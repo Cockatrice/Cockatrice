@@ -1,0 +1,104 @@
+#include <QtGui>
+#include "zoneviewzone.h"
+#include "player.h"
+#include "client.h"
+
+ZoneViewZone::ZoneViewZone(Player *_p, PlayerZone *_origZone, int _numberCards, QGraphicsItem *parent)
+	: PlayerZone(_p, _origZone->getName(), parent, true), numberCards(_numberCards), origZone(_origZone)
+{
+	cards = new CardList(true);
+	origZone->addView(this);
+}
+
+ZoneViewZone::~ZoneViewZone()
+{
+	qDebug("ZoneViewZone destructor");
+	origZone->removeView(this);
+}
+
+QRectF ZoneViewZone::boundingRect() const
+{
+	return QRectF(0, 0, CARD_WIDTH * 1.75, scene()->sceneRect().height());
+}
+
+void ZoneViewZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+	Q_UNUSED(painter);
+	Q_UNUSED(option);
+	Q_UNUSED(widget);
+}
+
+bool ZoneViewZone::initializeCards()
+{
+	if (!origZone->contentsKnown())
+		return false;
+
+	CardList *const c = origZone->getCards();
+	int number = numberCards == 0 ? c->size() : (numberCards < c->size() ? numberCards : c->size());
+	for (int i = 0; i < number; i++) {
+		CardItem *card = c->at(i);
+		addCard(new CardItem(player->getDb(), card->getName(), card->getId(), this), false, i);
+	}
+	reorganizeCards();
+	return true;
+}
+
+// Because of boundingRect(), this function must not be called before the zone was added to a scene.
+void ZoneViewZone::reorganizeCards()
+{
+	qDebug("reorganizeCards");
+
+	if (cards->isEmpty())
+		return;
+
+	int cardCount = cards->size();
+	qreal totalWidth = boundingRect().width();
+	qreal totalHeight = boundingRect().height();
+	qreal cardWidth = cards->at(0)->boundingRect().width();
+	qreal cardHeight = cards->at(0)->boundingRect().height();
+	qreal x1 = 0;
+	qreal x2 = (totalWidth - cardWidth);
+
+	for (int i = 0; i < cardCount; i++) {
+		CardItem *c = cards->at(i);
+		qreal x = i % 2 ? x2 : x1;
+		// If the total height of the cards is smaller than the available height,
+		// the cards do not need to overlap and are displayed in the center of the area.
+		if (cardHeight * cardCount > totalHeight)
+			c->setPos(x, ((qreal) i) * (totalHeight - cardHeight) / (cardCount - 1));
+		else
+			c->setPos(x, ((qreal) i) * cardHeight + (totalHeight - cardCount * cardHeight) / 2);
+		if (!origZone->contentsKnown())
+			c->setId(i);
+		c->setZValue(i);
+	}
+}
+
+void ZoneViewZone::addCard(CardItem *card, bool reorganize, int x, int y)
+{
+	Q_UNUSED(y);
+	qDebug(QString("ZoneViewZone: inserting '%1' at x=%2").arg(card->getName()).arg(x).toLatin1());
+	cards->insert(x, card);
+	card->setParentItem(this);
+	card->update(card->boundingRect());
+	if (reorganize)
+		reorganizeCards();
+}
+
+void ZoneViewZone::handleDropEvent(int cardId, PlayerZone *startZone, const QPoint &dropPoint)
+{
+	Q_UNUSED(dropPoint);
+	qDebug(QString("handleDropEvent id=%1").arg(cardId).toLatin1());
+	player->client->moveCard(cardId, startZone->getName(), getName(), 0, 0);
+}
+
+void ZoneViewZone::removeCard(int position)
+{
+	if (position >= cards->size())
+		return;
+
+	CardItem *card = cards->at(position);
+	cards->removeAt(position);
+	delete card;
+	reorganizeCards();
+}
