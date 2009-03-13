@@ -38,7 +38,7 @@ void myMessageOutput(QtMsgType type, const char *msg)
 
 int main(int argc, char *argv[])
 {
-	qInstallMsgHandler(myMessageOutput);
+//	qInstallMsgHandler(myMessageOutput);
       QApplication app(argc, argv);
       app.addLibraryPath("plugins");
       QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));

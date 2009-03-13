@@ -102,11 +102,6 @@ void Client::readLine()
 				c = i.next();
 				if (c->getMsgId() == msgid) {
 					found = true;
-
-					QString cmd = c->getCmd();
-					if (cmd.startsWith("submit_deck"))
-						readyStart();
-
 					break;
 				}
 			}
@@ -276,14 +271,13 @@ int Client::setCardAttr(const QString &zone, int cardid, const QString &aname, c
 	return cmd(QString("set_card_attr|%1|%2|%3|%4").arg(zone).arg(cardid).arg(aname).arg(avalue));
 }
 
-int Client::submitDeck(const QStringList &deck)
+void Client::submitDeck(const QStringList &deck)
 {
-	int retval = cmd("submit_deck");
+	cmd("submit_deck");
 	QStringListIterator i(deck);
 	while (i.hasNext())
 		msg(i.next());
 	msg(".");
-	return retval;
 }
 
 int Client::readyStart()

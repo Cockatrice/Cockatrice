@@ -57,7 +57,7 @@ public:
 	~Client();
 	ProtocolStatus getStatus() { return status; }
 	QString peerName() const { return socket->peerName(); }
-
+	
 	void connectToServer(const QString &hostname, unsigned int port, const QString &playername);
 	void disconnectFromServer();
 	int listGames();
@@ -73,7 +73,6 @@ public:
 	int moveCard(int cardid, const QString &startzone, const QString &targetzone, int x, int y = 0);
 	int createToken(const QString &zone, const QString &name, const QString &powtough, int x, int y);
 	int setCardAttr(const QString &zone, int cardid, const QString &aname, const QString &avalue);
-	int submitDeck(const QStringList &deck);
 	int readyStart();
 	int incCounter(const QString &counter, int delta);
 	int setCounter(const QString &counter, int value);
@@ -81,6 +80,8 @@ public:
 	int setActivePlayer(int player);
 	int setActivePhase(int phase);
 	int dumpZone(int player, const QString &zone, int numberCards);
+public slots:
+	void submitDeck(const QStringList &deck);
 };
 
 #endif

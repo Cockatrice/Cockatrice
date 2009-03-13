@@ -49,6 +49,8 @@ void DlgStartGame::actLoad()
 		}
 		card->getPixmap();
 	}
+	
+	emit newDeckLoaded(getDeckList());
 }
 
 QStringList DlgStartGame::getDeckList() const

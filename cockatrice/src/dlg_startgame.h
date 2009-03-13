@@ -13,6 +13,8 @@ class DlgStartGame: public QDialog {
 public:
 	DlgStartGame(CardDatabase *_db, QWidget *parent = 0);
 	QStringList getDeckList() const;
+signals:
+	void newDeckLoaded(const QStringList &cards);
 private slots:
 	void actLoad();
 private:

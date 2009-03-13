@@ -130,7 +130,6 @@ void MainWindow::buttonSay()
 void MainWindow::playerIdReceived(int id, QString name)
 {
 	game = new Game(db, client, scene, actionsMenu, cardMenu, id, name);
-	connect(game, SIGNAL(submitDecklist()), this, SLOT(decklistDialog()));
 	connect(game, SIGNAL(hoverCard(QString)), this, SLOT(hoverCard(QString)));
 	connect(game, SIGNAL(playerAdded(Player *)), this, SLOT(playerAdded(Player *)));
 	connect(game, SIGNAL(playerRemoved(Player *)), this, SLOT(playerRemoved(Player *)));

@@ -47,6 +47,7 @@ private slots:
 
 	void gameEvent(ServerEventData *msg);
 	void playerListReceived(QList<ServerPlayer *> playerList);
+	void readyStart(int foo);
 signals:
 	void submitDecklist();
 	void hoverCard(QString name);

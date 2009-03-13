@@ -96,9 +96,11 @@ void TestServerGame::startGameIfReady()
 	for (int i = 0; i < players.size(); i++)
 		if (players.at(i)->getStatus() != StatusReadyStart)
 			return;
-			
-	rnd = new TestRandom(this);
-	rnd->init();
+	
+	if (!rnd) {
+		rnd = new TestRandom(this);
+		rnd->init();
+	}
 	
 	for (int i = 0; i < players.size(); i++)
 		players.at(i)->setupZones();
