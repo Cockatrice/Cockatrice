@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include <QtGui>
-#include <QtOpenGL>
+//#include <QtOpenGL>
 
 #include "window.h"
 #include "dlg_connect.h"

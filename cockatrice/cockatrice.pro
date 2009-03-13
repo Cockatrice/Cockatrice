@@ -7,7 +7,8 @@ TARGET =
 DEPENDPATH += . src
 INCLUDEPATH += . src
 
-QT += network opengl
+QT += network
+#QT += opengl
 #QTPLUGIN += qjpeg
 
 # Input
