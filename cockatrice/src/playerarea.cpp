@@ -37,6 +37,7 @@ PlayerArea::PlayerArea(Player *_player, QGraphicsItem *parent)
 	table->setPos(base);
 	
 	bRect = QRectF(0, 0, base.x() + table->boundingRect().width(), base.y() + table->boundingRect().height());
+	qDebug(QString("%1").arg(bRect.width()).toLatin1());
 }
 
 PlayerArea::~PlayerArea()
