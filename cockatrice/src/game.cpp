@@ -305,7 +305,7 @@ void Game::actTap()
 	QListIterator<QGraphicsItem *> i(scene->selectedItems());
 	while (i.hasNext()) {
 		CardItem *temp = (CardItem *) i.next();
-		client->setCardAttr(qgraphicsitem_cast<PlayerZone *>(temp->parentItem())->getName(), temp->getId(), "tapped", "1");
+		client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "tapped", "1");
 	}
 }
 
@@ -314,7 +314,7 @@ void Game::actUntap()
 	QListIterator<QGraphicsItem *> i(scene->selectedItems());
 	while (i.hasNext()) {
 		CardItem *temp = (CardItem *) i.next();
-		client->setCardAttr(qgraphicsitem_cast<PlayerZone *>(temp->parentItem())->getName(), temp->getId(), "tapped", "0");
+		client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "tapped", "0");
 	}
 }
 
@@ -324,7 +324,7 @@ void Game::actAddCounter()
 	while (i.hasNext()) {
 		CardItem *temp = (CardItem *) i.next();
 		if (temp->getCounters() < MAX_COUNTERS_ON_CARD)
-			client->setCardAttr(qgraphicsitem_cast<PlayerZone *>(temp->parentItem())->getName(), temp->getId(), "counters", QString::number(temp->getCounters() + 1));
+			client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "counters", QString::number(temp->getCounters() + 1));
 	}
 }
 
@@ -334,7 +334,7 @@ void Game::actRemoveCounter()
 	while (i.hasNext()) {
 		CardItem *temp = (CardItem *) i.next();
 		if (temp->getCounters())
-			client->setCardAttr(qgraphicsitem_cast<PlayerZone *>(temp->parentItem())->getName(), temp->getId(), "counters", QString::number(temp->getCounters() - 1));
+			client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "counters", QString::number(temp->getCounters() - 1));
 	}
 }
 
@@ -348,7 +348,7 @@ void Game::actSetCounters()
 	QListIterator<QGraphicsItem *> i(scene->selectedItems());
 	while (i.hasNext()) {
 		CardItem *temp = (CardItem *) i.next();
-		client->setCardAttr(qgraphicsitem_cast<PlayerZone *>(temp->parentItem())->getName(), temp->getId(), "counters", QString::number(number));
+		client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "counters", QString::number(number));
 	}
 }
 
@@ -371,7 +371,7 @@ void Game::actRearrange()
 
 	for (int i = 0; i < list.size(); i++) {
 		CardItem *temp = (CardItem *) list.at(i);
-		QString zoneName = qgraphicsitem_cast<PlayerZone *>(temp->parentItem())->getName();
+		QString zoneName = qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName();
 		x = x_initial + i * RASTER_WIDTH;
 		y = y_initial + (i % 3) * RASTER_HEIGHT;
 		client->moveCard(temp->getId(), zoneName, zoneName, x, y);

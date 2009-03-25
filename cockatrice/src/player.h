@@ -52,7 +52,7 @@ private:
 	CardDatabase *db;
 public:
 	Client *client;
-	void addZone(PlayerZone *z);
+	void addZone(CardZone *z);
 	void addCounter(Counter *c);
 	Player(const QString &_name, int _id, QPointF _base, bool _local, CardDatabase *_db, Client *_client);
 	~Player();

@@ -1,12 +1,12 @@
 #ifndef ZONELIST_H
 #define ZONELIST_H
 
-#include "playerzone.h"
+#include "cardzone.h"
 #include <QList>
 
-class ZoneList : public QList<PlayerZone *> {
+class ZoneList : public QList<CardZone *> {
 public:
-	PlayerZone *findZone(const QString &name) const;
+	CardZone *findZone(const QString &name) const;
 };
 
 #endif

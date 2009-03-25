@@ -5,7 +5,7 @@
 #include "zoneviewzone.h"
 
 RfgZone::RfgZone(Player *_p)
-	: PlayerZone(_p, "rfg")
+	: CardZone(_p, "rfg")
 {
 	cards = new CardList(true);
 }
@@ -42,7 +42,7 @@ void RfgZone::addCard(CardItem *card, bool reorganize, int x, int y)
 		reorganizeCards();
 }
 
-void RfgZone::handleDropEvent(int cardId, PlayerZone *startZone, const QPoint &dropPoint)
+void RfgZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint)
 {
 	player->client->moveCard(cardId, startZone->getName(), getName(), 0, 0);
 }

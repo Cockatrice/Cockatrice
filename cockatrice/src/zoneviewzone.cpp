@@ -3,8 +3,8 @@
 #include "player.h"
 #include "client.h"
 
-ZoneViewZone::ZoneViewZone(Player *_p, PlayerZone *_origZone, int _numberCards, QGraphicsItem *parent)
-	: PlayerZone(_p, _origZone->getName(), parent, true), numberCards(_numberCards), origZone(_origZone)
+ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, QGraphicsItem *parent)
+	: CardZone(_p, _origZone->getName(), parent, true), numberCards(_numberCards), origZone(_origZone)
 {
 	cards = new CardList(true);
 	origZone->addView(this);
@@ -85,7 +85,7 @@ void ZoneViewZone::addCard(CardItem *card, bool reorganize, int x, int y)
 		reorganizeCards();
 }
 
-void ZoneViewZone::handleDropEvent(int cardId, PlayerZone *startZone, const QPoint &dropPoint)
+void ZoneViewZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint)
 {
 	Q_UNUSED(dropPoint);
 	qDebug(QString("handleDropEvent id=%1").arg(cardId).toLatin1());

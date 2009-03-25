@@ -1,5 +1,5 @@
-#ifndef PLAYERZONE_H
-#define PLAYERZONE_H
+#ifndef CARDZONE_H
+#define CARDZONE_H
 
 #include <QString>
 #include "cardlist.h"
@@ -8,7 +8,7 @@ class Player;
 class ZoneViewZone;
 class QMenu;
 
-class PlayerZone : public QGraphicsItem {
+class CardZone : public QGraphicsItem {
 protected:
 	Player *player;
 	QString name;
@@ -20,9 +20,9 @@ protected:
 public:
 	enum { Type = typeZone };
 	int type() const { return Type; }
-	virtual void handleDropEvent(int cardId, PlayerZone *startZone, const QPoint &dropPoint) = 0;
-	PlayerZone(Player *_player, const QString &_name, QGraphicsItem *parent = 0, bool isView = false);
-	~PlayerZone();
+	virtual void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint) = 0;
+	CardZone(Player *_player, const QString &_name, QGraphicsItem *parent = 0, bool isView = false);
+	~CardZone();
 	void clearContents();
 	bool getHasCardAttr() const { return hasCardAttr; }
 	QMenu *getMenu() const { return menu; }

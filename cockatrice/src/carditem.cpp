@@ -3,7 +3,7 @@
 #include "carditem.h"
 #include "carddragitem.h"
 #include "carddatabase.h"
-#include "playerzone.h"
+#include "cardzone.h"
 #include "tablezone.h"
 #include "player.h"
 
@@ -105,7 +105,7 @@ void CardItem::resetState()
 	update(boundingRect());
 }
 
-CardDragItem *CardItem::createDragItem(PlayerZone *startZone, int _id, const QPointF &_pos, const QPointF &_scenePos)
+CardDragItem *CardItem::createDragItem(CardZone *startZone, int _id, const QPointF &_pos, const QPointF &_scenePos)
 {
 	dragItem = new CardDragItem(scene(), startZone, image, _id, _pos);
 	dragItem->setPos(_scenePos - dragItem->getHotSpot());
@@ -128,7 +128,7 @@ void CardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 	if (event->button() == Qt::LeftButton) {
 		setCursor(Qt::ClosedHandCursor);
 	} else if (event->button() == Qt::RightButton) {
-		qgraphicsitem_cast<PlayerZone *>(parentItem())->getPlayer()->showCardMenu(event->screenPos());
+		qgraphicsitem_cast<CardZone *>(parentItem())->getPlayer()->showCardMenu(event->screenPos());
 	}
 	event->accept();
 }
@@ -138,7 +138,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < QApplication::startDragDistance())
 		return;
 
-	createDragItem((PlayerZone *) parentItem(), id, event->pos(), event->scenePos());
+	createDragItem((CardZone *) parentItem(), id, event->pos(), event->scenePos());
 	dragItem->grabMouse();
 
 	QList<QGraphicsItem *> sel = scene()->selectedItems();
@@ -146,7 +146,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 		CardItem *c = (CardItem *) sel.at(i);
 		if (c == this)
 			continue;
-		CardDragItem *drag = new CardDragItem(scene(), (PlayerZone *) parentItem(), c->getImage(), c->getId(), QPointF(), dragItem);
+		CardDragItem *drag = new CardDragItem(scene(), (CardZone *) parentItem(), c->getImage(), c->getId(), QPointF(), dragItem);
 		drag->setPos(c->pos() - pos());
 	}
 
@@ -169,7 +169,7 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 	}
 	event->accept();
 
-	PlayerZone *zone = (PlayerZone *) parentItem();
+	CardZone *zone = (CardZone *) parentItem();
 	// Do nothing if the card belongs to another player
 	if (!zone->getPlayer()->getLocal())
 		return;
@@ -180,7 +180,7 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 void CardItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-	((PlayerZone *) parentItem())->hoverCardEvent(this);
+	((CardZone *) parentItem())->hoverCardEvent(this);
 	QGraphicsItem::hoverEnterEvent(event);
 }
 

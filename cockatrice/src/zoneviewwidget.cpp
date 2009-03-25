@@ -7,7 +7,7 @@
 #include "client.h"
 #include "zoneclosebutton.h"
 
-ZoneViewWidget::ZoneViewWidget(CardDatabase *_db, Player *_player, PlayerZone *_origZone, int numberCards, QGraphicsItem *parent)
+ZoneViewWidget::ZoneViewWidget(CardDatabase *_db, Player *_player, CardZone *_origZone, int numberCards, QGraphicsItem *parent)
 	: QGraphicsWidget(parent), db(_db), player(_player)
 {
 	ZoneCloseButton *closeButton = new ZoneCloseButton(this);

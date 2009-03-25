@@ -4,7 +4,7 @@
 #include "client.h"
 
 HandZone::HandZone(Player *_p)
-	: PlayerZone(_p, "hand")
+	: CardZone(_p, "hand")
 {
 	cards = new CardList(player->getLocal());
 }
@@ -66,7 +66,7 @@ void HandZone::addCard(CardItem *card, bool reorganize, int x, int y)
 		reorganizeCards();
 }
 
-void HandZone::handleDropEvent(int cardId, PlayerZone *startZone, const QPoint &dropPoint)
+void HandZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint)
 {
 	Q_UNUSED(dropPoint);
 	player->client->moveCard(cardId, startZone->getName(), getName(), cards->size(), 0);

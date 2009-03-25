@@ -5,7 +5,7 @@
 
 class CardDatabase;
 class CardDragItem;
-class PlayerZone;
+class CardZone;
 
 
 const int CARD_WIDTH = 72;
@@ -66,7 +66,7 @@ public:
 	void setAnnotation(const QString &_annotation);
 	void resetState();
 
-	CardDragItem *createDragItem(PlayerZone *startZone, int _id, const QPointF &_pos, const QPointF &_scenePos);
+	CardDragItem *createDragItem(CardZone *startZone, int _id, const QPointF &_pos, const QPointF &_scenePos);
 	void deleteDragItem();
 protected:
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);

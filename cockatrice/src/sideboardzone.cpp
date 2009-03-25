@@ -5,7 +5,7 @@
 #include "zoneviewzone.h"
 
 SideboardZone::SideboardZone(Player *_p)
-	: PlayerZone(_p, "sb")
+	: CardZone(_p, "sb")
 {
 	cards = new CardList(false);
 }
@@ -42,7 +42,7 @@ void SideboardZone::addCard(CardItem *card, bool reorganize, int x, int y)
 		reorganizeCards();
 }
 
-void SideboardZone::handleDropEvent(int cardId, PlayerZone *startZone, const QPoint &dropPoint)
+void SideboardZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint)
 {
 	player->client->moveCard(cardId, startZone->getName(), getName(), 0, 0);
 }

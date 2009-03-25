@@ -5,7 +5,7 @@
 #include "zoneviewzone.h"
 
 GraveZone::GraveZone(Player *_p)
-	: PlayerZone(_p, "grave")
+	: CardZone(_p, "grave")
 {
 	cards = new CardList(true);
 }
@@ -42,7 +42,7 @@ void GraveZone::addCard(CardItem *card, bool reorganize, int x, int y)
 		reorganizeCards();
 }
 
-void GraveZone::handleDropEvent(int cardId, PlayerZone *startZone, const QPoint &dropPoint)
+void GraveZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint)
 {
 	player->client->moveCard(cardId, startZone->getName(), getName(), 0, 0);
 }

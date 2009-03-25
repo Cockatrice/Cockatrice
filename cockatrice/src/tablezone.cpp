@@ -4,7 +4,7 @@
 #include "client.h"
 
 TableZone::TableZone(Player *_p)
-	: PlayerZone(_p, "table"), width(700), height(500)
+	: CardZone(_p, "table"), width(700), height(500)
 {
 	cards = new CardList(true);
 	hasCardAttr = true;
@@ -37,7 +37,7 @@ void TableZone::addCard(CardItem *card, bool reorganize, int x, int y)
 	card->update(card->boundingRect());
 }
 
-void TableZone::handleDropEvent(int cardId, PlayerZone *startZone, const QPoint &dropPoint)
+void TableZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint)
 {
 	player->client->moveCard(cardId, startZone->getName(), getName(), dropPoint.x(), dropPoint.y());
 }

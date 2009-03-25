@@ -7,7 +7,7 @@
 #include "zoneviewzone.h"
 
 LibraryZone::LibraryZone(Player *_p)
-	: PlayerZone(_p, "deck")
+	: CardZone(_p, "deck")
 {
 	cards = new CardList(false);
 	setCursor(Qt::OpenHandCursor);
@@ -47,7 +47,7 @@ void LibraryZone::addCard(CardItem *card, bool reorganize, int x, int y)
 		reorganizeCards();
 }
 
-void LibraryZone::handleDropEvent(int cardId, PlayerZone *startZone, const QPoint &dropPoint)
+void LibraryZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint)
 {
 	player->client->moveCard(cardId, startZone->getName(), getName(), 0, 0);
 }
@@ -59,7 +59,7 @@ void LibraryZone::reorganizeCards()
 
 void LibraryZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-	PlayerZone::mousePressEvent(event);
+	CardZone::mousePressEvent(event);
 	if (event->isAccepted())
 		return;
 

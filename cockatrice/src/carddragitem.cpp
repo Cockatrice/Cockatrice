@@ -1,8 +1,8 @@
 #include "carddragitem.h"
-#include "playerzone.h"
+#include "cardzone.h"
 #include <QtGui>
 
-CardDragItem::CardDragItem(QGraphicsScene *scene, PlayerZone *_startZone, QPixmap *_image, int _id, const QPointF &_hotSpot, QGraphicsItem *parent)
+CardDragItem::CardDragItem(QGraphicsScene *scene, CardZone *_startZone, QPixmap *_image, int _id, const QPointF &_hotSpot, QGraphicsItem *parent)
 	: QGraphicsItem(parent), image(_image), id(_id), hotSpot(_hotSpot), startZone(_startZone)
 {
 	if ((hotSpot.x() < 0) || (hotSpot.y() < 0)) {
@@ -46,9 +46,9 @@ void CardDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	QPointF sp = event->scenePos();
 	QList<QGraphicsItem *> colliding = scene()->items(sp);
 
-	PlayerZone *cursorZone = 0;
+	CardZone *cursorZone = 0;
 	for (int i = colliding.size() - 1; i >= 0; i--) {
-		if ((cursorZone = qgraphicsitem_cast<PlayerZone *>(colliding.at(i)))) {
+		if ((cursorZone = qgraphicsitem_cast<CardZone *>(colliding.at(i)))) {
 			if (cursorZone->getName() == "table") {
 				QPointF cp = cursorZone->scenePos();
 				QPointF localpos = sp - hotSpot - cp;
@@ -70,12 +70,12 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 	QList<QGraphicsItem *> colliding = sc->items(event->scenePos());
 
 	qDebug(QString("drop: %1 collisions").arg(colliding.size()).toLatin1());
-	PlayerZone *dropZone = 0;
+	CardZone *dropZone = 0;
 	for (int i = colliding.size() - 1; i >= 0; i--) {
 		QRectF bbox = colliding.at(i)->boundingRect();
 		qDebug(QString("bbox x %1 y %2 w %3 h %4").arg(bbox.x()).arg(bbox.y()).arg(bbox.width()).arg(bbox.height()).toLatin1());
 
-		if ((dropZone = qgraphicsitem_cast<PlayerZone *>(colliding.at(i)))) {
+		if ((dropZone = qgraphicsitem_cast<CardZone *>(colliding.at(i)))) {
 			qDebug("zone found");
 			break;
 		}

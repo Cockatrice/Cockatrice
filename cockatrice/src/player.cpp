@@ -31,11 +31,11 @@ Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDa
 
 	_base += QPointF(deck->boundingRect().width(), 0);
 
-	PlayerZone *hand = new HandZone(this);
+	CardZone *hand = new HandZone(this);
 	hand->setPos(_base);
 	_base += QPointF(hand->boundingRect().width(), 0);
 
-	PlayerZone *table = new TableZone(this);
+	CardZone *table = new TableZone(this);
 	table->setPos(_base);
 
 	aMoveHandToTopLibrary = new QAction(tr("Move to &top of library"), this);
@@ -99,13 +99,13 @@ Player::~Player()
 
 void Player::actMoveHandToTopLibrary()
 {
-	PlayerZone *library = zones.findZone("deck");
+	CardZone *library = zones.findZone("deck");
 	zones.findZone("hand")->moveAllToZone(library->getName(), 0);
 }
 
 void Player::actMoveHandToBottomLibrary()
 {
-	PlayerZone *library = zones.findZone("deck");
+	CardZone *library = zones.findZone("deck");
 	zones.findZone("hand")->moveAllToZone(library->getName(), library->getCards()->size());
 }
 
@@ -139,7 +139,7 @@ void Player::actViewSideboard()
 	emit addZoneView(this, "sb", 0);
 }
 
-void Player::addZone(PlayerZone *z)
+void Player::addZone(CardZone *z)
 {
 	zones << z;
 }
@@ -167,12 +167,12 @@ void Player::gameEvent(ServerEventData *event)
 			Counter *lifeCounter = counters.findCounter("life");
 			lifeCounter->setValue(life);
 
-			PlayerZone *deck = zones.findZone("deck");
+			CardZone *deck = zones.findZone("deck");
 			for (; deck_cards; deck_cards--)
 				deck->addCard(new CardItem(db, QString(), -1));
 			deck->reorganizeCards();
 
-			PlayerZone *sb = zones.findZone("sb");
+			CardZone *sb = zones.findZone("sb");
 			for (; sb_cards; sb_cards--)
 				sb->addCard(new CardItem(db, QString(), -1));
 			sb->reorganizeCards();
@@ -180,8 +180,8 @@ void Player::gameEvent(ServerEventData *event)
 			break;
 		}
 		case eventDraw: {
-			PlayerZone *deck = zones.findZone("deck");
-			PlayerZone *hand = zones.findZone("hand");
+			CardZone *deck = zones.findZone("deck");
+			CardZone *hand = zones.findZone("hand");
 			if (!event->getPublic()) {
 				hand->addCard(deck->takeCard(0, data[0].toInt(), data[1]));
 			} else {
@@ -198,11 +198,11 @@ void Player::gameEvent(ServerEventData *event)
 			}
 			int cardId = data[0].toInt();
 			QString cardName = data[1];
-			PlayerZone *startZone = zones.findZone(data[2]);
+			CardZone *startZone = zones.findZone(data[2]);
 			if (!startZone)
 				qDebug(QString("start zone invalid: %1").arg(data[2]).toLatin1());
 			int position = data[3].toInt();
-			PlayerZone *targetZone = zones.findZone(data[4]);
+			CardZone *targetZone = zones.findZone(data[4]);
 			if (!targetZone)
 				qDebug(QString("target zone invalid: %1").arg(data[4]).toLatin1());
 			int x = data[5].toInt();
@@ -228,7 +228,7 @@ void Player::gameEvent(ServerEventData *event)
 			if (data.size() != 6) {
 				qDebug("error");
 			}
-			PlayerZone *zone = zones.findZone(data[0]);
+			CardZone *zone = zones.findZone(data[0]);
 			int cardid = data[1].toInt();
 			QString cardname = data[2];
 			QString powtough = data[3];
@@ -246,7 +246,7 @@ void Player::gameEvent(ServerEventData *event)
 			if (data.size() != 4) {
 				// XXX
 			}
-			PlayerZone *zone = zones.findZone(data[0]);
+			CardZone *zone = zones.findZone(data[0]);
 			int cardId = data[1].toInt();
 			CardItem *card = zone->getCard(cardId, "");
 			QString aname = data[2];
