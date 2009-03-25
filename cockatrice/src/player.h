@@ -11,6 +11,7 @@ class Client;
 class CardDatabase;
 class QMenu;
 class QAction;
+class PlayerArea;
 
 class Player : public QObject {
 	Q_OBJECT
@@ -42,6 +43,8 @@ private:
 	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary,
 		*aViewLibrary, *aViewTopCards, *aViewGraveyard, *aViewRfg, *aViewSideboard;
 
+	PlayerArea *area;
+	
 	int defaultNumberTopCards;
 	QString name;
 	int id;
@@ -54,7 +57,7 @@ public:
 	Client *client;
 	void addZone(CardZone *z);
 	void addCounter(Counter *c);
-	Player(const QString &_name, int _id, QPointF _base, bool _local, CardDatabase *_db, Client *_client);
+	Player(const QString &_name, int _id, QPointF _base, bool _local, CardDatabase *_db, Client *_client, QGraphicsScene *_scene);
 	~Player();
 	QMenu *getPlayerMenu() const { return playerMenu; }
 	int getId() const { return id; }

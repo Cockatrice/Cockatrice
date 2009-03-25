@@ -10,7 +10,7 @@ class TableZone : public CardZone {
 private:
 	int width, height;
 public:
-	TableZone(Player *_p);
+	TableZone(Player *_p, QGraphicsItem *parent = 0);
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	void addCard(CardItem *card, bool reorganize = true, int x = -1, int y = -1);

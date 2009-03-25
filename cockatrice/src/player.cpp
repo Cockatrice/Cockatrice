@@ -1,42 +1,19 @@
 #include "player.h"
 #include "client.h"
-#include "handzone.h"
-#include "tablezone.h"
-#include "libraryzone.h"
-#include "gravezone.h"
-#include "rfgzone.h"
-#include "sideboardzone.h"
+#include "cardzone.h"
+#include "playerarea.h"
+#include <QGraphicsScene>
 #include <QMenu>
 
-Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDatabase *_db, Client *_client)
+Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDatabase *_db, Client *_client, QGraphicsScene *_scene)
 	: QObject(), defaultNumberTopCards(3), name(_name), id(_id), base(_base), local(_local), db(_db), client(_client)
 {
-	LibraryZone *deck = new LibraryZone(this);
-	deck->setPos(_base);
-
-	// XXX
-	qreal foo = deck->boundingRect().height();
-
-	GraveZone *grave = new GraveZone(this);
-	grave->setPos(_base + QPointF(0, foo));
-
-	RfgZone *rfg = new RfgZone(this);
-	rfg->setPos(_base + QPointF(0, 2 * foo));
-
-	SideboardZone *sb = new SideboardZone(this);
-	sb->setPos(_base + QPointF(0, 3 * foo));
+	area = new PlayerArea(this);
+	area->setPos(_base);
+	_scene->addItem(area);
 
 	Counter *life = new Counter(this, "life");
-	life->setPos(_base + QPointF(-50, 5 * foo));
-
-	_base += QPointF(deck->boundingRect().width(), 0);
-
-	CardZone *hand = new HandZone(this);
-	hand->setPos(_base);
-	_base += QPointF(hand->boundingRect().width(), 0);
-
-	CardZone *table = new TableZone(this);
-	table->setPos(_base);
+	life->setPos(_base + QPointF(-50, 500));
 
 	aMoveHandToTopLibrary = new QAction(tr("Move to &top of library"), this);
 	connect(aMoveHandToTopLibrary, SIGNAL(triggered()), this, SLOT(actMoveHandToTopLibrary()));
@@ -66,24 +43,24 @@ Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDa
 	QMenu *handMenu = playerMenu->addMenu(tr("&Hand"));
 	handMenu->addAction(aMoveHandToTopLibrary);
 	handMenu->addAction(aMoveHandToBottomLibrary);
-	hand->setMenu(handMenu);
+	zones.findZone("hand")->setMenu(handMenu);
 
 	QMenu *libraryMenu = playerMenu->addMenu(tr("&Library"));
 	libraryMenu->addAction(aViewLibrary);
 	libraryMenu->addAction(aViewTopCards);
-	deck->setMenu(libraryMenu);
+	zones.findZone("deck")->setMenu(libraryMenu);
 
 	QMenu *graveMenu = playerMenu->addMenu(tr("&Graveyard"));
 	graveMenu->addAction(aViewGraveyard);
-	grave->setMenu(graveMenu);
+	zones.findZone("grave")->setMenu(graveMenu);
 
 	QMenu *rfgMenu = playerMenu->addMenu(tr("&Removed cards"));
 	rfgMenu->addAction(aViewRfg);
-	rfg->setMenu(rfgMenu);
+	zones.findZone("rfg")->setMenu(rfgMenu);
 
 	QMenu *sbMenu = playerMenu->addMenu(tr("&Sideboard"));
 	sbMenu->addAction(aViewSideboard);
-	sb->setMenu(sbMenu);
+	zones.findZone("sb")->setMenu(sbMenu);
 }
 
 Player::~Player()
@@ -95,6 +72,8 @@ Player::~Player()
 
 	for (int i = 0; i < counters.size(); i++)
 		delete counters.at(i);
+	
+	delete area;
 }
 
 void Player::actMoveHandToTopLibrary()

@@ -4,15 +4,15 @@
 #include "client.h"
 #include "zoneviewzone.h"
 
-RfgZone::RfgZone(Player *_p)
-	: CardZone(_p, "rfg")
+RfgZone::RfgZone(Player *_p, QGraphicsItem *parent)
+	: CardZone(_p, "rfg", parent)
 {
 	cards = new CardList(true);
 }
 
 QRectF RfgZone::boundingRect() const
 {
-	return QRectF(0, 0, 50, 50);
+	return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
 }
 
 void RfgZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -20,10 +20,15 @@ void RfgZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 	Q_UNUSED(option);
 	Q_UNUSED(widget);
 	painter->save();
-	painter->fillRect(boundingRect(), QColor("white"));
-	painter->setFont(QFont("Times", 20, QFont::Bold));
+	
+	painter->fillRect(boundingRect(), QColor("yellow"));
+	
+	painter->setFont(QFont("Times", 32, QFont::Bold));
 	painter->setPen(QPen(QColor("black")));
+	painter->setBackground(QBrush(QColor(255, 255, 255, 100)));
+	painter->setBackgroundMode(Qt::OpaqueMode);
 	painter->drawText(boundingRect(), Qt::AlignCenter, QString::number(cards->size()));
+
 	painter->restore();
 }
 

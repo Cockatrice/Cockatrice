@@ -6,7 +6,7 @@
 class LibraryZone : public CardZone {
 private:
 public:
-	LibraryZone(Player *_p);
+	LibraryZone(Player *_p, QGraphicsItem *parent = 0);
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	void addCard(CardItem *card, bool reorganize = true, int x = 0, int y = -1);

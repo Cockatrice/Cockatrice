@@ -4,15 +4,15 @@
 #include "client.h"
 #include "zoneviewzone.h"
 
-GraveZone::GraveZone(Player *_p)
-	: CardZone(_p, "grave")
+GraveZone::GraveZone(Player *_p, QGraphicsItem *parent)
+	: CardZone(_p, "grave", parent)
 {
 	cards = new CardList(true);
 }
 
 QRectF GraveZone::boundingRect() const
 {
-	return QRectF(0, 0, 50, 50);
+	return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
 }
 
 void GraveZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -20,10 +20,15 @@ void GraveZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 	Q_UNUSED(option);
 	Q_UNUSED(widget);
 	painter->save();
+	
 	painter->fillRect(boundingRect(), QColor("yellow"));
-	painter->setFont(QFont("Times", 20, QFont::Bold));
+	
+	painter->setFont(QFont("Times", 32, QFont::Bold));
 	painter->setPen(QPen(QColor("black")));
+	painter->setBackground(QBrush(QColor(255, 255, 255, 100)));
+	painter->setBackgroundMode(Qt::OpaqueMode);
 	painter->drawText(boundingRect(), Qt::AlignCenter, QString::number(cards->size()));
+	
 	painter->restore();
 }
 

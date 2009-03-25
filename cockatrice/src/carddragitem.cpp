@@ -82,13 +82,13 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 	}
 
 	if (dropZone) {
-		dropZone->handleDropEvent(id, startZone, (sp - dropZone->pos()).toPoint());
+		dropZone->handleDropEvent(id, startZone, (sp - dropZone->scenePos()).toPoint());
 		QList<QGraphicsItem *> childList = childItems();
 		for (int i = 0; i < childList.size(); i++) {
 			CardDragItem *c = qgraphicsitem_cast<CardDragItem *>(childList.at(i));
 			if (!c)
 				QMessageBox::critical(0, "fehler", "null");
-			dropZone->handleDropEvent(c->id, startZone, (sp - dropZone->pos() + c->pos()).toPoint());
+			dropZone->handleDropEvent(c->id, startZone, (sp - dropZone->scenePos() + c->pos()).toPoint());
 		}
 	} else
 		QMessageBox::critical(0, "fehler", "fehler");

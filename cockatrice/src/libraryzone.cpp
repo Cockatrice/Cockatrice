@@ -6,16 +6,19 @@
 #include "carddragitem.h"
 #include "zoneviewzone.h"
 
-LibraryZone::LibraryZone(Player *_p)
-	: CardZone(_p, "deck")
+LibraryZone::LibraryZone(Player *_p, QGraphicsItem *parent)
+	: CardZone(_p, "deck", parent)
 {
 	cards = new CardList(false);
 	setCursor(Qt::OpenHandCursor);
+	setCacheMode(DeviceCoordinateCache);
+	
+	image = player->getDb()->getCard()->getPixmap();
 }
 
 QRectF LibraryZone::boundingRect() const
 {
-	return QRectF(0, 0, 50, 50);
+	return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
 }
 
 void LibraryZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -23,10 +26,17 @@ void LibraryZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 	Q_UNUSED(option);
 	Q_UNUSED(widget);
 	painter->save();
-	painter->fillRect(boundingRect(), QColor("red"));
-	painter->setFont(QFont("Times", 20, QFont::Bold));
+
+	QRectF foo = option->matrix.mapRect(boundingRect());
+	QPixmap bar = image->scaled((int) foo.width(), (int) foo.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	painter->drawPixmap(boundingRect(), bar, bar.rect());
+
+	painter->setFont(QFont("Times", 32, QFont::Bold));
 	painter->setPen(QPen(QColor("black")));
+	painter->setBackground(QBrush(QColor(255, 255, 255, 100)));
+	painter->setBackgroundMode(Qt::OpaqueMode);
 	painter->drawText(boundingRect(), Qt::AlignCenter, QString::number(cards->size()));
+
 	painter->restore();
 }
 

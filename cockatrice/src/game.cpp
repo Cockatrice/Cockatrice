@@ -99,15 +99,7 @@ Game::~Game()
 
 Player *Game::addPlayer(int playerId, const QString &playerName, QPointF base, bool local)
 {
-	Player *newPlayer = new Player(playerName, playerId, base, local, db, client);
-
-	const ZoneList *const z = newPlayer->getZones();
-	for (int i = 0; i < z->size(); i++)
-		scene->addItem(z->at(i));
-
-	const CounterList *const c = newPlayer->getCounters();
-	for (int i = 0; i < c->size(); i++)
-		scene->addItem(c->at(i));
+	Player *newPlayer = new Player(playerName, playerId, base, local, db, client, scene);
 
 	connect(newPlayer, SIGNAL(hoverCard(QString)), this, SIGNAL(hoverCard(QString)));
 	connect(newPlayer, SIGNAL(sigShowCardMenu(QPoint)), this, SLOT(showCardMenu(QPoint)));

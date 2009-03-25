@@ -6,7 +6,7 @@
 class SideboardZone : public CardZone {
 private:
 public:
-	SideboardZone(Player *_p);
+	SideboardZone(Player *_p, QGraphicsItem *parent = 0);
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	void addCard(CardItem *card, bool reorganize = true, int x = 0, int y = -1);

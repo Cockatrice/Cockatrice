@@ -4,8 +4,8 @@
 #include "client.h"
 #include "zoneviewzone.h"
 
-SideboardZone::SideboardZone(Player *_p)
-	: CardZone(_p, "sb")
+SideboardZone::SideboardZone(Player *_p, QGraphicsItem *parent)
+	: CardZone(_p, "sb", parent)
 {
 	cards = new CardList(false);
 }
