@@ -37,7 +37,11 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 	painter->save();
 	QRectF foo = option->matrix.mapRect(boundingRect());
 	qDebug(QString("%1: w=%2,h=%3").arg(name).arg(foo.width()).arg(foo.height()).toLatin1());
-	QPixmap bar = image->scaled((int) foo.width(), (int) foo.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	QPixmap bar;
+	if (tapped)
+		bar = image->scaled((int) foo.height(), (int) foo.width(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	else
+		bar = image->scaled((int) foo.width(), (int) foo.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 //	painter->drawPixmap(boundingRect(), *image, QRectF(0, 0, image->width(), image->height()));
 	painter->drawPixmap(boundingRect(), bar, bar.rect());
 	if (isSelected()) {
@@ -195,7 +199,8 @@ QVariant CardItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QV
 		// XXX
 		return value;
 	} else if (change == ItemSelectedHasChanged) {
-		update();
+		qDebug("selection changed");
+		update(boundingRect());
 		return value;
 	} else
 		return QGraphicsItem::itemChange(change, value);

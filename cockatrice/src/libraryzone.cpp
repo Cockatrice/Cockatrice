@@ -85,6 +85,9 @@ void LibraryZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < QApplication::startDragDistance())
 		return;
 
+	if (cards->empty())
+		return;
+		
 	CardItem *card = cards->at(0);
 	CardDragItem *drag = card->createDragItem(this, 0, event->pos(), event->scenePos());
 	drag->grabMouse();

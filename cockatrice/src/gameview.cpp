@@ -4,8 +4,8 @@ GameView::GameView(QGraphicsScene *scene, QWidget *parent)
 	: QGraphicsView(scene, parent)
 {
 	setBackgroundBrush(QBrush(QColor(0, 0, 0)));
-	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-	setOptimizationFlags(/*DontClipPainter | */DontSavePainterState);
+	setRenderHints(QPainter::Antialiasing/* | QPainter::SmoothPixmapTransform*/);
+//	setOptimizationFlags(/*DontClipPainter | */DontSavePainterState);
 	setDragMode(RubberBandDrag);
 }
 
