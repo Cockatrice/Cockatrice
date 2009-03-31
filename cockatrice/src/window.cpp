@@ -203,7 +203,6 @@ MainWindow::MainWindow(QWidget *parent)
 	view = new GameView(scene);
 
 //	view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
-//	view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
 	zoneLayout = new ZoneViewLayout(db);
 	zoneLayout->setPos(912, 0);
