@@ -250,7 +250,8 @@ void Game::actSetLife()
 {
 	bool ok;
 	int life = QInputDialog::getInteger(0, tr("Set life"), tr("New life total:"), localPlayer->getCounters()->findCounter("life")->getValue(), 0, 2000000000, 1, &ok);
-	client->setCounter("life", life);
+	if (ok)
+		client->setCounter("life", life);
 }
 
 void Game::actShuffle()
@@ -281,10 +282,7 @@ void Game::actDrawCards()
 void Game::actCreateToken()
 {
 	QString cardname = QInputDialog::getText(0, tr("Create token"), tr("Name:"));
-	if (!db->getCard(cardname))
-		QMessageBox::critical(0, "Error", "No such card");
-	else
-		client->createToken("table", cardname, QString(), 0, 0);
+	client->createToken("table", cardname, QString(), 0, 0);
 }
 
 void Game::showCardMenu(QPoint p)

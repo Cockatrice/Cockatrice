@@ -114,9 +114,14 @@ void MainWindow::updateSceneSize()
 {
 	QRectF sr = scene->sceneRect();
 	QSizeF zoneSize = zoneLayout->size();
-	qDebug(QString("updateSceneSize: width=%1").arg(912 + zoneSize.width()).toLatin1());
-	scene->setSceneRect(sr.x(), sr.y(), 912 + zoneSize.width(), sr.height());
+	qDebug(QString("updateSceneSize: width=%1").arg(932 + zoneSize.width()).toLatin1());
+	scene->setSceneRect(sr.x(), sr.y(), 932 + zoneSize.width(), sr.height());
 	view->scaleToScene();
+}
+
+void MainWindow::textChanged(const QString &text)
+{
+	sayButton->setEnabled(!text.isEmpty());
 }
 
 // Knöpfe
@@ -199,13 +204,13 @@ MainWindow::MainWindow(QWidget *parent)
 	int cardCount = db->loadFromFile("../cards.dat");
 	qDebug(QString("%1 cards loaded").arg(cardCount).toLatin1());
 
-	scene = new QGraphicsScene(0, 0, 912, 1000, this);
+	scene = new QGraphicsScene(0, 0, 932, 1020, this);
 	view = new GameView(scene);
 
 //	view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
 	zoneLayout = new ZoneViewLayout(db);
-	zoneLayout->setPos(912, 0);
+	zoneLayout->setPos(932, 0);
 	scene->addItem(zoneLayout);
 	connect(zoneLayout, SIGNAL(sizeChanged()), this, SLOT(updateSceneSize()));
 
@@ -213,6 +218,7 @@ MainWindow::MainWindow(QWidget *parent)
 	messageLog = new MessageLogWidget;
 	sayEdit = new QLineEdit;
 	sayButton = new QPushButton(tr("&Say"));
+	sayButton->setEnabled(false);
 
 	QHBoxLayout *hLayout = new QHBoxLayout;
 	hLayout->addWidget(sayEdit);
@@ -232,7 +238,8 @@ MainWindow::MainWindow(QWidget *parent)
 	centralWidget->setLayout(mainLayout);
 	setCentralWidget(centralWidget);
 
-	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(buttonSay()));
+	connect(sayEdit, SIGNAL(returnPressed()), sayButton, SLOT(click()));
+	connect(sayEdit, SIGNAL(textChanged(const QString &)), this, SLOT(textChanged(const QString &)));
 	connect(sayButton, SIGNAL(clicked()), this, SLOT(buttonSay()));
 
 	client = new Client(this);
