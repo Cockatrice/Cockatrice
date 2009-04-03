@@ -47,6 +47,7 @@ private slots:
 	void playerIdReceived(int id, QString name);
 	void serverTimeout();
 
+	void textChanged(const QString &text);
 	void buttonSay();
 
 	void actConnect();
