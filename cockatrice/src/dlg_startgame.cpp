@@ -8,7 +8,7 @@ DlgStartGame::DlgStartGame(CardDatabase *_db, QWidget *parent)
 	: QDialog(parent), db(_db)
 {
 	tableView = new QTreeView;
-	tableModel = new DeckListModel(this);
+	tableModel = new DeckListModel(db, this);
 	tableView->setModel(tableModel);
 
 	loadButton = new QPushButton(tr("&Load..."));
@@ -36,19 +36,9 @@ DlgStartGame::DlgStartGame(CardDatabase *_db, QWidget *parent)
 void DlgStartGame::actLoad()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Load deck"), QString(), tr("Deck files (*.dec)"));
-	if (!fileName.isEmpty())
-		tableModel->loadFromFile(fileName);
-
-	// Precache card pictures
-	for (int i = 0; i < tableModel->rowCount(); i++) {
-		QString cardName = tableModel->getRow(i)->getCard();
-		CardInfo *card = db->getCard(cardName);
-		if (!card) {
-			qDebug(QString("Invalid card: %1").arg(cardName).toLatin1());
-			continue;
-		}
-		card->getPixmap();
-	}
+	if (fileName.isEmpty())
+		return;
+	tableModel->loadFromFile(fileName);
 	
 	emit newDeckLoaded(getDeckList());
 }

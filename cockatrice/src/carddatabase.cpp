@@ -97,6 +97,17 @@ CardInfo *CardDatabase::getCard(const QString &cardName)
 	}
 }
 
+QList<CardInfo *>CardDatabase::getCardList()
+{
+	QList<CardInfo *> cardList;
+	QHashIterator<QString, CardInfo *> i(hash);
+	while (i.hasNext()) {
+		i.next();
+		cardList.append(i.value());
+	}
+	return cardList;
+}
+
 void CardDatabase::importOracle()
 {
 	clear();

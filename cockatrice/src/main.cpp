@@ -22,7 +22,7 @@
 #include <QApplication>
 #include <QTextCodec>
 #include <QtPlugin>
-#include "window.h"
+#include "window_main.h"
 #include <stdio.h>
 
 //Q_IMPORT_PLUGIN(qjpeg)

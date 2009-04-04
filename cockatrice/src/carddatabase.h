@@ -43,6 +43,7 @@ public:
 	~CardDatabase();
 	void clear();
 	CardInfo *getCard(const QString &cardName = QString());
+	QList<CardInfo *> getCardList();
 	void importOracle();
 	int loadFromFile(const QString &fileName);
 	bool saveToFile(const QString &fileName);

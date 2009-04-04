@@ -20,9 +20,10 @@
 #include <QtGui>
 //#include <QtOpenGL>
 
-#include "window.h"
+#include "window_main.h"
 #include "dlg_connect.h"
 #include "dlg_games.h"
+#include "window_deckeditor.h"
 #include "cardinfowidget.h"
 #include "messagelogwidget.h"
 
@@ -105,6 +106,12 @@ void MainWindow::actLeaveGame()
 	aGames->setEnabled(true);
 }
 
+void MainWindow::actDeckEditor()
+{
+	WndDeckEditor *deckEditor = new WndDeckEditor(db, this);
+	deckEditor->show();
+}
+
 void MainWindow::actExit()
 {
 	close();
@@ -170,6 +177,8 @@ void MainWindow::createActions()
 	aLeaveGame = new QAction(tr("&Leave game"), this);
 	aLeaveGame->setEnabled(false);
 	connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
+	aDeckEditor = new QAction(tr("&Deck editor"), this);
+	connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
 	aExit = new QAction(tr("&Exit"), this);
 	connect(aExit, SIGNAL(triggered()), this, SLOT(actExit()));
 }
@@ -183,6 +192,8 @@ void MainWindow::createMenus()
 	gameMenu->addAction(aGames);
 	gameMenu->addAction(aRestartGame);
 	gameMenu->addAction(aLeaveGame);
+	gameMenu->addSeparator();
+	gameMenu->addAction(aDeckEditor);
 	gameMenu->addSeparator();
 	gameMenu->addAction(aExit);
 

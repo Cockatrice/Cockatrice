@@ -54,6 +54,7 @@ private slots:
 	void actDisconnect();
 	void actGames();
 	void actLeaveGame();
+	void actDeckEditor();
 	void actExit();
 
 	void updateSceneSize();
@@ -64,7 +65,7 @@ private:
 	void createActions();
 	void createMenus();
 	QMenu *gameMenu, *actionsMenu, *cardMenu;
-	QAction *aConnect, *aDisconnect, *aGames, *aRestartGame, *aLeaveGame, *aExit;
+	QAction *aConnect, *aDisconnect, *aGames, *aRestartGame, *aLeaveGame, *aDeckEditor, *aExit;
 
 	CardInfoWidget *cardInfo;
 	MessageLogWidget *messageLog;

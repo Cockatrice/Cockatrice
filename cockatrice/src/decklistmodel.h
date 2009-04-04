@@ -4,6 +4,8 @@
 #include <QAbstractListModel>
 #include <QList>
 
+class CardDatabase;
+
 class DecklistRow {
 private:
 	int number;
@@ -19,18 +21,20 @@ public:
 class DeckListModel : public QAbstractListModel {
 	Q_OBJECT
 public:
-	DeckListModel(QObject *parent = 0)
-		: QAbstractListModel(parent) { }
+	DeckListModel(CardDatabase *_db, QObject *parent = 0);
 	~DeckListModel();
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-	void loadFromFile(const QString &fileName);
+	bool loadFromFile(const QString &fileName);
+	bool saveToFile(const QString &fileName);
 	DecklistRow *getRow(int row) const;
-private:
-	QList<DecklistRow *> deckList;
 	void cleanList();
+private:
+	CardDatabase *db;
+	QList<DecklistRow *> deckList;
+	void cacheCardPictures();
 };
 
 #endif
