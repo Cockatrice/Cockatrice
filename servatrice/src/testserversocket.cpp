@@ -42,6 +42,11 @@ TestServerSocket::~TestServerSocket()
 		game->removePlayer(this);
 }
 
+int TestServerSocket::newCardId()
+{
+	return nextCardId++;
+}
+
 void TestServerSocket::setName(const QString &name)
 {
 	emit broadcastEvent(QString("name|%1|%2").arg(PlayerName).arg(name), this);
@@ -79,14 +84,14 @@ void TestServerSocket::setupZones()
 	// ------------------------------------------------------------------
 
 	// Create zones
-	PlayerZone *deck = new PlayerZone("deck", false, false, false);
+	PlayerZone *deck = new PlayerZone("deck", false, false, false, false);
 	zones << deck;
-	PlayerZone *sb = new PlayerZone("sb", false, false, false);
+	PlayerZone *sb = new PlayerZone("sb", false, false, false, false);
 	zones << sb;
-	zones << new PlayerZone("table", true, true, true);
-	zones << new PlayerZone("hand", false, false, true);
-	zones << new PlayerZone("grave", false, true, true);
-	zones << new PlayerZone("rfg", false, true, true);
+	zones << new PlayerZone("table", true, true, false, true);
+	zones << new PlayerZone("hand", false, false, true, true);
+	zones << new PlayerZone("grave", false, true, false, true);
+	zones << new PlayerZone("rfg", false, true, false, true);
 
 	// Create life counter
 	Counter *life = new Counter("life", 20);
@@ -301,8 +306,8 @@ bool TestServerSocket::parseCommand(QString line)
 
 		emit broadcastEvent(QString("draw|%1").arg(number), this);
 	} else if (!cmd.compare("move_card", Qt::CaseInsensitive)) {
-		// ID Karte, Startzone, Zielzone, Koordinaten X, Y
-		if (params.size() != 5)
+		// ID Karte, Startzone, Zielzone, Koordinaten X, Y, Facedown
+		if (params.size() != 6)
 			return remsg->send("syntax", false);
 		bool ok;
 		int cardid = params[0].toInt(&ok);
@@ -326,26 +331,43 @@ bool TestServerSocket::parseCommand(QString line)
 			if (!ok)
 				return remsg->send("syntax", false);
 		}
-		targetzone->insertCard(card, x, y);
+		bool facedown = params[5].toInt(&ok);
+		if (!ok)
+			return remsg->send("syntax", false);
 		remsg->send();
-		msg(QString("private|||move_card|%1|%2|%3|%4|%5|%6|%7").arg(card->getId())
-								    .arg(card->getName())
+		targetzone->insertCard(card, x, y);
+
+		QString privateCardName, publicCardName;
+		if (facedown)
+			card->setId(newCardId());
+		if ((!facedown && !card->getFaceDown())
+		  || (card->getFaceDown() && !facedown && startzone->isPublic() && targetzone->isPublic()))
+			publicCardName = card->getName();
+		if ((!facedown && !card->getFaceDown())
+		  || (card->getFaceDown() && !facedown && startzone->isPublic() && targetzone->isPublic())
+		  || (!facedown && targetzone->isPrivate()))
+			privateCardName = card->getName();
+		
+		card->setFaceDown(facedown);
+		msg(QString("private|||move_card|%1|%2|%3|%4|%5|%6|%7|%8").arg(card->getId())
+								    .arg(privateCardName)
 								    .arg(startzone->getName())
 								    .arg(position)
 								    .arg(targetzone->getName())
 								    .arg(x)
-								    .arg(y));
-		// Was ist mit Facedown-Karten?
+								    .arg(y)
+								    .arg(facedown ? 1 : 0));
 		if ((startzone->isPublic()) || (targetzone->isPublic()))
-			emit broadcastEvent(QString("move_card|%1|%2|%3|%4|%5|%6|%7").arg(card->getId())
-										 .arg(card->getName())
+			emit broadcastEvent(QString("move_card|%1|%2|%3|%4|%5|%6|%7|%8").arg(card->getId())
+										 .arg(publicCardName)
 										 .arg(startzone->getName())
 										 .arg(position)
 										 .arg(targetzone->getName())
 										 .arg(x)
-										 .arg(y), this);
+										 .arg(y)
+										 .arg(facedown ? 1 : 0), this);
 		else
-			emit broadcastEvent(QString("move_card|||%1|%2|%3|%4|%5").arg(startzone->getName())
+			emit broadcastEvent(QString("move_card|||%1|%2|%3|%4|%5|0").arg(startzone->getName())
 									     .arg(position)
 									     .arg(targetzone->getName())
 									     .arg(x)
@@ -361,7 +383,7 @@ bool TestServerSocket::parseCommand(QString line)
 		QString cardname = params[1];
 		int x = params[3].toInt();
 		int y = params[4].toInt();
-		int cardid = nextCardId++;
+		int cardid = newCardId();
 		QString powtough = params[2];
 
 		remsg->send();
@@ -389,13 +411,13 @@ bool TestServerSocket::parseCommand(QString line)
 		if (cardid == -1) {
 			QListIterator<TestCard *> CardIterator(zone->cards);
 			while (CardIterator.hasNext())
-				if (!CardIterator.next()->setAttribute(params[2], params[3]))
+				if (!CardIterator.next()->setAttribute(params[2], params[3], true))
 					return remsg->send("syntax", false);
 		} else {
 			TestCard *card = zone->getCard(cardid, false);
 			if (!card)
 				return remsg->send("game_state", false);
-			if (!card->setAttribute(params[2], params[3]))
+			if (!card->setAttribute(params[2], params[3], false))
 				return remsg->send("syntax", false);
 		}
 		remsg->send();

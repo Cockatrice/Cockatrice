@@ -31,17 +31,16 @@ void TableZone::addCard(CardItem *card, bool reorganize, int x, int y)
 			y = height - CARD_HEIGHT - y;
 		card->setPos(x, y);
 	}
-	qDebug(QString("zValue = %1, x = %2, y = %3").arg((y + CARD_HEIGHT) * width + x + 1000).arg(x).arg(y).toLatin1());
 	card->setZValue((y + CARD_HEIGHT) * width + x + 1000);
+	qDebug(QString("table: appended %1 at pos %2: zValue = %3, x = %4, y = %5").arg(card->getName()).arg(cards->size() - 1).arg(card->zValue()).arg(x).arg(y).toLatin1());
 	card->setParentItem(this);
 	card->setVisible(true);
 	card->update(card->boundingRect());
-	
 }
 
-void TableZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint)
+void TableZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
 {
-	player->client->moveCard(cardId, startZone->getName(), getName(), dropPoint.x(), dropPoint.y());
+	player->client->moveCard(cardId, startZone->getName(), getName(), dropPoint.x(), dropPoint.y(), faceDown);
 }
 
 void TableZone::reorganizeCards()

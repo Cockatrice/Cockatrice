@@ -16,7 +16,7 @@ public:
 	void addCard(CardItem *card, bool reorganize = true, int x = -1, int y = -1);
 	void reorganizeCards();
 	void toggleTapped();
-	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint);
+	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
 };
 
 #endif

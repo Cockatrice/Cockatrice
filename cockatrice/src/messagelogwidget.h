@@ -28,6 +28,7 @@ private slots:
 	void logSetCardCounters(QString playerName, QString cardName, int value, int oldValue);
 	void logSetTapped(QString playerName, QString cardName, bool tapped);
 	void logSetCounter(QString playerName, QString counterName, int value, int oldValue);
+	void logSetDoesntUntap(QString playerName, QString cardName, bool doesntUntap);
 	void logDumpZone(QString playerName, QString zoneName, QString zoneOwner, int numberCards);
 private:
 	void appendAndScroll(const QString &s);

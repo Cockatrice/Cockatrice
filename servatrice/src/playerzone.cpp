@@ -19,8 +19,8 @@
  ***************************************************************************/
 #include "playerzone.h"
 
-PlayerZone::PlayerZone(QString _name, bool _has_coords, bool _is_public, bool _id_access)
-	: name(_name), has_coords(_has_coords), is_public(_is_public), id_access(_id_access)
+PlayerZone::PlayerZone(QString _name, bool _has_coords, bool _is_public, bool _is_private, bool _id_access)
+	: name(_name), has_coords(_has_coords), is_public(_is_public), is_private(_is_private), id_access(_id_access)
 {
 }
 

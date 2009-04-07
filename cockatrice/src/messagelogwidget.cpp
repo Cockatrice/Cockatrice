@@ -112,6 +112,14 @@ void MessageLogWidget::logSetCounter(QString playerName, QString counterName, in
 	appendAndScroll(tr("%1 sets counter \"%2\" to %3 (%4%5)").arg(playerName).arg(counterName).arg(value).arg(value > oldValue ? "+" : "").arg(value - oldValue));
 }
 
+void MessageLogWidget::logSetDoesntUntap(QString playerName, QString cardName, bool doesntUntap)
+{
+	if (doesntUntap)
+		appendAndScroll(tr("%1 sets %2 to not untap normally.").arg(playerName).arg(cardName));
+	else
+		appendAndScroll(tr("%1 sets %2 to untap normally.").arg(playerName).arg(cardName));
+}
+
 void MessageLogWidget::logDumpZone(QString playerName, QString zoneName, QString zoneOwner, int numberCards)
 {
 	if (numberCards)
@@ -137,6 +145,7 @@ void MessageLogWidget::connectToGame(Game *game)
 	connect(game, SIGNAL(logSetCardCounters(QString, QString, int, int)), this, SLOT(logSetCardCounters(QString, QString, int, int)));
 	connect(game, SIGNAL(logSetTapped(QString, QString, bool)), this, SLOT(logSetTapped(QString, QString, bool)));
 	connect(game, SIGNAL(logSetCounter(QString, QString, int, int)), this, SLOT(logSetCounter(QString, QString, int, int)));
+	connect(game, SIGNAL(logSetDoesntUntap(QString, QString, bool)), this, SLOT(logSetDoesntUntap(QString, QString, bool)));
 	connect(game, SIGNAL(logDumpZone(QString, QString, QString, int)), this, SLOT(logDumpZone(QString, QString, QString, int)));
 }
 

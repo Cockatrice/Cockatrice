@@ -21,7 +21,7 @@ protected:
 public:
 	enum { Type = typeZone };
 	int type() const { return Type; }
-	virtual void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint) = 0;
+	virtual void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown) = 0;
 	CardZone(Player *_player, const QString &_name, QGraphicsItem *parent = 0, bool isView = false);
 	~CardZone();
 	void clearContents();

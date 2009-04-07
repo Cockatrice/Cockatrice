@@ -54,6 +54,7 @@ private:
 	QList<Counter *> counters;
 	int PlayerId;
 	int nextCardId;
+	int newCardId();
 	PlayerZone *getZone(const QString &name);
 	Counter *getCounter(const QString &name);
 	void setName(const QString &name);

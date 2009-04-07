@@ -65,7 +65,7 @@ private:
 	Qt::SortOrder order;
 public:
 	CardInfoCompare(int _column, Qt::SortOrder _order) : column(_column), order(_order) { }
-	bool operator()(CardInfo *a, CardInfo *b) const
+	inline bool operator()(CardInfo *a, CardInfo *b) const
 	{
 		bool result;
 		switch (column) {

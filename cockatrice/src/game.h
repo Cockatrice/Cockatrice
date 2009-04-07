@@ -15,7 +15,7 @@ class Game : public QObject {
 	Q_OBJECT
 private:
 	QMenu *actionsMenu, *cardMenu;
-	QAction *aTap, *aUntap, *aAddCounter, *aRemoveCounter, *aSetCounters, *aRearrange,
+	QAction *aTap, *aUntap, *aDoesntUntap, *aAddCounter, *aRemoveCounter, *aSetCounters, *aRearrange,
 		*aUntapAll, *aDecLife, *aIncLife, *aSetLife, *aShuffle, *aDraw, *aDrawCards, *aRollDice, *aCreateToken;
 	DlgStartGame *dlgStartGame;
 	
@@ -40,6 +40,7 @@ private slots:
 	void showCardMenu(QPoint p);
 	void actTap();
 	void actUntap();
+	void actDoesntUntap();
 	void actAddCounter();
 	void actRemoveCounter();
 	void actSetCounters();
@@ -69,6 +70,7 @@ signals:
 	void logSetCardCounters(QString playerName, QString cardName, int value, int oldValue);
 	void logSetTapped(QString playerName, QString cardName, bool tapped);
 	void logSetCounter(QString playerName, QString counterName, int value, int oldValue);
+	void logSetDoesntUntap(QString playerName, QString cardName, bool doesntUntap);
 	void logDumpZone(QString playerName, QString zoneName, QString zoneOwner, int numberCards);
 public slots:
 	void restartGameDialog();

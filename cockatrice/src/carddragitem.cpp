@@ -2,8 +2,8 @@
 #include "cardzone.h"
 #include <QtGui>
 
-CardDragItem::CardDragItem(QGraphicsScene *scene, CardZone *_startZone, QPixmap *_image, int _id, const QPointF &_hotSpot, QGraphicsItem *parent)
-	: QGraphicsItem(parent), image(_image), id(_id), hotSpot(_hotSpot), startZone(_startZone)
+CardDragItem::CardDragItem(QGraphicsScene *scene, CardZone *_startZone, QPixmap *_image, int _id, const QPointF &_hotSpot, bool _faceDown, QGraphicsItem *parent)
+	: QGraphicsItem(parent), image(_image), id(_id), hotSpot(_hotSpot), startZone(_startZone), faceDown(_faceDown)
 {
 	if ((hotSpot.x() < 0) || (hotSpot.y() < 0)) {
 		qDebug(QString("CardDragItem: coordinate overflow: x = %1, y = %2").arg(hotSpot.x()).arg(hotSpot.y()).toLatin1());
@@ -16,7 +16,8 @@ CardDragItem::CardDragItem(QGraphicsScene *scene, CardZone *_startZone, QPixmap 
 	setZValue(2000000000);
 	setCacheMode(DeviceCoordinateCache);
 
-	scene->addItem(this);
+	if (!parent)
+		scene->addItem(this);
 }
 
 CardDragItem::~CardDragItem()
@@ -82,16 +83,13 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 	}
 
 	if (dropZone) {
-		dropZone->handleDropEvent(id, startZone, (sp - dropZone->scenePos()).toPoint());
+		dropZone->handleDropEvent(id, startZone, (sp - dropZone->scenePos()).toPoint(), faceDown);
 		QList<QGraphicsItem *> childList = childItems();
 		for (int i = 0; i < childList.size(); i++) {
 			CardDragItem *c = qgraphicsitem_cast<CardDragItem *>(childList.at(i));
-			if (!c)
-				QMessageBox::critical(0, "fehler", "null");
-			dropZone->handleDropEvent(c->id, startZone, (sp - dropZone->scenePos() + c->pos()).toPoint());
+			dropZone->handleDropEvent(c->id, startZone, (sp - dropZone->scenePos() + c->pos()).toPoint(), faceDown);
 		}
-	} else
-		QMessageBox::critical(0, "fehler", "fehler");
+	}
 
 	event->accept();
 }

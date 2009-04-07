@@ -41,6 +41,7 @@ private:
 	bool facedown;
 	int counters;
 	QString annotation;
+	bool doesntUntap;
 	CardDragItem *dragItem;
 public:
 	enum { Type = typeCard };
@@ -58,15 +59,17 @@ public:
 	void setTapped(bool _tapped);
 	bool getAttacking() const { return attacking; }
 	void setAttacking(bool _attacking);
-	bool getFacedown() const { return facedown; }
-	void setFacedown(bool _facedown);
+	bool getFaceDown() const { return facedown; }
+	void setFaceDown(bool _facedown);
 	int getCounters() const { return counters; }
 	void setCounters(int _counters);
 	QString getAnnotation() const { return annotation; }
 	void setAnnotation(const QString &_annotation);
+	bool getDoesntUntap() const { return doesntUntap; }
+	void setDoesntUntap(bool _doesntUntap);
 	void resetState();
 
-	CardDragItem *createDragItem(CardZone *startZone, int _id, const QPointF &_pos, const QPointF &_scenePos);
+	CardDragItem *createDragItem(CardZone *startZone, int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);
 	void deleteDragItem();
 protected:
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);

@@ -66,6 +66,8 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	connect(aTap, SIGNAL(triggered()), this, SLOT(actTap()));
 	aUntap = new QAction(tr("&Untap"), this);
 	connect(aUntap, SIGNAL(triggered()), this, SLOT(actUntap()));
+	aDoesntUntap = new QAction(tr("Toggle &normal untapping"), this);
+	connect(aDoesntUntap, SIGNAL(triggered()), this, SLOT(actDoesntUntap()));
 	aAddCounter = new QAction(tr("&Add counter"), this);
 	connect(aAddCounter, SIGNAL(triggered()), this, SLOT(actAddCounter()));
 	aRemoveCounter = new QAction(tr("&Remove counter"), this);
@@ -77,6 +79,8 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 
 	cardMenu->addAction(aTap);
 	cardMenu->addAction(aUntap);
+	cardMenu->addAction(aDoesntUntap);
+	cardMenu->addSeparator();
 	cardMenu->addAction(aAddCounter);
 	cardMenu->addAction(aRemoveCounter);
 	cardMenu->addAction(aSetCounters);
@@ -108,6 +112,7 @@ Player *Game::addPlayer(int playerId, const QString &playerName, QPointF base, b
 	connect(newPlayer, SIGNAL(logSetCardCounters(QString, QString, int, int)), this, SIGNAL(logSetCardCounters(QString, QString, int, int)));
 	connect(newPlayer, SIGNAL(logSetTapped(QString, QString, bool)), this, SIGNAL(logSetTapped(QString, QString, bool)));
 	connect(newPlayer, SIGNAL(logSetCounter(QString, QString, int, int)), this, SIGNAL(logSetCounter(QString, QString, int, int)));
+	connect(newPlayer, SIGNAL(logSetDoesntUntap(QString, QString, bool)), this, SIGNAL(logSetDoesntUntap(QString, QString, bool)));
 
 	players << newPlayer;
 	emit playerAdded(newPlayer);
@@ -147,6 +152,7 @@ void Game::restartGameDialog()
 
 void Game::gameEvent(ServerEventData *msg)
 {
+	qDebug(QString("game::gameEvent: public=%1, player=%2, name=%3, type=%4, data=%5").arg(msg->getPublic()).arg(msg->getPlayerId()).arg(msg->getPlayerName()).arg(msg->getEventType()).arg(msg->getEventData().join("/")).toLatin1());
 	if (!msg->getPublic())
 		localPlayer->gameEvent(msg);
 	else {
@@ -231,9 +237,7 @@ void Game::gameEvent(ServerEventData *msg)
 
 void Game::actUntapAll()
 {
-	CardList *const cards = localPlayer->getZones()->findZone("table")->getCards();
-	for (int i = 0; i < cards->size(); i++)
-		client->setCardAttr("table", cards->at(i)->getId(), "tapped", "false");
+	client->setCardAttr("table", -1, "tapped", "false");
 }
 
 void Game::actIncLife()
@@ -305,6 +309,15 @@ void Game::actUntap()
 	while (i.hasNext()) {
 		CardItem *temp = (CardItem *) i.next();
 		client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "tapped", "0");
+	}
+}
+
+void Game::actDoesntUntap()
+{
+	QListIterator<QGraphicsItem *> i(scene->selectedItems());
+	while (i.hasNext()) {
+		CardItem *temp = (CardItem *) i.next();
+		client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "doesnt_untap", QString::number(!temp->getDoesntUntap()));
 	}
 }
 

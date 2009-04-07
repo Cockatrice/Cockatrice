@@ -8,7 +8,7 @@
 #include "player.h"
 
 CardItem::CardItem(CardDatabase *_db, const QString &_name, int _cardid, QGraphicsItem *parent)
-	: QGraphicsItem(parent), db(_db), name(_name), id(_cardid), tapped(false), attacking(false), facedown(false), counters(0), dragItem(NULL)
+	: QGraphicsItem(parent), db(_db), name(_name), id(_cardid), tapped(false), attacking(false), facedown(false), counters(0), doesntUntap(false), dragItem(NULL)
 {
 	width = CARD_WIDTH;
 	height = CARD_HEIGHT;
@@ -21,6 +21,7 @@ CardItem::CardItem(CardDatabase *_db, const QString &_name, int _cardid, QGraphi
 
 CardItem::~CardItem()
 {
+	deleteDragItem();
 	qDebug(QString("CardItem destructor: %1").arg(name).toLatin1());
 }
 
@@ -80,7 +81,7 @@ void CardItem::setAttacking(bool _attacking)
 	update(boundingRect());
 }
 
-void CardItem::setFacedown(bool _facedown)
+void CardItem::setFaceDown(bool _facedown)
 {
 	facedown = _facedown;
 	update(boundingRect());
@@ -98,6 +99,11 @@ void CardItem::setAnnotation(const QString &_annotation)
 	update(boundingRect());
 }
 
+void CardItem::setDoesntUntap(bool _doesntUntap)
+{
+	doesntUntap = _doesntUntap;
+}
+
 void CardItem::resetState()
 {
 	attacking = false;
@@ -105,12 +111,14 @@ void CardItem::resetState()
 	counters = 0;
 	annotation = QString();
 	setTapped(false);
+	setDoesntUntap(false);
 	update(boundingRect());
 }
 
-CardDragItem *CardItem::createDragItem(CardZone *startZone, int _id, const QPointF &_pos, const QPointF &_scenePos)
+CardDragItem *CardItem::createDragItem(CardZone *startZone, int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown)
 {
-	dragItem = new CardDragItem(scene(), startZone, image, _id, _pos);
+	deleteDragItem();
+	dragItem = new CardDragItem(scene(), startZone, image, _id, _pos, faceDown);
 	dragItem->setPos(_scenePos - dragItem->getHotSpot());
 
 	return dragItem;
@@ -140,8 +148,9 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
 	if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < QApplication::startDragDistance())
 		return;
+	bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier);
 
-	createDragItem((CardZone *) parentItem(), id, event->pos(), event->scenePos());
+	createDragItem((CardZone *) parentItem(), id, event->pos(), event->scenePos(), faceDown);
 	dragItem->grabMouse();
 
 	QList<QGraphicsItem *> sel = scene()->selectedItems();
@@ -149,7 +158,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 		CardItem *c = (CardItem *) sel.at(i);
 		if (c == this)
 			continue;
-		CardDragItem *drag = new CardDragItem(scene(), (CardZone *) parentItem(), c->getImage(), c->getId(), QPointF(), dragItem);
+		CardDragItem *drag = new CardDragItem(scene(), (CardZone *) parentItem(), c->getImage(), c->getId(), QPointF(), false, dragItem);
 		drag->setPos(c->pos() - pos());
 	}
 

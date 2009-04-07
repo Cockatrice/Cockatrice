@@ -254,11 +254,11 @@ int Client::drawCards(unsigned int number)
 	return cmd(QString("draw_cards|%1").arg(number));
 }
 
-int Client::moveCard(int cardid, const QString &startzone, const QString &targetzone, int x, int y)
+int Client::moveCard(int cardid, const QString &startzone, const QString &targetzone, int x, int y, bool faceDown)
 {
 	// if startzone is public: cardid is the card's id
 	// else: cardid is the position of the card in the zone (e.g. deck)
-	return cmd(QString("move_card|%1|%2|%3|%4|%5").arg(cardid).arg(startzone).arg(targetzone).arg(x).arg(y));
+	return cmd(QString("move_card|%1|%2|%3|%4|%5|%6").arg(cardid).arg(startzone).arg(targetzone).arg(x).arg(y).arg(faceDown ? 1 : 0));
 }
 
 int Client::createToken(const QString &zone, const QString &name, const QString &powtough, int x, int y)

@@ -26,6 +26,7 @@ signals:
 	void logSetCardCounters(QString playerName, QString cardName, int value, int oldValue);
 	void logSetTapped(QString playerName, QString cardName, bool tapped);
 	void logSetCounter(QString playerName, QString counterName, int value, int oldValue);
+	void logSetDoesntUntap(QString playerName, QString cardName, bool doesntUntap);
 private slots:
 	void actMoveHandToTopLibrary();
 	void actMoveHandToBottomLibrary();
@@ -53,6 +54,7 @@ private:
 	ZoneList zones;
 	CounterList counters;
 	CardDatabase *db;
+	void setCardAttrHelper(CardItem *card, const QString &aname, const QString &avalue, bool allCards);
 public:
 	Client *client;
 	void addZone(CardZone *z);

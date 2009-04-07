@@ -17,7 +17,6 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	deckModel = new DeckListModel(db, this);
 	deckView = new QTreeView();
 	deckView->setModel(deckModel);
-//	deckView->setSortingEnabled(true);
 	connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
 	
 	cardInfo = new CardInfoWidget(db);
@@ -99,6 +98,8 @@ void WndDeckEditor::actSaveDeck()
 void WndDeckEditor::actSaveDeckAs()
 {
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save deck as"), QString(), tr("Deck files (*.dec)"));
+	if (fileName.isEmpty())
+		return;
 	if (!fileName.endsWith(".dec"))
 		fileName.append(".dec");
 	if (deckModel->saveToFile(fileName))

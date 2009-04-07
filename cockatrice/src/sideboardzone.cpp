@@ -42,7 +42,7 @@ void SideboardZone::addCard(CardItem *card, bool reorganize, int x, int y)
 		reorganizeCards();
 }
 
-void SideboardZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint)
+void SideboardZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
 {
 	player->client->moveCard(cardId, startZone->getName(), getName(), 0, 0);
 }

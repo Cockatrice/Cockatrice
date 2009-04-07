@@ -66,7 +66,7 @@ void HandZone::addCard(CardItem *card, bool reorganize, int x, int y)
 		reorganizeCards();
 }
 
-void HandZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint)
+void HandZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
 {
 	Q_UNUSED(dropPoint);
 	player->client->moveCard(cardId, startZone->getName(), getName(), cards->size(), 0);

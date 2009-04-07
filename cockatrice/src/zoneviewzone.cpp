@@ -85,7 +85,7 @@ void ZoneViewZone::addCard(CardItem *card, bool reorganize, int x, int y)
 		reorganizeCards();
 }
 
-void ZoneViewZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint)
+void ZoneViewZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
 {
 	Q_UNUSED(dropPoint);
 	qDebug(QString("handleDropEvent id=%1").arg(cardId).toLatin1());

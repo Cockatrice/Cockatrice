@@ -70,7 +70,7 @@ public:
 	int shuffle();
 	int rollDice(unsigned int sides);
 	int drawCards(unsigned int number);
-	int moveCard(int cardid, const QString &startzone, const QString &targetzone, int x, int y = 0);
+	int moveCard(int cardid, const QString &startzone, const QString &targetzone, int x, int y = 0, bool faceDown = false);
 	int createToken(const QString &zone, const QString &name, const QString &powtough, int x, int y);
 	int setCardAttr(const QString &zone, int cardid, const QString &aname, const QString &avalue);
 	int readyStart();

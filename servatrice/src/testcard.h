@@ -21,9 +21,7 @@
 #define TESTCARD_H
 
 #include <QString>
-/**
-	@author Max-Wilhelm Bruker <brukie@laptop>
-*/
+
 class TestCard {
 private:
 	int id;
@@ -34,6 +32,7 @@ private:
 	bool attacking;
 	bool facedown;
 	QString annotation;
+	bool doesntUntap;
 public:
 	TestCard(QString _name, int _id, int _coord_x, int _coord_y);
 	~TestCard();
@@ -47,7 +46,9 @@ public:
 	bool getAttacking() { return attacking; }
 	bool getFaceDown() { return facedown; }
 	QString getAnnotation() { return annotation; }
+	bool getDoesntUntap() { return doesntUntap; }
 
+	void setId(int _id) { id = _id; }
 	void setCoords(int x, int y) { coord_x = x; coord_y = y; }
 	void setName(const QString &_name) { name = _name; }
 	void setCounters(int _counters) { counters = _counters; }
@@ -55,9 +56,10 @@ public:
 	void setAttacking(bool _attacking) { attacking = _attacking; }
 	void setFaceDown(bool _facedown) { facedown = _facedown; }
 	void setAnnotation(const QString &_annotation) { annotation = _annotation; }
+	void setDoesntUntap(bool _doesntUntap) { doesntUntap = _doesntUntap; }
 	
 	void resetState();
-	bool setAttribute(const QString &aname, const QString &avalue);
+	bool setAttribute(const QString &aname, const QString &avalue, bool allCards);
 };
 
 #endif

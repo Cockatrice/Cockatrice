@@ -48,7 +48,7 @@ void RfgZone::addCard(CardItem *card, bool reorganize, int x, int y)
 		reorganizeCards();
 }
 
-void RfgZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint)
+void RfgZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
 {
 	player->client->moveCard(cardId, startZone->getName(), getName(), 0, 0);
 }
@@ -79,8 +79,9 @@ void RfgZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	if (cards->empty())
 		return;
 		
+	bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier);
 	CardItem *card = cards->at(0);
-	CardDragItem *drag = card->createDragItem(this, card->getId(), event->pos(), event->scenePos());
+	CardDragItem *drag = card->createDragItem(this, card->getId(), event->pos(), event->scenePos(), faceDown);
 	drag->grabMouse();
 	setCursor(Qt::OpenHandCursor);
 }

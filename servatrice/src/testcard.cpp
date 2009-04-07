@@ -20,7 +20,7 @@
 #include "testcard.h"
 
 TestCard::TestCard(QString _name, int _id, int _coord_x, int _coord_y)
-	: id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), counters(0), tapped(false), attacking(false)
+	: id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), counters(0), tapped(false), attacking(false), facedown(false), annotation(QString()), doesntUntap(false)
 {
 }
 
@@ -36,10 +36,11 @@ void TestCard::resetState()
 	setTapped(false);
 	setAttacking(false);
 	setFaceDown(false);
-	setAnnotation("");
+	setAnnotation(QString());
+	setDoesntUntap(false);
 }
 
-bool TestCard::setAttribute(const QString &aname, const QString &avalue)
+bool TestCard::setAttribute(const QString &aname, const QString &avalue, bool allCards)
 {
 	if (!aname.compare("counters")) {
 		bool ok;
@@ -48,13 +49,17 @@ bool TestCard::setAttribute(const QString &aname, const QString &avalue)
 			return false;
 		setCounters(tmp_int);
 	} else if (!aname.compare("tapped")) {
-		setTapped(!avalue.compare("1"));
+		bool value = !avalue.compare("1");
+		if (!(!value && allCards && doesntUntap))
+			setTapped(value);
 	} else if (!aname.compare("attacking")) {
 		setAttacking(!avalue.compare("1"));
 	} else if (!aname.compare("facedown")) {
 		setFaceDown(!avalue.compare("1"));
 	} else if (!aname.compare("annotation")) {
 		setAnnotation(avalue);
+	} else if (!aname.compare("doesnt_untap")) {
+		setDoesntUntap(!avalue.compare("1"));
 	} else
 		return false;
 	

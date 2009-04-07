@@ -56,14 +56,17 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
 
 CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName)
 {
+	if (position >= cards->size())
+		return NULL;
+		
 	CardItem *c = cards->takeAt(position);
 	for (int i = 0; i < views.size(); i++)
 		views[i]->removeCard(position);
 
-	if (c->getId() == -1) {
+//	if (c->getId() == -1) {
 		c->setId(cardId);
 		c->setName(cardName);
-	}
+//	}
 	reorganizeCards();
 	return c;
 }

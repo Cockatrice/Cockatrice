@@ -9,7 +9,7 @@ class ZoneViewWidget;
 class ZoneViewZone : public CardZone {
 private:
 	int numberCards;
-	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint);
+	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
 	CardZone *origZone;
 signals:
 	void removeZoneViewWidget(ZoneViewWidget *zv);

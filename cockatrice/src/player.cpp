@@ -128,6 +128,31 @@ void Player::addCounter(Counter *c)
 	counters << c;
 }
 
+void Player::setCardAttrHelper(CardItem *card, const QString &aname, const QString &avalue, bool allCards)
+{
+	if (aname == "tapped") {
+		bool tapped = avalue == "1";
+		if (!(!tapped && card->getDoesntUntap() && allCards)) {
+			emit logSetTapped(name, card->getName(), tapped);
+			card->setTapped(tapped);
+		}
+	} else if (aname == "attacking")
+		card->setAttacking(avalue == "1");
+	else if (aname == "facedown")
+		card->setFaceDown(avalue == "1");
+	else if (aname == "counters") {
+		int value = avalue.toInt();
+		emit logSetCardCounters(name, card->getName(), value, card->getCounters());
+		card->setCounters(value);
+	} else if (aname == "annotation")
+		card->setAnnotation(avalue);
+	else if (aname == "doesnt_untap") {
+		bool value = (avalue == "1");
+		emit logSetDoesntUntap(name, card->getName(), value);
+		card->setDoesntUntap(value);
+	}
+}
+
 void Player::gameEvent(ServerEventData *event)
 {
 	QStringList data = event->getEventData();
@@ -171,7 +196,7 @@ void Player::gameEvent(ServerEventData *event)
 			break;
 		}
 		case eventMoveCard: {
-			if (data.size() != 7) {
+			if (data.size() != 8) {
 				qDebug("error");
 				// XXX
 			}
@@ -186,13 +211,16 @@ void Player::gameEvent(ServerEventData *event)
 				qDebug(QString("target zone invalid: %1").arg(data[4]).toLatin1());
 			int x = data[5].toInt();
 			int y = data[6].toInt();
+			bool facedown = data[7].toInt();
 			// XXX Mehr Fehlerbehandlung
 
 			CardItem *card = startZone->takeCard(position, cardId, cardName);
 			if (!card) // XXX
-				qDebug("null");
+				qDebug("moveCard: card not found");
 
 			card->deleteDragItem();
+			
+			card->setFaceDown(facedown);
 
 			// The log event has to be sent before the card is added to the target zone
 			// because the addCard function can modify the card object.
@@ -227,25 +255,18 @@ void Player::gameEvent(ServerEventData *event)
 			}
 			CardZone *zone = zones.findZone(data[0]);
 			int cardId = data[1].toInt();
-			CardItem *card = zone->getCard(cardId, "");
 			QString aname = data[2];
 			QString avalue = data[3];
 			// XXX Fehlerbehandlung
 
-			if (aname == "tapped") {
-				bool tapped = avalue == "1";
-				emit logSetTapped(name, card->getName(), tapped);
-				card->setTapped(tapped);
-			} else if (aname == "attacking")
-				card->setAttacking(avalue == "1");
-			else if (aname == "facedown")
-				card->setFacedown(avalue == "1");
-			else if (aname == "counters") {
-				int value = avalue.toInt();
-				emit logSetCardCounters(name, card->getName(), value, card->getCounters());
-				card->setCounters(value);
-			} else if (aname == "annotation")
-				card->setAnnotation(avalue);
+			if (cardId == -1) {
+				CardList *const cards = zone->getCards();
+				for (int i = 0; i < cards->size(); i++)
+					setCardAttrHelper(cards->at(i), aname, avalue, true);
+			} else {
+				CardItem *card = zone->getCard(cardId, "");
+				setCardAttrHelper(card, aname, avalue, false);
+			}
 			break;
 		}
 		case eventSetCounter: {
