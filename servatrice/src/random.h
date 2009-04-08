@@ -1,16 +1,16 @@
-#ifndef TESTRANDOM_H
-#define TESTRANDOM_H
+#ifndef RANDOM_H
+#define RANDOM_H
 
 #include <QObject>
 #include <QDateTime>
 #include <stdlib.h>
 
-class TestRandom : public QObject {
+class Random : public QObject {
 	Q_OBJECT
 private:
 	bool initialized;
 public:
-	TestRandom(QObject *parent) : QObject(parent), initialized(false) { }
+	Random(QObject *parent) : QObject(parent), initialized(false) { }
 	void init();
 	unsigned int getNumber(unsigned int min, unsigned int max);
 };

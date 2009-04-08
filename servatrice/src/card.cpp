@@ -17,49 +17,51 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef TESTCARD_H
-#define TESTCARD_H
+#include "card.h"
 
-#include <QString>
+Card::Card(QString _name, int _id, int _coord_x, int _coord_y)
+	: id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), counters(0), tapped(false), attacking(false), facedown(false), annotation(QString()), doesntUntap(false)
+{
+}
 
-class TestCard {
-private:
-	int id;
-	int coord_x, coord_y;
-	QString name;
-	int counters;
-	bool tapped;
-	bool attacking;
-	bool facedown;
-	QString annotation;
-	bool doesntUntap;
-public:
-	TestCard(QString _name, int _id, int _coord_x, int _coord_y);
-	~TestCard();
+
+Card::~Card()
+{
+}
+
+void Card::resetState()
+{
+	setCoords(0, 0);
+	setCounters(0);
+	setTapped(false);
+	setAttacking(false);
+	setFaceDown(false);
+	setAnnotation(QString());
+	setDoesntUntap(false);
+}
+
+bool Card::setAttribute(const QString &aname, const QString &avalue, bool allCards)
+{
+	if (!aname.compare("counters")) {
+		bool ok;
+		int tmp_int = avalue.toInt(&ok);
+		if (!ok)
+			return false;
+		setCounters(tmp_int);
+	} else if (!aname.compare("tapped")) {
+		bool value = !avalue.compare("1");
+		if (!(!value && allCards && doesntUntap))
+			setTapped(value);
+	} else if (!aname.compare("attacking")) {
+		setAttacking(!avalue.compare("1"));
+	} else if (!aname.compare("facedown")) {
+		setFaceDown(!avalue.compare("1"));
+	} else if (!aname.compare("annotation")) {
+		setAnnotation(avalue);
+	} else if (!aname.compare("doesnt_untap")) {
+		setDoesntUntap(!avalue.compare("1"));
+	} else
+		return false;
 	
-	int getId() { return id; }
-	int getX() { return coord_x; }
-	int getY() { return coord_y; }
-	QString getName() { return name; }
-	int getCounters() { return counters; }
-	bool getTapped() { return tapped; }
-	bool getAttacking() { return attacking; }
-	bool getFaceDown() { return facedown; }
-	QString getAnnotation() { return annotation; }
-	bool getDoesntUntap() { return doesntUntap; }
-
-	void setId(int _id) { id = _id; }
-	void setCoords(int x, int y) { coord_x = x; coord_y = y; }
-	void setName(const QString &_name) { name = _name; }
-	void setCounters(int _counters) { counters = _counters; }
-	void setTapped(bool _tapped) { tapped = _tapped; }
-	void setAttacking(bool _attacking) { attacking = _attacking; }
-	void setFaceDown(bool _facedown) { facedown = _facedown; }
-	void setAnnotation(const QString &_annotation) { annotation = _annotation; }
-	void setDoesntUntap(bool _doesntUntap) { doesntUntap = _doesntUntap; }
-	
-	void resetState();
-	bool setAttribute(const QString &aname, const QString &avalue, bool allCards);
-};
-
-#endif
+	return true;
+}

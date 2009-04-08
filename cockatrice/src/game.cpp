@@ -68,6 +68,8 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	connect(aUntap, SIGNAL(triggered()), this, SLOT(actUntap()));
 	aDoesntUntap = new QAction(tr("Toggle &normal untapping"), this);
 	connect(aDoesntUntap, SIGNAL(triggered()), this, SLOT(actDoesntUntap()));
+	aFlip = new QAction(tr("&Flip"), this);
+	connect(aFlip, SIGNAL(triggered()), this, SLOT(actFlip()));
 	aAddCounter = new QAction(tr("&Add counter"), this);
 	connect(aAddCounter, SIGNAL(triggered()), this, SLOT(actAddCounter()));
 	aRemoveCounter = new QAction(tr("&Remove counter"), this);
@@ -80,6 +82,8 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	cardMenu->addAction(aTap);
 	cardMenu->addAction(aUntap);
 	cardMenu->addAction(aDoesntUntap);
+	cardMenu->addSeparator();
+	cardMenu->addAction(aFlip);
 	cardMenu->addSeparator();
 	cardMenu->addAction(aAddCounter);
 	cardMenu->addAction(aRemoveCounter);
@@ -318,6 +322,16 @@ void Game::actDoesntUntap()
 	while (i.hasNext()) {
 		CardItem *temp = (CardItem *) i.next();
 		client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "doesnt_untap", QString::number(!temp->getDoesntUntap()));
+	}
+}
+
+void Game::actFlip()
+{
+	QListIterator<QGraphicsItem *> i(scene->selectedItems());
+	while (i.hasNext()) {
+		CardItem *temp = (CardItem *) i.next();
+		QString zone = qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName();
+		client->moveCard(temp->getId(), zone, zone, temp->pos().x(), temp->pos().y(), !temp->getFaceDown());
 	}
 }
 

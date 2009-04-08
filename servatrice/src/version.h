@@ -18,4 +18,4 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-const char *VERSION_STRING = "Testserver 0.20090407";
+const char *VERSION_STRING = "Testserver 0.20090408";

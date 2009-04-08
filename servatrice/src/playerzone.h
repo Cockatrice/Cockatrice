@@ -21,8 +21,10 @@
 #define PLAYERZONE_H
 
 #include <QList>
-#include "testcard.h"
-#include "testrandom.h"
+#include <QString>
+
+class Card;
+class Random;
 
 class PlayerZone {
 private:
@@ -40,7 +42,7 @@ public:
 	PlayerZone(QString _name, bool _has_coords, bool _is_public, bool _is_private, bool _id_access);
 	~PlayerZone();
 
-	TestCard *getCard(int id, bool remove, int *position = NULL);
+	Card *getCard(int id, bool remove, int *position = NULL);
 
 	bool isPublic() { return is_public; }
 	bool isPrivate() { return is_private; }
@@ -48,9 +50,9 @@ public:
 	bool hasIdAccess() { return id_access; }
 	QString getName() { return name; }
 	
-	QList<TestCard *> cards;
-	void insertCard(TestCard *card, int x, int y);
-	void shuffle(TestRandom *rnd);
+	QList<Card *> cards;
+	void insertCard(Card *card, int x, int y);
+	void shuffle(Random *rnd);
 	void clear();
 };
 

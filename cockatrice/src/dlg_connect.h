@@ -14,9 +14,10 @@ public:
 	QString getHost();
 	int getPort();
 	QString getPlayerName();
+	QString getPassword();
 private:
-	QLabel *hostLabel, *portLabel, *playernameLabel;
-	QLineEdit *hostEdit, *portEdit, *playernameEdit;
+	QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel;
+	QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit;
 	QPushButton *okButton, *cancelButton;
 };
 

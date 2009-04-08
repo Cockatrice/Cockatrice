@@ -82,7 +82,7 @@ void MainWindow::actConnect()
 {
 	DlgConnect dlg(this);
 	if (dlg.exec())
-		client->connectToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName());
+		client->connectToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName(), dlg.getPassword());
 }
 
 void MainWindow::actDisconnect()

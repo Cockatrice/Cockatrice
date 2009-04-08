@@ -20,14 +20,18 @@
 
 
 #include <QCoreApplication>
-#include "testserver.h"
+#include "server.h"
 
 int main(int argc, char *argv[])
 {
-      QCoreApplication app(argc, argv);
-      
-      TestServer server;
-      server.listen(QHostAddress::Any, 4747);
+	QCoreApplication app(argc, argv);
 
-      return app.exec();
+	Server server;
+	if (!server.openDatabase()) {
+		qCritical("Database error");
+		return -1;
+	}
+	server.listen(QHostAddress::Any, 4747);
+	
+	return app.exec();
 }

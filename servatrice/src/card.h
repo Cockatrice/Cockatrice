@@ -17,33 +17,49 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef TESTSERVER_H
-#define TESTSERVER_H
+#ifndef CARD_H
+#define CARD_H
 
-#include <QTcpServer>
-#include "testservergamethread.h"
-#include "testservergame.h"
+#include <QString>
 
-class TestServerGame;
-class TestServerSocket;
-
-class TestServer : public QTcpServer
-{
-	Q_OBJECT
-private slots:
-	void addGame(const QString name, const QString description, const QString password, const int maxPlayers, TestServerSocket *creator);
-	void addClientToGame(const QString name, TestServerSocket *client);
-	void gameCreated(TestServerGame *_game, TestServerSocket *_creator);
-	void gameClosed();
-public:
-	TestServer(QObject *parent = 0);
-	~TestServer();
-	bool checkGamePassword(const QString &name, const QString &password);
-	QList<TestServerGame *> listOpenGames();
-	TestServerGame *getGame(const QString &name);
+class Card {
 private:
-	void incomingConnection(int SocketId);
-	QList<TestServerGame *> games;
+	int id;
+	int coord_x, coord_y;
+	QString name;
+	int counters;
+	bool tapped;
+	bool attacking;
+	bool facedown;
+	QString annotation;
+	bool doesntUntap;
+public:
+	Card(QString _name, int _id, int _coord_x, int _coord_y);
+	~Card();
+	
+	int getId() { return id; }
+	int getX() { return coord_x; }
+	int getY() { return coord_y; }
+	QString getName() { return name; }
+	int getCounters() { return counters; }
+	bool getTapped() { return tapped; }
+	bool getAttacking() { return attacking; }
+	bool getFaceDown() { return facedown; }
+	QString getAnnotation() { return annotation; }
+	bool getDoesntUntap() { return doesntUntap; }
+
+	void setId(int _id) { id = _id; }
+	void setCoords(int x, int y) { coord_x = x; coord_y = y; }
+	void setName(const QString &_name) { name = _name; }
+	void setCounters(int _counters) { counters = _counters; }
+	void setTapped(bool _tapped) { tapped = _tapped; }
+	void setAttacking(bool _attacking) { attacking = _attacking; }
+	void setFaceDown(bool _facedown) { facedown = _facedown; }
+	void setAnnotation(const QString &_annotation) { annotation = _annotation; }
+	void setDoesntUntap(bool _doesntUntap) { doesntUntap = _doesntUntap; }
+	
+	void resetState();
+	bool setAttribute(const QString &aname, const QString &avalue, bool allCards);
 };
 
 #endif

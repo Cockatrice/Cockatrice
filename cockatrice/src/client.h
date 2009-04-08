@@ -48,6 +48,7 @@ private:
 	ProtocolStatus status;
 	QList<QStringList> msgbuf;
 	QString PlayerName;
+	QString password;
 	unsigned int MsgId;
 	void msg(const QString &s);
 	int cmd(const QString &s);
@@ -58,14 +59,14 @@ public:
 	ProtocolStatus getStatus() { return status; }
 	QString peerName() const { return socket->peerName(); }
 	
-	void connectToServer(const QString &hostname, unsigned int port, const QString &playername);
+	void connectToServer(const QString &hostname, unsigned int port, const QString &playername, const QString &password);
 	void disconnectFromServer();
 	int listGames();
 	int listPlayers();
 	int createGame(const QString &name, const QString &description, const QString &password, unsigned int maxPlayers);
 	int joinGame(const QString &name, const QString &password);
 	int leaveGame();
-	int setName(const QString &name);
+	int login(const QString &name, const QString &pass);
 	int say(const QString &s);
 	int shuffle();
 	int rollDice(unsigned int sides);

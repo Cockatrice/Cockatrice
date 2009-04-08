@@ -17,9 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "testservergame.h"
+#include "servergame.h"
+#include "random.h"
+#include "serversocket.h"
 
-TestServerGame::TestServerGame(QString _name, QString _description, QString _password, int _maxPlayers, QObject *parent)
+ServerGame::ServerGame(QString _name, QString _description, QString _password, int _maxPlayers, QObject *parent)
 	: QObject(parent), name(_name), description(_description), password(_password), maxPlayers(_maxPlayers)
 {
 	gameStarted = false;
@@ -27,59 +29,59 @@ TestServerGame::TestServerGame(QString _name, QString _description, QString _pas
 	rnd = NULL;
 }
 
-TestServerGame::~TestServerGame()
+ServerGame::~ServerGame()
 {
 	if (rnd)
 		delete rnd;
 	delete mutex;
-	qDebug("TestServerGame destructor");
+	qDebug("ServerGame destructor");
 }
 
-bool TestServerGame::getGameStarted()
+bool ServerGame::getGameStarted()
 {
 	return gameStarted;
 }
 
-int TestServerGame::getPlayerCount()
+int ServerGame::getPlayerCount()
 {
 	QMutexLocker locker(mutex);
 	return players.size();
 }
 
-QStringList TestServerGame::getPlayerNames()
+QStringList ServerGame::getPlayerNames()
 {
 	QMutexLocker locker(mutex);
 	
 	QStringList result;
-	QListIterator<TestServerSocket *> i(players);
+	QListIterator<ServerSocket *> i(players);
 	while (i.hasNext()) {
-		TestServerSocket *tmp = i.next();
+		ServerSocket *tmp = i.next();
 		result << QString("%1|%2").arg(tmp->getPlayerId()).arg(tmp->PlayerName);
 	}
 	return result;
 }
 
-TestServerSocket *TestServerGame::getPlayer(int player_id)
+ServerSocket *ServerGame::getPlayer(int player_id)
 {
-	QListIterator<TestServerSocket *> i(players);
+	QListIterator<ServerSocket *> i(players);
 	while (i.hasNext()) {
-		TestServerSocket *tmp = i.next();
+		ServerSocket *tmp = i.next();
 		if (tmp->getPlayerId() == player_id)
 			return tmp;
 	}
 	return NULL;
 }
 
-void TestServerGame::msg(const QString &s)
+void ServerGame::msg(const QString &s)
 {
 	QMutexLocker locker(mutex);
 	
-	QListIterator<TestServerSocket *> i(players);
+	QListIterator<ServerSocket *> i(players);
 	while (i.hasNext())
 		i.next()->msg(s);
 }
 
-void TestServerGame::broadcastEvent(const QString &cmd, TestServerSocket *player)
+void ServerGame::broadcastEvent(const QString &cmd, ServerSocket *player)
 {
 	if (player)
 		msg(QString("public|%1|%2|%3").arg(player->getPlayerId()).arg(player->PlayerName).arg(cmd));
@@ -87,7 +89,7 @@ void TestServerGame::broadcastEvent(const QString &cmd, TestServerSocket *player
 		msg(QString("public|||%1").arg(cmd));
 }
 
-void TestServerGame::startGameIfReady()
+void ServerGame::startGameIfReady()
 {
 	QMutexLocker locker(mutex);
 	
@@ -98,7 +100,7 @@ void TestServerGame::startGameIfReady()
 			return;
 	
 	if (!rnd) {
-		rnd = new TestRandom(this);
+		rnd = new Random(this);
 		rnd->init();
 	}
 	
@@ -111,12 +113,12 @@ void TestServerGame::startGameIfReady()
 	broadcastEvent("game_start", NULL);
 }
 
-void TestServerGame::addPlayer(TestServerSocket *player)
+void ServerGame::addPlayer(ServerSocket *player)
 {
 	QMutexLocker locker(mutex);
 	
 	int max = -1;
-	QListIterator<TestServerSocket *> i(players);
+	QListIterator<ServerSocket *> i(players);
 	while (i.hasNext()) {
 		int tmp = i.next()->getPlayerId();
 		if (tmp > max)
@@ -130,10 +132,10 @@ void TestServerGame::addPlayer(TestServerSocket *player)
 	
 	players << player;
 	
-	connect(player, SIGNAL(broadcastEvent(const QString &, TestServerSocket *)), this, SLOT(broadcastEvent(const QString &, TestServerSocket *)));
+	connect(player, SIGNAL(broadcastEvent(const QString &, ServerSocket *)), this, SLOT(broadcastEvent(const QString &, ServerSocket *)));
 }
 
-void TestServerGame::removePlayer(TestServerSocket *player)
+void ServerGame::removePlayer(ServerSocket *player)
 {
 	QMutexLocker locker(mutex);
 	
@@ -143,14 +145,14 @@ void TestServerGame::removePlayer(TestServerSocket *player)
 		thread()->quit();
 }
 
-void TestServerGame::setActivePlayer(int _activePlayer)
+void ServerGame::setActivePlayer(int _activePlayer)
 {
 	activePlayer = _activePlayer;
 	broadcastEvent(QString("set_active_player|%1").arg(_activePlayer), NULL);
 	setActivePhase(0);
 }
 
-void TestServerGame::setActivePhase(int _activePhase)
+void ServerGame::setActivePhase(int _activePhase)
 {
 	activePhase = _activePhase;
 	broadcastEvent(QString("set_active_phase|%1").arg(_activePhase), NULL);

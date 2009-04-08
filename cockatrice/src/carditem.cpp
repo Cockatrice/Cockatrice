@@ -148,7 +148,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
 	if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < QApplication::startDragDistance())
 		return;
-	bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier);
+	bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier) || facedown;
 
 	createDragItem((CardZone *) parentItem(), id, event->pos(), event->scenePos(), faceDown);
 	dragItem->grabMouse();

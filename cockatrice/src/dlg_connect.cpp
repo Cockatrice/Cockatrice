@@ -16,6 +16,11 @@ DlgConnect::DlgConnect(QWidget *parent)
 	playernameEdit = new QLineEdit("Player");
 	playernameLabel->setBuddy(playernameEdit);
 	
+	passwordLabel = new QLabel(tr("P&assword:"));
+	passwordEdit = new QLineEdit;
+	passwordLabel->setBuddy(passwordEdit);
+	passwordEdit->setEchoMode(QLineEdit::Password);
+	
 	okButton = new QPushButton(tr("&OK"));
 	okButton->setDefault(true);
 	cancelButton = new QPushButton(tr("&Cancel"));
@@ -27,6 +32,8 @@ DlgConnect::DlgConnect(QWidget *parent)
 	grid->addWidget(portEdit, 1, 1);
 	grid->addWidget(playernameLabel, 2, 0);
 	grid->addWidget(playernameEdit, 2, 1);
+	grid->addWidget(passwordLabel, 3, 0);
+	grid->addWidget(passwordEdit, 3, 1);
 	
 	QHBoxLayout *buttonLayout = new QHBoxLayout;
 	buttonLayout->addStretch();
@@ -58,4 +65,9 @@ int DlgConnect::getPort()
 QString DlgConnect::getPlayerName()
 {
 	return playernameEdit->text();
+}
+
+QString DlgConnect::getPassword()
+{
+	return passwordEdit->text();
 }

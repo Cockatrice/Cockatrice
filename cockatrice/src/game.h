@@ -15,7 +15,7 @@ class Game : public QObject {
 	Q_OBJECT
 private:
 	QMenu *actionsMenu, *cardMenu;
-	QAction *aTap, *aUntap, *aDoesntUntap, *aAddCounter, *aRemoveCounter, *aSetCounters, *aRearrange,
+	QAction *aTap, *aUntap, *aDoesntUntap, *aFlip, *aAddCounter, *aRemoveCounter, *aSetCounters, *aRearrange,
 		*aUntapAll, *aDecLife, *aIncLife, *aSetLife, *aShuffle, *aDraw, *aDrawCards, *aRollDice, *aCreateToken;
 	DlgStartGame *dlgStartGame;
 	
@@ -41,6 +41,7 @@ private slots:
 	void actTap();
 	void actUntap();
 	void actDoesntUntap();
+	void actFlip();
 	void actAddCounter();
 	void actRemoveCounter();
 	void actSetCounters();

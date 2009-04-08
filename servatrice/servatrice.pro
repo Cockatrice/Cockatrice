@@ -8,25 +8,25 @@ DEPENDPATH += . src
 INCLUDEPATH += . src
 
 CONFIG += qt thread
-QT += network
+QT += network sql
 QT -= gui
 
 # Input
-HEADERS += src/testserver.h src/testservergame.h src/testserversocket.h \
+HEADERS += src/server.h src/servergame.h src/serversocket.h \
  src/playerzone.h \
- src/testcard.h \
+ src/card.h \
  src/version.h \
  src/counter.h \
- src/testrandom.h \
- src/testservergamethread.h \
+ src/random.h \
+ src/servergamethread.h \
  src/returnmessage.h
 SOURCES += src/main.cpp \
-           src/testserver.cpp \
-           src/testservergame.cpp \
-           src/testserversocket.cpp \
+           src/server.cpp \
+           src/servergame.cpp \
+           src/serversocket.cpp \
  src/playerzone.cpp \
- src/testcard.cpp \
+ src/card.cpp \
  src/counter.cpp \
- src/testrandom.cpp \
- src/testservergamethread.cpp \
+ src/random.cpp \
+ src/servergamethread.cpp \
  src/returnmessage.cpp

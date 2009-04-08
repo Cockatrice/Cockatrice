@@ -155,7 +155,7 @@ void Client::readLine()
 				else if (!prefix.compare("welcome")) {
 					emit welcomeMsgReceived(welcomemsg);
 					setStatus(StatusConnected);
-					setName(PlayerName);
+					login(PlayerName, password);
 				}
 				msgbuf.clear();
 			} else
@@ -189,9 +189,10 @@ int Client::cmd(const QString &s)
 	return MsgId;
 }
 
-void Client::connectToServer(const QString &hostname, unsigned int port, const QString &playername)
+void Client::connectToServer(const QString &hostname, unsigned int port, const QString &playername, const QString &_password)
 {
 	PlayerName = playername;
+	password = _password;
 	socket->connectToHost(hostname, port);
 	setStatus(StatusConnecting);
 }
@@ -229,9 +230,9 @@ int Client::leaveGame()
 	return cmd("leave_game");
 }
 
-int Client::setName(const QString &name)
+int Client::login(const QString &name, const QString &pass)
 {
-	return cmd(QString("set_name|%1").arg(name));
+	return cmd(QString("login|%1|%2").arg(name).arg(pass));
 }
 
 int Client::say(const QString &s)

@@ -1,25 +1,36 @@
 #include "returnmessage.h"
-#include "testserversocket.h"
+#include "serversocket.h"
 
 void ReturnMessage::setMsgId(unsigned int _msg_id)
 {
 	msg_id = _msg_id;
 }
 
-bool ReturnMessage::send(const QString &args, bool success)
+bool ReturnMessage::send(ReturnCode code)
 {
-	TestServerSocket *s = qobject_cast<TestServerSocket *>(parent());
+	ServerSocket *s = qobject_cast<ServerSocket *>(parent());
 	if (!s)
 		return false;
+	bool success = (code == ReturnOk);
+	QString returnCodeString;
+	switch (code) {
+		case ReturnNothing: return true;
+		case ReturnOk: break;
+		case ReturnLoginNeeded: returnCodeString = "login_needed"; break;
+		case ReturnSyntaxError: returnCodeString = "syntax"; break;
+		case ReturnContextError: returnCodeString = "context"; break;
+		case ReturnPasswordWrong: returnCodeString = "password"; break;
+		case ReturnNameNotFound: returnCodeString = "name_not_found"; break;
+	}
 	s->msg(QString("resp|%1|%2|%3").arg(msg_id)
 				       .arg(success ? "ok" : "err")
-				       .arg(args));
+				       .arg(returnCodeString));
 	return success;
 }
 
 bool ReturnMessage::sendList(const QStringList &args)
 {
-	TestServerSocket *s = qobject_cast<TestServerSocket *>(parent());
+	ServerSocket *s = qobject_cast<ServerSocket *>(parent());
 	if (!s)
 		return false;
 	

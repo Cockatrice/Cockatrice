@@ -17,48 +17,36 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef TESTSERVERGAME_H
-#define TESTSERVERGAME_H
+#ifndef SERVER_H
+#define SERVER_H
 
-#include <QThread>
-#include <QMutex>
-#include <QStringList>
-#include "testserversocket.h"
-#include "testrandom.h"
+#include <QTcpServer>
 
-class TestServerSocket;
+class ServerGame;
+class ServerSocket;
+class QSqlDatabase;
 
-class TestServerGame : public QObject {
+enum AuthenticationResult { PasswordWrong = 0, PasswordRight = 1, UnknownUser = 2 };
+
+class Server : public QTcpServer
+{
 	Q_OBJECT
-private:
-	QList<TestServerSocket *> players;
-	bool gameStarted;
-	int activePlayer;
-	int activePhase;
-public slots:
-	void broadcastEvent(const QString &event, TestServerSocket *player);
+private slots:
+	void addGame(const QString name, const QString description, const QString password, const int maxPlayers, ServerSocket *creator);
+	void addClientToGame(const QString name, ServerSocket *client);
+	void gameCreated(ServerGame *_game, ServerSocket *_creator);
+	void gameClosed();
 public:
-	QMutex *mutex;
-	TestRandom *rnd;
-	QString name;
-	QString description;
-	QString password;
-	int maxPlayers;
-	TestServerGame(QString _name, QString _description, QString _password, int _maxPlayers, QObject *parent = 0);
-	~TestServerGame();
-	bool getGameStarted();
-	int getPlayerCount();
-	QStringList getPlayerNames();
-	TestServerSocket *getPlayer(int player_id);
-	void addPlayer(TestServerSocket *player);
-	void removePlayer(TestServerSocket *player);
-	void startGameIfReady();
-	void msg(const QString &s);
-	int getActivePlayer() { return activePlayer; }
-	int getActivePhase() { return activePhase; }
-	void setActivePlayer(int _activePlayer);
-	void setActivePhase(int _activePhase);
-	
+	Server(QObject *parent = 0);
+	~Server();
+	bool openDatabase();
+	bool checkGamePassword(const QString &name, const QString &password);
+	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
+	QList<ServerGame *> listOpenGames();
+	ServerGame *getGame(const QString &name);
+private:
+	void incomingConnection(int SocketId);
+	QList<ServerGame *> games;
 };
 
 #endif

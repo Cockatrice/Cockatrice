@@ -17,51 +17,47 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "testcard.h"
+#ifndef SERVERGAME_H
+#define SERVERGAME_H
 
-TestCard::TestCard(QString _name, int _id, int _coord_x, int _coord_y)
-	: id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), counters(0), tapped(false), attacking(false), facedown(false), annotation(QString()), doesntUntap(false)
-{
-}
+#include <QThread>
+#include <QMutex>
+#include <QStringList>
 
+class ServerSocket;
+class Random;
 
-TestCard::~TestCard()
-{
-}
-
-void TestCard::resetState()
-{
-	setCoords(0, 0);
-	setCounters(0);
-	setTapped(false);
-	setAttacking(false);
-	setFaceDown(false);
-	setAnnotation(QString());
-	setDoesntUntap(false);
-}
-
-bool TestCard::setAttribute(const QString &aname, const QString &avalue, bool allCards)
-{
-	if (!aname.compare("counters")) {
-		bool ok;
-		int tmp_int = avalue.toInt(&ok);
-		if (!ok)
-			return false;
-		setCounters(tmp_int);
-	} else if (!aname.compare("tapped")) {
-		bool value = !avalue.compare("1");
-		if (!(!value && allCards && doesntUntap))
-			setTapped(value);
-	} else if (!aname.compare("attacking")) {
-		setAttacking(!avalue.compare("1"));
-	} else if (!aname.compare("facedown")) {
-		setFaceDown(!avalue.compare("1"));
-	} else if (!aname.compare("annotation")) {
-		setAnnotation(avalue);
-	} else if (!aname.compare("doesnt_untap")) {
-		setDoesntUntap(!avalue.compare("1"));
-	} else
-		return false;
+class ServerGame : public QObject {
+	Q_OBJECT
+private:
+	QList<ServerSocket *> players;
+	bool gameStarted;
+	int activePlayer;
+	int activePhase;
+public slots:
+	void broadcastEvent(const QString &event, ServerSocket *player);
+public:
+	QMutex *mutex;
+	Random *rnd;
+	QString name;
+	QString description;
+	QString password;
+	int maxPlayers;
+	ServerGame(QString _name, QString _description, QString _password, int _maxPlayers, QObject *parent = 0);
+	~ServerGame();
+	bool getGameStarted();
+	int getPlayerCount();
+	QStringList getPlayerNames();
+	ServerSocket *getPlayer(int player_id);
+	void addPlayer(ServerSocket *player);
+	void removePlayer(ServerSocket *player);
+	void startGameIfReady();
+	void msg(const QString &s);
+	int getActivePlayer() { return activePlayer; }
+	int getActivePhase() { return activePhase; }
+	void setActivePlayer(int _activePlayer);
+	void setActivePhase(int _activePhase);
 	
-	return true;
-}
+};
+
+#endif

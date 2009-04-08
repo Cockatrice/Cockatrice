@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "playerzone.h"
+#include "random.h"
+#include "card.h"
 
 PlayerZone::PlayerZone(QString _name, bool _has_coords, bool _is_public, bool _is_private, bool _id_access)
 	: name(_name), has_coords(_has_coords), is_public(_is_public), is_private(_is_private), id_access(_id_access)
@@ -30,21 +32,21 @@ PlayerZone::~PlayerZone()
 	clear();
 }
 
-void PlayerZone::shuffle(TestRandom *rnd)
+void PlayerZone::shuffle(Random *rnd)
 {
-	QList<TestCard *> temp;
+	QList<Card *> temp;
 	for (int i = cards.size(); i; i--)
 		temp.append(cards.takeAt(rnd->getNumber(0, i - 1)));
 	cards = temp;
 }
 
-TestCard *PlayerZone::getCard(int id, bool remove, int *position)
+Card *PlayerZone::getCard(int id, bool remove, int *position)
 {
 	if (hasIdAccess()) {
-		QListIterator<TestCard *> CardIterator(cards);
+		QListIterator<Card *> CardIterator(cards);
 		int i = 0;
 		while (CardIterator.hasNext()) {
-			TestCard *tmp = CardIterator.next();
+			Card *tmp = CardIterator.next();
 			if (tmp->getId() == id) {
 				if (remove)
 					cards.removeAt(i);
@@ -58,7 +60,7 @@ TestCard *PlayerZone::getCard(int id, bool remove, int *position)
 	} else {
 		if (id >= cards.size())
 			return NULL;
-		TestCard *tmp = cards[id];
+		Card *tmp = cards[id];
 		if (remove)
 			cards.removeAt(id);
 		if (position)
@@ -67,7 +69,7 @@ TestCard *PlayerZone::getCard(int id, bool remove, int *position)
 	}
 }
 
-void PlayerZone::insertCard(TestCard *card, int x, int y)
+void PlayerZone::insertCard(Card *card, int x, int y)
 {
 	if (hasCoords()) {
 		card->setCoords(x, y);

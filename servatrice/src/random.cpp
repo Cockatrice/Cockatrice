@@ -1,7 +1,7 @@
-#include "testrandom.h"
+#include "random.h"
 #include <QThread>
 
-void TestRandom::init()
+void Random::init()
 {
 	if (initialized)
 		return;
@@ -11,7 +11,7 @@ void TestRandom::init()
 	initialized = true;
 }
 
-unsigned int TestRandom::getNumber(unsigned int min, unsigned int max)
+unsigned int Random::getNumber(unsigned int min, unsigned int max)
 {
 	int r = qrand();
 	return min + (unsigned int) (((double) (max + 1 - min)) * r / (RAND_MAX + 1.0));
