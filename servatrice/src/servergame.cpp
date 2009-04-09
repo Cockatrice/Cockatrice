@@ -22,17 +22,14 @@
 #include "serversocket.h"
 
 ServerGame::ServerGame(QString _name, QString _description, QString _password, int _maxPlayers, QObject *parent)
-	: QObject(parent), name(_name), description(_description), password(_password), maxPlayers(_maxPlayers)
+	: QObject(parent), gameStarted(false), rnd(0), name(_name), description(_description), password(_password), maxPlayers(_maxPlayers)
 {
-	gameStarted = false;
 	mutex = new QMutex(QMutex::Recursive);
-	rnd = NULL;
 }
 
 ServerGame::~ServerGame()
 {
-	if (rnd)
-		delete rnd;
+	delete rnd;
 	delete mutex;
 	qDebug("ServerGame destructor");
 }
