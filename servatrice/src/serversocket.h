@@ -21,6 +21,8 @@
 #define SERVERSOCKET_H
 
 #include <QTcpSocket>
+#include <QList>
+#include <QVariant>
 #include "server.h"
 #include "returnmessage.h"
 
@@ -44,41 +46,41 @@ signals:
 	void broadcastEvent(const QString &event, ServerSocket *player);
 	void startGameIfReady();
 private:
-	typedef ReturnMessage::ReturnCode (ServerSocket::*CommandHandler)(const QStringList &);
+	typedef ReturnMessage::ReturnCode (ServerSocket::*CommandHandler)(const QList<QVariant> &);
 	struct CommandProperties {
 		QString name;
-		int numberParams;
 		bool needsLogin;
 		bool needsGame;
 		bool needsStartedGame;
+		QList<QVariant::Type> paramTypes;
 		CommandHandler handler;
 	};
 	static const int numberCommands = 23;
 	static const CommandProperties commandList[numberCommands];
 
-	ReturnMessage::ReturnCode cmdLogin(const QStringList &params);
-	ReturnMessage::ReturnCode cmdListGames(const QStringList &params);
-	ReturnMessage::ReturnCode cmdCreateGame(const QStringList &params);
-	ReturnMessage::ReturnCode cmdJoinGame(const QStringList &params);
-	ReturnMessage::ReturnCode cmdLeaveGame(const QStringList &params);
-	ReturnMessage::ReturnCode cmdListPlayers(const QStringList &params);
-	ReturnMessage::ReturnCode cmdSay(const QStringList &params);
-	ReturnMessage::ReturnCode cmdSubmitDeck(const QStringList &params);
-	ReturnMessage::ReturnCode cmdReadyStart(const QStringList &params);
-	ReturnMessage::ReturnCode cmdShuffle(const QStringList &params);
-	ReturnMessage::ReturnCode cmdDrawCards(const QStringList &params);
-	ReturnMessage::ReturnCode cmdMoveCard(const QStringList &params);
-	ReturnMessage::ReturnCode cmdCreateToken(const QStringList &params);
-	ReturnMessage::ReturnCode cmdSetCardAttr(const QStringList &params);
-	ReturnMessage::ReturnCode cmdIncCounter(const QStringList &params);
-	ReturnMessage::ReturnCode cmdSetCounter(const QStringList &params);
-	ReturnMessage::ReturnCode cmdDelCounter(const QStringList &params);
-	ReturnMessage::ReturnCode cmdListCounters(const QStringList &params);
-	ReturnMessage::ReturnCode cmdListZones(const QStringList &params);
-	ReturnMessage::ReturnCode cmdDumpZone(const QStringList &params);
-	ReturnMessage::ReturnCode cmdRollDice(const QStringList &params);
-	ReturnMessage::ReturnCode cmdSetActivePlayer(const QStringList &params);
-	ReturnMessage::ReturnCode cmdSetActivePhase(const QStringList &params);
+	ReturnMessage::ReturnCode cmdLogin(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdListGames(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdCreateGame(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdJoinGame(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdLeaveGame(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdListPlayers(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdSay(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdSubmitDeck(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdReadyStart(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdShuffle(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdDrawCards(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdMoveCard(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdCreateToken(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdSetCardAttr(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdIncCounter(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdSetCounter(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdDelCounter(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdListCounters(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdListZones(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdDumpZone(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdRollDice(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdSetActivePlayer(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdSetActivePhase(const QList<QVariant> &params);
 
 	Server *server;
 	ServerGame *game;

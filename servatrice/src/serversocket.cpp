@@ -187,43 +187,65 @@ void ServerSocket::readClient()
 }
 
 const ServerSocket::CommandProperties ServerSocket::commandList[ServerSocket::numberCommands] = {
-	{"login", 2, false, false, false, &ServerSocket::cmdLogin},
-	{"list_games", 0, true, false, false, &ServerSocket::cmdListGames},
-	{"create_game", 4, true, false, false, &ServerSocket::cmdCreateGame},
-	{"join_game", 2, true, false, false, &ServerSocket::cmdJoinGame},
-	{"leave_game", 0, true, true, false, &ServerSocket::cmdLeaveGame},
-	{"list_players", 0, true, true, false, &ServerSocket::cmdListPlayers},
-	{"say", 1, true, true, false, &ServerSocket::cmdSay},
-	{"submit_deck", 0, true, true, false, &ServerSocket::cmdSubmitDeck},
-	{"ready_start", 0, true, true, false, &ServerSocket::cmdReadyStart},
-	{"shuffle", 0, true, true, true, &ServerSocket::cmdShuffle},
-	{"draw_cards", 1, true, true, true, &ServerSocket::cmdDrawCards},
-	{"move_card", 6, true, true, true, &ServerSocket::cmdMoveCard},
-	{"create_token", 5, true, true, true, &ServerSocket::cmdCreateToken},
-	{"set_card_attr", 4, true, true, true, &ServerSocket::cmdSetCardAttr},
-	{"inc_counter", 2, true, true, true, &ServerSocket::cmdIncCounter},
-	{"set_counter", 2, true, true, true, &ServerSocket::cmdSetCounter},
-	{"del_counter", 1, true, true, true, &ServerSocket::cmdDelCounter},
-	{"list_counters", 2, true, true, true, &ServerSocket::cmdListCounters},
-	{"list_zones", 1, true, true, true, &ServerSocket::cmdListZones},
-	{"dump_zone", 3, true, true, true, &ServerSocket::cmdDumpZone},
-	{"roll_dice", 1, true, true, true, &ServerSocket::cmdRollDice},
-	{"set_active_player", 1, true, true, true, &ServerSocket::cmdSetActivePlayer},
-	{"set_active_phase", 1, true, true, true, &ServerSocket::cmdSetActivePhase}
+	{"login", false, false, false, QList<QVariant::Type>() << QVariant::String
+							       << QVariant::String, &ServerSocket::cmdLogin},
+	{"list_games", true, false, false, QList<QVariant::Type>(), &ServerSocket::cmdListGames},
+	{"create_game", true, false, false, QList<QVariant::Type>() << QVariant::String
+								    << QVariant::String
+								    << QVariant::String
+								    << QVariant::Int, &ServerSocket::cmdCreateGame},
+	{"join_game", true, false, false, QList<QVariant::Type>() << QVariant::String
+								  << QVariant::String, &ServerSocket::cmdJoinGame},
+	{"leave_game", true, true, false, QList<QVariant::Type>(), &ServerSocket::cmdLeaveGame},
+	{"list_players", true, true, false, QList<QVariant::Type>(), &ServerSocket::cmdListPlayers},
+	{"say", true, true, false, QList<QVariant::Type>() << QVariant::String, &ServerSocket::cmdSay},
+	{"submit_deck", true, true, false, QList<QVariant::Type>(), &ServerSocket::cmdSubmitDeck},
+	{"ready_start", true, true, false, QList<QVariant::Type>(), &ServerSocket::cmdReadyStart},
+	{"shuffle", true, true, true, QList<QVariant::Type>(), &ServerSocket::cmdShuffle},
+	{"draw_cards", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdDrawCards},
+	{"move_card", true, true, true, QList<QVariant::Type>() << QVariant::Int
+								<< QVariant::String
+								<< QVariant::String
+								<< QVariant::Int
+								<< QVariant::Int
+								<< QVariant::Bool, &ServerSocket::cmdMoveCard},
+	{"create_token", true, true, true, QList<QVariant::Type>() << QVariant::String
+								   << QVariant::String
+								   << QVariant::String
+								   << QVariant::Int
+								   << QVariant::Int, &ServerSocket::cmdCreateToken},
+	{"set_card_attr", true, true, true, QList<QVariant::Type>() << QVariant::String
+								    << QVariant::Int
+								    << QVariant::String
+								    << QVariant::String, &ServerSocket::cmdSetCardAttr},
+	{"inc_counter", true, true, true, QList<QVariant::Type>() << QVariant::String
+								  << QVariant::Int, &ServerSocket::cmdIncCounter},
+	{"set_counter", true, true, true, QList<QVariant::Type>() << QVariant::String
+								  << QVariant::Int, &ServerSocket::cmdSetCounter},
+	{"del_counter", true, true, true, QList<QVariant::Type>() << QVariant::String, &ServerSocket::cmdDelCounter},
+	{"list_counters", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdListCounters},
+	{"list_zones", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdListZones},
+	{"dump_zone", true, true, true, QList<QVariant::Type>() << QVariant::Int
+								<< QVariant::String
+								<< QVariant::Int, &ServerSocket::cmdDumpZone},
+	{"roll_dice", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdRollDice},
+	{"set_active_player", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdSetActivePlayer},
+	{"set_active_phase", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdSetActivePhase}
 };
 
-ReturnMessage::ReturnCode ServerSocket::cmdLogin(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdLogin(const QList<QVariant> &params)
 {
-	authState = server->checkUserPassword(params[0], params[1]);
+	authState = server->checkUserPassword(params[0].toString(), params[1].toString());
 	if (authState == PasswordWrong)
 		return ReturnMessage::ReturnPasswordWrong;
-	PlayerName = params[0];
+	PlayerName = params[0].toString();
 	
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdListGames(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdListGames(const QList<QVariant> &params)
 {
+	Q_UNUSED(params);
 	QList<ServerGame *> gameList = server->listOpenGames();
 	QListIterator<ServerGame *> gameListIterator(gameList);
 	QStringList result;
@@ -241,11 +263,11 @@ ReturnMessage::ReturnCode ServerSocket::cmdListGames(const QStringList &params)
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdCreateGame(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdCreateGame(const QList<QVariant> &params)
 {
-	QString name = params[0];
-	QString description = params[1];
-	QString password = params[2];
+	QString name = params[0].toString();
+	QString description = params[1].toString();
+	QString password = params[2].toString();
 	int maxPlayers = params[3].toInt();
 	if (server->getGame(name))
 		return ReturnMessage::ReturnNameNotFound;
@@ -254,10 +276,10 @@ ReturnMessage::ReturnCode ServerSocket::cmdCreateGame(const QStringList &params)
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdJoinGame(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdJoinGame(const QList<QVariant> &params)
 {
-	QString name = params[0];
-	QString password = params[1];
+	QString name = params[0].toString();
+	QString password = params[1].toString();
 	if (!server->checkGamePassword(name, password))
 		return ReturnMessage::ReturnPasswordWrong;
 	leaveGame();
@@ -265,53 +287,55 @@ ReturnMessage::ReturnCode ServerSocket::cmdJoinGame(const QStringList &params)
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdLeaveGame(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdLeaveGame(const QList<QVariant> &params)
 {
+	Q_UNUSED(params);
 	leaveGame();
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdListPlayers(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdListPlayers(const QList<QVariant> &params)
 {
+	Q_UNUSED(params);
 	remsg->sendList(game->getPlayerNames());
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdSay(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdSay(const QList<QVariant> &params)
 {
-	emit broadcastEvent(QString("say|%1").arg(params[0]), this);
+	emit broadcastEvent(QString("say|%1").arg(params[0].toString()), this);
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdSubmitDeck(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdSubmitDeck(const QList<QVariant> &params)
 {
+	Q_UNUSED(params);
 	PlayerStatus = StatusSubmitDeck;
 	DeckList.clear();
 	SideboardList.clear();
 	return ReturnMessage::ReturnNothing;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdReadyStart(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdReadyStart(const QList<QVariant> &params)
 {
+	Q_UNUSED(params);
 	PlayerStatus = StatusReadyStart;
 	emit broadcastEvent(QString("ready_start"), this);
 	game->startGameIfReady();
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdShuffle(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdShuffle(const QList<QVariant> &params)
 {
+	Q_UNUSED(params);
 	getZone("deck")->shuffle(game->rnd);
 	emit broadcastEvent("shuffle", this);
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdDrawCards(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdDrawCards(const QList<QVariant> &params)
 {
-	bool ok;
-	int number = params[0].toInt(&ok);
-	if (!ok)
-		return ReturnMessage::ReturnSyntaxError;
+	int number = params[0].toInt();
 	PlayerZone *deck = getZone("deck");
 	PlayerZone *hand = getZone("hand");
 	if (deck->cards.size() < number)
@@ -328,174 +352,156 @@ ReturnMessage::ReturnCode ServerSocket::cmdDrawCards(const QStringList &params)
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdMoveCard(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdMoveCard(const QList<QVariant> &params)
 {
-		// ID Karte, Startzone, Zielzone, Koordinaten X, Y, Facedown
-		bool ok;
-		int cardid = params[0].toInt(&ok);
-		if (!ok)
-			return ReturnMessage::ReturnSyntaxError;
-		PlayerZone *startzone = getZone(params[1]);
-		PlayerZone *targetzone = getZone(params[2]);
-		if ((!startzone) || (!targetzone))
-			return ReturnMessage::ReturnContextError;
+	// ID Karte, Startzone, Zielzone, Koordinaten X, Y, Facedown
+	int cardid = params[0].toInt();
+	PlayerZone *startzone = getZone(params[1].toString());
+	PlayerZone *targetzone = getZone(params[2].toString());
+	if ((!startzone) || (!targetzone))
+		return ReturnMessage::ReturnContextError;
 
-		int position = -1;
-		Card *card = startzone->getCard(cardid, true, &position);
-		if (!card)
-			return ReturnMessage::ReturnContextError;
-		int x = params[3].toInt(&ok);
-		if (!ok)
-			return ReturnMessage::ReturnSyntaxError;
-		int y = 0;
-		if (targetzone->hasCoords()) {
-			y = params[4].toInt(&ok);
-			if (!ok)
-				return ReturnMessage::ReturnSyntaxError;
-		}
-		bool facedown = params[5].toInt(&ok);
-		if (!ok)
-			return ReturnMessage::ReturnSyntaxError;
+	int position = -1;
+	Card *card = startzone->getCard(cardid, true, &position);
+	if (!card)
+		return ReturnMessage::ReturnContextError;
+	int x = params[3].toInt();
+	int y = 0;
+	if (targetzone->hasCoords())
+		y = params[4].toInt();
+	bool facedown = params[5].toBool();
 
-		targetzone->insertCard(card, x, y);
+	targetzone->insertCard(card, x, y);
 
-		QString privateCardName, publicCardName;
-		if (facedown)
-			card->setId(newCardId());
-		if ((!facedown && !card->getFaceDown())
-		  || (card->getFaceDown() && !facedown && startzone->isPublic() && targetzone->isPublic()))
-			publicCardName = card->getName();
-		if ((!facedown && !card->getFaceDown())
-		  || (card->getFaceDown() && !facedown && startzone->isPublic() && targetzone->isPublic())
-		  || (!facedown && targetzone->isPrivate()))
-			privateCardName = card->getName();
-		
-		card->setFaceDown(facedown);
-		msg(QString("private|||move_card|%1|%2|%3|%4|%5|%6|%7|%8").arg(card->getId())
-								    .arg(privateCardName)
-								    .arg(startzone->getName())
-								    .arg(position)
-								    .arg(targetzone->getName())
-								    .arg(x)
-								    .arg(y)
-								    .arg(facedown ? 1 : 0));
-		if ((startzone->isPublic()) || (targetzone->isPublic()))
-			emit broadcastEvent(QString("move_card|%1|%2|%3|%4|%5|%6|%7|%8").arg(card->getId())
-										 .arg(publicCardName)
-										 .arg(startzone->getName())
-										 .arg(position)
-										 .arg(targetzone->getName())
-										 .arg(x)
-										 .arg(y)
-										 .arg(facedown ? 1 : 0), this);
-		else
-			emit broadcastEvent(QString("move_card|||%1|%2|%3|%4|%5|0").arg(startzone->getName())
-									     .arg(position)
-									     .arg(targetzone->getName())
-									     .arg(x)
-									     .arg(y), this);
-		return ReturnMessage::ReturnOk;
+	QString privateCardName, publicCardName;
+	if (facedown)
+		card->setId(newCardId());
+	if ((!facedown && !card->getFaceDown())
+	  || (card->getFaceDown() && !facedown && startzone->isPublic() && targetzone->isPublic()))
+		publicCardName = card->getName();
+	if ((!facedown && !card->getFaceDown())
+	  || (card->getFaceDown() && !facedown && startzone->isPublic() && targetzone->isPublic())
+	  || (!facedown && targetzone->isPrivate()))
+		privateCardName = card->getName();
+	
+	card->setFaceDown(facedown);
+	msg(QString("private|||move_card|%1|%2|%3|%4|%5|%6|%7|%8").arg(card->getId())
+							    .arg(privateCardName)
+							    .arg(startzone->getName())
+							    .arg(position)
+							    .arg(targetzone->getName())
+							    .arg(x)
+							    .arg(y)
+							    .arg(facedown ? 1 : 0));
+	if ((startzone->isPublic()) || (targetzone->isPublic()))
+		emit broadcastEvent(QString("move_card|%1|%2|%3|%4|%5|%6|%7|%8").arg(card->getId())
+									 .arg(publicCardName)
+									 .arg(startzone->getName())
+									 .arg(position)
+									 .arg(targetzone->getName())
+									 .arg(x)
+									 .arg(y)
+									 .arg(facedown ? 1 : 0), this);
+	else
+		emit broadcastEvent(QString("move_card|||%1|%2|%3|%4|%5|0").arg(startzone->getName())
+								     .arg(position)
+								     .arg(targetzone->getName())
+								     .arg(x)
+								     .arg(y), this);
+	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdCreateToken(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdCreateToken(const QList<QVariant> &params)
 {
-		// zone, cardname, powtough, x, y
-		// powtough wird erst mal ignoriert
-		PlayerZone *zone = getZone(params[0]);
-		if (!zone)
-			return ReturnMessage::ReturnContextError;
-		QString cardname = params[1];
-		int x = params[3].toInt();
-		int y = params[4].toInt();
-		int cardid = newCardId();
-		QString powtough = params[2];
+	// zone, cardname, powtough, x, y
+	// powtough wird erst mal ignoriert
+	PlayerZone *zone = getZone(params[0].toString());
+	if (!zone)
+		return ReturnMessage::ReturnContextError;
+	QString cardname = params[1].toString();
+	QString powtough = params[2].toString();
+	int x = params[3].toInt();
+	int y = params[4].toInt();
+	int cardid = newCardId();
 
-		Card *card = new Card(cardname, cardid, x, y);
-		zone->insertCard(card, x, y);
-		emit broadcastEvent(QString("create_token|%1|%2|%3|%4|%5|%6").arg(zone->getName())
-										 .arg(cardid)
-										 .arg(cardname)
-										 .arg(powtough)
-										 .arg(x)
-										 .arg(y), this);
-		return ReturnMessage::ReturnOk;
+	Card *card = new Card(cardname, cardid, x, y);
+	zone->insertCard(card, x, y);
+	emit broadcastEvent(QString("create_token|%1|%2|%3|%4|%5|%6").arg(zone->getName())
+									 .arg(cardid)
+									 .arg(cardname)
+									 .arg(powtough)
+									 .arg(x)
+									 .arg(y), this);
+	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdSetCardAttr(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdSetCardAttr(const QList<QVariant> &params)
 {
 	// zone, card id, attr name, attr value
 	// card id = -1 => affects all cards in the specified zone
-	PlayerZone *zone = getZone(params[0]);
+	PlayerZone *zone = getZone(params[0].toString());
 	if (!zone)
 		return ReturnMessage::ReturnContextError;
-	bool ok;
-	int cardid = params[1].toInt(&ok);
-	if (!ok)
-		return ReturnMessage::ReturnSyntaxError;
+	int cardid = params[1].toInt();
+	QString aname = params[2].toString();
+	QString avalue = params[3].toString();
 
 	if (cardid == -1) {
 		QListIterator<Card *> CardIterator(zone->cards);
 		while (CardIterator.hasNext())
-			if (!CardIterator.next()->setAttribute(params[2], params[3], true))
+			if (!CardIterator.next()->setAttribute(aname, avalue, true))
 				return ReturnMessage::ReturnSyntaxError;
 	} else {
 		Card *card = zone->getCard(cardid, false);
 		if (!card)
 			return ReturnMessage::ReturnContextError;
-		if (!card->setAttribute(params[2], params[3], false))
+		if (!card->setAttribute(aname, avalue, false))
 			return ReturnMessage::ReturnSyntaxError;
 	}
-	emit broadcastEvent(QString("set_card_attr|%1|%2|%3|%4").arg(zone->getName()).arg(cardid).arg(params[2]).arg(params[3]), this);
+	emit broadcastEvent(QString("set_card_attr|%1|%2|%3|%4").arg(zone->getName()).arg(cardid).arg(aname).arg(avalue), this);
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdIncCounter(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdIncCounter(const QList<QVariant> &params)
 {
-	Counter *c = getCounter(params[0]);
+	Counter *c = getCounter(params[0].toString());
 	if (!c)
 		return ReturnMessage::ReturnContextError;
-	bool ok;
-	int delta = params[1].toInt(&ok);
-	if (!ok)
-		return ReturnMessage::ReturnSyntaxError;
+	int delta = params[1].toInt();
+	
 	c->setCount(c->getCount() + delta);
-	emit broadcastEvent(QString("set_counter|%1|%2").arg(params[0]).arg(c->getCount()), this);
+	emit broadcastEvent(QString("set_counter|%1|%2").arg(c->getName()).arg(c->getCount()), this);
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdSetCounter(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdSetCounter(const QList<QVariant> &params)
 {
-	Counter *c = getCounter(params[0]);
-	bool ok;
-	int count = params[1].toInt(&ok);
-	if (!ok)
-		return ReturnMessage::ReturnSyntaxError;
+	Counter *c = getCounter(params[0].toString());
+	int count = params[1].toInt();
+	
 	if (!c) {
-		c = new Counter(params[0], count);
+		c = new Counter(params[0].toString(), count);
 		counters << c;
 	} else
 		c->setCount(count);
-	emit broadcastEvent(QString("set_counter|%1|%2").arg(params[0]).arg(count), this);
+	emit broadcastEvent(QString("set_counter|%1|%2").arg(c->getName()).arg(count), this);
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdDelCounter(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdDelCounter(const QList<QVariant> &params)
 {
-	Counter *c = getCounter(params[0]);
+	Counter *c = getCounter(params[0].toString());
 	if (!c)
 		return ReturnMessage::ReturnContextError;
 	delete c;
 	counters.removeAt(counters.indexOf(c));
-	emit broadcastEvent(QString("del_counter|%1").arg(params[0]), this);
+	emit broadcastEvent(QString("del_counter|%1").arg(params[0].toString()), this);
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdListCounters(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdListCounters(const QList<QVariant> &params)
 {
-	bool ok;
-	int player_id = params[0].toInt(&ok);
-	if (!ok)
-		return ReturnMessage::ReturnSyntaxError;
+	int player_id = params[0].toInt();
 	ServerSocket *player = game->getPlayer(player_id);
 	if (!player)
 		return ReturnMessage::ReturnContextError;
@@ -503,12 +509,9 @@ ReturnMessage::ReturnCode ServerSocket::cmdListCounters(const QStringList &param
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdListZones(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdListZones(const QList<QVariant> &params)
 {
-	bool ok;
-	int player_id = params[0].toInt(&ok);
-	if (!ok)
-		return ReturnMessage::ReturnSyntaxError;
+	int player_id = params[0].toInt();
 	ServerSocket *player = game->getPlayer(player_id);
 	if (!player)
 		return ReturnMessage::ReturnContextError;
@@ -516,23 +519,19 @@ ReturnMessage::ReturnCode ServerSocket::cmdListZones(const QStringList &params)
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdDumpZone(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdDumpZone(const QList<QVariant> &params)
 {
-	bool ok;
-	int player_id = params[0].toInt(&ok);
-	if (!ok)
-		return ReturnMessage::ReturnSyntaxError;
-	int number_cards = params[2].toInt(&ok);
-	if (!ok)
-		return ReturnMessage::ReturnSyntaxError;
+	int player_id = params[0].toInt();
+	int number_cards = params[2].toInt();
 	ServerSocket *player = game->getPlayer(player_id);
 	if (!player)
 		return ReturnMessage::ReturnContextError;
-	PlayerZone *zone = player->getZone(params[1]);
+	PlayerZone *zone = player->getZone(params[1].toString());
 	if (!zone)
 		return ReturnMessage::ReturnContextError;
 	if (!(zone->isPublic() || (player_id == PlayerId)))
 		return ReturnMessage::ReturnContextError;
+		
 	QListIterator<Card *> card_iterator(zone->cards);
 	QStringList result;
 	for (int i = 0; card_iterator.hasNext() && (i < number_cards || number_cards == 0); i++) {
@@ -555,34 +554,25 @@ ReturnMessage::ReturnCode ServerSocket::cmdDumpZone(const QStringList &params)
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdRollDice(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdRollDice(const QList<QVariant> &params)
 {
-	bool ok;
-	int sides = params[0].toInt(&ok);
-	if (!ok)
-		return ReturnMessage::ReturnSyntaxError;
+	int sides = params[0].toInt();
 	emit broadcastEvent(QString("roll_dice|%1|%2").arg(sides).arg(game->rnd->getNumber(1, sides)), this);
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdSetActivePlayer(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdSetActivePlayer(const QList<QVariant> &params)
 {
-	bool ok;
-	int active_player = params[0].toInt(&ok);
-	if (!ok)
-		return ReturnMessage::ReturnSyntaxError;
+	int active_player = params[0].toInt();
 	if (!game->getPlayer(active_player))
 		return ReturnMessage::ReturnContextError;
 	game->setActivePlayer(active_player);
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdSetActivePhase(const QStringList &params)
+ReturnMessage::ReturnCode ServerSocket::cmdSetActivePhase(const QList<QVariant> &params)
 {
-	bool ok;
-	int active_phase = params[0].toInt(&ok);
-	if (!ok)
-		return ReturnMessage::ReturnSyntaxError;
+	int active_phase = params[0].toInt();
 	// XXX Überprüfung, ob die Phase existiert...
 	game->setActivePhase(active_phase);
 	return ReturnMessage::ReturnOk;
@@ -620,12 +610,39 @@ bool ServerSocket::parseCommand(QString line)
 				return remsg->send(ReturnMessage::ReturnContextError);
 			if (commandList[i].needsStartedGame && !game->getGameStarted())
 				return remsg->send(ReturnMessage::ReturnContextError);
-			// Check parameter count
-			if (commandList[i].numberParams != params.size())
+			// Validate parameters
+			if (commandList[i].paramTypes.size() != params.size())
 				return remsg->send(ReturnMessage::ReturnSyntaxError);
+			QList<QVariant> paramList;
+			for (int j = 0; j < commandList[i].paramTypes.size(); j++)
+				switch (commandList[i].paramTypes[j]) {
+					case QVariant::String: {
+						paramList << QVariant(params[j]);
+						break;
+					}
+					case QVariant::Int: {
+						bool ok;
+						int temp = params[j].toInt(&ok);
+						if (!ok)
+							return remsg->send(ReturnMessage::ReturnSyntaxError);
+						paramList << QVariant(temp);
+						break;
+					}
+					case QVariant::Bool: {
+						if (params[j] == "1")
+							paramList << QVariant(true);
+						else if (params[j] == "0")
+							paramList << QVariant(false);
+						else
+							return remsg->send(ReturnMessage::ReturnSyntaxError);
+						break;
+					}
+					default:
+						paramList << QVariant(params[j]);
+				}
 			// Call handler function
 			CommandHandler handler = commandList[i].handler;
-			return remsg->send((this->*handler)(params));
+			return remsg->send((this->*handler)(paramList));
 		}
 	return remsg->send(ReturnMessage::ReturnSyntaxError);
 }
