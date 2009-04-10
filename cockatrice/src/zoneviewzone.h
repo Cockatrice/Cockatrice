@@ -8,6 +8,7 @@ class ZoneViewWidget;
 
 class ZoneViewZone : public CardZone {
 private:
+	int height;
 	int numberCards;
 	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
 	CardZone *origZone;
@@ -22,6 +23,7 @@ public:
 	void reorganizeCards();
 	bool initializeCards();
 	void removeCard(int position);
+	void setHeight(int _height) { height = _height; }
 };
 
 #endif

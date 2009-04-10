@@ -181,6 +181,11 @@ void MainWindow::createActions()
 	connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
 	aExit = new QAction(tr("&Exit"), this);
 	connect(aExit, SIGNAL(triggered()), this, SLOT(actExit()));
+	
+	aCloseMostRecentZoneView = new QAction(tr("Close most recent zone view"), this);
+	aCloseMostRecentZoneView->setShortcut(tr("Esc"));
+	connect(aCloseMostRecentZoneView, SIGNAL(triggered()), zoneLayout, SLOT(closeMostRecentZoneView()));
+	addAction(aCloseMostRecentZoneView);
 }
 
 void MainWindow::createMenus()
@@ -208,8 +213,6 @@ MainWindow::MainWindow(QWidget *parent)
 //	setWindowState(windowState() | Qt::WindowFullScreen);
 
 	QPixmapCache::setCacheLimit(200000);
-	createActions();
-	createMenus();
 
 	db = new CardDatabase;
 	int cardCount = db->loadFromFile("../cards.dat");
@@ -262,6 +265,9 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(client, SIGNAL(welcomeMsgReceived(const QStringList)), messageLog, SLOT(logConnected(const QStringList)));
 	connect(this, SIGNAL(logDisconnected()), messageLog, SLOT(logDisconnected()));
 	connect(client, SIGNAL(logSocketError(const QString &)), messageLog, SLOT(logSocketError(const QString &)));
+
+	createActions();
+	createMenus();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

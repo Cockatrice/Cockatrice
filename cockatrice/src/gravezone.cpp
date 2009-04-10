@@ -6,7 +6,7 @@
 #include "zoneviewzone.h"
 
 GraveZone::GraveZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "grave", parent)
+	: CardZone(_p, "grave", false, false, parent)
 {
 	cards = new CardList(true);
 }

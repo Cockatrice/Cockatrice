@@ -6,7 +6,7 @@
 #include "zoneviewzone.h"
 
 RfgZone::RfgZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "rfg", parent)
+	: CardZone(_p, "rfg", false, false, parent)
 {
 	cards = new CardList(true);
 }

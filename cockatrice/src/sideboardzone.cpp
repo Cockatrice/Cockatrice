@@ -5,7 +5,7 @@
 #include "zoneviewzone.h"
 
 SideboardZone::SideboardZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "sb", parent)
+	: CardZone(_p, "sb", false, false, parent)
 {
 	cards = new CardList(false);
 }

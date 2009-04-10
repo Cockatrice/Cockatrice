@@ -20,6 +20,7 @@ public:
 public slots:
 	void addItem(Player *player, const QString &zoneName, int numberCards = 0);
 	void removeItem(ZoneViewWidget *item);
+	void closeMostRecentZoneView();
 };
 
 #endif

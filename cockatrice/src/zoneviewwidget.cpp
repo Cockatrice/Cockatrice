@@ -5,18 +5,41 @@
 #include "zoneviewzone.h"
 #include "player.h"
 #include "client.h"
-#include "zoneclosebutton.h"
 
 ZoneViewWidget::ZoneViewWidget(CardDatabase *_db, Player *_player, CardZone *_origZone, int numberCards, QGraphicsItem *parent)
-	: QGraphicsWidget(parent), db(_db), player(_player)
+	: QGraphicsWidget(parent, Qt::Tool | Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint), db(_db), player(_player)
 {
-	ZoneCloseButton *closeButton = new ZoneCloseButton(this);
-	connect(closeButton, SIGNAL(triggered()), this, SLOT(slotClosePressed()));
+	setWindowTitle(QString("%1's %2").arg(player->getName()).arg(_origZone->getName()));
+	setAttribute(Qt::WA_DeleteOnClose);
 	
-	resize(150, 1000);
+	qreal y = 10;
+	if (_origZone->getIsShufflable() && (numberCards == 0)) {
+		shuffleCheckBox = new QCheckBox("shuffle when closing");
+		shuffleCheckBox->setChecked(true);
+		QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget(this);
+		shuffleProxy->setWidget(shuffleCheckBox);
+		y += shuffleProxy->y() + shuffleProxy->size().height();
+	} else
+		shuffleCheckBox = 0;
+
+	qreal left, top, right, bottom;
+	getWindowFrameMargins(&left, &top, &right, &bottom);
+	qreal h = scene()->sceneRect().height() - (top + bottom);
+	
+	scrollBar = new QScrollBar(Qt::Vertical);
+	QGraphicsProxyWidget *scrollProxy = new QGraphicsProxyWidget(this);
+	scrollProxy->setWidget(scrollBar);
+	scrollProxy->setPos(138, y);
+	scrollProxy->resize(scrollProxy->size().width(), h - y);
+	
+	qreal w = 138 + scrollProxy->size().width();
+	resize(w, h);
+	setMinimumSize(w, h);
+	setMaximumSize(w, h);
 	
 	zone = new ZoneViewZone(player, _origZone, numberCards, this);
-	zone->setPos(0, 30);
+	zone->setPos(3, y);
+	zone->setHeight(h - y);
 	if (!zone->initializeCards()) {
 		connect(player->client, SIGNAL(zoneDumpReceived(int, QList<ServerZoneCard *>)), this, SLOT(zoneDumpReceived(int, QList<ServerZoneCard *>)));
 		cmdId = player->client->dumpZone(player->getId(), _origZone->getName(), numberCards);
@@ -39,7 +62,11 @@ void ZoneViewWidget::zoneDumpReceived(int commandId, QList<ServerZoneCard *> car
 	zone->reorganizeCards();
 }
 
-void ZoneViewWidget::slotClosePressed()
+void ZoneViewWidget::closeEvent(QCloseEvent *event)
 {
+	if (shuffleCheckBox)
+		if (shuffleCheckBox->isChecked())
+			player->client->shuffle();
 	emit closePressed(this);
+	event->accept();
 }

@@ -17,15 +17,17 @@ protected:
 	QList<ZoneViewZone *> views;
 	QMenu *menu;
 	bool hasCardAttr;
+	bool isShufflable;
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 public:
 	enum { Type = typeZone };
 	int type() const { return Type; }
 	virtual void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown) = 0;
-	CardZone(Player *_player, const QString &_name, QGraphicsItem *parent = 0, bool isView = false);
+	CardZone(Player *_player, const QString &_name, bool _hasCardAttr, bool _isShufflable, QGraphicsItem *parent = 0, bool isView = false);
 	~CardZone();
 	void clearContents();
 	bool getHasCardAttr() const { return hasCardAttr; }
+	bool getIsShufflable() const { return isShufflable; }
 	QMenu *getMenu() const { return menu; }
 	void setMenu(QMenu *_menu) { menu = _menu; }
 	QString getName() const { return name; }

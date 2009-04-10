@@ -4,7 +4,7 @@
 #include "client.h"
 
 HandZone::HandZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "hand", parent)
+	: CardZone(_p, "hand", false, false, parent)
 {
 	cards = new CardList(player->getLocal());
 }

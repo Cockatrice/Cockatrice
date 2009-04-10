@@ -66,6 +66,7 @@ private:
 	void createMenus();
 	QMenu *gameMenu, *actionsMenu, *cardMenu;
 	QAction *aConnect, *aDisconnect, *aGames, *aRestartGame, *aLeaveGame, *aDeckEditor, *aExit;
+	QAction *aCloseMostRecentZoneView;
 
 	CardInfoWidget *cardInfo;
 	MessageLogWidget *messageLog;

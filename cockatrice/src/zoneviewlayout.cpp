@@ -11,10 +11,22 @@ ZoneViewLayout::ZoneViewLayout(CardDatabase *_db, QGraphicsItem *parent)
 void ZoneViewLayout::reorganize()
 {
 	qDebug(QString("ZoneViewLayout: activate: count=%1").arg(views.size()).toLatin1());
-	resize(views.size() * 150, 1000);
-	for (int i = 0; i < views.size(); i++) {
-		views.at(i)->setPos(i * 150, 0);
+	if (views.isEmpty()) {
+		resize(0, 0);
+		emit sizeChanged();
+		return;
 	}
+	qreal x, y;
+	views.at(0)->getWindowFrameMargins(&x, &y, 0, 0);
+	qreal totalWidth = x;
+	for (int i = 0; i < views.size(); i++) {
+		QRectF viewSize = views.at(i)->windowFrameRect();
+		qreal w = viewSize.right() - viewSize.left();
+		qreal h = viewSize.bottom() - viewSize.top();
+		views.at(i)->setPos(totalWidth, y);
+		totalWidth += w;
+	}
+	resize(totalWidth, scene()->sceneRect().height());
 	emit sizeChanged();
 }
 
@@ -31,6 +43,12 @@ void ZoneViewLayout::removeItem(ZoneViewWidget *item)
 	qDebug("ZoneViewLayout::removeItem");
 	views.removeAt(views.indexOf(item));
 	scene()->removeItem(item);
-	delete item;
 	reorganize();
+}
+
+void ZoneViewLayout::closeMostRecentZoneView()
+{
+	if (views.isEmpty())
+		return;
+	views.at(views.size() - 1)->close();
 }

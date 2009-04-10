@@ -4,7 +4,7 @@
 #include "client.h"
 
 ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, QGraphicsItem *parent)
-	: CardZone(_p, _origZone->getName(), parent, true), numberCards(_numberCards), origZone(_origZone)
+	: CardZone(_p, _origZone->getName(), false, false, parent, true), height(0), numberCards(_numberCards), origZone(_origZone)
 {
 	cards = new CardList(true);
 	origZone->addView(this);
@@ -18,7 +18,7 @@ ZoneViewZone::~ZoneViewZone()
 
 QRectF ZoneViewZone::boundingRect() const
 {
-	return QRectF(0, 0, CARD_WIDTH * 1.75, scene()->sceneRect().height());
+	return QRectF(0, 0, CARD_WIDTH * 1.75, height);
 }
 
 void ZoneViewZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

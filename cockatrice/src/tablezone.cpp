@@ -4,10 +4,9 @@
 #include "client.h"
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "table", parent), width(720), height(510)
+	: CardZone(_p, "table", true, false, parent), width(720), height(510)
 {
 	cards = new CardList(true);
-	hasCardAttr = true;
 }
 
 QRectF TableZone::boundingRect() const

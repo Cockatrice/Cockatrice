@@ -5,8 +5,8 @@
 #include "client.h"
 #include "zoneviewzone.h"
 
-CardZone::CardZone(Player *_p, const QString &_name, QGraphicsItem *parent, bool isView)
-	: QGraphicsItem(parent), player(_p), name(_name), cards(NULL), menu(NULL), hasCardAttr(false)
+CardZone::CardZone(Player *_p, const QString &_name, bool _hasCardAttr, bool _isShufflable, QGraphicsItem *parent, bool isView)
+	: QGraphicsItem(parent), player(_p), name(_name), cards(NULL), menu(NULL), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable)
 {
 	if (!isView)
 		player->addZone(this);

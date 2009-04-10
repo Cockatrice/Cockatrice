@@ -7,7 +7,7 @@
 #include "zoneviewzone.h"
 
 LibraryZone::LibraryZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "deck", parent)
+	: CardZone(_p, "deck", false, true, parent)
 {
 	cards = new CardList(false);
 	setCursor(Qt::OpenHandCursor);
