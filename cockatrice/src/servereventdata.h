@@ -20,6 +20,7 @@ enum ServerEventType {
 	eventMoveCard,
 	eventCreateToken,
 	eventSetCardAttr,
+	eventAddCounter,
 	eventSetCounter,
 	eventDelCounter,
 	eventSetActivePlayer,

@@ -9,6 +9,8 @@
 #include "handzone.h"
 #include "carddatabase.h"
 #include "dlg_startgame.h"
+#include "playerarea.h"
+#include "counter.h"
 
 Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_actionsMenu, QMenu *_cardMenu, int playerId, const QString &playerName)
 	: QObject(), actionsMenu(_actionsMenu), cardMenu(_cardMenu), db(_db), client(_client), scene(_scene), started(false)
@@ -209,6 +211,7 @@ void Game::gameEvent(ServerEventData *msg)
 		case eventCreateToken:
 		case eventSetupZones:
 		case eventSetCardAttr:
+		case eventAddCounter:
 		case eventSetCounter:
 		case eventDelCounter:
 		case eventPlayerId: {
@@ -257,7 +260,7 @@ void Game::actDecLife()
 void Game::actSetLife()
 {
 	bool ok;
-	int life = QInputDialog::getInteger(0, tr("Set life"), tr("New life total:"), localPlayer->getCounters()->findCounter("life")->getValue(), 0, 2000000000, 1, &ok);
+	int life = QInputDialog::getInteger(0, tr("Set life"), tr("New life total:"), localPlayer->area->getCounter("life")->getValue(), 0, 2000000000, 1, &ok);
 	if (ok)
 		client->setCounter("life", life);
 }

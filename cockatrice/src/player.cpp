@@ -2,6 +2,7 @@
 #include "client.h"
 #include "cardzone.h"
 #include "playerarea.h"
+#include "counter.h"
 #include <QGraphicsScene>
 #include <QMenu>
 
@@ -11,9 +12,6 @@ Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDa
 	area = new PlayerArea(this);
 	area->setPos(_base);
 	_scene->addItem(area);
-
-	Counter *life = new Counter(this, "life");
-	life->setPos(_base + QPointF(-50, 500));
 
 	aMoveHandToTopLibrary = new QAction(tr("Move to &top of library"), this);
 	connect(aMoveHandToTopLibrary, SIGNAL(triggered()), this, SLOT(actMoveHandToTopLibrary()));
@@ -70,9 +68,6 @@ Player::~Player()
 	for (int i = 0; i < zones.size(); i++)
 		delete zones.at(i);
 
-	for (int i = 0; i < counters.size(); i++)
-		delete counters.at(i);
-	
 	delete area;
 }
 
@@ -123,11 +118,6 @@ void Player::addZone(CardZone *z)
 	zones << z;
 }
 
-void Player::addCounter(Counter *c)
-{
-	counters << c;
-}
-
 void Player::setCardAttrHelper(CardItem *card, const QString &aname, const QString &avalue, bool allCards)
 {
 	if (aname == "tapped") {
@@ -159,17 +149,15 @@ void Player::gameEvent(ServerEventData *event)
 	switch (event->getEventType()) {
 		case eventSetupZones: {
 			// XXX Life counter
-			int life = data[0].toInt();
-			int deck_cards = data[1].toInt();
-			int sb_cards = data[2].toInt();
+			int deck_cards = data[0].toInt();
+			int sb_cards = data[1].toInt();
 			// XXX Fehlerbehandlung
 
 			// Clean up existing zones first
 			for (int i = 0; i < zones.size(); i++)
 				zones.at(i)->clearContents();
-
-			Counter *lifeCounter = counters.findCounter("life");
-			lifeCounter->setValue(life);
+				
+			area->clearCounters();
 
 			CardZone *deck = zones.findZone("deck");
 			for (; deck_cards; deck_cards--)
@@ -180,6 +168,17 @@ void Player::gameEvent(ServerEventData *event)
 			for (; sb_cards; sb_cards--)
 				sb->addCard(new CardItem(db, QString(), -1));
 			sb->reorganizeCards();
+
+			if (local) {
+				client->addCounter("life", QColor("white"), 20);
+				client->addCounter("w", QColor(200, 200, 200), 0);
+				client->addCounter("u", QColor(0, 0, 200), 0);
+				client->addCounter("b", QColor(100, 100, 100), 0);
+				client->addCounter("r", QColor(200, 0, 0), 0);
+				client->addCounter("g", QColor(0, 200, 0), 0);
+				client->addCounter("x", QColor(255, 255, 255), 0);
+				client->addCounter("storm", QColor(255, 255, 255), 0);
+			}
 
 			break;
 		}
@@ -269,12 +268,25 @@ void Player::gameEvent(ServerEventData *event)
 			}
 			break;
 		}
+		case eventAddCounter: {
+			if (data.size() != 3) {
+				// XXX
+			}
+			QString counterName = data[0];
+			int colorValue = data[1].toInt();
+			int value = data[2].toInt();
+			QColor color(colorValue / 65536, (colorValue % 65536) / 256, colorValue % 256);
+			qDebug(QString("%1 / %2 / %3").arg(color.red()).arg(color.green()).arg(color.blue()).toLatin1());
+			area->addCounter(counterName, color, value);
+			break;
+		}
 		case eventSetCounter: {
 			if (data.size() != 2) {
 				// XXX
 			}
 			int value = data[1].toInt();
-			Counter *c = counters.findCounter(data[0]);
+			QString counterName = data[0];
+			Counter *c = area->getCounter(counterName);
 			int oldValue = c->getValue();
 			c->setValue(value);
 			emit logSetCounter(name, c->getName(), value, oldValue);

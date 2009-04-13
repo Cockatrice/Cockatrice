@@ -9,6 +9,7 @@
 #include "serverzonecard.h"
 #include "pendingcommand.h"
 #include <QTcpSocket>
+#include <QColor>
 
 class QTimer;
 
@@ -76,6 +77,7 @@ public:
 	int setCardAttr(const QString &zone, int cardid, const QString &aname, const QString &avalue);
 	int readyStart();
 	int incCounter(const QString &counter, int delta);
+	int addCounter(const QString &counter, QColor color, int value);
 	int setCounter(const QString &counter, int value);
 	int delCounter(const QString &counter);
 	int setActivePlayer(int player);

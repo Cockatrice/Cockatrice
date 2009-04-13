@@ -4,7 +4,6 @@
 #include <QInputDialog>
 #include <QPoint>
 #include "zonelist.h"
-#include "counterlist.h"
 #include "servereventdata.h"
 
 class Client;
@@ -44,21 +43,18 @@ private:
 	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary,
 		*aViewLibrary, *aViewTopCards, *aViewGraveyard, *aViewRfg, *aViewSideboard;
 
-	PlayerArea *area;
-	
 	int defaultNumberTopCards;
 	QString name;
 	int id;
 	QPointF base;
 	bool local;
 	ZoneList zones;
-	CounterList counters;
 	CardDatabase *db;
 	void setCardAttrHelper(CardItem *card, const QString &aname, const QString &avalue, bool allCards);
 public:
+	PlayerArea *area;
 	Client *client;
 	void addZone(CardZone *z);
-	void addCounter(Counter *c);
 	Player(const QString &_name, int _id, QPointF _base, bool _local, CardDatabase *_db, Client *_client, QGraphicsScene *_scene);
 	~Player();
 	QMenu *getPlayerMenu() const { return playerMenu; }
@@ -66,7 +62,6 @@ public:
 	QString getName() const { return name; }
 	bool getLocal() const { return local; }
 	const ZoneList *const getZones() const { return &zones; }
-	const CounterList *const getCounters() const { return &counters; }
 	void gameEvent(ServerEventData *event);
 	void hoverCardEvent(CardItem *card);
 	CardDatabase *getDb() const { return db; }

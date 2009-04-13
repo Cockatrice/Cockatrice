@@ -291,6 +291,11 @@ int Client::incCounter(const QString &counter, int delta)
 	return cmd(QString("inc_counter|%1|%2").arg(counter).arg(delta));
 }
 
+int Client::addCounter(const QString &counter, QColor color, int value)
+{
+	return cmd(QString("add_counter|%1|%2|%3").arg(counter).arg(color.red() * 65536 + color.green() * 256 + color.blue()).arg(value));
+}
+
 int Client::setCounter(const QString &counter, int value)
 {
 	return cmd(QString("set_counter|%1|%2").arg(counter).arg(value));

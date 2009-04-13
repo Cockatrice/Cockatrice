@@ -98,10 +98,6 @@ void ServerSocket::setupZones()
 	zones << new PlayerZone("grave", false, true, false, true);
 	zones << new PlayerZone("rfg", false, true, false, true);
 
-	// Create life counter
-	Counter *life = new Counter("life", 20);
-	counters << life;
-
 	// ------------------------------------------------------------------
 
 	// Assign card ids and create deck from decklist
@@ -118,9 +114,8 @@ void ServerSocket::setupZones()
 	nextCardId = i;
 	
 	PlayerStatus = StatusPlaying;
-	broadcastEvent(QString("setup_zones|%1|%2|%3").arg(getCounter("life")->getCount())
-						      .arg(deck->cards.size())
-						      .arg(getZone("sb")->cards.size()), this);
+	broadcastEvent(QString("setup_zones|%1|%2").arg(deck->cards.size())
+						   .arg(sb->cards.size()), this);
 }
 
 void ServerSocket::clearZones()
@@ -220,6 +215,9 @@ const ServerSocket::CommandProperties ServerSocket::commandList[ServerSocket::nu
 								    << QVariant::String, &ServerSocket::cmdSetCardAttr},
 	{"inc_counter", true, true, true, QList<QVariant::Type>() << QVariant::String
 								  << QVariant::Int, &ServerSocket::cmdIncCounter},
+	{"add_counter", true, true, true, QList<QVariant::Type>() << QVariant::String
+								  << QVariant::Int
+								  << QVariant::Int, &ServerSocket::cmdAddCounter},
 	{"set_counter", true, true, true, QList<QVariant::Type>() << QVariant::String
 								  << QVariant::Int, &ServerSocket::cmdSetCounter},
 	{"del_counter", true, true, true, QList<QVariant::Type>() << QVariant::String, &ServerSocket::cmdDelCounter},
@@ -474,16 +472,29 @@ ReturnMessage::ReturnCode ServerSocket::cmdIncCounter(const QList<QVariant> &par
 	return ReturnMessage::ReturnOk;
 }
 
+ReturnMessage::ReturnCode ServerSocket::cmdAddCounter(const QList<QVariant> &params)
+{
+	QString name = params[0].toString();
+	if (getCounter(name))
+		return ReturnMessage::ReturnContextError;
+	int color = params[1].toInt();
+	int count = params[2].toInt();
+	
+	Counter *c = new Counter(name, color, count);
+	counters << c;
+	emit broadcastEvent(QString("add_counter|%1|%2|%3").arg(c->getName()).arg(color).arg(count), this);
+	
+	return ReturnMessage::ReturnOk;
+}
+
 ReturnMessage::ReturnCode ServerSocket::cmdSetCounter(const QList<QVariant> &params)
 {
 	Counter *c = getCounter(params[0].toString());
+	if (!c)
+		return ReturnMessage::ReturnContextError;
 	int count = params[1].toInt();
 	
-	if (!c) {
-		c = new Counter(params[0].toString(), count);
-		counters << c;
-	} else
-		c->setCount(count);
+	c->setCount(count);
 	emit broadcastEvent(QString("set_counter|%1|%2").arg(c->getName()).arg(count), this);
 	return ReturnMessage::ReturnOk;
 }

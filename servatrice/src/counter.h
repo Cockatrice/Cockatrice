@@ -25,9 +25,10 @@
 class Counter {
 protected:
 	QString name;
+	int color;
 	int count;
 public:
-	Counter(QString _name, int _count = 0) : name(_name), count(_count) { }
+	Counter(QString _name, int _color, int _count = 0) : name(_name), color(_color), count(_count) { }
 	~Counter() { }
 	int getCount() { return count; }
 	void setCount(int _count) { count = _count; }

@@ -3,7 +3,7 @@
 // Message structure for server events:
 // {"private","public"}|PlayerId|PlayerName|EventType|EventData
 
-const int event_count = 19;
+const int event_count = 20;
 const event_string event_strings[event_count] = {
 	{eventPlayerId, "player_id"},
 	{eventSay, "say"},
@@ -19,6 +19,7 @@ const event_string event_strings[event_count] = {
 	{eventMoveCard, "move_card"},
 	{eventCreateToken, "create_token"},
 	{eventSetCardAttr, "set_card_attr"},
+	{eventAddCounter, "add_counter"},
 	{eventSetCounter, "set_counter"},
 	{eventDelCounter, "del_counter"},
 	{eventSetActivePlayer, "set_active_player"},

@@ -121,8 +121,8 @@ void MainWindow::updateSceneSize()
 {
 	QRectF sr = scene->sceneRect();
 	QSizeF zoneSize = zoneLayout->size();
-	qDebug(QString("updateSceneSize: width=%1").arg(932 + zoneSize.width()).toLatin1());
-	scene->setSceneRect(sr.x(), sr.y(), 932 + zoneSize.width(), sr.height());
+	qDebug(QString("updateSceneSize: width=%1").arg(952 + zoneSize.width()).toLatin1());
+	scene->setSceneRect(sr.x(), sr.y(), 952 + zoneSize.width(), sr.height());
 	view->scaleToScene();
 }
 
@@ -218,13 +218,13 @@ MainWindow::MainWindow(QWidget *parent)
 	int cardCount = db->loadFromFile("../cards.dat");
 	qDebug(QString("%1 cards loaded").arg(cardCount).toLatin1());
 
-	scene = new QGraphicsScene(0, 0, 932, 1020, this);
+	scene = new QGraphicsScene(0, 0, 952, 1020, this);
 	view = new GameView(scene);
 
 //	view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
 	zoneLayout = new ZoneViewLayout(db);
-	zoneLayout->setPos(932, 0);
+	zoneLayout->setPos(952, 0);
 	scene->addItem(zoneLayout);
 	connect(zoneLayout, SIGNAL(sizeChanged()), this, SLOT(updateSceneSize()));
 

@@ -55,7 +55,7 @@ private:
 		QList<QVariant::Type> paramTypes;
 		CommandHandler handler;
 	};
-	static const int numberCommands = 23;
+	static const int numberCommands = 24;
 	static const CommandProperties commandList[numberCommands];
 
 	ReturnMessage::ReturnCode cmdLogin(const QList<QVariant> &params);
@@ -73,6 +73,7 @@ private:
 	ReturnMessage::ReturnCode cmdCreateToken(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdSetCardAttr(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdIncCounter(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdAddCounter(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdSetCounter(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdDelCounter(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdListCounters(const QList<QVariant> &params);
