@@ -52,3 +52,9 @@ void ZoneViewLayout::closeMostRecentZoneView()
 		return;
 	views.at(views.size() - 1)->close();
 }
+
+void ZoneViewLayout::clear()
+{
+	for (int i = views.size() - 1; i >= 0; i--)
+		views.at(i)->close();
+}

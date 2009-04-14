@@ -3,10 +3,8 @@
 #include "dlg_creategame.h"
 
 DlgGames::DlgGames(Client *_client, QWidget *parent)
-	: QDialog(parent), client(_client)
+	: QDialog(parent), client(_client), msgid(0)
 {
-	msgid = 0;
-	
 	tableView = new QTreeView;
 	tableModel = new GamesModel(this);
 	tableView->setModel(tableModel);
@@ -28,8 +26,8 @@ DlgGames::DlgGames(Client *_client, QWidget *parent)
 	setLayout(mainLayout);
 	
 	setWindowTitle(tr("Games"));
-	setMinimumWidth(sizeHint().width());
-	
+
+	setMinimumWidth(tableView->columnWidth(0) * tableModel->columnCount());
 	connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
 	connect(refreshButton, SIGNAL(clicked()), this, SLOT(actRefresh()));
 	connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
@@ -78,7 +76,7 @@ void DlgGames::actJoin()
 	}
 	
 	connect(client, SIGNAL(responseReceived(ServerResponse *)), this, SLOT(checkResponse(ServerResponse *)));
-	msgid = client->joinGame(game->getName(), password);
+	msgid = client->joinGame(game->getGameId(), password);
 }
 
 void DlgGames::gameListReceived(QList<ServerGame *> _gameList)

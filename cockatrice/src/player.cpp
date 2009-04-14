@@ -276,7 +276,6 @@ void Player::gameEvent(ServerEventData *event)
 			int colorValue = data[1].toInt();
 			int value = data[2].toInt();
 			QColor color(colorValue / 65536, (colorValue % 65536) / 256, colorValue % 256);
-			qDebug(QString("%1 / %2 / %3").arg(color.red()).arg(color.green()).arg(color.blue()).toLatin1());
 			area->addCounter(counterName, color, value);
 			break;
 		}

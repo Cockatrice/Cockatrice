@@ -40,8 +40,8 @@ private slots:
 	void readClient();
 	void catchSocketError(QAbstractSocket::SocketError socketError);
 signals:
-	void createGame(const QString name, const QString description, const QString password, const int maxPlayers, ServerSocket *creator);
-	void joinGame(const QString name, ServerSocket *player);
+	void createGame(const QString description, const QString password, const int maxPlayers, ServerSocket *creator);
+	void joinGame(int gameId, ServerSocket *player);
 	void commandReceived(QString cmd, ServerSocket *player);
 	void broadcastEvent(const QString &event, ServerSocket *player);
 	void startGameIfReady();

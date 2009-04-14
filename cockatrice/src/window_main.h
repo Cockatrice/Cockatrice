@@ -53,6 +53,7 @@ private slots:
 	void actConnect();
 	void actDisconnect();
 	void actGames();
+	void actRestartGame();
 	void actLeaveGame();
 	void actDeckEditor();
 	void actExit();

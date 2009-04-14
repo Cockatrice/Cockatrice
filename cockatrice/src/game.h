@@ -73,12 +73,11 @@ signals:
 	void logSetCounter(QString playerName, QString counterName, int value, int oldValue);
 	void logSetDoesntUntap(QString playerName, QString cardName, bool doesntUntap);
 	void logDumpZone(QString playerName, QString zoneName, QString zoneOwner, int numberCards);
-public slots:
-	void restartGameDialog();
 public:
 	Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_actionsMenu, QMenu *_cardMenu, int playerId, const QString &playerName);
 	~Game();
 	Player *getLocalPlayer() const { return localPlayer; }
+	void restartGameDialog();
 };
 
 #endif

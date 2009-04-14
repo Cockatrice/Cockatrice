@@ -25,6 +25,8 @@
 int main(int argc, char *argv[])
 {
 	QCoreApplication app(argc, argv);
+	app.setOrganizationName("Cockatrice");
+	app.setApplicationName("Servatrice");
 
 	Server server;
 	if (!server.openDatabase()) {

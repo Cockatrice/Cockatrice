@@ -21,8 +21,8 @@
 #include "random.h"
 #include "serversocket.h"
 
-ServerGame::ServerGame(QString _name, QString _description, QString _password, int _maxPlayers, QObject *parent)
-	: QObject(parent), gameStarted(false), rnd(0), name(_name), description(_description), password(_password), maxPlayers(_maxPlayers)
+ServerGame::ServerGame(ServerSocket *_creator, int _gameId, QString _description, QString _password, int _maxPlayers, QObject *parent)
+	: QObject(parent), gameStarted(false), rnd(0), creator(_creator), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers)
 {
 	mutex = new QMutex(QMutex::Recursive);
 }

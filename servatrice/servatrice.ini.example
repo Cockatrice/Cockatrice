@@ -1,0 +1,5 @@
+[database]
+hostname=localhost
+database=servatrice
+user=servatrice
+password=foobar

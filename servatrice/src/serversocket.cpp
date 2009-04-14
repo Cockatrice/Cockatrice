@@ -187,9 +187,8 @@ const ServerSocket::CommandProperties ServerSocket::commandList[ServerSocket::nu
 	{"list_games", true, false, false, QList<QVariant::Type>(), &ServerSocket::cmdListGames},
 	{"create_game", true, false, false, QList<QVariant::Type>() << QVariant::String
 								    << QVariant::String
-								    << QVariant::String
 								    << QVariant::Int, &ServerSocket::cmdCreateGame},
-	{"join_game", true, false, false, QList<QVariant::Type>() << QVariant::String
+	{"join_game", true, false, false, QList<QVariant::Type>() << QVariant::Int
 								  << QVariant::String, &ServerSocket::cmdJoinGame},
 	{"leave_game", true, true, false, QList<QVariant::Type>(), &ServerSocket::cmdLeaveGame},
 	{"list_players", true, true, false, QList<QVariant::Type>(), &ServerSocket::cmdListPlayers},
@@ -250,11 +249,12 @@ ReturnMessage::ReturnCode ServerSocket::cmdListGames(const QList<QVariant> &para
 	while (gameListIterator.hasNext()) {
 		ServerGame *tmp = gameListIterator.next();
 		tmp->mutex->lock();
-		result << QString("%1|%2|%3|%4|%5").arg(tmp->name)
+		result << QString("%1|%2|%3|%4|%5|%6").arg(tmp->gameId)
 						   .arg(tmp->description)
 						   .arg(tmp->password == "" ? 0 : 1)
 						   .arg(tmp->getPlayerCount())
-						   .arg(tmp->maxPlayers);
+						   .arg(tmp->maxPlayers)
+						   .arg(tmp->creator->PlayerName);
 		tmp->mutex->unlock();
 	}
 	remsg->sendList(result);
@@ -263,25 +263,22 @@ ReturnMessage::ReturnCode ServerSocket::cmdListGames(const QList<QVariant> &para
 
 ReturnMessage::ReturnCode ServerSocket::cmdCreateGame(const QList<QVariant> &params)
 {
-	QString name = params[0].toString();
-	QString description = params[1].toString();
-	QString password = params[2].toString();
-	int maxPlayers = params[3].toInt();
-	if (server->getGame(name))
-		return ReturnMessage::ReturnNameNotFound;
+	QString description = params[0].toString();
+	QString password = params[1].toString();
+	int maxPlayers = params[2].toInt();
 	leaveGame();
-	emit createGame(name, description, password, maxPlayers, this);
+	emit createGame(description, password, maxPlayers, this);
 	return ReturnMessage::ReturnOk;
 }
 
 ReturnMessage::ReturnCode ServerSocket::cmdJoinGame(const QList<QVariant> &params)
 {
-	QString name = params[0].toString();
+	int gameId = params[0].toInt();
 	QString password = params[1].toString();
-	if (!server->checkGamePassword(name, password))
+	if (!server->checkGamePassword(gameId, password))
 		return ReturnMessage::ReturnPasswordWrong;
 	leaveGame();
-	emit joinGame(name, this);
+	emit joinGame(gameId, this);
 	return ReturnMessage::ReturnOk;
 }
 

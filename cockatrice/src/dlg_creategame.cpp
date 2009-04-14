@@ -2,14 +2,8 @@
 #include "dlg_creategame.h"
 
 DlgCreateGame::DlgCreateGame(Client *_client, QWidget *parent)
-	: QDialog(parent), client(_client)
+	: QDialog(parent), client(_client), msgid(0)
 {
-	msgid = 0;
-	
-	nameLabel = new QLabel(tr("&Name:"));
-	nameEdit = new QLineEdit;
-	nameLabel->setBuddy(nameEdit);
-
 	descriptionLabel = new QLabel(tr("&Description:"));
 	descriptionEdit = new QLineEdit;
 	descriptionLabel->setBuddy(descriptionEdit);
@@ -18,19 +12,17 @@ DlgCreateGame::DlgCreateGame(Client *_client, QWidget *parent)
 	passwordEdit = new QLineEdit;
 	passwordLabel->setBuddy(passwordEdit);
 
-	maxPlayersLabel = new QLabel(tr("&Max Players:"));
+	maxPlayersLabel = new QLabel(tr("P&layers:"));
 	maxPlayersEdit = new QLineEdit("2");
 	maxPlayersLabel->setBuddy(maxPlayersEdit);
 
 	QGridLayout *grid = new QGridLayout;
-	grid->addWidget(nameLabel, 0, 0);
-	grid->addWidget(nameEdit, 0, 1);
-	grid->addWidget(descriptionLabel, 1, 0);
-	grid->addWidget(descriptionEdit, 1, 1);
-	grid->addWidget(passwordLabel, 2, 0);
-	grid->addWidget(passwordEdit, 2, 1);
-	grid->addWidget(maxPlayersLabel, 3, 0);
-	grid->addWidget(maxPlayersEdit, 3, 1);
+	grid->addWidget(descriptionLabel, 0, 0);
+	grid->addWidget(descriptionEdit, 0, 1);
+	grid->addWidget(passwordLabel, 1, 0);
+	grid->addWidget(passwordEdit, 1, 1);
+	grid->addWidget(maxPlayersLabel, 2, 0);
+	grid->addWidget(maxPlayersEdit, 2, 1);
 
 	okButton = new QPushButton(tr("&OK"));
 	okButton->setDefault(true);
@@ -65,8 +57,7 @@ void DlgCreateGame::actOK()
 		QMessageBox::critical(this, tr("Error"), tr("Invalid number of players."));
 		return;
 	}
-	msgid = client->createGame(nameEdit->text(),
-				   descriptionEdit->text(),
+	msgid = client->createGame(descriptionEdit->text(),
 				   passwordEdit->text(),
 				   maxPlayers);
 }

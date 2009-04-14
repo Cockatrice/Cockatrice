@@ -23,10 +23,12 @@
 #include "serversocket.h"
 #include "counter.h"
 #include <QtSql>
+#include <QSettings>
 
 Server::Server(QObject *parent)
- : QTcpServer(parent)
+ : QTcpServer(parent), nextGameId(1)
 {
+	settings = new QSettings("servatrice.ini", QSettings::IniFormat, this);
 }
 
 Server::~Server()
@@ -35,11 +37,14 @@ Server::~Server()
 
 bool Server::openDatabase()
 {
+	settings->beginGroup("database");
 	QSqlDatabase sqldb = QSqlDatabase::addDatabase("QMYSQL");
-	sqldb.setHostName("localhost");
-	sqldb.setDatabaseName("cockatrice");
-	sqldb.setUserName("cockatrice");
-	sqldb.setPassword("45CdX6rmd");
+	sqldb.setHostName(settings->value("hostname").toString());
+	sqldb.setDatabaseName(settings->value("database").toString());
+	sqldb.setUserName(settings->value("user").toString());
+	sqldb.setPassword(settings->value("password").toString());
+	settings->endGroup();
+	
 	return sqldb.open();
 }
 
@@ -50,9 +55,9 @@ void Server::gameCreated(ServerGame *_game, ServerSocket *_creator)
 	_game->addPlayer(_creator);
 }
 
-void Server::addGame(const QString name, const QString description, const QString password, const int maxPlayers, ServerSocket *creator)
+void Server::addGame(const QString description, const QString password, const int maxPlayers, ServerSocket *creator)
 {
-	ServerGameThread *newThread = new ServerGameThread(name, description, password, maxPlayers, creator);
+	ServerGameThread *newThread = new ServerGameThread(nextGameId++, description, password, maxPlayers, creator);
 	connect(newThread, SIGNAL(gameCreated(ServerGame *, ServerSocket *)), this, SLOT(gameCreated(ServerGame *, ServerSocket *)));
 	connect(newThread, SIGNAL(finished()), this, SLOT(gameClosed()));
 	newThread->start();
@@ -62,8 +67,8 @@ void Server::incomingConnection(int socketId)
 {
 	ServerSocket *socket = new ServerSocket(this);
 	socket->setSocketDescriptor(socketId);
-	connect(socket, SIGNAL(createGame(const QString, const QString, const QString, const int, ServerSocket *)), this, SLOT(addGame(const QString, const QString, const QString, const int, ServerSocket *)));
-	connect(socket, SIGNAL(joinGame(const QString, ServerSocket *)), this, SLOT(addClientToGame(const QString, ServerSocket *)));
+	connect(socket, SIGNAL(createGame(const QString, const QString, const int, ServerSocket *)), this, SLOT(addGame(const QString, const QString, const int, ServerSocket *)));
+	connect(socket, SIGNAL(joinGame(int, ServerSocket *)), this, SLOT(addClientToGame(int, ServerSocket *)));
 	socket->initConnection();
 }
 
@@ -85,12 +90,12 @@ AuthenticationResult Server::checkUserPassword(const QString &user, const QStrin
 		return UnknownUser;
 }
 
-ServerGame *Server::getGame(const QString &name)
+ServerGame *Server::getGame(int gameId)
 {
 	QListIterator<ServerGame *> i(games);
 	while (i.hasNext()) {
 		ServerGame *tmp = i.next();
-		if ((!tmp->name.compare(name, Qt::CaseSensitive)) && !tmp->getGameStarted())
+		if ((tmp->gameId == gameId) && !tmp->getGameStarted())
 			return tmp;
 	}
 	return NULL;
@@ -111,10 +116,10 @@ QList<ServerGame *> Server::listOpenGames()
 	return result;
 }
 
-bool Server::checkGamePassword(const QString &name, const QString &password)
+bool Server::checkGamePassword(int gameId, const QString &password)
 {
 	ServerGame *tmp;
-	if ((tmp = getGame(name))) {
+	if ((tmp = getGame(gameId))) {
 		QMutexLocker locker(tmp->mutex);
 		if ((!tmp->getGameStarted())
 		 && (!tmp->password.compare(password, Qt::CaseSensitive))
@@ -124,9 +129,9 @@ bool Server::checkGamePassword(const QString &name, const QString &password)
 	return false;
 }
 
-void Server::addClientToGame(const QString name, ServerSocket *client)
+void Server::addClientToGame(int gameId, ServerSocket *client)
 {
-	ServerGame *tmp = getGame(name);
+	ServerGame *tmp = getGame(gameId);
 	client->moveToThread(tmp->thread());
 	tmp->addPlayer(client);
 }

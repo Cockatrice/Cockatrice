@@ -25,6 +25,7 @@
 class ServerGame;
 class ServerSocket;
 class QSqlDatabase;
+class QSettings;
 
 enum AuthenticationResult { PasswordWrong = 0, PasswordRight = 1, UnknownUser = 2 };
 
@@ -32,21 +33,23 @@ class Server : public QTcpServer
 {
 	Q_OBJECT
 private slots:
-	void addGame(const QString name, const QString description, const QString password, const int maxPlayers, ServerSocket *creator);
-	void addClientToGame(const QString name, ServerSocket *client);
+	void addGame(const QString description, const QString password, const int maxPlayers, ServerSocket *creator);
+	void addClientToGame(int gameId, ServerSocket *client);
 	void gameCreated(ServerGame *_game, ServerSocket *_creator);
 	void gameClosed();
 public:
 	Server(QObject *parent = 0);
 	~Server();
+	QSettings *settings;
 	bool openDatabase();
-	bool checkGamePassword(const QString &name, const QString &password);
+	bool checkGamePassword(int gameId, const QString &password);
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
 	QList<ServerGame *> listOpenGames();
-	ServerGame *getGame(const QString &name);
+	ServerGame *getGame(int gameId);
 private:
 	void incomingConnection(int SocketId);
 	QList<ServerGame *> games;
+	int nextGameId;
 };
 
 #endif

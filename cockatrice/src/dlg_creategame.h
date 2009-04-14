@@ -19,8 +19,8 @@ private:
 	Client *client;
 	int msgid;
 	
-	QLabel *nameLabel, *descriptionLabel, *passwordLabel, *maxPlayersLabel;
-	QLineEdit *nameEdit, *descriptionEdit, *passwordEdit, *maxPlayersEdit;
+	QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel;
+	QLineEdit *descriptionEdit, *passwordEdit, *maxPlayersEdit;
 	QPushButton *okButton, *cancelButton;
 };
 

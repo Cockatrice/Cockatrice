@@ -130,7 +130,7 @@ void Client::readLine()
 
 					// XXX Parametergültigkeit überprüfen
 					if (!prefix.compare("list_games"))
-						gamelist << new ServerGame(val[0], val[1], val[2].toInt(), val[3].toInt(), val[4].toInt());
+						gamelist << new ServerGame(val[0].toInt(), val[5], val[1], val[2].toInt(), val[3].toInt(), val[4].toInt());
 					else if (!prefix.compare("list_players"))
 						playerlist << new ServerPlayer(val[0].toInt(), val[1]);
 					else if (!prefix.compare("list_counters"))
@@ -215,14 +215,14 @@ int Client::listPlayers()
 	return cmd("list_players");
 }
 
-int Client::createGame(const QString &name, const QString &description, const QString &password, unsigned int maxPlayers)
+int Client::createGame(const QString &description, const QString &password, unsigned int maxPlayers)
 {
-	return cmd(QString("create_game|%1|%2|%3|%4").arg(name).arg(description).arg(password).arg(maxPlayers));
+	return cmd(QString("create_game|%1|%2|%3").arg(description).arg(password).arg(maxPlayers));
 }
 
-int Client::joinGame(const QString &name, const QString &password)
+int Client::joinGame(int gameId, const QString &password)
 {
-	return cmd(QString("join_game|%1|%2").arg(name).arg(password));
+	return cmd(QString("join_game|%1|%2").arg(gameId).arg(password));
 }
 
 int Client::leaveGame()

@@ -64,8 +64,8 @@ public:
 	void disconnectFromServer();
 	int listGames();
 	int listPlayers();
-	int createGame(const QString &name, const QString &description, const QString &password, unsigned int maxPlayers);
-	int joinGame(const QString &name, const QString &password);
+	int createGame(const QString &description, const QString &password, unsigned int maxPlayers);
+	int joinGame(int gameId, const QString &password);
 	int leaveGame();
 	int login(const QString &name, const QString &pass);
 	int say(const QString &s);

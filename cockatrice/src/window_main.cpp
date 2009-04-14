@@ -96,8 +96,15 @@ void MainWindow::actGames()
 	dlg.exec();
 }
 
+void MainWindow::actRestartGame()
+{
+	zoneLayout->clear();
+	game->restartGameDialog();
+}
+
 void MainWindow::actLeaveGame()
 {
+	zoneLayout->clear();
 	client->leaveGame();
 	delete game;
 	game = 0;
@@ -145,7 +152,6 @@ void MainWindow::playerIdReceived(int id, QString name)
 	connect(game, SIGNAL(hoverCard(QString)), this, SLOT(hoverCard(QString)));
 	connect(game, SIGNAL(playerAdded(Player *)), this, SLOT(playerAdded(Player *)));
 	connect(game, SIGNAL(playerRemoved(Player *)), this, SLOT(playerRemoved(Player *)));
-	connect(aRestartGame, SIGNAL(triggered()), game, SLOT(restartGameDialog()));
 	playerAdded(game->getLocalPlayer());
 
 	messageLog->connectToGame(game);
@@ -174,6 +180,7 @@ void MainWindow::createActions()
 	aRestartGame = new QAction(tr("&Restart game..."), this);
 	aRestartGame->setShortcut(tr("F2"));
 	aRestartGame->setEnabled(false);
+	connect(aRestartGame, SIGNAL(triggered()), this, SLOT(actRestartGame()));
 	aLeaveGame = new QAction(tr("&Leave game"), this);
 	aLeaveGame->setEnabled(false);
 	connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));

@@ -39,11 +39,12 @@ public slots:
 public:
 	QMutex *mutex;
 	Random *rnd;
-	QString name;
+	ServerSocket *creator;
+	int gameId;
 	QString description;
 	QString password;
 	int maxPlayers;
-	ServerGame(QString _name, QString _description, QString _password, int _maxPlayers, QObject *parent = 0);
+	ServerGame(ServerSocket *_creator, int _gameId, QString _description, QString _password, int _maxPlayers, QObject *parent = 0);
 	~ServerGame();
 	bool getGameStarted();
 	int getPlayerCount();

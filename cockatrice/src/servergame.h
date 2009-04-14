@@ -3,15 +3,17 @@
 
 class ServerGame {
 private:
-	QString name;
+	int gameId;
+	QString creator;
 	QString description;
 	bool hasPassword;
 	unsigned char playerCount;
 	unsigned char maxPlayers;
 public:
-	ServerGame(const QString &_name, const QString &_description, bool _hasPassword, unsigned char _playerCount, unsigned char _maxPlayers)
-		: name(_name), description(_description), hasPassword(_hasPassword), playerCount(_playerCount), maxPlayers(_maxPlayers) { }
-	QString getName() { return name; }
+	ServerGame(int _gameId, const QString &_creator, const QString &_description, bool _hasPassword, unsigned char _playerCount, unsigned char _maxPlayers)
+		: gameId(_gameId), creator(_creator), description(_description), hasPassword(_hasPassword), playerCount(_playerCount), maxPlayers(_maxPlayers) { }
+	int getGameId() { return gameId; }
+	QString getCreator() { return creator; }
 	QString getDescription() { return description; }
 	bool getHasPassword() { return hasPassword; }
 	unsigned char getPlayerCount() { return playerCount; }
