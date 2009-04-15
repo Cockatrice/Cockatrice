@@ -55,9 +55,10 @@ private:
 		QList<QVariant::Type> paramTypes;
 		CommandHandler handler;
 	};
-	static const int numberCommands = 24;
+	static const int numberCommands = 25;
 	static const CommandProperties commandList[numberCommands];
 
+	ReturnMessage::ReturnCode cmdPing(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdLogin(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdListGames(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdCreateGame(const QList<QVariant> &params);

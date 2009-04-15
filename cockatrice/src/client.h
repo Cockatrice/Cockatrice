@@ -62,6 +62,7 @@ public:
 	
 	void connectToServer(const QString &hostname, unsigned int port, const QString &playername, const QString &password);
 	void disconnectFromServer();
+	int ping();
 	int listGames();
 	int listPlayers();
 	int createGame(const QString &description, const QString &password, unsigned int maxPlayers);

@@ -34,6 +34,7 @@ void Client::checkTimeout()
 			return;
 		}
 	}
+	ping();
 }
 
 void Client::slotSocketError(QAbstractSocket::SocketError error)
@@ -203,6 +204,11 @@ void Client::disconnectFromServer()
 	PendingCommands.clear();
 	setStatus(StatusDisconnected);
 	socket->close();
+}
+
+int Client::ping()
+{
+	return cmd("ping");
 }
 
 int Client::listGames()

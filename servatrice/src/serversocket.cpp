@@ -182,6 +182,7 @@ void ServerSocket::readClient()
 }
 
 const ServerSocket::CommandProperties ServerSocket::commandList[ServerSocket::numberCommands] = {
+	{"ping", false, false, false, QList<QVariant::Type>(), &ServerSocket::cmdPing},
 	{"login", false, false, false, QList<QVariant::Type>() << QVariant::String
 							       << QVariant::String, &ServerSocket::cmdLogin},
 	{"list_games", true, false, false, QList<QVariant::Type>(), &ServerSocket::cmdListGames},
@@ -229,6 +230,11 @@ const ServerSocket::CommandProperties ServerSocket::commandList[ServerSocket::nu
 	{"set_active_player", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdSetActivePlayer},
 	{"set_active_phase", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdSetActivePhase}
 };
+
+ReturnMessage::ReturnCode ServerSocket::cmdPing(const QList<QVariant> &params)
+{
+	return ReturnMessage::ReturnOk;
+}
 
 ReturnMessage::ReturnCode ServerSocket::cmdLogin(const QList<QVariant> &params)
 {

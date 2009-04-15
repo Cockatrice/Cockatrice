@@ -5,7 +5,7 @@ DlgConnect::DlgConnect(QWidget *parent)
 	: QDialog(parent)
 {
 	hostLabel = new QLabel(tr("&Host:"));
-	hostEdit = new QLineEdit("localhost");
+	hostEdit = new QLineEdit("cockatrice.de");
 	hostLabel->setBuddy(hostEdit);
 	
 	portLabel = new QLabel(tr("&Port:"));
