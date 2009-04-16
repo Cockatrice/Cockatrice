@@ -18,7 +18,6 @@ HEADERS += src/server.h src/servergame.h src/serversocket.h \
  src/version.h \
  src/counter.h \
  src/random.h \
- src/servergamethread.h \
  src/returnmessage.h
 SOURCES += src/main.cpp \
            src/server.cpp \
@@ -28,5 +27,4 @@ SOURCES += src/main.cpp \
  src/card.cpp \
  src/counter.cpp \
  src/random.cpp \
- src/servergamethread.cpp \
  src/returnmessage.cpp
