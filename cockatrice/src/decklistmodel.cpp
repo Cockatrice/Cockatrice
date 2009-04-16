@@ -77,7 +77,7 @@ bool DeckListModel::loadFromFile(const QString &fileName)
 	while (!in.atEnd()) {
 		QString line = in.readLine().simplified();
 		bool isSideboard = false;
-		if (line.startsWith("SB:")) {
+		if (line.startsWith("SB:", Qt::CaseInsensitive)) {
 			line = line.mid(3).trimmed();
 			isSideboard = true;
 		}

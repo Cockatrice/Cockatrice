@@ -24,13 +24,12 @@
 ServerGame::ServerGame(ServerSocket *_creator, int _gameId, QString _description, QString _password, int _maxPlayers, QObject *parent)
 	: QObject(parent), gameStarted(false), rnd(0), creator(_creator), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers)
 {
-	mutex = new QMutex(QMutex::Recursive);
 }
 
 ServerGame::~ServerGame()
 {
+	emit gameClosing();
 	delete rnd;
-	delete mutex;
 	qDebug("ServerGame destructor");
 }
 
@@ -41,14 +40,11 @@ bool ServerGame::getGameStarted()
 
 int ServerGame::getPlayerCount()
 {
-	QMutexLocker locker(mutex);
 	return players.size();
 }
 
 QStringList ServerGame::getPlayerNames()
 {
-	QMutexLocker locker(mutex);
-	
 	QStringList result;
 	QListIterator<ServerSocket *> i(players);
 	while (i.hasNext()) {
@@ -71,8 +67,6 @@ ServerSocket *ServerGame::getPlayer(int player_id)
 
 void ServerGame::msg(const QString &s)
 {
-	QMutexLocker locker(mutex);
-	
 	QListIterator<ServerSocket *> i(players);
 	while (i.hasNext())
 		i.next()->msg(s);
@@ -88,8 +82,6 @@ void ServerGame::broadcastEvent(const QString &cmd, ServerSocket *player)
 
 void ServerGame::startGameIfReady()
 {
-	QMutexLocker locker(mutex);
-	
 	if (players.size() < maxPlayers)
 		return;
 	for (int i = 0; i < players.size(); i++)
@@ -112,8 +104,6 @@ void ServerGame::startGameIfReady()
 
 void ServerGame::addPlayer(ServerSocket *player)
 {
-	QMutexLocker locker(mutex);
-	
 	int max = -1;
 	QListIterator<ServerSocket *> i(players);
 	while (i.hasNext()) {
@@ -134,12 +124,10 @@ void ServerGame::addPlayer(ServerSocket *player)
 
 void ServerGame::removePlayer(ServerSocket *player)
 {
-	QMutexLocker locker(mutex);
-	
 	players.removeAt(players.indexOf(player));
 	broadcastEvent("leave", player);
 	if (!players.size())
-		thread()->quit();
+		deleteLater();
 }
 
 void ServerGame::setActivePlayer(int _activePlayer)

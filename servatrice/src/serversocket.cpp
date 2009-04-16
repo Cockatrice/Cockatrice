@@ -254,14 +254,12 @@ ReturnMessage::ReturnCode ServerSocket::cmdListGames(const QList<QVariant> &para
 	QStringList result;
 	while (gameListIterator.hasNext()) {
 		ServerGame *tmp = gameListIterator.next();
-		tmp->mutex->lock();
 		result << QString("%1|%2|%3|%4|%5|%6").arg(tmp->gameId)
 						   .arg(tmp->description)
 						   .arg(tmp->password == "" ? 0 : 1)
 						   .arg(tmp->getPlayerCount())
 						   .arg(tmp->maxPlayers)
 						   .arg(tmp->creator->PlayerName);
-		tmp->mutex->unlock();
 	}
 	remsg->sendList(result);
 	return ReturnMessage::ReturnOk;

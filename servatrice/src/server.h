@@ -35,8 +35,7 @@ class Server : public QTcpServer
 private slots:
 	void addGame(const QString description, const QString password, const int maxPlayers, ServerSocket *creator);
 	void addClientToGame(int gameId, ServerSocket *client);
-	void gameCreated(ServerGame *_game, ServerSocket *_creator);
-	void gameClosed();
+	void gameClosing();
 public:
 	Server(QObject *parent = 0);
 	~Server();

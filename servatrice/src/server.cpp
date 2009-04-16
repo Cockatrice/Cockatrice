@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "server.h"
-#include "servergamethread.h"
 #include "servergame.h"
 #include "serversocket.h"
 #include "counter.h"
@@ -48,19 +47,12 @@ bool Server::openDatabase()
 	return sqldb.open();
 }
 
-void Server::gameCreated(ServerGame *_game, ServerSocket *_creator)
-{
-	games << _game;
-	_creator->moveToThread(_game->thread());
-	_game->addPlayer(_creator);
-}
-
 void Server::addGame(const QString description, const QString password, const int maxPlayers, ServerSocket *creator)
 {
-	ServerGameThread *newThread = new ServerGameThread(nextGameId++, description, password, maxPlayers, creator);
-	connect(newThread, SIGNAL(gameCreated(ServerGame *, ServerSocket *)), this, SLOT(gameCreated(ServerGame *, ServerSocket *)));
-	connect(newThread, SIGNAL(finished()), this, SLOT(gameClosed()));
-	newThread->start();
+	ServerGame *newGame = new ServerGame(creator, nextGameId++, description, password, maxPlayers);
+	games << newGame;
+	connect(newGame, SIGNAL(gameClosing()), this, SLOT(gameClosing()));
+	newGame->addPlayer(creator);
 }
 
 void Server::incomingConnection(int socketId)
@@ -74,12 +66,18 @@ void Server::incomingConnection(int socketId)
 
 AuthenticationResult Server::checkUserPassword(const QString &user, const QString &password)
 {
+	if (!QSqlDatabase::database().isOpen())
+		if (!openDatabase()) {
+			qCritical(QString("Database error: %1").arg(QSqlDatabase::database().lastError().text()).toLatin1());
+			return PasswordWrong;
+		}
+
 	QSqlQuery query;
 	query.prepare("select password from users where name = :name");
 	query.bindValue(":name", user);
 	if (!query.exec()) {
 		qCritical(QString("Database error: %1").arg(query.lastError().text()).toLatin1());
-		exit(-1);
+		return PasswordWrong;
 	}
 	if (query.next()) {
 		if (query.value(0).toString() == password)
@@ -107,11 +105,9 @@ QList<ServerGame *> Server::listOpenGames()
 	QListIterator<ServerGame *> i(games);
 	while (i.hasNext()) {
 		ServerGame *tmp = i.next();
-		tmp->mutex->lock();
 		if ((!tmp->getGameStarted())
 		 && (tmp->getPlayerCount() < tmp->maxPlayers))
 			result.append(tmp);
-		tmp->mutex->unlock();
 	}
 	return result;
 }
@@ -120,7 +116,6 @@ bool Server::checkGamePassword(int gameId, const QString &password)
 {
 	ServerGame *tmp;
 	if ((tmp = getGame(gameId))) {
-		QMutexLocker locker(tmp->mutex);
 		if ((!tmp->getGameStarted())
 		 && (!tmp->password.compare(password, Qt::CaseSensitive))
 		 && (tmp->getPlayerCount() < tmp->maxPlayers))
@@ -132,14 +127,12 @@ bool Server::checkGamePassword(int gameId, const QString &password)
 void Server::addClientToGame(int gameId, ServerSocket *client)
 {
 	ServerGame *tmp = getGame(gameId);
-	client->moveToThread(tmp->thread());
 	tmp->addPlayer(client);
 }
 
-void Server::gameClosed()
+void Server::gameClosing()
 {
-	qDebug("Server::gameClosed");
-	ServerGameThread *t = qobject_cast<ServerGameThread *>(sender());
-	games.removeAt(games.indexOf(t->getGame()));
-	delete t;
+	qDebug("Server::gameClosing");
+	ServerGame *g = qobject_cast<ServerGame *>(sender());
+	games.removeAt(games.indexOf(g));
 }

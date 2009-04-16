@@ -20,8 +20,6 @@
 #ifndef SERVERGAME_H
 #define SERVERGAME_H
 
-#include <QThread>
-#include <QMutex>
 #include <QStringList>
 
 class ServerSocket;
@@ -34,10 +32,11 @@ private:
 	bool gameStarted;
 	int activePlayer;
 	int activePhase;
+signals:
+	void gameClosing();
 public slots:
 	void broadcastEvent(const QString &event, ServerSocket *player);
 public:
-	QMutex *mutex;
 	Random *rnd;
 	ServerSocket *creator;
 	int gameId;
