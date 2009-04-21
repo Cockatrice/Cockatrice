@@ -142,25 +142,11 @@ void ServerSocket::leaveGame()
 
 void ServerSocket::readClient()
 {
-	QTextStream *stream = new QTextStream(this);
-	stream->setCodec("UTF-8");
-	QStringList lines;
-
-	// Before parsing, everything has to be buffered so that the stream
-	// can be deleted in order to avoid problems when moving the object
-	// to another thread while this function is still running.
-	for (;;) {
-		QString line = stream->readLine();
+	while (canReadLine()) {
+		QString line = QString(readLine()).trimmed();
 		if (line.isNull())
 			break;
-		lines << line;
-	}
-	delete stream;
-
-	QStringListIterator i(lines);
-	while (i.hasNext()) {
-		QString line = i.next();
-
+			
 		qDebug(QString("<<< %1").arg(line).toLatin1());
 		switch (PlayerStatus) {
 			case StatusNormal:

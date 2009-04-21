@@ -20,6 +20,7 @@
 
 
 #include <QCoreApplication>
+#include <QTextCodec>
 #include "server.h"
 
 int main(int argc, char *argv[])
@@ -27,6 +28,8 @@ int main(int argc, char *argv[])
 	QCoreApplication app(argc, argv);
 	app.setOrganizationName("Cockatrice");
 	app.setApplicationName("Servatrice");
+	
+	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
 	Server server;
 	if (!server.openDatabase()) {

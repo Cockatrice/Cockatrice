@@ -2,13 +2,12 @@
 #include "client.h"
 
 Client::Client(QObject *parent)
-	: QObject(parent)
+	: QObject(parent), MsgId(0)
 {
 	timer = new QTimer(this);
 	timer->setInterval(1000);
 	connect(timer, SIGNAL(timeout()), this, SLOT(checkTimeout()));
 
-	MsgId = 0;
 	status = StatusDisconnected;
 	socket = new QTcpSocket(this);
 	socket->setTextModeEnabled(true);
