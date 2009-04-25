@@ -25,7 +25,7 @@
 #include <QSettings>
 
 Server::Server(QObject *parent)
- : QTcpServer(parent), nextGameId(1)
+ : QTcpServer(parent), nextGameId(0)
 {
 	settings = new QSettings("servatrice.ini", QSettings::IniFormat, this);
 }
@@ -44,7 +44,19 @@ bool Server::openDatabase()
 	sqldb.setPassword(settings->value("password").toString());
 	settings->endGroup();
 	
-	return sqldb.open();
+	if (!sqldb.open())
+		return false;
+	
+	if (!nextGameId) {
+		QSqlQuery query;
+		if (!query.exec("select max(id) from games"))
+			return false;
+		if (!query.next())
+			return false;
+		nextGameId = query.value(0).toInt() + 1;
+		qDebug(QString("set nextGameId to %1").arg(nextGameId).toLatin1());
+	}
+	return true;
 }
 
 void Server::addGame(const QString description, const QString password, const int maxPlayers, ServerSocket *creator)
@@ -73,7 +85,7 @@ AuthenticationResult Server::checkUserPassword(const QString &user, const QStrin
 		}
 
 	QSqlQuery query;
-	query.prepare("select password from users where name = :name");
+	query.prepare("select password from players where name = :name");
 	query.bindValue(":name", user);
 	if (!query.exec()) {
 		qCritical(QString("Database error: %1").arg(query.lastError().text()).toLatin1());

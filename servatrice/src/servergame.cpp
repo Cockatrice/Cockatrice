@@ -20,6 +20,7 @@
 #include "servergame.h"
 #include "random.h"
 #include "serversocket.h"
+#include <QSqlQuery>
 
 ServerGame::ServerGame(ServerSocket *_creator, int _gameId, QString _description, QString _password, int _maxPlayers, QObject *parent)
 	: QObject(parent), gameStarted(false), rnd(0), creator(_creator), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers)
@@ -87,6 +88,20 @@ void ServerGame::startGameIfReady()
 	for (int i = 0; i < players.size(); i++)
 		if (players.at(i)->getStatus() != StatusReadyStart)
 			return;
+	
+	QSqlQuery query;
+	query.prepare("insert into games (id, descr, password, time_started) values(:id, :descr, :password, now())");
+	query.bindValue(":id", gameId);
+	query.bindValue(":descr", description);
+	query.bindValue(":password", !password.isEmpty());
+	query.exec();
+	
+	for (int i = 0; i < players.size(); i++) {
+		query.prepare("insert into games_players (id_game, player) values(:id, :player)");
+		query.bindValue(":id", gameId);
+		query.bindValue(":player", players.at(i)->PlayerName);
+		query.exec();
+	}
 	
 	if (!rnd) {
 		rnd = new Random(this);

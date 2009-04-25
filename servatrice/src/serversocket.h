@@ -55,7 +55,7 @@ private:
 		QList<QVariant::Type> paramTypes;
 		CommandHandler handler;
 	};
-	static const int numberCommands = 25;
+	static const int numberCommands = 26;
 	static const CommandProperties commandList[numberCommands];
 
 	ReturnMessage::ReturnCode cmdPing(const QList<QVariant> &params);
@@ -70,6 +70,7 @@ private:
 	ReturnMessage::ReturnCode cmdReadyStart(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdShuffle(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdDrawCards(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdRevealCard(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdMoveCard(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdCreateToken(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdSetCardAttr(const QList<QVariant> &params);

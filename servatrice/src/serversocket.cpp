@@ -184,6 +184,8 @@ const ServerSocket::CommandProperties ServerSocket::commandList[ServerSocket::nu
 	{"ready_start", true, true, false, QList<QVariant::Type>(), &ServerSocket::cmdReadyStart},
 	{"shuffle", true, true, true, QList<QVariant::Type>(), &ServerSocket::cmdShuffle},
 	{"draw_cards", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdDrawCards},
+	{"reveal_card", true, true, true, QList<QVariant::Type>() << QVariant::Int
+								  << QVariant::String, &ServerSocket::cmdRevealCard},
 	{"move_card", true, true, true, QList<QVariant::Type>() << QVariant::Int
 								<< QVariant::String
 								<< QVariant::String
@@ -334,6 +336,20 @@ ReturnMessage::ReturnCode ServerSocket::cmdDrawCards(const QList<QVariant> &para
 	}
 
 	emit broadcastEvent(QString("draw|%1").arg(number), this);
+	return ReturnMessage::ReturnOk;
+}
+
+ReturnMessage::ReturnCode ServerSocket::cmdRevealCard(const QList<QVariant> &params)
+{
+	int cardid = params[0].toInt();
+	PlayerZone *zone = getZone(params[1].toString());
+	if (!zone)
+		return ReturnMessage::ReturnContextError;
+	int position = -1;
+	Card *card = zone->getCard(cardid, false, &position);
+	if (!card)
+		return ReturnMessage::ReturnContextError;
+	emit broadcastEvent(QString("reveal_card|%1|%2|%3").arg(cardid).arg(zone->getName()).arg(card->getName()), this);
 	return ReturnMessage::ReturnOk;
 }
 

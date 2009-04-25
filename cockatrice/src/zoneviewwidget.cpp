@@ -7,7 +7,7 @@
 #include "client.h"
 
 ZoneViewWidget::ZoneViewWidget(CardDatabase *_db, Player *_player, CardZone *_origZone, int numberCards, QGraphicsItem *parent)
-	: QGraphicsWidget(parent, Qt::Tool | Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint), db(_db), player(_player)
+	: QGraphicsWidget(parent, Qt::Tool | Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint/* | Qt::WindowCloseButtonHint*/), db(_db), player(_player)
 {
 	setWindowTitle(QString("%1's %2").arg(player->getName()).arg(_origZone->getName()));
 	setAttribute(Qt::WA_DeleteOnClose);
