@@ -36,6 +36,9 @@ Server::~Server()
 
 bool Server::openDatabase()
 {
+	if (!QSqlDatabase::connectionNames().isEmpty())
+		QSqlDatabase::removeDatabase(QSqlDatabase::database().connectionNames().at(0));
+	
 	settings->beginGroup("database");
 	QSqlDatabase sqldb = QSqlDatabase::addDatabase("QMYSQL");
 	sqldb.setHostName(settings->value("hostname").toString());
@@ -78,11 +81,8 @@ void Server::incomingConnection(int socketId)
 
 AuthenticationResult Server::checkUserPassword(const QString &user, const QString &password)
 {
-	if (!QSqlDatabase::database().isOpen())
-		if (!openDatabase()) {
-			qCritical(QString("Database error: %1").arg(QSqlDatabase::database().lastError().text()).toLatin1());
-			return PasswordWrong;
-		}
+	if (!QSqlDatabase::exec("select 1").isActive())
+		openDatabase();
 
 	QSqlQuery query;
 	query.prepare("select password from players where name = :name");
