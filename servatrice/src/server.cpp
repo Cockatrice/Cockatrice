@@ -81,7 +81,7 @@ void Server::incomingConnection(int socketId)
 
 AuthenticationResult Server::checkUserPassword(const QString &user, const QString &password)
 {
-	if (!QSqlDatabase::exec("select 1").isActive())
+	if (!QSqlDatabase::database().exec("select 1").isActive())
 		openDatabase();
 
 	QSqlQuery query;
