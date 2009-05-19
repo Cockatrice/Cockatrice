@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QAbstractItemModel>
+#include "decklist.h"
 
 class CardDatabase;
 class CardDatabaseModel;
@@ -22,6 +23,7 @@ private slots:
 	void actSaveDeckAs();
 private:
 	QString lastFileName;
+	DeckList::FileFormat lastFileFormat;
 	CardDatabase *db;
 	
 	CardDatabaseModel *databaseModel;

@@ -79,12 +79,12 @@ void WndDeckEditor::actNewDeck()
 
 void WndDeckEditor::actLoadDeck()
 {
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Load deck"), QString(), tr("Deck files (*.dec)"));
-	if (fileName.isEmpty())
-		return;
-	
-	if (deckModel->loadFromFile(fileName))
-		lastFileName = fileName;
+	DeckList *l = deckModel->getDeckList();
+	if (l->loadDialog(this)) {
+		lastFileName = l->getLastFileName();
+		lastFileFormat = l->getLastFileFormat();
+		deckView->reset();
+	}
 }
 
 void WndDeckEditor::actSaveDeck()
@@ -92,16 +92,15 @@ void WndDeckEditor::actSaveDeck()
 	if (lastFileName.isEmpty())
 		actSaveDeckAs();
 	else
-		deckModel->saveToFile(lastFileName);
+		deckModel->getDeckList()->saveToFile(lastFileName, lastFileFormat);
+;
 }
 
 void WndDeckEditor::actSaveDeckAs()
 {
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Save deck as"), QString(), tr("Deck files (*.dec)"));
-	if (fileName.isEmpty())
-		return;
-	if (!fileName.endsWith(".dec"))
-		fileName.append(".dec");
-	if (deckModel->saveToFile(fileName))
-		lastFileName = fileName;
+	DeckList *l = deckModel->getDeckList();
+	if (l->saveDialog(this)) {
+		lastFileName = l->getLastFileName();
+		lastFileFormat = l->getLastFileFormat();
+	}
 }

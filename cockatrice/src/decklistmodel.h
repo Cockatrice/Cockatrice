@@ -3,20 +3,9 @@
 
 #include <QAbstractListModel>
 #include <QList>
+#include "decklist.h"
 
 class CardDatabase;
-
-class DecklistRow {
-private:
-	int number;
-	QString card;
-	bool sideboard;
-public:
-	DecklistRow(int _number, const QString &_card, bool _sideboard) : number(_number), card(_card), sideboard(_sideboard) { }
-	int getNumber() const { return number; }
-	QString getCard() const { return card; }
-	bool isSideboard() const { return sideboard; }
-};
 
 class DeckListModel : public QAbstractListModel {
 	Q_OBJECT
@@ -27,14 +16,14 @@ public:
 	int columnCount(const QModelIndex &parent = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-	bool loadFromFile(const QString &fileName);
-	bool saveToFile(const QString &fileName);
 	DecklistRow *getRow(int row) const;
 	void cleanList();
+	DeckList *getDeckList() const { return deckList; }
+	bool loadFromFile(const QString &fileName, DeckList::FileFormat fmt);
+	bool saveToFile(const QString &fileName, DeckList::FileFormat fmt);
 private:
 	CardDatabase *db;
-	QList<DecklistRow *> deckList;
-	void cacheCardPictures();
+	DeckList *deckList;
 };
 
 #endif

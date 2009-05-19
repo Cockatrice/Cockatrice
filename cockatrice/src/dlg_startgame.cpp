@@ -35,11 +35,10 @@ DlgStartGame::DlgStartGame(CardDatabase *_db, QWidget *parent)
 
 void DlgStartGame::actLoad()
 {
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Load deck"), QString(), tr("Deck files (*.dec)"));
-	if (fileName.isEmpty())
+	if (!tableModel->getDeckList()->loadDialog(this))
 		return;
-	tableModel->loadFromFile(fileName);
 	
+	tableView->reset();
 	emit newDeckLoaded(getDeckList());
 }
 
