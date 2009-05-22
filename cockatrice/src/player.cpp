@@ -161,12 +161,12 @@ void Player::gameEvent(ServerEventData *event)
 
 			CardZone *deck = zones.findZone("deck");
 			for (; deck_cards; deck_cards--)
-				deck->addCard(new CardItem(db, QString(), -1));
+				deck->addCard(new CardItem(db), false, -1);
 			deck->reorganizeCards();
 
 			CardZone *sb = zones.findZone("sb");
 			for (; sb_cards; sb_cards--)
-				sb->addCard(new CardItem(db, QString(), -1));
+				sb->addCard(new CardItem(db), false, -1);
 			sb->reorganizeCards();
 
 			if (local) {
@@ -186,11 +186,12 @@ void Player::gameEvent(ServerEventData *event)
 			CardZone *deck = zones.findZone("deck");
 			CardZone *hand = zones.findZone("hand");
 			if (!event->getPublic()) {
-				hand->addCard(deck->takeCard(0, data[0].toInt(), data[1]));
+				hand->addCard(deck->takeCard(0, data[0].toInt(), data[1]), true, -1);
 			} else {
 				int number = data[0].toInt();
 				for (; number; number--)
-					hand->addCard(deck->takeCard(0, -1, QString()));
+					hand->addCard(deck->takeCard(0, -1, QString()), false, -1);
+				hand->reorganizeCards();
 			}
 			break;
 		}

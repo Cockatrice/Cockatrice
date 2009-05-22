@@ -95,7 +95,7 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	
 	dlgStartGame = new DlgStartGame(db);
 	connect(dlgStartGame, SIGNAL(newDeckLoaded(const QStringList &)), client, SLOT(submitDeck(const QStringList &)));
-	connect(dlgStartGame, SIGNAL(finished(int)), this, SLOT(readyStart(int)));
+	connect(dlgStartGame, SIGNAL(finished(int)), this, SLOT(readyStart()));
 }
 
 Game::~Game()
@@ -144,10 +144,8 @@ void Game::playerListReceived(QList<ServerPlayer *> playerList)
 	restartGameDialog();
 }
 
-void Game::readyStart(int foo)
+void Game::readyStart()
 {
-	Q_UNUSED(foo);
-	
 	client->readyStart();
 }
 

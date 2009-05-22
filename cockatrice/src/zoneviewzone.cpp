@@ -7,13 +7,13 @@ ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, QG
 	: CardZone(_p, _origZone->getName(), false, false, parent, true), height(0), numberCards(_numberCards), origZone(_origZone)
 {
 	cards = new CardList(true);
-	origZone->addView(this);
+	origZone->setView(this);
 }
 
 ZoneViewZone::~ZoneViewZone()
 {
 	qDebug("ZoneViewZone destructor");
-	origZone->removeView(this);
+	origZone->setView(NULL);
 }
 
 QRectF ZoneViewZone::boundingRect() const
@@ -74,20 +74,15 @@ void ZoneViewZone::reorganizeCards()
 	}
 }
 
-void ZoneViewZone::addCard(CardItem *card, bool reorganize, int x, int y)
+void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
-	Q_UNUSED(y);
-	qDebug(QString("ZoneViewZone: inserting '%1' at x=%2").arg(card->getName()).arg(x).toLatin1());
 	cards->insert(x, card);
 	card->setParentItem(this);
 	card->update(card->boundingRect());
-	if (reorganize)
-		reorganizeCards();
 }
 
-void ZoneViewZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
+void ZoneViewZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
-	Q_UNUSED(dropPoint);
 	qDebug(QString("handleDropEvent id=%1").arg(cardId).toLatin1());
 	player->client->moveCard(cardId, startZone->getName(), getName(), 0, 0);
 }

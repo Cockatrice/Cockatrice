@@ -40,11 +40,8 @@ void LibraryZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 	painter->restore();
 }
 
-void LibraryZone::addCard(CardItem *card, bool reorganize, int x, int y)
+void LibraryZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
-	for (int i = 0; i < views.size(); i++)
-		views[i]->addCard(new CardItem(player->getDb(), card->getName(), card->getId()), reorganize, x, y);
-
 	cards->insert(x, card);
 	card->setId(-1);
 	card->setName(QString());
@@ -52,12 +49,9 @@ void LibraryZone::addCard(CardItem *card, bool reorganize, int x, int y)
 	card->setVisible(false);
 	card->resetState();
 	card->setParentItem(this);
-
-	if (reorganize)
-		reorganizeCards();
 }
 
-void LibraryZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
+void LibraryZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
 	player->client->moveCard(cardId, startZone->getName(), getName(), 0, 0);
 }

@@ -6,7 +6,7 @@
 #include "zoneviewzone.h"
 
 CardZone::CardZone(Player *_p, const QString &_name, bool _hasCardAttr, bool _isShufflable, QGraphicsItem *parent, bool isView)
-	: QGraphicsItem(parent), player(_p), name(_name), cards(NULL), menu(NULL), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable)
+	: QGraphicsItem(parent), player(_p), name(_name), cards(NULL), view(NULL), menu(NULL), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable)
 {
 	if (!isView)
 		player->addZone(this);
@@ -15,9 +15,7 @@ CardZone::CardZone(Player *_p, const QString &_name, bool _hasCardAttr, bool _is
 CardZone::~CardZone()
 {
 	qDebug(QString("CardZone destructor: %1").arg(name).toLatin1());
-	while (!views.empty())
-		delete views.at(0);
-	
+	delete view;
 	clearContents();
 	delete cards;
 }
@@ -41,6 +39,17 @@ void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 		event->ignore();
 }
 
+void CardZone::addCard(CardItem *card, bool reorganize, int x, int y)
+{
+	if (view)
+		view->addCard(new CardItem(player->getDb(), card->getName(), card->getId()), reorganize, x, y);
+
+	addCardImpl(card, x, y);
+	
+	if (reorganize)
+		reorganizeCards();
+}
+
 CardItem *CardZone::getCard(int cardId, const QString &cardName)
 {
 	CardItem *c = cards->findCard(cardId, false);
@@ -60,13 +69,13 @@ CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName)
 		return NULL;
 		
 	CardItem *c = cards->takeAt(position);
-	for (int i = 0; i < views.size(); i++)
-		views[i]->removeCard(position);
+	
+	if (view)
+		view->removeCard(position);
 
-//	if (c->getId() == -1) {
-		c->setId(cardId);
-		c->setName(cardName);
-//	}
+	c->setId(cardId);
+	c->setName(cardName);
+
 	reorganizeCards();
 	return c;
 }
@@ -82,14 +91,9 @@ void CardZone::hoverCardEvent(CardItem *card)
 	player->hoverCardEvent(card);
 }
 
-void CardZone::addView(ZoneViewZone *view)
+void CardZone::setView(ZoneViewZone *_view)
 {
-	views.append(view);
-}
-
-void CardZone::removeView(ZoneViewZone *view)
-{
-	views.removeAt(views.indexOf(view));
+	view = _view;
 }
 
 void CardZone::moveAllToZone(const QString &targetZone, int targetX)

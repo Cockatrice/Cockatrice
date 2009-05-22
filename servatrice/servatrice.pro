@@ -6,6 +6,8 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += . src
 INCLUDEPATH += . src
+MOC_DIR = build
+OBJECTS_DIR = build
 
 CONFIG += qt thread
 QT += network sql

@@ -61,7 +61,7 @@ public:
 	int getId() const { return id; }
 	QString getName() const { return name; }
 	bool getLocal() const { return local; }
-	const ZoneList *const getZones() const { return &zones; }
+	const ZoneList *getZones() const { return &zones; }
 	void gameEvent(ServerEventData *event);
 	void hoverCardEvent(CardItem *card);
 	CardDatabase *getDb() const { return db; }

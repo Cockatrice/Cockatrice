@@ -21,9 +21,8 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 	painter->fillRect(boundingRect(), QColor(0, 0, 100));
 }
 
-void TableZone::addCard(CardItem *card, bool reorganize, int x, int y)
+void TableZone::addCardImpl(CardItem *card, int x, int y)
 {
-	Q_UNUSED(reorganize);
 	cards->append(card);
 	if ((x != -1) && (y != -1)) {
 		if (!player->getLocal())

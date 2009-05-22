@@ -32,10 +32,6 @@ int main(int argc, char *argv[])
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
 	Server server;
-	if (!server.openDatabase()) {
-		qCritical("Database error");
-		return -1;
-	}
 	server.listen(QHostAddress::Any, 4747);
 	
 	return app.exec();

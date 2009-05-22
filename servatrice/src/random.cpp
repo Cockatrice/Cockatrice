@@ -1,14 +1,13 @@
 #include "random.h"
-#include <QThread>
+#include <QDateTime>
+#include <stdlib.h>
 
-void Random::init()
+Random::Random(QObject *parent)
+	: QObject(parent)
 {
-	if (initialized)
-		return;
 	int seed = QDateTime::currentDateTime().toTime_t();
-	qDebug(QString("%1: qsrand(%2)").arg(thread()->metaObject()->className()).arg(seed).toLatin1());
+	qDebug(QString("qsrand(%1)").arg(seed).toLatin1());
 	qsrand(seed);
-	initialized = true;
 }
 
 unsigned int Random::getNumber(unsigned int min, unsigned int max)

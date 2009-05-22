@@ -6,12 +6,12 @@ GamesModel::~GamesModel()
 	cleanList();
 }
 
-int GamesModel::rowCount(const QModelIndex &parent) const
+int GamesModel::rowCount(const QModelIndex &/*parent*/) const
 {
 	return gameList.size();
 }
 
-int GamesModel::columnCount(const QModelIndex &parent) const
+int GamesModel::columnCount(const QModelIndex &/*parent*/) const
 {
 	return 5;
 }

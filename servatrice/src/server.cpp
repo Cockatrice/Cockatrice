@@ -28,6 +28,10 @@ Server::Server(QObject *parent)
  : QTcpServer(parent), nextGameId(0)
 {
 	settings = new QSettings("servatrice.ini", QSettings::IniFormat, this);
+
+	QString dbType = settings->value("database/type").toString();
+	if (dbType == "mysql")
+		openDatabase();
 }
 
 Server::~Server()
@@ -81,21 +85,27 @@ void Server::incomingConnection(int socketId)
 
 AuthenticationResult Server::checkUserPassword(const QString &user, const QString &password)
 {
-	if (!QSqlDatabase::database().exec("select 1").isActive())
-		openDatabase();
-
-	QSqlQuery query;
-	query.prepare("select password from players where name = :name");
-	query.bindValue(":name", user);
-	if (!query.exec()) {
-		qCritical(QString("Database error: %1").arg(query.lastError().text()).toLatin1());
-		return PasswordWrong;
-	}
-	if (query.next()) {
-		if (query.value(0).toString() == password)
-			return PasswordRight;
-		else
+	const QString method = settings->value("authentication/method").toString();
+	if (method == "none")
+		return UnknownUser;
+	else if (method == "sql") {
+		if (!QSqlDatabase::database().exec("select 1").isActive())
+			openDatabase();
+	
+		QSqlQuery query;
+		query.prepare("select password from players where name = :name");
+		query.bindValue(":name", user);
+		if (!query.exec()) {
+			qCritical(QString("Database error: %1").arg(query.lastError().text()).toLatin1());
 			return PasswordWrong;
+		}
+		if (query.next()) {
+			if (query.value(0).toString() == password)
+				return PasswordRight;
+			else
+				return PasswordWrong;
+		} else
+			return UnknownUser;
 	} else
 		return UnknownUser;
 }

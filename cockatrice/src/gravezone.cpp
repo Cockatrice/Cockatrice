@@ -16,10 +16,8 @@ QRectF GraveZone::boundingRect() const
 	return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
 }
 
-void GraveZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void GraveZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	Q_UNUSED(option);
-	Q_UNUSED(widget);
 	painter->save();
 	
 	painter->fillRect(boundingRect(), QColor("yellow"));
@@ -33,22 +31,16 @@ void GraveZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 	painter->restore();
 }
 
-void GraveZone::addCard(CardItem *card, bool reorganize, int x, int y)
+void GraveZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
-	for (int i = 0; i < views.size(); i++)
-		views[i]->addCard(new CardItem(player->getDb(), card->getName(), card->getId()), reorganize, x, y);
-
 	cards->insert(x, card);
 	card->setPos(0, 0);
 	card->setVisible(false);
 	card->resetState();
 	card->setParentItem(this);
-
-	if (reorganize)
-		reorganizeCards();
 }
 
-void GraveZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
+void GraveZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
 	player->client->moveCard(cardId, startZone->getName(), getName(), 0, 0);
 }

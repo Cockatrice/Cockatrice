@@ -45,10 +45,8 @@ void HandZone::reorganizeCards()
 	}
 }
 
-void HandZone::addCard(CardItem *card, bool reorganize, int x, int y)
+void HandZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
-	Q_UNUSED(y);
-	
 	if (x == -1)
 		x = cards->size();
 	cards->insert(x, card);
@@ -61,13 +59,9 @@ void HandZone::addCard(CardItem *card, bool reorganize, int x, int y)
 	card->resetState();
 	card->setVisible(true);
 	card->update(card->boundingRect());
-
-	if (reorganize)
-		reorganizeCards();
 }
 
-void HandZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
+void HandZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
-	Q_UNUSED(dropPoint);
 	player->client->moveCard(cardId, startZone->getName(), getName(), cards->size(), 0);
 }

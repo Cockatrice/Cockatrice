@@ -46,7 +46,7 @@ private:
 public:
 	enum { Type = typeCard };
 	int type() const { return Type; }
-	CardItem(CardDatabase *_db, const QString &_name, int _cardid, QGraphicsItem *parent = 0);
+	CardItem(CardDatabase *_db, const QString &_name = QString(), int _cardid = -1, QGraphicsItem *parent = 0);
 	~CardItem();
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

@@ -33,22 +33,16 @@ void RfgZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 	painter->restore();
 }
 
-void RfgZone::addCard(CardItem *card, bool reorganize, int x, int y)
+void RfgZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
-	for (int i = 0; i < views.size(); i++)
-		views[i]->addCard(new CardItem(player->getDb(), card->getName(), card->getId()), reorganize, x, y);
-
 	cards->insert(x, card);
 	card->setPos(0, 0);
 	card->setVisible(false);
 	card->resetState();
 	card->setParentItem(this);
-
-	if (reorganize)
-		reorganizeCards();
 }
 
-void RfgZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
+void RfgZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
 	player->client->moveCard(cardId, startZone->getName(), getName(), 0, 0);
 }

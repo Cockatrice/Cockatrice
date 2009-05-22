@@ -19,11 +19,12 @@ public:
 	~ZoneViewZone();
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-	void addCard(CardItem *card, bool reorganize = true, int x = 0, int y = -1);
 	void reorganizeCards();
 	bool initializeCards();
 	void removeCard(int position);
 	void setHeight(int _height) { height = _height; }
+protected:
+	void addCardImpl(CardItem *card, int x, int y);
 };
 
 #endif

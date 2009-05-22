@@ -277,11 +277,8 @@ MainWindow::MainWindow(QWidget *parent)
 	createMenus();
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
+void MainWindow::closeEvent(QCloseEvent */*event*/)
 {
 	delete game;
-	
-//	db->importOracle();
-//	db->saveToFile("../cards.dat");
 	delete db;
 }

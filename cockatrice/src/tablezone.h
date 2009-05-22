@@ -13,10 +13,11 @@ public:
 	TableZone(Player *_p, QGraphicsItem *parent = 0);
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-	void addCard(CardItem *card, bool reorganize = true, int x = -1, int y = -1);
 	void reorganizeCards();
 	void toggleTapped();
 	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
+protected:
+	void addCardImpl(CardItem *card, int x, int y);
 };
 
 #endif
