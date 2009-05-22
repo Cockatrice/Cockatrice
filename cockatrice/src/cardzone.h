@@ -7,6 +7,7 @@
 class Player;
 class ZoneViewZone;
 class QMenu;
+class QPainter;
 
 class CardZone : public QGraphicsItem {
 protected:
@@ -20,6 +21,7 @@ protected:
 	bool isShufflable;
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 	virtual void addCardImpl(CardItem *card, int x, int y) = 0;
+	void paintCardNumberEllipse(QPainter *painter);
 public:
 	enum { Type = typeZone };
 	int type() const { return Type; }

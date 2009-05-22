@@ -10,9 +10,9 @@ LibraryZone::LibraryZone(Player *_p, QGraphicsItem *parent)
 	: CardZone(_p, "deck", false, true, parent)
 {
 	cards = new CardList(false);
+	setCacheMode(DeviceCoordinateCache); // Do not move this line to the parent constructor!
 	setCursor(Qt::OpenHandCursor);
-	setCacheMode(DeviceCoordinateCache);
-	
+
 	image = player->getDb()->getCard()->getPixmap();
 }
 
@@ -21,21 +21,15 @@ QRectF LibraryZone::boundingRect() const
 	return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
 }
 
-void LibraryZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void LibraryZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget */*widget*/)
 {
-	Q_UNUSED(option);
-	Q_UNUSED(widget);
 	painter->save();
 
 	QRectF foo = option->matrix.mapRect(boundingRect());
 	QPixmap bar = image->scaled((int) foo.width(), (int) foo.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 	painter->drawPixmap(boundingRect(), bar, bar.rect());
 
-	painter->setFont(QFont("Times", 32, QFont::Bold));
-	painter->setPen(QPen(QColor("black")));
-	painter->setBackground(QBrush(QColor(255, 255, 255, 100)));
-	painter->setBackgroundMode(Qt::OpaqueMode);
-	painter->drawText(boundingRect(), Qt::AlignCenter, QString::number(cards->size()));
+	paintCardNumberEllipse(painter);
 
 	painter->restore();
 }
@@ -81,7 +75,7 @@ void LibraryZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 	if (cards->empty())
 		return;
-		
+
 	bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier);
 	CardItem *card = cards->at(0);
 	CardDragItem *drag = card->createDragItem(this, 0, event->pos(), event->scenePos(), faceDown);

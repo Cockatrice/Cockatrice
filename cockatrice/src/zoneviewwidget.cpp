@@ -11,7 +11,7 @@ ZoneViewWidget::ZoneViewWidget(CardDatabase *_db, Player *_player, CardZone *_or
 {
 	setWindowTitle(QString("%1's %2").arg(player->getName()).arg(_origZone->getName()));
 	setAttribute(Qt::WA_DeleteOnClose);
-	
+
 	qreal y = 10;
 	if (_origZone->getIsShufflable() && (numberCards == 0)) {
 		shuffleCheckBox = new QCheckBox("shuffle when closing");
@@ -25,18 +25,18 @@ ZoneViewWidget::ZoneViewWidget(CardDatabase *_db, Player *_player, CardZone *_or
 	qreal left, top, right, bottom;
 	getWindowFrameMargins(&left, &top, &right, &bottom);
 	qreal h = scene()->sceneRect().height() - (top + bottom);
-	
+
 	scrollBar = new QScrollBar(Qt::Vertical);
 	QGraphicsProxyWidget *scrollProxy = new QGraphicsProxyWidget(this);
 	scrollProxy->setWidget(scrollBar);
 	scrollProxy->setPos(138, y);
 	scrollProxy->resize(scrollProxy->size().width(), h - y);
-	
+
 	qreal w = 138 + scrollProxy->size().width();
 	resize(w, h);
 	setMinimumSize(w, h);
 	setMaximumSize(w, h);
-	
+
 	zone = new ZoneViewZone(player, _origZone, numberCards, this);
 	zone->setPos(3, y);
 	zone->setHeight(h - y);
@@ -50,13 +50,13 @@ void ZoneViewWidget::zoneDumpReceived(int commandId, QList<ServerZoneCard *> car
 {
 	if (commandId != cmdId)
 		return;
-	
+
 	for (int i = 0; i < cards.size(); i++) {
 		ServerZoneCard *temp = cards[i];
-		
+
 		CardItem *card = new CardItem(db, temp->getName(), i, zone);
 		zone->addCard(card, false, i);
-		
+
 		delete temp;
 	}
 	zone->reorganizeCards();

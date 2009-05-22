@@ -156,18 +156,19 @@ void Player::gameEvent(ServerEventData *event)
 			// Clean up existing zones first
 			for (int i = 0; i < zones.size(); i++)
 				zones.at(i)->clearContents();
-				
+
 			area->clearCounters();
 
 			CardZone *deck = zones.findZone("deck");
 			for (; deck_cards; deck_cards--)
 				deck->addCard(new CardItem(db), false, -1);
-			deck->reorganizeCards();
 
 			CardZone *sb = zones.findZone("sb");
 			for (; sb_cards; sb_cards--)
 				sb->addCard(new CardItem(db), false, -1);
-			sb->reorganizeCards();
+
+			for (int i = 0; i < zones.size(); i++)
+				zones.at(i)->reorganizeCards();
 
 			if (local) {
 				client->addCounter("life", QColor("white"), 20);
@@ -219,7 +220,7 @@ void Player::gameEvent(ServerEventData *event)
 				qDebug("moveCard: card not found");
 
 			card->deleteDragItem();
-			
+
 			card->setFaceDown(facedown);
 
 			// The log event has to be sent before the card is added to the target zone

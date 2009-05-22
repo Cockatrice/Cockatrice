@@ -21,11 +21,8 @@ QRectF ZoneViewZone::boundingRect() const
 	return QRectF(0, 0, CARD_WIDTH * 1.75, height);
 }
 
-void ZoneViewZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void ZoneViewZone::paint(QPainter */*painter*/, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	Q_UNUSED(painter);
-	Q_UNUSED(option);
-	Q_UNUSED(widget);
 }
 
 bool ZoneViewZone::initializeCards()

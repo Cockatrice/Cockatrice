@@ -9,6 +9,7 @@ GraveZone::GraveZone(Player *_p, QGraphicsItem *parent)
 	: CardZone(_p, "grave", false, false, parent)
 {
 	cards = new CardList(true);
+	setCacheMode(DeviceCoordinateCache); // Do not move this line to the parent constructor!
 }
 
 QRectF GraveZone::boundingRect() const
@@ -16,18 +17,16 @@ QRectF GraveZone::boundingRect() const
 	return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
 }
 
-void GraveZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+void GraveZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+	if (!cards->isEmpty())
+		cards->at(0)->paint(painter, option, widget);
+
 	painter->save();
-	
-	painter->fillRect(boundingRect(), QColor("yellow"));
-	
-	painter->setFont(QFont("Times", 32, QFont::Bold));
-	painter->setPen(QPen(QColor("black")));
-	painter->setBackground(QBrush(QColor(255, 255, 255, 100)));
-	painter->setBackgroundMode(Qt::OpaqueMode);
-	painter->drawText(boundingRect(), Qt::AlignCenter, QString::number(cards->size()));
-	
+
+	paintCardNumberEllipse(painter);
+	painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
+
 	painter->restore();
 }
 
@@ -70,7 +69,7 @@ void GraveZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 	if (cards->empty())
 		return;
-		
+
 	bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier);
 	CardItem *card = cards->at(0);
 	CardDragItem *drag = card->createDragItem(this, card->getId(), event->pos(), event->scenePos(), faceDown);
@@ -78,8 +77,7 @@ void GraveZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	setCursor(Qt::OpenHandCursor);
 }
 
-void GraveZone::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void GraveZone::mouseReleaseEvent(QGraphicsSceneMouseEvent */*event*/)
 {
-	Q_UNUSED(event);
 	setCursor(Qt::OpenHandCursor);
 }

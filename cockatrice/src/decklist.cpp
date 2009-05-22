@@ -3,6 +3,7 @@
 #include <QTextStream>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
+#include <QProgressDialog>
 #include "decklist.h"
 #include "carddatabase.h"
 
@@ -57,12 +58,12 @@ bool DeckList::saveToFile_Native(QIODevice *device)
 	QXmlStreamWriter xml(device);
 	xml.setAutoFormatting(true);
 	xml.writeStartDocument();
-	
+
 	xml.writeStartElement("cockatrice_deck");
 	xml.writeAttribute("version", "1");
 	xml.writeTextElement("deckname", name);
 	xml.writeTextElement("comments", comments);
-	
+
 	xml.writeStartElement("decklist");
 	for (int i = 0; i < size(); i++) {
 		DecklistRow *r = at(i);
@@ -75,9 +76,9 @@ bool DeckList::saveToFile_Native(QIODevice *device)
 		xml.writeAttribute("name", r->getCard());
 	}
 	xml.writeEndElement(); // decklist
-	
+
 	xml.writeEndElement(); // cockatrice_deck
-	
+
 	xml.writeEndDocument();
 	return true;
 }
@@ -89,20 +90,20 @@ bool DeckList::loadFromFile_Plain(QIODevice *device)
 		QString line = in.readLine().simplified();
 		if (line.startsWith("//"))
 			continue;
-			
+
 		bool isSideboard = false;
 		if (line.startsWith("SB:", Qt::CaseInsensitive)) {
 			line = line.mid(3).trimmed();
 			isSideboard = true;
 		}
-		
+
 		// Filter out MWS edition symbols and basic land extras
 		QRegExp rx("\\[.*\\]");
 		line.remove(rx);
 		rx.setPattern("\\(.*\\)");
 		line.remove(rx);
 		line = line.simplified();
-		
+
 		int i = line.indexOf(' ');
 		bool ok;
 		int number = line.left(i).toInt(&ok);
@@ -123,7 +124,7 @@ bool DeckList::saveToFile_Plain(QIODevice *device)
 	return true;
 }
 
-bool DeckList::loadFromFile(const QString &fileName, FileFormat fmt)
+bool DeckList::loadFromFile(const QString &fileName, FileFormat fmt, QWidget *parent)
 {
 	QFile file(fileName);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -136,7 +137,7 @@ bool DeckList::loadFromFile(const QString &fileName, FileFormat fmt)
 		case CockatriceFormat: result = loadFromFile_Native(&file); break;
 	}
 	if (result)
-		cacheCardPictures();
+		cacheCardPictures(parent);
 	return result;
 }
 
@@ -150,7 +151,7 @@ bool DeckList::saveToFile(const QString &fileName, FileFormat fmt)
 	QFile file(fileName);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
 		return false;
-	
+
 	bool result = false;
 	switch (fmt) {
 		case PlainTextFormat: result = saveToFile_Plain(&file); break;
@@ -161,11 +162,11 @@ bool DeckList::saveToFile(const QString &fileName, FileFormat fmt)
 
 bool DeckList::loadDialog(QWidget *parent)
 {
-	QFileDialog dialog(parent);
+	QFileDialog dialog(parent, tr("Load deck"));
 	dialog.setNameFilters(fileNameFilters);
 	if (!dialog.exec())
 		return false;
-		
+
 	QString fileName = dialog.selectedFiles().at(0);
 	FileFormat fmt;
 	switch (fileNameFilters.indexOf(dialog.selectedNameFilter())) {
@@ -173,8 +174,8 @@ bool DeckList::loadDialog(QWidget *parent)
 		case 1: fmt = PlainTextFormat; break;
 		default: fmt = PlainTextFormat; break;
 	}
-	
-	if (loadFromFile(fileName, fmt)) {
+
+	if (loadFromFile(fileName, fmt, parent)) {
 		lastFileName = fileName;
 		lastFileFormat = fmt;
 		return true;
@@ -184,14 +185,14 @@ bool DeckList::loadDialog(QWidget *parent)
 
 bool DeckList::saveDialog(QWidget *parent)
 {
-	QFileDialog dialog(parent);
+	QFileDialog dialog(parent, tr("Save deck"));
 	dialog.setAcceptMode(QFileDialog::AcceptSave);
 	dialog.setConfirmOverwrite(true);
 	dialog.setDefaultSuffix("cod");
 	dialog.setNameFilters(fileNameFilters);
 	if (!dialog.exec())
 		return false;
-		
+
 	QString fileName = dialog.selectedFiles().at(0);
 	DeckList::FileFormat fmt;
 	switch (fileNameFilters.indexOf(dialog.selectedNameFilter())) {
@@ -199,7 +200,7 @@ bool DeckList::saveDialog(QWidget *parent)
 		case 1: fmt = DeckList::PlainTextFormat; break;
 		default: fmt = DeckList::PlainTextFormat; break;
 	}
-	
+
 	if (saveToFile(fileName, fmt)) {
 		lastFileName = fileName;
 		lastFileFormat = fmt;
@@ -208,10 +209,15 @@ bool DeckList::saveDialog(QWidget *parent)
 	return false;
 }
 
-void DeckList::cacheCardPictures()
+void DeckList::cacheCardPictures(QWidget *parent)
 {
-	for (int i = 0; i < size(); i++)
+	QProgressDialog progress(tr("Caching card pictures..."), QString(), 0, size(), parent);
+	progress.setWindowModality(Qt::WindowModal);
+
+	for (int i = 0; i < size(); i++) {
 		db->getCard(at(i)->getCard())->getPixmap();
+		progress.setValue(i + 1);
+	}
 }
 
 void DeckList::cleanList()

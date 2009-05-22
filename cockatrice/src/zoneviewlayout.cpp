@@ -22,7 +22,7 @@ void ZoneViewLayout::reorganize()
 	for (int i = 0; i < views.size(); i++) {
 		QRectF viewSize = views.at(i)->windowFrameRect();
 		qreal w = viewSize.right() - viewSize.left();
-		qreal h = viewSize.bottom() - viewSize.top();
+//		qreal h = viewSize.bottom() - viewSize.top();
 		views.at(i)->setPos(totalWidth, y);
 		totalWidth += w;
 	}

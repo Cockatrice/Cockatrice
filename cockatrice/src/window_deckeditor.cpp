@@ -13,29 +13,50 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	databaseView->setModel(databaseModel);
 	databaseView->setSortingEnabled(true);
 	connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
-	
+
+	QVBoxLayout *leftFrame = new QVBoxLayout;
+	leftFrame->addWidget(databaseView);
+
+	cardInfo = new CardInfoWidget(db);
+
+	QVBoxLayout *middleFrame = new QVBoxLayout;
+	middleFrame->addWidget(cardInfo);
+	middleFrame->addStretch();
+
 	deckModel = new DeckListModel(db, this);
 	deckView = new QTreeView();
 	deckView->setModel(deckModel);
 	connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
-	
-	cardInfo = new CardInfoWidget(db);
-	
-	QVBoxLayout *middleFrame = new QVBoxLayout;
-	middleFrame->addWidget(cardInfo);
-	middleFrame->addStretch();
-	
+
+	QLabel *nameLabel = new QLabel(tr("Deck &name:"));
+	nameEdit = new QLineEdit;
+	nameLabel->setBuddy(nameEdit);
+	connect(nameEdit, SIGNAL(textChanged(const QString &)), deckModel->getDeckList(), SLOT(setName(const QString &)));
+	QLabel *commentsLabel = new QLabel(tr("&Comments:"));
+	commentsEdit = new QLineEdit;
+	commentsLabel->setBuddy(commentsEdit);
+	connect(commentsEdit, SIGNAL(textChanged(const QString &)), deckModel->getDeckList(), SLOT(setComments(const QString &)));
+	QGridLayout *grid = new QGridLayout;
+	grid->addWidget(nameLabel, 0, 0);
+	grid->addWidget(nameEdit, 0, 1);
+	grid->addWidget(commentsLabel, 1, 0);
+	grid->addWidget(commentsEdit, 1, 1);
+
+	QVBoxLayout *rightFrame = new QVBoxLayout;
+	rightFrame->addLayout(grid);
+	rightFrame->addWidget(deckView);
+
 	QHBoxLayout *mainLayout = new QHBoxLayout;
-	mainLayout->addWidget(databaseView);
+	mainLayout->addLayout(leftFrame);
 	mainLayout->addLayout(middleFrame);
-	mainLayout->addWidget(deckView);
-	
+	mainLayout->addLayout(rightFrame);
+
 	QWidget *centralWidget = new QWidget;
 	centralWidget->setLayout(mainLayout);
 	setCentralWidget(centralWidget);
-	
+
 	setWindowTitle(tr("Card database"));
-	
+
 	aNewDeck = new QAction(tr("&New deck"), this);
 	connect(aNewDeck, SIGNAL(triggered()), this, SLOT(actNewDeck()));
 	aLoadDeck = new QAction(tr("&Load deck..."), this);
@@ -46,8 +67,8 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	connect(aSaveDeck, SIGNAL(triggered()), this, SLOT(actSaveDeck()));
 	aSaveDeckAs = new QAction(tr("&Save deck as..."), this);
 	connect(aSaveDeckAs, SIGNAL(triggered()), this, SLOT(actSaveDeckAs()));
-	
-	deckMenu = menuBar()->addMenu(tr("Deck"));
+
+	deckMenu = menuBar()->addMenu(tr("&Deck"));
 	deckMenu->addAction(aNewDeck);
 	deckMenu->addAction(aLoadDeck);
 	deckMenu->addAction(aSaveDeck);
@@ -84,6 +105,8 @@ void WndDeckEditor::actLoadDeck()
 		lastFileName = l->getLastFileName();
 		lastFileFormat = l->getLastFileFormat();
 		deckView->reset();
+		nameEdit->setText(l->getName());
+		commentsEdit->setText(l->getComments());
 	}
 }
 
