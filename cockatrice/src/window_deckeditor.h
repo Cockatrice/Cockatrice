@@ -25,10 +25,13 @@ private slots:
 	void actSaveDeckAs();
 
 	void actAddCard();
+	void actAddCardToSideboard();
 	void actRemoveCard();
 	void actIncrement();
 	void actDecrement();
 private:
+	void addCardHelper(int baseRow);
+
 	QString lastFileName;
 	DeckList::FileFormat lastFileFormat;
 	CardDatabase *db;
@@ -42,7 +45,7 @@ private:
 
 	QMenu *deckMenu;
 	QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs;
-	QAction *aAddCard, *aRemoveCard, *aIncrement, *aDecrement;
+	QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;
 public:
 	WndDeckEditor(CardDatabase *_db, QWidget *parent = 0);
 	~WndDeckEditor();

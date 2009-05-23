@@ -7,9 +7,20 @@
 #include "decklist.h"
 #include "carddatabase.h"
 
+QString DecklistZone::getVisibleName() const
+{
+	if (name == "main")
+		return QObject::tr("Maindeck");
+	else if (name == "side")
+		return QObject::tr("Sideboard");
+	else
+		return QString();
+}
+
 DeckList::DeckList(CardDatabase *_db, QObject *parent)
 	: QObject(parent), db(_db)
 {
+	initZones();
 }
 
 DeckList::~DeckList()
@@ -31,15 +42,16 @@ bool DeckList::loadFromFile_Native(QIODevice *device)
 					name = xml.readElementText();
 				else if (xml.name() == "comments")
 					comments = xml.readElementText();
-				else if (xml.name() == "decklist") {
+				else if (xml.name() == "zone") {
+					DecklistZone *zone = new DecklistZone(xml.attributes().value("name").toString());
+					zones.append(zone);
 					while (!xml.atEnd()) {
 						if (xml.readNext() == QXmlStreamReader::EndElement)
 							break;
 						if (xml.name() == "card") {
 							const int number = xml.attributes().value("number").toString().toInt();
 							const QString card = xml.attributes().value("name").toString();
-							const bool sb = xml.attributes().value("zone") == "side";
-							append(new DecklistRow(number, card, sb));
+							zone->append(new DecklistRow(number, card));
 							while (!xml.atEnd())
 								if (xml.readNext() == QXmlStreamReader::EndElement)
 									break;
@@ -63,18 +75,17 @@ bool DeckList::saveToFile_Native(QIODevice *device)
 	xml.writeTextElement("deckname", name);
 	xml.writeTextElement("comments", comments);
 
-	xml.writeStartElement("decklist");
-	for (int i = 0; i < size(); i++) {
-		DecklistRow *r = at(i);
-		xml.writeEmptyElement("card");
-		if (r->isSideboard())
-			xml.writeAttribute("zone", "side");
-		else
-			xml.writeAttribute("zone", "main");
-		xml.writeAttribute("number", QString::number(r->getNumber()));
-		xml.writeAttribute("name", r->getCard());
+	for (int i = 0; i < zones.size(); i++) {
+		xml.writeStartElement("zone");
+		xml.writeAttribute("name", zones[i]->getName());
+		for (int j = 0; j < zones[i]->size(); j++) {
+			DecklistRow *r = zones[i]->at(j);
+			xml.writeEmptyElement("card");
+			xml.writeAttribute("number", QString::number(r->getNumber()));
+			xml.writeAttribute("name", r->getCard());
+		}
+		xml.writeEndElement(); // zone
 	}
-	xml.writeEndElement(); // decklist
 
 	xml.writeEndElement(); // cockatrice_deck
 
@@ -84,17 +95,20 @@ bool DeckList::saveToFile_Native(QIODevice *device)
 
 bool DeckList::loadFromFile_Plain(QIODevice *device)
 {
+	initZones();
+
 	QTextStream in(device);
 	while (!in.atEnd()) {
 		QString line = in.readLine().simplified();
 		if (line.startsWith("//"))
 			continue;
 
-		bool isSideboard = false;
+		DecklistZone *zone;
 		if (line.startsWith("SB:", Qt::CaseInsensitive)) {
 			line = line.mid(3).trimmed();
-			isSideboard = true;
-		}
+			zone = zones[1];
+		} else
+			zone = zones[0];
 
 		// Filter out MWS edition symbols and basic land extras
 		QRegExp rx("\\[.*\\]");
@@ -108,7 +122,7 @@ bool DeckList::loadFromFile_Plain(QIODevice *device)
 		int number = line.left(i).toInt(&ok);
 		if (!ok)
 			continue;
-		append(new DecklistRow(number, line.mid(i + 1), isSideboard));
+		zone->append(new DecklistRow(number, line.mid(i + 1)));
 	}
 	return true;
 }
@@ -116,10 +130,11 @@ bool DeckList::loadFromFile_Plain(QIODevice *device)
 bool DeckList::saveToFile_Plain(QIODevice *device)
 {
 	QTextStream out(device);
-	for (int i = 0; i < size(); i++) {
-		DecklistRow *r = at(i);
-		out << QString("%1%2 %3\n").arg(r->isSideboard() ? "SB: " : "").arg(r->getNumber()).arg(r->getCard());
-	}
+	for (int i = 0; i < zones.size(); i++)
+		for (int j = 0; j < zones[i]->size(); j++) {
+			DecklistRow *r = zones[i]->at(j);
+			out << QString("%1%2 %3\n").arg(zones[i]->getName() == "side" ? "SB: " : "").arg(r->getNumber()).arg(r->getCard());
+		}
 	return true;
 }
 
@@ -212,18 +227,37 @@ bool DeckList::saveDialog(QWidget *parent)
 
 void DeckList::cacheCardPictures(QWidget *parent)
 {
-	QProgressDialog progress(tr("Caching card pictures..."), QString(), 0, size(), parent);
+	int totalCards = 0;
+	for (int i = 0; i < zones.size(); i++)
+		totalCards += zones[i]->size();
+
+	QProgressDialog progress(tr("Caching card pictures..."), QString(), 0, totalCards, parent);
+	progress.setMinimumDuration(1000);
 	progress.setWindowModality(Qt::WindowModal);
 
-	for (int i = 0; i < size(); i++) {
-		db->getCard(at(i)->getCard())->getPixmap();
-		progress.setValue(i + 1);
-	}
+	for (int i = 0; i < zones.size(); i++)
+		for (int j = 0; j < zones[i]->size(); j++) {
+			db->getCard(zones[i]->at(j)->getCard())->getPixmap();
+			progress.setValue(progress.value() + 1);
+		}
 }
 
 void DeckList::cleanList()
 {
-	for (int i = 0; i < size(); i++)
-		delete at(i);
-	clear();
+	for (int i = 0; i < zones.size(); i++) {
+		for (int j = 0; j < zones[i]->size(); j++)
+			delete zones[i]->at(j);
+		zones[i]->clear();
+		delete zones[i];
+	}
+	zones.clear();
+	setName();
+	setComments();
+}
+
+void DeckList::initZones()
+{
+	// possibly Magic specific
+	zones.append(new DecklistZone("main"));
+	zones.append(new DecklistZone("side"));
 }

@@ -11,17 +11,24 @@ class DecklistRow {
 private:
 	int number;
 	QString card;
-	bool sideboard;
 public:
-	DecklistRow(int _number = 1, const QString &_card = QString(), bool _sideboard = false) : number(_number), card(_card), sideboard(_sideboard) { }
+	DecklistRow(int _number = 1, const QString &_card = QString()) : number(_number), card(_card) { }
 	int getNumber() const { return number; }
 	void setNumber(int _number) { number = _number; }
 	QString getCard() const { return card; }
 	void setCard(const QString &_card) { card = _card; }
-	bool isSideboard() const { return sideboard; }
 };
 
-class DeckList : public QObject, public QList<DecklistRow *> {
+class DecklistZone : public QList<DecklistRow *> {
+private:
+	QString name;
+public:
+	DecklistZone(const QString &_name) : name(_name) { }
+	QString getName() const { return name; }
+	QString getVisibleName() const;
+};
+
+class DeckList : public QObject {
 	Q_OBJECT
 public:
 	enum FileFormat { PlainTextFormat, CockatriceFormat };
@@ -32,11 +39,12 @@ private:
 	QString name, comments;
 	QString lastFileName;
 	FileFormat lastFileFormat;
+	QList<DecklistZone *> zones;
 signals:
 	void deckLoaded();
 public slots:
-	void setName(const QString &_name) { name = _name; }
-	void setComments(const QString &_comments) { comments = _comments; }
+	void setName(const QString &_name = QString()) { name = _name; }
+	void setComments(const QString &_comments = QString()) { comments = _comments; }
 public:
 	DeckList(CardDatabase *_db, QObject *parent = 0);
 	~DeckList();
@@ -55,6 +63,10 @@ public:
 	bool saveDialog(QWidget *parent = 0);
 
 	void cleanList();
+	void initZones();
+
+	int zoneCount() const { return zones.size(); }
+	DecklistZone *getZoneByIndex(int index) const { return zones[index]; }
 };
 
 #endif

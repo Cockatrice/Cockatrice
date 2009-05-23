@@ -46,10 +46,13 @@ QStringList DlgStartGame::getDeckList() const
 {
 	QStringList result;
 	DeckList *deckList = tableModel->getDeckList();
-	for (int i = 0; i < deckList->size(); i++) {
-		DecklistRow *temp = deckList->at(i);
-		for (int j = 0; j < temp->getNumber(); j++)
-			result << QString("%1%2").arg(temp->isSideboard() ? "SB:" : "").arg(temp->getCard());
+	for (int i = 0; i < deckList->zoneCount(); i++) {
+		DecklistZone *zone = deckList->getZoneByIndex(i);
+		for (int j = 0; j < zone->size(); j++) {
+			DecklistRow *r = zone->at(j);
+			for (int k = 0; k < r->getNumber(); k++)
+				result << QString("%1%2").arg(zone->getName() == "side" ? "SB:" : "").arg(r->getCard());
+		}
 	}
 	return result;
 }
