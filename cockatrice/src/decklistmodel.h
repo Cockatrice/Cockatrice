@@ -9,6 +9,8 @@ class CardDatabase;
 
 class DeckListModel : public QAbstractListModel {
 	Q_OBJECT
+private slots:
+	void resetModel();
 public:
 	DeckListModel(CardDatabase *_db, QObject *parent = 0);
 	~DeckListModel();
@@ -16,7 +18,10 @@ public:
 	int columnCount(const QModelIndex &parent = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-	DecklistRow *getRow(int row) const;
+	Qt::ItemFlags flags(const QModelIndex &index) const;
+	bool setData(const QModelIndex &index, const QVariant &value, int role);
+	bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+	bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
 	void cleanList();
 	DeckList *getDeckList() const { return deckList; }
 	bool loadFromFile(const QString &fileName, DeckList::FileFormat fmt);

@@ -3,7 +3,7 @@
 ######################################################################
 
 TEMPLATE = app
-TARGET = 
+TARGET =
 DEPENDPATH += . src
 INCLUDEPATH += . src
 MOC_DIR = build

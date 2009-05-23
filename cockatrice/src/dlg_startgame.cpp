@@ -37,7 +37,7 @@ void DlgStartGame::actLoad()
 {
 	if (!tableModel->getDeckList()->loadDialog(this))
 		return;
-	
+
 	tableView->reset();
 	emit newDeckLoaded(getDeckList());
 }
@@ -45,8 +45,9 @@ void DlgStartGame::actLoad()
 QStringList DlgStartGame::getDeckList() const
 {
 	QStringList result;
-	for (int i = 0; i < tableModel->rowCount(); i++) {
-		DecklistRow *temp = tableModel->getRow(i);
+	DeckList *deckList = tableModel->getDeckList();
+	for (int i = 0; i < deckList->size(); i++) {
+		DecklistRow *temp = deckList->at(i);
 		for (int j = 0; j < temp->getNumber(); j++)
 			result << QString("%1%2").arg(temp->isSideboard() ? "SB:" : "").arg(temp->getCard());
 	}

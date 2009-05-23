@@ -9,6 +9,7 @@ class CardDatabase;
 class CardDatabaseModel;
 class DeckListModel;
 class QTreeView;
+class QTableView;
 class CardInfoWidget;
 class QLineEdit;
 
@@ -22,6 +23,11 @@ private slots:
 	void actLoadDeck();
 	void actSaveDeck();
 	void actSaveDeckAs();
+
+	void actAddCard();
+	void actRemoveCard();
+	void actIncrement();
+	void actDecrement();
 private:
 	QString lastFileName;
 	DeckList::FileFormat lastFileFormat;
@@ -29,12 +35,14 @@ private:
 
 	CardDatabaseModel *databaseModel;
 	DeckListModel *deckModel;
-	QTreeView *databaseView, *deckView;
+	QTreeView *databaseView;
+	QTreeView *deckView;
 	CardInfoWidget *cardInfo;
 	QLineEdit *nameEdit, *commentsEdit;
 
 	QMenu *deckMenu;
 	QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs;
+	QAction *aAddCard, *aRemoveCard, *aIncrement, *aDecrement;
 public:
 	WndDeckEditor(CardDatabase *_db, QWidget *parent = 0);
 	~WndDeckEditor();

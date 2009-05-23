@@ -38,16 +38,16 @@ void myMessageOutput(QtMsgType type, const char *msg)
 
 int main(int argc, char *argv[])
 {
-	qInstallMsgHandler(myMessageOutput);
-      QApplication app(argc, argv);
-      app.addLibraryPath("plugins");
-      QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+//	qInstallMsgHandler(myMessageOutput);
+	QApplication app(argc, argv);
+	app.addLibraryPath("plugins");
+	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
-      MainWindow *ui = new MainWindow;
-      qDebug("main(): MainWindow constructor finished");
-      ui->show();
-      qDebug("main(): ui->show() finished");
+	MainWindow *ui = new MainWindow;
+	qDebug("main(): MainWindow constructor finished");
+	ui->show();
+	qDebug("main(): ui->show() finished");
 
-      return app.exec();
+	return app.exec();
 }
 

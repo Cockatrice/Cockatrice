@@ -7,10 +7,9 @@
 #include "decklist.h"
 #include "carddatabase.h"
 
-DeckList::DeckList(CardDatabase *_db)
-	: db(_db)
+DeckList::DeckList(CardDatabase *_db, QObject *parent)
+	: QObject(parent), db(_db)
 {
-
 }
 
 DeckList::~DeckList()
@@ -136,8 +135,10 @@ bool DeckList::loadFromFile(const QString &fileName, FileFormat fmt, QWidget *pa
 		case PlainTextFormat: result = loadFromFile_Plain(&file); break;
 		case CockatriceFormat: result = loadFromFile_Native(&file); break;
 	}
-	if (result)
+	if (result) {
 		cacheCardPictures(parent);
+		emit deckLoaded();
+	}
 	return result;
 }
 

@@ -45,7 +45,7 @@ void CardInfoWidget::setCard(CardInfo *card)
 	QPixmap *pixmap = card->getPixmap();
 	if (aspectratio == 0)
 		aspectratio = (double) pixmap->height() / pixmap->width();
-	double w = width() * 2.0 / 3.0;
+	double w = 180;
 	cardPicture->setPixmap(pixmap->scaled((int) w, (int) (w * aspectratio), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
 	nameLabel2->setText(card->getName());

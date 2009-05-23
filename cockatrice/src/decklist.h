@@ -13,9 +13,11 @@ private:
 	QString card;
 	bool sideboard;
 public:
-	DecklistRow(int _number, const QString &_card, bool _sideboard) : number(_number), card(_card), sideboard(_sideboard) { }
+	DecklistRow(int _number = 1, const QString &_card = QString(), bool _sideboard = false) : number(_number), card(_card), sideboard(_sideboard) { }
 	int getNumber() const { return number; }
+	void setNumber(int _number) { number = _number; }
 	QString getCard() const { return card; }
+	void setCard(const QString &_card) { card = _card; }
 	bool isSideboard() const { return sideboard; }
 };
 
@@ -30,11 +32,13 @@ private:
 	QString name, comments;
 	QString lastFileName;
 	FileFormat lastFileFormat;
+signals:
+	void deckLoaded();
 public slots:
 	void setName(const QString &_name) { name = _name; }
 	void setComments(const QString &_comments) { comments = _comments; }
 public:
-	DeckList(CardDatabase *_db);
+	DeckList(CardDatabase *_db, QObject *parent = 0);
 	~DeckList();
 	QString getName() const { return name; }
 	QString getComments() const { return comments; }
