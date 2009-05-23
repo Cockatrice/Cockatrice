@@ -13,16 +13,14 @@ QRectF Counter::boundingRect() const
 	return QRectF(0, 0, 40, 40);
 }
 
-void Counter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void Counter::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	Q_UNUSED(option);
-	Q_UNUSED(widget);
 	painter->save();
 	painter->setBrush(QBrush(color));
 	painter->drawEllipse(boundingRect());
 	if (value) {
 		painter->setFont(QFont("Times", 16, QFont::Bold));
-		painter->drawText(boundingRect(), Qt::AlignCenter, QString("%1").arg(value));
+		painter->drawText(boundingRect(), Qt::AlignCenter, QString::number(value));
 	}
 	painter->restore();
 }

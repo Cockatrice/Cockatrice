@@ -45,10 +45,11 @@ QPixmap *CardInfo::getPixmap()
 	}
 	qDebug(QString("CardDatabase: loading pixmap for %1").arg(getName()).toLatin1());
 	for (int i = 0; i < editions.size(); i++) {
-		/* Fire // Ice */
-		if (pixmap->load(QString("../pics/%1/%2.full.jpg").arg(editions.at(i)).arg(getName().replace(" // ", ""))))
+		// Fire // Ice, Circle of Protection: Red
+		QString correctedName = getName().remove(" // ").remove(":");
+		if (pixmap->load(QString("../pics/%1/%2.full.jpg").arg(editions.at(i)).arg(correctedName)))
 			return pixmap;
-		if (pixmap->load(QString("../pics/%1/%2%3.full.jpg").arg(editions.at(i)).arg(getName().replace(" // ", "")).arg(1)))
+		if (pixmap->load(QString("../pics/%1/%2%3.full.jpg").arg(editions.at(i)).arg(correctedName).arg(1)))
 			return pixmap;
 	}
 	pixmap->load("../pics/none.jpg");
@@ -172,24 +173,24 @@ int CardDatabase::loadFromFile(const QString &fileName)
 	file.open(QIODevice::ReadOnly);
 	QDataStream in(&file);
 	in.setVersion(QDataStream::Qt_4_4);
-	
+
 	quint32 _magicNumber, _fileVersion, cardCount;
 	in >> _magicNumber
 	   >> _fileVersion
 	   >> cardCount;
-	
+
 	if (_magicNumber != magicNumber)
 		return -1;
 	if (_fileVersion != fileVersion)
 		return -2;
-		
+
 	clear();
 	hash.reserve(cardCount);
 	for (unsigned int i = 0; i < cardCount; i++) {
 		CardInfo *newCard = new CardInfo(in);
 		hash.insert(newCard->getName(), newCard);
 	}
-	
+
 	return cardCount;
 }
 
@@ -199,16 +200,16 @@ bool CardDatabase::saveToFile(const QString &fileName)
 	file.open(QIODevice::WriteOnly);
 	QDataStream out(&file);
 	out.setVersion(QDataStream::Qt_4_4);
-	
+
 	out << (quint32) magicNumber
 	    << (quint32) fileVersion
 	    << (quint32) hash.size();
-	
+
 	QHashIterator<QString, CardInfo *> i(hash);
 	while (i.hasNext()) {
 		i.next();
 		i.value()->saveToStream(out);
 	}
-	
+
 	return true;
 }

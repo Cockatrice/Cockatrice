@@ -18,25 +18,29 @@ Client::Client(QObject *parent)
 
 Client::~Client()
 {
+	disconnectFromServer();
 	delete socket;
 }
 
 void Client::checkTimeout()
 {
+	bool timeout = false;
 	QListIterator<PendingCommand *> i(PendingCommands);
 	while (i.hasNext()) {
 		PendingCommand *c = i.next();
-		c->incTime();
 		if (c->timeout()) {
-			disconnectFromServer();
-			emit serverTimeout();
-			return;
+			timeout = true;
+			break;
 		}
 	}
-	ping();
+	if (timeout) {
+		disconnectFromServer();
+		emit serverTimeout();
+	} else
+		ping();
 }
 
-void Client::slotSocketError(QAbstractSocket::SocketError error)
+void Client::slotSocketError(QAbstractSocket::SocketError /*error*/)
 {
 	emit logSocketError(socket->errorString());
 	disconnectFromServer();
@@ -108,7 +112,8 @@ void Client::readLine()
 			if (found) {
 				PendingCommands.removeAt(PendingCommands.indexOf(c));
 				delete c;
-			}
+			} else
+				qDebug(QString("msgid unknown: %1").arg(msgid).toLatin1());
 
 			emit responseReceived(new ServerResponse(msgid, ok, message));
 		} else if (!(prefix.compare("list_games")
@@ -179,7 +184,6 @@ void Client::msg(const QString &s)
 	stream.setCodec("UTF-8");
 	stream << s << endl;
 	stream.flush();
-	socket->flush();
 }
 
 int Client::cmd(const QString &s)
@@ -200,7 +204,11 @@ void Client::connectToServer(const QString &hostname, unsigned int port, const Q
 void Client::disconnectFromServer()
 {
 	timer->stop();
+
+	for (int i = 0; i < PendingCommands.size(); i++)
+		delete PendingCommands[i];
 	PendingCommands.clear();
+
 	setStatus(StatusDisconnected);
 	socket->close();
 }
