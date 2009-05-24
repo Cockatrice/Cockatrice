@@ -16,7 +16,7 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	: QObject(), actionsMenu(_actionsMenu), cardMenu(_cardMenu), db(_db), client(_client), scene(_scene), started(false)
 {
 	QRectF sr = scene->sceneRect();
-	localPlayer = addPlayer(playerId, playerName, QPointF(0, sr.y() + sr.height() / 2), true);
+	localPlayer = addPlayer(playerId, playerName, QPointF(0, sr.y() + sr.height() / 2 + 2), true);
 
 	connect(client, SIGNAL(gameEvent(ServerEventData *)), this, SLOT(gameEvent(ServerEventData *)));
 	connect(client, SIGNAL(playerListReceived(QList<ServerPlayer *>)), this, SLOT(playerListReceived(QList<ServerPlayer *>)));
@@ -92,7 +92,7 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	cardMenu->addAction(aSetCounters);
 	cardMenu->addSeparator();
 	cardMenu->addAction(aRearrange);
-	
+
 	dlgStartGame = new DlgStartGame(db);
 	connect(dlgStartGame, SIGNAL(newDeckLoaded(const QStringList &)), client, SLOT(submitDeck(const QStringList &)));
 	connect(dlgStartGame, SIGNAL(finished(int)), this, SLOT(readyStart()));

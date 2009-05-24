@@ -13,7 +13,7 @@ PlayerArea::PlayerArea(Player *_player, QGraphicsItem *parent)
 	: QGraphicsItem(parent), player(_player)
 {
  	QPointF base = QPointF(55, 50);
-	
+
 	LibraryZone *deck = new LibraryZone(_player, this);
 	deck->setPos(base);
 
@@ -36,7 +36,7 @@ PlayerArea::PlayerArea(Player *_player, QGraphicsItem *parent)
 
 	CardZone *table = new TableZone(_player, this);
 	table->setPos(base);
-	
+
 	bRect = QRectF(0, 0, base.x() + table->boundingRect().width(), base.y() + table->boundingRect().height());
 	qDebug(QString("%1").arg(bRect.width()).toLatin1());
 }
@@ -51,14 +51,14 @@ QRectF PlayerArea::boundingRect() const
 	return bRect;
 }
 
-void PlayerArea::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void PlayerArea::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
 	painter->save();
 
 	painter->fillRect(boundingRect(), QColor(200, 200, 200));
-	
+
 	painter->setFont(QFont("Times", 16, QFont::Bold));
-	painter->setPen(QPen(QColor("black")));
+	painter->setPen(QPen(Qt::black));
 	painter->drawText(QRectF(0, 0, CARD_WIDTH + 60, 40), Qt::AlignCenter, player->getName());
 
 	painter->restore();
@@ -99,7 +99,7 @@ void PlayerArea::clearCounters()
 void PlayerArea::rearrangeCounters()
 {
 	const int counterAreaWidth = 55;
-	int y = 50;
+	qreal y = 50;
 	for (int i = 0; i < counterList.size(); i++) {
 		Counter *temp = counterList.at(i);
 		QRectF br = temp->boundingRect();

@@ -188,7 +188,7 @@ void MainWindow::createActions()
 	connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
 	aExit = new QAction(tr("&Exit"), this);
 	connect(aExit, SIGNAL(triggered()), this, SLOT(actExit()));
-	
+
 	aCloseMostRecentZoneView = new QAction(tr("Close most recent zone view"), this);
 	aCloseMostRecentZoneView->setShortcut(tr("Esc"));
 	connect(aCloseMostRecentZoneView, SIGNAL(triggered()), zoneLayout, SLOT(closeMostRecentZoneView()));
@@ -225,7 +225,7 @@ MainWindow::MainWindow(QWidget *parent)
 	int cardCount = db->loadFromFile("../cards.dat");
 	qDebug(QString("%1 cards loaded").arg(cardCount).toLatin1());
 
-	scene = new QGraphicsScene(0, 0, 952, 1020, this);
+	scene = new QGraphicsScene(0, 0, 952, 1024, this);
 	view = new GameView(scene);
 
 //	view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
