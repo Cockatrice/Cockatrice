@@ -18,6 +18,7 @@ class WndDeckEditor : public QMainWindow {
 private slots:
 	void updateCardInfoLeft(const QModelIndex &current, const QModelIndex &previous);
 	void updateCardInfoRight(const QModelIndex &current, const QModelIndex &previous);
+	void updateSearch(const QString &search);
 
 	void actNewDeck();
 	void actLoadDeck();
@@ -41,7 +42,7 @@ private:
 	QTreeView *databaseView;
 	QTreeView *deckView;
 	CardInfoWidget *cardInfo;
-	QLineEdit *nameEdit, *commentsEdit;
+	QLineEdit *searchEdit, *nameEdit, *commentsEdit;
 
 	QMenu *deckMenu;
 	QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs;

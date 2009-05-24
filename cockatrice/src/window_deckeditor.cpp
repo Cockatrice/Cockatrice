@@ -8,14 +8,26 @@
 WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	: QMainWindow(parent), db(_db)
 {
+	QLabel *searchLabel = new QLabel(tr("&Search for:"));
+	searchEdit = new QLineEdit;
+	searchLabel->setBuddy(searchEdit);
+	connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
+	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(actAddCard()));
+
+	QHBoxLayout *searchLayout = new QHBoxLayout;
+	searchLayout->addWidget(searchLabel);
+	searchLayout->addWidget(searchEdit);
+
 	databaseModel = new CardDatabaseModel(db);
 	databaseView = new QTreeView();
 	databaseView->setModel(databaseModel);
 	databaseView->setUniformRowHeights(true);
 	databaseView->setSortingEnabled(true);
 	connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
+	connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
 
 	QVBoxLayout *leftFrame = new QVBoxLayout;
+	leftFrame->addLayout(searchLayout);
 	leftFrame->addWidget(databaseView);
 
 	cardInfo = new CardInfoWidget(db);
@@ -86,16 +98,21 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	deckMenu->addAction(aSaveDeck);
 	deckMenu->addAction(aSaveDeckAs);
 
-	aAddCard = new QAction(tr("&Add card to maindeck"), this);
+	aAddCard = new QAction(tr("Add card to &maindeck"), this);
 	connect(aAddCard, SIGNAL(triggered()), this, SLOT(actAddCard()));
-	aAddCardToSideboard = new QAction(tr("&Add card to sideboard"), this);
+	aAddCard->setShortcut(tr("Ctrl+M"));
+	aAddCardToSideboard = new QAction(tr("Add card to &sideboard"), this);
 	connect(aAddCardToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
+	aAddCardToSideboard->setShortcut(tr("Ctrl+N"));
 	aRemoveCard = new QAction(tr("&Remove row"), this);
 	connect(aRemoveCard, SIGNAL(triggered()), this, SLOT(actRemoveCard()));
+	aRemoveCard->setShortcut(tr("Ctrl+R"));
 	aIncrement = new QAction(tr("&Increment number"), this);
 	connect(aIncrement, SIGNAL(triggered()), this, SLOT(actIncrement()));
+	aIncrement->setShortcut(tr("+"));
 	aDecrement = new QAction(tr("&Decrement number"), this);
 	connect(aDecrement, SIGNAL(triggered()), this, SLOT(actDecrement()));
+	aDecrement->setShortcut(tr("-"));
 
 	verticalToolBar->addAction(aAddCard);
 	verticalToolBar->addAction(aAddCardToSideboard);
@@ -119,9 +136,19 @@ void WndDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
 	cardInfo->setCard(current.sibling(current.row(), 1).data().toString());
 }
 
+void WndDeckEditor::updateSearch(const QString &search)
+{
+	QModelIndexList matches = databaseModel->match(databaseModel->index(0, 0), Qt::DisplayRole, search);
+	if (matches.isEmpty())
+		return;
+	databaseView->selectionModel()->setCurrentIndex(matches[0], QItemSelectionModel::SelectCurrent);
+}
+
 void WndDeckEditor::actNewDeck()
 {
 	deckModel->cleanList();
+	nameEdit->setText(QString());
+	commentsEdit->setText(QString());
 	lastFileName = QString();
 }
 
