@@ -34,7 +34,6 @@ private:
 	CardDatabase *db;
 	QString name;
 	int id;
-	int width, height;
 	QPixmap *image;
 	bool tapped;
 	bool attacking;

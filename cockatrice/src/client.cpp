@@ -2,13 +2,12 @@
 #include "client.h"
 
 Client::Client(QObject *parent)
-	: QObject(parent), MsgId(0)
+	: QObject(parent), status(StatusDisconnected), MsgId(0)
 {
 	timer = new QTimer(this);
 	timer->setInterval(1000);
 	connect(timer, SIGNAL(timeout()), this, SLOT(checkTimeout()));
 
-	status = StatusDisconnected;
 	socket = new QTcpSocket(this);
 	socket->setTextModeEnabled(true);
 	connect(socket, SIGNAL(connected()), this, SLOT(slotConnected()));
@@ -19,7 +18,6 @@ Client::Client(QObject *parent)
 Client::~Client()
 {
 	disconnectFromServer();
-	delete socket;
 }
 
 void Client::checkTimeout()
@@ -54,11 +52,8 @@ void Client::slotConnected()
 
 void Client::readLine()
 {
-	QString line;
-	for (;;) {
-		if (!socket->canReadLine())
-			break;
-		line = QString(socket->readLine()).trimmed();
+	while (socket->canReadLine()) {
+		QString line = QString(socket->readLine()).trimmed();
 
 		if (line.isNull())
 			break;
@@ -67,9 +62,9 @@ void Client::readLine()
 		QString prefix = values.takeFirst();
 		// prefix is one of {welcome, private, public, resp, list_games, list_players, list_counters, list_zones, dump_zone}
 		if (!(prefix.compare("private") && prefix.compare("public"))) {
-			ServerEventData *event = new ServerEventData(line);
-			if (event->getEventType() == eventPlayerId) {
-				QStringList data = event->getEventData();
+			ServerEventData event(line);
+			if (event.getEventType() == eventPlayerId) {
+				QStringList data = event.getEventData();
 				if (data.size() != 2) {
 					// XXX
 				}
@@ -78,7 +73,6 @@ void Client::readLine()
 				if (!ok) {
 					// XXX
 				}
-				delete event;
 				emit playerIdReceived(id, data[1]);
 			} else
 				emit gameEvent(event);

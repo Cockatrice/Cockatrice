@@ -10,6 +10,7 @@ GraveZone::GraveZone(Player *_p, QGraphicsItem *parent)
 {
 	cards = new CardList(true);
 	setCacheMode(DeviceCoordinateCache); // Do not move this line to the parent constructor!
+	setCursor(Qt::OpenHandCursor);
 }
 
 QRectF GraveZone::boundingRect() const
@@ -19,6 +20,7 @@ QRectF GraveZone::boundingRect() const
 
 void GraveZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+	qDebug("grave: paint");
 	if (!cards->isEmpty())
 		cards->at(0)->paint(painter, option, widget);
 
@@ -46,6 +48,7 @@ void GraveZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/
 
 void GraveZone::reorganizeCards()
 {
+	qDebug(QString("grave: reorganize, x=%1, y=%2, w=%3, h=%4").arg(boundingRect().x()).arg(boundingRect().y()).arg(boundingRect().width()).arg(boundingRect().height()).toLatin1());
 	update(boundingRect());
 }
 

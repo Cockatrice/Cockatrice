@@ -62,7 +62,7 @@ public:
 	QString getName() const { return name; }
 	bool getLocal() const { return local; }
 	const ZoneList *getZones() const { return &zones; }
-	void gameEvent(ServerEventData *event);
+	void gameEvent(const ServerEventData &event);
 	void hoverCardEvent(CardItem *card);
 	CardDatabase *getDb() const { return db; }
 	void showCardMenu(const QPoint &p);

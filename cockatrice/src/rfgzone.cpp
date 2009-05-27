@@ -10,6 +10,7 @@ RfgZone::RfgZone(Player *_p, QGraphicsItem *parent)
 {
 	cards = new CardList(true);
 	setCacheMode(DeviceCoordinateCache); // Do not move this line to the parent constructor!
+	setCursor(Qt::OpenHandCursor);
 }
 
 QRectF RfgZone::boundingRect() const

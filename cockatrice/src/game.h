@@ -47,7 +47,7 @@ private slots:
 	void actSetCounters();
 	void actRearrange();
 
-	void gameEvent(ServerEventData *msg);
+	void gameEvent(const ServerEventData &msg);
 	void playerListReceived(QList<ServerPlayer *> playerList);
 	void readyStart();
 signals:

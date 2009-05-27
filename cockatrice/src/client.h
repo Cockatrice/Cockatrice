@@ -32,7 +32,7 @@ signals:
 	void zoneDumpReceived(int commandId, QList<ServerZoneCard *> cards);
 	void responseReceived(ServerResponse *response);
 	void playerIdReceived(int id, QString name);
-	void gameEvent(ServerEventData *msg);
+	void gameEvent(const ServerEventData &msg);
 	void serverTimeout();
 	void logSocketError(const QString &errorString);
 
@@ -57,7 +57,7 @@ private:
 public:
 	Client(QObject *parent = 0);
 	~Client();
-	ProtocolStatus getStatus() { return status; }
+	ProtocolStatus getStatus() const { return status; }
 	QString peerName() const { return socket->peerName(); }
 	
 	void connectToServer(const QString &hostname, unsigned int port, const QString &playername, const QString &password);

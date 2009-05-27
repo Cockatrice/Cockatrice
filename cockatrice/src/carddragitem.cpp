@@ -15,6 +15,7 @@ CardDragItem::CardDragItem(QGraphicsScene *scene, CardZone *_startZone, QPixmap 
 
 	setZValue(2000000000);
 	setCacheMode(DeviceCoordinateCache);
+	setCursor(Qt::ClosedHandCursor);
 
 	if (!parent)
 		scene->addItem(this);

@@ -10,8 +10,6 @@
 CardItem::CardItem(CardDatabase *_db, const QString &_name, int _cardid, QGraphicsItem *parent)
 	: QGraphicsItem(parent), db(_db), name(_name), id(_cardid), tapped(false), attacking(false), facedown(false), counters(0), doesntUntap(false), dragItem(NULL)
 {
-	width = CARD_WIDTH;
-	height = CARD_HEIGHT;
 	image = db->getCard(name)->getPixmap();
 	setCursor(Qt::OpenHandCursor);
 	setFlag(ItemIsSelectable);
@@ -27,13 +25,11 @@ CardItem::~CardItem()
 
 QRectF CardItem::boundingRect() const
 {
-	return QRectF(0, 0, width, height);
+	return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
 }
 
-void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget */*widget*/)
 {
-	Q_UNUSED(widget);
-
 	painter->save();
 	QRectF foo = option->matrix.mapRect(boundingRect());
 	qDebug(QString("%1: w=%2,h=%3").arg(name).arg(foo.width()).arg(foo.height()).toLatin1());
@@ -46,7 +42,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 	painter->drawPixmap(boundingRect(), bar, bar.rect());
 	if (isSelected()) {
 		painter->setPen(QPen(QColor("red")));
-		painter->drawRect(QRectF(1, 1, width - 2, height - 2));
+		painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 2));
 	}
 	if (counters) {
 		painter->setFont(QFont("Times", 32, QFont::Bold));
@@ -69,7 +65,7 @@ void CardItem::setTapped(bool _tapped)
 {
 	tapped = _tapped;
 	if (tapped)
-		setTransform(QTransform().translate((float) width / 2, (float) height / 2).rotate(90).translate((float) -width / 2, (float) -height / 2));
+		setTransform(QTransform().translate((float) CARD_WIDTH / 2, (float) CARD_HEIGHT / 2).rotate(90).translate((float) -CARD_WIDTH / 2, (float) -CARD_HEIGHT / 2));
 	else
 		setTransform(QTransform());
 	update(boundingRect());
@@ -161,19 +157,16 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 		CardDragItem *drag = new CardDragItem(scene(), (CardZone *) parentItem(), c->getImage(), c->getId(), QPointF(), false, dragItem);
 		drag->setPos(c->pos() - pos());
 	}
-
 	setCursor(Qt::OpenHandCursor);
 }
 
-void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent */*event*/)
 {
-	Q_UNUSED(event);
 	setCursor(Qt::OpenHandCursor);
 }
 
 void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-	Q_UNUSED(event);
 	if (!isSelected()) {
 		// Unselect all items, then select this one
 		scene()->setSelectionArea(QPainterPath());

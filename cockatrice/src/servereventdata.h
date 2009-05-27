@@ -45,11 +45,11 @@ private:
 	QStringList EventData;
 public:
 	ServerEventData(const QString &line);
-	bool getPublic() { return IsPublic; }
-	int getPlayerId() { return PlayerId; }
-	QString getPlayerName() { return PlayerName; }
-	ServerEventType getEventType() { return EventType; }
-	QStringList getEventData() { return EventData; }
+	bool getPublic() const { return IsPublic; }
+	int getPlayerId() const { return PlayerId; }
+	QString getPlayerName() const { return PlayerName; }
+	ServerEventType getEventType() const { return EventType; }
+	QStringList getEventData() const { return EventData; }
 };
 
 #endif

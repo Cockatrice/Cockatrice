@@ -12,12 +12,12 @@ private:
 public:
 	ServerGame(int _gameId, const QString &_creator, const QString &_description, bool _hasPassword, unsigned char _playerCount, unsigned char _maxPlayers)
 		: gameId(_gameId), creator(_creator), description(_description), hasPassword(_hasPassword), playerCount(_playerCount), maxPlayers(_maxPlayers) { }
-	int getGameId() { return gameId; }
-	QString getCreator() { return creator; }
-	QString getDescription() { return description; }
-	bool getHasPassword() { return hasPassword; }
-	unsigned char getPlayerCount() { return playerCount; }
-	unsigned char getMaxPlayers() { return maxPlayers; }
+	int getGameId() const { return gameId; }
+	QString getCreator() const { return creator; }
+	QString getDescription() const { return description; }
+	bool getHasPassword() const { return hasPassword; }
+	unsigned char getPlayerCount() const { return playerCount; }
+	unsigned char getMaxPlayers() const { return maxPlayers; }
 };
 
 #endif

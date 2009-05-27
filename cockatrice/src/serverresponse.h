@@ -14,9 +14,9 @@ private:
 public:
 	ServerResponse(int _msgId, bool _ok, ServerErrorMessage _message)
 		: msgId(_msgId), ok(_ok), message(_message) { }
-	int getMsgId() { return msgId; }
-	bool getOk() { return ok; }
-	ServerErrorMessage getMessage() { return message; }
+	int getMsgId() const { return msgId; }
+	bool getOk() const { return ok; }
+	ServerErrorMessage getMessage() const { return message; }
 };
 
 #endif

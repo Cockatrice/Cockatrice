@@ -18,7 +18,7 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	QRectF sr = scene->sceneRect();
 	localPlayer = addPlayer(playerId, playerName, QPointF(0, sr.y() + sr.height() / 2 + 2), true);
 
-	connect(client, SIGNAL(gameEvent(ServerEventData *)), this, SLOT(gameEvent(ServerEventData *)));
+	connect(client, SIGNAL(gameEvent(const ServerEventData &)), this, SLOT(gameEvent(const ServerEventData &)));
 	connect(client, SIGNAL(playerListReceived(QList<ServerPlayer *>)), this, SLOT(playerListReceived(QList<ServerPlayer *>)));
 
 	aUntapAll = new QAction(tr("&Untap all permanents"), this);
@@ -154,36 +154,38 @@ void Game::restartGameDialog()
 	dlgStartGame->show();
 }
 
-void Game::gameEvent(ServerEventData *msg)
+void Game::gameEvent(const ServerEventData &msg)
 {
-	qDebug(QString("game::gameEvent: public=%1, player=%2, name=%3, type=%4, data=%5").arg(msg->getPublic()).arg(msg->getPlayerId()).arg(msg->getPlayerName()).arg(msg->getEventType()).arg(msg->getEventData().join("/")).toLatin1());
-	if (!msg->getPublic())
+	qDebug(QString("game::gameEvent: public=%1, player=%2, name=%3, type=%4, data=%5").arg(msg.getPublic()).arg(msg.getPlayerId()).arg(msg.getPlayerName()).arg(msg.getEventType()).arg(msg.getEventData().join("/")).toLatin1());
+	if (!msg.getPublic())
 		localPlayer->gameEvent(msg);
 	else {
-		Player *p = players.findPlayer(msg->getPlayerId());
+		Player *p = players.findPlayer(msg.getPlayerId());
 		if (!p) {
 			// XXX
 		}
 
-		switch(msg->getEventType()) {
+		switch(msg.getEventType()) {
 		case eventSay:
-			emit logSay(p->getName(), msg->getEventData()[0]);
+			emit logSay(p->getName(), msg.getEventData()[0]);
 			break;
 		case eventJoin: {
-			emit logJoin(msg->getPlayerName());
-			addPlayer(msg->getPlayerId(), msg->getPlayerName(), QPointF(0, 0), false);
+			emit logJoin(msg.getPlayerName());
+			addPlayer(msg.getPlayerId(), msg.getPlayerName(), QPointF(0, 0), false);
 			break;
 		}
 		case eventLeave:
-			emit logLeave(msg->getPlayerName());
+			emit logLeave(msg.getPlayerName());
 			// XXX Spieler natürlich noch rauswerfen
 			break;
 		case eventReadyStart:
 			if (started) {
 				started = false;
 				emit logReadyStart(p->getName());
-				if (!p->getLocal())
+				if (!p->getLocal()) {
+					// XXX Zoneviews schließen
 					restartGameDialog();
+				}
 			}
 			break;
 		case eventGameStart:
@@ -194,7 +196,7 @@ void Game::gameEvent(ServerEventData *msg)
 			emit logShuffle(p->getName());
 			break;
 		case eventRollDice: {
-			QStringList data = msg->getEventData();
+			QStringList data = msg.getEventData();
 			int sides = data[0].toInt();
 			int roll = data[1].toInt();
 			emit logRollDice(p->getName(), sides, roll);
@@ -217,19 +219,19 @@ void Game::gameEvent(ServerEventData *msg)
 			break;
 		}
 		case eventDumpZone: {
-			QStringList data = msg->getEventData();
+			QStringList data = msg.getEventData();
 			emit logDumpZone(p->getName(), data[1], players.findPlayer(data[0].toInt())->getName(), data[2].toInt());
 			break;
 		}
 		case eventMoveCard: {
-			if (msg->getPlayerId() == localPlayer->getId())
+			if (msg.getPlayerId() == localPlayer->getId())
 				break;
 			p->gameEvent(msg);
 			break;
 		}
 		case eventDraw: {
-			emit logDraw(p->getName(), msg->getEventData()[0].toInt());
-			if (msg->getPlayerId() == localPlayer->getId())
+			emit logDraw(p->getName(), msg.getEventData()[0].toInt());
+			if (msg.getPlayerId() == localPlayer->getId())
 				break;
 			p->gameEvent(msg);
 			break;

@@ -143,10 +143,10 @@ void Player::setCardAttrHelper(CardItem *card, const QString &aname, const QStri
 	}
 }
 
-void Player::gameEvent(ServerEventData *event)
+void Player::gameEvent(const ServerEventData &event)
 {
-	QStringList data = event->getEventData();
-	switch (event->getEventType()) {
+	QStringList data = event.getEventData();
+	switch (event.getEventType()) {
 		case eventSetupZones: {
 			// XXX Life counter
 			int deck_cards = data[0].toInt();
@@ -186,7 +186,7 @@ void Player::gameEvent(ServerEventData *event)
 		case eventDraw: {
 			CardZone *deck = zones.findZone("deck");
 			CardZone *hand = zones.findZone("hand");
-			if (!event->getPublic()) {
+			if (!event.getPublic()) {
 				hand->addCard(deck->takeCard(0, data[0].toInt(), data[1]), true, -1);
 			} else {
 				int number = data[0].toInt();
