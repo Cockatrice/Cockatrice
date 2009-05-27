@@ -208,7 +208,7 @@ void MainWindow::createMenus()
 	gameMenu->addAction(aDeckEditor);
 	gameMenu->addSeparator();
 	gameMenu->addAction(aExit);
-
+	
 	actionsMenu = menuBar()->addMenu(tr("&Actions"));
 
 	cardMenu = menuBar()->addMenu(tr("&Card"));

@@ -79,24 +79,31 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	centralWidget->setLayout(mainLayout);
 	setCentralWidget(centralWidget);
 
-	setWindowTitle(tr("Card database"));
+	setWindowTitle(tr("Deck editor [*]"));
 
 	aNewDeck = new QAction(tr("&New deck"), this);
+	aNewDeck->setShortcuts(QKeySequence::New);
 	connect(aNewDeck, SIGNAL(triggered()), this, SLOT(actNewDeck()));
 	aLoadDeck = new QAction(tr("&Load deck..."), this);
-	aLoadDeck->setShortcut(tr("Ctrl+L"));
+	aLoadDeck->setShortcuts(QKeySequence::Open);
 	connect(aLoadDeck, SIGNAL(triggered()), this, SLOT(actLoadDeck()));
 	aSaveDeck = new QAction(tr("&Save deck"), this);
-	aSaveDeck->setShortcut(tr("Ctrl+S"));
+	aSaveDeck->setShortcuts(QKeySequence::Save);
 	connect(aSaveDeck, SIGNAL(triggered()), this, SLOT(actSaveDeck()));
 	aSaveDeckAs = new QAction(tr("&Save deck as..."), this);
+	aSaveDeckAs->setShortcuts(QKeySequence::SaveAs);
 	connect(aSaveDeckAs, SIGNAL(triggered()), this, SLOT(actSaveDeckAs()));
+	aClose = new QAction(tr("&Close"), this);
+	aClose->setShortcut(tr("Ctrl+Q"));
+	connect(aClose, SIGNAL(triggered()), this, SLOT(close()));
 
 	deckMenu = menuBar()->addMenu(tr("&Deck"));
 	deckMenu->addAction(aNewDeck);
 	deckMenu->addAction(aLoadDeck);
 	deckMenu->addAction(aSaveDeck);
 	deckMenu->addAction(aSaveDeckAs);
+	deckMenu->addSeparator();
+	deckMenu->addAction(aClose);
 
 	aAddCard = new QAction(tr("Add card to &maindeck"), this);
 	connect(aAddCard, SIGNAL(triggered()), this, SLOT(actAddCard()));
@@ -144,8 +151,33 @@ void WndDeckEditor::updateSearch(const QString &search)
 	databaseView->selectionModel()->setCurrentIndex(matches[0], QItemSelectionModel::SelectCurrent);
 }
 
+bool WndDeckEditor::confirmClose()
+{
+	if (isWindowModified()) {
+		QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("Are you sure?"),
+			tr("The decklist has been modified.\nDo you want to save the changes?"),
+			QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+		if (ret == QMessageBox::Save)
+			return actSaveDeck();
+		else if (ret == QMessageBox::Cancel)
+			return false;
+	}
+	return true;
+}
+
+void WndDeckEditor::closeEvent(QCloseEvent *event)
+{
+	if (confirmClose())
+		event->accept();
+	else
+		event->ignore();
+}
+
 void WndDeckEditor::actNewDeck()
 {
+	if (!confirmClose())
+		return;
+		
 	deckModel->cleanList();
 	nameEdit->setText(QString());
 	commentsEdit->setText(QString());
@@ -154,6 +186,9 @@ void WndDeckEditor::actNewDeck()
 
 void WndDeckEditor::actLoadDeck()
 {
+	if (!confirmClose())
+		return;
+
 	DeckList *l = deckModel->getDeckList();
 	if (l->loadDialog(this)) {
 		lastFileName = l->getLastFileName();
@@ -164,22 +199,27 @@ void WndDeckEditor::actLoadDeck()
 	}
 }
 
-void WndDeckEditor::actSaveDeck()
+bool WndDeckEditor::actSaveDeck()
 {
 	if (lastFileName.isEmpty())
-		actSaveDeckAs();
-	else
-		deckModel->getDeckList()->saveToFile(lastFileName, lastFileFormat);
-;
+		return actSaveDeckAs();
+	else if (deckModel->getDeckList()->saveToFile(lastFileName, lastFileFormat)) {
+		setWindowModified(false);
+		return true;
+	} else
+		return false;
 }
 
-void WndDeckEditor::actSaveDeckAs()
+bool WndDeckEditor::actSaveDeckAs()
 {
 	DeckList *l = deckModel->getDeckList();
 	if (l->saveDialog(this)) {
 		lastFileName = l->getLastFileName();
 		lastFileFormat = l->getLastFileFormat();
-	}
+		setWindowModified(false);
+		return true;
+	} else
+		return false;
 }
 
 void WndDeckEditor::addCardHelper(int baseRow)
@@ -200,6 +240,7 @@ void WndDeckEditor::addCardHelper(int baseRow)
 		const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
 		deckModel->setData(numberIndex, count + 1, Qt::EditRole);
 	}
+	setWindowModified(true);
 }
 
 void WndDeckEditor::actAddCard()
@@ -218,6 +259,7 @@ void WndDeckEditor::actRemoveCard()
 	if (!currentIndex.isValid())
 		return;
 	deckModel->removeRow(currentIndex.row(), currentIndex.parent());
+	setWindowModified(true);
 }
 
 void WndDeckEditor::actIncrement()
@@ -228,6 +270,7 @@ void WndDeckEditor::actIncrement()
 	const QModelIndex numberIndex = currentIndex.sibling(currentIndex.row(), 0);
 	const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
 	deckModel->setData(numberIndex, count + 1, Qt::EditRole);
+	setWindowModified(true);
 }
 
 void WndDeckEditor::actDecrement()
@@ -241,4 +284,5 @@ void WndDeckEditor::actDecrement()
 		deckModel->removeRow(currentIndex.row(), currentIndex.parent());
 	else
 		deckModel->setData(numberIndex, count - 1, Qt::EditRole);
+	setWindowModified(true);
 }

@@ -182,5 +182,6 @@ bool DeckListModel::insertRows(int row, int count, const QModelIndex &parent)
 void DeckListModel::cleanList()
 {
 	deckList->cleanList();
+	deckList->initZones();
 	reset();
 }
