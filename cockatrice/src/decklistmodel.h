@@ -7,10 +7,22 @@
 
 class CardDatabase;
 
+class DecklistModelCardNode : public AbstractDecklistNode {
+private:
+	DecklistCardNode *dataNode;
+public:
+	DecklistModelCardNode(DecklistCardNode *_dataNode, InnerDecklistNode *_parent) : AbstractDecklistNode(_parent), dataNode(_dataNode) { }
+	bool hasChildren() const { return false; }
+	inline int getNumber() const { return dataNode->getNumber(); }
+	inline void setNumber(int _number) { dataNode->setNumber(_number); }
+	inline QString getName() const { return dataNode->getName(); }
+	inline void setName(const QString &_name) { dataNode->setName(_name); }
+};
+
 class DeckListModel : public QAbstractItemModel {
 	Q_OBJECT
 private slots:
-	void resetModel();
+	void rebuildTree();
 public:
 	DeckListModel(CardDatabase *_db, QObject *parent = 0);
 	~DeckListModel();
@@ -27,11 +39,14 @@ public:
 	bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
 	void cleanList();
 	DeckList *getDeckList() const { return deckList; }
-	bool loadFromFile(const QString &fileName, DeckList::FileFormat fmt);
-	bool saveToFile(const QString &fileName, DeckList::FileFormat fmt);
 private:
 	CardDatabase *db;
 	DeckList *deckList;
+	InnerDecklistNode *root;
+	AbstractDecklistNode *findNode(const QString &name, InnerDecklistNode *root) const;
+	AbstractDecklistNode *findNode(const QModelIndex &index) const;
+	void debugIndexInfo(const QString &func, const QModelIndex &index) const;
+	void debugShowTree(InnerDecklistNode *node, int depth) const;
 };
 
 #endif

@@ -28,6 +28,7 @@ public:
 	QString getCardType() const { return cardtype; }
 	QString getPowTough() const { return powtough; }
 	QStringList getText() const { return text; }
+	QString getMainCardType() const;
 	void addEdition(const QString &edition);
 	QPixmap *getPixmap();
 	void saveToStream(QDataStream &stream);

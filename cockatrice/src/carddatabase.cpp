@@ -28,6 +28,35 @@ CardInfo::~CardInfo()
 	delete pixmap;
 }
 
+QString CardInfo::getMainCardType() const
+{
+	QString result = getCardType();
+	/*
+	Legendary Artifact Creature - Golem
+	Instant // Instant
+	*/
+	
+	int pos;
+	if ((pos = result.indexOf('-')) != -1)
+		result.remove(pos, result.length());
+	if ((pos = result.indexOf("//")) != -1)
+		result.remove(pos, result.length());
+	result = result.simplified();
+	/*
+	Legendary Artifact Creature
+	Instant
+	*/
+	
+	if ((pos = result.lastIndexOf(' ')) != -1)
+		result = result.mid(pos + 1);
+	/*
+	Creature
+	Instant
+	*/
+	
+	return result;
+}
+
 void CardInfo::addEdition(const QString &edition)
 {
 	if (!editions.contains(edition))

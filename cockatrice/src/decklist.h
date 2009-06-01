@@ -6,26 +6,45 @@
 
 class CardDatabase;
 class QIODevice;
+class QProgressDialog;
 
-class DecklistRow {
-private:
-	int number;
-	QString card;
+class InnerDecklistNode;
+
+class AbstractDecklistNode {
+protected:
+	InnerDecklistNode *parent;
 public:
-	DecklistRow(int _number = 1, const QString &_card = QString()) : number(_number), card(_card) { }
-	int getNumber() const { return number; }
-	void setNumber(int _number) { number = _number; }
-	QString getCard() const { return card; }
-	void setCard(const QString &_card) { card = _card; }
+	AbstractDecklistNode(InnerDecklistNode *_parent = 0);
+	virtual bool hasChildren() const = 0;
+	virtual QString getName() const = 0;
+	const InnerDecklistNode *getParent() const { return parent; }
 };
 
-class DecklistZone : public QList<DecklistRow *> {
+class InnerDecklistNode : public AbstractDecklistNode, public QList<AbstractDecklistNode *> {
 private:
 	QString name;
 public:
-	DecklistZone(const QString &_name) : name(_name) { }
+	InnerDecklistNode(const QString &_name = QString(), InnerDecklistNode *_parent = 0) : AbstractDecklistNode(_parent), name(_name) { }
+	~InnerDecklistNode();
+	bool hasChildren() const { return true; }
 	QString getName() const { return name; }
-	QString getVisibleName() const;
+	void setName(const QString &_name) { name = _name; }
+	virtual QString getVisibleName() const;
+	void clearTree();
+	int recursiveCount() const;
+};
+
+class DecklistCardNode : public AbstractDecklistNode {
+private:
+	QString name;
+	int number;
+public:
+	DecklistCardNode(const QString &_name = QString(), int _number = 1, InnerDecklistNode *_parent = 0) : AbstractDecklistNode(_parent), name(_name), number(_number) { }
+	bool hasChildren() const { return false; }
+	int getNumber() const { return number; }
+	void setNumber(int _number) { number = _number; }
+	QString getName() const { return name; }
+	void setName(const QString &_name) { name = _name; }
 };
 
 class DeckList : public QObject {
@@ -39,7 +58,8 @@ private:
 	QString name, comments;
 	QString lastFileName;
 	FileFormat lastFileFormat;
-	QList<DecklistZone *> zones;
+	InnerDecklistNode *root;
+	void cacheCardPicturesHelper(InnerDecklistNode *item, QProgressDialog *progress);
 signals:
 	void deckLoaded();
 public slots:
@@ -65,8 +85,7 @@ public:
 	void cleanList();
 	void initZones();
 
-	int zoneCount() const { return zones.size(); }
-	DecklistZone *getZoneByIndex(int index) const { return zones[index]; }
+	InnerDecklistNode *getRoot() const { return root; }
 };
 
 #endif

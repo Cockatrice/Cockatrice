@@ -45,7 +45,7 @@ void DlgStartGame::actLoad()
 QStringList DlgStartGame::getDeckList() const
 {
 	QStringList result;
-	DeckList *deckList = tableModel->getDeckList();
+/*	DeckList *deckList = tableModel->getDeckList();
 	for (int i = 0; i < deckList->zoneCount(); i++) {
 		DecklistZone *zone = deckList->getZoneByIndex(i);
 		for (int j = 0; j < zone->size(); j++) {
@@ -54,5 +54,5 @@ QStringList DlgStartGame::getDeckList() const
 				result << QString("%1%2").arg(zone->getName() == "side" ? "SB:" : "").arg(r->getCard());
 		}
 	}
-	return result;
+*/	return result;
 }

@@ -91,7 +91,7 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	aSaveDeck->setShortcuts(QKeySequence::Save);
 	connect(aSaveDeck, SIGNAL(triggered()), this, SLOT(actSaveDeck()));
 	aSaveDeckAs = new QAction(tr("&Save deck as..."), this);
-	aSaveDeckAs->setShortcuts(QKeySequence::SaveAs);
+//	aSaveDeckAs->setShortcuts(QKeySequence::SaveAs);
 	connect(aSaveDeckAs, SIGNAL(triggered()), this, SLOT(actSaveDeckAs()));
 	aClose = new QAction(tr("&Close"), this);
 	aClose->setShortcut(tr("Ctrl+Q"));
