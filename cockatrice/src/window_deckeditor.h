@@ -31,7 +31,8 @@ private slots:
 	void actIncrement();
 	void actDecrement();
 private:
-	void addCardHelper(int baseRow);
+	void addCardHelper(const QString &zoneName);
+	void recursiveExpand(const QModelIndex &index);
 	bool confirmClose();
 
 	QString lastFileName;

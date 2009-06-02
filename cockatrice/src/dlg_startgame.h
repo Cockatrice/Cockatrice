@@ -2,11 +2,11 @@
 #define DLG_STARTGAME_H
 
 #include <QDialog>
-#include "decklistmodel.h"
 
 class QTreeView;
 class QPushButton;
 class CardDatabase;
+class DeckListModel;
 
 class DlgStartGame: public QDialog {
 	Q_OBJECT
@@ -19,8 +19,8 @@ private slots:
 	void actLoad();
 private:
 	CardDatabase *db;
-	QTreeView *tableView;
-	DeckListModel *tableModel;
+	QTreeView *deckView;
+	DeckListModel *deckModel;
 
 	QPushButton *loadButton, *okButton;
 };

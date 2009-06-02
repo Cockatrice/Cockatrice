@@ -23,6 +23,7 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	databaseView->setModel(databaseModel);
 	databaseView->setUniformRowHeights(true);
 	databaseView->setSortingEnabled(true);
+	databaseView->resizeColumnToContents(0);
 	connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
 	connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
 
@@ -49,7 +50,6 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	deckView = new QTreeView();
 	deckView->setModel(deckModel);
 	deckView->setUniformRowHeights(true);
-	deckView->setRootIsDecorated(false);
 	connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
 
 	QLabel *nameLabel = new QLabel(tr("Deck &name:"));
@@ -113,7 +113,7 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	aAddCardToSideboard->setShortcut(tr("Ctrl+N"));
 	aRemoveCard = new QAction(tr("&Remove row"), this);
 	connect(aRemoveCard, SIGNAL(triggered()), this, SLOT(actRemoveCard()));
-	aRemoveCard->setShortcut(tr("Ctrl+R"));
+	aRemoveCard->setShortcut(tr("Del"));
 	aIncrement = new QAction(tr("&Increment number"), this);
 	connect(aIncrement, SIGNAL(triggered()), this, SLOT(actIncrement()));
 	aIncrement->setShortcut(tr("+"));
@@ -140,7 +140,10 @@ void WndDeckEditor::updateCardInfoLeft(const QModelIndex &current, const QModelI
 
 void WndDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModelIndex &/*previous*/)
 {
-	cardInfo->setCard(current.sibling(current.row(), 1).data().toString());
+	if (!current.isValid())
+		return;
+	if (!current.model()->hasChildren(current.sibling(current.row(), 0)))
+		cardInfo->setCard(current.sibling(current.row(), 1).data().toString());
 }
 
 void WndDeckEditor::updateSearch(const QString &search)
@@ -195,7 +198,9 @@ void WndDeckEditor::actLoadDeck()
 		lastFileFormat = l->getLastFileFormat();
 		nameEdit->setText(l->getName());
 		commentsEdit->setText(l->getComments());
+		deckModel->sort(1);
 		deckView->expandAll();
+		deckView->resizeColumnToContents(0);
 	}
 }
 
@@ -222,41 +227,40 @@ bool WndDeckEditor::actSaveDeckAs()
 		return false;
 }
 
-void WndDeckEditor::addCardHelper(int baseRow)
+void WndDeckEditor::recursiveExpand(const QModelIndex &index)
+{
+	if (index.parent().isValid())
+		recursiveExpand(index.parent());
+	deckView->expand(index);
+}
+
+void WndDeckEditor::addCardHelper(const QString &zoneName)
 {
 	const QModelIndex currentIndex = databaseView->selectionModel()->currentIndex();
 	if (!currentIndex.isValid())
 		return;
 	const QString cardName = databaseModel->index(currentIndex.row(), 0).data().toString();
-	QModelIndex zoneRoot = deckModel->index(baseRow, 0);
-	deckView->expand(zoneRoot);
-	QModelIndexList matches = deckModel->match(deckModel->index(0, 1, zoneRoot), Qt::EditRole, cardName);
-	if (matches.isEmpty()) {
-		int row = deckModel->rowCount(zoneRoot);
-		deckModel->insertRow(row, zoneRoot);
-		deckModel->setData(deckModel->index(row, 1, zoneRoot), cardName, Qt::EditRole);
-	} else {
-		const QModelIndex numberIndex = deckModel->index(matches[0].row(), 0, zoneRoot);
-		const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
-		deckModel->setData(numberIndex, count + 1, Qt::EditRole);
-	}
+	
+	QModelIndex newCardIndex = deckModel->addCard(cardName, zoneName);
+	recursiveExpand(newCardIndex);
+
 	setWindowModified(true);
 }
 
 void WndDeckEditor::actAddCard()
 {
-	addCardHelper(0);
+	addCardHelper("main");
 }
 
 void WndDeckEditor::actAddCardToSideboard()
 {
-	addCardHelper(1);
+	addCardHelper("side");
 }
 
 void WndDeckEditor::actRemoveCard()
 {
-	const QModelIndex currentIndex = deckView->selectionModel()->currentIndex();
-	if (!currentIndex.isValid())
+	const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
+	if (!currentIndex.isValid() || deckModel->hasChildren(currentIndex))
 		return;
 	deckModel->removeRow(currentIndex.row(), currentIndex.parent());
 	setWindowModified(true);
@@ -264,7 +268,7 @@ void WndDeckEditor::actRemoveCard()
 
 void WndDeckEditor::actIncrement()
 {
-	const QModelIndex currentIndex = deckView->selectionModel()->currentIndex();
+	const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
 	if (!currentIndex.isValid())
 		return;
 	const QModelIndex numberIndex = currentIndex.sibling(currentIndex.row(), 0);
@@ -275,7 +279,7 @@ void WndDeckEditor::actIncrement()
 
 void WndDeckEditor::actDecrement()
 {
-	const QModelIndex currentIndex = deckView->selectionModel()->currentIndex();
+	const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
 	if (!currentIndex.isValid())
 		return;
 	const QModelIndex numberIndex = currentIndex.sibling(currentIndex.row(), 0);

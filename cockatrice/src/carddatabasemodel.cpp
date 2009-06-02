@@ -11,15 +11,13 @@ CardDatabaseModel::~CardDatabaseModel()
 
 }
 
-int CardDatabaseModel::rowCount(const QModelIndex &parent) const
+int CardDatabaseModel::rowCount(const QModelIndex &/*parent*/) const
 {
-	Q_UNUSED(parent);
 	return cardList.size();
 }
 
-int CardDatabaseModel::columnCount(const QModelIndex &parent) const
+int CardDatabaseModel::columnCount(const QModelIndex &/*parent*/) const
 {
-	Q_UNUSED(parent);
 	return 5;
 }
 

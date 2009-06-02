@@ -7,9 +7,10 @@
 DlgStartGame::DlgStartGame(CardDatabase *_db, QWidget *parent)
 	: QDialog(parent), db(_db)
 {
-	tableView = new QTreeView;
-	tableModel = new DeckListModel(db, this);
-	tableView->setModel(tableModel);
+	deckView = new QTreeView;
+	deckModel = new DeckListModel(db, this);
+	deckView->setModel(deckModel);
+	deckView->setUniformRowHeights(true);
 
 	loadButton = new QPushButton(tr("&Load..."));
 	okButton = new QPushButton(tr("&OK"));
@@ -21,13 +22,14 @@ DlgStartGame::DlgStartGame(CardDatabase *_db, QWidget *parent)
 	buttonLayout->addWidget(okButton);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addWidget(tableView);
+	mainLayout->addWidget(deckView);
 	mainLayout->addLayout(buttonLayout);
 
 	setLayout(mainLayout);
 
 	setWindowTitle(tr("Start game"));
 	setMinimumWidth(sizeHint().width());
+	resize(300, 500);
 
 	connect(loadButton, SIGNAL(clicked()), this, SLOT(actLoad()));
 	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
@@ -35,24 +37,28 @@ DlgStartGame::DlgStartGame(CardDatabase *_db, QWidget *parent)
 
 void DlgStartGame::actLoad()
 {
-	if (!tableModel->getDeckList()->loadDialog(this))
+	if (!deckModel->getDeckList()->loadDialog(this))
 		return;
 
-	tableView->reset();
+	deckView->reset();
+	deckModel->sort(1);
+	deckView->expandAll();
+	deckView->resizeColumnToContents(0);
+	
 	emit newDeckLoaded(getDeckList());
 }
 
 QStringList DlgStartGame::getDeckList() const
 {
 	QStringList result;
-/*	DeckList *deckList = tableModel->getDeckList();
-	for (int i = 0; i < deckList->zoneCount(); i++) {
-		DecklistZone *zone = deckList->getZoneByIndex(i);
-		for (int j = 0; j < zone->size(); j++) {
-			DecklistRow *r = zone->at(j);
-			for (int k = 0; k < r->getNumber(); k++)
-				result << QString("%1%2").arg(zone->getName() == "side" ? "SB:" : "").arg(r->getCard());
+	DeckList *deckList = deckModel->getDeckList();
+	for (int i = 0; i < deckList->getRoot()->size(); i++) {
+		InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(deckList->getRoot()->at(i));
+		for (int j = 0; j < node->size(); j++) {
+			DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
+			for (int k = 0; k < card->getNumber(); k++)
+				result << QString("%1%2").arg(node->getName() == "side" ? "SB: " : "").arg(card->getName());
 		}
 	}
-*/	return result;
+	return result;
 }

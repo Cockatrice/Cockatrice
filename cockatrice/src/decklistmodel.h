@@ -7,16 +7,16 @@
 
 class CardDatabase;
 
-class DecklistModelCardNode : public AbstractDecklistNode {
+class DecklistModelCardNode : public AbstractDecklistCardNode {
 private:
 	DecklistCardNode *dataNode;
 public:
-	DecklistModelCardNode(DecklistCardNode *_dataNode, InnerDecklistNode *_parent) : AbstractDecklistNode(_parent), dataNode(_dataNode) { }
-	bool hasChildren() const { return false; }
-	inline int getNumber() const { return dataNode->getNumber(); }
-	inline void setNumber(int _number) { dataNode->setNumber(_number); }
-	inline QString getName() const { return dataNode->getName(); }
-	inline void setName(const QString &_name) { dataNode->setName(_name); }
+	DecklistModelCardNode(DecklistCardNode *_dataNode, InnerDecklistNode *_parent) : AbstractDecklistCardNode(_parent), dataNode(_dataNode) { }
+	int getNumber() const { return dataNode->getNumber(); }
+	void setNumber(int _number) { dataNode->setNumber(_number); }
+	QString getName() const { return dataNode->getName(); }
+	void setName(const QString &_name) { dataNode->setName(_name); }
+	DecklistCardNode *getDataNode() const { return dataNode; }
 };
 
 class DeckListModel : public QAbstractItemModel {
@@ -27,8 +27,7 @@ public:
 	DeckListModel(CardDatabase *_db, QObject *parent = 0);
 	~DeckListModel();
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	bool hasChildren(const QModelIndex &parent = QModelIndex()) const;
-	int columnCount(const QModelIndex &parent = QModelIndex()) const;
+	int columnCount(const QModelIndex &/*parent*/) const { return 2; }
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
@@ -36,17 +35,25 @@ public:
 	Qt::ItemFlags flags(const QModelIndex &index) const;
 	bool setData(const QModelIndex &index, const QVariant &value, int role);
 	bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-	bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
+	QModelIndex addCard(const QString &cardName, const QString &zoneName);
+	void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
 	void cleanList();
 	DeckList *getDeckList() const { return deckList; }
 private:
 	CardDatabase *db;
 	DeckList *deckList;
 	InnerDecklistNode *root;
-	AbstractDecklistNode *findNode(const QString &name, InnerDecklistNode *root) const;
-	AbstractDecklistNode *findNode(const QModelIndex &index) const;
+	InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
+	QModelIndex nodeToIndex(AbstractDecklistNode *node) const;
 	void debugIndexInfo(const QString &func, const QModelIndex &index) const;
 	void debugShowTree(InnerDecklistNode *node, int depth) const;
+	
+	template<typename T> T getNode(const QModelIndex &index) const
+	{
+		if (!index.isValid())
+			return dynamic_cast<T>(root);
+		return dynamic_cast<T>(static_cast<AbstractDecklistNode *>(index.internalPointer()));
+	}
 };
 
 #endif

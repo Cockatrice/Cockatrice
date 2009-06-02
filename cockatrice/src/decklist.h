@@ -15,32 +15,45 @@ protected:
 	InnerDecklistNode *parent;
 public:
 	AbstractDecklistNode(InnerDecklistNode *_parent = 0);
-	virtual bool hasChildren() const = 0;
 	virtual QString getName() const = 0;
-	const InnerDecklistNode *getParent() const { return parent; }
+	InnerDecklistNode *getParent() const { return parent; }
+	int depth() const;
+	virtual bool compare(AbstractDecklistNode *other) const = 0;
 };
 
 class InnerDecklistNode : public AbstractDecklistNode, public QList<AbstractDecklistNode *> {
 private:
 	QString name;
+	class compareFunctor;
 public:
 	InnerDecklistNode(const QString &_name = QString(), InnerDecklistNode *_parent = 0) : AbstractDecklistNode(_parent), name(_name) { }
 	~InnerDecklistNode();
-	bool hasChildren() const { return true; }
 	QString getName() const { return name; }
 	void setName(const QString &_name) { name = _name; }
 	virtual QString getVisibleName() const;
 	void clearTree();
-	int recursiveCount() const;
+	AbstractDecklistNode *findChild(const QString &name);
+	int recursiveCount(bool countTotalCards = false) const;
+	bool compare(AbstractDecklistNode *other) const;
+	void sort(Qt::SortOrder order = Qt::AscendingOrder);
 };
 
-class DecklistCardNode : public AbstractDecklistNode {
+class AbstractDecklistCardNode : public AbstractDecklistNode {
+public:
+	AbstractDecklistCardNode(InnerDecklistNode *_parent = 0) : AbstractDecklistNode(_parent) { }
+	virtual int getNumber() const = 0;
+	virtual void setNumber(int _number) = 0;
+	virtual QString getName() const = 0;
+	virtual void setName(const QString &_name) = 0;
+	bool compare(AbstractDecklistNode *other) const;
+};
+
+class DecklistCardNode : public AbstractDecklistCardNode {
 private:
 	QString name;
 	int number;
 public:
-	DecklistCardNode(const QString &_name = QString(), int _number = 1, InnerDecklistNode *_parent = 0) : AbstractDecklistNode(_parent), name(_name), number(_number) { }
-	bool hasChildren() const { return false; }
+	DecklistCardNode(const QString &_name = QString(), int _number = 1, InnerDecklistNode *_parent = 0) : AbstractDecklistCardNode(_parent), name(_name), number(_number) { }
 	int getNumber() const { return number; }
 	void setNumber(int _number) { number = _number; }
 	QString getName() const { return name; }
@@ -83,9 +96,10 @@ public:
 	bool saveDialog(QWidget *parent = 0);
 
 	void cleanList();
-	void initZones();
 
 	InnerDecklistNode *getRoot() const { return root; }
+	DecklistCardNode *addCard(const QString &cardName, const QString &zoneName);
+	bool deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNode = 0);
 };
 
 #endif
