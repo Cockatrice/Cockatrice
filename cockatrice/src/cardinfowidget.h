@@ -11,7 +11,8 @@ class CardInfoWidget : public QFrame {
 	Q_OBJECT
 private:
 	CardDatabase *db;
-	double aspectratio;
+	static const int pixmapWidth = 180;
+	int pixmapHeight;
 
 	QLabel *cardPicture;
 	QLabel *nameLabel1, *nameLabel2;
