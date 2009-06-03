@@ -12,8 +12,6 @@ LibraryZone::LibraryZone(Player *_p, QGraphicsItem *parent)
 	cards = new CardList(false);
 	setCacheMode(DeviceCoordinateCache); // Do not move this line to the parent constructor!
 	setCursor(Qt::OpenHandCursor);
-
-	image = player->getDb()->getCard()->getPixmap();
 }
 
 QRectF LibraryZone::boundingRect() const
@@ -25,9 +23,9 @@ void LibraryZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 {
 	painter->save();
 
-	QRectF foo = option->matrix.mapRect(boundingRect());
-	QPixmap bar = image->scaled((int) foo.width(), (int) foo.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-	painter->drawPixmap(boundingRect(), bar, bar.rect());
+	QSizeF translatedSize = option->matrix.mapRect(boundingRect()).size();
+	QPixmap *translatedPixmap = player->getDb()->getCard()->getPixmap(translatedSize.toSize());
+	painter->drawPixmap(boundingRect(), *translatedPixmap, translatedPixmap->rect());
 
 	paintCardNumberEllipse(painter);
 

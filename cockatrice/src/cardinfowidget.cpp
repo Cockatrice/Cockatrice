@@ -42,12 +42,13 @@ void CardInfoWidget::setCard(CardInfo *card)
 	if (!card)
 		return;
 
-	QPixmap *pixmap = card->getPixmap();
-	if (aspectratio == 0)
-		aspectratio = (double) pixmap->height() / pixmap->width();
+	if (aspectratio == 0) {
+		QPixmap *bigPixmap = card->loadPixmap();
+		aspectratio = (double) bigPixmap->height() / bigPixmap->width();
+	}
 	double w = 180;
-	cardPicture->setPixmap(pixmap->scaled((int) w, (int) (w * aspectratio), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-
+	cardPicture->setPixmap(*card->getPixmap(QSize(w, w * aspectratio)));
+	
 	nameLabel2->setText(card->getName());
 	manacostLabel2->setText(card->getManacost());
 	cardtypeLabel2->setText(card->getCardType());

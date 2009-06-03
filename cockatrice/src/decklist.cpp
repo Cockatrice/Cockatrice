@@ -343,7 +343,7 @@ void DeckList::cacheCardPicturesHelper(InnerDecklistNode *item, QProgressDialog 
 	for (int i = 0; i < item->size(); i++) {
 		DecklistCardNode *node = dynamic_cast<DecklistCardNode *>(item->at(i));
 		if (node) {
-			db->getCard(node->getName())->getPixmap();
+			db->getCard(node->getName())->loadPixmap();
 			progress->setValue(progress->value() + 1);
 		} else
 			cacheCardPicturesHelper(dynamic_cast<InnerDecklistNode *>(item->at(i)), progress);

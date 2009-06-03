@@ -1,9 +1,10 @@
 #include "carddragitem.h"
 #include "cardzone.h"
+#include "carddatabase.h"
 #include <QtGui>
 
-CardDragItem::CardDragItem(QGraphicsScene *scene, CardZone *_startZone, QPixmap *_image, int _id, const QPointF &_hotSpot, bool _faceDown, QGraphicsItem *parent)
-	: QGraphicsItem(parent), image(_image), id(_id), hotSpot(_hotSpot), startZone(_startZone), faceDown(_faceDown)
+CardDragItem::CardDragItem(QGraphicsScene *scene, CardZone *_startZone, CardInfo *_info, int _id, const QPointF &_hotSpot, bool _faceDown, QGraphicsItem *parent)
+	: QGraphicsItem(parent), id(_id), info(_info), hotSpot(_hotSpot), startZone(_startZone), faceDown(_faceDown)
 {
 	if ((hotSpot.x() < 0) || (hotSpot.y() < 0)) {
 		qDebug(QString("CardDragItem: coordinate overflow: x = %1, y = %2").arg(hotSpot.x()).arg(hotSpot.y()).toLatin1());
@@ -31,16 +32,11 @@ QRectF CardDragItem::boundingRect() const
 	return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
 }
 
-void CardDragItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CardDragItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget */*widget*/)
 {
-//	Q_UNUSED(option);
-	Q_UNUSED(widget);
-
-	QRectF foo = option->matrix.mapRect(boundingRect());
-	QPixmap bar = image->scaled(foo.width(), foo.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-	painter->drawPixmap(boundingRect(), bar, bar.rect());
-
-//	painter->drawPixmap(boundingRect(), *image, QRectF(0, 0, image->width(), image->height()));
+	QSizeF translatedSize = option->matrix.mapRect(boundingRect()).size();
+	QPixmap *translatedPixmap = info->getPixmap(translatedSize.toSize());
+	painter->drawPixmap(boundingRect(), *translatedPixmap, translatedPixmap->rect());
 }
 
 void CardDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)

@@ -34,7 +34,6 @@ private:
 	CardDatabase *db;
 	QString name;
 	int id;
-	QPixmap *image;
 	bool tapped;
 	bool attacking;
 	bool facedown;
@@ -53,7 +52,6 @@ public:
 	void setId(int _id) { id = _id; }
 	QString getName() const { return name; }
 	void setName(const QString &_name = QString());
-	QPixmap *getImage() const { return image; }
 	bool getTapped() const { return tapped; }
 	void setTapped(bool _tapped);
 	bool getAttacking() const { return attacking; }

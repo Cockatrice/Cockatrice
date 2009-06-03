@@ -3,6 +3,7 @@
 
 #include <QHash>
 #include <QPixmap>
+#include <QMap>
 #include <QDataStream>
 
 class CardInfo {
@@ -14,6 +15,7 @@ private:
 	QString powtough;
 	QStringList text;
 	QPixmap *pixmap;
+	QMap<int, QPixmap *> scaledPixmapCache;
 public:
 	CardInfo(const QString &_name = QString(),
 		const QString &_manacost = QString(),
@@ -30,7 +32,8 @@ public:
 	QStringList getText() const { return text; }
 	QString getMainCardType() const;
 	void addEdition(const QString &edition);
-	QPixmap *getPixmap();
+	QPixmap *loadPixmap();
+	QPixmap *getPixmap(QSize size);
 	void saveToStream(QDataStream &stream);
 };
 

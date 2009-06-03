@@ -23,9 +23,16 @@ CardInfo::CardInfo(QDataStream &stream)
 
 CardInfo::~CardInfo()
 {
-	if (pixmap)
+	if (pixmap) {
 		qDebug(QString("Deleting pixmap for %1").arg(name).toLatin1());
-	delete pixmap;
+		delete pixmap;
+		QMapIterator<int, QPixmap *> i(scaledPixmapCache);
+		while (i.hasNext()) {
+			i.next();
+			qDebug(QString("  Deleting cached pixmap for width %1").arg(i.key()).toLatin1());
+			delete i.value();
+		}
+	}
 }
 
 QString CardInfo::getMainCardType() const
@@ -63,7 +70,7 @@ void CardInfo::addEdition(const QString &edition)
 		editions << edition;
 }
 
-QPixmap *CardInfo::getPixmap()
+QPixmap *CardInfo::loadPixmap()
 {
 	if (pixmap)
 		return pixmap;
@@ -72,7 +79,7 @@ QPixmap *CardInfo::getPixmap()
 		pixmap->load("../pics/back.jpg");
 		return pixmap;
 	}
-	qDebug(QString("CardDatabase: loading pixmap for %1").arg(getName()).toLatin1());
+	qDebug(QString("CardDatabase: loading pixmap for '%1'").arg(getName()).toLatin1());
 	for (int i = 0; i < editions.size(); i++) {
 		// Fire // Ice, Circle of Protection: Red
 		QString correctedName = getName().remove(" // ").remove(":");
@@ -83,6 +90,19 @@ QPixmap *CardInfo::getPixmap()
 	}
 	pixmap->load("../pics/none.jpg");
 	return pixmap;
+}
+
+QPixmap *CardInfo::getPixmap(QSize size)
+{
+	qDebug(QString("CardInfo::getPixmap(%1, %2) for %3").arg(size.width()).arg(size.height()).arg(getName()).toLatin1());
+	if (QPixmap *result = scaledPixmapCache.value(size.width())) {
+		qDebug("cache HIT");
+		return result;
+	}
+	qDebug("cache MISS");
+	QPixmap *result = new QPixmap(loadPixmap()->scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	scaledPixmapCache.insert(size.width(), result);
+	return result;
 }
 
 void CardInfo::saveToStream(QDataStream &stream)
@@ -192,7 +212,7 @@ void CardDatabase::importOracle()
 	qDebug(QString("CardDatabase: %1 cards imported").arg(hash.size()).toLatin1());
 
 	CardInfo *empty = new CardInfo();
-	empty->getPixmap(); // cache pixmap for card back
+	empty->loadPixmap(); // cache pixmap for card back
 	hash.insert("", empty);
 }
 

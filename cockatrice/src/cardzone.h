@@ -11,7 +11,6 @@ class QPainter;
 
 class CardZone : public QGraphicsItem {
 protected:
-	QPixmap *image;
 	Player *player;
 	QString name;
 	CardList *cards;
