@@ -51,8 +51,16 @@ void DeckListModel::rebuildTree()
 		InnerDecklistNode *node = new InnerDecklistNode(currentZone->getName(), root);
 		for (int j = 0; j < currentZone->size(); j++) {
 			DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+			// XXX better sanity checking
+			if (!currentCard)
+				continue;
 
-			QString cardType = db->getCard(currentCard->getName())->getMainCardType();
+			CardInfo *info = db->getCard(currentCard->getName());
+			QString cardType;
+			if (!info)
+				cardType = "unknown";
+			else
+				cardType = info->getMainCardType();
 			InnerDecklistNode *cardTypeNode = dynamic_cast<InnerDecklistNode *>(node->findChild(cardType));
 			if (!cardTypeNode)
 				cardTypeNode = new InnerDecklistNode(cardType, node);
