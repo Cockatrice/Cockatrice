@@ -64,11 +64,11 @@ void DeckListModel::rebuildTree()
 			InnerDecklistNode *cardTypeNode = dynamic_cast<InnerDecklistNode *>(node->findChild(cardType));
 			if (!cardTypeNode)
 				cardTypeNode = new InnerDecklistNode(cardType, node);
-			
+
 			new DecklistModelCardNode(currentCard, cardTypeNode);
 		}
 	}
-	
+
 	reset();
 }
 
@@ -148,11 +148,11 @@ QModelIndex DeckListModel::index(int row, int column, const QModelIndex &parent)
 //	debugIndexInfo("index", parent);
 	if (!hasIndex(row, column, parent))
 		return QModelIndex();
-	
+
 	InnerDecklistNode *parentNode = getNode<InnerDecklistNode *>(parent);
 	if (row >= parentNode->size())
 		return QModelIndex();
-		
+
 	return createIndex(row, column, parentNode->at(row));
 }
 
@@ -160,7 +160,7 @@ QModelIndex DeckListModel::parent(const QModelIndex &ind) const
 {
 	if (!ind.isValid())
 		return QModelIndex();
-	
+
 	return nodeToIndex(static_cast<AbstractDecklistNode *>(ind.internalPointer())->getParent());
 }
 
@@ -170,12 +170,18 @@ Qt::ItemFlags DeckListModel::flags(const QModelIndex &index) const
 		return 0;
 
 	Qt::ItemFlags result = Qt::ItemIsEnabled;
-	if (getNode<DecklistModelCardNode *>(index)) {
+	if (getNode<DecklistModelCardNode *>(index))
 		result |= Qt::ItemIsSelectable;
-		if (index.column() == 0)
-			result |= Qt::ItemIsEditable;
-	}
+
 	return result;
+}
+
+void DeckListModel::emitRecursiveUpdates(const QModelIndex &index)
+{
+	if (!index.isValid())
+		return;
+	emit dataChanged(index, index);
+	emitRecursiveUpdates(index.parent());
 }
 
 bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -189,7 +195,7 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, int
 		case 1: node->setName(value.toString()); break;
 		default: return false;
 	}
-	emit dataChanged(index, index);
+	emitRecursiveUpdates(index);
 	return true;
 }
 
@@ -210,9 +216,11 @@ bool DeckListModel::removeRows(int row, int count, const QModelIndex &parent)
 		delete toDelete;
 	}
 	endRemoveRows();
-	
+
 	if (!node->size() && (node != root))
 		removeRows(parent.row(), 1, parent.parent());
+	else
+		emitRecursiveUpdates(parent);
 
 	return true;
 }
@@ -231,23 +239,25 @@ InnerDecklistNode *DeckListModel::createNodeIfNeeded(const QString &name, InnerD
 QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneName)
 {
 	InnerDecklistNode *zoneNode = createNodeIfNeeded(zoneName, root);
-	
+
 	CardInfo *info = db->getCard(cardName);
 	QString cardType = info->getMainCardType();
 	InnerDecklistNode *cardTypeNode = createNodeIfNeeded(cardType, zoneNode);
-	
+
 	DecklistModelCardNode *cardNode = dynamic_cast<DecklistModelCardNode *>(cardTypeNode->findChild(cardName));
 	if (!cardNode) {
 		DecklistCardNode *decklistCard = deckList->addCard(cardName, zoneName);
-		beginInsertRows(nodeToIndex(cardTypeNode), cardTypeNode->size(), cardTypeNode->size());
+		QModelIndex parentIndex = nodeToIndex(cardTypeNode);
+		beginInsertRows(parentIndex, cardTypeNode->size(), cardTypeNode->size());
 		cardNode = new DecklistModelCardNode(decklistCard, cardTypeNode);
 		endInsertRows();
 		sort(1);
+		emitRecursiveUpdates(parentIndex);
 		return nodeToIndex(cardNode);
 	} else {
 		cardNode->setNumber(cardNode->getNumber() + 1);
 		QModelIndex ind = nodeToIndex(cardNode);
-		emit dataChanged(ind, ind);
+		emitRecursiveUpdates(ind);
 		return ind;
 	}
 }
