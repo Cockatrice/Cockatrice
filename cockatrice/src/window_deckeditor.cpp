@@ -180,7 +180,7 @@ void WndDeckEditor::actNewDeck()
 {
 	if (!confirmClose())
 		return;
-		
+
 	deckModel->cleanList();
 	nameEdit->setText(QString());
 	commentsEdit->setText(QString());
@@ -240,9 +240,10 @@ void WndDeckEditor::addCardHelper(const QString &zoneName)
 	if (!currentIndex.isValid())
 		return;
 	const QString cardName = databaseModel->index(currentIndex.row(), 0).data().toString();
-	
+
 	QModelIndex newCardIndex = deckModel->addCard(cardName, zoneName);
 	recursiveExpand(newCardIndex);
+	deckView->setCurrentIndex(newCardIndex);
 
 	setWindowModified(true);
 }
@@ -273,6 +274,7 @@ void WndDeckEditor::actIncrement()
 		return;
 	const QModelIndex numberIndex = currentIndex.sibling(currentIndex.row(), 0);
 	const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
+	deckView->setCurrentIndex(numberIndex);
 	deckModel->setData(numberIndex, count + 1, Qt::EditRole);
 	setWindowModified(true);
 }
@@ -284,6 +286,7 @@ void WndDeckEditor::actDecrement()
 		return;
 	const QModelIndex numberIndex = currentIndex.sibling(currentIndex.row(), 0);
 	const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
+	deckView->setCurrentIndex(numberIndex);
 	if (count == 1)
 		deckModel->removeRow(currentIndex.row(), currentIndex.parent());
 	else

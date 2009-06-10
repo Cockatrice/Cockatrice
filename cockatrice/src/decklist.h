@@ -15,6 +15,7 @@ protected:
 	InnerDecklistNode *parent;
 public:
 	AbstractDecklistNode(InnerDecklistNode *_parent = 0);
+	virtual ~AbstractDecklistNode() { }
 	virtual QString getName() const = 0;
 	InnerDecklistNode *getParent() const { return parent; }
 	int depth() const;

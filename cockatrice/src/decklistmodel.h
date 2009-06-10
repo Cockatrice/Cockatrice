@@ -45,9 +45,10 @@ private:
 	InnerDecklistNode *root;
 	InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
 	QModelIndex nodeToIndex(AbstractDecklistNode *node) const;
+	void emitRecursiveUpdates(const QModelIndex &index);
 	void debugIndexInfo(const QString &func, const QModelIndex &index) const;
 	void debugShowTree(InnerDecklistNode *node, int depth) const;
-	
+
 	template<typename T> T getNode(const QModelIndex &index) const
 	{
 		if (!index.isValid())

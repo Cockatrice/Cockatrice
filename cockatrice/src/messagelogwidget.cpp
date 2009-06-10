@@ -104,6 +104,8 @@ void MessageLogWidget::logSetCardCounters(QString playerName, QString cardName, 
 
 void MessageLogWidget::logSetTapped(QString playerName, QString cardName, bool tapped)
 {
+	if (cardName == "-1")
+		cardName = tr("his permanents");
 	appendAndScroll(tr("%1 %2 %3").arg(playerName).arg(tapped ? "taps" : "untaps").arg(cardName));
 }
 
