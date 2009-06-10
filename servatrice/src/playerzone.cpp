@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "playerzone.h"
-#include "random.h"
+#include "abstractrng.h"
 #include "card.h"
 
 PlayerZone::PlayerZone(QString _name, bool _has_coords, bool _is_public, bool _is_private, bool _id_access)
@@ -32,7 +32,7 @@ PlayerZone::~PlayerZone()
 	clear();
 }
 
-void PlayerZone::shuffle(Random *rnd)
+void PlayerZone::shuffle(AbstractRNG *rnd)
 {
 	QList<Card *> temp;
 	for (int i = cards.size(); i; i--)

@@ -24,7 +24,7 @@
 #include <QString>
 
 class Card;
-class Random;
+class AbstractRNG;
 
 class PlayerZone {
 private:
@@ -52,7 +52,7 @@ public:
 	
 	QList<Card *> cards;
 	void insertCard(Card *card, int x, int y);
-	void shuffle(Random *rnd);
+	void shuffle(AbstractRNG *rnd);
 	void clear();
 };
 

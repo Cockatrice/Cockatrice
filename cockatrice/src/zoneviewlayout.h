@@ -5,6 +5,7 @@
 
 class CardDatabase;
 class ZoneViewWidget;
+class ZoneViewZone;
 class Player;
 
 class ZoneViewLayout : public QGraphicsWidget {
@@ -18,8 +19,9 @@ public:
 	ZoneViewLayout(CardDatabase *_db, QGraphicsItem *parent = 0);
 	void reorganize();
 public slots:
-	void addItem(Player *player, const QString &zoneName, int numberCards = 0);
+	void toggleZoneView(Player *player, const QString &zoneName, int numberCards = 0);
 	void removeItem(ZoneViewWidget *item);
+	void removeItem(ZoneViewZone *item);
 	void closeMostRecentZoneView();
 	void clear();
 };

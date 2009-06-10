@@ -30,6 +30,7 @@ private slots:
 	void zoneDumpReceived(int commandId, QList<ServerZoneCard *> cards);
 public:
 	ZoneViewWidget(CardDatabase *_db, Player *_player, CardZone *_origZone, int numberCards = 0, QGraphicsItem *parent = 0);
+	ZoneViewZone *getZone() const { return zone; }
 protected:
 	void closeEvent(QCloseEvent *event);
 };

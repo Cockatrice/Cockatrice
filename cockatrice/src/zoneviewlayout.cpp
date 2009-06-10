@@ -1,5 +1,6 @@
 #include "zoneviewlayout.h"
 #include "zoneviewwidget.h"
+#include "zoneviewzone.h"
 #include "player.h"
 
 ZoneViewLayout::ZoneViewLayout(CardDatabase *_db, QGraphicsItem *parent)
@@ -30,8 +31,17 @@ void ZoneViewLayout::reorganize()
 	emit sizeChanged();
 }
 
-void ZoneViewLayout::addItem(Player *player, const QString &zoneName, int numberCards)
+void ZoneViewLayout::toggleZoneView(Player *player, const QString &zoneName, int numberCards)
 {
+	for (int i = 0; i < views.size(); i++) {
+		ZoneViewZone *temp = views[i]->getZone();
+		if ((temp->getName() == zoneName) && (temp->getPlayer() == player)) { // view is already open
+			removeItem(views[i]);
+			if (temp->getNumberCards() == numberCards)
+				return;
+		}
+	}
+
 	ZoneViewWidget *item = new ZoneViewWidget(db, player, player->getZones()->findZone(zoneName), numberCards, this);
 	views.append(item);
 	connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeItem(ZoneViewWidget *)));
@@ -44,6 +54,11 @@ void ZoneViewLayout::removeItem(ZoneViewWidget *item)
 	views.removeAt(views.indexOf(item));
 	scene()->removeItem(item);
 	reorganize();
+}
+
+void ZoneViewLayout::removeItem(ZoneViewZone *item)
+{
+	removeItem(dynamic_cast<ZoneViewWidget *>(item->parentItem()));
 }
 
 void ZoneViewLayout::closeMostRecentZoneView()

@@ -27,7 +27,7 @@
 #include "playerzone.h"
 #include "counter.h"
 #include "card.h"
-#include "random.h"
+#include "abstractrng.h"
 
 ServerSocket::ServerSocket(Server *_server, QObject *parent)
  : QTcpSocket(parent), server(_server), game(0), authState(PasswordWrong)
@@ -105,7 +105,7 @@ void ServerSocket::setupZones()
 	int i = 0;
 	while (DeckIterator.hasNext())
 		deck->cards.append(new Card(DeckIterator.next(), i++, 0, 0));
-	deck->shuffle(game->rnd);
+	deck->shuffle(server->getRNG());
 
 	QListIterator<QString> SBIterator(SideboardList);
 	while (SBIterator.hasNext())
@@ -315,7 +315,7 @@ ReturnMessage::ReturnCode ServerSocket::cmdReadyStart(const QList<QVariant> &par
 ReturnMessage::ReturnCode ServerSocket::cmdShuffle(const QList<QVariant> &params)
 {
 	Q_UNUSED(params);
-	getZone("deck")->shuffle(game->rnd);
+	getZone("deck")->shuffle(server->getRNG());
 	emit broadcastEvent("shuffle", this);
 	return ReturnMessage::ReturnOk;
 }
@@ -367,6 +367,8 @@ ReturnMessage::ReturnCode ServerSocket::cmdMoveCard(const QList<QVariant> &param
 	if (!card)
 		return ReturnMessage::ReturnContextError;
 	int x = params[3].toInt();
+	if (x == -1)
+		x = targetzone->cards.size();
 	int y = 0;
 	if (targetzone->hasCoords())
 		y = params[4].toInt();
@@ -571,7 +573,7 @@ ReturnMessage::ReturnCode ServerSocket::cmdDumpZone(const QList<QVariant> &param
 ReturnMessage::ReturnCode ServerSocket::cmdRollDice(const QList<QVariant> &params)
 {
 	int sides = params[0].toInt();
-	emit broadcastEvent(QString("roll_dice|%1|%2").arg(sides).arg(game->rnd->getNumber(1, sides)), this);
+	emit broadcastEvent(QString("roll_dice|%1|%2").arg(sides).arg(server->getRNG()->getNumber(1, sides)), this);
 	return ReturnMessage::ReturnOk;
 }
 

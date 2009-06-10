@@ -11,13 +11,15 @@ class CardDatabase;
 class QMenu;
 class QAction;
 class PlayerArea;
+class ZoneViewZone;
 
 class Player : public QObject {
 	Q_OBJECT
 signals:
 	void moveCard(int cardId, QString startZone, QString targetZone, int x, int y);
 	void hoverCard(QString name);
-	void addZoneView(Player *player, QString zoneName, int number);
+	void closeZoneView(ZoneViewZone *zone);
+	void toggleZoneView(Player *player, QString zoneName, int number);
 	void sigShowCardMenu(QPoint p);
 	// Log events
 	void logMoveCard(QString playerName, QString cardName, QString startZone, QString targetZone);

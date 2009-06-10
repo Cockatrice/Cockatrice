@@ -43,7 +43,8 @@ void MainWindow::hoverCard(QString name)
 void MainWindow::playerAdded(Player *player)
 {
 	menuBar()->addMenu(player->getPlayerMenu());
-	connect(player, SIGNAL(addZoneView(Player *, QString, int)), zoneLayout, SLOT(addItem(Player *, QString, int)));
+	connect(player, SIGNAL(toggleZoneView(Player *, QString, int)), zoneLayout, SLOT(toggleZoneView(Player *, QString, int)));
+	connect(player, SIGNAL(closeZoneView(ZoneViewZone *)), zoneLayout, SLOT(removeItem(ZoneViewZone *)));
 }
 
 void MainWindow::playerRemoved(Player *player)

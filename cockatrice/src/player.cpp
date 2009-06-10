@@ -3,6 +3,7 @@
 #include "cardzone.h"
 #include "playerarea.h"
 #include "counter.h"
+#include "zoneviewzone.h"
 #include <QGraphicsScene>
 #include <QMenu>
 
@@ -85,7 +86,7 @@ void Player::actMoveHandToBottomLibrary()
 
 void Player::actViewLibrary()
 {
-	emit addZoneView(this, "deck", 0);
+	emit toggleZoneView(this, "deck", 0);
 }
 
 void Player::actViewTopCards()
@@ -94,23 +95,23 @@ void Player::actViewTopCards()
 	int number = QInputDialog::getInteger(0, tr("View top cards of library"), tr("Number of cards:"), defaultNumberTopCards, 1, 2000000000, 1, &ok);
 	if (ok) {
 		defaultNumberTopCards = number;
-		emit addZoneView(this, "deck", number);
+		emit toggleZoneView(this, "deck", number);
 	}
 }
 
 void Player::actViewGraveyard()
 {
-	emit addZoneView(this, "grave", 0);
+	emit toggleZoneView(this, "grave", 0);
 }
 
 void Player::actViewRfg()
 {
-	emit addZoneView(this, "rfg", 0);
+	emit toggleZoneView(this, "rfg", 0);
 }
 
 void Player::actViewSideboard()
 {
-	emit addZoneView(this, "sb", 0);
+	emit toggleZoneView(this, "sb", 0);
 }
 
 void Player::addZone(CardZone *z)
@@ -155,8 +156,11 @@ void Player::gameEvent(const ServerEventData &event)
 			// XXX Fehlerbehandlung
 
 			// Clean up existing zones first
-			for (int i = 0; i < zones.size(); i++)
+			for (int i = 0; i < zones.size(); i++) {
+				if (ZoneViewZone *view = zones.at(i)->getView())
+					emit closeZoneView(view);
 				zones.at(i)->clearContents();
+			}
 
 			area->clearCounters();
 

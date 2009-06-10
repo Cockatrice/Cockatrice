@@ -23,7 +23,6 @@
 #include <QStringList>
 
 class ServerSocket;
-class Random;
 
 class ServerGame : public QObject {
 	Q_OBJECT
@@ -37,7 +36,6 @@ signals:
 public slots:
 	void broadcastEvent(const QString &event, ServerSocket *player);
 public:
-	Random *rnd;
 	ServerSocket *creator;
 	int gameId;
 	QString description;
@@ -57,7 +55,6 @@ public:
 	int getActivePhase() { return activePhase; }
 	void setActivePlayer(int _activePlayer);
 	void setActivePhase(int _activePhase);
-	
 };
 
 #endif

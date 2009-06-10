@@ -21,12 +21,15 @@
 #include "servergame.h"
 #include "serversocket.h"
 #include "counter.h"
+#include "rng_qt.h"
 #include <QtSql>
 #include <QSettings>
 
 Server::Server(QObject *parent)
  : QTcpServer(parent), nextGameId(0)
 {
+	rng = new RNG_Qt(this);
+	
 	settings = new QSettings("servatrice.ini", QSettings::IniFormat, this);
 
 	QString dbType = settings->value("database/type").toString();

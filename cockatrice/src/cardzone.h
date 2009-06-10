@@ -43,6 +43,7 @@ public:
 	CardItem *takeCard(int position, int cardId, const QString &cardName);
 	void setCardAttr(int cardId, const QString &aname, const QString &avalue);
 	void hoverCardEvent(CardItem *card);
+	ZoneViewZone *getView() const { return view; }
 	void setView(ZoneViewZone *_view);
 	virtual void reorganizeCards() = 0;
 	void moveAllToZone(const QString &targetZone, int targetX);

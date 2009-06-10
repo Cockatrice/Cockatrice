@@ -26,6 +26,7 @@ class ServerGame;
 class ServerSocket;
 class QSqlDatabase;
 class QSettings;
+class AbstractRNG;
 
 enum AuthenticationResult { PasswordWrong = 0, PasswordRight = 1, UnknownUser = 2 };
 
@@ -45,10 +46,12 @@ public:
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
 	QList<ServerGame *> listOpenGames();
 	ServerGame *getGame(int gameId);
+	AbstractRNG *getRNG() const { return rng; }
 private:
 	void incomingConnection(int SocketId);
 	QList<ServerGame *> games;
 	int nextGameId;
+	AbstractRNG *rng;
 };
 
 #endif

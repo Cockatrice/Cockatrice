@@ -18,19 +18,17 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "servergame.h"
-#include "random.h"
 #include "serversocket.h"
 #include <QSqlQuery>
 
 ServerGame::ServerGame(ServerSocket *_creator, int _gameId, QString _description, QString _password, int _maxPlayers, QObject *parent)
-	: QObject(parent), gameStarted(false), rnd(0), creator(_creator), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers)
+	: QObject(parent), gameStarted(false), creator(_creator), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers)
 {
 }
 
 ServerGame::~ServerGame()
 {
 	emit gameClosing();
-	delete rnd;
 	qDebug("ServerGame destructor");
 }
 
@@ -101,11 +99,6 @@ void ServerGame::startGameIfReady()
 		query.bindValue(":id", gameId);
 		query.bindValue(":player", players.at(i)->PlayerName);
 		query.exec();
-	}
-	
-	if (!rnd) {
-		rnd = new Random(this);
-		rnd->init();
 	}
 	
 	for (int i = 0; i < players.size(); i++)

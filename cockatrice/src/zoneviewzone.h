@@ -23,6 +23,7 @@ public:
 	bool initializeCards();
 	void removeCard(int position);
 	void setHeight(int _height) { height = _height; }
+	int getNumberCards() const { return numberCards; }
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
 };
