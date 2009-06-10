@@ -123,7 +123,8 @@ void Player::setCardAttrHelper(CardItem *card, const QString &aname, const QStri
 	if (aname == "tapped") {
 		bool tapped = avalue == "1";
 		if (!(!tapped && card->getDoesntUntap() && allCards)) {
-			emit logSetTapped(name, card->getName(), tapped);
+			if (!allCards)
+				emit logSetTapped(name, card->getName(), tapped);
 			card->setTapped(tapped);
 		}
 	} else if (aname == "attacking")
@@ -264,6 +265,8 @@ void Player::gameEvent(const ServerEventData &event)
 				CardList *const cards = zone->getCards();
 				for (int i = 0; i < cards->size(); i++)
 					setCardAttrHelper(cards->at(i), aname, avalue, true);
+				if (aname == "tapped")
+					emit logSetTapped(name, QString("-1"), avalue == "1");
 			} else {
 				CardItem *card = zone->getCard(cardId, "");
 				setCardAttrHelper(card, aname, avalue, false);
