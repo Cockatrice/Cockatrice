@@ -27,7 +27,7 @@ private:
 	class compareFunctor;
 public:
 	InnerDecklistNode(const QString &_name = QString(), InnerDecklistNode *_parent = 0) : AbstractDecklistNode(_parent), name(_name) { }
-	~InnerDecklistNode();
+	virtual ~InnerDecklistNode();
 	QString getName() const { return name; }
 	void setName(const QString &_name) { name = _name; }
 	virtual QString getVisibleName() const;
