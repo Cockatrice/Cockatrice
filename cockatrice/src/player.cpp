@@ -74,14 +74,12 @@ Player::~Player()
 
 void Player::actMoveHandToTopLibrary()
 {
-	CardZone *library = zones.findZone("deck");
-	zones.findZone("hand")->moveAllToZone(library->getName(), 0);
+	zones.findZone("hand")->moveAllToZone("deck", 0);
 }
 
 void Player::actMoveHandToBottomLibrary()
 {
-	CardZone *library = zones.findZone("deck");
-	zones.findZone("hand")->moveAllToZone(library->getName(), library->getCards()->size());
+	zones.findZone("hand")->moveAllToZone("deck", -1);
 }
 
 void Player::actViewLibrary()
