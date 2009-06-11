@@ -14,10 +14,8 @@ QRectF TableZone::boundingRect() const
 	return QRectF(0, 0, width, height);
 }
 
-void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	Q_UNUSED(option);
-	Q_UNUSED(widget);
 	painter->fillRect(boundingRect(), QColor(0, 0, 100));
 }
 
@@ -38,7 +36,17 @@ void TableZone::addCardImpl(CardItem *card, int x, int y)
 
 void TableZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
 {
-	player->client->moveCard(cardId, startZone->getName(), getName(), dropPoint.x(), dropPoint.y(), faceDown);
+	int x = dropPoint.x();
+	int y = dropPoint.y();
+	if (x < 0)
+		x = 0;
+	if (y < 0)
+		y = 0;
+	if (x > width - CARD_WIDTH)
+		x = width - CARD_WIDTH;
+	if (y > height - CARD_HEIGHT)
+		y = height - CARD_HEIGHT;
+	player->client->moveCard(cardId, startZone->getName(), getName(), x, y, faceDown);
 }
 
 void TableZone::reorganizeCards()

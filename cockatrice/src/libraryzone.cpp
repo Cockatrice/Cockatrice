@@ -81,8 +81,7 @@ void LibraryZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	setCursor(Qt::OpenHandCursor);
 }
 
-void LibraryZone::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void LibraryZone::mouseReleaseEvent(QGraphicsSceneMouseEvent */*event*/)
 {
-	Q_UNUSED(event);
 	setCursor(Qt::OpenHandCursor);
 }
