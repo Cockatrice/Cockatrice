@@ -91,20 +91,20 @@ private:
 	QList<QString> SideboardList;
 	QList<PlayerZone *> zones;
 	QList<Counter *> counters;
-	int PlayerId;
+	int playerId;
+	QString playerName;
 	int nextCardId;
 	int newCardId();
-	PlayerZone *getZone(const QString &name);
-	Counter *getCounter(const QString &name);
-	void setName(const QString &name);
+	PlayerZone *getZone(const QString &name) const;
+	Counter *getCounter(const QString &name) const;
 	void clearZones();
 	void leaveGame();
 	bool parseCommand(QString line);
 	PlayerStatusEnum PlayerStatus;
 	ReturnMessage *remsg;
 	AuthenticationResult authState;
+	bool acceptsGameListChanges;
 public:
-	QString PlayerName;
 	ServerSocket(Server *_server, QObject *parent = 0);
 	~ServerSocket();
 	void msg(const QString &s);
@@ -112,8 +112,10 @@ public:
 	PlayerStatusEnum getStatus();
 	void setStatus(PlayerStatusEnum status);
 	void initConnection();
-	int getPlayerId() { return PlayerId; }
-	void setPlayerId(int _id) { PlayerId = _id; }
+	int getPlayerId() const { return playerId; }
+	void setPlayerId(int _id) { playerId = _id; }
+	QString getPlayerName() const { return playerName; }
+	bool getAcceptsGameListChanges() const { return acceptsGameListChanges; }
 	QStringList listCounters();
 	QStringList listZones();
 	void setupZones();

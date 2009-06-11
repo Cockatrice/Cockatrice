@@ -42,24 +42,24 @@ void Card::resetState()
 
 bool Card::setAttribute(const QString &aname, const QString &avalue, bool allCards)
 {
-	if (!aname.compare("counters")) {
+	if (aname == "counters") {
 		bool ok;
 		int tmp_int = avalue.toInt(&ok);
 		if (!ok)
 			return false;
 		setCounters(tmp_int);
-	} else if (!aname.compare("tapped")) {
-		bool value = !avalue.compare("1");
+	} else if (aname == "tapped") {
+		bool value = avalue == "1";
 		if (!(!value && allCards && doesntUntap))
 			setTapped(value);
-	} else if (!aname.compare("attacking")) {
-		setAttacking(!avalue.compare("1"));
-	} else if (!aname.compare("facedown")) {
-		setFaceDown(!avalue.compare("1"));
-	} else if (!aname.compare("annotation")) {
+	} else if (aname == "attacking") {
+		setAttacking(avalue == "1");
+	} else if (aname == "facedown") {
+		setFaceDown(avalue == "1");
+	} else if (aname == "annotation") {
 		setAnnotation(avalue);
-	} else if (!aname.compare("doesnt_untap")) {
-		setDoesntUntap(!avalue.compare("1"));
+	} else if (aname == "doesnt_untap") {
+		setDoesntUntap(avalue == "1");
 	} else
 		return false;
 	

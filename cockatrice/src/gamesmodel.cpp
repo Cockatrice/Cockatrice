@@ -6,24 +6,11 @@ GamesModel::~GamesModel()
 	cleanList();
 }
 
-int GamesModel::rowCount(const QModelIndex &/*parent*/) const
-{
-	return gameList.size();
-}
-
-int GamesModel::columnCount(const QModelIndex &/*parent*/) const
-{
-	return 5;
-}
-
 QVariant GamesModel::data(const QModelIndex &index, int role) const
 {
-	if (!index.isValid())
+	if ((role != Qt::DisplayRole) || !index.isValid())
 		return QVariant();
 	if ((index.row() >= gameList.size()) || (index.column() >= columnCount()))
-		return QVariant();
-	
-	if (role != Qt::DisplayRole)
 		return QVariant();
 	
 	ServerGame *g = gameList.at(index.row());
@@ -31,7 +18,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
 		case 0: return g->getGameId();
 		case 1: return g->getCreator();
 		case 2: return g->getDescription();
-		case 3: return QString(g->getHasPassword() ? "yes" : "no");
+		case 3: return QString(g->getHasPassword() ? tr("yes") : tr("no"));
 		case 4: return QString("%1/%2").arg(g->getPlayerCount()).arg(g->getMaxPlayers());
 		default: return QVariant();
 	}
@@ -39,16 +26,14 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
 
 QVariant GamesModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-	if (role != Qt::DisplayRole)
-		return QVariant();
-	if (orientation != Qt::Horizontal)
+	if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal))
 		return QVariant();
 	switch (section) {
-		case 0: return QString("Game ID");
-		case 1: return QString("Creator");
-		case 2: return QString("Description");
-		case 3: return QString("Password");
-		case 4: return QString("Players");
+		case 0: return tr("Game ID");
+		case 1: return tr("Creator");
+		case 2: return tr("Description");
+		case 3: return tr("Password");
+		case 4: return tr("Players");
 		default: return QVariant();
 	}
 }
@@ -60,11 +45,26 @@ ServerGame *GamesModel::getGame(int row)
 	return gameList[row];
 }
 
-void GamesModel::setGameList(const QList<ServerGame *> &_gameList)
+void GamesModel::updateGameList(ServerGame *game)
 {
-	cleanList();
-	gameList = _gameList;
-	reset();
+	for (int i = 0; i < gameList.size(); i++)
+		if (gameList[i]->getGameId() == game->getGameId()) {
+			if ((game->getPlayerCount() == 0) || (game->getPlayerCount() == game->getMaxPlayers())) {
+				beginRemoveRows(QModelIndex(), i, i);
+				delete gameList.takeAt(i);
+				endRemoveRows();
+			} else {
+				delete gameList[i];
+				gameList[i] = game;
+				emit dataChanged(index(i, 0), index(i, 4));
+			}
+			return;
+		}
+	if ((game->getPlayerCount() == 0) || (game->getPlayerCount() == game->getMaxPlayers()))
+		return;
+	beginInsertRows(QModelIndex(), gameList.size(), gameList.size());
+	gameList << game;
+	endInsertRows();
 }
 
 void GamesModel::cleanList()

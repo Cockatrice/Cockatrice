@@ -17,14 +17,13 @@ private slots:
 	void actCreate();
 	void actRefresh();
 	void actJoin();
-	void gameListReceived(QList<ServerGame *> _gameList);
 	void checkResponse(ServerResponse *response);
 private:
 	Client *client;
 	int msgid;
 	
-	QTreeView *tableView;
-	GamesModel *tableModel;
+	QTreeView *gameListView;
+	GamesModel *gameListModel;
 	QPushButton *refreshButton, *createButton, *joinButton;
 };
 

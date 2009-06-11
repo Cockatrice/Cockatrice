@@ -43,7 +43,7 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	connect(aDraw, SIGNAL(triggered()), this, SLOT(actDrawCard()));
 	aDrawCards = new QAction(tr("D&raw cards..."), this);
 	connect(aDrawCards, SIGNAL(triggered()), this, SLOT(actDrawCards()));
-	aDrawCards->setShortcut(tr("Ctrl+C"));
+	aDrawCards->setShortcut(tr("Ctrl+E"));
 	aRollDice = new QAction(tr("R&oll dice..."), this);
 	aRollDice->setShortcut(tr("Ctrl+I"));
 	connect(aRollDice, SIGNAL(triggered()), this, SLOT(actRollDice()));

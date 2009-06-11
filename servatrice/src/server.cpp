@@ -71,10 +71,12 @@ bool Server::openDatabase()
 
 void Server::addGame(const QString description, const QString password, const int maxPlayers, ServerSocket *creator)
 {
-	ServerGame *newGame = new ServerGame(creator, nextGameId++, description, password, maxPlayers);
+	ServerGame *newGame = new ServerGame(creator, nextGameId++, description, password, maxPlayers, this);
 	games << newGame;
 	connect(newGame, SIGNAL(gameClosing()), this, SLOT(gameClosing()));
 	newGame->addPlayer(creator);
+	
+	broadcastGameListUpdate(newGame);
 }
 
 void Server::incomingConnection(int socketId)
@@ -83,7 +85,9 @@ void Server::incomingConnection(int socketId)
 	socket->setSocketDescriptor(socketId);
 	connect(socket, SIGNAL(createGame(const QString, const QString, const int, ServerSocket *)), this, SLOT(addGame(const QString, const QString, const int, ServerSocket *)));
 	connect(socket, SIGNAL(joinGame(int, ServerSocket *)), this, SLOT(addClientToGame(int, ServerSocket *)));
+	connect(socket, SIGNAL(destroyed(QObject *)), this, SLOT(socketDestroyed(QObject *)));
 	socket->initConnection();
+	players << socket;
 }
 
 AuthenticationResult Server::checkUserPassword(const QString &user, const QString &password)
@@ -118,7 +122,7 @@ ServerGame *Server::getGame(int gameId)
 	QListIterator<ServerGame *> i(games);
 	while (i.hasNext()) {
 		ServerGame *tmp = i.next();
-		if ((tmp->gameId == gameId) && !tmp->getGameStarted())
+		if ((tmp->getGameId() == gameId) && !tmp->getGameStarted())
 			return tmp;
 	}
 	return NULL;
@@ -131,7 +135,7 @@ QList<ServerGame *> Server::listOpenGames()
 	while (i.hasNext()) {
 		ServerGame *tmp = i.next();
 		if ((!tmp->getGameStarted())
-		 && (tmp->getPlayerCount() < tmp->maxPlayers))
+		 && (tmp->getPlayerCount() < tmp->getMaxPlayers()))
 			result.append(tmp);
 	}
 	return result;
@@ -141,23 +145,35 @@ bool Server::checkGamePassword(int gameId, const QString &password)
 {
 	ServerGame *tmp;
 	if ((tmp = getGame(gameId))) {
-		if ((!tmp->getGameStarted())
-		 && (!tmp->password.compare(password, Qt::CaseSensitive))
-		 && (tmp->getPlayerCount() < tmp->maxPlayers))
+		if ((!tmp->getGameStarted()) && (tmp->getPassword() == password) && (tmp->getPlayerCount() < tmp->getMaxPlayers()))
 			return true;
 	}
 	return false;
 }
 
+void Server::broadcastGameListUpdate(ServerGame *game)
+{
+	QString line = game->getGameListLine();
+	for (int i = 0; i < players.size(); i++)
+		if (players[i]->getAcceptsGameListChanges())
+			players[i]->msg(line);
+}
+
 void Server::addClientToGame(int gameId, ServerSocket *client)
 {
-	ServerGame *tmp = getGame(gameId);
-	tmp->addPlayer(client);
+	ServerGame *game = getGame(gameId);
+	game->addPlayer(client);
+	broadcastGameListUpdate(game);
 }
 
 void Server::gameClosing()
 {
 	qDebug("Server::gameClosing");
-	ServerGame *g = qobject_cast<ServerGame *>(sender());
-	games.removeAt(games.indexOf(g));
+	games.removeAt(games.indexOf(static_cast<ServerGame *>(sender())));
+}
+
+void Server::socketDestroyed(QObject *obj)
+{
+	players.removeAt(players.indexOf(static_cast<ServerSocket *>(obj)));
+	qDebug(QString("Server::socketDestroyed: %1 players left").arg(players.size()).toLatin1());
 }

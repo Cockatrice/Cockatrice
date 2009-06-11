@@ -61,7 +61,7 @@ void Client::readLine()
 		QStringList values = line.split("|");
 		QString prefix = values.takeFirst();
 		// prefix is one of {welcome, private, public, resp, list_games, list_players, list_counters, list_zones, dump_zone}
-		if (!(prefix.compare("private") && prefix.compare("public"))) {
+		if ((prefix == "private") || (prefix == "public")) {
 			ServerEventData event(line);
 			if (event.getEventType() == eventPlayerId) {
 				QStringList data = event.getEventData();
@@ -76,7 +76,7 @@ void Client::readLine()
 				emit playerIdReceived(id, data[1]);
 			} else
 				emit gameEvent(event);
-		} else if (!prefix.compare("resp")) {
+		} else if (prefix == "resp") {
 			bool ok;
 			int msgid = values.takeFirst().toInt(&ok);
 			if (!ok) {
@@ -110,16 +110,12 @@ void Client::readLine()
 				qDebug(QString("msgid unknown: %1").arg(msgid).toLatin1());
 
 			emit responseReceived(new ServerResponse(msgid, ok, message));
-		} else if (!(prefix.compare("list_games")
-			  && prefix.compare("list_players")
-			  && prefix.compare("list_counters")
-			  && prefix.compare("list_zones")
-			  && prefix.compare("dump_zone")
-			  && prefix.compare("welcome"))) {
+		} else if (prefix == "list_games") {
+			emit gameListEvent(new ServerGame(values[0].toInt(), values[5], values[1], values[2].toInt(), values[3].toInt(), values[4].toInt()));
+		} else if ((prefix == "list_players") || (prefix == "list_counters") || (prefix == "list_zones") || (prefix == "dump_zone") || (prefix == "welcome")) {
 			int cmdid = values.takeFirst().toInt();
-			if (!values[0].compare(".")) {
+			if (values[0] == ".") {
 				QListIterator<QStringList> i(msgbuf);
-				QList<ServerGame *> gamelist;
 				QList<ServerPlayer *> playerlist;
 				QList<ServerZone *> zonelist;
 				QList<ServerZoneCard *> zonedump;
@@ -128,9 +124,7 @@ void Client::readLine()
 					QStringList val = i.next();
 
 					// XXX Parametergültigkeit überprüfen
-					if (!prefix.compare("list_games"))
-						gamelist << new ServerGame(val[0].toInt(), val[5], val[1], val[2].toInt(), val[3].toInt(), val[4].toInt());
-					else if (!prefix.compare("list_players"))
+					if (!prefix.compare("list_players"))
 						playerlist << new ServerPlayer(val[0].toInt(), val[1]);
 					else if (!prefix.compare("list_counters"))
 					{ }
@@ -141,9 +135,7 @@ void Client::readLine()
 					else if (!prefix.compare("welcome"))
 						welcomemsg << val[0];
 				}
-				if (!prefix.compare("list_games"))
-					emit gameListReceived(gamelist);
-				else if (!prefix.compare("list_players"))
+				if (!prefix.compare("list_players"))
 					emit playerListReceived(playerlist);
 				else if (!prefix.compare("list_counters"))
 				{ }

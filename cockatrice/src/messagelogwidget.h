@@ -30,8 +30,6 @@ private slots:
 	void logSetCounter(QString playerName, QString counterName, int value, int oldValue);
 	void logSetDoesntUntap(QString playerName, QString cardName, bool doesntUntap);
 	void logDumpZone(QString playerName, QString zoneName, QString zoneOwner, int numberCards);
-private:
-	void appendAndScroll(const QString &s);
 public:
 	void connectToGame(Game *game);
 	MessageLogWidget(QWidget *parent = 0);

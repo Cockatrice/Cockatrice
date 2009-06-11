@@ -37,16 +37,16 @@ public:
 	Card(QString _name, int _id, int _coord_x, int _coord_y);
 	~Card();
 	
-	int getId() { return id; }
-	int getX() { return coord_x; }
-	int getY() { return coord_y; }
-	QString getName() { return name; }
-	int getCounters() { return counters; }
-	bool getTapped() { return tapped; }
-	bool getAttacking() { return attacking; }
-	bool getFaceDown() { return facedown; }
-	QString getAnnotation() { return annotation; }
-	bool getDoesntUntap() { return doesntUntap; }
+	int getId() const { return id; }
+	int getX() const { return coord_x; }
+	int getY() const { return coord_y; }
+	QString getName() const { return name; }
+	int getCounters() const { return counters; }
+	bool getTapped() const { return tapped; }
+	bool getAttacking() const { return attacking; }
+	bool getFaceDown() const { return facedown; }
+	QString getAnnotation() const { return annotation; }
+	bool getDoesntUntap() const { return doesntUntap; }
 
 	void setId(int _id) { id = _id; }
 	void setCoords(int x, int y) { coord_x = x; coord_y = y; }

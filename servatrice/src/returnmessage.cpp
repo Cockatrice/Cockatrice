@@ -1,11 +1,6 @@
 #include "returnmessage.h"
 #include "serversocket.h"
 
-void ReturnMessage::setMsgId(unsigned int _msg_id)
-{
-	msg_id = _msg_id;
-}
-
 bool ReturnMessage::send(ReturnCode code)
 {
 	ServerSocket *s = qobject_cast<ServerSocket *>(parent());

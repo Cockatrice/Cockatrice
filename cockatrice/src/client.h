@@ -26,7 +26,7 @@ class Client : public QObject {
 signals:
 	void statusChanged(ProtocolStatus _status);
 	void welcomeMsgReceived(QStringList welcomeMsg);
-	void gameListReceived(QList<ServerGame *> games);
+	void gameListEvent(ServerGame *game);
 	void playerListReceived(QList<ServerPlayer *> players);
 	void zoneListReceived(int commandId, QList<ServerZone *> zones);
 	void zoneDumpReceived(int commandId, QList<ServerZoneCard *> cards);

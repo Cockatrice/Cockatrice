@@ -5,19 +5,19 @@
 #include <QList>
 #include "servergame.h"
 
-class GamesModel : public QAbstractListModel {
+class GamesModel : public QAbstractTableModel {
 	Q_OBJECT
 public:
-	GamesModel(QObject *parent = 0)
-		: QAbstractListModel(parent) { }
+	GamesModel(QObject *parent = 0) : QAbstractTableModel(parent) { }
 	~GamesModel();
-	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	int columnCount(const QModelIndex &parent = QModelIndex()) const;
+	int rowCount(const QModelIndex &parent = QModelIndex()) const { return parent.isValid() ? 0 : gameList.size(); }
+	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return 5; }
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	
-	void setGameList(const QList<ServerGame *> &_gameList);
 	ServerGame *getGame(int row);
+public slots:
+	void updateGameList(ServerGame *game);
 private:
 	QList<ServerGame *> gameList;
 	void cleanList();

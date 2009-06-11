@@ -17,12 +17,13 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "server.h"
 #include "servergame.h"
 #include "serversocket.h"
 #include <QSqlQuery>
 
-ServerGame::ServerGame(ServerSocket *_creator, int _gameId, QString _description, QString _password, int _maxPlayers, QObject *parent)
-	: QObject(parent), gameStarted(false), creator(_creator), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers)
+ServerGame::ServerGame(ServerSocket *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, QObject *parent)
+	: QObject(parent), creator(_creator), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers)
 {
 }
 
@@ -32,23 +33,23 @@ ServerGame::~ServerGame()
 	qDebug("ServerGame destructor");
 }
 
-bool ServerGame::getGameStarted()
+QString ServerGame::getGameListLine() const
 {
-	return gameStarted;
+	return QString("list_games|%1|%2|%3|%4|%5|%6").arg(gameId)
+						      .arg(description)
+						      .arg(password.isEmpty() ? 0 : 1)
+						      .arg(players.size())
+						      .arg(maxPlayers)
+						      .arg(creator->getPlayerName());
 }
 
-int ServerGame::getPlayerCount()
-{
-	return players.size();
-}
-
-QStringList ServerGame::getPlayerNames()
+QStringList ServerGame::getPlayerNames() const
 {
 	QStringList result;
 	QListIterator<ServerSocket *> i(players);
 	while (i.hasNext()) {
 		ServerSocket *tmp = i.next();
-		result << QString("%1|%2").arg(tmp->getPlayerId()).arg(tmp->PlayerName);
+		result << QString("%1|%2").arg(tmp->getPlayerId()).arg(tmp->getPlayerName());
 	}
 	return result;
 }
@@ -74,7 +75,7 @@ void ServerGame::msg(const QString &s)
 void ServerGame::broadcastEvent(const QString &cmd, ServerSocket *player)
 {
 	if (player)
-		msg(QString("public|%1|%2|%3").arg(player->getPlayerId()).arg(player->PlayerName).arg(cmd));
+		msg(QString("public|%1|%2|%3").arg(player->getPlayerId()).arg(player->getPlayerName()).arg(cmd));
 	else
 		msg(QString("public|||%1").arg(cmd));
 }
@@ -97,7 +98,7 @@ void ServerGame::startGameIfReady()
 	for (int i = 0; i < players.size(); i++) {
 		query.prepare("insert into games_players (id_game, player) values(:id, :player)");
 		query.bindValue(":id", gameId);
-		query.bindValue(":player", players.at(i)->PlayerName);
+		query.bindValue(":player", players.at(i)->getPlayerName());
 		query.exec();
 	}
 	
@@ -122,7 +123,7 @@ void ServerGame::addPlayer(ServerSocket *player)
 	player->setPlayerId(max + 1);
 	
 	player->setGame(this);
-	player->msg(QString("private|||player_id|%1|%2").arg(max + 1).arg(player->PlayerName));
+	player->msg(QString("private|||player_id|%1|%2").arg(max + 1).arg(player->getPlayerName()));
 	broadcastEvent("join", player);
 	
 	players << player;
@@ -136,6 +137,8 @@ void ServerGame::removePlayer(ServerSocket *player)
 	broadcastEvent("leave", player);
 	if (!players.size())
 		deleteLater();
+	if (!gameStarted)
+		qobject_cast<Server *>(parent())->broadcastGameListUpdate(this);
 }
 
 void ServerGame::setActivePlayer(int _activePlayer)
