@@ -18,4 +18,4 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-const char *VERSION_STRING = "Servatrice 0.20090416";
+const char *VERSION_STRING = "Servatrice 0.20090611";
