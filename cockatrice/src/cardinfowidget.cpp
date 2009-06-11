@@ -10,7 +10,7 @@ CardInfoWidget::CardInfoWidget(CardDatabase *_db, QWidget *parent)
 	cardPicture->setAlignment(Qt::AlignCenter);
 
 	QFont f;
-	f.setPointSize(9);
+	f.setPixelSize(11);
 	
 	nameLabel1 = new QLabel(tr("Name:"));
 	nameLabel1->setFont(f);

@@ -150,6 +150,6 @@ MessageLogWidget::MessageLogWidget(QWidget *parent)
 {
 	setReadOnly(true);
 	QFont f;
-	f.setPointSize(9);
+	f.setPixelSize(11);
 	setFont(f);
 }
