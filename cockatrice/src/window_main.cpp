@@ -131,7 +131,7 @@ void MainWindow::updateSceneSize()
 	QSizeF zoneSize = zoneLayout->size();
 	qDebug(QString("updateSceneSize: width=%1").arg(952 + zoneSize.width()).toLatin1());
 	scene->setSceneRect(sr.x(), sr.y(), 952 + zoneSize.width(), sr.height());
-	view->scaleToScene();
+	view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
 
 void MainWindow::textChanged(const QString &text)
