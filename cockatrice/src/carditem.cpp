@@ -35,15 +35,35 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 	if (tapped)
 		translatedSize.transpose();
 	QPixmap *translatedPixmap = db->getCard(name)->getPixmap(translatedSize.toSize());
-	painter->drawPixmap(boundingRect(), *translatedPixmap, translatedPixmap->rect());
+	painter->save();
+	if (translatedPixmap) {
+		painter->resetTransform();
+		if (tapped) {
+			painter->translate(((qreal) translatedSize.height()) / 2, ((qreal) translatedSize.width()) / 2);
+			painter->rotate(90);
+			painter->translate(-((qreal) translatedSize.width()) / 2, -((qreal) translatedSize.height()) / 2);
+		}
+		painter->drawPixmap(translatedPixmap->rect(), *translatedPixmap, translatedPixmap->rect());
+	} else {
+		QFont f;
+		f.setStyleHint(QFont::Serif);
+		f.setPointSize(8);
+		f.setWeight(QFont::Bold);
+		painter->setFont(f);
+		painter->setBrush(QColor(200, 200, 200));
+		painter->setPen(QPen(Qt::black));
+		painter->drawRect(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1);
+		painter->drawText(QRectF(5, 5, CARD_WIDTH - 15, CARD_HEIGHT - 15), Qt::AlignTop | Qt::AlignLeft | Qt::TextWordWrap, name);
+	}
+	painter->restore();
 
 	if (isSelected()) {
-		painter->setPen(QPen(QColor("red")));
-		painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 2));
+		painter->setPen(Qt::red);
+		painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
 	}
 	if (counters) {
 		painter->setFont(QFont("Times", 32, QFont::Bold));
-		painter->setPen(QPen(QColor("black")));
+		painter->setPen(QPen(Qt::black));
 		painter->setBackground(QBrush(QColor(255, 255, 255, 100)));
 		painter->setBackgroundMode(Qt::OpaqueMode);
 		painter->drawText(boundingRect(), Qt::AlignCenter, QString::number(counters));
@@ -107,10 +127,11 @@ void CardItem::resetState()
 	update(boundingRect());
 }
 
-CardDragItem *CardItem::createDragItem(CardZone *startZone, int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown)
+CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown)
 {
 	deleteDragItem();
-	dragItem = new CardDragItem(scene(), startZone, db->getCard(name), _id, _pos, faceDown);
+	dragItem = new CardDragItem(this, _id, _pos, faceDown);
+	scene()->addItem(dragItem);
 	dragItem->setPos(_scenePos - dragItem->getHotSpot());
 
 	return dragItem;
@@ -142,7 +163,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 		return;
 	bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier) || facedown;
 
-	createDragItem((CardZone *) parentItem(), id, event->pos(), event->scenePos(), faceDown);
+	createDragItem(id, event->pos(), event->scenePos(), faceDown);
 	dragItem->grabMouse();
 
 	QList<QGraphicsItem *> sel = scene()->selectedItems();
@@ -150,8 +171,9 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 		CardItem *c = (CardItem *) sel.at(i);
 		if (c == this)
 			continue;
-		CardDragItem *drag = new CardDragItem(scene(), (CardZone *) parentItem(), db->getCard(c->getName()), c->getId(), QPointF(), false, dragItem);
-		drag->setPos(c->pos() - pos());
+		CardDragItem *drag = new CardDragItem(c, c->getId(), c->pos() - pos(), false, dragItem);
+		drag->setPos(dragItem->pos() + c->pos() - pos());
+		scene()->addItem(drag);
 	}
 	setCursor(Qt::OpenHandCursor);
 }

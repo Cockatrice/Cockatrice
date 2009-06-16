@@ -88,19 +88,22 @@ QPixmap *CardInfo::loadPixmap()
 		if (pixmap->load(QString("../pics/%1/%2%3.full.jpg").arg(editions.at(i)).arg(correctedName).arg(1)))
 			return pixmap;
 	}
-	pixmap->load("../pics/none.jpg");
 	return pixmap;
 }
 
 QPixmap *CardInfo::getPixmap(QSize size)
 {
 	qDebug(QString("CardInfo::getPixmap(%1, %2) for %3").arg(size.width()).arg(size.height()).arg(getName()).toLatin1());
-	if (QPixmap *result = scaledPixmapCache.value(size.width())) {
+	QPixmap *cachedPixmap = scaledPixmapCache.value(size.width());
+	if (cachedPixmap) {
 		qDebug("cache HIT");
-		return result;
+		return cachedPixmap;
 	}
 	qDebug("cache MISS");
-	QPixmap *result = new QPixmap(loadPixmap()->scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap *bigPixmap = loadPixmap();
+	if (bigPixmap->isNull())
+		return 0;
+	QPixmap *result = new QPixmap(bigPixmap->scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	scaledPixmapCache.insert(size.width(), result);
 	return result;
 }

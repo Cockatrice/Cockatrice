@@ -2,9 +2,10 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QTextEdit>
+#include <QMessageBox>
 
 CardInfoWidget::CardInfoWidget(CardDatabase *_db, QWidget *parent)
-	: QFrame(parent), db(_db), pixmapHeight(0)
+	: QFrame(parent), db(_db), pixmapHeight(pixmapWidth)
 {
 	cardPicture = new QLabel();
 	cardPicture->setAlignment(Qt::AlignCenter);
@@ -50,8 +51,15 @@ CardInfoWidget::CardInfoWidget(CardDatabase *_db, QWidget *parent)
 	grid->setRowStretch(5, 1);
 	grid->setColumnStretch(1, 1);
 
+	CardInfo *cardBack = db->getCard();
+	QPixmap *bigPixmap = cardBack->loadPixmap();
+	if (bigPixmap->isNull())
+		QMessageBox::critical(this, tr("Error"), tr("Unable to load pixmap for card back."));
+	else
+		pixmapHeight = pixmapWidth * bigPixmap->height() / bigPixmap->width();
+	setCard(cardBack);
+	
 	setFrameStyle(QFrame::Panel | QFrame::Raised);
-	setCard(db->getCard());
 	setFixedSize(sizeHint());
 }
 
@@ -60,11 +68,11 @@ void CardInfoWidget::setCard(CardInfo *card)
 	if (!card)
 		return;
 
-	if (pixmapHeight == 0) {
-		QPixmap *bigPixmap = card->loadPixmap();
-		pixmapHeight = pixmapWidth * bigPixmap->height() / bigPixmap->width();
-	}
-	cardPicture->setPixmap(*card->getPixmap(QSize(pixmapWidth, pixmapHeight)));
+	QPixmap *resizedPixmap = card->getPixmap(QSize(pixmapWidth, pixmapHeight));
+	if (resizedPixmap)
+		cardPicture->setPixmap(*resizedPixmap);
+	else
+		cardPicture->setPixmap(*(db->getCard()->getPixmap(QSize(pixmapWidth, pixmapHeight))));
 	
 	nameLabel2->setText(card->getName());
 	manacostLabel2->setText(card->getManacost());

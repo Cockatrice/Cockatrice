@@ -10,18 +10,19 @@ class CardInfo;
 class CardDragItem : public QGraphicsItem {
 private:
 	int id;
-	CardInfo *info;
+	CardItem *item;
 	QPointF hotSpot;
-	CardZone *startZone;
 	bool faceDown;
+	QList<CardDragItem *> childDrags;
 public:
 	enum { Type = typeCardDrag };
 	int type() const { return Type; }
-	CardDragItem(QGraphicsScene *scene, CardZone *_startZone, CardInfo *_info, int _id, const QPointF &_hotSpot, bool _faceDown, QGraphicsItem *parent = 0);
+	CardDragItem(CardItem *_item, int _id, const QPointF &_hotSpot, bool _faceDown, CardDragItem *parentDrag = 0);
 	~CardDragItem();
-	QRectF boundingRect() const;
+	QRectF boundingRect() const { return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT); }
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QPointF getHotSpot() const { return hotSpot; }
+	void addChildDrag(CardDragItem *child);
 protected:
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);

@@ -13,13 +13,6 @@ const int CARD_HEIGHT = 102;
 const int RASTER_WIDTH = 36;
 const int RASTER_HEIGHT = 34;
 
-/*
-const int CARD_WIDTH = 72;
-const int CARD_HEIGHT = 108;
-const int RASTER_WIDTH = 36;
-const int RASTER_HEIGHT = 36;
-*/
-
 const int MAX_COUNTERS_ON_CARD = 999;
 
 enum CardItemType {
@@ -66,7 +59,7 @@ public:
 	void setDoesntUntap(bool _doesntUntap);
 	void resetState();
 
-	CardDragItem *createDragItem(CardZone *startZone, int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);
+	CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);
 	void deleteDragItem();
 protected:
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);

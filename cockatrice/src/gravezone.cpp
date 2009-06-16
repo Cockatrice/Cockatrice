@@ -75,7 +75,7 @@ void GraveZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 	bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier);
 	CardItem *card = cards->at(0);
-	CardDragItem *drag = card->createDragItem(this, card->getId(), event->pos(), event->scenePos(), faceDown);
+	CardDragItem *drag = card->createDragItem(card->getId(), event->pos(), event->scenePos(), faceDown);
 	drag->grabMouse();
 	setCursor(Qt::OpenHandCursor);
 }
