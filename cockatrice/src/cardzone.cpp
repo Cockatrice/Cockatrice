@@ -27,6 +27,12 @@ void CardZone::clearContents()
 	cards->clear();
 }
 
+void CardZone::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+	if (doubleClickAction)
+		doubleClickAction->trigger();
+}
+
 void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
 	if (event->button() == Qt::RightButton) {

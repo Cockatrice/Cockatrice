@@ -47,19 +47,19 @@ Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDa
 	QMenu *libraryMenu = playerMenu->addMenu(tr("&Library"));
 	libraryMenu->addAction(aViewLibrary);
 	libraryMenu->addAction(aViewTopCards);
-	zones.findZone("deck")->setMenu(libraryMenu);
+	zones.findZone("deck")->setMenu(libraryMenu, aViewLibrary);
 
 	QMenu *graveMenu = playerMenu->addMenu(tr("&Graveyard"));
 	graveMenu->addAction(aViewGraveyard);
-	zones.findZone("grave")->setMenu(graveMenu);
+	zones.findZone("grave")->setMenu(graveMenu, aViewGraveyard);
 
 	QMenu *rfgMenu = playerMenu->addMenu(tr("&Removed cards"));
 	rfgMenu->addAction(aViewRfg);
-	zones.findZone("rfg")->setMenu(rfgMenu);
+	zones.findZone("rfg")->setMenu(rfgMenu, aViewRfg);
 
 	QMenu *sbMenu = playerMenu->addMenu(tr("&Sideboard"));
 	sbMenu->addAction(aViewSideboard);
-	zones.findZone("sb")->setMenu(sbMenu);
+	zones.findZone("sb")->setMenu(sbMenu, aViewSideboard);
 }
 
 Player::~Player()

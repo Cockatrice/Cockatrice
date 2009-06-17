@@ -7,6 +7,7 @@
 class Player;
 class ZoneViewZone;
 class QMenu;
+class QAction;
 class QPainter;
 
 class CardZone : public QGraphicsItem {
@@ -16,8 +17,10 @@ protected:
 	CardList *cards;
 	ZoneViewZone *view;
 	QMenu *menu;
+	QAction *doubleClickAction;
 	bool hasCardAttr;
 	bool isShufflable;
+	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 	virtual void addCardImpl(CardItem *card, int x, int y) = 0;
 	void paintCardNumberEllipse(QPainter *painter);
@@ -31,7 +34,7 @@ public:
 	bool getHasCardAttr() const { return hasCardAttr; }
 	bool getIsShufflable() const { return isShufflable; }
 	QMenu *getMenu() const { return menu; }
-	void setMenu(QMenu *_menu) { menu = _menu; }
+	void setMenu(QMenu *_menu, QAction *_doubleClickAction = 0) { menu = _menu; doubleClickAction = _doubleClickAction; }
 	QString getName() const { return name; }
 	Player *getPlayer() const { return player; }
 	bool contentsKnown() const { return cards->getContentsKnown(); }
