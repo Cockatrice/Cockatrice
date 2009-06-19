@@ -43,6 +43,10 @@ int main(int argc, char *argv[])
 	app.addLibraryPath("plugins");
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
+	QCoreApplication::setOrganizationName("Cockatrice");
+	QCoreApplication::setOrganizationDomain("cockatrice.de");
+	QCoreApplication::setApplicationName("Cockatrice");
+
 	MainWindow *ui = new MainWindow;
 	qDebug("main(): MainWindow constructor finished");
 	ui->show();
