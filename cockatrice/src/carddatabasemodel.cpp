@@ -29,11 +29,17 @@ QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
 		return QVariant();
 	if (role != Qt::DisplayRole)
 		return QVariant();
-	
+
 	CardInfo *card = cardList.at(index.row());
 	switch (index.column()){
 		case 0: return card->getName();
-		case 1: return card->getEditions().join(", ");
+		case 1: {
+			QStringList setList;
+			QList<CardSet *> sets = card->getSets();
+			for (int i = 0; i < sets.size(); i++)
+				setList << sets[i]->getShortName();
+			return setList.join(", ");
+		}
 		case 2: return card->getManacost();
 		case 3: return card->getCardType();
 		case 4: return card->getPowTough();
@@ -68,7 +74,7 @@ public:
 		bool result;
 		switch (column) {
 			case 0: result = (a->getName() < b->getName()); break;
-			case 1: result = (a->getEditions().join("") < b->getEditions().join("")); break;
+			case 1: result = (a->getSets().at(0)->getShortName() < b->getSets().at(0)->getShortName()); break;
 			case 2: result = (a->getManacost() < b->getManacost()); break;
 			case 3: result = (a->getCardType() < b->getCardType()); break;
 			case 4: result = (a->getPowTough() < b->getPowTough()); break;

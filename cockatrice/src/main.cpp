@@ -22,8 +22,9 @@
 #include <QApplication>
 #include <QTextCodec>
 #include <QtPlugin>
-#include "window_main.h"
 #include <stdio.h>
+
+#include "window_main.h"
 
 //Q_IMPORT_PLUGIN(qjpeg)
 

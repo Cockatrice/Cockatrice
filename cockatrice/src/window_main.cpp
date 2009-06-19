@@ -120,6 +120,14 @@ void MainWindow::actDeckEditor()
 	deckEditor->show();
 }
 
+void MainWindow::actFullScreen(bool checked)
+{
+	if (checked)
+		setWindowState(windowState() | Qt::WindowFullScreen);
+	else
+		setWindowState(windowState() & ~Qt::WindowFullScreen);
+}
+
 void MainWindow::actExit()
 {
 	close();
@@ -149,7 +157,7 @@ void MainWindow::buttonSay()
 
 void MainWindow::playerIdReceived(int id, QString name)
 {
-	game = new Game(db, client, scene, actionsMenu, cardMenu, id, name);
+	game = new Game(db, client, scene, actionsMenu, cardMenu, id, name, this);
 	connect(game, SIGNAL(hoverCard(QString)), this, SLOT(hoverCard(QString)));
 	connect(game, SIGNAL(playerAdded(Player *)), this, SLOT(playerAdded(Player *)));
 	connect(game, SIGNAL(playerRemoved(Player *)), this, SLOT(playerRemoved(Player *)));
@@ -187,6 +195,10 @@ void MainWindow::createActions()
 	connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
 	aDeckEditor = new QAction(tr("&Deck editor"), this);
 	connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
+	aFullScreen = new QAction(tr("&Full screen"), this);
+	aFullScreen->setShortcut(tr("F4"));
+	aFullScreen->setCheckable(true);
+	connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
 	aExit = new QAction(tr("&Exit"), this);
 	connect(aExit, SIGNAL(triggered()), this, SLOT(actExit()));
 
@@ -208,8 +220,10 @@ void MainWindow::createMenus()
 	gameMenu->addSeparator();
 	gameMenu->addAction(aDeckEditor);
 	gameMenu->addSeparator();
+	gameMenu->addAction(aFullScreen);
+	gameMenu->addSeparator();
 	gameMenu->addAction(aExit);
-	
+
 	actionsMenu = menuBar()->addMenu(tr("&Actions"));
 
 	cardMenu = menuBar()->addMenu(tr("&Card"));
@@ -224,7 +238,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 	db = new CardDatabase;
 	int cardCount = db->loadFromFile("../cards.dat");
-	qDebug(QString("%1 cards loaded").arg(cardCount).toLatin1());
+//	db->importOracleDir();
+//	db->saveToFile("../cards.dat");
 
 	scene = new QGraphicsScene(0, 0, 952, 1024, this);
 	view = new GameView(scene);
@@ -253,7 +268,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 	QHBoxLayout *mainLayout = new QHBoxLayout;
 	mainLayout->addWidget(view);
-	mainLayout->setStretchFactor(view, 10);
+//	mainLayout->setStretchFactor(view, 10);
 	mainLayout->addLayout(verticalLayout);
 
 	QWidget *centralWidget = new QWidget;
@@ -280,6 +295,4 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::closeEvent(QCloseEvent */*event*/)
 {
-	delete game;
-	delete db;
 }

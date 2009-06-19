@@ -12,8 +12,8 @@
 #include "playerarea.h"
 #include "counter.h"
 
-Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_actionsMenu, QMenu *_cardMenu, int playerId, const QString &playerName)
-	: QObject(), actionsMenu(_actionsMenu), cardMenu(_cardMenu), db(_db), client(_client), scene(_scene), started(false)
+Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_actionsMenu, QMenu *_cardMenu, int playerId, const QString &playerName, QObject *parent)
+	: QObject(parent), actionsMenu(_actionsMenu), cardMenu(_cardMenu), db(_db), client(_client), scene(_scene), started(false)
 {
 	QRectF sr = scene->sceneRect();
 	localPlayer = addPlayer(playerId, playerName, QPointF(0, sr.y() + sr.height() / 2 + 2), true);

@@ -5,11 +5,33 @@
 #include <QPixmap>
 #include <QMap>
 #include <QDataStream>
+#include <QList>
+
+class CardDatabase;
+class CardInfo;
+
+class CardSet : public QList<CardInfo *> {
+private:
+	QString shortName, longName;
+	unsigned int sortKey;
+public:
+	CardSet(const QString &_shortName = QString(), const QString &_longName = QString());
+	QString getShortName() const { return shortName; }
+	QString getLongName() const { return longName; }
+	int getSortKey() const { return sortKey; }
+	void setSortKey(unsigned int _sortKey);
+	void updateSortKey();
+	void loadFromStream(QDataStream &stream);
+	void saveToStream(QDataStream &stream);
+};
 
 class CardInfo {
 private:
+	class SetCompareFunctor;
+	CardDatabase *db;
+
 	QString name;
-	QStringList editions;
+	QList<CardSet *> sets;
 	QString manacost;
 	QString cardtype;
 	QString powtough;
@@ -17,29 +39,32 @@ private:
 	QPixmap *pixmap;
 	QMap<int, QPixmap *> scaledPixmapCache;
 public:
-	CardInfo(const QString &_name = QString(),
+	CardInfo(CardDatabase *_db,
+		const QString &_name = QString(),
 		const QString &_manacost = QString(),
 		const QString &_cardtype = QString(),
 		const QString &_powtough = QString(),
 		const QStringList &_text = QStringList());
-	CardInfo(QDataStream &stream);
 	~CardInfo();
 	QString getName() const { return name; }
-	QStringList getEditions() const { return editions; }
+	QList<CardSet *> getSets() const { return sets; }
 	QString getManacost() const { return manacost; }
 	QString getCardType() const { return cardtype; }
 	QString getPowTough() const { return powtough; }
 	QStringList getText() const { return text; }
 	QString getMainCardType() const;
-	void addEdition(const QString &edition);
+	void addToSet(CardSet *set);
 	QPixmap *loadPixmap();
 	QPixmap *getPixmap(QSize size);
+	void loadFromStream(QDataStream &stream);
 	void saveToStream(QDataStream &stream);
 };
 
 class CardDatabase {
 private:
-	QHash<QString, CardInfo *> hash;
+	QHash<QString, CardInfo *> cardHash;
+	QHash<QString, CardSet *> setHash;
+	CardInfo *noCard;
 	static const unsigned int magicNumber = 0x12345678;
 	static const unsigned int fileVersion = 1;
 public:
@@ -47,8 +72,10 @@ public:
 	~CardDatabase();
 	void clear();
 	CardInfo *getCard(const QString &cardName = QString());
-	QList<CardInfo *> getCardList();
-	void importOracle();
+	CardSet *getSet(const QString &setName);
+	QList<CardInfo *> getCardList() { return cardHash.values(); }
+	void importOracleFile(const QString &fileName, CardSet *set);
+	void importOracleDir();
 	int loadFromFile(const QString &fileName);
 	bool saveToFile(const QString &fileName);
 };

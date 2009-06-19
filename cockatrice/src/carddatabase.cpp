@@ -3,22 +3,47 @@
 #include <QDirIterator>
 #include <QFile>
 #include <QTextStream>
+#include <QSettings>
 
-CardInfo::CardInfo(const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QStringList &_text)
-	: name(_name), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), pixmap(NULL)
+CardSet::CardSet(const QString &_shortName, const QString &_longName)
+	: shortName(_shortName), longName(_longName)
 {
-
+	updateSortKey();
 }
 
-CardInfo::CardInfo(QDataStream &stream)
-	: pixmap(NULL)
+void CardSet::loadFromStream(QDataStream &stream)
 {
-	stream >> name
-	       >> editions
-	       >> manacost
-	       >> cardtype
-	       >> powtough
-	       >> text;
+	stream >> shortName >> longName;
+	updateSortKey();
+	qDebug(QString("set loaded: %1, %2").arg(shortName).arg(longName).toLatin1());
+}
+
+void CardSet::saveToStream(QDataStream &stream)
+{
+	stream << shortName << longName;
+}
+
+void CardSet::setSortKey(unsigned int _sortKey)
+{
+	sortKey = _sortKey;
+
+	QSettings settings;
+	settings.beginGroup("sets");
+	settings.beginGroup(shortName);
+	settings.setValue("sortkey", sortKey);
+}
+
+void CardSet::updateSortKey()
+{
+	QSettings settings;
+	settings.beginGroup("sets");
+	settings.beginGroup(shortName);
+	sortKey = settings.value("sortkey", 0).toInt();
+}
+
+CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QStringList &_text)
+	: db(_db), name(_name), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), pixmap(NULL)
+{
 }
 
 CardInfo::~CardInfo()
@@ -42,7 +67,7 @@ QString CardInfo::getMainCardType() const
 	Legendary Artifact Creature - Golem
 	Instant // Instant
 	*/
-	
+
 	int pos;
 	if ((pos = result.indexOf('-')) != -1)
 		result.remove(pos, result.length());
@@ -53,22 +78,30 @@ QString CardInfo::getMainCardType() const
 	Legendary Artifact Creature
 	Instant
 	*/
-	
+
 	if ((pos = result.lastIndexOf(' ')) != -1)
 		result = result.mid(pos + 1);
 	/*
 	Creature
 	Instant
 	*/
-	
+
 	return result;
 }
 
-void CardInfo::addEdition(const QString &edition)
+void CardInfo::addToSet(CardSet *set)
 {
-	if (!editions.contains(edition))
-		editions << edition;
+	set->append(this);
+	sets << set;
 }
+
+class CardInfo::SetCompareFunctor {
+public:
+	inline bool operator()(CardSet *a, CardSet *b) const
+	{
+		return a->getSortKey() < b->getSortKey();
+	}
+};
 
 QPixmap *CardInfo::loadPixmap()
 {
@@ -79,13 +112,19 @@ QPixmap *CardInfo::loadPixmap()
 		pixmap->load("../pics/back.jpg");
 		return pixmap;
 	}
-	qDebug(QString("CardDatabase: loading pixmap for '%1'").arg(getName()).toLatin1());
-	for (int i = 0; i < editions.size(); i++) {
+	qSort(sets.begin(), sets.end(), SetCompareFunctor());
+
+	QString debugOutput = QString("CardDatabase: loading pixmap for '%1' from ").arg(getName());
+	for (int i = 0; i < sets.size(); i++)
+		debugOutput.append(QString("%1, ").arg(sets[i]->getShortName()));
+	qDebug(debugOutput.toLatin1());
+
+	for (int i = 0; i < sets.size(); i++) {
 		// Fire // Ice, Circle of Protection: Red
 		QString correctedName = getName().remove(" // ").remove(":");
-		if (pixmap->load(QString("../pics/%1/%2.full.jpg").arg(editions.at(i)).arg(correctedName)))
+		if (pixmap->load(QString("../pics/%1/%2.full.jpg").arg(sets[i]->getShortName()).arg(correctedName)))
 			return pixmap;
-		if (pixmap->load(QString("../pics/%1/%2%3.full.jpg").arg(editions.at(i)).arg(correctedName).arg(1)))
+		if (pixmap->load(QString("../pics/%1/%2%3.full.jpg").arg(sets[i]->getShortName()).arg(correctedName).arg(1)))
 			return pixmap;
 	}
 	return pixmap;
@@ -95,11 +134,8 @@ QPixmap *CardInfo::getPixmap(QSize size)
 {
 	qDebug(QString("CardInfo::getPixmap(%1, %2) for %3").arg(size.width()).arg(size.height()).arg(getName()).toLatin1());
 	QPixmap *cachedPixmap = scaledPixmapCache.value(size.width());
-	if (cachedPixmap) {
-		qDebug("cache HIT");
+	if (cachedPixmap)
 		return cachedPixmap;
-	}
-	qDebug("cache MISS");
 	QPixmap *bigPixmap = loadPixmap();
 	if (bigPixmap->isNull())
 		return 0;
@@ -108,10 +144,28 @@ QPixmap *CardInfo::getPixmap(QSize size)
 	return result;
 }
 
+void CardInfo::loadFromStream(QDataStream &stream)
+{
+	QStringList setNames;
+	stream >> name
+	       >> setNames
+	       >> manacost
+	       >> cardtype
+	       >> powtough
+	       >> text;
+
+	for (int i = 0; i < setNames.size(); i++)
+		addToSet(db->getSet(setNames[i]));
+}
+
 void CardInfo::saveToStream(QDataStream &stream)
 {
+	QStringList setNames;
+	for (int i = 0; i < sets.size(); i++)
+		setNames << sets[i]->getShortName();
+
 	stream << name
-	       << editions
+	       << setNames
 	       << manacost
 	       << cardtype
 	       << powtough
@@ -120,6 +174,8 @@ void CardInfo::saveToStream(QDataStream &stream)
 
 CardDatabase::CardDatabase()
 {
+	noCard = new CardInfo(this);
+	noCard->loadPixmap(); // cache pixmap for card back
 }
 
 CardDatabase::~CardDatabase()
@@ -129,39 +185,90 @@ CardDatabase::~CardDatabase()
 
 void CardDatabase::clear()
 {
-	QHashIterator<QString, CardInfo *> i(hash);
+	QHashIterator<QString, CardSet *> setIt(setHash);
+	while (setIt.hasNext()) {
+		setIt.next();
+		delete setIt.value();
+	}
+	setHash.clear();
+
+	QHashIterator<QString, CardInfo *> i(cardHash);
 	while (i.hasNext()) {
 		i.next();
 		delete i.value();
 	}
-	hash.clear();
+	cardHash.clear();
 }
 
 CardInfo *CardDatabase::getCard(const QString &cardName)
 {
-	if (hash.contains(cardName))
-		return hash.value(cardName);
+	if (cardName.isEmpty())
+		return noCard;
+	else if (cardHash.contains(cardName))
+		return cardHash.value(cardName);
 	else {
 		qDebug(QString("CardDatabase: card not found: %1").arg(cardName).toLatin1());
-		CardInfo *newCard = new CardInfo(cardName);
-		newCard->addEdition("TK");
-		hash.insert(cardName, newCard);
+		CardInfo *newCard = new CardInfo(this, cardName);
+		newCard->addToSet(getSet("TK"));
+		cardHash.insert(cardName, newCard);
 		return newCard;
 	}
 }
 
-QList<CardInfo *>CardDatabase::getCardList()
+CardSet *CardDatabase::getSet(const QString &setName)
 {
-	QList<CardInfo *> cardList;
-	QHashIterator<QString, CardInfo *> i(hash);
-	while (i.hasNext()) {
-		i.next();
-		cardList.append(i.value());
+	if (setHash.contains(setName))
+		return setHash.value(setName);
+	else {
+		qDebug(QString("CardDatabase: set not found: %1").arg(setName).toLatin1());
+		CardSet *newSet = new CardSet(setName);
+		setHash.insert(setName, newSet);
+		return newSet;
 	}
-	return cardList;
 }
 
-void CardDatabase::importOracle()
+void CardDatabase::importOracleFile(const QString &fileName, CardSet *set)
+{
+	QFile file(fileName);
+	file.open(QIODevice::ReadOnly | QIODevice::Text);
+	QTextStream in(&file);
+	while (!in.atEnd()) {
+		QString cardname = in.readLine();
+		if (cardname.isEmpty())
+			continue;
+		QString manacost = in.readLine();
+		QString cardtype, powtough;
+		QStringList text;
+		if (manacost.contains("Land", Qt::CaseInsensitive)) {
+			cardtype = manacost;
+			manacost.clear();
+		} else {
+			cardtype = in.readLine();
+			powtough = in.readLine();
+			// Dirty hack.
+			// Cards to test: Any creature, any basic land, Ancestral Vision, Fire // Ice.
+			if (!powtough.contains("/") || powtough.size() > 5) {
+				text << powtough;
+				powtough = QString();
+			}
+		}
+		QString line = in.readLine();
+		while (!line.isEmpty()) {
+			text << line;
+			line = in.readLine();
+		}
+		CardInfo *card;
+		if (cardHash.contains(cardname))
+			card = cardHash.value(cardname);
+		else {
+			card = new CardInfo(this, cardname, manacost, cardtype, powtough, text);
+			cardHash.insert(cardname, card);
+		}
+		card->addToSet(set);
+	}
+}
+
+void CardDatabase::importOracleDir()
 {
 	clear();
 	QDir dir("../db");
@@ -173,50 +280,16 @@ void CardDatabase::importOracle()
 	QFileInfoList files = dir.entryInfoList(QStringList() << "*.txt");
 	for (int k = 0; k < files.size(); k++) {
 		QFileInfo i = files[k];
-		QString edition = i.fileName().mid(i.fileName().indexOf('_') + 1);
-		edition = edition.left(edition.indexOf('.'));
-		QFile file(i.filePath());
-		file.open(QIODevice::ReadOnly | QIODevice::Text);
-		QTextStream in(&file);
-		while (!in.atEnd()) {
-			QString cardname = in.readLine();
-			QString manacost = in.readLine();
-			QString cardtype, powtough;
-			QStringList text;
-			if (manacost.contains("Land", Qt::CaseInsensitive)) {
-				cardtype = manacost;
-				manacost.clear();
-			} else {
-				cardtype = in.readLine();
-				powtough = in.readLine();
-				// Dirty hack.
-				// Cards to test: Any creature, any basic land, Ancestral Vision, Fire // Ice.
-				if (!powtough.contains("/") || powtough.size() > 5) {
-					text << powtough;
-					powtough = QString();
-				}
-			}
-			QString line = in.readLine();
-			while (!line.isEmpty()) {
-				text << line;
-				line = in.readLine();
-			}
-			CardInfo *card;
-			if (hash.contains(cardname))
-				card = hash.value(cardname);
-			else {
-				card = new CardInfo(cardname, manacost, cardtype, powtough, text);
-				hash.insert(cardname, card);
-			}
-			card->addEdition(edition);
-		}
+		QString shortName = i.fileName().left(i.fileName().indexOf('_'));
+		QString longName = i.fileName().mid(i.fileName().indexOf('_') + 1);
+		longName = longName.left(longName.indexOf('.'));
+		CardSet *set = new CardSet(shortName, longName);
+		setHash.insert(shortName, set);
+
+		importOracleFile(i.filePath(), set);
 	}
 
-	qDebug(QString("CardDatabase: %1 cards imported").arg(hash.size()).toLatin1());
-
-	CardInfo *empty = new CardInfo();
-	empty->loadPixmap(); // cache pixmap for card back
-	hash.insert("", empty);
+	qDebug(QString("CardDatabase: %1 cards imported").arg(cardHash.size()).toLatin1());
 }
 
 int CardDatabase::loadFromFile(const QString &fileName)
@@ -226,9 +299,10 @@ int CardDatabase::loadFromFile(const QString &fileName)
 	QDataStream in(&file);
 	in.setVersion(QDataStream::Qt_4_4);
 
-	quint32 _magicNumber, _fileVersion, cardCount;
+	quint32 _magicNumber, _fileVersion, setCount, cardCount;
 	in >> _magicNumber
 	   >> _fileVersion
+	   >> setCount
 	   >> cardCount;
 
 	if (_magicNumber != magicNumber)
@@ -237,11 +311,20 @@ int CardDatabase::loadFromFile(const QString &fileName)
 		return -2;
 
 	clear();
-	hash.reserve(cardCount);
-	for (unsigned int i = 0; i < cardCount; i++) {
-		CardInfo *newCard = new CardInfo(in);
-		hash.insert(newCard->getName(), newCard);
+	setHash.reserve(setCount);
+	qDebug(QString("setCount = %1").arg(setCount).toLatin1());
+	for (unsigned int i = 0; i < setCount; i++) {
+		CardSet *newSet = new CardSet;
+		newSet->loadFromStream(in);
+		setHash.insert(newSet->getShortName(), newSet);
 	}
+	cardHash.reserve(cardCount);
+	for (unsigned int i = 0; i < cardCount; i++) {
+		CardInfo *newCard = new CardInfo(this);
+		newCard->loadFromStream(in);
+		cardHash.insert(newCard->getName(), newCard);
+	}
+	qDebug(QString("%1 cards in %2 sets loaded").arg(cardCount).arg(setHash.size()).toLatin1());
 
 	return cardCount;
 }
@@ -255,9 +338,15 @@ bool CardDatabase::saveToFile(const QString &fileName)
 
 	out << (quint32) magicNumber
 	    << (quint32) fileVersion
-	    << (quint32) hash.size();
+	    << (quint32) setHash.size()
+	    << (quint32) cardHash.size();
 
-	QHashIterator<QString, CardInfo *> i(hash);
+	QHashIterator<QString, CardSet *> setIt(setHash);
+	while (setIt.hasNext()) {
+		setIt.next();
+		setIt.value()->saveToStream(out);
+	}
+	QHashIterator<QString, CardInfo *> i(cardHash);
 	while (i.hasNext()) {
 		i.next();
 		i.value()->saveToStream(out);
