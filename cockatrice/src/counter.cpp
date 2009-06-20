@@ -15,14 +15,12 @@ QRectF Counter::boundingRect() const
 
 void Counter::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	painter->save();
 	painter->setBrush(QBrush(color));
 	painter->drawEllipse(boundingRect());
 	if (value) {
 		painter->setFont(QFont("Times", 16, QFont::Bold));
 		painter->drawText(boundingRect(), Qt::AlignCenter, QString::number(value));
 	}
-	painter->restore();
 }
 
 void Counter::setValue(int _value)

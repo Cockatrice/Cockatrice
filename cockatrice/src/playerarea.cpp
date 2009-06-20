@@ -3,9 +3,7 @@
 #include "tablezone.h"
 #include "handzone.h"
 #include "libraryzone.h"
-#include "gravezone.h"
-#include "rfgzone.h"
-#include "sideboardzone.h"
+#include "pilezone.h"
 #include "counter.h"
 #include <QPainter>
 
@@ -19,13 +17,13 @@ PlayerArea::PlayerArea(Player *_player, QGraphicsItem *parent)
 
 	qreal h = deck->boundingRect().height() + 20;
 
-	GraveZone *grave = new GraveZone(_player, this);
+	PileZone *grave = new PileZone(_player, "grave", this);
 	grave->setPos(base + QPointF(0, h));
 
-	RfgZone *rfg = new RfgZone(_player, this);
+	PileZone *rfg = new PileZone(_player, "rfg", this);
 	rfg->setPos(base + QPointF(0, 2 * h));
 
-	SideboardZone *sb = new SideboardZone(_player, this);
+	PileZone *sb = new PileZone(_player, "sb", this);
 	sb->setVisible(false);
 
 	base = QPointF(deck->boundingRect().width() + 60, 0);
@@ -38,7 +36,6 @@ PlayerArea::PlayerArea(Player *_player, QGraphicsItem *parent)
 	table->setPos(base);
 
 	bRect = QRectF(0, 0, base.x() + table->boundingRect().width(), base.y() + table->boundingRect().height());
-	qDebug(QString("%1").arg(bRect.width()).toLatin1());
 }
 
 PlayerArea::~PlayerArea()
@@ -53,15 +50,11 @@ QRectF PlayerArea::boundingRect() const
 
 void PlayerArea::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	painter->save();
-
 	painter->fillRect(boundingRect(), QColor(200, 200, 200));
 
 	painter->setFont(QFont("Times", 16, QFont::Bold));
 	painter->setPen(QPen(Qt::black));
 	painter->drawText(QRectF(0, 0, CARD_WIDTH + 60, 40), Qt::AlignCenter, player->getName());
-
-	painter->restore();
 }
 
 Counter *PlayerArea::getCounter(const QString &name, bool remove)

@@ -2,7 +2,7 @@
 #include "dlg_creategame.h"
 
 DlgCreateGame::DlgCreateGame(Client *_client, QWidget *parent)
-	: QDialog(parent), client(_client), msgid(0)
+	: QDialog(parent), client(_client)
 {
 	descriptionLabel = new QLabel(tr("&Description:"));
 	descriptionEdit = new QLineEdit;
@@ -27,50 +27,48 @@ DlgCreateGame::DlgCreateGame(Client *_client, QWidget *parent)
 	okButton = new QPushButton(tr("&OK"));
 	okButton->setDefault(true);
 	cancelButton = new QPushButton(tr("&Cancel"));
-	
+
 	QHBoxLayout *buttonLayout = new QHBoxLayout;
 	buttonLayout->addStretch();
 	buttonLayout->addWidget(okButton);
 	buttonLayout->addWidget(cancelButton);
-	
+
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addLayout(grid);
 	mainLayout->addLayout(buttonLayout);
-	
+
 	setLayout(mainLayout);
-	
+
 	setWindowTitle(tr("Create game"));
 	setFixedHeight(sizeHint().height());
-	
+
 	connect(okButton, SIGNAL(clicked()), this, SLOT(actOK()));
 	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-	connect(client, SIGNAL(responseReceived(ServerResponse *)), this, SLOT(checkResponse(ServerResponse *)));
 }
 
 void DlgCreateGame::actOK()
 {
 	bool ok;
 	int maxPlayers = maxPlayersEdit->text().toInt(&ok);
-	if (msgid)
-		return;
 	if (!ok) {
 		QMessageBox::critical(this, tr("Error"), tr("Invalid number of players."));
 		return;
 	}
-	msgid = client->createGame(descriptionEdit->text(),
-				   passwordEdit->text(),
-				   maxPlayers);
+	PendingCommand *createCommand = client->createGame(descriptionEdit->text(), passwordEdit->text(), maxPlayers);
+	connect(createCommand, SIGNAL(finished(ServerResponse)), this, SLOT(checkResponse(ServerResponse)));
+	okButton->setEnabled(false);
+	cancelButton->setEnabled(false);
 }
 
-void DlgCreateGame::checkResponse(ServerResponse *response)
+void DlgCreateGame::checkResponse(ServerResponse response)
 {
-	if (response->getMsgId() != msgid)
-		return;
-	if (response->getOk())
+	okButton->setEnabled(true);
+	cancelButton->setEnabled(true);
+
+	if (response == RespOk)
 		accept();
 	else {
 		QMessageBox::critical(this, tr("Error"), tr("XXX"));
-		msgid = 0;
 		return;
 	}
 }

@@ -39,10 +39,11 @@ ZoneViewWidget::ZoneViewWidget(CardDatabase *_db, Player *_player, CardZone *_or
 
 	zone = new ZoneViewZone(player, _origZone, numberCards, this);
 	zone->setPos(3, y);
-	zone->setHeight(h - y);
+	zone->setHeight((int) (h - y));
 	if (!zone->initializeCards()) {
 		connect(player->client, SIGNAL(zoneDumpReceived(int, QList<ServerZoneCard *>)), this, SLOT(zoneDumpReceived(int, QList<ServerZoneCard *>)));
-		cmdId = player->client->dumpZone(player->getId(), _origZone->getName(), numberCards);
+		PendingCommand *dumpZoneCommand = player->client->dumpZone(player->getId(), _origZone->getName(), numberCards);
+		cmdId = dumpZoneCommand->getMsgId();
 	}
 }
 

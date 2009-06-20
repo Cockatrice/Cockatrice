@@ -29,6 +29,7 @@ class Game;
 class CardDatabase;
 class Player;
 
+class QVBoxLayout;
 class CardInfoWidget;
 class MessageLogWidget;
 class QLineEdit;
@@ -52,7 +53,6 @@ private slots:
 
 	void actConnect();
 	void actDisconnect();
-	void actGames();
 	void actRestartGame();
 	void actLeaveGame();
 	void actDeckEditor();
@@ -67,8 +67,9 @@ private:
 	void createActions();
 	void createMenus();
 	QMenu *gameMenu, *actionsMenu, *cardMenu;
-	QAction *aConnect, *aDisconnect, *aGames, *aRestartGame, *aLeaveGame, *aDeckEditor, *aFullScreen, *aExit;
+	QAction *aConnect, *aDisconnect, *aRestartGame, *aLeaveGame, *aDeckEditor, *aFullScreen, *aExit;
 	QAction *aCloseMostRecentZoneView;
+	QVBoxLayout *viewLayout;
 
 	CardInfoWidget *cardInfo;
 	MessageLogWidget *messageLog;

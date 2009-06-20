@@ -21,15 +21,15 @@ QRectF LibraryZone::boundingRect() const
 
 void LibraryZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget */*widget*/)
 {
-	painter->save();
-
 	QSizeF translatedSize = option->matrix.mapRect(boundingRect()).size();
 	QPixmap *translatedPixmap = player->getDb()->getCard()->getPixmap(translatedSize.toSize());
-	painter->drawPixmap(boundingRect(), *translatedPixmap, translatedPixmap->rect());
+
+	painter->save();
+	painter->resetTransform();
+	painter->drawPixmap(translatedPixmap->rect(), *translatedPixmap, translatedPixmap->rect());
+	painter->restore();
 
 	paintCardNumberEllipse(painter);
-
-	painter->restore();
 }
 
 void LibraryZone::addCardImpl(CardItem *card, int x, int /*y*/)

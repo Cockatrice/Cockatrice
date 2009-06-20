@@ -2,6 +2,7 @@
 method=none
 
 [database]
+type=mysql
 hostname=localhost
 database=servatrice
 user=servatrice

@@ -22,7 +22,7 @@
 
 #include "window_main.h"
 #include "dlg_connect.h"
-#include "dlg_games.h"
+#include "gameselector.h"
 #include "window_deckeditor.h"
 #include "cardinfowidget.h"
 #include "messagelogwidget.h"
@@ -64,14 +64,19 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 				game = 0;
 			}
 			aDisconnect->setEnabled(false);
-			aGames->setEnabled(false);
 			aRestartGame->setEnabled(false);
 			aLeaveGame->setEnabled(false);
 			emit logDisconnected();
 			break;
-		case StatusConnected:
+		case StatusLoggingIn:
 			aDisconnect->setEnabled(true);
-			aGames->setEnabled(true);
+			break;
+		case StatusIdle: {
+			GameSelector *gameSelector = new GameSelector(client);
+			viewLayout->insertWidget(0, gameSelector);
+		}
+		case StatusPlaying:
+			break;
 		default:
 			break;
 	}
@@ -91,12 +96,6 @@ void MainWindow::actDisconnect()
 	client->disconnectFromServer();
 }
 
-void MainWindow::actGames()
-{
-	DlgGames dlg(client, this);
-	dlg.exec();
-}
-
 void MainWindow::actRestartGame()
 {
 	zoneLayout->clear();
@@ -111,7 +110,6 @@ void MainWindow::actLeaveGame()
 	game = 0;
 	aRestartGame->setEnabled(false);
 	aLeaveGame->setEnabled(false);
-	aGames->setEnabled(true);
 }
 
 void MainWindow::actDeckEditor()
@@ -164,7 +162,6 @@ void MainWindow::playerIdReceived(int id, QString name)
 	playerAdded(game->getLocalPlayer());
 
 	messageLog->connectToGame(game);
-	aGames->setEnabled(false);
 	aRestartGame->setEnabled(true);
 	aLeaveGame->setEnabled(true);
 
@@ -183,9 +180,6 @@ void MainWindow::createActions()
 	aDisconnect = new QAction(tr("&Disconnect"), this);
 	aDisconnect->setEnabled(false);
 	connect(aDisconnect, SIGNAL(triggered()), this, SLOT(actDisconnect()));
-	aGames = new QAction(tr("&Games..."), this);
-	aGames->setEnabled(false);
-	connect(aGames, SIGNAL(triggered()), this, SLOT(actGames()));
 	aRestartGame = new QAction(tr("&Restart game..."), this);
 	aRestartGame->setShortcut(tr("F2"));
 	aRestartGame->setEnabled(false);
@@ -214,7 +208,6 @@ void MainWindow::createMenus()
 	gameMenu->addAction(aConnect);
 	gameMenu->addAction(aDisconnect);
 	gameMenu->addSeparator();
-	gameMenu->addAction(aGames);
 	gameMenu->addAction(aRestartGame);
 	gameMenu->addAction(aLeaveGame);
 	gameMenu->addSeparator();
@@ -232,12 +225,10 @@ void MainWindow::createMenus()
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent), game(NULL)
 {
-//	setWindowState(windowState() | Qt::WindowFullScreen);
-
 	QPixmapCache::setCacheLimit(200000);
 
 	db = new CardDatabase;
-	int cardCount = db->loadFromFile("../cards.dat");
+	db->loadFromFile("../cards.dat");
 //	db->importOracleDir();
 //	db->saveToFile("../cards.dat");
 
@@ -266,9 +257,11 @@ MainWindow::MainWindow(QWidget *parent)
 	verticalLayout->addWidget(messageLog);
 	verticalLayout->addLayout(hLayout);
 
+	viewLayout = new QVBoxLayout;
+	viewLayout->addWidget(view);
+
 	QHBoxLayout *mainLayout = new QHBoxLayout;
-	mainLayout->addWidget(view);
-//	mainLayout->setStretchFactor(view, 10);
+	mainLayout->addLayout(viewLayout, 10);
 	mainLayout->addLayout(verticalLayout);
 
 	QWidget *centralWidget = new QWidget;
@@ -288,6 +281,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(client, SIGNAL(welcomeMsgReceived(const QStringList)), messageLog, SLOT(logConnected(const QStringList)));
 	connect(this, SIGNAL(logDisconnected()), messageLog, SLOT(logDisconnected()));
 	connect(client, SIGNAL(logSocketError(const QString &)), messageLog, SLOT(logSocketError(const QString &)));
+	connect(client, SIGNAL(serverError(ServerResponse)), messageLog, SLOT(logServerError(ServerResponse)));
 
 	createActions();
 	createMenus();

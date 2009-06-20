@@ -26,6 +26,14 @@ void MessageLogWidget::logSocketError(const QString &errorString)
 	append(errorString);
 }
 
+void MessageLogWidget::logServerError(ServerResponse response)
+{
+	switch (response) {
+		case RespPassword: append(tr("Invalid password.")); break;
+		default: ;
+	}
+}
+
 void MessageLogWidget::logPlayerListReceived(QStringList players)
 {
 	append("---");

@@ -174,12 +174,12 @@ void Player::gameEvent(const ServerEventData &event)
 				zones.at(i)->reorganizeCards();
 
 			if (local) {
-				client->addCounter("life", QColor("white"), 20);
-				client->addCounter("w", QColor(200, 200, 200), 0);
-				client->addCounter("u", QColor(0, 0, 200), 0);
-				client->addCounter("b", QColor(100, 100, 100), 0);
-				client->addCounter("r", QColor(200, 0, 0), 0);
-				client->addCounter("g", QColor(0, 200, 0), 0);
+				client->addCounter("life", Qt::white, 20);
+				client->addCounter("w", QColor(255, 255, 150), 0);
+				client->addCounter("u", QColor(150, 150, 255), 0);
+				client->addCounter("b", QColor(150, 150, 150), 0);
+				client->addCounter("r", QColor(250, 150, 150), 0);
+				client->addCounter("g", QColor(150, 255, 150), 0);
 				client->addCounter("x", QColor(255, 255, 255), 0);
 				client->addCounter("storm", QColor(255, 255, 255), 0);
 			}

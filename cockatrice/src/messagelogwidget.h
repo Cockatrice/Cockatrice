@@ -3,6 +3,7 @@
 
 #include <QTextEdit>
 #include <QAbstractSocket>
+#include "client.h"
 
 class Game;
 
@@ -13,6 +14,7 @@ public slots:
 	void logConnected(const QStringList WelcomeMsg);
 	void logDisconnected();
 	void logSocketError(const QString &errorString);
+	void logServerError(ServerResponse response);
 private slots:
 	void logPlayerListReceived(QStringList players);
 	void logJoin(QString playerName);

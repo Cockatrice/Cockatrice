@@ -5,7 +5,6 @@ GameView::GameView(QGraphicsScene *scene, QWidget *parent)
 {
 	setBackgroundBrush(QBrush(QColor(0, 0, 0)));
 	setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing/* | QPainter::SmoothPixmapTransform*/);
-//	setOptimizationFlags(/*DontClipPainter | */DontSavePainterState);
 	setDragMode(RubberBandDrag);
 //	setViewportUpdateMode(FullViewportUpdate);
 }
