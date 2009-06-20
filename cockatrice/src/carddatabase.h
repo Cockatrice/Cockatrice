@@ -25,13 +25,20 @@ public:
 	void saveToStream(QDataStream &stream);
 };
 
+class SetList : public QList<CardSet *> {
+private:
+	class CompareFunctor;
+public:
+	void sortByKey();
+};
+
 class CardInfo {
 private:
 	class SetCompareFunctor;
 	CardDatabase *db;
 
 	QString name;
-	QList<CardSet *> sets;
+	SetList sets;
 	QString manacost;
 	QString cardtype;
 	QString powtough;
@@ -47,7 +54,7 @@ public:
 		const QStringList &_text = QStringList());
 	~CardInfo();
 	QString getName() const { return name; }
-	QList<CardSet *> getSets() const { return sets; }
+	SetList getSets() const { return sets; }
 	QString getManacost() const { return manacost; }
 	QString getCardType() const { return cardtype; }
 	QString getPowTough() const { return powtough; }
@@ -73,7 +80,8 @@ public:
 	void clear();
 	CardInfo *getCard(const QString &cardName = QString());
 	CardSet *getSet(const QString &setName);
-	QList<CardInfo *> getCardList() { return cardHash.values(); }
+	QList<CardInfo *> getCardList() const { return cardHash.values(); }
+	SetList getSetList() const;
 	void importOracleFile(const QString &fileName, CardSet *set);
 	void importOracleDir();
 	int loadFromFile(const QString &fileName);

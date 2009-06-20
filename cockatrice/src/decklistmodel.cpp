@@ -137,8 +137,8 @@ QVariant DeckListModel::headerData(int section, Qt::Orientation orientation, int
 	if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal))
 		return QVariant();
 	switch (section) {
-		case 0: return QString(tr("Number"));
-		case 1: return QString(tr("Card"));
+		case 0: return tr("Number");
+		case 1: return tr("Card");
 		default: return QVariant();
 	}
 }

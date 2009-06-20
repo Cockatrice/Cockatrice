@@ -25,6 +25,8 @@ private slots:
 	bool actSaveDeck();
 	bool actSaveDeckAs();
 
+	void actEditSets();
+
 	void actAddCard();
 	void actAddCardToSideboard();
 	void actRemoveCard();
@@ -46,8 +48,9 @@ private:
 	CardInfoWidget *cardInfo;
 	QLineEdit *searchEdit, *nameEdit, *commentsEdit;
 
-	QMenu *deckMenu;
+	QMenu *deckMenu, *setsMenu;
 	QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aClose;
+	QAction *aEditSets;
 	QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;
 public:
 	WndDeckEditor(CardDatabase *_db, QWidget *parent = 0);

@@ -41,6 +41,19 @@ void CardSet::updateSortKey()
 	sortKey = settings.value("sortkey", 0).toInt();
 }
 
+class SetList::CompareFunctor {
+public:
+	inline bool operator()(CardSet *a, CardSet *b) const
+	{
+		return a->getSortKey() < b->getSortKey();
+	}
+};
+
+void SetList::sortByKey()
+{
+	qSort(begin(), end(), CompareFunctor());
+}
+
 CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QStringList &_text)
 	: db(_db), name(_name), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), pixmap(NULL)
 {
@@ -95,14 +108,6 @@ void CardInfo::addToSet(CardSet *set)
 	sets << set;
 }
 
-class CardInfo::SetCompareFunctor {
-public:
-	inline bool operator()(CardSet *a, CardSet *b) const
-	{
-		return a->getSortKey() < b->getSortKey();
-	}
-};
-
 QPixmap *CardInfo::loadPixmap()
 {
 	if (pixmap)
@@ -112,7 +117,7 @@ QPixmap *CardInfo::loadPixmap()
 		pixmap->load("../pics/back.jpg");
 		return pixmap;
 	}
-	qSort(sets.begin(), sets.end(), SetCompareFunctor());
+	sets.sortByKey();
 
 	QString debugOutput = QString("CardDatabase: loading pixmap for '%1' from ").arg(getName());
 	for (int i = 0; i < sets.size(); i++)
@@ -225,6 +230,17 @@ CardSet *CardDatabase::getSet(const QString &setName)
 		setHash.insert(setName, newSet);
 		return newSet;
 	}
+}
+
+SetList CardDatabase::getSetList() const
+{
+	SetList result;
+	QHashIterator<QString, CardSet *> i(setHash);
+	while (i.hasNext()) {
+		i.next();
+		result << i.value();
+	}
+	return result;
 }
 
 void CardDatabase::importOracleFile(const QString &fileName, CardSet *set)

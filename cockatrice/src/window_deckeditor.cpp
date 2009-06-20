@@ -1,5 +1,6 @@
 #include <QtGui>
 #include "window_deckeditor.h"
+#include "window_sets.h"
 #include "carddatabase.h"
 #include "carddatabasemodel.h"
 #include "decklistmodel.h"
@@ -97,6 +98,9 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	aClose->setShortcut(tr("Ctrl+Q"));
 	connect(aClose, SIGNAL(triggered()), this, SLOT(close()));
 
+	aEditSets = new QAction(tr("&Edit sets..."), this);
+	connect(aEditSets, SIGNAL(triggered()), this, SLOT(actEditSets()));
+
 	deckMenu = menuBar()->addMenu(tr("&Deck"));
 	deckMenu->addAction(aNewDeck);
 	deckMenu->addAction(aLoadDeck);
@@ -104,6 +108,9 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	deckMenu->addAction(aSaveDeckAs);
 	deckMenu->addSeparator();
 	deckMenu->addAction(aClose);
+
+	setsMenu = menuBar()->addMenu(tr("&Sets"));
+	setsMenu->addAction(aEditSets);
 
 	aAddCard = new QAction(tr("Add card to &maindeck"), this);
 	connect(aAddCard, SIGNAL(triggered()), this, SLOT(actAddCard()));
@@ -225,6 +232,13 @@ bool WndDeckEditor::actSaveDeckAs()
 		return true;
 	} else
 		return false;
+}
+
+void WndDeckEditor::actEditSets()
+{
+	WndSets *w = new WndSets(db, this);
+	w->setWindowModality(Qt::WindowModal);
+	w->show();
 }
 
 void WndDeckEditor::recursiveExpand(const QModelIndex &index)
