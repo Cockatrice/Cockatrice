@@ -190,7 +190,7 @@ void MainWindow::createActions()
 	aDeckEditor = new QAction(tr("&Deck editor"), this);
 	connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
 	aFullScreen = new QAction(tr("&Full screen"), this);
-	aFullScreen->setShortcut(tr("F4"));
+	aFullScreen->setShortcut(tr("Ctrl+F4"));
 	aFullScreen->setCheckable(true);
 	connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
 	aExit = new QAction(tr("&Exit"), this);

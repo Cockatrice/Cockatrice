@@ -14,9 +14,9 @@ class DlgStartGame;
 class Game : public QObject {
 	Q_OBJECT
 private:
-	QMenu *actionsMenu, *cardMenu;
+	QMenu *actionsMenu, *sayMenu, *cardMenu;
 	QAction *aTap, *aUntap, *aDoesntUntap, *aFlip, *aAddCounter, *aRemoveCounter, *aSetCounters, *aRearrange,
-		*aUntapAll, *aDecLife, *aIncLife, *aSetLife, *aShuffle, *aDraw, *aDrawCards, *aRollDice, *aCreateToken;
+		*aUntapAll, *aDecLife, *aIncLife, *aSetLife, *aShuffle, *aDraw, *aDrawCards, *aRollDice, *aCreateToken, *aEditMessages;
 	DlgStartGame *dlgStartGame;
 
 	CardDatabase *db;
@@ -26,6 +26,7 @@ private:
 	Player *localPlayer;
 	bool started;
 	Player *addPlayer(int playerId, const QString &playerName, QPointF base, bool local);
+	void initSayMenu();
 private slots:
 	void actUntapAll();
 	void actIncLife();
@@ -36,6 +37,7 @@ private slots:
 	void actDrawCards();
 	void actRollDice();
 	void actCreateToken();
+	void actEditMessages();
 
 	void showCardMenu(QPoint p);
 	void actTap();
@@ -46,6 +48,8 @@ private slots:
 	void actRemoveCounter();
 	void actSetCounters();
 	void actRearrange();
+	
+	void actSayMessage();
 
 	void gameEvent(const ServerEventData &msg);
 	void playerListReceived(QList<ServerPlayer *> playerList);
