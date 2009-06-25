@@ -9,7 +9,7 @@ GameSelector::GameSelector(Client *_client, QWidget *parent)
 	gameListModel = new GamesModel(this);
 	gameListView->setModel(gameListModel);
 
-	createButton = new QPushButton(tr("&Create"));
+	createButton = new QPushButton(tr("C&reate"));
 	joinButton = new QPushButton(tr("&Join"));
 	QHBoxLayout *buttonLayout = new QHBoxLayout;
 	buttonLayout->addStretch();

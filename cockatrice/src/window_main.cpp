@@ -60,6 +60,7 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			break;
 		case StatusDisconnected:
 			if (game) {
+				zoneLayout->clear();
 				delete game;
 				game = 0;
 			}
@@ -72,6 +73,14 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			aDisconnect->setEnabled(true);
 			break;
 		case StatusIdle: {
+			if (game) {
+				zoneLayout->clear();
+				delete game;
+				game = 0;
+			}
+			aRestartGame->setEnabled(false);
+			aLeaveGame->setEnabled(false);
+			
 			GameSelector *gameSelector = new GameSelector(client);
 			viewLayout->insertWidget(0, gameSelector);
 		}
@@ -104,12 +113,7 @@ void MainWindow::actRestartGame()
 
 void MainWindow::actLeaveGame()
 {
-	zoneLayout->clear();
 	client->leaveGame();
-	delete game;
-	game = 0;
-	aRestartGame->setEnabled(false);
-	aLeaveGame->setEnabled(false);
 }
 
 void MainWindow::actDeckEditor()
@@ -140,15 +144,11 @@ void MainWindow::updateSceneSize()
 	view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
 
-void MainWindow::textChanged(const QString &text)
+void MainWindow::actSay()
 {
-	sayButton->setEnabled(!text.isEmpty());
-}
-
-// Knöpfe
-
-void MainWindow::buttonSay()
-{
+	if (sayEdit->text().isEmpty())
+		return;
+	
 	client->say(sayEdit->text());
 	sayEdit->clear();
 }
@@ -190,7 +190,7 @@ void MainWindow::createActions()
 	aDeckEditor = new QAction(tr("&Deck editor"), this);
 	connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
 	aFullScreen = new QAction(tr("&Full screen"), this);
-	aFullScreen->setShortcut(tr("Ctrl+F4"));
+	aFullScreen->setShortcut(tr("Ctrl+F"));
 	aFullScreen->setCheckable(true);
 	connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
 	aExit = new QAction(tr("&Exit"), this);
@@ -244,13 +244,13 @@ MainWindow::MainWindow(QWidget *parent)
 
 	cardInfo = new CardInfoWidget(db);
 	messageLog = new MessageLogWidget;
+	QLabel *sayLabel = new QLabel(tr("&Say:"));
 	sayEdit = new QLineEdit;
-	sayButton = new QPushButton(tr("&Say"));
-	sayButton->setEnabled(false);
+	sayLabel->setBuddy(sayEdit);
 
 	QHBoxLayout *hLayout = new QHBoxLayout;
+	hLayout->addWidget(sayLabel);
 	hLayout->addWidget(sayEdit);
-	hLayout->addWidget(sayButton);
 
 	QVBoxLayout *verticalLayout = new QVBoxLayout;
 	verticalLayout->addWidget(cardInfo);
@@ -268,9 +268,7 @@ MainWindow::MainWindow(QWidget *parent)
 	centralWidget->setLayout(mainLayout);
 	setCentralWidget(centralWidget);
 
-	connect(sayEdit, SIGNAL(returnPressed()), sayButton, SLOT(click()));
-	connect(sayEdit, SIGNAL(textChanged(const QString &)), this, SLOT(textChanged(const QString &)));
-	connect(sayButton, SIGNAL(clicked()), this, SLOT(buttonSay()));
+	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(actSay()));
 
 	client = new Client(this);
 	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
