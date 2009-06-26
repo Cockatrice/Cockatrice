@@ -1,6 +1,7 @@
 #include <QGraphicsScene>
 #include <QMenu>
 #include <QMessageBox>
+#include <QSettings>
 #include "serverplayer.h"
 #include "game.h"
 #include "servereventdata.h"
@@ -9,6 +10,7 @@
 #include "handzone.h"
 #include "carddatabase.h"
 #include "dlg_startgame.h"
+#include "dlg_editmessages.h"
 #include "playerarea.h"
 #include "counter.h"
 
@@ -51,6 +53,9 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	aCreateToken = new QAction(tr("&Create token..."), this);
 	aCreateToken->setShortcut(tr("Ctrl+T"));
 	connect(aCreateToken, SIGNAL(triggered()), this, SLOT(actCreateToken()));
+	
+	aEditMessages = new QAction(tr("&Edit messages..."), this);
+	connect(aEditMessages, SIGNAL(triggered()), this, SLOT(actEditMessages()));
 
 	actionsMenu->addAction(aUntapAll);
 	actionsMenu->addSeparator();
@@ -64,6 +69,9 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	actionsMenu->addAction(aRollDice);
 	actionsMenu->addSeparator();
 	actionsMenu->addAction(aCreateToken);
+	actionsMenu->addSeparator();
+	sayMenu = actionsMenu->addMenu(tr("S&ay"));
+	initSayMenu();
 
 	aTap = new QAction(tr("&Tap"), this);
 	connect(aTap, SIGNAL(triggered()), this, SLOT(actTap()));
@@ -105,6 +113,32 @@ Game::~Game()
 	for (int i = 0; i < players.size(); i++) {
 		emit playerRemoved(players.at(i));
 		delete players.at(i);
+	}
+}
+
+void Game::initSayMenu()
+{
+	sayMenu->clear();
+	sayMenu->addAction(aEditMessages);
+	sayMenu->addSeparator();
+
+	QSettings settings;
+	settings.beginGroup("messages");
+	int count = settings.value("count", 0).toInt();
+	for (int i = 0; i < count; i++) {
+		QAction *newAction = new QAction(settings.value(QString("msg%1").arg(i)).toString(), this);
+		QString shortcut;
+		switch (i) {
+			case 0: shortcut = tr("F5"); break;
+			case 1: shortcut = tr("F6"); break;
+			case 2: shortcut = tr("F7"); break;
+			case 3: shortcut = tr("F8"); break;
+			case 4: shortcut = tr("F9"); break;
+			case 5: shortcut = tr("F10"); break;
+		}
+		newAction->setShortcut(shortcut);
+		connect(newAction, SIGNAL(triggered()), this, SLOT(actSayMessage()));
+		sayMenu->addAction(newAction);
 	}
 }
 
@@ -295,6 +329,13 @@ void Game::actCreateToken()
 	client->createToken("table", cardname, QString(), 0, 0);
 }
 
+void Game::actEditMessages()
+{
+	DlgEditMessages dlg;
+	if (dlg.exec())
+		initSayMenu();
+}
+
 void Game::showCardMenu(QPoint p)
 {
 	cardMenu->exec(p);
@@ -395,4 +436,10 @@ void Game::actRearrange()
 		y = y_initial + (i % 3) * RASTER_HEIGHT;
 		client->moveCard(temp->getId(), zoneName, zoneName, x, y);
 	}
+}
+
+void Game::actSayMessage()
+{
+	QAction *a = qobject_cast<QAction *>(sender());
+	client->say(a->text());
 }

@@ -48,8 +48,7 @@ private slots:
 	void playerIdReceived(int id, QString name);
 	void serverTimeout();
 
-	void textChanged(const QString &text);
-	void buttonSay();
+	void actSay();
 
 	void actConnect();
 	void actDisconnect();
@@ -74,7 +73,6 @@ private:
 	CardInfoWidget *cardInfo;
 	MessageLogWidget *messageLog;
 	QLineEdit *sayEdit;
-	QPushButton *sayButton;
 
 	Client *client;
 	QGraphicsScene *scene;
