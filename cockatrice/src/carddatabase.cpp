@@ -4,6 +4,8 @@
 #include <QFile>
 #include <QTextStream>
 #include <QSettings>
+#include <QSvgRenderer>
+#include <QPainter>
 
 CardSet::CardSet(const QString &_shortName, const QString &_longName)
 	: shortName(_shortName), longName(_longName)
@@ -142,9 +144,18 @@ QPixmap *CardInfo::getPixmap(QSize size)
 	if (cachedPixmap)
 		return cachedPixmap;
 	QPixmap *bigPixmap = loadPixmap();
-	if (bigPixmap->isNull())
-		return 0;
-	QPixmap *result = new QPixmap(bigPixmap->scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap *result;
+	if (bigPixmap->isNull()) {
+		if (!getName().isEmpty())
+			return 0;
+		else {
+			result = new QPixmap(size);
+			QSvgRenderer svg(QString(":/back.svg"));
+			QPainter painter(result);
+			svg.render(&painter, QRectF(0, 0, size.width(), size.height()));
+		}
+	} else
+		result = new QPixmap(bigPixmap->scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	scaledPixmapCache.insert(size.width(), result);
 	return result;
 }

@@ -8,9 +8,10 @@ DEPENDPATH += . src
 INCLUDEPATH += . src
 MOC_DIR = build
 OBJECTS_DIR = build
+RESOURCES = cockatrice.qrc
 # CONFIG += qt debug
 
-QT += network
+QT += network svg
 #QT += opengl
 #QTPLUGIN += qjpeg
 

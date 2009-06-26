@@ -1,4 +1,5 @@
 #include "cardinfowidget.h"
+#include "carditem.h"
 #include <QGridLayout>
 #include <QLabel>
 #include <QTextEdit>
@@ -12,7 +13,7 @@ CardInfoWidget::CardInfoWidget(CardDatabase *_db, QWidget *parent)
 
 	QFont f;
 	f.setPixelSize(11);
-	
+
 	nameLabel1 = new QLabel(tr("Name:"));
 	nameLabel1->setFont(f);
 	nameLabel2 = new QLabel();
@@ -54,11 +55,11 @@ CardInfoWidget::CardInfoWidget(CardDatabase *_db, QWidget *parent)
 	CardInfo *cardBack = db->getCard();
 	QPixmap *bigPixmap = cardBack->loadPixmap();
 	if (bigPixmap->isNull())
-		QMessageBox::critical(this, tr("Error"), tr("Unable to load pixmap for card back."));
+		pixmapHeight = pixmapWidth * CARD_HEIGHT / CARD_WIDTH;
 	else
 		pixmapHeight = pixmapWidth * bigPixmap->height() / bigPixmap->width();
 	setCard(cardBack);
-	
+
 	setFrameStyle(QFrame::Panel | QFrame::Raised);
 	setFixedSize(sizeHint());
 }
@@ -73,7 +74,7 @@ void CardInfoWidget::setCard(CardInfo *card)
 		cardPicture->setPixmap(*resizedPixmap);
 	else
 		cardPicture->setPixmap(*(db->getCard()->getPixmap(QSize(pixmapWidth, pixmapHeight))));
-	
+
 	nameLabel2->setText(card->getName());
 	manacostLabel2->setText(card->getManacost());
 	cardtypeLabel2->setText(card->getCardType());
