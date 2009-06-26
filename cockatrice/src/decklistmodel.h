@@ -6,6 +6,8 @@
 #include "decklist.h"
 
 class CardDatabase;
+class QPrinter;
+class QTextCursor;
 
 class DecklistModelCardNode : public AbstractDecklistCardNode {
 private:
@@ -23,6 +25,8 @@ class DeckListModel : public QAbstractItemModel {
 	Q_OBJECT
 private slots:
 	void rebuildTree();
+public slots:
+	void printDeckList(QPrinter *printer);
 public:
 	DeckListModel(CardDatabase *_db, QObject *parent = 0);
 	~DeckListModel();
@@ -48,6 +52,8 @@ private:
 	void emitRecursiveUpdates(const QModelIndex &index);
 	void debugIndexInfo(const QString &func, const QModelIndex &index) const;
 	void debugShowTree(InnerDecklistNode *node, int depth) const;
+	
+	void printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node);
 
 	template<typename T> T getNode(const QModelIndex &index) const
 	{

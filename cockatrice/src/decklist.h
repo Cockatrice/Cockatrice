@@ -19,6 +19,7 @@ public:
 	virtual QString getName() const = 0;
 	InnerDecklistNode *getParent() const { return parent; }
 	int depth() const;
+	virtual int height() const = 0;
 	virtual bool compare(AbstractDecklistNode *other) const = 0;
 };
 
@@ -34,6 +35,7 @@ public:
 	virtual QString getVisibleName() const;
 	void clearTree();
 	AbstractDecklistNode *findChild(const QString &name);
+	int height() const;
 	int recursiveCount(bool countTotalCards = false) const;
 	bool compare(AbstractDecklistNode *other) const;
 	void sort(Qt::SortOrder order = Qt::AscendingOrder);
@@ -46,6 +48,7 @@ public:
 	virtual void setNumber(int _number) = 0;
 	virtual QString getName() const = 0;
 	virtual void setName(const QString &_name) = 0;
+	int height() const { return 0; }
 	bool compare(AbstractDecklistNode *other) const;
 };
 
