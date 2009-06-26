@@ -24,6 +24,7 @@ private slots:
 	void actLoadDeck();
 	bool actSaveDeck();
 	bool actSaveDeckAs();
+	void actPrintDeck();
 
 	void actEditSets();
 
@@ -49,7 +50,7 @@ private:
 	QLineEdit *searchEdit, *nameEdit, *commentsEdit;
 
 	QMenu *deckMenu, *setsMenu;
-	QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aClose;
+	QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aPrintDeck, *aClose;
 	QAction *aEditSets;
 	QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;
 public:

@@ -94,6 +94,9 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	aSaveDeckAs = new QAction(tr("&Save deck as..."), this);
 //	aSaveDeckAs->setShortcuts(QKeySequence::SaveAs);
 	connect(aSaveDeckAs, SIGNAL(triggered()), this, SLOT(actSaveDeckAs()));
+	aPrintDeck = new QAction(tr("&Print deck..."), this);
+	aPrintDeck->setShortcuts(QKeySequence::Print);
+	connect(aPrintDeck, SIGNAL(triggered()), this, SLOT(actPrintDeck()));
 	aClose = new QAction(tr("&Close"), this);
 	aClose->setShortcut(tr("Ctrl+Q"));
 	connect(aClose, SIGNAL(triggered()), this, SLOT(close()));
@@ -106,6 +109,8 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	deckMenu->addAction(aLoadDeck);
 	deckMenu->addAction(aSaveDeck);
 	deckMenu->addAction(aSaveDeckAs);
+	deckMenu->addSeparator();
+	deckMenu->addAction(aPrintDeck);
 	deckMenu->addSeparator();
 	deckMenu->addAction(aClose);
 
@@ -232,6 +237,13 @@ bool WndDeckEditor::actSaveDeckAs()
 		return true;
 	} else
 		return false;
+}
+
+void WndDeckEditor::actPrintDeck()
+{
+	QPrintPreviewDialog *dlg = new QPrintPreviewDialog(this);
+	connect(dlg, SIGNAL(paintRequested(QPrinter *)), deckModel, SLOT(printDeckList(QPrinter *)));
+	dlg->exec();
 }
 
 void WndDeckEditor::actEditSets()

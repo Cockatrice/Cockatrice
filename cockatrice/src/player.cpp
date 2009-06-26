@@ -21,14 +21,14 @@ Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDa
 
 	aViewLibrary = new QAction(tr("&View library"), this);
 	if (local)
-		aViewLibrary->setShortcut(tr("F5"));
+		aViewLibrary->setShortcut(tr("F3"));
 	connect(aViewLibrary, SIGNAL(triggered()), this, SLOT(actViewLibrary()));
 	aViewTopCards = new QAction(tr("View &top cards of library..."), this);
 	connect(aViewTopCards, SIGNAL(triggered()), this, SLOT(actViewTopCards()));
 
 	aViewGraveyard = new QAction(tr("&View graveyard"), this);
 	if (local)
-		aViewGraveyard->setShortcut(tr("F6"));
+		aViewGraveyard->setShortcut(tr("F4"));
 	connect(aViewGraveyard, SIGNAL(triggered()), this, SLOT(actViewGraveyard()));
 
 	aViewRfg = new QAction(tr("&View removed cards"), this);

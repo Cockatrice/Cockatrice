@@ -2,6 +2,10 @@
 #include <QTextStream>
 #include <QFont>
 #include <QBrush>
+#include <QTextCursor>
+#include <QTextDocument>
+#include <QPrinter>
+#include <QTextTable>
 #include "decklistmodel.h"
 #include "carddatabase.h"
 
@@ -281,4 +285,44 @@ void DeckListModel::cleanList()
 {
 	deckList->cleanList();
 	reset();
+}
+
+void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
+{
+	cursor->insertBlock();
+	cursor->insertText(node->getVisibleName());
+	if (node->height() == 1) {
+		QTextTableFormat tableFormat;
+		// XXX
+		QTextTable *table = cursor->insertTable(node->size(), 2, tableFormat);
+		for (int i = 0; i < node->size(); i++) {
+			AbstractDecklistCardNode *card = dynamic_cast<AbstractDecklistCardNode *>(node->at(i));
+			
+			QTextCursor cellCursor = table->cellAt(i, 0).firstCursorPosition();
+			cellCursor.insertText(QString::number(card->getNumber()));
+			cellCursor = table->cellAt(i, 1).firstCursorPosition();
+			cellCursor.insertText(card->getName());
+		}
+	} else {
+		for (int i = 0; i < node->size(); i++)
+			printDeckListNode(cursor, dynamic_cast<InnerDecklistNode *>(node->at(i)));
+	}
+	cursor->movePosition(QTextCursor::End);
+}
+
+void DeckListModel::printDeckList(QPrinter *printer)
+{
+	QTextDocument doc;
+	QTextCursor cursor(&doc);
+	
+	cursor.insertBlock();
+	cursor.insertText(deckList->getName());
+	
+	cursor.insertBlock();
+	cursor.insertText(deckList->getComments());
+	
+	for (int i = 0; i < root->size(); i++)
+		printDeckListNode(&cursor, dynamic_cast<InnerDecklistNode *>(root->at(i)));
+	
+	doc.print(printer);
 }

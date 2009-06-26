@@ -53,6 +53,11 @@ AbstractDecklistNode *InnerDecklistNode::findChild(const QString &name)
 	return 0;
 }
 
+int InnerDecklistNode::height() const
+{
+	return at(0)->height() + 1;
+}
+
 int InnerDecklistNode::recursiveCount(bool countTotalCards) const
 {
 	int result = 0;
