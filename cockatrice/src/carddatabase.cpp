@@ -300,9 +300,6 @@ void CardDatabase::importOracleDir()
 	clear();
 	QDir dir("../db");
 
-	// XXX User soll selber auswählen können, welche Karten ihm am besten gefallen.
-	// XXX Muss momentan schmutzig über Zahlen vor den Dateinamen gemacht werden.
-
 	dir.setSorting(QDir::Name | QDir::IgnoreCase);
 	QFileInfoList files = dir.entryInfoList(QStringList() << "*.txt");
 	for (int k = 0; k < files.size(); k++) {
