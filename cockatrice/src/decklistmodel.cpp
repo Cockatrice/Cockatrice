@@ -289,23 +289,60 @@ void DeckListModel::cleanList()
 
 void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
 {
-	cursor->insertBlock();
-	cursor->insertText(node->getVisibleName());
+	static const int totalColumns = 3;
+
 	if (node->height() == 1) {
+		QTextBlockFormat blockFormat;
+		QTextCharFormat charFormat;
+		charFormat.setFontPointSize(11);
+		charFormat.setFontWeight(QFont::Bold);
+		cursor->insertBlock(blockFormat, charFormat);
+		cursor->insertText(QString("%1: %2").arg(node->getVisibleName()).arg(node->recursiveCount(true)));
+
 		QTextTableFormat tableFormat;
-		// XXX
-		QTextTable *table = cursor->insertTable(node->size(), 2, tableFormat);
+		tableFormat.setCellPadding(0);
+		tableFormat.setCellSpacing(0);
+		tableFormat.setBorder(0);
+		QTextTable *table = cursor->insertTable(node->size() + 1, 2, tableFormat);
 		for (int i = 0; i < node->size(); i++) {
 			AbstractDecklistCardNode *card = dynamic_cast<AbstractDecklistCardNode *>(node->at(i));
-			
-			QTextCursor cellCursor = table->cellAt(i, 0).firstCursorPosition();
-			cellCursor.insertText(QString::number(card->getNumber()));
-			cellCursor = table->cellAt(i, 1).firstCursorPosition();
+
+			QTextCharFormat cellCharFormat;
+			cellCharFormat.setFontPointSize(9);
+
+			QTextTableCell cell = table->cellAt(i, 0);
+			cell.setFormat(cellCharFormat);
+			QTextCursor cellCursor = cell.firstCursorPosition();
+			cellCursor.insertText(QString("%1 ").arg(card->getNumber()));
+
+			cell = table->cellAt(i, 1);
+			cell.setFormat(cellCharFormat);
+			cellCursor = cell.firstCursorPosition();
 			cellCursor.insertText(card->getName());
 		}
-	} else {
-		for (int i = 0; i < node->size(); i++)
-			printDeckListNode(cursor, dynamic_cast<InnerDecklistNode *>(node->at(i)));
+	} else if (node->height() == 2) {
+		QTextBlockFormat blockFormat;
+		QTextCharFormat charFormat;
+		charFormat.setFontPointSize(14);
+		charFormat.setFontWeight(QFont::Bold);
+
+		cursor->insertBlock(blockFormat, charFormat);
+		cursor->insertText(QString("%1: %2").arg(node->getVisibleName()).arg(node->recursiveCount(true)));
+
+		QTextTableFormat tableFormat;
+		tableFormat.setCellPadding(10);
+		tableFormat.setCellSpacing(0);
+		tableFormat.setBorder(0);
+		QVector<QTextLength> constraints;
+		for (int i = 0; i < totalColumns; i++)
+			constraints << QTextLength(QTextLength::PercentageLength, 100.0 / totalColumns);
+		tableFormat.setColumnWidthConstraints(constraints);
+
+		QTextTable *table = cursor->insertTable(1, totalColumns, tableFormat);
+		for (int i = 0; i < node->size(); i++) {
+			QTextCursor cellCursor = table->cellAt(0, (i * totalColumns) / node->size()).lastCursorPosition();
+			printDeckListNode(&cellCursor, dynamic_cast<InnerDecklistNode *>(node->at(i)));
+		}
 	}
 	cursor->movePosition(QTextCursor::End);
 }
@@ -313,16 +350,32 @@ void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *no
 void DeckListModel::printDeckList(QPrinter *printer)
 {
 	QTextDocument doc;
+
+/*	QFont font("Times");
+	font.setStyleHint(QFont::Serif);
+	doc.setDefaultFont(font);
+*/
 	QTextCursor cursor(&doc);
-	
-	cursor.insertBlock();
+
+	QTextBlockFormat headerBlockFormat;
+	QTextCharFormat headerCharFormat;
+	headerCharFormat.setFontPointSize(16);
+	headerCharFormat.setFontWeight(QFont::Bold);
+
+	cursor.insertBlock(headerBlockFormat, headerCharFormat);
 	cursor.insertText(deckList->getName());
-	
-	cursor.insertBlock();
+
+	headerCharFormat.setFontPointSize(12);
+	cursor.insertBlock(headerBlockFormat, headerCharFormat);
 	cursor.insertText(deckList->getComments());
-	
-	for (int i = 0; i < root->size(); i++)
+	cursor.insertBlock(headerBlockFormat, headerCharFormat);
+
+	for (int i = 0; i < root->size(); i++) {
+		cursor.insertHtml("<hr>");
+		cursor.insertBlock(headerBlockFormat, headerCharFormat);
+
 		printDeckListNode(&cursor, dynamic_cast<InnerDecklistNode *>(root->at(i)));
-	
+	}
+
 	doc.print(printer);
 }

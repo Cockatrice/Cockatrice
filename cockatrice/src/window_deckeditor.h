@@ -12,10 +12,12 @@ class QTreeView;
 class QTableView;
 class CardInfoWidget;
 class QLineEdit;
+class QTextEdit;
 
 class WndDeckEditor : public QMainWindow {
 	Q_OBJECT
 private slots:
+	void updateComments();
 	void updateCardInfoLeft(const QModelIndex &current, const QModelIndex &previous);
 	void updateCardInfoRight(const QModelIndex &current, const QModelIndex &previous);
 	void updateSearch(const QString &search);
@@ -47,7 +49,8 @@ private:
 	QTreeView *databaseView;
 	QTreeView *deckView;
 	CardInfoWidget *cardInfo;
-	QLineEdit *searchEdit, *nameEdit, *commentsEdit;
+	QLineEdit *searchEdit, *nameEdit;
+	QTextEdit *commentsEdit;
 
 	QMenu *deckMenu, *setsMenu;
 	QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aPrintDeck, *aClose;

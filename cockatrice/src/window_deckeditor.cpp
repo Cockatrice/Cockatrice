@@ -58,9 +58,10 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	nameLabel->setBuddy(nameEdit);
 	connect(nameEdit, SIGNAL(textChanged(const QString &)), deckModel->getDeckList(), SLOT(setName(const QString &)));
 	QLabel *commentsLabel = new QLabel(tr("&Comments:"));
-	commentsEdit = new QLineEdit;
+	commentsEdit = new QTextEdit;
+	commentsEdit->setMaximumHeight(70);
 	commentsLabel->setBuddy(commentsEdit);
-	connect(commentsEdit, SIGNAL(textChanged(const QString &)), deckModel->getDeckList(), SLOT(setComments(const QString &)));
+	connect(commentsEdit, SIGNAL(textChanged()), this, SLOT(updateComments()));
 	QGridLayout *grid = new QGridLayout;
 	grid->addWidget(nameLabel, 0, 0);
 	grid->addWidget(nameEdit, 0, 1);
@@ -143,6 +144,11 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 WndDeckEditor::~WndDeckEditor()
 {
 
+}
+
+void WndDeckEditor::updateComments()
+{
+	deckModel->getDeckList()->setComments(commentsEdit->toPlainText());
 }
 
 void WndDeckEditor::updateCardInfoLeft(const QModelIndex &current, const QModelIndex &/*previous*/)
