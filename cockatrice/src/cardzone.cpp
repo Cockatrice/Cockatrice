@@ -6,7 +6,7 @@
 #include "zoneviewzone.h"
 
 CardZone::CardZone(Player *_p, const QString &_name, bool _hasCardAttr, bool _isShufflable, QGraphicsItem *parent, bool isView)
-	: QGraphicsItem(parent), player(_p), name(_name), cards(NULL), view(NULL), menu(NULL), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable)
+	: AbstractGraphicsItem(parent), player(_p), name(_name), cards(NULL), view(NULL), menu(NULL), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable)
 {
 	if (!isView)
 		player->addZone(this);
@@ -108,27 +108,4 @@ void CardZone::moveAllToZone(const QString &targetZone, int targetX)
 	// cards' list index doesn't change
 	for (int i = cards->size() - 1; i >= 0; i--)
 		player->client->moveCard(cards->at(i)->getId(), getName(), targetZone, targetX);
-}
-
-void CardZone::paintCardNumberEllipse(QPainter *painter)
-{
-	painter->save();
-
-	QString numStr = QString::number(cards->size());
-	QFont font("Times", 32, QFont::Bold);
-	QFontMetrics fm(font);
-	QRect br = fm.boundingRect(numStr);
-	double w = br.width() * 1.42;
-	double h = br.height() * 1.42;
-	if (w < h)
-		w = h;
-
-	painter->setPen(QPen(QColor("black")));
-	painter->setBrush(QColor(255, 255, 255, 150));
-	painter->drawEllipse(QRectF((boundingRect().width() - w) / 2.0, (boundingRect().height() - h) / 2.0, w, h));
-
-	painter->setFont(font);
-	painter->drawText(boundingRect(), Qt::AlignCenter, numStr);
-
-	painter->restore();
 }

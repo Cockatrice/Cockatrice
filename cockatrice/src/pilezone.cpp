@@ -26,7 +26,7 @@ void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		painter->restore();
 	}
 
-	paintCardNumberEllipse(painter);
+	paintNumberEllipse(cards->size(), painter);
 	painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
 }
 

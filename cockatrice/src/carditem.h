@@ -1,12 +1,11 @@
 #ifndef CARDITEM_H
 #define CARDITEM_H
 
-#include <QGraphicsItem>
+#include "abstractgraphicsitem.h"
 
 class CardDatabase;
 class CardDragItem;
 class CardZone;
-
 
 const int CARD_WIDTH = 72;
 const int CARD_HEIGHT = 102;
@@ -22,7 +21,7 @@ enum CardItemType {
 	typeOther = QGraphicsItem::UserType + 4
 };
 
-class CardItem : public QGraphicsItem {
+class CardItem : public AbstractGraphicsItem {
 private:
 	CardDatabase *db;
 	QString name;

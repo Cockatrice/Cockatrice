@@ -3,6 +3,7 @@
 
 #include <QString>
 #include "cardlist.h"
+#include "abstractgraphicsitem.h"
 
 class Player;
 class ZoneViewZone;
@@ -10,7 +11,7 @@ class QMenu;
 class QAction;
 class QPainter;
 
-class CardZone : public QGraphicsItem {
+class CardZone : public AbstractGraphicsItem {
 protected:
 	Player *player;
 	QString name;
@@ -23,7 +24,6 @@ protected:
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 	virtual void addCardImpl(CardItem *card, int x, int y) = 0;
-	void paintCardNumberEllipse(QPainter *painter);
 public:
 	enum { Type = typeZone };
 	int type() const { return Type; }

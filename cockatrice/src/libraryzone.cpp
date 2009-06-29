@@ -29,7 +29,7 @@ void LibraryZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 	painter->drawPixmap(translatedPixmap->rect(), *translatedPixmap, translatedPixmap->rect());
 	painter->restore();
 
-	paintCardNumberEllipse(painter);
+	paintNumberEllipse(cards->size(), painter);
 }
 
 void LibraryZone::addCardImpl(CardItem *card, int x, int /*y*/)

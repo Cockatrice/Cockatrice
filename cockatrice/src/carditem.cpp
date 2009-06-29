@@ -8,7 +8,7 @@
 #include "player.h"
 
 CardItem::CardItem(CardDatabase *_db, const QString &_name, int _cardid, QGraphicsItem *parent)
-	: QGraphicsItem(parent), db(_db), name(_name), id(_cardid), tapped(false), attacking(false), facedown(false), counters(0), doesntUntap(false), dragItem(NULL)
+	: AbstractGraphicsItem(parent), db(_db), name(_name), id(_cardid), tapped(false), attacking(false), facedown(false), counters(0), doesntUntap(false), dragItem(NULL)
 {
 	setCursor(Qt::OpenHandCursor);
 	setFlag(ItemIsSelectable);
@@ -61,23 +61,9 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		painter->setPen(Qt::red);
 		painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
 	}
-	if (counters) {
-		QString numStr = QString::number(counters);
-		QFont font("Times", 32, QFont::Bold);
-		QFontMetrics fm(font);
-		QRect br = fm.boundingRect(numStr);
-		double w = br.width() * 1.42;
-		double h = br.height() * 1.42;
-		if (w < h)
-			w = h;
-	
-		painter->setPen(Qt::black);
-		painter->setBrush(QColor(255, 255, 255, 150));
-		painter->drawEllipse(QRectF((boundingRect().width() - w) / 2.0, (boundingRect().height() - h) / 2.0, w, h));
-	
-		painter->setFont(font);
-		painter->drawText(boundingRect(), Qt::AlignCenter, numStr);
-	}
+	if (counters)
+		paintNumberEllipse(counters, painter);
+
 	painter->restore();
 }
 
