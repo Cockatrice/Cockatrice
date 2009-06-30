@@ -55,9 +55,15 @@ void TableZone::reorganizeCards()
 
 void TableZone::toggleTapped()
 {
-	QListIterator<QGraphicsItem *> i(scene()->selectedItems());
-	while (i.hasNext()) {
-		CardItem *temp = (CardItem *) i.next();
-		setCardAttr(temp->getId(), "tapped", temp->getTapped() ? "0" : "1");
+	QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+	bool tapAll = false;
+	for (int i = 0; i < selectedItems.size(); i++)
+		if (!qgraphicsitem_cast<CardItem *>(selectedItems[i])->getTapped()) {
+			tapAll = true;
+			break;
+		}
+	for (int i = 0; i < selectedItems.size(); i++) {
+		CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItems[i]);
+		setCardAttr(temp->getId(), "tapped", (!temp->getTapped() || tapAll) ? "1" : "0");
 	}
 }

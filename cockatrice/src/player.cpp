@@ -4,11 +4,12 @@
 #include "playerarea.h"
 #include "counter.h"
 #include "zoneviewzone.h"
+#include "game.h"
 #include <QGraphicsScene>
 #include <QMenu>
 
-Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDatabase *_db, Client *_client, QGraphicsScene *_scene)
-	: QObject(), defaultNumberTopCards(3), name(_name), id(_id), base(_base), local(_local), db(_db), client(_client)
+Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDatabase *_db, Client *_client, QGraphicsScene *_scene, Game *_parent)
+	: QObject(_parent), defaultNumberTopCards(3), name(_name), id(_id), base(_base), local(_local), db(_db), client(_client)
 {
 	area = new PlayerArea(this);
 	area->setPos(_base);

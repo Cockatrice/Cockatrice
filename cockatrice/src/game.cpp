@@ -144,7 +144,7 @@ void Game::initSayMenu()
 
 Player *Game::addPlayer(int playerId, const QString &playerName, QPointF base, bool local)
 {
-	Player *newPlayer = new Player(playerName, playerId, base, local, db, client, scene);
+	Player *newPlayer = new Player(playerName, playerId, base, local, db, client, scene, this);
 
 	connect(newPlayer, SIGNAL(hoverCard(QString)), this, SIGNAL(hoverCard(QString)));
 	connect(newPlayer, SIGNAL(sigShowCardMenu(QPoint)), this, SLOT(showCardMenu(QPoint)));
@@ -346,7 +346,8 @@ void Game::actTap()
 	QListIterator<QGraphicsItem *> i(scene->selectedItems());
 	while (i.hasNext()) {
 		CardItem *temp = (CardItem *) i.next();
-		client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "tapped", "1");
+		if (!temp->getTapped())
+			client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "tapped", "1");
 	}
 }
 
@@ -355,7 +356,8 @@ void Game::actUntap()
 	QListIterator<QGraphicsItem *> i(scene->selectedItems());
 	while (i.hasNext()) {
 		CardItem *temp = (CardItem *) i.next();
-		client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "tapped", "0");
+		if (temp->getTapped())
+			client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "tapped", "0");
 	}
 }
 
