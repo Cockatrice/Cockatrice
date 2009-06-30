@@ -3,6 +3,7 @@
 
 #include <QString>
 #include "cardlist.h"
+#include "carditem.h"
 #include "abstractgraphicsitem.h"
 
 class Player;

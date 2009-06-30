@@ -1,4 +1,5 @@
 #include "cardlist.h"
+#include "carditem.h"
 
 CardList::CardList(bool _contentsKnown)
 	: QList<CardItem *>(), contentsKnown(_contentsKnown)

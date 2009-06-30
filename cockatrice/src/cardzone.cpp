@@ -6,7 +6,7 @@
 #include "zoneviewzone.h"
 
 CardZone::CardZone(Player *_p, const QString &_name, bool _hasCardAttr, bool _isShufflable, QGraphicsItem *parent, bool isView)
-	: AbstractGraphicsItem(parent), player(_p), name(_name), cards(NULL), view(NULL), menu(NULL), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable)
+	: AbstractGraphicsItem(parent), player(_p), name(_name), cards(NULL), view(NULL), menu(NULL), doubleClickAction(0), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable)
 {
 	if (!isView)
 		player->addZone(this);
@@ -27,7 +27,7 @@ void CardZone::clearContents()
 	cards->clear();
 }
 
-void CardZone::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+void CardZone::mouseDoubleClickEvent(QGraphicsSceneMouseEvent */*event*/)
 {
 	if (doubleClickAction)
 		doubleClickAction->trigger();
@@ -71,8 +71,7 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
 
 CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName)
 {
-	if (position >= cards->size())
-		return NULL;
+	Q_ASSERT(position < cards->size());
 
 	CardItem *c = cards->takeAt(position);
 

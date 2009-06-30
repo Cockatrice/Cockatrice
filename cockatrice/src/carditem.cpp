@@ -70,7 +70,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 void CardItem::setName(const QString &_name)
 {
 	name = _name;
-	update(boundingRect());
+	update();
 }
 
 void CardItem::setTapped(bool _tapped)
@@ -80,31 +80,31 @@ void CardItem::setTapped(bool _tapped)
 		setTransform(QTransform().translate((float) CARD_WIDTH / 2, (float) CARD_HEIGHT / 2).rotate(90).translate((float) -CARD_WIDTH / 2, (float) -CARD_HEIGHT / 2));
 	else
 		setTransform(QTransform());
-	update(boundingRect());
+	update();
 }
 
 void CardItem::setAttacking(bool _attacking)
 {
 	attacking = _attacking;
-	update(boundingRect());
+	update();
 }
 
 void CardItem::setFaceDown(bool _facedown)
 {
 	facedown = _facedown;
-	update(boundingRect());
+	update();
 }
 
 void CardItem::setCounters(int _counters)
 {
 	counters = _counters;
-	update(boundingRect());
+	update();
 }
 
 void CardItem::setAnnotation(const QString &_annotation)
 {
 	annotation = _annotation;
-	update(boundingRect());
+	update();
 }
 
 void CardItem::setDoesntUntap(bool _doesntUntap)
@@ -120,7 +120,7 @@ void CardItem::resetState()
 	annotation = QString();
 	setTapped(false);
 	setDoesntUntap(false);
-	update(boundingRect());
+	update();
 }
 
 CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown)
@@ -215,7 +215,7 @@ QVariant CardItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QV
 		return value;
 	} else if (change == ItemSelectedHasChanged) {
 		qDebug("selection changed");
-		update(boundingRect());
+		update();
 		return value;
 	} else
 		return QGraphicsItem::itemChange(change, value);

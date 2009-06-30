@@ -31,7 +31,7 @@ void TableZone::addCardImpl(CardItem *card, int x, int y)
 	qDebug(QString("table: appended %1 at pos %2: zValue = %3, x = %4, y = %5").arg(card->getName()).arg(cards->size() - 1).arg(card->zValue()).arg(x).arg(y).toLatin1());
 	card->setParentItem(this);
 	card->setVisible(true);
-	card->update(card->boundingRect());
+	card->update();
 }
 
 void TableZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)

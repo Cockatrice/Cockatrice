@@ -59,7 +59,7 @@ void HandZone::addCardImpl(CardItem *card, int x, int /*y*/)
 	card->setParentItem(this);
 	card->resetState();
 	card->setVisible(true);
-	card->update(card->boundingRect());
+	card->update();
 }
 
 void HandZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)

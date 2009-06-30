@@ -26,7 +26,7 @@ void Counter::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*
 void Counter::setValue(int _value)
 {
 	value = _value;
-	update(boundingRect());
+	update();
 }
 
 void Counter::mousePressEvent(QGraphicsSceneMouseEvent *event)

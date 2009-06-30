@@ -50,7 +50,7 @@ void LibraryZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint 
 
 void LibraryZone::reorganizeCards()
 {
-	update(boundingRect());
+	update();
 }
 
 void LibraryZone::mousePressEvent(QGraphicsSceneMouseEvent *event)

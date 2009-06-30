@@ -52,7 +52,6 @@ void ZoneViewLayout::removeItem(ZoneViewWidget *item)
 {
 	qDebug("ZoneViewLayout::removeItem");
 	views.removeAt(views.indexOf(item));
-	scene()->removeItem(item);
 	reorganize();
 }
 
