@@ -66,9 +66,56 @@ Otherwise, "ok" is returned and for each game currently, a list_games event XXX 
 sent to the client. The "accepts game list changes" flag of the connection is set.
 
 3.4 create_game
+
+Flags:
+	login needed
+Parameters:
+	Description (string)
+	Password (string)
+	Number of players (int)
+Valid response codes:
+	ok
+
+A game with the given parameters is created. The client is set as creator of the
+game and joins it automatically. The "accepts game list changes" flag of the connection
+is unset.
+
 3.5 join_game
+
+Flags:
+	login needed
+Parameters:
+	Game ID (int)
+	Password (string)
+Valid response codes:
+	ok
+	password
+
+If the password for the given game is correct, the client leaves the current game
+(if any) and joins the given game. The "accepts game list changes" flag of the connection
+is unset.
+
 3.6 leave_game
+
+Flags:
+	login needed
+	game needed
+Parameters:
+	none
+Valid response codes:
+	ok
+	
+The client leaves the current game.
+
 3.7 list_players
+
+Flags:
+	login needed
+	game needed
+Parameters:
+	none
+
+
 3.8 say
 3.9 submit_deck
 3.10 ready_start
