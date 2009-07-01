@@ -139,8 +139,8 @@ void MainWindow::updateSceneSize()
 {
 	QRectF sr = scene->sceneRect();
 	QSizeF zoneSize = zoneLayout->size();
-	qDebug(QString("updateSceneSize: width=%1").arg(952 + zoneSize.width()).toLatin1());
-	scene->setSceneRect(sr.x(), sr.y(), 952 + zoneSize.width(), sr.height());
+	qDebug(QString("updateSceneSize: width=%1").arg(1096 + zoneSize.width()).toLatin1());
+	scene->setSceneRect(sr.x(), sr.y(), 1096 + zoneSize.width(), sr.height());
 	view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
 
@@ -232,13 +232,13 @@ MainWindow::MainWindow(QWidget *parent)
 //	db->importOracleDir();
 //	db->saveToFile("../cards.dat");
 
-	scene = new QGraphicsScene(0, 0, 952, 1024, this);
+	scene = new QGraphicsScene(0, 0, 1096, 1024, this);
 	view = new GameView(scene);
 
 //	view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
 	zoneLayout = new ZoneViewLayout(db);
-	zoneLayout->setPos(952, 0);
+	zoneLayout->setPos(1096, 0);
 	scene->addItem(zoneLayout);
 	connect(zoneLayout, SIGNAL(sizeChanged()), this, SLOT(updateSceneSize()));
 

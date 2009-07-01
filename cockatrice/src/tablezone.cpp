@@ -4,7 +4,7 @@
 #include "client.h"
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "table", true, false, parent), width(720), height(510)
+	: CardZone(_p, "table", true, false, parent), width(864), height(510)
 {
 	cards = new CardList(true);
 }
