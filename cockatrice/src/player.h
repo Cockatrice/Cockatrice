@@ -12,6 +12,7 @@ class QMenu;
 class QAction;
 class PlayerArea;
 class ZoneViewZone;
+class Game;
 
 class Player : public QObject {
 	Q_OBJECT
@@ -57,7 +58,7 @@ public:
 	PlayerArea *area;
 	Client *client;
 	void addZone(CardZone *z);
-	Player(const QString &_name, int _id, QPointF _base, bool _local, CardDatabase *_db, Client *_client, QGraphicsScene *_scene);
+	Player(const QString &_name, int _id, QPointF _base, bool _local, CardDatabase *_db, Client *_client, QGraphicsScene *_scene, Game *_parent);
 	~Player();
 	QMenu *getPlayerMenu() const { return playerMenu; }
 	int getId() const { return id; }

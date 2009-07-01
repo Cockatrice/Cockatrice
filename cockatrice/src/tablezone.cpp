@@ -31,7 +31,7 @@ void TableZone::addCardImpl(CardItem *card, int x, int y)
 	qDebug(QString("table: appended %1 at pos %2: zValue = %3, x = %4, y = %5").arg(card->getName()).arg(cards->size() - 1).arg(card->zValue()).arg(x).arg(y).toLatin1());
 	card->setParentItem(this);
 	card->setVisible(true);
-	card->update(card->boundingRect());
+	card->update();
 }
 
 void TableZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
@@ -55,9 +55,15 @@ void TableZone::reorganizeCards()
 
 void TableZone::toggleTapped()
 {
-	QListIterator<QGraphicsItem *> i(scene()->selectedItems());
-	while (i.hasNext()) {
-		CardItem *temp = (CardItem *) i.next();
-		setCardAttr(temp->getId(), "tapped", temp->getTapped() ? "0" : "1");
+	QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+	bool tapAll = false;
+	for (int i = 0; i < selectedItems.size(); i++)
+		if (!qgraphicsitem_cast<CardItem *>(selectedItems[i])->getTapped()) {
+			tapAll = true;
+			break;
+		}
+	for (int i = 0; i < selectedItems.size(); i++) {
+		CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItems[i]);
+		setCardAttr(temp->getId(), "tapped", (!temp->getTapped() || tapAll) ? "1" : "0");
 	}
 }

@@ -40,8 +40,6 @@ private slots:
 	void actEditMessages();
 
 	void showCardMenu(QPoint p);
-	void actTap();
-	void actUntap();
 	void actDoesntUntap();
 	void actFlip();
 	void actAddCounter();
@@ -54,6 +52,9 @@ private slots:
 	void gameEvent(const ServerEventData &msg);
 	void playerListReceived(QList<ServerPlayer *> playerList);
 	void readyStart();
+public slots:
+	void actTap();
+	void actUntap();
 signals:
 	void submitDecklist();
 	void hoverCard(QString name);

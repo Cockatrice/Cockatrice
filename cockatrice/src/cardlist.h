@@ -1,8 +1,9 @@
 #ifndef CARDLIST_H
 #define CARDLIST_H
 
-#include "carditem.h"
 #include <QList>
+
+class CardItem;
 
 class CardList : public QList<CardItem *> {
 protected:

@@ -15,7 +15,6 @@ bool ReturnMessage::send(ReturnCode code)
 		case ReturnSyntaxError: returnCodeString = "syntax"; break;
 		case ReturnContextError: returnCodeString = "context"; break;
 		case ReturnPasswordWrong: returnCodeString = "password"; break;
-		case ReturnNameNotFound: returnCodeString = "name_not_found"; break;
 	}
 	s->msg(QString("resp|%1|%2|%3").arg(msg_id)
 				       .arg(success ? "ok" : "err")

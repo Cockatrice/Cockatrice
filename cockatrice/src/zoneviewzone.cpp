@@ -75,7 +75,7 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
 	cards->insert(x, card);
 	card->setParentItem(this);
-	card->update(card->boundingRect());
+	card->update();
 }
 
 void ZoneViewZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
@@ -89,8 +89,7 @@ void ZoneViewZone::removeCard(int position)
 	if (position >= cards->size())
 		return;
 
-	CardItem *card = cards->at(position);
-	cards->removeAt(position);
+	CardItem *card = cards->takeAt(position);
 	delete card;
 	reorganizeCards();
 }
