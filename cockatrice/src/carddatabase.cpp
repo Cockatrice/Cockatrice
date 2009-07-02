@@ -150,6 +150,7 @@ QPixmap *CardInfo::getPixmap(QSize size)
 			return 0;
 		else {
 			result = new QPixmap(size);
+			result->fill(Qt::transparent);
 			QSvgRenderer svg(QString(":/back.svg"));
 			QPainter painter(result);
 			svg.render(&painter, QRectF(0, 0, size.width(), size.height()));
