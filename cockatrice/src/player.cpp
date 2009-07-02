@@ -4,6 +4,7 @@
 #include "playerarea.h"
 #include "counter.h"
 #include "zoneviewzone.h"
+#include "zoneviewwidget.h"
 #include "game.h"
 #include <QGraphicsScene>
 #include <QMenu>
@@ -157,7 +158,7 @@ void Player::gameEvent(const ServerEventData &event)
 			// Clean up existing zones first
 			for (int i = 0; i < zones.size(); i++) {
 				if (ZoneViewZone *view = zones.at(i)->getView())
-					emit closeZoneView(view);
+					((ZoneViewWidget *) view->parentItem())->close();
 				zones.at(i)->clearContents();
 			}
 

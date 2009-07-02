@@ -36,7 +36,7 @@ void ZoneViewLayout::toggleZoneView(Player *player, const QString &zoneName, int
 	for (int i = 0; i < views.size(); i++) {
 		ZoneViewZone *temp = views[i]->getZone();
 		if ((temp->getName() == zoneName) && (temp->getPlayer() == player)) { // view is already open
-			removeItem(views[i]);
+			views[i]->close();
 			if (temp->getNumberCards() == numberCards)
 				return;
 		}
@@ -51,7 +51,7 @@ void ZoneViewLayout::toggleZoneView(Player *player, const QString &zoneName, int
 void ZoneViewLayout::removeItem(ZoneViewWidget *item)
 {
 	qDebug("ZoneViewLayout::removeItem");
-	delete views.takeAt(views.indexOf(item));
+	views.removeAt(views.indexOf(item));
 	reorganize();
 }
 

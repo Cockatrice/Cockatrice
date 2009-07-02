@@ -69,5 +69,6 @@ void ZoneViewWidget::closeEvent(QCloseEvent *event)
 		if (shuffleCheckBox->isChecked())
 			player->client->shuffle();
 	emit closePressed(this);
+	deleteLater();
 	event->accept();
 }
