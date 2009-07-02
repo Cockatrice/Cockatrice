@@ -51,7 +51,7 @@ void ZoneViewLayout::toggleZoneView(Player *player, const QString &zoneName, int
 void ZoneViewLayout::removeItem(ZoneViewWidget *item)
 {
 	qDebug("ZoneViewLayout::removeItem");
-	views.removeAt(views.indexOf(item));
+	delete views.takeAt(views.indexOf(item));
 	reorganize();
 }
 
