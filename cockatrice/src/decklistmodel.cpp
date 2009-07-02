@@ -19,6 +19,7 @@ DeckListModel::DeckListModel(CardDatabase *_db, QObject *parent)
 
 DeckListModel::~DeckListModel()
 {
+	delete root;
 }
 
 
@@ -283,6 +284,7 @@ void DeckListModel::sort(int /*column*/, Qt::SortOrder order)
 
 void DeckListModel::cleanList()
 {
+	root->clearTree();
 	deckList->cleanList();
 	reset();
 }
