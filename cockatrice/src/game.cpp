@@ -87,8 +87,6 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	connect(aRemoveCounter, SIGNAL(triggered()), this, SLOT(actRemoveCounter()));
 	aSetCounters = new QAction(tr("&Set counters..."), this);
 	connect(aSetCounters, SIGNAL(triggered()), this, SLOT(actSetCounters()));
-	aRearrange = new QAction(tr("&Rearrange"), this);
-	connect(aRearrange, SIGNAL(triggered()), this, SLOT(actRearrange()));
 
 	cardMenu->addAction(aTap);
 	cardMenu->addAction(aUntap);
@@ -99,8 +97,6 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	cardMenu->addAction(aAddCounter);
 	cardMenu->addAction(aRemoveCounter);
 	cardMenu->addAction(aSetCounters);
-	cardMenu->addSeparator();
-	cardMenu->addAction(aRearrange);
 
 	dlgStartGame = new DlgStartGame(db);
 	connect(dlgStartGame, SIGNAL(newDeckLoaded(const QStringList &)), client, SLOT(submitDeck(const QStringList &)));
@@ -411,32 +407,6 @@ void Game::actSetCounters()
 	while (i.hasNext()) {
 		CardItem *temp = (CardItem *) i.next();
 		client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "counters", QString::number(number));
-	}
-}
-
-void Game::actRearrange()
-{
-	// nur sinnvoll bei Karten auf dem Tisch -> Einschränkung einbauen
-	int x, y, x_initial = 0, y_initial = 0;
-	QList<QGraphicsItem *> list = scene->selectedItems();
-
-	// Find coordinates of leftmost card
-	for (int i = 0; i < list.size(); i++) {
-		CardItem *temp = (CardItem *) list.at(i);
-		if ((temp->pos().x() < x_initial) || (x_initial == 0)) {
-			x_initial = (int) temp->pos().x();
-			y_initial = (int) temp->pos().y();
-		}
-	}
-	x = x_initial;
-	y = y_initial;
-
-	for (int i = 0; i < list.size(); i++) {
-		CardItem *temp = (CardItem *) list.at(i);
-		QString zoneName = qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName();
-		x = x_initial + i * RASTER_WIDTH;
-		y = y_initial + (i % 3) * RASTER_HEIGHT;
-		client->moveCard(temp->getId(), zoneName, zoneName, x, y);
 	}
 }
 

@@ -3,19 +3,22 @@
 
 #include "cardzone.h"
 
-const int GRID_WIDTH = 30;
-const int GRID_HEIGHT = 30;
-
 class TableZone : public CardZone {
 private:
 	int width, height;
 public:
+	static const int gridPointsPerCardX = 2;
+	static const int gridPointsPerCardY = 3;
+
 	TableZone(Player *_p, QGraphicsItem *parent = 0);
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	void reorganizeCards();
 	void toggleTapped();
 	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
+	CardItem *getCardFromGrid(const QPoint &gridPoint) const;
+	QPointF mapFromGrid(const QPoint &gridPoint) const;
+	QPoint mapToGrid(const QPointF &mapPoint) const;
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
 };

@@ -9,8 +9,6 @@ class CardZone;
 
 const int CARD_WIDTH = 72;
 const int CARD_HEIGHT = 102;
-const int RASTER_WIDTH = 36;
-const int RASTER_HEIGHT = 34;
 
 const int MAX_COUNTERS_ON_CARD = 999;
 

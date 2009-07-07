@@ -14,6 +14,7 @@ private:
 	QPointF hotSpot;
 	bool faceDown;
 	QList<CardDragItem *> childDrags;
+	CardZone *currentZone;
 public:
 	enum { Type = typeCardDrag };
 	int type() const { return Type; }
@@ -23,6 +24,7 @@ public:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QPointF getHotSpot() const { return hotSpot; }
 	void addChildDrag(CardDragItem *child);
+	void updatePosition(const QPointF &cursorScenePos);
 protected:
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);

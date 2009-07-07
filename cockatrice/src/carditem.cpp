@@ -128,7 +128,7 @@ CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPoin
 	deleteDragItem();
 	dragItem = new CardDragItem(this, _id, _pos, faceDown);
 	scene()->addItem(dragItem);
-	dragItem->setPos(_scenePos - dragItem->getHotSpot());
+	dragItem->updatePosition(_scenePos/* - dragItem->getHotSpot()*/);
 
 	return dragItem;
 }
