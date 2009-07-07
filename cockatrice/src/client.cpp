@@ -111,21 +111,20 @@ void Client::readLine()
 			} else
 				emit gameEvent(event);
 		} else if (prefix == "resp") {
+			if (values.size() != 2) {
+				// XXX
+			}
 			bool ok;
 			int msgid = values.takeFirst().toInt(&ok);
 			if (!ok) {
 				// XXX
 			}
 
-			if (values.empty()) {
-				// XXX
-			}
-
 			ServerResponse resp;
 			if (values[0] == "ok")
 				resp = RespOk;
-			else if (values[1] == "password")
-				resp  = RespPassword;
+			else if (values[0] == "password")
+				resp = RespPassword;
 			else
 				resp = RespErr;
 			emit responseReceived(msgid, resp);

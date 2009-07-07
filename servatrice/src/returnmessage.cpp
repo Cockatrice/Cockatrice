@@ -6,20 +6,18 @@ bool ReturnMessage::send(ReturnCode code)
 	ServerSocket *s = qobject_cast<ServerSocket *>(parent());
 	if (!s)
 		return false;
-	bool success = (code == ReturnOk);
 	QString returnCodeString;
 	switch (code) {
 		case ReturnNothing: return true;
-		case ReturnOk: break;
+		case ReturnOk: returnCodeString = "ok"; break;
 		case ReturnLoginNeeded: returnCodeString = "login_needed"; break;
 		case ReturnSyntaxError: returnCodeString = "syntax"; break;
 		case ReturnContextError: returnCodeString = "context"; break;
 		case ReturnPasswordWrong: returnCodeString = "password"; break;
 	}
-	s->msg(QString("resp|%1|%2|%3").arg(msg_id)
-				       .arg(success ? "ok" : "err")
-				       .arg(returnCodeString));
-	return success;
+	s->msg(QString("resp|%1|%2").arg(msg_id)
+				    .arg(returnCodeString));
+	return (code == ReturnOk);
 }
 
 bool ReturnMessage::sendList(const QStringList &args)
