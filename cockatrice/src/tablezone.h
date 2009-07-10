@@ -6,6 +6,7 @@
 class TableZone : public CardZone {
 private:
 	int width, height;
+	QList<QList<QPoint> > gridPoints;
 public:
 	static const int gridPointsPerCardX = 2;
 	static const int gridPointsPerCardY = 3;
@@ -19,6 +20,7 @@ public:
 	CardItem *getCardFromGrid(const QPoint &gridPoint) const;
 	QPointF mapFromGrid(const QPoint &gridPoint) const;
 	QPoint mapToGrid(const QPointF &mapPoint) const;
+	QPoint getFreeGridPoint(int row) const;
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
 };

@@ -8,7 +8,7 @@
 #include "player.h"
 
 CardItem::CardItem(CardDatabase *_db, const QString &_name, int _cardid, QGraphicsItem *parent)
-	: AbstractGraphicsItem(parent), db(_db), name(_name), id(_cardid), tapped(false), attacking(false), facedown(false), counters(0), doesntUntap(false), dragItem(NULL)
+	: AbstractGraphicsItem(parent), db(_db), info(db->getCard(_name)), name(_name), id(_cardid), tapped(false), attacking(false), facedown(false), counters(0), doesntUntap(false), dragItem(NULL)
 {
 	setCursor(Qt::OpenHandCursor);
 	setFlag(ItemIsSelectable);
@@ -34,7 +34,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 	QSizeF translatedSize = option->matrix.mapRect(boundingRect()).size();
 	if (tapped)
 		translatedSize.transpose();
-	QPixmap *translatedPixmap = db->getCard(name)->getPixmap(translatedSize.toSize());
+	QPixmap *translatedPixmap = info->getPixmap(translatedSize.toSize());
 	painter->save();
 	if (translatedPixmap) {
 		painter->resetTransform();
@@ -70,6 +70,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 void CardItem::setName(const QString &_name)
 {
 	name = _name;
+	info = db->getCard(name);
 	update();
 }
 
@@ -128,7 +129,7 @@ CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPoin
 	deleteDragItem();
 	dragItem = new CardDragItem(this, _id, _pos, faceDown);
 	scene()->addItem(dragItem);
-	dragItem->updatePosition(_scenePos/* - dragItem->getHotSpot()*/);
+	dragItem->updatePosition(_scenePos);
 
 	return dragItem;
 }
@@ -181,11 +182,6 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent */*event*/)
 
 void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-	if (!isSelected()) {
-		// Unselect all items, then select this one
-		scene()->setSelectionArea(QPainterPath());
-		setSelected(true);
-	}
 	event->accept();
 
 	CardZone *zone = (CardZone *) parentItem();
@@ -193,7 +189,11 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 	if (!zone->getPlayer()->getLocal())
 		return;
 
-	if (zone->getHasCardAttr())
+	if (zone->getName() == "hand") {
+		TableZone *table = (TableZone *) zone->getPlayer()->getZones()->findZone("table");
+		QPoint gridPoint = table->getFreeGridPoint(info->getTableRow());
+		table->handleDropEvent(id, zone, table->mapFromGrid(gridPoint).toPoint(), false);
+	} else if (zone->getName() == "table")
 		((TableZone *) zone)->toggleTapped();
 }
 

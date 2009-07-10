@@ -60,6 +60,7 @@ public:
 	QString getPowTough() const { return powtough; }
 	QStringList getText() const { return text; }
 	QString getMainCardType() const;
+	int getTableRow() const;
 	void addToSet(CardSet *set);
 	QPixmap *loadPixmap();
 	QPixmap *getPixmap(QSize size);

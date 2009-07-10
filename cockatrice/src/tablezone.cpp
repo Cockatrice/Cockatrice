@@ -4,9 +4,52 @@
 #include "client.h"
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "table", true, false, parent), width(864), height(510)
+	: CardZone(_p, "table", true, false, parent), width(864), height(578)
 {
 	cards = new CardList(true);
+	
+	gridPoints << (QList<QPoint>() << QPoint(8, 12)
+				       << QPoint(9, 13)
+				       << QPoint(10, 14)
+				       << QPoint(12, 12)
+				       << QPoint(13, 13)
+				       << QPoint(14, 14)
+				       << QPoint(4, 12)
+				       << QPoint(5, 13)
+				       << QPoint(6, 14)
+				       << QPoint(16, 12)
+				       << QPoint(17, 13)
+				       << QPoint(18, 14)
+				       << QPoint(0, 12)
+				       << QPoint(1, 13)
+				       << QPoint(2, 14)
+				       << QPoint(20, 12)
+				       << QPoint(21, 13)
+				       << QPoint(22, 14))
+		   << (QList<QPoint>() << QPoint(10, 8)
+				       << QPoint(13, 8)
+				       << QPoint(7, 8)
+				       << QPoint(16, 8)
+				       << QPoint(4, 8)
+				       << QPoint(19, 8)
+				       << QPoint(1, 8)
+				       << QPoint(22, 8))
+		   << (QList<QPoint>() << QPoint(10, 4)
+				       << QPoint(13, 4)
+				       << QPoint(7, 4)
+				       << QPoint(16, 4)
+				       << QPoint(4, 4)
+				       << QPoint(19, 4)
+				       << QPoint(1, 4)
+				       << QPoint(22, 4))
+		   << (QList<QPoint>() << QPoint(10, 0)
+				       << QPoint(13, 0)
+				       << QPoint(7, 0)
+				       << QPoint(16, 0)
+				       << QPoint(4, 0)
+				       << QPoint(19, 0)
+				       << QPoint(1, 0)
+				       << QPoint(22, 0));
 }
 
 QRectF TableZone::boundingRect() const
@@ -31,8 +74,8 @@ void TableZone::addCardImpl(CardItem *card, int _x, int _y)
 			y = height - CARD_HEIGHT - y;
 		card->setPos(x, y);
 //	}
+	card->setGridPoint(QPoint(_x, _y));
 	card->setZValue((y + CARD_HEIGHT) * width + x + 1000);
-	qDebug(QString("table: appended %1 at pos %2: zValue = %3, x = %4, y = %5").arg(card->getName()).arg(cards->size() - 1).arg(card->zValue()).arg(x).arg(y).toLatin1());
 	card->setParentItem(this);
 	card->setVisible(true);
 	card->update();
@@ -65,7 +108,10 @@ void TableZone::toggleTapped()
 
 CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
 {
-
+	for (int i = 0; i < cards->size(); i++)
+		if (cards->at(i)->getGridPoint() == gridPoint)
+			return cards->at(i);
+	return 0;
 }
 
 QPointF TableZone::mapFromGrid(const QPoint &gridPoint) const
@@ -88,4 +134,15 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 		y = height - CARD_HEIGHT;
 	
 	return QPoint(round(((double) x * gridPointsPerCardX) / CARD_WIDTH), round(((double) y * gridPointsPerCardY) / CARD_HEIGHT));
+}
+
+QPoint TableZone::getFreeGridPoint(int row) const
+{
+	Q_ASSERT(row < gridPoints.size());
+	
+	QList<QPoint> pointList = gridPoints[row];
+	for (int i = 0; i < pointList.size(); i++)
+		if (!getCardFromGrid(pointList[i]))
+			return pointList[i];
+	return QPoint(0, 0);
 }

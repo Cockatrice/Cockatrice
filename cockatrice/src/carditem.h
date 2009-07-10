@@ -6,6 +6,7 @@
 class CardDatabase;
 class CardDragItem;
 class CardZone;
+class CardInfo;
 
 const int CARD_WIDTH = 72;
 const int CARD_HEIGHT = 102;
@@ -22,6 +23,7 @@ enum CardItemType {
 class CardItem : public AbstractGraphicsItem {
 private:
 	CardDatabase *db;
+	CardInfo *info;
 	QString name;
 	int id;
 	bool tapped;
@@ -30,6 +32,7 @@ private:
 	int counters;
 	QString annotation;
 	bool doesntUntap;
+	QPoint gridPoint;
 	CardDragItem *dragItem;
 public:
 	enum { Type = typeCard };
@@ -38,6 +41,8 @@ public:
 	~CardItem();
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+	QPoint getGridPoint() const { return gridPoint; }
+	void setGridPoint(const QPoint &_gridPoint) { gridPoint = _gridPoint; }
 	int getId() const { return id; }
 	void setId(int _id) { id = _id; }
 	QString getName() const { return name; }

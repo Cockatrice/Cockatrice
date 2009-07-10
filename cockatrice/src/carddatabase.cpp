@@ -104,6 +104,18 @@ QString CardInfo::getMainCardType() const
 	return result;
 }
 
+int CardInfo::getTableRow() const
+{
+	QString mainCardType = getMainCardType();
+	if (mainCardType == "Land")
+		return 0;
+	if ((mainCardType == "Sorcery") || (mainCardType == "Instant"))
+		return 2;
+	if (mainCardType == "Creature")
+		return 3;
+	return 1;
+}
+
 void CardInfo::addToSet(CardSet *set)
 {
 	set->append(this);
@@ -337,7 +349,6 @@ int CardDatabase::loadFromFile(const QString &fileName)
 
 	clear();
 	setHash.reserve(setCount);
-	qDebug(QString("setCount = %1").arg(setCount).toLatin1());
 	for (unsigned int i = 0; i < setCount; i++) {
 		CardSet *newSet = new CardSet;
 		newSet->loadFromStream(in);

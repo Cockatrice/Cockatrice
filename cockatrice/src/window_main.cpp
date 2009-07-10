@@ -232,7 +232,7 @@ MainWindow::MainWindow(QWidget *parent)
 //	db->importOracleDir();
 //	db->saveToFile("../cards.dat");
 
-	scene = new QGraphicsScene(0, 0, 1096, 1024, this);
+	scene = new QGraphicsScene(0, 0, 1096, 1160, this);
 	view = new GameView(scene);
 
 //	view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));

@@ -11,7 +11,7 @@ HandZone::HandZone(Player *_p, QGraphicsItem *parent)
 
 QRectF HandZone::boundingRect() const
 {
-	return QRectF(0, 0, 100, 510);
+	return QRectF(0, 0, 100, 578);
 }
 
 void HandZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
