@@ -372,7 +372,7 @@ void Game::actFlip()
 	while (i.hasNext()) {
 		CardItem *temp = (CardItem *) i.next();
 		QString zone = qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName();
-		client->moveCard(temp->getId(), zone, zone, temp->pos().x(), temp->pos().y(), !temp->getFaceDown());
+		client->moveCard(temp->getId(), zone, zone, temp->getGridPoint().x(), temp->getGridPoint().y(), !temp->getFaceDown());
 	}
 }
 
