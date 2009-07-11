@@ -29,6 +29,8 @@ GameSelector::GameSelector(Client *_client, QWidget *parent)
 	connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
 
 	connect(client, SIGNAL(gameListEvent(ServerGame *)), gameListModel, SLOT(updateGameList(ServerGame *)));
+	connect(client, SIGNAL(statusChanged(ProtocolStatus)), this, SLOT(statusChanged(ProtocolStatus)));
+
 	client->listGames();
 }
 
@@ -42,6 +44,12 @@ void GameSelector::actCreate()
 void GameSelector::actRefresh()
 {
 	client->listGames();
+}
+
+void GameSelector::statusChanged(ProtocolStatus status)
+{
+	if (status == StatusDisconnected)
+		deleteLater();
 }
 
 void GameSelector::checkResponse(ServerResponse response)

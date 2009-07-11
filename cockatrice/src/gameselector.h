@@ -18,6 +18,7 @@ private slots:
 	void actRefresh();
 	void actJoin();
 	void checkResponse(ServerResponse response);
+	void statusChanged(ProtocolStatus status);
 private:
 	Client *client;
 
