@@ -69,7 +69,6 @@ protected:
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 	void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-	void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 	QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
 };
 

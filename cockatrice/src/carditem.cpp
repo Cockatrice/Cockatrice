@@ -189,23 +189,19 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 	if (!zone->getPlayer()->getLocal())
 		return;
 
-	if (zone->getName() == "hand") {
+	if (zone->getName() == "table")
+		((TableZone *) zone)->toggleTapped();
+	else {
 		TableZone *table = (TableZone *) zone->getPlayer()->getZones()->findZone("table");
 		QPoint gridPoint = table->getFreeGridPoint(info->getTableRow());
 		table->handleDropEvent(id, zone, table->mapFromGrid(gridPoint).toPoint(), false);
-	} else if (zone->getName() == "table")
-		((TableZone *) zone)->toggleTapped();
+	}
 }
 
 void CardItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
 	((CardZone *) parentItem())->hoverCardEvent(this);
 	QGraphicsItem::hoverEnterEvent(event);
-}
-
-void CardItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-	QGraphicsItem::hoverLeaveEvent(event);
 }
 
 QVariant CardItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)

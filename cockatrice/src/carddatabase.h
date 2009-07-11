@@ -34,7 +34,6 @@ public:
 
 class CardInfo {
 private:
-	class SetCompareFunctor;
 	CardDatabase *db;
 
 	QString name;
