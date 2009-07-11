@@ -54,8 +54,8 @@ void SetList::sortByKey()
 	qSort(begin(), end(), CompareFunctor());
 }
 
-CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QString &_text, const SetList &_sets)
-	: db(_db), name(_name), sets(_sets), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), pixmap(NULL)
+CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QString &_text, int _tableRow, const SetList &_sets)
+	: db(_db), name(_name), sets(_sets), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), tableRow(_tableRow), pixmap(NULL)
 {
 	for (int i = 0; i < sets.size(); i++)
 		sets[i]->append(this);
@@ -102,18 +102,6 @@ QString CardInfo::getMainCardType() const
 	*/
 
 	return result;
-}
-
-int CardInfo::getTableRow() const
-{
-	QString mainCardType = getMainCardType();
-	if (mainCardType == "Land")
-		return 0;
-	if ((mainCardType == "Sorcery") || (mainCardType == "Instant"))
-		return 2;
-	if (mainCardType == "Creature")
-		return 3;
-	return 1;
 }
 
 void CardInfo::addToSet(CardSet *set)
@@ -186,6 +174,7 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 	xml.writeTextElement("type", info->getCardType());
 	if (!info->getPowTough().isEmpty())
 		xml.writeTextElement("pt", info->getPowTough());
+	xml.writeTextElement("tablerow", QString::number(info->getTableRow()));
 	xml.writeTextElement("text", info->getText());
 	xml.writeEndElement(); // card
 	
@@ -293,6 +282,17 @@ void CardDatabase::importOracleFile(const QString &fileName, CardSet *set)
 			card = cardHash.value(cardname);
 		else {
 			card = new CardInfo(this, cardname, manacost, cardtype, powtough, text.join("\n"));
+			
+			int tableRow = 1;
+			QString mainCardType = card->getMainCardType();
+			if (mainCardType == "Land")
+				tableRow = 0;
+			else if ((mainCardType == "Sorcery") || (mainCardType == "Instant"))
+				tableRow = 2;
+			else if (mainCardType == "Creature")
+				tableRow = 3;
+			card->setTableRow(tableRow);
+			
 			cardHash.insert(cardname, card);
 		}
 		card->addToSet(set);
@@ -348,6 +348,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 		if (xml.name() == "card") {
 			QString name, manacost, type, pt, text;
 			SetList sets;
+			int tableRow = 0;
 			while (!xml.atEnd()) {
 				if (xml.readNext() == QXmlStreamReader::EndElement)
 					break;
@@ -363,8 +364,10 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 					text = xml.readElementText();
 				else if (xml.name() == "set")
 					sets << getSet(xml.readElementText());
+				else if (xml.name() == "tablerow")
+					tableRow = xml.readElementText().toInt();
 			}
-			cardHash.insert(name, new CardInfo(this, name, manacost, type, pt, text, sets));
+			cardHash.insert(name, new CardInfo(this, name, manacost, type, pt, text, tableRow, sets));
 		}
 	}
 }
