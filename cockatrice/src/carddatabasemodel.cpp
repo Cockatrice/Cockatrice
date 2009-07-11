@@ -40,7 +40,7 @@ QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
 				setList << sets[i]->getShortName();
 			return setList.join(", ");
 		}
-		case 2: return card->getManacost();
+		case 2: return card->getManaCost();
 		case 3: return card->getCardType();
 		case 4: return card->getPowTough();
 		default: return QVariant();
@@ -75,7 +75,7 @@ public:
 		switch (column) {
 			case 0: result = (a->getName() < b->getName()); break;
 			case 1: result = (a->getSets().at(0)->getShortName() < b->getSets().at(0)->getShortName()); break;
-			case 2: result = (a->getManacost() < b->getManacost()); break;
+			case 2: result = (a->getManaCost() < b->getManaCost()); break;
 			case 3: result = (a->getCardType() < b->getCardType()); break;
 			case 4: result = (a->getPowTough() < b->getPowTough()); break;
 			default: result = false;

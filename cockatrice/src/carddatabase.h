@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QDataStream>
 #include <QList>
+#include <QXmlStreamReader>
 
 class CardDatabase;
 class CardInfo;
@@ -21,8 +22,6 @@ public:
 	int getSortKey() const { return sortKey; }
 	void setSortKey(unsigned int _sortKey);
 	void updateSortKey();
-	void loadFromStream(QDataStream &stream);
-	void saveToStream(QDataStream &stream);
 };
 
 class SetList : public QList<CardSet *> {
@@ -41,7 +40,7 @@ private:
 	QString manacost;
 	QString cardtype;
 	QString powtough;
-	QStringList text;
+	QString text;
 	QPixmap *pixmap;
 	QMap<int, QPixmap *> scaledPixmapCache;
 public:
@@ -50,21 +49,20 @@ public:
 		const QString &_manacost = QString(),
 		const QString &_cardtype = QString(),
 		const QString &_powtough = QString(),
-		const QStringList &_text = QStringList());
+		const QString &_text = QString(),
+		const SetList &_sets = SetList());
 	~CardInfo();
 	QString getName() const { return name; }
 	SetList getSets() const { return sets; }
-	QString getManacost() const { return manacost; }
+	QString getManaCost() const { return manacost; }
 	QString getCardType() const { return cardtype; }
 	QString getPowTough() const { return powtough; }
-	QStringList getText() const { return text; }
+	QString getText() const { return text; }
 	QString getMainCardType() const;
 	int getTableRow() const;
 	void addToSet(CardSet *set);
 	QPixmap *loadPixmap();
 	QPixmap *getPixmap(QSize size);
-	void loadFromStream(QDataStream &stream);
-	void saveToStream(QDataStream &stream);
 };
 
 class CardDatabase {
@@ -74,6 +72,9 @@ private:
 	CardInfo *noCard;
 	static const unsigned int magicNumber = 0x12345678;
 	static const unsigned int fileVersion = 1;
+	
+	void loadCardsFromXml(QXmlStreamReader &xml);
+	void loadSetsFromXml(QXmlStreamReader &xml);
 public:
 	CardDatabase();
 	~CardDatabase();

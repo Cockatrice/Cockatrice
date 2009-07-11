@@ -13,16 +13,14 @@ CardSet::CardSet(const QString &_shortName, const QString &_longName)
 	updateSortKey();
 }
 
-void CardSet::loadFromStream(QDataStream &stream)
+QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
 {
-	stream >> shortName >> longName;
-	updateSortKey();
-	qDebug(QString("set loaded: %1, %2").arg(shortName).arg(longName).toLatin1());
-}
+	xml.writeStartElement("set");
+	xml.writeTextElement("name", set->getShortName());
+	xml.writeTextElement("longname", set->getLongName());
+	xml.writeEndElement();
 
-void CardSet::saveToStream(QDataStream &stream)
-{
-	stream << shortName << longName;
+	return xml;
 }
 
 void CardSet::setSortKey(unsigned int _sortKey)
@@ -56,9 +54,11 @@ void SetList::sortByKey()
 	qSort(begin(), end(), CompareFunctor());
 }
 
-CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QStringList &_text)
-	: db(_db), name(_name), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), pixmap(NULL)
+CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QString &_text, const SetList &_sets)
+	: db(_db), name(_name), sets(_sets), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), pixmap(NULL)
 {
+	for (int i = 0; i < sets.size(); i++)
+		sets[i]->append(this);
 }
 
 CardInfo::~CardInfo()
@@ -173,32 +173,23 @@ QPixmap *CardInfo::getPixmap(QSize size)
 	return result;
 }
 
-void CardInfo::loadFromStream(QDataStream &stream)
+QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 {
-	QStringList setNames;
-	stream >> name
-	       >> setNames
-	       >> manacost
-	       >> cardtype
-	       >> powtough
-	       >> text;
-
-	for (int i = 0; i < setNames.size(); i++)
-		addToSet(db->getSet(setNames[i]));
-}
-
-void CardInfo::saveToStream(QDataStream &stream)
-{
-	QStringList setNames;
+	xml.writeStartElement("card");
+	xml.writeTextElement("name", info->getName());
+	
+	SetList sets = info->getSets();
 	for (int i = 0; i < sets.size(); i++)
-		setNames << sets[i]->getShortName();
-
-	stream << name
-	       << setNames
-	       << manacost
-	       << cardtype
-	       << powtough
-	       << text;
+		xml.writeTextElement("set", sets[i]->getShortName());
+	
+	xml.writeTextElement("manacost", info->getManaCost());
+	xml.writeTextElement("type", info->getCardType());
+	if (!info->getPowTough().isEmpty())
+		xml.writeTextElement("pt", info->getPowTough());
+	xml.writeTextElement("text", info->getText());
+	xml.writeEndElement(); // card
+	
+	return xml;
 }
 
 CardDatabase::CardDatabase()
@@ -301,7 +292,7 @@ void CardDatabase::importOracleFile(const QString &fileName, CardSet *set)
 		if (cardHash.contains(cardname))
 			card = cardHash.value(cardname);
 		else {
-			card = new CardInfo(this, cardname, manacost, cardtype, powtough, text);
+			card = new CardInfo(this, cardname, manacost, cardtype, powtough, text.join("\n"));
 			cardHash.insert(cardname, card);
 		}
 		card->addToSet(set);
@@ -329,64 +320,104 @@ void CardDatabase::importOracleDir()
 	qDebug(QString("CardDatabase: %1 cards imported").arg(cardHash.size()).toLatin1());
 }
 
+void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
+{
+	while (!xml.atEnd()) {
+		if (xml.readNext() == QXmlStreamReader::EndElement)
+			break;
+		if (xml.name() == "set") {
+			QString shortName, longName;
+			while (!xml.atEnd()) {
+				if (xml.readNext() == QXmlStreamReader::EndElement)
+					break;
+				if (xml.name() == "name")
+					shortName = xml.readElementText();
+				else if (xml.name() == "longname")
+					longName = xml.readElementText();
+			}
+			setHash.insert(shortName, new CardSet(shortName, longName));
+		}
+	}
+}
+
+void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
+{
+	while (!xml.atEnd()) {
+		if (xml.readNext() == QXmlStreamReader::EndElement)
+			break;
+		if (xml.name() == "card") {
+			QString name, manacost, type, pt, text;
+			SetList sets;
+			while (!xml.atEnd()) {
+				if (xml.readNext() == QXmlStreamReader::EndElement)
+					break;
+				if (xml.name() == "name")
+					name = xml.readElementText();
+				else if (xml.name() == "manacost")
+					manacost = xml.readElementText();
+				else if (xml.name() == "type")
+					type = xml.readElementText();
+				else if (xml.name() == "pt")
+					pt = xml.readElementText();
+				else if (xml.name() == "text")
+					text = xml.readElementText();
+				else if (xml.name() == "set")
+					sets << getSet(xml.readElementText());
+			}
+			cardHash.insert(name, new CardInfo(this, name, manacost, type, pt, text, sets));
+		}
+	}
+}
+
 int CardDatabase::loadFromFile(const QString &fileName)
 {
 	QFile file(fileName);
 	file.open(QIODevice::ReadOnly);
-	QDataStream in(&file);
-	in.setVersion(QDataStream::Qt_4_4);
-
-	quint32 _magicNumber, _fileVersion, setCount, cardCount;
-	in >> _magicNumber
-	   >> _fileVersion
-	   >> setCount
-	   >> cardCount;
-
-	if (_magicNumber != magicNumber)
-		return -1;
-	if (_fileVersion != fileVersion)
-		return -2;
-
+	QXmlStreamReader xml(&file);
 	clear();
-	setHash.reserve(setCount);
-	for (unsigned int i = 0; i < setCount; i++) {
-		CardSet *newSet = new CardSet;
-		newSet->loadFromStream(in);
-		setHash.insert(newSet->getShortName(), newSet);
+	while (!xml.atEnd()) {
+		if (xml.readNext() == QXmlStreamReader::StartElement) {
+			if (xml.name() != "cockatrice_carddatabase")
+				return false;
+			while (!xml.atEnd()) {
+				if (xml.readNext() == QXmlStreamReader::EndElement)
+					break;
+				if (xml.name() == "sets")
+					loadSetsFromXml(xml);
+				else if (xml.name() == "cards")
+					loadCardsFromXml(xml);
+			}
+		}
 	}
-	cardHash.reserve(cardCount);
-	for (unsigned int i = 0; i < cardCount; i++) {
-		CardInfo *newCard = new CardInfo(this);
-		newCard->loadFromStream(in);
-		cardHash.insert(newCard->getName(), newCard);
-	}
-	qDebug(QString("%1 cards in %2 sets loaded").arg(cardCount).arg(setHash.size()).toLatin1());
-
-	return cardCount;
+	qDebug(QString("%1 cards in %2 sets loaded").arg(cardHash.size()).arg(setHash.size()).toLatin1());
+	return cardHash.size();
 }
 
 bool CardDatabase::saveToFile(const QString &fileName)
 {
 	QFile file(fileName);
 	file.open(QIODevice::WriteOnly);
-	QDataStream out(&file);
-	out.setVersion(QDataStream::Qt_4_4);
+	QXmlStreamWriter xml(&file);
+	
+	xml.setAutoFormatting(true);
+	xml.writeStartDocument();
+	xml.writeStartElement("cockatrice_carddatabase");
+	xml.writeAttribute("version", "1");
 
-	out << (quint32) magicNumber
-	    << (quint32) fileVersion
-	    << (quint32) setHash.size()
-	    << (quint32) cardHash.size();
-
-	QHashIterator<QString, CardSet *> setIt(setHash);
-	while (setIt.hasNext()) {
-		setIt.next();
-		setIt.value()->saveToStream(out);
-	}
-	QHashIterator<QString, CardInfo *> i(cardHash);
-	while (i.hasNext()) {
-		i.next();
-		i.value()->saveToStream(out);
-	}
+	xml.writeStartElement("sets");
+	QHashIterator<QString, CardSet *> setIterator(setHash);
+	while (setIterator.hasNext())
+		xml << setIterator.next().value();
+	xml.writeEndElement(); // sets
+	
+	xml.writeStartElement("cards");
+	QHashIterator<QString, CardInfo *> cardIterator(cardHash);
+	while (cardIterator.hasNext())
+		xml << cardIterator.next().value();
+	xml.writeEndElement(); // cards
+	
+	xml.writeEndElement(); // cockatrice_carddatabase
+	xml.writeEndDocument();
 
 	return true;
 }

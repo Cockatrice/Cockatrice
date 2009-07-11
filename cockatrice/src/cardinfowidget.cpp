@@ -76,10 +76,10 @@ void CardInfoWidget::setCard(CardInfo *card)
 		cardPicture->setPixmap(*(db->getCard()->getPixmap(QSize(pixmapWidth, pixmapHeight))));
 
 	nameLabel2->setText(card->getName());
-	manacostLabel2->setText(card->getManacost());
+	manacostLabel2->setText(card->getManaCost());
 	cardtypeLabel2->setText(card->getCardType());
 	powtoughLabel2->setText(card->getPowTough());
-	textLabel->setText(card->getText().join("\n"));
+	textLabel->setText(card->getText());
 }
 
 void CardInfoWidget::setCard(const QString &cardName)

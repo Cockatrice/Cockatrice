@@ -228,9 +228,9 @@ MainWindow::MainWindow(QWidget *parent)
 	QPixmapCache::setCacheLimit(200000);
 
 	db = new CardDatabase;
-	db->loadFromFile("../cards.dat");
+	db->loadFromFile("../cards.xml");
 //	db->importOracleDir();
-//	db->saveToFile("../cards.dat");
+//	db->saveToFile("../cards.xml");
 
 	scene = new QGraphicsScene(0, 0, 1096, 1160, this);
 	view = new GameView(scene);
