@@ -56,7 +56,7 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	QLabel *nameLabel = new QLabel(tr("Deck &name:"));
 	nameEdit = new QLineEdit;
 	nameLabel->setBuddy(nameEdit);
-	connect(nameEdit, SIGNAL(textChanged(const QString &)), deckModel->getDeckList(), SLOT(setName(const QString &)));
+	connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateName(const QString &)));
 	QLabel *commentsLabel = new QLabel(tr("&Comments:"));
 	commentsEdit = new QTextEdit;
 	commentsEdit->setMaximumHeight(70);
@@ -146,9 +146,16 @@ WndDeckEditor::~WndDeckEditor()
 
 }
 
+void WndDeckEditor::updateName(const QString &name)
+{
+	deckModel->getDeckList()->setName(name);
+	setWindowModified(true);
+}
+
 void WndDeckEditor::updateComments()
 {
 	deckModel->getDeckList()->setComments(commentsEdit->toPlainText());
+	setWindowModified(true);
 }
 
 void WndDeckEditor::updateCardInfoLeft(const QModelIndex &current, const QModelIndex &/*previous*/)
@@ -219,6 +226,7 @@ void WndDeckEditor::actLoadDeck()
 		deckModel->sort(1);
 		deckView->expandAll();
 		deckView->resizeColumnToContents(0);
+		setWindowModified(false);
 	}
 }
 

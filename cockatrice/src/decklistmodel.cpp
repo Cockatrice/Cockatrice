@@ -353,10 +353,10 @@ void DeckListModel::printDeckList(QPrinter *printer)
 {
 	QTextDocument doc;
 
-/*	QFont font("Times");
+	QFont font("Serif");
 	font.setStyleHint(QFont::Serif);
 	doc.setDefaultFont(font);
-*/
+
 	QTextCursor cursor(&doc);
 
 	QTextBlockFormat headerBlockFormat;

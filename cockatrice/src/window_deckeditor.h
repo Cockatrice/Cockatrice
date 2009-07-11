@@ -17,6 +17,7 @@ class QTextEdit;
 class WndDeckEditor : public QMainWindow {
 	Q_OBJECT
 private slots:
+	void updateName(const QString &name);
 	void updateComments();
 	void updateCardInfoLeft(const QModelIndex &current, const QModelIndex &previous);
 	void updateCardInfoRight(const QModelIndex &current, const QModelIndex &previous);
