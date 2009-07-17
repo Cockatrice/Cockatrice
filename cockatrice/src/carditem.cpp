@@ -52,7 +52,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		painter->setFont(f);
 		painter->setBrush(QColor(200, 200, 200));
 		painter->setPen(QPen(Qt::black));
-		painter->drawRect(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1);
+		painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
 		painter->drawText(QRectF(5, 5, CARD_WIDTH - 15, CARD_HEIGHT - 15), Qt::AlignTop | Qt::AlignLeft | Qt::TextWordWrap, name);
 	}
 	painter->restore();

@@ -133,7 +133,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 	else if (y > height - CARD_HEIGHT)
 		y = height - CARD_HEIGHT;
 	
-	return QPoint(round(((double) x * gridPointsPerCardX) / CARD_WIDTH), round(((double) y * gridPointsPerCardY) / CARD_HEIGHT));
+	return QPoint((int) round(((double) x * gridPointsPerCardX) / CARD_WIDTH), (int) round(((double) y * gridPointsPerCardY) / CARD_HEIGHT));
 }
 
 QPoint TableZone::getFreeGridPoint(int row) const
