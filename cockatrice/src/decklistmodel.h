@@ -31,7 +31,7 @@ public:
 	DeckListModel(CardDatabase *_db, QObject *parent = 0);
 	~DeckListModel();
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	int columnCount(const QModelIndex &/*parent*/) const { return 2; }
+	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return 2; }
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
@@ -50,6 +50,7 @@ private:
 	InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
 	QModelIndex nodeToIndex(AbstractDecklistNode *node) const;
 	void emitRecursiveUpdates(const QModelIndex &index);
+	void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);
 	void debugIndexInfo(const QString &func, const QModelIndex &index) const;
 	void debugShowTree(InnerDecklistNode *node, int depth) const;
 	

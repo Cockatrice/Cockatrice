@@ -55,6 +55,7 @@ AbstractDecklistNode *InnerDecklistNode::findChild(const QString &name)
 
 int InnerDecklistNode::height() const
 {
+	Q_ASSERT(!isEmpty());
 	return at(0)->height() + 1;
 }
 
@@ -96,21 +97,36 @@ private:
 	Qt::SortOrder order;
 public:
 	compareFunctor(Qt::SortOrder _order) : order(_order) { }
-	inline bool operator()(AbstractDecklistNode *a, AbstractDecklistNode *b) const
+	inline bool operator()(QPair<int, AbstractDecklistNode *> a, QPair<int, AbstractDecklistNode *> b) const
 	{
-		return (order == Qt::AscendingOrder) ^ (a->compare(b));
+		return (order == Qt::AscendingOrder) ^ (a.second->compare(b.second));
 	}
 };
 
-void InnerDecklistNode::sort(Qt::SortOrder order)
+QVector<QPair<int, int> > InnerDecklistNode::sort(Qt::SortOrder order)
 {
-	compareFunctor cmp(order);
-	qSort(begin(), end(), cmp);
-	for (int i = 0; i < size(); i++) {
-		InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(at(i));
-		if (node)
-			node->sort(order);
+	QVector<QPair<int, int> > result(size());
+	
+	// Initialize temporary list with contents of current list
+	QVector<QPair<int, AbstractDecklistNode *> > tempList(size());
+	for (int i = size() - 1; i >= 0; --i) {
+		tempList[i].first = i;
+		tempList[i].second = at(i);
 	}
+	
+	// Sort temporary list
+	compareFunctor cmp(order);
+	qSort(tempList.begin(), tempList.end(), cmp);
+	
+	// Map old indexes to new indexes and
+	// copy temporary list to the current one
+	for (int i = size() - 1; i >= 0; --i) {
+		result[i].first = tempList[i].first;
+		result[i].second = i;
+		replace(i, tempList[i].second);
+	}
+
+	return result;
 }
 
 DeckList::DeckList(CardDatabase *_db, QObject *parent)

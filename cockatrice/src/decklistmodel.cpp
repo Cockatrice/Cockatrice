@@ -206,7 +206,6 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, int
 
 bool DeckListModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-	debugIndexInfo("removeRows", parent);
 	InnerDecklistNode *node = getNode<InnerDecklistNode *>(parent);
 	if (!node)
 		return false;
@@ -274,11 +273,36 @@ QModelIndex DeckListModel::nodeToIndex(AbstractDecklistNode *node) const
 	return createIndex(node->getParent()->indexOf(node), 0, node);
 }
 
+void DeckListModel::sortHelper(InnerDecklistNode *node, Qt::SortOrder order)
+{
+	// Sort children of node and save the information needed to
+	// update the list of persistent indexes.
+	QVector<QPair<int, int> > sortResult = node->sort(order);
+	
+	QModelIndexList from, to;
+	for (int i = sortResult.size() - 1; i >= 0; --i) {
+		const int fromRow = sortResult[i].first;
+		const int toRow = sortResult[i].second;
+		AbstractDecklistNode *temp = node->at(toRow);
+		for (int j = columnCount(); j; --j) {
+			from << createIndex(fromRow, 0, temp);
+			to << createIndex(toRow, 0, temp);
+		}
+	}
+	changePersistentIndexList(from, to);
+	
+	// Recursion
+	for (int i = node->size() - 1; i >= 0; --i) {
+		InnerDecklistNode *subNode = dynamic_cast<InnerDecklistNode *>(node->at(i));
+		if (subNode)
+			sortHelper(subNode, order);
+	}
+}
 
 void DeckListModel::sort(int /*column*/, Qt::SortOrder order)
 {
 	emit layoutAboutToBeChanged();
-	root->sort(order);
+	sortHelper(root, order);
 	emit layoutChanged();
 }
 

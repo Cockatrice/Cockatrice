@@ -2,6 +2,8 @@
 #define DECKLIST_H
 
 #include <QList>
+#include <QVector>
+#include <QPair>
 #include <QObject>
 
 class CardDatabase;
@@ -38,7 +40,7 @@ public:
 	int height() const;
 	int recursiveCount(bool countTotalCards = false) const;
 	bool compare(AbstractDecklistNode *other) const;
-	void sort(Qt::SortOrder order = Qt::AscendingOrder);
+	QVector<QPair<int, int> > sort(Qt::SortOrder order = Qt::AscendingOrder);
 };
 
 class AbstractDecklistCardNode : public AbstractDecklistNode {
