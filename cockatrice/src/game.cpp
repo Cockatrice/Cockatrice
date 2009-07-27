@@ -10,7 +10,6 @@
 #include "handzone.h"
 #include "carddatabase.h"
 #include "dlg_startgame.h"
-#include "dlg_editmessages.h"
 #include "playerarea.h"
 #include "counter.h"
 
@@ -54,9 +53,6 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	aCreateToken->setShortcut(tr("Ctrl+T"));
 	connect(aCreateToken, SIGNAL(triggered()), this, SLOT(actCreateToken()));
 	
-	aEditMessages = new QAction(tr("&Edit messages..."), this);
-	connect(aEditMessages, SIGNAL(triggered()), this, SLOT(actEditMessages()));
-
 	actionsMenu->addAction(aUntapAll);
 	actionsMenu->addSeparator();
 	actionsMenu->addAction(aDecLife);
@@ -115,8 +111,6 @@ Game::~Game()
 void Game::initSayMenu()
 {
 	sayMenu->clear();
-	sayMenu->addAction(aEditMessages);
-	sayMenu->addSeparator();
 
 	QSettings settings;
 	settings.beginGroup("messages");
@@ -323,13 +317,6 @@ void Game::actCreateToken()
 {
 	QString cardname = QInputDialog::getText(0, tr("Create token"), tr("Name:"));
 	client->createToken("table", cardname, QString(), 0, 0);
-}
-
-void Game::actEditMessages()
-{
-	DlgEditMessages dlg;
-	if (dlg.exec())
-		initSayMenu();
 }
 
 void Game::showCardMenu(QPoint p)

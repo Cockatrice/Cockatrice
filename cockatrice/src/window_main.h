@@ -56,6 +56,7 @@ private slots:
 	void actLeaveGame();
 	void actDeckEditor();
 	void actFullScreen(bool checked);
+	void actSettings();
 	void actExit();
 
 	void updateSceneSize();
@@ -66,7 +67,7 @@ private:
 	void createActions();
 	void createMenus();
 	QMenu *gameMenu, *actionsMenu, *cardMenu;
-	QAction *aConnect, *aDisconnect, *aRestartGame, *aLeaveGame, *aDeckEditor, *aFullScreen, *aExit;
+	QAction *aConnect, *aDisconnect, *aRestartGame, *aLeaveGame, *aDeckEditor, *aFullScreen, *aSettings, *aExit;
 	QAction *aCloseMostRecentZoneView;
 	QVBoxLayout *viewLayout;
 

@@ -22,6 +22,7 @@
 
 #include "window_main.h"
 #include "dlg_connect.h"
+#include "dlg_settings.h"
 #include "gameselector.h"
 #include "window_deckeditor.h"
 #include "cardinfowidget.h"
@@ -130,6 +131,12 @@ void MainWindow::actFullScreen(bool checked)
 		setWindowState(windowState() & ~Qt::WindowFullScreen);
 }
 
+void MainWindow::actSettings()
+{
+	DlgSettings dlg;
+	dlg.exec();
+}
+
 void MainWindow::actExit()
 {
 	close();
@@ -193,6 +200,8 @@ void MainWindow::createActions()
 	aFullScreen->setShortcut(tr("Ctrl+F"));
 	aFullScreen->setCheckable(true);
 	connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
+	aSettings = new QAction(tr("&Settings..."), this);
+	connect(aSettings, SIGNAL(triggered()), this, SLOT(actSettings()));
 	aExit = new QAction(tr("&Exit"), this);
 	connect(aExit, SIGNAL(triggered()), this, SLOT(actExit()));
 
@@ -214,6 +223,8 @@ void MainWindow::createMenus()
 	gameMenu->addAction(aDeckEditor);
 	gameMenu->addSeparator();
 	gameMenu->addAction(aFullScreen);
+	gameMenu->addSeparator();
+	gameMenu->addAction(aSettings);
 	gameMenu->addSeparator();
 	gameMenu->addAction(aExit);
 
