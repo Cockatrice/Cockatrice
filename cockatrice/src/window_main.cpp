@@ -133,7 +133,7 @@ void MainWindow::actFullScreen(bool checked)
 
 void MainWindow::actSettings()
 {
-	DlgSettings dlg;
+	DlgSettings dlg(db, translator, this);
 	dlg.exec();
 }
 
@@ -180,40 +180,61 @@ void MainWindow::serverTimeout()
 	QMessageBox::critical(this, tr("Error"), tr("Server timeout"));
 }
 
+void MainWindow::retranslateUi()
+{
+	aConnect->setText(tr("&Connect..."));
+	aDisconnect->setText(tr("&Disconnect"));
+	aRestartGame->setText(tr("&Restart game..."));
+	aRestartGame->setShortcut(tr("F2"));
+	aLeaveGame->setText(tr("&Leave game"));
+	aDeckEditor->setText(tr("&Deck editor"));
+	aFullScreen->setText(tr("&Full screen"));
+	aFullScreen->setShortcut(tr("Ctrl+F"));
+	aSettings->setText(tr("&Settings..."));
+	aExit->setText(tr("&Exit"));
+	aCloseMostRecentZoneView->setText(tr("Close most recent zone view"));
+	aCloseMostRecentZoneView->setShortcut(tr("Esc"));
+	
+	gameMenu->setTitle(tr("&Game"));
+	actionsMenu->setTitle(tr("&Actions"));
+	cardMenu->setTitle(tr("&Card"));
+	
+	sayLabel->setText(tr("&Say:"));
+	
+	cardInfo->retranslateUi();
+}
+
 void MainWindow::createActions()
 {
-	aConnect = new QAction(tr("&Connect..."), this);
+	aConnect = new QAction(this);
 	connect(aConnect, SIGNAL(triggered()), this, SLOT(actConnect()));
-	aDisconnect = new QAction(tr("&Disconnect"), this);
+	aDisconnect = new QAction(this);
 	aDisconnect->setEnabled(false);
 	connect(aDisconnect, SIGNAL(triggered()), this, SLOT(actDisconnect()));
-	aRestartGame = new QAction(tr("&Restart game..."), this);
-	aRestartGame->setShortcut(tr("F2"));
+	aRestartGame = new QAction(this);
 	aRestartGame->setEnabled(false);
 	connect(aRestartGame, SIGNAL(triggered()), this, SLOT(actRestartGame()));
-	aLeaveGame = new QAction(tr("&Leave game"), this);
+	aLeaveGame = new QAction(this);
 	aLeaveGame->setEnabled(false);
 	connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
-	aDeckEditor = new QAction(tr("&Deck editor"), this);
+	aDeckEditor = new QAction(this);
 	connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
-	aFullScreen = new QAction(tr("&Full screen"), this);
-	aFullScreen->setShortcut(tr("Ctrl+F"));
+	aFullScreen = new QAction(this);
 	aFullScreen->setCheckable(true);
 	connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
-	aSettings = new QAction(tr("&Settings..."), this);
+	aSettings = new QAction(this);
 	connect(aSettings, SIGNAL(triggered()), this, SLOT(actSettings()));
-	aExit = new QAction(tr("&Exit"), this);
+	aExit = new QAction(this);
 	connect(aExit, SIGNAL(triggered()), this, SLOT(actExit()));
 
-	aCloseMostRecentZoneView = new QAction(tr("Close most recent zone view"), this);
-	aCloseMostRecentZoneView->setShortcut(tr("Esc"));
+	aCloseMostRecentZoneView = new QAction(this);
 	connect(aCloseMostRecentZoneView, SIGNAL(triggered()), zoneLayout, SLOT(closeMostRecentZoneView()));
 	addAction(aCloseMostRecentZoneView);
 }
 
 void MainWindow::createMenus()
 {
-	gameMenu = menuBar()->addMenu(tr("&Game"));
+	gameMenu = menuBar()->addMenu(QString());
 	gameMenu->addAction(aConnect);
 	gameMenu->addAction(aDisconnect);
 	gameMenu->addSeparator();
@@ -228,18 +249,17 @@ void MainWindow::createMenus()
 	gameMenu->addSeparator();
 	gameMenu->addAction(aExit);
 
-	actionsMenu = menuBar()->addMenu(tr("&Actions"));
+	actionsMenu = menuBar()->addMenu(QString());
 
-	cardMenu = menuBar()->addMenu(tr("&Card"));
+	cardMenu = menuBar()->addMenu(QString());
 }
 
-MainWindow::MainWindow(QWidget *parent)
-	: QMainWindow(parent), game(NULL)
+MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
+	: QMainWindow(parent), game(NULL), translator(_translator)
 {
 	QPixmapCache::setCacheLimit(200000);
 
-	db = new CardDatabase;
-	db->loadFromFile("../cards.xml");
+	db = new CardDatabase(this);
 //	db->importOracleDir();
 //	db->saveToFile("../cards.xml");
 
@@ -255,7 +275,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 	cardInfo = new CardInfoWidget(db);
 	messageLog = new MessageLogWidget;
-	QLabel *sayLabel = new QLabel(tr("&Say:"));
+	sayLabel = new QLabel;
 	sayEdit = new QLineEdit;
 	sayLabel->setBuddy(sayEdit);
 
@@ -294,8 +314,18 @@ MainWindow::MainWindow(QWidget *parent)
 
 	createActions();
 	createMenus();
+	
+	retranslateUi();
 }
 
 void MainWindow::closeEvent(QCloseEvent */*event*/)
 {
+	delete game;
+}
+
+void MainWindow::changeEvent(QEvent *event)
+{
+	if (event->type() == QEvent::LanguageChange)
+		retranslateUi();
+	QMainWindow::changeEvent(event);
 }

@@ -63,16 +63,7 @@ CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_mana
 
 CardInfo::~CardInfo()
 {
-	if (pixmap) {
-		qDebug(QString("Deleting pixmap for %1").arg(name).toLatin1());
-		delete pixmap;
-		QMapIterator<int, QPixmap *> i(scaledPixmapCache);
-		while (i.hasNext()) {
-			i.next();
-			qDebug(QString("  Deleting cached pixmap for width %1").arg(i.key()).toLatin1());
-			delete i.value();
-		}
-	}
+	clearPixmapCache();
 }
 
 QString CardInfo::getMainCardType() const
@@ -114,9 +105,10 @@ QPixmap *CardInfo::loadPixmap()
 {
 	if (pixmap)
 		return pixmap;
+	QString picsPath = db->getPicsPath();
 	pixmap = new QPixmap();
 	if (getName().isEmpty()) {
-		pixmap->load("../pics/back.jpg");
+		pixmap->load(QString("%1/back.jpg").arg(picsPath));
 		return pixmap;
 	}
 	sets.sortByKey();
@@ -129,9 +121,9 @@ QPixmap *CardInfo::loadPixmap()
 	for (int i = 0; i < sets.size(); i++) {
 		// Fire // Ice, Circle of Protection: Red
 		QString correctedName = getName().remove(" // ").remove(":");
-		if (pixmap->load(QString("../pics/%1/%2.full.jpg").arg(sets[i]->getShortName()).arg(correctedName)))
+		if (pixmap->load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(sets[i]->getShortName()).arg(correctedName)))
 			return pixmap;
-		if (pixmap->load(QString("../pics/%1/%2%3.full.jpg").arg(sets[i]->getShortName()).arg(correctedName).arg(1)))
+		if (pixmap->load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(sets[i]->getShortName()).arg(correctedName).arg(1)))
 			return pixmap;
 	}
 	return pixmap;
@@ -161,6 +153,22 @@ QPixmap *CardInfo::getPixmap(QSize size)
 	return result;
 }
 
+void CardInfo::clearPixmapCache()
+{
+	if (pixmap) {
+		qDebug(QString("Deleting pixmap for %1").arg(name).toLatin1());
+		delete pixmap;
+		pixmap = 0;
+		QMapIterator<int, QPixmap *> i(scaledPixmapCache);
+		while (i.hasNext()) {
+			i.next();
+			qDebug(QString("  Deleting cached pixmap for width %1").arg(i.key()).toLatin1());
+			delete i.value();
+		}
+		scaledPixmapCache.clear();
+	}
+}
+
 QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 {
 	xml.writeStartElement("card");
@@ -181,8 +189,12 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 	return xml;
 }
 
-CardDatabase::CardDatabase()
+CardDatabase::CardDatabase(QObject *parent)
+	: QObject(parent), noCard(0)
 {
+	updateDatabasePath();
+	updatePicsPath();
+	
 	noCard = new CardInfo(this);
 	noCard->loadPixmap(); // cache pixmap for card back
 }
@@ -245,6 +257,17 @@ SetList CardDatabase::getSetList() const
 		result << i.value();
 	}
 	return result;
+}
+
+void CardDatabase::clearPixmapCache()
+{
+	QHashIterator<QString, CardInfo *> i(cardHash);
+	while (i.hasNext()) {
+		i.next();
+		i.value()->clearPixmapCache();
+	}
+	if (noCard)
+		noCard->clearPixmapCache();
 }
 
 void CardDatabase::importOracleFile(const QString &fileName, CardSet *set)
@@ -423,4 +446,26 @@ bool CardDatabase::saveToFile(const QString &fileName)
 	xml.writeEndDocument();
 
 	return true;
+}
+
+void CardDatabase::updatePicsPath(const QString &path)
+{
+	if (path.isEmpty()) {
+		QSettings settings;
+		settings.beginGroup("paths");
+		picsPath = settings.value("pics").toString();
+	} else
+		picsPath = path;
+	clearPixmapCache();
+}
+
+void CardDatabase::updateDatabasePath(const QString &path)
+{
+	if (path.isEmpty()) {
+		QSettings settings;
+		settings.beginGroup("paths");
+		cardDatabasePath = settings.value("carddatabase").toString();
+	} else
+		cardDatabasePath = path;
+	loadFromFile(cardDatabasePath);
 }

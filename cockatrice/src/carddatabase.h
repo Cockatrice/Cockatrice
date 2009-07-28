@@ -66,30 +66,36 @@ public:
 	void addToSet(CardSet *set);
 	QPixmap *loadPixmap();
 	QPixmap *getPixmap(QSize size);
+	void clearPixmapCache();
 };
 
-class CardDatabase {
+class CardDatabase : public QObject {
+	Q_OBJECT
 private:
 	QHash<QString, CardInfo *> cardHash;
 	QHash<QString, CardSet *> setHash;
 	CardInfo *noCard;
-	static const unsigned int magicNumber = 0x12345678;
-	static const unsigned int fileVersion = 1;
+	QString picsPath, cardDatabasePath;
 	
 	void loadCardsFromXml(QXmlStreamReader &xml);
 	void loadSetsFromXml(QXmlStreamReader &xml);
 public:
-	CardDatabase();
+	CardDatabase(QObject *parent = 0);
 	~CardDatabase();
 	void clear();
 	CardInfo *getCard(const QString &cardName = QString());
 	CardSet *getSet(const QString &setName);
 	QList<CardInfo *> getCardList() const { return cardHash.values(); }
 	SetList getSetList() const;
+	void clearPixmapCache();
 	void importOracleFile(const QString &fileName, CardSet *set);
 	void importOracleDir();
 	int loadFromFile(const QString &fileName);
 	bool saveToFile(const QString &fileName);
+	const QString &getPicsPath() const { return picsPath; }
+public slots:
+	void updatePicsPath(const QString &path = QString());
+	void updateDatabasePath(const QString &path = QString());
 };
 
 #endif

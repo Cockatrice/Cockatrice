@@ -29,9 +29,11 @@ class Game;
 class CardDatabase;
 class Player;
 
+class QTranslator;
 class QVBoxLayout;
 class CardInfoWidget;
 class MessageLogWidget;
+class QLabel;
 class QLineEdit;
 class QPushButton;
 class ServerZoneCard;
@@ -64,6 +66,7 @@ signals:
 	void logConnecting(QString hostname);
 	void logDisconnected();
 private:
+	void retranslateUi();
 	void createActions();
 	void createMenus();
 	QMenu *gameMenu, *actionsMenu, *cardMenu;
@@ -73,6 +76,7 @@ private:
 
 	CardInfoWidget *cardInfo;
 	MessageLogWidget *messageLog;
+	QLabel *sayLabel;
 	QLineEdit *sayEdit;
 
 	Client *client;
@@ -81,10 +85,12 @@ private:
 	Game *game;
 	CardDatabase *db;
 	ZoneViewLayout *zoneLayout;
+	QTranslator *translator;
 public:
-	MainWindow(QWidget *parent = 0);
+	MainWindow(QTranslator *_translator, QWidget *parent = 0);
 protected:
 	void closeEvent(QCloseEvent *event);
+	void changeEvent(QEvent *event);
 };
 
 #endif

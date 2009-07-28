@@ -8,30 +8,30 @@
 CardInfoWidget::CardInfoWidget(CardDatabase *_db, QWidget *parent)
 	: QFrame(parent), db(_db), pixmapHeight(pixmapWidth)
 {
-	cardPicture = new QLabel();
+	cardPicture = new QLabel;
 	cardPicture->setAlignment(Qt::AlignCenter);
 
 	QFont f;
 	f.setPixelSize(11);
 
-	nameLabel1 = new QLabel(tr("Name:"));
+	nameLabel1 = new QLabel;
 	nameLabel1->setFont(f);
-	nameLabel2 = new QLabel();
+	nameLabel2 = new QLabel;
 	nameLabel2->setWordWrap(true);
 	nameLabel2->setFont(f);
-	manacostLabel1 = new QLabel(tr("Mana cost:"));
+	manacostLabel1 = new QLabel;
 	manacostLabel1->setFont(f);
-	manacostLabel2 = new QLabel();
+	manacostLabel2 = new QLabel;
 	manacostLabel2->setFont(f);
 	manacostLabel2->setWordWrap(true);
-	cardtypeLabel1 = new QLabel(tr("Card type:"));
+	cardtypeLabel1 = new QLabel;
 	cardtypeLabel1->setFont(f);
-	cardtypeLabel2 = new QLabel();
+	cardtypeLabel2 = new QLabel;
 	cardtypeLabel2->setFont(f);
 	cardtypeLabel2->setWordWrap(true);
-	powtoughLabel1 = new QLabel(tr("P / T:"));
+	powtoughLabel1 = new QLabel;
 	powtoughLabel1->setFont(f);
-	powtoughLabel2 = new QLabel();
+	powtoughLabel2 = new QLabel;
 	powtoughLabel2->setFont(f);
 
 	textLabel = new QTextEdit();
@@ -60,6 +60,7 @@ CardInfoWidget::CardInfoWidget(CardDatabase *_db, QWidget *parent)
 		pixmapHeight = pixmapWidth * bigPixmap->height() / bigPixmap->width();
 	setCard(cardBack);
 
+	retranslateUi();
 	setFrameStyle(QFrame::Panel | QFrame::Raised);
 	setFixedSize(sizeHint());
 }
@@ -85,4 +86,12 @@ void CardInfoWidget::setCard(CardInfo *card)
 void CardInfoWidget::setCard(const QString &cardName)
 {
 	setCard(db->getCard(cardName));
+}
+
+void CardInfoWidget::retranslateUi()
+{
+	nameLabel1->setText(tr("Name:"));
+	manacostLabel1->setText(tr("Mana cost:"));
+	cardtypeLabel1->setText(tr("Card type:"));
+	powtoughLabel1->setText(tr("P / T:"));
 }

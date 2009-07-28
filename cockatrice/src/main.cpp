@@ -22,6 +22,9 @@
 #include <QApplication>
 #include <QTextCodec>
 #include <QtPlugin>
+#include <QTranslator>
+#include <QLibraryInfo>
+#include <QSettings>
 #include <stdio.h>
 
 #include "window_main.h"
@@ -48,10 +51,25 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationDomain("cockatrice.de");
 	QCoreApplication::setApplicationName("Cockatrice");
 
-	MainWindow *ui = new MainWindow;
+	QString localeName = QLocale::system().name();
+	QTranslator qtTranslator;
+	qtTranslator.load("qt_" + localeName, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+	app.installTranslator(&qtTranslator);
+	
+	QTranslator translator;
+	QSettings settings;
+	settings.beginGroup("personal");
+	QString lang = settings.value("lang").toString();
+	if (lang.isEmpty())
+		translator.load("cockatrice_" + localeName, ":/translations", QString(), ".qm");
+	else
+		translator.load(lang);
+	app.installTranslator(&translator);
+	
+	MainWindow ui(&translator);
 	qDebug("main(): MainWindow constructor finished");
-	ui->show();
-	qDebug("main(): ui->show() finished");
+	ui.show();
+	qDebug("main(): ui.show() finished");
 
 	return app.exec();
 }

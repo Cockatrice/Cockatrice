@@ -1,37 +1,64 @@
 #include <QtGui>
 
+#include "carddatabase.h"
 #include "dlg_settings.h"
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
-	QGroupBox *personalGroupBox = new QGroupBox(tr("Personal settings"));
-	QLabel *languageLabel = new QLabel(tr("Language:"));
-	QComboBox *languageBox = new QComboBox;
+	QSettings settings;
 	
+	personalGroupBox = new QGroupBox;
+	languageLabel = new QLabel;
+	languageBox = new QComboBox;
+	
+	settings.beginGroup("personal");
+	QString setLanguage = settings.value("lang").toString();
 	QStringList qmFiles = findQmFiles();
-	for (int i = 0; i < qmFiles.size(); i++)
-		languageBox->addItem(languageName(qmFiles[i]), qmFiles[i]);
+	for (int i = 0; i < qmFiles.size(); i++) {
+		QString langName = languageName(qmFiles[i]);
+		languageBox->addItem(langName, qmFiles[i]);
+		if ((qmFiles[i] == settings.value("lang").toString()) || (setLanguage.isEmpty() && langName == tr("English")))
+			languageBox->setCurrentIndex(i);
+	}
+	settings.endGroup();
+	connect(languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
 	
 	QGridLayout *personalGrid = new QGridLayout;
 	personalGrid->addWidget(languageLabel, 0, 0);
 	personalGrid->addWidget(languageBox, 0, 1);
 	personalGroupBox->setLayout(personalGrid);
 	
-	QGroupBox *pathsGroupBox = new QGroupBox(tr("Paths"));
-	QLabel *deckPathLabel = new QLabel(tr("Decks directory:"));
-	QLineEdit *deckPathEdit = new QLineEdit;
-	QLabel *picsPathLabel = new QLabel(tr("Pictures directory:"));
-	QLineEdit *picsPathEdit = new QLineEdit;
-	QLabel *cardDatabasePathLabel = new QLabel(tr("Path to card database:"));
-	QLineEdit *cardDatabasePathEdit = new QLineEdit;
+	pathsGroupBox = new QGroupBox;
+	settings.beginGroup("paths");
+	
+	deckPathLabel = new QLabel;
+	deckPathEdit = new QLineEdit(settings.value("decks").toString());
+	deckPathEdit->setReadOnly(true);
+	QPushButton *deckPathButton = new QPushButton("...");
+	connect(deckPathButton, SIGNAL(clicked()), this, SLOT(deckPathButtonClicked()));
+	
+	picsPathLabel = new QLabel;
+	picsPathEdit = new QLineEdit(settings.value("pics").toString());
+	picsPathEdit->setReadOnly(true);
+	QPushButton *picsPathButton = new QPushButton("...");
+	connect(picsPathButton, SIGNAL(clicked()), this, SLOT(picsPathButtonClicked()));
+	
+	cardDatabasePathLabel = new QLabel;
+	cardDatabasePathEdit = new QLineEdit(settings.value("carddatabase").toString());
+	cardDatabasePathEdit->setReadOnly(true);
+	QPushButton *cardDatabasePathButton = new QPushButton("...");
+	connect(cardDatabasePathButton, SIGNAL(clicked()), this, SLOT(cardDatabasePathButtonClicked()));
 	
 	QGridLayout *pathsGrid = new QGridLayout;
 	pathsGrid->addWidget(deckPathLabel, 0, 0);
 	pathsGrid->addWidget(deckPathEdit, 0, 1);
+	pathsGrid->addWidget(deckPathButton, 0, 2);
 	pathsGrid->addWidget(picsPathLabel, 1, 0);
 	pathsGrid->addWidget(picsPathEdit, 1, 1);
+	pathsGrid->addWidget(picsPathButton, 1, 2);
 	pathsGrid->addWidget(cardDatabasePathLabel, 2, 0);
 	pathsGrid->addWidget(cardDatabasePathEdit, 2, 1);
+	pathsGrid->addWidget(cardDatabasePathButton, 2, 2);
 	pathsGroupBox->setLayout(pathsGrid);
 	
 	QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -61,16 +88,77 @@ QString GeneralSettingsPage::languageName(const QString &qmFile)
 	return translator.translate("GeneralSettingsPage", "English");
 }
 
+void GeneralSettingsPage::deckPathButtonClicked()
+{
+	QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"));
+	if (path.isEmpty())
+		return;
+	QSettings settings;
+	settings.beginGroup("paths");
+	settings.setValue("decks", path);
+	deckPathEdit->setText(path);
+}
+
+void GeneralSettingsPage::picsPathButtonClicked()
+{
+	QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"));
+	if (path.isEmpty())
+		return;
+	QSettings settings;
+	settings.beginGroup("paths");
+	settings.setValue("pics", path);
+	picsPathEdit->setText(path);
+	
+	emit picsPathChanged(path);
+}
+
+void GeneralSettingsPage::cardDatabasePathButtonClicked()
+{
+	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
+	if (path.isEmpty())
+		return;
+	QSettings settings;
+	settings.beginGroup("paths");
+	settings.setValue("carddatabase", path);
+	cardDatabasePathEdit->setText(path);
+	
+	emit cardDatabasePathChanged(path);
+}
+
+void GeneralSettingsPage::languageBoxChanged(int index)
+{
+	QString qmFile = languageBox->itemData(index).toString();
+	QSettings settings;
+	settings.beginGroup("personal");
+	settings.setValue("lang", qmFile);
+	emit changeLanguage(qmFile);
+}
+
+void GeneralSettingsPage::retranslateUi()
+{
+	personalGroupBox->setTitle(tr("Personal settings"));
+	languageLabel->setText(tr("Language:"));
+	pathsGroupBox->setTitle(tr("Paths"));
+	deckPathLabel->setText(tr("Decks directory:"));
+	picsPathLabel->setText(tr("Pictures directory:"));
+	cardDatabasePathLabel->setText(tr("Path to card database:"));
+}
+
 AppearanceSettingsPage::AppearanceSettingsPage()
+{
+
+}
+
+void AppearanceSettingsPage::retranslateUi()
 {
 
 }
 
 MessagesSettingsPage::MessagesSettingsPage()
 {
-	aAdd = new QAction(tr("Add"), this);
+	aAdd = new QAction(this);
 	connect(aAdd, SIGNAL(triggered()), this, SLOT(actAdd()));
-	aRemove = new QAction(tr("Remove"), this);
+	aRemove = new QAction(this);
 	connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemove()));
 	
 	messageList = new QListWidget;
@@ -90,6 +178,8 @@ MessagesSettingsPage::MessagesSettingsPage()
 	mainLayout->addWidget(messageToolBar);
 
 	setLayout(mainLayout);
+	
+	retranslateUi();
 }
 
 void MessagesSettingsPage::storeSettings()
@@ -119,8 +209,14 @@ void MessagesSettingsPage::actRemove()
 	}
 }
 
-DlgSettings::DlgSettings()
-	: QDialog()
+void MessagesSettingsPage::retranslateUi()
+{
+	aAdd->setText(tr("&Add"));
+	aRemove->setText(tr("&Remove"));
+}
+
+DlgSettings::DlgSettings(CardDatabase *_db, QTranslator *_translator, QWidget *parent)
+	: QDialog(parent), db(_db), translator(_translator)
 {
 	contentsWidget = new QListWidget;
 	contentsWidget->setViewMode(QListView::IconMode);
@@ -130,11 +226,15 @@ DlgSettings::DlgSettings()
 	contentsWidget->setSpacing(12);
 	
 	pagesWidget = new QStackedWidget;
-	pagesWidget->addWidget(new GeneralSettingsPage);
+	GeneralSettingsPage *general = new GeneralSettingsPage;
+	connect(general, SIGNAL(picsPathChanged(const QString &)), db, SLOT(updatePicsPath(const QString &)));
+	connect(general, SIGNAL(cardDatabasePathChanged(const QString &)), db, SLOT(updateDatabasePath(const QString &)));
+	connect(general, SIGNAL(changeLanguage(const QString &)), this, SLOT(changeLanguage(const QString &)));
+	pagesWidget->addWidget(general);
 	pagesWidget->addWidget(new AppearanceSettingsPage);
 	pagesWidget->addWidget(new MessagesSettingsPage);
 	
-	QPushButton *closeButton = new QPushButton(tr("&Close"));
+	closeButton = new QPushButton;
 	connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
 	
 	createIcons();
@@ -155,23 +255,20 @@ DlgSettings::DlgSettings()
 	mainLayout->addLayout(buttonsLayout);
 	setLayout(mainLayout);
 	
-	setWindowTitle(tr("Settings"));
+	retranslateUi();
 }
 
 void DlgSettings::createIcons()
 {
-	QListWidgetItem *generalButton = new QListWidgetItem(contentsWidget);
-	generalButton->setText(tr("General"));
+	generalButton = new QListWidgetItem(contentsWidget);
 	generalButton->setTextAlignment(Qt::AlignHCenter);
 	generalButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 	
-	QListWidgetItem *appearanceButton = new QListWidgetItem(contentsWidget);
-	appearanceButton->setText(tr("Appearance"));
+	appearanceButton = new QListWidgetItem(contentsWidget);
 	appearanceButton->setTextAlignment(Qt::AlignHCenter);
 	appearanceButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 	
-	QListWidgetItem *messagesButton = new QListWidgetItem(contentsWidget);
-	messagesButton->setText(tr("Messages"));
+	messagesButton = new QListWidgetItem(contentsWidget);
 	messagesButton->setTextAlignment(Qt::AlignHCenter);
 	messagesButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 	
@@ -184,4 +281,32 @@ void DlgSettings::changePage(QListWidgetItem *current, QListWidgetItem *previous
 		current = previous;
 	
 	pagesWidget->setCurrentIndex(contentsWidget->row(current));
+}
+
+void DlgSettings::changeLanguage(const QString &qmFile)
+{
+	qApp->removeTranslator(translator);
+	translator->load(qmFile);
+	qApp->installTranslator(translator);
+}
+
+void DlgSettings::changeEvent(QEvent *event)
+{
+	if (event->type() == QEvent::LanguageChange)
+		retranslateUi();
+	QDialog::changeEvent(event);
+}
+
+void DlgSettings::retranslateUi()
+{
+	setWindowTitle(tr("Settings"));
+	
+	generalButton->setText(tr("General"));
+	appearanceButton->setText(tr("Appearance"));
+	messagesButton->setText(tr("Messages"));
+	
+	closeButton->setText(tr("&Close"));
+	
+	for (int i = 0; i < pagesWidget->count(); i++)
+		dynamic_cast<AbstractSettingsPage *>(pagesWidget->widget(i))->retranslateUi();
 }

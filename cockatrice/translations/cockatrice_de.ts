@@ -209,27 +209,27 @@
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="158"/>
+        <location filename="../src/dlg_settings.cpp" line="302"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="164"/>
+        <location filename="../src/dlg_settings.cpp" line="304"/>
         <source>General</source>
         <translation>Allgemeines</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="169"/>
+        <location filename="../src/dlg_settings.cpp" line="305"/>
         <source>Appearance</source>
         <translation>Erscheinungsbild</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="174"/>
+        <location filename="../src/dlg_settings.cpp" line="306"/>
         <source>Messages</source>
         <translation>Nachrichten</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="137"/>
+        <location filename="../src/dlg_settings.cpp" line="308"/>
         <source>&amp;Close</source>
         <translation>S&amp;chließen</translation>
     </message>
@@ -543,37 +543,45 @@
 <context>
     <name>GeneralSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="7"/>
+        <location filename="../src/dlg_settings.cpp" line="93"/>
+        <location filename="../src/dlg_settings.cpp" line="104"/>
+        <location filename="../src/dlg_settings.cpp" line="117"/>
+        <source>Choose path</source>
+        <translation>Pfad auswählen</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="139"/>
         <source>Personal settings</source>
         <translation>Persönliche Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="8"/>
+        <location filename="../src/dlg_settings.cpp" line="140"/>
         <source>Language:</source>
         <translation>Sprache:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="20"/>
+        <location filename="../src/dlg_settings.cpp" line="141"/>
         <source>Paths</source>
         <translation>Pfade</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="21"/>
+        <location filename="../src/dlg_settings.cpp" line="142"/>
         <source>Decks directory:</source>
         <translation>Verzeichnis mit Decklisten:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="23"/>
+        <location filename="../src/dlg_settings.cpp" line="143"/>
         <source>Pictures directory:</source>
         <translation>Verzeichnis mit Bilddateien:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="25"/>
+        <location filename="../src/dlg_settings.cpp" line="144"/>
         <source>Path to card database:</source>
         <translation>Pfad zur Kartendatenbank:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="61"/>
+        <location filename="../src/dlg_settings.cpp" line="20"/>
+        <location filename="../src/dlg_settings.cpp" line="88"/>
         <source>English</source>
         <translation>Deutsch</translation>
     </message>
@@ -666,7 +674,7 @@
         <translation>&amp;Karte</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="258"/>
+        <location filename="../src/window_main.cpp" line="257"/>
         <source>&amp;Say:</source>
         <translation>&amp;Sagen:</translation>
     </message>
@@ -797,22 +805,30 @@
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="71"/>
+        <location filename="../src/dlg_settings.cpp" line="214"/>
+        <source>&amp;Add</source>
+        <translation>&amp;Hinzufügen</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="215"/>
+        <source>&amp;Remove</source>
+        <translation>&amp;Entfernen</translation>
+    </message>
+    <message>
         <source>Add</source>
-        <translation>Hinzufügen</translation>
+        <translation type="obsolete">Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="73"/>
         <source>Remove</source>
-        <translation>Entfernen</translation>
+        <translation type="obsolete">Entfernen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="107"/>
+        <location filename="../src/dlg_settings.cpp" line="197"/>
         <source>Add message</source>
         <translation>Nachricht hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="107"/>
+        <location filename="../src/dlg_settings.cpp" line="197"/>
         <source>Message:</source>
         <translation>Nachricht:</translation>
     </message>

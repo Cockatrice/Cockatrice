@@ -22,6 +22,7 @@ private:
 	QTextEdit *textLabel;
 public:
 	CardInfoWidget(CardDatabase *_db, QWidget *parent = 0);
+	void retranslateUi();
 public slots:
 	void setCard(CardInfo *card);
 	void setCard(const QString &cardName);
