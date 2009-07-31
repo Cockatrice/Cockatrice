@@ -28,18 +28,20 @@ private slots:
 	void deckPathButtonClicked();
 	void picsPathButtonClicked();
 	void cardDatabasePathButtonClicked();
+	void cardBackgroundPathButtonClicked();
 	void languageBoxChanged(int index);
 signals:
 	void picsPathChanged(const QString &path);
 	void cardDatabasePathChanged(const QString &path);
+	void cardBackgroundPathChanged(const QString &path);
 	void changeLanguage(const QString &qmFile);
 private:
 	QStringList findQmFiles();
 	QString languageName(const QString &qmFile);
-	QLineEdit *deckPathEdit, *picsPathEdit, *cardDatabasePathEdit;
+	QLineEdit *deckPathEdit, *picsPathEdit, *cardDatabasePathEdit, *cardBackgroundPathEdit;
 	QGroupBox *personalGroupBox, *pathsGroupBox;
 	QComboBox *languageBox;
-	QLabel *languageLabel, *deckPathLabel, *picsPathLabel, *cardDatabasePathLabel;
+	QLabel *languageLabel, *deckPathLabel, *picsPathLabel, *cardDatabasePathLabel, *cardBackgroundPathLabel;
 };
 
 class AppearanceSettingsPage : public AbstractSettingsPage {

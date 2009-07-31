@@ -66,8 +66,16 @@ int main(int argc, char *argv[])
 		translator.load(lang);
 	app.installTranslator(&translator);
 	
+	
+	
 	MainWindow ui(&translator);
 	qDebug("main(): MainWindow constructor finished");
+	
+	//set Icon
+	QIcon icon("resources/icon.svg");
+	ui.setWindowIcon(icon);
+	//
+	
 	ui.show();
 	qDebug("main(): ui.show() finished");
 

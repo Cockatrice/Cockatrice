@@ -49,6 +49,14 @@ GeneralSettingsPage::GeneralSettingsPage()
 	QPushButton *cardDatabasePathButton = new QPushButton("...");
 	connect(cardDatabasePathButton, SIGNAL(clicked()), this, SLOT(cardDatabasePathButtonClicked()));
 	
+    /*
+  	cardBackgroundPathLabel = new QLabel;
+	cardBackgroundPathEdit = new QLineEdit(settings.value("cardbackground").toString());
+	cardBackgroundPathEdit->setReadOnly(true);
+	QPushButton *cardBackgroundPathButton = new QPushButton("...");
+	connect(cardBackgroundPathButton, SIGNAL(clicked()), this, SLOT(cardBackgroundPathButtonClicked()));
+	*/
+	
 	QGridLayout *pathsGrid = new QGridLayout;
 	pathsGrid->addWidget(deckPathLabel, 0, 0);
 	pathsGrid->addWidget(deckPathEdit, 0, 1);
@@ -59,6 +67,11 @@ GeneralSettingsPage::GeneralSettingsPage()
 	pathsGrid->addWidget(cardDatabasePathLabel, 2, 0);
 	pathsGrid->addWidget(cardDatabasePathEdit, 2, 1);
 	pathsGrid->addWidget(cardDatabasePathButton, 2, 2);
+	/*	
+	pathsGrid->addWidget(cardBackgroundPathLabel, 3, 0);
+	pathsGrid->addWidget(cardBackgroundPathEdit, 3, 1);
+	pathsGrid->addWidget(cardBackgroundPathButton, 3, 2);
+	*/
 	pathsGroupBox->setLayout(pathsGrid);
 	
 	QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -125,6 +138,19 @@ void GeneralSettingsPage::cardDatabasePathButtonClicked()
 	emit cardDatabasePathChanged(path);
 }
 
+void GeneralSettingsPage::cardBackgroundPathButtonClicked()
+{
+	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
+	if (path.isEmpty())
+		return;
+	QSettings settings;
+	settings.beginGroup("paths");
+	settings.setValue("cardbackground", path);
+	cardBackgroundPathEdit->setText(path);
+	
+	emit cardBackgroundPathChanged(path);
+}
+
 void GeneralSettingsPage::languageBoxChanged(int index)
 {
 	QString qmFile = languageBox->itemData(index).toString();
@@ -142,6 +168,7 @@ void GeneralSettingsPage::retranslateUi()
 	deckPathLabel->setText(tr("Decks directory:"));
 	picsPathLabel->setText(tr("Pictures directory:"));
 	cardDatabasePathLabel->setText(tr("Path to card database:"));
+	//cardBackgroundPathLabel->setText(tr("Path to card background:"));
 }
 
 AppearanceSettingsPage::AppearanceSettingsPage()
@@ -302,7 +329,11 @@ void DlgSettings::retranslateUi()
 	setWindowTitle(tr("Settings"));
 	
 	generalButton->setText(tr("General"));
+	QIcon generalIcon("resources/icon_general_v1.svg");
+	generalButton->setIcon(generalIcon);
 	appearanceButton->setText(tr("Appearance"));
+	QIcon messagesIcon("resources/icon_messages_v1.svg");
+	messagesButton->setIcon(messagesIcon);	
 	messagesButton->setText(tr("Messages"));
 	
 	closeButton->setText(tr("&Close"));
