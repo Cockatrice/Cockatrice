@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationDomain("cockatrice.de");
 	QCoreApplication::setApplicationName("Cockatrice");
 
-	QString localeName = QLocale::system().name();
+	QString localeName;// = QLocale::system().name();
 	QTranslator qtTranslator;
 	qtTranslator.load("qt_" + localeName, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	app.installTranslator(&qtTranslator);

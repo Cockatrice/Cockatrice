@@ -1,13 +1,13 @@
 #ifndef MESSAGELOGWIDGET_H
 #define MESSAGELOGWIDGET_H
 
-#include <QTextEdit>
+#include <QPlainTextEdit>
 #include <QAbstractSocket>
 #include "client.h"
 
 class Game;
 
-class MessageLogWidget : public QTextEdit {
+class MessageLogWidget : public QPlainTextEdit {
 	Q_OBJECT
 public slots:
 	void logConnecting(QString hostname);

@@ -54,8 +54,8 @@ void SetList::sortByKey()
 	qSort(begin(), end(), CompareFunctor());
 }
 
-CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QString &_text, int _tableRow, const SetList &_sets)
-	: db(_db), name(_name), sets(_sets), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), tableRow(_tableRow), pixmap(NULL)
+CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QString &_text, const QStringList &_colors, int _tableRow, const SetList &_sets)
+	: db(_db), name(_name), sets(_sets), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), colors(_colors), tableRow(_tableRow), pixmap(NULL)
 {
 	for (int i = 0; i < sets.size(); i++)
 		sets[i]->append(this);
@@ -184,6 +184,9 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 	SetList sets = info->getSets();
 	for (int i = 0; i < sets.size(); i++)
 		xml.writeTextElement("set", sets[i]->getShortName());
+	QStringList colors = info->getColors();
+	for (int i = 0; i < colors.size(); i++)
+		xml.writeTextElement("color", colors[i]);
 
 	xml.writeTextElement("manacost", info->getManaCost());
 	xml.writeTextElement("type", info->getCardType());
@@ -277,79 +280,6 @@ void CardDatabase::clearPixmapCache()
 		noCard->clearPixmapCache();
 }
 
-void CardDatabase::importOracleFile(const QString &fileName, CardSet *set)
-{
-	QFile file(fileName);
-	file.open(QIODevice::ReadOnly | QIODevice::Text);
-	QTextStream in(&file);
-	while (!in.atEnd()) {
-		QString cardname = in.readLine();
-		if (cardname.isEmpty())
-			continue;
-		QString manacost = in.readLine();
-		QString cardtype, powtough;
-		QStringList text;
-		if (manacost.contains("Land", Qt::CaseInsensitive)) {
-			cardtype = manacost;
-			manacost.clear();
-		} else {
-			cardtype = in.readLine();
-			powtough = in.readLine();
-			// Dirty hack.
-			// Cards to test: Any creature, any basic land, Ancestral Vision, Fire // Ice.
-			if (!powtough.contains("/") || powtough.size() > 5) {
-				text << powtough;
-				powtough = QString();
-			}
-		}
-		QString line = in.readLine();
-		while (!line.isEmpty()) {
-			text << line;
-			line = in.readLine();
-		}
-		CardInfo *card;
-		if (cardHash.contains(cardname))
-			card = cardHash.value(cardname);
-		else {
-			card = new CardInfo(this, cardname, manacost, cardtype, powtough, text.join("\n"));
-
-			int tableRow = 1;
-			QString mainCardType = card->getMainCardType();
-			if (mainCardType == "Land")
-				tableRow = 0;
-			else if ((mainCardType == "Sorcery") || (mainCardType == "Instant"))
-				tableRow = 2;
-			else if (mainCardType == "Creature")
-				tableRow = 3;
-			card->setTableRow(tableRow);
-
-			cardHash.insert(cardname, card);
-		}
-		card->addToSet(set);
-	}
-}
-
-void CardDatabase::importOracleDir()
-{
-	clear();
-	QDir dir("../db");
-
-	dir.setSorting(QDir::Name | QDir::IgnoreCase);
-	QFileInfoList files = dir.entryInfoList(QStringList() << "*.txt");
-	for (int k = 0; k < files.size(); k++) {
-		QFileInfo i = files[k];
-		QString shortName = i.fileName().left(i.fileName().indexOf('_'));
-		QString longName = i.fileName().mid(i.fileName().indexOf('_') + 1);
-		longName = longName.left(longName.indexOf('.'));
-		CardSet *set = new CardSet(shortName, longName);
-		setHash.insert(shortName, set);
-
-		importOracleFile(i.filePath(), set);
-	}
-
-	qDebug(QString("CardDatabase: %1 cards imported").arg(cardHash.size()).toLatin1());
-}
-
 void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
 {
 	while (!xml.atEnd()) {
@@ -377,6 +307,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 			break;
 		if (xml.name() == "card") {
 			QString name, manacost, type, pt, text;
+			QStringList colors;
 			SetList sets;
 			int tableRow = 0;
 			while (!xml.atEnd()) {
@@ -394,10 +325,12 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 					text = xml.readElementText();
 				else if (xml.name() == "set")
 					sets << getSet(xml.readElementText());
+				else if (xml.name() == "color")
+					colors << xml.readElementText();
 				else if (xml.name() == "tablerow")
 					tableRow = xml.readElementText().toInt();
 			}
-			cardHash.insert(name, new CardInfo(this, name, manacost, type, pt, text, tableRow, sets));
+			cardHash.insert(name, new CardInfo(this, name, manacost, type, pt, text, colors, tableRow, sets));
 		}
 	}
 }

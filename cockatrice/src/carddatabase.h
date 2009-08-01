@@ -41,6 +41,7 @@ private:
 	QString cardtype;
 	QString powtough;
 	QString text;
+	QStringList colors;
 	int tableRow;
 	QPixmap *pixmap;
 	QMap<int, QPixmap *> scaledPixmapCache;
@@ -51,6 +52,7 @@ public:
 		const QString &_cardtype = QString(),
 		const QString &_powtough = QString(),
 		const QString &_text = QString(),
+		const QStringList &_colors = QStringList(),
 		int _tableRow = 0,
 		const SetList &_sets = SetList());
 	~CardInfo();
@@ -60,6 +62,7 @@ public:
 	QString getCardType() const { return cardtype; }
 	QString getPowTough() const { return powtough; }
 	QString getText() const { return text; }
+	QStringList getColors() const { return colors; }
 	QString getMainCardType() const;
 	int getTableRow() const { return tableRow; }
 	void setTableRow(int _tableRow) { tableRow = _tableRow; }
@@ -72,12 +75,12 @@ public:
 
 class CardDatabase : public QObject {
 	Q_OBJECT
-private:
+protected:
 	QHash<QString, CardInfo *> cardHash;
 	QHash<QString, CardSet *> setHash;
 	CardInfo *noCard;
 	QString picsPath, cardDatabasePath;
-
+private:
 	void loadCardsFromXml(QXmlStreamReader &xml);
 	void loadSetsFromXml(QXmlStreamReader &xml);
 public:
@@ -89,8 +92,6 @@ public:
 	QList<CardInfo *> getCardList() const { return cardHash.values(); }
 	SetList getSetList() const;
 	void clearPixmapCache();
-	void importOracleFile(const QString &fileName, CardSet *set);
-	void importOracleDir();
 	int loadFromFile(const QString &fileName);
 	bool saveToFile(const QString &fileName);
 	const QString &getPicsPath() const { return picsPath; }
