@@ -67,6 +67,7 @@ public:
 	QPixmap *loadPixmap();
 	QPixmap *getPixmap(QSize size);
 	void clearPixmapCache();
+	void updatePixmapCache();
 };
 
 class CardDatabase : public QObject {
@@ -76,7 +77,7 @@ private:
 	QHash<QString, CardSet *> setHash;
 	CardInfo *noCard;
 	QString picsPath, cardDatabasePath;
-	
+
 	void loadCardsFromXml(QXmlStreamReader &xml);
 	void loadSetsFromXml(QXmlStreamReader &xml);
 public:

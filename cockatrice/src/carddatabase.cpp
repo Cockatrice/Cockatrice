@@ -169,15 +169,22 @@ void CardInfo::clearPixmapCache()
 	}
 }
 
+void CardInfo::updatePixmapCache()
+{
+	qDebug(QString("Updating pixmap cache for %1").arg(name).toLatin1());
+	clearPixmapCache();
+	loadPixmap();
+}
+
 QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 {
 	xml.writeStartElement("card");
 	xml.writeTextElement("name", info->getName());
-	
+
 	SetList sets = info->getSets();
 	for (int i = 0; i < sets.size(); i++)
 		xml.writeTextElement("set", sets[i]->getShortName());
-	
+
 	xml.writeTextElement("manacost", info->getManaCost());
 	xml.writeTextElement("type", info->getCardType());
 	if (!info->getPowTough().isEmpty())
@@ -185,7 +192,7 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 	xml.writeTextElement("tablerow", QString::number(info->getTableRow()));
 	xml.writeTextElement("text", info->getText());
 	xml.writeEndElement(); // card
-	
+
 	return xml;
 }
 
@@ -194,7 +201,7 @@ CardDatabase::CardDatabase(QObject *parent)
 {
 	updateDatabasePath();
 	updatePicsPath();
-	
+
 	noCard = new CardInfo(this);
 	noCard->loadPixmap(); // cache pixmap for card back
 }
@@ -305,7 +312,7 @@ void CardDatabase::importOracleFile(const QString &fileName, CardSet *set)
 			card = cardHash.value(cardname);
 		else {
 			card = new CardInfo(this, cardname, manacost, cardtype, powtough, text.join("\n"));
-			
+
 			int tableRow = 1;
 			QString mainCardType = card->getMainCardType();
 			if (mainCardType == "Land")
@@ -315,7 +322,7 @@ void CardDatabase::importOracleFile(const QString &fileName, CardSet *set)
 			else if (mainCardType == "Creature")
 				tableRow = 3;
 			card->setTableRow(tableRow);
-			
+
 			cardHash.insert(cardname, card);
 		}
 		card->addToSet(set);
@@ -424,7 +431,7 @@ bool CardDatabase::saveToFile(const QString &fileName)
 	QFile file(fileName);
 	file.open(QIODevice::WriteOnly);
 	QXmlStreamWriter xml(&file);
-	
+
 	xml.setAutoFormatting(true);
 	xml.writeStartDocument();
 	xml.writeStartElement("cockatrice_carddatabase");
@@ -435,13 +442,13 @@ bool CardDatabase::saveToFile(const QString &fileName)
 	while (setIterator.hasNext())
 		xml << setIterator.next().value();
 	xml.writeEndElement(); // sets
-	
+
 	xml.writeStartElement("cards");
 	QHashIterator<QString, CardInfo *> cardIterator(cardHash);
 	while (cardIterator.hasNext())
 		xml << cardIterator.next().value();
 	xml.writeEndElement(); // cards
-	
+
 	xml.writeEndElement(); // cockatrice_carddatabase
 	xml.writeEndDocument();
 
