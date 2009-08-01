@@ -5,6 +5,7 @@
 #include <QXmlStreamWriter>
 #include <QProgressDialog>
 #include <QVariant>
+#include <QSettings>
 #include "decklist.h"
 #include "carddatabase.h"
 
@@ -313,6 +314,8 @@ bool DeckList::saveToFile(const QString &fileName, FileFormat fmt)
 bool DeckList::loadDialog(QWidget *parent)
 {
 	QFileDialog dialog(parent, tr("Load deck"));
+	QSettings settings;
+	dialog.setDirectory(settings.value("paths/decks").toString());
 	dialog.setNameFilters(fileNameFilters);
 	if (!dialog.exec())
 		return false;
@@ -336,6 +339,8 @@ bool DeckList::loadDialog(QWidget *parent)
 bool DeckList::saveDialog(QWidget *parent)
 {
 	QFileDialog dialog(parent, tr("Save deck"));
+	QSettings settings;
+	dialog.setDirectory(settings.value("paths/decks").toString());
 	dialog.setAcceptMode(QFileDialog::AcceptSave);
 	dialog.setConfirmOverwrite(true);
 	dialog.setDefaultSuffix("cod");
