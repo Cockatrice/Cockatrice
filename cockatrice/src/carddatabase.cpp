@@ -407,5 +407,6 @@ void CardDatabase::updateDatabasePath(const QString &path)
 		cardDatabasePath = settings.value("carddatabase").toString();
 	} else
 		cardDatabasePath = path;
-	loadFromFile(cardDatabasePath);
+	if (!cardDatabasePath.isEmpty())
+		loadFromFile(cardDatabasePath);
 }
