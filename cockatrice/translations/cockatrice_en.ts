@@ -32,22 +32,22 @@
 <context>
     <name>CardInfoWidget</name>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="17"/>
+        <location filename="../src/cardinfowidget.cpp" line="93"/>
         <source>Name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="22"/>
+        <location filename="../src/cardinfowidget.cpp" line="94"/>
         <source>Mana cost:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="27"/>
+        <location filename="../src/cardinfowidget.cpp" line="95"/>
         <source>Card type:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="32"/>
+        <location filename="../src/cardinfowidget.cpp" line="96"/>
         <source>P / T:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -55,17 +55,17 @@
 <context>
     <name>DeckList</name>
     <message>
-        <location filename="../src/decklist.cpp" line="315"/>
+        <location filename="../src/decklist.cpp" line="316"/>
         <source>Load deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/decklist.cpp" line="338"/>
+        <location filename="../src/decklist.cpp" line="341"/>
         <source>Save deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/decklist.cpp" line="378"/>
+        <location filename="../src/decklist.cpp" line="383"/>
         <source>Caching card pictures...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -173,27 +173,27 @@
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="302"/>
+        <location filename="../src/dlg_settings.cpp" line="329"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="304"/>
+        <location filename="../src/dlg_settings.cpp" line="331"/>
         <source>General</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="305"/>
+        <location filename="../src/dlg_settings.cpp" line="334"/>
         <source>Appearance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="306"/>
+        <location filename="../src/dlg_settings.cpp" line="337"/>
         <source>Messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="308"/>
+        <location filename="../src/dlg_settings.cpp" line="339"/>
         <source>&amp;Close</source>
         <translation type="unfinished"></translation>
     </message>
@@ -499,45 +499,46 @@
 <context>
     <name>GeneralSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="93"/>
-        <location filename="../src/dlg_settings.cpp" line="104"/>
+        <location filename="../src/dlg_settings.cpp" line="106"/>
         <location filename="../src/dlg_settings.cpp" line="117"/>
+        <location filename="../src/dlg_settings.cpp" line="130"/>
+        <location filename="../src/dlg_settings.cpp" line="143"/>
         <source>Choose path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="139"/>
+        <location filename="../src/dlg_settings.cpp" line="165"/>
         <source>Personal settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="140"/>
+        <location filename="../src/dlg_settings.cpp" line="166"/>
         <source>Language:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="141"/>
+        <location filename="../src/dlg_settings.cpp" line="167"/>
         <source>Paths</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="142"/>
+        <location filename="../src/dlg_settings.cpp" line="168"/>
         <source>Decks directory:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="143"/>
+        <location filename="../src/dlg_settings.cpp" line="169"/>
         <source>Pictures directory:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="144"/>
+        <location filename="../src/dlg_settings.cpp" line="170"/>
         <source>Path to card database:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="20"/>
-        <location filename="../src/dlg_settings.cpp" line="88"/>
+        <location filename="../src/dlg_settings.cpp" line="101"/>
         <source>English</source>
         <translation>English</translation>
     </message>
@@ -560,77 +561,77 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="187"/>
+        <location filename="../src/window_main.cpp" line="186"/>
         <source>&amp;Disconnect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="190"/>
+        <location filename="../src/window_main.cpp" line="187"/>
         <source>&amp;Restart game...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="191"/>
+        <location filename="../src/window_main.cpp" line="188"/>
         <source>F2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="194"/>
+        <location filename="../src/window_main.cpp" line="189"/>
         <source>&amp;Leave game</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="197"/>
+        <location filename="../src/window_main.cpp" line="190"/>
         <source>&amp;Deck editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="199"/>
+        <location filename="../src/window_main.cpp" line="191"/>
         <source>&amp;Full screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="200"/>
+        <location filename="../src/window_main.cpp" line="192"/>
         <source>Ctrl+F</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="203"/>
+        <location filename="../src/window_main.cpp" line="193"/>
         <source>&amp;Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="205"/>
+        <location filename="../src/window_main.cpp" line="194"/>
         <source>&amp;Exit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="208"/>
+        <location filename="../src/window_main.cpp" line="195"/>
         <source>Close most recent zone view</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="209"/>
+        <location filename="../src/window_main.cpp" line="196"/>
         <source>Esc</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="216"/>
+        <location filename="../src/window_main.cpp" line="198"/>
         <source>&amp;Game</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="231"/>
+        <location filename="../src/window_main.cpp" line="199"/>
         <source>&amp;Actions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="233"/>
+        <location filename="../src/window_main.cpp" line="200"/>
         <source>&amp;Card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="257"/>
+        <location filename="../src/window_main.cpp" line="202"/>
         <source>&amp;Say:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -761,22 +762,22 @@
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="214"/>
+        <location filename="../src/dlg_settings.cpp" line="241"/>
         <source>&amp;Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="215"/>
+        <location filename="../src/dlg_settings.cpp" line="242"/>
         <source>&amp;Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="197"/>
+        <location filename="../src/dlg_settings.cpp" line="224"/>
         <source>Add message</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="197"/>
+        <location filename="../src/dlg_settings.cpp" line="224"/>
         <source>Message:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -872,27 +873,27 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/decklist.cpp" line="34"/>
+        <location filename="../src/decklist.cpp" line="35"/>
         <source>Maindeck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/decklist.cpp" line="36"/>
+        <location filename="../src/decklist.cpp" line="37"/>
         <source>Sideboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/decklist.cpp" line="295"/>
+        <location filename="../src/decklist.cpp" line="296"/>
         <source>Cockatrice decks (*.cod)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/decklist.cpp" line="296"/>
+        <location filename="../src/decklist.cpp" line="297"/>
         <source>Plain text decks (*.dec *.mwDeck)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/decklist.cpp" line="297"/>
+        <location filename="../src/decklist.cpp" line="298"/>
         <source>All files (*.*)</source>
         <translation type="unfinished"></translation>
     </message>
