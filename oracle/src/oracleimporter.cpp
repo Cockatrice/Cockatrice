@@ -70,6 +70,7 @@ OracleImporter::OracleImporter()
 	setsToDownload << SetToDownload("P3", "Portal: Three Kingdoms", "http://www.crystalkeep.com/magic/rules/oracle/oracle-pt3.txt");
 	setsToDownload << SetToDownload("ST", "Starter", "http://www.crystalkeep.com/magic/rules/oracle/oracle-st.txt");
 	setsToDownload << SetToDownload("ST2K", "Starter 2000", "http://www.crystalkeep.com/magic/rules/oracle/oracle-st2.txt");
+	setsToDownload << SetToDownload("PR", "Promo cards", "pr.txt");
 	setsToDownload << SetToDownload("UG", "Unglued", "http://www.crystalkeep.com/magic/rules/oracle/oracle-ug.txt");
 	setsToDownload << SetToDownload("UNH", "Unhinged", "http://www.crystalkeep.com/magic/rules/oracle/oracle-uh.txt");
 
@@ -195,6 +196,7 @@ OracleImporter::OracleImporter()
 
 void OracleImporter::importOracleFile(CardSet *set)
 {
+	int cards = 0;
 	buffer->seek(0);
 	QTextStream in(buffer);
 	while (!in.atEnd()) {
@@ -249,11 +251,12 @@ void OracleImporter::importOracleFile(CardSet *set)
 				tableRow = 3;
 			card->setTableRow(tableRow);
 
-			qDebug(cardname.toLatin1());
 			cardHash.insert(cardname, card);
 		}
 		card->addToSet(set);
+		cards++;
 	}
+	qDebug(QString("%1: %2 cards imported").arg(set->getLongName()).arg(cards).toLatin1());
 }
 
 void OracleImporter::downloadNextFile()
@@ -262,13 +265,25 @@ void OracleImporter::downloadNextFile()
 		progressDialog = new QProgressDialog(tr("Downloading oracle files..."), QString(), 0, setsToDownload.size());
 		setIndex = 0;
 	}
-	QUrl url(setsToDownload[setIndex].getUrl());
-	http->setHost(url.host(), QHttp::ConnectionModeHttp, url.port() == -1 ? 0 : url.port());
-	
-	buffer->close();
-	buffer->setData(QByteArray());
-	buffer->open(QIODevice::ReadWrite | QIODevice::Text);
-	reqId = http->get(QUrl::toPercentEncoding(url.path(), "!$&'()*+,;=:@/"), buffer);
+	QString urlString = setsToDownload[setIndex].getUrl();
+	if (urlString.startsWith("http://")) {
+		QUrl url(urlString);
+		http->setHost(url.host(), QHttp::ConnectionModeHttp, url.port() == -1 ? 0 : url.port());
+		
+		buffer->close();
+		buffer->setData(QByteArray());
+		buffer->open(QIODevice::ReadWrite | QIODevice::Text);
+		reqId = http->get(QUrl::toPercentEncoding(url.path(), "!$&'()*+,;=:@/"), buffer);
+	} else {
+		QFile file(urlString);
+		file.open(QIODevice::ReadOnly | QIODevice::Text);
+		
+		buffer->close();
+		buffer->setData(file.readAll());
+		buffer->open(QIODevice::ReadWrite | QIODevice::Text);
+		reqId = 0;
+		httpRequestFinished(reqId, false);
+	}
 }
 
 void OracleImporter::httpRequestFinished(int requestId, bool error)
@@ -280,12 +295,17 @@ void OracleImporter::httpRequestFinished(int requestId, bool error)
 	if (requestId != reqId)
 		return;
 
-	importOracleFile(new CardSet(setsToDownload[setIndex].getShortName(), setsToDownload[setIndex].getLongName()));
+	CardSet *set = new CardSet(setsToDownload[setIndex].getShortName(), setsToDownload[setIndex].getLongName());
+	if (!setHash.contains(set->getShortName()))
+		setHash.insert(set->getShortName(), set);
+	importOracleFile(set);
 	progressDialog->setValue(++setIndex);
 	
 	if (setIndex == setsToDownload.size()) {
-		qDebug(QString("OracleImporter: %1 cards imported").arg(cardHash.size()).toLatin1());
+		qDebug(QString("Total: %1 cards imported").arg(cardHash.size()).toLatin1());
 		setIndex = -1;
+		saveToFile("cards.xml");
+		qApp->quit();
 	} else
 		downloadNextFile();
 }
