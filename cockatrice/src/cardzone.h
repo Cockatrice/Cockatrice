@@ -16,7 +16,7 @@ class CardZone : public AbstractGraphicsItem {
 protected:
 	Player *player;
 	QString name;
-	CardList *cards;
+	CardList cards;
 	ZoneViewZone *view;
 	QMenu *menu;
 	QAction *doubleClickAction;
@@ -29,7 +29,7 @@ public:
 	enum { Type = typeZone };
 	int type() const { return Type; }
 	virtual void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown) = 0;
-	CardZone(Player *_player, const QString &_name, bool _hasCardAttr, bool _isShufflable, QGraphicsItem *parent = 0, bool isView = false);
+	CardZone(Player *_player, const QString &_name, bool _hasCardAttr, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent = 0, bool isView = false);
 	~CardZone();
 	void clearContents();
 	bool getHasCardAttr() const { return hasCardAttr; }
@@ -38,15 +38,14 @@ public:
 	void setMenu(QMenu *_menu, QAction *_doubleClickAction = 0) { menu = _menu; doubleClickAction = _doubleClickAction; }
 	QString getName() const { return name; }
 	Player *getPlayer() const { return player; }
-	bool contentsKnown() const { return cards->getContentsKnown(); }
-	CardList *getCards() const { return cards; }
+	bool contentsKnown() const { return cards.getContentsKnown(); }
+	const CardList &getCards() const { return cards; }
 	void addCard(CardItem *card, bool reorganize, int x, int y = -1);
 	// getCard() finds a card by id.
 	CardItem *getCard(int cardId, const QString &cardName);
 	// takeCard() finds a card by position and removes it from the zone and from all of its views.
 	CardItem *takeCard(int position, int cardId, const QString &cardName);
 	void setCardAttr(int cardId, const QString &aname, const QString &avalue);
-	void hoverCardEvent(CardItem *card);
 	ZoneViewZone *getView() const { return view; }
 	void setView(ZoneViewZone *_view);
 	virtual void reorganizeCards() = 0;

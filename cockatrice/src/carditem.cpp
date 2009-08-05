@@ -6,6 +6,7 @@
 #include "cardzone.h"
 #include "tablezone.h"
 #include "player.h"
+#include "game.h"
 
 CardItem::CardItem(CardDatabase *_db, const QString &_name, int _cardid, QGraphicsItem *parent)
 	: AbstractGraphicsItem(parent), db(_db), info(db->getCard(_name)), name(_name), id(_cardid), tapped(false), attacking(false), facedown(false), counters(0), doesntUntap(false), dragItem(NULL)
@@ -200,7 +201,7 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 void CardItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-	((CardZone *) parentItem())->hoverCardEvent(this);
+	((Game *) ((CardZone *) parentItem())->getPlayer()->parent())->hoverCardEvent(this);
 	QGraphicsItem::hoverEnterEvent(event);
 }
 

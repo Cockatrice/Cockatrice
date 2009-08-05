@@ -4,9 +4,10 @@
 #include "client.h"
 
 HandZone::HandZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "hand", false, false, parent)
+	: CardZone(_p, "hand", false, false, _p->getLocal(), parent)
 {
-	cards = new CardList(player->getLocal());
+	setCacheMode(DeviceCoordinateCache);
+	setAcceptsHoverEvents(true); // Awkwardly, this is needed to repaint the cached item after it has been corrupted by buggy rubberband drag.
 }
 
 QRectF HandZone::boundingRect() const
@@ -21,20 +22,20 @@ void HandZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option
 
 void HandZone::reorganizeCards()
 {
-	if (cards->isEmpty())
+	if (cards.isEmpty())
 		return;
 
-	int cardCount = cards->size();
+	const int cardCount = cards.size();
 	qreal totalWidth = boundingRect().width();
 	qreal totalHeight = boundingRect().height();
-	qreal cardWidth = cards->at(0)->boundingRect().width();
-	qreal cardHeight = cards->at(0)->boundingRect().height();
+	qreal cardWidth = cards.at(0)->boundingRect().width();
+	qreal cardHeight = cards.at(0)->boundingRect().height();
 	qreal xspace = 5;
 	qreal x1 = xspace;
 	qreal x2 = totalWidth - xspace - cardWidth;
 
 	for (int i = 0; i < cardCount; i++) {
-		CardItem *c = cards->at(i);
+		CardItem *c = cards.at(i);
 		qreal x = i % 2 ? x2 : x1;
 		// If the total height of the cards is smaller than the available height,
 		// the cards do not need to overlap and are displayed in the center of the area.
@@ -49,10 +50,10 @@ void HandZone::reorganizeCards()
 void HandZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
 	if (x == -1)
-		x = cards->size();
-	cards->insert(x, card);
+		x = cards.size();
+	cards.insert(x, card);
 
-	if (!cards->getContentsKnown()) {
+	if (!cards.getContentsKnown()) {
 		card->setId(-1);
 		card->setName();
 	}
@@ -64,5 +65,5 @@ void HandZone::addCardImpl(CardItem *card, int x, int /*y*/)
 
 void HandZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
-	player->client->moveCard(cardId, startZone->getName(), getName(), cards->size(), 0);
+	player->client->moveCard(cardId, startZone->getName(), getName(), cards.size(), 0);
 }

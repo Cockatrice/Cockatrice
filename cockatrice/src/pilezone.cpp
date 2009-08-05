@@ -1,15 +1,16 @@
 #include <QtGui>
 #include "pilezone.h"
 #include "player.h"
+#include "game.h"
 #include "client.h"
 #include "carddragitem.h"
 #include "zoneviewzone.h"
 
-PileZone::PileZone(Player *_p, const QString &_name, QGraphicsItem *parent)
-	: CardZone(_p, _name, false, false, parent)
+PileZone::PileZone(Player *_p, const QString &_name, bool _contentsKnown, QGraphicsItem *parent)
+	: CardZone(_p, _name, false, false, _contentsKnown, parent)
 {
-	cards = new CardList(true);
 	setCacheMode(DeviceCoordinateCache); // Do not move this line to the parent constructor!
+	setAcceptsHoverEvents(true);
 	setCursor(Qt::OpenHandCursor);
 }
 
@@ -21,20 +22,24 @@ QRectF PileZone::boundingRect() const
 void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	qDebug("PileZone::paint");
-	if (!cards->isEmpty()) {
+	if (!cards.isEmpty()) {
 		painter->save();
-		cards->at(0)->paint(painter, option, widget);
+		cards.at(0)->paint(painter, option, widget);
 		painter->restore();
 	}
 
-	paintNumberEllipse(cards->size(), painter);
+	paintNumberEllipse(cards.size(), painter);
 	painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
 }
 
 void PileZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
-	cards->insert(x, card);
+	cards.insert(x, card);
 	card->setPos(0, 0);
+	if (!contentsKnown()) {
+		card->setName(QString());
+		card->setId(-1);
+	}
 	card->setVisible(false);
 	card->resetState();
 	card->setParentItem(this);
@@ -69,12 +74,13 @@ void PileZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < QApplication::startDragDistance())
 		return;
 
-	if (cards->empty())
+	if (cards.isEmpty())
 		return;
 
 	bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier);
-	CardItem *card = cards->at(0);
-	CardDragItem *drag = card->createDragItem(card->getId(), event->pos(), event->scenePos(), faceDown);
+	CardItem *card = cards.at(0);
+	const int cardid = contentsKnown() ? card->getId() : 0;
+	CardDragItem *drag = card->createDragItem(cardid, event->pos(), event->scenePos(), faceDown);
 	drag->grabMouse();
 	setCursor(Qt::OpenHandCursor);
 }
@@ -82,4 +88,11 @@ void PileZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void PileZone::mouseReleaseEvent(QGraphicsSceneMouseEvent */*event*/)
 {
 	setCursor(Qt::OpenHandCursor);
+}
+
+void PileZone::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+	if (!cards.isEmpty())
+		((Game *) player->parent())->hoverCardEvent(cards.at(0));
+	QGraphicsItem::hoverEnterEvent(event);
 }

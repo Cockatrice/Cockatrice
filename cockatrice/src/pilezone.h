@@ -4,9 +4,8 @@
 #include "cardzone.h"
 
 class PileZone : public CardZone {
-private:
 public:
-	PileZone(Player *_p, const QString &_name, QGraphicsItem *parent = 0);
+	PileZone(Player *_p, const QString &_name, bool _contentsKnown, QGraphicsItem *parent = 0);
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	void reorganizeCards();
@@ -15,6 +14,7 @@ protected:
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+	void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
 	void addCardImpl(CardItem *card, int x, int y);
 };
 

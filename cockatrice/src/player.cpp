@@ -125,7 +125,7 @@ void Player::setCardAttrHelper(CardItem *card, const QString &aname, const QStri
 		bool tapped = avalue == "1";
 		if (!(!tapped && card->getDoesntUntap() && allCards)) {
 			if (!allCards)
-				emit logSetTapped(name, card->getName(), tapped);
+				emit logSetTapped(this, card->getName(), tapped);
 			card->setTapped(tapped);
 		}
 	} else if (aname == "attacking")
@@ -134,13 +134,13 @@ void Player::setCardAttrHelper(CardItem *card, const QString &aname, const QStri
 		card->setFaceDown(avalue == "1");
 	else if (aname == "counters") {
 		int value = avalue.toInt();
-		emit logSetCardCounters(name, card->getName(), value, card->getCounters());
+		emit logSetCardCounters(this, card->getName(), value, card->getCounters());
 		card->setCounters(value);
 	} else if (aname == "annotation")
 		card->setAnnotation(avalue);
 	else if (aname == "doesnt_untap") {
 		bool value = (avalue == "1");
-		emit logSetDoesntUntap(name, card->getName(), value);
+		emit logSetDoesntUntap(this, card->getName(), value);
 		card->setDoesntUntap(value);
 	}
 }
@@ -230,7 +230,7 @@ void Player::gameEvent(const ServerEventData &event)
 
 			// The log event has to be sent before the card is added to the target zone
 			// because the addCard function can modify the card object.
-			emit logMoveCard(name, card->getName(), startZone->getName(), targetZone->getName());
+			emit logMoveCard(this, card->getName(), startZone->getName(), targetZone->getName());
 
 			targetZone->addCard(card, true, x, y);
 
@@ -250,7 +250,7 @@ void Player::gameEvent(const ServerEventData &event)
 
 			CardItem *card = new CardItem(db, cardname, cardid);
 
-			emit logCreateToken(name, card->getName());
+			emit logCreateToken(this, card->getName());
 			zone->addCard(card, true, x, y);
 
 			break;
@@ -266,11 +266,11 @@ void Player::gameEvent(const ServerEventData &event)
 			// XXX Fehlerbehandlung
 
 			if (cardId == -1) {
-				CardList *const cards = zone->getCards();
-				for (int i = 0; i < cards->size(); i++)
-					setCardAttrHelper(cards->at(i), aname, avalue, true);
+				const CardList &cards = zone->getCards();
+				for (int i = 0; i < cards.size(); i++)
+					setCardAttrHelper(cards.at(i), aname, avalue, true);
 				if (aname == "tapped")
-					emit logSetTapped(name, QString("-1"), avalue == "1");
+					emit logSetTapped(this, QString("-1"), avalue == "1");
 			} else {
 				CardItem *card = zone->getCard(cardId, "");
 				setCardAttrHelper(card, aname, avalue, false);
@@ -297,17 +297,12 @@ void Player::gameEvent(const ServerEventData &event)
 			Counter *c = area->getCounter(counterName);
 			int oldValue = c->getValue();
 			c->setValue(value);
-			emit logSetCounter(name, c->getName(), value, oldValue);
+			emit logSetCounter(this, c->getName(), value, oldValue);
 			break;
 		}
 		default:
 			qDebug("unhandled player event");
 	}
-}
-
-void Player::hoverCardEvent(CardItem *card)
-{
-	emit hoverCard(card->getName());
 }
 
 void Player::showCardMenu(const QPoint &p)

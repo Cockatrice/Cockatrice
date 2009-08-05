@@ -136,14 +136,13 @@ Player *Game::addPlayer(int playerId, const QString &playerName, QPointF base, b
 {
 	Player *newPlayer = new Player(playerName, playerId, base, local, db, client, scene, this);
 
-	connect(newPlayer, SIGNAL(hoverCard(QString)), this, SIGNAL(hoverCard(QString)));
 	connect(newPlayer, SIGNAL(sigShowCardMenu(QPoint)), this, SLOT(showCardMenu(QPoint)));
-	connect(newPlayer, SIGNAL(logMoveCard(QString, QString, QString, QString)), this, SIGNAL(logMoveCard(QString, QString, QString, QString)));
-	connect(newPlayer, SIGNAL(logCreateToken(QString, QString)), this, SIGNAL(logCreateToken(QString, QString)));
-	connect(newPlayer, SIGNAL(logSetCardCounters(QString, QString, int, int)), this, SIGNAL(logSetCardCounters(QString, QString, int, int)));
-	connect(newPlayer, SIGNAL(logSetTapped(QString, QString, bool)), this, SIGNAL(logSetTapped(QString, QString, bool)));
-	connect(newPlayer, SIGNAL(logSetCounter(QString, QString, int, int)), this, SIGNAL(logSetCounter(QString, QString, int, int)));
-	connect(newPlayer, SIGNAL(logSetDoesntUntap(QString, QString, bool)), this, SIGNAL(logSetDoesntUntap(QString, QString, bool)));
+	connect(newPlayer, SIGNAL(logMoveCard(Player *, QString, QString, QString)), this, SIGNAL(logMoveCard(Player *, QString, QString, QString)));
+	connect(newPlayer, SIGNAL(logCreateToken(Player *, QString)), this, SIGNAL(logCreateToken(Player *, QString)));
+	connect(newPlayer, SIGNAL(logSetCardCounters(Player *, QString, int, int)), this, SIGNAL(logSetCardCounters(Player *, QString, int, int)));
+	connect(newPlayer, SIGNAL(logSetTapped(Player *, QString, bool)), this, SIGNAL(logSetTapped(Player *, QString, bool)));
+	connect(newPlayer, SIGNAL(logSetCounter(Player *, QString, int, int)), this, SIGNAL(logSetCounter(Player *, QString, int, int)));
+	connect(newPlayer, SIGNAL(logSetDoesntUntap(Player *, QString, bool)), this, SIGNAL(logSetDoesntUntap(Player *, QString, bool)));
 
 	players << newPlayer;
 	emit playerAdded(newPlayer);
@@ -192,21 +191,21 @@ void Game::gameEvent(const ServerEventData &msg)
 
 		switch(msg.getEventType()) {
 		case eventSay:
-			emit logSay(p->getName(), msg.getEventData()[0]);
+			emit logSay(p, msg.getEventData()[0]);
 			break;
 		case eventJoin: {
-			emit logJoin(msg.getPlayerName());
+			emit logJoin(p);
 			addPlayer(msg.getPlayerId(), msg.getPlayerName(), QPointF(0, 0), false);
 			break;
 		}
 		case eventLeave:
-			emit logLeave(msg.getPlayerName());
+			emit logLeave(p);
 			// XXX Spieler natürlich noch rauswerfen
 			break;
 		case eventReadyStart:
 			if (started) {
 				started = false;
-				emit logReadyStart(p->getName());
+				emit logReadyStart(p);
 				if (!p->getLocal())
 					restartGameDialog();
 			}
@@ -216,13 +215,13 @@ void Game::gameEvent(const ServerEventData &msg)
 			emit logGameStart();
 			break;
 		case eventShuffle:
-			emit logShuffle(p->getName());
+			emit logShuffle(p);
 			break;
 		case eventRollDice: {
 			QStringList data = msg.getEventData();
 			int sides = data[0].toInt();
 			int roll = data[1].toInt();
-			emit logRollDice(p->getName(), sides, roll);
+			emit logRollDice(p, sides, roll);
 			break;
 		}
 		case eventSetActivePlayer:
@@ -243,7 +242,7 @@ void Game::gameEvent(const ServerEventData &msg)
 		}
 		case eventDumpZone: {
 			QStringList data = msg.getEventData();
-			emit logDumpZone(p->getName(), data[1], players.findPlayer(data[0].toInt())->getName(), data[2].toInt());
+			emit logDumpZone(p, data[1], players.findPlayer(data[0].toInt())->getName(), data[2].toInt());
 			break;
 		}
 		case eventMoveCard: {
@@ -253,7 +252,7 @@ void Game::gameEvent(const ServerEventData &msg)
 			break;
 		}
 		case eventDraw: {
-			emit logDraw(p->getName(), msg.getEventData()[0].toInt());
+			emit logDraw(p, msg.getEventData()[0].toInt());
 			if (msg.getPlayerId() == localPlayer->getId())
 				break;
 			p->gameEvent(msg);
@@ -401,4 +400,9 @@ void Game::actSayMessage()
 {
 	QAction *a = qobject_cast<QAction *>(sender());
 	client->say(a->text());
+}
+
+void Game::hoverCardEvent(CardItem *card)
+{
+	emit hoverCard(card->getName());
 }

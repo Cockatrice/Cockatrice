@@ -2,7 +2,6 @@
 #include "player.h"
 #include "tablezone.h"
 #include "handzone.h"
-#include "libraryzone.h"
 #include "pilezone.h"
 #include "counter.h"
 #include <QPainter>
@@ -10,20 +9,22 @@
 PlayerArea::PlayerArea(Player *_player, QGraphicsItem *parent)
 	: QGraphicsItem(parent), player(_player)
 {
- 	QPointF base = QPointF(55, 50);
+	setCacheMode(DeviceCoordinateCache);
+	
+	QPointF base = QPointF(55, 50);
 
-	LibraryZone *deck = new LibraryZone(_player, this);
+	PileZone *deck = new PileZone(_player, "deck", false, this);
 	deck->setPos(base);
 
 	qreal h = deck->boundingRect().height() + 20;
 
-	PileZone *grave = new PileZone(_player, "grave", this);
+	PileZone *grave = new PileZone(_player, "grave", true, this);
 	grave->setPos(base + QPointF(0, h));
 
-	PileZone *rfg = new PileZone(_player, "rfg", this);
+	PileZone *rfg = new PileZone(_player, "rfg", true, this);
 	rfg->setPos(base + QPointF(0, 2 * h));
 
-	PileZone *sb = new PileZone(_player, "sb", this);
+	PileZone *sb = new PileZone(_player, "sb", true, this);
 	sb->setVisible(false);
 
 	base = QPointF(deck->boundingRect().width() + 60, 0);

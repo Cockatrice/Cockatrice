@@ -23,12 +23,12 @@ signals:
 	void toggleZoneView(Player *player, QString zoneName, int number);
 	void sigShowCardMenu(QPoint p);
 	// Log events
-	void logMoveCard(QString playerName, QString cardName, QString startZone, QString targetZone);
-	void logCreateToken(QString playerName, QString cardName);
-	void logSetCardCounters(QString playerName, QString cardName, int value, int oldValue);
-	void logSetTapped(QString playerName, QString cardName, bool tapped);
-	void logSetCounter(QString playerName, QString counterName, int value, int oldValue);
-	void logSetDoesntUntap(QString playerName, QString cardName, bool doesntUntap);
+	void logMoveCard(Player *player, QString cardName, QString startZone, QString targetZone);
+	void logCreateToken(Player *player, QString cardName);
+	void logSetCardCounters(Player *player, QString cardName, int value, int oldValue);
+	void logSetTapped(Player *player, QString cardName, bool tapped);
+	void logSetCounter(Player *player, QString counterName, int value, int oldValue);
+	void logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap);
 private slots:
 	void actMoveHandToTopLibrary();
 	void actMoveHandToBottomLibrary();
@@ -66,7 +66,6 @@ public:
 	bool getLocal() const { return local; }
 	const ZoneList *getZones() const { return &zones; }
 	void gameEvent(const ServerEventData &event);
-	void hoverCardEvent(CardItem *card);
 	CardDatabase *getDb() const { return db; }
 	void showCardMenu(const QPoint &p);
 };

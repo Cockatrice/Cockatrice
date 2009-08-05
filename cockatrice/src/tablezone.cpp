@@ -4,10 +4,8 @@
 #include "client.h"
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "table", true, false, parent), width(864), height(578)
+	: CardZone(_p, "table", true, false, true, parent), width(864), height(578)
 {
-	cards = new CardList(true);
-	
 	gridPoints << (QList<QPoint>() << QPoint(8, 12)
 				       << QPoint(9, 13)
 				       << QPoint(10, 14)
@@ -68,7 +66,7 @@ void TableZone::addCardImpl(CardItem *card, int _x, int _y)
 	qreal x = mapPoint.x();
 	qreal y = mapPoint.y();
 	
-	cards->append(card);
+	cards.append(card);
 //	if ((x != -1) && (y != -1)) {
 		if (!player->getLocal())
 			y = height - CARD_HEIGHT - y;
@@ -108,9 +106,9 @@ void TableZone::toggleTapped()
 
 CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
 {
-	for (int i = 0; i < cards->size(); i++)
-		if (cards->at(i)->getGridPoint() == gridPoint)
-			return cards->at(i);
+	for (int i = 0; i < cards.size(); i++)
+		if (cards.at(i)->getGridPoint() == gridPoint)
+			return cards.at(i);
 	return 0;
 }
 

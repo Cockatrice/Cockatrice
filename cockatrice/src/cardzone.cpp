@@ -5,8 +5,8 @@
 #include "client.h"
 #include "zoneviewzone.h"
 
-CardZone::CardZone(Player *_p, const QString &_name, bool _hasCardAttr, bool _isShufflable, QGraphicsItem *parent, bool isView)
-	: AbstractGraphicsItem(parent), player(_p), name(_name), cards(NULL), view(NULL), menu(NULL), doubleClickAction(0), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable)
+CardZone::CardZone(Player *_p, const QString &_name, bool _hasCardAttr, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent, bool isView)
+	: AbstractGraphicsItem(parent), player(_p), name(_name), cards(_contentsKnown), view(NULL), menu(NULL), doubleClickAction(0), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable)
 {
 	if (!isView)
 		player->addZone(this);
@@ -17,14 +17,13 @@ CardZone::~CardZone()
 	qDebug(QString("CardZone destructor: %1").arg(name).toLatin1());
 	delete view;
 	clearContents();
-	delete cards;
 }
 
 void CardZone::clearContents()
 {
-	for (int i = 0; i < cards->size(); i++)
-		delete cards->at(i);
-	cards->clear();
+	for (int i = 0; i < cards.size(); i++)
+		delete cards.at(i);
+	cards.clear();
 }
 
 void CardZone::mouseDoubleClickEvent(QGraphicsSceneMouseEvent */*event*/)
@@ -58,7 +57,7 @@ void CardZone::addCard(CardItem *card, bool reorganize, int x, int y)
 
 CardItem *CardZone::getCard(int cardId, const QString &cardName)
 {
-	CardItem *c = cards->findCard(cardId, false);
+	CardItem *c = cards.findCard(cardId, false);
 	// If the card's id is -1, this zone is invisible,
 	// so we need to give the card an id and a name as it comes out.
 	// It can be assumed that in an invisible zone, all cards are equal.
@@ -71,9 +70,9 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
 
 CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName)
 {
-	Q_ASSERT(position < cards->size());
+	Q_ASSERT(position < cards.size());
 
-	CardItem *c = cards->takeAt(position);
+	CardItem *c = cards.takeAt(position);
 
 	if (view)
 		view->removeCard(position);
@@ -91,11 +90,6 @@ void CardZone::setCardAttr(int cardId, const QString &aname, const QString &aval
 		player->client->setCardAttr(name, cardId, aname, avalue);
 }
 
-void CardZone::hoverCardEvent(CardItem *card)
-{
-	player->hoverCardEvent(card);
-}
-
 void CardZone::setView(ZoneViewZone *_view)
 {
 	view = _view;
@@ -105,6 +99,6 @@ void CardZone::moveAllToZone(const QString &targetZone, int targetX)
 {
 	// Cards need to be moved in reverse order so that the other
 	// cards' list index doesn't change
-	for (int i = cards->size() - 1; i >= 0; i--)
-		player->client->moveCard(cards->at(i)->getId(), getName(), targetZone, targetX);
+	for (int i = cards.size() - 1; i >= 0; i--)
+		player->client->moveCard(cards.at(i)->getId(), getName(), targetZone, targetX);
 }

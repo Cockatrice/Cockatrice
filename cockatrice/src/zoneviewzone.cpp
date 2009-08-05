@@ -4,9 +4,8 @@
 #include "client.h"
 
 ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, QGraphicsItem *parent)
-	: CardZone(_p, _origZone->getName(), false, false, parent, true), height(0), numberCards(_numberCards), origZone(_origZone)
+	: CardZone(_p, _origZone->getName(), false, false, true, parent, true), height(0), numberCards(_numberCards), origZone(_origZone)
 {
-	cards = new CardList(true);
 	origZone->setView(this);
 }
 
@@ -30,10 +29,10 @@ bool ZoneViewZone::initializeCards()
 	if (!origZone->contentsKnown())
 		return false;
 
-	CardList *const c = origZone->getCards();
-	int number = numberCards == 0 ? c->size() : (numberCards < c->size() ? numberCards : c->size());
+	const CardList &c = origZone->getCards();
+	int number = numberCards == 0 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
 	for (int i = 0; i < number; i++) {
-		CardItem *card = c->at(i);
+		CardItem *card = c.at(i);
 		addCard(new CardItem(player->getDb(), card->getName(), card->getId(), this), false, i);
 	}
 	reorganizeCards();
@@ -45,19 +44,19 @@ void ZoneViewZone::reorganizeCards()
 {
 	qDebug("reorganizeCards");
 
-	if (cards->isEmpty())
+	if (cards.isEmpty())
 		return;
 
-	int cardCount = cards->size();
+	int cardCount = cards.size();
 	qreal totalWidth = boundingRect().width();
 	qreal totalHeight = boundingRect().height();
-	qreal cardWidth = cards->at(0)->boundingRect().width();
-	qreal cardHeight = cards->at(0)->boundingRect().height();
+	qreal cardWidth = cards.at(0)->boundingRect().width();
+	qreal cardHeight = cards.at(0)->boundingRect().height();
 	qreal x1 = 0;
 	qreal x2 = (totalWidth - cardWidth);
 
 	for (int i = 0; i < cardCount; i++) {
-		CardItem *c = cards->at(i);
+		CardItem *c = cards.at(i);
 		qreal x = i % 2 ? x2 : x1;
 		// If the total height of the cards is smaller than the available height,
 		// the cards do not need to overlap and are displayed in the center of the area.
@@ -73,7 +72,7 @@ void ZoneViewZone::reorganizeCards()
 
 void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
-	cards->insert(x, card);
+	cards.insert(x, card);
 	card->setParentItem(this);
 	card->update();
 }
@@ -86,10 +85,10 @@ void ZoneViewZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint
 
 void ZoneViewZone::removeCard(int position)
 {
-	if (position >= cards->size())
+	if (position >= cards.size())
 		return;
 
-	CardItem *card = cards->takeAt(position);
+	CardItem *card = cards.takeAt(position);
 	delete card;
 	reorganizeCards();
 }
