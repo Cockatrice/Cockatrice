@@ -249,7 +249,8 @@ DlgSettings::DlgSettings(CardDatabase *_db, QTranslator *_translator, QWidget *p
 	contentsWidget->setViewMode(QListView::IconMode);
 	contentsWidget->setIconSize(QSize(96, 84));
 	contentsWidget->setMovement(QListView::Static);
-	contentsWidget->setMaximumWidth(128);
+	contentsWidget->setMinimumWidth(128);
+	contentsWidget->setMaximumWidth(150);
 	contentsWidget->setSpacing(12);
 	
 	pagesWidget = new QStackedWidget;
@@ -269,7 +270,7 @@ DlgSettings::DlgSettings(CardDatabase *_db, QTranslator *_translator, QWidget *p
 	
 	QHBoxLayout *hboxLayout = new QHBoxLayout;
 	hboxLayout->addWidget(contentsWidget);
-	hboxLayout->addWidget(pagesWidget, 1);
+	hboxLayout->addWidget(pagesWidget);
 	
 	QHBoxLayout *buttonsLayout = new QHBoxLayout;
 	buttonsLayout->addStretch(1);
@@ -283,6 +284,8 @@ DlgSettings::DlgSettings(CardDatabase *_db, QTranslator *_translator, QWidget *p
 	setLayout(mainLayout);
 	
 	retranslateUi();
+	
+	resize(700, sizeHint().height());
 }
 
 void DlgSettings::createIcons()
@@ -290,6 +293,7 @@ void DlgSettings::createIcons()
 	generalButton = new QListWidgetItem(contentsWidget);
 	generalButton->setTextAlignment(Qt::AlignHCenter);
 	generalButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+	generalButton->setIcon(QIcon(":/resources/icon_config_general.svg"));
 	
 	appearanceButton = new QListWidgetItem(contentsWidget);
 	appearanceButton->setTextAlignment(Qt::AlignHCenter);
@@ -298,6 +302,7 @@ void DlgSettings::createIcons()
 	messagesButton = new QListWidgetItem(contentsWidget);
 	messagesButton->setTextAlignment(Qt::AlignHCenter);
 	messagesButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+	messagesButton->setIcon(QIcon(":/resources/icon_config_messages.svg"));
 	
 	connect(contentsWidget, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(changePage(QListWidgetItem *, QListWidgetItem *)));
 }
@@ -329,11 +334,7 @@ void DlgSettings::retranslateUi()
 	setWindowTitle(tr("Settings"));
 	
 	generalButton->setText(tr("General"));
-	QIcon generalIcon("resources/icon_general_v1.svg");
-	generalButton->setIcon(generalIcon);
 	appearanceButton->setText(tr("Appearance"));
-	QIcon messagesIcon("resources/icon_messages_v1.svg");
-	messagesButton->setIcon(messagesIcon);	
 	messagesButton->setText(tr("Messages"));
 	
 	closeButton->setText(tr("&Close"));
