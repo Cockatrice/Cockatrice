@@ -46,13 +46,12 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		}
 		painter->drawPixmap(translatedPixmap->rect(), *translatedPixmap, translatedPixmap->rect());
 	} else {
-		QFont f;
+		QFont f("Serif");
 		f.setStyleHint(QFont::Serif);
-		f.setPointSize(8);
-		f.setWeight(QFont::Bold);
+		f.setPixelSize(11);
 		painter->setFont(f);
-		painter->setBrush(QColor(200, 200, 200));
-		painter->setPen(QPen(Qt::black));
+		painter->setBrush(QColor(230, 230, 230));
+		painter->setPen(Qt::black);
 		painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
 		painter->drawText(QRectF(5, 5, CARD_WIDTH - 15, CARD_HEIGHT - 15), Qt::AlignTop | Qt::AlignLeft | Qt::TextWordWrap, name);
 	}

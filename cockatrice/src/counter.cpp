@@ -18,7 +18,10 @@ void Counter::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*
 	painter->setBrush(QBrush(color));
 	painter->drawEllipse(boundingRect());
 	if (value) {
-		painter->setFont(QFont("Times", 16, QFont::Bold));
+		QFont f("Times");
+		f.setPixelSize(20);
+		f.setWeight(QFont::Bold);
+		painter->setFont(f);
 		painter->drawText(boundingRect(), Qt::AlignCenter, QString::number(value));
 	}
 }
