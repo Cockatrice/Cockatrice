@@ -96,27 +96,58 @@ void MessageLogWidget::logDraw(Player *player, int number)
 
 void MessageLogWidget::logMoveCard(Player *player, QString cardName, QString startZone, QString targetZone)
 {
-	append(tr("%1 moves <font color=\"blue\">%2</font> from %3 to %4").arg(sanitizeHtml(player->getName())).arg(cardName).arg(startZone).arg(targetZone));
+	if ((startZone == "table") && (targetZone == "table"))
+		return;
+	QString fromStr;
+	if (startZone == "table")
+		fromStr = tr("from table");
+	else if (startZone == "grave")
+		fromStr = tr("from graveyard");
+	else if (startZone == "rfg")
+		fromStr = tr("from exile");
+	else if (startZone == "hand")
+		fromStr = tr("from hand");
+	else if (startZone == "deck")
+		fromStr = tr("from library");
+	
+	QString finalStr;
+	if (targetZone == "table")
+		finalStr = tr("%1 puts %2 into play %3");
+	else {
+		if (targetZone == "grave")
+			finalStr = tr("%1 puts %2 %3 into graveyard");
+		else if (targetZone == "rfg")
+			finalStr = tr("%1 exiles %2 %3");
+		else if (targetZone == "hand")
+			finalStr = tr("%1 moves %2 %3 to hand");
+		else if (targetZone == "deck")
+			finalStr = tr("%1 puts %2 %3 on top of his library");
+		else
+			finalStr = tr("%1 moves %2 %3 to %4");
+	}
+	append(finalStr.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(fromStr).arg(targetZone));
 }
 
 void MessageLogWidget::logCreateToken(Player *player, QString cardName)
 {
-	append(tr("%1 creates token: <font color=\"blue\">%2</font>").arg(sanitizeHtml(player->getName())).arg(cardName));
+	append(tr("%1 creates token: %2").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
 }
 
 void MessageLogWidget::logSetCardCounters(Player *player, QString cardName, int value, int oldValue)
 {
+	QString finalStr;
 	if (value > oldValue)
-		append(tr("%1 places %2 counters on <font color=\"blue\">%3</font> (now %4)").arg(sanitizeHtml(player->getName())).arg(value - oldValue).arg(cardName).arg(value));
+		finalStr = tr("%1 places %2 counters on %3 (now %4)");
 	else
-		append(tr("%1 removes %2 counters from <font color=\"blue\">%3</font> (now %4)").arg(sanitizeHtml(player->getName())).arg(oldValue - value).arg(cardName).arg(value));
+		finalStr = tr("%1 removes %2 counters from %3 (now %4)");
+	append(finalStr.arg(sanitizeHtml(player->getName())).arg(oldValue - value).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(value));
 }
 
 void MessageLogWidget::logSetTapped(Player *player, QString cardName, bool tapped)
 {
 	if (cardName == "-1")
 		cardName = tr("his permanents");
-	append(tr("%1 %2 <font color=\"blue\">%3</blue>").arg(sanitizeHtml(player->getName())).arg(tapped ? "taps" : "untaps").arg(cardName));
+	append(tr("%1 %2 %3").arg(sanitizeHtml(player->getName())).arg(tapped ? tr("taps") : tr("untaps")).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
 }
 
 void MessageLogWidget::logSetCounter(Player *player, QString counterName, int value, int oldValue)
@@ -126,10 +157,12 @@ void MessageLogWidget::logSetCounter(Player *player, QString counterName, int va
 
 void MessageLogWidget::logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap)
 {
+	QString finalStr;
 	if (doesntUntap)
-		append(tr("%1 sets <font color=\"blue\">%2</font> to not untap normally.").arg(sanitizeHtml(player->getName())).arg(cardName));
+		finalStr = tr("%1 sets %2 to not untap normally.");
 	else
-		append(tr("%1 sets <font color=\"blue\">%2</font> to untap normally.").arg(sanitizeHtml(player->getName())).arg(cardName));
+		finalStr = tr("%1 sets %2 to untap normally.");
+	append(finalStr.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
 }
 
 void MessageLogWidget::logDumpZone(Player *player, QString zoneName, QString zoneOwner, int numberCards)

@@ -379,48 +379,48 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="286"/>
+        <location filename="../src/game.cpp" line="285"/>
         <source>Set life</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="286"/>
+        <location filename="../src/game.cpp" line="285"/>
         <source>New life total:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="299"/>
+        <location filename="../src/game.cpp" line="298"/>
         <source>Roll dice</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="299"/>
+        <location filename="../src/game.cpp" line="298"/>
         <source>Number of sides:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="311"/>
+        <location filename="../src/game.cpp" line="310"/>
         <source>Draw cards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="311"/>
-        <location filename="../src/game.cpp" line="389"/>
+        <location filename="../src/game.cpp" line="310"/>
+        <location filename="../src/game.cpp" line="388"/>
         <source>Number:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="318"/>
+        <location filename="../src/game.cpp" line="317"/>
         <source>Create token</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="318"/>
+        <location filename="../src/game.cpp" line="317"/>
         <source>Name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="389"/>
+        <location filename="../src/game.cpp" line="388"/>
         <source>Set counters</source>
         <translation type="unfinished"></translation>
     </message>
@@ -639,123 +639,183 @@
 <context>
     <name>MessageLogWidget</name>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="7"/>
+        <location filename="../src/messagelogwidget.cpp" line="15"/>
         <source>Connecting to %1...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="12"/>
+        <location filename="../src/messagelogwidget.cpp" line="20"/>
         <source>Connected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="21"/>
+        <location filename="../src/messagelogwidget.cpp" line="29"/>
         <source>Disconnected from server.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="32"/>
+        <location filename="../src/messagelogwidget.cpp" line="40"/>
         <source>Invalid password.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="40"/>
+        <location filename="../src/messagelogwidget.cpp" line="48"/>
         <source>You have joined the game. Player list:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="48"/>
+        <location filename="../src/messagelogwidget.cpp" line="56"/>
         <source>%1 has joined the game</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="53"/>
+        <location filename="../src/messagelogwidget.cpp" line="61"/>
         <source>%1 has left the game</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="58"/>
+        <location filename="../src/messagelogwidget.cpp" line="66"/>
         <source>%1 is ready to start a new game.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="63"/>
+        <location filename="../src/messagelogwidget.cpp" line="71"/>
         <source>Game has started.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="73"/>
+        <location filename="../src/messagelogwidget.cpp" line="81"/>
         <source>%1 shuffles his/her library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="78"/>
+        <location filename="../src/messagelogwidget.cpp" line="86"/>
         <source>%1 rolled a %2 with a %3-sided dice</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="84"/>
+        <location filename="../src/messagelogwidget.cpp" line="92"/>
         <source>%1 draws a card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="86"/>
+        <location filename="../src/messagelogwidget.cpp" line="94"/>
         <source>%1 draws %2 cards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="91"/>
-        <source>%1 moves %2 from %3 to %4</source>
+        <location filename="../src/messagelogwidget.cpp" line="103"/>
+        <source>from table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="96"/>
-        <source>%1 creates token: %2</source>
+        <location filename="../src/messagelogwidget.cpp" line="105"/>
+        <source>from graveyard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="102"/>
-        <source>%1 places %2 counters on %3 (now %4)</source>
+        <location filename="../src/messagelogwidget.cpp" line="107"/>
+        <source>from exile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="104"/>
-        <source>%1 removes %2 counters from %3 (now %4)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="110"/>
-        <source>his permanents</source>
+        <location filename="../src/messagelogwidget.cpp" line="109"/>
+        <source>from hand</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="111"/>
-        <source>%1 %2 %3</source>
+        <source>from library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="116"/>
-        <source>%1 sets counter &quot;%2&quot; to %3 (%4%5)</source>
+        <location filename="../src/messagelogwidget.cpp" line="115"/>
+        <source>%1 puts %2 into play %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="118"/>
+        <source>%1 puts %2 %3 into graveyard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="120"/>
+        <source>%1 exiles %2 %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="122"/>
-        <source>%1 sets %2 to not untap normally.</source>
+        <source>%1 moves %2 %3 to hand</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="124"/>
+        <source>%1 puts %2 %3 on top of his library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="126"/>
+        <source>%1 moves %2 %3 to %4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="133"/>
+        <source>%1 creates token: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="140"/>
+        <source>%1 places %2 counters on %3 (now %4)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="142"/>
+        <source>%1 removes %2 counters from %3 (now %4)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="150"/>
+        <source>%1 %2 %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="150"/>
+        <source>taps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="150"/>
+        <source>untaps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="155"/>
+        <source>%1 sets counter &quot;%2&quot; to %3 (%4%5)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="162"/>
+        <source>%1 sets %2 to not untap normally.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="164"/>
         <source>%1 sets %2 to untap normally.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="130"/>
+        <location filename="../src/messagelogwidget.cpp" line="171"/>
         <source>%1 is looking at the top %2 cards of %3&apos;s %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="132"/>
+        <location filename="../src/messagelogwidget.cpp" line="173"/>
         <source>%1 is looking at %2&apos;s %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="149"/>
+        <source>his permanents</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
