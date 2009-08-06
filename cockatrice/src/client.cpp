@@ -197,6 +197,7 @@ PendingCommand *Client::cmd(const QString &s)
 	PendingCommands << pc;
 	connect(this, SIGNAL(responseReceived(int, ServerResponse)), pc, SLOT(responseReceived(int, ServerResponse)));
 	connect(pc, SIGNAL(finished(ServerResponse)), this, SLOT(removePendingCommand()));
+	connect(pc, SIGNAL(timeout()), this, SLOT(timeout()));
 	connect(timer, SIGNAL(timeout()), pc, SLOT(checkTimeout()));
 	return pc;
 }

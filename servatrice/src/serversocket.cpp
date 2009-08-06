@@ -42,6 +42,9 @@ ServerSocket::ServerSocket(Server *_server, QObject *parent)
 ServerSocket::~ServerSocket()
 {
 	qDebug("ServerSocket destructor");
+	// The socket has to be removed from the server's list before it is removed from the game's list
+	// so it will not receive the game update event.
+	server->removePlayer(this);
 	if (game)
 		game->removePlayer(this);
 }
@@ -242,9 +245,9 @@ ReturnMessage::ReturnCode ServerSocket::cmdCreateGame(const QList<QVariant> &par
 	QString description = params[0].toString();
 	QString password = params[1].toString();
 	int maxPlayers = params[2].toInt();
+	acceptsGameListChanges = false;
 	leaveGame();
 	emit createGame(description, password, maxPlayers, this);
-	acceptsGameListChanges = false;
 	return ReturnMessage::ReturnOk;
 }
 
@@ -254,9 +257,9 @@ ReturnMessage::ReturnCode ServerSocket::cmdJoinGame(const QList<QVariant> &param
 	QString password = params[1].toString();
 	if (!server->checkGamePassword(gameId, password))
 		return ReturnMessage::ReturnPasswordWrong;
+	acceptsGameListChanges = false;
 	leaveGame();
 	emit joinGame(gameId, this);
-	acceptsGameListChanges = false;
 	return ReturnMessage::ReturnOk;
 }
 
@@ -700,5 +703,6 @@ void ServerSocket::initConnection()
 void ServerSocket::catchSocketError(QAbstractSocket::SocketError socketError)
 {
 	qDebug(QString("socket error: %1").arg(socketError).toLatin1());
+	
 	deleteLater();
 }

@@ -35,12 +35,15 @@ ServerGame::~ServerGame()
 
 QString ServerGame::getGameListLine() const
 {
-	return QString("list_games|%1|%2|%3|%4|%5|%6").arg(gameId)
-						      .arg(description)
-						      .arg(password.isEmpty() ? 0 : 1)
-						      .arg(players.size())
-						      .arg(maxPlayers)
-						      .arg(creator->getPlayerName());
+	if (players.isEmpty())
+		return QString("list_games|%1|||0|%2|").arg(gameId).arg(maxPlayers);
+	else
+		return QString("list_games|%1|%2|%3|%4|%5|%6").arg(gameId)
+							      .arg(description)
+							      .arg(password.isEmpty() ? 0 : 1)
+							      .arg(players.size())
+							      .arg(maxPlayers)
+							      .arg(creator->getPlayerName());
 }
 
 QStringList ServerGame::getPlayerNames() const

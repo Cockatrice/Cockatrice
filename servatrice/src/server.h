@@ -37,7 +37,6 @@ private slots:
 	void addGame(const QString description, const QString password, const int maxPlayers, ServerSocket *creator);
 	void addClientToGame(int gameId, ServerSocket *client);
 	void gameClosing();
-	void socketDestroyed(QObject *obj);
 public:
 	Server(QObject *parent = 0);
 	~Server();
@@ -49,6 +48,7 @@ public:
 	ServerGame *getGame(int gameId);
 	AbstractRNG *getRNG() const { return rng; }
 	void broadcastGameListUpdate(ServerGame *game);
+	void removePlayer(ServerSocket *player);
 private:
 	void incomingConnection(int SocketId);
 	QList<ServerGame *> games;

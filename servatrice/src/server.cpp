@@ -85,7 +85,6 @@ void Server::incomingConnection(int socketId)
 	socket->setSocketDescriptor(socketId);
 	connect(socket, SIGNAL(createGame(const QString, const QString, const int, ServerSocket *)), this, SLOT(addGame(const QString, const QString, const int, ServerSocket *)));
 	connect(socket, SIGNAL(joinGame(int, ServerSocket *)), this, SLOT(addClientToGame(int, ServerSocket *)));
-	connect(socket, SIGNAL(destroyed(QObject *)), this, SLOT(socketDestroyed(QObject *)));
 	socket->initConnection();
 	players << socket;
 }
@@ -153,6 +152,7 @@ bool Server::checkGamePassword(int gameId, const QString &password)
 
 void Server::broadcastGameListUpdate(ServerGame *game)
 {
+	qDebug(QString("broadcastGameListUpdate() to %1 players").arg(players.size()).toLatin1());
 	QString line = game->getGameListLine();
 	for (int i = 0; i < players.size(); i++)
 		if (players[i]->getAcceptsGameListChanges())
@@ -172,8 +172,8 @@ void Server::gameClosing()
 	games.removeAt(games.indexOf(static_cast<ServerGame *>(sender())));
 }
 
-void Server::socketDestroyed(QObject *obj)
+void Server::removePlayer(ServerSocket *player)
 {
-	players.removeAt(players.indexOf(static_cast<ServerSocket *>(obj)));
-	qDebug(QString("Server::socketDestroyed: %1 players left").arg(players.size()).toLatin1());
+	players.removeAt(players.indexOf(player));
+	qDebug(QString("Server::removePlayer: %1 players left").arg(players.size()).toLatin1());
 }

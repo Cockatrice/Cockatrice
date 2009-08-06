@@ -35,13 +35,13 @@ private:
 	int time;
 signals:
 	void finished(ServerResponse resp);
+	void timeout();
 public slots:
 	void responseReceived(int _msgid, ServerResponse _resp);
 	void checkTimeout();
 public:
 	int getMsgId() const { return msgid; }
 	QString getCmd() const { return cmd; }
-	bool timeout() { return ++time > 5; }
 	PendingCommand(const QString &_cmd, int _msgid, QObject *parent = 0);
 };
 

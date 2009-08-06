@@ -9,7 +9,7 @@ INCLUDEPATH += . src
 MOC_DIR = build
 OBJECTS_DIR = build
 
-CONFIG += qt thread
+# CONFIG += qt debug
 QT += network sql
 QT -= gui
 

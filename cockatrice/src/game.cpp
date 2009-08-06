@@ -185,7 +185,7 @@ void Game::gameEvent(const ServerEventData &msg)
 		localPlayer->gameEvent(msg);
 	else {
 		Player *p = players.findPlayer(msg.getPlayerId());
-		if (!p) {
+		if ((!p) && (msg.getEventType() != eventJoin)) {
 			// XXX
 		}
 
@@ -194,8 +194,8 @@ void Game::gameEvent(const ServerEventData &msg)
 			emit logSay(p, msg.getEventData()[0]);
 			break;
 		case eventJoin: {
-			emit logJoin(p);
-			addPlayer(msg.getPlayerId(), msg.getPlayerName(), QPointF(0, 0), false);
+			Player *newPlayer = addPlayer(msg.getPlayerId(), msg.getPlayerName(), QPointF(0, 0), false);
+			emit logJoin(newPlayer);
 			break;
 		}
 		case eventLeave:
