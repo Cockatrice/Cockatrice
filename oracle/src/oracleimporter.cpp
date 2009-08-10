@@ -5,7 +5,7 @@
 OracleImporter::OracleImporter()
 	: setIndex(-1)
 {
-	setsToDownload << SetToDownload("10E", "Tenth Edition", "http://www.crystalkeep.com/magic/rules/oracle/oracle-10.txt");
+	/*setsToDownload << SetToDownload("10E", "Tenth Edition", "http://www.crystalkeep.com/magic/rules/oracle/oracle-10.txt");
 	setsToDownload << SetToDownload("ARB", "Alara Reborn", "http://www.crystalkeep.com/magic/rules/oracle/oracle-ar.txt");
 	setsToDownload << SetToDownload("CFX", "Conflux", "http://www.crystalkeep.com/magic/rules/oracle/oracle-cf.txt");
 	setsToDownload << SetToDownload("ALA", "Shards of Alara", "http://www.crystalkeep.com/magic/rules/oracle/oracle-sa.txt");
@@ -74,7 +74,24 @@ OracleImporter::OracleImporter()
 	setsToDownload << SetToDownload("UG", "Unglued", "http://www.crystalkeep.com/magic/rules/oracle/oracle-ug.txt");
 	setsToDownload << SetToDownload("UNH", "Unhinged", "http://www.crystalkeep.com/magic/rules/oracle/oracle-uh.txt");
 	setsToDownload << SetToDownload("M10", "Magic 2010", "http://www.crystalkeep.com/magic/rules/oracle/oracle-m10.txt");
-
+	*/
+		
+	QFile setsFile("sets.txt");
+		setsFile.open(QIODevice::ReadOnly | QIODevice::Text);
+	QTextStream setStream(&setsFile);
+	QString date = setStream.readLine();
+	QString edition;
+	QString editionLong;
+	QString editionURL;
+	setStream.readLine();
+	while(!setStream.atEnd()){
+		edition = setStream.readLine();
+		editionLong = setStream.readLine();
+		editionURL = setStream.readLine();
+		setStream.readLine();
+		setsToDownload << SetToDownload(edition, editionLong, editionURL);
+	}
+	
 	colorOverride.insert("Ancestral Vision", QStringList("U"));
 	colorOverride.insert("Crimson Kobolds", QStringList("R"));
 	colorOverride.insert("Crookshank Kobolds", QStringList("R"));

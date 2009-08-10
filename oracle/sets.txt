@@ -1,0 +1,278 @@
+20090811
+
+10E
+Tenth Edition
+http://www.crystalkeep.com/magic/rules/oracle/oracle-10.txt
+
+ARB
+Alara Reborn
+http://www.crystalkeep.com/magic/rules/oracle/oracle-ar.txt
+
+CFX
+Conflux
+http://www.crystalkeep.com/magic/rules/oracle/oracle-cf.txt
+
+ALA
+Shards of Alara
+http://www.crystalkeep.com/magic/rules/oracle/oracle-sa.txt
+
+EVE
+Eventide
+http://www.crystalkeep.com/magic/rules/oracle/oracle-et.txt
+
+SHM
+Shadowmoor
+http://www.crystalkeep.com/magic/rules/oracle/oracle-sm.txt
+
+MOR
+Morningtide
+http://www.crystalkeep.com/magic/rules/oracle/oracle-mt.txt
+
+LRW
+Lorwyn
+http://www.crystalkeep.com/magic/rules/oracle/oracle-lo.txt
+
+9E
+Ninth Edition
+http://www.crystalkeep.com/magic/rules/oracle/oracle-9th.txt
+
+8E
+Eighth Edition
+http://www.crystalkeep.com/magic/rules/oracle/oracle-8th.txt
+
+FUT
+Future Sight
+http://www.crystalkeep.com/magic/rules/oracle/oracle-fs.txt
+
+PLC
+Planar Chaos
+http://www.crystalkeep.com/magic/rules/oracle/oracle-pc.txt
+
+TSP
+Time Spiral
+http://www.crystalkeep.com/magic/rules/oracle/oracle-ts.txt
+
+CS
+Coldsnap
+http://www.crystalkeep.com/magic/rules/oracle/oracle-cs.txt
+
+DIS
+Dissension
+http://www.crystalkeep.com/magic/rules/oracle/oracle-di.txt
+
+GP
+Guildpact
+http://www.crystalkeep.com/magic/rules/oracle/oracle-gp.txt
+
+RAV
+Ravnica
+http://www.crystalkeep.com/magic/rules/oracle/oracle-ra.txt
+
+SOK
+Saviors of Kamigawa
+http://www.crystalkeep.com/magic/rules/oracle/oracle-sk.txt
+
+BOK
+Betrayers of Kamigawa
+http://www.crystalkeep.com/magic/rules/oracle/oracle-bk.txt
+
+CHK
+Champions of Kamigawa
+http://www.crystalkeep.com/magic/rules/oracle/oracle-ck.txt
+
+FD
+Fifth Dawn
+http://www.crystalkeep.com/magic/rules/oracle/oracle-fd.txt
+
+DS
+Darksteel
+http://www.crystalkeep.com/magic/rules/oracle/oracle-ds.txt
+
+MR
+Mirrodin
+http://www.crystalkeep.com/magic/rules/oracle/oracle-mr.txt
+
+SC
+Scourge
+http://www.crystalkeep.com/magic/rules/oracle/oracle-sc.txt
+
+LE
+Legions
+http://www.crystalkeep.com/magic/rules/oracle/oracle-le.txt
+
+ON
+Onslaught
+http://www.crystalkeep.com/magic/rules/oracle/oracle-on.txt
+
+7E
+Seventh Edition
+http://www.crystalkeep.com/magic/rules/oracle/oracle-7th.txt
+
+6E
+Sixth Edition
+http://www.crystalkeep.com/magic/rules/oracle/oracle-6th.txt
+
+5E
+Fifth Edition
+http://www.crystalkeep.com/magic/rules/oracle/oracle-5th.txt
+
+4E
+Fourth Edition
+http://www.crystalkeep.com/magic/rules/oracle/oracle-4th.txt
+
+R
+Revised Edition
+http://www.crystalkeep.com/magic/rules/oracle/oracle-rv.txt
+
+U
+Unlimited Edition
+http://www.crystalkeep.com/magic/rules/oracle/oracle-lu.txt
+
+B
+Limited Edition
+http://www.crystalkeep.com/magic/rules/oracle/oracle-lu.txt
+
+JU
+Judgment
+http://www.crystalkeep.com/magic/rules/oracle/oracle-ju.txt
+
+TO
+Torment
+http://www.crystalkeep.com/magic/rules/oracle/oracle-to.txt
+
+OD
+Odyssey
+http://www.crystalkeep.com/magic/rules/oracle/oracle-od.txt
+
+AP
+Apocalypse
+http://www.crystalkeep.com/magic/rules/oracle/oracle-ap.txt
+
+PS
+Planeshift
+http://www.crystalkeep.com/magic/rules/oracle/oracle-ps.txt
+
+IN
+Invasion
+http://www.crystalkeep.com/magic/rules/oracle/oracle-in.txt
+
+PY
+Prophecy
+http://www.crystalkeep.com/magic/rules/oracle/oracle-py.txt
+
+NE
+Nemesis
+http://www.crystalkeep.com/magic/rules/oracle/oracle-ne.txt
+
+MM
+Mercadian Masques
+http://www.crystalkeep.com/magic/rules/oracle/oracle-mm.txt
+
+UD
+Urza's Destiny
+http://www.crystalkeep.com/magic/rules/oracle/oracle-ud.txt
+
+UL
+Urza's Legacy
+http://www.crystalkeep.com/magic/rules/oracle/oracle-ul.txt
+
+US
+Urza's Saga
+http://www.crystalkeep.com/magic/rules/oracle/oracle-us.txt
+
+EX
+Exodus
+http://www.crystalkeep.com/magic/rules/oracle/oracle-ex.txt
+
+SH
+Stronghold
+http://www.crystalkeep.com/magic/rules/oracle/oracle-sh.txt
+
+TE
+Tempest
+http://www.crystalkeep.com/magic/rules/oracle/oracle-te.txt
+
+WL
+Weatherlight
+http://www.crystalkeep.com/magic/rules/oracle/oracle-wl.txt
+
+VI
+Visions
+http://www.crystalkeep.com/magic/rules/oracle/oracle-vi.txt
+
+MI
+Mirage
+http://www.crystalkeep.com/magic/rules/oracle/oracle-mi.txt
+
+AL
+Alliances
+http://www.crystalkeep.com/magic/rules/oracle/oracle-al.txt
+
+HL
+Homelands
+http://www.crystalkeep.com/magic/rules/oracle/oracle-hl.txt
+
+IA
+Ice Age
+http://www.crystalkeep.com/magic/rules/oracle/oracle-ia.txt
+
+CH
+Chronicles
+http://www.crystalkeep.com/magic/rules/oracle/oracle-ch.txt
+
+FE
+Fallen Empires
+http://www.crystalkeep.com/magic/rules/oracle/oracle-fe.txt
+
+DK
+The Dark
+http://www.crystalkeep.com/magic/rules/oracle/oracle-dk.txt
+
+LG
+Legends
+http://www.crystalkeep.com/magic/rules/oracle/oracle-lg.txt
+
+AQ
+Antiquities
+http://www.crystalkeep.com/magic/rules/oracle/oracle-aq.txt
+
+AN
+Arabian Nights
+http://www.crystalkeep.com/magic/rules/oracle/oracle-an.txt
+
+PT
+Portal
+http://www.crystalkeep.com/magic/rules/oracle/oracle-pt.txt
+
+P2
+Portal: Second Age
+http://www.crystalkeep.com/magic/rules/oracle/oracle-pt2.txt
+
+P3
+Portal: Three Kingdoms
+http://www.crystalkeep.com/magic/rules/oracle/oracle-pt3.txt
+
+ST
+Starter
+http://www.crystalkeep.com/magic/rules/oracle/oracle-st.txt
+
+ST2K
+Starter 2000
+http://www.crystalkeep.com/magic/rules/oracle/oracle-st2.txt
+
+PR
+Promo cards
+pr.txt
+
+UG
+Unglued
+http://www.crystalkeep.com/magic/rules/oracle/oracle-ug.txt
+
+UNH
+Unhinged
+http://www.crystalkeep.com/magic/rules/oracle/oracle-uh.txt
+
+M10
+Magic 2010
+http://www.crystalkeep.com/magic/rules/oracle/oracle-m10.txt
+
