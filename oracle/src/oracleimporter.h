@@ -29,6 +29,8 @@ private:
 	QBuffer *buffer;
 	QHttp *http;
 	QProgressDialog *progressDialog;
+	QString normalizeName(QString);
+	QString getURLFromName(QString);
 private slots:
 	void httpRequestFinished(int requestId, bool error);
 	void readResponseHeader(const QHttpResponseHeader &responseHeader);

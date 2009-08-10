@@ -73,6 +73,7 @@ OracleImporter::OracleImporter()
 	setsToDownload << SetToDownload("PR", "Promo cards", "pr.txt");
 	setsToDownload << SetToDownload("UG", "Unglued", "http://www.crystalkeep.com/magic/rules/oracle/oracle-ug.txt");
 	setsToDownload << SetToDownload("UNH", "Unhinged", "http://www.crystalkeep.com/magic/rules/oracle/oracle-uh.txt");
+	setsToDownload << SetToDownload("M10", "Magic 2010", "http://www.crystalkeep.com/magic/rules/oracle/oracle-m10.txt");
 
 	colorOverride.insert("Ancestral Vision", QStringList("U"));
 	colorOverride.insert("Crimson Kobolds", QStringList("R"));
@@ -203,6 +204,10 @@ void OracleImporter::importOracleFile(CardSet *set)
 		QString cardname = in.readLine();
 		if (cardname.isEmpty())
 			continue;
+		if (cardname.contains("XX")){
+			cardname.remove("XX");
+		}
+		
 		QString manacost = in.readLine();
 		QString cardtype, powtough;
 		QStringList text;
@@ -238,7 +243,7 @@ void OracleImporter::importOracleFile(CardSet *set)
 				colors = colorOverride.value(cardname);
 				
 			card = new CardInfo(this, cardname, manacost, cardtype, powtough, text.join("\n"), colors);
-
+			card->setPicURL(getURLFromName(normalizeName(cardname)));
 			int tableRow = 1;
 			QString mainCardType = card->getMainCardType();
 			if (tableRowOverride.contains(cardname))
@@ -257,6 +262,28 @@ void OracleImporter::importOracleFile(CardSet *set)
 		cards++;
 	}
 	qDebug(QString("%1: %2 cards imported").arg(set->getLongName()).arg(cards).toLatin1());
+}
+
+QString OracleImporter::normalizeName(QString cardname)
+{
+	QString normalized = cardname;
+	normalized.remove("'",Qt::CaseInsensitive);
+	normalized.remove("//",Qt::CaseInsensitive);
+	normalized.remove(",",Qt::CaseInsensitive);
+	normalized.remove(":",Qt::CaseInsensitive);
+	normalized.remove(".",Qt::CaseInsensitive);
+	normalized.remove(QRegExp("\\(.*\\)"));
+	normalized = normalized.trimmed();
+	normalized = normalized.simplified();
+	normalized = normalized.replace(" ", "_");
+	normalized = normalized.replace("-", "_");
+	return normalized;
+}
+
+
+QString OracleImporter::getURLFromName(QString normalizedName)
+{
+	return "http://www.wizards.com/global/images/magic/general/"+normalizedName+".jpg";
 }
 
 void OracleImporter::downloadNextFile()

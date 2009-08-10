@@ -54,8 +54,8 @@ void SetList::sortByKey()
 	qSort(begin(), end(), CompareFunctor());
 }
 
-CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QString &_text, const QStringList &_colors, int _tableRow, const SetList &_sets)
-	: db(_db), name(_name), sets(_sets), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), colors(_colors), tableRow(_tableRow), pixmap(NULL)
+CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QString &_text, const QStringList &_colors, int _tableRow, const SetList &_sets, const QString &_picURL)
+	: db(_db), name(_name), sets(_sets), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), colors(_colors), tableRow(_tableRow), pixmap(NULL), picURL(_picURL)
 {
 	for (int i = 0; i < sets.size(); i++)
 		sets[i]->append(this);
@@ -194,6 +194,7 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 		xml.writeTextElement("pt", info->getPowTough());
 	xml.writeTextElement("tablerow", QString::number(info->getTableRow()));
 	xml.writeTextElement("text", info->getText());
+	xml.writeTextElement("picURL", info->getPicURL());
 	xml.writeEndElement(); // card
 
 	return xml;

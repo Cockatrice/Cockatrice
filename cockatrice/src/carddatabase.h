@@ -42,6 +42,7 @@ private:
 	QString powtough;
 	QString text;
 	QStringList colors;
+	QString picURL;
 	int tableRow;
 	QPixmap *pixmap;
 	QMap<int, QPixmap *> scaledPixmapCache;
@@ -54,7 +55,8 @@ public:
 		const QString &_text = QString(),
 		const QStringList &_colors = QStringList(),
 		int _tableRow = 0,
-		const SetList &_sets = SetList());
+		const SetList &_sets = SetList(),
+		const QString &_picURL = QString());
 	~CardInfo();
 	QString getName() const { return name; }
 	SetList getSets() const { return sets; }
@@ -63,9 +65,11 @@ public:
 	QString getPowTough() const { return powtough; }
 	QString getText() const { return text; }
 	QStringList getColors() const { return colors; }
+	QString getPicURL() const { return picURL; }
 	QString getMainCardType() const;
 	int getTableRow() const { return tableRow; }
 	void setTableRow(int _tableRow) { tableRow = _tableRow; }
+	void setPicURL(QString _picURL) { picURL = _picURL; }
 	void addToSet(CardSet *set);
 	QPixmap *loadPixmap();
 	QPixmap *getPixmap(QSize size);
