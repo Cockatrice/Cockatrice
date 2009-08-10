@@ -140,14 +140,17 @@ void MessageLogWidget::logSetCardCounters(Player *player, QString cardName, int 
 		finalStr = tr("%1 places %2 counters on %3 (now %4)");
 	else
 		finalStr = tr("%1 removes %2 counters from %3 (now %4)");
-	append(finalStr.arg(sanitizeHtml(player->getName())).arg(oldValue - value).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(value));
+	append(finalStr.arg(sanitizeHtml(player->getName())).arg(abs(oldValue - value)).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(value));
 }
 
 void MessageLogWidget::logSetTapped(Player *player, QString cardName, bool tapped)
 {
+	QString cardStr;
 	if (cardName == "-1")
-		cardName = tr("his permanents");
-	append(tr("%1 %2 %3").arg(sanitizeHtml(player->getName())).arg(tapped ? tr("taps") : tr("untaps")).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+		cardStr = tr("his permanents");
+	else
+		cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName));
+	append(tr("%1 %2 %3").arg(sanitizeHtml(player->getName())).arg(tapped ? tr("taps") : tr("untaps")).arg(cardStr));
 }
 
 void MessageLogWidget::logSetCounter(Player *player, QString counterName, int value, int oldValue)
