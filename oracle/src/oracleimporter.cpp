@@ -1,6 +1,7 @@
 #include "oracleimporter.h"
 #include <QtGui>
 #include <QtNetwork>
+#include <QXmlStreamReader>
 
 OracleImporter::OracleImporter()
 	: setIndex(-1)
@@ -76,21 +77,30 @@ OracleImporter::OracleImporter()
 	setsToDownload << SetToDownload("M10", "Magic 2010", "http://www.crystalkeep.com/magic/rules/oracle/oracle-m10.txt");
 	*/
 		
-	QFile setsFile("sets.txt");
+	QFile setsFile("sets.xml");
 		setsFile.open(QIODevice::ReadOnly | QIODevice::Text);
-	QTextStream setStream(&setsFile);
-	QString date = setStream.readLine();
+	QXmlStreamReader xml(&setsFile);
 	QString edition;
 	QString editionLong;
 	QString editionURL;
-	setStream.readLine();
-	while(!setStream.atEnd()){
-		edition = setStream.readLine();
-		editionLong = setStream.readLine();
-		editionURL = setStream.readLine();
-		setStream.readLine();
-		setsToDownload << SetToDownload(edition, editionLong, editionURL);
-	}
+	while (!xml.atEnd()) {
+		if (xml.readNext() == QXmlStreamReader::EndElement)
+			break;
+		if (xml.name() == "set") {
+			QString shortName, longName;
+			while (!xml.atEnd()) {
+				if (xml.readNext() == QXmlStreamReader::EndElement)
+					break;
+				if (xml.name() == "name")
+					edition = xml.readElementText();
+				else if (xml.name() == "longname")
+					editionLong = xml.readElementText();
+				else if(xml.name() == "url")
+					editionURL = xml.readElementText();
+			}
+			setsToDownload << SetToDownload(edition, editionLong, editionURL);
+		}
+	}	
 	
 	colorOverride.insert("Ancestral Vision", QStringList("U"));
 	colorOverride.insert("Crimson Kobolds", QStringList("R"));
