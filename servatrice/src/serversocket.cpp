@@ -85,14 +85,14 @@ void ServerSocket::setupZones()
 	// ------------------------------------------------------------------
 
 	// Create zones
-	PlayerZone *deck = new PlayerZone("deck", false, false, false, false);
+	PlayerZone *deck = new PlayerZone("deck", false, PlayerZone::HiddenZone);
 	zones << deck;
-	PlayerZone *sb = new PlayerZone("sb", false, false, false, false);
+	PlayerZone *sb = new PlayerZone("sb", false, PlayerZone::HiddenZone);
 	zones << sb;
-	zones << new PlayerZone("table", true, true, false, true);
-	zones << new PlayerZone("hand", false, false, true, true);
-	zones << new PlayerZone("grave", false, true, false, true);
-	zones << new PlayerZone("rfg", false, true, false, true);
+	zones << new PlayerZone("table", true, PlayerZone::PublicZone);
+	zones << new PlayerZone("hand", false, PlayerZone::PrivateZone);
+	zones << new PlayerZone("grave", false, PlayerZone::PublicZone);
+	zones << new PlayerZone("rfg", false, PlayerZone::PublicZone);
 
 	// ------------------------------------------------------------------
 
@@ -209,6 +209,8 @@ const ServerSocket::CommandProperties ServerSocket::commandList[ServerSocket::nu
 	{"dump_zone", true, true, true, QList<QVariant::Type>() << QVariant::Int
 								<< QVariant::String
 								<< QVariant::Int, &ServerSocket::cmdDumpZone},
+	{"stop_dump_zone", true, true, true, QList<QVariant::Type>() << QVariant::Int
+								     << QVariant::String, &ServerSocket::cmdStopDumpZone},
 	{"roll_dice", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdRollDice},
 	{"set_active_player", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdSetActivePlayer},
 	{"set_active_phase", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdSetActivePhase}
@@ -364,15 +366,28 @@ ReturnMessage::ReturnCode ServerSocket::cmdMoveCard(const QList<QVariant> &param
 	if (facedown)
 		card->setId(newCardId());
 	if ((!facedown && !card->getFaceDown())
-	  || (card->getFaceDown() && !facedown && startzone->isPublic() && targetzone->isPublic()))
+	  || (card->getFaceDown() && !facedown && (startzone->getType() == PlayerZone::PublicZone) && (targetzone->getType() == PlayerZone::PublicZone)))
 		publicCardName = card->getName();
 	if ((!facedown && !card->getFaceDown())
-	  || (card->getFaceDown() && !facedown && startzone->isPublic() && targetzone->isPublic())
-	  || (!facedown && targetzone->isPrivate()))
+	  || (card->getFaceDown() && !facedown && (startzone->getType() == PlayerZone::PublicZone) && (targetzone->getType() == PlayerZone::PublicZone))
+	  || (!facedown && (targetzone->getType() != PlayerZone::PublicZone)))
 		privateCardName = card->getName();
 	
 	card->setFaceDown(facedown);
-	msg(QString("private|||move_card|%1|%2|%3|%4|%5|%6|%7|%8").arg(card->getId())
+	
+	// The player does not get to see which card he moved if it moves between two parts of hidden zones which
+	// are not being looked at.
+	QString privateCardId = QString::number(card->getId());
+	if ((targetzone->getType() == PlayerZone::HiddenZone)
+	 && (startzone->getType() == PlayerZone::HiddenZone)
+	 && (startzone->getCardsBeingLookedAt() <= position)
+	 && (startzone->getCardsBeingLookedAt() != 0)
+	 && (targetzone->getCardsBeingLookedAt() <= x)
+	 && (targetzone->getCardsBeingLookedAt() != 0)) {
+		privateCardId = QString();
+		privateCardName = QString();
+	}
+	msg(QString("private|||move_card|%1|%2|%3|%4|%5|%6|%7|%8").arg(privateCardId)
 							    .arg(privateCardName)
 							    .arg(startzone->getName())
 							    .arg(position)
@@ -380,7 +395,16 @@ ReturnMessage::ReturnCode ServerSocket::cmdMoveCard(const QList<QVariant> &param
 							    .arg(x)
 							    .arg(y)
 							    .arg(facedown ? 1 : 0));
-	if ((startzone->isPublic()) || (targetzone->isPublic()))
+	
+	// Other players do not get to see the start and/or target position of the card if the respective
+	// part of the zone is being looked at. The information is not needed anyway because in hidden zones,
+	// all cards are equal.
+	if ((startzone->getType() == PlayerZone::HiddenZone) && ((startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == 0)))
+		position = -1;
+	if ((targetzone->getType() == PlayerZone::HiddenZone) && ((targetzone->getCardsBeingLookedAt() > position) || (targetzone->getCardsBeingLookedAt() == 0)))
+		x = -1;
+	
+	if ((startzone->getType() == PlayerZone::PublicZone) || (targetzone->getType() == PlayerZone::PublicZone))
 		emit broadcastEvent(QString("move_card|%1|%2|%3|%4|%5|%6|%7|%8").arg(card->getId())
 									 .arg(publicCardName)
 									 .arg(startzone->getName())
@@ -529,7 +553,7 @@ ReturnMessage::ReturnCode ServerSocket::cmdDumpZone(const QList<QVariant> &param
 	PlayerZone *zone = player->getZone(params[1].toString());
 	if (!zone)
 		return ReturnMessage::ReturnContextError;
-	if (!(zone->isPublic() || (player_id == playerId)))
+	if (!((zone->getType() == PlayerZone::PublicZone) || (player_id == playerId)))
 		return ReturnMessage::ReturnContextError;
 		
 	QListIterator<Card *> card_iterator(zone->cards);
@@ -537,7 +561,7 @@ ReturnMessage::ReturnCode ServerSocket::cmdDumpZone(const QList<QVariant> &param
 	for (int i = 0; card_iterator.hasNext() && (i < number_cards || number_cards == 0); i++) {
 		Card *tmp = card_iterator.next();
 		// XXX Face down cards
-		if (zone->hasIdAccess())
+		if (zone->getType() != PlayerZone::HiddenZone)
 			result << QString("%1|%2|%3|%4|%5|%6|%7|%8").arg(tmp->getId())
 								    .arg(tmp->getName())
 								    .arg(tmp->getX())
@@ -546,11 +570,29 @@ ReturnMessage::ReturnCode ServerSocket::cmdDumpZone(const QList<QVariant> &param
 								    .arg(tmp->getTapped())
 								    .arg(tmp->getAttacking())
 								    .arg(tmp->getAnnotation());
-		else
+		else {
+			zone->setCardsBeingLookedAt(number_cards);
 			result << QString("%1|%2||||||").arg(i).arg(tmp->getName());
+		}
 	}
 	remsg->sendList(result);
 	emit broadcastEvent(QString("dump_zone|%1|%2|%3").arg(player_id).arg(zone->getName()).arg(number_cards), this);
+	return ReturnMessage::ReturnOk;
+}
+
+ReturnMessage::ReturnCode ServerSocket::cmdStopDumpZone(const QList<QVariant> &params)
+{
+	ServerSocket *player = game->getPlayer(params[0].toInt());
+	if (!player)
+		return ReturnMessage::ReturnContextError;
+	PlayerZone *zone = player->getZone(params[1].toString());
+	if (!zone)
+		return ReturnMessage::ReturnContextError;
+	
+	if (zone->getType() == PlayerZone::HiddenZone) {
+		zone->setCardsBeingLookedAt(-1);
+		emit broadcastEvent(QString("stop_dump_zone|%1|%2").arg(player->getPlayerId()).arg(zone->getName()), this);
+	}
 	return ReturnMessage::ReturnOk;
 }
 
@@ -662,7 +704,7 @@ void ServerSocket::setGame(ServerGame *g)
 	game = g;
 }
 
-QStringList ServerSocket::listCounters()
+QStringList ServerSocket::listCounters() const
 {
 	QStringList counter_list;
 	QListIterator<Counter *> i(counters);
@@ -673,13 +715,13 @@ QStringList ServerSocket::listCounters()
 	return counter_list;
 }
 
-QStringList ServerSocket::listZones()
+QStringList ServerSocket::listZones() const
 {
 	QStringList zone_list;
 	QListIterator<PlayerZone *> i(zones);
 	while (i.hasNext()) {
 		PlayerZone *tmp = i.next();
-		zone_list << QString("%1|%2|%3|%4").arg(tmp->getName()).arg(tmp->isPublic()).arg(tmp->hasCoords()).arg(tmp->cards.size());
+		zone_list << QString("%1|%2|%3|%4").arg(tmp->getName()).arg(tmp->getType() == PlayerZone::PublicZone ? 1 : 0).arg(tmp->hasCoords()).arg(tmp->cards.size());
 	}
 	return zone_list;
 }

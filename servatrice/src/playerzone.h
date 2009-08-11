@@ -27,28 +27,32 @@ class Card;
 class AbstractRNG;
 
 class PlayerZone {
+public:
+	// PrivateZone: Contents of the zone are always visible to the owner,
+	// but not to anyone else.
+	// PublicZone: Contents of the zone are always visible to anyone.
+	// HiddenZone: Contents of the zone are never visible to anyone.
+	// However, the owner of the zone can issue a dump_zone command,
+	// setting beingLookedAt to true.
+	// Cards in a zone with the type HiddenZone are referenced by their
+	// list index, whereas cards in any other zone are referenced by their ids.
+	enum ZoneType { PrivateZone, PublicZone, HiddenZone };
 private:
 	QString name;
 	bool has_coords;
-	bool is_public; // Contents of the zone are always visible to anyone
-	bool is_private; // Contents of the zone are always visible to the owner
-	bool id_access; // getCard() finds by id, not by list index
-	// Example: When moving a card from the library to the table,
-	// the card has to be found by list index because the client
-	// does not know the id. But when moving a card from the hand
-	// to the table, the card can be found by id because the client
-	// knows the id and the hand does not need to have a specific order.
+	ZoneType type;
+	int cardsBeingLookedAt;
 public:
-	PlayerZone(QString _name, bool _has_coords, bool _is_public, bool _is_private, bool _id_access);
+	PlayerZone(const QString &_name, bool _has_coords, ZoneType _type);
 	~PlayerZone();
 
 	Card *getCard(int id, bool remove, int *position = NULL);
 
-	bool isPublic() { return is_public; }
-	bool isPrivate() { return is_private; }
-	bool hasCoords() { return has_coords; }
-	bool hasIdAccess() { return id_access; }
-	QString getName() { return name; }
+	int getCardsBeingLookedAt() const { return cardsBeingLookedAt; }
+	void setCardsBeingLookedAt(bool _cardsBeingLookedAt) { cardsBeingLookedAt = _cardsBeingLookedAt; }
+	bool hasCoords() const { return has_coords; }
+	ZoneType getType() const { return type; }
+	QString getName() const { return name; }
 	
 	QList<Card *> cards;
 	void insertCard(Card *card, int x, int y);

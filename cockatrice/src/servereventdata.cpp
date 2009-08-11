@@ -3,7 +3,7 @@
 // Message structure for server events:
 // {"private","public"}|PlayerId|PlayerName|EventType|EventData
 
-const int event_count = 20;
+const int event_count = 21;
 const event_string event_strings[event_count] = {
 	{eventPlayerId, "player_id"},
 	{eventSay, "say"},
@@ -24,7 +24,8 @@ const event_string event_strings[event_count] = {
 	{eventDelCounter, "del_counter"},
 	{eventSetActivePlayer, "set_active_player"},
 	{eventSetActivePhase, "set_active_phase"},
-	{eventDumpZone, "dump_zone"}
+	{eventDumpZone, "dump_zone"},
+	{eventStopDumpZone, "stop_dump_zone"}
 };
 
 ServerEventData::ServerEventData(const QString &line)

@@ -3,7 +3,6 @@
 
 #include <QStringList>
 
-
 enum ServerEventType {
 	eventInvalid,
 	eventPlayerId,
@@ -25,7 +24,8 @@ enum ServerEventType {
 	eventDelCounter,
 	eventSetActivePlayer,
 	eventSetActivePhase,
-	eventDumpZone
+	eventDumpZone,
+	eventStopDumpZone
 };
 
 struct event_string {

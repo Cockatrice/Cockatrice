@@ -110,6 +110,7 @@ public:
 	PendingCommand *setActivePlayer(int player);
 	PendingCommand *setActivePhase(int phase);
 	PendingCommand *dumpZone(int player, const QString &zone, int numberCards);
+	PendingCommand *stopDumpZone(int player, const QString &zone);
 public slots:
 	void submitDeck(const QStringList &deck);
 };

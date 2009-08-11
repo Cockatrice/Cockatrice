@@ -6,8 +6,8 @@
 #include "carddragitem.h"
 #include "zoneviewzone.h"
 
-PileZone::PileZone(Player *_p, const QString &_name, bool _contentsKnown, QGraphicsItem *parent)
-	: CardZone(_p, _name, false, false, _contentsKnown, parent)
+PileZone::PileZone(Player *_p, const QString &_name, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent)
+	: CardZone(_p, _name, false, _isShufflable, _contentsKnown, parent)
 {
 	setCacheMode(DeviceCoordinateCache); // Do not move this line to the parent constructor!
 	setAcceptsHoverEvents(true);

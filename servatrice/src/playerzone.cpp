@@ -21,8 +21,8 @@
 #include "abstractrng.h"
 #include "card.h"
 
-PlayerZone::PlayerZone(QString _name, bool _has_coords, bool _is_public, bool _is_private, bool _id_access)
-	: name(_name), has_coords(_has_coords), is_public(_is_public), is_private(_is_private), id_access(_id_access)
+PlayerZone::PlayerZone(const QString &_name, bool _has_coords, ZoneType _type)
+	: name(_name), has_coords(_has_coords), type(_type), cardsBeingLookedAt(-1)
 {
 }
 
@@ -42,7 +42,7 @@ void PlayerZone::shuffle(AbstractRNG *rnd)
 
 Card *PlayerZone::getCard(int id, bool remove, int *position)
 {
-	if (hasIdAccess()) {
+	if (type != HiddenZone) {
 		QListIterator<Card *> CardIterator(cards);
 		int i = 0;
 		while (CardIterator.hasNext()) {

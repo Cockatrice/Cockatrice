@@ -13,18 +13,18 @@ PlayerArea::PlayerArea(Player *_player, QGraphicsItem *parent)
 	
 	QPointF base = QPointF(55, 50);
 
-	PileZone *deck = new PileZone(_player, "deck", false, this);
+	PileZone *deck = new PileZone(_player, "deck", true, false, this);
 	deck->setPos(base);
 
 	qreal h = deck->boundingRect().height() + 20;
 
-	PileZone *grave = new PileZone(_player, "grave", true, this);
+	PileZone *grave = new PileZone(_player, "grave", false, true, this);
 	grave->setPos(base + QPointF(0, h));
 
-	PileZone *rfg = new PileZone(_player, "rfg", true, this);
+	PileZone *rfg = new PileZone(_player, "rfg", false, true, this);
 	rfg->setPos(base + QPointF(0, 2 * h));
 
-	PileZone *sb = new PileZone(_player, "sb", true, this);
+	PileZone *sb = new PileZone(_player, "sb", false, true, this);
 	sb->setVisible(false);
 
 	base = QPointF(deck->boundingRect().width() + 60, 0);

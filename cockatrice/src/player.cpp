@@ -220,6 +220,12 @@ void Player::gameEvent(const ServerEventData &event)
 			bool facedown = data[7].toInt();
 			// XXX Mehr Fehlerbehandlung
 
+			int logPosition = position;
+			int logX = x;
+			if (position == -1)
+				position = 0;
+			if (x == -1)
+				x = 0;
 			CardItem *card = startZone->takeCard(position, cardId, cardName);
 			if (!card) // XXX
 				qDebug("moveCard: card not found");
@@ -230,7 +236,7 @@ void Player::gameEvent(const ServerEventData &event)
 
 			// The log event has to be sent before the card is added to the target zone
 			// because the addCard function can modify the card object.
-			emit logMoveCard(this, card->getName(), startZone->getName(), targetZone->getName());
+			emit logMoveCard(this, card->getName(), startZone->getName(), logPosition, targetZone->getName(), logX);
 
 			targetZone->addCard(card, true, x, y);
 

@@ -55,7 +55,7 @@ private:
 		QList<QVariant::Type> paramTypes;
 		CommandHandler handler;
 	};
-	static const int numberCommands = 26;
+	static const int numberCommands = 27;
 	static const CommandProperties commandList[numberCommands];
 
 	ReturnMessage::ReturnCode cmdPing(const QList<QVariant> &params);
@@ -81,6 +81,7 @@ private:
 	ReturnMessage::ReturnCode cmdListCounters(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdListZones(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdDumpZone(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdStopDumpZone(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdRollDice(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdSetActivePlayer(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdSetActivePhase(const QList<QVariant> &params);
@@ -116,8 +117,8 @@ public:
 	void setPlayerId(int _id) { playerId = _id; }
 	QString getPlayerName() const { return playerName; }
 	bool getAcceptsGameListChanges() const { return acceptsGameListChanges; }
-	QStringList listCounters();
-	QStringList listZones();
+	QStringList listCounters() const;
+	QStringList listZones() const;
 	void setupZones();
 };
 

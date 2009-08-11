@@ -350,3 +350,8 @@ PendingCommand *Client::dumpZone(int player, const QString &zone, int numberCard
 {
 	return cmd(QString("dump_zone|%1|%2|%3").arg(player).arg(zone).arg(numberCards));
 }
+
+PendingCommand *Client::stopDumpZone(int player, const QString &zone)
+{
+	return cmd(QString("stop_dump_zone|%1|%2").arg(player).arg(zone));
+}

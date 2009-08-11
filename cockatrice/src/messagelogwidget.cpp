@@ -94,7 +94,7 @@ void MessageLogWidget::logDraw(Player *player, int number)
 		append(tr("%1 draws %2 cards").arg(sanitizeHtml(player->getName())).arg(number));
 }
 
-void MessageLogWidget::logMoveCard(Player *player, QString cardName, QString startZone, QString targetZone)
+void MessageLogWidget::logMoveCard(Player *player, QString cardName, QString startZone, int oldX, QString targetZone, int newX)
 {
 	if ((startZone == "table") && (targetZone == "table"))
 		return;
@@ -176,6 +176,10 @@ void MessageLogWidget::logDumpZone(Player *player, QString zoneName, QString zon
 		append(tr("%1 is looking at %2's %3").arg(sanitizeHtml(player->getName())).arg(zoneOwner).arg(zoneName));
 }
 
+void MessageLogWidget::logStopDumpZone(Player *player, QString zoneName, QString zoneOwner)
+{
+	append(tr("%1 stops looking at %2's %3").arg(sanitizeHtml(player->getName())).arg(zoneOwner).arg(zoneName));
+}
 
 void MessageLogWidget::connectToGame(Game *game)
 {
@@ -188,13 +192,14 @@ void MessageLogWidget::connectToGame(Game *game)
 	connect(game, SIGNAL(logShuffle(Player *)), this, SLOT(logShuffle(Player *)));
 	connect(game, SIGNAL(logRollDice(Player *, int, int)), this, SLOT(logRollDice(Player *, int, int)));
 	connect(game, SIGNAL(logDraw(Player *, int)), this, SLOT(logDraw(Player *, int)));
-	connect(game, SIGNAL(logMoveCard(Player *, QString, QString, QString)), this, SLOT(logMoveCard(Player *, QString, QString, QString)));
+	connect(game, SIGNAL(logMoveCard(Player *, QString, QString, int, QString, int)), this, SLOT(logMoveCard(Player *, QString, QString, int, QString, int)));
 	connect(game, SIGNAL(logCreateToken(Player *, QString)), this, SLOT(logCreateToken(Player *, QString)));
 	connect(game, SIGNAL(logSetCardCounters(Player *, QString, int, int)), this, SLOT(logSetCardCounters(Player *, QString, int, int)));
 	connect(game, SIGNAL(logSetTapped(Player *, QString, bool)), this, SLOT(logSetTapped(Player *, QString, bool)));
 	connect(game, SIGNAL(logSetCounter(Player *, QString, int, int)), this, SLOT(logSetCounter(Player *, QString, int, int)));
 	connect(game, SIGNAL(logSetDoesntUntap(Player *, QString, bool)), this, SLOT(logSetDoesntUntap(Player *, QString, bool)));
 	connect(game, SIGNAL(logDumpZone(Player *, QString, QString, int)), this, SLOT(logDumpZone(Player *, QString, QString, int)));
+	connect(game, SIGNAL(logStopDumpZone(Player *, QString, QString)), this, SLOT(logStopDumpZone(Player *, QString, QString)));
 }
 
 MessageLogWidget::MessageLogWidget(QWidget *parent)

@@ -70,13 +70,14 @@ signals:
 	void logShuffle(Player *player);
 	void logRollDice(Player *player, int sides, int roll);
 	void logDraw(Player *player, int number);
-	void logMoveCard(Player *player, QString cardName, QString startZone, QString targetZone);
+	void logMoveCard(Player *player, QString cardName, QString startZone, int oldX, QString targetZone, int newX);
 	void logCreateToken(Player *player, QString cardName);
 	void logSetCardCounters(Player *player, QString cardName, int value, int oldValue);
 	void logSetTapped(Player *player, QString cardName, bool tapped);
 	void logSetCounter(Player *player, QString counterName, int value, int oldValue);
 	void logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap);
 	void logDumpZone(Player *player, QString zoneName, QString zoneOwner, int numberCards);
+	void logStopDumpZone(Player *player, QString zoneName, QString zoneOwner);
 public:
 	Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_actionsMenu, QMenu *_cardMenu, int playerId, const QString &playerName, QObject *parent = 0);
 	~Game();
