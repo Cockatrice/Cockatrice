@@ -27,7 +27,7 @@
 #include "window_deckeditor.h"
 #include "cardinfowidget.h"
 #include "messagelogwidget.h"
-
+#include "phasestoolbar.h"
 #include "gameview.h"
 #include "player.h"
 #include "game.h"
@@ -289,7 +289,10 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	viewLayout = new QVBoxLayout;
 	viewLayout->addWidget(view);
 
+	PhasesToolbar *phasesToolbar = new PhasesToolbar;
+
 	QHBoxLayout *mainLayout = new QHBoxLayout;
+	mainLayout->addWidget(phasesToolbar);
 	mainLayout->addLayout(viewLayout, 10);
 	mainLayout->addLayout(verticalLayout);
 

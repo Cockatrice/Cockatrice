@@ -1,6 +1,7 @@
 #include "messagelogwidget.h"
 #include "game.h"
 #include "player.h"
+#include "cardzone.h"
 
 QString MessageLogWidget::sanitizeHtml(QString dirty)
 {
@@ -94,38 +95,53 @@ void MessageLogWidget::logDraw(Player *player, int number)
 		append(tr("%1 draws %2 cards").arg(sanitizeHtml(player->getName())).arg(number));
 }
 
-void MessageLogWidget::logMoveCard(Player *player, QString cardName, QString startZone, int oldX, QString targetZone, int newX)
+void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX)
 {
-	if ((startZone == "table") && (targetZone == "table"))
+	QString startName = startZone->getName();
+	QString targetName = targetZone->getName();
+	if (((startName == "table") && (targetName == "table")) || ((startName == "hand") && (targetName == "hand")))
 		return;
 	QString fromStr;
-	if (startZone == "table")
+	if (startName == "table")
 		fromStr = tr("from table");
-	else if (startZone == "grave")
+	else if (startName == "grave")
 		fromStr = tr("from graveyard");
-	else if (startZone == "rfg")
+	else if (startName == "rfg")
 		fromStr = tr("from exile");
-	else if (startZone == "hand")
+	else if (startName == "hand")
 		fromStr = tr("from hand");
-	else if (startZone == "deck")
-		fromStr = tr("from library");
+	else if (startName == "deck") {
+		if (oldX == startZone->getCards().size() - 1)
+			fromStr = tr("from the bottom of his library");
+		else if (oldX == 0)
+			fromStr = tr("from the top of his library");
+		else
+			fromStr = tr("from library");
+	} else if (startName == "sb")
+		fromStr = tr("from sideboard");
 	
 	QString finalStr;
-	if (targetZone == "table")
+	if (targetName == "table")
 		finalStr = tr("%1 puts %2 into play %3");
-	else {
-		if (targetZone == "grave")
-			finalStr = tr("%1 puts %2 %3 into graveyard");
-		else if (targetZone == "rfg")
-			finalStr = tr("%1 exiles %2 %3");
-		else if (targetZone == "hand")
-			finalStr = tr("%1 moves %2 %3 to hand");
-		else if (targetZone == "deck")
+	else if (targetName == "grave")
+		finalStr = tr("%1 puts %2 %3 into graveyard");
+	else if (targetName == "rfg")
+		finalStr = tr("%1 exiles %2 %3");
+	else if (targetName == "hand")
+		finalStr = tr("%1 moves %2 %3 to hand");
+	else if (targetName == "deck") {
+		if (newX == -1)
+			finalStr = tr("%1 puts %2 %3 into his library");
+		else if (newX == targetZone->getCards().size())
+			finalStr = tr("%1 puts %2 %3 on bottom of his library");
+		else if (newX == 0)
 			finalStr = tr("%1 puts %2 %3 on top of his library");
 		else
-			finalStr = tr("%1 moves %2 %3 to %4");
-	}
-	append(finalStr.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(fromStr).arg(targetZone));
+			finalStr = tr("%1 puts %2 %3 into his library at position %4");
+	} else if (targetName == "sb")
+		finalStr = tr("%1 moves %2 %3 to sideboard");
+	
+	append(finalStr.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(fromStr).arg(newX));
 }
 
 void MessageLogWidget::logCreateToken(Player *player, QString cardName)
@@ -192,7 +208,7 @@ void MessageLogWidget::connectToGame(Game *game)
 	connect(game, SIGNAL(logShuffle(Player *)), this, SLOT(logShuffle(Player *)));
 	connect(game, SIGNAL(logRollDice(Player *, int, int)), this, SLOT(logRollDice(Player *, int, int)));
 	connect(game, SIGNAL(logDraw(Player *, int)), this, SLOT(logDraw(Player *, int)));
-	connect(game, SIGNAL(logMoveCard(Player *, QString, QString, int, QString, int)), this, SLOT(logMoveCard(Player *, QString, QString, int, QString, int)));
+	connect(game, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)), this, SLOT(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)));
 	connect(game, SIGNAL(logCreateToken(Player *, QString)), this, SLOT(logCreateToken(Player *, QString)));
 	connect(game, SIGNAL(logSetCardCounters(Player *, QString, int, int)), this, SLOT(logSetCardCounters(Player *, QString, int, int)));
 	connect(game, SIGNAL(logSetTapped(Player *, QString, bool)), this, SLOT(logSetTapped(Player *, QString, bool)));

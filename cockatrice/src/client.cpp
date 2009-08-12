@@ -177,8 +177,10 @@ void Client::readLine()
 
 void Client::setStatus(const ProtocolStatus _status)
 {
+	ProtocolStatus oldStatus = status;
 	status = _status;
-	emit statusChanged(_status);
+	if (oldStatus != _status)
+		emit statusChanged(_status);
 }
 
 void Client::msg(const QString &s)

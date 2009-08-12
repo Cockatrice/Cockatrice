@@ -236,7 +236,7 @@ void Player::gameEvent(const ServerEventData &event)
 
 			// The log event has to be sent before the card is added to the target zone
 			// because the addCard function can modify the card object.
-			emit logMoveCard(this, card->getName(), startZone->getName(), logPosition, targetZone->getName(), logX);
+			emit logMoveCard(this, card->getName(), startZone, logPosition, targetZone, logX);
 
 			targetZone->addCard(card, true, x, y);
 

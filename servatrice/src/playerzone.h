@@ -49,7 +49,7 @@ public:
 	Card *getCard(int id, bool remove, int *position = NULL);
 
 	int getCardsBeingLookedAt() const { return cardsBeingLookedAt; }
-	void setCardsBeingLookedAt(bool _cardsBeingLookedAt) { cardsBeingLookedAt = _cardsBeingLookedAt; }
+	void setCardsBeingLookedAt(int _cardsBeingLookedAt) { cardsBeingLookedAt = _cardsBeingLookedAt; }
 	bool hasCoords() const { return has_coords; }
 	ZoneType getType() const { return type; }
 	QString getName() const { return name; }
