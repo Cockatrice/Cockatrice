@@ -204,6 +204,8 @@ PendingCommand *Client::cmd(const QString &s)
 
 void Client::connectToServer(const QString &hostname, unsigned int port, const QString &_playerName, const QString &_password)
 {
+	disconnectFromServer();
+	
 	playerName = _playerName;
 	password = _password;
 	socket->connectToHost(hostname, port);
