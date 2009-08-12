@@ -23,7 +23,7 @@ signals:
 	void toggleZoneView(Player *player, QString zoneName, int number);
 	void sigShowCardMenu(QPoint p);
 	// Log events
-	void logMoveCard(Player *player, QString cardName, QString startZone, int oldX, QString targetZone, int newX);
+	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
 	void logCreateToken(Player *player, QString cardName);
 	void logSetCardCounters(Player *player, QString cardName, int value, int oldValue);
 	void logSetTapped(Player *player, QString cardName, bool tapped);

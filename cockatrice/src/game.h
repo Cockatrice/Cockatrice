@@ -70,7 +70,7 @@ signals:
 	void logShuffle(Player *player);
 	void logRollDice(Player *player, int sides, int roll);
 	void logDraw(Player *player, int number);
-	void logMoveCard(Player *player, QString cardName, QString startZone, int oldX, QString targetZone, int newX);
+	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
 	void logCreateToken(Player *player, QString cardName);
 	void logSetCardCounters(Player *player, QString cardName, int value, int oldValue);
 	void logSetTapped(Player *player, QString cardName, bool tapped);

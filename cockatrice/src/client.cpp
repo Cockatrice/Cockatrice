@@ -177,8 +177,10 @@ void Client::readLine()
 
 void Client::setStatus(const ProtocolStatus _status)
 {
+	ProtocolStatus oldStatus = status;
 	status = _status;
-	emit statusChanged(_status);
+	if (oldStatus != _status)
+		emit statusChanged(_status);
 }
 
 void Client::msg(const QString &s)
@@ -204,6 +206,8 @@ PendingCommand *Client::cmd(const QString &s)
 
 void Client::connectToServer(const QString &hostname, unsigned int port, const QString &_playerName, const QString &_password)
 {
+	disconnectFromServer();
+	
 	playerName = _playerName;
 	password = _password;
 	socket->connectToHost(hostname, port);
