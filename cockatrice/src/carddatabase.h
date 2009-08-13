@@ -7,6 +7,8 @@
 #include <QDataStream>
 #include <QList>
 #include <QXmlStreamReader>
+#include <QHttp>
+#include <QFile>
 
 class CardDatabase;
 class CardInfo;
@@ -31,7 +33,8 @@ public:
 	void sortByKey();
 };
 
-class CardInfo {
+class CardInfo : QObject{
+	Q_OBJECT
 private:
 	CardDatabase *db;
 
@@ -43,9 +46,14 @@ private:
 	QString text;
 	QStringList colors;
 	QString picURL;
+	QHttp http;
+	QFile *newPic;
+	int dlID;
 	int tableRow;
 	QPixmap *pixmap;
 	QMap<int, QPixmap *> scaledPixmapCache;
+	
+	void startDownload(QString, QString);
 public:
 	CardInfo(CardDatabase *_db,
 		const QString &_name = QString(),
@@ -75,6 +83,8 @@ public:
 	QPixmap *getPixmap(QSize size);
 	void clearPixmapCache();
 	void updatePixmapCache();
+public slots:
+	void picDownloadFinished(int, bool);
 };
 
 class CardDatabase : public QObject {

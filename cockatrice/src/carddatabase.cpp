@@ -6,6 +6,7 @@
 #include <QSettings>
 #include <QSvgRenderer>
 #include <QPainter>
+#include <QUrl>
 
 CardSet::CardSet(const QString &_shortName, const QString &_longName)
 	: shortName(_shortName), longName(_longName)
@@ -125,8 +126,40 @@ QPixmap *CardInfo::loadPixmap()
 			return pixmap;
 		if (pixmap->load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(sets[i]->getShortName()).arg(correctedName).arg(1)))
 			return pixmap;
+		if(pixmap->load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg("downloadedPics").arg(correctedName)))
+			return pixmap;
+		
+		startDownload(picsPath, correctedName);
+
+		
 	}
 	return pixmap;
+}
+
+void CardInfo::startDownload(QString picsPath, QString cardName)
+{		if(!QDir(QString(picsPath+"/downloadedPics/")).exists())
+		{
+			QDir dir(picsPath);
+			dir.mkdir("downloadedPics");
+		}
+		newPic = new QFile(picsPath+"/downloadedPics/"+cardName+".full.jpg");
+		newPic->open(QIODevice::WriteOnly);
+		connect(&http, SIGNAL(requestFinished(int, bool)), this, SLOT(picDownloadFinished(int, bool)));
+		QUrl url(picURL);
+		http.setHost(url.host(), url.port(80));
+		dlID = http.get(url.path(), newPic);
+}
+
+void CardInfo::picDownloadFinished(int id, bool result)
+{
+	if(id == dlID){
+		newPic->flush();
+		newPic->close();
+		http.close();
+		updatePixmapCache();
+		disconnect(&http, 0, this, 0);
+		delete newPic;
+	}
 }
 
 QPixmap *CardInfo::getPixmap(QSize size)
@@ -307,7 +340,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 		if (xml.readNext() == QXmlStreamReader::EndElement)
 			break;
 		if (xml.name() == "card") {
-			QString name, manacost, type, pt, text;
+			QString name, manacost, type, pt, text, picURL;
 			QStringList colors;
 			SetList sets;
 			int tableRow = 0;
@@ -330,8 +363,10 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 					colors << xml.readElementText();
 				else if (xml.name() == "tablerow")
 					tableRow = xml.readElementText().toInt();
+				else if (xml.name() == "picURL")
+					picURL = xml.readElementText();
 			}
-			cardHash.insert(name, new CardInfo(this, name, manacost, type, pt, text, colors, tableRow, sets));
+			cardHash.insert(name, new CardInfo(this, name, manacost, type, pt, text, colors, tableRow, sets, picURL));
 		}
 	}
 }
