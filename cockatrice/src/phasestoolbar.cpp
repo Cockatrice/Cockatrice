@@ -24,25 +24,27 @@ PhasesToolbar::PhasesToolbar(QWidget *parent)
 		
 	for (int i = 0; i < buttonList.size(); ++i) {
 		buttonList[i]->setCheckable(true);
-		buttonList[i]->setIconSize(QSize(50, 50));
+		buttonList[i]->setIconSize(QSize(45, 45));
 	}
 	
 	QVBoxLayout *layout = new QVBoxLayout;
+	layout->setSpacing(0);
+	
 	layout->addStretch(1);
 	layout->addWidget(untapButton);
 	layout->addWidget(upkeepButton);
 	layout->addWidget(drawButton);
-	layout->addSpacing(20);
+	layout->addSpacing(15);
 	layout->addWidget(main1Button);
-	layout->addSpacing(20);
+	layout->addSpacing(15);
 	layout->addWidget(combatStartButton);
 	layout->addWidget(combatAttackersButton);
 	layout->addWidget(combatBlockersButton);
 	layout->addWidget(combatDamageButton);
 	layout->addWidget(combatEndButton);
-	layout->addSpacing(20);
+	layout->addSpacing(15);
 	layout->addWidget(main2Button);
-	layout->addSpacing(20);
+	layout->addSpacing(15);
 	layout->addWidget(cleanupButton);
 	layout->addStretch(1);
 	
