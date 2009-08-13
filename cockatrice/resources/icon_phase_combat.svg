@@ -14,38 +14,30 @@
    id="svg5128"
    sodipodi:version="0.32"
    inkscape:version="0.46"
-   sodipodi:docname="icon_combat.svg"
+   sodipodi:docname="icon_phase_combat.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs5130">
     <linearGradient
        id="linearGradient5717">
       <stop
-         style="stop-color:#803300;stop-opacity:1;"
+         style="stop-color:#003580;stop-opacity:1;"
          offset="0"
          id="stop5719" />
       <stop
          id="stop5727"
-         offset="0.348957"
-         style="stop-color:#401900;stop-opacity:1;" />
-      <stop
-         style="stop-color:#200c00;stop-opacity:1;"
-         offset="0.42728195"
-         id="stop5729" />
+         offset="0.25297618"
+         style="stop-color:#055897;stop-opacity:1;" />
       <stop
          id="stop5725"
          offset="0.5"
-         style="stop-color:#000000;stop-opacity:1;" />
-      <stop
-         style="stop-color:#3a1500;stop-opacity:1;"
-         offset="0.61667371"
-         id="stop5731" />
+         style="stop-color:#00a4ff;stop-opacity:1;" />
       <stop
          id="stop5733"
-         offset="0.72448903"
-         style="stop-color:#883200;stop-opacity:1;" />
+         offset="0.75"
+         style="stop-color:#055897;stop-opacity:1;" />
       <stop
-         style="stop-color:#742b00;stop-opacity:1;"
+         style="stop-color:#003580;stop-opacity:1;"
          offset="1"
          id="stop5721" />
     </linearGradient>
@@ -126,14 +118,14 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.087072"
-     inkscape:cx="33.386071"
+     inkscape:cx="12.956872"
      inkscape:cy="29.617085"
      inkscape:current-layer="g5122"
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
      inkscape:window-width="1280"
-     inkscape:window-height="949"
+     inkscape:window-height="725"
      inkscape:window-x="0"
      inkscape:window-y="25" />
   <metadata
