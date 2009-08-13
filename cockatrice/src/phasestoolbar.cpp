@@ -24,9 +24,12 @@ PhasesToolbar::PhasesToolbar(QWidget *parent)
 		
 	for (int i = 0; i < buttonList.size(); ++i) {
 		buttonList[i]->setCheckable(true);
-		buttonList[i]->setIconSize(QSize(45, 45));
+		buttonList[i]->setIconSize(QSize(40, 40));
 	}
 	
+	QPushButton *nextTurnButton = new QPushButton(QIcon(":/resources/icon_nextturn.svg"), QString());
+	nextTurnButton->setIconSize(QSize(40, 40));
+		
 	QVBoxLayout *layout = new QVBoxLayout;
 	layout->setSpacing(0);
 	
@@ -46,6 +49,8 @@ PhasesToolbar::PhasesToolbar(QWidget *parent)
 	layout->addWidget(main2Button);
 	layout->addSpacing(15);
 	layout->addWidget(cleanupButton);
+	layout->addSpacing(25);
+	layout->addWidget(nextTurnButton);
 	layout->addStretch(1);
 	
 	setLayout(layout);

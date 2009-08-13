@@ -2,6 +2,7 @@
 <qresource>
 	<file alias="back.svg">resources/back.svg</file>
 	<file>resources/icon_config_general.svg</file>
+	<file>resources/icon_config_appearance.svg</file>
 	<file>resources/icon_config_messages.svg</file>
 	
 	<file>resources/icon_phase_untap.svg</file>
@@ -15,6 +16,7 @@
 	<file>resources/icon_phase_combat_end.svg</file>
 	<file>resources/icon_phase_main2.svg</file>
 	<file>resources/icon_phase_cleanup.svg</file>
+	<file>resources/icon_nextturn.svg</file>
 
 	<file>translations/cockatrice_de.qm</file>
 	<file>translations/cockatrice_en.qm</file>
