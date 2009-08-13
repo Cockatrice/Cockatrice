@@ -249,8 +249,8 @@ DlgSettings::DlgSettings(CardDatabase *_db, QTranslator *_translator, QWidget *p
 	contentsWidget->setViewMode(QListView::IconMode);
 	contentsWidget->setIconSize(QSize(96, 84));
 	contentsWidget->setMovement(QListView::Static);
-	contentsWidget->setMinimumWidth(128);
-	contentsWidget->setMaximumWidth(150);
+	contentsWidget->setMinimumWidth(115);
+	contentsWidget->setMaximumWidth(115);
 	contentsWidget->setSpacing(12);
 	
 	pagesWidget = new QStackedWidget;
@@ -278,14 +278,14 @@ DlgSettings::DlgSettings(CardDatabase *_db, QTranslator *_translator, QWidget *p
 	
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addLayout(hboxLayout);
-	mainLayout->addStretch(1);
+	//mainLayout->addStretch(1);
 	mainLayout->addSpacing(12);
 	mainLayout->addLayout(buttonsLayout);
 	setLayout(mainLayout);
 	
 	retranslateUi();
 	
-	resize(700, sizeHint().height());
+	resize(700, 450);
 }
 
 void DlgSettings::createIcons()
