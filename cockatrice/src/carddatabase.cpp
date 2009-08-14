@@ -96,6 +96,12 @@ QString CardInfo::getMainCardType() const
 	return result;
 }
 
+QString CardInfo::getCorrectedName() const
+{
+	// Fire // Ice, Circle of Protection: Red
+	return getName().remove(" // ").remove(":");
+}
+
 void CardInfo::addToSet(CardSet *set)
 {
 	set->append(this);
@@ -119,47 +125,58 @@ QPixmap *CardInfo::loadPixmap()
 		debugOutput.append(QString("%1, ").arg(sets[i]->getShortName()));
 	qDebug(debugOutput.toLatin1());
 
+	QString correctedName = getCorrectedName();
 	for (int i = 0; i < sets.size(); i++) {
-		// Fire // Ice, Circle of Protection: Red
-		QString correctedName = getName().remove(" // ").remove(":");
 		if (pixmap->load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(sets[i]->getShortName()).arg(correctedName)))
 			return pixmap;
 		if (pixmap->load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(sets[i]->getShortName()).arg(correctedName).arg(1)))
 			return pixmap;
 		if(pixmap->load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg("downloadedPics").arg(correctedName)))
 			return pixmap;
-		
-		startDownload(picsPath, correctedName);
-
-		
 	}
+	if (db->getPicDownload())
+		startDownload();
 	return pixmap;
 }
 
-void CardInfo::startDownload(QString picsPath, QString cardName)
-{		if(!QDir(QString(picsPath+"/downloadedPics/")).exists())
-		{
-			QDir dir(picsPath);
-			dir.mkdir("downloadedPics");
-		}
-		newPic = new QFile(picsPath+"/downloadedPics/"+cardName+".full.jpg");
-		newPic->open(QIODevice::WriteOnly);
-		connect(&http, SIGNAL(requestFinished(int, bool)), this, SLOT(picDownloadFinished(int, bool)));
-		QUrl url(picURL);
-		http.setHost(url.host(), url.port(80));
-		dlID = http.get(url.path(), newPic);
+void CardInfo::startDownload()
+{
+	downloadBuffer = new QBuffer(this);
+	downloadBuffer->open(QIODevice::ReadWrite);
+	http = new QHttp(this);
+	connect(http, SIGNAL(requestFinished(int, bool)), this, SLOT(picDownloadFinished(int, bool)));
+	QUrl url(picURL);
+	http->setHost(url.host(), url.port(80));
+	dlID = http->get(url.path(), downloadBuffer);
 }
 
-void CardInfo::picDownloadFinished(int id, bool result)
+void CardInfo::picDownloadFinished(int id, bool error)
 {
-	if(id == dlID){
-		newPic->flush();
-		newPic->close();
-		http.close();
-		updatePixmapCache();
-		disconnect(&http, 0, this, 0);
-		delete newPic;
+	if (id != dlID)
+		return;
+	http->close();
+	disconnect(http, 0, this, 0);
+	http->deleteLater();
+	
+	downloadBuffer->close();
+	if (!error) {
+		QString picsPath = db->getPicsPath();
+		const QByteArray &picData = downloadBuffer->data();
+		QPixmap testPixmap;
+		if (testPixmap.loadFromData(picData)) {
+			if (!QDir(QString(picsPath + "/downloadedPics/")).exists()) {
+				QDir dir(picsPath);
+				dir.mkdir("downloadedPics");
+			}
+			QFile newPic(picsPath + "/downloadedPics/" + getCorrectedName() + ".full.jpg");
+			newPic.open(QIODevice::WriteOnly);
+			newPic.write(picData);
+			newPic.close();
+			
+			updatePixmapCache();
+		}
 	}
+	delete downloadBuffer;
 }
 
 QPixmap *CardInfo::getPixmap(QSize size)
@@ -237,6 +254,7 @@ CardDatabase::CardDatabase(QObject *parent)
 	: QObject(parent), noCard(0)
 {
 	updateDatabasePath();
+	updatePicDownload();
 	updatePicsPath();
 
 	noCard = new CardInfo(this);
@@ -422,6 +440,15 @@ bool CardDatabase::saveToFile(const QString &fileName)
 	xml.writeEndDocument();
 
 	return true;
+}
+
+void CardDatabase::updatePicDownload(int _picDownload)
+{
+	if (_picDownload == -1) {
+		QSettings settings;
+		picDownload = settings.value("personal/picturedownload", 0).toInt();
+	} else
+		picDownload = _picDownload;
 }
 
 void CardDatabase::updatePicsPath(const QString &path)

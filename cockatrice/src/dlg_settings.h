@@ -12,6 +12,7 @@ class QLineEdit;
 class QPushButton;
 class QComboBox;
 class QGroupBox;
+class QCheckBox;
 class QLabel;
 
 class AbstractSettingsPage : public QWidget {
@@ -30,17 +31,20 @@ private slots:
 	void cardDatabasePathButtonClicked();
 	void cardBackgroundPathButtonClicked();
 	void languageBoxChanged(int index);
+	void picDownloadCheckBoxChanged(int state);
 signals:
 	void picsPathChanged(const QString &path);
 	void cardDatabasePathChanged(const QString &path);
 	void cardBackgroundPathChanged(const QString &path);
 	void changeLanguage(const QString &qmFile);
+	void picDownloadChanged(int state);
 private:
 	QStringList findQmFiles();
 	QString languageName(const QString &qmFile);
 	QLineEdit *deckPathEdit, *picsPathEdit, *cardDatabasePathEdit, *cardBackgroundPathEdit;
 	QGroupBox *personalGroupBox, *pathsGroupBox;
 	QComboBox *languageBox;
+	QCheckBox *picDownloadCheckBox;
 	QLabel *languageLabel, *deckPathLabel, *picsPathLabel, *cardDatabasePathLabel, *cardBackgroundPathLabel;
 };
 

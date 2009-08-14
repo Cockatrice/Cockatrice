@@ -8,6 +8,7 @@ GeneralSettingsPage::GeneralSettingsPage()
 	QSettings settings;
 	
 	personalGroupBox = new QGroupBox;
+	
 	languageLabel = new QLabel;
 	languageBox = new QComboBox;
 	
@@ -20,12 +21,19 @@ GeneralSettingsPage::GeneralSettingsPage()
 		if ((qmFiles[i] == settings.value("lang").toString()) || (setLanguage.isEmpty() && langName == tr("English")))
 			languageBox->setCurrentIndex(i);
 	}
+	
+	picDownloadCheckBox = new QCheckBox;
+	picDownloadCheckBox->setChecked(settings.value("picturedownload", 0).toInt());
+	
 	settings.endGroup();
 	connect(languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
+	connect(picDownloadCheckBox, SIGNAL(stateChanged(int)), this, SLOT(picDownloadCheckBoxChanged(int)));
 	
 	QGridLayout *personalGrid = new QGridLayout;
 	personalGrid->addWidget(languageLabel, 0, 0);
 	personalGrid->addWidget(languageBox, 0, 1);
+	personalGrid->addWidget(picDownloadCheckBox, 1, 0, 1, 2);
+	
 	personalGroupBox->setLayout(personalGrid);
 	
 	pathsGroupBox = new QGroupBox;
@@ -160,10 +168,20 @@ void GeneralSettingsPage::languageBoxChanged(int index)
 	emit changeLanguage(qmFile);
 }
 
+void GeneralSettingsPage::picDownloadCheckBoxChanged(int state)
+{
+	QSettings settings;
+	settings.beginGroup("personal");
+	settings.setValue("picturedownload", state);
+	
+	emit picDownloadChanged(state);
+}
+
 void GeneralSettingsPage::retranslateUi()
 {
 	personalGroupBox->setTitle(tr("Personal settings"));
 	languageLabel->setText(tr("Language:"));
+	picDownloadCheckBox->setText(tr("Download card pictures on the fly"));
 	pathsGroupBox->setTitle(tr("Paths"));
 	deckPathLabel->setText(tr("Decks directory:"));
 	picsPathLabel->setText(tr("Pictures directory:"));
@@ -250,7 +268,7 @@ DlgSettings::DlgSettings(CardDatabase *_db, QTranslator *_translator, QWidget *p
 	contentsWidget->setIconSize(QSize(96, 84));
 	contentsWidget->setMovement(QListView::Static);
 	contentsWidget->setMinimumWidth(115);
-	contentsWidget->setMaximumWidth(115);
+	contentsWidget->setMaximumWidth(130);
 	contentsWidget->setSpacing(12);
 	
 	pagesWidget = new QStackedWidget;
@@ -258,6 +276,7 @@ DlgSettings::DlgSettings(CardDatabase *_db, QTranslator *_translator, QWidget *p
 	connect(general, SIGNAL(picsPathChanged(const QString &)), db, SLOT(updatePicsPath(const QString &)));
 	connect(general, SIGNAL(cardDatabasePathChanged(const QString &)), db, SLOT(updateDatabasePath(const QString &)));
 	connect(general, SIGNAL(changeLanguage(const QString &)), this, SLOT(changeLanguage(const QString &)));
+	connect(general, SIGNAL(picDownloadChanged(int)), db, SLOT(updatePicDownload(int)));
 	pagesWidget->addWidget(general);
 	pagesWidget->addWidget(new AppearanceSettingsPage);
 	pagesWidget->addWidget(new MessagesSettingsPage);

@@ -8,7 +8,7 @@
 #include <QList>
 #include <QXmlStreamReader>
 #include <QHttp>
-#include <QFile>
+#include <QBuffer>
 
 class CardDatabase;
 class CardInfo;
@@ -33,7 +33,7 @@ public:
 	void sortByKey();
 };
 
-class CardInfo : QObject{
+class CardInfo : QObject {
 	Q_OBJECT
 private:
 	CardDatabase *db;
@@ -46,14 +46,14 @@ private:
 	QString text;
 	QStringList colors;
 	QString picURL;
-	QHttp http;
-	QFile *newPic;
+	QHttp *http;
+	QBuffer *downloadBuffer;
 	int dlID;
 	int tableRow;
 	QPixmap *pixmap;
 	QMap<int, QPixmap *> scaledPixmapCache;
 	
-	void startDownload(QString, QString);
+	void startDownload();
 public:
 	CardInfo(CardDatabase *_db,
 		const QString &_name = QString(),
@@ -75,16 +75,17 @@ public:
 	QStringList getColors() const { return colors; }
 	QString getPicURL() const { return picURL; }
 	QString getMainCardType() const;
+	QString getCorrectedName() const;
 	int getTableRow() const { return tableRow; }
 	void setTableRow(int _tableRow) { tableRow = _tableRow; }
-	void setPicURL(QString _picURL) { picURL = _picURL; }
+	void setPicURL(const QString &_picURL) { picURL = _picURL; }
 	void addToSet(CardSet *set);
 	QPixmap *loadPixmap();
 	QPixmap *getPixmap(QSize size);
 	void clearPixmapCache();
 	void updatePixmapCache();
-public slots:
-	void picDownloadFinished(int, bool);
+private slots:
+	void picDownloadFinished(int id, bool error);
 };
 
 class CardDatabase : public QObject {
@@ -97,6 +98,7 @@ protected:
 private:
 	void loadCardsFromXml(QXmlStreamReader &xml);
 	void loadSetsFromXml(QXmlStreamReader &xml);
+	bool picDownload;
 public:
 	CardDatabase(QObject *parent = 0);
 	~CardDatabase();
@@ -105,6 +107,7 @@ public:
 	CardSet *getSet(const QString &setName);
 	QList<CardInfo *> getCardList() const { return cardHash.values(); }
 	SetList getSetList() const;
+	bool getPicDownload() const { return picDownload; }
 	void clearPixmapCache();
 	int loadFromFile(const QString &fileName);
 	bool saveToFile(const QString &fileName);
@@ -112,6 +115,7 @@ public:
 public slots:
 	void updatePicsPath(const QString &path = QString());
 	void updateDatabasePath(const QString &path = QString());
+	void updatePicDownload(int _picDownload = -1);
 };
 
 #endif
