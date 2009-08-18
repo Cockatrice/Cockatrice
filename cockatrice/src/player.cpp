@@ -319,4 +319,5 @@ void Player::showCardMenu(const QPoint &p)
 void Player::setActive(bool _active)
 {
 	active = _active;
+	area->update();
 }

@@ -53,9 +53,33 @@ void PlayerArea::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opti
 {
 	painter->fillRect(boundingRect(), QColor(200, 200, 200));
 
-	painter->setFont(QFont("Times", 16, QFont::Bold));
+	QString nameStr = player->getName();
+	QFont font("Times");
+	font.setPixelSize(20);
+//	font.setWeight(QFont::Bold);
+	
+	int totalWidth = CARD_WIDTH + 60;
+	
+	if (player->getActive()) {
+		QFontMetrics fm(font);
+		double w = fm.width(nameStr) * 1.7;
+		double h = fm.height() * 1.7;
+		if (w < h)
+			w = h;
+		
+		painter->setPen(Qt::transparent);
+		QRadialGradient grad(QPointF(0.5, 0.5), 0.5);
+		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
+		grad.setColorAt(0, QColor(150, 200, 150, 255));
+		grad.setColorAt(0.7, QColor(150, 200, 150, 255));
+		grad.setColorAt(1, QColor(150, 150, 150, 0));
+		painter->setBrush(QBrush(grad));
+		
+		painter->drawEllipse(QRectF(((double) (totalWidth - w)) / 2, 0, w, h));
+	}
+	painter->setFont(font);
 	painter->setPen(QPen(Qt::black));
-	painter->drawText(QRectF(0, 0, CARD_WIDTH + 60, 40), Qt::AlignCenter, player->getName());
+	painter->drawText(QRectF(0, 0, totalWidth, 40), Qt::AlignCenter, nameStr);
 }
 
 Counter *PlayerArea::getCounter(const QString &name, bool remove)
