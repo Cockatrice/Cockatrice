@@ -1,12 +1,11 @@
 #include "phasestoolbar.h"
 #include <QAction>
 #include <QVBoxLayout>
-#include <QButtonGroup>
 #include <QPainter>
 #include <QPen>
 
 PhaseButton::PhaseButton(QIcon icon)
-	: QPushButton(icon, QString())
+	: QPushButton(icon, QString()), active(false)
 {
 
 }
@@ -19,27 +18,23 @@ void PhaseButton::update()
 void PhaseButton::paintEvent(QPaintEvent *event)
 {
 	QPushButton::paintEvent(event);
-	if (isChecked()) {
+	if (active) {
 		QPainter painter(this);
 		int height = size().height();
 		int width = size().width();
 
 		QPen pen;
-		pen.setWidth(3);
-		pen.setColor(QColor::fromRgb(180, 0, 0));
+		pen.setColor(QColor::fromRgb(180, 0, 0, 200));
 		painter.setPen(pen);
 
-//		painter.setPen(QColor(0, 0, 0, 0));
 		QRadialGradient grad(QPointF(0.5, 0.5), 0.5);
 		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
 		grad.setColorAt(0, QColor(180, 0, 0, 0));
 		grad.setColorAt(0.8, QColor(180, 0, 0, 0));
-		grad.setColorAt(1, QColor(180, 0, 0, 255));
+		grad.setColorAt(1, QColor(180, 0, 0, 200));
 		painter.setBrush(QBrush(grad));
-//		painter.drawEllipse(QRect(0, 0, width, height));
 
 		painter.drawRect(3, 3, width - 7, height - 7);
-
 	}
 }
 
@@ -69,38 +64,34 @@ PhasesToolbar::PhasesToolbar(QWidget *parent)
 		<< main2Button << cleanupButton;
 	
 	for (int i = 0; i < buttonList.size(); ++i) {
-		buttonList[i]->setCheckable(true);
-		buttonList[i]->setIconSize(QSize(40, 40));
+		buttonList[i]->setIconSize(QSize(36, 36));
+		connect(buttonList[i], SIGNAL(clicked()), this, SLOT(phaseButtonClicked()));
 	}
 	
 	QPushButton *nextTurnButton = new QPushButton(QIcon(":/resources/icon_nextturn.svg"), QString());
-	nextTurnButton->setIconSize(QSize(40, 40));
+	nextTurnButton->setIconSize(QSize(36, 36));
+	connect(nextTurnButton, SIGNAL(clicked()), this, SIGNAL(signalNextTurn()));
 		
 	QVBoxLayout *layout = new QVBoxLayout;
 	layout->setSpacing(0);
-	
-	QButtonGroup *bg = new QButtonGroup;
-	for (int i = 0; i < buttonList.size(); ++i) {
-		bg->addButton(buttonList[i]);
-	}
 	
 	layout->addStretch(1);
 	layout->addWidget(untapButton);
 	layout->addWidget(upkeepButton);
 	layout->addWidget(drawButton);
-	layout->addSpacing(15);
+	layout->addSpacing(10);
 	layout->addWidget(main1Button);
-	layout->addSpacing(15);
+	layout->addSpacing(10);
 	layout->addWidget(combatStartButton);
 	layout->addWidget(combatAttackersButton);
 	layout->addWidget(combatBlockersButton);
 	layout->addWidget(combatDamageButton);
 	layout->addWidget(combatEndButton);
-	layout->addSpacing(15);
+	layout->addSpacing(10);
 	layout->addWidget(main2Button);
-	layout->addSpacing(15);
+	layout->addSpacing(10);
 	layout->addWidget(cleanupButton);
-	layout->addSpacing(25);
+	layout->addSpacing(20);
 	layout->addWidget(nextTurnButton);
 	layout->addStretch(1);
 	
@@ -121,4 +112,19 @@ void PhasesToolbar::retranslateUi()
 	buttonList[8]->setPhaseText(tr("End of combat step"));
 	buttonList[9]->setPhaseText(tr("Second main phase"));
 	buttonList[10]->setPhaseText(tr("End of turn step"));
+}
+
+void PhasesToolbar::setActivePhase(int phase)
+{
+	if (phase >= buttonList.size())
+		return;
+	
+	for (int i = 0; i < buttonList.size(); ++i)
+		buttonList[i]->setActive(i == phase);
+}
+
+void PhasesToolbar::phaseButtonClicked()
+{
+	PhaseButton *button = qobject_cast<PhaseButton *>(sender());
+	emit signalSetPhase(buttonList.indexOf(button));
 }

@@ -68,6 +68,7 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			aDisconnect->setEnabled(false);
 			aRestartGame->setEnabled(false);
 			aLeaveGame->setEnabled(false);
+			phasesToolbar->setEnabled(false);
 			emit logDisconnected();
 			break;
 		case StatusLoggingIn:
@@ -81,11 +82,13 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			}
 			aRestartGame->setEnabled(false);
 			aLeaveGame->setEnabled(false);
+			phasesToolbar->setEnabled(false);
 			
 			GameSelector *gameSelector = new GameSelector(client);
 			viewLayout->insertWidget(0, gameSelector);
 		}
 		case StatusPlaying:
+			phasesToolbar->setEnabled(true);
 			break;
 		default:
 			break;
@@ -166,6 +169,7 @@ void MainWindow::playerIdReceived(int id, QString name)
 	connect(game, SIGNAL(hoverCard(QString)), this, SLOT(hoverCard(QString)));
 	connect(game, SIGNAL(playerAdded(Player *)), this, SLOT(playerAdded(Player *)));
 	connect(game, SIGNAL(playerRemoved(Player *)), this, SLOT(playerRemoved(Player *)));
+	connect(game, SIGNAL(setActivePhase(int)), phasesToolbar, SLOT(setActivePhase(int)));
 	playerAdded(game->getLocalPlayer());
 
 	messageLog->connectToGame(game);
@@ -289,7 +293,8 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	viewLayout = new QVBoxLayout;
 	viewLayout->addWidget(view);
 
-	PhasesToolbar *phasesToolbar = new PhasesToolbar;
+	phasesToolbar = new PhasesToolbar;
+	phasesToolbar->setEnabled(false);
 
 	QHBoxLayout *mainLayout = new QHBoxLayout;
 	mainLayout->addWidget(phasesToolbar);
@@ -312,6 +317,8 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	connect(this, SIGNAL(logDisconnected()), messageLog, SLOT(logDisconnected()));
 	connect(client, SIGNAL(logSocketError(const QString &)), messageLog, SLOT(logSocketError(const QString &)));
 	connect(client, SIGNAL(serverError(ServerResponse)), messageLog, SLOT(logServerError(ServerResponse)));
+	connect(phasesToolbar, SIGNAL(signalSetPhase(int)), client, SLOT(setActivePhase(int)));
+	connect(phasesToolbar, SIGNAL(signalNextTurn()), client, SLOT(nextTurn()));
 
 	createActions();
 	createMenus();

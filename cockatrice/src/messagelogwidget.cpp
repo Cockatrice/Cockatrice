@@ -207,9 +207,23 @@ void MessageLogWidget::logSetActivePlayer(Player *player)
 	append("---");
 }
 
-void MessageLogWidget::logSetActivePhase(Player *player, int phase)
+void MessageLogWidget::logSetActivePhase(int phase)
 {
-	append("<font color=\"green\">" + tr("It is now the %1 phase.").arg(phase) + "</font>");
+	QString phaseName;
+	switch (phase) {
+		case 0: phaseName = tr("untap step"); break;
+		case 1: phaseName = tr("upkeep step"); break;
+		case 2: phaseName = tr("draw step"); break;
+		case 3: phaseName = tr("first main phase"); break;
+		case 4: phaseName = tr("beginning of combat step"); break;
+		case 5: phaseName = tr("declare attackers step"); break;
+		case 6: phaseName = tr("declare blockers step"); break;
+		case 7: phaseName = tr("combat damage step"); break;
+		case 8: phaseName = tr("end of combat step"); break;
+		case 9: phaseName = tr("second main phase"); break;
+		case 10: phaseName = tr("end of turn step"); break;
+	}
+	append("<font color=\"green\">" + tr("It is now the %1.").arg(phaseName) + "</font>");
 }
 
 void MessageLogWidget::connectToGame(Game *game)
@@ -232,7 +246,7 @@ void MessageLogWidget::connectToGame(Game *game)
 	connect(game, SIGNAL(logDumpZone(Player *, QString, QString, int)), this, SLOT(logDumpZone(Player *, QString, QString, int)));
 	connect(game, SIGNAL(logStopDumpZone(Player *, QString, QString)), this, SLOT(logStopDumpZone(Player *, QString, QString)));
 	connect(game, SIGNAL(logSetActivePlayer(Player *)), this, SLOT(logSetActivePlayer(Player *)));
-	connect(game, SIGNAL(setActivePhase(Player *, int)), this, SLOT(logSetActivePhase(Player *, int)));
+	connect(game, SIGNAL(setActivePhase(int)), this, SLOT(logSetActivePhase(int)));
 }
 
 MessageLogWidget::MessageLogWidget(QWidget *parent)

@@ -340,9 +340,9 @@ PendingCommand *Client::delCounter(const QString &counter)
 	return cmd(QString("del_counter|%1").arg(counter));
 }
 
-PendingCommand *Client::setActivePlayer(int player)
+PendingCommand *Client::nextTurn()
 {
-	return cmd(QString("set_active_player|%1").arg(player));
+	return cmd(QString("next_turn"));
 }
 
 PendingCommand *Client::setActivePhase(int phase)

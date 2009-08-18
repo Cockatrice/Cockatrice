@@ -38,7 +38,7 @@ private slots:
 	void logDumpZone(Player *player, QString zoneName, QString zoneOwner, int numberCards);
 	void logStopDumpZone(Player *player, QString zoneName, QString zoneOwner);
 	void logSetActivePlayer(Player *player);
-	void logSetActivePhase(Player *player, int phase);
+	void logSetActivePhase(int phase);
 public:
 	void connectToGame(Game *game);
 	MessageLogWidget(QWidget *parent = 0);

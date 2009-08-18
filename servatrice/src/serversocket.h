@@ -83,7 +83,7 @@ private:
 	ReturnMessage::ReturnCode cmdDumpZone(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdStopDumpZone(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdRollDice(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdSetActivePlayer(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdNextTurn(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdSetActivePhase(const QList<QVariant> &params);
 
 	Server *server;

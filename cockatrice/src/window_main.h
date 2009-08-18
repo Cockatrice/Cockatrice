@@ -39,6 +39,7 @@ class QPushButton;
 class ServerZoneCard;
 class ZoneViewLayout;
 class ZoneViewWidget;
+class PhasesToolbar;
 
 class MainWindow : public QMainWindow {
 	Q_OBJECT
@@ -78,6 +79,7 @@ private:
 	MessageLogWidget *messageLog;
 	QLabel *sayLabel;
 	QLineEdit *sayEdit;
+	PhasesToolbar *phasesToolbar;
 
 	Client *client;
 	QGraphicsScene *scene;

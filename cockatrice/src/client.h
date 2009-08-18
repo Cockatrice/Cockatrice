@@ -89,6 +89,7 @@ public:
 
 	void connectToServer(const QString &hostname, unsigned int port, const QString &_playerName, const QString &_password);
 	void disconnectFromServer();
+public slots:
 	PendingCommand *listGames();
 	PendingCommand *listPlayers();
 	PendingCommand *createGame(const QString &description, const QString &password, unsigned int maxPlayers);
@@ -107,11 +108,10 @@ public:
 	PendingCommand *addCounter(const QString &counter, QColor color, int value);
 	PendingCommand *setCounter(const QString &counter, int value);
 	PendingCommand *delCounter(const QString &counter);
-	PendingCommand *setActivePlayer(int player);
+	PendingCommand *nextTurn();
 	PendingCommand *setActivePhase(int phase);
 	PendingCommand *dumpZone(int player, const QString &zone, int numberCards);
 	PendingCommand *stopDumpZone(int player, const QString &zone);
-public slots:
 	void submitDeck(const QStringList &deck);
 };
 

@@ -212,7 +212,7 @@ const ServerSocket::CommandProperties ServerSocket::commandList[ServerSocket::nu
 	{"stop_dump_zone", true, true, true, QList<QVariant::Type>() << QVariant::Int
 								     << QVariant::String, &ServerSocket::cmdStopDumpZone},
 	{"roll_dice", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdRollDice},
-	{"set_active_player", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdSetActivePlayer},
+	{"next_turn", true, true, true, QList<QVariant::Type>(), &ServerSocket::cmdNextTurn},
 	{"set_active_phase", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdSetActivePhase}
 };
 
@@ -603,13 +603,12 @@ ReturnMessage::ReturnCode ServerSocket::cmdRollDice(const QList<QVariant> &param
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdSetActivePlayer(const QList<QVariant> &params)
+ReturnMessage::ReturnCode ServerSocket::cmdNextTurn(const QList<QVariant> &params)
 {
-	int active_player = params[0].toInt();
-	if (!game->getPlayer(active_player))
-		return ReturnMessage::ReturnContextError;
-	game->setActivePlayer(active_player);
-	emit broadcastEvent(QString("set_active_player|%1").arg(active_player), this);
+	int activePlayer = game->getActivePlayer();
+	if (++activePlayer == game->getPlayerCount())
+		activePlayer = 0;
+	game->setActivePlayer(activePlayer);
 	return ReturnMessage::ReturnOk;
 }
 
@@ -620,7 +619,6 @@ ReturnMessage::ReturnCode ServerSocket::cmdSetActivePhase(const QList<QVariant> 
 	if (game->getActivePlayer() != playerId)
 		return ReturnMessage::ReturnContextError;
 	game->setActivePhase(active_phase);
-	emit broadcastEvent(QString("set_active_phase|%1").arg(active_phase), this);
 	return ReturnMessage::ReturnOk;
 }
 

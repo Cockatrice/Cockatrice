@@ -240,7 +240,7 @@ void Game::gameEvent(const ServerEventData &msg)
 		case eventSetActivePhase: {
 			QStringList data = msg.getEventData();
 			int phase = data[0].toInt();
-			emit setActivePhase(p, phase);
+			emit setActivePhase(phase);
 			break;
 		}
 

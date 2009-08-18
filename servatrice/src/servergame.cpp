@@ -108,10 +108,9 @@ void ServerGame::startGameIfReady()
 	for (int i = 0; i < players.size(); i++)
 		players.at(i)->setupZones();
 	
-	activePlayer = 0;
-	activePhase = 0;
 	gameStarted = true;
 	broadcastEvent("game_start", NULL);
+	setActivePlayer(0);
 }
 
 void ServerGame::addPlayer(ServerSocket *player)
