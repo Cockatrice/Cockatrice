@@ -97,6 +97,9 @@ void MessageLogWidget::logDraw(Player *player, int number)
 
 void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX)
 {
+	if (cardName.isEmpty())
+		cardName = tr("a card");
+	
 	QString startName = startZone->getName();
 	QString targetName = targetZone->getName();
 	if (((startName == "table") && (targetName == "table")) || ((startName == "hand") && (targetName == "hand")))
@@ -197,6 +200,18 @@ void MessageLogWidget::logStopDumpZone(Player *player, QString zoneName, QString
 	append(tr("%1 stops looking at %2's %3").arg(sanitizeHtml(player->getName())).arg(zoneOwner).arg(zoneName));
 }
 
+void MessageLogWidget::logSetActivePlayer(Player *player)
+{
+	append("---");
+	append("<font color=\"green\">" + tr("It is now %1's turn.").arg(player->getName()) + "</font>");
+	append("---");
+}
+
+void MessageLogWidget::logSetActivePhase(Player *player, int phase)
+{
+	append("<font color=\"green\">" + tr("It is now the %1 phase.").arg(phase) + "</font>");
+}
+
 void MessageLogWidget::connectToGame(Game *game)
 {
 	connect(game, SIGNAL(logPlayerListReceived(QStringList)), this, SLOT(logPlayerListReceived(QStringList)));
@@ -216,6 +231,8 @@ void MessageLogWidget::connectToGame(Game *game)
 	connect(game, SIGNAL(logSetDoesntUntap(Player *, QString, bool)), this, SLOT(logSetDoesntUntap(Player *, QString, bool)));
 	connect(game, SIGNAL(logDumpZone(Player *, QString, QString, int)), this, SLOT(logDumpZone(Player *, QString, QString, int)));
 	connect(game, SIGNAL(logStopDumpZone(Player *, QString, QString)), this, SLOT(logStopDumpZone(Player *, QString, QString)));
+	connect(game, SIGNAL(logSetActivePlayer(Player *)), this, SLOT(logSetActivePlayer(Player *)));
+	connect(game, SIGNAL(setActivePhase(Player *, int)), this, SLOT(logSetActivePhase(Player *, int)));
 }
 
 MessageLogWidget::MessageLogWidget(QWidget *parent)

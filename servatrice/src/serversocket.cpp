@@ -609,6 +609,7 @@ ReturnMessage::ReturnCode ServerSocket::cmdSetActivePlayer(const QList<QVariant>
 	if (!game->getPlayer(active_player))
 		return ReturnMessage::ReturnContextError;
 	game->setActivePlayer(active_player);
+	emit broadcastEvent(QString("set_active_player|%1").arg(active_player), this);
 	return ReturnMessage::ReturnOk;
 }
 
@@ -616,7 +617,10 @@ ReturnMessage::ReturnCode ServerSocket::cmdSetActivePhase(const QList<QVariant> 
 {
 	int active_phase = params[0].toInt();
 	// XXX Überprüfung, ob die Phase existiert...
+	if (game->getActivePlayer() != playerId)
+		return ReturnMessage::ReturnContextError;
 	game->setActivePhase(active_phase);
+	emit broadcastEvent(QString("set_active_phase|%1").arg(active_phase), this);
 	return ReturnMessage::ReturnOk;
 }
 

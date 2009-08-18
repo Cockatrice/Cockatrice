@@ -10,7 +10,7 @@
 #include <QMenu>
 
 Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDatabase *_db, Client *_client, QGraphicsScene *_scene, Game *_parent)
-	: QObject(_parent), defaultNumberTopCards(3), name(_name), id(_id), base(_base), local(_local), db(_db), client(_client)
+	: QObject(_parent), defaultNumberTopCards(3), name(_name), id(_id), active(false), base(_base), local(_local), db(_db), client(_client)
 {
 	area = new PlayerArea(this);
 	area->setPos(_base);
@@ -314,4 +314,9 @@ void Player::gameEvent(const ServerEventData &event)
 void Player::showCardMenu(const QPoint &p)
 {
 	emit sigShowCardMenu(p);
+}
+
+void Player::setActive(bool _active)
+{
+	active = _active;
 }

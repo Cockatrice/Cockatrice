@@ -37,6 +37,8 @@ private slots:
 	void logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap);
 	void logDumpZone(Player *player, QString zoneName, QString zoneOwner, int numberCards);
 	void logStopDumpZone(Player *player, QString zoneName, QString zoneOwner);
+	void logSetActivePlayer(Player *player);
+	void logSetActivePhase(Player *player, int phase);
 public:
 	void connectToGame(Game *game);
 	MessageLogWidget(QWidget *parent = 0);

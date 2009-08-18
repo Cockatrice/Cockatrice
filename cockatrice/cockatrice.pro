@@ -40,12 +40,11 @@ HEADERS += src/counter.h \
  src/carddatabasemodel.h \
  src/window_deckeditor.h \
  src/decklist.h \
- setsmodel.h \
+ src/setsmodel.h \
  src/window_sets.h \
  src/abstractgraphicsitem.h \
  src/dlg_settings.h \
- src/phasestoolbar.h \
- src/phasebutton.h
+ src/phasestoolbar.h
 SOURCES += src/counter.cpp \
  src/gameselector.cpp \
  src/dlg_creategame.cpp \
@@ -83,6 +82,5 @@ SOURCES += src/counter.cpp \
  src/window_sets.cpp \
  src/abstractgraphicsitem.cpp \
  src/dlg_settings.cpp \
- src/phasestoolbar.cpp \
- src/phasebutton.cpp
+ src/phasestoolbar.cpp
 TRANSLATIONS += translations/cockatrice_de.ts translations/cockatrice_en.ts

@@ -49,6 +49,7 @@ private:
 	int defaultNumberTopCards;
 	QString name;
 	int id;
+	bool active;
 	QPointF base;
 	bool local;
 	ZoneList zones;
@@ -68,6 +69,8 @@ public:
 	void gameEvent(const ServerEventData &event);
 	CardDatabase *getDb() const { return db; }
 	void showCardMenu(const QPoint &p);
+	bool getActive() const { return active; }
+	void setActive(bool _active);
 };
 
 #endif

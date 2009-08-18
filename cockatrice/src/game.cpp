@@ -224,10 +224,25 @@ void Game::gameEvent(const ServerEventData &msg)
 			emit logRollDice(p, sides, roll);
 			break;
 		}
-		case eventSetActivePlayer:
+		case eventSetActivePlayer: {
+			QStringList data = msg.getEventData();
+			int playerId = data[0].toInt();
+			Player *player = players.findPlayer(playerId);
+			if (!player) {
+				qDebug(QString("setActivePlayer: invalid player: %1").arg(playerId).toLatin1());
+				break;
+			}
+			for (int i = 0; i < players.size(); ++i)
+				players[i]->setActive(players[i] == player);
+			emit logSetActivePlayer(player);
 			break;
-		case eventSetActivePhase:
+		}
+		case eventSetActivePhase: {
+			QStringList data = msg.getEventData();
+			int phase = data[0].toInt();
+			emit setActivePhase(p, phase);
 			break;
+		}
 
 		case eventName:
 		case eventCreateToken:

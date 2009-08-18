@@ -78,6 +78,8 @@ signals:
 	void logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap);
 	void logDumpZone(Player *player, QString zoneName, QString zoneOwner, int numberCards);
 	void logStopDumpZone(Player *player, QString zoneName, QString zoneOwner);
+	void logSetActivePlayer(Player *player);
+	void setActivePhase(Player *player, int phase);
 public:
 	Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_actionsMenu, QMenu *_cardMenu, int playerId, const QString &playerName, QObject *parent = 0);
 	~Game();
