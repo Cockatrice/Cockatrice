@@ -1,23 +1,24 @@
 #include "phasestoolbar.h"
 #include <QAction>
-#include <QPushButton>
+//#include <QPushButton>
+#include "phasebutton.h"
 #include <QVBoxLayout>
 #include <QButtonGroup>
 
 PhasesToolbar::PhasesToolbar(QWidget *parent)
 	: QFrame(parent)
 {
-	QPushButton *untapButton = new QPushButton(QIcon(":/resources/icon_phase_untap.svg"), QString());
-	QPushButton *upkeepButton = new QPushButton(QIcon(":/resources/icon_phase_upkeep.svg"), QString());
-	QPushButton *drawButton = new QPushButton(QIcon(":/resources/icon_phase_draw.svg"), QString());
-	QPushButton *main1Button = new QPushButton(QIcon(":/resources/icon_phase_main1.svg"), QString());
-	QPushButton *combatStartButton = new QPushButton(QIcon(":/resources/icon_phase_combat_start.svg"), QString());
-	QPushButton *combatAttackersButton = new QPushButton(QIcon(":/resources/icon_phase_combat_attackers.svg"), QString());
-	QPushButton *combatBlockersButton = new QPushButton(QIcon(":/resources/icon_phase_combat_blockers.svg"), QString());
-	QPushButton *combatDamageButton = new QPushButton(QIcon(":/resources/icon_phase_combat_damage.svg"), QString());
-	QPushButton *combatEndButton = new QPushButton(QIcon(":/resources/icon_phase_combat_end.svg"), QString());
-	QPushButton *main2Button = new QPushButton(QIcon(":/resources/icon_phase_main2.svg"), QString());
-	QPushButton *cleanupButton = new QPushButton(QIcon(":/resources/icon_phase_cleanup.svg"), QString());
+	PhaseButton *untapButton = new PhaseButton(QIcon(":/resources/icon_phase_untap.svg"), QString());
+	PhaseButton *upkeepButton = new PhaseButton(QIcon(":/resources/icon_phase_upkeep.svg"), QString());
+	PhaseButton *drawButton = new PhaseButton(QIcon(":/resources/icon_phase_draw.svg"), QString());
+	PhaseButton *main1Button = new PhaseButton(QIcon(":/resources/icon_phase_main1.svg"), QString());
+	PhaseButton *combatStartButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_start.svg"), QString());
+	PhaseButton *combatAttackersButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_attackers.svg"), QString());
+	PhaseButton *combatBlockersButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_blockers.svg"), QString());
+	PhaseButton *combatDamageButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_damage.svg"), QString());
+	PhaseButton *combatEndButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_end.svg"), QString());
+	PhaseButton *main2Button = new PhaseButton(QIcon(":/resources/icon_phase_main2.svg"), QString());
+	PhaseButton *cleanupButton = new PhaseButton(QIcon(":/resources/icon_phase_cleanup.svg"), QString());
 	
 	buttonList << untapButton << upkeepButton << drawButton << main1Button << combatStartButton
 		<< combatAttackersButton << combatBlockersButton << combatDamageButton << combatEndButton
@@ -28,7 +29,7 @@ PhasesToolbar::PhasesToolbar(QWidget *parent)
 		buttonList[i]->setIconSize(QSize(40, 40));
 	}
 	
-	QPushButton *nextTurnButton = new QPushButton(QIcon(":/resources/icon_nextturn.svg"), QString());
+	PhaseButton *nextTurnButton = new PhaseButton(QIcon(":/resources/icon_nextturn.svg"), QString());
 	nextTurnButton->setIconSize(QSize(40, 40));
 		
 	QVBoxLayout *layout = new QVBoxLayout;
