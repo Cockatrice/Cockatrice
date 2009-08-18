@@ -2,6 +2,7 @@
 #include <QAction>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QButtonGroup>
 
 PhasesToolbar::PhasesToolbar(QWidget *parent)
 	: QFrame(parent)
@@ -32,6 +33,12 @@ PhasesToolbar::PhasesToolbar(QWidget *parent)
 		
 	QVBoxLayout *layout = new QVBoxLayout;
 	layout->setSpacing(0);
+	
+	QButtonGroup *bg = new QButtonGroup;
+	for (int i = 0; i < buttonList.size(); ++i) {
+		bg->addButton(buttonList[i]);
+	}
+	
 	
 	layout->addStretch(1);
 	layout->addWidget(untapButton);
