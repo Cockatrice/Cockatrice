@@ -329,6 +329,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/game.cpp" line="60"/>
+        <source>Ctrl+Return</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/game.cpp" line="79"/>
         <source>S&amp;ay</source>
         <translation type="unfinished"></translation>

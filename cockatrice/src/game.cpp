@@ -57,7 +57,7 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	aNextPhase->setShortcut(tr("Ctrl+Space"));
 	connect(aNextPhase, SIGNAL(triggered()), this, SLOT(actNextPhase()));
 	aNextTurn = new QAction(tr("Next &turn"), this);
-	aNextTurn->setShortcut(tr("Ctrl+Enter"));
+	aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
 	connect(aNextTurn, SIGNAL(triggered()), this, SLOT(actNextTurn()));
 	
 	actionsMenu->addAction(aNextPhase);

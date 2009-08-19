@@ -388,6 +388,11 @@
         <translation>Ctrl+Enter</translation>
     </message>
     <message>
+        <location filename="../src/game.cpp" line="60"/>
+        <source>Ctrl+Return</source>
+        <translation>Ctrl+Return</translation>
+    </message>
+    <message>
         <source>&amp;Edit messages...</source>
         <translation type="obsolete">Mitteilungen &amp;bearbeiten...</translation>
     </message>
