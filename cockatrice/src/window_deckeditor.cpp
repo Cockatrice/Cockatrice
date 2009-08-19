@@ -92,7 +92,7 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	aSaveDeck = new QAction(tr("&Save deck"), this);
 	aSaveDeck->setShortcuts(QKeySequence::Save);
 	connect(aSaveDeck, SIGNAL(triggered()), this, SLOT(actSaveDeck()));
-	aSaveDeckAs = new QAction(tr("&Save deck as..."), this);
+	aSaveDeckAs = new QAction(tr("Save deck &as..."), this);
 //	aSaveDeckAs->setShortcuts(QKeySequence::SaveAs);
 	connect(aSaveDeckAs, SIGNAL(triggered()), this, SLOT(actSaveDeckAs()));
 	aPrintDeck = new QAction(tr("&Print deck..."), this);

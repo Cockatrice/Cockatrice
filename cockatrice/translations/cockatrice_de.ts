@@ -1284,9 +1284,13 @@
         <translation>Deck &amp;speichern</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="95"/>
         <source>&amp;Save deck as...</source>
-        <translation>Deck &amp;speichern unter...</translation>
+        <translation type="obsolete">Deck &amp;speichern unter...</translation>
+    </message>
+    <message>
+        <location filename="../src/window_deckeditor.cpp" line="95"/>
+        <source>Save deck &amp;as...</source>
+        <translation>Deck s&amp;peichern unter...</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="98"/>

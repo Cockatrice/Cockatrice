@@ -1198,7 +1198,7 @@
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="95"/>
-        <source>&amp;Save deck as...</source>
+        <source>Save deck &amp;as...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
