@@ -7,7 +7,7 @@
 PhaseButton::PhaseButton(QIcon icon)
 	: QPushButton(icon, QString()), active(false)
 {
-
+	setFixedSize(50, 50);
 }
 
 void PhaseButton::update()
@@ -23,18 +23,16 @@ void PhaseButton::paintEvent(QPaintEvent *event)
 		int height = size().height();
 		int width = size().width();
 
-		QPen pen;
-		pen.setColor(QColor::fromRgb(180, 0, 0, 200));
-		painter.setPen(pen);
+		painter.setPen(QPen(Qt::transparent));
 
 		QRadialGradient grad(QPointF(0.5, 0.5), 0.5);
 		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
 		grad.setColorAt(0, QColor(180, 0, 0, 0));
 		grad.setColorAt(0.8, QColor(180, 0, 0, 0));
-		grad.setColorAt(1, QColor(180, 0, 0, 200));
+		grad.setColorAt(1, QColor(180, 0, 0, 255));
 		painter.setBrush(QBrush(grad));
 
-		painter.drawRect(3, 3, width - 7, height - 7);
+		painter.drawRect(2, 2, width - 4, height - 4);
 	}
 }
 
@@ -70,6 +68,7 @@ PhasesToolbar::PhasesToolbar(QWidget *parent)
 	
 	QPushButton *nextTurnButton = new QPushButton(QIcon(":/resources/icon_nextturn.svg"), QString());
 	nextTurnButton->setIconSize(QSize(36, 36));
+	nextTurnButton->setFixedSize(50, 50);
 	connect(nextTurnButton, SIGNAL(clicked()), this, SIGNAL(signalNextTurn()));
 		
 	QVBoxLayout *layout = new QVBoxLayout;

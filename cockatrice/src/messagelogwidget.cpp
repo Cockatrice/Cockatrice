@@ -97,9 +97,6 @@ void MessageLogWidget::logDraw(Player *player, int number)
 
 void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX)
 {
-	if (cardName.isEmpty())
-		cardName = tr("a card");
-	
 	QString startName = startZone->getName();
 	QString targetName = targetZone->getName();
 	if (((startName == "table") && (targetName == "table")) || ((startName == "hand") && (targetName == "hand")))
@@ -144,7 +141,7 @@ void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *s
 	} else if (targetName == "sb")
 		finalStr = tr("%1 moves %2 %3 to sideboard");
 	
-	append(finalStr.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(fromStr).arg(newX));
+	append(finalStr.arg(sanitizeHtml(player->getName())).arg(cardName.isEmpty() ? tr("a card") : QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(fromStr).arg(newX));
 }
 
 void MessageLogWidget::logCreateToken(Player *player, QString cardName)

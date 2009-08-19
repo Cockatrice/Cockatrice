@@ -15,9 +15,11 @@ class CardItem;
 class Game : public QObject {
 	Q_OBJECT
 private:
+	static const int phaseCount = 11;
+	
 	QMenu *actionsMenu, *sayMenu, *cardMenu;
 	QAction *aTap, *aUntap, *aDoesntUntap, *aFlip, *aAddCounter, *aRemoveCounter, *aSetCounters,
-		*aUntapAll, *aDecLife, *aIncLife, *aSetLife, *aShuffle, *aDraw, *aDrawCards, *aRollDice, *aCreateToken;
+		*aNextPhase, *aNextTurn, *aUntapAll, *aDecLife, *aIncLife, *aSetLife, *aShuffle, *aDraw, *aDrawCards, *aRollDice, *aCreateToken;
 	DlgStartGame *dlgStartGame;
 
 	CardDatabase *db;
@@ -26,9 +28,12 @@ private:
 	PlayerList players;
 	Player *localPlayer;
 	bool started;
+	int currentPhase;
 	Player *addPlayer(int playerId, const QString &playerName, QPointF base, bool local);
 	void initSayMenu();
 private slots:
+	void actNextPhase();
+	void actNextTurn();
 	void actUntapAll();
 	void actIncLife();
 	void actDecLife();

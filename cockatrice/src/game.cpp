@@ -14,7 +14,7 @@
 #include "counter.h"
 
 Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_actionsMenu, QMenu *_cardMenu, int playerId, const QString &playerName, QObject *parent)
-	: QObject(parent), actionsMenu(_actionsMenu), cardMenu(_cardMenu), db(_db), client(_client), scene(_scene), started(false)
+	: QObject(parent), actionsMenu(_actionsMenu), cardMenu(_cardMenu), db(_db), client(_client), scene(_scene), started(false), currentPhase(-1)
 {
 	QRectF sr = scene->sceneRect();
 	localPlayer = addPlayer(playerId, playerName, QPointF(0, sr.y() + sr.height() / 2 + 2), true);
@@ -53,6 +53,16 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	aCreateToken->setShortcut(tr("Ctrl+T"));
 	connect(aCreateToken, SIGNAL(triggered()), this, SLOT(actCreateToken()));
 	
+	aNextPhase = new QAction(tr("Next &phase"), this);
+	aNextPhase->setShortcut(tr("Ctrl+Space"));
+	connect(aNextPhase, SIGNAL(triggered()), this, SLOT(actNextPhase()));
+	aNextTurn = new QAction(tr("Next &turn"), this);
+	aNextTurn->setShortcut(tr("Ctrl+Enter"));
+	connect(aNextTurn, SIGNAL(triggered()), this, SLOT(actNextTurn()));
+	
+	actionsMenu->addAction(aNextPhase);
+	actionsMenu->addAction(aNextTurn);
+	actionsMenu->addSeparator();
 	actionsMenu->addAction(aUntapAll);
 	actionsMenu->addSeparator();
 	actionsMenu->addAction(aDecLife);
@@ -240,6 +250,7 @@ void Game::gameEvent(const ServerEventData &msg)
 		case eventSetActivePhase: {
 			QStringList data = msg.getEventData();
 			int phase = data[0].toInt();
+			currentPhase = phase;
 			emit setActivePhase(phase);
 			break;
 		}
@@ -282,6 +293,19 @@ void Game::gameEvent(const ServerEventData &msg)
 			qDebug("Unhandled global event");
 		}
 	}
+}
+
+void Game::actNextPhase()
+{
+	int phase = currentPhase;
+	if (++phase >= phaseCount)
+		phase = 0;
+	client->setActivePhase(phase);
+}
+
+void Game::actNextTurn()
+{
+	client->nextTurn();
 }
 
 void Game::actUntapAll()
