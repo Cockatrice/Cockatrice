@@ -24,6 +24,7 @@
 #include <QtPlugin>
 #include <QTranslator>
 #include <QLibraryInfo>
+#include <QDateTime>
 #include <QSettings>
 #include <stdio.h>
 
@@ -66,7 +67,7 @@ int main(int argc, char *argv[])
 		translator.load(lang);
 	app.installTranslator(&translator);
 	
-	
+	qsrand(QDateTime::currentDateTime().toTime_t());
 	
 	MainWindow ui(&translator);
 	qDebug("main(): MainWindow constructor finished");

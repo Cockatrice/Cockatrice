@@ -86,7 +86,7 @@ void Player::actMoveHandToBottomLibrary()
 
 void Player::actViewLibrary()
 {
-	emit toggleZoneView(this, "deck", 0);
+	emit toggleZoneView(this, "deck", -1);
 }
 
 void Player::actViewTopCards()
@@ -101,17 +101,17 @@ void Player::actViewTopCards()
 
 void Player::actViewGraveyard()
 {
-	emit toggleZoneView(this, "grave", 0);
+	emit toggleZoneView(this, "grave", -1);
 }
 
 void Player::actViewRfg()
 {
-	emit toggleZoneView(this, "rfg", 0);
+	emit toggleZoneView(this, "rfg", -1);
 }
 
 void Player::actViewSideboard()
 {
-	emit toggleZoneView(this, "sb", 0);
+	emit toggleZoneView(this, "sb", -1);
 }
 
 void Player::addZone(CardZone *z)

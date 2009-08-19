@@ -14,7 +14,6 @@ ZoneViewWidget::ZoneViewWidget(CardDatabase *_db, Player *_player, CardZone *_or
 
 	qreal y = 10;
 	if (_origZone->getIsShufflable() && (numberCards == 0)) {
-		qDebug(QString("ZoneViewWidget: bla!").toLatin1());
 		shuffleCheckBox = new QCheckBox("shuffle when closing");
 		shuffleCheckBox->setChecked(true);
 		QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget(this);

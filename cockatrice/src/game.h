@@ -17,8 +17,12 @@ class Game : public QObject {
 private:
 	static const int phaseCount = 11;
 	
-	QMenu *actionsMenu, *sayMenu, *cardMenu;
+	typedef void (Game::*CardMenuHandler)(CardItem *card);
+	QHash<QAction *, CardMenuHandler> cardMenuHandlers;
+	
+	QMenu *actionsMenu, *sayMenu, *cardMenu, *moveMenu;
 	QAction *aTap, *aUntap, *aDoesntUntap, *aFlip, *aAddCounter, *aRemoveCounter, *aSetCounters,
+		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile,
 		*aNextPhase, *aNextTurn, *aUntapAll, *aDecLife, *aIncLife, *aSetLife, *aShuffle, *aDraw, *aDrawCards, *aRollDice, *aCreateToken;
 	DlgStartGame *dlgStartGame;
 
@@ -32,6 +36,8 @@ private:
 	Player *addPlayer(int playerId, const QString &playerName, QPointF base, bool local);
 	void initSayMenu();
 private slots:
+	void cardMenuAction();
+	
 	void actNextPhase();
 	void actNextTurn();
 	void actUntapAll();
@@ -45,20 +51,23 @@ private slots:
 	void actCreateToken();
 
 	void showCardMenu(QPoint p);
-	void actDoesntUntap();
-	void actFlip();
-	void actAddCounter();
-	void actRemoveCounter();
+	void actTap(CardItem *card);
+	void actUntap(CardItem *card);
+	void actDoesntUntap(CardItem *card);
+	void actFlip(CardItem *card);
+	void actAddCounter(CardItem *card);
+	void actRemoveCounter(CardItem *card);
 	void actSetCounters();
+	void actMoveToTopLibrary(CardItem *card);
+	void actMoveToBottomLibrary(CardItem *card);
+	void actMoveToGraveyard(CardItem *card);
+	void actMoveToExile(CardItem *card);
 	
 	void actSayMessage();
 
 	void gameEvent(const ServerEventData &msg);
 	void playerListReceived(QList<ServerPlayer *> playerList);
 	void readyStart();
-public slots:
-	void actTap();
-	void actUntap();
 signals:
 	void submitDecklist();
 	void hoverCard(QString name);

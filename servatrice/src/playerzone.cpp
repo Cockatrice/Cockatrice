@@ -22,7 +22,7 @@
 #include "card.h"
 
 PlayerZone::PlayerZone(const QString &_name, bool _has_coords, ZoneType _type)
-	: name(_name), has_coords(_has_coords), type(_type), cardsBeingLookedAt(-1)
+	: name(_name), has_coords(_has_coords), type(_type), cardsBeingLookedAt(0)
 {
 }
 

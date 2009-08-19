@@ -278,131 +278,156 @@
 <context>
     <name>Game</name>
     <message>
-        <location filename="../src/game.cpp" line="25"/>
+        <location filename="../src/game.cpp" line="26"/>
         <source>&amp;Untap all permanents</source>
         <translation>&amp;Enttappe alle bleibenden Karten</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="26"/>
+        <location filename="../src/game.cpp" line="27"/>
         <source>Ctrl+U</source>
         <translation>Ctrl+U</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="29"/>
+        <location filename="../src/game.cpp" line="30"/>
         <source>&amp;Decrement life</source>
         <translation>Lebenspunkt &amp;verringern</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="30"/>
+        <location filename="../src/game.cpp" line="31"/>
         <source>F11</source>
         <translation>F11</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="32"/>
+        <location filename="../src/game.cpp" line="33"/>
         <source>&amp;Increment life</source>
         <translation>Lebens&amp;punkt erhöhen</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="33"/>
+        <location filename="../src/game.cpp" line="34"/>
         <source>F12</source>
         <translation>F12</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="35"/>
+        <location filename="../src/game.cpp" line="36"/>
         <source>&amp;Set life</source>
         <translation>&amp;Setze Lebenspunkte</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="36"/>
+        <location filename="../src/game.cpp" line="37"/>
         <source>Ctrl+L</source>
         <translation>Ctrl+L</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="39"/>
+        <location filename="../src/game.cpp" line="40"/>
         <source>&amp;Shuffle</source>
         <translation>Mi&amp;schen</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="40"/>
+        <location filename="../src/game.cpp" line="41"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="42"/>
+        <location filename="../src/game.cpp" line="43"/>
         <source>&amp;Draw a card</source>
         <translation>Karte &amp;ziehen</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="43"/>
+        <location filename="../src/game.cpp" line="44"/>
         <source>Ctrl+D</source>
         <translation>Ctrl+D</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="45"/>
+        <location filename="../src/game.cpp" line="46"/>
         <source>D&amp;raw cards...</source>
         <translation>Ka&amp;rten ziehen...</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="47"/>
+        <location filename="../src/game.cpp" line="48"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="48"/>
+        <location filename="../src/game.cpp" line="49"/>
         <source>R&amp;oll dice...</source>
         <translation>&amp;Würfeln...</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="49"/>
+        <location filename="../src/game.cpp" line="50"/>
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="52"/>
+        <location filename="../src/game.cpp" line="53"/>
         <source>&amp;Create token...</source>
         <translation>&amp;Token erstellen...</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="53"/>
+        <location filename="../src/game.cpp" line="54"/>
         <source>Ctrl+T</source>
         <translation>Ctrl+T</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="56"/>
+        <location filename="../src/game.cpp" line="57"/>
         <source>Next &amp;phase</source>
         <translation>Nächste &amp;Phase</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="57"/>
+        <location filename="../src/game.cpp" line="58"/>
         <source>Ctrl+Space</source>
         <translation>Ctrl+Space</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="59"/>
+        <location filename="../src/game.cpp" line="60"/>
         <source>Next &amp;turn</source>
         <translation>Nächster &amp;Zug</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="60"/>
+        <location filename="../src/game.cpp" line="61"/>
         <source>Ctrl+Enter</source>
         <translation>Ctrl+Enter</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="60"/>
+        <location filename="../src/game.cpp" line="61"/>
         <source>Ctrl+Return</source>
         <translation>Ctrl+Return</translation>
+    </message>
+    <message>
+        <location filename="../src/game.cpp" line="91"/>
+        <source>&amp;top of library</source>
+        <translation>&amp;auf die Bibliothek</translation>
+    </message>
+    <message>
+        <location filename="../src/game.cpp" line="92"/>
+        <source>&amp;bottom of library</source>
+        <translation>&amp;unter die Bibliothek</translation>
+    </message>
+    <message>
+        <location filename="../src/game.cpp" line="93"/>
+        <source>&amp;graveyard</source>
+        <translation>in den &amp;Friedhof</translation>
+    </message>
+    <message>
+        <location filename="../src/game.cpp" line="94"/>
+        <source>&amp;exile</source>
+        <translation>ins &amp;Exil</translation>
+    </message>
+    <message>
+        <location filename="../src/game.cpp" line="106"/>
+        <source>&amp;Move to</source>
+        <translation>&amp;Verschieben</translation>
     </message>
     <message>
         <source>&amp;Edit messages...</source>
         <translation type="obsolete">Mitteilungen &amp;bearbeiten...</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="79"/>
+        <location filename="../src/game.cpp" line="80"/>
         <source>S&amp;ay</source>
         <translation>&amp;Sagen</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="82"/>
+        <location filename="../src/game.cpp" line="83"/>
         <source>&amp;Tap</source>
         <translation>&amp;Tappen</translation>
     </message>
@@ -412,27 +437,27 @@
         <translation>E&amp;nttappen</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="86"/>
+        <location filename="../src/game.cpp" line="85"/>
         <source>Toggle &amp;normal untapping</source>
         <translation>&amp;Normales enttappen umschalten</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="88"/>
+        <location filename="../src/game.cpp" line="86"/>
         <source>&amp;Flip</source>
         <translation>&amp;Umdrehen</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="90"/>
+        <location filename="../src/game.cpp" line="87"/>
         <source>&amp;Add counter</source>
         <translation>Zählm&amp;arke hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="92"/>
+        <location filename="../src/game.cpp" line="88"/>
         <source>&amp;Remove counter</source>
         <translation>Zählma&amp;rke entfernen</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="94"/>
+        <location filename="../src/game.cpp" line="89"/>
         <source>&amp;Set counters...</source>
         <translation>&amp;Setze Zählmarken...</translation>
     </message>
@@ -441,78 +466,78 @@
         <translation type="obsolete">Neu a&amp;rrangieren</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="132"/>
+        <location filename="../src/game.cpp" line="155"/>
         <source>F5</source>
         <translation>F5</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="133"/>
+        <location filename="../src/game.cpp" line="156"/>
         <source>F6</source>
         <translation>F6</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="134"/>
+        <location filename="../src/game.cpp" line="157"/>
         <source>F7</source>
         <translation>F7</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="135"/>
+        <location filename="../src/game.cpp" line="158"/>
         <source>F8</source>
         <translation>F8</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="136"/>
+        <location filename="../src/game.cpp" line="159"/>
         <source>F9</source>
         <translation>F9</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="137"/>
+        <location filename="../src/game.cpp" line="160"/>
         <source>F10</source>
         <translation>F10</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="329"/>
+        <location filename="../src/game.cpp" line="352"/>
         <source>Set life</source>
         <translation>Setze Leben</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="329"/>
+        <location filename="../src/game.cpp" line="352"/>
         <source>New life total:</source>
         <translation>Neues Leben insgesammt:</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="342"/>
+        <location filename="../src/game.cpp" line="365"/>
         <source>Roll dice</source>
         <translation>Würfeln</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="342"/>
+        <location filename="../src/game.cpp" line="365"/>
         <source>Number of sides:</source>
         <translation>Anzahl der Seiten:</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="354"/>
+        <location filename="../src/game.cpp" line="377"/>
         <source>Draw cards</source>
         <translation>Karten ziehen</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="354"/>
-        <location filename="../src/game.cpp" line="432"/>
+        <location filename="../src/game.cpp" line="377"/>
+        <location filename="../src/game.cpp" line="447"/>
         <source>Number:</source>
         <translation>Anzahl:</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="361"/>
+        <location filename="../src/game.cpp" line="384"/>
         <source>Create token</source>
         <translation>Token erstellen</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="361"/>
+        <location filename="../src/game.cpp" line="384"/>
         <source>Name:</source>
         <translation>Name:</translation>
     </message>
     <message>
-        <location filename="../src/game.cpp" line="432"/>
+        <location filename="../src/game.cpp" line="447"/>
         <source>Set counters</source>
         <translation>Setze Zählmarke</translation>
     </message>

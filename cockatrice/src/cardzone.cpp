@@ -47,7 +47,8 @@ void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void CardZone::addCard(CardItem *card, bool reorganize, int x, int y)
 {
 	if (view)
-		view->addCard(new CardItem(player->getDb(), card->getName(), card->getId()), reorganize, x, y);
+		if ((x <= view->getCards().size()) || (view->getNumberCards() == -1))
+			view->addCard(new CardItem(player->getDb(), card->getName(), card->getId()), reorganize, x, y);
 
 	addCardImpl(card, x, y);
 

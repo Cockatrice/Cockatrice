@@ -30,7 +30,7 @@ bool ZoneViewZone::initializeCards()
 		return false;
 
 	const CardList &c = origZone->getCards();
-	int number = numberCards == 0 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
+	int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
 	for (int i = 0; i < number; i++) {
 		CardItem *card = c.at(i);
 		addCard(new CardItem(player->getDb(), card->getName(), card->getId(), this), false, i);

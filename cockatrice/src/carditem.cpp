@@ -93,6 +93,8 @@ void CardItem::setAttacking(bool _attacking)
 void CardItem::setFaceDown(bool _facedown)
 {
 	facedown = _facedown;
+	if (facedown)
+		setName(QString());
 	update();
 }
 

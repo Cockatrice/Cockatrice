@@ -186,7 +186,7 @@ void MessageLogWidget::logSetDoesntUntap(Player *player, QString cardName, bool 
 
 void MessageLogWidget::logDumpZone(Player *player, QString zoneName, QString zoneOwner, int numberCards)
 {
-	if (numberCards)
+	if (numberCards != -1)
 		append(tr("%1 is looking at the top %2 cards of %3's %4").arg(sanitizeHtml(player->getName())).arg(numberCards).arg(zoneOwner).arg(zoneName));
 	else
 		append(tr("%1 is looking at %2's %3").arg(sanitizeHtml(player->getName())).arg(zoneOwner).arg(zoneName));

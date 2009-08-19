@@ -15,7 +15,7 @@ private:
 signals:
 	void removeZoneViewWidget(ZoneViewWidget *zv);
 public:
-	ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards = 0, QGraphicsItem *parent = 0);
+	ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards = -1, QGraphicsItem *parent = 0);
 	~ZoneViewZone();
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

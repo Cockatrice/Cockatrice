@@ -2,6 +2,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QSettings>
+#include <stdlib.h>
 #include "serverplayer.h"
 #include "game.h"
 #include "servereventdata.h"
@@ -80,19 +81,17 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	initSayMenu();
 
 	aTap = new QAction(tr("&Tap"), this);
-	connect(aTap, SIGNAL(triggered()), this, SLOT(actTap()));
 	aUntap = new QAction(tr("&Untap"), this);
-	connect(aUntap, SIGNAL(triggered()), this, SLOT(actUntap()));
 	aDoesntUntap = new QAction(tr("Toggle &normal untapping"), this);
-	connect(aDoesntUntap, SIGNAL(triggered()), this, SLOT(actDoesntUntap()));
 	aFlip = new QAction(tr("&Flip"), this);
-	connect(aFlip, SIGNAL(triggered()), this, SLOT(actFlip()));
 	aAddCounter = new QAction(tr("&Add counter"), this);
-	connect(aAddCounter, SIGNAL(triggered()), this, SLOT(actAddCounter()));
 	aRemoveCounter = new QAction(tr("&Remove counter"), this);
-	connect(aRemoveCounter, SIGNAL(triggered()), this, SLOT(actRemoveCounter()));
 	aSetCounters = new QAction(tr("&Set counters..."), this);
 	connect(aSetCounters, SIGNAL(triggered()), this, SLOT(actSetCounters()));
+	aMoveToTopLibrary = new QAction(tr("&top of library"), this);
+	aMoveToBottomLibrary = new QAction(tr("&bottom of library"), this);
+	aMoveToGraveyard = new QAction(tr("&graveyard"), this);
+	aMoveToExile = new QAction(tr("&exile"), this);
 
 	cardMenu->addAction(aTap);
 	cardMenu->addAction(aUntap);
@@ -103,6 +102,30 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	cardMenu->addAction(aAddCounter);
 	cardMenu->addAction(aRemoveCounter);
 	cardMenu->addAction(aSetCounters);
+	cardMenu->addSeparator();
+	moveMenu = cardMenu->addMenu(tr("&Move to"));
+	
+	moveMenu->addAction(aMoveToTopLibrary);
+	moveMenu->addAction(aMoveToBottomLibrary);
+	moveMenu->addAction(aMoveToGraveyard);
+	moveMenu->addAction(aMoveToExile);
+	
+	cardMenuHandlers.insert(aTap, &Game::actTap);
+	cardMenuHandlers.insert(aUntap, &Game::actUntap);
+	cardMenuHandlers.insert(aDoesntUntap, &Game::actDoesntUntap);
+	cardMenuHandlers.insert(aFlip, &Game::actFlip);
+	cardMenuHandlers.insert(aAddCounter, &Game::actAddCounter);
+	cardMenuHandlers.insert(aRemoveCounter, &Game::actRemoveCounter);
+	cardMenuHandlers.insert(aMoveToTopLibrary, &Game::actMoveToTopLibrary);
+	cardMenuHandlers.insert(aMoveToBottomLibrary, &Game::actMoveToBottomLibrary);
+	cardMenuHandlers.insert(aMoveToGraveyard, &Game::actMoveToGraveyard);
+	cardMenuHandlers.insert(aMoveToExile, &Game::actMoveToExile);
+	
+	QHashIterator<QAction *, CardMenuHandler> i(cardMenuHandlers);
+	while (i.hasNext()) {
+		i.next();
+		connect(i.key(), SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+	}
 
 	dlgStartGame = new DlgStartGame(db);
 	connect(dlgStartGame, SIGNAL(newDeckLoaded(const QStringList &)), client, SLOT(submitDeck(const QStringList &)));
@@ -367,63 +390,55 @@ void Game::showCardMenu(QPoint p)
 	cardMenu->exec(p);
 }
 
-void Game::actTap()
+void Game::cardMenuAction()
 {
-	QListIterator<QGraphicsItem *> i(scene->selectedItems());
-	while (i.hasNext()) {
-		CardItem *temp = (CardItem *) i.next();
-		if (!temp->getTapped())
-			client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "tapped", "1");
+	// Determine the appropriate handler function.
+	CardMenuHandler handler = cardMenuHandlers.value(static_cast<QAction *>(sender()));
+			
+	// The list of selected items is randomly shuffled.
+	QList<QGraphicsItem *> sel = scene->selectedItems();
+	while (!sel.isEmpty()) {
+		unsigned int i = (unsigned int) (((double) sel.size()) * qrand() / (RAND_MAX + 1.0));
+		qDebug(QString("%1 items left, i=%2").arg(sel.size()).arg(i).toLatin1());
+		CardItem *card = qgraphicsitem_cast<CardItem *>(sel.takeAt(i));
+		// For each item, the handler function is called.
+		(this->*handler)(card);
 	}
 }
 
-void Game::actUntap()
+void Game::actTap(CardItem *card)
 {
-	QListIterator<QGraphicsItem *> i(scene->selectedItems());
-	while (i.hasNext()) {
-		CardItem *temp = (CardItem *) i.next();
-		if (temp->getTapped())
-			client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "tapped", "0");
-	}
+	if (!card->getTapped())
+		client->setCardAttr(qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "tapped", "1");
 }
 
-void Game::actDoesntUntap()
+void Game::actUntap(CardItem *card)
 {
-	QListIterator<QGraphicsItem *> i(scene->selectedItems());
-	while (i.hasNext()) {
-		CardItem *temp = (CardItem *) i.next();
-		client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "doesnt_untap", QString::number(!temp->getDoesntUntap()));
-	}
+	if (card->getTapped())
+		client->setCardAttr(qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "tapped", "0");
 }
 
-void Game::actFlip()
+void Game::actDoesntUntap(CardItem *card)
 {
-	QListIterator<QGraphicsItem *> i(scene->selectedItems());
-	while (i.hasNext()) {
-		CardItem *temp = (CardItem *) i.next();
-		QString zone = qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName();
-		client->moveCard(temp->getId(), zone, zone, temp->getGridPoint().x(), temp->getGridPoint().y(), !temp->getFaceDown());
-	}
+	client->setCardAttr(qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "doesnt_untap", QString::number(!card->getDoesntUntap()));
 }
 
-void Game::actAddCounter()
+void Game::actFlip(CardItem *card)
 {
-	QListIterator<QGraphicsItem *> i(scene->selectedItems());
-	while (i.hasNext()) {
-		CardItem *temp = (CardItem *) i.next();
-		if (temp->getCounters() < MAX_COUNTERS_ON_CARD)
-			client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "counters", QString::number(temp->getCounters() + 1));
-	}
+	QString zone = qgraphicsitem_cast<CardZone *>(card->parentItem())->getName();
+	client->moveCard(card->getId(), zone, zone, card->getGridPoint().x(), card->getGridPoint().y(), !card->getFaceDown());
 }
 
-void Game::actRemoveCounter()
+void Game::actAddCounter(CardItem *card)
 {
-	QListIterator<QGraphicsItem *> i(scene->selectedItems());
-	while (i.hasNext()) {
-		CardItem *temp = (CardItem *) i.next();
-		if (temp->getCounters())
-			client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "counters", QString::number(temp->getCounters() - 1));
-	}
+	if (card->getCounters() < MAX_COUNTERS_ON_CARD)
+		client->setCardAttr(qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "counters", QString::number(card->getCounters() + 1));
+}
+
+void Game::actRemoveCounter(CardItem *card)
+{
+	if (card->getCounters())
+		client->setCardAttr(qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "counters", QString::number(card->getCounters() - 1));
 }
 
 void Game::actSetCounters()
@@ -438,6 +453,30 @@ void Game::actSetCounters()
 		CardItem *temp = (CardItem *) i.next();
 		client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "counters", QString::number(number));
 	}
+}
+
+void Game::actMoveToTopLibrary(CardItem *card)
+{
+	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
+	client->moveCard(card->getId(), startZone->getName(), "deck", 0, 0, false);
+}
+
+void Game::actMoveToBottomLibrary(CardItem *card)
+{
+	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
+	client->moveCard(card->getId(), startZone->getName(), "deck", -1, 0, false);
+}
+
+void Game::actMoveToGraveyard(CardItem *card)
+{
+	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
+	client->moveCard(card->getId(), startZone->getName(), "grave", 0, 0, false);
+}
+
+void Game::actMoveToExile(CardItem *card)
+{
+	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
+	client->moveCard(card->getId(), startZone->getName(), "rfg", 0, 0, false);
 }
 
 void Game::actSayMessage()
