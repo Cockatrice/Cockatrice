@@ -878,7 +878,7 @@
     <message>
         <location filename="../src/messagelogwidget.cpp" line="127"/>
         <source>%1 puts %2 %3 into graveyard</source>
-        <translation>%1 legt %2 %3 in den Friedhof</translation>
+        <translation type="unfinished">%1 legt %2 %3 auf den Friedhof</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="129"/>

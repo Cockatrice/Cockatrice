@@ -13,7 +13,7 @@ ZoneViewWidget::ZoneViewWidget(CardDatabase *_db, Player *_player, CardZone *_or
 	setAttribute(Qt::WA_DeleteOnClose);
 
 	qreal y = 10;
-	if (_origZone->getIsShufflable() && (numberCards == 0)) {
+	if (_origZone->getIsShufflable() && (numberCards == -1)) {
 		shuffleCheckBox = new QCheckBox("shuffle when closing");
 		shuffleCheckBox->setChecked(true);
 		QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget(this);
