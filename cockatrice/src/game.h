@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <QHash>
 #include "playerlist.h"
 
 class ServerPlayer;
@@ -23,7 +24,7 @@ private:
 	QMenu *actionsMenu, *sayMenu, *cardMenu, *moveMenu;
 	QAction *aTap, *aUntap, *aDoesntUntap, *aFlip, *aAddCounter, *aRemoveCounter, *aSetCounters,
 		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile,
-		*aNextPhase, *aNextTurn, *aUntapAll, *aDecLife, *aIncLife, *aSetLife, *aShuffle, *aDraw, *aDrawCards, *aRollDice, *aCreateToken;
+		*aNextPhase, *aNextTurn, *aUntapAll, *aDecLife, *aIncLife, *aSetLife, *aRollDice, *aCreateToken;
 	DlgStartGame *dlgStartGame;
 
 	CardDatabase *db;
@@ -44,9 +45,6 @@ private slots:
 	void actIncLife();
 	void actDecLife();
 	void actSetLife();
-	void actShuffle();
-	void actDrawCard();
-	void actDrawCards();
 	void actRollDice();
 	void actCreateToken();
 

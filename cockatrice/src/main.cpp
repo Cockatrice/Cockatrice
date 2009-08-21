@@ -26,6 +26,7 @@
 #include <QLibraryInfo>
 #include <QDateTime>
 #include <QSettings>
+#include <QIcon>
 #include <stdio.h>
 
 #include "window_main.h"

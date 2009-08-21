@@ -68,6 +68,7 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			aDisconnect->setEnabled(false);
 			aRestartGame->setEnabled(false);
 			aLeaveGame->setEnabled(false);
+			phasesToolbar->setActivePhase(-1);
 			phasesToolbar->setEnabled(false);
 			emit logDisconnected();
 			break;
@@ -82,10 +83,12 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			}
 			aRestartGame->setEnabled(false);
 			aLeaveGame->setEnabled(false);
+			phasesToolbar->setActivePhase(-1);
 			phasesToolbar->setEnabled(false);
 			
 			GameSelector *gameSelector = new GameSelector(client);
 			viewLayout->insertWidget(0, gameSelector);
+			break;
 		}
 		case StatusPlaying:
 			phasesToolbar->setEnabled(true);
@@ -186,6 +189,8 @@ void MainWindow::serverTimeout()
 
 void MainWindow::retranslateUi()
 {
+	setWindowTitle(tr("Cockatrice"));
+
 	aConnect->setText(tr("&Connect..."));
 	aDisconnect->setText(tr("&Disconnect"));
 	aRestartGame->setText(tr("&Restart game..."));

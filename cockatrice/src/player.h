@@ -33,18 +33,20 @@ private slots:
 	void actMoveHandToTopLibrary();
 	void actMoveHandToBottomLibrary();
 
+	void actShuffle();
+	void actDrawCard();
+	void actDrawCards();
+
 	void actViewLibrary();
 	void actViewTopCards();
-
 	void actViewGraveyard();
-
 	void actViewRfg();
-
 	void actViewSideboard();
 private:
 	QMenu *playerMenu;
 	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary,
-		*aViewLibrary, *aViewTopCards, *aViewGraveyard, *aViewRfg, *aViewSideboard;
+		*aViewLibrary, *aViewTopCards, *aViewGraveyard, *aViewRfg, *aViewSideboard,
+		*aDrawCard, *aDrawCards, *aShuffle;
 
 	int defaultNumberTopCards;
 	QString name;

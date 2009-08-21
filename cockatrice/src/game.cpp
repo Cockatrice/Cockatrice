@@ -37,15 +37,6 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	aSetLife->setShortcut(tr("Ctrl+L"));
 	connect(aSetLife, SIGNAL(triggered()), this, SLOT(actSetLife()));
 
-	aShuffle = new QAction(tr("&Shuffle"), this);
-	aShuffle->setShortcut(tr("Ctrl+S"));
-	connect(aShuffle, SIGNAL(triggered()), this, SLOT(actShuffle()));
-	aDraw = new QAction(tr("&Draw a card"), this);
-	aDraw->setShortcut(tr("Ctrl+D"));
-	connect(aDraw, SIGNAL(triggered()), this, SLOT(actDrawCard()));
-	aDrawCards = new QAction(tr("D&raw cards..."), this);
-	connect(aDrawCards, SIGNAL(triggered()), this, SLOT(actDrawCards()));
-	aDrawCards->setShortcut(tr("Ctrl+E"));
 	aRollDice = new QAction(tr("R&oll dice..."), this);
 	aRollDice->setShortcut(tr("Ctrl+I"));
 	connect(aRollDice, SIGNAL(triggered()), this, SLOT(actRollDice()));
@@ -70,9 +61,6 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	actionsMenu->addAction(aIncLife);
 	actionsMenu->addAction(aSetLife);
 	actionsMenu->addSeparator();
-	actionsMenu->addAction(aShuffle);
-	actionsMenu->addAction(aDraw);
-	actionsMenu->addAction(aDrawCards);
 	actionsMenu->addAction(aRollDice);
 	actionsMenu->addSeparator();
 	actionsMenu->addAction(aCreateToken);
@@ -354,29 +342,12 @@ void Game::actSetLife()
 		client->setCounter("life", life);
 }
 
-void Game::actShuffle()
-{
-	client->shuffle();
-}
-
 void Game::actRollDice()
 {
 	bool ok;
 	int sides = QInputDialog::getInteger(0, tr("Roll dice"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
 	if (ok)
 		client->rollDice(sides);
-}
-
-void Game::actDrawCard()
-{
-	client->drawCards(1);
-}
-
-void Game::actDrawCards()
-{
-	int number = QInputDialog::getInteger(0, tr("Draw cards"), tr("Number:"));
-	if (number)
-		client->drawCards(number);
 }
 
 void Game::actCreateToken()

@@ -16,17 +16,18 @@ Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDa
 	area->setPos(_base);
 	_scene->addItem(area);
 
-	aMoveHandToTopLibrary = new QAction(tr("Move to &top of library"), this);
-	connect(aMoveHandToTopLibrary, SIGNAL(triggered()), this, SLOT(actMoveHandToTopLibrary()));
-	aMoveHandToBottomLibrary = new QAction(tr("Move to &bottom of library"), this);
-	connect(aMoveHandToBottomLibrary, SIGNAL(triggered()), this, SLOT(actMoveHandToBottomLibrary()));
+	if (local) {
+		aMoveHandToTopLibrary = new QAction(tr("Move to &top of library"), this);
+		connect(aMoveHandToTopLibrary, SIGNAL(triggered()), this, SLOT(actMoveHandToTopLibrary()));
+		aMoveHandToBottomLibrary = new QAction(tr("Move to &bottom of library"), this);
+		connect(aMoveHandToBottomLibrary, SIGNAL(triggered()), this, SLOT(actMoveHandToBottomLibrary()));
 
-	aViewLibrary = new QAction(tr("&View library"), this);
-	if (local)
+		aViewLibrary = new QAction(tr("&View library"), this);
 		aViewLibrary->setShortcut(tr("F3"));
-	connect(aViewLibrary, SIGNAL(triggered()), this, SLOT(actViewLibrary()));
-	aViewTopCards = new QAction(tr("View &top cards of library..."), this);
-	connect(aViewTopCards, SIGNAL(triggered()), this, SLOT(actViewTopCards()));
+		connect(aViewLibrary, SIGNAL(triggered()), this, SLOT(actViewLibrary()));
+		aViewTopCards = new QAction(tr("View &top cards of library..."), this);
+		connect(aViewTopCards, SIGNAL(triggered()), this, SLOT(actViewTopCards()));
+	}
 
 	aViewGraveyard = new QAction(tr("&View graveyard"), this);
 	if (local)
@@ -36,20 +37,37 @@ Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDa
 	aViewRfg = new QAction(tr("&View removed cards"), this);
 	connect(aViewRfg, SIGNAL(triggered()), this, SLOT(actViewRfg()));
 
-	aViewSideboard = new QAction(tr("&View sideboard"), this);
-	connect(aViewSideboard, SIGNAL(triggered()), this, SLOT(actViewSideboard()));
+	if (local) {
+		aViewSideboard = new QAction(tr("&View sideboard"), this);
+		connect(aViewSideboard, SIGNAL(triggered()), this, SLOT(actViewSideboard()));
+	
+		aDrawCard = new QAction(tr("&Draw card"), this);
+		connect(aDrawCard, SIGNAL(triggered()), this, SLOT(actDrawCard()));
+		aDrawCard->setShortcut(tr("Ctrl+D"));
+		aDrawCards = new QAction(tr("D&raw cards..."), this);
+		connect(aDrawCards, SIGNAL(triggered()), this, SLOT(actDrawCards()));
+		aDrawCards->setShortcut(tr("Ctrl+E"));
+		aShuffle = new QAction(tr("&Shuffle"), this);
+		connect(aShuffle, SIGNAL(triggered()), this, SLOT(actShuffle()));
+		aShuffle->setShortcut(tr("Ctrl+S"));
+	}
 
 	playerMenu = new QMenu(tr("Player \"%1\"").arg(name));
 
-	QMenu *handMenu = playerMenu->addMenu(tr("&Hand"));
-	handMenu->addAction(aMoveHandToTopLibrary);
-	handMenu->addAction(aMoveHandToBottomLibrary);
-	zones.findZone("hand")->setMenu(handMenu);
+	if (local) {
+		QMenu *handMenu = playerMenu->addMenu(tr("&Hand"));
+		handMenu->addAction(aMoveHandToTopLibrary);
+		handMenu->addAction(aMoveHandToBottomLibrary);
+		zones.findZone("hand")->setMenu(handMenu);
 
-	QMenu *libraryMenu = playerMenu->addMenu(tr("&Library"));
-	libraryMenu->addAction(aViewLibrary);
-	libraryMenu->addAction(aViewTopCards);
-	zones.findZone("deck")->setMenu(libraryMenu, aViewLibrary);
+		QMenu *libraryMenu = playerMenu->addMenu(tr("&Library"));
+		libraryMenu->addAction(aDrawCard);
+		libraryMenu->addAction(aDrawCards);
+		libraryMenu->addSeparator();
+		libraryMenu->addAction(aViewLibrary);
+		libraryMenu->addAction(aViewTopCards);
+		zones.findZone("deck")->setMenu(libraryMenu, aDrawCard);
+	}
 
 	QMenu *graveMenu = playerMenu->addMenu(tr("&Graveyard"));
 	graveMenu->addAction(aViewGraveyard);
@@ -59,9 +77,11 @@ Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDa
 	rfgMenu->addAction(aViewRfg);
 	zones.findZone("rfg")->setMenu(rfgMenu, aViewRfg);
 
-	QMenu *sbMenu = playerMenu->addMenu(tr("&Sideboard"));
-	sbMenu->addAction(aViewSideboard);
-	zones.findZone("sb")->setMenu(sbMenu, aViewSideboard);
+	if (local) {
+		QMenu *sbMenu = playerMenu->addMenu(tr("&Sideboard"));
+		sbMenu->addAction(aViewSideboard);
+		zones.findZone("sb")->setMenu(sbMenu, aViewSideboard);
+	}
 }
 
 Player::~Player()
@@ -112,6 +132,23 @@ void Player::actViewRfg()
 void Player::actViewSideboard()
 {
 	emit toggleZoneView(this, "sb", -1);
+}
+
+void Player::actShuffle()
+{
+	client->shuffle();
+}
+
+void Player::actDrawCard()
+{
+	client->drawCards(1);
+}
+
+void Player::actDrawCards()
+{
+	int number = QInputDialog::getInteger(0, tr("Draw cards"), tr("Number:"));
+	if (number)
+		client->drawCards(number);
 }
 
 void Player::addZone(CardZone *z)
