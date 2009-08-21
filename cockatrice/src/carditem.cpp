@@ -51,9 +51,45 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		f.setPixelSize(11);
 		painter->setFont(f);
 		painter->setBrush(QColor(230, 230, 230));
+		qDebug() <<"COLORS:::::" << info->getColors();
+		QString color;
+		QPen pen;
+		if(!info->getColors().empty())
+		{
+			color = info->getColors().first();
+			if(color == "B")
+				painter->setBrush(QColor(0,0,0));
+			if(color == "U")
+				painter->setBrush(QColor(0,140,180));
+			if(color == "W")
+				painter->setBrush(QColor(255,250,140));
+			if(color == "R")
+				painter->setBrush(QColor(230,0,0));
+			if(color == "G")
+				painter->setBrush(QColor(0,160,0));
+			if(info->getColors().size() > 1)
+			{
+				painter->setBrush(QColor(250,190,30));
+				color = "M"; // Multicolor
+			}
+				
+		}		
+		
 		painter->setPen(Qt::black);
+
 		painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
+		
+		pen.setWidth(3);
+		painter->setPen(pen);
+		painter->drawRect(QRectF(3, 3, CARD_WIDTH - 6, CARD_HEIGHT - 6));
+		painter->setPen(Qt::white);
+		if(color == "W" || color == "" || color == "M")
+			painter->setPen(Qt::black);
 		painter->drawText(QRectF(5, 5, CARD_WIDTH - 15, CARD_HEIGHT - 15), Qt::AlignTop | Qt::AlignLeft | Qt::TextWordWrap, name);
+		if(info->getCardType().contains("Creature"))
+		{
+			painter->drawText(QRectF(CARD_WIDTH - 40, CARD_HEIGHT - 25, 30, 30), Qt::AlignTop | Qt::AlignRight | Qt::TextWordWrap, info->getPowTough());
+		}
 	}
 	painter->restore();
 
