@@ -48,6 +48,8 @@ ServerSocket::~ServerSocket()
 	server->removePlayer(this);
 	if (game)
 		game->removePlayer(this);
+	for (int i = 0; i < chatChannels.size(); ++i)
+		chatChannels[i]->removePlayer(this);
 }
 
 int ServerSocket::newCardId()
@@ -256,9 +258,10 @@ ReturnMessage::ReturnCode ServerSocket::cmdChatJoinChannel(const QList<QVariant>
 	QList<ChatChannel *> allChannels = server->getChatChannelList();
 	for (int i = 0; i < allChannels.size(); ++i)
 		if (allChannels[i]->getName() == params[0]) {
+			remsg->send(ReturnMessage::ReturnOk);
 			allChannels[i]->addPlayer(this);
 			chatChannels << allChannels[i];
-			return ReturnMessage::ReturnOk;
+			return ReturnMessage::ReturnNothing;
 		}
 	return ReturnMessage::ReturnNameNotFound;
 }

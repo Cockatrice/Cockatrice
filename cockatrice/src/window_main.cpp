@@ -87,12 +87,15 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			phasesToolbar->setActivePhase(-1);
 			phasesToolbar->setEnabled(false);
 			
+			view->hide();
 			gameSelector->enableGameList();
 			chatWidget->enableChat();
 			break;
 		}
 		case StatusPlaying:
+			chatWidget->disableChat();
 			phasesToolbar->setEnabled(true);
+			view->show();
 			break;
 		default:
 			break;

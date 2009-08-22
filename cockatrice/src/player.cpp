@@ -64,6 +64,8 @@ Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDa
 		libraryMenu->addAction(aDrawCard);
 		libraryMenu->addAction(aDrawCards);
 		libraryMenu->addSeparator();
+		libraryMenu->addAction(aShuffle);
+		libraryMenu->addSeparator();
 		libraryMenu->addAction(aViewLibrary);
 		libraryMenu->addAction(aViewTopCards);
 		zones.findZone("deck")->setMenu(libraryMenu, aDrawCard);

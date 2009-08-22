@@ -11,7 +11,7 @@ void ChatChannel::addPlayer(ServerSocket *player)
 	QString str = QString("chat|join_channel|%1|%2").arg(name).arg(player->getPlayerName());
 	for (int i = 0; i < size(); ++i)
 		at(i)->msg(str);
-		
+	
 	append(player);
 	
 	for (int i = 0; i < size(); ++i)

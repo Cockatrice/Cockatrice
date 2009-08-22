@@ -33,6 +33,7 @@ private:
 	QString cmd;
 	int msgid;
 	int time;
+	QString extraData;
 signals:
 	void finished(ServerResponse resp);
 	void timeout();
@@ -42,6 +43,8 @@ public slots:
 public:
 	int getMsgId() const { return msgid; }
 	QString getCmd() const { return cmd; }
+	const QString &getExtraData() const { return extraData; }
+	void setExtraData(const QString &_extraData) { extraData = _extraData; }
 	PendingCommand(const QString &_cmd, int _msgid, QObject *parent = 0);
 };
 
