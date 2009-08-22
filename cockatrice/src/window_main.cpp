@@ -35,6 +35,7 @@
 #include "zoneviewzone.h"
 #include "zoneviewwidget.h"
 #include "zoneviewlayout.h"
+#include "chatwidget.h"
 
 void MainWindow::hoverCard(QString name)
 {
@@ -86,8 +87,8 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			phasesToolbar->setActivePhase(-1);
 			phasesToolbar->setEnabled(false);
 			
-			GameSelector *gameSelector = new GameSelector(client);
-			viewLayout->insertWidget(0, gameSelector);
+			gameSelector->enableGameList();
+			chatWidget->enableChat();
 			break;
 		}
 		case StatusPlaying:
@@ -211,6 +212,7 @@ void MainWindow::retranslateUi()
 	sayLabel->setText(tr("&Say:"));
 	
 	cardInfo->retranslateUi();
+	chatWidget->retranslateUi();
 }
 
 void MainWindow::createActions()
@@ -272,6 +274,7 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	
 	scene = new QGraphicsScene(0, 0, 1096, 1160, this);
 	view = new GameView(scene);
+	view->hide();
 
 //	view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
@@ -285,6 +288,12 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	sayLabel = new QLabel;
 	sayEdit = new QLineEdit;
 	sayLabel->setBuddy(sayEdit);
+	
+	client = new Client(this);
+	gameSelector = new GameSelector(client);
+	gameSelector->hide();
+	chatWidget = new ChatWidget(client);
+	chatWidget->hide();
 
 	QHBoxLayout *hLayout = new QHBoxLayout;
 	hLayout->addWidget(sayLabel);
@@ -296,6 +305,8 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	verticalLayout->addLayout(hLayout);
 
 	viewLayout = new QVBoxLayout;
+	viewLayout->addWidget(gameSelector);
+	viewLayout->addWidget(chatWidget);
 	viewLayout->addWidget(view);
 
 	phasesToolbar = new PhasesToolbar;
@@ -312,7 +323,6 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 
 	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(actSay()));
 
-	client = new Client(this);
 	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
 	connect(client, SIGNAL(statusChanged(ProtocolStatus)), this, SLOT(statusChanged(ProtocolStatus)));
 	connect(client, SIGNAL(playerIdReceived(int, QString)), this, SLOT(playerIdReceived(int, QString)));

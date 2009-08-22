@@ -22,6 +22,7 @@
 #include "serversocket.h"
 #include "counter.h"
 #include "rng_qt.h"
+#include "chatchannel.h"
 #include <QtSql>
 #include <QSettings>
 
@@ -35,6 +36,9 @@ Server::Server(QObject *parent)
 	QString dbType = settings->value("database/type").toString();
 	if (dbType == "mysql")
 		openDatabase();
+	
+	chatChannelList << new ChatChannel("channel1", "testchannel 1");
+	chatChannelList << new ChatChannel("channel2", "testchannel 2");
 }
 
 Server::~Server()

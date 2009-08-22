@@ -44,7 +44,8 @@ HEADERS += src/counter.h \
  src/window_sets.h \
  src/abstractgraphicsitem.h \
  src/dlg_settings.h \
- src/phasestoolbar.h
+ src/phasestoolbar.h \
+ src/chatwidget.h
 SOURCES += src/counter.cpp \
  src/gameselector.cpp \
  src/dlg_creategame.cpp \
@@ -82,5 +83,6 @@ SOURCES += src/counter.cpp \
  src/window_sets.cpp \
  src/abstractgraphicsitem.cpp \
  src/dlg_settings.cpp \
- src/phasestoolbar.cpp
+ src/phasestoolbar.cpp \
+ src/chatwidget.cpp
 TRANSLATIONS += translations/cockatrice_de.ts translations/cockatrice_en.ts

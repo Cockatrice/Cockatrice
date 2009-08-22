@@ -27,18 +27,13 @@ GameSelector::GameSelector(Client *_client, QWidget *parent)
 
 	connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
 	connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
-
-	connect(client, SIGNAL(gameListEvent(ServerGame *)), gameListModel, SLOT(updateGameList(ServerGame *)));
-	connect(client, SIGNAL(statusChanged(ProtocolStatus)), this, SLOT(statusChanged(ProtocolStatus)));
-
-	client->listGames();
 }
 
 void GameSelector::actCreate()
 {
 	DlgCreateGame dlg(client, this);
 	if (dlg.exec())
-		deleteLater();
+		disableGameList();
 }
 
 void GameSelector::actRefresh()
@@ -49,7 +44,7 @@ void GameSelector::actRefresh()
 void GameSelector::statusChanged(ProtocolStatus status)
 {
 	if (status == StatusDisconnected)
-		deleteLater();
+		disableGameList();
 }
 
 void GameSelector::checkResponse(ServerResponse response)
@@ -58,7 +53,7 @@ void GameSelector::checkResponse(ServerResponse response)
 	joinButton->setEnabled(true);
 
 	if (response == RespOk)
-		deleteLater();
+		disableGameList();
 	else {
 		QMessageBox::critical(this, tr("Error"), tr("XXX"));
 		return;
@@ -83,4 +78,19 @@ void GameSelector::actJoin()
 	connect(joinCommand, SIGNAL(finished(ServerResponse)), this, SLOT(checkResponse(ServerResponse)));
 	createButton->setEnabled(false);
 	joinButton->setEnabled(false);
+}
+
+void GameSelector::enableGameList()
+{
+	connect(client, SIGNAL(gameListEvent(ServerGame *)), gameListModel, SLOT(updateGameList(ServerGame *)));
+	connect(client, SIGNAL(statusChanged(ProtocolStatus)), this, SLOT(statusChanged(ProtocolStatus)));
+	client->listGames();
+	show();
+}
+
+void GameSelector::disableGameList()
+{
+	disconnect(client, 0, this, 0);
+	hide();
+	gameListModel->cleanList();
 }

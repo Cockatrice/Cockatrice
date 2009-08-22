@@ -10,6 +10,7 @@ bool ReturnMessage::send(ReturnCode code)
 	switch (code) {
 		case ReturnNothing: return true;
 		case ReturnOk: returnCodeString = "ok"; break;
+		case ReturnNameNotFound: returnCodeString = "name_not_found"; break;
 		case ReturnLoginNeeded: returnCodeString = "login_needed"; break;
 		case ReturnSyntaxError: returnCodeString = "syntax"; break;
 		case ReturnContextError: returnCodeString = "context"; break;

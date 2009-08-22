@@ -13,6 +13,8 @@ class GameSelector : public QWidget {
 	Q_OBJECT
 public:
 	GameSelector(Client *_client, QWidget *parent = 0);
+	void enableGameList();
+	void disableGameList();
 private slots:
 	void actCreate();
 	void actRefresh();

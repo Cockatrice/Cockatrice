@@ -27,6 +27,7 @@ class ServerSocket;
 class QSqlDatabase;
 class QSettings;
 class AbstractRNG;
+class ChatChannel;
 
 enum AuthenticationResult { PasswordWrong = 0, PasswordRight = 1, UnknownUser = 2 };
 
@@ -45,6 +46,7 @@ public:
 	bool checkGamePassword(int gameId, const QString &password);
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
 	QList<ServerGame *> listOpenGames();
+	QList<ChatChannel *> getChatChannelList() { return chatChannelList; }
 	ServerGame *getGame(int gameId);
 	AbstractRNG *getRNG() const { return rng; }
 	void broadcastGameListUpdate(ServerGame *game);
@@ -53,6 +55,7 @@ private:
 	void incomingConnection(int SocketId);
 	QList<ServerGame *> games;
 	QList<ServerSocket *> players;
+	QList<ChatChannel *> chatChannelList;
 	int nextGameId;
 	AbstractRNG *rng;
 };

@@ -110,6 +110,8 @@ void Client::readLine()
 				emit playerIdReceived(id, data[1]);
 			} else
 				emit gameEvent(event);
+		} else if (prefix == "chat") {
+			emit chatEvent(ChatEventData(line));
 		} else if (prefix == "resp") {
 			if (values.size() != 2) {
 				// XXX
@@ -229,6 +231,26 @@ void Client::disconnectFromServer()
 void Client::ping()
 {
 	cmd("ping");
+}
+
+PendingCommand *Client::chatListChannels()
+{
+	return cmd("chat_list_channels");
+}
+
+PendingCommand *Client::chatJoinChannel(const QString &name)
+{
+	return cmd(QString("chat_join_channel|%1").arg(name));
+}
+
+PendingCommand *Client::chatLeaveChannel(const QString &name)
+{
+	return cmd(QString("chat_leave_channel|%1").arg(name));
+}
+
+PendingCommand *Client::chatSay(const QString &channel, const QString &s)
+{
+	return cmd(QString("chat_say|%1|%2").arg(channel).arg(s));
 }
 
 PendingCommand *Client::listGames()

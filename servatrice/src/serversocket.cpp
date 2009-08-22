@@ -28,6 +28,7 @@
 #include "counter.h"
 #include "card.h"
 #include "abstractrng.h"
+#include "chatchannel.h"
 
 ServerSocket::ServerSocket(Server *_server, QObject *parent)
  : QTcpSocket(parent), server(_server), game(0), PlayerStatus(StatusNormal), authState(PasswordWrong), acceptsGameListChanges(false)
@@ -166,6 +167,11 @@ const ServerSocket::CommandProperties ServerSocket::commandList[ServerSocket::nu
 	{"ping", false, false, false, QList<QVariant::Type>(), &ServerSocket::cmdPing},
 	{"login", false, false, false, QList<QVariant::Type>() << QVariant::String
 							       << QVariant::String, &ServerSocket::cmdLogin},
+	{"chat_list_channels", true, false, false, QList<QVariant::Type>(), &ServerSocket::cmdChatListChannels},
+	{"chat_join_channel", true, false, false, QList<QVariant::Type>() << QVariant::String, &ServerSocket::cmdChatJoinChannel},
+	{"chat_leave_channel", true, false, false, QList<QVariant::Type>() << QVariant::String, &ServerSocket::cmdChatLeaveChannel},
+	{"chat_say", true, false, false, QList<QVariant::Type>() << QVariant::String
+								 << QVariant::String, &ServerSocket::cmdChatSay},
 	{"list_games", true, false, false, QList<QVariant::Type>(), &ServerSocket::cmdListGames},
 	{"create_game", true, false, false, QList<QVariant::Type>() << QVariant::String
 								    << QVariant::String
@@ -229,6 +235,55 @@ ReturnMessage::ReturnCode ServerSocket::cmdLogin(const QList<QVariant> &params)
 	playerName = params[0].toString();
 	
 	return ReturnMessage::ReturnOk;
+}
+
+ReturnMessage::ReturnCode ServerSocket::cmdChatListChannels(const QList<QVariant> &/*params*/)
+{
+	QList<ChatChannel *> chatChannelList = server->getChatChannelList();
+	for (int i = 0; i < chatChannelList.size(); ++i)
+		msg(QString("chat|list_channels|%1|%2|%3").arg(chatChannelList[i]->getName()).arg(chatChannelList[i]->getDescription()).arg(chatChannelList[i]->size()));
+	
+	acceptsChatChannelListChanges = true;
+	return ReturnMessage::ReturnOk;
+}
+
+ReturnMessage::ReturnCode ServerSocket::cmdChatJoinChannel(const QList<QVariant> &params)
+{
+	for (int i = 0; i < chatChannels.size(); ++i)
+		if (chatChannels[i]->getName() == params[0])
+			return ReturnMessage::ReturnContextError;
+			
+	QList<ChatChannel *> allChannels = server->getChatChannelList();
+	for (int i = 0; i < allChannels.size(); ++i)
+		if (allChannels[i]->getName() == params[0]) {
+			allChannels[i]->addPlayer(this);
+			chatChannels << allChannels[i];
+			return ReturnMessage::ReturnOk;
+		}
+	return ReturnMessage::ReturnNameNotFound;
+}
+
+ReturnMessage::ReturnCode ServerSocket::cmdChatLeaveChannel(const QList<QVariant> &params)
+{
+	for (int i = 0; i < chatChannels.size(); ++i) {
+		ChatChannel *c = chatChannels[i];
+		if (c->getName() == params[0]) {
+			chatChannels.removeAt(i);
+			c->removePlayer(this);
+			return ReturnMessage::ReturnOk;
+		}
+	}
+	return ReturnMessage::ReturnNameNotFound;
+}
+
+ReturnMessage::ReturnCode ServerSocket::cmdChatSay(const QList<QVariant> &params)
+{
+	for (int i = 0; i < chatChannels.size(); ++i)
+		if (chatChannels[i]->getName() == params[0]) {
+			chatChannels[i]->say(this, params[1].toString());
+			return ReturnMessage::ReturnOk;
+		}
+	return ReturnMessage::ReturnNameNotFound;
 }
 
 ReturnMessage::ReturnCode ServerSocket::cmdListGames(const QList<QVariant> &/*params*/)
