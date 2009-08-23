@@ -6,6 +6,7 @@ ChannelWidget::ChannelWidget(Client *_client, const QString &_name, bool readOnl
 	: QWidget(parent), client(_client), name(_name), virtualChannel(_virtualChannel)
 {
 	playerList = new QListWidget;
+	playerList->setFixedWidth(100);
 	
 	textEdit = new QTextEdit;
 	textEdit->setReadOnly(true);
@@ -22,7 +23,6 @@ ChannelWidget::ChannelWidget(Client *_client, const QString &_name, bool readOnl
 	QHBoxLayout *hbox = new QHBoxLayout;
 	hbox->addLayout(vbox);
 	hbox->addWidget(playerList);
-	playerList->setFixedWidth(100);
 	
 	setLayout(hbox);
 }
@@ -76,6 +76,8 @@ ChatWidget::ChatWidget(Client *_client, QWidget *parent)
 	: QWidget(parent), client(_client)
 {
 	channelList = new QTreeWidget;
+	channelList->setRootIsDecorated(false);
+	channelList->setFixedWidth(200);
 	
 	joinButton = new QPushButton;
 	connect(joinButton, SIGNAL(clicked()), this, SLOT(joinClicked()));
@@ -103,8 +105,8 @@ void ChatWidget::retranslateUi()
 	QTreeWidgetItem *header = channelList->headerItem();
 	Q_ASSERT(header != 0);
 	header->setText(0, tr("Channel"));
-	header->setText(1, tr("Description"));
-	header->setText(2, tr("Players"));
+	header->setText(1, tr("Players"));
+	header->setTextAlignment(1, Qt::AlignRight);
 }
 
 void ChatWidget::enableChat()
@@ -136,12 +138,17 @@ void ChatWidget::chatEvent(const ChatEventData &data)
 			for (int i = 0; i < channelList->topLevelItemCount(); ++i) {
 			  	QTreeWidgetItem *twi = channelList->topLevelItem(i);
 				if (twi->text(0) == msg[0]) {
-				  	twi->setText(1, msg[1]);
-					twi->setText(2, msg[2]);
+				  	twi->setToolTip(0, msg[1]);
+					twi->setText(1, msg[2]);
 					return;
 				}
 			}
-			channelList->addTopLevelItem(new QTreeWidgetItem(QStringList() << msg[0] << msg[1] << msg[2]));
+			QTreeWidgetItem *twi = new QTreeWidgetItem(QStringList() << msg[0] << msg[2]);
+			twi->setTextAlignment(1, Qt::AlignRight);
+			twi->setToolTip(0, msg[1]);
+			channelList->addTopLevelItem(twi);
+			channelList->resizeColumnToContents(0);
+			channelList->resizeColumnToContents(1);
 			if (msg[3] == "1")
 				joinChannel(msg[0]);
 			break;
