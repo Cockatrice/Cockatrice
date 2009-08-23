@@ -20,10 +20,12 @@ private:
 	QLineEdit *sayEdit;
 	Client *client;
 	QString name;
+	bool virtualChannel;
 private slots:
 	void sendMessage();
 public:
-	ChannelWidget(Client *_client, const QString &_name, bool readOnly = false, QWidget *parent = 0);
+	ChannelWidget(Client *_client, const QString &_name, bool readOnly = false, bool _virtualChannel = false, QWidget *parent = 0);
+	~ChannelWidget();
 	const QString &getName() const { return name; }
 	
 	void joinEvent(const QString &playerName);

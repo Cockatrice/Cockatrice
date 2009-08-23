@@ -350,6 +350,8 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 void MainWindow::closeEvent(QCloseEvent */*event*/)
 {
 	delete game;
+	chatWidget->disableChat();
+	gameSelector->disableGameList();
 }
 
 void MainWindow::changeEvent(QEvent *event)

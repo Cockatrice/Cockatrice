@@ -2,8 +2,8 @@
 #include "chatwidget.h"
 #include "client.h"
 
-ChannelWidget::ChannelWidget(Client *_client, const QString &_name, bool readOnly, QWidget *parent)
-	: QWidget(parent), client(_client), name(_name)
+ChannelWidget::ChannelWidget(Client *_client, const QString &_name, bool readOnly, bool _virtualChannel, QWidget *parent)
+	: QWidget(parent), client(_client), name(_name), virtualChannel(_virtualChannel)
 {
 	playerList = new QListWidget;
 	
@@ -25,6 +25,12 @@ ChannelWidget::ChannelWidget(Client *_client, const QString &_name, bool readOnl
 	playerList->setFixedWidth(100);
 	
 	setLayout(hbox);
+}
+
+ChannelWidget::~ChannelWidget()
+{
+  	if (!virtualChannel)
+		client->chatLeaveChannel(name);
 }
 
 void ChannelWidget::sendMessage()
@@ -111,6 +117,12 @@ void ChatWidget::enableChat()
 void ChatWidget::disableChat()
 {
 	disconnect(client, 0, this, 0);
+	while (tab->count()) {
+		ChannelWidget *cw = qobject_cast<ChannelWidget *>(tab->widget(0));
+		tab->removeTab(0);
+		delete cw;
+	}
+	channelList->clear();
 	hide();
 }
 
@@ -177,7 +189,7 @@ void ChatWidget::chatEvent(const ChatEventData &data)
 			if (msg[0].isEmpty()) {
 				w = getChannel("Server");
 				if (!w) {
-					w = new ChannelWidget(client, "Server", true);
+					w = new ChannelWidget(client, "Server", true, true);
 					tab->addTab(w, "Server");
 				}
 			} else
