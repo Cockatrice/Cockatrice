@@ -53,7 +53,8 @@ enum ChatEventType {
 	eventChatJoinChannel,
 	eventChatListPlayers,
 	eventChatLeaveChannel,
-	eventChatSay
+	eventChatSay,
+	eventChatServerMessage
 };
 
 class ChatEventData {

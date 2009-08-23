@@ -42,12 +42,6 @@ void GameSelector::actRefresh()
 	client->listGames();
 }
 
-void GameSelector::statusChanged(ProtocolStatus status)
-{
-	if (status == StatusDisconnected)
-		disableGameList();
-}
-
 void GameSelector::checkResponse(ServerResponse response)
 {
 	createButton->setEnabled(true);
@@ -84,7 +78,6 @@ void GameSelector::actJoin()
 void GameSelector::enableGameList()
 {
 	connect(client, SIGNAL(gameListEvent(ServerGame *)), gameListModel, SLOT(updateGameList(ServerGame *)));
-	connect(client, SIGNAL(statusChanged(ProtocolStatus)), this, SLOT(statusChanged(ProtocolStatus)));
 	client->listGames();
 	show();
 }

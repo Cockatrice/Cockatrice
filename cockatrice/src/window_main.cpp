@@ -71,6 +71,8 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			aLeaveGame->setEnabled(false);
 			phasesToolbar->setActivePhase(-1);
 			phasesToolbar->hide();
+			gameSelector->disableGameList();
+			chatWidget->disableChat();
 			emit logDisconnected();
 			break;
 		case StatusLoggingIn:

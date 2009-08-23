@@ -27,7 +27,7 @@
 #include <QSettings>
 
 Server::Server(QObject *parent)
- : QTcpServer(parent), nextGameId(0)
+	: QTcpServer(parent), nextGameId(0)
 {
 	rng = new RNG_Qt(this);
 	
@@ -37,11 +37,20 @@ Server::Server(QObject *parent)
 	if (dbType == "mysql")
 		openDatabase();
 	
-	chatChannelList << new ChatChannel("channel1", "testchannel 1");
-	chatChannelList << new ChatChannel("channel2", "testchannel 2");
+	int size = settings->beginReadArray("chatchannels");
+	for (int i = 0; i < size; ++i) {
+	  	settings->setArrayIndex(i);
+		chatChannelList << new ChatChannel(settings->value("name").toString(),
+						   settings->value("description").toString(),
+						   settings->value("autojoin").toBool(),
+						   settings->value("joinmessage").toStringList());
+	}
+	settings->endArray();
 	
 	for (int i = 0; i < chatChannelList.size(); ++i)
 	  	connect(chatChannelList[i], SIGNAL(channelInfoChanged()), this, SLOT(broadcastChannelUpdate()));
+	
+	loginMessage = settings->value("messages/login").toStringList();
 }
 
 Server::~Server()

@@ -62,6 +62,7 @@ CardInfoWidget::CardInfoWidget(CardDatabase *_db, QWidget *parent)
 
 	retranslateUi();
 	setFrameStyle(QFrame::Panel | QFrame::Raised);
+	textLabel->setFixedHeight(130);
 	setFixedSize(sizeHint());
 }
 

@@ -7,3 +7,6 @@ hostname=localhost
 database=servatrice
 user=servatrice
 password=foobar
+
+[messages]
+login="Example line 1", "Example line 2"

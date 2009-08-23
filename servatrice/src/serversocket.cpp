@@ -236,7 +236,13 @@ ReturnMessage::ReturnCode ServerSocket::cmdLogin(const QList<QVariant> &params)
 		return ReturnMessage::ReturnPasswordWrong;
 	playerName = params[0].toString();
 	
-	return ReturnMessage::ReturnOk;
+	remsg->send(ReturnMessage::ReturnOk);
+	
+	QStringList loginMessage = server->getLoginMessage();
+	for (int i = 0; i < loginMessage.size(); ++i)
+		msg("chat|server_message||" + loginMessage[i]);
+	
+	return ReturnMessage::ReturnNothing;
 }
 
 ReturnMessage::ReturnCode ServerSocket::cmdChatListChannels(const QList<QVariant> &/*params*/)

@@ -23,13 +23,14 @@ private:
 private slots:
 	void sendMessage();
 public:
-	ChannelWidget(Client *_client, const QString &_name, QWidget *parent = 0);
+	ChannelWidget(Client *_client, const QString &_name, bool readOnly = false, QWidget *parent = 0);
 	const QString &getName() const { return name; }
 	
 	void joinEvent(const QString &playerName);
 	void listPlayersEvent(const QString &playerName);
 	void leaveEvent(const QString &playerName);
 	void sayEvent(const QString &playerName, const QString &s);
+	void serverMessageEvent(const QString &s);
 };
 
 class ChatWidget : public QWidget {
@@ -41,6 +42,7 @@ private:
 	Client *client;
 	
 	ChannelWidget *getChannel(const QString &name);
+	void joinChannel(const QString &channelName);
 private slots:
 	void chatEvent(const ChatEventData &data);
 	void joinClicked();

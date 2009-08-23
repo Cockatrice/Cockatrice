@@ -3,6 +3,7 @@
 
 #include <QList>
 #include <QObject>
+#include <QStringList>
 
 class ServerSocket;
 
@@ -13,10 +14,13 @@ signals:
 private:
 	QString name;
 	QString description;
+	bool autoJoin;
+	QStringList joinMessage;
 public:
-	ChatChannel(const QString &_name, const QString &_description);
+	ChatChannel(const QString &_name, const QString &_description, bool _autoJoin, const QStringList &_joinMessage);
 	QString getName() const { return name; }
 	QString getDescription() const { return description; }
+	bool getAutoJoin() const { return autoJoin; }
 	void addPlayer(ServerSocket *player);
 	void removePlayer(ServerSocket *player);
 	void say(ServerSocket *player, const QString &s);

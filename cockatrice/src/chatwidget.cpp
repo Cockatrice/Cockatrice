@@ -2,23 +2,27 @@
 #include "chatwidget.h"
 #include "client.h"
 
-ChannelWidget::ChannelWidget(Client *_client, const QString &_name, QWidget *parent)
+ChannelWidget::ChannelWidget(Client *_client, const QString &_name, bool readOnly, QWidget *parent)
 	: QWidget(parent), client(_client), name(_name)
 {
 	playerList = new QListWidget;
 	
 	textEdit = new QTextEdit;
 	textEdit->setReadOnly(true);
-	sayEdit = new QLineEdit;
-	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
+	if (!readOnly) {
+		sayEdit = new QLineEdit;
+		connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
+	}
 	
 	QVBoxLayout *vbox = new QVBoxLayout;
 	vbox->addWidget(textEdit);
-	vbox->addWidget(sayEdit);
+	if (!readOnly)
+		vbox->addWidget(sayEdit);
 	
 	QHBoxLayout *hbox = new QHBoxLayout;
-	hbox->addLayout(vbox, 1);
+	hbox->addLayout(vbox);
 	hbox->addWidget(playerList);
+	playerList->setFixedWidth(100);
 	
 	setLayout(hbox);
 }
@@ -55,6 +59,11 @@ void ChannelWidget::leaveEvent(const QString &playerName)
 void ChannelWidget::sayEvent(const QString &playerName, const QString &s)
 {
 	textEdit->append(QString("<font color=\"red\">%1:</font> %2").arg(playerName).arg(s));
+}
+
+void ChannelWidget::serverMessageEvent(const QString &s)
+{
+	textEdit->append(QString("<font color=\"blue\">%1</font>").arg(s));
 }
 
 ChatWidget::ChatWidget(Client *_client, QWidget *parent)
@@ -110,7 +119,7 @@ void ChatWidget::chatEvent(const ChatEventData &data)
 	const QStringList &msg = data.getEventData();
 	switch (data.getEventType()) {
 		case eventChatListChannels: {
-			if (msg.size() != 3)
+			if (msg.size() != 4)
 				break;
 			for (int i = 0; i < channelList->topLevelItemCount(); ++i) {
 			  	QTreeWidgetItem *twi = channelList->topLevelItem(i);
@@ -121,6 +130,8 @@ void ChatWidget::chatEvent(const ChatEventData &data)
 				}
 			}
 			channelList->addTopLevelItem(new QTreeWidgetItem(QStringList() << msg[0] << msg[1] << msg[2]));
+			if (msg[3] == "1")
+				joinChannel(msg[0]);
 			break;
 		}
 		case eventChatJoinChannel: {
@@ -159,9 +170,31 @@ void ChatWidget::chatEvent(const ChatEventData &data)
 			w->sayEvent(msg[1], msg[2]);
 			break;
 		}
+		case eventChatServerMessage: {
+		  	if (msg.size() != 2)
+			  	break;
+			ChannelWidget *w;
+			if (msg[0].isEmpty()) {
+				w = getChannel("Server");
+				if (!w) {
+					w = new ChannelWidget(client, "Server", true);
+					tab->addTab(w, "Server");
+				}
+			} else
+			  	w = getChannel(msg[0]);
+			w->serverMessageEvent(msg[1]);
+			break;
+		}
 		default: {
 		}
 	}
+}
+
+void ChatWidget::joinChannel(const QString &channelName)
+{
+	PendingCommand *pc = client->chatJoinChannel(channelName);
+	pc->setExtraData(channelName);
+	connect(pc, SIGNAL(finished(ServerResponse)), this, SLOT(joinFinished(ServerResponse)));
 }
 
 void ChatWidget::joinClicked()
@@ -173,9 +206,7 @@ void ChatWidget::joinClicked()
 	if (getChannel(channelName))
 		return;
 	
-	PendingCommand *pc = client->chatJoinChannel(channelName);
-	pc->setExtraData(channelName);
-	connect(pc, SIGNAL(finished(ServerResponse)), this, SLOT(joinFinished(ServerResponse)));
+	joinChannel(channelName);
 }
 
 void ChatWidget::joinFinished(ServerResponse resp)

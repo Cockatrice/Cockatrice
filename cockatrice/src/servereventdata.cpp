@@ -50,6 +50,7 @@ ChatEventData::ChatEventData(const QString &line)
 		eventHash.insert("list_players", eventChatListPlayers);
 		eventHash.insert("leave_channel", eventChatLeaveChannel);
 		eventHash.insert("say", eventChatSay);
+		eventHash.insert("server_message", eventChatServerMessage);
 	}
 	
 	QStringList values = line.split('|');

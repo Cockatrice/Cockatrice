@@ -1,8 +1,8 @@
 #include "chatchannel.h"
 #include "serversocket.h"
 
-ChatChannel::ChatChannel(const QString &_name, const QString &_description)
-	: name(_name), description(_description)
+ChatChannel::ChatChannel(const QString &_name, const QString &_description, bool _autoJoin, const QStringList &_joinMessage)
+	: name(_name), description(_description), autoJoin(_autoJoin), joinMessage(_joinMessage)
 {
 }
 
@@ -16,6 +16,8 @@ void ChatChannel::addPlayer(ServerSocket *player)
 	
 	for (int i = 0; i < size(); ++i)
 		player->msg(QString("chat|list_players|%1|%2").arg(name).arg(at(i)->getPlayerName()));
+	for (int i = 0; i < joinMessage.size(); ++i)
+	  	player->msg(QString("chat|server_message|%1|%2").arg(name).arg(joinMessage[i]));
 
 	emit channelInfoChanged();
 }
@@ -40,5 +42,5 @@ void ChatChannel::say(ServerSocket *player, const QString &s)
 
 QString ChatChannel::getChannelListLine() const
 {
-	return QString("chat|list_channels|%1|%2|%3").arg(name).arg(description).arg(size());
+	return QString("chat|list_channels|%1|%2|%3|%4").arg(name).arg(description).arg(size()).arg(autoJoin ? 1 : 0);
 }

@@ -21,6 +21,7 @@
 #define SERVER_H
 
 #include <QTcpServer>
+#include <QStringList>
 
 class ServerGame;
 class ServerSocket;
@@ -52,12 +53,14 @@ public:
 	AbstractRNG *getRNG() const { return rng; }
 	void broadcastGameListUpdate(ServerGame *game);
 	void removePlayer(ServerSocket *player);
+	const QStringList &getLoginMessage() const { return loginMessage; }
 private:
 	void incomingConnection(int SocketId);
 	QList<ServerGame *> games;
 	QList<ServerSocket *> players;
 	QList<ChatChannel *> chatChannelList;
 	int nextGameId;
+	QStringList loginMessage;
 	AbstractRNG *rng;
 };
 
