@@ -216,6 +216,7 @@ void MainWindow::retranslateUi()
 	
 	cardInfo->retranslateUi();
 	chatWidget->retranslateUi();
+	gameSelector->retranslateUi();
 }
 
 void MainWindow::createActions()

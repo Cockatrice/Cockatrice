@@ -9,8 +9,8 @@ GameSelector::GameSelector(Client *_client, QWidget *parent)
 	gameListModel = new GamesModel(this);
 	gameListView->setModel(gameListModel);
 
-	createButton = new QPushButton(tr("C&reate"));
-	joinButton = new QPushButton(tr("&Join"));
+	createButton = new QPushButton;
+	joinButton = new QPushButton;
 	QHBoxLayout *buttonLayout = new QHBoxLayout;
 	buttonLayout->addStretch();
 	buttonLayout->addWidget(createButton);
@@ -20,6 +20,7 @@ GameSelector::GameSelector(Client *_client, QWidget *parent)
 	mainLayout->addWidget(gameListView);
 	mainLayout->addLayout(buttonLayout);
 
+	retranslateUi();
 	setLayout(mainLayout);
 
 	setMinimumWidth(gameListView->columnWidth(0) * gameListModel->columnCount());
@@ -93,4 +94,10 @@ void GameSelector::disableGameList()
 	disconnect(client, 0, this, 0);
 	hide();
 	gameListModel->cleanList();
+}
+
+void GameSelector::retranslateUi()
+{
+	createButton->setText(tr("C&reate"));
+	joinButton->setText(tr("&Join"));
 }

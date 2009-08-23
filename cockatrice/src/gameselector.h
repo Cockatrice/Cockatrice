@@ -15,6 +15,7 @@ public:
 	GameSelector(Client *_client, QWidget *parent = 0);
 	void enableGameList();
 	void disableGameList();
+	void retranslateUi();
 private slots:
 	void actCreate();
 	void actRefresh();
