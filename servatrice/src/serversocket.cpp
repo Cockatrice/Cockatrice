@@ -243,7 +243,7 @@ ReturnMessage::ReturnCode ServerSocket::cmdChatListChannels(const QList<QVariant
 {
 	QList<ChatChannel *> chatChannelList = server->getChatChannelList();
 	for (int i = 0; i < chatChannelList.size(); ++i)
-		msg(QString("chat|list_channels|%1|%2|%3").arg(chatChannelList[i]->getName()).arg(chatChannelList[i]->getDescription()).arg(chatChannelList[i]->size()));
+		msg(chatChannelList[i]->getChannelListLine());
 	
 	acceptsChatChannelListChanges = true;
 	return ReturnMessage::ReturnOk;
@@ -306,6 +306,7 @@ ReturnMessage::ReturnCode ServerSocket::cmdCreateGame(const QList<QVariant> &par
 	QString password = params[1].toString();
 	int maxPlayers = params[2].toInt();
 	acceptsGameListChanges = false;
+	acceptsChatChannelListChanges = false;
 	leaveGame();
 	emit createGame(description, password, maxPlayers, this);
 	return ReturnMessage::ReturnOk;
@@ -318,6 +319,7 @@ ReturnMessage::ReturnCode ServerSocket::cmdJoinGame(const QList<QVariant> &param
 	if (!server->checkGamePassword(gameId, password))
 		return ReturnMessage::ReturnPasswordWrong;
 	acceptsGameListChanges = false;
+	acceptsChatChannelListChanges = false;
 	leaveGame();
 	emit joinGame(gameId, this);
 	return ReturnMessage::ReturnOk;

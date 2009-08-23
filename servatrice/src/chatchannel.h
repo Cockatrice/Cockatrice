@@ -20,6 +20,7 @@ public:
 	void addPlayer(ServerSocket *player);
 	void removePlayer(ServerSocket *player);
 	void say(ServerSocket *player, const QString &s);
+	QString getChannelListLine() const;
 };
 
 #endif

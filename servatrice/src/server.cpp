@@ -39,6 +39,9 @@ Server::Server(QObject *parent)
 	
 	chatChannelList << new ChatChannel("channel1", "testchannel 1");
 	chatChannelList << new ChatChannel("channel2", "testchannel 2");
+	
+	for (int i = 0; i < chatChannelList.size(); ++i)
+	  	connect(chatChannelList[i], SIGNAL(channelInfoChanged()), this, SLOT(broadcastChannelUpdate()));
 }
 
 Server::~Server()
@@ -161,6 +164,14 @@ void Server::broadcastGameListUpdate(ServerGame *game)
 	for (int i = 0; i < players.size(); i++)
 		if (players[i]->getAcceptsGameListChanges())
 			players[i]->msg(line);
+}
+
+void Server::broadcastChannelUpdate()
+{
+	QString line = qobject_cast<ChatChannel *>(sender())->getChannelListLine();
+	for (int i = 0; i < players.size(); ++i)
+	  	if (players[i]->getAcceptsChatChannelListChanges())
+		  	players[i]->msg(line);
 }
 
 void Server::addClientToGame(int gameId, ServerSocket *client)

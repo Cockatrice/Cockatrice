@@ -2,13 +2,15 @@
 #include "chatwidget.h"
 #include "client.h"
 
-ChannelWidget::ChannelWidget(const QString &_name, QWidget *parent)
-	: QWidget(parent), name(_name)
+ChannelWidget::ChannelWidget(Client *_client, const QString &_name, QWidget *parent)
+	: QWidget(parent), client(_client), name(_name)
 {
 	playerList = new QListWidget;
 	
 	textEdit = new QTextEdit;
+	textEdit->setReadOnly(true);
 	sayEdit = new QLineEdit;
+	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
 	
 	QVBoxLayout *vbox = new QVBoxLayout;
 	vbox->addWidget(textEdit);
@@ -19,6 +21,14 @@ ChannelWidget::ChannelWidget(const QString &_name, QWidget *parent)
 	hbox->addWidget(playerList);
 	
 	setLayout(hbox);
+}
+
+void ChannelWidget::sendMessage()
+{
+	if (sayEdit->text().isEmpty())
+	  	return;
+	client->chatSay(name, sayEdit->text());
+	sayEdit->clear();
 }
 
 void ChannelWidget::joinEvent(const QString &playerName)
@@ -102,6 +112,14 @@ void ChatWidget::chatEvent(const ChatEventData &data)
 		case eventChatListChannels: {
 			if (msg.size() != 3)
 				break;
+			for (int i = 0; i < channelList->topLevelItemCount(); ++i) {
+			  	QTreeWidgetItem *twi = channelList->topLevelItem(i);
+				if (twi->text(0) == msg[0]) {
+				  	twi->setText(1, msg[1]);
+					twi->setText(2, msg[2]);
+					return;
+				}
+			}
 			channelList->addTopLevelItem(new QTreeWidgetItem(QStringList() << msg[0] << msg[1] << msg[2]));
 			break;
 		}
@@ -167,7 +185,7 @@ void ChatWidget::joinFinished(ServerResponse resp)
 	
 	PendingCommand *pc = qobject_cast<PendingCommand *>(sender());
 	QString channelName = pc->getExtraData();
-	ChannelWidget *cw = new ChannelWidget(channelName);
+	ChannelWidget *cw = new ChannelWidget(client, channelName);
 	tab->addTab(cw, channelName);
 }
 

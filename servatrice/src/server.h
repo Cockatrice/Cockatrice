@@ -38,6 +38,7 @@ private slots:
 	void addGame(const QString description, const QString password, const int maxPlayers, ServerSocket *creator);
 	void addClientToGame(int gameId, ServerSocket *client);
 	void gameClosing();
+	void broadcastChannelUpdate();
 public:
 	Server(QObject *parent = 0);
 	~Server();

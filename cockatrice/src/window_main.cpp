@@ -70,7 +70,7 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			aRestartGame->setEnabled(false);
 			aLeaveGame->setEnabled(false);
 			phasesToolbar->setActivePhase(-1);
-			phasesToolbar->setEnabled(false);
+			phasesToolbar->hide();
 			emit logDisconnected();
 			break;
 		case StatusLoggingIn:
@@ -85,7 +85,7 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			aRestartGame->setEnabled(false);
 			aLeaveGame->setEnabled(false);
 			phasesToolbar->setActivePhase(-1);
-			phasesToolbar->setEnabled(false);
+			phasesToolbar->hide();
 			
 			view->hide();
 			gameSelector->enableGameList();
@@ -94,7 +94,7 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 		}
 		case StatusPlaying:
 			chatWidget->disableChat();
-			phasesToolbar->setEnabled(true);
+			phasesToolbar->show();
 			view->show();
 			break;
 		default:
@@ -313,7 +313,7 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	viewLayout->addWidget(view);
 
 	phasesToolbar = new PhasesToolbar;
-	phasesToolbar->setEnabled(false);
+	phasesToolbar->hide();
 
 	QHBoxLayout *mainLayout = new QHBoxLayout;
 	mainLayout->addWidget(phasesToolbar);

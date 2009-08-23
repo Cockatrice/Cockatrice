@@ -18,9 +18,12 @@ private:
 	QListWidget *playerList;
 	QTextEdit *textEdit;
 	QLineEdit *sayEdit;
+	Client *client;
 	QString name;
+private slots:
+	void sendMessage();
 public:
-	ChannelWidget(const QString &_name, QWidget *parent = 0);
+	ChannelWidget(Client *_client, const QString &_name, QWidget *parent = 0);
 	const QString &getName() const { return name; }
 	
 	void joinEvent(const QString &playerName);

@@ -37,3 +37,8 @@ void ChatChannel::say(ServerSocket *player, const QString &s)
 	for (int i = 0; i < size(); ++i)
 		at(i)->msg(str);
 }
+
+QString ChatChannel::getChannelListLine() const
+{
+	return QString("chat|list_channels|%1|%2|%3").arg(name).arg(description).arg(size());
+}

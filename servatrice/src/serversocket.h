@@ -123,6 +123,7 @@ public:
 	void setPlayerId(int _id) { playerId = _id; }
 	QString getPlayerName() const { return playerName; }
 	bool getAcceptsGameListChanges() const { return acceptsGameListChanges; }
+	bool getAcceptsChatChannelListChanges() const { return acceptsChatChannelListChanges; }
 	QStringList listCounters() const;
 	QStringList listZones() const;
 	void setupZones();
