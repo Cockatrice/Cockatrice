@@ -33,6 +33,7 @@ private:
 	QString cmd;
 	int msgid;
 	int time;
+	QString extraData;
 signals:
 	void finished(ServerResponse resp);
 	void timeout();
@@ -42,6 +43,8 @@ public slots:
 public:
 	int getMsgId() const { return msgid; }
 	QString getCmd() const { return cmd; }
+	const QString &getExtraData() const { return extraData; }
+	void setExtraData(const QString &_extraData) { extraData = _extraData; }
 	PendingCommand(const QString &_cmd, int _msgid, QObject *parent = 0);
 };
 
@@ -57,6 +60,7 @@ signals:
 	void responseReceived(int msgid, ServerResponse resp);
 	void playerIdReceived(int id, QString name);
 	void gameEvent(const ServerEventData &msg);
+	void chatEvent(const ChatEventData &msg);
 	void serverTimeout();
 	void logSocketError(const QString &errorString);
 	void serverError(ServerResponse resp);
@@ -90,6 +94,10 @@ public:
 	void connectToServer(const QString &hostname, unsigned int port, const QString &_playerName, const QString &_password);
 	void disconnectFromServer();
 public slots:
+	PendingCommand *chatListChannels();
+	PendingCommand *chatJoinChannel(const QString &name);
+	PendingCommand *chatLeaveChannel(const QString &name);
+	PendingCommand *chatSay(const QString &name, const QString &s);
 	PendingCommand *listGames();
 	PendingCommand *listPlayers();
 	PendingCommand *createGame(const QString &description, const QString &password, unsigned int maxPlayers);

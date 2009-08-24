@@ -2,6 +2,7 @@
 #define SERVEREVENTDATA_H
 
 #include <QStringList>
+#include <QHash>
 
 enum ServerEventType {
 	eventInvalid,
@@ -28,16 +29,10 @@ enum ServerEventType {
 	eventStopDumpZone
 };
 
-struct event_string {
-	ServerEventType type;
-	char *str;
-};
-
-extern const int event_count;
-extern const event_string event_strings[];
-
 class ServerEventData {
 private:
+	static QHash<QString, ServerEventType> eventHash;
+	
 	bool IsPublic;
 	int PlayerId;
 	QString PlayerName;
@@ -47,9 +42,31 @@ public:
 	ServerEventData(const QString &line);
 	bool getPublic() const { return IsPublic; }
 	int getPlayerId() const { return PlayerId; }
-	QString getPlayerName() const { return PlayerName; }
+	const QString &getPlayerName() const { return PlayerName; }
 	ServerEventType getEventType() const { return EventType; }
-	QStringList getEventData() const { return EventData; }
+	const QStringList &getEventData() const { return EventData; }
+};
+
+enum ChatEventType {
+	eventChatInvalid,
+	eventChatListChannels,
+	eventChatJoinChannel,
+	eventChatListPlayers,
+	eventChatLeaveChannel,
+	eventChatSay,
+	eventChatServerMessage
+};
+
+class ChatEventData {
+private:
+	static QHash<QString, ChatEventType> eventHash;
+	
+	ChatEventType eventType;
+	QStringList eventData;
+public:
+	ChatEventData(const QString &line);
+	ChatEventType getEventType() const { return eventType; }
+	const QStringList &getEventData() const { return eventData; }
 };
 
 #endif

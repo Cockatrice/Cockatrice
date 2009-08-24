@@ -55,11 +55,15 @@ private:
 		QList<QVariant::Type> paramTypes;
 		CommandHandler handler;
 	};
-	static const int numberCommands = 27;
+	static const int numberCommands = 31;
 	static const CommandProperties commandList[numberCommands];
 
 	ReturnMessage::ReturnCode cmdPing(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdLogin(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdChatListChannels(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdChatJoinChannel(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdChatLeaveChannel(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdChatSay(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdListGames(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdCreateGame(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdJoinGame(const QList<QVariant> &params);
@@ -88,6 +92,7 @@ private:
 
 	Server *server;
 	ServerGame *game;
+	QList<ChatChannel *> chatChannels;
 	QList<QString> DeckList;
 	QList<QString> SideboardList;
 	QList<PlayerZone *> zones;
@@ -105,6 +110,7 @@ private:
 	ReturnMessage *remsg;
 	AuthenticationResult authState;
 	bool acceptsGameListChanges;
+	bool acceptsChatChannelListChanges;
 public:
 	ServerSocket(Server *_server, QObject *parent = 0);
 	~ServerSocket();
@@ -117,6 +123,7 @@ public:
 	void setPlayerId(int _id) { playerId = _id; }
 	QString getPlayerName() const { return playerName; }
 	bool getAcceptsGameListChanges() const { return acceptsGameListChanges; }
+	bool getAcceptsChatChannelListChanges() const { return acceptsChatChannelListChanges; }
 	QStringList listCounters() const;
 	QStringList listZones() const;
 	void setupZones();

@@ -22,11 +22,12 @@
 #include "serversocket.h"
 #include "counter.h"
 #include "rng_qt.h"
+#include "chatchannel.h"
 #include <QtSql>
 #include <QSettings>
 
 Server::Server(QObject *parent)
- : QTcpServer(parent), nextGameId(0)
+	: QTcpServer(parent), nextGameId(0)
 {
 	rng = new RNG_Qt(this);
 	
@@ -35,6 +36,21 @@ Server::Server(QObject *parent)
 	QString dbType = settings->value("database/type").toString();
 	if (dbType == "mysql")
 		openDatabase();
+	
+	int size = settings->beginReadArray("chatchannels");
+	for (int i = 0; i < size; ++i) {
+	  	settings->setArrayIndex(i);
+		chatChannelList << new ChatChannel(settings->value("name").toString(),
+						   settings->value("description").toString(),
+						   settings->value("autojoin").toBool(),
+						   settings->value("joinmessage").toStringList());
+	}
+	settings->endArray();
+	
+	for (int i = 0; i < chatChannelList.size(); ++i)
+	  	connect(chatChannelList[i], SIGNAL(channelInfoChanged()), this, SLOT(broadcastChannelUpdate()));
+	
+	loginMessage = settings->value("messages/login").toStringList();
 }
 
 Server::~Server()
@@ -157,6 +173,14 @@ void Server::broadcastGameListUpdate(ServerGame *game)
 	for (int i = 0; i < players.size(); i++)
 		if (players[i]->getAcceptsGameListChanges())
 			players[i]->msg(line);
+}
+
+void Server::broadcastChannelUpdate()
+{
+	QString line = qobject_cast<ChatChannel *>(sender())->getChannelListLine();
+	for (int i = 0; i < players.size(); ++i)
+	  	if (players[i]->getAcceptsChatChannelListChanges())
+		  	players[i]->msg(line);
 }
 
 void Server::addClientToGame(int gameId, ServerSocket *client)

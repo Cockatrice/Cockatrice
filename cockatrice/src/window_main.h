@@ -40,6 +40,8 @@ class ServerZoneCard;
 class ZoneViewLayout;
 class ZoneViewWidget;
 class PhasesToolbar;
+class GameSelector;
+class ChatWidget;
 
 class MainWindow : public QMainWindow {
 	Q_OBJECT
@@ -80,6 +82,8 @@ private:
 	QLabel *sayLabel;
 	QLineEdit *sayEdit;
 	PhasesToolbar *phasesToolbar;
+	GameSelector *gameSelector;
+	ChatWidget *chatWidget;
 
 	Client *client;
 	QGraphicsScene *scene;

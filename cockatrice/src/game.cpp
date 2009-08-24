@@ -300,8 +300,11 @@ void Game::gameEvent(const ServerEventData &msg)
 			p->gameEvent(msg);
 			break;
 		}
-		case eventInvalid:
+		case eventInvalid: {
 			qDebug("Unhandled global event");
+		}
+		default: {
+		}
 		}
 	}
 }

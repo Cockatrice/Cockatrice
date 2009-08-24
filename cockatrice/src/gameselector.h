@@ -13,12 +13,14 @@ class GameSelector : public QWidget {
 	Q_OBJECT
 public:
 	GameSelector(Client *_client, QWidget *parent = 0);
+	void enableGameList();
+	void disableGameList();
+	void retranslateUi();
 private slots:
 	void actCreate();
 	void actRefresh();
 	void actJoin();
 	void checkResponse(ServerResponse response);
-	void statusChanged(ProtocolStatus status);
 private:
 	Client *client;
 

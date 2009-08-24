@@ -21,12 +21,14 @@
 #define SERVER_H
 
 #include <QTcpServer>
+#include <QStringList>
 
 class ServerGame;
 class ServerSocket;
 class QSqlDatabase;
 class QSettings;
 class AbstractRNG;
+class ChatChannel;
 
 enum AuthenticationResult { PasswordWrong = 0, PasswordRight = 1, UnknownUser = 2 };
 
@@ -37,6 +39,7 @@ private slots:
 	void addGame(const QString description, const QString password, const int maxPlayers, ServerSocket *creator);
 	void addClientToGame(int gameId, ServerSocket *client);
 	void gameClosing();
+	void broadcastChannelUpdate();
 public:
 	Server(QObject *parent = 0);
 	~Server();
@@ -45,15 +48,19 @@ public:
 	bool checkGamePassword(int gameId, const QString &password);
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
 	QList<ServerGame *> listOpenGames();
+	QList<ChatChannel *> getChatChannelList() { return chatChannelList; }
 	ServerGame *getGame(int gameId);
 	AbstractRNG *getRNG() const { return rng; }
 	void broadcastGameListUpdate(ServerGame *game);
 	void removePlayer(ServerSocket *player);
+	const QStringList &getLoginMessage() const { return loginMessage; }
 private:
 	void incomingConnection(int SocketId);
 	QList<ServerGame *> games;
 	QList<ServerSocket *> players;
+	QList<ChatChannel *> chatChannelList;
 	int nextGameId;
+	QStringList loginMessage;
 	AbstractRNG *rng;
 };
 

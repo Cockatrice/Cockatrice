@@ -16,11 +16,11 @@ public:
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	
 	ServerGame *getGame(int row);
+	void cleanList();
 public slots:
 	void updateGameList(ServerGame *game);
 private:
 	QList<ServerGame *> gameList;
-	void cleanList();
 };
 
 #endif
