@@ -15,7 +15,7 @@ enum ServerEventType {
 	eventSetupZones,
 	eventGameStart,
 	eventShuffle,
-	eventRollDice,
+	eventRollDie,
 	eventDraw,
 	eventMoveCard,
 	eventCreateToken,

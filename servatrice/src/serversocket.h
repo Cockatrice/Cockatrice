@@ -86,7 +86,7 @@ private:
 	ReturnMessage::ReturnCode cmdListZones(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdDumpZone(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdStopDumpZone(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdRollDice(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdRollDie(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdNextTurn(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdSetActivePhase(const QList<QVariant> &params);
 

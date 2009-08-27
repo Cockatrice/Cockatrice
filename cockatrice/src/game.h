@@ -24,7 +24,7 @@ private:
 	QMenu *actionsMenu, *sayMenu, *cardMenu, *moveMenu;
 	QAction *aTap, *aUntap, *aDoesntUntap, *aFlip, *aAddCounter, *aRemoveCounter, *aSetCounters,
 		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile,
-		*aNextPhase, *aNextTurn, *aUntapAll, *aDecLife, *aIncLife, *aSetLife, *aRollDice, *aCreateToken;
+		*aNextPhase, *aNextTurn, *aUntapAll, *aDecLife, *aIncLife, *aSetLife, *aRollDie, *aCreateToken;
 	DlgStartGame *dlgStartGame;
 
 	CardDatabase *db;
@@ -45,7 +45,7 @@ private slots:
 	void actIncLife();
 	void actDecLife();
 	void actSetLife();
-	void actRollDice();
+	void actRollDie();
 	void actCreateToken();
 
 	void showCardMenu(QPoint p);
@@ -80,7 +80,7 @@ signals:
 	void logGameStart();
 	void logSay(Player *player, QString text);
 	void logShuffle(Player *player);
-	void logRollDice(Player *player, int sides, int roll);
+	void logRollDie(Player *player, int sides, int roll);
 	void logDraw(Player *player, int number);
 	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
 	void logCreateToken(Player *player, QString cardName);
@@ -88,14 +88,15 @@ signals:
 	void logSetTapped(Player *player, QString cardName, bool tapped);
 	void logSetCounter(Player *player, QString counterName, int value, int oldValue);
 	void logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap);
-	void logDumpZone(Player *player, QString zoneName, QString zoneOwner, int numberCards);
-	void logStopDumpZone(Player *player, QString zoneName, QString zoneOwner);
+	void logDumpZone(Player *player, CardZone *zone, Player *zoneOwner, int numberCards);
+	void logStopDumpZone(Player *player, CardZone *zone, Player *zoneOwner);
 	void logSetActivePlayer(Player *player);
 	void setActivePhase(int phase);
 public:
 	Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_actionsMenu, QMenu *_cardMenu, int playerId, const QString &playerName, QObject *parent = 0);
 	~Game();
 	Player *getLocalPlayer() const { return localPlayer; }
+	void retranslateUi();
 	void restartGameDialog();
 	void hoverCardEvent(CardItem *card);
 };

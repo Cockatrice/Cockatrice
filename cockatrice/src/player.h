@@ -43,7 +43,7 @@ private slots:
 	void actViewRfg();
 	void actViewSideboard();
 private:
-	QMenu *playerMenu;
+	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu;
 	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary,
 		*aViewLibrary, *aViewTopCards, *aViewGraveyard, *aViewRfg, *aViewSideboard,
 		*aDrawCard, *aDrawCards, *aShuffle;
@@ -63,6 +63,7 @@ public:
 	void addZone(CardZone *z);
 	Player(const QString &_name, int _id, QPointF _base, bool _local, CardDatabase *_db, Client *_client, QGraphicsScene *_scene, Game *_parent);
 	~Player();
+	void retranslateUi();
 	QMenu *getPlayerMenu() const { return playerMenu; }
 	int getId() const { return id; }
 	QString getName() const { return name; }

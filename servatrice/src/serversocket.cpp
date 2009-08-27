@@ -219,7 +219,7 @@ const ServerSocket::CommandProperties ServerSocket::commandList[ServerSocket::nu
 								<< QVariant::Int, &ServerSocket::cmdDumpZone},
 	{"stop_dump_zone", true, true, true, QList<QVariant::Type>() << QVariant::Int
 								     << QVariant::String, &ServerSocket::cmdStopDumpZone},
-	{"roll_dice", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdRollDice},
+	{"roll_die", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdRollDie},
 	{"next_turn", true, true, true, QList<QVariant::Type>(), &ServerSocket::cmdNextTurn},
 	{"set_active_phase", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdSetActivePhase}
 };
@@ -662,10 +662,10 @@ ReturnMessage::ReturnCode ServerSocket::cmdStopDumpZone(const QList<QVariant> &p
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdRollDice(const QList<QVariant> &params)
+ReturnMessage::ReturnCode ServerSocket::cmdRollDie(const QList<QVariant> &params)
 {
 	int sides = params[0].toInt();
-	emit broadcastEvent(QString("roll_dice|%1|%2").arg(sides).arg(server->getRNG()->getNumber(1, sides)), this);
+	emit broadcastEvent(QString("roll_die|%1|%2").arg(sides).arg(server->getRNG()->getNumber(1, sides)), this);
 	return ReturnMessage::ReturnOk;
 }
 

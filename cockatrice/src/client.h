@@ -106,7 +106,7 @@ public slots:
 	PendingCommand *login(const QString &name, const QString &pass);
 	PendingCommand *say(const QString &s);
 	PendingCommand *shuffle();
-	PendingCommand *rollDice(unsigned int sides);
+	PendingCommand *rollDie(unsigned int sides);
 	PendingCommand *drawCards(unsigned int number);
 	PendingCommand *moveCard(int cardid, const QString &startzone, const QString &targetzone, int x, int y = 0, bool faceDown = false);
 	PendingCommand *createToken(const QString &zone, const QString &name, const QString &powtough, int x, int y);

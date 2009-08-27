@@ -301,9 +301,9 @@ PendingCommand *Client::shuffle()
 	return cmd("shuffle");
 }
 
-PendingCommand *Client::rollDice(unsigned int sides)
+PendingCommand *Client::rollDie(unsigned int sides)
 {
-	return cmd(QString("roll_dice|%1").arg(sides));
+	return cmd(QString("roll_die|%1").arg(sides));
 }
 
 PendingCommand *Client::drawCards(unsigned int number)

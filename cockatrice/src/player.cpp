@@ -17,50 +17,44 @@ Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDa
 	_scene->addItem(area);
 
 	if (local) {
-		aMoveHandToTopLibrary = new QAction(tr("Move to &top of library"), this);
+		aMoveHandToTopLibrary = new QAction(this);
 		connect(aMoveHandToTopLibrary, SIGNAL(triggered()), this, SLOT(actMoveHandToTopLibrary()));
-		aMoveHandToBottomLibrary = new QAction(tr("Move to &bottom of library"), this);
+		aMoveHandToBottomLibrary = new QAction(this);
 		connect(aMoveHandToBottomLibrary, SIGNAL(triggered()), this, SLOT(actMoveHandToBottomLibrary()));
 
-		aViewLibrary = new QAction(tr("&View library"), this);
-		aViewLibrary->setShortcut(tr("F3"));
+		aViewLibrary = new QAction(this);
 		connect(aViewLibrary, SIGNAL(triggered()), this, SLOT(actViewLibrary()));
-		aViewTopCards = new QAction(tr("View &top cards of library..."), this);
+		aViewTopCards = new QAction(this);
 		connect(aViewTopCards, SIGNAL(triggered()), this, SLOT(actViewTopCards()));
 	}
 
-	aViewGraveyard = new QAction(tr("&View graveyard"), this);
-	if (local)
-		aViewGraveyard->setShortcut(tr("F4"));
+	aViewGraveyard = new QAction(this);
 	connect(aViewGraveyard, SIGNAL(triggered()), this, SLOT(actViewGraveyard()));
 
-	aViewRfg = new QAction(tr("&View removed cards"), this);
+	aViewRfg = new QAction(this);
 	connect(aViewRfg, SIGNAL(triggered()), this, SLOT(actViewRfg()));
 
 	if (local) {
-		aViewSideboard = new QAction(tr("&View sideboard"), this);
+		aViewSideboard = new QAction(this);
 		connect(aViewSideboard, SIGNAL(triggered()), this, SLOT(actViewSideboard()));
 	
-		aDrawCard = new QAction(tr("&Draw card"), this);
+		aDrawCard = new QAction(this);
 		connect(aDrawCard, SIGNAL(triggered()), this, SLOT(actDrawCard()));
-		aDrawCard->setShortcut(tr("Ctrl+D"));
-		aDrawCards = new QAction(tr("D&raw cards..."), this);
+		aDrawCards = new QAction(this);
 		connect(aDrawCards, SIGNAL(triggered()), this, SLOT(actDrawCards()));
-		aDrawCards->setShortcut(tr("Ctrl+E"));
-		aShuffle = new QAction(tr("&Shuffle"), this);
+		aShuffle = new QAction(this);
 		connect(aShuffle, SIGNAL(triggered()), this, SLOT(actShuffle()));
-		aShuffle->setShortcut(tr("Ctrl+S"));
 	}
 
-	playerMenu = new QMenu(tr("Player \"%1\"").arg(name));
+	playerMenu = new QMenu(QString());
 
 	if (local) {
-		QMenu *handMenu = playerMenu->addMenu(tr("&Hand"));
+		handMenu = playerMenu->addMenu(QString());
 		handMenu->addAction(aMoveHandToTopLibrary);
 		handMenu->addAction(aMoveHandToBottomLibrary);
 		zones.findZone("hand")->setMenu(handMenu);
 
-		QMenu *libraryMenu = playerMenu->addMenu(tr("&Library"));
+		libraryMenu = playerMenu->addMenu(QString());
 		libraryMenu->addAction(aDrawCard);
 		libraryMenu->addAction(aDrawCards);
 		libraryMenu->addSeparator();
@@ -69,21 +63,27 @@ Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDa
 		libraryMenu->addAction(aViewLibrary);
 		libraryMenu->addAction(aViewTopCards);
 		zones.findZone("deck")->setMenu(libraryMenu, aDrawCard);
+	} else {
+		handMenu = 0;
+		libraryMenu = 0;
 	}
 
-	QMenu *graveMenu = playerMenu->addMenu(tr("&Graveyard"));
+	graveMenu = playerMenu->addMenu(QString());
 	graveMenu->addAction(aViewGraveyard);
 	zones.findZone("grave")->setMenu(graveMenu, aViewGraveyard);
 
-	QMenu *rfgMenu = playerMenu->addMenu(tr("&Removed cards"));
+	rfgMenu = playerMenu->addMenu(QString());
 	rfgMenu->addAction(aViewRfg);
 	zones.findZone("rfg")->setMenu(rfgMenu, aViewRfg);
 
 	if (local) {
-		QMenu *sbMenu = playerMenu->addMenu(tr("&Sideboard"));
+		sbMenu = playerMenu->addMenu(QString());
 		sbMenu->addAction(aViewSideboard);
 		zones.findZone("sb")->setMenu(sbMenu, aViewSideboard);
-	}
+	} else
+		sbMenu = 0;
+	
+	retranslateUi();
 }
 
 Player::~Player()
@@ -94,6 +94,35 @@ Player::~Player()
 		delete zones.at(i);
 
 	delete area;
+}
+
+void Player::retranslateUi()
+{
+	aViewGraveyard->setText(tr("&View graveyard"));
+	aViewRfg->setText(tr("&View exile"));
+	playerMenu->setTitle(tr("Player \"%1\"").arg(name));
+	graveMenu->setTitle(tr("&Graveyard"));
+	rfgMenu->setTitle(tr("&Exile"));
+	
+	if (local) {
+		aMoveHandToTopLibrary->setText(tr("Move to &top of library"));
+		aMoveHandToBottomLibrary->setText(tr("Move to &bottom of library"));
+		aViewLibrary->setText(tr("&View library"));
+		aViewLibrary->setShortcut(tr("F3"));
+		aViewTopCards->setText(tr("View &top cards of library..."));
+		aViewGraveyard->setShortcut(tr("F4"));
+		aViewSideboard->setText(tr("&View sideboard"));
+		aDrawCard->setText(tr("&Draw card"));
+		aDrawCard->setShortcut(tr("Ctrl+D"));
+		aDrawCards->setText(tr("D&raw cards..."));
+		aDrawCards->setShortcut(tr("Ctrl+E"));
+		aShuffle->setText(tr("&Shuffle"));
+		aShuffle->setShortcut(tr("Ctrl+S"));
+	
+		handMenu->setTitle(tr("&Hand"));
+		sbMenu->setTitle(tr("&Sideboard"));
+		libraryMenu->setTitle(tr("&Library"));
+	}
 }
 
 void Player::actMoveHandToTopLibrary()

@@ -17,7 +17,7 @@ ServerEventData::ServerEventData(const QString &line)
 		eventHash.insert("setup_zones", eventSetupZones);
 		eventHash.insert("game_start", eventGameStart);
 		eventHash.insert("shuffle", eventShuffle);
-		eventHash.insert("roll_dice", eventRollDice);
+		eventHash.insert("roll_die", eventRollDie);
 		eventHash.insert("draw", eventDraw);
 		eventHash.insert("move_card", eventMoveCard);
 		eventHash.insert("create_token", eventCreateToken);

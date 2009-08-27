@@ -23,33 +23,25 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	connect(client, SIGNAL(gameEvent(const ServerEventData &)), this, SLOT(gameEvent(const ServerEventData &)));
 	connect(client, SIGNAL(playerListReceived(QList<ServerPlayer *>)), this, SLOT(playerListReceived(QList<ServerPlayer *>)));
 
-	aUntapAll = new QAction(tr("&Untap all permanents"), this);
-	aUntapAll->setShortcut(tr("Ctrl+U"));
+	aUntapAll = new QAction(this);
 	connect(aUntapAll, SIGNAL(triggered()), this, SLOT(actUntapAll()));
 
-	aDecLife = new QAction(tr("&Decrement life"), this);
-	aDecLife->setShortcut(tr("F11"));
+	aDecLife = new QAction(this);
 	connect(aDecLife, SIGNAL(triggered()), this, SLOT(actDecLife()));
-	aIncLife = new QAction(tr("&Increment life"), this);
-	aIncLife->setShortcut(tr("F12"));
+	aIncLife = new QAction(this);
 	connect(aIncLife, SIGNAL(triggered()), this, SLOT(actIncLife()));
-	aSetLife = new QAction(tr("&Set life"), this);
-	aSetLife->setShortcut(tr("Ctrl+L"));
+	aSetLife = new QAction(this);
 	connect(aSetLife, SIGNAL(triggered()), this, SLOT(actSetLife()));
 
-	aRollDice = new QAction(tr("R&oll dice..."), this);
-	aRollDice->setShortcut(tr("Ctrl+I"));
-	connect(aRollDice, SIGNAL(triggered()), this, SLOT(actRollDice()));
+	aRollDie = new QAction(this);
+	connect(aRollDie, SIGNAL(triggered()), this, SLOT(actRollDie()));
 
-	aCreateToken = new QAction(tr("&Create token..."), this);
-	aCreateToken->setShortcut(tr("Ctrl+T"));
+	aCreateToken = new QAction(this);
 	connect(aCreateToken, SIGNAL(triggered()), this, SLOT(actCreateToken()));
 	
-	aNextPhase = new QAction(tr("Next &phase"), this);
-	aNextPhase->setShortcut(tr("Ctrl+Space"));
+	aNextPhase = new QAction(this);
 	connect(aNextPhase, SIGNAL(triggered()), this, SLOT(actNextPhase()));
-	aNextTurn = new QAction(tr("Next &turn"), this);
-	aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
+	aNextTurn = new QAction(this);
 	connect(aNextTurn, SIGNAL(triggered()), this, SLOT(actNextTurn()));
 	
 	actionsMenu->addAction(aNextPhase);
@@ -61,25 +53,25 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	actionsMenu->addAction(aIncLife);
 	actionsMenu->addAction(aSetLife);
 	actionsMenu->addSeparator();
-	actionsMenu->addAction(aRollDice);
+	actionsMenu->addAction(aRollDie);
 	actionsMenu->addSeparator();
 	actionsMenu->addAction(aCreateToken);
 	actionsMenu->addSeparator();
-	sayMenu = actionsMenu->addMenu(tr("S&ay"));
+	sayMenu = actionsMenu->addMenu(QString());
 	initSayMenu();
 
-	aTap = new QAction(tr("&Tap"), this);
-	aUntap = new QAction(tr("&Untap"), this);
-	aDoesntUntap = new QAction(tr("Toggle &normal untapping"), this);
-	aFlip = new QAction(tr("&Flip"), this);
-	aAddCounter = new QAction(tr("&Add counter"), this);
-	aRemoveCounter = new QAction(tr("&Remove counter"), this);
-	aSetCounters = new QAction(tr("&Set counters..."), this);
+	aTap = new QAction(this);
+	aUntap = new QAction(this);
+	aDoesntUntap = new QAction(this);
+	aFlip = new QAction(this);
+	aAddCounter = new QAction(this);
+	aRemoveCounter = new QAction(this);
+	aSetCounters = new QAction(this);
 	connect(aSetCounters, SIGNAL(triggered()), this, SLOT(actSetCounters()));
-	aMoveToTopLibrary = new QAction(tr("&top of library"), this);
-	aMoveToBottomLibrary = new QAction(tr("&bottom of library"), this);
-	aMoveToGraveyard = new QAction(tr("&graveyard"), this);
-	aMoveToExile = new QAction(tr("&exile"), this);
+	aMoveToTopLibrary = new QAction(this);
+	aMoveToBottomLibrary = new QAction(this);
+	aMoveToGraveyard = new QAction(this);
+	aMoveToExile = new QAction(this);
 
 	cardMenu->addAction(aTap);
 	cardMenu->addAction(aUntap);
@@ -91,7 +83,7 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	cardMenu->addAction(aRemoveCounter);
 	cardMenu->addAction(aSetCounters);
 	cardMenu->addSeparator();
-	moveMenu = cardMenu->addMenu(tr("&Move to"));
+	moveMenu = cardMenu->addMenu(QString());
 	
 	moveMenu->addAction(aMoveToTopLibrary);
 	moveMenu->addAction(aMoveToBottomLibrary);
@@ -118,6 +110,8 @@ Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_a
 	dlgStartGame = new DlgStartGame(db);
 	connect(dlgStartGame, SIGNAL(newDeckLoaded(const QStringList &)), client, SLOT(submitDeck(const QStringList &)));
 	connect(dlgStartGame, SIGNAL(finished(int)), this, SLOT(readyStart()));
+	
+	retranslateUi();
 }
 
 Game::~Game()
@@ -127,6 +121,45 @@ Game::~Game()
 		emit playerRemoved(players.at(i));
 		delete players.at(i);
 	}
+}
+
+void Game::retranslateUi()
+{
+	aUntapAll->setText(tr("&Untap all permanents"));
+	aUntapAll->setShortcut(tr("Ctrl+U"));
+	aDecLife->setText(tr("&Decrement life"));
+	aDecLife->setShortcut(tr("F11"));
+	aIncLife->setText(tr("&Increment life"));
+	aIncLife->setShortcut(tr("F12"));
+	aSetLife->setText(tr("&Set life"));
+	aSetLife->setShortcut(tr("Ctrl+L"));
+	aRollDie->setText(tr("R&oll die..."));
+	aRollDie->setShortcut(tr("Ctrl+I"));
+	aCreateToken->setText(tr("&Create token..."));
+	aCreateToken->setShortcut(tr("Ctrl+T"));
+	aNextPhase->setText(tr("Next &phase"));
+	aNextPhase->setShortcut(tr("Ctrl+Space"));
+	aNextTurn->setText(tr("Next &turn"));
+	aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
+	
+	sayMenu->setTitle(tr("S&ay"));
+	
+	aTap->setText(tr("&Tap"));
+	aUntap->setText(tr("&Untap"));
+	aDoesntUntap->setText(tr("Toggle &normal untapping"));
+	aFlip->setText(tr("&Flip"));
+	aAddCounter->setText(tr("&Add counter"));
+	aRemoveCounter->setText(tr("&Remove counter"));
+	aSetCounters->setText(tr("&Set counters..."));
+	aMoveToTopLibrary->setText(tr("&top of library"));
+	aMoveToBottomLibrary->setText(tr("&bottom of library"));
+	aMoveToGraveyard->setText(tr("&graveyard"));
+	aMoveToExile->setText(tr("&exile"));
+	
+	moveMenu->setTitle(tr("&Move to"));
+	
+	for (int i = 0; i < players.size(); ++i)
+		players[i]->retranslateUi();
 }
 
 void Game::initSayMenu()
@@ -238,11 +271,11 @@ void Game::gameEvent(const ServerEventData &msg)
 		case eventShuffle:
 			emit logShuffle(p);
 			break;
-		case eventRollDice: {
+		case eventRollDie: {
 			QStringList data = msg.getEventData();
 			int sides = data[0].toInt();
 			int roll = data[1].toInt();
-			emit logRollDice(p, sides, roll);
+			emit logRollDie(p, sides, roll);
 			break;
 		}
 		case eventSetActivePlayer: {
@@ -279,12 +312,24 @@ void Game::gameEvent(const ServerEventData &msg)
 		}
 		case eventDumpZone: {
 			QStringList data = msg.getEventData();
-			emit logDumpZone(p, data[1], players.findPlayer(data[0].toInt())->getName(), data[2].toInt());
+			Player *zoneOwner = players.findPlayer(data[0].toInt());
+			if (!zoneOwner)
+				break;
+			CardZone *zone = zoneOwner->getZones()->findZone(data[1]);
+			if (!zone)
+				break;
+			emit logDumpZone(p, zone, zoneOwner, data[2].toInt());
 			break;
 		}
 		case eventStopDumpZone: {
 			QStringList data = msg.getEventData();
-			emit logStopDumpZone(p, data[1], players.findPlayer(data[0].toInt())->getName());
+			Player *zoneOwner = players.findPlayer(data[0].toInt());
+			if (!zoneOwner)
+				break;
+			CardZone *zone = zoneOwner->getZones()->findZone(data[1]);
+			if (!zone)
+				break;
+			emit logStopDumpZone(p, zone, zoneOwner);
 			break;
 		}
 		case eventMoveCard: {
@@ -345,12 +390,12 @@ void Game::actSetLife()
 		client->setCounter("life", life);
 }
 
-void Game::actRollDice()
+void Game::actRollDie()
 {
 	bool ok;
-	int sides = QInputDialog::getInteger(0, tr("Roll dice"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
+	int sides = QInputDialog::getInteger(0, tr("Roll die"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
 	if (ok)
-		client->rollDice(sides);
+		client->rollDie(sides);
 }
 
 void Game::actCreateToken()

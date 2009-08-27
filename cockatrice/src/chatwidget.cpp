@@ -103,7 +103,6 @@ void ChatWidget::retranslateUi()
 	joinButton->setText(tr("Joi&n"));
 
 	QTreeWidgetItem *header = channelList->headerItem();
-	Q_ASSERT(header != 0);
 	header->setText(0, tr("Channel"));
 	header->setText(1, tr("Players"));
 	header->setTextAlignment(1, Qt::AlignRight);
