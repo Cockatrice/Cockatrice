@@ -36,9 +36,7 @@ private:
 	int currentPhase;
 	Player *addPlayer(int playerId, const QString &playerName, QPointF base, bool local);
 	void initSayMenu();
-private slots:
-	void cardMenuAction();
-	
+public slots:
 	void actNextPhase();
 	void actNextTurn();
 	void actUntapAll();
@@ -47,6 +45,8 @@ private slots:
 	void actSetLife();
 	void actRollDie();
 	void actCreateToken();
+private slots:
+	void cardMenuAction();
 
 	void showCardMenu(QPoint p);
 	void actTap(CardItem *card);

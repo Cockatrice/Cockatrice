@@ -294,8 +294,10 @@ void Game::gameEvent(const ServerEventData &msg)
 		case eventSetActivePhase: {
 			QStringList data = msg.getEventData();
 			int phase = data[0].toInt();
-			currentPhase = phase;
-			emit setActivePhase(phase);
+			if (currentPhase != phase) {
+				currentPhase = phase;
+				emit setActivePhase(phase);
+			}
 			break;
 		}
 

@@ -12,16 +12,16 @@ class PhaseButton : public QPushButton {
 private:
 	QString phaseText;
 	bool active;
+	QAction *doubleClickAction;
 public:
-	PhaseButton();
-	PhaseButton(QIcon);
+	PhaseButton(const QIcon &icon, QAction *_doubleClickAction = 0);
 	void setPhaseText(const QString &_phaseText);
 	QString getPhaseText() const { return phaseText; }
 	void setActive(bool _active) { active = _active; update(); }
-public slots:
-	void update();
+	bool getActive() const { return active; }
 protected:
 	void paintEvent(QPaintEvent *event);
+	void mouseDoubleClickEvent(QMouseEvent *event);
 };
 
 class PhasesToolbar : public QFrame {
@@ -38,6 +38,8 @@ private slots:
 signals:
 	void signalSetPhase(int phase);
 	void signalNextTurn();
+	void signalUntapAll();
+	void signalDrawCard();
 };
 
 #endif

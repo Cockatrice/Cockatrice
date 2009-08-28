@@ -4,15 +4,10 @@
 #include <QPainter>
 #include <QPen>
 
-PhaseButton::PhaseButton(QIcon icon)
-	: QPushButton(icon, QString()), active(false)
+PhaseButton::PhaseButton(const QIcon &icon, QAction *_doubleClickAction)
+	: QPushButton(icon, QString()), active(false), doubleClickAction(_doubleClickAction)
 {
 	setFixedSize(50, 50);
-}
-
-void PhaseButton::update()
-{
-	QPushButton::update();
 }
 
 void PhaseButton::paintEvent(QPaintEvent *event)
@@ -42,12 +37,23 @@ void PhaseButton::setPhaseText(const QString &_phaseText)
 	setToolTip(phaseText);
 }
 
+void PhaseButton::mouseDoubleClickEvent(QMouseEvent */*event*/)
+{
+	if (doubleClickAction)
+		doubleClickAction->trigger();
+}
+
 PhasesToolbar::PhasesToolbar(QWidget *parent)
 	: QFrame(parent)
 {
-	PhaseButton *untapButton = new PhaseButton(QIcon(":/resources/icon_phase_untap.svg"));
+	QAction *aUntapAll = new QAction(this);
+	connect(aUntapAll, SIGNAL(triggered()), this, SIGNAL(signalUntapAll()));
+	QAction *aDrawCard = new QAction(this);
+	connect(aDrawCard, SIGNAL(triggered()), this, SIGNAL(signalDrawCard()));
+	
+	PhaseButton *untapButton = new PhaseButton(QIcon(":/resources/icon_phase_untap.svg"), aUntapAll);
 	PhaseButton *upkeepButton = new PhaseButton(QIcon(":/resources/icon_phase_upkeep.svg"));
-	PhaseButton *drawButton = new PhaseButton(QIcon(":/resources/icon_phase_draw.svg"));
+	PhaseButton *drawButton = new PhaseButton(QIcon(":/resources/icon_phase_draw.svg"), aDrawCard);
 	PhaseButton *main1Button = new PhaseButton(QIcon(":/resources/icon_phase_main1.svg"));
 	PhaseButton *combatStartButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_start.svg"));
 	PhaseButton *combatAttackersButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_attackers.svg"));
@@ -125,5 +131,7 @@ void PhasesToolbar::setActivePhase(int phase)
 void PhasesToolbar::phaseButtonClicked()
 {
 	PhaseButton *button = qobject_cast<PhaseButton *>(sender());
+	if (button->getActive())
+		return;
 	emit signalSetPhase(buttonList.indexOf(button));
 }
