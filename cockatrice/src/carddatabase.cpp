@@ -224,6 +224,8 @@ void CardInfo::updatePixmapCache()
 	qDebug(QString("Updating pixmap cache for %1").arg(name).toLatin1());
 	clearPixmapCache();
 	loadPixmap();
+	
+	emit pixmapUpdated();
 }
 
 QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)

@@ -15,6 +15,8 @@ CardItem::CardItem(CardDatabase *_db, const QString &_name, int _cardid, QGraphi
 	setFlag(ItemIsSelectable);
 	setAcceptsHoverEvents(true);
 	setCacheMode(DeviceCoordinateCache);
+
+	connect(info, SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
 }
 
 CardItem::~CardItem()
@@ -26,6 +28,11 @@ CardItem::~CardItem()
 QRectF CardItem::boundingRect() const
 {
 	return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
+}
+
+void CardItem::pixmapUpdated()
+{
+	update();
 }
 
 void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget */*widget*/)
@@ -105,8 +112,10 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
 void CardItem::setName(const QString &_name)
 {
+  	disconnect(info, 0, this, 0);
 	name = _name;
 	info = db->getCard(name);
+	connect(info, SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
 	update();
 }
 

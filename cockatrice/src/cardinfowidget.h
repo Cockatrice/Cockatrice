@@ -20,12 +20,16 @@ private:
 	QLabel *cardtypeLabel1, *cardtypeLabel2;
 	QLabel *powtoughLabel1, *powtoughLabel2;
 	QTextEdit *textLabel;
+	
+	CardInfo *info;
 public:
 	CardInfoWidget(CardDatabase *_db, QWidget *parent = 0);
 	void retranslateUi();
 public slots:
 	void setCard(CardInfo *card);
 	void setCard(const QString &cardName);
+private slots:
+	void updatePixmap();
 };
 
 #endif

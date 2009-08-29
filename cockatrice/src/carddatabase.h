@@ -33,7 +33,7 @@ public:
 	void sortByKey();
 };
 
-class CardInfo : QObject {
+class CardInfo : public QObject {
 	Q_OBJECT
 private:
 	CardDatabase *db;
@@ -86,6 +86,8 @@ public:
 	void updatePixmapCache();
 private slots:
 	void picDownloadFinished(int id, bool error);
+signals:
+	void pixmapUpdated();
 };
 
 class CardDatabase : public QObject {

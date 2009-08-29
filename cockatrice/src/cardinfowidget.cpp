@@ -6,7 +6,7 @@
 #include <QMessageBox>
 
 CardInfoWidget::CardInfoWidget(CardDatabase *_db, QWidget *parent)
-	: QFrame(parent), db(_db), pixmapHeight(pixmapWidth)
+	: QFrame(parent), db(_db), pixmapHeight(pixmapWidth), info(0)
 {
 	cardPicture = new QLabel;
 	cardPicture->setAlignment(Qt::AlignCenter);
@@ -71,12 +71,12 @@ void CardInfoWidget::setCard(CardInfo *card)
 	if (!card)
 		return;
 
-	QPixmap *resizedPixmap = card->getPixmap(QSize(pixmapWidth, pixmapHeight));
-	if (resizedPixmap)
-		cardPicture->setPixmap(*resizedPixmap);
-	else
-		cardPicture->setPixmap(*(db->getCard()->getPixmap(QSize(pixmapWidth, pixmapHeight))));
+	if (info)
+		disconnect(info, 0, this, 0);
+	info = card;
+	connect(info, SIGNAL(pixmapUpdated()), this, SLOT(updatePixmap()));
 
+	updatePixmap();
 	nameLabel2->setText(card->getName());
 	manacostLabel2->setText(card->getManaCost());
 	cardtypeLabel2->setText(card->getCardType());
@@ -87,6 +87,15 @@ void CardInfoWidget::setCard(CardInfo *card)
 void CardInfoWidget::setCard(const QString &cardName)
 {
 	setCard(db->getCard(cardName));
+}
+
+void CardInfoWidget::updatePixmap()
+{
+	QPixmap *resizedPixmap = info->getPixmap(QSize(pixmapWidth, pixmapHeight));
+	if (resizedPixmap)
+		cardPicture->setPixmap(*resizedPixmap);
+	else
+		cardPicture->setPixmap(*(db->getCard()->getPixmap(QSize(pixmapWidth, pixmapHeight))));
 }
 
 void CardInfoWidget::retranslateUi()

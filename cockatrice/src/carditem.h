@@ -20,7 +20,8 @@ enum CardItemType {
 	typeOther = QGraphicsItem::UserType + 4
 };
 
-class CardItem : public AbstractGraphicsItem {
+class CardItem : public QObject, public AbstractGraphicsItem {
+	Q_OBJECT
 private:
 	CardDatabase *db;
 	CardInfo *info;
@@ -34,6 +35,8 @@ private:
 	bool doesntUntap;
 	QPoint gridPoint;
 	CardDragItem *dragItem;
+private slots:
+	void pixmapUpdated();
 public:
 	enum { Type = typeCard };
 	int type() const { return Type; }
