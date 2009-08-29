@@ -86,4 +86,3 @@ SOURCES += src/counter.cpp \
  src/phasestoolbar.cpp \
  src/chatwidget.cpp
 TRANSLATIONS += translations/cockatrice_de.ts translations/cockatrice_en.ts
-CONFIG += qt debug
