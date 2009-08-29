@@ -77,6 +77,9 @@ void GameSelector::actJoin()
 
 void GameSelector::enableGameList()
 {
+	if (isVisible())
+		return;
+	
 	connect(client, SIGNAL(gameListEvent(ServerGame *)), gameListModel, SLOT(updateGameList(ServerGame *)));
 	client->listGames();
 	show();
@@ -84,7 +87,10 @@ void GameSelector::enableGameList()
 
 void GameSelector::disableGameList()
 {
-	disconnect(client, 0, this, 0);
+	if (!isVisible())
+		return;
+	
+	disconnect(client, 0, gameListModel, 0);
 	hide();
 	gameListModel->cleanList();
 }

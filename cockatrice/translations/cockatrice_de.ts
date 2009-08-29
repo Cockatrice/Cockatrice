@@ -1160,7 +1160,7 @@
     <message>
         <location filename="../src/messagelogwidget.cpp" line="215"/>
         <source>%1 sets counter &quot;%2&quot; to %3 (%4%5).</source>
-        <translation>%1 setzt Zählmarke &quot;%2&quot; auf %3% (%4%5).</translation>
+        <translation type="unfinished">%1 setzt Zählmarke &quot;%2&quot; auf %3 (%4%5).</translation>
     </message>
     <message>
         <source>%1 is looking at the top %2 cards of %3.</source>
