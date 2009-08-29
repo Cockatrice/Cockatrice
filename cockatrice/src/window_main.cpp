@@ -349,6 +349,8 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	createMenus();
 	
 	retranslateUi();
+	
+	resize(900, 700);
 }
 
 void MainWindow::closeEvent(QCloseEvent */*event*/)
