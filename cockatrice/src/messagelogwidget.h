@@ -41,6 +41,7 @@ private slots:
 	void logStopDumpZone(Player *player, CardZone *zone, Player *zoneOwner);
 	void logSetActivePlayer(Player *player);
 	void logSetActivePhase(int phase);
+	void msgAlert();
 public:
 	void connectToGame(Game *game);
 	MessageLogWidget(QWidget *parent = 0);

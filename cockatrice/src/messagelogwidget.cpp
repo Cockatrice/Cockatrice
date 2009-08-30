@@ -2,6 +2,7 @@
 #include "game.h"
 #include "player.h"
 #include "cardzone.h"
+#include <QApplication>
 
 QString MessageLogWidget::sanitizeHtml(QString dirty) const
 {
@@ -286,6 +287,20 @@ void MessageLogWidget::connectToGame(Game *game)
 	connect(game, SIGNAL(logStopDumpZone(Player *, CardZone *, Player *)), this, SLOT(logStopDumpZone(Player *, CardZone *, Player *)));
 	connect(game, SIGNAL(logSetActivePlayer(Player *)), this, SLOT(logSetActivePlayer(Player *)));
 	connect(game, SIGNAL(setActivePhase(int)), this, SLOT(logSetActivePhase(int)));
+	
+	//Alert Test
+	connect(game, SIGNAL(logSay(Player *, QString)), this, SLOT(msgAlert()));
+	connect(game, SIGNAL(logJoin(Player *)), this, SLOT(msgAlert()));
+	connect(game, SIGNAL(logLeave(Player *)), this, SLOT(msgAlert()));
+	connect(game, SIGNAL(logSetActivePlayer(Player *)), this, SLOT(msgAlert()));
+	connect(game, SIGNAL(setActivePhase(int)), this, SLOT(msgAlert()));
+	connect(game, SIGNAL(logDraw(Player *, int)), this, SLOT(msgAlert()));
+	connect(game, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)), this, SLOT(msgAlert()));
+}
+
+void MessageLogWidget::msgAlert()
+{
+	QApplication::alert(this);
 }
 
 MessageLogWidget::MessageLogWidget(QWidget *parent)

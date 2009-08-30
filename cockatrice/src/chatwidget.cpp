@@ -1,4 +1,5 @@
 #include <QtGui>
+#include <QApplication>
 #include "chatwidget.h"
 #include "client.h"
 
@@ -65,6 +66,7 @@ void ChannelWidget::leaveEvent(const QString &playerName)
 void ChannelWidget::sayEvent(const QString &playerName, const QString &s)
 {
 	textEdit->append(QString("<font color=\"red\">%1:</font> %2").arg(playerName).arg(s));
+	QApplication::alert(this);
 }
 
 void ChannelWidget::serverMessageEvent(const QString &s)
