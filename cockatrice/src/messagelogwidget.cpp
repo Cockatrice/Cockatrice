@@ -296,6 +296,7 @@ void MessageLogWidget::connectToGame(Game *game)
 	connect(game, SIGNAL(setActivePhase(int)), this, SLOT(msgAlert()));
 	connect(game, SIGNAL(logDraw(Player *, int)), this, SLOT(msgAlert()));
 	connect(game, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)), this, SLOT(msgAlert()));
+	connect(game, SIGNAL(logGameStart()), this, SLOT(msgAlert()));
 }
 
 void MessageLogWidget::msgAlert()
