@@ -7,6 +7,7 @@ class TableZone : public CardZone {
 private:
 	int width, height;
 	QList<QList<QPoint> > gridPoints;
+	QPixmap bgPixmap;
 public:
 	static const int gridPointsPerCardX = 2;
 	static const int gridPointsPerCardY = 3;

@@ -9,6 +9,7 @@ class Counter;
 
 class PlayerArea : public QGraphicsItem {
 private:
+	QPixmap bgPixmap;
 	QRectF bRect;
 	Player *player;
 	QList<Counter *> counterList;

@@ -50,6 +50,18 @@ private:
 
 class AppearanceSettingsPage : public AbstractSettingsPage {
 	Q_OBJECT
+private slots:
+	void handBgButtonClicked();
+	void tableBgButtonClicked();
+	void playerAreaBgButtonClicked();
+signals:
+	void handBgChanged(const QString &path);
+	void tableBgChanged(const QString &path);
+	void playerAreaBgChanged(const QString &path);
+private:
+	QLabel *handBgLabel, *tableBgLabel, *playerAreaBgLabel;
+	QLineEdit *handBgEdit, *tableBgEdit, *playerAreaBgEdit;
+	QGroupBox *zoneBgGroupBox;
 public:
 	AppearanceSettingsPage();
 	void retranslateUi();

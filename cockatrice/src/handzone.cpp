@@ -6,6 +6,11 @@
 HandZone::HandZone(Player *_p, QGraphicsItem *parent)
 	: CardZone(_p, "hand", false, false, _p->getLocal(), parent)
 {
+	QSettings settings;
+	QString bgPath = settings.value("zonebg/hand").toString();
+	if (!bgPath.isEmpty())
+		bgPixmap.load(bgPath);
+	
 	setCacheMode(DeviceCoordinateCache);
 	setAcceptsHoverEvents(true); // Awkwardly, this is needed to repaint the cached item after it has been corrupted by buggy rubberband drag.
 }
@@ -17,7 +22,10 @@ QRectF HandZone::boundingRect() const
 
 void HandZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	painter->fillRect(boundingRect(), Qt::darkGreen);
+	if (bgPixmap.isNull())
+		painter->fillRect(boundingRect(), Qt::darkGreen);
+	else
+		painter->fillRect(boundingRect(), QBrush(bgPixmap));
 }
 
 void HandZone::reorganizeCards()

@@ -48,6 +48,12 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 				       << QPoint(19, 0)
 				       << QPoint(1, 0)
 				       << QPoint(22, 0));
+	QSettings settings;
+	QString bgPath = settings.value("zonebg/table").toString();
+	if (!bgPath.isEmpty())
+		bgPixmap.load(bgPath);
+
+	setCacheMode(DeviceCoordinateCache);
 }
 
 QRectF TableZone::boundingRect() const
@@ -57,7 +63,10 @@ QRectF TableZone::boundingRect() const
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	painter->fillRect(boundingRect(), QColor(0, 0, 100));
+	if (bgPixmap.isNull())
+		painter->fillRect(boundingRect(), QColor(0, 0, 100));
+	else
+	painter->fillRect(boundingRect(), QBrush(bgPixmap));
 }
 
 void TableZone::addCardImpl(CardItem *card, int _x, int _y)

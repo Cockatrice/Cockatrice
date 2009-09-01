@@ -191,12 +191,93 @@ void GeneralSettingsPage::retranslateUi()
 
 AppearanceSettingsPage::AppearanceSettingsPage()
 {
+	zoneBgGroupBox = new QGroupBox;
+	QSettings settings;
+	settings.beginGroup("zonebg");
+	
+	handBgLabel = new QLabel;
+	handBgEdit = new QLineEdit(settings.value("hand").toString());
+	handBgEdit->setReadOnly(true);
+	QPushButton *handBgButton = new QPushButton("...");
+	connect(handBgButton, SIGNAL(clicked()), this, SLOT(handBgButtonClicked()));
+	
+	tableBgLabel = new QLabel;
+	tableBgEdit = new QLineEdit(settings.value("table").toString());
+	tableBgEdit->setReadOnly(true);
+	QPushButton *tableBgButton = new QPushButton("...");
+	connect(tableBgButton, SIGNAL(clicked()), this, SLOT(tableBgButtonClicked()));
+	
+	playerAreaBgLabel = new QLabel;
+	playerAreaBgEdit = new QLineEdit(settings.value("carddatabase").toString());
+	playerAreaBgEdit->setReadOnly(true);
+	QPushButton *playerAreaBgButton = new QPushButton("...");
+	connect(playerAreaBgButton, SIGNAL(clicked()), this, SLOT(playerAreaBgButtonClicked()));
+	
+	QGridLayout *zoneBgGrid = new QGridLayout;
+	zoneBgGrid->addWidget(handBgLabel, 0, 0);
+	zoneBgGrid->addWidget(handBgEdit, 0, 1);
+	zoneBgGrid->addWidget(handBgButton, 0, 2);
+	zoneBgGrid->addWidget(tableBgLabel, 1, 0);
+	zoneBgGrid->addWidget(tableBgEdit, 1, 1);
+	zoneBgGrid->addWidget(tableBgButton, 1, 2);
+	zoneBgGrid->addWidget(playerAreaBgLabel, 2, 0);
+	zoneBgGrid->addWidget(playerAreaBgEdit, 2, 1);
+	zoneBgGrid->addWidget(playerAreaBgButton, 2, 2);
+
+	zoneBgGroupBox->setLayout(zoneBgGrid);
+	
+	QVBoxLayout *mainLayout = new QVBoxLayout;
+	mainLayout->addWidget(zoneBgGroupBox);
+	
+	setLayout(mainLayout);
 
 }
 
 void AppearanceSettingsPage::retranslateUi()
 {
+	zoneBgGroupBox->setTitle(tr("Zone background pictures"));
+	handBgLabel->setText(tr("Path to hand background:"));
+	tableBgLabel->setText(tr("Path to table background:"));
+	playerAreaBgLabel->setText(tr("Path to player info background:"));
+}
 
+void AppearanceSettingsPage::handBgButtonClicked()
+{
+	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
+	if (path.isEmpty())
+		return;
+	QSettings settings;
+	settings.beginGroup("zonebg");
+	settings.setValue("hand", path);
+	handBgEdit->setText(path);
+	
+	emit handBgChanged(path);
+}
+
+void AppearanceSettingsPage::tableBgButtonClicked()
+{
+	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
+	if (path.isEmpty())
+		return;
+	QSettings settings;
+	settings.beginGroup("zonebg");
+	settings.setValue("table", path);
+	tableBgEdit->setText(path);
+	
+	emit tableBgChanged(path);
+}
+
+void AppearanceSettingsPage::playerAreaBgButtonClicked()
+{
+	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
+	if (path.isEmpty())
+		return;
+	QSettings settings;
+	settings.beginGroup("zonebg");
+	settings.setValue("playerarea", path);
+	playerAreaBgEdit->setText(path);
+	
+	emit playerAreaBgChanged(path);
 }
 
 MessagesSettingsPage::MessagesSettingsPage()

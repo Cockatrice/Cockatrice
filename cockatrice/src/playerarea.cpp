@@ -5,10 +5,15 @@
 #include "pilezone.h"
 #include "counter.h"
 #include <QPainter>
+#include <QSettings>
 
 PlayerArea::PlayerArea(Player *_player, QGraphicsItem *parent)
 	: QGraphicsItem(parent), player(_player)
 {
+	QSettings settings;
+	QString bgPath = settings.value("zonebg/playerarea").toString();
+	if (!bgPath.isEmpty())
+		bgPixmap.load(bgPath);
 	setCacheMode(DeviceCoordinateCache);
 	
 	QPointF base = QPointF(55, 50);
@@ -51,7 +56,10 @@ QRectF PlayerArea::boundingRect() const
 
 void PlayerArea::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	painter->fillRect(boundingRect(), QColor(200, 200, 200));
+	if (bgPixmap.isNull())
+		painter->fillRect(boundingRect(), QColor(200, 200, 200));
+	else
+		painter->fillRect(boundingRect(), QBrush(bgPixmap));
 
 	QString nameStr = player->getName();
 	QFont font("Times");
