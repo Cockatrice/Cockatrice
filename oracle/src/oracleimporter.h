@@ -22,8 +22,7 @@ class OracleImporter : public CardDatabase {
 	Q_OBJECT
 private:
 	QList<SetToDownload> setsToDownload;
-	QMap<QString, QStringList> colorOverride;
-	QMap<QString, int> tableRowOverride;
+	QString pictureUrl;
 	int setIndex;
 	int reqId;
 	QBuffer *buffer;

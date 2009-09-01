@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cockatrice_setdatabase version="20090811">
+	<picture_url>http://www.wizards.com/global/images/magic/general/%1.jpg</picture_url>
         <set>
             <name>5E</name>
             <longname>Fifth Edition</longname>
