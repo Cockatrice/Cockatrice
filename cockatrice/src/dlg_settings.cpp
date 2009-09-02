@@ -208,7 +208,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	connect(tableBgButton, SIGNAL(clicked()), this, SLOT(tableBgButtonClicked()));
 	
 	playerAreaBgLabel = new QLabel;
-	playerAreaBgEdit = new QLineEdit(settings.value("carddatabase").toString());
+	playerAreaBgEdit = new QLineEdit(settings.value("playerarea").toString());
 	playerAreaBgEdit->setReadOnly(true);
 	QPushButton *playerAreaBgButton = new QPushButton("...");
 	connect(playerAreaBgButton, SIGNAL(clicked()), this, SLOT(playerAreaBgButtonClicked()));
