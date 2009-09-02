@@ -1,26 +1,24 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-	<file alias="back.svg">resources/back.svg</file>
-	<file>resources/icon_config_general.svg</file>
-	<file>resources/icon_config_appearance.svg</file>
-	<file>resources/icon_config_messages.svg</file>
-	
-	<file>resources/icon_phase_untap.svg</file>
-	<file>resources/icon_phase_upkeep.svg</file>
-	<file>resources/icon_phase_draw.svg</file>
-	<file>resources/icon_phase_main1.svg</file>
-	<file>resources/icon_phase_combat_start.svg</file>
-	<file>resources/icon_phase_combat_attackers.svg</file>
-	<file>resources/icon_phase_combat_blockers.svg</file>
-	<file>resources/icon_phase_combat_damage.svg</file>
-	<file>resources/icon_phase_combat_end.svg</file>
-	<file>resources/icon_phase_main2.svg</file>
-	<file>resources/icon_phase_cleanup.svg</file>
-	<file>resources/icon_nextturn.svg</file>
-
-	<file>resources/hr.jpg</file>
-
-	<file>translations/cockatrice_de.qm</file>
-	<file>translations/cockatrice_en.qm</file>
-</qresource>
+<RCC>
+    <qresource prefix="/" >
+        <file alias="back.svg" >resources/back.svg</file>
+        <file>resources/icon_config_general.svg</file>
+        <file>resources/icon_config_appearance.svg</file>
+        <file>resources/icon_config_messages.svg</file>
+        <file>resources/icon_phase_untap.svg</file>
+        <file>resources/icon_phase_upkeep.svg</file>
+        <file>resources/icon_phase_draw.svg</file>
+        <file>resources/icon_phase_main1.svg</file>
+        <file>resources/icon_phase_combat_start.svg</file>
+        <file>resources/icon_phase_combat_attackers.svg</file>
+        <file>resources/icon_phase_combat_blockers.svg</file>
+        <file>resources/icon_phase_combat_damage.svg</file>
+        <file>resources/icon_phase_combat_end.svg</file>
+        <file>resources/icon_phase_main2.svg</file>
+        <file>resources/icon_phase_cleanup.svg</file>
+        <file>resources/icon_nextturn.svg</file>
+        <file>resources/hr.jpg</file>
+        <file>translations/cockatrice_de.qm</file>
+        <file>translations/cockatrice_en.qm</file>
+        <file>resources/icon.svg</file>
+    </qresource>
 </RCC>
