@@ -23,6 +23,7 @@ class OracleImporter : public CardDatabase {
 private:
 	QList<SetToDownload> setsToDownload;
 	QString pictureUrl;
+	QString dataDir;
 	int setIndex;
 	int reqId;
 	QBuffer *buffer;
@@ -34,7 +35,7 @@ private slots:
 	void httpRequestFinished(int requestId, bool error);
 	void readResponseHeader(const QHttpResponseHeader &responseHeader);
 public:
-	OracleImporter();
+	OracleImporter(const QString &_dataDir);
 	void importOracleFile(CardSet *set);
 	void downloadNextFile();
 };

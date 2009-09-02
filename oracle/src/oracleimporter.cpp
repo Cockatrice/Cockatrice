@@ -3,10 +3,10 @@
 #include <QtNetwork>
 #include <QXmlStreamReader>
 
-OracleImporter::OracleImporter()
-	: setIndex(-1)
+OracleImporter::OracleImporter(const QString &_dataDir)
+	: dataDir(_dataDir), setIndex(-1)
 {
-	QFile setsFile("sets.xml");
+	QFile setsFile(dataDir + "/sets.xml");
 		setsFile.open(QIODevice::ReadOnly | QIODevice::Text);
 	QXmlStreamReader xml(&setsFile);
 	QString edition;
@@ -159,7 +159,7 @@ void OracleImporter::downloadNextFile()
 		buffer->open(QIODevice::ReadWrite | QIODevice::Text);
 		reqId = http->get(QUrl::toPercentEncoding(url.path(), "!$&'()*+,;=:@/"), buffer);
 	} else {
-		QFile file(urlString);
+		QFile file(dataDir + "/" + urlString);
 		file.open(QIODevice::ReadOnly | QIODevice::Text);
 		
 		buffer->close();
@@ -188,7 +188,7 @@ void OracleImporter::httpRequestFinished(int requestId, bool error)
 	if (setIndex == setsToDownload.size()) {
 		QMessageBox::information(0, tr("Import finished"), tr("Total: %1 cards imported").arg(cardHash.size()));
 		setIndex = -1;
-		saveToFile("cards.xml");
+		saveToFile(dataDir + "/cards.xml");
 		qApp->quit();
 	} else
 		downloadNextFile();
