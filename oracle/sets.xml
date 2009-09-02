@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cockatrice_setdatabase version="20090811">
+	<picture_url>http://www.wizards.com/global/images/magic/general/%1.jpg</picture_url>
+        <set>
+            <name>5E</name>
+            <longname>Fifth Edition</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-5th.txt</url>
+        </set>
+        <set>
+            <name>ST2K</name>
+            <longname>Starter 2000</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-st2.txt</url>
+        </set>
+        <set>
+            <name>US</name>
+            <longname>Urza's Saga</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-us.txt</url>
+        </set>
+        <set>
+            <name>MR</name>
+            <longname>Mirrodin</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-mr.txt</url>
+        </set>
+        <set>
+            <name>NE</name>
+            <longname>Nemesis</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ne.txt</url>
+        </set>
+        <set>
+            <name>VI</name>
+            <longname>Visions</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-vi.txt</url>
+        </set>
+        <set>
+            <name>FD</name>
+            <longname>Fifth Dawn</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-fd.txt</url>
+        </set>
+        <set>
+            <name>FE</name>
+            <longname>Fallen Empires</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-fe.txt</url>
+        </set>
+        <set>
+            <name>EX</name>
+            <longname>Exodus</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ex.txt</url>
+        </set>
+        <set>
+            <name>6E</name>
+            <longname>Sixth Edition</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-6th.txt</url>
+        </set>
+        <set>
+            <name>PLC</name>
+            <longname>Planar Chaos</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-pc.txt</url>
+        </set>
+        <set>
+            <name>10E</name>
+            <longname>Tenth Edition</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-10.txt</url>
+        </set>
+        <set>
+            <name>CFX</name>
+            <longname>Conflux</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-cf.txt</url>
+        </set>
+        <set>
+            <name>P2</name>
+            <longname>Portal: Second Age</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-pt2.txt</url>
+        </set>
+        <set>
+            <name>P3</name>
+            <longname>Portal: Three Kingdoms</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-pt3.txt</url>
+        </set>
+        <set>
+            <name>OD</name>
+            <longname>Odyssey</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-od.txt</url>
+        </set>
+        <set>
+            <name>UNH</name>
+            <longname>Unhinged</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-uh.txt</url>
+        </set>
+        <set>
+            <name>BOK</name>
+            <longname>Betrayers of Kamigawa</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-bk.txt</url>
+        </set>
+        <set>
+            <name>LRW</name>
+            <longname>Lorwyn</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-lo.txt</url>
+        </set>
+        <set>
+            <name>WL</name>
+            <longname>Weatherlight</longname>
+ 	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-wl.txt</url>
+        </set>
+        <set>
+            <name>ON</name>
+            <longname>Onslaught</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-on.txt</url>
+        </set>
+        <set>
+            <name>7E</name>
+            <longname>Seventh Edition</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-7th.txt</url>
+        </set>
+        <set>
+            <name>GP</name>
+            <longname>Guildpact</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-gp.txt</url>
+        </set>
+        <set>
+            <name>CHK</name>
+            <longname>Champions of Kamigawa</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ck.txt</url>
+        </set>
+        <set>
+            <name>8E</name>
+            <longname>Eighth Edition</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-8th.txt</url>
+        </set>
+        <set>
+            <name>HL</name>
+            <longname>Homelands</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-hl.txt</url>
+        </set>
+        <set>
+            <name>PR</name>
+            <longname>Promo cards</longname>
+	     <url>promo.txt</url>
+        </set>
+        <set>
+            <name>PS</name>
+            <longname>Planeshift</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ps.txt</url>
+        </set>
+        <set>
+            <name>PT</name>
+            <longname>Portal</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-pt.txt</url>
+        </set>
+        <set>
+            <name>IA</name>
+            <longname>Ice Age</longname>
+            <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ia.txt</url>
+        </set>
+        <set>
+            <name>SOK</name>
+            <longname>Saviors of Kamigawa</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-sk.txt</url>
+        </set>
+        <set>
+            <name>DIS</name>
+            <longname>Dissension</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-di.txt</url>
+        </set>
+        <set>
+            <name>PY</name>
+            <longname>Prophecy</longname>
+ 	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-py.txt</url>
+        </set>
+        <set>
+            <name>9E</name>
+            <longname>Ninth Edition</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-9th.txt</url>
+        </set>
+        <set>
+            <name>B</name>
+            <longname>Limited Edition</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-lu.txt</url>
+        </set>
+        <set>
+            <name>IN</name>
+            <longname>Invasion</longname>
+ 	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-in.txt</url>
+        </set>
+        <set>
+            <name>AL</name>
+            <longname>Alliances</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-al.txt</url>
+        </set>
+        <set>
+            <name>AN</name>
+            <longname>Arabian Nights</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-an.txt</url>
+        </set>
+        <set>
+            <name>ARB</name>
+            <longname>Alara Reborn</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ar.txt</url>
+        </set>
+        <set>
+            <name>AP</name>
+            <longname>Apocalypse</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ap.txt</url>
+        </set>
+        <set>
+            <name>AQ</name>
+            <longname>Antiquities</longname>
+ 	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-aq.txt</url>
+        </set>
+        <set>
+            <name>SHM</name>
+            <longname>Shadowmoor</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-sm.txt</url>
+        </set>
+        <set>
+            <name>R</name>
+            <longname>Revised Edition</longname>
+ 	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-rv.txt</url>
+        </set>
+        <set>
+            <name>U</name>
+            <longname>Unlimited Edition</longname>
+ 	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-lu.txt</url>
+        </set>
+        <set>
+            <name>SC</name>
+            <longname>Scourge</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-sc.txt</url>
+        </set>
+        <set>
+            <name>SH</name>
+            <longname>Stronghold</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-sh.txt</url>
+        </set>
+        <set>
+            <name>JU</name>
+            <longname>Judgment</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ju.txt</url>
+        </set>
+        <set>
+            <name>CH</name>
+            <longname>Chronicles</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ch.txt</url>
+        </set>
+        <set>
+            <name>MOR</name>
+            <longname>Morningtide</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-mt.txt</url>
+        </set>
+        <set>
+            <name>ST</name>
+            <longname>Starter</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-st.txt</url>
+        </set>
+        <set>
+            <name>TE</name>
+            <longname>Tempest</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-te.txt</url>
+        </set>
+        <set>
+            <name>ALA</name>
+            <longname>Shards of Alara</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-sa.txt</url>
+        </set>
+        <set>
+            <name>LE</name>
+            <longname>Legions</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-le.txt</url>
+        </set>
+        <set>
+            <name>FUT</name>
+            <longname>Future Sight</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-fs.txt</url>
+        </set>
+        <set>
+            <name>CS</name>
+            <longname>Coldsnap</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-cs.txt</url>
+        </set>
+        <set>
+            <name>LG</name>
+            <longname>Legends</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-lg.txt</url>
+        </set>
+        <set>
+            <name>M10</name>
+            <longname>Magic 2010</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-m10.txt</url>
+        </set>
+        <set>
+            <name>RAV</name>
+            <longname>Ravnica</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ra.txt</url>
+        </set>
+        <set>
+            <name>TO</name>
+            <longname>Torment</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-to.txt</url>
+        </set>
+        <set>
+            <name>EVE</name>
+            <longname>Eventide</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-et.txt</url>
+        </set>
+        <set>
+            <name>DK</name>
+            <longname>The Dark</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-dk.txt</url>
+        </set>
+        <set>
+            <name>4E</name>
+            <longname>Fourth Edition</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-4th.txt</url>
+        </set>
+        <set>
+            <name>UD</name>
+            <longname>Urza's Destiny</longname>
+ 	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ud.txt</url>
+        </set>
+        <set>
+            <name>TSP</name>
+            <longname>Time Spiral</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ts.txt</url>
+        </set>
+        <set>
+            <name>UG</name>
+            <longname>Unglued</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ug.txt</url>
+        </set>
+        <set>
+            <name>DS</name>
+            <longname>Darksteel</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ds.txt</url>
+        </set>
+        <set>
+            <name>UL</name>
+            <longname>Urza's Legacy</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ul.txt</url>
+        </set>
+        <set>
+            <name>MI</name>
+            <longname>Mirage</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-mi.txt</url>
+        </set>
+        <set>
+            <name>MM</name>
+            <longname>Mercadian Masques</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-mm.txt</url>
+        </set>
+</cockatrice_setdatabase>
