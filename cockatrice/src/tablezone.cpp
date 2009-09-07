@@ -109,7 +109,8 @@ void TableZone::toggleTapped()
 		}
 	for (int i = 0; i < selectedItems.size(); i++) {
 		CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItems[i]);
-		setCardAttr(temp->getId(), "tapped", (!temp->getTapped() || tapAll) ? "1" : "0");
+		if (temp->getTapped() != tapAll)
+			setCardAttr(temp->getId(), "tapped", tapAll ? "1" : "0");
 	}
 }
 
