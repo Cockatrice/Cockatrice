@@ -112,8 +112,11 @@ QPixmap *CardInfo::loadPixmap()
 {
 	if (pixmap)
 		return pixmap;
-	QString picsPath = db->getPicsPath();
 	pixmap = new QPixmap();
+	QString picsPath = db->getPicsPath();
+	if (!QDir(picsPath).exists())
+		return pixmap;
+	
 	if (getName().isEmpty()) {
 		pixmap->load(QString("%1/back.jpg").arg(picsPath));
 		return pixmap;
@@ -395,6 +398,8 @@ int CardDatabase::loadFromFile(const QString &fileName)
 {
 	QFile file(fileName);
 	file.open(QIODevice::ReadOnly);
+	if (!file.isOpen())
+		return -1;
 	QXmlStreamReader xml(&file);
 	clear();
 	while (!xml.atEnd()) {
