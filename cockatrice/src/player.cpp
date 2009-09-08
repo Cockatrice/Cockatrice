@@ -1,20 +1,51 @@
 #include "player.h"
 #include "client.h"
 #include "cardzone.h"
-#include "playerarea.h"
 #include "counter.h"
 #include "zoneviewzone.h"
 #include "zoneviewwidget.h"
 #include "game.h"
-#include <QGraphicsScene>
+#include "pilezone.h"
+#include "tablezone.h"
+#include "handzone.h"
+#include <QSettings>
+#include <QPainter>
 #include <QMenu>
 
-Player::Player(const QString &_name, int _id, QPointF _base, bool _local, CardDatabase *_db, Client *_client, QGraphicsScene *_scene, Game *_parent)
-	: QObject(_parent), defaultNumberTopCards(3), name(_name), id(_id), active(false), base(_base), local(_local), db(_db), client(_client)
+Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Client *_client, Game *_parent)
+	: QObject(_parent), defaultNumberTopCards(3), name(_name), id(_id), active(false), local(_local), db(_db), client(_client)
 {
-	area = new PlayerArea(this);
-	area->setPos(_base);
-	_scene->addItem(area);
+	QSettings settings;
+	QString bgPath = settings.value("zonebg/playerarea").toString();
+	if (!bgPath.isEmpty())
+		bgPixmap.load(bgPath);
+	setCacheMode(DeviceCoordinateCache);
+	
+	QPointF base = QPointF(55, 50);
+
+	PileZone *deck = new PileZone(this, "deck", true, false, this);
+	deck->setPos(base);
+
+	qreal h = deck->boundingRect().height() + 20;
+
+	PileZone *grave = new PileZone(this, "grave", false, true, this);
+	grave->setPos(base + QPointF(0, h));
+
+	PileZone *rfg = new PileZone(this, "rfg", false, true, this);
+	rfg->setPos(base + QPointF(0, 2 * h));
+
+	PileZone *sb = new PileZone(this, "sb", false, true, this);
+	sb->setVisible(false);
+
+	CardZone *table = new TableZone(this, this);
+	CardZone *hand = new HandZone(this, table->boundingRect().height(), this);
+	
+	base = QPointF(deck->boundingRect().width() + 60, 0);
+	hand->setPos(base);
+	base += QPointF(hand->boundingRect().width(), 0);
+	table->setPos(base);
+
+	bRect = QRectF(0, 0, base.x() + table->boundingRect().width(), base.y() + table->boundingRect().height());
 
 	if (local) {
 		aMoveHandToTopLibrary = new QAction(this);
@@ -93,7 +124,7 @@ Player::~Player()
 	for (int i = 0; i < zones.size(); i++)
 		delete zones.at(i);
 
-	delete area;
+	clearCounters();
 }
 
 void Player::retranslateUi()
@@ -230,7 +261,7 @@ void Player::gameEvent(const ServerEventData &event)
 				zones.at(i)->clearContents();
 			}
 
-			area->clearCounters();
+			clearCounters();
 
 			CardZone *deck = zones.findZone("deck");
 			for (; deck_cards; deck_cards--)
@@ -359,7 +390,7 @@ void Player::gameEvent(const ServerEventData &event)
 			int colorValue = data[1].toInt();
 			int value = data[2].toInt();
 			QColor color(colorValue / 65536, (colorValue % 65536) / 256, colorValue % 256);
-			area->addCounter(counterName, color, value);
+			addCounter(counterName, color, value);
 			break;
 		}
 		case eventSetCounter: {
@@ -368,7 +399,7 @@ void Player::gameEvent(const ServerEventData &event)
 			}
 			int value = data[1].toInt();
 			QString counterName = data[0];
-			Counter *c = area->getCounter(counterName);
+			Counter *c = getCounter(counterName);
 			int oldValue = c->getValue();
 			c->setValue(value);
 			emit logSetCounter(this, c->getName(), value, oldValue);
@@ -387,5 +418,90 @@ void Player::showCardMenu(const QPoint &p)
 void Player::setActive(bool _active)
 {
 	active = _active;
-	area->update();
+	update();
+}
+
+QRectF Player::boundingRect() const
+{
+	return bRect;
+}
+
+void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+{
+	if (bgPixmap.isNull())
+		painter->fillRect(boundingRect(), QColor(200, 200, 200));
+	else
+		painter->fillRect(boundingRect(), QBrush(bgPixmap));
+
+	QString nameStr = getName();
+	QFont font("Times");
+	font.setPixelSize(20);
+//	font.setWeight(QFont::Bold);
+	
+	int totalWidth = CARD_WIDTH + 60;
+	
+	if (getActive()) {
+		QFontMetrics fm(font);
+		double w = fm.width(nameStr) * 1.7;
+		double h = fm.height() * 1.7;
+		if (w < h)
+			w = h;
+		
+		painter->setPen(Qt::transparent);
+		QRadialGradient grad(QPointF(0.5, 0.5), 0.5);
+		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
+		grad.setColorAt(0, QColor(150, 200, 150, 255));
+		grad.setColorAt(0.7, QColor(150, 200, 150, 255));
+		grad.setColorAt(1, QColor(150, 150, 150, 0));
+		painter->setBrush(QBrush(grad));
+		
+		painter->drawEllipse(QRectF(((double) (totalWidth - w)) / 2, 0, w, h));
+	}
+	painter->setFont(font);
+	painter->setPen(QPen(Qt::black));
+	painter->drawText(QRectF(0, 0, totalWidth, 40), Qt::AlignCenter, nameStr);
+}
+
+Counter *Player::getCounter(const QString &name, bool remove)
+{
+	for (int i = 0; i < counterList.size(); i++) {
+		Counter *temp = counterList.at(i);
+		if (temp->getName() == name) {
+			if (remove)
+				counterList.removeAt(i);
+			return temp;
+		}
+	}
+	return 0;
+}
+
+void Player::addCounter(const QString &name, QColor color, int value)
+{
+	counterList.append(new Counter(this, name, color, value, this));
+	rearrangeCounters();
+}
+
+void Player::delCounter(const QString &name)
+{
+	delete getCounter(name, true);
+	rearrangeCounters();
+}
+
+void Player::clearCounters()
+{
+	for (int i = 0; i < counterList.size(); i++)
+		delete counterList.at(i);
+	counterList.clear();
+}
+
+void Player::rearrangeCounters()
+{
+	const int counterAreaWidth = 55;
+	qreal y = 50;
+	for (int i = 0; i < counterList.size(); i++) {
+		Counter *temp = counterList.at(i);
+		QRectF br = temp->boundingRect();
+		temp->setPos((counterAreaWidth - br.width()) / 2, y);
+		y += br.height() + 10;
+	}
 }

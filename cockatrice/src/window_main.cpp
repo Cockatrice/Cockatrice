@@ -29,6 +29,7 @@
 #include "messagelogwidget.h"
 #include "phasestoolbar.h"
 #include "gameview.h"
+#include "gamescene.h"
 #include "player.h"
 #include "game.h"
 #include "carddatabase.h"
@@ -154,15 +155,6 @@ void MainWindow::actExit()
 	close();
 }
 
-void MainWindow::updateSceneSize()
-{
-	QRectF sr = scene->sceneRect();
-	QSizeF zoneSize = zoneLayout->size();
-	qDebug(QString("updateSceneSize: width=%1").arg(1096 + zoneSize.width()).toLatin1());
-	scene->setSceneRect(sr.x(), sr.y(), 1096 + zoneSize.width(), sr.height());
-	view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
-}
-
 void MainWindow::actSay()
 {
 	if (sayEdit->text().isEmpty())
@@ -178,6 +170,7 @@ void MainWindow::playerIdReceived(int id, QString name)
 	connect(game, SIGNAL(hoverCard(QString)), this, SLOT(hoverCard(QString)));
 	connect(game, SIGNAL(playerAdded(Player *)), this, SLOT(playerAdded(Player *)));
 	connect(game, SIGNAL(playerRemoved(Player *)), this, SLOT(playerRemoved(Player *)));
+	connect(game, SIGNAL(playerRemoved(Player *)), scene, SLOT(removePlayer(Player *)));
 	connect(game, SIGNAL(setActivePhase(int)), phasesToolbar, SLOT(setActivePhase(int)));
 	connect(phasesToolbar, SIGNAL(signalUntapAll()), game, SLOT(actUntapAll()));
 	playerAdded(game->getLocalPlayer());
@@ -281,16 +274,11 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 
 	db = new CardDatabase(this);
 	
-	scene = new QGraphicsScene(0, 0, 1096, 1160, this);
-	view = new GameView(scene);
-	view->hide();
-
-//	view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
-
 	zoneLayout = new ZoneViewLayout(db);
-	zoneLayout->setPos(1096, 0);
-	scene->addItem(zoneLayout);
-	connect(zoneLayout, SIGNAL(sizeChanged()), this, SLOT(updateSceneSize()));
+	scene = new GameScene(zoneLayout, this);
+	view = new GameView(scene);
+//	view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+	view->hide();
 
 	cardInfo = new CardInfoWidget(db);
 	messageLog = new MessageLogWidget;

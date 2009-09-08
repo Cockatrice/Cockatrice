@@ -1,4 +1,3 @@
-#include <QGraphicsScene>
 #include <QMenu>
 #include <QMessageBox>
 #include <QSettings>
@@ -11,14 +10,13 @@
 #include "handzone.h"
 #include "carddatabase.h"
 #include "dlg_startgame.h"
-#include "playerarea.h"
 #include "counter.h"
+#include "gamescene.h"
 
-Game::Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_actionsMenu, QMenu *_cardMenu, int playerId, const QString &playerName, QObject *parent)
+Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenu *_actionsMenu, QMenu *_cardMenu, int playerId, const QString &playerName, QObject *parent)
 	: QObject(parent), actionsMenu(_actionsMenu), cardMenu(_cardMenu), db(_db), client(_client), scene(_scene), started(false), currentPhase(-1)
 {
-	QRectF sr = scene->sceneRect();
-	localPlayer = addPlayer(playerId, playerName, QPointF(0, sr.y() + sr.height() / 2 + 2), true);
+	localPlayer = addPlayer(playerId, playerName, true);
 
 	connect(client, SIGNAL(gameEvent(const ServerEventData &)), this, SLOT(gameEvent(const ServerEventData &)));
 	connect(client, SIGNAL(playerListReceived(QList<ServerPlayer *>)), this, SLOT(playerListReceived(QList<ServerPlayer *>)));
@@ -186,9 +184,10 @@ void Game::initSayMenu()
 	}
 }
 
-Player *Game::addPlayer(int playerId, const QString &playerName, QPointF base, bool local)
+Player *Game::addPlayer(int playerId, const QString &playerName, bool local)
 {
-	Player *newPlayer = new Player(playerName, playerId, base, local, db, client, scene, this);
+	Player *newPlayer = new Player(playerName, playerId, local, db, client, this);
+	scene->addPlayer(newPlayer);
 
 	connect(newPlayer, SIGNAL(sigShowCardMenu(QPoint)), this, SLOT(showCardMenu(QPoint)));
 	connect(newPlayer, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)), this, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)));
@@ -200,7 +199,7 @@ Player *Game::addPlayer(int playerId, const QString &playerName, QPointF base, b
 
 	players << newPlayer;
 	emit playerAdded(newPlayer);
-
+	
 	return newPlayer;
 }
 
@@ -214,7 +213,7 @@ void Game::playerListReceived(QList<ServerPlayer *> playerList)
 		int id = temp->getPlayerId();
 
 		if (id != localPlayer->getId())
-			addPlayer(id, temp->getName(), QPointF(0, 0), false);
+			addPlayer(id, temp->getName(), false);
 
 		delete temp;
 	}
@@ -248,7 +247,7 @@ void Game::gameEvent(const ServerEventData &msg)
 			emit logSay(p, msg.getEventData()[0]);
 			break;
 		case eventJoin: {
-			Player *newPlayer = addPlayer(msg.getPlayerId(), msg.getPlayerName(), QPointF(0, 0), false);
+			Player *newPlayer = addPlayer(msg.getPlayerId(), msg.getPlayerName(), false);
 			emit logJoin(newPlayer);
 			break;
 		}
@@ -387,7 +386,7 @@ void Game::actDecLife()
 void Game::actSetLife()
 {
 	bool ok;
-	int life = QInputDialog::getInteger(0, tr("Set life"), tr("New life total:"), localPlayer->area->getCounter("life")->getValue(), 0, 2000000000, 1, &ok);
+	int life = QInputDialog::getInteger(0, tr("Set life"), tr("New life total:"), localPlayer->getCounter("life")->getValue(), 0, 2000000000, 1, &ok);
 	if (ok)
 		client->setCounter("life", life);
 }

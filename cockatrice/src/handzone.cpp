@@ -3,8 +3,8 @@
 #include "player.h"
 #include "client.h"
 
-HandZone::HandZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "hand", false, false, _p->getLocal(), parent)
+HandZone::HandZone(Player *_p, int _zoneHeight, QGraphicsItem *parent)
+	: CardZone(_p, "hand", false, false, _p->getLocal(), parent), zoneHeight(_zoneHeight)
 {
 	QSettings settings;
 	QString bgPath = settings.value("zonebg/hand").toString();
@@ -17,7 +17,7 @@ HandZone::HandZone(Player *_p, QGraphicsItem *parent)
 
 QRectF HandZone::boundingRect() const
 {
-	return QRectF(0, 0, 100, 578);
+	return QRectF(0, 0, 100, zoneHeight);
 }
 
 void HandZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)

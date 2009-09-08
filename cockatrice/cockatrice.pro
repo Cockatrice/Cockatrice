@@ -36,7 +36,6 @@ HEADERS += src/counter.h \
  src/pilezone.h \
  src/carddragitem.h \
  src/zoneviewlayout.h \
- src/playerarea.h \
  src/carddatabasemodel.h \
  src/window_deckeditor.h \
  src/decklist.h \
@@ -45,7 +44,8 @@ HEADERS += src/counter.h \
  src/abstractgraphicsitem.h \
  src/dlg_settings.h \
  src/phasestoolbar.h \
- src/chatwidget.h
+ src/chatwidget.h \
+ src/gamescene.h
 SOURCES += src/counter.cpp \
  src/gameselector.cpp \
  src/dlg_creategame.cpp \
@@ -75,7 +75,6 @@ SOURCES += src/counter.cpp \
  src/pilezone.cpp \
  src/carddragitem.cpp \
  src/zoneviewlayout.cpp \
- src/playerarea.cpp \
  src/carddatabasemodel.cpp \
  src/window_deckeditor.cpp \
  src/decklist.cpp \
@@ -84,5 +83,6 @@ SOURCES += src/counter.cpp \
  src/abstractgraphicsitem.cpp \
  src/dlg_settings.cpp \
  src/phasestoolbar.cpp \
- src/chatwidget.cpp
+ src/chatwidget.cpp \
+ src/gamescene.cpp
 TRANSLATIONS += translations/cockatrice_de.ts translations/cockatrice_en.ts

@@ -7,10 +7,18 @@ GameView::GameView(QGraphicsScene *scene, QWidget *parent)
 	setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing/* | QPainter::SmoothPixmapTransform*/);
 	setDragMode(RubberBandDrag);
 //	setViewportUpdateMode(FullViewportUpdate);
+
+	connect(scene, SIGNAL(sceneRectChanged(const QRectF &)), this, SLOT(updateSceneRect(const QRectF &)));
 }
 
 void GameView::resizeEvent(QResizeEvent *event)
 {
 	QGraphicsView::resizeEvent(event);
-	fitInView(scene()->sceneRect(), Qt::KeepAspectRatio);
+	updateSceneRect(scene()->sceneRect());
+}
+
+void GameView::updateSceneRect(const QRectF &rect)
+{
+	qDebug(QString("updateSceneRect = %1,%2").arg(rect.width()).arg(rect.height()).toLatin1());
+	fitInView(rect, Qt::KeepAspectRatio);
 }

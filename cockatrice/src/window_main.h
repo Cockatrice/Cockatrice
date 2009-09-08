@@ -23,8 +23,8 @@
 #include <QMainWindow>
 #include "client.h"
 
-class QGraphicsScene;
 class GameView;
+class GameScene;
 class Game;
 class CardDatabase;
 class Player;
@@ -63,8 +63,6 @@ private slots:
 	void actFullScreen(bool checked);
 	void actSettings();
 	void actExit();
-
-	void updateSceneSize();
 signals:
 	void logConnecting(QString hostname);
 	void logDisconnected();
@@ -86,7 +84,7 @@ private:
 	ChatWidget *chatWidget;
 
 	Client *client;
-	QGraphicsScene *scene;
+	GameScene *scene;
 	GameView *view;
 	Game *game;
 	CardDatabase *db;

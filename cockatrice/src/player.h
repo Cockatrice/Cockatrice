@@ -10,11 +10,11 @@ class Client;
 class CardDatabase;
 class QMenu;
 class QAction;
-class PlayerArea;
 class ZoneViewZone;
 class Game;
+class Counter;
 
-class Player : public QObject {
+class Player : public QObject, public QGraphicsItem {
 	Q_OBJECT
 signals:
 	void moveCard(int cardId, QString startZone, QString targetZone, int x, int y);
@@ -52,16 +52,30 @@ private:
 	QString name;
 	int id;
 	bool active;
-	QPointF base;
 	bool local;
 	ZoneList zones;
 	CardDatabase *db;
 	void setCardAttrHelper(CardItem *card, const QString &aname, const QString &avalue, bool allCards);
+
+	QPixmap bgPixmap;
+	QRectF bRect;
+
+	QList<Counter *> counterList;
+	void rearrangeCounters();
 public:
-	PlayerArea *area;
+	enum { Type = typeOther };
+	int type() const { return Type; }
+	QRectF boundingRect() const;
+	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+	
+	Counter *getCounter(const QString &name, bool remove = false);
+	void addCounter(const QString &name, QColor color, int value);
+	void delCounter(const QString &name);
+	void clearCounters();
+
 	Client *client;
 	void addZone(CardZone *z);
-	Player(const QString &_name, int _id, QPointF _base, bool _local, CardDatabase *_db, Client *_client, QGraphicsScene *_scene, Game *_parent);
+	Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Client *_client, Game *_parent);
 	~Player();
 	void retranslateUi();
 	QMenu *getPlayerMenu() const { return playerMenu; }

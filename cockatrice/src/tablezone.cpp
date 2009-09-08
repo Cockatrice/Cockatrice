@@ -4,56 +4,15 @@
 #include "client.h"
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "table", true, false, true, parent), width(864), height(578)
+	: CardZone(_p, "table", true, false, true, parent), width(864), height(536)
 {
-	gridPoints << (QList<QPoint>() << QPoint(8, 12)
-				       << QPoint(9, 13)
-				       << QPoint(10, 14)
-				       << QPoint(12, 12)
-				       << QPoint(13, 13)
-				       << QPoint(14, 14)
-				       << QPoint(4, 12)
-				       << QPoint(5, 13)
-				       << QPoint(6, 14)
-				       << QPoint(16, 12)
-				       << QPoint(17, 13)
-				       << QPoint(18, 14)
-				       << QPoint(0, 12)
-				       << QPoint(1, 13)
-				       << QPoint(2, 14)
-				       << QPoint(20, 12)
-				       << QPoint(21, 13)
-				       << QPoint(22, 14))
-		   << (QList<QPoint>() << QPoint(10, 8)
-				       << QPoint(13, 8)
-				       << QPoint(7, 8)
-				       << QPoint(16, 8)
-				       << QPoint(4, 8)
-				       << QPoint(19, 8)
-				       << QPoint(1, 8)
-				       << QPoint(22, 8))
-		   << (QList<QPoint>() << QPoint(10, 4)
-				       << QPoint(13, 4)
-				       << QPoint(7, 4)
-				       << QPoint(16, 4)
-				       << QPoint(4, 4)
-				       << QPoint(19, 4)
-				       << QPoint(1, 4)
-				       << QPoint(22, 4))
-		   << (QList<QPoint>() << QPoint(10, 0)
-				       << QPoint(13, 0)
-				       << QPoint(7, 0)
-				       << QPoint(16, 0)
-				       << QPoint(4, 0)
-				       << QPoint(19, 0)
-				       << QPoint(1, 0)
-				       << QPoint(22, 0));
 	QSettings settings;
 	QString bgPath = settings.value("zonebg/table").toString();
 	if (!bgPath.isEmpty())
 		bgPixmap.load(bgPath);
 
 	setCacheMode(DeviceCoordinateCache);
+	setAcceptsHoverEvents(true);
 }
 
 QRectF TableZone::boundingRect() const
@@ -90,7 +49,11 @@ void TableZone::addCardImpl(CardItem *card, int _x, int _y)
 
 void TableZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
 {
-	QPoint gridPoint = mapToGrid(dropPoint);
+	handleDropEventByGrid(cardId, startZone, mapToGrid(dropPoint), faceDown);
+}
+
+void TableZone::handleDropEventByGrid(int cardId, CardZone *startZone, const QPoint &gridPoint, bool faceDown)
+{
 	player->client->moveCard(cardId, startZone->getName(), getName(), gridPoint.x(), gridPoint.y(), faceDown);
 }
 
@@ -124,13 +87,21 @@ CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
 
 QPointF TableZone::mapFromGrid(const QPoint &gridPoint) const
 {
-	return QPointF(gridPoint.x() * CARD_WIDTH / gridPointsPerCardX,
-		gridPoint.y() * CARD_HEIGHT / gridPointsPerCardY);
+	if (gridPoint.y() == 3)
+		return QPointF(
+			20 + (CARD_WIDTH * gridPoint.x() + CARD_WIDTH * (gridPoint.x() / 3)) / gridPointsPerCardX,
+			(CARD_HEIGHT + paddingY) * gridPoint.y() / gridPointsPerCardY + (gridPoint.x() % 3 * CARD_HEIGHT) / 3
+		);
+	else
+		return QPointF(
+			20 + CARD_WIDTH * gridPoint.x() / gridPointsPerCardX,
+			(CARD_HEIGHT + paddingY) * gridPoint.y() / gridPointsPerCardY
+		);
 }
 
 QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 {
-	qreal x = mapPoint.x();
+	qreal x = mapPoint.x() - 20;
 	qreal y = mapPoint.y();
 	if (x < 0)
 		x = 0;
@@ -141,16 +112,27 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 	else if (y > height - CARD_HEIGHT)
 		y = height - CARD_HEIGHT;
 	
-	return QPoint((int) round(((double) x * gridPointsPerCardX) / CARD_WIDTH), (int) round(((double) y * gridPointsPerCardY) / CARD_HEIGHT));
+	if (y >= (CARD_HEIGHT + paddingY) * 3 - 1)
+		return QPoint(
+			(int) round(((double) x * gridPointsPerCardX) / CARD_WIDTH - x / (2 * CARD_WIDTH)),
+			3
+		);
+	else
+		return QPoint(
+			(int) round(((double) x * gridPointsPerCardX) / CARD_WIDTH),
+			(int) round(((double) y * gridPointsPerCardY) / (CARD_HEIGHT + paddingY))
+		);
 }
 
 QPoint TableZone::getFreeGridPoint(int row) const
 {
-	Q_ASSERT(row < gridPoints.size());
-	
-	QList<QPoint> pointList = gridPoints[row];
-	for (int i = 0; i < pointList.size(); i++)
-		if (!getCardFromGrid(pointList[i]))
-			return pointList[i];
-	return QPoint(0, 0);
+	int x = 0;
+	int y = 3 - row;
+	if (y == 3)
+		while (getCardFromGrid(QPoint(x, y)))
+			++x;
+	else
+		while (((x >= 2) && getCardFromGrid(QPoint(x - 2, y))) || ((x >= 1) && getCardFromGrid(QPoint(x - 1, y))) || getCardFromGrid(QPoint(x, y)) || getCardFromGrid(QPoint(x + 1, y)) || getCardFromGrid(QPoint(x + 2, y)))
+			++x;
+	return QPoint(x, y);
 }

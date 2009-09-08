@@ -241,7 +241,7 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 	else {
 		TableZone *table = (TableZone *) zone->getPlayer()->getZones()->findZone("table");
 		QPoint gridPoint = table->getFreeGridPoint(info->getTableRow());
-		table->handleDropEvent(id, zone, table->mapFromGrid(gridPoint).toPoint(), false);
+		table->handleDropEventByGrid(id, zone, gridPoint, false);
 	}
 }
 

@@ -5,7 +5,7 @@
 #include "playerlist.h"
 
 class ServerPlayer;
-class QGraphicsScene;
+class GameScene;
 class Player;
 class Client;
 class ServerEventData;
@@ -29,12 +29,12 @@ private:
 
 	CardDatabase *db;
 	Client *client;
-	QGraphicsScene *scene;
+	GameScene *scene;
 	PlayerList players;
 	Player *localPlayer;
 	bool started;
 	int currentPhase;
-	Player *addPlayer(int playerId, const QString &playerName, QPointF base, bool local);
+	Player *addPlayer(int playerId, const QString &playerName, bool local);
 	void initSayMenu();
 public slots:
 	void actNextPhase();
@@ -93,7 +93,7 @@ signals:
 	void logSetActivePlayer(Player *player);
 	void setActivePhase(int phase);
 public:
-	Game(CardDatabase *_db, Client *_client, QGraphicsScene *_scene, QMenu *_actionsMenu, QMenu *_cardMenu, int playerId, const QString &playerName, QObject *parent = 0);
+	Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenu *_actionsMenu, QMenu *_cardMenu, int playerId, const QString &playerName, QObject *parent = 0);
 	~Game();
 	Player *getLocalPlayer() const { return localPlayer; }
 	void retranslateUi();
