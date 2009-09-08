@@ -50,6 +50,7 @@ public:
 	void setView(ZoneViewZone *_view);
 	virtual void reorganizeCards() = 0;
 	void moveAllToZone(const QString &targetZone, int targetX);
+	virtual QPointF closestGridPoint(const QPointF &point);
 };
 
 #endif

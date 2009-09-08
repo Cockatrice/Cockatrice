@@ -103,3 +103,8 @@ void CardZone::moveAllToZone(const QString &targetZone, int targetX)
 	for (int i = cards.size() - 1; i >= 0; i--)
 		player->client->moveCard(cards.at(i)->getId(), getName(), targetZone, targetX);
 }
+
+QPointF CardZone::closestGridPoint(const QPointF &point)
+{
+	return point;
+}

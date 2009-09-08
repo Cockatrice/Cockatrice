@@ -54,14 +54,17 @@ private slots:
 	void handBgButtonClicked();
 	void tableBgButtonClicked();
 	void playerAreaBgButtonClicked();
+	void economicGridCheckBoxChanged(int state);
 signals:
 	void handBgChanged(const QString &path);
 	void tableBgChanged(const QString &path);
 	void playerAreaBgChanged(const QString &path);
+	void economicGridChanged(int state);
 private:
 	QLabel *handBgLabel, *tableBgLabel, *playerAreaBgLabel;
 	QLineEdit *handBgEdit, *tableBgEdit, *playerAreaBgEdit;
-	QGroupBox *zoneBgGroupBox;
+	QCheckBox *economicGridCheckBox;
+	QGroupBox *zoneBgGroupBox, *tableGroupBox;
 public:
 	AppearanceSettingsPage();
 	void retranslateUi();

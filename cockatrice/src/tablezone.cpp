@@ -4,12 +4,19 @@
 #include "client.h"
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "table", true, false, true, parent), width(864), height(536)
+	: CardZone(_p, "table", true, false, true, parent)
 {
 	QSettings settings;
 	QString bgPath = settings.value("zonebg/table").toString();
 	if (!bgPath.isEmpty())
 		bgPixmap.load(bgPath);
+
+	economicGrid = settings.value("table/economic", 1).toInt();
+	if (economicGrid)
+		height = 14.0 / 3 * CARD_HEIGHT + 3 * paddingY;
+	else
+		height = 4 * CARD_HEIGHT + 3 * paddingY;
+	width = 12 * CARD_WIDTH;
 
 	setCacheMode(DeviceCoordinateCache);
 	setAcceptsHoverEvents(true);
@@ -87,15 +94,22 @@ CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
 
 QPointF TableZone::mapFromGrid(const QPoint &gridPoint) const
 {
-	if (gridPoint.y() == 3)
+	qDebug(QString("mapFromGrid: %1, %2").arg(gridPoint.x()).arg(gridPoint.y()).toLatin1());
+	if (gridPoint.y() == 3) {
+		if (economicGrid)
+			return QPointF(
+				20 + (CARD_WIDTH * gridPoint.x() + CARD_WIDTH * (gridPoint.x() / 3)) / 2,
+				(CARD_HEIGHT + paddingY) * gridPoint.y() + (gridPoint.x() % 3 * CARD_HEIGHT) / 3
+			);
+		else
+			return QPointF(
+				20 + 3 * CARD_WIDTH * gridPoint.x() / 2,
+				(CARD_HEIGHT + paddingY) * gridPoint.y()
+			);
+	} else
 		return QPointF(
-			20 + (CARD_WIDTH * gridPoint.x() + CARD_WIDTH * (gridPoint.x() / 3)) / gridPointsPerCardX,
-			(CARD_HEIGHT + paddingY) * gridPoint.y() / gridPointsPerCardY + (gridPoint.x() % 3 * CARD_HEIGHT) / 3
-		);
-	else
-		return QPointF(
-			20 + CARD_WIDTH * gridPoint.x() / gridPointsPerCardX,
-			(CARD_HEIGHT + paddingY) * gridPoint.y() / gridPointsPerCardY
+			20 + CARD_WIDTH * gridPoint.x() / 2,
+			(CARD_HEIGHT + paddingY) * gridPoint.y()
 		);
 }
 
@@ -112,16 +126,28 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 	else if (y > height - CARD_HEIGHT)
 		y = height - CARD_HEIGHT;
 	
-	if (y >= (CARD_HEIGHT + paddingY) * 3 - 1)
+	qDebug(QString("mapToGrid: %1, %2").arg(x).arg(y).toLatin1());
+	if (y >= (CARD_HEIGHT + paddingY) * 3 - paddingY / 2) {
+		qDebug("UNTER grenze");
+		if (economicGrid)
+			return QPoint(
+				x * 2 / CARD_WIDTH - (x / (2 * CARD_WIDTH)),
+				3
+			);
+		else {
+			qDebug(QString("mapX = %1").arg((int) round((double) x / (1.25 * CARD_WIDTH))).toLatin1());
+			return QPoint(
+				x / (1.5 * CARD_WIDTH),
+				3
+			);
+		}
+	} else {
+		qDebug("UEBER grenze");
 		return QPoint(
-			(int) round(((double) x * gridPointsPerCardX) / CARD_WIDTH - x / (2 * CARD_WIDTH)),
-			3
+			x * 2 / CARD_WIDTH,
+			y / (CARD_HEIGHT + paddingY)
 		);
-	else
-		return QPoint(
-			(int) round(((double) x * gridPointsPerCardX) / CARD_WIDTH),
-			(int) round(((double) y * gridPointsPerCardY) / (CARD_HEIGHT + paddingY))
-		);
+	}
 }
 
 QPoint TableZone::getFreeGridPoint(int row) const
@@ -135,4 +161,9 @@ QPoint TableZone::getFreeGridPoint(int row) const
 		while (((x >= 2) && getCardFromGrid(QPoint(x - 2, y))) || ((x >= 1) && getCardFromGrid(QPoint(x - 1, y))) || getCardFromGrid(QPoint(x, y)) || getCardFromGrid(QPoint(x + 1, y)) || getCardFromGrid(QPoint(x + 2, y)))
 			++x;
 	return QPoint(x, y);
+}
+
+QPointF TableZone::closestGridPoint(const QPointF &point)
+{
+	return mapFromGrid(mapToGrid(point));
 }

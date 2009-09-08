@@ -213,6 +213,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	QPushButton *playerAreaBgButton = new QPushButton("...");
 	connect(playerAreaBgButton, SIGNAL(clicked()), this, SLOT(playerAreaBgButtonClicked()));
 	
+	settings.endGroup();
+
 	QGridLayout *zoneBgGrid = new QGridLayout;
 	zoneBgGrid->addWidget(handBgLabel, 0, 0);
 	zoneBgGrid->addWidget(handBgEdit, 0, 1);
@@ -226,8 +228,21 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
 	zoneBgGroupBox->setLayout(zoneBgGrid);
 	
+	tableGroupBox = new QGroupBox;
+	settings.beginGroup("table");
+	
+	economicGridCheckBox = new QCheckBox;
+	economicGridCheckBox->setChecked(settings.value("economic", 1).toInt());
+	connect(economicGridCheckBox, SIGNAL(stateChanged(int)), this, SLOT(economicGridCheckBoxChanged(int)));
+
+	QGridLayout *tableGrid = new QGridLayout;
+	tableGrid->addWidget(economicGridCheckBox, 0, 0, 1, 2);
+	
+	tableGroupBox->setLayout(tableGrid);
+	
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(zoneBgGroupBox);
+	mainLayout->addWidget(tableGroupBox);
 	
 	setLayout(mainLayout);
 
@@ -239,6 +254,9 @@ void AppearanceSettingsPage::retranslateUi()
 	handBgLabel->setText(tr("Path to hand background:"));
 	tableBgLabel->setText(tr("Path to table background:"));
 	playerAreaBgLabel->setText(tr("Path to player info background:"));
+	
+	tableGroupBox->setTitle(tr("Table grid layout"));
+	economicGridCheckBox->setText(tr("Economic layout"));
 }
 
 void AppearanceSettingsPage::handBgButtonClicked()
@@ -278,6 +296,15 @@ void AppearanceSettingsPage::playerAreaBgButtonClicked()
 	playerAreaBgEdit->setText(path);
 	
 	emit playerAreaBgChanged(path);
+}
+
+void AppearanceSettingsPage::economicGridCheckBoxChanged(int state)
+{
+	QSettings settings;
+	settings.beginGroup("table");
+	settings.setValue("economic", state);
+	
+	emit economicGridChanged(state);
 }
 
 MessagesSettingsPage::MessagesSettingsPage()

@@ -7,9 +7,8 @@ class TableZone : public CardZone {
 private:
 	int width, height;
 	QPixmap bgPixmap;
+	bool economicGrid;
 public:
-	static const int gridPointsPerCardX = 2;
-	static const int gridPointsPerCardY = 1;
 	static const int paddingY = 20;
 
 	TableZone(Player *_p, QGraphicsItem *parent = 0);
@@ -23,6 +22,7 @@ public:
 	QPointF mapFromGrid(const QPoint &gridPoint) const;
 	QPoint mapToGrid(const QPointF &mapPoint) const;
 	QPoint getFreeGridPoint(int row) const;
+	QPointF closestGridPoint(const QPointF &point);
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
 };

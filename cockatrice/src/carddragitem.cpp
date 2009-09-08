@@ -50,19 +50,17 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
 		return;
 	currentZone = cursorZone;
 	
-	QPointF newPos;
-	if (cursorZone->getName() == "table") {
-		TableZone *tableZone = (TableZone *) cursorZone;
-		QPointF cp = cursorZone->scenePos();
-		QPointF localpos = cursorScenePos - hotSpot - cp;
-		
-		newPos = cp + tableZone->mapFromGrid(tableZone->mapToGrid(localpos));
-	} else
-		newPos = cursorScenePos - hotSpot;
+	QPointF zonePos = currentZone->scenePos();
+	QPointF cursorPosInZone = cursorScenePos - zonePos;
+	QPointF cardTopLeft = cursorPosInZone - hotSpot;
+//	QPointF cardCenter = cardTopLeft + QPointF(CARD_WIDTH / 2, CARD_HEIGHT / 2);
+	QPointF newPos = zonePos + cursorZone->closestGridPoint(cardTopLeft + QPoint(CARD_WIDTH / 2, CARD_HEIGHT / 2));
+	
+//	qDebug(QString("cardTopLeft = %1, %2   cardCenter = %3, %4").arg((cardTopLeft).x()).arg((cardTopLeft).y()).arg(cardCenter.x()).arg(cardCenter.y()).toLatin1());
+
 	if (newPos != pos()) {
 		for (int i = 0; i < childDrags.size(); i++)
 			childDrags[i]->setPos(newPos + childDrags[i]->getHotSpot());
-//		qDebug(QString("setPos: x=%1, y=%2").arg(newPos.x()).arg(newPos.y()).toLatin1());
 		setPos(newPos);
 	}
 }
@@ -80,7 +78,6 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 	QPointF sp = pos();
 	qDebug(QString("sp: x=%1, y=%2").arg(sp.x()).arg(sp.y()).toLatin1());
 	sc->removeItem(this);
-	QList<QGraphicsItem *> colliding = sc->items(event->scenePos());
 
 	if (currentZone) {
 		CardZone *startZone = qgraphicsitem_cast<CardZone *>(item->parentItem());
