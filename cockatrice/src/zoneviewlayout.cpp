@@ -6,7 +6,7 @@
 ZoneViewLayout::ZoneViewLayout(CardDatabase *_db, QGraphicsItem *parent)
 	: QGraphicsWidget(parent), db(_db)
 {
-
+	resize(0, 0);
 }
 
 void ZoneViewLayout::reorganize()

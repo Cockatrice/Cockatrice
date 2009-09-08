@@ -13,6 +13,8 @@ class QAction;
 class ZoneViewZone;
 class Game;
 class Counter;
+class TableZone;
+class HandZone;
 
 class Player : public QObject, public QGraphicsItem {
 	Q_OBJECT
@@ -29,7 +31,11 @@ signals:
 	void logSetTapped(Player *player, QString cardName, bool tapped);
 	void logSetCounter(Player *player, QString counterName, int value, int oldValue);
 	void logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap);
+	
+	void sizeChanged();
 private slots:
+	void updateBoundingRect();
+	
 	void actMoveHandToTopLibrary();
 	void actMoveHandToBottomLibrary();
 
@@ -53,7 +59,11 @@ private:
 	int id;
 	bool active;
 	bool local;
+	
 	ZoneList zones;
+	TableZone *table;
+	HandZone *hand;
+	
 	CardDatabase *db;
 	void setCardAttrHelper(CardItem *card, const QString &aname, const QString &avalue, bool allCards);
 

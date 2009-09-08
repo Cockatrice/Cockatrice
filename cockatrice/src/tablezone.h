@@ -3,13 +3,18 @@
 
 #include "cardzone.h"
 
-class TableZone : public CardZone {
+class TableZone : public QObject, public CardZone {
+	Q_OBJECT
+signals:
+	void sizeChanged();
 private:
 	int width, height;
 	QPixmap bgPixmap;
 	bool economicGrid;
 public:
 	static const int paddingY = 20;
+	static const int marginX = 20;
+	static const int minWidth = 20;
 
 	TableZone(Player *_p, QGraphicsItem *parent = 0);
 	QRectF boundingRect() const;
@@ -23,6 +28,7 @@ public:
 	QPoint mapToGrid(const QPointF &mapPoint) const;
 	QPoint getFreeGridPoint(int row) const;
 	QPointF closestGridPoint(const QPointF &point);
+	CardItem *takeCard(int position, int cardId, const QString &cardName);
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
 };

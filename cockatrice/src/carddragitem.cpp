@@ -53,8 +53,7 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
 	QPointF zonePos = currentZone->scenePos();
 	QPointF cursorPosInZone = cursorScenePos - zonePos;
 	QPointF cardTopLeft = cursorPosInZone - hotSpot;
-//	QPointF cardCenter = cardTopLeft + QPointF(CARD_WIDTH / 2, CARD_HEIGHT / 2);
-	QPointF newPos = zonePos + cursorZone->closestGridPoint(cardTopLeft + QPoint(CARD_WIDTH / 2, CARD_HEIGHT / 2));
+	QPointF newPos = zonePos + cursorZone->closestGridPoint(cardTopLeft);
 	
 //	qDebug(QString("cardTopLeft = %1, %2   cardCenter = %3, %4").arg((cardTopLeft).x()).arg((cardTopLeft).y()).arg(cardCenter.x()).arg(cardCenter.y()).toLatin1());
 

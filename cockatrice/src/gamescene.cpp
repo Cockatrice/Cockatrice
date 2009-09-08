@@ -5,60 +5,57 @@
 GameScene::GameScene(ZoneViewLayout *_zvLayout, QObject *parent)
 	: QGraphicsScene(parent), zvLayout(_zvLayout)
 {
-	connect(zvLayout, SIGNAL(sizeChanged()), this, SLOT(updateSceneSize()));
+	connect(zvLayout, SIGNAL(sizeChanged()), this, SLOT(rearrange()));
 	addItem(zvLayout);
-}
-
-void GameScene::updateSceneSize()
-{
-	int sceneWidth = 0;
-	int sceneHeight = 0;
-	for (int i = 0; i < players.size(); ++i) {
-		const QRectF br = players[i]->boundingRect();
-		if (i)
-			sceneHeight += playerAreaSpacing;
-		sceneHeight += br.height();
-		if (br.width() > sceneWidth)
-			sceneWidth = br.width();
-	}
-	sceneWidth += zvLayout->size().width();
-	qDebug(QString("updateSceneSize: w=%1 h=%2").arg(sceneWidth).arg(sceneHeight).toLatin1());
-	setSceneRect(sceneRect().x(), sceneRect().y(), sceneWidth, sceneHeight);
 }
 
 void GameScene::addPlayer(Player *player)
 {
 	players << player;
-	updateSceneSize();
 	addItem(player);
-	rearrangePlayers();
+	rearrange();
+	connect(player, SIGNAL(sizeChanged()), this, SLOT(rearrange()));
 }
 
 void GameScene::removePlayer(Player *player)
 {
 	players.removeAt(players.indexOf(player));
 	removeItem(player);
-	updateSceneSize();
-	rearrangePlayers();
+	rearrange();
 }
 
-void GameScene::rearrangePlayers()
+void GameScene::rearrange()
 {
+	struct PlayerProcessor {
+		static void processPlayer(Player *p, qreal &w, qreal &h, QPointF &b)
+		{
+			const QRectF br = p->boundingRect();
+			if (br.width() > w)
+				w = br.width();
+			if (h)
+				h += playerAreaSpacing;
+			h += br.height();
+			p->setPos(b);
+			b += QPointF(0, br.height() + playerAreaSpacing);
+		}
+	};
+
 	QPointF base;
-	qreal maxWidth = 0;
+	qreal sceneWidth = 0;
+	qreal sceneHeight = 0;
 	Player *localPlayer = 0;
-	for (int i = 0; i < players.size(); ++i) {
-		QRectF br = players[i]->boundingRect();
-		if (br.width() > maxWidth)
-			maxWidth = br.width();
-		if (!players[i]->getLocal()) {
-			players[i]->setPos(base);
-			// Change this for better multiplayer support.
-			base += QPointF(0, br.height() + playerAreaSpacing);
-		} else
+
+	for (int i = 0; i < players.size(); ++i)
+		if (!players[i]->getLocal())
+			PlayerProcessor::processPlayer(players[i], sceneWidth, sceneHeight, base);
+		else
 			localPlayer = players[i];
-	}
 	if (localPlayer)
-		localPlayer->setPos(base);
-	zvLayout->setPos(QPointF(maxWidth, 0));
+		PlayerProcessor::processPlayer(localPlayer, sceneWidth, sceneHeight, base);
+
+	zvLayout->setPos(QPointF(sceneWidth, 0));
+	sceneWidth += zvLayout->size().width();
+	setSceneRect(sceneRect().x(), sceneRect().y(), sceneWidth, sceneHeight);
+
+	qDebug(QString("rearrange(): w=%1 h=%2").arg(sceneWidth).arg(sceneHeight).toLatin1());
 }

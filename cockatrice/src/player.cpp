@@ -37,15 +37,16 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 	PileZone *sb = new PileZone(this, "sb", false, true, this);
 	sb->setVisible(false);
 
-	CardZone *table = new TableZone(this, this);
-	CardZone *hand = new HandZone(this, table->boundingRect().height(), this);
+	table = new TableZone(this, this);
+	connect(table, SIGNAL(sizeChanged()), this, SLOT(updateBoundingRect()));
+	hand = new HandZone(this, table->boundingRect().height(), this);
 	
 	base = QPointF(deck->boundingRect().width() + 60, 0);
 	hand->setPos(base);
 	base += QPointF(hand->boundingRect().width(), 0);
 	table->setPos(base);
-
-	bRect = QRectF(0, 0, base.x() + table->boundingRect().width(), base.y() + table->boundingRect().height());
+	
+	updateBoundingRect();
 
 	if (local) {
 		aMoveHandToTopLibrary = new QAction(this);
@@ -83,7 +84,7 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 		handMenu = playerMenu->addMenu(QString());
 		handMenu->addAction(aMoveHandToTopLibrary);
 		handMenu->addAction(aMoveHandToBottomLibrary);
-		zones.findZone("hand")->setMenu(handMenu);
+		hand->setMenu(handMenu);
 
 		libraryMenu = playerMenu->addMenu(QString());
 		libraryMenu->addAction(aDrawCard);
@@ -93,7 +94,7 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 		libraryMenu->addSeparator();
 		libraryMenu->addAction(aViewLibrary);
 		libraryMenu->addAction(aViewTopCards);
-		zones.findZone("deck")->setMenu(libraryMenu, aDrawCard);
+		deck->setMenu(libraryMenu, aDrawCard);
 	} else {
 		handMenu = 0;
 		libraryMenu = 0;
@@ -101,16 +102,16 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 
 	graveMenu = playerMenu->addMenu(QString());
 	graveMenu->addAction(aViewGraveyard);
-	zones.findZone("grave")->setMenu(graveMenu, aViewGraveyard);
+	grave->setMenu(graveMenu, aViewGraveyard);
 
 	rfgMenu = playerMenu->addMenu(QString());
 	rfgMenu->addAction(aViewRfg);
-	zones.findZone("rfg")->setMenu(rfgMenu, aViewRfg);
+	rfg->setMenu(rfgMenu, aViewRfg);
 
 	if (local) {
 		sbMenu = playerMenu->addMenu(QString());
 		sbMenu->addAction(aViewSideboard);
-		zones.findZone("sb")->setMenu(sbMenu, aViewSideboard);
+		sb->setMenu(sbMenu, aViewSideboard);
 	} else
 		sbMenu = 0;
 	
@@ -125,6 +126,12 @@ Player::~Player()
 		delete zones.at(i);
 
 	clearCounters();
+}
+
+void Player::updateBoundingRect()
+{
+	bRect = QRectF(0, 0, CARD_WIDTH + 60 + hand->boundingRect().width() + table->boundingRect().width(), table->boundingRect().height());
+	emit sizeChanged();
 }
 
 void Player::retranslateUi()

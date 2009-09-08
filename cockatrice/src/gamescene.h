@@ -14,15 +14,13 @@ private:
 	
 	QList<Player *> players;
 	ZoneViewLayout *zvLayout;
-	
-	void rearrangePlayers();
 public:
 	GameScene(ZoneViewLayout *_zvLayout, QObject *parent = 0);
 public slots:
 	void addPlayer(Player *player);
 	void removePlayer(Player *player);
 private slots:
-	void updateSceneSize();
+	void rearrange();
 };
 
 #endif
