@@ -13,7 +13,7 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 
 	economicGrid = settings.value("table/economic", 1).toInt();
 	if (economicGrid)
-		height = 14.0 / 3 * CARD_HEIGHT + 3 * paddingY;
+		height = (int) (14.0 / 3 * CARD_HEIGHT + 3 * paddingY);
 	else
 		height = 4 * CARD_HEIGHT + 3 * paddingY;
 	width = minWidth + 2 * marginX;
@@ -103,7 +103,7 @@ void TableZone::resizeToContents()
 	int xMax = 0;
 	for (int i = 0; i < cards.size(); ++i)
 		if (cards[i]->pos().x() > xMax)
-			xMax = cards[i]->pos().x();
+			xMax = (int) cards[i]->pos().x();
 	xMax += 2 * CARD_WIDTH;
 	if (xMax < minWidth)
 		xMax = minWidth;
@@ -156,19 +156,19 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 		y = height - CARD_HEIGHT;
 	
 	QPoint result = QPoint(
-		x * 2 / CARD_WIDTH,
-		y / (CARD_HEIGHT + paddingY)
+		(int) (x * 2 / CARD_WIDTH),
+		(int) (y / (CARD_HEIGHT + paddingY))
 	);
 
 	if (result.y() == 3) {
 		if (economicGrid)
 			return QPoint(
-				x * 2 / CARD_WIDTH - floor(x / (2 * CARD_WIDTH)),
+				(int) (x * 2 / CARD_WIDTH - floor(x / (2 * CARD_WIDTH))),
 				3
 			);
 		else
 			return QPoint(
-				x / (1.5 * CARD_WIDTH),
+				(int) (x / (1.5 * CARD_WIDTH)),
 				3
 			);
 	} else

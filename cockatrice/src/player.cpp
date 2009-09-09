@@ -39,7 +39,7 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 
 	table = new TableZone(this, this);
 	connect(table, SIGNAL(sizeChanged()), this, SLOT(updateBoundingRect()));
-	hand = new HandZone(this, table->boundingRect().height(), this);
+	hand = new HandZone(this, (int) table->boundingRect().height(), this);
 	
 	base = QPointF(deck->boundingRect().width() + 60, 0);
 	hand->setPos(base);
