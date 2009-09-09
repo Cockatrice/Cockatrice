@@ -402,7 +402,8 @@ void Game::actRollDie()
 void Game::actCreateToken()
 {
 	QString cardname = QInputDialog::getText(0, tr("Create token"), tr("Name:"));
-	client->createToken("table", cardname, QString(), 0, 0);
+	if (!cardname.isEmpty())
+		client->createToken("table", cardname, QString(), 0, 0);
 }
 
 void Game::showCardMenu(QPoint p)
