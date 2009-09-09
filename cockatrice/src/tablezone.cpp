@@ -16,7 +16,7 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 		height = 14.0 / 3 * CARD_HEIGHT + 3 * paddingY;
 	else
 		height = 4 * CARD_HEIGHT + 3 * paddingY;
-	width = minWidth * CARD_WIDTH / 2;
+	width = minWidth + 2 * marginX;
 
 	setCacheMode(DeviceCoordinateCache);
 	setAcceptsHoverEvents(true);
@@ -29,25 +29,6 @@ QRectF TableZone::boundingRect() const
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-/*
-//	DEBUG
-	painter->fillRect(boundingRect(), Qt::black);
-	for (int i = 0; i < width; i += 2)
-		for (int j = 0; j < height; j += 2) {
-//			QPointF p = closestGridPoint(QPointF(i, j));
-			QPoint p = mapToGrid(QPointF(i, j));
-			QColor c;
-//			c.setHsv(p.x() / 2, p.y() / 3, 255);
-			c.setHsv(p.x() * 12, p.y() * 80, 255);
-			painter->setPen(c);
-			painter->setBrush(c);
-			painter->drawRect(i, j, 2, 2);
-		}
-	painter->setPen(Qt::black);
-	painter->drawLine(QPointF(0, 366), QPointF(1000, 366));
-//	DEBUG Ende
-*/
-	
 	if (bgPixmap.isNull())
 		painter->fillRect(boundingRect(), QColor(0, 0, 100));
 	else
@@ -60,18 +41,14 @@ void TableZone::addCardImpl(CardItem *card, int _x, int _y)
 	qreal x = mapPoint.x();
 	qreal y = mapPoint.y();
 	
-	if (x >= width - marginX - 2 * CARD_WIDTH) {
-		width += 2 * CARD_WIDTH;
-		emit sizeChanged();
-	}
-	
 	cards.append(card);
-//	if ((x != -1) && (y != -1)) {
-		if (!player->getLocal())
-			y = height - CARD_HEIGHT - y;
-		card->setPos(x, y);
-//	}
+	if (!player->getLocal())
+		y = height - CARD_HEIGHT - y;
+	card->setPos(x, y);
 	card->setGridPoint(QPoint(_x, _y));
+
+	resizeToContents();
+	
 	card->setZValue((y + CARD_HEIGHT) * 10000000 + x + 1000);
 	card->setParentItem(this);
 	card->setVisible(true);
@@ -108,21 +85,30 @@ void TableZone::toggleTapped()
 	}
 }
 
-CardItem *TableZone::takeCard(int position, int cardId, const QString &cardName)
+CardItem *TableZone::takeCard(int position, int cardId, const QString &cardName, bool canResize)
 {
 	CardItem *result = CardZone::takeCard(position, cardId, cardName);
+	if (canResize)
+		resizeToContents();
+	return result;
+}
+
+void TableZone::resizeToContents()
+{
+	qDebug("resizeToContents");
 	int xMax = 0;
 	for (int i = 0; i < cards.size(); ++i)
-		if (cards[i]->getGridPoint().x() > xMax)
-			xMax = cards[i]->getGridPoint().x();
+		if (cards[i]->pos().x() > xMax)
+			xMax = cards[i]->pos().x();
+	qDebug(QString("xMax = %1").arg(xMax).toLatin1());
+	xMax += 2 * CARD_WIDTH;
 	if (xMax < minWidth)
 		xMax = minWidth;
-	int newWidth = (xMax + 1) * CARD_WIDTH / 2 + 2 * marginX;
-	if (newWidth < width - 2 * CARD_WIDTH) {
+	int newWidth = xMax + 2 * marginX;
+	if (newWidth != width) {
 		width = newWidth;
 		emit sizeChanged();
 	}
-	return result;
 }
 
 CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const

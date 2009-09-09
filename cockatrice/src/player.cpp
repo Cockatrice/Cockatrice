@@ -332,7 +332,7 @@ void Player::gameEvent(const ServerEventData &event)
 				position = 0;
 			if (x == -1)
 				x = 0;
-			CardItem *card = startZone->takeCard(position, cardId, cardName);
+			CardItem *card = startZone->takeCard(position, cardId, cardName, startZone != targetZone);
 			if (!card) // XXX
 				qDebug("moveCard: card not found");
 

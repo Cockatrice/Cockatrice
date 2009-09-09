@@ -14,7 +14,7 @@ private:
 public:
 	static const int paddingY = 20;
 	static const int marginX = 20;
-	static const int minWidth = 20;
+	static const int minWidth = 20 * CARD_WIDTH / 2;
 
 	TableZone(Player *_p, QGraphicsItem *parent = 0);
 	QRectF boundingRect() const;
@@ -28,7 +28,8 @@ public:
 	QPoint mapToGrid(const QPointF &mapPoint) const;
 	QPoint getFreeGridPoint(int row) const;
 	QPointF closestGridPoint(const QPointF &point);
-	CardItem *takeCard(int position, int cardId, const QString &cardName);
+	CardItem *takeCard(int position, int cardId, const QString &cardName, bool canResize = true);
+	void resizeToContents();
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
 };

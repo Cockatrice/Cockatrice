@@ -69,7 +69,7 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
 	return c;
 }
 
-CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName)
+CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName, bool /*canResize*/)
 {
 	Q_ASSERT(position < cards.size());
 
