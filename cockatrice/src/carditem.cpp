@@ -209,14 +209,23 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 	createDragItem(id, event->pos(), event->scenePos(), faceDown);
 	dragItem->grabMouse();
+	
+	CardZone *zone = (CardZone *) parentItem();
 
 	QList<QGraphicsItem *> sel = scene()->selectedItems();
+	int j = 0;
 	for (int i = 0; i < sel.size(); i++) {
 		CardItem *c = (CardItem *) sel.at(i);
 		if (c == this)
 			continue;
-		CardDragItem *drag = new CardDragItem(c, c->getId(), c->pos() - pos(), false, dragItem);
-		drag->setPos(dragItem->pos() + c->pos() - pos());
+		++j;
+		QPointF childPos;
+		if (zone->getHasCardAttr())
+			childPos = c->pos() - pos();
+		else
+			childPos = QPointF(j * CARD_WIDTH / 2, 0);
+		CardDragItem *drag = new CardDragItem(c, c->getId(), childPos, false, dragItem);
+		drag->setPos(dragItem->pos() + childPos);
 		scene()->addItem(drag);
 	}
 	setCursor(Qt::OpenHandCursor);

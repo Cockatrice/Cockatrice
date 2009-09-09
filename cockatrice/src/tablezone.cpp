@@ -32,7 +32,12 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
 	if (bgPixmap.isNull())
 		painter->fillRect(boundingRect(), QColor(0, 0, 100));
 	else
-	painter->fillRect(boundingRect(), QBrush(bgPixmap));
+		painter->fillRect(boundingRect(), QBrush(bgPixmap));
+	painter->setPen(QColor(255, 255, 255, 40));
+	qreal separatorY = 3 * (CARD_HEIGHT + paddingY) - paddingY / 2;
+	if (!player->getLocal())
+		separatorY = height - separatorY;
+	painter->drawLine(QPointF(0, separatorY), QPointF(width, separatorY));
 }
 
 void TableZone::addCardImpl(CardItem *card, int _x, int _y)
@@ -95,12 +100,10 @@ CardItem *TableZone::takeCard(int position, int cardId, const QString &cardName,
 
 void TableZone::resizeToContents()
 {
-	qDebug("resizeToContents");
 	int xMax = 0;
 	for (int i = 0; i < cards.size(); ++i)
 		if (cards[i]->pos().x() > xMax)
 			xMax = cards[i]->pos().x();
-	qDebug(QString("xMax = %1").arg(xMax).toLatin1());
 	xMax += 2 * CARD_WIDTH;
 	if (xMax < minWidth)
 		xMax = minWidth;
@@ -121,7 +124,6 @@ CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
 
 QPointF TableZone::mapFromGrid(const QPoint &gridPoint) const
 {
-	qDebug(QString("mapFromGrid: %1, %2").arg(gridPoint.x()).arg(gridPoint.y()).toLatin1());
 	if (gridPoint.y() == 3) {
 		if (economicGrid)
 			return QPointF(
@@ -153,31 +155,24 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 	else if (y > height - CARD_HEIGHT)
 		y = height - CARD_HEIGHT;
 	
-	qDebug(QString("mapToGrid: %1, %2").arg(x).arg(y).toLatin1());
 	QPoint result = QPoint(
-//		(int) round((double) x * 2 / CARD_WIDTH),
-//		(int) round((double) y / (CARD_HEIGHT + paddingY))
 		x * 2 / CARD_WIDTH,
 		y / (CARD_HEIGHT + paddingY)
 	);
 
 	if (result.y() == 3) {
-		qDebug("UNTER grenze");
 		if (economicGrid)
 			return QPoint(
 				x * 2 / CARD_WIDTH - floor(x / (2 * CARD_WIDTH)),
 				3
 			);
-		else {
+		else
 			return QPoint(
 				x / (1.5 * CARD_WIDTH),
 				3
 			);
-		}
-	} else {
-		qDebug("UEBER grenze");
+	} else
 		return result;
-	}
 }
 
 QPoint TableZone::getFreeGridPoint(int row) const
