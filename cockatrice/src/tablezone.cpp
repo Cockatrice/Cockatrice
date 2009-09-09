@@ -179,12 +179,12 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 		qDebug("UNTER grenze");
 		if (economicGrid)
 			return QPoint(
-				x * 2 / CARD_WIDTH - (x / (2 * CARD_WIDTH)),
+				x * 2 / CARD_WIDTH - floor(x / (2 * CARD_WIDTH)),
 				3
 			);
 		else {
 			return QPoint(
-				round((double) x / (1.5 * CARD_WIDTH)),
+				x / (1.5 * CARD_WIDTH),
 				3
 			);
 		}
