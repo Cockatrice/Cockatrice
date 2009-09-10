@@ -17,12 +17,13 @@ private:
 	CardDatabase *db;
 public:
 	ZoneViewLayout(CardDatabase *_db, QGraphicsItem *parent = 0);
-	void reorganize();
+	void retranslateUi();
 public slots:
 	void toggleZoneView(Player *player, const QString &zoneName, int numberCards = 0);
 	void removeItem(ZoneViewWidget *item);
 	void removeItem(ZoneViewZone *item);
 	void closeMostRecentZoneView();
+	void reorganize();
 	void clear();
 };
 

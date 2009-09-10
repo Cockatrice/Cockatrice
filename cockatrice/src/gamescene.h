@@ -14,8 +14,10 @@ private:
 	
 	QList<Player *> players;
 	ZoneViewLayout *zvLayout;
+	QRectF playersRect;
 public:
 	GameScene(ZoneViewLayout *_zvLayout, QObject *parent = 0);
+	const QRectF &getPlayersRect() const { return playersRect; }
 public slots:
 	void addPlayer(Player *player);
 	void removePlayer(Player *player);

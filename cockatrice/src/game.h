@@ -88,8 +88,8 @@ signals:
 	void logSetTapped(Player *player, QString cardName, bool tapped);
 	void logSetCounter(Player *player, QString counterName, int value, int oldValue);
 	void logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap);
-	void logDumpZone(Player *player, CardZone *zone, Player *zoneOwner, int numberCards);
-	void logStopDumpZone(Player *player, CardZone *zone, Player *zoneOwner);
+	void logDumpZone(Player *player, CardZone *zone, int numberCards);
+	void logStopDumpZone(Player *player, CardZone *zone);
 	void logSetActivePlayer(Player *player);
 	void setActivePhase(int phase);
 public:

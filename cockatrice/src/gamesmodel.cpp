@@ -69,6 +69,9 @@ void GamesModel::updateGameList(ServerGame *game)
 
 void GamesModel::cleanList()
 {
+	if (gameList.isEmpty())
+		return;
+
 	beginRemoveRows(QModelIndex(), 0, gameList.size() - 1);
 	QListIterator<ServerGame *> i(gameList);
 	while (i.hasNext())

@@ -17,20 +17,21 @@ class ZoneViewWidget : public QGraphicsWidget {
 	Q_OBJECT
 private:
 	ZoneViewZone *zone;
-	int cmdId;
 	
 	QScrollBar *scrollBar;
-	QCheckBox *shuffleCheckBox;
+	QCheckBox *sortCheckBox, *shuffleCheckBox;
 	
 	CardDatabase *db;
 	Player *player;
 signals:
 	void closePressed(ZoneViewWidget *zv);
+	void sizeChanged();
 private slots:
-	void zoneDumpReceived(int commandId, QList<ServerZoneCard *> cards);
+	void resizeToZoneContents();
 public:
 	ZoneViewWidget(CardDatabase *_db, Player *_player, CardZone *_origZone, int numberCards = 0, QGraphicsItem *parent = 0);
 	ZoneViewZone *getZone() const { return zone; }
+	void retranslateUi();
 protected:
 	void closeEvent(QCloseEvent *event);
 };

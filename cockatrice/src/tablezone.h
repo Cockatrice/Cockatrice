@@ -3,7 +3,7 @@
 
 #include "cardzone.h"
 
-class TableZone : public QObject, public CardZone {
+class TableZone : public CardZone {
 	Q_OBJECT
 signals:
 	void sizeChanged();

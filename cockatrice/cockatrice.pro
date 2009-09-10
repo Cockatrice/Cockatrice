@@ -86,3 +86,4 @@ SOURCES += src/counter.cpp \
  src/chatwidget.cpp \
  src/gamescene.cpp
 TRANSLATIONS += translations/cockatrice_de.ts translations/cockatrice_en.ts
+CONFIG += qt debug

@@ -5,6 +5,7 @@
 #include "cardlist.h"
 #include "carditem.h"
 #include "abstractgraphicsitem.h"
+#include "translation.h"
 
 class Player;
 class ZoneViewZone;
@@ -12,7 +13,8 @@ class QMenu;
 class QAction;
 class QPainter;
 
-class CardZone : public AbstractGraphicsItem {
+class CardZone : public QObject, public AbstractGraphicsItem {
+	Q_OBJECT
 protected:
 	Player *player;
 	QString name;
@@ -25,6 +27,8 @@ protected:
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 	virtual void addCardImpl(CardItem *card, int x, int y) = 0;
+signals:
+	void contentsChanged();
 public:
 	enum { Type = typeZone };
 	int type() const { return Type; }
@@ -37,6 +41,7 @@ public:
 	QMenu *getMenu() const { return menu; }
 	void setMenu(QMenu *_menu, QAction *_doubleClickAction = 0) { menu = _menu; doubleClickAction = _doubleClickAction; }
 	QString getName() const { return name; }
+	QString getTranslatedName(bool hisOwn, GrammaticalCase gc) const;
 	Player *getPlayer() const { return player; }
 	bool contentsKnown() const { return cards.getContentsKnown(); }
 	const CardList &getCards() const { return cards; }

@@ -12,29 +12,6 @@ QString MessageLogWidget::sanitizeHtml(QString dirty) const
 		.replace(">", "&gt;");
 }
 
-QString MessageLogWidget::trZoneName(CardZone *zone, Player *owner, bool hisOwn, GrammaticalCase gc) const
-{
-	if (zone->getName() == "hand")
-		switch (gc) {
-//			case CaseNominative: return hisOwn ? tr("his hand") : tr("%1's hand").arg(owner->getName());
-			case CaseGenitive: return hisOwn ? tr("of his hand") : tr("of %1's hand").arg(owner->getName());
-			case CaseAccusative: return hisOwn ? tr("his hand") : tr("%1's hand").arg(owner->getName());
-		}
-	else if (zone->getName() == "deck")
-		switch (gc) {
-//			case CaseNominative: return hisOwn ? tr("his library") : tr("%1's library").arg(owner->getName());
-			case CaseGenitive: return hisOwn ? tr("of his library") : tr("of %1's library").arg(owner->getName());
-			case CaseAccusative: return hisOwn ? tr("his library") : tr("%1's library").arg(owner->getName());
-		}
-	else if (zone->getName() == "sb")
-		switch (gc) {
-//			case CaseNominative: return hisOwn ? tr("his sideboard") : tr("%1's sideboard").arg(owner->getName());
-			case CaseGenitive: return hisOwn ? tr("of his sideboard") : tr("of %1's sideboard").arg(owner->getName());
-			case CaseAccusative: return hisOwn ? tr("his sideboard") : tr("%1's sideboard").arg(owner->getName());
-		}
-	return QString();
-}
-
 void MessageLogWidget::logConnecting(QString hostname)
 {
 	append(tr("Connecting to %1...").arg(sanitizeHtml(hostname)));
@@ -226,17 +203,17 @@ void MessageLogWidget::logSetDoesntUntap(Player *player, QString cardName, bool 
 	append(finalStr.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
 }
 
-void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, Player *zoneOwner, int numberCards)
+void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCards)
 {
 	if (numberCards != -1)
-		append(tr("%1 is looking at the top %2 cards %3.").arg(sanitizeHtml(player->getName())).arg(numberCards).arg(trZoneName(zone, zoneOwner, zoneOwner == player, CaseGenitive)));
+		append(tr("%1 is looking at the top %2 cards %3.").arg(sanitizeHtml(player->getName())).arg(numberCards).arg(zone->getTranslatedName(zone->getPlayer() == player, CaseGenitive)));
 	else
-		append(tr("%1 is looking at %2.").arg(sanitizeHtml(player->getName())).arg(trZoneName(zone, zoneOwner, zoneOwner == player, CaseAccusative)));
+		append(tr("%1 is looking at %2.").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(zone->getPlayer() == player, CaseAccusative)));
 }
 
-void MessageLogWidget::logStopDumpZone(Player *player, CardZone *zone, Player *zoneOwner)
+void MessageLogWidget::logStopDumpZone(Player *player, CardZone *zone)
 {
-	QString zoneName = trZoneName(zone, zoneOwner, zoneOwner == player, CaseAccusative);
+	QString zoneName = zone->getTranslatedName(zone->getPlayer() == player, CaseAccusative);
 	append(tr("%1 stops looking at %2.").arg(sanitizeHtml(player->getName())).arg(zoneName));
 }
 
@@ -283,8 +260,8 @@ void MessageLogWidget::connectToGame(Game *game)
 	connect(game, SIGNAL(logSetTapped(Player *, QString, bool)), this, SLOT(logSetTapped(Player *, QString, bool)));
 	connect(game, SIGNAL(logSetCounter(Player *, QString, int, int)), this, SLOT(logSetCounter(Player *, QString, int, int)));
 	connect(game, SIGNAL(logSetDoesntUntap(Player *, QString, bool)), this, SLOT(logSetDoesntUntap(Player *, QString, bool)));
-	connect(game, SIGNAL(logDumpZone(Player *, CardZone *, Player *, int)), this, SLOT(logDumpZone(Player *, CardZone *, Player *, int)));
-	connect(game, SIGNAL(logStopDumpZone(Player *, CardZone *, Player *)), this, SLOT(logStopDumpZone(Player *, CardZone *, Player *)));
+	connect(game, SIGNAL(logDumpZone(Player *, CardZone *, int)), this, SLOT(logDumpZone(Player *, CardZone *, int)));
+	connect(game, SIGNAL(logStopDumpZone(Player *, CardZone *)), this, SLOT(logStopDumpZone(Player *, CardZone *)));
 	connect(game, SIGNAL(logSetActivePlayer(Player *)), this, SLOT(logSetActivePlayer(Player *)));
 	connect(game, SIGNAL(setActivePhase(int)), this, SLOT(logSetActivePhase(int)));
 	

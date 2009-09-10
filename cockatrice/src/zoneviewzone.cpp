@@ -4,7 +4,7 @@
 #include "client.h"
 
 ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, QGraphicsItem *parent)
-	: CardZone(_p, _origZone->getName(), false, false, true, parent, true), height(0), numberCards(_numberCards), origZone(_origZone)
+	: CardZone(_p, _origZone->getName(), false, false, true, parent, true), height(0), numberCards(_numberCards), origZone(_origZone), sortingEnabled(false)
 {
 	origZone->setView(this);
 }
@@ -24,19 +24,40 @@ void ZoneViewZone::paint(QPainter */*painter*/, const QStyleOptionGraphicsItem *
 {
 }
 
-bool ZoneViewZone::initializeCards()
+void ZoneViewZone::initializeCards()
 {
-	if (!origZone->contentsKnown())
-		return false;
-
-	const CardList &c = origZone->getCards();
-	int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
-	for (int i = 0; i < number; i++) {
-		CardItem *card = c.at(i);
-		addCard(new CardItem(player->getDb(), card->getName(), card->getId(), this), false, i);
+	if (!origZone->contentsKnown()) {
+		connect(player->client, SIGNAL(zoneDumpReceived(int, QList<ServerZoneCard *>)), this, SLOT(zoneDumpReceived(int, QList<ServerZoneCard *>)));
+		PendingCommand *dumpZoneCommand = player->client->dumpZone(player->getId(), name, numberCards);
+		cmdId = dumpZoneCommand->getMsgId();
+	} else {
+		const CardList &c = origZone->getCards();
+		int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
+		for (int i = 0; i < number; i++) {
+			CardItem *card = c.at(i);
+			addCard(new CardItem(player->getDb(), card->getName(), card->getId(), this), false, i);
+		}
+		emit contentsChanged();
+		reorganizeCards();
 	}
+}
+
+void ZoneViewZone::zoneDumpReceived(int commandId, QList<ServerZoneCard *> cards)
+{
+	if (commandId != cmdId)
+		return;
+
+	for (int i = 0; i < cards.size(); i++) {
+		ServerZoneCard *temp = cards[i];
+
+		CardItem *card = new CardItem(player->getDb(), temp->getName(), i, this);
+		addCard(card, false, i);
+
+		delete temp;
+	}
+	
+	emit contentsChanged();
 	reorganizeCards();
-	return true;
 }
 
 // Because of boundingRect(), this function must not be called before the zone was added to a scene.
@@ -48,15 +69,23 @@ void ZoneViewZone::reorganizeCards()
 		return;
 
 	int cardCount = cards.size();
+	if (!origZone->contentsKnown())
+		for (int i = 0; i < cardCount; ++i)
+			cards[i]->setId(i);
+	
 	qreal totalWidth = boundingRect().width();
 	qreal totalHeight = boundingRect().height();
 	qreal cardWidth = cards.at(0)->boundingRect().width();
 	qreal cardHeight = cards.at(0)->boundingRect().height();
 	qreal x1 = 0;
 	qreal x2 = (totalWidth - cardWidth);
-
+	
+	CardList cardsToDisplay(cards);
+	if (sortingEnabled)
+		cardsToDisplay.sort();
+	
 	for (int i = 0; i < cardCount; i++) {
-		CardItem *c = cards.at(i);
+		CardItem *c = cardsToDisplay.at(i);
 		qreal x = i % 2 ? x2 : x1;
 		// If the total height of the cards is smaller than the available height,
 		// the cards do not need to overlap and are displayed in the center of the area.
@@ -64,10 +93,14 @@ void ZoneViewZone::reorganizeCards()
 			c->setPos(x, ((qreal) i) * (totalHeight - cardHeight) / (cardCount - 1));
 		else
 			c->setPos(x, ((qreal) i) * cardHeight + (totalHeight - cardCount * cardHeight) / 2);
-		if (!origZone->contentsKnown())
-			c->setId(i);
 		c->setZValue(i);
 	}
+}
+
+void ZoneViewZone::setSortingEnabled(int _sortingEnabled)
+{
+	sortingEnabled = _sortingEnabled;
+	reorganizeCards();
 }
 
 void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
@@ -91,4 +124,21 @@ void ZoneViewZone::removeCard(int position)
 	CardItem *card = cards.takeAt(position);
 	delete card;
 	reorganizeCards();
+}
+
+void ZoneViewZone::setGeometry(const QRectF &rect)
+{
+	setPos(rect.topLeft());
+	height = rect.height();
+	reorganizeCards();
+}
+
+QSizeF ZoneViewZone::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+{
+	switch (which) {
+		case Qt::MinimumSize: return QSizeF(1.75 * CARD_WIDTH, 2 * CARD_HEIGHT);
+		case Qt::PreferredSize: return QSizeF(1.75 * CARD_WIDTH, constraint.height());
+		case Qt::MaximumSize: return QSizeF(1.75 * CARD_WIDTH, constraint.height());
+		default: return QSizeF();
+	}
 }

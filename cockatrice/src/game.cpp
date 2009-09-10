@@ -152,6 +152,7 @@ void Game::retranslateUi()
 	aMoveToTopLibrary->setText(tr("&top of library"));
 	aMoveToBottomLibrary->setText(tr("&bottom of library"));
 	aMoveToGraveyard->setText(tr("&graveyard"));
+	aMoveToGraveyard->setShortcut(tr("Ctrl+Del"));
 	aMoveToExile->setText(tr("&exile"));
 	
 	moveMenu->setTitle(tr("&Move to"));
@@ -319,7 +320,7 @@ void Game::gameEvent(const ServerEventData &msg)
 			CardZone *zone = zoneOwner->getZones()->findZone(data[1]);
 			if (!zone)
 				break;
-			emit logDumpZone(p, zone, zoneOwner, data[2].toInt());
+			emit logDumpZone(p, zone, data[2].toInt());
 			break;
 		}
 		case eventStopDumpZone: {
@@ -330,7 +331,7 @@ void Game::gameEvent(const ServerEventData &msg)
 			CardZone *zone = zoneOwner->getZones()->findZone(data[1]);
 			if (!zone)
 				break;
-			emit logStopDumpZone(p, zone, zoneOwner);
+			emit logStopDumpZone(p, zone);
 			break;
 		}
 		case eventMoveCard: {

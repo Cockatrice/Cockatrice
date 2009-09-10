@@ -234,15 +234,32 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	economicGridCheckBox = new QCheckBox;
 	economicGridCheckBox->setChecked(settings.value("economic", 1).toInt());
 	connect(economicGridCheckBox, SIGNAL(stateChanged(int)), this, SLOT(economicGridCheckBoxChanged(int)));
+	
+	settings.endGroup();
 
 	QGridLayout *tableGrid = new QGridLayout;
 	tableGrid->addWidget(economicGridCheckBox, 0, 0, 1, 2);
 	
 	tableGroupBox->setLayout(tableGrid);
 	
+	zoneViewGroupBox = new QGroupBox;
+	settings.beginGroup("zoneview");
+	
+	zoneViewSortingCheckBox = new QCheckBox;
+	zoneViewSortingCheckBox->setChecked(settings.value("sorting").toInt());
+	connect(zoneViewSortingCheckBox, SIGNAL(stateChanged(int)), this, SLOT(zoneViewSortingCheckBoxChanged(int)));
+	
+	settings.endGroup();
+
+	QGridLayout *zoneViewGrid = new QGridLayout;
+	zoneViewGrid->addWidget(zoneViewSortingCheckBox, 0, 0, 1, 2);
+	
+	zoneViewGroupBox->setLayout(zoneViewGrid);
+	
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(zoneBgGroupBox);
 	mainLayout->addWidget(tableGroupBox);
+	mainLayout->addWidget(zoneViewGroupBox);
 	
 	setLayout(mainLayout);
 
@@ -257,6 +274,9 @@ void AppearanceSettingsPage::retranslateUi()
 	
 	tableGroupBox->setTitle(tr("Table grid layout"));
 	economicGridCheckBox->setText(tr("Economic layout"));
+	
+	zoneViewGroupBox->setTitle(tr("Zone view layout"));
+	zoneViewSortingCheckBox->setText(tr("Sort alphabetically by default"));
 }
 
 void AppearanceSettingsPage::handBgButtonClicked()
@@ -305,6 +325,15 @@ void AppearanceSettingsPage::economicGridCheckBoxChanged(int state)
 	settings.setValue("economic", state);
 	
 	emit economicGridChanged(state);
+}
+
+void AppearanceSettingsPage::zoneViewSortingCheckBoxChanged(int state)
+{
+	QSettings settings;
+	settings.beginGroup("zoneview");
+	settings.setValue("sorting", state);
+	
+	emit zoneViewSortingChanged(state);
 }
 
 MessagesSettingsPage::MessagesSettingsPage()

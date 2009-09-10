@@ -30,3 +30,17 @@ CardItem *CardList::findCard(const int id, const bool remove, int *position)
 		}
 	return 0;
 }
+
+class CardList::compareFunctor {
+public:
+	inline bool operator()(CardItem *a, CardItem *b) const
+	{
+		return a->getName() < b->getName();
+	}
+};
+
+void CardList::sort()
+{
+	compareFunctor cf;
+	qSort(begin(), end(), cf);
+}

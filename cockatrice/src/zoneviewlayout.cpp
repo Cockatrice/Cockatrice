@@ -20,14 +20,17 @@ void ZoneViewLayout::reorganize()
 	qreal x, y;
 	views.at(0)->getWindowFrameMargins(&x, &y, 0, 0);
 	qreal totalWidth = x;
+	qreal totalHeight = 0;
 	for (int i = 0; i < views.size(); i++) {
 		QRectF viewSize = views.at(i)->windowFrameRect();
 		qreal w = viewSize.right() - viewSize.left();
-//		qreal h = viewSize.bottom() - viewSize.top();
+		qreal h = viewSize.bottom() - viewSize.top();
 		views.at(i)->setPos(totalWidth, y);
 		totalWidth += w;
+		if (h > totalHeight)
+			totalHeight = h;
 	}
-	resize(totalWidth, scene()->sceneRect().height());
+	resize(totalWidth, totalHeight);
 	emit sizeChanged();
 }
 
@@ -45,6 +48,7 @@ void ZoneViewLayout::toggleZoneView(Player *player, const QString &zoneName, int
 	ZoneViewWidget *item = new ZoneViewWidget(db, player, player->getZones()->findZone(zoneName), numberCards, this);
 	views.append(item);
 	connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeItem(ZoneViewWidget *)));
+	connect(item, SIGNAL(sizeChanged()), this, SLOT(reorganize()));
 	reorganize();
 }
 
@@ -69,6 +73,12 @@ void ZoneViewLayout::closeMostRecentZoneView()
 
 void ZoneViewLayout::clear()
 {
-	for (int i = views.size() - 1; i >= 0; i--)
+	for (int i = views.size() - 1; i >= 0; --i)
 		views.at(i)->close();
+}
+
+void ZoneViewLayout::retranslateUi()
+{
+	for (int i = views.size() - 1; i >= 0; --i)
+		views.at(i)->retranslateUi();
 }

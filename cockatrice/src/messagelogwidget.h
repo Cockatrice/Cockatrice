@@ -4,6 +4,7 @@
 #include <QPlainTextEdit>
 #include <QAbstractSocket>
 #include "client.h"
+#include "translation.h"
 
 class Game;
 class Player;
@@ -12,7 +13,6 @@ class CardZone;
 class MessageLogWidget : public QTextEdit {
 	Q_OBJECT
 private:
-	enum GrammaticalCase { /*CaseNominative, */CaseGenitive, CaseAccusative };
 	QString sanitizeHtml(QString dirty) const;
 	QString trZoneName(CardZone *zone, Player *player, bool hisOwn, GrammaticalCase gc) const;
 public slots:
@@ -37,8 +37,8 @@ private slots:
 	void logSetTapped(Player *player, QString cardName, bool tapped);
 	void logSetCounter(Player *player, QString counterName, int value, int oldValue);
 	void logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap);
-	void logDumpZone(Player *player, CardZone *zone, Player *zoneOwner, int numberCards);
-	void logStopDumpZone(Player *player, CardZone *zone, Player *zoneOwner);
+	void logDumpZone(Player *player, CardZone *zone, int numberCards);
+	void logStopDumpZone(Player *player, CardZone *zone);
 	void logSetActivePlayer(Player *player);
 	void logSetActivePhase(int phase);
 	void msgAlert();

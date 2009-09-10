@@ -53,8 +53,12 @@ void GameScene::rearrange()
 	if (localPlayer)
 		PlayerProcessor::processPlayer(localPlayer, sceneWidth, sceneHeight, base);
 
+	playersRect = QRectF(0, 0, sceneWidth, sceneHeight);
+	
 	zvLayout->setPos(QPointF(sceneWidth, 0));
 	sceneWidth += zvLayout->size().width();
+	if (zvLayout->size().height() > sceneHeight)
+		sceneHeight = zvLayout->size().height();
 	setSceneRect(sceneRect().x(), sceneRect().y(), sceneWidth, sceneHeight);
 
 	qDebug(QString("rearrange(): w=%1 h=%2").arg(sceneWidth).arg(sceneHeight).toLatin1());

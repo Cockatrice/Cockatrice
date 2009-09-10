@@ -215,6 +215,7 @@ void MainWindow::retranslateUi()
 	gameSelector->retranslateUi();
 	if (game)
 		game->retranslateUi();
+	zoneLayout->retranslateUi();
 }
 
 void MainWindow::createActions()

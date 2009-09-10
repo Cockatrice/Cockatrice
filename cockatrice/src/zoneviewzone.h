@@ -3,29 +3,37 @@
 
 #include "cardzone.h"
 #include "serverzonecard.h"
+#include <QGraphicsWidget>
+#include <QGraphicsLayoutItem>
 
 class ZoneViewWidget;
 
-class ZoneViewZone : public CardZone {
+class ZoneViewZone : public CardZone, public QGraphicsLayoutItem {
+	Q_OBJECT
 private:
 	int height;
 	int numberCards;
 	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
 	CardZone *origZone;
-signals:
-	void removeZoneViewWidget(ZoneViewWidget *zv);
+	bool sortingEnabled;
+	int cmdId;
 public:
 	ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards = -1, QGraphicsItem *parent = 0);
 	~ZoneViewZone();
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	void reorganizeCards();
-	bool initializeCards();
+	void initializeCards();
 	void removeCard(int position);
-	void setHeight(int _height) { height = _height; }
+	void setGeometry(const QRectF &rect);
 	int getNumberCards() const { return numberCards; }
+public slots:
+	void setSortingEnabled(int _sortingEnabled);
+private slots:
+	void zoneDumpReceived(int commandId, QList<ServerZoneCard *> cards);
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
+	QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 };
 
 #endif

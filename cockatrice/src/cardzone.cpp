@@ -26,6 +26,42 @@ void CardZone::clearContents()
 	cards.clear();
 }
 
+QString CardZone::getTranslatedName(bool hisOwn, GrammaticalCase gc) const
+{
+	QString ownerName = player->getName();
+	if (name == "hand")
+		switch (gc) {
+			case CaseNominative: return hisOwn ? tr("his hand") : tr("%1's hand").arg(ownerName);
+			case CaseGenitive: return hisOwn ? tr("of his hand") : tr("of %1's hand").arg(ownerName);
+			case CaseAccusative: return hisOwn ? tr("his hand") : tr("%1's hand").arg(ownerName);
+		}
+	else if (name == "deck")
+		switch (gc) {
+			case CaseNominative: return hisOwn ? tr("his library") : tr("%1's library").arg(ownerName);
+			case CaseGenitive: return hisOwn ? tr("of his library") : tr("of %1's library").arg(ownerName);
+			case CaseAccusative: return hisOwn ? tr("his library") : tr("%1's library").arg(ownerName);
+		}
+	else if (name == "grave")
+		switch (gc) {
+			case CaseNominative: return hisOwn ? tr("his graveyard") : tr("%1's graveyard").arg(ownerName);
+			case CaseGenitive: return hisOwn ? tr("of his graveyard") : tr("of %1's graveyard").arg(ownerName);
+			case CaseAccusative: return hisOwn ? tr("his graveyard") : tr("%1's graveyard").arg(ownerName);
+		}
+	else if (name == "rfg")
+		switch (gc) {
+			case CaseNominative: return hisOwn ? tr("his exile") : tr("%1's exile").arg(ownerName);
+			case CaseGenitive: return hisOwn ? tr("of his exile") : tr("of %1's exile").arg(ownerName);
+			case CaseAccusative: return hisOwn ? tr("his exile") : tr("%1's exile").arg(ownerName);
+		}
+	else if (name == "sb")
+		switch (gc) {
+			case CaseNominative: return hisOwn ? tr("his sideboard") : tr("%1's sideboard").arg(ownerName);
+			case CaseGenitive: return hisOwn ? tr("of his sideboard") : tr("of %1's sideboard").arg(ownerName);
+			case CaseAccusative: return hisOwn ? tr("his sideboard") : tr("%1's sideboard").arg(ownerName);
+		}
+	return QString();
+}
+
 void CardZone::mouseDoubleClickEvent(QGraphicsSceneMouseEvent */*event*/)
 {
 	if (doubleClickAction)
@@ -52,8 +88,12 @@ void CardZone::addCard(CardItem *card, bool reorganize, int x, int y)
 
 	addCardImpl(card, x, y);
 
-	if (reorganize)
+	if (reorganize) {
+		qDebug("------------ emitting");
+		dumpObjectInfo();
+		emit contentsChanged();
 		reorganizeCards();
+	}
 }
 
 CardItem *CardZone::getCard(int cardId, const QString &cardName)
@@ -81,6 +121,7 @@ CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName, 
 	c->setId(cardId);
 	c->setName(cardName);
 
+	emit contentsChanged();
 	reorganizeCards();
 	return c;
 }
