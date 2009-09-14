@@ -31,7 +31,7 @@
 #include "chatchannel.h"
 
 ServerSocket::ServerSocket(Server *_server, QObject *parent)
- : QTcpSocket(parent), server(_server), game(0), PlayerStatus(StatusNormal), authState(PasswordWrong), acceptsGameListChanges(false)
+ : QTcpSocket(parent), server(_server), game(0), spectator(false), PlayerStatus(StatusNormal), authState(PasswordWrong), acceptsGameListChanges(false)
 {
 	remsg = new ReturnMessage(this);
 	connect(this, SIGNAL(readyRead()), this, SLOT(readClient()));
@@ -166,62 +166,64 @@ void ServerSocket::readClient()
 }
 
 const ServerSocket::CommandProperties ServerSocket::commandList[ServerSocket::numberCommands] = {
-	{"ping", false, false, false, QList<QVariant::Type>(), &ServerSocket::cmdPing},
-	{"login", false, false, false, QList<QVariant::Type>() << QVariant::String
+	{"ping", false, false, false, true, QList<QVariant::Type>(), &ServerSocket::cmdPing},
+	{"login", false, false, false, true, QList<QVariant::Type>() << QVariant::String
 							       << QVariant::String, &ServerSocket::cmdLogin},
-	{"chat_list_channels", true, false, false, QList<QVariant::Type>(), &ServerSocket::cmdChatListChannels},
-	{"chat_join_channel", true, false, false, QList<QVariant::Type>() << QVariant::String, &ServerSocket::cmdChatJoinChannel},
-	{"chat_leave_channel", true, false, false, QList<QVariant::Type>() << QVariant::String, &ServerSocket::cmdChatLeaveChannel},
-	{"chat_say", true, false, false, QList<QVariant::Type>() << QVariant::String
+	{"chat_list_channels", true, false, false, true, QList<QVariant::Type>(), &ServerSocket::cmdChatListChannels},
+	{"chat_join_channel", true, false, false, true, QList<QVariant::Type>() << QVariant::String, &ServerSocket::cmdChatJoinChannel},
+	{"chat_leave_channel", true, false, false, true,  QList<QVariant::Type>() << QVariant::String, &ServerSocket::cmdChatLeaveChannel},
+	{"chat_say", true, false, false, true,  QList<QVariant::Type>() << QVariant::String
 								 << QVariant::String, &ServerSocket::cmdChatSay},
-	{"list_games", true, false, false, QList<QVariant::Type>(), &ServerSocket::cmdListGames},
-	{"create_game", true, false, false, QList<QVariant::Type>() << QVariant::String
+	{"list_games", true, false, false, true,  QList<QVariant::Type>(), &ServerSocket::cmdListGames},
+	{"create_game", true, false, false, true,  QList<QVariant::Type>() << QVariant::String
 								    << QVariant::String
-								    << QVariant::Int, &ServerSocket::cmdCreateGame},
-	{"join_game", true, false, false, QList<QVariant::Type>() << QVariant::Int
-								  << QVariant::String, &ServerSocket::cmdJoinGame},
-	{"leave_game", true, true, false, QList<QVariant::Type>(), &ServerSocket::cmdLeaveGame},
-	{"list_players", true, true, false, QList<QVariant::Type>(), &ServerSocket::cmdListPlayers},
-	{"say", true, true, false, QList<QVariant::Type>() << QVariant::String, &ServerSocket::cmdSay},
-	{"submit_deck", true, true, false, QList<QVariant::Type>(), &ServerSocket::cmdSubmitDeck},
-	{"ready_start", true, true, false, QList<QVariant::Type>(), &ServerSocket::cmdReadyStart},
-	{"shuffle", true, true, true, QList<QVariant::Type>(), &ServerSocket::cmdShuffle},
-	{"draw_cards", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdDrawCards},
-	{"reveal_card", true, true, true, QList<QVariant::Type>() << QVariant::Int
+								    << QVariant::Int
+								    << QVariant::Bool, &ServerSocket::cmdCreateGame},
+	{"join_game", true, false, false, true,  QList<QVariant::Type>() << QVariant::Int
+								  << QVariant::String
+								  << QVariant::Bool, &ServerSocket::cmdJoinGame},
+	{"leave_game", true, true, false, true,  QList<QVariant::Type>(), &ServerSocket::cmdLeaveGame},
+	{"list_players", true, true, false, true,  QList<QVariant::Type>(), &ServerSocket::cmdListPlayers},
+	{"say", true, true, false, false, QList<QVariant::Type>() << QVariant::String, &ServerSocket::cmdSay},
+	{"submit_deck", true, true, false, false, QList<QVariant::Type>(), &ServerSocket::cmdSubmitDeck},
+	{"ready_start", true, true, false, false, QList<QVariant::Type>(), &ServerSocket::cmdReadyStart},
+	{"shuffle", true, true, true, false, QList<QVariant::Type>(), &ServerSocket::cmdShuffle},
+	{"draw_cards", true, true, true, false, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdDrawCards},
+	{"reveal_card", true, true, true, false, QList<QVariant::Type>() << QVariant::Int
 								  << QVariant::String, &ServerSocket::cmdRevealCard},
-	{"move_card", true, true, true, QList<QVariant::Type>() << QVariant::Int
+	{"move_card", true, true, true, false, QList<QVariant::Type>() << QVariant::Int
 								<< QVariant::String
 								<< QVariant::String
 								<< QVariant::Int
 								<< QVariant::Int
 								<< QVariant::Bool, &ServerSocket::cmdMoveCard},
-	{"create_token", true, true, true, QList<QVariant::Type>() << QVariant::String
+	{"create_token", true, true, true, false, QList<QVariant::Type>() << QVariant::String
 								   << QVariant::String
 								   << QVariant::String
 								   << QVariant::Int
 								   << QVariant::Int, &ServerSocket::cmdCreateToken},
-	{"set_card_attr", true, true, true, QList<QVariant::Type>() << QVariant::String
+	{"set_card_attr", true, true, true, false, QList<QVariant::Type>() << QVariant::String
 								    << QVariant::Int
 								    << QVariant::String
 								    << QVariant::String, &ServerSocket::cmdSetCardAttr},
-	{"inc_counter", true, true, true, QList<QVariant::Type>() << QVariant::String
+	{"inc_counter", true, true, true, false, QList<QVariant::Type>() << QVariant::String
 								  << QVariant::Int, &ServerSocket::cmdIncCounter},
-	{"add_counter", true, true, true, QList<QVariant::Type>() << QVariant::String
+	{"add_counter", true, true, true, false, QList<QVariant::Type>() << QVariant::String
 								  << QVariant::Int
 								  << QVariant::Int, &ServerSocket::cmdAddCounter},
-	{"set_counter", true, true, true, QList<QVariant::Type>() << QVariant::String
+	{"set_counter", true, true, true, false, QList<QVariant::Type>() << QVariant::String
 								  << QVariant::Int, &ServerSocket::cmdSetCounter},
-	{"del_counter", true, true, true, QList<QVariant::Type>() << QVariant::String, &ServerSocket::cmdDelCounter},
-	{"list_counters", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdListCounters},
-	{"list_zones", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdListZones},
-	{"dump_zone", true, true, true, QList<QVariant::Type>() << QVariant::Int
+	{"del_counter", true, true, true, false, QList<QVariant::Type>() << QVariant::String, &ServerSocket::cmdDelCounter},
+	{"list_counters", true, true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdListCounters},
+	{"list_zones", true, true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdListZones},
+	{"dump_zone", true, true, true, true, QList<QVariant::Type>() << QVariant::Int
 								<< QVariant::String
 								<< QVariant::Int, &ServerSocket::cmdDumpZone},
-	{"stop_dump_zone", true, true, true, QList<QVariant::Type>() << QVariant::Int
+	{"stop_dump_zone", true, true, true, true, QList<QVariant::Type>() << QVariant::Int
 								     << QVariant::String, &ServerSocket::cmdStopDumpZone},
-	{"roll_die", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdRollDie},
-	{"next_turn", true, true, true, QList<QVariant::Type>(), &ServerSocket::cmdNextTurn},
-	{"set_active_phase", true, true, true, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdSetActivePhase}
+	{"roll_die", true, true, true, false, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdRollDie},
+	{"next_turn", true, true, true, false, QList<QVariant::Type>(), &ServerSocket::cmdNextTurn},
+	{"set_active_phase", true, true, true, false, QList<QVariant::Type>() << QVariant::Int, &ServerSocket::cmdSetActivePhase}
 };
 
 ReturnMessage::ReturnCode ServerSocket::cmdPing(const QList<QVariant> &/*params*/)
@@ -311,10 +313,14 @@ ReturnMessage::ReturnCode ServerSocket::cmdCreateGame(const QList<QVariant> &par
 	QString description = params[0].toString();
 	QString password = params[1].toString();
 	int maxPlayers = params[2].toInt();
+	bool spectatorsAllowed = params[3].toBool();
+	
 	acceptsGameListChanges = false;
 	acceptsChatChannelListChanges = false;
+	spectator = false;
 	leaveGame();
-	emit createGame(description, password, maxPlayers, this);
+	emit createGame(description, password, maxPlayers, spectatorsAllowed, this);
+	
 	return ReturnMessage::ReturnOk;
 }
 
@@ -322,13 +328,21 @@ ReturnMessage::ReturnCode ServerSocket::cmdJoinGame(const QList<QVariant> &param
 {
 	int gameId = params[0].toInt();
 	QString password = params[1].toString();
-	if (!server->checkGamePassword(gameId, password))
-		return ReturnMessage::ReturnPasswordWrong;
-	acceptsGameListChanges = false;
-	acceptsChatChannelListChanges = false;
-	leaveGame();
-	emit joinGame(gameId, this);
-	return ReturnMessage::ReturnOk;
+	bool _spectator = params[2].toBool();
+	
+	ServerGame *g = server->getGame(gameId);
+	if (!g)
+		return ReturnMessage::ReturnNameNotFound;
+	
+	ReturnMessage::ReturnCode result = g->checkJoin(password, _spectator);
+	if (result == ReturnMessage::ReturnOk) {
+		acceptsGameListChanges = false;
+		acceptsChatChannelListChanges = false;
+		leaveGame();
+		spectator = _spectator;
+		g->addPlayer(this, spectator);
+	}
+	return result;
 }
 
 ReturnMessage::ReturnCode ServerSocket::cmdLeaveGame(const QList<QVariant> &/*params*/)
@@ -716,6 +730,8 @@ bool ServerSocket::parseCommand(QString line)
 			if (commandList[i].needsLogin && (authState == PasswordWrong))
 				return remsg->send(ReturnMessage::ReturnLoginNeeded);
 			// Check context
+			if (!commandList[i].allowedToSpectator && spectator)
+				return remsg->send(ReturnMessage::ReturnContextError);
 			if (commandList[i].needsGame && !game)
 				return remsg->send(ReturnMessage::ReturnContextError);
 			if (commandList[i].needsStartedGame && !game->getGameStarted())

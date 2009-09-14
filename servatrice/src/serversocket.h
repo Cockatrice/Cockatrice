@@ -40,8 +40,7 @@ private slots:
 	void readClient();
 	void catchSocketError(QAbstractSocket::SocketError socketError);
 signals:
-	void createGame(const QString description, const QString password, const int maxPlayers, ServerSocket *creator);
-	void joinGame(int gameId, ServerSocket *player);
+	void createGame(const QString description, const QString password, int maxPlayers, bool spectatorsAllowed, ServerSocket *creator);
 	void commandReceived(QString cmd, ServerSocket *player);
 	void broadcastEvent(const QString &event, ServerSocket *player);
 	void startGameIfReady();
@@ -52,6 +51,7 @@ private:
 		bool needsLogin;
 		bool needsGame;
 		bool needsStartedGame;
+		bool allowedToSpectator;
 		QList<QVariant::Type> paramTypes;
 		CommandHandler handler;
 	};
@@ -99,6 +99,7 @@ private:
 	QList<Counter *> counters;
 	int playerId;
 	QString playerName;
+	bool spectator;
 	int nextCardId;
 	int newCardId();
 	PlayerZone *getZone(const QString &name) const;
@@ -121,6 +122,7 @@ public:
 	void initConnection();
 	int getPlayerId() const { return playerId; }
 	void setPlayerId(int _id) { playerId = _id; }
+	bool getSpectator() const { return spectator; }
 	QString getPlayerName() const { return playerName; }
 	bool getAcceptsGameListChanges() const { return acceptsGameListChanges; }
 	bool getAcceptsChatChannelListChanges() const { return acceptsChatChannelListChanges; }

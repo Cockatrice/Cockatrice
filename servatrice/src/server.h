@@ -36,8 +36,7 @@ class Server : public QTcpServer
 {
 	Q_OBJECT
 private slots:
-	void addGame(const QString description, const QString password, const int maxPlayers, ServerSocket *creator);
-	void addClientToGame(int gameId, ServerSocket *client);
+	void addGame(const QString description, const QString password, int maxPlayers, bool spectatorsAllowed, ServerSocket *creator);
 	void gameClosing();
 	void broadcastChannelUpdate();
 public:
@@ -45,7 +44,6 @@ public:
 	~Server();
 	QSettings *settings;
 	bool openDatabase();
-	bool checkGamePassword(int gameId, const QString &password);
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
 	QList<ServerGame *> listOpenGames();
 	QList<ChatChannel *> getChatChannelList() { return chatChannelList; }

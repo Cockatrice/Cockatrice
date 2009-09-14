@@ -85,12 +85,12 @@ bool Server::openDatabase()
 	return true;
 }
 
-void Server::addGame(const QString description, const QString password, const int maxPlayers, ServerSocket *creator)
+void Server::addGame(const QString description, const QString password, int maxPlayers, bool spectatorsAllowed, ServerSocket *creator)
 {
-	ServerGame *newGame = new ServerGame(creator, nextGameId++, description, password, maxPlayers, this);
+	ServerGame *newGame = new ServerGame(creator, nextGameId++, description, password, maxPlayers, spectatorsAllowed, this);
 	games << newGame;
 	connect(newGame, SIGNAL(gameClosing()), this, SLOT(gameClosing()));
-	newGame->addPlayer(creator);
+	newGame->addPlayer(creator, false);
 	
 	broadcastGameListUpdate(newGame);
 }
@@ -99,8 +99,8 @@ void Server::incomingConnection(int socketId)
 {
 	ServerSocket *socket = new ServerSocket(this);
 	socket->setSocketDescriptor(socketId);
-	connect(socket, SIGNAL(createGame(const QString, const QString, const int, ServerSocket *)), this, SLOT(addGame(const QString, const QString, const int, ServerSocket *)));
-	connect(socket, SIGNAL(joinGame(int, ServerSocket *)), this, SLOT(addClientToGame(int, ServerSocket *)));
+	connect(socket, SIGNAL(createGame(const QString, const QString, int, bool, ServerSocket *)), this, SLOT(addGame(const QString, const QString, int, bool, ServerSocket *)));
+	connect(socket, SIGNAL(joinGame(int, bool, ServerSocket *)), this, SLOT(addClientToGame(int, bool, ServerSocket *)));
 	socket->initConnection();
 	players << socket;
 }
@@ -156,16 +156,6 @@ QList<ServerGame *> Server::listOpenGames()
 	return result;
 }
 
-bool Server::checkGamePassword(int gameId, const QString &password)
-{
-	ServerGame *tmp;
-	if ((tmp = getGame(gameId))) {
-		if ((!tmp->getGameStarted()) && (tmp->getPassword() == password) && (tmp->getPlayerCount() < tmp->getMaxPlayers()))
-			return true;
-	}
-	return false;
-}
-
 void Server::broadcastGameListUpdate(ServerGame *game)
 {
 	qDebug(QString("broadcastGameListUpdate() to %1 players").arg(players.size()).toLatin1());
@@ -181,13 +171,6 @@ void Server::broadcastChannelUpdate()
 	for (int i = 0; i < players.size(); ++i)
 	  	if (players[i]->getAcceptsChatChannelListChanges())
 		  	players[i]->msg(line);
-}
-
-void Server::addClientToGame(int gameId, ServerSocket *client)
-{
-	ServerGame *game = getGame(gameId);
-	game->addPlayer(client);
-	broadcastGameListUpdate(game);
 }
 
 void Server::gameClosing()

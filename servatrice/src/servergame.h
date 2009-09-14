@@ -21,6 +21,7 @@
 #define SERVERGAME_H
 
 #include <QStringList>
+#include "returnmessage.h"
 
 class ServerSocket;
 
@@ -29,18 +30,20 @@ class ServerGame : public QObject {
 private:
 	ServerSocket *creator;
 	QList<ServerSocket *> players;
+	QList<ServerSocket *> spectators;
 	bool gameStarted;
 	int gameId;
 	QString description;
 	QString password;
 	int maxPlayers;
 	int activePlayer, activePhase;
+	bool spectatorsAllowed;
 signals:
 	void gameClosing();
 public slots:
 	void broadcastEvent(const QString &event, ServerSocket *player);
 public:
-	ServerGame(ServerSocket *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, QObject *parent = 0);
+	ServerGame(ServerSocket *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent = 0);
 	~ServerGame();
 	ServerSocket *getCreator() const { return creator; }
 	bool getGameStarted() const { return gameStarted; }
@@ -49,10 +52,12 @@ public:
 	QString getDescription() const { return description; }
 	QString getPassword() const { return password; }
 	int getMaxPlayers() const { return maxPlayers; }
+	bool getSpectatorsAllowed() const { return spectatorsAllowed; }
 	QString getGameListLine() const;
 	QStringList getPlayerNames() const;
 	ServerSocket *getPlayer(int player_id);
-	void addPlayer(ServerSocket *player);
+	ReturnMessage::ReturnCode checkJoin(const QString &_password, bool spectator);
+	void addPlayer(ServerSocket *player, bool spectator);
 	void removePlayer(ServerSocket *player);
 	void startGameIfReady();
 	void msg(const QString &s);

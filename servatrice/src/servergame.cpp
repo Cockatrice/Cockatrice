@@ -22,8 +22,8 @@
 #include "serversocket.h"
 #include <QSqlQuery>
 
-ServerGame::ServerGame(ServerSocket *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, QObject *parent)
-	: QObject(parent), creator(_creator), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers)
+ServerGame::ServerGame(ServerSocket *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent)
+	: QObject(parent), creator(_creator), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), spectatorsAllowed(_spectatorsAllowed)
 {
 }
 
@@ -36,14 +36,16 @@ ServerGame::~ServerGame()
 QString ServerGame::getGameListLine() const
 {
 	if (players.isEmpty())
-		return QString("list_games|%1|||0|%2|").arg(gameId).arg(maxPlayers);
+		return QString("list_games|%1|||0|%2||0").arg(gameId).arg(maxPlayers);
 	else
-		return QString("list_games|%1|%2|%3|%4|%5|%6").arg(gameId)
+		return QString("list_games|%1|%2|%3|%4|%5|%6|%7|%8").arg(gameId)
 							      .arg(description)
 							      .arg(password.isEmpty() ? 0 : 1)
 							      .arg(players.size())
 							      .arg(maxPlayers)
-							      .arg(creator->getPlayerName());
+							      .arg(creator->getPlayerName())
+							      .arg(spectatorsAllowed ? 0 : 1)
+							      .arg(spectators.size());
 }
 
 QStringList ServerGame::getPlayerNames() const
@@ -113,29 +115,53 @@ void ServerGame::startGameIfReady()
 	setActivePlayer(0);
 }
 
-void ServerGame::addPlayer(ServerSocket *player)
+ReturnMessage::ReturnCode ServerGame::checkJoin(const QString &_password, bool spectator)
 {
-	int max = -1;
-	QListIterator<ServerSocket *> i(players);
-	while (i.hasNext()) {
-		int tmp = i.next()->getPlayerId();
-		if (tmp > max)
-			max = tmp;
-	}
-	player->setPlayerId(max + 1);
+	if (_password != password)
+		return ReturnMessage::ReturnPasswordWrong;
+	if (spectator) {
+		if (!spectatorsAllowed)
+			return ReturnMessage::ReturnSpectatorsNotAllowed;
+	} else if (gameStarted || (getPlayerCount() >= getMaxPlayers()))
+		return ReturnMessage::ReturnContextError;
+	
+	return ReturnMessage::ReturnOk;
+}
+
+void ServerGame::addPlayer(ServerSocket *player, bool spectator)
+{
+	if (!spectator) {
+		int max = -1;
+		QListIterator<ServerSocket *> i(players);
+		while (i.hasNext()) {
+			int tmp = i.next()->getPlayerId();
+			if (tmp > max)
+				max = tmp;
+		}
+		player->setPlayerId(max + 1);
+		player->msg(QString("private|||player_id|%1|%2").arg(max + 1).arg(player->getPlayerName()));
+	} else
+		player->setPlayerId(-1);
 	
 	player->setGame(this);
-	player->msg(QString("private|||player_id|%1|%2").arg(max + 1).arg(player->getPlayerName()));
-	broadcastEvent("join", player);
+	broadcastEvent(QString("join|%1").arg(spectator ? 1 : 0), player);
 	
-	players << player;
+	if (spectator)
+		spectators << player;
+	else
+		players << player;
 	
 	connect(player, SIGNAL(broadcastEvent(const QString &, ServerSocket *)), this, SLOT(broadcastEvent(const QString &, ServerSocket *)));
+	
+	qobject_cast<Server *>(parent())->broadcastGameListUpdate(this);
 }
 
 void ServerGame::removePlayer(ServerSocket *player)
 {
-	players.removeAt(players.indexOf(player));
+	if (player->getSpectator())
+		spectators.removeAt(spectators.indexOf(player));
+	else
+		players.removeAt(players.indexOf(player));
 	broadcastEvent("leave", player);
 	if (!players.size())
 		deleteLater();
