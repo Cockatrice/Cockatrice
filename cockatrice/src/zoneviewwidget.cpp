@@ -19,10 +19,13 @@ ZoneViewWidget::ZoneViewWidget(CardDatabase *_db, Player *_player, CardZone *_or
 	QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
 	setLayout(vbox);
 	
-	sortCheckBox = new QCheckBox;
-	QGraphicsProxyWidget *sortProxy = new QGraphicsProxyWidget;
-	sortProxy->setWidget(sortCheckBox);
-	vbox->addItem(sortProxy);
+	if (numberCards == -1) {
+		sortCheckBox = new QCheckBox;
+		QGraphicsProxyWidget *sortProxy = new QGraphicsProxyWidget;
+		sortProxy->setWidget(sortCheckBox);
+		vbox->addItem(sortProxy);
+	} else
+		sortCheckBox = 0;
 	
 	if (_origZone->getIsShufflable() && (numberCards == -1)) {
 		shuffleCheckBox = new QCheckBox;
@@ -48,14 +51,16 @@ ZoneViewWidget::ZoneViewWidget(CardDatabase *_db, Player *_player, CardZone *_or
 	resize(w, h);
 
 	zone = new ZoneViewZone(player, _origZone, numberCards, this);
-	connect(sortCheckBox, SIGNAL(stateChanged(int)), zone, SLOT(setSortingEnabled(int)));
 	connect(zone, SIGNAL(contentsChanged()), this, SLOT(resizeToZoneContents()));
 	zone->dumpObjectInfo();
 	vbox->addItem(zone);
 	zone->initializeCards();
 	
-	QSettings settings;
-	sortCheckBox->setChecked(settings.value("zoneview/sorting").toInt());
+	if (sortCheckBox) {
+		connect(sortCheckBox, SIGNAL(stateChanged(int)), zone, SLOT(setSortingEnabled(int)));
+		QSettings settings;
+		sortCheckBox->setChecked(settings.value("zoneview/sorting").toInt());
+	}
 
 	retranslateUi();
 }
@@ -63,7 +68,8 @@ ZoneViewWidget::ZoneViewWidget(CardDatabase *_db, Player *_player, CardZone *_or
 void ZoneViewWidget::retranslateUi()
 {
 	setWindowTitle(zone->getTranslatedName(false, CaseNominative));
-	sortCheckBox->setText(tr("sort alphabetically"));
+	if (sortCheckBox)
+		sortCheckBox->setText(tr("sort alphabetically"));
 	if (shuffleCheckBox)
 		shuffleCheckBox->setText(tr("shuffle when closing"));
 }

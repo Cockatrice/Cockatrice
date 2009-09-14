@@ -6,7 +6,7 @@ void AbstractGraphicsItem::paintNumberEllipse(int number, QPainter *painter)
 	painter->save();
 
 	QString numStr = QString::number(number);
-	QFont font("Times");
+	QFont font("Serif");
 	font.setPixelSize(32);
 	font.setWeight(QFont::Bold);
 	
