@@ -186,9 +186,9 @@ void OracleImporter::httpRequestFinished(int requestId, bool error)
 	progressDialog->setValue(++setIndex);
 	
 	if (setIndex == setsToDownload.size()) {
-		QMessageBox::information(0, tr("Import finished"), tr("Total: %1 cards imported").arg(cardHash.size()));
 		setIndex = -1;
 		saveToFile(dataDir + "/cards.xml");
+		QMessageBox::information(0, tr("Import finished"), tr("Total: %1 cards imported").arg(cardHash.size()));
 		qApp->quit();
 	} else
 		downloadNextFile();
