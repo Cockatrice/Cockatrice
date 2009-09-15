@@ -52,7 +52,7 @@ class Client : public QObject {
 	Q_OBJECT
 signals:
 	void statusChanged(ProtocolStatus _status);
-	void welcomeMsgReceived(QStringList welcomeMsg);
+	void welcomeMsgReceived(QString welcomeMsg);
 	void gameListEvent(ServerGame *game);
 	void playerListReceived(QList<ServerPlayer *> players);
 	void zoneListReceived(int commandId, QList<ServerZone *> zones);
@@ -64,6 +64,7 @@ signals:
 	void serverTimeout();
 	void logSocketError(const QString &errorString);
 	void serverError(ServerResponse resp);
+	void protocolVersionMismatch();
 private slots:
 	void slotConnected();
 	void readLine();
@@ -75,6 +76,7 @@ private slots:
 	void enterGameResponse(ServerResponse response);
 	void leaveGameResponse(ServerResponse response);
 private:
+	static const int protocolVersion = 1;
 	QTimer *timer;
 	QList<PendingCommand *> PendingCommands;
 	QTcpSocket *socket;
@@ -100,8 +102,8 @@ public slots:
 	PendingCommand *chatSay(const QString &name, const QString &s);
 	PendingCommand *listGames();
 	PendingCommand *listPlayers();
-	PendingCommand *createGame(const QString &description, const QString &password, unsigned int maxPlayers);
-	PendingCommand *joinGame(int gameId, const QString &password);
+	PendingCommand *createGame(const QString &description, const QString &password, unsigned int maxPlayers, bool spectatorsAllowed);
+	PendingCommand *joinGame(int gameId, const QString &password, bool spectator);
 	PendingCommand *leaveGame();
 	PendingCommand *login(const QString &name, const QString &pass);
 	PendingCommand *say(const QString &s);

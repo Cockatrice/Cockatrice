@@ -822,8 +822,7 @@ void ServerSocket::msg(const QString &s)
 
 void ServerSocket::initConnection()
 {
-	msg(QString("welcome||%1").arg(VERSION_STRING));
-	msg("welcome||.");
+	msg(QString("welcome|%1|%2").arg(PROTOCOL_VERSION).arg(VERSION_STRING));
 }
 
 void ServerSocket::catchSocketError(QAbstractSocket::SocketError socketError)

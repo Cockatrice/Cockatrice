@@ -131,15 +131,28 @@ void Client::readLine()
 				resp = RespErr;
 			emit responseReceived(msgid, resp);
 		} else if (prefix == "list_games") {
-			emit gameListEvent(new ServerGame(values[0].toInt(), values[5], values[1], values[2].toInt(), values[3].toInt(), values[4].toInt()));
-		} else if ((prefix == "list_players") || (prefix == "list_counters") || (prefix == "list_zones") || (prefix == "dump_zone") || (prefix == "welcome")) {
+			if (values.size() != 8)
+				return;
+			emit gameListEvent(new ServerGame(values[0].toInt(), values[5], values[1], values[2].toInt(), values[3].toInt(), values[4].toInt(), values[6].toInt(), values[7].toInt()));
+		} else if (prefix == "welcome") {
+			if (values.size() != 2) {
+				emit protocolVersionMismatch();
+				disconnectFromServer();
+			} else if (values[0].toInt() != protocolVersion) {
+				emit protocolVersionMismatch();
+				disconnectFromServer();
+			} else {
+				emit welcomeMsgReceived(values[1]);
+				setStatus(StatusLoggingIn);
+				login(playerName, password);
+			}
+		} else if ((prefix == "list_players") || (prefix == "list_counters") || (prefix == "list_zones") || (prefix == "dump_zone")) {
 			int cmdid = values.takeFirst().toInt();
 			if (values[0] == ".") {
 				QListIterator<QStringList> i(msgbuf);
 				QList<ServerPlayer *> playerlist;
 				QList<ServerZone *> zonelist;
 				QList<ServerZoneCard *> zonedump;
-				QStringList welcomemsg;
 				while (i.hasNext()) {
 					QStringList val = i.next();
 
@@ -152,8 +165,6 @@ void Client::readLine()
 						zonelist << new ServerZone(val[0], val[1] == "1", val[2] == "1", val[3].toInt());
 					else if (prefix == "dump_zone")
 						zonedump << new ServerZoneCard(val[0].toInt(), val[1], val[2].toInt(), val[3].toInt(), val[4].toInt(), val[5] == "1", val[6]);
-					else if (prefix == "welcome")
-						welcomemsg << val[0];
 				}
 				if (prefix == "list_players")
 					emit playerListReceived(playerlist);
@@ -163,11 +174,6 @@ void Client::readLine()
 					emit zoneListReceived(cmdid, zonelist);
 				else if (prefix == "dump_zone")
 					emit zoneDumpReceived(cmdid, zonedump);
-				else if (prefix == "welcome") {
-					emit welcomeMsgReceived(welcomemsg);
-					setStatus(StatusLoggingIn);
-					login(playerName, password);
-				}
 				msgbuf.clear();
 			} else
 				msgbuf << values;
@@ -263,16 +269,16 @@ PendingCommand *Client::listPlayers()
 	return cmd("list_players");
 }
 
-PendingCommand *Client::createGame(const QString &description, const QString &password, unsigned int maxPlayers)
+PendingCommand *Client::createGame(const QString &description, const QString &password, unsigned int maxPlayers, bool spectatorsAllowed)
 {
-	PendingCommand *pc = cmd(QString("create_game|%1|%2|%3").arg(description).arg(password).arg(maxPlayers));
+	PendingCommand *pc = cmd(QString("create_game|%1|%2|%3|%4").arg(description).arg(password).arg(maxPlayers).arg(spectatorsAllowed ? 1 : 0));
 	connect(pc, SIGNAL(finished(ServerResponse)), this, SLOT(enterGameResponse(ServerResponse)));
 	return pc;
 }
 
-PendingCommand *Client::joinGame(int gameId, const QString &password)
+PendingCommand *Client::joinGame(int gameId, const QString &password, bool spectator)
 {
-	PendingCommand *pc = cmd(QString("join_game|%1|%2").arg(gameId).arg(password));
+	PendingCommand *pc = cmd(QString("join_game|%1|%2|%3").arg(gameId).arg(password).arg(spectator ? 1 : 0));
 	connect(pc, SIGNAL(finished(ServerResponse)), this, SLOT(enterGameResponse(ServerResponse)));
 	return pc;
 }

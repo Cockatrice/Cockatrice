@@ -15,6 +15,9 @@ DlgCreateGame::DlgCreateGame(Client *_client, QWidget *parent)
 	maxPlayersLabel = new QLabel(tr("P&layers:"));
 	maxPlayersEdit = new QLineEdit("2");
 	maxPlayersLabel->setBuddy(maxPlayersEdit);
+	
+	spectatorsAllowedCheckBox = new QCheckBox(tr("&Spectators allowed"));
+	spectatorsAllowedCheckBox->setChecked(true);
 
 	QGridLayout *grid = new QGridLayout;
 	grid->addWidget(descriptionLabel, 0, 0);
@@ -23,6 +26,7 @@ DlgCreateGame::DlgCreateGame(Client *_client, QWidget *parent)
 	grid->addWidget(passwordEdit, 1, 1);
 	grid->addWidget(maxPlayersLabel, 2, 0);
 	grid->addWidget(maxPlayersEdit, 2, 1);
+	grid->addWidget(spectatorsAllowedCheckBox, 3, 0, 1, 2);
 
 	okButton = new QPushButton(tr("&OK"));
 	okButton->setDefault(true);
@@ -54,7 +58,7 @@ void DlgCreateGame::actOK()
 		QMessageBox::critical(this, tr("Error"), tr("Invalid number of players."));
 		return;
 	}
-	PendingCommand *createCommand = client->createGame(descriptionEdit->text(), passwordEdit->text(), maxPlayers);
+	PendingCommand *createCommand = client->createGame(descriptionEdit->text(), passwordEdit->text(), maxPlayers, spectatorsAllowedCheckBox->isChecked());
 	connect(createCommand, SIGNAL(finished(ServerResponse)), this, SLOT(checkResponse(ServerResponse)));
 	okButton->setEnabled(false);
 	cancelButton->setEnabled(false);

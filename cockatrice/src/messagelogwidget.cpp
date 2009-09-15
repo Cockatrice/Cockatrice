@@ -17,13 +17,9 @@ void MessageLogWidget::logConnecting(QString hostname)
 	append(tr("Connecting to %1...").arg(sanitizeHtml(hostname)));
 }
 
-void MessageLogWidget::logConnected(const QStringList WelcomeMsg)
+void MessageLogWidget::logConnected(QString welcomeMsg)
 {
-	append(tr("Connected."));
-
-	QStringListIterator i(WelcomeMsg);
-	while (i.hasNext())
-		append(i.next());
+	append(tr("Connected: %1").arg(welcomeMsg));
 }
 
 void MessageLogWidget::logDisconnected()
@@ -42,6 +38,11 @@ void MessageLogWidget::logServerError(ServerResponse response)
 		case RespPassword: append(tr("Invalid password.")); break;
 		default: ;
 	}
+}
+
+void MessageLogWidget::logProtocolVersionMismatch()
+{
+	append(tr("Protocol version mismatch."));
 }
 
 void MessageLogWidget::logPlayerListReceived(QStringList players)

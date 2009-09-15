@@ -26,7 +26,7 @@ private:
 
 	QTreeView *gameListView;
 	GamesModel *gameListModel;
-	QPushButton *createButton, *joinButton;
+	QPushButton *createButton, *joinButton, *spectateButton;
 };
 
 #endif

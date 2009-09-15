@@ -7,6 +7,7 @@
 class QLabel;
 class QLineEdit;
 class QPushButton;
+class QCheckBox;
 
 class DlgCreateGame : public QDialog {
 	Q_OBJECT
@@ -20,6 +21,7 @@ private:
 
 	QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel;
 	QLineEdit *descriptionEdit, *passwordEdit, *maxPlayersEdit;
+	QCheckBox *spectatorsAllowedCheckBox;
 	QPushButton *okButton, *cancelButton;
 };
 

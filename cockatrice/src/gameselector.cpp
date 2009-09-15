@@ -11,10 +11,12 @@ GameSelector::GameSelector(Client *_client, QWidget *parent)
 
 	createButton = new QPushButton;
 	joinButton = new QPushButton;
+	spectateButton = new QPushButton;
 	QHBoxLayout *buttonLayout = new QHBoxLayout;
 	buttonLayout->addStretch();
 	buttonLayout->addWidget(createButton);
 	buttonLayout->addWidget(joinButton);
+	buttonLayout->addWidget(spectateButton);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(gameListView);
@@ -28,6 +30,7 @@ GameSelector::GameSelector(Client *_client, QWidget *parent)
 
 	connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
 	connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
+	connect(spectateButton, SIGNAL(clicked()), this, SLOT(actJoin()));
 }
 
 void GameSelector::actCreate()
@@ -46,6 +49,7 @@ void GameSelector::checkResponse(ServerResponse response)
 {
 	createButton->setEnabled(true);
 	joinButton->setEnabled(true);
+	spectateButton->setEnabled(true);
 
 	if (response == RespOk)
 		disableGameList();
@@ -57,6 +61,8 @@ void GameSelector::checkResponse(ServerResponse response)
 
 void GameSelector::actJoin()
 {
+	bool spectator = sender() == spectateButton;
+	
 	QModelIndex ind = gameListView->currentIndex();
 	if (!ind.isValid())
 		return;
@@ -69,10 +75,11 @@ void GameSelector::actJoin()
 			return;
 	}
 
-	PendingCommand *joinCommand = client->joinGame(game->getGameId(), password);
+	PendingCommand *joinCommand = client->joinGame(game->getGameId(), password, spectator);
 	connect(joinCommand, SIGNAL(finished(ServerResponse)), this, SLOT(checkResponse(ServerResponse)));
 	createButton->setEnabled(false);
 	joinButton->setEnabled(false);
+	spectateButton->setEnabled(false);
 }
 
 void GameSelector::enableGameList()
@@ -99,4 +106,5 @@ void GameSelector::retranslateUi()
 {
 	createButton->setText(tr("C&reate"));
 	joinButton->setText(tr("&Join"));
+	spectateButton->setText(tr("J&oin as spectator"));
 }

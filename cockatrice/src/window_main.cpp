@@ -326,10 +326,11 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	connect(client, SIGNAL(playerIdReceived(int, QString)), this, SLOT(playerIdReceived(int, QString)));
 
 	connect(this, SIGNAL(logConnecting(QString)), messageLog, SLOT(logConnecting(QString)));
-	connect(client, SIGNAL(welcomeMsgReceived(const QStringList)), messageLog, SLOT(logConnected(const QStringList)));
+	connect(client, SIGNAL(welcomeMsgReceived(QString)), messageLog, SLOT(logConnected(QString)));
 	connect(this, SIGNAL(logDisconnected()), messageLog, SLOT(logDisconnected()));
 	connect(client, SIGNAL(logSocketError(const QString &)), messageLog, SLOT(logSocketError(const QString &)));
 	connect(client, SIGNAL(serverError(ServerResponse)), messageLog, SLOT(logServerError(ServerResponse)));
+	connect(client, SIGNAL(protocolVersionMismatch()), messageLog, SLOT(logProtocolVersionMismatch()));
 	connect(phasesToolbar, SIGNAL(signalSetPhase(int)), client, SLOT(setActivePhase(int)));
 	connect(phasesToolbar, SIGNAL(signalNextTurn()), client, SLOT(nextTurn()));
 	connect(phasesToolbar, SIGNAL(signalDrawCard()), client, SLOT(drawCard()));

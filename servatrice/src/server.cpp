@@ -100,7 +100,6 @@ void Server::incomingConnection(int socketId)
 	ServerSocket *socket = new ServerSocket(this);
 	socket->setSocketDescriptor(socketId);
 	connect(socket, SIGNAL(createGame(const QString, const QString, int, bool, ServerSocket *)), this, SLOT(addGame(const QString, const QString, int, bool, ServerSocket *)));
-	connect(socket, SIGNAL(joinGame(int, bool, ServerSocket *)), this, SLOT(addClientToGame(int, bool, ServerSocket *)));
 	socket->initConnection();
 	players << socket;
 }

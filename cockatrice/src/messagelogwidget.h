@@ -17,10 +17,11 @@ private:
 	QString trZoneName(CardZone *zone, Player *player, bool hisOwn, GrammaticalCase gc) const;
 public slots:
 	void logConnecting(QString hostname);
-	void logConnected(const QStringList WelcomeMsg);
+	void logConnected(QString welcomeMsg);
 	void logDisconnected();
 	void logSocketError(const QString &errorString);
 	void logServerError(ServerResponse response);
+	void logProtocolVersionMismatch();
 private slots:
 	void logPlayerListReceived(QStringList players);
 	void logJoin(Player *player);
