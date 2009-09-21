@@ -33,6 +33,15 @@ signals:
 	void logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap);
 	
 	void sizeChanged();
+public slots:
+	void actUntapAll();
+	void actIncLife();
+	void actDecLife();
+	void actSetLife();
+	void actRollDie();
+	void actCreateToken();
+	
+	void actSayMessage();
 private slots:
 	void updateBoundingRect();
 	
@@ -49,10 +58,11 @@ private slots:
 	void actViewRfg();
 	void actViewSideboard();
 private:
-	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu;
+	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *sayMenu;
 	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary,
 		*aViewLibrary, *aViewTopCards, *aViewGraveyard, *aViewRfg, *aViewSideboard,
-		*aDrawCard, *aDrawCards, *aShuffle;
+		*aDrawCard, *aDrawCards, *aShuffle,
+		*aUntapAll, *aDecLife, *aIncLife, *aSetLife, *aRollDie, *aCreateToken;
 
 	int defaultNumberTopCards;
 	QString name;
@@ -72,6 +82,7 @@ private:
 
 	QList<Counter *> counterList;
 	void rearrangeCounters();
+	void initSayMenu();
 public:
 	enum { Type = typeOther };
 	int type() const { return Type; }

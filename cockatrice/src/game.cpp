@@ -1,4 +1,5 @@
 #include <QMenu>
+#include <QMenuBar>
 #include <QMessageBox>
 #include <QSettings>
 #include <stdlib.h>
@@ -13,51 +14,16 @@
 #include "counter.h"
 #include "gamescene.h"
 
-Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenu *_actionsMenu, QMenu *_cardMenu, int playerId, const QString &playerName, QObject *parent)
-	: QObject(parent), actionsMenu(_actionsMenu), cardMenu(_cardMenu), db(_db), client(_client), scene(_scene), started(false), currentPhase(-1)
+Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenuBar *menuBar, QObject *parent)
+	: QObject(parent), db(_db), client(_client), scene(_scene), started(false), currentPhase(-1)
 {
-	localPlayer = addPlayer(playerId, playerName, true);
-
 	connect(client, SIGNAL(gameEvent(const ServerEventData &)), this, SLOT(gameEvent(const ServerEventData &)));
 	connect(client, SIGNAL(playerListReceived(QList<ServerPlayer *>)), this, SLOT(playerListReceived(QList<ServerPlayer *>)));
 
-	aUntapAll = new QAction(this);
-	connect(aUntapAll, SIGNAL(triggered()), this, SLOT(actUntapAll()));
-
-	aDecLife = new QAction(this);
-	connect(aDecLife, SIGNAL(triggered()), this, SLOT(actDecLife()));
-	aIncLife = new QAction(this);
-	connect(aIncLife, SIGNAL(triggered()), this, SLOT(actIncLife()));
-	aSetLife = new QAction(this);
-	connect(aSetLife, SIGNAL(triggered()), this, SLOT(actSetLife()));
-
-	aRollDie = new QAction(this);
-	connect(aRollDie, SIGNAL(triggered()), this, SLOT(actRollDie()));
-
-	aCreateToken = new QAction(this);
-	connect(aCreateToken, SIGNAL(triggered()), this, SLOT(actCreateToken()));
-	
 	aNextPhase = new QAction(this);
 	connect(aNextPhase, SIGNAL(triggered()), this, SLOT(actNextPhase()));
 	aNextTurn = new QAction(this);
 	connect(aNextTurn, SIGNAL(triggered()), this, SLOT(actNextTurn()));
-	
-	actionsMenu->addAction(aNextPhase);
-	actionsMenu->addAction(aNextTurn);
-	actionsMenu->addSeparator();
-	actionsMenu->addAction(aUntapAll);
-	actionsMenu->addSeparator();
-	actionsMenu->addAction(aDecLife);
-	actionsMenu->addAction(aIncLife);
-	actionsMenu->addAction(aSetLife);
-	actionsMenu->addSeparator();
-	actionsMenu->addAction(aRollDie);
-	actionsMenu->addSeparator();
-	actionsMenu->addAction(aCreateToken);
-	actionsMenu->addSeparator();
-	sayMenu = actionsMenu->addMenu(QString());
-	initSayMenu();
-
 	aTap = new QAction(this);
 	aUntap = new QAction(this);
 	aDoesntUntap = new QAction(this);
@@ -71,6 +37,11 @@ Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenu *_action
 	aMoveToGraveyard = new QAction(this);
 	aMoveToExile = new QAction(this);
 
+	gameMenu = menuBar->addMenu(QString());
+	gameMenu->addAction(aNextPhase);
+	gameMenu->addAction(aNextTurn);
+	
+	cardMenu = menuBar->addMenu(QString());
 	cardMenu->addAction(aTap);
 	cardMenu->addAction(aUntap);
 	cardMenu->addAction(aDoesntUntap);
@@ -110,6 +81,8 @@ Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenu *_action
 	connect(dlgStartGame, SIGNAL(finished(int)), this, SLOT(readyStart()));
 	
 	retranslateUi();
+	
+	client->listPlayers();
 }
 
 Game::~Game()
@@ -119,29 +92,19 @@ Game::~Game()
 		emit playerRemoved(players.at(i));
 		delete players.at(i);
 	}
+	delete gameMenu;
+	delete cardMenu;
 }
 
 void Game::retranslateUi()
 {
-	aUntapAll->setText(tr("&Untap all permanents"));
-	aUntapAll->setShortcut(tr("Ctrl+U"));
-	aDecLife->setText(tr("&Decrement life"));
-	aDecLife->setShortcut(tr("F11"));
-	aIncLife->setText(tr("&Increment life"));
-	aIncLife->setShortcut(tr("F12"));
-	aSetLife->setText(tr("&Set life"));
-	aSetLife->setShortcut(tr("Ctrl+L"));
-	aRollDie->setText(tr("R&oll die..."));
-	aRollDie->setShortcut(tr("Ctrl+I"));
-	aCreateToken->setText(tr("&Create token..."));
-	aCreateToken->setShortcut(tr("Ctrl+T"));
+	gameMenu->setTitle(tr("&Game"));
 	aNextPhase->setText(tr("Next &phase"));
 	aNextPhase->setShortcut(tr("Ctrl+Space"));
 	aNextTurn->setText(tr("Next &turn"));
 	aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
 	
-	sayMenu->setTitle(tr("S&ay"));
-	
+	cardMenu->setTitle(tr("C&ard"));
 	aTap->setText(tr("&Tap"));
 	aUntap->setText(tr("&Untap"));
 	aDoesntUntap->setText(tr("Toggle &normal untapping"));
@@ -159,30 +122,6 @@ void Game::retranslateUi()
 	
 	for (int i = 0; i < players.size(); ++i)
 		players[i]->retranslateUi();
-}
-
-void Game::initSayMenu()
-{
-	sayMenu->clear();
-
-	QSettings settings;
-	settings.beginGroup("messages");
-	int count = settings.value("count", 0).toInt();
-	for (int i = 0; i < count; i++) {
-		QAction *newAction = new QAction(settings.value(QString("msg%1").arg(i)).toString(), this);
-		QString shortcut;
-		switch (i) {
-			case 0: shortcut = tr("F5"); break;
-			case 1: shortcut = tr("F6"); break;
-			case 2: shortcut = tr("F7"); break;
-			case 3: shortcut = tr("F8"); break;
-			case 4: shortcut = tr("F9"); break;
-			case 5: shortcut = tr("F10"); break;
-		}
-		newAction->setShortcut(shortcut);
-		connect(newAction, SIGNAL(triggered()), this, SLOT(actSayMessage()));
-		sayMenu->addAction(newAction);
-	}
 }
 
 Player *Game::addPlayer(int playerId, const QString &playerName, bool local)
@@ -213,8 +152,7 @@ void Game::playerListReceived(QList<ServerPlayer *> playerList)
 		nameList << temp->getName();
 		int id = temp->getPlayerId();
 
-		if (id != localPlayer->getId())
-			addPlayer(id, temp->getName(), false);
+		addPlayer(id, temp->getName(), temp->getLocal());
 
 		delete temp;
 	}
@@ -235,10 +173,12 @@ void Game::restartGameDialog()
 void Game::gameEvent(const ServerEventData &msg)
 {
 	qDebug(QString("game::gameEvent: public=%1, player=%2, name=%3, type=%4, data=%5").arg(msg.getPublic()).arg(msg.getPlayerId()).arg(msg.getPlayerName()).arg(msg.getEventType()).arg(msg.getEventData().join("/")).toLatin1());
-	if (!msg.getPublic())
-		localPlayer->gameEvent(msg);
-	else {
-		Player *p = players.findPlayer(msg.getPlayerId());
+	Player *p = players.findPlayer(msg.getPlayerId());
+	if (!msg.getPublic()) {
+		if (!p)
+			return;
+		p->gameEvent(msg);
+	} else {
 		if ((!p) && (msg.getEventType() != eventJoin)) {
 			// XXX
 		}
@@ -248,14 +188,32 @@ void Game::gameEvent(const ServerEventData &msg)
 			emit logSay(p, msg.getEventData()[0]);
 			break;
 		case eventJoin: {
-			Player *newPlayer = addPlayer(msg.getPlayerId(), msg.getPlayerName(), false);
-			emit logJoin(newPlayer);
+			const QStringList &data = msg.getEventData();
+			if (data.size() != 1)
+				return;
+			bool spectator = data[0].toInt();
+			if (spectator) {
+				spectatorList << msg.getPlayerName();
+				emit logJoinSpectator(msg.getPlayerName());
+			} else {
+				Player *newPlayer = addPlayer(msg.getPlayerId(), msg.getPlayerName(), false);
+				emit logJoin(newPlayer);
+			}
 			break;
 		}
-		case eventLeave:
-			emit logLeave(p);
-			// XXX Spieler natürlich noch rauswerfen
+		case eventLeave: {
+			if (p)
+				emit logLeave(p);
+				// XXX Spieler natürlich noch rauswerfen
+			else {
+				int spectatorIndex = spectatorList.indexOf(msg.getPlayerName());
+				if (spectatorIndex != -1) {
+					spectatorList.removeAt(spectatorIndex);
+					emit logLeaveSpectator(msg.getPlayerName());
+				}
+			}
 			break;
+		}
 		case eventReadyStart:
 			if (started) {
 				started = false;
@@ -335,16 +293,14 @@ void Game::gameEvent(const ServerEventData &msg)
 			break;
 		}
 		case eventMoveCard: {
-			if (msg.getPlayerId() == localPlayer->getId())
-				break;
-			p->gameEvent(msg);
+			if (!p->getLocal())
+				p->gameEvent(msg);
 			break;
 		}
 		case eventDraw: {
 			emit logDraw(p, msg.getEventData()[0].toInt());
-			if (msg.getPlayerId() == localPlayer->getId())
-				break;
-			p->gameEvent(msg);
+			if (!p->getLocal())
+				p->gameEvent(msg);
 			break;
 		}
 		case eventInvalid: {
@@ -367,44 +323,6 @@ void Game::actNextPhase()
 void Game::actNextTurn()
 {
 	client->nextTurn();
-}
-
-void Game::actUntapAll()
-{
-	client->setCardAttr("table", -1, "tapped", "false");
-}
-
-void Game::actIncLife()
-{
-	client->incCounter("life", 1);
-}
-
-void Game::actDecLife()
-{
-	client->incCounter("life", -1);
-}
-
-void Game::actSetLife()
-{
-	bool ok;
-	int life = QInputDialog::getInteger(0, tr("Set life"), tr("New life total:"), localPlayer->getCounter("life")->getValue(), 0, 2000000000, 1, &ok);
-	if (ok)
-		client->setCounter("life", life);
-}
-
-void Game::actRollDie()
-{
-	bool ok;
-	int sides = QInputDialog::getInteger(0, tr("Roll die"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
-	if (ok)
-		client->rollDie(sides);
-}
-
-void Game::actCreateToken()
-{
-	QString cardname = QInputDialog::getText(0, tr("Create token"), tr("Name:"));
-	if (!cardname.isEmpty())
-		client->createToken("table", cardname, QString(), 0, 0);
 }
 
 void Game::showCardMenu(QPoint p)
@@ -499,12 +417,6 @@ void Game::actMoveToExile(CardItem *card)
 {
 	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
 	client->moveCard(card->getId(), startZone->getName(), "rfg", 0, 0, false);
-}
-
-void Game::actSayMessage()
-{
-	QAction *a = qobject_cast<QAction *>(sender());
-	client->say(a->text());
 }
 
 void Game::hoverCardEvent(CardItem *card)

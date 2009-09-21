@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <QHash>
+#include <QStringList>
 #include "playerlist.h"
 
 class ServerPlayer;
@@ -12,6 +13,7 @@ class ServerEventData;
 class CardDatabase;
 class DlgStartGame;
 class CardItem;
+class QMenuBar;
 
 class Game : public QObject {
 	Q_OBJECT
@@ -21,30 +23,22 @@ private:
 	typedef void (Game::*CardMenuHandler)(CardItem *card);
 	QHash<QAction *, CardMenuHandler> cardMenuHandlers;
 	
-	QMenu *actionsMenu, *sayMenu, *cardMenu, *moveMenu;
+	QMenu *gameMenu, *cardMenu, *moveMenu;
 	QAction *aTap, *aUntap, *aDoesntUntap, *aFlip, *aAddCounter, *aRemoveCounter, *aSetCounters,
 		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile,
-		*aNextPhase, *aNextTurn, *aUntapAll, *aDecLife, *aIncLife, *aSetLife, *aRollDie, *aCreateToken;
+		*aNextPhase, *aNextTurn;
 	DlgStartGame *dlgStartGame;
 
 	CardDatabase *db;
 	Client *client;
 	GameScene *scene;
+	QStringList spectatorList;
 	PlayerList players;
-	Player *localPlayer;
 	bool started;
 	int currentPhase;
-	Player *addPlayer(int playerId, const QString &playerName, bool local);
-	void initSayMenu();
 public slots:
 	void actNextPhase();
 	void actNextTurn();
-	void actUntapAll();
-	void actIncLife();
-	void actDecLife();
-	void actSetLife();
-	void actRollDie();
-	void actCreateToken();
 private slots:
 	void cardMenuAction();
 
@@ -60,8 +54,6 @@ private slots:
 	void actMoveToBottomLibrary(CardItem *card);
 	void actMoveToGraveyard(CardItem *card);
 	void actMoveToExile(CardItem *card);
-	
-	void actSayMessage();
 
 	void gameEvent(const ServerEventData &msg);
 	void playerListReceived(QList<ServerPlayer *> playerList);
@@ -76,6 +68,8 @@ signals:
 	void logPlayerListReceived(QStringList players);
 	void logJoin(Player *player);
 	void logLeave(Player *player);
+	void logJoinSpectator(QString playerName);
+	void logLeaveSpectator(QString playerName);
 	void logReadyStart(Player *player);
 	void logGameStart();
 	void logSay(Player *player, QString text);
@@ -93,12 +87,12 @@ signals:
 	void logSetActivePlayer(Player *player);
 	void setActivePhase(int phase);
 public:
-	Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenu *_actionsMenu, QMenu *_cardMenu, int playerId, const QString &playerName, QObject *parent = 0);
+	Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenuBar *menuBar, QObject *parent = 0);
 	~Game();
-	Player *getLocalPlayer() const { return localPlayer; }
 	void retranslateUi();
 	void restartGameDialog();
 	void hoverCardEvent(CardItem *card);
+	Player *addPlayer(int playerId, const QString &playerName, bool local);
 };
 
 #endif

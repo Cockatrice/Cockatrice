@@ -112,6 +112,37 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 		sbMenu = playerMenu->addMenu(QString());
 		sbMenu->addAction(aViewSideboard);
 		sb->setMenu(sbMenu, aViewSideboard);
+
+		aUntapAll = new QAction(this);
+		connect(aUntapAll, SIGNAL(triggered()), this, SLOT(actUntapAll()));
+
+		aDecLife = new QAction(this);
+		connect(aDecLife, SIGNAL(triggered()), this, SLOT(actDecLife()));
+		aIncLife = new QAction(this);
+		connect(aIncLife, SIGNAL(triggered()), this, SLOT(actIncLife()));
+		aSetLife = new QAction(this);
+		connect(aSetLife, SIGNAL(triggered()), this, SLOT(actSetLife()));
+	
+		aRollDie = new QAction(this);
+		connect(aRollDie, SIGNAL(triggered()), this, SLOT(actRollDie()));
+	
+		aCreateToken = new QAction(this);
+		connect(aCreateToken, SIGNAL(triggered()), this, SLOT(actCreateToken()));
+		
+		playerMenu->addSeparator();
+		playerMenu->addAction(aUntapAll);
+		playerMenu->addSeparator();
+		playerMenu->addAction(aDecLife);
+		playerMenu->addAction(aIncLife);
+		playerMenu->addAction(aSetLife);
+		playerMenu->addSeparator();
+		playerMenu->addAction(aRollDie);
+		playerMenu->addSeparator();
+		playerMenu->addAction(aCreateToken);
+		playerMenu->addSeparator();
+		sayMenu = playerMenu->addMenu(QString());
+		initSayMenu();
+
 	} else
 		sbMenu = 0;
 	
@@ -126,6 +157,7 @@ Player::~Player()
 		delete zones.at(i);
 
 	clearCounters();
+	delete playerMenu;
 }
 
 void Player::updateBoundingRect()
@@ -160,6 +192,44 @@ void Player::retranslateUi()
 		handMenu->setTitle(tr("&Hand"));
 		sbMenu->setTitle(tr("&Sideboard"));
 		libraryMenu->setTitle(tr("&Library"));
+
+		aUntapAll->setText(tr("&Untap all permanents"));
+		aUntapAll->setShortcut(tr("Ctrl+U"));
+		aDecLife->setText(tr("&Decrement life"));
+		aDecLife->setShortcut(tr("F11"));
+		aIncLife->setText(tr("&Increment life"));
+		aIncLife->setShortcut(tr("F12"));
+		aSetLife->setText(tr("&Set life"));
+		aSetLife->setShortcut(tr("Ctrl+L"));
+		aRollDie->setText(tr("R&oll die..."));
+		aRollDie->setShortcut(tr("Ctrl+I"));
+		aCreateToken->setText(tr("&Create token..."));
+		aCreateToken->setShortcut(tr("Ctrl+T"));
+		sayMenu->setTitle(tr("S&ay"));
+	}
+}
+
+void Player::initSayMenu()
+{
+	sayMenu->clear();
+
+	QSettings settings;
+	settings.beginGroup("messages");
+	int count = settings.value("count", 0).toInt();
+	for (int i = 0; i < count; i++) {
+		QAction *newAction = new QAction(settings.value(QString("msg%1").arg(i)).toString(), this);
+		QString shortcut;
+		switch (i) {
+			case 0: shortcut = tr("F5"); break;
+			case 1: shortcut = tr("F6"); break;
+			case 2: shortcut = tr("F7"); break;
+			case 3: shortcut = tr("F8"); break;
+			case 4: shortcut = tr("F9"); break;
+			case 5: shortcut = tr("F10"); break;
+		}
+		newAction->setShortcut(shortcut);
+		connect(newAction, SIGNAL(triggered()), this, SLOT(actSayMessage()));
+		sayMenu->addAction(newAction);
 	}
 }
 
@@ -218,6 +288,50 @@ void Player::actDrawCards()
 	int number = QInputDialog::getInteger(0, tr("Draw cards"), tr("Number:"));
 	if (number)
 		client->drawCards(number);
+}
+
+void Player::actUntapAll()
+{
+	client->setCardAttr("table", -1, "tapped", "false");
+}
+
+void Player::actIncLife()
+{
+	client->incCounter("life", 1);
+}
+
+void Player::actDecLife()
+{
+	client->incCounter("life", -1);
+}
+
+void Player::actSetLife()
+{
+	bool ok;
+	int life = QInputDialog::getInteger(0, tr("Set life"), tr("New life total:"), getCounter("life")->getValue(), 0, 2000000000, 1, &ok);
+	if (ok)
+		client->setCounter("life", life);
+}
+
+void Player::actRollDie()
+{
+	bool ok;
+	int sides = QInputDialog::getInteger(0, tr("Roll die"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
+	if (ok)
+		client->rollDie(sides);
+}
+
+void Player::actCreateToken()
+{
+	QString cardname = QInputDialog::getText(0, tr("Create token"), tr("Name:"));
+	if (!cardname.isEmpty())
+		client->createToken("table", cardname, QString(), 0, 0);
+}
+
+void Player::actSayMessage()
+{
+	QAction *a = qobject_cast<QAction *>(sender());
+	client->say(a->text());
 }
 
 void Player::addZone(CardZone *z)

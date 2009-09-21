@@ -46,11 +46,8 @@ class ChatWidget;
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 private slots:
-	void hoverCard(QString name);
 	void playerAdded(Player *player);
-	void playerRemoved(Player *player);
 	void statusChanged(ProtocolStatus _status);
-	void playerIdReceived(int id, QString name);
 	void serverTimeout();
 
 	void actSay();
@@ -70,7 +67,7 @@ private:
 	void retranslateUi();
 	void createActions();
 	void createMenus();
-	QMenu *gameMenu, *actionsMenu, *cardMenu;
+	QMenu *cockatriceMenu;
 	QAction *aConnect, *aDisconnect, *aRestartGame, *aLeaveGame, *aDeckEditor, *aFullScreen, *aSettings, *aExit;
 	QAction *aCloseMostRecentZoneView;
 	QVBoxLayout *viewLayout;

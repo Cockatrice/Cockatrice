@@ -107,6 +107,7 @@ private:
 	void clearZones();
 	void leaveGame();
 	bool parseCommand(QString line);
+	void privateEvent(const QString &line);
 	PlayerStatusEnum PlayerStatus;
 	ReturnMessage *remsg;
 	AuthenticationResult authState;
@@ -117,8 +118,8 @@ public:
 	~ServerSocket();
 	void msg(const QString &s);
 	void setGame(ServerGame *g);
-	PlayerStatusEnum getStatus();
-	void setStatus(PlayerStatusEnum status);
+	PlayerStatusEnum getStatus() { return PlayerStatus; }
+	void setStatus(PlayerStatusEnum _status) { PlayerStatus = _status; }
 	void initConnection();
 	int getPlayerId() const { return playerId; }
 	void setPlayerId(int _id) { playerId = _id; }

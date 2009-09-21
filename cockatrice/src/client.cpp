@@ -158,7 +158,7 @@ void Client::readLine()
 
 					// XXX Parametergültigkeit überprüfen
 					if (prefix == "list_players")
-						playerlist << new ServerPlayer(val[0].toInt(), val[1]);
+						playerlist << new ServerPlayer(val[0].toInt(), val[1], val[2].toInt());
 					else if (prefix == "list_counters")
 					{ }
 					else if (prefix == "list_zones")
@@ -185,10 +185,10 @@ void Client::readLine()
 
 void Client::setStatus(const ProtocolStatus _status)
 {
-	ProtocolStatus oldStatus = status;
-	status = _status;
-	if (oldStatus != _status)
+	if (_status != status) {
+		status = _status;
 		emit statusChanged(_status);
+	}
 }
 
 void Client::msg(const QString &s)

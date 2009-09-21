@@ -38,21 +38,11 @@
 #include "zoneviewlayout.h"
 #include "chatwidget.h"
 
-void MainWindow::hoverCard(QString name)
-{
-	cardInfo->setCard(name);
-}
-
 void MainWindow::playerAdded(Player *player)
 {
 	menuBar()->addMenu(player->getPlayerMenu());
 	connect(player, SIGNAL(toggleZoneView(Player *, QString, int)), zoneLayout, SLOT(toggleZoneView(Player *, QString, int)));
 	connect(player, SIGNAL(closeZoneView(ZoneViewZone *)), zoneLayout, SLOT(removeItem(ZoneViewZone *)));
-}
-
-void MainWindow::playerRemoved(Player *player)
-{
-	menuBar()->removeAction(player->getPlayerMenu()->menuAction());
 }
 
 void MainWindow::statusChanged(ProtocolStatus _status)
@@ -95,11 +85,22 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			chatWidget->enableChat();
 			break;
 		}
-		case StatusPlaying:
+		case StatusPlaying: {
 			chatWidget->disableChat();
+			
+			game = new Game(db, client, scene, menuBar(), this);
+			connect(game, SIGNAL(hoverCard(QString)), cardInfo, SLOT(setCard(const QString &)));
+			connect(game, SIGNAL(playerAdded(Player *)), this, SLOT(playerAdded(Player *)));
+			connect(game, SIGNAL(playerRemoved(Player *)), scene, SLOT(removePlayer(Player *)));
+			connect(game, SIGNAL(setActivePhase(int)), phasesToolbar, SLOT(setActivePhase(int)));
+			messageLog->connectToGame(game);
+			aRestartGame->setEnabled(true);
+			aLeaveGame->setEnabled(true);
+		
 			phasesToolbar->show();
 			view->show();
 			break;
+		}
 		default:
 			break;
 	}
@@ -164,24 +165,6 @@ void MainWindow::actSay()
 	sayEdit->clear();
 }
 
-void MainWindow::playerIdReceived(int id, QString name)
-{
-	game = new Game(db, client, scene, actionsMenu, cardMenu, id, name, this);
-	connect(game, SIGNAL(hoverCard(QString)), this, SLOT(hoverCard(QString)));
-	connect(game, SIGNAL(playerAdded(Player *)), this, SLOT(playerAdded(Player *)));
-	connect(game, SIGNAL(playerRemoved(Player *)), this, SLOT(playerRemoved(Player *)));
-	connect(game, SIGNAL(playerRemoved(Player *)), scene, SLOT(removePlayer(Player *)));
-	connect(game, SIGNAL(setActivePhase(int)), phasesToolbar, SLOT(setActivePhase(int)));
-	connect(phasesToolbar, SIGNAL(signalUntapAll()), game, SLOT(actUntapAll()));
-	playerAdded(game->getLocalPlayer());
-
-	messageLog->connectToGame(game);
-	aRestartGame->setEnabled(true);
-	aLeaveGame->setEnabled(true);
-
-	client->listPlayers();
-}
-
 void MainWindow::serverTimeout()
 {
 	QMessageBox::critical(this, tr("Error"), tr("Server timeout"));
@@ -204,9 +187,7 @@ void MainWindow::retranslateUi()
 	aCloseMostRecentZoneView->setText(tr("Close most recent zone view"));
 	aCloseMostRecentZoneView->setShortcut(tr("Esc"));
 	
-	gameMenu->setTitle(tr("&Game"));
-	actionsMenu->setTitle(tr("&Actions"));
-	cardMenu->setTitle(tr("&Card"));
+	cockatriceMenu->setTitle(tr("&Cockatrice"));
 	
 	sayLabel->setText(tr("&Say:"));
 	
@@ -248,24 +229,20 @@ void MainWindow::createActions()
 
 void MainWindow::createMenus()
 {
-	gameMenu = menuBar()->addMenu(QString());
-	gameMenu->addAction(aConnect);
-	gameMenu->addAction(aDisconnect);
-	gameMenu->addSeparator();
-	gameMenu->addAction(aRestartGame);
-	gameMenu->addAction(aLeaveGame);
-	gameMenu->addSeparator();
-	gameMenu->addAction(aDeckEditor);
-	gameMenu->addSeparator();
-	gameMenu->addAction(aFullScreen);
-	gameMenu->addSeparator();
-	gameMenu->addAction(aSettings);
-	gameMenu->addSeparator();
-	gameMenu->addAction(aExit);
-
-	actionsMenu = menuBar()->addMenu(QString());
-
-	cardMenu = menuBar()->addMenu(QString());
+	cockatriceMenu = menuBar()->addMenu(QString());
+	cockatriceMenu->addAction(aConnect);
+	cockatriceMenu->addAction(aDisconnect);
+	cockatriceMenu->addSeparator();
+	cockatriceMenu->addAction(aRestartGame);
+	cockatriceMenu->addAction(aLeaveGame);
+	cockatriceMenu->addSeparator();
+	cockatriceMenu->addAction(aDeckEditor);
+	cockatriceMenu->addSeparator();
+	cockatriceMenu->addAction(aFullScreen);
+	cockatriceMenu->addSeparator();
+	cockatriceMenu->addAction(aSettings);
+	cockatriceMenu->addSeparator();
+	cockatriceMenu->addAction(aExit);
 }
 
 MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
@@ -323,7 +300,6 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 
 	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
 	connect(client, SIGNAL(statusChanged(ProtocolStatus)), this, SLOT(statusChanged(ProtocolStatus)));
-	connect(client, SIGNAL(playerIdReceived(int, QString)), this, SLOT(playerIdReceived(int, QString)));
 
 	connect(this, SIGNAL(logConnecting(QString)), messageLog, SLOT(logConnecting(QString)));
 	connect(client, SIGNAL(welcomeMsgReceived(QString)), messageLog, SLOT(logConnected(QString)));

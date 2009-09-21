@@ -13,6 +13,9 @@ private:
 	QString phaseText;
 	bool active;
 	QAction *doubleClickAction;
+	QPixmap activePixmap, inactivePixmap;
+	
+	void updatePixmap(QPixmap &pixmap, bool active);
 public:
 	PhaseButton(const QIcon &icon, QAction *_doubleClickAction = 0);
 	void setPhaseText(const QString &_phaseText);

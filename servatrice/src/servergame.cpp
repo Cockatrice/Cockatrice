@@ -44,27 +44,16 @@ QString ServerGame::getGameListLine() const
 							      .arg(players.size())
 							      .arg(maxPlayers)
 							      .arg(creator->getPlayerName())
-							      .arg(spectatorsAllowed ? 0 : 1)
+							      .arg(spectatorsAllowed ? 1 : 0)
 							      .arg(spectators.size());
 }
 
-QStringList ServerGame::getPlayerNames() const
-{
-	QStringList result;
-	QListIterator<ServerSocket *> i(players);
-	while (i.hasNext()) {
-		ServerSocket *tmp = i.next();
-		result << QString("%1|%2").arg(tmp->getPlayerId()).arg(tmp->getPlayerName());
-	}
-	return result;
-}
-
-ServerSocket *ServerGame::getPlayer(int player_id)
+ServerSocket *ServerGame::getPlayer(int playerId)
 {
 	QListIterator<ServerSocket *> i(players);
 	while (i.hasNext()) {
 		ServerSocket *tmp = i.next();
-		if (tmp->getPlayerId() == player_id)
+		if (tmp->getPlayerId() == playerId)
 			return tmp;
 	}
 	return NULL;
@@ -72,9 +61,10 @@ ServerSocket *ServerGame::getPlayer(int player_id)
 
 void ServerGame::msg(const QString &s)
 {
-	QListIterator<ServerSocket *> i(players);
-	while (i.hasNext())
-		i.next()->msg(s);
+	for (int i = 0; i < players.size(); ++i)
+		players[i]->msg(s);
+	for (int i = 0; i < spectators.size(); ++i)
+		spectators[i]->msg(s);
 }
 
 void ServerGame::broadcastEvent(const QString &cmd, ServerSocket *player)
@@ -139,7 +129,6 @@ void ServerGame::addPlayer(ServerSocket *player, bool spectator)
 				max = tmp;
 		}
 		player->setPlayerId(max + 1);
-		player->msg(QString("private|||player_id|%1|%2").arg(max + 1).arg(player->getPlayerName()));
 	} else
 		player->setPlayerId(-1);
 	

@@ -353,7 +353,12 @@ ReturnMessage::ReturnCode ServerSocket::cmdLeaveGame(const QList<QVariant> &/*pa
 
 ReturnMessage::ReturnCode ServerSocket::cmdListPlayers(const QList<QVariant> &/*params*/)
 {
-	remsg->sendList(game->getPlayerNames());
+	QStringList result;
+	const QList<ServerSocket *> &players = game->getPlayers();
+	for (int i = 0; i < players.size(); ++i)
+		result << QString("%1|%2|%3").arg(players[i]->getPlayerId()).arg(players[i]->getPlayerName()).arg(players[i] == this ? 1 : 0);
+	
+	remsg->sendList(result);
 	return ReturnMessage::ReturnOk;
 }
 
@@ -398,7 +403,7 @@ ReturnMessage::ReturnCode ServerSocket::cmdDrawCards(const QList<QVariant> &para
 		Card *card = deck->cards.first();
 		deck->cards.removeFirst();
 		hand->cards.append(card);
-		msg(QString("private|||draw|%1|%2").arg(card->getId()).arg(card->getName()));
+		privateEvent(QString("draw|%1|%2").arg(card->getId()).arg(card->getName()));
 	}
 
 	emit broadcastEvent(QString("draw|%1").arg(number), this);
@@ -467,7 +472,7 @@ ReturnMessage::ReturnCode ServerSocket::cmdMoveCard(const QList<QVariant> &param
 		privateCardId = QString();
 		privateCardName = QString();
 	}
-	msg(QString("private|||move_card|%1|%2|%3|%4|%5|%6|%7|%8").arg(privateCardId)
+	privateEvent(QString("move_card|%1|%2|%3|%4|%5|%6|%7|%8").arg(privateCardId)
 							    .arg(privateCardName)
 							    .arg(startzone->getName())
 							    .arg(position)
@@ -773,14 +778,9 @@ bool ServerSocket::parseCommand(QString line)
 	return remsg->send(ReturnMessage::ReturnSyntaxError);
 }
 
-PlayerStatusEnum ServerSocket::getStatus()
+void ServerSocket::privateEvent(const QString &line)
 {
-	return PlayerStatus;
-}
-
-void ServerSocket::setStatus(PlayerStatusEnum status)
-{
-	PlayerStatus = status;
+	msg(QString("private|%1|%2|%3").arg(playerId).arg(playerName).arg(line));
 }
 
 void ServerSocket::setGame(ServerGame *g)
@@ -812,7 +812,7 @@ QStringList ServerSocket::listZones() const
 
 void ServerSocket::msg(const QString &s)
 {
-	qDebug(QString(">>> %1").arg(s).toLatin1());
+	qDebug(QString("OUT id=%1 name=%2 >>> %3").arg(playerId).arg(playerName).arg(s).toLatin1());
 	QTextStream stream(this);
 	stream.setCodec("UTF-8");
 	stream << s << endl;

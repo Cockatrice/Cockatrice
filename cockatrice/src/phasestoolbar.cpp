@@ -5,30 +5,37 @@
 #include <QPen>
 
 PhaseButton::PhaseButton(const QIcon &icon, QAction *_doubleClickAction)
-	: QPushButton(icon, QString()), active(false), doubleClickAction(_doubleClickAction)
+	: QPushButton(icon, QString()), active(false), doubleClickAction(_doubleClickAction), activePixmap(50, 50), inactivePixmap(50, 50)
 {
 	setFixedSize(50, 50);
+	
+	updatePixmap(activePixmap, true);
+	updatePixmap(inactivePixmap, false);
 }
 
-void PhaseButton::paintEvent(QPaintEvent *event)
+void PhaseButton::updatePixmap(QPixmap &pixmap, bool active)
 {
-	QPushButton::paintEvent(event);
-	if (active) {
-		QPainter painter(this);
-		int height = size().height();
-		int width = size().width();
+	pixmap.fill(Qt::transparent);
+	
+	QPainter painter(&pixmap);
+	int height = pixmap.height();
+	int width = pixmap.width();
 
-		painter.setPen(QPen(Qt::transparent));
+	if (active)
+		painter.setBrush(Qt::red);
+	painter.setPen(Qt::gray);
+	painter.drawRect(1, 1, width - 2, height - 2);
 
-		QRadialGradient grad(QPointF(0.5, 0.5), 0.5);
-		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
-		grad.setColorAt(0, QColor(180, 0, 0, 0));
-		grad.setColorAt(0.8, QColor(180, 0, 0, 0));
-		grad.setColorAt(1, QColor(180, 0, 0, 255));
-		painter.setBrush(QBrush(grad));
+	icon().paint(&painter, 5, 5, width - 10, height - 10);
+}
 
-		painter.drawRect(2, 2, width - 4, height - 4);
-	}
+void PhaseButton::paintEvent(QPaintEvent */*event*/)
+{
+	QPainter painter(this);
+	if (active)
+		painter.drawPixmap(0, 0, size().width(), size().height(), activePixmap);
+	else
+		painter.drawPixmap(0, 0, size().width(), size().height(), inactivePixmap);
 }
 
 void PhaseButton::setPhaseText(const QString &_phaseText)
@@ -67,13 +74,11 @@ PhasesToolbar::PhasesToolbar(QWidget *parent)
 		<< combatAttackersButton << combatBlockersButton << combatDamageButton << combatEndButton
 		<< main2Button << cleanupButton;
 	
-	for (int i = 0; i < buttonList.size(); ++i) {
-		buttonList[i]->setIconSize(QSize(36, 36));
+	for (int i = 0; i < buttonList.size(); ++i)
 		connect(buttonList[i], SIGNAL(clicked()), this, SLOT(phaseButtonClicked()));
-	}
 	
 	QPushButton *nextTurnButton = new QPushButton(QIcon(":/resources/icon_nextturn.svg"), QString());
-	nextTurnButton->setIconSize(QSize(36, 36));
+	nextTurnButton->setIconSize(QSize(40, 40));
 	nextTurnButton->setFixedSize(50, 50);
 	connect(nextTurnButton, SIGNAL(clicked()), this, SIGNAL(signalNextTurn()));
 		

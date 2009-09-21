@@ -64,6 +64,16 @@ void MessageLogWidget::logLeave(Player *player)
 	append(tr("%1 has left the game").arg(sanitizeHtml(player->getName())));
 }
 
+void MessageLogWidget::logJoinSpectator(QString name)
+{
+	append(tr("%1 is now watching the game.").arg(sanitizeHtml(name)));
+}
+
+void MessageLogWidget::logLeaveSpectator(QString name)
+{
+	append(tr("%1 is not watching the game any more.").arg(sanitizeHtml(name)));
+}
+
 void MessageLogWidget::logReadyStart(Player *player)
 {
 	append(tr("%1 is ready to start a new game.").arg(sanitizeHtml(player->getName())));
@@ -249,6 +259,8 @@ void MessageLogWidget::connectToGame(Game *game)
 	connect(game, SIGNAL(logPlayerListReceived(QStringList)), this, SLOT(logPlayerListReceived(QStringList)));
 	connect(game, SIGNAL(logJoin(Player *)), this, SLOT(logJoin(Player *)));
 	connect(game, SIGNAL(logLeave(Player *)), this, SLOT(logLeave(Player *)));
+	connect(game, SIGNAL(logJoinSpectator(QString)), this, SLOT(logJoinSpectator(QString)));
+	connect(game, SIGNAL(logLeaveSpectator(QString)), this, SLOT(logLeaveSpectator(QString)));
 	connect(game, SIGNAL(logReadyStart(Player *)), this, SLOT(logReadyStart(Player *)));
 	connect(game, SIGNAL(logGameStart()), this, SLOT(logGameStart()));
 	connect(game, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));

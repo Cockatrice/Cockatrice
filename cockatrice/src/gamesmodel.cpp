@@ -15,11 +15,11 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
 	
 	ServerGame *g = gameList.at(index.row());
 	switch (index.column()) {
-		case 0: return g->getGameId();
+		case 0: return g->getDescription();
 		case 1: return g->getCreator();
-		case 2: return g->getDescription();
-		case 3: return QString(g->getHasPassword() ? tr("yes") : tr("no"));
-		case 4: return QString("%1/%2").arg(g->getPlayerCount()).arg(g->getMaxPlayers());
+		case 2: return g->getHasPassword() ? tr("yes") : tr("no");
+		case 3: return QString("%1/%2").arg(g->getPlayerCount()).arg(g->getMaxPlayers());
+		case 4: return g->getSpectatorsAllowed() ? QVariant(g->getSpectatorsCount()) : QVariant(tr("not allowed"));
 		default: return QVariant();
 	}
 }
@@ -29,11 +29,11 @@ QVariant GamesModel::headerData(int section, Qt::Orientation orientation, int ro
 	if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal))
 		return QVariant();
 	switch (section) {
-		case 0: return tr("Game ID");
+		case 0: return tr("Description");
 		case 1: return tr("Creator");
-		case 2: return tr("Description");
-		case 3: return tr("Password");
-		case 4: return tr("Players");
+		case 2: return tr("Password");
+		case 3: return tr("Players");
+		case 4: return tr("Spectators");
 		default: return QVariant();
 	}
 }
