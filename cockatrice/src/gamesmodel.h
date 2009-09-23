@@ -3,7 +3,8 @@
 
 #include <QAbstractListModel>
 #include <QList>
-#include "servergame.h"
+
+class ServerGame;
 
 class GamesModel : public QAbstractTableModel {
 	Q_OBJECT

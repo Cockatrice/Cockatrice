@@ -4,7 +4,6 @@
 #include <QInputDialog>
 #include <QPoint>
 #include "zonelist.h"
-#include "servereventdata.h"
 
 class Client;
 class CardDatabase;
@@ -15,6 +14,7 @@ class Game;
 class Counter;
 class TableZone;
 class HandZone;
+class ServerEventData;
 
 class Player : public QObject, public QGraphicsItem {
 	Q_OBJECT

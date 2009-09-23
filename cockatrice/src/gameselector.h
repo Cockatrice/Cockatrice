@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include "gamesmodel.h"
-#include "servergame.h"
 #include "client.h"
 
 class QPushButton;

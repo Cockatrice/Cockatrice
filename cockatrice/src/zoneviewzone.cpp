@@ -27,9 +27,8 @@ void ZoneViewZone::paint(QPainter */*painter*/, const QStyleOptionGraphicsItem *
 void ZoneViewZone::initializeCards()
 {
 	if (!origZone->contentsKnown()) {
-		connect(player->client, SIGNAL(zoneDumpReceived(int, QList<ServerZoneCard *>)), this, SLOT(zoneDumpReceived(int, QList<ServerZoneCard *>)));
-		PendingCommand *dumpZoneCommand = player->client->dumpZone(player->getId(), name, numberCards);
-		cmdId = dumpZoneCommand->getMsgId();
+		PendingCommand_DumpZone *dumpZoneCommand = player->client->dumpZone(player->getId(), name, numberCards);
+		connect(dumpZoneCommand, SIGNAL(cardListReceived(QList<ServerZoneCard>)), this, SLOT(zoneDumpReceived(QList<ServerZoneCard>)));
 	} else {
 		const CardList &c = origZone->getCards();
 		int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
@@ -42,18 +41,11 @@ void ZoneViewZone::initializeCards()
 	}
 }
 
-void ZoneViewZone::zoneDumpReceived(int commandId, QList<ServerZoneCard *> cards)
+void ZoneViewZone::zoneDumpReceived(QList<ServerZoneCard> cards)
 {
-	if (commandId != cmdId)
-		return;
-
 	for (int i = 0; i < cards.size(); i++) {
-		ServerZoneCard *temp = cards[i];
-
-		CardItem *card = new CardItem(player->getDb(), temp->getName(), i, this);
+		CardItem *card = new CardItem(player->getDb(), cards[i].getName(), i, this);
 		addCard(card, false, i);
-
-		delete temp;
 	}
 	
 	emit contentsChanged();

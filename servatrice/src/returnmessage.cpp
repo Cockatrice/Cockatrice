@@ -32,7 +32,5 @@ bool ReturnMessage::sendList(const QStringList &args)
 		s->msg(QString("%1|%2|%3").arg(cmd)
 					  .arg(msg_id)
 					  .arg(args[i]));
-	s->msg(QString("%1|%2|.").arg(cmd).arg(msg_id));
-	
 	return true;
 }

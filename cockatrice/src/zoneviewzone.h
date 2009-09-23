@@ -2,7 +2,7 @@
 #define ZONEVIEWERZONE_H
 
 #include "cardzone.h"
-#include "serverzonecard.h"
+#include "client.h"
 #include <QGraphicsWidget>
 #include <QGraphicsLayoutItem>
 
@@ -16,7 +16,6 @@ private:
 	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
 	CardZone *origZone;
 	bool sortingEnabled;
-	int cmdId;
 public:
 	ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards = -1, QGraphicsItem *parent = 0);
 	~ZoneViewZone();
@@ -30,7 +29,7 @@ public:
 public slots:
 	void setSortingEnabled(int _sortingEnabled);
 private slots:
-	void zoneDumpReceived(int commandId, QList<ServerZoneCard *> cards);
+	void zoneDumpReceived(QList<ServerZoneCard> cards);
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
 	QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;

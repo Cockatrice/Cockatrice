@@ -1,5 +1,5 @@
 #include "gamesmodel.h"
-#include "servergame.h"
+#include "client.h"
 
 GamesModel::~GamesModel()
 {

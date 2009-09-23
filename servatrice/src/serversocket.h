@@ -46,17 +46,25 @@ signals:
 	void startGameIfReady();
 private:
 	typedef ReturnMessage::ReturnCode (ServerSocket::*CommandHandler)(const QList<QVariant> &);
-	struct CommandProperties {
-		QString name;
+	class CommandProperties {
+	private:
 		bool needsLogin;
 		bool needsGame;
 		bool needsStartedGame;
 		bool allowedToSpectator;
 		QList<QVariant::Type> paramTypes;
 		CommandHandler handler;
+	public:
+		CommandProperties(bool _needsLogin = false, bool _needsGame = false, bool _needsStartedGame = false, bool _allowedToSpectator = false, const QList<QVariant::Type> &_paramTypes = QList<QVariant::Type>(), CommandHandler _handler = 0)
+			: needsLogin(_needsLogin), needsGame(_needsGame), needsStartedGame(_needsStartedGame), allowedToSpectator(_allowedToSpectator), paramTypes(_paramTypes), handler(_handler) { }
+		bool getNeedsLogin() const { return needsLogin; }
+		bool getNeedsGame() const { return needsGame; }
+		bool getNeedsStartedGame() const { return needsStartedGame; }
+		bool getAllowedToSpectator() const { return allowedToSpectator; }
+		const QList<QVariant::Type> &getParamTypes() const { return paramTypes; }
+		CommandHandler getHandler() const { return handler; }
 	};
-	static const int numberCommands = 31;
-	static const CommandProperties commandList[numberCommands];
+	static QHash<QString, CommandProperties> commandHash;
 
 	ReturnMessage::ReturnCode cmdPing(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdLogin(const QList<QVariant> &params);
@@ -127,8 +135,8 @@ public:
 	QString getPlayerName() const { return playerName; }
 	bool getAcceptsGameListChanges() const { return acceptsGameListChanges; }
 	bool getAcceptsChatChannelListChanges() const { return acceptsChatChannelListChanges; }
-	QStringList listCounters() const;
-	QStringList listZones() const;
+	const QList<PlayerZone *> &getZones() const { return zones; }
+	const QList<Counter *> &getCounters() const { return counters; }
 	void setupZones();
 };
 

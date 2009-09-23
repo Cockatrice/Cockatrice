@@ -22,6 +22,7 @@ public slots:
 	void logSocketError(const QString &errorString);
 	void logServerError(ServerResponse response);
 	void logProtocolVersionMismatch();
+	void logProtocolError();
 private slots:
 	void logPlayerListReceived(QStringList players);
 	void logJoin(Player *player);

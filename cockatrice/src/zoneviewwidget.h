@@ -4,7 +4,6 @@
 #include <QDialog>
 #include <QGraphicsScene>
 #include <QGraphicsWidget>
-#include "serverzonecard.h"
 
 class CardZone;
 class ZoneViewZone;

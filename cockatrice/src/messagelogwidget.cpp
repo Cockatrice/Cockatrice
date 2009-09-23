@@ -45,6 +45,11 @@ void MessageLogWidget::logProtocolVersionMismatch()
 	append(tr("Protocol version mismatch."));
 }
 
+void MessageLogWidget::logProtocolError()
+{
+	append(tr("Protocol error."));
+}
+
 void MessageLogWidget::logPlayerListReceived(QStringList players)
 {
 	append("---");

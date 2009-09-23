@@ -4,11 +4,10 @@
 #include <QHash>
 #include <QStringList>
 #include "playerlist.h"
+#include "client.h"
 
-class ServerPlayer;
 class GameScene;
 class Player;
-class Client;
 class ServerEventData;
 class CardDatabase;
 class DlgStartGame;
@@ -56,7 +55,7 @@ private slots:
 	void actMoveToExile(CardItem *card);
 
 	void gameEvent(const ServerEventData &msg);
-	void playerListReceived(QList<ServerPlayer *> playerList);
+	void playerListReceived(QList<ServerPlayer> playerList);
 	void readyStart();
 signals:
 	void submitDecklist();

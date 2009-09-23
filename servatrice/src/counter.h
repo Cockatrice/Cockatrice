@@ -30,9 +30,10 @@ protected:
 public:
 	Counter(QString _name, int _color, int _count = 0) : name(_name), color(_color), count(_count) { }
 	~Counter() { }
+	QString getName() const { return name; }
+	int getColor() const { return color; }
 	int getCount() const { return count; }
 	void setCount(int _count) { count = _count; }
-	QString getName() const { return name; }
 };
 
 #endif

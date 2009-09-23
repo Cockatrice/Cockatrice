@@ -2,7 +2,6 @@
 #define CHATWIDGET_H
 
 #include <QWidget>
-#include "servereventdata.h"
 #include "client.h"
 
 class QListWidget;

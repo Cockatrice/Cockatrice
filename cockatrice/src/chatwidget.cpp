@@ -212,8 +212,7 @@ void ChatWidget::chatEvent(const ChatEventData &data)
 
 void ChatWidget::joinChannel(const QString &channelName)
 {
-	PendingCommand *pc = client->chatJoinChannel(channelName);
-	pc->setExtraData(channelName);
+	PendingCommand_ChatJoinChannel *pc = client->chatJoinChannel(channelName);
 	connect(pc, SIGNAL(finished(ServerResponse)), this, SLOT(joinFinished(ServerResponse)));
 }
 
@@ -234,8 +233,8 @@ void ChatWidget::joinFinished(ServerResponse resp)
 	if (resp != RespOk)
 		return;
 	
-	PendingCommand *pc = qobject_cast<PendingCommand *>(sender());
-	QString channelName = pc->getExtraData();
+	PendingCommand_ChatJoinChannel *pc = qobject_cast<PendingCommand_ChatJoinChannel *>(sender());
+	QString channelName = pc->getChannelName();
 	ChannelWidget *cw = new ChannelWidget(client, channelName);
 	tab->addTab(cw, channelName);
 }

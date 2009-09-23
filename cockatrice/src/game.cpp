@@ -3,9 +3,7 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <stdlib.h>
-#include "serverplayer.h"
 #include "game.h"
-#include "servereventdata.h"
 #include "client.h"
 #include "tablezone.h"
 #include "handzone.h"
@@ -18,7 +16,6 @@ Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenuBar *menu
 	: QObject(parent), db(_db), client(_client), scene(_scene), started(false), currentPhase(-1)
 {
 	connect(client, SIGNAL(gameEvent(const ServerEventData &)), this, SLOT(gameEvent(const ServerEventData &)));
-	connect(client, SIGNAL(playerListReceived(QList<ServerPlayer *>)), this, SLOT(playerListReceived(QList<ServerPlayer *>)));
 
 	aNextPhase = new QAction(this);
 	connect(aNextPhase, SIGNAL(triggered()), this, SLOT(actNextPhase()));
@@ -82,7 +79,8 @@ Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenuBar *menu
 	
 	retranslateUi();
 	
-	client->listPlayers();
+	PendingCommand_ListPlayers *pc = client->listPlayers();
+	connect(pc, SIGNAL(playerListReceived(QList<ServerPlayer>)), this, SLOT(playerListReceived(QList<ServerPlayer>)));
 }
 
 Game::~Game()
@@ -143,18 +141,12 @@ Player *Game::addPlayer(int playerId, const QString &playerName, bool local)
 	return newPlayer;
 }
 
-void Game::playerListReceived(QList<ServerPlayer *> playerList)
+void Game::playerListReceived(QList<ServerPlayer> playerList)
 {
-	QListIterator<ServerPlayer *> i(playerList);
 	QStringList nameList;
-	while (i.hasNext()) {
-		ServerPlayer *temp = i.next();
-		nameList << temp->getName();
-		int id = temp->getPlayerId();
-
-		addPlayer(id, temp->getName(), temp->getLocal());
-
-		delete temp;
+	for (int i = 0; i < playerList.size(); ++i) {
+		nameList << playerList[i].getName();
+		addPlayer(playerList[i].getPlayerId(), playerList[i].getName(), playerList[i].getLocal());
 	}
 	emit logPlayerListReceived(nameList);
 	restartGameDialog();

@@ -13,8 +13,6 @@ HEADERS += src/counter.h \
  src/gamesmodel.h \
  src/client.h \
  src/window_main.h \
- src/servergame.h \
- src/servereventdata.h \
  src/zonelist.h \
  src/cardzone.h \
  src/player.h \
@@ -30,7 +28,6 @@ HEADERS += src/counter.h \
  src/dlg_startgame.h \
  src/cardinfowidget.h \
  src/messagelogwidget.h \
- src/serverzonecard.h \
  src/zoneviewzone.h \
  src/zoneviewwidget.h \
  src/pilezone.h \
@@ -53,7 +50,6 @@ SOURCES += src/counter.cpp \
  src/client.cpp \
  src/main.cpp \
  src/window_main.cpp \
- src/servereventdata.cpp \
  src/gamesmodel.cpp \
  src/player.cpp \
  src/cardzone.cpp \
