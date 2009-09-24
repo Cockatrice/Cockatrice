@@ -78,9 +78,6 @@ Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenuBar *menu
 	connect(dlgStartGame, SIGNAL(finished(int)), this, SLOT(readyStart()));
 	
 	retranslateUi();
-	
-	PendingCommand_ListPlayers *pc = client->listPlayers();
-	connect(pc, SIGNAL(playerListReceived(QList<ServerPlayer>)), this, SLOT(playerListReceived(QList<ServerPlayer>)));
 }
 
 Game::~Game()
@@ -141,6 +138,59 @@ Player *Game::addPlayer(int playerId, const QString &playerName, bool local)
 	return newPlayer;
 }
 
+void Game::cardListReceived(QList<ServerZoneCard> list)
+{
+	for (int i = 0; i < list.size(); ++i) {
+		Player *p = players.findPlayer(list[i].getPlayerId());
+		if (!p)
+			continue;
+		CardZone *zone = p->getZones().findZone(list[i].getZoneName());
+		if (!zone)
+			continue;
+		
+		CardItem *card = new CardItem(db, list[i].getName(), list[i].getId());
+		zone->addCard(card, false, list[i].getX(), list[i].getY());
+
+		card->setCounters(list[i].getCounters());
+		card->setTapped(list[i].getTapped());
+		card->setAttacking(list[i].getAttacking());
+		card->setAnnotation(list[i].getAnnotation());
+	}
+}
+
+void Game::zoneListReceived(QList<ServerZone> list)
+{
+	for (int i = 0; i < list.size(); ++i) {
+		Player *p = players.findPlayer(list[i].getPlayerId());
+		if (!p)
+			continue;
+		CardZone *zone = p->getZones().findZone(list[i].getName());
+		if (!zone)
+			continue;
+		zone->clearContents();
+		if (
+			(list[i].getType() != ServerZone::PublicZone)
+			&& !((list[i].getType() == ServerZone::PrivateZone) && p->getLocal())
+		) {
+			for (int j = 0; j < list[i].getCardCount(); ++j)
+				zone->addCard(new CardItem(db), false, -1);
+			zone->reorganizeCards();
+		}
+	}
+}
+
+void Game::counterListReceived(QList<ServerCounter> list)
+{
+	for (int i = 0; i < players.size(); ++i)
+		players[i]->clearCounters();
+	
+	for (int i = 0; i < list.size(); ++i) {
+		Player *p = players.findPlayer(list[i].getPlayerId());
+		if (p)
+			p->addCounter(list[i].getName(), list[i].getColor(), list[i].getCount());
+	}
+}
+
 void Game::playerListReceived(QList<ServerPlayer> playerList)
 {
 	QStringList nameList;
@@ -171,8 +221,9 @@ void Game::gameEvent(const ServerEventData &msg)
 			return;
 		p->gameEvent(msg);
 	} else {
-		if ((!p) && (msg.getEventType() != eventJoin)) {
-			// XXX
+		if ((msg.getPlayerId() != -1) && (!p) && (msg.getEventType() != eventJoin) && (msg.getEventType() != eventLeave)) {
+			qDebug("Game::gameEvent: invalid player");
+			return;
 		}
 
 		switch(msg.getEventType()) {
@@ -204,6 +255,11 @@ void Game::gameEvent(const ServerEventData &msg)
 					emit logLeaveSpectator(msg.getPlayerName());
 				}
 			}
+			break;
+		}
+		case eventGameClosed: {
+			started = false;
+			emit logGameClosed();
 			break;
 		}
 		case eventReadyStart:
@@ -251,7 +307,6 @@ void Game::gameEvent(const ServerEventData &msg)
 			break;
 		}
 
-		case eventName:
 		case eventCreateToken:
 		case eventSetupZones:
 		case eventSetCardAttr:
@@ -267,7 +322,7 @@ void Game::gameEvent(const ServerEventData &msg)
 			Player *zoneOwner = players.findPlayer(data[0].toInt());
 			if (!zoneOwner)
 				break;
-			CardZone *zone = zoneOwner->getZones()->findZone(data[1]);
+			CardZone *zone = zoneOwner->getZones().findZone(data[1]);
 			if (!zone)
 				break;
 			emit logDumpZone(p, zone, data[2].toInt());
@@ -278,7 +333,7 @@ void Game::gameEvent(const ServerEventData &msg)
 			Player *zoneOwner = players.findPlayer(data[0].toInt());
 			if (!zoneOwner)
 				break;
-			CardZone *zone = zoneOwner->getZones()->findZone(data[1]);
+			CardZone *zone = zoneOwner->getZones().findZone(data[1]);
 			if (!zone)
 				break;
 			emit logStopDumpZone(p, zone);
@@ -414,4 +469,13 @@ void Game::actMoveToExile(CardItem *card)
 void Game::hoverCardEvent(CardItem *card)
 {
 	emit hoverCard(card->getName());
+}
+
+void Game::queryGameState()
+{
+	PendingCommand_DumpAll *pc = client->dumpAll();
+	connect(pc, SIGNAL(playerListReceived(QList<ServerPlayer>)), this, SLOT(playerListReceived(QList<ServerPlayer>)));
+	connect(pc, SIGNAL(zoneListReceived(QList<ServerZone>)), this, SLOT(zoneListReceived(QList<ServerZone>)));
+	connect(pc, SIGNAL(cardListReceived(QList<ServerZoneCard>)), this, SLOT(cardListReceived(QList<ServerZoneCard>)));
+	connect(pc, SIGNAL(counterListReceived(QList<ServerCounter>)), this, SLOT(counterListReceived(QList<ServerCounter>)));
 }

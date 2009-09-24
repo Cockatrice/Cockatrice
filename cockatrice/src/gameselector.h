@@ -2,11 +2,13 @@
 #define GAMESELECTOR_H
 
 #include <QWidget>
-#include "gamesmodel.h"
 #include "client.h"
 
 class QPushButton;
+class QCheckBox;
 class QTreeView;
+class GamesModel;
+class GamesProxyModel;
 
 class GameSelector : public QWidget {
 	Q_OBJECT
@@ -16,6 +18,7 @@ public:
 	void disableGameList();
 	void retranslateUi();
 private slots:
+	void showFullGamesChanged(int state);
 	void actCreate();
 	void actRefresh();
 	void actJoin();
@@ -25,7 +28,9 @@ private:
 
 	QTreeView *gameListView;
 	GamesModel *gameListModel;
+	GamesProxyModel *gameListProxyModel;
 	QPushButton *createButton, *joinButton, *spectateButton;
+	QCheckBox *showFullGamesCheckBox;
 };
 
 #endif

@@ -88,7 +88,7 @@ bool Server::openDatabase()
 void Server::addGame(const QString description, const QString password, int maxPlayers, bool spectatorsAllowed, ServerSocket *creator)
 {
 	ServerGame *newGame = new ServerGame(creator, nextGameId++, description, password, maxPlayers, spectatorsAllowed, this);
-	games << newGame;
+	games.insert(newGame->getGameId(), newGame);
 	connect(newGame, SIGNAL(gameClosing()), this, SLOT(gameClosing()));
 	newGame->addPlayer(creator, false);
 	
@@ -131,28 +131,9 @@ AuthenticationResult Server::checkUserPassword(const QString &user, const QStrin
 		return UnknownUser;
 }
 
-ServerGame *Server::getGame(int gameId)
+ServerGame *Server::getGame(int gameId) const
 {
-	QListIterator<ServerGame *> i(games);
-	while (i.hasNext()) {
-		ServerGame *tmp = i.next();
-		if ((tmp->getGameId() == gameId) && !tmp->getGameStarted())
-			return tmp;
-	}
-	return NULL;
-}
-
-QList<ServerGame *> Server::listOpenGames()
-{
-	QList<ServerGame *> result;
-	QListIterator<ServerGame *> i(games);
-	while (i.hasNext()) {
-		ServerGame *tmp = i.next();
-		if ((!tmp->getGameStarted())
-		 && (tmp->getPlayerCount() < tmp->getMaxPlayers()))
-			result.append(tmp);
-	}
-	return result;
+	return games.value(gameId);
 }
 
 void Server::broadcastGameListUpdate(ServerGame *game)
@@ -175,7 +156,7 @@ void Server::broadcastChannelUpdate()
 void Server::gameClosing()
 {
 	qDebug("Server::gameClosing");
-	games.removeAt(games.indexOf(static_cast<ServerGame *>(sender())));
+	games.remove(games.key(static_cast<ServerGame *>(sender())));
 }
 
 void Server::removePlayer(ServerSocket *player)

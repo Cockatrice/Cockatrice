@@ -22,14 +22,15 @@ bool ReturnMessage::send(ReturnCode code)
 	return (code == ReturnOk);
 }
 
-bool ReturnMessage::sendList(const QStringList &args)
+bool ReturnMessage::sendList(const QStringList &args, const QString &prefix)
 {
 	ServerSocket *s = qobject_cast<ServerSocket *>(parent());
 	if (!s)
 		return false;
 	
+	QString arg1 = prefix.isEmpty() ? cmd : prefix;
 	for (int i = 0; i < args.size(); i++)
-		s->msg(QString("%1|%2|%3").arg(cmd)
+		s->msg(QString("%1|%2|%3").arg(arg1)
 					  .arg(msg_id)
 					  .arg(args[i]));
 	return true;

@@ -21,14 +21,14 @@
 #define SERVERGAME_H
 
 #include <QStringList>
+#include <QPointer>
 #include "returnmessage.h"
-
-class ServerSocket;
+#include "serversocket.h"
 
 class ServerGame : public QObject {
 	Q_OBJECT
 private:
-	ServerSocket *creator;
+	QPointer<ServerSocket> creator;
 	QList<ServerSocket *> players;
 	QList<ServerSocket *> spectators;
 	bool gameStarted;
@@ -41,7 +41,7 @@ private:
 signals:
 	void gameClosing();
 public slots:
-	void broadcastEvent(const QString &event, ServerSocket *player);
+	void broadcastEvent(const QString &eventStr, ServerSocket *player);
 public:
 	ServerGame(ServerSocket *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent = 0);
 	~ServerGame();
@@ -60,7 +60,6 @@ public:
 	void addPlayer(ServerSocket *player, bool spectator);
 	void removePlayer(ServerSocket *player);
 	void startGameIfReady();
-	void msg(const QString &s);
 	int getActivePlayer() const { return activePlayer; }
 	int getActivePhase() const { return activePhase; }
 	void setActivePlayer(int _activePlayer);

@@ -15,7 +15,7 @@ public:
 	void setMsgId(unsigned int _msg_id) { msg_id = _msg_id; }
 	void setCmd(const QString &_cmd) { cmd = _cmd; }
 	bool send(ReturnCode code);
-	bool sendList(const QStringList &args);
+	bool sendList(const QStringList &args, const QString &prefix = QString());
 };
 
 #endif

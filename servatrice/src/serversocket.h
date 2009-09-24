@@ -66,6 +66,11 @@ private:
 	};
 	static QHash<QString, CommandProperties> commandHash;
 
+	QStringList listPlayersHelper();
+	QStringList listZonesHelper(ServerSocket *player);
+	QStringList dumpZoneHelper(ServerSocket *player, PlayerZone *zone, int numberCards);
+	QStringList listCountersHelper(ServerSocket *player);
+	
 	ReturnMessage::ReturnCode cmdPing(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdLogin(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdChatListChannels(const QList<QVariant> &params);
@@ -97,6 +102,7 @@ private:
 	ReturnMessage::ReturnCode cmdRollDie(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdNextTurn(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdSetActivePhase(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdDumpAll(const QList<QVariant> &params);
 
 	Server *server;
 	ServerGame *game;
@@ -113,9 +119,7 @@ private:
 	PlayerZone *getZone(const QString &name) const;
 	Counter *getCounter(const QString &name) const;
 	void clearZones();
-	void leaveGame();
 	bool parseCommand(QString line);
-	void privateEvent(const QString &line);
 	PlayerStatusEnum PlayerStatus;
 	ReturnMessage *remsg;
 	AuthenticationResult authState;
@@ -125,7 +129,10 @@ public:
 	ServerSocket(Server *_server, QObject *parent = 0);
 	~ServerSocket();
 	void msg(const QString &s);
-	void setGame(ServerGame *g);
+	void privateEvent(const QString &line);
+	void publicEvent(const QString &line, ServerSocket *player = 0);
+	void setGame(ServerGame *g) { game = g; }
+	void leaveGame();
 	PlayerStatusEnum getStatus() { return PlayerStatus; }
 	void setStatus(PlayerStatusEnum _status) { PlayerStatus = _status; }
 	void initConnection();

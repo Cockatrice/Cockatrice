@@ -55,7 +55,12 @@ private slots:
 	void actMoveToExile(CardItem *card);
 
 	void gameEvent(const ServerEventData &msg);
+	
 	void playerListReceived(QList<ServerPlayer> playerList);
+	void cardListReceived(QList<ServerZoneCard> list);
+	void zoneListReceived(QList<ServerZone> list);
+	void counterListReceived(QList<ServerCounter> list);
+	
 	void readyStart();
 signals:
 	void submitDecklist();
@@ -67,6 +72,7 @@ signals:
 	void logPlayerListReceived(QStringList players);
 	void logJoin(Player *player);
 	void logLeave(Player *player);
+	void logGameClosed();
 	void logJoinSpectator(QString playerName);
 	void logLeaveSpectator(QString playerName);
 	void logReadyStart(Player *player);
@@ -92,6 +98,7 @@ public:
 	void restartGameDialog();
 	void hoverCardEvent(CardItem *card);
 	Player *addPlayer(int playerId, const QString &playerName, bool local);
+	void queryGameState();
 };
 
 #endif

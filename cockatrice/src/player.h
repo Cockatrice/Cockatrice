@@ -4,6 +4,7 @@
 #include <QInputDialog>
 #include <QPoint>
 #include "zonelist.h"
+#include "client.h"
 
 class Client;
 class CardDatabase;
@@ -14,7 +15,6 @@ class Game;
 class Counter;
 class TableZone;
 class HandZone;
-class ServerEventData;
 
 class Player : public QObject, public QGraphicsItem {
 	Q_OBJECT
@@ -103,7 +103,7 @@ public:
 	int getId() const { return id; }
 	QString getName() const { return name; }
 	bool getLocal() const { return local; }
-	const ZoneList *getZones() const { return &zones; }
+	const ZoneList &getZones() const { return zones; }
 	void gameEvent(const ServerEventData &event);
 	CardDatabase *getDb() const { return db; }
 	void showCardMenu(const QPoint &p);

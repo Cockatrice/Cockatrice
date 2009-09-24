@@ -45,16 +45,16 @@ public:
 	QSettings *settings;
 	bool openDatabase();
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
-	QList<ServerGame *> listOpenGames();
+	QList<ServerGame *> getGames() const { return games.values(); }
+	ServerGame *getGame(int gameId) const;
 	QList<ChatChannel *> getChatChannelList() { return chatChannelList; }
-	ServerGame *getGame(int gameId);
 	AbstractRNG *getRNG() const { return rng; }
 	void broadcastGameListUpdate(ServerGame *game);
 	void removePlayer(ServerSocket *player);
 	const QStringList &getLoginMessage() const { return loginMessage; }
 private:
 	void incomingConnection(int SocketId);
-	QList<ServerGame *> games;
+	QMap<int, ServerGame *> games;
 	QList<ServerSocket *> players;
 	QList<ChatChannel *> chatChannelList;
 	int nextGameId;

@@ -116,6 +116,7 @@ ServerSocket::ServerSocket(Server *_server, QObject *parent)
 		commandHash.insert("next_turn", CommandProperties(true, true, true, false, QList<QVariant::Type>(), &ServerSocket::cmdNextTurn));
 		commandHash.insert("set_active_phase", CommandProperties(true, true, true, false, QList<QVariant::Type>()
 			<< QVariant::Int, &ServerSocket::cmdSetActivePhase));
+		commandHash.insert("dump_all", CommandProperties(true, true, false, true, QList<QVariant::Type>(), &ServerSocket::cmdDumpAll));
 	}
 
 	remsg = new ReturnMessage(this);
@@ -323,10 +324,9 @@ ReturnMessage::ReturnCode ServerSocket::cmdChatSay(const QList<QVariant> &params
 
 ReturnMessage::ReturnCode ServerSocket::cmdListGames(const QList<QVariant> &/*params*/)
 {
-	QList<ServerGame *> gameList = server->listOpenGames();
-	QListIterator<ServerGame *> gameListIterator(gameList);
-	while (gameListIterator.hasNext())
-		msg(gameListIterator.next()->getGameListLine());
+	const QList<ServerGame *> &gameList = server->getGames();
+	for (int i = 0; i < gameList.size(); ++i)
+		msg(gameList[i]->getGameListLine());
 
 	acceptsGameListChanges = true;
 	return ReturnMessage::ReturnOk;
@@ -375,14 +375,18 @@ ReturnMessage::ReturnCode ServerSocket::cmdLeaveGame(const QList<QVariant> &/*pa
 	return ReturnMessage::ReturnOk;
 }
 
-ReturnMessage::ReturnCode ServerSocket::cmdListPlayers(const QList<QVariant> &/*params*/)
+QStringList ServerSocket::listPlayersHelper()
 {
 	QStringList result;
 	const QList<ServerSocket *> &players = game->getPlayers();
 	for (int i = 0; i < players.size(); ++i)
 		result << QString("%1|%2|%3").arg(players[i]->getPlayerId()).arg(players[i]->getPlayerName()).arg(players[i] == this ? 1 : 0);
-	
-	remsg->sendList(result);
+	return result;
+}
+
+ReturnMessage::ReturnCode ServerSocket::cmdListPlayers(const QList<QVariant> &/*params*/)
+{
+	remsg->sendList(listPlayersHelper());
 	return ReturnMessage::ReturnOk;
 }
 
@@ -632,6 +636,15 @@ ReturnMessage::ReturnCode ServerSocket::cmdDelCounter(const QList<QVariant> &par
 	return ReturnMessage::ReturnOk;
 }
 
+QStringList ServerSocket::listCountersHelper(ServerSocket *player)
+{
+	QStringList result;
+	const QList<Counter *> &counterList = player->getCounters();
+	for (int i = 0; i < counterList.size(); ++i)
+		result << QString("%1|%2|%3|%4").arg(player->getPlayerId()).arg(counterList[i]->getName()).arg(counterList[i]->getColor()).arg(counterList[i]->getCount());
+	return result;
+}
+
 ReturnMessage::ReturnCode ServerSocket::cmdListCounters(const QList<QVariant> &params)
 {
 	int player_id = params[0].toInt();
@@ -639,13 +652,25 @@ ReturnMessage::ReturnCode ServerSocket::cmdListCounters(const QList<QVariant> &p
 	if (!player)
 		return ReturnMessage::ReturnContextError;
 	
-	QStringList result;
-	const QList<Counter *> &counterList = player->getCounters();
-	for (int i = 0; i < counterList.size(); ++i)
-		result << QString("%1|%2|%3").arg(counterList[i]->getName()).arg(counterList[i]->getColor()).arg(counterList[i]->getCount());
-	
-	remsg->sendList(result);
+	remsg->sendList(listCountersHelper(player));
 	return ReturnMessage::ReturnOk;
+}
+
+QStringList ServerSocket::listZonesHelper(ServerSocket *player)
+{
+	QStringList result;
+	const QList<PlayerZone *> &zoneList = player->getZones();
+	for (int i = 0; i < zoneList.size(); ++i) {
+		QString typeStr;
+		switch (zoneList[i]->getType()) {
+			case PlayerZone::PublicZone: typeStr = "public"; break;
+			case PlayerZone::PrivateZone: typeStr = "private"; break;
+			case PlayerZone::HiddenZone: typeStr = "hidden"; break;
+			default: ;
+		}
+		result << QString("%1|%2|%3|%4|%5").arg(player->getPlayerId()).arg(zoneList[i]->getName()).arg(typeStr).arg(zoneList[i]->hasCoords()).arg(zoneList[i]->cards.size());
+	}
+	return result;
 }
 
 ReturnMessage::ReturnCode ServerSocket::cmdListZones(const QList<QVariant> &params)
@@ -655,12 +680,34 @@ ReturnMessage::ReturnCode ServerSocket::cmdListZones(const QList<QVariant> &para
 	if (!player)
 		return ReturnMessage::ReturnContextError;
 	
-	QStringList result;
-	const QList<PlayerZone *> &zoneList = player->getZones();
-	for (int i = 0; i < zoneList.size(); ++i)
-		result << QString("%1|%2|%3|%4").arg(zoneList[i]->getName()).arg(zoneList[i]->getType() == PlayerZone::PublicZone ? 1 : 0).arg(zoneList[i]->hasCoords()).arg(zoneList[i]->cards.size());
-	remsg->sendList(result);
+	remsg->sendList(listZonesHelper(player));
 	return ReturnMessage::ReturnOk;
+}
+
+QStringList ServerSocket::dumpZoneHelper(ServerSocket *player, PlayerZone *zone, int number_cards)
+{
+	QListIterator<Card *> card_iterator(zone->cards);
+	QStringList result;
+	for (int i = 0; card_iterator.hasNext() && (i < number_cards || number_cards == -1); i++) {
+		Card *tmp = card_iterator.next();
+		// XXX Face down cards
+		if (zone->getType() != PlayerZone::HiddenZone)
+			result << QString("%1|%2|%3|%4|%5|%6|%7|%8|%9|%10").arg(player->getPlayerId())
+								    .arg(zone->getName())
+								    .arg(tmp->getId())
+								    .arg(tmp->getName())
+								    .arg(tmp->getX())
+								    .arg(tmp->getY())
+								    .arg(tmp->getCounters())
+								    .arg(tmp->getTapped())
+								    .arg(tmp->getAttacking())
+								    .arg(tmp->getAnnotation());
+		else {
+			zone->setCardsBeingLookedAt(number_cards);
+			result << QString("%1|%2|%3|%4||||||").arg(player->getPlayerId()).arg(zone->getName()).arg(i).arg(tmp->getName());
+		}
+	}
+	return result;
 }
 
 ReturnMessage::ReturnCode ServerSocket::cmdDumpZone(const QList<QVariant> &params)
@@ -675,28 +722,11 @@ ReturnMessage::ReturnCode ServerSocket::cmdDumpZone(const QList<QVariant> &param
 		return ReturnMessage::ReturnContextError;
 	if (!((zone->getType() == PlayerZone::PublicZone) || (player_id == playerId)))
 		return ReturnMessage::ReturnContextError;
-		
-	QListIterator<Card *> card_iterator(zone->cards);
-	QStringList result;
-	for (int i = 0; card_iterator.hasNext() && (i < number_cards || number_cards == -1); i++) {
-		Card *tmp = card_iterator.next();
-		// XXX Face down cards
-		if (zone->getType() != PlayerZone::HiddenZone)
-			result << QString("%1|%2|%3|%4|%5|%6|%7|%8").arg(tmp->getId())
-								    .arg(tmp->getName())
-								    .arg(tmp->getX())
-								    .arg(tmp->getY())
-								    .arg(tmp->getCounters())
-								    .arg(tmp->getTapped())
-								    .arg(tmp->getAttacking())
-								    .arg(tmp->getAnnotation());
-		else {
-			zone->setCardsBeingLookedAt(number_cards);
-			result << QString("%1|%2||||||").arg(i).arg(tmp->getName());
-		}
-	}
-	emit broadcastEvent(QString("dump_zone|%1|%2|%3").arg(player_id).arg(zone->getName()).arg(number_cards), this);
-	remsg->sendList(result);
+	
+	if (zone->getType() == PlayerZone::HiddenZone)
+		emit broadcastEvent(QString("dump_zone|%1|%2|%3").arg(player_id).arg(zone->getName()).arg(number_cards), this);
+	
+	remsg->sendList(dumpZoneHelper(player, zone, number_cards));
 	return ReturnMessage::ReturnOk;
 }
 
@@ -740,6 +770,32 @@ ReturnMessage::ReturnCode ServerSocket::cmdSetActivePhase(const QList<QVariant> 
 		return ReturnMessage::ReturnContextError;
 	game->setActivePhase(active_phase);
 	return ReturnMessage::ReturnOk;
+}
+
+ReturnMessage::ReturnCode ServerSocket::cmdDumpAll(const QList<QVariant> &/*params*/)
+{
+	remsg->sendList(listPlayersHelper(), "list_players");
+	
+	if (game->getGameStarted()) {
+		const QList<ServerSocket *> &players = game->getPlayers();
+		for (int i = 0; i < players.size(); ++i) {
+			remsg->sendList(listZonesHelper(players[i]), "list_zones");
+			
+			const QList<PlayerZone *> &zones = players[i]->getZones();
+			for (int j = 0; j < zones.size(); ++j)
+				if ((zones[j]->getType() == PlayerZone::PublicZone) || ((zones[j]->getType() == PlayerZone::PrivateZone) && (playerId == players[i]->getPlayerId())))
+					remsg->sendList(dumpZoneHelper(players[i], zones[j], -1), "dump_zone");
+			
+			remsg->sendList(listCountersHelper(players[i]), "list_counters");
+		}
+	}
+	remsg->send(ReturnMessage::ReturnOk);
+	if (game->getGameStarted()) {
+		publicEvent(QString("set_active_player|%1").arg(game->getActivePlayer()));
+		publicEvent(QString("set_active_phase|%1").arg(game->getActivePhase()));
+	}
+
+	return ReturnMessage::ReturnNothing;
 }
 
 bool ServerSocket::parseCommand(QString line)
@@ -817,9 +873,12 @@ void ServerSocket::privateEvent(const QString &line)
 	msg(QString("private|%1|%2|%3").arg(playerId).arg(playerName).arg(line));
 }
 
-void ServerSocket::setGame(ServerGame *g)
+void ServerSocket::publicEvent(const QString &line, ServerSocket *player)
 {
-	game = g;
+	if (player)
+		msg(QString("public|%1|%2|%3").arg(player->getPlayerId()).arg(player->getPlayerName()).arg(line));
+	else
+		msg(QString("public|||%1").arg(line));
 }
 
 void ServerSocket::msg(const QString &s)

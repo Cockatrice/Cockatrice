@@ -11,9 +11,9 @@ ServerEventData::ServerEventData(const QString &line)
 	if (eventHash.isEmpty()) {
 		eventHash.insert("player_id", eventPlayerId);
 		eventHash.insert("say", eventSay);
-		eventHash.insert("name", eventName);
 		eventHash.insert("join", eventJoin);
 		eventHash.insert("leave", eventLeave);
+		eventHash.insert("game_closed", eventGameClosed);
 		eventHash.insert("ready_start", eventReadyStart);
 		eventHash.insert("setup_zones", eventSetupZones);
 		eventHash.insert("game_start", eventGameStart);
@@ -35,7 +35,10 @@ ServerEventData::ServerEventData(const QString &line)
 	QStringList values = line.split('|');
 
 	IsPublic = !values.takeFirst().compare("public");
-	PlayerId = values.takeFirst().toInt();
+	bool ok = false;
+	PlayerId = values.takeFirst().toInt(&ok);
+	if (!ok)
+		PlayerId = -1;
 	PlayerName = values.takeFirst();
 	EventType = eventHash.value(values.takeFirst(), eventInvalid);
 	EventData = values;
@@ -84,21 +87,11 @@ void PendingCommand_ListPlayers::responseReceived(ServerResponse resp)
 	PendingCommand::responseReceived(resp);
 }
 
-void PendingCommand_ListPlayers::addPlayer(const ServerPlayer &player)
-{
-	playerList.append(player);
-}
-
 void PendingCommand_ListZones::responseReceived(ServerResponse resp)
 {
 	if (resp == RespOk)
 		emit zoneListReceived(zoneList);
 	PendingCommand::responseReceived(resp);
-}
-
-void PendingCommand_ListZones::addZone(const ServerZone &zone)
-{
-	zoneList.append(zone);
 }
 
 void PendingCommand_DumpZone::responseReceived(ServerResponse resp)
@@ -108,11 +101,6 @@ void PendingCommand_DumpZone::responseReceived(ServerResponse resp)
 	PendingCommand::responseReceived(resp);
 }
 
-void PendingCommand_DumpZone::addCard(const ServerZoneCard &card)
-{
-	cardList.append(card);
-}
-
 void PendingCommand_ListCounters::responseReceived(ServerResponse resp)
 {
 	if (resp == RespOk)
@@ -120,9 +108,15 @@ void PendingCommand_ListCounters::responseReceived(ServerResponse resp)
 	PendingCommand::responseReceived(resp);
 }
 
-void PendingCommand_ListCounters::addCounter(const ServerCounter &counter)
+void PendingCommand_DumpAll::responseReceived(ServerResponse resp)
 {
-	counterList.append(counter);
+	if (resp == RespOk) {
+		emit playerListReceived(playerList);
+		emit zoneListReceived(zoneList);
+		emit cardListReceived(cardList);
+		emit counterListReceived(counterList);
+	}
+	PendingCommand::responseReceived(resp);
 }
 
 Client::Client(QObject *parent)
@@ -238,9 +232,11 @@ void Client::readLine()
 				resp = RespErr;
 			pc->responseReceived(resp);
 		} else if (prefix == "list_games") {
-			if (values.size() != 8)
+			if (values.size() != 8) {
+				emit protocolError();
 				continue;
-			emit gameListEvent(new ServerGame(values[0].toInt(), values[5], values[1], values[2].toInt(), values[3].toInt(), values[4].toInt(), values[6].toInt(), values[7].toInt()));
+			}
+			emit gameListEvent(ServerGame(values[0].toInt(), values[5], values[1], values[2].toInt(), values[3].toInt(), values[4].toInt(), values[6].toInt(), values[7].toInt()));
 		} else if (prefix == "welcome") {
 			if (values.size() != 2) {
 				emit protocolError();
@@ -259,37 +255,84 @@ void Client::readLine()
 				continue;
 			}
 			int cmdid = values.takeFirst().toInt();
-			PendingCommand_ListPlayers *pc = qobject_cast<PendingCommand_ListPlayers *>(pendingCommands.value(cmdid, 0));
-			if (!pc) {
-				emit protocolError();
-				continue;
+			PendingCommand *pc = pendingCommands.value(cmdid, 0);
+			ServerPlayer sp(values[0].toInt(), values[1], values[2].toInt());
+			
+			PendingCommand_ListPlayers *pcLP = qobject_cast<PendingCommand_ListPlayers *>(pc);
+			if (pcLP)
+				pcLP->addPlayer(sp);
+			else {
+				PendingCommand_DumpAll *pcDA = qobject_cast<PendingCommand_DumpAll *>(pc);
+				if (pcDA)
+					pcDA->addPlayer(sp);
+				else
+					emit protocolError();
 			}
-			pc->addPlayer(ServerPlayer(values[0].toInt(), values[1], values[2].toInt()));
 		} else if (prefix == "dump_zone") {
-			if (values.size() != 9) {
+			if (values.size() != 11) {
 				emit protocolError();
 				continue;
 			}
 			int cmdid = values.takeFirst().toInt();
-			PendingCommand_DumpZone *pc = qobject_cast<PendingCommand_DumpZone *>(pendingCommands.value(cmdid, 0));
-			if (!pc) {
+			PendingCommand *pc = pendingCommands.value(cmdid, 0);
+			ServerZoneCard szc(values[0].toInt(), values[1], values[2].toInt(), values[3], values[4].toInt(), values[5].toInt(), values[6].toInt(), values[7] == "1", values[8] == "1", values[9]);
+	
+			PendingCommand_DumpZone *pcDZ = qobject_cast<PendingCommand_DumpZone *>(pc);
+			if (pcDZ)
+				pcDZ->addCard(szc);
+			else {
+				PendingCommand_DumpAll *pcDA = qobject_cast<PendingCommand_DumpAll *>(pc);
+				if (pcDA)
+					pcDA->addCard(szc);
+				else
+					emit protocolError();
+			}
+		} else if (prefix == "list_zones") {
+			if (values.size() != 6) {
 				emit protocolError();
 				continue;
 			}
-			pc->addCard(ServerZoneCard(values[0].toInt(), values[1], values[2].toInt(), values[3].toInt(), values[4].toInt(), values[5] == "1", values[6] == "1", values[7]));
-		} else if (prefix == "list_zones") {
+			int cmdid = values.takeFirst().toInt();
+			PendingCommand *pc = pendingCommands.value(cmdid, 0);
+			ServerZone::ZoneType type;
+			if (values[2] == "private")
+				type = ServerZone::PrivateZone;
+			else if (values[2] == "hidden")
+				type = ServerZone::HiddenZone;
+			else
+				type = ServerZone::PublicZone;
+			ServerZone sz(values[0].toInt(), values[1], type, values[3] == "1", values[4].toInt());
+			
+			PendingCommand_ListZones *pcLZ = qobject_cast<PendingCommand_ListZones *>(pc);
+			if (pcLZ)
+				pcLZ->addZone(sz);
+			else {
+				PendingCommand_DumpAll *pcDA = qobject_cast<PendingCommand_DumpAll *>(pc);
+				if (pcDA)
+					pcDA->addZone(sz);
+				else
+					emit protocolError();
+			}
+		} else if (prefix == "list_counters") {
 			if (values.size() != 5) {
 				emit protocolError();
 				continue;
 			}
 			int cmdid = values.takeFirst().toInt();
-			PendingCommand_ListZones *pc = qobject_cast<PendingCommand_ListZones *>(pendingCommands.value(cmdid, 0));
-			if (!pc) {
-				emit protocolError();
-				continue;
+			PendingCommand *pc = pendingCommands.value(cmdid, 0);
+			int colorValue = values[2].toInt();
+			ServerCounter sc(values[0].toInt(), values[1], QColor(colorValue / 65536, (colorValue % 65536) / 256, colorValue % 256), values[3].toInt());
+			
+			PendingCommand_ListCounters *pcLC = qobject_cast<PendingCommand_ListCounters *>(pc);
+			if (pcLC)
+				pcLC->addCounter(sc);
+			else {
+				PendingCommand_DumpAll *pcDA = qobject_cast<PendingCommand_DumpAll *>(pc);
+				if (pcDA)
+					pcDA->addCounter(sc);
+				else
+					emit protocolError();
 			}
-			pc->addZone(ServerZone(values[0], values[1] == "1", values[2] == "1", values[3].toInt()));
-		} else if (prefix == "list_counters") {
 		} else
 			emit protocolError();
 	}
@@ -519,4 +562,11 @@ PendingCommand_DumpZone *Client::dumpZone(int player, const QString &zone, int n
 PendingCommand *Client::stopDumpZone(int player, const QString &zone)
 {
 	return cmd(QString("stop_dump_zone|%1|%2").arg(player).arg(zone));
+}
+
+PendingCommand_DumpAll *Client::dumpAll()
+{
+	PendingCommand_DumpAll *pc = new PendingCommand_DumpAll;
+	cmd("dump_all", pc);
+	return pc;
 }

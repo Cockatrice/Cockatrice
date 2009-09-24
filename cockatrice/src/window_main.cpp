@@ -97,6 +97,8 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			aRestartGame->setEnabled(true);
 			aLeaveGame->setEnabled(true);
 		
+			game->queryGameState();
+			
 			phasesToolbar->show();
 			view->show();
 			break;

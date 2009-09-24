@@ -28,9 +28,9 @@ enum ServerEventType {
 	eventInvalid,
 	eventPlayerId,
 	eventSay,
-	eventName,
 	eventJoin,
 	eventLeave,
+	eventGameClosed,
 	eventReadyStart,
 	eventSetupZones,
 	eventGameStart,
@@ -100,7 +100,7 @@ private:
 	bool spectatorsAllowed;
 	unsigned int spectatorsCount;
 public:
-	ServerGame(int _gameId, const QString &_creator, const QString &_description, bool _hasPassword, unsigned char _playerCount, unsigned char _maxPlayers, bool _spectatorsAllowed, unsigned int _spectatorsCount)
+	ServerGame(int _gameId = -1, const QString &_creator = QString(), const QString &_description = QString(), bool _hasPassword = false, unsigned char _playerCount = 0, unsigned char _maxPlayers = 0, bool _spectatorsAllowed = false, unsigned int _spectatorsCount = 0)
 		: gameId(_gameId), creator(_creator), description(_description), hasPassword(_hasPassword), playerCount(_playerCount), maxPlayers(_maxPlayers), spectatorsAllowed(_spectatorsAllowed), spectatorsCount(_spectatorsCount) { }
 	int getGameId() const { return gameId; }
 	QString getCreator() const { return creator; }
@@ -127,6 +127,8 @@ public:
 
 class ServerZoneCard {
 private:
+	int playerId;
+	QString zoneName;
 	int id;
 	QString name;
 	int x, y;
@@ -135,8 +137,10 @@ private:
 	bool attacking;
 	QString annotation;
 public:
-	ServerZoneCard(int _id, const QString &_name, int _x, int _y, int _counters, bool _tapped, bool _attacking, const QString &_annotation)
-		: id(_id), name(_name), x(_x), y(_y), counters(_counters), tapped(_tapped), attacking(_attacking), annotation(_annotation) { }
+	ServerZoneCard(int _playerId, const QString &_zoneName, int _id, const QString &_name, int _x, int _y, int _counters, bool _tapped, bool _attacking, const QString &_annotation)
+		: playerId(_playerId), zoneName(_zoneName), id(_id), name(_name), x(_x), y(_y), counters(_counters), tapped(_tapped), attacking(_attacking), annotation(_annotation) { }
+	int getPlayerId() const { return playerId; }
+	QString getZoneName() const { return zoneName; }
 	int getId() const { return id; }
 	QString getName() const { return name; }
 	int getX() const { return x; }
@@ -148,30 +152,36 @@ public:
 };
 
 class ServerZone {
+public:
+	enum ZoneType { PrivateZone, PublicZone, HiddenZone };
 private:
+	int playerId;
 	QString name;
-	bool isPublic;
+	ZoneType type;
 	bool hasCoords;
 	int cardCount;
 public:
-	ServerZone(const QString &_name, bool _isPublic, bool _hasCoords, int _cardCount)
-		: name(_name), isPublic(_isPublic), hasCoords(_hasCoords), cardCount(_cardCount) { }
+	ServerZone(int _playerId, const QString &_name, ZoneType _type, bool _hasCoords, int _cardCount)
+		: playerId(_playerId), name(_name), type(_type), hasCoords(_hasCoords), cardCount(_cardCount) { }
+	int getPlayerId() const { return playerId; }
 	QString getName() const { return name; }
-	bool getPublic() const { return isPublic; }
+	ZoneType getType() const { return type; }
 	bool getHasCoords() const { return hasCoords; }
 	int getCardCount() const { return cardCount; }
 };
 
 class ServerCounter {
 private:
+	int playerId;
 	QString name;
-	int color;
+	QColor color;
 	int count;
 public:
-	ServerCounter(const QString &_name, int _color, int _count)
-		: name(_name), color(_color), count(_count) { }
+	ServerCounter(int _playerId, const QString &_name, QColor _color, int _count)
+		: playerId(_playerId), name(_name), color(_color), count(_count) { }
+	int getPlayerId() const { return playerId; }
 	QString getName() const { return name; }
-	int getColor() const { return color; }
+	QColor getColor() const { return color; }
 	int getCount() const { return count; }
 };
 
@@ -210,7 +220,7 @@ signals:
 	void playerListReceived(QList<ServerPlayer> _playerList);
 public:
 	void responseReceived(ServerResponse resp);
-	void addPlayer(const ServerPlayer &player);
+	void addPlayer(const ServerPlayer &player) { playerList.append(player); }
 };
 
 class PendingCommand_ListZones : public PendingCommand {
@@ -224,7 +234,7 @@ public:
 	PendingCommand_ListZones(int _playerId)
 		: playerId(_playerId) { }
 	void responseReceived(ServerResponse resp);
-	void addZone(const ServerZone &zone);
+	void addZone(const ServerZone &zone) { zoneList.append(zone); }
 	int getPlayerId() const { return playerId; }
 };
 
@@ -241,7 +251,7 @@ public:
 	PendingCommand_DumpZone(int _playerId, const QString &_zoneName, int _numberCards)
 		: playerId(_playerId), zoneName(_zoneName), numberCards(_numberCards) { }
 	void responseReceived(ServerResponse resp);
-	void addCard(const ServerZoneCard &card);
+	void addCard(const ServerZoneCard &card) { cardList.append(card); }
 	int getPlayerId() const { return playerId; }
 	QString getZoneName() const { return zoneName; }
 	int getNumberCards() const { return numberCards; }
@@ -258,8 +268,28 @@ public:
 	PendingCommand_ListCounters(int _playerId)
 		: playerId(_playerId) { }
 	void responseReceived(ServerResponse resp);
-	void addCounter(const ServerCounter &counter);
+	void addCounter(const ServerCounter &counter) { counterList.append(counter); }
 	int getPlayerId() const { return playerId; }
+};
+
+class PendingCommand_DumpAll : public PendingCommand {
+	Q_OBJECT
+private:
+	QList<ServerPlayer> playerList;
+	QList<ServerZone> zoneList;
+	QList<ServerZoneCard> cardList;
+	QList<ServerCounter> counterList;
+signals:
+	void playerListReceived(QList<ServerPlayer> _playerList);
+	void zoneListReceived(QList<ServerZone> _zoneList);
+	void cardListReceived(QList<ServerZoneCard> _cardList);
+	void counterListReceived(QList<ServerCounter> _counterList);
+public:
+	void responseReceived(ServerResponse resp);
+	void addPlayer(const ServerPlayer &player) { playerList.append(player); }
+	void addZone(const ServerZone &zone) { zoneList.append(zone); }
+	void addCard(const ServerZoneCard &card) { cardList.append(card); }
+	void addCounter(const ServerCounter &counter) { counterList.append(counter); }
 };
 
 class Client : public QObject {
@@ -267,7 +297,7 @@ class Client : public QObject {
 signals:
 	void statusChanged(ProtocolStatus _status);
 	void welcomeMsgReceived(QString welcomeMsg);
-	void gameListEvent(ServerGame *game);
+	void gameListEvent(const ServerGame &game);
 	void playerIdReceived(int id, QString name);
 	void gameEvent(const ServerEventData &msg);
 	void chatEvent(const ChatEventData &msg);
@@ -335,6 +365,7 @@ public slots:
 	PendingCommand_ListZones *listZones(int playerId);
 	PendingCommand_DumpZone *dumpZone(int player, const QString &zone, int numberCards);
 	PendingCommand *stopDumpZone(int player, const QString &zone);
+	PendingCommand_DumpAll *dumpAll();
 	void submitDeck(const QStringList &deck);
 };
 

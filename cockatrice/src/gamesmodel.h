@@ -1,10 +1,10 @@
 #ifndef GAMESMODEL_H
 #define GAMESMODEL_H
 
-#include <QAbstractListModel>
+#include <QAbstractTableModel>
+#include <QSortFilterProxyModel>
 #include <QList>
-
-class ServerGame;
+#include "client.h"
 
 class GamesModel : public QAbstractTableModel {
 	Q_OBJECT
@@ -16,12 +16,23 @@ public:
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	
-	ServerGame *getGame(int row);
+	const ServerGame &getGame(int row);
 	void cleanList();
 public slots:
-	void updateGameList(ServerGame *game);
+	void updateGameList(const ServerGame &game);
 private:
-	QList<ServerGame *> gameList;
+	QList<ServerGame> gameList;
+};
+
+class GamesProxyModel : public QSortFilterProxyModel {
+	Q_OBJECT
+private:
+	bool fullGamesVisible;
+public:
+	GamesProxyModel(QObject *parent = 0);
+	void setFullGamesVisible(bool _fullGamesVisible);
+protected:
+	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 };
 
 #endif

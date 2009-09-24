@@ -29,6 +29,15 @@ ServerGame::ServerGame(ServerSocket *_creator, int _gameId, const QString &_desc
 
 ServerGame::~ServerGame()
 {
+	broadcastEvent("game_closed", 0);
+	
+	for (int i = 0; i < players.size(); ++i)
+		players[i]->leaveGame();
+	players.clear();
+	for (int i = 0; i < spectators.size(); ++i)
+		spectators[i]->leaveGame();
+	spectators.clear();
+	
 	emit gameClosing();
 	qDebug("ServerGame destructor");
 }
@@ -37,15 +46,17 @@ QString ServerGame::getGameListLine() const
 {
 	if (players.isEmpty())
 		return QString("list_games|%1|||0|%2||0").arg(gameId).arg(maxPlayers);
-	else
+	else {
+		QString creatorName = creator ? creator->getPlayerName() : QString();
 		return QString("list_games|%1|%2|%3|%4|%5|%6|%7|%8").arg(gameId)
 							      .arg(description)
 							      .arg(password.isEmpty() ? 0 : 1)
 							      .arg(players.size())
 							      .arg(maxPlayers)
-							      .arg(creator->getPlayerName())
+							      .arg(creatorName)
 							      .arg(spectatorsAllowed ? 1 : 0)
 							      .arg(spectators.size());
+	}
 }
 
 ServerSocket *ServerGame::getPlayer(int playerId)
@@ -59,20 +70,11 @@ ServerSocket *ServerGame::getPlayer(int playerId)
 	return NULL;
 }
 
-void ServerGame::msg(const QString &s)
+void ServerGame::broadcastEvent(const QString &eventStr, ServerSocket *player)
 {
-	for (int i = 0; i < players.size(); ++i)
-		players[i]->msg(s);
-	for (int i = 0; i < spectators.size(); ++i)
-		spectators[i]->msg(s);
-}
-
-void ServerGame::broadcastEvent(const QString &cmd, ServerSocket *player)
-{
-	if (player)
-		msg(QString("public|%1|%2|%3").arg(player->getPlayerId()).arg(player->getPlayerName()).arg(cmd));
-	else
-		msg(QString("public|||%1").arg(cmd));
+	QList<ServerSocket *> allClients = QList<ServerSocket *>() << players << spectators;
+	for (int i = 0; i < allClients.size(); ++i)
+		allClients[i]->publicEvent(eventStr, player);
 }
 
 void ServerGame::startGameIfReady()
@@ -152,6 +154,8 @@ void ServerGame::removePlayer(ServerSocket *player)
 	else
 		players.removeAt(players.indexOf(player));
 	broadcastEvent("leave", player);
+	disconnect(player, 0, this, 0);
+	
 	if (!players.size())
 		deleteLater();
 	if (!gameStarted)

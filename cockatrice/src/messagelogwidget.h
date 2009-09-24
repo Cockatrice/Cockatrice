@@ -27,6 +27,7 @@ private slots:
 	void logPlayerListReceived(QStringList players);
 	void logJoin(Player *player);
 	void logLeave(Player *player);
+	void logGameClosed();
 	void logJoinSpectator(QString name);
 	void logLeaveSpectator(QString name);
 	void logReadyStart(Player *player);
