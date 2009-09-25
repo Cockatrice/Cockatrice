@@ -11,6 +11,7 @@
 #include "dlg_startgame.h"
 #include "counter.h"
 #include "gamescene.h"
+#include "player.h"
 
 Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenuBar *menuBar, QObject *parent)
 	: QObject(parent), db(_db), client(_client), scene(_scene), started(false), currentPhase(-1)
@@ -83,10 +84,14 @@ Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenuBar *menu
 Game::~Game()
 {
 	qDebug("Game destructor");
-	for (int i = 0; i < players.size(); i++) {
-		emit playerRemoved(players.at(i));
-		delete players.at(i);
+
+	QMapIterator<int, Player *> i(players);
+	while (i.hasNext()) {
+		i.next();
+		emit playerRemoved(i.value());
+		delete i.value();
 	}
+	
 	delete gameMenu;
 	delete cardMenu;
 }
@@ -115,8 +120,9 @@ void Game::retranslateUi()
 	
 	moveMenu->setTitle(tr("&Move to"));
 	
-	for (int i = 0; i < players.size(); ++i)
-		players[i]->retranslateUi();
+	QMapIterator<int, Player *> i(players);
+	while (i.hasNext())
+		i.next().value()->retranslateUi();
 }
 
 Player *Game::addPlayer(int playerId, const QString &playerName, bool local)
@@ -132,7 +138,7 @@ Player *Game::addPlayer(int playerId, const QString &playerName, bool local)
 	connect(newPlayer, SIGNAL(logSetCounter(Player *, QString, int, int)), this, SIGNAL(logSetCounter(Player *, QString, int, int)));
 	connect(newPlayer, SIGNAL(logSetDoesntUntap(Player *, QString, bool)), this, SIGNAL(logSetDoesntUntap(Player *, QString, bool)));
 
-	players << newPlayer;
+	players.insert(playerId, newPlayer);
 	emit playerAdded(newPlayer);
 	
 	return newPlayer;
@@ -141,10 +147,11 @@ Player *Game::addPlayer(int playerId, const QString &playerName, bool local)
 void Game::cardListReceived(QList<ServerZoneCard> list)
 {
 	for (int i = 0; i < list.size(); ++i) {
-		Player *p = players.findPlayer(list[i].getPlayerId());
+		Player *p = players.value(list[i].getPlayerId(), 0);
 		if (!p)
 			continue;
-		CardZone *zone = p->getZones().findZone(list[i].getZoneName());
+		
+		CardZone *zone = p->getZones().value(list[i].getZoneName(), 0);
 		if (!zone)
 			continue;
 		
@@ -161,12 +168,14 @@ void Game::cardListReceived(QList<ServerZoneCard> list)
 void Game::zoneListReceived(QList<ServerZone> list)
 {
 	for (int i = 0; i < list.size(); ++i) {
-		Player *p = players.findPlayer(list[i].getPlayerId());
+		Player *p = players.value(list[i].getPlayerId(), 0);
 		if (!p)
 			continue;
-		CardZone *zone = p->getZones().findZone(list[i].getName());
+		
+		CardZone *zone = p->getZones().value(list[i].getName(), 0);
 		if (!zone)
 			continue;
+		
 		zone->clearContents();
 		if (
 			(list[i].getType() != ServerZone::PublicZone)
@@ -181,13 +190,15 @@ void Game::zoneListReceived(QList<ServerZone> list)
 
 void Game::counterListReceived(QList<ServerCounter> list)
 {
-	for (int i = 0; i < players.size(); ++i)
-		players[i]->clearCounters();
+	QMapIterator<int, Player *> i(players);
+	while (i.hasNext())
+		i.next().value()->clearCounters();
 	
 	for (int i = 0; i < list.size(); ++i) {
-		Player *p = players.findPlayer(list[i].getPlayerId());
-		if (p)
-			p->addCounter(list[i].getName(), list[i].getColor(), list[i].getCount());
+		Player *p = players.value(list[i].getPlayerId(), 0);
+		if (!p)
+			continue;
+		p->addCounter(list[i].getId(), list[i].getName(), list[i].getColor(), list[i].getRadius(), list[i].getCount());
 	}
 }
 
@@ -215,7 +226,7 @@ void Game::restartGameDialog()
 void Game::gameEvent(const ServerEventData &msg)
 {
 	qDebug(QString("game::gameEvent: public=%1, player=%2, name=%3, type=%4, data=%5").arg(msg.getPublic()).arg(msg.getPlayerId()).arg(msg.getPlayerName()).arg(msg.getEventType()).arg(msg.getEventData().join("/")).toLatin1());
-	Player *p = players.findPlayer(msg.getPlayerId());
+	Player *p = players.value(msg.getPlayerId(), 0);
 	if (!msg.getPublic()) {
 		if (!p)
 			return;
@@ -287,13 +298,16 @@ void Game::gameEvent(const ServerEventData &msg)
 		case eventSetActivePlayer: {
 			QStringList data = msg.getEventData();
 			int playerId = data[0].toInt();
-			Player *player = players.findPlayer(playerId);
+			Player *player = players.value(playerId, 0);
 			if (!player) {
 				qDebug(QString("setActivePlayer: invalid player: %1").arg(playerId).toLatin1());
 				break;
 			}
-			for (int i = 0; i < players.size(); ++i)
-				players[i]->setActive(players[i] == player);
+			QMapIterator<int, Player *> i(players);
+			while (i.hasNext()) {
+				i.next();
+				i.value()->setActive(i.value() == player);
+			}
 			emit logSetActivePlayer(player);
 			break;
 		}
@@ -319,10 +333,10 @@ void Game::gameEvent(const ServerEventData &msg)
 		}
 		case eventDumpZone: {
 			QStringList data = msg.getEventData();
-			Player *zoneOwner = players.findPlayer(data[0].toInt());
+			Player *zoneOwner = players.value(data[0].toInt(), 0);
 			if (!zoneOwner)
 				break;
-			CardZone *zone = zoneOwner->getZones().findZone(data[1]);
+			CardZone *zone = zoneOwner->getZones().value(data[1], 0);
 			if (!zone)
 				break;
 			emit logDumpZone(p, zone, data[2].toInt());
@@ -330,10 +344,10 @@ void Game::gameEvent(const ServerEventData &msg)
 		}
 		case eventStopDumpZone: {
 			QStringList data = msg.getEventData();
-			Player *zoneOwner = players.findPlayer(data[0].toInt());
+			Player *zoneOwner = players.value(data[0].toInt(), 0);
 			if (!zoneOwner)
 				break;
-			CardZone *zone = zoneOwner->getZones().findZone(data[1]);
+			CardZone *zone = zoneOwner->getZones().value(data[1], 0);
 			if (!zone)
 				break;
 			emit logStopDumpZone(p, zone);

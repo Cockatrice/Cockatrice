@@ -45,7 +45,7 @@ void ZoneViewLayout::toggleZoneView(Player *player, const QString &zoneName, int
 		}
 	}
 
-	ZoneViewWidget *item = new ZoneViewWidget(db, player, player->getZones().findZone(zoneName), numberCards, this);
+	ZoneViewWidget *item = new ZoneViewWidget(db, player, player->getZones().value(zoneName), numberCards, this);
 	views.append(item);
 	connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeItem(ZoneViewWidget *)));
 	connect(item, SIGNAL(sizeChanged()), this, SLOT(reorganize()));

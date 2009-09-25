@@ -314,14 +314,14 @@ void Client::readLine()
 					emit protocolError();
 			}
 		} else if (prefix == "list_counters") {
-			if (values.size() != 5) {
+			if (values.size() != 6) {
 				emit protocolError();
 				continue;
 			}
 			int cmdid = values.takeFirst().toInt();
 			PendingCommand *pc = pendingCommands.value(cmdid, 0);
-			int colorValue = values[2].toInt();
-			ServerCounter sc(values[0].toInt(), values[1], QColor(colorValue / 65536, (colorValue % 65536) / 256, colorValue % 256), values[3].toInt());
+			int colorValue = values[3].toInt();
+			ServerCounter sc(values[0].toInt(), values[1].toInt(), values[2], QColor(colorValue / 65536, (colorValue % 65536) / 256, colorValue % 256), values[4].toInt(), values[5].toInt());
 			
 			PendingCommand_ListCounters *pcLC = qobject_cast<PendingCommand_ListCounters *>(pc);
 			if (pcLC)
@@ -508,24 +508,24 @@ PendingCommand *Client::readyStart()
 	return cmd("ready_start");
 }
 
-PendingCommand *Client::incCounter(const QString &counter, int delta)
+PendingCommand *Client::incCounter(int counterId, int delta)
 {
-	return cmd(QString("inc_counter|%1|%2").arg(counter).arg(delta));
+	return cmd(QString("inc_counter|%1|%2").arg(counterId).arg(delta));
 }
 
-PendingCommand *Client::addCounter(const QString &counter, QColor color, int value)
+PendingCommand *Client::addCounter(const QString &counterName, QColor color, int radius, int value)
 {
-	return cmd(QString("add_counter|%1|%2|%3").arg(counter).arg(color.red() * 65536 + color.green() * 256 + color.blue()).arg(value));
+	return cmd(QString("add_counter|%1|%2|%3|%4").arg(counterName).arg(color.red() * 65536 + color.green() * 256 + color.blue()).arg(radius).arg(value));
 }
 
-PendingCommand *Client::setCounter(const QString &counter, int value)
+PendingCommand *Client::setCounter(int counterId, int value)
 {
-	return cmd(QString("set_counter|%1|%2").arg(counter).arg(value));
+	return cmd(QString("set_counter|%1|%2").arg(counterId).arg(value));
 }
 
-PendingCommand *Client::delCounter(const QString &counter)
+PendingCommand *Client::delCounter(int counterId)
 {
-	return cmd(QString("del_counter|%1").arg(counter));
+	return cmd(QString("del_counter|%1").arg(counterId));
 }
 
 PendingCommand_ListCounters *Client::listCounters(int playerId)

@@ -33,7 +33,7 @@
 QHash<QString, ServerSocket::CommandProperties> ServerSocket::commandHash;
 
 ServerSocket::ServerSocket(Server *_server, QObject *parent)
- : QTcpSocket(parent), server(_server), game(0), spectator(false), PlayerStatus(StatusNormal), authState(PasswordWrong), acceptsGameListChanges(false)
+ : QTcpSocket(parent), server(_server), game(0), spectator(false), nextCardId(0), PlayerStatus(StatusNormal), authState(PasswordWrong), acceptsGameListChanges(false)
 {
 	if (commandHash.isEmpty()) {
 		commandHash.insert("ping", CommandProperties(false, false, false, true, QList<QVariant::Type>(), &ServerSocket::cmdPing));
@@ -94,12 +94,13 @@ ServerSocket::ServerSocket(Server *_server, QObject *parent)
 		commandHash.insert("add_counter", CommandProperties(true, true, true, false, QList<QVariant::Type>()
 			<< QVariant::String
 			<< QVariant::Int
+			<< QVariant::Int
 			<< QVariant::Int, &ServerSocket::cmdAddCounter));
 		commandHash.insert("set_counter", CommandProperties(true, true, true, false, QList<QVariant::Type>()
-			<< QVariant::String
+			<< QVariant::Int
 			<< QVariant::Int, &ServerSocket::cmdSetCounter));
 		commandHash.insert("del_counter", CommandProperties(true, true, true, false, QList<QVariant::Type>()
-			<< QVariant::String, &ServerSocket::cmdDelCounter));
+			<< QVariant::Int, &ServerSocket::cmdDelCounter));
 		commandHash.insert("list_counters", CommandProperties(true, true, true, true, QList<QVariant::Type>()
 			<< QVariant::Int, &ServerSocket::cmdListCounters));
 		commandHash.insert("list_zones", CommandProperties(true, true, true, true, QList<QVariant::Type>()
@@ -143,22 +144,23 @@ int ServerSocket::newCardId()
 	return nextCardId++;
 }
 
+int ServerSocket::newCounterId() const
+{
+	int id = 0;
+	QMapIterator<int, Counter *> i(counters);
+	while (i.hasNext()) {
+		Counter *c = i.next().value();
+		if (c->getId() > id)
+			id = c->getId();
+	}
+	return id + 1;
+}
+
 PlayerZone *ServerSocket::getZone(const QString &name) const
 {
 	QListIterator<PlayerZone *> ZoneIterator(zones);
 	while (ZoneIterator.hasNext()) {
 		PlayerZone *temp = ZoneIterator.next();
-		if (temp->getName() == name)
-			return temp;
-	}
-	return NULL;
-}
-
-Counter *ServerSocket::getCounter(const QString &name) const
-{
-	QListIterator<Counter *> CounterIterator(counters);
-	while (CounterIterator.hasNext()) {
-		Counter *temp = CounterIterator.next();
 		if (temp->getName() == name)
 			return temp;
 	}
@@ -209,8 +211,9 @@ void ServerSocket::clearZones()
 		delete zones.at(i);
 	zones.clear();
 
-	for (int i = 0; i < counters.size(); i++)
-		delete counters.at(i);
+	QMapIterator<int, Counter *> counterIterator(counters);
+	while (counterIterator.hasNext())
+		delete counterIterator.next().value();
 	counters.clear();
 }
 
@@ -588,60 +591,62 @@ ReturnMessage::ReturnCode ServerSocket::cmdSetCardAttr(const QList<QVariant> &pa
 
 ReturnMessage::ReturnCode ServerSocket::cmdIncCounter(const QList<QVariant> &params)
 {
-	Counter *c = getCounter(params[0].toString());
+	Counter *c = counters.value(params[0].toInt(), 0);
 	if (!c)
 		return ReturnMessage::ReturnContextError;
 	int delta = params[1].toInt();
 	
 	c->setCount(c->getCount() + delta);
-	emit broadcastEvent(QString("set_counter|%1|%2").arg(c->getName()).arg(c->getCount()), this);
+	emit broadcastEvent(QString("set_counter|%1|%2").arg(c->getId()).arg(c->getCount()), this);
 	return ReturnMessage::ReturnOk;
 }
 
 ReturnMessage::ReturnCode ServerSocket::cmdAddCounter(const QList<QVariant> &params)
 {
 	QString name = params[0].toString();
-	if (getCounter(name))
-		return ReturnMessage::ReturnContextError;
 	int color = params[1].toInt();
-	int count = params[2].toInt();
+	int radius = params[2].toInt();
+	int count = params[3].toInt();
 	
-	Counter *c = new Counter(name, color, count);
-	counters << c;
-	emit broadcastEvent(QString("add_counter|%1|%2|%3").arg(c->getName()).arg(color).arg(count), this);
+	Counter *c = new Counter(newCounterId(), name, color, radius, count);
+	counters.insert(c->getId(), c);
+	emit broadcastEvent(QString("add_counter|%1|%2|%3|%4|%5").arg(c->getId()).arg(c->getName()).arg(color).arg(radius).arg(count), this);
 	
 	return ReturnMessage::ReturnOk;
 }
 
 ReturnMessage::ReturnCode ServerSocket::cmdSetCounter(const QList<QVariant> &params)
 {
-	Counter *c = getCounter(params[0].toString());
+	Counter *c = counters.value(params[0].toInt(), 0);
 	if (!c)
 		return ReturnMessage::ReturnContextError;
 	int count = params[1].toInt();
 	
 	c->setCount(count);
-	emit broadcastEvent(QString("set_counter|%1|%2").arg(c->getName()).arg(count), this);
+	emit broadcastEvent(QString("set_counter|%1|%2").arg(c->getId()).arg(count), this);
 	return ReturnMessage::ReturnOk;
 }
 
 ReturnMessage::ReturnCode ServerSocket::cmdDelCounter(const QList<QVariant> &params)
 {
-	Counter *c = getCounter(params[0].toString());
+	int counterId = params[0].toInt();
+	Counter *c = counters.value(counterId, 0);
 	if (!c)
 		return ReturnMessage::ReturnContextError;
+	counters.remove(counterId);
 	delete c;
-	counters.removeAt(counters.indexOf(c));
-	emit broadcastEvent(QString("del_counter|%1").arg(params[0].toString()), this);
+	emit broadcastEvent(QString("del_counter|%1").arg(counterId), this);
 	return ReturnMessage::ReturnOk;
 }
 
 QStringList ServerSocket::listCountersHelper(ServerSocket *player)
 {
 	QStringList result;
-	const QList<Counter *> &counterList = player->getCounters();
-	for (int i = 0; i < counterList.size(); ++i)
-		result << QString("%1|%2|%3|%4").arg(player->getPlayerId()).arg(counterList[i]->getName()).arg(counterList[i]->getColor()).arg(counterList[i]->getCount());
+	QMapIterator<int, Counter *> i(player->getCounters());
+	while (i.hasNext()) {
+		Counter *c = i.next().value();
+		result << QString("%1|%2|%3|%4|%5|%6").arg(player->getPlayerId()).arg(c->getId()).arg(c->getName()).arg(c->getColor()).arg(c->getRadius()).arg(c->getCount());
+	}
 	return result;
 }
 

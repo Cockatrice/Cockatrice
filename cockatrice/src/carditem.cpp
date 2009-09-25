@@ -245,10 +245,11 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 	if (!zone->getPlayer()->getLocal())
 		return;
 
-	if (zone->getName() == "table")
-		((TableZone *) zone)->toggleTapped();
+	TableZone *tz = qobject_cast<TableZone *>(zone);
+	if (tz)
+		tz->toggleTapped();
 	else {
-		TableZone *table = (TableZone *) zone->getPlayer()->getZones().findZone("table");
+		TableZone *table = zone->getPlayer()->getTable();
 		QPoint gridPoint = table->getFreeGridPoint(info->getTableRow());
 		table->handleDropEventByGrid(id, zone, gridPoint, false);
 	}

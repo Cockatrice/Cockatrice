@@ -2,8 +2,10 @@
 #define GAME_H
 
 #include <QHash>
+#include <QMap>
 #include <QStringList>
-#include "playerlist.h"
+#include <QMenu>
+#include <QAction>
 #include "client.h"
 
 class GameScene;
@@ -13,6 +15,7 @@ class CardDatabase;
 class DlgStartGame;
 class CardItem;
 class QMenuBar;
+class CardZone;
 
 class Game : public QObject {
 	Q_OBJECT
@@ -32,7 +35,7 @@ private:
 	Client *client;
 	GameScene *scene;
 	QStringList spectatorList;
-	PlayerList players;
+	QMap<int, Player *> players;
 	bool started;
 	int currentPhase;
 public slots:

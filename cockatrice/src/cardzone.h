@@ -29,6 +29,8 @@ protected:
 	virtual void addCardImpl(CardItem *card, int x, int y) = 0;
 signals:
 	void contentsChanged();
+public slots:
+	void moveAllToZone();
 public:
 	enum { Type = typeZone };
 	int type() const { return Type; }
@@ -52,9 +54,8 @@ public:
 	virtual CardItem *takeCard(int position, int cardId, const QString &cardName, bool canResize = true);
 	void setCardAttr(int cardId, const QString &aname, const QString &avalue);
 	ZoneViewZone *getView() const { return view; }
-	void setView(ZoneViewZone *_view);
+	void setView(ZoneViewZone *_view) { view = _view; }
 	virtual void reorganizeCards() = 0;
-	void moveAllToZone(const QString &targetZone, int targetX);
 	virtual QPointF closestGridPoint(const QPointF &point);
 };
 

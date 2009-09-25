@@ -173,15 +173,19 @@ public:
 class ServerCounter {
 private:
 	int playerId;
+	int id;
 	QString name;
 	QColor color;
+	int radius;
 	int count;
 public:
-	ServerCounter(int _playerId, const QString &_name, QColor _color, int _count)
-		: playerId(_playerId), name(_name), color(_color), count(_count) { }
+	ServerCounter(int _playerId, int _id, const QString &_name, QColor _color, int _radius, int _count)
+		: playerId(_playerId), id(_id), name(_name), color(_color), radius(_radius), count(_count) { }
 	int getPlayerId() const { return playerId; }
+	int getId() const { return id; }
 	QString getName() const { return name; }
 	QColor getColor() const { return color; }
+	int getRadius() const { return radius; }
 	int getCount() const { return count; }
 };
 
@@ -355,10 +359,10 @@ public slots:
 	PendingCommand *createToken(const QString &zone, const QString &name, const QString &powtough, int x, int y);
 	PendingCommand *setCardAttr(const QString &zone, int cardid, const QString &aname, const QString &avalue);
 	PendingCommand *readyStart();
-	PendingCommand *incCounter(const QString &counter, int delta);
-	PendingCommand *addCounter(const QString &counter, QColor color, int value);
-	PendingCommand *setCounter(const QString &counter, int value);
-	PendingCommand *delCounter(const QString &counter);
+	PendingCommand *incCounter(int counterId, int delta);
+	PendingCommand *addCounter(const QString &counterName, QColor color, int radius, int value);
+	PendingCommand *setCounter(int counterId, int value);
+	PendingCommand *delCounter(int counterId);
 	PendingCommand_ListCounters *listCounters(int playerId);
 	PendingCommand *nextTurn();
 	PendingCommand *setActivePhase(int phase);

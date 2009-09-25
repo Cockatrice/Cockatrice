@@ -132,13 +132,12 @@ void CardZone::setCardAttr(int cardId, const QString &aname, const QString &aval
 		player->client->setCardAttr(name, cardId, aname, avalue);
 }
 
-void CardZone::setView(ZoneViewZone *_view)
+void CardZone::moveAllToZone()
 {
-	view = _view;
-}
+	QList<QVariant> data = static_cast<QAction *>(sender())->data().toList();
+	QString targetZone = data[0].toString();
+	int targetX = data[1].toInt();
 
-void CardZone::moveAllToZone(const QString &targetZone, int targetX)
-{
 	// Cards need to be moved in reverse order so that the other
 	// cards' list index doesn't change
 	for (int i = cards.size() - 1; i >= 0; i--)

@@ -13,14 +13,12 @@ HEADERS += src/counter.h \
  src/gamesmodel.h \
  src/client.h \
  src/window_main.h \
- src/zonelist.h \
  src/cardzone.h \
  src/player.h \
  src/cardlist.h \
  src/carditem.h \
  src/tablezone.h \
  src/handzone.h \
- src/playerlist.h \
  src/game.h \
  src/carddatabase.h \
  src/gameview.h \
@@ -53,12 +51,10 @@ SOURCES += src/counter.cpp \
  src/gamesmodel.cpp \
  src/player.cpp \
  src/cardzone.cpp \
- src/zonelist.cpp \
  src/cardlist.cpp \
  src/carditem.cpp \
  src/tablezone.cpp \
  src/handzone.cpp \
- src/playerlist.cpp \
  src/game.cpp \
  src/carddatabase.cpp \
  src/gameview.cpp \

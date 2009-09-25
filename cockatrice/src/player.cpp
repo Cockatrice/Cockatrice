@@ -21,7 +21,7 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 		bgPixmap.load(bgPath);
 	setCacheMode(DeviceCoordinateCache);
 	
-	QPointF base = QPointF(55, 50);
+	QPointF base = QPointF(counterAreaWidth, 50);
 
 	PileZone *deck = new PileZone(this, "deck", true, false, this);
 	deck->setPos(base);
@@ -41,7 +41,7 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 	connect(table, SIGNAL(sizeChanged()), this, SLOT(updateBoundingRect()));
 	hand = new HandZone(this, (int) table->boundingRect().height(), this);
 	
-	base = QPointF(deck->boundingRect().width() + 60, 0);
+	base = QPointF(deck->boundingRect().width() + counterAreaWidth + 5, 0);
 	hand->setPos(base);
 	base += QPointF(hand->boundingRect().width(), 0);
 	table->setPos(base);
@@ -49,10 +49,31 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 	updateBoundingRect();
 
 	if (local) {
-		aMoveHandToTopLibrary = new QAction(this);
-		connect(aMoveHandToTopLibrary, SIGNAL(triggered()), this, SLOT(actMoveHandToTopLibrary()));
-		aMoveHandToBottomLibrary = new QAction(this);
-		connect(aMoveHandToBottomLibrary, SIGNAL(triggered()), this, SLOT(actMoveHandToBottomLibrary()));
+		aMoveToTopLibrary = new QAction(this);
+		aMoveToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
+		aMoveToBottomLibrary = new QAction(this);
+		aMoveToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
+		aMoveToHand = new QAction(this);
+		aMoveToHand->setData(QList<QVariant>() << "hand" << 0);
+		aMoveToGraveyard = new QAction(this);
+		aMoveToGraveyard->setData(QList<QVariant>() << "grave" << 0);
+		aMoveToRfg = new QAction(this);
+		aMoveToRfg->setData(QList<QVariant>() << "rfg" << 0);
+		
+		connect(aMoveToTopLibrary, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
+		connect(aMoveToBottomLibrary, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
+		connect(aMoveToGraveyard, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
+		connect(aMoveToRfg, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
+
+		connect(aMoveToTopLibrary, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
+		connect(aMoveToBottomLibrary, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
+		connect(aMoveToHand, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
+		connect(aMoveToRfg, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
+
+		connect(aMoveToTopLibrary, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
+		connect(aMoveToBottomLibrary, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
+		connect(aMoveToHand, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
+		connect(aMoveToGraveyard, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
 
 		aViewLibrary = new QAction(this);
 		connect(aViewLibrary, SIGNAL(triggered()), this, SLOT(actViewLibrary()));
@@ -82,8 +103,10 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 
 	if (local) {
 		handMenu = playerMenu->addMenu(QString());
-		handMenu->addAction(aMoveHandToTopLibrary);
-		handMenu->addAction(aMoveHandToBottomLibrary);
+		handMenu->addAction(aMoveToTopLibrary);
+		handMenu->addAction(aMoveToBottomLibrary);
+		handMenu->addAction(aMoveToGraveyard);
+		handMenu->addAction(aMoveToRfg);
 		hand->setMenu(handMenu);
 
 		libraryMenu = playerMenu->addMenu(QString());
@@ -109,6 +132,18 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 	rfg->setMenu(rfgMenu, aViewRfg);
 
 	if (local) {
+		graveMenu->addSeparator();
+		graveMenu->addAction(aMoveToTopLibrary);
+		graveMenu->addAction(aMoveToBottomLibrary);
+		graveMenu->addAction(aMoveToHand);
+		graveMenu->addAction(aMoveToRfg);
+
+		rfgMenu->addSeparator();
+		rfgMenu->addAction(aMoveToTopLibrary);
+		rfgMenu->addAction(aMoveToBottomLibrary);
+		rfgMenu->addAction(aMoveToHand);
+		rfgMenu->addAction(aMoveToGraveyard);
+
 		sbMenu = playerMenu->addMenu(QString());
 		sbMenu->addAction(aViewSideboard);
 		sb->setMenu(sbMenu, aViewSideboard);
@@ -153,8 +188,9 @@ Player::~Player()
 {
 	qDebug("Player destructor");
 
-	for (int i = 0; i < zones.size(); i++)
-		delete zones.at(i);
+	QMapIterator<QString, CardZone *> i(zones);
+	while (i.hasNext())
+		delete i.next().value();
 
 	clearCounters();
 	delete playerMenu;
@@ -175,8 +211,11 @@ void Player::retranslateUi()
 	rfgMenu->setTitle(tr("&Exile"));
 	
 	if (local) {
-		aMoveHandToTopLibrary->setText(tr("Move to &top of library"));
-		aMoveHandToBottomLibrary->setText(tr("Move to &bottom of library"));
+		aMoveToTopLibrary->setText(tr("Move to &top of library"));
+		aMoveToBottomLibrary->setText(tr("Move to &bottom of library"));
+		aMoveToHand->setText(tr("Move to &hand"));
+		aMoveToGraveyard->setText(tr("Move to g&raveyard"));
+		aMoveToRfg->setText(tr("Move to &exile"));
 		aViewLibrary->setText(tr("&View library"));
 		aViewLibrary->setShortcut(tr("F3"));
 		aViewTopCards->setText(tr("View &top cards of library..."));
@@ -233,16 +272,6 @@ void Player::initSayMenu()
 	}
 }
 
-void Player::actMoveHandToTopLibrary()
-{
-	zones.findZone("hand")->moveAllToZone("deck", 0);
-}
-
-void Player::actMoveHandToBottomLibrary()
-{
-	zones.findZone("hand")->moveAllToZone("deck", -1);
-}
-
 void Player::actViewLibrary()
 {
 	emit toggleZoneView(this, "deck", -1);
@@ -297,20 +326,22 @@ void Player::actUntapAll()
 
 void Player::actIncLife()
 {
-	client->incCounter("life", 1);
+	// XXX
+	client->incCounter(lifeCounter->getId(), 1);
 }
 
 void Player::actDecLife()
 {
-	client->incCounter("life", -1);
+	// XXX
+	client->incCounter(lifeCounter->getId(), -1);
 }
 
 void Player::actSetLife()
 {
 	bool ok;
-	int life = QInputDialog::getInteger(0, tr("Set life"), tr("New life total:"), getCounter("life")->getValue(), 0, 2000000000, 1, &ok);
+	int life = QInputDialog::getInteger(0, tr("Set life"), tr("New life total:"), lifeCounter->getValue(), 0, 2000000000, 1, &ok);
 	if (ok)
-		client->setCounter("life", life);
+		client->setCounter(lifeCounter->getId(), life);
 }
 
 void Player::actRollDie()
@@ -336,7 +367,7 @@ void Player::actSayMessage()
 
 void Player::addZone(CardZone *z)
 {
-	zones << z;
+	zones.insert(z->getName(), z);
 }
 
 void Player::setCardAttrHelper(CardItem *card, const QString &aname, const QString &avalue, bool allCards)
@@ -376,41 +407,44 @@ void Player::gameEvent(const ServerEventData &event)
 			// XXX Fehlerbehandlung
 
 			// Clean up existing zones first
-			for (int i = 0; i < zones.size(); i++) {
-				if (ZoneViewZone *view = zones.at(i)->getView())
+			QMapIterator<QString, CardZone *> zoneIterator(zones);
+			while (zoneIterator.hasNext()) {
+				zoneIterator.next();
+				if (ZoneViewZone *view = zoneIterator.value()->getView())
 					((ZoneViewWidget *) view->parentItem())->close();
-				zones.at(i)->clearContents();
+				zoneIterator.value()->clearContents();
 			}
 
 			clearCounters();
 
-			CardZone *deck = zones.findZone("deck");
+			CardZone *deck = zones.value("deck");
 			for (; deck_cards; deck_cards--)
 				deck->addCard(new CardItem(db), false, -1);
 
-			CardZone *sb = zones.findZone("sb");
+			CardZone *sb = zones.value("sb");
 			for (; sb_cards; sb_cards--)
 				sb->addCard(new CardItem(db), false, -1);
 
-			for (int i = 0; i < zones.size(); i++)
-				zones.at(i)->reorganizeCards();
+			zoneIterator.toFront();
+			while (zoneIterator.hasNext())
+				zoneIterator.next().value()->reorganizeCards();
 
 			if (local) {
-				client->addCounter("life", Qt::white, 20);
-				client->addCounter("w", QColor(255, 255, 150), 0);
-				client->addCounter("u", QColor(150, 150, 255), 0);
-				client->addCounter("b", QColor(150, 150, 150), 0);
-				client->addCounter("r", QColor(250, 150, 150), 0);
-				client->addCounter("g", QColor(150, 255, 150), 0);
-				client->addCounter("x", QColor(255, 255, 255), 0);
-				client->addCounter("storm", QColor(255, 255, 255), 0);
+				client->addCounter("life", Qt::white, 25, 20);
+				client->addCounter("w", QColor(255, 255, 150), 20, 0);
+				client->addCounter("u", QColor(150, 150, 255), 20, 0);
+				client->addCounter("b", QColor(150, 150, 150), 20, 0);
+				client->addCounter("r", QColor(250, 150, 150), 20, 0);
+				client->addCounter("g", QColor(150, 255, 150), 20, 0);
+				client->addCounter("x", QColor(255, 255, 255), 20, 0);
+				client->addCounter("storm", QColor(255, 255, 255), 20, 0);
 			}
 
 			break;
 		}
 		case eventDraw: {
-			CardZone *deck = zones.findZone("deck");
-			CardZone *hand = zones.findZone("hand");
+			CardZone *deck = zones.value("deck");
+			CardZone *hand = zones.value("hand");
 			if (!event.getPublic()) {
 				hand->addCard(deck->takeCard(0, data[0].toInt(), data[1]), true, -1);
 			} else {
@@ -428,13 +462,17 @@ void Player::gameEvent(const ServerEventData &event)
 			}
 			int cardId = data[0].toInt();
 			QString cardName = data[1];
-			CardZone *startZone = zones.findZone(data[2]);
-			if (!startZone)
+			CardZone *startZone = zones.value(data[2], 0);
+			if (!startZone) {
 				qDebug(QString("start zone invalid: %1").arg(data[2]).toLatin1());
+				break;
+			}
 			int position = data[3].toInt();
-			CardZone *targetZone = zones.findZone(data[4]);
-			if (!targetZone)
+			CardZone *targetZone = zones.value(data[4], 0);
+			if (!targetZone) {
 				qDebug(QString("target zone invalid: %1").arg(data[4]).toLatin1());
+				break;
+			}
 			int x = data[5].toInt();
 			int y = data[6].toInt();
 			bool facedown = data[7].toInt();
@@ -467,7 +505,9 @@ void Player::gameEvent(const ServerEventData &event)
 			if (data.size() != 6) {
 				qDebug("error");
 			}
-			CardZone *zone = zones.findZone(data[0]);
+			CardZone *zone = zones.value(data[0], 0);
+			if (!zone)
+				break;
 			int cardid = data[1].toInt();
 			QString cardname = data[2];
 			QString powtough = data[3];
@@ -485,7 +525,9 @@ void Player::gameEvent(const ServerEventData &event)
 			if (data.size() != 4) {
 				// XXX
 			}
-			CardZone *zone = zones.findZone(data[0]);
+			CardZone *zone = zones.value(data[0], 0);
+			if (!zone)
+				break;
 			int cardId = data[1].toInt();
 			QString aname = data[2];
 			QString avalue = data[3];
@@ -504,23 +546,27 @@ void Player::gameEvent(const ServerEventData &event)
 			break;
 		}
 		case eventAddCounter: {
-			if (data.size() != 3) {
+			if (data.size() != 4) {
 				// XXX
 			}
-			QString counterName = data[0];
-			int colorValue = data[1].toInt();
-			int value = data[2].toInt();
+			int counterId = data[0].toInt();
+			QString counterName = data[1];
+			int colorValue = data[2].toInt();
+			int radius = data[3].toInt();
+			int value = data[4].toInt();
 			QColor color(colorValue / 65536, (colorValue % 65536) / 256, colorValue % 256);
-			addCounter(counterName, color, value);
+			addCounter(counterId, counterName, color, radius, value);
 			break;
 		}
 		case eventSetCounter: {
 			if (data.size() != 2) {
 				// XXX
 			}
+			int counterId = data[0].toInt();
 			int value = data[1].toInt();
-			QString counterName = data[0];
-			Counter *c = getCounter(counterName);
+			Counter *c = counters.value(counterId, 0);
+			if (!c)
+				break;
 			int oldValue = c->getValue();
 			c->setValue(value);
 			emit logSetCounter(this, c->getName(), value, oldValue);
@@ -583,46 +629,62 @@ void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/
 	painter->drawText(QRectF(0, 0, totalWidth, 40), Qt::AlignCenter, nameStr);
 }
 
-Counter *Player::getCounter(const QString &name, bool remove)
+void Player::addCounter(int counterId, const QString &name, QColor color, int radius, int value)
 {
-	for (int i = 0; i < counterList.size(); i++) {
-		Counter *temp = counterList.at(i);
-		if (temp->getName() == name) {
-			if (remove)
-				counterList.removeAt(i);
-			return temp;
-		}
-	}
-	return 0;
-}
-
-void Player::addCounter(const QString &name, QColor color, int value)
-{
-	counterList.append(new Counter(this, name, color, value, this));
+	Counter *c = new Counter(this, counterId, name, color, radius, value, this);
+	counters.insert(counterId, c);
+	if (name == "life")
+		lifeCounter = c;
+	// XXX
 	rearrangeCounters();
 }
 
-void Player::delCounter(const QString &name)
+void Player::delCounter(int counterId)
 {
-	delete getCounter(name, true);
+	Counter *c = counters.value(counterId, 0);
+	if (!c)
+		return;
+	counters.remove(counterId);
+	delete c;
 	rearrangeCounters();
 }
 
 void Player::clearCounters()
 {
-	for (int i = 0; i < counterList.size(); i++)
-		delete counterList.at(i);
-	counterList.clear();
+	QMapIterator<int, Counter *> counterIterator(counters);
+	while (counterIterator.hasNext())
+		delete counterIterator.next().value();
+	counters.clear();
 }
 
 void Player::rearrangeCounters()
 {
-	const int counterAreaWidth = 55;
-	qreal y = 50;
-	for (int i = 0; i < counterList.size(); i++) {
-		Counter *temp = counterList.at(i);
-		QRectF br = temp->boundingRect();
-		temp->setPos((counterAreaWidth - br.width()) / 2, y);
-		y += br.height() + 10;
+	qreal marginTop = 50;
+	qreal marginBottom = 15;
+	
+	// Determine total height of bounding rectangles
+	qreal totalHeight = 0;
+	QMapIterator<int, Counter *> counterIterator(counters);
+	while (counterIterator.hasNext()) {
+		counterIterator.next();
+		totalHeight += counterIterator.value()->boundingRect().height();
+	}
+	
+	// Determine free space between objects
+	qreal padding = (boundingRect().height() - marginTop - marginBottom - totalHeight) / (counters.size() - 1);
+	qreal y = boundingRect().y() + marginTop;
+	
+	if (counters.size() == 1) {
+		padding = 0;
+		y += (boundingRect().height() - marginTop - marginBottom) / 2;
+	}
+	
+	// Place objects
+	for (counterIterator.toFront(); counterIterator.hasNext(); ) {
+		Counter *c = counterIterator.next().value();
+
+		QRectF br = c->boundingRect();
+		c->setPos((counterAreaWidth - br.width()) / 2, y);
+		y += br.height() + padding;
 	}
 }

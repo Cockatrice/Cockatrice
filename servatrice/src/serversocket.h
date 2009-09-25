@@ -110,14 +110,14 @@ private:
 	QList<QString> DeckList;
 	QList<QString> SideboardList;
 	QList<PlayerZone *> zones;
-	QList<Counter *> counters;
+	QMap<int, Counter *> counters;
 	int playerId;
 	QString playerName;
 	bool spectator;
 	int nextCardId;
 	int newCardId();
+	int newCounterId() const;
 	PlayerZone *getZone(const QString &name) const;
-	Counter *getCounter(const QString &name) const;
 	void clearZones();
 	bool parseCommand(QString line);
 	PlayerStatusEnum PlayerStatus;
@@ -143,7 +143,7 @@ public:
 	bool getAcceptsGameListChanges() const { return acceptsGameListChanges; }
 	bool getAcceptsChatChannelListChanges() const { return acceptsChatChannelListChanges; }
 	const QList<PlayerZone *> &getZones() const { return zones; }
-	const QList<Counter *> &getCounters() const { return counters; }
+	const QMap<int, Counter *> &getCounters() const { return counters; }
 	void setupZones();
 };
 

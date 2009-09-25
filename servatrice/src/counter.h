@@ -24,14 +24,18 @@
 
 class Counter {
 protected:
+	int id;
 	QString name;
 	int color;
+	int radius;
 	int count;
 public:
-	Counter(QString _name, int _color, int _count = 0) : name(_name), color(_color), count(_count) { }
+	Counter(int _id, const QString &_name, int _color, int _radius, int _count = 0) : id(_id), name(_name), color(_color), radius(_radius), count(_count) { }
 	~Counter() { }
+	int getId() const { return id; }
 	QString getName() const { return name; }
 	int getColor() const { return color; }
+	int getRadius() const { return radius; }
 	int getCount() const { return count; }
 	void setCount(int _count) { count = _count; }
 };

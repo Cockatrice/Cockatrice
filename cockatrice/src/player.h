@@ -3,8 +3,9 @@
 
 #include <QInputDialog>
 #include <QPoint>
-#include "zonelist.h"
+#include <QMap>
 #include "client.h"
+#include "carditem.h"
 
 class Client;
 class CardDatabase;
@@ -13,6 +14,7 @@ class QAction;
 class ZoneViewZone;
 class Game;
 class Counter;
+class CardZone;
 class TableZone;
 class HandZone;
 
@@ -45,9 +47,6 @@ public slots:
 private slots:
 	void updateBoundingRect();
 	
-	void actMoveHandToTopLibrary();
-	void actMoveHandToBottomLibrary();
-
 	void actShuffle();
 	void actDrawCard();
 	void actDrawCards();
@@ -59,7 +58,7 @@ private slots:
 	void actViewSideboard();
 private:
 	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *sayMenu;
-	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary,
+	QAction *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToRfg,
 		*aViewLibrary, *aViewTopCards, *aViewGraveyard, *aViewRfg, *aViewSideboard,
 		*aDrawCard, *aDrawCards, *aShuffle,
 		*aUntapAll, *aDecLife, *aIncLife, *aSetLife, *aRollDie, *aCreateToken;
@@ -70,7 +69,7 @@ private:
 	bool active;
 	bool local;
 	
-	ZoneList zones;
+	QMap<QString, CardZone *> zones;
 	TableZone *table;
 	HandZone *hand;
 	
@@ -80,18 +79,21 @@ private:
 	QPixmap bgPixmap;
 	QRectF bRect;
 
-	QList<Counter *> counterList;
+	QMap<int, Counter *> counters;
+	Counter *lifeCounter;
+	
 	void rearrangeCounters();
 	void initSayMenu();
 public:
+	static const int counterAreaWidth = 65;
+	
 	enum { Type = typeOther };
 	int type() const { return Type; }
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	
-	Counter *getCounter(const QString &name, bool remove = false);
-	void addCounter(const QString &name, QColor color, int value);
-	void delCounter(const QString &name);
+	void addCounter(int counterId, const QString &name, QColor color, int radius, int value);
+	void delCounter(int counterId);
 	void clearCounters();
 
 	Client *client;
@@ -103,7 +105,8 @@ public:
 	int getId() const { return id; }
 	QString getName() const { return name; }
 	bool getLocal() const { return local; }
-	const ZoneList &getZones() const { return zones; }
+	const QMap<QString, CardZone *> &getZones() const { return zones; }
+	TableZone *getTable() const { return table; }
 	void gameEvent(const ServerEventData &event);
 	CardDatabase *getDb() const { return db; }
 	void showCardMenu(const QPoint &p);
