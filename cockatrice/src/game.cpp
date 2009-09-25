@@ -493,3 +493,34 @@ void Game::queryGameState()
 	connect(pc, SIGNAL(cardListReceived(QList<ServerZoneCard>)), this, SLOT(cardListReceived(QList<ServerZoneCard>)));
 	connect(pc, SIGNAL(counterListReceived(QList<ServerCounter>)), this, SLOT(counterListReceived(QList<ServerCounter>)));
 }
+
+void Game::activePlayerDrawCard()
+{
+	Player *p = getActiveLocalPlayer();
+	if (p)
+		p->actDrawCard();
+}
+
+void Game::activePlayerUntapAll()
+{
+	Player *p = getActiveLocalPlayer();
+	if (p)
+		p->actUntapAll();
+}
+
+Player *Game::getActiveLocalPlayer() const
+{
+	int localPlayerCount = 0;
+	QMapIterator<int, Player *> i(players);
+	while (i.hasNext())
+		if (i.next().value()->getLocal())
+			++localPlayerCount;
+	
+	i.toFront();
+	while (i.hasNext()) {
+		Player *p = i.next().value();
+		if (p->getLocal() && (p->getActive() || (localPlayerCount == 1)))
+			return p;
+	}
+	return 0;
+}

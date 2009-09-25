@@ -691,16 +691,16 @@ ReturnMessage::ReturnCode ServerSocket::cmdListZones(const QList<QVariant> &para
 
 QStringList ServerSocket::dumpZoneHelper(ServerSocket *player, PlayerZone *zone, int number_cards)
 {
-	QListIterator<Card *> card_iterator(zone->cards);
 	QStringList result;
-	for (int i = 0; card_iterator.hasNext() && (i < number_cards || number_cards == -1); i++) {
-		Card *tmp = card_iterator.next();
-		// XXX Face down cards
+	for (int i = 0; (i < zone->cards.size()) && (i < number_cards || number_cards == -1); i++) {
+		Card *tmp = zone->cards[i];
+		QString displayedName = tmp->getFaceDown() ? QString() : tmp->getName();
+		
 		if (zone->getType() != PlayerZone::HiddenZone)
 			result << QString("%1|%2|%3|%4|%5|%6|%7|%8|%9|%10").arg(player->getPlayerId())
 								    .arg(zone->getName())
 								    .arg(tmp->getId())
-								    .arg(tmp->getName())
+								    .arg(displayedName)
 								    .arg(tmp->getX())
 								    .arg(tmp->getY())
 								    .arg(tmp->getCounters())
@@ -709,7 +709,7 @@ QStringList ServerSocket::dumpZoneHelper(ServerSocket *player, PlayerZone *zone,
 								    .arg(tmp->getAnnotation());
 		else {
 			zone->setCardsBeingLookedAt(number_cards);
-			result << QString("%1|%2|%3|%4||||||").arg(player->getPlayerId()).arg(zone->getName()).arg(i).arg(tmp->getName());
+			result << QString("%1|%2|%3|%4||||||").arg(player->getPlayerId()).arg(zone->getName()).arg(i).arg(displayedName);
 		}
 	}
 	return result;

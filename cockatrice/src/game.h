@@ -38,7 +38,12 @@ private:
 	QMap<int, Player *> players;
 	bool started;
 	int currentPhase;
+	
+	Player *getActiveLocalPlayer() const;
 public slots:
+	void activePlayerDrawCard();
+	void activePlayerUntapAll();
+	
 	void actNextPhase();
 	void actNextTurn();
 private slots:

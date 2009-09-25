@@ -39,11 +39,6 @@ public slots:
 	void actUntapAll();
 	void actRollDie();
 	void actCreateToken();
-	
-	void actSayMessage();
-private slots:
-	void updateBoundingRect();
-	
 	void actShuffle();
 	void actDrawCard();
 	void actDrawCards();
@@ -53,6 +48,10 @@ private slots:
 	void actViewGraveyard();
 	void actViewRfg();
 	void actViewSideboard();
+	
+	void actSayMessage();
+private slots:
+	void updateBoundingRect();
 private:
 	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *countersMenu, *sayMenu;
 	QAction *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToRfg,

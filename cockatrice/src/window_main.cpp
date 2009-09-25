@@ -93,6 +93,8 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			connect(game, SIGNAL(playerAdded(Player *)), this, SLOT(playerAdded(Player *)));
 			connect(game, SIGNAL(playerRemoved(Player *)), scene, SLOT(removePlayer(Player *)));
 			connect(game, SIGNAL(setActivePhase(int)), phasesToolbar, SLOT(setActivePhase(int)));
+			connect(phasesToolbar, SIGNAL(signalDrawCard()), game, SLOT(activePlayerDrawCard()));
+			connect(phasesToolbar, SIGNAL(signalUntapAll()), game, SLOT(activePlayerUntapAll()));
 			messageLog->connectToGame(game);
 			aRestartGame->setEnabled(true);
 			aLeaveGame->setEnabled(true);
@@ -312,7 +314,6 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	connect(client, SIGNAL(protocolError()), messageLog, SLOT(logProtocolError()));
 	connect(phasesToolbar, SIGNAL(signalSetPhase(int)), client, SLOT(setActivePhase(int)));
 	connect(phasesToolbar, SIGNAL(signalNextTurn()), client, SLOT(nextTurn()));
-	connect(phasesToolbar, SIGNAL(signalDrawCard()), client, SLOT(drawCard()));
 
 	createActions();
 	createMenus();
