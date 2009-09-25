@@ -188,7 +188,7 @@ Player::~Player()
 
 void Player::updateBoundingRect()
 {
-	bRect = QRectF(0, 0, CARD_WIDTH + 60 + hand->boundingRect().width() + table->boundingRect().width(), table->boundingRect().height());
+	bRect = QRectF(0, 0, CARD_WIDTH + 5 + counterAreaWidth + hand->boundingRect().width() + table->boundingRect().width(), table->boundingRect().height());
 	emit sizeChanged();
 }
 
@@ -574,7 +574,7 @@ void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/
 	font.setPixelSize(20);
 //	font.setWeight(QFont::Bold);
 	
-	int totalWidth = CARD_WIDTH + 60;
+	int totalWidth = CARD_WIDTH + counterAreaWidth + 5;
 	
 	if (getActive()) {
 		QFontMetrics fm(font);

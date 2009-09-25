@@ -73,7 +73,7 @@ void Counter::setValue(int _value)
 void Counter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
 	if (event->button() == Qt::LeftButton) {
-		player->client->incCounter(id, -1);
+		player->client->incCounter(id, 1);
 		event->accept();
 	} else if (event->button() == Qt::RightButton) {
 		menu->exec(event->screenPos());
