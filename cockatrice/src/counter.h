@@ -4,21 +4,34 @@
 #include <QGraphicsItem>
 
 class Player;
+class QMenu;
+class QAction;
 
-class Counter : public QGraphicsItem {
+class Counter : public QObject, public QGraphicsItem {
+	Q_OBJECT
 private:
+	Player *player;
 	int id;
 	QString name;
 	QColor color;
 	int radius;
 	int value;
+	
+	QAction *aSet, *aDec, *aInc;
+	QMenu *menu;
+private slots:
+	void incrementCounter();
+	void setCounter();
 protected:
-	Player *player;
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 public:
 	Counter(Player *_player, int _id, const QString &_name, QColor _color, int _radius, int _value, QGraphicsItem *parent = 0);
+	~Counter();
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+	
+	QMenu *getMenu() const { return menu; }
+	void retranslateUi();
 	
 	int getId() const { return id; }
 	QString getName() const { return name; }

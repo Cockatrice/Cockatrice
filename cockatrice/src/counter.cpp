@@ -4,10 +4,46 @@
 #include <QtGui>
 
 Counter::Counter(Player *_player, int _id, const QString &_name, QColor _color, int _radius, int _value, QGraphicsItem *parent)
-	: QGraphicsItem(parent), id(_id), name(_name), color(_color), radius(_radius), value(_value), player(_player)
+	: QGraphicsItem(parent), player(_player), id(_id), name(_name), color(_color), radius(_radius), value(_value), aDec(0), aInc(0)
 {
 	if (radius > Player::counterAreaWidth / 2)
 		radius = Player::counterAreaWidth / 2;
+	
+	menu = new QMenu(name);
+	aSet = new QAction(this);
+	connect(aSet, SIGNAL(triggered()), this, SLOT(setCounter()));
+	menu->addAction(aSet);
+	menu->addSeparator();
+	for (int i = -10; i <= 10; ++i)
+		if (i == 0)
+			menu->addSeparator();
+		else {
+			QAction *aIncrement = new QAction(QString(i < 0 ? "%1" : "+%1").arg(i), this);
+			if (i == -1)
+				aDec = aIncrement;
+			else if (i == 1)
+				aInc = aIncrement;
+			aIncrement->setData(i);
+			connect(aIncrement, SIGNAL(triggered()), this, SLOT(incrementCounter()));
+			menu->addAction(aIncrement);
+		}
+	
+	retranslateUi();
+}
+
+Counter::~Counter()
+{
+	delete menu;
+}
+
+void Counter::retranslateUi()
+{
+	aSet->setText(tr("&Set counter..."));
+	if (name == "life") {
+		aSet->setShortcut(tr("Ctrl+L"));
+		aDec->setShortcut(tr("F11"));
+		aInc->setShortcut(tr("F12"));
+	}
 }
 
 QRectF Counter::boundingRect() const
@@ -36,8 +72,26 @@ void Counter::setValue(int _value)
 
 void Counter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-	if (event->button() == Qt::LeftButton)
-		player->client->incCounter(id, 1);
-	else if (event->button() == Qt::RightButton)
+	if (event->button() == Qt::LeftButton) {
 		player->client->incCounter(id, -1);
+		event->accept();
+	} else if (event->button() == Qt::RightButton) {
+		menu->exec(event->screenPos());
+		event->accept();
+	} else
+		event->ignore();
+}
+
+void Counter::incrementCounter()
+{
+	int delta = static_cast<QAction *>(sender())->data().toInt();
+	player->client->incCounter(id, delta);
+}
+
+void Counter::setCounter()
+{
+	bool ok;
+	int newValue = QInputDialog::getInteger(0, tr("Set counter"), tr("New value for counter '%1':").arg(name), value, 0, 2000000000, 1, &ok);
+	if (ok)
+		player->client->setCounter(id, newValue);
 }

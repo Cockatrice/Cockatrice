@@ -37,9 +37,6 @@ signals:
 	void sizeChanged();
 public slots:
 	void actUntapAll();
-	void actIncLife();
-	void actDecLife();
-	void actSetLife();
 	void actRollDie();
 	void actCreateToken();
 	
@@ -57,11 +54,11 @@ private slots:
 	void actViewRfg();
 	void actViewSideboard();
 private:
-	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *sayMenu;
+	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *countersMenu, *sayMenu;
 	QAction *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToRfg,
 		*aViewLibrary, *aViewTopCards, *aViewGraveyard, *aViewRfg, *aViewSideboard,
 		*aDrawCard, *aDrawCards, *aShuffle,
-		*aUntapAll, *aDecLife, *aIncLife, *aSetLife, *aRollDie, *aCreateToken;
+		*aUntapAll, *aRollDie, *aCreateToken;
 
 	int defaultNumberTopCards;
 	QString name;
@@ -80,9 +77,8 @@ private:
 	QRectF bRect;
 
 	QMap<int, Counter *> counters;
-	Counter *lifeCounter;
-	
 	void rearrangeCounters();
+	
 	void initSayMenu();
 public:
 	static const int counterAreaWidth = 65;

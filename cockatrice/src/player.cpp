@@ -151,13 +151,6 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 		aUntapAll = new QAction(this);
 		connect(aUntapAll, SIGNAL(triggered()), this, SLOT(actUntapAll()));
 
-		aDecLife = new QAction(this);
-		connect(aDecLife, SIGNAL(triggered()), this, SLOT(actDecLife()));
-		aIncLife = new QAction(this);
-		connect(aIncLife, SIGNAL(triggered()), this, SLOT(actIncLife()));
-		aSetLife = new QAction(this);
-		connect(aSetLife, SIGNAL(triggered()), this, SLOT(actSetLife()));
-	
 		aRollDie = new QAction(this);
 		connect(aRollDie, SIGNAL(triggered()), this, SLOT(actRollDie()));
 	
@@ -165,11 +158,9 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 		connect(aCreateToken, SIGNAL(triggered()), this, SLOT(actCreateToken()));
 		
 		playerMenu->addSeparator();
-		playerMenu->addAction(aUntapAll);
+		countersMenu = playerMenu->addMenu(QString());
 		playerMenu->addSeparator();
-		playerMenu->addAction(aDecLife);
-		playerMenu->addAction(aIncLife);
-		playerMenu->addAction(aSetLife);
+		playerMenu->addAction(aUntapAll);
 		playerMenu->addSeparator();
 		playerMenu->addAction(aRollDie);
 		playerMenu->addSeparator();
@@ -177,7 +168,6 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 		playerMenu->addSeparator();
 		sayMenu = playerMenu->addMenu(QString());
 		initSayMenu();
-
 	} else
 		sbMenu = 0;
 	
@@ -231,20 +221,19 @@ void Player::retranslateUi()
 		handMenu->setTitle(tr("&Hand"));
 		sbMenu->setTitle(tr("&Sideboard"));
 		libraryMenu->setTitle(tr("&Library"));
+		countersMenu->setTitle(tr("&Counters"));
 
 		aUntapAll->setText(tr("&Untap all permanents"));
 		aUntapAll->setShortcut(tr("Ctrl+U"));
-		aDecLife->setText(tr("&Decrement life"));
-		aDecLife->setShortcut(tr("F11"));
-		aIncLife->setText(tr("&Increment life"));
-		aIncLife->setShortcut(tr("F12"));
-		aSetLife->setText(tr("&Set life"));
-		aSetLife->setShortcut(tr("Ctrl+L"));
 		aRollDie->setText(tr("R&oll die..."));
 		aRollDie->setShortcut(tr("Ctrl+I"));
 		aCreateToken->setText(tr("&Create token..."));
 		aCreateToken->setShortcut(tr("Ctrl+T"));
 		sayMenu->setTitle(tr("S&ay"));
+		
+		QMapIterator<int, Counter *> counterIterator(counters);
+		while (counterIterator.hasNext())
+			counterIterator.next().value()->retranslateUi();
 	}
 }
 
@@ -322,26 +311,6 @@ void Player::actDrawCards()
 void Player::actUntapAll()
 {
 	client->setCardAttr("table", -1, "tapped", "false");
-}
-
-void Player::actIncLife()
-{
-	// XXX
-	client->incCounter(lifeCounter->getId(), 1);
-}
-
-void Player::actDecLife()
-{
-	// XXX
-	client->incCounter(lifeCounter->getId(), -1);
-}
-
-void Player::actSetLife()
-{
-	bool ok;
-	int life = QInputDialog::getInteger(0, tr("Set life"), tr("New life total:"), lifeCounter->getValue(), 0, 2000000000, 1, &ok);
-	if (ok)
-		client->setCounter(lifeCounter->getId(), life);
 }
 
 void Player::actRollDie()
@@ -633,9 +602,7 @@ void Player::addCounter(int counterId, const QString &name, QColor color, int ra
 {
 	Counter *c = new Counter(this, counterId, name, color, radius, value, this);
 	counters.insert(counterId, c);
-	if (name == "life")
-		lifeCounter = c;
-	// XXX
+	countersMenu->addMenu(c->getMenu());
 	rearrangeCounters();
 }
 
