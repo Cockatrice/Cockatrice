@@ -19,4 +19,4 @@
  ***************************************************************************/
 
 static const int PROTOCOL_VERSION = 1;
-static const char *VERSION_STRING = "Servatrice 0.20090925";
+static const char *VERSION_STRING = "Servatrice 0.20090928";

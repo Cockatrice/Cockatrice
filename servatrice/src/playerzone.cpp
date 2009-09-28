@@ -58,7 +58,7 @@ Card *PlayerZone::getCard(int id, bool remove, int *position)
 		}
 		return NULL;
 	} else {
-		if (id >= cards.size())
+		if ((id >= cards.size()) || (id < 0))
 			return NULL;
 		Card *tmp = cards[id];
 		if (remove)
