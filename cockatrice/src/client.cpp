@@ -314,7 +314,7 @@ void Client::readLine()
 					emit protocolError();
 			}
 		} else if (prefix == "list_counters") {
-			if (values.size() != 6) {
+			if (values.size() != 7) {
 				emit protocolError();
 				continue;
 			}
