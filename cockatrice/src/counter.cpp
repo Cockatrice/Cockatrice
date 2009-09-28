@@ -9,24 +9,27 @@ Counter::Counter(Player *_player, int _id, const QString &_name, QColor _color, 
 	if (radius > Player::counterAreaWidth / 2)
 		radius = Player::counterAreaWidth / 2;
 	
-	menu = new QMenu(name);
-	aSet = new QAction(this);
-	connect(aSet, SIGNAL(triggered()), this, SLOT(setCounter()));
-	menu->addAction(aSet);
-	menu->addSeparator();
-	for (int i = -10; i <= 10; ++i)
-		if (i == 0)
-			menu->addSeparator();
-		else {
-			QAction *aIncrement = new QAction(QString(i < 0 ? "%1" : "+%1").arg(i), this);
-			if (i == -1)
-				aDec = aIncrement;
-			else if (i == 1)
-				aInc = aIncrement;
-			aIncrement->setData(i);
-			connect(aIncrement, SIGNAL(triggered()), this, SLOT(incrementCounter()));
-			menu->addAction(aIncrement);
-		}
+	if (player->getLocal()) {
+		menu = new QMenu(name);
+		aSet = new QAction(this);
+		connect(aSet, SIGNAL(triggered()), this, SLOT(setCounter()));
+		menu->addAction(aSet);
+		menu->addSeparator();
+		for (int i = -10; i <= 10; ++i)
+			if (i == 0)
+				menu->addSeparator();
+			else {
+				QAction *aIncrement = new QAction(QString(i < 0 ? "%1" : "+%1").arg(i), this);
+				if (i == -1)
+					aDec = aIncrement;
+				else if (i == 1)
+					aInc = aIncrement;
+				aIncrement->setData(i);
+				connect(aIncrement, SIGNAL(triggered()), this, SLOT(incrementCounter()));
+				menu->addAction(aIncrement);
+			}
+	} else
+		menu = 0;
 	
 	retranslateUi();
 }
@@ -38,11 +41,13 @@ Counter::~Counter()
 
 void Counter::retranslateUi()
 {
-	aSet->setText(tr("&Set counter..."));
-	if (name == "life") {
-		aSet->setShortcut(tr("Ctrl+L"));
-		aDec->setShortcut(tr("F11"));
-		aInc->setShortcut(tr("F12"));
+	if (menu) {
+		aSet->setText(tr("&Set counter..."));
+		if (name == "life") {
+			aSet->setShortcut(tr("Ctrl+L"));
+			aDec->setShortcut(tr("F11"));
+			aInc->setShortcut(tr("F12"));
+		}
 	}
 }
 
@@ -76,7 +81,8 @@ void Counter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 		player->client->incCounter(id, 1);
 		event->accept();
 	} else if (event->button() == Qt::RightButton) {
-		menu->exec(event->screenPos());
+		if (menu)
+			menu->exec(event->screenPos());
 		event->accept();
 	} else
 		event->ignore();

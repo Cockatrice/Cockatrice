@@ -168,8 +168,10 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 		playerMenu->addSeparator();
 		sayMenu = playerMenu->addMenu(QString());
 		initSayMenu();
-	} else
+	} else {
+		countersMenu = 0;
 		sbMenu = 0;
+	}
 	
 	retranslateUi();
 }
@@ -602,7 +604,8 @@ void Player::addCounter(int counterId, const QString &name, QColor color, int ra
 {
 	Counter *c = new Counter(this, counterId, name, color, radius, value, this);
 	counters.insert(counterId, c);
-	countersMenu->addMenu(c->getMenu());
+	if (countersMenu)
+		countersMenu->addMenu(c->getMenu());
 	rearrangeCounters();
 }
 
