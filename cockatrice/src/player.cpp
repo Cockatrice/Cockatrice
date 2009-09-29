@@ -49,31 +49,47 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 	updateBoundingRect();
 
 	if (local) {
-		aMoveToTopLibrary = new QAction(this);
-		aMoveToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
-		aMoveToBottomLibrary = new QAction(this);
-		aMoveToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
-		aMoveToHand = new QAction(this);
-		aMoveToHand->setData(QList<QVariant>() << "hand" << 0);
-		aMoveToGraveyard = new QAction(this);
-		aMoveToGraveyard->setData(QList<QVariant>() << "grave" << 0);
-		aMoveToRfg = new QAction(this);
-		aMoveToRfg->setData(QList<QVariant>() << "rfg" << 0);
+		aMoveHandToTopLibrary = new QAction(this);
+		aMoveHandToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
+		aMoveHandToBottomLibrary = new QAction(this);
+		aMoveHandToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
+		aMoveHandToGrave = new QAction(this);
+		aMoveHandToGrave->setData(QList<QVariant>() << "grave" << 0);
+		aMoveHandToRfg = new QAction(this);
+		aMoveHandToRfg->setData(QList<QVariant>() << "rfg" << 0);
 		
-		connect(aMoveToTopLibrary, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
-		connect(aMoveToBottomLibrary, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
-		connect(aMoveToGraveyard, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
-		connect(aMoveToRfg, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
+		connect(aMoveHandToTopLibrary, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
+		connect(aMoveHandToBottomLibrary, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
+		connect(aMoveHandToGrave, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
+		connect(aMoveHandToRfg, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
 
-		connect(aMoveToTopLibrary, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
-		connect(aMoveToBottomLibrary, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
-		connect(aMoveToHand, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
-		connect(aMoveToRfg, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
+		aMoveGraveToTopLibrary = new QAction(this);
+		aMoveGraveToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
+		aMoveGraveToBottomLibrary = new QAction(this);
+		aMoveGraveToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
+		aMoveGraveToHand = new QAction(this);
+		aMoveGraveToHand->setData(QList<QVariant>() << "hand" << 0);
+		aMoveGraveToRfg = new QAction(this);
+		aMoveGraveToRfg->setData(QList<QVariant>() << "rfg" << 0);
+		
+		connect(aMoveGraveToTopLibrary, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
+		connect(aMoveGraveToBottomLibrary, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
+		connect(aMoveGraveToHand, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
+		connect(aMoveGraveToRfg, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
 
-		connect(aMoveToTopLibrary, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
-		connect(aMoveToBottomLibrary, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
-		connect(aMoveToHand, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
-		connect(aMoveToGraveyard, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
+		aMoveRfgToTopLibrary = new QAction(this);
+		aMoveRfgToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
+		aMoveRfgToBottomLibrary = new QAction(this);
+		aMoveRfgToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
+		aMoveRfgToHand = new QAction(this);
+		aMoveRfgToHand->setData(QList<QVariant>() << "hand" << 0);
+		aMoveRfgToGrave = new QAction(this);
+		aMoveRfgToGrave->setData(QList<QVariant>() << "grave" << 0);
+		
+		connect(aMoveRfgToTopLibrary, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
+		connect(aMoveRfgToBottomLibrary, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
+		connect(aMoveRfgToHand, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
+		connect(aMoveRfgToGrave, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
 
 		aViewLibrary = new QAction(this);
 		connect(aViewLibrary, SIGNAL(triggered()), this, SLOT(actViewLibrary()));
@@ -103,10 +119,10 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 
 	if (local) {
 		handMenu = playerMenu->addMenu(QString());
-		handMenu->addAction(aMoveToTopLibrary);
-		handMenu->addAction(aMoveToBottomLibrary);
-		handMenu->addAction(aMoveToGraveyard);
-		handMenu->addAction(aMoveToRfg);
+		handMenu->addAction(aMoveHandToTopLibrary);
+		handMenu->addAction(aMoveHandToBottomLibrary);
+		handMenu->addAction(aMoveHandToGrave);
+		handMenu->addAction(aMoveHandToRfg);
 		hand->setMenu(handMenu);
 
 		libraryMenu = playerMenu->addMenu(QString());
@@ -133,16 +149,16 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 
 	if (local) {
 		graveMenu->addSeparator();
-		graveMenu->addAction(aMoveToTopLibrary);
-		graveMenu->addAction(aMoveToBottomLibrary);
-		graveMenu->addAction(aMoveToHand);
-		graveMenu->addAction(aMoveToRfg);
+		graveMenu->addAction(aMoveGraveToTopLibrary);
+		graveMenu->addAction(aMoveGraveToBottomLibrary);
+		graveMenu->addAction(aMoveGraveToHand);
+		graveMenu->addAction(aMoveGraveToRfg);
 
 		rfgMenu->addSeparator();
-		rfgMenu->addAction(aMoveToTopLibrary);
-		rfgMenu->addAction(aMoveToBottomLibrary);
-		rfgMenu->addAction(aMoveToHand);
-		rfgMenu->addAction(aMoveToGraveyard);
+		rfgMenu->addAction(aMoveRfgToTopLibrary);
+		rfgMenu->addAction(aMoveRfgToBottomLibrary);
+		rfgMenu->addAction(aMoveRfgToHand);
+		rfgMenu->addAction(aMoveRfgToGrave);
 
 		sbMenu = playerMenu->addMenu(QString());
 		sbMenu->addAction(aViewSideboard);
@@ -203,11 +219,18 @@ void Player::retranslateUi()
 	rfgMenu->setTitle(tr("&Exile"));
 	
 	if (local) {
-		aMoveToTopLibrary->setText(tr("Move to &top of library"));
-		aMoveToBottomLibrary->setText(tr("Move to &bottom of library"));
-		aMoveToHand->setText(tr("Move to &hand"));
-		aMoveToGraveyard->setText(tr("Move to g&raveyard"));
-		aMoveToRfg->setText(tr("Move to &exile"));
+		aMoveHandToTopLibrary->setText(tr("Move to &top of library"));
+		aMoveHandToBottomLibrary->setText(tr("Move to &bottom of library"));
+		aMoveHandToGrave->setText(tr("Move to g&raveyard"));
+		aMoveHandToRfg->setText(tr("Move to &exile"));
+		aMoveGraveToTopLibrary->setText(tr("Move to &top of library"));
+		aMoveGraveToBottomLibrary->setText(tr("Move to &bottom of library"));
+		aMoveGraveToHand->setText(tr("Move to &hand"));
+		aMoveGraveToRfg->setText(tr("Move to &exile"));
+		aMoveRfgToTopLibrary->setText(tr("Move to &top of library"));
+		aMoveRfgToBottomLibrary->setText(tr("Move to &bottom of library"));
+		aMoveRfgToHand->setText(tr("Move to &hand"));
+		aMoveRfgToGrave->setText(tr("Move to g&raveyard"));
 		aViewLibrary->setText(tr("&View library"));
 		aViewLibrary->setShortcut(tr("F3"));
 		aViewTopCards->setText(tr("View &top cards of library..."));
