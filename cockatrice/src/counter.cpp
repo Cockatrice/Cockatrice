@@ -81,6 +81,9 @@ void Counter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 		player->client->incCounter(id, 1);
 		event->accept();
 	} else if (event->button() == Qt::RightButton) {
+		player->client->incCounter(id, -1);
+		event->accept();
+	} else if (event->button() == Qt::MidButton) {
 		if (menu)
 			menu->exec(event->screenPos());
 		event->accept();
