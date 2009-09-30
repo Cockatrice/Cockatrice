@@ -45,7 +45,7 @@ ServerGame::~ServerGame()
 QString ServerGame::getGameListLine() const
 {
 	if (players.isEmpty())
-		return QString("list_games|%1|||0|%2||0").arg(gameId).arg(maxPlayers);
+		return QString("list_games|%1|||0|%2||0|0").arg(gameId).arg(maxPlayers);
 	else {
 		QString creatorName = creator ? creator->getPlayerName() : QString();
 		return QString("list_games|%1|%2|%3|%4|%5|%6|%7|%8").arg(gameId)
@@ -158,8 +158,7 @@ void ServerGame::removePlayer(ServerSocket *player)
 	
 	if (!players.size())
 		deleteLater();
-	if (!gameStarted)
-		qobject_cast<Server *>(parent())->broadcastGameListUpdate(this);
+	qobject_cast<Server *>(parent())->broadcastGameListUpdate(this);
 }
 
 void ServerGame::setActivePlayer(int _activePlayer)

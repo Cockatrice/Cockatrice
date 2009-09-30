@@ -156,7 +156,9 @@ void Server::broadcastChannelUpdate()
 void Server::gameClosing()
 {
 	qDebug("Server::gameClosing");
-	games.remove(games.key(static_cast<ServerGame *>(sender())));
+	ServerGame *game = static_cast<ServerGame *>(sender());
+	broadcastGameListUpdate(game);
+	games.remove(games.key(game));
 }
 
 void Server::removePlayer(ServerSocket *player)
