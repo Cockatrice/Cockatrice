@@ -26,7 +26,7 @@ void ZoneViewLayout::reorganize()
 		qreal w = viewSize.right() - viewSize.left();
 		qreal h = viewSize.bottom() - viewSize.top();
 		views.at(i)->setPos(totalWidth, y);
-		totalWidth += w;
+                totalWidth += w;
 		if (h > totalHeight)
 			totalHeight = h;
 	}
@@ -50,6 +50,7 @@ void ZoneViewLayout::toggleZoneView(Player *player, const QString &zoneName, int
 	connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeItem(ZoneViewWidget *)));
 	connect(item, SIGNAL(sizeChanged()), this, SLOT(reorganize()));
 	reorganize();
+        setZValue(2);
 }
 
 void ZoneViewLayout::removeItem(ZoneViewWidget *item)
