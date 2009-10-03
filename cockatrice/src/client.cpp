@@ -226,10 +226,20 @@ void Client::readLine()
 			ServerResponse resp;
 			if (values[0] == "ok")
 				resp = RespOk;
+			else if (values[0] == "name_not_found")
+				resp = RespNameNotFound;
+			else if (values[0] == "login_needed")
+				resp = RespLoginNeeded;
+			else if (values[0] == "syntax")
+				resp = RespSyntaxError;
+			else if (values[0] == "context")
+				resp = RespContextError;
 			else if (values[0] == "password")
-				resp = RespPassword;
+				resp = RespPasswordWrong;
+			else if (values[0] == "spectators_not_allowed")
+				resp = RespSpectatorsNotAllowed;
 			else
-				resp = RespErr;
+				resp = RespInvalid;
 			pc->responseReceived(resp);
 		} else if (prefix == "list_games") {
 			if (values.size() != 8) {

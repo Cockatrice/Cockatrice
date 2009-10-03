@@ -222,6 +222,14 @@ void CardInfo::clearPixmapCache()
 	}
 }
 
+void CardInfo::clearPixmapCacheMiss()
+{
+	if (!pixmap)
+		return;
+	if (pixmap->isNull())
+		clearPixmapCache();
+}
+
 void CardInfo::updatePixmapCache()
 {
 	qDebug(QString("Updating pixmap cache for %1").arg(name).toLatin1());
@@ -456,6 +464,14 @@ void CardDatabase::updatePicDownload(int _picDownload)
 		picDownload = settings.value("personal/picturedownload", 0).toInt();
 	} else
 		picDownload = _picDownload;
+		
+	if (picDownload) {
+		QHashIterator<QString, CardInfo *> cardIterator(cardHash);
+		while (cardIterator.hasNext()) {
+			CardInfo *c = cardIterator.next().value();
+			c->clearPixmapCacheMiss();
+		}
+	}
 }
 
 void CardDatabase::updatePicsPath(const QString &path)

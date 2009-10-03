@@ -83,6 +83,7 @@ public:
 	QPixmap *loadPixmap();
 	QPixmap *getPixmap(QSize size);
 	void clearPixmapCache();
+	void clearPixmapCacheMiss();
 	void updatePixmapCache();
 private slots:
 	void picDownloadFinished(int id, bool error);

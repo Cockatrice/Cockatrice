@@ -72,7 +72,7 @@ void DlgCreateGame::checkResponse(ServerResponse response)
 	if (response == RespOk)
 		accept();
 	else {
-		QMessageBox::critical(this, tr("Error"), tr("XXX"));
+		QMessageBox::critical(this, tr("Error"), tr("Server error."));
 		return;
 	}
 }

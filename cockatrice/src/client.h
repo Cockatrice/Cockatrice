@@ -20,8 +20,13 @@ enum ProtocolStatus { StatusDisconnected,
 
 enum ServerResponse {
 	RespOk,
-	RespPassword,
-	RespErr
+	RespNameNotFound,
+	RespLoginNeeded,
+	RespSyntaxError,
+	RespContextError,
+	RespPasswordWrong,
+	RespSpectatorsNotAllowed,
+	RespInvalid
 };
 
 enum ServerEventType {

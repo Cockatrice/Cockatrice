@@ -20,7 +20,6 @@ public:
 private slots:
 	void showFullGamesChanged(int state);
 	void actCreate();
-	void actRefresh();
 	void actJoin();
 	void checkResponse(ServerResponse response);
 private:

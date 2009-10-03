@@ -51,22 +51,19 @@ void GameSelector::actCreate()
 		disableGameList();
 }
 
-void GameSelector::actRefresh()
-{
-	client->listGames();
-}
-
 void GameSelector::checkResponse(ServerResponse response)
 {
 	createButton->setEnabled(true);
 	joinButton->setEnabled(true);
 	spectateButton->setEnabled(true);
 
-	if (response == RespOk)
-		disableGameList();
-	else {
-		QMessageBox::critical(this, tr("Error"), tr("XXX"));
-		return;
+	switch (response) {
+		case RespOk: disableGameList(); break;
+		case RespPasswordWrong: QMessageBox::critical(this, tr("Error"), tr("Wrong password.")); break;
+		case RespSpectatorsNotAllowed: QMessageBox::critical(this, tr("Error"), tr("Spectators are not allowed in this game.")); break;
+		case RespContextError: QMessageBox::critical(this, tr("Error"), tr("The game is already full.")); break;
+		case RespNameNotFound: QMessageBox::critical(this, tr("Error"), tr("The game does not exist any more.")); break;
+		default: ;
 	}
 }
 
@@ -77,7 +74,7 @@ void GameSelector::actJoin()
 	QModelIndex ind = gameListView->currentIndex();
 	if (!ind.isValid())
 		return;
-	const ServerGame &game = gameListModel->getGame(ind.row());
+	const ServerGame &game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
 	QString password;
 	if (game.getHasPassword()) {
 		bool ok;

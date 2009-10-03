@@ -304,12 +304,12 @@
         <translation>F12</translation>
     </message>
     <message>
-        <location filename="../src/counter.cpp" line="100"/>
+        <location filename="../src/counter.cpp" line="103"/>
         <source>Set counter</source>
         <translation>Zähler setzen</translation>
     </message>
     <message>
-        <location filename="../src/counter.cpp" line="100"/>
+        <location filename="../src/counter.cpp" line="103"/>
         <source>New value for counter &apos;%1&apos;:</source>
         <translation>Neuer Wert für den Zähler &apos;%1&apos;:</translation>
     </message>
@@ -433,8 +433,12 @@
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="75"/>
+        <source>Server error.</source>
+        <translation>Serverfehler.</translation>
+    </message>
+    <message>
         <source>XXX</source>
-        <translation>XXX</translation>
+        <translation type="obsolete">XXX</translation>
     </message>
 </context>
 <context>
@@ -770,42 +774,64 @@
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/gameselector.cpp" line="119"/>
+        <location filename="../src/gameselector.cpp" line="116"/>
         <source>C&amp;reate</source>
         <translation>Spiel e&amp;rstellen</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="120"/>
+        <location filename="../src/gameselector.cpp" line="117"/>
         <source>&amp;Join</source>
         <translation>&amp;Teilnehmen</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="68"/>
+        <location filename="../src/gameselector.cpp" line="62"/>
+        <location filename="../src/gameselector.cpp" line="63"/>
+        <location filename="../src/gameselector.cpp" line="64"/>
+        <location filename="../src/gameselector.cpp" line="65"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="68"/>
         <source>XXX</source>
-        <translation>XXX</translation>
+        <translation type="obsolete">XXX</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="84"/>
+        <location filename="../src/gameselector.cpp" line="62"/>
+        <source>Wrong password.</source>
+        <translation>Falsches Passwort.</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="63"/>
+        <source>Spectators are not allowed in this game.</source>
+        <translation>In diesem Spiel sind keine Zuschauer zugelassen.</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="64"/>
+        <source>The game is already full.</source>
+        <translation>Das Spiel ist bereits voll.</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="65"/>
+        <source>The game does not exist any more.</source>
+        <translation>Dieses Spiel gibt es nicht mehr.</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="81"/>
         <source>Join game</source>
         <translation>Spiel beitreten</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="84"/>
+        <location filename="../src/gameselector.cpp" line="81"/>
         <source>Password:</source>
         <translation>Passwort:</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="118"/>
+        <location filename="../src/gameselector.cpp" line="115"/>
         <source>&amp;Show full games</source>
         <translation>&amp;Volle Spiele anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="121"/>
+        <location filename="../src/gameselector.cpp" line="118"/>
         <source>J&amp;oin as spectator</source>
         <translation>&amp;Zuschauen</translation>
     </message>
@@ -813,12 +839,12 @@
 <context>
     <name>GamesModel</name>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="20"/>
+        <location filename="../src/gamesmodel.cpp" line="24"/>
         <source>yes</source>
         <translation>ja</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="20"/>
+        <location filename="../src/gamesmodel.cpp" line="24"/>
         <source>no</source>
         <translation>nein</translation>
     </message>
@@ -827,32 +853,32 @@
         <translation type="obsolete">Spiel ID</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="33"/>
+        <location filename="../src/gamesmodel.cpp" line="37"/>
         <source>Creator</source>
         <translation>Ersteller</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="32"/>
+        <location filename="../src/gamesmodel.cpp" line="36"/>
         <source>Description</source>
         <translation>Beschreibung</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="22"/>
+        <location filename="../src/gamesmodel.cpp" line="26"/>
         <source>not allowed</source>
         <translation>nicht erlaubt</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="34"/>
+        <location filename="../src/gamesmodel.cpp" line="38"/>
         <source>Password</source>
         <translation>Passwort</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="35"/>
+        <location filename="../src/gamesmodel.cpp" line="39"/>
         <source>Players</source>
         <translation>Spieler</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="36"/>
+        <location filename="../src/gamesmodel.cpp" line="40"/>
         <source>Spectators</source>
         <translation>Zuschauer</translation>
     </message>

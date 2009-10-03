@@ -269,12 +269,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/counter.cpp" line="100"/>
+        <location filename="../src/counter.cpp" line="103"/>
         <source>Set counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/counter.cpp" line="100"/>
+        <location filename="../src/counter.cpp" line="103"/>
         <source>New value for counter &apos;%1&apos;:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -398,7 +398,7 @@
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="75"/>
-        <source>XXX</source>
+        <source>Server error.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -564,42 +564,60 @@
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/gameselector.cpp" line="119"/>
+        <location filename="../src/gameselector.cpp" line="116"/>
         <source>C&amp;reate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="120"/>
+        <location filename="../src/gameselector.cpp" line="117"/>
         <source>&amp;Join</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="68"/>
+        <location filename="../src/gameselector.cpp" line="62"/>
+        <location filename="../src/gameselector.cpp" line="63"/>
+        <location filename="../src/gameselector.cpp" line="64"/>
+        <location filename="../src/gameselector.cpp" line="65"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="68"/>
-        <source>XXX</source>
+        <location filename="../src/gameselector.cpp" line="62"/>
+        <source>Wrong password.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="84"/>
+        <location filename="../src/gameselector.cpp" line="63"/>
+        <source>Spectators are not allowed in this game.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="64"/>
+        <source>The game is already full.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="65"/>
+        <source>The game does not exist any more.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="81"/>
         <source>Join game</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="84"/>
+        <location filename="../src/gameselector.cpp" line="81"/>
         <source>Password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="118"/>
+        <location filename="../src/gameselector.cpp" line="115"/>
         <source>&amp;Show full games</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="121"/>
+        <location filename="../src/gameselector.cpp" line="118"/>
         <source>J&amp;oin as spectator</source>
         <translation type="unfinished"></translation>
     </message>
@@ -607,42 +625,42 @@
 <context>
     <name>GamesModel</name>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="20"/>
+        <location filename="../src/gamesmodel.cpp" line="24"/>
         <source>yes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="20"/>
+        <location filename="../src/gamesmodel.cpp" line="24"/>
         <source>no</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="33"/>
+        <location filename="../src/gamesmodel.cpp" line="37"/>
         <source>Creator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="32"/>
+        <location filename="../src/gamesmodel.cpp" line="36"/>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="22"/>
+        <location filename="../src/gamesmodel.cpp" line="26"/>
         <source>not allowed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="34"/>
+        <location filename="../src/gamesmodel.cpp" line="38"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="35"/>
+        <location filename="../src/gamesmodel.cpp" line="39"/>
         <source>Players</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="36"/>
+        <location filename="../src/gamesmodel.cpp" line="40"/>
         <source>Spectators</source>
         <translation type="unfinished"></translation>
     </message>

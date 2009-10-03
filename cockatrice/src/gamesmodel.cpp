@@ -8,7 +8,11 @@ GamesModel::~GamesModel()
 
 QVariant GamesModel::data(const QModelIndex &index, int role) const
 {
-	if ((role != Qt::DisplayRole) || !index.isValid())
+	if (!index.isValid())
+		return QVariant();
+	if (role == Qt::UserRole)
+		return index.row();
+	if (role != Qt::DisplayRole)
 		return QVariant();
 	if ((index.row() >= gameList.size()) || (index.column() >= columnCount()))
 		return QVariant();
