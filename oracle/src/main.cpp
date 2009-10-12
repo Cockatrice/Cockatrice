@@ -1,12 +1,16 @@
 #include <QApplication>
+#include <QTextCodec>
 #include "oracleimporter.h"
+#include "window_main.h"
 
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
 	
-	OracleImporter importer("../oracle");
-	importer.downloadNextFile();
+	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+
+	WindowMain wnd;
+	wnd.show();
 	
 	return app.exec();
 }

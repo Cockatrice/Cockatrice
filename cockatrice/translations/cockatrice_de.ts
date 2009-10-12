@@ -2008,32 +2008,32 @@
         <translation>&amp;Suchen nach:</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="56"/>
+        <location filename="../src/window_deckeditor.cpp" line="60"/>
         <source>Deck &amp;name:</source>
         <translation>Deck &amp;Name:</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="60"/>
+        <location filename="../src/window_deckeditor.cpp" line="64"/>
         <source>&amp;Comments:</source>
         <translation>&amp;Kommentare:</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="84"/>
+        <location filename="../src/window_deckeditor.cpp" line="88"/>
         <source>Deck editor [*]</source>
         <translation>Deck-Editor [*]</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="86"/>
+        <location filename="../src/window_deckeditor.cpp" line="90"/>
         <source>&amp;New deck</source>
         <translation>&amp;Neues Deck</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="89"/>
+        <location filename="../src/window_deckeditor.cpp" line="93"/>
         <source>&amp;Load deck...</source>
         <translation>Deck &amp;laden...</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="92"/>
+        <location filename="../src/window_deckeditor.cpp" line="96"/>
         <source>&amp;Save deck</source>
         <translation>Deck &amp;speichern</translation>
     </message>
@@ -2042,97 +2042,97 @@
         <translation type="obsolete">Deck &amp;speichern unter...</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="95"/>
+        <location filename="../src/window_deckeditor.cpp" line="99"/>
         <source>Save deck &amp;as...</source>
         <translation>Deck s&amp;peichern unter...</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="98"/>
+        <location filename="../src/window_deckeditor.cpp" line="102"/>
         <source>&amp;Print deck...</source>
         <translation>Deck &amp;drucken...</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="101"/>
+        <location filename="../src/window_deckeditor.cpp" line="105"/>
         <source>&amp;Close</source>
         <translation>S&amp;chließen</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="102"/>
+        <location filename="../src/window_deckeditor.cpp" line="106"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="105"/>
+        <location filename="../src/window_deckeditor.cpp" line="109"/>
         <source>&amp;Edit sets...</source>
         <translation>&amp;Editionen bearbeiten...</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="108"/>
+        <location filename="../src/window_deckeditor.cpp" line="112"/>
         <source>&amp;Deck</source>
         <translation>&amp;Deck</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="118"/>
+        <location filename="../src/window_deckeditor.cpp" line="122"/>
         <source>&amp;Sets</source>
         <translation>&amp;Editionen</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="121"/>
+        <location filename="../src/window_deckeditor.cpp" line="125"/>
         <source>Add card to &amp;maindeck</source>
         <translation>Karte zu&amp;m Hauptdeck hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="123"/>
+        <location filename="../src/window_deckeditor.cpp" line="127"/>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="124"/>
+        <location filename="../src/window_deckeditor.cpp" line="128"/>
         <source>Add card to &amp;sideboard</source>
         <translation>Karte zum &amp;Sideboard hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="126"/>
+        <location filename="../src/window_deckeditor.cpp" line="130"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="127"/>
+        <location filename="../src/window_deckeditor.cpp" line="131"/>
         <source>&amp;Remove row</source>
         <translation>Zeile entfe&amp;rnen</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="129"/>
+        <location filename="../src/window_deckeditor.cpp" line="133"/>
         <source>Del</source>
         <translation>Entf</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="130"/>
+        <location filename="../src/window_deckeditor.cpp" line="134"/>
         <source>&amp;Increment number</source>
         <translation>Anzahl er&amp;höhen</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="132"/>
+        <location filename="../src/window_deckeditor.cpp" line="136"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="133"/>
+        <location filename="../src/window_deckeditor.cpp" line="137"/>
         <source>&amp;Decrement number</source>
         <translation>Anzahl v&amp;erringern</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="135"/>
+        <location filename="../src/window_deckeditor.cpp" line="139"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="185"/>
+        <location filename="../src/window_deckeditor.cpp" line="186"/>
         <source>Are you sure?</source>
         <translation>Bist du sicher?</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="186"/>
+        <location filename="../src/window_deckeditor.cpp" line="187"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
         <translation>Die Deckliste wurde verändert.

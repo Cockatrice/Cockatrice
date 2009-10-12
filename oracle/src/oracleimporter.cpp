@@ -2,9 +2,10 @@
 #include <QtGui>
 #include <QtNetwork>
 #include <QXmlStreamReader>
+#include <QDomDocument>
 
-OracleImporter::OracleImporter(const QString &_dataDir)
-	: dataDir(_dataDir), setIndex(-1)
+OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent)
+	: CardDatabase(parent), dataDir(_dataDir), setIndex(-1)
 {
 	QFile setsFile(dataDir + "/sets.xml");
 		setsFile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -24,101 +25,142 @@ OracleImporter::OracleImporter(const QString &_dataDir)
 					edition = xml.readElementText();
 				else if (xml.name() == "longname")
 					editionLong = xml.readElementText();
-				else if(xml.name() == "url")
+				else if (xml.name() == "url")
 					editionURL = xml.readElementText();
 			}
 			setsToDownload << SetToDownload(edition, editionLong, editionURL);
+			edition = editionLong = editionURL = QString();
 		} else if (xml.name() == "picture_url")
 			pictureUrl = xml.readElementText();
+		else if (xml.name() == "set_url")
+			setUrl = xml.readElementText();
 	}
 	
 	buffer = new QBuffer(this);
 	http = new QHttp(this);
 	connect(http, SIGNAL(requestFinished(int, bool)), this, SLOT(httpRequestFinished(int, bool)));
 	connect(http, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)), this, SLOT(readResponseHeader(const QHttpResponseHeader &)));
+	connect(http, SIGNAL(dataReadProgress(int, int)), this, SIGNAL(dataReadProgress(int, int)));
 }
 
-void OracleImporter::importOracleFile(CardSet *set)
+CardInfo *OracleImporter::addCard(QString cardName, const QString &cardCost, const QString &cardType, const QString &cardPT, const QStringList &cardText)
+{
+	QString fullCardText = cardText.join("\n");
+	bool splitCard = false;
+	if (cardName.contains('(')) {
+		cardName.remove(QRegExp(" \\(.*\\)"));
+		splitCard = true;
+	}
+	
+	CardInfo *card;
+	if (cardHash.contains(cardName)) {
+		card = cardHash.value(cardName);
+		if (splitCard && !card->getText().contains(fullCardText))
+			card->setText(card->getText() + "\n---\n" + fullCardText);
+	} else {
+		// Workaround for card name weirdness
+		if (cardName.contains("XX"))
+			cardName.remove("XX");
+		
+		bool mArtifact = false;
+		if (cardType.endsWith("Artifact"))
+			for (int i = 0; i < cardText.size(); ++i)
+				if (cardText[i].contains("{T}") && cardText[i].contains("to your mana pool"))
+					mArtifact = true;
+					
+		QStringList colors;
+		QStringList allColors = QStringList() << "W" << "U" << "B" << "R" << "G";
+		for (int i = 0; i < allColors.size(); i++)
+			if (cardCost.contains(allColors[i]))
+				colors << allColors[i];
+		
+		if (cardText.contains(cardName + " is white."))
+			colors << "W";
+		if (cardText.contains(cardName + " is blue."))
+			colors << "U";
+		if (cardText.contains(cardName + " is black."))
+			colors << "B";
+		if (cardText.contains(cardName + " is red."))
+			colors << "R";
+		if (cardText.contains(cardName + " is green."))
+			colors << "G";
+		
+		card = new CardInfo(this, cardName, cardCost, cardType, cardPT, fullCardText, colors);
+		card->setPicURL(getURLFromName(normalizeName(cardName)));
+		int tableRow = 1;
+		QString mainCardType = card->getMainCardType();
+		if ((mainCardType == "Land") || mArtifact)
+			tableRow = 0;
+		else if ((mainCardType == "Sorcery") || (mainCardType == "Instant"))
+			tableRow = 2;
+		else if (mainCardType == "Creature")
+			tableRow = 3;
+		card->setTableRow(tableRow);
+
+		cardHash.insert(cardName, card);
+	}
+	return card;
+}
+
+int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 {
 	int cards = 0;
-	buffer->seek(0);
-	QTextStream in(buffer);
-	while (!in.atEnd()) {
-		QString cardname = in.readLine();
-		if (cardname.isEmpty())
-			continue;
-		if (cardname.contains("XX")){
-			cardname.remove("XX");
+	QString bufferContents(data);
+	
+	// Workaround for ampersand bug in text spoilers
+	int index = -1;
+	while ((index = bufferContents.indexOf('&', index + 1)) != -1) {
+		int semicolonIndex = bufferContents.indexOf(';', index);
+		if (semicolonIndex > 5) {
+			bufferContents.insert(index + 1, "amp;");
+			index += 4;
 		}
-		
-		QString manacost = in.readLine();
-		QString cardtype, powtough;
-		QStringList text;
-		if ((manacost.contains("Land")) || (manacost.contains("Sorcery")) || (manacost.contains("Instant")) || (manacost.contains("Artifact"))) {
-			cardtype = manacost;
-			manacost.clear();
-		} else {
-			cardtype = in.readLine();
-			powtough = in.readLine();
-			// Dirty hack.
-			// Cards to test: Any creature, any basic land, Ancestral Vision, Fire // Ice.
-			if (!powtough.contains("/") || powtough.size() > 5) {
-				text << powtough;
-				powtough = QString();
-			}
-		}
-		QString line = in.readLine();
-		QString firstTextLine = line;
-		bool manaArtifact = false;
-		while (!line.isEmpty()) {
-			text << line;
-			line = in.readLine();
-		}
-		// Table row override
-		if (cardtype.endsWith("Artifact"))
-			for (int i = 0; i < text.size(); ++i)
-				if (text[i].contains("{T}") && text[i].contains("to your mana pool"))
-					manaArtifact = true;
-		CardInfo *card;
-		if (cardHash.contains(cardname))
-			card = cardHash.value(cardname);
-		else {
-			QStringList colors;
-			QStringList allColors = QStringList() << "W" << "U" << "B" << "R" << "G";
-			for (int i = 0; i < allColors.size(); i++)
-				if (manacost.contains(allColors[i]))
-					colors << allColors[i];
-
-			QString wholeText = text.join(";");
-			if (text.contains(cardname + " is white."))
-				colors << "W";
-			if (text.contains(cardname + " is blue."))
-				colors << "U";
-			if (text.contains(cardname + " is black."))
-				colors << "B";
-			if (text.contains(cardname + " is red."))
-				colors << "R";
-			if (text.contains(cardname + " is green."))
-				colors << "G";
-			
-			card = new CardInfo(this, cardname, manacost, cardtype, powtough, text.join("\n"), colors);
-			card->setPicURL(getURLFromName(normalizeName(cardname)));
-			int tableRow = 1;
-			QString mainCardType = card->getMainCardType();
-			if ((mainCardType == "Land") || manaArtifact)
-				tableRow = 0;
-			else if ((mainCardType == "Sorcery") || (mainCardType == "Instant"))
-				tableRow = 2;
-			else if (mainCardType == "Creature")
-				tableRow = 3;
-			card->setTableRow(tableRow);
-
-			cardHash.insert(cardname, card);
-		}
-		card->addToSet(set);
-		cards++;
 	}
-	qDebug(QString("%1: %2 cards imported").arg(set->getLongName()).arg(cards).toLatin1());
+	
+	QDomDocument doc;
+	QString errorMsg;
+	int errorLine, errorColumn;
+	if (!doc.setContent(bufferContents, &errorMsg, &errorLine, &errorColumn))
+		qDebug(QString("error: %1, line=%2, column=%3").arg(errorMsg).arg(errorLine).arg(errorColumn).toLatin1());
+
+	QDomNodeList divs = doc.elementsByTagName("div");
+	for (int i = 0; i < divs.size(); ++i) {
+		QDomElement div = divs.at(i).toElement();
+		QDomNode divClass = div.attributes().namedItem("class");
+		if (divClass.nodeValue() == "textspoiler") {
+			QString cardName, cardCost, cardType, cardPT, cardText;
+			
+			QDomNodeList trs = div.elementsByTagName("tr");
+			for (int j = 0; j < trs.size(); ++j) {
+				QDomElement tr = trs.at(j).toElement();
+				QDomNodeList tds = tr.elementsByTagName("td");
+				if (tds.size() != 2) {
+					CardInfo *card = addCard(cardName, cardCost, cardType, cardPT, cardText.split("\n"));
+					if (!set->contains(card)) {
+						card->addToSet(set);
+						cards++;
+					}
+					cardName = cardCost = cardType = cardPT = cardText = QString();
+				} else {
+					QString v1 = tds.at(0).toElement().text().simplified();
+					QString v2 = tds.at(1).toElement().text().replace(trUtf8("—"), "-");
+					
+					if (v1 == "Name:")
+						cardName = v2.simplified();
+					else if (v1 == "Cost:")
+						cardCost = v2.simplified();
+					else if (v1 == "Type:")
+						cardType = v2.simplified();
+					else if (v1 == "Pow/Tgh:")
+						cardPT = v2.simplified();
+					else if (v1 == "Rules Text:")
+						cardText = v2.trimmed();
+				}
+			}
+			break;
+		}
+	}
+	return cards;
 }
 
 QString OracleImporter::normalizeName(QString cardname)
@@ -146,18 +188,22 @@ QString OracleImporter::getURLFromName(QString normalizedName)
 void OracleImporter::downloadNextFile()
 {
 	if (setIndex == -1) {
-		progressDialog = new QProgressDialog(tr("Downloading oracle files..."), QString(), 0, setsToDownload.size());
 		setIndex = 0;
+		emit setIndexChanged(0, 0, setsToDownload[0].getLongName());
 	}
 	QString urlString = setsToDownload[setIndex].getUrl();
+	if (urlString.isEmpty())
+		urlString = setUrl;
+	urlString = urlString.replace("!longname!", setsToDownload[setIndex].getLongName());
 	if (urlString.startsWith("http://")) {
 		QUrl url(urlString);
 		http->setHost(url.host(), QHttp::ConnectionModeHttp, url.port() == -1 ? 0 : url.port());
+		QString path = QUrl::toPercentEncoding(urlString.mid(url.host().size() + 7).replace(' ', '+'), "?!$&'()*+,;=:@/");
 		
 		buffer->close();
 		buffer->setData(QByteArray());
 		buffer->open(QIODevice::ReadWrite | QIODevice::Text);
-		reqId = http->get(QUrl::toPercentEncoding(url.path(), "!$&'()*+,;=:@/"), buffer);
+		reqId = http->get(path, buffer);
 	} else {
 		QFile file(dataDir + "/" + urlString);
 		file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -182,16 +228,20 @@ void OracleImporter::httpRequestFinished(int requestId, bool error)
 	CardSet *set = new CardSet(setsToDownload[setIndex].getShortName(), setsToDownload[setIndex].getLongName());
 	if (!setHash.contains(set->getShortName()))
 		setHash.insert(set->getShortName(), set);
-	importOracleFile(set);
-	progressDialog->setValue(++setIndex);
+	
+	buffer->seek(0);
+	buffer->close();
+	int cards = importTextSpoiler(set, buffer->data());
+	++setIndex;
 	
 	if (setIndex == setsToDownload.size()) {
 		setIndex = -1;
 		saveToFile(dataDir + "/cards.xml");
-		QMessageBox::information(0, tr("Import finished"), tr("Total: %1 cards imported").arg(cardHash.size()));
-		qApp->quit();
-	} else
+		emit setIndexChanged(cards, setIndex, QString());
+	} else {
 		downloadNextFile();
+		emit setIndexChanged(cards, setIndex, setsToDownload[setIndex].getLongName());
+	}
 }
 
 void OracleImporter::readResponseHeader(const QHttpResponseHeader &responseHeader)
@@ -205,7 +255,6 @@ void OracleImporter::readResponseHeader(const QHttpResponseHeader &responseHeade
 			break;
 		default:
 			QMessageBox::information(0, tr("HTTP"), tr("Download failed: %1.").arg(responseHeader.reasonPhrase()));
-			progressDialog->hide();
 			http->abort();
 			deleteLater();
 	}

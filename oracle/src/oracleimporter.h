@@ -4,7 +4,6 @@
 #include <carddatabase.h>
 #include <QHttp>
 
-class QProgressDialog;
 class QBuffer;
 
 class SetToDownload {
@@ -22,22 +21,27 @@ class OracleImporter : public CardDatabase {
 	Q_OBJECT
 private:
 	QList<SetToDownload> setsToDownload;
-	QString pictureUrl;
+	QString pictureUrl, setUrl;
 	QString dataDir;
 	int setIndex;
 	int reqId;
 	QBuffer *buffer;
 	QHttp *http;
-	QProgressDialog *progressDialog;
 	QString normalizeName(QString);
 	QString getURLFromName(QString);
+	
+	CardInfo *addCard(QString cardName, const QString &cardCost, const QString &cardType, const QString &cardPT, const QStringList &cardText);
 private slots:
 	void httpRequestFinished(int requestId, bool error);
 	void readResponseHeader(const QHttpResponseHeader &responseHeader);
+signals:
+	void setIndexChanged(int cardsImported, int setIndex, const QString &nextSetName);
+	void dataReadProgress(int bytesRead, int totalBytes);
 public:
-	OracleImporter(const QString &_dataDir);
-	void importOracleFile(CardSet *set);
+	OracleImporter(const QString &_dataDir, QObject *parent = 0);
+	int importTextSpoiler(CardSet *set, const QByteArray &data);
 	void downloadNextFile();
+	int getSetsCount() const { return setsToDownload.size(); }
 };
 
 #endif

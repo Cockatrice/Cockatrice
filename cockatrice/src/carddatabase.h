@@ -72,6 +72,7 @@ public:
 	QString getCardType() const { return cardtype; }
 	QString getPowTough() const { return powtough; }
 	QString getText() const { return text; }
+	void setText(const QString &_text) { text = _text; }
 	QStringList getColors() const { return colors; }
 	QString getPicURL() const { return picURL; }
 	QString getMainCardType() const;
