@@ -27,8 +27,7 @@ private:
 	int reqId;
 	QBuffer *buffer;
 	QHttp *http;
-	QString normalizeName(QString);
-	QString getURLFromName(QString);
+	QString getURLFromName(QString name) const;
 	
 	CardInfo *addCard(QString cardName, const QString &cardCost, const QString &cardType, const QString &cardPT, const QStringList &cardText);
 private slots:

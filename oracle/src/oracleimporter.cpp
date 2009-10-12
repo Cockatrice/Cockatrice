@@ -86,7 +86,7 @@ CardInfo *OracleImporter::addCard(QString cardName, const QString &cardCost, con
 			colors << "G";
 		
 		card = new CardInfo(this, cardName, cardCost, cardType, cardPT, fullCardText, colors);
-		card->setPicURL(getURLFromName(normalizeName(cardName)));
+		card->setPicURL(getURLFromName(cardName));
 		int tableRow = 1;
 		QString mainCardType = card->getMainCardType();
 		if ((mainCardType == "Land") || mArtifact)
@@ -163,26 +163,20 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 	return cards;
 }
 
-QString OracleImporter::normalizeName(QString cardname)
+QString OracleImporter::getURLFromName(QString name) const
 {
-	QString normalized = cardname;
-	normalized.remove("'",Qt::CaseInsensitive);
-	normalized.remove("//",Qt::CaseInsensitive);
-	normalized.remove(",",Qt::CaseInsensitive);
-	normalized.remove(":",Qt::CaseInsensitive);
-	normalized.remove(".",Qt::CaseInsensitive);
-	normalized.remove(QRegExp("\\(.*\\)"));
-	normalized = normalized.trimmed();
-	normalized = normalized.simplified();
-	normalized = normalized.replace(" ", "_");
-	normalized = normalized.replace("-", "_");
-	return normalized;
-}
-
-
-QString OracleImporter::getURLFromName(QString normalizedName)
-{
-	return pictureUrl.arg(normalizedName);
+	return pictureUrl.arg(
+		name
+		.remove('\'')
+		.remove("//")
+		.remove(',')
+		.remove(':')
+		.remove('.')
+		.remove(QRegExp("\\(.*\\)"))
+		.simplified()
+		.replace(' ', '_')
+		.replace('-', '_')
+	);
 }
 
 void OracleImporter::downloadNextFile()
