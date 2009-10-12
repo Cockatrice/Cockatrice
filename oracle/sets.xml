@@ -346,4 +346,9 @@
             <longname>Mercadian Masques</longname>
 	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-mm.txt</url>
         </set>
+        <set>
+            <name>ZEN</name>
+            <longname>Zendikar</longname>
+	    <url>http://www.crystalkeep.com/magic/rules/oracle/oracle-ze.txt</url>
+        </set>
 </cockatrice_setdatabase>
