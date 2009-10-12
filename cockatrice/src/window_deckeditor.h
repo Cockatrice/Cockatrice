@@ -7,6 +7,7 @@
 
 class CardDatabase;
 class CardDatabaseModel;
+class CardDatabaseDisplayModel;
 class DeckListModel;
 class QTreeView;
 class QTableView;
@@ -46,6 +47,7 @@ private:
 	CardDatabase *db;
 
 	CardDatabaseModel *databaseModel;
+	CardDatabaseDisplayModel *databaseDisplayModel;
 	DeckListModel *deckModel;
 	QTreeView *databaseView;
 	QTreeView *deckView;

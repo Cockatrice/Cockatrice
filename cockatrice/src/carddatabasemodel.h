@@ -2,6 +2,7 @@
 #define CARDDATABASEMODEL_H
 
 #include <QAbstractListModel>
+#include <QSortFilterProxyModel>
 #include <QList>
 #include "carddatabase.h"
 
@@ -14,10 +15,15 @@ public:
 	int columnCount(const QModelIndex &parent = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-	void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
 private:
 	QList<CardInfo *> cardList;
 	CardDatabase *db;
+};
+
+class CardDatabaseDisplayModel : public QSortFilterProxyModel {
+	Q_OBJECT
+public:
+	CardDatabaseDisplayModel(QObject *parent = 0);
 };
 
 #endif

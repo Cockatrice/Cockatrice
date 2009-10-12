@@ -63,29 +63,9 @@ QVariant CardDatabaseModel::headerData(int section, Qt::Orientation orientation,
 	}
 }
 
-class CardInfoCompare {
-private:
-	int column;
-	Qt::SortOrder order;
-public:
-	CardInfoCompare(int _column, Qt::SortOrder _order) : column(_column), order(_order) { }
-	inline bool operator()(CardInfo *a, CardInfo *b) const
-	{
-		bool result;
-		switch (column) {
-			case 0: result = (a->getName() < b->getName()); break;
-			case 1: result = (a->getSets().at(0)->getShortName() < b->getSets().at(0)->getShortName()); break;
-			case 2: result = (a->getManaCost() < b->getManaCost()); break;
-			case 3: result = (a->getCardType() < b->getCardType()); break;
-			case 4: result = (a->getPowTough() < b->getPowTough()); break;
-			default: result = false;
-		}
-		return (order == Qt::AscendingOrder) ^ result;
-	}
-};
-
-void CardDatabaseModel::sort(int column, Qt::SortOrder order)
+CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
+	: QSortFilterProxyModel(parent)
 {
-	CardInfoCompare cmp(column, order);
-	qSort(cardList.begin(), cardList.end(), cmp);
+	setFilterCaseSensitivity(Qt::CaseInsensitive);
+	setSortCaseSensitivity(Qt::CaseInsensitive);
 }

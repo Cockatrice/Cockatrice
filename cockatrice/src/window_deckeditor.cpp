@@ -19,11 +19,15 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	searchLayout->addWidget(searchLabel);
 	searchLayout->addWidget(searchEdit);
 
-	databaseModel = new CardDatabaseModel(db);
+	databaseModel = new CardDatabaseModel(db, this);
+	databaseDisplayModel = new CardDatabaseDisplayModel(this);
+	databaseDisplayModel->setSourceModel(databaseModel);
+	databaseDisplayModel->sort(0, Qt::AscendingOrder);
 	databaseView = new QTreeView();
-	databaseView->setModel(databaseModel);
+	databaseView->setModel(databaseDisplayModel);
 	databaseView->setUniformRowHeights(true);
 	databaseView->setSortingEnabled(true);
+	databaseView->sortByColumn(0, Qt::AscendingOrder);
 	databaseView->resizeColumnToContents(0);
 	connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
 	connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
@@ -173,10 +177,7 @@ void WndDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
 
 void WndDeckEditor::updateSearch(const QString &search)
 {
-	QModelIndexList matches = databaseModel->match(databaseModel->index(0, 0), Qt::DisplayRole, search);
-	if (matches.isEmpty())
-		return;
-	databaseView->selectionModel()->setCurrentIndex(matches[0], QItemSelectionModel::SelectCurrent);
+	databaseDisplayModel->setFilterRegExp(search);
 }
 
 bool WndDeckEditor::confirmClose()
@@ -279,7 +280,7 @@ void WndDeckEditor::addCardHelper(const QString &zoneName)
 	const QModelIndex currentIndex = databaseView->selectionModel()->currentIndex();
 	if (!currentIndex.isValid())
 		return;
-	const QString cardName = databaseModel->index(currentIndex.row(), 0).data().toString();
+	const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
 
 	QModelIndex newCardIndex = deckModel->addCard(cardName, zoneName);
 	recursiveExpand(newCardIndex);
