@@ -125,16 +125,21 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	aAddCard = new QAction(tr("Add card to &maindeck"), this);
 	connect(aAddCard, SIGNAL(triggered()), this, SLOT(actAddCard()));
 	aAddCard->setShortcut(tr("Ctrl+M"));
+        aAddCard->setIcon(QIcon(":/resources/add_to_deck.svg"));
 	aAddCardToSideboard = new QAction(tr("Add card to &sideboard"), this);
+        aAddCardToSideboard->setIcon(QIcon(":/resources/add_to_sideboard.svg"));
 	connect(aAddCardToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
 	aAddCardToSideboard->setShortcut(tr("Ctrl+N"));
 	aRemoveCard = new QAction(tr("&Remove row"), this);
 	connect(aRemoveCard, SIGNAL(triggered()), this, SLOT(actRemoveCard()));
 	aRemoveCard->setShortcut(tr("Del"));
+        aRemoveCard->setIcon(QIcon(":/resources/remove_row.svg"));
 	aIncrement = new QAction(tr("&Increment number"), this);
 	connect(aIncrement, SIGNAL(triggered()), this, SLOT(actIncrement()));
 	aIncrement->setShortcut(tr("+"));
+        aIncrement->setIcon(QIcon(":/resources/increment.svg"));
 	aDecrement = new QAction(tr("&Decrement number"), this);
+        aDecrement->setIcon(QIcon(":/resources/decrement.svg"));
 	connect(aDecrement, SIGNAL(triggered()), this, SLOT(actDecrement()));
 	aDecrement->setShortcut(tr("-"));
 
