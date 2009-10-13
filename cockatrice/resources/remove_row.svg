@@ -30,14 +30,6 @@
          offset="1"
          id="stop3173" />
     </linearGradient>
-    <filter
-       inkscape:collect="always"
-       id="filter3287">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="0.88403668"
-         id="feGaussianBlur3289" />
-    </filter>
     <linearGradient
        id="linearGradient4766">
       <stop
@@ -324,12 +316,12 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="7.625"
-     inkscape:cx="8.1371056"
+     inkscape:cx="-21.305517"
      inkscape:cy="31.784541"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="false"
-     inkscape:window-width="1280"
+     inkscape:window-width="1272"
      inkscape:window-height="723"
      inkscape:window-x="0"
      inkscape:window-y="25" />
@@ -355,7 +347,7 @@
      inkscape:label="Pfeil"
      style="display:inline">
     <path
-       style="fill:#ff0000;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1.17863619;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
+       style="fill:#96ff96;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1.17863618999999997;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
        d="M 6.433227,14.50946 L 23.923767,32 L 6.433227,49.490541 L 14.50946,57.566773 L 32,40.076233 L 49.490541,57.566773 L 57.566773,49.490541 L 40.076233,32 L 57.566773,14.50946 L 49.490541,6.433227 L 32,23.923767 L 14.50946,6.433227 L 6.433227,14.50946 z"
        id="rect3548" />
   </g>
