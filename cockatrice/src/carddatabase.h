@@ -46,14 +46,9 @@ private:
 	QString text;
 	QStringList colors;
 	QString picURL;
-	QHttp *http;
-	QBuffer *downloadBuffer;
-	int dlID;
 	int tableRow;
 	QPixmap *pixmap;
 	QMap<int, QPixmap *> scaledPixmapCache;
-	
-	void startDownload();
 public:
 	CardInfo(CardDatabase *_db,
 		const QString &_name = QString(),
@@ -86,8 +81,6 @@ public:
 	void clearPixmapCache();
 	void clearPixmapCacheMiss();
 	void updatePixmapCache();
-private slots:
-	void picDownloadFinished(int id, bool error);
 signals:
 	void pixmapUpdated();
 };
@@ -97,12 +90,14 @@ class CardDatabase : public QObject {
 protected:
 	QHash<QString, CardInfo *> cardHash;
 	QHash<QString, CardSet *> setHash;
+	QMap<int, QPair<CardInfo *, QBuffer *> > downloadBuffers;
 	CardInfo *noCard;
 	QString picsPath, cardDatabasePath;
 private:
 	void loadCardsFromXml(QXmlStreamReader &xml);
 	void loadSetsFromXml(QXmlStreamReader &xml);
 	bool picDownload;
+	QHttp *http;
 public:
 	CardDatabase(QObject *parent = 0);
 	~CardDatabase();
@@ -116,6 +111,9 @@ public:
 	int loadFromFile(const QString &fileName);
 	bool saveToFile(const QString &fileName);
 	const QString &getPicsPath() const { return picsPath; }
+	void startPicDownload(CardInfo *card);
+private slots:
+	void picDownloadFinished(int id, bool error);
 public slots:
 	void updatePicsPath(const QString &path = QString());
 	void updateDatabasePath(const QString &path = QString());

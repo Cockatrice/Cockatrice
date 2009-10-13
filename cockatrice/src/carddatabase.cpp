@@ -138,48 +138,8 @@ QPixmap *CardInfo::loadPixmap()
 			return pixmap;
 	}
 	if (db->getPicDownload())
-		startDownload();
+		db->startPicDownload(this);
 	return pixmap;
-}
-
-void CardInfo::startDownload()
-{
-	downloadBuffer = new QBuffer(this);
-	downloadBuffer->open(QIODevice::ReadWrite);
-	http = new QHttp(this);
-	connect(http, SIGNAL(requestFinished(int, bool)), this, SLOT(picDownloadFinished(int, bool)));
-	QUrl url(picURL);
-	http->setHost(url.host(), url.port(80));
-	dlID = http->get(url.path(), downloadBuffer);
-}
-
-void CardInfo::picDownloadFinished(int id, bool error)
-{
-	if (id != dlID)
-		return;
-	http->close();
-	disconnect(http, 0, this, 0);
-	http->deleteLater();
-	
-	downloadBuffer->close();
-	if (!error) {
-		QString picsPath = db->getPicsPath();
-		const QByteArray &picData = downloadBuffer->data();
-		QPixmap testPixmap;
-		if (testPixmap.loadFromData(picData)) {
-			if (!QDir(QString(picsPath + "/downloadedPics/")).exists()) {
-				QDir dir(picsPath);
-				dir.mkdir("downloadedPics");
-			}
-			QFile newPic(picsPath + "/downloadedPics/" + getCorrectedName() + ".full.jpg");
-			newPic.open(QIODevice::WriteOnly);
-			newPic.write(picData);
-			newPic.close();
-			
-			updatePixmapCache();
-		}
-	}
-	delete downloadBuffer;
 }
 
 QPixmap *CardInfo::getPixmap(QSize size)
@@ -266,6 +226,9 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 CardDatabase::CardDatabase(QObject *parent)
 	: QObject(parent), noCard(0)
 {
+	http = new QHttp(this);
+	connect(http, SIGNAL(requestFinished(int, bool)), this, SLOT(picDownloadFinished(int, bool)));
+
 	updateDatabasePath();
 	updatePicDownload();
 	updatePicsPath();
@@ -343,6 +306,49 @@ void CardDatabase::clearPixmapCache()
 	}
 	if (noCard)
 		noCard->clearPixmapCache();
+}
+
+void CardDatabase::startPicDownload(CardInfo *card)
+{
+	QBuffer *buffer = new QBuffer(this);
+	buffer->open(QIODevice::ReadWrite);
+	QUrl url(card->getPicURL());
+	http->setHost(url.host(), url.port(80));
+	int dlID = http->get(url.path(), buffer);
+	downloadBuffers.insert(dlID, QPair<CardInfo *, QBuffer *>(card, buffer));
+}
+
+void CardDatabase::picDownloadFinished(int id, bool error)
+{
+	if (!downloadBuffers.contains(id))
+		return;
+	
+	const QPair<CardInfo *, QBuffer *> &temp = downloadBuffers.value(id);
+	CardInfo *card = temp.first;
+	QBuffer *buffer = temp.second;
+	downloadBuffers.remove(id);
+	buffer->close();
+	
+	if (!error) {
+		const QByteArray &picData = buffer->data();
+		QPixmap testPixmap;
+		if (testPixmap.loadFromData(picData)) {
+			if (!QDir(QString(picsPath + "/downloadedPics/")).exists()) {
+				QDir dir(picsPath);
+				if (!dir.exists())
+					return;
+				dir.mkdir("downloadedPics");
+			}
+			QFile newPic(picsPath + "/downloadedPics/" + card->getCorrectedName() + ".full.jpg");
+			if (!newPic.open(QIODevice::WriteOnly))
+				return;
+			newPic.write(picData);
+			newPic.close();
+			
+			card->updatePixmapCache();
+		}
+	}
+	delete buffer;
 }
 
 void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
