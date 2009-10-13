@@ -20,5 +20,10 @@
         <file>translations/cockatrice_de.qm</file>
         <file>translations/cockatrice_en.qm</file>
         <file>resources/icon.svg</file>
+        <file>resources/add_to_deck.svg</file>
+        <file>resources/add_to_sideboard.svg</file>
+        <file>resources/decrement.svg</file>
+        <file>resources/increment.svg</file>
+        <file>resources/remove_row.svg</file>
     </qresource>
 </RCC>
