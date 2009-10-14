@@ -41,6 +41,8 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 
 	QToolBar *verticalToolBar = new QToolBar;
 	verticalToolBar->setOrientation(Qt::Vertical);
+	verticalToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+	verticalToolBar->setIconSize(QSize(24, 24));
 	QHBoxLayout *verticalToolBarLayout = new QHBoxLayout;
 	verticalToolBarLayout->addStretch();
 	verticalToolBarLayout->addWidget(verticalToolBar);
@@ -148,6 +150,8 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	verticalToolBar->addAction(aRemoveCard);
 	verticalToolBar->addAction(aIncrement);
 	verticalToolBar->addAction(aDecrement);
+	
+	resize(950, 700);
 }
 
 WndDeckEditor::~WndDeckEditor()
