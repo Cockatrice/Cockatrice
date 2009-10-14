@@ -6,11 +6,18 @@
 #include "decklistmodel.h"
 #include "cardinfowidget.h"
 
+void SearchLineEdit::keyPressEvent(QKeyEvent *event)
+{
+	if (treeView && ((event->key() == Qt::Key_Up) || (event->key() == Qt::Key_Down)))
+		QCoreApplication::sendEvent(treeView, event);
+	QLineEdit::keyPressEvent(event);
+}
+
 WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	: QMainWindow(parent), db(_db)
 {
 	QLabel *searchLabel = new QLabel(tr("&Search for:"));
-	searchEdit = new QLineEdit;
+	searchEdit = new SearchLineEdit;
 	searchLabel->setBuddy(searchEdit);
 	connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(actAddCard()));
@@ -31,6 +38,7 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	databaseView->resizeColumnToContents(0);
 	connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
 	connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
+	searchEdit->setTreeView(databaseView);
 
 	QVBoxLayout *leftFrame = new QVBoxLayout;
 	leftFrame->addLayout(searchLayout);
@@ -125,25 +133,25 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	setsMenu->addAction(aEditSets);
 
 	aAddCard = new QAction(tr("Add card to &maindeck"), this);
-	connect(aAddCard, SIGNAL(triggered()), this, SLOT(actAddCard()));
-	aAddCard->setShortcut(tr("Ctrl+M"));
+	aAddCard->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Return")) << QKeySequence(tr("Enter")));
         aAddCard->setIcon(QIcon(":/resources/add_to_deck.svg"));
+	connect(aAddCard, SIGNAL(triggered()), this, SLOT(actAddCard()));
 	aAddCardToSideboard = new QAction(tr("Add card to &sideboard"), this);
         aAddCardToSideboard->setIcon(QIcon(":/resources/add_to_sideboard.svg"));
+	aAddCardToSideboard->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
 	connect(aAddCardToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
-	aAddCardToSideboard->setShortcut(tr("Ctrl+N"));
 	aRemoveCard = new QAction(tr("&Remove row"), this);
-	connect(aRemoveCard, SIGNAL(triggered()), this, SLOT(actRemoveCard()));
 	aRemoveCard->setShortcut(tr("Del"));
         aRemoveCard->setIcon(QIcon(":/resources/remove_row.svg"));
+	connect(aRemoveCard, SIGNAL(triggered()), this, SLOT(actRemoveCard()));
 	aIncrement = new QAction(tr("&Increment number"), this);
-	connect(aIncrement, SIGNAL(triggered()), this, SLOT(actIncrement()));
 	aIncrement->setShortcut(tr("+"));
         aIncrement->setIcon(QIcon(":/resources/increment.svg"));
+	connect(aIncrement, SIGNAL(triggered()), this, SLOT(actIncrement()));
 	aDecrement = new QAction(tr("&Decrement number"), this);
         aDecrement->setIcon(QIcon(":/resources/decrement.svg"));
-	connect(aDecrement, SIGNAL(triggered()), this, SLOT(actDecrement()));
 	aDecrement->setShortcut(tr("-"));
+	connect(aDecrement, SIGNAL(triggered()), this, SLOT(actDecrement()));
 
 	verticalToolBar->addAction(aAddCard);
 	verticalToolBar->addAction(aAddCardToSideboard);

@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QAbstractItemModel>
+#include <QLineEdit>
 #include "decklist.h"
 
 class CardDatabase;
@@ -12,8 +13,17 @@ class DeckListModel;
 class QTreeView;
 class QTableView;
 class CardInfoWidget;
-class QLineEdit;
 class QTextEdit;
+
+class SearchLineEdit : public QLineEdit {
+	private:
+		QTreeView *treeView;
+	protected:
+		void keyPressEvent(QKeyEvent *event);
+	public:
+		SearchLineEdit() : QLineEdit(), treeView(0) { }
+		void setTreeView(QTreeView *_treeView) { treeView = _treeView; }
+};
 
 class WndDeckEditor : public QMainWindow {
 	Q_OBJECT
@@ -52,7 +62,8 @@ private:
 	QTreeView *databaseView;
 	QTreeView *deckView;
 	CardInfoWidget *cardInfo;
-	QLineEdit *searchEdit, *nameEdit;
+	SearchLineEdit *searchEdit;
+	QLineEdit *nameEdit;
 	QTextEdit *commentsEdit;
 
 	QMenu *deckMenu, *setsMenu;
