@@ -74,12 +74,6 @@ void PendingCommand::responseReceived(ServerResponse resp)
 	deleteLater();
 }
 
-void PendingCommand::checkTimeout()
-{
-	if (++time > 5)
-		emit timeout();
-}
-
 void PendingCommand_ListPlayers::responseReceived(ServerResponse resp)
 {
 	if (resp == RespOk)
@@ -135,12 +129,6 @@ Client::Client(QObject *parent)
 
 Client::~Client()
 {
-	disconnectFromServer();
-}
-
-void Client::timeout()
-{
-	emit serverTimeout();
 	disconnectFromServer();
 }
 
@@ -376,8 +364,6 @@ PendingCommand *Client::cmd(const QString &s, PendingCommand *_pc)
 		pc = new PendingCommand(MsgId);
 	pendingCommands.insert(MsgId, pc);
 	connect(pc, SIGNAL(finished(ServerResponse)), this, SLOT(removePendingCommand()));
-	connect(pc, SIGNAL(timeout()), this, SLOT(timeout()));
-	connect(timer, SIGNAL(timeout()), pc, SLOT(checkTimeout()));
 	return pc;
 }
 
@@ -406,7 +392,19 @@ void Client::disconnectFromServer()
 
 void Client::ping()
 {
-	cmd("ping");
+	int maxTime = 0;
+	QMapIterator<int, PendingCommand *> i(pendingCommands);
+	while (i.hasNext()) {
+		int time = i.next().value()->tick();
+		if (time > maxTime)
+			maxTime = time;
+	}
+	emit maxPingTime(maxTime, maxTimeout);
+	if (maxTime >= maxTimeout) {
+		emit serverTimeout();
+		disconnectFromServer();
+	} else
+		cmd("ping");
 }
 
 PendingCommand *Client::chatListChannels()

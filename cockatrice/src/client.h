@@ -201,12 +201,11 @@ private:
 	int time;
 signals:
 	void finished(ServerResponse resp);
-	void timeout();
 public slots:
 	virtual void responseReceived(ServerResponse resp);
-	void checkTimeout();
 public:
 	PendingCommand(int _msgid = -1);
+	int tick() { return ++time; }
 	int getMsgId() const { return msgid; }
 	void setMsgId(int _msgId) { msgid = _msgId; }
 };
@@ -310,6 +309,7 @@ signals:
 	void playerIdReceived(int id, QString name);
 	void gameEvent(const ServerEventData &msg);
 	void chatEvent(const ChatEventData &msg);
+	void maxPingTime(int seconds, int maxSeconds);
 	void serverTimeout();
 	void logSocketError(const QString &errorString);
 	void serverError(ServerResponse resp);
@@ -318,7 +318,6 @@ signals:
 private slots:
 	void slotConnected();
 	void readLine();
-	void timeout();
 	void slotSocketError(QAbstractSocket::SocketError error);
 	void ping();
 	void removePendingCommand();
@@ -327,6 +326,8 @@ private slots:
 	void leaveGameResponse(ServerResponse response);
 private:
 	static const int protocolVersion = 1;
+	static const int maxTimeout = 10;
+	
 	QTimer *timer;
 	QMap<int, PendingCommand *> pendingCommands;
 	QTcpSocket *socket;

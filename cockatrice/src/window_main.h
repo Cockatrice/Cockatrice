@@ -43,6 +43,19 @@ class PhasesToolbar;
 class GameSelector;
 class ChatWidget;
 
+class PingWidget : public QWidget {
+	Q_OBJECT
+private:
+	QColor color;
+protected:
+	void paintEvent(QPaintEvent *event);
+public:
+	PingWidget(QWidget *parent = 0);
+	QSize sizeHint() const;
+public slots:
+	void setPercentage(int value, int max);
+};
+
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 private slots:
@@ -72,6 +85,7 @@ private:
 	QAction *aCloseMostRecentZoneView;
 	QVBoxLayout *viewLayout;
 
+	PingWidget *pingWidget;
 	CardInfoWidget *cardInfo;
 	MessageLogWidget *messageLog;
 	QLabel *sayLabel;

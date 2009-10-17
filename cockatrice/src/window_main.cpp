@@ -38,6 +38,31 @@
 #include "zoneviewlayout.h"
 #include "chatwidget.h"
 
+PingWidget::PingWidget(QWidget *parent)
+	: QWidget(parent), color(Qt::black)
+{
+}
+
+QSize PingWidget::sizeHint() const
+{
+	return QSize(10, 10);
+}
+
+void PingWidget::paintEvent(QPaintEvent */*event*/)
+{
+	QPainter painter(this);
+	painter.fillRect(0, 0, width(), height(), color);
+}
+
+void PingWidget::setPercentage(int value, int max)
+{
+	if (max == -1)
+		color = Qt::black;
+	else
+		color.setHsv(120 * (1.0 - ((double) value / max)), 255, 255);
+	update();
+}
+
 void MainWindow::playerAdded(Player *player)
 {
 	menuBar()->addMenu(player->getPlayerMenu());
@@ -57,6 +82,8 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 				delete game;
 				game = 0;
 			}
+			pingWidget->setPercentage(0, -1);
+			aConnect->setEnabled(true);
 			aDisconnect->setEnabled(false);
 			aRestartGame->setEnabled(false);
 			aLeaveGame->setEnabled(false);
@@ -67,6 +94,7 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			emit logDisconnected();
 			break;
 		case StatusLoggingIn:
+			aConnect->setEnabled(false);
 			aDisconnect->setEnabled(true);
 			break;
 		case StatusIdle: {
@@ -267,6 +295,7 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	sayLabel = new QLabel;
 	sayEdit = new QLineEdit;
 	sayLabel->setBuddy(sayEdit);
+	pingWidget = new PingWidget;
 	
 	client = new Client(this);
 	gameSelector = new GameSelector(client);
@@ -277,6 +306,7 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	QHBoxLayout *hLayout = new QHBoxLayout;
 	hLayout->addWidget(sayLabel);
 	hLayout->addWidget(sayEdit);
+	hLayout->addWidget(pingWidget);
 
 	QVBoxLayout *verticalLayout = new QVBoxLayout;
 	verticalLayout->addWidget(cardInfo);
@@ -302,6 +332,7 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 
 	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(actSay()));
 
+	connect(client, SIGNAL(maxPingTime(int, int)), pingWidget, SLOT(setPercentage(int, int)));
 	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
 	connect(client, SIGNAL(statusChanged(ProtocolStatus)), this, SLOT(statusChanged(ProtocolStatus)));
 
