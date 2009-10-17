@@ -7,6 +7,30 @@ WindowMain::WindowMain(QWidget *parent)
 {
 	importer = new OracleImporter("../oracle", this);
 	
+	QVBoxLayout *checkboxLayout = new QVBoxLayout;
+	QList<SetToDownload> &sets = importer->getSets();
+	for (int i = 0; i < sets.size(); ++i) {
+		QCheckBox *checkBox = new QCheckBox(sets[i].getLongName());
+		checkBox->setChecked(sets[i].getImport());
+		connect(checkBox, SIGNAL(stateChanged(int)), this, SLOT(checkBoxChanged(int)));
+		checkboxLayout->addWidget(checkBox);
+		checkBoxList << checkBox;
+	}
+	
+	QWidget *checkboxFrame = new QWidget;
+	checkboxFrame->setLayout(checkboxLayout);
+	
+	QScrollArea *checkboxArea = new QScrollArea;
+	checkboxArea->setWidget(checkboxFrame);
+	checkboxArea->setWidgetResizable(true);
+	
+	startButton = new QPushButton(tr("&Start download"));
+	connect(startButton, SIGNAL(clicked()), this, SLOT(actStart()));
+	
+	QVBoxLayout *settingsLayout = new QVBoxLayout;
+	settingsLayout->addWidget(checkboxArea);
+	settingsLayout->addWidget(startButton);
+	
 	totalLabel = new QLabel(tr("Total progress:"));
 	totalProgressBar = new QProgressBar;
 	nextSetLabel1 = new QLabel(tr("Current file:"));
@@ -26,8 +50,13 @@ WindowMain::WindowMain(QWidget *parent)
 	grid->addWidget(fileProgressBar, 2, 1);
 	grid->addWidget(messageLog, 3, 0, 1, 2);
 	
+	QHBoxLayout *mainLayout = new QHBoxLayout;
+	mainLayout->addLayout(settingsLayout);
+	mainLayout->addSpacing(10);
+	mainLayout->addLayout(grid);
+	
 	QWidget *centralWidget = new QWidget;
-	centralWidget->setLayout(grid);
+	centralWidget->setLayout(mainLayout);
 	setCentralWidget(centralWidget);
 	
 	connect(importer, SIGNAL(setIndexChanged(int, int, const QString &)), this, SLOT(updateTotalProgress(int, int, const QString &)));
@@ -35,9 +64,7 @@ WindowMain::WindowMain(QWidget *parent)
 	totalProgressBar->setMaximum(importer->getSetsCount());
 	
 	setWindowTitle(tr("Oracle importer"));
-	setFixedSize(300, 300);
-	
-	importer->downloadNextFile();
+	setFixedSize(500, 300);
 }
 
 void WindowMain::updateTotalProgress(int cardsImported, int setIndex, const QString &nextSetName)
@@ -57,4 +84,23 @@ void WindowMain::updateFileProgress(int bytesRead, int totalBytes)
 {
 	fileProgressBar->setMaximum(totalBytes);
 	fileProgressBar->setValue(bytesRead);
+}
+
+void WindowMain::actStart()
+{
+	startButton->setEnabled(false);
+	for (int i = 0; i < checkBoxList.size(); ++i)
+		checkBoxList[i]->setEnabled(false);
+	importer->downloadNextFile();
+}
+
+void WindowMain::checkBoxChanged(int state)
+{
+	QCheckBox *checkBox = qobject_cast<QCheckBox *>(sender());
+	QList<SetToDownload> &sets = importer->getSets();
+	for (int i = 0; i < sets.size(); ++i)
+		if (sets[i].getLongName() == checkBox->text()) {
+			sets[i].setImport(state);
+			break;
+		}
 }

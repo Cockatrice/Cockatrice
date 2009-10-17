@@ -35,7 +35,7 @@ QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
 		case 0: return card->getName();
 		case 1: {
 			QStringList setList;
-			QList<CardSet *> sets = card->getSets();
+			const QList<CardSet *> &sets = card->getSets();
 			for (int i = 0; i < sets.size(); i++)
 				setList << sets[i]->getShortName();
 			return setList.join(", ");

@@ -98,8 +98,9 @@ QString CardInfo::getMainCardType() const
 
 QString CardInfo::getCorrectedName() const
 {
+	QString result = name;
 	// Fire // Ice, Circle of Protection: Red
-	return getName().remove(" // ").remove(":");
+	return result.remove(" // ").remove(":");
 }
 
 void CardInfo::addToSet(CardSet *set)
@@ -204,10 +205,10 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 	xml.writeStartElement("card");
 	xml.writeTextElement("name", info->getName());
 
-	SetList sets = info->getSets();
+	const SetList &sets = info->getSets();
 	for (int i = 0; i < sets.size(); i++)
 		xml.writeTextElement("set", sets[i]->getShortName());
-	QStringList colors = info->getColors();
+	const QStringList &colors = info->getColors();
 	for (int i = 0; i < colors.size(); i++)
 		xml.writeTextElement("color", colors[i]);
 

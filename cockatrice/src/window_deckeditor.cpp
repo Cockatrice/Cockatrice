@@ -33,6 +33,7 @@ WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
 	databaseView = new QTreeView();
 	databaseView->setModel(databaseDisplayModel);
 	databaseView->setUniformRowHeights(true);
+	databaseView->setAlternatingRowColors(true);
 	databaseView->setSortingEnabled(true);
 	databaseView->sortByColumn(0, Qt::AscendingOrder);
 	databaseView->resizeColumnToContents(0);
@@ -194,7 +195,7 @@ void WndDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
 
 void WndDeckEditor::updateSearch(const QString &search)
 {
-	databaseDisplayModel->setFilterRegExp(search);
+	databaseDisplayModel->setFilterFixedString(search);
 }
 
 bool WndDeckEditor::confirmClose()

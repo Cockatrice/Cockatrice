@@ -18,6 +18,7 @@ OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent)
 			break;
 		if (xml.name() == "set") {
 			QString shortName, longName;
+			bool import = xml.attributes().value("import").toString().toInt();
 			while (!xml.atEnd()) {
 				if (xml.readNext() == QXmlStreamReader::EndElement)
 					break;
@@ -28,7 +29,7 @@ OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent)
 				else if (xml.name() == "url")
 					editionURL = xml.readElementText();
 			}
-			setsToDownload << SetToDownload(edition, editionLong, editionURL);
+			setsToDownload << SetToDownload(edition, editionLong, editionURL, import);
 			edition = editionLong = editionURL = QString();
 		} else if (xml.name() == "picture_url")
 			pictureUrl = xml.readElementText();
@@ -182,6 +183,13 @@ QString OracleImporter::getURLFromName(QString name) const
 void OracleImporter::downloadNextFile()
 {
 	if (setIndex == -1) {
+		for (int i = 0; i < setsToDownload.size(); ++i)
+			if (!setsToDownload[i].getImport()) {
+				setsToDownload.removeAt(i);
+				--i;
+			}
+		if (setsToDownload.isEmpty())
+			return;
 		setIndex = 0;
 		emit setIndexChanged(0, 0, setsToDownload[0].getLongName());
 	}

@@ -61,15 +61,15 @@ public:
 		const SetList &_sets = SetList(),
 		const QString &_picURL = QString());
 	~CardInfo();
-	QString getName() const { return name; }
-	SetList getSets() const { return sets; }
-	QString getManaCost() const { return manacost; }
-	QString getCardType() const { return cardtype; }
-	QString getPowTough() const { return powtough; }
-	QString getText() const { return text; }
+	const QString &getName() const { return name; }
+	const SetList &getSets() const { return sets; }
+	const QString &getManaCost() const { return manacost; }
+	const QString &getCardType() const { return cardtype; }
+	const QString &getPowTough() const { return powtough; }
+	const QString &getText() const { return text; }
 	void setText(const QString &_text) { text = _text; }
-	QStringList getColors() const { return colors; }
-	QString getPicURL() const { return picURL; }
+	const QStringList &getColors() const { return colors; }
+	const QString &getPicURL() const { return picURL; }
 	QString getMainCardType() const;
 	QString getCorrectedName() const;
 	int getTableRow() const { return tableRow; }
