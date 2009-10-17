@@ -189,6 +189,17 @@ void MessageLogWidget::logCreateToken(Player *player, QString cardName)
 	append(tr("%1 creates token: %2.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
 }
 
+void MessageLogWidget::logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard)
+{
+	append(tr("%1 points from %2's %3 to %4's %5.")
+		.arg(sanitizeHtml(player->getName()))
+		.arg(sanitizeHtml(startPlayer->getName()))
+		.arg(sanitizeHtml(startCard))
+		.arg(sanitizeHtml(targetPlayer->getName()))
+		.arg(sanitizeHtml(targetCard))
+	);
+}
+
 void MessageLogWidget::logSetCardCounters(Player *player, QString cardName, int value, int oldValue)
 {
 	QString finalStr;
@@ -280,6 +291,7 @@ void MessageLogWidget::connectToGame(Game *game)
 	connect(game, SIGNAL(logDraw(Player *, int)), this, SLOT(logDraw(Player *, int)));
 	connect(game, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)), this, SLOT(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)));
 	connect(game, SIGNAL(logCreateToken(Player *, QString)), this, SLOT(logCreateToken(Player *, QString)));
+	connect(game, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString)), this, SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString)));
 	connect(game, SIGNAL(logSetCardCounters(Player *, QString, int, int)), this, SLOT(logSetCardCounters(Player *, QString, int, int)));
 	connect(game, SIGNAL(logSetTapped(Player *, QString, bool)), this, SLOT(logSetTapped(Player *, QString, bool)));
 	connect(game, SIGNAL(logSetCounter(Player *, QString, int, int)), this, SLOT(logSetCounter(Player *, QString, int, int)));

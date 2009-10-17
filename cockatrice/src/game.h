@@ -91,6 +91,7 @@ signals:
 	void logDraw(Player *player, int number);
 	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
 	void logCreateToken(Player *player, QString cardName);
+	void logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard);
 	void logSetCardCounters(Player *player, QString cardName, int value, int oldValue);
 	void logSetTapped(Player *player, QString cardName, bool tapped);
 	void logSetCounter(Player *player, QString counterName, int value, int oldValue);

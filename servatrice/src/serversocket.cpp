@@ -83,6 +83,13 @@ ServerSocket::ServerSocket(Server *_server, QObject *parent)
 			<< QVariant::String
 			<< QVariant::Int
 			<< QVariant::Int, &ServerSocket::cmdCreateToken));
+		commandHash.insert("create_arrow", CommandProperties(true, true, true, false, QList<QVariant::Type>()
+			<< QVariant::Int
+			<< QVariant::String
+			<< QVariant::Int
+			<< QVariant::Int
+			<< QVariant::String
+			<< QVariant::Int, &ServerSocket::cmdCreateArrow));
 		commandHash.insert("set_card_attr", CommandProperties(true, true, true, false, QList<QVariant::Type>()
 			<< QVariant::String
 			<< QVariant::Int
@@ -559,6 +566,32 @@ ReturnMessage::ReturnCode ServerSocket::cmdCreateToken(const QList<QVariant> &pa
 									 .arg(powtough)
 									 .arg(x)
 									 .arg(y), this);
+	return ReturnMessage::ReturnOk;
+}
+
+ReturnMessage::ReturnCode ServerSocket::cmdCreateArrow(const QList<QVariant> &params)
+{
+	ServerSocket *startPlayer = game->getPlayer(params[0].toInt());
+	ServerSocket *targetPlayer = game->getPlayer(params[3].toInt());
+	if (!startPlayer || !targetPlayer)
+		return ReturnMessage::ReturnContextError;
+	PlayerZone *startZone = startPlayer->getZone(params[1].toString());
+	PlayerZone *targetZone = targetPlayer->getZone(params[4].toString());
+	if (!startZone || !targetZone)
+		return ReturnMessage::ReturnContextError;
+	Card *startCard = startZone->getCard(params[2].toInt(), false);
+	Card *targetCard = targetZone->getCard(params[5].toInt(), false);
+	if (!startCard || !targetCard)
+		return ReturnMessage::ReturnContextError;
+	
+	emit broadcastEvent(QString("create_arrow|%1|%2|%3|%4|%5|%6")
+		.arg(startPlayer->getPlayerId())
+		.arg(startZone->getName())
+		.arg(startCard->getId())
+		.arg(targetPlayer->getPlayerId())
+		.arg(targetZone->getName())
+		.arg(targetCard->getId()), this
+	);
 	return ReturnMessage::ReturnOk;
 }
 

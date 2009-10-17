@@ -55,8 +55,7 @@ void PingWidget::paintEvent(QPaintEvent */*event*/)
 	QRadialGradient g(QPointF((double) width() / 2, (double) height() / 2), qMin(width(), height()) / 2.0);
 	g.setColorAt(0, color);
 	g.setColorAt(1, Qt::transparent);
-	painter.setBrush(QBrush(g));
-	painter.setPen(Qt::black);
+	painter.fillRect(0, 0, width(), height(), QBrush(g));
 }
 
 void PingWidget::setPercentage(int value, int max)

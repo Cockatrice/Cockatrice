@@ -40,7 +40,8 @@ HEADERS += src/counter.h \
  src/dlg_settings.h \
  src/phasestoolbar.h \
  src/chatwidget.h \
- src/gamescene.h
+ src/gamescene.h \
+ src/arrowitem.h
 SOURCES += src/counter.cpp \
  src/gameselector.cpp \
  src/dlg_creategame.cpp \
@@ -76,6 +77,7 @@ SOURCES += src/counter.cpp \
  src/dlg_settings.cpp \
  src/phasestoolbar.cpp \
  src/chatwidget.cpp \
- src/gamescene.cpp
+ src/gamescene.cpp \
+ src/arrowitem.cpp
 TRANSLATIONS += translations/cockatrice_de.ts translations/cockatrice_en.ts
 CONFIG += qt debug

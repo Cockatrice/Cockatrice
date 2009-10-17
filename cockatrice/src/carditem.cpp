@@ -7,6 +7,7 @@
 #include "tablezone.h"
 #include "player.h"
 #include "game.h"
+#include "arrowitem.h"
 
 CardItem::CardItem(CardDatabase *_db, const QString &_name, int _cardid, QGraphicsItem *parent)
 	: AbstractGraphicsItem(parent), db(_db), info(db->getCard(_name)), name(_name), id(_cardid), tapped(false), attacking(false), facedown(false), counters(0), doesntUntap(false), dragItem(NULL)
@@ -193,46 +194,53 @@ void CardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 		scene()->clearSelection();
 		setSelected(true);
 	}
-	if (event->button() == Qt::LeftButton) {
+	if (event->button() == Qt::LeftButton)
 		setCursor(Qt::ClosedHandCursor);
-	} else if (event->button() == Qt::RightButton) {
-		qgraphicsitem_cast<CardZone *>(parentItem())->getPlayer()->showCardMenu(event->screenPos());
-	}
 	event->accept();
 }
 
 void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-	if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < QApplication::startDragDistance())
-		return;
-	bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier) || facedown;
-
-	createDragItem(id, event->pos(), event->scenePos(), faceDown);
-	dragItem->grabMouse();
+	if (event->buttons().testFlag(Qt::RightButton)) {
+		if ((event->screenPos() - event->buttonDownScreenPos(Qt::RightButton)).manhattanLength() < 2 * QApplication::startDragDistance())
+			return;
+		ArrowDragItem *arrow = new ArrowDragItem(this);
+		scene()->addItem(arrow);
+		arrow->grabMouse();
+	} else {
+		if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < 2 * QApplication::startDragDistance())
+			return;
+		bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier) || facedown;
 	
-	CardZone *zone = (CardZone *) parentItem();
-
-	QList<QGraphicsItem *> sel = scene()->selectedItems();
-	int j = 0;
-	for (int i = 0; i < sel.size(); i++) {
-		CardItem *c = (CardItem *) sel.at(i);
-		if (c == this)
-			continue;
-		++j;
-		QPointF childPos;
-		if (zone->getHasCardAttr())
-			childPos = c->pos() - pos();
-		else
-			childPos = QPointF(j * CARD_WIDTH / 2, 0);
-		CardDragItem *drag = new CardDragItem(c, c->getId(), childPos, false, dragItem);
-		drag->setPos(dragItem->pos() + childPos);
-		scene()->addItem(drag);
+		createDragItem(id, event->pos(), event->scenePos(), faceDown);
+		dragItem->grabMouse();
+		
+		CardZone *zone = (CardZone *) parentItem();
+	
+		QList<QGraphicsItem *> sel = scene()->selectedItems();
+		int j = 0;
+		for (int i = 0; i < sel.size(); i++) {
+			CardItem *c = (CardItem *) sel.at(i);
+			if (c == this)
+				continue;
+			++j;
+			QPointF childPos;
+			if (zone->getHasCardAttr())
+				childPos = c->pos() - pos();
+			else
+				childPos = QPointF(j * CARD_WIDTH / 2, 0);
+			CardDragItem *drag = new CardDragItem(c, c->getId(), childPos, false, dragItem);
+			drag->setPos(dragItem->pos() + childPos);
+			scene()->addItem(drag);
+		}
 	}
 	setCursor(Qt::OpenHandCursor);
 }
 
-void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent */*event*/)
+void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+	if (event->button() == Qt::RightButton)
+		qgraphicsitem_cast<CardZone *>(parentItem())->getPlayer()->showCardMenu(event->screenPos());
 	setCursor(Qt::OpenHandCursor);
 }
 

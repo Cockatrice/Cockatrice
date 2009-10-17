@@ -90,6 +90,7 @@ private:
 	ReturnMessage::ReturnCode cmdRevealCard(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdMoveCard(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdCreateToken(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdCreateArrow(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdSetCardAttr(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdIncCounter(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdAddCounter(const QList<QVariant> &params);

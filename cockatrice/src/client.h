@@ -44,6 +44,7 @@ enum ServerEventType {
 	eventDraw,
 	eventMoveCard,
 	eventCreateToken,
+	eventCreateArrow,
 	eventSetCardAttr,
 	eventAddCounter,
 	eventSetCounter,
@@ -325,7 +326,7 @@ private slots:
 	void enterGameResponse(ServerResponse response);
 	void leaveGameResponse(ServerResponse response);
 private:
-	static const int protocolVersion = 1;
+	static const int protocolVersion = 2;
 	static const int maxTimeout = 10;
 	
 	QTimer *timer;
@@ -363,6 +364,7 @@ public slots:
 	PendingCommand *drawCards(unsigned int number);
 	PendingCommand *moveCard(int cardid, const QString &startzone, const QString &targetzone, int x, int y = 0, bool faceDown = false);
 	PendingCommand *createToken(const QString &zone, const QString &name, const QString &powtough, int x, int y);
+	PendingCommand *createArrow(int startPlayerId, const QString &startZone, int startCardId, int targetPlayerId, const QString &targetPlayerZone, int targetCardId);
 	PendingCommand *setCardAttr(const QString &zone, int cardid, const QString &aname, const QString &avalue);
 	PendingCommand *readyStart();
 	PendingCommand *incCounter(int counterId, int delta);

@@ -18,5 +18,5 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-static const int PROTOCOL_VERSION = 1;
-static const char *VERSION_STRING = "Servatrice 0.20090928";
+static const int PROTOCOL_VERSION = 2;
+static const char *VERSION_STRING = "Servatrice 0.20091017";

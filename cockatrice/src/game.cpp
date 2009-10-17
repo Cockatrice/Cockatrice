@@ -12,6 +12,7 @@
 #include "counter.h"
 #include "gamescene.h"
 #include "player.h"
+#include "arrowitem.h"
 
 Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenuBar *menuBar, QObject *parent)
 	: QObject(parent), db(_db), client(_client), scene(_scene), started(false), currentPhase(-1)
@@ -320,7 +321,26 @@ void Game::gameEvent(const ServerEventData &msg)
 			}
 			break;
 		}
-
+		case eventCreateArrow: {
+			const QStringList &data = msg.getEventData();
+			Player *startPlayer = players.value(data[0].toInt(), 0);
+			Player *targetPlayer = players.value(data[3].toInt(), 0);
+			if (!startPlayer || !targetPlayer)
+				break;
+			CardZone *startZone = startPlayer->getZones().value(data[1], 0);
+			CardZone *targetZone = targetPlayer->getZones().value(data[4], 0);
+			if (!startZone || !targetZone)
+				break;
+			CardItem *startCard = startZone->getCard(data[2].toInt(), QString());
+			CardItem *targetCard = targetZone->getCard(data[5].toInt(), QString());
+			if (!startCard || !targetCard)
+				break;
+			
+			emit logCreateArrow(p, startPlayer, startCard->getName(), targetPlayer, targetCard->getName());
+			ArrowItem *arrow = new ArrowItem(startCard, targetCard);
+			scene->addItem(arrow);
+			break;
+		}
 		case eventCreateToken:
 		case eventSetupZones:
 		case eventSetCardAttr:

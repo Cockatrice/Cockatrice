@@ -22,6 +22,7 @@ ServerEventData::ServerEventData(const QString &line)
 		eventHash.insert("draw", eventDraw);
 		eventHash.insert("move_card", eventMoveCard);
 		eventHash.insert("create_token", eventCreateToken);
+		eventHash.insert("create_arrow", eventCreateArrow);
 		eventHash.insert("set_card_attr", eventSetCardAttr);
 		eventHash.insert("add_counter", eventAddCounter);
 		eventHash.insert("set_counter", eventSetCounter);
@@ -495,6 +496,11 @@ PendingCommand *Client::moveCard(int cardid, const QString &startzone, const QSt
 PendingCommand *Client::createToken(const QString &zone, const QString &name, const QString &powtough, int x, int y)
 {
 	return cmd(QString("create_token|%1|%2|%3|%4|%5").arg(zone).arg(name).arg(powtough).arg(x).arg(y));
+}
+
+PendingCommand *Client::createArrow(int startPlayerId, const QString &startZone, int startCardId, int targetPlayerId, const QString &targetPlayerZone, int targetCardId)
+{
+	return cmd(QString("create_arrow|%1|%2|%3|%4|%5|%6").arg(startPlayerId).arg(startZone).arg(startCardId).arg(targetPlayerId).arg(targetPlayerZone).arg(targetCardId));
 }
 
 PendingCommand *Client::setCardAttr(const QString &zone, int cardid, const QString &aname, const QString &avalue)
