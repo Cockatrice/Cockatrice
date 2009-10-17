@@ -135,9 +135,9 @@ QPixmap *CardInfo::loadPixmap()
 			return pixmap;
 		if (pixmap->load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(sets[i]->getShortName()).arg(correctedName).arg(1)))
 			return pixmap;
-		if(pixmap->load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg("downloadedPics").arg(correctedName)))
-			return pixmap;
 	}
+	if (pixmap->load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg("downloadedPics").arg(correctedName)))
+		return pixmap;
 	if (db->getPicDownload())
 		db->startPicDownload(this);
 	return pixmap;
