@@ -39,19 +39,24 @@
 #include "chatwidget.h"
 
 PingWidget::PingWidget(QWidget *parent)
-	: QWidget(parent), color(Qt::black)
+	: QWidget(parent)
 {
+	setPercentage(0, -1);
 }
 
 QSize PingWidget::sizeHint() const
 {
-	return QSize(10, 10);
+	return QSize(15, 15);
 }
 
 void PingWidget::paintEvent(QPaintEvent */*event*/)
 {
 	QPainter painter(this);
-	painter.fillRect(0, 0, width(), height(), color);
+	QRadialGradient g(QPointF((double) width() / 2, (double) height() / 2), qMin(width(), height()) / 2.0);
+	g.setColorAt(0, color);
+	g.setColorAt(1, Qt::transparent);
+	painter.setBrush(QBrush(g));
+	painter.setPen(Qt::black);
 }
 
 void PingWidget::setPercentage(int value, int max)
