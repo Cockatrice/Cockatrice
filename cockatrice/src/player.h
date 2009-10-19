@@ -42,6 +42,7 @@ public slots:
 	void actShuffle();
 	void actDrawCard();
 	void actDrawCards();
+        void actMuligan();
 
 	void actViewLibrary();
 	void actViewTopCards();
@@ -58,7 +59,7 @@ private:
 		*aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg,
 		*aMoveRfgToTopLibrary, *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave,
 		*aViewLibrary, *aViewTopCards, *aViewGraveyard, *aViewRfg, *aViewSideboard,
-		*aDrawCard, *aDrawCards, *aShuffle,
+                *aDrawCard, *aDrawCards, *aMulligan, *aShuffle,
 		*aUntapAll, *aRollDie, *aCreateToken;
 
 	int defaultNumberTopCards;
@@ -66,6 +67,8 @@ private:
 	int id;
 	bool active;
 	bool local;
+
+        int cardsInHand;
 	
 	QMap<QString, CardZone *> zones;
 	TableZone *table;

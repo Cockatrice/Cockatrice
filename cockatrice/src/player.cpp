@@ -8,6 +8,7 @@
 #include "pilezone.h"
 #include "tablezone.h"
 #include "handzone.h"
+#include "cardlist.h"
 #include <QSettings>
 #include <QPainter>
 #include <QMenu>
@@ -113,12 +114,15 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 		connect(aDrawCards, SIGNAL(triggered()), this, SLOT(actDrawCards()));
 		aShuffle = new QAction(this);
 		connect(aShuffle, SIGNAL(triggered()), this, SLOT(actShuffle()));
+                aMulligan = new QAction(this);
+                connect(aMulligan, SIGNAL(triggered()), this, SLOT(actMuligan()));
 	}
 
 	playerMenu = new QMenu(QString());
 
 	if (local) {
 		handMenu = playerMenu->addMenu(QString());
+                handMenu->addAction(aMulligan);
 		handMenu->addAction(aMoveHandToTopLibrary);
 		handMenu->addAction(aMoveHandToBottomLibrary);
 		handMenu->addAction(aMoveHandToGrave);
@@ -189,6 +193,8 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 		sbMenu = 0;
 	}
 	
+        cardsInHand = 0;
+
 	retranslateUi();
 }
 
@@ -240,6 +246,8 @@ void Player::retranslateUi()
 		aDrawCard->setShortcut(tr("Ctrl+D"));
 		aDrawCards->setText(tr("D&raw cards..."));
 		aDrawCards->setShortcut(tr("Ctrl+E"));
+                aMulligan->setText(tr("Take &mulligan..."));
+                aMulligan->setShortcut(tr("Ctrl+M"));
 		aShuffle->setText(tr("&Shuffle"));
 		aShuffle->setShortcut(tr("Ctrl+S"));
 	
@@ -324,13 +332,27 @@ void Player::actShuffle()
 void Player::actDrawCard()
 {
 	client->drawCards(1);
+        cardsInHand++;
+}
+
+void Player::actMuligan()
+{
+    if(cardsInHand >= 0) return;
+    CardList handCards = hand->getCards();
+    for(int i = 0; i < handCards.size(); i++){
+        client->moveCard(handCards.at(i)->getId(),"hand","deck",0);
+    }
+    client->shuffle();
+    client->drawCards(--cardsInHand);
 }
 
 void Player::actDrawCards()
 {
 	int number = QInputDialog::getInteger(0, tr("Draw cards"), tr("Number:"));
-	if (number)
+        if (number){
 		client->drawCards(number);
+                cardsInHand += number;
+        }
 }
 
 void Player::actUntapAll()
@@ -467,6 +489,12 @@ void Player::gameEvent(const ServerEventData &event)
 				qDebug(QString("target zone invalid: %1").arg(data[4]).toLatin1());
 				break;
 			}
+
+                       /* if(startZone == zones.value("hand")){
+                            cardsInHand--;
+                            qDebug() << "<<<<<<<<<<<<<<<<<<<< Karte aus hand entfernt";
+                            qDebug() << "<<<<<<<<<<<<<<<<<<<<< Handkartenanzahl: " << cardsInHand;
+                        }*/
 			int x = data[5].toInt();
 			int y = data[6].toInt();
 			bool facedown = data[7].toInt();
