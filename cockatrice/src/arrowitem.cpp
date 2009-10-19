@@ -32,14 +32,18 @@ void ArrowItem::updatePath(const QPointF &endPoint)
 	QLineF line(startPoint, endPoint);
 	qreal lineLength = line.length();
 	
-	path = QPainterPath(QPointF(0, -arrowWidth / 2));
-	path.lineTo(0, arrowWidth / 2);
-	path.lineTo(lineLength - headLength, arrowWidth / 2);
-	path.lineTo(lineLength - headLength, headWidth / 2);
-	path.lineTo(lineLength, 0);
-	path.lineTo(lineLength - headLength, -headWidth / 2);
-	path.lineTo(lineLength - headLength, -arrowWidth / 2);
-	path.lineTo(0, -arrowWidth / 2);
+	if (lineLength < headLength)
+		path = QPainterPath();
+	else {
+		path = QPainterPath(QPointF(0, -arrowWidth / 2));
+		path.lineTo(0, arrowWidth / 2);
+		path.lineTo(lineLength - headLength, arrowWidth / 2);
+		path.lineTo(lineLength - headLength, headWidth / 2);
+		path.lineTo(lineLength, 0);
+		path.lineTo(lineLength - headLength, -headWidth / 2);
+		path.lineTo(lineLength - headLength, -arrowWidth / 2);
+		path.lineTo(0, -arrowWidth / 2);
+	}
 	
 	setPos(startPoint);
 	setTransform(QTransform().rotate(-line.angle()));
@@ -79,7 +83,7 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
 {
-	if (targetItem) {
+	if (targetItem && (targetItem != startItem)) {
 		CardZone *startZone = static_cast<CardZone *>(startItem->parentItem());
 		CardZone *targetZone = static_cast<CardZone *>(targetItem->parentItem());
 		startZone->getPlayer()->client->createArrow(

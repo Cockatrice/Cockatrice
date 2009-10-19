@@ -581,7 +581,7 @@ ReturnMessage::ReturnCode ServerSocket::cmdCreateArrow(const QList<QVariant> &pa
 		return ReturnMessage::ReturnContextError;
 	Card *startCard = startZone->getCard(params[2].toInt(), false);
 	Card *targetCard = targetZone->getCard(params[5].toInt(), false);
-	if (!startCard || !targetCard)
+	if (!startCard || !targetCard || (startCard == targetCard))
 		return ReturnMessage::ReturnContextError;
 	
 	emit broadcastEvent(QString("create_arrow|%1|%2|%3|%4|%5|%6")

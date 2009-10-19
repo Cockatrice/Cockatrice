@@ -42,7 +42,7 @@ public slots:
 	void actShuffle();
 	void actDrawCard();
 	void actDrawCards();
-        void actMuligan();
+        void actMulligan();
 
 	void actViewLibrary();
 	void actViewTopCards();
