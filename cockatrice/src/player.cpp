@@ -193,8 +193,6 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 		sbMenu = 0;
 	}
 	
-        cardsInHand = 0;
-
 	retranslateUi();
 }
 
@@ -246,7 +244,7 @@ void Player::retranslateUi()
 		aDrawCard->setShortcut(tr("Ctrl+D"));
 		aDrawCards->setText(tr("D&raw cards..."));
 		aDrawCards->setShortcut(tr("Ctrl+E"));
-                aMulligan->setText(tr("Take &mulligan..."));
+                aMulligan->setText(tr("Take &mulligan"));
                 aMulligan->setShortcut(tr("Ctrl+M"));
 		aShuffle->setText(tr("&Shuffle"));
 		aShuffle->setShortcut(tr("Ctrl+S"));
@@ -332,30 +330,25 @@ void Player::actShuffle()
 void Player::actDrawCard()
 {
 	client->drawCards(1);
-        cardsInHand++;
 }
 
 void Player::actMulligan()
 {
-    if(cardsInHand <= 0 || cardsInHand > 7) return;
-
-
-    CardList handCards = hand->getCards();
-    for(int i = 0; i < handCards.size(); i++){
-        client->moveCard(handCards.at(i)->getId(),"hand","deck",0);
-    }
-    client->shuffle();
-    client->drawCards(--cardsInHand);
+	if (mulliganCards <= 0)
+		return;
+	
+	const CardList &handCards = hand->getCards();
+	for (int i = 0; i < handCards.size(); i++)
+		client->moveCard(handCards.at(i)->getId(), "hand", "deck", 0);
+	client->shuffle();
+	client->drawCards(mulliganCards--);
 }
 
 void Player::actDrawCards()
 {
 	int number = QInputDialog::getInteger(0, tr("Draw cards"), tr("Number:"));
-        if (number){
+        if (number)
 		client->drawCards(number);
-                cardsInHand = number;
-                qDebug() << "ANZAHL DER GEZOGENEN KARTEN: <<<<<<<<<<<<<<<<<<<<<<<<< " << cardsInHand;
-        }
 }
 
 void Player::actUntapAll()
@@ -457,6 +450,8 @@ void Player::gameEvent(const ServerEventData &event)
 				client->addCounter("g", QColor(150, 255, 150), 20, 0);
 				client->addCounter("x", QColor(255, 255, 255), 20, 0);
 				client->addCounter("storm", QColor(255, 255, 255), 20, 0);
+				
+				mulliganCards = 7;
 			}
 
 			break;
@@ -475,10 +470,8 @@ void Player::gameEvent(const ServerEventData &event)
 			break;
 		}
 		case eventMoveCard: {
-			if (data.size() != 8) {
-				qDebug("error");
-				// XXX
-			}
+			if (data.size() != 8)
+				break;
 			int cardId = data[0].toInt();
 			QString cardName = data[1];
 			CardZone *startZone = zones.value(data[2], 0);
@@ -517,22 +510,14 @@ void Player::gameEvent(const ServerEventData &event)
 			// because the addCard function can modify the card object.
 			emit logMoveCard(this, card->getName(), startZone, logPosition, targetZone, logX);
 
-                        /*if(startZone == zones.value("hand")){
-                            qDebug() << "<<<<<<<<<<<<<<<<<<<<< Handkartenanzahl: " << cardsInHand;
-                            cardsInHand--;
-                            qDebug() << "<<<<<<<<<<<<<<<<<<<< Karte aus hand entfernt";
-                            qDebug() << "<<<<<<<<<<<<<<<<<<<<< Handkartenanzahl: " << cardsInHand;
-                        }*/
-
 			targetZone->addCard(card, true, x, y);
 
 			break;
 		}
 		case eventCreateToken: {
 			// zone, cardid, cardname, powtough, x, y
-			if (data.size() != 6) {
-				qDebug("error");
-			}
+			if (data.size() != 6)
+				break;
 			CardZone *zone = zones.value(data[0], 0);
 			if (!zone)
 				break;
@@ -550,9 +535,8 @@ void Player::gameEvent(const ServerEventData &event)
 			break;
 		}
 		case eventSetCardAttr: {
-			if (data.size() != 4) {
-				// XXX
-			}
+			if (data.size() != 4)
+				break;
 			CardZone *zone = zones.value(data[0], 0);
 			if (!zone)
 				break;
@@ -574,9 +558,8 @@ void Player::gameEvent(const ServerEventData &event)
 			break;
 		}
 		case eventAddCounter: {
-			if (data.size() != 4) {
-				// XXX
-			}
+			if (data.size() != 4)
+				break;
 			int counterId = data[0].toInt();
 			QString counterName = data[1];
 			int colorValue = data[2].toInt();
@@ -587,9 +570,8 @@ void Player::gameEvent(const ServerEventData &event)
 			break;
 		}
 		case eventSetCounter: {
-			if (data.size() != 2) {
-				// XXX
-			}
+			if (data.size() != 2)
+				break;
 			int counterId = data[0].toInt();
 			int value = data[1].toInt();
 			Counter *c = counters.value(counterId, 0);

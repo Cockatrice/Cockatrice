@@ -63,12 +63,11 @@ private:
 		*aUntapAll, *aRollDie, *aCreateToken;
 
 	int defaultNumberTopCards;
+        int mulliganCards;
 	QString name;
 	int id;
 	bool active;
 	bool local;
-
-        int cardsInHand;
 	
 	QMap<QString, CardZone *> zones;
 	TableZone *table;
