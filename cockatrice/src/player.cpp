@@ -558,7 +558,7 @@ void Player::gameEvent(const ServerEventData &event)
 			break;
 		}
 		case eventAddCounter: {
-			if (data.size() != 4)
+			if (data.size() != 5)
 				break;
 			int counterId = data[0].toInt();
 			QString counterName = data[1];
