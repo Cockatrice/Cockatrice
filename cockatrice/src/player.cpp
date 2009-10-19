@@ -337,7 +337,7 @@ void Player::actDrawCard()
 
 void Player::actMuligan()
 {
-    if(cardsInHand >= 0) return;
+    if(cardsInHand <= 0) return;
     CardList handCards = hand->getCards();
     for(int i = 0; i < handCards.size(); i++){
         client->moveCard(handCards.at(i)->getId(),"hand","deck",0);
