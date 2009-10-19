@@ -115,7 +115,7 @@ Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Cl
 		aShuffle = new QAction(this);
 		connect(aShuffle, SIGNAL(triggered()), this, SLOT(actShuffle()));
                 aMulligan = new QAction(this);
-                connect(aMulligan, SIGNAL(triggered()), this, SLOT(actMuligan()));
+                connect(aMulligan, SIGNAL(triggered()), this, SLOT(actMulligan()));
 	}
 
 	playerMenu = new QMenu(QString());
@@ -335,9 +335,11 @@ void Player::actDrawCard()
         cardsInHand++;
 }
 
-void Player::actMuligan()
+void Player::actMulligan()
 {
-    if(cardsInHand <= 0) return;
+    if(cardsInHand <= 0 || cardsInHand > 7) return;
+
+
     CardList handCards = hand->getCards();
     for(int i = 0; i < handCards.size(); i++){
         client->moveCard(handCards.at(i)->getId(),"hand","deck",0);
@@ -351,7 +353,8 @@ void Player::actDrawCards()
 	int number = QInputDialog::getInteger(0, tr("Draw cards"), tr("Number:"));
         if (number){
 		client->drawCards(number);
-                cardsInHand += number;
+                cardsInHand = number;
+                qDebug() << "ANZAHL DER GEZOGENEN KARTEN: <<<<<<<<<<<<<<<<<<<<<<<<< " << cardsInHand;
         }
 }
 
@@ -490,11 +493,7 @@ void Player::gameEvent(const ServerEventData &event)
 				break;
 			}
 
-                       /* if(startZone == zones.value("hand")){
-                            cardsInHand--;
-                            qDebug() << "<<<<<<<<<<<<<<<<<<<< Karte aus hand entfernt";
-                            qDebug() << "<<<<<<<<<<<<<<<<<<<<< Handkartenanzahl: " << cardsInHand;
-                        }*/
+
 			int x = data[5].toInt();
 			int y = data[6].toInt();
 			bool facedown = data[7].toInt();
@@ -517,6 +516,13 @@ void Player::gameEvent(const ServerEventData &event)
 			// The log event has to be sent before the card is added to the target zone
 			// because the addCard function can modify the card object.
 			emit logMoveCard(this, card->getName(), startZone, logPosition, targetZone, logX);
+
+                        /*if(startZone == zones.value("hand")){
+                            qDebug() << "<<<<<<<<<<<<<<<<<<<<< Handkartenanzahl: " << cardsInHand;
+                            cardsInHand--;
+                            qDebug() << "<<<<<<<<<<<<<<<<<<<< Karte aus hand entfernt";
+                            qDebug() << "<<<<<<<<<<<<<<<<<<<<< Handkartenanzahl: " << cardsInHand;
+                        }*/
 
 			targetZone->addCard(card, true, x, y);
 
