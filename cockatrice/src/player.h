@@ -14,6 +14,7 @@ class QAction;
 class ZoneViewZone;
 class Game;
 class Counter;
+class ArrowItem;
 class CardZone;
 class TableZone;
 class HandZone;
@@ -32,6 +33,7 @@ signals:
 	void logSetCardCounters(Player *player, QString cardName, int value, int oldValue);
 	void logSetTapped(Player *player, QString cardName, bool tapped);
 	void logSetCounter(Player *player, QString counterName, int value, int oldValue);
+	void logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard);
 	void logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap);
 	
 	void sizeChanged();
@@ -80,6 +82,7 @@ private:
 	QRectF bRect;
 
 	QMap<int, Counter *> counters;
+	QMap<int, ArrowItem *> arrows;
 	void rearrangeCounters();
 	
 	void initSayMenu();
@@ -94,6 +97,10 @@ public:
 	void addCounter(int counterId, const QString &name, QColor color, int radius, int value);
 	void delCounter(int counterId);
 	void clearCounters();
+	
+	void addArrow(int arrowId, CardItem *startCard, CardItem *targetCard, const QColor &color);
+	void delArrow(int arrowId);
+	void clearArrows();
 
 	Client *client;
 	void addZone(CardZone *z);
@@ -105,6 +112,7 @@ public:
 	QString getName() const { return name; }
 	bool getLocal() const { return local; }
 	const QMap<QString, CardZone *> &getZones() const { return zones; }
+	const QMap<int, ArrowItem *> &getArrows() const { return arrows; }
 	TableZone *getTable() const { return table; }
 	void gameEvent(const ServerEventData &event);
 	CardDatabase *getDb() const { return db; }

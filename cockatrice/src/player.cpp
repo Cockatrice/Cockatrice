@@ -2,6 +2,7 @@
 #include "client.h"
 #include "cardzone.h"
 #include "counter.h"
+#include "arrowitem.h"
 #include "zoneviewzone.h"
 #include "zoneviewwidget.h"
 #include "game.h"
@@ -205,6 +206,7 @@ Player::~Player()
 		delete i.next().value();
 
 	clearCounters();
+	clearArrows();
 	delete playerMenu;
 }
 
@@ -428,6 +430,7 @@ void Player::gameEvent(const ServerEventData &event)
 			}
 
 			clearCounters();
+			clearArrows();
 
 			CardZone *deck = zones.value("deck");
 			for (; deck_cards; deck_cards--)
@@ -486,11 +489,9 @@ void Player::gameEvent(const ServerEventData &event)
 				break;
 			}
 
-
 			int x = data[5].toInt();
 			int y = data[6].toInt();
 			bool facedown = data[7].toInt();
-			// XXX Mehr Fehlerbehandlung
 
 			int logPosition = position;
 			int logX = x;
@@ -499,9 +500,11 @@ void Player::gameEvent(const ServerEventData &event)
 			if (x == -1)
 				x = 0;
 			CardItem *card = startZone->takeCard(position, cardId, cardName, startZone != targetZone);
-			if (!card) // XXX
+			if (!card) {
 				qDebug("moveCard: card not found");
-
+				break;
+			}
+			
 			card->deleteDragItem();
 
 			card->setFaceDown(facedown);
@@ -511,6 +514,27 @@ void Player::gameEvent(const ServerEventData &event)
 			emit logMoveCard(this, card->getName(), startZone, logPosition, targetZone, logX);
 
 			targetZone->addCard(card, true, x, y);
+
+			// Look at all arrows from and to the card.
+			// If the card was moved to another zone, delete the arrows, otherwise update them.
+			QMapIterator<int, Player *> playerIterator(static_cast<Game *>(parent())->getPlayers());
+			while (playerIterator.hasNext()) {
+				Player *p = playerIterator.next().value();
+
+				QList<int> arrowsToDelete;
+				QMapIterator<int, ArrowItem *> arrowIterator(p->getArrows());
+				while (arrowIterator.hasNext()) {
+					ArrowItem *arrow = arrowIterator.next().value();
+					if ((arrow->getStartItem() == card) || (arrow->getTargetItem() == card)) {
+						if (startZone == targetZone)
+							arrow->updatePath();
+						else
+							arrowsToDelete.append(arrow->getId());
+					}
+				}
+				for (int i = 0; i < arrowsToDelete.size(); ++i)
+					p->delArrow(arrowsToDelete[i]);
+			}
 
 			break;
 		}
@@ -580,6 +604,39 @@ void Player::gameEvent(const ServerEventData &event)
 			int oldValue = c->getValue();
 			c->setValue(value);
 			emit logSetCounter(this, c->getName(), value, oldValue);
+			break;
+		}
+		case eventCreateArrow: {
+			if (data.size() != 8)
+				break;
+			
+			const QMap<int, Player *> &playerList = static_cast<Game *>(parent())->getPlayers();
+			
+			Player *startPlayer = playerList.value(data[1].toInt(), 0);
+			Player *targetPlayer = playerList.value(data[4].toInt(), 0);
+			if (!startPlayer || !targetPlayer)
+				return;
+			
+			CardZone *startZone = startPlayer->getZones().value(data[2], 0);
+			CardZone *targetZone = targetPlayer->getZones().value(data[5], 0);
+			if (!startZone || !targetZone)
+				return;
+			
+			CardItem *startCard = startZone->getCard(data[3].toInt(), QString());
+			CardItem *targetCard = targetZone->getCard(data[6].toInt(), QString());
+			if (!startCard || !targetCard)
+				return;
+	
+			addArrow(data[0].toInt(), startCard, targetCard, client->numberToColor(data[7].toInt()));
+			emit logCreateArrow(this, startPlayer, startCard->getName(), targetPlayer, targetCard->getName());
+			
+			break;
+		}
+		case eventDeleteArrow: {
+			if (data.size() != 1)
+				break;
+			
+			delArrow(data[0].toInt());
 			break;
 		}
 		default:
@@ -664,6 +721,30 @@ void Player::clearCounters()
 	while (counterIterator.hasNext())
 		delete counterIterator.next().value();
 	counters.clear();
+}
+
+void Player::addArrow(int arrowId, CardItem *startCard, CardItem *targetCard, const QColor &color)
+{
+	ArrowItem *arrow = new ArrowItem(arrowId, startCard, targetCard, color);
+	arrows.insert(arrowId, arrow);
+	scene()->addItem(arrow);
+}
+
+void Player::delArrow(int arrowId)
+{
+	ArrowItem *a = arrows.value(arrowId, 0);
+	if (!a)
+		return;
+	arrows.remove(arrowId);
+	delete a;
+}
+
+void Player::clearArrows()
+{
+	QMapIterator<int, ArrowItem *> arrowIterator(arrows);
+	while (arrowIterator.hasNext())
+		delete arrowIterator.next().value();
+	arrows.clear();
 }
 
 void Player::rearrangeCounters()

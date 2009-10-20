@@ -115,13 +115,14 @@ private:
 	QList<QString> SideboardList;
 	QList<PlayerZone *> zones;
 	QMap<int, Counter *> counters;
-	QList<Arrow *> arrows;
+	QMap<int, Arrow *> arrows;
 	int playerId;
 	QString playerName;
 	bool spectator;
 	int nextCardId;
 	int newCardId();
 	int newCounterId() const;
+	int newArrowId() const;
 	PlayerZone *getZone(const QString &name) const;
 	void clearZones();
 	bool parseCommand(QString line);
@@ -149,7 +150,8 @@ public:
 	bool getAcceptsChatChannelListChanges() const { return acceptsChatChannelListChanges; }
 	const QList<PlayerZone *> &getZones() const { return zones; }
 	const QMap<int, Counter *> &getCounters() const { return counters; }
-	const QList<Arrow *> &getArrows() const { return arrows; }
+	const QMap<int, Arrow *> &getArrows() const { return arrows; }
+	bool deleteArrow(int arrowId);
 	void setupZones();
 };
 

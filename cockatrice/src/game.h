@@ -68,6 +68,7 @@ private slots:
 	void cardListReceived(QList<ServerZoneCard> list);
 	void zoneListReceived(QList<ServerZone> list);
 	void counterListReceived(QList<ServerCounter> list);
+	void arrowListReceived(QList<ServerArrow> list);
 	
 	void readyStart();
 signals:
@@ -107,6 +108,7 @@ public:
 	void restartGameDialog();
 	void hoverCardEvent(CardItem *card);
 	Player *addPlayer(int playerId, const QString &playerName, bool local);
+	const QMap<int, Player *> &getPlayers() const { return players; }
 	void queryGameState();
 };
 

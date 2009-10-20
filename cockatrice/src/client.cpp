@@ -23,6 +23,7 @@ ServerEventData::ServerEventData(const QString &line)
 		eventHash.insert("move_card", eventMoveCard);
 		eventHash.insert("create_token", eventCreateToken);
 		eventHash.insert("create_arrow", eventCreateArrow);
+		eventHash.insert("delete_arrow", eventDeleteArrow);
 		eventHash.insert("set_card_attr", eventSetCardAttr);
 		eventHash.insert("add_counter", eventAddCounter);
 		eventHash.insert("set_counter", eventSetCounter);
@@ -110,6 +111,7 @@ void PendingCommand_DumpAll::responseReceived(ServerResponse resp)
 		emit zoneListReceived(zoneList);
 		emit cardListReceived(cardList);
 		emit counterListReceived(counterList);
+		emit arrowListReceived(arrowList);
 	}
 	PendingCommand::responseReceived(resp);
 }
@@ -319,8 +321,7 @@ void Client::readLine()
 			}
 			int cmdid = values.takeFirst().toInt();
 			PendingCommand *pc = pendingCommands.value(cmdid, 0);
-			int colorValue = values[3].toInt();
-			ServerCounter sc(values[0].toInt(), values[1].toInt(), values[2], QColor(colorValue / 65536, (colorValue % 65536) / 256, colorValue % 256), values[4].toInt(), values[5].toInt());
+			ServerCounter sc(values[0].toInt(), values[1].toInt(), values[2], numberToColor(values[3].toInt()), values[4].toInt(), values[5].toInt());
 			
 			PendingCommand_ListCounters *pcLC = qobject_cast<PendingCommand_ListCounters *>(pc);
 			if (pcLC)
@@ -332,6 +333,20 @@ void Client::readLine()
 				else
 					emit protocolError();
 			}
+		} else if (prefix == "list_arrows") {
+			if (values.size() != 10) {
+				emit protocolError();
+				continue;
+			}
+			int cmdid = values.takeFirst().toInt();
+			PendingCommand *pc = pendingCommands.value(cmdid, 0);
+			ServerArrow sa(values[0].toInt(), values[1].toInt(), values[2].toInt(), values[3], values[4].toInt(), values[5].toInt(), values[6], values[7].toInt(), numberToColor(values[8].toInt()));
+			
+			PendingCommand_DumpAll *pcDA = qobject_cast<PendingCommand_DumpAll *>(pc);
+			if (pcDA)
+				pcDA->addArrow(sa);
+			else
+				emit protocolError();
 		} else
 			emit protocolError();
 	}
@@ -498,9 +513,9 @@ PendingCommand *Client::createToken(const QString &zone, const QString &name, co
 	return cmd(QString("create_token|%1|%2|%3|%4|%5").arg(zone).arg(name).arg(powtough).arg(x).arg(y));
 }
 
-PendingCommand *Client::createArrow(int startPlayerId, const QString &startZone, int startCardId, int targetPlayerId, const QString &targetPlayerZone, int targetCardId)
+PendingCommand *Client::createArrow(int startPlayerId, const QString &startZone, int startCardId, int targetPlayerId, const QString &targetPlayerZone, int targetCardId, const QColor &color)
 {
-	return cmd(QString("create_arrow|%1|%2|%3|%4|%5|%6").arg(startPlayerId).arg(startZone).arg(startCardId).arg(targetPlayerId).arg(targetPlayerZone).arg(targetCardId));
+	return cmd(QString("create_arrow|%1|%2|%3|%4|%5|%6|%7").arg(startPlayerId).arg(startZone).arg(startCardId).arg(targetPlayerId).arg(targetPlayerZone).arg(targetCardId).arg(colorToNumber(color)));
 }
 
 PendingCommand *Client::setCardAttr(const QString &zone, int cardid, const QString &aname, const QString &avalue)
@@ -529,7 +544,7 @@ PendingCommand *Client::incCounter(int counterId, int delta)
 
 PendingCommand *Client::addCounter(const QString &counterName, QColor color, int radius, int value)
 {
-	return cmd(QString("add_counter|%1|%2|%3|%4").arg(counterName).arg(color.red() * 65536 + color.green() * 256 + color.blue()).arg(radius).arg(value));
+	return cmd(QString("add_counter|%1|%2|%3|%4").arg(counterName).arg(colorToNumber(color)).arg(radius).arg(value));
 }
 
 PendingCommand *Client::setCounter(int counterId, int value)
@@ -583,4 +598,14 @@ PendingCommand_DumpAll *Client::dumpAll()
 	PendingCommand_DumpAll *pc = new PendingCommand_DumpAll;
 	cmd("dump_all", pc);
 	return pc;
+}
+
+QColor Client::numberToColor(int colorValue) const
+{
+	return QColor(colorValue / 65536, (colorValue % 65536) / 256, colorValue % 256);
+}
+
+int Client::colorToNumber(const QColor &color) const
+{
+	return color.red() * 65536 + color.green() * 256 + color.blue();
 }

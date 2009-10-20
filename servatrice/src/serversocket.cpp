@@ -93,11 +93,6 @@ ServerSocket::ServerSocket(Server *_server, QObject *parent)
 			<< QVariant::Int
 			<< QVariant::Int, &ServerSocket::cmdCreateArrow));
 		commandHash.insert("delete_arrow", CommandProperties(true, true, true, false, QList<QVariant::Type>()
-			<< QVariant::Int
-			<< QVariant::String
-			<< QVariant::Int
-			<< QVariant::Int
-			<< QVariant::String
 			<< QVariant::Int, &ServerSocket::cmdDeleteArrow));
 		commandHash.insert("set_card_attr", CommandProperties(true, true, true, false, QList<QVariant::Type>()
 			<< QVariant::String
@@ -173,6 +168,18 @@ int ServerSocket::newCounterId() const
 	return id + 1;
 }
 
+int ServerSocket::newArrowId() const
+{
+	int id = 0;
+	QMapIterator<int, Arrow *> i(arrows);
+	while (i.hasNext()) {
+		Arrow *a = i.next().value();
+		if (a->getId() > id)
+			id = a->getId();
+	}
+	return id + 1;
+}
+
 PlayerZone *ServerSocket::getZone(const QString &name) const
 {
 	QListIterator<PlayerZone *> ZoneIterator(zones);
@@ -233,8 +240,9 @@ void ServerSocket::clearZones()
 		delete counterIterator.next().value();
 	counters.clear();
 	
-	for (int i = 0; i < arrows.size(); i++)
-		delete arrows.at(i);
+	QMapIterator<int, Arrow *> arrowIterator(arrows);
+	while (arrowIterator.hasNext())
+		delete arrowIterator.next().value();
 	arrows.clear();
 }
 
@@ -246,6 +254,16 @@ void ServerSocket::leaveGame()
 	game = 0;
 	PlayerStatus = StatusNormal;
 	clearZones();
+}
+
+bool ServerSocket::deleteArrow(int arrowId)
+{
+	Arrow *arrow = arrows.value(arrowId, 0);
+	if (!arrow)
+		return false;
+	arrows.remove(arrowId);
+	delete arrow;
+	return true;
 }
 
 void ServerSocket::readClient()
@@ -556,6 +574,23 @@ ReturnMessage::ReturnCode ServerSocket::cmdMoveCard(const QList<QVariant> &param
 								     .arg(targetzone->getName())
 								     .arg(x)
 								     .arg(y), this);
+	
+	// If the card was moved to another zone, delete all arrows from and to the card
+	if (startzone != targetzone) {
+		const QList<ServerSocket *> &players = game->getPlayers();
+		for (int i = 0; i < players.size(); ++i) {
+			QList<int> arrowsToDelete;
+			QMapIterator<int, Arrow *> arrowIterator(players[i]->getArrows());
+			while (arrowIterator.hasNext()) {
+				Arrow *arrow = arrowIterator.next().value();
+				if ((arrow->getStartCard() == card) || (arrow->getTargetCard() == card))
+					arrowsToDelete.append(arrow->getId());
+			}
+			for (int j = 0; j < arrowsToDelete.size(); ++j)
+				players[i]->deleteArrow(arrowsToDelete[j]);
+		}
+	}
+	
 	return ReturnMessage::ReturnOk;
 }
 
@@ -597,13 +632,18 @@ ReturnMessage::ReturnCode ServerSocket::cmdCreateArrow(const QList<QVariant> &pa
 	Card *targetCard = targetZone->getCard(params[5].toInt(), false);
 	if (!startCard || !targetCard || (startCard == targetCard))
 		return ReturnMessage::ReturnContextError;
-	for (int i = 0; i < arrows.size(); ++i)
-		if ((arrows[i]->getStartCard() == startCard) && (arrows[i]->getTargetCard() == targetCard))
+	QMapIterator<int, Arrow *> arrowIterator(arrows);
+	while (arrowIterator.hasNext()) {
+		Arrow *temp = arrowIterator.next().value();
+		if ((temp->getStartCard() == startCard) && (temp->getTargetCard() == targetCard))
 			return ReturnMessage::ReturnContextError;
+	}
 	int color = params[6].toInt();
 	
-	arrows.append(new Arrow(startCard, targetCard, color));
-	emit broadcastEvent(QString("create_arrow|%1|%2|%3|%4|%5|%6|%7")
+	Arrow *arrow = new Arrow(newArrowId(), startCard, targetCard, color);
+	arrows.insert(arrow->getId(), arrow);
+	emit broadcastEvent(QString("create_arrow|%1|%2|%3|%4|%5|%6|%7|%8")
+		.arg(arrow->getId())
 		.arg(startPlayer->getPlayerId())
 		.arg(startZone->getName())
 		.arg(startCard->getId())
@@ -617,34 +657,11 @@ ReturnMessage::ReturnCode ServerSocket::cmdCreateArrow(const QList<QVariant> &pa
 
 ReturnMessage::ReturnCode ServerSocket::cmdDeleteArrow(const QList<QVariant> &params)
 {
-	ServerSocket *startPlayer = game->getPlayer(params[0].toInt());
-	ServerSocket *targetPlayer = game->getPlayer(params[3].toInt());
-	if (!startPlayer || !targetPlayer)
-		return ReturnMessage::ReturnContextError;
-	PlayerZone *startZone = startPlayer->getZone(params[1].toString());
-	PlayerZone *targetZone = targetPlayer->getZone(params[4].toString());
-	if (!startZone || !targetZone)
-		return ReturnMessage::ReturnContextError;
-	Card *startCard = startZone->getCard(params[2].toInt(), false);
-	Card *targetCard = targetZone->getCard(params[5].toInt(), false);
-	
-	Arrow *arrow = 0;
-	for (int i = 0; i < arrows.size(); ++i)
-		if ((arrows[i]->getStartCard() == startCard) && (arrows[i]->getTargetCard() == targetCard)) {
-			arrow = arrows.takeAt(i);
-			break;
-		}
-	if (!arrow)
+	int arrowId = params[0].toInt();
+	if (!deleteArrow(arrowId))
 		return ReturnMessage::ReturnContextError;
 	
-	emit broadcastEvent(QString("delete_arrow|%1|%2|%3|%4|%5|%6")
-		.arg(startPlayer->getPlayerId())
-		.arg(startZone->getName())
-		.arg(startCard->getId())
-		.arg(targetPlayer->getPlayerId())
-		.arg(targetZone->getName())
-		.arg(targetCard->getId()), this
-	);
+	emit broadcastEvent(QString("delete_arrow|%1").arg(arrowId), this);
 	return ReturnMessage::ReturnOk;
 }
 
@@ -866,15 +883,18 @@ ReturnMessage::ReturnCode ServerSocket::cmdSetActivePhase(const QList<QVariant> 
 QStringList ServerSocket::listArrowsHelper(ServerSocket *player)
 {
 	QStringList result;
-	const QList<Arrow *> &arrowList = player->getArrows();
-	for (int i = 0; i < arrowList.size(); ++i) {
-		Card *startCard = arrowList[i]->getStartCard();
-		Card *targetCard = arrowList[i]->getTargetCard();
+	QMapIterator<int, Arrow *> arrowIterator(player->getArrows());
+	while (arrowIterator.hasNext()) {
+		Arrow *arrow = arrowIterator.next().value();
+
+		Card *startCard = arrow->getStartCard();
+		Card *targetCard = arrow->getTargetCard();
 		PlayerZone *startZone = startCard->getZone();
 		PlayerZone *targetZone = targetCard->getZone();
 		ServerSocket *startPlayer = startZone->getPlayer();
 		ServerSocket *targetPlayer = targetZone->getPlayer();
-		result << QString("%1|%2|%3|%4|%5|%6|%7").arg(startPlayer->getPlayerName()).arg(startZone->getName()).arg(startCard->getId()).arg(targetPlayer->getPlayerName()).arg(targetZone->getName()).arg(targetCard->getId()).arg(arrowList[i]->getColor());
+		
+		result << QString("%1|%2|%3|%4|%5|%6|%7|%8|%9").arg(player->getPlayerId()).arg(arrow->getId()).arg(startPlayer->getPlayerId()).arg(startZone->getName()).arg(startCard->getId()).arg(targetPlayer->getPlayerId()).arg(targetZone->getName()).arg(targetCard->getId()).arg(arrow->getColor());
 	}
 	return result;
 }

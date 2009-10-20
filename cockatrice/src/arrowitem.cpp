@@ -7,8 +7,8 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsScene>
 
-ArrowItem::ArrowItem(CardItem *_startItem, CardItem *_targetItem)
-        : QGraphicsItem(), startItem(_startItem), targetItem(_targetItem)
+ArrowItem::ArrowItem(int _id, CardItem *_startItem, CardItem *_targetItem, const QColor &_color)
+        : QGraphicsItem(), id(_id), startItem(_startItem), targetItem(_targetItem), color(_color), fullColor(true)
 {
 	setZValue(2000000005);
 	if (startItem && targetItem)
@@ -17,7 +17,6 @@ ArrowItem::ArrowItem(CardItem *_startItem, CardItem *_targetItem)
 
 void ArrowItem::updatePath()
 {
-	color = QColor(255, 0, 0, 200);
 	QPointF endPoint = targetItem->mapToScene(QPointF(targetItem->boundingRect().width() / 2, targetItem->boundingRect().height() / 2));
 	updatePath(endPoint);
 }
@@ -32,6 +31,7 @@ void ArrowItem::updatePath(const QPointF &endPoint)
 	QLineF line(startPoint, endPoint);
 	qreal lineLength = line.length();
 	
+	prepareGeometryChange();
 	if (lineLength < headLength)
 		path = QPainterPath();
 	else {
@@ -51,12 +51,17 @@ void ArrowItem::updatePath(const QPointF &endPoint)
 
 void ArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-	painter->setBrush(color);
+	QColor paintColor(color);
+	if (fullColor)
+		paintColor.setAlpha(200);
+	else
+		paintColor.setAlpha(150);
+	painter->setBrush(paintColor);
 	painter->drawPath(path);
 }
 
 ArrowDragItem::ArrowDragItem(CardItem *_startItem)
-        : ArrowItem(_startItem)
+        : ArrowItem(-1, _startItem)
 {
 }
 
@@ -71,10 +76,11 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 if ((cursorItem = qgraphicsitem_cast<CardItem *>(colliding.at(i))))
                         break;
         if (!cursorItem) {
+		fullColor = false;
 		targetItem = 0;
 		updatePath(endPos);
-		color = QColor(190, 0, 0, 150);
 	} else {
+		fullColor = true;
 		targetItem = cursorItem;
 		updatePath();
 	}
@@ -92,7 +98,8 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
 			startItem->getId(),
 			targetZone->getPlayer()->getId(),
 			targetZone->getName(),
-			targetItem->getId()
+			targetItem->getId(),
+			color
 		);
 	}
 	deleteLater();

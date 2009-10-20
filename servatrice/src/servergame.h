@@ -49,13 +49,13 @@ public:
 	bool getGameStarted() const { return gameStarted; }
 	int getPlayerCount() const { return players.size(); }
 	const QList<ServerSocket *> &getPlayers() const { return players; }
+	ServerSocket *getPlayer(int playerId);
 	int getGameId() const { return gameId; }
 	QString getDescription() const { return description; }
 	QString getPassword() const { return password; }
 	int getMaxPlayers() const { return maxPlayers; }
 	bool getSpectatorsAllowed() const { return spectatorsAllowed; }
 	QString getGameListLine() const;
-	ServerSocket *getPlayer(int playerId);
 	ReturnMessage::ReturnCode checkJoin(const QString &_password, bool spectator);
 	void addPlayer(ServerSocket *player, bool spectator);
 	void removePlayer(ServerSocket *player);

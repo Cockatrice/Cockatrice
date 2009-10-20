@@ -137,6 +137,7 @@ Player *Game::addPlayer(int playerId, const QString &playerName, bool local)
 	connect(newPlayer, SIGNAL(logSetCardCounters(Player *, QString, int, int)), this, SIGNAL(logSetCardCounters(Player *, QString, int, int)));
 	connect(newPlayer, SIGNAL(logSetTapped(Player *, QString, bool)), this, SIGNAL(logSetTapped(Player *, QString, bool)));
 	connect(newPlayer, SIGNAL(logSetCounter(Player *, QString, int, int)), this, SIGNAL(logSetCounter(Player *, QString, int, int)));
+	connect(newPlayer, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString)), this, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString)));
 	connect(newPlayer, SIGNAL(logSetDoesntUntap(Player *, QString, bool)), this, SIGNAL(logSetDoesntUntap(Player *, QString, bool)));
 
 	players.insert(playerId, newPlayer);
@@ -200,6 +201,36 @@ void Game::counterListReceived(QList<ServerCounter> list)
 		if (!p)
 			continue;
 		p->addCounter(list[i].getId(), list[i].getName(), list[i].getColor(), list[i].getRadius(), list[i].getCount());
+	}
+}
+
+void Game::arrowListReceived(QList<ServerArrow> list)
+{
+	QMapIterator<int, Player *> i(players);
+	while (i.hasNext())
+		i.next().value()->clearArrows();
+	
+	for (int i = 0; i < list.size(); ++i) {
+		Player *p = players.value(list[i].getPlayerId(), 0);
+		if (!p)
+			continue;
+		
+		Player *startPlayer = players.value(list[i].getStartPlayerId(), 0);
+		Player *targetPlayer = players.value(list[i].getTargetPlayerId(), 0);
+		if (!startPlayer || !targetPlayer)
+			continue;
+		
+		CardZone *startZone = startPlayer->getZones().value(list[i].getStartZone(), 0);
+		CardZone *targetZone = targetPlayer->getZones().value(list[i].getTargetZone(), 0);
+		if (!startZone || !targetZone)
+			continue;
+		
+		CardItem *startCard = startZone->getCard(list[i].getStartCardId(), QString());
+		CardItem *targetCard = targetZone->getCard(list[i].getTargetCardId(), QString());
+		if (!startCard || !targetCard)
+			continue;
+
+		p->addArrow(list[i].getId(), startCard, targetCard, list[i].getColor());
 	}
 }
 
@@ -321,26 +352,8 @@ void Game::gameEvent(const ServerEventData &msg)
 			}
 			break;
 		}
-		case eventCreateArrow: {
-			const QStringList &data = msg.getEventData();
-			Player *startPlayer = players.value(data[0].toInt(), 0);
-			Player *targetPlayer = players.value(data[3].toInt(), 0);
-			if (!startPlayer || !targetPlayer)
-				break;
-			CardZone *startZone = startPlayer->getZones().value(data[1], 0);
-			CardZone *targetZone = targetPlayer->getZones().value(data[4], 0);
-			if (!startZone || !targetZone)
-				break;
-			CardItem *startCard = startZone->getCard(data[2].toInt(), QString());
-			CardItem *targetCard = targetZone->getCard(data[5].toInt(), QString());
-			if (!startCard || !targetCard)
-				break;
-			
-			emit logCreateArrow(p, startPlayer, startCard->getName(), targetPlayer, targetCard->getName());
-			ArrowItem *arrow = new ArrowItem(startCard, targetCard);
-			scene->addItem(arrow);
-			break;
-		}
+		case eventCreateArrow:
+		case eventDeleteArrow:
 		case eventCreateToken:
 		case eventSetupZones:
 		case eventSetCardAttr:
@@ -512,6 +525,7 @@ void Game::queryGameState()
 	connect(pc, SIGNAL(zoneListReceived(QList<ServerZone>)), this, SLOT(zoneListReceived(QList<ServerZone>)));
 	connect(pc, SIGNAL(cardListReceived(QList<ServerZoneCard>)), this, SLOT(cardListReceived(QList<ServerZoneCard>)));
 	connect(pc, SIGNAL(counterListReceived(QList<ServerCounter>)), this, SLOT(counterListReceived(QList<ServerCounter>)));
+	connect(pc, SIGNAL(arrowListReceived(QList<ServerArrow>)), this, SLOT(arrowListReceived(QList<ServerArrow>)));
 }
 
 void Game::activePlayerDrawCard()

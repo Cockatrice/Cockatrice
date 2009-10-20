@@ -109,6 +109,7 @@ void TableZone::resizeToContents()
 		xMax = minWidth;
 	int newWidth = xMax + 2 * marginX;
 	if (newWidth != width) {
+		prepareGeometryChange();
 		width = newWidth;
 		emit sizeChanged();
 	}

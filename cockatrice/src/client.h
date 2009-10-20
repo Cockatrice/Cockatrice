@@ -45,6 +45,7 @@ enum ServerEventType {
 	eventMoveCard,
 	eventCreateToken,
 	eventCreateArrow,
+	eventDeleteArrow,
 	eventSetCardAttr,
 	eventAddCounter,
 	eventSetCounter,
@@ -195,6 +196,31 @@ public:
 	int getCount() const { return count; }
 };
 
+class ServerArrow {
+private:
+	int id;
+	int playerId;
+	int startPlayerId;
+	QString startZone;
+	int startCardId;
+	int targetPlayerId;
+	QString targetZone;
+	int targetCardId;
+	QColor color;
+public:
+	ServerArrow(int _playerId, int _id, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, const QColor &_color)
+		: id(_id), playerId(_playerId), startPlayerId(_startPlayerId), startZone(_startZone), startCardId(_startCardId), targetPlayerId(_targetPlayerId), targetZone(_targetZone), targetCardId(_targetCardId), color(_color) { }
+	int getId() const { return id; }
+	int getPlayerId() const { return playerId; }
+	int getStartPlayerId() const { return startPlayerId; }
+	QString getStartZone() const { return startZone; }
+	int getStartCardId() const { return startCardId; }
+	int getTargetPlayerId() const { return targetPlayerId; }
+	QString getTargetZone() const { return targetZone; }
+	int getTargetCardId() const { return targetCardId; }
+	QColor getColor() const { return color; }
+};
+
 class PendingCommand : public QObject {
 	Q_OBJECT
 private:
@@ -288,17 +314,20 @@ private:
 	QList<ServerZone> zoneList;
 	QList<ServerZoneCard> cardList;
 	QList<ServerCounter> counterList;
+	QList<ServerArrow> arrowList;
 signals:
 	void playerListReceived(QList<ServerPlayer> _playerList);
 	void zoneListReceived(QList<ServerZone> _zoneList);
 	void cardListReceived(QList<ServerZoneCard> _cardList);
 	void counterListReceived(QList<ServerCounter> _counterList);
+	void arrowListReceived(QList<ServerArrow> _arrowList);
 public:
 	void responseReceived(ServerResponse resp);
 	void addPlayer(const ServerPlayer &player) { playerList.append(player); }
 	void addZone(const ServerZone &zone) { zoneList.append(zone); }
 	void addCard(const ServerZoneCard &card) { cardList.append(card); }
 	void addCounter(const ServerCounter &counter) { counterList.append(counter); }
+	void addArrow(const ServerArrow &arrow) { arrowList.append(arrow); }
 };
 
 class Client : public QObject {
@@ -346,6 +375,9 @@ public:
 
 	void connectToServer(const QString &hostname, unsigned int port, const QString &_playerName, const QString &_password);
 	void disconnectFromServer();
+
+	QColor numberToColor(int colorValue) const;
+	int colorToNumber(const QColor &color) const;
 public slots:
 	PendingCommand *chatListChannels();
 	PendingCommand_ChatJoinChannel *chatJoinChannel(const QString &name);
@@ -364,7 +396,7 @@ public slots:
 	PendingCommand *drawCards(unsigned int number);
 	PendingCommand *moveCard(int cardid, const QString &startzone, const QString &targetzone, int x, int y = 0, bool faceDown = false);
 	PendingCommand *createToken(const QString &zone, const QString &name, const QString &powtough, int x, int y);
-	PendingCommand *createArrow(int startPlayerId, const QString &startZone, int startCardId, int targetPlayerId, const QString &targetPlayerZone, int targetCardId);
+	PendingCommand *createArrow(int startPlayerId, const QString &startZone, int startCardId, int targetPlayerId, const QString &targetPlayerZone, int targetCardId, const QColor &color);
 	PendingCommand *setCardAttr(const QString &zone, int cardid, const QString &aname, const QString &avalue);
 	PendingCommand *readyStart();
 	PendingCommand *incCounter(int counterId, int delta);
