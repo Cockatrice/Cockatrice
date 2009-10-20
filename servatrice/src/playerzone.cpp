@@ -21,8 +21,8 @@
 #include "abstractrng.h"
 #include "card.h"
 
-PlayerZone::PlayerZone(const QString &_name, bool _has_coords, ZoneType _type)
-	: name(_name), has_coords(_has_coords), type(_type), cardsBeingLookedAt(0)
+PlayerZone::PlayerZone(ServerSocket *_player, const QString &_name, bool _has_coords, ZoneType _type)
+	: player(_player), name(_name), has_coords(_has_coords), type(_type), cardsBeingLookedAt(0)
 {
 }
 
@@ -48,8 +48,10 @@ Card *PlayerZone::getCard(int id, bool remove, int *position)
 		while (CardIterator.hasNext()) {
 			Card *tmp = CardIterator.next();
 			if (tmp->getId() == id) {
-				if (remove)
+				if (remove) {
 					cards.removeAt(i);
+					tmp->setZone(0);
+				}
 				if (position)
 					*position = i;
 				return tmp;
@@ -61,8 +63,10 @@ Card *PlayerZone::getCard(int id, bool remove, int *position)
 		if ((id >= cards.size()) || (id < 0))
 			return NULL;
 		Card *tmp = cards[id];
-		if (remove)
+		if (remove) {
 			cards.removeAt(id);
+			tmp->setZone(0);
+		}
 		if (position)
 			*position = id;
 		return tmp;
@@ -78,6 +82,7 @@ void PlayerZone::insertCard(Card *card, int x, int y)
 		card->setCoords(0, 0);
 		cards.insert(x, card);
 	}
+	card->setZone(this);
 }
 
 void PlayerZone::clear()

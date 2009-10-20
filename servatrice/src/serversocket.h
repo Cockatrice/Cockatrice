@@ -30,6 +30,7 @@ class Server;
 class ServerGame;
 class PlayerZone;
 class Counter;
+class Arrow;
 
 enum PlayerStatusEnum { StatusNormal, StatusSubmitDeck, StatusReadyStart, StatusPlaying };
 
@@ -70,6 +71,7 @@ private:
 	QStringList listZonesHelper(ServerSocket *player);
 	QStringList dumpZoneHelper(ServerSocket *player, PlayerZone *zone, int numberCards);
 	QStringList listCountersHelper(ServerSocket *player);
+	QStringList listArrowsHelper(ServerSocket *player);
 	
 	ReturnMessage::ReturnCode cmdPing(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdLogin(const QList<QVariant> &params);
@@ -91,6 +93,7 @@ private:
 	ReturnMessage::ReturnCode cmdMoveCard(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdCreateToken(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdCreateArrow(const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdDeleteArrow(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdSetCardAttr(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdIncCounter(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdAddCounter(const QList<QVariant> &params);
@@ -112,6 +115,7 @@ private:
 	QList<QString> SideboardList;
 	QList<PlayerZone *> zones;
 	QMap<int, Counter *> counters;
+	QList<Arrow *> arrows;
 	int playerId;
 	QString playerName;
 	bool spectator;
@@ -145,6 +149,7 @@ public:
 	bool getAcceptsChatChannelListChanges() const { return acceptsChatChannelListChanges; }
 	const QList<PlayerZone *> &getZones() const { return zones; }
 	const QMap<int, Counter *> &getCounters() const { return counters; }
+	const QList<Arrow *> &getArrows() const { return arrows; }
 	void setupZones();
 };
 

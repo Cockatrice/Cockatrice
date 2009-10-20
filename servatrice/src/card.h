@@ -22,8 +22,11 @@
 
 #include <QString>
 
+class PlayerZone;
+
 class Card {
 private:
+	PlayerZone *zone;
 	int id;
 	int coord_x, coord_y;
 	QString name;
@@ -36,6 +39,9 @@ private:
 public:
 	Card(QString _name, int _id, int _coord_x, int _coord_y);
 	~Card();
+	
+	PlayerZone *getZone() const { return zone; }
+	void setZone(PlayerZone *_zone) { zone = _zone; }
 	
 	int getId() const { return id; }
 	int getX() const { return coord_x; }

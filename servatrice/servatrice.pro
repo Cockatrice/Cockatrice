@@ -17,6 +17,7 @@ QT -= gui
 HEADERS += src/server.h src/servergame.h src/serversocket.h \
  src/playerzone.h \
  src/card.h \
+ src/arrow.h \
  src/version.h \
  src/counter.h \
  src/abstractrng.h \

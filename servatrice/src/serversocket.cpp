@@ -27,6 +27,7 @@
 #include "playerzone.h"
 #include "counter.h"
 #include "card.h"
+#include "arrow.h"
 #include "abstractrng.h"
 #include "chatchannel.h"
 
@@ -89,7 +90,15 @@ ServerSocket::ServerSocket(Server *_server, QObject *parent)
 			<< QVariant::Int
 			<< QVariant::Int
 			<< QVariant::String
+			<< QVariant::Int
 			<< QVariant::Int, &ServerSocket::cmdCreateArrow));
+		commandHash.insert("delete_arrow", CommandProperties(true, true, true, false, QList<QVariant::Type>()
+			<< QVariant::Int
+			<< QVariant::String
+			<< QVariant::Int
+			<< QVariant::Int
+			<< QVariant::String
+			<< QVariant::Int, &ServerSocket::cmdDeleteArrow));
 		commandHash.insert("set_card_attr", CommandProperties(true, true, true, false, QList<QVariant::Type>()
 			<< QVariant::String
 			<< QVariant::Int
@@ -137,6 +146,7 @@ ServerSocket::ServerSocket(Server *_server, QObject *parent)
 ServerSocket::~ServerSocket()
 {
 	qDebug("ServerSocket destructor");
+	clearZones();
 	// The socket has to be removed from the server's list before it is removed from the game's list
 	// so it will not receive the game update event.
 	server->removePlayer(this);
@@ -183,14 +193,14 @@ void ServerSocket::setupZones()
 	// ------------------------------------------------------------------
 
 	// Create zones
-	PlayerZone *deck = new PlayerZone("deck", false, PlayerZone::HiddenZone);
+	PlayerZone *deck = new PlayerZone(this, "deck", false, PlayerZone::HiddenZone);
 	zones << deck;
-	PlayerZone *sb = new PlayerZone("sb", false, PlayerZone::HiddenZone);
+	PlayerZone *sb = new PlayerZone(this, "sb", false, PlayerZone::HiddenZone);
 	zones << sb;
-	zones << new PlayerZone("table", true, PlayerZone::PublicZone);
-	zones << new PlayerZone("hand", false, PlayerZone::PrivateZone);
-	zones << new PlayerZone("grave", false, PlayerZone::PublicZone);
-	zones << new PlayerZone("rfg", false, PlayerZone::PublicZone);
+	zones << new PlayerZone(this, "table", true, PlayerZone::PublicZone);
+	zones << new PlayerZone(this, "hand", false, PlayerZone::PrivateZone);
+	zones << new PlayerZone(this, "grave", false, PlayerZone::PublicZone);
+	zones << new PlayerZone(this, "rfg", false, PlayerZone::PublicZone);
 
 	// ------------------------------------------------------------------
 
@@ -222,6 +232,10 @@ void ServerSocket::clearZones()
 	while (counterIterator.hasNext())
 		delete counterIterator.next().value();
 	counters.clear();
+	
+	for (int i = 0; i < arrows.size(); i++)
+		delete arrows.at(i);
+	arrows.clear();
 }
 
 void ServerSocket::leaveGame()
@@ -583,8 +597,47 @@ ReturnMessage::ReturnCode ServerSocket::cmdCreateArrow(const QList<QVariant> &pa
 	Card *targetCard = targetZone->getCard(params[5].toInt(), false);
 	if (!startCard || !targetCard || (startCard == targetCard))
 		return ReturnMessage::ReturnContextError;
+	for (int i = 0; i < arrows.size(); ++i)
+		if ((arrows[i]->getStartCard() == startCard) && (arrows[i]->getTargetCard() == targetCard))
+			return ReturnMessage::ReturnContextError;
+	int color = params[6].toInt();
 	
-	emit broadcastEvent(QString("create_arrow|%1|%2|%3|%4|%5|%6")
+	arrows.append(new Arrow(startCard, targetCard, color));
+	emit broadcastEvent(QString("create_arrow|%1|%2|%3|%4|%5|%6|%7")
+		.arg(startPlayer->getPlayerId())
+		.arg(startZone->getName())
+		.arg(startCard->getId())
+		.arg(targetPlayer->getPlayerId())
+		.arg(targetZone->getName())
+		.arg(targetCard->getId())
+		.arg(color), this
+	);
+	return ReturnMessage::ReturnOk;
+}
+
+ReturnMessage::ReturnCode ServerSocket::cmdDeleteArrow(const QList<QVariant> &params)
+{
+	ServerSocket *startPlayer = game->getPlayer(params[0].toInt());
+	ServerSocket *targetPlayer = game->getPlayer(params[3].toInt());
+	if (!startPlayer || !targetPlayer)
+		return ReturnMessage::ReturnContextError;
+	PlayerZone *startZone = startPlayer->getZone(params[1].toString());
+	PlayerZone *targetZone = targetPlayer->getZone(params[4].toString());
+	if (!startZone || !targetZone)
+		return ReturnMessage::ReturnContextError;
+	Card *startCard = startZone->getCard(params[2].toInt(), false);
+	Card *targetCard = targetZone->getCard(params[5].toInt(), false);
+	
+	Arrow *arrow = 0;
+	for (int i = 0; i < arrows.size(); ++i)
+		if ((arrows[i]->getStartCard() == startCard) && (arrows[i]->getTargetCard() == targetCard)) {
+			arrow = arrows.takeAt(i);
+			break;
+		}
+	if (!arrow)
+		return ReturnMessage::ReturnContextError;
+	
+	emit broadcastEvent(QString("delete_arrow|%1|%2|%3|%4|%5|%6")
 		.arg(startPlayer->getPlayerId())
 		.arg(startZone->getName())
 		.arg(startCard->getId())
@@ -810,6 +863,22 @@ ReturnMessage::ReturnCode ServerSocket::cmdSetActivePhase(const QList<QVariant> 
 	return ReturnMessage::ReturnOk;
 }
 
+QStringList ServerSocket::listArrowsHelper(ServerSocket *player)
+{
+	QStringList result;
+	const QList<Arrow *> &arrowList = player->getArrows();
+	for (int i = 0; i < arrowList.size(); ++i) {
+		Card *startCard = arrowList[i]->getStartCard();
+		Card *targetCard = arrowList[i]->getTargetCard();
+		PlayerZone *startZone = startCard->getZone();
+		PlayerZone *targetZone = targetCard->getZone();
+		ServerSocket *startPlayer = startZone->getPlayer();
+		ServerSocket *targetPlayer = targetZone->getPlayer();
+		result << QString("%1|%2|%3|%4|%5|%6|%7").arg(startPlayer->getPlayerName()).arg(startZone->getName()).arg(startCard->getId()).arg(targetPlayer->getPlayerName()).arg(targetZone->getName()).arg(targetCard->getId()).arg(arrowList[i]->getColor());
+	}
+	return result;
+}
+
 ReturnMessage::ReturnCode ServerSocket::cmdDumpAll(const QList<QVariant> &/*params*/)
 {
 	remsg->sendList(listPlayersHelper(), "list_players");
@@ -825,6 +894,7 @@ ReturnMessage::ReturnCode ServerSocket::cmdDumpAll(const QList<QVariant> &/*para
 					remsg->sendList(dumpZoneHelper(players[i], zones[j], -1), "dump_zone");
 			
 			remsg->sendList(listCountersHelper(players[i]), "list_counters");
+			remsg->sendList(listArrowsHelper(players[i]), "list_arrows");
 		}
 	}
 	remsg->send(ReturnMessage::ReturnOk);
