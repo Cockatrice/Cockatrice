@@ -5,18 +5,23 @@
 
 class CardItem;
 class QGraphicsSceneMouseEvent;
+class QMenu;
+class Player;
 
 class ArrowItem : public QObject, public QGraphicsItem {
 	Q_OBJECT
 private:
 	QPainterPath path;
+	QMenu *menu;
 protected:
+	Player *player;
 	int id;
 	CardItem *startItem, *targetItem;
 	QColor color;
 	bool fullColor;
+	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 public:
-	ArrowItem(int id, CardItem *_startItem = 0, CardItem *_targetItem = 0, const QColor &color = Qt::red);
+	ArrowItem(Player *_player, int _id, CardItem *_startItem, CardItem *_targetItem, const QColor &color);
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QRectF boundingRect() const { return path.boundingRect(); }
 	void updatePath();
@@ -32,7 +37,7 @@ public:
 class ArrowDragItem : public ArrowItem {
 	Q_OBJECT
 public:
-	ArrowDragItem(CardItem *_startItem);
+	ArrowDragItem(CardItem *_startItem, const QColor &_color);
 protected:
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);

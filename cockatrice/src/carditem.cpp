@@ -204,7 +204,16 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	if (event->buttons().testFlag(Qt::RightButton)) {
 		if ((event->screenPos() - event->buttonDownScreenPos(Qt::RightButton)).manhattanLength() < 2 * QApplication::startDragDistance())
 			return;
-		ArrowDragItem *arrow = new ArrowDragItem(this);
+		
+		QColor arrowColor = Qt::red;
+		if (event->modifiers().testFlag(Qt::ControlModifier))
+			arrowColor = Qt::yellow;
+		else if (event->modifiers().testFlag(Qt::AltModifier))
+			arrowColor = Qt::blue;
+		else if (event->modifiers().testFlag(Qt::ShiftModifier))
+			arrowColor = Qt::green;
+		
+		ArrowDragItem *arrow = new ArrowDragItem(this, arrowColor);
 		scene()->addItem(arrow);
 		arrow->grabMouse();
 	} else {

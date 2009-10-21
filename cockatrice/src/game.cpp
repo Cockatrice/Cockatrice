@@ -433,7 +433,6 @@ void Game::cardMenuAction()
 	QList<QGraphicsItem *> sel = scene->selectedItems();
 	while (!sel.isEmpty()) {
 		unsigned int i = (unsigned int) (((double) sel.size()) * qrand() / (RAND_MAX + 1.0));
-		qDebug(QString("%1 items left, i=%2").arg(sel.size()).arg(i).toLatin1());
 		CardItem *card = qgraphicsitem_cast<CardItem *>(sel.takeAt(i));
 		// For each item, the handler function is called.
 		(this->*handler)(card);

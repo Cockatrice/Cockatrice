@@ -20,6 +20,7 @@
 #include "server.h"
 #include "servergame.h"
 #include "serversocket.h"
+#include "arrow.h"
 #include <QSqlQuery>
 
 ServerGame::ServerGame(ServerSocket *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent)
@@ -170,6 +171,15 @@ void ServerGame::setActivePlayer(int _activePlayer)
 
 void ServerGame::setActivePhase(int _activePhase)
 {
+	for (int i = 0; i < players.size(); ++i) {
+		QMapIterator<int, Arrow *> arrowIterator(players[i]->getArrows());
+		while (arrowIterator.hasNext()) {
+			Arrow *a = arrowIterator.next().value();
+			broadcastEvent(QString("delete_arrow|%1").arg(a->getId()), players[i]);
+			players[i]->deleteArrow(a->getId());
+		}
+	}
+	
 	activePhase = _activePhase;
 	broadcastEvent(QString("set_active_phase|%1").arg(_activePhase), NULL);
 }

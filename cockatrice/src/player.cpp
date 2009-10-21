@@ -725,7 +725,7 @@ void Player::clearCounters()
 
 void Player::addArrow(int arrowId, CardItem *startCard, CardItem *targetCard, const QColor &color)
 {
-	ArrowItem *arrow = new ArrowItem(arrowId, startCard, targetCard, color);
+	ArrowItem *arrow = new ArrowItem(this, arrowId, startCard, targetCard, color);
 	arrows.insert(arrowId, arrow);
 	scene()->addItem(arrow);
 }

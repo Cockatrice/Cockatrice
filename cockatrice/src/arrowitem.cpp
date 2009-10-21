@@ -7,8 +7,8 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsScene>
 
-ArrowItem::ArrowItem(int _id, CardItem *_startItem, CardItem *_targetItem, const QColor &_color)
-        : QGraphicsItem(), id(_id), startItem(_startItem), targetItem(_targetItem), color(_color), fullColor(true)
+ArrowItem::ArrowItem(Player *_player, int _id, CardItem *_startItem, CardItem *_targetItem, const QColor &_color)
+        : QGraphicsItem(), player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), color(_color), fullColor(true)
 {
 	setZValue(2000000005);
 	if (startItem && targetItem)
@@ -60,14 +60,32 @@ void ArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 	painter->drawPath(path);
 }
 
-ArrowDragItem::ArrowDragItem(CardItem *_startItem)
-        : ArrowItem(-1, _startItem)
+void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+	if (!player->getLocal()) {
+		event->ignore();
+		return;
+	}
+	
+	QList<QGraphicsItem *> colliding = scene()->items(event->scenePos());
+	for (int i = 0; i < colliding.size(); ++i)
+		if (qgraphicsitem_cast<CardItem *>(colliding[i])) {
+			event->ignore();
+			return;
+		}
+	
+	event->accept();
+	if (event->button() == Qt::RightButton)
+		player->client->deleteArrow(id);
+}
+
+ArrowDragItem::ArrowDragItem(CardItem *_startItem, const QColor &_color)
+        : ArrowItem(static_cast<CardZone *>(_startItem->parentItem())->getPlayer(), -1, _startItem, 0, _color)
 {
 }
 
 void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-	event->accept();
 	QPointF endPos = event->scenePos();
 	
 	QList<QGraphicsItem *> colliding = scene()->items(endPos);
@@ -92,7 +110,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
 	if (targetItem && (targetItem != startItem)) {
 		CardZone *startZone = static_cast<CardZone *>(startItem->parentItem());
 		CardZone *targetZone = static_cast<CardZone *>(targetItem->parentItem());
-		startZone->getPlayer()->client->createArrow(
+		player->client->createArrow(
 			startZone->getPlayer()->getId(),
 			startZone->getName(),
 			startItem->getId(),

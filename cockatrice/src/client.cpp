@@ -518,6 +518,11 @@ PendingCommand *Client::createArrow(int startPlayerId, const QString &startZone,
 	return cmd(QString("create_arrow|%1|%2|%3|%4|%5|%6|%7").arg(startPlayerId).arg(startZone).arg(startCardId).arg(targetPlayerId).arg(targetPlayerZone).arg(targetCardId).arg(colorToNumber(color)));
 }
 
+PendingCommand *Client::deleteArrow(int arrowId)
+{
+	return cmd(QString("delete_arrow|%1").arg(arrowId));
+}
+
 PendingCommand *Client::setCardAttr(const QString &zone, int cardid, const QString &aname, const QString &avalue)
 {
 	return cmd(QString("set_card_attr|%1|%2|%3|%4").arg(zone).arg(cardid).arg(aname).arg(avalue));

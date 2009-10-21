@@ -397,6 +397,7 @@ public slots:
 	PendingCommand *moveCard(int cardid, const QString &startzone, const QString &targetzone, int x, int y = 0, bool faceDown = false);
 	PendingCommand *createToken(const QString &zone, const QString &name, const QString &powtough, int x, int y);
 	PendingCommand *createArrow(int startPlayerId, const QString &startZone, int startCardId, int targetPlayerId, const QString &targetPlayerZone, int targetCardId, const QColor &color);
+	PendingCommand *deleteArrow(int arrowId);
 	PendingCommand *setCardAttr(const QString &zone, int cardid, const QString &aname, const QString &avalue);
 	PendingCommand *readyStart();
 	PendingCommand *incCounter(int counterId, int delta);
