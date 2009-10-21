@@ -23,6 +23,8 @@ Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenuBar *menu
 	connect(aNextPhase, SIGNAL(triggered()), this, SLOT(actNextPhase()));
 	aNextTurn = new QAction(this);
 	connect(aNextTurn, SIGNAL(triggered()), this, SLOT(actNextTurn()));
+	aRemoveLocalArrows = new QAction(this);
+	connect(aRemoveLocalArrows, SIGNAL(triggered()), this, SLOT(actRemoveLocalArrows()));
 	aTap = new QAction(this);
 	aUntap = new QAction(this);
 	aDoesntUntap = new QAction(this);
@@ -39,6 +41,8 @@ Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenuBar *menu
 	gameMenu = menuBar->addMenu(QString());
 	gameMenu->addAction(aNextPhase);
 	gameMenu->addAction(aNextTurn);
+	gameMenu->addSeparator();
+	gameMenu->addAction(aRemoveLocalArrows);
 	
 	cardMenu = menuBar->addMenu(QString());
 	cardMenu->addAction(aTap);
@@ -104,6 +108,8 @@ void Game::retranslateUi()
 	aNextPhase->setShortcut(tr("Ctrl+Space"));
 	aNextTurn->setText(tr("Next &turn"));
 	aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
+	aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
+	aRemoveLocalArrows->setShortcut(tr("Ctrl+R"));
 	
 	cardMenu->setTitle(tr("C&ard"));
 	aTap->setText(tr("&Tap"));
@@ -417,6 +423,19 @@ void Game::actNextPhase()
 void Game::actNextTurn()
 {
 	client->nextTurn();
+}
+
+void Game::actRemoveLocalArrows()
+{
+	for (int i = 0; i < players.size(); ++i) {
+		if (!players[i]->getLocal())
+			continue;
+		QMapIterator<int, ArrowItem *> arrowIterator(players[i]->getArrows());
+		while (arrowIterator.hasNext()) {
+			ArrowItem *a = arrowIterator.next().value();
+			players[i]->client->deleteArrow(a->getId());
+		}
+	}
 }
 
 void Game::showCardMenu(QPoint p)

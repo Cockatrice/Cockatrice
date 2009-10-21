@@ -28,7 +28,7 @@ private:
 	QMenu *gameMenu, *cardMenu, *moveMenu;
 	QAction *aTap, *aUntap, *aDoesntUntap, *aFlip, *aAddCounter, *aRemoveCounter, *aSetCounters,
 		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile,
-		*aNextPhase, *aNextTurn;
+		*aNextPhase, *aNextTurn, *aRemoveLocalArrows;
 	DlgStartGame *dlgStartGame;
 
 	CardDatabase *db;
@@ -46,6 +46,7 @@ public slots:
 	
 	void actNextPhase();
 	void actNextTurn();
+	void actRemoveLocalArrows();
 private slots:
 	void cardMenuAction();
 
