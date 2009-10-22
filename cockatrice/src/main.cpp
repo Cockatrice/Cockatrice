@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 {
 //	qInstallMsgHandler(myMessageOutput);
 	QApplication app(argc, argv);
-	app.addLibraryPath("plugins");
+	app.addLibraryPath(app.applicationDirPath() + "/plugins");
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
 	QCoreApplication::setOrganizationName("Cockatrice");
@@ -73,10 +73,8 @@ int main(int argc, char *argv[])
 	MainWindow ui(&translator);
 	qDebug("main(): MainWindow constructor finished");
 	
-	//set Icon
-	QIcon icon("resources/icon.svg");
+	QIcon icon(":/resources/icon.svg");
 	ui.setWindowIcon(icon);
-	//
 	
 	ui.show();
 	qDebug("main(): ui.show() finished");

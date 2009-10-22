@@ -8,7 +8,6 @@ Counter::Counter(Player *_player, int _id, const QString &_name, QColor _color, 
 {
 	if (radius > Player::counterAreaWidth / 2)
 		radius = Player::counterAreaWidth / 2;
-	
 	if (player->getLocal()) {
 		menu = new QMenu(name);
 		aSet = new QAction(this);
