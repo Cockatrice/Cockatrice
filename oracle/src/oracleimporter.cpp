@@ -7,8 +7,13 @@
 OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent)
 	: CardDatabase(parent), dataDir(_dataDir), setIndex(-1)
 {
-	QFile setsFile(dataDir + "/sets.xml");
-		setsFile.open(QIODevice::ReadOnly | QIODevice::Text);
+	QString fileName = dataDir + "/sets.xml";
+	QFile setsFile(fileName);
+	if (!setsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		QMessageBox::critical(0, tr("Error"), tr("Cannot open file '%1'.").arg(fileName));
+		return;
+	}
+
 	QXmlStreamReader xml(&setsFile);
 	QString edition;
 	QString editionLong;

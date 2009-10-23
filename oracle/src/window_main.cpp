@@ -5,7 +5,7 @@
 WindowMain::WindowMain(QWidget *parent)
 	: QMainWindow(parent)
 {
-	importer = new OracleImporter(qApp->applicationDirPath() + "../oracle", this);
+	importer = new OracleImporter(qApp->applicationDirPath() + "/../oracle", this);
 	
 	QVBoxLayout *checkboxLayout = new QVBoxLayout;
 	QList<SetToDownload> &sets = importer->getSets();
