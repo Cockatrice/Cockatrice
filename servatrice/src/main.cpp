@@ -18,10 +18,12 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-
 #include <QCoreApplication>
 #include <QTextCodec>
 #include "server.h"
+#include "rng_qt.h"
+
+AbstractRNG *rng;
 
 int main(int argc, char *argv[])
 {
@@ -31,6 +33,8 @@ int main(int argc, char *argv[])
 	
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
+	rng = new RNG_Qt;
+	
 	Server server;
 	server.listen(QHostAddress::Any, 4747);
 	

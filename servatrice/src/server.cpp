@@ -21,7 +21,6 @@
 #include "servergame.h"
 #include "serversocket.h"
 #include "counter.h"
-#include "rng_qt.h"
 #include "chatchannel.h"
 #include <QtSql>
 #include <QSettings>
@@ -29,8 +28,6 @@
 Server::Server(QObject *parent)
 	: QTcpServer(parent), nextGameId(0)
 {
-	rng = new RNG_Qt(this);
-	
 	settings = new QSettings("servatrice.ini", QSettings::IniFormat, this);
 
 	QString dbType = settings->value("database/type").toString();
@@ -40,15 +37,14 @@ Server::Server(QObject *parent)
 	int size = settings->beginReadArray("chatchannels");
 	for (int i = 0; i < size; ++i) {
 	  	settings->setArrayIndex(i);
-		chatChannelList << new ChatChannel(settings->value("name").toString(),
+		ChatChannel *newChannel = new ChatChannel(settings->value("name").toString(),
 						   settings->value("description").toString(),
 						   settings->value("autojoin").toBool(),
 						   settings->value("joinmessage").toStringList());
+		chatChannels.insert(newChannel->getName(), newChannel);
+	  	connect(newChannel, SIGNAL(channelInfoChanged()), this, SLOT(broadcastChannelUpdate()));
 	}
 	settings->endArray();
-	
-	for (int i = 0; i < chatChannelList.size(); ++i)
-	  	connect(chatChannelList[i], SIGNAL(channelInfoChanged()), this, SLOT(broadcastChannelUpdate()));
 	
 	loginMessage = settings->value("messages/login").toStringList();
 }
@@ -85,14 +81,15 @@ bool Server::openDatabase()
 	return true;
 }
 
-void Server::addGame(const QString description, const QString password, int maxPlayers, bool spectatorsAllowed, ServerSocket *creator)
+ServerGame *Server::createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, const QString &creator)
 {
 	ServerGame *newGame = new ServerGame(creator, nextGameId++, description, password, maxPlayers, spectatorsAllowed, this);
 	games.insert(newGame->getGameId(), newGame);
 	connect(newGame, SIGNAL(gameClosing()), this, SLOT(gameClosing()));
-	newGame->addPlayer(creator, false);
 	
 	broadcastGameListUpdate(newGame);
+	
+	return newGame;
 }
 
 void Server::incomingConnection(int socketId)

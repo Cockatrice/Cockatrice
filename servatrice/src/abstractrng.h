@@ -10,4 +10,6 @@ public:
 	virtual unsigned int getNumber(unsigned int min, unsigned int max) = 0;
 };
 
+extern AbstractRNG *rng;
+
 #endif

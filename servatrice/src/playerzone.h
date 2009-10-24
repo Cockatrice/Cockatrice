@@ -25,7 +25,7 @@
 
 class Card;
 class ServerSocket;
-class AbstractRNG;
+class Player;
 
 class PlayerZone {
 public:
@@ -39,13 +39,13 @@ public:
 	// list index, whereas cards in any other zone are referenced by their ids.
 	enum ZoneType { PrivateZone, PublicZone, HiddenZone };
 private:
-	ServerSocket *player;
+	Player *player;
 	QString name;
 	bool has_coords;
 	ZoneType type;
 	int cardsBeingLookedAt;
 public:
-	PlayerZone(ServerSocket *_player, const QString &_name, bool _has_coords, ZoneType _type);
+	PlayerZone(Player *_player, const QString &_name, bool _has_coords, ZoneType _type);
 	~PlayerZone();
 
 	Card *getCard(int id, bool remove, int *position = NULL);
@@ -55,11 +55,11 @@ public:
 	bool hasCoords() const { return has_coords; }
 	ZoneType getType() const { return type; }
 	QString getName() const { return name; }
-	ServerSocket *getPlayer() const { return player; }
+	Player *getPlayer() const { return player; }
 	
 	QList<Card *> cards;
 	void insertCard(Card *card, int x, int y);
-	void shuffle(AbstractRNG *rnd);
+	void shuffle();
 	void clear();
 };
 

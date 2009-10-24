@@ -23,7 +23,8 @@ HEADERS += src/server.h src/servergame.h src/serversocket.h \
  src/abstractrng.h \
  src/rng_qt.h \
  src/returnmessage.h \
- src/chatchannel.h
+ src/chatchannel.h \
+ src/player.h
 SOURCES += src/main.cpp \
            src/server.cpp \
            src/servergame.cpp \
@@ -33,4 +34,5 @@ SOURCES += src/main.cpp \
  src/counter.cpp \
  src/rng_qt.cpp \
  src/returnmessage.cpp \
- src/chatchannel.cpp
+ src/chatchannel.cpp \
+ src/player.cpp

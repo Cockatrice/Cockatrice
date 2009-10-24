@@ -22,15 +22,16 @@
 
 #include <QStringList>
 #include <QPointer>
+#include "player.h"
 #include "returnmessage.h"
 #include "serversocket.h"
 
 class ServerGame : public QObject {
 	Q_OBJECT
 private:
-	QPointer<ServerSocket> creator;
-	QList<ServerSocket *> players;
-	QList<ServerSocket *> spectators;
+	QPointer<Player> creator;
+	QMap<int, Player *> players;
+	QList<Player *> spectators;
 	bool gameStarted;
 	int gameId;
 	QString description;
@@ -40,16 +41,14 @@ private:
 	bool spectatorsAllowed;
 signals:
 	void gameClosing();
-public slots:
-	void broadcastEvent(const QString &eventStr, ServerSocket *player);
 public:
-	ServerGame(ServerSocket *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent = 0);
+	ServerGame(const QString &_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent = 0);
 	~ServerGame();
-	ServerSocket *getCreator() const { return creator; }
+	Player *getCreator() const { return creator; }
 	bool getGameStarted() const { return gameStarted; }
 	int getPlayerCount() const { return players.size(); }
-	const QList<ServerSocket *> &getPlayers() const { return players; }
-	ServerSocket *getPlayer(int playerId);
+	QList<Player *> getPlayers() const { return players.values(); }
+	Player *getPlayer(int playerId) const { return players.value(playerId, 0); }
 	int getGameId() const { return gameId; }
 	QString getDescription() const { return description; }
 	QString getPassword() const { return password; }
@@ -57,13 +56,15 @@ public:
 	bool getSpectatorsAllowed() const { return spectatorsAllowed; }
 	QString getGameListLine() const;
 	ReturnMessage::ReturnCode checkJoin(const QString &_password, bool spectator);
-	void addPlayer(ServerSocket *player, bool spectator);
-	void removePlayer(ServerSocket *player);
+	Player *addPlayer(const QString &playerName, bool spectator);
+	void removePlayer(Player *player);
 	void startGameIfReady();
 	int getActivePlayer() const { return activePlayer; }
 	int getActivePhase() const { return activePhase; }
 	void setActivePlayer(int _activePlayer);
 	void setActivePhase(int _activePhase);
+
+	void broadcastEvent(const QString &eventStr, Player *player);
 };
 
 #endif

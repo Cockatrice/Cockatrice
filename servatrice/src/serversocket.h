@@ -28,11 +28,10 @@
 
 class Server;
 class ServerGame;
+class Player;
 class PlayerZone;
 class Counter;
 class Arrow;
-
-enum PlayerStatusEnum { StatusNormal, StatusSubmitDeck, StatusReadyStart, StatusPlaying };
 
 class ServerSocket : public QTcpSocket
 {
@@ -41,92 +40,112 @@ private slots:
 	void readClient();
 	void catchSocketError(QAbstractSocket::SocketError socketError);
 signals:
-	void createGame(const QString description, const QString password, int maxPlayers, bool spectatorsAllowed, ServerSocket *creator);
 	void commandReceived(QString cmd, ServerSocket *player);
-	void broadcastEvent(const QString &event, ServerSocket *player);
 	void startGameIfReady();
 private:
-	typedef ReturnMessage::ReturnCode (ServerSocket::*CommandHandler)(const QList<QVariant> &);
+	typedef ReturnMessage::ReturnCode (ServerSocket::*GameCommandHandler)(ServerGame *game, Player *player, const QList<QVariant> &);
+	typedef ReturnMessage::ReturnCode (ServerSocket::*ChatCommandHandler)(ChatChannel *channel, const QList<QVariant> &);
+	typedef ReturnMessage::ReturnCode (ServerSocket::*GenericCommandHandler)(const QList<QVariant> &);
+	
 	class CommandProperties {
+	public:
+		enum CommandType { ChatCommand, GameCommand, GenericCommand };
 	private:
+		CommandType type;
 		bool needsLogin;
-		bool needsGame;
+		QList<QVariant::Type> paramTypes;
+	protected:
+		QList<QVariant> getParamList(const QStringList &params) const;
+	public:
+		CommandProperties(CommandType _type, bool _needsLogin, const QList<QVariant::Type> &_paramTypes)
+			: type(_type), needsLogin(_needsLogin), paramTypes(_paramTypes) { }
+		bool getNeedsLogin() const { return needsLogin; }
+		CommandType getType() const { return type; }
+		const QList<QVariant::Type> &getParamTypes() const { return paramTypes; }
+		virtual ReturnMessage::ReturnCode exec(ServerSocket *s, QStringList &params) = 0;
+	};
+	class ChatCommandProperties : public CommandProperties {
+	private:
+		ChatCommandHandler handler;
+	public:
+		ChatCommandProperties(const QList<QVariant::Type> &_paramTypes, ChatCommandHandler _handler)
+			: CommandProperties(ChatCommand, true, _paramTypes), handler(_handler) { }
+		ReturnMessage::ReturnCode exec(ServerSocket *s, QStringList &params);
+	};
+	class GameCommandProperties : public CommandProperties {
+	private:
 		bool needsStartedGame;
 		bool allowedToSpectator;
-		QList<QVariant::Type> paramTypes;
-		CommandHandler handler;
+		GameCommandHandler handler;
 	public:
-		CommandProperties(bool _needsLogin = false, bool _needsGame = false, bool _needsStartedGame = false, bool _allowedToSpectator = false, const QList<QVariant::Type> &_paramTypes = QList<QVariant::Type>(), CommandHandler _handler = 0)
-			: needsLogin(_needsLogin), needsGame(_needsGame), needsStartedGame(_needsStartedGame), allowedToSpectator(_allowedToSpectator), paramTypes(_paramTypes), handler(_handler) { }
-		bool getNeedsLogin() const { return needsLogin; }
-		bool getNeedsGame() const { return needsGame; }
+		GameCommandProperties(bool _needsStartedGame, bool _allowedToSpectator, const QList<QVariant::Type> &_paramTypes, GameCommandHandler _handler)
+			: CommandProperties(GameCommand, true, _paramTypes), needsStartedGame(_needsStartedGame), allowedToSpectator(_allowedToSpectator), handler(_handler) { }
 		bool getNeedsStartedGame() const { return needsStartedGame; }
 		bool getAllowedToSpectator() const { return allowedToSpectator; }
-		const QList<QVariant::Type> &getParamTypes() const { return paramTypes; }
-		CommandHandler getHandler() const { return handler; }
+		ReturnMessage::ReturnCode exec(ServerSocket *s, QStringList &params);
 	};
-	static QHash<QString, CommandProperties> commandHash;
+	class GenericCommandProperties : public CommandProperties {
+	private:
+		GenericCommandHandler handler;
+	public:
+		GenericCommandProperties(bool _needsLogin, const QList<QVariant::Type> &_paramTypes, GenericCommandHandler _handler)
+			: CommandProperties(GenericCommand, _needsLogin, _paramTypes), handler(_handler) { }
+		ReturnMessage::ReturnCode exec(ServerSocket *s, QStringList &params);
+	};
+	static QHash<QString, CommandProperties *> commandHash;
 
-	QStringList listPlayersHelper();
-	QStringList listZonesHelper(ServerSocket *player);
-	QStringList dumpZoneHelper(ServerSocket *player, PlayerZone *zone, int numberCards);
-	QStringList listCountersHelper(ServerSocket *player);
-	QStringList listArrowsHelper(ServerSocket *player);
+	QStringList listPlayersHelper(ServerGame *game, Player *player);
+	QStringList listZonesHelper(Player *player);
+	QStringList dumpZoneHelper(Player *player, PlayerZone *zone, int numberCards);
+	QStringList listCountersHelper(Player *player);
+	QStringList listArrowsHelper(Player *player);
 	
 	ReturnMessage::ReturnCode cmdPing(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdLogin(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdChatListChannels(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdChatJoinChannel(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdChatLeaveChannel(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdChatSay(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdListGames(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdCreateGame(const QList<QVariant> &params);
 	ReturnMessage::ReturnCode cmdJoinGame(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdLeaveGame(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdListPlayers(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdSay(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdSubmitDeck(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdReadyStart(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdShuffle(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdDrawCards(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdRevealCard(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdMoveCard(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdCreateToken(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdCreateArrow(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdDeleteArrow(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdSetCardAttr(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdIncCounter(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdAddCounter(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdSetCounter(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdDelCounter(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdListCounters(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdListZones(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdDumpZone(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdStopDumpZone(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdRollDie(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdNextTurn(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdSetActivePhase(const QList<QVariant> &params);
-	ReturnMessage::ReturnCode cmdDumpAll(const QList<QVariant> &params);
+	
+	ReturnMessage::ReturnCode cmdChatLeaveChannel(ChatChannel *channel, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdChatSay(ChatChannel *channel, const QList<QVariant> &params);
+	
+	ReturnMessage::ReturnCode cmdLeaveGame(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdListPlayers(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdSay(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdSubmitDeck(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdReadyStart(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdShuffle(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdDrawCards(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdRevealCard(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdMoveCard(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdCreateToken(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdCreateArrow(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdDeleteArrow(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdSetCardAttr(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdIncCounter(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdAddCounter(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdSetCounter(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdDelCounter(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdListCounters(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdListZones(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdDumpZone(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdStopDumpZone(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdRollDie(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdNextTurn(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdSetActivePhase(ServerGame *game, Player *player, const QList<QVariant> &params);
+	ReturnMessage::ReturnCode cmdDumpAll(ServerGame *game, Player *player, const QList<QVariant> &params);
 
 	Server *server;
-	ServerGame *game;
-	QList<ChatChannel *> chatChannels;
-	QList<QString> DeckList;
-	QList<QString> SideboardList;
-	QList<PlayerZone *> zones;
-	QMap<int, Counter *> counters;
-	QMap<int, Arrow *> arrows;
-	int playerId;
+	QMap<int, QPair<ServerGame *, Player *> > games;
+	QMap<QString, ChatChannel *> chatChannels;
 	QString playerName;
-	bool spectator;
-	int nextCardId;
-	int newCardId();
-	int newCounterId() const;
-	int newArrowId() const;
-	PlayerZone *getZone(const QString &name) const;
-	void clearZones();
-	bool parseCommand(QString line);
-	PlayerStatusEnum PlayerStatus;
+	
+	Server *getServer() const { return server; }
+	QPair<ServerGame *, Player *> getGame(int gameId) const;
+	
+	bool parseCommand(const QString &line);
 	ReturnMessage *remsg;
 	AuthenticationResult authState;
 	bool acceptsGameListChanges;
@@ -135,24 +154,10 @@ public:
 	ServerSocket(Server *_server, QObject *parent = 0);
 	~ServerSocket();
 	void msg(const QString &s);
-	void privateEvent(const QString &line);
-	void publicEvent(const QString &line, ServerSocket *player = 0);
-	void setGame(ServerGame *g) { game = g; }
-	void leaveGame();
-	PlayerStatusEnum getStatus() { return PlayerStatus; }
-	void setStatus(PlayerStatusEnum _status) { PlayerStatus = _status; }
 	void initConnection();
-	int getPlayerId() const { return playerId; }
-	void setPlayerId(int _id) { playerId = _id; }
-	bool getSpectator() const { return spectator; }
-	QString getPlayerName() const { return playerName; }
 	bool getAcceptsGameListChanges() const { return acceptsGameListChanges; }
 	bool getAcceptsChatChannelListChanges() const { return acceptsChatChannelListChanges; }
-	const QList<PlayerZone *> &getZones() const { return zones; }
-	const QMap<int, Counter *> &getCounters() const { return counters; }
-	const QMap<int, Arrow *> &getArrows() const { return arrows; }
-	bool deleteArrow(int arrowId);
-	void setupZones();
+	const QString &getPlayerName() const { return playerName; }
 };
 
 #endif

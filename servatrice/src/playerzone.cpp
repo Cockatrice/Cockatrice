@@ -21,7 +21,7 @@
 #include "abstractrng.h"
 #include "card.h"
 
-PlayerZone::PlayerZone(ServerSocket *_player, const QString &_name, bool _has_coords, ZoneType _type)
+PlayerZone::PlayerZone(Player *_player, const QString &_name, bool _has_coords, ZoneType _type)
 	: player(_player), name(_name), has_coords(_has_coords), type(_type), cardsBeingLookedAt(0)
 {
 }
@@ -32,11 +32,11 @@ PlayerZone::~PlayerZone()
 	clear();
 }
 
-void PlayerZone::shuffle(AbstractRNG *rnd)
+void PlayerZone::shuffle()
 {
 	QList<Card *> temp;
 	for (int i = cards.size(); i; i--)
-		temp.append(cards.takeAt(rnd->getNumber(0, i - 1)));
+		temp.append(cards.takeAt(rng->getNumber(0, i - 1)));
 	cards = temp;
 }
 

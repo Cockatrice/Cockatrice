@@ -27,7 +27,6 @@ class ServerGame;
 class ServerSocket;
 class QSqlDatabase;
 class QSettings;
-class AbstractRNG;
 class ChatChannel;
 
 enum AuthenticationResult { PasswordWrong = 0, PasswordRight = 1, UnknownUser = 2 };
@@ -36,7 +35,6 @@ class Server : public QTcpServer
 {
 	Q_OBJECT
 private slots:
-	void addGame(const QString description, const QString password, int maxPlayers, bool spectatorsAllowed, ServerSocket *creator);
 	void gameClosing();
 	void broadcastChannelUpdate();
 public:
@@ -47,19 +45,18 @@ public:
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
 	QList<ServerGame *> getGames() const { return games.values(); }
 	ServerGame *getGame(int gameId) const;
-	QList<ChatChannel *> getChatChannelList() { return chatChannelList; }
-	AbstractRNG *getRNG() const { return rng; }
+	const QMap<QString, ChatChannel *> &getChatChannels() { return chatChannels; }
 	void broadcastGameListUpdate(ServerGame *game);
 	void removePlayer(ServerSocket *player);
 	const QStringList &getLoginMessage() const { return loginMessage; }
+	ServerGame *createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, const QString &playerName);
 private:
 	void incomingConnection(int SocketId);
 	QMap<int, ServerGame *> games;
 	QList<ServerSocket *> players;
-	QList<ChatChannel *> chatChannelList;
+	QMap<QString, ChatChannel *> chatChannels;
 	int nextGameId;
 	QStringList loginMessage;
-	AbstractRNG *rng;
 };
 
 #endif
