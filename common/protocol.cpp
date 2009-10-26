@@ -2,7 +2,7 @@
 #include <QXmlStreamWriter>
 #include <QDebug>
 #include "protocol.h"
-#include "protocol_commands.h"
+#include "protocol_items.h"
 
 QHash<QString, ProtocolItem::NewItemFunction> ProtocolItem::itemNameHash;
 
@@ -113,4 +113,24 @@ void ProtocolResponse::initializeHash()
 	responseHash.insert("context_error", RespContextError);
 	responseHash.insert("wrong_password", RespWrongPassword);
 	responseHash.insert("spectators_not_allowed", RespSpectatorsNotAllowed);
+}
+
+void GameEvent::extractParameters()
+{
+	bool ok;
+	gameId = parameters["game_id"].toInt(&ok);
+	if (!ok)
+		gameId = -1;
+	isPublic = parameters["is_public"].toInt();
+	playerId = parameters["player_id"].toInt(&ok);
+	if (!ok)
+		playerId = -1;
+}
+
+GameEvent::GameEvent(const QString &_eventName, int _gameId, bool _isPublic, int _playerId)
+	: ProtocolItem(_eventName), gameId(_gameId), isPublic(_isPublic), playerId(_playerId)
+{
+	setParameter("game_id", gameId);
+	setParameter("is_public", isPublic);
+	setParameter("player_id", playerId);
 }

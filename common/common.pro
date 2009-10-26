@@ -8,7 +8,7 @@ DEPENDPATH += .
 INCLUDEPATH += .
 
 # Input
-HEADERS += protocol.h widget.h protocol_commands.h
-SOURCES += main.cpp protocol.cpp widget.cpp protocol_commands.cpp
+HEADERS += protocol.h widget.h protocol_items.h
+SOURCES += main.cpp protocol.cpp widget.cpp protocol_items.cpp
 
 CONFIG += qt debug

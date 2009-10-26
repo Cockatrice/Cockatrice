@@ -9,7 +9,6 @@ QHash<QString, ServerEventType> ServerEventData::eventHash;
 ServerEventData::ServerEventData(const QString &line)
 {
 	if (eventHash.isEmpty()) {
-		eventHash.insert("player_id", eventPlayerId);
 		eventHash.insert("say", eventSay);
 		eventHash.insert("join", eventJoin);
 		eventHash.insert("leave", eventLeave);
@@ -187,19 +186,7 @@ void Client::readLine()
 		// prefix is one of {welcome, private, public, resp, list_games, list_players, list_counters, list_zones, dump_zone}
 		if ((prefix == "private") || (prefix == "public")) {
 			ServerEventData event(line);
-			if (event.getEventType() == eventPlayerId) {
-				QStringList data = event.getEventData();
-				if (data.size() != 2) {
-					// XXX
-				}
-				bool ok;
-				int id = data[0].toInt(&ok);
-				if (!ok) {
-					// XXX
-				}
-				emit playerIdReceived(id, data[1]);
-			} else
-				emit gameEvent(event);
+			emit gameEvent(event);
 		} else if (prefix == "chat") {
 			emit chatEvent(ChatEventData(line));
 		} else if (prefix == "resp") {

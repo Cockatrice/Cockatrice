@@ -99,4 +99,17 @@ public:
 	static ProtocolItem *newItem() { return new ProtocolResponse; }
 };
 
+class GameEvent : public ProtocolItem {
+	Q_OBJECT
+private:
+	int gameId;
+	bool isPublic;
+	int playerId;
+protected:
+	QString getItemType() const { return "game_event"; }
+	void extractParameters();
+public:
+	GameEvent(const QString &_eventName, int _gameId, bool _isPublic, int _playerId);
+};
+
 #endif

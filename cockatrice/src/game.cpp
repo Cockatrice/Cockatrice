@@ -365,8 +365,7 @@ void Game::gameEvent(const ServerEventData &msg)
 		case eventSetCardAttr:
 		case eventAddCounter:
 		case eventSetCounter:
-		case eventDelCounter:
-		case eventPlayerId: {
+		case eventDelCounter: {
 			p->gameEvent(msg);
 			break;
 		}

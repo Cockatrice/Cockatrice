@@ -2,7 +2,7 @@
 #include <QDebug>
 #include "widget.h"
 #include "protocol.h"
-#include "protocol_commands.h"
+#include "protocol_items.h"
 
 Widget::Widget()
 	: QMainWindow()
@@ -49,6 +49,9 @@ void Widget::startClicked()
 	
 	ProtocolResponse *test4 = new ProtocolResponse(123, ProtocolResponse::RespContextError);
 	test4->write(xmlWriter);
+	
+	GameEvent *test5 = new Event_RollDie(1234, true, 1, 20, 13);
+	test5->write(xmlWriter);
 }
 
 bool Widget::readCurrentCommand()

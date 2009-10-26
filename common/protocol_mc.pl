@@ -2,16 +2,16 @@
 
 $initializeHash = '';
 
-open(headerfile, ">protocol_commands.h");
-print headerfile "#ifndef PROTOCOL_COMMANDS_H\n"
-	. "#define PROTOCOL_COMMANDS_H\n\n"
+open(headerfile, ">protocol_items.h");
+print headerfile "#ifndef PROTOCOL_ITEMS_H\n"
+	. "#define PROTOCOL_ITEMS_H\n\n"
 	. "#include \"protocol.h\"\n\n";
 
-open(cppfile, ">protocol_commands.cpp");
+open(cppfile, ">protocol_items.cpp");
 print cppfile "#include \"protocol.h\"\n"
-	. "#include \"protocol_commands.h\"\n\n";
+	. "#include \"protocol_items.h\"\n\n";
 
-open(file, "protocol_commands.dat");
+open(file, "protocol_items.dat");
 while (<file>) {
 	s/\s+$//;
 	@line = split(/:/);
@@ -20,23 +20,35 @@ while (<file>) {
 	($name2 = $name1) =~ s/_(.)/\U$1\E/g;
 	$name2 =~ s/^(.)/\U$1\E/;
 	if ($type == 0) {
+		$type = 'cmd';
+		$namePrefix = 'Command';
 		$baseClass = 'Command';
 		$parentConstructorCall = "$baseClass(\"$name1\")";
 		$constructorParamsH = "";
 		$constructorParamsCpp = "";
 	} elsif ($type == 1) {
+		$type = 'cmd';
+		$namePrefix = 'Command';
 		$baseClass = 'ChatCommand';
 		$parentConstructorCall = "$baseClass(\"$name1\", _channel)";
 		$constructorParamsH = "const QString &_channel = QString()";
 		$constructorParamsCpp = "const QString &_channel";
-	} else {
+	} elsif ($type == 2) {
+		$type = 'cmd';
+		$namePrefix = 'Command';
 		$baseClass = 'GameCommand';
 		$parentConstructorCall = "$baseClass(\"$name1\", _gameId)";
 		$constructorParamsH = "int _gameId = -1";
 		$constructorParamsCpp = "int _gameId";
+	} elsif ($type == 3) {
+		$type = 'game_event';
+		$namePrefix = 'Event';
+		$baseClass = 'GameEvent';
+		$parentConstructorCall = "$baseClass(\"$name1\", _gameId, _isPublic, _playerId)";
+		$constructorParamsH = "int _gameId = -1, bool _isPublic = false, int _playerId = -1";
+		$constructorParamsCpp = "int _gameId, bool _isPublic, int _playerId";
 	}
-
-	$className = 'Command_' . $name2;
+	$className = $namePrefix . '_' . $name2;
 	print headerfile "class $className : public $baseClass {\n"
 		. "\tQ_OBJECT\n"
 		. "private:\n";
@@ -93,7 +105,7 @@ while (<file>) {
 			. $paramStr5
 			. "}\n";
 	}
-	$initializeHash .= "\titemNameHash.insert(\"cmd$name1\", $className" . "::newItem);\n";
+	$initializeHash .= "\titemNameHash.insert(\"$type$name1\", $className" . "::newItem);\n";
 }
 close(file);
 

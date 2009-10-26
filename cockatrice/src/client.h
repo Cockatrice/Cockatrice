@@ -31,7 +31,6 @@ enum ServerResponse {
 
 enum ServerEventType {
 	eventInvalid,
-	eventPlayerId,
 	eventSay,
 	eventJoin,
 	eventLeave,
