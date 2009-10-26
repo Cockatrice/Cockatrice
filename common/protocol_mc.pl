@@ -17,6 +17,8 @@ while (<file>) {
 	@line = split(/:/);
 	$type = shift(@line);
 	$name1 = shift(@line);
+	($name2 = $name1) =~ s/_(.)/\U$1\E/g;
+	$name2 =~ s/^(.)/\U$1\E/;
 	if ($type == 0) {
 		$baseClass = 'Command';
 		$parentConstructorCall = "$baseClass(\"$name1\")";
@@ -34,7 +36,7 @@ while (<file>) {
 		$constructorParamsCpp = "int _gameId";
 	}
 
-	$className = 'Command_' . shift(@line);
+	$className = 'Command_' . $name2;
 	print headerfile "class $className : public $baseClass {\n"
 		. "\tQ_OBJECT\n"
 		. "private:\n";

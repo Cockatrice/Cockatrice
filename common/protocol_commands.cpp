@@ -125,7 +125,7 @@ Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, int _
 	setParameter("target_zone", targetZone);
 	setParameter("x", x);
 	setParameter("y", y);
-	setParameter("faceDown", faceDown);
+	setParameter("face_down", faceDown);
 }
 void Command_MoveCard::extractParameters()
 {
@@ -135,7 +135,7 @@ void Command_MoveCard::extractParameters()
 	targetZone = parameters["target_zone"];
 	x = parameters["x"].toInt();
 	y = parameters["y"].toInt();
-	faceDown = (parameters["faceDown"] == "1");
+	faceDown = (parameters["face_down"] == "1");
 }
 Command_CreateToken::Command_CreateToken(int _gameId, const QString &_zone, const QString &_name, const QString &_pt, int _x, int _y)
 	: GameCommand("create_token", _gameId), zone(_zone), name(_name), pt(_pt), x(_x), y(_y)
