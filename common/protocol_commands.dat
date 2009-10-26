@@ -1,3 +1,4 @@
+0:ping:Ping
 0:login:Login:s,username:s,password
 0:chat_list_channels:ChatListChannels
 0:chat_join_channel:ChatJoinChannel:s,channel

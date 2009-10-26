@@ -1,15 +1,13 @@
-#include "protocol.h"
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QDebug>
+#include "protocol.h"
+#include "protocol_commands.h"
+
+QHash<QString, Command::NewCommandFunction> Command::commandHash;
 
 Command::Command(const QString &_cmdName)
 	: cmdName(_cmdName)
-{
-	
-}
-
-void Command::validateParameters()
 {
 }
 
@@ -22,7 +20,7 @@ bool Command::read(QXmlStreamReader &xml)
 		} else if (xml.isEndElement()) {
 			qDebug() << "endElement: " << xml.name().toString();
 			if (xml.name() == cmdName) {
-				validateParameters();
+				extractParameters();
 				qDebug() << "FERTIG";
 				deleteLater();
 				return true;
@@ -52,4 +50,11 @@ void Command::write(QXmlStreamWriter &xml)
 	}
 	
 	xml.writeEndElement();
+}
+
+Command *Command::getNewCommand(const QString &name)
+{
+	if (!commandHash.contains(name))
+		return 0;
+	return commandHash.value(name)();
 }

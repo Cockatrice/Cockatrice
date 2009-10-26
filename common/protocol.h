@@ -3,7 +3,9 @@
 
 #include <QString>
 #include <QMap>
+#include <QHash>
 #include <QObject>
+#include <QDebug>
 
 class QXmlStreamReader;
 class QXmlStreamWriter;
@@ -11,54 +13,58 @@ class QXmlStreamWriter;
 class Command : public QObject {
 	Q_OBJECT
 protected:
+	typedef Command *(*NewCommandFunction)();
+	static QHash<QString, NewCommandFunction> commandHash;
+	
 	QString cmdName;
 	QMap<QString, QString> parameters;
 	QString currentElementText;
+	void setParameter(const QString &name, const QString &value) { parameters[name] = value; }
+	void setParameter(const QString &name, bool value) { parameters[name] = (value ? "1" : "0"); }
+	void setParameter(const QString &name, int value) { parameters[name] = QString::number(value); }
+	virtual void extractParameters() { };
 public:
 	Command(const QString &_cmdName);
+	static void initializeHash();
+	static Command *getNewCommand(const QString &name);
 	virtual bool read(QXmlStreamReader &xml);
 	virtual void write(QXmlStreamWriter &xml);
-	void validateParameters();
 };
 
-class Command_Ping : public Command {
-public:
-	Command_Ping() : Command("ping") { }
-};
-class Command_ChatListChannels : public Command {
-public:
-	Command_ChatListChannels() : Command("chat_list_channels") { }
-};
-class Command_ChatJoinChannel : public Command {
+class ChatCommand : public Command {
+	Q_OBJECT
 private:
 	QString channel;
-public:
-	Command_ChatJoinChannel(const QString &_channel = QString()) : Command("chat_join_channel"), channel(_channel)
+protected:
+	void extractParameters()
 	{
-		parameters.insert("channel", channel);
+		channel = parameters["channel"];
 	}
-};
-class Command_ChatLeaveChannel : public Command {
-private:
-	QString channel;
 public:
-	Command_ChatLeaveChannel(const QString &_channel = QString()) : Command("chat_leave_channel"), channel(_channel)
+	ChatCommand(const QString &_cmdName, const QString &_channel)
+		: Command(_cmdName), channel(_channel)
 	{
-		parameters.insert("channel", channel);
+		setParameter("channel", channel);
 	}
-};
-class Command_ChatSay : public Command {
-private:
-	QString channel;
-	QString message;
-public:
-	Command_ChatSay(const QString &_channel = QString(), const QString &_message = QString()) : Command("chat_say"), channel(_channel), message(_message)
-	{
-		parameters.insert("channel", channel);
-		parameters.insert("message", message);
-	}
+	QString getChannel() const { return channel; }
 };
 
-
+class GameCommand : public Command {
+	Q_OBJECT
+private:
+	int gameId;
+protected:
+	void extractParameters()
+	{
+		gameId = parameters["game_id"].toInt();
+	}
+public:
+	GameCommand(const QString &_cmdName, int _gameId)
+		: Command(_cmdName), gameId(_gameId)
+	{
+		setParameter("game_id", gameId);
+	}
+	int getGameId() const { return gameId; }
+};
 
 #endif

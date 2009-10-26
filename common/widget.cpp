@@ -2,6 +2,7 @@
 #include <QDebug>
 #include "widget.h"
 #include "protocol.h"
+#include "protocol_commands.h"
 
 Widget::Widget()
 	: QMainWindow(), currentCommand(0)
@@ -24,6 +25,8 @@ Widget::Widget()
 	QWidget *central = new QWidget;
 	central->setLayout(vbox);
 	setCentralWidget(central);
+	
+	Command::initializeHash();
 }
 
 void Widget::startClicked()
@@ -31,6 +34,7 @@ void Widget::startClicked()
 	currentCommand = 0;
 	xmlWriter.writeStartDocument();
 	xmlWriter.writeStartElement("cockatrice_communication");
+	xmlWriter.writeAttribute("version", "4");
 	
 	Command *test = new Command_Ping;
 	test->write(xmlWriter);
@@ -63,13 +67,8 @@ void Widget::parseXml()
 		if (xmlReader.isStartElement()) {
 			QString cmdStr = xmlReader.name().toString();
 			qDebug() << "parseXml: startElement: " << cmdStr;
-			if (cmdStr == "ping")
-				currentCommand = new Command_Ping;
-			else if (cmdStr == "chat_leave_channel")
-				currentCommand = new Command_ChatLeaveChannel;
-			else if (cmdStr == "chat_say")
-				currentCommand = new Command_ChatSay;
-			else
+			currentCommand = Command::getNewCommand(cmdStr);
+			if (!currentCommand)
 				qDebug() << "unrecognized command";
 			readCurrentCommand();
 		}
