@@ -305,36 +305,36 @@ Command_SubmitDeck::Command_SubmitDeck(int _gameId)
 	: GameCommand("submit_deck", _gameId)
 {
 }
-void Command::initializeHash()
+void ProtocolItem::initializeHashAuto()
 {
-	commandHash.insert("ping", Command_Ping::newCommand);
-	commandHash.insert("login", Command_Login::newCommand);
-	commandHash.insert("chat_list_channels", Command_ChatListChannels::newCommand);
-	commandHash.insert("chat_join_channel", Command_ChatJoinChannel::newCommand);
-	commandHash.insert("chat_leave_channel", Command_ChatLeaveChannel::newCommand);
-	commandHash.insert("chat_say", Command_ChatSay::newCommand);
-	commandHash.insert("list_games", Command_ListGames::newCommand);
-	commandHash.insert("create_game", Command_CreateGame::newCommand);
-	commandHash.insert("join_game", Command_JoinGame::newCommand);
-	commandHash.insert("leave_game", Command_LeaveGame::newCommand);
-	commandHash.insert("say", Command_Say::newCommand);
-	commandHash.insert("shuffle", Command_Shuffle::newCommand);
-	commandHash.insert("roll_die", Command_RollDie::newCommand);
-	commandHash.insert("draw_cards", Command_DrawCards::newCommand);
-	commandHash.insert("move_card", Command_MoveCard::newCommand);
-	commandHash.insert("create_token", Command_CreateToken::newCommand);
-	commandHash.insert("create_arrow", Command_CreateArrow::newCommand);
-	commandHash.insert("delete_arrow", Command_DeleteArrow::newCommand);
-	commandHash.insert("set_card_attr", Command_SetCardAttr::newCommand);
-	commandHash.insert("ready_start", Command_ReadyStart::newCommand);
-	commandHash.insert("inc_counter", Command_IncCounter::newCommand);
-	commandHash.insert("add_counter", Command_AddCounter::newCommand);
-	commandHash.insert("set_counter", Command_SetCounter::newCommand);
-	commandHash.insert("del_counter", Command_DelCounter::newCommand);
-	commandHash.insert("next_turn", Command_NextTurn::newCommand);
-	commandHash.insert("set_active_phase", Command_SetActivePhase::newCommand);
-	commandHash.insert("dump_zone", Command_DumpZone::newCommand);
-	commandHash.insert("stop_dump_zone", Command_StopDumpZone::newCommand);
-	commandHash.insert("dump_all", Command_DumpAll::newCommand);
-	commandHash.insert("submit_deck", Command_SubmitDeck::newCommand);
+	itemNameHash.insert("cmdping", Command_Ping::newItem);
+	itemNameHash.insert("cmdlogin", Command_Login::newItem);
+	itemNameHash.insert("cmdchat_list_channels", Command_ChatListChannels::newItem);
+	itemNameHash.insert("cmdchat_join_channel", Command_ChatJoinChannel::newItem);
+	itemNameHash.insert("cmdchat_leave_channel", Command_ChatLeaveChannel::newItem);
+	itemNameHash.insert("cmdchat_say", Command_ChatSay::newItem);
+	itemNameHash.insert("cmdlist_games", Command_ListGames::newItem);
+	itemNameHash.insert("cmdcreate_game", Command_CreateGame::newItem);
+	itemNameHash.insert("cmdjoin_game", Command_JoinGame::newItem);
+	itemNameHash.insert("cmdleave_game", Command_LeaveGame::newItem);
+	itemNameHash.insert("cmdsay", Command_Say::newItem);
+	itemNameHash.insert("cmdshuffle", Command_Shuffle::newItem);
+	itemNameHash.insert("cmdroll_die", Command_RollDie::newItem);
+	itemNameHash.insert("cmddraw_cards", Command_DrawCards::newItem);
+	itemNameHash.insert("cmdmove_card", Command_MoveCard::newItem);
+	itemNameHash.insert("cmdcreate_token", Command_CreateToken::newItem);
+	itemNameHash.insert("cmdcreate_arrow", Command_CreateArrow::newItem);
+	itemNameHash.insert("cmddelete_arrow", Command_DeleteArrow::newItem);
+	itemNameHash.insert("cmdset_card_attr", Command_SetCardAttr::newItem);
+	itemNameHash.insert("cmdready_start", Command_ReadyStart::newItem);
+	itemNameHash.insert("cmdinc_counter", Command_IncCounter::newItem);
+	itemNameHash.insert("cmdadd_counter", Command_AddCounter::newItem);
+	itemNameHash.insert("cmdset_counter", Command_SetCounter::newItem);
+	itemNameHash.insert("cmddel_counter", Command_DelCounter::newItem);
+	itemNameHash.insert("cmdnext_turn", Command_NextTurn::newItem);
+	itemNameHash.insert("cmdset_active_phase", Command_SetActivePhase::newItem);
+	itemNameHash.insert("cmddump_zone", Command_DumpZone::newItem);
+	itemNameHash.insert("cmdstop_dump_zone", Command_StopDumpZone::newItem);
+	itemNameHash.insert("cmddump_all", Command_DumpAll::newItem);
+	itemNameHash.insert("cmdsubmit_deck", Command_SubmitDeck::newItem);
 }

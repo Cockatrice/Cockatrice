@@ -8,7 +8,7 @@
 class QTextEdit;
 class QPushButton;
 class QBuffer;
-class Command;
+class ProtocolItem;
 
 class Widget : public QMainWindow {
 	Q_OBJECT
@@ -19,7 +19,7 @@ private:
 	QXmlStreamReader xmlReader;
 	QXmlStreamWriter xmlWriter;
 	
-	Command *currentCommand;
+	ProtocolItem *currentItem;
 	bool readCurrentCommand();
 	void parseBuffer();
 	void parseXml();

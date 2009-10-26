@@ -5,7 +5,7 @@
 #include "protocol_commands.h"
 
 Widget::Widget()
-	: QMainWindow(), currentCommand(0)
+	: QMainWindow()
 {
 	edit1 = new QTextEdit;
 	start = new QPushButton;
@@ -26,12 +26,14 @@ Widget::Widget()
 	central->setLayout(vbox);
 	setCentralWidget(central);
 	
+	resize(400, 500);
+	
 	Command::initializeHash();
 }
 
 void Widget::startClicked()
 {
-	currentCommand = 0;
+	currentItem = 0;
 	xmlWriter.writeStartDocument();
 	xmlWriter.writeStartElement("cockatrice_communication");
 	xmlWriter.writeAttribute("version", "4");
@@ -44,15 +46,18 @@ void Widget::startClicked()
 	
 	Command *test3 = new Command_ChatSay("foobar", "Hallo, dies ist ein Test");
 	test3->write(xmlWriter);
+	
+	ProtocolResponse *test4 = new ProtocolResponse(123, ProtocolResponse::RespContextError);
+	test4->write(xmlWriter);
 }
 
 bool Widget::readCurrentCommand()
 {
-	if (!currentCommand)
+	if (!currentItem)
 		return false;
-	if (currentCommand->read(xmlReader)) {
+	if (currentItem->read(xmlReader)) {
 		qDebug() << "setting to 0";
-		currentCommand = 0;
+		currentItem = 0;
 	}
 	return true;
 }
@@ -65,11 +70,12 @@ void Widget::parseXml()
 	while (!xmlReader.atEnd()) {
 		xmlReader.readNext();
 		if (xmlReader.isStartElement()) {
-			QString cmdStr = xmlReader.name().toString();
-			qDebug() << "parseXml: startElement: " << cmdStr;
-			currentCommand = Command::getNewCommand(cmdStr);
-			if (!currentCommand)
-				qDebug() << "unrecognized command";
+			QString itemType = xmlReader.name().toString();
+			QString itemName = xmlReader.attributes().value("name").toString();
+			qDebug() << "parseXml: startElement: " << "type =" << itemType << ", name =" << itemName;
+			currentItem = ProtocolItem::getNewItem(itemType + itemName);
+			if (!currentItem)
+				qDebug() << "unrecognized item";
 			readCurrentCommand();
 		}
 	}

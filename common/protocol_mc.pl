@@ -78,7 +78,7 @@ while (<file>) {
 	print headerfile "public:\n"
 		. "\t$className($constructorParamsH);\n"
 		. $paramStr4
-		. "\tstatic Command *newCommand() { return new $className; }\n"
+		. "\tstatic ProtocolItem *newItem() { return new $className; }\n"
 		. ($paramStr5 eq '' ? '' : "protected:\n\tvoid extractParameters();\n")
 		. "};\n";
 	print cppfile $className . "::$className($constructorParamsCpp)\n"
@@ -93,14 +93,14 @@ while (<file>) {
 			. $paramStr5
 			. "}\n";
 	}
-	$initializeHash .= "\tcommandHash.insert(\"$name1\", $className" . "::newCommand);\n";
+	$initializeHash .= "\titemNameHash.insert(\"cmd$name1\", $className" . "::newItem);\n";
 }
 close(file);
 
 print headerfile "\n#endif\n";
 close(headerfile);
 
-print cppfile "void Command::initializeHash()\n"
+print cppfile "void ProtocolItem::initializeHashAuto()\n"
 	. "{\n"
 	. $initializeHash
 	. "}\n";

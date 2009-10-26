@@ -4,14 +4,14 @@
 #include "protocol.h"
 #include "protocol_commands.h"
 
-QHash<QString, Command::NewCommandFunction> Command::commandHash;
+QHash<QString, ProtocolItem::NewItemFunction> ProtocolItem::itemNameHash;
 
-Command::Command(const QString &_cmdName)
-	: cmdName(_cmdName)
+ProtocolItem::ProtocolItem(const QString &_itemName)
+	: itemName(_itemName)
 {
 }
 
-bool Command::read(QXmlStreamReader &xml)
+bool ProtocolItem::read(QXmlStreamReader &xml)
 {
 	while (!xml.atEnd()) {
 		xml.readNext();
@@ -19,7 +19,7 @@ bool Command::read(QXmlStreamReader &xml)
 			qDebug() << "startElement: " << xml.name().toString();
 		} else if (xml.isEndElement()) {
 			qDebug() << "endElement: " << xml.name().toString();
-			if (xml.name() == cmdName) {
+			if (xml.name() == getItemType()) {
 				extractParameters();
 				qDebug() << "FERTIG";
 				deleteLater();
@@ -39,9 +39,11 @@ bool Command::read(QXmlStreamReader &xml)
 	return false;
 }
 
-void Command::write(QXmlStreamWriter &xml)
+void ProtocolItem::write(QXmlStreamWriter &xml)
 {
-	xml.writeStartElement(cmdName);
+	xml.writeStartElement(getItemType());
+	if (!itemName.isEmpty())
+		xml.writeAttribute("name", itemName);
 	
 	QMapIterator<QString, QString> i(parameters);
 	while (i.hasNext()) {
@@ -52,9 +54,63 @@ void Command::write(QXmlStreamWriter &xml)
 	xml.writeEndElement();
 }
 
-Command *Command::getNewCommand(const QString &name)
+ProtocolItem *ProtocolItem::getNewItem(const QString &name)
 {
-	if (!commandHash.contains(name))
+	if (!itemNameHash.contains(name))
 		return 0;
-	return commandHash.value(name)();
+	return itemNameHash.value(name)();
+}
+
+void ProtocolItem::initializeHash()
+{
+	initializeHashAuto();
+	itemNameHash.insert("resp", ProtocolResponse::newItem);
+	ProtocolResponse::initializeHash();
+}
+
+int Command::lastCmdId = 0;
+
+Command::Command(const QString &_itemName, int _cmdId)
+	: ProtocolItem(_itemName), cmdId(_cmdId)
+{
+	if (cmdId == -1)
+		cmdId = lastCmdId++;
+	setParameter("cmd_id", cmdId);
+}
+
+void Command::extractParameters()
+{
+	bool ok;
+	cmdId = parameters["cmd_id"].toInt(&ok);
+	if (!ok)
+		cmdId = -1;
+}
+
+QHash<QString, ProtocolResponse::ResponseCode> ProtocolResponse::responseHash;
+
+ProtocolResponse::ProtocolResponse(int _cmdId, ResponseCode _responseCode)
+	: ProtocolItem(QString()), cmdId(_cmdId), responseCode(_responseCode)
+{
+	setParameter("cmd_id", cmdId);
+	setParameter("response_code", responseHash.key(responseCode));
+}
+
+void ProtocolResponse::extractParameters()
+{
+	bool ok;
+	cmdId = parameters["cmd_id"].toInt(&ok);
+	if (!ok)
+		cmdId = -1;
+	
+	responseCode = responseHash.value(parameters["response_code"], RespOk);
+}
+
+void ProtocolResponse::initializeHash()
+{
+	responseHash.insert("ok", RespOk);
+	responseHash.insert("name_not_found", RespNameNotFound);
+	responseHash.insert("login_needed", RespLoginNeeded);
+	responseHash.insert("context_error", RespContextError);
+	responseHash.insert("wrong_password", RespWrongPassword);
+	responseHash.insert("spectators_not_allowed", RespSpectatorsNotAllowed);
 }
