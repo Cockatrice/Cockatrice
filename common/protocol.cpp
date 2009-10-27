@@ -121,16 +121,25 @@ void GameEvent::extractParameters()
 	gameId = parameters["game_id"].toInt(&ok);
 	if (!ok)
 		gameId = -1;
-	isPublic = parameters["is_public"].toInt();
 	playerId = parameters["player_id"].toInt(&ok);
 	if (!ok)
 		playerId = -1;
 }
 
-GameEvent::GameEvent(const QString &_eventName, int _gameId, bool _isPublic, int _playerId)
-	: ProtocolItem(_eventName), gameId(_gameId), isPublic(_isPublic), playerId(_playerId)
+GameEvent::GameEvent(const QString &_eventName, int _gameId, int _playerId)
+	: ProtocolItem(_eventName), gameId(_gameId), playerId(_playerId)
 {
 	setParameter("game_id", gameId);
-	setParameter("is_public", isPublic);
 	setParameter("player_id", playerId);
+}
+
+void ChatEvent::extractParameters()
+{
+	channel = parameters["channel"];
+}
+
+ChatEvent::ChatEvent(const QString &_eventName, const QString &_channel)
+	: ProtocolItem(_eventName), channel(_channel)
+{
+	setParameter("channel", channel);
 }

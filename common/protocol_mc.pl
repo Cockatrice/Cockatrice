@@ -44,9 +44,9 @@ while (<file>) {
 		$type = 'game_event';
 		$namePrefix = 'Event';
 		$baseClass = 'GameEvent';
-		$parentConstructorCall = "$baseClass(\"$name1\", _gameId, _isPublic, _playerId)";
-		$constructorParamsH = "int _gameId = -1, bool _isPublic = false, int _playerId = -1";
-		$constructorParamsCpp = "int _gameId, bool _isPublic, int _playerId";
+		$parentConstructorCall = "$baseClass(\"$name1\", _gameId, _playerId)";
+		$constructorParamsH = "int _gameId = -1, int _playerId = -1";
+		$constructorParamsCpp = "int _gameId, int _playerId";
 	}
 	$className = $namePrefix . '_' . $name2;
 	print headerfile "class $className : public $baseClass {\n"

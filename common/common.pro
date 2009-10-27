@@ -6,6 +6,8 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += .
+MOC_DIR = build
+OBJECTS_DIR = build
 
 # Input
 HEADERS += protocol.h widget.h protocol_items.h

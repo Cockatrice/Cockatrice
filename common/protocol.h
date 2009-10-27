@@ -103,13 +103,23 @@ class GameEvent : public ProtocolItem {
 	Q_OBJECT
 private:
 	int gameId;
-	bool isPublic;
 	int playerId;
 protected:
 	QString getItemType() const { return "game_event"; }
 	void extractParameters();
 public:
-	GameEvent(const QString &_eventName, int _gameId, bool _isPublic, int _playerId);
+	GameEvent(const QString &_eventName, int _gameId, int _playerId);
+};
+
+class ChatEvent : public ProtocolItem {
+	Q_OBJECT
+private:
+	QString channel;
+protected:
+	QString getItemType() const { return "chat_event"; }
+	void extractParameters();
+public:
+	ChatEvent(const QString &_eventName, const QString &_channel);
 };
 
 #endif

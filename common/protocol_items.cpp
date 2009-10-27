@@ -305,8 +305,8 @@ Command_SubmitDeck::Command_SubmitDeck(int _gameId)
 	: GameCommand("submit_deck", _gameId)
 {
 }
-Event_Say::Event_Say(int _gameId, bool _isPublic, int _playerId, const QString &_message)
-	: GameEvent("say", _gameId, _isPublic, _playerId), message(_message)
+Event_Say::Event_Say(int _gameId, int _playerId, const QString &_message)
+	: GameEvent("say", _gameId, _playerId), message(_message)
 {
 	setParameter("message", message);
 }
@@ -315,8 +315,8 @@ void Event_Say::extractParameters()
 	GameEvent::extractParameters();
 	message = parameters["message"];
 }
-Event_Join::Event_Join(int _gameId, bool _isPublic, int _playerId, const QString &_playerName, bool _spectator)
-	: GameEvent("join", _gameId, _isPublic, _playerId), playerName(_playerName), spectator(_spectator)
+Event_Join::Event_Join(int _gameId, int _playerId, const QString &_playerName, bool _spectator)
+	: GameEvent("join", _gameId, _playerId), playerName(_playerName), spectator(_spectator)
 {
 	setParameter("player_name", playerName);
 	setParameter("spectator", spectator);
@@ -327,20 +327,20 @@ void Event_Join::extractParameters()
 	playerName = parameters["player_name"];
 	spectator = (parameters["spectator"] == "1");
 }
-Event_Leave::Event_Leave(int _gameId, bool _isPublic, int _playerId)
-	: GameEvent("leave", _gameId, _isPublic, _playerId)
+Event_Leave::Event_Leave(int _gameId, int _playerId)
+	: GameEvent("leave", _gameId, _playerId)
 {
 }
-Event_GameClosed::Event_GameClosed(int _gameId, bool _isPublic, int _playerId)
-	: GameEvent("game_closed", _gameId, _isPublic, _playerId)
+Event_GameClosed::Event_GameClosed(int _gameId, int _playerId)
+	: GameEvent("game_closed", _gameId, _playerId)
 {
 }
-Event_ReadyStart::Event_ReadyStart(int _gameId, bool _isPublic, int _playerId)
-	: GameEvent("ready_start", _gameId, _isPublic, _playerId)
+Event_ReadyStart::Event_ReadyStart(int _gameId, int _playerId)
+	: GameEvent("ready_start", _gameId, _playerId)
 {
 }
-Event_SetupZones::Event_SetupZones(int _gameId, bool _isPublic, int _playerId, int _deckSize, int _sbSize)
-	: GameEvent("setup_zones", _gameId, _isPublic, _playerId), deckSize(_deckSize), sbSize(_sbSize)
+Event_SetupZones::Event_SetupZones(int _gameId, int _playerId, int _deckSize, int _sbSize)
+	: GameEvent("setup_zones", _gameId, _playerId), deckSize(_deckSize), sbSize(_sbSize)
 {
 	setParameter("deck_size", deckSize);
 	setParameter("sb_size", sbSize);
@@ -351,16 +351,16 @@ void Event_SetupZones::extractParameters()
 	deckSize = parameters["deck_size"].toInt();
 	sbSize = parameters["sb_size"].toInt();
 }
-Event_GameStart::Event_GameStart(int _gameId, bool _isPublic, int _playerId)
-	: GameEvent("game_start", _gameId, _isPublic, _playerId)
+Event_GameStart::Event_GameStart(int _gameId, int _playerId)
+	: GameEvent("game_start", _gameId, _playerId)
 {
 }
-Event_Shuffle::Event_Shuffle(int _gameId, bool _isPublic, int _playerId)
-	: GameEvent("shuffle", _gameId, _isPublic, _playerId)
+Event_Shuffle::Event_Shuffle(int _gameId, int _playerId)
+	: GameEvent("shuffle", _gameId, _playerId)
 {
 }
-Event_RollDie::Event_RollDie(int _gameId, bool _isPublic, int _playerId, int _sides, int _value)
-	: GameEvent("roll_die", _gameId, _isPublic, _playerId), sides(_sides), value(_value)
+Event_RollDie::Event_RollDie(int _gameId, int _playerId, int _sides, int _value)
+	: GameEvent("roll_die", _gameId, _playerId), sides(_sides), value(_value)
 {
 	setParameter("sides", sides);
 	setParameter("value", value);
@@ -371,8 +371,8 @@ void Event_RollDie::extractParameters()
 	sides = parameters["sides"].toInt();
 	value = parameters["value"].toInt();
 }
-Event_MoveCard::Event_MoveCard(int _gameId, bool _isPublic, int _playerId, int _cardId, const QString &_cardName, const QString &_startZone, int _position, const QString &_targetZone, int _x, int _y, bool _faceDown)
-	: GameEvent("move_card", _gameId, _isPublic, _playerId), cardId(_cardId), cardName(_cardName), startZone(_startZone), position(_position), targetZone(_targetZone), x(_x), y(_y), faceDown(_faceDown)
+Event_MoveCard::Event_MoveCard(int _gameId, int _playerId, int _cardId, const QString &_cardName, const QString &_startZone, int _position, const QString &_targetZone, int _x, int _y, bool _faceDown)
+	: GameEvent("move_card", _gameId, _playerId), cardId(_cardId), cardName(_cardName), startZone(_startZone), position(_position), targetZone(_targetZone), x(_x), y(_y), faceDown(_faceDown)
 {
 	setParameter("card_id", cardId);
 	setParameter("card_name", cardName);
@@ -395,8 +395,8 @@ void Event_MoveCard::extractParameters()
 	y = parameters["y"].toInt();
 	faceDown = (parameters["face_down"] == "1");
 }
-Event_CreateToken::Event_CreateToken(int _gameId, bool _isPublic, int _playerId, const QString &_zone, int _cardId, const QString &_cardName, const QString &_pt, int _x, int _y)
-	: GameEvent("create_token", _gameId, _isPublic, _playerId), zone(_zone), cardId(_cardId), cardName(_cardName), pt(_pt), x(_x), y(_y)
+Event_CreateToken::Event_CreateToken(int _gameId, int _playerId, const QString &_zone, int _cardId, const QString &_cardName, const QString &_pt, int _x, int _y)
+	: GameEvent("create_token", _gameId, _playerId), zone(_zone), cardId(_cardId), cardName(_cardName), pt(_pt), x(_x), y(_y)
 {
 	setParameter("zone", zone);
 	setParameter("card_id", cardId);
@@ -415,8 +415,8 @@ void Event_CreateToken::extractParameters()
 	x = parameters["x"].toInt();
 	y = parameters["y"].toInt();
 }
-Event_CreateArrow::Event_CreateArrow(int _gameId, bool _isPublic, int _playerId, int _arrowId, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, int _color)
-	: GameEvent("create_arrow", _gameId, _isPublic, _playerId), arrowId(_arrowId), startPlayerId(_startPlayerId), startZone(_startZone), startCardId(_startCardId), targetPlayerId(_targetPlayerId), targetZone(_targetZone), targetCardId(_targetCardId), color(_color)
+Event_CreateArrow::Event_CreateArrow(int _gameId, int _playerId, int _arrowId, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, int _color)
+	: GameEvent("create_arrow", _gameId, _playerId), arrowId(_arrowId), startPlayerId(_startPlayerId), startZone(_startZone), startCardId(_startCardId), targetPlayerId(_targetPlayerId), targetZone(_targetZone), targetCardId(_targetCardId), color(_color)
 {
 	setParameter("arrow_id", arrowId);
 	setParameter("start_player_id", startPlayerId);
@@ -439,8 +439,8 @@ void Event_CreateArrow::extractParameters()
 	targetCardId = parameters["target_card_id"].toInt();
 	color = parameters["color"].toInt();
 }
-Event_DeleteArrow::Event_DeleteArrow(int _gameId, bool _isPublic, int _playerId, int _arrowId)
-	: GameEvent("delete_arrow", _gameId, _isPublic, _playerId), arrowId(_arrowId)
+Event_DeleteArrow::Event_DeleteArrow(int _gameId, int _playerId, int _arrowId)
+	: GameEvent("delete_arrow", _gameId, _playerId), arrowId(_arrowId)
 {
 	setParameter("arrow_id", arrowId);
 }
@@ -449,8 +449,8 @@ void Event_DeleteArrow::extractParameters()
 	GameEvent::extractParameters();
 	arrowId = parameters["arrow_id"].toInt();
 }
-Event_SetCardAttr::Event_SetCardAttr(int _gameId, bool _isPublic, int _playerId, const QString &_zone, int _cardId, const QString &_attrName, const QString &_attrValue)
-	: GameEvent("set_card_attr", _gameId, _isPublic, _playerId), zone(_zone), cardId(_cardId), attrName(_attrName), attrValue(_attrValue)
+Event_SetCardAttr::Event_SetCardAttr(int _gameId, int _playerId, const QString &_zone, int _cardId, const QString &_attrName, const QString &_attrValue)
+	: GameEvent("set_card_attr", _gameId, _playerId), zone(_zone), cardId(_cardId), attrName(_attrName), attrValue(_attrValue)
 {
 	setParameter("zone", zone);
 	setParameter("card_id", cardId);
@@ -465,8 +465,8 @@ void Event_SetCardAttr::extractParameters()
 	attrName = parameters["attr_name"];
 	attrValue = parameters["attr_value"];
 }
-Event_AddCounter::Event_AddCounter(int _gameId, bool _isPublic, int _playerId, int _counterId, const QString &_counterName, int _color, int _radius, int _value)
-	: GameEvent("add_counter", _gameId, _isPublic, _playerId), counterId(_counterId), counterName(_counterName), color(_color), radius(_radius), value(_value)
+Event_AddCounter::Event_AddCounter(int _gameId, int _playerId, int _counterId, const QString &_counterName, int _color, int _radius, int _value)
+	: GameEvent("add_counter", _gameId, _playerId), counterId(_counterId), counterName(_counterName), color(_color), radius(_radius), value(_value)
 {
 	setParameter("counter_id", counterId);
 	setParameter("counter_name", counterName);
@@ -483,8 +483,8 @@ void Event_AddCounter::extractParameters()
 	radius = parameters["radius"].toInt();
 	value = parameters["value"].toInt();
 }
-Event_SetCounter::Event_SetCounter(int _gameId, bool _isPublic, int _playerId, int _counterId, int _value)
-	: GameEvent("set_counter", _gameId, _isPublic, _playerId), counterId(_counterId), value(_value)
+Event_SetCounter::Event_SetCounter(int _gameId, int _playerId, int _counterId, int _value)
+	: GameEvent("set_counter", _gameId, _playerId), counterId(_counterId), value(_value)
 {
 	setParameter("counter_id", counterId);
 	setParameter("value", value);
@@ -495,8 +495,8 @@ void Event_SetCounter::extractParameters()
 	counterId = parameters["counter_id"].toInt();
 	value = parameters["value"].toInt();
 }
-Event_DelCounter::Event_DelCounter(int _gameId, bool _isPublic, int _playerId, int _counterId)
-	: GameEvent("del_counter", _gameId, _isPublic, _playerId), counterId(_counterId)
+Event_DelCounter::Event_DelCounter(int _gameId, int _playerId, int _counterId)
+	: GameEvent("del_counter", _gameId, _playerId), counterId(_counterId)
 {
 	setParameter("counter_id", counterId);
 }
@@ -505,8 +505,8 @@ void Event_DelCounter::extractParameters()
 	GameEvent::extractParameters();
 	counterId = parameters["counter_id"].toInt();
 }
-Event_SetActivePlayer::Event_SetActivePlayer(int _gameId, bool _isPublic, int _playerId, int _activePlayerId)
-	: GameEvent("set_active_player", _gameId, _isPublic, _playerId), activePlayerId(_activePlayerId)
+Event_SetActivePlayer::Event_SetActivePlayer(int _gameId, int _playerId, int _activePlayerId)
+	: GameEvent("set_active_player", _gameId, _playerId), activePlayerId(_activePlayerId)
 {
 	setParameter("active_player_id", activePlayerId);
 }
@@ -515,8 +515,8 @@ void Event_SetActivePlayer::extractParameters()
 	GameEvent::extractParameters();
 	activePlayerId = parameters["active_player_id"].toInt();
 }
-Event_SetActivePhase::Event_SetActivePhase(int _gameId, bool _isPublic, int _playerId, int _phase)
-	: GameEvent("set_active_phase", _gameId, _isPublic, _playerId), phase(_phase)
+Event_SetActivePhase::Event_SetActivePhase(int _gameId, int _playerId, int _phase)
+	: GameEvent("set_active_phase", _gameId, _playerId), phase(_phase)
 {
 	setParameter("phase", phase);
 }
@@ -525,8 +525,8 @@ void Event_SetActivePhase::extractParameters()
 	GameEvent::extractParameters();
 	phase = parameters["phase"].toInt();
 }
-Event_DumpZone::Event_DumpZone(int _gameId, bool _isPublic, int _playerId, int _zoneOwnerId, const QString &_zone, int _numberCards)
-	: GameEvent("dump_zone", _gameId, _isPublic, _playerId), zoneOwnerId(_zoneOwnerId), zone(_zone), numberCards(_numberCards)
+Event_DumpZone::Event_DumpZone(int _gameId, int _playerId, int _zoneOwnerId, const QString &_zone, int _numberCards)
+	: GameEvent("dump_zone", _gameId, _playerId), zoneOwnerId(_zoneOwnerId), zone(_zone), numberCards(_numberCards)
 {
 	setParameter("zone_owner_id", zoneOwnerId);
 	setParameter("zone", zone);
@@ -539,8 +539,8 @@ void Event_DumpZone::extractParameters()
 	zone = parameters["zone"];
 	numberCards = parameters["number_cards"].toInt();
 }
-Event_StopDumpZone::Event_StopDumpZone(int _gameId, bool _isPublic, int _playerId, int _zoneOwnerId, const QString &_zone)
-	: GameEvent("stop_dump_zone", _gameId, _isPublic, _playerId), zoneOwnerId(_zoneOwnerId), zone(_zone)
+Event_StopDumpZone::Event_StopDumpZone(int _gameId, int _playerId, int _zoneOwnerId, const QString &_zone)
+	: GameEvent("stop_dump_zone", _gameId, _playerId), zoneOwnerId(_zoneOwnerId), zone(_zone)
 {
 	setParameter("zone_owner_id", zoneOwnerId);
 	setParameter("zone", zone);

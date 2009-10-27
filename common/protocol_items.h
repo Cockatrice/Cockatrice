@@ -362,7 +362,7 @@ class Event_Say : public GameEvent {
 private:
 	QString message;
 public:
-	Event_Say(int _gameId = -1, bool _isPublic = false, int _playerId = -1, const QString &_message = QString());
+	Event_Say(int _gameId = -1, int _playerId = -1, const QString &_message = QString());
 	QString getMessage() const { return message; }
 	static ProtocolItem *newItem() { return new Event_Say; }
 protected:
@@ -374,7 +374,7 @@ private:
 	QString playerName;
 	bool spectator;
 public:
-	Event_Join(int _gameId = -1, bool _isPublic = false, int _playerId = -1, const QString &_playerName = QString(), bool _spectator = false);
+	Event_Join(int _gameId = -1, int _playerId = -1, const QString &_playerName = QString(), bool _spectator = false);
 	QString getPlayerName() const { return playerName; }
 	bool getSpectator() const { return spectator; }
 	static ProtocolItem *newItem() { return new Event_Join; }
@@ -385,21 +385,21 @@ class Event_Leave : public GameEvent {
 	Q_OBJECT
 private:
 public:
-	Event_Leave(int _gameId = -1, bool _isPublic = false, int _playerId = -1);
+	Event_Leave(int _gameId = -1, int _playerId = -1);
 	static ProtocolItem *newItem() { return new Event_Leave; }
 };
 class Event_GameClosed : public GameEvent {
 	Q_OBJECT
 private:
 public:
-	Event_GameClosed(int _gameId = -1, bool _isPublic = false, int _playerId = -1);
+	Event_GameClosed(int _gameId = -1, int _playerId = -1);
 	static ProtocolItem *newItem() { return new Event_GameClosed; }
 };
 class Event_ReadyStart : public GameEvent {
 	Q_OBJECT
 private:
 public:
-	Event_ReadyStart(int _gameId = -1, bool _isPublic = false, int _playerId = -1);
+	Event_ReadyStart(int _gameId = -1, int _playerId = -1);
 	static ProtocolItem *newItem() { return new Event_ReadyStart; }
 };
 class Event_SetupZones : public GameEvent {
@@ -408,7 +408,7 @@ private:
 	int deckSize;
 	int sbSize;
 public:
-	Event_SetupZones(int _gameId = -1, bool _isPublic = false, int _playerId = -1, int _deckSize = -1, int _sbSize = -1);
+	Event_SetupZones(int _gameId = -1, int _playerId = -1, int _deckSize = -1, int _sbSize = -1);
 	int getDeckSize() const { return deckSize; }
 	int getSbSize() const { return sbSize; }
 	static ProtocolItem *newItem() { return new Event_SetupZones; }
@@ -419,14 +419,14 @@ class Event_GameStart : public GameEvent {
 	Q_OBJECT
 private:
 public:
-	Event_GameStart(int _gameId = -1, bool _isPublic = false, int _playerId = -1);
+	Event_GameStart(int _gameId = -1, int _playerId = -1);
 	static ProtocolItem *newItem() { return new Event_GameStart; }
 };
 class Event_Shuffle : public GameEvent {
 	Q_OBJECT
 private:
 public:
-	Event_Shuffle(int _gameId = -1, bool _isPublic = false, int _playerId = -1);
+	Event_Shuffle(int _gameId = -1, int _playerId = -1);
 	static ProtocolItem *newItem() { return new Event_Shuffle; }
 };
 class Event_RollDie : public GameEvent {
@@ -435,7 +435,7 @@ private:
 	int sides;
 	int value;
 public:
-	Event_RollDie(int _gameId = -1, bool _isPublic = false, int _playerId = -1, int _sides = -1, int _value = -1);
+	Event_RollDie(int _gameId = -1, int _playerId = -1, int _sides = -1, int _value = -1);
 	int getSides() const { return sides; }
 	int getValue() const { return value; }
 	static ProtocolItem *newItem() { return new Event_RollDie; }
@@ -454,7 +454,7 @@ private:
 	int y;
 	bool faceDown;
 public:
-	Event_MoveCard(int _gameId = -1, bool _isPublic = false, int _playerId = -1, int _cardId = -1, const QString &_cardName = QString(), const QString &_startZone = QString(), int _position = -1, const QString &_targetZone = QString(), int _x = -1, int _y = -1, bool _faceDown = false);
+	Event_MoveCard(int _gameId = -1, int _playerId = -1, int _cardId = -1, const QString &_cardName = QString(), const QString &_startZone = QString(), int _position = -1, const QString &_targetZone = QString(), int _x = -1, int _y = -1, bool _faceDown = false);
 	int getCardId() const { return cardId; }
 	QString getCardName() const { return cardName; }
 	QString getStartZone() const { return startZone; }
@@ -477,7 +477,7 @@ private:
 	int x;
 	int y;
 public:
-	Event_CreateToken(int _gameId = -1, bool _isPublic = false, int _playerId = -1, const QString &_zone = QString(), int _cardId = -1, const QString &_cardName = QString(), const QString &_pt = QString(), int _x = -1, int _y = -1);
+	Event_CreateToken(int _gameId = -1, int _playerId = -1, const QString &_zone = QString(), int _cardId = -1, const QString &_cardName = QString(), const QString &_pt = QString(), int _x = -1, int _y = -1);
 	QString getZone() const { return zone; }
 	int getCardId() const { return cardId; }
 	QString getCardName() const { return cardName; }
@@ -500,7 +500,7 @@ private:
 	int targetCardId;
 	int color;
 public:
-	Event_CreateArrow(int _gameId = -1, bool _isPublic = false, int _playerId = -1, int _arrowId = -1, int _startPlayerId = -1, const QString &_startZone = QString(), int _startCardId = -1, int _targetPlayerId = -1, const QString &_targetZone = QString(), int _targetCardId = -1, int _color = -1);
+	Event_CreateArrow(int _gameId = -1, int _playerId = -1, int _arrowId = -1, int _startPlayerId = -1, const QString &_startZone = QString(), int _startCardId = -1, int _targetPlayerId = -1, const QString &_targetZone = QString(), int _targetCardId = -1, int _color = -1);
 	int getArrowId() const { return arrowId; }
 	int getStartPlayerId() const { return startPlayerId; }
 	QString getStartZone() const { return startZone; }
@@ -518,7 +518,7 @@ class Event_DeleteArrow : public GameEvent {
 private:
 	int arrowId;
 public:
-	Event_DeleteArrow(int _gameId = -1, bool _isPublic = false, int _playerId = -1, int _arrowId = -1);
+	Event_DeleteArrow(int _gameId = -1, int _playerId = -1, int _arrowId = -1);
 	int getArrowId() const { return arrowId; }
 	static ProtocolItem *newItem() { return new Event_DeleteArrow; }
 protected:
@@ -532,7 +532,7 @@ private:
 	QString attrName;
 	QString attrValue;
 public:
-	Event_SetCardAttr(int _gameId = -1, bool _isPublic = false, int _playerId = -1, const QString &_zone = QString(), int _cardId = -1, const QString &_attrName = QString(), const QString &_attrValue = QString());
+	Event_SetCardAttr(int _gameId = -1, int _playerId = -1, const QString &_zone = QString(), int _cardId = -1, const QString &_attrName = QString(), const QString &_attrValue = QString());
 	QString getZone() const { return zone; }
 	int getCardId() const { return cardId; }
 	QString getAttrName() const { return attrName; }
@@ -550,7 +550,7 @@ private:
 	int radius;
 	int value;
 public:
-	Event_AddCounter(int _gameId = -1, bool _isPublic = false, int _playerId = -1, int _counterId = -1, const QString &_counterName = QString(), int _color = -1, int _radius = -1, int _value = -1);
+	Event_AddCounter(int _gameId = -1, int _playerId = -1, int _counterId = -1, const QString &_counterName = QString(), int _color = -1, int _radius = -1, int _value = -1);
 	int getCounterId() const { return counterId; }
 	QString getCounterName() const { return counterName; }
 	int getColor() const { return color; }
@@ -566,7 +566,7 @@ private:
 	int counterId;
 	int value;
 public:
-	Event_SetCounter(int _gameId = -1, bool _isPublic = false, int _playerId = -1, int _counterId = -1, int _value = -1);
+	Event_SetCounter(int _gameId = -1, int _playerId = -1, int _counterId = -1, int _value = -1);
 	int getCounterId() const { return counterId; }
 	int getValue() const { return value; }
 	static ProtocolItem *newItem() { return new Event_SetCounter; }
@@ -578,7 +578,7 @@ class Event_DelCounter : public GameEvent {
 private:
 	int counterId;
 public:
-	Event_DelCounter(int _gameId = -1, bool _isPublic = false, int _playerId = -1, int _counterId = -1);
+	Event_DelCounter(int _gameId = -1, int _playerId = -1, int _counterId = -1);
 	int getCounterId() const { return counterId; }
 	static ProtocolItem *newItem() { return new Event_DelCounter; }
 protected:
@@ -589,7 +589,7 @@ class Event_SetActivePlayer : public GameEvent {
 private:
 	int activePlayerId;
 public:
-	Event_SetActivePlayer(int _gameId = -1, bool _isPublic = false, int _playerId = -1, int _activePlayerId = -1);
+	Event_SetActivePlayer(int _gameId = -1, int _playerId = -1, int _activePlayerId = -1);
 	int getActivePlayerId() const { return activePlayerId; }
 	static ProtocolItem *newItem() { return new Event_SetActivePlayer; }
 protected:
@@ -600,7 +600,7 @@ class Event_SetActivePhase : public GameEvent {
 private:
 	int phase;
 public:
-	Event_SetActivePhase(int _gameId = -1, bool _isPublic = false, int _playerId = -1, int _phase = -1);
+	Event_SetActivePhase(int _gameId = -1, int _playerId = -1, int _phase = -1);
 	int getPhase() const { return phase; }
 	static ProtocolItem *newItem() { return new Event_SetActivePhase; }
 protected:
@@ -613,7 +613,7 @@ private:
 	QString zone;
 	int numberCards;
 public:
-	Event_DumpZone(int _gameId = -1, bool _isPublic = false, int _playerId = -1, int _zoneOwnerId = -1, const QString &_zone = QString(), int _numberCards = -1);
+	Event_DumpZone(int _gameId = -1, int _playerId = -1, int _zoneOwnerId = -1, const QString &_zone = QString(), int _numberCards = -1);
 	int getZoneOwnerId() const { return zoneOwnerId; }
 	QString getZone() const { return zone; }
 	int getNumberCards() const { return numberCards; }
@@ -627,7 +627,7 @@ private:
 	int zoneOwnerId;
 	QString zone;
 public:
-	Event_StopDumpZone(int _gameId = -1, bool _isPublic = false, int _playerId = -1, int _zoneOwnerId = -1, const QString &_zone = QString());
+	Event_StopDumpZone(int _gameId = -1, int _playerId = -1, int _zoneOwnerId = -1, const QString &_zone = QString());
 	int getZoneOwnerId() const { return zoneOwnerId; }
 	QString getZone() const { return zone; }
 	static ProtocolItem *newItem() { return new Event_StopDumpZone; }
