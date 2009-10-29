@@ -28,6 +28,7 @@ protected:
 private:
 	static void initializeHashAuto();
 public:
+	static const int protocolVersion = 4;
 	ProtocolItem(const QString &_itemName);
 	static void initializeHash();
 	static ProtocolItem *getNewItem(const QString &name);
@@ -36,6 +37,7 @@ public:
 };
 
 class Command : public ProtocolItem {
+	Q_OBJECT
 private:
 	int cmdId;
 	static int lastCmdId;

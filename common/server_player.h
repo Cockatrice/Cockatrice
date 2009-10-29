@@ -7,21 +7,21 @@
 #include <QMap>
 
 class ServerSocket;
-class ServerGame;
-class PlayerZone;
-class Counter;
-class Arrow;
+class Server_Game;
+class Server_CardZone;
+class Server_Counter;
+class Server_Arrow;
 
 enum PlayerStatusEnum { StatusNormal, StatusSubmitDeck, StatusReadyStart, StatusPlaying };
 
-class Player : public QObject {
+class Server_Player : public QObject {
 	Q_OBJECT
 private:
-	ServerGame *game;
+	Server_Game *game;
 	ServerSocket *socket;
-	QMap<QString, PlayerZone *> zones;
-	QMap<int, Counter *> counters;
-	QMap<int, Arrow *> arrows;
+	QMap<QString, Server_CardZone *> zones;
+	QMap<int, Server_Counter *> counters;
+	QMap<int, Server_Arrow *> arrows;
 	int playerId;
 	QString playerName;
 	bool spectator;
@@ -34,7 +34,7 @@ public:
 	QList<QString> SideboardList;
 	// Pfusch Ende
 	
-	Player(ServerGame *_game, int _playerId, const QString &_playerName, bool _spectator);
+	Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator);
 	void setSocket(ServerSocket *_socket) { socket = _socket; }
 	
 	void setStatus(PlayerStatusEnum _status) { PlayerStatus = _status; }
@@ -43,24 +43,24 @@ public:
 	int getPlayerId() const { return playerId; }
 	bool getSpectator() const { return spectator; }
 	QString getPlayerName() const { return playerName; }
-	const QMap<QString, PlayerZone *> &getZones() const { return zones; }
-	const QMap<int, Counter *> &getCounters() const { return counters; }
-	const QMap<int, Arrow *> &getArrows() const { return arrows; }
+	const QMap<QString, Server_CardZone *> &getZones() const { return zones; }
+	const QMap<int, Server_Counter *> &getCounters() const { return counters; }
+	const QMap<int, Server_Arrow *> &getArrows() const { return arrows; }
 	
 	int newCardId();
 	int newCounterId() const;
 	int newArrowId() const;
 	
-	void addZone(PlayerZone *zone);
-	void addArrow(Arrow *arrow);
+	void addZone(Server_CardZone *zone);
+	void addArrow(Server_Arrow *arrow);
 	bool deleteArrow(int arrowId);
-	void addCounter(Counter *counter);
+	void addCounter(Server_Counter *counter);
 	bool deleteCounter(int counterId);
 	
 	void setupZones();
 
 	void privateEvent(const QString &line);
-	void publicEvent(const QString &line, Player *player = 0);
+	void publicEvent(const QString &line, Server_Player *player = 0);
 };
 
 #endif

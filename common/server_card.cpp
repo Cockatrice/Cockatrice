@@ -17,27 +17,51 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef COUNTER_H
-#define COUNTER_H
+#include "server_card.h"
 
-#include <QString>
+Server_Card::Server_Card(QString _name, int _id, int _coord_x, int _coord_y)
+	: id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), counters(0), tapped(false), attacking(false), facedown(false), annotation(QString()), doesntUntap(false)
+{
+}
 
-class Counter {
-protected:
-	int id;
-	QString name;
-	int color;
-	int radius;
-	int count;
-public:
-	Counter(int _id, const QString &_name, int _color, int _radius, int _count = 0) : id(_id), name(_name), color(_color), radius(_radius), count(_count) { }
-	~Counter() { }
-	int getId() const { return id; }
-	QString getName() const { return name; }
-	int getColor() const { return color; }
-	int getRadius() const { return radius; }
-	int getCount() const { return count; }
-	void setCount(int _count) { count = _count; }
-};
 
-#endif
+Server_Card::~Server_Card()
+{
+}
+
+void Server_Card::resetState()
+{
+	setCoords(0, 0);
+	setCounters(0);
+	setTapped(false);
+	setAttacking(false);
+	setFaceDown(false);
+	setAnnotation(QString());
+	setDoesntUntap(false);
+}
+
+bool Server_Card::setAttribute(const QString &aname, const QString &avalue, bool allCards)
+{
+	if (aname == "counters") {
+		bool ok;
+		int tmp_int = avalue.toInt(&ok);
+		if (!ok)
+			return false;
+		setCounters(tmp_int);
+	} else if (aname == "tapped") {
+		bool value = avalue == "1";
+		if (!(!value && allCards && doesntUntap))
+			setTapped(value);
+	} else if (aname == "attacking") {
+		setAttacking(avalue == "1");
+	} else if (aname == "facedown") {
+		setFaceDown(avalue == "1");
+	} else if (aname == "annotation") {
+		setAnnotation(avalue);
+	} else if (aname == "doesnt_untap") {
+		setDoesntUntap(avalue == "1");
+	} else
+		return false;
+	
+	return true;
+}

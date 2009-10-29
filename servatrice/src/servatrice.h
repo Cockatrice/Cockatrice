@@ -17,5 +17,30 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "counter.h"
+#ifndef SERVATRICE_H
+#define SERVATRICE_H
 
+#include <QTcpServer>
+#include "server.h"
+
+class QSqlDatabase;
+class QSettings;
+
+class Servatrice : public Server
+{
+	Q_OBJECT
+private slots:
+	void newConnection();
+public:
+	Servatrice(QObject *parent = 0);
+	~Servatrice();
+	bool openDatabase();
+	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
+	QStringList getLoginMessage() const { return loginMessage; }
+private:
+	QTcpServer *tcpServer;
+	QStringList loginMessage;
+	QSettings *settings;
+};
+
+#endif

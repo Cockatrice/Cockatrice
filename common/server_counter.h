@@ -17,55 +17,27 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CARD_H
-#define CARD_H
+#ifndef SERVER_COUNTER_H
+#define SERVER_COUNTER_H
 
 #include <QString>
 
-class PlayerZone;
-
-class Card {
-private:
-	PlayerZone *zone;
+class Server_Counter {
+protected:
 	int id;
-	int coord_x, coord_y;
 	QString name;
-	int counters;
-	bool tapped;
-	bool attacking;
-	bool facedown;
-	QString annotation;
-	bool doesntUntap;
+	int color;
+	int radius;
+	int count;
 public:
-	Card(QString _name, int _id, int _coord_x, int _coord_y);
-	~Card();
-	
-	PlayerZone *getZone() const { return zone; }
-	void setZone(PlayerZone *_zone) { zone = _zone; }
-	
+	Server_Counter(int _id, const QString &_name, int _color, int _radius, int _count = 0) : id(_id), name(_name), color(_color), radius(_radius), count(_count) { }
+	~Server_Counter() { }
 	int getId() const { return id; }
-	int getX() const { return coord_x; }
-	int getY() const { return coord_y; }
 	QString getName() const { return name; }
-	int getCounters() const { return counters; }
-	bool getTapped() const { return tapped; }
-	bool getAttacking() const { return attacking; }
-	bool getFaceDown() const { return facedown; }
-	QString getAnnotation() const { return annotation; }
-	bool getDoesntUntap() const { return doesntUntap; }
-
-	void setId(int _id) { id = _id; }
-	void setCoords(int x, int y) { coord_x = x; coord_y = y; }
-	void setName(const QString &_name) { name = _name; }
-	void setCounters(int _counters) { counters = _counters; }
-	void setTapped(bool _tapped) { tapped = _tapped; }
-	void setAttacking(bool _attacking) { attacking = _attacking; }
-	void setFaceDown(bool _facedown) { facedown = _facedown; }
-	void setAnnotation(const QString &_annotation) { annotation = _annotation; }
-	void setDoesntUntap(bool _doesntUntap) { doesntUntap = _doesntUntap; }
-	
-	void resetState();
-	bool setAttribute(const QString &aname, const QString &avalue, bool allCards);
+	int getColor() const { return color; }
+	int getRadius() const { return radius; }
+	int getCount() const { return count; }
+	void setCount(int _count) { count = _count; }
 };
 
 #endif

@@ -17,36 +17,36 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "playerzone.h"
-#include "abstractrng.h"
-#include "card.h"
+#include "server_cardzone.h"
+#include "server_card.h"
+#include "rng_abstract.h"
 
-PlayerZone::PlayerZone(Player *_player, const QString &_name, bool _has_coords, ZoneType _type)
+Server_CardZone::Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ZoneType _type)
 	: player(_player), name(_name), has_coords(_has_coords), type(_type), cardsBeingLookedAt(0)
 {
 }
 
-PlayerZone::~PlayerZone()
+Server_CardZone::~Server_CardZone()
 {
-	qDebug(QString("PlayerZone destructor: %1").arg(name).toLatin1());
+	qDebug(QString("Server_CardZone destructor: %1").arg(name).toLatin1());
 	clear();
 }
 
-void PlayerZone::shuffle()
+void Server_CardZone::shuffle()
 {
-	QList<Card *> temp;
+	QList<Server_Card *> temp;
 	for (int i = cards.size(); i; i--)
 		temp.append(cards.takeAt(rng->getNumber(0, i - 1)));
 	cards = temp;
 }
 
-Card *PlayerZone::getCard(int id, bool remove, int *position)
+Server_Card *Server_CardZone::getCard(int id, bool remove, int *position)
 {
 	if (type != HiddenZone) {
-		QListIterator<Card *> CardIterator(cards);
+		QListIterator<Server_Card *> CardIterator(cards);
 		int i = 0;
 		while (CardIterator.hasNext()) {
-			Card *tmp = CardIterator.next();
+			Server_Card *tmp = CardIterator.next();
 			if (tmp->getId() == id) {
 				if (remove) {
 					cards.removeAt(i);
@@ -62,7 +62,7 @@ Card *PlayerZone::getCard(int id, bool remove, int *position)
 	} else {
 		if ((id >= cards.size()) || (id < 0))
 			return NULL;
-		Card *tmp = cards[id];
+		Server_Card *tmp = cards[id];
 		if (remove) {
 			cards.removeAt(id);
 			tmp->setZone(0);
@@ -73,7 +73,7 @@ Card *PlayerZone::getCard(int id, bool remove, int *position)
 	}
 }
 
-void PlayerZone::insertCard(Card *card, int x, int y)
+void Server_CardZone::insertCard(Server_Card *card, int x, int y)
 {
 	if (hasCoords()) {
 		card->setCoords(x, y);
@@ -85,7 +85,7 @@ void PlayerZone::insertCard(Card *card, int x, int y)
 	card->setZone(this);
 }
 
-void PlayerZone::clear()
+void Server_CardZone::clear()
 {
 	for (int i = 0; i < cards.size(); i++)
 		delete cards.at(i);

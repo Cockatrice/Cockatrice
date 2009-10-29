@@ -63,6 +63,9 @@ ProtocolItem *ProtocolItem::getNewItem(const QString &name)
 
 void ProtocolItem::initializeHash()
 {
+	if (!itemNameHash.isEmpty())
+		return;
+	
 	initializeHashAuto();
 	itemNameHash.insert("resp", ProtocolResponse::newItem);
 	ProtocolResponse::initializeHash();

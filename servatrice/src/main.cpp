@@ -20,10 +20,7 @@
 
 #include <QCoreApplication>
 #include <QTextCodec>
-#include "server.h"
-#include "rng_qt.h"
-
-AbstractRNG *rng;
+#include "servatrice.h"
 
 int main(int argc, char *argv[])
 {
@@ -33,10 +30,7 @@ int main(int argc, char *argv[])
 	
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
-	rng = new RNG_Qt;
-	
-	Server server;
-	server.listen(QHostAddress::Any, 4747);
+	Servatrice server;
 	
 	return app.exec();
 }

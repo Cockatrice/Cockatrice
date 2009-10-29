@@ -17,46 +17,30 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef SERVERSOCKETINTERFACE_H
+#define SERVERSOCKETINTERFACE_H
 
-#include <QTcpServer>
-#include <QStringList>
+#include <QTcpSocket>
+#include <server_protocolhandler.h>
 
-class ServerGame;
-class ServerSocket;
-class QSqlDatabase;
-class QSettings;
-class ChatChannel;
+class QTcpSocket;
+class Server;
+class QXmlStreamReader;
+class QXmlStreamWriter;
 
-enum AuthenticationResult { PasswordWrong = 0, PasswordRight = 1, UnknownUser = 2 };
-
-class Server : public QTcpServer
+class ServerSocketInterface : public Server_ProtocolHandler
 {
 	Q_OBJECT
 private slots:
-	void gameClosing();
-	void broadcastChannelUpdate();
-public:
-	Server(QObject *parent = 0);
-	~Server();
-	QSettings *settings;
-	bool openDatabase();
-	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
-	QList<ServerGame *> getGames() const { return games.values(); }
-	ServerGame *getGame(int gameId) const;
-	const QMap<QString, ChatChannel *> &getChatChannels() { return chatChannels; }
-	void broadcastGameListUpdate(ServerGame *game);
-	void removePlayer(ServerSocket *player);
-	const QStringList &getLoginMessage() const { return loginMessage; }
-	ServerGame *createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, const QString &playerName);
+	void readClient();
+	void catchSocketError(QAbstractSocket::SocketError socketError);
 private:
-	void incomingConnection(int SocketId);
-	QMap<int, ServerGame *> games;
-	QList<ServerSocket *> players;
-	QMap<QString, ChatChannel *> chatChannels;
-	int nextGameId;
-	QStringList loginMessage;
+	QTcpSocket *socket;
+	QXmlStreamWriter *xmlWriter;
+	QXmlStreamReader *xmlReader;
+public:
+	ServerSocketInterface(Server *_server, QTcpSocket *_socket, QObject *parent = 0);
+	~ServerSocketInterface();
 };
 
 #endif

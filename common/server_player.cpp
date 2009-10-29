@@ -1,46 +1,45 @@
-#include "player.h"
-#include "card.h"
-#include "counter.h"
-#include "arrow.h"
-#include "playerzone.h"
-#include "serversocket.h"
-#include "servergame.h"
+#include "server_player.h"
+#include "server_card.h"
+#include "server_counter.h"
+#include "server_arrow.h"
+#include "server_cardzone.h"
+#include "server_game.h"
 
-Player::Player(ServerGame *_game, int _playerId, const QString &_playerName, bool _spectator)
+Server_Player::Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator)
 	: game(_game), socket(0), playerId(_playerId), playerName(_playerName), spectator(_spectator), nextCardId(0), PlayerStatus(StatusNormal)
 {
 }
 
-int Player::newCardId()
+int Server_Player::newCardId()
 {
 	return nextCardId++;
 }
 
-int Player::newCounterId() const
+int Server_Player::newCounterId() const
 {
 	int id = 0;
-	QMapIterator<int, Counter *> i(counters);
+	QMapIterator<int, Server_Counter *> i(counters);
 	while (i.hasNext()) {
-		Counter *c = i.next().value();
+		Server_Counter *c = i.next().value();
 		if (c->getId() > id)
 			id = c->getId();
 	}
 	return id + 1;
 }
 
-int Player::newArrowId() const
+int Server_Player::newArrowId() const
 {
 	int id = 0;
-	QMapIterator<int, Arrow *> i(arrows);
+	QMapIterator<int, Server_Arrow *> i(arrows);
 	while (i.hasNext()) {
-		Arrow *a = i.next().value();
+		Server_Arrow *a = i.next().value();
 		if (a->getId() > id)
 			id = a->getId();
 	}
 	return id + 1;
 }
 
-void Player::setupZones()
+void Server_Player::setupZones()
 {
 	// Delete existing zones and counters
 	clearZones();
@@ -49,14 +48,14 @@ void Player::setupZones()
 	// ------------------------------------------------------------------
 
 	// Create zones
-	PlayerZone *deck = new PlayerZone(this, "deck", false, PlayerZone::HiddenZone);
+	Server_CardZone *deck = new Server_CardZone(this, "deck", false, Server_CardZone::HiddenZone);
 	addZone(deck);
-	PlayerZone *sb = new PlayerZone(this, "sb", false, PlayerZone::HiddenZone);
+	Server_CardZone *sb = new Server_CardZone(this, "sb", false, Server_CardZone::HiddenZone);
 	addZone(sb);
-	addZone(new PlayerZone(this, "table", true, PlayerZone::PublicZone));
-	addZone(new PlayerZone(this, "hand", false, PlayerZone::PrivateZone));
-	addZone(new PlayerZone(this, "grave", false, PlayerZone::PublicZone));
-	addZone(new PlayerZone(this, "rfg", false, PlayerZone::PublicZone));
+	addZone(new Server_CardZone(this, "table", true, Server_CardZone::PublicZone));
+	addZone(new Server_CardZone(this, "hand", false, Server_CardZone::PrivateZone));
+	addZone(new Server_CardZone(this, "grave", false, Server_CardZone::PublicZone));
+	addZone(new Server_CardZone(this, "rfg", false, Server_CardZone::PublicZone));
 
 	// ------------------------------------------------------------------
 
@@ -64,12 +63,12 @@ void Player::setupZones()
 	QListIterator<QString> DeckIterator(DeckList);
 	int i = 0;
 	while (DeckIterator.hasNext())
-		deck->cards.append(new Card(DeckIterator.next(), i++, 0, 0));
+		deck->cards.append(new Server_Card(DeckIterator.next(), i++, 0, 0));
 	deck->shuffle();
 
 	QListIterator<QString> SBIterator(SideboardList);
 	while (SBIterator.hasNext())
-		sb->cards.append(new Card(SBIterator.next(), i++, 0, 0));
+		sb->cards.append(new Server_Card(SBIterator.next(), i++, 0, 0));
 
 	nextCardId = i;
 	
@@ -78,37 +77,37 @@ void Player::setupZones()
 						   .arg(sb->cards.size()), this);
 }
 
-void Player::clearZones()
+void Server_Player::clearZones()
 {
-	QMapIterator<QString, PlayerZone *> zoneIterator(zones);
+	QMapIterator<QString, Server_CardZone *> zoneIterator(zones);
 	while (zoneIterator.hasNext())
 		delete zoneIterator.next().value();
 	zones.clear();
 
-	QMapIterator<int, Counter *> counterIterator(counters);
+	QMapIterator<int, Server_Counter *> counterIterator(counters);
 	while (counterIterator.hasNext())
 		delete counterIterator.next().value();
 	counters.clear();
 	
-	QMapIterator<int, Arrow *> arrowIterator(arrows);
+	QMapIterator<int, Server_Arrow *> arrowIterator(arrows);
 	while (arrowIterator.hasNext())
 		delete arrowIterator.next().value();
 	arrows.clear();
 }
 
-void Player::addZone(PlayerZone *zone)
+void Server_Player::addZone(Server_CardZone *zone)
 {
 	zones.insert(zone->getName(), zone);
 }
 
-void Player::addArrow(Arrow *arrow)
+void Server_Player::addArrow(Server_Arrow *arrow)
 {
 	arrows.insert(arrow->getId(), arrow);
 }
 
-bool Player::deleteArrow(int arrowId)
+bool Server_Player::deleteArrow(int arrowId)
 {
-	Arrow *arrow = arrows.value(arrowId, 0);
+	Server_Arrow *arrow = arrows.value(arrowId, 0);
 	if (!arrow)
 		return false;
 	arrows.remove(arrowId);
@@ -116,14 +115,14 @@ bool Player::deleteArrow(int arrowId)
 	return true;
 }
 
-void Player::addCounter(Counter *counter)
+void Server_Player::addCounter(Server_Counter *counter)
 {
 	counters.insert(counter->getId(), counter);
 }
 
-bool Player::deleteCounter(int counterId)
+bool Server_Player::deleteCounter(int counterId)
 {
-	Counter *counter = counters.value(counterId, 0);
+	Server_Counter *counter = counters.value(counterId, 0);
 	if (!counter)
 		return false;
 	counters.remove(counterId);
@@ -131,19 +130,19 @@ bool Player::deleteCounter(int counterId)
 	return true;
 }
 
-void Player::privateEvent(const QString &line)
+void Server_Player::privateEvent(const QString &line)
 {
-	if (!socket)
+/*	if (!socket)
 		return;
 	socket->msg(QString("private|%1|%2|%3").arg(playerId).arg(playerName).arg(line));
-}
+*/}
 
-void Player::publicEvent(const QString &line, Player *player)
+void Server_Player::publicEvent(const QString &line, Server_Player *player)
 {
-	if (!socket)
+/*	if (!socket)
 		return;
 	if (player)
 		socket->msg(QString("public|%1|%2|%3").arg(player->getPlayerId()).arg(player->getPlayerName()).arg(line));
 	else
 		socket->msg(QString("public|||%1").arg(line));
-}
+*/}

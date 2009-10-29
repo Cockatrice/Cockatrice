@@ -22,16 +22,16 @@
 
 #include <QStringList>
 #include <QPointer>
-#include "player.h"
+#include <QObject>
+#include "server_player.h"
 #include "returnmessage.h"
-#include "serversocket.h"
 
-class ServerGame : public QObject {
+class Server_Game : public QObject {
 	Q_OBJECT
 private:
-	QPointer<Player> creator;
-	QMap<int, Player *> players;
-	QList<Player *> spectators;
+	QPointer<Server_Player> creator;
+	QMap<int, Server_Player *> players;
+	QList<Server_Player *> spectators;
 	bool gameStarted;
 	int gameId;
 	QString description;
@@ -42,13 +42,13 @@ private:
 signals:
 	void gameClosing();
 public:
-	ServerGame(const QString &_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent = 0);
-	~ServerGame();
-	Player *getCreator() const { return creator; }
+	Server_Game(const QString &_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent = 0);
+	~Server_Game();
+	Server_Player *getCreator() const { return creator; }
 	bool getGameStarted() const { return gameStarted; }
 	int getPlayerCount() const { return players.size(); }
-	QList<Player *> getPlayers() const { return players.values(); }
-	Player *getPlayer(int playerId) const { return players.value(playerId, 0); }
+	QList<Server_Player *> getPlayers() const { return players.values(); }
+	Server_Player *getPlayer(int playerId) const { return players.value(playerId, 0); }
 	int getGameId() const { return gameId; }
 	QString getDescription() const { return description; }
 	QString getPassword() const { return password; }
@@ -56,15 +56,15 @@ public:
 	bool getSpectatorsAllowed() const { return spectatorsAllowed; }
 	QString getGameListLine() const;
 	ReturnMessage::ReturnCode checkJoin(const QString &_password, bool spectator);
-	Player *addPlayer(const QString &playerName, bool spectator);
-	void removePlayer(Player *player);
+	Server_Player *addPlayer(const QString &playerName, bool spectator);
+	void removePlayer(Server_Player *player);
 	void startGameIfReady();
 	int getActivePlayer() const { return activePlayer; }
 	int getActivePhase() const { return activePhase; }
 	void setActivePlayer(int _activePlayer);
 	void setActivePhase(int _activePhase);
 
-	void broadcastEvent(const QString &eventStr, Player *player);
+	void broadcastEvent(const QString &eventStr, Server_Player *player);
 };
 
 #endif

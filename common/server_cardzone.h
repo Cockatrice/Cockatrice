@@ -17,17 +17,16 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef PLAYERZONE_H
-#define PLAYERZONE_H
+#ifndef SERVER_CARDZONE_H
+#define SERVER_CARDZONE_H
 
 #include <QList>
 #include <QString>
 
-class Card;
-class ServerSocket;
-class Player;
+class Server_Card;
+class Server_Player;
 
-class PlayerZone {
+class Server_CardZone {
 public:
 	// PrivateZone: Contents of the zone are always visible to the owner,
 	// but not to anyone else.
@@ -39,26 +38,26 @@ public:
 	// list index, whereas cards in any other zone are referenced by their ids.
 	enum ZoneType { PrivateZone, PublicZone, HiddenZone };
 private:
-	Player *player;
+	Server_Player *player;
 	QString name;
 	bool has_coords;
 	ZoneType type;
 	int cardsBeingLookedAt;
 public:
-	PlayerZone(Player *_player, const QString &_name, bool _has_coords, ZoneType _type);
-	~PlayerZone();
+	Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ZoneType _type);
+	~Server_CardZone();
 
-	Card *getCard(int id, bool remove, int *position = NULL);
+	Server_Card *getCard(int id, bool remove, int *position = NULL);
 
 	int getCardsBeingLookedAt() const { return cardsBeingLookedAt; }
 	void setCardsBeingLookedAt(int _cardsBeingLookedAt) { cardsBeingLookedAt = _cardsBeingLookedAt; }
 	bool hasCoords() const { return has_coords; }
 	ZoneType getType() const { return type; }
 	QString getName() const { return name; }
-	Player *getPlayer() const { return player; }
+	Server_Player *getPlayer() const { return player; }
 	
-	QList<Card *> cards;
-	void insertCard(Card *card, int x, int y);
+	QList<Server_Card *> cards;
+	void insertCard(Server_Card *card, int x, int y);
 	void shuffle();
 	void clear();
 };
