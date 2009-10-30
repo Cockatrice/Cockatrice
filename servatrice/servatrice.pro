@@ -4,8 +4,8 @@
 
 TEMPLATE = app
 TARGET = 
-DEPENDPATH += . src ../common/src
-INCLUDEPATH += . src ../common/src
+DEPENDPATH += . src ../common
+INCLUDEPATH += . src ../common
 MOC_DIR = build
 OBJECTS_DIR = build
 
@@ -16,31 +16,31 @@ QT -= gui
 HEADERS += src/servatrice.h \
 	src/serversocketinterface.h \
 	src/version.h \
-	../common/src/protocol.h \
-	../common/src/protocol_items.h \
-	../common/src/rng_abstract.h \
-	../common/src/rng_qt.h \
-	../common/src/server.h \
-	../common/src/server_arrow.h \
-	../common/src/server_card.h \
-	../common/src/server_cardzone.h \
-	../common/src/server_chatchannel.h \
-	../common/src/server_counter.h \
-	../common/src/server_game.h \
-	../common/src/server_player.h \
-	../common/src/server_protocolhandler.h
+	../common/protocol.h \
+	../common/protocol_items.h \
+	../common/rng_abstract.h \
+	../common/rng_qt.h \
+	../common/server.h \
+	../common/server_arrow.h \
+	../common/server_card.h \
+	../common/server_cardzone.h \
+	../common/server_chatchannel.h \
+	../common/server_counter.h \
+	../common/server_game.h \
+	../common/server_player.h \
+	../common/server_protocolhandler.h
  
 SOURCES += src/main.cpp \
 	src/servatrice.cpp \
 	src/serversocketinterface.cpp \
-	../common/src/protocol.cpp \
-	../common/src/protocol_items.cpp \
-	../common/src/rng_abstract.cpp \
-	../common/src/rng_qt.cpp \
-	../common/src/server.cpp \
-	../common/src/server_card.cpp \
-	../common/src/server_cardzone.cpp \
-	../common/src/server_chatchannel.cpp \
-	../common/src/server_game.cpp \
-	../common/src/server_player.cpp \
-	../common/src/server_protocolhandler.cpp
+	../common/protocol.cpp \
+	../common/protocol_items.cpp \
+	../common/rng_abstract.cpp \
+	../common/rng_qt.cpp \
+	../common/server.cpp \
+	../common/server_card.cpp \
+	../common/server_cardzone.cpp \
+	../common/server_chatchannel.cpp \
+	../common/server_game.cpp \
+	../common/server_player.cpp \
+	../common/server_protocolhandler.cpp

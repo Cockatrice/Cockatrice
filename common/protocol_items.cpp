@@ -551,6 +551,16 @@ void Event_StopDumpZone::extractParameters()
 	zoneOwnerId = parameters["zone_owner_id"].toInt();
 	zone = parameters["zone"];
 }
+Event_Welcome::Event_Welcome(const QString &_message)
+	: GenericEvent("welcome"), message(_message)
+{
+	setParameter("message", message);
+}
+void Event_Welcome::extractParameters()
+{
+	GenericEvent::extractParameters();
+	message = parameters["message"];
+}
 void ProtocolItem::initializeHashAuto()
 {
 	itemNameHash.insert("cmdping", Command_Ping::newItem);
@@ -604,4 +614,5 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventset_active_phase", Event_SetActivePhase::newItem);
 	itemNameHash.insert("game_eventdump_zone", Event_DumpZone::newItem);
 	itemNameHash.insert("game_eventstop_dump_zone", Event_StopDumpZone::newItem);
+	itemNameHash.insert("generic_eventwelcome", Event_Welcome::newItem);
 }

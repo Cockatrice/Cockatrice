@@ -11,47 +11,47 @@ ProtocolItem::ProtocolItem(const QString &_itemName)
 {
 }
 
-bool ProtocolItem::read(QXmlStreamReader &xml)
+bool ProtocolItem::read(QXmlStreamReader *xml)
 {
-	while (!xml.atEnd()) {
-		xml.readNext();
-		if (xml.isStartElement()) {
-			qDebug() << "startElement: " << xml.name().toString();
-		} else if (xml.isEndElement()) {
-			qDebug() << "endElement: " << xml.name().toString();
-			if (xml.name() == getItemType()) {
+	while (!xml->atEnd()) {
+		xml->readNext();
+		if (xml->isStartElement()) {
+			qDebug() << "startElement: " << xml->name().toString();
+		} else if (xml->isEndElement()) {
+			qDebug() << "endElement: " << xml->name().toString();
+			if (xml->name() == getItemType()) {
 				extractParameters();
 				qDebug() << "FERTIG";
 				deleteLater();
 				return true;
 			} else {
-				QString tagName = xml.name().toString();
+				QString tagName = xml->name().toString();
 				if (!parameters.contains(tagName))
 					qDebug() << "unrecognized attribute";
 				else
 					parameters[tagName] = currentElementText;
 			}
-		} else if (xml.isCharacters() && !xml.isWhitespace()) {
-			currentElementText = xml.text().toString();
+		} else if (xml->isCharacters() && !xml->isWhitespace()) {
+			currentElementText = xml->text().toString();
 			qDebug() << "text: " << currentElementText;
 		}
 	}
 	return false;
 }
 
-void ProtocolItem::write(QXmlStreamWriter &xml)
+void ProtocolItem::write(QXmlStreamWriter *xml)
 {
-	xml.writeStartElement(getItemType());
+	xml->writeStartElement(getItemType());
 	if (!itemName.isEmpty())
-		xml.writeAttribute("name", itemName);
+		xml->writeAttribute("name", itemName);
 	
 	QMapIterator<QString, QString> i(parameters);
 	while (i.hasNext()) {
 		i.next();
-		xml.writeTextElement(i.key(), i.value());
+		xml->writeTextElement(i.key(), i.value());
 	}
 	
-	xml.writeEndElement();
+	xml->writeEndElement();
 }
 
 ProtocolItem *ProtocolItem::getNewItem(const QString &name)
@@ -116,6 +116,11 @@ void ProtocolResponse::initializeHash()
 	responseHash.insert("context_error", RespContextError);
 	responseHash.insert("wrong_password", RespWrongPassword);
 	responseHash.insert("spectators_not_allowed", RespSpectatorsNotAllowed);
+}
+
+GenericEvent::GenericEvent(const QString &_eventName)
+	: ProtocolItem(_eventName)
+{
 }
 
 void GameEvent::extractParameters()

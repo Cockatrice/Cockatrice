@@ -49,3 +49,4 @@
 3:set_active_phase:i,phase
 3:dump_zone:i,zone_owner_id:s,zone:i,number_cards
 3:stop_dump_zone:i,zone_owner_id:s,zone
+4:welcome:s,message

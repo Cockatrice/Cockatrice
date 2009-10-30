@@ -117,3 +117,5 @@ AuthenticationResult Servatrice::checkUserPassword(const QString &user, const QS
 	} else
 		return UnknownUser;
 }
+
+const QString Servatrice::versionString = "Servatrice 0.20091030";

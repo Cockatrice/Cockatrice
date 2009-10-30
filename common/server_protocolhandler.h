@@ -7,6 +7,7 @@
 
 class Server_Player;
 class Command;
+class ProtocolItem;
 
 class Server_ProtocolHandler : public QObject {
 	Q_OBJECT
@@ -31,6 +32,7 @@ public:
 	const QString &getPlayerName() const { return playerName; }
 	
 	void processCommand(Command *command);
+	virtual void sendProtocolItem(ProtocolItem *item) = 0;
 };
 
 #endif

@@ -32,8 +32,8 @@ public:
 	ProtocolItem(const QString &_itemName);
 	static void initializeHash();
 	static ProtocolItem *getNewItem(const QString &name);
-	virtual bool read(QXmlStreamReader &xml);
-	virtual void write(QXmlStreamWriter &xml);
+	virtual bool read(QXmlStreamReader *xml);
+	virtual void write(QXmlStreamWriter *xml);
 };
 
 class Command : public ProtocolItem {
@@ -99,6 +99,14 @@ public:
 	ProtocolResponse(int _cmdId = -1, ResponseCode _responseCode = RespOk);
 	static void initializeHash();
 	static ProtocolItem *newItem() { return new ProtocolResponse; }
+};
+
+class GenericEvent : public ProtocolItem {
+	Q_OBJECT
+protected:
+	QString getItemType() const { return "generic_event"; }
+public:
+	GenericEvent(const QString &_eventName);
 };
 
 class GameEvent : public ProtocolItem {

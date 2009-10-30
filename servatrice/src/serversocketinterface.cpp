@@ -21,13 +21,16 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include "serversocketinterface.h"
+#include "servatrice.h"
 #include "protocol.h"
+#include "protocol_items.h"
 
 ServerSocketInterface::ServerSocketInterface(Server *_server, QTcpSocket *_socket, QObject *parent)
 	: Server_ProtocolHandler(_server, parent), socket(_socket)
 {
 	xmlWriter = new QXmlStreamWriter;
 	xmlWriter->setDevice(socket);
+	xmlWriter->setAutoFormatting(true);
 	
 	xmlReader = new QXmlStreamReader;
 	
@@ -38,6 +41,8 @@ ServerSocketInterface::ServerSocketInterface(Server *_server, QTcpSocket *_socke
 	xmlWriter->writeStartDocument();
 	xmlWriter->writeStartElement("cockatrice_communication");
 	xmlWriter->writeAttribute("version", QString::number(ProtocolItem::protocolVersion));
+	
+	sendProtocolItem(new Event_Welcome(Servatrice::versionString));
 }
 
 ServerSocketInterface::~ServerSocketInterface()
@@ -59,7 +64,9 @@ ServerSocketInterface::~ServerSocketInterface()
 
 void ServerSocketInterface::readClient()
 {
-/*	while (canReadLine()) {
+	xmlReader->addData(socket->readAll());
+	
+	while (canReadLine()) {
 		QString line = QString(readLine()).trimmed();
 		if (line.isNull())
 			break;
@@ -91,3 +98,8 @@ void ServerSocketInterface::catchSocketError(QAbstractSocket::SocketError socket
 	deleteLater();
 }
 
+void ServerSocketInterface::sendProtocolItem(ProtocolItem *item)
+{
+	item->write(xmlWriter);
+	delete item;
+}

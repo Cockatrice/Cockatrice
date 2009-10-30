@@ -32,6 +32,7 @@ class Servatrice : public Server
 private slots:
 	void newConnection();
 public:
+	static const QString versionString;
 	Servatrice(QObject *parent = 0);
 	~Servatrice();
 	bool openDatabase();

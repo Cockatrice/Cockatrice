@@ -47,6 +47,13 @@ while (<file>) {
 		$parentConstructorCall = "$baseClass(\"$name1\", _gameId, _playerId)";
 		$constructorParamsH = "int _gameId = -1, int _playerId = -1";
 		$constructorParamsCpp = "int _gameId, int _playerId";
+	} elsif ($type == 4) {
+		$type = 'generic_event';
+		$namePrefix = 'Event';
+		$baseClass = 'GenericEvent';
+		$parentConstructorCall = "$baseClass(\"$name1\")";
+		$constructorParamsH = "";
+		$constructorParamsCpp = "";
 	}
 	$className = $namePrefix . '_' . $name2;
 	print headerfile "class $className : public $baseClass {\n"

@@ -634,5 +634,16 @@ public:
 protected:
 	void extractParameters();
 };
+class Event_Welcome : public GenericEvent {
+	Q_OBJECT
+private:
+	QString message;
+public:
+	Event_Welcome(const QString &_message = QString());
+	QString getMessage() const { return message; }
+	static ProtocolItem *newItem() { return new Event_Welcome; }
+protected:
+	void extractParameters();
+};
 
 #endif

@@ -41,6 +41,8 @@ private:
 public:
 	ServerSocketInterface(Server *_server, QTcpSocket *_socket, QObject *parent = 0);
 	~ServerSocketInterface();
+
+	void sendProtocolItem(ProtocolItem *item);
 };
 
 #endif
