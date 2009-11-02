@@ -15,7 +15,6 @@ QT -= gui
 
 HEADERS += src/servatrice.h \
 	src/serversocketinterface.h \
-	src/version.h \
 	../common/protocol.h \
 	../common/protocol_items.h \
 	../common/rng_abstract.h \

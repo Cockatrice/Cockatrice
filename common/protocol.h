@@ -6,6 +6,7 @@
 #include <QHash>
 #include <QObject>
 #include <QDebug>
+#include "protocol_item_ids.h"
 
 class QXmlStreamReader;
 class QXmlStreamWriter;
@@ -29,6 +30,7 @@ private:
 	static void initializeHashAuto();
 public:
 	static const int protocolVersion = 4;
+	virtual int getItemId() const = 0;
 	ProtocolItem(const QString &_itemName);
 	static void initializeHash();
 	static ProtocolItem *getNewItem(const QString &name);
@@ -45,7 +47,15 @@ protected:
 	QString getItemType() const { return "cmd"; }
 	void extractParameters();
 public:
-	Command(const QString &_itemName, int _cmdId = -1);
+	Command(const QString &_itemName = QString(), int _cmdId = -1);
+	int getCmdId() const { return cmdId; }
+};
+
+class InvalidCommand : public Command {
+	Q_OBJECT
+public:
+	InvalidCommand() : Command() { }
+	int getItemId() const { return ItemId_Other; }
 };
 
 class ChatCommand : public Command {
@@ -87,7 +97,7 @@ public:
 class ProtocolResponse : public ProtocolItem {
 	Q_OBJECT
 public:
-	enum ResponseCode { RespOk, RespNameNotFound, RespLoginNeeded, RespContextError, RespWrongPassword, RespSpectatorsNotAllowed };
+	enum ResponseCode { RespNothing, RespOk, RespInvalidCommand, RespNameNotFound, RespLoginNeeded, RespContextError, RespWrongPassword, RespSpectatorsNotAllowed };
 private:
 	int cmdId;
 	ResponseCode responseCode;
@@ -97,6 +107,7 @@ protected:
 	void extractParameters();
 public:
 	ProtocolResponse(int _cmdId = -1, ResponseCode _responseCode = RespOk);
+	int getItemId() const { return ItemId_Other; }
 	static void initializeHash();
 	static ProtocolItem *newItem() { return new ProtocolResponse; }
 };

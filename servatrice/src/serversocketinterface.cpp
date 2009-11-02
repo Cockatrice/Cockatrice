@@ -26,7 +26,7 @@
 #include "protocol_items.h"
 
 ServerSocketInterface::ServerSocketInterface(Server *_server, QTcpSocket *_socket, QObject *parent)
-	: Server_ProtocolHandler(_server, parent), socket(_socket)
+	: Server_ProtocolHandler(_server, parent), socket(_socket), currentItem(0)
 {
 	xmlWriter = new QXmlStreamWriter;
 	xmlWriter->setDevice(socket);
@@ -39,7 +39,7 @@ ServerSocketInterface::ServerSocketInterface(Server *_server, QTcpSocket *_socke
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(catchSocketError(QAbstractSocket::SocketError)));
 	
 	xmlWriter->writeStartDocument();
-	xmlWriter->writeStartElement("cockatrice_communication");
+	xmlWriter->writeStartElement("cockatrice_server_stream");
 	xmlWriter->writeAttribute("version", QString::number(ProtocolItem::protocolVersion));
 	
 	sendProtocolItem(new Event_Welcome(Servatrice::versionString));
@@ -64,32 +64,38 @@ ServerSocketInterface::~ServerSocketInterface()
 
 void ServerSocketInterface::readClient()
 {
+	qDebug() << "readClient";
 	xmlReader->addData(socket->readAll());
 	
-	while (canReadLine()) {
-		QString line = QString(readLine()).trimmed();
-		if (line.isNull())
-			break;
-			
-		qDebug(QString("<<< %1").arg(line).toLatin1());
-/*		switch (PlayerStatus) {
-			case StatusNormal:
-			case StatusReadyStart:
-			case StatusPlaying:
-				parseCommand(line);
-				break;
-			case StatusSubmitDeck:
-				QString card = line;
-				if (card == ".") {
-					PlayerStatus = StatusNormal;
-					remsg->send(ReturnMessage::ReturnOk);
-				} else if (card.startsWith("SB:"))
-					SideboardList << card.mid(3);
+	if (currentItem) {
+		if (!currentItem->read(xmlReader))
+			return;
+		currentItem = 0;
+	}
+	while (!xmlReader->atEnd()) {
+		xmlReader->readNext();
+		if (xmlReader->isStartElement()) {
+			QString itemType = xmlReader->name().toString();
+			if (itemType == "cockatrice_client_stream")
+				continue;
+			QString itemName = xmlReader->attributes().value("name").toString();
+			qDebug() << "parseXml: startElement: " << "type =" << itemType << ", name =" << itemName;
+			currentItem = ProtocolItem::getNewItem(itemType + itemName);
+			if (!currentItem)
+				currentItem = new InvalidCommand;
+			if (!currentItem->read(xmlReader))
+				return;
+			else {
+				Command *command = qobject_cast<Command *>(currentItem);
+				if (qobject_cast<InvalidCommand *>(command))
+					sendProtocolItem(new ProtocolResponse(command->getCmdId(), ProtocolResponse::RespInvalidCommand));
 				else
-					DeckList << card;
+					processCommand(command);
+				currentItem = 0;
+			}
 		}
 	}
-*/}
+}
 
 void ServerSocketInterface::catchSocketError(QAbstractSocket::SocketError socketError)
 {

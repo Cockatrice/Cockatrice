@@ -1,6 +1,11 @@
 #!/usr/bin/perl
 
 $initializeHash = '';
+$itemId = 1000;
+
+$headerfileBuffer = '';
+
+open(idfile, ">protocol_item_ids.h");
 
 open(headerfile, ">protocol_items.h");
 print headerfile "#ifndef PROTOCOL_ITEMS_H\n"
@@ -56,7 +61,8 @@ while (<file>) {
 		$constructorParamsCpp = "";
 	}
 	$className = $namePrefix . '_' . $name2;
-	print headerfile "class $className : public $baseClass {\n"
+	$itemEnum .= "ItemId_$className = " . ++$itemId . ",\n";
+	$headerfileBuffer .= "class $className : public $baseClass {\n"
 		. "\tQ_OBJECT\n"
 		. "private:\n";
 	$paramStr2 = '';
@@ -92,12 +98,13 @@ while (<file>) {
 		}
 		($prettyVarName2 = $prettyVarName) =~ s/^(.)/\U$1\E/;
 		$paramStr4 .= "\t$dataType get$prettyVarName2() const { return $prettyVarName; }\n";
-		print headerfile "\t$dataType $prettyVarName;\n";
+		$headerfileBuffer .= "\t$dataType $prettyVarName;\n";
 	}
-	print headerfile "public:\n"
+	$headerfileBuffer .= "public:\n"
 		. "\t$className($constructorParamsH);\n"
 		. $paramStr4
 		. "\tstatic ProtocolItem *newItem() { return new $className; }\n"
+		. "\tint getItemId() const { return ItemId_$className; }\n"
 		. ($paramStr5 eq '' ? '' : "protected:\n\tvoid extractParameters();\n")
 		. "};\n";
 	print cppfile $className . "::$className($constructorParamsCpp)\n"
@@ -116,7 +123,14 @@ while (<file>) {
 }
 close(file);
 
-print headerfile "\n#endif\n";
+print idfile "enum AutoItemId {\n"
+	. $itemEnum
+	. "ItemId_Other = " . ++$itemId . "\n"
+	. "};\n";
+close(idfile);
+	
+print headerfile $headerfileBuffer
+	. "\n#endif\n";
 close(headerfile);
 
 print cppfile "void ProtocolItem::initializeHashAuto()\n"

@@ -22,10 +22,13 @@
 #include "servatrice.h"
 #include "server_chatchannel.h"
 #include "serversocketinterface.h"
+#include "protocol.h"
 
 Servatrice::Servatrice(QObject *parent)
 	: Server(parent)
 {
+	ProtocolItem::initializeHash();
+	
 	tcpServer = new QTcpServer(this);
 	connect(tcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 	tcpServer->listen(QHostAddress::Any, 4747); // XXX make customizable

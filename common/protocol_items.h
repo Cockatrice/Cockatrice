@@ -9,6 +9,7 @@ private:
 public:
 	Command_Ping();
 	static ProtocolItem *newItem() { return new Command_Ping; }
+	int getItemId() const { return ItemId_Command_Ping; }
 };
 class Command_Login : public Command {
 	Q_OBJECT
@@ -20,6 +21,7 @@ public:
 	QString getUsername() const { return username; }
 	QString getPassword() const { return password; }
 	static ProtocolItem *newItem() { return new Command_Login; }
+	int getItemId() const { return ItemId_Command_Login; }
 protected:
 	void extractParameters();
 };
@@ -29,6 +31,7 @@ private:
 public:
 	Command_ChatListChannels();
 	static ProtocolItem *newItem() { return new Command_ChatListChannels; }
+	int getItemId() const { return ItemId_Command_ChatListChannels; }
 };
 class Command_ChatJoinChannel : public Command {
 	Q_OBJECT
@@ -38,6 +41,7 @@ public:
 	Command_ChatJoinChannel(const QString &_channel = QString());
 	QString getChannel() const { return channel; }
 	static ProtocolItem *newItem() { return new Command_ChatJoinChannel; }
+	int getItemId() const { return ItemId_Command_ChatJoinChannel; }
 protected:
 	void extractParameters();
 };
@@ -47,6 +51,7 @@ private:
 public:
 	Command_ChatLeaveChannel(const QString &_channel = QString());
 	static ProtocolItem *newItem() { return new Command_ChatLeaveChannel; }
+	int getItemId() const { return ItemId_Command_ChatLeaveChannel; }
 };
 class Command_ChatSay : public ChatCommand {
 	Q_OBJECT
@@ -56,6 +61,7 @@ public:
 	Command_ChatSay(const QString &_channel = QString(), const QString &_message = QString());
 	QString getMessage() const { return message; }
 	static ProtocolItem *newItem() { return new Command_ChatSay; }
+	int getItemId() const { return ItemId_Command_ChatSay; }
 protected:
 	void extractParameters();
 };
@@ -65,6 +71,7 @@ private:
 public:
 	Command_ListGames();
 	static ProtocolItem *newItem() { return new Command_ListGames; }
+	int getItemId() const { return ItemId_Command_ListGames; }
 };
 class Command_CreateGame : public Command {
 	Q_OBJECT
@@ -80,6 +87,7 @@ public:
 	int getMaxPlayers() const { return maxPlayers; }
 	bool getSpectatorsAllowed() const { return spectatorsAllowed; }
 	static ProtocolItem *newItem() { return new Command_CreateGame; }
+	int getItemId() const { return ItemId_Command_CreateGame; }
 protected:
 	void extractParameters();
 };
@@ -95,6 +103,7 @@ public:
 	QString getPassword() const { return password; }
 	bool getSpectator() const { return spectator; }
 	static ProtocolItem *newItem() { return new Command_JoinGame; }
+	int getItemId() const { return ItemId_Command_JoinGame; }
 protected:
 	void extractParameters();
 };
@@ -104,6 +113,7 @@ private:
 public:
 	Command_LeaveGame(int _gameId = -1);
 	static ProtocolItem *newItem() { return new Command_LeaveGame; }
+	int getItemId() const { return ItemId_Command_LeaveGame; }
 };
 class Command_Say : public GameCommand {
 	Q_OBJECT
@@ -113,6 +123,7 @@ public:
 	Command_Say(int _gameId = -1, const QString &_message = QString());
 	QString getMessage() const { return message; }
 	static ProtocolItem *newItem() { return new Command_Say; }
+	int getItemId() const { return ItemId_Command_Say; }
 protected:
 	void extractParameters();
 };
@@ -122,6 +133,7 @@ private:
 public:
 	Command_Shuffle(int _gameId = -1);
 	static ProtocolItem *newItem() { return new Command_Shuffle; }
+	int getItemId() const { return ItemId_Command_Shuffle; }
 };
 class Command_RollDie : public GameCommand {
 	Q_OBJECT
@@ -131,6 +143,7 @@ public:
 	Command_RollDie(int _gameId = -1, int _sides = -1);
 	int getSides() const { return sides; }
 	static ProtocolItem *newItem() { return new Command_RollDie; }
+	int getItemId() const { return ItemId_Command_RollDie; }
 protected:
 	void extractParameters();
 };
@@ -142,6 +155,7 @@ public:
 	Command_DrawCards(int _gameId = -1, int _number = -1);
 	int getNumber() const { return number; }
 	static ProtocolItem *newItem() { return new Command_DrawCards; }
+	int getItemId() const { return ItemId_Command_DrawCards; }
 protected:
 	void extractParameters();
 };
@@ -163,6 +177,7 @@ public:
 	int getY() const { return y; }
 	bool getFaceDown() const { return faceDown; }
 	static ProtocolItem *newItem() { return new Command_MoveCard; }
+	int getItemId() const { return ItemId_Command_MoveCard; }
 protected:
 	void extractParameters();
 };
@@ -170,18 +185,19 @@ class Command_CreateToken : public GameCommand {
 	Q_OBJECT
 private:
 	QString zone;
-	QString name;
+	QString cardName;
 	QString pt;
 	int x;
 	int y;
 public:
-	Command_CreateToken(int _gameId = -1, const QString &_zone = QString(), const QString &_name = QString(), const QString &_pt = QString(), int _x = -1, int _y = -1);
+	Command_CreateToken(int _gameId = -1, const QString &_zone = QString(), const QString &_cardName = QString(), const QString &_pt = QString(), int _x = -1, int _y = -1);
 	QString getZone() const { return zone; }
-	QString getName() const { return name; }
+	QString getCardName() const { return cardName; }
 	QString getPt() const { return pt; }
 	int getX() const { return x; }
 	int getY() const { return y; }
 	static ProtocolItem *newItem() { return new Command_CreateToken; }
+	int getItemId() const { return ItemId_Command_CreateToken; }
 protected:
 	void extractParameters();
 };
@@ -192,19 +208,20 @@ private:
 	QString startZone;
 	int startCardId;
 	int targetPlayerId;
-	QString targetPlayerZone;
+	QString targetZone;
 	int targetCardId;
 	int color;
 public:
-	Command_CreateArrow(int _gameId = -1, int _startPlayerId = -1, const QString &_startZone = QString(), int _startCardId = -1, int _targetPlayerId = -1, const QString &_targetPlayerZone = QString(), int _targetCardId = -1, int _color = -1);
+	Command_CreateArrow(int _gameId = -1, int _startPlayerId = -1, const QString &_startZone = QString(), int _startCardId = -1, int _targetPlayerId = -1, const QString &_targetZone = QString(), int _targetCardId = -1, int _color = -1);
 	int getStartPlayerId() const { return startPlayerId; }
 	QString getStartZone() const { return startZone; }
 	int getStartCardId() const { return startCardId; }
 	int getTargetPlayerId() const { return targetPlayerId; }
-	QString getTargetPlayerZone() const { return targetPlayerZone; }
+	QString getTargetZone() const { return targetZone; }
 	int getTargetCardId() const { return targetCardId; }
 	int getColor() const { return color; }
 	static ProtocolItem *newItem() { return new Command_CreateArrow; }
+	int getItemId() const { return ItemId_Command_CreateArrow; }
 protected:
 	void extractParameters();
 };
@@ -216,6 +233,7 @@ public:
 	Command_DeleteArrow(int _gameId = -1, int _arrowId = -1);
 	int getArrowId() const { return arrowId; }
 	static ProtocolItem *newItem() { return new Command_DeleteArrow; }
+	int getItemId() const { return ItemId_Command_DeleteArrow; }
 protected:
 	void extractParameters();
 };
@@ -233,6 +251,7 @@ public:
 	QString getAttrName() const { return attrName; }
 	QString getAttrValue() const { return attrValue; }
 	static ProtocolItem *newItem() { return new Command_SetCardAttr; }
+	int getItemId() const { return ItemId_Command_SetCardAttr; }
 protected:
 	void extractParameters();
 };
@@ -242,6 +261,7 @@ private:
 public:
 	Command_ReadyStart(int _gameId = -1);
 	static ProtocolItem *newItem() { return new Command_ReadyStart; }
+	int getItemId() const { return ItemId_Command_ReadyStart; }
 };
 class Command_IncCounter : public GameCommand {
 	Q_OBJECT
@@ -253,6 +273,7 @@ public:
 	int getCounterId() const { return counterId; }
 	int getDelta() const { return delta; }
 	static ProtocolItem *newItem() { return new Command_IncCounter; }
+	int getItemId() const { return ItemId_Command_IncCounter; }
 protected:
 	void extractParameters();
 };
@@ -270,6 +291,7 @@ public:
 	int getRadius() const { return radius; }
 	int getValue() const { return value; }
 	static ProtocolItem *newItem() { return new Command_AddCounter; }
+	int getItemId() const { return ItemId_Command_AddCounter; }
 protected:
 	void extractParameters();
 };
@@ -283,6 +305,7 @@ public:
 	int getCounterId() const { return counterId; }
 	int getValue() const { return value; }
 	static ProtocolItem *newItem() { return new Command_SetCounter; }
+	int getItemId() const { return ItemId_Command_SetCounter; }
 protected:
 	void extractParameters();
 };
@@ -294,6 +317,7 @@ public:
 	Command_DelCounter(int _gameId = -1, int _counterId = -1);
 	int getCounterId() const { return counterId; }
 	static ProtocolItem *newItem() { return new Command_DelCounter; }
+	int getItemId() const { return ItemId_Command_DelCounter; }
 protected:
 	void extractParameters();
 };
@@ -303,6 +327,7 @@ private:
 public:
 	Command_NextTurn(int _gameId = -1);
 	static ProtocolItem *newItem() { return new Command_NextTurn; }
+	int getItemId() const { return ItemId_Command_NextTurn; }
 };
 class Command_SetActivePhase : public GameCommand {
 	Q_OBJECT
@@ -312,6 +337,7 @@ public:
 	Command_SetActivePhase(int _gameId = -1, int _phase = -1);
 	int getPhase() const { return phase; }
 	static ProtocolItem *newItem() { return new Command_SetActivePhase; }
+	int getItemId() const { return ItemId_Command_SetActivePhase; }
 protected:
 	void extractParameters();
 };
@@ -327,6 +353,7 @@ public:
 	QString getZoneName() const { return zoneName; }
 	int getNumberCards() const { return numberCards; }
 	static ProtocolItem *newItem() { return new Command_DumpZone; }
+	int getItemId() const { return ItemId_Command_DumpZone; }
 protected:
 	void extractParameters();
 };
@@ -340,6 +367,7 @@ public:
 	int getPlayerId() const { return playerId; }
 	QString getZoneName() const { return zoneName; }
 	static ProtocolItem *newItem() { return new Command_StopDumpZone; }
+	int getItemId() const { return ItemId_Command_StopDumpZone; }
 protected:
 	void extractParameters();
 };
@@ -349,6 +377,7 @@ private:
 public:
 	Command_DumpAll(int _gameId = -1);
 	static ProtocolItem *newItem() { return new Command_DumpAll; }
+	int getItemId() const { return ItemId_Command_DumpAll; }
 };
 class Command_SubmitDeck : public GameCommand {
 	Q_OBJECT
@@ -356,6 +385,7 @@ private:
 public:
 	Command_SubmitDeck(int _gameId = -1);
 	static ProtocolItem *newItem() { return new Command_SubmitDeck; }
+	int getItemId() const { return ItemId_Command_SubmitDeck; }
 };
 class Event_Say : public GameEvent {
 	Q_OBJECT
@@ -365,6 +395,7 @@ public:
 	Event_Say(int _gameId = -1, int _playerId = -1, const QString &_message = QString());
 	QString getMessage() const { return message; }
 	static ProtocolItem *newItem() { return new Event_Say; }
+	int getItemId() const { return ItemId_Event_Say; }
 protected:
 	void extractParameters();
 };
@@ -378,6 +409,7 @@ public:
 	QString getPlayerName() const { return playerName; }
 	bool getSpectator() const { return spectator; }
 	static ProtocolItem *newItem() { return new Event_Join; }
+	int getItemId() const { return ItemId_Event_Join; }
 protected:
 	void extractParameters();
 };
@@ -387,6 +419,7 @@ private:
 public:
 	Event_Leave(int _gameId = -1, int _playerId = -1);
 	static ProtocolItem *newItem() { return new Event_Leave; }
+	int getItemId() const { return ItemId_Event_Leave; }
 };
 class Event_GameClosed : public GameEvent {
 	Q_OBJECT
@@ -394,6 +427,7 @@ private:
 public:
 	Event_GameClosed(int _gameId = -1, int _playerId = -1);
 	static ProtocolItem *newItem() { return new Event_GameClosed; }
+	int getItemId() const { return ItemId_Event_GameClosed; }
 };
 class Event_ReadyStart : public GameEvent {
 	Q_OBJECT
@@ -401,6 +435,7 @@ private:
 public:
 	Event_ReadyStart(int _gameId = -1, int _playerId = -1);
 	static ProtocolItem *newItem() { return new Event_ReadyStart; }
+	int getItemId() const { return ItemId_Event_ReadyStart; }
 };
 class Event_SetupZones : public GameEvent {
 	Q_OBJECT
@@ -412,6 +447,7 @@ public:
 	int getDeckSize() const { return deckSize; }
 	int getSbSize() const { return sbSize; }
 	static ProtocolItem *newItem() { return new Event_SetupZones; }
+	int getItemId() const { return ItemId_Event_SetupZones; }
 protected:
 	void extractParameters();
 };
@@ -421,6 +457,7 @@ private:
 public:
 	Event_GameStart(int _gameId = -1, int _playerId = -1);
 	static ProtocolItem *newItem() { return new Event_GameStart; }
+	int getItemId() const { return ItemId_Event_GameStart; }
 };
 class Event_Shuffle : public GameEvent {
 	Q_OBJECT
@@ -428,6 +465,7 @@ private:
 public:
 	Event_Shuffle(int _gameId = -1, int _playerId = -1);
 	static ProtocolItem *newItem() { return new Event_Shuffle; }
+	int getItemId() const { return ItemId_Event_Shuffle; }
 };
 class Event_RollDie : public GameEvent {
 	Q_OBJECT
@@ -439,6 +477,7 @@ public:
 	int getSides() const { return sides; }
 	int getValue() const { return value; }
 	static ProtocolItem *newItem() { return new Event_RollDie; }
+	int getItemId() const { return ItemId_Event_RollDie; }
 protected:
 	void extractParameters();
 };
@@ -464,6 +503,7 @@ public:
 	int getY() const { return y; }
 	bool getFaceDown() const { return faceDown; }
 	static ProtocolItem *newItem() { return new Event_MoveCard; }
+	int getItemId() const { return ItemId_Event_MoveCard; }
 protected:
 	void extractParameters();
 };
@@ -485,6 +525,7 @@ public:
 	int getX() const { return x; }
 	int getY() const { return y; }
 	static ProtocolItem *newItem() { return new Event_CreateToken; }
+	int getItemId() const { return ItemId_Event_CreateToken; }
 protected:
 	void extractParameters();
 };
@@ -510,6 +551,7 @@ public:
 	int getTargetCardId() const { return targetCardId; }
 	int getColor() const { return color; }
 	static ProtocolItem *newItem() { return new Event_CreateArrow; }
+	int getItemId() const { return ItemId_Event_CreateArrow; }
 protected:
 	void extractParameters();
 };
@@ -521,6 +563,7 @@ public:
 	Event_DeleteArrow(int _gameId = -1, int _playerId = -1, int _arrowId = -1);
 	int getArrowId() const { return arrowId; }
 	static ProtocolItem *newItem() { return new Event_DeleteArrow; }
+	int getItemId() const { return ItemId_Event_DeleteArrow; }
 protected:
 	void extractParameters();
 };
@@ -538,6 +581,7 @@ public:
 	QString getAttrName() const { return attrName; }
 	QString getAttrValue() const { return attrValue; }
 	static ProtocolItem *newItem() { return new Event_SetCardAttr; }
+	int getItemId() const { return ItemId_Event_SetCardAttr; }
 protected:
 	void extractParameters();
 };
@@ -557,6 +601,7 @@ public:
 	int getRadius() const { return radius; }
 	int getValue() const { return value; }
 	static ProtocolItem *newItem() { return new Event_AddCounter; }
+	int getItemId() const { return ItemId_Event_AddCounter; }
 protected:
 	void extractParameters();
 };
@@ -570,6 +615,7 @@ public:
 	int getCounterId() const { return counterId; }
 	int getValue() const { return value; }
 	static ProtocolItem *newItem() { return new Event_SetCounter; }
+	int getItemId() const { return ItemId_Event_SetCounter; }
 protected:
 	void extractParameters();
 };
@@ -581,6 +627,7 @@ public:
 	Event_DelCounter(int _gameId = -1, int _playerId = -1, int _counterId = -1);
 	int getCounterId() const { return counterId; }
 	static ProtocolItem *newItem() { return new Event_DelCounter; }
+	int getItemId() const { return ItemId_Event_DelCounter; }
 protected:
 	void extractParameters();
 };
@@ -592,6 +639,7 @@ public:
 	Event_SetActivePlayer(int _gameId = -1, int _playerId = -1, int _activePlayerId = -1);
 	int getActivePlayerId() const { return activePlayerId; }
 	static ProtocolItem *newItem() { return new Event_SetActivePlayer; }
+	int getItemId() const { return ItemId_Event_SetActivePlayer; }
 protected:
 	void extractParameters();
 };
@@ -603,6 +651,7 @@ public:
 	Event_SetActivePhase(int _gameId = -1, int _playerId = -1, int _phase = -1);
 	int getPhase() const { return phase; }
 	static ProtocolItem *newItem() { return new Event_SetActivePhase; }
+	int getItemId() const { return ItemId_Event_SetActivePhase; }
 protected:
 	void extractParameters();
 };
@@ -618,6 +667,7 @@ public:
 	QString getZone() const { return zone; }
 	int getNumberCards() const { return numberCards; }
 	static ProtocolItem *newItem() { return new Event_DumpZone; }
+	int getItemId() const { return ItemId_Event_DumpZone; }
 protected:
 	void extractParameters();
 };
@@ -631,6 +681,7 @@ public:
 	int getZoneOwnerId() const { return zoneOwnerId; }
 	QString getZone() const { return zone; }
 	static ProtocolItem *newItem() { return new Event_StopDumpZone; }
+	int getItemId() const { return ItemId_Event_StopDumpZone; }
 protected:
 	void extractParameters();
 };
@@ -642,6 +693,7 @@ public:
 	Event_Welcome(const QString &_message = QString());
 	QString getMessage() const { return message; }
 	static ProtocolItem *newItem() { return new Event_Welcome; }
+	int getItemId() const { return ItemId_Event_Welcome; }
 protected:
 	void extractParameters();
 };

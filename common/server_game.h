@@ -24,7 +24,7 @@
 #include <QPointer>
 #include <QObject>
 #include "server_player.h"
-#include "returnmessage.h"
+#include "protocol.h"
 
 class Server_Game : public QObject {
 	Q_OBJECT
@@ -55,7 +55,7 @@ public:
 	int getMaxPlayers() const { return maxPlayers; }
 	bool getSpectatorsAllowed() const { return spectatorsAllowed; }
 	QString getGameListLine() const;
-	ReturnMessage::ReturnCode checkJoin(const QString &_password, bool spectator);
+	ProtocolResponse::ResponseCode checkJoin(const QString &_password, bool spectator);
 	Server_Player *addPlayer(const QString &playerName, bool spectator);
 	void removePlayer(Server_Player *player);
 	void startGameIfReady();

@@ -21,7 +21,7 @@
 #define SERVERSOCKETINTERFACE_H
 
 #include <QTcpSocket>
-#include <server_protocolhandler.h>
+#include "server_protocolhandler.h"
 
 class QTcpSocket;
 class Server;
@@ -38,6 +38,7 @@ private:
 	QTcpSocket *socket;
 	QXmlStreamWriter *xmlWriter;
 	QXmlStreamReader *xmlReader;
+	ProtocolItem *currentItem;
 public:
 	ServerSocketInterface(Server *_server, QTcpSocket *_socket, QObject *parent = 0);
 	~ServerSocketInterface();

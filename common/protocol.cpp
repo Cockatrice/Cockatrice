@@ -22,7 +22,6 @@ bool ProtocolItem::read(QXmlStreamReader *xml)
 			if (xml->name() == getItemType()) {
 				extractParameters();
 				qDebug() << "FERTIG";
-				deleteLater();
 				return true;
 			} else {
 				QString tagName = xml->name().toString();
@@ -111,6 +110,7 @@ void ProtocolResponse::extractParameters()
 void ProtocolResponse::initializeHash()
 {
 	responseHash.insert("ok", RespOk);
+	responseHash.insert("invalid_command", RespInvalidCommand);
 	responseHash.insert("name_not_found", RespNameNotFound);
 	responseHash.insert("login_needed", RespLoginNeeded);
 	responseHash.insert("context_error", RespContextError);

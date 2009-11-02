@@ -137,11 +137,11 @@ void Command_MoveCard::extractParameters()
 	y = parameters["y"].toInt();
 	faceDown = (parameters["face_down"] == "1");
 }
-Command_CreateToken::Command_CreateToken(int _gameId, const QString &_zone, const QString &_name, const QString &_pt, int _x, int _y)
-	: GameCommand("create_token", _gameId), zone(_zone), name(_name), pt(_pt), x(_x), y(_y)
+Command_CreateToken::Command_CreateToken(int _gameId, const QString &_zone, const QString &_cardName, const QString &_pt, int _x, int _y)
+	: GameCommand("create_token", _gameId), zone(_zone), cardName(_cardName), pt(_pt), x(_x), y(_y)
 {
 	setParameter("zone", zone);
-	setParameter("name", name);
+	setParameter("card_name", cardName);
 	setParameter("pt", pt);
 	setParameter("x", x);
 	setParameter("y", y);
@@ -150,19 +150,19 @@ void Command_CreateToken::extractParameters()
 {
 	GameCommand::extractParameters();
 	zone = parameters["zone"];
-	name = parameters["name"];
+	cardName = parameters["card_name"];
 	pt = parameters["pt"];
 	x = parameters["x"].toInt();
 	y = parameters["y"].toInt();
 }
-Command_CreateArrow::Command_CreateArrow(int _gameId, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetPlayerZone, int _targetCardId, int _color)
-	: GameCommand("create_arrow", _gameId), startPlayerId(_startPlayerId), startZone(_startZone), startCardId(_startCardId), targetPlayerId(_targetPlayerId), targetPlayerZone(_targetPlayerZone), targetCardId(_targetCardId), color(_color)
+Command_CreateArrow::Command_CreateArrow(int _gameId, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, int _color)
+	: GameCommand("create_arrow", _gameId), startPlayerId(_startPlayerId), startZone(_startZone), startCardId(_startCardId), targetPlayerId(_targetPlayerId), targetZone(_targetZone), targetCardId(_targetCardId), color(_color)
 {
 	setParameter("start_player_id", startPlayerId);
 	setParameter("start_zone", startZone);
 	setParameter("start_card_id", startCardId);
 	setParameter("target_player_id", targetPlayerId);
-	setParameter("target_player_zone", targetPlayerZone);
+	setParameter("target_zone", targetZone);
 	setParameter("target_card_id", targetCardId);
 	setParameter("color", color);
 }
@@ -173,7 +173,7 @@ void Command_CreateArrow::extractParameters()
 	startZone = parameters["start_zone"];
 	startCardId = parameters["start_card_id"].toInt();
 	targetPlayerId = parameters["target_player_id"].toInt();
-	targetPlayerZone = parameters["target_player_zone"];
+	targetZone = parameters["target_zone"];
 	targetCardId = parameters["target_card_id"].toInt();
 	color = parameters["color"].toInt();
 }

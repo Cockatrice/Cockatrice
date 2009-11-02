@@ -13,8 +13,8 @@
 2:roll_die:i,sides
 2:draw_cards:i,number
 2:move_card:s,start_zone:i,card_id:s,target_zone:i,x:i,y:b,face_down
-2:create_token:s,zone:s,name:s,pt:i,x:i,y
-2:create_arrow:i,start_player_id:s,start_zone:i,start_card_id:i,target_player_id:s,target_player_zone:i,target_card_id:i,color
+2:create_token:s,zone:s,card_name:s,pt:i,x:i,y
+2:create_arrow:i,start_player_id:s,start_zone:i,start_card_id:i,target_player_id:s,target_zone:i,target_card_id:i,color
 2:delete_arrow:i,arrow_id
 2:set_card_attr:s,zone:i,card_id:s,attr_name:s,attr_value
 2:ready_start
