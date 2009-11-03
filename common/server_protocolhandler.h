@@ -24,6 +24,8 @@ private:
 	bool acceptsGameListChanges;
 	bool acceptsChatChannelListChanges;
 	
+	QList<ProtocolItem *> itemQueue;
+	
 	ProtocolResponse::ResponseCode cmdPing(Command_Ping *cmd);
 	ProtocolResponse::ResponseCode cmdLogin(Command_Login *cmd);
 	ProtocolResponse::ResponseCode cmdChatListChannels(Command_ChatListChannels *cmd);
@@ -54,9 +56,6 @@ private:
 	ProtocolResponse::ResponseCode cmdStopDumpZone(Command_StopDumpZone *cmd, Server_Game *game, Server_Player *player);
 	ProtocolResponse::ResponseCode cmdDumpAll(Command_DumpAll *cmd, Server_Game *game, Server_Player *player);
 	ProtocolResponse::ResponseCode cmdSubmitDeck(Command_SubmitDeck *cmd, Server_Game *game, Server_Player *player);
-	
-	QList<ProtocolItem *> itemQueue;
-	void enqueueProtocolItem(ProtocolItem *item);
 public:
 	Server_ProtocolHandler(Server *_server, QObject *parent = 0);
 	~Server_ProtocolHandler();
@@ -66,7 +65,8 @@ public:
 	const QString &getPlayerName() const { return playerName; }
 	
 	void processCommand(Command *command);
-	virtual void sendProtocolItem(ProtocolItem *item) = 0;
+	virtual void sendProtocolItem(ProtocolItem *item, bool deleteItem = true) = 0;
+	void enqueueProtocolItem(ProtocolItem *item);
 };
 
 #endif

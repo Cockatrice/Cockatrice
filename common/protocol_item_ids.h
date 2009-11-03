@@ -50,6 +50,9 @@ ItemId_Event_SetActivePlayer = 1048,
 ItemId_Event_SetActivePhase = 1049,
 ItemId_Event_DumpZone = 1050,
 ItemId_Event_StopDumpZone = 1051,
-ItemId_Event_Welcome = 1052,
-ItemId_Other = 1053
+ItemId_Event_ChatServerMessage = 1052,
+ItemId_Event_ChatJoinChannel = 1053,
+ItemId_Event_ChatLeaveChannel = 1054,
+ItemId_Event_ChatSay = 1055,
+ItemId_Other = 1056
 };

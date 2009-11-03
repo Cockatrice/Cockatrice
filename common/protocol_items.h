@@ -685,15 +685,53 @@ public:
 protected:
 	void extractParameters();
 };
-class Event_Welcome : public GenericEvent {
+class Event_ChatServerMessage : public ChatEvent {
 	Q_OBJECT
 private:
 	QString message;
 public:
-	Event_Welcome(const QString &_message = QString());
+	Event_ChatServerMessage(const QString &_channel = QString(), const QString &_message = QString());
 	QString getMessage() const { return message; }
-	static ProtocolItem *newItem() { return new Event_Welcome; }
-	int getItemId() const { return ItemId_Event_Welcome; }
+	static ProtocolItem *newItem() { return new Event_ChatServerMessage; }
+	int getItemId() const { return ItemId_Event_ChatServerMessage; }
+protected:
+	void extractParameters();
+};
+class Event_ChatJoinChannel : public ChatEvent {
+	Q_OBJECT
+private:
+	QString playerName;
+public:
+	Event_ChatJoinChannel(const QString &_channel = QString(), const QString &_playerName = QString());
+	QString getPlayerName() const { return playerName; }
+	static ProtocolItem *newItem() { return new Event_ChatJoinChannel; }
+	int getItemId() const { return ItemId_Event_ChatJoinChannel; }
+protected:
+	void extractParameters();
+};
+class Event_ChatLeaveChannel : public ChatEvent {
+	Q_OBJECT
+private:
+	QString playerName;
+public:
+	Event_ChatLeaveChannel(const QString &_channel = QString(), const QString &_playerName = QString());
+	QString getPlayerName() const { return playerName; }
+	static ProtocolItem *newItem() { return new Event_ChatLeaveChannel; }
+	int getItemId() const { return ItemId_Event_ChatLeaveChannel; }
+protected:
+	void extractParameters();
+};
+class Event_ChatSay : public ChatEvent {
+	Q_OBJECT
+private:
+	QString playerName;
+	QString message;
+public:
+	Event_ChatSay(const QString &_channel = QString(), const QString &_playerName = QString(), const QString &_message = QString());
+	QString getPlayerName() const { return playerName; }
+	QString getMessage() const { return message; }
+	static ProtocolItem *newItem() { return new Event_ChatSay; }
+	int getItemId() const { return ItemId_Event_ChatSay; }
 protected:
 	void extractParameters();
 };

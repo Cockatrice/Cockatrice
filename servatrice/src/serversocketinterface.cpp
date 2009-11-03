@@ -42,7 +42,7 @@ ServerSocketInterface::ServerSocketInterface(Server *_server, QTcpSocket *_socke
 	xmlWriter->writeStartElement("cockatrice_server_stream");
 	xmlWriter->writeAttribute("version", QString::number(ProtocolItem::protocolVersion));
 	
-	sendProtocolItem(new Event_Welcome(Servatrice::versionString));
+	sendProtocolItem(new Event_ChatServerMessage(QString(), Servatrice::versionString));
 }
 
 ServerSocketInterface::~ServerSocketInterface()
@@ -104,8 +104,9 @@ void ServerSocketInterface::catchSocketError(QAbstractSocket::SocketError socket
 	deleteLater();
 }
 
-void ServerSocketInterface::sendProtocolItem(ProtocolItem *item)
+void ServerSocketInterface::sendProtocolItem(ProtocolItem *item, bool deleteItem)
 {
 	item->write(xmlWriter);
-	delete item;
+	if (deleteItem)
+		delete item;
 }

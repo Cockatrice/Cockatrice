@@ -6,6 +6,7 @@
 #include <QStringList>
 
 class Server_ProtocolHandler;
+class ChatEvent;
 
 class Server_ChatChannel : public QObject, public QList<Server_ProtocolHandler *> {
 	Q_OBJECT
@@ -15,16 +16,17 @@ private:
 	QString name;
 	QString description;
 	bool autoJoin;
-	QStringList joinMessage;
+	QString joinMessage;
 public:
-	Server_ChatChannel(const QString &_name, const QString &_description, bool _autoJoin, const QStringList &_joinMessage);
+	Server_ChatChannel(const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage);
 	QString getName() const { return name; }
 	QString getDescription() const { return description; }
 	bool getAutoJoin() const { return autoJoin; }
 	void addClient(Server_ProtocolHandler *client);
 	void removeClient(Server_ProtocolHandler *client);
 	void say(Server_ProtocolHandler *client, const QString &s);
-	QString getChannelListLine() const;
+	
+	void sendChatEvent(ChatEvent *event);
 };
 
 #endif

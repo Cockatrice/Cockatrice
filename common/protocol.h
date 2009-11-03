@@ -12,20 +12,29 @@ class QXmlStreamReader;
 class QXmlStreamWriter;
 class QXmlStreamAttributes;
 
+enum ItemId {
+	ItemId_Event_ChatListChannels = ItemId_Other + 1,
+	ItemId_Event_ChatListPlayers = ItemId_Other + 2,
+};
+
 class ProtocolItem : public QObject {
 	Q_OBJECT
+private:
+	QString currentElementText;
 protected:
 	typedef ProtocolItem *(*NewItemFunction)();
 	static QHash<QString, NewItemFunction> itemNameHash;
 	
 	QString itemName;
 	QMap<QString, QString> parameters;
-	QString currentElementText;
 	void setParameter(const QString &name, const QString &value) { parameters[name] = value; }
 	void setParameter(const QString &name, bool value) { parameters[name] = (value ? "1" : "0"); }
 	void setParameter(const QString &name, int value) { parameters[name] = QString::number(value); }
-	virtual void extractParameters() { };
+	virtual void extractParameters() { }
 	virtual QString getItemType() const = 0;
+	
+	virtual bool readElement(QXmlStreamReader * /*xml*/) { return false; }
+	virtual void writeElement(QXmlStreamWriter * /*xml*/) { }
 private:
 	static void initializeHashAuto();
 public:
@@ -34,8 +43,8 @@ public:
 	ProtocolItem(const QString &_itemName);
 	static void initializeHash();
 	static ProtocolItem *getNewItem(const QString &name);
-	virtual bool read(QXmlStreamReader *xml);
-	virtual void write(QXmlStreamWriter *xml);
+	bool read(QXmlStreamReader *xml);
+	void write(QXmlStreamWriter *xml);
 };
 
 class Command : public ProtocolItem {
@@ -141,6 +150,64 @@ protected:
 	void extractParameters();
 public:
 	ChatEvent(const QString &_eventName, const QString &_channel);
+};
+
+class Event_ChatListChannels : public GenericEvent {
+	Q_OBJECT
+public:
+	class ChannelInfo {
+	private:
+		QString name;
+		QString description;
+		int playerCount;
+		bool autoJoin;
+	public:
+		ChannelInfo(const QString &_name, const QString &_description, int _playerCount, bool _autoJoin)
+			: name(_name), description(_description), playerCount(_playerCount), autoJoin(_autoJoin) { }
+		QString getName() const { return name; }
+		QString getDescription() const { return description; }
+		int getPlayerCount() const { return playerCount; }
+		bool getAutoJoin() const { return autoJoin; }
+	};
+private:
+	QList<ChannelInfo> channelList;
+public:
+	Event_ChatListChannels() : GenericEvent("chat_list_channels") { }
+	int getItemId() const { return ItemId_Event_ChatListChannels; }
+	void addChannel(const QString &_name, const QString &_description, int _playerCount, bool _autoJoin)
+	{
+		channelList.append(ChannelInfo(_name, _description, _playerCount, _autoJoin));
+	}
+	const QList<ChannelInfo> &getChannelList() const { return channelList; }
+
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
+};
+
+class Event_ChatListPlayers : public ChatEvent {
+	Q_OBJECT
+public:
+	class PlayerInfo {
+	private:
+		QString name;
+	public:
+		PlayerInfo(const QString &_name)
+			: name(_name) { }
+		QString getName() const { return name; }
+	};
+private:
+	QList<PlayerInfo> playerList;
+public:
+	Event_ChatListPlayers(const QString &_channel) : ChatEvent("chat_list_players", _channel) { }
+	int getItemId() const { return ItemId_Event_ChatListPlayers; }
+	void addPlayer(const QString &_name)
+	{
+		playerList.append(PlayerInfo(_name));
+	}
+	const QList<PlayerInfo> &getPlayerList() const { return playerList; }
+
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
 };
 
 #endif

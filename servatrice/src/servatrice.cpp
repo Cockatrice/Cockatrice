@@ -46,13 +46,13 @@ Servatrice::Servatrice(QObject *parent)
 			settings->value("name").toString(),
 			settings->value("description").toString(),
 			settings->value("autojoin").toBool(),
-			settings->value("joinmessage").toStringList()
+			settings->value("joinmessage").toString()
 		);
 		addChatChannel(newChannel);
 	}
 	settings->endArray();
 	
-	loginMessage = settings->value("messages/login").toStringList();
+	loginMessage = settings->value("messages/login").toString();
 }
 
 Servatrice::~Servatrice()
@@ -121,4 +121,4 @@ AuthenticationResult Servatrice::checkUserPassword(const QString &user, const QS
 		return UnknownUser;
 }
 
-const QString Servatrice::versionString = "Servatrice 0.20091030";
+const QString Servatrice::versionString = "Servatrice 0.20091103";

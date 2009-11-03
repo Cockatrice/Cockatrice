@@ -37,10 +37,10 @@ public:
 	~Servatrice();
 	bool openDatabase();
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
-	QStringList getLoginMessage() const { return loginMessage; }
+	QString getLoginMessage() const { return loginMessage; }
 private:
 	QTcpServer *tcpServer;
-	QStringList loginMessage;
+	QString loginMessage;
 	QSettings *settings;
 };
 

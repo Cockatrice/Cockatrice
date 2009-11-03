@@ -85,6 +85,14 @@ void Server_ProtocolHandler::processCommand(Command *command)
 		sendProtocolItem(new ProtocolResponse(command->getCmdId(), response));
 	
 	delete command;
+	
+	while (!itemQueue.isEmpty())
+		sendProtocolItem(itemQueue.takeFirst());
+}
+
+void Server_ProtocolHandler::enqueueProtocolItem(ProtocolItem *item)
+{
+	itemQueue << item;
 }
 
 QPair<Server_Game *, Server_Player *> Server_ProtocolHandler::getGame(int gameId) const
@@ -106,23 +114,19 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *c
 		return ProtocolResponse::RespWrongPassword;
 	playerName = cmd->getUsername();
 	
-/*
-	Mit enqueueProtocolItem() lösen!
-	
-	QStringList loginMessage = server->getLoginMessage();
-	for (int i = 0; i < loginMessage.size(); ++i)
-		msg("chat|server_message||" + loginMessage[i]);
-*/	
+	enqueueProtocolItem(new Event_ChatServerMessage(QString(), server->getLoginMessage()));
 	return ProtocolResponse::RespOk;
 }
 
 ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdChatListChannels(Command_ChatListChannels *cmd)
 {
+	Event_ChatListChannels *event = new Event_ChatListChannels;
 	QMapIterator<QString, Server_ChatChannel *> channelIterator(server->getChatChannels());
 	while (channelIterator.hasNext()) {
 		Server_ChatChannel *c = channelIterator.next().value();
-//		msg(c->getChannelListLine());
+		event->addChannel(c->getName(), c->getDescription(), c->size(), c->getAutoJoin());
 	}
+	sendProtocolItem(event);
 	
 	acceptsChatChannelListChanges = true;
 	return ProtocolResponse::RespOk;

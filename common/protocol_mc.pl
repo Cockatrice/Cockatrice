@@ -59,6 +59,13 @@ while (<file>) {
 		$parentConstructorCall = "$baseClass(\"$name1\")";
 		$constructorParamsH = "";
 		$constructorParamsCpp = "";
+	} elsif ($type == 5) {
+		$type = 'chat_event';
+		$namePrefix = 'Event';
+		$baseClass = 'ChatEvent';
+		$parentConstructorCall = "$baseClass(\"$name1\", _channel)";
+		$constructorParamsH = "const QString &_channel = QString()";
+		$constructorParamsCpp = "const QString &_channel";
 	}
 	$className = $namePrefix . '_' . $name2;
 	$itemEnum .= "ItemId_$className = " . ++$itemId . ",\n";

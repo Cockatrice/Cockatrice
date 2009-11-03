@@ -15,25 +15,19 @@ bool ProtocolItem::read(QXmlStreamReader *xml)
 {
 	while (!xml->atEnd()) {
 		xml->readNext();
-		if (xml->isStartElement()) {
-			qDebug() << "startElement: " << xml->name().toString();
-		} else if (xml->isEndElement()) {
-			qDebug() << "endElement: " << xml->name().toString();
+		if (readElement(xml))
+			continue;
+		if (xml->isEndElement()) {
 			if (xml->name() == getItemType()) {
 				extractParameters();
-				qDebug() << "FERTIG";
 				return true;
 			} else {
 				QString tagName = xml->name().toString();
-				if (!parameters.contains(tagName))
-					qDebug() << "unrecognized attribute";
-				else
+				if (parameters.contains(tagName))
 					parameters[tagName] = currentElementText;
 			}
-		} else if (xml->isCharacters() && !xml->isWhitespace()) {
+		} else if (xml->isCharacters() && !xml->isWhitespace())
 			currentElementText = xml->text().toString();
-			qDebug() << "text: " << currentElementText;
-		}
 	}
 	return false;
 }
@@ -49,6 +43,8 @@ void ProtocolItem::write(QXmlStreamWriter *xml)
 		i.next();
 		xml->writeTextElement(i.key(), i.value());
 	}
+	
+	writeElement(xml);
 	
 	xml->writeEndElement();
 }
@@ -150,4 +146,50 @@ ChatEvent::ChatEvent(const QString &_eventName, const QString &_channel)
 	: ProtocolItem(_eventName), channel(_channel)
 {
 	setParameter("channel", channel);
+}
+
+bool Event_ChatListChannels::readElement(QXmlStreamReader *xml)
+{
+	if (xml->isStartElement() && (xml->name() == "channel")) {
+		channelList.append(ChannelInfo(
+			xml->attributes().value("name").toString(),
+			xml->attributes().value("description").toString(),
+			xml->attributes().value("player_count").toString().toInt(),
+			xml->attributes().value("auto_join").toString().toInt()
+		));
+		return true;
+	}
+	return false;
+}
+
+void Event_ChatListChannels::writeElement(QXmlStreamWriter *xml)
+{
+	for (int i = 0; i < channelList.size(); ++i) {
+		xml->writeStartElement("channel");
+		xml->writeAttribute("name", channelList[i].getName());
+		xml->writeAttribute("description", channelList[i].getDescription());
+		xml->writeAttribute("player_count", QString::number(channelList[i].getPlayerCount()));
+		xml->writeAttribute("auto_join", channelList[i].getAutoJoin() ? "1" : "0");
+		xml->writeEndElement();
+	}
+}
+
+bool Event_ChatListPlayers::readElement(QXmlStreamReader *xml)
+{
+	if (xml->isStartElement() && ((xml->name() == "player"))) {
+		playerList.append(PlayerInfo(
+			xml->attributes().value("name").toString()
+		));
+		return true;
+	}
+	return false;
+}
+
+void Event_ChatListPlayers::writeElement(QXmlStreamWriter *xml)
+{
+	for (int i = 0; i < playerList.size(); ++i) {
+		xml->writeStartElement("player");
+		xml->writeAttribute("name", playerList[i].getName());
+		xml->writeEndElement();
+	}
 }

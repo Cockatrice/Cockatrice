@@ -551,14 +551,46 @@ void Event_StopDumpZone::extractParameters()
 	zoneOwnerId = parameters["zone_owner_id"].toInt();
 	zone = parameters["zone"];
 }
-Event_Welcome::Event_Welcome(const QString &_message)
-	: GenericEvent("welcome"), message(_message)
+Event_ChatServerMessage::Event_ChatServerMessage(const QString &_channel, const QString &_message)
+	: ChatEvent("chat_server_message", _channel), message(_message)
 {
 	setParameter("message", message);
 }
-void Event_Welcome::extractParameters()
+void Event_ChatServerMessage::extractParameters()
 {
-	GenericEvent::extractParameters();
+	ChatEvent::extractParameters();
+	message = parameters["message"];
+}
+Event_ChatJoinChannel::Event_ChatJoinChannel(const QString &_channel, const QString &_playerName)
+	: ChatEvent("chat_join_channel", _channel), playerName(_playerName)
+{
+	setParameter("player_name", playerName);
+}
+void Event_ChatJoinChannel::extractParameters()
+{
+	ChatEvent::extractParameters();
+	playerName = parameters["player_name"];
+}
+Event_ChatLeaveChannel::Event_ChatLeaveChannel(const QString &_channel, const QString &_playerName)
+	: ChatEvent("chat_leave_channel", _channel), playerName(_playerName)
+{
+	setParameter("player_name", playerName);
+}
+void Event_ChatLeaveChannel::extractParameters()
+{
+	ChatEvent::extractParameters();
+	playerName = parameters["player_name"];
+}
+Event_ChatSay::Event_ChatSay(const QString &_channel, const QString &_playerName, const QString &_message)
+	: ChatEvent("chat_say", _channel), playerName(_playerName), message(_message)
+{
+	setParameter("player_name", playerName);
+	setParameter("message", message);
+}
+void Event_ChatSay::extractParameters()
+{
+	ChatEvent::extractParameters();
+	playerName = parameters["player_name"];
 	message = parameters["message"];
 }
 void ProtocolItem::initializeHashAuto()
@@ -614,5 +646,8 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventset_active_phase", Event_SetActivePhase::newItem);
 	itemNameHash.insert("game_eventdump_zone", Event_DumpZone::newItem);
 	itemNameHash.insert("game_eventstop_dump_zone", Event_StopDumpZone::newItem);
-	itemNameHash.insert("generic_eventwelcome", Event_Welcome::newItem);
+	itemNameHash.insert("chat_eventchat_server_message", Event_ChatServerMessage::newItem);
+	itemNameHash.insert("chat_eventchat_join_channel", Event_ChatJoinChannel::newItem);
+	itemNameHash.insert("chat_eventchat_leave_channel", Event_ChatLeaveChannel::newItem);
+	itemNameHash.insert("chat_eventchat_say", Event_ChatSay::newItem);
 }

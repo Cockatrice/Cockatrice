@@ -43,7 +43,7 @@ public:
 	ServerSocketInterface(Server *_server, QTcpSocket *_socket, QObject *parent = 0);
 	~ServerSocketInterface();
 
-	void sendProtocolItem(ProtocolItem *item);
+	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
 };
 
 #endif
