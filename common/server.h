@@ -29,7 +29,7 @@ public:
 	void addClient(Server_ProtocolHandler *player);
 	void removeClient(Server_ProtocolHandler *player);
 	virtual QString getLoginMessage() const = 0;
-	Server_Game *createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, const QString &playerName);
+	Server_Game *createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, Server_ProtocolHandler *creator);
 private:
 	QMap<int, Server_Game *> games;
 	QList<Server_ProtocolHandler *> clients;

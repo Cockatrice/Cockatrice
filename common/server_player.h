@@ -6,11 +6,12 @@
 #include <QList>
 #include <QMap>
 
-class ServerSocket;
 class Server_Game;
 class Server_CardZone;
 class Server_Counter;
 class Server_Arrow;
+class Server_ProtocolHandler;
+class ProtocolItem;
 
 enum PlayerStatusEnum { StatusNormal, StatusSubmitDeck, StatusReadyStart, StatusPlaying };
 
@@ -18,7 +19,7 @@ class Server_Player : public QObject {
 	Q_OBJECT
 private:
 	Server_Game *game;
-	ServerSocket *socket;
+	Server_ProtocolHandler *handler;
 	QMap<QString, Server_CardZone *> zones;
 	QMap<int, Server_Counter *> counters;
 	QMap<int, Server_Arrow *> arrows;
@@ -34,8 +35,8 @@ public:
 	QList<QString> SideboardList;
 	// Pfusch Ende
 	
-	Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator);
-	void setSocket(ServerSocket *_socket) { socket = _socket; }
+	Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator, Server_ProtocolHandler *_handler);
+	void setProtocolHandler(Server_ProtocolHandler *_handler) { handler = _handler; }
 	
 	void setStatus(PlayerStatusEnum _status) { PlayerStatus = _status; }
 	void setPlayerId(int _id) { playerId = _id; }
@@ -59,8 +60,7 @@ public:
 	
 	void setupZones();
 
-	void privateEvent(const QString &line);
-	void publicEvent(const QString &line, Server_Player *player = 0);
+	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
 };
 
 #endif

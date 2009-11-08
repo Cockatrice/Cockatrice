@@ -1,4 +1,5 @@
 #include <QDebug>
+#include "rng_abstract.h"
 #include "server_protocolhandler.h"
 #include "protocol.h"
 #include "protocol_items.h"
@@ -102,7 +103,7 @@ QPair<Server_Game *, Server_Player *> Server_ProtocolHandler::getGame(int gameId
 	return QPair<Server_Game *, Server_Player *>(0, 0);
 }
 
-ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdPing(Command_Ping *cmd)
+ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdPing(Command_Ping * /*cmd*/)
 {
 	return ProtocolResponse::RespOk;
 }
@@ -118,7 +119,7 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *c
 	return ProtocolResponse::RespOk;
 }
 
-ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdChatListChannels(Command_ChatListChannels *cmd)
+ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdChatListChannels(Command_ChatListChannels * /*cmd*/)
 {
 	Event_ChatListChannels *event = new Event_ChatListChannels;
 	QMapIterator<QString, Server_ChatChannel *> channelIterator(server->getChatChannels());
@@ -142,13 +143,12 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdChatJoinChannel(Comman
 	if (!c)
 		return ProtocolResponse::RespNameNotFound;
 
-	// hier wird irgendwo ein Event erzeugt, das nach dem ok kommen muss -> evtl mit enqueue
 	c->addClient(this);
 	chatChannels.insert(cmd->getChannel(), c);
 	return ProtocolResponse::RespOk;
 }
 
-ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdChatLeaveChannel(Command_ChatLeaveChannel *cmd, Server_ChatChannel *channel)
+ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdChatLeaveChannel(Command_ChatLeaveChannel * /*cmd*/, Server_ChatChannel *channel)
 {
 	chatChannels.remove(channel->getName());
 	channel->removeClient(this);
@@ -161,19 +161,32 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdChatSay(Command_ChatSa
 	return ProtocolResponse::RespOk;
 }
 
-ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdListGames(Command_ListGames *cmd)
+ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdListGames(Command_ListGames * /*cmd*/)
 {
+	Event_ListGames *event = new Event_ListGames;
 	const QList<Server_Game *> &gameList = server->getGames();
 	for (int i = 0; i < gameList.size(); ++i) {
-//		msg(gameList[i]->getGameListLine());
+		Server_Game *g = gameList[i];
+		event->addGame(
+			g->getGameId(),
+			g->getDescription(),
+			!g->getPassword().isEmpty(),
+			g->getPlayerCount(),
+			g->getMaxPlayers(),
+			g->getCreatorName(),
+			g->getSpectatorsAllowed(),
+			g->getSpectatorCount()
+		);
 	}
+	sendProtocolItem(event);
+	
 	acceptsGameListChanges = true;
 	return ProtocolResponse::RespOk;
 }
 
 ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd)
 {
-	Server_Game *game = server->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), cmd->getSpectatorsAllowed(), playerName);
+	Server_Game *game = server->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), cmd->getSpectatorsAllowed(), this);
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, game->getCreator()));
 	
 	return ProtocolResponse::RespOk;
@@ -187,13 +200,13 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinG
 	
 	ProtocolResponse::ResponseCode result = g->checkJoin(cmd->getPassword(), cmd->getSpectator());
 	if (result == ProtocolResponse::RespOk) {
-		Server_Player *player = g->addPlayer(playerName, cmd->getSpectator());
+		Server_Player *player = g->addPlayer(this, cmd->getSpectator());
 		games.insert(cmd->getGameId(), QPair<Server_Game *, Server_Player *>(g, player));
 	}
 	return result;
 }
 
-ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdLeaveGame(Command_LeaveGame *cmd, Server_Game *game, Server_Player *player)
+ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdLeaveGame(Command_LeaveGame * /*cmd*/, Server_Game *game, Server_Player *player)
 {
 	game->removePlayer(player);
 	return ProtocolResponse::RespOk;
@@ -201,20 +214,20 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdLeaveGame(Command_Leav
 
 ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdSay(Command_Say *cmd, Server_Game *game, Server_Player *player)
 {
-	// XXX
+	game->sendGameEvent(new Event_Say(-1, player->getPlayerId(), cmd->getMessage()));
 	return ProtocolResponse::RespOk;
 }
 
-ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdShuffle(Command_Shuffle *cmd, Server_Game *game, Server_Player *player)
+ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdShuffle(Command_Shuffle * /*cmd*/, Server_Game *game, Server_Player *player)
 {
 	player->getZones().value("deck")->shuffle();
-//	game->broadcastEvent("shuffle", player);
+	game->sendGameEvent(new Event_Shuffle(-1, player->getPlayerId()));
 	return ProtocolResponse::RespOk;
 }
 
 ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdRollDie(Command_RollDie *cmd, Server_Game *game, Server_Player *player)
 {
-//	game->broadcastEvent(QString("roll_die|%1|%2").arg(sides).arg(rng->getNumber(1, sides)), player);
+	game->sendGameEvent(new Event_RollDie(-1, player->getPlayerId(), cmd->getSides(), rng->getNumber(1, cmd->getSides())));
 	return ProtocolResponse::RespOk;
 }
 
@@ -337,7 +350,6 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveC
 
 ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, Server_Game *game, Server_Player *player)
 {
-	// zone, cardname, powtough, x, y
 	// powtough wird erst mal ignoriert
 	Server_CardZone *zone = player->getZones().value(cmd->getZone());
 	if (!zone)
@@ -345,13 +357,9 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_Cr
 
 	Server_Card *card = new Server_Card(cmd->getCardName(), player->newCardId(), cmd->getX(), cmd->getY());
 	zone->insertCard(card, cmd->getX(), cmd->getY());
-/*	game->broadcastEvent(QString("create_token|%1|%2|%3|%4|%5|%6").arg(zone->getName())
-									 .arg(cardid)
-									 .arg(cardname)
-									 .arg(powtough)
-									 .arg(x)
-									 .arg(y), player);
-*/	return ProtocolResponse::RespOk;
+	game->sendGameEvent(new Event_CreateToken(-1, player->getPlayerId(), zone->getName(), card->getId(), card->getName(), cmd->getPt(), cmd->getX(), cmd->getY()));
+	
+	return ProtocolResponse::RespOk;
 }
 
 ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Server_Game *game, Server_Player *player)
@@ -377,17 +385,19 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_Cr
 
 	Server_Arrow *arrow = new Server_Arrow(player->newArrowId(), startCard, targetCard, cmd->getColor());
 	player->addArrow(arrow);
-/*	game->broadcastEvent(QString("create_arrow|%1|%2|%3|%4|%5|%6|%7|%8")
-		.arg(arrow->getId())
-		.arg(startPlayer->getPlayerId())
-		.arg(startZone->getName())
-		.arg(startCard->getId())
-		.arg(targetPlayer->getPlayerId())
-		.arg(targetZone->getName())
-		.arg(targetCard->getId())
-		.arg(cmd->getColor()), player
-	);
-*/	return ProtocolResponse::RespOk;
+	game->sendGameEvent(new Event_CreateArrow(
+		-1,
+		player->getPlayerId(),
+		arrow->getId(),
+		startPlayer->getPlayerId(),
+		startZone->getName(),
+		startCard->getId(),
+		targetPlayer->getPlayerId(),
+		targetZone->getName(),
+		targetCard->getId(),
+		cmd->getColor()
+	));
+	return ProtocolResponse::RespOk;
 }
 
 ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdDeleteArrow(Command_DeleteArrow *cmd, Server_Game *game, Server_Player *player)
@@ -395,7 +405,7 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdDeleteArrow(Command_De
 	if (!player->deleteArrow(cmd->getArrowId()))
 		return ProtocolResponse::RespNameNotFound;
 	
-//	game->broadcastEvent(QString("delete_arrow|%1").arg(arrowId), player);
+	game->sendGameEvent(new Event_DeleteArrow(-1, player->getPlayerId(), cmd->getArrowId()));
 	return ProtocolResponse::RespOk;
 }
 
@@ -419,14 +429,14 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdSetCardAttr(Command_Se
 		if (!card->setAttribute(cmd->getAttrName(), cmd->getAttrValue(), false))
 			return ProtocolResponse::RespInvalidCommand;
 	}
-//	game->broadcastEvent(QString("set_card_attr|%1|%2|%3|%4").arg(zone->getName()).arg(cardid).arg(aname).arg(avalue), player);
+	game->sendGameEvent(new Event_SetCardAttr(-1, player->getPlayerId(), zone->getName(), cmd->getCardId(), cmd->getAttrName(), cmd->getAttrValue()));
 	return ProtocolResponse::RespOk;
 }
 
-ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdReadyStart(Command_ReadyStart *cmd, Server_Game *game, Server_Player *player)
+ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdReadyStart(Command_ReadyStart * /*cmd*/, Server_Game *game, Server_Player *player)
 {
 	player->setStatus(StatusReadyStart);
-//	game->broadcastEvent(QString("ready_start"), player);
+	game->sendGameEvent(new Event_ReadyStart(-1, player->getPlayerId()));
 	game->startGameIfReady();
 	return ProtocolResponse::RespOk;
 }
@@ -439,7 +449,7 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdIncCounter(Command_Inc
 		return ProtocolResponse::RespNameNotFound;
 	
 	c->setCount(c->getCount() + cmd->getDelta());
-//	game->broadcastEvent(QString("set_counter|%1|%2").arg(c->getId()).arg(c->getCount()), player);
+	game->sendGameEvent(new Event_SetCounter(-1, player->getPlayerId(), c->getId(), c->getCount()));
 	return ProtocolResponse::RespOk;
 }
 
@@ -447,7 +457,7 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdAddCounter(Command_Add
 {
 	Server_Counter *c = new Server_Counter(player->newCounterId(), cmd->getCounterName(), cmd->getColor(), cmd->getRadius(), cmd->getValue());
 	player->addCounter(c);
-//	game->broadcastEvent(QString("add_counter|%1|%2|%3|%4|%5").arg(c->getId()).arg(c->getName()).arg(color).arg(radius).arg(count), player);
+	game->sendGameEvent(new Event_AddCounter(-1, player->getPlayerId(), c->getId(), c->getName(), c->getColor(), c->getRadius(), c->getCount()));
 	
 	return ProtocolResponse::RespOk;
 }
@@ -459,7 +469,7 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdSetCounter(Command_Set
 		return ProtocolResponse::RespNameNotFound;
 	
 	c->setCount(cmd->getValue());
-//	game->broadcastEvent(QString("set_counter|%1|%2").arg(c->getId()).arg(count), player);
+	game->sendGameEvent(new Event_SetCounter(-1, player->getPlayerId(), c->getId(), c->getCount()));
 	return ProtocolResponse::RespOk;
 }
 
@@ -467,7 +477,7 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdDelCounter(Command_Del
 {
 	if (!player->deleteCounter(cmd->getCounterId()))
 		return ProtocolResponse::RespNameNotFound;
-//	game->broadcastEvent(QString("del_counter|%1").arg(counterId), player);
+	game->sendGameEvent(new Event_DelCounter(-1, player->getPlayerId(), cmd->getCounterId()));
 	return ProtocolResponse::RespOk;
 }
 
@@ -518,7 +528,7 @@ ProtocolResponse::ResponseCode Server_ProtocolHandler::cmdStopDumpZone(Command_S
 	
 	if (zone->getType() == Server_CardZone::HiddenZone) {
 		zone->setCardsBeingLookedAt(0);
-//		game->broadcastEvent(QString("stop_dump_zone|%1|%2").arg(otherPlayer->getPlayerId()).arg(zone->getName()), player);
+		game->sendGameEvent(new Event_StopDumpZone(-1, player->getPlayerId(), cmd->getPlayerId(), zone->getName()));
 	}
 	return ProtocolResponse::RespOk;
 }

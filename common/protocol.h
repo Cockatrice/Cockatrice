@@ -15,6 +15,7 @@ class QXmlStreamAttributes;
 enum ItemId {
 	ItemId_Event_ChatListChannels = ItemId_Other + 1,
 	ItemId_Event_ChatListPlayers = ItemId_Other + 2,
+	ItemId_Event_ListGames = ItemId_Other + 3
 };
 
 class ProtocolItem : public QObject {
@@ -139,6 +140,9 @@ protected:
 	void extractParameters();
 public:
 	GameEvent(const QString &_eventName, int _gameId, int _playerId);
+	int getGameId() const { return gameId; }
+	int getPlayerId() const { return playerId; }
+	void setGameId(int _gameId) { gameId = _gameId; }
 };
 
 class ChatEvent : public ProtocolItem {
@@ -205,6 +209,46 @@ public:
 		playerList.append(PlayerInfo(_name));
 	}
 	const QList<PlayerInfo> &getPlayerList() const { return playerList; }
+
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
+};
+
+class Event_ListGames : public GenericEvent {
+	Q_OBJECT
+public:
+	class GameInfo {
+	private:
+		int gameId;
+		QString description;
+		bool hasPassword;
+		int playerCount;
+		int maxPlayers;
+		QString creatorName;
+		bool spectatorsAllowed;
+		int spectatorCount;
+	public:
+		GameInfo(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, const QString &_creatorName, bool _spectatorsAllowed, int _spectatorCount)
+			: gameId(_gameId), description(_description), hasPassword(_hasPassword), playerCount(_playerCount), maxPlayers(_maxPlayers), creatorName(_creatorName), spectatorsAllowed(_spectatorsAllowed), spectatorCount(_spectatorCount) { }
+		int getGameId() const { return gameId; }
+		QString getDescription() const { return description; }
+		bool getHasPassword() const { return hasPassword; }
+		int getPlayerCount() const { return playerCount; }
+		int getMaxPlayers() const { return maxPlayers; }
+		QString getCreatorName() const { return creatorName; }
+		bool getSpectatorsAllowed() const { return spectatorsAllowed; }
+		int getSpectatorCount() const { return spectatorCount; }
+	};
+private:
+	QList<GameInfo> gameList;
+public:
+	Event_ListGames() : GenericEvent("list_games") { }
+	int getItemId() const { return ItemId_Event_ListGames; }
+	void addGame(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, const QString &_creatorName, bool _spectatorsAllowed, int _spectatorCount)
+	{
+		gameList.append(GameInfo(_gameId, _description, _hasPassword, _playerCount, _maxPlayers, _creatorName, _spectatorsAllowed, _spectatorCount));
+	}
+	const QList<GameInfo> &getGameList() const { return gameList; }
 
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);

@@ -4,9 +4,12 @@
 #include "server_arrow.h"
 #include "server_cardzone.h"
 #include "server_game.h"
+#include "server_protocolhandler.h"
+#include "protocol.h"
+#include "protocol_items.h"
 
-Server_Player::Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator)
-	: game(_game), socket(0), playerId(_playerId), playerName(_playerName), spectator(_spectator), nextCardId(0), PlayerStatus(StatusNormal)
+Server_Player::Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator, Server_ProtocolHandler *_handler)
+	: game(_game), handler(_handler), playerId(_playerId), playerName(_playerName), spectator(_spectator), nextCardId(0), PlayerStatus(StatusNormal)
 {
 }
 
@@ -73,8 +76,7 @@ void Server_Player::setupZones()
 	nextCardId = i;
 	
 	PlayerStatus = StatusPlaying;
-	game->broadcastEvent(QString("setup_zones|%1|%2").arg(deck->cards.size())
-						   .arg(sb->cards.size()), this);
+	game->sendGameEvent(new Event_SetupZones(-1, playerId, deck->cards.size(), sb->cards.size()));
 }
 
 void Server_Player::clearZones()
@@ -130,19 +132,8 @@ bool Server_Player::deleteCounter(int counterId)
 	return true;
 }
 
-void Server_Player::privateEvent(const QString &line)
+void Server_Player::sendProtocolItem(ProtocolItem *item, bool deleteItem)
 {
-/*	if (!socket)
-		return;
-	socket->msg(QString("private|%1|%2|%3").arg(playerId).arg(playerName).arg(line));
-*/}
-
-void Server_Player::publicEvent(const QString &line, Server_Player *player)
-{
-/*	if (!socket)
-		return;
-	if (player)
-		socket->msg(QString("public|%1|%2|%3").arg(player->getPlayerId()).arg(player->getPlayerName()).arg(line));
-	else
-		socket->msg(QString("public|||%1").arg(line));
-*/}
+	if (handler)
+		handler->sendProtocolItem(item, deleteItem);
+}

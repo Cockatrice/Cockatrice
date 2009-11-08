@@ -21,6 +21,7 @@
 #include "server_game.h"
 #include "server_counter.h"
 #include "server_chatchannel.h"
+#include "server_protocolhandler.h"
 
 Server::Server(QObject *parent)
 	: QObject(parent), nextGameId(0)
@@ -31,7 +32,7 @@ Server::~Server()
 {
 }
 
-Server_Game *Server::createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, const QString &creator)
+Server_Game *Server::createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, Server_ProtocolHandler *creator)
 {
 	Server_Game *newGame = new Server_Game(creator, nextGameId++, description, password, maxPlayers, spectatorsAllowed, this);
 	games.insert(newGame->getGameId(), newGame);
@@ -60,19 +61,40 @@ Server_Game *Server::getGame(int gameId) const
 
 void Server::broadcastGameListUpdate(Server_Game *game)
 {
-/*	QString line = game->getGameListLine();
+	Event_ListGames *event = new Event_ListGames;
+	if (game->getPlayerCount())
+		// Game is open
+		event->addGame(
+			game->getGameId(),
+			game->getDescription(),
+			!game->getPassword().isEmpty(),
+			game->getPlayerCount(),
+			game->getMaxPlayers(),
+			game->getCreatorName(),
+			game->getSpectatorsAllowed(),
+			game->getSpectatorCount()
+		);
+	else
+		// Game is closing
+		event->addGame(game->getGameId(), QString(), false, 0, game->getMaxPlayers(), QString(), false, 0);
+	
 	for (int i = 0; i < clients.size(); i++)
 		if (clients[i]->getAcceptsGameListChanges())
-			clients[i]->msg(line);
-*/}
+			clients[i]->sendProtocolItem(event, false);
+	delete event;
+}
 
 void Server::broadcastChannelUpdate()
 {
-/*	QString line = qobject_cast<Server_ChatChannel *>(sender())->getChannelListLine();
-	for (int i = 0; i < players.size(); ++i)
-	  	if (players[i]->getAcceptsChatChannelListChanges())
-		  	players[i]->msg(line);
-*/}
+	Server_ChatChannel *channel = static_cast<Server_ChatChannel *>(sender());
+	Event_ChatListChannels *event = new Event_ChatListChannels;
+	event->addChannel(channel->getName(), channel->getDescription(), channel->size(), channel->getAutoJoin());
+
+	for (int i = 0; i < clients.size(); ++i)
+	  	if (clients[i]->getAcceptsChatChannelListChanges())
+		  	clients[i]->sendProtocolItem(event, false);
+	delete event;
+}
 
 void Server::gameClosing()
 {

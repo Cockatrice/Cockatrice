@@ -193,3 +193,37 @@ void Event_ChatListPlayers::writeElement(QXmlStreamWriter *xml)
 		xml->writeEndElement();
 	}
 }
+
+bool Event_ListGames::readElement(QXmlStreamReader *xml)
+{
+	if (xml->isStartElement() && (xml->name() == "game")) {
+		gameList.append(GameInfo(
+			xml->attributes().value("id").toString().toInt(),
+			xml->attributes().value("description").toString(),
+			xml->attributes().value("has_password").toString().toInt(),
+			xml->attributes().value("player_count").toString().toInt(),
+			xml->attributes().value("max_players").toString().toInt(),
+			xml->attributes().value("creator").toString(),
+			xml->attributes().value("spectators_allowed").toString().toInt(),
+			xml->attributes().value("spectator_count").toString().toInt()
+		));
+		return true;
+	}
+	return false;
+}
+
+void Event_ListGames::writeElement(QXmlStreamWriter *xml)
+{
+	for (int i = 0; i < gameList.size(); ++i) {
+		xml->writeStartElement("game");
+		xml->writeAttribute("id", QString::number(gameList[i].getGameId()));
+		xml->writeAttribute("description", gameList[i].getDescription());
+		xml->writeAttribute("has_password", gameList[i].getHasPassword() ? "1" : "0");
+		xml->writeAttribute("player_count", QString::number(gameList[i].getPlayerCount()));
+		xml->writeAttribute("max_players", QString::number(gameList[i].getMaxPlayers()));
+		xml->writeAttribute("creator", gameList[i].getCreatorName());
+		xml->writeAttribute("spectators_allowed", gameList[i].getSpectatorsAllowed() ? "1" : "0");
+		xml->writeAttribute("spectator_count", QString::number(gameList[i].getSpectatorCount()));
+		xml->writeEndElement();
+	}
+}

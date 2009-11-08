@@ -42,11 +42,13 @@ private:
 signals:
 	void gameClosing();
 public:
-	Server_Game(const QString &_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent = 0);
+	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent = 0);
 	~Server_Game();
 	Server_Player *getCreator() const { return creator; }
+	QString getCreatorName() const { return creator ? creator->getPlayerName() : QString(); }
 	bool getGameStarted() const { return gameStarted; }
 	int getPlayerCount() const { return players.size(); }
+	int getSpectatorCount() const { return spectators.size(); }
 	QList<Server_Player *> getPlayers() const { return players.values(); }
 	Server_Player *getPlayer(int playerId) const { return players.value(playerId, 0); }
 	int getGameId() const { return gameId; }
@@ -54,9 +56,8 @@ public:
 	QString getPassword() const { return password; }
 	int getMaxPlayers() const { return maxPlayers; }
 	bool getSpectatorsAllowed() const { return spectatorsAllowed; }
-	QString getGameListLine() const;
 	ProtocolResponse::ResponseCode checkJoin(const QString &_password, bool spectator);
-	Server_Player *addPlayer(const QString &playerName, bool spectator);
+	Server_Player *addPlayer(Server_ProtocolHandler *handler, bool spectator);
 	void removePlayer(Server_Player *player);
 	void startGameIfReady();
 	int getActivePlayer() const { return activePlayer; }
@@ -64,7 +65,7 @@ public:
 	void setActivePlayer(int _activePlayer);
 	void setActivePhase(int _activePhase);
 
-	void broadcastEvent(const QString &eventStr, Server_Player *player);
+	void sendGameEvent(GameEvent *event);
 };
 
 #endif
