@@ -1,11 +1,12 @@
 TEMPLATE = app
 TARGET =
-DEPENDPATH += . src
-INCLUDEPATH += . src
+DEPENDPATH += . src ../common
+INCLUDEPATH += . src ../common
 MOC_DIR = build
 OBJECTS_DIR = build
 RESOURCES = cockatrice.qrc
 QT += network svg
+
 HEADERS += src/counter.h \
  src/gameselector.h \
  src/dlg_creategame.h \
@@ -41,7 +42,11 @@ HEADERS += src/counter.h \
  src/phasestoolbar.h \
  src/chatwidget.h \
  src/gamescene.h \
- src/arrowitem.h
+ src/arrowitem.h \
+	../common/protocol.h \
+	../common/protocol_items.h \
+	../common/protocol_datastructures.h
+
 SOURCES += src/counter.cpp \
  src/gameselector.cpp \
  src/dlg_creategame.cpp \
@@ -78,6 +83,9 @@ SOURCES += src/counter.cpp \
  src/phasestoolbar.cpp \
  src/chatwidget.cpp \
  src/gamescene.cpp \
- src/arrowitem.cpp
+ src/arrowitem.cpp \
+	../common/protocol.cpp \
+	../common/protocol_items.cpp
+ 
 TRANSLATIONS += translations/cockatrice_de.ts translations/cockatrice_en.ts
 CONFIG += qt debug

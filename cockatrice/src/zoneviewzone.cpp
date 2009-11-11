@@ -27,8 +27,8 @@ void ZoneViewZone::paint(QPainter */*painter*/, const QStyleOptionGraphicsItem *
 void ZoneViewZone::initializeCards()
 {
 	if (!origZone->contentsKnown()) {
-		PendingCommand_DumpZone *dumpZoneCommand = player->client->dumpZone(player->getId(), name, numberCards);
-		connect(dumpZoneCommand, SIGNAL(cardListReceived(QList<ServerZoneCard>)), this, SLOT(zoneDumpReceived(QList<ServerZoneCard>)));
+//		PendingCommand_DumpZone *dumpZoneCommand = player->client->dumpZone(player->getId(), name, numberCards);
+//		connect(dumpZoneCommand, SIGNAL(cardListReceived(QList<ServerZoneCard>)), this, SLOT(zoneDumpReceived(QList<ServerZoneCard>)));
 	} else {
 		const CardList &c = origZone->getCards();
 		int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());

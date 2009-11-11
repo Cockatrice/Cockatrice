@@ -2,7 +2,7 @@
 #define ZONEVIEWERZONE_H
 
 #include "cardzone.h"
-#include "client.h"
+#include "protocol_datastructures.h"
 #include <QGraphicsWidget>
 #include <QGraphicsLayoutItem>
 

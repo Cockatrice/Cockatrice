@@ -11,12 +11,12 @@ OBJECTS_DIR = build
 
 CONFIG += qt debug
 QT += network sql
-QT -= gui
 
 HEADERS += src/servatrice.h \
 	src/serversocketinterface.h \
 	../common/protocol.h \
 	../common/protocol_items.h \
+	../common/protocol_datastructures.h \
 	../common/rng_abstract.h \
 	../common/rng_qt.h \
 	../common/server.h \

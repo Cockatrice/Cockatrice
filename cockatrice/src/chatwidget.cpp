@@ -128,7 +128,7 @@ void ChatWidget::disableChat()
 	channelList->clear();
 	hide();
 }
-
+/*
 void ChatWidget::chatEvent(const ChatEventData &data)
 {
 	const QStringList &msg = data.getEventData();
@@ -209,11 +209,11 @@ void ChatWidget::chatEvent(const ChatEventData &data)
 		}
 	}
 }
-
+*/
 void ChatWidget::joinChannel(const QString &channelName)
 {
-	PendingCommand_ChatJoinChannel *pc = client->chatJoinChannel(channelName);
-	connect(pc, SIGNAL(finished(ServerResponse)), this, SLOT(joinFinished(ServerResponse)));
+//	PendingCommand_ChatJoinChannel *pc = client->chatJoinChannel(channelName);
+//	connect(pc, SIGNAL(finished(ServerResponse)), this, SLOT(joinFinished(ServerResponse)));
 }
 
 void ChatWidget::joinClicked()
@@ -228,15 +228,15 @@ void ChatWidget::joinClicked()
 	joinChannel(channelName);
 }
 
-void ChatWidget::joinFinished(ServerResponse resp)
+void ChatWidget::joinFinished(ResponseCode resp)
 {
 	if (resp != RespOk)
 		return;
 	
-	PendingCommand_ChatJoinChannel *pc = qobject_cast<PendingCommand_ChatJoinChannel *>(sender());
-	QString channelName = pc->getChannelName();
-	ChannelWidget *cw = new ChannelWidget(client, channelName);
-	tab->addTab(cw, channelName);
+//	PendingCommand_ChatJoinChannel *pc = qobject_cast<PendingCommand_ChatJoinChannel *>(sender());
+//	QString channelName = pc->getChannelName();
+//	ChannelWidget *cw = new ChannelWidget(client, channelName);
+//	tab->addTab(cw, channelName);
 }
 
 ChannelWidget *ChatWidget::getChannel(const QString &name)

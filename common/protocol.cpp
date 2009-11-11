@@ -69,7 +69,7 @@ void ProtocolItem::initializeHash()
 int Command::lastCmdId = 0;
 
 Command::Command(const QString &_itemName, int _cmdId)
-	: ProtocolItem(_itemName), cmdId(_cmdId)
+	: ProtocolItem(_itemName), cmdId(_cmdId), ticks(0)
 {
 	if (cmdId == -1)
 		cmdId = lastCmdId++;
@@ -84,7 +84,7 @@ void Command::extractParameters()
 		cmdId = -1;
 }
 
-QHash<QString, ProtocolResponse::ResponseCode> ProtocolResponse::responseHash;
+QHash<QString, ResponseCode> ProtocolResponse::responseHash;
 
 ProtocolResponse::ProtocolResponse(int _cmdId, ResponseCode _responseCode)
 	: ProtocolItem(QString()), cmdId(_cmdId), responseCode(_responseCode)
@@ -151,7 +151,7 @@ ChatEvent::ChatEvent(const QString &_eventName, const QString &_channel)
 bool Event_ChatListChannels::readElement(QXmlStreamReader *xml)
 {
 	if (xml->isStartElement() && (xml->name() == "channel")) {
-		channelList.append(ChannelInfo(
+		channelList.append(ServerChatChannelInfo(
 			xml->attributes().value("name").toString(),
 			xml->attributes().value("description").toString(),
 			xml->attributes().value("player_count").toString().toInt(),
@@ -177,7 +177,7 @@ void Event_ChatListChannels::writeElement(QXmlStreamWriter *xml)
 bool Event_ChatListPlayers::readElement(QXmlStreamReader *xml)
 {
 	if (xml->isStartElement() && ((xml->name() == "player"))) {
-		playerList.append(PlayerInfo(
+		playerList.append(ServerPlayerInfo(
 			xml->attributes().value("name").toString()
 		));
 		return true;
@@ -197,7 +197,7 @@ void Event_ChatListPlayers::writeElement(QXmlStreamWriter *xml)
 bool Event_ListGames::readElement(QXmlStreamReader *xml)
 {
 	if (xml->isStartElement() && (xml->name() == "game")) {
-		gameList.append(GameInfo(
+		gameList.append(ServerGameInfo(
 			xml->attributes().value("id").toString().toInt(),
 			xml->attributes().value("description").toString(),
 			xml->attributes().value("has_password").toString().toInt(),

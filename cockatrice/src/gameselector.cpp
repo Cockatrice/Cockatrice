@@ -51,7 +51,7 @@ void GameSelector::actCreate()
 		disableGameList();
 }
 
-void GameSelector::checkResponse(ServerResponse response)
+/*void GameSelector::checkResponse(ServerResponse response)
 {
 	createButton->setEnabled(true);
 	joinButton->setEnabled(true);
@@ -66,7 +66,7 @@ void GameSelector::checkResponse(ServerResponse response)
 		default: ;
 	}
 }
-
+*/
 void GameSelector::actJoin()
 {
 	bool spectator = sender() == spectateButton;
@@ -74,7 +74,7 @@ void GameSelector::actJoin()
 	QModelIndex ind = gameListView->currentIndex();
 	if (!ind.isValid())
 		return;
-	const ServerGame &game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
+	const ServerGameInfo &game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
 	QString password;
 	if (game.getHasPassword()) {
 		bool ok;
@@ -83,8 +83,8 @@ void GameSelector::actJoin()
 			return;
 	}
 
-	PendingCommand *joinCommand = client->joinGame(game.getGameId(), password, spectator);
-	connect(joinCommand, SIGNAL(finished(ServerResponse)), this, SLOT(checkResponse(ServerResponse)));
+//	PendingCommand *joinCommand = client->joinGame(game.getGameId(), password, spectator);
+//	connect(joinCommand, SIGNAL(finished(ServerResponse)), this, SLOT(checkResponse(ServerResponse)));
 	createButton->setEnabled(false);
 	joinButton->setEnabled(false);
 	spectateButton->setEnabled(false);
@@ -95,7 +95,7 @@ void GameSelector::enableGameList()
 	if (isVisible())
 		return;
 	
-	connect(client, SIGNAL(gameListEvent(const ServerGame &)), gameListModel, SLOT(updateGameList(const ServerGame &)));
+	connect(client, SIGNAL(gameListEvent(const ServerGameInfo &)), gameListModel, SLOT(updateGameList(const ServerGameInfo &)));
 	client->listGames();
 	show();
 }

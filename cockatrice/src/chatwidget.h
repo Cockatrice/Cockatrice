@@ -2,7 +2,7 @@
 #define CHATWIDGET_H
 
 #include <QWidget>
-#include "client.h"
+#include "protocol_datastructures.h"
 
 class QListWidget;
 class QTextEdit;
@@ -10,6 +10,7 @@ class QLineEdit;
 class QTreeWidget;
 class QTabWidget;
 class QPushButton;
+class Client;
 
 class ChannelWidget : public QWidget {
 	Q_OBJECT
@@ -45,9 +46,9 @@ private:
 	ChannelWidget *getChannel(const QString &name);
 	void joinChannel(const QString &channelName);
 private slots:
-	void chatEvent(const ChatEventData &data);
+//	void chatEvent(const ChatEventData &data);
 	void joinClicked();
-	void joinFinished(ServerResponse resp);
+	void joinFinished(ResponseCode resp);
 public:
 	ChatWidget(Client *_client, QWidget *parent = 0);
 	void retranslateUi();

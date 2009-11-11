@@ -1,5 +1,5 @@
 #include "gamesmodel.h"
-#include "client.h"
+#include "protocol_datastructures.h"
 
 GamesModel::~GamesModel()
 {
@@ -17,13 +17,13 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
 	if ((index.row() >= gameList.size()) || (index.column() >= columnCount()))
 		return QVariant();
 	
-	const ServerGame &g = gameList[index.row()];
+	const ServerGameInfo &g = gameList[index.row()];
 	switch (index.column()) {
 		case 0: return g.getDescription();
-		case 1: return g.getCreator();
+		case 1: return g.getCreatorName();
 		case 2: return g.getHasPassword() ? tr("yes") : tr("no");
 		case 3: return QString("%1/%2").arg(g.getPlayerCount()).arg(g.getMaxPlayers());
-		case 4: return g.getSpectatorsAllowed() ? QVariant(g.getSpectatorsCount()) : QVariant(tr("not allowed"));
+		case 4: return g.getSpectatorsAllowed() ? QVariant(g.getSpectatorCount()) : QVariant(tr("not allowed"));
 		default: return QVariant();
 	}
 }
@@ -42,13 +42,13 @@ QVariant GamesModel::headerData(int section, Qt::Orientation orientation, int ro
 	}
 }
 
-const ServerGame &GamesModel::getGame(int row)
+const ServerGameInfo &GamesModel::getGame(int row)
 {
 	Q_ASSERT(row < gameList.size());
 	return gameList[row];
 }
 
-void GamesModel::updateGameList(const ServerGame &game)
+void GamesModel::updateGameList(const ServerGameInfo &game)
 {
 	for (int i = 0; i < gameList.size(); i++)
 		if (gameList[i].getGameId() == game.getGameId()) {
@@ -100,7 +100,7 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourc
 	if (!model)
 		return false;
 	
-	const ServerGame &game = model->getGame(sourceRow);
+	const ServerGameInfo &game = model->getGame(sourceRow);
 	if (game.getPlayerCount() == game.getMaxPlayers())
 		return false;
 	

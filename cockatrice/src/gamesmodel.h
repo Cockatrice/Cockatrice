@@ -4,7 +4,7 @@
 #include <QAbstractTableModel>
 #include <QSortFilterProxyModel>
 #include <QList>
-#include "client.h"
+#include "protocol_datastructures.h"
 
 class GamesModel : public QAbstractTableModel {
 	Q_OBJECT
@@ -16,12 +16,12 @@ public:
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	
-	const ServerGame &getGame(int row);
+	const ServerGameInfo &getGame(int row);
 	void cleanList();
 public slots:
-	void updateGameList(const ServerGame &game);
+	void updateGameList(const ServerGameInfo &game);
 private:
-	QList<ServerGame> gameList;
+	QList<ServerGameInfo> gameList;
 };
 
 class GamesProxyModel : public QSortFilterProxyModel {

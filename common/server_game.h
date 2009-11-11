@@ -56,7 +56,7 @@ public:
 	QString getPassword() const { return password; }
 	int getMaxPlayers() const { return maxPlayers; }
 	bool getSpectatorsAllowed() const { return spectatorsAllowed; }
-	ProtocolResponse::ResponseCode checkJoin(const QString &_password, bool spectator);
+	ResponseCode checkJoin(const QString &_password, bool spectator);
 	Server_Player *addPlayer(Server_ProtocolHandler *handler, bool spectator);
 	void removePlayer(Server_Player *player);
 	void startGameIfReady();

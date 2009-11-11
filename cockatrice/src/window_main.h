@@ -60,7 +60,7 @@ class MainWindow : public QMainWindow {
 	Q_OBJECT
 private slots:
 	void playerAdded(Player *player);
-	void statusChanged(ProtocolStatus _status);
+	void statusChanged(ClientStatus _status);
 	void serverTimeout();
 
 	void actSay();

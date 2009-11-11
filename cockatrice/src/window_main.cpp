@@ -74,7 +74,7 @@ void MainWindow::playerAdded(Player *player)
 	connect(player, SIGNAL(closeZoneView(ZoneViewZone *)), zoneLayout, SLOT(removeItem(ZoneViewZone *)));
 }
 
-void MainWindow::statusChanged(ProtocolStatus _status)
+void MainWindow::statusChanged(ClientStatus _status)
 {
 	switch (_status) {
 		case StatusConnecting:
@@ -101,8 +101,8 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			aConnect->setEnabled(false);
 			aDisconnect->setEnabled(true);
 			break;
-		case StatusIdle: {
-			if (game) {
+		case StatusLoggedIn: {
+/*			if (game) {
 				zoneLayout->clear();
 				delete game;
 				game = 0;
@@ -115,10 +115,10 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			view->hide();
 			gameSelector->enableGameList();
 			chatWidget->enableChat();
-			break;
+*/			break;
 		}
-		case StatusPlaying: {
-			chatWidget->disableChat();
+//		case StatusPlaying: {
+/*			chatWidget->disableChat();
 			
 			game = new Game(db, client, scene, menuBar(), this);
 			connect(game, SIGNAL(hoverCard(QString)), cardInfo, SLOT(setCard(const QString &)));
@@ -137,7 +137,7 @@ void MainWindow::statusChanged(ProtocolStatus _status)
 			view->show();
 			break;
 		}
-		default:
+*/		default:
 			break;
 	}
 }
@@ -338,7 +338,7 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 
 	connect(client, SIGNAL(maxPingTime(int, int)), pingWidget, SLOT(setPercentage(int, int)));
 	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
-	connect(client, SIGNAL(statusChanged(ProtocolStatus)), this, SLOT(statusChanged(ProtocolStatus)));
+	connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
 
 	connect(this, SIGNAL(logConnecting(QString)), messageLog, SLOT(logConnecting(QString)));
 	connect(client, SIGNAL(welcomeMsgReceived(QString)), messageLog, SLOT(logConnected(QString)));

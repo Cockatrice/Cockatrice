@@ -13,6 +13,7 @@
 #include "gamescene.h"
 #include "player.h"
 #include "arrowitem.h"
+#include "protocol_datastructures.h"
 
 Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenuBar *menuBar, QObject *parent)
 	: QObject(parent), db(_db), client(_client), scene(_scene), started(false), currentPhase(-1)
@@ -151,7 +152,7 @@ Player *Game::addPlayer(int playerId, const QString &playerName, bool local)
 	
 	return newPlayer;
 }
-
+/*
 void Game::cardListReceived(QList<ServerZoneCard> list)
 {
 	for (int i = 0; i < list.size(); ++i) {
@@ -250,7 +251,7 @@ void Game::playerListReceived(QList<ServerPlayer> playerList)
 	emit logPlayerListReceived(nameList);
 	restartGameDialog();
 }
-
+*/
 void Game::readyStart()
 {
 	client->readyStart();
@@ -260,7 +261,7 @@ void Game::restartGameDialog()
 {
 	dlgStartGame->show();
 }
-
+/*
 void Game::gameEvent(const ServerEventData &msg)
 {
 	qDebug(QString("game::gameEvent: public=%1, player=%2, name=%3, type=%4, data=%5").arg(msg.getPublic()).arg(msg.getPlayerId()).arg(msg.getPlayerName()).arg(msg.getEventType()).arg(msg.getEventData().join("/")).toLatin1());
@@ -410,7 +411,7 @@ void Game::gameEvent(const ServerEventData &msg)
 		}
 	}
 }
-
+*/
 void Game::actNextPhase()
 {
 	int phase = currentPhase;
@@ -537,13 +538,13 @@ void Game::hoverCardEvent(CardItem *card)
 
 void Game::queryGameState()
 {
-	PendingCommand_DumpAll *pc = client->dumpAll();
+/*	PendingCommand_DumpAll *pc = client->dumpAll();
 	connect(pc, SIGNAL(playerListReceived(QList<ServerPlayer>)), this, SLOT(playerListReceived(QList<ServerPlayer>)));
 	connect(pc, SIGNAL(zoneListReceived(QList<ServerZone>)), this, SLOT(zoneListReceived(QList<ServerZone>)));
 	connect(pc, SIGNAL(cardListReceived(QList<ServerZoneCard>)), this, SLOT(cardListReceived(QList<ServerZoneCard>)));
 	connect(pc, SIGNAL(counterListReceived(QList<ServerCounter>)), this, SLOT(counterListReceived(QList<ServerCounter>)));
 	connect(pc, SIGNAL(arrowListReceived(QList<ServerArrow>)), this, SLOT(arrowListReceived(QList<ServerArrow>)));
-}
+*/}
 
 void Game::activePlayerDrawCard()
 {

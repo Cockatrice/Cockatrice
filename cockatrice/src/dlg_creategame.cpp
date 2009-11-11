@@ -58,13 +58,13 @@ void DlgCreateGame::actOK()
 		QMessageBox::critical(this, tr("Error"), tr("Invalid number of players."));
 		return;
 	}
-	PendingCommand *createCommand = client->createGame(descriptionEdit->text(), passwordEdit->text(), maxPlayers, spectatorsAllowedCheckBox->isChecked());
-	connect(createCommand, SIGNAL(finished(ServerResponse)), this, SLOT(checkResponse(ServerResponse)));
+//	PendingCommand *createCommand = client->createGame(descriptionEdit->text(), passwordEdit->text(), maxPlayers, spectatorsAllowedCheckBox->isChecked());
+//	connect(createCommand, SIGNAL(finished(ServerResponse)), this, SLOT(checkResponse(ServerResponse)));
 	okButton->setEnabled(false);
 	cancelButton->setEnabled(false);
 }
 
-void DlgCreateGame::checkResponse(ServerResponse response)
+/*void DlgCreateGame::checkResponse(ServerResponse response)
 {
 	okButton->setEnabled(true);
 	cancelButton->setEnabled(true);
@@ -76,3 +76,4 @@ void DlgCreateGame::checkResponse(ServerResponse response)
 		return;
 	}
 }
+*/

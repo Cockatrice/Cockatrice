@@ -3,8 +3,8 @@
 
 #include <QPlainTextEdit>
 #include <QAbstractSocket>
-#include "client.h"
 #include "translation.h"
+#include "protocol_datastructures.h"
 
 class Game;
 class Player;
@@ -20,7 +20,7 @@ public slots:
 	void logConnected(QString welcomeMsg);
 	void logDisconnected();
 	void logSocketError(const QString &errorString);
-	void logServerError(ServerResponse response);
+	void logServerError(ResponseCode response);
 	void logProtocolVersionMismatch();
 	void logProtocolError();
 private slots:

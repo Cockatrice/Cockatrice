@@ -32,10 +32,10 @@ void MessageLogWidget::logSocketError(const QString &errorString)
 	append(sanitizeHtml(errorString));
 }
 
-void MessageLogWidget::logServerError(ServerResponse response)
+void MessageLogWidget::logServerError(ResponseCode response)
 {
 	switch (response) {
-		case RespPasswordWrong: append(tr("Invalid password.")); break;
+		case RespWrongPassword: append(tr("Invalid password.")); break;
 		default: ;
 	}
 }

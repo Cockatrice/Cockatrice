@@ -114,7 +114,7 @@ public:
 	const QMap<QString, CardZone *> &getZones() const { return zones; }
 	const QMap<int, ArrowItem *> &getArrows() const { return arrows; }
 	TableZone *getTable() const { return table; }
-	void gameEvent(const ServerEventData &event);
+//	void gameEvent(const ServerEventData &event);
 	CardDatabase *getDb() const { return db; }
 	void showCardMenu(const QPoint &p);
 	bool getActive() const { return active; }

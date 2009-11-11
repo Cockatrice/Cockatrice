@@ -21,7 +21,7 @@ private slots:
 	void showFullGamesChanged(int state);
 	void actCreate();
 	void actJoin();
-	void checkResponse(ServerResponse response);
+//	void checkResponse(ServerResponse response);
 private:
 	Client *client;
 

@@ -88,7 +88,7 @@ void ServerSocketInterface::readClient()
 			else {
 				Command *command = qobject_cast<Command *>(currentItem);
 				if (qobject_cast<InvalidCommand *>(command))
-					sendProtocolItem(new ProtocolResponse(command->getCmdId(), ProtocolResponse::RespInvalidCommand));
+					sendProtocolItem(new ProtocolResponse(command->getCmdId(), RespInvalidCommand));
 				else
 					processCommand(command);
 				currentItem = 0;

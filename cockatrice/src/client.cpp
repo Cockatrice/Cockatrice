@@ -1,132 +1,26 @@
 #include <QTimer>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 #include "client.h"
-
-// Message structure for server events:
-// {"private","public"}|PlayerId|PlayerName|EventType|EventData
-
-QHash<QString, ServerEventType> ServerEventData::eventHash;
-
-ServerEventData::ServerEventData(const QString &line)
-{
-	if (eventHash.isEmpty()) {
-		eventHash.insert("say", eventSay);
-		eventHash.insert("join", eventJoin);
-		eventHash.insert("leave", eventLeave);
-		eventHash.insert("game_closed", eventGameClosed);
-		eventHash.insert("ready_start", eventReadyStart);
-		eventHash.insert("setup_zones", eventSetupZones);
-		eventHash.insert("game_start", eventGameStart);
-		eventHash.insert("shuffle", eventShuffle);
-		eventHash.insert("roll_die", eventRollDie);
-		eventHash.insert("draw", eventDraw);
-		eventHash.insert("move_card", eventMoveCard);
-		eventHash.insert("create_token", eventCreateToken);
-		eventHash.insert("create_arrow", eventCreateArrow);
-		eventHash.insert("delete_arrow", eventDeleteArrow);
-		eventHash.insert("set_card_attr", eventSetCardAttr);
-		eventHash.insert("add_counter", eventAddCounter);
-		eventHash.insert("set_counter", eventSetCounter);
-		eventHash.insert("del_counter", eventDelCounter);
-		eventHash.insert("set_active_player", eventSetActivePlayer);
-		eventHash.insert("set_active_phase", eventSetActivePhase);
-		eventHash.insert("dump_zone", eventDumpZone);
-		eventHash.insert("stop_dump_zone", eventStopDumpZone);
-	}
-	
-	QStringList values = line.split('|');
-
-	IsPublic = !values.takeFirst().compare("public");
-	bool ok = false;
-	PlayerId = values.takeFirst().toInt(&ok);
-	if (!ok)
-		PlayerId = -1;
-	PlayerName = values.takeFirst();
-	EventType = eventHash.value(values.takeFirst(), eventInvalid);
-	EventData = values;
-}
-
-QHash<QString, ChatEventType> ChatEventData::eventHash;
-
-ChatEventData::ChatEventData(const QString &line)
-{
-	if (eventHash.isEmpty()) {
-		eventHash.insert("list_channels", eventChatListChannels);
-		eventHash.insert("join_channel", eventChatJoinChannel);
-		eventHash.insert("list_players", eventChatListPlayers);
-		eventHash.insert("leave_channel", eventChatLeaveChannel);
-		eventHash.insert("say", eventChatSay);
-		eventHash.insert("server_message", eventChatServerMessage);
-	}
-	
-	QStringList values = line.split('|');
-	values.removeFirst();
-	eventType = eventHash.value(values.takeFirst(), eventChatInvalid);
-	eventData = values;
-}
-
-PendingCommand::PendingCommand(int _msgid)
-	: QObject(), msgid(_msgid), time(0)
-{
-}
-
-void PendingCommand::responseReceived(ServerResponse resp)
-{
-	emit finished(resp);
-	deleteLater();
-}
-
-void PendingCommand_ListPlayers::responseReceived(ServerResponse resp)
-{
-	if (resp == RespOk)
-		emit playerListReceived(playerList);
-	PendingCommand::responseReceived(resp);
-}
-
-void PendingCommand_ListZones::responseReceived(ServerResponse resp)
-{
-	if (resp == RespOk)
-		emit zoneListReceived(zoneList);
-	PendingCommand::responseReceived(resp);
-}
-
-void PendingCommand_DumpZone::responseReceived(ServerResponse resp)
-{
-	if (resp == RespOk)
-		emit cardListReceived(cardList);
-	PendingCommand::responseReceived(resp);
-}
-
-void PendingCommand_ListCounters::responseReceived(ServerResponse resp)
-{
-	if (resp == RespOk)
-		emit counterListReceived(counterList);
-	PendingCommand::responseReceived(resp);
-}
-
-void PendingCommand_DumpAll::responseReceived(ServerResponse resp)
-{
-	if (resp == RespOk) {
-		emit playerListReceived(playerList);
-		emit zoneListReceived(zoneList);
-		emit cardListReceived(cardList);
-		emit counterListReceived(counterList);
-		emit arrowListReceived(arrowList);
-	}
-	PendingCommand::responseReceived(resp);
-}
+#include "protocol.h"
+#include "protocol_items.h"
 
 Client::Client(QObject *parent)
-	: QObject(parent), status(StatusDisconnected), MsgId(0)
+	: QObject(parent), currentItem(0), status(StatusDisconnected)
 {
 	timer = new QTimer(this);
 	timer->setInterval(1000);
 	connect(timer, SIGNAL(timeout()), this, SLOT(ping()));
 
 	socket = new QTcpSocket(this);
-	socket->setTextModeEnabled(true);
 	connect(socket, SIGNAL(connected()), this, SLOT(slotConnected()));
-	connect(socket, SIGNAL(readyRead()), this, SLOT(readLine()));
+	connect(socket, SIGNAL(readyRead()), this, SLOT(readData()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slotSocketError(QAbstractSocket::SocketError)));
+	
+	xmlReader = new QXmlStreamReader;
+	xmlWriter = new QXmlStreamWriter;
+	xmlWriter->setAutoFormatting(true);
+	xmlWriter->setDevice(socket);
 }
 
 Client::~Client()
@@ -148,9 +42,9 @@ void Client::slotConnected()
 
 void Client::removePendingCommand()
 {
-	pendingCommands.remove(static_cast<PendingCommand *>(sender())->getMsgId());
+	pendingCommands.remove(static_cast<Command *>(sender())->getCmdId());
 }
-
+/*
 void Client::loginResponse(ServerResponse response)
 {
 	if (response == RespOk)
@@ -172,9 +66,40 @@ void Client::leaveGameResponse(ServerResponse response)
 	if (response == RespOk)
 		setStatus(StatusIdle);
 }
-
-void Client::readLine()
+*/
+void Client::readData()
 {
+	xmlReader->addData(socket->readAll());
+
+	if (currentItem) {
+		if (!currentItem->read(xmlReader))
+			return;
+		currentItem = 0;
+	}
+	while (!xmlReader->atEnd()) {
+		xmlReader->readNext();
+		if (xmlReader->isStartElement()) {
+			QString itemType = xmlReader->name().toString();
+			if (itemType == "cockatrice_server_stream")
+				continue;
+			QString itemName = xmlReader->attributes().value("name").toString();
+			qDebug() << "parseXml: startElement: " << "type =" << itemType << ", name =" << itemName;
+			currentItem = ProtocolItem::getNewItem(itemType + itemName);
+			if (!currentItem)
+				continue;
+			if (!currentItem->read(xmlReader))
+				return;
+			else {
+/*				Command *command = qobject_cast<Command *>(currentItem);
+				if (qobject_cast<InvalidCommand *>(command))
+					sendProtocolItem(new ProtocolResponse(command->getCmdId(), ProtocolResponse::RespInvalidCommand));
+				else
+					processCommand(command);
+				currentItem = 0;
+*/			}
+		}
+	}
+/*
 	while (socket->canReadLine()) {
 		QString line = QString(socket->readLine()).trimmed();
 
@@ -337,25 +262,17 @@ void Client::readLine()
 		} else
 			emit protocolError();
 	}
+*/
 }
 
-void Client::setStatus(const ProtocolStatus _status)
+void Client::setStatus(const ClientStatus _status)
 {
 	if (_status != status) {
 		status = _status;
 		emit statusChanged(_status);
 	}
 }
-
-void Client::msg(const QString &s)
-{
-	qDebug(QString(">> %1").arg(s).toLatin1());
-	QTextStream stream(socket);
-	stream.setCodec("UTF-8");
-	stream << s << endl;
-	stream.flush();
-}
-
+/*
 PendingCommand *Client::cmd(const QString &s, PendingCommand *_pc)
 {
 	msg(QString("%1|%2").arg(++MsgId).arg(s));
@@ -369,7 +286,7 @@ PendingCommand *Client::cmd(const QString &s, PendingCommand *_pc)
 	connect(pc, SIGNAL(finished(ServerResponse)), this, SLOT(removePendingCommand()));
 	return pc;
 }
-
+*/
 void Client::connectToServer(const QString &hostname, unsigned int port, const QString &_playerName, const QString &_password)
 {
 	disconnectFromServer();
@@ -382,9 +299,12 @@ void Client::connectToServer(const QString &hostname, unsigned int port, const Q
 
 void Client::disconnectFromServer()
 {
+	currentItem = 0;
+	xmlReader->clear();
+	
 	timer->stop();
 
-	QList<PendingCommand *> pc = pendingCommands.values();
+	QList<Command *> pc = pendingCommands.values();
 	for (int i = 0; i < pc.size(); i++)
 		delete pc[i];
 	pendingCommands.clear();
@@ -396,7 +316,7 @@ void Client::disconnectFromServer()
 void Client::ping()
 {
 	int maxTime = 0;
-	QMapIterator<int, PendingCommand *> i(pendingCommands);
+	QMapIterator<int, Command *> i(pendingCommands);
 	while (i.hasNext()) {
 		int time = i.next().value()->tick();
 		if (time > maxTime)
@@ -406,10 +326,12 @@ void Client::ping()
 	if (maxTime >= maxTimeout) {
 		emit serverTimeout();
 		disconnectFromServer();
-	} else
+	}
+/*	else
 		cmd("ping");
+*/
 }
-
+/*
 PendingCommand *Client::chatListChannels()
 {
 	return cmd("chat_list_channels");
@@ -601,3 +523,4 @@ int Client::colorToNumber(const QColor &color) const
 {
 	return color.red() * 65536 + color.green() * 256 + color.blue();
 }
+*/

@@ -77,17 +77,17 @@ void Server_Game::startGameIfReady()
 	setActivePlayer(0);
 }
 
-ProtocolResponse::ResponseCode Server_Game::checkJoin(const QString &_password, bool spectator)
+ResponseCode Server_Game::checkJoin(const QString &_password, bool spectator)
 {
 	if (_password != password)
-		return ProtocolResponse::RespWrongPassword;
+		return RespWrongPassword;
 	if (spectator) {
 		if (!spectatorsAllowed)
-			return ProtocolResponse::RespSpectatorsNotAllowed;
+			return RespSpectatorsNotAllowed;
 	} else if (gameStarted || (getPlayerCount() >= getMaxPlayers()))
-		return ProtocolResponse::RespContextError;
+		return RespContextError;
 	
-	return ProtocolResponse::RespOk;
+	return RespOk;
 }
 
 Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spectator)

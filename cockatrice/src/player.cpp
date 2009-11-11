@@ -410,7 +410,7 @@ void Player::setCardAttrHelper(CardItem *card, const QString &aname, const QStri
 	}
 }
 
-void Player::gameEvent(const ServerEventData &event)
+/*void Player::gameEvent(const ServerEventData &event)
 {
 	QStringList data = event.getEventData();
 	switch (event.getEventType()) {
@@ -643,7 +643,7 @@ void Player::gameEvent(const ServerEventData &event)
 			qDebug("unhandled player event");
 	}
 }
-
+*/
 void Player::showCardMenu(const QPoint &p)
 {
 	emit sigShowCardMenu(p);

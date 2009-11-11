@@ -10,7 +10,6 @@
 
 class GameScene;
 class Player;
-class ServerEventData;
 class CardDatabase;
 class DlgStartGame;
 class CardItem;
@@ -63,14 +62,14 @@ private slots:
 	void actMoveToGraveyard(CardItem *card);
 	void actMoveToExile(CardItem *card);
 
-	void gameEvent(const ServerEventData &msg);
+/*	void gameEvent(const ServerEventData &msg);
 	
 	void playerListReceived(QList<ServerPlayer> playerList);
 	void cardListReceived(QList<ServerZoneCard> list);
 	void zoneListReceived(QList<ServerZone> list);
 	void counterListReceived(QList<ServerCounter> list);
 	void arrowListReceived(QList<ServerArrow> list);
-	
+*/	
 	void readyStart();
 signals:
 	void submitDecklist();
