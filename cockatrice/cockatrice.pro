@@ -43,6 +43,9 @@ HEADERS += src/counter.h \
  src/chatwidget.h \
  src/gamescene.h \
  src/arrowitem.h \
+ src/tab_server.h \
+ src/tab_chatchannel.h \
+ src/tab_game.h \
 	../common/protocol.h \
 	../common/protocol_items.h \
 	../common/protocol_datastructures.h
@@ -84,6 +87,9 @@ SOURCES += src/counter.cpp \
  src/chatwidget.cpp \
  src/gamescene.cpp \
  src/arrowitem.cpp \
+ src/tab_server.cpp \
+ src/tab_chatchannel.cpp \
+ src/tab_game.cpp \
 	../common/protocol.cpp \
 	../common/protocol_items.cpp
  
