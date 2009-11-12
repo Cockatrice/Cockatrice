@@ -13,6 +13,8 @@ class QXmlStreamReader;
 class QXmlStreamWriter;
 class QXmlStreamAttributes;
 
+class ProtocolResponse;
+
 enum ItemId {
 	ItemId_Event_ChatListChannels = ItemId_Other + 1,
 	ItemId_Event_ChatListPlayers = ItemId_Other + 2,
@@ -51,6 +53,8 @@ public:
 
 class Command : public ProtocolItem {
 	Q_OBJECT
+signals:
+	void finished(ResponseCode response);
 private:
 	int cmdId;
 	int ticks;
@@ -62,6 +66,7 @@ public:
 	Command(const QString &_itemName = QString(), int _cmdId = -1);
 	int getCmdId() const { return cmdId; }
 	int tick() { return ++ticks; }
+	void processResponse(ProtocolResponse *response);
 };
 
 class InvalidCommand : public Command {
@@ -121,6 +126,8 @@ public:
 	int getItemId() const { return ItemId_Other; }
 	static void initializeHash();
 	static ProtocolItem *newItem() { return new ProtocolResponse; }
+	int getCmdId() const { return cmdId; }
+	ResponseCode getResponseCode() const { return responseCode; }
 };
 
 class GenericEvent : public ProtocolItem {
@@ -157,12 +164,12 @@ public:
 	ChatEvent(const QString &_eventName, const QString &_channel);
 };
 
-class Event_ChatListChannels : public GenericEvent {
+class Event_ChatListChannels : public ChatEvent {
 	Q_OBJECT
 private:
 	QList<ServerChatChannelInfo> channelList;
 public:
-	Event_ChatListChannels() : GenericEvent("chat_list_channels") { }
+	Event_ChatListChannels() : ChatEvent("chat_list_channels", QString()) { }
 	int getItemId() const { return ItemId_Event_ChatListChannels; }
 	void addChannel(const QString &_name, const QString &_description, int _playerCount, bool _autoJoin)
 	{

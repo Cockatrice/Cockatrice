@@ -17,9 +17,9 @@ void MessageLogWidget::logConnecting(QString hostname)
 	append(tr("Connecting to %1...").arg(sanitizeHtml(hostname)));
 }
 
-void MessageLogWidget::logConnected(QString welcomeMsg)
+void MessageLogWidget::logConnected()
 {
-	append(tr("Connected: %1").arg(welcomeMsg));
+	append(tr("Connected."));
 }
 
 void MessageLogWidget::logDisconnected()
@@ -40,9 +40,9 @@ void MessageLogWidget::logServerError(ResponseCode response)
 	}
 }
 
-void MessageLogWidget::logProtocolVersionMismatch()
+void MessageLogWidget::logProtocolVersionMismatch(int clientVersion, int serverVersion)
 {
-	append(tr("Protocol version mismatch."));
+	append(tr("Protocol version mismatch. Client: %1, Server: %2").arg(clientVersion).arg(serverVersion));
 }
 
 void MessageLogWidget::logProtocolError()

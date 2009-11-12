@@ -84,6 +84,11 @@ void Command::extractParameters()
 		cmdId = -1;
 }
 
+void Command::processResponse(ProtocolResponse *response)
+{
+	emit finished(response->getResponseCode());
+}
+
 QHash<QString, ResponseCode> ProtocolResponse::responseHash;
 
 ProtocolResponse::ProtocolResponse(int _cmdId, ResponseCode _responseCode)

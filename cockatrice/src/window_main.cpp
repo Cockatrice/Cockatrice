@@ -98,6 +98,7 @@ void MainWindow::statusChanged(ClientStatus _status)
 			emit logDisconnected();
 			break;
 		case StatusLoggingIn:
+			emit logConnected();
 			aConnect->setEnabled(false);
 			aDisconnect->setEnabled(true);
 			break;
@@ -341,11 +342,11 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
 
 	connect(this, SIGNAL(logConnecting(QString)), messageLog, SLOT(logConnecting(QString)));
-	connect(client, SIGNAL(welcomeMsgReceived(QString)), messageLog, SLOT(logConnected(QString)));
+	connect(this, SIGNAL(logConnected()), messageLog, SLOT(logConnected()));
 	connect(this, SIGNAL(logDisconnected()), messageLog, SLOT(logDisconnected()));
 	connect(client, SIGNAL(logSocketError(const QString &)), messageLog, SLOT(logSocketError(const QString &)));
-	connect(client, SIGNAL(serverError(ServerResponse)), messageLog, SLOT(logServerError(ServerResponse)));
-	connect(client, SIGNAL(protocolVersionMismatch()), messageLog, SLOT(logProtocolVersionMismatch()));
+	connect(client, SIGNAL(serverError(ResponseCode)), messageLog, SLOT(logServerError(ResponseCode)));
+	connect(client, SIGNAL(protocolVersionMismatch(int, int)), messageLog, SLOT(logProtocolVersionMismatch(int, int)));
 	connect(client, SIGNAL(protocolError()), messageLog, SLOT(logProtocolError()));
 	connect(phasesToolbar, SIGNAL(signalSetPhase(int)), client, SLOT(setActivePhase(int)));
 	connect(phasesToolbar, SIGNAL(signalNextTurn()), client, SLOT(nextTurn()));

@@ -8,6 +8,8 @@
 Client::Client(QObject *parent)
 	: QObject(parent), currentItem(0), status(StatusDisconnected)
 {
+	ProtocolItem::initializeHash();
+	
 	timer = new QTimer(this);
 	timer->setInterval(1000);
 	connect(timer, SIGNAL(timeout()), this, SLOT(ping()));
@@ -40,36 +42,21 @@ void Client::slotConnected()
 	setStatus(StatusAwaitingWelcome);
 }
 
-void Client::removePendingCommand()
-{
-	pendingCommands.remove(static_cast<Command *>(sender())->getCmdId());
-}
-/*
-void Client::loginResponse(ServerResponse response)
+void Client::loginResponse(ResponseCode response)
 {
 	if (response == RespOk)
-		setStatus(StatusIdle);
+		setStatus(StatusLoggedIn);
 	else {
 		emit serverError(response);
 		disconnectFromServer();
 	}
 }
 
-void Client::enterGameResponse(ServerResponse response)
-{
-	if (response == RespOk)
-		setStatus(StatusPlaying);
-}
-
-void Client::leaveGameResponse(ServerResponse response)
-{
-	if (response == RespOk)
-		setStatus(StatusIdle);
-}
-*/
 void Client::readData()
 {
-	xmlReader->addData(socket->readAll());
+	QByteArray data = socket->readAll();
+	qDebug() << data;
+	xmlReader->addData(data);
 
 	if (currentItem) {
 		if (!currentItem->read(xmlReader))
@@ -80,8 +67,25 @@ void Client::readData()
 		xmlReader->readNext();
 		if (xmlReader->isStartElement()) {
 			QString itemType = xmlReader->name().toString();
-			if (itemType == "cockatrice_server_stream")
-				continue;
+			if (itemType == "cockatrice_server_stream") {
+				int serverVersion = xmlReader->attributes().value("version").toString().toInt();
+				if (serverVersion != ProtocolItem::protocolVersion) {
+					emit protocolVersionMismatch(ProtocolItem::protocolVersion, serverVersion);
+					disconnectFromServer();
+					return;
+				} else {
+					xmlWriter->writeStartDocument();
+					xmlWriter->writeStartElement("cockatrice_client_stream");
+					xmlWriter->writeAttribute("version", QString::number(ProtocolItem::protocolVersion));
+					
+					setStatus(StatusLoggingIn);
+					Command_Login *cmdLogin = new Command_Login(userName, password);
+					connect(cmdLogin, SIGNAL(finished(ResponseCode)), this, SLOT(loginResponse(ResponseCode)));
+					sendCommand(cmdLogin);
+					
+					continue;
+				}
+			}
 			QString itemName = xmlReader->attributes().value("name").toString();
 			qDebug() << "parseXml: startElement: " << "type =" << itemType << ", name =" << itemName;
 			currentItem = ProtocolItem::getNewItem(itemType + itemName);
@@ -90,13 +94,9 @@ void Client::readData()
 			if (!currentItem->read(xmlReader))
 				return;
 			else {
-/*				Command *command = qobject_cast<Command *>(currentItem);
-				if (qobject_cast<InvalidCommand *>(command))
-					sendProtocolItem(new ProtocolResponse(command->getCmdId(), ProtocolResponse::RespInvalidCommand));
-				else
-					processCommand(command);
+				processProtocolItem(currentItem);
 				currentItem = 0;
-*/			}
+			}
 		}
 	}
 /*
@@ -265,6 +265,46 @@ void Client::readData()
 */
 }
 
+void Client::processProtocolItem(ProtocolItem *item)
+{
+	ProtocolResponse *response = qobject_cast<ProtocolResponse *>(item);
+	if (response) {
+		Command *cmd = pendingCommands.value(response->getCmdId(), 0);
+		if (!cmd)
+			return;
+		
+		cmd->processResponse(response);
+		delete response;
+		
+		pendingCommands.remove(cmd->getCmdId());
+		delete cmd;
+		
+		return;
+	}
+	
+	GenericEvent *genericEvent = qobject_cast<GenericEvent *>(item);
+	if (genericEvent) {
+		switch (genericEvent->getItemId()) {
+		}
+		delete genericEvent;
+		return;
+	}
+
+/*	GameEvent *gameEvent = qobject_cast<GameEvent *>(item);
+	if (gameEvent) {
+		emit gameEventReceived(gameEvent);
+		delete gameEvent;
+		return;
+	}
+*/
+	ChatEvent *chatEvent = qobject_cast<ChatEvent *>(item);
+	if (chatEvent) {
+		qDebug() << "chatEventReceived()";
+		emit chatEventReceived(chatEvent);
+		delete chatEvent;
+	}
+}
+
 void Client::setStatus(const ClientStatus _status)
 {
 	if (_status != status) {
@@ -272,26 +312,18 @@ void Client::setStatus(const ClientStatus _status)
 		emit statusChanged(_status);
 	}
 }
-/*
-PendingCommand *Client::cmd(const QString &s, PendingCommand *_pc)
+
+void Client::sendCommand(Command *cmd)
 {
-	msg(QString("%1|%2").arg(++MsgId).arg(s));
-	PendingCommand *pc;
-	if (_pc) {
-		pc = _pc;
-		pc->setMsgId(MsgId);
-	} else
-		pc = new PendingCommand(MsgId);
-	pendingCommands.insert(MsgId, pc);
-	connect(pc, SIGNAL(finished(ServerResponse)), this, SLOT(removePendingCommand()));
-	return pc;
+	cmd->write(xmlWriter);
+	pendingCommands.insert(cmd->getCmdId(), cmd);
 }
-*/
-void Client::connectToServer(const QString &hostname, unsigned int port, const QString &_playerName, const QString &_password)
+
+void Client::connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password)
 {
 	disconnectFromServer();
 	
-	playerName = _playerName;
+	userName = _userName;
 	password = _password;
 	socket->connectToHost(hostname, port);
 	setStatus(StatusConnecting);
@@ -326,10 +358,8 @@ void Client::ping()
 	if (maxTime >= maxTimeout) {
 		emit serverTimeout();
 		disconnectFromServer();
-	}
-/*	else
-		cmd("ping");
-*/
+	} else
+		sendCommand(new Command_Ping);
 }
 /*
 PendingCommand *Client::chatListChannels()

@@ -5,12 +5,15 @@
 #include <QColor>
 #include <QStringList>
 #include <QHash>
+#include "protocol_datastructures.h"
 
 class QTimer;
 class Command;
 class QXmlStreamReader;
 class QXmlStreamWriter;
+
 class ProtocolItem;
+class ChatEvent;
 
 enum ClientStatus {
 	StatusDisconnected,
@@ -24,26 +27,23 @@ class Client : public QObject {
 	Q_OBJECT
 signals:
 	void statusChanged(ClientStatus _status);
-	void welcomeMsgReceived(QString welcomeMsg);
 //	void gameListEvent(const ServerGame &game);
-	void playerIdReceived(int id, QString name);
+//	void playerIdReceived(int id, QString name);
 //	void gameEvent(const ServerEventData &msg);
-//	void chatEvent(const ChatEventData &msg);
 	void maxPingTime(int seconds, int maxSeconds);
 	void serverTimeout();
 	void logSocketError(const QString &errorString);
-//	void serverError(ServerResponse resp);
-	void protocolVersionMismatch();
+	void serverError(ResponseCode resp);
+	void protocolVersionMismatch(int clientVersion, int serverVersion);
 	void protocolError();
+	
+	void chatEventReceived(ChatEvent *event);
 private slots:
 	void slotConnected();
 	void readData();
 	void slotSocketError(QAbstractSocket::SocketError error);
 	void ping();
-	void removePendingCommand();
-//	void loginResponse(ServerResponse response);
-//	void enterGameResponse(ServerResponse response);
-//	void leaveGameResponse(ServerResponse response);
+	void loginResponse(ResponseCode response);
 private:
 	static const int maxTimeout = 10;
 	
@@ -54,16 +54,18 @@ private:
 	QXmlStreamWriter *xmlWriter;
 	ProtocolItem *currentItem;
 	ClientStatus status;
-	QString playerName, password;
+	QString userName, password;
 	void setStatus(ClientStatus _status);
+	void processProtocolItem(ProtocolItem *item);
 public:
 	Client(QObject *parent = 0);
 	~Client();
 	ClientStatus getStatus() const { return status; }
 	QString peerName() const { return socket->peerName(); }
 
-	void connectToServer(const QString &hostname, unsigned int port, const QString &_playerName, const QString &_password);
+	void connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
 	void disconnectFromServer();
+	void sendCommand(Command *cmd);
 public slots:
 
 	void chatListChannels() { }

@@ -75,6 +75,7 @@ private slots:
 	void actExit();
 signals:
 	void logConnecting(QString hostname);
+	void logConnected();
 	void logDisconnected();
 private:
 	void retranslateUi();
