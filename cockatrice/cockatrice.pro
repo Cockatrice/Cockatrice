@@ -39,7 +39,6 @@ HEADERS += src/counter.h \
  src/abstractgraphicsitem.h \
  src/dlg_settings.h \
  src/phasestoolbar.h \
- src/chatwidget.h \
  src/gamescene.h \
  src/arrowitem.h \
  src/tab_server.h \
@@ -83,7 +82,6 @@ SOURCES += src/counter.cpp \
  src/abstractgraphicsitem.cpp \
  src/dlg_settings.cpp \
  src/phasestoolbar.cpp \
- src/chatwidget.cpp \
  src/gamescene.cpp \
  src/arrowitem.cpp \
  src/tab_server.cpp \

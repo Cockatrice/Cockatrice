@@ -35,7 +35,6 @@
 #include "zoneviewzone.h"
 #include "zoneviewwidget.h"
 #include "zoneviewlayout.h"
-#include "chatwidget.h"
 #include "tab_supervisor.h"
 
 PingWidget::PingWidget(QWidget *parent)
