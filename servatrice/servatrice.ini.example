@@ -2,19 +2,19 @@
 method=none
 
 [database]
-type=mysql
+type=none
 hostname=localhost
 database=servatrice
 user=servatrice
 password=foobar
 
 [messages]
-login="Example line 1", "Example line 2"
+login="Example line"
 
 [chatchannels]
 size=1
 1\name="General Chat"
 1\description="Discuss anything here."
 1\autojoin=true
-1\joinmessage="This is the general chat channel.", "This message is only here to show that channels can have a join message."
+1\joinmessage="This is the general chat channel. This message is only here to show that channels can have a join message."
 

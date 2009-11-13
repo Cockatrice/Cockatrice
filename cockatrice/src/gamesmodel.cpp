@@ -1,9 +1,12 @@
 #include "gamesmodel.h"
-#include "protocol_datastructures.h"
 
 GamesModel::~GamesModel()
 {
-	cleanList();
+	if (!gameList.isEmpty()) {
+		beginRemoveRows(QModelIndex(), 0, gameList.size() - 1);
+		gameList.clear();
+		endRemoveRows();
+	}
 }
 
 QVariant GamesModel::data(const QModelIndex &index, int role) const
@@ -67,16 +70,6 @@ void GamesModel::updateGameList(const ServerGameInfo &game)
 	beginInsertRows(QModelIndex(), gameList.size(), gameList.size());
 	gameList << game;
 	endInsertRows();
-}
-
-void GamesModel::cleanList()
-{
-	if (gameList.isEmpty())
-		return;
-
-	beginRemoveRows(QModelIndex(), 0, gameList.size() - 1);
-	gameList.clear();
-	endRemoveRows();
 }
 
 GamesProxyModel::GamesProxyModel(QObject *parent)

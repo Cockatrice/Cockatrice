@@ -18,6 +18,15 @@ Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
 
 Server_ProtocolHandler::~Server_ProtocolHandler()
 {
+	// The socket has to be removed from the server's list before it is removed from the game's list
+	// so it will not receive the game update event.
+	server->removeClient(this);
+//	if (game)
+//		game->removePlayer(this);
+
+	QMapIterator<QString, Server_ChatChannel *> chatChannelIterator(chatChannels);
+	while (chatChannelIterator.hasNext())
+		chatChannelIterator.next().value()->removeClient(this);
 }
 
 void Server_ProtocolHandler::processCommand(Command *command)
@@ -75,7 +84,7 @@ void Server_ProtocolHandler::processCommand(Command *command)
 		switch (command->getItemId()) {
 			case ItemId_Command_Ping: response = cmdPing(qobject_cast<Command_Ping *>(command)); break;
 			case ItemId_Command_Login: response = cmdLogin(qobject_cast<Command_Login *>(command)); break;
-			case ItemId_Command_ChatListChannels: response = cmdChatListChannels(qobject_cast<Command_ChatListChannels *>(command)); break;
+			case ItemId_Command_ListChatChannels: response = cmdListChatChannels(qobject_cast<Command_ListChatChannels *>(command)); break;
 			case ItemId_Command_ChatJoinChannel: response = cmdChatJoinChannel(qobject_cast<Command_ChatJoinChannel *>(command)); break;
 			case ItemId_Command_ListGames: response = cmdListGames(qobject_cast<Command_ListGames *>(command)); break;
 			case ItemId_Command_CreateGame: response = cmdCreateGame(qobject_cast<Command_CreateGame *>(command)); break;
@@ -115,13 +124,13 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd)
 		return RespWrongPassword;
 	playerName = cmd->getUsername();
 	
-	enqueueProtocolItem(new Event_ChatServerMessage(QString(), server->getLoginMessage()));
+	enqueueProtocolItem(new Event_ServerMessage(server->getLoginMessage()));
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdChatListChannels(Command_ChatListChannels * /*cmd*/)
+ResponseCode Server_ProtocolHandler::cmdListChatChannels(Command_ListChatChannels * /*cmd*/)
 {
-	Event_ChatListChannels *event = new Event_ChatListChannels;
+	Event_ListChatChannels *event = new Event_ListChatChannels;
 	QMapIterator<QString, Server_ChatChannel *> channelIterator(server->getChatChannels());
 	while (channelIterator.hasNext()) {
 		Server_ChatChannel *c = channelIterator.next().value();

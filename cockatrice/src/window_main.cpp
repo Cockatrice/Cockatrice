@@ -23,7 +23,6 @@
 #include "window_main.h"
 #include "dlg_connect.h"
 #include "dlg_settings.h"
-#include "gameselector.h"
 #include "window_deckeditor.h"
 #include "cardinfowidget.h"
 #include "messagelogwidget.h"
@@ -37,6 +36,7 @@
 #include "zoneviewwidget.h"
 #include "zoneviewlayout.h"
 #include "chatwidget.h"
+#include "tab_supervisor.h"
 
 PingWidget::PingWidget(QWidget *parent)
 	: QWidget(parent)
@@ -86,15 +86,13 @@ void MainWindow::statusChanged(ClientStatus _status)
 				delete game;
 				game = 0;
 			}
-			pingWidget->setPercentage(0, -1);
+//			pingWidget->setPercentage(0, -1);
 			aConnect->setEnabled(true);
 			aDisconnect->setEnabled(false);
 			aRestartGame->setEnabled(false);
 			aLeaveGame->setEnabled(false);
-			phasesToolbar->setActivePhase(-1);
-			phasesToolbar->hide();
-			gameSelector->disableGameList();
-			chatWidget->disableChat();
+//			phasesToolbar->setActivePhase(-1);
+//			phasesToolbar->hide();
 			emit logDisconnected();
 			break;
 		case StatusLoggingIn:
@@ -103,6 +101,8 @@ void MainWindow::statusChanged(ClientStatus _status)
 			aDisconnect->setEnabled(true);
 			break;
 		case StatusLoggedIn: {
+			tabSupervisor->start(client);
+	
 /*			if (game) {
 				zoneLayout->clear();
 				delete game;
@@ -210,7 +210,7 @@ void MainWindow::serverTimeout()
 void MainWindow::retranslateUi()
 {
 	setWindowTitle(tr("Cockatrice"));
-
+	
 	aConnect->setText(tr("&Connect..."));
 	aDisconnect->setText(tr("&Disconnect"));
 	aRestartGame->setText(tr("&Restart game..."));
@@ -225,7 +225,7 @@ void MainWindow::retranslateUi()
 	aCloseMostRecentZoneView->setShortcut(tr("Esc"));
 	
 	cockatriceMenu->setTitle(tr("&Cockatrice"));
-	
+/*	
 	sayLabel->setText(tr("&Say:"));
 	
 	cardInfo->retranslateUi();
@@ -234,7 +234,7 @@ void MainWindow::retranslateUi()
 	if (game)
 		game->retranslateUi();
 	zoneLayout->retranslateUi();
-}
+*/}
 
 void MainWindow::createActions()
 {
@@ -260,7 +260,7 @@ void MainWindow::createActions()
 	connect(aExit, SIGNAL(triggered()), this, SLOT(actExit()));
 
 	aCloseMostRecentZoneView = new QAction(this);
-	connect(aCloseMostRecentZoneView, SIGNAL(triggered()), zoneLayout, SLOT(closeMostRecentZoneView()));
+//	connect(aCloseMostRecentZoneView, SIGNAL(triggered()), zoneLayout, SLOT(closeMostRecentZoneView()));
 	addAction(aCloseMostRecentZoneView);
 }
 
@@ -288,6 +288,11 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	QPixmapCache::setCacheLimit(200000);
 
 	db = new CardDatabase(this);
+	client = new Client(this);
+	tabSupervisor = new TabSupervisor;
+	
+	setCentralWidget(tabSupervisor);
+/*
 	
 	zoneLayout = new ZoneViewLayout(db);
 	scene = new GameScene(zoneLayout, this);
@@ -302,7 +307,6 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	sayLabel->setBuddy(sayEdit);
 	pingWidget = new PingWidget;
 	
-	client = new Client(this);
 	gameSelector = new GameSelector(client);
 	gameSelector->hide();
 	chatWidget = new ChatWidget(client);
@@ -338,8 +342,6 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(actSay()));
 
 	connect(client, SIGNAL(maxPingTime(int, int)), pingWidget, SLOT(setPercentage(int, int)));
-	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
-	connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
 
 	connect(this, SIGNAL(logConnecting(QString)), messageLog, SLOT(logConnecting(QString)));
 	connect(this, SIGNAL(logConnected()), messageLog, SLOT(logConnected()));
@@ -350,6 +352,9 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	connect(client, SIGNAL(protocolError()), messageLog, SLOT(logProtocolError()));
 	connect(phasesToolbar, SIGNAL(signalSetPhase(int)), client, SLOT(setActivePhase(int)));
 	connect(phasesToolbar, SIGNAL(signalNextTurn()), client, SLOT(nextTurn()));
+*/
+	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
+	connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
 
 	createActions();
 	createMenus();
@@ -362,8 +367,6 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 void MainWindow::closeEvent(QCloseEvent */*event*/)
 {
 	delete game;
-	chatWidget->disableChat();
-	gameSelector->disableGameList();
 }
 
 void MainWindow::changeEvent(QEvent *event)

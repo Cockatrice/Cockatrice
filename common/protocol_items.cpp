@@ -17,8 +17,8 @@ void Command_Login::extractParameters()
 	username = parameters["username"];
 	password = parameters["password"];
 }
-Command_ChatListChannels::Command_ChatListChannels()
-	: Command("chat_list_channels")
+Command_ListChatChannels::Command_ListChatChannels()
+	: Command("list_chat_channels")
 {
 }
 Command_ChatJoinChannel::Command_ChatJoinChannel(const QString &_channel)
@@ -551,14 +551,14 @@ void Event_StopDumpZone::extractParameters()
 	zoneOwnerId = parameters["zone_owner_id"].toInt();
 	zone = parameters["zone"];
 }
-Event_ChatServerMessage::Event_ChatServerMessage(const QString &_channel, const QString &_message)
-	: ChatEvent("chat_server_message", _channel), message(_message)
+Event_ServerMessage::Event_ServerMessage(const QString &_message)
+	: GenericEvent("server_message"), message(_message)
 {
 	setParameter("message", message);
 }
-void Event_ChatServerMessage::extractParameters()
+void Event_ServerMessage::extractParameters()
 {
-	ChatEvent::extractParameters();
+	GenericEvent::extractParameters();
 	message = parameters["message"];
 }
 Event_ChatJoinChannel::Event_ChatJoinChannel(const QString &_channel, const QString &_playerName)
@@ -597,7 +597,7 @@ void ProtocolItem::initializeHashAuto()
 {
 	itemNameHash.insert("cmdping", Command_Ping::newItem);
 	itemNameHash.insert("cmdlogin", Command_Login::newItem);
-	itemNameHash.insert("cmdchat_list_channels", Command_ChatListChannels::newItem);
+	itemNameHash.insert("cmdlist_chat_channels", Command_ListChatChannels::newItem);
 	itemNameHash.insert("cmdchat_join_channel", Command_ChatJoinChannel::newItem);
 	itemNameHash.insert("cmdchat_leave_channel", Command_ChatLeaveChannel::newItem);
 	itemNameHash.insert("cmdchat_say", Command_ChatSay::newItem);
@@ -646,7 +646,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventset_active_phase", Event_SetActivePhase::newItem);
 	itemNameHash.insert("game_eventdump_zone", Event_DumpZone::newItem);
 	itemNameHash.insert("game_eventstop_dump_zone", Event_StopDumpZone::newItem);
-	itemNameHash.insert("chat_eventchat_server_message", Event_ChatServerMessage::newItem);
+	itemNameHash.insert("generic_eventserver_message", Event_ServerMessage::newItem);
 	itemNameHash.insert("chat_eventchat_join_channel", Event_ChatJoinChannel::newItem);
 	itemNameHash.insert("chat_eventchat_leave_channel", Event_ChatLeaveChannel::newItem);
 	itemNameHash.insert("chat_eventchat_say", Event_ChatSay::newItem);

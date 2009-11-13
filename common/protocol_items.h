@@ -25,13 +25,13 @@ public:
 protected:
 	void extractParameters();
 };
-class Command_ChatListChannels : public Command {
+class Command_ListChatChannels : public Command {
 	Q_OBJECT
 private:
 public:
-	Command_ChatListChannels();
-	static ProtocolItem *newItem() { return new Command_ChatListChannels; }
-	int getItemId() const { return ItemId_Command_ChatListChannels; }
+	Command_ListChatChannels();
+	static ProtocolItem *newItem() { return new Command_ListChatChannels; }
+	int getItemId() const { return ItemId_Command_ListChatChannels; }
 };
 class Command_ChatJoinChannel : public Command {
 	Q_OBJECT
@@ -685,15 +685,15 @@ public:
 protected:
 	void extractParameters();
 };
-class Event_ChatServerMessage : public ChatEvent {
+class Event_ServerMessage : public GenericEvent {
 	Q_OBJECT
 private:
 	QString message;
 public:
-	Event_ChatServerMessage(const QString &_channel = QString(), const QString &_message = QString());
+	Event_ServerMessage(const QString &_message = QString());
 	QString getMessage() const { return message; }
-	static ProtocolItem *newItem() { return new Event_ChatServerMessage; }
-	int getItemId() const { return ItemId_Event_ChatServerMessage; }
+	static ProtocolItem *newItem() { return new Event_ServerMessage; }
+	int getItemId() const { return ItemId_Event_ServerMessage; }
 protected:
 	void extractParameters();
 };

@@ -28,7 +28,7 @@ private:
 	
 	ResponseCode cmdPing(Command_Ping *cmd);
 	ResponseCode cmdLogin(Command_Login *cmd);
-	ResponseCode cmdChatListChannels(Command_ChatListChannels *cmd);
+	ResponseCode cmdListChatChannels(Command_ListChatChannels *cmd);
 	ResponseCode cmdChatJoinChannel(Command_ChatJoinChannel *cmd);
 	ResponseCode cmdChatLeaveChannel(Command_ChatLeaveChannel *cmd, Server_ChatChannel *channel);
 	ResponseCode cmdChatSay(Command_ChatSay *cmd, Server_ChatChannel *channel);

@@ -42,7 +42,7 @@ ServerSocketInterface::ServerSocketInterface(Server *_server, QTcpSocket *_socke
 	xmlWriter->writeStartElement("cockatrice_server_stream");
 	xmlWriter->writeAttribute("version", QString::number(ProtocolItem::protocolVersion));
 	
-	sendProtocolItem(new Event_ChatServerMessage(QString(), Servatrice::versionString));
+	sendProtocolItem(new Event_ServerMessage(Servatrice::versionString));
 }
 
 ServerSocketInterface::~ServerSocketInterface()
@@ -52,19 +52,10 @@ ServerSocketInterface::~ServerSocketInterface()
 	delete xmlWriter;
 	delete xmlReader;
 	delete socket;
-/*	clearZones();
-	// The socket has to be removed from the server's list before it is removed from the game's list
-	// so it will not receive the game update event.
-	server->removePlayer(this);
-	if (game)
-		game->removePlayer(this);
-	for (int i = 0; i < chatChannels.size(); ++i)
-		chatChannels[i]->removePlayer(this);
-*/}
+}
 
 void ServerSocketInterface::readClient()
 {
-	qDebug() << "readClient";
 	xmlReader->addData(socket->readAll());
 	
 	if (currentItem) {

@@ -87,7 +87,7 @@ void Server::broadcastGameListUpdate(Server_Game *game)
 void Server::broadcastChannelUpdate()
 {
 	Server_ChatChannel *channel = static_cast<Server_ChatChannel *>(sender());
-	Event_ChatListChannels *event = new Event_ChatListChannels;
+	Event_ListChatChannels *event = new Event_ListChatChannels;
 	event->addChannel(channel->getName(), channel->getDescription(), channel->size(), channel->getAutoJoin());
 
 	for (int i = 0; i < clients.size(); ++i)

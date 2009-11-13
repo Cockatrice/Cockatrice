@@ -36,12 +36,14 @@ class MessageLogWidget;
 class QLabel;
 class QLineEdit;
 class QPushButton;
+class QTabWidget;
 class ServerZoneCard;
 class ZoneViewLayout;
 class ZoneViewWidget;
 class PhasesToolbar;
 class GameSelector;
 class ChatWidget;
+class TabSupervisor;
 
 class PingWidget : public QWidget {
 	Q_OBJECT
@@ -84,6 +86,7 @@ private:
 	QMenu *cockatriceMenu;
 	QAction *aConnect, *aDisconnect, *aRestartGame, *aLeaveGame, *aDeckEditor, *aFullScreen, *aSettings, *aExit;
 	QAction *aCloseMostRecentZoneView;
+	TabSupervisor *tabSupervisor;
 	QVBoxLayout *viewLayout;
 
 	PingWidget *pingWidget;

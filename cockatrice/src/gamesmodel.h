@@ -17,8 +17,6 @@ public:
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	
 	const ServerGameInfo &getGame(int row);
-	void cleanList();
-public slots:
 	void updateGameList(const ServerGameInfo &game);
 private:
 	QList<ServerGameInfo> gameList;

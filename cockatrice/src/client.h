@@ -14,6 +14,10 @@ class QXmlStreamWriter;
 
 class ProtocolItem;
 class ChatEvent;
+class GameEvent;
+class Event_ListGames;
+class Event_ServerMessage;
+class Event_ListChatChannels;
 
 enum ClientStatus {
 	StatusDisconnected,
@@ -27,7 +31,6 @@ class Client : public QObject {
 	Q_OBJECT
 signals:
 	void statusChanged(ClientStatus _status);
-//	void gameListEvent(const ServerGame &game);
 //	void playerIdReceived(int id, QString name);
 //	void gameEvent(const ServerEventData &msg);
 	void maxPingTime(int seconds, int maxSeconds);
@@ -37,7 +40,15 @@ signals:
 	void protocolVersionMismatch(int clientVersion, int serverVersion);
 	void protocolError();
 	
+	// Chat events
 	void chatEventReceived(ChatEvent *event);
+	// Game events
+	void gameEventReceived(GameEvent *event);
+	// Generic events
+	void listGamesEventReceived(Event_ListGames *event);
+	void serverMessageEventReceived(Event_ServerMessage *event);
+	void listChatChannelsEventReceived(Event_ListChatChannels *event);
+	
 private slots:
 	void slotConnected();
 	void readData();

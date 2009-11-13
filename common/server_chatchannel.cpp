@@ -16,7 +16,7 @@ void Server_ChatChannel::addClient(Server_ProtocolHandler *client)
 		eventCLP->addPlayer(at(i)->getPlayerName());
 	client->enqueueProtocolItem(eventCLP);
 	
-	client->enqueueProtocolItem(new Event_ChatServerMessage(name, joinMessage));
+	client->enqueueProtocolItem(new Event_ChatSay(name, QString(), joinMessage));
 
 	emit channelInfoChanged();
 }

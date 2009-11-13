@@ -25,6 +25,7 @@ bool ProtocolItem::read(QXmlStreamReader *xml)
 				QString tagName = xml->name().toString();
 				if (parameters.contains(tagName))
 					parameters[tagName] = currentElementText;
+				currentElementText.clear();
 			}
 		} else if (xml->isCharacters() && !xml->isWhitespace())
 			currentElementText = xml->text().toString();
@@ -62,8 +63,13 @@ void ProtocolItem::initializeHash()
 		return;
 	
 	initializeHashAuto();
+	
 	itemNameHash.insert("resp", ProtocolResponse::newItem);
 	ProtocolResponse::initializeHash();
+	
+	itemNameHash.insert("generic_eventlist_games", Event_ListGames::newItem);
+	itemNameHash.insert("generic_eventlist_chat_channels", Event_ListChatChannels::newItem);
+	itemNameHash.insert("chat_eventchat_list_players", Event_ChatListPlayers::newItem);
 }
 
 int Command::lastCmdId = 0;
@@ -153,7 +159,7 @@ ChatEvent::ChatEvent(const QString &_eventName, const QString &_channel)
 	setParameter("channel", channel);
 }
 
-bool Event_ChatListChannels::readElement(QXmlStreamReader *xml)
+bool Event_ListChatChannels::readElement(QXmlStreamReader *xml)
 {
 	if (xml->isStartElement() && (xml->name() == "channel")) {
 		channelList.append(ServerChatChannelInfo(
@@ -167,7 +173,7 @@ bool Event_ChatListChannels::readElement(QXmlStreamReader *xml)
 	return false;
 }
 
-void Event_ChatListChannels::writeElement(QXmlStreamWriter *xml)
+void Event_ListChatChannels::writeElement(QXmlStreamWriter *xml)
 {
 	for (int i = 0; i < channelList.size(); ++i) {
 		xml->writeStartElement("channel");

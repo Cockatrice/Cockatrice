@@ -16,7 +16,7 @@ class QXmlStreamAttributes;
 class ProtocolResponse;
 
 enum ItemId {
-	ItemId_Event_ChatListChannels = ItemId_Other + 1,
+	ItemId_Event_ListChatChannels = ItemId_Other + 1,
 	ItemId_Event_ChatListPlayers = ItemId_Other + 2,
 	ItemId_Event_ListGames = ItemId_Other + 3
 };
@@ -162,15 +162,17 @@ protected:
 	void extractParameters();
 public:
 	ChatEvent(const QString &_eventName, const QString &_channel);
+	QString getChannel() const { return channel; }
 };
 
-class Event_ChatListChannels : public ChatEvent {
+class Event_ListChatChannels : public GenericEvent {
 	Q_OBJECT
 private:
 	QList<ServerChatChannelInfo> channelList;
 public:
-	Event_ChatListChannels() : ChatEvent("chat_list_channels", QString()) { }
-	int getItemId() const { return ItemId_Event_ChatListChannels; }
+	Event_ListChatChannels() : GenericEvent("list_chat_channels") { }
+	int getItemId() const { return ItemId_Event_ListChatChannels; }
+	static ProtocolItem *newItem() { return new Event_ListChatChannels; }
 	void addChannel(const QString &_name, const QString &_description, int _playerCount, bool _autoJoin)
 	{
 		channelList.append(ServerChatChannelInfo(_name, _description, _playerCount, _autoJoin));
@@ -186,8 +188,9 @@ class Event_ChatListPlayers : public ChatEvent {
 private:
 	QList<ServerPlayerInfo> playerList;
 public:
-	Event_ChatListPlayers(const QString &_channel) : ChatEvent("chat_list_players", _channel) { }
+	Event_ChatListPlayers(const QString &_channel = QString()) : ChatEvent("chat_list_players", _channel) { }
 	int getItemId() const { return ItemId_Event_ChatListPlayers; }
+	static ProtocolItem *newItem() { return new Event_ChatListPlayers; }
 	void addPlayer(const QString &_name)
 	{
 		playerList.append(ServerPlayerInfo(_name));
@@ -205,6 +208,7 @@ private:
 public:
 	Event_ListGames() : GenericEvent("list_games") { }
 	int getItemId() const { return ItemId_Event_ListGames; }
+	static ProtocolItem *newItem() { return new Event_ListGames; }
 	void addGame(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, const QString &_creatorName, bool _spectatorsAllowed, int _spectatorCount)
 	{
 		gameList.append(ServerGameInfo(_gameId, _description, _hasPassword, _playerCount, _maxPlayers, _creatorName, _spectatorsAllowed, _spectatorCount));
