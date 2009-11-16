@@ -8,9 +8,10 @@
 #include "player.h"
 #include "game.h"
 #include "arrowitem.h"
+#include "main.h"
 
-CardItem::CardItem(CardDatabase *_db, const QString &_name, int _cardid, QGraphicsItem *parent)
-	: AbstractGraphicsItem(parent), db(_db), info(db->getCard(_name)), name(_name), id(_cardid), tapped(false), attacking(false), facedown(false), counters(0), doesntUntap(false), dragItem(NULL)
+CardItem::CardItem(const QString &_name, int _cardid, QGraphicsItem *parent)
+	: AbstractGraphicsItem(parent), info(db->getCard(_name)), name(_name), id(_cardid), tapped(false), attacking(false), facedown(false), counters(0), doesntUntap(false), dragItem(NULL)
 {
 	setCursor(Qt::OpenHandCursor);
 	setFlag(ItemIsSelectable);

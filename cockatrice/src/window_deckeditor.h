@@ -6,7 +6,6 @@
 #include <QLineEdit>
 #include "decklist.h"
 
-class CardDatabase;
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
 class DeckListModel;
@@ -54,7 +53,6 @@ private:
 
 	QString lastFileName;
 	DeckList::FileFormat lastFileFormat;
-	CardDatabase *db;
 
 	CardDatabaseModel *databaseModel;
 	CardDatabaseDisplayModel *databaseDisplayModel;
@@ -71,7 +69,7 @@ private:
 	QAction *aEditSets;
 	QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;
 public:
-	WndDeckEditor(CardDatabase *_db, QWidget *parent = 0);
+	WndDeckEditor(QWidget *parent = 0);
 	~WndDeckEditor();
 protected:
 	void closeEvent(QCloseEvent *event);

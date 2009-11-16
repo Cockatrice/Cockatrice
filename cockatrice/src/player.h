@@ -75,7 +75,6 @@ private:
 	TableZone *table;
 	HandZone *hand;
 	
-	CardDatabase *db;
 	void setCardAttrHelper(CardItem *card, const QString &aname, const QString &avalue, bool allCards);
 
 	QPixmap bgPixmap;
@@ -104,7 +103,7 @@ public:
 
 	Client *client;
 	void addZone(CardZone *z);
-	Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Client *_client, Game *_parent);
+	Player(const QString &_name, int _id, bool _local, Client *_client, Game *_parent);
 	~Player();
 	void retranslateUi();
 	QMenu *getPlayerMenu() const { return playerMenu; }
@@ -115,7 +114,6 @@ public:
 	const QMap<int, ArrowItem *> &getArrows() const { return arrows; }
 	TableZone *getTable() const { return table; }
 //	void gameEvent(const ServerEventData &event);
-	CardDatabase *getDb() const { return db; }
 	void showCardMenu(const QPoint &p);
 	bool getActive() const { return active; }
 	void setActive(bool _active);

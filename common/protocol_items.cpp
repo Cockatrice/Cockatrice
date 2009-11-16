@@ -561,6 +561,18 @@ void Event_ServerMessage::extractParameters()
 	GenericEvent::extractParameters();
 	message = parameters["message"];
 }
+Event_GameJoined::Event_GameJoined(int _gameId, bool _spectator)
+	: GenericEvent("game_joined"), gameId(_gameId), spectator(_spectator)
+{
+	setParameter("game_id", gameId);
+	setParameter("spectator", spectator);
+}
+void Event_GameJoined::extractParameters()
+{
+	GenericEvent::extractParameters();
+	gameId = parameters["game_id"].toInt();
+	spectator = (parameters["spectator"] == "1");
+}
 Event_ChatJoinChannel::Event_ChatJoinChannel(const QString &_channel, const QString &_playerName)
 	: ChatEvent("chat_join_channel", _channel), playerName(_playerName)
 {
@@ -647,6 +659,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventdump_zone", Event_DumpZone::newItem);
 	itemNameHash.insert("game_eventstop_dump_zone", Event_StopDumpZone::newItem);
 	itemNameHash.insert("generic_eventserver_message", Event_ServerMessage::newItem);
+	itemNameHash.insert("generic_eventgame_joined", Event_GameJoined::newItem);
 	itemNameHash.insert("chat_eventchat_join_channel", Event_ChatJoinChannel::newItem);
 	itemNameHash.insert("chat_eventchat_leave_channel", Event_ChatLeaveChannel::newItem);
 	itemNameHash.insert("chat_eventchat_say", Event_ChatSay::newItem);

@@ -14,8 +14,8 @@
 #include <QPainter>
 #include <QMenu>
 
-Player::Player(const QString &_name, int _id, bool _local, CardDatabase *_db, Client *_client, Game *_parent)
-	: QObject(_parent), defaultNumberTopCards(3), name(_name), id(_id), active(false), local(_local), db(_db), client(_client)
+Player::Player(const QString &_name, int _id, bool _local, Client *_client, Game *_parent)
+	: QObject(_parent), defaultNumberTopCards(3), name(_name), id(_id), active(false), local(_local), client(_client)
 {
 	QSettings settings;
 	QString bgPath = settings.value("zonebg/playerarea").toString();

@@ -22,6 +22,7 @@ void TabSupervisor::start(Client *_client)
 	client = _client;
 	connect(client, SIGNAL(chatEventReceived(ChatEvent *)), this, SLOT(processChatEvent(ChatEvent *)));
 	connect(client, SIGNAL(gameEventReceived(GameEvent *)), this, SLOT(processGameEvent(GameEvent *)));
+	connect(client, SIGNAL(gameJoinedEventReceived(Event_GameJoined *)), this, SLOT(gameJoined(Event_GameJoined *)));
 
 	tabServer = new TabServer(client);
 	connect(tabServer, SIGNAL(gameJoined(int)), this, SLOT(addGameTab(int)));
@@ -34,12 +35,32 @@ void TabSupervisor::start(Client *_client)
 
 void TabSupervisor::stop()
 {
+	if (!client)
+		return;
+	
+	disconnect(client, 0, this, 0);
+	
+	clear();
+	
+	delete tabServer;
+	tabServer = 0;
+	
+	QMapIterator<QString, TabChatChannel *> chatChannelIterator(chatChannelTabs);
+	while (chatChannelIterator.hasNext())
+		delete chatChannelIterator.next().value();
+	chatChannelTabs.clear();
 
+	QMapIterator<int, TabGame *> gameIterator(gameTabs);
+	while (gameIterator.hasNext())
+		delete gameIterator.next().value();
+	gameTabs.clear();
 }
 
-void TabSupervisor::addGameTab(int gameId)
+void TabSupervisor::gameJoined(Event_GameJoined *event)
 {
-
+	TabGame *tab = new TabGame(client, event->getGameId());
+	addTab(tab, tr("Game %1").arg(event->getGameId()));
+	gameTabs.insert(event->getGameId(), tab);
 }
 
 void TabSupervisor::addChatChannelTab(const QString &channelName)
@@ -58,5 +79,7 @@ void TabSupervisor::processChatEvent(ChatEvent *event)
 
 void TabSupervisor::processGameEvent(GameEvent *event)
 {
-
+	TabGame *tab = gameTabs.value(event->getGameId());
+	if (tab)
+		tab->processGameEvent(event);
 }

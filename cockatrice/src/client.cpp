@@ -288,23 +288,24 @@ void Client::processProtocolItem(ProtocolItem *item)
 			case ItemId_Event_ListGames: emit listGamesEventReceived(qobject_cast<Event_ListGames *>(item)); break;
 			case ItemId_Event_ServerMessage: emit serverMessageEventReceived(qobject_cast<Event_ServerMessage *>(item)); break;
 			case ItemId_Event_ListChatChannels: emit listChatChannelsEventReceived(qobject_cast<Event_ListChatChannels *>(item)); break;
+			case ItemId_Event_GameJoined: emit gameJoinedEventReceived(qobject_cast<Event_GameJoined *>(item)); break;
 		}
 		delete genericEvent;
 		return;
 	}
 
-/*	GameEvent *gameEvent = qobject_cast<GameEvent *>(item);
+	GameEvent *gameEvent = qobject_cast<GameEvent *>(item);
 	if (gameEvent) {
 		emit gameEventReceived(gameEvent);
 		delete gameEvent;
 		return;
 	}
-*/
+
 	ChatEvent *chatEvent = qobject_cast<ChatEvent *>(item);
 	if (chatEvent) {
-		qDebug() << "chatEventReceived()";
 		emit chatEventReceived(chatEvent);
 		delete chatEvent;
+		return;
 	}
 }
 

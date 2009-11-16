@@ -24,17 +24,6 @@
 #include "dlg_connect.h"
 #include "dlg_settings.h"
 #include "window_deckeditor.h"
-#include "cardinfowidget.h"
-#include "messagelogwidget.h"
-#include "phasestoolbar.h"
-#include "gameview.h"
-#include "gamescene.h"
-#include "player.h"
-#include "game.h"
-#include "carddatabase.h"
-#include "zoneviewzone.h"
-#include "zoneviewwidget.h"
-#include "zoneviewlayout.h"
 #include "tab_supervisor.h"
 
 PingWidget::PingWidget(QWidget *parent)
@@ -65,14 +54,14 @@ void PingWidget::setPercentage(int value, int max)
 		color.setHsv(120 * (1.0 - ((double) value / max)), 255, 255);
 	update();
 }
-
+/*
 void MainWindow::playerAdded(Player *player)
 {
 	menuBar()->addMenu(player->getPlayerMenu());
 	connect(player, SIGNAL(toggleZoneView(Player *, QString, int)), zoneLayout, SLOT(toggleZoneView(Player *, QString, int)));
 	connect(player, SIGNAL(closeZoneView(ZoneViewZone *)), zoneLayout, SLOT(removeItem(ZoneViewZone *)));
 }
-
+*/
 void MainWindow::statusChanged(ClientStatus _status)
 {
 	switch (_status) {
@@ -80,16 +69,17 @@ void MainWindow::statusChanged(ClientStatus _status)
 			emit logConnecting(client->peerName());
 			break;
 		case StatusDisconnected:
-			if (game) {
-				zoneLayout->clear();
-				delete game;
-				game = 0;
-			}
+			tabSupervisor->stop();
+//			if (game) {
+//				zoneLayout->clear();
+//				delete game;
+//				game = 0;
+//			}
 //			pingWidget->setPercentage(0, -1);
 			aConnect->setEnabled(true);
 			aDisconnect->setEnabled(false);
-			aRestartGame->setEnabled(false);
-			aLeaveGame->setEnabled(false);
+//			aRestartGame->setEnabled(false);
+//			aLeaveGame->setEnabled(false);
 //			phasesToolbar->setActivePhase(-1);
 //			phasesToolbar->hide();
 			emit logDisconnected();
@@ -155,7 +145,7 @@ void MainWindow::actDisconnect()
 {
 	client->disconnectFromServer();
 }
-
+/*
 void MainWindow::actRestartGame()
 {
 	zoneLayout->clear();
@@ -166,10 +156,10 @@ void MainWindow::actLeaveGame()
 {
 	client->leaveGame();
 }
-
+*/
 void MainWindow::actDeckEditor()
 {
-	WndDeckEditor *deckEditor = new WndDeckEditor(db, this);
+	WndDeckEditor *deckEditor = new WndDeckEditor(this);
 	deckEditor->show();
 }
 
@@ -183,7 +173,7 @@ void MainWindow::actFullScreen(bool checked)
 
 void MainWindow::actSettings()
 {
-	DlgSettings dlg(db, translator, this);
+	DlgSettings dlg(this);
 	dlg.exec();
 }
 
@@ -191,7 +181,7 @@ void MainWindow::actExit()
 {
 	close();
 }
-
+/*
 void MainWindow::actSay()
 {
 	if (sayEdit->text().isEmpty())
@@ -200,7 +190,7 @@ void MainWindow::actSay()
 	client->say(sayEdit->text());
 	sayEdit->clear();
 }
-
+*/
 void MainWindow::serverTimeout()
 {
 	QMessageBox::critical(this, tr("Error"), tr("Server timeout"));
@@ -212,9 +202,9 @@ void MainWindow::retranslateUi()
 	
 	aConnect->setText(tr("&Connect..."));
 	aDisconnect->setText(tr("&Disconnect"));
-	aRestartGame->setText(tr("&Restart game..."));
-	aRestartGame->setShortcut(tr("F2"));
-	aLeaveGame->setText(tr("&Leave game"));
+//	aRestartGame->setText(tr("&Restart game..."));
+//	aRestartGame->setShortcut(tr("F2"));
+//	aLeaveGame->setText(tr("&Leave game"));
 	aDeckEditor->setText(tr("&Deck editor"));
 	aFullScreen->setText(tr("&Full screen"));
 	aFullScreen->setShortcut(tr("Ctrl+F"));
@@ -242,13 +232,13 @@ void MainWindow::createActions()
 	aDisconnect = new QAction(this);
 	aDisconnect->setEnabled(false);
 	connect(aDisconnect, SIGNAL(triggered()), this, SLOT(actDisconnect()));
-	aRestartGame = new QAction(this);
+/*	aRestartGame = new QAction(this);
 	aRestartGame->setEnabled(false);
 	connect(aRestartGame, SIGNAL(triggered()), this, SLOT(actRestartGame()));
 	aLeaveGame = new QAction(this);
 	aLeaveGame->setEnabled(false);
 	connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
-	aDeckEditor = new QAction(this);
+*/	aDeckEditor = new QAction(this);
 	connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
 	aFullScreen = new QAction(this);
 	aFullScreen->setCheckable(true);
@@ -269,9 +259,6 @@ void MainWindow::createMenus()
 	cockatriceMenu->addAction(aConnect);
 	cockatriceMenu->addAction(aDisconnect);
 	cockatriceMenu->addSeparator();
-	cockatriceMenu->addAction(aRestartGame);
-	cockatriceMenu->addAction(aLeaveGame);
-	cockatriceMenu->addSeparator();
 	cockatriceMenu->addAction(aDeckEditor);
 	cockatriceMenu->addSeparator();
 	cockatriceMenu->addAction(aFullScreen);
@@ -281,67 +268,17 @@ void MainWindow::createMenus()
 	cockatriceMenu->addAction(aExit);
 }
 
-MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
-	: QMainWindow(parent), game(NULL), translator(_translator)
+MainWindow::MainWindow(QWidget *parent)
+	: QMainWindow(parent)
 {
 	QPixmapCache::setCacheLimit(200000);
 
-	db = new CardDatabase(this);
 	client = new Client(this);
 	tabSupervisor = new TabSupervisor;
 	
 	setCentralWidget(tabSupervisor);
 /*
 	
-	zoneLayout = new ZoneViewLayout(db);
-	scene = new GameScene(zoneLayout, this);
-	view = new GameView(scene);
-//	view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
-	view->hide();
-
-	cardInfo = new CardInfoWidget(db);
-	messageLog = new MessageLogWidget;
-	sayLabel = new QLabel;
-	sayEdit = new QLineEdit;
-	sayLabel->setBuddy(sayEdit);
-	pingWidget = new PingWidget;
-	
-	gameSelector = new GameSelector(client);
-	gameSelector->hide();
-	chatWidget = new ChatWidget(client);
-	chatWidget->hide();
-
-	QHBoxLayout *hLayout = new QHBoxLayout;
-	hLayout->addWidget(sayLabel);
-	hLayout->addWidget(sayEdit);
-	hLayout->addWidget(pingWidget);
-
-	QVBoxLayout *verticalLayout = new QVBoxLayout;
-	verticalLayout->addWidget(cardInfo);
-	verticalLayout->addWidget(messageLog);
-	verticalLayout->addLayout(hLayout);
-
-	viewLayout = new QVBoxLayout;
-	viewLayout->addWidget(gameSelector);
-	viewLayout->addWidget(chatWidget);
-	viewLayout->addWidget(view);
-
-	phasesToolbar = new PhasesToolbar;
-	phasesToolbar->hide();
-
-	QHBoxLayout *mainLayout = new QHBoxLayout;
-	mainLayout->addWidget(phasesToolbar);
-	mainLayout->addLayout(viewLayout, 10);
-	mainLayout->addLayout(verticalLayout);
-
-	QWidget *centralWidget = new QWidget;
-	centralWidget->setLayout(mainLayout);
-	setCentralWidget(centralWidget);
-
-	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(actSay()));
-
-	connect(client, SIGNAL(maxPingTime(int, int)), pingWidget, SLOT(setPercentage(int, int)));
-
 	connect(this, SIGNAL(logConnecting(QString)), messageLog, SLOT(logConnecting(QString)));
 	connect(this, SIGNAL(logConnected()), messageLog, SLOT(logConnected()));
 	connect(this, SIGNAL(logDisconnected()), messageLog, SLOT(logDisconnected()));
@@ -349,8 +286,6 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 	connect(client, SIGNAL(serverError(ResponseCode)), messageLog, SLOT(logServerError(ResponseCode)));
 	connect(client, SIGNAL(protocolVersionMismatch(int, int)), messageLog, SLOT(logProtocolVersionMismatch(int, int)));
 	connect(client, SIGNAL(protocolError()), messageLog, SLOT(logProtocolError()));
-	connect(phasesToolbar, SIGNAL(signalSetPhase(int)), client, SLOT(setActivePhase(int)));
-	connect(phasesToolbar, SIGNAL(signalNextTurn()), client, SLOT(nextTurn()));
 */
 	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
 	connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
@@ -365,7 +300,7 @@ MainWindow::MainWindow(QTranslator *_translator, QWidget *parent)
 
 void MainWindow::closeEvent(QCloseEvent */*event*/)
 {
-	delete game;
+	delete tabSupervisor;
 }
 
 void MainWindow::changeEvent(QEvent *event)

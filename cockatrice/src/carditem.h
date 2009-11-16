@@ -23,7 +23,6 @@ enum CardItemType {
 class CardItem : public QObject, public AbstractGraphicsItem {
 	Q_OBJECT
 private:
-	CardDatabase *db;
 	CardInfo *info;
 	QString name;
 	int id;
@@ -40,7 +39,7 @@ private slots:
 public:
 	enum { Type = typeCard };
 	int type() const { return Type; }
-	CardItem(CardDatabase *_db, const QString &_name = QString(), int _cardid = -1, QGraphicsItem *parent = 0);
+	CardItem(const QString &_name = QString(), int _cardid = -1, QGraphicsItem *parent = 0);
 	~CardItem();
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

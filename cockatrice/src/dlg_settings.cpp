@@ -2,6 +2,7 @@
 
 #include "carddatabase.h"
 #include "dlg_settings.h"
+#include "main.h"
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
@@ -397,8 +398,8 @@ void MessagesSettingsPage::retranslateUi()
 	aRemove->setText(tr("&Remove"));
 }
 
-DlgSettings::DlgSettings(CardDatabase *_db, QTranslator *_translator, QWidget *parent)
-	: QDialog(parent), db(_db), translator(_translator)
+DlgSettings::DlgSettings(QWidget *parent)
+	: QDialog(parent)
 {
 	contentsWidget = new QListWidget;
 	contentsWidget->setViewMode(QListView::IconMode);

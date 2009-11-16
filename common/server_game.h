@@ -57,7 +57,7 @@ public:
 	int getMaxPlayers() const { return maxPlayers; }
 	bool getSpectatorsAllowed() const { return spectatorsAllowed; }
 	ResponseCode checkJoin(const QString &_password, bool spectator);
-	Server_Player *addPlayer(Server_ProtocolHandler *handler, bool spectator);
+	Server_Player *addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate = true);
 	void removePlayer(Server_Player *player);
 	void startGameIfReady();
 	int getActivePlayer() const { return activePlayer; }

@@ -51,8 +51,9 @@ ItemId_Event_SetActivePhase = 1049,
 ItemId_Event_DumpZone = 1050,
 ItemId_Event_StopDumpZone = 1051,
 ItemId_Event_ServerMessage = 1052,
-ItemId_Event_ChatJoinChannel = 1053,
-ItemId_Event_ChatLeaveChannel = 1054,
-ItemId_Event_ChatSay = 1055,
-ItemId_Other = 1056
+ItemId_Event_GameJoined = 1053,
+ItemId_Event_ChatJoinChannel = 1054,
+ItemId_Event_ChatLeaveChannel = 1055,
+ItemId_Event_ChatSay = 1056,
+ItemId_Other = 1057
 };

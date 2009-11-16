@@ -15,7 +15,7 @@ public:
 	DlgCreateGame(Client *_client, QWidget *parent = 0);
 private slots:
 	void actOK();
-//	void checkResponse(ServerResponse response);
+	void checkResponse(ResponseCode response);
 private:
 	Client *client;
 
@@ -26,4 +26,3 @@ private:
 };
 
 #endif
-

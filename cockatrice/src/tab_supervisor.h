@@ -10,6 +10,7 @@ class TabChatChannel;
 class TabGame;
 class ChatEvent;
 class GameEvent;
+class Event_GameJoined;
 
 class TabSupervisor : public QTabWidget {
 	Q_OBJECT
@@ -24,7 +25,7 @@ public:
 	void start(Client *_client);
 	void stop();
 private slots:
-	void addGameTab(int gameId);
+	void gameJoined(Event_GameJoined *event);
 	void addChatChannelTab(const QString &channelName);
 	void processChatEvent(ChatEvent *event);
 	void processGameEvent(GameEvent *event);

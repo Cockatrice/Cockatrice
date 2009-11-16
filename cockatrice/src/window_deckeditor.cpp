@@ -5,6 +5,7 @@
 #include "carddatabasemodel.h"
 #include "decklistmodel.h"
 #include "cardinfowidget.h"
+#include "main.h"
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
@@ -13,8 +14,8 @@ void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 	QLineEdit::keyPressEvent(event);
 }
 
-WndDeckEditor::WndDeckEditor(CardDatabase *_db, QWidget *parent)
-	: QMainWindow(parent), db(_db)
+WndDeckEditor::WndDeckEditor(QWidget *parent)
+	: QMainWindow(parent)
 {
 	QLabel *searchLabel = new QLabel(tr("&Search for:"));
 	searchEdit = new SearchLineEdit;
@@ -281,7 +282,7 @@ void WndDeckEditor::actPrintDeck()
 
 void WndDeckEditor::actEditSets()
 {
-	WndSets *w = new WndSets(db, this);
+	WndSets *w = new WndSets(this);
 	w->setWindowModality(Qt::WindowModal);
 	w->show();
 }

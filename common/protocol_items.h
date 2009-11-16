@@ -697,6 +697,20 @@ public:
 protected:
 	void extractParameters();
 };
+class Event_GameJoined : public GenericEvent {
+	Q_OBJECT
+private:
+	int gameId;
+	bool spectator;
+public:
+	Event_GameJoined(int _gameId = -1, bool _spectator = false);
+	int getGameId() const { return gameId; }
+	bool getSpectator() const { return spectator; }
+	static ProtocolItem *newItem() { return new Event_GameJoined; }
+	int getItemId() const { return ItemId_Event_GameJoined; }
+protected:
+	void extractParameters();
+};
 class Event_ChatJoinChannel : public ChatEvent {
 	Q_OBJECT
 private:

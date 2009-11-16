@@ -63,7 +63,6 @@ void GameSelector::checkResponse(ResponseCode response)
 	spectateButton->setEnabled(true);
 
 	switch (response) {
-		case RespOk: /* HIER CODE FÜR NEUEN GAME_TAB EINFÜGEN */ break;
 		case RespWrongPassword: QMessageBox::critical(this, tr("Error"), tr("Wrong password.")); break;
 		case RespSpectatorsNotAllowed: QMessageBox::critical(this, tr("Error"), tr("Spectators are not allowed in this game.")); break;
 		case RespContextError: QMessageBox::critical(this, tr("Error"), tr("The game is already full.")); break;
@@ -172,88 +171,6 @@ void ChatChannelSelector::processListChatChannelsEvent(Event_ListChatChannels *e
 	}
 }
 
-/*
-void ChatWidget::chatEvent(const ChatEventData &data)
-{
-	const QStringList &msg = data.getEventData();
-	switch (data.getEventType()) {
-		case eventListChatChannels: {
-			if (msg.size() != 4)
-				break;
-			for (int i = 0; i < channelList->topLevelItemCount(); ++i) {
-			  	QTreeWidgetItem *twi = channelList->topLevelItem(i);
-				if (twi->text(0) == msg[0]) {
-				  	twi->setToolTip(0, msg[1]);
-					twi->setText(1, msg[2]);
-					return;
-				}
-			}
-			QTreeWidgetItem *twi = new QTreeWidgetItem(QStringList() << msg[0] << msg[2]);
-			twi->setTextAlignment(1, Qt::AlignRight);
-			twi->setToolTip(0, msg[1]);
-			channelList->addTopLevelItem(twi);
-			channelList->resizeColumnToContents(0);
-			channelList->resizeColumnToContents(1);
-			if (msg[3] == "1")
-				joinChannel(msg[0]);
-			break;
-		}
-		case eventChatJoinChannel: {
-			if (msg.size() != 2)
-				break;
-			ChannelWidget *w = getChannel(msg[0]);
-			if (!w)
-				break;
-			w->joinEvent(msg[1]);
-			break;
-		}
-		case eventChatListPlayers: {
-			if (msg.size() != 2)
-				break;
-			ChannelWidget *w = getChannel(msg[0]);
-			if (!w)
-				break;
-			w->listPlayersEvent(msg[1]);
-			break;
-		}
-		case eventChatLeaveChannel: {
-			if (msg.size() != 2)
-				break;
-			ChannelWidget *w = getChannel(msg[0]);
-			if (!w)
-				break;
-			w->leaveEvent(msg[1]);
-			break;
-		}
-		case eventChatSay: {
-			if (msg.size() != 3)
-				break;
-			ChannelWidget *w = getChannel(msg[0]);
-			if (!w)
-				break;
-			w->sayEvent(msg[1], msg[2]);
-			break;
-		}
-		case eventChatServerMessage: {
-		  	if (msg.size() != 2)
-			  	break;
-			ChannelWidget *w;
-			if (msg[0].isEmpty()) {
-				w = getChannel("Server");
-				if (!w) {
-					w = new ChannelWidget(client, "Server", true, true);
-					tab->addTab(w, "Server");
-				}
-			} else
-			  	w = getChannel(msg[0]);
-			w->serverMessageEvent(msg[1]);
-			break;
-		}
-		default: {
-		}
-	}
-}
-*/
 void ChatChannelSelector::joinChannel(const QString &channelName)
 {
 	Command_ChatJoinChannel *command = new Command_ChatJoinChannel(channelName);

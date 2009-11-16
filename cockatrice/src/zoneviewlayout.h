@@ -3,7 +3,6 @@
 
 #include <QGraphicsWidget>
 
-class CardDatabase;
 class ZoneViewWidget;
 class ZoneViewZone;
 class Player;
@@ -14,9 +13,8 @@ signals:
 	void sizeChanged();
 private:
 	QList<ZoneViewWidget *> views;
-	CardDatabase *db;
 public:
-	ZoneViewLayout(CardDatabase *_db, QGraphicsItem *parent = 0);
+	ZoneViewLayout(QGraphicsItem *parent = 0);
 	void retranslateUi();
 public slots:
 	void toggleZoneView(Player *player, const QString &zoneName, int numberCards = 0);

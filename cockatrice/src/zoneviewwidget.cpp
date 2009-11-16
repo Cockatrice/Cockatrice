@@ -7,8 +7,8 @@
 #include "client.h"
 #include "gamescene.h"
 
-ZoneViewWidget::ZoneViewWidget(CardDatabase *_db, Player *_player, CardZone *_origZone, int numberCards, QGraphicsItem *parent)
-	: QGraphicsWidget(parent, Qt::Tool | Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint/* | Qt::WindowCloseButtonHint*/), db(_db), player(_player)
+ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, QGraphicsItem *parent)
+	: QGraphicsWidget(parent, Qt::Tool | Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint/* | Qt::WindowCloseButtonHint*/), player(_player)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	

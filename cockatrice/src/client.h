@@ -18,6 +18,7 @@ class GameEvent;
 class Event_ListGames;
 class Event_ServerMessage;
 class Event_ListChatChannels;
+class Event_GameJoined;
 
 enum ClientStatus {
 	StatusDisconnected,
@@ -32,7 +33,6 @@ class Client : public QObject {
 signals:
 	void statusChanged(ClientStatus _status);
 //	void playerIdReceived(int id, QString name);
-//	void gameEvent(const ServerEventData &msg);
 	void maxPingTime(int seconds, int maxSeconds);
 	void serverTimeout();
 	void logSocketError(const QString &errorString);
@@ -48,6 +48,7 @@ signals:
 	void listGamesEventReceived(Event_ListGames *event);
 	void serverMessageEventReceived(Event_ServerMessage *event);
 	void listChatChannelsEventReceived(Event_ListChatChannels *event);
+	void gameJoinedEventReceived(Event_GameJoined *event);
 	
 private slots:
 	void slotConnected();

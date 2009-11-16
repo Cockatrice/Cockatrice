@@ -23,26 +23,6 @@
 #include <QMainWindow>
 #include "client.h"
 
-class GameView;
-class GameScene;
-class Game;
-class CardDatabase;
-class Player;
-
-class QTranslator;
-class QVBoxLayout;
-class CardInfoWidget;
-class MessageLogWidget;
-class QLabel;
-class QLineEdit;
-class QPushButton;
-class QTabWidget;
-class ServerZoneCard;
-class ZoneViewLayout;
-class ZoneViewWidget;
-class PhasesToolbar;
-class GameSelector;
-class ChatWidget;
 class TabSupervisor;
 
 class PingWidget : public QWidget {
@@ -61,16 +41,12 @@ public slots:
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 private slots:
-	void playerAdded(Player *player);
+//	void playerAdded(Player *player);
 	void statusChanged(ClientStatus _status);
 	void serverTimeout();
 
-	void actSay();
-
 	void actConnect();
 	void actDisconnect();
-	void actRestartGame();
-	void actLeaveGame();
 	void actDeckEditor();
 	void actFullScreen(bool checked);
 	void actSettings();
@@ -84,29 +60,15 @@ private:
 	void createActions();
 	void createMenus();
 	QMenu *cockatriceMenu;
-	QAction *aConnect, *aDisconnect, *aRestartGame, *aLeaveGame, *aDeckEditor, *aFullScreen, *aSettings, *aExit;
+	QAction *aConnect, *aDisconnect, *aDeckEditor, *aFullScreen, *aSettings, *aExit;
 	QAction *aCloseMostRecentZoneView;
 	TabSupervisor *tabSupervisor;
-	QVBoxLayout *viewLayout;
 
 	PingWidget *pingWidget;
-	CardInfoWidget *cardInfo;
-	MessageLogWidget *messageLog;
-	QLabel *sayLabel;
-	QLineEdit *sayEdit;
-	PhasesToolbar *phasesToolbar;
-	GameSelector *gameSelector;
-	ChatWidget *chatWidget;
 
 	Client *client;
-	GameScene *scene;
-	GameView *view;
-	Game *game;
-	CardDatabase *db;
-	ZoneViewLayout *zoneLayout;
-	QTranslator *translator;
 public:
-	MainWindow(QTranslator *_translator, QWidget *parent = 0);
+	MainWindow(QWidget *parent = 0);
 protected:
 	void closeEvent(QCloseEvent *event);
 	void changeEvent(QEvent *event);

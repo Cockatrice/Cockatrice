@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-
 #include <QApplication>
 #include <QTextCodec>
 #include <QtPlugin>
@@ -29,9 +28,14 @@
 #include <QIcon>
 #include <stdio.h>
 
+#include "main.h"
 #include "window_main.h"
+#include "carddatabase.h"
 
 //Q_IMPORT_PLUGIN(qjpeg)
+
+CardDatabase *db;
+QTranslator *translator;
 
 void myMessageOutput(QtMsgType type, const char *msg)
 {
@@ -52,25 +56,27 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationName("Cockatrice");
 	QCoreApplication::setOrganizationDomain("cockatrice.de");
 	QCoreApplication::setApplicationName("Cockatrice");
+	
+	db = new CardDatabase;
 
 	QString localeName;// = QLocale::system().name();
 	QTranslator qtTranslator;
 	qtTranslator.load("qt_" + localeName, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	app.installTranslator(&qtTranslator);
 	
-	QTranslator translator;
+	translator = new QTranslator;
 	QSettings settings;
 	settings.beginGroup("personal");
 	QString lang = settings.value("lang").toString();
 	if (lang.isEmpty())
-		translator.load("cockatrice_" + localeName, ":/translations", QString(), ".qm");
+		translator->load("cockatrice_" + localeName, ":/translations", QString(), ".qm");
 	else
-		translator.load(lang);
-	app.installTranslator(&translator);
+		translator->load(lang);
+	app.installTranslator(translator);
 	
 	qsrand(QDateTime::currentDateTime().toTime_t());
 	
-	MainWindow ui(&translator);
+	MainWindow ui;
 	qDebug("main(): MainWindow constructor finished");
 	
 	QIcon icon(":/resources/icon.svg");
@@ -81,4 +87,3 @@ int main(int argc, char *argv[])
 
 	return app.exec();
 }
-

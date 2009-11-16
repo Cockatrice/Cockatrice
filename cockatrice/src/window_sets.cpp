@@ -1,11 +1,12 @@
 #include "window_sets.h"
 #include "setsmodel.h"
+#include "main.h"
 #include <QtGui>
 
-WndSets::WndSets(CardDatabase *_db, QWidget *parent)
+WndSets::WndSets(QWidget *parent)
 	: QMainWindow(parent)
 {
-	model = new SetsModel(_db, this);
+	model = new SetsModel(db, this);
 	view = new QTreeView;
 	view->setModel(model);
 	view->setAlternatingRowColors(true);

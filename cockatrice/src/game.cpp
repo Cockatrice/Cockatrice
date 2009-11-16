@@ -135,7 +135,7 @@ void Game::retranslateUi()
 
 Player *Game::addPlayer(int playerId, const QString &playerName, bool local)
 {
-	Player *newPlayer = new Player(playerName, playerId, local, db, client, this);
+	Player *newPlayer = new Player(playerName, playerId, local, client, this);
 	scene->addPlayer(newPlayer);
 
 	connect(newPlayer, SIGNAL(sigShowCardMenu(QPoint)), this, SLOT(showCardMenu(QPoint)));

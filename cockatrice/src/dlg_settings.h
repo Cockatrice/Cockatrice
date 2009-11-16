@@ -4,7 +4,6 @@
 #include <QDialog>
 
 class CardDatabase;
-class QTranslator;
 class QListWidget;
 class QListWidgetItem;
 class QStackedWidget;
@@ -90,13 +89,11 @@ private:
 class DlgSettings : public QDialog {
 	Q_OBJECT
 public:
-	DlgSettings(CardDatabase *_db, QTranslator *_translator, QWidget *parent = 0);
+	DlgSettings(QWidget *parent = 0);
 private slots:
 	void changePage(QListWidgetItem *current, QListWidgetItem *previous);
 	void changeLanguage(const QString &qmFile);
 private:
-	CardDatabase *db;
-	QTranslator *translator;
 	QListWidget *contentsWidget;
 	QStackedWidget *pagesWidget;
 	QListWidgetItem *generalButton, *appearanceButton, *messagesButton;

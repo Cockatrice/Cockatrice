@@ -20,7 +20,6 @@ private:
 	QScrollBar *scrollBar;
 	QCheckBox *sortCheckBox, *shuffleCheckBox;
 	
-	CardDatabase *db;
 	Player *player;
 signals:
 	void closePressed(ZoneViewWidget *zv);
@@ -28,7 +27,7 @@ signals:
 private slots:
 	void resizeToZoneContents();
 public:
-	ZoneViewWidget(CardDatabase *_db, Player *_player, CardZone *_origZone, int numberCards = 0, QGraphicsItem *parent = 0);
+	ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards = 0, QGraphicsItem *parent = 0);
 	ZoneViewZone *getZone() const { return zone; }
 	void retranslateUi();
 protected:

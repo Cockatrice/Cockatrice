@@ -26,7 +26,7 @@
 Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent)
 	: QObject(parent), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), spectatorsAllowed(_spectatorsAllowed)
 {
-	creator = addPlayer(_creator, false);
+	creator = addPlayer(_creator, false, false);
 }
 
 Server_Game::~Server_Game()
@@ -90,7 +90,7 @@ ResponseCode Server_Game::checkJoin(const QString &_password, bool spectator)
 	return RespOk;
 }
 
-Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spectator)
+Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate)
 {
 	int playerId;
 	if (!spectator) {
@@ -113,7 +113,8 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 	else
 		players.insert(playerId, newPlayer);
 	
-	qobject_cast<Server *>(parent())->broadcastGameListUpdate(this);
+	if (broadcastUpdate)
+		qobject_cast<Server *>(parent())->broadcastGameListUpdate(this);
 	
 	return newPlayer;
 }

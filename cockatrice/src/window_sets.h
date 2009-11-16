@@ -13,7 +13,7 @@ private:
 	SetsModel *model;
 	QTreeView *view;
 public:
-	WndSets(CardDatabase *_db, QWidget *parent = 0);
+	WndSets(QWidget *parent = 0);
 	~WndSets();
 };
 

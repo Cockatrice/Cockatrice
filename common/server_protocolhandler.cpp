@@ -198,6 +198,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd)
 	Server_Game *game = server->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), cmd->getSpectatorsAllowed(), this);
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, game->getCreator()));
 	
+	enqueueProtocolItem(new Event_GameJoined(game->getGameId(), false));
 	return RespOk;
 }
 
@@ -212,6 +213,7 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd)
 		Server_Player *player = g->addPlayer(this, cmd->getSpectator());
 		games.insert(cmd->getGameId(), QPair<Server_Game *, Server_Player *>(g, player));
 	}
+	enqueueProtocolItem(new Event_GameJoined(cmd->getGameId(), cmd->getSpectator()));
 	return result;
 }
 

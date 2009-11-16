@@ -1,5 +1,6 @@
 #include <QtGui>
 #include "dlg_creategame.h"
+#include "protocol_items.h"
 
 DlgCreateGame::DlgCreateGame(Client *_client, QWidget *parent)
 	: QDialog(parent), client(_client)
@@ -58,13 +59,15 @@ void DlgCreateGame::actOK()
 		QMessageBox::critical(this, tr("Error"), tr("Invalid number of players."));
 		return;
 	}
-//	PendingCommand *createCommand = client->createGame(descriptionEdit->text(), passwordEdit->text(), maxPlayers, spectatorsAllowedCheckBox->isChecked());
-//	connect(createCommand, SIGNAL(finished(ServerResponse)), this, SLOT(checkResponse(ServerResponse)));
+	Command_CreateGame *createCommand = new Command_CreateGame(descriptionEdit->text(), passwordEdit->text(), maxPlayers, spectatorsAllowedCheckBox->isChecked());
+	connect(createCommand, SIGNAL(finished(ResponseCode)), this, SLOT(checkResponse(ResponseCode)));
+	client->sendCommand(createCommand);
+	
 	okButton->setEnabled(false);
 	cancelButton->setEnabled(false);
 }
 
-/*void DlgCreateGame::checkResponse(ServerResponse response)
+void DlgCreateGame::checkResponse(ResponseCode response)
 {
 	okButton->setEnabled(true);
 	cancelButton->setEnabled(true);
@@ -76,4 +79,3 @@ void DlgCreateGame::actOK()
 		return;
 	}
 }
-*/
