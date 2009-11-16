@@ -83,6 +83,7 @@ private:
 protected:
 	void extractParameters()
 	{
+		Command::extractParameters();
 		channel = parameters["channel"];
 	}
 public:
@@ -101,6 +102,7 @@ private:
 protected:
 	void extractParameters()
 	{
+		Command::extractParameters();
 		gameId = parameters["game_id"].toInt();
 	}
 public:
