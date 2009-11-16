@@ -3,12 +3,13 @@
 #include "dlg_startgame.h"
 #include "decklistmodel.h"
 #include "carddatabase.h"
+#include "main.h"
 
-DlgStartGame::DlgStartGame(CardDatabase *_db, QWidget *parent)
-	: QDialog(parent), db(_db)
+DlgStartGame::DlgStartGame(QWidget *parent)
+	: QDialog(parent)
 {
 	deckView = new QTreeView;
-	deckModel = new DeckListModel(db, this);
+	deckModel = new DeckListModel(this);
 	deckView->setModel(deckModel);
 	deckView->setUniformRowHeights(true);
 
@@ -37,8 +38,8 @@ DlgStartGame::DlgStartGame(CardDatabase *_db, QWidget *parent)
 
 void DlgStartGame::actLoad()
 {
-	if (!deckModel->getDeckList()->loadDialog(this))
-		return;
+//	if (!deckModel->getDeckList()->loadDialog(this))
+//		return;
 
 	deckView->reset();
 	deckModel->sort(1);

@@ -6,13 +6,15 @@
 #include <QTextDocument>
 #include <QPrinter>
 #include <QTextTable>
+#include <QProgressDialog>
+#include "main.h"
 #include "decklistmodel.h"
 #include "carddatabase.h"
 
-DeckListModel::DeckListModel(CardDatabase *_db, QObject *parent)
-	: QAbstractItemModel(parent), db(_db)
+DeckListModel::DeckListModel(QObject *parent)
+	: QAbstractItemModel(parent)
 {
-	deckList = new DeckList(db, this);
+	deckList = new DeckList(this);
 	connect(deckList, SIGNAL(deckLoaded()), this, SLOT(rebuildTree()));
 	root = new InnerDecklistNode;
 }
@@ -311,6 +313,29 @@ void DeckListModel::cleanList()
 	root->clearTree();
 	deckList->cleanList();
 	reset();
+}
+
+void DeckListModel::cacheCardPicturesHelper(InnerDecklistNode *item, QProgressDialog *progress)
+{
+	for (int i = 0; i < item->size(); i++) {
+		DecklistCardNode *node = dynamic_cast<DecklistCardNode *>(item->at(i));
+		if (node) {
+			db->getCard(node->getName())->loadPixmap();
+			progress->setValue(progress->value() + 1);
+		} else
+			cacheCardPicturesHelper(dynamic_cast<InnerDecklistNode *>(item->at(i)), progress);
+	}
+}
+
+void DeckListModel::cacheCardPictures(QWidget *parent)
+{
+	int totalCards = deckList->getRoot()->recursiveCount();
+
+	QProgressDialog progress(tr("Caching card pictures..."), QString(), 0, totalCards, parent);
+	progress.setMinimumDuration(1000);
+	progress.setWindowModality(Qt::WindowModal);
+
+	cacheCardPicturesHelper(deckList->getRoot(), &progress);
 }
 
 void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)

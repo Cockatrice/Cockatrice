@@ -51,6 +51,7 @@ private:
 	void recursiveExpand(const QModelIndex &index);
 	bool confirmClose();
 
+	static const QStringList fileNameFilters;
 	QString lastFileName;
 	DeckList::FileFormat lastFileFormat;
 

@@ -3,9 +3,7 @@
 #include <QTextStream>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
-#include <QProgressDialog>
 #include <QVariant>
-#include <QSettings>
 #include "decklist.h"
 #include "carddatabase.h"
 
@@ -130,8 +128,8 @@ QVector<QPair<int, int> > InnerDecklistNode::sort(Qt::SortOrder order)
 	return result;
 }
 
-DeckList::DeckList(CardDatabase *_db, QObject *parent)
-	: QObject(parent), db(_db)
+DeckList::DeckList(QObject *parent)
+	: QObject(parent)
 {
 	root = new InnerDecklistNode;
 }
@@ -273,7 +271,7 @@ bool DeckList::saveToFile_Plain(QIODevice *device)
 	return true;
 }
 
-bool DeckList::loadFromFile(const QString &fileName, FileFormat fmt, QWidget *parent)
+bool DeckList::loadFromFile(const QString &fileName, FileFormat fmt)
 {
 	QFile file(fileName);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -285,17 +283,10 @@ bool DeckList::loadFromFile(const QString &fileName, FileFormat fmt, QWidget *pa
 		case PlainTextFormat: result = loadFromFile_Plain(&file); break;
 		case CockatriceFormat: result = loadFromFile_Native(&file); break;
 	}
-	if (result) {
+	if (result)
 		emit deckLoaded();
-		cacheCardPictures(parent);
-	}
 	return result;
 }
-
-const QStringList DeckList::fileNameFilters = QStringList()
-	<< QObject::tr("Cockatrice decks (*.cod)")
-	<< QObject::tr("Plain text decks (*.dec *.mwDeck)")
-	<< QObject::tr("All files (*.*)");
 
 bool DeckList::saveToFile(const QString &fileName, FileFormat fmt)
 {
@@ -309,82 +300,6 @@ bool DeckList::saveToFile(const QString &fileName, FileFormat fmt)
 		case CockatriceFormat: result = saveToFile_Native(&file); break;
 	}
 	return result;
-}
-
-bool DeckList::loadDialog(QWidget *parent)
-{
-	QFileDialog dialog(parent, tr("Load deck"));
-	QSettings settings;
-	dialog.setDirectory(settings.value("paths/decks").toString());
-	dialog.setNameFilters(fileNameFilters);
-	if (!dialog.exec())
-		return false;
-
-	QString fileName = dialog.selectedFiles().at(0);
-	FileFormat fmt;
-	switch (fileNameFilters.indexOf(dialog.selectedNameFilter())) {
-		case 0: fmt = CockatriceFormat; break;
-		case 1: fmt = PlainTextFormat; break;
-		default: fmt = PlainTextFormat; break;
-	}
-
-	if (loadFromFile(fileName, fmt, parent)) {
-		lastFileName = fileName;
-		lastFileFormat = fmt;
-		return true;
-	}
-	return false;
-}
-
-bool DeckList::saveDialog(QWidget *parent)
-{
-	QFileDialog dialog(parent, tr("Save deck"));
-	QSettings settings;
-	dialog.setDirectory(settings.value("paths/decks").toString());
-	dialog.setAcceptMode(QFileDialog::AcceptSave);
-	dialog.setConfirmOverwrite(true);
-	dialog.setDefaultSuffix("cod");
-	dialog.setNameFilters(fileNameFilters);
-	if (!dialog.exec())
-		return false;
-
-	QString fileName = dialog.selectedFiles().at(0);
-	DeckList::FileFormat fmt;
-	switch (fileNameFilters.indexOf(dialog.selectedNameFilter())) {
-		case 0: fmt = DeckList::CockatriceFormat; break;
-		case 1: fmt = DeckList::PlainTextFormat; break;
-		default: fmt = DeckList::PlainTextFormat; break;
-	}
-
-	if (saveToFile(fileName, fmt)) {
-		lastFileName = fileName;
-		lastFileFormat = fmt;
-		return true;
-	}
-	return false;
-}
-
-void DeckList::cacheCardPicturesHelper(InnerDecklistNode *item, QProgressDialog *progress)
-{
-	for (int i = 0; i < item->size(); i++) {
-		DecklistCardNode *node = dynamic_cast<DecklistCardNode *>(item->at(i));
-		if (node) {
-			db->getCard(node->getName())->loadPixmap();
-			progress->setValue(progress->value() + 1);
-		} else
-			cacheCardPicturesHelper(dynamic_cast<InnerDecklistNode *>(item->at(i)), progress);
-	}
-}
-	
-void DeckList::cacheCardPictures(QWidget *parent)
-{
-	int totalCards = root->recursiveCount();
-
-	QProgressDialog progress(tr("Caching card pictures..."), QString(), 0, totalCards, parent);
-	progress.setMinimumDuration(1000);
-	progress.setWindowModality(Qt::WindowModal);
-
-	cacheCardPicturesHelper(root, &progress);
 }
 
 void DeckList::cleanList()

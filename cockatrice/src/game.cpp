@@ -15,8 +15,8 @@
 #include "arrowitem.h"
 #include "protocol_datastructures.h"
 
-Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenuBar *menuBar, QObject *parent)
-	: QObject(parent), db(_db), client(_client), scene(_scene), started(false), currentPhase(-1)
+Game::Game(Client *_client, GameScene *_scene, QMenuBar *menuBar, QObject *parent)
+	: QObject(parent), client(_client), scene(_scene), started(false), currentPhase(-1)
 {
 	connect(client, SIGNAL(gameEvent(const ServerEventData &)), this, SLOT(gameEvent(const ServerEventData &)));
 
@@ -80,7 +80,7 @@ Game::Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenuBar *menu
 		connect(i.key(), SIGNAL(triggered()), this, SLOT(cardMenuAction()));
 	}
 
-	dlgStartGame = new DlgStartGame(db);
+	dlgStartGame = new DlgStartGame;
 	connect(dlgStartGame, SIGNAL(newDeckLoaded(const QStringList &)), client, SLOT(submitDeck(const QStringList &)));
 	connect(dlgStartGame, SIGNAL(finished(int)), this, SLOT(readyStart()));
 	

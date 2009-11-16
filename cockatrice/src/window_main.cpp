@@ -110,18 +110,9 @@ void MainWindow::statusChanged(ClientStatus _status)
 //		case StatusPlaying: {
 /*			chatWidget->disableChat();
 			
-			game = new Game(db, client, scene, menuBar(), this);
-			connect(game, SIGNAL(hoverCard(QString)), cardInfo, SLOT(setCard(const QString &)));
-			connect(game, SIGNAL(playerAdded(Player *)), this, SLOT(playerAdded(Player *)));
-			connect(game, SIGNAL(playerRemoved(Player *)), scene, SLOT(removePlayer(Player *)));
-			connect(game, SIGNAL(setActivePhase(int)), phasesToolbar, SLOT(setActivePhase(int)));
-			connect(phasesToolbar, SIGNAL(signalDrawCard()), game, SLOT(activePlayerDrawCard()));
-			connect(phasesToolbar, SIGNAL(signalUntapAll()), game, SLOT(activePlayerUntapAll()));
-			messageLog->connectToGame(game);
 			aRestartGame->setEnabled(true);
 			aLeaveGame->setEnabled(true);
 		
-			game->queryGameState();
 			
 			phasesToolbar->show();
 			view->show();

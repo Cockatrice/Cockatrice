@@ -6,6 +6,7 @@
 #include "decklist.h"
 
 class CardDatabase;
+class QProgressDialog;
 class QPrinter;
 class QTextCursor;
 
@@ -28,7 +29,7 @@ private slots:
 public slots:
 	void printDeckList(QPrinter *printer);
 public:
-	DeckListModel(CardDatabase *_db, QObject *parent = 0);
+	DeckListModel(QObject *parent = 0);
 	~DeckListModel();
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return 2; }
@@ -43,8 +44,8 @@ public:
 	void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
 	void cleanList();
 	DeckList *getDeckList() const { return deckList; }
+	void cacheCardPictures(QWidget *parent = 0);
 private:
-	CardDatabase *db;
 	DeckList *deckList;
 	InnerDecklistNode *root;
 	InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
@@ -53,7 +54,8 @@ private:
 	void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);
 	void debugIndexInfo(const QString &func, const QModelIndex &index) const;
 	void debugShowTree(InnerDecklistNode *node, int depth) const;
-	
+
+	void cacheCardPicturesHelper(InnerDecklistNode *item, QProgressDialog *progress);
 	void printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node);
 
 	template<typename T> T getNode(const QModelIndex &index) const

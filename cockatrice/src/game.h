@@ -30,7 +30,6 @@ private:
 		*aNextPhase, *aNextTurn, *aRemoveLocalArrows;
 	DlgStartGame *dlgStartGame;
 
-	CardDatabase *db;
 	Client *client;
 	GameScene *scene;
 	QStringList spectatorList;
@@ -102,7 +101,7 @@ signals:
 	void logSetActivePlayer(Player *player);
 	void setActivePhase(int phase);
 public:
-	Game(CardDatabase *_db, Client *_client, GameScene *_scene, QMenuBar *menuBar, QObject *parent = 0);
+	Game(Client *_client, GameScene *_scene, QMenuBar *menuBar, QObject *parent = 0);
 	~Game();
 	void retranslateUi();
 	void restartGameDialog();

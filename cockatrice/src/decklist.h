@@ -8,7 +8,6 @@
 
 class CardDatabase;
 class QIODevice;
-class QProgressDialog;
 
 class InnerDecklistNode;
 
@@ -71,21 +70,17 @@ class DeckList : public QObject {
 public:
 	enum FileFormat { PlainTextFormat, CockatriceFormat };
 private:
-	static const QStringList fileNameFilters;
-	void cacheCardPictures(QWidget *parent = 0);
-	CardDatabase *db;
 	QString name, comments;
 	QString lastFileName;
 	FileFormat lastFileFormat;
 	InnerDecklistNode *root;
-	void cacheCardPicturesHelper(InnerDecklistNode *item, QProgressDialog *progress);
 signals:
 	void deckLoaded();
 public slots:
 	void setName(const QString &_name = QString()) { name = _name; }
 	void setComments(const QString &_comments = QString()) { comments = _comments; }
 public:
-	DeckList(CardDatabase *_db, QObject *parent = 0);
+	DeckList(QObject *parent = 0);
 	~DeckList();
 	QString getName() const { return name; }
 	QString getComments() const { return comments; }
@@ -96,7 +91,7 @@ public:
 	bool saveToFile_Native(QIODevice *device);
 	bool loadFromFile_Plain(QIODevice *device);
 	bool saveToFile_Plain(QIODevice *device);
-	bool loadFromFile(const QString &fileName, FileFormat fmt, QWidget *parent = 0);
+	bool loadFromFile(const QString &fileName, FileFormat fmt);
 	bool saveToFile(const QString &fileName, FileFormat fmt);
 	bool loadDialog(QWidget *parent = 0);
 	bool saveDialog(QWidget *parent = 0);

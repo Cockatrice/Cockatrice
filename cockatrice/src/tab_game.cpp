@@ -50,8 +50,19 @@ TabGame::TabGame(Client *_client, int _gameId)
 	connect(phasesToolbar, SIGNAL(signalSetPhase(int)), client, SLOT(setActivePhase(int)));
 	connect(phasesToolbar, SIGNAL(signalNextTurn()), client, SLOT(nextTurn()));
 	
-}
+/*	game = new Game(client, scene, menuBar(), this);
+	connect(game, SIGNAL(hoverCard(QString)), cardInfo, SLOT(setCard(const QString &)));
+	connect(game, SIGNAL(playerAdded(Player *)), this, SLOT(playerAdded(Player *)));
+	connect(game, SIGNAL(playerRemoved(Player *)), scene, SLOT(removePlayer(Player *)));
+	connect(game, SIGNAL(setActivePhase(int)), phasesToolbar, SLOT(setActivePhase(int)));
+	connect(phasesToolbar, SIGNAL(signalDrawCard()), game, SLOT(activePlayerDrawCard()));
+	connect(phasesToolbar, SIGNAL(signalUntapAll()), game, SLOT(activePlayerUntapAll()));
+	messageLog->connectToGame(game);
+
+	game->queryGameState();
+*/}
 
 void TabGame::processGameEvent(GameEvent *event)
 {
+//	game->processGameEvent(event);
 }

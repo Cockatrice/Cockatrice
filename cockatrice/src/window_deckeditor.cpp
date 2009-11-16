@@ -14,6 +14,11 @@ void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 	QLineEdit::keyPressEvent(event);
 }
 
+const QStringList WndDeckEditor::fileNameFilters = QStringList()
+	<< QObject::tr("Cockatrice decks (*.cod)")
+	<< QObject::tr("Plain text decks (*.dec *.mwDeck)")
+	<< QObject::tr("All files (*.*)");
+
 WndDeckEditor::WndDeckEditor(QWidget *parent)
 	: QMainWindow(parent)
 {
@@ -63,7 +68,7 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	middleFrame->addLayout(verticalToolBarLayout);
 	middleFrame->addStretch();
 
-	deckModel = new DeckListModel(db, this);
+	deckModel = new DeckListModel(this);
 	deckView = new QTreeView();
 	deckView->setModel(deckModel);
 	deckView->setUniformRowHeights(true);
@@ -237,16 +242,33 @@ void WndDeckEditor::actLoadDeck()
 	if (!confirmClose())
 		return;
 
+	QFileDialog dialog(this, tr("Load deck"));
+	QSettings settings;
+	dialog.setDirectory(settings.value("paths/decks").toString());
+	dialog.setNameFilters(fileNameFilters);
+	if (!dialog.exec())
+		return;
+
+	QString fileName = dialog.selectedFiles().at(0);
+	DeckList::FileFormat fmt;
+	switch (fileNameFilters.indexOf(dialog.selectedNameFilter())) {
+		case 0: fmt = DeckList::CockatriceFormat; break;
+		case 1: fmt = DeckList::PlainTextFormat; break;
+		default: fmt = DeckList::PlainTextFormat; break;
+	}
+
 	DeckList *l = deckModel->getDeckList();
-	if (l->loadDialog(this)) {
-		lastFileName = l->getLastFileName();
-		lastFileFormat = l->getLastFileFormat();
+	if (l->loadFromFile(fileName, fmt)) {
+		lastFileName = fileName;
+		lastFileFormat = fmt;
 		nameEdit->setText(l->getName());
 		commentsEdit->setText(l->getComments());
 		deckModel->sort(1);
 		deckView->expandAll();
 		deckView->resizeColumnToContents(0);
 		setWindowModified(false);
+		
+		deckModel->cacheCardPictures(this);
 	}
 }
 
@@ -263,14 +285,31 @@ bool WndDeckEditor::actSaveDeck()
 
 bool WndDeckEditor::actSaveDeckAs()
 {
-	DeckList *l = deckModel->getDeckList();
-	if (l->saveDialog(this)) {
-		lastFileName = l->getLastFileName();
-		lastFileFormat = l->getLastFileFormat();
+	QFileDialog dialog(this, tr("Save deck"));
+	QSettings settings;
+	dialog.setDirectory(settings.value("paths/decks").toString());
+	dialog.setAcceptMode(QFileDialog::AcceptSave);
+	dialog.setConfirmOverwrite(true);
+	dialog.setDefaultSuffix("cod");
+	dialog.setNameFilters(fileNameFilters);
+	if (!dialog.exec())
+		return false;
+
+	QString fileName = dialog.selectedFiles().at(0);
+	DeckList::FileFormat fmt;
+	switch (fileNameFilters.indexOf(dialog.selectedNameFilter())) {
+		case 0: fmt = DeckList::CockatriceFormat; break;
+		case 1: fmt = DeckList::PlainTextFormat; break;
+		default: fmt = DeckList::PlainTextFormat; break;
+	}
+
+	if (deckModel->getDeckList()->saveToFile(fileName, fmt)) {
+		lastFileName = fileName;
+		lastFileFormat = fmt;
 		setWindowModified(false);
 		return true;
-	} else
-		return false;
+	}
+	return false;
 }
 
 void WndDeckEditor::actPrintDeck()
