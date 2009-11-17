@@ -1,3 +1,6 @@
+[server]
+port=4747
+
 [authentication]
 method=none
 

@@ -2,8 +2,7 @@
 0:login:s,username:s,password
 0:deck_list
 0:deck_new_dir:s,path:s,name
-0:deck_del_dir:s,path:s,name
-0:deck_new:s,path:i,id
+0:deck_del_dir:s,path
 0:deck_del:i,id
 0:deck_download:i,id
 0:list_chat_channels

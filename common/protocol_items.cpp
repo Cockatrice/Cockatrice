@@ -33,29 +33,15 @@ void Command_DeckNewDir::extractParameters()
 	path = parameters["path"];
 	name = parameters["name"];
 }
-Command_DeckDelDir::Command_DeckDelDir(const QString &_path, const QString &_name)
-	: Command("deck_del_dir"), path(_path), name(_name)
+Command_DeckDelDir::Command_DeckDelDir(const QString &_path)
+	: Command("deck_del_dir"), path(_path)
 {
 	setParameter("path", path);
-	setParameter("name", name);
 }
 void Command_DeckDelDir::extractParameters()
 {
 	Command::extractParameters();
 	path = parameters["path"];
-	name = parameters["name"];
-}
-Command_DeckNew::Command_DeckNew(const QString &_path, int _id)
-	: Command("deck_new"), path(_path), id(_id)
-{
-	setParameter("path", path);
-	setParameter("id", id);
-}
-void Command_DeckNew::extractParameters()
-{
-	Command::extractParameters();
-	path = parameters["path"];
-	id = parameters["id"].toInt();
 }
 Command_DeckDel::Command_DeckDel(int _id)
 	: Command("deck_del"), id(_id)
@@ -672,7 +658,6 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmddeck_list", Command_DeckList::newItem);
 	itemNameHash.insert("cmddeck_new_dir", Command_DeckNewDir::newItem);
 	itemNameHash.insert("cmddeck_del_dir", Command_DeckDelDir::newItem);
-	itemNameHash.insert("cmddeck_new", Command_DeckNew::newItem);
 	itemNameHash.insert("cmddeck_del", Command_DeckDel::newItem);
 	itemNameHash.insert("cmddeck_download", Command_DeckDownload::newItem);
 	itemNameHash.insert("cmdlist_chat_channels", Command_ListChatChannels::newItem);

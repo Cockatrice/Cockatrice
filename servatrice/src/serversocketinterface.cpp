@@ -55,6 +55,16 @@ ServerSocketInterface::~ServerSocketInterface()
 	delete socket;
 }
 
+void ServerSocketInterface::itemFinishedReading()
+{
+	Command *command = qobject_cast<Command *>(currentItem);
+	if (qobject_cast<InvalidCommand *>(command))
+		sendProtocolItem(new ProtocolResponse(command->getCmdId(), RespInvalidCommand));
+	else
+		processCommand(command);
+	currentItem = 0;
+}
+
 void ServerSocketInterface::readClient()
 {
 	xmlReader->addData(socket->readAll());
@@ -62,7 +72,7 @@ void ServerSocketInterface::readClient()
 	if (currentItem) {
 		if (!currentItem->read(xmlReader))
 			return;
-		currentItem = 0;
+		itemFinishedReading();
 	}
 	while (!xmlReader->atEnd()) {
 		xmlReader->readNext();
@@ -77,14 +87,7 @@ void ServerSocketInterface::readClient()
 				currentItem = new InvalidCommand;
 			if (!currentItem->read(xmlReader))
 				return;
-			else {
-				Command *command = qobject_cast<Command *>(currentItem);
-				if (qobject_cast<InvalidCommand *>(command))
-					sendProtocolItem(new ProtocolResponse(command->getCmdId(), RespInvalidCommand));
-				else
-					processCommand(command);
-				currentItem = 0;
-			}
+			itemFinishedReading();
 		}
 	}
 }
@@ -127,6 +130,11 @@ int ServerSocketInterface::getDeckPathId(int basePathId, QStringList path)
 		return getDeckPathId(id, path);
 }
 
+int ServerSocketInterface::getDeckPathId(const QString &path)
+{
+	return getDeckPathId(0, path.split("/"));
+}
+
 void ServerSocketInterface::deckListHelper(Response_DeckList::Directory *folder)
 {
 	QSqlQuery query;
@@ -139,6 +147,15 @@ void ServerSocketInterface::deckListHelper(Response_DeckList::Directory *folder)
 		Response_DeckList::Directory *newFolder = new Response_DeckList::Directory(query.value(1).toString(), query.value(0).toInt());
 		folder->append(newFolder);
 		deckListHelper(newFolder);
+	}
+	
+	query.prepare("select id, name from decklist_files where id_folder = :id_folder");
+	query.bindValue(":id_folder", folder->getId());
+	servatrice->execSqlQuery(query);
+	
+	while (query.next()) {
+		Response_DeckList::File *newFile = new Response_DeckList::File(query.value(1).toString(), query.value(0).toInt());
+		folder->append(newFile);
 	}
 }
 
@@ -157,8 +174,7 @@ ResponseCode ServerSocketInterface::cmdDeckList(Command_DeckList *cmd)
 
 ResponseCode ServerSocketInterface::cmdDeckNewDir(Command_DeckNewDir *cmd)
 {
-	int folderId = getDeckPathId(0, cmd->getPath().split("/"));
-	qDebug() << "folderId" << folderId;
+	int folderId = getDeckPathId(cmd->getPath());
 	if (folderId == -1)
 		return RespNameNotFound;
 	
@@ -172,12 +188,31 @@ ResponseCode ServerSocketInterface::cmdDeckNewDir(Command_DeckNewDir *cmd)
 	return RespOk;
 }
 
-ResponseCode ServerSocketInterface::cmdDeckDelDir(Command_DeckDelDir *cmd)
+void ServerSocketInterface::deckDelDirHelper(int basePathId)
 {
+	QSqlQuery query;
+	
+	query.prepare("select id from decklist_folders where id_parent = :id_parent");
+	query.bindValue(":id_parent", basePathId);
+	servatrice->execSqlQuery(query);
+	while (query.next())
+		deckDelDirHelper(query.value(0).toInt());
+	
+	query.prepare("delete from decklist_files where id_folder = :id_folder");
+	query.bindValue(":id_folder", basePathId);
+	servatrice->execSqlQuery(query);
+	
+	query.prepare("delete from decklist_folders where id = :id");
+	query.bindValue(":id", basePathId);
+	servatrice->execSqlQuery(query);
 }
 
-ResponseCode ServerSocketInterface::cmdDeckNew(Command_DeckNew *cmd)
+ResponseCode ServerSocketInterface::cmdDeckDelDir(Command_DeckDelDir *cmd)
 {
+	int basePathId = getDeckPathId(cmd->getPath());
+	if (basePathId == -1)
+		return RespNameNotFound;
+	deckDelDirHelper(basePathId);
 }
 
 ResponseCode ServerSocketInterface::cmdDeckDel(Command_DeckDel *cmd)

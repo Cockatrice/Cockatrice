@@ -87,7 +87,6 @@ void Server_ProtocolHandler::processCommand(Command *command)
 			case ItemId_Command_DeckList: response = cmdDeckList(qobject_cast<Command_DeckList *>(command)); break;
 			case ItemId_Command_DeckNewDir: response = cmdDeckNewDir(qobject_cast<Command_DeckNewDir *>(command)); break;
 			case ItemId_Command_DeckDelDir: response = cmdDeckDelDir(qobject_cast<Command_DeckDelDir *>(command)); break;
-			case ItemId_Command_DeckNew: response = cmdDeckNew(qobject_cast<Command_DeckNew *>(command)); break;
 			case ItemId_Command_DeckDel: response = cmdDeckDel(qobject_cast<Command_DeckDel *>(command)); break;
 			case ItemId_Command_DeckUpload: response = cmdDeckUpload(qobject_cast<Command_DeckUpload *>(command)); break;
 			case ItemId_Command_DeckDownload: response = cmdDeckDownload(qobject_cast<Command_DeckDownload *>(command)); break;

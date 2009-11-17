@@ -51,27 +51,11 @@ class Command_DeckDelDir : public Command {
 	Q_OBJECT
 private:
 	QString path;
-	QString name;
 public:
-	Command_DeckDelDir(const QString &_path = QString(), const QString &_name = QString());
+	Command_DeckDelDir(const QString &_path = QString());
 	QString getPath() const { return path; }
-	QString getName() const { return name; }
 	static ProtocolItem *newItem() { return new Command_DeckDelDir; }
 	int getItemId() const { return ItemId_Command_DeckDelDir; }
-protected:
-	void extractParameters();
-};
-class Command_DeckNew : public Command {
-	Q_OBJECT
-private:
-	QString path;
-	int id;
-public:
-	Command_DeckNew(const QString &_path = QString(), int _id = -1);
-	QString getPath() const { return path; }
-	int getId() const { return id; }
-	static ProtocolItem *newItem() { return new Command_DeckNew; }
-	int getItemId() const { return ItemId_Command_DeckNew; }
 protected:
 	void extractParameters();
 };

@@ -32,7 +32,6 @@ private:
 	virtual ResponseCode cmdDeckList(Command_DeckList *cmd) = 0;
 	virtual ResponseCode cmdDeckNewDir(Command_DeckNewDir *cmd) = 0;
 	virtual ResponseCode cmdDeckDelDir(Command_DeckDelDir *cmd) = 0;
-	virtual ResponseCode cmdDeckNew(Command_DeckNew *cmd) = 0;
 	virtual ResponseCode cmdDeckDel(Command_DeckDel *cmd) = 0;
 	virtual ResponseCode cmdDeckUpload(Command_DeckUpload *cmd) = 0;
 	virtual ResponseCode cmdDeckDownload(Command_DeckDownload *cmd) = 0;

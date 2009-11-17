@@ -28,13 +28,12 @@ Servatrice::Servatrice(QObject *parent)
 	: Server(parent)
 {
 	ProtocolItem::initializeHash();
+	settings = new QSettings("servatrice.ini", QSettings::IniFormat, this);
 	
 	tcpServer = new QTcpServer(this);
 	connect(tcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
-	tcpServer->listen(QHostAddress::Any, 4747); // XXX make customizable
+	tcpServer->listen(QHostAddress::Any, settings->value("server/port", 4747).toInt());
 	
-	settings = new QSettings("servatrice.ini", QSettings::IniFormat, this);
-
 	QString dbType = settings->value("database/type").toString();
 	if (dbType == "mysql")
 		openDatabase();

@@ -42,14 +42,17 @@ private:
 	ProtocolItem *currentItem;
 
 	int getDeckPathId(int basePathId, QStringList path);
+	int getDeckPathId(const QString &path);
 	void deckListHelper(Response_DeckList::Directory *folder);
 	ResponseCode cmdDeckList(Command_DeckList *cmd);
 	ResponseCode cmdDeckNewDir(Command_DeckNewDir *cmd);
+	void deckDelDirHelper(int basePathId);
 	ResponseCode cmdDeckDelDir(Command_DeckDelDir *cmd);
-	ResponseCode cmdDeckNew(Command_DeckNew *cmd);
 	ResponseCode cmdDeckDel(Command_DeckDel *cmd);
 	ResponseCode cmdDeckUpload(Command_DeckUpload *cmd);
 	ResponseCode cmdDeckDownload(Command_DeckDownload *cmd);
+	
+	void itemFinishedReading();
 public:
 	ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent = 0);
 	~ServerSocketInterface();
