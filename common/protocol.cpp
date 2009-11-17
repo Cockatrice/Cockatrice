@@ -64,8 +64,11 @@ void ProtocolItem::initializeHash()
 	
 	initializeHashAuto();
 	
+	itemNameHash.insert("cmddeck_upload", Command_DeckUpload::newItem);
+	
 	itemNameHash.insert("resp", ProtocolResponse::newItem);
 	ProtocolResponse::initializeHash();
+	itemNameHash.insert("respdeck_list", Response_DeckList::newItem);
 	
 	itemNameHash.insert("generic_eventlist_games", Event_ListGames::newItem);
 	itemNameHash.insert("generic_eventlist_chat_channels", Event_ListChatChannels::newItem);
@@ -92,13 +95,14 @@ void Command::extractParameters()
 
 void Command::processResponse(ProtocolResponse *response)
 {
+	emit finished(response);
 	emit finished(response->getResponseCode());
 }
 
 QHash<QString, ResponseCode> ProtocolResponse::responseHash;
 
-ProtocolResponse::ProtocolResponse(int _cmdId, ResponseCode _responseCode)
-	: ProtocolItem(QString()), cmdId(_cmdId), responseCode(_responseCode)
+ProtocolResponse::ProtocolResponse(int _cmdId, ResponseCode _responseCode, const QString &_itemName)
+	: ProtocolItem(_itemName), cmdId(_cmdId), responseCode(_responseCode)
 {
 	setParameter("cmd_id", cmdId);
 	setParameter("response_code", responseHash.key(responseCode));
@@ -123,6 +127,81 @@ void ProtocolResponse::initializeHash()
 	responseHash.insert("context_error", RespContextError);
 	responseHash.insert("wrong_password", RespWrongPassword);
 	responseHash.insert("spectators_not_allowed", RespSpectatorsNotAllowed);
+}
+
+bool Response_DeckList::File::readElement(QXmlStreamReader *xml)
+{
+	if (xml->isEndElement())
+		return true;
+	else
+		return false;
+}
+
+void Response_DeckList::File::writeElement(QXmlStreamWriter *xml)
+{
+	xml->writeStartElement("file");
+	xml->writeAttribute("name", name);
+	xml->writeAttribute("id", QString::number(id));
+	xml->writeEndElement();
+}
+
+Response_DeckList::Directory::~Directory()
+{
+	for (int i = 0; i < size(); ++i)
+		delete at(i);
+}
+
+bool Response_DeckList::Directory::readElement(QXmlStreamReader *xml)
+{
+	if (currentItem) {
+		if (currentItem->readElement(xml))
+			currentItem = 0;
+		return true;
+	}
+	if (xml->isStartElement() && (xml->name() == "directory")) {
+		currentItem = new Directory(xml->attributes().value("name").toString());
+		append(currentItem);
+	} else if (xml->isStartElement() && (xml->name() == "file")) {
+		currentItem = new File(xml->attributes().value("name").toString(), xml->attributes().value("id").toString().toInt());
+		append(currentItem);
+	} else
+		return false;
+	return true;
+}
+
+void Response_DeckList::Directory::writeElement(QXmlStreamWriter *xml)
+{
+	xml->writeStartElement("directory");
+	xml->writeAttribute("name", name);
+	for (int i = 0; i < size(); ++i)
+		at(i)->writeElement(xml);
+	xml->writeEndElement();
+}
+
+Response_DeckList::Response_DeckList(int _cmdId, ResponseCode _responseCode, Directory *_root)
+	: ProtocolResponse(_cmdId, _responseCode, "deck_list"), root(_root)
+{
+}
+
+Response_DeckList::~Response_DeckList()
+{
+	delete root;
+}
+
+bool Response_DeckList::readElement(QXmlStreamReader *xml)
+{
+	if (!root) {
+		if (xml->isStartElement() && (xml->name() == "directory"))
+			root = new Directory;
+		return false;
+	}
+	
+	return root->readElement(xml);
+}
+
+void Response_DeckList::writeElement(QXmlStreamWriter *xml)
+{
+	root->writeElement(xml);
 }
 
 GenericEvent::GenericEvent(const QString &_eventName)

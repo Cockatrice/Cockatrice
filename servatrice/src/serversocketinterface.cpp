@@ -20,13 +20,14 @@
 
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
+#include <QtSql>
 #include "serversocketinterface.h"
 #include "servatrice.h"
 #include "protocol.h"
 #include "protocol_items.h"
 
-ServerSocketInterface::ServerSocketInterface(Server *_server, QTcpSocket *_socket, QObject *parent)
-	: Server_ProtocolHandler(_server, parent), socket(_socket), currentItem(0)
+ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent)
+	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), currentItem(0)
 {
 	xmlWriter = new QXmlStreamWriter;
 	xmlWriter->setDevice(socket);
@@ -100,4 +101,93 @@ void ServerSocketInterface::sendProtocolItem(ProtocolItem *item, bool deleteItem
 	item->write(xmlWriter);
 	if (deleteItem)
 		delete item;
+}
+
+int ServerSocketInterface::getDeckPathId(int basePathId, QStringList path)
+{
+	if (path.isEmpty())
+		return 0;
+	if (path[0].isEmpty())
+		return 0;
+	
+	servatrice->checkSql();
+	
+	QSqlQuery query;
+	query.prepare("select id from decklist_folders where id_parent = :id_parent and name = :name");
+	query.bindValue(":id_parent", basePathId);
+	query.bindValue(":name", path.takeFirst());
+	if (!servatrice->execSqlQuery(query))
+		return -1;
+	if (!query.next())
+		return -1;
+	int id = query.value(0).toInt();
+	if (path.isEmpty())
+		return id;
+	else
+		return getDeckPathId(id, path);
+}
+
+void ServerSocketInterface::deckListHelper(Response_DeckList::Directory *folder)
+{
+	QSqlQuery query;
+	query.prepare("select id, name from decklist_folders where id_parent = :id_parent and user = :user");
+	query.bindValue(":id_parent", folder->getId());
+	query.bindValue(":user", playerName);
+	servatrice->execSqlQuery(query);
+	
+	while (query.next()) {
+		Response_DeckList::Directory *newFolder = new Response_DeckList::Directory(query.value(1).toString(), query.value(0).toInt());
+		folder->append(newFolder);
+		deckListHelper(newFolder);
+	}
+}
+
+ResponseCode ServerSocketInterface::cmdDeckList(Command_DeckList *cmd)
+{
+	Response_DeckList::Directory *root = new Response_DeckList::Directory(QString());
+	
+	servatrice->checkSql();
+	QSqlQuery query;
+	deckListHelper(root);
+	
+	sendProtocolItem(new Response_DeckList(cmd->getCmdId(), RespOk, root));
+	
+	return RespNothing;
+}
+
+ResponseCode ServerSocketInterface::cmdDeckNewDir(Command_DeckNewDir *cmd)
+{
+	int folderId = getDeckPathId(0, cmd->getPath().split("/"));
+	qDebug() << "folderId" << folderId;
+	if (folderId == -1)
+		return RespNameNotFound;
+	
+	QSqlQuery query;
+	query.prepare("insert into decklist_folders (id_parent, user, name) values(:id_parent, :user, :name)");
+	query.bindValue(":id_parent", folderId);
+	query.bindValue(":user", playerName);
+	query.bindValue(":name", cmd->getName());
+	if (!servatrice->execSqlQuery(query))
+		return RespContextError;
+	return RespOk;
+}
+
+ResponseCode ServerSocketInterface::cmdDeckDelDir(Command_DeckDelDir *cmd)
+{
+}
+
+ResponseCode ServerSocketInterface::cmdDeckNew(Command_DeckNew *cmd)
+{
+}
+
+ResponseCode ServerSocketInterface::cmdDeckDel(Command_DeckDel *cmd)
+{
+}
+
+ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd)
+{
+}
+
+ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd)
+{
 }

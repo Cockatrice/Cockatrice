@@ -87,6 +87,20 @@ bool Servatrice::openDatabase()
 	return true;
 }
 
+void Servatrice::checkSql()
+{
+	if (!QSqlDatabase::database().exec("select 1").isActive())
+		openDatabase();
+}
+
+bool Servatrice::execSqlQuery(QSqlQuery &query)
+{
+	if (query.exec())
+		return true;
+	qCritical(QString("Database error: %1").arg(query.lastError().text()).toLatin1());
+	return false;
+}
+
 void Servatrice::newConnection()
 {
 	QTcpSocket *socket = tcpServer->nextPendingConnection();
@@ -100,16 +114,14 @@ AuthenticationResult Servatrice::checkUserPassword(const QString &user, const QS
 	if (method == "none")
 		return UnknownUser;
 	else if (method == "sql") {
-		if (!QSqlDatabase::database().exec("select 1").isActive())
-			openDatabase();
+		checkSql();
 	
 		QSqlQuery query;
 		query.prepare("select password from players where name = :name");
 		query.bindValue(":name", user);
-		if (!query.exec()) {
-			qCritical(QString("Database error: %1").arg(query.lastError().text()).toLatin1());
+		if (!execSqlQuery(query))
 			return PasswordWrong;
-		}
+		
 		if (query.next()) {
 			if (query.value(0).toString() == password)
 				return PasswordRight;

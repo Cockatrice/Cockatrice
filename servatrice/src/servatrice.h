@@ -25,6 +25,7 @@
 
 class QSqlDatabase;
 class QSettings;
+class QSqlQuery;
 
 class Servatrice : public Server
 {
@@ -36,6 +37,8 @@ public:
 	Servatrice(QObject *parent = 0);
 	~Servatrice();
 	bool openDatabase();
+	void checkSql();
+	bool execSqlQuery(QSqlQuery &query);
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
 	QString getLoginMessage() const { return loginMessage; }
 private:

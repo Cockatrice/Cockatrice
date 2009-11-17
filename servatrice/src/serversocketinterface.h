@@ -24,7 +24,7 @@
 #include "server_protocolhandler.h"
 
 class QTcpSocket;
-class Server;
+class Servatrice;
 class QXmlStreamReader;
 class QXmlStreamWriter;
 
@@ -35,12 +35,23 @@ private slots:
 	void readClient();
 	void catchSocketError(QAbstractSocket::SocketError socketError);
 private:
+	Servatrice *servatrice;
 	QTcpSocket *socket;
 	QXmlStreamWriter *xmlWriter;
 	QXmlStreamReader *xmlReader;
 	ProtocolItem *currentItem;
+
+	int getDeckPathId(int basePathId, QStringList path);
+	void deckListHelper(Response_DeckList::Directory *folder);
+	ResponseCode cmdDeckList(Command_DeckList *cmd);
+	ResponseCode cmdDeckNewDir(Command_DeckNewDir *cmd);
+	ResponseCode cmdDeckDelDir(Command_DeckDelDir *cmd);
+	ResponseCode cmdDeckNew(Command_DeckNew *cmd);
+	ResponseCode cmdDeckDel(Command_DeckDel *cmd);
+	ResponseCode cmdDeckUpload(Command_DeckUpload *cmd);
+	ResponseCode cmdDeckDownload(Command_DeckDownload *cmd);
 public:
-	ServerSocketInterface(Server *_server, QTcpSocket *_socket, QObject *parent = 0);
+	ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent = 0);
 	~ServerSocketInterface();
 
 	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);

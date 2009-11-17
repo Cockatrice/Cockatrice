@@ -11,7 +11,7 @@ class Server_Player;
 
 class Server_ProtocolHandler : public QObject {
 	Q_OBJECT
-private:
+protected:
 	Server *server;
 	QMap<int, QPair<Server_Game *, Server_Player *> > games;
 	QMap<QString, Server_ChatChannel *> chatChannels;
@@ -24,10 +24,18 @@ private:
 	bool acceptsGameListChanges;
 	bool acceptsChatChannelListChanges;
 	
+private:
 	QList<ProtocolItem *> itemQueue;
 	
 	ResponseCode cmdPing(Command_Ping *cmd);
 	ResponseCode cmdLogin(Command_Login *cmd);
+	virtual ResponseCode cmdDeckList(Command_DeckList *cmd) = 0;
+	virtual ResponseCode cmdDeckNewDir(Command_DeckNewDir *cmd) = 0;
+	virtual ResponseCode cmdDeckDelDir(Command_DeckDelDir *cmd) = 0;
+	virtual ResponseCode cmdDeckNew(Command_DeckNew *cmd) = 0;
+	virtual ResponseCode cmdDeckDel(Command_DeckDel *cmd) = 0;
+	virtual ResponseCode cmdDeckUpload(Command_DeckUpload *cmd) = 0;
+	virtual ResponseCode cmdDeckDownload(Command_DeckDownload *cmd) = 0;
 	ResponseCode cmdListChatChannels(Command_ListChatChannels *cmd);
 	ResponseCode cmdChatJoinChannel(Command_ChatJoinChannel *cmd);
 	ResponseCode cmdChatLeaveChannel(Command_ChatLeaveChannel *cmd, Server_ChatChannel *channel);

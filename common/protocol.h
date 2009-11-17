@@ -16,9 +16,11 @@ class QXmlStreamAttributes;
 class ProtocolResponse;
 
 enum ItemId {
-	ItemId_Event_ListChatChannels = ItemId_Other + 1,
-	ItemId_Event_ChatListPlayers = ItemId_Other + 2,
-	ItemId_Event_ListGames = ItemId_Other + 3
+	ItemId_Command_DeckUpload = ItemId_Other + 1,
+	ItemId_Event_ListChatChannels = ItemId_Other + 2,
+	ItemId_Event_ChatListPlayers = ItemId_Other + 3,
+	ItemId_Event_ListGames = ItemId_Other + 4,
+	ItemId_Response_DeckList = ItemId_Other + 5
 };
 
 class ProtocolItem : public QObject {
@@ -51,9 +53,14 @@ public:
 	void write(QXmlStreamWriter *xml);
 };
 
+// ----------------
+// --- COMMANDS ---
+// ----------------
+
 class Command : public ProtocolItem {
 	Q_OBJECT
 signals:
+	void finished(ProtocolResponse *response);
 	void finished(ResponseCode response);
 private:
 	int cmdId;
@@ -114,6 +121,18 @@ public:
 	int getGameId() const { return gameId; }
 };
 
+class Command_DeckUpload : public Command {
+	Q_OBJECT
+public:
+	Command_DeckUpload(int _cmdId = -1) : Command("deck_upload", _cmdId) { }
+	static ProtocolItem *newItem() { return new Command_DeckUpload; }
+	int getItemId() const { return ItemId_Command_DeckUpload; }
+};
+
+// -----------------
+// --- RESPONSES ---
+// -----------------
+
 class ProtocolResponse : public ProtocolItem {
 	Q_OBJECT
 private:
@@ -124,13 +143,59 @@ protected:
 	QString getItemType() const { return "resp"; }
 	void extractParameters();
 public:
-	ProtocolResponse(int _cmdId = -1, ResponseCode _responseCode = RespOk);
+	ProtocolResponse(int _cmdId = -1, ResponseCode _responseCode = RespOk, const QString &_itemName = QString());
 	int getItemId() const { return ItemId_Other; }
 	static void initializeHash();
 	static ProtocolItem *newItem() { return new ProtocolResponse; }
 	int getCmdId() const { return cmdId; }
 	ResponseCode getResponseCode() const { return responseCode; }
 };
+
+class Response_DeckList : public ProtocolResponse {
+	Q_OBJECT
+public:
+	class TreeItem {
+	protected:
+		QString name;
+		int id;
+	public:
+		TreeItem(const QString &_name, int _id) : name(_name), id(_id) { }
+		QString getName() const { return name; }
+		int getId() const { return id; }
+		virtual bool readElement(QXmlStreamReader *xml) = 0;
+		virtual void writeElement(QXmlStreamWriter *xml) = 0;
+	};
+	class File : public TreeItem {
+	public:
+		File(const QString &_name, int _id) : TreeItem(_name, _id) { }
+		bool readElement(QXmlStreamReader *xml);
+		void writeElement(QXmlStreamWriter *xml);
+	};
+	class Directory : public TreeItem, public QList<TreeItem *> {
+	private:
+		TreeItem *currentItem;
+	public:
+		Directory(const QString &_name = QString(), int _id = 0) : TreeItem(_name, _id), currentItem(0) { }
+		~Directory();
+		bool readElement(QXmlStreamReader *xml);
+		void writeElement(QXmlStreamWriter *xml);
+	};
+private:
+	Directory *root;
+protected:
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
+public:
+	Response_DeckList(int _cmdId = -1, ResponseCode _responseCode = RespOk, Directory *_root = 0);
+	~Response_DeckList();
+	int getItemId() const { return ItemId_Response_DeckList; }
+	static ProtocolItem *newItem() { return new Response_DeckList; }
+	Directory *getRoot() const { return root; }
+};
+
+// --------------
+// --- EVENTS ---
+// --------------
 
 class GenericEvent : public ProtocolItem {
 	Q_OBJECT

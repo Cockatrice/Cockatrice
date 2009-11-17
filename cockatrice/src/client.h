@@ -13,6 +13,7 @@ class QXmlStreamReader;
 class QXmlStreamWriter;
 
 class ProtocolItem;
+class ProtocolResponse;
 class ChatEvent;
 class GameEvent;
 class Event_ListGames;

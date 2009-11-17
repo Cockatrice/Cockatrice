@@ -17,6 +17,66 @@ void Command_Login::extractParameters()
 	username = parameters["username"];
 	password = parameters["password"];
 }
+Command_DeckList::Command_DeckList()
+	: Command("deck_list")
+{
+}
+Command_DeckNewDir::Command_DeckNewDir(const QString &_path, const QString &_name)
+	: Command("deck_new_dir"), path(_path), name(_name)
+{
+	setParameter("path", path);
+	setParameter("name", name);
+}
+void Command_DeckNewDir::extractParameters()
+{
+	Command::extractParameters();
+	path = parameters["path"];
+	name = parameters["name"];
+}
+Command_DeckDelDir::Command_DeckDelDir(const QString &_path, const QString &_name)
+	: Command("deck_del_dir"), path(_path), name(_name)
+{
+	setParameter("path", path);
+	setParameter("name", name);
+}
+void Command_DeckDelDir::extractParameters()
+{
+	Command::extractParameters();
+	path = parameters["path"];
+	name = parameters["name"];
+}
+Command_DeckNew::Command_DeckNew(const QString &_path, int _id)
+	: Command("deck_new"), path(_path), id(_id)
+{
+	setParameter("path", path);
+	setParameter("id", id);
+}
+void Command_DeckNew::extractParameters()
+{
+	Command::extractParameters();
+	path = parameters["path"];
+	id = parameters["id"].toInt();
+}
+Command_DeckDel::Command_DeckDel(int _id)
+	: Command("deck_del"), id(_id)
+{
+	setParameter("id", id);
+}
+void Command_DeckDel::extractParameters()
+{
+	Command::extractParameters();
+	id = parameters["id"].toInt();
+}
+Command_DeckDownload::Command_DeckDownload(int _id)
+	: Command("deck_download"), id(_id)
+{
+	setParameter("id", id);
+}
+void Command_DeckDownload::extractParameters()
+{
+	Command::extractParameters();
+	id = parameters["id"].toInt();
+}
 Command_ListChatChannels::Command_ListChatChannels()
 	: Command("list_chat_channels")
 {
@@ -609,6 +669,12 @@ void ProtocolItem::initializeHashAuto()
 {
 	itemNameHash.insert("cmdping", Command_Ping::newItem);
 	itemNameHash.insert("cmdlogin", Command_Login::newItem);
+	itemNameHash.insert("cmddeck_list", Command_DeckList::newItem);
+	itemNameHash.insert("cmddeck_new_dir", Command_DeckNewDir::newItem);
+	itemNameHash.insert("cmddeck_del_dir", Command_DeckDelDir::newItem);
+	itemNameHash.insert("cmddeck_new", Command_DeckNew::newItem);
+	itemNameHash.insert("cmddeck_del", Command_DeckDel::newItem);
+	itemNameHash.insert("cmddeck_download", Command_DeckDownload::newItem);
 	itemNameHash.insert("cmdlist_chat_channels", Command_ListChatChannels::newItem);
 	itemNameHash.insert("cmdchat_join_channel", Command_ChatJoinChannel::newItem);
 	itemNameHash.insert("cmdchat_leave_channel", Command_ChatLeaveChannel::newItem);

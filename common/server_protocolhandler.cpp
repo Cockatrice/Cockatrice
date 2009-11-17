@@ -84,6 +84,13 @@ void Server_ProtocolHandler::processCommand(Command *command)
 		switch (command->getItemId()) {
 			case ItemId_Command_Ping: response = cmdPing(qobject_cast<Command_Ping *>(command)); break;
 			case ItemId_Command_Login: response = cmdLogin(qobject_cast<Command_Login *>(command)); break;
+			case ItemId_Command_DeckList: response = cmdDeckList(qobject_cast<Command_DeckList *>(command)); break;
+			case ItemId_Command_DeckNewDir: response = cmdDeckNewDir(qobject_cast<Command_DeckNewDir *>(command)); break;
+			case ItemId_Command_DeckDelDir: response = cmdDeckDelDir(qobject_cast<Command_DeckDelDir *>(command)); break;
+			case ItemId_Command_DeckNew: response = cmdDeckNew(qobject_cast<Command_DeckNew *>(command)); break;
+			case ItemId_Command_DeckDel: response = cmdDeckDel(qobject_cast<Command_DeckDel *>(command)); break;
+			case ItemId_Command_DeckUpload: response = cmdDeckUpload(qobject_cast<Command_DeckUpload *>(command)); break;
+			case ItemId_Command_DeckDownload: response = cmdDeckDownload(qobject_cast<Command_DeckDownload *>(command)); break;
 			case ItemId_Command_ListChatChannels: response = cmdListChatChannels(qobject_cast<Command_ListChatChannels *>(command)); break;
 			case ItemId_Command_ChatJoinChannel: response = cmdChatJoinChannel(qobject_cast<Command_ChatJoinChannel *>(command)); break;
 			case ItemId_Command_ListGames: response = cmdListGames(qobject_cast<Command_ListGames *>(command)); break;
