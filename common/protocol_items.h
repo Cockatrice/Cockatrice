@@ -37,11 +37,11 @@ class Command_DeckNewDir : public Command {
 	Q_OBJECT
 private:
 	QString path;
-	QString name;
+	QString dirName;
 public:
-	Command_DeckNewDir(const QString &_path = QString(), const QString &_name = QString());
+	Command_DeckNewDir(const QString &_path = QString(), const QString &_dirName = QString());
 	QString getPath() const { return path; }
-	QString getName() const { return name; }
+	QString getDirName() const { return dirName; }
 	static ProtocolItem *newItem() { return new Command_DeckNewDir; }
 	int getItemId() const { return ItemId_Command_DeckNewDir; }
 protected:
@@ -62,10 +62,10 @@ protected:
 class Command_DeckDel : public Command {
 	Q_OBJECT
 private:
-	int id;
+	int deckId;
 public:
-	Command_DeckDel(int _id = -1);
-	int getId() const { return id; }
+	Command_DeckDel(int _deckId = -1);
+	int getDeckId() const { return deckId; }
 	static ProtocolItem *newItem() { return new Command_DeckDel; }
 	int getItemId() const { return ItemId_Command_DeckDel; }
 protected:
@@ -74,10 +74,10 @@ protected:
 class Command_DeckDownload : public Command {
 	Q_OBJECT
 private:
-	int id;
+	int deckId;
 public:
-	Command_DeckDownload(int _id = -1);
-	int getId() const { return id; }
+	Command_DeckDownload(int _deckId = -1);
+	int getDeckId() const { return deckId; }
 	static ProtocolItem *newItem() { return new Command_DeckDownload; }
 	int getItemId() const { return ItemId_Command_DeckDownload; }
 protected:

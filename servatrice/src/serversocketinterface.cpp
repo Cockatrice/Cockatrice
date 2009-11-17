@@ -116,9 +116,10 @@ int ServerSocketInterface::getDeckPathId(int basePathId, QStringList path)
 	servatrice->checkSql();
 	
 	QSqlQuery query;
-	query.prepare("select id from decklist_folders where id_parent = :id_parent and name = :name");
+	query.prepare("select id from decklist_folders where id_parent = :id_parent and name = :name and user = :user");
 	query.bindValue(":id_parent", basePathId);
 	query.bindValue(":name", path.takeFirst());
+	query.bindValue(":user", playerName);
 	if (!servatrice->execSqlQuery(query))
 		return -1;
 	if (!query.next())
@@ -159,6 +160,9 @@ void ServerSocketInterface::deckListHelper(Response_DeckList::Directory *folder)
 	}
 }
 
+// CHECK AUTHENTICATION!
+// Also check for every function that data belonging to other users cannot be accessed.
+
 ResponseCode ServerSocketInterface::cmdDeckList(Command_DeckList *cmd)
 {
 	Response_DeckList::Directory *root = new Response_DeckList::Directory(QString());
@@ -182,7 +186,7 @@ ResponseCode ServerSocketInterface::cmdDeckNewDir(Command_DeckNewDir *cmd)
 	query.prepare("insert into decklist_folders (id_parent, user, name) values(:id_parent, :user, :name)");
 	query.bindValue(":id_parent", folderId);
 	query.bindValue(":user", playerName);
-	query.bindValue(":name", cmd->getName());
+	query.bindValue(":name", cmd->getDirName());
 	if (!servatrice->execSqlQuery(query))
 		return RespContextError;
 	return RespOk;
@@ -217,6 +221,20 @@ ResponseCode ServerSocketInterface::cmdDeckDelDir(Command_DeckDelDir *cmd)
 
 ResponseCode ServerSocketInterface::cmdDeckDel(Command_DeckDel *cmd)
 {
+	QSqlQuery query;
+	
+	query.prepare("select id from decklist_files where id = :id and user = :user");
+	query.bindValue(":id", cmd->getDeckId());
+	query.bindValue(":user", playerName);
+	servatrice->execSqlQuery(query);
+	if (!query.next())
+		return RespNameNotFound;
+	
+	query.prepare("delete from decklist_files where id = :id");
+	query.bindValue(":id", cmd->getDeckId());
+	servatrice->execSqlQuery(query);
+	
+	return RespOk;
 }
 
 ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd)

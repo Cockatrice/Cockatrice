@@ -21,17 +21,17 @@ Command_DeckList::Command_DeckList()
 	: Command("deck_list")
 {
 }
-Command_DeckNewDir::Command_DeckNewDir(const QString &_path, const QString &_name)
-	: Command("deck_new_dir"), path(_path), name(_name)
+Command_DeckNewDir::Command_DeckNewDir(const QString &_path, const QString &_dirName)
+	: Command("deck_new_dir"), path(_path), dirName(_dirName)
 {
 	setParameter("path", path);
-	setParameter("name", name);
+	setParameter("dir_name", dirName);
 }
 void Command_DeckNewDir::extractParameters()
 {
 	Command::extractParameters();
 	path = parameters["path"];
-	name = parameters["name"];
+	dirName = parameters["dir_name"];
 }
 Command_DeckDelDir::Command_DeckDelDir(const QString &_path)
 	: Command("deck_del_dir"), path(_path)
@@ -43,25 +43,25 @@ void Command_DeckDelDir::extractParameters()
 	Command::extractParameters();
 	path = parameters["path"];
 }
-Command_DeckDel::Command_DeckDel(int _id)
-	: Command("deck_del"), id(_id)
+Command_DeckDel::Command_DeckDel(int _deckId)
+	: Command("deck_del"), deckId(_deckId)
 {
-	setParameter("id", id);
+	setParameter("deck_id", deckId);
 }
 void Command_DeckDel::extractParameters()
 {
 	Command::extractParameters();
-	id = parameters["id"].toInt();
+	deckId = parameters["deck_id"].toInt();
 }
-Command_DeckDownload::Command_DeckDownload(int _id)
-	: Command("deck_download"), id(_id)
+Command_DeckDownload::Command_DeckDownload(int _deckId)
+	: Command("deck_download"), deckId(_deckId)
 {
-	setParameter("id", id);
+	setParameter("deck_id", deckId);
 }
 void Command_DeckDownload::extractParameters()
 {
 	Command::extractParameters();
-	id = parameters["id"].toInt();
+	deckId = parameters["deck_id"].toInt();
 }
 Command_ListChatChannels::Command_ListChatChannels()
 	: Command("list_chat_channels")

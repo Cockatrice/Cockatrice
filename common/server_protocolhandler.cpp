@@ -37,6 +37,11 @@ void Server_ProtocolHandler::processCommand(Command *command)
 	GameCommand *gameCommand = qobject_cast<GameCommand *>(command);
 	if (chatCommand) {
 		qDebug() << "received ChatCommand: channel =" << chatCommand->getChannel();
+		if (authState == PasswordWrong) {
+			sendProtocolItem(new ProtocolResponse(gameCommand->getCmdId(), RespLoginNeeded));
+			return;
+		}
+	
 		Server_ChatChannel *channel = chatChannels.value(chatCommand->getChannel(), 0);
 		if (!channel) {
 			sendProtocolItem(new ProtocolResponse(gameCommand->getCmdId(), RespNameNotFound));
@@ -48,6 +53,11 @@ void Server_ProtocolHandler::processCommand(Command *command)
 		}
 	} else if (gameCommand) {
 		qDebug() << "received GameCommand: game =" << gameCommand->getGameId();
+		if (authState == PasswordWrong) {
+			sendProtocolItem(new ProtocolResponse(gameCommand->getCmdId(), RespLoginNeeded));
+			return;
+		}
+	
 		if (!games.contains(gameCommand->getGameId())) {
 			sendProtocolItem(new ProtocolResponse(gameCommand->getCmdId(), RespNameNotFound));
 			return;
@@ -136,6 +146,9 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd)
 
 ResponseCode Server_ProtocolHandler::cmdListChatChannels(Command_ListChatChannels * /*cmd*/)
 {
+	if (authState == PasswordWrong)
+		return RespLoginNeeded;
+	
 	Event_ListChatChannels *event = new Event_ListChatChannels;
 	QMapIterator<QString, Server_ChatChannel *> channelIterator(server->getChatChannels());
 	while (channelIterator.hasNext()) {
@@ -150,6 +163,9 @@ ResponseCode Server_ProtocolHandler::cmdListChatChannels(Command_ListChatChannel
 
 ResponseCode Server_ProtocolHandler::cmdChatJoinChannel(Command_ChatJoinChannel *cmd)
 {
+	if (authState == PasswordWrong)
+		return RespLoginNeeded;
+	
 	if (chatChannels.contains(cmd->getChannel()))
 		return RespContextError;
 	
