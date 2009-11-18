@@ -4,7 +4,6 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QVariant>
-#include <QDebug>
 #include "decklist.h"
 
 AbstractDecklistNode::AbstractDecklistNode(InnerDecklistNode *_parent)
@@ -193,10 +192,9 @@ bool DeckList::readElement(QXmlStreamReader *xml)
 			name = currentElementText;
 		else if (xml->name() == "comments")
 			comments = currentElementText;
-		else if (xml->name() == "cockatrice_deck") {
-			qDebug() << "deck finished!";
+		else if (xml->name() == "cockatrice_deck")
 			return true;
-		}
+		
 		currentElementText.clear();
 	} else if (xml->isStartElement() && (xml->name() == "zone"))
 		currentZone = new InnerDecklistNode(xml->attributes().value("name").toString(), root);
