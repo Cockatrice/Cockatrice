@@ -33,7 +33,6 @@ HEADERS += src/counter.h \
  src/zoneviewlayout.h \
  src/carddatabasemodel.h \
  src/window_deckeditor.h \
- src/decklist.h \
  src/setsmodel.h \
  src/window_sets.h \
  src/abstractgraphicsitem.h \
@@ -45,6 +44,7 @@ HEADERS += src/counter.h \
  src/tab_chatchannel.h \
  src/tab_game.h \
  src/tab_supervisor.h \
+ 	../common/decklist.h \
 	../common/protocol.h \
 	../common/protocol_items.h \
 	../common/protocol_datastructures.h
@@ -76,7 +76,6 @@ SOURCES += src/counter.cpp \
  src/zoneviewlayout.cpp \
  src/carddatabasemodel.cpp \
  src/window_deckeditor.cpp \
- src/decklist.cpp \
  src/setsmodel.cpp \
  src/window_sets.cpp \
  src/abstractgraphicsitem.cpp \
@@ -88,6 +87,7 @@ SOURCES += src/counter.cpp \
  src/tab_chatchannel.cpp \
  src/tab_game.cpp \
  src/tab_supervisor.cpp \
+ 	../common/decklist.cpp \
 	../common/protocol.cpp \
 	../common/protocol_items.cpp
  

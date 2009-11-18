@@ -4,7 +4,7 @@
 #include <QString>
 #include <QColor>
 
-enum ResponseCode { RespNothing, RespOk, RespInvalidCommand, RespNameNotFound, RespLoginNeeded, RespContextError, RespWrongPassword, RespSpectatorsNotAllowed };
+enum ResponseCode { RespNothing, RespOk, RespInvalidCommand, RespInvalidData, RespNameNotFound, RespLoginNeeded, RespContextError, RespWrongPassword, RespSpectatorsNotAllowed };
 
 class ServerChatChannelInfo {
 private:

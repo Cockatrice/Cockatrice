@@ -14,6 +14,7 @@ QT += network sql
 
 HEADERS += src/servatrice.h \
 	src/serversocketinterface.h \
+	../common/decklist.h \
 	../common/protocol.h \
 	../common/protocol_items.h \
 	../common/protocol_datastructures.h \
@@ -32,6 +33,7 @@ HEADERS += src/servatrice.h \
 SOURCES += src/main.cpp \
 	src/servatrice.cpp \
 	src/serversocketinterface.cpp \
+	../common/decklist.cpp \
 	../common/protocol.cpp \
 	../common/protocol_items.cpp \
 	../common/rng_abstract.cpp \

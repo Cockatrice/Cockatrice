@@ -3,6 +3,7 @@
 #include <QDebug>
 #include "protocol.h"
 #include "protocol_items.h"
+#include "decklist.h"
 
 QHash<QString, ProtocolItem::NewItemFunction> ProtocolItem::itemNameHash;
 
@@ -69,6 +70,7 @@ void ProtocolItem::initializeHash()
 	itemNameHash.insert("resp", ProtocolResponse::newItem);
 	ProtocolResponse::initializeHash();
 	itemNameHash.insert("respdeck_list", Response_DeckList::newItem);
+	itemNameHash.insert("respdeck_download", Response_DeckDownload::newItem);
 	
 	itemNameHash.insert("generic_eventlist_games", Event_ListGames::newItem);
 	itemNameHash.insert("generic_eventlist_chat_channels", Event_ListChatChannels::newItem);
@@ -98,6 +100,49 @@ void Command::processResponse(ProtocolResponse *response)
 	emit finished(response);
 	emit finished(response->getResponseCode());
 }
+
+Command_DeckUpload::Command_DeckUpload(int _cmdId, DeckList *_deck, const QString &_path)
+	: Command("deck_upload", _cmdId), deck(_deck), path(_path), readFinished(false)
+{
+	setParameter("path", path);
+}
+
+Command_DeckUpload::~Command_DeckUpload()
+{
+	delete deck;
+}
+
+void Command_DeckUpload::extractParameters()
+{
+	Command::extractParameters();
+	
+	path = parameters["path"];
+}
+
+bool Command_DeckUpload::readElement(QXmlStreamReader *xml)
+{
+	if (readFinished)
+		return false;
+	
+	if (!deck) {
+		if (xml->isStartElement() && (xml->name() == "cockatrice_deck")) {
+			deck = new DeckList;
+			return true;
+		}
+		return false;
+	}
+	
+	if (deck->readElement(xml))
+		readFinished = true;
+	return true;
+}
+
+void Command_DeckUpload::writeElement(QXmlStreamWriter *xml)
+{
+	if (deck)
+		deck->writeElement(xml);
+}
+
 
 QHash<QString, ResponseCode> ProtocolResponse::responseHash;
 
@@ -180,7 +225,7 @@ void Response_DeckList::Directory::writeElement(QXmlStreamWriter *xml)
 }
 
 Response_DeckList::Response_DeckList(int _cmdId, ResponseCode _responseCode, Directory *_root)
-	: ProtocolResponse(_cmdId, _responseCode, "deck_list"), root(_root)
+	: ProtocolResponse(_cmdId, _responseCode, "deck_list"), root(_root), readFinished(false)
 {
 }
 
@@ -191,18 +236,75 @@ Response_DeckList::~Response_DeckList()
 
 bool Response_DeckList::readElement(QXmlStreamReader *xml)
 {
+	if (readFinished)
+		return false;
+	
 	if (!root) {
-		if (xml->isStartElement() && (xml->name() == "directory"))
+		if (xml->isStartElement() && (xml->name() == "directory")) {
 			root = new Directory;
+			return true;
+		}
 		return false;
 	}
 	
-	return !root->readElement(xml);
+	if (root->readElement(xml))
+		readFinished = true;
+	return true;
 }
 
 void Response_DeckList::writeElement(QXmlStreamWriter *xml)
 {
 	root->writeElement(xml);
+}
+
+Response_DeckDownload::Response_DeckDownload(int _cmdId, ResponseCode _responseCode, DeckList *_deck)
+	: ProtocolResponse(_cmdId, _responseCode, "deck_download"), deck(_deck), readFinished(false)
+{
+}
+
+Response_DeckDownload::~Response_DeckDownload()
+{
+	delete deck;
+}
+
+bool Response_DeckDownload::readElement(QXmlStreamReader *xml)
+{
+	if (readFinished)
+		return false;
+	
+	if (!deck) {
+		if (xml->isStartElement() && (xml->name() == "cockatrice_deck")) {
+			deck = new DeckList;
+			return true;
+		}
+		return false;
+	}
+	
+	if (deck->readElement(xml))
+		readFinished = true;
+	return true;
+}
+
+void Response_DeckDownload::writeElement(QXmlStreamWriter *xml)
+{
+	if (deck)
+		deck->writeElement(xml);
+}
+
+Response_DeckUpload::Response_DeckUpload(int _cmdId, ResponseCode _responseCode, int _deckId)
+	: ProtocolResponse(_cmdId, _responseCode, "deck_upload"), deckId(_deckId)
+{
+	setParameter("deck_id", deckId);
+}
+
+void Response_DeckUpload::extractParameters()
+{
+	ProtocolResponse::extractParameters();
+	
+	bool ok;
+	deckId = parameters["deck_id"].toInt(&ok);
+	if (!ok)
+		deckId = -1;
 }
 
 GenericEvent::GenericEvent(const QString &_eventName)

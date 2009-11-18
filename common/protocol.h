@@ -14,13 +14,16 @@ class QXmlStreamWriter;
 class QXmlStreamAttributes;
 
 class ProtocolResponse;
+class DeckList;
 
 enum ItemId {
 	ItemId_Command_DeckUpload = ItemId_Other + 1,
 	ItemId_Event_ListChatChannels = ItemId_Other + 2,
 	ItemId_Event_ChatListPlayers = ItemId_Other + 3,
 	ItemId_Event_ListGames = ItemId_Other + 4,
-	ItemId_Response_DeckList = ItemId_Other + 5
+	ItemId_Response_DeckList = ItemId_Other + 5,
+	ItemId_Response_DeckDownload = ItemId_Other + 6,
+	ItemId_Response_DeckUpload = ItemId_Other + 7
 };
 
 class ProtocolItem : public QObject {
@@ -123,10 +126,21 @@ public:
 
 class Command_DeckUpload : public Command {
 	Q_OBJECT
+private:
+	DeckList *deck;
+	QString path;
+	bool readFinished;
+protected:
+	void extractParameters();
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
 public:
-	Command_DeckUpload(int _cmdId = -1) : Command("deck_upload", _cmdId) { }
+	Command_DeckUpload(int _cmdId = -1, DeckList *_deck = 0, const QString &_path = QString());
+	~Command_DeckUpload();
 	static ProtocolItem *newItem() { return new Command_DeckUpload; }
 	int getItemId() const { return ItemId_Command_DeckUpload; }
+	DeckList *getDeck() const { return deck; }
+	QString getPath() const { return path; }
 };
 
 // -----------------
@@ -182,6 +196,7 @@ public:
 	};
 private:
 	Directory *root;
+	bool readFinished;
 protected:
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
@@ -191,6 +206,35 @@ public:
 	int getItemId() const { return ItemId_Response_DeckList; }
 	static ProtocolItem *newItem() { return new Response_DeckList; }
 	Directory *getRoot() const { return root; }
+};
+
+class Response_DeckDownload : public ProtocolResponse {
+	Q_OBJECT
+private:
+	DeckList *deck;
+	bool readFinished;
+protected:
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
+public:
+	Response_DeckDownload(int _cmdId = -1, ResponseCode _responseCode = RespOk, DeckList *_deck = 0);
+	~Response_DeckDownload();
+	int getItemId() const { return ItemId_Response_DeckDownload; }
+	static ProtocolItem *newItem() { return new Response_DeckDownload; }
+	DeckList *getDeck() const { return deck; }
+};
+
+class Response_DeckUpload : public ProtocolResponse {
+	Q_OBJECT
+private:
+	int deckId;
+protected:
+	void extractParameters();
+public:
+	Response_DeckUpload(int _cmdId = -1, ResponseCode _responseCode = RespOk, int _deckId = -1);
+	int getItemId() const { return ItemId_Response_DeckUpload; }
+	static ProtocolItem *newItem() { return new Response_DeckUpload; }
+	int getDeckId() const { return deckId; }
 };
 
 // --------------

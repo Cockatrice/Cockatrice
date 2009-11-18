@@ -4,8 +4,8 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QVariant>
+#include <QDebug>
 #include "decklist.h"
-#include "carddatabase.h"
 
 AbstractDecklistNode::AbstractDecklistNode(InnerDecklistNode *_parent)
 	: parent(_parent), currentItem(0)
@@ -185,7 +185,7 @@ bool DeckList::readElement(QXmlStreamReader *xml)
 	if (currentZone) {
 		if (currentZone->readElement(xml))
 			currentZone = 0;
-		return true;
+		return false;
 	}
 	
 	if (xml->isEndElement()) {
@@ -193,17 +193,17 @@ bool DeckList::readElement(QXmlStreamReader *xml)
 			name = currentElementText;
 		else if (xml->name() == "comments")
 			comments = currentElementText;
-		else
-			return false;
+		else if (xml->name() == "cockatrice_deck") {
+			qDebug() << "deck finished!";
+			return true;
+		}
 		currentElementText.clear();
 	} else if (xml->isStartElement() && (xml->name() == "zone"))
 		currentZone = new InnerDecklistNode(xml->attributes().value("name").toString(), root);
 	else if (xml->isCharacters() && !xml->isWhitespace())
 		currentElementText = xml->text().toString();
-	else
-		return false;
 	
-	return true;
+	return false;
 }
 
 void DeckList::writeElement(QXmlStreamWriter *xml)
@@ -219,23 +219,27 @@ void DeckList::writeElement(QXmlStreamWriter *xml)
 	xml->writeEndElement(); // cockatrice_deck
 }
 
-bool DeckList::loadFromFile_Native(QIODevice *device)
+bool DeckList::loadFromXml(QXmlStreamReader *xml)
 {
-	QXmlStreamReader xml(device);
-	while (!xml.atEnd()) {
-		xml.readNext();
-		if (xml.isStartElement()) {
-			if (xml.name() != "cockatrice_deck")
+	while (!xml->atEnd()) {
+		xml->readNext();
+		if (xml->isStartElement()) {
+			if (xml->name() != "cockatrice_deck")
 				return false;
-			while (!xml.atEnd()) {
-				xml.readNext();
-				if (!readElement(&xml))
-					if (xml.isEndElement() && (xml.name() == "cockatrice_deck"))
-						return true;
+			while (!xml->atEnd()) {
+				xml->readNext();
+				if (readElement(xml))
+					return true;
 			}
 		}
 	}
 	return false;
+}
+
+bool DeckList::loadFromFile_Native(QIODevice *device)
+{
+	QXmlStreamReader xml(device);
+	return loadFromXml(&xml);
 }
 
 bool DeckList::saveToFile_Native(QIODevice *device)

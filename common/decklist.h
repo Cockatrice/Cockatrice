@@ -103,6 +103,7 @@ public:
 
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
+	bool loadFromXml(QXmlStreamReader *xml);
 	
 	bool loadFromFile_Native(QIODevice *device);
 	bool saveToFile_Native(QIODevice *device);

@@ -25,6 +25,7 @@
 #include "servatrice.h"
 #include "protocol.h"
 #include "protocol_items.h"
+#include "decklist.h"
 
 ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent)
 	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), currentItem(0)
@@ -113,8 +114,6 @@ int ServerSocketInterface::getDeckPathId(int basePathId, QStringList path)
 	if (path[0].isEmpty())
 		return 0;
 	
-	servatrice->checkSql();
-	
 	QSqlQuery query;
 	query.prepare("select id from decklist_folders where id_parent = :id_parent and name = :name and user = :user");
 	query.bindValue(":id_parent", basePathId);
@@ -136,28 +135,33 @@ int ServerSocketInterface::getDeckPathId(const QString &path)
 	return getDeckPathId(0, path.split("/"));
 }
 
-void ServerSocketInterface::deckListHelper(Response_DeckList::Directory *folder)
+bool ServerSocketInterface::deckListHelper(Response_DeckList::Directory *folder)
 {
 	QSqlQuery query;
 	query.prepare("select id, name from decklist_folders where id_parent = :id_parent and user = :user");
 	query.bindValue(":id_parent", folder->getId());
 	query.bindValue(":user", playerName);
-	servatrice->execSqlQuery(query);
+	if (!servatrice->execSqlQuery(query))
+		return false;
 	
 	while (query.next()) {
 		Response_DeckList::Directory *newFolder = new Response_DeckList::Directory(query.value(1).toString(), query.value(0).toInt());
 		folder->append(newFolder);
-		deckListHelper(newFolder);
+		if (!deckListHelper(newFolder))
+			return false;
 	}
 	
 	query.prepare("select id, name from decklist_files where id_folder = :id_folder");
 	query.bindValue(":id_folder", folder->getId());
-	servatrice->execSqlQuery(query);
+	if (!servatrice->execSqlQuery(query))
+		return false;
 	
 	while (query.next()) {
 		Response_DeckList::File *newFile = new Response_DeckList::File(query.value(1).toString(), query.value(0).toInt());
 		folder->append(newFile);
 	}
+	
+	return true;
 }
 
 // CHECK AUTHENTICATION!
@@ -165,11 +169,12 @@ void ServerSocketInterface::deckListHelper(Response_DeckList::Directory *folder)
 
 ResponseCode ServerSocketInterface::cmdDeckList(Command_DeckList *cmd)
 {
-	Response_DeckList::Directory *root = new Response_DeckList::Directory(QString());
-	
 	servatrice->checkSql();
+	
+	Response_DeckList::Directory *root = new Response_DeckList::Directory(QString());
 	QSqlQuery query;
-	deckListHelper(root);
+	if (!deckListHelper(root))
+		return RespContextError;
 	
 	sendProtocolItem(new Response_DeckList(cmd->getCmdId(), RespOk, root));
 	
@@ -178,6 +183,8 @@ ResponseCode ServerSocketInterface::cmdDeckList(Command_DeckList *cmd)
 
 ResponseCode ServerSocketInterface::cmdDeckNewDir(Command_DeckNewDir *cmd)
 {
+	servatrice->checkSql();
+	
 	int folderId = getDeckPathId(cmd->getPath());
 	if (folderId == -1)
 		return RespNameNotFound;
@@ -194,6 +201,8 @@ ResponseCode ServerSocketInterface::cmdDeckNewDir(Command_DeckNewDir *cmd)
 
 void ServerSocketInterface::deckDelDirHelper(int basePathId)
 {
+	servatrice->checkSql();
+	
 	QSqlQuery query;
 	
 	query.prepare("select id from decklist_folders where id_parent = :id_parent");
@@ -213,14 +222,19 @@ void ServerSocketInterface::deckDelDirHelper(int basePathId)
 
 ResponseCode ServerSocketInterface::cmdDeckDelDir(Command_DeckDelDir *cmd)
 {
+	servatrice->checkSql();
+	
 	int basePathId = getDeckPathId(cmd->getPath());
 	if (basePathId == -1)
 		return RespNameNotFound;
 	deckDelDirHelper(basePathId);
+	return RespOk;
 }
 
 ResponseCode ServerSocketInterface::cmdDeckDel(Command_DeckDel *cmd)
 {
+	servatrice->checkSql();
+	
 	QSqlQuery query;
 	
 	query.prepare("select id from decklist_files where id = :id and user = :user");
@@ -239,8 +253,53 @@ ResponseCode ServerSocketInterface::cmdDeckDel(Command_DeckDel *cmd)
 
 ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd)
 {
+	servatrice->checkSql();
+	
+	if (!cmd->getDeck())
+		return RespInvalidData;
+	int folderId = getDeckPathId(cmd->getPath());
+	if (folderId == -1)
+		return RespNameNotFound;
+	
+	QString deckContents;
+	QXmlStreamWriter deckWriter(&deckContents);
+	deckWriter.writeStartDocument();
+	cmd->getDeck()->writeElement(&deckWriter);
+	deckWriter.writeEndDocument();
+	
+	QSqlQuery query;
+	query.prepare("insert into decklist_files (id_folder, user, name, content) value(:id_folder, :user, :name, :content)");
+	query.bindValue(":id_folder", folderId);
+	query.bindValue(":user", playerName);
+	query.bindValue(":name", cmd->getDeck()->getName());
+	query.bindValue(":content", deckContents);
+	servatrice->execSqlQuery(query);
+	
+	sendProtocolItem(new Response_DeckUpload(cmd->getCmdId(), RespOk, query.lastInsertId().toInt()));
+	return RespNothing;
 }
 
 ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd)
 {
+	servatrice->checkSql();
+	
+	QSqlQuery query;
+	
+	query.prepare("select content from decklist_files where id = :id and user = :user");
+	query.bindValue(":id", cmd->getDeckId());
+	query.bindValue(":user", playerName);
+	servatrice->execSqlQuery(query);
+	if (!query.next())
+		return RespNameNotFound;
+	
+	QXmlStreamReader deckReader(query.value(0).toString());
+	DeckList *deck = new DeckList;
+	if (!deck->loadFromXml(&deckReader)) {
+		delete deck;
+		deck = 0;
+		return RespInvalidData;
+	}
+	
+	sendProtocolItem(new Response_DeckDownload(cmd->getCmdId(), RespOk, deck));
+	return RespNothing;
 }
