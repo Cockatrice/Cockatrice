@@ -156,7 +156,7 @@ bool Response_DeckList::Directory::readElement(QXmlStreamReader *xml)
 	if (currentItem) {
 		if (currentItem->readElement(xml))
 			currentItem = 0;
-		return true;
+		return false;
 	}
 	if (xml->isStartElement() && (xml->name() == "directory")) {
 		currentItem = new Directory(xml->attributes().value("name").toString());
@@ -164,9 +164,10 @@ bool Response_DeckList::Directory::readElement(QXmlStreamReader *xml)
 	} else if (xml->isStartElement() && (xml->name() == "file")) {
 		currentItem = new File(xml->attributes().value("name").toString(), xml->attributes().value("id").toString().toInt());
 		append(currentItem);
-	} else
-		return false;
-	return true;
+	} else if (xml->isEndElement() && (xml->name() == "directory"))
+		return true;
+	
+	return false;
 }
 
 void Response_DeckList::Directory::writeElement(QXmlStreamWriter *xml)
@@ -196,7 +197,7 @@ bool Response_DeckList::readElement(QXmlStreamReader *xml)
 		return false;
 	}
 	
-	return root->readElement(xml);
+	return !root->readElement(xml);
 }
 
 void Response_DeckList::writeElement(QXmlStreamWriter *xml)

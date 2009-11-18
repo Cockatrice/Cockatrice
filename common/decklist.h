@@ -8,12 +8,15 @@
 
 class CardDatabase;
 class QIODevice;
+class QXmlStreamReader;
+class QXmlStreamWriter;
 
 class InnerDecklistNode;
 
 class AbstractDecklistNode {
 protected:
 	InnerDecklistNode *parent;
+	AbstractDecklistNode *currentItem;
 public:
 	AbstractDecklistNode(InnerDecklistNode *_parent = 0);
 	virtual ~AbstractDecklistNode() { }
@@ -22,6 +25,9 @@ public:
 	int depth() const;
 	virtual int height() const = 0;
 	virtual bool compare(AbstractDecklistNode *other) const = 0;
+	
+	virtual bool readElement(QXmlStreamReader *xml) = 0;
+	virtual void writeElement(QXmlStreamWriter *xml) = 0;
 };
 
 class InnerDecklistNode : public AbstractDecklistNode, public QList<AbstractDecklistNode *> {
@@ -40,6 +46,9 @@ public:
 	int recursiveCount(bool countTotalCards = false) const;
 	bool compare(AbstractDecklistNode *other) const;
 	QVector<QPair<int, int> > sort(Qt::SortOrder order = Qt::AscendingOrder);
+	
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
 };
 
 class AbstractDecklistCardNode : public AbstractDecklistNode {
@@ -51,6 +60,9 @@ public:
 	virtual void setName(const QString &_name) = 0;
 	int height() const { return 0; }
 	bool compare(AbstractDecklistNode *other) const;
+	
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
 };
 
 class DecklistCardNode : public AbstractDecklistCardNode {
@@ -74,6 +86,8 @@ private:
 	QString lastFileName;
 	FileFormat lastFileFormat;
 	InnerDecklistNode *root;
+	InnerDecklistNode *currentZone;
+	QString currentElementText;
 signals:
 	void deckLoaded();
 public slots:
@@ -87,6 +101,9 @@ public:
 	QString getLastFileName() const { return lastFileName; }
 	FileFormat getLastFileFormat() const { return lastFileFormat; }
 
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
+	
 	bool loadFromFile_Native(QIODevice *device);
 	bool saveToFile_Native(QIODevice *device);
 	bool loadFromFile_Plain(QIODevice *device);
