@@ -43,6 +43,7 @@ HEADERS += src/counter.h \
  src/tab_server.h \
  src/tab_chatchannel.h \
  src/tab_game.h \
+ src/tab_deck_storage.h \
  src/tab_supervisor.h \
  	../common/decklist.h \
 	../common/protocol.h \
@@ -86,6 +87,7 @@ SOURCES += src/counter.cpp \
  src/tab_server.cpp \
  src/tab_chatchannel.cpp \
  src/tab_game.cpp \
+ src/tab_deck_storage.cpp \
  src/tab_supervisor.cpp \
  	../common/decklist.cpp \
 	../common/protocol.cpp \

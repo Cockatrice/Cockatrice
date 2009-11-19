@@ -3,10 +3,11 @@
 #include "tab_server.h"
 #include "tab_chatchannel.h"
 #include "tab_game.h"
+#include "tab_deck_storage.h"
 #include "protocol_items.h"
 
 TabSupervisor::	TabSupervisor(QWidget *parent)
-	: QTabWidget(parent), client(0), tabServer(0)
+	: QTabWidget(parent), client(0), tabServer(0), tabDeckStorage(0)
 {
 
 }
@@ -15,6 +16,8 @@ void TabSupervisor::retranslateUi()
 {
 	if (tabServer)
 		setTabText(0, tr("Server"));
+	if (tabDeckStorage)
+		setTabText(1, tr("Deck storage"));
 }
 
 void TabSupervisor::start(Client *_client)
@@ -27,8 +30,10 @@ void TabSupervisor::start(Client *_client)
 	tabServer = new TabServer(client);
 	connect(tabServer, SIGNAL(gameJoined(int)), this, SLOT(addGameTab(int)));
 	connect(tabServer, SIGNAL(chatChannelJoined(const QString &)), this, SLOT(addChatChannelTab(const QString &)));
-	
 	addTab(tabServer, QString());
+	
+	tabDeckStorage = new TabDeckStorage(client);
+	addTab(tabDeckStorage, QString());
 
 	retranslateUi();
 }
@@ -44,6 +49,9 @@ void TabSupervisor::stop()
 	
 	delete tabServer;
 	tabServer = 0;
+	
+	delete tabDeckStorage;
+	tabDeckStorage = 0;
 	
 	QMapIterator<QString, TabChatChannel *> chatChannelIterator(chatChannelTabs);
 	while (chatChannelIterator.hasNext())

@@ -8,6 +8,7 @@ class Client;
 class TabServer;
 class TabChatChannel;
 class TabGame;
+class TabDeckStorage;
 class ChatEvent;
 class GameEvent;
 class Event_GameJoined;
@@ -17,6 +18,7 @@ class TabSupervisor : public QTabWidget {
 private:
 	Client *client;
 	TabServer *tabServer;
+	TabDeckStorage *tabDeckStorage;
 	QMap<QString, TabChatChannel *> chatChannelTabs;
 	QMap<int, TabGame *> gameTabs;
 public:

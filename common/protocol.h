@@ -6,6 +6,7 @@
 #include <QHash>
 #include <QObject>
 #include <QDebug>
+#include <QDateTime>
 #include "protocol_item_ids.h"
 #include "protocol_datastructures.h"
 
@@ -180,10 +181,13 @@ public:
 		virtual void writeElement(QXmlStreamWriter *xml) = 0;
 	};
 	class File : public TreeItem {
+	private:
+		QDateTime uploadTime;
 	public:
-		File(const QString &_name, int _id) : TreeItem(_name, _id) { }
+		File(const QString &_name, int _id, QDateTime _uploadTime) : TreeItem(_name, _id), uploadTime(_uploadTime) { }
 		bool readElement(QXmlStreamReader *xml);
 		void writeElement(QXmlStreamWriter *xml);
+		QDateTime getUploadTime() const { return uploadTime; }
 	};
 	class Directory : public TreeItem, public QList<TreeItem *> {
 	private:

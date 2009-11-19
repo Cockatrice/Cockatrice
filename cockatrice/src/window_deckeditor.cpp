@@ -141,7 +141,7 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 
 	aAddCard = new QAction(tr("Add card to &maindeck"), this);
 	aAddCard->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Return")) << QKeySequence(tr("Enter")));
-        aAddCard->setIcon(QIcon(":/resources/add_to_deck.svg"));
+	aAddCard->setIcon(QIcon(":/resources/arrow_right_green.svg"));
 	connect(aAddCard, SIGNAL(triggered()), this, SLOT(actAddCard()));
 	aAddCardToSideboard = new QAction(tr("Add card to &sideboard"), this);
         aAddCardToSideboard->setIcon(QIcon(":/resources/add_to_sideboard.svg"));

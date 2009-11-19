@@ -151,13 +151,13 @@ bool ServerSocketInterface::deckListHelper(Response_DeckList::Directory *folder)
 			return false;
 	}
 	
-	query.prepare("select id, name from decklist_files where id_folder = :id_folder");
+	query.prepare("select id, name, upload_time from decklist_files where id_folder = :id_folder");
 	query.bindValue(":id_folder", folder->getId());
 	if (!servatrice->execSqlQuery(query))
 		return false;
 	
 	while (query.next()) {
-		Response_DeckList::File *newFile = new Response_DeckList::File(query.value(1).toString(), query.value(0).toInt());
+		Response_DeckList::File *newFile = new Response_DeckList::File(query.value(1).toString(), query.value(0).toInt(), query.value(2).toDateTime());
 		folder->append(newFile);
 	}
 	
@@ -267,11 +267,15 @@ ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd)
 	cmd->getDeck()->writeElement(&deckWriter);
 	deckWriter.writeEndDocument();
 	
+	QString deckName = cmd->getDeck()->getName();
+	if (deckName.isEmpty())
+		deckName = "Unnamed deck";
+
 	QSqlQuery query;
-	query.prepare("insert into decklist_files (id_folder, user, name, content) value(:id_folder, :user, :name, :content)");
+	query.prepare("insert into decklist_files (id_folder, user, name, upload_time, content) values(:id_folder, :user, :name, NOW(), :content)");
 	query.bindValue(":id_folder", folderId);
 	query.bindValue(":user", playerName);
-	query.bindValue(":name", cmd->getDeck()->getName());
+	query.bindValue(":name", deckName);
 	query.bindValue(":content", deckContents);
 	servatrice->execSqlQuery(query);
 	

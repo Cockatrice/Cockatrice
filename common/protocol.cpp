@@ -187,6 +187,7 @@ void Response_DeckList::File::writeElement(QXmlStreamWriter *xml)
 	xml->writeStartElement("file");
 	xml->writeAttribute("name", name);
 	xml->writeAttribute("id", QString::number(id));
+	xml->writeAttribute("upload_time", QString::number(uploadTime.toTime_t()));
 	xml->writeEndElement();
 }
 
@@ -207,7 +208,7 @@ bool Response_DeckList::Directory::readElement(QXmlStreamReader *xml)
 		currentItem = new Directory(xml->attributes().value("name").toString());
 		append(currentItem);
 	} else if (xml->isStartElement() && (xml->name() == "file")) {
-		currentItem = new File(xml->attributes().value("name").toString(), xml->attributes().value("id").toString().toInt());
+		currentItem = new File(xml->attributes().value("name").toString(), xml->attributes().value("id").toString().toInt(), QDateTime::fromTime_t(xml->attributes().value("upload_time").toString().toUInt()));
 		append(currentItem);
 	} else if (xml->isEndElement() && (xml->name() == "directory"))
 		return true;
