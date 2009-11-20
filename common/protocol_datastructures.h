@@ -3,6 +3,10 @@
 
 #include <QString>
 #include <QColor>
+#include <QDateTime>
+
+class QXmlStreamReader;
+class QXmlStreamWriter;
 
 enum ResponseCode { RespNothing, RespOk, RespInvalidCommand, RespInvalidData, RespNameNotFound, RespLoginNeeded, RespContextError, RespWrongPassword, RespSpectatorsNotAllowed };
 
@@ -153,6 +157,36 @@ public:
 	QString getTargetZone() const { return targetZone; }
 	int getTargetCardId() const { return targetCardId; }
 	QColor getColor() const { return color; }
+};
+
+class DeckList_TreeItem {
+protected:
+	QString name;
+	int id;
+public:
+	DeckList_TreeItem(const QString &_name, int _id) : name(_name), id(_id) { }
+	QString getName() const { return name; }
+	int getId() const { return id; }
+	virtual bool readElement(QXmlStreamReader *xml) = 0;
+	virtual void writeElement(QXmlStreamWriter *xml) = 0;
+};
+class DeckList_File : public DeckList_TreeItem {
+private:
+	QDateTime uploadTime;
+public:
+	DeckList_File(const QString &_name, int _id, QDateTime _uploadTime) : DeckList_TreeItem(_name, _id), uploadTime(_uploadTime) { }
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
+	QDateTime getUploadTime() const { return uploadTime; }
+};
+class DeckList_Directory : public DeckList_TreeItem, public QList<DeckList_TreeItem *> {
+private:
+	DeckList_TreeItem *currentItem;
+public:
+	DeckList_Directory(const QString &_name = QString(), int _id = 0) : DeckList_TreeItem(_name, _id), currentItem(0) { }
+	~DeckList_Directory();
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
 };
 
 #endif

@@ -71,6 +71,7 @@ void ProtocolItem::initializeHash()
 	ProtocolResponse::initializeHash();
 	itemNameHash.insert("respdeck_list", Response_DeckList::newItem);
 	itemNameHash.insert("respdeck_download", Response_DeckDownload::newItem);
+	itemNameHash.insert("respdeck_upload", Response_DeckUpload::newItem);
 	
 	itemNameHash.insert("generic_eventlist_games", Event_ListGames::newItem);
 	itemNameHash.insert("generic_eventlist_chat_channels", Event_ListChatChannels::newItem);
@@ -174,7 +175,7 @@ void ProtocolResponse::initializeHash()
 	responseHash.insert("spectators_not_allowed", RespSpectatorsNotAllowed);
 }
 
-bool Response_DeckList::File::readElement(QXmlStreamReader *xml)
+bool DeckList_File::readElement(QXmlStreamReader *xml)
 {
 	if (xml->isEndElement())
 		return true;
@@ -182,7 +183,7 @@ bool Response_DeckList::File::readElement(QXmlStreamReader *xml)
 		return false;
 }
 
-void Response_DeckList::File::writeElement(QXmlStreamWriter *xml)
+void DeckList_File::writeElement(QXmlStreamWriter *xml)
 {
 	xml->writeStartElement("file");
 	xml->writeAttribute("name", name);
@@ -191,13 +192,13 @@ void Response_DeckList::File::writeElement(QXmlStreamWriter *xml)
 	xml->writeEndElement();
 }
 
-Response_DeckList::Directory::~Directory()
+DeckList_Directory::~DeckList_Directory()
 {
 	for (int i = 0; i < size(); ++i)
 		delete at(i);
 }
 
-bool Response_DeckList::Directory::readElement(QXmlStreamReader *xml)
+bool DeckList_Directory::readElement(QXmlStreamReader *xml)
 {
 	if (currentItem) {
 		if (currentItem->readElement(xml))
@@ -205,10 +206,10 @@ bool Response_DeckList::Directory::readElement(QXmlStreamReader *xml)
 		return false;
 	}
 	if (xml->isStartElement() && (xml->name() == "directory")) {
-		currentItem = new Directory(xml->attributes().value("name").toString());
+		currentItem = new DeckList_Directory(xml->attributes().value("name").toString());
 		append(currentItem);
 	} else if (xml->isStartElement() && (xml->name() == "file")) {
-		currentItem = new File(xml->attributes().value("name").toString(), xml->attributes().value("id").toString().toInt(), QDateTime::fromTime_t(xml->attributes().value("upload_time").toString().toUInt()));
+		currentItem = new DeckList_File(xml->attributes().value("name").toString(), xml->attributes().value("id").toString().toInt(), QDateTime::fromTime_t(xml->attributes().value("upload_time").toString().toUInt()));
 		append(currentItem);
 	} else if (xml->isEndElement() && (xml->name() == "directory"))
 		return true;
@@ -216,7 +217,7 @@ bool Response_DeckList::Directory::readElement(QXmlStreamReader *xml)
 	return false;
 }
 
-void Response_DeckList::Directory::writeElement(QXmlStreamWriter *xml)
+void DeckList_Directory::writeElement(QXmlStreamWriter *xml)
 {
 	xml->writeStartElement("directory");
 	xml->writeAttribute("name", name);
@@ -225,7 +226,7 @@ void Response_DeckList::Directory::writeElement(QXmlStreamWriter *xml)
 	xml->writeEndElement();
 }
 
-Response_DeckList::Response_DeckList(int _cmdId, ResponseCode _responseCode, Directory *_root)
+Response_DeckList::Response_DeckList(int _cmdId, ResponseCode _responseCode, DeckList_Directory *_root)
 	: ProtocolResponse(_cmdId, _responseCode, "deck_list"), root(_root), readFinished(false)
 {
 }
@@ -242,7 +243,7 @@ bool Response_DeckList::readElement(QXmlStreamReader *xml)
 	
 	if (!root) {
 		if (xml->isStartElement() && (xml->name() == "directory")) {
-			root = new Directory;
+			root = new DeckList_Directory;
 			return true;
 		}
 		return false;
@@ -292,20 +293,38 @@ void Response_DeckDownload::writeElement(QXmlStreamWriter *xml)
 		deck->writeElement(xml);
 }
 
-Response_DeckUpload::Response_DeckUpload(int _cmdId, ResponseCode _responseCode, int _deckId)
-	: ProtocolResponse(_cmdId, _responseCode, "deck_upload"), deckId(_deckId)
+Response_DeckUpload::Response_DeckUpload(int _cmdId, ResponseCode _responseCode, DeckList_File *_file)
+	: ProtocolResponse(_cmdId, _responseCode, "deck_upload"), file(_file), readFinished(false)
 {
-	setParameter("deck_id", deckId);
 }
 
-void Response_DeckUpload::extractParameters()
+Response_DeckUpload::~Response_DeckUpload()
 {
-	ProtocolResponse::extractParameters();
+	delete file;
+}
+
+bool Response_DeckUpload::readElement(QXmlStreamReader *xml)
+{
+	if (readFinished)
+		return false;
 	
-	bool ok;
-	deckId = parameters["deck_id"].toInt(&ok);
-	if (!ok)
-		deckId = -1;
+	if (!file) {
+		if (xml->isStartElement() && (xml->name() == "file")) {
+			file = new DeckList_File(xml->attributes().value("name").toString(), xml->attributes().value("id").toString().toInt(), QDateTime::fromTime_t(xml->attributes().value("upload_time").toString().toUInt()));
+			return true;
+		}
+		return false;
+	}
+	
+	if (file->readElement(xml))
+		readFinished = true;
+	return true;
+}
+
+void Response_DeckUpload::writeElement(QXmlStreamWriter *xml)
+{
+	if (file)
+		file->writeElement(xml);
 }
 
 GenericEvent::GenericEvent(const QString &_eventName)

@@ -5,8 +5,7 @@
 #include <QMap>
 #include <QHash>
 #include <QObject>
-#include <QDebug>
-#include <QDateTime>
+#include <QVariant>
 #include "protocol_item_ids.h"
 #include "protocol_datastructures.h"
 
@@ -70,6 +69,7 @@ private:
 	int cmdId;
 	int ticks;
 	static int lastCmdId;
+	QVariant extraData;
 protected:
 	QString getItemType() const { return "cmd"; }
 	void extractParameters();
@@ -78,6 +78,8 @@ public:
 	int getCmdId() const { return cmdId; }
 	int tick() { return ++ticks; }
 	void processResponse(ProtocolResponse *response);
+	void setExtraData(const QVariant &_extraData) { extraData = _extraData; }
+	QVariant getExtraData() const { return extraData; }
 };
 
 class InvalidCommand : public Command {
@@ -168,48 +170,18 @@ public:
 
 class Response_DeckList : public ProtocolResponse {
 	Q_OBJECT
-public:
-	class TreeItem {
-	protected:
-		QString name;
-		int id;
-	public:
-		TreeItem(const QString &_name, int _id) : name(_name), id(_id) { }
-		QString getName() const { return name; }
-		int getId() const { return id; }
-		virtual bool readElement(QXmlStreamReader *xml) = 0;
-		virtual void writeElement(QXmlStreamWriter *xml) = 0;
-	};
-	class File : public TreeItem {
-	private:
-		QDateTime uploadTime;
-	public:
-		File(const QString &_name, int _id, QDateTime _uploadTime) : TreeItem(_name, _id), uploadTime(_uploadTime) { }
-		bool readElement(QXmlStreamReader *xml);
-		void writeElement(QXmlStreamWriter *xml);
-		QDateTime getUploadTime() const { return uploadTime; }
-	};
-	class Directory : public TreeItem, public QList<TreeItem *> {
-	private:
-		TreeItem *currentItem;
-	public:
-		Directory(const QString &_name = QString(), int _id = 0) : TreeItem(_name, _id), currentItem(0) { }
-		~Directory();
-		bool readElement(QXmlStreamReader *xml);
-		void writeElement(QXmlStreamWriter *xml);
-	};
 private:
-	Directory *root;
+	DeckList_Directory *root;
 	bool readFinished;
 protected:
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 public:
-	Response_DeckList(int _cmdId = -1, ResponseCode _responseCode = RespOk, Directory *_root = 0);
+	Response_DeckList(int _cmdId = -1, ResponseCode _responseCode = RespOk, DeckList_Directory *_root = 0);
 	~Response_DeckList();
 	int getItemId() const { return ItemId_Response_DeckList; }
 	static ProtocolItem *newItem() { return new Response_DeckList; }
-	Directory *getRoot() const { return root; }
+	DeckList_Directory *getRoot() const { return root; }
 };
 
 class Response_DeckDownload : public ProtocolResponse {
@@ -231,14 +203,17 @@ public:
 class Response_DeckUpload : public ProtocolResponse {
 	Q_OBJECT
 private:
-	int deckId;
+	DeckList_File *file;
+	bool readFinished;
 protected:
-	void extractParameters();
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
 public:
-	Response_DeckUpload(int _cmdId = -1, ResponseCode _responseCode = RespOk, int _deckId = -1);
+	Response_DeckUpload(int _cmdId = -1, ResponseCode _responseCode = RespOk, DeckList_File *_file = 0);
+	~Response_DeckUpload();
 	int getItemId() const { return ItemId_Response_DeckUpload; }
 	static ProtocolItem *newItem() { return new Response_DeckUpload; }
-	int getDeckId() const { return deckId; }
+	DeckList_File *getFile() const { return file; }
 };
 
 // --------------

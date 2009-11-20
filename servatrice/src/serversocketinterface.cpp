@@ -135,7 +135,7 @@ int ServerSocketInterface::getDeckPathId(const QString &path)
 	return getDeckPathId(0, path.split("/"));
 }
 
-bool ServerSocketInterface::deckListHelper(Response_DeckList::Directory *folder)
+bool ServerSocketInterface::deckListHelper(DeckList_Directory *folder)
 {
 	QSqlQuery query;
 	query.prepare("select id, name from decklist_folders where id_parent = :id_parent and user = :user");
@@ -145,7 +145,7 @@ bool ServerSocketInterface::deckListHelper(Response_DeckList::Directory *folder)
 		return false;
 	
 	while (query.next()) {
-		Response_DeckList::Directory *newFolder = new Response_DeckList::Directory(query.value(1).toString(), query.value(0).toInt());
+		DeckList_Directory *newFolder = new DeckList_Directory(query.value(1).toString(), query.value(0).toInt());
 		folder->append(newFolder);
 		if (!deckListHelper(newFolder))
 			return false;
@@ -157,7 +157,7 @@ bool ServerSocketInterface::deckListHelper(Response_DeckList::Directory *folder)
 		return false;
 	
 	while (query.next()) {
-		Response_DeckList::File *newFile = new Response_DeckList::File(query.value(1).toString(), query.value(0).toInt(), query.value(2).toDateTime());
+		DeckList_File *newFile = new DeckList_File(query.value(1).toString(), query.value(0).toInt(), query.value(2).toDateTime());
 		folder->append(newFile);
 	}
 	
@@ -171,7 +171,7 @@ ResponseCode ServerSocketInterface::cmdDeckList(Command_DeckList *cmd)
 {
 	servatrice->checkSql();
 	
-	Response_DeckList::Directory *root = new Response_DeckList::Directory(QString());
+	DeckList_Directory *root = new DeckList_Directory(QString());
 	QSqlQuery query;
 	if (!deckListHelper(root))
 		return RespContextError;
@@ -279,7 +279,7 @@ ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd)
 	query.bindValue(":content", deckContents);
 	servatrice->execSqlQuery(query);
 	
-	sendProtocolItem(new Response_DeckUpload(cmd->getCmdId(), RespOk, query.lastInsertId().toInt()));
+	sendProtocolItem(new Response_DeckUpload(cmd->getCmdId(), RespOk, new DeckList_File(deckName, query.lastInsertId().toInt(), QDateTime::currentDateTime())));
 	return RespNothing;
 }
 

@@ -43,7 +43,7 @@ private:
 
 	int getDeckPathId(int basePathId, QStringList path);
 	int getDeckPathId(const QString &path);
-	bool deckListHelper(Response_DeckList::Directory *folder);
+	bool deckListHelper(DeckList_Directory *folder);
 	ResponseCode cmdDeckList(Command_DeckList *cmd);
 	ResponseCode cmdDeckNewDir(Command_DeckNewDir *cmd);
 	void deckDelDirHelper(int basePathId);
