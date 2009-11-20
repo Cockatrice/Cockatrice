@@ -16,7 +16,7 @@
    sodipodi:version="0.32"
    inkscape:version="0.47pre4 r22446"
    version="1.0"
-   sodipodi:docname="add_to_deck.svg"
+   sodipodi:docname="test.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs2648">
@@ -750,14 +750,14 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.625"
-     inkscape:cx="58.42623"
-     inkscape:cy="31.460692"
+     inkscape:zoom="7.203125"
+     inkscape:cx="3.6095445"
+     inkscape:cy="32"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="false"
      inkscape:window-width="1272"
-     inkscape:window-height="723"
+     inkscape:window-height="718"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:window-maximized="0" />
@@ -784,9 +784,8 @@
      inkscape:label="Pfeil"
      style="display:inline">
     <path
-       style="fill:#96ff96;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:3;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 28.61871,53.104623 0,-12.351931 32.248315,0 0,-17.505386 -32.248315,0 0,-12.351929 L 3.132975,31.999999 28.61871,53.104623 z"
-       id="rect2714"
-       sodipodi:nodetypes="cccccccc" />
+       style="fill:#96ff96;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="M 28.802264,8.8785925 2.0835141,31.441092 l 26.7187499,22.5625 0,-13.40625 31.59375,0 0,-18.3125 -31.59375,0 0,-13.4062495 z"
+       id="rect4156" />
   </g>
 </svg>
