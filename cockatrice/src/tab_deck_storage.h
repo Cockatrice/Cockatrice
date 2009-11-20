@@ -21,7 +21,7 @@ private:
 	QTreeView *localDirView;
 	QFileSystemModel *localDirModel;
 	QSortFilterProxyModel *sortFilter;
-	QToolBar *toolBar;
+	QToolBar *leftToolBar, *rightToolBar;
 	QTreeWidget *serverDirView;
 	QGroupBox *leftGroupBox, *rightGroupBox;
 	

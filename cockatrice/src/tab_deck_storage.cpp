@@ -25,27 +25,40 @@ TabDeckStorage::TabDeckStorage(Client *_client)
 	localDirView->setSortingEnabled(true);
 	localDirView->header()->setResizeMode(QHeaderView::ResizeToContents);
 	
+	leftToolBar = new QToolBar;
+	leftToolBar->setOrientation(Qt::Horizontal);
+	leftToolBar->setIconSize(QSize(32, 32));
+	QHBoxLayout *leftToolBarLayout = new QHBoxLayout;
+	leftToolBarLayout->addStretch();
+	leftToolBarLayout->addWidget(leftToolBar);
+	leftToolBarLayout->addStretch();
+
 	QVBoxLayout *leftVbox = new QVBoxLayout;
 	leftVbox->addWidget(localDirView);
+	leftVbox->addLayout(leftToolBarLayout);
 	leftGroupBox = new QGroupBox;
 	leftGroupBox->setLayout(leftVbox);
 	
-	toolBar = new QToolBar;
-	toolBar->setOrientation(Qt::Vertical);
-	toolBar->setIconSize(QSize(24, 24));
-	
+	rightToolBar = new QToolBar;
+	rightToolBar->setOrientation(Qt::Horizontal);
+	rightToolBar->setIconSize(QSize(32, 32));
+	QHBoxLayout *rightToolBarLayout = new QHBoxLayout;
+	rightToolBarLayout->addStretch();
+	rightToolBarLayout->addWidget(rightToolBar);
+	rightToolBarLayout->addStretch();
+
 	serverDirView = new QTreeWidget;
 	serverDirView->header()->setResizeMode(QHeaderView::ResizeToContents);
 	serverDirView->setColumnCount(3);
 
 	QVBoxLayout *rightVbox = new QVBoxLayout;
 	rightVbox->addWidget(serverDirView);
+	rightVbox->addLayout(rightToolBarLayout);
 	rightGroupBox = new QGroupBox;
 	rightGroupBox->setLayout(rightVbox);
 	
 	QHBoxLayout *hbox = new QHBoxLayout;
 	hbox->addWidget(leftGroupBox);
-	hbox->addWidget(toolBar);
 	hbox->addWidget(rightGroupBox);
 	
 	aUpload = new QAction(this);
@@ -55,15 +68,16 @@ TabDeckStorage::TabDeckStorage(Client *_client)
 	aDownload->setIcon(QIcon(":/resources/arrow_left_green.svg"));
 	connect(aDownload, SIGNAL(triggered()), this, SLOT(actDownload()));
 	aNewFolder = new QAction(this);
+	aNewFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder));
 	connect(aNewFolder, SIGNAL(triggered()), this, SLOT(actNewFolder()));
 	aDelete = new QAction(this);
 	aDelete->setIcon(QIcon(":/resources/remove_row.svg"));
 	connect(aDelete, SIGNAL(triggered()), this, SLOT(actDelete()));
 	
-	toolBar->addAction(aUpload);
-	toolBar->addAction(aDownload);
-	toolBar->addAction(aNewFolder);
-	toolBar->addAction(aDelete);
+	leftToolBar->addAction(aUpload);
+	rightToolBar->addAction(aDownload);
+	rightToolBar->addAction(aNewFolder);
+	rightToolBar->addAction(aDelete);
 	
 	retranslateUi();
 	setLayout(hbox);
