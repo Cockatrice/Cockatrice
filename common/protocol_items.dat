@@ -32,10 +32,10 @@
 2:dump_zone:i,player_id:s,zone_name:i,number_cards
 2:stop_dump_zone:i,player_id:s,zone_name
 2:dump_all
-2:submit_deck
 3:say:s,message
 3:join:s,player_name:b,spectator
 3:leave
+3:deck_select:i,deck_id
 3:game_closed
 3:ready_start
 3:setup_zones:i,deck_size:i,sb_size

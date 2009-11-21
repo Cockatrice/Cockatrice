@@ -14,10 +14,22 @@ TabSupervisor::	TabSupervisor(QWidget *parent)
 
 void TabSupervisor::retranslateUi()
 {
-	if (tabServer)
+	if (tabServer) {
 		setTabText(0, tr("Server"));
-	if (tabDeckStorage)
+		tabServer->retranslateUi();
+	}
+	if (tabDeckStorage) {
 		setTabText(1, tr("Deck storage"));
+		tabDeckStorage->retranslateUi();
+	}
+	
+	QMapIterator<QString, TabChatChannel *> chatChannelIterator(chatChannelTabs);
+	while (chatChannelIterator.hasNext())
+		chatChannelIterator.next().value()->retranslateUi();
+
+	QMapIterator<int, TabGame *> gameIterator(gameTabs);
+	while (gameIterator.hasNext())
+		gameIterator.next().value()->retranslateUi();
 }
 
 void TabSupervisor::start(Client *_client)
@@ -28,7 +40,6 @@ void TabSupervisor::start(Client *_client)
 	connect(client, SIGNAL(gameJoinedEventReceived(Event_GameJoined *)), this, SLOT(gameJoined(Event_GameJoined *)));
 
 	tabServer = new TabServer(client);
-	connect(tabServer, SIGNAL(gameJoined(int)), this, SLOT(addGameTab(int)));
 	connect(tabServer, SIGNAL(chatChannelJoined(const QString &)), this, SLOT(addChatChannelTab(const QString &)));
 	addTab(tabServer, QString());
 	

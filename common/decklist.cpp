@@ -26,14 +26,19 @@ InnerDecklistNode::~InnerDecklistNode()
 	clearTree();
 }
 
-QString InnerDecklistNode::getVisibleName() const
+QString InnerDecklistNode::visibleNameFromName(const QString &_name)
 {
-	if (name == "main")
+	if (_name == "main")
 		return QObject::tr("Maindeck");
-	else if (name == "side")
+	else if (_name == "side")
 		return QObject::tr("Sideboard");
 	else
-		return getName();
+		return _name;
+}
+
+QString InnerDecklistNode::getVisibleName() const
+{
+	return visibleNameFromName(name);
 }
 
 void InnerDecklistNode::clearTree()

@@ -27,6 +27,7 @@ class QTcpSocket;
 class Servatrice;
 class QXmlStreamReader;
 class QXmlStreamWriter;
+class DeckList;
 
 class ServerSocketInterface : public Server_ProtocolHandler
 {
@@ -50,6 +51,7 @@ private:
 	ResponseCode cmdDeckDelDir(Command_DeckDelDir *cmd);
 	ResponseCode cmdDeckDel(Command_DeckDel *cmd);
 	ResponseCode cmdDeckUpload(Command_DeckUpload *cmd);
+	DeckList *getDeckFromDatabase(int deckId);
 	ResponseCode cmdDeckDownload(Command_DeckDownload *cmd);
 	
 	void itemFinishedReading();

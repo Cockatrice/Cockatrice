@@ -437,14 +437,6 @@ public:
 	static ProtocolItem *newItem() { return new Command_DumpAll; }
 	int getItemId() const { return ItemId_Command_DumpAll; }
 };
-class Command_SubmitDeck : public GameCommand {
-	Q_OBJECT
-private:
-public:
-	Command_SubmitDeck(int _gameId = -1);
-	static ProtocolItem *newItem() { return new Command_SubmitDeck; }
-	int getItemId() const { return ItemId_Command_SubmitDeck; }
-};
 class Event_Say : public GameEvent {
 	Q_OBJECT
 private:
@@ -478,6 +470,18 @@ public:
 	Event_Leave(int _gameId = -1, int _playerId = -1);
 	static ProtocolItem *newItem() { return new Event_Leave; }
 	int getItemId() const { return ItemId_Event_Leave; }
+};
+class Event_DeckSelect : public GameEvent {
+	Q_OBJECT
+private:
+	int deckId;
+public:
+	Event_DeckSelect(int _gameId = -1, int _playerId = -1, int _deckId = -1);
+	int getDeckId() const { return deckId; }
+	static ProtocolItem *newItem() { return new Event_DeckSelect; }
+	int getItemId() const { return ItemId_Event_DeckSelect; }
+protected:
+	void extractParameters();
 };
 class Event_GameClosed : public GameEvent {
 	Q_OBJECT

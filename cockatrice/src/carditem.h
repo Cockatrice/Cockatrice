@@ -1,32 +1,18 @@
 #ifndef CARDITEM_H
 #define CARDITEM_H
 
-#include "abstractgraphicsitem.h"
+#include "abstractcarditem.h"
 
 class CardDatabase;
 class CardDragItem;
 class CardZone;
-class CardInfo;
-
-const int CARD_WIDTH = 72;
-const int CARD_HEIGHT = 102;
 
 const int MAX_COUNTERS_ON_CARD = 999;
 
-enum CardItemType {
-	typeCard = QGraphicsItem::UserType + 1,
-	typeCardDrag = QGraphicsItem::UserType + 2,
-	typeZone = QGraphicsItem::UserType + 3,
-	typeOther = QGraphicsItem::UserType + 4
-};
-
-class CardItem : public QObject, public AbstractGraphicsItem {
+class CardItem : public AbstractCardItem {
 	Q_OBJECT
 private:
-	CardInfo *info;
-	QString name;
 	int id;
-	bool tapped;
 	bool attacking;
 	bool facedown;
 	int counters;
@@ -34,23 +20,16 @@ private:
 	bool doesntUntap;
 	QPoint gridPoint;
 	CardDragItem *dragItem;
-private slots:
-	void pixmapUpdated();
 public:
 	enum { Type = typeCard };
 	int type() const { return Type; }
 	CardItem(const QString &_name = QString(), int _cardid = -1, QGraphicsItem *parent = 0);
 	~CardItem();
-	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QPoint getGridPoint() const { return gridPoint; }
 	void setGridPoint(const QPoint &_gridPoint) { gridPoint = _gridPoint; }
 	int getId() const { return id; }
 	void setId(int _id) { id = _id; }
-	QString getName() const { return name; }
-	void setName(const QString &_name = QString());
-	bool getTapped() const { return tapped; }
-	void setTapped(bool _tapped);
 	bool getAttacking() const { return attacking; }
 	void setAttacking(bool _attacking);
 	bool getFaceDown() const { return facedown; }
@@ -66,12 +45,10 @@ public:
 	CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);
 	void deleteDragItem();
 protected:
-	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 	void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-	QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
 };
 
 #endif

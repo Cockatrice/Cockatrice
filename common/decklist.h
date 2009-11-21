@@ -39,6 +39,7 @@ public:
 	virtual ~InnerDecklistNode();
 	QString getName() const { return name; }
 	void setName(const QString &_name) { name = _name; }
+	static QString visibleNameFromName(const QString &_name);
 	virtual QString getVisibleName() const;
 	void clearTree();
 	AbstractDecklistNode *findChild(const QString &name);

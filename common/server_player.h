@@ -6,6 +6,7 @@
 #include <QList>
 #include <QMap>
 
+class DeckList;
 class Server_Game;
 class Server_CardZone;
 class Server_Counter;
@@ -20,6 +21,7 @@ class Server_Player : public QObject {
 private:
 	Server_Game *game;
 	Server_ProtocolHandler *handler;
+	DeckList *deck;
 	QMap<QString, Server_CardZone *> zones;
 	QMap<int, Server_Counter *> counters;
 	QMap<int, Server_Arrow *> arrows;
@@ -30,11 +32,6 @@ private:
 	void clearZones();
 	PlayerStatusEnum PlayerStatus;
 public:
-	// Pfusch
-	QList<QString> DeckList;
-	QList<QString> SideboardList;
-	// Pfusch Ende
-	
 	Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator, Server_ProtocolHandler *_handler);
 	void setProtocolHandler(Server_ProtocolHandler *_handler) { handler = _handler; }
 	
@@ -44,6 +41,8 @@ public:
 	int getPlayerId() const { return playerId; }
 	bool getSpectator() const { return spectator; }
 	QString getPlayerName() const { return playerName; }
+	void setDeck(DeckList *_deck);
+	DeckList *getDeck() const { return deck; }
 	const QMap<QString, Server_CardZone *> &getZones() const { return zones; }
 	const QMap<int, Server_Counter *> &getCounters() const { return counters; }
 	const QMap<int, Server_Arrow *> &getArrows() const { return arrows; }

@@ -201,20 +201,9 @@ void MainWindow::retranslateUi()
 	aFullScreen->setShortcut(tr("Ctrl+F"));
 	aSettings->setText(tr("&Settings..."));
 	aExit->setText(tr("&Exit"));
-	aCloseMostRecentZoneView->setText(tr("Close most recent zone view"));
-	aCloseMostRecentZoneView->setShortcut(tr("Esc"));
 	
 	cockatriceMenu->setTitle(tr("&Cockatrice"));
-/*	
-	sayLabel->setText(tr("&Say:"));
-	
-	cardInfo->retranslateUi();
-	chatWidget->retranslateUi();
-	gameSelector->retranslateUi();
-	if (game)
-		game->retranslateUi();
-	zoneLayout->retranslateUi();
-*/}
+}
 
 void MainWindow::createActions()
 {
@@ -238,10 +227,6 @@ void MainWindow::createActions()
 	connect(aSettings, SIGNAL(triggered()), this, SLOT(actSettings()));
 	aExit = new QAction(this);
 	connect(aExit, SIGNAL(triggered()), this, SLOT(actExit()));
-
-	aCloseMostRecentZoneView = new QAction(this);
-//	connect(aCloseMostRecentZoneView, SIGNAL(triggered()), zoneLayout, SLOT(closeMostRecentZoneView()));
-	addAction(aCloseMostRecentZoneView);
 }
 
 void MainWindow::createMenus()

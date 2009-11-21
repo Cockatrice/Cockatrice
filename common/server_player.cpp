@@ -7,9 +7,10 @@
 #include "server_protocolhandler.h"
 #include "protocol.h"
 #include "protocol_items.h"
+#include "decklist.h"
 
 Server_Player::Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator, Server_ProtocolHandler *_handler)
-	: game(_game), handler(_handler), playerId(_playerId), playerName(_playerName), spectator(_spectator), nextCardId(0), PlayerStatus(StatusNormal)
+	: game(_game), handler(_handler), deck(0), playerId(_playerId), playerName(_playerName), spectator(_spectator), nextCardId(0), PlayerStatus(StatusNormal)
 {
 }
 
@@ -51,10 +52,10 @@ void Server_Player::setupZones()
 	// ------------------------------------------------------------------
 
 	// Create zones
-	Server_CardZone *deck = new Server_CardZone(this, "deck", false, Server_CardZone::HiddenZone);
-	addZone(deck);
-	Server_CardZone *sb = new Server_CardZone(this, "sb", false, Server_CardZone::HiddenZone);
-	addZone(sb);
+	Server_CardZone *deckZone = new Server_CardZone(this, "deck", false, Server_CardZone::HiddenZone);
+	addZone(deckZone);
+	Server_CardZone *sbZone = new Server_CardZone(this, "sb", false, Server_CardZone::HiddenZone);
+	addZone(sbZone);
 	addZone(new Server_CardZone(this, "table", true, Server_CardZone::PublicZone));
 	addZone(new Server_CardZone(this, "hand", false, Server_CardZone::PrivateZone));
 	addZone(new Server_CardZone(this, "grave", false, Server_CardZone::PublicZone));
@@ -63,20 +64,30 @@ void Server_Player::setupZones()
 	// ------------------------------------------------------------------
 
 	// Assign card ids and create deck from decklist
-	QListIterator<QString> DeckIterator(DeckList);
-	int i = 0;
-	while (DeckIterator.hasNext())
-		deck->cards.append(new Server_Card(DeckIterator.next(), i++, 0, 0));
-	deck->shuffle();
+	InnerDecklistNode *listRoot = deck->getRoot();
+	nextCardId = 0;
+	for (int i = 0; i < listRoot->size(); ++i) {
+		InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+		Server_CardZone *z;
+		if (currentZone->getName() == "main")
+			z = deckZone;
+		else if (currentZone->getName() == "side")
+			z = sbZone;
+		else
+			continue;
+		
+		for (int j = 0; j < currentZone->size(); ++j) {
+			DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+			if (!currentCard)
+				continue;
+			for (int k = 0; k < currentCard->getNumber(); ++k)
+				z->cards.append(new Server_Card(currentCard->getName(), nextCardId++, 0, 0));
+		}
+	}
+	deckZone->shuffle();
 
-	QListIterator<QString> SBIterator(SideboardList);
-	while (SBIterator.hasNext())
-		sb->cards.append(new Server_Card(SBIterator.next(), i++, 0, 0));
-
-	nextCardId = i;
-	
 	PlayerStatus = StatusPlaying;
-	game->sendGameEvent(new Event_SetupZones(-1, playerId, deck->cards.size(), sb->cards.size()));
+	game->sendGameEvent(new Event_SetupZones(-1, playerId, deckZone->cards.size(), sbZone->cards.size()));
 }
 
 void Server_Player::clearZones()
@@ -95,6 +106,12 @@ void Server_Player::clearZones()
 	while (arrowIterator.hasNext())
 		delete arrowIterator.next().value();
 	arrows.clear();
+}
+
+void Server_Player::setDeck(DeckList *_deck)
+{
+	delete deck;
+	deck = _deck;
 }
 
 void Server_Player::addZone(Server_CardZone *zone)

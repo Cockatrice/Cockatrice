@@ -244,3 +244,10 @@ TabServer::TabServer(Client *_client, QWidget *parent)
 	
 	setLayout(mainLayout);
 }
+
+void TabServer::retranslateUi()
+{
+	gameSelector->retranslateUi();
+	chatChannelSelector->retranslateUi();
+	serverMessageLog->retranslateUi();
+}

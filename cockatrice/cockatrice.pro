@@ -16,6 +16,7 @@ HEADERS += src/counter.h \
  src/cardzone.h \
  src/player.h \
  src/cardlist.h \
+ src/abstractcarditem.h \
  src/carditem.h \
  src/tablezone.h \
  src/handzone.h \
@@ -45,6 +46,7 @@ HEADERS += src/counter.h \
  src/tab_game.h \
  src/tab_deck_storage.h \
  src/tab_supervisor.h \
+ src/deckview.h \
  	../common/decklist.h \
 	../common/protocol.h \
 	../common/protocol_items.h \
@@ -60,6 +62,7 @@ SOURCES += src/counter.cpp \
  src/player.cpp \
  src/cardzone.cpp \
  src/cardlist.cpp \
+ src/abstractcarditem.cpp \
  src/carditem.cpp \
  src/tablezone.cpp \
  src/handzone.cpp \
@@ -89,6 +92,7 @@ SOURCES += src/counter.cpp \
  src/tab_game.cpp \
  src/tab_deck_storage.cpp \
  src/tab_supervisor.cpp \
+ src/deckview.cpp \
  	../common/decklist.cpp \
 	../common/protocol.cpp \
 	../common/protocol_items.cpp

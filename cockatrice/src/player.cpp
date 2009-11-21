@@ -212,6 +212,7 @@ Player::~Player()
 
 void Player::updateBoundingRect()
 {
+	// XXX! PREPARE GEOMETRY CHANGE
 	bRect = QRectF(0, 0, CARD_WIDTH + 5 + counterAreaWidth + hand->boundingRect().width() + table->boundingRect().width(), table->boundingRect().height());
 	emit sizeChanged();
 }

@@ -17,13 +17,14 @@ class ProtocolResponse;
 class DeckList;
 
 enum ItemId {
-	ItemId_Command_DeckUpload = ItemId_Other + 1,
-	ItemId_Event_ListChatChannels = ItemId_Other + 2,
-	ItemId_Event_ChatListPlayers = ItemId_Other + 3,
-	ItemId_Event_ListGames = ItemId_Other + 4,
-	ItemId_Response_DeckList = ItemId_Other + 5,
-	ItemId_Response_DeckDownload = ItemId_Other + 6,
-	ItemId_Response_DeckUpload = ItemId_Other + 7
+	ItemId_Command_DeckUpload = ItemId_Other + 100,
+	ItemId_Command_DeckSelect = ItemId_Other + 101,
+	ItemId_Event_ListChatChannels = ItemId_Other + 200,
+	ItemId_Event_ChatListPlayers = ItemId_Other + 201,
+	ItemId_Event_ListGames = ItemId_Other + 202,
+	ItemId_Response_DeckList = ItemId_Other + 300,
+	ItemId_Response_DeckDownload = ItemId_Other + 301,
+	ItemId_Response_DeckUpload = ItemId_Other + 302
 };
 
 class ProtocolItem : public QObject {
@@ -138,12 +139,29 @@ protected:
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 public:
-	Command_DeckUpload(int _cmdId = -1, DeckList *_deck = 0, const QString &_path = QString());
-	~Command_DeckUpload();
+	Command_DeckUpload(DeckList *_deck = 0, const QString &_path = QString());
 	static ProtocolItem *newItem() { return new Command_DeckUpload; }
 	int getItemId() const { return ItemId_Command_DeckUpload; }
 	DeckList *getDeck() const { return deck; }
 	QString getPath() const { return path; }
+};
+
+class Command_DeckSelect : public GameCommand {
+	Q_OBJECT
+private:
+	DeckList *deck;
+	int deckId;
+	bool readFinished;
+protected:
+	void extractParameters();
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
+public:
+	Command_DeckSelect(int _gameId = -1, DeckList *_deck = 0, int _deckId = -1);
+	static ProtocolItem *newItem() { return new Command_DeckSelect; }
+	int getItemId() const { return ItemId_Command_DeckSelect; }
+	DeckList *getDeck() const { return deck; }
+	int getDeckId() const { return deckId; }
 };
 
 // -----------------

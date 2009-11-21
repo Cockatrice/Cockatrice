@@ -26,6 +26,7 @@
 #include "protocol.h"
 #include "protocol_items.h"
 #include "decklist.h"
+#include "server_player.h"
 
 ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent)
 	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), currentItem(0)
@@ -279,31 +280,41 @@ ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd)
 	query.bindValue(":content", deckContents);
 	servatrice->execSqlQuery(query);
 	
+	delete cmd->getDeck();
+	
 	sendProtocolItem(new Response_DeckUpload(cmd->getCmdId(), RespOk, new DeckList_File(deckName, query.lastInsertId().toInt(), QDateTime::currentDateTime())));
 	return RespNothing;
 }
 
-ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd)
+DeckList *ServerSocketInterface::getDeckFromDatabase(int deckId)
 {
 	servatrice->checkSql();
 	
 	QSqlQuery query;
 	
 	query.prepare("select content from decklist_files where id = :id and user = :user");
-	query.bindValue(":id", cmd->getDeckId());
+	query.bindValue(":id", deckId);
 	query.bindValue(":user", playerName);
 	servatrice->execSqlQuery(query);
 	if (!query.next())
-		return RespNameNotFound;
+		throw RespNameNotFound;
 	
 	QXmlStreamReader deckReader(query.value(0).toString());
 	DeckList *deck = new DeckList;
-	if (!deck->loadFromXml(&deckReader)) {
-		delete deck;
-		deck = 0;
-		return RespInvalidData;
-	}
+	if (!deck->loadFromXml(&deckReader))
+		throw RespInvalidData;
 	
+	return deck;
+}
+
+ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd)
+{
+	DeckList *deck;
+	try {
+		deck = getDeckFromDatabase(cmd->getDeckId());
+	} catch(ResponseCode r) {
+		return r;
+	}
 	sendProtocolItem(new Response_DeckDownload(cmd->getCmdId(), RespOk, deck));
 	return RespNothing;
 }

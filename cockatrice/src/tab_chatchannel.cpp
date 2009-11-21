@@ -25,6 +25,10 @@ TabChatChannel::TabChatChannel(Client *_client, const QString &_channelName)
 	setLayout(hbox);
 }
 
+void TabChatChannel::retranslateUi()
+{
+}
+
 void TabChatChannel::sendMessage()
 {
 	if (sayEdit->text().isEmpty())

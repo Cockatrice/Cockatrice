@@ -61,7 +61,6 @@ private:
 	void createMenus();
 	QMenu *cockatriceMenu;
 	QAction *aConnect, *aDisconnect, *aDeckEditor, *aFullScreen, *aSettings, *aExit;
-	QAction *aCloseMostRecentZoneView;
 	TabSupervisor *tabSupervisor;
 
 	PingWidget *pingWidget;

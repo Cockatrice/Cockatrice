@@ -66,6 +66,7 @@ void ProtocolItem::initializeHash()
 	initializeHashAuto();
 	
 	itemNameHash.insert("cmddeck_upload", Command_DeckUpload::newItem);
+	itemNameHash.insert("cmddeck_select", Command_DeckSelect::newItem);
 	
 	itemNameHash.insert("resp", ProtocolResponse::newItem);
 	ProtocolResponse::initializeHash();
@@ -102,15 +103,10 @@ void Command::processResponse(ProtocolResponse *response)
 	emit finished(response->getResponseCode());
 }
 
-Command_DeckUpload::Command_DeckUpload(int _cmdId, DeckList *_deck, const QString &_path)
-	: Command("deck_upload", _cmdId), deck(_deck), path(_path), readFinished(false)
+Command_DeckUpload::Command_DeckUpload(DeckList *_deck, const QString &_path)
+	: Command("deck_upload"), deck(_deck), path(_path), readFinished(false)
 {
 	setParameter("path", path);
-}
-
-Command_DeckUpload::~Command_DeckUpload()
-{
-	delete deck;
 }
 
 void Command_DeckUpload::extractParameters()
@@ -144,6 +140,45 @@ void Command_DeckUpload::writeElement(QXmlStreamWriter *xml)
 		deck->writeElement(xml);
 }
 
+Command_DeckSelect::Command_DeckSelect(int _gameId, DeckList *_deck, int _deckId)
+	: GameCommand("deck_upload", _gameId), deck(_deck), deckId(_deckId), readFinished(false)
+{
+	setParameter("deck_id", _deckId);
+}
+
+void Command_DeckSelect::extractParameters()
+{
+	GameCommand::extractParameters();
+	
+	bool ok;
+	deckId = parameters["deck_id"].toInt(&ok);
+	if (!ok)
+		deckId = -1;
+}
+
+bool Command_DeckSelect::readElement(QXmlStreamReader *xml)
+{
+	if (readFinished)
+		return false;
+	
+	if (!deck) {
+		if (xml->isStartElement() && (xml->name() == "cockatrice_deck")) {
+			deck = new DeckList;
+			return true;
+		}
+		return false;
+	}
+	
+	if (deck->readElement(xml))
+		readFinished = true;
+	return true;
+}
+
+void Command_DeckSelect::writeElement(QXmlStreamWriter *xml)
+{
+	if (deck)
+		deck->writeElement(xml);
+}
 
 QHash<QString, ResponseCode> ProtocolResponse::responseHash;
 

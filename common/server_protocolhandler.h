@@ -27,6 +27,8 @@ protected:
 private:
 	QList<ProtocolItem *> itemQueue;
 	
+	virtual DeckList *getDeckFromDatabase(int deckId) = 0;
+
 	ResponseCode cmdPing(Command_Ping *cmd);
 	ResponseCode cmdLogin(Command_Login *cmd);
 	virtual ResponseCode cmdDeckList(Command_DeckList *cmd) = 0;
@@ -43,6 +45,7 @@ private:
 	ResponseCode cmdCreateGame(Command_CreateGame *cmd);
 	ResponseCode cmdJoinGame(Command_JoinGame *cmd);
 	ResponseCode cmdLeaveGame(Command_LeaveGame *cmd, Server_Game *game, Server_Player *player);
+	ResponseCode cmdDeckSelect(Command_DeckSelect *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdSay(Command_Say *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdShuffle(Command_Shuffle *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdRollDie(Command_RollDie *cmd, Server_Game *game, Server_Player *player);
@@ -62,7 +65,6 @@ private:
 	ResponseCode cmdDumpZone(Command_DumpZone *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdStopDumpZone(Command_StopDumpZone *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdDumpAll(Command_DumpAll *cmd, Server_Game *game, Server_Player *player);
-	ResponseCode cmdSubmitDeck(Command_SubmitDeck *cmd, Server_Game *game, Server_Player *player);
 public:
 	Server_ProtocolHandler(Server *_server, QObject *parent = 0);
 	~Server_ProtocolHandler();

@@ -347,10 +347,6 @@ Command_DumpAll::Command_DumpAll(int _gameId)
 	: GameCommand("dump_all", _gameId)
 {
 }
-Command_SubmitDeck::Command_SubmitDeck(int _gameId)
-	: GameCommand("submit_deck", _gameId)
-{
-}
 Event_Say::Event_Say(int _gameId, int _playerId, const QString &_message)
 	: GameEvent("say", _gameId, _playerId), message(_message)
 {
@@ -376,6 +372,16 @@ void Event_Join::extractParameters()
 Event_Leave::Event_Leave(int _gameId, int _playerId)
 	: GameEvent("leave", _gameId, _playerId)
 {
+}
+Event_DeckSelect::Event_DeckSelect(int _gameId, int _playerId, int _deckId)
+	: GameEvent("deck_select", _gameId, _playerId), deckId(_deckId)
+{
+	setParameter("deck_id", deckId);
+}
+void Event_DeckSelect::extractParameters()
+{
+	GameEvent::extractParameters();
+	deckId = parameters["deck_id"].toInt();
 }
 Event_GameClosed::Event_GameClosed(int _gameId, int _playerId)
 	: GameEvent("game_closed", _gameId, _playerId)
@@ -687,10 +693,10 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmddump_zone", Command_DumpZone::newItem);
 	itemNameHash.insert("cmdstop_dump_zone", Command_StopDumpZone::newItem);
 	itemNameHash.insert("cmddump_all", Command_DumpAll::newItem);
-	itemNameHash.insert("cmdsubmit_deck", Command_SubmitDeck::newItem);
 	itemNameHash.insert("game_eventsay", Event_Say::newItem);
 	itemNameHash.insert("game_eventjoin", Event_Join::newItem);
 	itemNameHash.insert("game_eventleave", Event_Leave::newItem);
+	itemNameHash.insert("game_eventdeck_select", Event_DeckSelect::newItem);
 	itemNameHash.insert("game_eventgame_closed", Event_GameClosed::newItem);
 	itemNameHash.insert("game_eventready_start", Event_ReadyStart::newItem);
 	itemNameHash.insert("game_eventsetup_zones", Event_SetupZones::newItem);

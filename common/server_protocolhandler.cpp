@@ -67,6 +67,7 @@ void Server_ProtocolHandler::processCommand(Command *command)
 		Server_Player *player = gamePair.second;
 		
 		switch (command->getItemId()) {
+			case ItemId_Command_DeckSelect: response = cmdDeckSelect(qobject_cast<Command_DeckSelect *>(command), game, player); break;
 			case ItemId_Command_LeaveGame: response = cmdLeaveGame(qobject_cast<Command_LeaveGame *>(command), game, player); break;
 			case ItemId_Command_Say: response = cmdSay(qobject_cast<Command_Say *>(command), game, player); break;
 			case ItemId_Command_Shuffle: response = cmdShuffle(qobject_cast<Command_Shuffle *>(command), game, player); break;
@@ -87,7 +88,6 @@ void Server_ProtocolHandler::processCommand(Command *command)
 			case ItemId_Command_DumpZone: response = cmdDumpZone(qobject_cast<Command_DumpZone *>(command), game, player); break;
 			case ItemId_Command_StopDumpZone: response = cmdStopDumpZone(qobject_cast<Command_StopDumpZone *>(command), game, player); break;
 			case ItemId_Command_DumpAll: response = cmdDumpAll(qobject_cast<Command_DumpAll *>(command), game, player); break;
-			case ItemId_Command_SubmitDeck: response = cmdSubmitDeck(qobject_cast<Command_SubmitDeck *>(command), game, player); break;
 		}
 	} else {
 		qDebug() << "received generic Command";
@@ -242,6 +242,27 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd)
 ResponseCode Server_ProtocolHandler::cmdLeaveGame(Command_LeaveGame * /*cmd*/, Server_Game *game, Server_Player *player)
 {
 	game->removePlayer(player);
+	return RespOk;
+}
+
+ResponseCode Server_ProtocolHandler::cmdDeckSelect(Command_DeckSelect *cmd, Server_Game *game, Server_Player *player)
+{
+	DeckList *deck;
+	if (cmd->getDeckId() == -1) {
+		if (!cmd->getDeck())
+			return RespInvalidData;
+		deck = cmd->getDeck();
+	} else {
+		try {
+			deck = getDeckFromDatabase(cmd->getDeckId());
+		} catch(ResponseCode r) {
+			return r;
+		}
+	}
+	player->setDeck(deck);
+	
+	game->sendGameEvent(new Event_DeckSelect(-1, player->getPlayerId(), cmd->getDeckId()));
+	
 	return RespOk;
 }
 
@@ -468,6 +489,9 @@ ResponseCode Server_ProtocolHandler::cmdSetCardAttr(Command_SetCardAttr *cmd, Se
 
 ResponseCode Server_ProtocolHandler::cmdReadyStart(Command_ReadyStart * /*cmd*/, Server_Game *game, Server_Player *player)
 {
+	if (!player->getDeck())
+		return RespContextError;
+	
 	player->setStatus(StatusReadyStart);
 	game->sendGameEvent(new Event_ReadyStart(-1, player->getPlayerId()));
 	game->startGameIfReady();
@@ -567,11 +591,6 @@ ResponseCode Server_ProtocolHandler::cmdStopDumpZone(Command_StopDumpZone *cmd, 
 }
 
 ResponseCode Server_ProtocolHandler::cmdDumpAll(Command_DumpAll *cmd, Server_Game *game, Server_Player *player)
-{
-	return RespOk;
-}
-
-ResponseCode Server_ProtocolHandler::cmdSubmitDeck(Command_SubmitDeck *cmd, Server_Game *game, Server_Player *player)
 {
 	return RespOk;
 }

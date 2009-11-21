@@ -83,6 +83,7 @@ private:
 	ServerMessageLog *serverMessageLog;
 public:
 	TabServer(Client *_client, QWidget *parent = 0);
+	void retranslateUi();
 };
 
 #endif

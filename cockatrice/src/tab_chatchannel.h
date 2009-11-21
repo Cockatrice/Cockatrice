@@ -31,6 +31,7 @@ private slots:
 	void processSayEvent(Event_ChatSay *event);
 public:
 	TabChatChannel(Client *_client, const QString &_channelName);
+	void retranslateUi();
 	void processChatEvent(ChatEvent *event);
 };
 

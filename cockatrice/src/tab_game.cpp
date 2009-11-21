@@ -10,6 +10,8 @@
 #include "zoneviewzone.h"
 #include "zoneviewwidget.h"
 #include "zoneviewlayout.h"
+#include "deckview.h"
+#include "decklist.h"
 #include "main.h"
 
 TabGame::TabGame(Client *_client, int _gameId)
@@ -17,7 +19,15 @@ TabGame::TabGame(Client *_client, int _gameId)
 {
 	zoneLayout = new ZoneViewLayout;
 	scene = new GameScene(zoneLayout, this);
-	view = new GameView(scene);
+	gameView = new GameView(scene);
+	gameView->hide();
+	
+	deckView = new DeckView;
+	
+	DeckList *foo = new DeckList;
+	foo->loadFromFile("/home/brukie/cockatrice/decks/adfb.cod", DeckList::CockatriceFormat);
+	deckView->setDeck(foo);
+//	deckView->hide();
 
 	cardInfo = new CardInfoWidget(db);
 	messageLog = new MessageLogWidget;
@@ -30,6 +40,7 @@ TabGame::TabGame(Client *_client, int _gameId)
 	hLayout->addWidget(sayEdit);
 
 	phasesToolbar = new PhasesToolbar;
+	phasesToolbar->hide();
 	
 	QVBoxLayout *verticalLayout = new QVBoxLayout;
 	verticalLayout->addWidget(cardInfo);
@@ -38,11 +49,14 @@ TabGame::TabGame(Client *_client, int _gameId)
 
 	QHBoxLayout *mainLayout = new QHBoxLayout;
 	mainLayout->addWidget(phasesToolbar);
-	mainLayout->addWidget(view, 10);
+	mainLayout->addWidget(gameView, 10);
+	mainLayout->addWidget(deckView, 10);
 	mainLayout->addLayout(verticalLayout);
 
-	setLayout(mainLayout);
-
+	aCloseMostRecentZoneView = new QAction(this);
+	connect(aCloseMostRecentZoneView, SIGNAL(triggered()), zoneLayout, SLOT(closeMostRecentZoneView()));
+	addAction(aCloseMostRecentZoneView);
+	
 	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(actSay()));
 
 //	connect(client, SIGNAL(maxPingTime(int, int)), pingWidget, SLOT(setPercentage(int, int)));
@@ -60,7 +74,21 @@ TabGame::TabGame(Client *_client, int _gameId)
 	messageLog->connectToGame(game);
 
 	game->queryGameState();
-*/}
+*/
+	retranslateUi();
+	setLayout(mainLayout);
+}
+
+void TabGame::retranslateUi()
+{
+	sayLabel->setText(tr("&Say:"));
+	cardInfo->retranslateUi();
+//	if (game)
+//		game->retranslateUi();
+	zoneLayout->retranslateUi();
+	aCloseMostRecentZoneView->setText(tr("Close most recent zone view"));
+	aCloseMostRecentZoneView->setShortcut(tr("Esc"));
+}
 
 void TabGame::processGameEvent(GameEvent *event)
 {

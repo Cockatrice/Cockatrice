@@ -7,6 +7,7 @@ class Client;
 class CardDatabase;
 class GameEvent;
 class GameView;
+class DeckView;
 class GameScene;
 class Game;
 class CardInfoWidget;
@@ -30,12 +31,15 @@ private:
 	QLineEdit *sayEdit;
 	PhasesToolbar *phasesToolbar;
 	GameScene *scene;
-	GameView *view;
+	GameView *gameView;
+	DeckView *deckView;
 	Game *game;
 	ZoneViewLayout *zoneLayout;
+	QAction *aCloseMostRecentZoneView;
 private slots:
 public:
 	TabGame(Client *_client, int _gameId);
+	void retranslateUi();
 	void processGameEvent(GameEvent *event);
 };
 

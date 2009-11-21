@@ -177,9 +177,8 @@ void TabDeckStorage::actUpload()
 		curRight = curRight->parent();
 	if (curRight)
 		targetPath = curRight->data(0, Qt::UserRole).toString();
-	qDebug() << "targetPath:" << targetPath;
 
-	Command_DeckUpload *command = new Command_DeckUpload(-1, deck, targetPath);
+	Command_DeckUpload *command = new Command_DeckUpload(deck, targetPath);
 	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(uploadFinished(ProtocolResponse *)));
 	client->sendCommand(command);
 }
@@ -190,6 +189,7 @@ void TabDeckStorage::uploadFinished(ProtocolResponse *r)
 	if (!resp)
 		return;
 	Command_DeckUpload *cmd = static_cast<Command_DeckUpload *>(sender());
+	delete cmd->getDeck();
 
 	QTreeWidgetItemIterator it(serverDirView);
 	while (*it) {
@@ -264,7 +264,6 @@ void TabDeckStorage::newFolderFinished(ResponseCode resp)
 	QTreeWidgetItemIterator it(serverDirView);
 	while (*it) {
 		if ((*it)->data(0, Qt::UserRole) == cmd->getPath()) {
-			qDebug() << "gefunden";
 			QFileIconProvider fip;
 			QTreeWidgetItem *newItem = new QTreeWidgetItem(TWIFolderType);
 			newItem->setIcon(0, fip.icon(QFileIconProvider::Folder));
@@ -272,8 +271,7 @@ void TabDeckStorage::newFolderFinished(ResponseCode resp)
 			newItem->setData(0, Qt::UserRole, cmd->getPath() + "/" + cmd->getDirName());
 			(*it)->addChild(newItem);
 			break;
-		} else
-			qDebug() << "path = " << (*it)->data(0, Qt::UserRole) << " nicht gefunden";
+		}
 		++it;
 	}
 }
