@@ -14,6 +14,7 @@
 #include "decklist.h"
 #include "deck_picturecacher.h"
 #include "protocol_items.h"
+#include "dlg_load_remote_deck.h"
 #include "main.h"
 
 TabGame::TabGame(Client *_client, int _gameId)
@@ -26,10 +27,12 @@ TabGame::TabGame(Client *_client, int _gameId)
 	
 	loadLocalButton = new QPushButton;
 	loadRemoteButton = new QPushButton;
+	readyStartButton = new QPushButton;
 	
 	QHBoxLayout *buttonHBox = new QHBoxLayout;
 	buttonHBox->addWidget(loadLocalButton);
 	buttonHBox->addWidget(loadRemoteButton);
+	buttonHBox->addWidget(readyStartButton);
 	buttonHBox->addStretch();
 	deckView = new DeckView;
 	QVBoxLayout *deckViewLayout = new QVBoxLayout;
@@ -66,6 +69,7 @@ TabGame::TabGame(Client *_client, int _gameId)
 	
 	connect(loadLocalButton, SIGNAL(clicked()), this, SLOT(loadLocalDeck()));
 	connect(loadRemoteButton, SIGNAL(clicked()), this, SLOT(loadRemoteDeck()));
+	connect(readyStartButton, SIGNAL(clicked()), this, SLOT(readyStart()));
 	
 	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(actSay()));
 
@@ -93,6 +97,7 @@ void TabGame::retranslateUi()
 {
 	loadLocalButton->setText(tr("Load &local deck"));
 	loadRemoteButton->setText(tr("Load deck from &server"));
+	readyStartButton->setText(tr("&Start game"));
 	sayLabel->setText(tr("&Say:"));
 	cardInfo->retranslateUi();
 //	if (game)
@@ -132,7 +137,12 @@ void TabGame::loadLocalDeck()
 
 void TabGame::loadRemoteDeck()
 {
-	
+	DlgLoadRemoteDeck dlg(client);
+	if (dlg.exec()) {
+		Command_DeckSelect *cmd = new Command_DeckSelect(gameId, 0, dlg.getDeckId());
+		connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(deckSelectFinished(ProtocolResponse *)));
+		client->sendCommand(cmd);
+	}
 }
 
 void TabGame::deckSelectFinished(ProtocolResponse *r)
@@ -145,4 +155,9 @@ void TabGame::deckSelectFinished(ProtocolResponse *r)
 	
 	Deck_PictureCacher::cachePictures(resp->getDeck(), this);
 	deckView->setDeck(resp->getDeck());
+}
+
+void TabGame::readyStart()
+{
+	client->sendCommand(new Command_ReadyStart(gameId));
 }

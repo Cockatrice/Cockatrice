@@ -25,7 +25,7 @@ HEADERS += src/counter.h \
  src/gameview.h \
  src/deck_picturecacher.h \
  src/decklistmodel.h \
- src/dlg_startgame.h \
+ src/dlg_load_remote_deck.h \
  src/cardinfowidget.h \
  src/messagelogwidget.h \
  src/zoneviewzone.h \
@@ -47,6 +47,7 @@ HEADERS += src/counter.h \
  src/tab_game.h \
  src/tab_deck_storage.h \
  src/tab_supervisor.h \
+ src/remotedecklist_treewidget.h \
  src/deckview.h \
  	../common/decklist.h \
 	../common/protocol.h \
@@ -72,7 +73,7 @@ SOURCES += src/counter.cpp \
  src/gameview.cpp \
  src/deck_picturecacher.cpp \
  src/decklistmodel.cpp \
- src/dlg_startgame.cpp \
+ src/dlg_load_remote_deck.cpp \
  src/cardinfowidget.cpp \
  src/messagelogwidget.cpp \
  src/zoneviewzone.cpp \
@@ -94,6 +95,7 @@ SOURCES += src/counter.cpp \
  src/tab_game.cpp \
  src/tab_deck_storage.cpp \
  src/tab_supervisor.cpp \
+ src/remotedecklist_treewidget.cpp \
  src/deckview.cpp \
  	../common/decklist.cpp \
 	../common/protocol.cpp \

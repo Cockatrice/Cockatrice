@@ -13,6 +13,7 @@ class QTreeWidget;
 class QTreeWidgetItem;
 class QGroupBox;
 class ProtocolResponse;
+class RemoteDeckList_TreeWidget;
 
 class TabDeckStorage : public QWidget {
 	Q_OBJECT
@@ -22,16 +23,11 @@ private:
 	QFileSystemModel *localDirModel;
 	QSortFilterProxyModel *sortFilter;
 	QToolBar *leftToolBar, *rightToolBar;
-	QTreeWidget *serverDirView;
+	RemoteDeckList_TreeWidget *serverDirView;
 	QGroupBox *leftGroupBox, *rightGroupBox;
 	
 	QAction *aUpload, *aDownload, *aNewFolder, *aDelete;
-	void addFileToTree(DeckList_File *file, QTreeWidgetItem *parent);
-	void populateDeckList(DeckList_Directory *folder, QTreeWidgetItem *parent);
-	void refreshServerList();
 private slots:
-	void deckListFinished(ProtocolResponse *r);
-
 	void actUpload();
 	void uploadFinished(ProtocolResponse *r);
 

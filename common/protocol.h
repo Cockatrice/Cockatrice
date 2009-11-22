@@ -257,7 +257,11 @@ public:
 	GameEvent(const QString &_eventName, int _gameId, int _playerId);
 	int getGameId() const { return gameId; }
 	int getPlayerId() const { return playerId; }
-	void setGameId(int _gameId) { gameId = _gameId; }
+	void setGameId(int _gameId)
+	{
+		gameId = _gameId;
+		setParameter("game_id", gameId);
+	}
 };
 
 class ChatEvent : public ProtocolItem {

@@ -11,7 +11,6 @@
 class GameScene;
 class Player;
 class CardDatabase;
-class DlgStartGame;
 class CardItem;
 class QMenuBar;
 class CardZone;
@@ -28,7 +27,6 @@ private:
 	QAction *aTap, *aUntap, *aDoesntUntap, *aFlip, *aAddCounter, *aRemoveCounter, *aSetCounters,
 		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile,
 		*aNextPhase, *aNextTurn, *aRemoveLocalArrows;
-	DlgStartGame *dlgStartGame;
 
 	Client *client;
 	GameScene *scene;

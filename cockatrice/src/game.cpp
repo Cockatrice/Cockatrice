@@ -8,7 +8,6 @@
 #include "tablezone.h"
 #include "handzone.h"
 #include "carddatabase.h"
-#include "dlg_startgame.h"
 #include "counter.h"
 #include "gamescene.h"
 #include "player.h"
@@ -80,10 +79,6 @@ Game::Game(Client *_client, GameScene *_scene, QMenuBar *menuBar, QObject *paren
 		connect(i.key(), SIGNAL(triggered()), this, SLOT(cardMenuAction()));
 	}
 
-	dlgStartGame = new DlgStartGame;
-	connect(dlgStartGame, SIGNAL(newDeckLoaded(const QStringList &)), client, SLOT(submitDeck(const QStringList &)));
-	connect(dlgStartGame, SIGNAL(finished(int)), this, SLOT(readyStart()));
-	
 	retranslateUi();
 }
 
@@ -259,7 +254,7 @@ void Game::readyStart()
 
 void Game::restartGameDialog()
 {
-	dlgStartGame->show();
+//	dlgStartGame->show();
 }
 /*
 void Game::gameEvent(const ServerEventData &msg)

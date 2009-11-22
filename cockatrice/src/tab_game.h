@@ -26,7 +26,7 @@ private:
 	Client *client;
 	int gameId;
 
-	QPushButton *loadLocalButton, *loadRemoteButton;
+	QPushButton *loadLocalButton, *loadRemoteButton, *readyStartButton;
 	CardInfoWidget *cardInfo;
 	MessageLogWidget *messageLog;
 	QLabel *sayLabel;
@@ -41,6 +41,7 @@ private:
 private slots:
 	void loadLocalDeck();
 	void loadRemoteDeck();
+	void readyStart();
 	void deckSelectFinished(ProtocolResponse *r);
 public:
 	TabGame(Client *_client, int _gameId);

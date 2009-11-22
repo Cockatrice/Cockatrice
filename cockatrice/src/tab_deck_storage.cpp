@@ -1,11 +1,10 @@
 #include <QtGui>
 #include <QDebug>
 #include "tab_deck_storage.h"
+#include "remotedecklist_treewidget.h"
 #include "client.h"
 #include "decklist.h"
 #include "protocol_items.h"
-
-enum { TWIFolderType = QTreeWidgetItem::UserType + 1, TWIDeckType = QTreeWidgetItem::UserType + 2 };
 
 TabDeckStorage::TabDeckStorage(Client *_client)
 	: QWidget(), client(_client)
@@ -47,9 +46,7 @@ TabDeckStorage::TabDeckStorage(Client *_client)
 	rightToolBarLayout->addWidget(rightToolBar);
 	rightToolBarLayout->addStretch();
 
-	serverDirView = new QTreeWidget;
-	serverDirView->header()->setResizeMode(QHeaderView::ResizeToContents);
-	serverDirView->setColumnCount(3);
+	serverDirView = new RemoteDeckList_TreeWidget(client);
 
 	QVBoxLayout *rightVbox = new QVBoxLayout;
 	rightVbox->addWidget(serverDirView);
@@ -81,8 +78,6 @@ TabDeckStorage::TabDeckStorage(Client *_client)
 	
 	retranslateUi();
 	setLayout(hbox);
-
-	refreshServerList();
 }
 
 void TabDeckStorage::retranslateUi()
@@ -94,71 +89,8 @@ void TabDeckStorage::retranslateUi()
 	aDownload->setText(tr("Download deck"));
 	aNewFolder->setText(tr("New folder"));
 	aDelete->setText(tr("Delete"));
-
-	QTreeWidgetItem *header = serverDirView->headerItem();
-	header->setText(0, tr("Name"));
-	header->setText(1, tr("ID"));
-	header->setText(2, tr("Upload time"));
-	header->setTextAlignment(1, Qt::AlignRight);
-}
-
-void TabDeckStorage::refreshServerList()
-{
-	Command_DeckList *command = new Command_DeckList;
-	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(deckListFinished(ProtocolResponse *)));
-	client->sendCommand(command);
-}
-
-void TabDeckStorage::addFileToTree(DeckList_File *file, QTreeWidgetItem *parent)
-{
-	QFileIconProvider fip;
-	QTreeWidgetItem *newDeck = new QTreeWidgetItem(TWIDeckType);
-	newDeck->setIcon(0, fip.icon(QFileIconProvider::File));
-	newDeck->setData(0, Qt::DisplayRole, file->getName());
-	newDeck->setData(1, Qt::DisplayRole, file->getId());
-	newDeck->setTextAlignment(1, Qt::AlignRight);
-	newDeck->setData(2, Qt::DisplayRole, file->getUploadTime());
-
-	parent->addChild(newDeck);
-}
-
-void TabDeckStorage::populateDeckList(DeckList_Directory *folder, QTreeWidgetItem *parent)
-{
-	QFileIconProvider fip;
-	QTreeWidgetItem *newItem = new QTreeWidgetItem(TWIFolderType);
-	newItem->setIcon(0, fip.icon(QFileIconProvider::Folder));
-	newItem->setText(0, parent ? folder->getName() : "/");
-	if (parent) {
-		parent->addChild(newItem);
-
-		QString path = parent->data(0, Qt::UserRole).toString();
-		if (path.isEmpty())
-			newItem->setData(0, Qt::UserRole, folder->getName());
-		else
-			newItem->setData(0, Qt::UserRole, path + "/" + folder->getName());
-	} else {
-		serverDirView->addTopLevelItem(newItem);
-		newItem->setData(0, Qt::UserRole, QString());
-	}
-
-	for (int i = 0; i < folder->size(); ++i) {
-		DeckList_Directory *subFolder = dynamic_cast<DeckList_Directory *>(folder->at(i));
-		if (subFolder)
-			populateDeckList(subFolder, newItem);
-		else
-			addFileToTree(dynamic_cast<DeckList_File *>(folder->at(i)), newItem);
-	}
-}
-
-void TabDeckStorage::deckListFinished(ProtocolResponse *r)
-{
-	Response_DeckList *resp = qobject_cast<Response_DeckList *>(r);
-	if (!resp)
-		return;
-
-	serverDirView->clear();
-	populateDeckList(resp->getRoot(), 0);
-	serverDirView->expandAll();
+	
+	serverDirView->retranslateUi();
 }
 
 void TabDeckStorage::actUpload()
@@ -194,7 +126,7 @@ void TabDeckStorage::uploadFinished(ProtocolResponse *r)
 	QTreeWidgetItemIterator it(serverDirView);
 	while (*it) {
 		if ((*it)->data(0, Qt::UserRole) == cmd->getPath()) {
-			addFileToTree(resp->getFile(), *it);
+			serverDirView->addFileToTree(resp->getFile(), *it);
 			break;
 		}
 		++it;
