@@ -26,34 +26,6 @@
 #include "window_deckeditor.h"
 #include "tab_supervisor.h"
 
-PingWidget::PingWidget(QWidget *parent)
-	: QWidget(parent)
-{
-	setPercentage(0, -1);
-}
-
-QSize PingWidget::sizeHint() const
-{
-	return QSize(15, 15);
-}
-
-void PingWidget::paintEvent(QPaintEvent */*event*/)
-{
-	QPainter painter(this);
-	QRadialGradient g(QPointF((double) width() / 2, (double) height() / 2), qMin(width(), height()) / 2.0);
-	g.setColorAt(0, color);
-	g.setColorAt(1, Qt::transparent);
-	painter.fillRect(0, 0, width(), height(), QBrush(g));
-}
-
-void PingWidget::setPercentage(int value, int max)
-{
-	if (max == -1)
-		color = Qt::black;
-	else
-		color.setHsv(120 * (1.0 - ((double) value / max)), 255, 255);
-	update();
-}
 /*
 void MainWindow::playerAdded(Player *player)
 {
@@ -75,7 +47,6 @@ void MainWindow::statusChanged(ClientStatus _status)
 //				delete game;
 //				game = 0;
 //			}
-//			pingWidget->setPercentage(0, -1);
 			aConnect->setEnabled(true);
 			aDisconnect->setEnabled(false);
 //			aRestartGame->setEnabled(false);

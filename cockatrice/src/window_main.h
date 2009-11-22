@@ -25,19 +25,6 @@
 
 class TabSupervisor;
 
-class PingWidget : public QWidget {
-	Q_OBJECT
-private:
-	QColor color;
-protected:
-	void paintEvent(QPaintEvent *event);
-public:
-	PingWidget(QWidget *parent = 0);
-	QSize sizeHint() const;
-public slots:
-	void setPercentage(int value, int max);
-};
-
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 private slots:
@@ -62,8 +49,6 @@ private:
 	QMenu *cockatriceMenu;
 	QAction *aConnect, *aDisconnect, *aDeckEditor, *aFullScreen, *aSettings, *aExit;
 	TabSupervisor *tabSupervisor;
-
-	PingWidget *pingWidget;
 
 	Client *client;
 public:

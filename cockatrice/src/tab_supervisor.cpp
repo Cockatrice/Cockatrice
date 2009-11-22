@@ -5,11 +5,12 @@
 #include "tab_game.h"
 #include "tab_deck_storage.h"
 #include "protocol_items.h"
+#include <QPainter>
 
 TabSupervisor::	TabSupervisor(QWidget *parent)
 	: QTabWidget(parent), client(0), tabServer(0), tabDeckStorage(0)
 {
-
+	setIconSize(QSize(15, 15));
 }
 
 void TabSupervisor::retranslateUi()
@@ -38,10 +39,12 @@ void TabSupervisor::start(Client *_client)
 	connect(client, SIGNAL(chatEventReceived(ChatEvent *)), this, SLOT(processChatEvent(ChatEvent *)));
 	connect(client, SIGNAL(gameEventReceived(GameEvent *)), this, SLOT(processGameEvent(GameEvent *)));
 	connect(client, SIGNAL(gameJoinedEventReceived(Event_GameJoined *)), this, SLOT(gameJoined(Event_GameJoined *)));
+	connect(client, SIGNAL(maxPingTime(int, int)), this, SLOT(updatePingTime(int, int)));
 
 	tabServer = new TabServer(client);
 	connect(tabServer, SIGNAL(chatChannelJoined(const QString &)), this, SLOT(addChatChannelTab(const QString &)));
 	addTab(tabServer, QString());
+	updatePingTime(0, -1);
 	
 	tabDeckStorage = new TabDeckStorage(client);
 	addTab(tabDeckStorage, QString());
@@ -73,6 +76,27 @@ void TabSupervisor::stop()
 	while (gameIterator.hasNext())
 		delete gameIterator.next().value();
 	gameTabs.clear();
+}
+
+void TabSupervisor::updatePingTime(int value, int max)
+{
+	if (!tabServer)
+		return;
+	QPixmap pixmap(15, 15);
+	pixmap.fill(Qt::transparent);
+	QPainter painter(&pixmap);
+	QColor color;
+	if (max == -1)
+		color = Qt::black;
+	else
+		color.setHsv(120 * (1.0 - ((double) value / max)), 255, 255);
+	
+	QRadialGradient g(QPointF((double) pixmap.width() / 2, (double) pixmap.height() / 2), qMin(pixmap.width(), pixmap.height()) / 2.0);
+	g.setColorAt(0, color);
+	g.setColorAt(1, Qt::transparent);
+	painter.fillRect(0, 0, pixmap.width(), pixmap.height(), QBrush(g));
+	
+	setTabIcon(0, QIcon(pixmap));
 }
 
 void TabSupervisor::gameJoined(Event_GameJoined *event)

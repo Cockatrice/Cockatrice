@@ -27,6 +27,7 @@ public:
 	void start(Client *_client);
 	void stop();
 private slots:
+	void updatePingTime(int value, int max);
 	void gameJoined(Event_GameJoined *event);
 	void addChatChannelTab(const QString &channelName);
 	void processChatEvent(ChatEvent *event);

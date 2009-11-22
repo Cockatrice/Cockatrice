@@ -73,8 +73,6 @@ TabGame::TabGame(Client *_client, int _gameId)
 	
 	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(actSay()));
 
-//	connect(client, SIGNAL(maxPingTime(int, int)), pingWidget, SLOT(setPercentage(int, int)));
-
 	connect(phasesToolbar, SIGNAL(signalSetPhase(int)), client, SLOT(setActivePhase(int)));
 	connect(phasesToolbar, SIGNAL(signalNextTurn()), client, SLOT(nextTurn()));
 	
