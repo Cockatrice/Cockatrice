@@ -315,29 +315,6 @@ void DeckListModel::cleanList()
 	reset();
 }
 
-void DeckListModel::cacheCardPicturesHelper(InnerDecklistNode *item, QProgressDialog *progress)
-{
-	for (int i = 0; i < item->size(); i++) {
-		DecklistCardNode *node = dynamic_cast<DecklistCardNode *>(item->at(i));
-		if (node) {
-			db->getCard(node->getName())->loadPixmap();
-			progress->setValue(progress->value() + 1);
-		} else
-			cacheCardPicturesHelper(dynamic_cast<InnerDecklistNode *>(item->at(i)), progress);
-	}
-}
-
-void DeckListModel::cacheCardPictures(QWidget *parent)
-{
-	int totalCards = deckList->getRoot()->recursiveCount();
-
-	QProgressDialog progress(tr("Caching card pictures..."), QString(), 0, totalCards, parent);
-	progress.setMinimumDuration(1000);
-	progress.setWindowModality(Qt::WindowModal);
-
-	cacheCardPicturesHelper(deckList->getRoot(), &progress);
-}
-
 void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
 {
 	static const int totalColumns = 3;

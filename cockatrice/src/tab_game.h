@@ -18,6 +18,7 @@ class QPushButton;
 class ZoneViewLayout;
 class ZoneViewWidget;
 class PhasesToolbar;
+class ProtocolResponse;
 
 class TabGame : public QWidget {
 	Q_OBJECT
@@ -25,6 +26,7 @@ private:
 	Client *client;
 	int gameId;
 
+	QPushButton *loadLocalButton, *loadRemoteButton;
 	CardInfoWidget *cardInfo;
 	MessageLogWidget *messageLog;
 	QLabel *sayLabel;
@@ -37,6 +39,9 @@ private:
 	ZoneViewLayout *zoneLayout;
 	QAction *aCloseMostRecentZoneView;
 private slots:
+	void loadLocalDeck();
+	void loadRemoteDeck();
+	void deckSelectFinished(ProtocolResponse *r);
 public:
 	TabGame(Client *_client, int _gameId);
 	void retranslateUi();

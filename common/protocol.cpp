@@ -141,7 +141,7 @@ void Command_DeckUpload::writeElement(QXmlStreamWriter *xml)
 }
 
 Command_DeckSelect::Command_DeckSelect(int _gameId, DeckList *_deck, int _deckId)
-	: GameCommand("deck_upload", _gameId), deck(_deck), deckId(_deckId), readFinished(false)
+	: GameCommand("deck_select", _gameId), deck(_deck), deckId(_deckId), readFinished(false)
 {
 	setParameter("deck_id", _deckId);
 }
@@ -297,11 +297,6 @@ void Response_DeckList::writeElement(QXmlStreamWriter *xml)
 Response_DeckDownload::Response_DeckDownload(int _cmdId, ResponseCode _responseCode, DeckList *_deck)
 	: ProtocolResponse(_cmdId, _responseCode, "deck_download"), deck(_deck), readFinished(false)
 {
-}
-
-Response_DeckDownload::~Response_DeckDownload()
-{
-	delete deck;
 }
 
 bool Response_DeckDownload::readElement(QXmlStreamReader *xml)

@@ -12,6 +12,8 @@
 #include "zoneviewlayout.h"
 #include "deckview.h"
 #include "decklist.h"
+#include "deck_picturecacher.h"
+#include "protocol_items.h"
 #include "main.h"
 
 TabGame::TabGame(Client *_client, int _gameId)
@@ -22,12 +24,17 @@ TabGame::TabGame(Client *_client, int _gameId)
 	gameView = new GameView(scene);
 	gameView->hide();
 	
-	deckView = new DeckView;
+	loadLocalButton = new QPushButton;
+	loadRemoteButton = new QPushButton;
 	
-	DeckList *foo = new DeckList;
-	foo->loadFromFile("/home/brukie/cockatrice/decks/adfb.cod", DeckList::CockatriceFormat);
-	deckView->setDeck(foo);
-//	deckView->hide();
+	QHBoxLayout *buttonHBox = new QHBoxLayout;
+	buttonHBox->addWidget(loadLocalButton);
+	buttonHBox->addWidget(loadRemoteButton);
+	buttonHBox->addStretch();
+	deckView = new DeckView;
+	QVBoxLayout *deckViewLayout = new QVBoxLayout;
+	deckViewLayout->addLayout(buttonHBox);
+	deckViewLayout->addWidget(deckView);
 
 	cardInfo = new CardInfoWidget(db);
 	messageLog = new MessageLogWidget;
@@ -50,12 +57,15 @@ TabGame::TabGame(Client *_client, int _gameId)
 	QHBoxLayout *mainLayout = new QHBoxLayout;
 	mainLayout->addWidget(phasesToolbar);
 	mainLayout->addWidget(gameView, 10);
-	mainLayout->addWidget(deckView, 10);
+	mainLayout->addLayout(deckViewLayout, 10);
 	mainLayout->addLayout(verticalLayout);
 
 	aCloseMostRecentZoneView = new QAction(this);
 	connect(aCloseMostRecentZoneView, SIGNAL(triggered()), zoneLayout, SLOT(closeMostRecentZoneView()));
 	addAction(aCloseMostRecentZoneView);
+	
+	connect(loadLocalButton, SIGNAL(clicked()), this, SLOT(loadLocalDeck()));
+	connect(loadRemoteButton, SIGNAL(clicked()), this, SLOT(loadRemoteDeck()));
 	
 	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(actSay()));
 
@@ -81,6 +91,8 @@ TabGame::TabGame(Client *_client, int _gameId)
 
 void TabGame::retranslateUi()
 {
+	loadLocalButton->setText(tr("Load &local deck"));
+	loadRemoteButton->setText(tr("Load deck from &server"));
 	sayLabel->setText(tr("&Say:"));
 	cardInfo->retranslateUi();
 //	if (game)
@@ -93,4 +105,44 @@ void TabGame::retranslateUi()
 void TabGame::processGameEvent(GameEvent *event)
 {
 //	game->processGameEvent(event);
+}
+
+void TabGame::loadLocalDeck()
+{
+	QFileDialog dialog(this, tr("Load deck"));
+	QSettings settings;
+	dialog.setDirectory(settings.value("paths/decks").toString());
+	dialog.setNameFilters(DeckList::fileNameFilters);
+	if (!dialog.exec())
+		return;
+
+	QString fileName = dialog.selectedFiles().at(0);
+	DeckList::FileFormat fmt = DeckList::getFormatFromNameFilter(dialog.selectedNameFilter());
+	DeckList *deck = new DeckList;
+	if (!deck->loadFromFile(fileName, fmt)) {
+		delete deck;
+		// Error message
+		return;
+	}
+	
+	Command_DeckSelect *cmd = new Command_DeckSelect(gameId, deck, -1);
+	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(deckSelectFinished(ProtocolResponse *)));
+	client->sendCommand(cmd);
+}
+
+void TabGame::loadRemoteDeck()
+{
+	
+}
+
+void TabGame::deckSelectFinished(ProtocolResponse *r)
+{
+	Response_DeckDownload *resp = qobject_cast<Response_DeckDownload *>(r);
+	if (!resp)
+		return;
+	Command_DeckSelect *cmd = static_cast<Command_DeckSelect *>(sender());
+	delete cmd->getDeck();
+	
+	Deck_PictureCacher::cachePictures(resp->getDeck(), this);
+	deckView->setDeck(resp->getDeck());
 }

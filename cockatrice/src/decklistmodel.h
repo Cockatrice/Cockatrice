@@ -44,7 +44,6 @@ public:
 	void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
 	void cleanList();
 	DeckList *getDeckList() const { return deckList; }
-	void cacheCardPictures(QWidget *parent = 0);
 private:
 	DeckList *deckList;
 	InnerDecklistNode *root;
@@ -55,7 +54,6 @@ private:
 	void debugIndexInfo(const QString &func, const QModelIndex &index) const;
 	void debugShowTree(InnerDecklistNode *node, int depth) const;
 
-	void cacheCardPicturesHelper(InnerDecklistNode *item, QProgressDialog *progress);
 	void printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node);
 
 	template<typename T> T getNode(const QModelIndex &index) const

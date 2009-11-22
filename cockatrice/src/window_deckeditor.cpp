@@ -5,6 +5,7 @@
 #include "carddatabasemodel.h"
 #include "decklistmodel.h"
 #include "cardinfowidget.h"
+#include "deck_picturecacher.h"
 #include "main.h"
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
@@ -13,11 +14,6 @@ void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 		QCoreApplication::sendEvent(treeView, event);
 	QLineEdit::keyPressEvent(event);
 }
-
-const QStringList WndDeckEditor::fileNameFilters = QStringList()
-	<< QObject::tr("Cockatrice decks (*.cod)")
-	<< QObject::tr("Plain text decks (*.dec *.mwDeck)")
-	<< QObject::tr("All files (*.*)");
 
 WndDeckEditor::WndDeckEditor(QWidget *parent)
 	: QMainWindow(parent)
@@ -245,18 +241,12 @@ void WndDeckEditor::actLoadDeck()
 	QFileDialog dialog(this, tr("Load deck"));
 	QSettings settings;
 	dialog.setDirectory(settings.value("paths/decks").toString());
-	dialog.setNameFilters(fileNameFilters);
+	dialog.setNameFilters(DeckList::fileNameFilters);
 	if (!dialog.exec())
 		return;
 
 	QString fileName = dialog.selectedFiles().at(0);
-	DeckList::FileFormat fmt;
-	switch (fileNameFilters.indexOf(dialog.selectedNameFilter())) {
-		case 0: fmt = DeckList::CockatriceFormat; break;
-		case 1: fmt = DeckList::PlainTextFormat; break;
-		default: fmt = DeckList::PlainTextFormat; break;
-	}
-
+	DeckList::FileFormat fmt = DeckList::getFormatFromNameFilter(dialog.selectedNameFilter());
 	DeckList *l = deckModel->getDeckList();
 	if (l->loadFromFile(fileName, fmt)) {
 		lastFileName = fileName;
@@ -268,7 +258,7 @@ void WndDeckEditor::actLoadDeck()
 		deckView->resizeColumnToContents(0);
 		setWindowModified(false);
 		
-		deckModel->cacheCardPictures(this);
+		Deck_PictureCacher::cachePictures(l, this);
 	}
 }
 
@@ -291,17 +281,12 @@ bool WndDeckEditor::actSaveDeckAs()
 	dialog.setAcceptMode(QFileDialog::AcceptSave);
 	dialog.setConfirmOverwrite(true);
 	dialog.setDefaultSuffix("cod");
-	dialog.setNameFilters(fileNameFilters);
+	dialog.setNameFilters(DeckList::fileNameFilters);
 	if (!dialog.exec())
 		return false;
 
 	QString fileName = dialog.selectedFiles().at(0);
-	DeckList::FileFormat fmt;
-	switch (fileNameFilters.indexOf(dialog.selectedNameFilter())) {
-		case 0: fmt = DeckList::CockatriceFormat; break;
-		case 1: fmt = DeckList::PlainTextFormat; break;
-		default: fmt = DeckList::PlainTextFormat; break;
-	}
+	DeckList::FileFormat fmt = DeckList::getFormatFromNameFilter(dialog.selectedNameFilter());
 
 	if (deckModel->getDeckList()->saveToFile(fileName, fmt)) {
 		lastFileName = fileName;

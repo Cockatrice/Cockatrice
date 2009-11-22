@@ -37,7 +37,6 @@ private:
 	bool started;
 	int currentPhase;
 	
-	Player *getActiveLocalPlayer() const;
 public slots:
 	void activePlayerDrawCard();
 	void activePlayerUntapAll();
@@ -107,6 +106,7 @@ public:
 	void restartGameDialog();
 	void hoverCardEvent(CardItem *card);
 	Player *addPlayer(int playerId, const QString &playerName, bool local);
+	Player *getActiveLocalPlayer() const;
 	const QMap<int, Player *> &getPlayers() const { return players; }
 	void queryGameState();
 };

@@ -95,6 +95,7 @@ public slots:
 	void setName(const QString &_name = QString()) { name = _name; }
 	void setComments(const QString &_comments = QString()) { comments = _comments; }
 public:
+	static const QStringList fileNameFilters;
 	DeckList(QObject *parent = 0);
 	~DeckList();
 	QString getName() const { return name; }
@@ -112,8 +113,7 @@ public:
 	bool saveToFile_Plain(QIODevice *device);
 	bool loadFromFile(const QString &fileName, FileFormat fmt);
 	bool saveToFile(const QString &fileName, FileFormat fmt);
-	bool loadDialog(QWidget *parent = 0);
-	bool saveDialog(QWidget *parent = 0);
+	static FileFormat getFormatFromNameFilter(const QString &selectedNameFilter);
 
 	void cleanList();
 

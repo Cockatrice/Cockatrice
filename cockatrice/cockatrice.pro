@@ -23,6 +23,7 @@ HEADERS += src/counter.h \
  src/game.h \
  src/carddatabase.h \
  src/gameview.h \
+ src/deck_picturecacher.h \
  src/decklistmodel.h \
  src/dlg_startgame.h \
  src/cardinfowidget.h \
@@ -69,6 +70,7 @@ SOURCES += src/counter.cpp \
  src/game.cpp \
  src/carddatabase.cpp \
  src/gameview.cpp \
+ src/deck_picturecacher.cpp \
  src/decklistmodel.cpp \
  src/dlg_startgame.cpp \
  src/cardinfowidget.cpp \

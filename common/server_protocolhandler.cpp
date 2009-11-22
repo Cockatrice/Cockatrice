@@ -263,7 +263,8 @@ ResponseCode Server_ProtocolHandler::cmdDeckSelect(Command_DeckSelect *cmd, Serv
 	
 	game->sendGameEvent(new Event_DeckSelect(-1, player->getPlayerId(), cmd->getDeckId()));
 	
-	return RespOk;
+	sendProtocolItem(new Response_DeckDownload(cmd->getCmdId(), RespOk, deck));
+	return RespNothing;
 }
 
 ResponseCode Server_ProtocolHandler::cmdSay(Command_Say *cmd, Server_Game *game, Server_Player *player)

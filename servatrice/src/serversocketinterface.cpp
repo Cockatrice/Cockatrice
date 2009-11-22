@@ -316,5 +316,6 @@ ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd)
 		return r;
 	}
 	sendProtocolItem(new Response_DeckDownload(cmd->getCmdId(), RespOk, deck));
+	delete deck;
 	return RespNothing;
 }

@@ -212,7 +212,6 @@ protected:
 	void writeElement(QXmlStreamWriter *xml);
 public:
 	Response_DeckDownload(int _cmdId = -1, ResponseCode _responseCode = RespOk, DeckList *_deck = 0);
-	~Response_DeckDownload();
 	int getItemId() const { return ItemId_Response_DeckDownload; }
 	static ProtocolItem *newItem() { return new Response_DeckDownload; }
 	DeckList *getDeck() const { return deck; }
