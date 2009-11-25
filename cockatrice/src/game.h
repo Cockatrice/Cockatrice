@@ -103,7 +103,6 @@ public:
 	void retranslateUi();
 	void restartGameDialog();
 	void hoverCardEvent(CardItem *card);
-	Player *addPlayer(int playerId, const QString &playerName, bool local);
 	Player *getActiveLocalPlayer() const;
 	const QMap<int, Player *> &getPlayers() const { return players; }
 	void queryGameState();

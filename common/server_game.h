@@ -65,6 +65,7 @@ public:
 	void setActivePlayer(int _activePlayer);
 	void setActivePhase(int _activePhase);
 
+	QList<ServerInfo_Player *> getGameState() const;
 	void sendGameEvent(GameEvent *event);
 };
 

@@ -99,7 +99,8 @@ SOURCES += src/counter.cpp \
  src/deckview.cpp \
  	../common/decklist.cpp \
 	../common/protocol.cpp \
-	../common/protocol_items.cpp
+	../common/protocol_items.cpp \
+	../common/protocol_datastructures.cpp
  
 TRANSLATIONS += translations/cockatrice_de.ts translations/cockatrice_en.ts
 CONFIG += qt debug

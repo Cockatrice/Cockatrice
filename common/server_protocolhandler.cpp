@@ -220,7 +220,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd)
 	Server_Game *game = server->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), cmd->getSpectatorsAllowed(), this);
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, game->getCreator()));
 	
-	enqueueProtocolItem(new Event_GameJoined(game->getGameId(), false));
+	enqueueProtocolItem(new Event_GameJoined(game->getGameId(), game->getCreator()->getPlayerId(), false, game->getGameState()));
 	return RespOk;
 }
 
@@ -234,8 +234,8 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd)
 	if (result == RespOk) {
 		Server_Player *player = g->addPlayer(this, cmd->getSpectator());
 		games.insert(cmd->getGameId(), QPair<Server_Game *, Server_Player *>(g, player));
+		enqueueProtocolItem(new Event_GameJoined(cmd->getGameId(), player->getPlayerId(), cmd->getSpectator(), g->getGameState()));
 	}
-	enqueueProtocolItem(new Event_GameJoined(cmd->getGameId(), cmd->getSpectator()));
 	return result;
 }
 
@@ -326,13 +326,13 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, Server_G
 
 	targetzone->insertCard(card, x, y);
 
-	bool targetBeingLookedAt = (targetzone->getType() != Server_CardZone::HiddenZone) || (targetzone->getCardsBeingLookedAt() > x) || (targetzone->getCardsBeingLookedAt() == -1);
-	bool sourceBeingLookedAt = (startzone->getType() != Server_CardZone::HiddenZone) || (startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1);
+	bool targetBeingLookedAt = (targetzone->getType() != HiddenZone) || (targetzone->getCardsBeingLookedAt() > x) || (targetzone->getCardsBeingLookedAt() == -1);
+	bool sourceBeingLookedAt = (startzone->getType() != HiddenZone) || (startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1);
 
 	bool targetHiddenToPlayer = facedown || !targetBeingLookedAt;
-	bool targetHiddenToOthers = facedown || (targetzone->getType() != Server_CardZone::PublicZone);
+	bool targetHiddenToOthers = facedown || (targetzone->getType() != PublicZone);
 	bool sourceHiddenToPlayer = card->getFaceDown() || !sourceBeingLookedAt;
-	bool sourceHiddenToOthers = card->getFaceDown() || (startzone->getType() != Server_CardZone::PublicZone);
+	bool sourceHiddenToOthers = card->getFaceDown() || (startzone->getType() != PublicZone);
 	
 	QString privateCardName, publicCardName;
 	if (!(sourceHiddenToPlayer && targetHiddenToPlayer))
@@ -363,9 +363,9 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, Server_G
 	// Other players do not get to see the start and/or target position of the card if the respective
 	// part of the zone is being looked at. The information is not needed anyway because in hidden zones,
 	// all cards are equal.
-	if ((startzone->getType() == Server_CardZone::HiddenZone) && ((startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1)))
+	if ((startzone->getType() == HiddenZone) && ((startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1)))
 		position = -1;
-	if ((targetzone->getType() == Server_CardZone::HiddenZone) && ((targetzone->getCardsBeingLookedAt() > x) || (targetzone->getCardsBeingLookedAt() == -1)))
+	if ((targetzone->getType() == HiddenZone) && ((targetzone->getCardsBeingLookedAt() > x) || (targetzone->getCardsBeingLookedAt() == -1)))
 		x = -1;
 	
 /*	if ((startzone->getType() == Server_CardZone::PublicZone) || (targetzone->getType() == Server_CardZone::PublicZone))
@@ -565,10 +565,10 @@ ResponseCode Server_ProtocolHandler::cmdDumpZone(Command_DumpZone *cmd, Server_G
 	Server_CardZone *zone = otherPlayer->getZones().value(cmd->getZoneName());
 	if (!zone)
 		return RespNameNotFound;
-	if (!((zone->getType() == Server_CardZone::PublicZone) || (player == otherPlayer)))
+	if (!((zone->getType() == PublicZone) || (player == otherPlayer)))
 		return RespContextError;
 	
-	if (zone->getType() == Server_CardZone::HiddenZone) {
+	if (zone->getType() == HiddenZone) {
 //		game->broadcastEvent(QString("dump_zone|%1|%2|%3").arg(player_id).arg(zone->getName()).arg(number_cards), player);
 	}
 //	remsg->sendList(dumpZoneHelper(otherPlayer, zone, number_cards));
@@ -584,7 +584,7 @@ ResponseCode Server_ProtocolHandler::cmdStopDumpZone(Command_StopDumpZone *cmd, 
 	if (!zone)
 		return RespNameNotFound;
 	
-	if (zone->getType() == Server_CardZone::HiddenZone) {
+	if (zone->getType() == HiddenZone) {
 		zone->setCardsBeingLookedAt(0);
 		game->sendGameEvent(new Event_StopDumpZone(-1, player->getPlayerId(), cmd->getPlayerId(), zone->getName()));
 	}

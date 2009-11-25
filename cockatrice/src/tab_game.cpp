@@ -18,7 +18,7 @@
 #include "main.h"
 
 TabGame::TabGame(Client *_client, int _gameId)
-	: client(_client), gameId(_gameId)
+	: client(_client), gameId(_gameId), localPlayerId(-1)
 {
 	zoneLayout = new ZoneViewLayout;
 	scene = new GameScene(zoneLayout, this);
@@ -38,6 +38,8 @@ TabGame::TabGame(Client *_client, int _gameId)
 	QVBoxLayout *deckViewLayout = new QVBoxLayout;
 	deckViewLayout->addLayout(buttonHBox);
 	deckViewLayout->addWidget(deckView);
+	deckViewContainer = new QWidget;
+	deckViewContainer->setLayout(deckViewLayout);
 
 	cardInfo = new CardInfoWidget(db);
 	messageLog = new MessageLogWidget;
@@ -60,7 +62,7 @@ TabGame::TabGame(Client *_client, int _gameId)
 	QHBoxLayout *mainLayout = new QHBoxLayout;
 	mainLayout->addWidget(phasesToolbar);
 	mainLayout->addWidget(gameView, 10);
-	mainLayout->addLayout(deckViewLayout, 10);
+	mainLayout->addWidget(deckViewContainer, 10);
 	mainLayout->addLayout(verticalLayout);
 
 	aCloseMostRecentZoneView = new QAction(this);
@@ -105,9 +107,44 @@ void TabGame::retranslateUi()
 	aCloseMostRecentZoneView->setShortcut(tr("Esc"));
 }
 
+Player *TabGame::addPlayer(int playerId, const QString &playerName)
+{
+	Player *newPlayer = new Player(playerName, playerId, playerId == localPlayerId, client, this);
+	scene->addPlayer(newPlayer);
+
+	messageLog->connectToPlayer(newPlayer);
+
+	players.insert(playerId, newPlayer);
+	emit playerAdded(newPlayer);
+
+	return newPlayer;
+}
+
 void TabGame::processGameEvent(GameEvent *event)
 {
-//	game->processGameEvent(event);
+	switch (event->getItemId()) {
+		case ItemId_Event_GameStart: eventGameStart(qobject_cast<Event_GameStart *>(event)); break;
+		default: qDebug() << "unhandled game event";
+	}
+}
+
+void TabGame::processGameJoinedEvent(Event_GameJoined *event)
+{
+	localPlayerId = event->getPlayerId();
+	spectator = event->getSpectator();
+
+	const QList<ServerInfo_Player *> &plList = event->getPlayerList();
+	for (int i = 0; i < plList.size(); ++i) {
+		ServerInfo_Player *pl = plList[i];
+		Player *newPlayer = addPlayer(pl->getPlayerId(), pl->getName());
+		newPlayer->processPlayerInfo(pl);
+	}
+}
+
+void TabGame::eventGameStart(Event_GameStart *event)
+{
+	deckViewContainer->hide();
+	gameView->show();
 }
 
 void TabGame::loadLocalDeck()

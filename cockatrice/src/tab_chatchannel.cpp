@@ -51,7 +51,7 @@ void TabChatChannel::processChatEvent(ChatEvent *event)
 
 void TabChatChannel::processListPlayersEvent(Event_ChatListPlayers *event)
 {
-	const QList<ServerPlayerInfo> &players = event->getPlayerList();
+	const QList<ServerChatUserInfo> &players = event->getPlayerList();
 	for (int i = 0; i < players.size(); ++i)
 		playerList->addItem(players[i].getName());
 }

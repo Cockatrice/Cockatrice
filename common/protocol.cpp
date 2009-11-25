@@ -76,6 +76,7 @@ void ProtocolItem::initializeHash()
 	
 	itemNameHash.insert("generic_eventlist_games", Event_ListGames::newItem);
 	itemNameHash.insert("generic_eventlist_chat_channels", Event_ListChatChannels::newItem);
+	itemNameHash.insert("generic_eventgame_joined", Event_GameJoined::newItem);
 	itemNameHash.insert("chat_eventchat_list_players", Event_ChatListPlayers::newItem);
 }
 
@@ -208,57 +209,6 @@ void ProtocolResponse::initializeHash()
 	responseHash.insert("context_error", RespContextError);
 	responseHash.insert("wrong_password", RespWrongPassword);
 	responseHash.insert("spectators_not_allowed", RespSpectatorsNotAllowed);
-}
-
-bool DeckList_File::readElement(QXmlStreamReader *xml)
-{
-	if (xml->isEndElement())
-		return true;
-	else
-		return false;
-}
-
-void DeckList_File::writeElement(QXmlStreamWriter *xml)
-{
-	xml->writeStartElement("file");
-	xml->writeAttribute("name", name);
-	xml->writeAttribute("id", QString::number(id));
-	xml->writeAttribute("upload_time", QString::number(uploadTime.toTime_t()));
-	xml->writeEndElement();
-}
-
-DeckList_Directory::~DeckList_Directory()
-{
-	for (int i = 0; i < size(); ++i)
-		delete at(i);
-}
-
-bool DeckList_Directory::readElement(QXmlStreamReader *xml)
-{
-	if (currentItem) {
-		if (currentItem->readElement(xml))
-			currentItem = 0;
-		return false;
-	}
-	if (xml->isStartElement() && (xml->name() == "directory")) {
-		currentItem = new DeckList_Directory(xml->attributes().value("name").toString());
-		append(currentItem);
-	} else if (xml->isStartElement() && (xml->name() == "file")) {
-		currentItem = new DeckList_File(xml->attributes().value("name").toString(), xml->attributes().value("id").toString().toInt(), QDateTime::fromTime_t(xml->attributes().value("upload_time").toString().toUInt()));
-		append(currentItem);
-	} else if (xml->isEndElement() && (xml->name() == "directory"))
-		return true;
-	
-	return false;
-}
-
-void DeckList_Directory::writeElement(QXmlStreamWriter *xml)
-{
-	xml->writeStartElement("directory");
-	xml->writeAttribute("name", name);
-	for (int i = 0; i < size(); ++i)
-		at(i)->writeElement(xml);
-	xml->writeEndElement();
 }
 
 Response_DeckList::Response_DeckList(int _cmdId, ResponseCode _responseCode, DeckList_Directory *_root)
@@ -420,7 +370,7 @@ void Event_ListChatChannels::writeElement(QXmlStreamWriter *xml)
 bool Event_ChatListPlayers::readElement(QXmlStreamReader *xml)
 {
 	if (xml->isStartElement() && ((xml->name() == "player"))) {
-		playerList.append(ServerPlayerInfo(
+		playerList.append(ServerChatUserInfo(
 			xml->attributes().value("name").toString()
 		));
 		return true;
@@ -469,4 +419,51 @@ void Event_ListGames::writeElement(QXmlStreamWriter *xml)
 		xml->writeAttribute("spectator_count", QString::number(gameList[i].getSpectatorCount()));
 		xml->writeEndElement();
 	}
+}
+
+Event_GameJoined::Event_GameJoined(int _gameId, int _playerId, bool _spectator, const QList<ServerInfo_Player *> &_playerList)
+	: GenericEvent("game_joined"), currentItem(0), readFinished(false), gameId(_gameId), playerId(_playerId), spectator(_spectator), playerList(_playerList)
+{
+	setParameter("game_id", gameId);
+	setParameter("player_id", playerId);
+	setParameter("spectator", spectator);
+}
+
+Event_GameJoined::~Event_GameJoined()
+{
+	for (int i = 0; i < playerList.size(); ++i)
+		delete playerList[i];
+}
+
+void Event_GameJoined::extractParameters()
+{
+	GenericEvent::extractParameters();
+	gameId = parameters["game_id"].toInt();
+	playerId = parameters["player_id"].toInt();
+	spectator = (parameters["spectator"] == "1");
+}
+
+bool Event_GameJoined::readElement(QXmlStreamReader *xml)
+{
+	if (currentItem) {
+		if (currentItem->readElement(xml))
+			currentItem = 0;
+		return true;
+	}
+	if (xml->isStartElement() && (xml->name() == "player")) {
+		ServerInfo_Player *player = new ServerInfo_Player;
+		playerList.append(player);
+		currentItem = player;
+	} else
+		return false;
+	if (currentItem)
+		if (currentItem->readElement(xml))
+			currentItem = 0;
+	return true;
+}
+
+void Event_GameJoined::writeElement(QXmlStreamWriter *xml)
+{
+	for (int i = 0; i < playerList.size(); ++i)
+		playerList[i]->writeElement(xml);
 }

@@ -22,21 +22,12 @@
 
 #include <QList>
 #include <QString>
+#include "protocol_datastructures.h"
 
 class Server_Card;
 class Server_Player;
 
 class Server_CardZone {
-public:
-	// PrivateZone: Contents of the zone are always visible to the owner,
-	// but not to anyone else.
-	// PublicZone: Contents of the zone are always visible to anyone.
-	// HiddenZone: Contents of the zone are never visible to anyone.
-	// However, the owner of the zone can issue a dump_zone command,
-	// setting beingLookedAt to true.
-	// Cards in a zone with the type HiddenZone are referenced by their
-	// list index, whereas cards in any other zone are referenced by their ids.
-	enum ZoneType { PrivateZone, PublicZone, HiddenZone };
 private:
 	Server_Player *player;
 	QString name;

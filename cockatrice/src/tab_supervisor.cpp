@@ -104,6 +104,8 @@ void TabSupervisor::gameJoined(Event_GameJoined *event)
 	TabGame *tab = new TabGame(client, event->getGameId());
 	addTab(tab, tr("Game %1").arg(event->getGameId()));
 	gameTabs.insert(event->getGameId(), tab);
+	tab->processGameJoinedEvent(event);
+	setCurrentWidget(tab);
 }
 
 void TabSupervisor::addChatChannelTab(const QString &channelName)
@@ -111,6 +113,7 @@ void TabSupervisor::addChatChannelTab(const QString &channelName)
 	TabChatChannel *tab = new TabChatChannel(client, channelName);
 	addTab(tab, channelName);
 	chatChannelTabs.insert(channelName, tab);
+	setCurrentWidget(tab);
 }
 
 void TabSupervisor::processChatEvent(ChatEvent *event)

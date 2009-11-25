@@ -12,12 +12,13 @@ class CardDatabase;
 class QMenu;
 class QAction;
 class ZoneViewZone;
-class Game;
+class TabGame;
 class Counter;
 class ArrowItem;
 class CardZone;
 class TableZone;
 class HandZone;
+class ServerInfo_Player;
 
 class Player : public QObject, public QGraphicsItem {
 	Q_OBJECT
@@ -103,7 +104,7 @@ public:
 
 	Client *client;
 	void addZone(CardZone *z);
-	Player(const QString &_name, int _id, bool _local, Client *_client, Game *_parent);
+	Player(const QString &_name, int _id, bool _local, Client *_client, TabGame *_parent);
 	~Player();
 	void retranslateUi();
 	QMenu *getPlayerMenu() const { return playerMenu; }
@@ -117,6 +118,8 @@ public:
 	void showCardMenu(const QPoint &p);
 	bool getActive() const { return active; }
 	void setActive(bool _active);
+
+	void processPlayerInfo(ServerInfo_Player *info);
 };
 
 #endif

@@ -55,7 +55,6 @@
 3:dump_zone:i,zone_owner_id:s,zone:i,number_cards
 3:stop_dump_zone:i,zone_owner_id:s,zone
 4:server_message:s,message
-4:game_joined:i,game_id:b,spectator
 5:chat_join_channel:s,player_name
 5:chat_leave_channel:s,player_name
 5:chat_say:s,player_name:s,message

@@ -128,25 +128,6 @@ void Game::retranslateUi()
 		i.next().value()->retranslateUi();
 }
 
-Player *Game::addPlayer(int playerId, const QString &playerName, bool local)
-{
-	Player *newPlayer = new Player(playerName, playerId, local, client, this);
-	scene->addPlayer(newPlayer);
-
-	connect(newPlayer, SIGNAL(sigShowCardMenu(QPoint)), this, SLOT(showCardMenu(QPoint)));
-	connect(newPlayer, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)), this, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)));
-	connect(newPlayer, SIGNAL(logCreateToken(Player *, QString)), this, SIGNAL(logCreateToken(Player *, QString)));
-	connect(newPlayer, SIGNAL(logSetCardCounters(Player *, QString, int, int)), this, SIGNAL(logSetCardCounters(Player *, QString, int, int)));
-	connect(newPlayer, SIGNAL(logSetTapped(Player *, QString, bool)), this, SIGNAL(logSetTapped(Player *, QString, bool)));
-	connect(newPlayer, SIGNAL(logSetCounter(Player *, QString, int, int)), this, SIGNAL(logSetCounter(Player *, QString, int, int)));
-	connect(newPlayer, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString)), this, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString)));
-	connect(newPlayer, SIGNAL(logSetDoesntUntap(Player *, QString, bool)), this, SIGNAL(logSetDoesntUntap(Player *, QString, bool)));
-
-	players.insert(playerId, newPlayer);
-	emit playerAdded(newPlayer);
-	
-	return newPlayer;
-}
 /*
 void Game::cardListReceived(QList<ServerZoneCard> list)
 {

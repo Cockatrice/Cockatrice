@@ -29,7 +29,7 @@ public:
 public slots:
 	void setSortingEnabled(int _sortingEnabled);
 private slots:
-	void zoneDumpReceived(QList<ServerZoneCard> cards);
+	void zoneDumpReceived(QList<ServerInfo_Card> cards);
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
 	QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;

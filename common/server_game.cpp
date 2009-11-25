@@ -21,6 +21,9 @@
 #include "server_game.h"
 #include "server_protocolhandler.h"
 #include "server_arrow.h"
+#include "server_card.h"
+#include "server_cardzone.h"
+#include "server_counter.h"
 #include <QSqlQuery>
 
 Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent)
@@ -155,6 +158,54 @@ void Server_Game::setActivePhase(int _activePhase)
 	
 	activePhase = _activePhase;
 	sendGameEvent(new Event_SetActivePhase(-1, -1, activePhase));
+}
+
+QList<ServerInfo_Player *> Server_Game::getGameState() const
+{
+	QList<ServerInfo_Player *> result;
+	QMapIterator<int, Server_Player *> playerIterator(players);
+	while (playerIterator.hasNext()) {
+		Server_Player *player = playerIterator.next().value();
+
+		QList<ServerInfo_Arrow *> arrowList;
+		QMapIterator<int, Server_Arrow *> arrowIterator(player->getArrows());
+		while (arrowIterator.hasNext()) {
+			Server_Arrow *arrow = arrowIterator.next().value();
+			arrowList.append(new ServerInfo_Arrow(
+				arrow->getId(),
+				arrow->getStartCard()->getZone()->getPlayer()->getPlayerId(),
+				arrow->getStartCard()->getZone()->getName(),
+				arrow->getStartCard()->getId(),
+				arrow->getTargetCard()->getZone()->getPlayer()->getPlayerId(),
+				arrow->getTargetCard()->getZone()->getName(),
+				arrow->getTargetCard()->getId(),
+				arrow->getColor()
+			));
+		}
+
+		QList<ServerInfo_Counter *> counterList;
+		QMapIterator<int, Server_Counter *> counterIterator(player->getCounters());
+		while (counterIterator.hasNext()) {
+			Server_Counter *counter = counterIterator.next().value();
+			counterList.append(new ServerInfo_Counter(counter->getId(), counter->getName(), counter->getColor(), counter->getRadius(), counter->getCount()));
+		}
+
+		QList<ServerInfo_Zone *> zoneList;
+		QMapIterator<QString, Server_CardZone *> zoneIterator(player->getZones());
+		while (zoneIterator.hasNext()) {
+			Server_CardZone *zone = zoneIterator.next().value();
+			QList<ServerInfo_Card *> cardList;
+			QListIterator<Server_Card *> cardIterator(zone->cards);
+			while (cardIterator.hasNext()) {
+				Server_Card *card = cardIterator.next();
+				cardList.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getCounters(), card->getTapped(), card->getAttacking(), card->getAnnotation()));
+			}
+			zoneList.append(new ServerInfo_Zone(zone->getName(), zone->getType(), zone->hasCoords(), zone->cards.size(), cardList));
+		}
+
+		result.append(new ServerInfo_Player(player->getPlayerId(), player->getPlayerName(), zoneList, counterList, arrowList));
+	}
+	return result;
 }
 
 void Server_Game::sendGameEvent(GameEvent *event)

@@ -52,14 +52,14 @@ void Server_Player::setupZones()
 	// ------------------------------------------------------------------
 
 	// Create zones
-	Server_CardZone *deckZone = new Server_CardZone(this, "deck", false, Server_CardZone::HiddenZone);
+	Server_CardZone *deckZone = new Server_CardZone(this, "deck", false, HiddenZone);
 	addZone(deckZone);
-	Server_CardZone *sbZone = new Server_CardZone(this, "sb", false, Server_CardZone::HiddenZone);
+	Server_CardZone *sbZone = new Server_CardZone(this, "sb", false, HiddenZone);
 	addZone(sbZone);
-	addZone(new Server_CardZone(this, "table", true, Server_CardZone::PublicZone));
-	addZone(new Server_CardZone(this, "hand", false, Server_CardZone::PrivateZone));
-	addZone(new Server_CardZone(this, "grave", false, Server_CardZone::PublicZone));
-	addZone(new Server_CardZone(this, "rfg", false, Server_CardZone::PublicZone));
+	addZone(new Server_CardZone(this, "table", true, PublicZone));
+	addZone(new Server_CardZone(this, "hand", false, PrivateZone));
+	addZone(new Server_CardZone(this, "grave", false, PublicZone));
+	addZone(new Server_CardZone(this, "rfg", false, PublicZone));
 
 	// ------------------------------------------------------------------
 

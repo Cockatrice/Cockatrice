@@ -41,7 +41,7 @@ void ZoneViewZone::initializeCards()
 	}
 }
 
-void ZoneViewZone::zoneDumpReceived(QList<ServerZoneCard> cards)
+void ZoneViewZone::zoneDumpReceived(QList<ServerInfo_Card> cards)
 {
 	for (int i = 0; i < cards.size(); i++) {
 		CardItem *card = new CardItem(cards[i].getName(), i, this);

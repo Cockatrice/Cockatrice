@@ -5,16 +5,16 @@
 #include "arrowitem.h"
 #include "zoneviewzone.h"
 #include "zoneviewwidget.h"
-#include "game.h"
 #include "pilezone.h"
 #include "tablezone.h"
 #include "handzone.h"
 #include "cardlist.h"
+#include "tab_game.h"
 #include <QSettings>
 #include <QPainter>
 #include <QMenu>
 
-Player::Player(const QString &_name, int _id, bool _local, Client *_client, Game *_parent)
+Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabGame *_parent)
 	: QObject(_parent), defaultNumberTopCards(3), name(_name), id(_id), active(false), local(_local), client(_client)
 {
 	QSettings settings;
@@ -695,6 +695,10 @@ void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/
 	painter->setFont(font);
 	painter->setPen(QPen(Qt::black));
 	painter->drawText(QRectF(0, 0, totalWidth, 40), Qt::AlignCenter, nameStr);
+}
+
+void Player::processPlayerInfo(ServerInfo_Player *info)
+{
 }
 
 void Player::addCounter(int counterId, const QString &name, QColor color, int radius, int value)

@@ -10,6 +10,25 @@ class QXmlStreamWriter;
 
 enum ResponseCode { RespNothing, RespOk, RespInvalidCommand, RespInvalidData, RespNameNotFound, RespLoginNeeded, RespContextError, RespWrongPassword, RespSpectatorsNotAllowed };
 
+// PrivateZone: Contents of the zone are always visible to the owner,
+// but not to anyone else.
+// PublicZone: Contents of the zone are always visible to anyone.
+// HiddenZone: Contents of the zone are never visible to anyone.
+// However, the owner of the zone can issue a dump_zone command,
+// setting beingLookedAt to true.
+// Cards in a zone with the type HiddenZone are referenced by their
+// list index, whereas cards in any other zone are referenced by their ids.
+enum ZoneType { PrivateZone, PublicZone, HiddenZone };
+
+class SerializableItem {
+protected:
+	SerializableItem *currentItem;
+public:
+	SerializableItem() : currentItem(0) { }
+	virtual bool readElement(QXmlStreamReader *xml) = 0;
+	virtual void writeElement(QXmlStreamWriter *xml) = 0;
+};
+
 class ServerChatChannelInfo {
 private:
 	QString name;
@@ -25,11 +44,11 @@ public:
 	bool getAutoJoin() const { return autoJoin; }
 };
 
-class ServerPlayerInfo {
+class ServerChatUserInfo {
 private:
 	QString name;
 public:
-	ServerPlayerInfo(const QString &_name)
+	ServerChatUserInfo(const QString &_name)
 		: name(_name) { }
 	QString getName() const { return name; }
 };
@@ -57,23 +76,8 @@ public:
 	int getSpectatorCount() const { return spectatorCount; }
 };
 
-class ServerPlayer {
+class ServerInfo_Card : public SerializableItem {
 private:
-	int PlayerId;
-	QString name;
-	bool local;
-public:
-	ServerPlayer(int _PlayerId, const QString &_name, bool _local)
-		: PlayerId(_PlayerId), name(_name), local(_local) { }
-	int getPlayerId() const { return PlayerId; }
-	QString getName() const { return name; }
-	bool getLocal() const { return local; }
-};
-
-class ServerZoneCard {
-private:
-	int playerId;
-	QString zoneName;
 	int id;
 	QString name;
 	int x, y;
@@ -82,10 +86,8 @@ private:
 	bool attacking;
 	QString annotation;
 public:
-	ServerZoneCard(int _playerId, const QString &_zoneName, int _id, const QString &_name, int _x, int _y, int _counters, bool _tapped, bool _attacking, const QString &_annotation)
-		: playerId(_playerId), zoneName(_zoneName), id(_id), name(_name), x(_x), y(_y), counters(_counters), tapped(_tapped), attacking(_attacking), annotation(_annotation) { }
-	int getPlayerId() const { return playerId; }
-	QString getZoneName() const { return zoneName; }
+	ServerInfo_Card(int _id = -1, const QString &_name = QString(), int _x = -1, int _y = -1, int _counters = -1, bool _tapped = false, bool _attacking = false, const QString &_annotation = QString())
+		: id(_id), name(_name), x(_x), y(_y), counters(_counters), tapped(_tapped), attacking(_attacking), annotation(_annotation) { }
 	int getId() const { return id; }
 	QString getName() const { return name; }
 	int getX() const { return x; }
@@ -94,50 +96,53 @@ public:
 	bool getTapped() const { return tapped; }
 	bool getAttacking() const { return attacking; }
 	QString getAnnotation() const { return annotation; }
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
 };
 
-class ServerZone {
-public:
-	enum ZoneType { PrivateZone, PublicZone, HiddenZone };
+class ServerInfo_Zone : public SerializableItem {
 private:
-	int playerId;
 	QString name;
 	ZoneType type;
 	bool hasCoords;
 	int cardCount;
+	QList<ServerInfo_Card *> cardList;
 public:
-	ServerZone(int _playerId, const QString &_name, ZoneType _type, bool _hasCoords, int _cardCount)
-		: playerId(_playerId), name(_name), type(_type), hasCoords(_hasCoords), cardCount(_cardCount) { }
-	int getPlayerId() const { return playerId; }
+	ServerInfo_Zone(const QString &_name = QString(), ZoneType _type = PrivateZone, bool _hasCoords = false, int _cardCount = -1, const QList<ServerInfo_Card *> &_cardList = QList<ServerInfo_Card *>())
+		: name(_name), type(_type), hasCoords(_hasCoords), cardCount(_cardCount), cardList(_cardList) { }
+	~ServerInfo_Zone();
 	QString getName() const { return name; }
 	ZoneType getType() const { return type; }
 	bool getHasCoords() const { return hasCoords; }
 	int getCardCount() const { return cardCount; }
+	const QList<ServerInfo_Card *> &getCardList() const { return cardList; }
+	void addCard(ServerInfo_Card *card) { cardList.append(card); ++cardCount; }
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
 };
 
-class ServerCounter {
+class ServerInfo_Counter : public SerializableItem {
 private:
-	int playerId;
 	int id;
 	QString name;
 	QColor color;
 	int radius;
 	int count;
 public:
-	ServerCounter(int _playerId, int _id, const QString &_name, QColor _color, int _radius, int _count)
-		: playerId(_playerId), id(_id), name(_name), color(_color), radius(_radius), count(_count) { }
-	int getPlayerId() const { return playerId; }
+	ServerInfo_Counter(int _id = -1, const QString &_name = QString(), const QColor &_color = QColor(), int _radius = -1, int _count = -1)
+		: id(_id), name(_name), color(_color), radius(_radius), count(_count) { }
 	int getId() const { return id; }
 	QString getName() const { return name; }
 	QColor getColor() const { return color; }
 	int getRadius() const { return radius; }
 	int getCount() const { return count; }
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
 };
 
-class ServerArrow {
+class ServerInfo_Arrow : public SerializableItem {
 private:
 	int id;
-	int playerId;
 	int startPlayerId;
 	QString startZone;
 	int startCardId;
@@ -146,10 +151,9 @@ private:
 	int targetCardId;
 	QColor color;
 public:
-	ServerArrow(int _playerId, int _id, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, const QColor &_color)
-		: id(_id), playerId(_playerId), startPlayerId(_startPlayerId), startZone(_startZone), startCardId(_startCardId), targetPlayerId(_targetPlayerId), targetZone(_targetZone), targetCardId(_targetCardId), color(_color) { }
+	ServerInfo_Arrow(int _id = -1, int _startPlayerId = -1, const QString &_startZone = QString(), int _startCardId = -1, int _targetPlayerId = -1, const QString &_targetZone = QString(), int _targetCardId = -1, const QColor &_color = QColor())
+		: id(_id), startPlayerId(_startPlayerId), startZone(_startZone), startCardId(_startCardId), targetPlayerId(_targetPlayerId), targetZone(_targetZone), targetCardId(_targetCardId), color(_color) { }
 	int getId() const { return id; }
-	int getPlayerId() const { return playerId; }
 	int getStartPlayerId() const { return startPlayerId; }
 	QString getStartZone() const { return startZone; }
 	int getStartCardId() const { return startCardId; }
@@ -157,9 +161,34 @@ public:
 	QString getTargetZone() const { return targetZone; }
 	int getTargetCardId() const { return targetCardId; }
 	QColor getColor() const { return color; }
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
 };
 
-class DeckList_TreeItem {
+class ServerInfo_Player : public SerializableItem {
+private:
+	int playerId;
+	QString name;
+	QList<ServerInfo_Zone *> zoneList;
+	QList<ServerInfo_Counter *> counterList;
+	QList<ServerInfo_Arrow *> arrowList;
+public:
+	ServerInfo_Player(int _playerId = -1, const QString &_name = QString(), const QList<ServerInfo_Zone *> &_zoneList = QList<ServerInfo_Zone *>(), const QList<ServerInfo_Counter *> &_counterList = QList<ServerInfo_Counter *>(), const QList<ServerInfo_Arrow *> &_arrowList = QList<ServerInfo_Arrow *>())
+		: playerId(_playerId), name(_name), zoneList(_zoneList), counterList(_counterList), arrowList(_arrowList) { }
+	~ServerInfo_Player();
+	int getPlayerId() const { return playerId; }
+	QString getName() const { return name; }
+	const QList<ServerInfo_Zone *> &getZoneList() const { return zoneList; }
+	const QList<ServerInfo_Counter *> &getCounterList() const { return counterList; }
+	const QList<ServerInfo_Arrow *> &getArrowList() const { return arrowList; }
+	void addZone(ServerInfo_Zone *zone) { zoneList.append(zone); }
+	void addCounter(ServerInfo_Counter *counter) { counterList.append(counter); }
+	void addArrow(ServerInfo_Arrow *arrow) { arrowList.append(arrow); }
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
+};
+
+class DeckList_TreeItem : public SerializableItem {
 protected:
 	QString name;
 	int id;
@@ -167,8 +196,6 @@ public:
 	DeckList_TreeItem(const QString &_name, int _id) : name(_name), id(_id) { }
 	QString getName() const { return name; }
 	int getId() const { return id; }
-	virtual bool readElement(QXmlStreamReader *xml) = 0;
-	virtual void writeElement(QXmlStreamWriter *xml) = 0;
 };
 class DeckList_File : public DeckList_TreeItem {
 private:
@@ -180,10 +207,8 @@ public:
 	QDateTime getUploadTime() const { return uploadTime; }
 };
 class DeckList_Directory : public DeckList_TreeItem, public QList<DeckList_TreeItem *> {
-private:
-	DeckList_TreeItem *currentItem;
 public:
-	DeckList_Directory(const QString &_name = QString(), int _id = 0) : DeckList_TreeItem(_name, _id), currentItem(0) { }
+	DeckList_Directory(const QString &_name = QString(), int _id = 0) : DeckList_TreeItem(_name, _id) { }
 	~DeckList_Directory();
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);

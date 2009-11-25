@@ -36,6 +36,7 @@ SOURCES += src/main.cpp \
 	../common/decklist.cpp \
 	../common/protocol.cpp \
 	../common/protocol_items.cpp \
+	../common/protocol_datastructures.cpp \
 	../common/rng_abstract.cpp \
 	../common/rng_qt.cpp \
 	../common/server.cpp \

@@ -6,7 +6,6 @@
 #include "translation.h"
 #include "protocol_datastructures.h"
 
-class Game;
 class Player;
 class CardZone;
 
@@ -49,7 +48,7 @@ private slots:
 	void logSetActivePhase(int phase);
 	void msgAlert();
 public:
-	void connectToGame(Game *game);
+	void connectToPlayer(Player *player);
 	MessageLogWidget(QWidget *parent = 0);
 };
 

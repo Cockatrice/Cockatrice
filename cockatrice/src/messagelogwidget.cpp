@@ -275,9 +275,9 @@ void MessageLogWidget::logSetActivePhase(int phase)
 	append("<font color=\"green\">" + tr("It is now the %1.").arg(phaseName) + "</font>");
 }
 
-void MessageLogWidget::connectToGame(Game *game)
+void MessageLogWidget::connectToPlayer(Player *player)
 {
-	connect(game, SIGNAL(logPlayerListReceived(QStringList)), this, SLOT(logPlayerListReceived(QStringList)));
+/*	connect(game, SIGNAL(logPlayerListReceived(QStringList)), this, SLOT(logPlayerListReceived(QStringList)));
 	connect(game, SIGNAL(logJoin(Player *)), this, SLOT(logJoin(Player *)));
 	connect(game, SIGNAL(logLeave(Player *)), this, SLOT(logLeave(Player *)));
 	connect(game, SIGNAL(logGameClosed()), this, SLOT(logGameClosed()));
@@ -310,7 +310,7 @@ void MessageLogWidget::connectToGame(Game *game)
 	connect(game, SIGNAL(logDraw(Player *, int)), this, SLOT(msgAlert()));
 	connect(game, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)), this, SLOT(msgAlert()));
 	connect(game, SIGNAL(logGameStart()), this, SLOT(msgAlert()));
-}
+*/}
 
 void MessageLogWidget::msgAlert()
 {
