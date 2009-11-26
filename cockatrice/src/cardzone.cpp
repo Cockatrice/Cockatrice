@@ -128,9 +128,9 @@ CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName, 
 
 void CardZone::setCardAttr(int cardId, const QString &aname, const QString &avalue)
 {
-	if (hasCardAttr)
+/*	if (hasCardAttr)
 		player->client->setCardAttr(name, cardId, aname, avalue);
-}
+*/}
 
 void CardZone::moveAllToZone()
 {
@@ -140,8 +140,8 @@ void CardZone::moveAllToZone()
 
 	// Cards need to be moved in reverse order so that the other
 	// cards' list index doesn't change
-	for (int i = cards.size() - 1; i >= 0; i--)
-		player->client->moveCard(cards.at(i)->getId(), getName(), targetZone, targetX);
+//	for (int i = cards.size() - 1; i >= 0; i--)
+//		player->client->moveCard(cards.at(i)->getId(), getName(), targetZone, targetX);
 }
 
 QPointF CardZone::closestGridPoint(const QPointF &point)

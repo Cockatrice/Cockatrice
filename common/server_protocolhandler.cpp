@@ -218,9 +218,11 @@ ResponseCode Server_ProtocolHandler::cmdListGames(Command_ListGames * /*cmd*/)
 ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd)
 {
 	Server_Game *game = server->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), cmd->getSpectatorsAllowed(), this);
-	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, game->getCreator()));
+	Server_Player *creator = game->getCreator();
+	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	
-	enqueueProtocolItem(new Event_GameJoined(game->getGameId(), game->getCreator()->getPlayerId(), false, game->getGameState()));
+	enqueueProtocolItem(new Event_GameJoined(game->getGameId(), creator->getPlayerId(), false));
+	enqueueProtocolItem(new Event_GameStateChanged(game->getGameId(), game->getGameState(creator)));
 	return RespOk;
 }
 
@@ -234,7 +236,8 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd)
 	if (result == RespOk) {
 		Server_Player *player = g->addPlayer(this, cmd->getSpectator());
 		games.insert(cmd->getGameId(), QPair<Server_Game *, Server_Player *>(g, player));
-		enqueueProtocolItem(new Event_GameJoined(cmd->getGameId(), player->getPlayerId(), cmd->getSpectator(), g->getGameState()));
+		enqueueProtocolItem(new Event_GameJoined(cmd->getGameId(), player->getPlayerId(), cmd->getSpectator()));
+		enqueueProtocolItem(new Event_GameStateChanged(cmd->getGameId(), g->getGameState(player)));
 	}
 	return result;
 }
@@ -346,20 +349,13 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, Server_G
 	
 	// The player does not get to see which card he moved if it moves between two parts of hidden zones which
 	// are not being looked at.
-	QString privateCardId = QString::number(card->getId());
+	int privateCardId = card->getId();
 	if (!targetBeingLookedAt && !sourceBeingLookedAt) {
-		privateCardId = QString();
+		privateCardId = -1;
 		privateCardName = QString();
 	}
-/*	player->privateEvent(QString("move_card|%1|%2|%3|%4|%5|%6|%7|%8").arg(privateCardId)
-							    .arg(privateCardName)
-							    .arg(startzone->getName())
-							    .arg(position)
-							    .arg(targetzone->getName())
-							    .arg(x)
-							    .arg(y)
-							    .arg(facedown ? 1 : 0));
-*/	
+	player->sendProtocolItem(new Event_MoveCard(game->getGameId(), player->getPlayerId(), privateCardId, privateCardName, startzone->getName(), position, targetzone->getName(), x, y, facedown));
+
 	// Other players do not get to see the start and/or target position of the card if the respective
 	// part of the zone is being looked at. The information is not needed anyway because in hidden zones,
 	// all cards are equal.
@@ -368,22 +364,11 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, Server_G
 	if ((targetzone->getType() == HiddenZone) && ((targetzone->getCardsBeingLookedAt() > x) || (targetzone->getCardsBeingLookedAt() == -1)))
 		x = -1;
 	
-/*	if ((startzone->getType() == Server_CardZone::PublicZone) || (targetzone->getType() == Server_CardZone::PublicZone))
-		game->broadcastEvent(QString("move_card|%1|%2|%3|%4|%5|%6|%7|%8").arg(card->getId())
-									 .arg(publicCardName)
-									 .arg(startzone->getName())
-									 .arg(position)
-									 .arg(targetzone->getName())
-									 .arg(x)
-									 .arg(y)
-									 .arg(facedown ? 1 : 0), player);
+	if ((startzone->getType() == PublicZone) || (targetzone->getType() == PublicZone))
+		game->sendGameEvent(new Event_MoveCard(-1, player->getPlayerId(), card->getId(), publicCardName, startzone->getName(), position, targetzone->getName(), x, y, facedown));
 	else
-		game->broadcastEvent(QString("move_card|||%1|%2|%3|%4|%5|0").arg(startzone->getName())
-								     .arg(position)
-								     .arg(targetzone->getName())
-								     .arg(x)
-								     .arg(y), player);
-*/	
+		game->sendGameEvent(new Event_MoveCard(-1, player->getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getName(), x, y, false));
+
 	// If the card was moved to another zone, delete all arrows from and to the card
 	if (startzone != targetzone) {
 		const QList<Server_Player *> &players = game->getPlayers();
@@ -493,7 +478,7 @@ ResponseCode Server_ProtocolHandler::cmdReadyStart(Command_ReadyStart * /*cmd*/,
 	if (!player->getDeck())
 		return RespContextError;
 	
-	player->setStatus(StatusReadyStart);
+	player->setReadyStart(true);
 	game->sendGameEvent(new Event_ReadyStart(-1, player->getPlayerId()));
 	game->startGameIfReady();
 	return RespOk;

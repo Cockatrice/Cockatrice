@@ -76,7 +76,7 @@ void ProtocolItem::initializeHash()
 	
 	itemNameHash.insert("generic_eventlist_games", Event_ListGames::newItem);
 	itemNameHash.insert("generic_eventlist_chat_channels", Event_ListChatChannels::newItem);
-	itemNameHash.insert("generic_eventgame_joined", Event_GameJoined::newItem);
+	itemNameHash.insert("game_eventgame_state_changed", Event_GameStateChanged::newItem);
 	itemNameHash.insert("chat_eventchat_list_players", Event_ChatListPlayers::newItem);
 }
 
@@ -421,29 +421,18 @@ void Event_ListGames::writeElement(QXmlStreamWriter *xml)
 	}
 }
 
-Event_GameJoined::Event_GameJoined(int _gameId, int _playerId, bool _spectator, const QList<ServerInfo_Player *> &_playerList)
-	: GenericEvent("game_joined"), currentItem(0), readFinished(false), gameId(_gameId), playerId(_playerId), spectator(_spectator), playerList(_playerList)
+Event_GameStateChanged::Event_GameStateChanged(int _gameId, const QList<ServerInfo_Player *> &_playerList)
+	: GameEvent("game_state_changed", _gameId, -1), currentItem(0), readFinished(false), playerList(_playerList)
 {
-	setParameter("game_id", gameId);
-	setParameter("player_id", playerId);
-	setParameter("spectator", spectator);
 }
 
-Event_GameJoined::~Event_GameJoined()
+Event_GameStateChanged::~Event_GameStateChanged()
 {
 	for (int i = 0; i < playerList.size(); ++i)
 		delete playerList[i];
 }
 
-void Event_GameJoined::extractParameters()
-{
-	GenericEvent::extractParameters();
-	gameId = parameters["game_id"].toInt();
-	playerId = parameters["player_id"].toInt();
-	spectator = (parameters["spectator"] == "1");
-}
-
-bool Event_GameJoined::readElement(QXmlStreamReader *xml)
+bool Event_GameStateChanged::readElement(QXmlStreamReader *xml)
 {
 	if (currentItem) {
 		if (currentItem->readElement(xml))
@@ -462,7 +451,7 @@ bool Event_GameJoined::readElement(QXmlStreamReader *xml)
 	return true;
 }
 
-void Event_GameJoined::writeElement(QXmlStreamWriter *xml)
+void Event_GameStateChanged::writeElement(QXmlStreamWriter *xml)
 {
 	for (int i = 0; i < playerList.size(); ++i)
 		playerList[i]->writeElement(xml);

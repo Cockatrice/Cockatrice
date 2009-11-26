@@ -22,7 +22,7 @@ enum ItemId {
 	ItemId_Event_ListChatChannels = ItemId_Other + 200,
 	ItemId_Event_ChatListPlayers = ItemId_Other + 201,
 	ItemId_Event_ListGames = ItemId_Other + 202,
-	ItemId_Event_GameJoined = ItemId_Other + 203,
+	ItemId_Event_GameStateChanged = ItemId_Other + 203,
 	ItemId_Response_DeckList = ItemId_Other + 300,
 	ItemId_Response_DeckDownload = ItemId_Other + 301,
 	ItemId_Response_DeckUpload = ItemId_Other + 302
@@ -41,6 +41,7 @@ protected:
 	void setParameter(const QString &name, const QString &value) { parameters[name] = value; }
 	void setParameter(const QString &name, bool value) { parameters[name] = (value ? "1" : "0"); }
 	void setParameter(const QString &name, int value) { parameters[name] = QString::number(value); }
+	void setParameter(const QString &name, const QColor &value) { parameters[name] = QString::number(ColorConverter::colorToInt(value)); }
 	virtual void extractParameters() { }
 	virtual QString getItemType() const = 0;
 	
@@ -127,6 +128,11 @@ public:
 		setParameter("game_id", gameId);
 	}
 	int getGameId() const { return gameId; }
+	void setGameId(int _gameId)
+	{
+		gameId = _gameId;
+		setParameter("game_id", gameId);
+	}
 };
 
 class Command_DeckUpload : public Command {
@@ -331,26 +337,18 @@ public:
 	void writeElement(QXmlStreamWriter *xml);
 };
 
-class Event_GameJoined : public GenericEvent {
+class Event_GameStateChanged : public GameEvent {
 	Q_OBJECT
 private:
 	SerializableItem *currentItem;
 	bool readFinished;
-	int gameId;
-	int playerId;
-	bool spectator;
 	QList<ServerInfo_Player *> playerList;
-protected:
-	void extractParameters();
 public:
-	Event_GameJoined(int _gameId = -1, int _playerId = -1, bool _spectator = false, const QList<ServerInfo_Player *> &_playerList = QList<ServerInfo_Player *>());
-	~Event_GameJoined();
-	int getGameId() const { return gameId; }
-	int getPlayerId() const { return playerId; }
-	bool getSpectator() const { return spectator; }
+	Event_GameStateChanged(int _gameId = -1, const QList<ServerInfo_Player *> &_playerList = QList<ServerInfo_Player *>());
+	~Event_GameStateChanged();
 	const QList<ServerInfo_Player *> &getPlayerList() const { return playerList; }
-	static ProtocolItem *newItem() { return new Event_GameJoined; }
-	int getItemId() const { return ItemId_Event_GameJoined; }
+	static ProtocolItem *newItem() { return new Event_GameStateChanged; }
+	int getItemId() const { return ItemId_Event_GameStateChanged; }
 	
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);

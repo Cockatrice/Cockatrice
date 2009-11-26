@@ -19,6 +19,7 @@ class CardZone;
 class TableZone;
 class HandZone;
 class ServerInfo_Player;
+class GameCommand;
 
 class Player : public QObject, public QGraphicsItem {
 	Q_OBJECT
@@ -94,6 +95,8 @@ public:
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	
+	void addZone(CardZone *z);
+
 	void addCounter(int counterId, const QString &name, QColor color, int radius, int value);
 	void delCounter(int counterId);
 	void clearCounters();
@@ -103,7 +106,6 @@ public:
 	void clearArrows();
 
 	Client *client;
-	void addZone(CardZone *z);
 	Player(const QString &_name, int _id, bool _local, Client *_client, TabGame *_parent);
 	~Player();
 	void retranslateUi();
@@ -120,6 +122,7 @@ public:
 	void setActive(bool _active);
 
 	void processPlayerInfo(ServerInfo_Player *info);
+	void sendGameCommand(GameCommand *command);
 };
 
 #endif

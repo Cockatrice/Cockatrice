@@ -2,6 +2,7 @@
 #include "tablezone.h"
 #include "player.h"
 #include "client.h"
+#include "protocol_items.h"
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 	: CardZone(_p, "table", true, false, true, parent)
@@ -67,7 +68,7 @@ void TableZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &d
 
 void TableZone::handleDropEventByGrid(int cardId, CardZone *startZone, const QPoint &gridPoint, bool faceDown)
 {
-	player->client->moveCard(cardId, startZone->getName(), getName(), gridPoint.x(), gridPoint.y(), faceDown);
+	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), cardId, getName(), gridPoint.x(), gridPoint.y(), faceDown));
 }
 
 void TableZone::reorganizeCards()

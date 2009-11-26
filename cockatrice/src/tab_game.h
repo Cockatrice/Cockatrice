@@ -19,7 +19,8 @@ class ZoneViewWidget;
 class PhasesToolbar;
 class ProtocolResponse;
 class GameEvent;
-class Event_GameJoined;
+class GameCommand;
+class Event_GameStateChanged;
 class Event_GameStart;
 class Player;
 class CardZone;
@@ -51,6 +52,7 @@ private:
 
 	Player *addPlayer(int playerId, const QString &playerName);
 
+	void eventGameStateChanged(Event_GameStateChanged *event);
 	void eventGameStart(Event_GameStart *event);
 signals:
 	void playerAdded(Player *player);
@@ -86,11 +88,12 @@ private slots:
 	void readyStart();
 	void deckSelectFinished(ProtocolResponse *r);
 public:
-	TabGame(Client *_client, int _gameId);
+	TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectator);
 	void retranslateUi();
+	const QMap<int, Player *> &getPlayers() const { return players; }
 
 	void processGameEvent(GameEvent *event);
-	void processGameJoinedEvent(Event_GameJoined *event);
+	void sendGameCommand(GameCommand *command);
 };
 
 #endif

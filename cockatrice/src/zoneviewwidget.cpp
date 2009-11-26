@@ -1,11 +1,11 @@
 #include <QtGui>
-
 #include "zoneviewwidget.h"
 #include "carditem.h"
 #include "zoneviewzone.h"
 #include "player.h"
 #include "client.h"
 #include "gamescene.h"
+#include "protocol_items.h"
 
 ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, QGraphicsItem *parent)
 	: QGraphicsWidget(parent, Qt::Tool | Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint/* | Qt::WindowCloseButtonHint*/), player(_player)
@@ -91,10 +91,10 @@ void ZoneViewWidget::resizeToZoneContents()
 
 void ZoneViewWidget::closeEvent(QCloseEvent *event)
 {
-	player->client->stopDumpZone(player->getId(), zone->getName());
+	player->sendGameCommand(new Command_StopDumpZone(-1, player->getId(), zone->getName()));
 	if (shuffleCheckBox)
 		if (shuffleCheckBox->isChecked())
-			player->client->shuffle();
+			player->sendGameCommand(new Command_Shuffle);
 	emit closePressed(this);
 	deleteLater();
 	event->accept();

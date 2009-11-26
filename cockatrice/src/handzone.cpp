@@ -2,6 +2,7 @@
 #include "handzone.h"
 #include "player.h"
 #include "client.h"
+#include "protocol_items.h"
 
 HandZone::HandZone(Player *_p, int _zoneHeight, QGraphicsItem *parent)
 	: CardZone(_p, "hand", false, false, _p->getLocal(), parent), zoneHeight(_zoneHeight)
@@ -73,5 +74,5 @@ void HandZone::addCardImpl(CardItem *card, int x, int /*y*/)
 
 void HandZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
-	player->client->moveCard(cardId, startZone->getName(), getName(), cards.size(), 0);
+	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), cardId, getName(), cards.size(), -1, false));
 }

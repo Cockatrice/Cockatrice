@@ -2,6 +2,7 @@
 #include "zoneviewzone.h"
 #include "player.h"
 #include "client.h"
+#include "protocol_items.h"
 
 ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, QGraphicsItem *parent)
 	: CardZone(_p, _origZone->getName(), false, false, true, parent, true), height(0), numberCards(_numberCards), origZone(_origZone), sortingEnabled(false)
@@ -105,7 +106,7 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 void ZoneViewZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
 	qDebug(QString("handleDropEvent id=%1").arg(cardId).toLatin1());
-	player->client->moveCard(cardId, startZone->getName(), getName(), 0, 0);
+	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), cardId, getName(), 0, 0, false));
 }
 
 void ZoneViewZone::removeCard(int position)

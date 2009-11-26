@@ -54,8 +54,16 @@ void Server_Game::startGameIfReady()
 		return;
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	while (playerIterator.hasNext())
-		if (playerIterator.next().value()->getStatus() != StatusReadyStart)
+		if (!playerIterator.next().value()->getReadyStart())
 			return;
+	playerIterator.toFront();
+	while (playerIterator.hasNext())
+		playerIterator.next().value()->setupZones();
+	playerIterator.toFront();
+	while (playerIterator.hasNext()) {
+		Server_Player *player = playerIterator.next().value();
+		player->sendProtocolItem(new Event_GameStateChanged(gameId, getGameState(player)));
+	}
 	
 /*	QSqlQuery query;
 	query.prepare("insert into games (id, descr, password, time_started) values(:id, :descr, :password, now())");
@@ -71,8 +79,6 @@ void Server_Game::startGameIfReady()
 		query.bindValue(":id", gameId);
 		query.bindValue(":player", player->getPlayerName());
 		query.exec();
-
-		player->setupZones();
 	}
 */	
 	gameStarted = true;
@@ -160,7 +166,7 @@ void Server_Game::setActivePhase(int _activePhase)
 	sendGameEvent(new Event_SetActivePhase(-1, -1, activePhase));
 }
 
-QList<ServerInfo_Player *> Server_Game::getGameState() const
+QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAsking) const
 {
 	QList<ServerInfo_Player *> result;
 	QMapIterator<int, Server_Player *> playerIterator(players);
@@ -195,10 +201,15 @@ QList<ServerInfo_Player *> Server_Game::getGameState() const
 		while (zoneIterator.hasNext()) {
 			Server_CardZone *zone = zoneIterator.next().value();
 			QList<ServerInfo_Card *> cardList;
-			QListIterator<Server_Card *> cardIterator(zone->cards);
-			while (cardIterator.hasNext()) {
-				Server_Card *card = cardIterator.next();
-				cardList.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getCounters(), card->getTapped(), card->getAttacking(), card->getAnnotation()));
+			if (
+				((playerWhosAsking == player) && (zone->getType() != HiddenZone))
+				|| ((playerWhosAsking != player) && (zone->getType() == PublicZone))
+			) {
+				QListIterator<Server_Card *> cardIterator(zone->cards);
+				while (cardIterator.hasNext()) {
+					Server_Card *card = cardIterator.next();
+					cardList.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getCounters(), card->getTapped(), card->getAttacking(), card->getAnnotation()));
+				}
 			}
 			zoneList.append(new ServerInfo_Zone(zone->getName(), zone->getType(), zone->hasCoords(), zone->cards.size(), cardList));
 		}

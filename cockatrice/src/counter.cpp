@@ -1,6 +1,7 @@
 #include "counter.h"
 #include "player.h"
 #include "client.h"
+#include "protocol_items.h"
 #include <QtGui>
 
 Counter::Counter(Player *_player, int _id, const QString &_name, QColor _color, int _radius, int _value, QGraphicsItem *parent)
@@ -77,10 +78,10 @@ void Counter::setValue(int _value)
 void Counter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
 	if (event->button() == Qt::LeftButton) {
-		player->client->incCounter(id, 1);
+		player->sendGameCommand(new Command_IncCounter(-1, id, 1));
 		event->accept();
 	} else if (event->button() == Qt::RightButton) {
-		player->client->incCounter(id, -1);
+		player->sendGameCommand(new Command_IncCounter(-1, id, -1));
 		event->accept();
 	} else if (event->button() == Qt::MidButton) {
 		if (menu)
@@ -93,7 +94,7 @@ void Counter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void Counter::incrementCounter()
 {
 	int delta = static_cast<QAction *>(sender())->data().toInt();
-	player->client->incCounter(id, delta);
+	player->sendGameCommand(new Command_IncCounter(-1, id, delta));
 }
 
 void Counter::setCounter()
@@ -101,5 +102,5 @@ void Counter::setCounter()
 	bool ok;
 	int newValue = QInputDialog::getInteger(0, tr("Set counter"), tr("New value for counter '%1':").arg(name), value, 0, 2000000000, 1, &ok);
 	if (ok)
-		player->client->setCounter(id, newValue);
+		player->sendGameCommand(new Command_SetCounter(-1, id, newValue));
 }

@@ -14,8 +14,6 @@ class Server_Arrow;
 class Server_ProtocolHandler;
 class ProtocolItem;
 
-enum PlayerStatusEnum { StatusNormal, StatusSubmitDeck, StatusReadyStart, StatusPlaying };
-
 class Server_Player : public QObject {
 	Q_OBJECT
 private:
@@ -30,14 +28,14 @@ private:
 	bool spectator;
 	int nextCardId;
 	void clearZones();
-	PlayerStatusEnum PlayerStatus;
+	bool readyStart;
 public:
 	Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator, Server_ProtocolHandler *_handler);
 	void setProtocolHandler(Server_ProtocolHandler *_handler) { handler = _handler; }
 	
-	void setStatus(PlayerStatusEnum _status) { PlayerStatus = _status; }
 	void setPlayerId(int _id) { playerId = _id; }
-	PlayerStatusEnum getStatus() { return PlayerStatus; }
+	bool getReadyStart() const { return readyStart; }
+	void setReadyStart(bool _readyStart) { readyStart = _readyStart; }
 	int getPlayerId() const { return playerId; }
 	bool getSpectator() const { return spectator; }
 	QString getPlayerName() const { return playerName; }

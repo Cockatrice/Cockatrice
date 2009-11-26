@@ -201,7 +201,7 @@ void Command_CreateToken::extractParameters()
 	x = parameters["x"].toInt();
 	y = parameters["y"].toInt();
 }
-Command_CreateArrow::Command_CreateArrow(int _gameId, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, int _color)
+Command_CreateArrow::Command_CreateArrow(int _gameId, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, const QColor &_color)
 	: GameCommand("create_arrow", _gameId), startPlayerId(_startPlayerId), startZone(_startZone), startCardId(_startCardId), targetPlayerId(_targetPlayerId), targetZone(_targetZone), targetCardId(_targetCardId), color(_color)
 {
 	setParameter("start_player_id", startPlayerId);
@@ -221,7 +221,7 @@ void Command_CreateArrow::extractParameters()
 	targetPlayerId = parameters["target_player_id"].toInt();
 	targetZone = parameters["target_zone"];
 	targetCardId = parameters["target_card_id"].toInt();
-	color = parameters["color"].toInt();
+	color = ColorConverter::colorFromInt(parameters["color"].toInt());
 }
 Command_DeleteArrow::Command_DeleteArrow(int _gameId, int _arrowId)
 	: GameCommand("delete_arrow", _gameId), arrowId(_arrowId)
@@ -265,7 +265,7 @@ void Command_IncCounter::extractParameters()
 	counterId = parameters["counter_id"].toInt();
 	delta = parameters["delta"].toInt();
 }
-Command_AddCounter::Command_AddCounter(int _gameId, const QString &_counterName, int _color, int _radius, int _value)
+Command_AddCounter::Command_AddCounter(int _gameId, const QString &_counterName, const QColor &_color, int _radius, int _value)
 	: GameCommand("add_counter", _gameId), counterName(_counterName), color(_color), radius(_radius), value(_value)
 {
 	setParameter("counter_name", counterName);
@@ -277,7 +277,7 @@ void Command_AddCounter::extractParameters()
 {
 	GameCommand::extractParameters();
 	counterName = parameters["counter_name"];
-	color = parameters["color"].toInt();
+	color = ColorConverter::colorFromInt(parameters["color"].toInt());
 	radius = parameters["radius"].toInt();
 	value = parameters["value"].toInt();
 }
@@ -391,18 +391,6 @@ Event_ReadyStart::Event_ReadyStart(int _gameId, int _playerId)
 	: GameEvent("ready_start", _gameId, _playerId)
 {
 }
-Event_SetupZones::Event_SetupZones(int _gameId, int _playerId, int _deckSize, int _sbSize)
-	: GameEvent("setup_zones", _gameId, _playerId), deckSize(_deckSize), sbSize(_sbSize)
-{
-	setParameter("deck_size", deckSize);
-	setParameter("sb_size", sbSize);
-}
-void Event_SetupZones::extractParameters()
-{
-	GameEvent::extractParameters();
-	deckSize = parameters["deck_size"].toInt();
-	sbSize = parameters["sb_size"].toInt();
-}
 Event_GameStart::Event_GameStart(int _gameId, int _playerId)
 	: GameEvent("game_start", _gameId, _playerId)
 {
@@ -467,7 +455,7 @@ void Event_CreateToken::extractParameters()
 	x = parameters["x"].toInt();
 	y = parameters["y"].toInt();
 }
-Event_CreateArrow::Event_CreateArrow(int _gameId, int _playerId, int _arrowId, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, int _color)
+Event_CreateArrow::Event_CreateArrow(int _gameId, int _playerId, int _arrowId, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, const QColor &_color)
 	: GameEvent("create_arrow", _gameId, _playerId), arrowId(_arrowId), startPlayerId(_startPlayerId), startZone(_startZone), startCardId(_startCardId), targetPlayerId(_targetPlayerId), targetZone(_targetZone), targetCardId(_targetCardId), color(_color)
 {
 	setParameter("arrow_id", arrowId);
@@ -489,7 +477,7 @@ void Event_CreateArrow::extractParameters()
 	targetPlayerId = parameters["target_player_id"].toInt();
 	targetZone = parameters["target_zone"];
 	targetCardId = parameters["target_card_id"].toInt();
-	color = parameters["color"].toInt();
+	color = ColorConverter::colorFromInt(parameters["color"].toInt());
 }
 Event_DeleteArrow::Event_DeleteArrow(int _gameId, int _playerId, int _arrowId)
 	: GameEvent("delete_arrow", _gameId, _playerId), arrowId(_arrowId)
@@ -517,7 +505,7 @@ void Event_SetCardAttr::extractParameters()
 	attrName = parameters["attr_name"];
 	attrValue = parameters["attr_value"];
 }
-Event_AddCounter::Event_AddCounter(int _gameId, int _playerId, int _counterId, const QString &_counterName, int _color, int _radius, int _value)
+Event_AddCounter::Event_AddCounter(int _gameId, int _playerId, int _counterId, const QString &_counterName, const QColor &_color, int _radius, int _value)
 	: GameEvent("add_counter", _gameId, _playerId), counterId(_counterId), counterName(_counterName), color(_color), radius(_radius), value(_value)
 {
 	setParameter("counter_id", counterId);
@@ -531,7 +519,7 @@ void Event_AddCounter::extractParameters()
 	GameEvent::extractParameters();
 	counterId = parameters["counter_id"].toInt();
 	counterName = parameters["counter_name"];
-	color = parameters["color"].toInt();
+	color = ColorConverter::colorFromInt(parameters["color"].toInt());
 	radius = parameters["radius"].toInt();
 	value = parameters["value"].toInt();
 }
@@ -613,6 +601,20 @@ void Event_ServerMessage::extractParameters()
 	GenericEvent::extractParameters();
 	message = parameters["message"];
 }
+Event_GameJoined::Event_GameJoined(int _gameId, int _playerId, bool _spectator)
+	: GenericEvent("game_joined"), gameId(_gameId), playerId(_playerId), spectator(_spectator)
+{
+	setParameter("game_id", gameId);
+	setParameter("player_id", playerId);
+	setParameter("spectator", spectator);
+}
+void Event_GameJoined::extractParameters()
+{
+	GenericEvent::extractParameters();
+	gameId = parameters["game_id"].toInt();
+	playerId = parameters["player_id"].toInt();
+	spectator = (parameters["spectator"] == "1");
+}
 Event_ChatJoinChannel::Event_ChatJoinChannel(const QString &_channel, const QString &_playerName)
 	: ChatEvent("chat_join_channel", _channel), playerName(_playerName)
 {
@@ -687,7 +689,6 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventdeck_select", Event_DeckSelect::newItem);
 	itemNameHash.insert("game_eventgame_closed", Event_GameClosed::newItem);
 	itemNameHash.insert("game_eventready_start", Event_ReadyStart::newItem);
-	itemNameHash.insert("game_eventsetup_zones", Event_SetupZones::newItem);
 	itemNameHash.insert("game_eventgame_start", Event_GameStart::newItem);
 	itemNameHash.insert("game_eventshuffle", Event_Shuffle::newItem);
 	itemNameHash.insert("game_eventroll_die", Event_RollDie::newItem);
@@ -704,6 +705,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventdump_zone", Event_DumpZone::newItem);
 	itemNameHash.insert("game_eventstop_dump_zone", Event_StopDumpZone::newItem);
 	itemNameHash.insert("generic_eventserver_message", Event_ServerMessage::newItem);
+	itemNameHash.insert("generic_eventgame_joined", Event_GameJoined::newItem);
 	itemNameHash.insert("chat_eventchat_join_channel", Event_ChatJoinChannel::newItem);
 	itemNameHash.insert("chat_eventchat_leave_channel", Event_ChatLeaveChannel::newItem);
 	itemNameHash.insert("chat_eventchat_say", Event_ChatSay::newItem);

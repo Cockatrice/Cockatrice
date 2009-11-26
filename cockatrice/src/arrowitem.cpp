@@ -3,6 +3,7 @@
 #include "cardzone.h"
 #include "player.h"
 #include "math.h"
+#include "protocol_items.h"
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsScene>
@@ -76,7 +77,7 @@ void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 	
 	event->accept();
 	if (event->button() == Qt::RightButton)
-		player->client->deleteArrow(id);
+		player->sendGameCommand(new Command_DeleteArrow(-1, id));
 }
 
 ArrowDragItem::ArrowDragItem(CardItem *_startItem, const QColor &_color)
@@ -110,7 +111,8 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
 	if (targetItem && (targetItem != startItem)) {
 		CardZone *startZone = static_cast<CardZone *>(startItem->parentItem());
 		CardZone *targetZone = static_cast<CardZone *>(targetItem->parentItem());
-		player->client->createArrow(
+		player->sendGameCommand(new Command_CreateArrow(
+			-1,
 			startZone->getPlayer()->getId(),
 			startZone->getName(),
 			startItem->getId(),
@@ -118,7 +120,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
 			targetZone->getName(),
 			targetItem->getId(),
 			color
-		);
+		));
 	}
 	deleteLater();
 }

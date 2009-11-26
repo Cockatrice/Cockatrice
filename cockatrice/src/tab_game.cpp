@@ -17,8 +17,8 @@
 #include "dlg_load_remote_deck.h"
 #include "main.h"
 
-TabGame::TabGame(Client *_client, int _gameId)
-	: client(_client), gameId(_gameId), localPlayerId(-1)
+TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectator)
+	: client(_client), gameId(_gameId), localPlayerId(_localPlayerId), spectator(_spectator)
 {
 	zoneLayout = new ZoneViewLayout;
 	scene = new GameScene(zoneLayout, this);
@@ -124,20 +124,26 @@ void TabGame::processGameEvent(GameEvent *event)
 {
 	switch (event->getItemId()) {
 		case ItemId_Event_GameStart: eventGameStart(qobject_cast<Event_GameStart *>(event)); break;
+		case ItemId_Event_GameStateChanged: eventGameStateChanged(qobject_cast<Event_GameStateChanged *>(event)); break;
 		default: qDebug() << "unhandled game event";
 	}
 }
 
-void TabGame::processGameJoinedEvent(Event_GameJoined *event)
+void TabGame::sendGameCommand(GameCommand *command)
 {
-	localPlayerId = event->getPlayerId();
-	spectator = event->getSpectator();
+	command->setGameId(gameId);
+	client->sendCommand(command);
+}
 
+void TabGame::eventGameStateChanged(Event_GameStateChanged *event)
+{
 	const QList<ServerInfo_Player *> &plList = event->getPlayerList();
 	for (int i = 0; i < plList.size(); ++i) {
 		ServerInfo_Player *pl = plList[i];
-		Player *newPlayer = addPlayer(pl->getPlayerId(), pl->getName());
-		newPlayer->processPlayerInfo(pl);
+		Player *player = players.value(pl->getPlayerId(), 0);
+		if (!player)
+			player = addPlayer(pl->getPlayerId(), pl->getName());
+		player->processPlayerInfo(pl);
 	}
 }
 

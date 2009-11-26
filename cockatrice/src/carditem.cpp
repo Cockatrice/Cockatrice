@@ -71,6 +71,18 @@ void CardItem::resetState()
 	update();
 }
 
+void CardItem::processCardInfo(ServerInfo_Card *info)
+{
+	id = info->getId();
+	name = info->getName();
+	attacking = info->getAttacking();
+	counters = info->getCounters();
+	annotation = info->getAnnotation();
+	tapped = info->getTapped();
+
+	update();
+}
+
 CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown)
 {
 	deleteDragItem();

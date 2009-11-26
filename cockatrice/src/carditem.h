@@ -6,6 +6,7 @@
 class CardDatabase;
 class CardDragItem;
 class CardZone;
+class ServerInfo_Card;
 
 const int MAX_COUNTERS_ON_CARD = 999;
 
@@ -41,6 +42,7 @@ public:
 	bool getDoesntUntap() const { return doesntUntap; }
 	void setDoesntUntap(bool _doesntUntap);
 	void resetState();
+	void processCardInfo(ServerInfo_Card *info);
 
 	CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);
 	void deleteDragItem();

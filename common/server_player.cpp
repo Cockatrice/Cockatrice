@@ -10,7 +10,7 @@
 #include "decklist.h"
 
 Server_Player::Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator, Server_ProtocolHandler *_handler)
-	: game(_game), handler(_handler), deck(0), playerId(_playerId), playerName(_playerName), spectator(_spectator), nextCardId(0), PlayerStatus(StatusNormal)
+	: game(_game), handler(_handler), deck(0), playerId(_playerId), playerName(_playerName), spectator(_spectator), nextCardId(0)
 {
 }
 
@@ -85,9 +85,6 @@ void Server_Player::setupZones()
 		}
 	}
 	deckZone->shuffle();
-
-	PlayerStatus = StatusPlaying;
-	game->sendGameEvent(new Event_SetupZones(-1, playerId, deckZone->cards.size(), sbZone->cards.size()));
 }
 
 void Server_Player::clearZones()

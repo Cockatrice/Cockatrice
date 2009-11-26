@@ -20,6 +20,18 @@ enum ResponseCode { RespNothing, RespOk, RespInvalidCommand, RespInvalidData, Re
 // list index, whereas cards in any other zone are referenced by their ids.
 enum ZoneType { PrivateZone, PublicZone, HiddenZone };
 
+class ColorConverter {
+public:
+	static int colorToInt(const QColor &color)
+	{
+		return color.red() * 65536 + color.green() * 256 + color.blue();
+	}
+	static QColor colorFromInt(int colorValue)
+	{
+		return QColor(colorValue / 65536, (colorValue % 65536) / 256, colorValue % 256);
+	}
+};
+
 class SerializableItem {
 protected:
 	SerializableItem *currentItem;

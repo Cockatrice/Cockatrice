@@ -129,49 +129,6 @@ void Game::retranslateUi()
 }
 
 /*
-void Game::cardListReceived(QList<ServerZoneCard> list)
-{
-	for (int i = 0; i < list.size(); ++i) {
-		Player *p = players.value(list[i].getPlayerId(), 0);
-		if (!p)
-			continue;
-		
-		CardZone *zone = p->getZones().value(list[i].getZoneName(), 0);
-		if (!zone)
-			continue;
-		
-		CardItem *card = new CardItem(db, list[i].getName(), list[i].getId());
-		zone->addCard(card, false, list[i].getX(), list[i].getY());
-
-		card->setCounters(list[i].getCounters());
-		card->setTapped(list[i].getTapped());
-		card->setAttacking(list[i].getAttacking());
-		card->setAnnotation(list[i].getAnnotation());
-	}
-}
-
-void Game::zoneListReceived(QList<ServerZone> list)
-{
-	for (int i = 0; i < list.size(); ++i) {
-		Player *p = players.value(list[i].getPlayerId(), 0);
-		if (!p)
-			continue;
-		
-		CardZone *zone = p->getZones().value(list[i].getName(), 0);
-		if (!zone)
-			continue;
-		
-		zone->clearContents();
-		if (
-			(list[i].getType() != ServerZone::PublicZone)
-			&& !((list[i].getType() == ServerZone::PrivateZone) && p->getLocal())
-		) {
-			for (int j = 0; j < list[i].getCardCount(); ++j)
-				zone->addCard(new CardItem(db), false, -1);
-			zone->reorganizeCards();
-		}
-	}
-}
 
 void Game::counterListReceived(QList<ServerCounter> list)
 {
@@ -228,11 +185,6 @@ void Game::playerListReceived(QList<ServerPlayer> playerList)
 	restartGameDialog();
 }
 */
-void Game::readyStart()
-{
-	client->readyStart();
-}
-
 void Game::restartGameDialog()
 {
 //	dlgStartGame->show();
@@ -393,12 +345,12 @@ void Game::actNextPhase()
 	int phase = currentPhase;
 	if (++phase >= phaseCount)
 		phase = 0;
-	client->setActivePhase(phase);
+//	client->setActivePhase(phase);
 }
 
 void Game::actNextTurn()
 {
-	client->nextTurn();
+//	client->nextTurn();
 }
 
 void Game::actRemoveLocalArrows()
@@ -409,7 +361,7 @@ void Game::actRemoveLocalArrows()
 		QMapIterator<int, ArrowItem *> arrowIterator(players[i]->getArrows());
 		while (arrowIterator.hasNext()) {
 			ArrowItem *a = arrowIterator.next().value();
-			players[i]->client->deleteArrow(a->getId());
+//			players[i]->client->deleteArrow(a->getId());
 		}
 	}
 }
@@ -436,37 +388,37 @@ void Game::cardMenuAction()
 
 void Game::actTap(CardItem *card)
 {
-	if (!card->getTapped())
-		client->setCardAttr(qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "tapped", "1");
+//	if (!card->getTapped())
+//		client->setCardAttr(qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "tapped", "1");
 }
 
 void Game::actUntap(CardItem *card)
 {
-	if (card->getTapped())
-		client->setCardAttr(qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "tapped", "0");
+//	if (card->getTapped())
+//		client->setCardAttr(qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "tapped", "0");
 }
 
 void Game::actDoesntUntap(CardItem *card)
 {
-	client->setCardAttr(qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "doesnt_untap", QString::number(!card->getDoesntUntap()));
+//	client->setCardAttr(qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "doesnt_untap", QString::number(!card->getDoesntUntap()));
 }
 
 void Game::actFlip(CardItem *card)
 {
-	QString zone = qgraphicsitem_cast<CardZone *>(card->parentItem())->getName();
-	client->moveCard(card->getId(), zone, zone, card->getGridPoint().x(), card->getGridPoint().y(), !card->getFaceDown());
+//	QString zone = qgraphicsitem_cast<CardZone *>(card->parentItem())->getName();
+//	client->moveCard(card->getId(), zone, zone, card->getGridPoint().x(), card->getGridPoint().y(), !card->getFaceDown());
 }
 
 void Game::actAddCounter(CardItem *card)
 {
-	if (card->getCounters() < MAX_COUNTERS_ON_CARD)
-		client->setCardAttr(qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "counters", QString::number(card->getCounters() + 1));
+//	if (card->getCounters() < MAX_COUNTERS_ON_CARD)
+//		client->setCardAttr(qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "counters", QString::number(card->getCounters() + 1));
 }
 
 void Game::actRemoveCounter(CardItem *card)
 {
-	if (card->getCounters())
-		client->setCardAttr(qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "counters", QString::number(card->getCounters() - 1));
+//	if (card->getCounters())
+//		client->setCardAttr(qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "counters", QString::number(card->getCounters() - 1));
 }
 
 void Game::actSetCounters()
@@ -479,32 +431,32 @@ void Game::actSetCounters()
 	QListIterator<QGraphicsItem *> i(scene->selectedItems());
 	while (i.hasNext()) {
 		CardItem *temp = (CardItem *) i.next();
-		client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "counters", QString::number(number));
+//		client->setCardAttr(qgraphicsitem_cast<CardZone *>(temp->parentItem())->getName(), temp->getId(), "counters", QString::number(number));
 	}
 }
 
 void Game::actMoveToTopLibrary(CardItem *card)
 {
-	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
-	client->moveCard(card->getId(), startZone->getName(), "deck", 0, 0, false);
+//	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
+//	client->moveCard(card->getId(), startZone->getName(), "deck", 0, 0, false);
 }
 
 void Game::actMoveToBottomLibrary(CardItem *card)
 {
-	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
-	client->moveCard(card->getId(), startZone->getName(), "deck", -1, 0, false);
+//	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
+//	client->moveCard(card->getId(), startZone->getName(), "deck", -1, 0, false);
 }
 
 void Game::actMoveToGraveyard(CardItem *card)
 {
-	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
-	client->moveCard(card->getId(), startZone->getName(), "grave", 0, 0, false);
+//	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
+//	client->moveCard(card->getId(), startZone->getName(), "grave", 0, 0, false);
 }
 
 void Game::actMoveToExile(CardItem *card)
 {
-	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
-	client->moveCard(card->getId(), startZone->getName(), "rfg", 0, 0, false);
+//	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
+//	client->moveCard(card->getId(), startZone->getName(), "rfg", 0, 0, false);
 }
 
 void Game::hoverCardEvent(CardItem *card)

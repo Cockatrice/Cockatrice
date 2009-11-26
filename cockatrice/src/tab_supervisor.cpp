@@ -101,10 +101,9 @@ void TabSupervisor::updatePingTime(int value, int max)
 
 void TabSupervisor::gameJoined(Event_GameJoined *event)
 {
-	TabGame *tab = new TabGame(client, event->getGameId());
+	TabGame *tab = new TabGame(client, event->getGameId(), event->getPlayerId(), event->getSpectator());
 	addTab(tab, tr("Game %1").arg(event->getGameId()));
 	gameTabs.insert(event->getGameId(), tab);
-	tab->processGameJoinedEvent(event);
 	setCurrentWidget(tab);
 }
 

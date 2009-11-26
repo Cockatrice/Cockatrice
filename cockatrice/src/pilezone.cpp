@@ -5,6 +5,7 @@
 #include "client.h"
 #include "carddragitem.h"
 #include "zoneviewzone.h"
+#include "protocol_items.h"
 
 PileZone::PileZone(Player *_p, const QString &_name, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent)
 	: CardZone(_p, _name, false, _isShufflable, _contentsKnown, parent)
@@ -47,7 +48,7 @@ void PileZone::addCardImpl(CardItem *card, int x, int /*y*/)
 
 void PileZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
-	player->client->moveCard(cardId, startZone->getName(), getName(), 0, 0);
+	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), cardId, getName(), 0, 0, false));
 }
 
 void PileZone::reorganizeCards()

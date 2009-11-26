@@ -102,6 +102,11 @@ while (<file>) {
 			$constructorParamsH .= "int _$prettyVarName = -1";
 			$constructorParamsCpp .= "int _$prettyVarName";
 			$paramStr5 .= "\t$prettyVarName = parameters[\"$value\"].toInt();\n";
+		} elsif ($key eq 'c') {
+			$dataType = 'QColor';
+			$constructorParamsH .= "const QColor &_$prettyVarName = QColor()";
+			$constructorParamsCpp .= "const QColor &_$prettyVarName";
+			$paramStr5 .= "\t$prettyVarName = ColorConverter::colorFromInt(parameters[\"$value\"].toInt());\n";
 		}
 		($prettyVarName2 = $prettyVarName) =~ s/^(.)/\U$1\E/;
 		$paramStr4 .= "\t$dataType get$prettyVarName2() const { return $prettyVarName; }\n";

@@ -66,7 +66,6 @@ private slots:
 	void counterListReceived(QList<ServerCounter> list);
 	void arrowListReceived(QList<ServerArrow> list);
 */	
-	void readyStart();
 signals:
 	void submitDecklist();
 	void hoverCard(QString name);

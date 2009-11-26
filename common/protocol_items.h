@@ -268,16 +268,16 @@ private:
 	int targetPlayerId;
 	QString targetZone;
 	int targetCardId;
-	int color;
+	QColor color;
 public:
-	Command_CreateArrow(int _gameId = -1, int _startPlayerId = -1, const QString &_startZone = QString(), int _startCardId = -1, int _targetPlayerId = -1, const QString &_targetZone = QString(), int _targetCardId = -1, int _color = -1);
+	Command_CreateArrow(int _gameId = -1, int _startPlayerId = -1, const QString &_startZone = QString(), int _startCardId = -1, int _targetPlayerId = -1, const QString &_targetZone = QString(), int _targetCardId = -1, const QColor &_color = QColor());
 	int getStartPlayerId() const { return startPlayerId; }
 	QString getStartZone() const { return startZone; }
 	int getStartCardId() const { return startCardId; }
 	int getTargetPlayerId() const { return targetPlayerId; }
 	QString getTargetZone() const { return targetZone; }
 	int getTargetCardId() const { return targetCardId; }
-	int getColor() const { return color; }
+	QColor getColor() const { return color; }
 	static ProtocolItem *newItem() { return new Command_CreateArrow; }
 	int getItemId() const { return ItemId_Command_CreateArrow; }
 protected:
@@ -339,13 +339,13 @@ class Command_AddCounter : public GameCommand {
 	Q_OBJECT
 private:
 	QString counterName;
-	int color;
+	QColor color;
 	int radius;
 	int value;
 public:
-	Command_AddCounter(int _gameId = -1, const QString &_counterName = QString(), int _color = -1, int _radius = -1, int _value = -1);
+	Command_AddCounter(int _gameId = -1, const QString &_counterName = QString(), const QColor &_color = QColor(), int _radius = -1, int _value = -1);
 	QString getCounterName() const { return counterName; }
-	int getColor() const { return color; }
+	QColor getColor() const { return color; }
 	int getRadius() const { return radius; }
 	int getValue() const { return value; }
 	static ProtocolItem *newItem() { return new Command_AddCounter; }
@@ -499,20 +499,6 @@ public:
 	static ProtocolItem *newItem() { return new Event_ReadyStart; }
 	int getItemId() const { return ItemId_Event_ReadyStart; }
 };
-class Event_SetupZones : public GameEvent {
-	Q_OBJECT
-private:
-	int deckSize;
-	int sbSize;
-public:
-	Event_SetupZones(int _gameId = -1, int _playerId = -1, int _deckSize = -1, int _sbSize = -1);
-	int getDeckSize() const { return deckSize; }
-	int getSbSize() const { return sbSize; }
-	static ProtocolItem *newItem() { return new Event_SetupZones; }
-	int getItemId() const { return ItemId_Event_SetupZones; }
-protected:
-	void extractParameters();
-};
 class Event_GameStart : public GameEvent {
 	Q_OBJECT
 private:
@@ -601,9 +587,9 @@ private:
 	int targetPlayerId;
 	QString targetZone;
 	int targetCardId;
-	int color;
+	QColor color;
 public:
-	Event_CreateArrow(int _gameId = -1, int _playerId = -1, int _arrowId = -1, int _startPlayerId = -1, const QString &_startZone = QString(), int _startCardId = -1, int _targetPlayerId = -1, const QString &_targetZone = QString(), int _targetCardId = -1, int _color = -1);
+	Event_CreateArrow(int _gameId = -1, int _playerId = -1, int _arrowId = -1, int _startPlayerId = -1, const QString &_startZone = QString(), int _startCardId = -1, int _targetPlayerId = -1, const QString &_targetZone = QString(), int _targetCardId = -1, const QColor &_color = QColor());
 	int getArrowId() const { return arrowId; }
 	int getStartPlayerId() const { return startPlayerId; }
 	QString getStartZone() const { return startZone; }
@@ -611,7 +597,7 @@ public:
 	int getTargetPlayerId() const { return targetPlayerId; }
 	QString getTargetZone() const { return targetZone; }
 	int getTargetCardId() const { return targetCardId; }
-	int getColor() const { return color; }
+	QColor getColor() const { return color; }
 	static ProtocolItem *newItem() { return new Event_CreateArrow; }
 	int getItemId() const { return ItemId_Event_CreateArrow; }
 protected:
@@ -652,14 +638,14 @@ class Event_AddCounter : public GameEvent {
 private:
 	int counterId;
 	QString counterName;
-	int color;
+	QColor color;
 	int radius;
 	int value;
 public:
-	Event_AddCounter(int _gameId = -1, int _playerId = -1, int _counterId = -1, const QString &_counterName = QString(), int _color = -1, int _radius = -1, int _value = -1);
+	Event_AddCounter(int _gameId = -1, int _playerId = -1, int _counterId = -1, const QString &_counterName = QString(), const QColor &_color = QColor(), int _radius = -1, int _value = -1);
 	int getCounterId() const { return counterId; }
 	QString getCounterName() const { return counterName; }
-	int getColor() const { return color; }
+	QColor getColor() const { return color; }
 	int getRadius() const { return radius; }
 	int getValue() const { return value; }
 	static ProtocolItem *newItem() { return new Event_AddCounter; }
@@ -756,6 +742,22 @@ public:
 	QString getMessage() const { return message; }
 	static ProtocolItem *newItem() { return new Event_ServerMessage; }
 	int getItemId() const { return ItemId_Event_ServerMessage; }
+protected:
+	void extractParameters();
+};
+class Event_GameJoined : public GenericEvent {
+	Q_OBJECT
+private:
+	int gameId;
+	int playerId;
+	bool spectator;
+public:
+	Event_GameJoined(int _gameId = -1, int _playerId = -1, bool _spectator = false);
+	int getGameId() const { return gameId; }
+	int getPlayerId() const { return playerId; }
+	bool getSpectator() const { return spectator; }
+	static ProtocolItem *newItem() { return new Event_GameJoined; }
+	int getItemId() const { return ItemId_Event_GameJoined; }
 protected:
 	void extractParameters();
 };

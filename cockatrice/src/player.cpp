@@ -10,6 +10,7 @@
 #include "handzone.h"
 #include "cardlist.h"
 #include "tab_game.h"
+#include "protocol_items.h"
 #include <QSettings>
 #include <QPainter>
 #include <QMenu>
@@ -327,12 +328,12 @@ void Player::actViewSideboard()
 
 void Player::actShuffle()
 {
-	client->shuffle();
+	sendGameCommand(new Command_Shuffle);
 }
 
 void Player::actDrawCard()
 {
-	client->drawCards(1);
+	sendGameCommand(new Command_DrawCards(-1, 1));
 }
 
 void Player::actMulligan()
@@ -342,21 +343,21 @@ void Player::actMulligan()
 	
 	const CardList &handCards = hand->getCards();
 	for (int i = 0; i < handCards.size(); i++)
-		client->moveCard(handCards.at(i)->getId(), "hand", "deck", 0);
-	client->shuffle();
-	client->drawCards(mulliganCards--);
+		sendGameCommand(new Command_MoveCard(-1, "hand", handCards.at(i)->getId(), "deck", 0, -1, false));
+	sendGameCommand(new Command_Shuffle);
+	sendGameCommand(new Command_DrawCards(-1, mulliganCards--));
 }
 
 void Player::actDrawCards()
 {
 	int number = QInputDialog::getInteger(0, tr("Draw cards"), tr("Number:"));
         if (number)
-		client->drawCards(number);
+		sendGameCommand(new Command_DrawCards(-1, number));
 }
 
 void Player::actUntapAll()
 {
-	client->setCardAttr("table", -1, "tapped", "false");
+//	client->setCardAttr("table", -1, "tapped", "false");
 }
 
 void Player::actRollDie()
@@ -364,25 +365,20 @@ void Player::actRollDie()
 	bool ok;
 	int sides = QInputDialog::getInteger(0, tr("Roll die"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
 	if (ok)
-		client->rollDie(sides);
+		sendGameCommand(new Command_RollDie(-1, sides));
 }
 
 void Player::actCreateToken()
 {
 	QString cardname = QInputDialog::getText(0, tr("Create token"), tr("Name:"));
 	if (!cardname.isEmpty())
-		client->createToken("table", cardname, QString(), 0, 0);
+		sendGameCommand(new Command_CreateToken(-1, "table", cardname, QString(), 0, 0));
 }
 
 void Player::actSayMessage()
 {
 	QAction *a = qobject_cast<QAction *>(sender());
-	client->say(a->text());
-}
-
-void Player::addZone(CardZone *z)
-{
-	zones.insert(z->getName(), z);
+	sendGameCommand(new Command_Say(-1, a->text()));
 }
 
 void Player::setCardAttrHelper(CardItem *card, const QString &aname, const QString &avalue, bool allCards)
@@ -699,6 +695,56 @@ void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/
 
 void Player::processPlayerInfo(ServerInfo_Player *info)
 {
+	for (int i = 0; i < info->getZoneList().size(); ++i) {
+		ServerInfo_Zone *zoneInfo = info->getZoneList()[i];
+		CardZone *zone = zones.value(zoneInfo->getName(), 0);
+		if (!zone)
+			continue;
+
+		zone->clearContents();
+		const QList<ServerInfo_Card *> &cardList = zoneInfo->getCardList();
+		if (cardList.isEmpty()) {
+			for (int j = 0; j < zoneInfo->getCardCount(); ++j)
+				zone->addCard(new CardItem, false, -1);
+		} else {
+			for (int j = 0; j < cardList.size(); ++j) {
+				CardItem *card = new CardItem;
+				card->processCardInfo(cardList[i]);
+				zone->addCard(card, false, cardList[i]->getX(), cardList[i]->getY());
+			}
+		}
+		zone->reorganizeCards();
+	}
+
+	clearCounters();
+	for (int i = 0; i < info->getCounterList().size(); ++i) {
+		ServerInfo_Counter *counterInfo = info->getCounterList().at(i);
+		addCounter(counterInfo->getId(), counterInfo->getName(), counterInfo->getColor(), counterInfo->getRadius(), counterInfo->getCount());
+	}
+
+	clearArrows();
+	for (int i = 0; i < info->getArrowList().size(); ++i) {
+		ServerInfo_Arrow *arrowInfo = info->getArrowList().at(i);
+		const QMap<int, Player *> &playerList = static_cast<TabGame *>(parent())->getPlayers();
+		Player *startPlayer = playerList.value(arrowInfo->getStartPlayerId(), 0);
+		Player *targetPlayer = playerList.value(arrowInfo->getTargetPlayerId(), 0);
+		if (!startPlayer || !targetPlayer)
+			continue;
+		CardZone *startZone = startPlayer->getZones().value(arrowInfo->getStartZone(), 0);
+		CardZone *targetZone = targetPlayer->getZones().value(arrowInfo->getTargetZone(), 0);
+		if (!startZone || !targetZone)
+			continue;
+		CardItem *startCard = startZone->getCard(arrowInfo->getStartCardId(), QString());
+		CardItem *targetCard = targetZone->getCard(arrowInfo->getTargetCardId(), QString());
+		if (!startCard || !targetCard)
+			continue;
+		addArrow(arrowInfo->getId(), startCard, targetCard, arrowInfo->getColor());
+	}
+}
+
+void Player::addZone(CardZone *z)
+{
+	zones.insert(z->getName(), z);
 }
 
 void Player::addCounter(int counterId, const QString &name, QColor color, int radius, int value)
@@ -782,4 +828,9 @@ void Player::rearrangeCounters()
 		c->setPos((counterAreaWidth - br.width()) / 2, y);
 		y += br.height() + padding;
 	}
+}
+
+void Player::sendGameCommand(GameCommand *command)
+{
+	static_cast<TabGame *>(parent())->sendGameCommand(command);
 }
