@@ -125,6 +125,9 @@ void TabSupervisor::processChatEvent(ChatEvent *event)
 void TabSupervisor::processGameEvent(GameEvent *event)
 {
 	TabGame *tab = gameTabs.value(event->getGameId());
-	if (tab)
+	if (tab) {
+		qDebug() << "gameEvent gameId =" << event->getGameId();
 		tab->processGameEvent(event);
+	} else
+		qDebug() << "gameEvent: invalid gameId";
 }

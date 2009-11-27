@@ -47,7 +47,7 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	leftFrame->addLayout(searchLayout);
 	leftFrame->addWidget(databaseView);
 
-	cardInfo = new CardInfoWidget(db);
+	cardInfo = new CardInfoWidget;
 	cardInfo->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
 
 	QToolBar *verticalToolBar = new QToolBar;

@@ -1,17 +1,17 @@
 #ifndef CARDINFOWIDGET_H
 #define CARDINFOWIDGET_H
 
-#include "carddatabase.h"
 #include <QFrame>
 
 class QLabel;
 class QTextEdit;
+class CardItem;
+class CardInfo;
 
 class CardInfoWidget : public QFrame {
 	Q_OBJECT
 private:
-	CardDatabase *db;
-	static const int pixmapWidth = 180;
+	static const int pixmapWidth = 160;
 	int pixmapHeight;
 
 	QLabel *cardPicture;
@@ -23,11 +23,12 @@ private:
 	
 	CardInfo *info;
 public:
-	CardInfoWidget(CardDatabase *_db, QWidget *parent = 0);
+	CardInfoWidget(QWidget *parent = 0);
 	void retranslateUi();
 public slots:
 	void setCard(CardInfo *card);
 	void setCard(const QString &cardName);
+	void setCard(CardItem *card);
 private slots:
 	void updatePixmap();
 };

@@ -265,15 +265,15 @@ void Command_IncCounter::extractParameters()
 	counterId = parameters["counter_id"].toInt();
 	delta = parameters["delta"].toInt();
 }
-Command_AddCounter::Command_AddCounter(int _gameId, const QString &_counterName, const QColor &_color, int _radius, int _value)
-	: GameCommand("add_counter", _gameId), counterName(_counterName), color(_color), radius(_radius), value(_value)
+Command_CreateCounter::Command_CreateCounter(int _gameId, const QString &_counterName, const QColor &_color, int _radius, int _value)
+	: GameCommand("create_counter", _gameId), counterName(_counterName), color(_color), radius(_radius), value(_value)
 {
 	setParameter("counter_name", counterName);
 	setParameter("color", color);
 	setParameter("radius", radius);
 	setParameter("value", value);
 }
-void Command_AddCounter::extractParameters()
+void Command_CreateCounter::extractParameters()
 {
 	GameCommand::extractParameters();
 	counterName = parameters["counter_name"];
@@ -342,10 +342,6 @@ void Command_StopDumpZone::extractParameters()
 	GameCommand::extractParameters();
 	playerId = parameters["player_id"].toInt();
 	zoneName = parameters["zone_name"];
-}
-Command_DumpAll::Command_DumpAll(int _gameId)
-	: GameCommand("dump_all", _gameId)
-{
 }
 Event_Say::Event_Say(int _gameId, int _playerId, const QString &_message)
 	: GameEvent("say", _gameId, _playerId), message(_message)
@@ -455,30 +451,6 @@ void Event_CreateToken::extractParameters()
 	x = parameters["x"].toInt();
 	y = parameters["y"].toInt();
 }
-Event_CreateArrow::Event_CreateArrow(int _gameId, int _playerId, int _arrowId, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, const QColor &_color)
-	: GameEvent("create_arrow", _gameId, _playerId), arrowId(_arrowId), startPlayerId(_startPlayerId), startZone(_startZone), startCardId(_startCardId), targetPlayerId(_targetPlayerId), targetZone(_targetZone), targetCardId(_targetCardId), color(_color)
-{
-	setParameter("arrow_id", arrowId);
-	setParameter("start_player_id", startPlayerId);
-	setParameter("start_zone", startZone);
-	setParameter("start_card_id", startCardId);
-	setParameter("target_player_id", targetPlayerId);
-	setParameter("target_zone", targetZone);
-	setParameter("target_card_id", targetCardId);
-	setParameter("color", color);
-}
-void Event_CreateArrow::extractParameters()
-{
-	GameEvent::extractParameters();
-	arrowId = parameters["arrow_id"].toInt();
-	startPlayerId = parameters["start_player_id"].toInt();
-	startZone = parameters["start_zone"];
-	startCardId = parameters["start_card_id"].toInt();
-	targetPlayerId = parameters["target_player_id"].toInt();
-	targetZone = parameters["target_zone"];
-	targetCardId = parameters["target_card_id"].toInt();
-	color = ColorConverter::colorFromInt(parameters["color"].toInt());
-}
 Event_DeleteArrow::Event_DeleteArrow(int _gameId, int _playerId, int _arrowId)
 	: GameEvent("delete_arrow", _gameId, _playerId), arrowId(_arrowId)
 {
@@ -504,24 +476,6 @@ void Event_SetCardAttr::extractParameters()
 	cardId = parameters["card_id"].toInt();
 	attrName = parameters["attr_name"];
 	attrValue = parameters["attr_value"];
-}
-Event_AddCounter::Event_AddCounter(int _gameId, int _playerId, int _counterId, const QString &_counterName, const QColor &_color, int _radius, int _value)
-	: GameEvent("add_counter", _gameId, _playerId), counterId(_counterId), counterName(_counterName), color(_color), radius(_radius), value(_value)
-{
-	setParameter("counter_id", counterId);
-	setParameter("counter_name", counterName);
-	setParameter("color", color);
-	setParameter("radius", radius);
-	setParameter("value", value);
-}
-void Event_AddCounter::extractParameters()
-{
-	GameEvent::extractParameters();
-	counterId = parameters["counter_id"].toInt();
-	counterName = parameters["counter_name"];
-	color = ColorConverter::colorFromInt(parameters["color"].toInt());
-	radius = parameters["radius"].toInt();
-	value = parameters["value"].toInt();
 }
 Event_SetCounter::Event_SetCounter(int _gameId, int _playerId, int _counterId, int _value)
 	: GameEvent("set_counter", _gameId, _playerId), counterId(_counterId), value(_value)
@@ -675,14 +629,13 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdset_card_attr", Command_SetCardAttr::newItem);
 	itemNameHash.insert("cmdready_start", Command_ReadyStart::newItem);
 	itemNameHash.insert("cmdinc_counter", Command_IncCounter::newItem);
-	itemNameHash.insert("cmdadd_counter", Command_AddCounter::newItem);
+	itemNameHash.insert("cmdcreate_counter", Command_CreateCounter::newItem);
 	itemNameHash.insert("cmdset_counter", Command_SetCounter::newItem);
 	itemNameHash.insert("cmddel_counter", Command_DelCounter::newItem);
 	itemNameHash.insert("cmdnext_turn", Command_NextTurn::newItem);
 	itemNameHash.insert("cmdset_active_phase", Command_SetActivePhase::newItem);
 	itemNameHash.insert("cmddump_zone", Command_DumpZone::newItem);
 	itemNameHash.insert("cmdstop_dump_zone", Command_StopDumpZone::newItem);
-	itemNameHash.insert("cmddump_all", Command_DumpAll::newItem);
 	itemNameHash.insert("game_eventsay", Event_Say::newItem);
 	itemNameHash.insert("game_eventjoin", Event_Join::newItem);
 	itemNameHash.insert("game_eventleave", Event_Leave::newItem);
@@ -694,10 +647,8 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventroll_die", Event_RollDie::newItem);
 	itemNameHash.insert("game_eventmove_card", Event_MoveCard::newItem);
 	itemNameHash.insert("game_eventcreate_token", Event_CreateToken::newItem);
-	itemNameHash.insert("game_eventcreate_arrow", Event_CreateArrow::newItem);
 	itemNameHash.insert("game_eventdelete_arrow", Event_DeleteArrow::newItem);
 	itemNameHash.insert("game_eventset_card_attr", Event_SetCardAttr::newItem);
-	itemNameHash.insert("game_eventadd_counter", Event_AddCounter::newItem);
 	itemNameHash.insert("game_eventset_counter", Event_SetCounter::newItem);
 	itemNameHash.insert("game_eventdel_counter", Event_DelCounter::newItem);
 	itemNameHash.insert("game_eventset_active_player", Event_SetActivePlayer::newItem);

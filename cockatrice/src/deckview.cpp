@@ -89,6 +89,13 @@ DeckViewScene::~DeckViewScene()
 
 void DeckViewScene::setDeck(DeckList *_deck)
 {
+	if (deck)
+		delete deck;
+	QMapIterator<QString, DeckViewCardContainer *> i(cardContainers);
+	while (i.hasNext())
+		delete i.next().value();
+	cardContainers.clear();
+	
 	deck = _deck;
 	rebuildTree();
 	rearrangeItems();

@@ -4,7 +4,6 @@
 #include <QInputDialog>
 #include <QPoint>
 #include <QMap>
-#include "client.h"
 #include "carditem.h"
 
 class Client;
@@ -19,24 +18,50 @@ class CardZone;
 class TableZone;
 class HandZone;
 class ServerInfo_Player;
+class ServerInfo_Arrow;
+class ServerInfo_Counter;
 class GameCommand;
+class GameEvent;
+class Event_DeckSelect;
+class Event_Say;
+class Event_ReadyStart;
+class Event_Shuffle;
+class Event_RollDie;
+class Event_CreateArrow;
+class Event_DeleteArrow;
+class Event_CreateToken;
+class Event_SetCardAttr;
+class Event_CreateCounter;
+class Event_SetCounter;
+class Event_DelCounter;
+class Event_DumpZone;
+class Event_StopDumpZone;
+class Event_MoveCard;
+class Event_DrawCards;
 
 class Player : public QObject, public QGraphicsItem {
 	Q_OBJECT
 signals:
-	void moveCard(int cardId, QString startZone, QString targetZone, int x, int y);
-	void hoverCard(QString name);
 	void closeZoneView(ZoneViewZone *zone);
 	void toggleZoneView(Player *player, QString zoneName, int number);
-	void sigShowCardMenu(QPoint p);
+	void sigShowCardMenu(QPoint p); // XXX
+	void newCardAdded(CardItem *card);
 	// Log events
-	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
+	void logDeckSelect(Player *player, int deckId);
+	void logSay(Player *player, QString message);
+	void logReadyStart(Player *player);
+	void logShuffle(Player *player);
+	void logRollDie(Player *player, int sides, int roll);
+	void logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard);
 	void logCreateToken(Player *player, QString cardName);
+	void logDrawCards(Player *player, int number);
+	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
 	void logSetCardCounters(Player *player, QString cardName, int value, int oldValue);
 	void logSetTapped(Player *player, QString cardName, bool tapped);
 	void logSetCounter(Player *player, QString counterName, int value, int oldValue);
-	void logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard);
 	void logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap);
+	void logDumpZone(Player *player, CardZone *zone, int numberCards);
+	void logStopDumpZone(Player *player, CardZone *zone);
 	
 	void sizeChanged();
 public slots:
@@ -87,6 +112,23 @@ private:
 	void rearrangeCounters();
 	
 	void initSayMenu();
+	
+	void eventDeckSelect(Event_DeckSelect *event);
+	void eventSay(Event_Say *event);
+	void eventReadyStart(Event_ReadyStart *event);
+	void eventShuffle(Event_Shuffle *event);
+	void eventRollDie(Event_RollDie *event);
+	void eventCreateArrow(Event_CreateArrow *event);
+	void eventDeleteArrow(Event_DeleteArrow *event);
+	void eventCreateToken(Event_CreateToken *event);
+	void eventSetCardAttr(Event_SetCardAttr *event);
+	void eventCreateCounter(Event_CreateCounter *event);
+	void eventSetCounter(Event_SetCounter *event);
+	void eventDelCounter(Event_DelCounter *event);
+	void eventDumpZone(Event_DumpZone *event);
+	void eventStopDumpZone(Event_StopDumpZone *event);
+	void eventMoveCard(Event_MoveCard *event);
+	void eventDrawCards(Event_DrawCards *event);
 public:
 	static const int counterAreaWidth = 65;
 	
@@ -95,13 +137,16 @@ public:
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	
+	void addCard(CardItem *c);
 	void addZone(CardZone *z);
 
-	void addCounter(int counterId, const QString &name, QColor color, int radius, int value);
+	Counter *addCounter(ServerInfo_Counter *counter);
+	Counter *addCounter(int counterId, const QString &name, QColor color, int radius, int value);
 	void delCounter(int counterId);
 	void clearCounters();
 	
-	void addArrow(int arrowId, CardItem *startCard, CardItem *targetCard, const QColor &color);
+	ArrowItem *addArrow(ServerInfo_Arrow *arrow);
+	ArrowItem *addArrow(int arrowId, CardItem *startCard, CardItem *targetCard, const QColor &color);
 	void delArrow(int arrowId);
 	void clearArrows();
 
@@ -116,12 +161,13 @@ public:
 	const QMap<QString, CardZone *> &getZones() const { return zones; }
 	const QMap<int, ArrowItem *> &getArrows() const { return arrows; }
 	TableZone *getTable() const { return table; }
-//	void gameEvent(const ServerEventData &event);
 	void showCardMenu(const QPoint &p);
 	bool getActive() const { return active; }
 	void setActive(bool _active);
-
+	
+	void prepareForGame();
 	void processPlayerInfo(ServerInfo_Player *info);
+	void processGameEvent(GameEvent *event);
 	void sendGameCommand(GameCommand *command);
 };
 

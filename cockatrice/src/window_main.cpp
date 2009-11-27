@@ -143,16 +143,7 @@ void MainWindow::actExit()
 {
 	close();
 }
-/*
-void MainWindow::actSay()
-{
-	if (sayEdit->text().isEmpty())
-		return;
-	
-	client->say(sayEdit->text());
-	sayEdit->clear();
-}
-*/
+
 void MainWindow::serverTimeout()
 {
 	QMessageBox::critical(this, tr("Error"), tr("Server timeout"));

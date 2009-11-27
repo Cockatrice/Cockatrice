@@ -6,6 +6,7 @@
 #include <QPushButton>
 
 class Player;
+class GameCommand;
 
 class PhaseButton : public QPushButton {
 	Q_OBJECT
@@ -34,15 +35,16 @@ private:
 public:
 	PhasesToolbar(QWidget *parent = 0);
 	void retranslateUi();
+	int phaseCount() const { return buttonList.size(); }
 public slots:
 	void setActivePhase(int phase);
 private slots:
 	void phaseButtonClicked();
+	void actNextTurn();
+	void actUntapAll();
+	void actDrawCard();
 signals:
-	void signalSetPhase(int phase);
-	void signalNextTurn();
-	void signalUntapAll();
-	void signalDrawCard();
+	void sendGameCommand(GameCommand *command);
 };
 
 #endif

@@ -6,13 +6,14 @@
 #include "cardzone.h"
 #include "tablezone.h"
 #include "player.h"
-#include "game.h"
 #include "arrowitem.h"
 #include "main.h"
+#include "protocol_datastructures.h"
 
-CardItem::CardItem(const QString &_name, int _cardid, QGraphicsItem *parent)
-	: AbstractCardItem(_name, parent), id(_cardid), attacking(false), facedown(false), counters(0), doesntUntap(false), dragItem(NULL)
+CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, QGraphicsItem *parent)
+	: AbstractCardItem(_name, parent), owner(_owner), id(_cardid), attacking(false), facedown(false), counters(0), doesntUntap(false), dragItem(NULL)
 {
+	owner->addCard(this);
 }
 
 CardItem::~CardItem()
@@ -172,8 +173,13 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 	}
 }
 
+void CardItem::processHoverEvent()
+{
+	emit hovered(this);
+}
+
 void CardItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-	((Game *) ((CardZone *) parentItem())->getPlayer()->parent())->hoverCardEvent(this);
+	processHoverEvent();
 	QGraphicsItem::hoverEnterEvent(event);
 }

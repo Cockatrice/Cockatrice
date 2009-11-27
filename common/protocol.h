@@ -23,6 +23,9 @@ enum ItemId {
 	ItemId_Event_ChatListPlayers = ItemId_Other + 201,
 	ItemId_Event_ListGames = ItemId_Other + 202,
 	ItemId_Event_GameStateChanged = ItemId_Other + 203,
+	ItemId_Event_CreateArrow = ItemId_Other + 204,
+	ItemId_Event_CreateCounter = ItemId_Other + 205,
+	ItemId_Event_DrawCards = ItemId_Other + 206,
 	ItemId_Response_DeckList = ItemId_Other + 300,
 	ItemId_Response_DeckDownload = ItemId_Other + 301,
 	ItemId_Response_DeckUpload = ItemId_Other + 302
@@ -341,7 +344,6 @@ class Event_GameStateChanged : public GameEvent {
 	Q_OBJECT
 private:
 	SerializableItem *currentItem;
-	bool readFinished;
 	QList<ServerInfo_Player *> playerList;
 public:
 	Event_GameStateChanged(int _gameId = -1, const QList<ServerInfo_Player *> &_playerList = QList<ServerInfo_Player *>());
@@ -352,6 +354,57 @@ public:
 	
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
+};
+
+class Event_CreateArrow : public GameEvent {
+	Q_OBJECT
+private:
+	ServerInfo_Arrow *arrow;
+	bool readFinished;
+protected:
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
+public:
+	Event_CreateArrow(int _gameId = -1, int _playerId = -1, ServerInfo_Arrow *_arrow = 0);
+	~Event_CreateArrow();
+	int getItemId() const { return ItemId_Event_CreateArrow; }
+	static ProtocolItem *newItem() { return new Event_CreateArrow; }
+	ServerInfo_Arrow *getArrow() const { return arrow; }
+};
+
+class Event_CreateCounter : public GameEvent {
+	Q_OBJECT
+private:
+	ServerInfo_Counter *counter;
+	bool readFinished;
+protected:
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
+public:
+	Event_CreateCounter(int _gameId = -1, int _playerId = -1, ServerInfo_Counter *_counter = 0);
+	~Event_CreateCounter();
+	int getItemId() const { return ItemId_Event_CreateCounter; }
+	static ProtocolItem *newItem() { return new Event_CreateCounter; }
+	ServerInfo_Counter *getCounter() const { return counter; }
+};
+
+class Event_DrawCards : public GameEvent {
+	Q_OBJECT
+private:
+	SerializableItem *currentItem;
+	int numberCards;
+	QList<ServerInfo_Card *> cardList;
+protected:
+	void extractParameters();
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
+public:
+	Event_DrawCards(int _gameId = -1, int _playerId = -1, int numberCards = -1, const QList<ServerInfo_Card *> &_cardList = QList<ServerInfo_Card *>());
+	~Event_DrawCards();
+	int getItemId() const { return ItemId_Event_DrawCards; }
+	static ProtocolItem *newItem() { return new Event_DrawCards; }
+	int getNumberCards() const { return numberCards; }
+	const QList<ServerInfo_Card *> &getCardList() const { return cardList; }
 };
 
 #endif

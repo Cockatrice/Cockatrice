@@ -152,8 +152,9 @@ bool ServerSocketInterface::deckListHelper(DeckList_Directory *folder)
 			return false;
 	}
 	
-	query.prepare("select id, name, upload_time from decklist_files where id_folder = :id_folder");
+	query.prepare("select id, name, upload_time from decklist_files where id_folder = :id_folder and user = :user");
 	query.bindValue(":id_folder", folder->getId());
+	query.bindValue(":user", playerName);
 	if (!servatrice->execSqlQuery(query))
 		return false;
 	

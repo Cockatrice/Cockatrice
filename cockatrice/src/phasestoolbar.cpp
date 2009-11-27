@@ -1,8 +1,9 @@
-#include "phasestoolbar.h"
 #include <QAction>
 #include <QVBoxLayout>
 #include <QPainter>
 #include <QPen>
+#include "phasestoolbar.h"
+#include "protocol_items.h"
 
 PhaseButton::PhaseButton(const QIcon &icon, QAction *_doubleClickAction)
 	: QPushButton(icon, QString()), active(false), doubleClickAction(_doubleClickAction), activePixmap(50, 50), inactivePixmap(50, 50)
@@ -54,9 +55,9 @@ PhasesToolbar::PhasesToolbar(QWidget *parent)
 	: QFrame(parent)
 {
 	QAction *aUntapAll = new QAction(this);
-	connect(aUntapAll, SIGNAL(triggered()), this, SIGNAL(signalUntapAll()));
+	connect(aUntapAll, SIGNAL(triggered()), this, SLOT(actUntapAll()));
 	QAction *aDrawCard = new QAction(this);
-	connect(aDrawCard, SIGNAL(triggered()), this, SIGNAL(signalDrawCard()));
+	connect(aDrawCard, SIGNAL(triggered()), this, SLOT(actDrawCard()));
 	
 	PhaseButton *untapButton = new PhaseButton(QIcon(":/resources/icon_phase_untap.svg"), aUntapAll);
 	PhaseButton *upkeepButton = new PhaseButton(QIcon(":/resources/icon_phase_upkeep.svg"));
@@ -80,7 +81,7 @@ PhasesToolbar::PhasesToolbar(QWidget *parent)
 	QPushButton *nextTurnButton = new QPushButton(QIcon(":/resources/icon_nextturn.svg"), QString());
 	nextTurnButton->setIconSize(QSize(40, 40));
 	nextTurnButton->setFixedSize(50, 50);
-	connect(nextTurnButton, SIGNAL(clicked()), this, SIGNAL(signalNextTurn()));
+	connect(nextTurnButton, SIGNAL(clicked()), this, SLOT(actNextTurn()));
 		
 	QVBoxLayout *layout = new QVBoxLayout;
 	layout->setSpacing(0);
@@ -138,5 +139,20 @@ void PhasesToolbar::phaseButtonClicked()
 	PhaseButton *button = qobject_cast<PhaseButton *>(sender());
 	if (button->getActive())
 		return;
-	emit signalSetPhase(buttonList.indexOf(button));
+	emit sendGameCommand(new Command_SetActivePhase(-1, buttonList.indexOf(button)));
+}
+
+void PhasesToolbar::actNextTurn()
+{
+	emit sendGameCommand(new Command_NextTurn);
+}
+
+void PhasesToolbar::actUntapAll()
+{
+	emit sendGameCommand(new Command_SetCardAttr(-1, "table", -1, "tapped", "0"));
+}
+
+void PhasesToolbar::actDrawCard()
+{
+	emit sendGameCommand(new Command_DrawCards(-1, 1));
 }

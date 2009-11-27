@@ -219,13 +219,14 @@ QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAs
 	return result;
 }
 
-void Server_Game::sendGameEvent(GameEvent *event)
+void Server_Game::sendGameEvent(GameEvent *event, Server_Player *exclude)
 {
 	event->setGameId(gameId);
 	QList<Server_Player *> receivers = QList<Server_Player *>() << players.values() << spectators;
 	
 	for (int i = 0; i < receivers.size(); ++i)
-		receivers[i]->sendProtocolItem(event, false);
+		if (receivers[i] != exclude)
+			receivers[i]->sendProtocolItem(event, false);
 
 	delete event;
 }

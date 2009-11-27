@@ -80,14 +80,13 @@ void Server_ProtocolHandler::processCommand(Command *command)
 			case ItemId_Command_SetCardAttr: response = cmdSetCardAttr(qobject_cast<Command_SetCardAttr *>(command), game, player); break;
 			case ItemId_Command_ReadyStart: response = cmdReadyStart(qobject_cast<Command_ReadyStart *>(command), game, player); break;
 			case ItemId_Command_IncCounter: response = cmdIncCounter(qobject_cast<Command_IncCounter *>(command), game, player); break;
-			case ItemId_Command_AddCounter: response = cmdAddCounter(qobject_cast<Command_AddCounter *>(command), game, player); break;
+			case ItemId_Command_CreateCounter: response = cmdCreateCounter(qobject_cast<Command_CreateCounter *>(command), game, player); break;
 			case ItemId_Command_SetCounter: response = cmdSetCounter(qobject_cast<Command_SetCounter *>(command), game, player); break;
 			case ItemId_Command_DelCounter: response = cmdDelCounter(qobject_cast<Command_DelCounter *>(command), game, player); break;
 			case ItemId_Command_NextTurn: response = cmdNextTurn(qobject_cast<Command_NextTurn *>(command), game, player); break;
 			case ItemId_Command_SetActivePhase: response = cmdSetActivePhase(qobject_cast<Command_SetActivePhase *>(command), game, player); break;
 			case ItemId_Command_DumpZone: response = cmdDumpZone(qobject_cast<Command_DumpZone *>(command), game, player); break;
 			case ItemId_Command_StopDumpZone: response = cmdStopDumpZone(qobject_cast<Command_StopDumpZone *>(command), game, player); break;
-			case ItemId_Command_DumpAll: response = cmdDumpAll(qobject_cast<Command_DumpAll *>(command), game, player); break;
 		}
 	} else {
 		qDebug() << "received generic Command";
@@ -297,13 +296,16 @@ ResponseCode Server_ProtocolHandler::cmdDrawCards(Command_DrawCards *cmd, Server
 	if (deck->cards.size() < number)
 		number = deck->cards.size();
 
+	QList<ServerInfo_Card *> cardList;
 	for (int i = 0; i < number; ++i) {
 		Server_Card *card = deck->cards.takeFirst();
 		hand->cards.append(card);
-//		player->privateEvent(QString("draw|%1|%2").arg(card->getId()).arg(card->getName()));
+		cardList.append(new ServerInfo_Card(card->getId(), card->getName()));
 	}
+	
+	player->sendProtocolItem(new Event_DrawCards(game->getGameId(), player->getPlayerId(), cardList.size(), cardList));
+	game->sendGameEvent(new Event_DrawCards(-1, player->getPlayerId(), cardList.size()), player);
 
-//	game->broadcastEvent(QString("draw|%1").arg(number), player);
 	return RespOk;
 }
 
@@ -365,9 +367,9 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, Server_G
 		x = -1;
 	
 	if ((startzone->getType() == PublicZone) || (targetzone->getType() == PublicZone))
-		game->sendGameEvent(new Event_MoveCard(-1, player->getPlayerId(), card->getId(), publicCardName, startzone->getName(), position, targetzone->getName(), x, y, facedown));
+		game->sendGameEvent(new Event_MoveCard(-1, player->getPlayerId(), card->getId(), publicCardName, startzone->getName(), position, targetzone->getName(), x, y, facedown), player);
 	else
-		game->sendGameEvent(new Event_MoveCard(-1, player->getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getName(), x, y, false));
+		game->sendGameEvent(new Event_MoveCard(-1, player->getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getName(), x, y, false), player);
 
 	// If the card was moved to another zone, delete all arrows from and to the card
 	if (startzone != targetzone) {
@@ -425,9 +427,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Se
 
 	Server_Arrow *arrow = new Server_Arrow(player->newArrowId(), startCard, targetCard, cmd->getColor());
 	player->addArrow(arrow);
-	game->sendGameEvent(new Event_CreateArrow(
-		-1,
-		player->getPlayerId(),
+	game->sendGameEvent(new Event_CreateArrow(-1, player->getPlayerId(), new ServerInfo_Arrow(
 		arrow->getId(),
 		startPlayer->getPlayerId(),
 		startZone->getName(),
@@ -436,7 +436,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Se
 		targetZone->getName(),
 		targetCard->getId(),
 		cmd->getColor()
-	));
+	)));
 	return RespOk;
 }
 
@@ -496,11 +496,11 @@ ResponseCode Server_ProtocolHandler::cmdIncCounter(Command_IncCounter *cmd, Serv
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdAddCounter(Command_AddCounter *cmd, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdCreateCounter(Command_CreateCounter *cmd, Server_Game *game, Server_Player *player)
 {
 	Server_Counter *c = new Server_Counter(player->newCounterId(), cmd->getCounterName(), cmd->getColor(), cmd->getRadius(), cmd->getValue());
 	player->addCounter(c);
-	game->sendGameEvent(new Event_AddCounter(-1, player->getPlayerId(), c->getId(), c->getName(), c->getColor(), c->getRadius(), c->getCount()));
+	game->sendGameEvent(new Event_CreateCounter(-1, player->getPlayerId(), new ServerInfo_Counter(c->getId(), c->getName(), c->getColor(), c->getRadius(), c->getCount())));
 	
 	return RespOk;
 }
@@ -573,10 +573,5 @@ ResponseCode Server_ProtocolHandler::cmdStopDumpZone(Command_StopDumpZone *cmd, 
 		zone->setCardsBeingLookedAt(0);
 		game->sendGameEvent(new Event_StopDumpZone(-1, player->getPlayerId(), cmd->getPlayerId(), zone->getName()));
 	}
-	return RespOk;
-}
-
-ResponseCode Server_ProtocolHandler::cmdDumpAll(Command_DumpAll *cmd, Server_Game *game, Server_Player *player)
-{
 	return RespOk;
 }

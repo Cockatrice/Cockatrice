@@ -35,7 +35,7 @@ void ZoneViewZone::initializeCards()
 		int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
 		for (int i = 0; i < number; i++) {
 			CardItem *card = c.at(i);
-			addCard(new CardItem(card->getName(), card->getId(), this), false, i);
+			addCard(new CardItem(player, card->getName(), card->getId(), this), false, i);
 		}
 		emit contentsChanged();
 		reorganizeCards();
@@ -45,7 +45,7 @@ void ZoneViewZone::initializeCards()
 void ZoneViewZone::zoneDumpReceived(QList<ServerInfo_Card> cards)
 {
 	for (int i = 0; i < cards.size(); i++) {
-		CardItem *card = new CardItem(cards[i].getName(), i, this);
+		CardItem *card = new CardItem(player, cards[i].getName(), i, this);
 		addCard(card, false, i);
 	}
 	

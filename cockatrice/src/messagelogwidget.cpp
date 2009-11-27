@@ -1,5 +1,4 @@
 #include "messagelogwidget.h"
-#include "game.h"
 #include "player.h"
 #include "cardzone.h"
 #include <QApplication>
@@ -50,23 +49,19 @@ void MessageLogWidget::logProtocolError()
 	append(tr("Protocol error."));
 }
 
-void MessageLogWidget::logPlayerListReceived(QStringList players)
+void MessageLogWidget::logGameJoined(int gameId)
 {
-	append("---");
-	append(tr("You have joined the game. Player list:"));
-	for (int i = 0; i < players.size(); i++)
-		append(sanitizeHtml(players.at(i)));
-	append("---");
+	append(tr("You have joined game #%1.").arg(gameId));
 }
 
 void MessageLogWidget::logJoin(Player *player)
 {
-	append(tr("%1 has joined the game").arg(sanitizeHtml(player->getName())));
+	append(tr("%1 has joined the game.").arg(sanitizeHtml(player->getName())));
 }
 
 void MessageLogWidget::logLeave(Player *player)
 {
-	append(tr("%1 has left the game").arg(sanitizeHtml(player->getName())));
+	append(tr("%1 has left the game.").arg(sanitizeHtml(player->getName())));
 }
 
 void MessageLogWidget::logGameClosed()
@@ -84,9 +79,17 @@ void MessageLogWidget::logLeaveSpectator(QString name)
 	append(tr("%1 is not watching the game any more.").arg(sanitizeHtml(name)));
 }
 
+void MessageLogWidget::logDeckSelect(Player *player, int deckId)
+{
+	if (deckId == -1)
+		append(tr("%1 has loaded a local deck.").arg(sanitizeHtml(player->getName())));
+	else
+		append(tr("%1 has loaded deck #%2.").arg(sanitizeHtml(player->getName())).arg(deckId));
+}
+
 void MessageLogWidget::logReadyStart(Player *player)
 {
-	append(tr("%1 is ready to start a new game.").arg(sanitizeHtml(player->getName())));
+	append(tr("%1 is ready to start the game.").arg(sanitizeHtml(player->getName())));
 }
 
 void MessageLogWidget::logGameStart()
@@ -109,7 +112,7 @@ void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
 	append(tr("%1 rolls a %2 with a %3-sided die.").arg(sanitizeHtml(player->getName())).arg(roll).arg(sides));
 }
 
-void MessageLogWidget::logDraw(Player *player, int number)
+void MessageLogWidget::logDrawCards(Player *player, int number)
 {
 	if (number == 1)
 		append(tr("%1 draws a card.").arg(sanitizeHtml(player->getName())));
@@ -277,29 +280,27 @@ void MessageLogWidget::logSetActivePhase(int phase)
 
 void MessageLogWidget::connectToPlayer(Player *player)
 {
-/*	connect(game, SIGNAL(logPlayerListReceived(QStringList)), this, SLOT(logPlayerListReceived(QStringList)));
+	connect(player, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));
+	connect(player, SIGNAL(logDeckSelect(Player *, int)), this, SLOT(logDeckSelect(Player *, int)));
+	connect(player, SIGNAL(logReadyStart(Player *)), this, SLOT(logReadyStart(Player *)));
+	connect(player, SIGNAL(logShuffle(Player *)), this, SLOT(logShuffle(Player *)));
+	connect(player, SIGNAL(logRollDie(Player *, int, int)), this, SLOT(logRollDie(Player *, int, int)));
+	connect(player, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString)), this, SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString)));
+	connect(player, SIGNAL(logCreateToken(Player *, QString)), this, SLOT(logCreateToken(Player *, QString)));
+	connect(player, SIGNAL(logSetCounter(Player *, QString, int, int)), this, SLOT(logSetCounter(Player *, QString, int, int)));
+	connect(player, SIGNAL(logSetCardCounters(Player *, QString, int, int)), this, SLOT(logSetCardCounters(Player *, QString, int, int)));
+	connect(player, SIGNAL(logSetTapped(Player *, QString, bool)), this, SLOT(logSetTapped(Player *, QString, bool)));
+	connect(player, SIGNAL(logSetDoesntUntap(Player *, QString, bool)), this, SLOT(logSetDoesntUntap(Player *, QString, bool)));
+	connect(player, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)), this, SLOT(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)));
+	connect(player, SIGNAL(logDumpZone(Player *, CardZone *, int)), this, SLOT(logDumpZone(Player *, CardZone *, int)));
+	connect(player, SIGNAL(logStopDumpZone(Player *, CardZone *)), this, SLOT(logStopDumpZone(Player *, CardZone *)));
+	connect(player, SIGNAL(logDrawCards(Player *, int)), this, SLOT(logDrawCards(Player *, int)));
+/*
 	connect(game, SIGNAL(logJoin(Player *)), this, SLOT(logJoin(Player *)));
 	connect(game, SIGNAL(logLeave(Player *)), this, SLOT(logLeave(Player *)));
 	connect(game, SIGNAL(logGameClosed()), this, SLOT(logGameClosed()));
 	connect(game, SIGNAL(logJoinSpectator(QString)), this, SLOT(logJoinSpectator(QString)));
 	connect(game, SIGNAL(logLeaveSpectator(QString)), this, SLOT(logLeaveSpectator(QString)));
-	connect(game, SIGNAL(logReadyStart(Player *)), this, SLOT(logReadyStart(Player *)));
-	connect(game, SIGNAL(logGameStart()), this, SLOT(logGameStart()));
-	connect(game, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));
-	connect(game, SIGNAL(logShuffle(Player *)), this, SLOT(logShuffle(Player *)));
-	connect(game, SIGNAL(logRollDie(Player *, int, int)), this, SLOT(logRollDie(Player *, int, int)));
-	connect(game, SIGNAL(logDraw(Player *, int)), this, SLOT(logDraw(Player *, int)));
-	connect(game, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)), this, SLOT(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)));
-	connect(game, SIGNAL(logCreateToken(Player *, QString)), this, SLOT(logCreateToken(Player *, QString)));
-	connect(game, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString)), this, SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString)));
-	connect(game, SIGNAL(logSetCardCounters(Player *, QString, int, int)), this, SLOT(logSetCardCounters(Player *, QString, int, int)));
-	connect(game, SIGNAL(logSetTapped(Player *, QString, bool)), this, SLOT(logSetTapped(Player *, QString, bool)));
-	connect(game, SIGNAL(logSetCounter(Player *, QString, int, int)), this, SLOT(logSetCounter(Player *, QString, int, int)));
-	connect(game, SIGNAL(logSetDoesntUntap(Player *, QString, bool)), this, SLOT(logSetDoesntUntap(Player *, QString, bool)));
-	connect(game, SIGNAL(logDumpZone(Player *, CardZone *, int)), this, SLOT(logDumpZone(Player *, CardZone *, int)));
-	connect(game, SIGNAL(logStopDumpZone(Player *, CardZone *)), this, SLOT(logStopDumpZone(Player *, CardZone *)));
-	connect(game, SIGNAL(logSetActivePlayer(Player *)), this, SLOT(logSetActivePlayer(Player *)));
-	connect(game, SIGNAL(setActivePhase(int)), this, SLOT(logSetActivePhase(int)));
 	
 	//Alert Test
 	connect(game, SIGNAL(logSay(Player *, QString)), this, SLOT(msgAlert()));

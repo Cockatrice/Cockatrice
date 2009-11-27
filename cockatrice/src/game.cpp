@@ -19,12 +19,6 @@ Game::Game(Client *_client, GameScene *_scene, QMenuBar *menuBar, QObject *paren
 {
 	connect(client, SIGNAL(gameEvent(const ServerEventData &)), this, SLOT(gameEvent(const ServerEventData &)));
 
-	aNextPhase = new QAction(this);
-	connect(aNextPhase, SIGNAL(triggered()), this, SLOT(actNextPhase()));
-	aNextTurn = new QAction(this);
-	connect(aNextTurn, SIGNAL(triggered()), this, SLOT(actNextTurn()));
-	aRemoveLocalArrows = new QAction(this);
-	connect(aRemoveLocalArrows, SIGNAL(triggered()), this, SLOT(actRemoveLocalArrows()));
 	aTap = new QAction(this);
 	aUntap = new QAction(this);
 	aDoesntUntap = new QAction(this);
@@ -38,12 +32,6 @@ Game::Game(Client *_client, GameScene *_scene, QMenuBar *menuBar, QObject *paren
 	aMoveToGraveyard = new QAction(this);
 	aMoveToExile = new QAction(this);
 
-	gameMenu = menuBar->addMenu(QString());
-	gameMenu->addAction(aNextPhase);
-	gameMenu->addAction(aNextTurn);
-	gameMenu->addSeparator();
-	gameMenu->addAction(aRemoveLocalArrows);
-	
 	cardMenu = menuBar->addMenu(QString());
 	cardMenu->addAction(aTap);
 	cardMenu->addAction(aUntap);
@@ -99,14 +87,6 @@ Game::~Game()
 
 void Game::retranslateUi()
 {
-	gameMenu->setTitle(tr("&Game"));
-	aNextPhase->setText(tr("Next &phase"));
-	aNextPhase->setShortcut(tr("Ctrl+Space"));
-	aNextTurn->setText(tr("Next &turn"));
-	aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
-	aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
-	aRemoveLocalArrows->setShortcut(tr("Ctrl+R"));
-	
 	cardMenu->setTitle(tr("C&ard"));
 	aTap->setText(tr("&Tap"));
 	aUntap->setText(tr("&Untap"));
@@ -123,247 +103,11 @@ void Game::retranslateUi()
 	
 	moveMenu->setTitle(tr("&Move to"));
 	
-	QMapIterator<int, Player *> i(players);
-	while (i.hasNext())
-		i.next().value()->retranslateUi();
 }
 
-/*
-
-void Game::counterListReceived(QList<ServerCounter> list)
-{
-	QMapIterator<int, Player *> i(players);
-	while (i.hasNext())
-		i.next().value()->clearCounters();
-	
-	for (int i = 0; i < list.size(); ++i) {
-		Player *p = players.value(list[i].getPlayerId(), 0);
-		if (!p)
-			continue;
-		p->addCounter(list[i].getId(), list[i].getName(), list[i].getColor(), list[i].getRadius(), list[i].getCount());
-	}
-}
-
-void Game::arrowListReceived(QList<ServerArrow> list)
-{
-	QMapIterator<int, Player *> i(players);
-	while (i.hasNext())
-		i.next().value()->clearArrows();
-	
-	for (int i = 0; i < list.size(); ++i) {
-		Player *p = players.value(list[i].getPlayerId(), 0);
-		if (!p)
-			continue;
-		
-		Player *startPlayer = players.value(list[i].getStartPlayerId(), 0);
-		Player *targetPlayer = players.value(list[i].getTargetPlayerId(), 0);
-		if (!startPlayer || !targetPlayer)
-			continue;
-		
-		CardZone *startZone = startPlayer->getZones().value(list[i].getStartZone(), 0);
-		CardZone *targetZone = targetPlayer->getZones().value(list[i].getTargetZone(), 0);
-		if (!startZone || !targetZone)
-			continue;
-		
-		CardItem *startCard = startZone->getCard(list[i].getStartCardId(), QString());
-		CardItem *targetCard = targetZone->getCard(list[i].getTargetCardId(), QString());
-		if (!startCard || !targetCard)
-			continue;
-
-		p->addArrow(list[i].getId(), startCard, targetCard, list[i].getColor());
-	}
-}
-
-void Game::playerListReceived(QList<ServerPlayer> playerList)
-{
-	QStringList nameList;
-	for (int i = 0; i < playerList.size(); ++i) {
-		nameList << playerList[i].getName();
-		addPlayer(playerList[i].getPlayerId(), playerList[i].getName(), playerList[i].getLocal());
-	}
-	emit logPlayerListReceived(nameList);
-	restartGameDialog();
-}
-*/
 void Game::restartGameDialog()
 {
 //	dlgStartGame->show();
-}
-/*
-void Game::gameEvent(const ServerEventData &msg)
-{
-	qDebug(QString("game::gameEvent: public=%1, player=%2, name=%3, type=%4, data=%5").arg(msg.getPublic()).arg(msg.getPlayerId()).arg(msg.getPlayerName()).arg(msg.getEventType()).arg(msg.getEventData().join("/")).toLatin1());
-	Player *p = players.value(msg.getPlayerId(), 0);
-	if (!msg.getPublic()) {
-		if (!p)
-			return;
-		p->gameEvent(msg);
-	} else {
-		if ((msg.getPlayerId() != -1) && (!p) && (msg.getEventType() != eventJoin) && (msg.getEventType() != eventLeave)) {
-			qDebug("Game::gameEvent: invalid player");
-			return;
-		}
-
-		switch(msg.getEventType()) {
-		case eventSay:
-			emit logSay(p, msg.getEventData()[0]);
-			break;
-		case eventJoin: {
-			const QStringList &data = msg.getEventData();
-			if (data.size() != 1)
-				return;
-			bool spectator = data[0].toInt();
-			if (spectator) {
-				spectatorList << msg.getPlayerName();
-				emit logJoinSpectator(msg.getPlayerName());
-			} else {
-				Player *newPlayer = addPlayer(msg.getPlayerId(), msg.getPlayerName(), false);
-				emit logJoin(newPlayer);
-			}
-			break;
-		}
-		case eventLeave: {
-			if (p)
-				emit logLeave(p);
-				// XXX Spieler natürlich noch rauswerfen
-			else {
-				int spectatorIndex = spectatorList.indexOf(msg.getPlayerName());
-				if (spectatorIndex != -1) {
-					spectatorList.removeAt(spectatorIndex);
-					emit logLeaveSpectator(msg.getPlayerName());
-				}
-			}
-			break;
-		}
-		case eventGameClosed: {
-			started = false;
-			emit logGameClosed();
-			break;
-		}
-		case eventReadyStart:
-			if (started) {
-				started = false;
-				emit logReadyStart(p);
-				if (!p->getLocal())
-					restartGameDialog();
-			}
-			break;
-		case eventGameStart:
-			started = true;
-			emit logGameStart();
-			break;
-		case eventShuffle:
-			emit logShuffle(p);
-			break;
-		case eventRollDie: {
-			QStringList data = msg.getEventData();
-			int sides = data[0].toInt();
-			int roll = data[1].toInt();
-			emit logRollDie(p, sides, roll);
-			break;
-		}
-		case eventSetActivePlayer: {
-			QStringList data = msg.getEventData();
-			int playerId = data[0].toInt();
-			Player *player = players.value(playerId, 0);
-			if (!player) {
-				qDebug(QString("setActivePlayer: invalid player: %1").arg(playerId).toLatin1());
-				break;
-			}
-			QMapIterator<int, Player *> i(players);
-			while (i.hasNext()) {
-				i.next();
-				i.value()->setActive(i.value() == player);
-			}
-			emit logSetActivePlayer(player);
-			break;
-		}
-		case eventSetActivePhase: {
-			QStringList data = msg.getEventData();
-			int phase = data[0].toInt();
-			if (currentPhase != phase) {
-				currentPhase = phase;
-				emit setActivePhase(phase);
-			}
-			break;
-		}
-		case eventCreateArrow:
-		case eventDeleteArrow:
-		case eventCreateToken:
-		case eventSetupZones:
-		case eventSetCardAttr:
-		case eventAddCounter:
-		case eventSetCounter:
-		case eventDelCounter: {
-			p->gameEvent(msg);
-			break;
-		}
-		case eventDumpZone: {
-			QStringList data = msg.getEventData();
-			Player *zoneOwner = players.value(data[0].toInt(), 0);
-			if (!zoneOwner)
-				break;
-			CardZone *zone = zoneOwner->getZones().value(data[1], 0);
-			if (!zone)
-				break;
-			emit logDumpZone(p, zone, data[2].toInt());
-			break;
-		}
-		case eventStopDumpZone: {
-			QStringList data = msg.getEventData();
-			Player *zoneOwner = players.value(data[0].toInt(), 0);
-			if (!zoneOwner)
-				break;
-			CardZone *zone = zoneOwner->getZones().value(data[1], 0);
-			if (!zone)
-				break;
-			emit logStopDumpZone(p, zone);
-			break;
-		}
-		case eventMoveCard: {
-			if (!p->getLocal())
-				p->gameEvent(msg);
-			break;
-		}
-		case eventDraw: {
-			emit logDraw(p, msg.getEventData()[0].toInt());
-			if (!p->getLocal())
-				p->gameEvent(msg);
-			break;
-		}
-		case eventInvalid: {
-			qDebug("Unhandled global event");
-		}
-		default: {
-		}
-		}
-	}
-}
-*/
-void Game::actNextPhase()
-{
-	int phase = currentPhase;
-	if (++phase >= phaseCount)
-		phase = 0;
-//	client->setActivePhase(phase);
-}
-
-void Game::actNextTurn()
-{
-//	client->nextTurn();
-}
-
-void Game::actRemoveLocalArrows()
-{
-	for (int i = 0; i < players.size(); ++i) {
-		if (!players[i]->getLocal())
-			continue;
-		QMapIterator<int, ArrowItem *> arrowIterator(players[i]->getArrows());
-		while (arrowIterator.hasNext()) {
-			ArrowItem *a = arrowIterator.next().value();
-//			players[i]->client->deleteArrow(a->getId());
-		}
-	}
 }
 
 void Game::showCardMenu(QPoint p)
@@ -457,50 +201,4 @@ void Game::actMoveToExile(CardItem *card)
 {
 //	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
 //	client->moveCard(card->getId(), startZone->getName(), "rfg", 0, 0, false);
-}
-
-void Game::hoverCardEvent(CardItem *card)
-{
-	emit hoverCard(card->getName());
-}
-
-void Game::queryGameState()
-{
-/*	PendingCommand_DumpAll *pc = client->dumpAll();
-	connect(pc, SIGNAL(playerListReceived(QList<ServerPlayer>)), this, SLOT(playerListReceived(QList<ServerPlayer>)));
-	connect(pc, SIGNAL(zoneListReceived(QList<ServerZone>)), this, SLOT(zoneListReceived(QList<ServerZone>)));
-	connect(pc, SIGNAL(cardListReceived(QList<ServerZoneCard>)), this, SLOT(cardListReceived(QList<ServerZoneCard>)));
-	connect(pc, SIGNAL(counterListReceived(QList<ServerCounter>)), this, SLOT(counterListReceived(QList<ServerCounter>)));
-	connect(pc, SIGNAL(arrowListReceived(QList<ServerArrow>)), this, SLOT(arrowListReceived(QList<ServerArrow>)));
-*/}
-
-void Game::activePlayerDrawCard()
-{
-	Player *p = getActiveLocalPlayer();
-	if (p)
-		p->actDrawCard();
-}
-
-void Game::activePlayerUntapAll()
-{
-	Player *p = getActiveLocalPlayer();
-	if (p)
-		p->actUntapAll();
-}
-
-Player *Game::getActiveLocalPlayer() const
-{
-	int localPlayerCount = 0;
-	QMapIterator<int, Player *> i(players);
-	while (i.hasNext())
-		if (i.next().value()->getLocal())
-			++localPlayerCount;
-	
-	i.toFront();
-	while (i.hasNext()) {
-		Player *p = i.next().value();
-		if (p->getLocal() && (p->getActive() || (localPlayerCount == 1)))
-			return p;
-	}
-	return 0;
 }

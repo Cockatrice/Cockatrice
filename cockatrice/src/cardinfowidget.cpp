@@ -1,12 +1,13 @@
-#include "cardinfowidget.h"
-#include "carditem.h"
 #include <QGridLayout>
 #include <QLabel>
 #include <QTextEdit>
-#include <QMessageBox>
+#include "cardinfowidget.h"
+#include "carditem.h"
+#include "carddatabase.h"
+#include "main.h"
 
-CardInfoWidget::CardInfoWidget(CardDatabase *_db, QWidget *parent)
-	: QFrame(parent), db(_db), pixmapHeight(pixmapWidth), info(0)
+CardInfoWidget::CardInfoWidget(QWidget *parent)
+	: QFrame(parent), pixmapHeight(pixmapWidth), info(0)
 {
 	cardPicture = new QLabel;
 	cardPicture->setAlignment(Qt::AlignCenter);
@@ -62,15 +63,12 @@ CardInfoWidget::CardInfoWidget(CardDatabase *_db, QWidget *parent)
 
 	retranslateUi();
 	setFrameStyle(QFrame::Panel | QFrame::Raised);
-	textLabel->setFixedHeight(130);
+	textLabel->setFixedHeight(100);
 	setFixedSize(sizeHint());
 }
 
 void CardInfoWidget::setCard(CardInfo *card)
 {
-	if (!card)
-		return;
-
 	if (info)
 		disconnect(info, 0, this, 0);
 	info = card;
@@ -87,6 +85,11 @@ void CardInfoWidget::setCard(CardInfo *card)
 void CardInfoWidget::setCard(const QString &cardName)
 {
 	setCard(db->getCard(cardName));
+}
+
+void CardInfoWidget::setCard(CardItem *card)
+{
+	setCard(card->getInfo());
 }
 
 void CardInfoWidget::updatePixmap()

@@ -77,6 +77,9 @@ void ProtocolItem::initializeHash()
 	itemNameHash.insert("generic_eventlist_games", Event_ListGames::newItem);
 	itemNameHash.insert("generic_eventlist_chat_channels", Event_ListChatChannels::newItem);
 	itemNameHash.insert("game_eventgame_state_changed", Event_GameStateChanged::newItem);
+	itemNameHash.insert("game_eventcreate_arrow", Event_CreateArrow::newItem);
+	itemNameHash.insert("game_eventcreate_counter", Event_CreateCounter::newItem);
+	itemNameHash.insert("game_eventdraw_cards", Event_DrawCards::newItem);
 	itemNameHash.insert("chat_eventchat_list_players", Event_ChatListPlayers::newItem);
 }
 
@@ -422,7 +425,7 @@ void Event_ListGames::writeElement(QXmlStreamWriter *xml)
 }
 
 Event_GameStateChanged::Event_GameStateChanged(int _gameId, const QList<ServerInfo_Player *> &_playerList)
-	: GameEvent("game_state_changed", _gameId, -1), currentItem(0), readFinished(false), playerList(_playerList)
+	: GameEvent("game_state_changed", _gameId, -1), currentItem(0), playerList(_playerList)
 {
 }
 
@@ -455,4 +458,116 @@ void Event_GameStateChanged::writeElement(QXmlStreamWriter *xml)
 {
 	for (int i = 0; i < playerList.size(); ++i)
 		playerList[i]->writeElement(xml);
+}
+
+Event_CreateArrow::Event_CreateArrow(int _gameId, int _playerId, ServerInfo_Arrow *_arrow)
+	: GameEvent("create_arrow", _gameId, _playerId), arrow(_arrow), readFinished(false)
+{
+}
+
+Event_CreateArrow::~Event_CreateArrow()
+{
+	delete arrow;
+}
+
+bool Event_CreateArrow::readElement(QXmlStreamReader *xml)
+{
+	if (readFinished)
+		return false;
+	
+	if (!arrow) {
+		if (xml->isStartElement() && (xml->name() == "arrow"))
+			arrow = new ServerInfo_Arrow;
+		else
+			return false;
+	}
+	
+	if (arrow->readElement(xml))
+		readFinished = true;
+	return true;
+}
+
+void Event_CreateArrow::writeElement(QXmlStreamWriter *xml)
+{
+	if (arrow)
+		arrow->writeElement(xml);
+}
+
+Event_CreateCounter::Event_CreateCounter(int _gameId, int _playerId, ServerInfo_Counter *_counter)
+	: GameEvent("create_counter", _gameId, _playerId), counter(_counter), readFinished(false)
+{
+}
+
+Event_CreateCounter::~Event_CreateCounter()
+{
+	delete counter;
+}
+
+bool Event_CreateCounter::readElement(QXmlStreamReader *xml)
+{
+	if (readFinished)
+		return false;
+	
+	if (!counter) {
+		if (xml->isStartElement() && (xml->name() == "counter"))
+			counter = new ServerInfo_Counter;
+		else
+			return false;
+	}
+	
+	if (counter->readElement(xml))
+		readFinished = true;
+	return true;
+}
+
+void Event_CreateCounter::writeElement(QXmlStreamWriter *xml)
+{
+	if (counter)
+		counter->writeElement(xml);
+}
+
+Event_DrawCards::Event_DrawCards(int _gameId, int _playerId, int _numberCards, const QList<ServerInfo_Card *> &_cardList)
+	: GameEvent("draw_cards", _gameId, _playerId), currentItem(0), numberCards(_numberCards), cardList(_cardList)
+{
+	setParameter("number_cards", numberCards);
+}
+
+Event_DrawCards::~Event_DrawCards()
+{
+	for (int i = 0; i < cardList.size(); ++i)
+		delete cardList[i];
+}
+
+void Event_DrawCards::extractParameters()
+{
+	GameEvent::extractParameters();
+	bool ok;
+	numberCards = parameters["number_cards"].toInt(&ok);
+	if (!ok)
+		numberCards = -1;
+}
+
+bool Event_DrawCards::readElement(QXmlStreamReader *xml)
+{
+	if (currentItem) {
+		if (currentItem->readElement(xml))
+			currentItem = 0;
+		return true;
+	}
+	if (xml->isStartElement() && (xml->name() == "card")) {
+		ServerInfo_Card *card = new ServerInfo_Card;
+		cardList.append(card);
+		currentItem = card;
+	} else
+		return false;
+	if (currentItem)
+		if (currentItem->readElement(xml))
+			currentItem = 0;
+	return true;
+}
+
+void Event_DrawCards::writeElement(QXmlStreamWriter *xml)
+{
+	for (int i = 0; i < cardList.size(); ++i)
+		cardList[i]->writeElement(xml);
 }

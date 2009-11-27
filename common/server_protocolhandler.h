@@ -57,14 +57,13 @@ private:
 	ResponseCode cmdSetCardAttr(Command_SetCardAttr *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdReadyStart(Command_ReadyStart *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdIncCounter(Command_IncCounter *cmd, Server_Game *game, Server_Player *player);
-	ResponseCode cmdAddCounter(Command_AddCounter *cmd, Server_Game *game, Server_Player *player);
+	ResponseCode cmdCreateCounter(Command_CreateCounter *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdSetCounter(Command_SetCounter *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdDelCounter(Command_DelCounter *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdNextTurn(Command_NextTurn *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdSetActivePhase(Command_SetActivePhase *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdDumpZone(Command_DumpZone *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdStopDumpZone(Command_StopDumpZone *cmd, Server_Game *game, Server_Player *player);
-	ResponseCode cmdDumpAll(Command_DumpAll *cmd, Server_Game *game, Server_Player *player);
 public:
 	Server_ProtocolHandler(Server *_server, QObject *parent = 0);
 	~Server_ProtocolHandler();

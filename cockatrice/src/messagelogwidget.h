@@ -22,19 +22,19 @@ public slots:
 	void logServerError(ResponseCode response);
 	void logProtocolVersionMismatch(int clientVersion, int serverVersion);
 	void logProtocolError();
-private slots:
-	void logPlayerListReceived(QStringList players);
+	void logGameJoined(int gameId);
 	void logJoin(Player *player);
 	void logLeave(Player *player);
 	void logGameClosed();
 	void logJoinSpectator(QString name);
 	void logLeaveSpectator(QString name);
+	void logDeckSelect(Player *player, int deckId);
 	void logReadyStart(Player *player);
 	void logGameStart();
 	void logSay(Player *player, QString message);
 	void logShuffle(Player *player);
 	void logRollDie(Player *player, int sides, int roll);
-	void logDraw(Player *player, int number);
+	void logDrawCards(Player *player, int number);
 	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
 	void logCreateToken(Player *player, QString cardName);
 	void logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard);

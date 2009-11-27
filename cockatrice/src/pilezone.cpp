@@ -1,7 +1,6 @@
 #include <QtGui>
 #include "pilezone.h"
 #include "player.h"
-#include "game.h"
 #include "client.h"
 #include "carddragitem.h"
 #include "zoneviewzone.h"
@@ -94,6 +93,6 @@ void PileZone::mouseReleaseEvent(QGraphicsSceneMouseEvent */*event*/)
 void PileZone::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
 	if (!cards.isEmpty())
-		((Game *) player->parent())->hoverCardEvent(cards.at(0));
+		cards[0]->processHoverEvent();
 	QGraphicsItem::hoverEnterEvent(event);
 }
