@@ -2,6 +2,7 @@
 #define TAB_SERVER_H
 
 #include <QGroupBox>
+#include "tab.h"
 #include "protocol_datastructures.h"
 
 class Client;
@@ -71,7 +72,7 @@ public:
 	void retranslateUi();
 };
 
-class TabServer : public QWidget {
+class TabServer : public Tab {
 	Q_OBJECT
 signals:
 	void chatChannelJoined(const QString &channelName);

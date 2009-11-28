@@ -21,7 +21,7 @@
 #include "main.h"
 
 TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectator)
-	: client(_client), gameId(_gameId), localPlayerId(_localPlayerId), spectator(_spectator), started(false), currentPhase(-1)
+	: Tab(), client(_client), gameId(_gameId), localPlayerId(_localPlayerId), spectator(_spectator), started(false), currentPhase(-1)
 {
 	zoneLayout = new ZoneViewLayout;
 	scene = new GameScene(zoneLayout, this);
@@ -61,8 +61,8 @@ TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectat
 	
 	QVBoxLayout *verticalLayout = new QVBoxLayout;
 	verticalLayout->addWidget(cardInfo);
-	verticalLayout->addWidget(playerListWidget);
-	verticalLayout->addWidget(messageLog);
+	verticalLayout->addWidget(playerListWidget, 1);
+	verticalLayout->addWidget(messageLog, 3);
 	verticalLayout->addLayout(hLayout);
 
 	QHBoxLayout *mainLayout = new QHBoxLayout;
@@ -89,11 +89,12 @@ TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectat
 	aRemoveLocalArrows = new QAction(this);
 	connect(aRemoveLocalArrows, SIGNAL(triggered()), this, SLOT(actRemoveLocalArrows()));
 	
-	gameMenu = new QMenu(this);
-	gameMenu->addAction(aNextPhase);
-	gameMenu->addAction(aNextTurn);
-	gameMenu->addSeparator();
-	gameMenu->addAction(aRemoveLocalArrows);
+	tabMenu = new QMenu(this);
+	playersSeparator = tabMenu->addSeparator();
+	tabMenu->addAction(aNextPhase);
+	tabMenu->addAction(aNextTurn);
+	tabMenu->addSeparator();
+	tabMenu->addAction(aRemoveLocalArrows);
 	
 	retranslateUi();
 	setLayout(mainLayout);
@@ -103,7 +104,7 @@ TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectat
 
 void TabGame::retranslateUi()
 {
-	gameMenu->setTitle(tr("&Game"));
+	tabMenu->setTitle(tr("&Game"));
 	aNextPhase->setText(tr("Next &phase"));
 	aNextPhase->setShortcut(tr("Ctrl+Space"));
 	aNextTurn->setText(tr("Next &turn"));
@@ -167,8 +168,12 @@ Player *TabGame::addPlayer(int playerId, const QString &playerName)
 	scene->addPlayer(newPlayer);
 
 	connect(newPlayer, SIGNAL(newCardAdded(CardItem *)), this, SLOT(newCardAdded(CardItem *)));
+	connect(newPlayer, SIGNAL(toggleZoneView(Player *, QString, int)), zoneLayout, SLOT(toggleZoneView(Player *, QString, int)));
+	connect(newPlayer, SIGNAL(closeZoneView(ZoneViewZone *)), zoneLayout, SLOT(removeItem(ZoneViewZone *)));
 	messageLog->connectToPlayer(newPlayer);
 
+	tabMenu->insertMenu(playersSeparator, newPlayer->getPlayerMenu());
+	
 	players.insert(playerId, newPlayer);
 	emit playerAdded(newPlayer);
 

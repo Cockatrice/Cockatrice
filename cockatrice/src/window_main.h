@@ -28,7 +28,7 @@ class TabSupervisor;
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 private slots:
-//	void playerAdded(Player *player);
+	void updateTabMenu(QMenu *menu);
 	void statusChanged(ClientStatus _status);
 	void serverTimeout();
 
@@ -46,7 +46,7 @@ private:
 	void retranslateUi();
 	void createActions();
 	void createMenus();
-	QMenu *cockatriceMenu;
+	QMenu *cockatriceMenu, *tabMenu;
 	QAction *aConnect, *aDisconnect, *aDeckEditor, *aFullScreen, *aSettings, *aExit;
 	TabSupervisor *tabSupervisor;
 

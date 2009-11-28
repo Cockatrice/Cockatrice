@@ -225,7 +225,7 @@ void ServerMessageLog::processServerMessageEvent(Event_ServerMessage *event)
 }
 
 TabServer::TabServer(Client *_client, QWidget *parent)
-	: QWidget(parent), client(_client)
+	: Tab(parent), client(_client)
 {
 	gameSelector = new GameSelector(client);
 	chatChannelSelector = new ChatChannelSelector(client);

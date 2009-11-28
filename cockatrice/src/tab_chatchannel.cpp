@@ -4,7 +4,7 @@
 #include "protocol_items.h"
 
 TabChatChannel::TabChatChannel(Client *_client, const QString &_channelName)
-	: QWidget(), client(_client), channelName(_channelName)
+	: Tab(), client(_client), channelName(_channelName)
 {
 	playerList = new QListWidget;
 	playerList->setFixedWidth(150);

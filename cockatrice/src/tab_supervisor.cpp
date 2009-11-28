@@ -11,6 +11,7 @@ TabSupervisor::	TabSupervisor(QWidget *parent)
 	: QTabWidget(parent), client(0), tabServer(0), tabDeckStorage(0)
 {
 	setIconSize(QSize(15, 15));
+	connect(this, SIGNAL(currentChanged(int)), this, SLOT(updateMenu(int)));
 }
 
 void TabSupervisor::retranslateUi()
@@ -130,4 +131,12 @@ void TabSupervisor::processGameEvent(GameEvent *event)
 		tab->processGameEvent(event);
 	} else
 		qDebug() << "gameEvent: invalid gameId";
+}
+
+void TabSupervisor::updateMenu(int index)
+{
+	if (index != -1)
+		emit setMenu(static_cast<Tab *>(widget(index))->getTabMenu());
+	else
+		emit setMenu(0);
 }

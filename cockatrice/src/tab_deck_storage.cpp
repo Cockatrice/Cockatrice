@@ -7,7 +7,7 @@
 #include "protocol_items.h"
 
 TabDeckStorage::TabDeckStorage(Client *_client)
-	: QWidget(), client(_client)
+	: Tab(), client(_client)
 {
 	localDirModel = new QFileSystemModel(this);
 	QSettings settings;

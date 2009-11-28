@@ -4,6 +4,7 @@
 #include <QTabWidget>
 #include <QMap>
 
+class QMenu;
 class Client;
 class TabServer;
 class TabChatChannel;
@@ -26,7 +27,10 @@ public:
 	void retranslateUi();
 	void start(Client *_client);
 	void stop();
+signals:
+	void setMenu(QMenu *menu);
 private slots:
+	void updateMenu(int index);
 	void updatePingTime(int value, int max);
 	void gameJoined(Event_GameJoined *event);
 	void addChatChannelTab(const QString &channelName);

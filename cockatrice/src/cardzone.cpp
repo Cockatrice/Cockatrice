@@ -2,8 +2,8 @@
 #include "cardzone.h"
 #include "carditem.h"
 #include "player.h"
-#include "client.h"
 #include "zoneviewzone.h"
+#include "protocol_items.h"
 
 CardZone::CardZone(Player *_p, const QString &_name, bool _hasCardAttr, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent, bool isView)
 	: AbstractGraphicsItem(parent), player(_p), name(_name), cards(_contentsKnown), view(NULL), menu(NULL), doubleClickAction(0), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable)
@@ -128,9 +128,9 @@ CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName, 
 
 void CardZone::setCardAttr(int cardId, const QString &aname, const QString &avalue)
 {
-/*	if (hasCardAttr)
-		player->client->setCardAttr(name, cardId, aname, avalue);
-*/}
+	if (hasCardAttr)
+		player->sendGameCommand(new Command_SetCardAttr(-1, name, cardId, aname, avalue));
+}
 
 void CardZone::moveAllToZone()
 {

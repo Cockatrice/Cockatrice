@@ -1,7 +1,7 @@
 #ifndef TAB_CHATCHANNEL_H
 #define TAB_CHATCHANNEL_H
 
-#include <QWidget>
+#include "tab.h"
 
 class Client;
 class QListWidget;
@@ -13,7 +13,7 @@ class Event_ChatJoinChannel;
 class Event_ChatLeaveChannel;
 class Event_ChatSay;
 
-class TabChatChannel : public QWidget {
+class TabChatChannel : public Tab {
 	Q_OBJECT
 private:
 	Client *client;

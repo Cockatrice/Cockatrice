@@ -1,8 +1,8 @@
 #ifndef TAB_GAME_H
 #define TAB_GAME_H
 
-#include <QWidget>
 #include <QMap>
+#include "tab.h"
 
 class Client;
 class CardDatabase;
@@ -34,7 +34,7 @@ class Player;
 class CardZone;
 class CardItem;
 
-class TabGame : public QWidget {
+class TabGame : public Tab {
 	Q_OBJECT
 private:
 	Client *client;
@@ -58,9 +58,10 @@ private:
 	DeckView *deckView;
 	QWidget *deckViewContainer;
 	ZoneViewLayout *zoneLayout;
+	QAction *playersSeparator;
+	QMenu *playersMenu;
 	QAction *aCloseMostRecentZoneView,
 		*aNextPhase, *aNextTurn, *aRemoveLocalArrows;
-	QMenu *gameMenu;
 
 	Player *addPlayer(int playerId, const QString &playerName);
 

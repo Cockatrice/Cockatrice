@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include <QtGui>
-//#include <QtOpenGL>
 
 #include "window_main.h"
 #include "dlg_connect.h"
@@ -26,14 +25,15 @@
 #include "window_deckeditor.h"
 #include "tab_supervisor.h"
 
-/*
-void MainWindow::playerAdded(Player *player)
+void MainWindow::updateTabMenu(QMenu *menu)
 {
-	menuBar()->addMenu(player->getPlayerMenu());
-	connect(player, SIGNAL(toggleZoneView(Player *, QString, int)), zoneLayout, SLOT(toggleZoneView(Player *, QString, int)));
-	connect(player, SIGNAL(closeZoneView(ZoneViewZone *)), zoneLayout, SLOT(removeItem(ZoneViewZone *)));
+	if (tabMenu)
+		menuBar()->removeAction(tabMenu->menuAction());
+	tabMenu = menu;
+	if (menu)
+		menuBar()->addMenu(menu);
 }
-*/
+
 void MainWindow::statusChanged(ClientStatus _status)
 {
 	switch (_status) {
@@ -207,12 +207,13 @@ void MainWindow::createMenus()
 }
 
 MainWindow::MainWindow(QWidget *parent)
-	: QMainWindow(parent)
+	: QMainWindow(parent), tabMenu(0)
 {
 	QPixmapCache::setCacheLimit(200000);
 
 	client = new Client(this);
 	tabSupervisor = new TabSupervisor;
+	connect(tabSupervisor, SIGNAL(setMenu(QMenu *)), this, SLOT(updateTabMenu(QMenu *)));
 	
 	setCentralWidget(tabSupervisor);
 /*

@@ -1,8 +1,8 @@
 #ifndef TAB_DECK_STORAGE_H
 #define TAB_DECK_STORAGE_H
 
-#include <QWidget>
-#include "protocol_datastructures.h"
+#include "tab.h"
+#include "protocol.h"
 
 class Client;
 class QTreeView;
@@ -15,7 +15,7 @@ class QGroupBox;
 class ProtocolResponse;
 class RemoteDeckList_TreeWidget;
 
-class TabDeckStorage : public QWidget {
+class TabDeckStorage : public Tab {
 	Q_OBJECT
 private:
 	Client *client;

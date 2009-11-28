@@ -41,6 +41,7 @@ HEADERS += src/counter.h \
  src/phasestoolbar.h \
  src/gamescene.h \
  src/arrowitem.h \
+ src/tab.h \
  src/tab_server.h \
  src/tab_chatchannel.h \
  src/tab_game.h \
