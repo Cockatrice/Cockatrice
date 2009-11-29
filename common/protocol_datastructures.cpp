@@ -2,244 +2,154 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
-ServerInfo_Player::~ServerInfo_Player()
+ServerInfo_ChatChannel::ServerInfo_ChatChannel(const QString &_name, const QString &_description, int _playerCount, bool _autoJoin)
+	: SerializableItem_Map("chat_channel")
 {
-	for (int i = 0; i < zoneList.size(); ++i)
-		delete zoneList[i];
-	for (int i = 0; i < arrowList.size(); ++i)
-		delete arrowList[i];
-	for (int i = 0; i < counterList.size(); ++i)
-		delete counterList[i];
+	insertItem(new SerializableItem_String("name", _name));
+	insertItem(new SerializableItem_String("description", _description));
+	insertItem(new SerializableItem_Int("player_count", _playerCount));
+	insertItem(new SerializableItem_Bool("auto_join", _autoJoin));
 }
 
-ServerInfo_Zone::~ServerInfo_Zone()
+ServerInfo_ChatUser::ServerInfo_ChatUser(const QString &_name)
+	: SerializableItem_Map("chat_user")
 {
-	for (int i = 0; i < cardList.size(); ++i)
-		delete cardList[i];
+	insertItem(new SerializableItem_String("name", _name));
 }
 
-bool ServerInfo_Arrow::readElement(QXmlStreamReader *xml)
+ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, const QString &_creatorName, bool _spectatorsAllowed, int _spectatorCount)
+	: SerializableItem_Map("game")
 {
-	if (xml->isStartElement() && (xml->name() == "arrow")) {
-		id = xml->attributes().value("id").toString().toInt();
-		startPlayerId = xml->attributes().value("start_player_id").toString().toInt();
-		startZone = xml->attributes().value("start_zone").toString();
-		startCardId = xml->attributes().value("start_card_id").toString().toInt();
-		targetPlayerId = xml->attributes().value("target_player_id").toString().toInt();
-		targetZone = xml->attributes().value("target_zone").toString();
-		targetCardId = xml->attributes().value("target_card_id").toString().toInt();
-		color = ColorConverter::colorFromInt(xml->attributes().value("color").toString().toInt());
-	} else if (xml->isEndElement() && (xml->name() == "arrow"))
-		return true;
-	return false;
+	insertItem(new SerializableItem_Int("game_id", _gameId));
+	insertItem(new SerializableItem_String("description", _description));
+	insertItem(new SerializableItem_Bool("has_password", _hasPassword));
+	insertItem(new SerializableItem_Int("player_count", _playerCount));
+	insertItem(new SerializableItem_Int("max_players", _maxPlayers));
+	insertItem(new SerializableItem_String("creator_name", _creatorName));
+	insertItem(new SerializableItem_Bool("spectators_allowed", _spectatorsAllowed));
+	insertItem(new SerializableItem_Int("spectator_count", _spectatorCount));
 }
 
-void ServerInfo_Arrow::writeElement(QXmlStreamWriter *xml)
+ServerInfo_Card::ServerInfo_Card(int _id, const QString &_name, int _x, int _y, int _counters, bool _tapped, bool _attacking, const QString &_annotation)
+	: SerializableItem_Map("card")
 {
-	xml->writeStartElement("arrow");
-	xml->writeAttribute("id", QString::number(id));
-	xml->writeAttribute("start_player_id", QString::number(startPlayerId));
-	xml->writeAttribute("start_zone", startZone);
-	xml->writeAttribute("start_card_id", QString::number(startCardId));
-	xml->writeAttribute("target_player_id", QString::number(targetPlayerId));
-	xml->writeAttribute("target_zone", targetZone);
-	xml->writeAttribute("target_card_id", QString::number(targetCardId));
-	xml->writeAttribute("color", QString::number(ColorConverter::colorToInt(color)));
-	xml->writeEndElement();
+	insertItem(new SerializableItem_Int("id", _id));
+	insertItem(new SerializableItem_String("name", _name));
+	insertItem(new SerializableItem_Int("x", _x));
+	insertItem(new SerializableItem_Int("y", _y));
+	insertItem(new SerializableItem_Int("counters", _counters));
+	insertItem(new SerializableItem_Bool("tapped", _tapped));
+	insertItem(new SerializableItem_Bool("attacking", _attacking));
+	insertItem(new SerializableItem_String("annotation", _annotation));
 }
 
-bool ServerInfo_Counter::readElement(QXmlStreamReader *xml)
+ServerInfo_Zone::ServerInfo_Zone(const QString &_name, ZoneType _type, bool _hasCoords, int _cardCount, const QList<ServerInfo_Card *> &_cardList)
+	: SerializableItem_Map("zone")
 {
-	if (xml->isStartElement() && (xml->name() == "counter")) {
-		id = xml->attributes().value("id").toString().toInt();
-		name = xml->attributes().value("name").toString();
-		color = ColorConverter::colorFromInt(xml->attributes().value("color").toString().toInt());
-		radius = xml->attributes().value("radius").toString().toInt();
-		count = xml->attributes().value("count").toString().toInt();
-	} else if (xml->isEndElement() && (xml->name() == "counter"))
-		return true;
-	return false;
+	insertItem(new SerializableItem_String("name", _name));
+	insertItem(new SerializableItem_String("zone_type", typeToString(_type)));
+	insertItem(new SerializableItem_Bool("has_coords", _hasCoords));
+	insertItem(new SerializableItem_Int("card_count", _cardCount));
+	
+	for (int i = 0; i < _cardList.size(); ++i)
+		itemList.append(_cardList[i]);
 }
 
-void ServerInfo_Counter::writeElement(QXmlStreamWriter *xml)
+ZoneType ServerInfo_Zone::typeFromString(const QString &type) const
 {
-	xml->writeStartElement("counter");
-	xml->writeAttribute("id", QString::number(id));
-	xml->writeAttribute("name", name);
-	xml->writeAttribute("color", QString::number(ColorConverter::colorToInt(color)));
-	xml->writeAttribute("radius", QString::number(radius));
-	xml->writeAttribute("count", QString::number(count));
-	xml->writeEndElement();
+	if (type == "private")
+		return PrivateZone;
+	else if (type == "hidden")
+		return HiddenZone;
+	return PublicZone;
 }
 
-bool ServerInfo_Card::readElement(QXmlStreamReader *xml)
+QString ServerInfo_Zone::typeToString(ZoneType type) const
 {
-	if (xml->isStartElement() && (xml->name() == "card")) {
-		id = xml->attributes().value("id").toString().toInt();
-		name = xml->attributes().value("name").toString();
-		x = xml->attributes().value("x").toString().toInt();
-		y = xml->attributes().value("y").toString().toInt();
-		counters = xml->attributes().value("counters").toString().toInt();
-		tapped = xml->attributes().value("tapped").toString().toInt();
-		attacking = xml->attributes().value("attacking").toString().toInt();
-		annotation = xml->attributes().value("annotation").toString();
-	} else if (xml->isEndElement() && (xml->name() == "card"))
-		return true;
-	return false;
-}
-
-void ServerInfo_Card::writeElement(QXmlStreamWriter *xml)
-{
-	xml->writeStartElement("card");
-	xml->writeAttribute("id", QString::number(id));
-	xml->writeAttribute("name", name);
-	xml->writeAttribute("x", QString::number(x));
-	xml->writeAttribute("y", QString::number(y));
-	xml->writeAttribute("counters", QString::number(counters));
-	xml->writeAttribute("tapped", tapped ? "1" : "0");
-	xml->writeAttribute("attacking", attacking ? "1" : "0");
-	xml->writeAttribute("annotation", annotation);
-	xml->writeEndElement();
-}
-
-bool ServerInfo_Zone::readElement(QXmlStreamReader *xml)
-{
-	if (currentItem) {
-		if (currentItem->readElement(xml))
-			currentItem = 0;
-		return false;
-	}
-	if (xml->isStartElement() && (xml->name() == "zone")) {
-		name = xml->attributes().value("name").toString();
-		type = (ZoneType) xml->attributes().value("type").toString().toInt();
-		hasCoords = xml->attributes().value("has_coords").toString().toInt();
-		cardCount = xml->attributes().value("card_count").toString().toInt();
-	} else if (xml->isStartElement() && (xml->name() == "card")) {
-		ServerInfo_Card *card = new ServerInfo_Card;
-		cardList.append(card);
-		currentItem = card;
-	} else if (xml->isEndElement() && (xml->name() == "zone"))
-		return true;
-
-	if (currentItem)
-		if (currentItem->readElement(xml))
-			currentItem = 0;
-	return false;
-
-}
-
-void ServerInfo_Zone::writeElement(QXmlStreamWriter *xml)
-{
-	xml->writeStartElement("zone");
-	xml->writeAttribute("name", name);
-	QString typeStr;
 	switch (type) {
-		case PrivateZone: typeStr = "private"; break;
-		case HiddenZone: typeStr = "hidden"; break;
-		case PublicZone: typeStr = "public"; break;
+		case PrivateZone: return "private";
+		case HiddenZone: return "hidden";
+		default: return "public";
 	}
-	xml->writeAttribute("type", typeStr);
-	xml->writeAttribute("has_coords", hasCoords ? "1" : "0");
-	xml->writeAttribute("card_count", QString::number(cardCount));
-	for (int i = 0; i < cardList.size(); ++i)
-		cardList[i]->writeElement(xml);
-	xml->writeEndElement();
 }
 
-bool ServerInfo_Player::readElement(QXmlStreamReader *xml)
+QList<ServerInfo_Card *> ServerInfo_Zone::getCardList() const
 {
-	if (currentItem) {
-		if (currentItem->readElement(xml))
-			currentItem = 0;
-		return false;
+	QList<ServerInfo_Card *> result;
+	for (int i = 0; i < itemList.size(); ++i) {
+		ServerInfo_Card *card = dynamic_cast<ServerInfo_Card *>(itemList[i]);
+		if (card)
+			result.append(card);
 	}
-	if (xml->isStartElement() && (xml->name() == "player")) {
-		playerId = xml->attributes().value("player_id").toString().toInt();
-		name = xml->attributes().value("name").toString();
-	} else if (xml->isStartElement() && (xml->name() == "zone")) {
-		ServerInfo_Zone *zone = new ServerInfo_Zone;
-		zoneList.append(zone);
-		currentItem = zone;
-	} else if (xml->isStartElement() && (xml->name() == "counter")) {
-		ServerInfo_Counter *counter = new ServerInfo_Counter;
-		counterList.append(counter);
-		currentItem = counter;
-	} else if (xml->isStartElement() && (xml->name() == "arrow")) {
-		ServerInfo_Arrow *arrow = new ServerInfo_Arrow;
-		arrowList.append(arrow);
-		currentItem = arrow;
-	} else if (xml->isEndElement() && (xml->name() == "player"))
-		return true;
-
-	if (currentItem)
-		if (currentItem->readElement(xml))
-			currentItem = 0;
-	return false;
+	return result;
 }
 
-void ServerInfo_Player::writeElement(QXmlStreamWriter *xml)
+ServerInfo_Counter::ServerInfo_Counter(int _id, const QString &_name, const QColor &_color, int _radius, int _count)
+	: SerializableItem_Map("counter")
 {
-	xml->writeStartElement("player");
-	xml->writeAttribute("player_id", QString::number(playerId));
-	xml->writeAttribute("name", name);
-	for (int i = 0; i < zoneList.size(); ++i)
-		zoneList[i]->writeElement(xml);
-	for (int i = 0; i < counterList.size(); ++i)
-		counterList[i]->writeElement(xml);
-	for (int i = 0; i < arrowList.size(); ++i)
-		arrowList[i]->writeElement(xml);
-	xml->writeEndElement();
+	insertItem(new SerializableItem_Int("id", _id));
+	insertItem(new SerializableItem_String("name", _name));
+	insertItem(new SerializableItem_Color("color", _color));
+	insertItem(new SerializableItem_Int("radius", _radius));
+	insertItem(new SerializableItem_Int("count", _count));
 }
 
-bool DeckList_File::readElement(QXmlStreamReader *xml)
+ServerInfo_Arrow::ServerInfo_Arrow(int _id, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, const QColor &_color)
+	: SerializableItem_Map("arrow")
 {
-	if (xml->isEndElement())
-		return true;
-	else
-		return false;
+	insertItem(new SerializableItem_Int("id", _id));
+	insertItem(new SerializableItem_Int("start_player_id", _startPlayerId));
+	insertItem(new SerializableItem_String("start_zone", _startZone));
+	insertItem(new SerializableItem_Int("start_card_id", _startCardId));
+	insertItem(new SerializableItem_Int("target_player_id", _targetPlayerId));
+	insertItem(new SerializableItem_String("target_zone", _targetZone));
+	insertItem(new SerializableItem_Int("target_card_id", _targetCardId));
+	insertItem(new SerializableItem_Color("color", _color));
 }
 
-void DeckList_File::writeElement(QXmlStreamWriter *xml)
+ServerInfo_Player::ServerInfo_Player(int _playerId, const QString &_name, const QList<ServerInfo_Zone *> &_zoneList, const QList<ServerInfo_Counter *> &_counterList, const QList<ServerInfo_Arrow *> &_arrowList)
+	: SerializableItem_Map("player"), zoneList(_zoneList), counterList(_counterList), arrowList(_arrowList)
 {
-	xml->writeStartElement("file");
-	xml->writeAttribute("name", name);
-	xml->writeAttribute("id", QString::number(id));
-	xml->writeAttribute("upload_time", QString::number(uploadTime.toTime_t()));
-	xml->writeEndElement();
+	insertItem(new SerializableItem_Int("player_id", _playerId));
+	insertItem(new SerializableItem_String("name", _name));
+	
+	for (int i = 0; i < _zoneList.size(); ++i)
+		itemList.append(_zoneList[i]);
+	for (int i = 0; i < _counterList.size(); ++i)
+		itemList.append(_counterList[i]);
+	for (int i = 0; i < _arrowList.size(); ++i)
+		itemList.append(_arrowList[i]);
 }
 
-DeckList_Directory::~DeckList_Directory()
+void ServerInfo_Player::extractData()
 {
-	for (int i = 0; i < size(); ++i)
-		delete at(i);
-}
-
-bool DeckList_Directory::readElement(QXmlStreamReader *xml)
-{
-	if (currentItem) {
-		if (currentItem->readElement(xml))
-			currentItem = 0;
-		return false;
+	for (int i = 0; i < itemList.size(); ++i) {
+		ServerInfo_Zone *zone = dynamic_cast<ServerInfo_Zone *>(itemList[i]);
+		ServerInfo_Counter *counter = dynamic_cast<ServerInfo_Counter *>(itemList[i]);
+		ServerInfo_Arrow *arrow = dynamic_cast<ServerInfo_Arrow *>(itemList[i]);
+		if (zone)
+			zoneList.append(zone);
+		else if (counter)
+			counterList.append(counter);
+		else if (arrow)
+			arrowList.append(arrow);
 	}
-	if (xml->isStartElement() && (xml->name() == "directory")) {
-		DeckList_Directory *newItem = new DeckList_Directory(xml->attributes().value("name").toString());
-		append(newItem);
-		currentItem = newItem;
-	} else if (xml->isStartElement() && (xml->name() == "file")) {
-		DeckList_File *newItem = new DeckList_File(xml->attributes().value("name").toString(), xml->attributes().value("id").toString().toInt(), QDateTime::fromTime_t(xml->attributes().value("upload_time").toString().toUInt()));
-		append(newItem);
-		currentItem = newItem;
-	} else if (xml->isEndElement() && (xml->name() == "directory"))
-		return true;
-
-	return false;
 }
 
-void DeckList_Directory::writeElement(QXmlStreamWriter *xml)
+DeckList_TreeItem::DeckList_TreeItem(const QString &_itemType, const QString &_name, int _id)
+	: SerializableItem_Map(_itemType)
 {
-	xml->writeStartElement("directory");
-	xml->writeAttribute("name", name);
-	for (int i = 0; i < size(); ++i)
-		at(i)->writeElement(xml);
-	xml->writeEndElement();
+	insertItem(new SerializableItem_String("name", _name));
+	insertItem(new SerializableItem_Int("id", _id));
+}
+
+DeckList_File::DeckList_File(const QString &_name, int _id, QDateTime _uploadTime)
+	: DeckList_TreeItem("file", _name, _id)
+{
+	insertItem(new SerializableItem_DateTime("upload_time", _uploadTime));
+}
+
+DeckList_Directory::DeckList_Directory(const QString &_name, int _id)
+	: DeckList_TreeItem("directory", _name, _id)
+{
 }

@@ -50,6 +50,7 @@ HEADERS += src/counter.h \
  src/remotedecklist_treewidget.h \
  src/deckview.h \
  src/playerlistwidget.h \
+ 	../common/serializable_item.h \
 	../common/decklist.h \
 	../common/protocol.h \
 	../common/protocol_items.h \
@@ -98,6 +99,7 @@ SOURCES += src/counter.cpp \
  src/remotedecklist_treewidget.cpp \
  src/deckview.cpp \
  src/playerlistwidget.cpp \
+ 	../common/serializable_item.cpp \
 	../common/decklist.cpp \
 	../common/protocol.cpp \
 	../common/protocol_items.cpp \

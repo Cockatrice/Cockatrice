@@ -121,7 +121,6 @@ void TabDeckStorage::uploadFinished(ProtocolResponse *r)
 	if (!resp)
 		return;
 	Command_DeckUpload *cmd = static_cast<Command_DeckUpload *>(sender());
-	delete cmd->getDeck();
 
 	QTreeWidgetItemIterator it(serverDirView);
 	while (*it) {

@@ -42,7 +42,7 @@ void ZoneViewZone::initializeCards()
 	}
 }
 
-void ZoneViewZone::zoneDumpReceived(QList<ServerInfo_Card> cards)
+/*void ZoneViewZone::zoneDumpReceived(QList<ServerInfo_Card *> cards)
 {
 	for (int i = 0; i < cards.size(); i++) {
 		CardItem *card = new CardItem(player, cards[i].getName(), i, this);
@@ -52,7 +52,7 @@ void ZoneViewZone::zoneDumpReceived(QList<ServerInfo_Card> cards)
 	emit contentsChanged();
 	reorganizeCards();
 }
-
+*/
 // Because of boundingRect(), this function must not be called before the zone was added to a scene.
 void ZoneViewZone::reorganizeCards()
 {

@@ -5,100 +5,87 @@
 #include "protocol_items.h"
 #include "decklist.h"
 
-QHash<QString, ProtocolItem::NewItemFunction> ProtocolItem::itemNameHash;
-
-ProtocolItem::ProtocolItem(const QString &_itemName)
-	: itemName(_itemName)
+ProtocolItem::ProtocolItem(const QString &_itemType, const QString &_itemSubType)
+	: SerializableItem_Map(_itemType, _itemSubType)
 {
-}
-
-bool ProtocolItem::read(QXmlStreamReader *xml)
-{
-	while (!xml->atEnd()) {
-		xml->readNext();
-		if (readElement(xml))
-			continue;
-		if (xml->isEndElement()) {
-			if (xml->name() == getItemType()) {
-				extractParameters();
-				return true;
-			} else {
-				QString tagName = xml->name().toString();
-				if (parameters.contains(tagName))
-					parameters[tagName] = currentElementText;
-				currentElementText.clear();
-			}
-		} else if (xml->isCharacters() && !xml->isWhitespace())
-			currentElementText = xml->text().toString();
-	}
-	return false;
-}
-
-void ProtocolItem::write(QXmlStreamWriter *xml)
-{
-	xml->writeStartElement(getItemType());
-	if (!itemName.isEmpty())
-		xml->writeAttribute("name", itemName);
-	
-	QMapIterator<QString, QString> i(parameters);
-	while (i.hasNext()) {
-		i.next();
-		xml->writeTextElement(i.key(), i.value());
-	}
-	
-	writeElement(xml);
-	
-	xml->writeEndElement();
-}
-
-ProtocolItem *ProtocolItem::getNewItem(const QString &name)
-{
-	if (!itemNameHash.contains(name))
-		return 0;
-	return itemNameHash.value(name)();
 }
 
 void ProtocolItem::initializeHash()
 {
-	if (!itemNameHash.isEmpty())
-		return;
-	
 	initializeHashAuto();
 	
-	itemNameHash.insert("cmddeck_upload", Command_DeckUpload::newItem);
-	itemNameHash.insert("cmddeck_select", Command_DeckSelect::newItem);
+	registerSerializableItem("chat_channel", ServerInfo_ChatChannel::newItem);
+	registerSerializableItem("chat_user", ServerInfo_ChatUser::newItem);
+	registerSerializableItem("game", ServerInfo_Game::newItem);
+	registerSerializableItem("card", ServerInfo_Card::newItem);
+	registerSerializableItem("zone", ServerInfo_Zone::newItem);
+	registerSerializableItem("counter", ServerInfo_Counter::newItem);
+	registerSerializableItem("arrow", ServerInfo_Arrow::newItem);
+	registerSerializableItem("player", ServerInfo_Player::newItem);
+	registerSerializableItem("file", DeckList_File::newItem);
+	registerSerializableItem("directory", DeckList_Directory::newItem);
 	
-	itemNameHash.insert("resp", ProtocolResponse::newItem);
+	registerSerializableItem("cmddeck_upload", Command_DeckUpload::newItem);
+	registerSerializableItem("cmddeck_select", Command_DeckSelect::newItem);
+	
+	registerSerializableItem("resp", ProtocolResponse::newItem);
 	ProtocolResponse::initializeHash();
-	itemNameHash.insert("respdeck_list", Response_DeckList::newItem);
-	itemNameHash.insert("respdeck_download", Response_DeckDownload::newItem);
-	itemNameHash.insert("respdeck_upload", Response_DeckUpload::newItem);
+	registerSerializableItem("respdeck_list", Response_DeckList::newItem);
+	registerSerializableItem("respdeck_download", Response_DeckDownload::newItem);
+	registerSerializableItem("respdeck_upload", Response_DeckUpload::newItem);
 	
-	itemNameHash.insert("generic_eventlist_games", Event_ListGames::newItem);
-	itemNameHash.insert("generic_eventlist_chat_channels", Event_ListChatChannels::newItem);
-	itemNameHash.insert("game_eventgame_state_changed", Event_GameStateChanged::newItem);
-	itemNameHash.insert("game_eventcreate_arrow", Event_CreateArrow::newItem);
-	itemNameHash.insert("game_eventcreate_counter", Event_CreateCounter::newItem);
-	itemNameHash.insert("game_eventdraw_cards", Event_DrawCards::newItem);
-	itemNameHash.insert("chat_eventchat_list_players", Event_ChatListPlayers::newItem);
+	registerSerializableItem("generic_eventlist_games", Event_ListGames::newItem);
+	registerSerializableItem("generic_eventlist_chat_channels", Event_ListChatChannels::newItem);
+	registerSerializableItem("game_eventgame_state_changed", Event_GameStateChanged::newItem);
+	registerSerializableItem("game_eventcreate_arrows", Event_CreateArrows::newItem);
+	registerSerializableItem("game_eventcreate_counters", Event_CreateCounters::newItem);
+	registerSerializableItem("game_eventdraw_cards", Event_DrawCards::newItem);
+	registerSerializableItem("chat_eventchat_list_players", Event_ChatListPlayers::newItem);
+}
+
+TopLevelProtocolItem::TopLevelProtocolItem()
+	: SerializableItem(QString()), currentItem(0)
+{
+}
+
+bool TopLevelProtocolItem::readCurrentItem(QXmlStreamReader *xml)
+{
+	if (currentItem) {
+		if (currentItem->read(xml)) {
+			emit protocolItemReceived(currentItem);
+			currentItem = 0;
+		}
+		return true;
+	} else
+		return false;
+}
+
+void TopLevelProtocolItem::readElement(QXmlStreamReader *xml)
+{
+	if (!readCurrentItem(xml) && (xml->isStartElement())) {
+		QString childName = xml->name().toString();
+		QString childSubType = xml->attributes().value("type").toString();
+		
+		currentItem = dynamic_cast<ProtocolItem *>(getNewItem(childName + childSubType));
+		if (!currentItem)
+			currentItem = new ProtocolItem_Invalid;
+		
+		readCurrentItem(xml);
+	}
+}
+
+void TopLevelProtocolItem::writeElement(QXmlStreamWriter * /*xml*/)
+{
 }
 
 int Command::lastCmdId = 0;
 
 Command::Command(const QString &_itemName, int _cmdId)
-	: ProtocolItem(_itemName), cmdId(_cmdId), ticks(0)
+	: ProtocolItem("cmd", _itemName), ticks(0)
 {
-	if (cmdId == -1)
-		cmdId = lastCmdId++;
-	setParameter("cmd_id", cmdId);
-}
-
-void Command::extractParameters()
-{
-	bool ok;
-	cmdId = parameters["cmd_id"].toInt(&ok);
-	if (!ok)
-		cmdId = -1;
+	if (_cmdId == -1)
+		_cmdId = lastCmdId++;
+	insertItem(new SerializableItem_Int("cmd_id", _cmdId));
 }
 
 void Command::processResponse(ProtocolResponse *response)
@@ -108,99 +95,40 @@ void Command::processResponse(ProtocolResponse *response)
 }
 
 Command_DeckUpload::Command_DeckUpload(DeckList *_deck, const QString &_path)
-	: Command("deck_upload"), deck(_deck), path(_path), readFinished(false)
+	: Command("deck_upload")
 {
-	setParameter("path", path);
+	insertItem(new SerializableItem_String("path", _path));
+	if (!_deck)
+		_deck = new DeckList;
+	insertItem(_deck);
 }
 
-void Command_DeckUpload::extractParameters()
+DeckList *Command_DeckUpload::getDeck() const
 {
-	Command::extractParameters();
-	
-	path = parameters["path"];
-}
-
-bool Command_DeckUpload::readElement(QXmlStreamReader *xml)
-{
-	if (readFinished)
-		return false;
-	
-	if (!deck) {
-		if (xml->isStartElement() && (xml->name() == "cockatrice_deck")) {
-			deck = new DeckList;
-			return true;
-		}
-		return false;
-	}
-	
-	if (deck->readElement(xml))
-		readFinished = true;
-	return true;
-}
-
-void Command_DeckUpload::writeElement(QXmlStreamWriter *xml)
-{
-	if (deck)
-		deck->writeElement(xml);
+	return static_cast<DeckList *>(itemMap.value("cockatrice_deck"));
 }
 
 Command_DeckSelect::Command_DeckSelect(int _gameId, DeckList *_deck, int _deckId)
-	: GameCommand("deck_select", _gameId), deck(_deck), deckId(_deckId), readFinished(false)
+	: GameCommand("deck_select", _gameId)
 {
-	setParameter("deck_id", _deckId);
+	insertItem(new SerializableItem_Int("deck_id", _deckId));
+	if (!_deck)
+		_deck = new DeckList;
+	insertItem(_deck);
 }
 
-void Command_DeckSelect::extractParameters()
+DeckList *Command_DeckSelect::getDeck() const
 {
-	GameCommand::extractParameters();
-	
-	bool ok;
-	deckId = parameters["deck_id"].toInt(&ok);
-	if (!ok)
-		deckId = -1;
-}
-
-bool Command_DeckSelect::readElement(QXmlStreamReader *xml)
-{
-	if (readFinished)
-		return false;
-	
-	if (!deck) {
-		if (xml->isStartElement() && (xml->name() == "cockatrice_deck")) {
-			deck = new DeckList;
-			return true;
-		}
-		return false;
-	}
-	
-	if (deck->readElement(xml))
-		readFinished = true;
-	return true;
-}
-
-void Command_DeckSelect::writeElement(QXmlStreamWriter *xml)
-{
-	if (deck)
-		deck->writeElement(xml);
+	return static_cast<DeckList *>(itemMap.value("cockatrice_deck"));
 }
 
 QHash<QString, ResponseCode> ProtocolResponse::responseHash;
 
 ProtocolResponse::ProtocolResponse(int _cmdId, ResponseCode _responseCode, const QString &_itemName)
-	: ProtocolItem(_itemName), cmdId(_cmdId), responseCode(_responseCode)
+	: ProtocolItem("resp", _itemName)
 {
-	setParameter("cmd_id", cmdId);
-	setParameter("response_code", responseHash.key(responseCode));
-}
-
-void ProtocolResponse::extractParameters()
-{
-	bool ok;
-	cmdId = parameters["cmd_id"].toInt(&ok);
-	if (!ok)
-		cmdId = -1;
-	
-	responseCode = responseHash.value(parameters["response_code"], RespOk);
+	insertItem(new SerializableItem_Int("cmd_id", _cmdId));
+	insertItem(new SerializableItem_String("response_code", responseHash.key(_responseCode)));
 }
 
 void ProtocolResponse::initializeHash()
@@ -215,359 +143,93 @@ void ProtocolResponse::initializeHash()
 }
 
 Response_DeckList::Response_DeckList(int _cmdId, ResponseCode _responseCode, DeckList_Directory *_root)
-	: ProtocolResponse(_cmdId, _responseCode, "deck_list"), root(_root), readFinished(false)
+	: ProtocolResponse(_cmdId, _responseCode, "deck_list")
 {
-}
-
-Response_DeckList::~Response_DeckList()
-{
-	delete root;
-}
-
-bool Response_DeckList::readElement(QXmlStreamReader *xml)
-{
-	if (readFinished)
-		return false;
-	
-	if (!root) {
-		if (xml->isStartElement() && (xml->name() == "directory")) {
-			root = new DeckList_Directory;
-			return true;
-		}
-		return false;
-	}
-	
-	if (root->readElement(xml))
-		readFinished = true;
-	return true;
-}
-
-void Response_DeckList::writeElement(QXmlStreamWriter *xml)
-{
-	root->writeElement(xml);
+	if (!_root)
+		_root = new DeckList_Directory;
+	insertItem(_root);
 }
 
 Response_DeckDownload::Response_DeckDownload(int _cmdId, ResponseCode _responseCode, DeckList *_deck)
-	: ProtocolResponse(_cmdId, _responseCode, "deck_download"), deck(_deck), readFinished(false)
+	: ProtocolResponse(_cmdId, _responseCode, "deck_download")
 {
+	if (!_deck)
+		_deck = new DeckList;
+	insertItem(_deck);
 }
 
-bool Response_DeckDownload::readElement(QXmlStreamReader *xml)
+DeckList *Response_DeckDownload::getDeck() const
 {
-	if (readFinished)
-		return false;
-	
-	if (!deck) {
-		if (xml->isStartElement() && (xml->name() == "cockatrice_deck")) {
-			deck = new DeckList;
-			return true;
-		}
-		return false;
-	}
-	
-	if (deck->readElement(xml))
-		readFinished = true;
-	return true;
-}
-
-void Response_DeckDownload::writeElement(QXmlStreamWriter *xml)
-{
-	if (deck)
-		deck->writeElement(xml);
+	return static_cast<DeckList *>(itemMap.value("cockatrice_deck"));
 }
 
 Response_DeckUpload::Response_DeckUpload(int _cmdId, ResponseCode _responseCode, DeckList_File *_file)
-	: ProtocolResponse(_cmdId, _responseCode, "deck_upload"), file(_file), readFinished(false)
+	: ProtocolResponse(_cmdId, _responseCode, "deck_upload")
 {
-}
-
-Response_DeckUpload::~Response_DeckUpload()
-{
-	delete file;
-}
-
-bool Response_DeckUpload::readElement(QXmlStreamReader *xml)
-{
-	if (readFinished)
-		return false;
-	
-	if (!file) {
-		if (xml->isStartElement() && (xml->name() == "file")) {
-			file = new DeckList_File(xml->attributes().value("name").toString(), xml->attributes().value("id").toString().toInt(), QDateTime::fromTime_t(xml->attributes().value("upload_time").toString().toUInt()));
-			return true;
-		}
-		return false;
-	}
-	
-	if (file->readElement(xml))
-		readFinished = true;
-	return true;
-}
-
-void Response_DeckUpload::writeElement(QXmlStreamWriter *xml)
-{
-	if (file)
-		file->writeElement(xml);
-}
-
-GenericEvent::GenericEvent(const QString &_eventName)
-	: ProtocolItem(_eventName)
-{
-}
-
-void GameEvent::extractParameters()
-{
-	bool ok;
-	gameId = parameters["game_id"].toInt(&ok);
-	if (!ok)
-		gameId = -1;
-	playerId = parameters["player_id"].toInt(&ok);
-	if (!ok)
-		playerId = -1;
+	if (!_file)
+		_file = new DeckList_File;
+	insertItem(_file);
 }
 
 GameEvent::GameEvent(const QString &_eventName, int _gameId, int _playerId)
-	: ProtocolItem(_eventName), gameId(_gameId), playerId(_playerId)
+	: ProtocolItem("game_event", _eventName)
 {
-	setParameter("game_id", gameId);
-	setParameter("player_id", playerId);
-}
-
-void ChatEvent::extractParameters()
-{
-	channel = parameters["channel"];
+	insertItem(new SerializableItem_Int("game_id", _gameId));
+	insertItem(new SerializableItem_Int("player_id", _playerId));
 }
 
 ChatEvent::ChatEvent(const QString &_eventName, const QString &_channel)
-	: ProtocolItem(_eventName), channel(_channel)
+	: ProtocolItem("chat_event", _eventName)
 {
-	setParameter("channel", channel);
+	insertItem(new SerializableItem_String("channel", _channel));
 }
 
-bool Event_ListChatChannels::readElement(QXmlStreamReader *xml)
+Event_ListChatChannels::Event_ListChatChannels(const QList<ServerInfo_ChatChannel *> &_channelList)
+	: GenericEvent("list_chat_channels")
 {
-	if (xml->isStartElement() && (xml->name() == "channel")) {
-		channelList.append(ServerChatChannelInfo(
-			xml->attributes().value("name").toString(),
-			xml->attributes().value("description").toString(),
-			xml->attributes().value("player_count").toString().toInt(),
-			xml->attributes().value("auto_join").toString().toInt()
-		));
-		return true;
-	}
-	return false;
+	for (int i = 0; i < _channelList.size(); ++i)
+		itemList.append(_channelList[i]);
 }
 
-void Event_ListChatChannels::writeElement(QXmlStreamWriter *xml)
+Event_ChatListPlayers::Event_ChatListPlayers(const QString &_channel, const QList<ServerInfo_ChatUser *> &_playerList)
+	: ChatEvent("chat_list_players", _channel)
 {
-	for (int i = 0; i < channelList.size(); ++i) {
-		xml->writeStartElement("channel");
-		xml->writeAttribute("name", channelList[i].getName());
-		xml->writeAttribute("description", channelList[i].getDescription());
-		xml->writeAttribute("player_count", QString::number(channelList[i].getPlayerCount()));
-		xml->writeAttribute("auto_join", channelList[i].getAutoJoin() ? "1" : "0");
-		xml->writeEndElement();
-	}
+	for (int i = 0; i < _playerList.size(); ++i)
+		itemList.append(_playerList[i]);
 }
 
-bool Event_ChatListPlayers::readElement(QXmlStreamReader *xml)
+Event_ListGames::Event_ListGames(const QList<ServerInfo_Game *> &_gameList)
+	: GenericEvent("list_games")
 {
-	if (xml->isStartElement() && ((xml->name() == "player"))) {
-		playerList.append(ServerChatUserInfo(
-			xml->attributes().value("name").toString()
-		));
-		return true;
-	}
-	return false;
-}
-
-void Event_ChatListPlayers::writeElement(QXmlStreamWriter *xml)
-{
-	for (int i = 0; i < playerList.size(); ++i) {
-		xml->writeStartElement("player");
-		xml->writeAttribute("name", playerList[i].getName());
-		xml->writeEndElement();
-	}
-}
-
-bool Event_ListGames::readElement(QXmlStreamReader *xml)
-{
-	if (xml->isStartElement() && (xml->name() == "game")) {
-		gameList.append(ServerGameInfo(
-			xml->attributes().value("id").toString().toInt(),
-			xml->attributes().value("description").toString(),
-			xml->attributes().value("has_password").toString().toInt(),
-			xml->attributes().value("player_count").toString().toInt(),
-			xml->attributes().value("max_players").toString().toInt(),
-			xml->attributes().value("creator").toString(),
-			xml->attributes().value("spectators_allowed").toString().toInt(),
-			xml->attributes().value("spectator_count").toString().toInt()
-		));
-		return true;
-	}
-	return false;
-}
-
-void Event_ListGames::writeElement(QXmlStreamWriter *xml)
-{
-	for (int i = 0; i < gameList.size(); ++i) {
-		xml->writeStartElement("game");
-		xml->writeAttribute("id", QString::number(gameList[i].getGameId()));
-		xml->writeAttribute("description", gameList[i].getDescription());
-		xml->writeAttribute("has_password", gameList[i].getHasPassword() ? "1" : "0");
-		xml->writeAttribute("player_count", QString::number(gameList[i].getPlayerCount()));
-		xml->writeAttribute("max_players", QString::number(gameList[i].getMaxPlayers()));
-		xml->writeAttribute("creator", gameList[i].getCreatorName());
-		xml->writeAttribute("spectators_allowed", gameList[i].getSpectatorsAllowed() ? "1" : "0");
-		xml->writeAttribute("spectator_count", QString::number(gameList[i].getSpectatorCount()));
-		xml->writeEndElement();
-	}
+	for (int i = 0; i < _gameList.size(); ++i)
+		itemList.append(_gameList[i]);
 }
 
 Event_GameStateChanged::Event_GameStateChanged(int _gameId, const QList<ServerInfo_Player *> &_playerList)
-	: GameEvent("game_state_changed", _gameId, -1), currentItem(0), playerList(_playerList)
+	: GameEvent("game_state_changed", _gameId, -1)
 {
+	for (int i = 0; i < _playerList.size(); ++i)
+		itemList.append(_playerList[i]);
 }
 
-Event_GameStateChanged::~Event_GameStateChanged()
+Event_CreateArrows::Event_CreateArrows(int _gameId, int _playerId, const QList<ServerInfo_Arrow *> &_arrowList)
+	: GameEvent("create_arrows", _gameId, _playerId)
 {
-	for (int i = 0; i < playerList.size(); ++i)
-		delete playerList[i];
+	for (int i = 0; i < _arrowList.size(); ++i)
+		itemList.append(_arrowList[i]);
 }
 
-bool Event_GameStateChanged::readElement(QXmlStreamReader *xml)
+Event_CreateCounters::Event_CreateCounters(int _gameId, int _playerId, const QList<ServerInfo_Counter *> &_counterList)
+	: GameEvent("create_counters", _gameId, _playerId)
 {
-	if (currentItem) {
-		if (currentItem->readElement(xml))
-			currentItem = 0;
-		return true;
-	}
-	if (xml->isStartElement() && (xml->name() == "player")) {
-		ServerInfo_Player *player = new ServerInfo_Player;
-		playerList.append(player);
-		currentItem = player;
-	} else
-		return false;
-	if (currentItem)
-		if (currentItem->readElement(xml))
-			currentItem = 0;
-	return true;
-}
-
-void Event_GameStateChanged::writeElement(QXmlStreamWriter *xml)
-{
-	for (int i = 0; i < playerList.size(); ++i)
-		playerList[i]->writeElement(xml);
-}
-
-Event_CreateArrow::Event_CreateArrow(int _gameId, int _playerId, ServerInfo_Arrow *_arrow)
-	: GameEvent("create_arrow", _gameId, _playerId), arrow(_arrow), readFinished(false)
-{
-}
-
-Event_CreateArrow::~Event_CreateArrow()
-{
-	delete arrow;
-}
-
-bool Event_CreateArrow::readElement(QXmlStreamReader *xml)
-{
-	if (readFinished)
-		return false;
-	
-	if (!arrow) {
-		if (xml->isStartElement() && (xml->name() == "arrow"))
-			arrow = new ServerInfo_Arrow;
-		else
-			return false;
-	}
-	
-	if (arrow->readElement(xml))
-		readFinished = true;
-	return true;
-}
-
-void Event_CreateArrow::writeElement(QXmlStreamWriter *xml)
-{
-	if (arrow)
-		arrow->writeElement(xml);
-}
-
-Event_CreateCounter::Event_CreateCounter(int _gameId, int _playerId, ServerInfo_Counter *_counter)
-	: GameEvent("create_counter", _gameId, _playerId), counter(_counter), readFinished(false)
-{
-}
-
-Event_CreateCounter::~Event_CreateCounter()
-{
-	delete counter;
-}
-
-bool Event_CreateCounter::readElement(QXmlStreamReader *xml)
-{
-	if (readFinished)
-		return false;
-	
-	if (!counter) {
-		if (xml->isStartElement() && (xml->name() == "counter"))
-			counter = new ServerInfo_Counter;
-		else
-			return false;
-	}
-	
-	if (counter->readElement(xml))
-		readFinished = true;
-	return true;
-}
-
-void Event_CreateCounter::writeElement(QXmlStreamWriter *xml)
-{
-	if (counter)
-		counter->writeElement(xml);
+	for (int i = 0; i < _counterList.size(); ++i)
+		itemList.append(_counterList[i]);
 }
 
 Event_DrawCards::Event_DrawCards(int _gameId, int _playerId, int _numberCards, const QList<ServerInfo_Card *> &_cardList)
-	: GameEvent("draw_cards", _gameId, _playerId), currentItem(0), numberCards(_numberCards), cardList(_cardList)
+	: GameEvent("draw_cards", _gameId, _playerId)
 {
-	setParameter("number_cards", numberCards);
-}
-
-Event_DrawCards::~Event_DrawCards()
-{
-	for (int i = 0; i < cardList.size(); ++i)
-		delete cardList[i];
-}
-
-void Event_DrawCards::extractParameters()
-{
-	GameEvent::extractParameters();
-	bool ok;
-	numberCards = parameters["number_cards"].toInt(&ok);
-	if (!ok)
-		numberCards = -1;
-}
-
-bool Event_DrawCards::readElement(QXmlStreamReader *xml)
-{
-	if (currentItem) {
-		if (currentItem->readElement(xml))
-			currentItem = 0;
-		return true;
-	}
-	if (xml->isStartElement() && (xml->name() == "card")) {
-		ServerInfo_Card *card = new ServerInfo_Card;
-		cardList.append(card);
-		currentItem = card;
-	} else
-		return false;
-	if (currentItem)
-		if (currentItem->readElement(xml))
-			currentItem = 0;
-	return true;
-}
-
-void Event_DrawCards::writeElement(QXmlStreamWriter *xml)
-{
-	for (int i = 0; i < cardList.size(); ++i)
-		cardList[i]->writeElement(xml);
+	insertItem(new SerializableItem_Int("number_cards", _numberCards));
+	for (int i = 0; i < _cardList.size(); ++i)
+		itemList.append(_cardList[i]);
 }

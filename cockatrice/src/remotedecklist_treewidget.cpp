@@ -54,12 +54,13 @@ void RemoteDeckList_TreeWidget::addFolderToTree(DeckList_Directory *folder, QTre
 		newItem->setData(0, Qt::UserRole, QString());
 	}
 
-	for (int i = 0; i < folder->size(); ++i) {
-		DeckList_Directory *subFolder = dynamic_cast<DeckList_Directory *>(folder->at(i));
+	const QList<DeckList_TreeItem *> &folderItems = folder->getTreeItems();
+	for (int i = 0; i < folderItems.size(); ++i) {
+		DeckList_Directory *subFolder = dynamic_cast<DeckList_Directory *>(folderItems[i]);
 		if (subFolder)
 			addFolderToTree(subFolder, newItem);
 		else
-			addFileToTree(dynamic_cast<DeckList_File *>(folder->at(i)), newItem);
+			addFileToTree(dynamic_cast<DeckList_File *>(folderItems[i]), newItem);
 	}
 }
 

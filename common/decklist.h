@@ -5,6 +5,7 @@
 #include <QVector>
 #include <QPair>
 #include <QObject>
+#include "serializable_item.h"
 
 class CardDatabase;
 class QIODevice;
@@ -36,6 +37,7 @@ private:
 	class compareFunctor;
 public:
 	InnerDecklistNode(const QString &_name = QString(), InnerDecklistNode *_parent = 0) : AbstractDecklistNode(_parent), name(_name) { }
+	InnerDecklistNode(InnerDecklistNode *other, InnerDecklistNode *_parent = 0);
 	virtual ~InnerDecklistNode();
 	QString getName() const { return name; }
 	void setName(const QString &_name) { name = _name; }
@@ -72,13 +74,14 @@ private:
 	int number;
 public:
 	DecklistCardNode(const QString &_name = QString(), int _number = 1, InnerDecklistNode *_parent = 0) : AbstractDecklistCardNode(_parent), name(_name), number(_number) { }
+	DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent);
 	int getNumber() const { return number; }
 	void setNumber(int _number) { number = _number; }
 	QString getName() const { return name; }
 	void setName(const QString &_name) { name = _name; }
 };
 
-class DeckList : public QObject {
+class DeckList : public SerializableItem {
 	Q_OBJECT
 public:
 	enum FileFormat { PlainTextFormat, CockatriceFormat };
@@ -96,16 +99,17 @@ public slots:
 	void setComments(const QString &_comments = QString()) { comments = _comments; }
 public:
 	static const QStringList fileNameFilters;
-	DeckList(QObject *parent = 0);
+	DeckList();
+	DeckList(DeckList *other);
 	~DeckList();
 	QString getName() const { return name; }
 	QString getComments() const { return comments; }
 	QString getLastFileName() const { return lastFileName; }
 	FileFormat getLastFileFormat() const { return lastFileFormat; }
 
-	bool readElement(QXmlStreamReader *xml);
+	void readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
-	bool loadFromXml(QXmlStreamReader *xml);
+	void loadFromXml(QXmlStreamReader *xml);
 	
 	bool loadFromFile_Native(QIODevice *device);
 	bool saveToFile_Native(QIODevice *device);

@@ -324,11 +324,9 @@ void TabGame::deckSelectFinished(ProtocolResponse *r)
 	Response_DeckDownload *resp = qobject_cast<Response_DeckDownload *>(r);
 	if (!resp)
 		return;
-	Command_DeckSelect *cmd = static_cast<Command_DeckSelect *>(sender());
-	delete cmd->getDeck();
 	
 	Deck_PictureCacher::cachePictures(resp->getDeck(), this);
-	deckView->setDeck(resp->getDeck());
+	deckView->setDeck(new DeckList(resp->getDeck()));
 }
 
 void TabGame::readyStart()

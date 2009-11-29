@@ -61,10 +61,10 @@ Server_Game *Server::getGame(int gameId) const
 
 void Server::broadcastGameListUpdate(Server_Game *game)
 {
-	Event_ListGames *event = new Event_ListGames;
+	QList<ServerInfo_Game *> eventGameList;
 	if (game->getPlayerCount())
 		// Game is open
-		event->addGame(
+		eventGameList.append(new ServerInfo_Game(
 			game->getGameId(),
 			game->getDescription(),
 			!game->getPassword().isEmpty(),
@@ -73,10 +73,11 @@ void Server::broadcastGameListUpdate(Server_Game *game)
 			game->getCreatorName(),
 			game->getSpectatorsAllowed(),
 			game->getSpectatorCount()
-		);
+		));
 	else
 		// Game is closing
-		event->addGame(game->getGameId(), QString(), false, 0, game->getMaxPlayers(), QString(), false, 0);
+		eventGameList.append(new ServerInfo_Game(game->getGameId(), QString(), false, 0, game->getMaxPlayers(), QString(), false, 0));
+	Event_ListGames *event = new Event_ListGames(eventGameList);
 	
 	for (int i = 0; i < clients.size(); i++)
 		if (clients[i]->getAcceptsGameListChanges())
@@ -87,8 +88,9 @@ void Server::broadcastGameListUpdate(Server_Game *game)
 void Server::broadcastChannelUpdate()
 {
 	Server_ChatChannel *channel = static_cast<Server_ChatChannel *>(sender());
-	Event_ListChatChannels *event = new Event_ListChatChannels;
-	event->addChannel(channel->getName(), channel->getDescription(), channel->size(), channel->getAutoJoin());
+	QList<ServerInfo_ChatChannel *> eventChannelList;
+	eventChannelList.append(new ServerInfo_ChatChannel(channel->getName(), channel->getDescription(), channel->size(), channel->getAutoJoin()));
+	Event_ListChatChannels *event = new Event_ListChatChannels(eventChannelList);
 
 	for (int i = 0; i < clients.size(); ++i)
 	  	if (clients[i]->getAcceptsChatChannelListChanges())

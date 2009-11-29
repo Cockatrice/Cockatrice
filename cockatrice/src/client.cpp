@@ -6,7 +6,7 @@
 #include "protocol_items.h"
 
 Client::Client(QObject *parent)
-	: QObject(parent), currentItem(0), status(StatusDisconnected)
+	: QObject(parent), topLevelItem(0), status(StatusDisconnected)
 {
 	ProtocolItem::initializeHash();
 	
@@ -58,44 +58,31 @@ void Client::readData()
 	qDebug() << data;
 	xmlReader->addData(data);
 
-	if (currentItem) {
-		if (!currentItem->read(xmlReader))
-			return;
-		currentItem = 0;
-	}
-	while (!xmlReader->atEnd()) {
-		xmlReader->readNext();
-		if (xmlReader->isStartElement()) {
-			QString itemType = xmlReader->name().toString();
-			if (itemType == "cockatrice_server_stream") {
+	if (topLevelItem)
+		topLevelItem->read(xmlReader);
+	else {
+		while (!xmlReader->atEnd()) {
+			xmlReader->readNext();
+			if (xmlReader->isStartElement() && (xmlReader->name().toString() == "cockatrice_server_stream")) {
 				int serverVersion = xmlReader->attributes().value("version").toString().toInt();
 				if (serverVersion != ProtocolItem::protocolVersion) {
 					emit protocolVersionMismatch(ProtocolItem::protocolVersion, serverVersion);
 					disconnectFromServer();
 					return;
-				} else {
-					xmlWriter->writeStartDocument();
-					xmlWriter->writeStartElement("cockatrice_client_stream");
-					xmlWriter->writeAttribute("version", QString::number(ProtocolItem::protocolVersion));
-					
-					setStatus(StatusLoggingIn);
-					Command_Login *cmdLogin = new Command_Login(userName, password);
-					connect(cmdLogin, SIGNAL(finished(ResponseCode)), this, SLOT(loginResponse(ResponseCode)));
-					sendCommand(cmdLogin);
-					
-					continue;
 				}
-			}
-			QString itemName = xmlReader->attributes().value("name").toString();
-			qDebug() << "parseXml: startElement: " << "type =" << itemType << ", name =" << itemName;
-			currentItem = ProtocolItem::getNewItem(itemType + itemName);
-			if (!currentItem)
-				continue;
-			if (!currentItem->read(xmlReader))
-				return;
-			else {
-				processProtocolItem(currentItem);
-				currentItem = 0;
+				xmlWriter->writeStartDocument();
+				xmlWriter->writeStartElement("cockatrice_client_stream");
+				xmlWriter->writeAttribute("version", QString::number(ProtocolItem::protocolVersion));
+				
+				topLevelItem = new TopLevelProtocolItem;
+				connect(topLevelItem, SIGNAL(protocolItemReceived(ProtocolItem *)), this, SLOT(processProtocolItem(ProtocolItem *)));
+				
+				setStatus(StatusLoggingIn);
+				Command_Login *cmdLogin = new Command_Login(userName, password);
+				connect(cmdLogin, SIGNAL(finished(ResponseCode)), this, SLOT(loginResponse(ResponseCode)));
+				sendCommand(cmdLogin);
+
+				topLevelItem->read(xmlReader);
 			}
 		}
 	}
@@ -171,7 +158,9 @@ void Client::connectToServer(const QString &hostname, unsigned int port, const Q
 
 void Client::disconnectFromServer()
 {
-	currentItem = 0;
+	delete topLevelItem;
+	topLevelItem = 0;
+	
 	xmlReader->clear();
 	
 	timer->stop();

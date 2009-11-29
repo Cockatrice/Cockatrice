@@ -14,6 +14,7 @@ class QXmlStreamWriter;
 
 class ProtocolItem;
 class ProtocolResponse;
+class TopLevelProtocolItem;
 class ChatEvent;
 class GameEvent;
 class Event_ListGames;
@@ -56,6 +57,7 @@ private slots:
 	void slotSocketError(QAbstractSocket::SocketError error);
 	void ping();
 	void loginResponse(ResponseCode response);
+	void processProtocolItem(ProtocolItem *item);
 private:
 	static const int maxTimeout = 10;
 	
@@ -64,11 +66,10 @@ private:
 	QTcpSocket *socket;
 	QXmlStreamReader *xmlReader;
 	QXmlStreamWriter *xmlWriter;
-	ProtocolItem *currentItem;
+	TopLevelProtocolItem *topLevelItem;
 	ClientStatus status;
 	QString userName, password;
 	void setStatus(ClientStatus _status);
-	void processProtocolItem(ProtocolItem *item);
 public:
 	Client(QObject *parent = 0);
 	~Client();

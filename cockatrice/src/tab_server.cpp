@@ -78,16 +78,16 @@ void GameSelector::actJoin()
 	QModelIndex ind = gameListView->currentIndex();
 	if (!ind.isValid())
 		return;
-	const ServerGameInfo &game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
+	ServerInfo_Game *game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
 	QString password;
-	if (game.getHasPassword()) {
+	if (game->getHasPassword()) {
 		bool ok;
 		password = QInputDialog::getText(this, tr("Join game"), tr("Password:"), QLineEdit::Password, QString(), &ok);
 		if (!ok)
 			return;
 	}
 
-	Command_JoinGame *commandJoinGame = new Command_JoinGame(game.getGameId(), password, spectator);
+	Command_JoinGame *commandJoinGame = new Command_JoinGame(game->getGameId(), password, spectator);
 	connect(commandJoinGame, SIGNAL(finished(ResponseCode)), this, SLOT(checkResponse(ResponseCode)));
 	client->sendCommand(commandJoinGame);
 
@@ -107,7 +107,7 @@ void GameSelector::retranslateUi()
 
 void GameSelector::processListGamesEvent(Event_ListGames *event)
 {
-	const QList<ServerGameInfo> &gamesToUpdate = event->getGameList();
+	const QList<ServerInfo_Game *> &gamesToUpdate = event->getGameList();
 	for (int i = 0; i < gamesToUpdate.size(); ++i)
 		gameListModel->updateGameList(gamesToUpdate[i]);
 }
@@ -148,26 +148,26 @@ void ChatChannelSelector::retranslateUi()
 
 void ChatChannelSelector::processListChatChannelsEvent(Event_ListChatChannels *event)
 {
-	const QList<ServerChatChannelInfo> &channelsToUpdate = event->getChannelList();
+	const QList<ServerInfo_ChatChannel *> &channelsToUpdate = event->getChannelList();
 	for (int i = 0; i < channelsToUpdate.size(); ++i) {
-		const ServerChatChannelInfo &channel = channelsToUpdate[i];
+		ServerInfo_ChatChannel *channel = channelsToUpdate[i];
 		
 		for (int j = 0; j < channelList->topLevelItemCount(); ++j) {
 		  	QTreeWidgetItem *twi = channelList->topLevelItem(j);
-			if (twi->text(0) == channel.getName()) {
-				twi->setText(1, channel.getDescription());
-				twi->setText(2, QString::number(channel.getPlayerCount()));
+			if (twi->text(0) == channel->getName()) {
+				twi->setText(1, channel->getDescription());
+				twi->setText(2, QString::number(channel->getPlayerCount()));
 				return;
 			}
 		}
-		QTreeWidgetItem *twi = new QTreeWidgetItem(QStringList() << channel.getName() << channel.getDescription() << QString::number(channel.getPlayerCount()));
+		QTreeWidgetItem *twi = new QTreeWidgetItem(QStringList() << channel->getName() << channel->getDescription() << QString::number(channel->getPlayerCount()));
 		twi->setTextAlignment(2, Qt::AlignRight);
 		channelList->addTopLevelItem(twi);
 		channelList->resizeColumnToContents(0);
 		channelList->resizeColumnToContents(1);
 		channelList->resizeColumnToContents(2);
-		if (channel.getAutoJoin())
-			joinChannel(channel.getName());
+		if (channel->getAutoJoin())
+			joinChannel(channel->getName());
 	}
 }
 

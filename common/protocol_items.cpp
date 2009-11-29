@@ -6,378 +6,209 @@ Command_Ping::Command_Ping()
 {
 }
 Command_Login::Command_Login(const QString &_username, const QString &_password)
-	: Command("login"), username(_username), password(_password)
+	: Command("login")
 {
-	setParameter("username", username);
-	setParameter("password", password);
-}
-void Command_Login::extractParameters()
-{
-	Command::extractParameters();
-	username = parameters["username"];
-	password = parameters["password"];
+	insertItem(new SerializableItem_String("username", _username));
+	insertItem(new SerializableItem_String("password", _password));
 }
 Command_DeckList::Command_DeckList()
 	: Command("deck_list")
 {
 }
 Command_DeckNewDir::Command_DeckNewDir(const QString &_path, const QString &_dirName)
-	: Command("deck_new_dir"), path(_path), dirName(_dirName)
+	: Command("deck_new_dir")
 {
-	setParameter("path", path);
-	setParameter("dir_name", dirName);
-}
-void Command_DeckNewDir::extractParameters()
-{
-	Command::extractParameters();
-	path = parameters["path"];
-	dirName = parameters["dir_name"];
+	insertItem(new SerializableItem_String("path", _path));
+	insertItem(new SerializableItem_String("dir_name", _dirName));
 }
 Command_DeckDelDir::Command_DeckDelDir(const QString &_path)
-	: Command("deck_del_dir"), path(_path)
+	: Command("deck_del_dir")
 {
-	setParameter("path", path);
-}
-void Command_DeckDelDir::extractParameters()
-{
-	Command::extractParameters();
-	path = parameters["path"];
+	insertItem(new SerializableItem_String("path", _path));
 }
 Command_DeckDel::Command_DeckDel(int _deckId)
-	: Command("deck_del"), deckId(_deckId)
+	: Command("deck_del")
 {
-	setParameter("deck_id", deckId);
-}
-void Command_DeckDel::extractParameters()
-{
-	Command::extractParameters();
-	deckId = parameters["deck_id"].toInt();
+	insertItem(new SerializableItem_Int("deck_id", _deckId));
 }
 Command_DeckDownload::Command_DeckDownload(int _deckId)
-	: Command("deck_download"), deckId(_deckId)
+	: Command("deck_download")
 {
-	setParameter("deck_id", deckId);
-}
-void Command_DeckDownload::extractParameters()
-{
-	Command::extractParameters();
-	deckId = parameters["deck_id"].toInt();
+	insertItem(new SerializableItem_Int("deck_id", _deckId));
 }
 Command_ListChatChannels::Command_ListChatChannels()
 	: Command("list_chat_channels")
 {
 }
 Command_ChatJoinChannel::Command_ChatJoinChannel(const QString &_channel)
-	: Command("chat_join_channel"), channel(_channel)
+	: Command("chat_join_channel")
 {
-	setParameter("channel", channel);
-}
-void Command_ChatJoinChannel::extractParameters()
-{
-	Command::extractParameters();
-	channel = parameters["channel"];
+	insertItem(new SerializableItem_String("channel", _channel));
 }
 Command_ChatLeaveChannel::Command_ChatLeaveChannel(const QString &_channel)
 	: ChatCommand("chat_leave_channel", _channel)
 {
 }
 Command_ChatSay::Command_ChatSay(const QString &_channel, const QString &_message)
-	: ChatCommand("chat_say", _channel), message(_message)
+	: ChatCommand("chat_say", _channel)
 {
-	setParameter("message", message);
-}
-void Command_ChatSay::extractParameters()
-{
-	ChatCommand::extractParameters();
-	message = parameters["message"];
+	insertItem(new SerializableItem_String("message", _message));
 }
 Command_ListGames::Command_ListGames()
 	: Command("list_games")
 {
 }
 Command_CreateGame::Command_CreateGame(const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed)
-	: Command("create_game"), description(_description), password(_password), maxPlayers(_maxPlayers), spectatorsAllowed(_spectatorsAllowed)
+	: Command("create_game")
 {
-	setParameter("description", description);
-	setParameter("password", password);
-	setParameter("max_players", maxPlayers);
-	setParameter("spectators_allowed", spectatorsAllowed);
-}
-void Command_CreateGame::extractParameters()
-{
-	Command::extractParameters();
-	description = parameters["description"];
-	password = parameters["password"];
-	maxPlayers = parameters["max_players"].toInt();
-	spectatorsAllowed = (parameters["spectators_allowed"] == "1");
+	insertItem(new SerializableItem_String("description", _description));
+	insertItem(new SerializableItem_String("password", _password));
+	insertItem(new SerializableItem_Int("max_players", _maxPlayers));
+	insertItem(new SerializableItem_Bool("spectators_allowed", _spectatorsAllowed));
 }
 Command_JoinGame::Command_JoinGame(int _gameId, const QString &_password, bool _spectator)
-	: Command("join_game"), gameId(_gameId), password(_password), spectator(_spectator)
+	: Command("join_game")
 {
-	setParameter("game_id", gameId);
-	setParameter("password", password);
-	setParameter("spectator", spectator);
-}
-void Command_JoinGame::extractParameters()
-{
-	Command::extractParameters();
-	gameId = parameters["game_id"].toInt();
-	password = parameters["password"];
-	spectator = (parameters["spectator"] == "1");
+	insertItem(new SerializableItem_Int("game_id", _gameId));
+	insertItem(new SerializableItem_String("password", _password));
+	insertItem(new SerializableItem_Bool("spectator", _spectator));
 }
 Command_LeaveGame::Command_LeaveGame(int _gameId)
 	: GameCommand("leave_game", _gameId)
 {
 }
 Command_Say::Command_Say(int _gameId, const QString &_message)
-	: GameCommand("say", _gameId), message(_message)
+	: GameCommand("say", _gameId)
 {
-	setParameter("message", message);
-}
-void Command_Say::extractParameters()
-{
-	GameCommand::extractParameters();
-	message = parameters["message"];
+	insertItem(new SerializableItem_String("message", _message));
 }
 Command_Shuffle::Command_Shuffle(int _gameId)
 	: GameCommand("shuffle", _gameId)
 {
 }
 Command_RollDie::Command_RollDie(int _gameId, int _sides)
-	: GameCommand("roll_die", _gameId), sides(_sides)
+	: GameCommand("roll_die", _gameId)
 {
-	setParameter("sides", sides);
-}
-void Command_RollDie::extractParameters()
-{
-	GameCommand::extractParameters();
-	sides = parameters["sides"].toInt();
+	insertItem(new SerializableItem_Int("sides", _sides));
 }
 Command_DrawCards::Command_DrawCards(int _gameId, int _number)
-	: GameCommand("draw_cards", _gameId), number(_number)
+	: GameCommand("draw_cards", _gameId)
 {
-	setParameter("number", number);
-}
-void Command_DrawCards::extractParameters()
-{
-	GameCommand::extractParameters();
-	number = parameters["number"].toInt();
+	insertItem(new SerializableItem_Int("number", _number));
 }
 Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, int _cardId, const QString &_targetZone, int _x, int _y, bool _faceDown)
-	: GameCommand("move_card", _gameId), startZone(_startZone), cardId(_cardId), targetZone(_targetZone), x(_x), y(_y), faceDown(_faceDown)
+	: GameCommand("move_card", _gameId)
 {
-	setParameter("start_zone", startZone);
-	setParameter("card_id", cardId);
-	setParameter("target_zone", targetZone);
-	setParameter("x", x);
-	setParameter("y", y);
-	setParameter("face_down", faceDown);
-}
-void Command_MoveCard::extractParameters()
-{
-	GameCommand::extractParameters();
-	startZone = parameters["start_zone"];
-	cardId = parameters["card_id"].toInt();
-	targetZone = parameters["target_zone"];
-	x = parameters["x"].toInt();
-	y = parameters["y"].toInt();
-	faceDown = (parameters["face_down"] == "1");
+	insertItem(new SerializableItem_String("start_zone", _startZone));
+	insertItem(new SerializableItem_Int("card_id", _cardId));
+	insertItem(new SerializableItem_String("target_zone", _targetZone));
+	insertItem(new SerializableItem_Int("x", _x));
+	insertItem(new SerializableItem_Int("y", _y));
+	insertItem(new SerializableItem_Bool("face_down", _faceDown));
 }
 Command_CreateToken::Command_CreateToken(int _gameId, const QString &_zone, const QString &_cardName, const QString &_pt, int _x, int _y)
-	: GameCommand("create_token", _gameId), zone(_zone), cardName(_cardName), pt(_pt), x(_x), y(_y)
+	: GameCommand("create_token", _gameId)
 {
-	setParameter("zone", zone);
-	setParameter("card_name", cardName);
-	setParameter("pt", pt);
-	setParameter("x", x);
-	setParameter("y", y);
-}
-void Command_CreateToken::extractParameters()
-{
-	GameCommand::extractParameters();
-	zone = parameters["zone"];
-	cardName = parameters["card_name"];
-	pt = parameters["pt"];
-	x = parameters["x"].toInt();
-	y = parameters["y"].toInt();
+	insertItem(new SerializableItem_String("zone", _zone));
+	insertItem(new SerializableItem_String("card_name", _cardName));
+	insertItem(new SerializableItem_String("pt", _pt));
+	insertItem(new SerializableItem_Int("x", _x));
+	insertItem(new SerializableItem_Int("y", _y));
 }
 Command_CreateArrow::Command_CreateArrow(int _gameId, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, const QColor &_color)
-	: GameCommand("create_arrow", _gameId), startPlayerId(_startPlayerId), startZone(_startZone), startCardId(_startCardId), targetPlayerId(_targetPlayerId), targetZone(_targetZone), targetCardId(_targetCardId), color(_color)
+	: GameCommand("create_arrow", _gameId)
 {
-	setParameter("start_player_id", startPlayerId);
-	setParameter("start_zone", startZone);
-	setParameter("start_card_id", startCardId);
-	setParameter("target_player_id", targetPlayerId);
-	setParameter("target_zone", targetZone);
-	setParameter("target_card_id", targetCardId);
-	setParameter("color", color);
-}
-void Command_CreateArrow::extractParameters()
-{
-	GameCommand::extractParameters();
-	startPlayerId = parameters["start_player_id"].toInt();
-	startZone = parameters["start_zone"];
-	startCardId = parameters["start_card_id"].toInt();
-	targetPlayerId = parameters["target_player_id"].toInt();
-	targetZone = parameters["target_zone"];
-	targetCardId = parameters["target_card_id"].toInt();
-	color = ColorConverter::colorFromInt(parameters["color"].toInt());
+	insertItem(new SerializableItem_Int("start_player_id", _startPlayerId));
+	insertItem(new SerializableItem_String("start_zone", _startZone));
+	insertItem(new SerializableItem_Int("start_card_id", _startCardId));
+	insertItem(new SerializableItem_Int("target_player_id", _targetPlayerId));
+	insertItem(new SerializableItem_String("target_zone", _targetZone));
+	insertItem(new SerializableItem_Int("target_card_id", _targetCardId));
+	insertItem(new SerializableItem_Color("color", _color));
 }
 Command_DeleteArrow::Command_DeleteArrow(int _gameId, int _arrowId)
-	: GameCommand("delete_arrow", _gameId), arrowId(_arrowId)
+	: GameCommand("delete_arrow", _gameId)
 {
-	setParameter("arrow_id", arrowId);
-}
-void Command_DeleteArrow::extractParameters()
-{
-	GameCommand::extractParameters();
-	arrowId = parameters["arrow_id"].toInt();
+	insertItem(new SerializableItem_Int("arrow_id", _arrowId));
 }
 Command_SetCardAttr::Command_SetCardAttr(int _gameId, const QString &_zone, int _cardId, const QString &_attrName, const QString &_attrValue)
-	: GameCommand("set_card_attr", _gameId), zone(_zone), cardId(_cardId), attrName(_attrName), attrValue(_attrValue)
+	: GameCommand("set_card_attr", _gameId)
 {
-	setParameter("zone", zone);
-	setParameter("card_id", cardId);
-	setParameter("attr_name", attrName);
-	setParameter("attr_value", attrValue);
-}
-void Command_SetCardAttr::extractParameters()
-{
-	GameCommand::extractParameters();
-	zone = parameters["zone"];
-	cardId = parameters["card_id"].toInt();
-	attrName = parameters["attr_name"];
-	attrValue = parameters["attr_value"];
+	insertItem(new SerializableItem_String("zone", _zone));
+	insertItem(new SerializableItem_Int("card_id", _cardId));
+	insertItem(new SerializableItem_String("attr_name", _attrName));
+	insertItem(new SerializableItem_String("attr_value", _attrValue));
 }
 Command_ReadyStart::Command_ReadyStart(int _gameId)
 	: GameCommand("ready_start", _gameId)
 {
 }
 Command_IncCounter::Command_IncCounter(int _gameId, int _counterId, int _delta)
-	: GameCommand("inc_counter", _gameId), counterId(_counterId), delta(_delta)
+	: GameCommand("inc_counter", _gameId)
 {
-	setParameter("counter_id", counterId);
-	setParameter("delta", delta);
-}
-void Command_IncCounter::extractParameters()
-{
-	GameCommand::extractParameters();
-	counterId = parameters["counter_id"].toInt();
-	delta = parameters["delta"].toInt();
+	insertItem(new SerializableItem_Int("counter_id", _counterId));
+	insertItem(new SerializableItem_Int("delta", _delta));
 }
 Command_CreateCounter::Command_CreateCounter(int _gameId, const QString &_counterName, const QColor &_color, int _radius, int _value)
-	: GameCommand("create_counter", _gameId), counterName(_counterName), color(_color), radius(_radius), value(_value)
+	: GameCommand("create_counter", _gameId)
 {
-	setParameter("counter_name", counterName);
-	setParameter("color", color);
-	setParameter("radius", radius);
-	setParameter("value", value);
-}
-void Command_CreateCounter::extractParameters()
-{
-	GameCommand::extractParameters();
-	counterName = parameters["counter_name"];
-	color = ColorConverter::colorFromInt(parameters["color"].toInt());
-	radius = parameters["radius"].toInt();
-	value = parameters["value"].toInt();
+	insertItem(new SerializableItem_String("counter_name", _counterName));
+	insertItem(new SerializableItem_Color("color", _color));
+	insertItem(new SerializableItem_Int("radius", _radius));
+	insertItem(new SerializableItem_Int("value", _value));
 }
 Command_SetCounter::Command_SetCounter(int _gameId, int _counterId, int _value)
-	: GameCommand("set_counter", _gameId), counterId(_counterId), value(_value)
+	: GameCommand("set_counter", _gameId)
 {
-	setParameter("counter_id", counterId);
-	setParameter("value", value);
-}
-void Command_SetCounter::extractParameters()
-{
-	GameCommand::extractParameters();
-	counterId = parameters["counter_id"].toInt();
-	value = parameters["value"].toInt();
+	insertItem(new SerializableItem_Int("counter_id", _counterId));
+	insertItem(new SerializableItem_Int("value", _value));
 }
 Command_DelCounter::Command_DelCounter(int _gameId, int _counterId)
-	: GameCommand("del_counter", _gameId), counterId(_counterId)
+	: GameCommand("del_counter", _gameId)
 {
-	setParameter("counter_id", counterId);
-}
-void Command_DelCounter::extractParameters()
-{
-	GameCommand::extractParameters();
-	counterId = parameters["counter_id"].toInt();
+	insertItem(new SerializableItem_Int("counter_id", _counterId));
 }
 Command_NextTurn::Command_NextTurn(int _gameId)
 	: GameCommand("next_turn", _gameId)
 {
 }
 Command_SetActivePhase::Command_SetActivePhase(int _gameId, int _phase)
-	: GameCommand("set_active_phase", _gameId), phase(_phase)
+	: GameCommand("set_active_phase", _gameId)
 {
-	setParameter("phase", phase);
-}
-void Command_SetActivePhase::extractParameters()
-{
-	GameCommand::extractParameters();
-	phase = parameters["phase"].toInt();
+	insertItem(new SerializableItem_Int("phase", _phase));
 }
 Command_DumpZone::Command_DumpZone(int _gameId, int _playerId, const QString &_zoneName, int _numberCards)
-	: GameCommand("dump_zone", _gameId), playerId(_playerId), zoneName(_zoneName), numberCards(_numberCards)
+	: GameCommand("dump_zone", _gameId)
 {
-	setParameter("player_id", playerId);
-	setParameter("zone_name", zoneName);
-	setParameter("number_cards", numberCards);
-}
-void Command_DumpZone::extractParameters()
-{
-	GameCommand::extractParameters();
-	playerId = parameters["player_id"].toInt();
-	zoneName = parameters["zone_name"];
-	numberCards = parameters["number_cards"].toInt();
+	insertItem(new SerializableItem_Int("player_id", _playerId));
+	insertItem(new SerializableItem_String("zone_name", _zoneName));
+	insertItem(new SerializableItem_Int("number_cards", _numberCards));
 }
 Command_StopDumpZone::Command_StopDumpZone(int _gameId, int _playerId, const QString &_zoneName)
-	: GameCommand("stop_dump_zone", _gameId), playerId(_playerId), zoneName(_zoneName)
+	: GameCommand("stop_dump_zone", _gameId)
 {
-	setParameter("player_id", playerId);
-	setParameter("zone_name", zoneName);
-}
-void Command_StopDumpZone::extractParameters()
-{
-	GameCommand::extractParameters();
-	playerId = parameters["player_id"].toInt();
-	zoneName = parameters["zone_name"];
+	insertItem(new SerializableItem_Int("player_id", _playerId));
+	insertItem(new SerializableItem_String("zone_name", _zoneName));
 }
 Event_Say::Event_Say(int _gameId, int _playerId, const QString &_message)
-	: GameEvent("say", _gameId, _playerId), message(_message)
+	: GameEvent("say", _gameId, _playerId)
 {
-	setParameter("message", message);
-}
-void Event_Say::extractParameters()
-{
-	GameEvent::extractParameters();
-	message = parameters["message"];
+	insertItem(new SerializableItem_String("message", _message));
 }
 Event_Join::Event_Join(int _gameId, int _playerId, const QString &_playerName, bool _spectator)
-	: GameEvent("join", _gameId, _playerId), playerName(_playerName), spectator(_spectator)
+	: GameEvent("join", _gameId, _playerId)
 {
-	setParameter("player_name", playerName);
-	setParameter("spectator", spectator);
-}
-void Event_Join::extractParameters()
-{
-	GameEvent::extractParameters();
-	playerName = parameters["player_name"];
-	spectator = (parameters["spectator"] == "1");
+	insertItem(new SerializableItem_String("player_name", _playerName));
+	insertItem(new SerializableItem_Bool("spectator", _spectator));
 }
 Event_Leave::Event_Leave(int _gameId, int _playerId)
 	: GameEvent("leave", _gameId, _playerId)
 {
 }
 Event_DeckSelect::Event_DeckSelect(int _gameId, int _playerId, int _deckId)
-	: GameEvent("deck_select", _gameId, _playerId), deckId(_deckId)
+	: GameEvent("deck_select", _gameId, _playerId)
 {
-	setParameter("deck_id", deckId);
-}
-void Event_DeckSelect::extractParameters()
-{
-	GameEvent::extractParameters();
-	deckId = parameters["deck_id"].toInt();
+	insertItem(new SerializableItem_Int("deck_id", _deckId));
 }
 Event_GameClosed::Event_GameClosed(int _gameId, int _playerId)
 	: GameEvent("game_closed", _gameId, _playerId)
@@ -396,210 +227,107 @@ Event_Shuffle::Event_Shuffle(int _gameId, int _playerId)
 {
 }
 Event_RollDie::Event_RollDie(int _gameId, int _playerId, int _sides, int _value)
-	: GameEvent("roll_die", _gameId, _playerId), sides(_sides), value(_value)
+	: GameEvent("roll_die", _gameId, _playerId)
 {
-	setParameter("sides", sides);
-	setParameter("value", value);
-}
-void Event_RollDie::extractParameters()
-{
-	GameEvent::extractParameters();
-	sides = parameters["sides"].toInt();
-	value = parameters["value"].toInt();
+	insertItem(new SerializableItem_Int("sides", _sides));
+	insertItem(new SerializableItem_Int("value", _value));
 }
 Event_MoveCard::Event_MoveCard(int _gameId, int _playerId, int _cardId, const QString &_cardName, const QString &_startZone, int _position, const QString &_targetZone, int _x, int _y, bool _faceDown)
-	: GameEvent("move_card", _gameId, _playerId), cardId(_cardId), cardName(_cardName), startZone(_startZone), position(_position), targetZone(_targetZone), x(_x), y(_y), faceDown(_faceDown)
+	: GameEvent("move_card", _gameId, _playerId)
 {
-	setParameter("card_id", cardId);
-	setParameter("card_name", cardName);
-	setParameter("start_zone", startZone);
-	setParameter("position", position);
-	setParameter("target_zone", targetZone);
-	setParameter("x", x);
-	setParameter("y", y);
-	setParameter("face_down", faceDown);
-}
-void Event_MoveCard::extractParameters()
-{
-	GameEvent::extractParameters();
-	cardId = parameters["card_id"].toInt();
-	cardName = parameters["card_name"];
-	startZone = parameters["start_zone"];
-	position = parameters["position"].toInt();
-	targetZone = parameters["target_zone"];
-	x = parameters["x"].toInt();
-	y = parameters["y"].toInt();
-	faceDown = (parameters["face_down"] == "1");
+	insertItem(new SerializableItem_Int("card_id", _cardId));
+	insertItem(new SerializableItem_String("card_name", _cardName));
+	insertItem(new SerializableItem_String("start_zone", _startZone));
+	insertItem(new SerializableItem_Int("position", _position));
+	insertItem(new SerializableItem_String("target_zone", _targetZone));
+	insertItem(new SerializableItem_Int("x", _x));
+	insertItem(new SerializableItem_Int("y", _y));
+	insertItem(new SerializableItem_Bool("face_down", _faceDown));
 }
 Event_CreateToken::Event_CreateToken(int _gameId, int _playerId, const QString &_zone, int _cardId, const QString &_cardName, const QString &_pt, int _x, int _y)
-	: GameEvent("create_token", _gameId, _playerId), zone(_zone), cardId(_cardId), cardName(_cardName), pt(_pt), x(_x), y(_y)
+	: GameEvent("create_token", _gameId, _playerId)
 {
-	setParameter("zone", zone);
-	setParameter("card_id", cardId);
-	setParameter("card_name", cardName);
-	setParameter("pt", pt);
-	setParameter("x", x);
-	setParameter("y", y);
-}
-void Event_CreateToken::extractParameters()
-{
-	GameEvent::extractParameters();
-	zone = parameters["zone"];
-	cardId = parameters["card_id"].toInt();
-	cardName = parameters["card_name"];
-	pt = parameters["pt"];
-	x = parameters["x"].toInt();
-	y = parameters["y"].toInt();
+	insertItem(new SerializableItem_String("zone", _zone));
+	insertItem(new SerializableItem_Int("card_id", _cardId));
+	insertItem(new SerializableItem_String("card_name", _cardName));
+	insertItem(new SerializableItem_String("pt", _pt));
+	insertItem(new SerializableItem_Int("x", _x));
+	insertItem(new SerializableItem_Int("y", _y));
 }
 Event_DeleteArrow::Event_DeleteArrow(int _gameId, int _playerId, int _arrowId)
-	: GameEvent("delete_arrow", _gameId, _playerId), arrowId(_arrowId)
+	: GameEvent("delete_arrow", _gameId, _playerId)
 {
-	setParameter("arrow_id", arrowId);
-}
-void Event_DeleteArrow::extractParameters()
-{
-	GameEvent::extractParameters();
-	arrowId = parameters["arrow_id"].toInt();
+	insertItem(new SerializableItem_Int("arrow_id", _arrowId));
 }
 Event_SetCardAttr::Event_SetCardAttr(int _gameId, int _playerId, const QString &_zone, int _cardId, const QString &_attrName, const QString &_attrValue)
-	: GameEvent("set_card_attr", _gameId, _playerId), zone(_zone), cardId(_cardId), attrName(_attrName), attrValue(_attrValue)
+	: GameEvent("set_card_attr", _gameId, _playerId)
 {
-	setParameter("zone", zone);
-	setParameter("card_id", cardId);
-	setParameter("attr_name", attrName);
-	setParameter("attr_value", attrValue);
-}
-void Event_SetCardAttr::extractParameters()
-{
-	GameEvent::extractParameters();
-	zone = parameters["zone"];
-	cardId = parameters["card_id"].toInt();
-	attrName = parameters["attr_name"];
-	attrValue = parameters["attr_value"];
+	insertItem(new SerializableItem_String("zone", _zone));
+	insertItem(new SerializableItem_Int("card_id", _cardId));
+	insertItem(new SerializableItem_String("attr_name", _attrName));
+	insertItem(new SerializableItem_String("attr_value", _attrValue));
 }
 Event_SetCounter::Event_SetCounter(int _gameId, int _playerId, int _counterId, int _value)
-	: GameEvent("set_counter", _gameId, _playerId), counterId(_counterId), value(_value)
+	: GameEvent("set_counter", _gameId, _playerId)
 {
-	setParameter("counter_id", counterId);
-	setParameter("value", value);
-}
-void Event_SetCounter::extractParameters()
-{
-	GameEvent::extractParameters();
-	counterId = parameters["counter_id"].toInt();
-	value = parameters["value"].toInt();
+	insertItem(new SerializableItem_Int("counter_id", _counterId));
+	insertItem(new SerializableItem_Int("value", _value));
 }
 Event_DelCounter::Event_DelCounter(int _gameId, int _playerId, int _counterId)
-	: GameEvent("del_counter", _gameId, _playerId), counterId(_counterId)
+	: GameEvent("del_counter", _gameId, _playerId)
 {
-	setParameter("counter_id", counterId);
-}
-void Event_DelCounter::extractParameters()
-{
-	GameEvent::extractParameters();
-	counterId = parameters["counter_id"].toInt();
+	insertItem(new SerializableItem_Int("counter_id", _counterId));
 }
 Event_SetActivePlayer::Event_SetActivePlayer(int _gameId, int _playerId, int _activePlayerId)
-	: GameEvent("set_active_player", _gameId, _playerId), activePlayerId(_activePlayerId)
+	: GameEvent("set_active_player", _gameId, _playerId)
 {
-	setParameter("active_player_id", activePlayerId);
-}
-void Event_SetActivePlayer::extractParameters()
-{
-	GameEvent::extractParameters();
-	activePlayerId = parameters["active_player_id"].toInt();
+	insertItem(new SerializableItem_Int("active_player_id", _activePlayerId));
 }
 Event_SetActivePhase::Event_SetActivePhase(int _gameId, int _playerId, int _phase)
-	: GameEvent("set_active_phase", _gameId, _playerId), phase(_phase)
+	: GameEvent("set_active_phase", _gameId, _playerId)
 {
-	setParameter("phase", phase);
-}
-void Event_SetActivePhase::extractParameters()
-{
-	GameEvent::extractParameters();
-	phase = parameters["phase"].toInt();
+	insertItem(new SerializableItem_Int("phase", _phase));
 }
 Event_DumpZone::Event_DumpZone(int _gameId, int _playerId, int _zoneOwnerId, const QString &_zone, int _numberCards)
-	: GameEvent("dump_zone", _gameId, _playerId), zoneOwnerId(_zoneOwnerId), zone(_zone), numberCards(_numberCards)
+	: GameEvent("dump_zone", _gameId, _playerId)
 {
-	setParameter("zone_owner_id", zoneOwnerId);
-	setParameter("zone", zone);
-	setParameter("number_cards", numberCards);
-}
-void Event_DumpZone::extractParameters()
-{
-	GameEvent::extractParameters();
-	zoneOwnerId = parameters["zone_owner_id"].toInt();
-	zone = parameters["zone"];
-	numberCards = parameters["number_cards"].toInt();
+	insertItem(new SerializableItem_Int("zone_owner_id", _zoneOwnerId));
+	insertItem(new SerializableItem_String("zone", _zone));
+	insertItem(new SerializableItem_Int("number_cards", _numberCards));
 }
 Event_StopDumpZone::Event_StopDumpZone(int _gameId, int _playerId, int _zoneOwnerId, const QString &_zone)
-	: GameEvent("stop_dump_zone", _gameId, _playerId), zoneOwnerId(_zoneOwnerId), zone(_zone)
+	: GameEvent("stop_dump_zone", _gameId, _playerId)
 {
-	setParameter("zone_owner_id", zoneOwnerId);
-	setParameter("zone", zone);
-}
-void Event_StopDumpZone::extractParameters()
-{
-	GameEvent::extractParameters();
-	zoneOwnerId = parameters["zone_owner_id"].toInt();
-	zone = parameters["zone"];
+	insertItem(new SerializableItem_Int("zone_owner_id", _zoneOwnerId));
+	insertItem(new SerializableItem_String("zone", _zone));
 }
 Event_ServerMessage::Event_ServerMessage(const QString &_message)
-	: GenericEvent("server_message"), message(_message)
+	: GenericEvent("server_message")
 {
-	setParameter("message", message);
-}
-void Event_ServerMessage::extractParameters()
-{
-	GenericEvent::extractParameters();
-	message = parameters["message"];
+	insertItem(new SerializableItem_String("message", _message));
 }
 Event_GameJoined::Event_GameJoined(int _gameId, int _playerId, bool _spectator)
-	: GenericEvent("game_joined"), gameId(_gameId), playerId(_playerId), spectator(_spectator)
+	: GenericEvent("game_joined")
 {
-	setParameter("game_id", gameId);
-	setParameter("player_id", playerId);
-	setParameter("spectator", spectator);
-}
-void Event_GameJoined::extractParameters()
-{
-	GenericEvent::extractParameters();
-	gameId = parameters["game_id"].toInt();
-	playerId = parameters["player_id"].toInt();
-	spectator = (parameters["spectator"] == "1");
+	insertItem(new SerializableItem_Int("game_id", _gameId));
+	insertItem(new SerializableItem_Int("player_id", _playerId));
+	insertItem(new SerializableItem_Bool("spectator", _spectator));
 }
 Event_ChatJoinChannel::Event_ChatJoinChannel(const QString &_channel, const QString &_playerName)
-	: ChatEvent("chat_join_channel", _channel), playerName(_playerName)
+	: ChatEvent("chat_join_channel", _channel)
 {
-	setParameter("player_name", playerName);
-}
-void Event_ChatJoinChannel::extractParameters()
-{
-	ChatEvent::extractParameters();
-	playerName = parameters["player_name"];
+	insertItem(new SerializableItem_String("player_name", _playerName));
 }
 Event_ChatLeaveChannel::Event_ChatLeaveChannel(const QString &_channel, const QString &_playerName)
-	: ChatEvent("chat_leave_channel", _channel), playerName(_playerName)
+	: ChatEvent("chat_leave_channel", _channel)
 {
-	setParameter("player_name", playerName);
-}
-void Event_ChatLeaveChannel::extractParameters()
-{
-	ChatEvent::extractParameters();
-	playerName = parameters["player_name"];
+	insertItem(new SerializableItem_String("player_name", _playerName));
 }
 Event_ChatSay::Event_ChatSay(const QString &_channel, const QString &_playerName, const QString &_message)
-	: ChatEvent("chat_say", _channel), playerName(_playerName), message(_message)
+	: ChatEvent("chat_say", _channel)
 {
-	setParameter("player_name", playerName);
-	setParameter("message", message);
-}
-void Event_ChatSay::extractParameters()
-{
-	ChatEvent::extractParameters();
-	playerName = parameters["player_name"];
-	message = parameters["message"];
+	insertItem(new SerializableItem_String("player_name", _playerName));
+	insertItem(new SerializableItem_String("message", _message));
 }
 void ProtocolItem::initializeHashAuto()
 {

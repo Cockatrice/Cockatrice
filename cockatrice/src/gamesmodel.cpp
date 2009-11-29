@@ -1,9 +1,12 @@
 #include "gamesmodel.h"
+#include "protocol_datastructures.h"
 
 GamesModel::~GamesModel()
 {
 	if (!gameList.isEmpty()) {
 		beginRemoveRows(QModelIndex(), 0, gameList.size() - 1);
+		for (int i = 0; i < gameList.size(); ++i)
+			delete gameList[i];
 		gameList.clear();
 		endRemoveRows();
 	}
@@ -20,13 +23,13 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
 	if ((index.row() >= gameList.size()) || (index.column() >= columnCount()))
 		return QVariant();
 	
-	const ServerGameInfo &g = gameList[index.row()];
+	ServerInfo_Game *g = gameList[index.row()];
 	switch (index.column()) {
-		case 0: return g.getDescription();
-		case 1: return g.getCreatorName();
-		case 2: return g.getHasPassword() ? tr("yes") : tr("no");
-		case 3: return QString("%1/%2").arg(g.getPlayerCount()).arg(g.getMaxPlayers());
-		case 4: return g.getSpectatorsAllowed() ? QVariant(g.getSpectatorCount()) : QVariant(tr("not allowed"));
+		case 0: return g->getDescription();
+		case 1: return g->getCreatorName();
+		case 2: return g->getHasPassword() ? tr("yes") : tr("no");
+		case 3: return QString("%1/%2").arg(g->getPlayerCount()).arg(g->getMaxPlayers());
+		case 4: return g->getSpectatorsAllowed() ? QVariant(g->getSpectatorCount()) : QVariant(tr("not allowed"));
 		default: return QVariant();
 	}
 }
@@ -45,30 +48,32 @@ QVariant GamesModel::headerData(int section, Qt::Orientation orientation, int ro
 	}
 }
 
-const ServerGameInfo &GamesModel::getGame(int row)
+ServerInfo_Game *GamesModel::getGame(int row)
 {
 	Q_ASSERT(row < gameList.size());
 	return gameList[row];
 }
 
-void GamesModel::updateGameList(const ServerGameInfo &game)
+void GamesModel::updateGameList(ServerInfo_Game *_game)
 {
+	ServerInfo_Game *game = new ServerInfo_Game(_game->getGameId(), _game->getDescription(), _game->getHasPassword(), _game->getPlayerCount(), _game->getMaxPlayers(), _game->getCreatorName(), _game->getSpectatorsAllowed(), _game->getSpectatorCount());
 	for (int i = 0; i < gameList.size(); i++)
-		if (gameList[i].getGameId() == game.getGameId()) {
-			if (game.getPlayerCount() == 0) {
+		if (gameList[i]->getGameId() == game->getGameId()) {
+			if (game->getPlayerCount() == 0) {
 				beginRemoveRows(QModelIndex(), i, i);
-				gameList.removeAt(i);
+				delete gameList.takeAt(i);
 				endRemoveRows();
 			} else {
+				delete gameList[i];
 				gameList[i] = game;
 				emit dataChanged(index(i, 0), index(i, 4));
 			}
 			return;
 		}
-	if (game.getPlayerCount() == 0)
+	if (game->getPlayerCount() == 0)
 		return;
 	beginInsertRows(QModelIndex(), gameList.size(), gameList.size());
-	gameList << game;
+	gameList.append(game);
 	endInsertRows();
 }
 
@@ -93,8 +98,8 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourc
 	if (!model)
 		return false;
 	
-	const ServerGameInfo &game = model->getGame(sourceRow);
-	if (game.getPlayerCount() == game.getMaxPlayers())
+	ServerInfo_Game *game = model->getGame(sourceRow);
+	if (game->getPlayerCount() == game->getMaxPlayers())
 		return false;
 	
 	return true;

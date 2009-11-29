@@ -29,7 +29,7 @@
 #include "server_player.h"
 
 ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent)
-	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), currentItem(0)
+	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), topLevelItem(0)
 {
 	xmlWriter = new QXmlStreamWriter;
 	xmlWriter->setDevice(socket);
@@ -57,41 +57,31 @@ ServerSocketInterface::~ServerSocketInterface()
 	delete socket;
 }
 
-void ServerSocketInterface::itemFinishedReading()
+void ServerSocketInterface::processProtocolItem(ProtocolItem *item)
 {
-	Command *command = qobject_cast<Command *>(currentItem);
-	if (qobject_cast<InvalidCommand *>(command))
+	Command *command = qobject_cast<Command *>(item);
+	if (!command)
 		sendProtocolItem(new ProtocolResponse(command->getCmdId(), RespInvalidCommand));
 	else
 		processCommand(command);
-	currentItem = 0;
 }
 
 void ServerSocketInterface::readClient()
 {
 	xmlReader->addData(socket->readAll());
 	
-	if (currentItem) {
-		if (!currentItem->read(xmlReader))
-			return;
-		itemFinishedReading();
-	}
-	while (!xmlReader->atEnd()) {
-		xmlReader->readNext();
-		if (xmlReader->isStartElement()) {
-			QString itemType = xmlReader->name().toString();
-			if (itemType == "cockatrice_client_stream")
-				continue;
-			QString itemName = xmlReader->attributes().value("name").toString();
-			qDebug() << "parseXml: startElement: " << "type =" << itemType << ", name =" << itemName;
-			currentItem = ProtocolItem::getNewItem(itemType + itemName);
-			if (!currentItem)
-				currentItem = new InvalidCommand;
-			if (!currentItem->read(xmlReader))
-				return;
-			itemFinishedReading();
+	if (topLevelItem)
+		topLevelItem->read(xmlReader);
+	else
+		while (!xmlReader->atEnd()) {
+			xmlReader->readNext();
+			if (xmlReader->isStartElement() && (xmlReader->name().toString() == "cockatrice_client_stream")) {
+				topLevelItem = new TopLevelProtocolItem;
+				connect(topLevelItem, SIGNAL(protocolItemReceived(ProtocolItem *)), this, SLOT(processProtocolItem(ProtocolItem *)));
+				
+				topLevelItem->read(xmlReader);
+			}
 		}
-	}
 }
 
 void ServerSocketInterface::catchSocketError(QAbstractSocket::SocketError socketError)
@@ -147,7 +137,7 @@ bool ServerSocketInterface::deckListHelper(DeckList_Directory *folder)
 	
 	while (query.next()) {
 		DeckList_Directory *newFolder = new DeckList_Directory(query.value(1).toString(), query.value(0).toInt());
-		folder->append(newFolder);
+		folder->appendItem(newFolder);
 		if (!deckListHelper(newFolder))
 			return false;
 	}
@@ -160,7 +150,7 @@ bool ServerSocketInterface::deckListHelper(DeckList_Directory *folder)
 	
 	while (query.next()) {
 		DeckList_File *newFile = new DeckList_File(query.value(1).toString(), query.value(0).toInt(), query.value(2).toDateTime());
-		folder->append(newFile);
+		folder->appendItem(newFile);
 	}
 	
 	return true;
@@ -266,7 +256,7 @@ ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd)
 	QString deckContents;
 	QXmlStreamWriter deckWriter(&deckContents);
 	deckWriter.writeStartDocument();
-	cmd->getDeck()->writeElement(&deckWriter);
+	cmd->getDeck()->write(&deckWriter);
 	deckWriter.writeEndDocument();
 	
 	QString deckName = cmd->getDeck()->getName();
@@ -280,8 +270,6 @@ ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd)
 	query.bindValue(":name", deckName);
 	query.bindValue(":content", deckContents);
 	servatrice->execSqlQuery(query);
-	
-	delete cmd->getDeck();
 	
 	sendProtocolItem(new Response_DeckUpload(cmd->getCmdId(), RespOk, new DeckList_File(deckName, query.lastInsertId().toInt(), QDateTime::currentDateTime())));
 	return RespNothing;
@@ -302,8 +290,7 @@ DeckList *ServerSocketInterface::getDeckFromDatabase(int deckId)
 	
 	QXmlStreamReader deckReader(query.value(0).toString());
 	DeckList *deck = new DeckList;
-	if (!deck->loadFromXml(&deckReader))
-		throw RespInvalidData;
+	deck->loadFromXml(&deckReader);
 	
 	return deck;
 }
@@ -317,6 +304,5 @@ ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd)
 		return r;
 	}
 	sendProtocolItem(new Response_DeckDownload(cmd->getCmdId(), RespOk, deck));
-	delete deck;
 	return RespNothing;
 }

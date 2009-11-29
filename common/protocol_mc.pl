@@ -70,12 +70,9 @@ while (<file>) {
 	$className = $namePrefix . '_' . $name2;
 	$itemEnum .= "ItemId_$className = " . ++$itemId . ",\n";
 	$headerfileBuffer .= "class $className : public $baseClass {\n"
-		. "\tQ_OBJECT\n"
-		. "private:\n";
-	$paramStr2 = '';
-	$paramStr3 = '';
-	$paramStr4 = '';
-	$paramStr5 = '';
+		. "\tQ_OBJECT\n";
+	$constructorCode = '';
+	$getFunctionCode = '';
 	while ($param = shift(@line)) {
 		($key, $value) = split(/,/, $param);
 		($prettyVarName = $value) =~ s/_(.)/\U$1\E/g;
@@ -85,52 +82,44 @@ while (<file>) {
 		if (!($constructorParamsCpp eq '')) {
 			$constructorParamsCpp .= ', ';
 		}
-		$paramStr2 .= ", $prettyVarName(_$prettyVarName)";
-		$paramStr3 .= "\tsetParameter(\"$value\", $prettyVarName);\n";
+		($prettyVarName2 = $prettyVarName) =~ s/^(.)/\U$1\E/;
 		if ($key eq 'b') {
 			$dataType = 'bool';
 			$constructorParamsH .= "bool _$prettyVarName = false";
 			$constructorParamsCpp .= "bool _$prettyVarName";
-			$paramStr5 .= "\t$prettyVarName = (parameters[\"$value\"] == \"1\");\n";
+			$constructorCode .= "\tinsertItem(new SerializableItem_Bool(\"$value\", _$prettyVarName));\n";
+			$getFunctionCode .= "\t$dataType get$prettyVarName2() const { return static_cast<SerializableItem_Bool *>(itemMap.value(\"$value\"))->getData(); };\n";
 		} elsif ($key eq 's') {
 			$dataType = 'QString';
 			$constructorParamsH .= "const QString &_$prettyVarName = QString()";
 			$constructorParamsCpp .= "const QString &_$prettyVarName";
-			$paramStr5 .= "\t$prettyVarName = parameters[\"$value\"];\n";
+			$constructorCode .= "\tinsertItem(new SerializableItem_String(\"$value\", _$prettyVarName));\n";
+			$getFunctionCode .= "\t$dataType get$prettyVarName2() const { return static_cast<SerializableItem_String *>(itemMap.value(\"$value\"))->getData(); };\n";
 		} elsif ($key eq 'i') {
 			$dataType = 'int';
 			$constructorParamsH .= "int _$prettyVarName = -1";
 			$constructorParamsCpp .= "int _$prettyVarName";
-			$paramStr5 .= "\t$prettyVarName = parameters[\"$value\"].toInt();\n";
+			$constructorCode .= "\tinsertItem(new SerializableItem_Int(\"$value\", _$prettyVarName));\n";
+			$getFunctionCode .= "\t$dataType get$prettyVarName2() const { return static_cast<SerializableItem_Int *>(itemMap.value(\"$value\"))->getData(); };\n";
 		} elsif ($key eq 'c') {
 			$dataType = 'QColor';
 			$constructorParamsH .= "const QColor &_$prettyVarName = QColor()";
 			$constructorParamsCpp .= "const QColor &_$prettyVarName";
-			$paramStr5 .= "\t$prettyVarName = ColorConverter::colorFromInt(parameters[\"$value\"].toInt());\n";
+			$constructorCode .= "\tinsertItem(new SerializableItem_Color(\"$value\", _$prettyVarName));\n";
+			$getFunctionCode .= "\t$dataType get$prettyVarName2() const { return static_cast<SerializableItem_Color *>(itemMap.value(\"$value\"))->getData(); };\n";
 		}
-		($prettyVarName2 = $prettyVarName) =~ s/^(.)/\U$1\E/;
-		$paramStr4 .= "\t$dataType get$prettyVarName2() const { return $prettyVarName; }\n";
-		$headerfileBuffer .= "\t$dataType $prettyVarName;\n";
 	}
 	$headerfileBuffer .= "public:\n"
 		. "\t$className($constructorParamsH);\n"
-		. $paramStr4
-		. "\tstatic ProtocolItem *newItem() { return new $className; }\n"
+		. $getFunctionCode
+		. "\tstatic SerializableItem *newItem() { return new $className; }\n"
 		. "\tint getItemId() const { return ItemId_$className; }\n"
-		. ($paramStr5 eq '' ? '' : "protected:\n\tvoid extractParameters();\n")
 		. "};\n";
 	print cppfile $className . "::$className($constructorParamsCpp)\n"
-		. "\t: $parentConstructorCall$paramStr2\n"
+		. "\t: $parentConstructorCall\n"
 		. "{\n"
-		. $paramStr3
+		. $constructorCode
 		. "}\n";
-	if (!($paramStr5 eq '')) {
-		print cppfile "void $className" . "::extractParameters()\n"
-			. "{\n"
-			. "\t$baseClass" . "::extractParameters();\n"
-			. $paramStr5
-			. "}\n";
-	}
 	$initializeHash .= "\titemNameHash.insert(\"$type$name1\", $className" . "::newItem);\n";
 }
 close(file);

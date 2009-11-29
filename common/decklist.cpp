@@ -21,6 +21,18 @@ int AbstractDecklistNode::depth() const
 		return 0;
 }
 
+InnerDecklistNode::InnerDecklistNode(InnerDecklistNode *other, InnerDecklistNode *_parent)
+	: AbstractDecklistNode(_parent), name(other->getName())
+{
+	for (int i = 0; i < other->size(); ++i) {
+		InnerDecklistNode *inner = dynamic_cast<InnerDecklistNode *>(other->at(i));
+		if (inner)
+			new InnerDecklistNode(inner, this);
+		else
+			new DecklistCardNode(dynamic_cast<DecklistCardNode *>(other->at(i)), this);
+	}
+}
+
 InnerDecklistNode::~InnerDecklistNode()
 {
 	clearTree();
@@ -46,6 +58,11 @@ void InnerDecklistNode::clearTree()
 	for (int i = 0; i < size(); i++)
 		delete at(i);
 	clear();
+}
+
+DecklistCardNode::DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent)
+	: AbstractDecklistCardNode(_parent), name(other->getName()), number(other->getNumber())
+{
 }
 
 AbstractDecklistNode *InnerDecklistNode::findChild(const QString &name)
@@ -178,10 +195,16 @@ const QStringList DeckList::fileNameFilters = QStringList()
 	<< QObject::tr("Plain text decks (*.dec *.mwDeck)")
 	<< QObject::tr("All files (*.*)");
 
-DeckList::DeckList(QObject *parent)
-	: QObject(parent), currentZone(0)
+DeckList::DeckList()
+	: SerializableItem("cockatrice_deck"), currentZone(0)
 {
 	root = new InnerDecklistNode;
+}
+
+DeckList::DeckList(DeckList *other)
+	: SerializableItem("cockatrice_deck"), currentZone(0)
+{
+	root = new InnerDecklistNode(other->getRoot());
 }
 
 DeckList::~DeckList()
@@ -189,65 +212,54 @@ DeckList::~DeckList()
 	delete root;
 }
 
-bool DeckList::readElement(QXmlStreamReader *xml)
+void DeckList::readElement(QXmlStreamReader *xml)
 {
 	if (currentZone) {
 		if (currentZone->readElement(xml))
 			currentZone = 0;
-		return false;
-	}
-	
-	if (xml->isEndElement()) {
+	} else if (xml->isEndElement()) {
 		if (xml->name() == "deckname")
 			name = currentElementText;
 		else if (xml->name() == "comments")
 			comments = currentElementText;
-		else if (xml->name() == "cockatrice_deck")
-			return true;
 		
 		currentElementText.clear();
 	} else if (xml->isStartElement() && (xml->name() == "zone"))
 		currentZone = new InnerDecklistNode(xml->attributes().value("name").toString(), root);
 	else if (xml->isCharacters() && !xml->isWhitespace())
 		currentElementText = xml->text().toString();
-	
-	return false;
 }
 
 void DeckList::writeElement(QXmlStreamWriter *xml)
 {
-	xml->writeStartElement("cockatrice_deck");
 	xml->writeAttribute("version", "1");
 	xml->writeTextElement("deckname", name);
 	xml->writeTextElement("comments", comments);
 
 	for (int i = 0; i < root->size(); i++)
 		root->at(i)->writeElement(xml);
-
-	xml->writeEndElement(); // cockatrice_deck
 }
 
-bool DeckList::loadFromXml(QXmlStreamReader *xml)
+void DeckList::loadFromXml(QXmlStreamReader *xml)
 {
 	while (!xml->atEnd()) {
 		xml->readNext();
 		if (xml->isStartElement()) {
 			if (xml->name() != "cockatrice_deck")
-				return false;
+				return;
 			while (!xml->atEnd()) {
 				xml->readNext();
-				if (readElement(xml))
-					return true;
+				readElement(xml);
 			}
 		}
 	}
-	return false;
 }
 
 bool DeckList::loadFromFile_Native(QIODevice *device)
 {
 	QXmlStreamReader xml(device);
-	return loadFromXml(&xml);
+	loadFromXml(&xml);
+	return true;
 }
 
 bool DeckList::saveToFile_Native(QIODevice *device)
@@ -256,7 +268,7 @@ bool DeckList::saveToFile_Native(QIODevice *device)
 	xml.setAutoFormatting(true);
 	xml.writeStartDocument();
 
-	writeElement(&xml);
+	write(&xml);
 
 	xml.writeEndDocument();
 	return true;

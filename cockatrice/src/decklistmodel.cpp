@@ -14,7 +14,7 @@
 DeckListModel::DeckListModel(QObject *parent)
 	: QAbstractItemModel(parent)
 {
-	deckList = new DeckList(this);
+	deckList = new DeckList;
 	connect(deckList, SIGNAL(deckLoaded()), this, SLOT(rebuildTree()));
 	root = new InnerDecklistNode;
 }
@@ -22,6 +22,7 @@ DeckListModel::DeckListModel(QObject *parent)
 DeckListModel::~DeckListModel()
 {
 	delete root;
+	delete deckList;
 }
 
 

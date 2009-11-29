@@ -10,6 +10,7 @@
 #include "server_counter.h"
 #include "server_game.h"
 #include "server_player.h"
+#include "decklist.h"
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
 	: QObject(parent), server(_server), authState(PasswordWrong), acceptsGameListChanges(false)
@@ -148,13 +149,13 @@ ResponseCode Server_ProtocolHandler::cmdListChatChannels(Command_ListChatChannel
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
 	
-	Event_ListChatChannels *event = new Event_ListChatChannels;
+	QList<ServerInfo_ChatChannel *> eventChannelList;
 	QMapIterator<QString, Server_ChatChannel *> channelIterator(server->getChatChannels());
 	while (channelIterator.hasNext()) {
 		Server_ChatChannel *c = channelIterator.next().value();
-		event->addChannel(c->getName(), c->getDescription(), c->size(), c->getAutoJoin());
+		eventChannelList.append(new ServerInfo_ChatChannel(c->getName(), c->getDescription(), c->size(), c->getAutoJoin()));
 	}
-	sendProtocolItem(event);
+	sendProtocolItem(new Event_ListChatChannels(eventChannelList));
 	
 	acceptsChatChannelListChanges = true;
 	return RespOk;
@@ -193,11 +194,11 @@ ResponseCode Server_ProtocolHandler::cmdChatSay(Command_ChatSay *cmd, Server_Cha
 
 ResponseCode Server_ProtocolHandler::cmdListGames(Command_ListGames * /*cmd*/)
 {
-	Event_ListGames *event = new Event_ListGames;
 	const QList<Server_Game *> &gameList = server->getGames();
+	QList<ServerInfo_Game *> eventGameList;
 	for (int i = 0; i < gameList.size(); ++i) {
 		Server_Game *g = gameList[i];
-		event->addGame(
+		eventGameList.append(new ServerInfo_Game(
 			g->getGameId(),
 			g->getDescription(),
 			!g->getPassword().isEmpty(),
@@ -206,9 +207,9 @@ ResponseCode Server_ProtocolHandler::cmdListGames(Command_ListGames * /*cmd*/)
 			g->getCreatorName(),
 			g->getSpectatorsAllowed(),
 			g->getSpectatorCount()
-		);
+		));
 	}
-	sendProtocolItem(event);
+	sendProtocolItem(new Event_ListGames(eventGameList));
 	
 	acceptsGameListChanges = true;
 	return RespOk;
@@ -253,7 +254,7 @@ ResponseCode Server_ProtocolHandler::cmdDeckSelect(Command_DeckSelect *cmd, Serv
 	if (cmd->getDeckId() == -1) {
 		if (!cmd->getDeck())
 			return RespInvalidData;
-		deck = cmd->getDeck();
+		deck = new DeckList(cmd->getDeck());
 	} else {
 		try {
 			deck = getDeckFromDatabase(cmd->getDeckId());
@@ -265,7 +266,7 @@ ResponseCode Server_ProtocolHandler::cmdDeckSelect(Command_DeckSelect *cmd, Serv
 	
 	game->sendGameEvent(new Event_DeckSelect(-1, player->getPlayerId(), cmd->getDeckId()));
 	
-	sendProtocolItem(new Response_DeckDownload(cmd->getCmdId(), RespOk, deck));
+	sendProtocolItem(new Response_DeckDownload(cmd->getCmdId(), RespOk, new DeckList(deck)));
 	return RespNothing;
 }
 
@@ -427,7 +428,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Se
 
 	Server_Arrow *arrow = new Server_Arrow(player->newArrowId(), startCard, targetCard, cmd->getColor());
 	player->addArrow(arrow);
-	game->sendGameEvent(new Event_CreateArrow(-1, player->getPlayerId(), new ServerInfo_Arrow(
+	game->sendGameEvent(new Event_CreateArrows(-1, player->getPlayerId(), QList<ServerInfo_Arrow *>() << new ServerInfo_Arrow(
 		arrow->getId(),
 		startPlayer->getPlayerId(),
 		startZone->getName(),
@@ -500,7 +501,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateCounter(Command_CreateCounter *cmd
 {
 	Server_Counter *c = new Server_Counter(player->newCounterId(), cmd->getCounterName(), cmd->getColor(), cmd->getRadius(), cmd->getValue());
 	player->addCounter(c);
-	game->sendGameEvent(new Event_CreateCounter(-1, player->getPlayerId(), new ServerInfo_Counter(c->getId(), c->getName(), c->getColor(), c->getRadius(), c->getCount())));
+	game->sendGameEvent(new Event_CreateCounters(-1, player->getPlayerId(), QList<ServerInfo_Counter *>() << new ServerInfo_Counter(c->getId(), c->getName(), c->getColor(), c->getRadius(), c->getCount())));
 	
 	return RespOk;
 }

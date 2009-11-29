@@ -28,6 +28,7 @@ class Servatrice;
 class QXmlStreamReader;
 class QXmlStreamWriter;
 class DeckList;
+class TopLevelProtocolItem;
 
 class ServerSocketInterface : public Server_ProtocolHandler
 {
@@ -35,12 +36,13 @@ class ServerSocketInterface : public Server_ProtocolHandler
 private slots:
 	void readClient();
 	void catchSocketError(QAbstractSocket::SocketError socketError);
+	void processProtocolItem(ProtocolItem *item);
 private:
 	Servatrice *servatrice;
 	QTcpSocket *socket;
 	QXmlStreamWriter *xmlWriter;
 	QXmlStreamReader *xmlReader;
-	ProtocolItem *currentItem;
+	TopLevelProtocolItem *topLevelItem;
 
 	int getDeckPathId(int basePathId, QStringList path);
 	int getDeckPathId(const QString &path);
@@ -53,8 +55,6 @@ private:
 	ResponseCode cmdDeckUpload(Command_DeckUpload *cmd);
 	DeckList *getDeckFromDatabase(int deckId);
 	ResponseCode cmdDeckDownload(Command_DeckDownload *cmd);
-	
-	void itemFinishedReading();
 public:
 	ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent = 0);
 	~ServerSocketInterface();

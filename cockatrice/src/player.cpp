@@ -373,7 +373,7 @@ void Player::actDrawCards()
 
 void Player::actUntapAll()
 {
-//	client->setCardAttr("table", -1, "tapped", "false");
+	sendGameCommand(new Command_SetCardAttr(-1, "table", -1, "tapped", "0"));
 }
 
 void Player::actRollDie()
@@ -448,12 +448,15 @@ void Player::eventRollDie(Event_RollDie *event)
 	emit logRollDie(this, event->getSides(), event->getValue());
 }
 
-void Player::eventCreateArrow(Event_CreateArrow *event)
+void Player::eventCreateArrows(Event_CreateArrows *event)
 {
-	ArrowItem *arrow = addArrow(event->getArrow());
-	if (!arrow)
-		return;
-	emit logCreateArrow(this, arrow->getStartItem()->getOwner(), arrow->getStartItem()->getName(), arrow->getTargetItem()->getOwner(), arrow->getTargetItem()->getName());
+	const QList<ServerInfo_Arrow *> eventArrowList = event->getArrowList();
+	for (int i = 0; i < eventArrowList.size(); ++i) {
+		ArrowItem *arrow = addArrow(eventArrowList[i]);
+		if (!arrow)
+			return;
+		emit logCreateArrow(this, arrow->getStartItem()->getOwner(), arrow->getStartItem()->getName(), arrow->getTargetItem()->getOwner(), arrow->getTargetItem()->getName());
+	}
 }
 
 void Player::eventDeleteArrow(Event_DeleteArrow *event)
@@ -492,9 +495,11 @@ void Player::eventSetCardAttr(Event_SetCardAttr *event)
 	}
 }
 
-void Player::eventCreateCounter(Event_CreateCounter *event)
+void Player::eventCreateCounters(Event_CreateCounters *event)
 {
-	addCounter(event->getCounter());
+	const QList<ServerInfo_Counter *> &eventCounterList = event->getCounterList();
+	for (int i = 0; i < eventCounterList.size(); ++i)
+		addCounter(eventCounterList[i]);
 }
 
 void Player::eventSetCounter(Event_SetCounter *event)
@@ -612,11 +617,11 @@ void Player::processGameEvent(GameEvent *event)
 		case ItemId_Event_ReadyStart: eventReadyStart(qobject_cast<Event_ReadyStart *>(event)); break;
 		case ItemId_Event_Shuffle: eventShuffle(qobject_cast<Event_Shuffle *>(event)); break;
 		case ItemId_Event_RollDie: eventRollDie(qobject_cast<Event_RollDie *>(event)); break;
-		case ItemId_Event_CreateArrow: eventCreateArrow(qobject_cast<Event_CreateArrow *>(event)); break;
+		case ItemId_Event_CreateArrows: eventCreateArrows(qobject_cast<Event_CreateArrows *>(event)); break;
 		case ItemId_Event_DeleteArrow: eventDeleteArrow(qobject_cast<Event_DeleteArrow *>(event)); break;
 		case ItemId_Event_CreateToken: eventCreateToken(qobject_cast<Event_CreateToken *>(event)); break;
 		case ItemId_Event_SetCardAttr: eventSetCardAttr(qobject_cast<Event_SetCardAttr *>(event)); break;
-		case ItemId_Event_CreateCounter: eventCreateCounter(qobject_cast<Event_CreateCounter *>(event)); break;
+		case ItemId_Event_CreateCounters: eventCreateCounters(qobject_cast<Event_CreateCounters *>(event)); break;
 		case ItemId_Event_SetCounter: eventSetCounter(qobject_cast<Event_SetCounter *>(event)); break;
 		case ItemId_Event_DelCounter: eventDelCounter(qobject_cast<Event_DelCounter *>(event)); break;
 		case ItemId_Event_DumpZone: eventDumpZone(qobject_cast<Event_DumpZone *>(event)); break;
