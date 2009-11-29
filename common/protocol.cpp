@@ -33,6 +33,7 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("respdeck_list", Response_DeckList::newItem);
 	registerSerializableItem("respdeck_download", Response_DeckDownload::newItem);
 	registerSerializableItem("respdeck_upload", Response_DeckUpload::newItem);
+	registerSerializableItem("respdump_zone", Response_DumpZone::newItem);
 	
 	registerSerializableItem("generic_eventlist_games", Event_ListGames::newItem);
 	registerSerializableItem("generic_eventlist_chat_channels", Event_ListChatChannels::newItem);
@@ -169,6 +170,14 @@ Response_DeckUpload::Response_DeckUpload(int _cmdId, ResponseCode _responseCode,
 	if (!_file)
 		_file = new DeckList_File;
 	insertItem(_file);
+}
+
+Response_DumpZone::Response_DumpZone(int _cmdId, ResponseCode _responseCode, ServerInfo_Zone *_zone)
+	: ProtocolResponse(_cmdId, _responseCode, "dump_zone")
+{
+	if (!_zone)
+		_zone = new ServerInfo_Zone;
+	insertItem(_zone);
 }
 
 GameEvent::GameEvent(const QString &_eventName, int _gameId, int _playerId)

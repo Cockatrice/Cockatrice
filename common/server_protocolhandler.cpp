@@ -554,11 +554,22 @@ ResponseCode Server_ProtocolHandler::cmdDumpZone(Command_DumpZone *cmd, Server_G
 	if (!((zone->getType() == PublicZone) || (player == otherPlayer)))
 		return RespContextError;
 	
-	if (zone->getType() == HiddenZone) {
-//		game->broadcastEvent(QString("dump_zone|%1|%2|%3").arg(player_id).arg(zone->getName()).arg(number_cards), player);
+	int numberCards = cmd->getNumberCards();
+	QList<ServerInfo_Card *> respCardList;
+	for (int i = 0; (i < zone->cards.size()) && (i < numberCards || numberCards == -1); ++i) {
+		Server_Card *card = zone->cards[i];
+		QString displayedName = card->getFaceDown() ? QString() : card->getName();
+		if (zone->getType() == HiddenZone)
+			respCardList.append(new ServerInfo_Card(i, displayedName));
+		else
+			respCardList.append(new ServerInfo_Card(card->getId(), displayedName, card->getX(), card->getY(), card->getCounters(), card->getTapped(), card->getAttacking(), card->getAnnotation()));
 	}
-//	remsg->sendList(dumpZoneHelper(otherPlayer, zone, number_cards));
-	return RespOk;
+	if (zone->getType() == HiddenZone) {
+		zone->setCardsBeingLookedAt(numberCards);
+		game->sendGameEvent(new Event_DumpZone(-1, player->getPlayerId(), otherPlayer->getPlayerId(), zone->getName(), numberCards));
+	}
+	sendProtocolItem(new Response_DumpZone(cmd->getCmdId(), RespOk, new ServerInfo_Zone(zone->getName(), zone->getType(), zone->hasCoords(), numberCards < zone->cards.size() ? zone->cards.size() : numberCards, respCardList)));
+	return RespNothing;
 }
 
 ResponseCode Server_ProtocolHandler::cmdStopDumpZone(Command_StopDumpZone *cmd, Server_Game *game, Server_Player *player)

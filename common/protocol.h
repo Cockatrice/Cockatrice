@@ -29,6 +29,7 @@ enum ItemId {
 	ItemId_Response_DeckList = ItemId_Other + 300,
 	ItemId_Response_DeckDownload = ItemId_Other + 301,
 	ItemId_Response_DeckUpload = ItemId_Other + 302,
+	ItemId_Response_DumpZone = ItemId_Other + 303,
 	ItemId_Invalid = ItemId_Other + 1000
 };
 
@@ -170,6 +171,15 @@ public:
 	int getItemId() const { return ItemId_Response_DeckUpload; }
 	static SerializableItem *newItem() { return new Response_DeckUpload; }
 	DeckList_File *getFile() const { return static_cast<DeckList_File *>(itemMap.value("file")); }
+};
+
+class Response_DumpZone : public ProtocolResponse {
+	Q_OBJECT
+public:
+	Response_DumpZone(int _cmdId = -1, ResponseCode _responseCode = RespOk, ServerInfo_Zone *zone = 0);
+	int getItemId() const { return ItemId_Response_DumpZone; }
+	static SerializableItem *newItem() { return new Response_DumpZone; }
+	ServerInfo_Zone *getZone() const { return static_cast<ServerInfo_Zone *>(itemMap.value("zone")); }
 };
 
 // --------------

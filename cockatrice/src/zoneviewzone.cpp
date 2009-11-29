@@ -28,8 +28,9 @@ void ZoneViewZone::paint(QPainter */*painter*/, const QStyleOptionGraphicsItem *
 void ZoneViewZone::initializeCards()
 {
 	if (!origZone->contentsKnown()) {
-//		PendingCommand_DumpZone *dumpZoneCommand = player->client->dumpZone(player->getId(), name, numberCards);
-//		connect(dumpZoneCommand, SIGNAL(cardListReceived(QList<ServerZoneCard>)), this, SLOT(zoneDumpReceived(QList<ServerZoneCard>)));
+		Command_DumpZone *command = new Command_DumpZone(-1, player->getId(), name, numberCards);
+		connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(zoneDumpReceived(ProtocolResponse *)));
+		player->sendGameCommand(command);
 	} else {
 		const CardList &c = origZone->getCards();
 		int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
@@ -42,17 +43,22 @@ void ZoneViewZone::initializeCards()
 	}
 }
 
-/*void ZoneViewZone::zoneDumpReceived(QList<ServerInfo_Card *> cards)
+void ZoneViewZone::zoneDumpReceived(ProtocolResponse *r)
 {
-	for (int i = 0; i < cards.size(); i++) {
-		CardItem *card = new CardItem(player, cards[i].getName(), i, this);
+	Response_DumpZone *resp = qobject_cast<Response_DumpZone *>(r);
+	if (!resp)
+		return;
+	
+	const QList<ServerInfo_Card *> &respCardList = resp->getZone()->getCardList();
+	for (int i = 0; i < respCardList.size(); i++) {
+		CardItem *card = new CardItem(player, respCardList[i]->getName(), respCardList[i]->getId(), this);
 		addCard(card, false, i);
 	}
 	
 	emit contentsChanged();
 	reorganizeCards();
 }
-*/
+
 // Because of boundingRect(), this function must not be called before the zone was added to a scene.
 void ZoneViewZone::reorganizeCards()
 {

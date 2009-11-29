@@ -2,11 +2,11 @@
 #define ZONEVIEWERZONE_H
 
 #include "cardzone.h"
-#include "protocol_datastructures.h"
 #include <QGraphicsWidget>
 #include <QGraphicsLayoutItem>
 
 class ZoneViewWidget;
+class ProtocolResponse;
 
 class ZoneViewZone : public CardZone, public QGraphicsLayoutItem {
 	Q_OBJECT
@@ -29,7 +29,7 @@ public:
 public slots:
 	void setSortingEnabled(int _sortingEnabled);
 private slots:
-//	void zoneDumpReceived(QList<ServerInfo_Card> cards);
+	void zoneDumpReceived(ProtocolResponse *r);
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
 	QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
