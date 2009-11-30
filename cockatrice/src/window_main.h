@@ -22,6 +22,7 @@
 
 #include <QMainWindow>
 #include "client.h"
+#include "protocol_datastructures.h"
 
 class TabSupervisor;
 
@@ -31,6 +32,9 @@ private slots:
 	void updateTabMenu(QMenu *menu);
 	void statusChanged(ClientStatus _status);
 	void serverTimeout();
+	void serverError(ResponseCode r);
+	void socketError(const QString &errorStr);
+	void protocolVersionMismatch(int localVersion, int remoteVersion);
 
 	void actConnect();
 	void actDisconnect();
@@ -38,11 +42,9 @@ private slots:
 	void actFullScreen(bool checked);
 	void actSettings();
 	void actExit();
-signals:
-	void logConnecting(QString hostname);
-	void logConnected();
-	void logDisconnected();
 private:
+	static const QString appName;
+	void setClientStatusTitle();
 	void retranslateUi();
 	void createActions();
 	void createMenus();

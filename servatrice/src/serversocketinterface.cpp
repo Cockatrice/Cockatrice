@@ -21,6 +21,7 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QtSql>
+#include <QDebug>
 #include "serversocketinterface.h"
 #include "servatrice.h"
 #include "protocol.h"
@@ -68,7 +69,9 @@ void ServerSocketInterface::processProtocolItem(ProtocolItem *item)
 
 void ServerSocketInterface::readClient()
 {
-	xmlReader->addData(socket->readAll());
+	QByteArray data = socket->readAll();
+	qDebug() << data;
+	xmlReader->addData(data);
 	
 	if (topLevelItem)
 		topLevelItem->read(xmlReader);

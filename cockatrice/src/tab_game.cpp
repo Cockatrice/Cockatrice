@@ -88,6 +88,8 @@ TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectat
 	connect(aNextTurn, SIGNAL(triggered()), this, SLOT(actNextTurn()));
 	aRemoveLocalArrows = new QAction(this);
 	connect(aRemoveLocalArrows, SIGNAL(triggered()), this, SLOT(actRemoveLocalArrows()));
+	aLeaveGame = new QAction(this);
+	connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
 	
 	tabMenu = new QMenu(this);
 	playersSeparator = tabMenu->addSeparator();
@@ -95,11 +97,18 @@ TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectat
 	tabMenu->addAction(aNextTurn);
 	tabMenu->addSeparator();
 	tabMenu->addAction(aRemoveLocalArrows);
+	tabMenu->addSeparator();
+	tabMenu->addAction(aLeaveGame);
 	
 	retranslateUi();
 	setLayout(mainLayout);
 	
 	messageLog->logGameJoined(gameId);
+}
+
+TabGame::~TabGame()
+{
+	emit gameClosing(this);
 }
 
 void TabGame::retranslateUi()
@@ -111,6 +120,7 @@ void TabGame::retranslateUi()
 	aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
 	aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
 	aRemoveLocalArrows->setShortcut(tr("Ctrl+R"));
+	aLeaveGame->setText(tr("&Leave game"));
 	
 	loadLocalButton->setText(tr("Load &local deck"));
 	loadRemoteButton->setText(tr("Load deck from &server"));
@@ -124,6 +134,15 @@ void TabGame::retranslateUi()
 	QMapIterator<int, Player *> i(players);
 	while (i.hasNext())
 		i.next().value()->retranslateUi();
+}
+
+void TabGame::actLeaveGame()
+{
+	if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+		return;
+
+	sendGameCommand(new Command_LeaveGame);
+	deleteLater();
 }
 
 void TabGame::actSay()
@@ -175,7 +194,6 @@ Player *TabGame::addPlayer(int playerId, const QString &playerName)
 	tabMenu->insertMenu(playersSeparator, newPlayer->getPlayerMenu());
 	
 	players.insert(playerId, newPlayer);
-	emit playerAdded(newPlayer);
 
 	return newPlayer;
 }
@@ -207,15 +225,21 @@ void TabGame::sendGameCommand(GameCommand *command)
 	client->sendCommand(command);
 }
 
-void TabGame::eventGameStart(Event_GameStart * /*event*/)
+void TabGame::startGame()
 {
 	currentPhase = -1;
-	
+
+	started = true;
 	deckViewContainer->hide();
 	gameView->show();
 	phasesToolbar->show();
+}
+
+void TabGame::eventGameStart(Event_GameStart * /*event*/)
+{
+	startGame();
 	messageLog->logGameStart();
-	
+
 	QMapIterator<int, Player *> i(players);
 	while (i.hasNext())
 		i.next().value()->prepareForGame();
@@ -233,26 +257,35 @@ void TabGame::eventGameStateChanged(Event_GameStateChanged *event)
 		}
 		player->processPlayerInfo(pl);
 	}
+	if (event->getGameStarted() && !started) {
+		startGame();
+		setActivePlayer(event->getActivePlayer());
+		setActivePhase(event->getActivePhase());
+	}
 }
 
 void TabGame::eventJoin(Event_Join *event)
 {
-	if (event->getSpectator()) {
-		spectatorList.append(event->getPlayerName());
-		messageLog->logJoinSpectator(event->getPlayerName());
+	ServerInfo_Player *playerInfo = event->getPlayer();
+	if (playerInfo->getSpectator()) {
+		spectatorList.append(playerInfo->getName());
+		messageLog->logJoinSpectator(playerInfo->getName());
 	} else {
-		Player *newPlayer = addPlayer(event->getPlayerId(), event->getPlayerName());
+		Player *newPlayer = addPlayer(playerInfo->getPlayerId(), playerInfo->getName());
 		messageLog->logJoin(newPlayer);
+		playerListWidget->addPlayer(playerInfo);
 	}
 }
 
 void TabGame::eventLeave(Event_Leave *event)
 {
-	Player *player = players.value(event->getPlayerId(), 0);
+	int playerId = event->getPlayerId();
+	Player *player = players.value(playerId, 0);
 	if (!player)
 		return;
 	
 	messageLog->logLeave(player);
+	playerListWidget->removePlayer(playerId);
 }
 
 void TabGame::eventGameClosed(Event_GameClosed * /*event*/)
@@ -261,29 +294,43 @@ void TabGame::eventGameClosed(Event_GameClosed * /*event*/)
 	messageLog->logGameClosed();
 }
 
-void TabGame::eventSetActivePlayer(Event_SetActivePlayer *event)
+Player *TabGame::setActivePlayer(int id)
 {
-	Player *player = players.value(event->getActivePlayerId(), 0);
+	Player *player = players.value(id, 0);
 	if (!player)
-		return;
-	playerListWidget->setActivePlayer(event->getActivePlayerId());
+		return 0;
+	playerListWidget->setActivePlayer(id);
 	QMapIterator<int, Player *> i(players);
 	while (i.hasNext()) {
 		i.next();
 		i.value()->setActive(i.value() == player);
 	}
-	messageLog->logSetActivePlayer(player);
 	currentPhase = -1;
+	return player;
+}
+
+void TabGame::eventSetActivePlayer(Event_SetActivePlayer *event)
+{
+	Player *player = setActivePlayer(event->getActivePlayerId());
+	if (!player)
+		return;
+	messageLog->logSetActivePlayer(player);
+}
+
+void TabGame::setActivePhase(int phase)
+{
+	if (currentPhase != phase) {
+		currentPhase = phase;
+		phasesToolbar->setActivePhase(phase);
+	}
 }
 
 void TabGame::eventSetActivePhase(Event_SetActivePhase *event)
 {
-	const int phase = event->getPhase();
-	if (currentPhase != phase) {
-		currentPhase = phase;
-		phasesToolbar->setActivePhase(phase);
+	int phase = event->getPhase();
+	if (currentPhase != phase)
 		messageLog->logSetActivePhase(phase);
-	}
+	setActivePhase(phase);
 }
 
 void TabGame::loadLocalDeck()

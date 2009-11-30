@@ -24,6 +24,7 @@ class Event_GameJoined;
 
 enum ClientStatus {
 	StatusDisconnected,
+	StatusDisconnecting,
 	StatusConnecting,
 	StatusAwaitingWelcome,
 	StatusLoggingIn,
@@ -36,7 +37,7 @@ signals:
 	void statusChanged(ClientStatus _status);
 	void maxPingTime(int seconds, int maxSeconds);
 	void serverTimeout();
-	void logSocketError(const QString &errorString);
+	void socketError(const QString &errorString);
 	void serverError(ResponseCode resp);
 	void protocolVersionMismatch(int clientVersion, int serverVersion);
 	void protocolError();

@@ -22,11 +22,25 @@ TabChatChannel::TabChatChannel(Client *_client, const QString &_channelName)
 	hbox->addLayout(vbox);
 	hbox->addWidget(playerList);
 	
+	aLeaveChannel = new QAction(this);
+	connect(aLeaveChannel, SIGNAL(triggered()), this, SLOT(actLeaveChannel()));
+
+	tabMenu = new QMenu(this);
+	tabMenu->addAction(aLeaveChannel);
+
+	retranslateUi();
 	setLayout(hbox);
+}
+
+TabChatChannel::~TabChatChannel()
+{
+	emit channelClosing(this);
 }
 
 void TabChatChannel::retranslateUi()
 {
+	tabMenu->setTitle(tr("C&hat channel"));
+	aLeaveChannel->setText(tr("&Leave channel"));
 }
 
 void TabChatChannel::sendMessage()
@@ -36,6 +50,12 @@ void TabChatChannel::sendMessage()
 	
 	client->sendCommand(new Command_ChatSay(channelName, sayEdit->text()));
 	sayEdit->clear();
+}
+
+void TabChatChannel::actLeaveChannel()
+{
+	client->sendCommand(new Command_ChatLeaveChannel(channelName));
+	deleteLater();
 }
 
 void TabChatChannel::processChatEvent(ChatEvent *event)

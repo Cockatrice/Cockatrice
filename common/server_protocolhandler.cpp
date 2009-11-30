@@ -22,8 +22,12 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 	// The socket has to be removed from the server's list before it is removed from the game's list
 	// so it will not receive the game update event.
 	server->removeClient(this);
-//	if (game)
-//		game->removePlayer(this);
+
+	QMapIterator<int, QPair<Server_Game *, Server_Player *> > gameIterator(games);
+	while (gameIterator.hasNext()) {
+		Server_Player *p = gameIterator.next().value().second;
+		p->setProtocolHandler(0);
+	}
 
 	QMapIterator<QString, Server_ChatChannel *> chatChannelIterator(chatChannels);
 	while (chatChannelIterator.hasNext())
@@ -135,12 +139,29 @@ ResponseCode Server_ProtocolHandler::cmdPing(Command_Ping * /*cmd*/)
 
 ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd)
 {
-	authState = server->checkUserPassword(cmd->getUsername(), cmd->getPassword());
+	QString userName = cmd->getUsername();
+	authState = server->checkUserPassword(userName, cmd->getPassword());
 	if (authState == PasswordWrong)
 		return RespWrongPassword;
-	playerName = cmd->getUsername();
-	
+	if (authState == PasswordRight)
+		server->closeOldSession(userName);
+
+	playerName = userName;
 	enqueueProtocolItem(new Event_ServerMessage(server->getLoginMessage()));
+
+	// This might not scale very well. Use an extra QMap if it becomes a problem.
+	const QList<Server_Game *> &serverGames = server->getGames();
+	for (int i = 0; i < serverGames.size(); ++i) {
+		const QList<Server_Player *> &gamePlayers = serverGames[i]->getPlayers();
+		for (int j = 0; j < gamePlayers.size(); ++j)
+			if (gamePlayers[j]->getPlayerName() == playerName) {
+				gamePlayers[j]->setProtocolHandler(this);
+				games.insert(serverGames[i]->getGameId(), QPair<Server_Game *, Server_Player *>(serverGames[i], gamePlayers[j]));
+				enqueueProtocolItem(new Event_GameJoined(serverGames[i]->getGameId(), gamePlayers[j]->getPlayerId(), gamePlayers[j]->getSpectator()));
+				enqueueProtocolItem(new Event_GameStateChanged(serverGames[i]->getGameId(), serverGames[i]->getGameStarted(), serverGames[i]->getActivePlayer(), serverGames[i]->getActivePhase(), serverGames[i]->getGameState(gamePlayers[j])));
+			}
+	}
+
 	return RespOk;
 }
 
@@ -222,7 +243,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd)
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	
 	enqueueProtocolItem(new Event_GameJoined(game->getGameId(), creator->getPlayerId(), false));
-	enqueueProtocolItem(new Event_GameStateChanged(game->getGameId(), game->getGameState(creator)));
+	enqueueProtocolItem(new Event_GameStateChanged(game->getGameId(), game->getGameStarted(), game->getActivePlayer(), game->getActivePhase(), game->getGameState(creator)));
 	return RespOk;
 }
 
@@ -237,7 +258,7 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd)
 		Server_Player *player = g->addPlayer(this, cmd->getSpectator());
 		games.insert(cmd->getGameId(), QPair<Server_Game *, Server_Player *>(g, player));
 		enqueueProtocolItem(new Event_GameJoined(cmd->getGameId(), player->getPlayerId(), cmd->getSpectator()));
-		enqueueProtocolItem(new Event_GameStateChanged(cmd->getGameId(), g->getGameState(player)));
+		enqueueProtocolItem(new Event_GameStateChanged(cmd->getGameId(), g->getGameStarted(), g->getActivePlayer(), g->getActivePhase(), g->getGameState(player)));
 	}
 	return result;
 }
@@ -357,7 +378,10 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, Server_G
 		privateCardId = -1;
 		privateCardName = QString();
 	}
-	player->sendProtocolItem(new Event_MoveCard(game->getGameId(), player->getPlayerId(), privateCardId, privateCardName, startzone->getName(), position, targetzone->getName(), x, y, facedown));
+	int privatePosition = -1;
+	if (startzone->getType() == HiddenZone)
+		privatePosition = position;
+	player->sendProtocolItem(new Event_MoveCard(game->getGameId(), player->getPlayerId(), privateCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getName(), x, y, facedown));
 
 	// Other players do not get to see the start and/or target position of the card if the respective
 	// part of the zone is being looked at. The information is not needed anyway because in hidden zones,

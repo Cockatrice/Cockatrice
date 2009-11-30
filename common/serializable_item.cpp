@@ -56,16 +56,12 @@ void SerializableItem_Map::readElement(QXmlStreamReader *xml)
 	else if (xml->isStartElement()) {
 		QString childName = xml->name().toString();
 		QString childSubType = xml->attributes().value("type").toString();
-		qDebug() << "Map: started new item, name=" << childName << "subtype=" << childSubType;
 		currentItem = itemMap.value(childName);
 		if (!currentItem) {
-			qDebug() << "Item not found in map";
 			currentItem = getNewItem(childName + childSubType);
 			itemList.append(currentItem);
-			if (!currentItem) {
-				qDebug() << "Item still not found";
+			if (!currentItem)
 				currentItem = new SerializableItem_Invalid(childName);
-			}
 		}
 		if (currentItem->read(xml))
 			currentItem = 0;

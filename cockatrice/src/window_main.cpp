@@ -25,6 +25,8 @@
 #include "window_deckeditor.h"
 #include "tab_supervisor.h"
 
+const QString MainWindow::appName = "Cockatrice";
+
 void MainWindow::updateTabMenu(QMenu *menu)
 {
 	if (tabMenu)
@@ -36,60 +38,24 @@ void MainWindow::updateTabMenu(QMenu *menu)
 
 void MainWindow::statusChanged(ClientStatus _status)
 {
+	setClientStatusTitle();
 	switch (_status) {
 		case StatusConnecting:
-			emit logConnecting(client->peerName());
 			break;
 		case StatusDisconnected:
 			tabSupervisor->stop();
-//			if (game) {
-//				zoneLayout->clear();
-//				delete game;
-//				game = 0;
-//			}
 			aConnect->setEnabled(true);
 			aDisconnect->setEnabled(false);
-//			aRestartGame->setEnabled(false);
-//			aLeaveGame->setEnabled(false);
-//			phasesToolbar->setActivePhase(-1);
-//			phasesToolbar->hide();
-			emit logDisconnected();
 			break;
 		case StatusLoggingIn:
-			emit logConnected();
 			aConnect->setEnabled(false);
 			aDisconnect->setEnabled(true);
 			break;
 		case StatusLoggedIn: {
 			tabSupervisor->start(client);
-	
-/*			if (game) {
-				zoneLayout->clear();
-				delete game;
-				game = 0;
-			}
-			aRestartGame->setEnabled(false);
-			aLeaveGame->setEnabled(false);
-			phasesToolbar->setActivePhase(-1);
-			phasesToolbar->hide();
-			
-			view->hide();
-			gameSelector->enableGameList();
-			chatWidget->enableChat();
-*/			break;
-		}
-//		case StatusPlaying: {
-/*			chatWidget->disableChat();
-			
-			aRestartGame->setEnabled(true);
-			aLeaveGame->setEnabled(true);
-		
-			
-			phasesToolbar->show();
-			view->show();
 			break;
 		}
-*/		default:
+		default:
 			break;
 	}
 }
@@ -107,18 +73,7 @@ void MainWindow::actDisconnect()
 {
 	client->disconnectFromServer();
 }
-/*
-void MainWindow::actRestartGame()
-{
-	zoneLayout->clear();
-	game->restartGameDialog();
-}
 
-void MainWindow::actLeaveGame()
-{
-	client->leaveGame();
-}
-*/
 void MainWindow::actDeckEditor()
 {
 	WndDeckEditor *deckEditor = new WndDeckEditor(this);
@@ -149,15 +104,40 @@ void MainWindow::serverTimeout()
 	QMessageBox::critical(this, tr("Error"), tr("Server timeout"));
 }
 
+void MainWindow::serverError(ResponseCode r)
+{
+	switch (r) {
+		case RespWrongPassword: QMessageBox::critical(this, tr("Error"), tr("Invalid login data.")); break;
+		default: ;
+	}
+}
+
+void MainWindow::socketError(const QString &errorStr)
+{
+	QMessageBox::critical(this, tr("Error"), tr("Socket error: %1").arg(errorStr));
+}
+
+void MainWindow::protocolVersionMismatch(int localVersion, int remoteVersion)
+{
+	QMessageBox::critical(this, tr("Error"), tr("Protocol version mismatch. Local version: %1, remote version: %2.").arg(localVersion).arg(remoteVersion));
+}
+
+void MainWindow::setClientStatusTitle()
+{
+	switch (client->getStatus()) {
+		case StatusConnecting: setWindowTitle(appName + " - " + tr("Connecting to %1...").arg(client->peerName())); break;
+		case StatusDisconnected: setWindowTitle(appName + " - " + tr("Disconnected")); break;
+		case StatusLoggedIn: setWindowTitle(appName + " - " + tr("Logged in at %1").arg(client->peerName())); break;
+		default: setWindowTitle(appName);
+	}
+}
+
 void MainWindow::retranslateUi()
 {
-	setWindowTitle(tr("Cockatrice"));
+	setClientStatusTitle();
 	
 	aConnect->setText(tr("&Connect..."));
 	aDisconnect->setText(tr("&Disconnect"));
-//	aRestartGame->setText(tr("&Restart game..."));
-//	aRestartGame->setShortcut(tr("F2"));
-//	aLeaveGame->setText(tr("&Leave game"));
 	aDeckEditor->setText(tr("&Deck editor"));
 	aFullScreen->setText(tr("&Full screen"));
 	aFullScreen->setShortcut(tr("Ctrl+F"));
@@ -174,13 +154,7 @@ void MainWindow::createActions()
 	aDisconnect = new QAction(this);
 	aDisconnect->setEnabled(false);
 	connect(aDisconnect, SIGNAL(triggered()), this, SLOT(actDisconnect()));
-/*	aRestartGame = new QAction(this);
-	aRestartGame->setEnabled(false);
-	connect(aRestartGame, SIGNAL(triggered()), this, SLOT(actRestartGame()));
-	aLeaveGame = new QAction(this);
-	aLeaveGame->setEnabled(false);
-	connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
-*/	aDeckEditor = new QAction(this);
+	aDeckEditor = new QAction(this);
 	connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
 	aFullScreen = new QAction(this);
 	aFullScreen->setCheckable(true);
@@ -212,22 +186,16 @@ MainWindow::MainWindow(QWidget *parent)
 	QPixmapCache::setCacheLimit(200000);
 
 	client = new Client(this);
+	connect(client, SIGNAL(serverError(ResponseCode)), this, SLOT(serverError(ResponseCode)));
+	connect(client, SIGNAL(socketError(const QString &)), this, SLOT(socketError(const QString &)));
+	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
+	connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
+	connect(client, SIGNAL(protocolVersionMismatch(int, int)), this, SLOT(protocolVersionMismatch(int, int)));
+
 	tabSupervisor = new TabSupervisor;
 	connect(tabSupervisor, SIGNAL(setMenu(QMenu *)), this, SLOT(updateTabMenu(QMenu *)));
 	
 	setCentralWidget(tabSupervisor);
-/*
-	
-	connect(this, SIGNAL(logConnecting(QString)), messageLog, SLOT(logConnecting(QString)));
-	connect(this, SIGNAL(logConnected()), messageLog, SLOT(logConnected()));
-	connect(this, SIGNAL(logDisconnected()), messageLog, SLOT(logDisconnected()));
-	connect(client, SIGNAL(logSocketError(const QString &)), messageLog, SLOT(logSocketError(const QString &)));
-	connect(client, SIGNAL(serverError(ResponseCode)), messageLog, SLOT(logServerError(ResponseCode)));
-	connect(client, SIGNAL(protocolVersionMismatch(int, int)), messageLog, SLOT(logProtocolVersionMismatch(int, int)));
-	connect(client, SIGNAL(protocolError()), messageLog, SLOT(logProtocolError()));
-*/
-	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
-	connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
 
 	createActions();
 	createMenus();

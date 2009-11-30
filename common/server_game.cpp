@@ -59,10 +59,12 @@ void Server_Game::startGameIfReady()
 	playerIterator.toFront();
 	while (playerIterator.hasNext())
 		playerIterator.next().value()->setupZones();
+
+	gameStarted = true;
 	playerIterator.toFront();
 	while (playerIterator.hasNext()) {
 		Server_Player *player = playerIterator.next().value();
-		player->sendProtocolItem(new Event_GameStateChanged(gameId, getGameState(player)));
+		player->sendProtocolItem(new Event_GameStateChanged(gameId, gameStarted, 0, 0, getGameState(player)));
 	}
 	
 /*	QSqlQuery query;
@@ -81,7 +83,6 @@ void Server_Game::startGameIfReady()
 		query.exec();
 	}
 */	
-	gameStarted = true;
 	sendGameEvent(new Event_GameStart);
 	setActivePlayer(0);
 }
@@ -115,7 +116,7 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 		playerId = -1;
 	
 	Server_Player *newPlayer = new Server_Player(this, playerId, handler->getPlayerName(), spectator, handler);
-	sendGameEvent(new Event_Join(-1, playerId, handler->getPlayerName(), spectator));
+	sendGameEvent(new Event_Join(-1, new ServerInfo_Player(playerId, handler->getPlayerName(), spectator)));
 	
 	if (spectator)
 		spectators << newPlayer;
@@ -214,7 +215,7 @@ QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAs
 			zoneList.append(new ServerInfo_Zone(zone->getName(), zone->getType(), zone->hasCoords(), zone->cards.size(), cardList));
 		}
 
-		result.append(new ServerInfo_Player(player->getPlayerId(), player->getPlayerName(), zoneList, counterList, arrowList));
+		result.append(new ServerInfo_Player(player->getPlayerId(), player->getPlayerName(), player->getSpectator(), player->getDeck(), zoneList, counterList, arrowList));
 	}
 	return result;
 }

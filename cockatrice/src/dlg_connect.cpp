@@ -50,6 +50,7 @@ DlgConnect::DlgConnect(QWidget *parent)
 
 	setWindowTitle(tr("Connect to server"));
 	setFixedHeight(sizeHint().height());
+	setMinimumWidth(300);
 
 	connect(okButton, SIGNAL(clicked()), this, SLOT(actOk()));
 	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));

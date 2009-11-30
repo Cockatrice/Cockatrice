@@ -22,7 +22,7 @@
 #include "server_counter.h"
 #include "server_chatchannel.h"
 #include "server_protocolhandler.h"
-
+#include <QDebug>
 Server::Server(QObject *parent)
 	: QObject(parent), nextGameId(0)
 {
@@ -52,6 +52,22 @@ void Server::removeClient(Server_ProtocolHandler *client)
 {
 	clients.removeAt(clients.indexOf(client));
 	qDebug(QString("Server::removeClient: %1 clients left").arg(clients.size()).toLatin1());
+}
+
+void Server::closeOldSession(const QString &playerName)
+{
+	qDebug() << "closing old";
+	Server_ProtocolHandler *session = 0;
+	for (int i = 0; i < clients.size(); ++i)
+		if (clients[i]->getPlayerName() == playerName) {
+			session = clients[i];
+			break;
+		}
+	if (session) {
+		qDebug() << "found";
+		removeClient(session);
+		delete session;
+	}
 }
 
 Server_Game *Server::getGame(int gameId) const

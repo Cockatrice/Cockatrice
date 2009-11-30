@@ -74,14 +74,12 @@ void CardItem::resetState()
 
 void CardItem::processCardInfo(ServerInfo_Card *info)
 {
-	id = info->getId();
-	name = info->getName();
-	attacking = info->getAttacking();
-	counters = info->getCounters();
-	annotation = info->getAnnotation();
-	tapped = info->getTapped();
-
-	update();
+	setId(info->getId());
+	setName(info->getName());
+	setAttacking(info->getAttacking());
+	setCounters(info->getCounters());
+	setAnnotation(info->getAnnotation());
+	setTapped(info->getTapped());
 }
 
 CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown)

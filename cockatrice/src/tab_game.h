@@ -61,22 +61,22 @@ private:
 	QAction *playersSeparator;
 	QMenu *playersMenu;
 	QAction *aCloseMostRecentZoneView,
-		*aNextPhase, *aNextTurn, *aRemoveLocalArrows;
+		*aLeaveGame, *aNextPhase, *aNextTurn, *aRemoveLocalArrows;
 
 	Player *addPlayer(int playerId, const QString &playerName);
 
+	void startGame();
 	void eventGameStart(Event_GameStart *event);
 	void eventGameStateChanged(Event_GameStateChanged *event);
 	void eventJoin(Event_Join *event);
 	void eventLeave(Event_Leave *event);
 	void eventGameClosed(Event_GameClosed *event);
+	Player *setActivePlayer(int id);
 	void eventSetActivePlayer(Event_SetActivePlayer *event);
+	void setActivePhase(int phase);
 	void eventSetActivePhase(Event_SetActivePhase *event);
 signals:
-	// -- XXX --
-	void playerAdded(Player *player);
-	void playerRemoved(Player *player);
-	// -- XXX --
+	void gameClosing(TabGame *tab);
 private slots:
 	void loadLocalDeck();
 	void loadRemoteDeck();
@@ -84,14 +84,17 @@ private slots:
 	void deckSelectFinished(ProtocolResponse *r);
 	void newCardAdded(CardItem *card);
 	
+	void actLeaveGame();
 	void actRemoveLocalArrows();
 	void actSay();
 	void actNextPhase();
 	void actNextTurn();
 public:
 	TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectator);
+	~TabGame();
 	void retranslateUi();
 	const QMap<int, Player *> &getPlayers() const { return players; }
+	int getGameId() const { return gameId; }
 
 	void processGameEvent(GameEvent *event);
 public slots:

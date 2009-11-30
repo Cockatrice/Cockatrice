@@ -546,14 +546,18 @@ void Player::eventMoveCard(Event_MoveCard *event)
 	if (!startZone || !targetZone)
 		return;
 	
+	qDebug("Player::eventMoveCard --- startZone");
+	startZone->dumpObjectInfo();
+	qDebug("Player::eventMoveCard --- targetZone");
+	targetZone->dumpObjectInfo();
+	qDebug("---");
+
 	int position = event->getPosition();
 	int x = event->getX();
 	int y = event->getY();
 
 	int logPosition = position;
 	int logX = x;
-	if (position == -1)
-		position = 0;
 	if (x == -1)
 		x = 0;
 	CardItem *card = startZone->takeCard(position, event->getCardId(), event->getCardName(), startZone != targetZone);
@@ -702,8 +706,8 @@ void Player::processPlayerInfo(ServerInfo_Player *info)
 		} else {
 			for (int j = 0; j < cardList.size(); ++j) {
 				CardItem *card = new CardItem(this);
-				card->processCardInfo(cardList[i]);
-				zone->addCard(card, false, cardList[i]->getX(), cardList[i]->getY());
+				card->processCardInfo(cardList[j]);
+				zone->addCard(card, false, cardList[j]->getX(), cardList[j]->getY());
 			}
 		}
 		zone->reorganizeCards();

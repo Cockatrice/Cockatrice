@@ -32,7 +32,7 @@ Client::~Client()
 
 void Client::slotSocketError(QAbstractSocket::SocketError /*error*/)
 {
-	emit logSocketError(socket->errorString());
+	emit socketError(socket->errorString());
 	disconnectFromServer();
 }
 
@@ -48,7 +48,7 @@ void Client::loginResponse(ResponseCode response)
 		setStatus(StatusLoggedIn);
 	else {
 		emit serverError(response);
-		disconnectFromServer();
+		setStatus(StatusDisconnecting);
 	}
 }
 
@@ -82,10 +82,13 @@ void Client::readData()
 				connect(cmdLogin, SIGNAL(finished(ResponseCode)), this, SLOT(loginResponse(ResponseCode)));
 				sendCommand(cmdLogin);
 
-				topLevelItem->read(xmlReader);
+				if (topLevelItem)
+					topLevelItem->read(xmlReader);
 			}
 		}
 	}
+	if (status == StatusDisconnecting)
+		disconnectFromServer();
 }
 
 void Client::processProtocolItem(ProtocolItem *item)
@@ -96,10 +99,9 @@ void Client::processProtocolItem(ProtocolItem *item)
 		if (!cmd)
 			return;
 		
+		pendingCommands.remove(cmd->getCmdId());
 		cmd->processResponse(response);
 		delete response;
-		
-		pendingCommands.remove(cmd->getCmdId());
 		delete cmd;
 		
 		return;

@@ -299,15 +299,6 @@ public:
 	static SerializableItem *newItem() { return new Event_Say; }
 	int getItemId() const { return ItemId_Event_Say; }
 };
-class Event_Join : public GameEvent {
-	Q_OBJECT
-public:
-	Event_Join(int _gameId = -1, int _playerId = -1, const QString &_playerName = QString(), bool _spectator = false);
-	QString getPlayerName() const { return static_cast<SerializableItem_String *>(itemMap.value("player_name"))->getData(); };
-	bool getSpectator() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectator"))->getData(); };
-	static SerializableItem *newItem() { return new Event_Join; }
-	int getItemId() const { return ItemId_Event_Join; }
-};
 class Event_Leave : public GameEvent {
 	Q_OBJECT
 public:

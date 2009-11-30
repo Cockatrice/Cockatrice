@@ -37,6 +37,7 @@ void ProtocolItem::initializeHash()
 	
 	registerSerializableItem("generic_eventlist_games", Event_ListGames::newItem);
 	registerSerializableItem("generic_eventlist_chat_channels", Event_ListChatChannels::newItem);
+	registerSerializableItem("game_eventjoin", Event_Join::newItem);
 	registerSerializableItem("game_eventgame_state_changed", Event_GameStateChanged::newItem);
 	registerSerializableItem("game_eventcreate_arrows", Event_CreateArrows::newItem);
 	registerSerializableItem("game_eventcreate_counters", Event_CreateCounters::newItem);
@@ -214,9 +215,20 @@ Event_ListGames::Event_ListGames(const QList<ServerInfo_Game *> &_gameList)
 		itemList.append(_gameList[i]);
 }
 
-Event_GameStateChanged::Event_GameStateChanged(int _gameId, const QList<ServerInfo_Player *> &_playerList)
+Event_Join::Event_Join(int _gameId, ServerInfo_Player *player)
+	: GameEvent("join", _gameId, -1)
+{
+	if (!player)
+		player = new ServerInfo_Player;
+	insertItem(player);
+}
+
+Event_GameStateChanged::Event_GameStateChanged(int _gameId, bool _gameStarted, int _activePlayer, int _activePhase, const QList<ServerInfo_Player *> &_playerList)
 	: GameEvent("game_state_changed", _gameId, -1)
 {
+	insertItem(new SerializableItem_Bool("game_started", _gameStarted));
+	insertItem(new SerializableItem_Int("active_player", _activePlayer));
+	insertItem(new SerializableItem_Int("active_phase", _activePhase));
 	for (int i = 0; i < _playerList.size(); ++i)
 		itemList.append(_playerList[i]);
 }

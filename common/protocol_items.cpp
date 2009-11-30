@@ -195,12 +195,6 @@ Event_Say::Event_Say(int _gameId, int _playerId, const QString &_message)
 {
 	insertItem(new SerializableItem_String("message", _message));
 }
-Event_Join::Event_Join(int _gameId, int _playerId, const QString &_playerName, bool _spectator)
-	: GameEvent("join", _gameId, _playerId)
-{
-	insertItem(new SerializableItem_String("player_name", _playerName));
-	insertItem(new SerializableItem_Bool("spectator", _spectator));
-}
 Event_Leave::Event_Leave(int _gameId, int _playerId)
 	: GameEvent("leave", _gameId, _playerId)
 {
@@ -365,7 +359,6 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmddump_zone", Command_DumpZone::newItem);
 	itemNameHash.insert("cmdstop_dump_zone", Command_StopDumpZone::newItem);
 	itemNameHash.insert("game_eventsay", Event_Say::newItem);
-	itemNameHash.insert("game_eventjoin", Event_Join::newItem);
 	itemNameHash.insert("game_eventleave", Event_Leave::newItem);
 	itemNameHash.insert("game_eventdeck_select", Event_DeckSelect::newItem);
 	itemNameHash.insert("game_eventgame_closed", Event_GameClosed::newItem);

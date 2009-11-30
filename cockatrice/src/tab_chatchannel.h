@@ -22,8 +22,13 @@ private:
 	QListWidget *playerList;
 	QTextEdit *textEdit;
 	QLineEdit *sayEdit;
+
+	QAction *aLeaveChannel;
+signals:
+	void channelClosing(TabChatChannel *tab);
 private slots:
 	void sendMessage();
+	void actLeaveChannel();
 	
 	void processListPlayersEvent(Event_ChatListPlayers *event);
 	void processJoinChannelEvent(Event_ChatJoinChannel *event);
@@ -31,8 +36,10 @@ private slots:
 	void processSayEvent(Event_ChatSay *event);
 public:
 	TabChatChannel(Client *_client, const QString &_channelName);
+	~TabChatChannel();
 	void retranslateUi();
 	void processChatEvent(ChatEvent *event);
+	QString getChannelName() const { return channelName; }
 };
 
 #endif

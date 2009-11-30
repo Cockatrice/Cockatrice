@@ -33,7 +33,9 @@ private slots:
 	void updateMenu(int index);
 	void updatePingTime(int value, int max);
 	void gameJoined(Event_GameJoined *event);
+	void gameLeft(TabGame *tab);
 	void addChatChannelTab(const QString &channelName);
+	void chatChannelLeft(TabChatChannel *tab);
 	void processChatEvent(ChatEvent *event);
 	void processGameEvent(GameEvent *event);
 };

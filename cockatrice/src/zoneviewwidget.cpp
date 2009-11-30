@@ -80,8 +80,8 @@ void ZoneViewWidget::resizeToZoneContents()
 	int cardCount = zone->getCards().size();
 	const QRectF &playersRect = static_cast<GameScene *>(scene())->getPlayersRect();
 	int h = 0;
-	if (cardCount * CARD_HEIGHT / 5 < playersRect.height() * 1.5)
-		h = cardCount * CARD_HEIGHT / 5;
+	if (cardCount * CARD_HEIGHT / 3 < playersRect.height() * 1.5)
+		h = cardCount * CARD_HEIGHT / 3;
 	else
 		h = playersRect.height() * 1.5;
 	qDebug(QString("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx resizing to %1").arg(h).toLatin1());

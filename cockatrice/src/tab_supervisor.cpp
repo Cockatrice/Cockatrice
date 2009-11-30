@@ -103,17 +103,35 @@ void TabSupervisor::updatePingTime(int value, int max)
 void TabSupervisor::gameJoined(Event_GameJoined *event)
 {
 	TabGame *tab = new TabGame(client, event->getGameId(), event->getPlayerId(), event->getSpectator());
+	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	addTab(tab, tr("Game %1").arg(event->getGameId()));
 	gameTabs.insert(event->getGameId(), tab);
 	setCurrentWidget(tab);
 }
 
+void TabSupervisor::gameLeft(TabGame *tab)
+{
+	emit setMenu(0);
+
+	gameTabs.remove(tab->getGameId());
+	removeTab(indexOf(tab));
+}
+
 void TabSupervisor::addChatChannelTab(const QString &channelName)
 {
 	TabChatChannel *tab = new TabChatChannel(client, channelName);
+	connect(tab, SIGNAL(channelClosing(TabChatChannel *)), this, SLOT(chatChannelLeft(TabChatChannel *)));
 	addTab(tab, channelName);
 	chatChannelTabs.insert(channelName, tab);
 	setCurrentWidget(tab);
+}
+
+void TabSupervisor::chatChannelLeft(TabChatChannel *tab)
+{
+	emit setMenu(0);
+
+	chatChannelTabs.remove(tab->getChannelName());
+	removeTab(indexOf(tab));
 }
 
 void TabSupervisor::processChatEvent(ChatEvent *event)

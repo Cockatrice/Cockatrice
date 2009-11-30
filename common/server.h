@@ -28,6 +28,7 @@ public:
 	
 	void addClient(Server_ProtocolHandler *player);
 	void removeClient(Server_ProtocolHandler *player);
+	void closeOldSession(const QString &playerName);
 	virtual QString getLoginMessage() const = 0;
 	Server_Game *createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, Server_ProtocolHandler *creator);
 private:
