@@ -25,8 +25,14 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 
 	QMapIterator<int, QPair<Server_Game *, Server_Player *> > gameIterator(games);
 	while (gameIterator.hasNext()) {
-		Server_Player *p = gameIterator.next().value().second;
-		p->setProtocolHandler(0);
+		gameIterator.next();
+		Server_Game *g = gameIterator.value().first;
+		Server_Player *p = gameIterator.value().second;
+		
+		if (authState == UnknownUser)
+			g->removePlayer(p);
+		else
+			p->setProtocolHandler(0);
 	}
 
 	QMapIterator<QString, Server_ChatChannel *> chatChannelIterator(chatChannels);
