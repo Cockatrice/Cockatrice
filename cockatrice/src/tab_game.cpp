@@ -88,6 +88,8 @@ TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectat
 	connect(aNextTurn, SIGNAL(triggered()), this, SLOT(actNextTurn()));
 	aRemoveLocalArrows = new QAction(this);
 	connect(aRemoveLocalArrows, SIGNAL(triggered()), this, SLOT(actRemoveLocalArrows()));
+	aConcede = new QAction(this);
+	connect(aConcede, SIGNAL(triggered()), this, SLOT(actConcede()));
 	aLeaveGame = new QAction(this);
 	connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
 	
@@ -98,6 +100,7 @@ TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectat
 	tabMenu->addSeparator();
 	tabMenu->addAction(aRemoveLocalArrows);
 	tabMenu->addSeparator();
+	tabMenu->addAction(aConcede);
 	tabMenu->addAction(aLeaveGame);
 	
 	retranslateUi();
@@ -120,6 +123,8 @@ void TabGame::retranslateUi()
 	aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
 	aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
 	aRemoveLocalArrows->setShortcut(tr("Ctrl+R"));
+	aConcede->setText(tr("&Concede"));
+	aConcede->setShortcut(tr("F2"));
 	aLeaveGame->setText(tr("&Leave game"));
 	
 	loadLocalButton->setText(tr("Load &local deck"));
@@ -134,6 +139,14 @@ void TabGame::retranslateUi()
 	QMapIterator<int, Player *> i(players);
 	while (i.hasNext())
 		i.next().value()->retranslateUi();
+}
+
+void TabGame::actConcede()
+{
+	if (QMessageBox::question(this, tr("Concede"), tr("Are you sure you want to concede this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+		return;
+
+	sendGameCommand(new Command_Concede);
 }
 
 void TabGame::actLeaveGame()
@@ -235,6 +248,15 @@ void TabGame::startGame()
 	phasesToolbar->show();
 }
 
+void TabGame::stopGame()
+{
+	currentPhase = -1;
+	started = false;
+	gameView->hide();
+	phasesToolbar->hide();
+	deckViewContainer->show();
+}
+
 void TabGame::eventGameStart(Event_GameStart * /*event*/)
 {
 	startGame();
@@ -256,11 +278,18 @@ void TabGame::eventGameStateChanged(Event_GameStateChanged *event)
 			playerListWidget->addPlayer(pl);
 		}
 		player->processPlayerInfo(pl);
+		if (player->getLocal() && pl->getDeck()) {
+			Deck_PictureCacher::cachePictures(pl->getDeck(), this);
+			deckView->setDeck(new DeckList(pl->getDeck()));
+		}
 	}
 	if (event->getGameStarted() && !started) {
 		startGame();
 		setActivePlayer(event->getActivePlayer());
 		setActivePhase(event->getActivePhase());
+	} else if (!event->getGameStarted() && started) {
+		stopGame();
+		zoneLayout->clear();
 	}
 }
 

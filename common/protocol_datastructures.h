@@ -112,11 +112,12 @@ private:
 protected:
 	void extractData();
 public:
-	ServerInfo_Player(int _playerId = -1, const QString &_name = QString(), bool _spectator = false, DeckList *_deck = 0, const QList<ServerInfo_Zone *> &_zoneList = QList<ServerInfo_Zone *>(), const QList<ServerInfo_Counter *> &_counterList = QList<ServerInfo_Counter *>(), const QList<ServerInfo_Arrow *> &_arrowList = QList<ServerInfo_Arrow *>());
+	ServerInfo_Player(int _playerId = -1, const QString &_name = QString(), bool _spectator = false, bool _conceded = false, DeckList *_deck = 0, const QList<ServerInfo_Zone *> &_zoneList = QList<ServerInfo_Zone *>(), const QList<ServerInfo_Counter *> &_counterList = QList<ServerInfo_Counter *>(), const QList<ServerInfo_Arrow *> &_arrowList = QList<ServerInfo_Arrow *>());
 	static SerializableItem *newItem() { return new ServerInfo_Player; }
 	int getPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("player_id"))->getData(); }
 	QString getName() const { return static_cast<SerializableItem_String *>(itemMap.value("name"))->getData(); }
 	bool getSpectator() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectator"))->getData(); }
+	bool getConceded() const { return static_cast<SerializableItem_Bool *>(itemMap.value("conceded"))->getData(); }
 	DeckList *getDeck() const;
 	const QList<ServerInfo_Zone *> &getZoneList() const { return zoneList; }
 	const QList<ServerInfo_Counter *> &getCounterList() const { return counterList; }

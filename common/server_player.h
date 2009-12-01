@@ -29,6 +29,7 @@ private:
 	int nextCardId;
 	void clearZones();
 	bool readyStart;
+	bool conceded;
 public:
 	Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator, Server_ProtocolHandler *_handler);
 	void setProtocolHandler(Server_ProtocolHandler *_handler) { handler = _handler; }
@@ -38,6 +39,8 @@ public:
 	void setReadyStart(bool _readyStart) { readyStart = _readyStart; }
 	int getPlayerId() const { return playerId; }
 	bool getSpectator() const { return spectator; }
+	bool getConceded() const { return conceded; }
+	void setConceded(bool _conceded) { conceded = _conceded; }
 	QString getPlayerName() const { return playerName; }
 	void setDeck(DeckList *_deck);
 	DeckList *getDeck() const { return deck; }

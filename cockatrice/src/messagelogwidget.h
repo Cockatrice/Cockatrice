@@ -30,6 +30,7 @@ public slots:
 	void logLeaveSpectator(QString name);
 	void logDeckSelect(Player *player, int deckId);
 	void logReadyStart(Player *player);
+	void logConcede(Player *player);
 	void logGameStart();
 	void logSay(Player *player, QString message);
 	void logShuffle(Player *player);

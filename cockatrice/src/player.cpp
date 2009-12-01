@@ -438,6 +438,11 @@ void Player::eventReadyStart(Event_ReadyStart * /*event*/)
 	emit logReadyStart(this);
 }
 
+void Player::eventConcede(Event_Concede * /*event*/)
+{
+	emit logConcede(this);
+}
+
 void Player::eventShuffle(Event_Shuffle * /*event*/)
 {
 	emit logShuffle(this);
@@ -619,6 +624,7 @@ void Player::processGameEvent(GameEvent *event)
 		case ItemId_Event_DeckSelect: eventDeckSelect(qobject_cast<Event_DeckSelect *>(event)); break;
 		case ItemId_Event_Say: eventSay(qobject_cast<Event_Say *>(event)); break;
 		case ItemId_Event_ReadyStart: eventReadyStart(qobject_cast<Event_ReadyStart *>(event)); break;
+		case ItemId_Event_Concede: eventConcede(qobject_cast<Event_Concede *>(event)); break;
 		case ItemId_Event_Shuffle: eventShuffle(qobject_cast<Event_Shuffle *>(event)); break;
 		case ItemId_Event_RollDie: eventRollDie(qobject_cast<Event_RollDie *>(event)); break;
 		case ItemId_Event_CreateArrows: eventCreateArrows(qobject_cast<Event_CreateArrows *>(event)); break;

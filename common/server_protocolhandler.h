@@ -45,6 +45,8 @@ private:
 	ResponseCode cmdCreateGame(Command_CreateGame *cmd);
 	ResponseCode cmdJoinGame(Command_JoinGame *cmd);
 	ResponseCode cmdLeaveGame(Command_LeaveGame *cmd, Server_Game *game, Server_Player *player);
+	ResponseCode cmdConcede(Command_Concede *cmd, Server_Game *game, Server_Player *player);
+	ResponseCode cmdReadyStart(Command_ReadyStart *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdDeckSelect(Command_DeckSelect *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdSay(Command_Say *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdShuffle(Command_Shuffle *cmd, Server_Game *game, Server_Player *player);
@@ -55,7 +57,6 @@ private:
 	ResponseCode cmdCreateArrow(Command_CreateArrow *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdDeleteArrow(Command_DeleteArrow *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdSetCardAttr(Command_SetCardAttr *cmd, Server_Game *game, Server_Player *player);
-	ResponseCode cmdReadyStart(Command_ReadyStart *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdIncCounter(Command_IncCounter *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdCreateCounter(Command_CreateCounter *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdSetCounter(Command_SetCounter *cmd, Server_Game *game, Server_Player *player);

@@ -23,6 +23,7 @@
 2:delete_arrow:i,arrow_id
 2:set_card_attr:s,zone:i,card_id:s,attr_name:s,attr_value
 2:ready_start
+2:concede
 2:inc_counter:i,counter_id:i,delta
 2:create_counter:s,counter_name:c,color:i,radius:i,value
 2:set_counter:i,counter_id:i,value
@@ -36,6 +37,7 @@
 3:deck_select:i,deck_id
 3:game_closed
 3:ready_start
+3:concede
 3:game_start
 3:shuffle
 3:roll_die:i,sides:i,value

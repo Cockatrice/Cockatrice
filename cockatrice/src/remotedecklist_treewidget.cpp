@@ -9,7 +9,7 @@ RemoteDeckList_TreeWidget::RemoteDeckList_TreeWidget(Client *_client, QWidget *p
 {
 	header()->setResizeMode(QHeaderView::ResizeToContents);
 	setColumnCount(3);
-	
+
 	refreshTree();
 	retranslateUi();
 }
@@ -33,6 +33,7 @@ void RemoteDeckList_TreeWidget::addFileToTree(DeckList_File *file, QTreeWidgetIt
 	newDeck->setData(2, Qt::DisplayRole, file->getUploadTime());
 
 	parent->addChild(newDeck);
+	sortItems(0, Qt::AscendingOrder);
 }
 
 void RemoteDeckList_TreeWidget::addFolderToTree(DeckList_Directory *folder, QTreeWidgetItem *parent)
@@ -62,6 +63,7 @@ void RemoteDeckList_TreeWidget::addFolderToTree(DeckList_Directory *folder, QTre
 		else
 			addFileToTree(dynamic_cast<DeckList_File *>(folderItems[i]), newItem);
 	}
+	sortItems(0, Qt::AscendingOrder);
 }
 
 void RemoteDeckList_TreeWidget::refreshTree()

@@ -143,6 +143,10 @@ Command_ReadyStart::Command_ReadyStart(int _gameId)
 	: GameCommand("ready_start", _gameId)
 {
 }
+Command_Concede::Command_Concede(int _gameId)
+	: GameCommand("concede", _gameId)
+{
+}
 Command_IncCounter::Command_IncCounter(int _gameId, int _counterId, int _delta)
 	: GameCommand("inc_counter", _gameId)
 {
@@ -210,6 +214,10 @@ Event_GameClosed::Event_GameClosed(int _gameId, int _playerId)
 }
 Event_ReadyStart::Event_ReadyStart(int _gameId, int _playerId)
 	: GameEvent("ready_start", _gameId, _playerId)
+{
+}
+Event_Concede::Event_Concede(int _gameId, int _playerId)
+	: GameEvent("concede", _gameId, _playerId)
 {
 }
 Event_GameStart::Event_GameStart(int _gameId, int _playerId)
@@ -350,6 +358,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmddelete_arrow", Command_DeleteArrow::newItem);
 	itemNameHash.insert("cmdset_card_attr", Command_SetCardAttr::newItem);
 	itemNameHash.insert("cmdready_start", Command_ReadyStart::newItem);
+	itemNameHash.insert("cmdconcede", Command_Concede::newItem);
 	itemNameHash.insert("cmdinc_counter", Command_IncCounter::newItem);
 	itemNameHash.insert("cmdcreate_counter", Command_CreateCounter::newItem);
 	itemNameHash.insert("cmdset_counter", Command_SetCounter::newItem);
@@ -363,6 +372,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventdeck_select", Event_DeckSelect::newItem);
 	itemNameHash.insert("game_eventgame_closed", Event_GameClosed::newItem);
 	itemNameHash.insert("game_eventready_start", Event_ReadyStart::newItem);
+	itemNameHash.insert("game_eventconcede", Event_Concede::newItem);
 	itemNameHash.insert("game_eventgame_start", Event_GameStart::newItem);
 	itemNameHash.insert("game_eventshuffle", Event_Shuffle::newItem);
 	itemNameHash.insert("game_eventroll_die", Event_RollDie::newItem);

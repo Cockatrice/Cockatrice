@@ -80,6 +80,8 @@ void Server_ProtocolHandler::processCommand(Command *command)
 		switch (command->getItemId()) {
 			case ItemId_Command_DeckSelect: response = cmdDeckSelect(qobject_cast<Command_DeckSelect *>(command), game, player); break;
 			case ItemId_Command_LeaveGame: response = cmdLeaveGame(qobject_cast<Command_LeaveGame *>(command), game, player); break;
+			case ItemId_Command_ReadyStart: response = cmdReadyStart(qobject_cast<Command_ReadyStart *>(command), game, player); break;
+			case ItemId_Command_Concede: response = cmdConcede(qobject_cast<Command_Concede *>(command), game, player); break;
 			case ItemId_Command_Say: response = cmdSay(qobject_cast<Command_Say *>(command), game, player); break;
 			case ItemId_Command_Shuffle: response = cmdShuffle(qobject_cast<Command_Shuffle *>(command), game, player); break;
 			case ItemId_Command_RollDie: response = cmdRollDie(qobject_cast<Command_RollDie *>(command), game, player); break;
@@ -89,7 +91,6 @@ void Server_ProtocolHandler::processCommand(Command *command)
 			case ItemId_Command_CreateArrow: response = cmdCreateArrow(qobject_cast<Command_CreateArrow *>(command), game, player); break;
 			case ItemId_Command_DeleteArrow: response = cmdDeleteArrow(qobject_cast<Command_DeleteArrow *>(command), game, player); break;
 			case ItemId_Command_SetCardAttr: response = cmdSetCardAttr(qobject_cast<Command_SetCardAttr *>(command), game, player); break;
-			case ItemId_Command_ReadyStart: response = cmdReadyStart(qobject_cast<Command_ReadyStart *>(command), game, player); break;
 			case ItemId_Command_IncCounter: response = cmdIncCounter(qobject_cast<Command_IncCounter *>(command), game, player); break;
 			case ItemId_Command_CreateCounter: response = cmdCreateCounter(qobject_cast<Command_CreateCounter *>(command), game, player); break;
 			case ItemId_Command_SetCounter: response = cmdSetCounter(qobject_cast<Command_SetCounter *>(command), game, player); break;
@@ -297,6 +298,25 @@ ResponseCode Server_ProtocolHandler::cmdDeckSelect(Command_DeckSelect *cmd, Serv
 	return RespNothing;
 }
 
+ResponseCode Server_ProtocolHandler::cmdConcede(Command_Concede * /*cmd*/, Server_Game *game, Server_Player *player)
+{
+	player->setConceded(true);
+	game->sendGameEvent(new Event_Concede(-1, player->getPlayerId()));
+	game->stopGameIfFinished();
+	return RespOk;
+}
+
+ResponseCode Server_ProtocolHandler::cmdReadyStart(Command_ReadyStart * /*cmd*/, Server_Game *game, Server_Player *player)
+{
+	if (!player->getDeck())
+		return RespContextError;
+
+	player->setReadyStart(true);
+	game->sendGameEvent(new Event_ReadyStart(-1, player->getPlayerId()));
+	game->startGameIfReady();
+	return RespOk;
+}
+
 ResponseCode Server_ProtocolHandler::cmdSay(Command_Say *cmd, Server_Game *game, Server_Player *player)
 {
 	game->sendGameEvent(new Event_Say(-1, player->getPlayerId(), cmd->getMessage()));
@@ -501,17 +521,6 @@ ResponseCode Server_ProtocolHandler::cmdSetCardAttr(Command_SetCardAttr *cmd, Se
 			return RespInvalidCommand;
 	}
 	game->sendGameEvent(new Event_SetCardAttr(-1, player->getPlayerId(), zone->getName(), cmd->getCardId(), cmd->getAttrName(), cmd->getAttrValue()));
-	return RespOk;
-}
-
-ResponseCode Server_ProtocolHandler::cmdReadyStart(Command_ReadyStart * /*cmd*/, Server_Game *game, Server_Player *player)
-{
-	if (!player->getDeck())
-		return RespContextError;
-	
-	player->setReadyStart(true);
-	game->sendGameEvent(new Event_ReadyStart(-1, player->getPlayerId()));
-	game->startGameIfReady();
 	return RespOk;
 }
 

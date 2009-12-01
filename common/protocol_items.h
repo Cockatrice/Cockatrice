@@ -220,6 +220,13 @@ public:
 	static SerializableItem *newItem() { return new Command_ReadyStart; }
 	int getItemId() const { return ItemId_Command_ReadyStart; }
 };
+class Command_Concede : public GameCommand {
+	Q_OBJECT
+public:
+	Command_Concede(int _gameId = -1);
+	static SerializableItem *newItem() { return new Command_Concede; }
+	int getItemId() const { return ItemId_Command_Concede; }
+};
 class Command_IncCounter : public GameCommand {
 	Q_OBJECT
 public:
@@ -327,6 +334,13 @@ public:
 	Event_ReadyStart(int _gameId = -1, int _playerId = -1);
 	static SerializableItem *newItem() { return new Event_ReadyStart; }
 	int getItemId() const { return ItemId_Event_ReadyStart; }
+};
+class Event_Concede : public GameEvent {
+	Q_OBJECT
+public:
+	Event_Concede(int _gameId = -1, int _playerId = -1);
+	static SerializableItem *newItem() { return new Event_Concede; }
+	int getItemId() const { return ItemId_Event_Concede; }
 };
 class Event_GameStart : public GameEvent {
 	Q_OBJECT

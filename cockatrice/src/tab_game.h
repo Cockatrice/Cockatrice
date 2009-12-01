@@ -61,11 +61,13 @@ private:
 	QAction *playersSeparator;
 	QMenu *playersMenu;
 	QAction *aCloseMostRecentZoneView,
-		*aLeaveGame, *aNextPhase, *aNextTurn, *aRemoveLocalArrows;
+		*aConcede, *aLeaveGame, *aNextPhase, *aNextTurn, *aRemoveLocalArrows;
 
 	Player *addPlayer(int playerId, const QString &playerName);
 
 	void startGame();
+	void stopGame();
+
 	void eventGameStart(Event_GameStart *event);
 	void eventGameStateChanged(Event_GameStateChanged *event);
 	void eventJoin(Event_Join *event);
@@ -84,6 +86,7 @@ private slots:
 	void deckSelectFinished(ProtocolResponse *r);
 	void newCardAdded(CardItem *card);
 	
+	void actConcede();
 	void actLeaveGame();
 	void actRemoveLocalArrows();
 	void actSay();

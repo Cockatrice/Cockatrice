@@ -60,6 +60,7 @@ public:
 	Server_Player *addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate = true);
 	void removePlayer(Server_Player *player);
 	void startGameIfReady();
+	void stopGameIfFinished();
 	int getActivePlayer() const { return activePlayer; }
 	int getActivePhase() const { return activePhase; }
 	void setActivePlayer(int _activePlayer);

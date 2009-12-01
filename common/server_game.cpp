@@ -64,6 +64,8 @@ void Server_Game::startGameIfReady()
 	playerIterator.toFront();
 	while (playerIterator.hasNext()) {
 		Server_Player *player = playerIterator.next().value();
+		player->setConceded(false);
+		player->setReadyStart(false);
 		player->sendProtocolItem(new Event_GameStateChanged(gameId, gameStarted, 0, 0, getGameState(player)));
 	}
 	
@@ -85,6 +87,27 @@ void Server_Game::startGameIfReady()
 */	
 	sendGameEvent(new Event_GameStart);
 	setActivePlayer(0);
+}
+
+void Server_Game::stopGameIfFinished()
+{
+	QMapIterator<int, Server_Player *> playerIterator(players);
+	int playing = 0;
+	while (playerIterator.hasNext()) {
+		Server_Player *p = playerIterator.next().value();
+		if (!p->getConceded() && !p->getSpectator())
+			++playing;
+	}
+	if (playing > 1)
+		return;
+
+	gameStarted = false;
+	playerIterator.toFront();
+	while (playerIterator.hasNext()) {
+		Server_Player *player = playerIterator.next().value();
+		player->sendProtocolItem(new Event_GameStateChanged(gameId, gameStarted, -1, -1, getGameState(player)));
+	}
+
 }
 
 ResponseCode Server_Game::checkJoin(const QString &_password, bool spectator)
@@ -215,7 +238,7 @@ QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAs
 			zoneList.append(new ServerInfo_Zone(zone->getName(), zone->getType(), zone->hasCoords(), zone->cards.size(), cardList));
 		}
 
-		result.append(new ServerInfo_Player(player->getPlayerId(), player->getPlayerName(), player->getSpectator(), player->getDeck(), zoneList, counterList, arrowList));
+		result.append(new ServerInfo_Player(player->getPlayerId(), player->getPlayerName(), player->getSpectator(), player->getConceded(), player == playerWhosAsking ? player->getDeck() : 0, zoneList, counterList, arrowList));
 	}
 	return result;
 }
