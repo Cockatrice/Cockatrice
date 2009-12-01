@@ -53,7 +53,7 @@ TopLevelProtocolItem::TopLevelProtocolItem()
 bool TopLevelProtocolItem::readCurrentItem(QXmlStreamReader *xml)
 {
 	if (currentItem) {
-		if (currentItem->read(xml)) {
+		if (currentItem->readElement(xml)) {
 			emit protocolItemReceived(currentItem);
 			currentItem = 0;
 		}
@@ -62,7 +62,7 @@ bool TopLevelProtocolItem::readCurrentItem(QXmlStreamReader *xml)
 		return false;
 }
 
-void TopLevelProtocolItem::readElement(QXmlStreamReader *xml)
+bool TopLevelProtocolItem::readElement(QXmlStreamReader *xml)
 {
 	if (!readCurrentItem(xml) && (xml->isStartElement())) {
 		QString childName = xml->name().toString();
@@ -74,6 +74,7 @@ void TopLevelProtocolItem::readElement(QXmlStreamReader *xml)
 		
 		readCurrentItem(xml);
 	}
+	return SerializableItem::readElement(xml);
 }
 
 void TopLevelProtocolItem::writeElement(QXmlStreamWriter * /*xml*/)

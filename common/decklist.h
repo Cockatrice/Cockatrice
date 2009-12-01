@@ -107,7 +107,7 @@ public:
 	QString getLastFileName() const { return lastFileName; }
 	FileFormat getLastFileFormat() const { return lastFileFormat; }
 
-	void readElement(QXmlStreamReader *xml);
+	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 	void loadFromXml(QXmlStreamReader *xml);
 	

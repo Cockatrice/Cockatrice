@@ -58,11 +58,10 @@ signals:
 private:
 	ProtocolItem *currentItem;
 	bool readCurrentItem(QXmlStreamReader *xml);
-protected:
-	void readElement(QXmlStreamReader *xml);
-	void writeElement(QXmlStreamWriter *xml);
 public:
 	TopLevelProtocolItem();
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
 };
 
 // ----------------

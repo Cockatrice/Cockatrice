@@ -5,6 +5,7 @@
 #include <QXmlStreamWriter>
 #include <QVariant>
 #include "decklist.h"
+#include <QDebug>
 
 AbstractDecklistNode::AbstractDecklistNode(InnerDecklistNode *_parent)
 	: parent(_parent), currentItem(0)
@@ -212,7 +213,7 @@ DeckList::~DeckList()
 	delete root;
 }
 
-void DeckList::readElement(QXmlStreamReader *xml)
+bool DeckList::readElement(QXmlStreamReader *xml)
 {
 	if (currentZone) {
 		if (currentZone->readElement(xml))
@@ -228,6 +229,7 @@ void DeckList::readElement(QXmlStreamReader *xml)
 		currentZone = new InnerDecklistNode(xml->attributes().value("name").toString(), root);
 	else if (xml->isCharacters() && !xml->isWhitespace())
 		currentElementText = xml->text().toString();
+	return SerializableItem::readElement(xml);
 }
 
 void DeckList::writeElement(QXmlStreamWriter *xml)

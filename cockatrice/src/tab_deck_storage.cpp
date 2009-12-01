@@ -102,6 +102,12 @@ void TabDeckStorage::actUpload()
 	DeckList *deck = new DeckList;
 	if (!deck->loadFromFile(filePath, DeckList::CockatriceFormat))
 		return;
+	if (deck->getName().isEmpty()) {
+		QString deckName = QInputDialog::getText(this, tr("Enter deck name"), tr("This decklist does not have a name.\nPlease enter a name:"), QLineEdit::Normal, tr("Unnamed deck"));
+		if (deckName.isEmpty())
+			deckName = tr("Unnamed deck");
+		deck->setName(deckName);
+	}
 
 	QString targetPath;
 	QTreeWidgetItem *curRight = serverDirView->currentItem();

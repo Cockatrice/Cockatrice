@@ -58,33 +58,28 @@ void Client::readData()
 	qDebug() << data;
 	xmlReader->addData(data);
 
-	if (topLevelItem)
-		topLevelItem->read(xmlReader);
-	else {
-		while (!xmlReader->atEnd()) {
-			xmlReader->readNext();
-			if (xmlReader->isStartElement() && (xmlReader->name().toString() == "cockatrice_server_stream")) {
-				int serverVersion = xmlReader->attributes().value("version").toString().toInt();
-				if (serverVersion != ProtocolItem::protocolVersion) {
-					emit protocolVersionMismatch(ProtocolItem::protocolVersion, serverVersion);
-					disconnectFromServer();
-					return;
-				}
-				xmlWriter->writeStartDocument();
-				xmlWriter->writeStartElement("cockatrice_client_stream");
-				xmlWriter->writeAttribute("version", QString::number(ProtocolItem::protocolVersion));
-				
-				topLevelItem = new TopLevelProtocolItem;
-				connect(topLevelItem, SIGNAL(protocolItemReceived(ProtocolItem *)), this, SLOT(processProtocolItem(ProtocolItem *)));
-				
-				setStatus(StatusLoggingIn);
-				Command_Login *cmdLogin = new Command_Login(userName, password);
-				connect(cmdLogin, SIGNAL(finished(ResponseCode)), this, SLOT(loginResponse(ResponseCode)));
-				sendCommand(cmdLogin);
-
-				if (topLevelItem)
-					topLevelItem->read(xmlReader);
+	while (!xmlReader->atEnd()) {
+		xmlReader->readNext();
+		if (topLevelItem)
+			topLevelItem->readElement(xmlReader);
+		else if (xmlReader->isStartElement() && (xmlReader->name().toString() == "cockatrice_server_stream")) {
+			int serverVersion = xmlReader->attributes().value("version").toString().toInt();
+			if (serverVersion != ProtocolItem::protocolVersion) {
+				emit protocolVersionMismatch(ProtocolItem::protocolVersion, serverVersion);
+				disconnectFromServer();
+				return;
 			}
+			xmlWriter->writeStartDocument();
+			xmlWriter->writeStartElement("cockatrice_client_stream");
+			xmlWriter->writeAttribute("version", QString::number(ProtocolItem::protocolVersion));
+			
+			topLevelItem = new TopLevelProtocolItem;
+			connect(topLevelItem, SIGNAL(protocolItemReceived(ProtocolItem *)), this, SLOT(processProtocolItem(ProtocolItem *)));
+			
+			setStatus(StatusLoggingIn);
+			Command_Login *cmdLogin = new Command_Login(userName, password);
+			connect(cmdLogin, SIGNAL(finished(ResponseCode)), this, SLOT(loginResponse(ResponseCode)));
+			sendCommand(cmdLogin);
 		}
 	}
 	if (status == StatusDisconnecting)

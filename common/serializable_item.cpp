@@ -17,14 +17,10 @@ void SerializableItem::registerSerializableItem(const QString &name, NewItemFunc
 	itemNameHash.insert(name, func);
 }
 
-bool SerializableItem::read(QXmlStreamReader *xml)
+bool SerializableItem::readElement(QXmlStreamReader *xml)
 {
-	while (!xml->atEnd()) {
-		xml->readNext();
-		readElement(xml);
-		if (xml->isEndElement() && (xml->name() == itemType))
-			return true;
-	}
+	if (xml->isEndElement() && (xml->name() == itemType))
+		return true;
 	return false;
 }
 
@@ -46,12 +42,14 @@ SerializableItem_Map::~SerializableItem_Map()
 		delete itemList[i];
 }
 
-void SerializableItem_Map::readElement(QXmlStreamReader *xml)
+bool SerializableItem_Map::readElement(QXmlStreamReader *xml)
 {
 	if (currentItem) {
-		if (currentItem->read(xml))
+		if (currentItem->readElement(xml))
 			currentItem = 0;
-	} else if (xml->isEndElement() && (xml->name() == itemType))
+	} else if (firstItem)
+		firstItem = false;
+	else if (xml->isEndElement() && (xml->name() == itemType))
 		extractData();
 	else if (xml->isStartElement()) {
 		QString childName = xml->name().toString();
@@ -63,9 +61,10 @@ void SerializableItem_Map::readElement(QXmlStreamReader *xml)
 			if (!currentItem)
 				currentItem = new SerializableItem_Invalid(childName);
 		}
-		if (currentItem->read(xml))
+		if (currentItem->readElement(xml))
 			currentItem = 0;
 	}
+	return SerializableItem::readElement(xml);
 }
 
 void SerializableItem_Map::writeElement(QXmlStreamWriter *xml)
@@ -77,10 +76,11 @@ void SerializableItem_Map::writeElement(QXmlStreamWriter *xml)
 		itemList[i]->write(xml);
 }
 
-void SerializableItem_String::readElement(QXmlStreamReader *xml)
+bool SerializableItem_String::readElement(QXmlStreamReader *xml)
 {
 	if (xml->isCharacters() && !xml->isWhitespace())
 		data = xml->text().toString();
+	return SerializableItem::readElement(xml);
 }
 
 void SerializableItem_String::writeElement(QXmlStreamWriter *xml)
@@ -88,7 +88,7 @@ void SerializableItem_String::writeElement(QXmlStreamWriter *xml)
 	xml->writeCharacters(data);
 }
 
-void SerializableItem_Int::readElement(QXmlStreamReader *xml)
+bool SerializableItem_Int::readElement(QXmlStreamReader *xml)
 {
 	if (xml->isCharacters() && !xml->isWhitespace()) {
 		bool ok;
@@ -96,6 +96,7 @@ void SerializableItem_Int::readElement(QXmlStreamReader *xml)
 		if (!ok)
 			data = -1;
 	}
+	return SerializableItem::readElement(xml);
 }
 
 void SerializableItem_Int::writeElement(QXmlStreamWriter *xml)
@@ -103,10 +104,11 @@ void SerializableItem_Int::writeElement(QXmlStreamWriter *xml)
 	xml->writeCharacters(QString::number(data));
 }
 
-void SerializableItem_Bool::readElement(QXmlStreamReader *xml)
+bool SerializableItem_Bool::readElement(QXmlStreamReader *xml)
 {
 	if (xml->isCharacters() && !xml->isWhitespace())
 		data = xml->text().toString() == "1";
+	return SerializableItem::readElement(xml);
 }
 
 void SerializableItem_Bool::writeElement(QXmlStreamWriter *xml)
@@ -124,13 +126,14 @@ QColor SerializableItem_Color::colorFromInt(int colorValue) const
 	return QColor(colorValue / 65536, (colorValue % 65536) / 256, colorValue % 256);
 }
 
-void SerializableItem_Color::readElement(QXmlStreamReader *xml)
+bool SerializableItem_Color::readElement(QXmlStreamReader *xml)
 {
 	if (xml->isCharacters() && !xml->isWhitespace()) {
 		bool ok;
 		int colorValue = xml->text().toString().toInt(&ok);
 		data = ok ? colorFromInt(colorValue) : Qt::black;
 	}
+	return SerializableItem::readElement(xml);
 }
 
 void SerializableItem_Color::writeElement(QXmlStreamWriter *xml)
@@ -138,13 +141,14 @@ void SerializableItem_Color::writeElement(QXmlStreamWriter *xml)
 	xml->writeCharacters(QString::number(colorToInt(data)));
 }
 
-void SerializableItem_DateTime::readElement(QXmlStreamReader *xml)
+bool SerializableItem_DateTime::readElement(QXmlStreamReader *xml)
 {
 	if (xml->isCharacters() && !xml->isWhitespace()) {
 		bool ok;
 		unsigned int dateTimeValue = xml->text().toString().toUInt(&ok);
 		data = ok ? QDateTime::fromTime_t(dateTimeValue) : QDateTime();
 	}
+	return SerializableItem::readElement(xml);
 }
 
 void SerializableItem_DateTime::writeElement(QXmlStreamWriter *xml)

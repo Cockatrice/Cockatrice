@@ -18,23 +18,22 @@ protected:
 	static QHash<QString, NewItemFunction> itemNameHash;
 	
 	QString itemType, itemSubType;
+	bool firstItem;
 public:
 	SerializableItem(const QString &_itemType, const QString &_itemSubType = QString())
-		: QObject(), itemType(_itemType), itemSubType(_itemSubType) { }
+		: QObject(), itemType(_itemType), itemSubType(_itemSubType), firstItem(true) { }
 	static void registerSerializableItem(const QString &name, NewItemFunction func);
 	static SerializableItem *getNewItem(const QString &name);
 	const QString &getItemType() const { return itemType; }
 	const QString &getItemSubType() const { return itemSubType; }
-	virtual void readElement(QXmlStreamReader *xml) = 0;
+	virtual bool readElement(QXmlStreamReader *xml);
 	virtual void writeElement(QXmlStreamWriter *xml) = 0;
-	bool read(QXmlStreamReader *xml);
 	void write(QXmlStreamWriter *xml);
 };
 
 class SerializableItem_Invalid : public SerializableItem {
 public:
 	SerializableItem_Invalid(const QString &_itemType) : SerializableItem(_itemType) { }
-	void readElement(QXmlStreamReader * /*xml*/) { }
 	void writeElement(QXmlStreamWriter * /*xml*/) { }
 };
 
@@ -65,7 +64,7 @@ public:
 	{
 	}
 	~SerializableItem_Map();
-	void readElement(QXmlStreamReader *xml);
+	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 	void appendItem(SerializableItem *item) { itemList.append(item); }
 };
@@ -74,7 +73,7 @@ class SerializableItem_String : public SerializableItem {
 private:
 	QString data;
 protected:
-	void readElement(QXmlStreamReader *xml);
+	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 public:
 	SerializableItem_String(const QString &_itemType, const QString &_data)
@@ -87,7 +86,7 @@ class SerializableItem_Int : public SerializableItem {
 private:
 	int data;
 protected:
-	void readElement(QXmlStreamReader *xml);
+	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 public:
 	SerializableItem_Int(const QString &_itemType, int _data)
@@ -100,7 +99,7 @@ class SerializableItem_Bool : public SerializableItem {
 private:
 	bool data;
 protected:
-	void readElement(QXmlStreamReader *xml);
+	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 public:
 	SerializableItem_Bool(const QString &_itemType, bool _data)
@@ -115,7 +114,7 @@ private:
 	int colorToInt(const QColor &color) const;
 	QColor colorFromInt(int colorValue) const;
 protected:
-	void readElement(QXmlStreamReader *xml);
+	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 public:
 	SerializableItem_Color(const QString &_itemType, const QColor &_data)
@@ -128,7 +127,7 @@ class SerializableItem_DateTime : public SerializableItem {
 private:
 	QDateTime data;
 protected:
-	void readElement(QXmlStreamReader *xml);
+	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 public:
 	SerializableItem_DateTime(const QString &_itemType, const QDateTime &_data)

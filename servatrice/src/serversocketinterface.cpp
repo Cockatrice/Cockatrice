@@ -73,18 +73,15 @@ void ServerSocketInterface::readClient()
 	qDebug() << data;
 	xmlReader->addData(data);
 	
-	if (topLevelItem)
-		topLevelItem->read(xmlReader);
-	else
-		while (!xmlReader->atEnd()) {
-			xmlReader->readNext();
-			if (xmlReader->isStartElement() && (xmlReader->name().toString() == "cockatrice_client_stream")) {
-				topLevelItem = new TopLevelProtocolItem;
-				connect(topLevelItem, SIGNAL(protocolItemReceived(ProtocolItem *)), this, SLOT(processProtocolItem(ProtocolItem *)));
-				
-				topLevelItem->read(xmlReader);
-			}
+	while (!xmlReader->atEnd()) {
+		xmlReader->readNext();
+		if (topLevelItem)
+			topLevelItem->readElement(xmlReader);
+		else if (xmlReader->isStartElement() && (xmlReader->name().toString() == "cockatrice_client_stream")) {
+			topLevelItem = new TopLevelProtocolItem;
+			connect(topLevelItem, SIGNAL(protocolItemReceived(ProtocolItem *)), this, SLOT(processProtocolItem(ProtocolItem *)));
 		}
+	}
 }
 
 void ServerSocketInterface::catchSocketError(QAbstractSocket::SocketError socketError)
