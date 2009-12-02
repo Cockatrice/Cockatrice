@@ -73,6 +73,7 @@ void TableZone::handleDropEventByGrid(int cardId, CardZone *startZone, const QPo
 
 void TableZone::reorganizeCards()
 {
+	update();
 }
 
 void TableZone::toggleTapped()

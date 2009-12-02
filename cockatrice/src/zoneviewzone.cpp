@@ -127,6 +127,7 @@ void ZoneViewZone::removeCard(int position)
 
 void ZoneViewZone::setGeometry(const QRectF &rect)
 {
+	prepareGeometryChange();
 	setPos(rect.topLeft());
 	height = rect.height();
 	reorganizeCards();
