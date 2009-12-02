@@ -116,7 +116,7 @@ AuthenticationResult Servatrice::checkUserPassword(const QString &user, const QS
 		checkSql();
 	
 		QSqlQuery query;
-		query.prepare("select password from players where name = :name");
+		query.prepare("select password from users where name = :name");
 		query.bindValue(":name", user);
 		if (!execSqlQuery(query))
 			return PasswordWrong;
