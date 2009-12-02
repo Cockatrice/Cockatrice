@@ -47,6 +47,7 @@ bool SerializableItem_Map::readElement(QXmlStreamReader *xml)
 	if (currentItem) {
 		if (currentItem->readElement(xml))
 			currentItem = 0;
+		return false;
 	} else if (firstItem)
 		firstItem = false;
 	else if (xml->isEndElement() && (xml->name() == itemType))
