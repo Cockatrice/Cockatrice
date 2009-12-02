@@ -32,6 +32,7 @@ private:
 	bool conceded;
 public:
 	Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator, Server_ProtocolHandler *_handler);
+	~Server_Player();
 	void setProtocolHandler(Server_ProtocolHandler *_handler) { handler = _handler; }
 	
 	void setPlayerId(int _id) { playerId = _id; }
