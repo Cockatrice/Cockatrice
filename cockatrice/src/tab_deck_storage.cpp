@@ -1,5 +1,4 @@
 #include <QtGui>
-#include <QDebug>
 #include "tab_deck_storage.h"
 #include "remotedecklist_treewidget.h"
 #include "client.h"
@@ -23,6 +22,8 @@ TabDeckStorage::TabDeckStorage(Client *_client)
 	localDirView->setRootIndex(sortFilter->mapFromSource(localDirModel->index(localDirModel->rootPath(), 0)));
 	localDirView->setSortingEnabled(true);
 	localDirView->header()->setResizeMode(QHeaderView::ResizeToContents);
+	sortFilter->sort(0, Qt::AscendingOrder);
+	localDirView->header()->setSortIndicator(0, Qt::AscendingOrder);
 	
 	leftToolBar = new QToolBar;
 	leftToolBar->setOrientation(Qt::Horizontal);
@@ -89,8 +90,6 @@ void TabDeckStorage::retranslateUi()
 	aDownload->setText(tr("Download deck"));
 	aNewFolder->setText(tr("New folder"));
 	aDelete->setText(tr("Delete"));
-	
-	serverDirView->retranslateUi();
 }
 
 void TabDeckStorage::actUpload()
@@ -110,11 +109,12 @@ void TabDeckStorage::actUpload()
 	}
 
 	QString targetPath;
-	QTreeWidgetItem *curRight = serverDirView->currentItem();
-	while ((curRight != 0) && (curRight->type() != TWIFolderType))
-		curRight = curRight->parent();
-	if (curRight)
-		targetPath = curRight->data(0, Qt::UserRole).toString();
+	RemoteDeckList_TreeModel::Node *curRight = serverDirView->getCurrentItem();
+	if (!curRight)
+		return;
+	if (!dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight))
+		curRight = curRight->getParent();
+	targetPath = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight)->getPath();
 
 	Command_DeckUpload *command = new Command_DeckUpload(deck, targetPath);
 	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(uploadFinished(ProtocolResponse *)));
@@ -128,14 +128,7 @@ void TabDeckStorage::uploadFinished(ProtocolResponse *r)
 		return;
 	Command_DeckUpload *cmd = static_cast<Command_DeckUpload *>(sender());
 
-	QTreeWidgetItemIterator it(serverDirView);
-	while (*it) {
-		if ((*it)->data(0, Qt::UserRole) == cmd->getPath()) {
-			serverDirView->addFileToTree(resp->getFile(), *it);
-			break;
-		}
-		++it;
-	}
+	serverDirView->addFileToTree(resp->getFile(), serverDirView->getNodeByPath(cmd->getPath()));
 }
 
 void TabDeckStorage::actDownload()
@@ -150,12 +143,12 @@ void TabDeckStorage::actDownload()
 		filePath = localDirModel->filePath(curLeft);
 	}
 
-	QTreeWidgetItem *curRight = serverDirView->currentItem();
-	if ((!curRight) || (curRight->type() != TWIDeckType))
+	RemoteDeckList_TreeModel::FileNode *curRight = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(serverDirView->getCurrentItem());
+	if (!curRight)
 		return;
-	filePath += "/" + curRight->data(1, Qt::DisplayRole).toString() + ".cod";
+	filePath += QString("/deck_%1.cod").arg(curRight->getId());
 
-	Command_DeckDownload *command = new Command_DeckDownload(curRight->data(1, Qt::DisplayRole).toInt());
+	Command_DeckDownload *command = new Command_DeckDownload(curRight->getId());
 	command->setExtraData(filePath);
 	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(downloadFinished(ProtocolResponse *)));
 	client->sendCommand(command);
@@ -179,11 +172,13 @@ void TabDeckStorage::actNewFolder()
 		return;
 
 	QString targetPath;
-	QTreeWidgetItem *curRight = serverDirView->currentItem();
-	while ((curRight != 0) && (curRight->type() != TWIFolderType))
-		curRight = curRight->parent();
-	if (curRight)
-		targetPath = curRight->data(0, Qt::UserRole).toString();
+	RemoteDeckList_TreeModel::Node *curRight = serverDirView->getCurrentItem();
+	if (!curRight)
+		return;
+	if (!dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight))
+		curRight = curRight->getParent();
+	RemoteDeckList_TreeModel::DirectoryNode *dir = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight);
+	targetPath = dir->getPath();
 
 	Command_DeckNewDir *command = new Command_DeckNewDir(targetPath, folderName);
 	connect(command, SIGNAL(finished(ResponseCode)), this, SLOT(newFolderFinished(ResponseCode)));
@@ -196,33 +191,23 @@ void TabDeckStorage::newFolderFinished(ResponseCode resp)
 		return;
 
 	Command_DeckNewDir *cmd = static_cast<Command_DeckNewDir *>(sender());
-
-	qDebug() << cmd->getPath() << cmd->getDirName();
-	QTreeWidgetItemIterator it(serverDirView);
-	while (*it) {
-		if ((*it)->data(0, Qt::UserRole) == cmd->getPath()) {
-			QFileIconProvider fip;
-			QTreeWidgetItem *newItem = new QTreeWidgetItem(TWIFolderType);
-			newItem->setIcon(0, fip.icon(QFileIconProvider::Folder));
-			newItem->setText(0, cmd->getDirName());
-			newItem->setData(0, Qt::UserRole, cmd->getPath() + "/" + cmd->getDirName());
-			(*it)->addChild(newItem);
-			break;
-		}
-		++it;
-	}
+	serverDirView->addFolderToTree(cmd->getDirName(), serverDirView->getNodeByPath(cmd->getPath()));
 }
 
 void TabDeckStorage::actDelete()
 {
 	Command *command;
-	QTreeWidgetItem *curRight = serverDirView->currentItem();
-	if (curRight->type() == TWIFolderType) {
-		if (curRight->data(0, Qt::UserRole).toString().isEmpty())
+	RemoteDeckList_TreeModel::Node *curRight = serverDirView->getCurrentItem();
+	if (!curRight)
+		return;
+	RemoteDeckList_TreeModel::DirectoryNode *dir = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight);
+	if (dir) {
+		QString path = dir->getPath();
+		if (path.isEmpty())
 			return;
-		command = new Command_DeckDelDir(curRight->data(0, Qt::UserRole).toString());
+		command = new Command_DeckDelDir(path);
 	} else
-		command = new Command_DeckDel(curRight->data(1, Qt::DisplayRole).toInt());
+		command = new Command_DeckDel(dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight)->getId());
 	connect(command, SIGNAL(finished(ResponseCode)), this, SLOT(deleteFinished(ResponseCode)));
 	client->sendCommand(command);
 }
@@ -232,27 +217,13 @@ void TabDeckStorage::deleteFinished(ResponseCode resp)
 	if (resp != RespOk)
 		return;
 
-	QTreeWidgetItem *toDelete = 0;
-	QTreeWidgetItemIterator it(serverDirView);
+	RemoteDeckList_TreeModel::Node *toDelete = 0;
 	Command_DeckDelDir *cmdDelDir = qobject_cast<Command_DeckDelDir *>(sender());
-	if (cmdDelDir) {
-		while (*it) {
-			if ((*it)->data(0, Qt::UserRole).toString() == cmdDelDir->getPath()) {
-				toDelete = *it;
-				break;
-			}
-			++it;
-		}
-	} else {
-		Command_DeckDel *cmdDel = qobject_cast<Command_DeckDel *>(sender());
-		while (*it) {
-			if ((*it)->data(1, Qt::DisplayRole).toInt() == cmdDel->getDeckId()) {
-				toDelete = *it;
-				break;
-			}
-			++it;
-		}
-	}
+	if (cmdDelDir)
+		toDelete = serverDirView->getNodeByPath(cmdDelDir->getPath());
+	else
+		toDelete = serverDirView->getNodeById(static_cast<Command_DeckDel *>(sender())->getDeckId());
+	
 	if (toDelete)
-		delete toDelete;
+		serverDirView->removeNode(toDelete);
 }

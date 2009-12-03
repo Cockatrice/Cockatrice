@@ -4,7 +4,7 @@
 #include <QDialog>
 
 class RemoteDeckList_TreeWidget;
-class QTreeWidgetItem;
+class QModelIndex;
 class Client;
 class QPushButton;
 
@@ -15,7 +15,7 @@ private:
 	RemoteDeckList_TreeWidget *dirView;
 	QPushButton *okButton, *cancelButton;
 private slots:
-	void currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+	void currentItemChanged(const QModelIndex &current, const QModelIndex &previous);
 public:
 	DlgLoadRemoteDeck(Client *_client, QWidget *parent = 0);
 	int getDeckId() const;

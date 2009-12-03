@@ -31,22 +31,17 @@ DlgLoadRemoteDeck::DlgLoadRemoteDeck(Client *_client, QWidget *parent)
 	setMinimumWidth(sizeHint().width());
 	resize(300, 500);
 
-	connect(dirView, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
+	connect(dirView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(currentItemChanged(const QModelIndex &, const QModelIndex &)));
 	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
-void DlgLoadRemoteDeck::currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem * /*previous*/)
+void DlgLoadRemoteDeck::currentItemChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
-	if (!current)
-		okButton->setEnabled(false);
-	else if (current->type() == TWIDeckType)
-		okButton->setEnabled(true);
-	else
-		okButton->setEnabled(false);
+	okButton->setEnabled(dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(dirView->getNode(current)));
 }
 
 int DlgLoadRemoteDeck::getDeckId() const
 {
-	return dirView->currentItem()->data(1, Qt::DisplayRole).toInt();
+	return dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(dirView->getNode(dirView->selectionModel()->currentIndex()))->getId();
 }
