@@ -109,7 +109,7 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 void AbstractCardItem::setName(const QString &_name)
 {
-  	disconnect(info, 0, this, 0);
+	disconnect(info, 0, this, 0);
 	name = _name;
 	info = db->getCard(name);
 	connect(info, SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));

@@ -45,7 +45,6 @@ class Player : public QObject, public QGraphicsItem {
 signals:
 	void closeZoneView(ZoneViewZone *zone);
 	void toggleZoneView(Player *player, QString zoneName, int number);
-	void sigShowCardMenu(QPoint p); // XXX
 	void newCardAdded(CardItem *card);
 	// Log events
 	void logDeckSelect(Player *player, int deckId);
@@ -84,6 +83,8 @@ public slots:
 	void actSayMessage();
 private slots:
 	void updateBoundingRect();
+	void cardMenuAction();
+	void actSetCounters();
 private:
 	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *countersMenu, *sayMenu;
 	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
@@ -92,6 +93,25 @@ private:
 		*aViewLibrary, *aViewTopCards, *aViewGraveyard, *aViewRfg, *aViewSideboard,
                 *aDrawCard, *aDrawCards, *aMulligan, *aShuffle,
 		*aUntapAll, *aRollDie, *aCreateToken;
+
+	typedef void (Player::*CardMenuHandler)(CardItem *card);
+	QHash<QAction *, CardMenuHandler> cardMenuHandlers;
+	
+	QMenu *cardMenu, *moveMenu;
+	QAction *aTap, *aUntap, *aDoesntUntap, *aFlip, *aAddCounter, *aRemoveCounter, *aSetCounters,
+		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile;
+
+
+	void actTap(CardItem *card);
+	void actUntap(CardItem *card);
+	void actDoesntUntap(CardItem *card);
+	void actFlip(CardItem *card);
+	void actAddCounter(CardItem *card);
+	void actRemoveCounter(CardItem *card);
+	void actMoveToTopLibrary(CardItem *card);
+	void actMoveToBottomLibrary(CardItem *card);
+	void actMoveToGraveyard(CardItem *card);
+	void actMoveToExile(CardItem *card);
 
 	int defaultNumberTopCards;
         int mulliganCards;
