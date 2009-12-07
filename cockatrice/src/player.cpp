@@ -563,6 +563,10 @@ void Player::eventSetCardAttr(Event_SetCardAttr *event)
 			emit logSetTapped(this, QString("-1"), event->getAttrValue() == "1");
 	} else {
 		CardItem *card = zone->getCard(event->getCardId(), QString());
+		if (!card) {
+			qDebug() << "Player::eventSetCardAttr: card id=" << event->getCardId() << "not found";
+			return;
+		}
 		setCardAttrHelper(card, event->getAttrName(), event->getAttrValue(), false);
 	}
 }

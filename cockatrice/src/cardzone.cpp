@@ -99,6 +99,10 @@ void CardZone::addCard(CardItem *card, bool reorganize, int x, int y)
 CardItem *CardZone::getCard(int cardId, const QString &cardName)
 {
 	CardItem *c = cards.findCard(cardId, false);
+	if (!c) {
+		qDebug() << "CardZone::getCard: card id=" << cardId << "not found";
+		return 0;
+	}
 	// If the card's id is -1, this zone is invisible,
 	// so we need to give the card an id and a name as it comes out.
 	// It can be assumed that in an invisible zone, all cards are equal.

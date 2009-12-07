@@ -65,8 +65,7 @@ void Server::closeOldSession(const QString &playerName)
 		}
 	if (session) {
 		qDebug() << "found";
-		removeClient(session);
-		delete session;
+		delete session; // ~Server_ProtocolHandler() will call Server::removeClient
 	}
 }
 
