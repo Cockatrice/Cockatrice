@@ -119,8 +119,8 @@ CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName, 
 			}
 		if (position == -1)
 			return 0;
-	}
-	Q_ASSERT(position < cards.size());
+	} else if (position >= cards.size())
+		return 0;
 
 	CardItem *c = cards.takeAt(position);
 

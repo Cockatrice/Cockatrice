@@ -242,6 +242,7 @@ Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabG
 	} else {
 		countersMenu = 0;
 		sbMenu = 0;
+		cardMenu = 0;
 	}
 	
 	retranslateUi();
