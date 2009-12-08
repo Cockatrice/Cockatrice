@@ -116,14 +116,17 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
 CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName, bool /*canResize*/)
 {
 	if (position == -1) {
+		// position == -1 means either that the zone is indexed by card id
+		// or that it doesn't matter which card you take.
 		for (int i = 0; i < cards.size(); ++i)
 			if (cards[i]->getId() == cardId) {
 				position = i;
 				break;
 			}
 		if (position == -1)
-			return 0;
-	} else if (position >= cards.size())
+			position = 0;
+	}
+	if (position >= cards.size())
 		return 0;
 
 	CardItem *c = cards.takeAt(position);
