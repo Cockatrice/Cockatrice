@@ -7,6 +7,7 @@ GameView::GameView(QGraphicsScene *scene, QWidget *parent)
 	setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing/* | QPainter::SmoothPixmapTransform*/);
 	setDragMode(RubberBandDrag);
 	setViewportUpdateMode(BoundingRectViewportUpdate);
+	setFocusPolicy(Qt::NoFocus);
 
 	connect(scene, SIGNAL(sceneRectChanged(const QRectF &)), this, SLOT(updateSceneRect(const QRectF &)));
 }

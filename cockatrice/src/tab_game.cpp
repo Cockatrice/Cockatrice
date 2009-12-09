@@ -129,7 +129,7 @@ void TabGame::retranslateUi()
 	
 	loadLocalButton->setText(tr("Load &local deck"));
 	loadRemoteButton->setText(tr("Load d&eck from server"));
-	readyStartButton->setText(tr("&Start game"));
+	readyStartButton->setText(tr("S&tart game"));
 	sayLabel->setText(tr("&Say:"));
 	cardInfo->retranslateUi();
 	zoneLayout->retranslateUi();
