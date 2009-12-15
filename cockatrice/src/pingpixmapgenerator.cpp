@@ -7,7 +7,7 @@ QPixmap PingPixmapGenerator::generatePixmap(int size, int value, int max)
 	pixmap.fill(Qt::transparent);
 	QPainter painter(&pixmap);
 	QColor color;
-	if (max == -1)
+	if ((max == -1) || (value == -1))
 		color = Qt::black;
 	else
 		color.setHsv(120 * (1.0 - ((double) value / max)), 255, 255);
