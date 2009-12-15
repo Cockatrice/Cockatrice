@@ -363,22 +363,6 @@ void Player::initSayMenu()
 	}
 }
 
-void Player::prepareForGame()
-{
-	if (local) {
-		sendGameCommand(new Command_CreateCounter(-1, "life", Qt::white, 25, 20));
-		sendGameCommand(new Command_CreateCounter(-1, "w", QColor(255, 255, 150), 20, 0));
-		sendGameCommand(new Command_CreateCounter(-1, "u", QColor(150, 150, 255), 20, 0));
-		sendGameCommand(new Command_CreateCounter(-1, "b", QColor(150, 150, 150), 20, 0));
-		sendGameCommand(new Command_CreateCounter(-1, "r", QColor(250, 150, 150), 20, 0));
-		sendGameCommand(new Command_CreateCounter(-1, "g", QColor(150, 255, 150), 20, 0));
-		sendGameCommand(new Command_CreateCounter(-1, "x", QColor(255, 255, 255), 20, 0));
-		sendGameCommand(new Command_CreateCounter(-1, "storm", QColor(255, 255, 255), 20, 0));
-		
-		mulliganCards = 7;
-	}
-}
-
 void Player::actViewLibrary()
 {
 	emit toggleZoneView(this, "deck", -1);
@@ -421,14 +405,7 @@ void Player::actDrawCard()
 
 void Player::actMulligan()
 {
-	if (mulliganCards <= 0)
-		return;
-	
-	const CardList &handCards = hand->getCards();
-	for (int i = 0; i < handCards.size(); i++)
-		sendGameCommand(new Command_MoveCard(-1, "hand", handCards.at(i)->getId(), "deck", 0, -1, false));
-	sendGameCommand(new Command_Shuffle);
-	sendGameCommand(new Command_DrawCards(-1, mulliganCards--));
+	sendGameCommand(new Command_Mulligan);
 }
 
 void Player::actDrawCards()

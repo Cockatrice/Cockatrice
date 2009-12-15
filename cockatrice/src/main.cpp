@@ -37,7 +37,7 @@
 CardDatabase *db;
 QTranslator *translator;
 
-void myMessageOutput(QtMsgType type, const char *msg)
+void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
 	static FILE *f = NULL;
 	if (!f)

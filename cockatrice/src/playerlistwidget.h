@@ -16,6 +16,7 @@ public:
 	void addPlayer(ServerInfo_Player *player);
 	void removePlayer(int playerId);
 	void setActivePlayer(int playerId);
+	void updatePing(int playerId, int pingTime);
 };
 
 #endif

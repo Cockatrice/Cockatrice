@@ -11,10 +11,15 @@
 #include "server_game.h"
 #include "server_player.h"
 #include "decklist.h"
+#include <QDateTime>
+#include <QTimer>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
-	: QObject(parent), server(_server), authState(PasswordWrong), acceptsGameListChanges(false)
+	: QObject(parent), server(_server), authState(PasswordWrong), acceptsGameListChanges(false), lastCommandTime(QDateTime::currentDateTime())
 {
+	pingClock = new QTimer(this);
+	connect(pingClock, SIGNAL(timeout()), this, SLOT(pingClockTimeout()));
+	pingClock->start(1000);
 }
 
 Server_ProtocolHandler::~Server_ProtocolHandler()
@@ -42,6 +47,8 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 
 void Server_ProtocolHandler::processCommand(Command *command)
 {
+	lastCommandTime = QDateTime::currentDateTime();
+
 	ResponseCode response = RespInvalidCommand;
 	
 	ChatCommand *chatCommand = qobject_cast<ChatCommand *>(command);
@@ -84,6 +91,7 @@ void Server_ProtocolHandler::processCommand(Command *command)
 			case ItemId_Command_Concede: response = cmdConcede(qobject_cast<Command_Concede *>(command), game, player); break;
 			case ItemId_Command_Say: response = cmdSay(qobject_cast<Command_Say *>(command), game, player); break;
 			case ItemId_Command_Shuffle: response = cmdShuffle(qobject_cast<Command_Shuffle *>(command), game, player); break;
+			case ItemId_Command_Mulligan: response = cmdMulligan(qobject_cast<Command_Mulligan *>(command), game, player); break;
 			case ItemId_Command_RollDie: response = cmdRollDie(qobject_cast<Command_RollDie *>(command), game, player); break;
 			case ItemId_Command_DrawCards: response = cmdDrawCards(qobject_cast<Command_DrawCards *>(command), game, player); break;
 			case ItemId_Command_MoveCard: response = cmdMoveCard(qobject_cast<Command_MoveCard *>(command), game, player); break;
@@ -127,9 +135,15 @@ void Server_ProtocolHandler::processCommand(Command *command)
 		sendProtocolItem(itemQueue.takeFirst());
 }
 
+void Server_ProtocolHandler::pingClockTimeout()
+{
+	if (lastCommandTime.secsTo(QDateTime::currentDateTime()) > 10)
+		deleteLater();
+}
+
 void Server_ProtocolHandler::enqueueProtocolItem(ProtocolItem *item)
 {
-	itemQueue << item;
+	itemQueue.append(item);
 }
 
 QPair<Server_Game *, Server_Player *> Server_ProtocolHandler::getGame(int gameId) const
@@ -156,17 +170,19 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd)
 	playerName = userName;
 	enqueueProtocolItem(new Event_ServerMessage(server->getLoginMessage()));
 
-	// This might not scale very well. Use an extra QMap if it becomes a problem.
-	const QList<Server_Game *> &serverGames = server->getGames();
-	for (int i = 0; i < serverGames.size(); ++i) {
-		const QList<Server_Player *> &gamePlayers = serverGames[i]->getPlayers();
-		for (int j = 0; j < gamePlayers.size(); ++j)
-			if (gamePlayers[j]->getPlayerName() == playerName) {
-				gamePlayers[j]->setProtocolHandler(this);
-				games.insert(serverGames[i]->getGameId(), QPair<Server_Game *, Server_Player *>(serverGames[i], gamePlayers[j]));
-				enqueueProtocolItem(new Event_GameJoined(serverGames[i]->getGameId(), gamePlayers[j]->getPlayerId(), gamePlayers[j]->getSpectator()));
-				enqueueProtocolItem(new Event_GameStateChanged(serverGames[i]->getGameId(), serverGames[i]->getGameStarted(), serverGames[i]->getActivePlayer(), serverGames[i]->getActivePhase(), serverGames[i]->getGameState(gamePlayers[j])));
-			}
+	if (authState == PasswordRight) {
+		// This might not scale very well. Use an extra QMap if it becomes a problem.
+		const QList<Server_Game *> &serverGames = server->getGames();
+		for (int i = 0; i < serverGames.size(); ++i) {
+			const QList<Server_Player *> &gamePlayers = serverGames[i]->getPlayers();
+			for (int j = 0; j < gamePlayers.size(); ++j)
+				if (gamePlayers[j]->getPlayerName() == playerName) {
+					gamePlayers[j]->setProtocolHandler(this);
+					games.insert(serverGames[i]->getGameId(), QPair<Server_Game *, Server_Player *>(serverGames[i], gamePlayers[j]));
+					enqueueProtocolItem(new Event_GameJoined(serverGames[i]->getGameId(), gamePlayers[j]->getPlayerId(), gamePlayers[j]->getSpectator(), true));
+					enqueueProtocolItem(new Event_GameStateChanged(serverGames[i]->getGameId(), serverGames[i]->getGameStarted(), serverGames[i]->getActivePlayer(), serverGames[i]->getActivePhase(), serverGames[i]->getGameState(gamePlayers[j])));
+				}
+		}
 	}
 
 	return RespOk;
@@ -249,7 +265,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd)
 	Server_Player *creator = game->getCreator();
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	
-	enqueueProtocolItem(new Event_GameJoined(game->getGameId(), creator->getPlayerId(), false));
+	enqueueProtocolItem(new Event_GameJoined(game->getGameId(), creator->getPlayerId(), false, false));
 	enqueueProtocolItem(new Event_GameStateChanged(game->getGameId(), game->getGameStarted(), game->getActivePlayer(), game->getActivePhase(), game->getGameState(creator)));
 	return RespOk;
 }
@@ -264,7 +280,7 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd)
 	if (result == RespOk) {
 		Server_Player *player = g->addPlayer(this, cmd->getSpectator());
 		games.insert(cmd->getGameId(), QPair<Server_Game *, Server_Player *>(g, player));
-		enqueueProtocolItem(new Event_GameJoined(cmd->getGameId(), player->getPlayerId(), cmd->getSpectator()));
+		enqueueProtocolItem(new Event_GameJoined(cmd->getGameId(), player->getPlayerId(), cmd->getSpectator(), false));
 		enqueueProtocolItem(new Event_GameStateChanged(cmd->getGameId(), g->getGameStarted(), g->getActivePlayer(), g->getActivePhase(), g->getGameState(player)));
 	}
 	return result;
@@ -272,6 +288,7 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd)
 
 ResponseCode Server_ProtocolHandler::cmdLeaveGame(Command_LeaveGame * /*cmd*/, Server_Game *game, Server_Player *player)
 {
+	games.remove(game->getGameId());
 	game->removePlayer(player);
 	return RespOk;
 }
@@ -330,17 +347,35 @@ ResponseCode Server_ProtocolHandler::cmdShuffle(Command_Shuffle * /*cmd*/, Serve
 	return RespOk;
 }
 
+ResponseCode Server_ProtocolHandler::cmdMulligan(Command_Mulligan * /*cmd*/, Server_Game *game, Server_Player *player)
+{
+	int number = player->getInitialCards();
+	if (!number)
+		return RespContextError;
+
+	Server_CardZone *hand = player->getZones().value("hand");
+	while (!hand->cards.isEmpty())
+		moveCard(game, player, "hand", hand->cards.first()->getId(), "deck", 0, 0, false);
+
+	player->getZones().value("deck")->shuffle();
+	game->sendGameEvent(new Event_Shuffle(-1, player->getPlayerId()));
+
+	drawCards(game, player, number);
+	player->setInitialCards(number - 1);
+
+	return RespOk;
+}
+
 ResponseCode Server_ProtocolHandler::cmdRollDie(Command_RollDie *cmd, Server_Game *game, Server_Player *player)
 {
 	game->sendGameEvent(new Event_RollDie(-1, player->getPlayerId(), cmd->getSides(), rng->getNumber(1, cmd->getSides())));
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdDrawCards(Command_DrawCards *cmd, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::drawCards(Server_Game *game, Server_Player *player, int number)
 {
 	Server_CardZone *deck = player->getZones().value("deck");
 	Server_CardZone *hand = player->getZones().value("hand");
-	int number = cmd->getNumber();
 	if (deck->cards.size() < number)
 		number = deck->cards.size();
 
@@ -350,53 +385,55 @@ ResponseCode Server_ProtocolHandler::cmdDrawCards(Command_DrawCards *cmd, Server
 		hand->cards.append(card);
 		cardList.append(new ServerInfo_Card(card->getId(), card->getName()));
 	}
-	
+
 	player->sendProtocolItem(new Event_DrawCards(game->getGameId(), player->getPlayerId(), cardList.size(), cardList));
 	game->sendGameEvent(new Event_DrawCards(-1, player->getPlayerId(), cardList.size()), player);
 
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, Server_Game *game, Server_Player *player)
+
+ResponseCode Server_ProtocolHandler::cmdDrawCards(Command_DrawCards *cmd, Server_Game *game, Server_Player *player)
 {
-	// ID Karte, Startzone, Zielzone, Koordinaten X, Y, Facedown
-	Server_CardZone *startzone = player->getZones().value(cmd->getStartZone());
-	Server_CardZone *targetzone = player->getZones().value(cmd->getTargetZone());
+	return drawCards(game, player, cmd->getNumber());
+}
+
+ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *player, const QString &_startZone, int _cardId, const QString &_targetZone, int x, int y, bool faceDown)
+{
+	Server_CardZone *startzone = player->getZones().value(_startZone);
+	Server_CardZone *targetzone = player->getZones().value(_targetZone);
 	if ((!startzone) || (!targetzone))
 		return RespNameNotFound;
 
 	int position = -1;
-	Server_Card *card = startzone->getCard(cmd->getCardId(), true, &position);
+	Server_Card *card = startzone->getCard(_cardId, true, &position);
 	if (!card)
 		return RespNameNotFound;
-	int x = cmd->getX();
 	if (x == -1)
 		x = targetzone->cards.size();
-	int y = 0;
-	if (targetzone->hasCoords())
-		y = cmd->getY();
-	bool facedown = cmd->getFaceDown();
+	if (!targetzone->hasCoords())
+		y = 0;
 
 	targetzone->insertCard(card, x, y);
 
 	bool targetBeingLookedAt = (targetzone->getType() != HiddenZone) || (targetzone->getCardsBeingLookedAt() > x) || (targetzone->getCardsBeingLookedAt() == -1);
 	bool sourceBeingLookedAt = (startzone->getType() != HiddenZone) || (startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1);
 
-	bool targetHiddenToPlayer = facedown || !targetBeingLookedAt;
-	bool targetHiddenToOthers = facedown || (targetzone->getType() != PublicZone);
+	bool targetHiddenToPlayer = faceDown || !targetBeingLookedAt;
+	bool targetHiddenToOthers = faceDown || (targetzone->getType() != PublicZone);
 	bool sourceHiddenToPlayer = card->getFaceDown() || !sourceBeingLookedAt;
 	bool sourceHiddenToOthers = card->getFaceDown() || (startzone->getType() != PublicZone);
-	
+
 	QString privateCardName, publicCardName;
 	if (!(sourceHiddenToPlayer && targetHiddenToPlayer))
 		privateCardName = card->getName();
 	if (!(sourceHiddenToOthers && targetHiddenToOthers))
 		publicCardName = card->getName();
-		
-	if (facedown)
+
+	if (faceDown)
 		card->setId(player->newCardId());
-	card->setFaceDown(facedown);
-	
+	card->setFaceDown(faceDown);
+
 	// The player does not get to see which card he moved if it moves between two parts of hidden zones which
 	// are not being looked at.
 	int privateCardId = card->getId();
@@ -407,7 +444,7 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, Server_G
 	int privatePosition = -1;
 	if (startzone->getType() == HiddenZone)
 		privatePosition = position;
-	player->sendProtocolItem(new Event_MoveCard(game->getGameId(), player->getPlayerId(), privateCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getName(), x, y, facedown));
+	player->sendProtocolItem(new Event_MoveCard(game->getGameId(), player->getPlayerId(), privateCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getName(), x, y, faceDown));
 
 	// Other players do not get to see the start and/or target position of the card if the respective
 	// part of the zone is being looked at. The information is not needed anyway because in hidden zones,
@@ -416,9 +453,9 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, Server_G
 		position = -1;
 	if ((targetzone->getType() == HiddenZone) && ((targetzone->getCardsBeingLookedAt() > x) || (targetzone->getCardsBeingLookedAt() == -1)))
 		x = -1;
-	
+
 	if ((startzone->getType() == PublicZone) || (targetzone->getType() == PublicZone))
-		game->sendGameEvent(new Event_MoveCard(-1, player->getPlayerId(), card->getId(), publicCardName, startzone->getName(), position, targetzone->getName(), x, y, facedown), player);
+		game->sendGameEvent(new Event_MoveCard(-1, player->getPlayerId(), card->getId(), publicCardName, startzone->getName(), position, targetzone->getName(), x, y, faceDown), player);
 	else
 		game->sendGameEvent(new Event_MoveCard(-1, player->getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getName(), x, y, false), player);
 
@@ -439,6 +476,11 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, Server_G
 	}
 
 	return RespOk;
+}
+
+ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, Server_Game *game, Server_Player *player)
+{
+	return moveCard(game, player, cmd->getStartZone(), cmd->getCardId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown());
 }
 
 ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, Server_Game *game, Server_Player *player)

@@ -8,6 +8,7 @@
 #include "protocol_items.h"
 
 class Server_Player;
+class QTimer;
 
 class Server_ProtocolHandler : public QObject {
 	Q_OBJECT
@@ -16,7 +17,7 @@ protected:
 	QMap<int, QPair<Server_Game *, Server_Player *> > games;
 	QMap<QString, Server_ChatChannel *> chatChannels;
 	QString playerName;
-	
+
 	Server *getServer() const { return server; }
 	QPair<Server_Game *, Server_Player *> getGame(int gameId) const;
 
@@ -26,7 +27,9 @@ protected:
 	
 private:
 	QList<ProtocolItem *> itemQueue;
-	
+	QDateTime lastCommandTime;
+	QTimer *pingClock;
+
 	virtual DeckList *getDeckFromDatabase(int deckId) = 0;
 
 	ResponseCode cmdPing(Command_Ping *cmd);
@@ -50,8 +53,12 @@ private:
 	ResponseCode cmdDeckSelect(Command_DeckSelect *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdSay(Command_Say *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdShuffle(Command_Shuffle *cmd, Server_Game *game, Server_Player *player);
+	ResponseCode cmdMulligan(Command_Mulligan *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdRollDie(Command_RollDie *cmd, Server_Game *game, Server_Player *player);
+	// XXX Maybe the following function and others belong into Server_Player
+	ResponseCode drawCards(Server_Game *game, Server_Player *player, int number);
 	ResponseCode cmdDrawCards(Command_DrawCards *cmd, Server_Game *game, Server_Player *player);
+	ResponseCode moveCard(Server_Game *game, Server_Player *player, const QString &_startZone, int _cardId, const QString &_targetZone, int _x, int _y, bool _faceDown);
 	ResponseCode cmdMoveCard(Command_MoveCard *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdCreateToken(Command_CreateToken *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdCreateArrow(Command_CreateArrow *cmd, Server_Game *game, Server_Player *player);
@@ -65,6 +72,8 @@ private:
 	ResponseCode cmdSetActivePhase(Command_SetActivePhase *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdDumpZone(Command_DumpZone *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdStopDumpZone(Command_StopDumpZone *cmd, Server_Game *game, Server_Player *player);
+private slots:
+	void pingClockTimeout();
 public:
 	Server_ProtocolHandler(Server *_server, QObject *parent = 0);
 	~Server_ProtocolHandler();
@@ -72,7 +81,8 @@ public:
 	bool getAcceptsGameListChanges() const { return acceptsGameListChanges; }
 	bool getAcceptsChatChannelListChanges() const { return acceptsChatChannelListChanges; }
 	const QString &getPlayerName() const { return playerName; }
-	
+	const QDateTime &getLastCommandTime() const { return lastCommandTime; }
+
 	void processCommand(Command *command);
 	virtual void sendProtocolItem(ProtocolItem *item, bool deleteItem = true) = 0;
 	void enqueueProtocolItem(ProtocolItem *item);

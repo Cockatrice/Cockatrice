@@ -27,6 +27,7 @@ enum ItemId {
 	ItemId_Event_CreateCounters = ItemId_Other + 205,
 	ItemId_Event_DrawCards = ItemId_Other + 206,
 	ItemId_Event_Join = ItemId_Other + 207,
+	ItemId_Event_Ping = ItemId_Other + 208,
 	ItemId_Response_DeckList = ItemId_Other + 300,
 	ItemId_Response_DeckDownload = ItemId_Other + 301,
 	ItemId_Response_DeckUpload = ItemId_Other + 302,
@@ -255,6 +256,15 @@ public:
 	bool getGameStarted() const { return static_cast<SerializableItem_Bool *>(itemMap.value("game_started"))->getData(); }
 	int getActivePlayer() const { return static_cast<SerializableItem_Int *>(itemMap.value("active_player"))->getData(); }
 	int getActivePhase() const { return static_cast<SerializableItem_Int *>(itemMap.value("active_phase"))->getData(); }
+};
+
+class Event_Ping : public GameEvent {
+	Q_OBJECT
+public:
+	Event_Ping(int _gameId = -1, const QList<ServerInfo_PlayerPing *> &_pingList = QList<ServerInfo_PlayerPing *>());
+	static SerializableItem *newItem() { return new Event_Ping; }
+	int getItemId() const { return ItemId_Event_Ping; }
+	QList<ServerInfo_PlayerPing *> getPingList() const { return typecastItemList<ServerInfo_PlayerPing *>(); }
 };
 
 class Event_CreateArrows : public GameEvent {

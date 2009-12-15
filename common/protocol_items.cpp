@@ -86,6 +86,10 @@ Command_Shuffle::Command_Shuffle(int _gameId)
 	: GameCommand("shuffle", _gameId)
 {
 }
+Command_Mulligan::Command_Mulligan(int _gameId)
+	: GameCommand("mulligan", _gameId)
+{
+}
 Command_RollDie::Command_RollDie(int _gameId, int _sides)
 	: GameCommand("roll_die", _gameId)
 {
@@ -220,10 +224,6 @@ Event_Concede::Event_Concede(int _gameId, int _playerId)
 	: GameEvent("concede", _gameId, _playerId)
 {
 }
-Event_GameStart::Event_GameStart(int _gameId, int _playerId)
-	: GameEvent("game_start", _gameId, _playerId)
-{
-}
 Event_Shuffle::Event_Shuffle(int _gameId, int _playerId)
 	: GameEvent("shuffle", _gameId, _playerId)
 {
@@ -308,12 +308,13 @@ Event_ServerMessage::Event_ServerMessage(const QString &_message)
 {
 	insertItem(new SerializableItem_String("message", _message));
 }
-Event_GameJoined::Event_GameJoined(int _gameId, int _playerId, bool _spectator)
+Event_GameJoined::Event_GameJoined(int _gameId, int _playerId, bool _spectator, bool _resuming)
 	: GenericEvent("game_joined")
 {
 	insertItem(new SerializableItem_Int("game_id", _gameId));
 	insertItem(new SerializableItem_Int("player_id", _playerId));
 	insertItem(new SerializableItem_Bool("spectator", _spectator));
+	insertItem(new SerializableItem_Bool("resuming", _resuming));
 }
 Event_ChatJoinChannel::Event_ChatJoinChannel(const QString &_channel, const QString &_playerName)
 	: ChatEvent("chat_join_channel", _channel)
@@ -350,6 +351,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdleave_game", Command_LeaveGame::newItem);
 	itemNameHash.insert("cmdsay", Command_Say::newItem);
 	itemNameHash.insert("cmdshuffle", Command_Shuffle::newItem);
+	itemNameHash.insert("cmdmulligan", Command_Mulligan::newItem);
 	itemNameHash.insert("cmdroll_die", Command_RollDie::newItem);
 	itemNameHash.insert("cmddraw_cards", Command_DrawCards::newItem);
 	itemNameHash.insert("cmdmove_card", Command_MoveCard::newItem);
@@ -373,7 +375,6 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventgame_closed", Event_GameClosed::newItem);
 	itemNameHash.insert("game_eventready_start", Event_ReadyStart::newItem);
 	itemNameHash.insert("game_eventconcede", Event_Concede::newItem);
-	itemNameHash.insert("game_eventgame_start", Event_GameStart::newItem);
 	itemNameHash.insert("game_eventshuffle", Event_Shuffle::newItem);
 	itemNameHash.insert("game_eventroll_die", Event_RollDie::newItem);
 	itemNameHash.insert("game_eventmove_card", Event_MoveCard::newItem);

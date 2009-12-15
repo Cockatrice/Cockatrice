@@ -114,7 +114,6 @@ private:
 	void actMoveToExile(CardItem *card);
 
 	int defaultNumberTopCards;
-        int mulliganCards;
 	QString name;
 	int id;
 	bool active;
@@ -188,7 +187,6 @@ public:
 	bool getActive() const { return active; }
 	void setActive(bool _active);
 	
-	void prepareForGame();
 	void processPlayerInfo(ServerInfo_Player *info);
 	void processGameEvent(GameEvent *event);
 	void sendGameCommand(GameCommand *command);

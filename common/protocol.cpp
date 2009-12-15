@@ -22,6 +22,7 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("counter", ServerInfo_Counter::newItem);
 	registerSerializableItem("arrow", ServerInfo_Arrow::newItem);
 	registerSerializableItem("player", ServerInfo_Player::newItem);
+	registerSerializableItem("player_ping", ServerInfo_PlayerPing::newItem);
 	registerSerializableItem("file", DeckList_File::newItem);
 	registerSerializableItem("directory", DeckList_Directory::newItem);
 	
@@ -42,6 +43,7 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("game_eventcreate_arrows", Event_CreateArrows::newItem);
 	registerSerializableItem("game_eventcreate_counters", Event_CreateCounters::newItem);
 	registerSerializableItem("game_eventdraw_cards", Event_DrawCards::newItem);
+	registerSerializableItem("game_eventping", Event_Ping::newItem);
 	registerSerializableItem("chat_eventchat_list_players", Event_ChatListPlayers::newItem);
 }
 
@@ -232,6 +234,13 @@ Event_GameStateChanged::Event_GameStateChanged(int _gameId, bool _gameStarted, i
 	insertItem(new SerializableItem_Int("active_phase", _activePhase));
 	for (int i = 0; i < _playerList.size(); ++i)
 		itemList.append(_playerList[i]);
+}
+
+Event_Ping::Event_Ping(int _gameId, const QList<ServerInfo_PlayerPing *> &_pingList)
+	: GameEvent("ping", _gameId, -1)
+{
+	for (int i = 0; i < _pingList.size(); ++i)
+		itemList.append(_pingList[i]);
 }
 
 Event_CreateArrows::Event_CreateArrows(int _gameId, int _playerId, const QList<ServerInfo_Arrow *> &_arrowList)

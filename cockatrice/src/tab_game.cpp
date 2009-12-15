@@ -20,8 +20,8 @@
 #include "arrowitem.h"
 #include "main.h"
 
-TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectator)
-	: Tab(), client(_client), gameId(_gameId), localPlayerId(_localPlayerId), spectator(_spectator), started(false), currentPhase(-1)
+TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectator, bool _resuming)
+	: Tab(), client(_client), gameId(_gameId), localPlayerId(_localPlayerId), spectator(_spectator), started(false), resuming(_resuming), currentPhase(-1)
 {
 	zoneLayout = new ZoneViewLayout;
 	scene = new GameScene(zoneLayout, this);
@@ -31,6 +31,7 @@ TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectat
 	loadLocalButton = new QPushButton;
 	loadRemoteButton = new QPushButton;
 	readyStartButton = new QPushButton;
+	readyStartButton->setEnabled(false);
 	
 	QHBoxLayout *buttonHBox = new QHBoxLayout;
 	buttonHBox->addWidget(loadLocalButton);
@@ -50,7 +51,7 @@ TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectat
 	sayLabel = new QLabel;
 	sayEdit = new QLineEdit;
 	sayLabel->setBuddy(sayEdit);
-	
+
 	QHBoxLayout *hLayout = new QHBoxLayout;
 	hLayout->addWidget(sayLabel);
 	hLayout->addWidget(sayEdit);
@@ -70,6 +71,14 @@ TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectat
 	mainLayout->addWidget(gameView, 10);
 	mainLayout->addWidget(deckViewContainer, 10);
 	mainLayout->addLayout(verticalLayout);
+
+	if (spectator) {
+		sayLabel->hide();
+		sayEdit->hide();
+		loadLocalButton->hide();
+		loadRemoteButton->hide();
+		readyStartButton->hide();
+	}
 
 	aCloseMostRecentZoneView = new QAction(this);
 	connect(aCloseMostRecentZoneView, SIGNAL(triggered()), zoneLayout, SLOT(closeMostRecentZoneView()));
@@ -214,13 +223,14 @@ Player *TabGame::addPlayer(int playerId, const QString &playerName)
 void TabGame::processGameEvent(GameEvent *event)
 {
 	switch (event->getItemId()) {
-		case ItemId_Event_GameStart: eventGameStart(qobject_cast<Event_GameStart *>(event)); break;
 		case ItemId_Event_GameStateChanged: eventGameStateChanged(qobject_cast<Event_GameStateChanged *>(event)); break;
 		case ItemId_Event_Join: eventJoin(qobject_cast<Event_Join *>(event)); break;
 		case ItemId_Event_Leave: eventLeave(qobject_cast<Event_Leave *>(event)); break;
 		case ItemId_Event_GameClosed: eventGameClosed(qobject_cast<Event_GameClosed *>(event)); break;
 		case ItemId_Event_SetActivePlayer: eventSetActivePlayer(qobject_cast<Event_SetActivePlayer *>(event)); break;
 		case ItemId_Event_SetActivePhase: eventSetActivePhase(qobject_cast<Event_SetActivePhase *>(event)); break;
+		case ItemId_Event_Ping: eventPing(qobject_cast<Event_Ping *>(event)); break;
+
 		default: {
 			Player *player = players.value(event->getPlayerId(), 0);
 			if (!player) {
@@ -257,34 +267,33 @@ void TabGame::stopGame()
 	deckViewContainer->show();
 }
 
-void TabGame::eventGameStart(Event_GameStart * /*event*/)
-{
-	startGame();
-	messageLog->logGameStart();
-
-	QMapIterator<int, Player *> i(players);
-	while (i.hasNext())
-		i.next().value()->prepareForGame();
-}
-
 void TabGame::eventGameStateChanged(Event_GameStateChanged *event)
 {
 	const QList<ServerInfo_Player *> &plList = event->getPlayerList();
 	for (int i = 0; i < plList.size(); ++i) {
 		ServerInfo_Player *pl = plList[i];
-		Player *player = players.value(pl->getPlayerId(), 0);
-		if (!player) {
-			player = addPlayer(pl->getPlayerId(), pl->getName());
-			playerListWidget->addPlayer(pl);
-		}
-		player->processPlayerInfo(pl);
-		if (player->getLocal() && pl->getDeck()) {
-			Deck_PictureCacher::cachePictures(pl->getDeck(), this);
-			deckView->setDeck(new DeckList(pl->getDeck()));
+		if (pl->getSpectator()) {
+			if (!spectators.contains(pl->getPlayerId())) {
+				spectators.insert(pl->getPlayerId(), pl->getName());
+				playerListWidget->addPlayer(pl);
+			}
+		} else {
+			Player *player = players.value(pl->getPlayerId(), 0);
+			if (!player) {
+				player = addPlayer(pl->getPlayerId(), pl->getName());
+				playerListWidget->addPlayer(pl);
+			}
+			player->processPlayerInfo(pl);
+			if (player->getLocal() && pl->getDeck()) {
+				Deck_PictureCacher::cachePictures(pl->getDeck(), this);
+				deckView->setDeck(new DeckList(pl->getDeck()));
+			}
 		}
 	}
 	if (event->getGameStarted() && !started) {
 		startGame();
+		if (!resuming)
+			messageLog->logGameStart();
 		setActivePlayer(event->getActivePlayer());
 		setActivePhase(event->getActivePhase());
 	} else if (!event->getGameStarted() && started) {
@@ -297,8 +306,9 @@ void TabGame::eventJoin(Event_Join *event)
 {
 	ServerInfo_Player *playerInfo = event->getPlayer();
 	if (playerInfo->getSpectator()) {
-		spectatorList.append(playerInfo->getName());
+		spectators.insert(playerInfo->getPlayerId(), playerInfo->getName());
 		messageLog->logJoinSpectator(playerInfo->getName());
+		playerListWidget->addPlayer(playerInfo);
 	} else {
 		Player *newPlayer = addPlayer(playerInfo->getPlayerId(), playerInfo->getName());
 		messageLog->logJoin(newPlayer);
@@ -309,12 +319,18 @@ void TabGame::eventJoin(Event_Join *event)
 void TabGame::eventLeave(Event_Leave *event)
 {
 	int playerId = event->getPlayerId();
+
 	Player *player = players.value(playerId, 0);
-	if (!player)
-		return;
-	
-	messageLog->logLeave(player);
-	playerListWidget->removePlayer(playerId);
+	if (player) {
+		messageLog->logLeave(player);
+		playerListWidget->removePlayer(playerId);
+		players.remove(playerId);
+		delete player;
+	} else if (spectators.contains(playerId)) {
+		messageLog->logLeaveSpectator(spectators.value(playerId));
+		playerListWidget->removePlayer(playerId);
+		spectators.remove(playerId);
+	}
 }
 
 void TabGame::eventGameClosed(Event_GameClosed * /*event*/)
@@ -362,6 +378,13 @@ void TabGame::eventSetActivePhase(Event_SetActivePhase *event)
 	setActivePhase(phase);
 }
 
+void TabGame::eventPing(Event_Ping *event)
+{
+	const QList<ServerInfo_PlayerPing *> &pingList = event->getPingList();
+	for (int i = 0; i < pingList.size(); ++i)
+		playerListWidget->updatePing(pingList[i]->getPlayerId(), pingList[i]->getPingTime());
+}
+
 void TabGame::loadLocalDeck()
 {
 	QFileDialog dialog(this, tr("Load deck"));
@@ -403,6 +426,7 @@ void TabGame::deckSelectFinished(ProtocolResponse *r)
 	
 	Deck_PictureCacher::cachePictures(resp->getDeck(), this);
 	deckView->setDeck(new DeckList(resp->getDeck()));
+	readyStartButton->setEnabled(true);
 }
 
 void TabGame::readyStart()

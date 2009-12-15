@@ -22,7 +22,6 @@ class PlayerListWidget;
 class ProtocolResponse;
 class GameEvent;
 class GameCommand;
-class Event_GameStart;
 class Event_GameStateChanged;
 class Event_Join;
 class Event_Leave;
@@ -30,6 +29,7 @@ class Event_GameClosed;
 class Event_GameStart;
 class Event_SetActivePlayer;
 class Event_SetActivePhase;
+class Event_Ping;
 class Player;
 class CardZone;
 class CardItem;
@@ -41,9 +41,10 @@ private:
 	int gameId;
 	int localPlayerId;
 	bool spectator;
-	QStringList spectatorList;
 	QMap<int, Player *> players;
+	QMap<int, QString> spectators;
 	bool started;
+	bool resuming;
 	int currentPhase;
 
 	QPushButton *loadLocalButton, *loadRemoteButton, *readyStartButton;
@@ -68,7 +69,6 @@ private:
 	void startGame();
 	void stopGame();
 
-	void eventGameStart(Event_GameStart *event);
 	void eventGameStateChanged(Event_GameStateChanged *event);
 	void eventJoin(Event_Join *event);
 	void eventLeave(Event_Leave *event);
@@ -77,6 +77,7 @@ private:
 	void eventSetActivePlayer(Event_SetActivePlayer *event);
 	void setActivePhase(int phase);
 	void eventSetActivePhase(Event_SetActivePhase *event);
+	void eventPing(Event_Ping *event);
 signals:
 	void gameClosing(TabGame *tab);
 private slots:
@@ -93,7 +94,7 @@ private slots:
 	void actNextPhase();
 	void actNextTurn();
 public:
-	TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectator);
+	TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectator, bool _resuming);
 	~TabGame();
 	void retranslateUi();
 	const QMap<int, Player *> &getPlayers() const { return players; }

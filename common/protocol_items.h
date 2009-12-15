@@ -139,6 +139,13 @@ public:
 	static SerializableItem *newItem() { return new Command_Shuffle; }
 	int getItemId() const { return ItemId_Command_Shuffle; }
 };
+class Command_Mulligan : public GameCommand {
+	Q_OBJECT
+public:
+	Command_Mulligan(int _gameId = -1);
+	static SerializableItem *newItem() { return new Command_Mulligan; }
+	int getItemId() const { return ItemId_Command_Mulligan; }
+};
 class Command_RollDie : public GameCommand {
 	Q_OBJECT
 public:
@@ -342,13 +349,6 @@ public:
 	static SerializableItem *newItem() { return new Event_Concede; }
 	int getItemId() const { return ItemId_Event_Concede; }
 };
-class Event_GameStart : public GameEvent {
-	Q_OBJECT
-public:
-	Event_GameStart(int _gameId = -1, int _playerId = -1);
-	static SerializableItem *newItem() { return new Event_GameStart; }
-	int getItemId() const { return ItemId_Event_GameStart; }
-};
 class Event_Shuffle : public GameEvent {
 	Q_OBJECT
 public:
@@ -475,10 +475,11 @@ public:
 class Event_GameJoined : public GenericEvent {
 	Q_OBJECT
 public:
-	Event_GameJoined(int _gameId = -1, int _playerId = -1, bool _spectator = false);
+	Event_GameJoined(int _gameId = -1, int _playerId = -1, bool _spectator = false, bool _resuming = false);
 	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); };
 	int getPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("player_id"))->getData(); };
 	bool getSpectator() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectator"))->getData(); };
+	bool getResuming() const { return static_cast<SerializableItem_Bool *>(itemMap.value("resuming"))->getData(); };
 	static SerializableItem *newItem() { return new Event_GameJoined; }
 	int getItemId() const { return ItemId_Event_GameJoined; }
 };

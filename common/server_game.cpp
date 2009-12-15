@@ -25,11 +25,16 @@
 #include "server_cardzone.h"
 #include "server_counter.h"
 #include <QSqlQuery>
+#include <QTimer>
 
 Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent)
-	: QObject(parent), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), spectatorsAllowed(_spectatorsAllowed)
+	: QObject(parent), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), activePlayer(-1), activePhase(-1), spectatorsAllowed(_spectatorsAllowed)
 {
 	creator = addPlayer(_creator, false, false);
+
+	pingClock = new QTimer(this);
+	connect(pingClock, SIGNAL(timeout()), this, SLOT(pingClockTimeout()));
+	pingClock->start(1000);
 }
 
 Server_Game::~Server_Game()
@@ -40,25 +45,60 @@ Server_Game::~Server_Game()
 	while (playerIterator.hasNext())
 		delete playerIterator.next().value();
 	players.clear();
-	for (int i = 0; i < spectators.size(); ++i)
-		delete spectators[i];
-	spectators.clear();
 	
 	emit gameClosing();
 	qDebug("Server_Game destructor");
 }
 
+void Server_Game::pingClockTimeout()
+{
+	QDateTime now = QDateTime::currentDateTime();
+	QList<ServerInfo_PlayerPing *> pingList;
+	QMapIterator<int, Server_Player *> playerIterator(players);
+	while (playerIterator.hasNext()) {
+		Server_Player *player = playerIterator.next().value();
+		int pingTime = player->getProtocolHandler() ? player->getProtocolHandler()->getLastCommandTime().secsTo(now) : -1;
+		pingList.append(new ServerInfo_PlayerPing(player->getPlayerId(), pingTime));
+	}
+	sendGameEvent(new Event_Ping(-1, pingList));
+}
+
+int Server_Game::getPlayerCount() const
+{
+	QMapIterator<int, Server_Player *> playerIterator(players);
+	int result = 0;
+	while (playerIterator.hasNext())
+		if (!playerIterator.next().value()->getSpectator())
+			++result;
+	return result;
+}
+
+int Server_Game::getSpectatorCount() const
+{
+	QMapIterator<int, Server_Player *> playerIterator(players);
+	int result = 0;
+	while (playerIterator.hasNext())
+		if (playerIterator.next().value()->getSpectator())
+			++result;
+	return result;
+}
+
 void Server_Game::startGameIfReady()
 {
-	if (players.size() < maxPlayers)
+	if (getPlayerCount() < maxPlayers)
 		return;
 	QMapIterator<int, Server_Player *> playerIterator(players);
-	while (playerIterator.hasNext())
-		if (!playerIterator.next().value()->getReadyStart())
+	while (playerIterator.hasNext()) {
+		Server_Player *p = playerIterator.next().value();
+		if (!p->getReadyStart() && !p->getSpectator())
 			return;
+	}
 	playerIterator.toFront();
-	while (playerIterator.hasNext())
-		playerIterator.next().value()->setupZones();
+	while (playerIterator.hasNext()) {
+		Server_Player *p = playerIterator.next().value();
+		if (!p->getSpectator())
+			p->setupZones();
+	}
 
 	gameStarted = true;
 	playerIterator.toFront();
@@ -85,7 +125,6 @@ void Server_Game::startGameIfReady()
 		query.exec();
 	}
 */	
-	sendGameEvent(new Event_GameStart);
 	setActivePlayer(0);
 }
 
@@ -125,27 +164,13 @@ ResponseCode Server_Game::checkJoin(const QString &_password, bool spectator)
 
 Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate)
 {
-	int playerId;
-	if (!spectator) {
-		int max = -1;
-		QMapIterator<int, Server_Player *> i(players);
-		while (i.hasNext()) {
-			int tmp = i.next().value()->getPlayerId();
-			if (tmp > max)
-				max = tmp;
-		}
-		playerId = max + 1;
-	} else
-		playerId = -1;
+	const QList<int> &keyList = players.keys();
+	int playerId = keyList.isEmpty() ? 0 : (keyList.last() + 1);
 	
 	Server_Player *newPlayer = new Server_Player(this, playerId, handler->getPlayerName(), spectator, handler);
 	sendGameEvent(new Event_Join(-1, new ServerInfo_Player(playerId, handler->getPlayerName(), spectator)));
-	
-	if (spectator)
-		spectators << newPlayer;
-	else
-		players.insert(playerId, newPlayer);
-	
+	players.insert(playerId, newPlayer);
+
 	if (broadcastUpdate)
 		qobject_cast<Server *>(parent())->broadcastGameListUpdate(this);
 	
@@ -154,14 +179,11 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 
 void Server_Game::removePlayer(Server_Player *player)
 {
-	if (player->getSpectator())
-		spectators.removeAt(spectators.indexOf(player));
-	else
-		players.remove(player->getPlayerId());
+	players.remove(player->getPlayerId());
 	sendGameEvent(new Event_Leave(-1, player->getPlayerId()));
 	delete player;
 	
-	if (!players.size())
+	if (!getPlayerCount())
 		deleteLater();
 	qobject_cast<Server *>(parent())->broadcastGameListUpdate(this);
 }
@@ -246,11 +268,12 @@ QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAs
 void Server_Game::sendGameEvent(GameEvent *event, Server_Player *exclude)
 {
 	event->setGameId(gameId);
-	QList<Server_Player *> receivers = QList<Server_Player *>() << players.values() << spectators;
-	
-	for (int i = 0; i < receivers.size(); ++i)
-		if (receivers[i] != exclude)
-			receivers[i]->sendProtocolItem(event, false);
+	QMapIterator<int, Server_Player *> playerIterator(players);
+	while (playerIterator.hasNext()) {
+		Server_Player *p = playerIterator.next().value();
+		if (p != exclude)
+			p->sendProtocolItem(event, false);
+	}
 
 	delete event;
 }

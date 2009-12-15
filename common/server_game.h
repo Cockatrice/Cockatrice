@@ -26,12 +26,13 @@
 #include "server_player.h"
 #include "protocol.h"
 
+class QTimer;
+
 class Server_Game : public QObject {
 	Q_OBJECT
 private:
 	QPointer<Server_Player> creator;
 	QMap<int, Server_Player *> players;
-	QList<Server_Player *> spectators;
 	bool gameStarted;
 	int gameId;
 	QString description;
@@ -39,16 +40,19 @@ private:
 	int maxPlayers;
 	int activePlayer, activePhase;
 	bool spectatorsAllowed;
+	QTimer *pingClock;
 signals:
 	void gameClosing();
+private slots:
+	void pingClockTimeout();
 public:
 	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent = 0);
 	~Server_Game();
 	Server_Player *getCreator() const { return creator; }
 	QString getCreatorName() const { return creator ? creator->getPlayerName() : QString(); }
 	bool getGameStarted() const { return gameStarted; }
-	int getPlayerCount() const { return players.size(); }
-	int getSpectatorCount() const { return spectators.size(); }
+	int getPlayerCount() const;
+	int getSpectatorCount() const;
 	QList<Server_Player *> getPlayers() const { return players.values(); }
 	Server_Player *getPlayer(int playerId) const { return players.value(playerId, 0); }
 	int getGameId() const { return gameId; }

@@ -102,7 +102,10 @@ void TabDeckStorage::actUpload()
 	if (!deck->loadFromFile(filePath, DeckList::CockatriceFormat))
 		return;
 	if (deck->getName().isEmpty()) {
-		QString deckName = QInputDialog::getText(this, tr("Enter deck name"), tr("This decklist does not have a name.\nPlease enter a name:"), QLineEdit::Normal, tr("Unnamed deck"));
+		bool ok;
+		QString deckName = QInputDialog::getText(this, tr("Enter deck name"), tr("This decklist does not have a name.\nPlease enter a name:"), QLineEdit::Normal, tr("Unnamed deck"), &ok);
+		if (!ok)
+			return;
 		if (deckName.isEmpty())
 			deckName = tr("Unnamed deck");
 		deck->setName(deckName);

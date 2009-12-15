@@ -5,7 +5,7 @@
 #include "tab_game.h"
 #include "tab_deck_storage.h"
 #include "protocol_items.h"
-#include <QPainter>
+#include "pingpixmapgenerator.h"
 
 TabSupervisor::	TabSupervisor(QWidget *parent)
 	: QTabWidget(parent), client(0), tabServer(0), tabDeckStorage(0)
@@ -83,26 +83,13 @@ void TabSupervisor::updatePingTime(int value, int max)
 {
 	if (!tabServer)
 		return;
-	QPixmap pixmap(15, 15);
-	pixmap.fill(Qt::transparent);
-	QPainter painter(&pixmap);
-	QColor color;
-	if (max == -1)
-		color = Qt::black;
-	else
-		color.setHsv(120 * (1.0 - ((double) value / max)), 255, 255);
 	
-	QRadialGradient g(QPointF((double) pixmap.width() / 2, (double) pixmap.height() / 2), qMin(pixmap.width(), pixmap.height()) / 2.0);
-	g.setColorAt(0, color);
-	g.setColorAt(1, Qt::transparent);
-	painter.fillRect(0, 0, pixmap.width(), pixmap.height(), QBrush(g));
-	
-	setTabIcon(0, QIcon(pixmap));
+	setTabIcon(0, QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));
 }
 
 void TabSupervisor::gameJoined(Event_GameJoined *event)
 {
-	TabGame *tab = new TabGame(client, event->getGameId(), event->getPlayerId(), event->getSpectator());
+	TabGame *tab = new TabGame(client, event->getGameId(), event->getPlayerId(), event->getSpectator(), event->getResuming());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	addTab(tab, tr("Game %1").arg(event->getGameId()));
 	gameTabs.insert(event->getGameId(), tab);

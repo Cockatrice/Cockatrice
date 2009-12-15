@@ -148,6 +148,13 @@ DeckList *ServerInfo_Player::getDeck() const
 	return static_cast<DeckList *>(itemMap.value("cockatrice_deck"));
 }
 
+ServerInfo_PlayerPing::ServerInfo_PlayerPing(int _playerId, int _pingTime)
+	: SerializableItem_Map("player_ping")
+{
+	insertItem(new SerializableItem_Int("player_id", _playerId));
+	insertItem(new SerializableItem_Int("ping_time", _pingTime));
+}
+
 DeckList_TreeItem::DeckList_TreeItem(const QString &_itemType, const QString &_name, int _id)
 	: SerializableItem_Map(_itemType)
 {

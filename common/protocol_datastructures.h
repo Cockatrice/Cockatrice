@@ -124,6 +124,14 @@ public:
 	const QList<ServerInfo_Arrow *> &getArrowList() const { return arrowList; }
 };
 
+class ServerInfo_PlayerPing : public SerializableItem_Map {
+public:
+	ServerInfo_PlayerPing(int _playerId = -1, int _pingTime = -1);
+	static SerializableItem *newItem() { return new ServerInfo_PlayerPing; }
+	int getPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("player_id"))->getData(); }
+	int getPingTime() const { return static_cast<SerializableItem_Int *>(itemMap.value("ping_time"))->getData(); }
+};
+
 class DeckList_TreeItem : public SerializableItem_Map {
 public:
 	DeckList_TreeItem(const QString &_itemType, const QString &_name, int _id);
