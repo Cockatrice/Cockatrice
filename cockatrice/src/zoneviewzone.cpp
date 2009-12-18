@@ -12,6 +12,7 @@ ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, QG
 
 ZoneViewZone::~ZoneViewZone()
 {
+	emit beingDeleted();
 	qDebug("ZoneViewZone destructor");
 	origZone->setView(NULL);
 }

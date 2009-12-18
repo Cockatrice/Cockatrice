@@ -430,34 +430,40 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 	if (!(sourceHiddenToOthers && targetHiddenToOthers))
 		publicCardName = card->getName();
 
+	int oldCardId = card->getId();
 	if (faceDown)
 		card->setId(player->newCardId());
 	card->setFaceDown(faceDown);
 
 	// The player does not get to see which card he moved if it moves between two parts of hidden zones which
 	// are not being looked at.
-	int privateCardId = card->getId();
+	int privateNewCardId = card->getId();
+	int privateOldCardId = oldCardId;
 	if (!targetBeingLookedAt && !sourceBeingLookedAt) {
-		privateCardId = -1;
+		privateOldCardId = -1;
+		privateNewCardId = -1;
 		privateCardName = QString();
 	}
 	int privatePosition = -1;
 	if (startzone->getType() == HiddenZone)
 		privatePosition = position;
-	player->sendProtocolItem(new Event_MoveCard(game->getGameId(), player->getPlayerId(), privateCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getName(), x, y, faceDown));
+	player->sendProtocolItem(new Event_MoveCard(game->getGameId(), player->getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getName(), x, y, privateNewCardId, faceDown));
 
 	// Other players do not get to see the start and/or target position of the card if the respective
 	// part of the zone is being looked at. The information is not needed anyway because in hidden zones,
 	// all cards are equal.
-	if ((startzone->getType() == HiddenZone) && ((startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1)))
+	if (
+		((startzone->getType() == HiddenZone) && ((startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1)))
+		|| (startzone->getType() == PublicZone)
+	)
 		position = -1;
 	if ((targetzone->getType() == HiddenZone) && ((targetzone->getCardsBeingLookedAt() > x) || (targetzone->getCardsBeingLookedAt() == -1)))
 		x = -1;
 
 	if ((startzone->getType() == PublicZone) || (targetzone->getType() == PublicZone))
-		game->sendGameEvent(new Event_MoveCard(-1, player->getPlayerId(), card->getId(), publicCardName, startzone->getName(), position, targetzone->getName(), x, y, faceDown), player);
+		game->sendGameEvent(new Event_MoveCard(-1, player->getPlayerId(), oldCardId, publicCardName, startzone->getName(), position, targetzone->getName(), x, y, card->getId(), faceDown), player);
 	else
-		game->sendGameEvent(new Event_MoveCard(-1, player->getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getName(), x, y, false), player);
+		game->sendGameEvent(new Event_MoveCard(-1, player->getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getName(), x, y, -1, false), player);
 
 	// If the card was moved to another zone, delete all arrows from and to the card
 	if (startzone != targetzone) {

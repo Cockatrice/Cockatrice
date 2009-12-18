@@ -234,7 +234,7 @@ Event_RollDie::Event_RollDie(int _gameId, int _playerId, int _sides, int _value)
 	insertItem(new SerializableItem_Int("sides", _sides));
 	insertItem(new SerializableItem_Int("value", _value));
 }
-Event_MoveCard::Event_MoveCard(int _gameId, int _playerId, int _cardId, const QString &_cardName, const QString &_startZone, int _position, const QString &_targetZone, int _x, int _y, bool _faceDown)
+Event_MoveCard::Event_MoveCard(int _gameId, int _playerId, int _cardId, const QString &_cardName, const QString &_startZone, int _position, const QString &_targetZone, int _x, int _y, int _newCardId, bool _faceDown)
 	: GameEvent("move_card", _gameId, _playerId)
 {
 	insertItem(new SerializableItem_Int("card_id", _cardId));
@@ -244,6 +244,7 @@ Event_MoveCard::Event_MoveCard(int _gameId, int _playerId, int _cardId, const QS
 	insertItem(new SerializableItem_String("target_zone", _targetZone));
 	insertItem(new SerializableItem_Int("x", _x));
 	insertItem(new SerializableItem_Int("y", _y));
+	insertItem(new SerializableItem_Int("new_card_id", _newCardId));
 	insertItem(new SerializableItem_Bool("face_down", _faceDown));
 }
 Event_CreateToken::Event_CreateToken(int _gameId, int _playerId, const QString &_zone, int _cardId, const QString &_cardName, const QString &_pt, int _x, int _y)

@@ -30,6 +30,8 @@ public slots:
 	void setSortingEnabled(int _sortingEnabled);
 private slots:
 	void zoneDumpReceived(ProtocolResponse *r);
+signals:
+	void beingDeleted();
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
 	QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;

@@ -26,6 +26,7 @@ signals:
 	void sizeChanged();
 private slots:
 	void resizeToZoneContents();
+	void zoneDeleted();
 public:
 	ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards = 0, QGraphicsItem *parent = 0);
 	ZoneViewZone *getZone() const { return zone; }

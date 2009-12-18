@@ -11,6 +11,7 @@
 #include "cardlist.h"
 #include "tab_game.h"
 #include "protocol_items.h"
+#include "gamescene.h"
 #include <QSettings>
 #include <QPainter>
 #include <QMenu>
@@ -252,6 +253,8 @@ Player::~Player()
 {
 	qDebug("Player destructor");
 
+	static_cast<GameScene *>(scene())->removePlayer(this);
+	
 	QMapIterator<QString, CardZone *> i(zones);
 	while (i.hasNext())
 		delete i.next().value();
@@ -619,6 +622,7 @@ void Player::eventMoveCard(Event_MoveCard *event)
 	
 	card->deleteDragItem();
 
+	card->setId(event->getNewCardId());
 	card->setFaceDown(event->getFaceDown());
 
 	// The log event has to be sent before the card is added to the target zone

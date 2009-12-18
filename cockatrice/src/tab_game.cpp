@@ -120,6 +120,11 @@ TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectat
 
 TabGame::~TabGame()
 {
+	QMapIterator<int, Player *> i(players);
+	while (i.hasNext())
+		delete i.next().value();
+	players.clear();
+	
 	emit gameClosing(this);
 }
 
@@ -287,6 +292,7 @@ void TabGame::eventGameStateChanged(Event_GameStateChanged *event)
 			if (player->getLocal() && pl->getDeck()) {
 				Deck_PictureCacher::cachePictures(pl->getDeck(), this);
 				deckView->setDeck(new DeckList(pl->getDeck()));
+				readyStartButton->setEnabled(true);
 			}
 		}
 	}

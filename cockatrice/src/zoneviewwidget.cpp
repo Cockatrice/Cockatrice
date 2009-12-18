@@ -52,6 +52,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 
 	zone = new ZoneViewZone(player, _origZone, numberCards, this);
 	connect(zone, SIGNAL(contentsChanged()), this, SLOT(resizeToZoneContents()));
+	connect(zone, SIGNAL(beingDeleted()), this, SLOT(zoneDeleted()));
 	zone->dumpObjectInfo();
 	vbox->addItem(zone);
 	zone->initializeCards();
@@ -91,6 +92,7 @@ void ZoneViewWidget::resizeToZoneContents()
 
 void ZoneViewWidget::closeEvent(QCloseEvent *event)
 {
+	disconnect(zone, SIGNAL(beingDeleted()), this, 0);
 	player->sendGameCommand(new Command_StopDumpZone(-1, player->getId(), zone->getName()));
 	if (shuffleCheckBox)
 		if (shuffleCheckBox->isChecked())
@@ -98,4 +100,11 @@ void ZoneViewWidget::closeEvent(QCloseEvent *event)
 	emit closePressed(this);
 	deleteLater();
 	event->accept();
+}
+
+void ZoneViewWidget::zoneDeleted()
+{
+	emit closePressed(this);
+	qDebug("foo");
+	deleteLater();
 }

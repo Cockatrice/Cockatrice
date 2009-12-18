@@ -368,7 +368,7 @@ public:
 class Event_MoveCard : public GameEvent {
 	Q_OBJECT
 public:
-	Event_MoveCard(int _gameId = -1, int _playerId = -1, int _cardId = -1, const QString &_cardName = QString(), const QString &_startZone = QString(), int _position = -1, const QString &_targetZone = QString(), int _x = -1, int _y = -1, bool _faceDown = false);
+	Event_MoveCard(int _gameId = -1, int _playerId = -1, int _cardId = -1, const QString &_cardName = QString(), const QString &_startZone = QString(), int _position = -1, const QString &_targetZone = QString(), int _x = -1, int _y = -1, int _newCardId = -1, bool _faceDown = false);
 	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); };
 	QString getCardName() const { return static_cast<SerializableItem_String *>(itemMap.value("card_name"))->getData(); };
 	QString getStartZone() const { return static_cast<SerializableItem_String *>(itemMap.value("start_zone"))->getData(); };
@@ -376,6 +376,7 @@ public:
 	QString getTargetZone() const { return static_cast<SerializableItem_String *>(itemMap.value("target_zone"))->getData(); };
 	int getX() const { return static_cast<SerializableItem_Int *>(itemMap.value("x"))->getData(); };
 	int getY() const { return static_cast<SerializableItem_Int *>(itemMap.value("y"))->getData(); };
+	int getNewCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("new_card_id"))->getData(); };
 	bool getFaceDown() const { return static_cast<SerializableItem_Bool *>(itemMap.value("face_down"))->getData(); };
 	static SerializableItem *newItem() { return new Event_MoveCard; }
 	int getItemId() const { return ItemId_Event_MoveCard; }

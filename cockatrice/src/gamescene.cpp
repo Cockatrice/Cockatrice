@@ -11,6 +11,7 @@ GameScene::GameScene(ZoneViewLayout *_zvLayout, QObject *parent)
 
 void GameScene::addPlayer(Player *player)
 {
+	qDebug("GameScene::addPlayer");
 	players << player;
 	addItem(player);
 	rearrange();
@@ -19,6 +20,7 @@ void GameScene::addPlayer(Player *player)
 
 void GameScene::removePlayer(Player *player)
 {
+	qDebug("GameScene::removePlayer");
 	players.removeAt(players.indexOf(player));
 	removeItem(player);
 	rearrange();
