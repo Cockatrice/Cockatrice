@@ -160,7 +160,9 @@ ResponseCode Server_ProtocolHandler::cmdPing(Command_Ping * /*cmd*/)
 
 ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd)
 {
-	QString userName = cmd->getUsername();
+	QString userName = cmd->getUsername().simplified();
+	if (userName.isEmpty())
+		return RespContextError;
 	authState = server->checkUserPassword(userName, cmd->getPassword());
 	if (authState == PasswordWrong)
 		return RespWrongPassword;
