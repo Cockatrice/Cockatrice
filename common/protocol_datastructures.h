@@ -8,7 +8,7 @@
 
 class DeckList;
 
-enum ResponseCode { RespNothing, RespOk, RespInvalidCommand, RespInvalidData, RespNameNotFound, RespLoginNeeded, RespContextError, RespWrongPassword, RespSpectatorsNotAllowed };
+enum ResponseCode { RespNothing, RespOk, RespInvalidCommand, RespInvalidData, RespNameNotFound, RespLoginNeeded, RespFunctionNotAllowed, RespContextError, RespWrongPassword, RespSpectatorsNotAllowed };
 
 // PrivateZone: Contents of the zone are always visible to the owner,
 // but not to anyone else.

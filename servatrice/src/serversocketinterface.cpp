@@ -161,6 +161,9 @@ bool ServerSocketInterface::deckListHelper(DeckList_Directory *folder)
 
 ResponseCode ServerSocketInterface::cmdDeckList(Command_DeckList *cmd)
 {
+	if (authState != PasswordRight)
+		return RespFunctionNotAllowed;
+	
 	servatrice->checkSql();
 	
 	DeckList_Directory *root = new DeckList_Directory(QString());
@@ -175,6 +178,9 @@ ResponseCode ServerSocketInterface::cmdDeckList(Command_DeckList *cmd)
 
 ResponseCode ServerSocketInterface::cmdDeckNewDir(Command_DeckNewDir *cmd)
 {
+	if (authState != PasswordRight)
+		return RespFunctionNotAllowed;
+	
 	servatrice->checkSql();
 	
 	int folderId = getDeckPathId(cmd->getPath());
@@ -214,6 +220,9 @@ void ServerSocketInterface::deckDelDirHelper(int basePathId)
 
 ResponseCode ServerSocketInterface::cmdDeckDelDir(Command_DeckDelDir *cmd)
 {
+	if (authState != PasswordRight)
+		return RespFunctionNotAllowed;
+	
 	servatrice->checkSql();
 	
 	int basePathId = getDeckPathId(cmd->getPath());
@@ -225,6 +234,9 @@ ResponseCode ServerSocketInterface::cmdDeckDelDir(Command_DeckDelDir *cmd)
 
 ResponseCode ServerSocketInterface::cmdDeckDel(Command_DeckDel *cmd)
 {
+	if (authState != PasswordRight)
+		return RespFunctionNotAllowed;
+	
 	servatrice->checkSql();
 	
 	QSqlQuery query;
@@ -245,6 +257,9 @@ ResponseCode ServerSocketInterface::cmdDeckDel(Command_DeckDel *cmd)
 
 ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd)
 {
+	if (authState != PasswordRight)
+		return RespFunctionNotAllowed;
+	
 	servatrice->checkSql();
 	
 	if (!cmd->getDeck())
@@ -297,6 +312,9 @@ DeckList *ServerSocketInterface::getDeckFromDatabase(int deckId)
 
 ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd)
 {
+	if (authState != PasswordRight)
+		return RespFunctionNotAllowed;
+	
 	DeckList *deck;
 	try {
 		deck = getDeckFromDatabase(cmd->getDeckId());

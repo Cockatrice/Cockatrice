@@ -146,7 +146,6 @@ void Server_Game::stopGameIfFinished()
 		Server_Player *player = playerIterator.next().value();
 		player->sendProtocolItem(new Event_GameStateChanged(gameId, gameStarted, -1, -1, getGameState(player)));
 	}
-
 }
 
 ResponseCode Server_Game::checkJoin(const QString &_password, bool spectator)
@@ -185,6 +184,8 @@ void Server_Game::removePlayer(Server_Player *player)
 	
 	if (!getPlayerCount())
 		deleteLater();
+	else
+		stopGameIfFinished();
 	qobject_cast<Server *>(parent())->broadcastGameListUpdate(this);
 }
 

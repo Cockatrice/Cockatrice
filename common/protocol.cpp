@@ -142,6 +142,7 @@ void ProtocolResponse::initializeHash()
 	responseHash.insert("invalid_command", RespInvalidCommand);
 	responseHash.insert("name_not_found", RespNameNotFound);
 	responseHash.insert("login_needed", RespLoginNeeded);
+	responseHash.insert("function_not_allowed", RespFunctionNotAllowed);
 	responseHash.insert("context_error", RespContextError);
 	responseHash.insert("wrong_password", RespWrongPassword);
 	responseHash.insert("spectators_not_allowed", RespSpectatorsNotAllowed);
