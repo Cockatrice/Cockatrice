@@ -26,11 +26,16 @@ private:
 	RemoteDeckList_TreeWidget *serverDirView;
 	QGroupBox *leftGroupBox, *rightGroupBox;
 	
-	QAction *aUpload, *aDownload, *aNewFolder, *aDelete;
+	QAction *aOpenLocalDeck, *aUpload, *aOpenRemoteDeck, *aDownload, *aNewFolder, *aDelete;
 private slots:
+	void actOpenLocalDeck();
+	
 	void actUpload();
 	void uploadFinished(ProtocolResponse *r);
 
+	void actOpenRemoteDeck();
+	void openRemoteDeckFinished(ProtocolResponse *r);
+	
 	void actDownload();
 	void downloadFinished(ProtocolResponse *r);
 

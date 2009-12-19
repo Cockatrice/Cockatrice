@@ -137,6 +137,17 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 	event->accept();
 }
 
+void AbstractCardItem::processHoverEvent()
+{
+	emit hovered(this);
+}
+
+void AbstractCardItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+	processHoverEvent();
+	QGraphicsItem::hoverEnterEvent(event);
+}
+
 QVariant AbstractCardItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
 	if (change == ItemSelectedHasChanged) {

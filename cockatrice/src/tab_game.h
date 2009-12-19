@@ -32,6 +32,7 @@ class Event_SetActivePhase;
 class Event_Ping;
 class Player;
 class CardZone;
+class AbstractCardItem;
 class CardItem;
 
 class TabGame : public Tab {
@@ -85,7 +86,7 @@ private slots:
 	void loadRemoteDeck();
 	void readyStart();
 	void deckSelectFinished(ProtocolResponse *r);
-	void newCardAdded(CardItem *card);
+	void newCardAdded(AbstractCardItem *card);
 	
 	void actConcede();
 	void actLeaveGame();

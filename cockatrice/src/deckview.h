@@ -35,6 +35,8 @@ public:
 
 class DeckViewScene : public QGraphicsScene {
 	Q_OBJECT
+signals:
+	void newCardAdded(AbstractCardItem *card);
 private:
 	DeckList *deck;
 	QMap<QString, DeckViewCardContainer *> cardContainers;
@@ -54,6 +56,8 @@ protected:
 	void resizeEvent(QResizeEvent *event);
 public slots:
 	void updateSceneRect(const QRectF &rect);
+signals:
+	void newCardAdded(AbstractCardItem *card);
 public:
 	DeckView(QWidget *parent = 0);
 	void setDeck(DeckList *_deck);

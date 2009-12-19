@@ -316,6 +316,13 @@ void DeckListModel::cleanList()
 	reset();
 }
 
+void DeckListModel::setDeckList(DeckList *_deck)
+{
+	delete deckList;
+	deckList = _deck;
+	rebuildTree();
+}
+
 void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
 {
 	static const int totalColumns = 3;

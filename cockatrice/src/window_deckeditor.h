@@ -71,6 +71,7 @@ private:
 public:
 	WndDeckEditor(QWidget *parent = 0);
 	~WndDeckEditor();
+	void setDeck(DeckList *_deck, const QString &_lastFileName = QString(), DeckList::FileFormat _lastFileFormat = DeckList::CockatriceFormat);
 protected:
 	void closeEvent(QCloseEvent *event);
 };

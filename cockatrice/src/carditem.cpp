@@ -170,14 +170,3 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 		table->handleDropEventByGrid(id, zone, gridPoint, false);
 	}
 }
-
-void CardItem::processHoverEvent()
-{
-	emit hovered(this);
-}
-
-void CardItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-{
-	processHoverEvent();
-	QGraphicsItem::hoverEnterEvent(event);
-}

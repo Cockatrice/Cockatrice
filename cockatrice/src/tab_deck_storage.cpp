@@ -4,6 +4,7 @@
 #include "client.h"
 #include "decklist.h"
 #include "protocol_items.h"
+#include "window_deckeditor.h"
 
 TabDeckStorage::TabDeckStorage(Client *_client)
 	: Tab(), client(_client)
@@ -59,9 +60,15 @@ TabDeckStorage::TabDeckStorage(Client *_client)
 	hbox->addWidget(leftGroupBox);
 	hbox->addWidget(rightGroupBox);
 	
+	aOpenLocalDeck = new QAction(this);
+	aOpenLocalDeck->setIcon(QIcon(":/resources/pencil.svg"));
+	connect(aOpenLocalDeck, SIGNAL(triggered()), this, SLOT(actOpenLocalDeck()));
 	aUpload = new QAction(this);
 	aUpload->setIcon(QIcon(":/resources/arrow_right_green.svg"));
 	connect(aUpload, SIGNAL(triggered()), this, SLOT(actUpload()));
+	aOpenRemoteDeck = new QAction(this);
+	aOpenRemoteDeck->setIcon(QIcon(":/resources/pencil.svg"));
+	connect(aOpenRemoteDeck, SIGNAL(triggered()), this, SLOT(actOpenRemoteDeck()));
 	aDownload = new QAction(this);
 	aDownload->setIcon(QIcon(":/resources/arrow_left_green.svg"));
 	connect(aDownload, SIGNAL(triggered()), this, SLOT(actDownload()));
@@ -72,7 +79,9 @@ TabDeckStorage::TabDeckStorage(Client *_client)
 	aDelete->setIcon(QIcon(":/resources/remove_row.svg"));
 	connect(aDelete, SIGNAL(triggered()), this, SLOT(actDelete()));
 	
+	leftToolBar->addAction(aOpenLocalDeck);
 	leftToolBar->addAction(aUpload);
+	rightToolBar->addAction(aOpenRemoteDeck);
 	rightToolBar->addAction(aDownload);
 	rightToolBar->addAction(aNewFolder);
 	rightToolBar->addAction(aDelete);
@@ -86,10 +95,27 @@ void TabDeckStorage::retranslateUi()
 	leftGroupBox->setTitle(tr("Local file system"));
 	rightGroupBox->setTitle(tr("Server deck storage"));
 	
+	aOpenLocalDeck->setText(tr("Open in deck editor"));
 	aUpload->setText(tr("Upload deck"));
+	aOpenRemoteDeck->setText(tr("Open in deck editor"));
 	aDownload->setText(tr("Download deck"));
 	aNewFolder->setText(tr("New folder"));
 	aDelete->setText(tr("Delete"));
+}
+
+void TabDeckStorage::actOpenLocalDeck()
+{
+	QModelIndex curLeft = sortFilter->mapToSource(localDirView->selectionModel()->currentIndex());
+	if (localDirModel->isDir(curLeft))
+		return;
+	QString filePath = localDirModel->filePath(curLeft);
+	DeckList *deck = new DeckList;
+	if (!deck->loadFromFile(filePath, DeckList::CockatriceFormat))
+		return;
+	
+	WndDeckEditor *deckEditor = new WndDeckEditor;
+	deckEditor->setDeck(deck, filePath, DeckList::CockatriceFormat);
+	deckEditor->show();
 }
 
 void TabDeckStorage::actUpload()
@@ -132,6 +158,28 @@ void TabDeckStorage::uploadFinished(ProtocolResponse *r)
 	Command_DeckUpload *cmd = static_cast<Command_DeckUpload *>(sender());
 
 	serverDirView->addFileToTree(resp->getFile(), serverDirView->getNodeByPath(cmd->getPath()));
+}
+
+void TabDeckStorage::actOpenRemoteDeck()
+{
+	RemoteDeckList_TreeModel::FileNode *curRight = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(serverDirView->getCurrentItem());
+	if (!curRight)
+		return;
+
+	Command_DeckDownload *command = new Command_DeckDownload(curRight->getId());
+	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(openRemoteDeckFinished(ProtocolResponse *)));
+	client->sendCommand(command);
+}
+
+void TabDeckStorage::openRemoteDeckFinished(ProtocolResponse *r)
+{
+	Response_DeckDownload *resp = qobject_cast<Response_DeckDownload *>(r);
+	if (!resp)
+		return;
+	
+	WndDeckEditor *deckEditor = new WndDeckEditor;
+	deckEditor->setDeck(new DeckList(resp->getDeck()));
+	deckEditor->show();
 }
 
 void TabDeckStorage::actDownload()

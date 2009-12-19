@@ -39,6 +39,7 @@ TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectat
 	buttonHBox->addWidget(readyStartButton);
 	buttonHBox->addStretch();
 	deckView = new DeckView;
+	connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
 	QVBoxLayout *deckViewLayout = new QVBoxLayout;
 	deckViewLayout->addLayout(buttonHBox);
 	deckViewLayout->addWidget(deckView);
@@ -213,7 +214,7 @@ Player *TabGame::addPlayer(int playerId, const QString &playerName)
 	Player *newPlayer = new Player(playerName, playerId, playerId == localPlayerId, client, this);
 	scene->addPlayer(newPlayer);
 
-	connect(newPlayer, SIGNAL(newCardAdded(CardItem *)), this, SLOT(newCardAdded(CardItem *)));
+	connect(newPlayer, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
 	connect(newPlayer, SIGNAL(toggleZoneView(Player *, QString, int)), zoneLayout, SLOT(toggleZoneView(Player *, QString, int)));
 	connect(newPlayer, SIGNAL(closeZoneView(ZoneViewZone *)), zoneLayout, SLOT(removeItem(ZoneViewZone *)));
 	messageLog->connectToPlayer(newPlayer);
@@ -440,7 +441,7 @@ void TabGame::readyStart()
 	client->sendCommand(new Command_ReadyStart(gameId));
 }
 
-void TabGame::newCardAdded(CardItem *card)
+void TabGame::newCardAdded(AbstractCardItem *card)
 {
-	connect(card, SIGNAL(hovered(CardItem *)), cardInfo, SLOT(setCard(CardItem *)));
+	connect(card, SIGNAL(hovered(AbstractCardItem *)), cardInfo, SLOT(setCard(AbstractCardItem *)));
 }

@@ -5,7 +5,7 @@
 
 class QLabel;
 class QTextEdit;
-class CardItem;
+class AbstractCardItem;
 class CardInfo;
 
 class CardInfoWidget : public QFrame {
@@ -28,7 +28,7 @@ public:
 public slots:
 	void setCard(CardInfo *card);
 	void setCard(const QString &cardName);
-	void setCard(CardItem *card);
+	void setCard(AbstractCardItem *card);
 private slots:
 	void updatePixmap();
 };

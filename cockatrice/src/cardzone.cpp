@@ -156,8 +156,8 @@ void CardZone::moveAllToZone()
 
 	// Cards need to be moved in reverse order so that the other
 	// cards' list index doesn't change
-//	for (int i = cards.size() - 1; i >= 0; i--)
-//		player->client->moveCard(cards.at(i)->getId(), getName(), targetZone, targetX);
+	for (int i = cards.size() - 1; i >= 0; i--)
+		player->sendGameCommand(new Command_MoveCard(-1, getName(), cards.at(i)->getId(), getName(), targetX));
 }
 
 QPointF CardZone::closestGridPoint(const QPointF &point)

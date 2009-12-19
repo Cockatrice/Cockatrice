@@ -44,6 +44,7 @@ public:
 	void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
 	void cleanList();
 	DeckList *getDeckList() const { return deckList; }
+	void setDeckList(DeckList *_deck);
 private:
 	DeckList *deckList;
 	InnerDecklistNode *root;

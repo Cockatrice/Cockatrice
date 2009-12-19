@@ -23,6 +23,8 @@ protected:
 	bool tapped;
 private slots:
 	void pixmapUpdated();
+signals:
+	void hovered(AbstractCardItem *card);
 public:
 	enum { Type = typeCard };
 	int type() const { return Type; }
@@ -35,8 +37,10 @@ public:
 	void setName(const QString &_name = QString());
 	bool getTapped() const { return tapped; }
 	void setTapped(bool _tapped);
+	void processHoverEvent();
 protected:
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
+	void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
 	QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
 };
  

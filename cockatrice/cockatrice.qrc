@@ -16,6 +16,7 @@
         <file>resources/icon_phase_main2.svg</file>
         <file>resources/icon_phase_cleanup.svg</file>
         <file>resources/icon_nextturn.svg</file>
+	<file>resources/pencil.svg</file>
         <file>resources/hr.jpg</file>
         <file>translations/cockatrice_de.qm</file>
         <file>translations/cockatrice_en.qm</file>

@@ -45,7 +45,7 @@ class Player : public QObject, public QGraphicsItem {
 signals:
 	void closeZoneView(ZoneViewZone *zone);
 	void toggleZoneView(Player *player, QString zoneName, int number);
-	void newCardAdded(CardItem *card);
+	void newCardAdded(AbstractCardItem *card);
 	// Log events
 	void logDeckSelect(Player *player, int deckId);
 	void logSay(Player *player, QString message);

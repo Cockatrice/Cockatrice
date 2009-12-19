@@ -119,8 +119,11 @@ void DeckViewScene::rebuildTree()
 			if (!currentCard)
 				continue;
 
-			for (int k = 0; k < currentCard->getNumber(); ++k)
-				container->addCard(new DeckViewCard(currentCard->getName(), container));
+			for (int k = 0; k < currentCard->getNumber(); ++k) {
+				DeckViewCard *newCard = new DeckViewCard(currentCard->getName(), container);
+				container->addCard(newCard);
+				emit newCardAdded(newCard);
+			}
 		}
 	}
 }
@@ -155,6 +158,7 @@ DeckView::DeckView(QWidget *parent)
 	setScene(deckViewScene);
 
 	connect(deckViewScene, SIGNAL(sceneRectChanged(const QRectF &)), this, SLOT(updateSceneRect(const QRectF &)));
+	connect(deckViewScene, SIGNAL(newCardAdded(AbstractCardItem *)), this, SIGNAL(newCardAdded(AbstractCardItem *)));
 }
 
 void DeckView::resizeEvent(QResizeEvent *event)

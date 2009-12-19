@@ -36,9 +36,9 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	databaseView->setModel(databaseDisplayModel);
 	databaseView->setUniformRowHeights(true);
 	databaseView->setAlternatingRowColors(true);
+	databaseView->header()->setResizeMode(QHeaderView::ResizeToContents);
 	databaseView->setSortingEnabled(true);
 	databaseView->sortByColumn(0, Qt::AscendingOrder);
-	databaseView->resizeColumnToContents(0);
 	connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
 	connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
 	searchEdit->setTreeView(databaseView);
@@ -68,6 +68,7 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	deckView = new QTreeView();
 	deckView->setModel(deckModel);
 	deckView->setUniformRowHeights(true);
+	deckView->header()->setResizeMode(QHeaderView::ResizeToContents);
 	connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
 
 	QLabel *nameLabel = new QLabel(tr("Deck &name:"));
@@ -167,7 +168,6 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 
 WndDeckEditor::~WndDeckEditor()
 {
-
 }
 
 void WndDeckEditor::updateName(const QString &name)
@@ -216,9 +216,10 @@ bool WndDeckEditor::confirmClose()
 
 void WndDeckEditor::closeEvent(QCloseEvent *event)
 {
-	if (confirmClose())
+	if (confirmClose()) {
 		event->accept();
-	else
+		deleteLater();
+	} else
 		event->ignore();
 }
 
@@ -247,19 +248,11 @@ void WndDeckEditor::actLoadDeck()
 
 	QString fileName = dialog.selectedFiles().at(0);
 	DeckList::FileFormat fmt = DeckList::getFormatFromNameFilter(dialog.selectedNameFilter());
-	DeckList *l = deckModel->getDeckList();
-	if (l->loadFromFile(fileName, fmt)) {
-		lastFileName = fileName;
-		lastFileFormat = fmt;
-		nameEdit->setText(l->getName());
-		commentsEdit->setText(l->getComments());
-		deckModel->sort(1);
-		deckView->expandAll();
-		deckView->resizeColumnToContents(0);
-		setWindowModified(false);
-		
-		Deck_PictureCacher::cachePictures(l, this);
-	}
+	DeckList *l = new DeckList;
+	if (l->loadFromFile(fileName, fmt))
+		setDeck(l, fileName, fmt);
+	else
+		delete l;
 }
 
 bool WndDeckEditor::actSaveDeck()
@@ -376,4 +369,21 @@ void WndDeckEditor::actDecrement()
 	else
 		deckModel->setData(numberIndex, count - 1, Qt::EditRole);
 	setWindowModified(true);
+}
+
+void WndDeckEditor::setDeck(DeckList *_deck, const QString &_lastFileName, DeckList::FileFormat _lastFileFormat)
+{
+	deckModel->setDeckList(_deck);
+
+	lastFileName = _lastFileName;
+	lastFileFormat = _lastFileFormat;
+	nameEdit->setText(_deck->getName());
+	commentsEdit->setText(_deck->getComments());
+	deckModel->sort(1);
+	deckView->expandAll();
+	setWindowModified(false);
+		
+	Deck_PictureCacher::cachePictures(_deck, this);
+	deckView->expandAll();
+	setWindowModified(false);
 }
