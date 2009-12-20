@@ -78,11 +78,30 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 		if (!info->getName().startsWith(cardNameBeginning, Qt::CaseInsensitive))
 			return false;
 	
+	if (!cardName.isEmpty())
+		if (!info->getName().contains(cardName, Qt::CaseInsensitive))
+			return false;
+	
+	if (!cardText.isEmpty())
+		if (!info->getText().contains(cardText, Qt::CaseInsensitive))
+			return false;
+	
+	if (!cardColors.isEmpty())
+		if (QSet<QString>::fromList(info->getColors()).intersect(cardColors).isEmpty())
+			return false;
+		
+	if (!cardTypes.isEmpty())
+		if (!cardTypes.contains(info->getMainCardType()))
+			return false;
+
 	return true;
 }
 
-void CardDatabaseDisplayModel::setCardNameBeginning(const QString &_beginning)
+void CardDatabaseDisplayModel::clearSearch()
 {
-	cardNameBeginning = _beginning;
+	cardName.clear();
+	cardText.clear();
+	cardTypes.clear();
+	cardColors.clear();
 	invalidateFilter();
 }

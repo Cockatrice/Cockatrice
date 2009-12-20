@@ -6,6 +6,7 @@
 #include "decklistmodel.h"
 #include "cardinfowidget.h"
 #include "deck_picturecacher.h"
+#include "dlg_cardsearch.h"
 #include "main.h"
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
@@ -18,15 +19,28 @@ void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 WndDeckEditor::WndDeckEditor(QWidget *parent)
 	: QMainWindow(parent)
 {
+	aSearch = new QAction(tr("&Search..."), this);
+	aSearch->setIcon(QIcon(":/resources/icon_search.svg"));
+	connect(aSearch, SIGNAL(triggered()), this, SLOT(actSearch()));
+	aClearSearch = new QAction(tr("&Clear search"), this);
+	aClearSearch->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
+	connect(aClearSearch, SIGNAL(triggered()), this, SLOT(actClearSearch()));
+
 	QLabel *searchLabel = new QLabel(tr("&Search for:"));
 	searchEdit = new SearchLineEdit;
 	searchLabel->setBuddy(searchEdit);
 	connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(actAddCard()));
+	QToolButton *searchButton = new QToolButton;
+	searchButton->setDefaultAction(aSearch);
+	QToolButton *clearSearchButton = new QToolButton;
+	clearSearchButton->setDefaultAction(aClearSearch);
 
 	QHBoxLayout *searchLayout = new QHBoxLayout;
 	searchLayout->addWidget(searchLabel);
 	searchLayout->addWidget(searchEdit);
+	searchLayout->addWidget(searchButton);
+	searchLayout->addWidget(clearSearchButton);
 
 	databaseModel = new CardDatabaseModel(db, this);
 	databaseDisplayModel = new CardDatabaseDisplayModel(this);
@@ -134,8 +148,11 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	deckMenu->addSeparator();
 	deckMenu->addAction(aClose);
 
-	setsMenu = menuBar()->addMenu(tr("&Sets"));
-	setsMenu->addAction(aEditSets);
+	dbMenu = menuBar()->addMenu(tr("&Card database"));
+	dbMenu->addAction(aEditSets);
+	dbMenu->addSeparator();
+	dbMenu->addAction(aSearch);
+	dbMenu->addAction(aClearSearch);
 
 	aAddCard = new QAction(tr("Add card to &maindeck"), this);
 	aAddCard->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Return")) << QKeySequence(tr("Enter")));
@@ -163,6 +180,8 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	verticalToolBar->addAction(aRemoveCard);
 	verticalToolBar->addAction(aIncrement);
 	verticalToolBar->addAction(aDecrement);
+	
+	dlgCardSearch = new DlgCardSearch(this);
 	
 	resize(950, 700);
 }
@@ -303,6 +322,22 @@ void WndDeckEditor::actEditSets()
 	WndSets *w = new WndSets(this);
 	w->setWindowModality(Qt::WindowModal);
 	w->show();
+}
+
+void WndDeckEditor::actSearch()
+{
+	if (dlgCardSearch->exec()) {
+		searchEdit->clear();
+		databaseDisplayModel->setCardName(dlgCardSearch->getCardName());
+		databaseDisplayModel->setCardText(dlgCardSearch->getCardText());
+		databaseDisplayModel->setCardTypes(dlgCardSearch->getCardTypes());
+		databaseDisplayModel->setCardColors(dlgCardSearch->getCardColors());
+	}
+}
+
+void WndDeckEditor::actClearSearch()
+{
+	databaseDisplayModel->clearSearch();
 }
 
 void WndDeckEditor::recursiveExpand(const QModelIndex &index)

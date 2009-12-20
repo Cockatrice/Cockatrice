@@ -38,6 +38,7 @@ HEADERS += src/counter.h \
  src/window_sets.h \
  src/abstractgraphicsitem.h \
  src/dlg_settings.h \
+ src/dlg_cardsearch.h \
  src/phasestoolbar.h \
  src/gamescene.h \
  src/arrowitem.h \
@@ -89,6 +90,7 @@ SOURCES += src/counter.cpp \
  src/window_sets.cpp \
  src/abstractgraphicsitem.cpp \
  src/dlg_settings.cpp \
+ src/dlg_cardsearch.cpp \
  src/phasestoolbar.cpp \
  src/gamescene.cpp \
  src/arrowitem.cpp \

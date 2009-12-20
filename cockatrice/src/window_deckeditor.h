@@ -13,6 +13,7 @@ class QTreeView;
 class QTableView;
 class CardInfoWidget;
 class QTextEdit;
+class DlgCardSearch;
 
 class SearchLineEdit : public QLineEdit {
 	private:
@@ -40,6 +41,9 @@ private slots:
 	void actPrintDeck();
 
 	void actEditSets();
+	
+	void actSearch();
+	void actClearSearch();
 
 	void actAddCard();
 	void actAddCardToSideboard();
@@ -63,10 +67,11 @@ private:
 	SearchLineEdit *searchEdit;
 	QLineEdit *nameEdit;
 	QTextEdit *commentsEdit;
+	DlgCardSearch *dlgCardSearch;
 
-	QMenu *deckMenu, *setsMenu;
+	QMenu *deckMenu, *dbMenu;
 	QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aPrintDeck, *aClose;
-	QAction *aEditSets;
+	QAction *aEditSets, *aSearch, *aClearSearch;
 	QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;
 public:
 	WndDeckEditor(QWidget *parent = 0);

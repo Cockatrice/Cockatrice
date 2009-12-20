@@ -112,6 +112,8 @@ public:
 	bool saveToFile(const QString &fileName);
 	const QString &getPicsPath() const { return picsPath; }
 	void startPicDownload(CardInfo *card);
+	QStringList getAllColors() const;
+	QStringList getAllMainCardTypes() const;
 private slots:
 	void picDownloadFinished(int id, bool error);
 public slots:

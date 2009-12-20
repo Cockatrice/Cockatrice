@@ -7,6 +7,7 @@
 #include <QSvgRenderer>
 #include <QPainter>
 #include <QUrl>
+#include <QSet>
 
 CardSet::CardSet(const QString &_shortName, const QString &_longName)
 	: shortName(_shortName), longName(_longName)
@@ -502,4 +503,25 @@ void CardDatabase::updateDatabasePath(const QString &path)
 		cardDatabasePath = path;
 	if (!cardDatabasePath.isEmpty())
 		loadFromFile(cardDatabasePath);
+}
+
+QStringList CardDatabase::getAllColors() const
+{
+	QSet<QString> colors;
+	QHashIterator<QString, CardInfo *> cardIterator(cardHash);
+	while (cardIterator.hasNext()) {
+		const QStringList &cardColors = cardIterator.next().value()->getColors();
+		for (int i = 0; i < cardColors.size(); ++i)
+			colors.insert(cardColors[i]);
+	}
+	return colors.toList();
+}
+
+QStringList CardDatabase::getAllMainCardTypes() const
+{
+	QSet<QString> types;
+	QHashIterator<QString, CardInfo *> cardIterator(cardHash);
+	while (cardIterator.hasNext())
+		types.insert(cardIterator.next().value()->getMainCardType());
+	return types.toList();
 }

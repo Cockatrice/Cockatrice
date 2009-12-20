@@ -4,6 +4,7 @@
 #include <QAbstractListModel>
 #include <QSortFilterProxyModel>
 #include <QList>
+#include <QSet>
 #include "carddatabase.h"
 
 class CardDatabaseModel : public QAbstractListModel {
@@ -24,10 +25,16 @@ private:
 class CardDatabaseDisplayModel : public QSortFilterProxyModel {
 	Q_OBJECT
 private:
-	QString cardNameBeginning;
+	QString cardNameBeginning, cardName, cardText;
+	QSet<QString> cardTypes, cardColors;
 public:
 	CardDatabaseDisplayModel(QObject *parent = 0);
-	void setCardNameBeginning(const QString &_beginning);
+	void setCardNameBeginning(const QString &_beginning) { cardNameBeginning = _beginning; invalidateFilter(); }
+	void setCardName(const QString &_cardName) { cardName = _cardName; invalidateFilter(); }
+	void setCardText(const QString &_cardText) { cardText = _cardText; invalidateFilter(); }
+	void setCardTypes(const QSet<QString> &_cardTypes) { cardTypes = _cardTypes; invalidateFilter(); }
+	void setCardColors(const QSet<QString> &_cardColors) { cardColors = _cardColors; invalidateFilter(); }
+	void clearSearch();
 protected:
 	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 };
