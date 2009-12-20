@@ -9,6 +9,7 @@ class QLineEdit;
 class QCheckBox;
 
 class DlgCardSearch : public QDialog {
+	Q_OBJECT
 private:
 	QLineEdit *cardNameEdit, *cardTextEdit;
 	QList<QCheckBox *> cardTypeCheckBoxes, cardColorCheckBoxes;
