@@ -31,6 +31,7 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	databaseModel = new CardDatabaseModel(db, this);
 	databaseDisplayModel = new CardDatabaseDisplayModel(this);
 	databaseDisplayModel->setSourceModel(databaseModel);
+	databaseDisplayModel->setFilterKeyColumn(0);
 	databaseDisplayModel->sort(0, Qt::AscendingOrder);
 	databaseView = new QTreeView();
 	databaseView->setModel(databaseDisplayModel);
@@ -197,7 +198,7 @@ void WndDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
 
 void WndDeckEditor::updateSearch(const QString &search)
 {
-	databaseDisplayModel->setFilterFixedString(search);
+	databaseDisplayModel->setCardNameBeginning(search);
 }
 
 bool WndDeckEditor::confirmClose()

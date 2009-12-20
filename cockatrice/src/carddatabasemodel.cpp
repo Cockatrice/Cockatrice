@@ -69,3 +69,20 @@ CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
 	setFilterCaseSensitivity(Qt::CaseInsensitive);
 	setSortCaseSensitivity(Qt::CaseInsensitive);
 }
+
+bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
+{
+	CardInfo *info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
+	
+	if (!cardNameBeginning.isEmpty())
+		if (!info->getName().startsWith(cardNameBeginning, Qt::CaseInsensitive))
+			return false;
+	
+	return true;
+}
+
+void CardDatabaseDisplayModel::setCardNameBeginning(const QString &_beginning)
+{
+	cardNameBeginning = _beginning;
+	invalidateFilter();
+}

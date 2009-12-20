@@ -15,6 +15,7 @@ public:
 	int columnCount(const QModelIndex &parent = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+	CardInfo *getCard(int index) const { return cardList[index]; }
 private:
 	QList<CardInfo *> cardList;
 	CardDatabase *db;
@@ -22,8 +23,13 @@ private:
 
 class CardDatabaseDisplayModel : public QSortFilterProxyModel {
 	Q_OBJECT
+private:
+	QString cardNameBeginning;
 public:
 	CardDatabaseDisplayModel(QObject *parent = 0);
+	void setCardNameBeginning(const QString &_beginning);
+protected:
+	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 };
 
 #endif
