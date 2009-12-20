@@ -36,9 +36,9 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	databaseView->setModel(databaseDisplayModel);
 	databaseView->setUniformRowHeights(true);
 	databaseView->setAlternatingRowColors(true);
-	databaseView->header()->setResizeMode(QHeaderView::ResizeToContents);
 	databaseView->setSortingEnabled(true);
 	databaseView->sortByColumn(0, Qt::AscendingOrder);
+	databaseView->resizeColumnToContents(0);
 	connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
 	connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
 	searchEdit->setTreeView(databaseView);
