@@ -698,7 +698,8 @@ void Player::processGameEvent(GameEvent *event)
 
 void Player::showCardMenu(const QPoint &p)
 {
-	cardMenu->exec(p);
+	if (cardMenu)
+		cardMenu->exec(p);
 }
 
 void Player::setActive(bool _active)
