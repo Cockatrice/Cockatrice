@@ -344,6 +344,9 @@ ResponseCode Server_ProtocolHandler::cmdSay(Command_Say *cmd, Server_Game *game,
 
 ResponseCode Server_ProtocolHandler::cmdShuffle(Command_Shuffle * /*cmd*/, Server_Game *game, Server_Player *player)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	player->getZones().value("deck")->shuffle();
 	game->sendGameEvent(new Event_Shuffle(-1, player->getPlayerId()));
 	return RespOk;
@@ -351,6 +354,9 @@ ResponseCode Server_ProtocolHandler::cmdShuffle(Command_Shuffle * /*cmd*/, Serve
 
 ResponseCode Server_ProtocolHandler::cmdMulligan(Command_Mulligan * /*cmd*/, Server_Game *game, Server_Player *player)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	int number = player->getInitialCards();
 	if (!number)
 		return RespContextError;
@@ -376,6 +382,9 @@ ResponseCode Server_ProtocolHandler::cmdRollDie(Command_RollDie *cmd, Server_Gam
 
 ResponseCode Server_ProtocolHandler::drawCards(Server_Game *game, Server_Player *player, int number)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	Server_CardZone *deck = player->getZones().value("deck");
 	Server_CardZone *hand = player->getZones().value("hand");
 	if (deck->cards.size() < number)
@@ -402,6 +411,9 @@ ResponseCode Server_ProtocolHandler::cmdDrawCards(Command_DrawCards *cmd, Server
 
 ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *player, const QString &_startZone, int _cardId, const QString &_targetZone, int x, int y, bool faceDown)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	Server_CardZone *startzone = player->getZones().value(_startZone);
 	Server_CardZone *targetzone = player->getZones().value(_targetZone);
 	if ((!startzone) || (!targetzone))
@@ -493,6 +505,9 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, Server_G
 
 ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, Server_Game *game, Server_Player *player)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	// powtough wird erst mal ignoriert
 	Server_CardZone *zone = player->getZones().value(cmd->getZone());
 	if (!zone)
@@ -507,6 +522,9 @@ ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, Se
 
 ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Server_Game *game, Server_Player *player)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	Server_Player *startPlayer = game->getPlayer(cmd->getStartPlayerId());
 	Server_Player *targetPlayer = game->getPlayer(cmd->getTargetPlayerId());
 	if (!startPlayer || !targetPlayer)
@@ -543,6 +561,9 @@ ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Se
 
 ResponseCode Server_ProtocolHandler::cmdDeleteArrow(Command_DeleteArrow *cmd, Server_Game *game, Server_Player *player)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	if (!player->deleteArrow(cmd->getArrowId()))
 		return RespNameNotFound;
 	
@@ -552,6 +573,9 @@ ResponseCode Server_ProtocolHandler::cmdDeleteArrow(Command_DeleteArrow *cmd, Se
 
 ResponseCode Server_ProtocolHandler::cmdSetCardAttr(Command_SetCardAttr *cmd, Server_Game *game, Server_Player *player)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	// zone, card id, attr name, attr value
 	// card id = -1 => affects all cards in the specified zone
 	Server_CardZone *zone = player->getZones().value(cmd->getZone());
@@ -576,6 +600,9 @@ ResponseCode Server_ProtocolHandler::cmdSetCardAttr(Command_SetCardAttr *cmd, Se
 
 ResponseCode Server_ProtocolHandler::cmdIncCounter(Command_IncCounter *cmd, Server_Game *game, Server_Player *player)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	const QMap<int, Server_Counter *> counters = player->getCounters();
 	Server_Counter *c = counters.value(cmd->getCounterId(), 0);
 	if (!c)
@@ -588,6 +615,9 @@ ResponseCode Server_ProtocolHandler::cmdIncCounter(Command_IncCounter *cmd, Serv
 
 ResponseCode Server_ProtocolHandler::cmdCreateCounter(Command_CreateCounter *cmd, Server_Game *game, Server_Player *player)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	Server_Counter *c = new Server_Counter(player->newCounterId(), cmd->getCounterName(), cmd->getColor(), cmd->getRadius(), cmd->getValue());
 	player->addCounter(c);
 	game->sendGameEvent(new Event_CreateCounters(-1, player->getPlayerId(), QList<ServerInfo_Counter *>() << new ServerInfo_Counter(c->getId(), c->getName(), c->getColor(), c->getRadius(), c->getCount())));
@@ -597,6 +627,9 @@ ResponseCode Server_ProtocolHandler::cmdCreateCounter(Command_CreateCounter *cmd
 
 ResponseCode Server_ProtocolHandler::cmdSetCounter(Command_SetCounter *cmd, Server_Game *game, Server_Player *player)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	Server_Counter *c = player->getCounters().value(cmd->getCounterId(), 0);;
 	if (!c)
 		return RespNameNotFound;
@@ -608,6 +641,9 @@ ResponseCode Server_ProtocolHandler::cmdSetCounter(Command_SetCounter *cmd, Serv
 
 ResponseCode Server_ProtocolHandler::cmdDelCounter(Command_DelCounter *cmd, Server_Game *game, Server_Player *player)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	if (!player->deleteCounter(cmd->getCounterId()))
 		return RespNameNotFound;
 	game->sendGameEvent(new Event_DelCounter(-1, player->getPlayerId(), cmd->getCounterId()));
@@ -616,6 +652,9 @@ ResponseCode Server_ProtocolHandler::cmdDelCounter(Command_DelCounter *cmd, Serv
 
 ResponseCode Server_ProtocolHandler::cmdNextTurn(Command_NextTurn * /*cmd*/, Server_Game *game, Server_Player * /*player*/)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	int activePlayer = game->getActivePlayer();
 	if (++activePlayer == game->getPlayerCount())
 		activePlayer = 0;
@@ -625,6 +664,9 @@ ResponseCode Server_ProtocolHandler::cmdNextTurn(Command_NextTurn * /*cmd*/, Ser
 
 ResponseCode Server_ProtocolHandler::cmdSetActivePhase(Command_SetActivePhase *cmd, Server_Game *game, Server_Player *player)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	if (game->getActivePlayer() != player->getPlayerId())
 		return RespContextError;
 	game->setActivePhase(cmd->getPhase());
@@ -634,6 +676,9 @@ ResponseCode Server_ProtocolHandler::cmdSetActivePhase(Command_SetActivePhase *c
 
 ResponseCode Server_ProtocolHandler::cmdDumpZone(Command_DumpZone *cmd, Server_Game *game, Server_Player *player)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	Server_Player *otherPlayer = game->getPlayer(cmd->getPlayerId());
 	if (!otherPlayer)
 		return RespNameNotFound;
@@ -663,6 +708,9 @@ ResponseCode Server_ProtocolHandler::cmdDumpZone(Command_DumpZone *cmd, Server_G
 
 ResponseCode Server_ProtocolHandler::cmdStopDumpZone(Command_StopDumpZone *cmd, Server_Game *game, Server_Player *player)
 {
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
 	Server_Player *otherPlayer = game->getPlayer(cmd->getPlayerId());
 	if (!otherPlayer)
 		return RespNameNotFound;
