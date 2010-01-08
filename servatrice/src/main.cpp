@@ -22,8 +22,19 @@
 #include <QTextCodec>
 #include "servatrice.h"
 
+void myMessageOutput(QtMsgType /*type*/, const char *msg)
+{
+	static FILE *f = NULL;
+	if (!f)
+		f = fopen("qdebug.txt", "w");
+	fprintf(f, "%s\n", msg);
+	fflush(f);
+}
+
 int main(int argc, char *argv[])
 {
+	qInstallMsgHandler(myMessageOutput);
+
 	QCoreApplication app(argc, argv);
 	app.setOrganizationName("Cockatrice");
 	app.setApplicationName("Servatrice");
