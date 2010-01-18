@@ -156,7 +156,7 @@ ResponseCode Server_Game::checkJoin(const QString &_password, bool spectator)
 		if (!spectatorsAllowed)
 			return RespSpectatorsNotAllowed;
 	} else if (gameStarted || (getPlayerCount() >= getMaxPlayers()))
-		return RespContextError;
+		return RespGameFull;
 	
 	return RespOk;
 }

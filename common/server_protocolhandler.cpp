@@ -274,6 +274,9 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd)
 
 ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd)
 {
+	if (games.contains(cmd->getGameId()))
+		return RespContextError;
+	
 	Server_Game *g = server->getGame(cmd->getGameId());
 	if (!g)
 		return RespNameNotFound;

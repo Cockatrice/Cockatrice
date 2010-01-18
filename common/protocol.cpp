@@ -144,6 +144,7 @@ void ProtocolResponse::initializeHash()
 	responseHash.insert("login_needed", RespLoginNeeded);
 	responseHash.insert("function_not_allowed", RespFunctionNotAllowed);
 	responseHash.insert("game_not_started", RespGameNotStarted);
+	responseHash.insert("game_full", RespGameFull);
 	responseHash.insert("context_error", RespContextError);
 	responseHash.insert("wrong_password", RespWrongPassword);
 	responseHash.insert("spectators_not_allowed", RespSpectatorsNotAllowed);

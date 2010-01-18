@@ -65,7 +65,7 @@ void GameSelector::checkResponse(ResponseCode response)
 	switch (response) {
 		case RespWrongPassword: QMessageBox::critical(this, tr("Error"), tr("Wrong password.")); break;
 		case RespSpectatorsNotAllowed: QMessageBox::critical(this, tr("Error"), tr("Spectators are not allowed in this game.")); break;
-		case RespContextError: QMessageBox::critical(this, tr("Error"), tr("The game is already full.")); break;
+		case RespGameFull: QMessageBox::critical(this, tr("Error"), tr("The game is already full.")); break;
 		case RespNameNotFound: QMessageBox::critical(this, tr("Error"), tr("The game does not exist any more.")); break;
 		default: ;
 	}
