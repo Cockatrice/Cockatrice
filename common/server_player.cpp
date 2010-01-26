@@ -17,6 +17,9 @@ Server_Player::Server_Player(Server_Game *_game, int _playerId, const QString &_
 Server_Player::~Server_Player()
 {
 	delete deck;
+	
+	if (handler)
+		handler->playerRemovedFromGame(game);
 }
 
 int Server_Player::newCardId()

@@ -72,11 +72,14 @@ private:
 	ResponseCode cmdSetActivePhase(Command_SetActivePhase *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdDumpZone(Command_DumpZone *cmd, Server_Game *game, Server_Player *player);
 	ResponseCode cmdStopDumpZone(Command_StopDumpZone *cmd, Server_Game *game, Server_Player *player);
+	
+	void processCommandHelper(Command *command);
 private slots:
 	void pingClockTimeout();
 public:
 	Server_ProtocolHandler(Server *_server, QObject *parent = 0);
 	~Server_ProtocolHandler();
+	void playerRemovedFromGame(Server_Game *game);
 	
 	bool getAcceptsGameListChanges() const { return acceptsGameListChanges; }
 	bool getAcceptsChatChannelListChanges() const { return acceptsChatChannelListChanges; }

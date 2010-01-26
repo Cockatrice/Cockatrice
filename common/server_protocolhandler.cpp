@@ -45,7 +45,13 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 		chatChannelIterator.next().value()->removeClient(this);
 }
 
-void Server_ProtocolHandler::processCommand(Command *command)
+void Server_ProtocolHandler::playerRemovedFromGame(Server_Game *game)
+{
+	qDebug() << "Server_ProtocolHandler::playerRemovedFromGame(): gameId =" << game->getGameId();
+	games.remove(game->getGameId());
+}
+
+void Server_ProtocolHandler::processCommandHelper(Command *command)
 {
 	lastCommandTime = QDateTime::currentDateTime();
 
@@ -77,6 +83,7 @@ void Server_ProtocolHandler::processCommand(Command *command)
 		}
 	
 		if (!games.contains(gameCommand->getGameId())) {
+			qDebug() << "invalid game";
 			sendProtocolItem(new ProtocolResponse(gameCommand->getCmdId(), RespNameNotFound));
 			return;
 		}
@@ -128,6 +135,11 @@ void Server_ProtocolHandler::processCommand(Command *command)
 	}
 	if (response != RespNothing)
 		sendProtocolItem(new ProtocolResponse(command->getCmdId(), response));
+}
+
+void Server_ProtocolHandler::processCommand(Command *command)
+{
+	processCommandHelper(command);
 	
 	delete command;
 	
@@ -293,7 +305,6 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd)
 
 ResponseCode Server_ProtocolHandler::cmdLeaveGame(Command_LeaveGame * /*cmd*/, Server_Game *game, Server_Player *player)
 {
-	games.remove(game->getGameId());
 	game->removePlayer(player);
 	return RespOk;
 }
