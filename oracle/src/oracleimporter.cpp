@@ -173,6 +173,7 @@ QString OracleImporter::getURLFromName(QString name) const
 {
 	return pictureUrl.arg(
 		name
+                .replace("Æther", "Aether")
 		.remove('\'')
 		.remove("//")
 		.remove(',')
