@@ -286,6 +286,10 @@
             <name>WL</name>
             <longname>Weatherlight</longname>
         </set>
+	<set import="1">
+	    <name>WWK</name>
+	    <longname>Worldwake</longname>
+	</set>
         <set import="1">
             <name>ZEN</name>
             <longname>Zendikar</longname>
