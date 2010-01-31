@@ -52,6 +52,9 @@ Servatrice::Servatrice(QObject *parent)
 	settings->endArray();
 	
 	loginMessage = settings->value("messages/login").toString();
+	
+	maxGameInactivityTime = settings->value("game/max_game_inactivity_time").toInt();
+	maxPlayerInactivityTime = settings->value("game/max_player_inactivity_time").toInt();
 }
 
 Servatrice::~Servatrice()

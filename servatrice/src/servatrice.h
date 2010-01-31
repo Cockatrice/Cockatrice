@@ -41,10 +41,14 @@ public:
 	bool execSqlQuery(QSqlQuery &query);
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
 	QString getLoginMessage() const { return loginMessage; }
+	int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
+	int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
 private:
 	QTcpServer *tcpServer;
 	QString loginMessage;
 	QSettings *settings;
+	int maxGameInactivityTime;
+	int maxPlayerInactivityTime;
 };
 
 #endif

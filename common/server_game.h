@@ -40,6 +40,7 @@ private:
 	int maxPlayers;
 	int activePlayer, activePhase;
 	bool spectatorsAllowed;
+	int inactivityCounter;
 	QTimer *pingClock;
 signals:
 	void gameClosing();

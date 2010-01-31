@@ -149,7 +149,7 @@ void Server_ProtocolHandler::processCommand(Command *command)
 
 void Server_ProtocolHandler::pingClockTimeout()
 {
-	if (lastCommandTime.secsTo(QDateTime::currentDateTime()) > 10)
+	if (lastCommandTime.secsTo(QDateTime::currentDateTime()) > server->getMaxPlayerInactivityTime())
 		deleteLater();
 }
 

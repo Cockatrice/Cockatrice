@@ -28,7 +28,7 @@
 #include <QTimer>
 
 Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent)
-	: QObject(parent), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), activePlayer(-1), activePhase(-1), spectatorsAllowed(_spectatorsAllowed)
+	: QObject(parent), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), activePlayer(-1), activePhase(-1), spectatorsAllowed(_spectatorsAllowed), inactivityCounter(0)
 {
 	creator = addPlayer(_creator, false, false);
 
@@ -55,12 +55,25 @@ void Server_Game::pingClockTimeout()
 	QDateTime now = QDateTime::currentDateTime();
 	QList<ServerInfo_PlayerPing *> pingList;
 	QMapIterator<int, Server_Player *> playerIterator(players);
+	bool allPlayersInactive = true;
 	while (playerIterator.hasNext()) {
 		Server_Player *player = playerIterator.next().value();
-		int pingTime = player->getProtocolHandler() ? player->getProtocolHandler()->getLastCommandTime().secsTo(now) : -1;
+		int pingTime;
+		if (player->getProtocolHandler()) {
+			pingTime = player->getProtocolHandler()->getLastCommandTime().secsTo(now);
+			allPlayersInactive = false;
+		} else
+			pingTime = -1;
 		pingList.append(new ServerInfo_PlayerPing(player->getPlayerId(), pingTime));
 	}
 	sendGameEvent(new Event_Ping(-1, pingList));
+	
+	const int maxTime = static_cast<Server *>(parent())->getMaxGameInactivityTime();
+	if (allPlayersInactive) {
+		if ((++inactivityCounter >= maxTime) && (maxTime > 0))
+			deleteLater();
+	} else
+		inactivityCounter = 0;
 }
 
 int Server_Game::getPlayerCount() const

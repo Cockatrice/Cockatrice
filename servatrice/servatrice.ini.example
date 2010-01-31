@@ -21,3 +21,6 @@ size=1
 1\autojoin=true
 1\joinmessage="This is the general chat channel. This message is only here to show that channels can have a join message."
 
+[game]
+max_game_inactivity_time=300
+max_player_inactivity_time=15
