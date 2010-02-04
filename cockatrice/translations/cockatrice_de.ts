@@ -1283,7 +1283,7 @@
     <message>
         <location filename="../src/messagelogwidget.cpp" line="54"/>
         <source>You have joined game #%1.</source>
-        <translation></translation>
+        <translation>Sie sind dem Spiel %1 beigetreten.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="59"/>
