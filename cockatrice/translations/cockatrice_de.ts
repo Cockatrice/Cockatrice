@@ -2433,7 +2433,7 @@ Bitte geben Sie einen Namen ein:</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="146"/>
         <source>Load d&amp;eck from server</source>
-        <translation>Deck vom S&amp;server laden</translation>
+        <translation>Deck vom &amp;Server laden</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="147"/>
