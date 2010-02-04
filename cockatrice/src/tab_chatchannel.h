@@ -40,6 +40,7 @@ public:
 	void retranslateUi();
 	void processChatEvent(ChatEvent *event);
 	QString getChannelName() const { return channelName; }
+	QString getTabText() const { return channelName; }
 };
 
 #endif

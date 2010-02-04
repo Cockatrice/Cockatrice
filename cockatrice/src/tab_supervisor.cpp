@@ -1,3 +1,4 @@
+#include <QApplication>
 #include "tab_supervisor.h"
 #include "client.h"
 #include "tab_server.h"
@@ -16,22 +17,28 @@ TabSupervisor::	TabSupervisor(QWidget *parent)
 
 void TabSupervisor::retranslateUi()
 {
-	if (tabServer) {
-		setTabText(0, tr("Server"));
-		tabServer->retranslateUi();
-	}
-	if (tabDeckStorage) {
-		setTabText(1, tr("Deck storage"));
-		tabDeckStorage->retranslateUi();
-	}
-	
+	QList<Tab *> tabs;
+	if (tabServer)
+		tabs.append(tabServer);
+	if (tabDeckStorage)
+		tabs.append(tabDeckStorage);
 	QMapIterator<QString, TabChatChannel *> chatChannelIterator(chatChannelTabs);
 	while (chatChannelIterator.hasNext())
-		chatChannelIterator.next().value()->retranslateUi();
-
+		tabs.append(chatChannelIterator.next().value());
 	QMapIterator<int, TabGame *> gameIterator(gameTabs);
 	while (gameIterator.hasNext())
-		gameIterator.next().value()->retranslateUi();
+		tabs.append(gameIterator.next().value());
+	
+	for (int i = 0; i < tabs.size(); ++i) {
+		setTabText(indexOf(tabs[i]), tabs[i]->getTabText());
+		tabs[i]->retranslateUi();
+	}
+}
+
+void TabSupervisor::myAddTab(Tab *tab)
+{
+	connect(tab, SIGNAL(userEvent()), this, SLOT(tabUserEvent()));
+	addTab(tab, tab->getTabText());
 }
 
 void TabSupervisor::start(Client *_client)
@@ -44,11 +51,11 @@ void TabSupervisor::start(Client *_client)
 
 	tabServer = new TabServer(client);
 	connect(tabServer, SIGNAL(chatChannelJoined(const QString &)), this, SLOT(addChatChannelTab(const QString &)));
-	addTab(tabServer, QString());
+	myAddTab(tabServer);
 	updatePingTime(0, -1);
 	
 	tabDeckStorage = new TabDeckStorage(client);
-	addTab(tabDeckStorage, QString());
+	myAddTab(tabDeckStorage);
 
 	retranslateUi();
 }
@@ -89,9 +96,9 @@ void TabSupervisor::updatePingTime(int value, int max)
 
 void TabSupervisor::gameJoined(Event_GameJoined *event)
 {
-	TabGame *tab = new TabGame(client, event->getGameId(), event->getPlayerId(), event->getSpectator(), event->getResuming());
+	TabGame *tab = new TabGame(client, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getResuming());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
-	addTab(tab, tr("Game %1").arg(event->getGameId()));
+	myAddTab(tab);
 	gameTabs.insert(event->getGameId(), tab);
 	setCurrentWidget(tab);
 }
@@ -108,7 +115,7 @@ void TabSupervisor::addChatChannelTab(const QString &channelName)
 {
 	TabChatChannel *tab = new TabChatChannel(client, channelName);
 	connect(tab, SIGNAL(channelClosing(TabChatChannel *)), this, SLOT(chatChannelLeft(TabChatChannel *)));
-	addTab(tab, channelName);
+	myAddTab(tab);
 	chatChannelTabs.insert(channelName, tab);
 	setCurrentWidget(tab);
 }
@@ -119,6 +126,13 @@ void TabSupervisor::chatChannelLeft(TabChatChannel *tab)
 
 	chatChannelTabs.remove(tab->getChannelName());
 	removeTab(indexOf(tab));
+}
+
+void TabSupervisor::tabUserEvent()
+{
+	Tab *tab = static_cast<Tab *>(sender());
+	// XXX Mark tab as changed (exclamation mark icon?)
+	QApplication::alert(this);
 }
 
 void TabSupervisor::processChatEvent(ChatEvent *event)

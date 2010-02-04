@@ -47,6 +47,7 @@ private slots:
 public:
 	TabDeckStorage(Client *_client);
 	void retranslateUi();
+	QString getTabText() const { return tr("Deck storage"); }
 };
 
 #endif

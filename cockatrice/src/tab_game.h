@@ -40,6 +40,7 @@ class TabGame : public Tab {
 private:
 	Client *client;
 	int gameId;
+	QString gameDescription;
 	int localPlayerId;
 	bool spectator;
 	QMap<int, Player *> players;
@@ -95,11 +96,12 @@ private slots:
 	void actNextPhase();
 	void actNextTurn();
 public:
-	TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectator, bool _resuming);
+	TabGame(Client *_client, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _resuming);
 	~TabGame();
 	void retranslateUi();
 	const QMap<int, Player *> &getPlayers() const { return players; }
 	int getGameId() const { return gameId; }
+	QString getTabText() const { return tr("Game %1: %2").arg(gameId).arg(gameDescription); }
 
 	void processGameEvent(GameEvent *event);
 public slots:

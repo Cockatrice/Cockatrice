@@ -2149,12 +2149,12 @@
     </message>
     <message>
         <location filename="../src/player.cpp" line="416"/>
-        <location filename="../src/player.cpp" line="963"/>
+        <location filename="../src/player.cpp" line="964"/>
         <source>Number:</source>
         <translation>Anzahl:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="963"/>
+        <location filename="../src/player.cpp" line="964"/>
         <source>Set counters</source>
         <translation>Setze Zählmarken</translation>
     </message>
@@ -2295,7 +2295,7 @@
         <translation>%1 hat den Raum betreten.</translation>
     </message>
     <message>
-        <location filename="../src/tab_chatchannel.cpp" line="87"/>
+        <location filename="../src/tab_chatchannel.cpp" line="88"/>
         <source>%1 has left the channel.</source>
         <translation>%1 hat den Raum verlassen.</translation>
     </message>
@@ -2361,6 +2361,11 @@ Bitte geben Sie einen Namen ein:</translation>
         <location filename="../src/tab_deck_storage.cpp" line="221"/>
         <source>Name of new folder:</source>
         <translation>Name für den neuen Ordner:</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_storage.h" line="50"/>
+        <source>Deck storage</source>
+        <translation>Deckspeicherplatz</translation>
     </message>
 </context>
 <context>
@@ -2475,23 +2480,33 @@ Bitte geben Sie einen Namen ein:</translation>
         <source>Load deck</source>
         <translation>Deck laden</translation>
     </message>
+    <message>
+        <location filename="../src/tab_game.h" line="104"/>
+        <source>Game %1: %2</source>
+        <translation>Spiel %1: %2</translation>
+    </message>
+</context>
+<context>
+    <name>TabServer</name>
+    <message>
+        <location filename="../src/tab_server.h" line="88"/>
+        <source>Server</source>
+        <translation>Server</translation>
+    </message>
 </context>
 <context>
     <name>TabSupervisor</name>
     <message>
-        <location filename="../src/tab_supervisor.cpp" line="20"/>
         <source>Server</source>
-        <translation>Server</translation>
+        <translation type="obsolete">Server</translation>
     </message>
     <message>
-        <location filename="../src/tab_supervisor.cpp" line="24"/>
         <source>Deck storage</source>
-        <translation>Deckspeicherplatz</translation>
+        <translation type="obsolete">Deckspeicherplatz</translation>
     </message>
     <message>
-        <location filename="../src/tab_supervisor.cpp" line="94"/>
         <source>Game %1</source>
-        <translation>Spiel %1</translation>
+        <translation type="obsolete">Spiel %1</translation>
     </message>
 </context>
 <context>

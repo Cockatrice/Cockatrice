@@ -6,6 +6,7 @@
 
 class QMenu;
 class Client;
+class Tab;
 class TabServer;
 class TabChatChannel;
 class TabGame;
@@ -22,6 +23,7 @@ private:
 	TabDeckStorage *tabDeckStorage;
 	QMap<QString, TabChatChannel *> chatChannelTabs;
 	QMap<int, TabGame *> gameTabs;
+	void myAddTab(Tab *tab);
 public:
 	TabSupervisor(QWidget *parent = 0);
 	void retranslateUi();
@@ -36,6 +38,7 @@ private slots:
 	void gameLeft(TabGame *tab);
 	void addChatChannelTab(const QString &channelName);
 	void chatChannelLeft(TabChatChannel *tab);
+	void tabUserEvent();
 	void processChatEvent(ChatEvent *event);
 	void processGameEvent(GameEvent *event);
 };

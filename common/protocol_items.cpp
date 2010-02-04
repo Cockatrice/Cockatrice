@@ -309,10 +309,11 @@ Event_ServerMessage::Event_ServerMessage(const QString &_message)
 {
 	insertItem(new SerializableItem_String("message", _message));
 }
-Event_GameJoined::Event_GameJoined(int _gameId, int _playerId, bool _spectator, bool _resuming)
+Event_GameJoined::Event_GameJoined(int _gameId, const QString &_gameDescription, int _playerId, bool _spectator, bool _resuming)
 	: GenericEvent("game_joined")
 {
 	insertItem(new SerializableItem_Int("game_id", _gameId));
+	insertItem(new SerializableItem_String("game_description", _gameDescription));
 	insertItem(new SerializableItem_Int("player_id", _playerId));
 	insertItem(new SerializableItem_Bool("spectator", _spectator));
 	insertItem(new SerializableItem_Bool("resuming", _resuming));

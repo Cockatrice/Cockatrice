@@ -193,7 +193,7 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd)
 				if (gamePlayers[j]->getPlayerName() == playerName) {
 					gamePlayers[j]->setProtocolHandler(this);
 					games.insert(serverGames[i]->getGameId(), QPair<Server_Game *, Server_Player *>(serverGames[i], gamePlayers[j]));
-					enqueueProtocolItem(new Event_GameJoined(serverGames[i]->getGameId(), gamePlayers[j]->getPlayerId(), gamePlayers[j]->getSpectator(), true));
+					enqueueProtocolItem(new Event_GameJoined(serverGames[i]->getGameId(), serverGames[i]->getDescription(), gamePlayers[j]->getPlayerId(), gamePlayers[j]->getSpectator(), true));
 					enqueueProtocolItem(new Event_GameStateChanged(serverGames[i]->getGameId(), serverGames[i]->getGameStarted(), serverGames[i]->getActivePlayer(), serverGames[i]->getActivePhase(), serverGames[i]->getGameState(gamePlayers[j])));
 				}
 		}
@@ -279,7 +279,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd)
 	Server_Player *creator = game->getCreator();
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	
-	enqueueProtocolItem(new Event_GameJoined(game->getGameId(), creator->getPlayerId(), false, false));
+	enqueueProtocolItem(new Event_GameJoined(game->getGameId(), game->getDescription(), creator->getPlayerId(), false, false));
 	enqueueProtocolItem(new Event_GameStateChanged(game->getGameId(), game->getGameStarted(), game->getActivePlayer(), game->getActivePhase(), game->getGameState(creator)));
 	return RespOk;
 }
@@ -297,7 +297,7 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd)
 	if (result == RespOk) {
 		Server_Player *player = g->addPlayer(this, cmd->getSpectator());
 		games.insert(cmd->getGameId(), QPair<Server_Game *, Server_Player *>(g, player));
-		enqueueProtocolItem(new Event_GameJoined(cmd->getGameId(), player->getPlayerId(), cmd->getSpectator(), false));
+		enqueueProtocolItem(new Event_GameJoined(cmd->getGameId(), g->getDescription(), player->getPlayerId(), cmd->getSpectator(), false));
 		enqueueProtocolItem(new Event_GameStateChanged(cmd->getGameId(), g->getGameStarted(), g->getActivePlayer(), g->getActivePhase(), g->getGameState(player)));
 	}
 	return result;

@@ -145,6 +145,8 @@ void MainWindow::retranslateUi()
 	aExit->setText(tr("&Exit"));
 	
 	cockatriceMenu->setTitle(tr("&Cockatrice"));
+	
+	tabSupervisor->retranslateUi();
 }
 
 void MainWindow::createActions()

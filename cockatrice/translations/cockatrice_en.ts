@@ -1440,7 +1440,7 @@
     </message>
     <message>
         <location filename="../src/player.cpp" line="416"/>
-        <location filename="../src/player.cpp" line="963"/>
+        <location filename="../src/player.cpp" line="964"/>
         <source>Number:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1465,7 +1465,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="963"/>
+        <location filename="../src/player.cpp" line="964"/>
         <source>Set counters</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1578,7 +1578,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_chatchannel.cpp" line="87"/>
+        <location filename="../src/tab_chatchannel.cpp" line="88"/>
         <source>%1 has left the channel.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1642,6 +1642,11 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="221"/>
         <source>Name of new folder:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_storage.h" line="50"/>
+        <source>Deck storage</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1757,22 +1762,17 @@ Please enter a name:</source>
         <source>Load deck</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../src/tab_game.h" line="104"/>
+        <source>Game %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
-    <name>TabSupervisor</name>
+    <name>TabServer</name>
     <message>
-        <location filename="../src/tab_supervisor.cpp" line="20"/>
+        <location filename="../src/tab_server.h" line="88"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/tab_supervisor.cpp" line="24"/>
-        <source>Deck storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/tab_supervisor.cpp" line="94"/>
-        <source>Game %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

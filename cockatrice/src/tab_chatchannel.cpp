@@ -80,6 +80,7 @@ void TabChatChannel::processJoinChannelEvent(Event_ChatJoinChannel *event)
 {
 	textEdit->append(tr("%1 has joined the channel.").arg(event->getPlayerName()));
 	playerList->addItem(event->getPlayerName());
+	emit userEvent();
 }
 
 void TabChatChannel::processLeaveChannelEvent(Event_ChatLeaveChannel *event)
@@ -90,6 +91,7 @@ void TabChatChannel::processLeaveChannelEvent(Event_ChatLeaveChannel *event)
 			delete playerList->takeItem(i);
 			break;
 		}
+	emit userEvent();
 }
 
 void TabChatChannel::processSayEvent(Event_ChatSay *event)
@@ -98,5 +100,5 @@ void TabChatChannel::processSayEvent(Event_ChatSay *event)
 		textEdit->append(QString("<font color=\"blue\">%1</font").arg(event->getMessage()));
 	else
 		textEdit->append(QString("<font color=\"red\">%1:</font> %2").arg(event->getPlayerName()).arg(event->getMessage()));
-	QApplication::alert(this);
+	emit userEvent();
 }

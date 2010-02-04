@@ -20,8 +20,8 @@
 #include "arrowitem.h"
 #include "main.h"
 
-TabGame::TabGame(Client *_client, int _gameId, int _localPlayerId, bool _spectator, bool _resuming)
-	: Tab(), client(_client), gameId(_gameId), localPlayerId(_localPlayerId), spectator(_spectator), started(false), resuming(_resuming), currentPhase(-1)
+TabGame::TabGame(Client *_client, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _resuming)
+	: Tab(), client(_client), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), started(false), resuming(_resuming), currentPhase(-1)
 {
 	zoneLayout = new ZoneViewLayout;
 	scene = new GameScene(zoneLayout, this);
@@ -244,6 +244,7 @@ void TabGame::processGameEvent(GameEvent *event)
 				break;
 			}
 			player->processGameEvent(event);
+			emit userEvent();
 		}
 	}
 }
@@ -307,6 +308,7 @@ void TabGame::eventGameStateChanged(Event_GameStateChanged *event)
 		stopGame();
 		zoneLayout->clear();
 	}
+	emit userEvent();
 }
 
 void TabGame::eventJoin(Event_Join *event)
@@ -321,6 +323,7 @@ void TabGame::eventJoin(Event_Join *event)
 		messageLog->logJoin(newPlayer);
 		playerListWidget->addPlayer(playerInfo);
 	}
+	emit userEvent();
 }
 
 void TabGame::eventLeave(Event_Leave *event)
@@ -338,12 +341,14 @@ void TabGame::eventLeave(Event_Leave *event)
 		playerListWidget->removePlayer(playerId);
 		spectators.remove(playerId);
 	}
+	emit userEvent();
 }
 
 void TabGame::eventGameClosed(Event_GameClosed * /*event*/)
 {
 	started = false;
 	messageLog->logGameClosed();
+	emit userEvent();
 }
 
 Player *TabGame::setActivePlayer(int id)
@@ -358,6 +363,7 @@ Player *TabGame::setActivePlayer(int id)
 		i.value()->setActive(i.value() == player);
 	}
 	currentPhase = -1;
+	emit userEvent();
 	return player;
 }
 
@@ -367,6 +373,7 @@ void TabGame::eventSetActivePlayer(Event_SetActivePlayer *event)
 	if (!player)
 		return;
 	messageLog->logSetActivePlayer(player);
+	emit userEvent();
 }
 
 void TabGame::setActivePhase(int phase)
@@ -383,6 +390,7 @@ void TabGame::eventSetActivePhase(Event_SetActivePhase *event)
 	if (currentPhase != phase)
 		messageLog->logSetActivePhase(phase);
 	setActivePhase(phase);
+	emit userEvent();
 }
 
 void TabGame::eventPing(Event_Ping *event)

@@ -476,8 +476,9 @@ public:
 class Event_GameJoined : public GenericEvent {
 	Q_OBJECT
 public:
-	Event_GameJoined(int _gameId = -1, int _playerId = -1, bool _spectator = false, bool _resuming = false);
+	Event_GameJoined(int _gameId = -1, const QString &_gameDescription = QString(), int _playerId = -1, bool _spectator = false, bool _resuming = false);
 	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); };
+	QString getGameDescription() const { return static_cast<SerializableItem_String *>(itemMap.value("game_description"))->getData(); };
 	int getPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("player_id"))->getData(); };
 	bool getSpectator() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectator"))->getData(); };
 	bool getResuming() const { return static_cast<SerializableItem_Bool *>(itemMap.value("resuming"))->getData(); };
