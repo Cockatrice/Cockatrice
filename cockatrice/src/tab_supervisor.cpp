@@ -12,6 +12,7 @@ TabSupervisor::	TabSupervisor(QWidget *parent)
 	: QTabWidget(parent), client(0), tabServer(0), tabDeckStorage(0)
 {
 	tabChangedIcon = new QIcon(":/resources/icon_tab_changed.svg");
+	setElideMode(Qt::ElideRight);
 	setIconSize(QSize(15, 15));
 	connect(this, SIGNAL(currentChanged(int)), this, SLOT(updateCurrent(int)));
 }

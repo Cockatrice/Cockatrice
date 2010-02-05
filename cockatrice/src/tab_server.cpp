@@ -14,6 +14,7 @@ GameSelector::GameSelector(Client *_client, QWidget *parent)
 	gameListProxyModel = new GamesProxyModel(this);
 	gameListProxyModel->setSourceModel(gameListModel);
 	gameListView->setModel(gameListProxyModel);
+	gameListView->header()->setResizeMode(0, QHeaderView::ResizeToContents);
 
 	showFullGamesCheckBox = new QCheckBox;
 	createButton = new QPushButton;
