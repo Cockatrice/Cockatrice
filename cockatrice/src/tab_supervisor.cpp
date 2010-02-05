@@ -11,8 +11,14 @@
 TabSupervisor::	TabSupervisor(QWidget *parent)
 	: QTabWidget(parent), client(0), tabServer(0), tabDeckStorage(0)
 {
+	tabChangedIcon = new QIcon(":/resources/icon_tab_changed.svg");
 	setIconSize(QSize(15, 15));
-	connect(this, SIGNAL(currentChanged(int)), this, SLOT(updateMenu(int)));
+	connect(this, SIGNAL(currentChanged(int)), this, SLOT(updateCurrent(int)));
+}
+
+TabSupervisor::~TabSupervisor()
+{
+	delete tabChangedIcon;
 }
 
 void TabSupervisor::retranslateUi()
@@ -131,7 +137,10 @@ void TabSupervisor::chatChannelLeft(TabChatChannel *tab)
 void TabSupervisor::tabUserEvent()
 {
 	Tab *tab = static_cast<Tab *>(sender());
-	// XXX Mark tab as changed (exclamation mark icon?)
+	if (tab != currentWidget()) {
+		tab->setContentsChanged(true);
+		setTabIcon(indexOf(tab), *tabChangedIcon);
+	}
 	QApplication::alert(this);
 }
 
@@ -152,10 +161,15 @@ void TabSupervisor::processGameEvent(GameEvent *event)
 		qDebug() << "gameEvent: invalid gameId";
 }
 
-void TabSupervisor::updateMenu(int index)
+void TabSupervisor::updateCurrent(int index)
 {
-	if (index != -1)
+	if (index != -1) {
+		Tab *tab = static_cast<Tab *>(widget(index));
+		if (tab->getContentsChanged()) {
+			setTabIcon(index, QIcon());
+			tab->setContentsChanged(false);
+		}
 		emit setMenu(static_cast<Tab *>(widget(index))->getTabMenu());
-	else
+	} else
 		emit setMenu(0);
 }

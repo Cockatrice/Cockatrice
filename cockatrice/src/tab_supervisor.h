@@ -18,6 +18,7 @@ class Event_GameJoined;
 class TabSupervisor : public QTabWidget {
 	Q_OBJECT
 private:
+	QIcon *tabChangedIcon;
 	Client *client;
 	TabServer *tabServer;
 	TabDeckStorage *tabDeckStorage;
@@ -26,13 +27,14 @@ private:
 	void myAddTab(Tab *tab);
 public:
 	TabSupervisor(QWidget *parent = 0);
+	~TabSupervisor();
 	void retranslateUi();
 	void start(Client *_client);
 	void stop();
 signals:
 	void setMenu(QMenu *menu);
 private slots:
-	void updateMenu(int index);
+	void updateCurrent(int index);
 	void updatePingTime(int value, int max);
 	void gameJoined(Event_GameJoined *event);
 	void gameLeft(TabGame *tab);
