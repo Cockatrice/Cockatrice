@@ -22,6 +22,7 @@ private:
 	QString annotation;
 	bool doesntUntap;
 	QPoint gridPoint;
+	bool beingPointedAt;
 	CardDragItem *dragItem;
 public:
 	enum { Type = typeCard };
@@ -44,6 +45,7 @@ public:
 	void setAnnotation(const QString &_annotation);
 	bool getDoesntUntap() const { return doesntUntap; }
 	void setDoesntUntap(bool _doesntUntap);
+	void setBeingPointedAt(bool _beingPointedAt);
 	void resetState();
 	void processCardInfo(ServerInfo_Card *info);
 

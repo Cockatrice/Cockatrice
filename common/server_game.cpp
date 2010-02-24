@@ -268,7 +268,8 @@ QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAs
 				QListIterator<Server_Card *> cardIterator(zone->cards);
 				while (cardIterator.hasNext()) {
 					Server_Card *card = cardIterator.next();
-					cardList.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getCounters(), card->getTapped(), card->getAttacking(), card->getAnnotation()));
+					QString displayedName = card->getFaceDown() ? QString() : card->getName();
+					cardList.append(new ServerInfo_Card(card->getId(), displayedName, card->getX(), card->getY(), card->getCounters(), card->getTapped(), card->getAttacking(), card->getAnnotation()));
 				}
 			}
 			zoneList.append(new ServerInfo_Zone(zone->getName(), zone->getType(), zone->hasCoords(), zone->cards.size(), cardList));

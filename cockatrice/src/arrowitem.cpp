@@ -27,23 +27,39 @@ void ArrowItem::updatePath(const QPointF &endPoint)
 	const double arrowWidth = 15.0;
 	const double headWidth = 40.0;
 	const double headLength = headWidth / sqrt(2);
+	const double phi = 15;
 	
 	QPointF startPoint = startItem->mapToScene(QPointF(startItem->boundingRect().width() / 2, startItem->boundingRect().height() / 2));
 	QLineF line(startPoint, endPoint);
 	qreal lineLength = line.length();
 	
 	prepareGeometryChange();
-	if (lineLength < headLength)
+	if (lineLength < 30)
 		path = QPainterPath();
 	else {
-		path = QPainterPath(QPointF(0, -arrowWidth / 2));
-		path.lineTo(0, arrowWidth / 2);
-		path.lineTo(lineLength - headLength, arrowWidth / 2);
-		path.lineTo(lineLength - headLength, headWidth / 2);
-		path.lineTo(lineLength, 0);
-		path.lineTo(lineLength - headLength, -headWidth / 2);
-		path.lineTo(lineLength - headLength, -arrowWidth / 2);
-		path.lineTo(0, -arrowWidth / 2);
+		QPointF c(lineLength / 2, tan(phi * M_PI / 180) * lineLength);
+		
+		QPainterPath centerLine;
+		centerLine.moveTo(0, 0);
+		centerLine.quadTo(c, QPointF(lineLength, 0));
+		
+		double percentage = 1 - headLength / lineLength;
+		QPointF arrowBodyEndPoint = centerLine.pointAtPercent(percentage);
+		QLineF testLine(arrowBodyEndPoint, centerLine.pointAtPercent(percentage + 0.001));
+		qreal alpha = testLine.angle() - 90;
+		QPointF endPoint1 = arrowBodyEndPoint + arrowWidth / 2 * QPointF(cos(alpha * M_PI / 180), -sin(alpha * M_PI / 180));
+		QPointF endPoint2 = arrowBodyEndPoint + arrowWidth / 2 * QPointF(-cos(alpha * M_PI / 180), sin(alpha * M_PI / 180));
+		QPointF point1 = endPoint1 + (headWidth - arrowWidth) / 2 * QPointF(cos(alpha * M_PI / 180), -sin(alpha * M_PI / 180));
+		QPointF point2 = endPoint2 + (headWidth - arrowWidth) / 2 * QPointF(-cos(alpha * M_PI / 180), sin(alpha * M_PI / 180));
+		
+		path = QPainterPath(-arrowWidth / 2 * QPointF(cos((phi - 90) * M_PI / 180), sin((phi - 90) * M_PI / 180)));
+		path.quadTo(c, endPoint1);
+		path.lineTo(point1);
+		path.lineTo(QPointF(lineLength, 0));
+		path.lineTo(point2);
+		path.lineTo(endPoint2);
+		path.quadTo(c, arrowWidth / 2 * QPointF(cos((phi - 90) * M_PI / 180), sin((phi - 90) * M_PI / 180)));
+		path.lineTo(-arrowWidth / 2 * QPointF(cos((phi - 90) * M_PI / 180), sin((phi - 90) * M_PI / 180)));
 	}
 	
 	setPos(startPoint);
@@ -94,12 +110,15 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         for (int i = colliding.size() - 1; i >= 0; i--)
                 if ((cursorItem = qgraphicsitem_cast<CardItem *>(colliding.at(i))))
                         break;
+	if ((cursorItem != targetItem) && targetItem)
+		targetItem->setBeingPointedAt(false);
         if (!cursorItem) {
 		fullColor = false;
 		targetItem = 0;
 		updatePath(endPos);
 	} else {
 		fullColor = true;
+		cursorItem->setBeingPointedAt(true);
 		targetItem = cursorItem;
 		updatePath();
 	}
@@ -109,6 +128,7 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
 {
 	if (targetItem && (targetItem != startItem)) {
+		targetItem->setBeingPointedAt(false);
 		CardZone *startZone = static_cast<CardZone *>(startItem->parentItem());
 		CardZone *targetZone = static_cast<CardZone *>(targetItem->parentItem());
 		player->sendGameCommand(new Command_CreateArrow(

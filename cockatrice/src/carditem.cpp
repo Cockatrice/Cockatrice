@@ -11,7 +11,7 @@
 #include "protocol_datastructures.h"
 
 CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, QGraphicsItem *parent)
-	: AbstractCardItem(_name, parent), owner(_owner), id(_cardid), attacking(false), facedown(false), counters(0), doesntUntap(false), dragItem(NULL)
+	: AbstractCardItem(_name, parent), owner(_owner), id(_cardid), attacking(false), facedown(false), counters(0), doesntUntap(false), beingPointedAt(false), dragItem(NULL)
 {
 	owner->addCard(this);
 }
@@ -27,6 +27,8 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 	AbstractCardItem::paint(painter, option, widget);
 	if (counters)
 		paintNumberEllipse(counters, painter);
+	if (beingPointedAt)
+		painter->fillRect(boundingRect(), QBrush(QColor(255, 0, 0, 100)));
 	painter->restore();
 }
 
@@ -59,6 +61,12 @@ void CardItem::setAnnotation(const QString &_annotation)
 void CardItem::setDoesntUntap(bool _doesntUntap)
 {
 	doesntUntap = _doesntUntap;
+}
+
+void CardItem::setBeingPointedAt(bool _beingPointedAt)
+{
+	beingPointedAt = _beingPointedAt;
+	update();
 }
 
 void CardItem::resetState()
