@@ -34,11 +34,10 @@ void AbstractCardItem::pixmapUpdated()
 	update();
 }
 
-void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget */*widget*/)
+void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
 	painter->save();
-	
-	QSizeF translatedSize = option->matrix.mapRect(boundingRect()).size();
+	QSizeF translatedSize = painter->combinedTransform().mapRect(boundingRect()).size();
 	if (tapped)
 		translatedSize.transpose();
 	QPixmap *translatedPixmap = info->getPixmap(translatedSize.toSize());
