@@ -49,9 +49,9 @@ while (<file>) {
 		$type = 'game_event';
 		$namePrefix = 'Event';
 		$baseClass = 'GameEvent';
-		$parentConstructorCall = "$baseClass(\"$name1\", _gameId, _playerId)";
-		$constructorParamsH = "int _gameId = -1, int _playerId = -1";
-		$constructorParamsCpp = "int _gameId, int _playerId";
+		$parentConstructorCall = "$baseClass(\"$name1\", _playerId)";
+		$constructorParamsH = "int _playerId = -1";
+		$constructorParamsCpp = "int _playerId";
 	} elsif ($type == 4) {
 		$type = 'generic_event';
 		$namePrefix = 'Event';

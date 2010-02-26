@@ -56,8 +56,8 @@ void SetList::sortByKey()
 	qSort(begin(), end(), CompareFunctor());
 }
 
-CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QString &_text, const QStringList &_colors, int _tableRow, const SetList &_sets, const QString &_picURL)
-	: db(_db), name(_name), sets(_sets), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), colors(_colors), picURL(_picURL), tableRow(_tableRow), pixmap(NULL)
+CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QString &_text, const QStringList &_colors, bool _cipt, int _tableRow, const SetList &_sets, const QString &_picURL)
+	: db(_db), name(_name), sets(_sets), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), colors(_colors), picURL(_picURL), cipt(_cipt), tableRow(_tableRow), pixmap(NULL)
 {
 	for (int i = 0; i < sets.size(); i++)
 		sets[i]->append(this);
@@ -220,6 +220,8 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 	xml.writeTextElement("tablerow", QString::number(info->getTableRow()));
 	xml.writeTextElement("text", info->getText());
 	xml.writeTextElement("picURL", info->getPicURL());
+	if (info->getCipt())
+		xml.writeTextElement("cipt", "1");
 	xml.writeEndElement(); // card
 
 	return xml;
@@ -383,6 +385,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 			QStringList colors;
 			SetList sets;
 			int tableRow = 0;
+			bool cipt = false;
 			while (!xml.atEnd()) {
 				if (xml.readNext() == QXmlStreamReader::EndElement)
 					break;
@@ -404,8 +407,10 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 					tableRow = xml.readElementText().toInt();
 				else if (xml.name() == "picURL")
 					picURL = xml.readElementText();
+				else if (xml.name() == "cipt")
+					cipt = (xml.readElementText() == "1");
 			}
-			cardHash.insert(name, new CardInfo(this, name, manacost, type, pt, text, colors, tableRow, sets, picURL));
+			cardHash.insert(name, new CardInfo(this, name, manacost, type, pt, text, colors, cipt, tableRow, sets, picURL));
 		}
 	}
 }

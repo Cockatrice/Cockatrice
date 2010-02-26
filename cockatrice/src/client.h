@@ -9,14 +9,16 @@
 
 class QTimer;
 class Command;
+class CommandContainer;
 class QXmlStreamReader;
 class QXmlStreamWriter;
 
 class ProtocolItem;
 class ProtocolResponse;
 class TopLevelProtocolItem;
+class CommandContainer;
 class ChatEvent;
-class GameEvent;
+class GameEventContainer;
 class Event_ListGames;
 class Event_ServerMessage;
 class Event_ListChatChannels;
@@ -45,7 +47,7 @@ signals:
 	// Chat events
 	void chatEventReceived(ChatEvent *event);
 	// Game events
-	void gameEventReceived(GameEvent *event);
+	void gameEventContainerReceived(GameEventContainer *event);
 	// Generic events
 	void listGamesEventReceived(Event_ListGames *event);
 	void serverMessageEventReceived(Event_ServerMessage *event);
@@ -63,7 +65,7 @@ private:
 	static const int maxTimeout = 10;
 	
 	QTimer *timer;
-	QMap<int, Command *> pendingCommands;
+	QMap<int, CommandContainer *> pendingCommands;
 	QTcpSocket *socket;
 	QXmlStreamReader *xmlReader;
 	QXmlStreamWriter *xmlWriter;
@@ -80,6 +82,7 @@ public:
 	void connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
 	void disconnectFromServer();
 	void sendCommand(Command *cmd);
+	void sendCommandContainer(CommandContainer *cont);
 };
 
 #endif

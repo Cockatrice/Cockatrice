@@ -908,6 +908,11 @@ void Player::sendGameCommand(GameCommand *command)
 	static_cast<TabGame *>(parent())->sendGameCommand(command);
 }
 
+void Player::sendCommandContainer(CommandContainer *cont)
+{
+	static_cast<TabGame *>(parent())->sendCommandContainer(cont);
+}
+
 void Player::cardMenuAction()
 {
 	// Determine the appropriate handler function.

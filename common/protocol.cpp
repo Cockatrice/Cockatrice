@@ -26,6 +26,9 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("file", DeckList_File::newItem);
 	registerSerializableItem("directory", DeckList_Directory::newItem);
 	
+	registerSerializableItem("containercmd", CommandContainer::newItem);
+	registerSerializableItem("containergame_event", GameEventContainer::newItem);
+	
 	registerSerializableItem("cmddeck_upload", Command_DeckUpload::newItem);
 	registerSerializableItem("cmddeck_select", Command_DeckSelect::newItem);
 	
@@ -83,20 +86,51 @@ void TopLevelProtocolItem::writeElement(QXmlStreamWriter * /*xml*/)
 {
 }
 
-int Command::lastCmdId = 0;
+int CommandContainer::lastCmdId = 0;
 
-Command::Command(const QString &_itemName, int _cmdId)
-	: ProtocolItem("cmd", _itemName), ticks(0)
+Command::Command(const QString &_itemName)
+	: ProtocolItem("cmd", _itemName)
 {
-	if (_cmdId == -1)
-		_cmdId = lastCmdId++;
-	insertItem(new SerializableItem_Int("cmd_id", _cmdId));
 }
 
 void Command::processResponse(ProtocolResponse *response)
 {
 	emit finished(response);
 	emit finished(response->getResponseCode());
+}
+
+CommandContainer::CommandContainer(const QList<Command *> &_commandList, int _cmdId)
+	: ProtocolItem("container", "cmd"), ticks(0), resp(0), gameEventQueue(0)
+{
+	if (_cmdId == -1)
+		_cmdId = lastCmdId++;
+	insertItem(new SerializableItem_Int("cmd_id", _cmdId));
+	
+	for (int i = 0; i < _commandList.size(); ++i)
+		itemList.append(_commandList[i]);
+}
+
+void CommandContainer::processResponse(ProtocolResponse *response)
+{
+	emit finished(response);
+	emit finished(response->getResponseCode());
+	
+	const QList<Command *> &cmdList = getCommandList();
+	for (int i = 0; i < cmdList.size(); ++i)
+		cmdList[i]->processResponse(response);
+}
+
+void CommandContainer::setResponse(ProtocolResponse *_resp)
+{
+	delete resp;
+	resp = _resp;
+}
+
+void CommandContainer::enqueueGameEvent(GameEvent *event, int gameId)
+{
+	if (!gameEventQueue)
+		gameEventQueue = new GameEventContainer(QList<GameEvent *>(), gameId);
+	gameEventQueue->appendItem(event);
 }
 
 Command_DeckUpload::Command_DeckUpload(DeckList *_deck, const QString &_path)
@@ -187,10 +221,9 @@ Response_DumpZone::Response_DumpZone(int _cmdId, ResponseCode _responseCode, Ser
 	insertItem(_zone);
 }
 
-GameEvent::GameEvent(const QString &_eventName, int _gameId, int _playerId)
+GameEvent::GameEvent(const QString &_eventName, int _playerId)
 	: ProtocolItem("game_event", _eventName)
 {
-	insertItem(new SerializableItem_Int("game_id", _gameId));
 	insertItem(new SerializableItem_Int("player_id", _playerId));
 }
 
@@ -221,16 +254,30 @@ Event_ListGames::Event_ListGames(const QList<ServerInfo_Game *> &_gameList)
 		itemList.append(_gameList[i]);
 }
 
-Event_Join::Event_Join(int _gameId, ServerInfo_Player *player)
-	: GameEvent("join", _gameId, -1)
+Event_Join::Event_Join(ServerInfo_Player *player)
+	: GameEvent("join", -1)
 {
 	if (!player)
 		player = new ServerInfo_Player;
 	insertItem(player);
 }
 
-Event_GameStateChanged::Event_GameStateChanged(int _gameId, bool _gameStarted, int _activePlayer, int _activePhase, const QList<ServerInfo_Player *> &_playerList)
-	: GameEvent("game_state_changed", _gameId, -1)
+GameEventContainer::GameEventContainer(const QList<GameEvent *> &_eventList, int _gameId)
+	: ProtocolItem("container", "game_event")
+{
+	insertItem(new SerializableItem_Int("game_id", _gameId));
+	
+	for (int i = 0; i < _eventList.size(); ++i)
+		itemList.append(_eventList[i]);
+}
+
+GameEventContainer *GameEventContainer::makeNew(GameEvent *event, int _gameId)
+{
+	return new GameEventContainer(QList<GameEvent *>() << event, _gameId);
+}
+
+Event_GameStateChanged::Event_GameStateChanged(bool _gameStarted, int _activePlayer, int _activePhase, const QList<ServerInfo_Player *> &_playerList)
+	: GameEvent("game_state_changed", -1)
 {
 	insertItem(new SerializableItem_Bool("game_started", _gameStarted));
 	insertItem(new SerializableItem_Int("active_player", _activePlayer));
@@ -239,29 +286,29 @@ Event_GameStateChanged::Event_GameStateChanged(int _gameId, bool _gameStarted, i
 		itemList.append(_playerList[i]);
 }
 
-Event_Ping::Event_Ping(int _gameId, const QList<ServerInfo_PlayerPing *> &_pingList)
-	: GameEvent("ping", _gameId, -1)
+Event_Ping::Event_Ping(const QList<ServerInfo_PlayerPing *> &_pingList)
+	: GameEvent("ping", -1)
 {
 	for (int i = 0; i < _pingList.size(); ++i)
 		itemList.append(_pingList[i]);
 }
 
-Event_CreateArrows::Event_CreateArrows(int _gameId, int _playerId, const QList<ServerInfo_Arrow *> &_arrowList)
-	: GameEvent("create_arrows", _gameId, _playerId)
+Event_CreateArrows::Event_CreateArrows(int _playerId, const QList<ServerInfo_Arrow *> &_arrowList)
+	: GameEvent("create_arrows", _playerId)
 {
 	for (int i = 0; i < _arrowList.size(); ++i)
 		itemList.append(_arrowList[i]);
 }
 
-Event_CreateCounters::Event_CreateCounters(int _gameId, int _playerId, const QList<ServerInfo_Counter *> &_counterList)
-	: GameEvent("create_counters", _gameId, _playerId)
+Event_CreateCounters::Event_CreateCounters(int _playerId, const QList<ServerInfo_Counter *> &_counterList)
+	: GameEvent("create_counters", _playerId)
 {
 	for (int i = 0; i < _counterList.size(); ++i)
 		itemList.append(_counterList[i]);
 }
 
-Event_DrawCards::Event_DrawCards(int _gameId, int _playerId, int _numberCards, const QList<ServerInfo_Card *> &_cardList)
-	: GameEvent("draw_cards", _gameId, _playerId)
+Event_DrawCards::Event_DrawCards(int _playerId, int _numberCards, const QList<ServerInfo_Card *> &_cardList)
+	: GameEvent("draw_cards", _playerId)
 {
 	insertItem(new SerializableItem_Int("number_cards", _numberCards));
 	for (int i = 0; i < _cardList.size(); ++i)

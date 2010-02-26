@@ -46,6 +46,7 @@ private:
 	QString text;
 	QStringList colors;
 	QString picURL;
+	bool cipt;
 	int tableRow;
 	QPixmap *pixmap;
 	QMap<int, QPixmap *> scaledPixmapCache;
@@ -57,6 +58,7 @@ public:
 		const QString &_powtough = QString(),
 		const QString &_text = QString(),
 		const QStringList &_colors = QStringList(),
+		bool cipt = false,
 		int _tableRow = 0,
 		const SetList &_sets = SetList(),
 		const QString &_picURL = QString());
@@ -67,6 +69,7 @@ public:
 	const QString &getCardType() const { return cardtype; }
 	const QString &getPowTough() const { return powtough; }
 	const QString &getText() const { return text; }
+	bool getCipt() const { return cipt; }
 	void setText(const QString &_text) { text = _text; }
 	const QStringList &getColors() const { return colors; }
 	const QString &getPicURL() const { return picURL; }

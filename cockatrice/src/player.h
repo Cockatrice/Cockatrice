@@ -20,6 +20,7 @@ class HandZone;
 class ServerInfo_Player;
 class ServerInfo_Arrow;
 class ServerInfo_Counter;
+class CommandContainer;
 class GameCommand;
 class GameEvent;
 class Event_DeckSelect;
@@ -190,6 +191,7 @@ public:
 	void processPlayerInfo(ServerInfo_Player *info);
 	void processGameEvent(GameEvent *event);
 	void sendGameCommand(GameCommand *command);
+	void sendCommandContainer(CommandContainer *cont);
 };
 
 #endif

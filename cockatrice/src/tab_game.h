@@ -20,8 +20,9 @@ class ZoneViewWidget;
 class PhasesToolbar;
 class PlayerListWidget;
 class ProtocolResponse;
-class GameEvent;
+class GameEventContainer;
 class GameCommand;
+class CommandContainer;
 class Event_GameStateChanged;
 class Event_Join;
 class Event_Leave;
@@ -103,9 +104,10 @@ public:
 	int getGameId() const { return gameId; }
 	QString getTabText() const { return tr("Game %1: %2").arg(gameId).arg(gameDescription); }
 
-	void processGameEvent(GameEvent *event);
+	void processGameEventContainer(GameEventContainer *cont);
 public slots:
 	void sendGameCommand(GameCommand *command);
+	void sendCommandContainer(CommandContainer *cont);
 };
 
 #endif

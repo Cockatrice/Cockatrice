@@ -198,44 +198,44 @@ Command_StopDumpZone::Command_StopDumpZone(int _gameId, int _playerId, const QSt
 	insertItem(new SerializableItem_Int("player_id", _playerId));
 	insertItem(new SerializableItem_String("zone_name", _zoneName));
 }
-Event_Say::Event_Say(int _gameId, int _playerId, const QString &_message)
-	: GameEvent("say", _gameId, _playerId)
+Event_Say::Event_Say(int _playerId, const QString &_message)
+	: GameEvent("say", _playerId)
 {
 	insertItem(new SerializableItem_String("message", _message));
 }
-Event_Leave::Event_Leave(int _gameId, int _playerId)
-	: GameEvent("leave", _gameId, _playerId)
+Event_Leave::Event_Leave(int _playerId)
+	: GameEvent("leave", _playerId)
 {
 }
-Event_DeckSelect::Event_DeckSelect(int _gameId, int _playerId, int _deckId)
-	: GameEvent("deck_select", _gameId, _playerId)
+Event_DeckSelect::Event_DeckSelect(int _playerId, int _deckId)
+	: GameEvent("deck_select", _playerId)
 {
 	insertItem(new SerializableItem_Int("deck_id", _deckId));
 }
-Event_GameClosed::Event_GameClosed(int _gameId, int _playerId)
-	: GameEvent("game_closed", _gameId, _playerId)
+Event_GameClosed::Event_GameClosed(int _playerId)
+	: GameEvent("game_closed", _playerId)
 {
 }
-Event_ReadyStart::Event_ReadyStart(int _gameId, int _playerId)
-	: GameEvent("ready_start", _gameId, _playerId)
+Event_ReadyStart::Event_ReadyStart(int _playerId)
+	: GameEvent("ready_start", _playerId)
 {
 }
-Event_Concede::Event_Concede(int _gameId, int _playerId)
-	: GameEvent("concede", _gameId, _playerId)
+Event_Concede::Event_Concede(int _playerId)
+	: GameEvent("concede", _playerId)
 {
 }
-Event_Shuffle::Event_Shuffle(int _gameId, int _playerId)
-	: GameEvent("shuffle", _gameId, _playerId)
+Event_Shuffle::Event_Shuffle(int _playerId)
+	: GameEvent("shuffle", _playerId)
 {
 }
-Event_RollDie::Event_RollDie(int _gameId, int _playerId, int _sides, int _value)
-	: GameEvent("roll_die", _gameId, _playerId)
+Event_RollDie::Event_RollDie(int _playerId, int _sides, int _value)
+	: GameEvent("roll_die", _playerId)
 {
 	insertItem(new SerializableItem_Int("sides", _sides));
 	insertItem(new SerializableItem_Int("value", _value));
 }
-Event_MoveCard::Event_MoveCard(int _gameId, int _playerId, int _cardId, const QString &_cardName, const QString &_startZone, int _position, const QString &_targetZone, int _x, int _y, int _newCardId, bool _faceDown)
-	: GameEvent("move_card", _gameId, _playerId)
+Event_MoveCard::Event_MoveCard(int _playerId, int _cardId, const QString &_cardName, const QString &_startZone, int _position, const QString &_targetZone, int _x, int _y, int _newCardId, bool _faceDown)
+	: GameEvent("move_card", _playerId)
 {
 	insertItem(new SerializableItem_Int("card_id", _cardId));
 	insertItem(new SerializableItem_String("card_name", _cardName));
@@ -247,8 +247,8 @@ Event_MoveCard::Event_MoveCard(int _gameId, int _playerId, int _cardId, const QS
 	insertItem(new SerializableItem_Int("new_card_id", _newCardId));
 	insertItem(new SerializableItem_Bool("face_down", _faceDown));
 }
-Event_CreateToken::Event_CreateToken(int _gameId, int _playerId, const QString &_zone, int _cardId, const QString &_cardName, const QString &_pt, int _x, int _y)
-	: GameEvent("create_token", _gameId, _playerId)
+Event_CreateToken::Event_CreateToken(int _playerId, const QString &_zone, int _cardId, const QString &_cardName, const QString &_pt, int _x, int _y)
+	: GameEvent("create_token", _playerId)
 {
 	insertItem(new SerializableItem_String("zone", _zone));
 	insertItem(new SerializableItem_Int("card_id", _cardId));
@@ -257,49 +257,49 @@ Event_CreateToken::Event_CreateToken(int _gameId, int _playerId, const QString &
 	insertItem(new SerializableItem_Int("x", _x));
 	insertItem(new SerializableItem_Int("y", _y));
 }
-Event_DeleteArrow::Event_DeleteArrow(int _gameId, int _playerId, int _arrowId)
-	: GameEvent("delete_arrow", _gameId, _playerId)
+Event_DeleteArrow::Event_DeleteArrow(int _playerId, int _arrowId)
+	: GameEvent("delete_arrow", _playerId)
 {
 	insertItem(new SerializableItem_Int("arrow_id", _arrowId));
 }
-Event_SetCardAttr::Event_SetCardAttr(int _gameId, int _playerId, const QString &_zone, int _cardId, const QString &_attrName, const QString &_attrValue)
-	: GameEvent("set_card_attr", _gameId, _playerId)
+Event_SetCardAttr::Event_SetCardAttr(int _playerId, const QString &_zone, int _cardId, const QString &_attrName, const QString &_attrValue)
+	: GameEvent("set_card_attr", _playerId)
 {
 	insertItem(new SerializableItem_String("zone", _zone));
 	insertItem(new SerializableItem_Int("card_id", _cardId));
 	insertItem(new SerializableItem_String("attr_name", _attrName));
 	insertItem(new SerializableItem_String("attr_value", _attrValue));
 }
-Event_SetCounter::Event_SetCounter(int _gameId, int _playerId, int _counterId, int _value)
-	: GameEvent("set_counter", _gameId, _playerId)
+Event_SetCounter::Event_SetCounter(int _playerId, int _counterId, int _value)
+	: GameEvent("set_counter", _playerId)
 {
 	insertItem(new SerializableItem_Int("counter_id", _counterId));
 	insertItem(new SerializableItem_Int("value", _value));
 }
-Event_DelCounter::Event_DelCounter(int _gameId, int _playerId, int _counterId)
-	: GameEvent("del_counter", _gameId, _playerId)
+Event_DelCounter::Event_DelCounter(int _playerId, int _counterId)
+	: GameEvent("del_counter", _playerId)
 {
 	insertItem(new SerializableItem_Int("counter_id", _counterId));
 }
-Event_SetActivePlayer::Event_SetActivePlayer(int _gameId, int _playerId, int _activePlayerId)
-	: GameEvent("set_active_player", _gameId, _playerId)
+Event_SetActivePlayer::Event_SetActivePlayer(int _playerId, int _activePlayerId)
+	: GameEvent("set_active_player", _playerId)
 {
 	insertItem(new SerializableItem_Int("active_player_id", _activePlayerId));
 }
-Event_SetActivePhase::Event_SetActivePhase(int _gameId, int _playerId, int _phase)
-	: GameEvent("set_active_phase", _gameId, _playerId)
+Event_SetActivePhase::Event_SetActivePhase(int _playerId, int _phase)
+	: GameEvent("set_active_phase", _playerId)
 {
 	insertItem(new SerializableItem_Int("phase", _phase));
 }
-Event_DumpZone::Event_DumpZone(int _gameId, int _playerId, int _zoneOwnerId, const QString &_zone, int _numberCards)
-	: GameEvent("dump_zone", _gameId, _playerId)
+Event_DumpZone::Event_DumpZone(int _playerId, int _zoneOwnerId, const QString &_zone, int _numberCards)
+	: GameEvent("dump_zone", _playerId)
 {
 	insertItem(new SerializableItem_Int("zone_owner_id", _zoneOwnerId));
 	insertItem(new SerializableItem_String("zone", _zone));
 	insertItem(new SerializableItem_Int("number_cards", _numberCards));
 }
-Event_StopDumpZone::Event_StopDumpZone(int _gameId, int _playerId, int _zoneOwnerId, const QString &_zone)
-	: GameEvent("stop_dump_zone", _gameId, _playerId)
+Event_StopDumpZone::Event_StopDumpZone(int _playerId, int _zoneOwnerId, const QString &_zone)
+	: GameEvent("stop_dump_zone", _playerId)
 {
 	insertItem(new SerializableItem_Int("zone_owner_id", _zoneOwnerId));
 	insertItem(new SerializableItem_String("zone", _zone));

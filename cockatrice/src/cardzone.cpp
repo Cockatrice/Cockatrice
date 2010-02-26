@@ -142,12 +142,6 @@ CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName, 
 	return c;
 }
 
-void CardZone::setCardAttr(int cardId, const QString &aname, const QString &avalue)
-{
-	if (hasCardAttr)
-		player->sendGameCommand(new Command_SetCardAttr(-1, name, cardId, aname, avalue));
-}
-
 void CardZone::moveAllToZone()
 {
 	QList<QVariant> data = static_cast<QAction *>(sender())->data().toList();

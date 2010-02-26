@@ -91,7 +91,11 @@ CardInfo *OracleImporter::addCard(QString cardName, const QString &cardCost, con
 		if (cardText.contains(cardName + " is green."))
 			colors << "G";
 		
-		card = new CardInfo(this, cardName, cardCost, cardType, cardPT, fullCardText, colors);
+		bool cipt = (cardText.contains(cardName + " enters the battlefield tapped."));
+		if (cipt)
+			qDebug() << cardName;
+		
+		card = new CardInfo(this, cardName, cardCost, cardType, cardPT, fullCardText, colors, cipt);
 		card->setPicURL(getURLFromName(cardName));
 		int tableRow = 1;
 		QString mainCardType = card->getMainCardType();

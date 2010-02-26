@@ -85,11 +85,13 @@ void TableZone::toggleTapped()
 			tapAll = true;
 			break;
 		}
+	QList<Command *> cmdList;
 	for (int i = 0; i < selectedItems.size(); i++) {
 		CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItems[i]);
 		if (temp->getTapped() != tapAll)
-			setCardAttr(temp->getId(), "tapped", tapAll ? "1" : "0");
+			cmdList.append(new Command_SetCardAttr(-1, name, temp->getId(), "tapped", tapAll ? "1" : "0"));
 	}
+	player->sendCommandContainer(new CommandContainer(cmdList));
 }
 
 CardItem *TableZone::takeCard(int position, int cardId, const QString &cardName, bool canResize)

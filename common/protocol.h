@@ -15,8 +15,12 @@ class QXmlStreamAttributes;
 
 class ProtocolResponse;
 class DeckList;
+class GameEvent;
+class GameEventContainer;
 
 enum ItemId {
+	ItemId_CommandContainer = ItemId_Other + 50,
+	ItemId_GameEventContainer = ItemId_Other + 51,
 	ItemId_Command_DeckUpload = ItemId_Other + 100,
 	ItemId_Command_DeckSelect = ItemId_Other + 101,
 	ItemId_Event_ListChatChannels = ItemId_Other + 200,
@@ -40,7 +44,7 @@ class ProtocolItem : public SerializableItem_Map {
 private:
 	static void initializeHashAuto();
 public:
-	static const int protocolVersion = 5;
+	static const int protocolVersion = 6;
 	static void initializeHash();
 	virtual int getItemId() const = 0;
 	ProtocolItem(const QString &_itemType, const QString &_itemSubType);
@@ -75,16 +79,42 @@ signals:
 	void finished(ProtocolResponse *response);
 	void finished(ResponseCode response);
 private:
-	int ticks;
-	static int lastCmdId;
 	QVariant extraData;
 public:
-	Command(const QString &_itemName = QString(), int _cmdId = -1);
+	Command(const QString &_itemName = QString());
+	void setExtraData(const QVariant &_extraData) { extraData = _extraData; }
+	QVariant getExtraData() const { return extraData; }
+	void processResponse(ProtocolResponse *response);
+};
+
+class CommandContainer : public ProtocolItem {
+	Q_OBJECT
+signals:
+	void finished(ProtocolResponse *response);
+	void finished(ResponseCode response);
+private:
+	int ticks;
+	static int lastCmdId;
+	
+	// These are only for processing inside the server.
+	ProtocolResponse *resp;
+	QList<ProtocolItem *> itemQueue;
+	GameEventContainer *gameEventQueue;
+public:
+	CommandContainer(const QList<Command *> &_commandList = QList<Command *>(), int _cmdId = -1);
+	static SerializableItem *newItem() { return new CommandContainer; }
+	int getItemId() const { return ItemId_CommandContainer; }
 	int getCmdId() const { return static_cast<SerializableItem_Int *>(itemMap.value("cmd_id"))->getData(); }
 	int tick() { return ++ticks; }
 	void processResponse(ProtocolResponse *response);
-	void setExtraData(const QVariant &_extraData) { extraData = _extraData; }
-	QVariant getExtraData() const { return extraData; }
+	QList<Command *> getCommandList() const { return typecastItemList<Command *>(); }
+	
+	ProtocolResponse *getResponse() const { return resp; }
+	void setResponse(ProtocolResponse *_resp);
+	const QList<ProtocolItem *> &getItemQueue() const { return itemQueue; }
+	void enqueueItem(ProtocolItem *item) { itemQueue.append(item); }
+	GameEventContainer *getGameEventQueue() const { return gameEventQueue; }
+	void enqueueGameEvent(GameEvent *event, int gameId);
 };
 
 class ChatCommand : public Command {
@@ -197,9 +227,20 @@ public:
 class GameEvent : public ProtocolItem {
 	Q_OBJECT
 public:
-	GameEvent(const QString &_eventName, int _gameId, int _playerId);
-	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); }
+	GameEvent(const QString &_eventName, int _playerId);
 	int getPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("player_id"))->getData(); }
+};
+
+class GameEventContainer : public ProtocolItem {
+	Q_OBJECT
+public:
+	GameEventContainer(const QList<GameEvent *> &_eventList = QList<GameEvent *>(), int _gameId = -1);
+	static SerializableItem *newItem() { return new GameEventContainer; }
+	int getItemId() const { return ItemId_GameEventContainer; }
+	QList<GameEvent *> getEventList() const { return typecastItemList<GameEvent *>(); }
+	static GameEventContainer *makeNew(GameEvent *event, int _gameId);
+
+	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); }
 	void setGameId(int _gameId) { static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->setData(_gameId); }
 };
 
@@ -240,7 +281,7 @@ public:
 class Event_Join : public GameEvent {
 	Q_OBJECT
 public:
-	Event_Join(int _gameId = -1, ServerInfo_Player * player = 0);
+	Event_Join(ServerInfo_Player * player = 0);
 	static SerializableItem *newItem() { return new Event_Join; }
 	int getItemId() const { return ItemId_Event_Join; }
 	ServerInfo_Player *getPlayer() const { return static_cast<ServerInfo_Player *>(itemMap.value("player")); }
@@ -249,7 +290,7 @@ public:
 class Event_GameStateChanged : public GameEvent {
 	Q_OBJECT
 public:
-	Event_GameStateChanged(int _gameId = -1, bool _gameStarted = false, int _activePlayer = -1, int _activePhase = -1, const QList<ServerInfo_Player *> &_playerList = QList<ServerInfo_Player *>());
+	Event_GameStateChanged(bool _gameStarted = false, int _activePlayer = -1, int _activePhase = -1, const QList<ServerInfo_Player *> &_playerList = QList<ServerInfo_Player *>());
 	static SerializableItem *newItem() { return new Event_GameStateChanged; }
 	int getItemId() const { return ItemId_Event_GameStateChanged; }
 	QList<ServerInfo_Player *> getPlayerList() const { return typecastItemList<ServerInfo_Player *>(); }
@@ -261,7 +302,7 @@ public:
 class Event_Ping : public GameEvent {
 	Q_OBJECT
 public:
-	Event_Ping(int _gameId = -1, const QList<ServerInfo_PlayerPing *> &_pingList = QList<ServerInfo_PlayerPing *>());
+	Event_Ping(const QList<ServerInfo_PlayerPing *> &_pingList = QList<ServerInfo_PlayerPing *>());
 	static SerializableItem *newItem() { return new Event_Ping; }
 	int getItemId() const { return ItemId_Event_Ping; }
 	QList<ServerInfo_PlayerPing *> getPingList() const { return typecastItemList<ServerInfo_PlayerPing *>(); }
@@ -270,7 +311,7 @@ public:
 class Event_CreateArrows : public GameEvent {
 	Q_OBJECT
 public:
-	Event_CreateArrows(int _gameId = -1, int _playerId = -1, const QList<ServerInfo_Arrow *> &_arrowList = QList<ServerInfo_Arrow *>());
+	Event_CreateArrows(int _playerId = -1, const QList<ServerInfo_Arrow *> &_arrowList = QList<ServerInfo_Arrow *>());
 	int getItemId() const { return ItemId_Event_CreateArrows; }
 	static SerializableItem *newItem() { return new Event_CreateArrows; }
 	QList<ServerInfo_Arrow *> getArrowList() const { return typecastItemList<ServerInfo_Arrow *>(); }
@@ -279,7 +320,7 @@ public:
 class Event_CreateCounters : public GameEvent {
 	Q_OBJECT
 public:
-	Event_CreateCounters(int _gameId = -1, int _playerId = -1, const QList<ServerInfo_Counter *> &_counterList = QList<ServerInfo_Counter *>());
+	Event_CreateCounters(int _playerId = -1, const QList<ServerInfo_Counter *> &_counterList = QList<ServerInfo_Counter *>());
 	int getItemId() const { return ItemId_Event_CreateCounters; }
 	static SerializableItem *newItem() { return new Event_CreateCounters; }
 	QList<ServerInfo_Counter *> getCounterList() const { return typecastItemList<ServerInfo_Counter *>(); }
@@ -288,7 +329,7 @@ public:
 class Event_DrawCards : public GameEvent {
 	Q_OBJECT
 public:
-	Event_DrawCards(int _gameId = -1, int _playerId = -1, int numberCards = -1, const QList<ServerInfo_Card *> &_cardList = QList<ServerInfo_Card *>());
+	Event_DrawCards(int _playerId = -1, int numberCards = -1, const QList<ServerInfo_Card *> &_cardList = QList<ServerInfo_Card *>());
 	int getItemId() const { return ItemId_Event_DrawCards; }
 	static SerializableItem *newItem() { return new Event_DrawCards; }
 	int getNumberCards() const { return static_cast<SerializableItem_Int *>(itemMap.value("number_cards"))->getData(); }

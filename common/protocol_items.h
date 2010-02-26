@@ -308,7 +308,7 @@ public:
 class Event_Say : public GameEvent {
 	Q_OBJECT
 public:
-	Event_Say(int _gameId = -1, int _playerId = -1, const QString &_message = QString());
+	Event_Say(int _playerId = -1, const QString &_message = QString());
 	QString getMessage() const { return static_cast<SerializableItem_String *>(itemMap.value("message"))->getData(); };
 	static SerializableItem *newItem() { return new Event_Say; }
 	int getItemId() const { return ItemId_Event_Say; }
@@ -316,14 +316,14 @@ public:
 class Event_Leave : public GameEvent {
 	Q_OBJECT
 public:
-	Event_Leave(int _gameId = -1, int _playerId = -1);
+	Event_Leave(int _playerId = -1);
 	static SerializableItem *newItem() { return new Event_Leave; }
 	int getItemId() const { return ItemId_Event_Leave; }
 };
 class Event_DeckSelect : public GameEvent {
 	Q_OBJECT
 public:
-	Event_DeckSelect(int _gameId = -1, int _playerId = -1, int _deckId = -1);
+	Event_DeckSelect(int _playerId = -1, int _deckId = -1);
 	int getDeckId() const { return static_cast<SerializableItem_Int *>(itemMap.value("deck_id"))->getData(); };
 	static SerializableItem *newItem() { return new Event_DeckSelect; }
 	int getItemId() const { return ItemId_Event_DeckSelect; }
@@ -331,35 +331,35 @@ public:
 class Event_GameClosed : public GameEvent {
 	Q_OBJECT
 public:
-	Event_GameClosed(int _gameId = -1, int _playerId = -1);
+	Event_GameClosed(int _playerId = -1);
 	static SerializableItem *newItem() { return new Event_GameClosed; }
 	int getItemId() const { return ItemId_Event_GameClosed; }
 };
 class Event_ReadyStart : public GameEvent {
 	Q_OBJECT
 public:
-	Event_ReadyStart(int _gameId = -1, int _playerId = -1);
+	Event_ReadyStart(int _playerId = -1);
 	static SerializableItem *newItem() { return new Event_ReadyStart; }
 	int getItemId() const { return ItemId_Event_ReadyStart; }
 };
 class Event_Concede : public GameEvent {
 	Q_OBJECT
 public:
-	Event_Concede(int _gameId = -1, int _playerId = -1);
+	Event_Concede(int _playerId = -1);
 	static SerializableItem *newItem() { return new Event_Concede; }
 	int getItemId() const { return ItemId_Event_Concede; }
 };
 class Event_Shuffle : public GameEvent {
 	Q_OBJECT
 public:
-	Event_Shuffle(int _gameId = -1, int _playerId = -1);
+	Event_Shuffle(int _playerId = -1);
 	static SerializableItem *newItem() { return new Event_Shuffle; }
 	int getItemId() const { return ItemId_Event_Shuffle; }
 };
 class Event_RollDie : public GameEvent {
 	Q_OBJECT
 public:
-	Event_RollDie(int _gameId = -1, int _playerId = -1, int _sides = -1, int _value = -1);
+	Event_RollDie(int _playerId = -1, int _sides = -1, int _value = -1);
 	int getSides() const { return static_cast<SerializableItem_Int *>(itemMap.value("sides"))->getData(); };
 	int getValue() const { return static_cast<SerializableItem_Int *>(itemMap.value("value"))->getData(); };
 	static SerializableItem *newItem() { return new Event_RollDie; }
@@ -368,7 +368,7 @@ public:
 class Event_MoveCard : public GameEvent {
 	Q_OBJECT
 public:
-	Event_MoveCard(int _gameId = -1, int _playerId = -1, int _cardId = -1, const QString &_cardName = QString(), const QString &_startZone = QString(), int _position = -1, const QString &_targetZone = QString(), int _x = -1, int _y = -1, int _newCardId = -1, bool _faceDown = false);
+	Event_MoveCard(int _playerId = -1, int _cardId = -1, const QString &_cardName = QString(), const QString &_startZone = QString(), int _position = -1, const QString &_targetZone = QString(), int _x = -1, int _y = -1, int _newCardId = -1, bool _faceDown = false);
 	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); };
 	QString getCardName() const { return static_cast<SerializableItem_String *>(itemMap.value("card_name"))->getData(); };
 	QString getStartZone() const { return static_cast<SerializableItem_String *>(itemMap.value("start_zone"))->getData(); };
@@ -384,7 +384,7 @@ public:
 class Event_CreateToken : public GameEvent {
 	Q_OBJECT
 public:
-	Event_CreateToken(int _gameId = -1, int _playerId = -1, const QString &_zone = QString(), int _cardId = -1, const QString &_cardName = QString(), const QString &_pt = QString(), int _x = -1, int _y = -1);
+	Event_CreateToken(int _playerId = -1, const QString &_zone = QString(), int _cardId = -1, const QString &_cardName = QString(), const QString &_pt = QString(), int _x = -1, int _y = -1);
 	QString getZone() const { return static_cast<SerializableItem_String *>(itemMap.value("zone"))->getData(); };
 	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); };
 	QString getCardName() const { return static_cast<SerializableItem_String *>(itemMap.value("card_name"))->getData(); };
@@ -397,7 +397,7 @@ public:
 class Event_DeleteArrow : public GameEvent {
 	Q_OBJECT
 public:
-	Event_DeleteArrow(int _gameId = -1, int _playerId = -1, int _arrowId = -1);
+	Event_DeleteArrow(int _playerId = -1, int _arrowId = -1);
 	int getArrowId() const { return static_cast<SerializableItem_Int *>(itemMap.value("arrow_id"))->getData(); };
 	static SerializableItem *newItem() { return new Event_DeleteArrow; }
 	int getItemId() const { return ItemId_Event_DeleteArrow; }
@@ -405,7 +405,7 @@ public:
 class Event_SetCardAttr : public GameEvent {
 	Q_OBJECT
 public:
-	Event_SetCardAttr(int _gameId = -1, int _playerId = -1, const QString &_zone = QString(), int _cardId = -1, const QString &_attrName = QString(), const QString &_attrValue = QString());
+	Event_SetCardAttr(int _playerId = -1, const QString &_zone = QString(), int _cardId = -1, const QString &_attrName = QString(), const QString &_attrValue = QString());
 	QString getZone() const { return static_cast<SerializableItem_String *>(itemMap.value("zone"))->getData(); };
 	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); };
 	QString getAttrName() const { return static_cast<SerializableItem_String *>(itemMap.value("attr_name"))->getData(); };
@@ -416,7 +416,7 @@ public:
 class Event_SetCounter : public GameEvent {
 	Q_OBJECT
 public:
-	Event_SetCounter(int _gameId = -1, int _playerId = -1, int _counterId = -1, int _value = -1);
+	Event_SetCounter(int _playerId = -1, int _counterId = -1, int _value = -1);
 	int getCounterId() const { return static_cast<SerializableItem_Int *>(itemMap.value("counter_id"))->getData(); };
 	int getValue() const { return static_cast<SerializableItem_Int *>(itemMap.value("value"))->getData(); };
 	static SerializableItem *newItem() { return new Event_SetCounter; }
@@ -425,7 +425,7 @@ public:
 class Event_DelCounter : public GameEvent {
 	Q_OBJECT
 public:
-	Event_DelCounter(int _gameId = -1, int _playerId = -1, int _counterId = -1);
+	Event_DelCounter(int _playerId = -1, int _counterId = -1);
 	int getCounterId() const { return static_cast<SerializableItem_Int *>(itemMap.value("counter_id"))->getData(); };
 	static SerializableItem *newItem() { return new Event_DelCounter; }
 	int getItemId() const { return ItemId_Event_DelCounter; }
@@ -433,7 +433,7 @@ public:
 class Event_SetActivePlayer : public GameEvent {
 	Q_OBJECT
 public:
-	Event_SetActivePlayer(int _gameId = -1, int _playerId = -1, int _activePlayerId = -1);
+	Event_SetActivePlayer(int _playerId = -1, int _activePlayerId = -1);
 	int getActivePlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("active_player_id"))->getData(); };
 	static SerializableItem *newItem() { return new Event_SetActivePlayer; }
 	int getItemId() const { return ItemId_Event_SetActivePlayer; }
@@ -441,7 +441,7 @@ public:
 class Event_SetActivePhase : public GameEvent {
 	Q_OBJECT
 public:
-	Event_SetActivePhase(int _gameId = -1, int _playerId = -1, int _phase = -1);
+	Event_SetActivePhase(int _playerId = -1, int _phase = -1);
 	int getPhase() const { return static_cast<SerializableItem_Int *>(itemMap.value("phase"))->getData(); };
 	static SerializableItem *newItem() { return new Event_SetActivePhase; }
 	int getItemId() const { return ItemId_Event_SetActivePhase; }
@@ -449,7 +449,7 @@ public:
 class Event_DumpZone : public GameEvent {
 	Q_OBJECT
 public:
-	Event_DumpZone(int _gameId = -1, int _playerId = -1, int _zoneOwnerId = -1, const QString &_zone = QString(), int _numberCards = -1);
+	Event_DumpZone(int _playerId = -1, int _zoneOwnerId = -1, const QString &_zone = QString(), int _numberCards = -1);
 	int getZoneOwnerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("zone_owner_id"))->getData(); };
 	QString getZone() const { return static_cast<SerializableItem_String *>(itemMap.value("zone"))->getData(); };
 	int getNumberCards() const { return static_cast<SerializableItem_Int *>(itemMap.value("number_cards"))->getData(); };
@@ -459,7 +459,7 @@ public:
 class Event_StopDumpZone : public GameEvent {
 	Q_OBJECT
 public:
-	Event_StopDumpZone(int _gameId = -1, int _playerId = -1, int _zoneOwnerId = -1, const QString &_zone = QString());
+	Event_StopDumpZone(int _playerId = -1, int _zoneOwnerId = -1, const QString &_zone = QString());
 	int getZoneOwnerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("zone_owner_id"))->getData(); };
 	QString getZone() const { return static_cast<SerializableItem_String *>(itemMap.value("zone"))->getData(); };
 	static SerializableItem *newItem() { return new Event_StopDumpZone; }

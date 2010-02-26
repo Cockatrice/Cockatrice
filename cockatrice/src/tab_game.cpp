@@ -226,25 +226,30 @@ Player *TabGame::addPlayer(int playerId, const QString &playerName)
 	return newPlayer;
 }
 
-void TabGame::processGameEvent(GameEvent *event)
+void TabGame::processGameEventContainer(GameEventContainer *cont)
 {
-	switch (event->getItemId()) {
-		case ItemId_Event_GameStateChanged: eventGameStateChanged(qobject_cast<Event_GameStateChanged *>(event)); break;
-		case ItemId_Event_Join: eventJoin(qobject_cast<Event_Join *>(event)); break;
-		case ItemId_Event_Leave: eventLeave(qobject_cast<Event_Leave *>(event)); break;
-		case ItemId_Event_GameClosed: eventGameClosed(qobject_cast<Event_GameClosed *>(event)); break;
-		case ItemId_Event_SetActivePlayer: eventSetActivePlayer(qobject_cast<Event_SetActivePlayer *>(event)); break;
-		case ItemId_Event_SetActivePhase: eventSetActivePhase(qobject_cast<Event_SetActivePhase *>(event)); break;
-		case ItemId_Event_Ping: eventPing(qobject_cast<Event_Ping *>(event)); break;
-
-		default: {
-			Player *player = players.value(event->getPlayerId(), 0);
-			if (!player) {
-				qDebug() << "unhandled game event: invalid player id";
-				break;
+	const QList<GameEvent *> &eventList = cont->getEventList();
+	for (int i = 0; i < eventList.size(); ++i) {
+		GameEvent *event = eventList[i];
+		
+		switch (event->getItemId()) {
+			case ItemId_Event_GameStateChanged: eventGameStateChanged(qobject_cast<Event_GameStateChanged *>(event)); break;
+			case ItemId_Event_Join: eventJoin(qobject_cast<Event_Join *>(event)); break;
+			case ItemId_Event_Leave: eventLeave(qobject_cast<Event_Leave *>(event)); break;
+			case ItemId_Event_GameClosed: eventGameClosed(qobject_cast<Event_GameClosed *>(event)); break;
+			case ItemId_Event_SetActivePlayer: eventSetActivePlayer(qobject_cast<Event_SetActivePlayer *>(event)); break;
+			case ItemId_Event_SetActivePhase: eventSetActivePhase(qobject_cast<Event_SetActivePhase *>(event)); break;
+			case ItemId_Event_Ping: eventPing(qobject_cast<Event_Ping *>(event)); break;
+	
+			default: {
+				Player *player = players.value(event->getPlayerId(), 0);
+				if (!player) {
+					qDebug() << "unhandled game event: invalid player id";
+					break;
+				}
+				player->processGameEvent(event);
+				emit userEvent();
 			}
-			player->processGameEvent(event);
-			emit userEvent();
 		}
 	}
 }
@@ -253,6 +258,17 @@ void TabGame::sendGameCommand(GameCommand *command)
 {
 	command->setGameId(gameId);
 	client->sendCommand(command);
+}
+
+void TabGame::sendCommandContainer(CommandContainer *cont)
+{
+	const QList<Command *> &cmdList = cont->getCommandList();
+	for (int i = 0; i < cmdList.size(); ++i) {
+		GameCommand *cmd = qobject_cast<GameCommand *>(cmdList[i]);
+		if (cmd)
+			cmd->setGameId(gameId);
+	}
+	client->sendCommandContainer(cont);
 }
 
 void TabGame::startGame()

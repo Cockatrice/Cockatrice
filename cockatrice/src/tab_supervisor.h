@@ -12,7 +12,7 @@ class TabChatChannel;
 class TabGame;
 class TabDeckStorage;
 class ChatEvent;
-class GameEvent;
+class GameEventContainer;
 class Event_GameJoined;
 
 class TabSupervisor : public QTabWidget {
@@ -42,7 +42,7 @@ private slots:
 	void chatChannelLeft(TabChatChannel *tab);
 	void tabUserEvent();
 	void processChatEvent(ChatEvent *event);
-	void processGameEvent(GameEvent *event);
+	void processGameEventContainer(GameEventContainer *cont);
 };
 
 #endif

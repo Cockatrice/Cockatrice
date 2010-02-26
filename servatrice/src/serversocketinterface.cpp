@@ -60,11 +60,11 @@ ServerSocketInterface::~ServerSocketInterface()
 
 void ServerSocketInterface::processProtocolItem(ProtocolItem *item)
 {
-	Command *command = qobject_cast<Command *>(item);
-	if (!command)
-		sendProtocolItem(new ProtocolResponse(command->getCmdId(), RespInvalidCommand));
+	CommandContainer *cont = qobject_cast<CommandContainer *>(item);
+	if (!cont)
+		sendProtocolItem(new ProtocolResponse(cont->getCmdId(), RespInvalidCommand));
 	else
-		processCommand(command);
+		processCommandContainer(cont);
 }
 
 void ServerSocketInterface::readClient()
@@ -159,7 +159,7 @@ bool ServerSocketInterface::deckListHelper(DeckList_Directory *folder)
 // CHECK AUTHENTICATION!
 // Also check for every function that data belonging to other users cannot be accessed.
 
-ResponseCode ServerSocketInterface::cmdDeckList(Command_DeckList *cmd)
+ResponseCode ServerSocketInterface::cmdDeckList(Command_DeckList * /*cmd*/, CommandContainer *cont)
 {
 	if (authState != PasswordRight)
 		return RespFunctionNotAllowed;
@@ -171,12 +171,12 @@ ResponseCode ServerSocketInterface::cmdDeckList(Command_DeckList *cmd)
 	if (!deckListHelper(root))
 		return RespContextError;
 	
-	sendProtocolItem(new Response_DeckList(cmd->getCmdId(), RespOk, root));
+	cont->setResponse(new Response_DeckList(cont->getCmdId(), RespOk, root));
 	
 	return RespNothing;
 }
 
-ResponseCode ServerSocketInterface::cmdDeckNewDir(Command_DeckNewDir *cmd)
+ResponseCode ServerSocketInterface::cmdDeckNewDir(Command_DeckNewDir *cmd, CommandContainer * /*cont*/)
 {
 	if (authState != PasswordRight)
 		return RespFunctionNotAllowed;
@@ -218,7 +218,7 @@ void ServerSocketInterface::deckDelDirHelper(int basePathId)
 	servatrice->execSqlQuery(query);
 }
 
-ResponseCode ServerSocketInterface::cmdDeckDelDir(Command_DeckDelDir *cmd)
+ResponseCode ServerSocketInterface::cmdDeckDelDir(Command_DeckDelDir *cmd, CommandContainer * /*cont*/)
 {
 	if (authState != PasswordRight)
 		return RespFunctionNotAllowed;
@@ -232,7 +232,7 @@ ResponseCode ServerSocketInterface::cmdDeckDelDir(Command_DeckDelDir *cmd)
 	return RespOk;
 }
 
-ResponseCode ServerSocketInterface::cmdDeckDel(Command_DeckDel *cmd)
+ResponseCode ServerSocketInterface::cmdDeckDel(Command_DeckDel *cmd, CommandContainer * /*cont*/)
 {
 	if (authState != PasswordRight)
 		return RespFunctionNotAllowed;
@@ -255,7 +255,7 @@ ResponseCode ServerSocketInterface::cmdDeckDel(Command_DeckDel *cmd)
 	return RespOk;
 }
 
-ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd)
+ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd, CommandContainer *cont)
 {
 	if (authState != PasswordRight)
 		return RespFunctionNotAllowed;
@@ -286,7 +286,7 @@ ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd)
 	query.bindValue(":content", deckContents);
 	servatrice->execSqlQuery(query);
 	
-	sendProtocolItem(new Response_DeckUpload(cmd->getCmdId(), RespOk, new DeckList_File(deckName, query.lastInsertId().toInt(), QDateTime::currentDateTime())));
+	cont->setResponse(new Response_DeckUpload(cont->getCmdId(), RespOk, new DeckList_File(deckName, query.lastInsertId().toInt(), QDateTime::currentDateTime())));
 	return RespNothing;
 }
 
@@ -310,7 +310,7 @@ DeckList *ServerSocketInterface::getDeckFromDatabase(int deckId)
 	return deck;
 }
 
-ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd)
+ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd, CommandContainer *cont)
 {
 	if (authState != PasswordRight)
 		return RespFunctionNotAllowed;
@@ -321,6 +321,6 @@ ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd)
 	} catch(ResponseCode r) {
 		return r;
 	}
-	sendProtocolItem(new Response_DeckDownload(cmd->getCmdId(), RespOk, deck));
+	cont->setResponse(new Response_DeckDownload(cont->getCmdId(), RespOk, deck));
 	return RespNothing;
 }

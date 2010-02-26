@@ -66,7 +66,7 @@ void Server_Game::pingClockTimeout()
 			pingTime = -1;
 		pingList.append(new ServerInfo_PlayerPing(player->getPlayerId(), pingTime));
 	}
-	sendGameEvent(new Event_Ping(-1, pingList));
+	sendGameEvent(new Event_Ping(pingList));
 	
 	const int maxTime = static_cast<Server *>(parent())->getMaxGameInactivityTime();
 	if (allPlayersInactive) {
@@ -119,7 +119,7 @@ void Server_Game::startGameIfReady()
 		Server_Player *player = playerIterator.next().value();
 		player->setConceded(false);
 		player->setReadyStart(false);
-		player->sendProtocolItem(new Event_GameStateChanged(gameId, gameStarted, 0, 0, getGameState(player)));
+		sendGameEventToPlayer(player, new Event_GameStateChanged(gameStarted, 0, 0, getGameState(player)));
 	}
 	
 /*	QSqlQuery query;
@@ -157,7 +157,7 @@ void Server_Game::stopGameIfFinished()
 	playerIterator.toFront();
 	while (playerIterator.hasNext()) {
 		Server_Player *player = playerIterator.next().value();
-		player->sendProtocolItem(new Event_GameStateChanged(gameId, gameStarted, -1, -1, getGameState(player)));
+		sendGameEventToPlayer(player, new Event_GameStateChanged(gameStarted, -1, -1, getGameState(player)));
 	}
 }
 
@@ -180,7 +180,7 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 	int playerId = keyList.isEmpty() ? 0 : (keyList.last() + 1);
 	
 	Server_Player *newPlayer = new Server_Player(this, playerId, handler->getPlayerName(), spectator, handler);
-	sendGameEvent(new Event_Join(-1, new ServerInfo_Player(playerId, handler->getPlayerName(), spectator)));
+	sendGameEvent(new Event_Join(new ServerInfo_Player(playerId, handler->getPlayerName(), spectator)));
 	players.insert(playerId, newPlayer);
 
 	if (broadcastUpdate)
@@ -192,7 +192,7 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 void Server_Game::removePlayer(Server_Player *player)
 {
 	players.remove(player->getPlayerId());
-	sendGameEvent(new Event_Leave(-1, player->getPlayerId()));
+	sendGameEvent(new Event_Leave(player->getPlayerId()));
 	delete player;
 	
 	if (!getPlayerCount())
@@ -205,7 +205,7 @@ void Server_Game::removePlayer(Server_Player *player)
 void Server_Game::setActivePlayer(int _activePlayer)
 {
 	activePlayer = _activePlayer;
-	sendGameEvent(new Event_SetActivePlayer(-1, -1, activePlayer));
+	sendGameEvent(new Event_SetActivePlayer(-1, activePlayer));
 	setActivePhase(0);
 }
 
@@ -217,13 +217,13 @@ void Server_Game::setActivePhase(int _activePhase)
 		QList<Server_Arrow *> toDelete = player->getArrows().values();
 		for (int i = 0; i < toDelete.size(); ++i) {
 			Server_Arrow *a = toDelete[i];
-			sendGameEvent(new Event_DeleteArrow(-1, player->getPlayerId(), a->getId()));
+			sendGameEvent(new Event_DeleteArrow(player->getPlayerId(), a->getId()));
 			player->deleteArrow(a->getId());
 		}
 	}
 	
 	activePhase = _activePhase;
-	sendGameEvent(new Event_SetActivePhase(-1, -1, activePhase));
+	sendGameEvent(new Event_SetActivePhase(-1, activePhase));
 }
 
 QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAsking) const
@@ -282,13 +282,23 @@ QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAs
 
 void Server_Game::sendGameEvent(GameEvent *event, Server_Player *exclude)
 {
-	event->setGameId(gameId);
+	sendGameEventContainer(new GameEventContainer(QList<GameEvent *>() << event), exclude);
+}
+
+void Server_Game::sendGameEventContainer(GameEventContainer *cont, Server_Player *exclude)
+{
+	cont->setGameId(gameId);
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	while (playerIterator.hasNext()) {
 		Server_Player *p = playerIterator.next().value();
 		if (p != exclude)
-			p->sendProtocolItem(event, false);
+			p->sendProtocolItem(cont, false);
 	}
 
-	delete event;
+	delete cont;
+}
+
+void Server_Game::sendGameEventToPlayer(Server_Player *player, GameEvent *event)
+{
+	player->sendProtocolItem(new GameEventContainer(QList<GameEvent *>() << event, gameId));
 }

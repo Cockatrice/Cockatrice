@@ -52,7 +52,7 @@ void TabSupervisor::start(Client *_client)
 {
 	client = _client;
 	connect(client, SIGNAL(chatEventReceived(ChatEvent *)), this, SLOT(processChatEvent(ChatEvent *)));
-	connect(client, SIGNAL(gameEventReceived(GameEvent *)), this, SLOT(processGameEvent(GameEvent *)));
+	connect(client, SIGNAL(gameEventContainerReceived(GameEventContainer *)), this, SLOT(processGameEventContainer(GameEventContainer *)));
 	connect(client, SIGNAL(gameJoinedEventReceived(Event_GameJoined *)), this, SLOT(gameJoined(Event_GameJoined *)));
 	connect(client, SIGNAL(maxPingTime(int, int)), this, SLOT(updatePingTime(int, int)));
 
@@ -152,12 +152,12 @@ void TabSupervisor::processChatEvent(ChatEvent *event)
 		tab->processChatEvent(event);
 }
 
-void TabSupervisor::processGameEvent(GameEvent *event)
+void TabSupervisor::processGameEventContainer(GameEventContainer *cont)
 {
-	TabGame *tab = gameTabs.value(event->getGameId());
+	TabGame *tab = gameTabs.value(cont->getGameId());
 	if (tab) {
-		qDebug() << "gameEvent gameId =" << event->getGameId();
-		tab->processGameEvent(event);
+		qDebug() << "gameEvent gameId =" << cont->getGameId();
+		tab->processGameEventContainer(cont);
 	} else
 		qDebug() << "gameEvent: invalid gameId";
 }

@@ -90,14 +90,14 @@ void Client::processProtocolItem(ProtocolItem *item)
 {
 	ProtocolResponse *response = qobject_cast<ProtocolResponse *>(item);
 	if (response) {
-		Command *cmd = pendingCommands.value(response->getCmdId(), 0);
-		if (!cmd)
+		CommandContainer *cmdCont = pendingCommands.value(response->getCmdId(), 0);
+		if (!cmdCont)
 			return;
 		
-		pendingCommands.remove(cmd->getCmdId());
-		cmd->processResponse(response);
+		pendingCommands.remove(cmdCont->getCmdId());
+		cmdCont->processResponse(response);
 		delete response;
-		delete cmd;
+		delete cmdCont;
 		
 		return;
 	}
@@ -114,10 +114,10 @@ void Client::processProtocolItem(ProtocolItem *item)
 		return;
 	}
 
-	GameEvent *gameEvent = qobject_cast<GameEvent *>(item);
-	if (gameEvent) {
-		emit gameEventReceived(gameEvent);
-		delete gameEvent;
+	GameEventContainer *gameEventContainer = qobject_cast<GameEventContainer *>(item);
+	if (gameEventContainer) {
+		emit gameEventContainerReceived(gameEventContainer);
+		delete gameEventContainer;
 		return;
 	}
 
@@ -139,8 +139,13 @@ void Client::setStatus(const ClientStatus _status)
 
 void Client::sendCommand(Command *cmd)
 {
-	cmd->write(xmlWriter);
-	pendingCommands.insert(cmd->getCmdId(), cmd);
+	sendCommandContainer(new CommandContainer(QList<Command *>() << cmd));
+}
+
+void Client::sendCommandContainer(CommandContainer *cont)
+{
+	cont->write(xmlWriter);
+	pendingCommands.insert(cont->getCmdId(), cont);
 }
 
 void Client::connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password)
@@ -162,7 +167,7 @@ void Client::disconnectFromServer()
 	
 	timer->stop();
 
-	QList<Command *> pc = pendingCommands.values();
+	QList<CommandContainer *> pc = pendingCommands.values();
 	for (int i = 0; i < pc.size(); i++)
 		delete pc[i];
 	pendingCommands.clear();
@@ -174,7 +179,7 @@ void Client::disconnectFromServer()
 void Client::ping()
 {
 	int maxTime = 0;
-	QMapIterator<int, Command *> i(pendingCommands);
+	QMapIterator<int, CommandContainer *> i(pendingCommands);
 	while (i.hasNext()) {
 		int time = i.next().value()->tick();
 		if (time > maxTime)

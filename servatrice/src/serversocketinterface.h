@@ -47,14 +47,14 @@ private:
 	int getDeckPathId(int basePathId, QStringList path);
 	int getDeckPathId(const QString &path);
 	bool deckListHelper(DeckList_Directory *folder);
-	ResponseCode cmdDeckList(Command_DeckList *cmd);
-	ResponseCode cmdDeckNewDir(Command_DeckNewDir *cmd);
+	ResponseCode cmdDeckList(Command_DeckList *cmd, CommandContainer *cont);
+	ResponseCode cmdDeckNewDir(Command_DeckNewDir *cmd, CommandContainer *cont);
 	void deckDelDirHelper(int basePathId);
-	ResponseCode cmdDeckDelDir(Command_DeckDelDir *cmd);
-	ResponseCode cmdDeckDel(Command_DeckDel *cmd);
-	ResponseCode cmdDeckUpload(Command_DeckUpload *cmd);
+	ResponseCode cmdDeckDelDir(Command_DeckDelDir *cmd, CommandContainer *cont);
+	ResponseCode cmdDeckDel(Command_DeckDel *cmd, CommandContainer *cont);
+	ResponseCode cmdDeckUpload(Command_DeckUpload *cmd, CommandContainer *cont);
 	DeckList *getDeckFromDatabase(int deckId);
-	ResponseCode cmdDeckDownload(Command_DeckDownload *cmd);
+	ResponseCode cmdDeckDownload(Command_DeckDownload *cmd, CommandContainer *cont);
 public:
 	ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent = 0);
 	~ServerSocketInterface();
