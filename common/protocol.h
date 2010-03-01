@@ -99,7 +99,8 @@ private:
 	// These are only for processing inside the server.
 	ProtocolResponse *resp;
 	QList<ProtocolItem *> itemQueue;
-	GameEventContainer *gameEventQueue;
+	GameEventContainer *gameEventQueuePublic;
+	GameEventContainer *gameEventQueuePrivate;
 public:
 	CommandContainer(const QList<Command *> &_commandList = QList<Command *>(), int _cmdId = -1);
 	static SerializableItem *newItem() { return new CommandContainer; }
@@ -113,8 +114,10 @@ public:
 	void setResponse(ProtocolResponse *_resp);
 	const QList<ProtocolItem *> &getItemQueue() const { return itemQueue; }
 	void enqueueItem(ProtocolItem *item) { itemQueue.append(item); }
-	GameEventContainer *getGameEventQueue() const { return gameEventQueue; }
-	void enqueueGameEvent(GameEvent *event, int gameId);
+	GameEventContainer *getGameEventQueuePublic() const { return gameEventQueuePublic; }
+	void enqueueGameEventPublic(GameEvent *event, int gameId);
+	GameEventContainer *getGameEventQueuePrivate() const { return gameEventQueuePrivate; }
+	void enqueueGameEventPrivate(GameEvent *event, int gameId);
 };
 
 class ChatCommand : public Command {

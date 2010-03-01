@@ -100,7 +100,7 @@ void Command::processResponse(ProtocolResponse *response)
 }
 
 CommandContainer::CommandContainer(const QList<Command *> &_commandList, int _cmdId)
-	: ProtocolItem("container", "cmd"), ticks(0), resp(0), gameEventQueue(0)
+	: ProtocolItem("container", "cmd"), ticks(0), resp(0), gameEventQueuePublic(0), gameEventQueuePrivate(0)
 {
 	if (_cmdId == -1)
 		_cmdId = lastCmdId++;
@@ -126,11 +126,18 @@ void CommandContainer::setResponse(ProtocolResponse *_resp)
 	resp = _resp;
 }
 
-void CommandContainer::enqueueGameEvent(GameEvent *event, int gameId)
+void CommandContainer::enqueueGameEventPublic(GameEvent *event, int gameId)
 {
-	if (!gameEventQueue)
-		gameEventQueue = new GameEventContainer(QList<GameEvent *>(), gameId);
-	gameEventQueue->appendItem(event);
+	if (!gameEventQueuePublic)
+		gameEventQueuePublic = new GameEventContainer(QList<GameEvent *>(), gameId);
+	gameEventQueuePublic->appendItem(event);
+}
+
+void CommandContainer::enqueueGameEventPrivate(GameEvent *event, int gameId)
+{
+	if (!gameEventQueuePrivate)
+		gameEventQueuePrivate = new GameEventContainer(QList<GameEvent *>(), gameId);
+	gameEventQueuePrivate->appendItem(event);
 }
 
 Command_DeckUpload::Command_DeckUpload(DeckList *_deck, const QString &_path)

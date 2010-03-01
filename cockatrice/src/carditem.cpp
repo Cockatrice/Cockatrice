@@ -173,8 +173,11 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 	if (tz)
 		tz->toggleTapped();
 	else {
+		bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier);
+		bool tapped = info->getCipt();
+		
 		TableZone *table = zone->getPlayer()->getTable();
 		QPoint gridPoint = table->getFreeGridPoint(info->getTableRow());
-		table->handleDropEventByGrid(id, zone, gridPoint, false);
+		table->handleDropEventByGrid(id, zone, gridPoint, faceDown, tapped);
 	}
 }

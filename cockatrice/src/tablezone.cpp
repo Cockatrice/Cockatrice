@@ -66,9 +66,9 @@ void TableZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &d
 	handleDropEventByGrid(cardId, startZone, mapToGrid(dropPoint), faceDown);
 }
 
-void TableZone::handleDropEventByGrid(int cardId, CardZone *startZone, const QPoint &gridPoint, bool faceDown)
+void TableZone::handleDropEventByGrid(int cardId, CardZone *startZone, const QPoint &gridPoint, bool faceDown, bool tapped)
 {
-	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), cardId, getName(), gridPoint.x(), gridPoint.y(), faceDown));
+	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), cardId, getName(), gridPoint.x(), gridPoint.y(), faceDown, tapped));
 }
 
 void TableZone::reorganizeCards()

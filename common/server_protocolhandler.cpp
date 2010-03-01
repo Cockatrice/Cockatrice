@@ -142,10 +142,16 @@ void Server_ProtocolHandler::processCommandContainer(CommandContainer *cont)
 	if (!pr)
 		pr = new ProtocolResponse(cont->getCmdId(), finalResponseCode);
 	
-	GameEventContainer *gQ = cont->getGameEventQueue();
-	if (gQ) {
-		Server_Game *game = games.value(gQ->getGameId()).first;
-		game->sendGameEventContainer(gQ);
+	GameEventContainer *gQPublic = cont->getGameEventQueuePublic();
+	if (gQPublic) {
+		Server_Game *game = games.value(gQPublic->getGameId()).first;
+		Server_Player *player = games.value(gQPublic->getGameId()).second;
+		GameEventContainer *gQPrivate = cont->getGameEventQueuePrivate();
+		if (gQPrivate) {
+			game->sendGameEventContainer(gQPublic, player);
+			player->sendProtocolItem(gQPrivate);
+		} else
+			game->sendGameEventContainer(gQPublic);
 	}
 	
 	const QList<ProtocolItem *> &iQ = cont->getItemQueue();
@@ -391,12 +397,13 @@ ResponseCode Server_ProtocolHandler::cmdMulligan(Command_Mulligan * /*cmd*/, Com
 
 	Server_CardZone *hand = player->getZones().value("hand");
 	while (!hand->cards.isEmpty())
-		moveCard(game, player, "hand", hand->cards.first()->getId(), "deck", 0, 0, false);
+		moveCard(game, player, cont, "hand", hand->cards.first()->getId(), "deck", 0, 0, false, false);
 
 	player->getZones().value("deck")->shuffle();
-	game->sendGameEvent(new Event_Shuffle(player->getPlayerId()));
+	cont->enqueueGameEventPrivate(new Event_Shuffle(player->getPlayerId()), game->getGameId());
+	cont->enqueueGameEventPublic(new Event_Shuffle(player->getPlayerId()), game->getGameId());
 
-	drawCards(game, player, number);
+	drawCards(game, player, cont, number);
 	player->setInitialCards(number - 1);
 
 	return RespOk;
@@ -408,7 +415,7 @@ ResponseCode Server_ProtocolHandler::cmdRollDie(Command_RollDie *cmd, CommandCon
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::drawCards(Server_Game *game, Server_Player *player, int number)
+ResponseCode Server_ProtocolHandler::drawCards(Server_Game *game, Server_Player *player, CommandContainer *cont, int number)
 {
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
@@ -425,8 +432,8 @@ ResponseCode Server_ProtocolHandler::drawCards(Server_Game *game, Server_Player 
 		cardList.append(new ServerInfo_Card(card->getId(), card->getName()));
 	}
 
-	player->sendProtocolItem(GameEventContainer::makeNew(new Event_DrawCards(player->getPlayerId(), cardList.size(), cardList), game->getGameId()));
-	game->sendGameEvent(new Event_DrawCards(player->getPlayerId(), cardList.size()), player);
+	cont->enqueueGameEventPrivate(new Event_DrawCards(player->getPlayerId(), cardList.size(), cardList), game->getGameId());
+	cont->enqueueGameEventPublic(new Event_DrawCards(player->getPlayerId(), cardList.size()), game->getGameId());
 
 	return RespOk;
 }
@@ -434,10 +441,10 @@ ResponseCode Server_ProtocolHandler::drawCards(Server_Game *game, Server_Player 
 
 ResponseCode Server_ProtocolHandler::cmdDrawCards(Command_DrawCards *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
 {
-	return drawCards(game, player, cmd->getNumber());
+	return drawCards(game, player, cont, cmd->getNumber());
 }
 
-ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *player, const QString &_startZone, int _cardId, const QString &_targetZone, int x, int y, bool faceDown)
+ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *player, CommandContainer *cont, const QString &_startZone, int _cardId, const QString &_targetZone, int x, int y, bool faceDown, bool tapped)
 {
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
@@ -489,7 +496,7 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 	int privatePosition = -1;
 	if (startzone->getType() == HiddenZone)
 		privatePosition = position;
-	player->sendProtocolItem(GameEventContainer::makeNew(new Event_MoveCard(player->getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getName(), x, y, privateNewCardId, faceDown), game->getGameId()));
+	cont->enqueueGameEventPrivate(new Event_MoveCard(player->getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getName(), x, y, privateNewCardId, faceDown), game->getGameId());
 
 	// Other players do not get to see the start and/or target position of the card if the respective
 	// part of the zone is being looked at. The information is not needed anyway because in hidden zones,
@@ -503,9 +510,12 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 		x = -1;
 
 	if ((startzone->getType() == PublicZone) || (targetzone->getType() == PublicZone))
-		game->sendGameEvent(new Event_MoveCard(player->getPlayerId(), oldCardId, publicCardName, startzone->getName(), position, targetzone->getName(), x, y, card->getId(), faceDown), player);
+		cont->enqueueGameEventPublic(new Event_MoveCard(player->getPlayerId(), oldCardId, publicCardName, startzone->getName(), position, targetzone->getName(), x, y, card->getId(), faceDown), game->getGameId());
 	else
-		game->sendGameEvent(new Event_MoveCard(player->getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getName(), x, y, -1, false), player);
+		cont->enqueueGameEventPublic(new Event_MoveCard(player->getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getName(), x, y, -1, false), game->getGameId());
+	
+	if (tapped)
+		setCardAttrHelper(cont, game, player, targetzone->getName(), card->getId(), "tapped", "1");
 
 	// If the card was moved to another zone, delete all arrows from and to the card
 	if (startzone != targetzone) {
@@ -528,7 +538,7 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 
 ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
 {
-	return moveCard(game, player, cmd->getStartZone(), cmd->getCardId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown());
+	return moveCard(game, player, cont, cmd->getStartZone(), cmd->getCardId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown(), cmd->getTapped());
 }
 
 ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
@@ -599,31 +609,37 @@ ResponseCode Server_ProtocolHandler::cmdDeleteArrow(Command_DeleteArrow *cmd, Co
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdSetCardAttr(Command_SetCardAttr *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::setCardAttrHelper(CommandContainer *cont, Server_Game *game, Server_Player *player, const QString &zoneName, int cardId, const QString &attrName, const QString &attrValue)
 {
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
 		
 	// zone, card id, attr name, attr value
 	// card id = -1 => affects all cards in the specified zone
-	Server_CardZone *zone = player->getZones().value(cmd->getZone());
+	Server_CardZone *zone = player->getZones().value(zoneName);
 	if (!zone)
 		return RespNameNotFound;
 
-	if (cmd->getCardId() == -1) {
+	if (cardId == -1) {
 		QListIterator<Server_Card *> CardIterator(zone->cards);
 		while (CardIterator.hasNext())
-			if (!CardIterator.next()->setAttribute(cmd->getAttrName(), cmd->getAttrValue(), true))
+			if (!CardIterator.next()->setAttribute(attrName, attrValue, true))
 				return RespInvalidCommand;
 	} else {
-		Server_Card *card = zone->getCard(cmd->getCardId(), false);
+		Server_Card *card = zone->getCard(cardId, false);
 		if (!card)
 			return RespNameNotFound;
-		if (!card->setAttribute(cmd->getAttrName(), cmd->getAttrValue(), false))
+		if (!card->setAttribute(attrName, attrValue, false))
 			return RespInvalidCommand;
 	}
-	cont->enqueueGameEvent(new Event_SetCardAttr(player->getPlayerId(), zone->getName(), cmd->getCardId(), cmd->getAttrName(), cmd->getAttrValue()), game->getGameId());
+	cont->enqueueGameEventPrivate(new Event_SetCardAttr(player->getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
+	cont->enqueueGameEventPublic(new Event_SetCardAttr(player->getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
 	return RespOk;
+}
+
+ResponseCode Server_ProtocolHandler::cmdSetCardAttr(Command_SetCardAttr *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+{
+	return setCardAttrHelper(cont, game, player, cmd->getZone(), cmd->getCardId(), cmd->getAttrName(), cmd->getAttrValue());
 }
 
 ResponseCode Server_ProtocolHandler::cmdIncCounter(Command_IncCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)

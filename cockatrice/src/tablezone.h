@@ -21,8 +21,8 @@ public:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	void reorganizeCards();
 	void toggleTapped();
-	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
-	void handleDropEventByGrid(int cardId, CardZone *startZone, const QPoint &gridPoint, bool faceDown);
+	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown = false);
+	void handleDropEventByGrid(int cardId, CardZone *startZone, const QPoint &gridPoint, bool faceDown = false, bool tapped = false);
 	CardItem *getCardFromGrid(const QPoint &gridPoint) const;
 	QPointF mapFromGrid(const QPoint &gridPoint) const;
 	QPoint mapToGrid(const QPointF &mapPoint) const;

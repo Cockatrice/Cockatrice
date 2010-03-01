@@ -100,7 +100,7 @@ Command_DrawCards::Command_DrawCards(int _gameId, int _number)
 {
 	insertItem(new SerializableItem_Int("number", _number));
 }
-Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, int _cardId, const QString &_targetZone, int _x, int _y, bool _faceDown)
+Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, int _cardId, const QString &_targetZone, int _x, int _y, bool _faceDown, bool _tapped)
 	: GameCommand("move_card", _gameId)
 {
 	insertItem(new SerializableItem_String("start_zone", _startZone));
@@ -109,6 +109,7 @@ Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, int _
 	insertItem(new SerializableItem_Int("x", _x));
 	insertItem(new SerializableItem_Int("y", _y));
 	insertItem(new SerializableItem_Bool("face_down", _faceDown));
+	insertItem(new SerializableItem_Bool("tapped", _tapped));
 }
 Command_CreateToken::Command_CreateToken(int _gameId, const QString &_zone, const QString &_cardName, const QString &_pt, int _x, int _y)
 	: GameCommand("create_token", _gameId)

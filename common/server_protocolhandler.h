@@ -56,13 +56,14 @@ private:
 	ResponseCode cmdMulligan(Command_Mulligan *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdRollDie(Command_RollDie *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	// XXX Maybe the following function and others belong into Server_Player
-	ResponseCode drawCards(Server_Game *game, Server_Player *player, int number);
+	ResponseCode drawCards(Server_Game *game, Server_Player *player, CommandContainer *cont, int number);
 	ResponseCode cmdDrawCards(Command_DrawCards *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode moveCard(Server_Game *game, Server_Player *player, const QString &_startZone, int _cardId, const QString &_targetZone, int _x, int _y, bool _faceDown);
+	ResponseCode moveCard(Server_Game *game, Server_Player *player, CommandContainer *cont, const QString &_startZone, int _cardId, const QString &_targetZone, int _x, int _y, bool _faceDown, bool _tapped);
 	ResponseCode cmdMoveCard(Command_MoveCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdCreateToken(Command_CreateToken *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdCreateArrow(Command_CreateArrow *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdDeleteArrow(Command_DeleteArrow *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
+	ResponseCode setCardAttrHelper(CommandContainer *cont, Server_Game *game, Server_Player *player, const QString &zone, int cardId, const QString &attrName, const QString &attrValue);
 	ResponseCode cmdSetCardAttr(Command_SetCardAttr *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdIncCounter(Command_IncCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdCreateCounter(Command_CreateCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
