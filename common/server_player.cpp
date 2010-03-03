@@ -10,7 +10,7 @@
 #include "decklist.h"
 
 Server_Player::Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator, Server_ProtocolHandler *_handler)
-	: game(_game), handler(_handler), deck(0), playerId(_playerId), playerName(_playerName), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false)
+	: game(_game), handler(_handler), deck(0), playerId(_playerId), playerName(_playerName), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false), deckId(-2)
 {
 }
 
@@ -124,10 +124,16 @@ void Server_Player::clearZones()
 	arrows.clear();
 }
 
-void Server_Player::setDeck(DeckList *_deck)
+ServerInfo_PlayerProperties *Server_Player::getProperties()
+{
+	return new ServerInfo_PlayerProperties(playerId, playerName, spectator, conceded, readyStart, deckId);
+}
+
+void Server_Player::setDeck(DeckList *_deck, int _deckId)
 {
 	delete deck;
 	deck = _deck;
+	deckId = _deckId;
 }
 
 void Server_Player::addZone(Server_CardZone *zone)

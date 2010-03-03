@@ -470,24 +470,9 @@ void Player::setCardAttrHelper(CardItem *card, const QString &aname, const QStri
 	}
 }
 
-void Player::eventDeckSelect(Event_DeckSelect *event)
-{
-	emit logDeckSelect(this, event->getDeckId());
-}
-
 void Player::eventSay(Event_Say *event)
 {
 	emit logSay(this, event->getMessage());
-}
-
-void Player::eventReadyStart(Event_ReadyStart * /*event*/)
-{
-	emit logReadyStart(this);
-}
-
-void Player::eventConcede(Event_Concede * /*event*/)
-{
-	emit logConcede(this);
 }
 
 void Player::eventShuffle(Event_Shuffle * /*event*/)
@@ -670,13 +655,10 @@ void Player::eventDrawCards(Event_DrawCards *event)
 	emit logDrawCards(this, event->getNumberCards());
 }
 
-void Player::processGameEvent(GameEvent *event)
+void Player::processGameEvent(GameEvent *event, GameEventContext *context)
 {
 	switch (event->getItemId()) {
-		case ItemId_Event_DeckSelect: eventDeckSelect(qobject_cast<Event_DeckSelect *>(event)); break;
 		case ItemId_Event_Say: eventSay(qobject_cast<Event_Say *>(event)); break;
-		case ItemId_Event_ReadyStart: eventReadyStart(qobject_cast<Event_ReadyStart *>(event)); break;
-		case ItemId_Event_Concede: eventConcede(qobject_cast<Event_Concede *>(event)); break;
 		case ItemId_Event_Shuffle: eventShuffle(qobject_cast<Event_Shuffle *>(event)); break;
 		case ItemId_Event_RollDie: eventRollDie(qobject_cast<Event_RollDie *>(event)); break;
 		case ItemId_Event_CreateArrows: eventCreateArrows(qobject_cast<Event_CreateArrows *>(event)); break;

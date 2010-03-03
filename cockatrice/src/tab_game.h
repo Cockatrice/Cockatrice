@@ -21,9 +21,11 @@ class PhasesToolbar;
 class PlayerListWidget;
 class ProtocolResponse;
 class GameEventContainer;
+class GameEventContext;
 class GameCommand;
 class CommandContainer;
 class Event_GameStateChanged;
+class Event_PlayerPropertiesChanged;
 class Event_Join;
 class Event_Leave;
 class Event_GameClosed;
@@ -72,15 +74,16 @@ private:
 	void startGame();
 	void stopGame();
 
-	void eventGameStateChanged(Event_GameStateChanged *event);
-	void eventJoin(Event_Join *event);
-	void eventLeave(Event_Leave *event);
-	void eventGameClosed(Event_GameClosed *event);
+	void eventGameStateChanged(Event_GameStateChanged *event, GameEventContext *context);
+	void eventPlayerPropertiesChanged(Event_PlayerPropertiesChanged *event, GameEventContext *context);
+	void eventJoin(Event_Join *event, GameEventContext *context);
+	void eventLeave(Event_Leave *event, GameEventContext *context);
+	void eventGameClosed(Event_GameClosed *event, GameEventContext *context);
 	Player *setActivePlayer(int id);
-	void eventSetActivePlayer(Event_SetActivePlayer *event);
+	void eventSetActivePlayer(Event_SetActivePlayer *event, GameEventContext *context);
 	void setActivePhase(int phase);
-	void eventSetActivePhase(Event_SetActivePhase *event);
-	void eventPing(Event_Ping *event);
+	void eventSetActivePhase(Event_SetActivePhase *event, GameEventContext *context);
+	void eventPing(Event_Ping *event, GameEventContext *context);
 signals:
 	void gameClosing(TabGame *tab);
 private slots:

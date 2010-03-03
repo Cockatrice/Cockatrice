@@ -66,6 +66,13 @@ while (<file>) {
 		$parentConstructorCall = "$baseClass(\"$name1\", _channel)";
 		$constructorParamsH = "const QString &_channel = QString()";
 		$constructorParamsCpp = "const QString &_channel";
+	} elsif ($type == 6) {
+		$type = 'game_event_context';
+		$namePrefix = 'Context';
+		$baseClass = 'GameEventContext';
+		$parentConstructorCall = "$baseClass(\"$name1\")";
+		$constructorParamsH = "";
+		$constructorParamsCpp = "";
 	}
 	$className = $namePrefix . '_' . $name2;
 	$itemEnum .= "ItemId_$className = " . ++$itemId . ",\n";

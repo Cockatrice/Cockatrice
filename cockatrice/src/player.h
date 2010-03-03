@@ -23,10 +23,8 @@ class ServerInfo_Counter;
 class CommandContainer;
 class GameCommand;
 class GameEvent;
-class Event_DeckSelect;
+class GameEventContext;
 class Event_Say;
-class Event_ReadyStart;
-class Event_Concede;
 class Event_Shuffle;
 class Event_RollDie;
 class Event_CreateArrows;
@@ -48,10 +46,7 @@ signals:
 	void toggleZoneView(Player *player, QString zoneName, int number);
 	void newCardAdded(AbstractCardItem *card);
 	// Log events
-	void logDeckSelect(Player *player, int deckId);
 	void logSay(Player *player, QString message);
-	void logReadyStart(Player *player);
-	void logConcede(Player *player);
 	void logShuffle(Player *player);
 	void logRollDie(Player *player, int sides, int roll);
 	void logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard);
@@ -102,7 +97,6 @@ private:
 	QAction *aTap, *aUntap, *aDoesntUntap, *aFlip, *aAddCounter, *aRemoveCounter, *aSetCounters,
 		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile;
 
-
 	void actTap(CardItem *card);
 	void actUntap(CardItem *card);
 	void actDoesntUntap(CardItem *card);
@@ -135,10 +129,7 @@ private:
 	
 	void initSayMenu();
 	
-	void eventDeckSelect(Event_DeckSelect *event);
 	void eventSay(Event_Say *event);
-	void eventReadyStart(Event_ReadyStart *event);
-	void eventConcede(Event_Concede *event);
 	void eventShuffle(Event_Shuffle *event);
 	void eventRollDie(Event_RollDie *event);
 	void eventCreateArrows(Event_CreateArrows *event);
@@ -189,7 +180,7 @@ public:
 	void setActive(bool _active);
 	
 	void processPlayerInfo(ServerInfo_Player *info);
-	void processGameEvent(GameEvent *event);
+	void processGameEvent(GameEvent *event, GameEventContext *context);
 	void sendGameCommand(GameCommand *command);
 	void sendCommandContainer(CommandContainer *cont);
 };

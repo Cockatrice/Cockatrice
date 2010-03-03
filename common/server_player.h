@@ -13,6 +13,7 @@ class Server_Counter;
 class Server_Arrow;
 class Server_ProtocolHandler;
 class ProtocolItem;
+class ServerInfo_PlayerProperties;
 
 class Server_Player : public QObject {
 	Q_OBJECT
@@ -31,6 +32,7 @@ private:
 	void clearZones();
 	bool readyStart;
 	bool conceded;
+	int deckId;
 public:
 	Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator, Server_ProtocolHandler *_handler);
 	~Server_Player();
@@ -46,12 +48,15 @@ public:
 	bool getSpectator() const { return spectator; }
 	bool getConceded() const { return conceded; }
 	void setConceded(bool _conceded) { conceded = _conceded; }
+	int getDeckId() const { return deckId; }
 	QString getPlayerName() const { return playerName; }
-	void setDeck(DeckList *_deck);
+	void setDeck(DeckList *_deck, int _deckId);
 	DeckList *getDeck() const { return deck; }
 	const QMap<QString, Server_CardZone *> &getZones() const { return zones; }
 	const QMap<int, Server_Counter *> &getCounters() const { return counters; }
 	const QMap<int, Server_Arrow *> &getArrows() const { return arrows; }
+
+	ServerInfo_PlayerProperties *getProperties();
 	
 	int newCardId();
 	int newCounterId() const;

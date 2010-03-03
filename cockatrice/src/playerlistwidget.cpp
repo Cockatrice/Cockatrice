@@ -1,28 +1,58 @@
+#include <QHeaderView>
 #include "playerlistwidget.h"
 #include "protocol_datastructures.h"
 #include "pingpixmapgenerator.h"
 
 PlayerListWidget::PlayerListWidget(QWidget *parent)
-	: QTreeWidget(parent)
+	: QTreeWidget(parent), gameStarted(false)
 {
-	setColumnCount(2);
+	readyIcon = QIcon(":/resources/icon_ready_start.svg");
+	notReadyIcon = QIcon(":/resources/icon_not_ready_start.svg");
+	concededIcon = QIcon(":/resources/icon_conceded.svg");
+	playerIcon = QIcon(":/resources/icon_player.svg");
+	spectatorIcon = QIcon(":/resources/icon_spectator.svg");
+
+	setColumnCount(5);
 	setRootIsDecorated(false);
+	setSelectionMode(NoSelection);
+	header()->setResizeMode(QHeaderView::ResizeToContents);
 	retranslateUi();
 }
 
 void PlayerListWidget::retranslateUi()
 {
-	headerItem()->setText(0, tr("Player name"));
-	headerItem()->setText(1, tr("Role"));
+	headerItem()->setText(0, QString());
+	headerItem()->setText(1, QString());
+	headerItem()->setText(2, QString());
+	headerItem()->setText(3, tr("Player name"));
+	headerItem()->setText(4, tr("Deck"));
 }
 
-void PlayerListWidget::addPlayer(ServerInfo_Player *player)
+void PlayerListWidget::addPlayer(ServerInfo_PlayerProperties *player)
 {
 	QTreeWidgetItem *newPlayer = new QTreeWidgetItem;
-	newPlayer->setText(0, player->getName());
-	newPlayer->setText(1, player->getSpectator() ? tr("Spectator") : tr("Player"));
-	addTopLevelItem(newPlayer);
 	players.insert(player->getPlayerId(), newPlayer);
+	updatePlayerProperties(player);
+	addTopLevelItem(newPlayer);
+}
+
+void PlayerListWidget::updatePlayerProperties(ServerInfo_PlayerProperties *prop)
+{
+	QTreeWidgetItem *player = players.value(prop->getPlayerId(), 0);
+	if (!player)
+		return;
+
+	player->setIcon(1, prop->getSpectator() ? spectatorIcon : playerIcon);
+	player->setIcon(2, gameStarted ? (prop->getConceded() ? concededIcon : QIcon()) : (prop->getReadyStart() ? readyIcon : notReadyIcon));
+	player->setText(3, prop->getName());
+
+	QString deckText;
+	switch (prop->getDeckId()) {
+		case -2: deckText = tr("no deck"); break;
+		case -1: deckText = tr("local deck"); break;
+		default: deckText = tr("ID #%1").arg(prop->getDeckId());
+	}
+	player->setText(4, deckText);
 }
 
 void PlayerListWidget::removePlayer(int playerId)
@@ -41,8 +71,7 @@ void PlayerListWidget::setActivePlayer(int playerId)
 		i.next();
 		QTreeWidgetItem *twi = i.value();
 		QColor c = i.key() == playerId ? QColor(150, 255, 150) : Qt::white;
-		twi->setBackground(0, c);
-		twi->setBackground(1, c);
+		twi->setBackground(3, c);
 	}
 }
 
@@ -52,4 +81,11 @@ void PlayerListWidget::updatePing(int playerId, int pingTime)
 	if (!twi)
 		return;
 	twi->setIcon(0, QIcon(PingPixmapGenerator::generatePixmap(10, pingTime, 10)));
+}
+
+void PlayerListWidget::setGameStarted(bool _gameStarted)
+{
+	gameStarted = _gameStarted;
+	for (int i = 0; i < players.size(); ++i)
+		players[i]->setIcon(2, gameStarted ? QIcon() : notReadyIcon);
 }

@@ -180,7 +180,7 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 	int playerId = keyList.isEmpty() ? 0 : (keyList.last() + 1);
 	
 	Server_Player *newPlayer = new Server_Player(this, playerId, handler->getPlayerName(), spectator, handler);
-	sendGameEvent(new Event_Join(new ServerInfo_Player(playerId, handler->getPlayerName(), spectator)));
+	sendGameEvent(new Event_Join(newPlayer->getProperties()));
 	players.insert(playerId, newPlayer);
 
 	if (broadcastUpdate)
@@ -275,14 +275,15 @@ QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAs
 			zoneList.append(new ServerInfo_Zone(zone->getName(), zone->getType(), zone->hasCoords(), zone->cards.size(), cardList));
 		}
 
-		result.append(new ServerInfo_Player(player->getPlayerId(), player->getPlayerName(), player->getSpectator(), player->getConceded(), player == playerWhosAsking ? player->getDeck() : 0, zoneList, counterList, arrowList));
+		ServerInfo_PlayerProperties *properties = new ServerInfo_PlayerProperties(player->getPlayerId(), player->getPlayerName(), player->getSpectator(), player->getConceded(), player->getReadyStart(), player->getDeckId());
+		result.append(new ServerInfo_Player(properties, player == playerWhosAsking ? player->getDeck() : 0, zoneList, counterList, arrowList));
 	}
 	return result;
 }
 
-void Server_Game::sendGameEvent(GameEvent *event, Server_Player *exclude)
+void Server_Game::sendGameEvent(GameEvent *event, GameEventContext *context, Server_Player *exclude)
 {
-	sendGameEventContainer(new GameEventContainer(QList<GameEvent *>() << event), exclude);
+	sendGameEventContainer(new GameEventContainer(QList<GameEvent *>() << event, -1, context), exclude);
 }
 
 void Server_Game::sendGameEventContainer(GameEventContainer *cont, Server_Player *exclude)

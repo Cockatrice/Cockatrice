@@ -208,21 +208,8 @@ Event_Leave::Event_Leave(int _playerId)
 	: GameEvent("leave", _playerId)
 {
 }
-Event_DeckSelect::Event_DeckSelect(int _playerId, int _deckId)
-	: GameEvent("deck_select", _playerId)
-{
-	insertItem(new SerializableItem_Int("deck_id", _deckId));
-}
 Event_GameClosed::Event_GameClosed(int _playerId)
 	: GameEvent("game_closed", _playerId)
-{
-}
-Event_ReadyStart::Event_ReadyStart(int _playerId)
-	: GameEvent("ready_start", _playerId)
-{
-}
-Event_Concede::Event_Concede(int _playerId)
-	: GameEvent("concede", _playerId)
 {
 }
 Event_Shuffle::Event_Shuffle(int _playerId)
@@ -335,6 +322,19 @@ Event_ChatSay::Event_ChatSay(const QString &_channel, const QString &_playerName
 	insertItem(new SerializableItem_String("player_name", _playerName));
 	insertItem(new SerializableItem_String("message", _message));
 }
+Context_ReadyStart::Context_ReadyStart()
+	: GameEventContext("ready_start")
+{
+}
+Context_Concede::Context_Concede()
+	: GameEventContext("concede")
+{
+}
+Context_DeckSelect::Context_DeckSelect(int _deckId)
+	: GameEventContext("deck_select")
+{
+	insertItem(new SerializableItem_Int("deck_id", _deckId));
+}
 void ProtocolItem::initializeHashAuto()
 {
 	itemNameHash.insert("cmdping", Command_Ping::newItem);
@@ -374,10 +374,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdstop_dump_zone", Command_StopDumpZone::newItem);
 	itemNameHash.insert("game_eventsay", Event_Say::newItem);
 	itemNameHash.insert("game_eventleave", Event_Leave::newItem);
-	itemNameHash.insert("game_eventdeck_select", Event_DeckSelect::newItem);
 	itemNameHash.insert("game_eventgame_closed", Event_GameClosed::newItem);
-	itemNameHash.insert("game_eventready_start", Event_ReadyStart::newItem);
-	itemNameHash.insert("game_eventconcede", Event_Concede::newItem);
 	itemNameHash.insert("game_eventshuffle", Event_Shuffle::newItem);
 	itemNameHash.insert("game_eventroll_die", Event_RollDie::newItem);
 	itemNameHash.insert("game_eventmove_card", Event_MoveCard::newItem);
@@ -395,4 +392,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("chat_eventchat_join_channel", Event_ChatJoinChannel::newItem);
 	itemNameHash.insert("chat_eventchat_leave_channel", Event_ChatLeaveChannel::newItem);
 	itemNameHash.insert("chat_eventchat_say", Event_ChatSay::newItem);
+	itemNameHash.insert("game_event_contextready_start", Context_ReadyStart::newItem);
+	itemNameHash.insert("game_event_contextconcede", Context_Concede::newItem);
+	itemNameHash.insert("game_event_contextdeck_select", Context_DeckSelect::newItem);
 }

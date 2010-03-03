@@ -321,34 +321,12 @@ public:
 	static SerializableItem *newItem() { return new Event_Leave; }
 	int getItemId() const { return ItemId_Event_Leave; }
 };
-class Event_DeckSelect : public GameEvent {
-	Q_OBJECT
-public:
-	Event_DeckSelect(int _playerId = -1, int _deckId = -1);
-	int getDeckId() const { return static_cast<SerializableItem_Int *>(itemMap.value("deck_id"))->getData(); };
-	static SerializableItem *newItem() { return new Event_DeckSelect; }
-	int getItemId() const { return ItemId_Event_DeckSelect; }
-};
 class Event_GameClosed : public GameEvent {
 	Q_OBJECT
 public:
 	Event_GameClosed(int _playerId = -1);
 	static SerializableItem *newItem() { return new Event_GameClosed; }
 	int getItemId() const { return ItemId_Event_GameClosed; }
-};
-class Event_ReadyStart : public GameEvent {
-	Q_OBJECT
-public:
-	Event_ReadyStart(int _playerId = -1);
-	static SerializableItem *newItem() { return new Event_ReadyStart; }
-	int getItemId() const { return ItemId_Event_ReadyStart; }
-};
-class Event_Concede : public GameEvent {
-	Q_OBJECT
-public:
-	Event_Concede(int _playerId = -1);
-	static SerializableItem *newItem() { return new Event_Concede; }
-	int getItemId() const { return ItemId_Event_Concede; }
 };
 class Event_Shuffle : public GameEvent {
 	Q_OBJECT
@@ -510,6 +488,28 @@ public:
 	QString getMessage() const { return static_cast<SerializableItem_String *>(itemMap.value("message"))->getData(); };
 	static SerializableItem *newItem() { return new Event_ChatSay; }
 	int getItemId() const { return ItemId_Event_ChatSay; }
+};
+class Context_ReadyStart : public GameEventContext {
+	Q_OBJECT
+public:
+	Context_ReadyStart();
+	static SerializableItem *newItem() { return new Context_ReadyStart; }
+	int getItemId() const { return ItemId_Context_ReadyStart; }
+};
+class Context_Concede : public GameEventContext {
+	Q_OBJECT
+public:
+	Context_Concede();
+	static SerializableItem *newItem() { return new Context_Concede; }
+	int getItemId() const { return ItemId_Context_Concede; }
+};
+class Context_DeckSelect : public GameEventContext {
+	Q_OBJECT
+public:
+	Context_DeckSelect(int _deckId = -1);
+	int getDeckId() const { return static_cast<SerializableItem_Int *>(itemMap.value("deck_id"))->getData(); };
+	static SerializableItem *newItem() { return new Context_DeckSelect; }
+	int getItemId() const { return ItemId_Context_DeckSelect; }
 };
 
 #endif

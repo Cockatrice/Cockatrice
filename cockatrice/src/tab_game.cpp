@@ -229,17 +229,19 @@ Player *TabGame::addPlayer(int playerId, const QString &playerName)
 void TabGame::processGameEventContainer(GameEventContainer *cont)
 {
 	const QList<GameEvent *> &eventList = cont->getEventList();
+	GameEventContext *context = cont->getContext();
 	for (int i = 0; i < eventList.size(); ++i) {
 		GameEvent *event = eventList[i];
 		
 		switch (event->getItemId()) {
-			case ItemId_Event_GameStateChanged: eventGameStateChanged(qobject_cast<Event_GameStateChanged *>(event)); break;
-			case ItemId_Event_Join: eventJoin(qobject_cast<Event_Join *>(event)); break;
-			case ItemId_Event_Leave: eventLeave(qobject_cast<Event_Leave *>(event)); break;
-			case ItemId_Event_GameClosed: eventGameClosed(qobject_cast<Event_GameClosed *>(event)); break;
-			case ItemId_Event_SetActivePlayer: eventSetActivePlayer(qobject_cast<Event_SetActivePlayer *>(event)); break;
-			case ItemId_Event_SetActivePhase: eventSetActivePhase(qobject_cast<Event_SetActivePhase *>(event)); break;
-			case ItemId_Event_Ping: eventPing(qobject_cast<Event_Ping *>(event)); break;
+			case ItemId_Event_GameStateChanged: eventGameStateChanged(qobject_cast<Event_GameStateChanged *>(event), context); break;
+			case ItemId_Event_PlayerPropertiesChanged: eventPlayerPropertiesChanged(qobject_cast<Event_PlayerPropertiesChanged *>(event), context); break;
+			case ItemId_Event_Join: eventJoin(qobject_cast<Event_Join *>(event), context); break;
+			case ItemId_Event_Leave: eventLeave(qobject_cast<Event_Leave *>(event), context); break;
+			case ItemId_Event_GameClosed: eventGameClosed(qobject_cast<Event_GameClosed *>(event), context); break;
+			case ItemId_Event_SetActivePlayer: eventSetActivePlayer(qobject_cast<Event_SetActivePlayer *>(event), context); break;
+			case ItemId_Event_SetActivePhase: eventSetActivePhase(qobject_cast<Event_SetActivePhase *>(event), context); break;
+			case ItemId_Event_Ping: eventPing(qobject_cast<Event_Ping *>(event), context); break;
 	
 			default: {
 				Player *player = players.value(event->getPlayerId(), 0);
@@ -247,7 +249,7 @@ void TabGame::processGameEventContainer(GameEventContainer *cont)
 					qDebug() << "unhandled game event: invalid player id";
 					break;
 				}
-				player->processGameEvent(event);
+				player->processGameEvent(event, context);
 				emit userEvent();
 			}
 		}
@@ -275,6 +277,7 @@ void TabGame::startGame()
 {
 	currentPhase = -1;
 
+	playerListWidget->setGameStarted(true);
 	started = true;
 	deckViewContainer->hide();
 	gameView->show();
@@ -284,27 +287,31 @@ void TabGame::startGame()
 void TabGame::stopGame()
 {
 	currentPhase = -1;
+
+	playerListWidget->setActivePlayer(-1);
+	playerListWidget->setGameStarted(false);
 	started = false;
 	gameView->hide();
 	phasesToolbar->hide();
 	deckViewContainer->show();
 }
 
-void TabGame::eventGameStateChanged(Event_GameStateChanged *event)
+void TabGame::eventGameStateChanged(Event_GameStateChanged *event, GameEventContext * /*context*/)
 {
 	const QList<ServerInfo_Player *> &plList = event->getPlayerList();
 	for (int i = 0; i < plList.size(); ++i) {
 		ServerInfo_Player *pl = plList[i];
-		if (pl->getSpectator()) {
-			if (!spectators.contains(pl->getPlayerId())) {
-				spectators.insert(pl->getPlayerId(), pl->getName());
-				playerListWidget->addPlayer(pl);
+		ServerInfo_PlayerProperties *prop = pl->getProperties();
+		if (prop->getSpectator()) {
+			if (!spectators.contains(prop->getPlayerId())) {
+				spectators.insert(prop->getPlayerId(), prop->getName());
+				playerListWidget->addPlayer(prop);
 			}
 		} else {
-			Player *player = players.value(pl->getPlayerId(), 0);
+			Player *player = players.value(prop->getPlayerId(), 0);
 			if (!player) {
-				player = addPlayer(pl->getPlayerId(), pl->getName());
-				playerListWidget->addPlayer(pl);
+				player = addPlayer(prop->getPlayerId(), prop->getName());
+				playerListWidget->addPlayer(prop);
 			}
 			player->processPlayerInfo(pl);
 			if (player->getLocal() && pl->getDeck()) {
@@ -327,9 +334,23 @@ void TabGame::eventGameStateChanged(Event_GameStateChanged *event)
 	emit userEvent();
 }
 
-void TabGame::eventJoin(Event_Join *event)
+void TabGame::eventPlayerPropertiesChanged(Event_PlayerPropertiesChanged *event, GameEventContext *context)
 {
-	ServerInfo_Player *playerInfo = event->getPlayer();
+	Player *player = players.value(event->getProperties()->getPlayerId(), 0);
+	if (!player)
+		return;
+	playerListWidget->updatePlayerProperties(event->getProperties());
+	if (context) switch (context->getItemId()) {
+		case ItemId_Context_ReadyStart: messageLog->logReadyStart(player); break;
+		case ItemId_Context_Concede: messageLog->logConcede(player); break;
+		case ItemId_Context_DeckSelect: messageLog->logDeckSelect(player, static_cast<Context_DeckSelect *>(context)->getDeckId()); break;
+		default: ;
+	}
+}
+
+void TabGame::eventJoin(Event_Join *event, GameEventContext * /*context*/)
+{
+	ServerInfo_PlayerProperties *playerInfo = event->getPlayer();
 	if (playerInfo->getSpectator()) {
 		spectators.insert(playerInfo->getPlayerId(), playerInfo->getName());
 		messageLog->logJoinSpectator(playerInfo->getName());
@@ -342,7 +363,7 @@ void TabGame::eventJoin(Event_Join *event)
 	emit userEvent();
 }
 
-void TabGame::eventLeave(Event_Leave *event)
+void TabGame::eventLeave(Event_Leave *event, GameEventContext * /*context*/)
 {
 	int playerId = event->getPlayerId();
 
@@ -360,7 +381,7 @@ void TabGame::eventLeave(Event_Leave *event)
 	emit userEvent();
 }
 
-void TabGame::eventGameClosed(Event_GameClosed * /*event*/)
+void TabGame::eventGameClosed(Event_GameClosed * /*event*/, GameEventContext * /*context*/)
 {
 	started = false;
 	messageLog->logGameClosed();
@@ -383,7 +404,7 @@ Player *TabGame::setActivePlayer(int id)
 	return player;
 }
 
-void TabGame::eventSetActivePlayer(Event_SetActivePlayer *event)
+void TabGame::eventSetActivePlayer(Event_SetActivePlayer *event, GameEventContext * /*context*/)
 {
 	Player *player = setActivePlayer(event->getActivePlayerId());
 	if (!player)
@@ -400,7 +421,7 @@ void TabGame::setActivePhase(int phase)
 	}
 }
 
-void TabGame::eventSetActivePhase(Event_SetActivePhase *event)
+void TabGame::eventSetActivePhase(Event_SetActivePhase *event, GameEventContext * /*context*/)
 {
 	int phase = event->getPhase();
 	if (currentPhase != phase)
@@ -409,7 +430,7 @@ void TabGame::eventSetActivePhase(Event_SetActivePhase *event)
 	emit userEvent();
 }
 
-void TabGame::eventPing(Event_Ping *event)
+void TabGame::eventPing(Event_Ping *event, GameEventContext * /*context*/)
 {
 	const QList<ServerInfo_PlayerPing *> &pingList = event->getPingList();
 	for (int i = 0; i < pingList.size(); ++i)

@@ -30,5 +30,10 @@
         <file>resources/remove_row.svg</file>
         <file>resources/arrow_left_green.svg</file>
         <file>resources/arrow_right_green.svg</file>
+	<file>resources/icon_ready_start.svg</file>
+	<file>resources/icon_not_ready_start.svg</file>
+	<file>resources/icon_conceded.svg</file>
+	<file>resources/icon_player.svg</file>
+	<file>resources/icon_spectator.svg</file>
     </qresource>
 </RCC>

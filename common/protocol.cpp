@@ -21,6 +21,7 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("zone", ServerInfo_Zone::newItem);
 	registerSerializableItem("counter", ServerInfo_Counter::newItem);
 	registerSerializableItem("arrow", ServerInfo_Arrow::newItem);
+	registerSerializableItem("player_properties", ServerInfo_PlayerProperties::newItem);
 	registerSerializableItem("player", ServerInfo_Player::newItem);
 	registerSerializableItem("player_ping", ServerInfo_PlayerPing::newItem);
 	registerSerializableItem("file", DeckList_File::newItem);
@@ -43,6 +44,7 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("generic_eventlist_chat_channels", Event_ListChatChannels::newItem);
 	registerSerializableItem("game_eventjoin", Event_Join::newItem);
 	registerSerializableItem("game_eventgame_state_changed", Event_GameStateChanged::newItem);
+	registerSerializableItem("game_eventplayer_properties_changed", Event_PlayerPropertiesChanged::newItem);
 	registerSerializableItem("game_eventcreate_arrows", Event_CreateArrows::newItem);
 	registerSerializableItem("game_eventcreate_counters", Event_CreateCounters::newItem);
 	registerSerializableItem("game_eventdraw_cards", Event_DrawCards::newItem);
@@ -234,6 +236,11 @@ GameEvent::GameEvent(const QString &_eventName, int _playerId)
 	insertItem(new SerializableItem_Int("player_id", _playerId));
 }
 
+GameEventContext::GameEventContext(const QString &_contextName)
+	: ProtocolItem("game_event_context", _contextName)
+{
+}
+
 ChatEvent::ChatEvent(const QString &_eventName, const QString &_channel)
 	: ProtocolItem("chat_event", _eventName)
 {
@@ -261,21 +268,51 @@ Event_ListGames::Event_ListGames(const QList<ServerInfo_Game *> &_gameList)
 		itemList.append(_gameList[i]);
 }
 
-Event_Join::Event_Join(ServerInfo_Player *player)
+Event_Join::Event_Join(ServerInfo_PlayerProperties *player)
 	: GameEvent("join", -1)
 {
 	if (!player)
-		player = new ServerInfo_Player;
+		player = new ServerInfo_PlayerProperties;
 	insertItem(player);
 }
 
-GameEventContainer::GameEventContainer(const QList<GameEvent *> &_eventList, int _gameId)
+GameEventContainer::GameEventContainer(const QList<GameEvent *> &_eventList, int _gameId, GameEventContext *_context)
 	: ProtocolItem("container", "game_event")
 {
 	insertItem(new SerializableItem_Int("game_id", _gameId));
 	
+	context = _context;
+	if (_context)
+		itemList.append(_context);
+
 	for (int i = 0; i < _eventList.size(); ++i)
 		itemList.append(_eventList[i]);
+}
+
+void GameEventContainer::extractData()
+{
+	for (int i = 0; i < itemList.size(); ++i) {
+		GameEvent *_event = dynamic_cast<GameEvent *>(itemList[i]);
+		GameEventContext *_context = dynamic_cast<GameEventContext *>(itemList[i]);
+		if (_event)
+			eventList.append(_event);
+		else if (_context)
+			context = _context;
+	}
+}
+
+void GameEventContainer::setContext(GameEventContext *_context)
+{
+	for (int i = 0; i < itemList.size(); ++i) {
+		GameEventContext *temp = qobject_cast<GameEventContext *>(itemList[i]);
+		if (temp) {
+			delete temp;
+			itemList.removeAt(i);
+			break;
+		}
+	}
+	itemList.append(_context);
+	context = _context;
 }
 
 GameEventContainer *GameEventContainer::makeNew(GameEvent *event, int _gameId)
@@ -291,6 +328,14 @@ Event_GameStateChanged::Event_GameStateChanged(bool _gameStarted, int _activePla
 	insertItem(new SerializableItem_Int("active_phase", _activePhase));
 	for (int i = 0; i < _playerList.size(); ++i)
 		itemList.append(_playerList[i]);
+}
+
+Event_PlayerPropertiesChanged::Event_PlayerPropertiesChanged(ServerInfo_PlayerProperties *_properties)
+	: GameEvent("player_properties_changed", -1)
+{
+	if (!_properties)
+		_properties = new ServerInfo_PlayerProperties;
+	insertItem(_properties);
 }
 
 Event_Ping::Event_Ping(const QList<ServerInfo_PlayerPing *> &_pingList)

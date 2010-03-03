@@ -260,27 +260,27 @@
 <context>
     <name>ChatChannelSelector</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="139"/>
+        <location filename="../src/tab_server.cpp" line="140"/>
         <source>Chat channels</source>
         <translation>Chaträume</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="140"/>
+        <location filename="../src/tab_server.cpp" line="141"/>
         <source>Joi&amp;n</source>
         <translation>Teil&amp;nehmen</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="143"/>
+        <location filename="../src/tab_server.cpp" line="144"/>
         <source>Channel</source>
         <translation>Raum</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="144"/>
+        <location filename="../src/tab_server.cpp" line="145"/>
         <source>Description</source>
         <translation>Beschreibung</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="145"/>
+        <location filename="../src/tab_server.cpp" line="146"/>
         <source>Players</source>
         <translation>Spieler</translation>
     </message>
@@ -841,20 +841,20 @@
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="103"/>
+        <location filename="../src/tab_server.cpp" line="104"/>
         <source>C&amp;reate</source>
         <translation>Spiel e&amp;rstellen</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="104"/>
+        <location filename="../src/tab_server.cpp" line="105"/>
         <source>&amp;Join</source>
         <translation>&amp;Teilnehmen</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="66"/>
         <location filename="../src/tab_server.cpp" line="67"/>
         <location filename="../src/tab_server.cpp" line="68"/>
         <location filename="../src/tab_server.cpp" line="69"/>
+        <location filename="../src/tab_server.cpp" line="70"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
@@ -863,47 +863,47 @@
         <translation type="obsolete">XXX</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="66"/>
+        <location filename="../src/tab_server.cpp" line="67"/>
         <source>Wrong password.</source>
         <translation>Falsches Passwort.</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="67"/>
+        <location filename="../src/tab_server.cpp" line="68"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>In diesem Spiel sind keine Zuschauer zugelassen.</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="68"/>
+        <location filename="../src/tab_server.cpp" line="69"/>
         <source>The game is already full.</source>
         <translation>Das Spiel ist bereits voll.</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="69"/>
+        <location filename="../src/tab_server.cpp" line="70"/>
         <source>The game does not exist any more.</source>
         <translation>Dieses Spiel gibt es nicht mehr.</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="85"/>
+        <location filename="../src/tab_server.cpp" line="86"/>
         <source>Join game</source>
         <translation>Spiel beitreten</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="85"/>
+        <location filename="../src/tab_server.cpp" line="86"/>
         <source>Password:</source>
         <translation>Passwort:</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="101"/>
+        <location filename="../src/tab_server.cpp" line="102"/>
         <source>Games</source>
         <translation>Spiele</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="102"/>
+        <location filename="../src/tab_server.cpp" line="103"/>
         <source>&amp;Show full games</source>
         <translation>&amp;Volle Spiele anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="105"/>
+        <location filename="../src/tab_server.cpp" line="106"/>
         <source>J&amp;oin as spectator</source>
         <translation>&amp;Zuschauen</translation>
     </message>
@@ -2149,12 +2149,12 @@
     </message>
     <message>
         <location filename="../src/player.cpp" line="416"/>
-        <location filename="../src/player.cpp" line="964"/>
+        <location filename="../src/player.cpp" line="957"/>
         <source>Number:</source>
         <translation>Anzahl:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="964"/>
+        <location filename="../src/player.cpp" line="957"/>
         <source>Set counters</source>
         <translation>Setze Zählmarken</translation>
     </message>
@@ -2190,24 +2190,41 @@
 <context>
     <name>PlayerListWidget</name>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="15"/>
+        <location filename="../src/playerlistwidget.cpp" line="26"/>
         <source>Player name</source>
         <translation>Spielername</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="16"/>
+        <location filename="../src/playerlistwidget.cpp" line="27"/>
+        <source>Deck</source>
+        <translation>Deck</translation>
+    </message>
+    <message>
+        <location filename="../src/playerlistwidget.cpp" line="50"/>
+        <source>no deck</source>
+        <translation>kein Deck</translation>
+    </message>
+    <message>
+        <location filename="../src/playerlistwidget.cpp" line="51"/>
+        <source>local deck</source>
+        <translation>lokales Deck</translation>
+    </message>
+    <message>
+        <location filename="../src/playerlistwidget.cpp" line="52"/>
+        <source>ID #%1</source>
+        <translation>ID #%1</translation>
+    </message>
+    <message>
         <source>Role</source>
-        <translation>Rolle</translation>
+        <translation type="obsolete">Rolle</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="23"/>
         <source>Spectator</source>
-        <translation>Zuschauer</translation>
+        <translation type="obsolete">Zuschauer</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="23"/>
         <source>Player</source>
-        <translation>Spieler</translation>
+        <translation type="obsolete">Spieler</translation>
     </message>
 </context>
 <context>
@@ -2259,7 +2276,7 @@
 <context>
     <name>ServerMessageLog</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="219"/>
+        <location filename="../src/tab_server.cpp" line="220"/>
         <source>Server messages</source>
         <translation>Servernachrichten</translation>
     </message>
@@ -2476,12 +2493,12 @@ Bitte geben Sie einen Namen ein:</translation>
         <translation>Sind Sie sicher, dass Sie das Spiel verlassen möchten?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="397"/>
+        <location filename="../src/tab_game.cpp" line="440"/>
         <source>Load deck</source>
         <translation>Deck laden</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.h" line="104"/>
+        <location filename="../src/tab_game.h" line="108"/>
         <source>Game %1: %2</source>
         <translation>Spiel %1: %2</translation>
     </message>
