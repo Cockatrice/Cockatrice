@@ -85,5 +85,9 @@ int main(int argc, char *argv[])
 	ui.show();
 	qDebug("main(): ui.show() finished");
 
-	return app.exec();
+	int retval = app.exec();
+
+	delete db;
+
+	return retval;
 }
