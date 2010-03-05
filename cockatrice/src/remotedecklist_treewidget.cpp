@@ -264,6 +264,7 @@ RemoteDeckList_TreeWidget::RemoteDeckList_TreeWidget(Client *_client, QWidget *p
 	connect(treeModel, SIGNAL(treeRefreshed()), this, SLOT(expandAll()));
 
 	header()->setResizeMode(QHeaderView::ResizeToContents);
+	setUniformRowHeights(true);
 	setSortingEnabled(true);
 	proxyModel->sort(0, Qt::AscendingOrder);
 	header()->setSortIndicator(0, Qt::AscendingOrder);
