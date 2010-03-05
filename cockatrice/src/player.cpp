@@ -296,6 +296,7 @@ void Player::retranslateUi()
 		aViewLibrary->setText(tr("&View library"));
 		aViewLibrary->setShortcut(tr("F3"));
 		aViewTopCards->setText(tr("View &top cards of library..."));
+		aViewTopCards->setShortcut(tr("Ctrl+W"));
 		aViewGraveyard->setShortcut(tr("F4"));
 		aViewSideboard->setText(tr("&View sideboard"));
 		aDrawCard->setText(tr("&Draw card"));
