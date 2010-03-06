@@ -3,57 +3,50 @@
 #include "carddatabase.h"
 #include "dlg_settings.h"
 #include "main.h"
+#include "settingscache.h"
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
-	QSettings settings;
-	
-	personalGroupBox = new QGroupBox;
-	
 	languageLabel = new QLabel;
 	languageBox = new QComboBox;
 	
-	settings.beginGroup("personal");
-	QString setLanguage = settings.value("lang").toString();
+	QString setLanguage = settingsCache->getLang();
 	QStringList qmFiles = findQmFiles();
 	for (int i = 0; i < qmFiles.size(); i++) {
 		QString langName = languageName(qmFiles[i]);
 		languageBox->addItem(langName, qmFiles[i]);
-		if ((qmFiles[i] == settings.value("lang").toString()) || (setLanguage.isEmpty() && langName == tr("English")))
+		if ((qmFiles[i] == setLanguage) || (setLanguage.isEmpty() && langName == tr("English")))
 			languageBox->setCurrentIndex(i);
 	}
 	
 	picDownloadCheckBox = new QCheckBox;
-	picDownloadCheckBox->setChecked(settings.value("picturedownload", 0).toInt());
+	picDownloadCheckBox->setChecked(settingsCache->getPicDownload());
 	
-	settings.endGroup();
 	connect(languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
-	connect(picDownloadCheckBox, SIGNAL(stateChanged(int)), this, SLOT(picDownloadCheckBoxChanged(int)));
+	connect(picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
 	
 	QGridLayout *personalGrid = new QGridLayout;
 	personalGrid->addWidget(languageLabel, 0, 0);
 	personalGrid->addWidget(languageBox, 0, 1);
 	personalGrid->addWidget(picDownloadCheckBox, 1, 0, 1, 2);
 	
+	personalGroupBox = new QGroupBox;
 	personalGroupBox->setLayout(personalGrid);
 	
-	pathsGroupBox = new QGroupBox;
-	settings.beginGroup("paths");
-	
 	deckPathLabel = new QLabel;
-	deckPathEdit = new QLineEdit(settings.value("decks").toString());
+	deckPathEdit = new QLineEdit(settingsCache->getDeckPath());
 	deckPathEdit->setReadOnly(true);
 	QPushButton *deckPathButton = new QPushButton("...");
 	connect(deckPathButton, SIGNAL(clicked()), this, SLOT(deckPathButtonClicked()));
 	
 	picsPathLabel = new QLabel;
-	picsPathEdit = new QLineEdit(settings.value("pics").toString());
+	picsPathEdit = new QLineEdit(settingsCache->getPicsPath());
 	picsPathEdit->setReadOnly(true);
 	QPushButton *picsPathButton = new QPushButton("...");
 	connect(picsPathButton, SIGNAL(clicked()), this, SLOT(picsPathButtonClicked()));
 	
 	cardDatabasePathLabel = new QLabel;
-	cardDatabasePathEdit = new QLineEdit(settings.value("carddatabase").toString());
+	cardDatabasePathEdit = new QLineEdit(settingsCache->getCardDatabasePath());
 	cardDatabasePathEdit->setReadOnly(true);
 	QPushButton *cardDatabasePathButton = new QPushButton("...");
 	connect(cardDatabasePathButton, SIGNAL(clicked()), this, SLOT(cardDatabasePathButtonClicked()));
@@ -81,8 +74,9 @@ GeneralSettingsPage::GeneralSettingsPage()
 	pathsGrid->addWidget(cardBackgroundPathEdit, 3, 1);
 	pathsGrid->addWidget(cardBackgroundPathButton, 3, 2);
 	*/
+	pathsGroupBox = new QGroupBox;
 	pathsGroupBox->setLayout(pathsGrid);
-	
+
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(personalGroupBox);
 	mainLayout->addWidget(pathsGroupBox);
@@ -115,10 +109,9 @@ void GeneralSettingsPage::deckPathButtonClicked()
 	QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"));
 	if (path.isEmpty())
 		return;
-	QSettings settings;
-	settings.beginGroup("paths");
-	settings.setValue("decks", path);
+	
 	deckPathEdit->setText(path);
+	settingsCache->setDeckPath(path);
 }
 
 void GeneralSettingsPage::picsPathButtonClicked()
@@ -126,12 +119,9 @@ void GeneralSettingsPage::picsPathButtonClicked()
 	QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"));
 	if (path.isEmpty())
 		return;
-	QSettings settings;
-	settings.beginGroup("paths");
-	settings.setValue("pics", path);
-	picsPathEdit->setText(path);
 	
-	emit picsPathChanged(path);
+	picsPathEdit->setText(path);
+	settingsCache->setPicsPath(path);
 }
 
 void GeneralSettingsPage::cardDatabasePathButtonClicked()
@@ -139,12 +129,9 @@ void GeneralSettingsPage::cardDatabasePathButtonClicked()
 	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
 	if (path.isEmpty())
 		return;
-	QSettings settings;
-	settings.beginGroup("paths");
-	settings.setValue("carddatabase", path);
-	cardDatabasePathEdit->setText(path);
 	
-	emit cardDatabasePathChanged(path);
+	cardDatabasePathEdit->setText(path);
+	settingsCache->setCardDatabasePath(path);
 }
 
 void GeneralSettingsPage::cardBackgroundPathButtonClicked()
@@ -163,19 +150,7 @@ void GeneralSettingsPage::cardBackgroundPathButtonClicked()
 void GeneralSettingsPage::languageBoxChanged(int index)
 {
 	QString qmFile = languageBox->itemData(index).toString();
-	QSettings settings;
-	settings.beginGroup("personal");
-	settings.setValue("lang", qmFile);
-	emit changeLanguage(qmFile);
-}
-
-void GeneralSettingsPage::picDownloadCheckBoxChanged(int state)
-{
-	QSettings settings;
-	settings.beginGroup("personal");
-	settings.setValue("picturedownload", state);
-	
-	emit picDownloadChanged(state);
+	settingsCache->setLang(qmFile);
 }
 
 void GeneralSettingsPage::retranslateUi()
@@ -230,14 +205,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	zoneBgGroupBox->setLayout(zoneBgGrid);
 	
 	tableGroupBox = new QGroupBox;
-	settings.beginGroup("table");
-	
 	economicGridCheckBox = new QCheckBox;
-	economicGridCheckBox->setChecked(settings.value("economic", 1).toInt());
-	connect(economicGridCheckBox, SIGNAL(stateChanged(int)), this, SLOT(economicGridCheckBoxChanged(int)));
+	economicGridCheckBox->setChecked(settingsCache->getEconomicGrid());
+	connect(economicGridCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setEconomicGrid(int)));
 	
-	settings.endGroup();
-
 	QGridLayout *tableGrid = new QGridLayout;
 	tableGrid->addWidget(economicGridCheckBox, 0, 0, 1, 2);
 	
@@ -319,15 +290,6 @@ void AppearanceSettingsPage::playerAreaBgButtonClicked()
 	emit playerAreaBgChanged(path);
 }
 
-void AppearanceSettingsPage::economicGridCheckBoxChanged(int state)
-{
-	QSettings settings;
-	settings.beginGroup("table");
-	settings.setValue("economic", state);
-	
-	emit economicGridChanged(state);
-}
-
 void AppearanceSettingsPage::zoneViewSortingCheckBoxChanged(int state)
 {
 	QSettings settings;
@@ -335,6 +297,30 @@ void AppearanceSettingsPage::zoneViewSortingCheckBoxChanged(int state)
 	settings.setValue("sorting", state);
 	
 	emit zoneViewSortingChanged(state);
+}
+
+UserInterfaceSettingsPage::UserInterfaceSettingsPage()
+{
+	doubleClickToPlayCheckBox = new QCheckBox;
+	doubleClickToPlayCheckBox->setChecked(settingsCache->getDoubleClickToPlay());
+	connect(doubleClickToPlayCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDoubleClickToPlay(int)));
+	
+	QGridLayout *generalGrid = new QGridLayout;
+	generalGrid->addWidget(doubleClickToPlayCheckBox, 0, 0);
+	
+	generalGroupBox = new QGroupBox;
+	generalGroupBox->setLayout(generalGrid);
+	
+	QVBoxLayout *mainLayout = new QVBoxLayout;
+	mainLayout->addWidget(generalGroupBox);
+	
+	setLayout(mainLayout);
+}
+
+void UserInterfaceSettingsPage::retranslateUi()
+{
+	generalGroupBox->setTitle(tr("General interface settings"));
+	doubleClickToPlayCheckBox->setText(tr("&Double-click cards to play them (instead of single-click)"));
 }
 
 MessagesSettingsPage::MessagesSettingsPage()
@@ -401,6 +387,8 @@ void MessagesSettingsPage::retranslateUi()
 DlgSettings::DlgSettings(QWidget *parent)
 	: QDialog(parent)
 {
+	connect(settingsCache, SIGNAL(langChanged()), this, SLOT(updateLanguage()));
+	
 	contentsWidget = new QListWidget;
 	contentsWidget->setViewMode(QListView::IconMode);
 	contentsWidget->setIconSize(QSize(96, 84));
@@ -410,13 +398,9 @@ DlgSettings::DlgSettings(QWidget *parent)
 	contentsWidget->setSpacing(12);
 	
 	pagesWidget = new QStackedWidget;
-	GeneralSettingsPage *general = new GeneralSettingsPage;
-	connect(general, SIGNAL(picsPathChanged(const QString &)), db, SLOT(updatePicsPath(const QString &)));
-	connect(general, SIGNAL(cardDatabasePathChanged(const QString &)), db, SLOT(updateDatabasePath(const QString &)));
-	connect(general, SIGNAL(changeLanguage(const QString &)), this, SLOT(changeLanguage(const QString &)));
-	connect(general, SIGNAL(picDownloadChanged(int)), db, SLOT(updatePicDownload(int)));
-	pagesWidget->addWidget(general);
+	pagesWidget->addWidget(new GeneralSettingsPage);
 	pagesWidget->addWidget(new AppearanceSettingsPage);
+	pagesWidget->addWidget(new UserInterfaceSettingsPage);
 	pagesWidget->addWidget(new MessagesSettingsPage);
 	
 	closeButton = new QPushButton;
@@ -457,6 +441,11 @@ void DlgSettings::createIcons()
 	appearanceButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 	appearanceButton->setIcon(QIcon(":/resources/icon_config_appearance.svg"));
 	
+	userInterfaceButton = new QListWidgetItem(contentsWidget);
+	userInterfaceButton->setTextAlignment(Qt::AlignHCenter);
+	userInterfaceButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+	userInterfaceButton->setIcon(QIcon(":/resources/icon_config_appearance.svg"));
+	
 	messagesButton = new QListWidgetItem(contentsWidget);
 	messagesButton->setTextAlignment(Qt::AlignHCenter);
 	messagesButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
@@ -473,10 +462,10 @@ void DlgSettings::changePage(QListWidgetItem *current, QListWidgetItem *previous
 	pagesWidget->setCurrentIndex(contentsWidget->row(current));
 }
 
-void DlgSettings::changeLanguage(const QString &qmFile)
+void DlgSettings::updateLanguage()
 {
 	qApp->removeTranslator(translator);
-	translator->load(qmFile);
+	translator->load(settingsCache->getLang());
 	qApp->installTranslator(translator);
 }
 
@@ -493,6 +482,7 @@ void DlgSettings::retranslateUi()
 	
 	generalButton->setText(tr("General"));
 	appearanceButton->setText(tr("Appearance"));
+	userInterfaceButton->setText(tr("User interface"));
 	messagesButton->setText(tr("Messages"));
 	
 	closeButton->setText(tr("&Close"));

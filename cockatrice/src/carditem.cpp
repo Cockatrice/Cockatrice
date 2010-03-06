@@ -9,6 +9,7 @@
 #include "arrowitem.h"
 #include "main.h"
 #include "protocol_datastructures.h"
+#include "settingscache.h"
 
 CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, QGraphicsItem *parent)
 	: AbstractCardItem(_name, parent), owner(_owner), id(_cardid), attacking(false), facedown(false), counters(0), doesntUntap(false), beingPointedAt(false), dragItem(NULL)
@@ -153,18 +154,9 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	setCursor(Qt::OpenHandCursor);
 }
 
-void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void CardItem::playCard(QGraphicsSceneMouseEvent *event)
 {
-	if (event->button() == Qt::RightButton)
-		qgraphicsitem_cast<CardZone *>(parentItem())->getPlayer()->showCardMenu(event->screenPos());
-	setCursor(Qt::OpenHandCursor);
-}
-
-void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
-{
-	event->accept();
-
-	CardZone *zone = (CardZone *) parentItem();
+	CardZone *zone = static_cast<CardZone *>(parentItem());
 	// Do nothing if the card belongs to another player
 	if (!zone->getPlayer()->getLocal())
 		return;
@@ -180,4 +172,21 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 		QPoint gridPoint = table->getFreeGridPoint(info->getTableRow());
 		table->handleDropEventByGrid(id, zone, gridPoint, faceDown, tapped);
 	}
+}
+
+void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+	if (event->button() == Qt::RightButton)
+		qgraphicsitem_cast<CardZone *>(parentItem())->getPlayer()->showCardMenu(event->screenPos());
+	else if ((event->button() == Qt::LeftButton) && !settingsCache->getDoubleClickToPlay())
+		playCard(event);
+	
+	setCursor(Qt::OpenHandCursor);
+}
+
+void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+	if (settingsCache->getDoubleClickToPlay())
+		playCard(event);
+	event->accept();
 }

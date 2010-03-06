@@ -1,8 +1,14 @@
 #include "pingpixmapgenerator.h"
 #include <QPainter>
 
+QMap<int, QPixmap> PingPixmapGenerator::pmCache;
+
 QPixmap PingPixmapGenerator::generatePixmap(int size, int value, int max)
 {
+	int key = size * 1000000 + max * 1000 + value;
+	if (pmCache.contains(key))
+		return pmCache.value(key);
+	
 	QPixmap pixmap(size, size);
 	pixmap.fill(Qt::transparent);
 	QPainter painter(&pixmap);
@@ -16,6 +22,8 @@ QPixmap PingPixmapGenerator::generatePixmap(int size, int value, int max)
 	g.setColorAt(0, color);
 	g.setColorAt(1, Qt::transparent);
 	painter.fillRect(0, 0, pixmap.width(), pixmap.height(), QBrush(g));
+	
+	pmCache.insert(key, pixmap);
 
 	return pixmap;
 }

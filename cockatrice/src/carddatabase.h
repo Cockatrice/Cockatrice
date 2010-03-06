@@ -95,7 +95,6 @@ protected:
 	QHash<QString, CardSet *> setHash;
 	QMap<int, QPair<CardInfo *, QBuffer *> > downloadBuffers;
 	CardInfo *noCard;
-	QString picsPath, cardDatabasePath;
 private:
 	void loadCardsFromXml(QXmlStreamReader &xml);
 	void loadSetsFromXml(QXmlStreamReader &xml);
@@ -109,20 +108,17 @@ public:
 	CardSet *getSet(const QString &setName);
 	QList<CardInfo *> getCardList() const { return cardHash.values(); }
 	SetList getSetList() const;
-	bool getPicDownload() const { return picDownload; }
-	void clearPixmapCache();
 	int loadFromFile(const QString &fileName);
 	bool saveToFile(const QString &fileName);
-	const QString &getPicsPath() const { return picsPath; }
 	void startPicDownload(CardInfo *card);
 	QStringList getAllColors() const;
 	QStringList getAllMainCardTypes() const;
+public slots:
+	void clearPixmapCache();
 private slots:
 	void picDownloadFinished(int id, bool error);
-public slots:
-	void updatePicsPath(const QString &path = QString());
-	void updateDatabasePath(const QString &path = QString());
-	void updatePicDownload(int _picDownload = -1);
+	void loadCardDatabase();
+	void picDownloadChanged();
 };
 
 #endif

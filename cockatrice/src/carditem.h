@@ -24,6 +24,8 @@ private:
 	QPoint gridPoint;
 	bool beingPointedAt;
 	CardDragItem *dragItem;
+	
+	void playCard(QGraphicsSceneMouseEvent *event);
 public:
 	enum { Type = typeCard };
 	int type() const { return Type; }

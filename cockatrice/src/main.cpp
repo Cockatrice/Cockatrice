@@ -31,11 +31,13 @@
 #include "main.h"
 #include "window_main.h"
 #include "carddatabase.h"
+#include "settingscache.h"
 
 //Q_IMPORT_PLUGIN(qjpeg)
 
 CardDatabase *db;
 QTranslator *translator;
+SettingsCache *settingsCache;
 
 void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
@@ -57,6 +59,7 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationDomain("cockatrice.de");
 	QCoreApplication::setApplicationName("Cockatrice");
 	
+	settingsCache = new SettingsCache;
 	db = new CardDatabase;
 
 	QString localeName;// = QLocale::system().name();
@@ -65,9 +68,7 @@ int main(int argc, char *argv[])
 	app.installTranslator(&qtTranslator);
 	
 	translator = new QTranslator;
-	QSettings settings;
-	settings.beginGroup("personal");
-	QString lang = settings.value("lang").toString();
+	QString lang = settingsCache->getLang();
 	if (lang.isEmpty())
 		translator->load("cockatrice_" + localeName, ":/translations", QString(), ".qm");
 	else
@@ -88,6 +89,7 @@ int main(int argc, char *argv[])
 	int retval = app.exec();
 
 	delete db;
+	delete settingsCache;
 
 	return retval;
 }

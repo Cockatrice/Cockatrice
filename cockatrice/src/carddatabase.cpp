@@ -1,4 +1,5 @@
 #include "carddatabase.h"
+#include "settingscache.h"
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
@@ -115,7 +116,7 @@ QPixmap *CardInfo::loadPixmap()
 	if (pixmap)
 		return pixmap;
 	pixmap = new QPixmap();
-	QString picsPath = db->getPicsPath();
+	QString picsPath = settingsCache->getPicsPath();
 	if (!QDir(picsPath).exists())
 		return pixmap;
 	
@@ -139,7 +140,7 @@ QPixmap *CardInfo::loadPixmap()
 	}
 	if (pixmap->load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg("downloadedPics").arg(correctedName)))
 		return pixmap;
-	if (db->getPicDownload())
+	if (settingsCache->getPicDownload())
 		db->startPicDownload(this);
 	return pixmap;
 }
@@ -230,12 +231,14 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 CardDatabase::CardDatabase(QObject *parent)
 	: QObject(parent), noCard(0)
 {
+	connect(settingsCache, SIGNAL(picsPathChanged()), this, SLOT(clearPixmapCache()));
+	connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabase()));
+	connect(settingsCache, SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
+	
 	http = new QHttp(this);
 	connect(http, SIGNAL(requestFinished(int, bool)), this, SLOT(picDownloadFinished(int, bool)));
 
-	updateDatabasePath();
-	updatePicDownload();
-	updatePicsPath();
+	loadCardDatabase();
 
 	noCard = new CardInfo(this);
 	noCard->loadPixmap(); // cache pixmap for card back
@@ -334,6 +337,7 @@ void CardDatabase::picDownloadFinished(int id, bool error)
 	buffer->close();
 	
 	if (!error) {
+		QString picsPath = settingsCache->getPicsPath();
 		const QByteArray &picData = buffer->data();
 		QPixmap testPixmap;
 		if (testPixmap.loadFromData(picData)) {
@@ -470,42 +474,18 @@ bool CardDatabase::saveToFile(const QString &fileName)
 	return true;
 }
 
-void CardDatabase::updatePicDownload(int _picDownload)
+void CardDatabase::picDownloadChanged()
 {
-	if (_picDownload == -1) {
-		QSettings settings;
-		picDownload = settings.value("personal/picturedownload", 0).toInt();
-	} else
-		picDownload = _picDownload;
-		
-	if (picDownload) {
+	if (settingsCache->getPicDownload()) {
 		QHashIterator<QString, CardInfo *> cardIterator(cardHash);
-		while (cardIterator.hasNext()) {
-			CardInfo *c = cardIterator.next().value();
-			c->clearPixmapCacheMiss();
-		}
+		while (cardIterator.hasNext())
+			cardIterator.next().value()->clearPixmapCacheMiss();
 	}
 }
 
-void CardDatabase::updatePicsPath(const QString &path)
+void CardDatabase::loadCardDatabase()
 {
-	if (path.isEmpty()) {
-		QSettings settings;
-		settings.beginGroup("paths");
-		picsPath = settings.value("pics").toString();
-	} else
-		picsPath = path;
-	clearPixmapCache();
-}
-
-void CardDatabase::updateDatabasePath(const QString &path)
-{
-	if (path.isEmpty()) {
-		QSettings settings;
-		settings.beginGroup("paths");
-		cardDatabasePath = settings.value("carddatabase").toString();
-	} else
-		cardDatabasePath = path;
+	QString cardDatabasePath = settingsCache->getCardDatabasePath();
 	if (!cardDatabasePath.isEmpty())
 		loadFromFile(cardDatabasePath);
 }

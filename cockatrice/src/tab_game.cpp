@@ -49,6 +49,7 @@ TabGame::TabGame(Client *_client, int _gameId, const QString &_gameDescription, 
 
 	cardInfo = new CardInfoWidget;
 	playerListWidget = new PlayerListWidget;
+	playerListWidget->setFocusPolicy(Qt::NoFocus);
 	messageLog = new MessageLogWidget;
 	sayLabel = new QLabel;
 	sayEdit = new QLineEdit;

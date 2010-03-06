@@ -53,6 +53,7 @@ HEADERS += src/counter.h \
  src/deckview.h \
  src/playerlistwidget.h \
  src/pingpixmapgenerator.h \
+ src/settingscache.h \
  	../common/serializable_item.h \
 	../common/decklist.h \
 	../common/protocol.h \
@@ -105,6 +106,7 @@ SOURCES += src/counter.cpp \
  src/deckview.cpp \
  src/playerlistwidget.cpp \
  src/pingpixmapgenerator.cpp \
+ src/settingscache.cpp \
  	../common/serializable_item.cpp \
 	../common/decklist.cpp \
 	../common/protocol.cpp \
