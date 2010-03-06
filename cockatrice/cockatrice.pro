@@ -37,6 +37,7 @@ HEADERS += src/counter.h \
  src/setsmodel.h \
  src/window_sets.h \
  src/abstractgraphicsitem.h \
+ src/abstractcarddragitem.h \
  src/dlg_settings.h \
  src/dlg_cardsearch.h \
  src/phasestoolbar.h \
@@ -89,6 +90,7 @@ SOURCES += src/counter.cpp \
  src/setsmodel.cpp \
  src/window_sets.cpp \
  src/abstractgraphicsitem.cpp \
+ src/abstractcarddragitem.cpp \
  src/dlg_settings.cpp \
  src/dlg_cardsearch.cpp \
  src/phasestoolbar.cpp \

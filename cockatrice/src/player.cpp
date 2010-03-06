@@ -38,7 +38,7 @@ Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabG
 	PileZone *rfg = new PileZone(this, "rfg", false, true, this);
 	rfg->setPos(base + QPointF(0, 2 * h));
 
-	PileZone *sb = new PileZone(this, "sb", false, true, this);
+	PileZone *sb = new PileZone(this, "sb", false, false, this);
 	sb->setVisible(false);
 
 	table = new TableZone(this, this);

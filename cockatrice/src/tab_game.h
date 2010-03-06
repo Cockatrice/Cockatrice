@@ -92,6 +92,7 @@ private slots:
 	void readyStart();
 	void deckSelectFinished(ProtocolResponse *r);
 	void newCardAdded(AbstractCardItem *card);
+	void sideboardPlanChanged();
 	
 	void actConcede();
 	void actLeaveGame();

@@ -103,6 +103,34 @@ void Server_Player::setupZones()
 				z->cards.append(new Server_Card(currentCard->getName(), nextCardId++, 0, 0));
 		}
 	}
+	
+	const QList<MoveCardToZone *> &sideboardPlan = deck->getCurrentSideboardPlan();
+	for (int i = 0; i < sideboardPlan.size(); ++i) {
+		MoveCardToZone *m = sideboardPlan[i];
+		
+		Server_CardZone *start, *target;
+		if (m->getStartZone() == "main")
+			start = deckZone;
+		else if (m->getStartZone() == "side")
+			start = sbZone;
+		else
+			continue;
+		if (m->getTargetZone() == "main")
+			target = deckZone;
+		else if (m->getTargetZone() == "side")
+			target = sbZone;
+		else
+			continue;
+		
+		for (int j = 0; j < start->cards.size(); ++j)
+			if (start->cards[j]->getName() == m->getCardName()) {
+				Server_Card *card = start->cards[j];
+				start->cards.removeAt(j);
+				target->cards.append(card);
+				break;
+			}
+	}
+	
 	deckZone->shuffle();
 }
 

@@ -286,9 +286,6 @@ void MessageLogWidget::logSetActivePhase(int phase)
 void MessageLogWidget::connectToPlayer(Player *player)
 {
 	connect(player, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));
-	connect(player, SIGNAL(logDeckSelect(Player *, int)), this, SLOT(logDeckSelect(Player *, int)));
-	connect(player, SIGNAL(logReadyStart(Player *)), this, SLOT(logReadyStart(Player *)));
-	connect(player, SIGNAL(logConcede(Player *)), this, SLOT(logConcede(Player *)));
 	connect(player, SIGNAL(logShuffle(Player *)), this, SLOT(logShuffle(Player *)));
 	connect(player, SIGNAL(logRollDie(Player *, int, int)), this, SLOT(logRollDie(Player *, int, int)));
 	connect(player, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString)), this, SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString)));

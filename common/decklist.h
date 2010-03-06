@@ -14,6 +14,25 @@ class QXmlStreamWriter;
 
 class InnerDecklistNode;
 
+class MoveCardToZone : public SerializableItem_Map {
+public:
+	MoveCardToZone(const QString &_cardName = QString(), const QString &_startZone = QString(), const QString &_targetZone = QString());
+	MoveCardToZone(MoveCardToZone *other);
+	static SerializableItem *newItem() { return new MoveCardToZone; }
+	QString getCardName() const { return static_cast<SerializableItem_String *>(itemMap.value("card_name"))->getData(); }
+	QString getStartZone() const { return static_cast<SerializableItem_String *>(itemMap.value("start_zone"))->getData(); }
+	QString getTargetZone() const { return static_cast<SerializableItem_String *>(itemMap.value("target_zone"))->getData(); }
+};
+
+class SideboardPlan : public SerializableItem_Map {
+public:
+	SideboardPlan(const QString &_name = QString(), const QList<MoveCardToZone *> &_moveList = QList<MoveCardToZone *>());
+	static SerializableItem *newItem() { return new SideboardPlan; }
+	QString getName() const { return static_cast<SerializableItem_String *>(itemMap.value("name"))->getData(); }
+	QList<MoveCardToZone *> getMoveList() const { return typecastItemList<MoveCardToZone *>(); }
+	void setMoveList(const QList<MoveCardToZone *> &_moveList);
+};
+
 class AbstractDecklistNode {
 protected:
 	InnerDecklistNode *parent;
@@ -89,8 +108,10 @@ private:
 	QString name, comments;
 	QString lastFileName;
 	FileFormat lastFileFormat;
+	QMap<QString, SideboardPlan *> sideboardPlans;
 	InnerDecklistNode *root;
 	InnerDecklistNode *currentZone;
+	SideboardPlan *currentSideboardPlan;
 	QString currentElementText;
 signals:
 	void deckLoaded();
@@ -106,6 +127,9 @@ public:
 	QString getComments() const { return comments; }
 	QString getLastFileName() const { return lastFileName; }
 	FileFormat getLastFileFormat() const { return lastFileFormat; }
+	QList<MoveCardToZone *> getCurrentSideboardPlan();
+	void setCurrentSideboardPlan(const QList<MoveCardToZone *> &plan);
+	const QMap<QString, SideboardPlan *> &getSideboardPlans() const { return sideboardPlans; }
 
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);

@@ -1,42 +1,13 @@
 #include "carddragitem.h"
 #include "cardzone.h"
-#include "carddatabase.h"
 #include "tablezone.h"
-#include <QtGui>
+#include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
+#include <QCursor>
 
-CardDragItem::CardDragItem(CardItem *_item, int _id, const QPointF &_hotSpot, bool _faceDown, CardDragItem *parentDrag)
-	: QGraphicsItem(), id(_id), item(_item), hotSpot(_hotSpot), faceDown(_faceDown), currentZone(0)
+CardDragItem::CardDragItem(AbstractCardItem *_item, int _id, const QPointF &_hotSpot, bool _faceDown, AbstractCardDragItem *parentDrag)
+	: AbstractCardDragItem(_item, _hotSpot, parentDrag), id(_id), faceDown(_faceDown), currentZone(0)
 {
-	if (parentDrag) {
-		parentDrag->addChildDrag(this);
-		setZValue(1000000000 + hotSpot.x() * 1000000 + hotSpot.y() * 1000 + 1000);
-	} else {
-		if ((hotSpot.x() < 0) || (hotSpot.y() < 0)) {
-			qDebug(QString("CardDragItem: coordinate overflow: x = %1, y = %2").arg(hotSpot.x()).arg(hotSpot.y()).toLatin1());
-			hotSpot = QPointF();
-		} else if ((hotSpot.x() > CARD_WIDTH) || (hotSpot.y() > CARD_HEIGHT)) {
-			qDebug(QString("CardDragItem: coordinate overflow: x = %1, y = %2").arg(hotSpot.x()).arg(hotSpot.y()).toLatin1());
-			hotSpot = QPointF(CARD_WIDTH, CARD_HEIGHT);
-		}
-		setCursor(Qt::ClosedHandCursor);
-		setZValue(1000000000);
-	}
-	if (item->getTapped())
-		setTransform(QTransform().translate((float) CARD_WIDTH / 2, (float) CARD_HEIGHT / 2).rotate(90).translate((float) -CARD_WIDTH / 2, (float) -CARD_HEIGHT / 2));
-
-	setCacheMode(DeviceCoordinateCache);
-}
-
-CardDragItem::~CardDragItem()
-{
-	qDebug("CardDragItem destructor");
-	for (int i = 0; i < childDrags.size(); i++)
-		delete childDrags[i];
-}
-
-void CardDragItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-	item->paint(painter, option, widget);
 }
 
 void CardDragItem::updatePosition(const QPointF &cursorScenePos)
@@ -56,8 +27,6 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
 	QPointF cardTopLeft = cursorPosInZone - hotSpot;
 	QPointF newPos = zonePos + cursorZone->closestGridPoint(cardTopLeft);
 	
-//	qDebug(QString("cardTopLeft = %1, %2   cardCenter = %3, %4").arg((cardTopLeft).x()).arg((cardTopLeft).y()).arg(cardCenter.x()).arg(cardCenter.y()).toLatin1());
-
 	if (newPos != pos()) {
 		for (int i = 0; i < childDrags.size(); i++)
 			childDrags[i]->setPos(newPos + childDrags[i]->getHotSpot());
@@ -65,34 +34,22 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
 	}
 }
 
-void CardDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-	event->accept();
-	updatePosition(event->scenePos());
-}
-
 void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
 	setCursor(Qt::OpenHandCursor);
 	QGraphicsScene *sc = scene();
 	QPointF sp = pos();
-	qDebug(QString("sp: x=%1, y=%2").arg(sp.x()).arg(sp.y()).toLatin1());
 	sc->removeItem(this);
 
 	if (currentZone) {
 		CardZone *startZone = qgraphicsitem_cast<CardZone *>(item->parentItem());
 		currentZone->handleDropEvent(id, startZone, (sp - currentZone->scenePos()).toPoint(), faceDown);
 		for (int i = 0; i < childDrags.size(); i++) {
-			CardDragItem *c = childDrags[i];
+			CardDragItem *c = static_cast<CardDragItem *>(childDrags[i]);
 			currentZone->handleDropEvent(c->id, startZone, (sp - currentZone->scenePos() + c->getHotSpot()).toPoint(), faceDown);
 			sc->removeItem(c);
 		}
 	}
 
 	event->accept();
-}
-
-void CardDragItem::addChildDrag(CardDragItem *child)
-{
-	childDrags << child;
 }

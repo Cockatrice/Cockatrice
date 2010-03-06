@@ -7,6 +7,41 @@
 #include "decklist.h"
 #include <QDebug>
 
+MoveCardToZone::MoveCardToZone(const QString &_cardName, const QString &_startZone, const QString &_targetZone)
+	: SerializableItem_Map("move_card_to_zone")
+{
+	insertItem(new SerializableItem_String("card_name", _cardName));
+	insertItem(new SerializableItem_String("start_zone", _startZone));
+	insertItem(new SerializableItem_String("target_zone", _targetZone));
+}
+
+MoveCardToZone::MoveCardToZone(MoveCardToZone *other)
+	: SerializableItem_Map("move_card_to_zone")
+{
+	insertItem(new SerializableItem_String("card_name", other->getCardName()));
+	insertItem(new SerializableItem_String("start_zone", other->getStartZone()));
+	insertItem(new SerializableItem_String("target_zone", other->getTargetZone()));
+}
+
+SideboardPlan::SideboardPlan(const QString &_name, const QList<MoveCardToZone *> &_moveList)
+	: SerializableItem_Map("sideboard_plan")
+{
+	insertItem(new SerializableItem_String("name", _name));
+	
+	for (int i = 0; i < _moveList.size(); ++i)
+		itemList.append(_moveList[i]);
+}
+
+void SideboardPlan::setMoveList(const QList<MoveCardToZone *> &_moveList)
+{
+	for (int i = 0; i < itemList.size(); ++i)
+		delete itemList[i];
+	itemList.clear();
+	
+	for (int i = 0; i < _moveList.size(); ++i)
+		itemList.append(_moveList[i]);
+}
+
 AbstractDecklistNode::AbstractDecklistNode(InnerDecklistNode *_parent)
 	: parent(_parent), currentItem(0)
 {
@@ -197,20 +232,57 @@ const QStringList DeckList::fileNameFilters = QStringList()
 	<< QObject::tr("All files (*.*)");
 
 DeckList::DeckList()
-	: SerializableItem("cockatrice_deck"), currentZone(0)
+	: SerializableItem("cockatrice_deck"), currentZone(0), currentSideboardPlan(0)
 {
 	root = new InnerDecklistNode;
 }
 
 DeckList::DeckList(DeckList *other)
-	: SerializableItem("cockatrice_deck"), currentZone(0)
+	: SerializableItem("cockatrice_deck"), currentZone(0), currentSideboardPlan(0)
 {
 	root = new InnerDecklistNode(other->getRoot());
+	
+	QMapIterator<QString, SideboardPlan *> spIterator(other->getSideboardPlans());
+	while (spIterator.hasNext()) {
+		spIterator.next();
+		QList<MoveCardToZone *> newMoveList;
+		QList<MoveCardToZone *> oldMoveList = spIterator.value()->getMoveList();
+		for (int i = 0; i < oldMoveList.size(); ++i)
+			newMoveList.append(new MoveCardToZone(oldMoveList[i]));
+		sideboardPlans.insert(spIterator.key(), new SideboardPlan(spIterator.key(), newMoveList));
+	}
 }
 
 DeckList::~DeckList()
 {
 	delete root;
+	
+	QMapIterator<QString, SideboardPlan *> i(sideboardPlans);
+	while (i.hasNext())
+		delete i.next().value();
+}
+
+QList<MoveCardToZone *> DeckList::getCurrentSideboardPlan()
+{
+	SideboardPlan *current = sideboardPlans.value(QString(), 0);
+	if (!current)
+		return QList<MoveCardToZone *>();
+	else
+		return current->getMoveList();
+}
+
+void DeckList::setCurrentSideboardPlan(const QList<MoveCardToZone *> &plan)
+{
+	SideboardPlan *current = sideboardPlans.value(QString(), 0);
+	if (!current) {
+		current = new SideboardPlan;
+		sideboardPlans.insert(QString(), current);
+	}
+	
+	QList<MoveCardToZone *> newList;
+	for (int i = 0; i < plan.size(); ++i)
+		newList.append(new MoveCardToZone(plan[i]));
+	current->setMoveList(newList);
 }
 
 bool DeckList::readElement(QXmlStreamReader *xml)
@@ -218,6 +290,11 @@ bool DeckList::readElement(QXmlStreamReader *xml)
 	if (currentZone) {
 		if (currentZone->readElement(xml))
 			currentZone = 0;
+	} else if (currentSideboardPlan) {
+		if (currentSideboardPlan->readElement(xml)) {
+			sideboardPlans.insert(currentSideboardPlan->getName(), currentSideboardPlan);
+			currentSideboardPlan = 0;
+		}
 	} else if (xml->isEndElement()) {
 		if (xml->name() == "deckname")
 			name = currentElementText;
@@ -227,6 +304,8 @@ bool DeckList::readElement(QXmlStreamReader *xml)
 		currentElementText.clear();
 	} else if (xml->isStartElement() && (xml->name() == "zone"))
 		currentZone = new InnerDecklistNode(xml->attributes().value("name").toString(), root);
+	else if (xml->isStartElement() && (xml->name() == "sideboard_plan"))
+		currentSideboardPlan = new SideboardPlan;
 	else if (xml->isCharacters() && !xml->isWhitespace())
 		currentElementText = xml->text().toString();
 	return SerializableItem::readElement(xml);
@@ -240,6 +319,10 @@ void DeckList::writeElement(QXmlStreamWriter *xml)
 
 	for (int i = 0; i < root->size(); i++)
 		root->at(i)->writeElement(xml);
+	
+	QMapIterator<QString, SideboardPlan *> i(sideboardPlans);
+	while (i.hasNext())
+		i.next().value()->write(xml);
 }
 
 void DeckList::loadFromXml(QXmlStreamReader *xml)

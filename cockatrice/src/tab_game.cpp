@@ -40,6 +40,7 @@ TabGame::TabGame(Client *_client, int _gameId, const QString &_gameDescription, 
 	buttonHBox->addStretch();
 	deckView = new DeckView;
 	connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
+	connect(deckView, SIGNAL(sideboardPlanChanged()), this, SLOT(sideboardPlanChanged()));
 	QVBoxLayout *deckViewLayout = new QVBoxLayout;
 	deckViewLayout->addLayout(buttonHBox);
 	deckViewLayout->addWidget(deckView);
@@ -489,4 +490,10 @@ void TabGame::readyStart()
 void TabGame::newCardAdded(AbstractCardItem *card)
 {
 	connect(card, SIGNAL(hovered(AbstractCardItem *)), cardInfo, SLOT(setCard(AbstractCardItem *)));
+}
+
+void TabGame::sideboardPlanChanged()
+{
+	QList<MoveCardToZone *> newPlan = deckView->getSideboardPlan();
+	client->sendCommand(new Command_SetSideboardPlan(gameId, newPlan));
 }

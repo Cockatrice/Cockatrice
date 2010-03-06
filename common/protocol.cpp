@@ -14,6 +14,7 @@ void ProtocolItem::initializeHash()
 {
 	initializeHashAuto();
 	
+	registerSerializableItem("move_card_to_zone", MoveCardToZone::newItem);
 	registerSerializableItem("chat_channel", ServerInfo_ChatChannel::newItem);
 	registerSerializableItem("chat_user", ServerInfo_ChatUser::newItem);
 	registerSerializableItem("game", ServerInfo_Game::newItem);
@@ -32,6 +33,7 @@ void ProtocolItem::initializeHash()
 	
 	registerSerializableItem("cmddeck_upload", Command_DeckUpload::newItem);
 	registerSerializableItem("cmddeck_select", Command_DeckSelect::newItem);
+	registerSerializableItem("cmdset_sideboard_plan", Command_SetSideboardPlan::newItem);
 	
 	registerSerializableItem("resp", ProtocolResponse::newItem);
 	ProtocolResponse::initializeHash();
@@ -168,6 +170,18 @@ Command_DeckSelect::Command_DeckSelect(int _gameId, DeckList *_deck, int _deckId
 DeckList *Command_DeckSelect::getDeck() const
 {
 	return static_cast<DeckList *>(itemMap.value("cockatrice_deck"));
+}
+
+Command_SetSideboardPlan::Command_SetSideboardPlan(int _gameId, const QList<MoveCardToZone *> &_moveList)
+	: GameCommand("set_sideboard_plan", _gameId)
+{
+	for (int i = 0; i < _moveList.size(); ++i)
+		itemList.append(_moveList[i]);
+}
+
+QList<MoveCardToZone *> Command_SetSideboardPlan::getMoveList() const
+{
+	return typecastItemList<MoveCardToZone *>();
 }
 
 QHash<QString, ResponseCode> ProtocolResponse::responseHash;

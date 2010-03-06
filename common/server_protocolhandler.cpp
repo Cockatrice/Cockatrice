@@ -85,6 +85,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 		
 		switch (command->getItemId()) {
 			case ItemId_Command_DeckSelect: return cmdDeckSelect(qobject_cast<Command_DeckSelect *>(command), cont, game, player);
+			case ItemId_Command_SetSideboardPlan: return cmdSetSideboardPlan(qobject_cast<Command_SetSideboardPlan *>(command), cont, game, player);
 			case ItemId_Command_LeaveGame: return cmdLeaveGame(qobject_cast<Command_LeaveGame *>(command), cont, game, player);
 			case ItemId_Command_ReadyStart: return cmdReadyStart(qobject_cast<Command_ReadyStart *>(command), cont, game, player);
 			case ItemId_Command_Concede: return cmdConcede(qobject_cast<Command_Concede *>(command), cont, game, player);
@@ -349,6 +350,16 @@ ResponseCode Server_ProtocolHandler::cmdDeckSelect(Command_DeckSelect *cmd, Comm
 
 	cont->setResponse(new Response_DeckDownload(cont->getCmdId(), RespOk, new DeckList(deck)));
 	return RespNothing;
+}
+
+ResponseCode Server_ProtocolHandler::cmdSetSideboardPlan(Command_SetSideboardPlan *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+{
+	DeckList *deck = player->getDeck();
+	if (!deck)
+		return RespContextError;
+	
+	deck->setCurrentSideboardPlan(cmd->getMoveList());
+	return RespOk;
 }
 
 ResponseCode Server_ProtocolHandler::cmdConcede(Command_Concede * /*cmd*/, CommandContainer *cont, Server_Game *game, Server_Player *player)

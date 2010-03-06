@@ -17,12 +17,14 @@ class ProtocolResponse;
 class DeckList;
 class GameEvent;
 class GameEventContainer;
+class MoveCardToZone;
 
 enum ItemId {
 	ItemId_CommandContainer = ItemId_Other + 50,
 	ItemId_GameEventContainer = ItemId_Other + 51,
 	ItemId_Command_DeckUpload = ItemId_Other + 100,
 	ItemId_Command_DeckSelect = ItemId_Other + 101,
+	ItemId_Command_SetSideboardPlan = ItemId_Other + 102,
 	ItemId_Event_ListChatChannels = ItemId_Other + 200,
 	ItemId_Event_ChatListPlayers = ItemId_Other + 201,
 	ItemId_Event_ListGames = ItemId_Other + 202,
@@ -162,6 +164,15 @@ public:
 	int getItemId() const { return ItemId_Command_DeckSelect; }
 	DeckList *getDeck() const;
 	int getDeckId() const { return static_cast<SerializableItem_Int *>(itemMap.value("deck_id"))->getData(); }
+};
+
+class Command_SetSideboardPlan : public GameCommand {
+	Q_OBJECT
+public:
+	Command_SetSideboardPlan(int _gameId = -1, const QList<MoveCardToZone *> &_moveList = QList<MoveCardToZone *>());
+	static SerializableItem *newItem() { return new Command_SetSideboardPlan; }
+	int getItemId() const { return ItemId_Command_SetSideboardPlan; }
+	QList<MoveCardToZone *> getMoveList() const;
 };
 
 // -----------------

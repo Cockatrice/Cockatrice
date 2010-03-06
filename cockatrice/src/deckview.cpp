@@ -5,13 +5,110 @@
 #include "main.h"
 #include <QDebug>
 
-DeckViewCard::DeckViewCard(const QString &_name, QGraphicsItem *parent)
-	: AbstractCardItem(_name, parent)
+DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag)
+	: AbstractCardDragItem(_item, _hotSpot, parentDrag)
 {
 }
 
+void DeckViewCardDragItem::updatePosition(const QPointF &cursorScenePos)
+{
+	QList<QGraphicsItem *> colliding = scene()->items(cursorScenePos);
+
+	DeckViewCardContainer *cursorZone = 0;
+	for (int i = colliding.size() - 1; i >= 0; i--)
+		if ((cursorZone = qgraphicsitem_cast<DeckViewCardContainer *>(colliding.at(i))))
+			break;
+	if (!cursorZone)
+		return;
+	currentZone = cursorZone;
+	
+	QPointF newPos = cursorScenePos;
+	if (newPos != pos()) {
+		for (int i = 0; i < childDrags.size(); i++)
+			childDrags[i]->setPos(newPos + childDrags[i]->getHotSpot());
+		setPos(newPos);
+	}
+}
+
+void DeckViewCardDragItem::handleDrop(DeckViewCardContainer *target)
+{
+	DeckViewCard *card = static_cast<DeckViewCard *>(item);
+	DeckViewCardContainer *start = static_cast<DeckViewCardContainer *>(item->parentItem());
+	start->removeCard(card);
+	target->addCard(card);
+	card->setParentItem(target);
+}
+
+void DeckViewCardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+	setCursor(Qt::OpenHandCursor);
+	DeckViewScene *sc = static_cast<DeckViewScene *>(scene());
+	QPointF sp = pos();
+	sc->removeItem(this);
+
+	if (currentZone) {
+		handleDrop(currentZone);
+		for (int i = 0; i < childDrags.size(); i++) {
+			DeckViewCardDragItem *c = static_cast<DeckViewCardDragItem *>(childDrags[i]);
+			c->handleDrop(currentZone);
+			sc->removeItem(c);
+		}
+		
+		sc->updateContents();
+	}
+	
+	event->accept();
+}
+
+DeckViewCard::DeckViewCard(const QString &_name, const QString &_originZone, QGraphicsItem *parent)
+	: AbstractCardItem(_name, parent), originZone(_originZone), dragItem(0)
+{
+}
+
+void DeckViewCard::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+	AbstractCardItem::paint(painter, option, widget);
+	
+	painter->save();
+	QPen pen(Qt::DotLine);
+	pen.setWidth(2);
+	if (originZone == "main")
+		pen.setColor(QColor(0, 255, 0));
+	else
+		pen.setColor(QColor(255, 255, 0));
+	painter->setPen(pen);
+	painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 2));
+	painter->restore();
+}
+
+void DeckViewCard::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+	if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < 2 * QApplication::startDragDistance())
+		return;
+	
+	delete dragItem;
+	dragItem = new DeckViewCardDragItem(this, event->pos());
+	scene()->addItem(dragItem);
+	dragItem->updatePosition(event->scenePos());
+	dragItem->grabMouse();
+	
+	QList<QGraphicsItem *> sel = scene()->selectedItems();
+	int j = 0;
+	for (int i = 0; i < sel.size(); i++) {
+		DeckViewCard *c = static_cast<DeckViewCard *>(sel.at(i));
+		if (c == this)
+			continue;
+		++j;
+		QPointF childPos = QPointF(j * CARD_WIDTH / 2, 0);
+		DeckViewCardDragItem *drag = new DeckViewCardDragItem(c, childPos, dragItem);
+		drag->setPos(dragItem->pos() + childPos);
+		scene()->addItem(drag);
+	}
+	setCursor(Qt::OpenHandCursor);
+}
+
 DeckViewCardContainer::DeckViewCardContainer(const QString &_name)
-	: QGraphicsItem(), name(_name), width(0), height(0)
+	: QGraphicsItem(), name(_name), width(0), height(0), maxWidth(0)
 {
 	QSettings settings;
 	QString bgPath = settings.value("zonebg/table").toString();
@@ -41,23 +138,32 @@ void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsI
 	f.setPixelSize(24);
 	f.setWeight(QFont::Bold);
 	painter->setFont(f);
-	painter->drawText(10, 0, width - 20, separatorY, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine, InnerDecklistNode::visibleNameFromName(name));
+	painter->drawText(10, 0, width - 20, separatorY, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine, InnerDecklistNode::visibleNameFromName(name) + QString(": %1").arg(cards.size()));
 }
 
 void DeckViewCardContainer::addCard(DeckViewCard *card)
 {
-	cards.insertMulti(card->getInfo()->getMainCardType(), card);
+	cards.append(card);
+}
+
+void DeckViewCardContainer::removeCard(DeckViewCard *card)
+{
+	cards.removeAt(cards.indexOf(card));
 }
 
 void DeckViewCardContainer::rearrangeItems()
 {
 	separatorY = 30;
 	
-	QList<QString> cardTypeList = cards.uniqueKeys();
+	QMap<QString, DeckViewCard *> cardsByType;
+	for (int i = 0; i < cards.size(); ++i)
+		cardsByType.insertMulti(cards[i]->getInfo()->getMainCardType(), cards[i]);
+	
+	QList<QString> cardTypeList = cardsByType.uniqueKeys();
 	int rows = cardTypeList.size();
 	int cols = 0;
 	for (int i = 0; i < rows; ++i) {
-		QList<DeckViewCard *> row = cards.values(cardTypeList[i]);
+		QList<DeckViewCard *> row = cardsByType.values(cardTypeList[i]);
 		if (row.size() > cols)
 			cols = row.size();
 		for (int j = 0; j < row.size(); ++j) {
@@ -67,7 +173,8 @@ void DeckViewCardContainer::rearrangeItems()
 	}
 	
 	prepareGeometryChange();
-	width = cols * CARD_WIDTH;
+	if (cols * CARD_WIDTH > maxWidth)
+		width = maxWidth = cols * CARD_WIDTH;
 	height = separatorY + 10 + rows * CARD_HEIGHT + rowSpacing * (rows - 1);
 }
 
@@ -98,6 +205,7 @@ void DeckViewScene::setDeck(DeckList *_deck)
 	
 	deck = _deck;
 	rebuildTree();
+	applySideboardPlan(deck->getCurrentSideboardPlan());
 	rearrangeItems();
 }
 
@@ -120,11 +228,37 @@ void DeckViewScene::rebuildTree()
 				continue;
 
 			for (int k = 0; k < currentCard->getNumber(); ++k) {
-				DeckViewCard *newCard = new DeckViewCard(currentCard->getName(), container);
+				DeckViewCard *newCard = new DeckViewCard(currentCard->getName(), currentZone->getName(), container);
 				container->addCard(newCard);
 				emit newCardAdded(newCard);
 			}
 		}
+	}
+}
+
+void DeckViewScene::applySideboardPlan(const QList<MoveCardToZone *> &plan)
+{
+	for (int i = 0; i < plan.size(); ++i) {
+		MoveCardToZone *m = plan[i];
+		
+		DeckViewCardContainer *start = cardContainers.value(m->getStartZone());
+		DeckViewCardContainer *target = cardContainers.value(m->getTargetZone());
+		if (!start || !target)
+			continue;
+		
+		DeckViewCard *card = 0;
+		const QList<DeckViewCard *> &cardList = start->getCards();
+		for (int j = 0; j < cardList.size(); ++j)
+			if (cardList[j]->getName() == m->getCardName()) {
+				card = cardList[j];
+				break;
+			}
+		if (!card)
+			continue;
+		
+		start->removeCard(card);
+		target->addCard(card);
+		card->setParentItem(target);
 	}
 }
 
@@ -148,17 +282,39 @@ void DeckViewScene::rearrangeItems()
 	setSceneRect(QRectF(0, 0, totalWidth, totalHeight));
 }
 
+void DeckViewScene::updateContents()
+{
+	rearrangeItems();
+	emit sideboardPlanChanged();
+}
+
+QList<MoveCardToZone *> DeckViewScene::getSideboardPlan() const
+{
+	QList<MoveCardToZone *> result;
+	QMapIterator<QString, DeckViewCardContainer *> containerIterator(cardContainers);
+	while (containerIterator.hasNext()) {
+		DeckViewCardContainer *cont = containerIterator.next().value();
+		const QList<DeckViewCard *> cardList = cont->getCards();
+		for (int i = 0; i < cardList.size(); ++i)
+			if (cardList[i]->getOriginZone() != cont->getName())
+				result.append(new MoveCardToZone(cardList[i]->getName(), cardList[i]->getOriginZone(), cont->getName()));
+	}
+	return result;
+}
+
 DeckView::DeckView(QWidget *parent)
 	: QGraphicsView(parent)
 {
 	deckViewScene = new DeckViewScene(this);
 	
 	setBackgroundBrush(QBrush(QColor(0, 0, 0)));
+	setDragMode(RubberBandDrag);
 	setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing/* | QPainter::SmoothPixmapTransform*/);
 	setScene(deckViewScene);
 
 	connect(deckViewScene, SIGNAL(sceneRectChanged(const QRectF &)), this, SLOT(updateSceneRect(const QRectF &)));
 	connect(deckViewScene, SIGNAL(newCardAdded(AbstractCardItem *)), this, SIGNAL(newCardAdded(AbstractCardItem *)));
+	connect(deckViewScene, SIGNAL(sideboardPlanChanged()), this, SIGNAL(sideboardPlanChanged()));
 }
 
 void DeckView::resizeEvent(QResizeEvent *event)
@@ -169,7 +325,6 @@ void DeckView::resizeEvent(QResizeEvent *event)
 
 void DeckView::updateSceneRect(const QRectF &rect)
 {
-	qDebug(QString("deckView::updateSceneRect = %1,%2").arg(rect.width()).arg(rect.height()).toLatin1());
 	fitInView(rect, Qt::KeepAspectRatio);
 }
 
