@@ -3,17 +3,16 @@
 #include "player.h"
 #include "client.h"
 #include "protocol_items.h"
+#include "settingscache.h"
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 	: CardZone(_p, "table", true, false, true, parent)
 {
-	QSettings settings;
-	QString bgPath = settings.value("zonebg/table").toString();
-	if (!bgPath.isEmpty())
-		bgPixmap.load(bgPath);
+	connect(settingsCache, SIGNAL(tableBgPathChanged()), this, SLOT(updateBgPixmap()));
+	connect(settingsCache, SIGNAL(economicGridChanged()), this, SLOT(reorganizeCards()));
+	updateBgPixmap();
 
-	economicGrid = settings.value("table/economic", 1).toInt();
-	if (economicGrid)
+	if (settingsCache->getEconomicGrid())
 		height = (int) (14.0 / 3 * CARD_HEIGHT + 3 * paddingY);
 	else
 		height = 4 * CARD_HEIGHT + 3 * paddingY;
@@ -21,6 +20,14 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 
 	setCacheMode(DeviceCoordinateCache);
 	setAcceptsHoverEvents(true);
+}
+
+void TableZone::updateBgPixmap()
+{
+	QString bgPath = settingsCache->getTableBgPath();
+	if (!bgPath.isEmpty())
+		bgPixmap.load(bgPath);
+	update();
 }
 
 QRectF TableZone::boundingRect() const
@@ -43,19 +50,11 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
 
 void TableZone::addCardImpl(CardItem *card, int _x, int _y)
 {
-	QPointF mapPoint = mapFromGrid(QPoint(_x, _y));
-	qreal x = mapPoint.x();
-	qreal y = mapPoint.y();
-	
 	cards.append(card);
-	if (!player->getLocal())
-		y = height - CARD_HEIGHT - y;
-	card->setPos(x, y);
 	card->setGridPoint(QPoint(_x, _y));
 
 	resizeToContents();
 	
-	card->setZValue((y + CARD_HEIGHT) * 10000000 + x + 1000);
 	card->setParentItem(this);
 	card->setVisible(true);
 	card->update();
@@ -73,6 +72,17 @@ void TableZone::handleDropEventByGrid(int cardId, CardZone *startZone, const QPo
 
 void TableZone::reorganizeCards()
 {
+	for (int i = 0; i < cards.size(); ++i) {
+		QPointF mapPoint = mapFromGrid(cards[i]->getGridPos());
+		qreal x = mapPoint.x();
+		qreal y = mapPoint.y();
+		
+		if (!player->getLocal())
+			y = height - CARD_HEIGHT - y;
+		cards[i]->setPos(x, y);
+		cards[i]->setZValue((y + CARD_HEIGHT) * 10000000 + x + 1000);
+	}
+		
 	update();
 }
 
@@ -130,7 +140,7 @@ CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
 QPointF TableZone::mapFromGrid(const QPoint &gridPoint) const
 {
 	if (gridPoint.y() == 3) {
-		if (economicGrid)
+		if (settingsCache->getEconomicGrid())
 			return QPointF(
 				20 + (CARD_WIDTH * gridPoint.x() + CARD_WIDTH * (gridPoint.x() / 3)) / 2,
 				(CARD_HEIGHT + paddingY) * gridPoint.y() + (gridPoint.x() % 3 * CARD_HEIGHT) / 3
@@ -166,7 +176,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 	);
 
 	if (result.y() == 3) {
-		if (economicGrid)
+		if (settingsCache->getEconomicGrid())
 			return QPoint(
 				(int) (x * 2 / CARD_WIDTH - floor(x / (2 * CARD_WIDTH))),
 				3

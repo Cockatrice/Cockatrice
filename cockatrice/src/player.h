@@ -78,6 +78,7 @@ public slots:
 	
 	void actSayMessage();
 private slots:
+	void updateBgPixmap();
 	void updateBoundingRect();
 	void cardMenuAction();
 	void actSetCounters();

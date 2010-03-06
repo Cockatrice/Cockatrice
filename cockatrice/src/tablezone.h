@@ -10,7 +10,10 @@ signals:
 private:
 	int width, height;
 	QPixmap bgPixmap;
-	bool economicGrid;
+private slots:	
+	void updateBgPixmap();
+public slots:
+	void reorganizeCards();
 public:
 	static const int paddingY = 20;
 	static const int marginX = 20;
@@ -19,7 +22,6 @@ public:
 	TableZone(Player *_p, QGraphicsItem *parent = 0);
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-	void reorganizeCards();
 	void toggleTapped();
 	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown = false);
 	void handleDropEventByGrid(int cardId, CardZone *startZone, const QPoint &gridPoint, bool faceDown = false, bool tapped = false);

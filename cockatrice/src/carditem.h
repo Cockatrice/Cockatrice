@@ -34,6 +34,7 @@ public:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QPoint getGridPoint() const { return gridPoint; }
 	void setGridPoint(const QPoint &_gridPoint) { gridPoint = _gridPoint; }
+	QPoint getGridPos() const { return gridPoint; }
 	Player *getOwner() const { return owner; }
 	int getId() const { return id; }
 	void setId(int _id) { id = _id; }

@@ -4,9 +4,12 @@
 #include "cardzone.h"
 
 class HandZone : public CardZone {
+	Q_OBJECT
 private:
 	QPixmap bgPixmap;
 	int zoneHeight;
+private slots:	
+	void updateBgPixmap();
 public:
 	HandZone(Player *_p, int _zoneHeight, QGraphicsItem *parent = 0);
 	QRectF boundingRect() const;

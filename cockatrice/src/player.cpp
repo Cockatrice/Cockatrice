@@ -12,6 +12,7 @@
 #include "tab_game.h"
 #include "protocol_items.h"
 #include "gamescene.h"
+#include "settingscache.h"
 #include <QSettings>
 #include <QPainter>
 #include <QMenu>
@@ -19,11 +20,10 @@
 Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabGame *_parent)
 	: QObject(_parent), defaultNumberTopCards(3), name(_name), id(_id), active(false), local(_local), client(_client)
 {
-	QSettings settings;
-	QString bgPath = settings.value("zonebg/playerarea").toString();
-	if (!bgPath.isEmpty())
-		bgPixmap.load(bgPath);
 	setCacheMode(DeviceCoordinateCache);
+	
+	connect(settingsCache, SIGNAL(playerBgPathChanged()), this, SLOT(updateBgPixmap()));
+	updateBgPixmap();
 	
 	QPointF base = QPointF(counterAreaWidth, 50);
 
@@ -263,6 +263,16 @@ Player::~Player()
 	clearArrows();
 	delete playerMenu;
 	delete cardMenu;
+}
+
+void Player::updateBgPixmap()
+{
+	QString bgPath = settingsCache->getPlayerBgPath();
+	if (!bgPath.isEmpty()) {
+		qDebug() << "loading" << bgPath;
+		bgPixmap.load(bgPath);
+	}
+	update();
 }
 
 void Player::updateBoundingRect()

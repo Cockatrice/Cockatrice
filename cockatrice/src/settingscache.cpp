@@ -11,6 +11,10 @@ SettingsCache::SettingsCache()
 	picsPath = settings->value("paths/pics").toString();
 	cardDatabasePath = settings->value("paths/carddatabase").toString();
 	
+	handBgPath = settings->value("zonebg/hand").toString();
+	tableBgPath = settings->value("zonebg/table").toString();
+	playerBgPath = settings->value("zonebg/playerarea").toString();
+	
 	picDownload = settings->value("personal/picturedownload", 0).toInt();
 	doubleClickToPlay = settings->value("interface/doubleclicktoplay", 1).toInt();
 	economicGrid = settings->value("table/economic", 0).toInt();
@@ -43,6 +47,27 @@ void SettingsCache::setCardDatabasePath(const QString &_cardDatabasePath)
 	emit cardDatabasePathChanged();
 }
 
+void SettingsCache::setHandBgPath(const QString &_handBgPath)
+{
+	handBgPath = _handBgPath;
+	settings->setValue("zonebg/hand", handBgPath);
+	emit handBgPathChanged();
+}
+
+void SettingsCache::setTableBgPath(const QString &_tableBgPath)
+{
+	tableBgPath = _tableBgPath;
+	settings->setValue("zonebg/table", tableBgPath);
+	emit tableBgPathChanged();
+}
+
+void SettingsCache::setPlayerBgPath(const QString &_playerBgPath)
+{
+	playerBgPath = _playerBgPath;
+	settings->setValue("zonebg/player", playerBgPath);
+	emit playerBgPathChanged();
+}
+
 void SettingsCache::setPicDownload(int _picDownload)
 {
 	picDownload = _picDownload;
@@ -60,4 +85,5 @@ void SettingsCache::setEconomicGrid(int _economicGrid)
 {
 	economicGrid = _economicGrid;
 	settings->setValue("table/economic", economicGrid);
+	emit economicGridChanged();
 }

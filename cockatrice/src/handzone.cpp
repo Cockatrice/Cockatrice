@@ -3,17 +3,23 @@
 #include "player.h"
 #include "client.h"
 #include "protocol_items.h"
+#include "settingscache.h"
 
 HandZone::HandZone(Player *_p, int _zoneHeight, QGraphicsItem *parent)
 	: CardZone(_p, "hand", false, false, _p->getLocal(), parent), zoneHeight(_zoneHeight)
 {
-	QSettings settings;
-	QString bgPath = settings.value("zonebg/hand").toString();
-	if (!bgPath.isEmpty())
-		bgPixmap.load(bgPath);
+	connect(settingsCache, SIGNAL(handBgPathChanged()), this, SLOT(updateBgPixmap()));
+	updateBgPixmap();
 	
 	setCacheMode(DeviceCoordinateCache);
-	setAcceptsHoverEvents(true); // Awkwardly, this is needed to repaint the cached item after it has been corrupted by buggy rubberband drag.
+}
+
+void HandZone::updateBgPixmap()
+{
+	QString bgPath = settingsCache->getHandBgPath();
+	if (!bgPath.isEmpty())
+		bgPixmap.load(bgPath);
+	update();
 }
 
 QRectF HandZone::boundingRect() const

@@ -11,12 +11,17 @@ signals:
 	void langChanged();
 	void picsPathChanged();
 	void cardDatabasePathChanged();
+	void handBgPathChanged();
+	void tableBgPathChanged();
+	void playerBgPathChanged();
 	void picDownloadChanged();
+	void economicGridChanged();
 private:
 	QSettings *settings;
 	
 	QString lang;
 	QString deckPath, picsPath, cardDatabasePath;
+	QString handBgPath, tableBgPath, playerBgPath;
 	bool picDownload;
 	bool doubleClickToPlay;
 	bool economicGrid;
@@ -26,6 +31,9 @@ public:
 	QString getDeckPath() const { return deckPath; }
 	QString getPicsPath() const { return picsPath; }
 	QString getCardDatabasePath() const { return cardDatabasePath; }
+	QString getHandBgPath() const { return handBgPath; }
+	QString getTableBgPath() const { return tableBgPath; }
+	QString getPlayerBgPath() const { return playerBgPath; }
 	bool getPicDownload() const { return picDownload; }
 	bool getDoubleClickToPlay() const { return doubleClickToPlay; }
 	bool getEconomicGrid() const { return economicGrid; }
@@ -34,6 +42,9 @@ public slots:
 	void setDeckPath(const QString &_deckPath);
 	void setPicsPath(const QString &_picsPath);
 	void setCardDatabasePath(const QString &_cardDatabasePath);
+	void setHandBgPath(const QString &_handBgPath);
+	void setTableBgPath(const QString &_tableBgPath);
+	void setPlayerBgPath(const QString &_playerBgPath);
 	void setPicDownload(int _picDownload);
 	void setDoubleClickToPlay(int _doubleClickToPlay);
 	void setEconomicGrid(int _economicGrid);

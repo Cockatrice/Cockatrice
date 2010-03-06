@@ -169,28 +169,25 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 {
 	zoneBgGroupBox = new QGroupBox;
 	QSettings settings;
-	settings.beginGroup("zonebg");
 	
 	handBgLabel = new QLabel;
-	handBgEdit = new QLineEdit(settings.value("hand").toString());
+	handBgEdit = new QLineEdit(settingsCache->getHandBgPath());
 	handBgEdit->setReadOnly(true);
 	QPushButton *handBgButton = new QPushButton("...");
 	connect(handBgButton, SIGNAL(clicked()), this, SLOT(handBgButtonClicked()));
 	
 	tableBgLabel = new QLabel;
-	tableBgEdit = new QLineEdit(settings.value("table").toString());
+	tableBgEdit = new QLineEdit(settingsCache->getTableBgPath());
 	tableBgEdit->setReadOnly(true);
 	QPushButton *tableBgButton = new QPushButton("...");
 	connect(tableBgButton, SIGNAL(clicked()), this, SLOT(tableBgButtonClicked()));
 	
 	playerAreaBgLabel = new QLabel;
-	playerAreaBgEdit = new QLineEdit(settings.value("playerarea").toString());
+	playerAreaBgEdit = new QLineEdit(settingsCache->getPlayerBgPath());
 	playerAreaBgEdit->setReadOnly(true);
 	QPushButton *playerAreaBgButton = new QPushButton("...");
 	connect(playerAreaBgButton, SIGNAL(clicked()), this, SLOT(playerAreaBgButtonClicked()));
 	
-	settings.endGroup();
-
 	QGridLayout *zoneBgGrid = new QGridLayout;
 	zoneBgGrid->addWidget(handBgLabel, 0, 0);
 	zoneBgGrid->addWidget(handBgEdit, 0, 1);
@@ -256,12 +253,9 @@ void AppearanceSettingsPage::handBgButtonClicked()
 	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
 	if (path.isEmpty())
 		return;
-	QSettings settings;
-	settings.beginGroup("zonebg");
-	settings.setValue("hand", path);
-	handBgEdit->setText(path);
 	
-	emit handBgChanged(path);
+	handBgEdit->setText(path);
+	settingsCache->setHandBgPath(path);
 }
 
 void AppearanceSettingsPage::tableBgButtonClicked()
@@ -269,12 +263,9 @@ void AppearanceSettingsPage::tableBgButtonClicked()
 	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
 	if (path.isEmpty())
 		return;
-	QSettings settings;
-	settings.beginGroup("zonebg");
-	settings.setValue("table", path);
+
 	tableBgEdit->setText(path);
-	
-	emit tableBgChanged(path);
+	settingsCache->setTableBgPath(path);
 }
 
 void AppearanceSettingsPage::playerAreaBgButtonClicked()
@@ -282,12 +273,9 @@ void AppearanceSettingsPage::playerAreaBgButtonClicked()
 	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
 	if (path.isEmpty())
 		return;
-	QSettings settings;
-	settings.beginGroup("zonebg");
-	settings.setValue("playerarea", path);
-	playerAreaBgEdit->setText(path);
 	
-	emit playerAreaBgChanged(path);
+	playerAreaBgEdit->setText(path);
+	settingsCache->setPlayerBgPath(path);
 }
 
 void AppearanceSettingsPage::zoneViewSortingCheckBoxChanged(int state)
