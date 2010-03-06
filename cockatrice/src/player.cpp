@@ -379,7 +379,7 @@ void Player::initSayMenu()
 
 void Player::actViewLibrary()
 {
-	emit toggleZoneView(this, "deck", -1);
+	static_cast<GameScene *>(scene())->toggleZoneView(this, "deck", -1);
 }
 
 void Player::actViewTopCards()
@@ -388,23 +388,23 @@ void Player::actViewTopCards()
 	int number = QInputDialog::getInteger(0, tr("View top cards of library"), tr("Number of cards:"), defaultNumberTopCards, 1, 2000000000, 1, &ok);
 	if (ok) {
 		defaultNumberTopCards = number;
-		emit toggleZoneView(this, "deck", number);
+		static_cast<GameScene *>(scene())->toggleZoneView(this, "deck", number);
 	}
 }
 
 void Player::actViewGraveyard()
 {
-	emit toggleZoneView(this, "grave", -1);
+	static_cast<GameScene *>(scene())->toggleZoneView(this, "grave", -1);
 }
 
 void Player::actViewRfg()
 {
-	emit toggleZoneView(this, "rfg", -1);
+	static_cast<GameScene *>(scene())->toggleZoneView(this, "rfg", -1);
 }
 
 void Player::actViewSideboard()
 {
-	emit toggleZoneView(this, "sb", -1);
+	static_cast<GameScene *>(scene())->toggleZoneView(this, "sb", -1);
 }
 
 void Player::actShuffle()

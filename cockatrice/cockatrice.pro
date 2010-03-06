@@ -31,7 +31,6 @@ HEADERS += src/counter.h \
  src/zoneviewwidget.h \
  src/pilezone.h \
  src/carddragitem.h \
- src/zoneviewlayout.h \
  src/carddatabasemodel.h \
  src/window_deckeditor.h \
  src/setsmodel.h \
@@ -85,7 +84,6 @@ SOURCES += src/counter.cpp \
  src/zoneviewwidget.cpp \
  src/pilezone.cpp \
  src/carddragitem.cpp \
- src/zoneviewlayout.cpp \
  src/carddatabasemodel.cpp \
  src/window_deckeditor.cpp \
  src/setsmodel.cpp \

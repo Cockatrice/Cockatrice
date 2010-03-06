@@ -9,7 +9,6 @@
 #include "player.h"
 #include "zoneviewzone.h"
 #include "zoneviewwidget.h"
-#include "zoneviewlayout.h"
 #include "deckview.h"
 #include "decklist.h"
 #include "deck_picturecacher.h"
@@ -23,8 +22,7 @@
 TabGame::TabGame(Client *_client, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _resuming)
 	: Tab(), client(_client), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), started(false), resuming(_resuming), currentPhase(-1)
 {
-	zoneLayout = new ZoneViewLayout;
-	scene = new GameScene(zoneLayout, this);
+	scene = new GameScene(this);
 	gameView = new GameView(scene);
 	gameView->hide();
 	
@@ -84,7 +82,6 @@ TabGame::TabGame(Client *_client, int _gameId, const QString &_gameDescription, 
 	}
 
 	aCloseMostRecentZoneView = new QAction(this);
-	connect(aCloseMostRecentZoneView, SIGNAL(triggered()), zoneLayout, SLOT(closeMostRecentZoneView()));
 	addAction(aCloseMostRecentZoneView);
 	
 	connect(loadLocalButton, SIGNAL(clicked()), this, SLOT(loadLocalDeck()));
@@ -149,13 +146,14 @@ void TabGame::retranslateUi()
 	readyStartButton->setText(tr("S&tart game"));
 	sayLabel->setText(tr("&Say:"));
 	cardInfo->retranslateUi();
-	zoneLayout->retranslateUi();
 	aCloseMostRecentZoneView->setText(tr("Close most recent zone view"));
 	aCloseMostRecentZoneView->setShortcut(tr("Esc"));
 
 	QMapIterator<int, Player *> i(players);
 	while (i.hasNext())
 		i.next().value()->retranslateUi();
+	
+	scene->retranslateUi();
 }
 
 void TabGame::actConcede()
@@ -217,8 +215,6 @@ Player *TabGame::addPlayer(int playerId, const QString &playerName)
 	scene->addPlayer(newPlayer);
 
 	connect(newPlayer, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
-	connect(newPlayer, SIGNAL(toggleZoneView(Player *, QString, int)), zoneLayout, SLOT(toggleZoneView(Player *, QString, int)));
-	connect(newPlayer, SIGNAL(closeZoneView(ZoneViewZone *)), zoneLayout, SLOT(removeItem(ZoneViewZone *)));
 	messageLog->connectToPlayer(newPlayer);
 
 	tabMenu->insertMenu(playersSeparator, newPlayer->getPlayerMenu());
@@ -331,7 +327,7 @@ void TabGame::eventGameStateChanged(Event_GameStateChanged *event, GameEventCont
 		setActivePhase(event->getActivePhase());
 	} else if (!event->getGameStarted() && started) {
 		stopGame();
-		zoneLayout->clear();
+		scene->clearViews();
 	}
 	emit userEvent();
 }

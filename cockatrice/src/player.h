@@ -42,8 +42,6 @@ class Event_DrawCards;
 class Player : public QObject, public QGraphicsItem {
 	Q_OBJECT
 signals:
-	void closeZoneView(ZoneViewZone *zone);
-	void toggleZoneView(Player *player, QString zoneName, int number);
 	void newCardAdded(AbstractCardItem *card);
 	// Log events
 	void logSay(Player *player, QString message);

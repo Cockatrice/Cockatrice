@@ -7,8 +7,8 @@
 #include "gamescene.h"
 #include "protocol_items.h"
 
-ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, QGraphicsItem *parent)
-	: QGraphicsWidget(parent, Qt::Tool | Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint/* | Qt::WindowCloseButtonHint*/), player(_player)
+ZoneViewWidget::ZoneViewWidget(GameScene *_scene, Player *_player, CardZone *_origZone, int numberCards)
+	: QGraphicsWidget(0, Qt::Tool | Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint/* | Qt::WindowCloseButtonHint*/), player(_player)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	
@@ -38,7 +38,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 	
 	qreal left, top, right, bottom;
 	getWindowFrameMargins(&left, &top, &right, &bottom);
-	qreal h = scene()->sceneRect().height() - (top + bottom);
+	qreal h = _scene->sceneRect().height() - (top + bottom);
 
 /*	scrollBar = new QScrollBar(Qt::Vertical);
 	QGraphicsProxyWidget *scrollProxy = new QGraphicsProxyWidget(this);
@@ -77,7 +77,7 @@ void ZoneViewWidget::retranslateUi()
 
 void ZoneViewWidget::resizeToZoneContents()
 {
-	qDebug("+++++++ bla");
+/*	qDebug("+++++++ bla");
 	int cardCount = zone->getCards().size();
 	const QRectF &playersRect = static_cast<GameScene *>(scene())->getPlayersRect();
 	int h = 0;
@@ -88,7 +88,7 @@ void ZoneViewWidget::resizeToZoneContents()
 	qDebug(QString("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx resizing to %1").arg(h).toLatin1());
 	resize(size().width(), h);
 	emit sizeChanged();
-}
+*/}
 
 void ZoneViewWidget::closeEvent(QCloseEvent *event)
 {

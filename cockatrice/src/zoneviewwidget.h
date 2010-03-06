@@ -11,6 +11,7 @@ class Player;
 class CardDatabase;
 class QScrollBar;
 class QCheckBox;
+class GameScene;
 
 class ZoneViewWidget : public QGraphicsWidget {
 	Q_OBJECT
@@ -28,7 +29,7 @@ private slots:
 	void resizeToZoneContents();
 	void zoneDeleted();
 public:
-	ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards = 0, QGraphicsItem *parent = 0);
+	ZoneViewWidget(GameScene *_scene, Player *_player, CardZone *_origZone, int numberCards = 0);
 	ZoneViewZone *getZone() const { return zone; }
 	void retranslateUi();
 protected:

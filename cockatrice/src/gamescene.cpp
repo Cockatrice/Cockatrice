@@ -1,12 +1,17 @@
 #include "gamescene.h"
 #include "player.h"
-#include "zoneviewlayout.h"
+#include "zoneviewwidget.h"
+#include "zoneviewzone.h"
 
-GameScene::GameScene(ZoneViewLayout *_zvLayout, QObject *parent)
-	: QGraphicsScene(parent), zvLayout(_zvLayout)
+GameScene::GameScene(QObject *parent)
+	: QGraphicsScene(parent)
 {
-	connect(zvLayout, SIGNAL(sizeChanged()), this, SLOT(rearrange()));
-	addItem(zvLayout);
+}
+
+void GameScene::retranslateUi()
+{
+	for (int i = 0; i < views.size(); ++i)
+		views[i]->retranslateUi();
 }
 
 void GameScene::addPlayer(Player *player)
@@ -57,11 +62,36 @@ void GameScene::rearrange()
 
 	playersRect = QRectF(0, 0, sceneWidth, sceneHeight);
 	
-	zvLayout->setPos(QPointF(sceneWidth, 0));
-	sceneWidth += zvLayout->size().width();
-	if (zvLayout->size().height() > sceneHeight)
-		sceneHeight = zvLayout->size().height();
 	setSceneRect(sceneRect().x(), sceneRect().y(), sceneWidth, sceneHeight);
 
 	qDebug(QString("rearrange(): w=%1 h=%2").arg(sceneWidth).arg(sceneHeight).toLatin1());
+}
+
+void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numberCards)
+{
+        for (int i = 0; i < views.size(); i++) {
+                ZoneViewZone *temp = views[i]->getZone();
+                if ((temp->getName() == zoneName) && (temp->getPlayer() == player)) { // view is already open
+                        views[i]->close();
+                        if (temp->getNumberCards() == numberCards)
+                                return;
+                }
+        }
+
+        ZoneViewWidget *item = new ZoneViewWidget(this, player, player->getZones().value(zoneName), numberCards);
+        views.append(item);
+        connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
+	addItem(item);
+}
+
+void GameScene::removeZoneView(ZoneViewWidget *item)
+{
+        views.removeAt(views.indexOf(item));
+	removeItem(item);
+}
+
+void GameScene::clearViews()
+{
+	for (int i = 0; i < views.size(); ++i)
+		views[i]->close();
 }
