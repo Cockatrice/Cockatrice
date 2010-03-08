@@ -118,7 +118,8 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 		updatePath(endPos);
 	} else {
 		fullColor = true;
-		cursorItem->setBeingPointedAt(true);
+		if (cursorItem != startItem)
+			cursorItem->setBeingPointedAt(true);
 		targetItem = cursorItem;
 		updatePath();
 	}
