@@ -18,17 +18,14 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 	setFont(font);
 
 	QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
-	setLayout(vbox);
 	
 	if (numberCards == -1) {
 		sortByNameCheckBox = new QCheckBox;
-		sortByNameCheckBox->setChecked(settingsCache->getZoneViewSortByName());
 		QGraphicsProxyWidget *sortByNameProxy = new QGraphicsProxyWidget;
 		sortByNameProxy->setWidget(sortByNameCheckBox);
 		vbox->addItem(sortByNameProxy);
 
 		sortByTypeCheckBox = new QCheckBox;
-		sortByTypeCheckBox->setChecked(settingsCache->getZoneViewSortByType());
 		QGraphicsProxyWidget *sortByTypeProxy = new QGraphicsProxyWidget;
 		sortByTypeProxy->setWidget(sortByTypeCheckBox);
 		vbox->addItem(sortByTypeProxy);
@@ -58,8 +55,11 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 	if (sortByNameCheckBox) {
 		connect(sortByNameCheckBox, SIGNAL(stateChanged(int)), zone, SLOT(setSortByName(int)));
 		connect(sortByTypeCheckBox, SIGNAL(stateChanged(int)), zone, SLOT(setSortByType(int)));
+		sortByNameCheckBox->setChecked(settingsCache->getZoneViewSortByName());
+		sortByTypeCheckBox->setChecked(settingsCache->getZoneViewSortByType());
 	}
 
+	setLayout(vbox);
 	retranslateUi();
 }
 
@@ -77,12 +77,11 @@ void ZoneViewWidget::retranslateUi()
 void ZoneViewWidget::resizeToZoneContents()
 {
 	QRectF zoneRect = zone->getOptimumRect();
-	qDebug() << "resizeToZone: w=" << zoneRect.width() << "h=" << zoneRect.height();
-	qDebug() << "maxW=" << maximumWidth() << "maxH=" << maximumHeight();
-	QSizeF newSize(zoneRect.width() + 10, zoneRect.height() + extraHeight);
+	QSizeF newSize(zoneRect.width() + 10, zoneRect.height() + extraHeight + 10);
 	setMaximumSize(newSize);
 	resize(newSize);
-	qDebug() << "w=" << size().width() << "h=" << size().height();
+	if (layout())
+		layout()->invalidate();
 }
 
 void ZoneViewWidget::closeEvent(QCloseEvent *event)

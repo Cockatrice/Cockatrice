@@ -75,6 +75,10 @@ RemoteDeckList_TreeModel::FileNode *RemoteDeckList_TreeModel::DirectoryNode::get
 RemoteDeckList_TreeModel::RemoteDeckList_TreeModel(Client *_client, QObject *parent)
 	: QAbstractItemModel(parent), client(_client)
 {
+	QFileIconProvider fip;
+	dirIcon = fip.icon(QFileIconProvider::Folder);
+	fileIcon = fip.icon(QFileIconProvider::File);
+
 	root = new DirectoryNode;
 	refreshTree();
 }
@@ -118,7 +122,7 @@ QVariant RemoteDeckList_TreeModel::data(const QModelIndex &index, int role) cons
 				}
 			}
 			case Qt::DecorationRole:
-				return index.column() == 0 ? QFileIconProvider().icon(QFileIconProvider::Folder) : QVariant();
+				return index.column() == 0 ? dirIcon : QVariant();
 			default: return QVariant();
 		}
 	} else {
@@ -133,7 +137,7 @@ QVariant RemoteDeckList_TreeModel::data(const QModelIndex &index, int role) cons
 				}
 			}
 			case Qt::DecorationRole:
-				return index.column() == 0 ? QFileIconProvider().icon(QFileIconProvider::File) : QVariant();
+				return index.column() == 0 ? fileIcon : QVariant();
 			case Qt::TextAlignmentRole:
 				return index.column() == 1 ? Qt::AlignRight : Qt::AlignLeft;
 			default: return QVariant();

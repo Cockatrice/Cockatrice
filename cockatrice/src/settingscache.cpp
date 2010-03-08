@@ -3,7 +3,7 @@
 
 SettingsCache::SettingsCache()
 {
-	settings = new QSettings;
+	settings = new QSettings(this);
 	
 	lang = settings->value("personal/lang").toString();
 	
@@ -15,9 +15,12 @@ SettingsCache::SettingsCache()
 	tableBgPath = settings->value("zonebg/table").toString();
 	playerBgPath = settings->value("zonebg/playerarea").toString();
 	
-	picDownload = settings->value("personal/picturedownload", 0).toInt();
-	doubleClickToPlay = settings->value("interface/doubleclicktoplay", 1).toInt();
-	economicGrid = settings->value("table/economic", 0).toInt();
+	picDownload = settings->value("personal/picturedownload", false).toBool();
+	doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
+	economicGrid = settings->value("table/economic", false).toBool();
+	
+	zoneViewSortByName = settings->value("zoneview/sortbyname", false).toBool();
+	zoneViewSortByType = settings->value("zoneview/sortbytype", false).toBool();
 }
 
 void SettingsCache::setLang(const QString &_lang)

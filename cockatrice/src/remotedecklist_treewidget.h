@@ -58,6 +58,8 @@ private:
 	Client *client;
 	DirectoryNode *root;
 	
+	QIcon fileIcon, dirIcon;
+	
 	QModelIndex nodeToIndex(Node *node) const;
 signals:
 	void treeRefreshed();

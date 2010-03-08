@@ -70,14 +70,14 @@ void DeckViewCard::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 	AbstractCardItem::paint(painter, option, widget);
 	
 	painter->save();
-	QPen pen(Qt::DotLine);
-	pen.setWidth(2);
+	QPen pen;//(Qt::DotLine);
+	pen.setWidth(3);
 	if (originZone == "main")
 		pen.setColor(QColor(0, 255, 0));
 	else
-		pen.setColor(QColor(255, 255, 0));
+		pen.setColor(QColor(255, 0, 0));
 	painter->setPen(pen);
-	painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 2));
+	painter->drawRect(QRectF(1.5, 1.5, CARD_WIDTH - 3, CARD_HEIGHT - 3));
 	painter->restore();
 }
 

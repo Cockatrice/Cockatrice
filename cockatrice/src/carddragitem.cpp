@@ -19,14 +19,22 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
 	CardZone *cardZone = 0;
 	ZoneViewZone *zoneViewZone = 0;
 	for (int i = colliding.size() - 1; i >= 0; i--) {
-		if (!zoneViewZone) zoneViewZone = qgraphicsitem_cast<ZoneViewZone *>(colliding.at(i));
-		if (!cardZone) cardZone = qgraphicsitem_cast<CardZone *>(colliding.at(i));
+		CardZone *temp = qgraphicsitem_cast<CardZone *>(colliding.at(i));
+		if (temp)
+			qDebug() << "zone name:" << temp->getName();
+		if (!cardZone)
+			cardZone = temp;
+		if (!zoneViewZone)
+			zoneViewZone = qobject_cast<ZoneViewZone *>(temp);
 	}
 	CardZone *cursorZone = 0;
-	if (zoneViewZone)
+	if (zoneViewZone) {
+		qDebug() << "zv found";
 		cursorZone = zoneViewZone;
-	else if (cardZone)
+	} else if (cardZone) {
+		qDebug() << "normal found";
 		cursorZone = cardZone;
+	}
 	if (!cursorZone)
 		return;
 	currentZone = cursorZone;

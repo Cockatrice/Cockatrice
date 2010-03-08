@@ -16,8 +16,6 @@ private:
 	CardZone *origZone;
 	bool sortByName, sortByType;
 public:
-	enum { Type = typeZoneView };
-	int type() const { return Type; }
 	ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards = -1, QGraphicsItem *parent = 0);
 	~ZoneViewZone();
 	QRectF boundingRect() const;
