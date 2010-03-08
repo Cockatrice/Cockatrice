@@ -4,6 +4,7 @@
 	<file>resources/icon_tab_changed.svg</file>
         <file>resources/icon_config_general.svg</file>
         <file>resources/icon_config_appearance.svg</file>
+        <file>resources/icon_config_interface.svg</file>
         <file>resources/icon_config_messages.svg</file>
         <file>resources/icon_phase_untap.svg</file>
         <file>resources/icon_phase_upkeep.svg</file>

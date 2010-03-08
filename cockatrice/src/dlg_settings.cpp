@@ -422,7 +422,7 @@ void DlgSettings::createIcons()
 	userInterfaceButton = new QListWidgetItem(contentsWidget);
 	userInterfaceButton->setTextAlignment(Qt::AlignHCenter);
 	userInterfaceButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-	userInterfaceButton->setIcon(QIcon(":/resources/icon_config_appearance.svg"));
+	userInterfaceButton->setIcon(QIcon(":/resources/icon_config_interface.svg"));
 	
 	messagesButton = new QListWidgetItem(contentsWidget);
 	messagesButton->setTextAlignment(Qt::AlignHCenter);
