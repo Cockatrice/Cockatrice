@@ -1,8 +1,6 @@
 #include "pingpixmapgenerator.h"
 #include <QPainter>
 
-QMap<int, QPixmap> PingPixmapGenerator::pmCache;
-
 QPixmap PingPixmapGenerator::generatePixmap(int size, int value, int max)
 {
 	int key = size * 1000000 + max * 1000 + value;

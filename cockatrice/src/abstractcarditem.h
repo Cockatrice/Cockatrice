@@ -12,7 +12,8 @@ enum CardItemType {
 	typeCard = QGraphicsItem::UserType + 1,
 	typeCardDrag = QGraphicsItem::UserType + 2,
 	typeZone = QGraphicsItem::UserType + 3,
-	typeOther = QGraphicsItem::UserType + 4
+	typeZoneView = QGraphicsItem::UserType + 4,
+	typeOther = QGraphicsItem::UserType + 5
 };
 
 class AbstractCardItem : public QObject, public AbstractGraphicsItem {

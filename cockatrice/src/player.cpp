@@ -218,6 +218,9 @@ Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabG
 		cardMenu->addAction(aSetCounters);
 		cardMenu->addSeparator();
 		moveMenu = cardMenu->addMenu(QString());
+
+		playerMenu->addSeparator();
+		playerMenu->addMenu(cardMenu);
 		
 		moveMenu->addAction(aMoveToTopLibrary);
 		moveMenu->addAction(aMoveToBottomLibrary);

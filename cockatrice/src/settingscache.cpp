@@ -87,3 +87,15 @@ void SettingsCache::setEconomicGrid(int _economicGrid)
 	settings->setValue("table/economic", economicGrid);
 	emit economicGridChanged();
 }
+
+void SettingsCache::setZoneViewSortByName(int _zoneViewSortByName)
+{
+	zoneViewSortByName = _zoneViewSortByName;
+	settings->setValue("zoneview/sortbyname", zoneViewSortByName);
+}
+
+void SettingsCache::setZoneViewSortByType(int _zoneViewSortByType)
+{
+	zoneViewSortByType = _zoneViewSortByType;
+	settings->setValue("zoneview/sortbytype", zoneViewSortByType);
+}

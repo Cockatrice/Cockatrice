@@ -81,9 +81,6 @@ TabGame::TabGame(Client *_client, int _gameId, const QString &_gameDescription, 
 		readyStartButton->hide();
 	}
 
-	aCloseMostRecentZoneView = new QAction(this);
-	addAction(aCloseMostRecentZoneView);
-	
 	connect(loadLocalButton, SIGNAL(clicked()), this, SLOT(loadLocalDeck()));
 	connect(loadRemoteButton, SIGNAL(clicked()), this, SLOT(loadRemoteDeck()));
 	connect(readyStartButton, SIGNAL(clicked()), this, SLOT(readyStart()));
@@ -146,8 +143,6 @@ void TabGame::retranslateUi()
 	readyStartButton->setText(tr("S&tart game"));
 	sayLabel->setText(tr("&Say:"));
 	cardInfo->retranslateUi();
-	aCloseMostRecentZoneView->setText(tr("Close most recent zone view"));
-	aCloseMostRecentZoneView->setShortcut(tr("Esc"));
 
 	QMapIterator<int, Player *> i(players);
 	while (i.hasNext())

@@ -6,26 +6,36 @@
 #include "client.h"
 #include "gamescene.h"
 #include "protocol_items.h"
+#include "settingscache.h"
 
-ZoneViewWidget::ZoneViewWidget(GameScene *_scene, Player *_player, CardZone *_origZone, int numberCards)
+ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards)
 	: QGraphicsWidget(0, Qt::Tool | Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint/* | Qt::WindowCloseButtonHint*/), player(_player)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	
 	QFont font;
-	font.setPixelSize(8);
+	font.setPixelSize(10);
 	setFont(font);
 
 	QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
 	setLayout(vbox);
 	
 	if (numberCards == -1) {
-		sortCheckBox = new QCheckBox;
-		QGraphicsProxyWidget *sortProxy = new QGraphicsProxyWidget;
-		sortProxy->setWidget(sortCheckBox);
-		vbox->addItem(sortProxy);
-	} else
-		sortCheckBox = 0;
+		sortByNameCheckBox = new QCheckBox;
+		sortByNameCheckBox->setChecked(settingsCache->getZoneViewSortByName());
+		QGraphicsProxyWidget *sortByNameProxy = new QGraphicsProxyWidget;
+		sortByNameProxy->setWidget(sortByNameCheckBox);
+		vbox->addItem(sortByNameProxy);
+
+		sortByTypeCheckBox = new QCheckBox;
+		sortByTypeCheckBox->setChecked(settingsCache->getZoneViewSortByType());
+		QGraphicsProxyWidget *sortByTypeProxy = new QGraphicsProxyWidget;
+		sortByTypeProxy->setWidget(sortByTypeCheckBox);
+		vbox->addItem(sortByTypeProxy);
+	} else {
+		sortByNameCheckBox = 0;
+		sortByTypeCheckBox = 0;
+	}
 	
 	if (_origZone->getIsShufflable() && (numberCards == -1)) {
 		shuffleCheckBox = new QCheckBox;
@@ -36,31 +46,18 @@ ZoneViewWidget::ZoneViewWidget(GameScene *_scene, Player *_player, CardZone *_or
 	} else
 		shuffleCheckBox = 0;
 	
-	qreal left, top, right, bottom;
-	getWindowFrameMargins(&left, &top, &right, &bottom);
-	qreal h = _scene->sceneRect().height() - (top + bottom);
-
-/*	scrollBar = new QScrollBar(Qt::Vertical);
-	QGraphicsProxyWidget *scrollProxy = new QGraphicsProxyWidget(this);
-	scrollProxy->setWidget(scrollBar);
-	scrollProxy->setPos(138, y);
-	scrollProxy->resize(scrollProxy->size().width(), h - y);
-
-	qreal w = 138 + scrollProxy->size().width();
-*/qreal w = 138;
-	resize(w, h);
+	extraHeight = vbox->sizeHint(Qt::PreferredSize).height();
+	resize(150, 150);
 
 	zone = new ZoneViewZone(player, _origZone, numberCards, this);
-	connect(zone, SIGNAL(contentsChanged()), this, SLOT(resizeToZoneContents()));
+	connect(zone, SIGNAL(optimumRectChanged()), this, SLOT(resizeToZoneContents()));
 	connect(zone, SIGNAL(beingDeleted()), this, SLOT(zoneDeleted()));
-	zone->dumpObjectInfo();
 	vbox->addItem(zone);
 	zone->initializeCards();
 	
-	if (sortCheckBox) {
-		connect(sortCheckBox, SIGNAL(stateChanged(int)), zone, SLOT(setSortingEnabled(int)));
-		QSettings settings;
-		sortCheckBox->setChecked(settings.value("zoneview/sorting").toInt());
+	if (sortByNameCheckBox) {
+		connect(sortByNameCheckBox, SIGNAL(stateChanged(int)), zone, SLOT(setSortByName(int)));
+		connect(sortByTypeCheckBox, SIGNAL(stateChanged(int)), zone, SLOT(setSortByType(int)));
 	}
 
 	retranslateUi();
@@ -69,26 +66,24 @@ ZoneViewWidget::ZoneViewWidget(GameScene *_scene, Player *_player, CardZone *_or
 void ZoneViewWidget::retranslateUi()
 {
 	setWindowTitle(zone->getTranslatedName(false, CaseNominative));
-	if (sortCheckBox)
-		sortCheckBox->setText(tr("sort alphabetically"));
+	if (sortByNameCheckBox)
+		sortByNameCheckBox->setText(tr("sort by name"));
+	if (sortByTypeCheckBox)
+		sortByTypeCheckBox->setText(tr("sort by type"));
 	if (shuffleCheckBox)
 		shuffleCheckBox->setText(tr("shuffle when closing"));
 }
 
 void ZoneViewWidget::resizeToZoneContents()
 {
-/*	qDebug("+++++++ bla");
-	int cardCount = zone->getCards().size();
-	const QRectF &playersRect = static_cast<GameScene *>(scene())->getPlayersRect();
-	int h = 0;
-	if (cardCount * CARD_HEIGHT / 3 < playersRect.height() * 1.5)
-		h = cardCount * CARD_HEIGHT / 3;
-	else
-		h = playersRect.height() * 1.5;
-	qDebug(QString("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx resizing to %1").arg(h).toLatin1());
-	resize(size().width(), h);
-	emit sizeChanged();
-*/}
+	QRectF zoneRect = zone->getOptimumRect();
+	qDebug() << "resizeToZone: w=" << zoneRect.width() << "h=" << zoneRect.height();
+	qDebug() << "maxW=" << maximumWidth() << "maxH=" << maximumHeight();
+	QSizeF newSize(zoneRect.width() + 10, zoneRect.height() + extraHeight);
+	setMaximumSize(newSize);
+	resize(newSize);
+	qDebug() << "w=" << size().width() << "h=" << size().height();
+}
 
 void ZoneViewWidget::closeEvent(QCloseEvent *event)
 {
@@ -105,6 +100,5 @@ void ZoneViewWidget::closeEvent(QCloseEvent *event)
 void ZoneViewWidget::zoneDeleted()
 {
 	emit closePressed(this);
-	qDebug("foo");
 	deleteLater();
 }

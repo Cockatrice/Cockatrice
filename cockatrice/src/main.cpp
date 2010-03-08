@@ -32,12 +32,14 @@
 #include "window_main.h"
 #include "carddatabase.h"
 #include "settingscache.h"
+#include "pingpixmapgenerator.h"
 
 //Q_IMPORT_PLUGIN(qjpeg)
 
 CardDatabase *db;
 QTranslator *translator;
 SettingsCache *settingsCache;
+PingPixmapGenerator *pingPixmapGenerator;
 
 void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
@@ -61,6 +63,7 @@ int main(int argc, char *argv[])
 	
 	settingsCache = new SettingsCache;
 	db = new CardDatabase;
+	pingPixmapGenerator = new PingPixmapGenerator;
 
 	QString localeName;// = QLocale::system().name();
 	QTranslator qtTranslator;
@@ -88,6 +91,7 @@ int main(int argc, char *argv[])
 
 	int retval = app.exec();
 
+	delete pingPixmapGenerator;
 	delete db;
 	delete settingsCache;
 

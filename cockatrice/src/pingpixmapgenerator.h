@@ -6,9 +6,11 @@
 
 class PingPixmapGenerator {
 private:
-	static QMap<int, QPixmap> pmCache;
+	QMap<int, QPixmap> pmCache;
 public:
-	static QPixmap generatePixmap(int size, int value, int max);
+	QPixmap generatePixmap(int size, int value, int max);
 };
+
+extern PingPixmapGenerator *pingPixmapGenerator;
 
 #endif

@@ -25,6 +25,7 @@ private:
 	bool picDownload;
 	bool doubleClickToPlay;
 	bool economicGrid;
+	bool zoneViewSortByName, zoneViewSortByType;
 public:
 	SettingsCache();
 	QString getLang() const { return lang; }
@@ -37,6 +38,8 @@ public:
 	bool getPicDownload() const { return picDownload; }
 	bool getDoubleClickToPlay() const { return doubleClickToPlay; }
 	bool getEconomicGrid() const { return economicGrid; }
+	bool getZoneViewSortByName() const { return zoneViewSortByName; }
+	bool getZoneViewSortByType() const { return zoneViewSortByType; }
 public slots:
 	void setLang(const QString &_lang);
 	void setDeckPath(const QString &_deckPath);
@@ -48,6 +51,8 @@ public slots:
 	void setPicDownload(int _picDownload);
 	void setDoubleClickToPlay(int _doubleClickToPlay);
 	void setEconomicGrid(int _economicGrid);
+	void setZoneViewSortByName(int _zoneViewSortByName);
+	void setZoneViewSortByType(int _zoneViewSortByType);
 };
 
 extern SettingsCache *settingsCache;

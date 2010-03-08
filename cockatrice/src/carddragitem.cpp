@@ -1,9 +1,11 @@
 #include "carddragitem.h"
 #include "cardzone.h"
 #include "tablezone.h"
+#include "zoneviewzone.h"
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QCursor>
+#include <QDebug>
 
 CardDragItem::CardDragItem(AbstractCardItem *_item, int _id, const QPointF &_hotSpot, bool _faceDown, AbstractCardDragItem *parentDrag)
 	: AbstractCardDragItem(_item, _hotSpot, parentDrag), id(_id), faceDown(_faceDown), currentZone(0)
@@ -14,10 +16,17 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
 {
 	QList<QGraphicsItem *> colliding = scene()->items(cursorScenePos);
 
+	CardZone *cardZone = 0;
+	ZoneViewZone *zoneViewZone = 0;
+	for (int i = colliding.size() - 1; i >= 0; i--) {
+		if (!zoneViewZone) zoneViewZone = qgraphicsitem_cast<ZoneViewZone *>(colliding.at(i));
+		if (!cardZone) cardZone = qgraphicsitem_cast<CardZone *>(colliding.at(i));
+	}
 	CardZone *cursorZone = 0;
-	for (int i = colliding.size() - 1; i >= 0; i--)
-		if ((cursorZone = qgraphicsitem_cast<CardZone *>(colliding.at(i))))
-			break;
+	if (zoneViewZone)
+		cursorZone = zoneViewZone;
+	else if (cardZone)
+		cursorZone = cardZone;
 	if (!cursorZone)
 		return;
 	currentZone = cursorZone;

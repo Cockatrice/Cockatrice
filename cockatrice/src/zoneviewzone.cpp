@@ -5,7 +5,7 @@
 #include "protocol_items.h"
 
 ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, QGraphicsItem *parent)
-	: CardZone(_p, _origZone->getName(), false, false, true, parent, true), height(0), numberCards(_numberCards), origZone(_origZone), sortingEnabled(false)
+	: CardZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0), numberCards(_numberCards), origZone(_origZone), sortByName(false), sortByType(false)
 {
 	origZone->setView(this);
 }
@@ -19,7 +19,7 @@ ZoneViewZone::~ZoneViewZone()
 
 QRectF ZoneViewZone::boundingRect() const
 {
-	return QRectF(0, 0, CARD_WIDTH * 1.75, height);
+	return bRect;
 }
 
 void ZoneViewZone::paint(QPainter */*painter*/, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
@@ -63,43 +63,52 @@ void ZoneViewZone::zoneDumpReceived(ProtocolResponse *r)
 // Because of boundingRect(), this function must not be called before the zone was added to a scene.
 void ZoneViewZone::reorganizeCards()
 {
-	qDebug("reorganizeCards");
-
-	if (cards.isEmpty())
-		return;
-
 	int cardCount = cards.size();
 	if (!origZone->contentsKnown())
 		for (int i = 0; i < cardCount; ++i)
 			cards[i]->setId(i);
+
+	int cols = floor(sqrt((double) cardCount / 2));
+	int rows = ceil((double) cardCount / cols);
+	if (rows < 1)
+		rows = 1;
+	if (minRows == 0)
+		minRows = rows;
+	else if (rows < minRows) {
+		rows = minRows;
+		cols = ceil((double) cardCount / minRows);
+	}
+	if (cols < 2)
+		cols = 2;
 	
-	qreal totalWidth = boundingRect().width();
-	qreal totalHeight = boundingRect().height();
-	qreal cardWidth = cards.at(0)->boundingRect().width();
-	qreal cardHeight = cards.at(0)->boundingRect().height();
-	qreal x1 = 0;
-	qreal x2 = (totalWidth - cardWidth);
-	
+	qDebug() << "reorganizeCards: rows=" << rows << "cols=" << cols;
+
 	CardList cardsToDisplay(cards);
-	if (sortingEnabled)
-		cardsToDisplay.sort();
+	if (sortByName || sortByType)
+		cardsToDisplay.sort((sortByName ? CardList::SortByName : 0) | (sortByType ? CardList::SortByType : 0));
 	
 	for (int i = 0; i < cardCount; i++) {
 		CardItem *c = cardsToDisplay.at(i);
-		qreal x = i % 2 ? x2 : x1;
-		// If the total height of the cards is smaller than the available height,
-		// the cards do not need to overlap and are displayed in the center of the area.
-		if (cardHeight * cardCount > totalHeight)
-			c->setPos(x, ((qreal) i) * (totalHeight - cardHeight) / (cardCount - 1));
-		else
-			c->setPos(x, ((qreal) i) * cardHeight + (totalHeight - cardCount * cardHeight) / 2);
+		qreal x = (i / rows) * CARD_WIDTH;
+		qreal y = (i % rows) * CARD_HEIGHT / 3;
+		c->setPos(x, y);
 		c->setZValue(i);
 	}
+
+	optimumRect = QRectF(0, 0, cols * CARD_WIDTH, ((rows - 1) * CARD_HEIGHT) / 3 + CARD_HEIGHT);
+	updateGeometry();
+	emit optimumRectChanged();
 }
 
-void ZoneViewZone::setSortingEnabled(int _sortingEnabled)
+void ZoneViewZone::setSortByName(int _sortByName)
 {
-	sortingEnabled = _sortingEnabled;
+	sortByName = _sortByName;
+	reorganizeCards();
+}
+
+void ZoneViewZone::setSortByType(int _sortByType)
+{
+	sortByType = _sortByType;
 	reorganizeCards();
 }
 
@@ -129,17 +138,11 @@ void ZoneViewZone::removeCard(int position)
 void ZoneViewZone::setGeometry(const QRectF &rect)
 {
 	prepareGeometryChange();
-	setPos(rect.topLeft());
-	height = rect.height();
-	reorganizeCards();
+	setPos(rect.x(), rect.y());
+	bRect = QRectF(0, 0, rect.width(), rect.height());
 }
 
-QSizeF ZoneViewZone::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+QSizeF ZoneViewZone::sizeHint(Qt::SizeHint /*which*/, const QSizeF & /*constraint*/) const
 {
-	switch (which) {
-		case Qt::MinimumSize: return QSizeF(1.75 * CARD_WIDTH, 2 * CARD_HEIGHT);
-		case Qt::PreferredSize: return QSizeF(1.75 * CARD_WIDTH, constraint.height());
-		case Qt::MaximumSize: return QSizeF(1.75 * CARD_WIDTH, constraint.height());
-		default: return QSizeF();
-	}
+	return optimumRect.size();
 }

@@ -2,6 +2,7 @@
 #include "player.h"
 #include "zoneviewwidget.h"
 #include "zoneviewzone.h"
+#include <QAction>
 
 GameScene::GameScene(QObject *parent)
 	: QGraphicsScene(parent)
@@ -78,7 +79,7 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
                 }
         }
 
-        ZoneViewWidget *item = new ZoneViewWidget(this, player, player->getZones().value(zoneName), numberCards);
+	ZoneViewWidget *item = new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards);
         views.append(item);
         connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
 	addItem(item);
@@ -94,4 +95,10 @@ void GameScene::clearViews()
 {
 	for (int i = 0; i < views.size(); ++i)
 		views[i]->close();
+}
+
+void GameScene::closeMostRecentZoneView()
+{
+	if (!views.isEmpty())
+		views.last()->close();
 }

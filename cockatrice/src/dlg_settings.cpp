@@ -167,9 +167,6 @@ void GeneralSettingsPage::retranslateUi()
 
 AppearanceSettingsPage::AppearanceSettingsPage()
 {
-	zoneBgGroupBox = new QGroupBox;
-	QSettings settings;
-	
 	handBgLabel = new QLabel;
 	handBgEdit = new QLineEdit(settingsCache->getHandBgPath());
 	handBgEdit->setReadOnly(true);
@@ -199,9 +196,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	zoneBgGrid->addWidget(playerAreaBgEdit, 2, 1);
 	zoneBgGrid->addWidget(playerAreaBgButton, 2, 2);
 
+	zoneBgGroupBox = new QGroupBox;
 	zoneBgGroupBox->setLayout(zoneBgGrid);
-	
-	tableGroupBox = new QGroupBox;
+
 	economicGridCheckBox = new QCheckBox;
 	economicGridCheckBox->setChecked(settingsCache->getEconomicGrid());
 	connect(economicGridCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setEconomicGrid(int)));
@@ -209,20 +206,21 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	QGridLayout *tableGrid = new QGridLayout;
 	tableGrid->addWidget(economicGridCheckBox, 0, 0, 1, 2);
 	
+	tableGroupBox = new QGroupBox;
 	tableGroupBox->setLayout(tableGrid);
 	
-	zoneViewGroupBox = new QGroupBox;
-	settings.beginGroup("zoneview");
-	
-	zoneViewSortingCheckBox = new QCheckBox;
-	zoneViewSortingCheckBox->setChecked(settings.value("sorting").toInt());
-	connect(zoneViewSortingCheckBox, SIGNAL(stateChanged(int)), this, SLOT(zoneViewSortingCheckBoxChanged(int)));
-	
-	settings.endGroup();
+	zoneViewSortByNameCheckBox = new QCheckBox;
+	zoneViewSortByNameCheckBox->setChecked(settingsCache->getZoneViewSortByName());
+	connect(zoneViewSortByNameCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setZoneViewSortByName(int)));
+	zoneViewSortByTypeCheckBox = new QCheckBox;
+	zoneViewSortByTypeCheckBox->setChecked(settingsCache->getZoneViewSortByType());
+	connect(zoneViewSortByTypeCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setZoneViewSortByType(int)));
 
 	QGridLayout *zoneViewGrid = new QGridLayout;
-	zoneViewGrid->addWidget(zoneViewSortingCheckBox, 0, 0, 1, 2);
-	
+	zoneViewGrid->addWidget(zoneViewSortByNameCheckBox, 0, 0, 1, 2);
+	zoneViewGrid->addWidget(zoneViewSortByTypeCheckBox, 1, 0, 1, 2);
+
+	zoneViewGroupBox = new QGroupBox;
 	zoneViewGroupBox->setLayout(zoneViewGrid);
 	
 	QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -245,7 +243,8 @@ void AppearanceSettingsPage::retranslateUi()
 	economicGridCheckBox->setText(tr("Economic layout"));
 	
 	zoneViewGroupBox->setTitle(tr("Zone view layout"));
-	zoneViewSortingCheckBox->setText(tr("Sort alphabetically by default"));
+	zoneViewSortByNameCheckBox->setText(tr("Sort by name"));
+	zoneViewSortByTypeCheckBox->setText(tr("Sort by type"));
 }
 
 void AppearanceSettingsPage::handBgButtonClicked()
@@ -276,15 +275,6 @@ void AppearanceSettingsPage::playerAreaBgButtonClicked()
 	
 	playerAreaBgEdit->setText(path);
 	settingsCache->setPlayerBgPath(path);
-}
-
-void AppearanceSettingsPage::zoneViewSortingCheckBoxChanged(int state)
-{
-	QSettings settings;
-	settings.beginGroup("zoneview");
-	settings.setValue("sorting", state);
-	
-	emit zoneViewSortingChanged(state);
 }
 
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()

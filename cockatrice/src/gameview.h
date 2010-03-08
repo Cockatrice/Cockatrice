@@ -5,6 +5,8 @@
 
 class GameView : public QGraphicsView {
 	Q_OBJECT
+private:
+	QAction *aCloseMostRecentZoneView;
 protected:
 	void resizeEvent(QResizeEvent *event);
 public slots:

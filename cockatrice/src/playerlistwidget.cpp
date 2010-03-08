@@ -80,7 +80,7 @@ void PlayerListWidget::updatePing(int playerId, int pingTime)
 	QTreeWidgetItem *twi = players.value(playerId, 0);
 	if (!twi)
 		return;
-	twi->setIcon(0, QIcon(PingPixmapGenerator::generatePixmap(10, pingTime, 10)));
+	twi->setIcon(0, QIcon(pingPixmapGenerator->generatePixmap(10, pingTime, 10)));
 }
 
 void PlayerListWidget::setGameStarted(bool _gameStarted)

@@ -66,8 +66,7 @@ private:
 	ZoneViewLayout *zoneLayout;
 	QAction *playersSeparator;
 	QMenu *playersMenu;
-	QAction *aCloseMostRecentZoneView,
-		*aConcede, *aLeaveGame, *aNextPhase, *aNextTurn, *aRemoveLocalArrows;
+	QAction *aConcede, *aLeaveGame, *aNextPhase, *aNextTurn, *aRemoveLocalArrows;
 
 	Player *addPlayer(int playerId, const QString &playerName);
 

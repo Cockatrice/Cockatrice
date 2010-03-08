@@ -1,5 +1,6 @@
 #include "cardlist.h"
 #include "carditem.h"
+#include "carddatabase.h"
 
 CardList::CardList(bool _contentsKnown)
 	: QList<CardItem *>(), contentsKnown(_contentsKnown)
@@ -32,15 +33,27 @@ CardItem *CardList::findCard(const int id, const bool remove, int *position)
 }
 
 class CardList::compareFunctor {
+private:
+	int flags;
 public:
+	compareFunctor(int _flags) : flags(_flags)
+	{
+	}
 	inline bool operator()(CardItem *a, CardItem *b) const
 	{
-		return a->getName() < b->getName();
+		if (flags & SortByType) {
+			QString t1 = a->getInfo()->getMainCardType();
+			QString t2 = b->getInfo()->getMainCardType();
+			if ((t1 == t2) && (flags & SortByName))
+				return a->getName() < b->getName();
+			return t1 < t2;
+		} else
+			return a->getName() < b->getName();
 	}
 };
 
-void CardList::sort()
+void CardList::sort(int flags)
 {
-	compareFunctor cf;
+	compareFunctor cf(flags);
 	qSort(begin(), end(), cf);
 }

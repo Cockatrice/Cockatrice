@@ -19,17 +19,17 @@ private:
 	ZoneViewZone *zone;
 	
 	QScrollBar *scrollBar;
-	QCheckBox *sortCheckBox, *shuffleCheckBox;
+	QCheckBox *sortByNameCheckBox, *sortByTypeCheckBox, *shuffleCheckBox;
 	
+	int extraHeight;
 	Player *player;
 signals:
 	void closePressed(ZoneViewWidget *zv);
-	void sizeChanged();
 private slots:
 	void resizeToZoneContents();
 	void zoneDeleted();
 public:
-	ZoneViewWidget(GameScene *_scene, Player *_player, CardZone *_origZone, int numberCards = 0);
+	ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards = 0);
 	ZoneViewZone *getZone() const { return zone; }
 	void retranslateUi();
 protected:

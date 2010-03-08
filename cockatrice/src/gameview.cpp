@@ -1,4 +1,5 @@
 #include "gameview.h"
+#include <QAction>
 
 GameView::GameView(QGraphicsScene *scene, QWidget *parent)
 	: QGraphicsView(scene, parent)
@@ -7,9 +8,13 @@ GameView::GameView(QGraphicsScene *scene, QWidget *parent)
 	setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing/* | QPainter::SmoothPixmapTransform*/);
 	setDragMode(RubberBandDrag);
 	setViewportUpdateMode(BoundingRectViewportUpdate);
-	setFocusPolicy(Qt::NoFocus);
 
 	connect(scene, SIGNAL(sceneRectChanged(const QRectF &)), this, SLOT(updateSceneRect(const QRectF &)));
+
+	aCloseMostRecentZoneView = new QAction(this);
+	aCloseMostRecentZoneView->setShortcut(tr("Esc"));
+	connect(aCloseMostRecentZoneView, SIGNAL(triggered()), scene, SLOT(closeMostRecentZoneView()));
+	addAction(aCloseMostRecentZoneView);
 }
 
 void GameView::resizeEvent(QResizeEvent *event)

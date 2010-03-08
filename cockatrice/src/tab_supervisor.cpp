@@ -98,7 +98,7 @@ void TabSupervisor::updatePingTime(int value, int max)
 	if (!tabServer)
 		return;
 	
-	setTabIcon(0, QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));
+	setTabIcon(0, QIcon(pingPixmapGenerator->generatePixmap(15, value, max)));
 }
 
 void TabSupervisor::gameJoined(Event_GameJoined *event)

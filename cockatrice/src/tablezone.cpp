@@ -53,8 +53,6 @@ void TableZone::addCardImpl(CardItem *card, int _x, int _y)
 	cards.append(card);
 	card->setGridPoint(QPoint(_x, _y));
 
-	resizeToContents();
-	
 	card->setParentItem(this);
 	card->setVisible(true);
 	card->update();
@@ -82,7 +80,8 @@ void TableZone::reorganizeCards()
 		cards[i]->setPos(x, y);
 		cards[i]->setZValue((y + CARD_HEIGHT) * 10000000 + x + 1000);
 	}
-		
+
+	resizeToContents();
 	update();
 }
 

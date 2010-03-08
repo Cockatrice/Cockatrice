@@ -25,6 +25,7 @@ public slots:
 	void addPlayer(Player *player);
 	void removePlayer(Player *player);
 	void clearViews();
+	void closeMostRecentZoneView();
 private slots:
 	void rearrange();
 };
