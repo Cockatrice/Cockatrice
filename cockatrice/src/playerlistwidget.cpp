@@ -86,6 +86,9 @@ void PlayerListWidget::updatePing(int playerId, int pingTime)
 void PlayerListWidget::setGameStarted(bool _gameStarted)
 {
 	gameStarted = _gameStarted;
-	for (int i = 0; i < players.size(); ++i)
-		players[i]->setIcon(2, gameStarted ? QIcon() : notReadyIcon);
+	QMapIterator<int, QTreeWidgetItem *> i(players);
+	while (i.hasNext()) {
+		QTreeWidgetItem *twi = i.next().value();
+		twi->setIcon(2, gameStarted ? QIcon() : notReadyIcon);
+	}
 }
