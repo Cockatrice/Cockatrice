@@ -298,27 +298,6 @@ void MessageLogWidget::connectToPlayer(Player *player)
 	connect(player, SIGNAL(logDumpZone(Player *, CardZone *, int)), this, SLOT(logDumpZone(Player *, CardZone *, int)));
 	connect(player, SIGNAL(logStopDumpZone(Player *, CardZone *)), this, SLOT(logStopDumpZone(Player *, CardZone *)));
 	connect(player, SIGNAL(logDrawCards(Player *, int)), this, SLOT(logDrawCards(Player *, int)));
-/*
-	connect(game, SIGNAL(logJoin(Player *)), this, SLOT(logJoin(Player *)));
-	connect(game, SIGNAL(logLeave(Player *)), this, SLOT(logLeave(Player *)));
-	connect(game, SIGNAL(logGameClosed()), this, SLOT(logGameClosed()));
-	connect(game, SIGNAL(logJoinSpectator(QString)), this, SLOT(logJoinSpectator(QString)));
-	connect(game, SIGNAL(logLeaveSpectator(QString)), this, SLOT(logLeaveSpectator(QString)));
-	
-	//Alert Test
-	connect(game, SIGNAL(logSay(Player *, QString)), this, SLOT(msgAlert()));
-	connect(game, SIGNAL(logJoin(Player *)), this, SLOT(msgAlert()));
-	connect(game, SIGNAL(logLeave(Player *)), this, SLOT(msgAlert()));
-	connect(game, SIGNAL(logSetActivePlayer(Player *)), this, SLOT(msgAlert()));
-	connect(game, SIGNAL(setActivePhase(int)), this, SLOT(msgAlert()));
-	connect(game, SIGNAL(logDraw(Player *, int)), this, SLOT(msgAlert()));
-	connect(game, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)), this, SLOT(msgAlert()));
-	connect(game, SIGNAL(logGameStart()), this, SLOT(msgAlert()));
-*/}
-
-void MessageLogWidget::msgAlert()
-{
-	QApplication::alert(this);
 }
 
 MessageLogWidget::MessageLogWidget(QWidget *parent)

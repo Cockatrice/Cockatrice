@@ -8,6 +8,7 @@
 PhaseButton::PhaseButton(const QIcon &icon, QAction *_doubleClickAction)
 	: QPushButton(icon, QString()), active(false), doubleClickAction(_doubleClickAction), activePixmap(50, 50), inactivePixmap(50, 50)
 {
+	setFocusPolicy(Qt::NoFocus);
 	setFixedSize(50, 50);
 	
 	updatePixmap(activePixmap, true);
@@ -79,6 +80,7 @@ PhasesToolbar::PhasesToolbar(QWidget *parent)
 		connect(buttonList[i], SIGNAL(clicked()), this, SLOT(phaseButtonClicked()));
 	
 	QPushButton *nextTurnButton = new QPushButton(QIcon(":/resources/icon_nextturn.svg"), QString());
+	nextTurnButton->setFocusPolicy(Qt::NoFocus);
 	nextTurnButton->setIconSize(QSize(40, 40));
 	nextTurnButton->setFixedSize(50, 50);
 	connect(nextTurnButton, SIGNAL(clicked()), this, SLOT(actNextTurn()));

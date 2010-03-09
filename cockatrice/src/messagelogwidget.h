@@ -47,7 +47,6 @@ public slots:
 	void logStopDumpZone(Player *player, CardZone *zone);
 	void logSetActivePlayer(Player *player);
 	void logSetActivePhase(int phase);
-	void msgAlert();
 public:
 	void connectToPlayer(Player *player);
 	MessageLogWidget(QWidget *parent = 0);
