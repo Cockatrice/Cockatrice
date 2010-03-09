@@ -39,7 +39,6 @@ void ZoneViewZone::initializeCards()
 			CardItem *card = c.at(i);
 			addCard(new CardItem(player, card->getName(), card->getId(), this), false, i);
 		}
-		emit contentsChanged();
 		reorganizeCards();
 	}
 }
@@ -56,7 +55,6 @@ void ZoneViewZone::zoneDumpReceived(ProtocolResponse *r)
 		addCard(card, false, i);
 	}
 	
-	emit contentsChanged();
 	reorganizeCards();
 }
 

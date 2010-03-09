@@ -29,7 +29,6 @@ private:
 	bool spectator;
 	int initialCards;
 	int nextCardId;
-	void clearZones();
 	bool readyStart;
 	bool conceded;
 	int deckId;
@@ -68,6 +67,7 @@ public:
 	void addCounter(Server_Counter *counter);
 	bool deleteCounter(int counterId);
 	
+	void clearZones();
 	void setupZones();
 
 	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);

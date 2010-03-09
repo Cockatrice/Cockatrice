@@ -154,6 +154,11 @@ void Server_Game::stopGameIfFinished()
 		return;
 
 	gameStarted = false;
+
+	playerIterator.toFront();
+	while (playerIterator.hasNext())
+		playerIterator.next().value()->clearZones();
+
 	playerIterator.toFront();
 	while (playerIterator.hasNext()) {
 		Server_Player *player = playerIterator.next().value();

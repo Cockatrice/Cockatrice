@@ -601,12 +601,6 @@ void Player::eventMoveCard(Event_MoveCard *event)
 	if (!startZone || !targetZone)
 		return;
 	
-	qDebug("Player::eventMoveCard --- startZone");
-	startZone->dumpObjectInfo();
-	qDebug("Player::eventMoveCard --- targetZone");
-	targetZone->dumpObjectInfo();
-	qDebug("---");
-
 	int position = event->getPosition();
 	int x = event->getX();
 	int y = event->getY();
@@ -747,13 +741,16 @@ void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/
 
 void Player::processPlayerInfo(ServerInfo_Player *info)
 {
+	QMapIterator<QString, CardZone *> zoneIt(zones);
+	while (zoneIt.hasNext())
+		zoneIt.next().value()->clearContents();
+
 	for (int i = 0; i < info->getZoneList().size(); ++i) {
 		ServerInfo_Zone *zoneInfo = info->getZoneList()[i];
 		CardZone *zone = zones.value(zoneInfo->getName(), 0);
 		if (!zone)
 			continue;
 
-		zone->clearContents();
 		const QList<ServerInfo_Card *> &cardList = zoneInfo->getCardList();
 		if (cardList.isEmpty()) {
 			for (int j = 0; j < zoneInfo->getCardCount(); ++j)

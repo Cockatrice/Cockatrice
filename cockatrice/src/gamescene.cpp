@@ -83,6 +83,7 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
         views.append(item);
         connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
 	addItem(item);
+	item->setPos(100, 100);
 }
 
 void GameScene::removeZoneView(ZoneViewWidget *item)

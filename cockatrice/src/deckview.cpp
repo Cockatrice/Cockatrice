@@ -3,7 +3,6 @@
 #include "decklist.h"
 #include "carddatabase.h"
 #include "main.h"
-#include <QDebug>
 
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag)
 	: AbstractCardDragItem(_item, _hotSpot, parentDrag)

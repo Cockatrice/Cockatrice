@@ -82,18 +82,14 @@ void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void CardZone::addCard(CardItem *card, bool reorganize, int x, int y)
 {
-	dumpObjectInfo();
 	if (view)
 		if ((x <= view->getCards().size()) || (view->getNumberCards() == -1))
 			view->addCard(new CardItem(player, card->getName(), card->getId()), reorganize, x, y);
 
 	addCardImpl(card, x, y);
 
-	if (reorganize) {
-		qDebug("------------ emitting");
-		emit contentsChanged();
+	if (reorganize)
 		reorganizeCards();
-	}
 }
 
 CardItem *CardZone::getCard(int cardId, const QString &cardName)
@@ -137,7 +133,6 @@ CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName, 
 	c->setId(cardId);
 	c->setName(cardName);
 
-	emit contentsChanged();
 	reorganizeCards();
 	return c;
 }

@@ -53,9 +53,6 @@ int Server_Player::newArrowId() const
 
 void Server_Player::setupZones()
 {
-	// Delete existing zones and counters
-	clearZones();
-
 	// This may need to be customized according to the game rules.
 	// ------------------------------------------------------------------
 

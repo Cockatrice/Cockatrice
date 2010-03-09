@@ -5,7 +5,6 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QCursor>
-#include <QDebug>
 
 CardDragItem::CardDragItem(AbstractCardItem *_item, int _id, const QPointF &_hotSpot, bool _faceDown, AbstractCardDragItem *parentDrag)
 	: AbstractCardDragItem(_item, _hotSpot, parentDrag), id(_id), faceDown(_faceDown), currentZone(0)
@@ -20,21 +19,16 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
 	ZoneViewZone *zoneViewZone = 0;
 	for (int i = colliding.size() - 1; i >= 0; i--) {
 		CardZone *temp = qgraphicsitem_cast<CardZone *>(colliding.at(i));
-		if (temp)
-			qDebug() << "zone name:" << temp->getName();
 		if (!cardZone)
 			cardZone = temp;
 		if (!zoneViewZone)
 			zoneViewZone = qobject_cast<ZoneViewZone *>(temp);
 	}
 	CardZone *cursorZone = 0;
-	if (zoneViewZone) {
-		qDebug() << "zv found";
+	if (zoneViewZone)
 		cursorZone = zoneViewZone;
-	} else if (cardZone) {
-		qDebug() << "normal found";
+	else if (cardZone)
 		cursorZone = cardZone;
-	}
 	if (!cursorZone)
 		return;
 	currentZone = cursorZone;
