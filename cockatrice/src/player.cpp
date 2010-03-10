@@ -617,6 +617,8 @@ void Player::eventMoveCard(Event_MoveCard *event)
 
 	card->setId(event->getNewCardId());
 	card->setFaceDown(event->getFaceDown());
+	if (startZone != targetZone)
+		card->setBeingPointedAt(false);
 
 	// The log event has to be sent before the card is added to the target zone
 	// because the addCard function can modify the card object.
