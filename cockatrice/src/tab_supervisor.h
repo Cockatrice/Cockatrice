@@ -31,6 +31,7 @@ public:
 	void retranslateUi();
 	void start(Client *_client);
 	void stop();
+	int getGameCount() const { return gameTabs.size(); }
 signals:
 	void setMenu(QMenu *menu);
 private slots:

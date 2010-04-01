@@ -207,8 +207,15 @@ MainWindow::MainWindow(QWidget *parent)
 	resize(900, 700);
 }
 
-void MainWindow::closeEvent(QCloseEvent */*event*/)
+void MainWindow::closeEvent(QCloseEvent *event)
 {
+	if (tabSupervisor->getGameCount()) {
+		if (QMessageBox::question(this, tr("Are you sure?"), tr("There are still open games. Are you sure you want to quit?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
+			event->ignore();
+			return;
+		}
+	}
+	event->accept();
 	delete tabSupervisor;
 }
 

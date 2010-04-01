@@ -552,7 +552,7 @@
 <context>
     <name>GameView</name>
     <message>
-        <location filename="../src/gameview.cpp" line="15"/>
+        <location filename="../src/gameview.cpp" line="16"/>
         <source>Esc</source>
         <translation type="unfinished"></translation>
     </message>
@@ -735,6 +735,16 @@
     <message>
         <location filename="../src/window_main.cpp" line="147"/>
         <source>&amp;Cockatrice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="213"/>
+        <source>Are you sure?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="213"/>
+        <source>There are still open games. Are you sure you want to quit?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1107,57 +1117,57 @@
 <context>
     <name>PhasesToolbar</name>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="115"/>
+        <location filename="../src/phasestoolbar.cpp" line="117"/>
         <source>Untap step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="116"/>
+        <location filename="../src/phasestoolbar.cpp" line="118"/>
         <source>Upkeep step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="117"/>
+        <location filename="../src/phasestoolbar.cpp" line="119"/>
         <source>Draw step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="118"/>
+        <location filename="../src/phasestoolbar.cpp" line="120"/>
         <source>First main phase</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="119"/>
+        <location filename="../src/phasestoolbar.cpp" line="121"/>
         <source>Beginning of combat step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="120"/>
+        <location filename="../src/phasestoolbar.cpp" line="122"/>
         <source>Declare attackers step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="121"/>
+        <location filename="../src/phasestoolbar.cpp" line="123"/>
         <source>Declare blockers step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="122"/>
+        <location filename="../src/phasestoolbar.cpp" line="124"/>
         <source>Combat damage step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="123"/>
+        <location filename="../src/phasestoolbar.cpp" line="125"/>
         <source>End of combat step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="124"/>
+        <location filename="../src/phasestoolbar.cpp" line="126"/>
         <source>Second main phase</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="125"/>
+        <location filename="../src/phasestoolbar.cpp" line="127"/>
         <source>End of turn step</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1463,7 +1473,7 @@
     </message>
     <message>
         <location filename="../src/player.cpp" line="430"/>
-        <location filename="../src/player.cpp" line="965"/>
+        <location filename="../src/player.cpp" line="964"/>
         <source>Number:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1488,7 +1498,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="965"/>
+        <location filename="../src/player.cpp" line="964"/>
         <source>Set counters</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1552,17 +1562,17 @@
 <context>
     <name>RemoteDeckList_TreeModel</name>
     <message>
-        <location filename="../src/remotedecklist_treewidget.cpp" line="153"/>
+        <location filename="../src/remotedecklist_treewidget.cpp" line="157"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/remotedecklist_treewidget.cpp" line="154"/>
+        <location filename="../src/remotedecklist_treewidget.cpp" line="158"/>
         <source>ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/remotedecklist_treewidget.cpp" line="155"/>
+        <location filename="../src/remotedecklist_treewidget.cpp" line="159"/>
         <source>Upload time</source>
         <translation type="unfinished"></translation>
     </message>
