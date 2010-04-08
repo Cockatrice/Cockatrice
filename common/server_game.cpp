@@ -198,11 +198,12 @@ void Server_Game::removePlayer(Server_Player *player)
 {
 	players.remove(player->getPlayerId());
 	sendGameEvent(new Event_Leave(player->getPlayerId()));
+	bool spectator = player->getSpectator();
 	delete player;
 	
 	if (!getPlayerCount())
 		deleteLater();
-	else
+	else if (!spectator)
 		stopGameIfFinished();
 	qobject_cast<Server *>(parent())->broadcastGameListUpdate(this);
 }

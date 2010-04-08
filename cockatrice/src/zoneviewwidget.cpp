@@ -12,6 +12,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 	: QGraphicsWidget(0, Qt::Tool | Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint/* | Qt::WindowCloseButtonHint*/), player(_player)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
+	setZValue(100);
 	
 	QFont font;
 	font.setPixelSize(10);
