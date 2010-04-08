@@ -9,6 +9,9 @@
 #include <QPainter>
 #include <QUrl>
 #include <QSet>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 
 CardSet::CardSet(const QString &_shortName, const QString &_longName)
 	: shortName(_shortName), longName(_longName)
@@ -235,8 +238,8 @@ CardDatabase::CardDatabase(QObject *parent)
 	connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabase()));
 	connect(settingsCache, SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
 	
-	http = new QHttp(this);
-	connect(http, SIGNAL(requestFinished(int, bool)), this, SLOT(picDownloadFinished(int, bool)));
+	networkManager = new QNetworkAccessManager(this);
+	connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
 
 	loadCardDatabase();
 
@@ -317,46 +320,54 @@ void CardDatabase::clearPixmapCache()
 
 void CardDatabase::startPicDownload(CardInfo *card)
 {
-	QBuffer *buffer = new QBuffer(this);
-	buffer->open(QIODevice::ReadWrite);
-	QUrl url(card->getPicURL());
-	http->setHost(url.host(), url.port(80));
-	int dlID = http->get(url.path(), buffer);
-	downloadBuffers.insert(dlID, QPair<CardInfo *, QBuffer *>(card, buffer));
-}
-
-void CardDatabase::picDownloadFinished(int id, bool error)
-{
-	if (!downloadBuffers.contains(id))
+	if (card->getPicURL().isEmpty())
 		return;
 	
-	const QPair<CardInfo *, QBuffer *> &temp = downloadBuffers.value(id);
-	CardInfo *card = temp.first;
-	QBuffer *buffer = temp.second;
-	downloadBuffers.remove(id);
-	buffer->close();
-	
-	if (!error) {
-		QString picsPath = settingsCache->getPicsPath();
-		const QByteArray &picData = buffer->data();
-		QPixmap testPixmap;
-		if (testPixmap.loadFromData(picData)) {
-			if (!QDir(QString(picsPath + "/downloadedPics/")).exists()) {
-				QDir dir(picsPath);
-				if (!dir.exists())
-					return;
-				dir.mkdir("downloadedPics");
-			}
-			QFile newPic(picsPath + "/downloadedPics/" + card->getCorrectedName() + ".full.jpg");
-			if (!newPic.open(QIODevice::WriteOnly))
-				return;
-			newPic.write(picData);
-			newPic.close();
-			
-			card->updatePixmapCache();
-		}
+	cardsToDownload.append(card);
+	if (!downloadRunning)
+		startNextPicDownload();
+}
+
+void CardDatabase::startNextPicDownload()
+{
+	if (cardsToDownload.isEmpty()) {
+		downloadRunning = false;
+		return;
 	}
-	delete buffer;
+	
+	downloadRunning = true;
+	
+	CardInfo *card = cardsToDownload.takeFirst();
+	QNetworkRequest req(QUrl(card->getPicURL()));
+	req.setOriginatingObject(card);
+	networkManager->get(req);
+}
+
+void CardDatabase::picDownloadFinished(QNetworkReply *reply)
+{
+	CardInfo *card = static_cast<CardInfo *>(reply->request().originatingObject());
+	
+	QString picsPath = settingsCache->getPicsPath();
+	const QByteArray &picData = reply->readAll();
+	QPixmap testPixmap;
+	if (testPixmap.loadFromData(picData)) {
+		if (!QDir(QString(picsPath + "/downloadedPics/")).exists()) {
+			QDir dir(picsPath);
+			if (!dir.exists())
+				return;
+			dir.mkdir("downloadedPics");
+		}
+		QFile newPic(picsPath + "/downloadedPics/" + card->getCorrectedName() + ".full.jpg");
+		if (!newPic.open(QIODevice::WriteOnly))
+			return;
+		newPic.write(picData);
+		newPic.close();
+		
+		card->updatePixmapCache();
+	}
+	
+	reply->deleteLater();
+	startNextPicDownload();
 }
 
 void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)

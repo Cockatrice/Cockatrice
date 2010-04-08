@@ -7,11 +7,12 @@
 #include <QDataStream>
 #include <QList>
 #include <QXmlStreamReader>
-#include <QHttp>
-#include <QBuffer>
 
 class CardDatabase;
 class CardInfo;
+class QNetworkAccessManager;
+class QNetworkReply;
+class QNetworkRequest;
 
 class CardSet : public QList<CardInfo *> {
 private:
@@ -93,13 +94,14 @@ class CardDatabase : public QObject {
 protected:
 	QHash<QString, CardInfo *> cardHash;
 	QHash<QString, CardSet *> setHash;
-	QMap<int, QPair<CardInfo *, QBuffer *> > downloadBuffers;
+	QNetworkAccessManager *networkManager;
+	QList<CardInfo *> cardsToDownload;
+	bool downloadRunning;
 	CardInfo *noCard;
 private:
 	void loadCardsFromXml(QXmlStreamReader &xml);
 	void loadSetsFromXml(QXmlStreamReader &xml);
-	bool picDownload;
-	QHttp *http;
+	void startNextPicDownload();
 public:
 	CardDatabase(QObject *parent = 0);
 	~CardDatabase();
@@ -116,7 +118,7 @@ public:
 public slots:
 	void clearPixmapCache();
 private slots:
-	void picDownloadFinished(int id, bool error);
+	void picDownloadFinished(QNetworkReply *reply);
 	void loadCardDatabase();
 	void picDownloadChanged();
 };
