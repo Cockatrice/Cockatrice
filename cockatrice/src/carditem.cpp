@@ -127,12 +127,15 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	} else {
 		if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < 2 * QApplication::startDragDistance())
 			return;
+		if (!owner->getLocal())
+			return;
+		
 		bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier) || facedown;
 	
 		createDragItem(id, event->pos(), event->scenePos(), faceDown);
 		dragItem->grabMouse();
 		
-		CardZone *zone = (CardZone *) parentItem();
+		CardZone *zone = static_cast<CardZone *>(parentItem());
 	
 		QList<QGraphicsItem *> sel = scene()->selectedItems();
 		int j = 0;

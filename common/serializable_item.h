@@ -1,6 +1,7 @@
 #ifndef SERIALIZABLE_ITEM_H
 #define SERIALIZABLE_ITEM_H
 
+#include <QtCore/QXmlStreamWriter>
 #include <QObject>
 #include <QMap>
 #include <QList>

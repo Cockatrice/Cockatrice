@@ -47,11 +47,12 @@ void PlayerListWidget::updatePlayerProperties(ServerInfo_PlayerProperties *prop)
 	player->setText(3, prop->getName());
 
 	QString deckText;
-	switch (prop->getDeckId()) {
-		case -2: deckText = tr("no deck"); break;
-		case -1: deckText = tr("local deck"); break;
-		default: deckText = tr("ID #%1").arg(prop->getDeckId());
-	}
+	if (!prop->getSpectator())
+		switch (prop->getDeckId()) {
+			case -2: deckText = tr("no deck"); break;
+			case -1: deckText = tr("local deck"); break;
+			default: deckText = tr("ID #%1").arg(prop->getDeckId());
+		}
 	player->setText(4, deckText);
 }
 

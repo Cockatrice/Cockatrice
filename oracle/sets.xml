@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<cockatrice_setdatabase version="20091017">
+<cockatrice_setdatabase version="20100416">
 	<picture_url>http://www.wizards.com/global/images/magic/general/%1.jpg</picture_url>
 	<set_url>http://gatherer.wizards.com/Pages/Search/Default.aspx?output=spoiler&amp;method=text&amp;set=[&quot;!longname!&quot;]</set_url>
         <set import="1">
@@ -293,5 +293,9 @@
         <set import="1">
             <name>ZEN</name>
             <longname>Zendikar</longname>
+        </set>
+        <set import="1">
+            <name>ROE</name>
+            <longname>Rise of the Eldrazi</longname>
         </set>
 </cockatrice_setdatabase>
