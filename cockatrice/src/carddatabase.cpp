@@ -331,22 +331,20 @@ void CardDatabase::startPicDownload(CardInfo *card)
 void CardDatabase::startNextPicDownload()
 {
 	if (cardsToDownload.isEmpty()) {
+		cardBeingDownloaded = 0;
 		downloadRunning = false;
 		return;
 	}
 	
 	downloadRunning = true;
 	
-	CardInfo *card = cardsToDownload.takeFirst();
-	QNetworkRequest req(QUrl(card->getPicURL()));
-	req.setOriginatingObject(card);
+	cardBeingDownloaded = cardsToDownload.takeFirst();
+	QNetworkRequest req(QUrl(cardBeingDownloaded->getPicURL()));
 	networkManager->get(req);
 }
 
 void CardDatabase::picDownloadFinished(QNetworkReply *reply)
 {
-	CardInfo *card = static_cast<CardInfo *>(reply->request().originatingObject());
-	
 	QString picsPath = settingsCache->getPicsPath();
 	const QByteArray &picData = reply->readAll();
 	QPixmap testPixmap;
@@ -357,13 +355,13 @@ void CardDatabase::picDownloadFinished(QNetworkReply *reply)
 				return;
 			dir.mkdir("downloadedPics");
 		}
-		QFile newPic(picsPath + "/downloadedPics/" + card->getCorrectedName() + ".full.jpg");
+		QFile newPic(picsPath + "/downloadedPics/" + cardBeingDownloaded->getCorrectedName() + ".full.jpg");
 		if (!newPic.open(QIODevice::WriteOnly))
 			return;
 		newPic.write(picData);
 		newPic.close();
 		
-		card->updatePixmapCache();
+		cardBeingDownloaded->updatePixmapCache();
 	}
 	
 	reply->deleteLater();

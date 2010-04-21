@@ -7,6 +7,7 @@
 #include <QDataStream>
 #include <QList>
 #include <QXmlStreamReader>
+#include <QNetworkRequest>
 
 class CardDatabase;
 class CardInfo;
@@ -96,6 +97,7 @@ protected:
 	QHash<QString, CardSet *> setHash;
 	QNetworkAccessManager *networkManager;
 	QList<CardInfo *> cardsToDownload;
+	CardInfo *cardBeingDownloaded;
 	bool downloadRunning;
 	CardInfo *noCard;
 private:
