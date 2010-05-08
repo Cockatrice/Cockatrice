@@ -1,24 +1,21 @@
 #include <QtGui>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include "window_main.h"
 #include "oracleimporter.h"
+
+const QString WindowMain::defaultSetsUrl = QString("http://www.cockatrice.de/files/sets.xml");
 
 WindowMain::WindowMain(QWidget *parent)
 	: QMainWindow(parent)
 {
-	importer = new OracleImporter(qApp->applicationDirPath() + "/../oracle", this);
+	importer = new OracleImporter(qApp->applicationDirPath(), this);
+	nam = new QNetworkAccessManager(this);
 	
-	QVBoxLayout *checkboxLayout = new QVBoxLayout;
-	QList<SetToDownload> &sets = importer->getSets();
-	for (int i = 0; i < sets.size(); ++i) {
-		QCheckBox *checkBox = new QCheckBox(sets[i].getLongName());
-		checkBox->setChecked(sets[i].getImport());
-		connect(checkBox, SIGNAL(stateChanged(int)), this, SLOT(checkBoxChanged(int)));
-		checkboxLayout->addWidget(checkBox);
-		checkBoxList << checkBox;
-	}
+	checkBoxLayout = new QVBoxLayout;
 	
 	QWidget *checkboxFrame = new QWidget;
-	checkboxFrame->setLayout(checkboxLayout);
+	checkboxFrame->setLayout(checkBoxLayout);
 	
 	QScrollArea *checkboxArea = new QScrollArea;
 	checkboxArea->setWidget(checkboxFrame);
@@ -61,10 +58,66 @@ WindowMain::WindowMain(QWidget *parent)
 	
 	connect(importer, SIGNAL(setIndexChanged(int, int, const QString &)), this, SLOT(updateTotalProgress(int, int, const QString &)));
 	connect(importer, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateFileProgress(int, int)));
-	totalProgressBar->setMaximum(importer->getSetsCount());
+	
+	aLoadSetsFile = new QAction(tr("Load sets information from &file..."), this);
+	connect(aLoadSetsFile, SIGNAL(triggered()), this, SLOT(actLoadSetsFile()));
+	aDownloadSetsFile = new QAction(tr("&Download sets information..."), this);
+	connect(aDownloadSetsFile, SIGNAL(triggered()), this, SLOT(actDownloadSetsFile()));
+	aExit = new QAction(tr("E&xit"), this);
+	connect(aExit, SIGNAL(triggered()), this, SLOT(close()));
+	
+	fileMenu = menuBar()->addMenu(tr("&File"));
+	fileMenu->addAction(aLoadSetsFile);
+	fileMenu->addAction(aDownloadSetsFile);
+	fileMenu->addSeparator();
+	fileMenu->addAction(aExit);
 	
 	setWindowTitle(tr("Oracle importer"));
-	setFixedSize(500, 300);
+	setFixedSize(600, 500);
+}
+
+void WindowMain::updateSetList()
+{
+	for (int i = 0; i < checkBoxList.size(); ++i)
+		delete checkBoxList[i];
+	checkBoxList.clear();
+	
+	QList<SetToDownload> &sets = importer->getSets();
+	for (int i = 0; i < sets.size(); ++i) {
+		QCheckBox *checkBox = new QCheckBox(sets[i].getLongName());
+		checkBox->setChecked(sets[i].getImport());
+		connect(checkBox, SIGNAL(stateChanged(int)), this, SLOT(checkBoxChanged(int)));
+		checkBoxLayout->addWidget(checkBox);
+		checkBoxList << checkBox;
+	}
+}
+
+void WindowMain::actLoadSetsFile()
+{
+	QFileDialog dialog(this, tr("Load sets file"));
+	dialog.setFileMode(QFileDialog::ExistingFile);
+	dialog.setNameFilter("Sets XML file (*.xml)");
+	if (!dialog.exec())
+		return;
+
+	QString fileName = dialog.selectedFiles().at(0);
+	importer->readSetsFromFile(fileName);
+	updateSetList();
+}
+
+void WindowMain::actDownloadSetsFile()
+{
+	QString url = QInputDialog::getText(this, tr("Load sets from URL"), tr("Please enter the URL of the sets file:"), QLineEdit::Normal, defaultSetsUrl);
+	QNetworkReply *reply = nam->get(QNetworkRequest(url));
+	connect(reply, SIGNAL(finished()), this, SLOT(setsDownloadFinished()));
+}
+
+void WindowMain::setsDownloadFinished()
+{
+	QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
+	importer->readSetsFromByteArray(reply->readAll());
+	reply->deleteLater();
+	updateSetList();
 }
 
 void WindowMain::updateTotalProgress(int cardsImported, int setIndex, const QString &nextSetName)
@@ -91,7 +144,8 @@ void WindowMain::actStart()
 	startButton->setEnabled(false);
 	for (int i = 0; i < checkBoxList.size(); ++i)
 		checkBoxList[i]->setEnabled(false);
-	importer->downloadNextFile();
+	int setsCount = importer->startDownload();
+	totalProgressBar->setMaximum(setsCount);
 }
 
 void WindowMain::checkBoxChanged(int state)

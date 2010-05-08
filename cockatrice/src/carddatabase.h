@@ -99,6 +99,7 @@ protected:
 	QList<CardInfo *> cardsToDownload;
 	CardInfo *cardBeingDownloaded;
 	bool downloadRunning;
+	bool loadSuccess;
 	CardInfo *noCard;
 private:
 	void loadCardsFromXml(QXmlStreamReader &xml);
@@ -112,16 +113,17 @@ public:
 	CardSet *getSet(const QString &setName);
 	QList<CardInfo *> getCardList() const { return cardHash.values(); }
 	SetList getSetList() const;
-	int loadFromFile(const QString &fileName);
+	bool loadFromFile(const QString &fileName);
 	bool saveToFile(const QString &fileName);
 	void startPicDownload(CardInfo *card);
 	QStringList getAllColors() const;
 	QStringList getAllMainCardTypes() const;
+	bool getLoadSuccess() const { return loadSuccess; }
 public slots:
 	void clearPixmapCache();
 private slots:
 	void picDownloadFinished(QNetworkReply *reply);
-	void loadCardDatabase();
+	bool loadCardDatabase();
 	void picDownloadChanged();
 };
 

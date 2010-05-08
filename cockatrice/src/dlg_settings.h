@@ -13,6 +13,7 @@ class QComboBox;
 class QGroupBox;
 class QCheckBox;
 class QLabel;
+class QCloseEvent;
 
 class AbstractSettingsPage : public QWidget {
 public:
@@ -107,6 +108,7 @@ private:
 	void retranslateUi();
 protected:
 	void changeEvent(QEvent *event);
+	void closeEvent(QCloseEvent *event);
 };
 
 #endif 

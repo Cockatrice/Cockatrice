@@ -454,6 +454,21 @@ void DlgSettings::changeEvent(QEvent *event)
 	QDialog::changeEvent(event);
 }
 
+void DlgSettings::closeEvent(QCloseEvent *event)
+{
+	if (!db->getLoadSuccess()) {
+		QMessageBox::critical(this, tr("Error"), tr("Your card database is invalid. Please check if the path is set correctly."));
+		event->ignore();
+	} else if (!QDir(settingsCache->getDeckPath()).exists()) {
+		QMessageBox::critical(this, tr("Error"), tr("The path to your deck directory is invalid."));
+		event->ignore();
+	} else if (!QDir(settingsCache->getPicsPath()).exists()) {
+		QMessageBox::critical(this, tr("Error"), tr("The path to your card pictures directory is invalid."));
+		event->ignore();
+	} else
+		event->accept();
+}
+
 void DlgSettings::retranslateUi()
 {
 	setWindowTitle(tr("Settings"));

@@ -26,10 +26,12 @@
 #include <QDateTime>
 #include <QSettings>
 #include <QIcon>
+#include <QDir>
 #include <stdio.h>
 
 #include "main.h"
 #include "window_main.h"
+#include "dlg_settings.h"
 #include "carddatabase.h"
 #include "settingscache.h"
 #include "pingpixmapgenerator.h"
@@ -80,20 +82,30 @@ int main(int argc, char *argv[])
 	
 	qsrand(QDateTime::currentDateTime().toTime_t());
 	
-	MainWindow ui;
-	qDebug("main(): MainWindow constructor finished");
+	bool startMainProgram = true;
+	if (!db->getLoadSuccess() || !QDir(settingsCache->getDeckPath()).exists() || !QDir(settingsCache->getPicsPath()).exists()) {
+		DlgSettings dlgSettings;
+		dlgSettings.show();
+		app.exec();
+		startMainProgram = (db->getLoadSuccess() && QDir(settingsCache->getDeckPath()).exists() && QDir(settingsCache->getPicsPath()).exists());
+	}
 	
-	QIcon icon(":/resources/appicon.svg");
-	ui.setWindowIcon(icon);
-	
-	ui.show();
-	qDebug("main(): ui.show() finished");
-
-	int retval = app.exec();
+	if (startMainProgram) {
+		MainWindow ui;
+		qDebug("main(): MainWindow constructor finished");
+		
+		QIcon icon(":/resources/appicon.svg");
+		ui.setWindowIcon(icon);
+		
+		ui.show();
+		qDebug("main(): ui.show() finished");
+		
+		app.exec();
+	}
 
 	delete pingPixmapGenerator;
 	delete db;
 	delete settingsCache;
 
-	return retval;
+	return 0;
 }
