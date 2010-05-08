@@ -564,32 +564,54 @@
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="459"/>
+        <location filename="../src/dlg_settings.cpp" line="460"/>
+        <location filename="../src/dlg_settings.cpp" line="463"/>
+        <location filename="../src/dlg_settings.cpp" line="466"/>
+        <source>Error</source>
+        <translation>Fehler</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="460"/>
+        <source>Your card database is invalid. Please check if the path is set correctly.</source>
+        <translation>Ihre Kartendatenbank ist ungültig. Bitte überprüfen Sie, ob der Pfad korrekt gesetzt ist.</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="463"/>
+        <source>The path to your deck directory is invalid.</source>
+        <translation>Der Pfad zum Deckverzeichnis ist ungültig.</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="466"/>
+        <source>The path to your card pictures directory is invalid.</source>
+        <translation>Der Pfad zum Kartenbilderverzeichnis ist ungültig.</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="474"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="461"/>
+        <location filename="../src/dlg_settings.cpp" line="476"/>
         <source>General</source>
         <translation>Allgemeines</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="462"/>
+        <location filename="../src/dlg_settings.cpp" line="477"/>
         <source>Appearance</source>
         <translation>Erscheinungsbild</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="463"/>
+        <location filename="../src/dlg_settings.cpp" line="478"/>
         <source>User interface</source>
         <translation>Bedienung</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="464"/>
+        <location filename="../src/dlg_settings.cpp" line="479"/>
         <source>Messages</source>
         <translation>Nachrichten</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="466"/>
+        <location filename="../src/dlg_settings.cpp" line="481"/>
         <source>&amp;Close</source>
         <translation>S&amp;chließen</translation>
     </message>
@@ -2237,17 +2259,17 @@
         <translation>Deck</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="51"/>
+        <location filename="../src/playerlistwidget.cpp" line="52"/>
         <source>no deck</source>
         <translation>kein Deck</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="52"/>
+        <location filename="../src/playerlistwidget.cpp" line="53"/>
         <source>local deck</source>
         <translation>lokales Deck</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="53"/>
+        <location filename="../src/playerlistwidget.cpp" line="54"/>
         <source>ID #%1</source>
         <translation>ID #%1</translation>
     </message>
@@ -2770,17 +2792,17 @@ Willst du die Änderungen speichern?</translation>
         <translation type="obsolete">alphabetisch sortieren</translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="70"/>
+        <location filename="../src/zoneviewwidget.cpp" line="71"/>
         <source>sort by name</source>
         <translation>nach Namen sortieren</translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="72"/>
+        <location filename="../src/zoneviewwidget.cpp" line="73"/>
         <source>sort by type</source>
         <translation>nach Kartentypen sortieren</translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="74"/>
+        <location filename="../src/zoneviewwidget.cpp" line="75"/>
         <source>shuffle when closing</source>
         <translation>beim Schließen mischen</translation>
     </message>
