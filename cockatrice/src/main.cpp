@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 	MainWindow ui;
 	qDebug("main(): MainWindow constructor finished");
 	
-	QIcon icon(":/resources/icon.svg");
+	QIcon icon(":/resources/appicon.svg");
 	ui.setWindowIcon(icon);
 	
 	ui.show();
