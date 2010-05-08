@@ -74,6 +74,10 @@ WindowMain::WindowMain(QWidget *parent)
 	
 	setWindowTitle(tr("Oracle importer"));
 	setFixedSize(600, 500);
+
+	QStringList args = qApp->arguments();
+	if (args.contains("-dlsets"))
+		downloadSetsFile(defaultSetsUrl);
 }
 
 void WindowMain::updateSetList()
@@ -108,6 +112,12 @@ void WindowMain::actLoadSetsFile()
 void WindowMain::actDownloadSetsFile()
 {
 	QString url = QInputDialog::getText(this, tr("Load sets from URL"), tr("Please enter the URL of the sets file:"), QLineEdit::Normal, defaultSetsUrl);
+	if (!url.isEmpty())
+		downloadSetsFile(url);
+}
+
+void WindowMain::downloadSetsFile(const QString &url)
+{
 	QNetworkReply *reply = nam->get(QNetworkRequest(url));
 	connect(reply, SIGNAL(finished()), this, SLOT(setsDownloadFinished()));
 }

@@ -31,6 +31,8 @@ private:
 	QTextEdit *messageLog;
 	QVBoxLayout *checkBoxLayout;
 	QList<QCheckBox *> checkBoxList;
+	
+	void downloadSetsFile(const QString &url);
 private slots:
 	void updateTotalProgress(int cardsImported, int setIndex, const QString &nextSetName);
 	void updateFileProgress(int bytesRead, int totalBytes);
