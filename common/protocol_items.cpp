@@ -58,13 +58,16 @@ Command_ListGames::Command_ListGames()
 	: Command("list_games")
 {
 }
-Command_CreateGame::Command_CreateGame(const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed)
+Command_CreateGame::Command_CreateGame(const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything)
 	: Command("create_game")
 {
 	insertItem(new SerializableItem_String("description", _description));
 	insertItem(new SerializableItem_String("password", _password));
 	insertItem(new SerializableItem_Int("max_players", _maxPlayers));
 	insertItem(new SerializableItem_Bool("spectators_allowed", _spectatorsAllowed));
+	insertItem(new SerializableItem_Bool("spectators_need_password", _spectatorsNeedPassword));
+	insertItem(new SerializableItem_Bool("spectators_can_talk", _spectatorsCanTalk));
+	insertItem(new SerializableItem_Bool("spectators_see_everything", _spectatorsSeeEverything));
 }
 Command_JoinGame::Command_JoinGame(int _gameId, const QString &_password, bool _spectator)
 	: Command("join_game")
@@ -297,13 +300,15 @@ Event_ServerMessage::Event_ServerMessage(const QString &_message)
 {
 	insertItem(new SerializableItem_String("message", _message));
 }
-Event_GameJoined::Event_GameJoined(int _gameId, const QString &_gameDescription, int _playerId, bool _spectator, bool _resuming)
+Event_GameJoined::Event_GameJoined(int _gameId, const QString &_gameDescription, int _playerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
 	: GenericEvent("game_joined")
 {
 	insertItem(new SerializableItem_Int("game_id", _gameId));
 	insertItem(new SerializableItem_String("game_description", _gameDescription));
 	insertItem(new SerializableItem_Int("player_id", _playerId));
 	insertItem(new SerializableItem_Bool("spectator", _spectator));
+	insertItem(new SerializableItem_Bool("spectators_can_talk", _spectatorsCanTalk));
+	insertItem(new SerializableItem_Bool("spectators_see_everything", _spectatorsSeeEverything));
 	insertItem(new SerializableItem_Bool("resuming", _resuming));
 }
 Event_ChatJoinChannel::Event_ChatJoinChannel(const QString &_channel, const QString &_playerName)

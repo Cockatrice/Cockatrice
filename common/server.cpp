@@ -32,9 +32,9 @@ Server::~Server()
 {
 }
 
-Server_Game *Server::createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, Server_ProtocolHandler *creator)
+Server_Game *Server::createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator)
 {
-	Server_Game *newGame = new Server_Game(creator, nextGameId++, description, password, maxPlayers, spectatorsAllowed, this);
+	Server_Game *newGame = new Server_Game(creator, nextGameId++, description, password, maxPlayers, spectatorsAllowed, spectatorsNeedPassword, spectatorsCanTalk, spectatorsSeeEverything, this);
 	games.insert(newGame->getGameId(), newGame);
 	connect(newGame, SIGNAL(gameClosing()), this, SLOT(gameClosing()));
 	
@@ -84,6 +84,7 @@ void Server::broadcastGameListUpdate(Server_Game *game)
 			game->getMaxPlayers(),
 			game->getCreatorName(),
 			game->getSpectatorsAllowed(),
+			game->getSpectatorsNeedPassword(),
 			game->getSpectatorCount()
 		));
 	else

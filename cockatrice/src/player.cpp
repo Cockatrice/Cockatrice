@@ -43,7 +43,7 @@ Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabG
 
 	table = new TableZone(this, this);
 	connect(table, SIGNAL(sizeChanged()), this, SLOT(updateBoundingRect()));
-	hand = new HandZone(this, (int) table->boundingRect().height(), this);
+	hand = new HandZone(this, _local || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()), (int) table->boundingRect().height(), this);
 	
 	base = QPointF(deck->boundingRect().width() + counterAreaWidth + 5, 0);
 	hand->setPos(base);

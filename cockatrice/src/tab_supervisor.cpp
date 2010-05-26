@@ -103,7 +103,7 @@ void TabSupervisor::updatePingTime(int value, int max)
 
 void TabSupervisor::gameJoined(Event_GameJoined *event)
 {
-	TabGame *tab = new TabGame(client, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getResuming());
+	TabGame *tab = new TabGame(client, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	myAddTab(tab);
 	gameTabs.insert(event->getGameId(), tab);

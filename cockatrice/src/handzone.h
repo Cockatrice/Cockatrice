@@ -11,7 +11,7 @@ private:
 private slots:	
 	void updateBgPixmap();
 public:
-	HandZone(Player *_p, int _zoneHeight, QGraphicsItem *parent = 0);
+	HandZone(Player *_p, bool _contentsKnown, int _zoneHeight, QGraphicsItem *parent = 0);
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	void reorganizeCards();

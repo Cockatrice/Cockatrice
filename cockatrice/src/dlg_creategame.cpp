@@ -14,11 +14,25 @@ DlgCreateGame::DlgCreateGame(Client *_client, QWidget *parent)
 	passwordLabel->setBuddy(passwordEdit);
 
 	maxPlayersLabel = new QLabel(tr("P&layers:"));
-	maxPlayersEdit = new QLineEdit("2");
+	maxPlayersEdit = new QSpinBox();
+	maxPlayersEdit->setMinimum(1);
+	maxPlayersEdit->setMaximum(100);
+	maxPlayersEdit->setValue(2);
 	maxPlayersLabel->setBuddy(maxPlayersEdit);
 	
 	spectatorsAllowedCheckBox = new QCheckBox(tr("&Spectators allowed"));
 	spectatorsAllowedCheckBox->setChecked(true);
+	connect(spectatorsAllowedCheckBox, SIGNAL(stateChanged(int)), this, SLOT(spectatorsAllowedChanged(int)));
+	spectatorsNeedPasswordCheckBox = new QCheckBox(tr("Spectators &need a password to join"));
+	spectatorsCanTalkCheckBox = new QCheckBox(tr("Spectators can &talk"));
+	spectatorsSeeEverythingCheckBox = new QCheckBox(tr("Spectators see &everything"));
+	QVBoxLayout *spectatorsLayout = new QVBoxLayout;
+	spectatorsLayout->addWidget(spectatorsAllowedCheckBox);
+	spectatorsLayout->addWidget(spectatorsNeedPasswordCheckBox);
+	spectatorsLayout->addWidget(spectatorsCanTalkCheckBox);
+	spectatorsLayout->addWidget(spectatorsSeeEverythingCheckBox);
+	spectatorsGroupBox = new QGroupBox(tr("Spectators"));
+	spectatorsGroupBox->setLayout(spectatorsLayout);
 
 	QGridLayout *grid = new QGridLayout;
 	grid->addWidget(descriptionLabel, 0, 0);
@@ -27,7 +41,7 @@ DlgCreateGame::DlgCreateGame(Client *_client, QWidget *parent)
 	grid->addWidget(passwordEdit, 1, 1);
 	grid->addWidget(maxPlayersLabel, 2, 0);
 	grid->addWidget(maxPlayersEdit, 2, 1);
-	grid->addWidget(spectatorsAllowedCheckBox, 3, 0, 1, 2);
+	grid->addWidget(spectatorsGroupBox, 3, 0, 1, 2);
 
 	okButton = new QPushButton(tr("&OK"));
 	okButton->setDefault(true);
@@ -53,13 +67,15 @@ DlgCreateGame::DlgCreateGame(Client *_client, QWidget *parent)
 
 void DlgCreateGame::actOK()
 {
-	bool ok;
-	int maxPlayers = maxPlayersEdit->text().toInt(&ok);
-	if (!ok) {
-		QMessageBox::critical(this, tr("Error"), tr("Invalid number of players."));
-		return;
-	}
-	Command_CreateGame *createCommand = new Command_CreateGame(descriptionEdit->text(), passwordEdit->text(), maxPlayers, spectatorsAllowedCheckBox->isChecked());
+	Command_CreateGame *createCommand = new Command_CreateGame(
+		descriptionEdit->text(),
+		passwordEdit->text(),
+		maxPlayersEdit->value(),
+		spectatorsAllowedCheckBox->isChecked(),
+		spectatorsNeedPasswordCheckBox->isChecked(),
+		spectatorsCanTalkCheckBox->isChecked(),
+		spectatorsSeeEverythingCheckBox->isChecked()
+	);
 	connect(createCommand, SIGNAL(finished(ResponseCode)), this, SLOT(checkResponse(ResponseCode)));
 	client->sendCommand(createCommand);
 	
@@ -78,4 +94,11 @@ void DlgCreateGame::checkResponse(ResponseCode response)
 		QMessageBox::critical(this, tr("Error"), tr("Server error."));
 		return;
 	}
+}
+
+void DlgCreateGame::spectatorsAllowedChanged(int state)
+{
+	spectatorsNeedPasswordCheckBox->setEnabled(state);
+	spectatorsCanTalkCheckBox->setEnabled(state);
+	spectatorsSeeEverythingCheckBox->setEnabled(state);
 }

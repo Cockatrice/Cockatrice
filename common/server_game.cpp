@@ -27,8 +27,8 @@
 #include <QSqlQuery>
 #include <QTimer>
 
-Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent)
-	: QObject(parent), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), activePlayer(-1), activePhase(-1), spectatorsAllowed(_spectatorsAllowed), inactivityCounter(0)
+Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, QObject *parent)
+	: QObject(parent), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), activePlayer(-1), activePhase(-1), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0)
 {
 	creator = addPlayer(_creator, false, false);
 
@@ -168,7 +168,7 @@ void Server_Game::stopGameIfFinished()
 
 ResponseCode Server_Game::checkJoin(const QString &_password, bool spectator)
 {
-	if (_password != password)
+	if ((_password != password) && !(spectator && !spectatorsNeedPassword))
 		return RespWrongPassword;
 	if (spectator) {
 		if (!spectatorsAllowed)
@@ -292,13 +292,26 @@ void Server_Game::sendGameEvent(GameEvent *event, GameEventContext *context, Ser
 	sendGameEventContainer(new GameEventContainer(QList<GameEvent *>() << event, -1, context), exclude);
 }
 
-void Server_Game::sendGameEventContainer(GameEventContainer *cont, Server_Player *exclude)
+void Server_Game::sendGameEventContainer(GameEventContainer *cont, Server_Player *exclude, bool excludeOmniscient)
 {
 	cont->setGameId(gameId);
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	while (playerIterator.hasNext()) {
 		Server_Player *p = playerIterator.next().value();
-		if (p != exclude)
+		if ((p != exclude) && !(excludeOmniscient && p->getSpectator() && spectatorsSeeEverything))
+			p->sendProtocolItem(cont, false);
+	}
+
+	delete cont;
+}
+
+void Server_Game::sendGameEventContainerOmniscient(GameEventContainer *cont, Server_Player *exclude)
+{
+	cont->setGameId(gameId);
+	QMapIterator<int, Server_Player *> playerIterator(players);
+	while (playerIterator.hasNext()) {
+		Server_Player *p = playerIterator.next().value();
+		if ((p != exclude) && (p->getSpectator() && spectatorsSeeEverything))
 			p->sendProtocolItem(cont, false);
 	}
 

@@ -5,8 +5,8 @@
 #include "protocol_items.h"
 #include "settingscache.h"
 
-HandZone::HandZone(Player *_p, int _zoneHeight, QGraphicsItem *parent)
-	: CardZone(_p, "hand", false, false, _p->getLocal(), parent), zoneHeight(_zoneHeight)
+HandZone::HandZone(Player *_p, bool _contentsKnown, int _zoneHeight, QGraphicsItem *parent)
+	: CardZone(_p, "hand", false, false, _contentsKnown, parent), zoneHeight(_zoneHeight)
 {
 	connect(settingsCache, SIGNAL(handBgPathChanged()), this, SLOT(updateBgPixmap()));
 	updateBgPixmap();

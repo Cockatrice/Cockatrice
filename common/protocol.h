@@ -103,6 +103,7 @@ private:
 	ProtocolResponse *resp;
 	QList<ProtocolItem *> itemQueue;
 	GameEventContainer *gameEventQueuePublic;
+	GameEventContainer *gameEventQueueOmniscient;
 	GameEventContainer *gameEventQueuePrivate;
 public:
 	CommandContainer(const QList<Command *> &_commandList = QList<Command *>(), int _cmdId = -1);
@@ -119,6 +120,8 @@ public:
 	void enqueueItem(ProtocolItem *item) { itemQueue.append(item); }
 	GameEventContainer *getGameEventQueuePublic() const { return gameEventQueuePublic; }
 	void enqueueGameEventPublic(GameEvent *event, int gameId);
+	GameEventContainer *getGameEventQueueOmniscient() const { return gameEventQueueOmniscient; }
+	void enqueueGameEventOmniscient(GameEvent *event, int gameId);
 	GameEventContainer *getGameEventQueuePrivate() const { return gameEventQueuePrivate; }
 	void enqueueGameEventPrivate(GameEvent *event, int gameId);
 };

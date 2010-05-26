@@ -18,7 +18,7 @@ ServerInfo_ChatUser::ServerInfo_ChatUser(const QString &_name)
 	insertItem(new SerializableItem_String("name", _name));
 }
 
-ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, const QString &_creatorName, bool _spectatorsAllowed, int _spectatorCount)
+ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, const QString &_creatorName, bool _spectatorsAllowed, bool _spectatorsNeedPassword, int _spectatorCount)
 	: SerializableItem_Map("game")
 {
 	insertItem(new SerializableItem_Int("game_id", _gameId));
@@ -28,6 +28,7 @@ ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool 
 	insertItem(new SerializableItem_Int("max_players", _maxPlayers));
 	insertItem(new SerializableItem_String("creator_name", _creatorName));
 	insertItem(new SerializableItem_Bool("spectators_allowed", _spectatorsAllowed));
+	insertItem(new SerializableItem_Bool("spectators_need_password", _spectatorsNeedPassword));
 	insertItem(new SerializableItem_Int("spectator_count", _spectatorCount));
 }
 

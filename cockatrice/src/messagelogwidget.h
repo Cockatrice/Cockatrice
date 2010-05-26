@@ -33,6 +33,7 @@ public slots:
 	void logConcede(Player *player);
 	void logGameStart();
 	void logSay(Player *player, QString message);
+	void logSpectatorSay(QString spectatorName, QString message);
 	void logShuffle(Player *player);
 	void logRollDie(Player *player, int sides, int roll);
 	void logDrawCards(Player *player, int number);
