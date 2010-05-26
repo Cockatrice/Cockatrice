@@ -112,4 +112,10 @@ SOURCES += src/counter.cpp \
 	../common/protocol_datastructures.cpp
  
 TRANSLATIONS += translations/cockatrice_de.ts translations/cockatrice_en.ts
-CONFIG += qt debug
+win32 {
+	RC_FILE = cockatrice.rc
+}
+macx {
+	ICON = resources/appicon.icns
+	CONFIG += x86 ppc
+}

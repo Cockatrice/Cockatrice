@@ -453,32 +453,54 @@
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="459"/>
-        <source>Settings</source>
+        <location filename="../src/dlg_settings.cpp" line="460"/>
+        <location filename="../src/dlg_settings.cpp" line="463"/>
+        <location filename="../src/dlg_settings.cpp" line="466"/>
+        <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="461"/>
-        <source>General</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="462"/>
-        <source>Appearance</source>
+        <location filename="../src/dlg_settings.cpp" line="460"/>
+        <source>Your card database is invalid. Please check if the path is set correctly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="463"/>
-        <source>User interface</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="464"/>
-        <source>Messages</source>
+        <source>The path to your deck directory is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="466"/>
+        <source>The path to your card pictures directory is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="474"/>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="476"/>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="477"/>
+        <source>Appearance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="478"/>
+        <source>User interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="479"/>
+        <source>Messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="481"/>
         <source>&amp;Close</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1516,17 +1538,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="51"/>
+        <location filename="../src/playerlistwidget.cpp" line="52"/>
         <source>no deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="52"/>
+        <location filename="../src/playerlistwidget.cpp" line="53"/>
         <source>local deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="53"/>
+        <location filename="../src/playerlistwidget.cpp" line="54"/>
         <source>ID #%1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1992,17 +2014,17 @@ Do you want to save the changes?</source>
 <context>
     <name>ZoneViewWidget</name>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="70"/>
+        <location filename="../src/zoneviewwidget.cpp" line="71"/>
         <source>sort by name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="72"/>
+        <location filename="../src/zoneviewwidget.cpp" line="73"/>
         <source>sort by type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="74"/>
+        <location filename="../src/zoneviewwidget.cpp" line="75"/>
         <source>shuffle when closing</source>
         <translation type="unfinished"></translation>
     </message>

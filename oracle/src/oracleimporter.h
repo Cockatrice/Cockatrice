@@ -5,6 +5,7 @@
 #include <QHttp>
 
 class QBuffer;
+class QXmlStreamReader;
 
 class SetToDownload {
 private:
@@ -15,7 +16,7 @@ public:
 	const QString &getLongName() const { return longName; }
 	const QString &getUrl() const { return url; }
 	bool getImport() const { return import; }
-	void setImport(bool _import) { qDebug(QString("%1: setting import to %2").arg(getShortName()).arg(_import).toUtf8()); import = _import; }
+	void setImport(bool _import) { import = _import; }
 	SetToDownload(const QString &_shortName, const QString &_longName, const QString &_url, bool _import)
 		: shortName(_shortName), longName(_longName), url(_url), import(_import) { }
 };
@@ -23,7 +24,7 @@ public:
 class OracleImporter : public CardDatabase {
 	Q_OBJECT
 private:
-	QList<SetToDownload> setsToDownload;
+	QList<SetToDownload> allSets, setsToDownload;
 	QString pictureUrl, setUrl;
 	QString dataDir;
 	int setIndex;
@@ -32,6 +33,8 @@ private:
 	QHttp *http;
 	QString getURLFromName(QString name) const;
 	
+	void downloadNextFile();
+	void readSetsFromXml(QXmlStreamReader &xml);
 	CardInfo *addCard(QString cardName, const QString &cardCost, const QString &cardType, const QString &cardPT, const QStringList &cardText);
 private slots:
 	void httpRequestFinished(int requestId, bool error);
@@ -41,10 +44,11 @@ signals:
 	void dataReadProgress(int bytesRead, int totalBytes);
 public:
 	OracleImporter(const QString &_dataDir, QObject *parent = 0);
+	void readSetsFromByteArray(const QByteArray &data);
+	void readSetsFromFile(const QString &fileName);
+	int startDownload();
 	int importTextSpoiler(CardSet *set, const QByteArray &data);
-	void downloadNextFile();
-	int getSetsCount() const { return setsToDownload.size(); }
-	QList<SetToDownload> &getSets() { return setsToDownload; }
+	QList<SetToDownload> &getSets() { return allSets; }
 };
 
 #endif

@@ -232,7 +232,7 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 }
 
 CardDatabase::CardDatabase(QObject *parent)
-	: QObject(parent), noCard(0)
+	: QObject(parent), downloadRunning(false), loadSuccess(false), noCard(0)
 {
 	connect(settingsCache, SIGNAL(picsPathChanged()), this, SLOT(clearPixmapCache()));
 	connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabase()));
@@ -331,22 +331,20 @@ void CardDatabase::startPicDownload(CardInfo *card)
 void CardDatabase::startNextPicDownload()
 {
 	if (cardsToDownload.isEmpty()) {
+		cardBeingDownloaded = 0;
 		downloadRunning = false;
 		return;
 	}
 	
 	downloadRunning = true;
 	
-	CardInfo *card = cardsToDownload.takeFirst();
-	QNetworkRequest req(QUrl(card->getPicURL()));
-	req.setOriginatingObject(card);
+	cardBeingDownloaded = cardsToDownload.takeFirst();
+	QNetworkRequest req(QUrl(cardBeingDownloaded->getPicURL()));
 	networkManager->get(req);
 }
 
 void CardDatabase::picDownloadFinished(QNetworkReply *reply)
 {
-	CardInfo *card = static_cast<CardInfo *>(reply->request().originatingObject());
-	
 	QString picsPath = settingsCache->getPicsPath();
 	const QByteArray &picData = reply->readAll();
 	QPixmap testPixmap;
@@ -357,13 +355,13 @@ void CardDatabase::picDownloadFinished(QNetworkReply *reply)
 				return;
 			dir.mkdir("downloadedPics");
 		}
-		QFile newPic(picsPath + "/downloadedPics/" + card->getCorrectedName() + ".full.jpg");
+		QFile newPic(picsPath + "/downloadedPics/" + cardBeingDownloaded->getCorrectedName() + ".full.jpg");
 		if (!newPic.open(QIODevice::WriteOnly))
 			return;
 		newPic.write(picData);
 		newPic.close();
 		
-		card->updatePixmapCache();
+		cardBeingDownloaded->updatePixmapCache();
 	}
 	
 	reply->deleteLater();
@@ -430,12 +428,12 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 	}
 }
 
-int CardDatabase::loadFromFile(const QString &fileName)
+bool CardDatabase::loadFromFile(const QString &fileName)
 {
 	QFile file(fileName);
 	file.open(QIODevice::ReadOnly);
 	if (!file.isOpen())
-		return -1;
+		return false;
 	QXmlStreamReader xml(&file);
 	clear();
 	while (!xml.atEnd()) {
@@ -453,7 +451,7 @@ int CardDatabase::loadFromFile(const QString &fileName)
 		}
 	}
 	qDebug(QString("%1 cards in %2 sets loaded").arg(cardHash.size()).arg(setHash.size()).toLatin1());
-	return cardHash.size();
+	return true;
 }
 
 bool CardDatabase::saveToFile(const QString &fileName)
@@ -494,11 +492,13 @@ void CardDatabase::picDownloadChanged()
 	}
 }
 
-void CardDatabase::loadCardDatabase()
+bool CardDatabase::loadCardDatabase()
 {
 	QString cardDatabasePath = settingsCache->getCardDatabasePath();
 	if (!cardDatabasePath.isEmpty())
-		loadFromFile(cardDatabasePath);
+		loadSuccess = loadFromFile(cardDatabasePath);
+	else loadSuccess = false;
+	return loadSuccess;
 }
 
 QStringList CardDatabase::getAllColors() const

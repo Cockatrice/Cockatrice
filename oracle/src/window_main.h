@@ -10,21 +10,37 @@ class QProgressBar;
 class QTextEdit;
 class QPushButton;
 class QCheckBox;
+class QVBoxLayout;
+class QMenu;
+class QAction;
+class QNetworkAccessManager;
 
 class WindowMain : public QMainWindow {
 	Q_OBJECT
 private:
-	OracleImporter *importer;
+	static const QString defaultSetsUrl;
 	
+	OracleImporter *importer;
+	QNetworkAccessManager *nam;
+	
+	QMenu *fileMenu;
+	QAction *aLoadSetsFile, *aDownloadSetsFile, *aExit;
 	QPushButton *startButton;
 	QLabel *totalLabel, *fileLabel, *nextSetLabel1, *nextSetLabel2;
 	QProgressBar *totalProgressBar, *fileProgressBar;
 	QTextEdit *messageLog;
+	QVBoxLayout *checkBoxLayout;
 	QList<QCheckBox *> checkBoxList;
+	
+	void downloadSetsFile(const QString &url);
 private slots:
 	void updateTotalProgress(int cardsImported, int setIndex, const QString &nextSetName);
 	void updateFileProgress(int bytesRead, int totalBytes);
+	void updateSetList();
 	void actStart();
+	void actLoadSetsFile();
+	void actDownloadSetsFile();
+	void setsDownloadFinished();
 	void checkBoxChanged(int state);
 public:
 	WindowMain(QWidget *parent = 0);

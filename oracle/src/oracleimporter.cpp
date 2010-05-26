@@ -7,7 +7,15 @@
 OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent)
 	: CardDatabase(parent), dataDir(_dataDir), setIndex(-1)
 {
-	QString fileName = dataDir + "/sets.xml";
+	buffer = new QBuffer(this);
+	http = new QHttp(this);
+	connect(http, SIGNAL(requestFinished(int, bool)), this, SLOT(httpRequestFinished(int, bool)));
+	connect(http, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)), this, SLOT(readResponseHeader(const QHttpResponseHeader &)));
+	connect(http, SIGNAL(dataReadProgress(int, int)), this, SIGNAL(dataReadProgress(int, int)));
+}
+
+void OracleImporter::readSetsFromFile(const QString &fileName)
+{
 	QFile setsFile(fileName);
 	if (!setsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		QMessageBox::critical(0, tr("Error"), tr("Cannot open file '%1'.").arg(fileName));
@@ -15,6 +23,19 @@ OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent)
 	}
 
 	QXmlStreamReader xml(&setsFile);
+	readSetsFromXml(xml);
+}
+
+void OracleImporter::readSetsFromByteArray(const QByteArray &data)
+{
+	QXmlStreamReader xml(data);
+	readSetsFromXml(xml);
+}
+
+void OracleImporter::readSetsFromXml(QXmlStreamReader &xml)
+{
+	allSets.clear();
+	
 	QString edition;
 	QString editionLong;
 	QString editionURL;
@@ -34,19 +55,13 @@ OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent)
 				else if (xml.name() == "url")
 					editionURL = xml.readElementText();
 			}
-			setsToDownload << SetToDownload(edition, editionLong, editionURL, import);
+			allSets << SetToDownload(edition, editionLong, editionURL, import);
 			edition = editionLong = editionURL = QString();
 		} else if (xml.name() == "picture_url")
 			pictureUrl = xml.readElementText();
 		else if (xml.name() == "set_url")
 			setUrl = xml.readElementText();
 	}
-	
-	buffer = new QBuffer(this);
-	http = new QHttp(this);
-	connect(http, SIGNAL(requestFinished(int, bool)), this, SLOT(httpRequestFinished(int, bool)));
-	connect(http, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)), this, SLOT(readResponseHeader(const QHttpResponseHeader &)));
-	connect(http, SIGNAL(dataReadProgress(int, int)), this, SIGNAL(dataReadProgress(int, int)));
 }
 
 CardInfo *OracleImporter::addCard(QString cardName, const QString &cardCost, const QString &cardType, const QString &cardPT, const QStringList &cardText)
@@ -188,19 +203,24 @@ QString OracleImporter::getURLFromName(QString name) const
 	);
 }
 
+int OracleImporter::startDownload()
+{
+	setsToDownload.clear();
+	for (int i = 0; i < allSets.size(); ++i)
+		if (allSets[i].getImport())
+			setsToDownload.append(allSets[i]);
+	
+	if (setsToDownload.isEmpty())
+		return 0;
+	setIndex = 0;
+	emit setIndexChanged(0, 0, setsToDownload[0].getLongName());
+	
+	downloadNextFile();
+	return setsToDownload.size();
+}
+
 void OracleImporter::downloadNextFile()
 {
-	if (setIndex == -1) {
-		for (int i = 0; i < setsToDownload.size(); ++i)
-			if (!setsToDownload[i].getImport()) {
-				setsToDownload.removeAt(i);
-				--i;
-			}
-		if (setsToDownload.isEmpty())
-			return;
-		setIndex = 0;
-		emit setIndexChanged(0, 0, setsToDownload[0].getLongName());
-	}
 	QString urlString = setsToDownload[setIndex].getUrl();
 	if (urlString.isEmpty())
 		urlString = setUrl;
@@ -245,9 +265,9 @@ void OracleImporter::httpRequestFinished(int requestId, bool error)
 	++setIndex;
 	
 	if (setIndex == setsToDownload.size()) {
-		setIndex = -1;
 		saveToFile(dataDir + "/cards.xml");
 		emit setIndexChanged(cards, setIndex, QString());
+		setIndex = -1;
 	} else {
 		downloadNextFile();
 		emit setIndexChanged(cards, setIndex, setsToDownload[setIndex].getLongName());
