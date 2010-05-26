@@ -208,7 +208,7 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 		// This might not scale very well. Use an extra QMap if it becomes a problem.
 		const QList<Server_Game *> &serverGames = server->getGames();
 		for (int i = 0; i < serverGames.size(); ++i) {
-			const QList<Server_Player *> &gamePlayers = serverGames[i]->getPlayers();
+			const QList<Server_Player *> &gamePlayers = serverGames[i]->getPlayers().values();
 			for (int j = 0; j < gamePlayers.size(); ++j)
 				if (gamePlayers[j]->getPlayerName() == playerName) {
 					gamePlayers[j]->setProtocolHandler(this);
@@ -530,7 +530,7 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 
 	// If the card was moved to another zone, delete all arrows from and to the card
 	if (startzone != targetzone) {
-		const QList<Server_Player *> &players = game->getPlayers();
+		const QList<Server_Player *> &players = game->getPlayers().values();
 		for (int i = 0; i < players.size(); ++i) {
 			QList<int> arrowsToDelete;
 			QMapIterator<int, Server_Arrow *> arrowIterator(players[i]->getArrows());
@@ -709,11 +709,19 @@ ResponseCode Server_ProtocolHandler::cmdNextTurn(Command_NextTurn * /*cmd*/, Com
 {
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
+	
+	const QMap<int, Server_Player *> &players = game->getPlayers();
+	const QList<int> keys = players.keys();
+	
 	int activePlayer = game->getActivePlayer();
-	if (++activePlayer == game->getPlayerCount())
-		activePlayer = 0;
-	game->setActivePlayer(activePlayer);
+	int listPos = keys.indexOf(activePlayer);
+	do {
+		++listPos;
+		if (listPos == keys.size())
+			listPos = 0;
+	} while (players.value(keys[listPos])->getSpectator());
+	
+	game->setActivePlayer(keys[listPos]);
 	return RespOk;
 }
 

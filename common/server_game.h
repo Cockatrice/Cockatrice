@@ -54,7 +54,7 @@ public:
 	bool getGameStarted() const { return gameStarted; }
 	int getPlayerCount() const;
 	int getSpectatorCount() const;
-	QList<Server_Player *> getPlayers() const { return players.values(); }
+	const QMap<int, Server_Player *> &getPlayers() const { return players; }
 	Server_Player *getPlayer(int playerId) const { return players.value(playerId, 0); }
 	int getGameId() const { return gameId; }
 	QString getDescription() const { return description; }
