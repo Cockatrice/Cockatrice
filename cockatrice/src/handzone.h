@@ -5,19 +5,17 @@
 
 class HandZone : public CardZone {
 	Q_OBJECT
-private:
+protected:
 	QPixmap bgPixmap;
-	int zoneHeight;
-private slots:	
+private slots:
 	void updateBgPixmap();
 public:
-	HandZone(Player *_p, bool _contentsKnown, int _zoneHeight, QGraphicsItem *parent = 0);
-	QRectF boundingRect() const;
-	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-	void reorganizeCards();
+	HandZone(Player *_p, bool _contentsKnown, QGraphicsItem *parent = 0);
 	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
+	virtual void setWidth(qreal _width) = 0;
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
 };
 
 #endif
+

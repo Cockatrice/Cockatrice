@@ -24,6 +24,7 @@ private:
 	QString handBgPath, tableBgPath, playerBgPath;
 	bool picDownload;
 	bool doubleClickToPlay;
+	bool horizontalHand;
 	bool economicGrid;
 	bool zoneViewSortByName, zoneViewSortByType;
 public:
@@ -37,6 +38,7 @@ public:
 	QString getPlayerBgPath() const { return playerBgPath; }
 	bool getPicDownload() const { return picDownload; }
 	bool getDoubleClickToPlay() const { return doubleClickToPlay; }
+	bool getHorizontalHand() const { return horizontalHand; }
 	bool getEconomicGrid() const { return economicGrid; }
 	bool getZoneViewSortByName() const { return zoneViewSortByName; }
 	bool getZoneViewSortByType() const { return zoneViewSortByType; }
@@ -50,6 +52,7 @@ public slots:
 	void setPlayerBgPath(const QString &_playerBgPath);
 	void setPicDownload(int _picDownload);
 	void setDoubleClickToPlay(int _doubleClickToPlay);
+	void setHorizontalHand(int _horizontalHand);
 	void setEconomicGrid(int _economicGrid);
 	void setZoneViewSortByName(int _zoneViewSortByName);
 	void setZoneViewSortByType(int _zoneViewSortByType);

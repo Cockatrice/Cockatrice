@@ -1,4 +1,6 @@
 #include "gameview.h"
+#include "gamescene.h"
+#include <QResizeEvent>
 #include <QAction>
 
 GameView::GameView(QGraphicsScene *scene, QWidget *parent)
@@ -21,6 +23,10 @@ GameView::GameView(QGraphicsScene *scene, QWidget *parent)
 void GameView::resizeEvent(QResizeEvent *event)
 {
 	QGraphicsView::resizeEvent(event);
+	GameScene *s = dynamic_cast<GameScene *>(scene());
+	if (s) {
+		s->processViewSizeChange(event->size());
+	}
 	updateSceneRect(scene()->sceneRect());
 }
 

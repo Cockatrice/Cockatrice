@@ -7,7 +7,8 @@
 #include "zoneviewwidget.h"
 #include "pilezone.h"
 #include "tablezone.h"
-#include "handzone.h"
+#include "handzone_vert.h"
+#include "handzone_horiz.h"
 #include "cardlist.h"
 #include "tab_game.h"
 #include "protocol_items.h"
@@ -17,8 +18,8 @@
 #include <QPainter>
 #include <QMenu>
 
-Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabGame *_parent)
-	: QObject(_parent), defaultNumberTopCards(3), name(_name), id(_id), active(false), local(_local), client(_client)
+Player::Player(const QString &_name, int _id, bool _local, bool _mirrored, Client *_client, TabGame *_parent)
+	: QObject(_parent), defaultNumberTopCards(3), name(_name), id(_id), active(false), local(_local), mirrored(_mirrored), client(_client)
 {
 	setCacheMode(DeviceCoordinateCache);
 	
@@ -43,12 +44,25 @@ Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabG
 
 	table = new TableZone(this, this);
 	connect(table, SIGNAL(sizeChanged()), this, SLOT(updateBoundingRect()));
-	hand = new HandZone(this, _local || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()), (int) table->boundingRect().height(), this);
 	
 	base = QPointF(deck->boundingRect().width() + counterAreaWidth + 5, 0);
-	hand->setPos(base);
-	base += QPointF(hand->boundingRect().width(), 0);
-	table->setPos(base);
+	
+	if (settingsCache->getHorizontalHand()) {
+		hand = new HandZoneHoriz(this, _local || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()), this);
+	
+		if (mirrored) {
+			hand->setPos(counterAreaWidth + CARD_WIDTH + 5, base.y());
+			table->setPos(base.x(), base.y() + hand->boundingRect().height());
+		} else {
+			table->setPos(base);
+			hand->setPos(counterAreaWidth + CARD_WIDTH + 5, base.y() + table->boundingRect().height());
+		}
+	} else {
+		hand = new HandZoneVert(this, _local || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()), (int) table->boundingRect().height(), this);
+		hand->setPos(base);
+		base += QPointF(hand->boundingRect().width(), 0);
+		table->setPos(base);
+	}
 	
 	updateBoundingRect();
 
@@ -281,7 +295,10 @@ void Player::updateBgPixmap()
 void Player::updateBoundingRect()
 {
 	prepareGeometryChange();
-	bRect = QRectF(0, 0, CARD_WIDTH + 5 + counterAreaWidth + hand->boundingRect().width() + table->boundingRect().width(), table->boundingRect().height());
+	if (settingsCache->getHorizontalHand())
+		bRect = QRectF(0, 0, CARD_WIDTH + 5 + counterAreaWidth + table->boundingRect().width(), table->boundingRect().height() + hand->boundingRect().height());
+	else
+		bRect = QRectF(0, 0, CARD_WIDTH + 5 + counterAreaWidth + hand->boundingRect().width() + table->boundingRect().width(), table->boundingRect().height());
 	emit sizeChanged();
 }
 
@@ -707,17 +724,16 @@ QRectF Player::boundingRect() const
 
 void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	if (bgPixmap.isNull())
-		painter->fillRect(boundingRect(), QColor(200, 200, 200));
-	else
-		painter->fillRect(boundingRect(), QBrush(bgPixmap));
-
 	QString nameStr = getName();
 	QFont font("Times");
 	font.setPixelSize(20);
 //	font.setWeight(QFont::Bold);
 	
 	int totalWidth = CARD_WIDTH + counterAreaWidth + 5;
+	if (bgPixmap.isNull())
+		painter->fillRect(QRectF(0, 0, totalWidth, boundingRect().height()), QColor(200, 200, 200));
+	else
+		painter->fillRect(QRectF(0, 0, totalWidth, boundingRect().height()), QBrush(bgPixmap));
 	
 	if (getActive()) {
 		QFontMetrics fm(font);
@@ -994,4 +1010,19 @@ void Player::actMoveToExile(CardItem *card)
 {
 	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
 	sendGameCommand(new Command_MoveCard(-1, startZone->getName(), card->getId(), "rfg", 0, 0, false));
+}
+
+qreal Player::getMinimumWidth() const
+{
+	return table->getMinimumWidth() + CARD_WIDTH + 5 + counterAreaWidth;
+}
+
+void Player::processSceneSizeChange(const QSizeF &newSize)
+{
+	// This will need to be changed if player areas are displayed side by side (e.g. 2x2 for a 4-player game)
+	qreal fullPlayerWidth = newSize.width();
+	
+	qreal tableWidth = fullPlayerWidth - CARD_WIDTH - 5 - counterAreaWidth;
+	table->setWidth(tableWidth);
+	hand->setWidth(tableWidth);
 }

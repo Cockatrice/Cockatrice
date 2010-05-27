@@ -103,3 +103,26 @@ void GameScene::closeMostRecentZoneView()
 	if (!views.isEmpty())
 		views.last()->close();
 }
+
+void GameScene::processViewSizeChange(const QSize &newSize)
+{
+	qreal newRatio = ((qreal) newSize.width()) / newSize.height();
+	qreal minWidth = 0;
+	for (int i = 0; i < players.size(); ++i) {
+		qreal w = players[i]->getMinimumWidth();
+		if (w > minWidth)
+			minWidth = w;
+	}
+	
+	qreal minRatio = minWidth / sceneRect().height();
+	if (minRatio > newRatio) {
+		// Aspect ratio is dominated by table width.
+		setSceneRect(sceneRect().x(), sceneRect().y(), minWidth, sceneRect().height());
+	} else {
+		// Aspect ratio is dominated by window dimensions.
+		setSceneRect(sceneRect().x(), sceneRect().y(), newRatio * sceneRect().height(), sceneRect().height());
+	}
+	
+	for (int i = 0; i < players.size(); ++i)
+		players[i]->processSceneSizeChange(sceneRect().size());
+}

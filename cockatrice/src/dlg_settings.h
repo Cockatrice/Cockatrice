@@ -60,8 +60,8 @@ signals:
 private:
 	QLabel *handBgLabel, *tableBgLabel, *playerAreaBgLabel;
 	QLineEdit *handBgEdit, *tableBgEdit, *playerAreaBgEdit;
-	QCheckBox *economicGridCheckBox, *zoneViewSortByNameCheckBox, *zoneViewSortByTypeCheckBox;
-	QGroupBox *zoneBgGroupBox, *tableGroupBox, *zoneViewGroupBox;
+	QCheckBox *horizontalHandCheckBox, *economicGridCheckBox, *zoneViewSortByNameCheckBox, *zoneViewSortByTypeCheckBox;
+	QGroupBox *zoneBgGroupBox, *handGroupBox, *tableGroupBox, *zoneViewGroupBox;
 public:
 	AppearanceSettingsPage();
 	void retranslateUi();

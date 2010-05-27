@@ -112,6 +112,7 @@ private:
 	int id;
 	bool active;
 	bool local;
+	bool mirrored;
 	
 	QMap<QString, CardZone *> zones;
 	TableZone *table;
@@ -164,19 +165,23 @@ public:
 	void clearArrows();
 
 	Client *client;
-	Player(const QString &_name, int _id, bool _local, Client *_client, TabGame *_parent);
+	Player(const QString &_name, int _id, bool _local, bool _mirrored, Client *_client, TabGame *_parent);
 	~Player();
 	void retranslateUi();
 	QMenu *getPlayerMenu() const { return playerMenu; }
 	int getId() const { return id; }
 	QString getName() const { return name; }
 	bool getLocal() const { return local; }
+	bool getMirrored() const { return mirrored; }
 	const QMap<QString, CardZone *> &getZones() const { return zones; }
 	const QMap<int, ArrowItem *> &getArrows() const { return arrows; }
 	TableZone *getTable() const { return table; }
 	void showCardMenu(const QPoint &p);
 	bool getActive() const { return active; }
 	void setActive(bool _active);
+	
+	qreal getMinimumWidth() const;
+	void processSceneSizeChange(const QSizeF &newSize);
 	
 	void processPlayerInfo(ServerInfo_Player *info);
 	void processGameEvent(GameEvent *event, GameEventContext *context);

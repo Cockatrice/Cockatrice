@@ -17,6 +17,7 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 	else
 		height = 4 * CARD_HEIGHT + 3 * paddingY;
 	width = minWidth + 2 * marginX;
+	currentMinimumWidth = minWidth;
 
 	setCacheMode(DeviceCoordinateCache);
 	setAcceptsHoverEvents(true);
@@ -43,7 +44,7 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
 		painter->fillRect(boundingRect(), QBrush(bgPixmap));
 	painter->setPen(QColor(255, 255, 255, 40));
 	qreal separatorY = 3 * (CARD_HEIGHT + paddingY) - paddingY / 2;
-	if (!player->getLocal())
+	if (player->getMirrored())
 		separatorY = height - separatorY;
 	painter->drawLine(QPointF(0, separatorY), QPointF(width, separatorY));
 }
@@ -120,10 +121,10 @@ void TableZone::resizeToContents()
 	xMax += 2 * CARD_WIDTH;
 	if (xMax < minWidth)
 		xMax = minWidth;
-	int newWidth = xMax + 2 * marginX;
-	if (newWidth != width) {
+	currentMinimumWidth = xMax + 2 * marginX;
+	if (currentMinimumWidth > width) {
 		prepareGeometryChange();
-		width = newWidth;
+		width = currentMinimumWidth;
 		emit sizeChanged();
 	}
 }
@@ -205,4 +206,10 @@ QPoint TableZone::getFreeGridPoint(int row) const
 QPointF TableZone::closestGridPoint(const QPointF &point)
 {
 	return mapFromGrid(mapToGrid(point + QPoint(CARD_WIDTH / 2, CARD_HEIGHT / 2)));
+}
+
+void TableZone::setWidth(qreal _width)
+{
+	prepareGeometryChange();
+	width = _width;
 }
