@@ -232,6 +232,7 @@ void TabGame::processGameEventContainer(GameEventContainer *cont)
 		if (spectators.contains(event->getPlayerId())) {
 			switch (event->getItemId()) {
 				case ItemId_Event_Say: eventSpectatorSay(qobject_cast<Event_Say *>(event), context); break;
+				case ItemId_Event_Leave: eventSpectatorLeave(qobject_cast<Event_Leave *>(event), context); break;
 				default: {
 					qDebug() << "unhandled spectator game event";
 					break;
@@ -303,6 +304,16 @@ void TabGame::stopGame()
 void TabGame::eventSpectatorSay(Event_Say *event, GameEventContext * /*context*/)
 {
 	messageLog->logSpectatorSay(spectators.value(event->getPlayerId()), event->getMessage());
+}
+
+void TabGame::eventSpectatorLeave(Event_Leave *event, GameEventContext * /*context*/)
+{
+	int playerId = event->getPlayerId();
+	messageLog->logLeaveSpectator(spectators.value(playerId));
+	playerListWidget->removePlayer(playerId);
+	spectators.remove(playerId);
+	
+	emit userEvent();
 }
 
 void TabGame::eventGameStateChanged(Event_GameStateChanged *event, GameEventContext * /*context*/)
@@ -382,10 +393,6 @@ void TabGame::eventLeave(Event_Leave *event, GameEventContext * /*context*/)
 		playerListWidget->removePlayer(playerId);
 		players.remove(playerId);
 		delete player;
-	} else if (spectators.contains(playerId)) {
-		messageLog->logLeaveSpectator(spectators.value(playerId));
-		playerListWidget->removePlayer(playerId);
-		spectators.remove(playerId);
 	}
 	emit userEvent();
 }

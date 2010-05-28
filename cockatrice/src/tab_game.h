@@ -76,6 +76,8 @@ private:
 	void stopGame();
 
 	void eventSpectatorSay(Event_Say *event, GameEventContext *context);
+	void eventSpectatorLeave(Event_Leave *event, GameEventContext *context);
+	
 	void eventGameStateChanged(Event_GameStateChanged *event, GameEventContext *context);
 	void eventPlayerPropertiesChanged(Event_PlayerPropertiesChanged *event, GameEventContext *context);
 	void eventJoin(Event_Join *event, GameEventContext *context);
