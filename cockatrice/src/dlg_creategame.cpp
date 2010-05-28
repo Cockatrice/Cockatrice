@@ -24,7 +24,7 @@ DlgCreateGame::DlgCreateGame(Client *_client, QWidget *parent)
 	spectatorsAllowedCheckBox->setChecked(true);
 	connect(spectatorsAllowedCheckBox, SIGNAL(stateChanged(int)), this, SLOT(spectatorsAllowedChanged(int)));
 	spectatorsNeedPasswordCheckBox = new QCheckBox(tr("Spectators &need a password to join"));
-	spectatorsCanTalkCheckBox = new QCheckBox(tr("Spectators can &talk"));
+	spectatorsCanTalkCheckBox = new QCheckBox(tr("Spectators can &chat"));
 	spectatorsSeeEverythingCheckBox = new QCheckBox(tr("Spectators see &everything"));
 	QVBoxLayout *spectatorsLayout = new QVBoxLayout;
 	spectatorsLayout->addWidget(spectatorsAllowedCheckBox);

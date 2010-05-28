@@ -7,6 +7,7 @@
 #include "cardinfowidget.h"
 #include "deck_picturecacher.h"
 #include "dlg_cardsearch.h"
+#include "dlg_load_deck_from_clipboard.h"
 #include "main.h"
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
@@ -122,6 +123,8 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	aLoadDeck = new QAction(tr("&Load deck..."), this);
 	aLoadDeck->setShortcuts(QKeySequence::Open);
 	connect(aLoadDeck, SIGNAL(triggered()), this, SLOT(actLoadDeck()));
+	aLoadDeckFromClipboard = new QAction(tr("Load deck from cl&ipboard..."), this);
+	connect(aLoadDeckFromClipboard, SIGNAL(triggered()), this, SLOT(actLoadDeckFromClipboard()));
 	aSaveDeck = new QAction(tr("&Save deck"), this);
 	aSaveDeck->setShortcuts(QKeySequence::Save);
 	connect(aSaveDeck, SIGNAL(triggered()), this, SLOT(actSaveDeck()));
@@ -141,6 +144,7 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	deckMenu = menuBar()->addMenu(tr("&Deck"));
 	deckMenu->addAction(aNewDeck);
 	deckMenu->addAction(aLoadDeck);
+	deckMenu->addAction(aLoadDeckFromClipboard);
 	deckMenu->addAction(aSaveDeck);
 	deckMenu->addAction(aSaveDeckAs);
 	deckMenu->addSeparator();
@@ -273,6 +277,19 @@ void WndDeckEditor::actLoadDeck()
 		setDeck(l, fileName, fmt);
 	else
 		delete l;
+}
+
+void WndDeckEditor::actLoadDeckFromClipboard()
+{
+	if (!confirmClose())
+		return;
+	
+	DlgLoadDeckFromClipboard dlg;
+	if (!dlg.exec())
+		return;
+	
+	setDeck(dlg.getDeckList());
+	setWindowModified(true);
 }
 
 bool WndDeckEditor::actSaveDeck()
