@@ -6,7 +6,7 @@
 #include "settingscache.h"
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "table", true, false, true, parent)
+	: CardZone(_p, "table", true, false, true, parent), active(false)
 {
 	connect(settingsCache, SIGNAL(tableBgPathChanged()), this, SLOT(updateBgPixmap()));
 	connect(settingsCache, SIGNAL(economicGridChanged()), this, SLOT(reorganizeCards()));
@@ -47,6 +47,26 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
 	if (player->getMirrored())
 		separatorY = height - separatorY;
 	painter->drawLine(QPointF(0, separatorY), QPointF(width, separatorY));
+	
+	if (active) {
+		QColor color1(255, 255, 255, 150);
+		QColor color2(255, 255, 255, 0);
+		QLinearGradient grad1(0, 0, 0, 1);
+		grad1.setCoordinateMode(QGradient::ObjectBoundingMode);
+		grad1.setColorAt(0, color1);
+		grad1.setColorAt(1, color2);
+		painter->fillRect(QRectF(0, 0, width, 10), QBrush(grad1));
+		
+		grad1.setFinalStop(1, 0);
+		painter->fillRect(QRectF(0, 0, 10, height), QBrush(grad1));
+		
+		grad1.setStart(0, 1);
+		grad1.setFinalStop(0, 0);
+		painter->fillRect(QRectF(0, height - 10, width, 10), QBrush(grad1));
+		
+		grad1.setStart(1, 0);
+		painter->fillRect(QRectF(width - 10, 0, 10, height), QBrush(grad1));
+	}
 }
 
 void TableZone::addCardImpl(CardItem *card, int _x, int _y)

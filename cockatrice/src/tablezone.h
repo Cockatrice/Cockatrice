@@ -11,6 +11,7 @@ private:
 	int width, height;
 	int currentMinimumWidth;
 	QPixmap bgPixmap;
+	bool active;
 private slots:	
 	void updateBgPixmap();
 public slots:
@@ -36,6 +37,7 @@ public:
 	int getMinimumWidth() const { return currentMinimumWidth; }
 	void setWidth(qreal _width);
 	qreal getWidth() const { return width; }
+	void setActive(bool _active) { active = _active; update(); }
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
 };

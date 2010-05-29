@@ -726,6 +726,7 @@ void Player::showCardMenu(const QPoint &p)
 void Player::setActive(bool _active)
 {
 	active = _active;
+	table->setActive(active);
 	update();
 }
 
@@ -747,23 +748,6 @@ void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/
 	else
 		painter->fillRect(QRectF(0, 0, totalWidth, boundingRect().height()), QBrush(bgPixmap));
 	
-	if (getActive()) {
-		QFontMetrics fm(font);
-		double w = fm.width(nameStr) * 1.7;
-		double h = fm.height() * 1.7;
-		if (w < h)
-			w = h;
-		
-		painter->setPen(Qt::transparent);
-		QRadialGradient grad(QPointF(0.5, 0.5), 0.5);
-		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
-		grad.setColorAt(0, QColor(150, 200, 150, 255));
-		grad.setColorAt(0.7, QColor(150, 200, 150, 255));
-		grad.setColorAt(1, QColor(150, 150, 150, 0));
-		painter->setBrush(QBrush(grad));
-		
-		painter->drawEllipse(QRectF(((double) (totalWidth - w)) / 2, 0, w, h));
-	}
 	painter->setFont(font);
 	painter->setPen(QPen(Qt::black));
 	painter->drawText(QRectF(0, 0, totalWidth, 40), Qt::AlignCenter, nameStr);
