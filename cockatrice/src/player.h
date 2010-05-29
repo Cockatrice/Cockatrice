@@ -80,6 +80,7 @@ private slots:
 	void updateBoundingRect();
 	void cardMenuAction();
 	void actSetCounters();
+	void rearrangeZones();
 private:
 	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *countersMenu, *sayMenu;
 	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
@@ -165,7 +166,7 @@ public:
 	void clearArrows();
 
 	Client *client;
-	Player(const QString &_name, int _id, bool _local, bool _mirrored, Client *_client, TabGame *_parent);
+	Player(const QString &_name, int _id, bool _local, Client *_client, TabGame *_parent);
 	~Player();
 	void retranslateUi();
 	QMenu *getPlayerMenu() const { return playerMenu; }
@@ -181,6 +182,7 @@ public:
 	void setActive(bool _active);
 	
 	qreal getMinimumWidth() const;
+	void setMirrored(bool _mirrored);
 	void processSceneSizeChange(const QSizeF &newSize);
 	
 	void processPlayerInfo(ServerInfo_Player *info);

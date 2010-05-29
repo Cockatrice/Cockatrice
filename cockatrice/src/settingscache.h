@@ -15,6 +15,7 @@ signals:
 	void tableBgPathChanged();
 	void playerBgPathChanged();
 	void picDownloadChanged();
+	void horizontalHandChanged();
 	void economicGridChanged();
 private:
 	QSettings *settings;

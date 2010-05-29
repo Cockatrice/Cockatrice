@@ -76,7 +76,7 @@ void TableZone::reorganizeCards()
 		qreal x = mapPoint.x();
 		qreal y = mapPoint.y();
 		
-		if (!player->getLocal())
+		if (player->getMirrored())
 			y = height - CARD_HEIGHT - y;
 		cards[i]->setPos(x, y);
 		cards[i]->setZValue((y + CARD_HEIGHT) * 10000000 + x + 1000);

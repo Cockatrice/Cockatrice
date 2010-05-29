@@ -9,8 +9,6 @@
 #include "tablezone.h"
 #include "handzone.h"
 #include "handcounter.h"
-#include "handzone_vert.h"
-#include "handzone_horiz.h"
 #include "cardlist.h"
 #include "tab_game.h"
 #include "protocol_items.h"
@@ -20,11 +18,12 @@
 #include <QPainter>
 #include <QMenu>
 
-Player::Player(const QString &_name, int _id, bool _local, bool _mirrored, Client *_client, TabGame *_parent)
-	: QObject(_parent), defaultNumberTopCards(3), name(_name), id(_id), active(false), local(_local), mirrored(_mirrored), client(_client)
+Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabGame *_parent)
+	: QObject(_parent), defaultNumberTopCards(3), name(_name), id(_id), active(false), local(_local), mirrored(false), client(_client)
 {
 	setCacheMode(DeviceCoordinateCache);
 	
+	connect(settingsCache, SIGNAL(horizontalHandChanged()), this, SLOT(rearrangeZones()));
 	connect(settingsCache, SIGNAL(playerBgPathChanged()), this, SLOT(updateBgPixmap()));
 	updateBgPixmap();
 	
@@ -33,7 +32,7 @@ Player::Player(const QString &_name, int _id, bool _local, bool _mirrored, Clien
 	PileZone *deck = new PileZone(this, "deck", true, false, this);
 	deck->setPos(base);
 
-	qreal h = deck->boundingRect().height() + 20;
+	qreal h = deck->boundingRect().height() + 10;
 
 	PileZone *grave = new PileZone(this, "grave", false, true, this);
 	grave->setPos(base + QPointF(0, h));
@@ -50,24 +49,7 @@ Player::Player(const QString &_name, int _id, bool _local, bool _mirrored, Clien
 	table = new TableZone(this, this);
 	connect(table, SIGNAL(sizeChanged()), this, SLOT(updateBoundingRect()));
 	
-	base = QPointF(deck->boundingRect().width() + counterAreaWidth + 5, 0);
-	
-	if (settingsCache->getHorizontalHand()) {
-		hand = new HandZoneHoriz(this, _local || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()), this);
-	
-		if (mirrored) {
-			hand->setPos(counterAreaWidth + CARD_WIDTH + 5, base.y());
-			table->setPos(base.x(), base.y() + hand->boundingRect().height());
-		} else {
-			table->setPos(base);
-			hand->setPos(counterAreaWidth + CARD_WIDTH + 5, base.y() + table->boundingRect().height());
-		}
-	} else {
-		hand = new HandZoneVert(this, _local || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()), (int) table->boundingRect().height(), this);
-		hand->setPos(base);
-		base += QPointF(hand->boundingRect().width(), 0);
-		table->setPos(base);
-	}
+	hand = new HandZone(this, _local || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()), (int) table->boundingRect().height(), this);
 	connect(hand, SIGNAL(cardCountChanged()), handCounter, SLOT(updateNumber()));
 	
 	updateBoundingRect();
@@ -269,6 +251,7 @@ Player::Player(const QString &_name, int _id, bool _local, bool _mirrored, Clien
 		cardMenu = 0;
 	}
 	
+	rearrangeZones();
 	retranslateUi();
 }
 
@@ -286,6 +269,29 @@ Player::~Player()
 	clearArrows();
 	delete playerMenu;
 	delete cardMenu;
+}
+
+void Player::rearrangeZones()
+{
+	QPointF base = QPointF(CARD_WIDTH + counterAreaWidth + 5, 0);
+	
+	if (settingsCache->getHorizontalHand()) {
+		if (mirrored) {
+			hand->setPos(counterAreaWidth + CARD_WIDTH + 5, base.y());
+			table->setPos(base.x(), base.y() + hand->boundingRect().height());
+		} else {
+			table->setPos(base);
+			hand->setPos(counterAreaWidth + CARD_WIDTH + 5, base.y() + table->boundingRect().height());
+		}
+		hand->setWidth(table->getWidth());
+	} else {
+		hand->setPos(base);
+		base += QPointF(hand->boundingRect().width(), 0);
+		table->setPos(base);
+	}
+	hand->updateOrientation();
+	updateBoundingRect();
+	rearrangeCounters();
 }
 
 void Player::updateBgPixmap()
@@ -1021,6 +1027,14 @@ void Player::actMoveToExile(CardItem *card)
 qreal Player::getMinimumWidth() const
 {
 	return table->getMinimumWidth() + CARD_WIDTH + 5 + counterAreaWidth;
+}
+
+void Player::setMirrored(bool _mirrored)
+{
+	if (mirrored != _mirrored) {
+		mirrored = _mirrored;
+		rearrangeZones();
+	}
 }
 
 void Player::processSceneSizeChange(const QSizeF &newSize)

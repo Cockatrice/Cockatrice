@@ -35,6 +35,7 @@ public:
 	void resizeToContents();
 	int getMinimumWidth() const { return currentMinimumWidth; }
 	void setWidth(qreal _width);
+	qreal getWidth() const { return width; }
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
 };

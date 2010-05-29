@@ -21,8 +21,6 @@ HEADERS += src/counter.h \
  src/tablezone.h \
  src/handzone.h \
  src/handcounter.h \
- src/handzone_vert.h \
- src/handzone_horiz.h \
  src/carddatabase.h \
  src/gameview.h \
  src/deck_picturecacher.h \
@@ -78,8 +76,6 @@ SOURCES += src/counter.cpp \
  src/tablezone.cpp \
  src/handzone.cpp \
  src/handcounter.cpp \
- src/handzone_vert.cpp \
- src/handzone_horiz.cpp \
  src/carddatabase.cpp \
  src/gameview.cpp \
  src/deck_picturecacher.cpp \

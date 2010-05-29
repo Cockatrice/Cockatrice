@@ -89,6 +89,7 @@ void SettingsCache::setHorizontalHand(int _horizontalHand)
 {
 	horizontalHand = _horizontalHand;
 	settings->setValue("hand/horizontal", horizontalHand);
+	emit horizontalHandChanged();
 }
 
 void SettingsCache::setEconomicGrid(int _economicGrid)

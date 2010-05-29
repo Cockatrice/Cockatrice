@@ -35,7 +35,7 @@ void GameScene::removePlayer(Player *player)
 void GameScene::rearrange()
 {
 	struct PlayerProcessor {
-		static void processPlayer(Player *p, qreal &w, qreal &h, QPointF &b)
+		static void processPlayer(Player *p, qreal &w, qreal &h, QPointF &b, bool singlePlayer)
 		{
 			const QRectF br = p->boundingRect();
 			if (br.width() > w)
@@ -44,6 +44,7 @@ void GameScene::rearrange()
 				h += playerAreaSpacing;
 			h += br.height();
 			p->setPos(b);
+			p->setMirrored((b.y() < playerAreaSpacing) && !singlePlayer);
 			b += QPointF(0, br.height() + playerAreaSpacing);
 		}
 	};
@@ -55,11 +56,11 @@ void GameScene::rearrange()
 
 	for (int i = 0; i < players.size(); ++i)
 		if (!players[i]->getLocal())
-			PlayerProcessor::processPlayer(players[i], sceneWidth, sceneHeight, base);
+			PlayerProcessor::processPlayer(players[i], sceneWidth, sceneHeight, base, players.size() == 1);
 		else
 			localPlayer = players[i];
 	if (localPlayer)
-		PlayerProcessor::processPlayer(localPlayer, sceneWidth, sceneHeight, base);
+		PlayerProcessor::processPlayer(localPlayer, sceneWidth, sceneHeight, base, players.size() == 1);
 
 	playersRect = QRectF(0, 0, sceneWidth, sceneHeight);
 	

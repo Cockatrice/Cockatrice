@@ -208,8 +208,7 @@ void TabGame::actRemoveLocalArrows()
 
 Player *TabGame::addPlayer(int playerId, const QString &playerName)
 {
-	// XXX Find a different criterion for the 'mirrored' flag. When spectating, both players are not local, but only one should be mirrored.
-	Player *newPlayer = new Player(playerName, playerId, playerId == localPlayerId, playerId != localPlayerId, client, this);
+	Player *newPlayer = new Player(playerName, playerId, playerId == localPlayerId, client, this);
 	scene->addPlayer(newPlayer);
 
 	connect(newPlayer, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
