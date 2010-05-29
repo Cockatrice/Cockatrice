@@ -20,6 +20,7 @@ HEADERS += src/counter.h \
  src/carditem.h \
  src/tablezone.h \
  src/handzone.h \
+ src/handcounter.h \
  src/carddatabase.h \
  src/gameview.h \
  src/deck_picturecacher.h \
@@ -73,6 +74,7 @@ SOURCES += src/counter.cpp \
  src/carditem.cpp \
  src/tablezone.cpp \
  src/handzone.cpp \
+ src/handcounter.cpp \
  src/carddatabase.cpp \
  src/gameview.cpp \
  src/deck_picturecacher.cpp \

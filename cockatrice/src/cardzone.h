@@ -27,6 +27,8 @@ protected:
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 	virtual void addCardImpl(CardItem *card, int x, int y) = 0;
+signals:
+	void cardCountChanged();
 public slots:
 	void moveAllToZone();
 public:

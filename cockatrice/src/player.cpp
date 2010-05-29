@@ -8,6 +8,7 @@
 #include "pilezone.h"
 #include "tablezone.h"
 #include "handzone.h"
+#include "handcounter.h"
 #include "cardlist.h"
 #include "tab_game.h"
 #include "protocol_items.h"
@@ -41,9 +42,13 @@ Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabG
 	PileZone *sb = new PileZone(this, "sb", false, false, this);
 	sb->setVisible(false);
 
+	HandCounter *handCounter = new HandCounter(this);
+	handCounter->setPos(base + QPointF(0, 3 * h));
+	
 	table = new TableZone(this, this);
 	connect(table, SIGNAL(sizeChanged()), this, SLOT(updateBoundingRect()));
 	hand = new HandZone(this, (int) table->boundingRect().height(), this);
+	connect(hand, SIGNAL(cardCountChanged()), handCounter, SLOT(updateNumber()));
 	
 	base = QPointF(deck->boundingRect().width() + counterAreaWidth + 5, 0);
 	hand->setPos(base);

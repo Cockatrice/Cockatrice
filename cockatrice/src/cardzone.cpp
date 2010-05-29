@@ -24,6 +24,7 @@ void CardZone::clearContents()
 	for (int i = 0; i < cards.size(); i++)
 		delete cards.at(i);
 	cards.clear();
+	emit cardCountChanged();
 }
 
 QString CardZone::getTranslatedName(bool hisOwn, GrammaticalCase gc) const
@@ -90,6 +91,8 @@ void CardZone::addCard(CardItem *card, bool reorganize, int x, int y)
 
 	if (reorganize)
 		reorganizeCards();
+	
+	emit cardCountChanged();
 }
 
 CardItem *CardZone::getCard(int cardId, const QString &cardName)
@@ -134,6 +137,7 @@ CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName, 
 	c->setName(cardName);
 
 	reorganizeCards();
+	emit cardCountChanged();
 	return c;
 }
 
