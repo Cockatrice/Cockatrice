@@ -104,7 +104,12 @@ void MessageLogWidget::logGameStart()
 
 void MessageLogWidget::logSay(Player *player, QString message)
 {
-	append(QString("<font color=\"red\">%1:</font> %2").arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(message)));
+	append(QString("<b><font color=\"red\">%1:</font></b> %2").arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(message)));
+}
+
+void MessageLogWidget::logSpectatorSay(QString spectatorName, QString message)
+{
+	append(QString("<font color=\"red\">%1:</font> %2").arg(sanitizeHtml(spectatorName)).arg(sanitizeHtml(message)));
 }
 
 void MessageLogWidget::logShuffle(Player *player)

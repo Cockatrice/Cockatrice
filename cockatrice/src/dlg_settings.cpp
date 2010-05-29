@@ -199,6 +199,16 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	zoneBgGroupBox = new QGroupBox;
 	zoneBgGroupBox->setLayout(zoneBgGrid);
 
+	horizontalHandCheckBox = new QCheckBox;
+	horizontalHandCheckBox->setChecked(settingsCache->getHorizontalHand());
+	connect(horizontalHandCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setHorizontalHand(int)));
+	
+	QGridLayout *handGrid = new QGridLayout;
+	handGrid->addWidget(horizontalHandCheckBox, 0, 0, 1, 2);
+	
+	handGroupBox = new QGroupBox;
+	handGroupBox->setLayout(handGrid);
+	
 	economicGridCheckBox = new QCheckBox;
 	economicGridCheckBox->setChecked(settingsCache->getEconomicGrid());
 	connect(economicGridCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setEconomicGrid(int)));
@@ -225,6 +235,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(zoneBgGroupBox);
+	mainLayout->addWidget(handGroupBox);
 	mainLayout->addWidget(tableGroupBox);
 	mainLayout->addWidget(zoneViewGroupBox);
 	
@@ -238,6 +249,9 @@ void AppearanceSettingsPage::retranslateUi()
 	handBgLabel->setText(tr("Path to hand background:"));
 	tableBgLabel->setText(tr("Path to table background:"));
 	playerAreaBgLabel->setText(tr("Path to player info background:"));
+	
+	handGroupBox->setTitle(tr("Hand layout"));
+	horizontalHandCheckBox->setText(tr("Display hand horizontally (wastes space)"));
 	
 	tableGroupBox->setTitle(tr("Table grid layout"));
 	economicGridCheckBox->setText(tr("Economic layout"));

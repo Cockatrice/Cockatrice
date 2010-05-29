@@ -33,6 +33,7 @@ class Event_GameStart;
 class Event_SetActivePlayer;
 class Event_SetActivePhase;
 class Event_Ping;
+class Event_Say;
 class Player;
 class CardZone;
 class AbstractCardItem;
@@ -46,6 +47,7 @@ private:
 	QString gameDescription;
 	int localPlayerId;
 	bool spectator;
+	bool spectatorsCanTalk, spectatorsSeeEverything;
 	QMap<int, Player *> players;
 	QMap<int, QString> spectators;
 	bool started;
@@ -73,6 +75,9 @@ private:
 	void startGame();
 	void stopGame();
 
+	void eventSpectatorSay(Event_Say *event, GameEventContext *context);
+	void eventSpectatorLeave(Event_Leave *event, GameEventContext *context);
+	
 	void eventGameStateChanged(Event_GameStateChanged *event, GameEventContext *context);
 	void eventPlayerPropertiesChanged(Event_PlayerPropertiesChanged *event, GameEventContext *context);
 	void eventJoin(Event_Join *event, GameEventContext *context);
@@ -100,12 +105,15 @@ private slots:
 	void actNextPhase();
 	void actNextTurn();
 public:
-	TabGame(Client *_client, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _resuming);
+	TabGame(Client *_client, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming);
 	~TabGame();
 	void retranslateUi();
 	const QMap<int, Player *> &getPlayers() const { return players; }
 	int getGameId() const { return gameId; }
 	QString getTabText() const { return tr("Game %1: %2").arg(gameId).arg(gameDescription); }
+	bool getSpectator() const { return spectator; }
+	bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
+	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
 
 	void processGameEventContainer(GameEventContainer *cont);
 public slots:

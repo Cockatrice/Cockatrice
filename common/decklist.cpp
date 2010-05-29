@@ -359,11 +359,11 @@ bool DeckList::saveToFile_Native(QIODevice *device)
 	return true;
 }
 
-bool DeckList::loadFromFile_Plain(QIODevice *device)
+bool DeckList::loadFromStream_Plain(QTextStream &in)
 {
 	InnerDecklistNode *main = 0, *side = 0;
 
-	QTextStream in(device);
+	int okRows = 0;
 	while (!in.atEnd()) {
 		QString line = in.readLine().simplified();
 		if (line.startsWith("//"))
@@ -393,9 +393,16 @@ bool DeckList::loadFromFile_Plain(QIODevice *device)
 		int number = line.left(i).toInt(&ok);
 		if (!ok)
 			continue;
+		++okRows;
 		new DecklistCardNode(line.mid(i + 1), number, zone);
 	}
-	return true;
+	return (okRows > 0);
+}
+
+bool DeckList::loadFromFile_Plain(QIODevice *device)
+{
+	QTextStream in(device);
+	return loadFromStream_Plain(in);
 }
 
 bool DeckList::saveToFile_Plain(QIODevice *device)

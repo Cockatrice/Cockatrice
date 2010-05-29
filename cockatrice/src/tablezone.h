@@ -9,6 +9,7 @@ signals:
 	void sizeChanged();
 private:
 	int width, height;
+	int currentMinimumWidth;
 	QPixmap bgPixmap;
 private slots:	
 	void updateBgPixmap();
@@ -32,6 +33,8 @@ public:
 	QPointF closestGridPoint(const QPointF &point);
 	CardItem *takeCard(int position, int cardId, const QString &cardName, bool canResize = true);
 	void resizeToContents();
+	int getMinimumWidth() const { return currentMinimumWidth; }
+	void setWidth(qreal _width);
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
 };

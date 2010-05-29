@@ -9,6 +9,7 @@
 
 class CardDatabase;
 class QIODevice;
+class QTextStream;
 class QXmlStreamReader;
 class QXmlStreamWriter;
 
@@ -137,6 +138,7 @@ public:
 	
 	bool loadFromFile_Native(QIODevice *device);
 	bool saveToFile_Native(QIODevice *device);
+	bool loadFromStream_Plain(QTextStream &stream);
 	bool loadFromFile_Plain(QIODevice *device);
 	bool saveToFile_Plain(QIODevice *device);
 	bool loadFromFile(const QString &fileName, FileFormat fmt);

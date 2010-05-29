@@ -17,6 +17,7 @@ SettingsCache::SettingsCache()
 	
 	picDownload = settings->value("personal/picturedownload", false).toBool();
 	doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
+	horizontalHand = settings->value("hand/horizontal", false).toBool();
 	economicGrid = settings->value("table/economic", false).toBool();
 	
 	zoneViewSortByName = settings->value("zoneview/sortbyname", false).toBool();
@@ -82,6 +83,12 @@ void SettingsCache::setDoubleClickToPlay(int _doubleClickToPlay)
 {
 	doubleClickToPlay = _doubleClickToPlay;
 	settings->setValue("interface/doubleclicktoplay", doubleClickToPlay);
+}
+
+void SettingsCache::setHorizontalHand(int _horizontalHand)
+{
+	horizontalHand = _horizontalHand;
+	settings->setValue("hand/horizontal", horizontalHand);
 }
 
 void SettingsCache::setEconomicGrid(int _economicGrid)

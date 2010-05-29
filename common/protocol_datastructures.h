@@ -39,7 +39,7 @@ public:
 
 class ServerInfo_Game : public SerializableItem_Map {
 public:
-	ServerInfo_Game(int _gameId = -1, const QString &_description = QString(), bool _hasPassword = false, int _playerCount = -1, int _maxPlayers = -1, const QString &_creatorName = QString(), bool _spectatorsAllowed = false, int _spectatorCount = -1);
+	ServerInfo_Game(int _gameId = -1, const QString &_description = QString(), bool _hasPassword = false, int _playerCount = -1, int _maxPlayers = -1, const QString &_creatorName = QString(), bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, int _spectatorCount = -1);
 	static SerializableItem *newItem() { return new ServerInfo_Game; }
 	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); }
 	QString getDescription() const { return static_cast<SerializableItem_String *>(itemMap.value("description"))->getData(); }
@@ -48,6 +48,7 @@ public:
 	int getMaxPlayers() const { return static_cast<SerializableItem_Int *>(itemMap.value("max_players"))->getData(); }
 	QString getCreatorName() const { return static_cast<SerializableItem_String *>(itemMap.value("creator_name"))->getData(); }
 	bool getSpectatorsAllowed() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_allowed"))->getData(); }
+	bool getSpectatorsNeedPassword() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_need_password"))->getData(); }
 	int getSpectatorCount() const { return static_cast<SerializableItem_Int *>(itemMap.value("spectator_count"))->getData(); }
 };
 

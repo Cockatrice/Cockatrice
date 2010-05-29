@@ -104,7 +104,7 @@ void Command::processResponse(ProtocolResponse *response)
 }
 
 CommandContainer::CommandContainer(const QList<Command *> &_commandList, int _cmdId)
-	: ProtocolItem("container", "cmd"), ticks(0), resp(0), gameEventQueuePublic(0), gameEventQueuePrivate(0)
+	: ProtocolItem("container", "cmd"), ticks(0), resp(0), gameEventQueuePublic(0), gameEventQueueOmniscient(0), gameEventQueuePrivate(0)
 {
 	if (_cmdId == -1)
 		_cmdId = lastCmdId++;
@@ -135,6 +135,13 @@ void CommandContainer::enqueueGameEventPublic(GameEvent *event, int gameId)
 	if (!gameEventQueuePublic)
 		gameEventQueuePublic = new GameEventContainer(QList<GameEvent *>(), gameId);
 	gameEventQueuePublic->appendItem(event);
+}
+
+void CommandContainer::enqueueGameEventOmniscient(GameEvent *event, int gameId)
+{
+	if (!gameEventQueueOmniscient)
+		gameEventQueueOmniscient = new GameEventContainer(QList<GameEvent *>(), gameId);
+	gameEventQueueOmniscient->appendItem(event);
 }
 
 void CommandContainer::enqueueGameEventPrivate(GameEvent *event, int gameId)

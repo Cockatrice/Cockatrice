@@ -19,8 +19,8 @@
 #include "arrowitem.h"
 #include "main.h"
 
-TabGame::TabGame(Client *_client, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _resuming)
-	: Tab(), client(_client), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), started(false), resuming(_resuming), currentPhase(-1)
+TabGame::TabGame(Client *_client, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
+	: Tab(), client(_client), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), started(false), resuming(_resuming), currentPhase(-1)
 {
 	scene = new GameScene(this);
 	gameView = new GameView(scene);
@@ -74,8 +74,10 @@ TabGame::TabGame(Client *_client, int _gameId, const QString &_gameDescription, 
 	mainLayout->addLayout(verticalLayout);
 
 	if (spectator) {
-		sayLabel->hide();
-		sayEdit->hide();
+		if (!spectatorsCanTalk) {
+			sayLabel->hide();
+			sayEdit->hide();
+		}
 		loadLocalButton->hide();
 		loadRemoteButton->hide();
 		readyStartButton->hide();
@@ -206,7 +208,8 @@ void TabGame::actRemoveLocalArrows()
 
 Player *TabGame::addPlayer(int playerId, const QString &playerName)
 {
-	Player *newPlayer = new Player(playerName, playerId, playerId == localPlayerId, client, this);
+	// XXX Find a different criterion for the 'mirrored' flag. When spectating, both players are not local, but only one should be mirrored.
+	Player *newPlayer = new Player(playerName, playerId, playerId == localPlayerId, playerId != localPlayerId, client, this);
 	scene->addPlayer(newPlayer);
 
 	connect(newPlayer, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
@@ -226,7 +229,16 @@ void TabGame::processGameEventContainer(GameEventContainer *cont)
 	for (int i = 0; i < eventList.size(); ++i) {
 		GameEvent *event = eventList[i];
 		
-		switch (event->getItemId()) {
+		if (spectators.contains(event->getPlayerId())) {
+			switch (event->getItemId()) {
+				case ItemId_Event_Say: eventSpectatorSay(qobject_cast<Event_Say *>(event), context); break;
+				case ItemId_Event_Leave: eventSpectatorLeave(qobject_cast<Event_Leave *>(event), context); break;
+				default: {
+					qDebug() << "unhandled spectator game event";
+					break;
+				}
+			}
+		} else switch (event->getItemId()) {
 			case ItemId_Event_GameStateChanged: eventGameStateChanged(qobject_cast<Event_GameStateChanged *>(event), context); break;
 			case ItemId_Event_PlayerPropertiesChanged: eventPlayerPropertiesChanged(qobject_cast<Event_PlayerPropertiesChanged *>(event), context); break;
 			case ItemId_Event_Join: eventJoin(qobject_cast<Event_Join *>(event), context); break;
@@ -287,6 +299,21 @@ void TabGame::stopGame()
 	gameView->hide();
 	phasesToolbar->hide();
 	deckViewContainer->show();
+}
+
+void TabGame::eventSpectatorSay(Event_Say *event, GameEventContext * /*context*/)
+{
+	messageLog->logSpectatorSay(spectators.value(event->getPlayerId()), event->getMessage());
+}
+
+void TabGame::eventSpectatorLeave(Event_Leave *event, GameEventContext * /*context*/)
+{
+	int playerId = event->getPlayerId();
+	messageLog->logLeaveSpectator(spectators.value(playerId));
+	playerListWidget->removePlayer(playerId);
+	spectators.remove(playerId);
+	
+	emit userEvent();
 }
 
 void TabGame::eventGameStateChanged(Event_GameStateChanged *event, GameEventContext * /*context*/)
@@ -366,10 +393,6 @@ void TabGame::eventLeave(Event_Leave *event, GameEventContext * /*context*/)
 		playerListWidget->removePlayer(playerId);
 		players.remove(playerId);
 		delete player;
-	} else if (spectators.contains(playerId)) {
-		messageLog->logLeaveSpectator(spectators.value(playerId));
-		playerListWidget->removePlayer(playerId);
-		spectators.remove(playerId);
 	}
 	emit userEvent();
 }

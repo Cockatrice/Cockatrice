@@ -81,7 +81,7 @@ void GameSelector::actJoin()
 		return;
 	ServerInfo_Game *game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
 	QString password;
-	if (game->getHasPassword()) {
+	if (game->getHasPassword() && !(spectator && !game->getSpectatorsNeedPassword())) {
 		bool ok;
 		password = QInputDialog::getText(this, tr("Join game"), tr("Password:"), QLineEdit::Password, QString(), &ok);
 		if (!ok)

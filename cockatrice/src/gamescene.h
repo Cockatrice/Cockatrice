@@ -19,6 +19,7 @@ public:
 	GameScene(QObject *parent = 0);
 	void retranslateUi();
 	const QRectF &getPlayersRect() const { return playersRect; }
+	void processViewSizeChange(const QSize &newSize);
 public slots:
 	void toggleZoneView(Player *player, const QString &zoneName, int numberCards);
 	void removeZoneView(ZoneViewWidget *item);

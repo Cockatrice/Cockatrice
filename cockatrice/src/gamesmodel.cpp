@@ -27,7 +27,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
 	switch (index.column()) {
 		case 0: return g->getDescription();
 		case 1: return g->getCreatorName();
-		case 2: return g->getHasPassword() ? tr("yes") : tr("no");
+		case 2: return g->getHasPassword() ? (g->getSpectatorsNeedPassword() ? tr("yes") : tr("yes, free for spectators")) : tr("no");
 		case 3: return QString("%1/%2").arg(g->getPlayerCount()).arg(g->getMaxPlayers());
 		case 4: return g->getSpectatorsAllowed() ? QVariant(g->getSpectatorCount()) : QVariant(tr("not allowed"));
 		default: return QVariant();
@@ -56,7 +56,7 @@ ServerInfo_Game *GamesModel::getGame(int row)
 
 void GamesModel::updateGameList(ServerInfo_Game *_game)
 {
-	ServerInfo_Game *game = new ServerInfo_Game(_game->getGameId(), _game->getDescription(), _game->getHasPassword(), _game->getPlayerCount(), _game->getMaxPlayers(), _game->getCreatorName(), _game->getSpectatorsAllowed(), _game->getSpectatorCount());
+	ServerInfo_Game *game = new ServerInfo_Game(_game->getGameId(), _game->getDescription(), _game->getHasPassword(), _game->getPlayerCount(), _game->getMaxPlayers(), _game->getCreatorName(), _game->getSpectatorsAllowed(), _game->getSpectatorsNeedPassword(), _game->getSpectatorCount());
 	for (int i = 0; i < gameList.size(); i++)
 		if (gameList[i]->getGameId() == game->getGameId()) {
 			if (game->getPlayerCount() == 0) {

@@ -40,6 +40,9 @@ private:
 	int maxPlayers;
 	int activePlayer, activePhase;
 	bool spectatorsAllowed;
+	bool spectatorsNeedPassword;
+	bool spectatorsCanTalk;
+	bool spectatorsSeeEverything;
 	int inactivityCounter;
 	QTimer *pingClock;
 signals:
@@ -47,20 +50,23 @@ signals:
 private slots:
 	void pingClockTimeout();
 public:
-	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, QObject *parent = 0);
+	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, QObject *parent = 0);
 	~Server_Game();
 	Server_Player *getCreator() const { return creator; }
 	QString getCreatorName() const { return creator ? creator->getPlayerName() : QString(); }
 	bool getGameStarted() const { return gameStarted; }
 	int getPlayerCount() const;
 	int getSpectatorCount() const;
-	QList<Server_Player *> getPlayers() const { return players.values(); }
+	const QMap<int, Server_Player *> &getPlayers() const { return players; }
 	Server_Player *getPlayer(int playerId) const { return players.value(playerId, 0); }
 	int getGameId() const { return gameId; }
 	QString getDescription() const { return description; }
 	QString getPassword() const { return password; }
 	int getMaxPlayers() const { return maxPlayers; }
 	bool getSpectatorsAllowed() const { return spectatorsAllowed; }
+	bool getSpectatorsNeedPassword() const { return spectatorsNeedPassword; }
+	bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
+	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
 	ResponseCode checkJoin(const QString &_password, bool spectator);
 	Server_Player *addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate = true);
 	void removePlayer(Server_Player *player);
@@ -73,7 +79,8 @@ public:
 
 	QList<ServerInfo_Player *> getGameState(Server_Player *playerWhosAsking) const;
 	void sendGameEvent(GameEvent *event, GameEventContext *context = 0, Server_Player *exclude = 0);
-	void sendGameEventContainer(GameEventContainer *cont, Server_Player *exclude = 0);
+	void sendGameEventContainer(GameEventContainer *cont, Server_Player *exclude = 0, bool excludeOmniscient = false);
+	void sendGameEventContainerOmniscient(GameEventContainer *cont, Server_Player *exclude = 0);
 	void sendGameEventToPlayer(Server_Player *player, GameEvent *event);
 };
 

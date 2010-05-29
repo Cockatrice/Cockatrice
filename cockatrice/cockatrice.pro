@@ -21,10 +21,13 @@ HEADERS += src/counter.h \
  src/tablezone.h \
  src/handzone.h \
  src/handcounter.h \
+ src/handzone_vert.h \
+ src/handzone_horiz.h \
  src/carddatabase.h \
  src/gameview.h \
  src/deck_picturecacher.h \
  src/decklistmodel.h \
+ src/dlg_load_deck_from_clipboard.h \
  src/dlg_load_remote_deck.h \
  src/cardinfowidget.h \
  src/messagelogwidget.h \
@@ -75,10 +78,13 @@ SOURCES += src/counter.cpp \
  src/tablezone.cpp \
  src/handzone.cpp \
  src/handcounter.cpp \
+ src/handzone_vert.cpp \
+ src/handzone_horiz.cpp \
  src/carddatabase.cpp \
  src/gameview.cpp \
  src/deck_picturecacher.cpp \
  src/decklistmodel.cpp \
+ src/dlg_load_deck_from_clipboard.cpp \
  src/dlg_load_remote_deck.cpp \
  src/cardinfowidget.cpp \
  src/messagelogwidget.cpp \
