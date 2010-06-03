@@ -92,6 +92,11 @@ void MessageLogWidget::logReadyStart(Player *player)
 	append(tr("%1 is ready to start the game.").arg(sanitizeHtml(player->getName())));
 }
 
+void MessageLogWidget::logNotReadyStart(Player *player)
+{
+	append(tr("%1 is not ready to start the game any more.").arg(sanitizeHtml(player->getName())));
+}
+
 void MessageLogWidget::logConcede(Player *player)
 {
 	append(tr("%1 has conceded the game.").arg(sanitizeHtml(player->getName())));

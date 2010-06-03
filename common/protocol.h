@@ -47,7 +47,7 @@ class ProtocolItem : public SerializableItem_Map {
 private:
 	static void initializeHashAuto();
 public:
-	static const int protocolVersion = 6;
+	static const int protocolVersion = 7;
 	static void initializeHash();
 	virtual int getItemId() const = 0;
 	ProtocolItem(const QString &_itemType, const QString &_itemSubType);

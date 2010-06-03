@@ -19,6 +19,29 @@
 #include "arrowitem.h"
 #include "main.h"
 
+ReadyStartButton::ReadyStartButton(QWidget *parent)
+	: QPushButton(parent), readyStart(false)
+{
+}
+
+void ReadyStartButton::paintEvent(QPaintEvent *event)
+{
+	QPushButton::paintEvent(event);
+	
+	QPainter painter(this);
+	if (readyStart)
+		painter.setPen(QPen(Qt::green, 3));
+	else
+		painter.setPen(QPen(Qt::red, 3));
+	painter.drawRect(1.5, 1.5, width() - 3, height() - 3);
+}
+
+void ReadyStartButton::setReadyStart(bool _readyStart)
+{
+	readyStart = _readyStart;
+	update();
+}
+
 TabGame::TabGame(Client *_client, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
 	: Tab(), client(_client), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), started(false), resuming(_resuming), currentPhase(-1)
 {
@@ -28,7 +51,7 @@ TabGame::TabGame(Client *_client, int _gameId, const QString &_gameDescription, 
 	
 	loadLocalButton = new QPushButton;
 	loadRemoteButton = new QPushButton;
-	readyStartButton = new QPushButton;
+	readyStartButton = new ReadyStartButton;
 	readyStartButton->setEnabled(false);
 	
 	QHBoxLayout *buttonHBox = new QHBoxLayout;
@@ -142,7 +165,7 @@ void TabGame::retranslateUi()
 	
 	loadLocalButton->setText(tr("Load &local deck"));
 	loadRemoteButton->setText(tr("Load d&eck from server"));
-	readyStartButton->setText(tr("S&tart game"));
+	readyStartButton->setText(tr("Ready to s&tart"));
 	sayLabel->setText(tr("&Say:"));
 	cardInfo->retranslateUi();
 
@@ -360,7 +383,18 @@ void TabGame::eventPlayerPropertiesChanged(Event_PlayerPropertiesChanged *event,
 		return;
 	playerListWidget->updatePlayerProperties(event->getProperties());
 	if (context) switch (context->getItemId()) {
-		case ItemId_Context_ReadyStart: messageLog->logReadyStart(player); break;
+		case ItemId_Context_ReadyStart: {
+			bool ready = event->getProperties()->getReadyStart();
+			if (player->getLocal()) {
+				readyStartButton->setReadyStart(ready);
+				deckView->setLocked(ready);
+			}
+			if (ready)
+				messageLog->logReadyStart(player);
+			else
+				messageLog->logNotReadyStart(player);
+			break;
+		}
 		case ItemId_Context_Concede: messageLog->logConcede(player); break;
 		case ItemId_Context_DeckSelect: messageLog->logDeckSelect(player, static_cast<Context_DeckSelect *>(context)->getDeckId()); break;
 		default: ;
@@ -498,7 +532,7 @@ void TabGame::deckSelectFinished(ProtocolResponse *r)
 
 void TabGame::readyStart()
 {
-	client->sendCommand(new Command_ReadyStart(gameId));
+	client->sendCommand(new Command_ReadyStart(gameId, !readyStartButton->getReadyStart()));
 }
 
 void TabGame::newCardAdded(AbstractCardItem *card)

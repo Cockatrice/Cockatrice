@@ -227,7 +227,8 @@ public:
 class Command_ReadyStart : public GameCommand {
 	Q_OBJECT
 public:
-	Command_ReadyStart(int _gameId = -1);
+	Command_ReadyStart(int _gameId = -1, bool _ready = false);
+	bool getReady() const { return static_cast<SerializableItem_Bool *>(itemMap.value("ready"))->getData(); };
 	static SerializableItem *newItem() { return new Command_ReadyStart; }
 	int getItemId() const { return ItemId_Command_ReadyStart; }
 };

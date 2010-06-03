@@ -64,6 +64,11 @@ DeckViewCard::DeckViewCard(const QString &_name, const QString &_originZone, QGr
 {
 }
 
+DeckViewCard::~DeckViewCard()
+{
+	delete dragItem;
+}
+
 void DeckViewCard::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	AbstractCardItem::paint(painter, option, widget);
@@ -83,6 +88,9 @@ void DeckViewCard::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 void DeckViewCard::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
 	if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < 2 * QApplication::startDragDistance())
+		return;
+	
+	if (static_cast<DeckViewScene *>(scene())->getLocked())
 		return;
 	
 	delete dragItem;
@@ -185,7 +193,7 @@ void DeckViewCardContainer::setWidth(qreal _width)
 }
 
 DeckViewScene::DeckViewScene(QObject *parent)
-	: QGraphicsScene(parent), deck(0)
+	: QGraphicsScene(parent), locked(false), deck(0)
 {
 }
 

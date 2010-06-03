@@ -2,6 +2,7 @@
 #define TAB_GAME_H
 
 #include <QMap>
+#include <QPushButton>
 #include "tab.h"
 
 class Client;
@@ -39,6 +40,18 @@ class CardZone;
 class AbstractCardItem;
 class CardItem;
 
+class ReadyStartButton : public QPushButton {
+	Q_OBJECT
+private:
+	bool readyStart;
+public:
+	ReadyStartButton(QWidget *parent = 0);
+	bool getReadyStart() const { return readyStart; }
+	void setReadyStart(bool _readyStart);
+protected:
+	void paintEvent(QPaintEvent *event);
+};
+
 class TabGame : public Tab {
 	Q_OBJECT
 private:
@@ -54,7 +67,8 @@ private:
 	bool resuming;
 	int currentPhase;
 
-	QPushButton *loadLocalButton, *loadRemoteButton, *readyStartButton;
+	QPushButton *loadLocalButton, *loadRemoteButton;
+	ReadyStartButton *readyStartButton;
 	CardInfoWidget *cardInfo;
 	PlayerListWidget *playerListWidget;
 	MessageLogWidget *messageLog;

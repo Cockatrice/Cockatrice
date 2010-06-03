@@ -365,6 +365,8 @@ ResponseCode Server_ProtocolHandler::cmdSetSideboardPlan(Command_SetSideboardPla
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
+	if (player->getReadyStart())
+		return RespContextError;
 	
 	DeckList *deck = player->getDeck();
 	if (!deck)
@@ -385,7 +387,7 @@ ResponseCode Server_ProtocolHandler::cmdConcede(Command_Concede * /*cmd*/, Comma
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdReadyStart(Command_ReadyStart * /*cmd*/, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdReadyStart(Command_ReadyStart *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -393,7 +395,10 @@ ResponseCode Server_ProtocolHandler::cmdReadyStart(Command_ReadyStart * /*cmd*/,
 	if (!player->getDeck())
 		return RespContextError;
 
-	player->setReadyStart(true);
+	if (player->getReadyStart() == cmd->getReady())
+		return RespContextError;
+	
+	player->setReadyStart(cmd->getReady());
 	game->sendGameEvent(new Event_PlayerPropertiesChanged(player->getProperties()), new Context_ReadyStart);
 	game->startGameIfReady();
 	return RespOk;

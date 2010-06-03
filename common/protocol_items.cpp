@@ -147,9 +147,10 @@ Command_SetCardAttr::Command_SetCardAttr(int _gameId, const QString &_zone, int 
 	insertItem(new SerializableItem_String("attr_name", _attrName));
 	insertItem(new SerializableItem_String("attr_value", _attrValue));
 }
-Command_ReadyStart::Command_ReadyStart(int _gameId)
+Command_ReadyStart::Command_ReadyStart(int _gameId, bool _ready)
 	: GameCommand("ready_start", _gameId)
 {
+	insertItem(new SerializableItem_Bool("ready", _ready));
 }
 Command_Concede::Command_Concede(int _gameId)
 	: GameCommand("concede", _gameId)

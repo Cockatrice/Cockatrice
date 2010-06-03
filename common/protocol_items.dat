@@ -23,7 +23,7 @@
 2:create_arrow:i,start_player_id:s,start_zone:i,start_card_id:i,target_player_id:s,target_zone:i,target_card_id:c,color
 2:delete_arrow:i,arrow_id
 2:set_card_attr:s,zone:i,card_id:s,attr_name:s,attr_value
-2:ready_start
+2:ready_start:b,ready
 2:concede
 2:inc_counter:i,counter_id:i,delta
 2:create_counter:s,counter_name:c,color:i,radius:i,value
