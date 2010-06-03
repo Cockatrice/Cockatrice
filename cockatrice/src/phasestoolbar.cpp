@@ -48,6 +48,11 @@ void PhaseButton::setPhaseText(const QString &_phaseText)
 
 void PhaseButton::mouseDoubleClickEvent(QMouseEvent */*event*/)
 {
+	triggerDoubleClickAction();
+}
+
+void PhaseButton::triggerDoubleClickAction()
+{
 	if (doubleClickAction)
 		doubleClickAction->trigger();
 }
@@ -61,16 +66,22 @@ PhasesToolbar::PhasesToolbar(QWidget *parent)
 	connect(aDrawCard, SIGNAL(triggered()), this, SLOT(actDrawCard()));
 	
 	PhaseButton *untapButton = new PhaseButton(QIcon(":/resources/icon_phase_untap.svg"), aUntapAll);
+	untapButton->setShortcut(QKeySequence("F5"));
 	PhaseButton *upkeepButton = new PhaseButton(QIcon(":/resources/icon_phase_upkeep.svg"));
 	PhaseButton *drawButton = new PhaseButton(QIcon(":/resources/icon_phase_draw.svg"), aDrawCard);
+	drawButton->setShortcut(QKeySequence("F6"));
 	PhaseButton *main1Button = new PhaseButton(QIcon(":/resources/icon_phase_main1.svg"));
+	main1Button->setShortcut(QKeySequence("F7"));
 	PhaseButton *combatStartButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_start.svg"));
+	combatStartButton->setShortcut(QKeySequence("F8"));
 	PhaseButton *combatAttackersButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_attackers.svg"));
 	PhaseButton *combatBlockersButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_blockers.svg"));
 	PhaseButton *combatDamageButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_damage.svg"));
 	PhaseButton *combatEndButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_end.svg"));
 	PhaseButton *main2Button = new PhaseButton(QIcon(":/resources/icon_phase_main2.svg"));
+	main2Button->setShortcut(QKeySequence("F9"));
 	PhaseButton *cleanupButton = new PhaseButton(QIcon(":/resources/icon_phase_cleanup.svg"));
+	cleanupButton->setShortcut(QKeySequence("F10"));
 	
 	buttonList << untapButton << upkeepButton << drawButton << main1Button << combatStartButton
 		<< combatAttackersButton << combatBlockersButton << combatDamageButton << combatEndButton
@@ -140,7 +151,7 @@ void PhasesToolbar::phaseButtonClicked()
 {
 	PhaseButton *button = qobject_cast<PhaseButton *>(sender());
 	if (button->getActive())
-		return;
+		button->triggerDoubleClickAction();
 	emit sendGameCommand(new Command_SetActivePhase(-1, buttonList.indexOf(button)));
 }
 

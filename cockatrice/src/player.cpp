@@ -394,16 +394,8 @@ void Player::initSayMenu()
 	int count = settings.value("count", 0).toInt();
 	for (int i = 0; i < count; i++) {
 		QAction *newAction = new QAction(settings.value(QString("msg%1").arg(i)).toString(), this);
-		QString shortcut;
-		switch (i) {
-			case 0: shortcut = tr("F5"); break;
-			case 1: shortcut = tr("F6"); break;
-			case 2: shortcut = tr("F7"); break;
-			case 3: shortcut = tr("F8"); break;
-			case 4: shortcut = tr("F9"); break;
-			case 5: shortcut = tr("F10"); break;
-		}
-		newAction->setShortcut(shortcut);
+		if (i <= 10)
+			newAction->setShortcut(QString("Ctrl+%1").arg((i + 1) % 10));
 		connect(newAction, SIGNAL(triggered()), this, SLOT(actSayMessage()));
 		sayMenu->addAction(newAction);
 	}

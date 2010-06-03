@@ -23,6 +23,7 @@ public:
 	QString getPhaseText() const { return phaseText; }
 	void setActive(bool _active) { active = _active; update(); }
 	bool getActive() const { return active; }
+	void triggerDoubleClickAction();
 protected:
 	void paintEvent(QPaintEvent *event);
 	void mouseDoubleClickEvent(QMouseEvent *event);
