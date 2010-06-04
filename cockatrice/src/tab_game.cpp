@@ -304,6 +304,7 @@ void TabGame::startGame()
 {
 	currentPhase = -1;
 
+	readyStartButton->setReadyStart(false);
 	playerListWidget->setGameStarted(true);
 	started = true;
 	deckViewContainer->hide();
