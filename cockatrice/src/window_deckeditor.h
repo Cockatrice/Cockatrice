@@ -36,9 +36,10 @@ private slots:
 
 	void actNewDeck();
 	void actLoadDeck();
-	void actLoadDeckFromClipboard();
 	bool actSaveDeck();
 	bool actSaveDeckAs();
+	void actLoadDeckFromClipboard();
+	void actSaveDeckToClipboard();
 	void actPrintDeck();
 
 	void actEditSets();
@@ -71,7 +72,7 @@ private:
 	DlgCardSearch *dlgCardSearch;
 
 	QMenu *deckMenu, *dbMenu;
-	QAction *aNewDeck, *aLoadDeck, *aLoadDeckFromClipboard, *aSaveDeck, *aSaveDeckAs, *aPrintDeck, *aClose;
+	QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aClose;
 	QAction *aEditSets, *aSearch, *aClearSearch;
 	QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;
 public:

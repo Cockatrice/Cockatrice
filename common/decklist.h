@@ -140,6 +140,7 @@ public:
 	bool saveToFile_Native(QIODevice *device);
 	bool loadFromStream_Plain(QTextStream &stream);
 	bool loadFromFile_Plain(QIODevice *device);
+	bool saveToStream_Plain(QTextStream &stream);
 	bool saveToFile_Plain(QIODevice *device);
 	bool loadFromFile(const QString &fileName, FileFormat fmt);
 	bool saveToFile(const QString &fileName, FileFormat fmt);

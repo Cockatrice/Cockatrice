@@ -405,10 +405,9 @@ bool DeckList::loadFromFile_Plain(QIODevice *device)
 	return loadFromStream_Plain(in);
 }
 
-bool DeckList::saveToFile_Plain(QIODevice *device)
+bool DeckList::saveToStream_Plain(QTextStream &out)
 {
 	// Support for this is only possible if the internal structure doesn't get more complicated.
-	QTextStream out(device);
 	for (int i = 0; i < root->size(); i++) {
 		InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
 		for (int j = 0; j < node->size(); j++) {
@@ -417,6 +416,12 @@ bool DeckList::saveToFile_Plain(QIODevice *device)
 		}
 	}
 	return true;
+}
+
+bool DeckList::saveToFile_Plain(QIODevice *device)
+{
+	QTextStream out(device);
+	return saveToStream_Plain(out);
 }
 
 bool DeckList::loadFromFile(const QString &fileName, FileFormat fmt)

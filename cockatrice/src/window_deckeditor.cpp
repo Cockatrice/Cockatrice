@@ -123,14 +123,18 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	aLoadDeck = new QAction(tr("&Load deck..."), this);
 	aLoadDeck->setShortcuts(QKeySequence::Open);
 	connect(aLoadDeck, SIGNAL(triggered()), this, SLOT(actLoadDeck()));
-	aLoadDeckFromClipboard = new QAction(tr("Load deck from cl&ipboard..."), this);
-	connect(aLoadDeckFromClipboard, SIGNAL(triggered()), this, SLOT(actLoadDeckFromClipboard()));
 	aSaveDeck = new QAction(tr("&Save deck"), this);
 	aSaveDeck->setShortcuts(QKeySequence::Save);
 	connect(aSaveDeck, SIGNAL(triggered()), this, SLOT(actSaveDeck()));
 	aSaveDeckAs = new QAction(tr("Save deck &as..."), this);
 //	aSaveDeckAs->setShortcuts(QKeySequence::SaveAs);
 	connect(aSaveDeckAs, SIGNAL(triggered()), this, SLOT(actSaveDeckAs()));
+	aLoadDeckFromClipboard = new QAction(tr("Load deck from cl&ipboard..."), this);
+	connect(aLoadDeckFromClipboard, SIGNAL(triggered()), this, SLOT(actLoadDeckFromClipboard()));
+	aLoadDeckFromClipboard->setShortcuts(QKeySequence::Paste);
+	aSaveDeckToClipboard = new QAction(tr("Save deck to cl&ipboard"), this);
+	connect(aSaveDeckToClipboard, SIGNAL(triggered()), this, SLOT(actSaveDeckToClipboard()));
+	aSaveDeckToClipboard->setShortcuts(QKeySequence::Copy);
 	aPrintDeck = new QAction(tr("&Print deck..."), this);
 	aPrintDeck->setShortcuts(QKeySequence::Print);
 	connect(aPrintDeck, SIGNAL(triggered()), this, SLOT(actPrintDeck()));
@@ -144,9 +148,11 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	deckMenu = menuBar()->addMenu(tr("&Deck"));
 	deckMenu->addAction(aNewDeck);
 	deckMenu->addAction(aLoadDeck);
-	deckMenu->addAction(aLoadDeckFromClipboard);
 	deckMenu->addAction(aSaveDeck);
 	deckMenu->addAction(aSaveDeckAs);
+	deckMenu->addSeparator();
+	deckMenu->addAction(aLoadDeckFromClipboard);
+	deckMenu->addAction(aSaveDeckToClipboard);
 	deckMenu->addSeparator();
 	deckMenu->addAction(aPrintDeck);
 	deckMenu->addSeparator();
@@ -279,19 +285,6 @@ void WndDeckEditor::actLoadDeck()
 		delete l;
 }
 
-void WndDeckEditor::actLoadDeckFromClipboard()
-{
-	if (!confirmClose())
-		return;
-	
-	DlgLoadDeckFromClipboard dlg;
-	if (!dlg.exec())
-		return;
-	
-	setDeck(dlg.getDeckList());
-	setWindowModified(true);
-}
-
 bool WndDeckEditor::actSaveDeck()
 {
 	if (lastFileName.isEmpty())
@@ -325,6 +318,27 @@ bool WndDeckEditor::actSaveDeckAs()
 		return true;
 	}
 	return false;
+}
+
+void WndDeckEditor::actLoadDeckFromClipboard()
+{
+	if (!confirmClose())
+		return;
+	
+	DlgLoadDeckFromClipboard dlg;
+	if (!dlg.exec())
+		return;
+	
+	setDeck(dlg.getDeckList());
+	setWindowModified(true);
+}
+
+void WndDeckEditor::actSaveDeckToClipboard()
+{
+	QString buffer;
+	QTextStream stream(&buffer);
+	deckModel->getDeckList()->saveToStream_Plain(stream);
+	QApplication::clipboard()->setText(buffer);
 }
 
 void WndDeckEditor::actPrintDeck()
