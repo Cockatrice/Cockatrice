@@ -1002,7 +1002,10 @@ void Player::actMoveToExile(CardItem *card)
 
 qreal Player::getMinimumWidth() const
 {
-	return table->getMinimumWidth() + CARD_WIDTH + 5 + counterAreaWidth;
+	qreal result = table->getMinimumWidth() + CARD_WIDTH + 5 + counterAreaWidth;
+	if (!settingsCache->getHorizontalHand())
+		result += hand->boundingRect().width();
+	return result;
 }
 
 void Player::setMirrored(bool _mirrored)
@@ -1019,6 +1022,9 @@ void Player::processSceneSizeChange(const QSizeF &newSize)
 	qreal fullPlayerWidth = newSize.width();
 	
 	qreal tableWidth = fullPlayerWidth - CARD_WIDTH - 5 - counterAreaWidth;
+	if (!settingsCache->getHorizontalHand())
+		tableWidth -= hand->boundingRect().width();
+	
 	table->setWidth(tableWidth);
 	hand->setWidth(tableWidth);
 }
