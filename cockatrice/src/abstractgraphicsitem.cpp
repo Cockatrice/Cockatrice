@@ -1,7 +1,7 @@
 #include "abstractgraphicsitem.h"
 #include <QPainter>
 
-void AbstractGraphicsItem::paintNumberEllipse(int number, int fontSize, const QColor &color, int position, QPainter *painter)
+void AbstractGraphicsItem::paintNumberEllipse(int number, int fontSize, const QColor &color, int position, int count, QPainter *painter)
 {
 	painter->save();
 
@@ -31,8 +31,13 @@ void AbstractGraphicsItem::paintNumberEllipse(int number, int fontSize, const QC
 	if (position == -1)
 		textRect = QRectF((boundingRect().width() - w) / 2.0, (boundingRect().height() - h) / 2.0, w, h);
 	else {
-		qreal offset = boundingRect().width() / 20.0;
-		textRect = QRectF(offset, offset * (position + 1) + h * position, w, h);
+		qreal xOffset = 10;
+		qreal yOffset = 20;
+		qreal spacing = 2;
+		if (position < 2)
+			textRect = QRectF(count == 1 ? ((boundingRect().width() - w) / 2.0) : (position % 2 == 0 ? xOffset : (boundingRect().width() - xOffset - w)), yOffset, w, h);
+		else
+			textRect = QRectF(count == 3 ? ((boundingRect().width() - w) / 2.0) : (position % 2 == 0 ? xOffset : (boundingRect().width() - xOffset - w)), yOffset + (spacing + h) * (position / 2), w, h);
 	}
 	
 	painter->drawEllipse(textRect);

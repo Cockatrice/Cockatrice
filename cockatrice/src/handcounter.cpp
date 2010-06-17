@@ -42,5 +42,5 @@ void HandCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
 	painter->drawPixmap(cachedPixmap.rect(), cachedPixmap, cachedPixmap.rect());
 	painter->restore();
 	
-	paintNumberEllipse(number, 24, Qt::white, -1, painter);
+	paintNumberEllipse(number, 24, Qt::white, -1, -1, painter);
 }

@@ -34,7 +34,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		QColor color;
 		color.setHsv(counterIterator.key() * 60, 150, 255);
 		
-		paintNumberEllipse(counterIterator.value(), 14, color, i, painter);
+		paintNumberEllipse(counterIterator.value(), 14, color, i, counters.size(), painter);
 		++i;
 	}
 	if (!pt.isEmpty()) {
