@@ -99,6 +99,8 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 			case ItemId_Command_CreateArrow: return cmdCreateArrow(qobject_cast<Command_CreateArrow *>(command), cont, game, player);
 			case ItemId_Command_DeleteArrow: return cmdDeleteArrow(qobject_cast<Command_DeleteArrow *>(command), cont, game, player);
 			case ItemId_Command_SetCardAttr: return cmdSetCardAttr(qobject_cast<Command_SetCardAttr *>(command), cont, game, player);
+			case ItemId_Command_SetCardCounter: return cmdSetCardCounter(qobject_cast<Command_SetCardCounter *>(command), cont, game, player);
+			case ItemId_Command_IncCardCounter: return cmdIncCardCounter(qobject_cast<Command_IncCardCounter *>(command), cont, game, player);
 			case ItemId_Command_IncCounter: return cmdIncCounter(qobject_cast<Command_IncCounter *>(command), cont, game, player);
 			case ItemId_Command_CreateCounter: return cmdCreateCounter(qobject_cast<Command_CreateCounter *>(command), cont, game, player);
 			case ItemId_Command_SetCounter: return cmdSetCounter(qobject_cast<Command_SetCounter *>(command), cont, game, player);
@@ -682,8 +684,6 @@ ResponseCode Server_ProtocolHandler::setCardAttrHelper(CommandContainer *cont, S
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
 		
-	// zone, card id, attr name, attr value
-	// card id = -1 => affects all cards in the specified zone
 	Server_CardZone *zone = player->getZones().value(zoneName);
 	if (!zone)
 		return RespNameNotFound;
@@ -708,6 +708,53 @@ ResponseCode Server_ProtocolHandler::setCardAttrHelper(CommandContainer *cont, S
 ResponseCode Server_ProtocolHandler::cmdSetCardAttr(Command_SetCardAttr *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
 {
 	return setCardAttrHelper(cont, game, player, cmd->getZone(), cmd->getCardId(), cmd->getAttrName(), cmd->getAttrValue());
+}
+
+ResponseCode Server_ProtocolHandler::cmdSetCardCounter(Command_SetCardCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+{
+	if (player->getSpectator())
+		return RespFunctionNotAllowed;
+	
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
+	Server_CardZone *zone = player->getZones().value(cmd->getZone());
+	if (!zone)
+		return RespNameNotFound;
+
+	Server_Card *card = zone->getCard(cmd->getCardId(), false);
+	if (!card)
+		return RespNameNotFound;
+	
+	card->setCounter(cmd->getCounterId(), cmd->getCounterValue());
+	
+	cont->enqueueGameEventPrivate(new Event_SetCardCounter(player->getPlayerId(), zone->getName(), card->getId(), cmd->getCounterId(), cmd->getCounterValue()), game->getGameId());
+	cont->enqueueGameEventPublic(new Event_SetCardCounter(player->getPlayerId(), zone->getName(), card->getId(), cmd->getCounterId(), cmd->getCounterValue()), game->getGameId());
+	return RespOk;
+}
+
+ResponseCode Server_ProtocolHandler::cmdIncCardCounter(Command_IncCardCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+{
+	if (player->getSpectator())
+		return RespFunctionNotAllowed;
+	
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
+	Server_CardZone *zone = player->getZones().value(cmd->getZone());
+	if (!zone)
+		return RespNameNotFound;
+
+	Server_Card *card = zone->getCard(cmd->getCardId(), false);
+	if (!card)
+		return RespNameNotFound;
+	
+	int newValue = card->getCounter(cmd->getCounterId()) + cmd->getCounterDelta();
+	card->setCounter(cmd->getCounterId(), newValue);
+	
+	cont->enqueueGameEventPrivate(new Event_SetCardCounter(player->getPlayerId(), zone->getName(), card->getId(), cmd->getCounterId(), newValue), game->getGameId());
+	cont->enqueueGameEventPublic(new Event_SetCardCounter(player->getPlayerId(), zone->getName(), card->getId(), cmd->getCounterId(), newValue), game->getGameId());
+	return RespOk;
 }
 
 ResponseCode Server_ProtocolHandler::cmdIncCounter(Command_IncCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
@@ -833,8 +880,15 @@ ResponseCode Server_ProtocolHandler::cmdDumpZone(Command_DumpZone *cmd, CommandC
 		QString displayedName = card->getFaceDown() ? QString() : card->getName();
 		if (zone->getType() == HiddenZone)
 			respCardList.append(new ServerInfo_Card(i, displayedName));
-		else
-			respCardList.append(new ServerInfo_Card(card->getId(), displayedName, card->getX(), card->getY(), card->getCounters(), card->getTapped(), card->getAttacking(), card->getAnnotation()));
+		else {
+			QList<ServerInfo_CardCounter *> cardCounterList;
+			QMapIterator<int, int> cardCounterIterator(card->getCounters());
+			while (cardCounterIterator.hasNext()) {
+				cardCounterIterator.next();
+				cardCounterList.append(new ServerInfo_CardCounter(cardCounterIterator.key(), cardCounterIterator.value()));
+			}
+			respCardList.append(new ServerInfo_Card(card->getId(), displayedName, card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getPT(), card->getAnnotation(), cardCounterList));
+		}
 	}
 	if (zone->getType() == HiddenZone) {
 		zone->setCardsBeingLookedAt(numberCards);

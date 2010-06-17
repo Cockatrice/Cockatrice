@@ -218,14 +218,24 @@ void MessageLogWidget::logCreateArrow(Player *player, Player *startPlayer, QStri
 	);
 }
 
-void MessageLogWidget::logSetCardCounters(Player *player, QString cardName, int value, int oldValue)
+void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int counterId, int value, int oldValue)
 {
-	QString finalStr;
+	QString finalStr, colorStr;
+	
+	int delta = abs(oldValue - value);
 	if (value > oldValue)
-		finalStr = tr("%1 places %2 counters on %3 (now %4).");
+		finalStr = tr("%1 places %n counter(s) (%2) on %3 (now %4).", "", delta);
 	else
-		finalStr = tr("%1 removes %2 counters from %3 (now %4).");
-	append(finalStr.arg(sanitizeHtml(player->getName())).arg(abs(oldValue - value)).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(value));
+		finalStr = tr("%1 removes %n counter(s) (%2) from %3 (now %4).", "", delta);
+	
+	switch (counterId) {
+		case 0: colorStr = tr("red"); break;
+		case 1: colorStr = tr("yellow"); break;
+		case 2: colorStr = tr("green"); break;
+		default: ;
+	}
+	
+	append(finalStr.arg(sanitizeHtml(player->getName())).arg(colorStr).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(value));
 }
 
 void MessageLogWidget::logSetTapped(Player *player, QString cardName, bool tapped)
@@ -240,7 +250,7 @@ void MessageLogWidget::logSetTapped(Player *player, QString cardName, bool tappe
 
 void MessageLogWidget::logSetCounter(Player *player, QString counterName, int value, int oldValue)
 {
-	append(tr("%1 sets counter \"%2\" to %3 (%4%5).").arg(sanitizeHtml(player->getName())).arg(counterName).arg(value).arg(value > oldValue ? "+" : "").arg(value - oldValue));
+	append(tr("%1 sets counter %2 to %3 (%4%5).").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(counterName))).arg(QString("<font color=\"blue\">%1</font>").arg(value)).arg(value > oldValue ? "+" : "").arg(value - oldValue));
 }
 
 void MessageLogWidget::logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap)
@@ -251,6 +261,16 @@ void MessageLogWidget::logSetDoesntUntap(Player *player, QString cardName, bool 
 	else
 		finalStr = tr("%1 sets %2 to untap normally.");
 	append(finalStr.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+}
+
+void MessageLogWidget::logSetPT(Player *player, QString cardName, QString newPT)
+{
+	append(tr("%1 sets PT of %2 to %3.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newPT))));
+}
+
+void MessageLogWidget::logSetAnnotation(Player *player, QString cardName, QString newAnnotation)
+{
+	append(tr("%1 sets annotation of %2 to %3.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newAnnotation))));
 }
 
 void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCards)
@@ -301,9 +321,11 @@ void MessageLogWidget::connectToPlayer(Player *player)
 	connect(player, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString)), this, SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString)));
 	connect(player, SIGNAL(logCreateToken(Player *, QString)), this, SLOT(logCreateToken(Player *, QString)));
 	connect(player, SIGNAL(logSetCounter(Player *, QString, int, int)), this, SLOT(logSetCounter(Player *, QString, int, int)));
-	connect(player, SIGNAL(logSetCardCounters(Player *, QString, int, int)), this, SLOT(logSetCardCounters(Player *, QString, int, int)));
+	connect(player, SIGNAL(logSetCardCounter(Player *, QString, int, int, int)), this, SLOT(logSetCardCounter(Player *, QString, int, int, int)));
 	connect(player, SIGNAL(logSetTapped(Player *, QString, bool)), this, SLOT(logSetTapped(Player *, QString, bool)));
 	connect(player, SIGNAL(logSetDoesntUntap(Player *, QString, bool)), this, SLOT(logSetDoesntUntap(Player *, QString, bool)));
+	connect(player, SIGNAL(logSetPT(Player *, QString, QString)), this, SLOT(logSetPT(Player *, QString, QString)));
+	connect(player, SIGNAL(logSetAnnotation(Player *, QString, QString)), this, SLOT(logSetAnnotation(Player *, QString, QString)));
 	connect(player, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)), this, SLOT(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)));
 	connect(player, SIGNAL(logDumpZone(Player *, CardZone *, int)), this, SLOT(logDumpZone(Player *, CardZone *, int)));
 	connect(player, SIGNAL(logStopDumpZone(Player *, CardZone *)), this, SLOT(logStopDumpZone(Player *, CardZone *)));

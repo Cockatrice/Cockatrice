@@ -132,7 +132,7 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	aLoadDeckFromClipboard = new QAction(tr("Load deck from cl&ipboard..."), this);
 	connect(aLoadDeckFromClipboard, SIGNAL(triggered()), this, SLOT(actLoadDeckFromClipboard()));
 	aLoadDeckFromClipboard->setShortcuts(QKeySequence::Paste);
-	aSaveDeckToClipboard = new QAction(tr("Save deck to cl&ipboard"), this);
+	aSaveDeckToClipboard = new QAction(tr("Save deck to clip&board"), this);
 	connect(aSaveDeckToClipboard, SIGNAL(triggered()), this, SLOT(actSaveDeckToClipboard()));
 	aSaveDeckToClipboard->setShortcuts(QKeySequence::Copy);
 	aPrintDeck = new QAction(tr("&Print deck..."), this);

@@ -34,5 +34,5 @@ QRectF HandCounter::boundingRect() const
 void HandCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
 	painter->drawPixmap(handImage->rect(), *handImage, handImage->rect());
-	paintNumberEllipse(number, painter);
+	paintNumberEllipse(number, 24, Qt::white, -1, painter);
 }

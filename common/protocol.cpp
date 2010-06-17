@@ -18,6 +18,7 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("chat_channel", ServerInfo_ChatChannel::newItem);
 	registerSerializableItem("chat_user", ServerInfo_ChatUser::newItem);
 	registerSerializableItem("game", ServerInfo_Game::newItem);
+	registerSerializableItem("card_counter", ServerInfo_CardCounter::newItem);
 	registerSerializableItem("card", ServerInfo_Card::newItem);
 	registerSerializableItem("zone", ServerInfo_Zone::newItem);
 	registerSerializableItem("counter", ServerInfo_Counter::newItem);

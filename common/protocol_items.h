@@ -224,6 +224,28 @@ public:
 	static SerializableItem *newItem() { return new Command_SetCardAttr; }
 	int getItemId() const { return ItemId_Command_SetCardAttr; }
 };
+class Command_SetCardCounter : public GameCommand {
+	Q_OBJECT
+public:
+	Command_SetCardCounter(int _gameId = -1, const QString &_zone = QString(), int _cardId = -1, int _counterId = -1, int _counterValue = -1);
+	QString getZone() const { return static_cast<SerializableItem_String *>(itemMap.value("zone"))->getData(); };
+	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); };
+	int getCounterId() const { return static_cast<SerializableItem_Int *>(itemMap.value("counter_id"))->getData(); };
+	int getCounterValue() const { return static_cast<SerializableItem_Int *>(itemMap.value("counter_value"))->getData(); };
+	static SerializableItem *newItem() { return new Command_SetCardCounter; }
+	int getItemId() const { return ItemId_Command_SetCardCounter; }
+};
+class Command_IncCardCounter : public GameCommand {
+	Q_OBJECT
+public:
+	Command_IncCardCounter(int _gameId = -1, const QString &_zone = QString(), int _cardId = -1, int _counterId = -1, int _counterDelta = -1);
+	QString getZone() const { return static_cast<SerializableItem_String *>(itemMap.value("zone"))->getData(); };
+	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); };
+	int getCounterId() const { return static_cast<SerializableItem_Int *>(itemMap.value("counter_id"))->getData(); };
+	int getCounterDelta() const { return static_cast<SerializableItem_Int *>(itemMap.value("counter_delta"))->getData(); };
+	static SerializableItem *newItem() { return new Command_IncCardCounter; }
+	int getItemId() const { return ItemId_Command_IncCardCounter; }
+};
 class Command_ReadyStart : public GameCommand {
 	Q_OBJECT
 public:
@@ -395,6 +417,17 @@ public:
 	QString getAttrValue() const { return static_cast<SerializableItem_String *>(itemMap.value("attr_value"))->getData(); };
 	static SerializableItem *newItem() { return new Event_SetCardAttr; }
 	int getItemId() const { return ItemId_Event_SetCardAttr; }
+};
+class Event_SetCardCounter : public GameEvent {
+	Q_OBJECT
+public:
+	Event_SetCardCounter(int _playerId = -1, const QString &_zone = QString(), int _cardId = -1, int _counterId = -1, int _counterValue = -1);
+	QString getZone() const { return static_cast<SerializableItem_String *>(itemMap.value("zone"))->getData(); };
+	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); };
+	int getCounterId() const { return static_cast<SerializableItem_Int *>(itemMap.value("counter_id"))->getData(); };
+	int getCounterValue() const { return static_cast<SerializableItem_Int *>(itemMap.value("counter_value"))->getData(); };
+	static SerializableItem *newItem() { return new Event_SetCardCounter; }
+	int getItemId() const { return ItemId_Event_SetCardCounter; }
 };
 class Event_SetCounter : public GameEvent {
 	Q_OBJECT

@@ -21,6 +21,7 @@
 #define SERVER_CARD_H
 
 #include <QString>
+#include <QMap>
 
 class Server_CardZone;
 
@@ -30,10 +31,11 @@ private:
 	int id;
 	int coord_x, coord_y;
 	QString name;
-	int counters;
+	QMap<int, int> counters;
 	bool tapped;
 	bool attacking;
 	bool facedown;
+	QString pt;
 	QString annotation;
 	bool doesntUntap;
 public:
@@ -47,20 +49,23 @@ public:
 	int getX() const { return coord_x; }
 	int getY() const { return coord_y; }
 	QString getName() const { return name; }
-	int getCounters() const { return counters; }
+	const QMap<int, int> &getCounters() const { return counters; }
+	int getCounter(int id) const { return counters.value(id, 0); }
 	bool getTapped() const { return tapped; }
 	bool getAttacking() const { return attacking; }
 	bool getFaceDown() const { return facedown; }
+	QString getPT() const { return pt; }
 	QString getAnnotation() const { return annotation; }
 	bool getDoesntUntap() const { return doesntUntap; }
 
 	void setId(int _id) { id = _id; }
 	void setCoords(int x, int y) { coord_x = x; coord_y = y; }
 	void setName(const QString &_name) { name = _name; }
-	void setCounters(int _counters) { counters = _counters; }
+	void setCounter(int id, int value);
 	void setTapped(bool _tapped) { tapped = _tapped; }
 	void setAttacking(bool _attacking) { attacking = _attacking; }
 	void setFaceDown(bool _facedown) { facedown = _facedown; }
+	void setPT(const QString &_pt) { pt = _pt; }
 	void setAnnotation(const QString &_annotation) { annotation = _annotation; }
 	void setDoesntUntap(bool _doesntUntap) { doesntUntap = _doesntUntap; }
 	

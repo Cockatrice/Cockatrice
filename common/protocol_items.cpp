@@ -147,6 +147,22 @@ Command_SetCardAttr::Command_SetCardAttr(int _gameId, const QString &_zone, int 
 	insertItem(new SerializableItem_String("attr_name", _attrName));
 	insertItem(new SerializableItem_String("attr_value", _attrValue));
 }
+Command_SetCardCounter::Command_SetCardCounter(int _gameId, const QString &_zone, int _cardId, int _counterId, int _counterValue)
+	: GameCommand("set_card_counter", _gameId)
+{
+	insertItem(new SerializableItem_String("zone", _zone));
+	insertItem(new SerializableItem_Int("card_id", _cardId));
+	insertItem(new SerializableItem_Int("counter_id", _counterId));
+	insertItem(new SerializableItem_Int("counter_value", _counterValue));
+}
+Command_IncCardCounter::Command_IncCardCounter(int _gameId, const QString &_zone, int _cardId, int _counterId, int _counterDelta)
+	: GameCommand("inc_card_counter", _gameId)
+{
+	insertItem(new SerializableItem_String("zone", _zone));
+	insertItem(new SerializableItem_Int("card_id", _cardId));
+	insertItem(new SerializableItem_Int("counter_id", _counterId));
+	insertItem(new SerializableItem_Int("counter_delta", _counterDelta));
+}
 Command_ReadyStart::Command_ReadyStart(int _gameId, bool _ready)
 	: GameCommand("ready_start", _gameId)
 {
@@ -262,6 +278,14 @@ Event_SetCardAttr::Event_SetCardAttr(int _playerId, const QString &_zone, int _c
 	insertItem(new SerializableItem_String("attr_name", _attrName));
 	insertItem(new SerializableItem_String("attr_value", _attrValue));
 }
+Event_SetCardCounter::Event_SetCardCounter(int _playerId, const QString &_zone, int _cardId, int _counterId, int _counterValue)
+	: GameEvent("set_card_counter", _playerId)
+{
+	insertItem(new SerializableItem_String("zone", _zone));
+	insertItem(new SerializableItem_Int("card_id", _cardId));
+	insertItem(new SerializableItem_Int("counter_id", _counterId));
+	insertItem(new SerializableItem_Int("counter_value", _counterValue));
+}
 Event_SetCounter::Event_SetCounter(int _playerId, int _counterId, int _value)
 	: GameEvent("set_counter", _playerId)
 {
@@ -368,6 +392,8 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdcreate_arrow", Command_CreateArrow::newItem);
 	itemNameHash.insert("cmddelete_arrow", Command_DeleteArrow::newItem);
 	itemNameHash.insert("cmdset_card_attr", Command_SetCardAttr::newItem);
+	itemNameHash.insert("cmdset_card_counter", Command_SetCardCounter::newItem);
+	itemNameHash.insert("cmdinc_card_counter", Command_IncCardCounter::newItem);
 	itemNameHash.insert("cmdready_start", Command_ReadyStart::newItem);
 	itemNameHash.insert("cmdconcede", Command_Concede::newItem);
 	itemNameHash.insert("cmdinc_counter", Command_IncCounter::newItem);
@@ -387,6 +413,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventcreate_token", Event_CreateToken::newItem);
 	itemNameHash.insert("game_eventdelete_arrow", Event_DeleteArrow::newItem);
 	itemNameHash.insert("game_eventset_card_attr", Event_SetCardAttr::newItem);
+	itemNameHash.insert("game_eventset_card_counter", Event_SetCardCounter::newItem);
 	itemNameHash.insert("game_eventset_counter", Event_SetCounter::newItem);
 	itemNameHash.insert("game_eventdel_counter", Event_DelCounter::newItem);
 	itemNameHash.insert("game_eventset_active_player", Event_SetActivePlayer::newItem);

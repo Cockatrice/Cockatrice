@@ -12,7 +12,7 @@
 #include "settingscache.h"
 
 CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, QGraphicsItem *parent)
-	: AbstractCardItem(_name, parent), owner(_owner), id(_cardid), attacking(false), facedown(false), counters(0), doesntUntap(false), beingPointedAt(false), dragItem(NULL)
+	: AbstractCardItem(_name, parent), owner(_owner), id(_cardid), attacking(false), facedown(false), doesntUntap(false), beingPointedAt(false), dragItem(NULL)
 {
 	owner->addCard(this);
 }
@@ -26,8 +26,29 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 {
 	painter->save();
 	AbstractCardItem::paint(painter, option, widget);
-	if (counters)
-		paintNumberEllipse(counters, painter);
+	
+	int i = 0;
+	QMapIterator<int, int> counterIterator(counters);
+	while (counterIterator.hasNext()) {
+		counterIterator.next();
+		QColor color;
+		color.setHsv(counterIterator.key() * 60, 150, 255);
+		
+		paintNumberEllipse(counterIterator.value(), 14, color, i, painter);
+		++i;
+	}
+	if (!pt.isEmpty()) {
+		QFont font("Serif");
+		font.setPixelSize(16);
+		painter->setFont(font);
+		QPen pen(Qt::white);
+		QBrush brush(Qt::black);
+		painter->setBackground(brush);
+		painter->setBackgroundMode(Qt::OpaqueMode);
+		painter->setPen(pen);
+		
+		painter->drawText(QRectF(0, 0, boundingRect().width() - 5, boundingRect().height() - 5), Qt::AlignRight | Qt::AlignBottom, pt);
+	}
 	if (beingPointedAt)
 		painter->fillRect(boundingRect(), QBrush(QColor(255, 0, 0, 100)));
 	painter->restore();
@@ -47,21 +68,31 @@ void CardItem::setFaceDown(bool _facedown)
 	update();
 }
 
-void CardItem::setCounters(int _counters)
+void CardItem::setCounter(int _id, int _value)
 {
-	counters = _counters;
+	if (_value)
+		counters.insert(_id, _value);
+	else
+		counters.remove(_id);
 	update();
 }
 
 void CardItem::setAnnotation(const QString &_annotation)
 {
 	annotation = _annotation;
+	setToolTip(annotation);
 	update();
 }
 
 void CardItem::setDoesntUntap(bool _doesntUntap)
 {
 	doesntUntap = _doesntUntap;
+}
+
+void CardItem::setPT(const QString &_pt)
+{
+	pt = _pt;
+	update();
 }
 
 void CardItem::setBeingPointedAt(bool _beingPointedAt)
@@ -74,8 +105,9 @@ void CardItem::resetState()
 {
 	attacking = false;
 	facedown = false;
-	counters = 0;
-	annotation = QString();
+	counters.clear();
+	pt.clear();
+	annotation.clear();
 	setTapped(false);
 	setDoesntUntap(false);
 	update();
@@ -83,10 +115,15 @@ void CardItem::resetState()
 
 void CardItem::processCardInfo(ServerInfo_Card *info)
 {
+	counters.clear();
+	const QList<ServerInfo_CardCounter *> &_counterList = info->getCounters();
+	for (int i = 0; i < _counterList.size(); ++i)
+		counters.insert(_counterList[i]->getId(), _counterList[i]->getValue());
+	
 	setId(info->getId());
 	setName(info->getName());
 	setAttacking(info->getAttacking());
-	setCounters(info->getCounters());
+	setPT(info->getPT());
 	setAnnotation(info->getAnnotation());
 	setTapped(info->getTapped());
 }

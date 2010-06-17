@@ -41,10 +41,12 @@ public slots:
 	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
 	void logCreateToken(Player *player, QString cardName);
 	void logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard);
-	void logSetCardCounters(Player *player, QString cardName, int value, int oldValue);
+	void logSetCardCounter(Player *player, QString cardName, int counterId, int value, int oldValue);
 	void logSetTapped(Player *player, QString cardName, bool tapped);
 	void logSetCounter(Player *player, QString counterName, int value, int oldValue);
 	void logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap);
+	void logSetPT(Player *player, QString cardName, QString newPT);
+	void logSetAnnotation(Player *player, QString cardName, QString newAnnotation);
 	void logDumpZone(Player *player, CardZone *zone, int numberCards);
 	void logStopDumpZone(Player *player, CardZone *zone);
 	void logSetActivePlayer(Player *player);

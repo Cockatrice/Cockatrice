@@ -31,6 +31,7 @@ class Event_CreateArrows;
 class Event_DeleteArrow;
 class Event_CreateToken;
 class Event_SetCardAttr;
+class Event_SetCardCounter;
 class Event_CreateCounters;
 class Event_SetCounter;
 class Event_DelCounter;
@@ -51,10 +52,12 @@ signals:
 	void logCreateToken(Player *player, QString cardName);
 	void logDrawCards(Player *player, int number);
 	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
-	void logSetCardCounters(Player *player, QString cardName, int value, int oldValue);
+	void logSetCardCounter(Player *player, QString cardName, int counterId, int value, int oldValue);
 	void logSetTapped(Player *player, QString cardName, bool tapped);
 	void logSetCounter(Player *player, QString counterName, int value, int oldValue);
 	void logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap);
+	void logSetPT(Player *player, QString cardName, QString newPT);
+	void logSetAnnotation(Player *player, QString cardName, QString newAnnotation);
 	void logDumpZone(Player *player, CardZone *zone, int numberCards);
 	void logStopDumpZone(Player *player, CardZone *zone);
 	
@@ -76,12 +79,17 @@ public slots:
 	
 	void actSayMessage();
 private slots:
+	void actSetPT();
+	void actSetAnnotation();
+	
 	void updateBgPixmap();
 	void updateBoundingRect();
 	void cardMenuAction();
-	void actSetCounters();
+	void actCardCounterTrigger(QAction *a);
 	void rearrangeZones();
 private:
+	QList<QMenu *> cardCounterMenus;
+	QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
 	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *countersMenu, *sayMenu;
 	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
 		*aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg,
@@ -94,15 +102,13 @@ private:
 	QHash<QAction *, CardMenuHandler> cardMenuHandlers;
 	
 	QMenu *cardMenu, *moveMenu;
-	QAction *aTap, *aUntap, *aDoesntUntap, *aFlip, *aAddCounter, *aRemoveCounter, *aSetCounters,
+	QAction *aTap, *aUntap, *aDoesntUntap, *aSetPT, *aSetAnnotation, *aFlip,
 		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile;
 
 	void actTap(CardItem *card);
 	void actUntap(CardItem *card);
 	void actDoesntUntap(CardItem *card);
 	void actFlip(CardItem *card);
-	void actAddCounter(CardItem *card);
-	void actRemoveCounter(CardItem *card);
 	void actMoveToTopLibrary(CardItem *card);
 	void actMoveToBottomLibrary(CardItem *card);
 	void actMoveToGraveyard(CardItem *card);
@@ -137,6 +143,7 @@ private:
 	void eventDeleteArrow(Event_DeleteArrow *event);
 	void eventCreateToken(Event_CreateToken *event);
 	void eventSetCardAttr(Event_SetCardAttr *event);
+	void eventSetCardCounter(Event_SetCardCounter *event);
 	void eventCreateCounters(Event_CreateCounters *event);
 	void eventSetCounter(Event_SetCounter *event);
 	void eventDelCounter(Event_DelCounter *event);

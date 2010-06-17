@@ -32,17 +32,27 @@ ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool 
 	insertItem(new SerializableItem_Int("spectator_count", _spectatorCount));
 }
 
-ServerInfo_Card::ServerInfo_Card(int _id, const QString &_name, int _x, int _y, int _counters, bool _tapped, bool _attacking, const QString &_annotation)
+ServerInfo_CardCounter::ServerInfo_CardCounter(int _id, int _value)
+	: SerializableItem_Map("card_counter")
+{
+	insertItem(new SerializableItem_Int("id", _id));
+	insertItem(new SerializableItem_Int("value", _value));
+}
+
+ServerInfo_Card::ServerInfo_Card(int _id, const QString &_name, int _x, int _y, bool _tapped, bool _attacking, const QString &_pt, const QString &_annotation, const QList<ServerInfo_CardCounter *> &_counters)
 	: SerializableItem_Map("card")
 {
 	insertItem(new SerializableItem_Int("id", _id));
 	insertItem(new SerializableItem_String("name", _name));
 	insertItem(new SerializableItem_Int("x", _x));
 	insertItem(new SerializableItem_Int("y", _y));
-	insertItem(new SerializableItem_Int("counters", _counters));
 	insertItem(new SerializableItem_Bool("tapped", _tapped));
 	insertItem(new SerializableItem_Bool("attacking", _attacking));
+	insertItem(new SerializableItem_String("pt", _pt));
 	insertItem(new SerializableItem_String("annotation", _annotation));
+	
+	for (int i = 0; i < _counters.size(); ++i)
+		itemList.append(_counters[i]);
 }
 
 ServerInfo_Zone::ServerInfo_Zone(const QString &_name, ZoneType _type, bool _hasCoords, int _cardCount, const QList<ServerInfo_Card *> &_cardList)

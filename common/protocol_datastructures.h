@@ -52,18 +52,27 @@ public:
 	int getSpectatorCount() const { return static_cast<SerializableItem_Int *>(itemMap.value("spectator_count"))->getData(); }
 };
 
+class ServerInfo_CardCounter : public SerializableItem_Map {
+public:
+	ServerInfo_CardCounter(int _id = -1, int _value = 0);
+	static SerializableItem *newItem() { return new ServerInfo_CardCounter; }
+	int getId() const { return static_cast<SerializableItem_Int *>(itemMap.value("id"))->getData(); }
+	int getValue() const { return static_cast<SerializableItem_Int *>(itemMap.value("value"))->getData(); }
+};
+
 class ServerInfo_Card : public SerializableItem_Map {
 public:
-	ServerInfo_Card(int _id = -1, const QString &_name = QString(), int _x = -1, int _y = -1, int _counters = -1, bool _tapped = false, bool _attacking = false, const QString &_annotation = QString());
+	ServerInfo_Card(int _id = -1, const QString &_name = QString(), int _x = -1, int _y = -1, bool _tapped = false, bool _attacking = false, const QString &_pt = QString(), const QString &_annotation = QString(), const QList<ServerInfo_CardCounter *> &_counterList = QList<ServerInfo_CardCounter *>());
 	static SerializableItem *newItem() { return new ServerInfo_Card; }
 	int getId() const { return static_cast<SerializableItem_Int *>(itemMap.value("id"))->getData(); }
 	QString getName() const { return static_cast<SerializableItem_String *>(itemMap.value("name"))->getData(); }
 	int getX() const { return static_cast<SerializableItem_Int *>(itemMap.value("x"))->getData(); }
 	int getY() const { return static_cast<SerializableItem_Int *>(itemMap.value("y"))->getData(); }
-	int getCounters() const { return static_cast<SerializableItem_Int *>(itemMap.value("counters"))->getData(); }
 	bool getTapped() const { return static_cast<SerializableItem_Bool *>(itemMap.value("tapped"))->getData(); }
 	bool getAttacking() const { return static_cast<SerializableItem_Bool *>(itemMap.value("attacking"))->getData(); }
+	QString getPT() const { return static_cast<SerializableItem_String *>(itemMap.value("pt"))->getData(); }
 	QString getAnnotation() const { return static_cast<SerializableItem_String *>(itemMap.value("annotation"))->getData(); }
+	QList<ServerInfo_CardCounter *> getCounters() const { return typecastItemList<ServerInfo_CardCounter *>(); }
 };
 
 class ServerInfo_Zone : public SerializableItem_Map {

@@ -18,8 +18,9 @@ private:
 	int id;
 	bool attacking;
 	bool facedown;
-	int counters;
+	QMap<int, int> counters;
 	QString annotation;
+	QString pt;
 	bool doesntUntap;
 	QPoint gridPoint;
 	bool beingPointedAt;
@@ -42,12 +43,14 @@ public:
 	void setAttacking(bool _attacking);
 	bool getFaceDown() const { return facedown; }
 	void setFaceDown(bool _facedown);
-	int getCounters() const { return counters; }
-	void setCounters(int _counters);
+	const QMap<int, int> &getCounters() const { return counters; }
+	void setCounter(int _id, int _value);
 	QString getAnnotation() const { return annotation; }
 	void setAnnotation(const QString &_annotation);
 	bool getDoesntUntap() const { return doesntUntap; }
 	void setDoesntUntap(bool _doesntUntap);
+	QString getPT() const { return pt; }
+	void setPT(const QString &_pt);
 	void setBeingPointedAt(bool _beingPointedAt);
 	void resetState();
 	void processCardInfo(ServerInfo_Card *info);

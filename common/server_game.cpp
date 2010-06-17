@@ -275,7 +275,15 @@ QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAs
 				while (cardIterator.hasNext()) {
 					Server_Card *card = cardIterator.next();
 					QString displayedName = card->getFaceDown() ? QString() : card->getName();
-					cardList.append(new ServerInfo_Card(card->getId(), displayedName, card->getX(), card->getY(), card->getCounters(), card->getTapped(), card->getAttacking(), card->getAnnotation()));
+					
+					QList<ServerInfo_CardCounter *> cardCounterList;
+					QMapIterator<int, int> cardCounterIterator(card->getCounters());
+					while (cardCounterIterator.hasNext()) {
+						cardCounterIterator.next();
+						cardCounterList.append(new ServerInfo_CardCounter(cardCounterIterator.key(), cardCounterIterator.value()));
+					}
+					
+					cardList.append(new ServerInfo_Card(card->getId(), displayedName, card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getPT(), card->getAnnotation(), cardCounterList));
 				}
 			}
 			zoneList.append(new ServerInfo_Zone(zone->getName(), zone->getType(), zone->hasCoords(), zone->cards.size(), cardList));

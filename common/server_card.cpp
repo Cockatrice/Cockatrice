@@ -20,7 +20,7 @@
 #include "server_card.h"
 
 Server_Card::Server_Card(QString _name, int _id, int _coord_x, int _coord_y)
-	: id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), counters(0), tapped(false), attacking(false), facedown(false), annotation(QString()), doesntUntap(false)
+	: id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), tapped(false), attacking(false), facedown(false), pt(QString()), annotation(QString()), doesntUntap(false)
 {
 }
 
@@ -32,23 +32,18 @@ Server_Card::~Server_Card()
 void Server_Card::resetState()
 {
 	setCoords(0, 0);
-	setCounters(0);
+	counters.clear();
 	setTapped(false);
 	setAttacking(false);
 	setFaceDown(false);
+	setPT(QString());
 	setAnnotation(QString());
 	setDoesntUntap(false);
 }
 
 bool Server_Card::setAttribute(const QString &aname, const QString &avalue, bool allCards)
 {
-	if (aname == "counters") {
-		bool ok;
-		int tmp_int = avalue.toInt(&ok);
-		if (!ok)
-			return false;
-		setCounters(tmp_int);
-	} else if (aname == "tapped") {
+	if (aname == "tapped") {
 		bool value = avalue == "1";
 		if (!(!value && allCards && doesntUntap))
 			setTapped(value);
@@ -56,6 +51,8 @@ bool Server_Card::setAttribute(const QString &aname, const QString &avalue, bool
 		setAttacking(avalue == "1");
 	} else if (aname == "facedown") {
 		setFaceDown(avalue == "1");
+	} else if (aname == "pt") {
+		setPT(avalue);
 	} else if (aname == "annotation") {
 		setAnnotation(avalue);
 	} else if (aname == "doesnt_untap") {
@@ -64,4 +61,12 @@ bool Server_Card::setAttribute(const QString &aname, const QString &avalue, bool
 		return false;
 	
 	return true;
+}
+
+void Server_Card::setCounter(int id, int value)
+{
+	if (value)
+		counters.insert(id, value);
+	else
+		counters.remove(id);
 }
