@@ -11,7 +11,6 @@ class HandCounter : public QObject, public AbstractGraphicsItem {
 	Q_OBJECT
 private:
 	int number;
-	QPixmap *handImage;
 public slots:
 	void updateNumber();
 public:
