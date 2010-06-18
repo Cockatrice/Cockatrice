@@ -14,6 +14,7 @@
 #include "protocol_items.h"
 #include "gamescene.h"
 #include "settingscache.h"
+#include "dlg_create_token.h"
 #include <QSettings>
 #include <QPainter>
 #include <QMenu>
@@ -182,6 +183,10 @@ Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabG
 		aCreateToken = new QAction(this);
 		connect(aCreateToken, SIGNAL(triggered()), this, SLOT(actCreateToken()));
 		
+		aCreateAnotherToken = new QAction(this);
+		connect(aCreateAnotherToken, SIGNAL(triggered()), this, SLOT(actCreateAnotherToken()));
+		aCreateAnotherToken->setEnabled(false);
+
 		playerMenu->addSeparator();
 		countersMenu = playerMenu->addMenu(QString());
 		playerMenu->addSeparator();
@@ -190,6 +195,7 @@ Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabG
 		playerMenu->addAction(aRollDie);
 		playerMenu->addSeparator();
 		playerMenu->addAction(aCreateToken);
+		playerMenu->addAction(aCreateAnotherToken);
 		playerMenu->addSeparator();
 		sayMenu = playerMenu->addMenu(QString());
 		initSayMenu();
@@ -264,6 +270,7 @@ Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabG
 		countersMenu = 0;
 		sbMenu = 0;
 		cardMenu = 0;
+		aCreateAnotherToken = 0;
 	}
 	
 	rearrangeZones();
@@ -376,6 +383,8 @@ void Player::retranslateUi()
 		aRollDie->setShortcut(tr("Ctrl+I"));
 		aCreateToken->setText(tr("&Create token..."));
 		aCreateToken->setShortcut(tr("Ctrl+T"));
+		aCreateAnotherToken->setText(tr("C&reate another token"));
+		aCreateAnotherToken->setShortcut(tr("Ctrl+G"));
 		sayMenu->setTitle(tr("S&ay"));
 		
 		QMapIterator<int, Counter *> counterIterator(counters);
@@ -491,9 +500,22 @@ void Player::actRollDie()
 
 void Player::actCreateToken()
 {
-	QString cardname = QInputDialog::getText(0, tr("Create token"), tr("Name:"));
-	if (!cardname.isEmpty())
-		sendGameCommand(new Command_CreateToken(-1, "table", cardname, QString(), -1, 0));
+	DlgCreateToken dlg;
+	if (!dlg.exec())
+		return;
+	
+	lastTokenName = dlg.getName();
+	lastTokenColor = dlg.getColor();
+	lastTokenPT = dlg.getPT();
+	lastTokenAnnotation = dlg.getAnnotation();
+	aCreateAnotherToken->setEnabled(true);
+	
+	sendGameCommand(new Command_CreateToken(-1, "table", dlg.getName(), dlg.getColor(), dlg.getPT(), dlg.getAnnotation(), -1, 0));
+}
+
+void Player::actCreateAnotherToken()
+{
+	sendGameCommand(new Command_CreateToken(-1, "table", lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation, -1, 0));
 }
 
 void Player::actSayMessage()
@@ -566,8 +588,11 @@ void Player::eventCreateToken(Event_CreateToken *event)
 		return;
 
 	CardItem *card = new CardItem(this, event->getCardName(), event->getCardId());
+	card->setColor(event->getColor());
+	card->setPT(event->getPt());
+	card->setAnnotation(event->getAnnotation());
 
-	emit logCreateToken(this, card->getName());
+	emit logCreateToken(this, card->getName(), card->getPT());
 	zone->addCard(card, true, event->getX(), event->getY());
 
 }

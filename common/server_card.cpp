@@ -20,7 +20,7 @@
 #include "server_card.h"
 
 Server_Card::Server_Card(QString _name, int _id, int _coord_x, int _coord_y)
-	: id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), tapped(false), attacking(false), facedown(false), pt(QString()), annotation(QString()), doesntUntap(false)
+	: id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), tapped(false), attacking(false), facedown(false), color(QString()), pt(QString()), annotation(QString()), doesntUntap(false)
 {
 }
 
@@ -36,6 +36,7 @@ void Server_Card::resetState()
 	setTapped(false);
 	setAttacking(false);
 	setFaceDown(false);
+	setColor(QString());
 	setPT(QString());
 	setAnnotation(QString());
 	setDoesntUntap(false);
@@ -51,6 +52,8 @@ bool Server_Card::setAttribute(const QString &aname, const QString &avalue, bool
 		setAttacking(avalue == "1");
 	} else if (aname == "facedown") {
 		setFaceDown(avalue == "1");
+	} else if (aname == "color") {
+		setColor(avalue);
 	} else if (aname == "pt") {
 		setPT(avalue);
 	} else if (aname == "annotation") {

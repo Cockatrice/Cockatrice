@@ -10,6 +10,7 @@ QT += network svg
 HEADERS += src/counter.h \
  src/dlg_creategame.h \
  src/dlg_connect.h \
+ src/dlg_create_token.h \
  src/gamesmodel.h \
  src/client.h \
  src/window_main.h \
@@ -64,6 +65,7 @@ HEADERS += src/counter.h \
 SOURCES += src/counter.cpp \
  src/dlg_creategame.cpp \
  src/dlg_connect.cpp \
+ src/dlg_create_token.cpp \
  src/client.cpp \
  src/main.cpp \
  src/window_main.cpp \

@@ -35,6 +35,7 @@ private:
 	bool tapped;
 	bool attacking;
 	bool facedown;
+	QString color;
 	QString pt;
 	QString annotation;
 	bool doesntUntap;
@@ -54,6 +55,7 @@ public:
 	bool getTapped() const { return tapped; }
 	bool getAttacking() const { return attacking; }
 	bool getFaceDown() const { return facedown; }
+	QString getColor() const { return color; }
 	QString getPT() const { return pt; }
 	QString getAnnotation() const { return annotation; }
 	bool getDoesntUntap() const { return doesntUntap; }
@@ -65,6 +67,7 @@ public:
 	void setTapped(bool _tapped) { tapped = _tapped; }
 	void setAttacking(bool _attacking) { attacking = _attacking; }
 	void setFaceDown(bool _facedown) { facedown = _facedown; }
+	void setColor(const QString &_color) { color = _color; }
 	void setPT(const QString &_pt) { pt = _pt; }
 	void setAnnotation(const QString &_annotation) { annotation = _annotation; }
 	void setDoesntUntap(bool _doesntUntap) { doesntUntap = _doesntUntap; }

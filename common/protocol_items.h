@@ -182,10 +182,12 @@ public:
 class Command_CreateToken : public GameCommand {
 	Q_OBJECT
 public:
-	Command_CreateToken(int _gameId = -1, const QString &_zone = QString(), const QString &_cardName = QString(), const QString &_pt = QString(), int _x = -1, int _y = -1);
+	Command_CreateToken(int _gameId = -1, const QString &_zone = QString(), const QString &_cardName = QString(), const QString &_color = QString(), const QString &_pt = QString(), const QString &_annotation = QString(), int _x = -1, int _y = -1);
 	QString getZone() const { return static_cast<SerializableItem_String *>(itemMap.value("zone"))->getData(); };
 	QString getCardName() const { return static_cast<SerializableItem_String *>(itemMap.value("card_name"))->getData(); };
+	QString getColor() const { return static_cast<SerializableItem_String *>(itemMap.value("color"))->getData(); };
 	QString getPt() const { return static_cast<SerializableItem_String *>(itemMap.value("pt"))->getData(); };
+	QString getAnnotation() const { return static_cast<SerializableItem_String *>(itemMap.value("annotation"))->getData(); };
 	int getX() const { return static_cast<SerializableItem_Int *>(itemMap.value("x"))->getData(); };
 	int getY() const { return static_cast<SerializableItem_Int *>(itemMap.value("y"))->getData(); };
 	static SerializableItem *newItem() { return new Command_CreateToken; }
@@ -389,11 +391,13 @@ public:
 class Event_CreateToken : public GameEvent {
 	Q_OBJECT
 public:
-	Event_CreateToken(int _playerId = -1, const QString &_zone = QString(), int _cardId = -1, const QString &_cardName = QString(), const QString &_pt = QString(), int _x = -1, int _y = -1);
+	Event_CreateToken(int _playerId = -1, const QString &_zone = QString(), int _cardId = -1, const QString &_cardName = QString(), const QString &_color = QString(), const QString &_pt = QString(), const QString &_annotation = QString(), int _x = -1, int _y = -1);
 	QString getZone() const { return static_cast<SerializableItem_String *>(itemMap.value("zone"))->getData(); };
 	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); };
 	QString getCardName() const { return static_cast<SerializableItem_String *>(itemMap.value("card_name"))->getData(); };
+	QString getColor() const { return static_cast<SerializableItem_String *>(itemMap.value("color"))->getData(); };
 	QString getPt() const { return static_cast<SerializableItem_String *>(itemMap.value("pt"))->getData(); };
+	QString getAnnotation() const { return static_cast<SerializableItem_String *>(itemMap.value("annotation"))->getData(); };
 	int getX() const { return static_cast<SerializableItem_Int *>(itemMap.value("x"))->getData(); };
 	int getY() const { return static_cast<SerializableItem_Int *>(itemMap.value("y"))->getData(); };
 	static SerializableItem *newItem() { return new Event_CreateToken; }

@@ -21,6 +21,7 @@ protected:
 	CardInfo *info;
 	QString name;
 	bool tapped;
+	QString color;
 private slots:
 	void pixmapUpdated();
 signals:
@@ -35,6 +36,8 @@ public:
 	CardInfo *getInfo() const { return info; }
 	QString getName() const { return name; }
 	void setName(const QString &_name = QString());
+	QString getColor() const { return color; }
+	void setColor(const QString &_color);
 	bool getTapped() const { return tapped; }
 	void setTapped(bool _tapped);
 	void processHoverEvent();

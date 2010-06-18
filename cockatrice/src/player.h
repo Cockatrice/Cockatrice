@@ -49,7 +49,7 @@ signals:
 	void logShuffle(Player *player);
 	void logRollDie(Player *player, int sides, int roll);
 	void logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard);
-	void logCreateToken(Player *player, QString cardName);
+	void logCreateToken(Player *player, QString cardName, QString pt);
 	void logDrawCards(Player *player, int number);
 	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
 	void logSetCardCounter(Player *player, QString cardName, int counterId, int value, int oldValue);
@@ -66,6 +66,7 @@ public slots:
 	void actUntapAll();
 	void actRollDie();
 	void actCreateToken();
+	void actCreateAnotherToken();
 	void actShuffle();
 	void actDrawCard();
 	void actDrawCards();
@@ -96,7 +97,7 @@ private:
 		*aMoveRfgToTopLibrary, *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave,
 		*aViewLibrary, *aViewTopCards, *aViewGraveyard, *aViewRfg, *aViewSideboard,
                 *aDrawCard, *aDrawCards, *aMulligan, *aShuffle,
-		*aUntapAll, *aRollDie, *aCreateToken;
+		*aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken;
 
 	typedef void (Player::*CardMenuHandler)(CardItem *card);
 	QHash<QAction *, CardMenuHandler> cardMenuHandlers;
@@ -115,6 +116,7 @@ private:
 	void actMoveToExile(CardItem *card);
 
 	int defaultNumberTopCards;
+	QString lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation;
 	QString name;
 	int id;
 	bool active;

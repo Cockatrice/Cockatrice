@@ -609,7 +609,6 @@ ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, Co
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
 		
-	// powtough wird erst mal ignoriert
 	Server_CardZone *zone = player->getZones().value(cmd->getZone());
 	if (!zone)
 		return RespNameNotFound;
@@ -624,8 +623,12 @@ ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, Co
 		y = 0;
 
 	Server_Card *card = new Server_Card(cmd->getCardName(), player->newCardId(), x, y);
+	card->setPT(cmd->getPt());
+	card->setColor(cmd->getColor());
+	card->setAnnotation(cmd->getAnnotation());
+	
 	zone->insertCard(card, x, y);
-	game->sendGameEvent(new Event_CreateToken(player->getPlayerId(), zone->getName(), card->getId(), card->getName(), cmd->getPt(), x, y));
+	game->sendGameEvent(new Event_CreateToken(player->getPlayerId(), zone->getName(), card->getId(), card->getName(), cmd->getColor(), cmd->getPt(), cmd->getAnnotation(), x, y));
 	
 	return RespOk;
 }
@@ -898,7 +901,7 @@ ResponseCode Server_ProtocolHandler::cmdDumpZone(Command_DumpZone *cmd, CommandC
 				cardCounterIterator.next();
 				cardCounterList.append(new ServerInfo_CardCounter(cardCounterIterator.key(), cardCounterIterator.value()));
 			}
-			respCardList.append(new ServerInfo_Card(card->getId(), displayedName, card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getPT(), card->getAnnotation(), cardCounterList));
+			respCardList.append(new ServerInfo_Card(card->getId(), displayedName, card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), cardCounterList));
 		}
 	}
 	if (zone->getType() == HiddenZone) {

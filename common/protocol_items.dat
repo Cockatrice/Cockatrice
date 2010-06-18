@@ -19,7 +19,7 @@
 2:roll_die:i,sides
 2:draw_cards:i,number
 2:move_card:s,start_zone:i,card_id:s,target_zone:i,x:i,y:b,face_down:b,tapped
-2:create_token:s,zone:s,card_name:s,pt:i,x:i,y
+2:create_token:s,zone:s,card_name:s,color:s,pt:s,annotation:i,x:i,y
 2:create_arrow:i,start_player_id:s,start_zone:i,start_card_id:i,target_player_id:s,target_zone:i,target_card_id:c,color
 2:delete_arrow:i,arrow_id
 2:set_card_attr:s,zone:i,card_id:s,attr_name:s,attr_value
@@ -41,7 +41,7 @@
 3:shuffle
 3:roll_die:i,sides:i,value
 3:move_card:i,card_id:s,card_name:s,start_zone:i,position:s,target_zone:i,x:i,y:i,new_card_id:b,face_down
-3:create_token:s,zone:i,card_id:s,card_name:s,pt:i,x:i,y
+3:create_token:s,zone:i,card_id:s,card_name:s,color:s,pt:s,annotation:i,x:i,y
 3:delete_arrow:i,arrow_id
 3:set_card_attr:s,zone:i,card_id:s,attr_name:s,attr_value
 3:set_card_counter:s,zone:i,card_id:i,counter_id:i,counter_value

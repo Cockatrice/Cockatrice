@@ -114,12 +114,14 @@ Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, int _
 	insertItem(new SerializableItem_Bool("face_down", _faceDown));
 	insertItem(new SerializableItem_Bool("tapped", _tapped));
 }
-Command_CreateToken::Command_CreateToken(int _gameId, const QString &_zone, const QString &_cardName, const QString &_pt, int _x, int _y)
+Command_CreateToken::Command_CreateToken(int _gameId, const QString &_zone, const QString &_cardName, const QString &_color, const QString &_pt, const QString &_annotation, int _x, int _y)
 	: GameCommand("create_token", _gameId)
 {
 	insertItem(new SerializableItem_String("zone", _zone));
 	insertItem(new SerializableItem_String("card_name", _cardName));
+	insertItem(new SerializableItem_String("color", _color));
 	insertItem(new SerializableItem_String("pt", _pt));
+	insertItem(new SerializableItem_String("annotation", _annotation));
 	insertItem(new SerializableItem_Int("x", _x));
 	insertItem(new SerializableItem_Int("y", _y));
 }
@@ -255,13 +257,15 @@ Event_MoveCard::Event_MoveCard(int _playerId, int _cardId, const QString &_cardN
 	insertItem(new SerializableItem_Int("new_card_id", _newCardId));
 	insertItem(new SerializableItem_Bool("face_down", _faceDown));
 }
-Event_CreateToken::Event_CreateToken(int _playerId, const QString &_zone, int _cardId, const QString &_cardName, const QString &_pt, int _x, int _y)
+Event_CreateToken::Event_CreateToken(int _playerId, const QString &_zone, int _cardId, const QString &_cardName, const QString &_color, const QString &_pt, const QString &_annotation, int _x, int _y)
 	: GameEvent("create_token", _playerId)
 {
 	insertItem(new SerializableItem_String("zone", _zone));
 	insertItem(new SerializableItem_Int("card_id", _cardId));
 	insertItem(new SerializableItem_String("card_name", _cardName));
+	insertItem(new SerializableItem_String("color", _color));
 	insertItem(new SerializableItem_String("pt", _pt));
+	insertItem(new SerializableItem_String("annotation", _annotation));
 	insertItem(new SerializableItem_Int("x", _x));
 	insertItem(new SerializableItem_Int("y", _y));
 }

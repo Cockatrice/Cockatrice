@@ -202,9 +202,9 @@ void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *s
 	append(finalStr.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr).arg(newX));
 }
 
-void MessageLogWidget::logCreateToken(Player *player, QString cardName)
+void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt)
 {
-	append(tr("%1 creates token: %2.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+	append(tr("%1 creates token: %2 (%3).").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(sanitizeHtml(pt)));
 }
 
 void MessageLogWidget::logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard)
@@ -319,7 +319,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
 	connect(player, SIGNAL(logShuffle(Player *)), this, SLOT(logShuffle(Player *)));
 	connect(player, SIGNAL(logRollDie(Player *, int, int)), this, SLOT(logRollDie(Player *, int, int)));
 	connect(player, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString)), this, SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString)));
-	connect(player, SIGNAL(logCreateToken(Player *, QString)), this, SLOT(logCreateToken(Player *, QString)));
+	connect(player, SIGNAL(logCreateToken(Player *, QString, QString)), this, SLOT(logCreateToken(Player *, QString, QString)));
 	connect(player, SIGNAL(logSetCounter(Player *, QString, int, int)), this, SLOT(logSetCounter(Player *, QString, int, int)));
 	connect(player, SIGNAL(logSetCardCounter(Player *, QString, int, int, int)), this, SLOT(logSetCardCounter(Player *, QString, int, int, int)));
 	connect(player, SIGNAL(logSetTapped(Player *, QString, bool)), this, SLOT(logSetTapped(Player *, QString, bool)));
