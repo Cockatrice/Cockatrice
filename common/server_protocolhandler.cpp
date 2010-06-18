@@ -515,10 +515,12 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 	Server_Card *card = startzone->getCard(_cardId, true, &position);
 	if (!card)
 		return RespNameNotFound;
-	if (x == -1)
-		x = targetzone->cards.size();
-	if (!targetzone->hasCoords())
+	if (!targetzone->hasCoords()) {
 		y = 0;
+		if (x == -1)
+			x = targetzone->cards.size();
+	} else if (x == -1)
+		x = targetzone->getFreeGridColumn(y);
 
 	targetzone->insertCard(card, x, y);
 
@@ -612,9 +614,18 @@ ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, Co
 	if (!zone)
 		return RespNameNotFound;
 
-	Server_Card *card = new Server_Card(cmd->getCardName(), player->newCardId(), cmd->getX(), cmd->getY());
-	zone->insertCard(card, cmd->getX(), cmd->getY());
-	game->sendGameEvent(new Event_CreateToken(player->getPlayerId(), zone->getName(), card->getId(), card->getName(), cmd->getPt(), cmd->getX(), cmd->getY()));
+	int x = cmd->getX();
+	int y = cmd->getY();
+	if (zone->hasCoords() && (x == -1))
+		x = zone->getFreeGridColumn(y);
+	if (x < 0)
+		x = 0;
+	if (y < 0)
+		y = 0;
+
+	Server_Card *card = new Server_Card(cmd->getCardName(), player->newCardId(), x, y);
+	zone->insertCard(card, x, y);
+	game->sendGameEvent(new Event_CreateToken(player->getPlayerId(), zone->getName(), card->getId(), card->getName(), cmd->getPt(), x, y));
 	
 	return RespOk;
 }

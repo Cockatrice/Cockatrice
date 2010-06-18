@@ -47,6 +47,7 @@ public:
 	QString getName() const { return name; }
 	Server_Player *getPlayer() const { return player; }
 	
+	int getFreeGridColumn(int y) const;
 	QList<Server_Card *> cards;
 	void insertCard(Server_Card *card, int x, int y);
 	void shuffle();

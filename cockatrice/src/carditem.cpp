@@ -209,7 +209,7 @@ void CardItem::playCard(QGraphicsSceneMouseEvent *event)
 		bool tapped = info->getCipt();
 		
 		TableZone *table = zone->getPlayer()->getTable();
-		QPoint gridPoint = table->getFreeGridPoint(info->getTableRow());
+		QPoint gridPoint = QPoint(-1, 3 - info->getTableRow());
 		table->handleDropEventByGrid(id, zone, gridPoint, faceDown, tapped);
 	}
 }

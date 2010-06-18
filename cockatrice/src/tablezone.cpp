@@ -13,10 +13,10 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 	updateBgPixmap();
 
 	if (settingsCache->getEconomicGrid())
-		height = (int) (14.0 / 3 * CARD_HEIGHT + 3 * paddingY);
+		height = 2 * boxLineWidth + (int) (14.0 / 3 * CARD_HEIGHT + 3 * paddingY);
 	else
-		height = 4 * CARD_HEIGHT + 3 * paddingY;
-	width = minWidth + 2 * marginX;
+		height = 2 * boxLineWidth + 4 * CARD_HEIGHT + 3 * paddingY;
+	width = minWidth + 2 * marginX + 2 * boxLineWidth;
 	currentMinimumWidth = minWidth;
 
 	setCacheMode(DeviceCoordinateCache);
@@ -55,17 +55,17 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
 		grad1.setCoordinateMode(QGradient::ObjectBoundingMode);
 		grad1.setColorAt(0, color1);
 		grad1.setColorAt(1, color2);
-		painter->fillRect(QRectF(0, 0, width, 10), QBrush(grad1));
+		painter->fillRect(QRectF(0, 0, width, boxLineWidth), QBrush(grad1));
 		
 		grad1.setFinalStop(1, 0);
-		painter->fillRect(QRectF(0, 0, 10, height), QBrush(grad1));
+		painter->fillRect(QRectF(0, 0, boxLineWidth, height), QBrush(grad1));
 		
 		grad1.setStart(0, 1);
 		grad1.setFinalStop(0, 0);
-		painter->fillRect(QRectF(0, height - 10, width, 10), QBrush(grad1));
+		painter->fillRect(QRectF(0, height - boxLineWidth, width, boxLineWidth), QBrush(grad1));
 		
 		grad1.setStart(1, 0);
-		painter->fillRect(QRectF(width - 10, 0, 10, height), QBrush(grad1));
+		painter->fillRect(QRectF(width - boxLineWidth, 0, boxLineWidth, height), QBrush(grad1));
 	}
 }
 
@@ -141,7 +141,7 @@ void TableZone::resizeToContents()
 	xMax += 2 * CARD_WIDTH;
 	if (xMax < minWidth)
 		xMax = minWidth;
-	currentMinimumWidth = xMax + 2 * marginX;
+	currentMinimumWidth = xMax + 2 * marginX + 2 * boxLineWidth;
 	if (currentMinimumWidth > width) {
 		prepareGeometryChange();
 		width = currentMinimumWidth;
@@ -159,28 +159,22 @@ CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
 
 QPointF TableZone::mapFromGrid(const QPoint &gridPoint) const
 {
-	if (gridPoint.y() == 3) {
-		if (settingsCache->getEconomicGrid())
-			return QPointF(
-				20 + (CARD_WIDTH * gridPoint.x() + CARD_WIDTH * (gridPoint.x() / 3)) / 2,
-				(CARD_HEIGHT + paddingY) * gridPoint.y() + (gridPoint.x() % 3 * CARD_HEIGHT) / 3
-			);
-		else
-			return QPointF(
-				20 + 3 * CARD_WIDTH * gridPoint.x() / 2,
-				(CARD_HEIGHT + paddingY) * gridPoint.y()
-			);
-	} else
+	if ((gridPoint.y() == 3) && (settingsCache->getEconomicGrid()))
 		return QPointF(
-			20 + CARD_WIDTH * gridPoint.x() / 2,
-			(CARD_HEIGHT + paddingY) * gridPoint.y()
+			marginX + (CARD_WIDTH * gridPoint.x() + CARD_WIDTH * (gridPoint.x() / 3)) / 2,
+			boxLineWidth + (CARD_HEIGHT + paddingY) * gridPoint.y() + (gridPoint.x() % 3 * CARD_HEIGHT) / 3
+		);
+	else
+		return QPointF(
+			marginX + 3 * CARD_WIDTH * gridPoint.x() / 2,
+			boxLineWidth + (CARD_HEIGHT + paddingY) * gridPoint.y()
 		);
 }
 
 QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 {
 	qreal x = mapPoint.x() - marginX;
-	qreal y = mapPoint.y() + paddingY / 2;
+	qreal y = mapPoint.y() + paddingY / 2 - boxLineWidth;
 	if (x < 0)
 		x = 0;
 	else if (x > width - CARD_WIDTH - marginX)
@@ -191,36 +185,17 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 		y = height - CARD_HEIGHT;
 	
 	QPoint result = QPoint(
-		(int) (x * 2 / CARD_WIDTH),
+		(int) (x / (1.5 * CARD_WIDTH)),
 		(int) (y / (CARD_HEIGHT + paddingY))
 	);
 
-	if (result.y() == 3) {
-		if (settingsCache->getEconomicGrid())
-			return QPoint(
-				(int) (x * 2 / CARD_WIDTH - floor(x / (2 * CARD_WIDTH))),
-				3
-			);
-		else
-			return QPoint(
-				(int) (x / (1.5 * CARD_WIDTH)),
-				3
-			);
-	} else
-		return result;
-}
-
-QPoint TableZone::getFreeGridPoint(int row) const
-{
-	int x = 0;
-	int y = 3 - row;
-	if (y == 3)
-		while (getCardFromGrid(QPoint(x, y)))
-			++x;
+	if ((result.y() == 3) && (settingsCache->getEconomicGrid()))
+		return QPoint(
+			(int) (x * 2 / CARD_WIDTH - floor(x / (2 * CARD_WIDTH))),
+			3
+		);
 	else
-		while (((x >= 2) && getCardFromGrid(QPoint(x - 2, y))) || ((x >= 1) && getCardFromGrid(QPoint(x - 1, y))) || getCardFromGrid(QPoint(x, y)) || getCardFromGrid(QPoint(x + 1, y)) || getCardFromGrid(QPoint(x + 2, y)))
-			++x;
-	return QPoint(x, y);
+		return result;
 }
 
 QPointF TableZone::closestGridPoint(const QPointF &point)

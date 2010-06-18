@@ -73,6 +73,26 @@ Server_Card *Server_CardZone::getCard(int id, bool remove, int *position)
 	}
 }
 
+int Server_CardZone::getFreeGridColumn(int y) const
+{
+	int x = 0;
+	
+	// Stupid algorithm. For large numbers of cards, it would be more
+	// efficient to sort the cards by their x value and only need to iterate once.
+	bool occupied;
+	do {
+		occupied = false;
+		for (int i = 0; i < cards.size(); ++i)
+			if ((cards[i]->getY() == y) && (cards[i]->getX() == x)) {
+				occupied = true;
+				++x;
+				break;
+			}
+	} while (occupied);
+	
+	return x;
+}
+
 void Server_CardZone::insertCard(Server_Card *card, int x, int y)
 {
 	if (hasCoords()) {

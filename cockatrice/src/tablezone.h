@@ -8,6 +8,11 @@ class TableZone : public CardZone {
 signals:
 	void sizeChanged();
 private:
+	static const int boxLineWidth = 10;
+	static const int paddingY = 20;
+	static const int marginX = 20;
+	static const int minWidth = 20 * CARD_WIDTH / 2;
+
 	int width, height;
 	int currentMinimumWidth;
 	QPixmap bgPixmap;
@@ -17,10 +22,6 @@ private slots:
 public slots:
 	void reorganizeCards();
 public:
-	static const int paddingY = 20;
-	static const int marginX = 20;
-	static const int minWidth = 20 * CARD_WIDTH / 2;
-
 	TableZone(Player *_p, QGraphicsItem *parent = 0);
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -30,7 +31,6 @@ public:
 	CardItem *getCardFromGrid(const QPoint &gridPoint) const;
 	QPointF mapFromGrid(const QPoint &gridPoint) const;
 	QPoint mapToGrid(const QPointF &mapPoint) const;
-	QPoint getFreeGridPoint(int row) const;
 	QPointF closestGridPoint(const QPointF &point);
 	CardItem *takeCard(int position, int cardId, const QString &cardName, bool canResize = true);
 	void resizeToContents();

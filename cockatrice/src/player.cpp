@@ -493,7 +493,7 @@ void Player::actCreateToken()
 {
 	QString cardname = QInputDialog::getText(0, tr("Create token"), tr("Name:"));
 	if (!cardname.isEmpty())
-		sendGameCommand(new Command_CreateToken(-1, "table", cardname, QString(), 0, 0));
+		sendGameCommand(new Command_CreateToken(-1, "table", cardname, QString(), -1, 0));
 }
 
 void Player::actSayMessage()
