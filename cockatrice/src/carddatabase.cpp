@@ -492,13 +492,17 @@ void CardDatabase::picDownloadChanged()
 	}
 }
 
-bool CardDatabase::loadCardDatabase()
+bool CardDatabase::loadCardDatabase(const QString &path)
 {
-	QString cardDatabasePath = settingsCache->getCardDatabasePath();
-	if (!cardDatabasePath.isEmpty())
-		loadSuccess = loadFromFile(cardDatabasePath);
+	if (!path.isEmpty())
+		loadSuccess = loadFromFile(path);
 	else loadSuccess = false;
 	return loadSuccess;
+}
+
+bool CardDatabase::loadCardDatabase()
+{
+	return loadCardDatabase(settingsCache->getCardDatabasePath());
 }
 
 QStringList CardDatabase::getAllColors() const

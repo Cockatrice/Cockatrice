@@ -56,7 +56,18 @@ int main(int argc, char *argv[])
 {
 //	qInstallMsgHandler(myMessageOutput);
 	QApplication app(argc, argv);
+#ifdef Q_OS_MAC
+	QDir baseDir(app.applicationDirPath());
+	baseDir.cdUp();
+	QDir pluginsDir = baseDir;
+	pluginsDir.cd("PlugIns");
+	app.addLibraryPath(pluginsDir.absolutePath());
+	baseDir.cdUp();
+	baseDir.cdUp();
+#endif
+#ifdef Q_OS_WIN
 	app.addLibraryPath(app.applicationDirPath() + "/plugins");
+#endif
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
 	QCoreApplication::setOrganizationName("Cockatrice");
@@ -83,6 +94,15 @@ int main(int argc, char *argv[])
 	qsrand(QDateTime::currentDateTime().toTime_t());
 	
 	bool startMainProgram = true;
+#ifdef Q_OS_MAC
+	if (!db->getLoadSuccess())
+		if (db->loadCardDatabase(baseDir.absolutePath() + "/cards.xml"))
+			settingsCache->setCardDatabasePath(baseDir.absolutePath() + "/cards.xml");
+	if (!QDir(settingsCache->getDeckPath()).exists())
+		settingsCache->setDeckPath(baseDir.absolutePath() + "/decks");
+	if (!QDir(settingsCache->getPicsPath()).exists())
+		settingsCache->setPicsPath(baseDir.absolutePath() + "/pics");
+#endif
 	if (!db->getLoadSuccess() || !QDir(settingsCache->getDeckPath()).exists() || !QDir(settingsCache->getPicsPath()).exists()) {
 		DlgSettings dlgSettings;
 		dlgSettings.show();

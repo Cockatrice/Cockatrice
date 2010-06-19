@@ -118,4 +118,5 @@ win32 {
 macx {
 	ICON = resources/appicon.icns
 	CONFIG += x86 ppc
+	LIBS += -bind_at_load
 }
