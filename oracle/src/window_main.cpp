@@ -9,7 +9,13 @@ const QString WindowMain::defaultSetsUrl = QString("http://www.cockatrice.de/fil
 WindowMain::WindowMain(QWidget *parent)
 	: QMainWindow(parent)
 {
-	importer = new OracleImporter(qApp->applicationDirPath(), this);
+	QDir dataDir(qApp->applicationDirPath());
+#ifdef Q_OS_MAC
+	dataDir.cdUp();
+	dataDir.cdUp();
+	dataDir.cdUp();
+#endif
+	importer = new OracleImporter(dataDir.absolutePath(), this);
 	nam = new QNetworkAccessManager(this);
 	
 	checkBoxLayout = new QVBoxLayout;

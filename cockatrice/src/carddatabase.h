@@ -121,9 +121,10 @@ public:
 	bool getLoadSuccess() const { return loadSuccess; }
 public slots:
 	void clearPixmapCache();
+	bool loadCardDatabase(const QString &path);
+	bool loadCardDatabase();
 private slots:
 	void picDownloadFinished(QNetworkReply *reply);
-	bool loadCardDatabase();
 	void picDownloadChanged();
 };
 
