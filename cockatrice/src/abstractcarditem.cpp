@@ -60,7 +60,7 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 			colorStr = color;
 		else if (info->getColors().size() > 1)
 			colorStr = "m";
-		else
+		else if (!info->getColors().isEmpty())
 			colorStr = info->getColors().first().toLower();
 		
 		QColor bgColor;
