@@ -268,7 +268,7 @@ QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAs
 			Server_CardZone *zone = zoneIterator.next().value();
 			QList<ServerInfo_Card *> cardList;
 			if (
-				((playerWhosAsking == player) && (zone->getType() != HiddenZone))
+				(((playerWhosAsking == player) || (playerWhosAsking->getSpectator() && spectatorsSeeEverything)) && (zone->getType() != HiddenZone))
 				|| ((playerWhosAsking != player) && (zone->getType() == PublicZone))
 			) {
 				QListIterator<Server_Card *> cardIterator(zone->cards);
