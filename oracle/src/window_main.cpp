@@ -27,11 +27,21 @@ WindowMain::WindowMain(QWidget *parent)
 	checkboxArea->setWidget(checkboxFrame);
 	checkboxArea->setWidgetResizable(true);
 	
+	checkAllButton = new QPushButton(tr("&Check all"));
+	connect(checkAllButton, SIGNAL(clicked()), this, SLOT(actCheckAll()));
+	uncheckAllButton = new QPushButton(tr("&Uncheck all"));
+	connect(uncheckAllButton, SIGNAL(clicked()), this, SLOT(actUncheckAll()));
+	
+	QHBoxLayout *checkAllButtonLayout = new QHBoxLayout;
+	checkAllButtonLayout->addWidget(checkAllButton);
+	checkAllButtonLayout->addWidget(uncheckAllButton);
+	
 	startButton = new QPushButton(tr("&Start download"));
 	connect(startButton, SIGNAL(clicked()), this, SLOT(actStart()));
 	
 	QVBoxLayout *settingsLayout = new QVBoxLayout;
 	settingsLayout->addWidget(checkboxArea);
+	settingsLayout->addLayout(checkAllButtonLayout);
 	settingsLayout->addWidget(startButton);
 	
 	totalLabel = new QLabel(tr("Total progress:"));
@@ -155,12 +165,28 @@ void WindowMain::updateFileProgress(int bytesRead, int totalBytes)
 	fileProgressBar->setValue(bytesRead);
 }
 
+void WindowMain::actCheckAll()
+{
+	for (int i = 0; i < checkBoxList.size(); ++i)
+		checkBoxList[i]->setChecked(true);
+}
+
+void WindowMain::actUncheckAll()
+{
+	for (int i = 0; i < checkBoxList.size(); ++i)
+		checkBoxList[i]->setChecked(false);
+}
+
 void WindowMain::actStart()
 {
-	startButton->setEnabled(false);
+	int setsCount = importer->startDownload();
+	if (!setsCount) {
+		QMessageBox::critical(this, tr("Error"), tr("No sets to download selected."));
+		return;
+	}
 	for (int i = 0; i < checkBoxList.size(); ++i)
 		checkBoxList[i]->setEnabled(false);
-	int setsCount = importer->startDownload();
+	startButton->setEnabled(false);
 	totalProgressBar->setMaximum(setsCount);
 }
 

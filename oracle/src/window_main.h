@@ -25,7 +25,7 @@ private:
 	
 	QMenu *fileMenu;
 	QAction *aLoadSetsFile, *aDownloadSetsFile, *aExit;
-	QPushButton *startButton;
+	QPushButton *checkAllButton, *uncheckAllButton, *startButton;
 	QLabel *totalLabel, *fileLabel, *nextSetLabel1, *nextSetLabel2;
 	QProgressBar *totalProgressBar, *fileProgressBar;
 	QTextEdit *messageLog;
@@ -37,6 +37,8 @@ private slots:
 	void updateTotalProgress(int cardsImported, int setIndex, const QString &nextSetName);
 	void updateFileProgress(int bytesRead, int totalBytes);
 	void updateSetList();
+	void actCheckAll();
+	void actUncheckAll();
 	void actStart();
 	void actLoadSetsFile();
 	void actDownloadSetsFile();
