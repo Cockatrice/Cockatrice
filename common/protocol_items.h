@@ -179,15 +179,28 @@ public:
 	static SerializableItem *newItem() { return new Command_MoveCard; }
 	int getItemId() const { return ItemId_Command_MoveCard; }
 };
+class Command_AttachCard : public GameCommand {
+	Q_OBJECT
+public:
+	Command_AttachCard(int _gameId = -1, const QString &_startZone = QString(), int _cardId = -1, int _targetPlayerId = -1, const QString &_targetZone = QString(), int _targetCardId = -1);
+	QString getStartZone() const { return static_cast<SerializableItem_String *>(itemMap.value("start_zone"))->getData(); };
+	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); };
+	int getTargetPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("target_player_id"))->getData(); };
+	QString getTargetZone() const { return static_cast<SerializableItem_String *>(itemMap.value("target_zone"))->getData(); };
+	int getTargetCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("target_card_id"))->getData(); };
+	static SerializableItem *newItem() { return new Command_AttachCard; }
+	int getItemId() const { return ItemId_Command_AttachCard; }
+};
 class Command_CreateToken : public GameCommand {
 	Q_OBJECT
 public:
-	Command_CreateToken(int _gameId = -1, const QString &_zone = QString(), const QString &_cardName = QString(), const QString &_color = QString(), const QString &_pt = QString(), const QString &_annotation = QString(), int _x = -1, int _y = -1);
+	Command_CreateToken(int _gameId = -1, const QString &_zone = QString(), const QString &_cardName = QString(), const QString &_color = QString(), const QString &_pt = QString(), const QString &_annotation = QString(), bool _destroy = false, int _x = -1, int _y = -1);
 	QString getZone() const { return static_cast<SerializableItem_String *>(itemMap.value("zone"))->getData(); };
 	QString getCardName() const { return static_cast<SerializableItem_String *>(itemMap.value("card_name"))->getData(); };
 	QString getColor() const { return static_cast<SerializableItem_String *>(itemMap.value("color"))->getData(); };
 	QString getPt() const { return static_cast<SerializableItem_String *>(itemMap.value("pt"))->getData(); };
 	QString getAnnotation() const { return static_cast<SerializableItem_String *>(itemMap.value("annotation"))->getData(); };
+	bool getDestroy() const { return static_cast<SerializableItem_Bool *>(itemMap.value("destroy"))->getData(); };
 	int getX() const { return static_cast<SerializableItem_Int *>(itemMap.value("x"))->getData(); };
 	int getY() const { return static_cast<SerializableItem_Int *>(itemMap.value("y"))->getData(); };
 	static SerializableItem *newItem() { return new Command_CreateToken; }
@@ -388,16 +401,38 @@ public:
 	static SerializableItem *newItem() { return new Event_MoveCard; }
 	int getItemId() const { return ItemId_Event_MoveCard; }
 };
+class Event_DestroyCard : public GameEvent {
+	Q_OBJECT
+public:
+	Event_DestroyCard(int _playerId = -1, const QString &_zone = QString(), int _cardId = -1);
+	QString getZone() const { return static_cast<SerializableItem_String *>(itemMap.value("zone"))->getData(); };
+	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); };
+	static SerializableItem *newItem() { return new Event_DestroyCard; }
+	int getItemId() const { return ItemId_Event_DestroyCard; }
+};
+class Event_AttachCard : public GameEvent {
+	Q_OBJECT
+public:
+	Event_AttachCard(int _playerId = -1, const QString &_startZone = QString(), int _cardId = -1, int _targetPlayerId = -1, const QString &_targetZone = QString(), int _targetCardId = -1);
+	QString getStartZone() const { return static_cast<SerializableItem_String *>(itemMap.value("start_zone"))->getData(); };
+	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); };
+	int getTargetPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("target_player_id"))->getData(); };
+	QString getTargetZone() const { return static_cast<SerializableItem_String *>(itemMap.value("target_zone"))->getData(); };
+	int getTargetCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("target_card_id"))->getData(); };
+	static SerializableItem *newItem() { return new Event_AttachCard; }
+	int getItemId() const { return ItemId_Event_AttachCard; }
+};
 class Event_CreateToken : public GameEvent {
 	Q_OBJECT
 public:
-	Event_CreateToken(int _playerId = -1, const QString &_zone = QString(), int _cardId = -1, const QString &_cardName = QString(), const QString &_color = QString(), const QString &_pt = QString(), const QString &_annotation = QString(), int _x = -1, int _y = -1);
+	Event_CreateToken(int _playerId = -1, const QString &_zone = QString(), int _cardId = -1, const QString &_cardName = QString(), const QString &_color = QString(), const QString &_pt = QString(), const QString &_annotation = QString(), bool _destroyOnZoneChange = false, int _x = -1, int _y = -1);
 	QString getZone() const { return static_cast<SerializableItem_String *>(itemMap.value("zone"))->getData(); };
 	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); };
 	QString getCardName() const { return static_cast<SerializableItem_String *>(itemMap.value("card_name"))->getData(); };
 	QString getColor() const { return static_cast<SerializableItem_String *>(itemMap.value("color"))->getData(); };
 	QString getPt() const { return static_cast<SerializableItem_String *>(itemMap.value("pt"))->getData(); };
 	QString getAnnotation() const { return static_cast<SerializableItem_String *>(itemMap.value("annotation"))->getData(); };
+	bool getDestroyOnZoneChange() const { return static_cast<SerializableItem_Bool *>(itemMap.value("destroy_on_zone_change"))->getData(); };
 	int getX() const { return static_cast<SerializableItem_Int *>(itemMap.value("x"))->getData(); };
 	int getY() const { return static_cast<SerializableItem_Int *>(itemMap.value("y"))->getData(); };
 	static SerializableItem *newItem() { return new Event_CreateToken; }

@@ -38,6 +38,7 @@ class Event_DelCounter;
 class Event_DumpZone;
 class Event_StopDumpZone;
 class Event_MoveCard;
+class Event_DestroyCard;
 class Event_DrawCards;
 
 class Player : public QObject, public QGraphicsItem {
@@ -52,6 +53,7 @@ signals:
 	void logCreateToken(Player *player, QString cardName, QString pt);
 	void logDrawCards(Player *player, int number);
 	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
+	void logDestroyCard(Player *player, QString cardName);
 	void logSetCardCounter(Player *player, QString cardName, int counterId, int value, int oldValue);
 	void logSetTapped(Player *player, QString cardName, bool tapped);
 	void logSetCounter(Player *player, QString counterName, int value, int oldValue);
@@ -79,44 +81,35 @@ public slots:
 	void actViewSideboard();
 	
 	void actSayMessage();
-private slots:
+
+	void actAttach();
+	void actUnattach();
 	void actSetPT();
 	void actSetAnnotation();
+	void cardMenuAction();
+	void actCardCounterTrigger();
+
+private slots:
 	
 	void updateBgPixmap();
 	void updateBoundingRect();
-	void cardMenuAction();
-	void actCardCounterTrigger(QAction *a);
 	void rearrangeZones();
 private:
-	QList<QMenu *> cardCounterMenus;
-	QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
 	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *countersMenu, *sayMenu;
 	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
 		*aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg,
 		*aMoveRfgToTopLibrary, *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave,
 		*aViewLibrary, *aViewTopCards, *aViewGraveyard, *aViewRfg, *aViewSideboard,
                 *aDrawCard, *aDrawCards, *aMulligan, *aShuffle,
-		*aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken;
+		*aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,
+		*aCardMenu;
 
 	typedef void (Player::*CardMenuHandler)(CardItem *card);
 	QHash<QAction *, CardMenuHandler> cardMenuHandlers;
 	
-	QMenu *cardMenu, *moveMenu;
-	QAction *aTap, *aUntap, *aDoesntUntap, *aSetPT, *aSetAnnotation, *aFlip,
-		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile;
-
-	void actTap(CardItem *card);
-	void actUntap(CardItem *card);
-	void actDoesntUntap(CardItem *card);
-	void actFlip(CardItem *card);
-	void actMoveToTopLibrary(CardItem *card);
-	void actMoveToBottomLibrary(CardItem *card);
-	void actMoveToGraveyard(CardItem *card);
-	void actMoveToExile(CardItem *card);
-
 	int defaultNumberTopCards;
 	QString lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation;
+	bool lastTokenDestroy;
 	QString name;
 	int id;
 	bool active;
@@ -152,6 +145,7 @@ private:
 	void eventDumpZone(Event_DumpZone *event);
 	void eventStopDumpZone(Event_StopDumpZone *event);
 	void eventMoveCard(Event_MoveCard *event);
+	void eventDestroyCard(Event_DestroyCard *event);
 	void eventDrawCards(Event_DrawCards *event);
 public:
 	static const int counterAreaWidth = 65;
@@ -186,7 +180,8 @@ public:
 	const QMap<QString, CardZone *> &getZones() const { return zones; }
 	const QMap<int, ArrowItem *> &getArrows() const { return arrows; }
 	TableZone *getTable() const { return table; }
-	void showCardMenu(const QPoint &p);
+	void setCardMenu(QMenu *menu);
+	QMenu *getCardMenu() const;
 	bool getActive() const { return active; }
 	void setActive(bool _active);
 	

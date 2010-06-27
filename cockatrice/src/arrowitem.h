@@ -24,6 +24,7 @@ public:
 	ArrowItem(Player *_player, int _id, CardItem *_startItem, CardItem *_targetItem, const QColor &color);
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QRectF boundingRect() const { return path.boundingRect(); }
+	QPainterPath shape() const { return path; }
 	void updatePath();
 	void updatePath(const QPointF &endPoint);
 	
@@ -36,8 +37,11 @@ public:
 
 class ArrowDragItem : public ArrowItem {
 	Q_OBJECT
+private:
+	QList<ArrowDragItem *> childArrows;
 public:
 	ArrowDragItem(CardItem *_startItem, const QColor &_color);
+	void addChildArrow(ArrowDragItem *childArrow);
 protected:
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);

@@ -8,6 +8,7 @@ class CardDragItem;
 class CardZone;
 class ServerInfo_Card;
 class Player;
+class QAction;
 
 const int MAX_COUNTERS_ON_CARD = 999;
 
@@ -21,17 +22,25 @@ private:
 	QMap<int, int> counters;
 	QString annotation;
 	QString pt;
+	bool destroyOnZoneChange;
 	bool doesntUntap;
 	QPoint gridPoint;
 	bool beingPointedAt;
 	CardDragItem *dragItem;
 	
+	QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
+	QAction *aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aSetPT, *aSetAnnotation, *aFlip, *aClone,
+		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile;
+	QMenu *cardMenu, *moveMenu;
+
 	void playCard(QGraphicsSceneMouseEvent *event);
 public:
 	enum { Type = typeCard };
 	int type() const { return Type; }
 	CardItem(Player *_owner, const QString &_name = QString(), int _cardid = -1, QGraphicsItem *parent = 0);
 	~CardItem();
+	void retranslateUi();
+	QMenu *getCardMenu() const { return cardMenu; }
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QPoint getGridPoint() const { return gridPoint; }
 	void setGridPoint(const QPoint &_gridPoint) { gridPoint = _gridPoint; }
@@ -51,6 +60,8 @@ public:
 	void setDoesntUntap(bool _doesntUntap);
 	QString getPT() const { return pt; }
 	void setPT(const QString &_pt);
+	bool getDestroyOnZoneChange() const { return destroyOnZoneChange; }
+	void setDestroyOnZoneChange(bool _destroy) { destroyOnZoneChange = _destroy; }
 	void setBeingPointedAt(bool _beingPointedAt);
 	void resetState();
 	void processCardInfo(ServerInfo_Card *info);
@@ -61,6 +72,7 @@ protected:
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
+	QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 };
 
 #endif

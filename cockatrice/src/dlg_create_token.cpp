@@ -26,6 +26,9 @@ DlgCreateToken::DlgCreateToken(QWidget *parent)
 	annotationLabel = new QLabel(tr("&Annotation:"));
 	annotationEdit = new QLineEdit;
 	annotationLabel->setBuddy(annotationEdit);
+	
+	destroyCheckBox = new QCheckBox(tr("&Destroy token when it leaves the table"));
+	destroyCheckBox->setChecked(true);
 
 	okButton = new QPushButton(tr("&OK"));
 	okButton->setDefault(true);
@@ -40,6 +43,7 @@ DlgCreateToken::DlgCreateToken(QWidget *parent)
 	grid->addWidget(ptEdit, 2, 1);
 	grid->addWidget(annotationLabel, 3, 0);
 	grid->addWidget(annotationEdit, 3, 1);
+	grid->addWidget(destroyCheckBox, 4, 0, 1, 2);
 
 	QHBoxLayout *buttonLayout = new QHBoxLayout;
 	buttonLayout->addStretch();
@@ -82,4 +86,9 @@ QString DlgCreateToken::getPT() const
 QString DlgCreateToken::getAnnotation() const
 {
 	return annotationEdit->text();
+}
+
+bool DlgCreateToken::getDestroy() const
+{
+	return destroyCheckBox->isChecked();
 }

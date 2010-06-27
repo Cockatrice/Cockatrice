@@ -20,7 +20,7 @@
 #include <QMenu>
 
 Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabGame *_parent)
-	: QObject(_parent), defaultNumberTopCards(3), name(_name), id(_id), active(false), local(_local), mirrored(false), client(_client)
+	: QObject(_parent), defaultNumberTopCards(3), lastTokenDestroy(true), name(_name), id(_id), active(false), local(_local), mirrored(false), client(_client)
 {
 	setCacheMode(DeviceCoordinateCache);
 	
@@ -200,76 +200,12 @@ Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabG
 		sayMenu = playerMenu->addMenu(QString());
 		initSayMenu();
 		
-		// Card menu
-		aTap = new QAction(this);
-		aUntap = new QAction(this);
-		aDoesntUntap = new QAction(this);
-		aSetPT = new QAction(this);
-		connect(aSetPT, SIGNAL(triggered()), this, SLOT(actSetPT()));
-		aSetAnnotation = new QAction(this);
-		connect(aSetAnnotation, SIGNAL(triggered()), this, SLOT(actSetAnnotation()));
-		aFlip = new QAction(this);
-		aMoveToTopLibrary = new QAction(this);
-		aMoveToBottomLibrary = new QAction(this);
-		aMoveToGraveyard = new QAction(this);
-		aMoveToExile = new QAction(this);
-	
-		for (int i = 0; i < 3; ++i) {
-			QMenu *menu = new QMenu;
-			QAction *tempAddCounter = new QAction(this);
-			QAction *tempRemoveCounter = new QAction(this);
-			QAction *tempSetCounter = new QAction(this);
-			menu->addAction(tempAddCounter);
-			menu->addAction(tempRemoveCounter);
-			menu->addAction(tempSetCounter);
-			aAddCounter.append(tempAddCounter);
-			aRemoveCounter.append(tempRemoveCounter);
-			aSetCounter.append(tempSetCounter);
-			connect(menu, SIGNAL(triggered(QAction *)), this, SLOT(actCardCounterTrigger(QAction *)));
-			cardCounterMenus.append(menu);
-		}
-		
-		cardMenu = new QMenu;
-		cardMenu->addAction(aTap);
-		cardMenu->addAction(aUntap);
-		cardMenu->addAction(aDoesntUntap);
-		cardMenu->addSeparator();
-		cardMenu->addAction(aSetPT);
-		cardMenu->addAction(aSetAnnotation);
-		cardMenu->addSeparator();
-		cardMenu->addAction(aFlip);
-		cardMenu->addSeparator();
-		for (int i = 0; i < cardCounterMenus.size(); ++i)
-			cardMenu->addMenu(cardCounterMenus[i]);
-		cardMenu->addSeparator();
-		moveMenu = cardMenu->addMenu(QString());
-
+		aCardMenu = new QAction(this);
 		playerMenu->addSeparator();
-		playerMenu->addMenu(cardMenu);
-		
-		moveMenu->addAction(aMoveToTopLibrary);
-		moveMenu->addAction(aMoveToBottomLibrary);
-		moveMenu->addAction(aMoveToGraveyard);
-		moveMenu->addAction(aMoveToExile);
-		
-		cardMenuHandlers.insert(aTap, &Player::actTap);
-		cardMenuHandlers.insert(aUntap, &Player::actUntap);
-		cardMenuHandlers.insert(aDoesntUntap, &Player::actDoesntUntap);
-		cardMenuHandlers.insert(aFlip, &Player::actFlip);
-		cardMenuHandlers.insert(aMoveToTopLibrary, &Player::actMoveToTopLibrary);
-		cardMenuHandlers.insert(aMoveToBottomLibrary, &Player::actMoveToBottomLibrary);
-		cardMenuHandlers.insert(aMoveToGraveyard, &Player::actMoveToGraveyard);
-		cardMenuHandlers.insert(aMoveToExile, &Player::actMoveToExile);
-		
-		QHashIterator<QAction *, CardMenuHandler> i(cardMenuHandlers);
-		while (i.hasNext()) {
-			i.next();
-			connect(i.key(), SIGNAL(triggered()), this, SLOT(cardMenuAction()));
-		}
+		playerMenu->addAction(aCardMenu);
 	} else {
 		countersMenu = 0;
 		sbMenu = 0;
-		cardMenu = 0;
 		aCreateAnotherToken = 0;
 	}
 	
@@ -290,7 +226,6 @@ Player::~Player()
 	clearCounters();
 	clearArrows();
 	delete playerMenu;
-	delete cardMenu;
 }
 
 void Player::rearrangeZones()
@@ -391,30 +326,12 @@ void Player::retranslateUi()
 		while (counterIterator.hasNext())
 			counterIterator.next().value()->retranslateUi();
 
-		cardMenu->setTitle(tr("C&ard"));
-		aTap->setText(tr("&Tap"));
-		aUntap->setText(tr("&Untap"));
-		aDoesntUntap->setText(tr("Toggle &normal untapping"));
-		aSetPT->setText(tr("Set &P/T..."));
-		aSetAnnotation->setText(tr("&Set annotation..."));
-		aFlip->setText(tr("&Flip"));
-		cardCounterMenus[0]->setTitle(tr("Counters (red)"));
-		cardCounterMenus[1]->setTitle(tr("Counters (yellow)"));
-		cardCounterMenus[2]->setTitle(tr("Counters (green)"));
-		for (int i = 0; i < aAddCounter.size(); ++i)
-			aAddCounter[i]->setText(tr("&Add counter"));
-		for (int i = 0; i < aRemoveCounter.size(); ++i)
-			aRemoveCounter[i]->setText(tr("&Remove counter"));
-		for (int i = 0; i < aSetCounter.size(); ++i)
-			aSetCounter[i]->setText(tr("&Set counters..."));
-		aMoveToTopLibrary->setText(tr("&top of library"));
-		aMoveToBottomLibrary->setText(tr("&bottom of library"));
-		aMoveToGraveyard->setText(tr("&graveyard"));
-		aMoveToGraveyard->setShortcut(tr("Ctrl+Del"));
-		aMoveToExile->setText(tr("&exile"));
-		
-		moveMenu->setTitle(tr("&Move to"));
+		aCardMenu->setText(tr("C&ard"));
 	}
+	
+	QMapIterator<QString, CardZone *> zoneIterator(zones);
+	while (zoneIterator.hasNext())
+		zoneIterator.next().value()->retranslateUi();
 }
 
 void Player::initSayMenu()
@@ -508,14 +425,15 @@ void Player::actCreateToken()
 	lastTokenColor = dlg.getColor();
 	lastTokenPT = dlg.getPT();
 	lastTokenAnnotation = dlg.getAnnotation();
+	lastTokenDestroy = dlg.getDestroy();
 	aCreateAnotherToken->setEnabled(true);
 	
-	sendGameCommand(new Command_CreateToken(-1, "table", dlg.getName(), dlg.getColor(), dlg.getPT(), dlg.getAnnotation(), -1, 0));
+	sendGameCommand(new Command_CreateToken(-1, "table", dlg.getName(), dlg.getColor(), dlg.getPT(), dlg.getAnnotation(), dlg.getDestroy(), -1, 0));
 }
 
 void Player::actCreateAnotherToken()
 {
-	sendGameCommand(new Command_CreateToken(-1, "table", lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation, -1, 0));
+	sendGameCommand(new Command_CreateToken(-1, "table", lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation, lastTokenDestroy, -1, 0));
 }
 
 void Player::actSayMessage()
@@ -591,6 +509,7 @@ void Player::eventCreateToken(Event_CreateToken *event)
 	card->setColor(event->getColor());
 	card->setPT(event->getPt());
 	card->setAnnotation(event->getAnnotation());
+	card->setDestroyOnZoneChange(event->getDestroyOnZoneChange());
 
 	emit logCreateToken(this, card->getName(), card->getPT());
 	zone->addCard(card, true, event->getX(), event->getY());
@@ -732,6 +651,21 @@ void Player::eventMoveCard(Event_MoveCard *event)
 	}
 }
 
+void Player::eventDestroyCard(Event_DestroyCard *event)
+{
+	CardZone *zone = zones.value(event->getZone(), 0);
+	if (!zone)
+		return;
+	
+	CardItem *card = zone->getCard(event->getCardId(), QString());
+	if (!card)
+		return;
+	
+	emit logDestroyCard(this, card->getName());
+	zone->takeCard(-1, event->getCardId(), QString(), true);
+	delete card;
+}
+
 void Player::eventDrawCards(Event_DrawCards *event)
 {
 	CardZone *deck = zones.value("deck");
@@ -766,17 +700,12 @@ void Player::processGameEvent(GameEvent *event, GameEventContext *context)
 		case ItemId_Event_DumpZone: eventDumpZone(qobject_cast<Event_DumpZone *>(event)); break;
 		case ItemId_Event_StopDumpZone: eventStopDumpZone(qobject_cast<Event_StopDumpZone *>(event)); break;
 		case ItemId_Event_MoveCard: eventMoveCard(qobject_cast<Event_MoveCard *>(event)); break;
+		case ItemId_Event_DestroyCard: eventDestroyCard(qobject_cast<Event_DestroyCard *>(event)); break;
 		case ItemId_Event_DrawCards: eventDrawCards(qobject_cast<Event_DrawCards *>(event)); break;
 		default: {
 			qDebug() << "unhandled game event";
 		}
 	}
-}
-
-void Player::showCardMenu(const QPoint &p)
-{
-	if (cardMenu)
-		cardMenu->exec(p);
 }
 
 void Player::setActive(bool _active)
@@ -978,34 +907,47 @@ void Player::sendCommandContainer(CommandContainer *cont)
 
 void Player::cardMenuAction()
 {
-	// Determine the appropriate handler function.
-	CardMenuHandler handler = cardMenuHandlers.value(static_cast<QAction *>(sender()));
-			
-	// The list of selected items is randomly shuffled.
+	QAction *a = static_cast<QAction *>(sender());
 	QList<QGraphicsItem *> sel = scene()->selectedItems();
 	while (!sel.isEmpty()) {
 		unsigned int i = (unsigned int) (((double) sel.size()) * qrand() / (RAND_MAX + 1.0));
 		CardItem *card = qgraphicsitem_cast<CardItem *>(sel.takeAt(i));
-		// For each item, the handler function is called.
-		(this->*handler)(card);
+
+		switch (a->data().toInt()) {
+			case 0:
+				if (!card->getTapped())
+					sendGameCommand(new Command_SetCardAttr(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "tapped", "1"));
+				break;
+			case 1:
+				if (card->getTapped())
+					sendGameCommand(new Command_SetCardAttr(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "tapped", "0"));
+				break;
+			case 2:
+				sendGameCommand(new Command_SetCardAttr(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "doesnt_untap", QString::number(!card->getDoesntUntap())));
+				break;
+			case 3: {
+				QString zone = qgraphicsitem_cast<CardZone *>(card->parentItem())->getName();
+				sendGameCommand(new Command_MoveCard(-1, zone, card->getId(), zone, card->getGridPoint().x(), card->getGridPoint().y(), !card->getFaceDown()));
+				break;
+			}
+			case 4:
+				sendGameCommand(new Command_CreateToken(-1, static_cast<CardZone *>(card->parentItem())->getName(), card->getName(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), -1, card->getGridPoint().y()));
+				break;
+			case 5:
+				sendGameCommand(new Command_MoveCard(-1, static_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "deck", 0, 0, false));
+				break;
+			case 6:
+				sendGameCommand(new Command_MoveCard(-1, static_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "deck", -1, 0, false));
+				break;
+			case 7:
+				sendGameCommand(new Command_MoveCard(-1, static_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "grave", 0, 0, false));
+				break;
+			case 8:
+				sendGameCommand(new Command_MoveCard(-1, static_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "rfg", 0, 0, false));
+				break;
+			default: ;
+		}
 	}
-}
-
-void Player::actTap(CardItem *card)
-{
-	if (!card->getTapped())
-		sendGameCommand(new Command_SetCardAttr(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "tapped", "1"));
-}
-
-void Player::actUntap(CardItem *card)
-{
-	if (card->getTapped())
-		sendGameCommand(new Command_SetCardAttr(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "tapped", "0"));
-}
-
-void Player::actDoesntUntap(CardItem *card)
-{
-	sendGameCommand(new Command_SetCardAttr(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "doesnt_untap", QString::number(!card->getDoesntUntap())));
 }
 
 void Player::actSetPT()
@@ -1051,67 +993,64 @@ void Player::actSetAnnotation()
 	}
 }
 
-void Player::actFlip(CardItem *card)
+void Player::actAttach()
 {
-	QString zone = qgraphicsitem_cast<CardZone *>(card->parentItem())->getName();
-	sendGameCommand(new Command_MoveCard(-1, zone, card->getId(), zone, card->getGridPoint().x(), card->getGridPoint().y(), !card->getFaceDown()));
 }
 
-void Player::actCardCounterTrigger(QAction *a)
+void Player::actUnattach()
 {
-	QMenu *menu = static_cast<QMenu *>(sender());
-	int counterId = cardCounterMenus.indexOf(menu);
+}
+
+void Player::actCardCounterTrigger()
+{
+	QAction *a = static_cast<QAction *>(sender());
 	
-	if (aAddCounter.contains(a)) {
-		QListIterator<QGraphicsItem *> i(scene()->selectedItems());
-		while (i.hasNext()) {
-			CardItem *card = static_cast<CardItem *>(i.next());
-			if (card->getCounters().value(counterId, 0) < MAX_COUNTERS_ON_CARD)
-				sendGameCommand(new Command_SetCardCounter(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), counterId, card->getCounters().value(counterId, 0) + 1));
+	int counterId = a->data().toInt() / 1000;
+	int action = a->data().toInt() % 1000;
+	switch (action) {
+		case 9: {
+			QListIterator<QGraphicsItem *> i(scene()->selectedItems());
+			while (i.hasNext()) {
+				CardItem *card = static_cast<CardItem *>(i.next());
+				if (card->getCounters().value(counterId, 0) < MAX_COUNTERS_ON_CARD)
+					sendGameCommand(new Command_SetCardCounter(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), counterId, card->getCounters().value(counterId, 0) + 1));
+			}
+			break;
 		}
-	} else if (aRemoveCounter.contains(a)) {
-		QListIterator<QGraphicsItem *> i(scene()->selectedItems());
-		while (i.hasNext()) {
-			CardItem *card = static_cast<CardItem *>(i.next());
-			if (card->getCounters().value(counterId, 0))
-				sendGameCommand(new Command_SetCardCounter(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), counterId, card->getCounters().value(counterId, 0) - 1));
+		case 10: {
+			QListIterator<QGraphicsItem *> i(scene()->selectedItems());
+			while (i.hasNext()) {
+				CardItem *card = static_cast<CardItem *>(i.next());
+				if (card->getCounters().value(counterId, 0))
+					sendGameCommand(new Command_SetCardCounter(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), counterId, card->getCounters().value(counterId, 0) - 1));
+			}
+			break;
 		}
-	} else if (aSetCounter.contains(a)) {
-		bool ok;
-		int number = QInputDialog::getInteger(0, tr("Set counters"), tr("Number:"), 0, 0, MAX_COUNTERS_ON_CARD, 1, &ok);
-		if (!ok)
-			return;
-	
-		QListIterator<QGraphicsItem *> i(scene()->selectedItems());
-		while (i.hasNext()) {
-			CardItem *card = static_cast<CardItem *>(i.next());
-			sendGameCommand(new Command_SetCardCounter(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), counterId, number));
+		case 11: {
+			bool ok;
+			int number = QInputDialog::getInteger(0, tr("Set counters"), tr("Number:"), 0, 0, MAX_COUNTERS_ON_CARD, 1, &ok);
+			if (!ok)
+				return;
+		
+			QListIterator<QGraphicsItem *> i(scene()->selectedItems());
+			while (i.hasNext()) {
+				CardItem *card = static_cast<CardItem *>(i.next());
+				sendGameCommand(new Command_SetCardCounter(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), counterId, number));
+			}
+			break;
 		}
+		default: ;
 	}
 }
 
-void Player::actMoveToTopLibrary(CardItem *card)
+void Player::setCardMenu(QMenu *menu)
 {
-	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
-	sendGameCommand(new Command_MoveCard(-1, startZone->getName(), card->getId(), "deck", 0, 0, false));
+	aCardMenu->setMenu(menu);
 }
 
-void Player::actMoveToBottomLibrary(CardItem *card)
+QMenu *Player::getCardMenu() const
 {
-	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
-	sendGameCommand(new Command_MoveCard(-1, startZone->getName(), card->getId(), "deck", -1, 0, false));
-}
-
-void Player::actMoveToGraveyard(CardItem *card)
-{
-	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
-	sendGameCommand(new Command_MoveCard(-1, startZone->getName(), card->getId(), "grave", 0, 0, false));
-}
-
-void Player::actMoveToExile(CardItem *card)
-{
-	CardZone *startZone = qgraphicsitem_cast<CardZone *>(card->parentItem());
-	sendGameCommand(new Command_MoveCard(-1, startZone->getName(), card->getId(), "rfg", 0, 0, false));
+	return aCardMenu->menu();
 }
 
 qreal Player::getMinimumWidth() const

@@ -38,7 +38,10 @@ private:
 	QString color;
 	QString pt;
 	QString annotation;
+	bool destroyOnZoneChange;
 	bool doesntUntap;
+	
+	Server_Card *parentCard;
 public:
 	Server_Card(QString _name, int _id, int _coord_x, int _coord_y);
 	~Server_Card();
@@ -59,6 +62,8 @@ public:
 	QString getPT() const { return pt; }
 	QString getAnnotation() const { return annotation; }
 	bool getDoesntUntap() const { return doesntUntap; }
+	bool getDestroyOnZoneChange() const { return destroyOnZoneChange; }
+	Server_Card *getParentCard() const { return parentCard; }
 
 	void setId(int _id) { id = _id; }
 	void setCoords(int x, int y) { coord_x = x; coord_y = y; }
@@ -70,7 +75,9 @@ public:
 	void setColor(const QString &_color) { color = _color; }
 	void setPT(const QString &_pt) { pt = _pt; }
 	void setAnnotation(const QString &_annotation) { annotation = _annotation; }
+	void setDestroyOnZoneChange(bool _destroy) { destroyOnZoneChange = _destroy; }
 	void setDoesntUntap(bool _doesntUntap) { doesntUntap = _doesntUntap; }
+	void setParentCard(Server_Card *_parentCard) { parentCard = _parentCard; }
 	
 	void resetState();
 	bool setAttribute(const QString &aname, const QString &avalue, bool allCards);

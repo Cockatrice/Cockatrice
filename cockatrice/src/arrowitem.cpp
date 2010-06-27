@@ -101,6 +101,11 @@ ArrowDragItem::ArrowDragItem(CardItem *_startItem, const QColor &_color)
 {
 }
 
+void ArrowDragItem::addChildArrow(ArrowDragItem *childArrow)
+{
+	childArrows.append(childArrow);
+}
+
 void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
 	QPointF endPos = event->scenePos();
@@ -124,9 +129,12 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 		updatePath();
 	}
 	update();
+	
+	for (int i = 0; i < childArrows.size(); ++i)
+		childArrows[i]->mouseMoveEvent(event);
 }
 
-void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
+void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
 	if (targetItem && (targetItem != startItem)) {
 		targetItem->setBeingPointedAt(false);
@@ -144,4 +152,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
 		));
 	}
 	deleteLater();
+
+	for (int i = 0; i < childArrows.size(); ++i)
+		childArrows[i]->mouseReleaseEvent(event);
 }

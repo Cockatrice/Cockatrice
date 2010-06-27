@@ -19,6 +19,12 @@ CardZone::~CardZone()
 	clearContents();
 }
 
+void CardZone::retranslateUi()
+{
+	for (int i = 0; i < cards.size(); ++i)
+		cards[i]->retranslateUi();
+}
+
 void CardZone::clearContents()
 {
 	for (int i = 0; i < cards.size(); i++)

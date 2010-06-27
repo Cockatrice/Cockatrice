@@ -95,6 +95,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 			case ItemId_Command_RollDie: return cmdRollDie(qobject_cast<Command_RollDie *>(command), cont, game, player);
 			case ItemId_Command_DrawCards: return cmdDrawCards(qobject_cast<Command_DrawCards *>(command), cont, game, player);
 			case ItemId_Command_MoveCard: return cmdMoveCard(qobject_cast<Command_MoveCard *>(command), cont, game, player);
+			case ItemId_Command_AttachCard: return cmdAttachCard(qobject_cast<Command_AttachCard *>(command), cont, game, player);
 			case ItemId_Command_CreateToken: return cmdCreateToken(qobject_cast<Command_CreateToken *>(command), cont, game, player);
 			case ItemId_Command_CreateArrow: return cmdCreateArrow(qobject_cast<Command_CreateArrow *>(command), cont, game, player);
 			case ItemId_Command_DeleteArrow: return cmdDeleteArrow(qobject_cast<Command_DeleteArrow *>(command), cont, game, player);
@@ -515,6 +516,13 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 	Server_Card *card = startzone->getCard(_cardId, true, &position);
 	if (!card)
 		return RespNameNotFound;
+	
+	if (card->getDestroyOnZoneChange() && (startzone != targetzone)) {
+		cont->enqueueGameEventPrivate(new Event_DestroyCard(player->getPlayerId(), startzone->getName(), card->getId()), game->getGameId());
+		cont->enqueueGameEventPublic(new Event_DestroyCard(player->getPlayerId(), startzone->getName(), card->getId()), game->getGameId());
+		return RespOk;
+	}
+	
 	if (!targetzone->hasCoords()) {
 		y = 0;
 		if (x == -1)
@@ -601,6 +609,40 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, CommandC
 	return moveCard(game, player, cont, cmd->getStartZone(), cmd->getCardId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown(), cmd->getTapped());
 }
 
+ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+{
+	if (player->getSpectator())
+		return RespFunctionNotAllowed;
+	
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
+	Server_CardZone *startzone = player->getZones().value(cmd->getStartZone());
+	if (!startzone)
+		return RespNameNotFound;
+	
+	Server_Card *card = startzone->getCard(cmd->getCardId(), false);
+	if (!card)
+		return RespNameNotFound;
+
+	Server_Player *targetPlayer = game->getPlayer(cmd->getTargetPlayerId());
+	if (!targetPlayer)
+		return RespNameNotFound;
+	
+	Server_CardZone *targetzone = targetPlayer->getZones().value(cmd->getTargetZone());
+	if (!targetzone)
+		return RespNameNotFound;
+
+	Server_Card *targetCard = targetzone->getCard(cmd->getTargetCardId(), false);
+	if (!targetCard)
+		return RespNameNotFound;
+	
+	card->setParentCard(targetCard);
+	cont->enqueueGameEventPrivate(new Event_AttachCard(player->getPlayerId(), startzone->getName(), card->getId(), targetPlayer->getPlayerId(), targetzone->getName(), targetCard->getId()), game->getGameId());
+	cont->enqueueGameEventPublic(new Event_AttachCard(player->getPlayerId(), startzone->getName(), card->getId(), targetPlayer->getPlayerId(), targetzone->getName(), targetCard->getId()), game->getGameId());
+	return RespOk;
+}
+
 ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
@@ -626,9 +668,10 @@ ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, Co
 	card->setPT(cmd->getPt());
 	card->setColor(cmd->getColor());
 	card->setAnnotation(cmd->getAnnotation());
+	card->setDestroyOnZoneChange(cmd->getDestroy());
 	
 	zone->insertCard(card, x, y);
-	game->sendGameEvent(new Event_CreateToken(player->getPlayerId(), zone->getName(), card->getId(), card->getName(), cmd->getColor(), cmd->getPt(), cmd->getAnnotation(), x, y));
+	game->sendGameEvent(new Event_CreateToken(player->getPlayerId(), zone->getName(), card->getId(), card->getName(), cmd->getColor(), cmd->getPt(), cmd->getAnnotation(), cmd->getDestroy(), x, y));
 	
 	return RespOk;
 }
@@ -901,7 +944,7 @@ ResponseCode Server_ProtocolHandler::cmdDumpZone(Command_DumpZone *cmd, CommandC
 				cardCounterIterator.next();
 				cardCounterList.append(new ServerInfo_CardCounter(cardCounterIterator.key(), cardCounterIterator.value()));
 			}
-			respCardList.append(new ServerInfo_Card(card->getId(), displayedName, card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), cardCounterList));
+			respCardList.append(new ServerInfo_Card(card->getId(), displayedName, card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), cardCounterList));
 		}
 	}
 	if (zone->getType() == HiddenZone) {

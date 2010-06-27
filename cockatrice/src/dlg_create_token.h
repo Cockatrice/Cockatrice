@@ -6,6 +6,7 @@
 
 class QLabel;
 class QComboBox;
+class QCheckBox;
 class QPushButton;
 
 class DlgCreateToken : public QDialog {
@@ -16,12 +17,14 @@ public:
 	QString getColor() const;
 	QString getPT() const;
 	QString getAnnotation() const;
+	bool getDestroy() const;
 private slots:
 	void actOk();
 private:
 	QLabel *nameLabel, *colorLabel, *ptLabel, *annotationLabel;
 	QComboBox *colorEdit;
 	QLineEdit *nameEdit, *ptEdit, *annotationEdit;
+	QCheckBox *destroyCheckBox;
 	QPushButton *okButton, *cancelButton;
 };
 

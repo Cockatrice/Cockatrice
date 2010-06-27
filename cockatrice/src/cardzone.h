@@ -37,6 +37,7 @@ public:
 	virtual void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown) = 0;
 	CardZone(Player *_player, const QString &_name, bool _hasCardAttr, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent = 0, bool isView = false);
 	~CardZone();
+	void retranslateUi();
 	void clearContents();
 	bool getHasCardAttr() const { return hasCardAttr; }
 	bool getIsShufflable() const { return isShufflable; }

@@ -12,14 +12,133 @@
 #include "settingscache.h"
 
 CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, QGraphicsItem *parent)
-	: AbstractCardItem(_name, parent), owner(_owner), id(_cardid), attacking(false), facedown(false), doesntUntap(false), beingPointedAt(false), dragItem(NULL)
+	: AbstractCardItem(_name, parent), owner(_owner), id(_cardid), attacking(false), facedown(false), destroyOnZoneChange(false), doesntUntap(false), beingPointedAt(false), dragItem(NULL)
 {
 	owner->addCard(this);
+
+	if (owner->getLocal()) {
+		aTap = new QAction(this);
+		aTap->setData(0);
+		connect(aTap, SIGNAL(triggered()), owner, SLOT(cardMenuAction()));
+		aUntap = new QAction(this);
+		aUntap->setData(1);
+		connect(aUntap, SIGNAL(triggered()), owner, SLOT(cardMenuAction()));
+		aDoesntUntap = new QAction(this);
+		aDoesntUntap->setData(2);
+		connect(aDoesntUntap, SIGNAL(triggered()), owner, SLOT(cardMenuAction()));
+		aAttach = new QAction(this);
+		connect(aAttach, SIGNAL(triggered()), owner, SLOT(actAttach()));
+		aUnattach = new QAction(this);
+		connect(aUnattach, SIGNAL(triggered()), owner, SLOT(actUnattach()));
+		aSetPT = new QAction(this);
+		connect(aSetPT, SIGNAL(triggered()), owner, SLOT(actSetPT()));
+		aSetAnnotation = new QAction(this);
+		connect(aSetAnnotation, SIGNAL(triggered()), owner, SLOT(actSetAnnotation()));
+		aFlip = new QAction(this);
+		aFlip->setData(3);
+		connect(aFlip, SIGNAL(triggered()), owner, SLOT(cardMenuAction()));
+		aClone = new QAction(this);
+		aClone->setData(4);
+		connect(aClone, SIGNAL(triggered()), owner, SLOT(cardMenuAction()));
+		aMoveToTopLibrary = new QAction(this);
+		aMoveToTopLibrary->setData(5);
+		aMoveToBottomLibrary = new QAction(this);
+		aMoveToBottomLibrary->setData(6);
+		aMoveToGraveyard = new QAction(this);
+		aMoveToGraveyard->setData(7);
+		aMoveToExile = new QAction(this);
+		aMoveToExile->setData(8);
+		connect(aMoveToTopLibrary, SIGNAL(triggered()), owner, SLOT(cardMenuAction()));
+		connect(aMoveToBottomLibrary, SIGNAL(triggered()), owner, SLOT(cardMenuAction()));
+		connect(aMoveToGraveyard, SIGNAL(triggered()), owner, SLOT(cardMenuAction()));
+		connect(aMoveToExile, SIGNAL(triggered()), owner, SLOT(cardMenuAction()));
+	
+		
+		cardMenu = new QMenu;
+		cardMenu->addAction(aTap);
+		cardMenu->addAction(aUntap);
+		cardMenu->addAction(aDoesntUntap);
+		cardMenu->addAction(aFlip);
+		cardMenu->addSeparator();
+		cardMenu->addAction(aAttach);
+		cardMenu->addAction(aUnattach);
+		cardMenu->addSeparator();
+		cardMenu->addAction(aSetPT);
+		cardMenu->addAction(aSetAnnotation);
+		cardMenu->addSeparator();
+		cardMenu->addAction(aClone);
+		for (int i = 0; i < 3; ++i) {
+			QAction *tempAddCounter = new QAction(this);
+			tempAddCounter->setData(9 + i * 1000);
+			QAction *tempRemoveCounter = new QAction(this);
+			tempRemoveCounter->setData(10 + i * 1000);
+			QAction *tempSetCounter = new QAction(this);
+			tempSetCounter->setData(11 + i * 1000);
+			aAddCounter.append(tempAddCounter);
+			aRemoveCounter.append(tempRemoveCounter);
+			aSetCounter.append(tempSetCounter);
+			connect(tempAddCounter, SIGNAL(triggered()), owner, SLOT(actCardCounterTrigger()));
+			connect(tempRemoveCounter, SIGNAL(triggered()), owner, SLOT(actCardCounterTrigger()));
+			connect(tempSetCounter, SIGNAL(triggered()), owner, SLOT(actCardCounterTrigger()));
+
+			cardMenu->addSeparator();
+			cardMenu->addAction(tempAddCounter);
+			cardMenu->addAction(tempRemoveCounter);
+			cardMenu->addAction(tempSetCounter);
+		}
+		cardMenu->addSeparator();
+		
+		moveMenu = cardMenu->addMenu(QString());
+		moveMenu->addAction(aMoveToTopLibrary);
+		moveMenu->addAction(aMoveToBottomLibrary);
+		moveMenu->addAction(aMoveToGraveyard);
+		moveMenu->addAction(aMoveToExile);
+		
+		
+		retranslateUi();
+	} else
+		cardMenu = 0;
 }
 
 CardItem::~CardItem()
 {
+	if (owner->getCardMenu() == cardMenu)
+		owner->setCardMenu(0);
+	delete cardMenu;
+	
 	deleteDragItem();
+}
+
+void CardItem::retranslateUi()
+{
+	if (owner->getLocal()) {
+		aTap->setText(tr("&Tap"));
+		aUntap->setText(tr("&Untap"));
+		aDoesntUntap->setText(tr("Toggle &normal untapping"));
+		aFlip->setText(tr("&Flip"));
+		aClone->setText(tr("&Clone"));
+		aAttach->setText(tr("Attach to card..."));
+		aUnattach->setText(tr("Unattach"));
+		aSetPT->setText(tr("Set &P/T..."));
+		aSetAnnotation->setText(tr("&Set annotation..."));
+		QStringList counterColors;
+		counterColors.append(tr("red"));
+		counterColors.append(tr("yellow"));
+		counterColors.append(tr("green"));
+		for (int i = 0; i < aAddCounter.size(); ++i)
+			aAddCounter[i]->setText(tr("&Add counter (%1)").arg(counterColors[i]));
+		for (int i = 0; i < aRemoveCounter.size(); ++i)
+			aRemoveCounter[i]->setText(tr("&Remove counter (%1)").arg(counterColors[i]));
+		for (int i = 0; i < aSetCounter.size(); ++i)
+			aSetCounter[i]->setText(tr("&Set counters (%1)...").arg(counterColors[i]));
+		aMoveToTopLibrary->setText(tr("&top of library"));
+		aMoveToBottomLibrary->setText(tr("&bottom of library"));
+		aMoveToGraveyard->setText(tr("&graveyard"));
+		aMoveToGraveyard->setShortcut(tr("Ctrl+Del"));
+		aMoveToExile->setText(tr("&exile"));
+		
+		moveMenu->setTitle(tr("&Move to"));
+	}
 }
 
 void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -125,7 +244,9 @@ void CardItem::processCardInfo(ServerInfo_Card *info)
 	setAttacking(info->getAttacking());
 	setPT(info->getPT());
 	setAnnotation(info->getAnnotation());
+	setColor(info->getColor());
 	setTapped(info->getTapped());
+	setDestroyOnZoneChange(info->getDestroyOnZoneChange());
 }
 
 CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown)
@@ -161,6 +282,19 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 		ArrowDragItem *arrow = new ArrowDragItem(this, arrowColor);
 		scene()->addItem(arrow);
 		arrow->grabMouse();
+		
+		QListIterator<QGraphicsItem *> itemIterator(scene()->selectedItems());
+		while (itemIterator.hasNext()) {
+			CardItem *c = qgraphicsitem_cast<CardItem *>(itemIterator.next());
+			if (!c)
+				continue;
+			if (c->parentItem() != parentItem())
+				continue;
+			
+			ArrowDragItem *childArrow = new ArrowDragItem(c, arrowColor);
+			scene()->addItem(childArrow);
+			arrow->addChildArrow(childArrow);
+		}
 	} else {
 		if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < 2 * QApplication::startDragDistance())
 			return;
@@ -216,9 +350,10 @@ void CardItem::playCard(QGraphicsSceneMouseEvent *event)
 
 void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-	if (event->button() == Qt::RightButton)
-		qgraphicsitem_cast<CardZone *>(parentItem())->getPlayer()->showCardMenu(event->screenPos());
-	else if ((event->button() == Qt::LeftButton) && !settingsCache->getDoubleClickToPlay())
+	if (event->button() == Qt::RightButton) {
+		if (cardMenu)
+			cardMenu->exec(event->screenPos());
+	} else if ((event->button() == Qt::LeftButton) && !settingsCache->getDoubleClickToPlay())
 		playCard(event);
 	
 	setCursor(Qt::OpenHandCursor);
@@ -229,4 +364,15 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 	if (settingsCache->getDoubleClickToPlay())
 		playCard(event);
 	event->accept();
+}
+
+QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+	if (change == ItemSelectedHasChanged) {
+		if (value == true)
+			owner->setCardMenu(cardMenu);
+		else if (owner->getCardMenu() == cardMenu)
+			owner->setCardMenu(0);
+	}
+	return QGraphicsItem::itemChange(change, value);
 }
