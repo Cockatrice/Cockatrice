@@ -25,7 +25,6 @@ private:
 	bool destroyOnZoneChange;
 	bool doesntUntap;
 	QPoint gridPoint;
-	bool beingPointedAt;
 	CardDragItem *dragItem;
 	
 	QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
@@ -62,7 +61,6 @@ public:
 	void setPT(const QString &_pt);
 	bool getDestroyOnZoneChange() const { return destroyOnZoneChange; }
 	void setDestroyOnZoneChange(bool _destroy) { destroyOnZoneChange = _destroy; }
-	void setBeingPointedAt(bool _beingPointedAt);
 	void resetState();
 	void processCardInfo(ServerInfo_Card *info);
 

@@ -197,6 +197,28 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 void Server_Game::removePlayer(Server_Player *player)
 {
 	players.remove(player->getPlayerId());
+	
+	// Remove all arrows of other players pointing to the player being removed or to one of his cards.
+	QMapIterator<int, Server_Player *> playerIterator(players);
+	while (playerIterator.hasNext()) {
+		Server_Player *p = playerIterator.next().value();
+		QList<Server_Arrow *> arrows = p->getArrows().values();
+		QList<Server_Arrow *> toDelete;
+		for (int i = 0; i < arrows.size(); ++i) {
+			Server_Arrow *a = arrows[i];
+			Server_Card *targetCard = qobject_cast<Server_Card *>(a->getTargetItem());
+			if (targetCard) {
+				if (targetCard->getZone()->getPlayer() == player)
+					toDelete.append(a);
+			} else if ((static_cast<Server_Player *>(a->getTargetItem()) == player) || (a->getStartCard()->getZone()->getPlayer() == player))
+				toDelete.append(a);
+		}
+		for (int i = 0; i < toDelete.size(); ++i) {
+			sendGameEvent(new Event_DeleteArrow(p->getPlayerId(), toDelete[i]->getId()));
+			p->deleteArrow(toDelete[i]->getId());
+		}
+	}
+	
 	sendGameEvent(new Event_Leave(player->getPlayerId()));
 	bool spectator = player->getSpectator();
 	delete player;
@@ -243,16 +265,29 @@ QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAs
 		QMapIterator<int, Server_Arrow *> arrowIterator(player->getArrows());
 		while (arrowIterator.hasNext()) {
 			Server_Arrow *arrow = arrowIterator.next().value();
-			arrowList.append(new ServerInfo_Arrow(
-				arrow->getId(),
-				arrow->getStartCard()->getZone()->getPlayer()->getPlayerId(),
-				arrow->getStartCard()->getZone()->getName(),
-				arrow->getStartCard()->getId(),
-				arrow->getTargetCard()->getZone()->getPlayer()->getPlayerId(),
-				arrow->getTargetCard()->getZone()->getName(),
-				arrow->getTargetCard()->getId(),
-				arrow->getColor()
-			));
+			Server_Card *targetCard = qobject_cast<Server_Card *>(arrow->getTargetItem());
+			if (targetCard)
+				arrowList.append(new ServerInfo_Arrow(
+					arrow->getId(),
+					arrow->getStartCard()->getZone()->getPlayer()->getPlayerId(),
+					arrow->getStartCard()->getZone()->getName(),
+					arrow->getStartCard()->getId(),
+					targetCard->getZone()->getPlayer()->getPlayerId(),
+					targetCard->getZone()->getName(),
+					targetCard->getId(),
+					arrow->getColor()
+				));
+			else
+				arrowList.append(new ServerInfo_Arrow(
+					arrow->getId(),
+					arrow->getStartCard()->getZone()->getPlayer()->getPlayerId(),
+					arrow->getStartCard()->getZone()->getName(),
+					arrow->getStartCard()->getId(),
+					qobject_cast<Server_Player *>(arrow->getTargetItem())->getPlayerId(),
+					QString(),
+					-1,
+					arrow->getColor()
+				));
 		}
 
 		QList<ServerInfo_Counter *> counterList;

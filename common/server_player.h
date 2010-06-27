@@ -1,7 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <QObject>
+#include "server_arrowtarget.h"
 #include <QString>
 #include <QList>
 #include <QMap>
@@ -15,7 +15,7 @@ class Server_ProtocolHandler;
 class ProtocolItem;
 class ServerInfo_PlayerProperties;
 
-class Server_Player : public QObject {
+class Server_Player : public Server_ArrowTarget {
 	Q_OBJECT
 private:
 	Server_Game *game;

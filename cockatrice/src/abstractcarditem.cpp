@@ -9,7 +9,7 @@
 #include <QDebug>
 
 AbstractCardItem::AbstractCardItem(const QString &_name, QGraphicsItem *parent)
-	: AbstractGraphicsItem(parent), info(db->getCard(_name)), name(_name), tapped(false)
+	: ArrowTarget(parent), info(db->getCard(_name)), name(_name), tapped(false)
 {
 	setCursor(Qt::OpenHandCursor);
 	setFlag(ItemIsSelectable);
@@ -51,7 +51,7 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 		}
 		painter->drawPixmap(translatedPixmap->rect(), *translatedPixmap, translatedPixmap->rect());
 	} else {
-		QFont f("Serif");
+		QFont f("Times");
 		f.setStyleHint(QFont::Serif);
 		f.setPixelSize(12);
 		painter->setFont(f);

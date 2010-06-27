@@ -29,7 +29,8 @@ HEADERS += src/servatrice.h \
 	../common/server_counter.h \
 	../common/server_game.h \
 	../common/server_player.h \
-	../common/server_protocolhandler.h
+	../common/server_protocolhandler.h \
+	../common/server_arrowtarget.h
  
 SOURCES += src/main.cpp \
 	src/servatrice.cpp \

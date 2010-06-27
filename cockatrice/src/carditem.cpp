@@ -12,7 +12,7 @@
 #include "settingscache.h"
 
 CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, QGraphicsItem *parent)
-	: AbstractCardItem(_name, parent), owner(_owner), id(_cardid), attacking(false), facedown(false), destroyOnZoneChange(false), doesntUntap(false), beingPointedAt(false), dragItem(NULL)
+	: AbstractCardItem(_name, parent), owner(_owner), id(_cardid), attacking(false), facedown(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(NULL)
 {
 	owner->addCard(this);
 
@@ -117,8 +117,8 @@ void CardItem::retranslateUi()
 		aDoesntUntap->setText(tr("Toggle &normal untapping"));
 		aFlip->setText(tr("&Flip"));
 		aClone->setText(tr("&Clone"));
-		aAttach->setText(tr("Attach to card..."));
-		aUnattach->setText(tr("Unattach"));
+		aAttach->setText(tr("&Attach to card..."));
+		aUnattach->setText(tr("Unattac&h"));
 		aSetPT->setText(tr("Set &P/T..."));
 		aSetAnnotation->setText(tr("&Set annotation..."));
 		QStringList counterColors;
@@ -157,7 +157,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		++i;
 	}
 	if (!pt.isEmpty()) {
-		QFont font("Serif");
+		QFont font("Times");
 		font.setPixelSize(16);
 		painter->setFont(font);
 		QPen pen(Qt::white);
@@ -168,7 +168,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		
 		painter->drawText(QRectF(0, 0, boundingRect().width() - 5, boundingRect().height() - 5), Qt::AlignRight | Qt::AlignBottom, pt);
 	}
-	if (beingPointedAt)
+	if (getBeingPointedAt())
 		painter->fillRect(boundingRect(), QBrush(QColor(255, 0, 0, 100)));
 	painter->restore();
 }
@@ -211,12 +211,6 @@ void CardItem::setDoesntUntap(bool _doesntUntap)
 void CardItem::setPT(const QString &_pt)
 {
 	pt = _pt;
-	update();
-}
-
-void CardItem::setBeingPointedAt(bool _beingPointedAt)
-{
-	beingPointedAt = _beingPointedAt;
 	update();
 }
 
@@ -286,7 +280,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 		QListIterator<QGraphicsItem *> itemIterator(scene()->selectedItems());
 		while (itemIterator.hasNext()) {
 			CardItem *c = qgraphicsitem_cast<CardItem *>(itemIterator.next());
-			if (!c)
+			if (!c || (c == this))
 				continue;
 			if (c->parentItem() != parentItem())
 				continue;

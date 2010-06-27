@@ -212,15 +212,23 @@ void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString 
 	append(tr("%1 creates token: %2%3.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
 }
 
-void MessageLogWidget::logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard)
+void MessageLogWidget::logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard, bool playerTarget)
 {
-	append(tr("%1 points from %2's %3 to %4's %5.")
-		.arg(sanitizeHtml(player->getName()))
-		.arg(sanitizeHtml(startPlayer->getName()))
-		.arg(sanitizeHtml(startCard))
-		.arg(sanitizeHtml(targetPlayer->getName()))
-		.arg(sanitizeHtml(targetCard))
-	);
+	if (playerTarget)
+		append(tr("%1 points from %2's %3 to %4.")
+			.arg(sanitizeHtml(player->getName()))
+			.arg(sanitizeHtml(startPlayer->getName()))
+			.arg(sanitizeHtml(startCard))
+			.arg(sanitizeHtml(targetPlayer->getName()))
+		);
+	else
+		append(tr("%1 points from %2's %3 to %4's %5.")
+			.arg(sanitizeHtml(player->getName()))
+			.arg(sanitizeHtml(startPlayer->getName()))
+			.arg(sanitizeHtml(startCard))
+			.arg(sanitizeHtml(targetPlayer->getName()))
+			.arg(sanitizeHtml(targetCard))
+		);
 }
 
 void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int counterId, int value, int oldValue)
@@ -323,7 +331,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
 	connect(player, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));
 	connect(player, SIGNAL(logShuffle(Player *)), this, SLOT(logShuffle(Player *)));
 	connect(player, SIGNAL(logRollDie(Player *, int, int)), this, SLOT(logRollDie(Player *, int, int)));
-	connect(player, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString)), this, SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString)));
+	connect(player, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)), this, SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)));
 	connect(player, SIGNAL(logCreateToken(Player *, QString, QString)), this, SLOT(logCreateToken(Player *, QString, QString)));
 	connect(player, SIGNAL(logSetCounter(Player *, QString, int, int)), this, SLOT(logSetCounter(Player *, QString, int, int)));
 	connect(player, SIGNAL(logSetCardCounter(Player *, QString, int, int, int)), this, SLOT(logSetCardCounter(Player *, QString, int, int, int)));

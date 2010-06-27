@@ -16,6 +16,7 @@ HEADERS += src/counter.h \
  src/window_main.h \
  src/cardzone.h \
  src/player.h \
+ src/playertarget.h \
  src/cardlist.h \
  src/abstractcarditem.h \
  src/carditem.h \
@@ -45,6 +46,7 @@ HEADERS += src/counter.h \
  src/phasestoolbar.h \
  src/gamescene.h \
  src/arrowitem.h \
+ src/arrowtarget.h \
  src/tab.h \
  src/tab_server.h \
  src/tab_chatchannel.h \
@@ -71,6 +73,7 @@ SOURCES += src/counter.cpp \
  src/window_main.cpp \
  src/gamesmodel.cpp \
  src/player.cpp \
+ src/playertarget.cpp \
  src/cardzone.cpp \
  src/cardlist.cpp \
  src/abstractcarditem.cpp \
@@ -101,6 +104,7 @@ SOURCES += src/counter.cpp \
  src/phasestoolbar.cpp \
  src/gamescene.cpp \
  src/arrowitem.cpp \
+ src/arrowtarget.cpp \
  src/tab_server.cpp \
  src/tab_chatchannel.cpp \
  src/tab_game.cpp \

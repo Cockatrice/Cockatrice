@@ -1,6 +1,7 @@
 #include "player.h"
 #include "client.h"
 #include "cardzone.h"
+#include "playertarget.h"
 #include "counter.h"
 #include "arrowitem.h"
 #include "zoneviewzone.h"
@@ -28,6 +29,9 @@ Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabG
 	connect(settingsCache, SIGNAL(playerBgPathChanged()), this, SLOT(updateBgPixmap()));
 	updateBgPixmap();
 	
+	playerTarget = new PlayerTarget(name, CARD_WIDTH + counterAreaWidth + 5, this);
+	playerTarget->setPos(QPointF(0, 0));
+
 	QPointF base = QPointF(counterAreaWidth, 50);
 
 	PileZone *deck = new PileZone(this, "deck", true, false, this);
@@ -207,6 +211,7 @@ Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabG
 		countersMenu = 0;
 		sbMenu = 0;
 		aCreateAnotherToken = 0;
+		aCardMenu = 0;
 	}
 	
 	rearrangeZones();
@@ -490,7 +495,13 @@ void Player::eventCreateArrows(Event_CreateArrows *event)
 		ArrowItem *arrow = addArrow(eventArrowList[i]);
 		if (!arrow)
 			return;
-		emit logCreateArrow(this, arrow->getStartItem()->getOwner(), arrow->getStartItem()->getName(), arrow->getTargetItem()->getOwner(), arrow->getTargetItem()->getName());
+		
+		CardItem *startCard = static_cast<CardItem *>(arrow->getStartItem());
+		CardItem *targetCard = qgraphicsitem_cast<CardItem *>(arrow->getTargetItem());
+		if (targetCard)
+			emit logCreateArrow(this, startCard->getOwner(), startCard->getName(), targetCard->getOwner(), targetCard->getName(), false);
+		else
+			emit logCreateArrow(this, startCard->getOwner(), startCard->getName(), static_cast<Player *>(arrow->getTargetItem()->parentItem()), QString(), true);
 	}
 }
 
@@ -722,20 +733,11 @@ QRectF Player::boundingRect() const
 
 void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	QString nameStr = getName();
-	QFont font("Times");
-	font.setPixelSize(20);
-//	font.setWeight(QFont::Bold);
-	
 	int totalWidth = CARD_WIDTH + counterAreaWidth + 5;
 	if (bgPixmap.isNull())
 		painter->fillRect(QRectF(0, 0, totalWidth, boundingRect().height()), QColor(200, 200, 200));
 	else
 		painter->fillRect(QRectF(0, 0, totalWidth, boundingRect().height()), QBrush(bgPixmap));
-	
-	painter->setFont(font);
-	painter->setPen(QPen(Qt::black));
-	painter->drawText(QRectF(0, 0, totalWidth, 40), Qt::AlignCenter, nameStr);
 }
 
 void Player::processPlayerInfo(ServerInfo_Player *info)
@@ -827,20 +829,25 @@ ArrowItem *Player::addArrow(ServerInfo_Arrow *arrow)
 	
 	CardZone *startZone = startPlayer->getZones().value(arrow->getStartZone(), 0);
 	CardZone *targetZone = targetPlayer->getZones().value(arrow->getTargetZone(), 0);
-	if (!startZone || !targetZone)
+	if (!startZone || (!targetZone && !arrow->getTargetZone().isEmpty()))
 		return 0;
 	
 	CardItem *startCard = startZone->getCard(arrow->getStartCardId(), QString());
-	CardItem *targetCard = targetZone->getCard(arrow->getTargetCardId(), QString());
-	if (!startCard || !targetCard)
+	CardItem *targetCard = 0;
+	if (targetZone)
+		targetCard = targetZone->getCard(arrow->getTargetCardId(), QString());
+	if (!startCard || (!targetCard && !arrow->getTargetZone().isEmpty()))
 		return 0;
 	
-	return addArrow(arrow->getId(), startCard, targetCard, arrow->getColor());
+	if (targetCard)
+		return addArrow(arrow->getId(), startCard, targetCard, arrow->getColor());
+	else
+		return addArrow(arrow->getId(), startCard, targetPlayer->getPlayerTarget(), arrow->getColor());
 }
 
-ArrowItem *Player::addArrow(int arrowId, CardItem *startCard, CardItem *targetCard, const QColor &color)
+ArrowItem *Player::addArrow(int arrowId, CardItem *startCard, ArrowTarget *targetItem, const QColor &color)
 {
-	ArrowItem *arrow = new ArrowItem(this, arrowId, startCard, targetCard, color);
+	ArrowItem *arrow = new ArrowItem(this, arrowId, startCard, targetItem, color);
 	arrows.insert(arrowId, arrow);
 	scene()->addItem(arrow);
 	return arrow;
@@ -909,6 +916,7 @@ void Player::cardMenuAction()
 {
 	QAction *a = static_cast<QAction *>(sender());
 	QList<QGraphicsItem *> sel = scene()->selectedItems();
+	QList<Command *> commandList;
 	while (!sel.isEmpty()) {
 		unsigned int i = (unsigned int) (((double) sel.size()) * qrand() / (RAND_MAX + 1.0));
 		CardItem *card = qgraphicsitem_cast<CardItem *>(sel.takeAt(i));
@@ -916,38 +924,39 @@ void Player::cardMenuAction()
 		switch (a->data().toInt()) {
 			case 0:
 				if (!card->getTapped())
-					sendGameCommand(new Command_SetCardAttr(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "tapped", "1"));
+					commandList.append(new Command_SetCardAttr(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "tapped", "1"));
 				break;
 			case 1:
 				if (card->getTapped())
-					sendGameCommand(new Command_SetCardAttr(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "tapped", "0"));
+					commandList.append(new Command_SetCardAttr(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "tapped", "0"));
 				break;
 			case 2:
-				sendGameCommand(new Command_SetCardAttr(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "doesnt_untap", QString::number(!card->getDoesntUntap())));
+				commandList.append(new Command_SetCardAttr(-1, qgraphicsitem_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "doesnt_untap", QString::number(!card->getDoesntUntap())));
 				break;
 			case 3: {
 				QString zone = qgraphicsitem_cast<CardZone *>(card->parentItem())->getName();
-				sendGameCommand(new Command_MoveCard(-1, zone, card->getId(), zone, card->getGridPoint().x(), card->getGridPoint().y(), !card->getFaceDown()));
+				commandList.append(new Command_MoveCard(-1, zone, card->getId(), zone, card->getGridPoint().x(), card->getGridPoint().y(), !card->getFaceDown()));
 				break;
 			}
 			case 4:
-				sendGameCommand(new Command_CreateToken(-1, static_cast<CardZone *>(card->parentItem())->getName(), card->getName(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), -1, card->getGridPoint().y()));
+				commandList.append(new Command_CreateToken(-1, static_cast<CardZone *>(card->parentItem())->getName(), card->getName(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), -1, card->getGridPoint().y()));
 				break;
 			case 5:
-				sendGameCommand(new Command_MoveCard(-1, static_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "deck", 0, 0, false));
+				commandList.append(new Command_MoveCard(-1, static_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "deck", 0, 0, false));
 				break;
 			case 6:
-				sendGameCommand(new Command_MoveCard(-1, static_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "deck", -1, 0, false));
+				commandList.append(new Command_MoveCard(-1, static_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "deck", -1, 0, false));
 				break;
 			case 7:
-				sendGameCommand(new Command_MoveCard(-1, static_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "grave", 0, 0, false));
+				commandList.append(new Command_MoveCard(-1, static_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "grave", 0, 0, false));
 				break;
 			case 8:
-				sendGameCommand(new Command_MoveCard(-1, static_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "rfg", 0, 0, false));
+				commandList.append(new Command_MoveCard(-1, static_cast<CardZone *>(card->parentItem())->getName(), card->getId(), "rfg", 0, 0, false));
 				break;
 			default: ;
 		}
 	}
+	sendCommandContainer(new CommandContainer(commandList));
 }
 
 void Player::actSetPT()
@@ -1045,12 +1054,15 @@ void Player::actCardCounterTrigger()
 
 void Player::setCardMenu(QMenu *menu)
 {
-	aCardMenu->setMenu(menu);
+	if (aCardMenu)
+		aCardMenu->setMenu(menu);
 }
 
 QMenu *Player::getCardMenu() const
 {
-	return aCardMenu->menu();
+	if (aCardMenu)
+		return aCardMenu->menu();
+	return 0;
 }
 
 qreal Player::getMinimumWidth() const

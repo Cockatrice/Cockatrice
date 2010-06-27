@@ -7,6 +7,7 @@ class CardItem;
 class QGraphicsSceneMouseEvent;
 class QMenu;
 class Player;
+class ArrowTarget;
 
 class ArrowItem : public QObject, public QGraphicsItem {
 	Q_OBJECT
@@ -16,12 +17,12 @@ private:
 protected:
 	Player *player;
 	int id;
-	CardItem *startItem, *targetItem;
+	ArrowTarget *startItem, *targetItem;
 	QColor color;
 	bool fullColor;
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 public:
-	ArrowItem(Player *_player, int _id, CardItem *_startItem, CardItem *_targetItem, const QColor &color);
+	ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &color);
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QRectF boundingRect() const { return path.boundingRect(); }
 	QPainterPath shape() const { return path; }
@@ -29,10 +30,10 @@ public:
 	void updatePath(const QPointF &endPoint);
 	
 	int getId() const { return id; }
-	void setStartItem(CardItem *_item) { startItem = _item; }
-	void setTargetItem(CardItem *_item) { targetItem = _item; }
-	CardItem *getStartItem() const { return startItem; }
-	CardItem *getTargetItem() const { return targetItem; }
+	void setStartItem(ArrowTarget *_item) { startItem = _item; }
+	void setTargetItem(ArrowTarget *_item) { targetItem = _item; }
+	ArrowTarget *getStartItem() const { return startItem; }
+	ArrowTarget *getTargetItem() const { return targetItem; }
 };
 
 class ArrowDragItem : public ArrowItem {
@@ -40,7 +41,7 @@ class ArrowDragItem : public ArrowItem {
 private:
 	QList<ArrowDragItem *> childArrows;
 public:
-	ArrowDragItem(CardItem *_startItem, const QColor &_color);
+	ArrowDragItem(ArrowTarget *_startItem, const QColor &_color);
 	void addChildArrow(ArrowDragItem *childArrow);
 protected:
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);

@@ -593,7 +593,7 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 			QMapIterator<int, Server_Arrow *> arrowIterator(players[i]->getArrows());
 			while (arrowIterator.hasNext()) {
 				Server_Arrow *arrow = arrowIterator.next().value();
-				if ((arrow->getStartCard() == card) || (arrow->getTargetCard() == card))
+				if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card))
 					arrowsToDelete.append(arrow->getId());
 			}
 			for (int j = 0; j < arrowsToDelete.size(); ++j)
@@ -689,21 +689,33 @@ ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Co
 	if (!startPlayer || !targetPlayer)
 		return RespNameNotFound;
 	Server_CardZone *startZone = startPlayer->getZones().value(cmd->getStartZone());
-	Server_CardZone *targetZone = targetPlayer->getZones().value(cmd->getTargetZone());
-	if (!startZone || !targetZone)
+	bool playerTarget = cmd->getTargetZone().isEmpty();
+	Server_CardZone *targetZone = 0;
+	if (!playerTarget)
+		targetZone = targetPlayer->getZones().value(cmd->getTargetZone());
+	if (!startZone || (!targetZone && !playerTarget))
 		return RespNameNotFound;
 	Server_Card *startCard = startZone->getCard(cmd->getStartCardId(), false);
-	Server_Card *targetCard = targetZone->getCard(cmd->getTargetCardId(), false);
-	if (!startCard || !targetCard || (startCard == targetCard))
+	Server_Card *targetCard = 0;
+	if (!playerTarget)
+		targetCard = targetZone->getCard(cmd->getTargetCardId(), false);
+	if (!startCard || (!targetCard && !playerTarget) || (startCard == targetCard))
 		return RespContextError;
+	
+	Server_ArrowTarget *targetItem;
+	if (playerTarget)
+		targetItem = targetPlayer;
+	else
+		targetItem = targetCard;
+
 	QMapIterator<int, Server_Arrow *> arrowIterator(player->getArrows());
 	while (arrowIterator.hasNext()) {
 		Server_Arrow *temp = arrowIterator.next().value();
-		if ((temp->getStartCard() == startCard) && (temp->getTargetCard() == targetCard))
+		if ((temp->getStartCard() == startCard) && (temp->getTargetItem() == targetItem))
 			return RespContextError;
 	}
-
-	Server_Arrow *arrow = new Server_Arrow(player->newArrowId(), startCard, targetCard, cmd->getColor());
+	
+	Server_Arrow *arrow = new Server_Arrow(player->newArrowId(), startCard, targetItem, cmd->getColor());
 	player->addArrow(arrow);
 	game->sendGameEvent(new Event_CreateArrows(player->getPlayerId(), QList<ServerInfo_Arrow *>() << new ServerInfo_Arrow(
 		arrow->getId(),
@@ -711,8 +723,8 @@ ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Co
 		startZone->getName(),
 		startCard->getId(),
 		targetPlayer->getPlayerId(),
-		targetZone->getName(),
-		targetCard->getId(),
+		cmd->getTargetZone(),
+		cmd->getTargetCardId(),
 		cmd->getColor()
 	)));
 	return RespOk;

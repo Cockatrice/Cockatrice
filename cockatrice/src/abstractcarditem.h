@@ -1,21 +1,14 @@
 #ifndef ABSTRACTCARDITEM_H
 #define ABSTRACTCARDITEM_H
 
-#include "abstractgraphicsitem.h"
+#include "arrowtarget.h"
 
 class CardInfo;
 
 const int CARD_WIDTH = 72;
 const int CARD_HEIGHT = 102;
 
-enum CardItemType {
-	typeCard = QGraphicsItem::UserType + 1,
-	typeCardDrag = QGraphicsItem::UserType + 2,
-	typeZone = QGraphicsItem::UserType + 3,
-	typeOther = QGraphicsItem::UserType + 5
-};
-
-class AbstractCardItem : public QObject, public AbstractGraphicsItem {
+class AbstractCardItem : public QObject, public ArrowTarget {
 	Q_OBJECT
 protected:
 	CardInfo *info;

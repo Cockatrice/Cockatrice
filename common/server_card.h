@@ -20,12 +20,14 @@
 #ifndef SERVER_CARD_H
 #define SERVER_CARD_H
 
+#include "server_arrowtarget.h"
 #include <QString>
 #include <QMap>
 
 class Server_CardZone;
 
-class Server_Card {
+class Server_Card : public Server_ArrowTarget {
+	Q_OBJECT
 private:
 	Server_CardZone *zone;
 	int id;

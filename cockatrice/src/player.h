@@ -17,6 +17,7 @@ class ArrowItem;
 class CardZone;
 class TableZone;
 class HandZone;
+class PlayerTarget;
 class ServerInfo_Player;
 class ServerInfo_Arrow;
 class ServerInfo_Counter;
@@ -49,7 +50,7 @@ signals:
 	void logSay(Player *player, QString message);
 	void logShuffle(Player *player);
 	void logRollDie(Player *player, int sides, int roll);
-	void logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard);
+	void logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard, bool _playerTarget);
 	void logCreateToken(Player *player, QString cardName, QString pt);
 	void logDrawCards(Player *player, int number);
 	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
@@ -90,7 +91,6 @@ public slots:
 	void actCardCounterTrigger();
 
 private slots:
-	
 	void updateBgPixmap();
 	void updateBoundingRect();
 	void rearrangeZones();
@@ -104,9 +104,6 @@ private:
 		*aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,
 		*aCardMenu;
 
-	typedef void (Player::*CardMenuHandler)(CardItem *card);
-	QHash<QAction *, CardMenuHandler> cardMenuHandlers;
-	
 	int defaultNumberTopCards;
 	QString lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation;
 	bool lastTokenDestroy;
@@ -119,6 +116,7 @@ private:
 	QMap<QString, CardZone *> zones;
 	TableZone *table;
 	HandZone *hand;
+	PlayerTarget *playerTarget;
 	
 	void setCardAttrHelper(CardItem *card, const QString &aname, const QString &avalue, bool allCards);
 
@@ -164,9 +162,10 @@ public:
 	void clearCounters();
 	
 	ArrowItem *addArrow(ServerInfo_Arrow *arrow);
-	ArrowItem *addArrow(int arrowId, CardItem *startCard, CardItem *targetCard, const QColor &color);
+	ArrowItem *addArrow(int arrowId, CardItem *startCard, ArrowTarget *targetItem, const QColor &color);
 	void delArrow(int arrowId);
 	void clearArrows();
+	PlayerTarget *getPlayerTarget() const { return playerTarget; }
 
 	Client *client;
 	Player(const QString &_name, int _id, bool _local, Client *_client, TabGame *_parent);
