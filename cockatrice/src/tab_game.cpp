@@ -316,7 +316,8 @@ void TabGame::startGame()
 void TabGame::stopGame()
 {
 	currentPhase = -1;
-
+	activePlayer = -1;
+	
 	playerListWidget->setActivePlayer(-1);
 	playerListWidget->setGameStarted(false);
 	started = false;
@@ -363,6 +364,16 @@ void TabGame::eventGameStateChanged(Event_GameStateChanged *event, GameEventCont
 				deckView->setDeck(new DeckList(pl->getDeck()));
 				readyStartButton->setEnabled(true);
 			}
+		}
+	}
+	for (int i = 0; i < plList.size(); ++i) {
+		ServerInfo_Player *pl = plList[i];
+		ServerInfo_PlayerProperties *prop = pl->getProperties();
+		if (!prop->getSpectator()) {
+			Player *player = players.value(prop->getPlayerId(), 0);
+			if (!player)
+				continue;
+			player->processCardAttachment(pl);
 		}
 	}
 	if (event->getGameStarted() && !started) {
@@ -444,6 +455,7 @@ Player *TabGame::setActivePlayer(int id)
 	Player *player = players.value(id, 0);
 	if (!player)
 		return 0;
+	activePlayer = id;
 	playerListWidget->setActivePlayer(id);
 	QMapIterator<int, Player *> i(players);
 	while (i.hasNext()) {
@@ -546,4 +558,34 @@ void TabGame::sideboardPlanChanged()
 {
 	QList<MoveCardToZone *> newPlan = deckView->getSideboardPlan();
 	client->sendCommand(new Command_SetSideboardPlan(gameId, newPlan));
+}
+
+CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) const
+{
+	Player *player = players.value(playerId, 0);
+	if (!player)
+		return 0;
+	
+	CardZone *zone = player->getZones().value(zoneName, 0);
+	if (!zone)
+		return 0;
+	
+	return zone->getCard(cardId, QString());
+}
+
+Player *TabGame::getActiveLocalPlayer() const
+{
+	Player *active = players.value(activePlayer, 0);
+	if (active)
+		if (active->getLocal())
+			return active;
+	
+	QMapIterator<int, Player *> playerIterator(players);
+	while (playerIterator.hasNext()) {
+		Player *temp = playerIterator.next().value();
+		if (temp->getLocal())
+			return temp;
+	}
+	
+	return 0;
 }

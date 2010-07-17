@@ -27,6 +27,12 @@ Server_Card::Server_Card(QString _name, int _id, int _coord_x, int _coord_y)
 
 Server_Card::~Server_Card()
 {
+	// setParentCard(0) leads to the item being removed from our list, so we can't iterate properly
+	while (!attachedCards.isEmpty())
+		attachedCards.first()->setParentCard(0);
+	
+	if (parentCard)
+		parentCard->removeAttachedCard(this);
 }
 
 void Server_Card::resetState()
@@ -73,4 +79,13 @@ void Server_Card::setCounter(int id, int value)
 		counters.insert(id, value);
 	else
 		counters.remove(id);
+}
+
+void Server_Card::setParentCard(Server_Card *_parentCard)
+{
+	if (parentCard)
+		parentCard->removeAttachedCard(this);
+	parentCard = _parentCard;
+	if (parentCard)
+		parentCard->addAttachedCard(this);
 }

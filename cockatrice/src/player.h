@@ -40,6 +40,7 @@ class Event_DumpZone;
 class Event_StopDumpZone;
 class Event_MoveCard;
 class Event_DestroyCard;
+class Event_AttachCard;
 class Event_DrawCards;
 
 class Player : public QObject, public QGraphicsItem {
@@ -55,6 +56,8 @@ signals:
 	void logDrawCards(Player *player, int number);
 	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
 	void logDestroyCard(Player *player, QString cardName);
+	void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);
+	void logUnattachCard(Player *player, QString cardName);
 	void logSetCardCounter(Player *player, QString cardName, int counterId, int value, int oldValue);
 	void logSetTapped(Player *player, QString cardName, bool tapped);
 	void logSetCounter(Player *player, QString counterName, int value, int oldValue);
@@ -144,6 +147,7 @@ private:
 	void eventStopDumpZone(Event_StopDumpZone *event);
 	void eventMoveCard(Event_MoveCard *event);
 	void eventDestroyCard(Event_DestroyCard *event);
+	void eventAttachCard(Event_AttachCard *event);
 	void eventDrawCards(Event_DrawCards *event);
 public:
 	static const int counterAreaWidth = 65;
@@ -189,6 +193,8 @@ public:
 	void processSceneSizeChange(const QSizeF &newSize);
 	
 	void processPlayerInfo(ServerInfo_Player *info);
+	void processCardAttachment(ServerInfo_Player *info);
+	
 	void processGameEvent(GameEvent *event, GameEventContext *context);
 	void sendGameCommand(GameCommand *command);
 	void sendCommandContainer(CommandContainer *cont);

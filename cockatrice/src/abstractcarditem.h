@@ -4,6 +4,7 @@
 #include "arrowtarget.h"
 
 class CardInfo;
+class Player;
 
 const int CARD_WIDTH = 72;
 const int CARD_HEIGHT = 102;
@@ -22,7 +23,7 @@ signals:
 public:
 	enum { Type = typeCard };
 	int type() const { return Type; }
-	AbstractCardItem(const QString &_name = QString(), QGraphicsItem *parent = 0);
+	AbstractCardItem(const QString &_name = QString(), Player *_owner = 0, QGraphicsItem *parent = 0);
 	~AbstractCardItem();
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

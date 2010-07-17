@@ -8,13 +8,32 @@
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsScene>
+#include <QDebug>
 
 ArrowItem::ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &_color)
         : QGraphicsItem(), player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), color(_color), fullColor(true)
 {
 	setZValue(2000000005);
+	
+	if (startItem)
+		startItem->addArrowFrom(this);
+	if (targetItem)
+		targetItem->addArrowTo(this);
+	
 	if (startItem && targetItem)
 		updatePath();
+}
+
+ArrowItem::~ArrowItem()
+{
+	qDebug() << "ArrowItem destructor";
+	if (startItem)
+		startItem->removeArrowFrom(this);
+	
+	if (targetItem) {
+		targetItem->setBeingPointedAt(false);
+		targetItem->removeArrowTo(this);
+	}
 }
 
 void ArrowItem::updatePath()
@@ -97,8 +116,8 @@ void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 		player->sendGameCommand(new Command_DeleteArrow(-1, id));
 }
 
-ArrowDragItem::ArrowDragItem(ArrowTarget *_startItem, const QColor &_color)
-        : ArrowItem(static_cast<CardZone *>(_startItem->parentItem())->getPlayer(), -1, _startItem, 0, _color)
+ArrowDragItem::ArrowDragItem(Player *_owner, ArrowTarget *_startItem, const QColor &_color)
+        : ArrowItem(_owner, -1, _startItem, 0, _color)
 {
 }
 
@@ -118,17 +137,23 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 			cursorItem = static_cast<ArrowTarget *>(colliding.at(i));
                         break;
 		}
-	if ((cursorItem != targetItem) && targetItem)
+	if ((cursorItem != targetItem) && targetItem) {
 		targetItem->setBeingPointedAt(false);
+		targetItem->removeArrowTo(this);
+	}
         if (!cursorItem) {
 		fullColor = false;
 		targetItem = 0;
 		updatePath(endPos);
 	} else {
-		fullColor = true;
-		if (cursorItem != startItem)
-			cursorItem->setBeingPointedAt(true);
-		targetItem = cursorItem;
+		if (cursorItem != targetItem) {
+			fullColor = true;
+			if (cursorItem != startItem) {
+				cursorItem->setBeingPointedAt(true);
+				cursorItem->addArrowTo(this);
+			}
+			targetItem = cursorItem;
+		}
 		updatePath();
 	}
 	update();
@@ -140,14 +165,13 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
 	if (targetItem && (targetItem != startItem)) {
-		targetItem->setBeingPointedAt(false);
-		CardZone *startZone = static_cast<CardZone *>(startItem->parentItem());
+		CardZone *startZone = static_cast<CardItem *>(startItem)->getZone();
 		// For now, we can safely assume that the start item is always a card.
 		// The target item can be a player as well.
 		CardItem *startCard = qgraphicsitem_cast<CardItem *>(startItem);
 		CardItem *targetCard = qgraphicsitem_cast<CardItem *>(targetItem);
 		if (targetCard) {
-			CardZone *targetZone = static_cast<CardZone *>(targetItem->parentItem());
+			CardZone *targetZone = targetCard->getZone();
 			player->sendGameCommand(new Command_CreateArrow(
 				-1,
 				startZone->getPlayer()->getId(),
@@ -165,7 +189,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 				startZone->getPlayer()->getId(),
 				startZone->getName(),
 				startCard->getId(),
-				static_cast<Player *>(targetPlayer->parentItem())->getId(),
+				targetPlayer->getOwner()->getId(),
 				QString(),
 				-1,
 				color
@@ -176,4 +200,56 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 	for (int i = 0; i < childArrows.size(); ++i)
 		childArrows[i]->mouseReleaseEvent(event);
+}
+
+ArrowAttachItem::ArrowAttachItem(ArrowTarget *_startItem)
+        : ArrowItem(_startItem->getOwner(), -1, _startItem, 0, Qt::green)
+{
+}
+
+void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+	QPointF endPos = event->scenePos();
+	
+	QList<QGraphicsItem *> colliding = scene()->items(endPos);
+        ArrowTarget *cursorItem = 0;
+        for (int i = colliding.size() - 1; i >= 0; i--)
+                if (qgraphicsitem_cast<CardItem *>(colliding.at(i))) {
+			cursorItem = static_cast<ArrowTarget *>(colliding.at(i));
+                        break;
+		}
+	if ((cursorItem != targetItem) && targetItem)
+		targetItem->setBeingPointedAt(false);
+        if (!cursorItem) {
+		fullColor = false;
+		targetItem = 0;
+		updatePath(endPos);
+	} else {
+		fullColor = true;
+		if (cursorItem != startItem)
+			cursorItem->setBeingPointedAt(true);
+		targetItem = cursorItem;
+		updatePath();
+	}
+	update();
+}
+
+void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
+{
+	if (targetItem && (targetItem != startItem)) {
+		CardItem *startCard = qgraphicsitem_cast<CardItem *>(startItem);
+		CardZone *startZone = startCard->getZone();
+		CardItem *targetCard = qgraphicsitem_cast<CardItem *>(targetItem);
+		CardZone *targetZone = targetCard->getZone();
+
+		player->sendGameCommand(new Command_AttachCard(
+			-1,
+			startZone->getName(),
+			startCard->getId(),
+			targetZone->getPlayer()->getId(),
+			targetZone->getName(),
+			targetCard->getId()
+		));
+	}
+	deleteLater();
 }

@@ -44,6 +44,7 @@ private:
 	bool doesntUntap;
 	
 	Server_Card *parentCard;
+	QList<Server_Card *> attachedCards;
 public:
 	Server_Card(QString _name, int _id, int _coord_x, int _coord_y);
 	~Server_Card();
@@ -66,6 +67,7 @@ public:
 	bool getDoesntUntap() const { return doesntUntap; }
 	bool getDestroyOnZoneChange() const { return destroyOnZoneChange; }
 	Server_Card *getParentCard() const { return parentCard; }
+	const QList<Server_Card *> &getAttachedCards() const { return attachedCards; }
 
 	void setId(int _id) { id = _id; }
 	void setCoords(int x, int y) { coord_x = x; coord_y = y; }
@@ -79,7 +81,9 @@ public:
 	void setAnnotation(const QString &_annotation) { annotation = _annotation; }
 	void setDestroyOnZoneChange(bool _destroy) { destroyOnZoneChange = _destroy; }
 	void setDoesntUntap(bool _doesntUntap) { doesntUntap = _doesntUntap; }
-	void setParentCard(Server_Card *_parentCard) { parentCard = _parentCard; }
+	void setParentCard(Server_Card *_parentCard);
+	void addAttachedCard(Server_Card *card) { attachedCards.append(card); }
+	void removeAttachedCard(Server_Card *card) { attachedCards.removeAt(attachedCards.indexOf(card)); }
 	
 	void resetState();
 	bool setAttribute(const QString &aname, const QString &avalue, bool allCards);

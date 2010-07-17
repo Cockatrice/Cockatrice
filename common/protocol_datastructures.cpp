@@ -39,7 +39,7 @@ ServerInfo_CardCounter::ServerInfo_CardCounter(int _id, int _value)
 	insertItem(new SerializableItem_Int("value", _value));
 }
 
-ServerInfo_Card::ServerInfo_Card(int _id, const QString &_name, int _x, int _y, bool _tapped, bool _attacking, const QString &_color, const QString &_pt, const QString &_annotation, bool _destroyOnZoneChange, const QList<ServerInfo_CardCounter *> &_counters)
+ServerInfo_Card::ServerInfo_Card(int _id, const QString &_name, int _x, int _y, bool _tapped, bool _attacking, const QString &_color, const QString &_pt, const QString &_annotation, bool _destroyOnZoneChange, const QList<ServerInfo_CardCounter *> &_counters, int _attachPlayerId, const QString &_attachZone, int _attachCardId)
 	: SerializableItem_Map("card")
 {
 	insertItem(new SerializableItem_Int("id", _id));
@@ -52,6 +52,9 @@ ServerInfo_Card::ServerInfo_Card(int _id, const QString &_name, int _x, int _y, 
 	insertItem(new SerializableItem_String("pt", _pt));
 	insertItem(new SerializableItem_String("annotation", _annotation));
 	insertItem(new SerializableItem_Bool("destroy_on_zone_change", _destroyOnZoneChange));
+	insertItem(new SerializableItem_Int("attach_player_id", _attachPlayerId));
+	insertItem(new SerializableItem_String("attach_zone", _attachZone));
+	insertItem(new SerializableItem_Int("attach_card_id", _attachCardId));
 	
 	for (int i = 0; i < _counters.size(); ++i)
 		itemList.append(_counters[i]);

@@ -207,6 +207,16 @@ void MessageLogWidget::logDestroyCard(Player *player, QString cardName)
 	append(tr("%1 destroys %2.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
 }
 
+void MessageLogWidget::logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName)
+{
+	append(tr("%1 attaches %2 to %3's %4.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(sanitizeHtml(targetPlayer->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(targetCardName))));
+}
+
+void MessageLogWidget::logUnattachCard(Player *player, QString cardName)
+{
+	append(tr("%1 unattaches %2.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+}
+
 void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt)
 {
 	append(tr("%1 creates token: %2%3.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
@@ -341,6 +351,8 @@ void MessageLogWidget::connectToPlayer(Player *player)
 	connect(player, SIGNAL(logSetAnnotation(Player *, QString, QString)), this, SLOT(logSetAnnotation(Player *, QString, QString)));
 	connect(player, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)), this, SLOT(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)));
 	connect(player, SIGNAL(logDestroyCard(Player *, QString)), this, SLOT(logDestroyCard(Player *, QString)));
+	connect(player, SIGNAL(logAttachCard(Player *, QString, Player *, QString)), this, SLOT(logAttachCard(Player *, QString, Player *, QString)));
+	connect(player, SIGNAL(logUnattachCard(Player *, QString)), this, SLOT(logUnattachCard(Player *, QString)));
 	connect(player, SIGNAL(logDumpZone(Player *, CardZone *, int)), this, SLOT(logDumpZone(Player *, CardZone *, int)));
 	connect(player, SIGNAL(logStopDumpZone(Player *, CardZone *)), this, SLOT(logStopDumpZone(Player *, CardZone *)));
 	connect(player, SIGNAL(logDrawCards(Player *, int)), this, SLOT(logDrawCards(Player *, int)));

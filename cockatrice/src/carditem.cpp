@@ -10,9 +10,10 @@
 #include "main.h"
 #include "protocol_datastructures.h"
 #include "settingscache.h"
+#include "tab_game.h"
 
 CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, QGraphicsItem *parent)
-	: AbstractCardItem(_name, parent), owner(_owner), id(_cardid), attacking(false), facedown(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(NULL)
+	: AbstractCardItem(_name, _owner, parent), id(_cardid), attacking(false), facedown(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(0), attachedTo(0)
 {
 	owner->addCard(this);
 
@@ -106,6 +107,14 @@ CardItem::~CardItem()
 		owner->setCardMenu(0);
 	delete cardMenu;
 	
+	while (!attachedCards.isEmpty()) {
+		attachedCards.first()->setZone(0); // so that it won't try to call reorganizeCards()
+		attachedCards.first()->setAttachedTo(0);
+	}
+	
+	if (attachedTo)
+		attachedTo->removeAttachedCard(this);
+
 	deleteDragItem();
 }
 
@@ -118,6 +127,7 @@ void CardItem::retranslateUi()
 		aFlip->setText(tr("&Flip"));
 		aClone->setText(tr("&Clone"));
 		aAttach->setText(tr("&Attach to card..."));
+		aAttach->setShortcut(tr("Ctrl+A"));
 		aUnattach->setText(tr("Unattac&h"));
 		aSetPT->setText(tr("Set &P/T..."));
 		aSetAnnotation->setText(tr("&Set annotation..."));
@@ -214,6 +224,23 @@ void CardItem::setPT(const QString &_pt)
 	update();
 }
 
+void CardItem::setAttachedTo(CardItem *_attachedTo)
+{
+	if (attachedTo)
+		attachedTo->removeAttachedCard(this);
+	
+	gridPoint.setX(-1);
+	attachedTo = _attachedTo;
+	if (attachedTo) {
+		attachedTo->addAttachedCard(this);
+		if (zone != attachedTo->getZone())
+			attachedTo->getZone()->reorganizeCards();
+	}
+
+	if (zone)
+		zone->reorganizeCards();
+}
+
 void CardItem::resetState()
 {
 	attacking = false;
@@ -221,6 +248,8 @@ void CardItem::resetState()
 	counters.clear();
 	pt.clear();
 	annotation.clear();
+	attachedTo = 0;
+	attachedCards.clear();
 	setTapped(false);
 	setDoesntUntap(false);
 	update();
@@ -273,7 +302,8 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 		else if (event->modifiers().testFlag(Qt::ShiftModifier))
 			arrowColor = Qt::green;
 		
-		ArrowDragItem *arrow = new ArrowDragItem(this, arrowColor);
+		Player *arrowOwner = static_cast<TabGame *>(owner->parent())->getActiveLocalPlayer();
+		ArrowDragItem *arrow = new ArrowDragItem(arrowOwner, this, arrowColor);
 		scene()->addItem(arrow);
 		arrow->grabMouse();
 		
@@ -282,10 +312,10 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 			CardItem *c = qgraphicsitem_cast<CardItem *>(itemIterator.next());
 			if (!c || (c == this))
 				continue;
-			if (c->parentItem() != parentItem())
+			if (c->getZone() != zone)
 				continue;
 			
-			ArrowDragItem *childArrow = new ArrowDragItem(c, arrowColor);
+			ArrowDragItem *childArrow = new ArrowDragItem(arrowOwner, c, arrowColor);
 			scene()->addItem(childArrow);
 			arrow->addChildArrow(childArrow);
 		}
@@ -300,8 +330,6 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 		createDragItem(id, event->pos(), event->scenePos(), faceDown);
 		dragItem->grabMouse();
 		
-		CardZone *zone = static_cast<CardZone *>(parentItem());
-	
 		QList<QGraphicsItem *> sel = scene()->selectedItems();
 		int j = 0;
 		for (int i = 0; i < sel.size(); i++) {
@@ -324,9 +352,8 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void CardItem::playCard(QGraphicsSceneMouseEvent *event)
 {
-	CardZone *zone = static_cast<CardZone *>(parentItem());
 	// Do nothing if the card belongs to another player
-	if (!zone->getPlayer()->getLocal())
+	if (!owner->getLocal())
 		return;
 
 	TableZone *tz = qobject_cast<TableZone *>(zone);

@@ -13,6 +13,7 @@ private:
 	static const int marginX = 20;
 	static const int minWidth = 20 * CARD_WIDTH / 2;
 
+	QMap<int, int> gridPointWidth;
 	int width, height;
 	int currentMinimumWidth;
 	QPixmap bgPixmap;

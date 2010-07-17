@@ -8,6 +8,7 @@
 #include "protocol_items.h"
 
 class Server_Player;
+class Server_Card;
 class QTimer;
 
 class Server_ProtocolHandler : public QObject {
@@ -61,6 +62,7 @@ private:
 	ResponseCode cmdDrawCards(Command_DrawCards *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode moveCard(Server_Game *game, Server_Player *player, CommandContainer *cont, const QString &_startZone, int _cardId, const QString &_targetZone, int _x, int _y, bool _faceDown, bool _tapped);
 	ResponseCode cmdMoveCard(Command_MoveCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
+	void unattachCard(Server_Game *game, Server_Player *player, CommandContainer *cont, Server_Card *card);
 	ResponseCode cmdAttachCard(Command_AttachCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdCreateToken(Command_CreateToken *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdCreateArrow(Command_CreateArrow *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);

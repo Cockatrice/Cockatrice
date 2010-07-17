@@ -6,7 +6,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QCursor>
 
-CardDragItem::CardDragItem(AbstractCardItem *_item, int _id, const QPointF &_hotSpot, bool _faceDown, AbstractCardDragItem *parentDrag)
+CardDragItem::CardDragItem(CardItem *_item, int _id, const QPointF &_hotSpot, bool _faceDown, AbstractCardDragItem *parentDrag)
 	: AbstractCardDragItem(_item, _hotSpot, parentDrag), id(_id), faceDown(_faceDown), currentZone(0)
 {
 }
@@ -53,7 +53,7 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 	sc->removeItem(this);
 
 	if (currentZone) {
-		CardZone *startZone = qgraphicsitem_cast<CardZone *>(item->parentItem());
+		CardZone *startZone = static_cast<CardItem *>(item)->getZone();
 		currentZone->handleDropEvent(id, startZone, (sp - currentZone->scenePos()).toPoint(), faceDown);
 		for (int i = 0; i < childDrags.size(); i++) {
 			CardDragItem *c = static_cast<CardDragItem *>(childDrags[i]);

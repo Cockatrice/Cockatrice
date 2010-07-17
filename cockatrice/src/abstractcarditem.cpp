@@ -8,8 +8,8 @@
 #include "main.h"
 #include <QDebug>
 
-AbstractCardItem::AbstractCardItem(const QString &_name, QGraphicsItem *parent)
-	: ArrowTarget(parent), info(db->getCard(_name)), name(_name), tapped(false)
+AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, QGraphicsItem *parent)
+	: ArrowTarget(_owner, parent), info(db->getCard(_name)), name(_name), tapped(false)
 {
 	setCursor(Qt::OpenHandCursor);
 	setFlag(ItemIsSelectable);

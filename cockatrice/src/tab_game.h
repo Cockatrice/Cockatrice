@@ -66,6 +66,7 @@ private:
 	bool started;
 	bool resuming;
 	int currentPhase;
+	int activePlayer;
 
 	QPushButton *loadLocalButton, *loadRemoteButton;
 	ReadyStartButton *readyStartButton;
@@ -123,11 +124,13 @@ public:
 	~TabGame();
 	void retranslateUi();
 	const QMap<int, Player *> &getPlayers() const { return players; }
+	CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;
 	int getGameId() const { return gameId; }
 	QString getTabText() const { return tr("Game %1: %2").arg(gameId).arg(gameDescription); }
 	bool getSpectator() const { return spectator; }
 	bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
 	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
+	Player *getActiveLocalPlayer() const;
 
 	void processGameEventContainer(GameEventContainer *cont);
 public slots:

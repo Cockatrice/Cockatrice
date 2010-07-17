@@ -4,6 +4,8 @@
 #include "arrowtarget.h"
 #include <QFont>
 
+class Player;
+
 class PlayerTarget : public ArrowTarget {
 private:
 	QString name;
@@ -13,7 +15,7 @@ public:
 	enum { Type = typePlayerTarget };
 	int type() const { return Type; }
 	
-	PlayerTarget(const QString &_name, int _maxWidth, QGraphicsItem *parent = 0);
+	PlayerTarget(const QString &_name, int _maxWidth, Player *parent = 0);
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 };

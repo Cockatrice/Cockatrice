@@ -130,6 +130,10 @@
             <name>M10</name>
             <longname>Magic 2010</longname>
         </set>
+	<set import="1">
+	    <name>M11</name>
+	    <longname>Magic 2011</longname>
+	</set>
         <set import="1">
             <name>MM</name>
             <longname>Mercadian Masques</longname>

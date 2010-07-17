@@ -318,7 +318,15 @@ QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAs
 						cardCounterList.append(new ServerInfo_CardCounter(cardCounterIterator.key(), cardCounterIterator.value()));
 					}
 					
-					cardList.append(new ServerInfo_Card(card->getId(), displayedName, card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), cardCounterList));
+					int attachPlayerId = -1;
+					QString attachZone;
+					int attachCardId = -1;
+					if (card->getParentCard()) {
+						attachPlayerId = card->getParentCard()->getZone()->getPlayer()->getPlayerId();
+						attachZone = card->getParentCard()->getZone()->getName();
+						attachCardId = card->getParentCard()->getId();
+					}
+					cardList.append(new ServerInfo_Card(card->getId(), displayedName, card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), cardCounterList, attachPlayerId, attachZone, attachCardId));
 				}
 			}
 			zoneList.append(new ServerInfo_Zone(zone->getName(), zone->getType(), zone->hasCoords(), zone->cards.size(), cardList));

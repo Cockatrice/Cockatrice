@@ -15,7 +15,7 @@ const int MAX_COUNTERS_ON_CARD = 999;
 class CardItem : public AbstractCardItem {
 	Q_OBJECT
 private:
-	Player *owner;
+	CardZone *zone;
 	int id;
 	bool attacking;
 	bool facedown;
@@ -26,6 +26,8 @@ private:
 	bool doesntUntap;
 	QPoint gridPoint;
 	CardDragItem *dragItem;
+	CardItem *attachedTo;
+	QList<CardItem *> attachedCards;
 	
 	QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
 	QAction *aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aSetPT, *aSetAnnotation, *aFlip, *aClone,
@@ -39,6 +41,8 @@ public:
 	CardItem(Player *_owner, const QString &_name = QString(), int _cardid = -1, QGraphicsItem *parent = 0);
 	~CardItem();
 	void retranslateUi();
+	CardZone *getZone() const { return zone; }
+	void setZone(CardZone *_zone) { zone = _zone; }
 	QMenu *getCardMenu() const { return cardMenu; }
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QPoint getGridPoint() const { return gridPoint; }
@@ -61,6 +65,11 @@ public:
 	void setPT(const QString &_pt);
 	bool getDestroyOnZoneChange() const { return destroyOnZoneChange; }
 	void setDestroyOnZoneChange(bool _destroy) { destroyOnZoneChange = _destroy; }
+	CardItem *getAttachedTo() const { return attachedTo; }
+	void setAttachedTo(CardItem *_attachedTo);
+	void addAttachedCard(CardItem *card) { attachedCards.append(card); }
+	void removeAttachedCard(CardItem *card) { attachedCards.removeAt(attachedCards.indexOf(card)); }
+	const QList<CardItem *> &getAttachedCards() const { return attachedCards; }
 	void resetState();
 	void processCardInfo(ServerInfo_Card *info);
 

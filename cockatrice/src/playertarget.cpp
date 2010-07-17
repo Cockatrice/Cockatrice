@@ -1,8 +1,9 @@
 #include "playertarget.h"
+#include "player.h"
 #include <QPainter>
 
-PlayerTarget::PlayerTarget(const QString &_name, int _maxWidth, QGraphicsItem *parent)
-	: ArrowTarget(parent), name(_name), maxWidth(_maxWidth)
+PlayerTarget::PlayerTarget(const QString &_name, int _maxWidth, Player *_owner)
+	: ArrowTarget(_owner, _owner), name(_name), maxWidth(_maxWidth)
 {
 	font = QFont("Times");
 	font.setStyleHint(QFont::Serif);
