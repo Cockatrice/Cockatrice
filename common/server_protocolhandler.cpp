@@ -512,6 +512,12 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 	if ((!startzone) || (!targetzone))
 		return RespNameNotFound;
 
+	// Collision detection
+	if (targetzone->hasCoords())
+		for (int i = 0; i < targetzone->cards.size(); ++i)
+			if ((targetzone->cards[i]->getX() == x) && (targetzone->cards[i]->getY() == y))
+				return RespContextError;
+		
 	int position = -1;
 	Server_Card *card = startzone->getCard(_cardId, true, &position);
 	if (!card)

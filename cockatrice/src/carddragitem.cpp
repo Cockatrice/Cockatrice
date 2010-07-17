@@ -5,10 +5,19 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QCursor>
+#include <QPainter>
 
 CardDragItem::CardDragItem(CardItem *_item, int _id, const QPointF &_hotSpot, bool _faceDown, AbstractCardDragItem *parentDrag)
-	: AbstractCardDragItem(_item, _hotSpot, parentDrag), id(_id), faceDown(_faceDown), currentZone(0)
+	: AbstractCardDragItem(_item, _hotSpot, parentDrag), id(_id), faceDown(_faceDown), occupied(false), currentZone(0)
 {
+}
+
+void CardDragItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+	AbstractCardDragItem::paint(painter, option, widget);
+	
+	if (occupied)
+		painter->fillRect(boundingRect(), QColor(200, 0, 0, 100));
 }
 
 void CardDragItem::updatePosition(const QPointF &cursorScenePos)
@@ -36,12 +45,23 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
 	QPointF zonePos = currentZone->scenePos();
 	QPointF cursorPosInZone = cursorScenePos - zonePos;
 	QPointF cardTopLeft = cursorPosInZone - hotSpot;
-	QPointF newPos = zonePos + cursorZone->closestGridPoint(cardTopLeft);
+	QPointF closestGridPoint = cursorZone->closestGridPoint(cardTopLeft);
+	QPointF newPos = zonePos + closestGridPoint;
 	
 	if (newPos != pos()) {
 		for (int i = 0; i < childDrags.size(); i++)
 			childDrags[i]->setPos(newPos + childDrags[i]->getHotSpot());
 		setPos(newPos);
+		
+		bool newOccupied = false;
+		TableZone *table = qobject_cast<TableZone *>(cursorZone);
+		if (table)
+			if (table->getCardFromCoords(closestGridPoint))
+				newOccupied = true;
+		if (newOccupied != occupied) {
+			occupied = newOccupied;
+			update();
+		}
 	}
 }
 
@@ -54,10 +74,11 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 	CardZone *startZone = static_cast<CardItem *>(item)->getZone();
 	if (currentZone && !(static_cast<CardItem *>(item)->getAttachedTo() && (startZone == currentZone))) {
-		currentZone->handleDropEvent(id, startZone, (sp - currentZone->scenePos()).toPoint(), faceDown);
+		if (!occupied)
+			currentZone->handleDropEvent(id, startZone, (sp - currentZone->scenePos()).toPoint(), faceDown);
 		for (int i = 0; i < childDrags.size(); i++) {
 			CardDragItem *c = static_cast<CardDragItem *>(childDrags[i]);
-			if (!(static_cast<CardItem *>(c->item)->getAttachedTo() && (startZone == currentZone)))
+			if (!(static_cast<CardItem *>(c->item)->getAttachedTo() && (startZone == currentZone)) && !c->occupied)
 				currentZone->handleDropEvent(c->id, startZone, (sp - currentZone->scenePos() + c->getHotSpot()).toPoint(), faceDown);
 			sc->removeItem(c);
 		}

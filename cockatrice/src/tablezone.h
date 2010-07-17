@@ -30,6 +30,7 @@ public:
 	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown = false);
 	void handleDropEventByGrid(int cardId, CardZone *startZone, const QPoint &gridPoint, bool faceDown = false, bool tapped = false);
 	CardItem *getCardFromGrid(const QPoint &gridPoint) const;
+	CardItem *getCardFromCoords(const QPointF &point) const;
 	QPointF mapFromGrid(const QPoint &gridPoint) const;
 	QPoint mapToGrid(const QPointF &mapPoint) const;
 	QPointF closestGridPoint(const QPointF &point);

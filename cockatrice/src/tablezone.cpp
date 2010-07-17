@@ -202,6 +202,13 @@ CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
 	return 0;
 }
 
+CardItem *TableZone::getCardFromCoords(const QPointF &point) const
+{
+	QPoint gridPoint = mapToGrid(point);
+	return getCardFromGrid(gridPoint);
+}
+
+	
 QPointF TableZone::mapFromGrid(const QPoint &gridPoint) const
 {
 	if ((gridPoint.y() == 3) && (settingsCache->getEconomicGrid()))
