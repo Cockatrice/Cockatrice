@@ -518,6 +518,9 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 		return RespNameNotFound;
 	
 	if (startzone != targetzone) {
+		if (card->getParentCard())
+			card->setParentCard(0);
+		
 		const QList<Server_Card *> &attachedCards = card->getAttachedCards();
 		for (int i = 0; i < attachedCards.size(); ++i)
 			unattachCard(game, attachedCards[i]->getZone()->getPlayer(), cont, attachedCards[i]);

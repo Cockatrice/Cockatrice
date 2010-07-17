@@ -52,12 +52,13 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 	QPointF sp = pos();
 	sc->removeItem(this);
 
-	if (currentZone) {
-		CardZone *startZone = static_cast<CardItem *>(item)->getZone();
+	CardZone *startZone = static_cast<CardItem *>(item)->getZone();
+	if (currentZone && !(static_cast<CardItem *>(item)->getAttachedTo() && (startZone == currentZone))) {
 		currentZone->handleDropEvent(id, startZone, (sp - currentZone->scenePos()).toPoint(), faceDown);
 		for (int i = 0; i < childDrags.size(); i++) {
 			CardDragItem *c = static_cast<CardDragItem *>(childDrags[i]);
-			currentZone->handleDropEvent(c->id, startZone, (sp - currentZone->scenePos() + c->getHotSpot()).toPoint(), faceDown);
+			if (!(static_cast<CardItem *>(c->item)->getAttachedTo() && (startZone == currentZone)))
+				currentZone->handleDropEvent(c->id, startZone, (sp - currentZone->scenePos() + c->getHotSpot()).toPoint(), faceDown);
 			sc->removeItem(c);
 		}
 	}

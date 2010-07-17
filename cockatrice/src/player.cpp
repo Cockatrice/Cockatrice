@@ -628,6 +628,9 @@ void Player::eventMoveCard(Event_MoveCard *event)
 	if (!card)
 		return;
 	
+	if (card->getAttachedTo() && (startZone != targetZone))
+		card->setAttachedTo(0);
+	
 	card->deleteDragItem();
 
 	card->setId(event->getNewCardId());
