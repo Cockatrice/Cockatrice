@@ -2086,9 +2086,9 @@ Local version is %1, remote version is %2.</source>
         <source>%1 draws %n card(s).</source>
         <comment>female</comment>
         <translation>
-            <numerusform>%1 добрала %n карт(ы).</numerusform>
-            <numerusform>%1 взял %n карты.</numerusform>
-            <numerusform>%1 взял %n карт(ы).</numerusform>
+            <numerusform>%1 взяла %n карту.</numerusform>
+            <numerusform>%1 взяла %n карты.</numerusform>
+            <numerusform>%1 взяла %n карт(ы).</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2096,7 +2096,7 @@ Local version is %1, remote version is %2.</source>
         <source>%1 draws %n card(s).</source>
         <comment>male</comment>
         <translation>
-            <numerusform>%1 добрал %n карт(ы).</numerusform>
+            <numerusform>%1 взял %n карту.</numerusform>
             <numerusform>%1 взял %n карты.</numerusform>
             <numerusform>%1 взял %n карт(ы).</numerusform>
         </translation>
