@@ -14,7 +14,7 @@
 #include "deck_picturecacher.h"
 #include "protocol_items.h"
 #include "dlg_load_remote_deck.h"
-#include "client.h"
+#include "abstractclient.h"
 #include "carditem.h"
 #include "arrowitem.h"
 #include "main.h"
@@ -42,7 +42,7 @@ void ReadyStartButton::setReadyStart(bool _readyStart)
 	update();
 }
 
-TabGame::TabGame(Client *_client, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
+TabGame::TabGame(AbstractClient *_client, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
 	: Tab(), client(_client), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), started(false), resuming(_resuming), currentPhase(-1)
 {
 	scene = new GameScene(this);

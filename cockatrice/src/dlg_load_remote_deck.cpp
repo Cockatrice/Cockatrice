@@ -5,7 +5,7 @@
 #include "dlg_load_remote_deck.h"
 #include "main.h"
 
-DlgLoadRemoteDeck::DlgLoadRemoteDeck(Client *_client, QWidget *parent)
+DlgLoadRemoteDeck::DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent)
 	: QDialog(parent), client(_client)
 {
 	dirView = new RemoteDeckList_TreeWidget(client);

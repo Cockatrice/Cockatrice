@@ -2,11 +2,11 @@
 #include "tab_server.h"
 #include "gamesmodel.h"
 #include "dlg_creategame.h"
-#include "client.h"
+#include "abstractclient.h"
 #include "protocol.h"
 #include "protocol_items.h"
 
-GameSelector::GameSelector(Client *_client, QWidget *parent)
+GameSelector::GameSelector(AbstractClient *_client, QWidget *parent)
 	: QGroupBox(parent), client(_client)
 {
 	gameListView = new QTreeView;
@@ -113,7 +113,7 @@ void GameSelector::processListGamesEvent(Event_ListGames *event)
 		gameListModel->updateGameList(gamesToUpdate[i]);
 }
 
-ChatChannelSelector::ChatChannelSelector(Client *_client, QWidget *parent)
+ChatChannelSelector::ChatChannelSelector(AbstractClient *_client, QWidget *parent)
 	: QGroupBox(parent), client(_client)
 {
 	channelList = new QTreeWidget;
@@ -200,7 +200,7 @@ void ChatChannelSelector::joinFinished(ResponseCode resp)
 	emit channelJoined(channelName);
 }
 
-ServerMessageLog::ServerMessageLog(Client *_client, QWidget *parent)
+ServerMessageLog::ServerMessageLog(AbstractClient *_client, QWidget *parent)
 	: QGroupBox(parent)
 {
 	textEdit = new QTextEdit;
@@ -225,7 +225,7 @@ void ServerMessageLog::processServerMessageEvent(Event_ServerMessage *event)
 	textEdit->append(event->getMessage());
 }
 
-TabServer::TabServer(Client *_client, QWidget *parent)
+TabServer::TabServer(AbstractClient *_client, QWidget *parent)
 	: Tab(parent), client(_client)
 {
 	gameSelector = new GameSelector(client);

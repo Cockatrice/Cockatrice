@@ -1,7 +1,6 @@
 #include <QtGui>
 #include "zoneviewzone.h"
 #include "player.h"
-#include "client.h"
 #include "protocol_items.h"
 
 ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, QGraphicsItem *parent)

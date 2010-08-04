@@ -2,7 +2,7 @@
 #define DLG_CREATEGAME_H
 
 #include <QDialog>
-#include "client.h"
+#include "abstractclient.h"
 
 class QLabel;
 class QLineEdit;
@@ -14,13 +14,13 @@ class QSpinBox;
 class DlgCreateGame : public QDialog {
 	Q_OBJECT
 public:
-	DlgCreateGame(Client *_client, QWidget *parent = 0);
+	DlgCreateGame(AbstractClient *_client, QWidget *parent = 0);
 private slots:
 	void actOK();
 	void checkResponse(ResponseCode response);
 	void spectatorsAllowedChanged(int state);
 private:
-	Client *client;
+	AbstractClient *client;
 
 	QGroupBox *spectatorsGroupBox;
 	QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel;

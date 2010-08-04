@@ -1,7 +1,6 @@
 #include <QtGui>
 #include "pilezone.h"
 #include "player.h"
-#include "client.h"
 #include "carddragitem.h"
 #include "zoneviewzone.h"
 #include "protocol_items.h"

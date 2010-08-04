@@ -6,13 +6,15 @@ MOC_DIR = build
 OBJECTS_DIR = build
 RESOURCES = cockatrice.qrc
 QT += network svg
+CONFIG += debug
 
 HEADERS += src/counter.h \
  src/dlg_creategame.h \
  src/dlg_connect.h \
  src/dlg_create_token.h \
  src/gamesmodel.h \
- src/client.h \
+ src/abstractclient.h \
+ src/remoteclient.h \
  src/window_main.h \
  src/cardzone.h \
  src/player.h \
@@ -58,17 +60,33 @@ HEADERS += src/counter.h \
  src/playerlistwidget.h \
  src/pingpixmapgenerator.h \
  src/settingscache.h \
+ src/localserver.h \
+ src/localserverinterface.h \
+ src/localclient.h \
  	../common/serializable_item.h \
 	../common/decklist.h \
 	../common/protocol.h \
 	../common/protocol_items.h \
-	../common/protocol_datastructures.h
+	../common/protocol_datastructures.h \
+	../common/rng_abstract.h \
+	../common/rng_qt.h \
+	../common/server.h \
+	../common/server_arrow.h \
+	../common/server_card.h \
+	../common/server_cardzone.h \
+	../common/server_chatchannel.h \
+	../common/server_counter.h \
+	../common/server_game.h \
+	../common/server_player.h \
+	../common/server_protocolhandler.h \
+	../common/server_arrowtarget.h
 
 SOURCES += src/counter.cpp \
  src/dlg_creategame.cpp \
  src/dlg_connect.cpp \
  src/dlg_create_token.cpp \
- src/client.cpp \
+ src/abstractclient.cpp \
+ src/remoteclient.cpp \
  src/main.cpp \
  src/window_main.cpp \
  src/gamesmodel.cpp \
@@ -115,12 +133,24 @@ SOURCES += src/counter.cpp \
  src/playerlistwidget.cpp \
  src/pingpixmapgenerator.cpp \
  src/settingscache.cpp \
+ src/localserver.cpp \
+ src/localserverinterface.cpp \
+ src/localclient.cpp \
  	../common/serializable_item.cpp \
 	../common/decklist.cpp \
 	../common/protocol.cpp \
 	../common/protocol_items.cpp \
-	../common/protocol_datastructures.cpp
- 
+	../common/protocol_datastructures.cpp \
+	../common/rng_abstract.cpp \
+	../common/rng_qt.cpp \
+	../common/server.cpp \
+	../common/server_card.cpp \
+	../common/server_cardzone.cpp \
+	../common/server_chatchannel.cpp \
+	../common/server_game.cpp \
+	../common/server_player.cpp \
+	../common/server_protocolhandler.cpp
+
 TRANSLATIONS += translations/cockatrice_de.ts translations/cockatrice_en.ts
 win32 {
 	RC_FILE = cockatrice.rc

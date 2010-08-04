@@ -5,7 +5,7 @@
 #include "tab.h"
 #include "protocol_datastructures.h"
 
-class Client;
+class AbstractClient;
 class QTreeView;
 class QTreeWidget;
 class QPushButton;
@@ -22,7 +22,7 @@ class Event_ServerMessage;
 class GameSelector : public QGroupBox {
 	Q_OBJECT
 public:
-	GameSelector(Client *_client, QWidget *parent = 0);
+	GameSelector(AbstractClient *_client, QWidget *parent = 0);
 	void retranslateUi();
 private slots:
 	void processListGamesEvent(Event_ListGames *event);
@@ -33,7 +33,7 @@ private slots:
 signals:
 	void gameJoined(int gameId);
 private:
-	Client *client;
+	AbstractClient *client;
 
 	QTreeView *gameListView;
 	GamesModel *gameListModel;
@@ -47,7 +47,7 @@ class ChatChannelSelector : public QGroupBox {
 private:
 	QTreeWidget *channelList;
 	QPushButton *joinButton;
-	Client *client;
+	AbstractClient *client;
 	
 	void joinChannel(const QString &channelName);
 private slots:
@@ -57,7 +57,7 @@ private slots:
 signals:
 	void channelJoined(const QString &channelName);
 public:
-	ChatChannelSelector(Client *_client, QWidget *parent = 0);
+	ChatChannelSelector(AbstractClient *_client, QWidget *parent = 0);
 	void retranslateUi();
 };
 
@@ -68,7 +68,7 @@ private:
 private slots:
 	void processServerMessageEvent(Event_ServerMessage *event);
 public:
-	ServerMessageLog(Client *_client, QWidget *parent = 0);
+	ServerMessageLog(AbstractClient *_client, QWidget *parent = 0);
 	void retranslateUi();
 };
 
@@ -78,12 +78,12 @@ signals:
 	void chatChannelJoined(const QString &channelName);
 	void gameJoined(int gameId);
 private:
-	Client *client;
+	AbstractClient *client;
 	GameSelector *gameSelector;
 	ChatChannelSelector *chatChannelSelector;
 	ServerMessageLog *serverMessageLog;
 public:
-	TabServer(Client *_client, QWidget *parent = 0);
+	TabServer(AbstractClient *_client, QWidget *parent = 0);
 	void retranslateUi();
 	QString getTabText() const { return tr("Server"); }
 };

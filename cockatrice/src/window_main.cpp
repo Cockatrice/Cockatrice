@@ -24,6 +24,10 @@
 #include "dlg_settings.h"
 #include "window_deckeditor.h"
 #include "tab_supervisor.h"
+#include "remoteclient.h"
+#include "localserver.h"
+#include "localserverinterface.h"
+#include "localclient.h"
 
 const QString MainWindow::appName = "Cockatrice";
 
@@ -72,6 +76,15 @@ void MainWindow::actConnect()
 void MainWindow::actDisconnect()
 {
 	client->disconnectFromServer();
+}
+
+void MainWindow::actSinglePlayer()
+{
+	LocalServer *ls = new LocalServer(this);
+	LocalServerInterface *mainLsi = ls->newConnection();
+	LocalClient *mainClient = new LocalClient(mainLsi, this);
+	tabSupervisor->start(mainClient);
+	
 }
 
 void MainWindow::actDeckEditor()
@@ -138,6 +151,7 @@ void MainWindow::retranslateUi()
 	
 	aConnect->setText(tr("&Connect..."));
 	aDisconnect->setText(tr("&Disconnect"));
+	aSinglePlayer->setText(tr("Start &local game..."));
 	aDeckEditor->setText(tr("&Deck editor"));
 	aFullScreen->setText(tr("&Full screen"));
 	aFullScreen->setShortcut(tr("Ctrl+F"));
@@ -156,6 +170,8 @@ void MainWindow::createActions()
 	aDisconnect = new QAction(this);
 	aDisconnect->setEnabled(false);
 	connect(aDisconnect, SIGNAL(triggered()), this, SLOT(actDisconnect()));
+	aSinglePlayer = new QAction(this);
+	connect(aSinglePlayer, SIGNAL(triggered()), this, SLOT(actSinglePlayer()));
 	aDeckEditor = new QAction(this);
 	connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
 	aFullScreen = new QAction(this);
@@ -172,6 +188,7 @@ void MainWindow::createMenus()
 	cockatriceMenu = menuBar()->addMenu(QString());
 	cockatriceMenu->addAction(aConnect);
 	cockatriceMenu->addAction(aDisconnect);
+	cockatriceMenu->addAction(aSinglePlayer);
 	cockatriceMenu->addSeparator();
 	cockatriceMenu->addAction(aDeckEditor);
 	cockatriceMenu->addSeparator();
@@ -187,7 +204,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
 	QPixmapCache::setCacheLimit(200000);
 
-	client = new Client(this);
+	client = new RemoteClient(this);
 	connect(client, SIGNAL(serverError(ResponseCode)), this, SLOT(serverError(ResponseCode)));
 	connect(client, SIGNAL(socketError(const QString &)), this, SLOT(socketError(const QString &)));
 	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));

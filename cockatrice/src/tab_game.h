@@ -5,7 +5,7 @@
 #include <QPushButton>
 #include "tab.h"
 
-class Client;
+class AbstractClient;
 class CardDatabase;
 class GameView;
 class DeckView;
@@ -55,7 +55,7 @@ protected:
 class TabGame : public Tab {
 	Q_OBJECT
 private:
-	Client *client;
+	AbstractClient *client;
 	int gameId;
 	QString gameDescription;
 	int localPlayerId;
@@ -120,7 +120,7 @@ private slots:
 	void actNextPhase();
 	void actNextTurn();
 public:
-	TabGame(Client *_client, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming);
+	TabGame(AbstractClient *_client, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming);
 	~TabGame();
 	void retranslateUi();
 	const QMap<int, Player *> &getPlayers() const { return players; }

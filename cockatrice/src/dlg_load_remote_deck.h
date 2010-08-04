@@ -5,19 +5,19 @@
 
 class RemoteDeckList_TreeWidget;
 class QModelIndex;
-class Client;
+class AbstractClient;
 class QPushButton;
 
 class DlgLoadRemoteDeck: public QDialog {
 	Q_OBJECT
 private:
-	Client *client;
+	AbstractClient *client;
 	RemoteDeckList_TreeWidget *dirView;
 	QPushButton *okButton, *cancelButton;
 private slots:
 	void currentItemChanged(const QModelIndex &current, const QModelIndex &previous);
 public:
-	DlgLoadRemoteDeck(Client *_client, QWidget *parent = 0);
+	DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent = 0);
 	int getDeckId() const;
 };
 

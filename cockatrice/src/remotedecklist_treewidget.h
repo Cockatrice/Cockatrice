@@ -6,7 +6,7 @@
 #include <QTreeView>
 
 class ProtocolResponse;
-class Client;
+class AbstractClient;
 class QSortFilterProxyModel;
 class DeckList_File;
 class DeckList_Directory;
@@ -55,7 +55,7 @@ public:
 		return dynamic_cast<T>(static_cast<Node *>(index.internalPointer()));
 	}
 private:
-	Client *client;
+	AbstractClient *client;
 	DirectoryNode *root;
 	
 	QIcon fileIcon, dirIcon;
@@ -66,7 +66,7 @@ signals:
 private slots:
 	void deckListFinished(ProtocolResponse *r);
 public:
-	RemoteDeckList_TreeModel(Client *_client, QObject *parent = 0);
+	RemoteDeckList_TreeModel(AbstractClient *_client, QObject *parent = 0);
 	~RemoteDeckList_TreeModel();
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const;
@@ -89,7 +89,7 @@ private:
 	RemoteDeckList_TreeModel *treeModel;
 	QSortFilterProxyModel *proxyModel;
 public:
-	RemoteDeckList_TreeWidget(Client *_client, QWidget *parent = 0);
+	RemoteDeckList_TreeWidget(AbstractClient *_client, QWidget *parent = 0);
 	RemoteDeckList_TreeModel::Node *getNode(const QModelIndex &ind) const;
 	RemoteDeckList_TreeModel::Node *getCurrentItem() const;
 	RemoteDeckList_TreeModel::DirectoryNode *getNodeByPath(const QString &path) const;

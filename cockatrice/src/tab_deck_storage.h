@@ -4,7 +4,7 @@
 #include "tab.h"
 #include "protocol.h"
 
-class Client;
+class AbstractClient;
 class QTreeView;
 class QFileSystemModel;
 class QSortFilterProxyModel;
@@ -18,7 +18,7 @@ class RemoteDeckList_TreeWidget;
 class TabDeckStorage : public Tab {
 	Q_OBJECT
 private:
-	Client *client;
+	AbstractClient *client;
 	QTreeView *localDirView;
 	QFileSystemModel *localDirModel;
 	QSortFilterProxyModel *sortFilter;
@@ -45,7 +45,7 @@ private slots:
 	void actDelete();
 	void deleteFinished(ResponseCode resp);
 public:
-	TabDeckStorage(Client *_client);
+	TabDeckStorage(AbstractClient *_client);
 	void retranslateUi();
 	QString getTabText() const { return tr("Deck storage"); }
 };

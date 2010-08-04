@@ -1,6 +1,5 @@
 #include "counter.h"
 #include "player.h"
-#include "client.h"
 #include "protocol_items.h"
 #include <QtGui>
 

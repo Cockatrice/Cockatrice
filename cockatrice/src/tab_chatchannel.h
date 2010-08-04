@@ -3,7 +3,7 @@
 
 #include "tab.h"
 
-class Client;
+class AbstractClient;
 class QListWidget;
 class QTextEdit;
 class QLineEdit;
@@ -16,7 +16,7 @@ class Event_ChatSay;
 class TabChatChannel : public Tab {
 	Q_OBJECT
 private:
-	Client *client;
+	AbstractClient *client;
 	QString channelName;
 	
 	QListWidget *playerList;
@@ -35,7 +35,7 @@ private slots:
 	void processLeaveChannelEvent(Event_ChatLeaveChannel *event);
 	void processSayEvent(Event_ChatSay *event);
 public:
-	TabChatChannel(Client *_client, const QString &_channelName);
+	TabChatChannel(AbstractClient *_client, const QString &_channelName);
 	~TabChatChannel();
 	void retranslateUi();
 	void processChatEvent(ChatEvent *event);

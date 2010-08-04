@@ -21,10 +21,11 @@
 #define WINDOW_H
 
 #include <QMainWindow>
-#include "client.h"
+#include "abstractclient.h"
 #include "protocol_datastructures.h"
 
 class TabSupervisor;
+class RemoteClient;
 
 class MainWindow : public QMainWindow {
 	Q_OBJECT
@@ -38,6 +39,7 @@ private slots:
 
 	void actConnect();
 	void actDisconnect();
+	void actSinglePlayer();
 	void actDeckEditor();
 	void actFullScreen(bool checked);
 	void actSettings();
@@ -49,10 +51,10 @@ private:
 	void createActions();
 	void createMenus();
 	QMenu *cockatriceMenu, *tabMenu;
-	QAction *aConnect, *aDisconnect, *aDeckEditor, *aFullScreen, *aSettings, *aExit;
+	QAction *aConnect, *aDisconnect, *aSinglePlayer, *aDeckEditor, *aFullScreen, *aSettings, *aExit;
 	TabSupervisor *tabSupervisor;
 
-	Client *client;
+	RemoteClient *client;
 public:
 	MainWindow(QWidget *parent = 0);
 protected:

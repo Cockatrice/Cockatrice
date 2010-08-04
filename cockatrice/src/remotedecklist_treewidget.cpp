@@ -3,7 +3,7 @@
 #include <QSortFilterProxyModel>
 #include "remotedecklist_treewidget.h"
 #include "protocol_items.h"
-#include "client.h"
+#include "abstractclient.h"
 
 RemoteDeckList_TreeModel::DirectoryNode::DirectoryNode(const QString &_name, RemoteDeckList_TreeModel::DirectoryNode *_parent)
 	: RemoteDeckList_TreeModel::Node(_name, _parent)
@@ -72,7 +72,7 @@ RemoteDeckList_TreeModel::FileNode *RemoteDeckList_TreeModel::DirectoryNode::get
 	return 0;
 }
 
-RemoteDeckList_TreeModel::RemoteDeckList_TreeModel(Client *_client, QObject *parent)
+RemoteDeckList_TreeModel::RemoteDeckList_TreeModel(AbstractClient *_client, QObject *parent)
 	: QAbstractItemModel(parent), client(_client)
 {
 	QFileIconProvider fip;
@@ -256,7 +256,7 @@ void RemoteDeckList_TreeModel::deckListFinished(ProtocolResponse *r)
 	emit treeRefreshed();
 }
 
-RemoteDeckList_TreeWidget::RemoteDeckList_TreeWidget(Client *_client, QWidget *parent)
+RemoteDeckList_TreeWidget::RemoteDeckList_TreeWidget(AbstractClient *_client, QWidget *parent)
 	: QTreeView(parent)
 {
 	treeModel = new RemoteDeckList_TreeModel(_client, this);

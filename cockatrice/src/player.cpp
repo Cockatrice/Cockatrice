@@ -1,5 +1,5 @@
 #include "player.h"
-#include "client.h"
+#include "abstractclient.h"
 #include "cardzone.h"
 #include "playertarget.h"
 #include "counter.h"
@@ -19,8 +19,9 @@
 #include <QSettings>
 #include <QPainter>
 #include <QMenu>
+#include <QDebug>
 
-Player::Player(const QString &_name, int _id, bool _local, Client *_client, TabGame *_parent)
+Player::Player(const QString &_name, int _id, bool _local, AbstractClient *_client, TabGame *_parent)
 	: QObject(_parent), defaultNumberTopCards(3), lastTokenDestroy(true), name(_name), id(_id), active(false), local(_local), mirrored(false), client(_client)
 {
 	setCacheMode(DeviceCoordinateCache);

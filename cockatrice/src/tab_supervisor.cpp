@@ -1,12 +1,13 @@
 #include <QApplication>
 #include "tab_supervisor.h"
-#include "client.h"
+#include "abstractclient.h"
 #include "tab_server.h"
 #include "tab_chatchannel.h"
 #include "tab_game.h"
 #include "tab_deck_storage.h"
 #include "protocol_items.h"
 #include "pingpixmapgenerator.h"
+#include <QDebug>
 
 TabSupervisor::	TabSupervisor(QWidget *parent)
 	: QTabWidget(parent), client(0), tabServer(0), tabDeckStorage(0)
@@ -48,7 +49,7 @@ void TabSupervisor::myAddTab(Tab *tab)
 	addTab(tab, tab->getTabText());
 }
 
-void TabSupervisor::start(Client *_client)
+void TabSupervisor::start(AbstractClient *_client)
 {
 	client = _client;
 	connect(client, SIGNAL(chatEventReceived(ChatEvent *)), this, SLOT(processChatEvent(ChatEvent *)));

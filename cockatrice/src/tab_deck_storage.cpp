@@ -1,12 +1,12 @@
 #include <QtGui>
 #include "tab_deck_storage.h"
 #include "remotedecklist_treewidget.h"
-#include "client.h"
+#include "abstractclient.h"
 #include "decklist.h"
 #include "protocol_items.h"
 #include "window_deckeditor.h"
 
-TabDeckStorage::TabDeckStorage(Client *_client)
+TabDeckStorage::TabDeckStorage(AbstractClient *_client)
 	: Tab(), client(_client)
 {
 	localDirModel = new QFileSystemModel(this);

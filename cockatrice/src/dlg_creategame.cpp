@@ -2,7 +2,7 @@
 #include "dlg_creategame.h"
 #include "protocol_items.h"
 
-DlgCreateGame::DlgCreateGame(Client *_client, QWidget *parent)
+DlgCreateGame::DlgCreateGame(AbstractClient *_client, QWidget *parent)
 	: QDialog(parent), client(_client)
 {
 	descriptionLabel = new QLabel(tr("&Description:"));

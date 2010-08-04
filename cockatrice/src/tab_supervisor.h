@@ -5,7 +5,7 @@
 #include <QMap>
 
 class QMenu;
-class Client;
+class AbstractClient;
 class Tab;
 class TabServer;
 class TabChatChannel;
@@ -19,7 +19,7 @@ class TabSupervisor : public QTabWidget {
 	Q_OBJECT
 private:
 	QIcon *tabChangedIcon;
-	Client *client;
+	AbstractClient *client;
 	TabServer *tabServer;
 	TabDeckStorage *tabDeckStorage;
 	QMap<QString, TabChatChannel *> chatChannelTabs;
@@ -29,7 +29,7 @@ public:
 	TabSupervisor(QWidget *parent = 0);
 	~TabSupervisor();
 	void retranslateUi();
-	void start(Client *_client);
+	void start(AbstractClient *_client);
 	void stop();
 	int getGameCount() const { return gameTabs.size(); }
 signals:

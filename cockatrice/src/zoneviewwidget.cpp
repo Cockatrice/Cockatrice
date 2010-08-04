@@ -3,7 +3,6 @@
 #include "carditem.h"
 #include "zoneviewzone.h"
 #include "player.h"
-#include "client.h"
 #include "gamescene.h"
 #include "protocol_items.h"
 #include "settingscache.h"
