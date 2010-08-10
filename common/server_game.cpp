@@ -137,7 +137,7 @@ void Server_Game::startGameIfReady()
 		query.exec();
 	}
 */	
-	setActivePlayer(0);
+	setActivePlayer(players.keys().first());
 }
 
 void Server_Game::stopGameIfFinished()

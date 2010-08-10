@@ -43,7 +43,7 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
 	else
 		painter->fillRect(boundingRect(), QBrush(bgPixmap));
 	painter->setPen(QColor(255, 255, 255, 40));
-	qreal separatorY = 3 * (CARD_HEIGHT + paddingY) - paddingY / 2;
+	qreal separatorY = 3 * (CARD_HEIGHT + paddingY) + boxLineWidth - paddingY / 2;
 	if (player->getMirrored())
 		separatorY = height - separatorY;
 	painter->drawLine(QPointF(0, separatorY), QPointF(width, separatorY));

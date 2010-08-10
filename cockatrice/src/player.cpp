@@ -254,6 +254,7 @@ void Player::rearrangeZones()
 		table->setPos(base);
 	}
 	hand->updateOrientation();
+	table->reorganizeCards();
 	updateBoundingRect();
 	rearrangeCounters();
 }
