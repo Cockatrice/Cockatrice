@@ -76,6 +76,7 @@ public:
 	int getActivePhase() const { return activePhase; }
 	void setActivePlayer(int _activePlayer);
 	void setActivePhase(int _activePhase);
+	void nextTurn();
 
 	QList<ServerInfo_Player *> getGameState(Server_Player *playerWhosAsking) const;
 	void sendGameEvent(GameEvent *event, GameEventContext *context = 0, Server_Player *exclude = 0);
