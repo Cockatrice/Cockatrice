@@ -7,7 +7,8 @@ class QGraphicsScene;
 class CardZone;
 class CardInfo;
 
-class AbstractCardDragItem : public QGraphicsItem {
+class AbstractCardDragItem : public QObject, public QGraphicsItem {
+	Q_OBJECT
 protected:
 	AbstractCardItem *item;
 	QPointF hotSpot;

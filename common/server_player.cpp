@@ -196,10 +196,8 @@ bool Server_Player::deleteCounter(int counterId)
 	return true;
 }
 
-bool Server_Player::sendProtocolItem(ProtocolItem *item, bool deleteItem)
+void Server_Player::sendProtocolItem(ProtocolItem *item, bool deleteItem)
 {
 	if (handler)
-		return handler->sendProtocolItem(item, deleteItem);
-	else
-		return true;
+		handler->sendProtocolItem(item, deleteItem);
 }

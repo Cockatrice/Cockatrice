@@ -36,9 +36,7 @@ void Server_ChatChannel::say(Server_ProtocolHandler *client, const QString &s)
 
 void Server_ChatChannel::sendChatEvent(ChatEvent *event)
 {
-	bool mayDelete = true;
 	for (int i = 0; i < size(); ++i)
-		mayDelete = at(i)->sendProtocolItem(event, false);
-	if (mayDelete)
-		delete event;
+		at(i)->sendProtocolItem(event, false);
+	delete event;
 }

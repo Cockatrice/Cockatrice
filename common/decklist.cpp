@@ -5,7 +5,6 @@
 #include <QXmlStreamWriter>
 #include <QVariant>
 #include "decklist.h"
-#include <QDebug>
 
 MoveCardToZone::MoveCardToZone(const QString &_cardName, const QString &_startZone, const QString &_targetZone)
 	: SerializableItem_Map("move_card_to_zone")

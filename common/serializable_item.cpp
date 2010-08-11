@@ -1,7 +1,6 @@
 #include "serializable_item.h"
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
-#include <QDebug>
 
 QHash<QString, SerializableItem::NewItemFunction> SerializableItem::itemNameHash;
 

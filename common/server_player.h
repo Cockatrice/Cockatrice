@@ -70,7 +70,7 @@ public:
 	void clearZones();
 	void setupZones();
 
-	bool sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
+	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
 };
 
 #endif

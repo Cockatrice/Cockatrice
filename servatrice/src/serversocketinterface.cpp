@@ -96,7 +96,6 @@ void ServerSocketInterface::sendProtocolItem(ProtocolItem *item, bool deleteItem
 	item->write(xmlWriter);
 	if (deleteItem)
 		delete item;
-	return true;
 }
 
 int ServerSocketInterface::getDeckPathId(int basePathId, QStringList path)

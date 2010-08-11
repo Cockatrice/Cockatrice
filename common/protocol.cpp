@@ -1,12 +1,11 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
-#include <QDebug>
 #include "protocol.h"
 #include "protocol_items.h"
 #include "decklist.h"
 
 ProtocolItem::ProtocolItem(const QString &_itemType, const QString &_itemSubType)
-	: SerializableItem_Map(_itemType, _itemSubType)
+	: SerializableItem_Map(_itemType, _itemSubType), receiverMayDelete(true)
 {
 }
 
@@ -135,21 +134,21 @@ void CommandContainer::enqueueGameEventPublic(GameEvent *event, int gameId)
 {
 	if (!gameEventQueuePublic)
 		gameEventQueuePublic = new GameEventContainer(QList<GameEvent *>(), gameId);
-	gameEventQueuePublic->appendItem(event);
+	gameEventQueuePublic->addGameEvent(event);
 }
 
 void CommandContainer::enqueueGameEventOmniscient(GameEvent *event, int gameId)
 {
 	if (!gameEventQueueOmniscient)
 		gameEventQueueOmniscient = new GameEventContainer(QList<GameEvent *>(), gameId);
-	gameEventQueueOmniscient->appendItem(event);
+	gameEventQueueOmniscient->addGameEvent(event);
 }
 
 void CommandContainer::enqueueGameEventPrivate(GameEvent *event, int gameId)
 {
 	if (!gameEventQueuePrivate)
 		gameEventQueuePrivate = new GameEventContainer(QList<GameEvent *>(), gameId);
-	gameEventQueuePrivate->appendItem(event);
+	gameEventQueuePrivate->addGameEvent(event);
 }
 
 Command_DeckUpload::Command_DeckUpload(DeckList *_deck, const QString &_path)
@@ -307,6 +306,7 @@ GameEventContainer::GameEventContainer(const QList<GameEvent *> &_eventList, int
 	if (_context)
 		itemList.append(_context);
 
+	eventList = _eventList;
 	for (int i = 0; i < _eventList.size(); ++i)
 		itemList.append(_eventList[i]);
 }
@@ -335,6 +335,12 @@ void GameEventContainer::setContext(GameEventContext *_context)
 	}
 	itemList.append(_context);
 	context = _context;
+}
+
+void GameEventContainer::addGameEvent(GameEvent *event)
+{
+	appendItem(event);
+	eventList.append(event);
 }
 
 GameEventContainer *GameEventContainer::makeNew(GameEvent *event, int _gameId)

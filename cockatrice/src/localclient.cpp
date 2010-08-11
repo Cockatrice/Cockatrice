@@ -6,6 +6,7 @@ LocalClient::LocalClient(LocalServerInterface *_lsi, QObject *parent)
 	: AbstractClient(parent), lsi(_lsi)
 {
 	connect(lsi, SIGNAL(itemToClient(ProtocolItem *)), this, SLOT(itemFromServer(ProtocolItem *)));
+	sendCommand(new Command_Login("Player", QString()));
 }
 
 LocalClient::~LocalClient()
@@ -14,6 +15,8 @@ LocalClient::~LocalClient()
 
 void LocalClient::sendCommandContainer(CommandContainer *cont)
 {
+	cont->setReceiverMayDelete(false);
+	pendingCommands.insert(cont->getCmdId(), cont);
 	lsi->itemFromClient(cont);
 }
 

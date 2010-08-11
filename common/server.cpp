@@ -92,12 +92,10 @@ void Server::broadcastGameListUpdate(Server_Game *game)
 		eventGameList.append(new ServerInfo_Game(game->getGameId(), QString(), false, 0, game->getMaxPlayers(), QString(), false, 0));
 	Event_ListGames *event = new Event_ListGames(eventGameList);
 	
-	bool mayDelete = true;
 	for (int i = 0; i < clients.size(); i++)
 		if (clients[i]->getAcceptsGameListChanges())
-			mayDelete = clients[i]->sendProtocolItem(event, false);
-	if (mayDelete)
-		delete event;
+			clients[i]->sendProtocolItem(event, false);
+	delete event;
 }
 
 void Server::broadcastChannelUpdate()
@@ -107,12 +105,10 @@ void Server::broadcastChannelUpdate()
 	eventChannelList.append(new ServerInfo_ChatChannel(channel->getName(), channel->getDescription(), channel->size(), channel->getAutoJoin()));
 	Event_ListChatChannels *event = new Event_ListChatChannels(eventChannelList);
 
-	bool mayDelete = true;
 	for (int i = 0; i < clients.size(); ++i)
 	  	if (clients[i]->getAcceptsChatChannelListChanges())
-			mayDelete = clients[i]->sendProtocolItem(event, false);
-	if (mayDelete)
-		delete event;
+			clients[i]->sendProtocolItem(event, false);
+	delete event;
 }
 
 void Server::gameClosing()

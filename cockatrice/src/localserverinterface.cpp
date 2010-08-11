@@ -1,5 +1,6 @@
 #include "localserverinterface.h"
 #include "localserver.h"
+#include <QDebug>
 
 LocalServerInterface::LocalServerInterface(LocalServer *_server)
 	: Server_ProtocolHandler(_server, _server)
@@ -10,10 +11,12 @@ LocalServerInterface::~LocalServerInterface()
 {
 }
 
-bool LocalServerInterface::sendProtocolItem(ProtocolItem *item, bool deleteItem)
+void LocalServerInterface::sendProtocolItem(ProtocolItem *item, bool deleteItem)
 {
+	item->setReceiverMayDelete(false);
 	emit itemToClient(item);
-	return false;
+	if (deleteItem)
+		delete item;
 }
 
 void LocalServerInterface::itemFromClient(ProtocolItem *item)

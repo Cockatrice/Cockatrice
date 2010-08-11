@@ -25,6 +25,7 @@
 #include "server_cardzone.h"
 #include "server_counter.h"
 #include <QTimer>
+#include <QDebug>
 
 Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, QObject *parent)
 	: QObject(parent), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), activePlayer(-1), activePhase(-1), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0)
@@ -344,34 +345,28 @@ void Server_Game::sendGameEvent(GameEvent *event, GameEventContext *context, Ser
 
 void Server_Game::sendGameEventContainer(GameEventContainer *cont, Server_Player *exclude, bool excludeOmniscient)
 {
-	bool mayDelete = true;
-	
 	cont->setGameId(gameId);
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	while (playerIterator.hasNext()) {
 		Server_Player *p = playerIterator.next().value();
 		if ((p != exclude) && !(excludeOmniscient && p->getSpectator() && spectatorsSeeEverything))
-			mayDelete = p->sendProtocolItem(cont, false);
+			p->sendProtocolItem(cont, false);
 	}
 
-	if (mayDelete)
-		delete cont;
+	delete cont;
 }
 
 void Server_Game::sendGameEventContainerOmniscient(GameEventContainer *cont, Server_Player *exclude)
 {
-	bool mayDelete = true;
-	
 	cont->setGameId(gameId);
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	while (playerIterator.hasNext()) {
 		Server_Player *p = playerIterator.next().value();
 		if ((p != exclude) && (p->getSpectator() && spectatorsSeeEverything))
-			mayDelete = p->sendProtocolItem(cont, false);
+			p->sendProtocolItem(cont, false);
 	}
 	
-	if (mayDelete)
-		delete cont;
+	delete cont;
 }
 
 void Server_Game::sendGameEventToPlayer(Server_Player *player, GameEvent *event)

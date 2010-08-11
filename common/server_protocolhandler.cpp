@@ -145,7 +145,7 @@ void Server_ProtocolHandler::processCommandContainer(CommandContainer *cont)
 	ProtocolResponse *pr = cont->getResponse();
 	if (!pr)
 		pr = new ProtocolResponse(cont->getCmdId(), finalResponseCode);
-	
+
 	GameEventContainer *gQPublic = cont->getGameEventQueuePublic();
 	if (gQPublic) {
 		Server_Game *game = games.value(gQPublic->getGameId()).first;
@@ -169,10 +169,11 @@ void Server_ProtocolHandler::processCommandContainer(CommandContainer *cont)
 	
 	sendProtocolItem(pr);
 	
-	delete cont;
-	
 	while (!itemQueue.isEmpty())
 		sendProtocolItem(itemQueue.takeFirst());
+
+	if (cont->getReceiverMayDelete())
+		delete cont;
 }
 
 void Server_ProtocolHandler::pingClockTimeout()
@@ -281,6 +282,9 @@ ResponseCode Server_ProtocolHandler::cmdChatSay(Command_ChatSay *cmd, CommandCon
 
 ResponseCode Server_ProtocolHandler::cmdListGames(Command_ListGames * /*cmd*/, CommandContainer *cont)
 {
+	if (authState == PasswordWrong)
+		return RespLoginNeeded;
+	
 	const QList<Server_Game *> &gameList = server->getGames();
 	QList<ServerInfo_Game *> eventGameList;
 	for (int i = 0; i < gameList.size(); ++i) {
@@ -305,6 +309,9 @@ ResponseCode Server_ProtocolHandler::cmdListGames(Command_ListGames * /*cmd*/, C
 
 ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, CommandContainer *cont)
 {
+	if (authState == PasswordWrong)
+		return RespLoginNeeded;
+	
 	Server_Game *game = server->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
 	Server_Player *creator = game->getCreator();
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
@@ -316,6 +323,9 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 
 ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandContainer *cont)
 {
+	if (authState == PasswordWrong)
+		return RespLoginNeeded;
+	
 	if (games.contains(cmd->getGameId()))
 		return RespContextError;
 	
@@ -485,7 +495,6 @@ ResponseCode Server_ProtocolHandler::drawCards(Server_Game *game, Server_Player 
 		cardListPrivate.append(new ServerInfo_Card(card->getId(), card->getName()));
 		cardListOmniscient.append(new ServerInfo_Card(card->getId(), card->getName()));
 	}
-
 	cont->enqueueGameEventPrivate(new Event_DrawCards(player->getPlayerId(), cardListPrivate.size(), cardListPrivate), game->getGameId());
 	cont->enqueueGameEventOmniscient(new Event_DrawCards(player->getPlayerId(), cardListOmniscient.size(), cardListOmniscient), game->getGameId());
 	cont->enqueueGameEventPublic(new Event_DrawCards(player->getPlayerId(), cardListPrivate.size()), game->getGameId());

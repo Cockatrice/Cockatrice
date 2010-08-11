@@ -1,6 +1,7 @@
 #include "abstractclient.h"
 #include "protocol.h"
 #include "protocol_items.h"
+#include <QDebug>
 
 AbstractClient::AbstractClient(QObject *parent)
 	: QObject(parent), status(StatusDisconnected)
@@ -21,8 +22,9 @@ void AbstractClient::processProtocolItem(ProtocolItem *item)
 		
 		pendingCommands.remove(cmdCont->getCmdId());
 		cmdCont->processResponse(response);
-		delete response;
-		delete cmdCont;
+		if (response->getReceiverMayDelete())
+			delete response;
+		cmdCont->deleteLater();
 		
 		return;
 	}
@@ -35,21 +37,24 @@ void AbstractClient::processProtocolItem(ProtocolItem *item)
 			case ItemId_Event_ListChatChannels: emit listChatChannelsEventReceived(qobject_cast<Event_ListChatChannels *>(item)); break;
 			case ItemId_Event_GameJoined: emit gameJoinedEventReceived(qobject_cast<Event_GameJoined *>(item)); break;
 		}
-		delete genericEvent;
+		if (genericEvent->getReceiverMayDelete())
+			delete genericEvent;
 		return;
 	}
 
 	GameEventContainer *gameEventContainer = qobject_cast<GameEventContainer *>(item);
 	if (gameEventContainer) {
 		emit gameEventContainerReceived(gameEventContainer);
-		delete gameEventContainer;
+		if (gameEventContainer->getReceiverMayDelete())
+			delete gameEventContainer;
 		return;
 	}
 
 	ChatEvent *chatEvent = qobject_cast<ChatEvent *>(item);
 	if (chatEvent) {
 		emit chatEventReceived(chatEvent);
-		delete chatEvent;
+		if (chatEvent->getReceiverMayDelete())
+			delete chatEvent;
 		return;
 	}
 }

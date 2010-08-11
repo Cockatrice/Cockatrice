@@ -739,6 +739,7 @@ void Player::eventDrawCards(Event_DrawCards *event)
 
 void Player::processGameEvent(GameEvent *event, GameEventContext *context)
 {
+	qDebug() << "player event: id=" << event->getItemId();
 	switch (event->getItemId()) {
 		case ItemId_Event_Say: eventSay(qobject_cast<Event_Say *>(event)); break;
 		case ItemId_Event_Shuffle: eventShuffle(qobject_cast<Event_Shuffle *>(event)); break;

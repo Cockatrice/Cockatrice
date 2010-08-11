@@ -284,7 +284,7 @@ CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPoin
 
 void CardItem::deleteDragItem()
 {
-	delete dragItem;
+	dragItem->deleteLater();
 	dragItem = NULL;
 }
 
@@ -376,7 +376,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 			cardMenu->exec(event->screenPos());
 	} else if ((event->button() == Qt::LeftButton) && !settingsCache->getDoubleClickToPlay())
 		playCard(event);
-	
+
 	setCursor(Qt::OpenHandCursor);
 }
 

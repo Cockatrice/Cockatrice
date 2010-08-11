@@ -128,7 +128,7 @@ void ZoneViewZone::removeCard(int position)
 		return;
 
 	CardItem *card = cards.takeAt(position);
-	delete card;
+	card->deleteLater();
 	reorganizeCards();
 }
 

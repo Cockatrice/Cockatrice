@@ -20,7 +20,7 @@ public:
 	LocalServerInterface(LocalServer *_server);
 	~LocalServerInterface();
 	
-	bool sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
+	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
 	
 signals:
 	void itemToClient(ProtocolItem *item);

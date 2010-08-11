@@ -94,7 +94,7 @@ public:
 	const QDateTime &getLastCommandTime() const { return lastCommandTime; }
 
 	void processCommandContainer(CommandContainer *cont);
-	virtual bool sendProtocolItem(ProtocolItem *item, bool deleteItem = true) = 0;
+	virtual void sendProtocolItem(ProtocolItem *item, bool deleteItem = true) = 0;
 	void enqueueProtocolItem(ProtocolItem *item);
 };
 

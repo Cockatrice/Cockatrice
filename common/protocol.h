@@ -46,10 +46,13 @@ class ProtocolItem : public SerializableItem_Map {
 	Q_OBJECT
 private:
 	static void initializeHashAuto();
+	bool receiverMayDelete;
 public:
 	static const int protocolVersion = 7;
 	static void initializeHash();
 	virtual int getItemId() const = 0;
+	bool getReceiverMayDelete() const { return receiverMayDelete; }
+	void setReceiverMayDelete(bool _receiverMayDelete) { receiverMayDelete = _receiverMayDelete; }
 	ProtocolItem(const QString &_itemType, const QString &_itemSubType);
 };
 
@@ -269,6 +272,7 @@ public:
 	QList<GameEvent *> getEventList() const { return eventList; }
 	GameEventContext *getContext() const { return context; }
 	void setContext(GameEventContext *_context);
+	void addGameEvent(GameEvent *event);
 	static GameEventContainer *makeNew(GameEvent *event, int _gameId);
 
 	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); }

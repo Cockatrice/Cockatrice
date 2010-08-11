@@ -148,10 +148,13 @@ ServerInfo_Player::ServerInfo_Player(ServerInfo_PlayerProperties *_properties, D
 	else
 		insertItem(new DeckList(_deck));
 	
+	zoneList = _zoneList;
 	for (int i = 0; i < _zoneList.size(); ++i)
 		itemList.append(_zoneList[i]);
+	counterList = _counterList;
 	for (int i = 0; i < _counterList.size(); ++i)
 		itemList.append(_counterList[i]);
+	arrowList = _arrowList;
 	for (int i = 0; i < _arrowList.size(); ++i)
 		itemList.append(_arrowList[i]);
 }
