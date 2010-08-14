@@ -68,6 +68,14 @@ void TabSupervisor::start(AbstractClient *_client)
 	retranslateUi();
 }
 
+void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
+{
+	localClients = _clients;
+	for (int i = 0; i < localClients.size(); ++i)
+		connect(localClients[i], SIGNAL(gameEventContainerReceived(GameEventContainer *)), this, SLOT(processGameEventContainer(GameEventContainer *)));
+	connect(localClients.first(), SIGNAL(gameJoinedEventReceived(Event_GameJoined *)), this, SLOT(localGameJoined(Event_GameJoined *)));
+}
+
 void TabSupervisor::stop()
 {
 	if (!client)
@@ -104,11 +112,26 @@ void TabSupervisor::updatePingTime(int value, int max)
 
 void TabSupervisor::gameJoined(Event_GameJoined *event)
 {
-	TabGame *tab = new TabGame(client, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
+	TabGame *tab = new TabGame(QList<AbstractClient *>() << client, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	myAddTab(tab);
 	gameTabs.insert(event->getGameId(), tab);
 	setCurrentWidget(tab);
+}
+
+void TabSupervisor::localGameJoined(Event_GameJoined *event)
+{
+	TabGame *tab = new TabGame(localClients, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
+	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
+	myAddTab(tab);
+	gameTabs.insert(event->getGameId(), tab);
+	setCurrentWidget(tab);
+	
+	for (int i = 1; i < localClients.size(); ++i) {
+		qDebug("JOINING");
+		Command_JoinGame *cmd = new Command_JoinGame(event->getGameId());
+		localClients[i]->sendCommand(cmd);
+	}
 }
 
 void TabSupervisor::gameLeft(TabGame *tab)

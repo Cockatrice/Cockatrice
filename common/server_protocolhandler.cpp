@@ -12,14 +12,11 @@
 #include "server_player.h"
 #include "decklist.h"
 #include <QDateTime>
-#include <QTimer>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
 	: QObject(parent), server(_server), authState(PasswordWrong), acceptsGameListChanges(false), lastCommandTime(QDateTime::currentDateTime())
 {
-	pingClock = new QTimer(this);
-	connect(pingClock, SIGNAL(timeout()), this, SLOT(pingClockTimeout()));
-	pingClock->start(1000);
+	connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
 
 Server_ProtocolHandler::~Server_ProtocolHandler()
@@ -332,7 +329,7 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandC
 	Server_Game *g = server->getGame(cmd->getGameId());
 	if (!g)
 		return RespNameNotFound;
-	
+		
 	ResponseCode result = g->checkJoin(cmd->getPassword(), cmd->getSpectator());
 	if (result == RespOk) {
 		Server_Player *player = g->addPlayer(this, cmd->getSpectator());

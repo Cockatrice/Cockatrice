@@ -2,11 +2,11 @@
 #include "localserverinterface.h"
 #include "protocol.h"
 
-LocalClient::LocalClient(LocalServerInterface *_lsi, QObject *parent)
+LocalClient::LocalClient(LocalServerInterface *_lsi, const QString &_playerName, QObject *parent)
 	: AbstractClient(parent), lsi(_lsi)
 {
 	connect(lsi, SIGNAL(itemToClient(ProtocolItem *)), this, SLOT(itemFromServer(ProtocolItem *)));
-	sendCommand(new Command_Login("Player", QString()));
+	sendCommand(new Command_Login(_playerName, QString()));
 }
 
 LocalClient::~LocalClient()

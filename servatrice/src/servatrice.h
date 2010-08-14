@@ -26,6 +26,7 @@
 class QSqlDatabase;
 class QSettings;
 class QSqlQuery;
+class QTimer;
 
 class Servatrice : public Server
 {
@@ -44,6 +45,7 @@ public:
 	int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
 	int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
 private:
+	QTimer *pingClock;
 	QTcpServer *tcpServer;
 	QString loginMessage;
 	QSettings *settings;

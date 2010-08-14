@@ -52,15 +52,16 @@ void GameScene::rearrange()
 	QPointF base;
 	qreal sceneWidth = 0;
 	qreal sceneHeight = 0;
-	Player *localPlayer = 0;
+	QList<Player *> localPlayers;
 
 	for (int i = 0; i < players.size(); ++i)
 		if (!players[i]->getLocal())
 			PlayerProcessor::processPlayer(players[i], sceneWidth, sceneHeight, base, players.size() == 1);
 		else
-			localPlayer = players[i];
-	if (localPlayer)
-		PlayerProcessor::processPlayer(localPlayer, sceneWidth, sceneHeight, base, players.size() == 1);
+			localPlayers.append(players[i]);
+	
+	for (int i = 0; i < localPlayers.size(); ++i)
+		PlayerProcessor::processPlayer(localPlayers[i], sceneWidth, sceneHeight, base, players.size() == 1);
 
 	playersRect = QRectF(0, 0, sceneWidth, sceneHeight);
 	

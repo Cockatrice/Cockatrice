@@ -14,6 +14,8 @@ enum AuthenticationResult { PasswordWrong = 0, PasswordRight = 1, UnknownUser = 
 class Server : public QObject
 {
 	Q_OBJECT
+signals:
+	void pingClockTimeout();
 private slots:
 	void gameClosing();
 	void broadcastChannelUpdate();

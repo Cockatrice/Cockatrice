@@ -26,6 +26,7 @@
 
 class TabSupervisor;
 class RemoteClient;
+class LocalClient;
 
 class MainWindow : public QMainWindow {
 	Q_OBJECT
@@ -55,6 +56,7 @@ private:
 	TabSupervisor *tabSupervisor;
 
 	RemoteClient *client;
+	QList<AbstractClient *> localClients;
 public:
 	MainWindow(QWidget *parent = 0);
 protected:

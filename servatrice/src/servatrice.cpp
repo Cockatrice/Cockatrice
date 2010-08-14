@@ -27,6 +27,10 @@
 Servatrice::Servatrice(QObject *parent)
 	: Server(parent)
 {
+	pingClock = new QTimer(this);
+	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
+	pingClock->start(1000);
+	
 	ProtocolItem::initializeHash();
 	settings = new QSettings("servatrice.ini", QSettings::IniFormat, this);
 	

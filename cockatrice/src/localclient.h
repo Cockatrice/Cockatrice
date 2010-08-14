@@ -10,7 +10,7 @@ class LocalClient : public AbstractClient {
 private:
 	LocalServerInterface *lsi;
 public:
-	LocalClient(LocalServerInterface *_lsi, QObject *parent = 0);
+	LocalClient(LocalServerInterface *_lsi, const QString &_playerName, QObject *parent = 0);
 	~LocalClient();
 	
 	void sendCommandContainer(CommandContainer *cont);

@@ -42,17 +42,17 @@ void ReadyStartButton::setReadyStart(bool _readyStart)
 	update();
 }
 
-TabGame::TabGame(AbstractClient *_client, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
-	: Tab(), client(_client), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), started(false), resuming(_resuming), currentPhase(-1)
+DeckViewContainer::DeckViewContainer(AbstractClient *_client, TabGame *parent)
+	: QWidget(parent), client(_client)
 {
-	scene = new GameScene(this);
-	gameView = new GameView(scene);
-	gameView->hide();
-	
 	loadLocalButton = new QPushButton;
 	loadRemoteButton = new QPushButton;
 	readyStartButton = new ReadyStartButton;
 	readyStartButton->setEnabled(false);
+	
+	connect(loadLocalButton, SIGNAL(clicked()), this, SLOT(loadLocalDeck()));
+	connect(loadRemoteButton, SIGNAL(clicked()), this, SLOT(loadRemoteDeck()));
+	connect(readyStartButton, SIGNAL(clicked()), this, SLOT(readyStart()));
 	
 	QHBoxLayout *buttonHBox = new QHBoxLayout;
 	buttonHBox->addWidget(loadLocalButton);
@@ -60,14 +60,105 @@ TabGame::TabGame(AbstractClient *_client, int _gameId, const QString &_gameDescr
 	buttonHBox->addWidget(readyStartButton);
 	buttonHBox->addStretch();
 	deckView = new DeckView;
-	connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
+	connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SIGNAL(newCardAdded(AbstractCardItem *)));
 	connect(deckView, SIGNAL(sideboardPlanChanged()), this, SLOT(sideboardPlanChanged()));
+	
 	QVBoxLayout *deckViewLayout = new QVBoxLayout;
 	deckViewLayout->addLayout(buttonHBox);
 	deckViewLayout->addWidget(deckView);
-	deckViewContainer = new QWidget;
-	deckViewContainer->setLayout(deckViewLayout);
+	setLayout(deckViewLayout);
+	
+	retranslateUi();
+}
 
+void DeckViewContainer::retranslateUi()
+{
+	loadLocalButton->setText(tr("Load &local deck"));
+	loadRemoteButton->setText(tr("Load d&eck from server"));
+	readyStartButton->setText(tr("Ready to s&tart"));
+}
+
+void DeckViewContainer::setButtonsVisible(bool _visible)
+{
+	loadLocalButton->setVisible(_visible);
+	loadRemoteButton->setVisible(_visible);
+	readyStartButton->setVisible(_visible);
+}
+
+void DeckViewContainer::loadLocalDeck()
+{
+	QFileDialog dialog(this, tr("Load deck"));
+	QSettings settings;
+	dialog.setDirectory(settings.value("paths/decks").toString());
+	dialog.setNameFilters(DeckList::fileNameFilters);
+	if (!dialog.exec())
+		return;
+
+	QString fileName = dialog.selectedFiles().at(0);
+	DeckList::FileFormat fmt = DeckList::getFormatFromNameFilter(dialog.selectedNameFilter());
+	DeckList *deck = new DeckList;
+	if (!deck->loadFromFile(fileName, fmt)) {
+		delete deck;
+		// Error message
+		return;
+	}
+	
+	Command_DeckSelect *cmd = new Command_DeckSelect(static_cast<TabGame *>(parent())->getGameId(), deck, -1);
+	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(deckSelectFinished(ProtocolResponse *)));
+	client->sendCommand(cmd);
+}
+
+void DeckViewContainer::loadRemoteDeck()
+{
+	DlgLoadRemoteDeck dlg(client);
+	if (dlg.exec()) {
+		Command_DeckSelect *cmd = new Command_DeckSelect(static_cast<TabGame *>(parent())->getGameId(), 0, dlg.getDeckId());
+		connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(deckSelectFinished(ProtocolResponse *)));
+		client->sendCommand(cmd);
+	}
+}
+
+void DeckViewContainer::deckSelectFinished(ProtocolResponse *r)
+{
+	Response_DeckDownload *resp = qobject_cast<Response_DeckDownload *>(r);
+	if (!resp)
+		return;
+	
+	Deck_PictureCacher::cachePictures(resp->getDeck(), this);
+	deckView->setDeck(new DeckList(resp->getDeck()));
+	readyStartButton->setEnabled(true);
+}
+
+void DeckViewContainer::readyStart()
+{
+	client->sendCommand(new Command_ReadyStart(static_cast<TabGame *>(parent())->getGameId(), !readyStartButton->getReadyStart()));
+}
+
+void DeckViewContainer::sideboardPlanChanged()
+{
+	QList<MoveCardToZone *> newPlan = deckView->getSideboardPlan();
+	client->sendCommand(new Command_SetSideboardPlan(static_cast<TabGame *>(parent())->getGameId(), newPlan));
+}
+
+void DeckViewContainer::setReadyStart(bool ready)
+{
+	readyStartButton->setReadyStart(ready);
+	deckView->setLocked(ready);
+}
+
+void DeckViewContainer::setDeck(DeckList *deck)
+{
+	deckView->setDeck(deck);
+	readyStartButton->setEnabled(true);
+}
+
+TabGame::TabGame(QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
+	: Tab(), clients(_clients), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), started(false), resuming(_resuming), currentPhase(-1)
+{
+	scene = new GameScene(this);
+	gameView = new GameView(scene);
+	gameView->hide();
+	
 	cardInfo = new CardInfoWidget;
 	playerListWidget = new PlayerListWidget;
 	playerListWidget->setFocusPolicy(Qt::NoFocus);
@@ -79,10 +170,12 @@ TabGame::TabGame(AbstractClient *_client, int _gameId, const QString &_gameDescr
 	QHBoxLayout *hLayout = new QHBoxLayout;
 	hLayout->addWidget(sayLabel);
 	hLayout->addWidget(sayEdit);
+	
+	deckViewContainerLayout = new QVBoxLayout;
 
 	phasesToolbar = new PhasesToolbar;
 	phasesToolbar->hide();
-	connect(phasesToolbar, SIGNAL(sendGameCommand(GameCommand *)), this, SLOT(sendGameCommand(GameCommand *)));
+	connect(phasesToolbar, SIGNAL(sendGameCommand(GameCommand *, int)), this, SLOT(sendGameCommand(GameCommand *, int)));
 	
 	QVBoxLayout *verticalLayout = new QVBoxLayout;
 	verticalLayout->addWidget(cardInfo);
@@ -90,26 +183,17 @@ TabGame::TabGame(AbstractClient *_client, int _gameId, const QString &_gameDescr
 	verticalLayout->addWidget(messageLog, 3);
 	verticalLayout->addLayout(hLayout);
 
-	QHBoxLayout *mainLayout = new QHBoxLayout;
+	mainLayout = new QHBoxLayout;
 	mainLayout->addWidget(phasesToolbar);
 	mainLayout->addWidget(gameView, 10);
-	mainLayout->addWidget(deckViewContainer, 10);
+	mainLayout->addLayout(deckViewContainerLayout, 10);
 	mainLayout->addLayout(verticalLayout);
 
-	if (spectator) {
-		if (!spectatorsCanTalk) {
-			sayLabel->hide();
-			sayEdit->hide();
-		}
-		loadLocalButton->hide();
-		loadRemoteButton->hide();
-		readyStartButton->hide();
+	if (spectator && !spectatorsCanTalk) {
+		sayLabel->hide();
+		sayEdit->hide();
 	}
 
-	connect(loadLocalButton, SIGNAL(clicked()), this, SLOT(loadLocalDeck()));
-	connect(loadRemoteButton, SIGNAL(clicked()), this, SLOT(loadRemoteDeck()));
-	connect(readyStartButton, SIGNAL(clicked()), this, SLOT(readyStart()));
-	
 	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(actSay()));
 
 	// Menu actions
@@ -147,6 +231,8 @@ TabGame::~TabGame()
 		delete i.next().value();
 	players.clear();
 	
+	delete deckViewContainerLayout;
+	
 	emit gameClosing(this);
 }
 
@@ -163,15 +249,15 @@ void TabGame::retranslateUi()
 	aConcede->setShortcut(tr("F2"));
 	aLeaveGame->setText(tr("&Leave game"));
 	
-	loadLocalButton->setText(tr("Load &local deck"));
-	loadRemoteButton->setText(tr("Load d&eck from server"));
-	readyStartButton->setText(tr("Ready to s&tart"));
 	sayLabel->setText(tr("&Say:"));
 	cardInfo->retranslateUi();
 
 	QMapIterator<int, Player *> i(players);
 	while (i.hasNext())
 		i.next().value()->retranslateUi();
+	QMapIterator<int, DeckViewContainer *> j(deckViewContainers);
+	while (j.hasNext())
+		j.next().value()->retranslateUi();
 	
 	scene->retranslateUi();
 }
@@ -181,7 +267,7 @@ void TabGame::actConcede()
 	if (QMessageBox::question(this, tr("Concede"), tr("Are you sure you want to concede this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
 		return;
 
-	sendGameCommand(new Command_Concede);
+	sendGameCommand(new Command_Concede, getActiveLocalPlayer()->getId());
 }
 
 void TabGame::actLeaveGame()
@@ -189,14 +275,14 @@ void TabGame::actLeaveGame()
 	if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
 		return;
 
-	sendGameCommand(new Command_LeaveGame);
+	sendGameCommand(new Command_LeaveGame, getActiveLocalPlayer()->getId());
 	deleteLater();
 }
 
 void TabGame::actSay()
 {
 	if (!sayEdit->text().isEmpty()) {
-		sendGameCommand(new Command_Say(-1, sayEdit->text()));
+		sendGameCommand(new Command_Say(-1, sayEdit->text()), getActiveLocalPlayer()->getId());
 		sayEdit->clear();
 	}
 }
@@ -206,12 +292,12 @@ void TabGame::actNextPhase()
 	int phase = currentPhase;
 	if (++phase >= phasesToolbar->phaseCount())
 		phase = 0;
-	sendGameCommand(new Command_SetActivePhase(-1, phase));
+	sendGameCommand(new Command_SetActivePhase(-1, phase), getActiveLocalPlayer()->getId());
 }
 
 void TabGame::actNextTurn()
 {
-	sendGameCommand(new Command_NextTurn);
+	sendGameCommand(new Command_NextTurn, getActiveLocalPlayer()->getId());
 }
 
 void TabGame::actRemoveLocalArrows()
@@ -224,18 +310,31 @@ void TabGame::actRemoveLocalArrows()
 		QMapIterator<int, ArrowItem *> arrowIterator(player->getArrows());
 		while (arrowIterator.hasNext()) {
 			ArrowItem *a = arrowIterator.next().value();
-			sendGameCommand(new Command_DeleteArrow(-1, a->getId()));
+			sendGameCommand(new Command_DeleteArrow(-1, a->getId()), getActiveLocalPlayer()->getId());
 		}
 	}
 }
 
 Player *TabGame::addPlayer(int playerId, const QString &playerName)
 {
-	Player *newPlayer = new Player(playerName, playerId, playerId == localPlayerId, client, this);
+	bool local = ((clients.size() > 1) || (playerId == localPlayerId));
+	Player *newPlayer = new Player(playerName, playerId, local, this);
 	scene->addPlayer(newPlayer);
 
 	connect(newPlayer, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
 	messageLog->connectToPlayer(newPlayer);
+	
+	if (local && !spectator) {
+		AbstractClient *client;
+		if (clients.size() > 1)
+			client = clients.at(playerId);
+		else
+			client = clients.first();
+		DeckViewContainer *deckView = new DeckViewContainer(client, this);
+		connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
+		deckViewContainers.insert(playerId, deckView);
+		deckViewContainerLayout->addWidget(deckView);
+	}
 
 	tabMenu->insertMenu(playersSeparator, newPlayer->getPlayerMenu());
 	
@@ -283,13 +382,19 @@ void TabGame::processGameEventContainer(GameEventContainer *cont)
 	}
 }
 
-void TabGame::sendGameCommand(GameCommand *command)
+void TabGame::sendGameCommand(GameCommand *command, int playerId)
 {
 	command->setGameId(gameId);
+	
+	AbstractClient *client;
+	if (clients.size() > 1)
+		client = clients.at(playerId);
+	else
+		client = clients.first();
 	client->sendCommand(command);
 }
 
-void TabGame::sendCommandContainer(CommandContainer *cont)
+void TabGame::sendCommandContainer(CommandContainer *cont, int playerId)
 {
 	const QList<Command *> &cmdList = cont->getCommandList();
 	for (int i = 0; i < cmdList.size(); ++i) {
@@ -297,6 +402,12 @@ void TabGame::sendCommandContainer(CommandContainer *cont)
 		if (cmd)
 			cmd->setGameId(gameId);
 	}
+
+	AbstractClient *client;
+	if (clients.size() > 1)
+		client = clients.at(playerId);
+	else
+		client = clients.first();
 	client->sendCommandContainer(cont);
 }
 
@@ -304,11 +415,16 @@ void TabGame::startGame()
 {
 	currentPhase = -1;
 
-	readyStartButton->setReadyStart(false);
-	deckView->setLocked(false);
+	QMapIterator<int, DeckViewContainer *> i(deckViewContainers);
+	while (i.hasNext()) {
+		i.next();
+		i.value()->setReadyStart(false);
+		i.value()->hide();
+	}
+	mainLayout->removeItem(deckViewContainerLayout);
+	
 	playerListWidget->setGameStarted(true);
 	started = true;
-	deckViewContainer->hide();
 	gameView->show();
 	phasesToolbar->show();
 }
@@ -318,12 +434,18 @@ void TabGame::stopGame()
 	currentPhase = -1;
 	activePlayer = -1;
 	
+	QMapIterator<int, DeckViewContainer *> i(deckViewContainers);
+	while (i.hasNext()) {
+		i.next();
+		i.value()->show();
+	}
+	mainLayout->insertLayout(2, deckViewContainerLayout, 10);
+
 	playerListWidget->setActivePlayer(-1);
 	playerListWidget->setGameStarted(false);
 	started = false;
 	gameView->hide();
 	phasesToolbar->hide();
-	deckViewContainer->show();
 }
 
 void TabGame::eventSpectatorSay(Event_Say *event, GameEventContext * /*context*/)
@@ -361,8 +483,7 @@ void TabGame::eventGameStateChanged(Event_GameStateChanged *event, GameEventCont
 			player->processPlayerInfo(pl);
 			if (player->getLocal() && pl->getDeck()) {
 				Deck_PictureCacher::cachePictures(pl->getDeck(), this);
-				deckView->setDeck(new DeckList(pl->getDeck()));
-				readyStartButton->setEnabled(true);
+				deckViewContainers.value(player->getId())->setDeck(new DeckList(pl->getDeck()));
 			}
 		}
 	}
@@ -398,10 +519,8 @@ void TabGame::eventPlayerPropertiesChanged(Event_PlayerPropertiesChanged *event,
 	if (context) switch (context->getItemId()) {
 		case ItemId_Context_ReadyStart: {
 			bool ready = event->getProperties()->getReadyStart();
-			if (player->getLocal()) {
-				readyStartButton->setReadyStart(ready);
-				deckView->setLocked(ready);
-			}
+			if (player->getLocal())
+				deckViewContainers.value(player->getId())->setReadyStart(ready);
 			if (ready)
 				messageLog->logReadyStart(player);
 			else
@@ -500,64 +619,9 @@ void TabGame::eventPing(Event_Ping *event, GameEventContext * /*context*/)
 		playerListWidget->updatePing(pingList[i]->getPlayerId(), pingList[i]->getPingTime());
 }
 
-void TabGame::loadLocalDeck()
-{
-	QFileDialog dialog(this, tr("Load deck"));
-	QSettings settings;
-	dialog.setDirectory(settings.value("paths/decks").toString());
-	dialog.setNameFilters(DeckList::fileNameFilters);
-	if (!dialog.exec())
-		return;
-
-	QString fileName = dialog.selectedFiles().at(0);
-	DeckList::FileFormat fmt = DeckList::getFormatFromNameFilter(dialog.selectedNameFilter());
-	DeckList *deck = new DeckList;
-	if (!deck->loadFromFile(fileName, fmt)) {
-		delete deck;
-		// Error message
-		return;
-	}
-	
-	Command_DeckSelect *cmd = new Command_DeckSelect(gameId, deck, -1);
-	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(deckSelectFinished(ProtocolResponse *)));
-	client->sendCommand(cmd);
-}
-
-void TabGame::loadRemoteDeck()
-{
-	DlgLoadRemoteDeck dlg(client);
-	if (dlg.exec()) {
-		Command_DeckSelect *cmd = new Command_DeckSelect(gameId, 0, dlg.getDeckId());
-		connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(deckSelectFinished(ProtocolResponse *)));
-		client->sendCommand(cmd);
-	}
-}
-
-void TabGame::deckSelectFinished(ProtocolResponse *r)
-{
-	Response_DeckDownload *resp = qobject_cast<Response_DeckDownload *>(r);
-	if (!resp)
-		return;
-	
-	Deck_PictureCacher::cachePictures(resp->getDeck(), this);
-	deckView->setDeck(new DeckList(resp->getDeck()));
-	readyStartButton->setEnabled(true);
-}
-
-void TabGame::readyStart()
-{
-	client->sendCommand(new Command_ReadyStart(gameId, !readyStartButton->getReadyStart()));
-}
-
 void TabGame::newCardAdded(AbstractCardItem *card)
 {
 	connect(card, SIGNAL(hovered(AbstractCardItem *)), cardInfo, SLOT(setCard(AbstractCardItem *)));
-}
-
-void TabGame::sideboardPlanChanged()
-{
-	QList<MoveCardToZone *> newPlan = deckView->getSideboardPlan();
-	client->sendCommand(new Command_SetSideboardPlan(gameId, newPlan));
 }
 
 CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) const

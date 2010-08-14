@@ -20,6 +20,7 @@ class TabSupervisor : public QTabWidget {
 private:
 	QIcon *tabChangedIcon;
 	AbstractClient *client;
+	QList<AbstractClient *> localClients;
 	TabServer *tabServer;
 	TabDeckStorage *tabDeckStorage;
 	QMap<QString, TabChatChannel *> chatChannelTabs;
@@ -30,6 +31,7 @@ public:
 	~TabSupervisor();
 	void retranslateUi();
 	void start(AbstractClient *_client);
+	void startLocal(const QList<AbstractClient *> &_clients);
 	void stop();
 	int getGameCount() const { return gameTabs.size(); }
 signals:
@@ -38,6 +40,7 @@ private slots:
 	void updateCurrent(int index);
 	void updatePingTime(int value, int max);
 	void gameJoined(Event_GameJoined *event);
+	void localGameJoined(Event_GameJoined *event);
 	void gameLeft(TabGame *tab);
 	void addChatChannelTab(const QString &channelName);
 	void chatChannelLeft(TabChatChannel *tab);

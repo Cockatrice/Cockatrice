@@ -6,7 +6,6 @@
 #include <QMap>
 #include "carditem.h"
 
-class AbstractClient;
 class CardDatabase;
 class QMenu;
 class QAction;
@@ -171,8 +170,7 @@ public:
 	void clearArrows();
 	PlayerTarget *getPlayerTarget() const { return playerTarget; }
 
-	AbstractClient *client;
-	Player(const QString &_name, int _id, bool _local, AbstractClient *_client, TabGame *_parent);
+	Player(const QString &_name, int _id, bool _local, TabGame *_parent);
 	~Player();
 	void retranslateUi();
 	QMenu *getPlayerMenu() const { return playerMenu; }

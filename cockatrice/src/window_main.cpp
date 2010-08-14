@@ -80,11 +80,25 @@ void MainWindow::actDisconnect()
 
 void MainWindow::actSinglePlayer()
 {
+	bool ok;
+	int numberPlayers = QInputDialog::getInt(this, tr("Number of players"), tr("Please enter the number of players."), 2, 1, 8, 1, &ok);
+	if (!ok)
+		return;
+	
 	LocalServer *ls = new LocalServer(this);
 	LocalServerInterface *mainLsi = ls->newConnection();
-	LocalClient *mainClient = new LocalClient(mainLsi, this);
-	tabSupervisor->start(mainClient);
+	LocalClient *mainClient = new LocalClient(mainLsi, tr("Player %1").arg(1), this);
+	localClients.append(mainClient);
 	
+	for (int i = 0; i < numberPlayers - 1; ++i) {
+		LocalServerInterface *slaveLsi = ls->newConnection();
+		LocalClient *slaveClient = new LocalClient(slaveLsi, tr("Player %1").arg(i + 2), this);
+		localClients.append(slaveClient);
+	}
+	tabSupervisor->startLocal(localClients);
+	
+	Command_CreateGame *createCommand = new Command_CreateGame(QString(), QString(), numberPlayers, false, false, false, false);
+	mainClient->sendCommand(createCommand);
 }
 
 void MainWindow::actDeckEditor()

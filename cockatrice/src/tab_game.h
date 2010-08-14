@@ -39,6 +39,10 @@ class Player;
 class CardZone;
 class AbstractCardItem;
 class CardItem;
+class TabGame;
+class DeckList;
+class QVBoxLayout;
+class QHBoxLayout;
 
 class ReadyStartButton : public QPushButton {
 	Q_OBJECT
@@ -52,10 +56,33 @@ protected:
 	void paintEvent(QPaintEvent *event);
 };
 
+class DeckViewContainer : public QWidget {
+	Q_OBJECT
+private:
+	QPushButton *loadLocalButton, *loadRemoteButton;
+	ReadyStartButton *readyStartButton;
+	DeckView *deckView;
+	AbstractClient *client;
+private slots:
+	void loadLocalDeck();
+	void loadRemoteDeck();
+	void readyStart();
+	void deckSelectFinished(ProtocolResponse *r);
+	void sideboardPlanChanged();
+signals:
+	void newCardAdded(AbstractCardItem *card);
+public:
+	DeckViewContainer(AbstractClient *_client, TabGame *parent = 0);
+	void retranslateUi();
+	void setButtonsVisible(bool _visible);
+	void setReadyStart(bool ready);
+	void setDeck(DeckList *deck);
+};
+
 class TabGame : public Tab {
 	Q_OBJECT
 private:
-	AbstractClient *client;
+	QList<AbstractClient *> clients;
 	int gameId;
 	QString gameDescription;
 	int localPlayerId;
@@ -68,8 +95,6 @@ private:
 	int currentPhase;
 	int activePlayer;
 
-	QPushButton *loadLocalButton, *loadRemoteButton;
-	ReadyStartButton *readyStartButton;
 	CardInfoWidget *cardInfo;
 	PlayerListWidget *playerListWidget;
 	MessageLogWidget *messageLog;
@@ -78,8 +103,9 @@ private:
 	PhasesToolbar *phasesToolbar;
 	GameScene *scene;
 	GameView *gameView;
-	DeckView *deckView;
-	QWidget *deckViewContainer;
+	QMap<int, DeckViewContainer *> deckViewContainers;
+	QVBoxLayout *deckViewContainerLayout;
+	QHBoxLayout *mainLayout;
 	ZoneViewLayout *zoneLayout;
 	QAction *playersSeparator;
 	QMenu *playersMenu;
@@ -106,12 +132,7 @@ private:
 signals:
 	void gameClosing(TabGame *tab);
 private slots:
-	void loadLocalDeck();
-	void loadRemoteDeck();
-	void readyStart();
-	void deckSelectFinished(ProtocolResponse *r);
 	void newCardAdded(AbstractCardItem *card);
-	void sideboardPlanChanged();
 	
 	void actConcede();
 	void actLeaveGame();
@@ -120,7 +141,7 @@ private slots:
 	void actNextPhase();
 	void actNextTurn();
 public:
-	TabGame(AbstractClient *_client, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming);
+	TabGame(QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming);
 	~TabGame();
 	void retranslateUi();
 	const QMap<int, Player *> &getPlayers() const { return players; }
@@ -134,8 +155,8 @@ public:
 
 	void processGameEventContainer(GameEventContainer *cont);
 public slots:
-	void sendGameCommand(GameCommand *command);
-	void sendCommandContainer(CommandContainer *cont);
+	void sendGameCommand(GameCommand *command, int playerId);
+	void sendCommandContainer(CommandContainer *cont, int playerId);
 };
 
 #endif
