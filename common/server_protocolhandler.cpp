@@ -524,7 +524,7 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 	// Collision detection
 	if (targetzone->hasCoords())
 		for (int i = 0; i < targetzone->cards.size(); ++i)
-			if ((targetzone->cards[i]->getX() == x) && (targetzone->cards[i]->getY() == y))
+			if ((targetzone->cards[i]->getX() == x) && (targetzone->cards[i]->getY() == y) && (x != -1))
 				return RespContextError;
 		
 	int position = -1;
