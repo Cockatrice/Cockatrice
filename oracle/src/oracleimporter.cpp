@@ -82,6 +82,7 @@ CardInfo *OracleImporter::addCard(QString cardName, const QString &cardCost, con
 		// Workaround for card name weirdness
 		if (cardName.contains("XX"))
 			cardName.remove("XX");
+		cardName = cardName.replace("Æ", "Ae");
 		
 		bool mArtifact = false;
 		if (cardType.endsWith("Artifact"))
