@@ -511,8 +511,11 @@ QStringList CardDatabase::getAllColors() const
 	QHashIterator<QString, CardInfo *> cardIterator(cardHash);
 	while (cardIterator.hasNext()) {
 		const QStringList &cardColors = cardIterator.next().value()->getColors();
-		for (int i = 0; i < cardColors.size(); ++i)
-			colors.insert(cardColors[i]);
+		if (cardColors.isEmpty())
+			colors.insert("X");
+		else
+			for (int i = 0; i < cardColors.size(); ++i)
+				colors.insert(cardColors[i]);
 	}
 	return colors.toList();
 }

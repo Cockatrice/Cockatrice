@@ -87,7 +87,7 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 			return false;
 	
 	if (!cardColors.isEmpty())
-		if (QSet<QString>::fromList(info->getColors()).intersect(cardColors).isEmpty())
+		if (QSet<QString>::fromList(info->getColors()).intersect(cardColors).isEmpty() && !(info->getColors().isEmpty() && cardColors.contains("X")))
 			return false;
 		
 	if (!cardTypes.isEmpty())
