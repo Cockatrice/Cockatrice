@@ -111,7 +111,6 @@ void TableZone::reorganizeCards()
 		QPointF mapPoint = mapFromGrid(gridPoint);
 		qreal x = mapPoint.x();
 		qreal y = mapPoint.y();
-		qDebug() << "gridPos=" << gridPoint << "mapPoint=" << mapPoint;
 		
 		int numberAttachedCards = cards[i]->getAttachedCards().size();
 		qreal actualX = x + numberAttachedCards * CARD_WIDTH / 3.0;
