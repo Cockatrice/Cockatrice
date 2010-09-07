@@ -152,20 +152,20 @@ void PhasesToolbar::phaseButtonClicked()
 	PhaseButton *button = qobject_cast<PhaseButton *>(sender());
 	if (button->getActive())
 		button->triggerDoubleClickAction();
-	emit sendGameCommand(new Command_SetActivePhase(-1, buttonList.indexOf(button)));
+	emit sendGameCommand(new Command_SetActivePhase(-1, buttonList.indexOf(button)), -1);
 }
 
 void PhasesToolbar::actNextTurn()
 {
-	emit sendGameCommand(new Command_NextTurn);
+	emit sendGameCommand(new Command_NextTurn, -1);
 }
 
 void PhasesToolbar::actUntapAll()
 {
-	emit sendGameCommand(new Command_SetCardAttr(-1, "table", -1, "tapped", "0"));
+	emit sendGameCommand(new Command_SetCardAttr(-1, "table", -1, "tapped", "0"), -1);
 }
 
 void PhasesToolbar::actDrawCard()
 {
-	emit sendGameCommand(new Command_DrawCards(-1, 1));
+	emit sendGameCommand(new Command_DrawCards(-1, 1), -1);
 }

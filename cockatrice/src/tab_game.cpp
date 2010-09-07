@@ -384,8 +384,10 @@ void TabGame::processGameEventContainer(GameEventContainer *cont)
 
 void TabGame::sendGameCommand(GameCommand *command, int playerId)
 {
+	if (playerId == -1)
+		playerId = getActiveLocalPlayer()->getId();
+
 	command->setGameId(gameId);
-	
 	AbstractClient *client;
 	if (clients.size() > 1)
 		client = clients.at(playerId);
@@ -396,6 +398,9 @@ void TabGame::sendGameCommand(GameCommand *command, int playerId)
 
 void TabGame::sendCommandContainer(CommandContainer *cont, int playerId)
 {
+	if (playerId == -1)
+		playerId = getActiveLocalPlayer()->getId();
+
 	const QList<Command *> &cmdList = cont->getCommandList();
 	for (int i = 0; i < cmdList.size(); ++i) {
 		GameCommand *cmd = qobject_cast<GameCommand *>(cmdList[i]);

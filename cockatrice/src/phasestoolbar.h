@@ -45,7 +45,7 @@ private slots:
 	void actUntapAll();
 	void actDrawCard();
 signals:
-	void sendGameCommand(GameCommand *command);
+	void sendGameCommand(GameCommand *command, int playerId);
 };
 
 #endif
