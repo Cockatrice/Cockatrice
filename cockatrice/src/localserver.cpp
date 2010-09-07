@@ -13,5 +13,6 @@ LocalServer::~LocalServer()
 LocalServerInterface *LocalServer::newConnection()
 {
 	LocalServerInterface *lsi = new LocalServerInterface(this);
+	addClient(lsi);
 	return lsi;
 }

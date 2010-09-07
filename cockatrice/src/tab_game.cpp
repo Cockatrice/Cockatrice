@@ -328,8 +328,10 @@ Player *TabGame::addPlayer(int playerId, const QString &playerName)
 		AbstractClient *client;
 		if (clients.size() > 1)
 			client = clients.at(playerId);
-		else
+		else {
 			client = clients.first();
+			newPlayer->setShortcutsActive();
+		}
 		DeckViewContainer *deckView = new DeckViewContainer(client, this);
 		connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
 		deckViewContainers.insert(playerId, deckView);
@@ -590,7 +592,15 @@ Player *TabGame::setActivePlayer(int id)
 	QMapIterator<int, Player *> i(players);
 	while (i.hasNext()) {
 		i.next();
-		i.value()->setActive(i.value() == player);
+		if (i.value() == player) {
+			i.value()->setActive(true);
+			if (clients.size() > 1)
+				i.value()->setShortcutsActive();
+		} else {
+			i.value()->setActive(false);
+			if (clients.size() > 1)
+				i.value()->setShortcutsInactive();
+		}
 	}
 	currentPhase = -1;
 	emit userEvent();

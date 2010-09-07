@@ -185,6 +185,8 @@ public:
 	QMenu *getCardMenu() const;
 	bool getActive() const { return active; }
 	void setActive(bool _active);
+	void setShortcutsActive();
+	void setShortcutsInactive();
 	
 	qreal getMinimumWidth() const;
 	void setMirrored(bool _mirrored);

@@ -20,6 +20,7 @@ TabSupervisor::	TabSupervisor(QWidget *parent)
 
 TabSupervisor::~TabSupervisor()
 {
+	stop();
 	delete tabChangedIcon;
 }
 
@@ -78,11 +79,22 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
 
 void TabSupervisor::stop()
 {
-	if (!client)
+	if ((!client) && localClients.isEmpty())
 		return;
 	
-	disconnect(client, 0, this, 0);
+	if (client) {
+		disconnect(client, 0, this, 0);
+		client = 0;
+	}
 	
+	if (!localClients.isEmpty()) {
+		for (int i = 0; i < localClients.size(); ++i)
+			localClients[i]->deleteLater();
+		localClients.clear();
+		
+		emit localGameEnded();
+	}
+
 	clear();
 	
 	delete tabServer;
@@ -93,12 +105,12 @@ void TabSupervisor::stop()
 	
 	QMapIterator<QString, TabChatChannel *> chatChannelIterator(chatChannelTabs);
 	while (chatChannelIterator.hasNext())
-		delete chatChannelIterator.next().value();
+		chatChannelIterator.next().value()->deleteLater();
 	chatChannelTabs.clear();
 
 	QMapIterator<int, TabGame *> gameIterator(gameTabs);
 	while (gameIterator.hasNext())
-		delete gameIterator.next().value();
+		gameIterator.next().value()->deleteLater();
 	gameTabs.clear();
 }
 
@@ -128,7 +140,6 @@ void TabSupervisor::localGameJoined(Event_GameJoined *event)
 	setCurrentWidget(tab);
 	
 	for (int i = 1; i < localClients.size(); ++i) {
-		qDebug("JOINING");
 		Command_JoinGame *cmd = new Command_JoinGame(event->getGameId());
 		localClients[i]->sendCommand(cmd);
 	}
@@ -140,6 +151,9 @@ void TabSupervisor::gameLeft(TabGame *tab)
 
 	gameTabs.remove(tab->getGameId());
 	removeTab(indexOf(tab));
+	
+	if (!localClients.isEmpty())
+		stop();
 }
 
 void TabSupervisor::addChatChannelTab(const QString &channelName)

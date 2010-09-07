@@ -27,6 +27,7 @@
 class TabSupervisor;
 class RemoteClient;
 class LocalClient;
+class LocalServer;
 
 class MainWindow : public QMainWindow {
 	Q_OBJECT
@@ -37,6 +38,7 @@ private slots:
 	void serverError(ResponseCode r);
 	void socketError(const QString &errorStr);
 	void protocolVersionMismatch(int localVersion, int remoteVersion);
+	void localGameEnded();
 
 	void actConnect();
 	void actDisconnect();
@@ -56,7 +58,7 @@ private:
 	TabSupervisor *tabSupervisor;
 
 	RemoteClient *client;
-	QList<AbstractClient *> localClients;
+	LocalServer *localServer;
 public:
 	MainWindow(QWidget *parent = 0);
 protected:

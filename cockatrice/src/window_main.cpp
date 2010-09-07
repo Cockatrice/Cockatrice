@@ -48,10 +48,12 @@ void MainWindow::statusChanged(ClientStatus _status)
 			break;
 		case StatusDisconnected:
 			tabSupervisor->stop();
+			aSinglePlayer->setEnabled(true);
 			aConnect->setEnabled(true);
 			aDisconnect->setEnabled(false);
 			break;
 		case StatusLoggingIn:
+			aSinglePlayer->setEnabled(false);
 			aConnect->setEnabled(false);
 			aDisconnect->setEnabled(true);
 			break;
@@ -85,13 +87,17 @@ void MainWindow::actSinglePlayer()
 	if (!ok)
 		return;
 	
-	LocalServer *ls = new LocalServer(this);
-	LocalServerInterface *mainLsi = ls->newConnection();
+	aConnect->setEnabled(false);
+	aSinglePlayer->setEnabled(false);
+	
+	localServer = new LocalServer(this);
+	LocalServerInterface *mainLsi = localServer->newConnection();
 	LocalClient *mainClient = new LocalClient(mainLsi, tr("Player %1").arg(1), this);
+	QList<AbstractClient *> localClients;
 	localClients.append(mainClient);
 	
 	for (int i = 0; i < numberPlayers - 1; ++i) {
-		LocalServerInterface *slaveLsi = ls->newConnection();
+		LocalServerInterface *slaveLsi = localServer->newConnection();
 		LocalClient *slaveClient = new LocalClient(slaveLsi, tr("Player %1").arg(i + 2), this);
 		localClients.append(slaveClient);
 	}
@@ -99,6 +105,15 @@ void MainWindow::actSinglePlayer()
 	
 	Command_CreateGame *createCommand = new Command_CreateGame(QString(), QString(), numberPlayers, false, false, false, false);
 	mainClient->sendCommand(createCommand);
+}
+
+void MainWindow::localGameEnded()
+{
+	delete localServer;
+	localServer = 0;
+	
+	aConnect->setEnabled(true);
+	aSinglePlayer->setEnabled(true);
 }
 
 void MainWindow::actDeckEditor()
@@ -214,7 +229,7 @@ void MainWindow::createMenus()
 }
 
 MainWindow::MainWindow(QWidget *parent)
-	: QMainWindow(parent), tabMenu(0)
+	: QMainWindow(parent), tabMenu(0), localServer(0)
 {
 	QPixmapCache::setCacheLimit(200000);
 
@@ -227,6 +242,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 	tabSupervisor = new TabSupervisor;
 	connect(tabSupervisor, SIGNAL(setMenu(QMenu *)), this, SLOT(updateTabMenu(QMenu *)));
+	connect(tabSupervisor, SIGNAL(localGameEnded()), this, SLOT(localGameEnded()));
 	
 	setCentralWidget(tabSupervisor);
 

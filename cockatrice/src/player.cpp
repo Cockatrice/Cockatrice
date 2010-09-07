@@ -300,19 +300,12 @@ void Player::retranslateUi()
 		aMoveRfgToHand->setText(tr("Move to &hand"));
 		aMoveRfgToGrave->setText(tr("Move to g&raveyard"));
 		aViewLibrary->setText(tr("&View library"));
-		aViewLibrary->setShortcut(tr("F3"));
 		aViewTopCards->setText(tr("View &top cards of library..."));
-		aViewTopCards->setShortcut(tr("Ctrl+W"));
-		aViewGraveyard->setShortcut(tr("F4"));
 		aViewSideboard->setText(tr("&View sideboard"));
 		aDrawCard->setText(tr("&Draw card"));
-		aDrawCard->setShortcut(tr("Ctrl+D"));
 		aDrawCards->setText(tr("D&raw cards..."));
-		aDrawCards->setShortcut(tr("Ctrl+E"));
-                aMulligan->setText(tr("Take &mulligan"));
-                aMulligan->setShortcut(tr("Ctrl+M"));
+		aMulligan->setText(tr("Take &mulligan"));
 		aShuffle->setText(tr("&Shuffle"));
-		aShuffle->setShortcut(tr("Ctrl+S"));
 	
 		handMenu->setTitle(tr("&Hand"));
 		sbMenu->setTitle(tr("&Sideboard"));
@@ -320,13 +313,9 @@ void Player::retranslateUi()
 		countersMenu->setTitle(tr("&Counters"));
 
 		aUntapAll->setText(tr("&Untap all permanents"));
-		aUntapAll->setShortcut(tr("Ctrl+U"));
 		aRollDie->setText(tr("R&oll die..."));
-		aRollDie->setShortcut(tr("Ctrl+I"));
 		aCreateToken->setText(tr("&Create token..."));
-		aCreateToken->setShortcut(tr("Ctrl+T"));
 		aCreateAnotherToken->setText(tr("C&reate another token"));
-		aCreateAnotherToken->setShortcut(tr("Ctrl+G"));
 		sayMenu->setTitle(tr("S&ay"));
 		
 		QMapIterator<int, Counter *> counterIterator(counters);
@@ -339,6 +328,44 @@ void Player::retranslateUi()
 	QMapIterator<QString, CardZone *> zoneIterator(zones);
 	while (zoneIterator.hasNext())
 		zoneIterator.next().value()->retranslateUi();
+}
+
+void Player::setShortcutsActive()
+{
+	aViewLibrary->setShortcut(tr("F3"));
+	aViewTopCards->setShortcut(tr("Ctrl+W"));
+	aViewGraveyard->setShortcut(tr("F4"));
+	aDrawCard->setShortcut(tr("Ctrl+D"));
+	aDrawCards->setShortcut(tr("Ctrl+E"));
+	aMulligan->setShortcut(tr("Ctrl+M"));
+	aShuffle->setShortcut(tr("Ctrl+S"));
+	aUntapAll->setShortcut(tr("Ctrl+U"));
+	aRollDie->setShortcut(tr("Ctrl+I"));
+	aCreateToken->setShortcut(tr("Ctrl+T"));
+	aCreateAnotherToken->setShortcut(tr("Ctrl+G"));
+
+	QMapIterator<int, Counter *> counterIterator(counters);
+	while (counterIterator.hasNext())
+		counterIterator.next().value()->setShortcutsActive();
+}
+
+void Player::setShortcutsInactive()
+{
+	aViewLibrary->setShortcut(QKeySequence());
+	aViewTopCards->setShortcut(QKeySequence());
+	aViewGraveyard->setShortcut(QKeySequence());
+	aDrawCard->setShortcut(QKeySequence());
+	aDrawCards->setShortcut(QKeySequence());
+	aMulligan->setShortcut(QKeySequence());
+	aShuffle->setShortcut(QKeySequence());
+	aUntapAll->setShortcut(QKeySequence());
+	aRollDie->setShortcut(QKeySequence());
+	aCreateToken->setShortcut(QKeySequence());
+	aCreateAnotherToken->setShortcut(QKeySequence());
+
+	QMapIterator<int, Counter *> counterIterator(counters);
+	while (counterIterator.hasNext())
+		counterIterator.next().value()->setShortcutsInactive();
 }
 
 void Player::initSayMenu()

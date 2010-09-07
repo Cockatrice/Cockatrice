@@ -42,11 +42,24 @@ void Counter::retranslateUi()
 {
 	if (menu) {
 		aSet->setText(tr("&Set counter..."));
-		if (name == "life") {
-			aSet->setShortcut(tr("Ctrl+L"));
-			aDec->setShortcut(tr("F11"));
-			aInc->setShortcut(tr("F12"));
-		}
+	}
+}
+
+void Counter::setShortcutsActive()
+{
+	if (name == "life") {
+		aSet->setShortcut(tr("Ctrl+L"));
+		aDec->setShortcut(tr("F11"));
+		aInc->setShortcut(tr("F12"));
+	}
+}
+
+void Counter::setShortcutsInactive()
+{
+	if (name == "life") {
+		aSet->setShortcut(QKeySequence());
+		aDec->setShortcut(QKeySequence());
+		aInc->setShortcut(QKeySequence());
 	}
 }
 

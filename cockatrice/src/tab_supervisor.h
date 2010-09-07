@@ -36,6 +36,7 @@ public:
 	int getGameCount() const { return gameTabs.size(); }
 signals:
 	void setMenu(QMenu *menu);
+	void localGameEnded();
 private slots:
 	void updateCurrent(int index);
 	void updatePingTime(int value, int max);

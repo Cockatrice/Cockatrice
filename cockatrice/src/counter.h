@@ -37,6 +37,9 @@ public:
 	QString getName() const { return name; }
 	int getValue() const { return value; }
 	void setValue(int _value);
+	
+	void setShortcutsActive();
+	void setShortcutsInactive();
 };
 
 #endif

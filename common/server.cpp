@@ -22,6 +22,7 @@
 #include "server_counter.h"
 #include "server_chatchannel.h"
 #include "server_protocolhandler.h"
+#include <QDebug>
 
 Server::Server(QObject *parent)
 	: QObject(parent), nextGameId(0)
@@ -30,6 +31,8 @@ Server::Server(QObject *parent)
 
 Server::~Server()
 {
+	while (!clients.isEmpty())
+		delete clients.takeFirst();
 }
 
 Server_Game *Server::createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator)
