@@ -111,9 +111,7 @@ void TableZone::reorganizeCards()
 		QPointF mapPoint = mapFromGrid(gridPoint);
 		qreal x = mapPoint.x();
 		qreal y = mapPoint.y();
-		
-		if (player->getMirrored())
-			y = height - CARD_HEIGHT - y;
+		qDebug() << "gridPos=" << gridPoint << "mapPoint=" << mapPoint;
 		
 		int numberAttachedCards = cards[i]->getAttachedCards().size();
 		qreal actualX = x + numberAttachedCards * CARD_WIDTH / 3.0;
@@ -207,7 +205,6 @@ CardItem *TableZone::getCardFromCoords(const QPointF &point) const
 	return getCardFromGrid(gridPoint);
 }
 
-	
 QPointF TableZone::mapFromGrid(const QPoint &gridPoint) const
 {
 	if ((gridPoint.y() == 3) && (settingsCache->getEconomicGrid()))
@@ -219,18 +216,24 @@ QPointF TableZone::mapFromGrid(const QPoint &gridPoint) const
 		qreal x = marginX + 0.5 * CARD_WIDTH * gridPoint.x();
 		for (int i = 0; i < gridPoint.x(); ++i)
 			x += gridPointWidth.value(gridPoint.y() * 1000 + i, CARD_WIDTH);
-
-		return QPointF(
-			x,
-			boxLineWidth + (CARD_HEIGHT + paddingY) * gridPoint.y()
-		);
+		
+		qreal y = boxLineWidth + (CARD_HEIGHT + paddingY) * gridPoint.y();
+		
+		if (player->getMirrored())
+			y = height - CARD_HEIGHT - y;
+		
+		return QPointF(x, y);
 	}
 }
 
 QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 {
 	qreal x = mapPoint.x() - marginX;
-	qreal y = mapPoint.y() + paddingY / 2 - boxLineWidth;
+	qreal y = mapPoint.y();
+	if (player->getMirrored())
+		y = height - y;
+	y += paddingY / 2 - boxLineWidth;
+	
 	if (x < 0)
 		x = 0;
 	else if (x > width - CARD_WIDTH - marginX)

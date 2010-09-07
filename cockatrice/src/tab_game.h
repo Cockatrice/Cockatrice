@@ -153,7 +153,7 @@ public:
 	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
 	Player *getActiveLocalPlayer() const;
 
-	void processGameEventContainer(GameEventContainer *cont);
+	void processGameEventContainer(GameEventContainer *cont, AbstractClient *client);
 public slots:
 	void sendGameCommand(GameCommand *command, int playerId);
 	void sendCommandContainer(CommandContainer *cont, int playerId);
