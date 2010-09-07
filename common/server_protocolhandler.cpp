@@ -958,18 +958,7 @@ ResponseCode Server_ProtocolHandler::cmdNextTurn(Command_NextTurn * /*cmd*/, Com
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
 	
-	const QMap<int, Server_Player *> &players = game->getPlayers();
-	const QList<int> keys = players.keys();
-	
-	int activePlayer = game->getActivePlayer();
-	int listPos = keys.indexOf(activePlayer);
-	do {
-		++listPos;
-		if (listPos == keys.size())
-			listPos = 0;
-	} while (players.value(keys[listPos])->getSpectator());
-	
-	game->setActivePlayer(keys[listPos]);
+	game->nextTurn();
 	return RespOk;
 }
 

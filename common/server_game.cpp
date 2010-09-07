@@ -138,7 +138,8 @@ void Server_Game::startGameIfReady()
 		query.exec();
 	}
 */	
-	setActivePlayer(players.keys().first());
+	activePlayer = -1;
+	nextTurn();
 }
 
 void Server_Game::stopGameIfFinished()
@@ -252,6 +253,21 @@ void Server_Game::setActivePhase(int _activePhase)
 	
 	activePhase = _activePhase;
 	sendGameEvent(new Event_SetActivePhase(-1, activePhase));
+}
+
+void Server_Game::nextTurn()
+{
+	const QList<int> keys = players.keys();
+	int listPos = -1;
+	if (activePlayer != -1)
+		listPos = keys.indexOf(activePlayer);
+	do {
+		++listPos;
+		if (listPos == keys.size())
+			listPos = 0;
+	} while (players.value(keys[listPos])->getSpectator());
+	
+	setActivePlayer(keys[listPos]);
 }
 
 QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAsking) const
