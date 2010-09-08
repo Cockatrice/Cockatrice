@@ -1,4 +1,21 @@
-#include <QtGui>
+#include <QLabel>
+#include <QToolButton>
+#include <QTreeView>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QToolBar>
+#include <QTextEdit>
+#include <QMenu>
+#include <QAction>
+#include <QCloseEvent>
+#include <QFileDialog>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QPrintPreviewDialog>
+#include <QHeaderView>
+#include <QApplication>
+#include <QClipboard>
+#include <QTextStream>
 #include "window_deckeditor.h"
 #include "window_sets.h"
 #include "carddatabase.h"
@@ -9,6 +26,7 @@
 #include "dlg_cardsearch.h"
 #include "dlg_load_deck_from_clipboard.h"
 #include "main.h"
+#include "settingscache.h"
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
@@ -270,8 +288,7 @@ void WndDeckEditor::actLoadDeck()
 		return;
 
 	QFileDialog dialog(this, tr("Load deck"));
-	QSettings settings;
-	dialog.setDirectory(settings.value("paths/decks").toString());
+	dialog.setDirectory(settingsCache->getDeckPath());
 	dialog.setNameFilters(DeckList::fileNameFilters);
 	if (!dialog.exec())
 		return;
@@ -299,8 +316,7 @@ bool WndDeckEditor::actSaveDeck()
 bool WndDeckEditor::actSaveDeckAs()
 {
 	QFileDialog dialog(this, tr("Save deck"));
-	QSettings settings;
-	dialog.setDirectory(settings.value("paths/decks").toString());
+	dialog.setDirectory(settingsCache->getDeckPath());
 	dialog.setAcceptMode(QFileDialog::AcceptSave);
 	dialog.setConfirmOverwrite(true);
 	dialog.setDefaultSuffix("cod");

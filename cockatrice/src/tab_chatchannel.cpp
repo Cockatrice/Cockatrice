@@ -1,4 +1,10 @@
-#include <QtGui>
+#include <QListWidget>
+#include <QTextEdit>
+#include <QLineEdit>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QMenu>
+#include <QAction>
 #include "tab_chatchannel.h"
 #include "abstractclient.h"
 #include "protocol_items.h"

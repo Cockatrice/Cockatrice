@@ -17,7 +17,13 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include <QtGui>
+#include <QMenu>
+#include <QAction>
+#include <QCloseEvent>
+#include <QMessageBox>
+#include <QMenuBar>
+#include <QPixmapCache>
+#include <QInputDialog>
 
 #include "window_main.h"
 #include "dlg_connect.h"

@@ -1,4 +1,7 @@
-#include <QtGui>
+#include <QMenu>
+#include <QAction>
+#include <QGraphicsSceneMouseEvent>
+#include <QDebug>
 #include "cardzone.h"
 #include "carditem.h"
 #include "player.h"
@@ -14,7 +17,7 @@ CardZone::CardZone(Player *_p, const QString &_name, bool _hasCardAttr, bool _is
 
 CardZone::~CardZone()
 {
-	qDebug(QString("CardZone destructor: %1").arg(name).toLatin1());
+	qDebug() << "CardZone destructor: " << name;
 	delete view;
 	clearContents();
 }
@@ -34,7 +37,7 @@ void CardZone::clearContents()
 		for (int j = 0; j < attachedCards.size(); ++j)
 			attachedCards[j]->setParentItem(attachedCards[j]->getZone());
 		
-		delete cards.at(i);
+		player->deleteCard(cards.at(i));
 	}
 	cards.clear();
 	emit cardCountChanged();

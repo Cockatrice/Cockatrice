@@ -1,4 +1,7 @@
-#include <QtGui>
+#include <QPainter>
+#include <QSet>
+#include <QGraphicsScene>
+#include <math.h>
 #include "tablezone.h"
 #include "player.h"
 #include "protocol_items.h"

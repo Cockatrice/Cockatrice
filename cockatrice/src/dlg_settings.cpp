@@ -1,5 +1,21 @@
-#include <QtGui>
-
+#include <QLabel>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QGroupBox>
+#include <QPushButton>
+#include <QGridLayout>
+#include <QListWidget>
+#include <QStackedWidget>
+#include <QCloseEvent>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QToolBar>
+#include <QTranslator>
+#include <QAction>
+#include <QSettings>
+#include <QApplication>
+#include <QInputDialog>
 #include "carddatabase.h"
 #include "dlg_settings.h"
 #include "main.h"

@@ -1,4 +1,5 @@
-#include <QtGui>
+#include <math.h>
+#include <QDebug>
 #include "zoneviewzone.h"
 #include "player.h"
 #include "protocol_items.h"

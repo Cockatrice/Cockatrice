@@ -1,4 +1,11 @@
-#include <QtGui>
+#include <QLabel>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QPushButton>
+#include <QCheckBox>
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include "dlg_create_token.h"
 
 DlgCreateToken::DlgCreateToken(QWidget *parent)

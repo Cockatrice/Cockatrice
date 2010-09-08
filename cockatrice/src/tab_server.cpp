@@ -1,4 +1,14 @@
-#include <QtGui>
+#include <QTreeView>
+#include <QCheckBox>
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QTreeWidget>
+#include <QTextEdit>
+#include <QMessageBox>
+#include <QLineEdit>
+#include <QHeaderView>
+#include <QInputDialog>
 #include "tab_server.h"
 #include "gamesmodel.h"
 #include "dlg_creategame.h"

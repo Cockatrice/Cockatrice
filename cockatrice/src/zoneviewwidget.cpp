@@ -1,4 +1,6 @@
-#include <QtGui>
+#include <QGraphicsLinearLayout>
+#include <QGraphicsProxyWidget>
+#include <QCheckBox>
 #include "zoneviewwidget.h"
 #include "carditem.h"
 #include "zoneviewzone.h"

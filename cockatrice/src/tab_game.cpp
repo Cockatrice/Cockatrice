@@ -1,4 +1,9 @@
-#include <QtGui>
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QMenu>
+#include <QAction>
+#include <QMessageBox>
+#include <QFileDialog>
 #include "tab_game.h"
 #include "cardinfowidget.h"
 #include "playerlistwidget.h"
@@ -18,6 +23,7 @@
 #include "carditem.h"
 #include "arrowitem.h"
 #include "main.h"
+#include "settingscache.h"
 
 ReadyStartButton::ReadyStartButton(QWidget *parent)
 	: QPushButton(parent), readyStart(false)
@@ -88,8 +94,7 @@ void DeckViewContainer::setButtonsVisible(bool _visible)
 void DeckViewContainer::loadLocalDeck()
 {
 	QFileDialog dialog(this, tr("Load deck"));
-	QSettings settings;
-	dialog.setDirectory(settings.value("paths/decks").toString());
+	dialog.setDirectory(settingsCache->getDeckPath());
 	dialog.setNameFilters(DeckList::fileNameFilters);
 	if (!dialog.exec())
 		return;

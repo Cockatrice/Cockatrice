@@ -1,4 +1,8 @@
-#include <QtGui>
+#include <QSettings>
+#include <QLabel>
+#include <QPushButton>
+#include <QGridLayout>
+#include <QHBoxLayout>
 #include "dlg_connect.h"
 
 DlgConnect::DlgConnect(QWidget *parent)

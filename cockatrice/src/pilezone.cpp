@@ -1,4 +1,6 @@
-#include <QtGui>
+#include <QPainter>
+#include <QGraphicsSceneMouseEvent>
+#include <QApplication>
 #include "pilezone.h"
 #include "player.h"
 #include "carddragitem.h"
@@ -20,7 +22,6 @@ QRectF PileZone::boundingRect() const
 
 void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-	qDebug("PileZone::paint");
 	if (!cards.isEmpty()) {
 		painter->save();
 		cards.at(0)->paint(painter, option, widget);
@@ -51,7 +52,6 @@ void PileZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*
 
 void PileZone::reorganizeCards()
 {
-	qDebug(QString("PileZone: reorganize, x=%1, y=%2, w=%3, h=%4").arg(boundingRect().x()).arg(boundingRect().y()).arg(boundingRect().width()).arg(boundingRect().height()).toLatin1());
 	update();
 }
 

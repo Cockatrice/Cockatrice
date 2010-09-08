@@ -1,4 +1,13 @@
-#include <QtGui>
+#include <QLabel>
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QPushButton>
+#include <QGridLayout>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QSpinBox>
+#include <QGroupBox>
+#include <QMessageBox>
 #include "dlg_creategame.h"
 #include "protocol_items.h"
 

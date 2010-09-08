@@ -1,7 +1,9 @@
-#include <QtGui>
+#include <QApplication>
+#include <QGraphicsSceneMouseEvent>
 #include "deckview.h"
 #include "decklist.h"
 #include "carddatabase.h"
+#include "settingscache.h"
 #include "main.h"
 
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag)
@@ -117,8 +119,7 @@ void DeckViewCard::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 DeckViewCardContainer::DeckViewCardContainer(const QString &_name)
 	: QGraphicsItem(), name(_name), width(0), height(0), maxWidth(0)
 {
-	QSettings settings;
-	QString bgPath = settings.value("zonebg/table").toString();
+	QString bgPath = settingsCache->getTableBgPath();
 	if (!bgPath.isEmpty())
 		bgPixmap.load(bgPath);
 

@@ -1,5 +1,9 @@
 #include <QApplication>
-#include <QtGui>
+#include <QPainter>
+#include <QMenu>
+#include <QAction>
+#include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
 #include "carditem.h"
 #include "carddragitem.h"
 #include "carddatabase.h"

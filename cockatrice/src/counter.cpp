@@ -1,10 +1,13 @@
 #include "counter.h"
 #include "player.h"
 #include "protocol_items.h"
-#include <QtGui>
+#include <QPainter>
+#include <QMenu>
+#include <QAction>
+#include <QGraphicsSceneMouseEvent>
 
 Counter::Counter(Player *_player, int _id, const QString &_name, QColor _color, int _radius, int _value, QGraphicsItem *parent)
-	: QGraphicsItem(parent), player(_player), id(_id), name(_name), color(_color), radius(_radius), value(_value), aDec(0), aInc(0)
+	: QGraphicsItem(parent), player(_player), id(_id), name(_name), color(_color), radius(_radius), value(_value), aDec(0), aInc(0), dialogSemaphore(false), deleteAfterDialog(false)
 {
 	if (radius > Player::counterAreaWidth / 2)
 		radius = Player::counterAreaWidth / 2;
@@ -36,6 +39,14 @@ Counter::Counter(Player *_player, int _id, const QString &_name, QColor _color, 
 Counter::~Counter()
 {
 	delete menu;
+}
+
+void Counter::delCounter()
+{
+	if (dialogSemaphore)
+		deleteAfterDialog = true;
+	else
+		deleteLater();
 }
 
 void Counter::retranslateUi()
@@ -112,7 +123,13 @@ void Counter::incrementCounter()
 void Counter::setCounter()
 {
 	bool ok;
+	dialogSemaphore = true;
 	int newValue = QInputDialog::getInteger(0, tr("Set counter"), tr("New value for counter '%1':").arg(name), value, 0, 2000000000, 1, &ok);
+	if (deleteAfterDialog) {
+		deleteLater();
+		return;
+	}
+	dialogSemaphore = false;
 	if (ok)
 		player->sendGameCommand(new Command_SetCounter(-1, id, newValue));
 }

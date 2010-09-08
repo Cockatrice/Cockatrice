@@ -21,7 +21,7 @@
 #include <QDebug>
 
 Player::Player(const QString &_name, int _id, bool _local, TabGame *_parent)
-	: QObject(_parent), defaultNumberTopCards(3), lastTokenDestroy(true), name(_name), id(_id), active(false), local(_local), mirrored(false)
+	: QObject(_parent), shortcutsActive(false), defaultNumberTopCards(3), lastTokenDestroy(true), name(_name), id(_id), active(false), local(_local), mirrored(false), dialogSemaphore(false)
 {
 	setCacheMode(DeviceCoordinateCache);
 	
@@ -332,6 +332,8 @@ void Player::retranslateUi()
 
 void Player::setShortcutsActive()
 {
+	shortcutsActive = true;
+	
 	aViewLibrary->setShortcut(tr("F3"));
 	aViewTopCards->setShortcut(tr("Ctrl+W"));
 	aViewGraveyard->setShortcut(tr("F4"));
@@ -351,6 +353,8 @@ void Player::setShortcutsActive()
 
 void Player::setShortcutsInactive()
 {
+	shortcutsActive = false;
+	
 	aViewLibrary->setShortcut(QKeySequence());
 	aViewTopCards->setShortcut(QKeySequence());
 	aViewGraveyard->setShortcut(QKeySequence());
@@ -880,6 +884,14 @@ void Player::addCard(CardItem *c)
 	emit newCardAdded(c);
 }
 
+void Player::deleteCard(CardItem *c)
+{
+	if (dialogSemaphore)
+		cardsToDelete.append(c);
+	else
+		delete c;
+}
+
 void Player::addZone(CardZone *z)
 {
 	zones.insert(z->getName(), z);
@@ -896,6 +908,8 @@ Counter *Player::addCounter(int counterId, const QString &name, QColor color, in
 	counters.insert(counterId, c);
 	if (countersMenu)
 		countersMenu->addMenu(c->getMenu());
+	if (shortcutsActive)
+		c->setShortcutsActive();
 	rearrangeCounters();
 	return c;
 }
@@ -906,7 +920,7 @@ void Player::delCounter(int counterId)
 	if (!c)
 		return;
 	counters.remove(counterId);
-	delete c;
+	c->delCounter();
 	rearrangeCounters();
 }
 
@@ -914,7 +928,7 @@ void Player::clearCounters()
 {
 	QMapIterator<int, Counter *> counterIterator(counters);
 	while (counterIterator.hasNext())
-		delete counterIterator.next().value();
+		counterIterator.next().value()->delCounter();
 	counters.clear();
 }
 
@@ -1016,6 +1030,18 @@ void Player::sendCommandContainer(CommandContainer *cont)
 	static_cast<TabGame *>(parent())->sendCommandContainer(cont, id);
 }
 
+bool Player::clearCardsToDelete()
+{
+	if (cardsToDelete.isEmpty())
+		return false;
+	
+	for (int i = 0; i < cardsToDelete.size(); ++i)
+		cardsToDelete[i]->deleteLater();
+	cardsToDelete.clear();
+	
+	return true;
+}
+
 void Player::cardMenuAction()
 {
 	QAction *a = static_cast<QAction *>(sender());
@@ -1073,13 +1099,17 @@ void Player::actSetPT()
 			oldPT = card->getPT();
 	}
 	bool ok;
+	dialogSemaphore = true;
 	QString pt = QInputDialog::getText(0, tr("Set power/toughness"), tr("Please enter the new PT:"), QLineEdit::Normal, oldPT, &ok);
+	dialogSemaphore = false;
+	if (clearCardsToDelete())
+		return;
 	if (!ok)
 		return;
 	
-	i.toFront();
-	while (i.hasNext()) {
-		CardItem *card = static_cast<CardItem *>(i.next());
+	QListIterator<QGraphicsItem *> j(scene()->selectedItems());
+	while (j.hasNext()) {
+		CardItem *card = static_cast<CardItem *>(j.next());
 		sendGameCommand(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "pt", pt));
 	}
 }
@@ -1095,7 +1125,11 @@ void Player::actSetAnnotation()
 	}
 	
 	bool ok;
+	dialogSemaphore = true;
 	QString annotation = QInputDialog::getText(0, tr("Set annotation"), tr("Please enter the new annotation:"), QLineEdit::Normal, oldAnnotation, &ok);
+	dialogSemaphore = false;
+	if (clearCardsToDelete())
+		return;
 	if (!ok)
 		return;
 	
@@ -1147,7 +1181,11 @@ void Player::actCardCounterTrigger()
 		}
 		case 11: {
 			bool ok;
+			dialogSemaphore = true;
 			int number = QInputDialog::getInteger(0, tr("Set counters"), tr("Number:"), 0, 0, MAX_COUNTERS_ON_CARD, 1, &ok);
+			dialogSemaphore = false;
+			if (clearCardsToDelete())
+				return;
 			if (!ok)
 				return;
 		

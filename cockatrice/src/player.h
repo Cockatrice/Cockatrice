@@ -106,6 +106,7 @@ private:
 		*aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,
 		*aCardMenu;
 
+	bool shortcutsActive;
 	int defaultNumberTopCards;
 	QString lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation;
 	bool lastTokenDestroy;
@@ -114,6 +115,10 @@ private:
 	bool active;
 	bool local;
 	bool mirrored;
+	
+	bool dialogSemaphore;
+	bool clearCardsToDelete();
+	QList<CardItem *> cardsToDelete;
 	
 	QMap<QString, CardZone *> zones;
 	TableZone *table;
@@ -157,6 +162,7 @@ public:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	
 	void addCard(CardItem *c);
+	void deleteCard(CardItem *c);
 	void addZone(CardZone *z);
 
 	Counter *addCounter(ServerInfo_Counter *counter);

@@ -1,17 +1,27 @@
-#include <QtGui>
+#include <QTreeView>
+#include <QFileSystemModel>
+#include <QSortFilterProxyModel>
+#include <QToolBar>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QAction>
+#include <QGroupBox>
+#include <QHeaderView>
+#include <QApplication>
+#include <QInputDialog>
 #include "tab_deck_storage.h"
 #include "remotedecklist_treewidget.h"
 #include "abstractclient.h"
 #include "decklist.h"
 #include "protocol_items.h"
 #include "window_deckeditor.h"
+#include "settingscache.h"
 
 TabDeckStorage::TabDeckStorage(AbstractClient *_client)
 	: Tab(), client(_client)
 {
 	localDirModel = new QFileSystemModel(this);
-	QSettings settings;
-	localDirModel->setRootPath(settings.value("paths/decks").toString());
+	localDirModel->setRootPath(settingsCache->getDeckPath());
 	
 	sortFilter = new QSortFilterProxyModel(this);
 	sortFilter->setSourceModel(localDirModel);

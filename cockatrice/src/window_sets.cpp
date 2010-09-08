@@ -1,7 +1,8 @@
 #include "window_sets.h"
 #include "setsmodel.h"
 #include "main.h"
-#include <QtGui>
+#include <QTreeView>
+#include <QHBoxLayout>
 
 WndSets::WndSets(QWidget *parent)
 	: QMainWindow(parent)

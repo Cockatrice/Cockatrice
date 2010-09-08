@@ -19,6 +19,7 @@ private:
 	
 	QAction *aSet, *aDec, *aInc;
 	QMenu *menu;
+	bool dialogSemaphore, deleteAfterDialog;
 private slots:
 	void incrementCounter();
 	void setCounter();
@@ -37,6 +38,7 @@ public:
 	QString getName() const { return name; }
 	int getValue() const { return value; }
 	void setValue(int _value);
+	void delCounter();
 	
 	void setShortcutsActive();
 	void setShortcutsInactive();
