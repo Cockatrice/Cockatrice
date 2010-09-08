@@ -365,7 +365,7 @@ ResponseCode Server_ProtocolHandler::cmdDeckSelect(Command_DeckSelect *cmd, Comm
 	}
 	player->setDeck(deck, cmd->getDeckId());
 	
-	game->sendGameEvent(new Event_PlayerPropertiesChanged(player->getProperties()), new Context_DeckSelect(cmd->getDeckId()));
+	game->sendGameEvent(new Event_PlayerPropertiesChanged(player->getPlayerId(), player->getProperties()), new Context_DeckSelect(cmd->getDeckId()));
 
 	cont->setResponse(new Response_DeckDownload(cont->getCmdId(), RespOk, new DeckList(deck)));
 	return RespNothing;
@@ -392,7 +392,7 @@ ResponseCode Server_ProtocolHandler::cmdConcede(Command_Concede * /*cmd*/, Comma
 		return RespFunctionNotAllowed;
 	
 	player->setConceded(true);
-	game->sendGameEvent(new Event_PlayerPropertiesChanged(player->getProperties()), new Context_Concede);
+	game->sendGameEvent(new Event_PlayerPropertiesChanged(player->getPlayerId(), player->getProperties()), new Context_Concede);
 	game->stopGameIfFinished();
 	return RespOk;
 }
@@ -409,7 +409,7 @@ ResponseCode Server_ProtocolHandler::cmdReadyStart(Command_ReadyStart *cmd, Comm
 		return RespContextError;
 	
 	player->setReadyStart(cmd->getReady());
-	game->sendGameEvent(new Event_PlayerPropertiesChanged(player->getProperties()), new Context_ReadyStart);
+	game->sendGameEvent(new Event_PlayerPropertiesChanged(player->getPlayerId(), player->getProperties()), new Context_ReadyStart);
 	game->startGameIfReady();
 	return RespOk;
 }

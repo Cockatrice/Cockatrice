@@ -234,7 +234,7 @@ void Server_Game::removePlayer(Server_Player *player)
 void Server_Game::setActivePlayer(int _activePlayer)
 {
 	activePlayer = _activePlayer;
-	sendGameEvent(new Event_SetActivePlayer(-1, activePlayer));
+	sendGameEvent(new Event_SetActivePlayer(activePlayer, activePlayer));
 	setActivePhase(0);
 }
 

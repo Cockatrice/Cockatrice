@@ -337,7 +337,7 @@ public:
 class Event_PlayerPropertiesChanged : public GameEvent {
 	Q_OBJECT
 public:
-	Event_PlayerPropertiesChanged(ServerInfo_PlayerProperties *_properties = 0);
+	Event_PlayerPropertiesChanged(int _playerId = -1, ServerInfo_PlayerProperties *_properties = 0);
 	static SerializableItem *newItem() { return new Event_PlayerPropertiesChanged; }
 	int getItemId() const { return ItemId_Event_PlayerPropertiesChanged; }
 	ServerInfo_PlayerProperties *getProperties() const { return static_cast<ServerInfo_PlayerProperties *>(itemMap.value("player_properties")); }

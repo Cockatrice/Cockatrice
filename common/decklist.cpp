@@ -470,6 +470,11 @@ void DeckList::cleanList()
 	setComments();
 }
 
+bool DeckList::isEmpty() const
+{
+	return root->isEmpty();
+}
+
 DecklistCardNode *DeckList::addCard(const QString &cardName, const QString &zoneName)
 {
 	InnerDecklistNode *zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));

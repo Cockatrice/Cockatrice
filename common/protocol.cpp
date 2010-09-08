@@ -358,8 +358,8 @@ Event_GameStateChanged::Event_GameStateChanged(bool _gameStarted, int _activePla
 		itemList.append(_playerList[i]);
 }
 
-Event_PlayerPropertiesChanged::Event_PlayerPropertiesChanged(ServerInfo_PlayerProperties *_properties)
-	: GameEvent("player_properties_changed", -1)
+Event_PlayerPropertiesChanged::Event_PlayerPropertiesChanged(int _playerId, ServerInfo_PlayerProperties *_properties)
+	: GameEvent("player_properties_changed", _playerId)
 {
 	if (!_properties)
 		_properties = new ServerInfo_PlayerProperties;

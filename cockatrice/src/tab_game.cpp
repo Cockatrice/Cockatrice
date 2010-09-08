@@ -494,7 +494,7 @@ void TabGame::eventGameStateChanged(Event_GameStateChanged *event, GameEventCont
 				playerListWidget->addPlayer(prop);
 			}
 			player->processPlayerInfo(pl);
-			if (player->getLocal() && pl->getDeck()) {
+			if (player->getLocal() && !pl->getDeck()->isEmpty()) {
 				Deck_PictureCacher::cachePictures(pl->getDeck(), this);
 				deckViewContainers.value(player->getId())->setDeck(new DeckList(pl->getDeck()));
 			}
