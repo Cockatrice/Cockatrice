@@ -27,17 +27,30 @@ ArrowItem::ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTar
 ArrowItem::~ArrowItem()
 {
 	qDebug() << "ArrowItem destructor";
-	if (startItem)
+}
+
+void ArrowItem::delArrow()
+{
+	if (startItem) {
 		startItem->removeArrowFrom(this);
+		startItem = 0;
+	}
 	
 	if (targetItem) {
 		targetItem->setBeingPointedAt(false);
 		targetItem->removeArrowTo(this);
+		targetItem = 0;
 	}
+	
+	player->removeArrow(this);
+	deleteLater();
 }
 
 void ArrowItem::updatePath()
 {
+	if (!targetItem)
+		return;
+	
 	QPointF endPoint = targetItem->mapToScene(QPointF(targetItem->boundingRect().width() / 2, targetItem->boundingRect().height() / 2));
 	updatePath(endPoint);
 }
@@ -196,7 +209,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 			));
 		}
 	}
-	deleteLater();
+	delArrow();
 
 	for (int i = 0; i < childArrows.size(); ++i)
 		childArrows[i]->mouseReleaseEvent(event);
@@ -251,5 +264,6 @@ void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
 			targetCard->getId()
 		));
 	}
-	deleteLater();
+	
+	delArrow();
 }

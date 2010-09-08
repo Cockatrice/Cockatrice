@@ -167,6 +167,7 @@ public:
 	ArrowItem *addArrow(ServerInfo_Arrow *arrow);
 	ArrowItem *addArrow(int arrowId, CardItem *startCard, ArrowTarget *targetItem, const QColor &color);
 	void delArrow(int arrowId);
+	void removeArrow(ArrowItem *arrow);
 	void clearArrows();
 	PlayerTarget *getPlayerTarget() const { return playerTarget; }
 

@@ -36,6 +36,7 @@ public:
 	void setTargetItem(ArrowTarget *_item) { targetItem = _item; }
 	ArrowTarget *getStartItem() const { return startItem; }
 	ArrowTarget *getTargetItem() const { return targetItem; }
+	void delArrow();
 };
 
 class ArrowDragItem : public ArrowItem {

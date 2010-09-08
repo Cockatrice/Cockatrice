@@ -813,13 +813,13 @@ void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/
 
 void Player::processPlayerInfo(ServerInfo_Player *info)
 {
+	clearCounters();
+	clearArrows();
+	
 	QMapIterator<QString, CardZone *> zoneIt(zones);
 	while (zoneIt.hasNext())
 		zoneIt.next().value()->clearContents();
 
-	clearCounters();
-	clearArrows();
-	
 	QList<ServerInfo_Zone *> zl = info->getZoneList();
 	for (int i = 0; i < zl.size(); ++i) {
 		ServerInfo_Zone *zoneInfo = zl[i];
@@ -957,15 +957,20 @@ void Player::delArrow(int arrowId)
 	ArrowItem *a = arrows.value(arrowId, 0);
 	if (!a)
 		return;
-	arrows.remove(arrowId);
-	delete a;
+	a->delArrow();
+}
+
+void Player::removeArrow(ArrowItem *arrow)
+{
+	if (arrow->getId() != -1)
+		arrows.remove(arrow->getId());
 }
 
 void Player::clearArrows()
 {
 	QMapIterator<int, ArrowItem *> arrowIterator(arrows);
 	while (arrowIterator.hasNext())
-		delete arrowIterator.next().value();
+		arrowIterator.next().value()->delArrow();
 	arrows.clear();
 }
 
