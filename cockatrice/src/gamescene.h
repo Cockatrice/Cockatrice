@@ -15,6 +15,7 @@ private:
 	QList<Player *> players;
 	QRectF playersRect;
 	QList<ZoneViewWidget *> views;
+	QSize viewSize;
 public:
 	GameScene(QObject *parent = 0);
 	void retranslateUi();

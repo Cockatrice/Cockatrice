@@ -66,6 +66,7 @@ void GameScene::rearrange()
 	playersRect = QRectF(0, 0, sceneWidth, sceneHeight);
 	
 	setSceneRect(sceneRect().x(), sceneRect().y(), sceneWidth, sceneHeight);
+	processViewSizeChange(viewSize);
 
 	qDebug(QString("rearrange(): w=%1 h=%2").arg(sceneWidth).arg(sceneHeight).toLatin1());
 }
@@ -108,6 +109,8 @@ void GameScene::closeMostRecentZoneView()
 
 void GameScene::processViewSizeChange(const QSize &newSize)
 {
+	viewSize = newSize;
+	
 	qreal newRatio = ((qreal) newSize.width()) / newSize.height();
 	qreal minWidth = 0;
 	for (int i = 0; i < players.size(); ++i) {

@@ -186,7 +186,7 @@ void TableZone::resizeToContents()
 	if (xMax < minWidth)
 		xMax = minWidth;
 	currentMinimumWidth = xMax + 2 * marginX + 2 * boxLineWidth;
-	if (currentMinimumWidth > width) {
+	if (currentMinimumWidth != width) {
 		prepareGeometryChange();
 		width = currentMinimumWidth;
 		emit sizeChanged();
