@@ -13,6 +13,7 @@ public:
 	~LocalServer();
 	AuthenticationResult checkUserPassword(const QString & /*user*/, const QString & /*password*/) { return UnknownUser; }
 	QString getLoginMessage() const { return QString(); }
+	bool getGameShouldPing() const { return false; }
 	int getMaxGameInactivityTime() const { return 9999999; }
 	int getMaxPlayerInactivityTime() const { return 9999999; }
 	

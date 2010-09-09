@@ -27,14 +27,16 @@
 #include <QTimer>
 #include <QDebug>
 
-Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, QObject *parent)
+Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server *parent)
 	: QObject(parent), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), activePlayer(-1), activePhase(-1), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0)
 {
 	creator = addPlayer(_creator, false, false);
 
-	pingClock = new QTimer(this);
-	connect(pingClock, SIGNAL(timeout()), this, SLOT(pingClockTimeout()));
-	pingClock->start(1000);
+	if (parent->getGameShouldPing()) {
+		pingClock = new QTimer(this);
+		connect(pingClock, SIGNAL(timeout()), this, SLOT(pingClockTimeout()));
+		pingClock->start(1000);
+	}
 }
 
 Server_Game::~Server_Game()

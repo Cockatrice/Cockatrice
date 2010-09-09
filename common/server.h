@@ -34,6 +34,7 @@ public:
 	virtual QString getLoginMessage() const = 0;
 	Server_Game *createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator);
 	
+	virtual bool getGameShouldPing() const = 0;
 	virtual int getMaxGameInactivityTime() const = 0;
 	virtual int getMaxPlayerInactivityTime() const = 0;
 private:

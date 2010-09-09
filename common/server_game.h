@@ -27,6 +27,7 @@
 #include "protocol.h"
 
 class QTimer;
+class Server;
 
 class Server_Game : public QObject {
 	Q_OBJECT
@@ -50,7 +51,7 @@ signals:
 private slots:
 	void pingClockTimeout();
 public:
-	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, QObject *parent = 0);
+	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server *parent);
 	~Server_Game();
 	Server_Player *getCreator() const { return creator; }
 	QString getCreatorName() const { return creator ? creator->getPlayerName() : QString(); }

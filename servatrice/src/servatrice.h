@@ -42,6 +42,7 @@ public:
 	bool execSqlQuery(QSqlQuery &query);
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
 	QString getLoginMessage() const { return loginMessage; }
+	bool getGameShouldPing() const { return true; }
 	int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
 	int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
 private:
