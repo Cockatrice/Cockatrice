@@ -672,6 +672,10 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 		targetzone = targetPlayer->getZones().value(cmd->getTargetZone());
 	if (targetzone)
 		targetCard = targetzone->getCard(cmd->getTargetCardId(), false);
+	// This is currently enough to make sure cards don't get attached to a card that is not on the table.
+	// Possibly a flag will have to be introduced for this sometime.
+	if (!startzone->hasCoords() || !targetzone->hasCoords())
+		return RespContextError;
 	
 	// Get all arrows pointing to or originating from the card being attached and delete them.
 	QMapIterator<int, Server_Player *> playerIterator(game->getPlayers());
@@ -759,7 +763,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Co
 	Server_Card *targetCard = 0;
 	if (!playerTarget)
 		targetCard = targetZone->getCard(cmd->getTargetCardId(), false);
-	if (!startCard || (!targetCard && !playerTarget) || (startCard == targetCard))
+	if (!startCard || (!targetCard && !playerTarget) || (startCard == targetCard) || (startZone->getType() != PublicZone) || (targetZone->getType() != PublicZone))
 		return RespContextError;
 	
 	Server_ArrowTarget *targetItem;
