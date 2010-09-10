@@ -103,19 +103,15 @@ GeneralSettingsPage::GeneralSettingsPage()
 QStringList GeneralSettingsPage::findQmFiles()
 {
 	QDir dir(":/translations");
-	QStringList fileNames = dir.entryList(QStringList("*.qm"), QDir::Files, QDir::Name);
-	QMutableStringListIterator i(fileNames);
-	while (i.hasNext()) {
-		i.next();
-		i.setValue(dir.filePath(i.value()));
-	}
+	QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
+	fileNames.replaceInStrings(QRegExp(translationPrefix + "_(.*)\\.qm"), "\\1");
 	return fileNames;
 }
 
 QString GeneralSettingsPage::languageName(const QString &qmFile)
 {
 	QTranslator translator;
-	translator.load(qmFile);
+	translator.load(":/translations/" + translationPrefix + "_" + qmFile + ".qm");
 	
 	return translator.translate("GeneralSettingsPage", "English");
 }
@@ -165,8 +161,7 @@ void GeneralSettingsPage::cardBackgroundPathButtonClicked()
 
 void GeneralSettingsPage::languageBoxChanged(int index)
 {
-	QString qmFile = languageBox->itemData(index).toString();
-	settingsCache->setLang(qmFile);
+	settingsCache->setLang(languageBox->itemData(index).toString());
 }
 
 void GeneralSettingsPage::retranslateUi()
@@ -473,8 +468,7 @@ void DlgSettings::changePage(QListWidgetItem *current, QListWidgetItem *previous
 void DlgSettings::updateLanguage()
 {
 	qApp->removeTranslator(translator);
-	translator->load(settingsCache->getLang());
-	qApp->installTranslator(translator);
+	installNewTranslator();
 }
 
 void DlgSettings::changeEvent(QEvent *event)

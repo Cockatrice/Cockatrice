@@ -39,7 +39,7 @@
 //Q_IMPORT_PLUGIN(qjpeg)
 
 CardDatabase *db;
-QTranslator *translator;
+QTranslator *translator, *qtTranslator;
 SettingsCache *settingsCache;
 PingPixmapGenerator *pingPixmapGenerator;
 
@@ -50,6 +50,17 @@ void myMessageOutput(QtMsgType /*type*/, const char *msg)
 		f = fopen("qdebug.txt", "w");
 	fprintf(f, "%s\n", msg);
 	fflush(f);
+}
+
+void installNewTranslator()
+{
+	QString lang = settingsCache->getLang();
+
+	qtTranslator->load("qt_" + lang, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+	qApp->installTranslator(qtTranslator);
+	
+	translator->load(translationPrefix + "_" + lang, ":/translations");
+	qApp->installTranslator(translator);
 }
 
 int main(int argc, char *argv[])
@@ -78,18 +89,9 @@ int main(int argc, char *argv[])
 	db = new CardDatabase;
 	pingPixmapGenerator = new PingPixmapGenerator;
 
-	QString localeName;// = QLocale::system().name();
-	QTranslator qtTranslator;
-	qtTranslator.load("qt_" + localeName, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-	app.installTranslator(&qtTranslator);
-	
+	qtTranslator = new QTranslator;
 	translator = new QTranslator;
-	QString lang = settingsCache->getLang();
-	if (lang.isEmpty())
-		translator->load("cockatrice_" + localeName, ":/translations", QString(), ".qm");
-	else
-		translator->load(lang);
-	app.installTranslator(translator);
+	installNewTranslator();
 	
 	qsrand(QDateTime::currentDateTime().toTime_t());
 	
