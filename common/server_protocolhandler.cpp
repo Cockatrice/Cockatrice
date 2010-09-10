@@ -761,10 +761,11 @@ ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Co
 		return RespNameNotFound;
 	Server_Card *startCard = startZone->getCard(cmd->getStartCardId(), false);
 	Server_Card *targetCard = 0;
-	if (!playerTarget)
+	if (!playerTarget) {
 		targetCard = targetZone->getCard(cmd->getTargetCardId(), false);
-	if (!startCard || (!targetCard && !playerTarget) || (startCard == targetCard) || (startZone->getType() != PublicZone) || (targetZone->getType() != PublicZone))
-		return RespContextError;
+		if ((startZone->getType() != PublicZone) || (targetZone->getType() != PublicZone))
+			return RespContextError;
+	}
 	
 	Server_ArrowTarget *targetItem;
 	if (playerTarget)
