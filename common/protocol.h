@@ -48,7 +48,7 @@ private:
 	static void initializeHashAuto();
 	bool receiverMayDelete;
 public:
-	static const int protocolVersion = 7;
+	static const int protocolVersion = 8;
 	static void initializeHash();
 	virtual int getItemId() const = 0;
 	bool getReceiverMayDelete() const { return receiverMayDelete; }
