@@ -203,6 +203,10 @@
             <longname>Revised Edition</longname>
         </set>
         <set import="1">
+            <name>ROE</name>
+            <longname>Rise of the Eldrazi</longname>
+        </set>
+        <set import="1">
             <name>SOK</name>
             <longname>Saviors of Kamigawa</longname>
         </set>
@@ -297,9 +301,5 @@
         <set import="1">
             <name>ZEN</name>
             <longname>Zendikar</longname>
-        </set>
-        <set import="1">
-            <name>ROE</name>
-            <longname>Rise of the Eldrazi</longname>
         </set>
 </cockatrice_setdatabase>
