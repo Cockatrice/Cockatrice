@@ -124,21 +124,22 @@ QPixmap *CardInfo::loadPixmap()
 		return pixmap;
 	
 	if (getName().isEmpty()) {
-		pixmap->load(QString("%1/back.jpg").arg(picsPath));
+		pixmap->load(settingsCache->getCardBackPicturePath());
 		return pixmap;
 	}
-	sets.sortByKey();
+	SetList sortedSets = sets;
+	sortedSets.sortByKey();
 
 	QString debugOutput = QString("CardDatabase: loading pixmap for '%1' from ").arg(getName());
-	for (int i = 0; i < sets.size(); i++)
-		debugOutput.append(QString("%1, ").arg(sets[i]->getShortName()));
+	for (int i = 0; i < sortedSets.size(); i++)
+		debugOutput.append(QString("%1, ").arg(sortedSets[i]->getShortName()));
 	qDebug(debugOutput.toLatin1());
 
 	QString correctedName = getCorrectedName();
-	for (int i = 0; i < sets.size(); i++) {
-		if (pixmap->load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(sets[i]->getShortName()).arg(correctedName)))
+	for (int i = 0; i < sortedSets.size(); i++) {
+		if (pixmap->load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(sortedSets[i]->getShortName()).arg(correctedName)))
 			return pixmap;
-		if (pixmap->load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(sets[i]->getShortName()).arg(correctedName).arg(1)))
+		if (pixmap->load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(sortedSets[i]->getShortName()).arg(correctedName).arg(1)))
 			return pixmap;
 	}
 	if (pixmap->load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg("downloadedPics").arg(correctedName)))
@@ -245,6 +246,7 @@ CardDatabase::CardDatabase(QObject *parent)
 
 	noCard = new CardInfo(this);
 	noCard->loadPixmap(); // cache pixmap for card back
+	connect(settingsCache, SIGNAL(cardBackPicturePathChanged()), noCard, SLOT(updatePixmapCache()));
 }
 
 CardDatabase::~CardDatabase()

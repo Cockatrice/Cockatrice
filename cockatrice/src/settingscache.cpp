@@ -14,6 +14,7 @@ SettingsCache::SettingsCache()
 	handBgPath = settings->value("zonebg/hand").toString();
 	tableBgPath = settings->value("zonebg/table").toString();
 	playerBgPath = settings->value("zonebg/playerarea").toString();
+	cardBackPicturePath = settings->value("paths/cardbackpicture").toString();
 	
 	picDownload = settings->value("personal/picturedownload", false).toBool();
 	doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
@@ -70,6 +71,13 @@ void SettingsCache::setPlayerBgPath(const QString &_playerBgPath)
 	playerBgPath = _playerBgPath;
 	settings->setValue("zonebg/player", playerBgPath);
 	emit playerBgPathChanged();
+}
+
+void SettingsCache::setCardBackPicturePath(const QString &_cardBackPicturePath)
+{
+	cardBackPicturePath = _cardBackPicturePath;
+	settings->setValue("paths/cardbackpicture", cardBackPicturePath);
+	emit cardBackPicturePathChanged();
 }
 
 void SettingsCache::setPicDownload(int _picDownload)

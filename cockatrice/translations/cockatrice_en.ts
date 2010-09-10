@@ -4,64 +4,70 @@
 <context>
     <name>AppearanceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="259"/>
+        <location filename="../src/dlg_settings.cpp" line="241"/>
         <source>Zone background pictures</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="260"/>
+        <location filename="../src/dlg_settings.cpp" line="242"/>
         <source>Path to hand background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="261"/>
+        <location filename="../src/dlg_settings.cpp" line="243"/>
         <source>Path to table background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="262"/>
+        <location filename="../src/dlg_settings.cpp" line="244"/>
         <source>Path to player info background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="264"/>
+        <location filename="../src/dlg_settings.cpp" line="245"/>
+        <source>Path to picture of card back:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="247"/>
         <source>Hand layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="265"/>
+        <location filename="../src/dlg_settings.cpp" line="248"/>
         <source>Display hand horizontally (wastes space)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="267"/>
+        <location filename="../src/dlg_settings.cpp" line="250"/>
         <source>Table grid layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="268"/>
+        <location filename="../src/dlg_settings.cpp" line="251"/>
         <source>Economic layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="270"/>
+        <location filename="../src/dlg_settings.cpp" line="253"/>
         <source>Zone view layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="271"/>
+        <location filename="../src/dlg_settings.cpp" line="254"/>
         <source>Sort by name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="272"/>
+        <location filename="../src/dlg_settings.cpp" line="255"/>
         <source>Sort by type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="277"/>
-        <location filename="../src/dlg_settings.cpp" line="287"/>
-        <location filename="../src/dlg_settings.cpp" line="297"/>
+        <location filename="../src/dlg_settings.cpp" line="260"/>
+        <location filename="../src/dlg_settings.cpp" line="270"/>
+        <location filename="../src/dlg_settings.cpp" line="280"/>
+        <location filename="../src/dlg_settings.cpp" line="290"/>
         <source>Choose path</source>
         <translation type="unfinished"></translation>
     </message>
@@ -724,54 +730,54 @@
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="484"/>
-        <location filename="../src/dlg_settings.cpp" line="487"/>
-        <location filename="../src/dlg_settings.cpp" line="490"/>
+        <location filename="../src/dlg_settings.cpp" line="476"/>
+        <location filename="../src/dlg_settings.cpp" line="479"/>
+        <location filename="../src/dlg_settings.cpp" line="482"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="484"/>
+        <location filename="../src/dlg_settings.cpp" line="476"/>
         <source>Your card database is invalid. Please check if the path is set correctly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="487"/>
+        <location filename="../src/dlg_settings.cpp" line="479"/>
         <source>The path to your deck directory is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="490"/>
+        <location filename="../src/dlg_settings.cpp" line="482"/>
         <source>The path to your card pictures directory is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="498"/>
+        <location filename="../src/dlg_settings.cpp" line="490"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="500"/>
+        <location filename="../src/dlg_settings.cpp" line="492"/>
         <source>General</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="501"/>
+        <location filename="../src/dlg_settings.cpp" line="493"/>
         <source>Appearance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="502"/>
+        <location filename="../src/dlg_settings.cpp" line="494"/>
         <source>User interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="503"/>
+        <location filename="../src/dlg_settings.cpp" line="495"/>
         <source>Messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="505"/>
+        <location filename="../src/dlg_settings.cpp" line="497"/>
         <source>&amp;Close</source>
         <translation type="unfinished"></translation>
     </message>
@@ -901,51 +907,50 @@
 <context>
     <name>GeneralSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="121"/>
-        <location filename="../src/dlg_settings.cpp" line="131"/>
-        <location filename="../src/dlg_settings.cpp" line="141"/>
-        <location filename="../src/dlg_settings.cpp" line="151"/>
+        <location filename="../src/dlg_settings.cpp" line="108"/>
+        <location filename="../src/dlg_settings.cpp" line="118"/>
+        <location filename="../src/dlg_settings.cpp" line="128"/>
         <source>Choose path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="169"/>
+        <location filename="../src/dlg_settings.cpp" line="143"/>
         <source>Personal settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="170"/>
+        <location filename="../src/dlg_settings.cpp" line="144"/>
         <source>Language:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="171"/>
+        <location filename="../src/dlg_settings.cpp" line="145"/>
         <source>Download card pictures on the fly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="172"/>
+        <location filename="../src/dlg_settings.cpp" line="146"/>
         <source>Paths</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="173"/>
+        <location filename="../src/dlg_settings.cpp" line="147"/>
         <source>Decks directory:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="174"/>
+        <location filename="../src/dlg_settings.cpp" line="148"/>
         <source>Pictures directory:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="175"/>
+        <location filename="../src/dlg_settings.cpp" line="149"/>
         <source>Path to card database:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="34"/>
-        <location filename="../src/dlg_settings.cpp" line="116"/>
+        <location filename="../src/dlg_settings.cpp" line="103"/>
         <source>English</source>
         <translation>English</translation>
     </message>
@@ -1469,22 +1474,22 @@
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="386"/>
+        <location filename="../src/dlg_settings.cpp" line="379"/>
         <source>&amp;Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="387"/>
+        <location filename="../src/dlg_settings.cpp" line="380"/>
         <source>&amp;Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="369"/>
+        <location filename="../src/dlg_settings.cpp" line="362"/>
         <source>Add message</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="369"/>
+        <location filename="../src/dlg_settings.cpp" line="362"/>
         <source>Message:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2087,12 +2092,12 @@ Please enter a name:</source>
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="325"/>
+        <location filename="../src/dlg_settings.cpp" line="318"/>
         <source>General interface settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="326"/>
+        <location filename="../src/dlg_settings.cpp" line="319"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation type="unfinished"></translation>
     </message>

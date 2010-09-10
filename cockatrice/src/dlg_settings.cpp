@@ -67,14 +67,6 @@ GeneralSettingsPage::GeneralSettingsPage()
 	QPushButton *cardDatabasePathButton = new QPushButton("...");
 	connect(cardDatabasePathButton, SIGNAL(clicked()), this, SLOT(cardDatabasePathButtonClicked()));
 	
-    /*
-  	cardBackgroundPathLabel = new QLabel;
-	cardBackgroundPathEdit = new QLineEdit(settings.value("cardbackground").toString());
-	cardBackgroundPathEdit->setReadOnly(true);
-	QPushButton *cardBackgroundPathButton = new QPushButton("...");
-	connect(cardBackgroundPathButton, SIGNAL(clicked()), this, SLOT(cardBackgroundPathButtonClicked()));
-	*/
-	
 	QGridLayout *pathsGrid = new QGridLayout;
 	pathsGrid->addWidget(deckPathLabel, 0, 0);
 	pathsGrid->addWidget(deckPathEdit, 0, 1);
@@ -85,11 +77,6 @@ GeneralSettingsPage::GeneralSettingsPage()
 	pathsGrid->addWidget(cardDatabasePathLabel, 2, 0);
 	pathsGrid->addWidget(cardDatabasePathEdit, 2, 1);
 	pathsGrid->addWidget(cardDatabasePathButton, 2, 2);
-	/*	
-	pathsGrid->addWidget(cardBackgroundPathLabel, 3, 0);
-	pathsGrid->addWidget(cardBackgroundPathEdit, 3, 1);
-	pathsGrid->addWidget(cardBackgroundPathButton, 3, 2);
-	*/
 	pathsGroupBox = new QGroupBox;
 	pathsGroupBox->setLayout(pathsGrid);
 
@@ -146,19 +133,6 @@ void GeneralSettingsPage::cardDatabasePathButtonClicked()
 	settingsCache->setCardDatabasePath(path);
 }
 
-void GeneralSettingsPage::cardBackgroundPathButtonClicked()
-{
-	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
-	if (path.isEmpty())
-		return;
-	QSettings settings;
-	settings.beginGroup("paths");
-	settings.setValue("cardbackground", path);
-	cardBackgroundPathEdit->setText(path);
-	
-	emit cardBackgroundPathChanged(path);
-}
-
 void GeneralSettingsPage::languageBoxChanged(int index)
 {
 	settingsCache->setLang(languageBox->itemData(index).toString());
@@ -173,7 +147,6 @@ void GeneralSettingsPage::retranslateUi()
 	deckPathLabel->setText(tr("Decks directory:"));
 	picsPathLabel->setText(tr("Pictures directory:"));
 	cardDatabasePathLabel->setText(tr("Path to card database:"));
-	//cardBackgroundPathLabel->setText(tr("Path to card background:"));
 }
 
 AppearanceSettingsPage::AppearanceSettingsPage()
@@ -196,6 +169,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	QPushButton *playerAreaBgButton = new QPushButton("...");
 	connect(playerAreaBgButton, SIGNAL(clicked()), this, SLOT(playerAreaBgButtonClicked()));
 	
+	cardBackPicturePathLabel = new QLabel;
+	cardBackPicturePathEdit = new QLineEdit(settingsCache->getCardBackPicturePath());
+	cardBackPicturePathEdit->setReadOnly(true);
+	QPushButton *cardBackPicturePathButton = new QPushButton("...");
+	connect(cardBackPicturePathButton, SIGNAL(clicked()), this, SLOT(cardBackPicturePathButtonClicked()));
+	
 	QGridLayout *zoneBgGrid = new QGridLayout;
 	zoneBgGrid->addWidget(handBgLabel, 0, 0);
 	zoneBgGrid->addWidget(handBgEdit, 0, 1);
@@ -206,6 +185,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	zoneBgGrid->addWidget(playerAreaBgLabel, 2, 0);
 	zoneBgGrid->addWidget(playerAreaBgEdit, 2, 1);
 	zoneBgGrid->addWidget(playerAreaBgButton, 2, 2);
+	zoneBgGrid->addWidget(cardBackPicturePathLabel, 3, 0);
+	zoneBgGrid->addWidget(cardBackPicturePathEdit, 3, 1);
+	zoneBgGrid->addWidget(cardBackPicturePathButton, 3, 2);
 
 	zoneBgGroupBox = new QGroupBox;
 	zoneBgGroupBox->setLayout(zoneBgGrid);
@@ -260,6 +242,7 @@ void AppearanceSettingsPage::retranslateUi()
 	handBgLabel->setText(tr("Path to hand background:"));
 	tableBgLabel->setText(tr("Path to table background:"));
 	playerAreaBgLabel->setText(tr("Path to player info background:"));
+	cardBackPicturePathLabel->setText(tr("Path to picture of card back:"));
 	
 	handGroupBox->setTitle(tr("Hand layout"));
 	horizontalHandCheckBox->setText(tr("Display hand horizontally (wastes space)"));
@@ -300,6 +283,16 @@ void AppearanceSettingsPage::playerAreaBgButtonClicked()
 	
 	playerAreaBgEdit->setText(path);
 	settingsCache->setPlayerBgPath(path);
+}
+
+void AppearanceSettingsPage::cardBackPicturePathButtonClicked()
+{
+	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
+	if (path.isEmpty())
+		return;
+	
+	cardBackPicturePathEdit->setText(path);
+	settingsCache->setCardBackPicturePath(path);
 }
 
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
@@ -422,7 +415,6 @@ DlgSettings::DlgSettings(QWidget *parent)
 	
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addLayout(hboxLayout);
-	//mainLayout->addStretch(1);
 	mainLayout->addSpacing(12);
 	mainLayout->addLayout(buttonsLayout);
 	setLayout(mainLayout);

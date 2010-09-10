@@ -85,6 +85,7 @@ public:
 	QPixmap *getPixmap(QSize size);
 	void clearPixmapCache();
 	void clearPixmapCacheMiss();
+public slots:
 	void updatePixmapCache();
 signals:
 	void pixmapUpdated();

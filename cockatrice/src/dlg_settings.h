@@ -29,22 +29,20 @@ private slots:
 	void deckPathButtonClicked();
 	void picsPathButtonClicked();
 	void cardDatabasePathButtonClicked();
-	void cardBackgroundPathButtonClicked();
 	void languageBoxChanged(int index);
 signals:
 	void picsPathChanged(const QString &path);
 	void cardDatabasePathChanged(const QString &path);
-	void cardBackgroundPathChanged(const QString &path);
 	void changeLanguage(const QString &qmFile);
 	void picDownloadChanged(int state);
 private:
 	QStringList findQmFiles();
 	QString languageName(const QString &qmFile);
-	QLineEdit *deckPathEdit, *picsPathEdit, *cardDatabasePathEdit, *cardBackgroundPathEdit;
+	QLineEdit *deckPathEdit, *picsPathEdit, *cardDatabasePathEdit;
 	QGroupBox *personalGroupBox, *pathsGroupBox;
 	QComboBox *languageBox;
 	QCheckBox *picDownloadCheckBox;
-	QLabel *languageLabel, *deckPathLabel, *picsPathLabel, *cardDatabasePathLabel, *cardBackgroundPathLabel;
+	QLabel *languageLabel, *deckPathLabel, *picsPathLabel, *cardDatabasePathLabel;
 };
 
 class AppearanceSettingsPage : public AbstractSettingsPage {
@@ -53,13 +51,15 @@ private slots:
 	void handBgButtonClicked();
 	void tableBgButtonClicked();
 	void playerAreaBgButtonClicked();
+	void cardBackPicturePathButtonClicked();
 signals:
 	void handBgChanged(const QString &path);
 	void tableBgChanged(const QString &path);
 	void playerAreaBgChanged(const QString &path);
+	void cardBackPicturePathChanged(const QString &path);
 private:
-	QLabel *handBgLabel, *tableBgLabel, *playerAreaBgLabel;
-	QLineEdit *handBgEdit, *tableBgEdit, *playerAreaBgEdit;
+	QLabel *handBgLabel, *tableBgLabel, *playerAreaBgLabel, *cardBackPicturePathLabel;
+	QLineEdit *handBgEdit, *tableBgEdit, *playerAreaBgEdit, *cardBackPicturePathEdit;
 	QCheckBox *horizontalHandCheckBox, *economicGridCheckBox, *zoneViewSortByNameCheckBox, *zoneViewSortByTypeCheckBox;
 	QGroupBox *zoneBgGroupBox, *handGroupBox, *tableGroupBox, *zoneViewGroupBox;
 public:

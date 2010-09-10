@@ -14,6 +14,7 @@ signals:
 	void handBgPathChanged();
 	void tableBgPathChanged();
 	void playerBgPathChanged();
+	void cardBackPicturePathChanged();
 	void picDownloadChanged();
 	void horizontalHandChanged();
 	void economicGridChanged();
@@ -22,7 +23,7 @@ private:
 	
 	QString lang;
 	QString deckPath, picsPath, cardDatabasePath;
-	QString handBgPath, tableBgPath, playerBgPath;
+	QString handBgPath, tableBgPath, playerBgPath, cardBackPicturePath;
 	bool picDownload;
 	bool doubleClickToPlay;
 	bool horizontalHand;
@@ -37,6 +38,7 @@ public:
 	QString getHandBgPath() const { return handBgPath; }
 	QString getTableBgPath() const { return tableBgPath; }
 	QString getPlayerBgPath() const { return playerBgPath; }
+	QString getCardBackPicturePath() const { return cardBackPicturePath; }
 	bool getPicDownload() const { return picDownload; }
 	bool getDoubleClickToPlay() const { return doubleClickToPlay; }
 	bool getHorizontalHand() const { return horizontalHand; }
@@ -51,6 +53,7 @@ public slots:
 	void setHandBgPath(const QString &_handBgPath);
 	void setTableBgPath(const QString &_tableBgPath);
 	void setPlayerBgPath(const QString &_playerBgPath);
+	void setCardBackPicturePath(const QString &_cardBackPicturePath);
 	void setPicDownload(int _picDownload);
 	void setDoubleClickToPlay(int _doubleClickToPlay);
 	void setHorizontalHand(int _horizontalHand);
