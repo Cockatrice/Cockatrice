@@ -126,6 +126,10 @@ Player::Player(const QString &_name, int _id, bool _local, TabGame *_parent)
 		connect(aShuffle, SIGNAL(triggered()), this, SLOT(actShuffle()));
                 aMulligan = new QAction(this);
                 connect(aMulligan, SIGNAL(triggered()), this, SLOT(actMulligan()));
+		aMoveTopCardsToGrave = new QAction(this);
+		connect(aMoveTopCardsToGrave, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToGrave()));
+		aMoveTopCardsToExile = new QAction(this);
+		connect(aMoveTopCardsToExile, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToExile()));
 	}
 
 	playerMenu = new QMenu(QString());
@@ -147,6 +151,9 @@ Player::Player(const QString &_name, int _id, bool _local, TabGame *_parent)
 		libraryMenu->addSeparator();
 		libraryMenu->addAction(aViewLibrary);
 		libraryMenu->addAction(aViewTopCards);
+		libraryMenu->addSeparator();
+		libraryMenu->addAction(aMoveTopCardsToGrave);
+		libraryMenu->addAction(aMoveTopCardsToExile);
 		deck->setMenu(libraryMenu, aDrawCard);
 	} else {
 		handMenu = 0;
@@ -306,6 +313,8 @@ void Player::retranslateUi()
 		aDrawCards->setText(tr("D&raw cards..."));
 		aMulligan->setText(tr("Take &mulligan"));
 		aShuffle->setText(tr("&Shuffle"));
+		aMoveTopCardsToGrave->setText(tr("Move top cards to g&raveyard..."));
+		aMoveTopCardsToExile->setText(tr("Move top cards to &exile..."));
 	
 		handMenu->setTitle(tr("&Hand"));
 		sbMenu->setTitle(tr("&Sideboard"));
@@ -438,6 +447,36 @@ void Player::actDrawCards()
 	int number = QInputDialog::getInteger(0, tr("Draw cards"), tr("Number:"));
         if (number)
 		sendGameCommand(new Command_DrawCards(-1, number));
+}
+
+void Player::actMoveTopCardsToGrave()
+{
+	int number = QInputDialog::getInteger(0, tr("Move top cards to grave"), tr("Number:"));
+        if (!number)
+		return;
+
+	QList<Command *> commandList;
+	const int maxCards = zones.value("deck")->getCards().size();
+	if (number > maxCards)
+		number = maxCards;
+	for (int i = 0; i < number; ++i)
+		commandList.append(new Command_MoveCard(-1, "deck", 0, "grave", 0, 0, false));
+	sendCommandContainer(new CommandContainer(commandList));
+}
+
+void Player::actMoveTopCardsToExile()
+{
+	int number = QInputDialog::getInteger(0, tr("Move top cards to grave"), tr("Number:"));
+        if (!number)
+		return;
+
+	QList<Command *> commandList;
+	const int maxCards = zones.value("deck")->getCards().size();
+	if (number > maxCards)
+		number = maxCards;
+	for (int i = 0; i < number; ++i)
+		commandList.append(new Command_MoveCard(-1, "deck", 0, "rfg", 0, 0, false));
+	sendCommandContainer(new CommandContainer(commandList));
 }
 
 void Player::actUntapAll()
