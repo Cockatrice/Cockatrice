@@ -272,7 +272,7 @@ void TabGame::actConcede()
 	if (QMessageBox::question(this, tr("Concede"), tr("Are you sure you want to concede this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
 		return;
 
-	sendGameCommand(new Command_Concede, getActiveLocalPlayer()->getId());
+	sendGameCommand(new Command_Concede);
 }
 
 void TabGame::actLeaveGame()
@@ -280,14 +280,14 @@ void TabGame::actLeaveGame()
 	if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
 		return;
 
-	sendGameCommand(new Command_LeaveGame, getActiveLocalPlayer()->getId());
+	sendGameCommand(new Command_LeaveGame);
 	deleteLater();
 }
 
 void TabGame::actSay()
 {
 	if (!sayEdit->text().isEmpty()) {
-		sendGameCommand(new Command_Say(-1, sayEdit->text()), getActiveLocalPlayer()->getId());
+		sendGameCommand(new Command_Say(-1, sayEdit->text()));
 		sayEdit->clear();
 	}
 }
@@ -297,12 +297,12 @@ void TabGame::actNextPhase()
 	int phase = currentPhase;
 	if (++phase >= phasesToolbar->phaseCount())
 		phase = 0;
-	sendGameCommand(new Command_SetActivePhase(-1, phase), getActiveLocalPlayer()->getId());
+	sendGameCommand(new Command_SetActivePhase(-1, phase));
 }
 
 void TabGame::actNextTurn()
 {
-	sendGameCommand(new Command_NextTurn, getActiveLocalPlayer()->getId());
+	sendGameCommand(new Command_NextTurn);
 }
 
 void TabGame::actRemoveLocalArrows()
@@ -315,7 +315,7 @@ void TabGame::actRemoveLocalArrows()
 		QMapIterator<int, ArrowItem *> arrowIterator(player->getArrows());
 		while (arrowIterator.hasNext()) {
 			ArrowItem *a = arrowIterator.next().value();
-			sendGameCommand(new Command_DeleteArrow(-1, a->getId()), getActiveLocalPlayer()->getId());
+			sendGameCommand(new Command_DeleteArrow(-1, a->getId()));
 		}
 	}
 }
@@ -397,23 +397,20 @@ void TabGame::processGameEventContainer(GameEventContainer *cont, AbstractClient
 
 void TabGame::sendGameCommand(GameCommand *command, int playerId)
 {
-	if (playerId == -1)
-		playerId = getActiveLocalPlayer()->getId();
-
 	command->setGameId(gameId);
 	AbstractClient *client;
-	if (clients.size() > 1)
+	if (clients.size() > 1) {
+		if (playerId == -1)
+			playerId = getActiveLocalPlayer()->getId();
+
 		client = clients.at(playerId);
-	else
+	} else
 		client = clients.first();
 	client->sendCommand(command);
 }
 
 void TabGame::sendCommandContainer(CommandContainer *cont, int playerId)
 {
-	if (playerId == -1)
-		playerId = getActiveLocalPlayer()->getId();
-
 	const QList<Command *> &cmdList = cont->getCommandList();
 	for (int i = 0; i < cmdList.size(); ++i) {
 		GameCommand *cmd = qobject_cast<GameCommand *>(cmdList[i]);
@@ -422,9 +419,11 @@ void TabGame::sendCommandContainer(CommandContainer *cont, int playerId)
 	}
 
 	AbstractClient *client;
-	if (clients.size() > 1)
+	if (clients.size() > 1) {
+		if (playerId == -1)
+			playerId = getActiveLocalPlayer()->getId();
 		client = clients.at(playerId);
-	else
+	} else
 		client = clients.first();
 	client->sendCommandContainer(cont);
 }

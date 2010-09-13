@@ -155,8 +155,8 @@ public:
 
 	void processGameEventContainer(GameEventContainer *cont, AbstractClient *client);
 public slots:
-	void sendGameCommand(GameCommand *command, int playerId);
-	void sendCommandContainer(CommandContainer *cont, int playerId);
+	void sendGameCommand(GameCommand *command, int playerId = -1);
+	void sendCommandContainer(CommandContainer *cont, int playerId = -1);
 };
 
 #endif
