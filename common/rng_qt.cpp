@@ -6,7 +6,6 @@ RNG_Qt::RNG_Qt(QObject *parent)
 	: RNG_Abstract(parent)
 {
 	int seed = QDateTime::currentDateTime().toTime_t();
-	qDebug(QString("qsrand(%1)").arg(seed).toLatin1());
 	qsrand(seed);
 }
 

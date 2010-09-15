@@ -69,7 +69,7 @@ HEADERS += src/counter.h \
 	../common/protocol_items.h \
 	../common/protocol_datastructures.h \
 	../common/rng_abstract.h \
-	../common/rng_qt.h \
+	../common/rng_sfmt.h \
 	../common/server.h \
 	../common/server_arrow.h \
 	../common/server_card.h \
@@ -142,7 +142,8 @@ SOURCES += src/counter.cpp \
 	../common/protocol_items.cpp \
 	../common/protocol_datastructures.cpp \
 	../common/rng_abstract.cpp \
-	../common/rng_qt.cpp \
+	../common/rng_sfmt.cpp \
+	../common/sfmt/SFMT.c \
 	../common/server.cpp \
 	../common/server_card.cpp \
 	../common/server_cardzone.cpp \
