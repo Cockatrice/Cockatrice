@@ -721,7 +721,7 @@ void Player::eventMoveCard(Event_MoveCard *event)
 	while (playerIterator.hasNext()) {
 		Player *p = playerIterator.next().value();
 
-		QList<int> arrowsToDelete;
+		QList<ArrowItem *> arrowsToDelete;
 		QMapIterator<int, ArrowItem *> arrowIterator(p->getArrows());
 		while (arrowIterator.hasNext()) {
 			ArrowItem *arrow = arrowIterator.next().value();
@@ -729,11 +729,11 @@ void Player::eventMoveCard(Event_MoveCard *event)
 				if (startZone == targetZone)
 					arrow->updatePath();
 				else
-					arrowsToDelete.append(arrow->getId());
+					arrowsToDelete.append(arrow);
 			}
 		}
 		for (int i = 0; i < arrowsToDelete.size(); ++i)
-			p->delArrow(arrowsToDelete[i]);
+			arrowsToDelete[i]->delArrow();
 	}
 }
 
@@ -774,14 +774,19 @@ void Player::eventAttachCard(Event_AttachCard *event)
 	if (!startCard)
 		return;
 	
+	CardItem *oldParent = startCard->getAttachedTo();
+	
 	if (targetZone)
 		startCard->setParentItem(targetZone);
 	else
 		startCard->setParentItem(startZone);
 	startCard->setAttachedTo(targetCard);
+	
 	startZone->reorganizeCards();
 	if ((startZone != targetZone) && targetZone)
 		targetZone->reorganizeCards();
+	if (oldParent)
+		oldParent->getZone()->reorganizeCards();
 	
 	if (targetCard)
 		emit logAttachCard(this, startCard->getName(), targetPlayer, targetCard->getName());
@@ -928,7 +933,7 @@ void Player::deleteCard(CardItem *c)
 	if (dialogSemaphore)
 		cardsToDelete.append(c);
 	else
-		delete c;
+		c->deleteLater();
 }
 
 void Player::addZone(CardZone *z)

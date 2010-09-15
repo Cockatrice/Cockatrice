@@ -670,11 +670,14 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 		return RespContextError;
 	if (targetPlayer)
 		targetzone = targetPlayer->getZones().value(cmd->getTargetZone());
-	if (targetzone)
+	if (targetzone) {
+		// This is currently enough to make sure cards don't get attached to a card that is not on the table.
+		// Possibly a flag will have to be introduced for this sometime.
+		if (!targetzone->hasCoords())
+			return RespContextError;
 		targetCard = targetzone->getCard(cmd->getTargetCardId(), false);
-	// This is currently enough to make sure cards don't get attached to a card that is not on the table.
-	// Possibly a flag will have to be introduced for this sometime.
-	if (!startzone->hasCoords() || !targetzone->hasCoords())
+	}
+	if (!startzone->hasCoords())
 		return RespContextError;
 	
 	// Get all arrows pointing to or originating from the card being attached and delete them.
