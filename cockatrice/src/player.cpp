@@ -774,14 +774,19 @@ void Player::eventAttachCard(Event_AttachCard *event)
 	if (!startCard)
 		return;
 	
+	CardItem *oldParent = startCard->getAttachedTo();
+	
 	if (targetZone)
 		startCard->setParentItem(targetZone);
 	else
 		startCard->setParentItem(startZone);
 	startCard->setAttachedTo(targetCard);
+	
 	startZone->reorganizeCards();
 	if ((startZone != targetZone) && targetZone)
 		targetZone->reorganizeCards();
+	if (oldParent)
+		oldParent->getZone()->reorganizeCards();
 	
 	if (targetCard)
 		emit logAttachCard(this, startCard->getName(), targetPlayer, targetCard->getName());
