@@ -13,6 +13,7 @@
 ArrowItem::ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &_color)
         : QGraphicsItem(), player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), color(_color), fullColor(true)
 {
+	qDebug() << "ArrowItem constructor: startItem=" << startItem;
 	setZValue(2000000005);
 	
 	if (startItem)
@@ -61,6 +62,9 @@ void ArrowItem::updatePath(const QPointF &endPoint)
 	const double headWidth = 40.0;
 	const double headLength = headWidth / sqrt(2);
 	const double phi = 15;
+	
+	if (!startItem)
+		return;
 	
 	QPointF startPoint = startItem->mapToScene(QPointF(startItem->boundingRect().width() / 2, startItem->boundingRect().height() / 2));
 	QLineF line(startPoint, endPoint);
@@ -141,6 +145,11 @@ void ArrowDragItem::addChildArrow(ArrowDragItem *childArrow)
 
 void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
+	// This ensures that if a mouse move event happens after a call to delArrow(),
+	// the event will be discarded as it would create some stray pointers.
+	if (!startItem)
+		return;
+	
 	QPointF endPos = event->scenePos();
 	
 	QList<QGraphicsItem *> colliding = scene()->items(endPos);
@@ -177,6 +186,9 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+	if (!startItem)
+		return;
+	
 	if (targetItem && (targetItem != startItem)) {
 		CardZone *startZone = static_cast<CardItem *>(startItem)->getZone();
 		// For now, we can safely assume that the start item is always a card.
@@ -222,6 +234,9 @@ ArrowAttachItem::ArrowAttachItem(ArrowTarget *_startItem)
 
 void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
+	if (!startItem)
+		return;
+
 	QPointF endPos = event->scenePos();
 	
 	QList<QGraphicsItem *> colliding = scene()->items(endPos);
@@ -249,6 +264,9 @@ void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
 {
+	if (!startItem)
+		return;
+
 	if (targetItem && (targetItem != startItem)) {
 		CardItem *startCard = qgraphicsitem_cast<CardItem *>(startItem);
 		CardZone *startZone = startCard->getZone();

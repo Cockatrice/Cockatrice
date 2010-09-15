@@ -1,6 +1,7 @@
 #include "arrowtarget.h"
 #include "arrowitem.h"
 #include "player.h"
+#include <QDebug>
 
 ArrowTarget::ArrowTarget(Player *_owner, QGraphicsItem *parent)
 	: AbstractGraphicsItem(parent), owner(_owner), beingPointedAt(false)
@@ -9,6 +10,7 @@ ArrowTarget::ArrowTarget(Player *_owner, QGraphicsItem *parent)
 
 ArrowTarget::~ArrowTarget()
 {
+	qDebug() << "ArrowTarget destructor";
 	for (int i = 0; i < arrowsFrom.size(); ++i) {
 		arrowsFrom[i]->setStartItem(0);
 		arrowsFrom[i]->delArrow();
