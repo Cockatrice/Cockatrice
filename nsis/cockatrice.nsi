@@ -1,4 +1,5 @@
 !include "MUI2.nsh"
+!include "FileFunc.nsh"
 
 Name "Cockatrice"
 OutFile "cockatrice_win32.exe"
@@ -7,8 +8,10 @@ InstallDir "$PROGRAMFILES\Cockatrice"
 
 !define MUI_ABORTWARNING
 !define MUI_WELCOMEFINISHPAGE_BITMAP "leftimage.bmp"
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "leftimage.bmp"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_BITMAP "headerimage.bmp"
+!define MUI_HEADERIMAGE_UNBITMAP "headerimage.bmp"
 !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of Cockatrice.$\r$\n$\r$\nClick Next to continue."
 !define MUI_FINISHPAGE_RUN "$INSTDIR/oracle.exe"
 !define MUI_FINISHPAGE_RUN_TEXT "Run card database downloader now"
@@ -19,6 +22,10 @@ InstallDir "$PROGRAMFILES\Cockatrice"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
+
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+!insertmacro MUI_UNPAGE_FINISH
 
 !insertmacro MUI_LANGUAGE "English"
 
@@ -43,18 +50,51 @@ Section "Application" SecApplication
 	SetOutPath "$INSTDIR\pics"
 	SetOutPath "$INSTDIR\decks"
 
+        WriteUninstaller "$INSTDIR\uninstall.exe"
+        ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+        IntFmt $0 "0x%08X" $0
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayName" "Cockatrice"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "InstallLocation" "$INSTDIR"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayIcon" "$INSTDIR\cockatrice.exe"
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "EstimatedSize" "$0"
 SectionEnd
 
 Section "Update configuration" SecUpdateConfig
 	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "carddatabase" "$INSTDIR\cards.xml"
 	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "decks" "$INSTDIR\decks"
 	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "pics" "$INSTDIR\pics"
+	
 SectionEnd
 
 Section "Start menu item" SecStartMenu
 	createDirectory "$SMPROGRAMS\Cockatrice"
 	createShortCut "$SMPROGRAMS\Cockatrice\Cockatrice.lnk" "$INSTDIR\cockatrice.exe"
 	createShortCut "$SMPROGRAMS\Cockatrice\Oracle.lnk" "$INSTDIR\oracle.exe"
+SectionEnd
+
+Section Uninstall
+        RMDir /r "$INSTDIR\zonebg"
+        RMDir /r "$INSTDIR\plugins"
+        RMDir "$INSTDIR\decks"
+        RMDir /r "$INSTDIR\pics\downloadedPics"
+        RMDir "$INSTDIR\pics"
+        Delete "$INSTDIR\uninstall.exe"
+        Delete "$INSTDIR\cockatrice.exe"
+        Delete "$INSTDIR\oracle.exe"
+        Delete "$INSTDIR\cards.xml"
+        Delete "$INSTDIR\libgcc_s_dw2-1.dll"
+        Delete "$INSTDIR\mingwm10.dll"
+        Delete "$INSTDIR\QtCore4.dll"
+        Delete "$INSTDIR\QtGui4.dll"
+        Delete "$INSTDIR\QtNetwork4.dll"
+        Delete "$INSTDIR\QtSvg4.dll"
+        Delete "$INSTDIR\QtXml4.dll"
+        RMDir "$INSTDIR"
+        
+        DeleteRegKey HKCU "Software\Cockatrice"
+        DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
 SectionEnd
 
 LangString DESC_SecApplication ${LANG_ENGLISH} "Cockatrice program files"
