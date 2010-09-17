@@ -749,7 +749,7 @@ void Player::eventDestroyCard(Event_DestroyCard *event)
 	
 	emit logDestroyCard(this, card->getName());
 	zone->takeCard(-1, event->getCardId(), QString(), true);
-	delete card;
+	card->deleteLater();
 }
 
 void Player::eventAttachCard(Event_AttachCard *event)
