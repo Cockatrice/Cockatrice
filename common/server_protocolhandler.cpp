@@ -92,6 +92,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 			case ItemId_Command_RollDie: return cmdRollDie(qobject_cast<Command_RollDie *>(command), cont, game, player);
 			case ItemId_Command_DrawCards: return cmdDrawCards(qobject_cast<Command_DrawCards *>(command), cont, game, player);
 			case ItemId_Command_MoveCard: return cmdMoveCard(qobject_cast<Command_MoveCard *>(command), cont, game, player);
+			case ItemId_Command_FlipCard: return cmdFlipCard(qobject_cast<Command_FlipCard *>(command), cont, game, player);
 			case ItemId_Command_AttachCard: return cmdAttachCard(qobject_cast<Command_AttachCard *>(command), cont, game, player);
 			case ItemId_Command_CreateToken: return cmdCreateToken(qobject_cast<Command_CreateToken *>(command), cont, game, player);
 			case ItemId_Command_CreateArrow: return cmdCreateArrow(qobject_cast<Command_CreateArrow *>(command), cont, game, player);
@@ -630,6 +631,35 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, CommandC
 	return moveCard(game, player, cont, cmd->getStartZone(), cmd->getCardId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown(), cmd->getTapped());
 }
 
+ResponseCode Server_ProtocolHandler::cmdFlipCard(Command_FlipCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+{
+	if (player->getSpectator())
+		return RespFunctionNotAllowed;
+	
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
+	Server_CardZone *zone = player->getZones().value(cmd->getZone());
+	if (!zone)
+		return RespNameNotFound;
+	if (!zone->hasCoords())
+		return RespContextError;
+	
+	Server_Card *card = zone->getCard(cmd->getCardId(), false);
+	if (!card)
+		return RespNameNotFound;
+	
+	const bool faceDown = cmd->getFaceDown();
+	if (faceDown == card->getFaceDown())
+		return RespContextError;
+	
+	card->setFaceDown(faceDown);
+	cont->enqueueGameEventPrivate(new Event_FlipCard(player->getPlayerId(), zone->getName(), card->getId(), card->getName(), faceDown), game->getGameId());
+	cont->enqueueGameEventPublic(new Event_FlipCard(player->getPlayerId(), zone->getName(), card->getId(), card->getName(), faceDown), game->getGameId());
+	
+	return RespOk;
+}
+
 void Server_ProtocolHandler::unattachCard(Server_Game *game, Server_Player *player, CommandContainer *cont, Server_Card *card)
 {
 	Server_CardZone *zone = card->getZone();
@@ -824,6 +854,8 @@ ResponseCode Server_ProtocolHandler::setCardAttrHelper(CommandContainer *cont, S
 	Server_CardZone *zone = player->getZones().value(zoneName);
 	if (!zone)
 		return RespNameNotFound;
+	if (!zone->hasCoords())
+		return RespContextError;
 
 	if (cardId == -1) {
 		QListIterator<Server_Card *> CardIterator(zone->cards);
@@ -858,6 +890,8 @@ ResponseCode Server_ProtocolHandler::cmdSetCardCounter(Command_SetCardCounter *c
 	Server_CardZone *zone = player->getZones().value(cmd->getZone());
 	if (!zone)
 		return RespNameNotFound;
+	if (!zone->hasCoords())
+		return RespContextError;
 
 	Server_Card *card = zone->getCard(cmd->getCardId(), false);
 	if (!card)
@@ -881,6 +915,8 @@ ResponseCode Server_ProtocolHandler::cmdIncCardCounter(Command_IncCardCounter *c
 	Server_CardZone *zone = player->getZones().value(cmd->getZone());
 	if (!zone)
 		return RespNameNotFound;
+	if (!zone->hasCoords())
+		return RespContextError;
 
 	Server_Card *card = zone->getCard(cmd->getCardId(), false);
 	if (!card)

@@ -202,6 +202,14 @@ void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *s
 	append(finalStr.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr).arg(newX));
 }
 
+void MessageLogWidget::logFlipCard(Player *player, QString cardName, bool faceDown)
+{
+	if (faceDown)
+		append(tr("%1 flips %2 face-down.").arg(sanitizeHtml(player->getName())).arg(cardName));
+	else
+		append(tr("%1 flips %2 face-up.").arg(sanitizeHtml(player->getName())).arg(cardName));
+}
+
 void MessageLogWidget::logDestroyCard(Player *player, QString cardName)
 {
 	append(tr("%1 destroys %2.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
@@ -350,6 +358,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
 	connect(player, SIGNAL(logSetPT(Player *, QString, QString)), this, SLOT(logSetPT(Player *, QString, QString)));
 	connect(player, SIGNAL(logSetAnnotation(Player *, QString, QString)), this, SLOT(logSetAnnotation(Player *, QString, QString)));
 	connect(player, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)), this, SLOT(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)));
+	connect(player, SIGNAL(logFlipCard(Player *, QString, bool)), this, SLOT(logFlipCard(Player *, QString, bool)));
 	connect(player, SIGNAL(logDestroyCard(Player *, QString)), this, SLOT(logDestroyCard(Player *, QString)));
 	connect(player, SIGNAL(logAttachCard(Player *, QString, Player *, QString)), this, SLOT(logAttachCard(Player *, QString, Player *, QString)));
 	connect(player, SIGNAL(logUnattachCard(Player *, QString)), this, SLOT(logUnattachCard(Player *, QString)));

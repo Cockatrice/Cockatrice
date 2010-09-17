@@ -38,6 +38,7 @@ class Event_DelCounter;
 class Event_DumpZone;
 class Event_StopDumpZone;
 class Event_MoveCard;
+class Event_FlipCard;
 class Event_DestroyCard;
 class Event_AttachCard;
 class Event_DrawCards;
@@ -54,6 +55,7 @@ signals:
 	void logCreateToken(Player *player, QString cardName, QString pt);
 	void logDrawCards(Player *player, int number);
 	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
+	void logFlipCard(Player *player, QString cardName, bool faceDown);
 	void logDestroyCard(Player *player, QString cardName);
 	void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);
 	void logUnattachCard(Player *player, QString cardName);
@@ -153,6 +155,7 @@ private:
 	void eventDumpZone(Event_DumpZone *event);
 	void eventStopDumpZone(Event_StopDumpZone *event);
 	void eventMoveCard(Event_MoveCard *event);
+	void eventFlipCard(Event_FlipCard *event);
 	void eventDestroyCard(Event_DestroyCard *event);
 	void eventAttachCard(Event_AttachCard *event);
 	void eventDrawCards(Event_DrawCards *event);

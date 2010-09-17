@@ -179,6 +179,16 @@ public:
 	static SerializableItem *newItem() { return new Command_MoveCard; }
 	int getItemId() const { return ItemId_Command_MoveCard; }
 };
+class Command_FlipCard : public GameCommand {
+	Q_OBJECT
+public:
+	Command_FlipCard(int _gameId = -1, const QString &_zone = QString(), int _cardId = -1, bool _faceDown = false);
+	QString getZone() const { return static_cast<SerializableItem_String *>(itemMap.value("zone"))->getData(); };
+	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); };
+	bool getFaceDown() const { return static_cast<SerializableItem_Bool *>(itemMap.value("face_down"))->getData(); };
+	static SerializableItem *newItem() { return new Command_FlipCard; }
+	int getItemId() const { return ItemId_Command_FlipCard; }
+};
 class Command_AttachCard : public GameCommand {
 	Q_OBJECT
 public:
@@ -400,6 +410,17 @@ public:
 	bool getFaceDown() const { return static_cast<SerializableItem_Bool *>(itemMap.value("face_down"))->getData(); };
 	static SerializableItem *newItem() { return new Event_MoveCard; }
 	int getItemId() const { return ItemId_Event_MoveCard; }
+};
+class Event_FlipCard : public GameEvent {
+	Q_OBJECT
+public:
+	Event_FlipCard(int _playerId = -1, const QString &_zone = QString(), int _cardId = -1, const QString &_cardName = QString(), bool _faceDown = false);
+	QString getZone() const { return static_cast<SerializableItem_String *>(itemMap.value("zone"))->getData(); };
+	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); };
+	QString getCardName() const { return static_cast<SerializableItem_String *>(itemMap.value("card_name"))->getData(); };
+	bool getFaceDown() const { return static_cast<SerializableItem_Bool *>(itemMap.value("face_down"))->getData(); };
+	static SerializableItem *newItem() { return new Event_FlipCard; }
+	int getItemId() const { return ItemId_Event_FlipCard; }
 };
 class Event_DestroyCard : public GameEvent {
 	Q_OBJECT

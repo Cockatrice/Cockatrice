@@ -39,6 +39,7 @@ public slots:
 	void logRollDie(Player *player, int sides, int roll);
 	void logDrawCards(Player *player, int number);
 	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
+	void logFlipCard(Player *player, QString cardName, bool faceDown);
 	void logDestroyCard(Player *player, QString cardName);
 	void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);
 	void logUnattachCard(Player *player, QString cardName);

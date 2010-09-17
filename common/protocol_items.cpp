@@ -114,6 +114,13 @@ Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, int _
 	insertItem(new SerializableItem_Bool("face_down", _faceDown));
 	insertItem(new SerializableItem_Bool("tapped", _tapped));
 }
+Command_FlipCard::Command_FlipCard(int _gameId, const QString &_zone, int _cardId, bool _faceDown)
+	: GameCommand("flip_card", _gameId)
+{
+	insertItem(new SerializableItem_String("zone", _zone));
+	insertItem(new SerializableItem_Int("card_id", _cardId));
+	insertItem(new SerializableItem_Bool("face_down", _faceDown));
+}
 Command_AttachCard::Command_AttachCard(int _gameId, const QString &_startZone, int _cardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId)
 	: GameCommand("attach_card", _gameId)
 {
@@ -267,6 +274,14 @@ Event_MoveCard::Event_MoveCard(int _playerId, int _cardId, const QString &_cardN
 	insertItem(new SerializableItem_Int("new_card_id", _newCardId));
 	insertItem(new SerializableItem_Bool("face_down", _faceDown));
 }
+Event_FlipCard::Event_FlipCard(int _playerId, const QString &_zone, int _cardId, const QString &_cardName, bool _faceDown)
+	: GameEvent("flip_card", _playerId)
+{
+	insertItem(new SerializableItem_String("zone", _zone));
+	insertItem(new SerializableItem_Int("card_id", _cardId));
+	insertItem(new SerializableItem_String("card_name", _cardName));
+	insertItem(new SerializableItem_Bool("face_down", _faceDown));
+}
 Event_DestroyCard::Event_DestroyCard(int _playerId, const QString &_zone, int _cardId)
 	: GameEvent("destroy_card", _playerId)
 {
@@ -418,6 +433,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdroll_die", Command_RollDie::newItem);
 	itemNameHash.insert("cmddraw_cards", Command_DrawCards::newItem);
 	itemNameHash.insert("cmdmove_card", Command_MoveCard::newItem);
+	itemNameHash.insert("cmdflip_card", Command_FlipCard::newItem);
 	itemNameHash.insert("cmdattach_card", Command_AttachCard::newItem);
 	itemNameHash.insert("cmdcreate_token", Command_CreateToken::newItem);
 	itemNameHash.insert("cmdcreate_arrow", Command_CreateArrow::newItem);
@@ -441,6 +457,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventshuffle", Event_Shuffle::newItem);
 	itemNameHash.insert("game_eventroll_die", Event_RollDie::newItem);
 	itemNameHash.insert("game_eventmove_card", Event_MoveCard::newItem);
+	itemNameHash.insert("game_eventflip_card", Event_FlipCard::newItem);
 	itemNameHash.insert("game_eventdestroy_card", Event_DestroyCard::newItem);
 	itemNameHash.insert("game_eventattach_card", Event_AttachCard::newItem);
 	itemNameHash.insert("game_eventcreate_token", Event_CreateToken::newItem);

@@ -737,6 +737,18 @@ void Player::eventMoveCard(Event_MoveCard *event)
 	}
 }
 
+void Player::eventFlipCard(Event_FlipCard *event)
+{
+	CardZone *zone = zones.value(event->getZone(), 0);
+	if (!zone)
+		return;
+	CardItem *card = zone->getCard(event->getCardId(), event->getCardName());
+	if (!card)
+		return;
+	emit logFlipCard(this, card->getName(), event->getFaceDown());
+	card->setFaceDown(event->getFaceDown());
+}
+
 void Player::eventDestroyCard(Event_DestroyCard *event)
 {
 	CardZone *zone = zones.value(event->getZone(), 0);
@@ -829,6 +841,7 @@ void Player::processGameEvent(GameEvent *event, GameEventContext *context)
 		case ItemId_Event_DumpZone: eventDumpZone(qobject_cast<Event_DumpZone *>(event)); break;
 		case ItemId_Event_StopDumpZone: eventStopDumpZone(qobject_cast<Event_StopDumpZone *>(event)); break;
 		case ItemId_Event_MoveCard: eventMoveCard(qobject_cast<Event_MoveCard *>(event)); break;
+		case ItemId_Event_FlipCard: eventFlipCard(qobject_cast<Event_FlipCard *>(event)); break;
 		case ItemId_Event_DestroyCard: eventDestroyCard(qobject_cast<Event_DestroyCard *>(event)); break;
 		case ItemId_Event_AttachCard: eventAttachCard(qobject_cast<Event_AttachCard *>(event)); break;
 		case ItemId_Event_DrawCards: eventDrawCards(qobject_cast<Event_DrawCards *>(event)); break;
@@ -1109,7 +1122,7 @@ void Player::cardMenuAction()
 				break;
 			case 3: {
 				QString zone = card->getZone()->getName();
-				commandList.append(new Command_MoveCard(-1, zone, card->getId(), zone, card->getGridPoint().x(), card->getGridPoint().y(), !card->getFaceDown()));
+				commandList.append(new Command_FlipCard(-1, zone, card->getId(), !card->getFaceDown()));
 				break;
 			}
 			case 4:
