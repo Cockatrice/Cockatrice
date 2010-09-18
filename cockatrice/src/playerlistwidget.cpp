@@ -13,6 +13,7 @@ PlayerListWidget::PlayerListWidget(QWidget *parent)
 	playerIcon = QIcon(":/resources/icon_player.svg");
 	spectatorIcon = QIcon(":/resources/icon_spectator.svg");
 
+	setIconSize(QSize(20, 15));
 	setColumnCount(5);
 	setRootIsDecorated(false);
 	setSelectionMode(NoSelection);
@@ -47,7 +48,7 @@ void PlayerListWidget::updatePlayerProperties(ServerInfo_PlayerProperties *prop)
 	player->setIcon(2, gameStarted ? (prop->getConceded() ? concededIcon : QIcon()) : (prop->getReadyStart() ? readyIcon : notReadyIcon));
 	player->setText(3, prop->getUserInfo()->getName());
 	if (!prop->getUserInfo()->getCountry().isEmpty())
-		player->setIcon(3, QIcon(CountryPixmapGenerator::generatePixmap(10, prop->getUserInfo()->getCountry())));
+		player->setIcon(3, QIcon(CountryPixmapGenerator::generatePixmap(12, prop->getUserInfo()->getCountry())));
 
 	QString deckText;
 	if (!prop->getSpectator())

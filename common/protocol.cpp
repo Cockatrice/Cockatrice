@@ -37,12 +37,14 @@ void ProtocolItem::initializeHash()
 	
 	registerSerializableItem("resp", ProtocolResponse::newItem);
 	ProtocolResponse::initializeHash();
+	registerSerializableItem("resplist_users", Response_ListUsers::newItem);
 	registerSerializableItem("respdeck_list", Response_DeckList::newItem);
 	registerSerializableItem("respdeck_download", Response_DeckDownload::newItem);
 	registerSerializableItem("respdeck_upload", Response_DeckUpload::newItem);
 	registerSerializableItem("respdump_zone", Response_DumpZone::newItem);
 	
 	registerSerializableItem("generic_eventlist_games", Event_ListGames::newItem);
+	registerSerializableItem("generic_eventuser_joined", Event_UserJoined::newItem);
 	registerSerializableItem("generic_eventlist_chat_channels", Event_ListChatChannels::newItem);
 	registerSerializableItem("game_eventjoin", Event_Join::newItem);
 	registerSerializableItem("game_eventgame_state_changed", Event_GameStateChanged::newItem);
@@ -215,6 +217,13 @@ void ProtocolResponse::initializeHash()
 	responseHash.insert("spectators_not_allowed", RespSpectatorsNotAllowed);
 }
 
+Response_ListUsers::Response_ListUsers(int _cmdId, ResponseCode _responseCode, const QList<ServerInfo_User *> &_userList)
+	: ProtocolResponse(_cmdId, _responseCode, "list_users")
+{
+	for (int i = 0; i < _userList.size(); ++i)
+		itemList.append(_userList[i]);
+}
+
 Response_DeckList::Response_DeckList(int _cmdId, ResponseCode _responseCode, DeckList_Directory *_root)
 	: ProtocolResponse(_cmdId, _responseCode, "deck_list")
 {
@@ -296,6 +305,14 @@ Event_ListGames::Event_ListGames(const QList<ServerInfo_Game *> &_gameList)
 {
 	for (int i = 0; i < _gameList.size(); ++i)
 		itemList.append(_gameList[i]);
+}
+
+Event_UserJoined::Event_UserJoined(ServerInfo_User *_userInfo)
+	: GenericEvent("user_joined")
+{
+	if (!_userInfo)
+		_userInfo = new ServerInfo_User;
+	insertItem(_userInfo);
 }
 
 Event_Join::Event_Join(ServerInfo_PlayerProperties *player)

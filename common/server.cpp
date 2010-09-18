@@ -62,6 +62,12 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	
 	users.insert(name, session);
 	
+	Event_UserJoined *event = new Event_UserJoined(new ServerInfo_User(data));
+	for (int i = 0; i < clients.size(); ++i)
+		if (clients[i]->getAcceptsUserListChanges())
+			clients[i]->sendProtocolItem(event, false);
+	delete event;
+	
 	return authState;
 }
 
@@ -85,8 +91,15 @@ void Server::removeClient(Server_ProtocolHandler *client)
 {
 	clients.removeAt(clients.indexOf(client));
 	ServerInfo_User *data = client->getUserInfo();
-	if (data)
+	if (data) {
+		Event_UserLeft *event = new Event_UserLeft(data->getName());
+		for (int i = 0; i < clients.size(); ++i)
+			if (clients[i]->getAcceptsUserListChanges())
+				clients[i]->sendProtocolItem(event, false);
+		delete event;
+		
 		users.remove(data->getName());
+	}
 	qDebug() << "Server::removeClient: " << clients.size() << "clients; " << users.size() << "users left";
 }
 

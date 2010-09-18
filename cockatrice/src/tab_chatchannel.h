@@ -24,6 +24,7 @@ private:
 	QLineEdit *sayEdit;
 
 	QAction *aLeaveChannel;
+	QString sanitizeHtml(QString dirty) const;
 signals:
 	void channelClosing(TabChatChannel *tab);
 private slots:

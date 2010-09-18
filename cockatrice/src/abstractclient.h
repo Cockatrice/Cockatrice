@@ -13,9 +13,12 @@ class CommandContainer;
 class ChatEvent;
 class GameEventContainer;
 class Event_ListGames;
+class Event_UserJoined;
+class Event_UserLeft;
 class Event_ServerMessage;
 class Event_ListChatChannels;
 class Event_GameJoined;
+class Event_Message;
 
 enum ClientStatus {
 	StatusDisconnected,
@@ -38,9 +41,12 @@ signals:
 	void gameEventContainerReceived(GameEventContainer *event);
 	// Generic events
 	void listGamesEventReceived(Event_ListGames *event);
+	void userJoinedEventReceived(Event_UserJoined *event);
+	void userLeftEventReceived(Event_UserLeft *event);
 	void serverMessageEventReceived(Event_ServerMessage *event);
 	void listChatChannelsEventReceived(Event_ListChatChannels *event);
 	void gameJoinedEventReceived(Event_GameJoined *event);
+	void messageEventReceived(Event_Message *event);
 protected slots:
 	void processProtocolItem(ProtocolItem *item);
 protected:

@@ -5,6 +5,7 @@
 #include "tab_chatchannel.h"
 #include "tab_game.h"
 #include "tab_deck_storage.h"
+#include "tab_message.h"
 #include "protocol_items.h"
 #include "pixmapgenerator.h"
 #include <QDebug>
@@ -56,10 +57,13 @@ void TabSupervisor::start(AbstractClient *_client)
 	connect(client, SIGNAL(chatEventReceived(ChatEvent *)), this, SLOT(processChatEvent(ChatEvent *)));
 	connect(client, SIGNAL(gameEventContainerReceived(GameEventContainer *)), this, SLOT(processGameEventContainer(GameEventContainer *)));
 	connect(client, SIGNAL(gameJoinedEventReceived(Event_GameJoined *)), this, SLOT(gameJoined(Event_GameJoined *)));
+	connect(client, SIGNAL(messageEventReceived(Event_Message *)), this, SLOT(processMessageEvent(Event_Message *)));
 	connect(client, SIGNAL(maxPingTime(int, int)), this, SLOT(updatePingTime(int, int)));
 
 	tabServer = new TabServer(client);
 	connect(tabServer, SIGNAL(chatChannelJoined(const QString &)), this, SLOT(addChatChannelTab(const QString &)));
+	connect(tabServer, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
+	connect(tabServer, SIGNAL(userLeft(const QString &)), this, SLOT(processUserLeft(const QString &)));
 	myAddTab(tabServer);
 	updatePingTime(0, -1);
 	
@@ -173,6 +177,25 @@ void TabSupervisor::chatChannelLeft(TabChatChannel *tab)
 	removeTab(indexOf(tab));
 }
 
+TabMessage *TabSupervisor::addMessageTab(const QString &userName, bool focus)
+{
+	TabMessage *tab = new TabMessage(client, userName);
+	connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
+	myAddTab(tab);
+	messageTabs.insert(userName, tab);
+	if (focus)
+		setCurrentWidget(tab);
+	return tab;
+}
+
+void TabSupervisor::talkLeft(TabMessage *tab)
+{
+	emit setMenu(0);
+
+	messageTabs.remove(tab->getUserName());
+	removeTab(indexOf(tab));
+}
+
 void TabSupervisor::tabUserEvent()
 {
 	Tab *tab = static_cast<Tab *>(sender());
@@ -198,6 +221,23 @@ void TabSupervisor::processGameEventContainer(GameEventContainer *cont)
 		tab->processGameEventContainer(cont, qobject_cast<AbstractClient *>(sender()));
 	} else
 		qDebug() << "gameEvent: invalid gameId";
+}
+
+void TabSupervisor::processMessageEvent(Event_Message *event)
+{
+	TabMessage *tab = messageTabs.value(event->getSenderName());
+	if (!tab)
+		tab = messageTabs.value(event->getReceiverName());
+	if (!tab)
+		tab = addMessageTab(event->getSenderName(), false);
+	tab->processMessageEvent(event);
+}
+
+void TabSupervisor::processUserLeft(const QString &userName)
+{
+	TabMessage *tab = messageTabs.value(userName);
+	if (tab)
+		tab->processUserLeft(userName);
 }
 
 void TabSupervisor::updateCurrent(int index)

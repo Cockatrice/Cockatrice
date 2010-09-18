@@ -19,6 +19,15 @@ public:
 	static SerializableItem *newItem() { return new Command_Login; }
 	int getItemId() const { return ItemId_Command_Login; }
 };
+class Command_Message : public Command {
+	Q_OBJECT
+public:
+	Command_Message(const QString &_userName = QString(), const QString &_text = QString());
+	QString getUserName() const { return static_cast<SerializableItem_String *>(itemMap.value("user_name"))->getData(); };
+	QString getText() const { return static_cast<SerializableItem_String *>(itemMap.value("text"))->getData(); };
+	static SerializableItem *newItem() { return new Command_Message; }
+	int getItemId() const { return ItemId_Command_Message; }
+};
 class Command_DeckList : public Command {
 	Q_OBJECT
 public:
@@ -95,6 +104,13 @@ public:
 	Command_ListGames();
 	static SerializableItem *newItem() { return new Command_ListGames; }
 	int getItemId() const { return ItemId_Command_ListGames; }
+};
+class Command_ListUsers : public Command {
+	Q_OBJECT
+public:
+	Command_ListUsers();
+	static SerializableItem *newItem() { return new Command_ListUsers; }
+	int getItemId() const { return ItemId_Command_ListUsers; }
 };
 class Command_CreateGame : public Command {
 	Q_OBJECT
@@ -549,6 +565,16 @@ public:
 	static SerializableItem *newItem() { return new Event_ServerMessage; }
 	int getItemId() const { return ItemId_Event_ServerMessage; }
 };
+class Event_Message : public GenericEvent {
+	Q_OBJECT
+public:
+	Event_Message(const QString &_senderName = QString(), const QString &_receiverName = QString(), const QString &_text = QString());
+	QString getSenderName() const { return static_cast<SerializableItem_String *>(itemMap.value("sender_name"))->getData(); };
+	QString getReceiverName() const { return static_cast<SerializableItem_String *>(itemMap.value("receiver_name"))->getData(); };
+	QString getText() const { return static_cast<SerializableItem_String *>(itemMap.value("text"))->getData(); };
+	static SerializableItem *newItem() { return new Event_Message; }
+	int getItemId() const { return ItemId_Event_Message; }
+};
 class Event_GameJoined : public GenericEvent {
 	Q_OBJECT
 public:
@@ -562,6 +588,14 @@ public:
 	bool getResuming() const { return static_cast<SerializableItem_Bool *>(itemMap.value("resuming"))->getData(); };
 	static SerializableItem *newItem() { return new Event_GameJoined; }
 	int getItemId() const { return ItemId_Event_GameJoined; }
+};
+class Event_UserLeft : public GenericEvent {
+	Q_OBJECT
+public:
+	Event_UserLeft(const QString &_userName = QString());
+	QString getUserName() const { return static_cast<SerializableItem_String *>(itemMap.value("user_name"))->getData(); };
+	static SerializableItem *newItem() { return new Event_UserLeft; }
+	int getItemId() const { return ItemId_Event_UserLeft; }
 };
 class Event_ChatLeaveChannel : public ChatEvent {
 	Q_OBJECT

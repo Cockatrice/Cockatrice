@@ -49,6 +49,14 @@ void TabChatChannel::retranslateUi()
 	aLeaveChannel->setText(tr("&Leave channel"));
 }
 
+QString TabChatChannel::sanitizeHtml(QString dirty) const
+{
+	return dirty
+		.replace("&", "&amp;")
+		.replace("<", "&lt;")
+		.replace(">", "&gt;");
+}
+
 void TabChatChannel::sendMessage()
 {
 	if (sayEdit->text().isEmpty())
@@ -84,14 +92,14 @@ void TabChatChannel::processListPlayersEvent(Event_ChatListPlayers *event)
 
 void TabChatChannel::processJoinChannelEvent(Event_ChatJoinChannel *event)
 {
-	textEdit->append(tr("%1 has joined the channel.").arg(event->getUserInfo()->getName()));
+	textEdit->append(tr("%1 has joined the channel.").arg(sanitizeHtml(event->getUserInfo()->getName())));
 	playerList->addItem(event->getUserInfo()->getName());
 	emit userEvent();
 }
 
 void TabChatChannel::processLeaveChannelEvent(Event_ChatLeaveChannel *event)
 {
-	textEdit->append(tr("%1 has left the channel.").arg(event->getPlayerName()));
+	textEdit->append(tr("%1 has left the channel.").arg(sanitizeHtml(event->getPlayerName())));
 	for (int i = 0; i < playerList->count(); ++i)
 		if (playerList->item(i)->text() == event->getPlayerName()) {
 			delete playerList->takeItem(i);
@@ -103,8 +111,8 @@ void TabChatChannel::processLeaveChannelEvent(Event_ChatLeaveChannel *event)
 void TabChatChannel::processSayEvent(Event_ChatSay *event)
 {
 	if (event->getPlayerName().isEmpty())
-		textEdit->append(QString("<font color=\"blue\">%1</font").arg(event->getMessage()));
+		textEdit->append(QString("<font color=\"blue\">%1</font").arg(sanitizeHtml(event->getMessage())));
 	else
-		textEdit->append(QString("<font color=\"red\">%1:</font> %2").arg(event->getPlayerName()).arg(event->getMessage()));
+		textEdit->append(QString("<font color=\"red\">%1:</font> %2").arg(sanitizeHtml(event->getPlayerName())).arg(sanitizeHtml(event->getMessage())));
 	emit userEvent();
 }

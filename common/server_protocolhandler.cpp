@@ -14,7 +14,7 @@
 #include <QDateTime>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
-	: QObject(parent), server(_server), authState(PasswordWrong), acceptsGameListChanges(false), userInfo(0), lastCommandTime(QDateTime::currentDateTime())
+	: QObject(parent), server(_server), authState(PasswordWrong), acceptsGameListChanges(false), acceptsUserListChanges(false), acceptsChatChannelListChanges(false), userInfo(0), lastCommandTime(QDateTime::currentDateTime())
 {
 	connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
@@ -116,6 +116,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 		switch (command->getItemId()) {
 			case ItemId_Command_Ping: return cmdPing(qobject_cast<Command_Ping *>(command), cont);
 			case ItemId_Command_Login: return cmdLogin(qobject_cast<Command_Login *>(command), cont);
+			case ItemId_Command_Message: return cmdMessage(qobject_cast<Command_Message *>(command), cont);
 			case ItemId_Command_DeckList: return cmdDeckList(qobject_cast<Command_DeckList *>(command), cont);
 			case ItemId_Command_DeckNewDir: return cmdDeckNewDir(qobject_cast<Command_DeckNewDir *>(command), cont);
 			case ItemId_Command_DeckDelDir: return cmdDeckDelDir(qobject_cast<Command_DeckDelDir *>(command), cont);
@@ -124,6 +125,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 			case ItemId_Command_DeckDownload: return cmdDeckDownload(qobject_cast<Command_DeckDownload *>(command), cont);
 			case ItemId_Command_ListChatChannels: return cmdListChatChannels(qobject_cast<Command_ListChatChannels *>(command), cont);
 			case ItemId_Command_ChatJoinChannel: return cmdChatJoinChannel(qobject_cast<Command_ChatJoinChannel *>(command), cont);
+			case ItemId_Command_ListUsers: return cmdListUsers(qobject_cast<Command_ListUsers *>(command), cont);
 			case ItemId_Command_ListGames: return cmdListGames(qobject_cast<Command_ListGames *>(command), cont);
 			case ItemId_Command_CreateGame: return cmdCreateGame(qobject_cast<Command_CreateGame *>(command), cont);
 			case ItemId_Command_JoinGame: return cmdJoinGame(qobject_cast<Command_JoinGame *>(command), cont);
@@ -229,6 +231,21 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 	return RespOk;
 }
 
+ResponseCode Server_ProtocolHandler::cmdMessage(Command_Message *cmd, CommandContainer *cont)
+{
+	if (authState == PasswordWrong)
+		return RespLoginNeeded;
+	
+	QString receiver = cmd->getUserName();
+	Server_ProtocolHandler *userHandler = server->getUsers().value(receiver);
+	if (!userHandler)
+		return RespNameNotFound;
+	
+	cont->enqueueItem(new Event_Message(userInfo->getName(), receiver, cmd->getText()));
+	userHandler->sendProtocolItem(new Event_Message(userInfo->getName(), receiver, cmd->getText()));
+	return RespOk;
+}
+
 ResponseCode Server_ProtocolHandler::cmdListChatChannels(Command_ListChatChannels * /*cmd*/, CommandContainer *cont)
 {
 	if (authState == PasswordWrong)
@@ -275,6 +292,22 @@ ResponseCode Server_ProtocolHandler::cmdChatSay(Command_ChatSay *cmd, CommandCon
 {
 	channel->say(this, cmd->getMessage());
 	return RespOk;
+}
+
+ResponseCode Server_ProtocolHandler::cmdListUsers(Command_ListUsers * /*cmd*/, CommandContainer *cont)
+{
+	if (authState == PasswordWrong)
+		return RespLoginNeeded;
+	
+	QList<ServerInfo_User *> resultList;
+	QMapIterator<QString, Server_ProtocolHandler *> userIterator = server->getUsers();
+	while (userIterator.hasNext())
+		resultList.append(new ServerInfo_User(userIterator.next().value()->getUserInfo()));
+	
+	acceptsUserListChanges = true;
+	
+	cont->setResponse(new Response_ListUsers(cont->getCmdId(), RespOk, resultList));
+	return RespNothing;
 }
 
 ResponseCode Server_ProtocolHandler::cmdListGames(Command_ListGames * /*cmd*/, CommandContainer *cont)

@@ -11,6 +11,12 @@ Command_Login::Command_Login(const QString &_username, const QString &_password)
 	insertItem(new SerializableItem_String("username", _username));
 	insertItem(new SerializableItem_String("password", _password));
 }
+Command_Message::Command_Message(const QString &_userName, const QString &_text)
+	: Command("message")
+{
+	insertItem(new SerializableItem_String("user_name", _userName));
+	insertItem(new SerializableItem_String("text", _text));
+}
 Command_DeckList::Command_DeckList()
 	: Command("deck_list")
 {
@@ -56,6 +62,10 @@ Command_ChatSay::Command_ChatSay(const QString &_channel, const QString &_messag
 }
 Command_ListGames::Command_ListGames()
 	: Command("list_games")
+{
+}
+Command_ListUsers::Command_ListUsers()
+	: Command("list_users")
 {
 }
 Command_CreateGame::Command_CreateGame(const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything)
@@ -370,6 +380,13 @@ Event_ServerMessage::Event_ServerMessage(const QString &_message)
 {
 	insertItem(new SerializableItem_String("message", _message));
 }
+Event_Message::Event_Message(const QString &_senderName, const QString &_receiverName, const QString &_text)
+	: GenericEvent("message")
+{
+	insertItem(new SerializableItem_String("sender_name", _senderName));
+	insertItem(new SerializableItem_String("receiver_name", _receiverName));
+	insertItem(new SerializableItem_String("text", _text));
+}
 Event_GameJoined::Event_GameJoined(int _gameId, const QString &_gameDescription, int _playerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
 	: GenericEvent("game_joined")
 {
@@ -380,6 +397,11 @@ Event_GameJoined::Event_GameJoined(int _gameId, const QString &_gameDescription,
 	insertItem(new SerializableItem_Bool("spectators_can_talk", _spectatorsCanTalk));
 	insertItem(new SerializableItem_Bool("spectators_see_everything", _spectatorsSeeEverything));
 	insertItem(new SerializableItem_Bool("resuming", _resuming));
+}
+Event_UserLeft::Event_UserLeft(const QString &_userName)
+	: GenericEvent("user_left")
+{
+	insertItem(new SerializableItem_String("user_name", _userName));
 }
 Event_ChatLeaveChannel::Event_ChatLeaveChannel(const QString &_channel, const QString &_playerName)
 	: ChatEvent("chat_leave_channel", _channel)
@@ -409,6 +431,7 @@ void ProtocolItem::initializeHashAuto()
 {
 	itemNameHash.insert("cmdping", Command_Ping::newItem);
 	itemNameHash.insert("cmdlogin", Command_Login::newItem);
+	itemNameHash.insert("cmdmessage", Command_Message::newItem);
 	itemNameHash.insert("cmddeck_list", Command_DeckList::newItem);
 	itemNameHash.insert("cmddeck_new_dir", Command_DeckNewDir::newItem);
 	itemNameHash.insert("cmddeck_del_dir", Command_DeckDelDir::newItem);
@@ -419,6 +442,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdchat_leave_channel", Command_ChatLeaveChannel::newItem);
 	itemNameHash.insert("cmdchat_say", Command_ChatSay::newItem);
 	itemNameHash.insert("cmdlist_games", Command_ListGames::newItem);
+	itemNameHash.insert("cmdlist_users", Command_ListUsers::newItem);
 	itemNameHash.insert("cmdcreate_game", Command_CreateGame::newItem);
 	itemNameHash.insert("cmdjoin_game", Command_JoinGame::newItem);
 	itemNameHash.insert("cmdleave_game", Command_LeaveGame::newItem);
@@ -466,7 +490,9 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventdump_zone", Event_DumpZone::newItem);
 	itemNameHash.insert("game_eventstop_dump_zone", Event_StopDumpZone::newItem);
 	itemNameHash.insert("generic_eventserver_message", Event_ServerMessage::newItem);
+	itemNameHash.insert("generic_eventmessage", Event_Message::newItem);
 	itemNameHash.insert("generic_eventgame_joined", Event_GameJoined::newItem);
+	itemNameHash.insert("generic_eventuser_left", Event_UserLeft::newItem);
 	itemNameHash.insert("chat_eventchat_leave_channel", Event_ChatLeaveChannel::newItem);
 	itemNameHash.insert("chat_eventchat_say", Event_ChatSay::newItem);
 	itemNameHash.insert("game_event_contextready_start", Context_ReadyStart::newItem);

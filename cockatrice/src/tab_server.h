@@ -8,6 +8,7 @@
 class AbstractClient;
 class QTreeView;
 class QTreeWidget;
+class QTreeWidgetItem;
 class QPushButton;
 class QCheckBox;
 class QTextEdit;
@@ -18,6 +19,9 @@ class GamesProxyModel;
 class Event_ListGames;
 class Event_ListChatChannels;
 class Event_ServerMessage;
+class Event_UserJoined;
+class Event_UserLeft;
+class ProtocolResponse;
 
 class GameSelector : public QGroupBox {
 	Q_OBJECT
@@ -72,16 +76,37 @@ public:
 	void retranslateUi();
 };
 
+class UserList : public QGroupBox {
+	Q_OBJECT
+private:
+	QTreeWidget *userTree;
+	void processUserInfo(ServerInfo_User *user);
+private slots:
+	void processResponse(ProtocolResponse *response);
+	void processUserJoinedEvent(Event_UserJoined *event);
+	void processUserLeftEvent(Event_UserLeft *event);
+	void userClicked(QTreeWidgetItem *item, int column);
+signals:
+	void openMessageDialog(const QString &userName, bool focus);
+	void userLeft(const QString &userName);
+public:
+	UserList(AbstractClient *_client, QWidget *parent = 0);
+	void retranslateUi();
+};
+
 class TabServer : public Tab {
 	Q_OBJECT
 signals:
 	void chatChannelJoined(const QString &channelName);
 	void gameJoined(int gameId);
+	void openMessageDialog(const QString &userName, bool focus);
+	void userLeft(const QString &userName);
 private:
 	AbstractClient *client;
 	GameSelector *gameSelector;
 	ChatChannelSelector *chatChannelSelector;
 	ServerMessageLog *serverMessageLog;
+	UserList *userList;
 public:
 	TabServer(AbstractClient *_client, QWidget *parent = 0);
 	void retranslateUi();

@@ -29,6 +29,7 @@ public:
 	const QMap<QString, Server_ChatChannel *> &getChatChannels() { return chatChannels; }
 	void broadcastGameListUpdate(Server_Game *game);
 	
+	const QMap<QString, Server_ProtocolHandler *> &getUsers() const { return users; }
 	void addClient(Server_ProtocolHandler *player);
 	void removeClient(Server_ProtocolHandler *player);
 	virtual QString getLoginMessage() const = 0;

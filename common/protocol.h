@@ -29,17 +29,19 @@ enum ItemId {
 	ItemId_Event_ChatListPlayers = ItemId_Other + 201,
 	ItemId_Event_ChatJoinChannel = ItemId_Other + 202,
 	ItemId_Event_ListGames = ItemId_Other + 203,
-	ItemId_Event_GameStateChanged = ItemId_Other + 204,
-	ItemId_Event_PlayerPropertiesChanged = ItemId_Other + 205,
-	ItemId_Event_CreateArrows = ItemId_Other + 206,
-	ItemId_Event_CreateCounters = ItemId_Other + 207,
-	ItemId_Event_DrawCards = ItemId_Other + 208,
-	ItemId_Event_Join = ItemId_Other + 209,
-	ItemId_Event_Ping = ItemId_Other + 210,
-	ItemId_Response_DeckList = ItemId_Other + 300,
-	ItemId_Response_DeckDownload = ItemId_Other + 301,
-	ItemId_Response_DeckUpload = ItemId_Other + 302,
-	ItemId_Response_DumpZone = ItemId_Other + 303,
+	ItemId_Event_UserJoined = ItemId_Other + 204,
+	ItemId_Event_GameStateChanged = ItemId_Other + 205,
+	ItemId_Event_PlayerPropertiesChanged = ItemId_Other + 206,
+	ItemId_Event_CreateArrows = ItemId_Other + 207,
+	ItemId_Event_CreateCounters = ItemId_Other + 208,
+	ItemId_Event_DrawCards = ItemId_Other + 209,
+	ItemId_Event_Join = ItemId_Other + 210,
+	ItemId_Event_Ping = ItemId_Other + 211,
+	ItemId_Response_ListUsers = ItemId_Other + 300,
+	ItemId_Response_DeckList = ItemId_Other + 301,
+	ItemId_Response_DeckDownload = ItemId_Other + 302,
+	ItemId_Response_DeckUpload = ItemId_Other + 303,
+	ItemId_Response_DumpZone = ItemId_Other + 304,
 	ItemId_Invalid = ItemId_Other + 1000
 };
 
@@ -199,6 +201,15 @@ public:
 	ResponseCode getResponseCode() const { return responseHash.value(static_cast<SerializableItem_String *>(itemMap.value("response_code"))->getData(), RespOk); }
 };
 
+class Response_ListUsers : public ProtocolResponse {
+	Q_OBJECT
+public:
+	Response_ListUsers(int _cmdId = -1, ResponseCode _responseCode = RespOk, const QList<ServerInfo_User *> &_userList = QList<ServerInfo_User *>());
+	int getItemId() const { return ItemId_Response_ListUsers; }
+	static SerializableItem *newItem() { return new Response_ListUsers; }
+	QList<ServerInfo_User *> getUserList() const { return typecastItemList<ServerInfo_User *>(); }
+};
+
 class Response_DeckList : public ProtocolResponse {
 	Q_OBJECT
 public:
@@ -321,6 +332,15 @@ public:
 	int getItemId() const { return ItemId_Event_ListGames; }
 	static SerializableItem *newItem() { return new Event_ListGames; }
 	QList<ServerInfo_Game *> getGameList() const { return typecastItemList<ServerInfo_Game *>(); }
+};
+
+class Event_UserJoined : public GenericEvent {
+	Q_OBJECT
+public:
+	Event_UserJoined(ServerInfo_User *_userInfo = 0);
+	int getItemId() const { return ItemId_Event_UserJoined; }
+	static SerializableItem *newItem() { return new Event_UserJoined; }
+	ServerInfo_User *getUserInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
 };
 
 class Event_Join : public GameEvent {

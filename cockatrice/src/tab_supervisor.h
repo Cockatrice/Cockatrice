@@ -11,9 +11,11 @@ class TabServer;
 class TabChatChannel;
 class TabGame;
 class TabDeckStorage;
+class TabMessage;
 class ChatEvent;
 class GameEventContainer;
 class Event_GameJoined;
+class Event_Message;
 
 class TabSupervisor : public QTabWidget {
 	Q_OBJECT
@@ -25,6 +27,7 @@ private:
 	TabDeckStorage *tabDeckStorage;
 	QMap<QString, TabChatChannel *> chatChannelTabs;
 	QMap<int, TabGame *> gameTabs;
+	QMap<QString, TabMessage *> messageTabs;
 	void myAddTab(Tab *tab);
 public:
 	TabSupervisor(QWidget *parent = 0);
@@ -45,9 +48,13 @@ private slots:
 	void gameLeft(TabGame *tab);
 	void addChatChannelTab(const QString &channelName);
 	void chatChannelLeft(TabChatChannel *tab);
+	TabMessage *addMessageTab(const QString &userName, bool focus);
+	void processUserLeft(const QString &userName);
+	void talkLeft(TabMessage *tab);
 	void tabUserEvent();
 	void processChatEvent(ChatEvent *event);
 	void processGameEventContainer(GameEventContainer *cont);
+	void processMessageEvent(Event_Message *event);
 };
 
 #endif

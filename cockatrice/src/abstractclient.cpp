@@ -33,9 +33,12 @@ void AbstractClient::processProtocolItem(ProtocolItem *item)
 	if (genericEvent) {
 		switch (genericEvent->getItemId()) {
 			case ItemId_Event_ListGames: emit listGamesEventReceived(qobject_cast<Event_ListGames *>(item)); break;
+			case ItemId_Event_UserJoined: emit userJoinedEventReceived(qobject_cast<Event_UserJoined *>(item)); break;
+			case ItemId_Event_UserLeft: emit userLeftEventReceived(qobject_cast<Event_UserLeft *>(item)); break;
 			case ItemId_Event_ServerMessage: emit serverMessageEventReceived(qobject_cast<Event_ServerMessage *>(item)); break;
 			case ItemId_Event_ListChatChannels: emit listChatChannelsEventReceived(qobject_cast<Event_ListChatChannels *>(item)); break;
 			case ItemId_Event_GameJoined: emit gameJoinedEventReceived(qobject_cast<Event_GameJoined *>(item)); break;
+			case ItemId_Event_Message: emit messageEventReceived(qobject_cast<Event_Message *>(item)); break;
 		}
 		if (genericEvent->getReceiverMayDelete())
 			delete genericEvent;

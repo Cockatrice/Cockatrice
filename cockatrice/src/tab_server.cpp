@@ -15,6 +15,8 @@
 #include "abstractclient.h"
 #include "protocol.h"
 #include "protocol_items.h"
+#include "pixmapgenerator.h"
+#include <QDebug>
 
 GameSelector::GameSelector(AbstractClient *_client, QWidget *parent)
 	: QGroupBox(parent), client(_client)
@@ -235,23 +237,116 @@ void ServerMessageLog::processServerMessageEvent(Event_ServerMessage *event)
 	textEdit->append(event->getMessage());
 }
 
+UserList::UserList(AbstractClient *_client, QWidget *parent)
+	: QGroupBox(parent)
+{
+	userTree = new QTreeWidget;
+	userTree->setColumnCount(2);
+	userTree->header()->setResizeMode(QHeaderView::ResizeToContents);
+	userTree->setHeaderHidden(true);
+	userTree->setRootIsDecorated(false);
+	userTree->setIconSize(QSize(20, 12));
+	connect(userTree, SIGNAL(itemActivated(QTreeWidgetItem *, int)), this, SLOT(userClicked(QTreeWidgetItem *, int)));
+	
+	QVBoxLayout *vbox = new QVBoxLayout;
+	vbox->addWidget(userTree);
+	
+	setLayout(vbox);
+	
+	retranslateUi();
+	
+	connect(_client, SIGNAL(userJoinedEventReceived(Event_UserJoined *)), this, SLOT(processUserJoinedEvent(Event_UserJoined *)));
+	connect(_client, SIGNAL(userLeftEventReceived(Event_UserLeft *)), this, SLOT(processUserLeftEvent(Event_UserLeft *)));
+	
+	Command_ListUsers *cmd = new Command_ListUsers;
+	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(processResponse(ProtocolResponse *)));
+	_client->sendCommand(cmd);
+}
+
+void UserList::retranslateUi()
+{
+	setTitle(tr("Users online: %1").arg(userTree->topLevelItemCount()));
+}
+
+void UserList::processUserInfo(ServerInfo_User *user)
+{
+	QTreeWidgetItem *item = 0;
+	for (int i = 0; i < userTree->topLevelItemCount(); ++i) {
+		QTreeWidgetItem *temp = userTree->topLevelItem(i);
+		if (temp->data(1, Qt::UserRole) == user->getName()) {
+			item = temp;
+			break;
+		}
+	}
+	if (!item) {
+		item = new QTreeWidgetItem;
+		userTree->addTopLevelItem(item);
+		retranslateUi();
+	}
+	item->setIcon(0, QIcon(CountryPixmapGenerator::generatePixmap(12, user->getCountry())));
+	item->setData(1, Qt::UserRole, user->getName());
+	item->setData(1, Qt::DisplayRole, user->getName());
+}
+
+void UserList::processResponse(ProtocolResponse *response)
+{
+	Response_ListUsers *resp = qobject_cast<Response_ListUsers *>(response);
+	if (!resp)
+		return;
+	
+	const QList<ServerInfo_User *> &respList = resp->getUserList();
+	for (int i = 0; i < respList.size(); ++i)
+		processUserInfo(respList[i]);
+	
+	userTree->sortItems(1, Qt::AscendingOrder);
+}
+
+void UserList::processUserJoinedEvent(Event_UserJoined *event)
+{
+	processUserInfo(event->getUserInfo());
+	userTree->sortItems(1, Qt::AscendingOrder);
+}
+
+void UserList::processUserLeftEvent(Event_UserLeft *event)
+{
+	for (int i = 0; i < userTree->topLevelItemCount(); ++i)
+		if (userTree->topLevelItem(i)->data(1, Qt::UserRole) == event->getUserName()) {
+			emit userLeft(event->getUserName());
+			delete userTree->takeTopLevelItem(i);
+			retranslateUi();
+			break;
+		}
+}
+
+void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
+{
+	emit openMessageDialog(item->data(1, Qt::UserRole).toString(), true);
+}
+
 TabServer::TabServer(AbstractClient *_client, QWidget *parent)
 	: Tab(parent), client(_client)
 {
 	gameSelector = new GameSelector(client);
 	chatChannelSelector = new ChatChannelSelector(client);
 	serverMessageLog = new ServerMessageLog(client);
+	userList = new UserList(client);
 	
 	connect(gameSelector, SIGNAL(gameJoined(int)), this, SIGNAL(gameJoined(int)));
 	connect(chatChannelSelector, SIGNAL(channelJoined(const QString &)), this, SIGNAL(chatChannelJoined(const QString &)));
+	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
+	connect(userList, SIGNAL(userLeft(const QString &)), this, SIGNAL(userLeft(const QString &)));
 	
 	QHBoxLayout *hbox = new QHBoxLayout;
 	hbox->addWidget(chatChannelSelector);
 	hbox->addWidget(serverMessageLog);
 	
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addWidget(gameSelector);
-	mainLayout->addLayout(hbox);
+	QVBoxLayout *vbox = new QVBoxLayout;
+	vbox->addWidget(gameSelector);
+	vbox->addLayout(hbox);
+	
+	QHBoxLayout *mainLayout = new QHBoxLayout;
+	mainLayout->addLayout(vbox, 3);
+	mainLayout->addWidget(userList, 1);
 	
 	setLayout(mainLayout);
 }
@@ -261,4 +356,5 @@ void TabServer::retranslateUi()
 	gameSelector->retranslateUi();
 	chatChannelSelector->retranslateUi();
 	serverMessageLog->retranslateUi();
+	userList->retranslateUi();
 }

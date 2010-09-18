@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <QSvgRenderer>
 #include <math.h>
+#include <QDebug>
 
 QPixmap PingPixmapGenerator::generatePixmap(int size, int value, int max)
 {
@@ -39,11 +40,13 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
 		return pmCache.value(key);
 	
 	QSvgRenderer svg(QString(":/resources/countries/" + countryCode + ".svg"));
-	double aspect = (double) svg.defaultSize().width() / (double) svg.defaultSize().height();
-	QPixmap pixmap((int) round(aspect * height), height);
+	int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
+	QPixmap pixmap(width, height);
 	pixmap.fill(Qt::transparent);
 	QPainter painter(&pixmap);
-	svg.render(&painter, QRectF(0, 0, aspect * height, height));
+	svg.render(&painter, QRectF(0, 0, width, height));
+	painter.setPen(Qt::black);
+	painter.drawRect(0.5, 0.5, width - 1, height - 1);
 	
 	pmCache.insert(key, pixmap);
 	return pixmap;

@@ -24,6 +24,7 @@ protected:
 
 	AuthenticationResult authState;
 	bool acceptsGameListChanges;
+	bool acceptsUserListChanges;
 	bool acceptsChatChannelListChanges;
 	ServerInfo_User *userInfo;
 	
@@ -36,6 +37,7 @@ private:
 
 	ResponseCode cmdPing(Command_Ping *cmd, CommandContainer *cont);
 	ResponseCode cmdLogin(Command_Login *cmd, CommandContainer *cont);
+	ResponseCode cmdMessage(Command_Message *cmd, CommandContainer *cont);
 	virtual ResponseCode cmdDeckList(Command_DeckList *cmd, CommandContainer *cont) = 0;
 	virtual ResponseCode cmdDeckNewDir(Command_DeckNewDir *cmd, CommandContainer *cont) = 0;
 	virtual ResponseCode cmdDeckDelDir(Command_DeckDelDir *cmd, CommandContainer *cont) = 0;
@@ -46,6 +48,7 @@ private:
 	ResponseCode cmdChatJoinChannel(Command_ChatJoinChannel *cmd, CommandContainer *cont);
 	ResponseCode cmdChatLeaveChannel(Command_ChatLeaveChannel *cmd, CommandContainer *cont, Server_ChatChannel *channel);
 	ResponseCode cmdChatSay(Command_ChatSay *cmd, CommandContainer *cont, Server_ChatChannel *channel);
+	ResponseCode cmdListUsers(Command_ListUsers *cmd, CommandContainer *cont);
 	ResponseCode cmdListGames(Command_ListGames *cmd, CommandContainer *cont);
 	ResponseCode cmdCreateGame(Command_CreateGame *cmd, CommandContainer *cont);
 	ResponseCode cmdJoinGame(Command_JoinGame *cmd, CommandContainer *cont);
@@ -91,6 +94,7 @@ public:
 	void playerRemovedFromGame(Server_Game *game);
 	
 	bool getAcceptsGameListChanges() const { return acceptsGameListChanges; }
+	bool getAcceptsUserListChanges() const { return acceptsUserListChanges; }
 	bool getAcceptsChatChannelListChanges() const { return acceptsChatChannelListChanges; }
 	ServerInfo_User *getUserInfo() const { return userInfo; }
 	void setUserInfo(ServerInfo_User *_userInfo) { userInfo = _userInfo; }

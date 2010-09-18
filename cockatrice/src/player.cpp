@@ -466,7 +466,7 @@ void Player::actMoveTopCardsToGrave()
 
 void Player::actMoveTopCardsToExile()
 {
-	int number = QInputDialog::getInteger(0, tr("Move top cards to grave"), tr("Number:"));
+	int number = QInputDialog::getInteger(0, tr("Move top cards to exile"), tr("Number:"));
         if (!number)
 		return;
 
