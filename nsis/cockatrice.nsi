@@ -92,6 +92,8 @@ Section Uninstall
         Delete "$INSTDIR\QtSvg4.dll"
         Delete "$INSTDIR\QtXml4.dll"
         RMDir "$INSTDIR"
+
+	RMDir /r "$SMPROGRAMS\Cockatrice"
         
         DeleteRegKey HKCU "Software\Cockatrice"
         DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
