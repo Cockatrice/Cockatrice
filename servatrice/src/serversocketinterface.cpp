@@ -109,7 +109,7 @@ int ServerSocketInterface::getDeckPathId(int basePathId, QStringList path)
 	query.prepare("select id from decklist_folders where id_parent = :id_parent and name = :name and user = :user");
 	query.bindValue(":id_parent", basePathId);
 	query.bindValue(":name", path.takeFirst());
-	query.bindValue(":user", playerName);
+	query.bindValue(":user", userInfo->getName());
 	if (!servatrice->execSqlQuery(query))
 		return -1;
 	if (!query.next())
@@ -131,7 +131,7 @@ bool ServerSocketInterface::deckListHelper(DeckList_Directory *folder)
 	QSqlQuery query;
 	query.prepare("select id, name from decklist_folders where id_parent = :id_parent and user = :user");
 	query.bindValue(":id_parent", folder->getId());
-	query.bindValue(":user", playerName);
+	query.bindValue(":user", userInfo->getName());
 	if (!servatrice->execSqlQuery(query))
 		return false;
 	
@@ -144,7 +144,7 @@ bool ServerSocketInterface::deckListHelper(DeckList_Directory *folder)
 	
 	query.prepare("select id, name, upload_time from decklist_files where id_folder = :id_folder and user = :user");
 	query.bindValue(":id_folder", folder->getId());
-	query.bindValue(":user", playerName);
+	query.bindValue(":user", userInfo->getName());
 	if (!servatrice->execSqlQuery(query))
 		return false;
 	
@@ -190,7 +190,7 @@ ResponseCode ServerSocketInterface::cmdDeckNewDir(Command_DeckNewDir *cmd, Comma
 	QSqlQuery query;
 	query.prepare("insert into decklist_folders (id_parent, user, name) values(:id_parent, :user, :name)");
 	query.bindValue(":id_parent", folderId);
-	query.bindValue(":user", playerName);
+	query.bindValue(":user", userInfo->getName());
 	query.bindValue(":name", cmd->getDirName());
 	if (!servatrice->execSqlQuery(query))
 		return RespContextError;
@@ -243,7 +243,7 @@ ResponseCode ServerSocketInterface::cmdDeckDel(Command_DeckDel *cmd, CommandCont
 	
 	query.prepare("select id from decklist_files where id = :id and user = :user");
 	query.bindValue(":id", cmd->getDeckId());
-	query.bindValue(":user", playerName);
+	query.bindValue(":user", userInfo->getName());
 	servatrice->execSqlQuery(query);
 	if (!query.next())
 		return RespNameNotFound;
@@ -281,7 +281,7 @@ ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd, Comma
 	QSqlQuery query;
 	query.prepare("insert into decklist_files (id_folder, user, name, upload_time, content) values(:id_folder, :user, :name, NOW(), :content)");
 	query.bindValue(":id_folder", folderId);
-	query.bindValue(":user", playerName);
+	query.bindValue(":user", userInfo->getName());
 	query.bindValue(":name", deckName);
 	query.bindValue(":content", deckContents);
 	servatrice->execSqlQuery(query);
@@ -298,7 +298,7 @@ DeckList *ServerSocketInterface::getDeckFromDatabase(int deckId)
 	
 	query.prepare("select content from decklist_files where id = :id and user = :user");
 	query.bindValue(":id", deckId);
-	query.bindValue(":user", playerName);
+	query.bindValue(":user", userInfo->getName());
 	servatrice->execSqlQuery(query);
 	if (!query.next())
 		throw RespNameNotFound;

@@ -381,11 +381,6 @@ Event_GameJoined::Event_GameJoined(int _gameId, const QString &_gameDescription,
 	insertItem(new SerializableItem_Bool("spectators_see_everything", _spectatorsSeeEverything));
 	insertItem(new SerializableItem_Bool("resuming", _resuming));
 }
-Event_ChatJoinChannel::Event_ChatJoinChannel(const QString &_channel, const QString &_playerName)
-	: ChatEvent("chat_join_channel", _channel)
-{
-	insertItem(new SerializableItem_String("player_name", _playerName));
-}
 Event_ChatLeaveChannel::Event_ChatLeaveChannel(const QString &_channel, const QString &_playerName)
 	: ChatEvent("chat_leave_channel", _channel)
 {
@@ -472,7 +467,6 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventstop_dump_zone", Event_StopDumpZone::newItem);
 	itemNameHash.insert("generic_eventserver_message", Event_ServerMessage::newItem);
 	itemNameHash.insert("generic_eventgame_joined", Event_GameJoined::newItem);
-	itemNameHash.insert("chat_eventchat_join_channel", Event_ChatJoinChannel::newItem);
 	itemNameHash.insert("chat_eventchat_leave_channel", Event_ChatLeaveChannel::newItem);
 	itemNameHash.insert("chat_eventchat_say", Event_ChatSay::newItem);
 	itemNameHash.insert("game_event_contextready_start", Context_ReadyStart::newItem);

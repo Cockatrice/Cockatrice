@@ -488,13 +488,13 @@ void TabGame::eventGameStateChanged(Event_GameStateChanged *event, GameEventCont
 		ServerInfo_PlayerProperties *prop = pl->getProperties();
 		if (prop->getSpectator()) {
 			if (!spectators.contains(prop->getPlayerId())) {
-				spectators.insert(prop->getPlayerId(), prop->getName());
+				spectators.insert(prop->getPlayerId(), prop->getUserInfo()->getName());
 				playerListWidget->addPlayer(prop);
 			}
 		} else {
 			Player *player = players.value(prop->getPlayerId(), 0);
 			if (!player) {
-				player = addPlayer(prop->getPlayerId(), prop->getName());
+				player = addPlayer(prop->getPlayerId(), prop->getUserInfo()->getName());
 				playerListWidget->addPlayer(prop);
 			}
 			player->processPlayerInfo(pl);
@@ -554,11 +554,11 @@ void TabGame::eventJoin(Event_Join *event, GameEventContext * /*context*/)
 {
 	ServerInfo_PlayerProperties *playerInfo = event->getPlayer();
 	if (playerInfo->getSpectator()) {
-		spectators.insert(playerInfo->getPlayerId(), playerInfo->getName());
-		messageLog->logJoinSpectator(playerInfo->getName());
+		spectators.insert(playerInfo->getPlayerId(), playerInfo->getUserInfo()->getName());
+		messageLog->logJoinSpectator(playerInfo->getUserInfo()->getName());
 		playerListWidget->addPlayer(playerInfo);
 	} else {
-		Player *newPlayer = addPlayer(playerInfo->getPlayerId(), playerInfo->getName());
+		Player *newPlayer = addPlayer(playerInfo->getPlayerId(), playerInfo->getUserInfo()->getName());
 		messageLog->logJoin(newPlayer);
 		playerListWidget->addPlayer(playerInfo);
 	}

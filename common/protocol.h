@@ -27,14 +27,15 @@ enum ItemId {
 	ItemId_Command_SetSideboardPlan = ItemId_Other + 102,
 	ItemId_Event_ListChatChannels = ItemId_Other + 200,
 	ItemId_Event_ChatListPlayers = ItemId_Other + 201,
-	ItemId_Event_ListGames = ItemId_Other + 202,
-	ItemId_Event_GameStateChanged = ItemId_Other + 203,
-	ItemId_Event_PlayerPropertiesChanged = ItemId_Other + 204,
-	ItemId_Event_CreateArrows = ItemId_Other + 205,
-	ItemId_Event_CreateCounters = ItemId_Other + 206,
-	ItemId_Event_DrawCards = ItemId_Other + 207,
-	ItemId_Event_Join = ItemId_Other + 208,
-	ItemId_Event_Ping = ItemId_Other + 209,
+	ItemId_Event_ChatJoinChannel = ItemId_Other + 202,
+	ItemId_Event_ListGames = ItemId_Other + 203,
+	ItemId_Event_GameStateChanged = ItemId_Other + 204,
+	ItemId_Event_PlayerPropertiesChanged = ItemId_Other + 205,
+	ItemId_Event_CreateArrows = ItemId_Other + 206,
+	ItemId_Event_CreateCounters = ItemId_Other + 207,
+	ItemId_Event_DrawCards = ItemId_Other + 208,
+	ItemId_Event_Join = ItemId_Other + 209,
+	ItemId_Event_Ping = ItemId_Other + 210,
 	ItemId_Response_DeckList = ItemId_Other + 300,
 	ItemId_Response_DeckDownload = ItemId_Other + 301,
 	ItemId_Response_DeckUpload = ItemId_Other + 302,
@@ -298,10 +299,19 @@ public:
 class Event_ChatListPlayers : public ChatEvent {
 	Q_OBJECT
 public:
-	Event_ChatListPlayers(const QString &_channel = QString(), const QList<ServerInfo_ChatUser *> &_playerList = QList<ServerInfo_ChatUser *>());
+	Event_ChatListPlayers(const QString &_channel = QString(), const QList<ServerInfo_User *> &_playerList = QList<ServerInfo_User *>());
 	int getItemId() const { return ItemId_Event_ChatListPlayers; }
 	static SerializableItem *newItem() { return new Event_ChatListPlayers; }
-	QList<ServerInfo_ChatUser *> getPlayerList() const { return typecastItemList<ServerInfo_ChatUser *>(); }
+	QList<ServerInfo_User *> getPlayerList() const { return typecastItemList<ServerInfo_User *>(); }
+};
+
+class Event_ChatJoinChannel : public ChatEvent {
+	Q_OBJECT
+public:
+	Event_ChatJoinChannel(const QString &_channel = QString(), ServerInfo_User *_info = 0);
+	int getItemId() const { return ItemId_Event_ChatJoinChannel; }
+	static SerializableItem *newItem() { return new Event_ChatJoinChannel; }
+	ServerInfo_User *getUserInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
 };
 
 class Event_ListGames : public GenericEvent {

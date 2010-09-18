@@ -8,6 +8,7 @@
 class Server_Game;
 class Server_ChatChannel;
 class Server_ProtocolHandler;
+class ServerInfo_User;
 
 enum AuthenticationResult { PasswordWrong = 0, PasswordRight = 1, UnknownUser = 2 };
 
@@ -22,7 +23,7 @@ private slots:
 public:
 	Server(QObject *parent = 0);
 	~Server();
-	virtual AuthenticationResult checkUserPassword(const QString &user, const QString &password) = 0;
+	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password);
 	QList<Server_Game *> getGames() const { return games.values(); }
 	Server_Game *getGame(int gameId) const;
 	const QMap<QString, Server_ChatChannel *> &getChatChannels() { return chatChannels; }
@@ -30,7 +31,6 @@ public:
 	
 	void addClient(Server_ProtocolHandler *player);
 	void removeClient(Server_ProtocolHandler *player);
-	void closeOldSession(const QString &playerName);
 	virtual QString getLoginMessage() const = 0;
 	Server_Game *createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator);
 	
@@ -40,8 +40,11 @@ public:
 private:
 	QMap<int, Server_Game *> games;
 	QList<Server_ProtocolHandler *> clients;
+	QMap<QString, Server_ProtocolHandler *> users;
 	QMap<QString, Server_ChatChannel *> chatChannels;
 protected:
+	virtual AuthenticationResult checkUserPassword(const QString &user, const QString &password) = 0;
+	virtual ServerInfo_User *getUserData(const QString &name) = 0;
 	int nextGameId;
 	void addChatChannel(Server_ChatChannel *newChannel);
 };

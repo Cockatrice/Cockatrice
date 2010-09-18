@@ -34,14 +34,12 @@
 #include "dlg_settings.h"
 #include "carddatabase.h"
 #include "settingscache.h"
-#include "pingpixmapgenerator.h"
 
 //Q_IMPORT_PLUGIN(qjpeg)
 
 CardDatabase *db;
 QTranslator *translator, *qtTranslator;
 SettingsCache *settingsCache;
-PingPixmapGenerator *pingPixmapGenerator;
 
 void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
@@ -87,7 +85,6 @@ int main(int argc, char *argv[])
 	
 	settingsCache = new SettingsCache;
 	db = new CardDatabase;
-	pingPixmapGenerator = new PingPixmapGenerator;
 
 	qtTranslator = new QTranslator;
 	translator = new QTranslator;
@@ -125,7 +122,6 @@ int main(int argc, char *argv[])
 		app.exec();
 	}
 
-	delete pingPixmapGenerator;
 	delete db;
 	delete settingsCache;
 

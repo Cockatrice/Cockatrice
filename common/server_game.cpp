@@ -28,9 +28,9 @@
 #include <QDebug>
 
 Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server *parent)
-	: QObject(parent), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), activePlayer(-1), activePhase(-1), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0)
+	: QObject(parent), creatorInfo(new ServerInfo_User(_creator->getUserInfo())), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), activePlayer(-1), activePhase(-1), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0)
 {
-	creator = addPlayer(_creator, false, false);
+	addPlayer(_creator, false, false);
 
 	if (parent->getGameShouldPing()) {
 		pingClock = new QTimer(this);
@@ -49,6 +49,7 @@ Server_Game::~Server_Game()
 	players.clear();
 	
 	emit gameClosing();
+	delete creatorInfo;
 	qDebug("Server_Game destructor");
 }
 
@@ -187,7 +188,7 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 	const QList<int> &keyList = players.keys();
 	int playerId = keyList.isEmpty() ? 0 : (keyList.last() + 1);
 	
-	Server_Player *newPlayer = new Server_Player(this, playerId, handler->getPlayerName(), spectator, handler);
+	Server_Player *newPlayer = new Server_Player(this, playerId, handler->getUserInfo(), spectator, handler);
 	sendGameEvent(new Event_Join(newPlayer->getProperties()));
 	players.insert(playerId, newPlayer);
 
@@ -350,8 +351,7 @@ QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAs
 			zoneList.append(new ServerInfo_Zone(zone->getName(), zone->getType(), zone->hasCoords(), zone->cards.size(), cardList));
 		}
 
-		ServerInfo_PlayerProperties *properties = new ServerInfo_PlayerProperties(player->getPlayerId(), player->getPlayerName(), player->getSpectator(), player->getConceded(), player->getReadyStart(), player->getDeckId());
-		result.append(new ServerInfo_Player(properties, player == playerWhosAsking ? player->getDeck() : 0, zoneList, counterList, arrowList));
+		result.append(new ServerInfo_Player(player->getProperties(), player == playerWhosAsking ? player->getDeck() : 0, zoneList, counterList, arrowList));
 	}
 	return result;
 }

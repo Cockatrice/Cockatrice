@@ -28,11 +28,12 @@
 
 class QTimer;
 class Server;
+class ServerInfo_User;
 
 class Server_Game : public QObject {
 	Q_OBJECT
 private:
-	QPointer<Server_Player> creator;
+	ServerInfo_User *creatorInfo;
 	QMap<int, Server_Player *> players;
 	bool gameStarted;
 	int gameId;
@@ -53,8 +54,7 @@ private slots:
 public:
 	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server *parent);
 	~Server_Game();
-	Server_Player *getCreator() const { return creator; }
-	QString getCreatorName() const { return creator ? creator->getPlayerName() : QString(); }
+	ServerInfo_User *getCreatorInfo() const { return creatorInfo; }
 	bool getGameStarted() const { return gameStarted; }
 	int getPlayerCount() const;
 	int getSpectatorCount() const;

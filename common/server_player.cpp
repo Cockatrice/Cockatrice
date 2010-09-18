@@ -9,8 +9,8 @@
 #include "protocol_items.h"
 #include "decklist.h"
 
-Server_Player::Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator, Server_ProtocolHandler *_handler)
-	: game(_game), handler(_handler), deck(0), playerId(_playerId), playerName(_playerName), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false), deckId(-2)
+Server_Player::Server_Player(Server_Game *_game, int _playerId, ServerInfo_User *_userInfo, bool _spectator, Server_ProtocolHandler *_handler)
+	: game(_game), handler(_handler), userInfo(new ServerInfo_User(_userInfo)), deck(0), playerId(_playerId), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false), deckId(-2)
 {
 }
 
@@ -20,6 +20,7 @@ Server_Player::~Server_Player()
 	
 	if (handler)
 		handler->playerRemovedFromGame(game);
+	delete userInfo;
 }
 
 int Server_Player::newCardId()
@@ -151,7 +152,7 @@ void Server_Player::clearZones()
 
 ServerInfo_PlayerProperties *Server_Player::getProperties()
 {
-	return new ServerInfo_PlayerProperties(playerId, playerName, spectator, conceded, readyStart, deckId);
+	return new ServerInfo_PlayerProperties(playerId, new ServerInfo_User(userInfo), spectator, conceded, readyStart, deckId);
 }
 
 void Server_Player::setDeck(DeckList *_deck, int _deckId)

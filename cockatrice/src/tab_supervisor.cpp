@@ -6,7 +6,7 @@
 #include "tab_game.h"
 #include "tab_deck_storage.h"
 #include "protocol_items.h"
-#include "pingpixmapgenerator.h"
+#include "pixmapgenerator.h"
 #include <QDebug>
 
 TabSupervisor::	TabSupervisor(QWidget *parent)
@@ -97,10 +97,10 @@ void TabSupervisor::stop()
 
 	clear();
 	
-	delete tabServer;
+	tabServer->deleteLater();
 	tabServer = 0;
 	
-	delete tabDeckStorage;
+	tabDeckStorage->deleteLater();
 	tabDeckStorage = 0;
 	
 	QMapIterator<QString, TabChatChannel *> chatChannelIterator(chatChannelTabs);
@@ -119,7 +119,7 @@ void TabSupervisor::updatePingTime(int value, int max)
 	if (!tabServer)
 		return;
 	
-	setTabIcon(0, QIcon(pingPixmapGenerator->generatePixmap(15, value, max)));
+	setTabIcon(0, QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));
 }
 
 void TabSupervisor::gameJoined(Event_GameJoined *event)

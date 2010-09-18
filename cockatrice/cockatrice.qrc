@@ -37,5 +37,32 @@
 	<file>resources/icon_conceded.svg</file>
 	<file>resources/icon_player.svg</file>
 	<file>resources/icon_spectator.svg</file>
+
+	<file>resources/countries/at.svg</file>
+	<file>resources/countries/au.svg</file>
+	<file>resources/countries/be.svg</file>
+	<file>resources/countries/br.svg</file>
+	<file>resources/countries/ca.svg</file>
+	<file>resources/countries/ch.svg</file>
+	<file>resources/countries/cn.svg</file>
+	<file>resources/countries/de.svg</file>
+	<file>resources/countries/dk.svg</file>
+	<file>resources/countries/es.svg</file>
+	<file>resources/countries/fi.svg</file>
+	<file>resources/countries/fr.svg</file>
+	<file>resources/countries/gr.svg</file>
+	<file>resources/countries/hu.svg</file>
+	<file>resources/countries/ie.svg</file>
+	<file>resources/countries/il.svg</file>
+	<file>resources/countries/it.svg</file>
+	<file>resources/countries/jp.svg</file>
+	<file>resources/countries/mx.svg</file>
+	<file>resources/countries/nl.svg</file>
+	<file>resources/countries/pl.svg</file>
+	<file>resources/countries/ru.svg</file>
+	<file>resources/countries/se.svg</file>
+	<file>resources/countries/tr.svg</file>
+	<file>resources/countries/uk.svg</file>
+	<file>resources/countries/us.svg</file>
     </qresource>
 </RCC>

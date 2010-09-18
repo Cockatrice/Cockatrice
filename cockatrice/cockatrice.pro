@@ -58,7 +58,7 @@ HEADERS += src/counter.h \
  src/remotedecklist_treewidget.h \
  src/deckview.h \
  src/playerlistwidget.h \
- src/pingpixmapgenerator.h \
+ src/pixmapgenerator.h \
  src/settingscache.h \
  src/localserver.h \
  src/localserverinterface.h \
@@ -131,7 +131,7 @@ SOURCES += src/counter.cpp \
  src/remotedecklist_treewidget.cpp \
  src/deckview.cpp \
  src/playerlistwidget.cpp \
- src/pingpixmapgenerator.cpp \
+ src/pixmapgenerator.cpp \
  src/settingscache.cpp \
  src/localserver.cpp \
  src/localserverinterface.cpp \

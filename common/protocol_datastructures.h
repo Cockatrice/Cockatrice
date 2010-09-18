@@ -30,23 +30,33 @@ public:
 	bool getAutoJoin() const { return static_cast<SerializableItem_Bool *>(itemMap.value("auto_join"))->getData(); }
 };
 
-class ServerInfo_ChatUser : public SerializableItem_Map {
+class ServerInfo_User : public SerializableItem_Map {
 public:
-	ServerInfo_ChatUser(const QString &_name = QString());
-	static SerializableItem *newItem() { return new ServerInfo_ChatUser; }
+	enum UserLevelFlags {
+		IsNothing = 0x00,
+		IsUser = 0x01,
+		IsRegistered = 0x02,
+		IsAdmin = 0x04
+	};
+	ServerInfo_User(const QString &_name = QString(), int _userLevel = IsNothing, const QString &_country = QString());
+	ServerInfo_User(const ServerInfo_User *other);
+	static SerializableItem *newItem() { return new ServerInfo_User; }
 	QString getName() const { return static_cast<SerializableItem_String *>(itemMap.value("name"))->getData(); }
+	int getUserLevel() const { return static_cast<SerializableItem_Int *>(itemMap.value("userlevel"))->getData(); }
+	void setUserLevel(int _userLevel) { static_cast<SerializableItem_Int *>(itemMap.value("userlevel"))->setData(_userLevel); }
+	QString getCountry() const { return static_cast<SerializableItem_String *>(itemMap.value("country"))->getData(); }
 };
 
 class ServerInfo_Game : public SerializableItem_Map {
 public:
-	ServerInfo_Game(int _gameId = -1, const QString &_description = QString(), bool _hasPassword = false, int _playerCount = -1, int _maxPlayers = -1, const QString &_creatorName = QString(), bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, int _spectatorCount = -1);
+	ServerInfo_Game(int _gameId = -1, const QString &_description = QString(), bool _hasPassword = false, int _playerCount = -1, int _maxPlayers = -1, ServerInfo_User *creatorInfo = 0, bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, int _spectatorCount = -1);
 	static SerializableItem *newItem() { return new ServerInfo_Game; }
 	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); }
 	QString getDescription() const { return static_cast<SerializableItem_String *>(itemMap.value("description"))->getData(); }
 	bool getHasPassword() const { return static_cast<SerializableItem_Bool *>(itemMap.value("has_password"))->getData(); }
 	int getPlayerCount() const { return static_cast<SerializableItem_Int *>(itemMap.value("player_count"))->getData(); }
 	int getMaxPlayers() const { return static_cast<SerializableItem_Int *>(itemMap.value("max_players"))->getData(); }
-	QString getCreatorName() const { return static_cast<SerializableItem_String *>(itemMap.value("creator_name"))->getData(); }
+	ServerInfo_User *getCreatorInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
 	bool getSpectatorsAllowed() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_allowed"))->getData(); }
 	bool getSpectatorsNeedPassword() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_need_password"))->getData(); }
 	int getSpectatorCount() const { return static_cast<SerializableItem_Int *>(itemMap.value("spectator_count"))->getData(); }
@@ -121,10 +131,10 @@ public:
 
 class ServerInfo_PlayerProperties : public SerializableItem_Map {
 public:
-	ServerInfo_PlayerProperties(int _playerId = -1, const QString &_name = QString(), bool _spectator = false, bool _conceded = false, bool _readyStart = false, int _deckId = -1);
+	ServerInfo_PlayerProperties(int _playerId = -1, ServerInfo_User *_userInfo = 0, bool _spectator = false, bool _conceded = false, bool _readyStart = false, int _deckId = -1);
 	static SerializableItem *newItem() { return new ServerInfo_PlayerProperties; }
 	int getPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("player_id"))->getData(); }
-	QString getName() const { return static_cast<SerializableItem_String *>(itemMap.value("name"))->getData(); }
+	ServerInfo_User *getUserInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
 	bool getSpectator() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectator"))->getData(); }
 	bool getConceded() const { return static_cast<SerializableItem_Bool *>(itemMap.value("conceded"))->getData(); }
 	bool getReadyStart() const { return static_cast<SerializableItem_Bool *>(itemMap.value("ready_start"))->getData(); }

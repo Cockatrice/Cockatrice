@@ -77,15 +77,15 @@ void TabChatChannel::processChatEvent(ChatEvent *event)
 
 void TabChatChannel::processListPlayersEvent(Event_ChatListPlayers *event)
 {
-	const QList<ServerInfo_ChatUser *> &players = event->getPlayerList();
+	const QList<ServerInfo_User *> &players = event->getPlayerList();
 	for (int i = 0; i < players.size(); ++i)
 		playerList->addItem(players[i]->getName());
 }
 
 void TabChatChannel::processJoinChannelEvent(Event_ChatJoinChannel *event)
 {
-	textEdit->append(tr("%1 has joined the channel.").arg(event->getPlayerName()));
-	playerList->addItem(event->getPlayerName());
+	textEdit->append(tr("%1 has joined the channel.").arg(event->getUserInfo()->getName()));
+	playerList->addItem(event->getUserInfo()->getName());
 	emit userEvent();
 }
 

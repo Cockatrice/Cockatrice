@@ -563,14 +563,6 @@ public:
 	static SerializableItem *newItem() { return new Event_GameJoined; }
 	int getItemId() const { return ItemId_Event_GameJoined; }
 };
-class Event_ChatJoinChannel : public ChatEvent {
-	Q_OBJECT
-public:
-	Event_ChatJoinChannel(const QString &_channel = QString(), const QString &_playerName = QString());
-	QString getPlayerName() const { return static_cast<SerializableItem_String *>(itemMap.value("player_name"))->getData(); };
-	static SerializableItem *newItem() { return new Event_ChatJoinChannel; }
-	int getItemId() const { return ItemId_Event_ChatJoinChannel; }
-};
 class Event_ChatLeaveChannel : public ChatEvent {
 	Q_OBJECT
 public:

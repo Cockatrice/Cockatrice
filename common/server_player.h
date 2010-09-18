@@ -13,6 +13,7 @@ class Server_Counter;
 class Server_Arrow;
 class Server_ProtocolHandler;
 class ProtocolItem;
+class ServerInfo_User;
 class ServerInfo_PlayerProperties;
 
 class Server_Player : public Server_ArrowTarget {
@@ -20,12 +21,12 @@ class Server_Player : public Server_ArrowTarget {
 private:
 	Server_Game *game;
 	Server_ProtocolHandler *handler;
+	ServerInfo_User *userInfo;
 	DeckList *deck;
 	QMap<QString, Server_CardZone *> zones;
 	QMap<int, Server_Counter *> counters;
 	QMap<int, Server_Arrow *> arrows;
 	int playerId;
-	QString playerName;
 	bool spectator;
 	int initialCards;
 	int nextCardId;
@@ -33,7 +34,7 @@ private:
 	bool conceded;
 	int deckId;
 public:
-	Server_Player(Server_Game *_game, int _playerId, const QString &_playerName, bool _spectator, Server_ProtocolHandler *_handler);
+	Server_Player(Server_Game *_game, int _playerId, ServerInfo_User *_userInfo, bool _spectator, Server_ProtocolHandler *_handler);
 	~Server_Player();
 	Server_ProtocolHandler *getProtocolHandler() const { return handler; }
 	void setProtocolHandler(Server_ProtocolHandler *_handler) { handler = _handler; }
@@ -48,7 +49,7 @@ public:
 	bool getConceded() const { return conceded; }
 	void setConceded(bool _conceded) { conceded = _conceded; }
 	int getDeckId() const { return deckId; }
-	QString getPlayerName() const { return playerName; }
+	ServerInfo_User *getUserInfo() const { return userInfo; }
 	void setDeck(DeckList *_deck, int _deckId);
 	DeckList *getDeck() const { return deck; }
 	const QMap<QString, Server_CardZone *> &getZones() const { return zones; }

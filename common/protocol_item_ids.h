@@ -59,11 +59,10 @@ ItemId_Event_DumpZone = 1057,
 ItemId_Event_StopDumpZone = 1058,
 ItemId_Event_ServerMessage = 1059,
 ItemId_Event_GameJoined = 1060,
-ItemId_Event_ChatJoinChannel = 1061,
-ItemId_Event_ChatLeaveChannel = 1062,
-ItemId_Event_ChatSay = 1063,
-ItemId_Context_ReadyStart = 1064,
-ItemId_Context_Concede = 1065,
-ItemId_Context_DeckSelect = 1066,
-ItemId_Other = 1067
+ItemId_Event_ChatLeaveChannel = 1061,
+ItemId_Event_ChatSay = 1062,
+ItemId_Context_ReadyStart = 1063,
+ItemId_Context_Concede = 1064,
+ItemId_Context_DeckSelect = 1065,
+ItemId_Other = 1066
 };

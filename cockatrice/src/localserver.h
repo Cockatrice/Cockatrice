@@ -18,6 +18,8 @@ public:
 	int getMaxPlayerInactivityTime() const { return 9999999; }
 	
 	LocalServerInterface *newConnection();
+protected:
+	ServerInfo_User *getUserData(const QString &name);
 };
 
 #endif

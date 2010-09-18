@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="3000" height="2000" viewBox="0 0 30 20">
+<rect fill="#de2910" width="30" height="20"/>
+<g id="bstar" transform="translate(5,5) scale(3)" fill="#ffde00"><g id="cone">
+<polygon id="triangle" points="0,0 0,1 .5,1" transform="translate(0,-1) rotate(18)"/><use xlink:href="#triangle" transform="scale(-1,1)" id="use5"/></g>
+<use xlink:href="#cone" transform="rotate(72)" id="use1"/>
+<use xlink:href="#cone" transform="rotate(-72)" id="use2"/>
+<use xlink:href="#cone" transform="rotate(144)" id="use3"/>
+<use xlink:href="#cone" transform="rotate(-144)" id="use4"/></g>
+<use xlink:href="#bstar" transform="matrix(0,0.33,-0.33,0,11.641927,7.359454)"/> 
+<use xlink:href="#bstar" transform="matrix(0,0.33,-0.33,0,11.641927,0.359454)"/>
+<use xlink:href="#bstar" transform="matrix(0.33328261,-0.00581747,0.00581747,0.33328261,10.3045,5.3626743)"/>
+<use xlink:href="#bstar" transform="matrix(-0.00581747,-0.33328261,0.33328261,-0.00581747,10.362674,5.6955004)"/>  
+</svg>

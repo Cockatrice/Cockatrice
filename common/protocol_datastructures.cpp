@@ -12,13 +12,23 @@ ServerInfo_ChatChannel::ServerInfo_ChatChannel(const QString &_name, const QStri
 	insertItem(new SerializableItem_Bool("auto_join", _autoJoin));
 }
 
-ServerInfo_ChatUser::ServerInfo_ChatUser(const QString &_name)
-	: SerializableItem_Map("chat_user")
+ServerInfo_User::ServerInfo_User(const QString &_name, int _userLevel, const QString &_country)
+	: SerializableItem_Map("user")
 {
 	insertItem(new SerializableItem_String("name", _name));
+	insertItem(new SerializableItem_Int("userlevel", _userLevel));
+	insertItem(new SerializableItem_String("country", _country));
 }
 
-ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, const QString &_creatorName, bool _spectatorsAllowed, bool _spectatorsNeedPassword, int _spectatorCount)
+ServerInfo_User::ServerInfo_User(const ServerInfo_User *other)
+	: SerializableItem_Map("user")
+{
+	insertItem(new SerializableItem_String("name", other->getName()));
+	insertItem(new SerializableItem_Int("userlevel", other->getUserLevel()));
+	insertItem(new SerializableItem_String("country", other->getCountry()));
+}
+
+ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, ServerInfo_User *_creatorInfo, bool _spectatorsAllowed, bool _spectatorsNeedPassword, int _spectatorCount)
 	: SerializableItem_Map("game")
 {
 	insertItem(new SerializableItem_Int("game_id", _gameId));
@@ -26,7 +36,9 @@ ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool 
 	insertItem(new SerializableItem_Bool("has_password", _hasPassword));
 	insertItem(new SerializableItem_Int("player_count", _playerCount));
 	insertItem(new SerializableItem_Int("max_players", _maxPlayers));
-	insertItem(new SerializableItem_String("creator_name", _creatorName));
+	if (!_creatorInfo)
+		_creatorInfo = new ServerInfo_User;
+	insertItem(_creatorInfo);
 	insertItem(new SerializableItem_Bool("spectators_allowed", _spectatorsAllowed));
 	insertItem(new SerializableItem_Bool("spectators_need_password", _spectatorsNeedPassword));
 	insertItem(new SerializableItem_Int("spectator_count", _spectatorCount));
@@ -124,11 +136,13 @@ ServerInfo_Arrow::ServerInfo_Arrow(int _id, int _startPlayerId, const QString &_
 	insertItem(new SerializableItem_Color("color", _color));
 }
 
-ServerInfo_PlayerProperties::ServerInfo_PlayerProperties(int _playerId, const QString &_name, bool _spectator, bool _conceded, bool _readyStart, int _deckId)
+ServerInfo_PlayerProperties::ServerInfo_PlayerProperties(int _playerId, ServerInfo_User *_userInfo, bool _spectator, bool _conceded, bool _readyStart, int _deckId)
 	: SerializableItem_Map("player_properties")
 {
 	insertItem(new SerializableItem_Int("player_id", _playerId));
-	insertItem(new SerializableItem_String("name", _name));
+	if (!_userInfo)
+		_userInfo = new ServerInfo_User;
+	insertItem(_userInfo);
 	insertItem(new SerializableItem_Bool("spectator", _spectator));
 	insertItem(new SerializableItem_Bool("conceded", _conceded));
 	insertItem(new SerializableItem_Bool("ready_start", _readyStart));

@@ -1,7 +1,8 @@
 #include <QHeaderView>
 #include "playerlistwidget.h"
 #include "protocol_datastructures.h"
-#include "pingpixmapgenerator.h"
+#include "pixmapgenerator.h"
+#include <QDebug>
 
 PlayerListWidget::PlayerListWidget(QWidget *parent)
 	: QTreeWidget(parent), gameStarted(false)
@@ -44,14 +45,16 @@ void PlayerListWidget::updatePlayerProperties(ServerInfo_PlayerProperties *prop)
 
 	player->setIcon(1, prop->getSpectator() ? spectatorIcon : playerIcon);
 	player->setIcon(2, gameStarted ? (prop->getConceded() ? concededIcon : QIcon()) : (prop->getReadyStart() ? readyIcon : notReadyIcon));
-	player->setText(3, prop->getName());
+	player->setText(3, prop->getUserInfo()->getName());
+	if (!prop->getUserInfo()->getCountry().isEmpty())
+		player->setIcon(3, QIcon(CountryPixmapGenerator::generatePixmap(10, prop->getUserInfo()->getCountry())));
 
 	QString deckText;
 	if (!prop->getSpectator())
 		switch (prop->getDeckId()) {
-			case -2: deckText = tr("no deck"); break;
-			case -1: deckText = tr("local deck"); break;
-			default: deckText = tr("ID #%1").arg(prop->getDeckId());
+			case -2: deckText = tr("---"); break;
+			case -1: deckText = tr("local"); break;
+			default: deckText = tr("#%1").arg(prop->getDeckId());
 		}
 	player->setText(4, deckText);
 }
@@ -81,7 +84,7 @@ void PlayerListWidget::updatePing(int playerId, int pingTime)
 	QTreeWidgetItem *twi = players.value(playerId, 0);
 	if (!twi)
 		return;
-	twi->setIcon(0, QIcon(pingPixmapGenerator->generatePixmap(10, pingTime, 10)));
+	twi->setIcon(0, QIcon(PingPixmapGenerator::generatePixmap(10, pingTime, 10)));
 }
 
 void PlayerListWidget::setGameStarted(bool _gameStarted)

@@ -1,0 +1,52 @@
+#include "pixmapgenerator.h"
+#include <QPainter>
+#include <QSvgRenderer>
+#include <math.h>
+
+QPixmap PingPixmapGenerator::generatePixmap(int size, int value, int max)
+{
+	int key = size * 1000000 + max * 1000 + value;
+	if (pmCache.contains(key))
+		return pmCache.value(key);
+	
+	QPixmap pixmap(size, size);
+	pixmap.fill(Qt::transparent);
+	QPainter painter(&pixmap);
+	QColor color;
+	if ((max == -1) || (value == -1))
+		color = Qt::black;
+	else
+		color.setHsv(120 * (1.0 - ((double) value / max)), 255, 255);
+	
+	QRadialGradient g(QPointF((double) pixmap.width() / 2, (double) pixmap.height() / 2), qMin(pixmap.width(), pixmap.height()) / 2.0);
+	g.setColorAt(0, color);
+	g.setColorAt(1, Qt::transparent);
+	painter.fillRect(0, 0, pixmap.width(), pixmap.height(), QBrush(g));
+	
+	pmCache.insert(key, pixmap);
+
+	return pixmap;
+}
+
+QMap<int, QPixmap> PingPixmapGenerator::pmCache;
+
+QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countryCode)
+{
+	if (countryCode.size() != 2)
+		return QPixmap();
+	QString key = countryCode + QString::number(height);
+	if (pmCache.contains(key))
+		return pmCache.value(key);
+	
+	QSvgRenderer svg(QString(":/resources/countries/" + countryCode + ".svg"));
+	double aspect = (double) svg.defaultSize().width() / (double) svg.defaultSize().height();
+	QPixmap pixmap((int) round(aspect * height), height);
+	pixmap.fill(Qt::transparent);
+	QPainter painter(&pixmap);
+	svg.render(&painter, QRectF(0, 0, aspect * height, height));
+	
+	pmCache.insert(key, pixmap);
+	return pixmap;
+}
+
+QMap<QString, QPixmap> CountryPixmapGenerator::pmCache;

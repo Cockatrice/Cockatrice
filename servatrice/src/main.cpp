@@ -48,7 +48,6 @@ void testRNG()
 		numbers[max - minMax] = rng->makeNumbersVector(n * (max - min + 1), min, max);
 		chisq[max - minMax] = rng->testRandom(numbers[max - minMax]);
 	}
-	qDebug() << numbers;
 	for (int i = 0; i <= maxMax - min; ++i) {
 		std::cerr << (min + i);
 		for (int j = 0; j < numbers.size(); ++j) {

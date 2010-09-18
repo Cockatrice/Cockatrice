@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include <QtSql>
 #include <QSettings>
+#include <QDebug>
 #include "servatrice.h"
 #include "server_chatchannel.h"
 #include "serversocketinterface.h"
@@ -88,7 +89,7 @@ bool Servatrice::openDatabase()
 		if (!query.next())
 			return false;
 		nextGameId = query.value(0).toInt() + 1;
-		qDebug(QString("set nextGameId to %1").arg(nextGameId).toLatin1());
+		qDebug() << "set nextGameId to " << nextGameId;
 	}
 	return true;
 }
@@ -103,7 +104,7 @@ bool Servatrice::execSqlQuery(QSqlQuery &query)
 {
 	if (query.exec())
 		return true;
-	qCritical(QString("Database error: %1").arg(query.lastError().text()).toLatin1());
+	qCritical() << "Database error:" << query.lastError().text();
 	return false;
 }
 
@@ -139,4 +140,35 @@ AuthenticationResult Servatrice::checkUserPassword(const QString &user, const QS
 		return UnknownUser;
 }
 
-const QString Servatrice::versionString = "Servatrice 0.20100915";
+ServerInfo_User *Servatrice::getUserData(const QString &name)
+{
+	const QString method = settings->value("authentication/method").toString();
+	if (method == "sql") {
+		checkSql();
+
+		QSqlQuery query;
+		query.prepare("select admin, country from users where name = :name");
+		query.bindValue(":name", name);
+		if (!execSqlQuery(query))
+			return new ServerInfo_User(name);
+		
+		if (query.next()) {
+			bool is_admin = query.value(0).toInt();
+			QString country = query.value(1).toString();
+			
+			int userLevel = ServerInfo_User::IsUser;
+			if (is_admin)
+				userLevel |= ServerInfo_User::IsAdmin;
+			
+			return new ServerInfo_User(
+				name,
+				userLevel,
+				country
+			);
+		} else
+			return new ServerInfo_User(name);
+	} else
+		return new ServerInfo_User(name);
+}
+
+const QString Servatrice::versionString = "Servatrice 0.20100918";

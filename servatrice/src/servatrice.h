@@ -40,11 +40,13 @@ public:
 	bool openDatabase();
 	void checkSql();
 	bool execSqlQuery(QSqlQuery &query);
-	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
 	QString getLoginMessage() const { return loginMessage; }
 	bool getGameShouldPing() const { return true; }
 	int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
 	int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
+protected:
+	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
+	ServerInfo_User *getUserData(const QString &name);
 private:
 	QTimer *pingClock;
 	QTcpServer *tcpServer;

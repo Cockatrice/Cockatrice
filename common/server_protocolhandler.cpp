@@ -14,7 +14,7 @@
 #include <QDateTime>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
-	: QObject(parent), server(_server), authState(PasswordWrong), acceptsGameListChanges(false), lastCommandTime(QDateTime::currentDateTime())
+	: QObject(parent), server(_server), authState(PasswordWrong), acceptsGameListChanges(false), userInfo(0), lastCommandTime(QDateTime::currentDateTime())
 {
 	connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
@@ -40,6 +40,8 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 	QMapIterator<QString, Server_ChatChannel *> chatChannelIterator(chatChannels);
 	while (chatChannelIterator.hasNext())
 		chatChannelIterator.next().value()->removeClient(this);
+	
+	delete userInfo;
 }
 
 void Server_ProtocolHandler::playerRemovedFromGame(Server_Game *game)
@@ -200,15 +202,12 @@ ResponseCode Server_ProtocolHandler::cmdPing(Command_Ping * /*cmd*/, CommandCont
 ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContainer *cont)
 {
 	QString userName = cmd->getUsername().simplified();
-	if (userName.isEmpty())
+	if (userName.isEmpty() || (userInfo != 0))
 		return RespContextError;
-	authState = server->checkUserPassword(userName, cmd->getPassword());
+	authState = server->loginUser(this, userName, cmd->getPassword());
 	if (authState == PasswordWrong)
 		return RespWrongPassword;
-	if (authState == PasswordRight)
-		server->closeOldSession(userName);
 
-	playerName = userName;
 	enqueueProtocolItem(new Event_ServerMessage(server->getLoginMessage()));
 
 	if (authState == PasswordRight) {
@@ -217,7 +216,7 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 		for (int i = 0; i < serverGames.size(); ++i) {
 			const QList<Server_Player *> &gamePlayers = serverGames[i]->getPlayers().values();
 			for (int j = 0; j < gamePlayers.size(); ++j)
-				if (gamePlayers[j]->getPlayerName() == playerName) {
+				if (gamePlayers[j]->getUserInfo()->getName() == userInfo->getName()) {
 					gamePlayers[j]->setProtocolHandler(this);
 					games.insert(serverGames[i]->getGameId(), QPair<Server_Game *, Server_Player *>(serverGames[i], gamePlayers[j]));
 					
@@ -293,7 +292,7 @@ ResponseCode Server_ProtocolHandler::cmdListGames(Command_ListGames * /*cmd*/, C
 			!g->getPassword().isEmpty(),
 			g->getPlayerCount(),
 			g->getMaxPlayers(),
-			g->getCreatorName(),
+			g->getCreatorInfo(),
 			g->getSpectatorsAllowed(),
 			g->getSpectatorsNeedPassword(),
 			g->getSpectatorCount()
@@ -311,7 +310,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 		return RespLoginNeeded;
 	
 	Server_Game *game = server->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
-	Server_Player *creator = game->getCreator();
+	Server_Player *creator = game->getPlayers().values().first();
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	
 	enqueueProtocolItem(new Event_GameJoined(game->getGameId(), game->getDescription(), creator->getPlayerId(), false, game->getSpectatorsCanTalk(), game->getSpectatorsSeeEverything(), false));

@@ -22,6 +22,7 @@
 #include "server_counter.h"
 #include "server_chatchannel.h"
 #include "server_protocolhandler.h"
+#include "protocol_datastructures.h"
 #include <QDebug>
 
 Server::Server(QObject *parent)
@@ -33,6 +34,35 @@ Server::~Server()
 {
 	while (!clients.isEmpty())
 		delete clients.takeFirst();
+}
+
+AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password)
+{
+	AuthenticationResult authState = checkUserPassword(name, password);
+	if (authState == PasswordWrong)
+		return authState;
+	
+	if (authState == PasswordRight) {
+		Server_ProtocolHandler *oldSession = users.value(name);
+		if (oldSession)
+			delete oldSession; // ~Server_ProtocolHandler() will call Server::removeClient
+	} else if (authState == UnknownUser) {
+		// Change user name so that no two users have the same names
+		QString tempName = name;
+		int i = 0;
+		while (users.contains(tempName))
+			tempName = name + "_" + QString::number(++i);
+		name = tempName;
+	}
+	
+	ServerInfo_User *data = getUserData(name);
+	if (authState == PasswordRight)
+		data->setUserLevel(data->getUserLevel() | ServerInfo_User::IsRegistered);
+	session->setUserInfo(data);
+	
+	users.insert(name, session);
+	
+	return authState;
 }
 
 Server_Game *Server::createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator)
@@ -54,19 +84,10 @@ void Server::addClient(Server_ProtocolHandler *client)
 void Server::removeClient(Server_ProtocolHandler *client)
 {
 	clients.removeAt(clients.indexOf(client));
-	qDebug(QString("Server::removeClient: %1 clients left").arg(clients.size()).toLatin1());
-}
-
-void Server::closeOldSession(const QString &playerName)
-{
-	Server_ProtocolHandler *session = 0;
-	for (int i = 0; i < clients.size(); ++i)
-		if (clients[i]->getPlayerName() == playerName) {
-			session = clients[i];
-			break;
-		}
-	if (session)
-		delete session; // ~Server_ProtocolHandler() will call Server::removeClient
+	ServerInfo_User *data = client->getUserInfo();
+	if (data)
+		users.remove(data->getName());
+	qDebug() << "Server::removeClient: " << clients.size() << "clients; " << users.size() << "users left";
 }
 
 Server_Game *Server::getGame(int gameId) const
@@ -85,14 +106,14 @@ void Server::broadcastGameListUpdate(Server_Game *game)
 			!game->getPassword().isEmpty(),
 			game->getPlayerCount(),
 			game->getMaxPlayers(),
-			game->getCreatorName(),
+			new ServerInfo_User(game->getCreatorInfo()),
 			game->getSpectatorsAllowed(),
 			game->getSpectatorsNeedPassword(),
 			game->getSpectatorCount()
 		));
 	else
 		// Game is closing
-		eventGameList.append(new ServerInfo_Game(game->getGameId(), QString(), false, 0, game->getMaxPlayers(), QString(), false, 0));
+		eventGameList.append(new ServerInfo_Game(game->getGameId(), QString(), false, 0, game->getMaxPlayers(), 0, false, 0));
 	Event_ListGames *event = new Event_ListGames(eventGameList);
 	
 	for (int i = 0; i < clients.size(); i++)

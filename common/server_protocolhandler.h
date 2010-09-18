@@ -9,6 +9,7 @@
 
 class Server_Player;
 class Server_Card;
+class ServerInfo_User;
 class QTimer;
 
 class Server_ProtocolHandler : public QObject {
@@ -17,7 +18,6 @@ protected:
 	Server *server;
 	QMap<int, QPair<Server_Game *, Server_Player *> > games;
 	QMap<QString, Server_ChatChannel *> chatChannels;
-	QString playerName;
 
 	Server *getServer() const { return server; }
 	QPair<Server_Game *, Server_Player *> getGame(int gameId) const;
@@ -25,6 +25,7 @@ protected:
 	AuthenticationResult authState;
 	bool acceptsGameListChanges;
 	bool acceptsChatChannelListChanges;
+	ServerInfo_User *userInfo;
 	
 private:
 	QList<ProtocolItem *> itemQueue;
@@ -91,7 +92,8 @@ public:
 	
 	bool getAcceptsGameListChanges() const { return acceptsGameListChanges; }
 	bool getAcceptsChatChannelListChanges() const { return acceptsChatChannelListChanges; }
-	const QString &getPlayerName() const { return playerName; }
+	ServerInfo_User *getUserInfo() const { return userInfo; }
+	void setUserInfo(ServerInfo_User *_userInfo) { userInfo = _userInfo; }
 	const QDateTime &getLastCommandTime() const { return lastCommandTime; }
 
 	void processCommandContainer(CommandContainer *cont);
