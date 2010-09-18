@@ -292,7 +292,7 @@ ResponseCode Server_ProtocolHandler::cmdListGames(Command_ListGames * /*cmd*/, C
 			!g->getPassword().isEmpty(),
 			g->getPlayerCount(),
 			g->getMaxPlayers(),
-			g->getCreatorInfo(),
+			new ServerInfo_User(g->getCreatorInfo()),
 			g->getSpectatorsAllowed(),
 			g->getSpectatorsNeedPassword(),
 			g->getSpectatorCount()
