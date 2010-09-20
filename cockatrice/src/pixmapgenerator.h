@@ -1,5 +1,5 @@
-#ifndef PINGPIXMAPGENERATOR_H
-#define PINGPIXMAPGENERATOR_H
+#ifndef PIXMAPGENERATOR_H
+#define PIXMAPGENERATOR_H
 
 #include <QPixmap>
 #include <QMap>
@@ -9,6 +9,7 @@ private:
 	static QMap<int, QPixmap> pmCache;
 public:
 	static QPixmap generatePixmap(int size, int value, int max);
+	static void clear() { pmCache.clear(); }
 };
 
 class CountryPixmapGenerator {
@@ -16,6 +17,15 @@ private:
 	static QMap<QString, QPixmap> pmCache;
 public:
 	static QPixmap generatePixmap(int height, const QString &countryCode);
+	static void clear() { pmCache.clear(); }
+};
+
+class UserLevelPixmapGenerator {
+private:
+	static QMap<int, QPixmap> pmCache;
+public:
+	static QPixmap generatePixmap(int height, int userLevel);
+	static void clear() { pmCache.clear(); }
 };
 
 #endif

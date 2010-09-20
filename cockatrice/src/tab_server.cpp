@@ -241,7 +241,7 @@ UserList::UserList(AbstractClient *_client, QWidget *parent)
 	: QGroupBox(parent)
 {
 	userTree = new QTreeWidget;
-	userTree->setColumnCount(2);
+	userTree->setColumnCount(3);
 	userTree->header()->setResizeMode(QHeaderView::ResizeToContents);
 	userTree->setHeaderHidden(true);
 	userTree->setRootIsDecorated(false);
@@ -273,7 +273,7 @@ void UserList::processUserInfo(ServerInfo_User *user)
 	QTreeWidgetItem *item = 0;
 	for (int i = 0; i < userTree->topLevelItemCount(); ++i) {
 		QTreeWidgetItem *temp = userTree->topLevelItem(i);
-		if (temp->data(1, Qt::UserRole) == user->getName()) {
+		if (temp->data(2, Qt::UserRole) == user->getName()) {
 			item = temp;
 			break;
 		}
@@ -283,9 +283,10 @@ void UserList::processUserInfo(ServerInfo_User *user)
 		userTree->addTopLevelItem(item);
 		retranslateUi();
 	}
-	item->setIcon(0, QIcon(CountryPixmapGenerator::generatePixmap(12, user->getCountry())));
-	item->setData(1, Qt::UserRole, user->getName());
-	item->setData(1, Qt::DisplayRole, user->getName());
+	item->setIcon(0, QIcon(UserLevelPixmapGenerator::generatePixmap(12, user->getUserLevel())));
+	item->setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(12, user->getCountry())));
+	item->setData(2, Qt::UserRole, user->getName());
+	item->setData(2, Qt::DisplayRole, user->getName());
 }
 
 void UserList::processResponse(ProtocolResponse *response)
@@ -310,7 +311,7 @@ void UserList::processUserJoinedEvent(Event_UserJoined *event)
 void UserList::processUserLeftEvent(Event_UserLeft *event)
 {
 	for (int i = 0; i < userTree->topLevelItemCount(); ++i)
-		if (userTree->topLevelItem(i)->data(1, Qt::UserRole) == event->getUserName()) {
+		if (userTree->topLevelItem(i)->data(2, Qt::UserRole) == event->getUserName()) {
 			emit userLeft(event->getUserName());
 			delete userTree->takeTopLevelItem(i);
 			retranslateUi();
@@ -320,7 +321,7 @@ void UserList::processUserLeftEvent(Event_UserLeft *event)
 
 void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
 {
-	emit openMessageDialog(item->data(1, Qt::UserRole).toString(), true);
+	emit openMessageDialog(item->data(2, Qt::UserRole).toString(), true);
 }
 
 TabServer::TabServer(AbstractClient *_client, QWidget *parent)

@@ -36,7 +36,8 @@ public:
 		IsNothing = 0x00,
 		IsUser = 0x01,
 		IsRegistered = 0x02,
-		IsAdmin = 0x04
+		IsJudge = 0x04,
+		IsAdmin = 0x08
 	};
 	ServerInfo_User(const QString &_name = QString(), int _userLevel = IsNothing, const QString &_country = QString());
 	ServerInfo_User(const ServerInfo_User *other);

@@ -34,6 +34,7 @@
 #include "dlg_settings.h"
 #include "carddatabase.h"
 #include "settingscache.h"
+#include "pixmapgenerator.h"
 
 //Q_IMPORT_PLUGIN(qjpeg)
 
@@ -124,6 +125,9 @@ int main(int argc, char *argv[])
 
 	delete db;
 	delete settingsCache;
-
+	PingPixmapGenerator::clear();
+	CountryPixmapGenerator::clear();
+	UserLevelPixmapGenerator::clear();
+	
 	return 0;
 }

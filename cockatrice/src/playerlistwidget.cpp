@@ -14,7 +14,7 @@ PlayerListWidget::PlayerListWidget(QWidget *parent)
 	spectatorIcon = QIcon(":/resources/icon_spectator.svg");
 
 	setIconSize(QSize(20, 15));
-	setColumnCount(5);
+	setColumnCount(6);
 	setRootIsDecorated(false);
 	setSelectionMode(NoSelection);
 	header()->setResizeMode(QHeaderView::ResizeToContents);
@@ -26,8 +26,9 @@ void PlayerListWidget::retranslateUi()
 	headerItem()->setText(0, QString());
 	headerItem()->setText(1, QString());
 	headerItem()->setText(2, QString());
-	headerItem()->setText(3, tr("Player name"));
-	headerItem()->setText(4, tr("Deck"));
+	headerItem()->setText(3, QString());
+	headerItem()->setText(4, tr("Player name"));
+	headerItem()->setText(5, tr("Deck"));
 }
 
 void PlayerListWidget::addPlayer(ServerInfo_PlayerProperties *player)
@@ -46,9 +47,10 @@ void PlayerListWidget::updatePlayerProperties(ServerInfo_PlayerProperties *prop)
 
 	player->setIcon(1, prop->getSpectator() ? spectatorIcon : playerIcon);
 	player->setIcon(2, gameStarted ? (prop->getConceded() ? concededIcon : QIcon()) : (prop->getReadyStart() ? readyIcon : notReadyIcon));
-	player->setText(3, prop->getUserInfo()->getName());
+	player->setIcon(3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, prop->getUserInfo()->getUserLevel())));
+	player->setText(4, prop->getUserInfo()->getName());
 	if (!prop->getUserInfo()->getCountry().isEmpty())
-		player->setIcon(3, QIcon(CountryPixmapGenerator::generatePixmap(12, prop->getUserInfo()->getCountry())));
+		player->setIcon(4, QIcon(CountryPixmapGenerator::generatePixmap(12, prop->getUserInfo()->getCountry())));
 
 	QString deckText;
 	if (!prop->getSpectator())
@@ -57,7 +59,7 @@ void PlayerListWidget::updatePlayerProperties(ServerInfo_PlayerProperties *prop)
 			case -1: deckText = tr("local"); break;
 			default: deckText = tr("#%1").arg(prop->getDeckId());
 		}
-	player->setText(4, deckText);
+	player->setText(5, deckText);
 }
 
 void PlayerListWidget::removePlayer(int playerId)
@@ -76,7 +78,7 @@ void PlayerListWidget::setActivePlayer(int playerId)
 		i.next();
 		QTreeWidgetItem *twi = i.value();
 		QColor c = i.key() == playerId ? QColor(150, 255, 150) : Qt::white;
-		twi->setBackground(3, c);
+		twi->setBackground(4, c);
 	}
 }
 
@@ -85,7 +87,7 @@ void PlayerListWidget::updatePing(int playerId, int pingTime)
 	QTreeWidgetItem *twi = players.value(playerId, 0);
 	if (!twi)
 		return;
-	twi->setIcon(0, QIcon(PingPixmapGenerator::generatePixmap(10, pingTime, 10)));
+	twi->setIcon(0, QIcon(PingPixmapGenerator::generatePixmap(12, pingTime, 10)));
 }
 
 void PlayerListWidget::setGameStarted(bool _gameStarted)

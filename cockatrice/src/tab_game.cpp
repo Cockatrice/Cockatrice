@@ -553,6 +553,8 @@ void TabGame::eventPlayerPropertiesChanged(Event_PlayerPropertiesChanged *event,
 void TabGame::eventJoin(Event_Join *event, GameEventContext * /*context*/)
 {
 	ServerInfo_PlayerProperties *playerInfo = event->getPlayer();
+	if (players.contains(playerInfo->getPlayerId()))
+		return;
 	if (playerInfo->getSpectator()) {
 		spectators.insert(playerInfo->getPlayerId(), playerInfo->getUserInfo()->getName());
 		messageLog->logJoinSpectator(playerInfo->getUserInfo()->getName());

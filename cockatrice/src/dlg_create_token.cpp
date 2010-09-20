@@ -12,7 +12,8 @@ DlgCreateToken::DlgCreateToken(QWidget *parent)
 	: QDialog(parent)
 {
 	nameLabel = new QLabel(tr("&Name:"));
-	nameEdit = new QLineEdit;
+	nameEdit = new QLineEdit(tr("Token"));
+	nameEdit->selectAll();
 	nameLabel->setBuddy(nameEdit);
 
 	colorLabel = new QLabel(tr("C&olor:"));

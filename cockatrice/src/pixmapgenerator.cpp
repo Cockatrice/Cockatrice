@@ -1,4 +1,5 @@
 #include "pixmapgenerator.h"
+#include "protocol_datastructures.h"
 #include <QPainter>
 #include <QSvgRenderer>
 #include <math.h>
@@ -53,3 +54,31 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
 }
 
 QMap<QString, QPixmap> CountryPixmapGenerator::pmCache;
+
+QPixmap UserLevelPixmapGenerator::generatePixmap(int height, int userLevel)
+{
+	int key = height * 10000 + userLevel;
+	if (pmCache.contains(key))
+		return pmCache.value(key);
+	
+	QString levelString;
+	if (userLevel & ServerInfo_User::IsAdmin)
+		levelString = "judge";
+	else if (userLevel & ServerInfo_User::IsJudge)
+		levelString = "judge";
+	else if (userLevel &ServerInfo_User::IsRegistered)
+		levelString = "registered";
+	else
+		levelString = "normal";
+	QSvgRenderer svg(QString(":/resources/userlevels/" + levelString + ".svg"));
+	int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
+	QPixmap pixmap(width, height);
+	pixmap.fill(Qt::transparent);
+	QPainter painter(&pixmap);
+	svg.render(&painter, QRectF(0, 0, width, height));
+	
+	pmCache.insert(key, pixmap);
+	return pixmap;
+}
+
+QMap<int, QPixmap> UserLevelPixmapGenerator::pmCache;

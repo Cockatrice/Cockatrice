@@ -64,5 +64,10 @@
 	<file>resources/countries/tr.svg</file>
 	<file>resources/countries/uk.svg</file>
 	<file>resources/countries/us.svg</file>
+
+	<file>resources/userlevels/normal.svg</file>
+	<file>resources/userlevels/registered.svg</file>
+	<file>resources/userlevels/judge.svg</file>
+	<file>resources/userlevels/admin.svg</file>
     </qresource>
 </RCC>

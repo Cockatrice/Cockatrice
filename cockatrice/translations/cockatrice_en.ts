@@ -606,72 +606,77 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="18"/>
+        <location filename="../src/dlg_create_token.cpp" line="15"/>
+        <source>Token</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_create_token.cpp" line="19"/>
         <source>C&amp;olor:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="20"/>
+        <location filename="../src/dlg_create_token.cpp" line="21"/>
         <source>white</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="21"/>
+        <location filename="../src/dlg_create_token.cpp" line="22"/>
         <source>blue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="22"/>
+        <location filename="../src/dlg_create_token.cpp" line="23"/>
         <source>black</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="23"/>
+        <location filename="../src/dlg_create_token.cpp" line="24"/>
         <source>red</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="24"/>
+        <location filename="../src/dlg_create_token.cpp" line="25"/>
         <source>green</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="25"/>
+        <location filename="../src/dlg_create_token.cpp" line="26"/>
         <source>multicolor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="26"/>
+        <location filename="../src/dlg_create_token.cpp" line="27"/>
         <source>colorless</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="29"/>
+        <location filename="../src/dlg_create_token.cpp" line="30"/>
         <source>&amp;P/T:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="33"/>
+        <location filename="../src/dlg_create_token.cpp" line="34"/>
         <source>&amp;Annotation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="37"/>
+        <location filename="../src/dlg_create_token.cpp" line="38"/>
         <source>&amp;Destroy token when it leaves the table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="40"/>
+        <location filename="../src/dlg_create_token.cpp" line="41"/>
         <source>&amp;OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="42"/>
+        <location filename="../src/dlg_create_token.cpp" line="43"/>
         <source>&amp;Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="65"/>
+        <location filename="../src/dlg_create_token.cpp" line="66"/>
         <source>Create token</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1843,27 +1848,27 @@
 <context>
     <name>PlayerListWidget</name>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="29"/>
+        <location filename="../src/playerlistwidget.cpp" line="30"/>
         <source>Player name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="30"/>
+        <location filename="../src/playerlistwidget.cpp" line="31"/>
         <source>Deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="56"/>
+        <location filename="../src/playerlistwidget.cpp" line="58"/>
         <source>---</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="57"/>
+        <location filename="../src/playerlistwidget.cpp" line="59"/>
         <source>local</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="58"/>
+        <location filename="../src/playerlistwidget.cpp" line="60"/>
         <source>#%1</source>
         <translation type="unfinished"></translation>
     </message>
