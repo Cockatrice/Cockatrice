@@ -63,7 +63,7 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height, int userLevel)
 	
 	QString levelString;
 	if (userLevel & ServerInfo_User::IsAdmin)
-		levelString = "judge";
+		levelString = "admin";
 	else if (userLevel & ServerInfo_User::IsJudge)
 		levelString = "judge";
 	else if (userLevel &ServerInfo_User::IsRegistered)
