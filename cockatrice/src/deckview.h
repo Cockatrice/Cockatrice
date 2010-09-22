@@ -49,6 +49,8 @@ private:
 	QPixmap bgPixmap;
 	static const int rowSpacing = 5;
 public:
+	enum { Type = typeDeckViewCardContainer };
+	int type() const { return Type; }
 	DeckViewCardContainer(const QString &_name);
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

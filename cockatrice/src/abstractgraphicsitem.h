@@ -8,7 +8,8 @@ enum GraphicsItemType {
 	typeCardDrag = QGraphicsItem::UserType + 2,
 	typeZone = QGraphicsItem::UserType + 3,
 	typePlayerTarget = QGraphicsItem::UserType + 4,
-	typeOther = QGraphicsItem::UserType + 5
+	typeDeckViewCardContainer = QGraphicsItem::UserType + 5,
+	typeOther = QGraphicsItem::UserType + 6
 };
 
 class AbstractGraphicsItem : public QGraphicsItem {
