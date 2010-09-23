@@ -3,7 +3,6 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QTreeWidget>
 #include <QTextEdit>
 #include <QMessageBox>
 #include <QLineEdit>
@@ -237,6 +236,20 @@ void ServerMessageLog::processServerMessageEvent(Event_ServerMessage *event)
 	textEdit->append(event->getMessage());
 }
 
+UserListTWI::UserListTWI()
+	: QTreeWidgetItem(Type)
+{
+}
+
+bool UserListTWI::operator<(const QTreeWidgetItem &other) const
+{
+	// Equal user level => sort by name
+	if (data(0, Qt::UserRole) == other.data(0, Qt::UserRole))
+		return data(2, Qt::UserRole).toString().toLower() < other.data(2, Qt::UserRole).toString().toLower();
+	// Else sort by user level
+	return data(0, Qt::UserRole).toInt() > other.data(0, Qt::UserRole).toInt();
+}
+
 UserList::UserList(AbstractClient *_client, QWidget *parent)
 	: QGroupBox(parent)
 {
@@ -279,10 +292,11 @@ void UserList::processUserInfo(ServerInfo_User *user)
 		}
 	}
 	if (!item) {
-		item = new QTreeWidgetItem;
+		item = new UserListTWI;
 		userTree->addTopLevelItem(item);
 		retranslateUi();
 	}
+	item->setData(0, Qt::UserRole, user->getUserLevel());
 	item->setIcon(0, QIcon(UserLevelPixmapGenerator::generatePixmap(12, user->getUserLevel())));
 	item->setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(12, user->getCountry())));
 	item->setData(2, Qt::UserRole, user->getName());

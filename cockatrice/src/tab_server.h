@@ -2,6 +2,7 @@
 #define TAB_SERVER_H
 
 #include <QGroupBox>
+#include <QTreeWidget>
 #include "tab.h"
 #include "protocol_datastructures.h"
 
@@ -74,6 +75,12 @@ private slots:
 public:
 	ServerMessageLog(AbstractClient *_client, QWidget *parent = 0);
 	void retranslateUi();
+};
+
+class UserListTWI : public QTreeWidgetItem {
+public:
+	UserListTWI();
+	bool operator<(const QTreeWidgetItem &other) const;
 };
 
 class UserList : public QGroupBox {
