@@ -35,12 +35,14 @@
 #include "carddatabase.h"
 #include "settingscache.h"
 #include "pixmapgenerator.h"
+#include "rng_sfmt.h"
 
 //Q_IMPORT_PLUGIN(qjpeg)
 
 CardDatabase *db;
 QTranslator *translator, *qtTranslator;
 SettingsCache *settingsCache;
+RNG_Abstract *rng;
 
 void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
@@ -84,6 +86,7 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationDomain("cockatrice.de");
 	QCoreApplication::setApplicationName("Cockatrice");
 	
+	rng = new RNG_SFMT;
 	settingsCache = new SettingsCache;
 	db = new CardDatabase;
 
@@ -125,6 +128,7 @@ int main(int argc, char *argv[])
 
 	delete db;
 	delete settingsCache;
+	delete rng;
 	PingPixmapGenerator::clear();
 	CountryPixmapGenerator::clear();
 	UserLevelPixmapGenerator::clear();

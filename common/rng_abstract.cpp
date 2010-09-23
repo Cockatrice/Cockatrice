@@ -1,9 +1,6 @@
 #include "rng_abstract.h"
-#include "rng_qt.h"
-#include "rng_sfmt.h"
 #include <QDebug>
 
-RNG_Abstract *rng = new RNG_SFMT;
 
 QVector<int> RNG_Abstract::makeNumbersVector(int n, int min, int max)
 {

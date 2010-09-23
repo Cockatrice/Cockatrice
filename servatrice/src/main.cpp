@@ -22,7 +22,9 @@
 #include <QTextCodec>
 #include <iostream>
 #include "servatrice.h"
-#include "rng_abstract.h"
+#include "rng_sfmt.h"
+
+RNG_Abstract *rng;
 
 void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
@@ -76,6 +78,8 @@ int main(int argc, char *argv[])
 	app.setApplicationName("Servatrice");
 	
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+
+	rng = new RNG_SFMT;
 	
 	std::cerr << "Servatrice " << Servatrice::versionString.toStdString() << " starting." << std::endl;
 	std::cerr << "-------------------------" << std::endl;
@@ -87,5 +91,9 @@ int main(int argc, char *argv[])
 	std::cerr << "-------------------------" << std::endl;
 	std::cerr << "Server initialized." << std::endl;
 	
-	return app.exec();
+	int retval = app.exec();
+
+	delete rng;
+
+	return retval;
 }
