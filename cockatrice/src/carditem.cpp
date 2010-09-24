@@ -297,6 +297,8 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	if (event->buttons().testFlag(Qt::RightButton)) {
 		if ((event->screenPos() - event->buttonDownScreenPos(Qt::RightButton)).manhattanLength() < 2 * QApplication::startDragDistance())
 			return;
+		if (static_cast<TabGame *>(owner->parent())->getSpectator())
+			return;
 		
 		QColor arrowColor = Qt::red;
 		if (event->modifiers().testFlag(Qt::ControlModifier))
