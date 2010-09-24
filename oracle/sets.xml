@@ -210,6 +210,10 @@
             <name>SOK</name>
             <longname>Saviors of Kamigawa</longname>
         </set>
+	<set import="1">
+	    <name>SOM</name>
+	    <longname>Scars of Mirrodin</longname>
+	</set>
         <set import="1">
             <name>SC</name>
             <longname>Scourge</longname>
