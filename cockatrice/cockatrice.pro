@@ -154,7 +154,10 @@ SOURCES += src/counter.cpp \
 	../common/server_player.cpp \
 	../common/server_protocolhandler.cpp
 
-TRANSLATIONS += translations/cockatrice_de.ts translations/cockatrice_en.ts
+TRANSLATIONS += \
+	translations/cockatrice_de.ts \
+	translations/cockatrice_en.ts \
+	translations/cockatrice_es.ts
 win32 {
 	RC_FILE = cockatrice.rc
 }

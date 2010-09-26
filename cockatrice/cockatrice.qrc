@@ -25,6 +25,7 @@
         <file>resources/hr.jpg</file>
         <file>translations/cockatrice_de.qm</file>
         <file>translations/cockatrice_en.qm</file>
+	<file>translations/cockatrice_es.qm</file>
         <file>resources/appicon.svg</file>
         <file>resources/add_to_sideboard.svg</file>
         <file>resources/decrement.svg</file>
