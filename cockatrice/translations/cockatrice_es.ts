@@ -952,7 +952,7 @@
         <location filename="../src/dlg_settings.cpp" line="34"/>
         <location filename="../src/dlg_settings.cpp" line="103"/>
         <source>English</source>
-        <translation type="unfinished">Espanol</translation>
+        <translation>Español</translation>
     </message>
 </context>
 <context>
