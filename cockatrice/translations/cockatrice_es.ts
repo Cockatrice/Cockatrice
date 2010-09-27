@@ -608,7 +608,7 @@
     <message>
         <location filename="../src/dlg_create_token.cpp" line="15"/>
         <source>Token</source>
-        <translation type="unfinished"></translation>
+        <translation>Ficha</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="19"/>
@@ -1227,12 +1227,12 @@
     <message>
         <location filename="../src/messagelogwidget.cpp" line="208"/>
         <source>%1 flips %2 face-down.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 voltea %2 boca abajo.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="210"/>
         <source>%1 flips %2 face-up.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 voltea %2 boca arriba.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="220"/>
@@ -1774,12 +1774,12 @@
     <message>
         <location filename="../src/player.cpp" line="316"/>
         <source>Move top cards to g&amp;raveyard...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mover cartas superiores al ce&amp;menterio...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="317"/>
         <source>Move top cards to &amp;exile...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mover cartas superiores al &amp;exilio...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="334"/>
@@ -1802,12 +1802,12 @@
     <message>
         <location filename="../src/player.cpp" line="454"/>
         <source>Move top cards to grave</source>
-        <translation type="unfinished"></translation>
+        <translation>Mover cartas superiores al cementerio</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="469"/>
         <source>Move top cards to exile</source>
-        <translation type="unfinished"></translation>
+        <translation>Mover cartas superiores al exilio</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="490"/>
@@ -1860,17 +1860,17 @@
     <message>
         <location filename="../src/playerlistwidget.cpp" line="58"/>
         <source>---</source>
-        <translation type="unfinished"></translation>
+        <translation>---</translation>
     </message>
     <message>
         <location filename="../src/playerlistwidget.cpp" line="59"/>
         <source>local</source>
-        <translation type="unfinished"></translation>
+        <translation>local</translation>
     </message>
     <message>
         <location filename="../src/playerlistwidget.cpp" line="60"/>
         <source>#%1</source>
-        <translation type="unfinished"></translation>
+        <translation>#%1</translation>
     </message>
     <message>
         <source>no deck</source>
@@ -2063,7 +2063,7 @@ Por favor, introduzca un nombre:</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="249"/>
         <source>Next &amp;turn</source>
-        <translation>Proximo &amp;turno</translation>
+        <translation>Próximo &amp;turno</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="250"/>
@@ -2136,22 +2136,22 @@ Por favor, introduzca un nombre:</translation>
     <message>
         <location filename="../src/tab_message.cpp" line="40"/>
         <source>Personal &amp;talk</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Conversación personal</translation>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="41"/>
         <source>&amp;Leave</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Cerrar</translation>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="75"/>
         <source>%1 has left the server.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ha abandonado el servidor.</translation>
     </message>
     <message>
         <location filename="../src/tab_message.h" line="35"/>
         <source>Talking to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Hablando con %1</translation>
     </message>
 </context>
 <context>
@@ -2180,7 +2180,7 @@ Por favor, introduzca un nombre:</translation>
     <message>
         <location filename="../src/tab_server.cpp" line="281"/>
         <source>Users online: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuarios online: %1</translation>
     </message>
 </context>
 <context>
