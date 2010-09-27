@@ -352,27 +352,27 @@
 <context>
     <name>ChatChannelSelector</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="152"/>
+        <location filename="../src/tab_server.cpp" line="151"/>
         <source>Chat channels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="153"/>
+        <location filename="../src/tab_server.cpp" line="152"/>
         <source>Joi&amp;n</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="156"/>
+        <location filename="../src/tab_server.cpp" line="155"/>
         <source>Channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="157"/>
+        <location filename="../src/tab_server.cpp" line="156"/>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="158"/>
+        <location filename="../src/tab_server.cpp" line="157"/>
         <source>Players</source>
         <translation type="unfinished"></translation>
     </message>
@@ -790,65 +790,65 @@
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="116"/>
+        <location filename="../src/tab_server.cpp" line="115"/>
         <source>C&amp;reate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="117"/>
+        <location filename="../src/tab_server.cpp" line="116"/>
         <source>&amp;Join</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/tab_server.cpp" line="78"/>
         <location filename="../src/tab_server.cpp" line="79"/>
         <location filename="../src/tab_server.cpp" line="80"/>
         <location filename="../src/tab_server.cpp" line="81"/>
-        <location filename="../src/tab_server.cpp" line="82"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="79"/>
+        <location filename="../src/tab_server.cpp" line="78"/>
         <source>Wrong password.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="80"/>
+        <location filename="../src/tab_server.cpp" line="79"/>
         <source>Spectators are not allowed in this game.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="81"/>
+        <location filename="../src/tab_server.cpp" line="80"/>
         <source>The game is already full.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="82"/>
+        <location filename="../src/tab_server.cpp" line="81"/>
         <source>The game does not exist any more.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="98"/>
+        <location filename="../src/tab_server.cpp" line="97"/>
         <source>Join game</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="98"/>
+        <location filename="../src/tab_server.cpp" line="97"/>
         <source>Password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="114"/>
+        <location filename="../src/tab_server.cpp" line="113"/>
         <source>Games</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="115"/>
+        <location filename="../src/tab_server.cpp" line="114"/>
         <source>&amp;Show full games</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="118"/>
+        <location filename="../src/tab_server.cpp" line="117"/>
         <source>J&amp;oin as spectator</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1922,7 +1922,7 @@
 <context>
     <name>ServerMessageLog</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="232"/>
+        <location filename="../src/tab_server.cpp" line="231"/>
         <source>Server messages</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2144,7 +2144,7 @@ Please enter a name:</source>
 <context>
     <name>TabServer</name>
     <message>
-        <location filename="../src/tab_server.h" line="113"/>
+        <location filename="../src/tab_server.h" line="120"/>
         <source>Server</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2165,7 +2165,7 @@ Please enter a name:</source>
 <context>
     <name>UserList</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="268"/>
+        <location filename="../src/tab_server.cpp" line="281"/>
         <source>Users online: %1</source>
         <translation type="unfinished"></translation>
     </message>
