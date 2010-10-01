@@ -825,6 +825,8 @@ ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Co
 	if (!startZone || (!targetZone && !playerTarget))
 		return RespNameNotFound;
 	Server_Card *startCard = startZone->getCard(cmd->getStartCardId(), false);
+	if (!startCard)
+		return RespNameNotFound;
 	Server_Card *targetCard = 0;
 	if (!playerTarget) {
 		targetCard = targetZone->getCard(cmd->getTargetCardId(), false);
@@ -837,6 +839,8 @@ ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Co
 		targetItem = targetPlayer;
 	else
 		targetItem = targetCard;
+	if (!targetItem)
+		return RespNameNotFound;
 
 	QMapIterator<int, Server_Arrow *> arrowIterator(player->getArrows());
 	while (arrowIterator.hasNext()) {
