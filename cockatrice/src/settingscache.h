@@ -17,7 +17,7 @@ signals:
 	void cardBackPicturePathChanged();
 	void picDownloadChanged();
 	void horizontalHandChanged();
-	void economicGridChanged();
+	void economicalGridChanged();
 private:
 	QSettings *settings;
 	
@@ -27,7 +27,8 @@ private:
 	bool picDownload;
 	bool doubleClickToPlay;
 	bool horizontalHand;
-	bool economicGrid;
+	bool economicalGrid;
+	bool tapAnimation;
 	bool zoneViewSortByName, zoneViewSortByType;
 public:
 	SettingsCache();
@@ -42,7 +43,8 @@ public:
 	bool getPicDownload() const { return picDownload; }
 	bool getDoubleClickToPlay() const { return doubleClickToPlay; }
 	bool getHorizontalHand() const { return horizontalHand; }
-	bool getEconomicGrid() const { return economicGrid; }
+	bool getEconomicalGrid() const { return economicalGrid; }
+	bool getTapAnimation() const { return tapAnimation; }
 	bool getZoneViewSortByName() const { return zoneViewSortByName; }
 	bool getZoneViewSortByType() const { return zoneViewSortByType; }
 public slots:
@@ -57,7 +59,8 @@ public slots:
 	void setPicDownload(int _picDownload);
 	void setDoubleClickToPlay(int _doubleClickToPlay);
 	void setHorizontalHand(int _horizontalHand);
-	void setEconomicGrid(int _economicGrid);
+	void setEconomicalGrid(int _economicalGrid);
+	void setTapAnimation(int _tapAnimation);
 	void setZoneViewSortByName(int _zoneViewSortByName);
 	void setZoneViewSortByType(int _zoneViewSortByType);
 };

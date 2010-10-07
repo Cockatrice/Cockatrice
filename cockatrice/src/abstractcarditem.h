@@ -5,6 +5,7 @@
 
 class CardInfo;
 class Player;
+class QTimer;
 
 const int CARD_WIDTH = 72;
 const int CARD_HEIGHT = 102;
@@ -15,8 +16,12 @@ protected:
 	CardInfo *info;
 	QString name;
 	bool tapped;
+	int tapAngle;
 	QString color;
+private:
+	QTimer *animationTimer;
 private slots:
+	void animationEvent();
 	void pixmapUpdated();
 signals:
 	void hovered(AbstractCardItem *card);
@@ -33,7 +38,7 @@ public:
 	QString getColor() const { return color; }
 	void setColor(const QString &_color);
 	bool getTapped() const { return tapped; }
-	void setTapped(bool _tapped);
+	void setTapped(bool _tapped, bool canAnimate = false);
 	void processHoverEvent();
 protected:
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);

@@ -202,12 +202,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	handGroupBox = new QGroupBox;
 	handGroupBox->setLayout(handGrid);
 	
-	economicGridCheckBox = new QCheckBox;
-	economicGridCheckBox->setChecked(settingsCache->getEconomicGrid());
-	connect(economicGridCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setEconomicGrid(int)));
+	economicalGridCheckBox = new QCheckBox;
+	economicalGridCheckBox->setChecked(settingsCache->getEconomicalGrid());
+	connect(economicalGridCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setEconomicalGrid(int)));
 	
 	QGridLayout *tableGrid = new QGridLayout;
-	tableGrid->addWidget(economicGridCheckBox, 0, 0, 1, 2);
+	tableGrid->addWidget(economicalGridCheckBox, 0, 0, 1, 2);
 	
 	tableGroupBox = new QGroupBox;
 	tableGroupBox->setLayout(tableGrid);
@@ -248,7 +248,7 @@ void AppearanceSettingsPage::retranslateUi()
 	horizontalHandCheckBox->setText(tr("Display hand horizontally (wastes space)"));
 	
 	tableGroupBox->setTitle(tr("Table grid layout"));
-	economicGridCheckBox->setText(tr("Economic layout"));
+	economicalGridCheckBox->setText(tr("Economical layout"));
 	
 	zoneViewGroupBox->setTitle(tr("Zone view layout"));
 	zoneViewSortByNameCheckBox->setText(tr("Sort by name"));
@@ -307,8 +307,19 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 	generalGroupBox = new QGroupBox;
 	generalGroupBox->setLayout(generalGrid);
 	
+	tapAnimationCheckBox = new QCheckBox;
+	tapAnimationCheckBox->setChecked(settingsCache->getTapAnimation());
+	connect(tapAnimationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setTapAnimation(int)));
+	
+	QGridLayout *animationGrid = new QGridLayout;
+	animationGrid->addWidget(tapAnimationCheckBox, 0, 0);
+	
+	animationGroupBox = new QGroupBox;
+	animationGroupBox->setLayout(animationGrid);
+
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(generalGroupBox);
+	mainLayout->addWidget(animationGroupBox);
 	
 	setLayout(mainLayout);
 }
@@ -317,6 +328,8 @@ void UserInterfaceSettingsPage::retranslateUi()
 {
 	generalGroupBox->setTitle(tr("General interface settings"));
 	doubleClickToPlayCheckBox->setText(tr("&Double-click cards to play them (instead of single-click)"));
+	animationGroupBox->setTitle(tr("Animation settings"));
+	tapAnimationCheckBox->setText(tr("&Tap/untap animation"));
 }
 
 MessagesSettingsPage::MessagesSettingsPage()

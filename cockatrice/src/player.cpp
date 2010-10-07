@@ -526,7 +526,7 @@ void Player::setCardAttrHelper(CardItem *card, const QString &aname, const QStri
 		if (!(!tapped && card->getDoesntUntap() && allCards)) {
 			if (!allCards)
 				emit logSetTapped(this, card->getName(), tapped);
-			card->setTapped(tapped);
+			card->setTapped(tapped, true);
 		}
 	} else if (aname == "attacking")
 		card->setAttacking(avalue == "1");

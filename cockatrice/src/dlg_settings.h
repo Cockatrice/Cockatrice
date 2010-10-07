@@ -60,7 +60,7 @@ signals:
 private:
 	QLabel *handBgLabel, *tableBgLabel, *playerAreaBgLabel, *cardBackPicturePathLabel;
 	QLineEdit *handBgEdit, *tableBgEdit, *playerAreaBgEdit, *cardBackPicturePathEdit;
-	QCheckBox *horizontalHandCheckBox, *economicGridCheckBox, *zoneViewSortByNameCheckBox, *zoneViewSortByTypeCheckBox;
+	QCheckBox *horizontalHandCheckBox, *economicalGridCheckBox, *zoneViewSortByNameCheckBox, *zoneViewSortByTypeCheckBox;
 	QGroupBox *zoneBgGroupBox, *handGroupBox, *tableGroupBox, *zoneViewGroupBox;
 public:
 	AppearanceSettingsPage();
@@ -71,7 +71,8 @@ class UserInterfaceSettingsPage : public AbstractSettingsPage {
 	Q_OBJECT
 private:
 	QCheckBox *doubleClickToPlayCheckBox;
-	QGroupBox *generalGroupBox;
+	QCheckBox *tapAnimationCheckBox;
+	QGroupBox *generalGroupBox, *animationGroupBox;
 public:
 	UserInterfaceSettingsPage();
 	void retranslateUi();

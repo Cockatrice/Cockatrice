@@ -252,6 +252,7 @@ CardDatabase::CardDatabase(QObject *parent)
 CardDatabase::~CardDatabase()
 {
 	clear();
+	delete noCard;
 }
 
 void CardDatabase::clear()
