@@ -117,7 +117,7 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 void AbstractCardItem::animationEvent()
 {
-	int delta = 10;
+	int delta = 18;
 	if (!tapped)
 		delta *= -1;
 	
