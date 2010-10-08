@@ -45,8 +45,12 @@
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="251"/>
+        <source>Economical layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Economic layout</source>
-        <translation>Disposición económica</translation>
+        <translation type="obsolete">Disposición económica</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="253"/>
@@ -735,54 +739,54 @@
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="476"/>
-        <location filename="../src/dlg_settings.cpp" line="479"/>
-        <location filename="../src/dlg_settings.cpp" line="482"/>
+        <location filename="../src/dlg_settings.cpp" line="489"/>
+        <location filename="../src/dlg_settings.cpp" line="492"/>
+        <location filename="../src/dlg_settings.cpp" line="495"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="476"/>
+        <location filename="../src/dlg_settings.cpp" line="489"/>
         <source>Your card database is invalid. Please check if the path is set correctly.</source>
         <translation>Tu base de datos de cartas es invalida. Por favor, comprueba si la ruta está asignada correctamente.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="479"/>
+        <location filename="../src/dlg_settings.cpp" line="492"/>
         <source>The path to your deck directory is invalid.</source>
         <translation>La ruta a tu directorio de mazos es invalida.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="482"/>
+        <location filename="../src/dlg_settings.cpp" line="495"/>
         <source>The path to your card pictures directory is invalid.</source>
         <translation>La ruta a tu directorio de imagenes de las cartas es invalida.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="490"/>
+        <location filename="../src/dlg_settings.cpp" line="503"/>
         <source>Settings</source>
         <translation>Preferencias</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="492"/>
+        <location filename="../src/dlg_settings.cpp" line="505"/>
         <source>General</source>
         <translation>General</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="493"/>
+        <location filename="../src/dlg_settings.cpp" line="506"/>
         <source>Appearance</source>
         <translation>Apariencia</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="494"/>
+        <location filename="../src/dlg_settings.cpp" line="507"/>
         <source>User interface</source>
         <translation>Interfaz de usuario</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="495"/>
+        <location filename="../src/dlg_settings.cpp" line="508"/>
         <source>Messages</source>
         <translation>Mensajes</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="497"/>
+        <location filename="../src/dlg_settings.cpp" line="510"/>
         <source>&amp;Close</source>
         <translation>&amp;Cerrar</translation>
     </message>
@@ -1489,22 +1493,22 @@
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="379"/>
+        <location filename="../src/dlg_settings.cpp" line="392"/>
         <source>&amp;Add</source>
         <translation>&amp;Añadir</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="380"/>
+        <location filename="../src/dlg_settings.cpp" line="393"/>
         <source>&amp;Remove</source>
         <translation>&amp;Quitar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="362"/>
+        <location filename="../src/dlg_settings.cpp" line="375"/>
         <source>Add message</source>
         <translation>Añadir mensaje</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="362"/>
+        <location filename="../src/dlg_settings.cpp" line="375"/>
         <source>Message:</source>
         <translation>Mensaje:</translation>
     </message>
@@ -2165,14 +2169,24 @@ Por favor, introduzca un nombre:</translation>
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="318"/>
+        <location filename="../src/dlg_settings.cpp" line="329"/>
         <source>General interface settings</source>
         <translation>Preferencias generales de la interfaz</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="319"/>
+        <location filename="../src/dlg_settings.cpp" line="330"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation>&amp;Doble click en las cartas para jugarlas (en lugar de un solo click)</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="331"/>
+        <source>Animation settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="332"/>
+        <source>&amp;Tap/untap animation</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -68,8 +68,12 @@
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="251"/>
-        <source>Economic layout</source>
+        <source>Economical layout</source>
         <translation>Platzsparende Anordnung</translation>
+    </message>
+    <message>
+        <source>Economic layout</source>
+        <translation type="obsolete">Platzsparende Anordnung</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="253"/>
@@ -854,54 +858,54 @@
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="476"/>
-        <location filename="../src/dlg_settings.cpp" line="479"/>
-        <location filename="../src/dlg_settings.cpp" line="482"/>
+        <location filename="../src/dlg_settings.cpp" line="489"/>
+        <location filename="../src/dlg_settings.cpp" line="492"/>
+        <location filename="../src/dlg_settings.cpp" line="495"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="476"/>
+        <location filename="../src/dlg_settings.cpp" line="489"/>
         <source>Your card database is invalid. Please check if the path is set correctly.</source>
         <translation>Ihre Kartendatenbank ist ungültig. Bitte überprüfen Sie, ob der Pfad korrekt gesetzt ist.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="479"/>
+        <location filename="../src/dlg_settings.cpp" line="492"/>
         <source>The path to your deck directory is invalid.</source>
         <translation>Der Pfad zum Deckverzeichnis ist ungültig.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="482"/>
+        <location filename="../src/dlg_settings.cpp" line="495"/>
         <source>The path to your card pictures directory is invalid.</source>
         <translation>Der Pfad zum Kartenbilderverzeichnis ist ungültig.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="490"/>
+        <location filename="../src/dlg_settings.cpp" line="503"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="492"/>
+        <location filename="../src/dlg_settings.cpp" line="505"/>
         <source>General</source>
         <translation>Allgemeines</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="493"/>
+        <location filename="../src/dlg_settings.cpp" line="506"/>
         <source>Appearance</source>
         <translation>Erscheinungsbild</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="494"/>
+        <location filename="../src/dlg_settings.cpp" line="507"/>
         <source>User interface</source>
         <translation>Bedienung</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="495"/>
+        <location filename="../src/dlg_settings.cpp" line="508"/>
         <source>Messages</source>
         <translation>Nachrichten</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="497"/>
+        <location filename="../src/dlg_settings.cpp" line="510"/>
         <source>&amp;Close</source>
         <translation>S&amp;chließen</translation>
     </message>
@@ -2186,12 +2190,12 @@
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="379"/>
+        <location filename="../src/dlg_settings.cpp" line="392"/>
         <source>&amp;Add</source>
         <translation>&amp;Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="380"/>
+        <location filename="../src/dlg_settings.cpp" line="393"/>
         <source>&amp;Remove</source>
         <translation>&amp;Entfernen</translation>
     </message>
@@ -2204,12 +2208,12 @@
         <translation type="obsolete">Entfernen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="362"/>
+        <location filename="../src/dlg_settings.cpp" line="375"/>
         <source>Add message</source>
         <translation>Nachricht hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="362"/>
+        <location filename="../src/dlg_settings.cpp" line="375"/>
         <source>Message:</source>
         <translation>Nachricht:</translation>
     </message>
@@ -3073,14 +3077,24 @@ Bitte geben Sie einen Namen ein:</translation>
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="318"/>
+        <location filename="../src/dlg_settings.cpp" line="329"/>
         <source>General interface settings</source>
         <translation>Allgemeine Bedienung</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="319"/>
+        <location filename="../src/dlg_settings.cpp" line="330"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation>Karten durch &amp;Doppelklick ausspielen (statt Einzelklick)</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="331"/>
+        <source>Animation settings</source>
+        <translation>Animationseinstellungen</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="332"/>
+        <source>&amp;Tap/untap animation</source>
+        <translation>Animiertes &amp;Tappen/Enttappen</translation>
     </message>
 </context>
 <context>
