@@ -454,7 +454,7 @@ bool CardDatabase::loadFromFile(const QString &fileName)
 		}
 	}
 	qDebug(QString("%1 cards in %2 sets loaded").arg(cardHash.size()).arg(setHash.size()).toLatin1());
-	return true;
+	return !cardHash.isEmpty();
 }
 
 bool CardDatabase::saveToFile(const QString &fileName)

@@ -48,9 +48,13 @@ private:
 class AppearanceSettingsPage : public AbstractSettingsPage {
 	Q_OBJECT
 private slots:
+	void handBgClearButtonClicked();
 	void handBgButtonClicked();
+	void tableBgClearButtonClicked();
 	void tableBgButtonClicked();
+	void playerAreaBgClearButtonClicked();
 	void playerAreaBgButtonClicked();
+	void cardBackPicturePathClearButtonClicked();
 	void cardBackPicturePathButtonClicked();
 signals:
 	void handBgChanged(const QString &path);

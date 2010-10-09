@@ -151,43 +151,57 @@ void GeneralSettingsPage::retranslateUi()
 
 AppearanceSettingsPage::AppearanceSettingsPage()
 {
+	QIcon deleteIcon(":/resources/icon_delete.svg");
+	
 	handBgLabel = new QLabel;
 	handBgEdit = new QLineEdit(settingsCache->getHandBgPath());
 	handBgEdit->setReadOnly(true);
+	QPushButton *handBgClearButton = new QPushButton(deleteIcon, QString());
+	connect(handBgClearButton, SIGNAL(clicked()), this, SLOT(handBgClearButtonClicked()));
 	QPushButton *handBgButton = new QPushButton("...");
 	connect(handBgButton, SIGNAL(clicked()), this, SLOT(handBgButtonClicked()));
 	
 	tableBgLabel = new QLabel;
 	tableBgEdit = new QLineEdit(settingsCache->getTableBgPath());
 	tableBgEdit->setReadOnly(true);
+	QPushButton *tableBgClearButton = new QPushButton(deleteIcon, QString());
+	connect(tableBgClearButton, SIGNAL(clicked()), this, SLOT(tableBgClearButtonClicked()));
 	QPushButton *tableBgButton = new QPushButton("...");
 	connect(tableBgButton, SIGNAL(clicked()), this, SLOT(tableBgButtonClicked()));
 	
 	playerAreaBgLabel = new QLabel;
 	playerAreaBgEdit = new QLineEdit(settingsCache->getPlayerBgPath());
 	playerAreaBgEdit->setReadOnly(true);
+	QPushButton *playerAreaBgClearButton = new QPushButton(deleteIcon, QString());
+	connect(playerAreaBgClearButton, SIGNAL(clicked()), this, SLOT(playerAreaBgClearButtonClicked()));
 	QPushButton *playerAreaBgButton = new QPushButton("...");
 	connect(playerAreaBgButton, SIGNAL(clicked()), this, SLOT(playerAreaBgButtonClicked()));
 	
 	cardBackPicturePathLabel = new QLabel;
 	cardBackPicturePathEdit = new QLineEdit(settingsCache->getCardBackPicturePath());
 	cardBackPicturePathEdit->setReadOnly(true);
+	QPushButton *cardBackPicturePathClearButton = new QPushButton(deleteIcon, QString());
+	connect(cardBackPicturePathClearButton, SIGNAL(clicked()), this, SLOT(cardBackPicturePathClearButtonClicked()));
 	QPushButton *cardBackPicturePathButton = new QPushButton("...");
 	connect(cardBackPicturePathButton, SIGNAL(clicked()), this, SLOT(cardBackPicturePathButtonClicked()));
 	
 	QGridLayout *zoneBgGrid = new QGridLayout;
 	zoneBgGrid->addWidget(handBgLabel, 0, 0);
 	zoneBgGrid->addWidget(handBgEdit, 0, 1);
-	zoneBgGrid->addWidget(handBgButton, 0, 2);
+	zoneBgGrid->addWidget(handBgClearButton, 0, 2);
+	zoneBgGrid->addWidget(handBgButton, 0, 3);
 	zoneBgGrid->addWidget(tableBgLabel, 1, 0);
 	zoneBgGrid->addWidget(tableBgEdit, 1, 1);
-	zoneBgGrid->addWidget(tableBgButton, 1, 2);
+	zoneBgGrid->addWidget(tableBgClearButton, 1, 2);
+	zoneBgGrid->addWidget(tableBgButton, 1, 3);
 	zoneBgGrid->addWidget(playerAreaBgLabel, 2, 0);
 	zoneBgGrid->addWidget(playerAreaBgEdit, 2, 1);
-	zoneBgGrid->addWidget(playerAreaBgButton, 2, 2);
+	zoneBgGrid->addWidget(playerAreaBgClearButton, 2, 2);
+	zoneBgGrid->addWidget(playerAreaBgButton, 2, 3);
 	zoneBgGrid->addWidget(cardBackPicturePathLabel, 3, 0);
 	zoneBgGrid->addWidget(cardBackPicturePathEdit, 3, 1);
-	zoneBgGrid->addWidget(cardBackPicturePathButton, 3, 2);
+	zoneBgGrid->addWidget(cardBackPicturePathClearButton, 3, 2);
+	zoneBgGrid->addWidget(cardBackPicturePathButton, 3, 3);
 
 	zoneBgGroupBox = new QGroupBox;
 	zoneBgGroupBox->setLayout(zoneBgGrid);
@@ -255,6 +269,12 @@ void AppearanceSettingsPage::retranslateUi()
 	zoneViewSortByTypeCheckBox->setText(tr("Sort by type"));
 }
 
+void AppearanceSettingsPage::handBgClearButtonClicked()
+{
+	handBgEdit->setText(QString());
+	settingsCache->setHandBgPath(QString());
+}
+
 void AppearanceSettingsPage::handBgButtonClicked()
 {
 	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
@@ -263,6 +283,12 @@ void AppearanceSettingsPage::handBgButtonClicked()
 	
 	handBgEdit->setText(path);
 	settingsCache->setHandBgPath(path);
+}
+
+void AppearanceSettingsPage::tableBgClearButtonClicked()
+{
+	tableBgEdit->setText(QString());
+	settingsCache->setTableBgPath(QString());
 }
 
 void AppearanceSettingsPage::tableBgButtonClicked()
@@ -275,6 +301,12 @@ void AppearanceSettingsPage::tableBgButtonClicked()
 	settingsCache->setTableBgPath(path);
 }
 
+void AppearanceSettingsPage::playerAreaBgClearButtonClicked()
+{
+	playerAreaBgEdit->setText(QString());
+	settingsCache->setPlayerBgPath(QString());
+}
+
 void AppearanceSettingsPage::playerAreaBgButtonClicked()
 {
 	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
@@ -283,6 +315,12 @@ void AppearanceSettingsPage::playerAreaBgButtonClicked()
 	
 	playerAreaBgEdit->setText(path);
 	settingsCache->setPlayerBgPath(path);
+}
+
+void AppearanceSettingsPage::cardBackPicturePathClearButtonClicked()
+{
+	cardBackPicturePathEdit->setText(QString());
+	settingsCache->setCardBackPicturePath(QString());
 }
 
 void AppearanceSettingsPage::cardBackPicturePathButtonClicked()
@@ -485,17 +523,22 @@ void DlgSettings::changeEvent(QEvent *event)
 
 void DlgSettings::closeEvent(QCloseEvent *event)
 {
-	if (!db->getLoadSuccess()) {
-		QMessageBox::critical(this, tr("Error"), tr("Your card database is invalid. Please check if the path is set correctly."));
-		event->ignore();
-	} else if (!QDir(settingsCache->getDeckPath()).exists()) {
-		QMessageBox::critical(this, tr("Error"), tr("The path to your deck directory is invalid."));
-		event->ignore();
-	} else if (!QDir(settingsCache->getPicsPath()).exists()) {
-		QMessageBox::critical(this, tr("Error"), tr("The path to your card pictures directory is invalid."));
-		event->ignore();
-	} else
-		event->accept();
+	if (!db->getLoadSuccess())
+		if (QMessageBox::critical(this, tr("Error"), tr("Your card database is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+			event->ignore();
+			return;
+		}
+	if (!QDir(settingsCache->getDeckPath()).exists())
+		if (QMessageBox::critical(this, tr("Error"), tr("The path to your deck directory is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+			event->ignore();
+			return;
+		}
+	if (!QDir(settingsCache->getPicsPath()).exists())
+		if (QMessageBox::critical(this, tr("Error"), tr("The path to your card pictures directory is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+			event->ignore();
+			return;
+		}
+	event->accept();
 }
 
 void DlgSettings::retranslateUi()
