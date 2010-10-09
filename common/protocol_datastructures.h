@@ -39,13 +39,14 @@ public:
 		IsJudge = 0x04,
 		IsAdmin = 0x08
 	};
-	ServerInfo_User(const QString &_name = QString(), int _userLevel = IsNothing, const QString &_country = QString());
+	ServerInfo_User(const QString &_name = QString(), int _userLevel = IsNothing, const QString &_country = QString(), const QByteArray &_avatarBmp = QByteArray());
 	ServerInfo_User(const ServerInfo_User *other);
 	static SerializableItem *newItem() { return new ServerInfo_User; }
 	QString getName() const { return static_cast<SerializableItem_String *>(itemMap.value("name"))->getData(); }
 	int getUserLevel() const { return static_cast<SerializableItem_Int *>(itemMap.value("userlevel"))->getData(); }
 	void setUserLevel(int _userLevel) { static_cast<SerializableItem_Int *>(itemMap.value("userlevel"))->setData(_userLevel); }
 	QString getCountry() const { return static_cast<SerializableItem_String *>(itemMap.value("country"))->getData(); }
+	QByteArray getAvatarBmp() const { return static_cast<SerializableItem_ByteArray *>(itemMap.value("avatar_bmp"))->getData(); }
 };
 
 class ServerInfo_Game : public SerializableItem_Map {

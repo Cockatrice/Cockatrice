@@ -20,6 +20,7 @@
 #include <QtSql>
 #include <QSettings>
 #include <QDebug>
+#include <iostream>
 #include "servatrice.h"
 #include "server_chatchannel.h"
 #include "serversocketinterface.h"
@@ -79,8 +80,12 @@ bool Servatrice::openDatabase()
 	sqldb.setPassword(settings->value("password").toString());
 	settings->endGroup();
 	
-	if (!sqldb.open())
+	std::cerr << "Opening database...";
+	if (!sqldb.open()) {
+		std::cerr << "error" << std::endl;
 		return false;
+	}
+	std::cerr << "OK" << std::endl;
 	
 	if (!nextGameId) {
 		QSqlQuery query;
@@ -124,7 +129,7 @@ AuthenticationResult Servatrice::checkUserPassword(const QString &user, const QS
 		checkSql();
 	
 		QSqlQuery query;
-		query.prepare("select password from users where name = :name");
+		query.prepare("select password from users where name = :name and active = 1");
 		query.bindValue(":name", user);
 		if (!execSqlQuery(query))
 			return PasswordWrong;
@@ -147,7 +152,7 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 		checkSql();
 
 		QSqlQuery query;
-		query.prepare("select admin, country from users where name = :name");
+		query.prepare("select admin, country, avatar_bmp from users where name = :name and active = 1");
 		query.bindValue(":name", name);
 		if (!execSqlQuery(query))
 			return new ServerInfo_User(name);
@@ -155,15 +160,17 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 		if (query.next()) {
 			bool is_admin = query.value(0).toInt();
 			QString country = query.value(1).toString();
+			QByteArray avatarBmp = query.value(2).toByteArray();
 			
-			int userLevel = ServerInfo_User::IsUser;
+			int userLevel = ServerInfo_User::IsUser | ServerInfo_User::IsRegistered;
 			if (is_admin)
 				userLevel |= ServerInfo_User::IsAdmin;
 			
 			return new ServerInfo_User(
 				name,
 				userLevel,
-				country
+				country,
+				avatarBmp
 			);
 		} else
 			return new ServerInfo_User(name);
@@ -171,4 +178,4 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 		return new ServerInfo_User(name);
 }
 
-const QString Servatrice::versionString = "Servatrice 0.20100918";
+const QString Servatrice::versionString = "Servatrice 0.20101009";

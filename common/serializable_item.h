@@ -121,7 +121,7 @@ public:
 	const Color &getData() { return data; }
 	void setData(const Color &_data) { data = _data; }
 };
- 
+
 class SerializableItem_DateTime : public SerializableItem {
 private:
 	QDateTime data;
@@ -133,6 +133,19 @@ public:
 		: SerializableItem(_itemType), data(_data) { }
 	const QDateTime &getData() { return data; }
 	void setData(const QDateTime &_data) { data = _data; }
+};
+
+class SerializableItem_ByteArray : public SerializableItem {
+private:
+	QByteArray data;
+protected:
+	bool readElement(QXmlStreamReader *xml);
+	void writeElement(QXmlStreamWriter *xml);
+public:
+	SerializableItem_ByteArray(const QString &_itemType, const QByteArray &_data)
+		: SerializableItem(_itemType), data(_data) { }
+	const QByteArray &getData() { return data; }
+	void setData(const QByteArray &_data) { data = _data; }
 };
 
 #endif

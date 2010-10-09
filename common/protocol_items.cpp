@@ -17,6 +17,11 @@ Command_Message::Command_Message(const QString &_userName, const QString &_text)
 	insertItem(new SerializableItem_String("user_name", _userName));
 	insertItem(new SerializableItem_String("text", _text));
 }
+Command_GetUserInfo::Command_GetUserInfo(const QString &_userName)
+	: Command("get_user_info")
+{
+	insertItem(new SerializableItem_String("user_name", _userName));
+}
 Command_DeckList::Command_DeckList()
 	: Command("deck_list")
 {
@@ -432,6 +437,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdping", Command_Ping::newItem);
 	itemNameHash.insert("cmdlogin", Command_Login::newItem);
 	itemNameHash.insert("cmdmessage", Command_Message::newItem);
+	itemNameHash.insert("cmdget_user_info", Command_GetUserInfo::newItem);
 	itemNameHash.insert("cmddeck_list", Command_DeckList::newItem);
 	itemNameHash.insert("cmddeck_new_dir", Command_DeckNewDir::newItem);
 	itemNameHash.insert("cmddeck_del_dir", Command_DeckDelDir::newItem);

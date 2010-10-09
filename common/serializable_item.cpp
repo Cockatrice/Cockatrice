@@ -145,3 +145,16 @@ void SerializableItem_DateTime::writeElement(QXmlStreamWriter *xml)
 {
 	xml->writeCharacters(QString::number(data.toTime_t()));
 }
+
+bool SerializableItem_ByteArray::readElement(QXmlStreamReader *xml)
+{
+	if (xml->isCharacters() && !xml->isWhitespace())
+		data = qUncompress(QByteArray::fromBase64(xml->text().toString().toAscii()));
+	
+	return SerializableItem::readElement(xml);
+}
+
+void SerializableItem_ByteArray::writeElement(QXmlStreamWriter *xml)
+{
+	xml->writeCharacters(QString(qCompress(data).toBase64()));
+}

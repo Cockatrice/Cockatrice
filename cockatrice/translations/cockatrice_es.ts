@@ -356,27 +356,27 @@
 <context>
     <name>ChatChannelSelector</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="151"/>
+        <location filename="../src/tab_server.cpp" line="152"/>
         <source>Chat channels</source>
         <translation>Canales de Chat</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="152"/>
+        <location filename="../src/tab_server.cpp" line="153"/>
         <source>Joi&amp;n</source>
         <translation>E&amp;ntrar</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="155"/>
+        <location filename="../src/tab_server.cpp" line="156"/>
         <source>Channel</source>
         <translation>Canal</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="156"/>
+        <location filename="../src/tab_server.cpp" line="157"/>
         <source>Description</source>
         <translation>Descripción</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="157"/>
+        <location filename="../src/tab_server.cpp" line="158"/>
         <source>Players</source>
         <translation>Jugadores</translation>
     </message>
@@ -806,65 +806,65 @@
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="115"/>
+        <location filename="../src/tab_server.cpp" line="116"/>
         <source>C&amp;reate</source>
         <translation>C&amp;rear</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="116"/>
+        <location filename="../src/tab_server.cpp" line="117"/>
         <source>&amp;Join</source>
         <translation>E&amp;ntrar</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="78"/>
         <location filename="../src/tab_server.cpp" line="79"/>
         <location filename="../src/tab_server.cpp" line="80"/>
         <location filename="../src/tab_server.cpp" line="81"/>
+        <location filename="../src/tab_server.cpp" line="82"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="78"/>
+        <location filename="../src/tab_server.cpp" line="79"/>
         <source>Wrong password.</source>
         <translation>Contraseña incorrecta.</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="79"/>
+        <location filename="../src/tab_server.cpp" line="80"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>No se permiten espectadores en esta partida.</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="80"/>
+        <location filename="../src/tab_server.cpp" line="81"/>
         <source>The game is already full.</source>
         <translation>La partida no tiene plazas libres.</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="81"/>
+        <location filename="../src/tab_server.cpp" line="82"/>
         <source>The game does not exist any more.</source>
         <translation>La partida ya no existe.</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="97"/>
+        <location filename="../src/tab_server.cpp" line="98"/>
         <source>Join game</source>
         <translation>Entrar en la partida</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="97"/>
+        <location filename="../src/tab_server.cpp" line="98"/>
         <source>Password:</source>
         <translation>Contraseña:</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="113"/>
+        <location filename="../src/tab_server.cpp" line="114"/>
         <source>Games</source>
         <translation>Partidas</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="114"/>
+        <location filename="../src/tab_server.cpp" line="115"/>
         <source>&amp;Show full games</source>
         <translation>&amp;Ver partidas sin plazas libres</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="117"/>
+        <location filename="../src/tab_server.cpp" line="118"/>
         <source>J&amp;oin as spectator</source>
         <translation>Entrar como e&amp;spectador</translation>
     </message>
@@ -1950,7 +1950,7 @@
 <context>
     <name>ServerMessageLog</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="231"/>
+        <location filename="../src/tab_server.cpp" line="232"/>
         <source>Server messages</source>
         <translation>Mensajes del servidor</translation>
     </message>
@@ -2173,9 +2173,22 @@ Por favor, introduzca un nombre:</translation>
 <context>
     <name>TabServer</name>
     <message>
-        <location filename="../src/tab_server.h" line="120"/>
+        <location filename="../src/tab_server.h" line="133"/>
         <source>Server</source>
         <translation>Servidor</translation>
+    </message>
+</context>
+<context>
+    <name>UserInfoBox</name>
+    <message>
+        <location filename="../src/tab_server.cpp" line="373"/>
+        <source>Location:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/tab_server.cpp" line="374"/>
+        <source>User level:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2204,7 +2217,7 @@ Por favor, introduzca un nombre:</translation>
 <context>
     <name>UserList</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="281"/>
+        <location filename="../src/tab_server.cpp" line="282"/>
         <source>Users online: %1</source>
         <translation>Usuarios online: %1</translation>
     </message>

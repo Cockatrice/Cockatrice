@@ -38,6 +38,7 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("resp", ProtocolResponse::newItem);
 	ProtocolResponse::initializeHash();
 	registerSerializableItem("resplist_users", Response_ListUsers::newItem);
+	registerSerializableItem("respget_user_info", Response_GetUserInfo::newItem);
 	registerSerializableItem("respdeck_list", Response_DeckList::newItem);
 	registerSerializableItem("respdeck_download", Response_DeckDownload::newItem);
 	registerSerializableItem("respdeck_upload", Response_DeckUpload::newItem);
@@ -230,6 +231,14 @@ Response_DeckList::Response_DeckList(int _cmdId, ResponseCode _responseCode, Dec
 	if (!_root)
 		_root = new DeckList_Directory;
 	insertItem(_root);
+}
+
+Response_GetUserInfo::Response_GetUserInfo(int _cmdId, ResponseCode _responseCode, ServerInfo_User *_user)
+	: ProtocolResponse(_cmdId, _responseCode, "get_user_info")
+{
+	if (!_user)
+		_user = new ServerInfo_User;
+	insertItem(_user);
 }
 
 Response_DeckDownload::Response_DeckDownload(int _cmdId, ResponseCode _responseCode, DeckList *_deck)

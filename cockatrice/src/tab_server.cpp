@@ -1,3 +1,4 @@
+#include <QLabel>
 #include <QTreeView>
 #include <QCheckBox>
 #include <QPushButton>
@@ -338,12 +339,65 @@ void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
 	emit openMessageDialog(item->data(2, Qt::UserRole).toString(), true);
 }
 
+UserInfoBox::UserInfoBox(AbstractClient *_client, QWidget *parent)
+	: QWidget(parent)
+{
+	avatarLabel = new QLabel;
+	nameLabel = new QLabel;
+	QFont nameFont = nameLabel->font();
+	nameFont.setBold(true);
+	nameFont.setPointSize(nameFont.pointSize() * 1.5);
+	nameLabel->setFont(nameFont);
+	countryLabel1 = new QLabel;
+	countryLabel2 = new QLabel;
+	userLevelLabel1 = new QLabel;
+	userLevelLabel2 = new QLabel;
+	
+	QGridLayout *mainLayout = new QGridLayout;
+	mainLayout->addWidget(avatarLabel, 0, 0, 3, 1);
+	mainLayout->addWidget(nameLabel, 0, 1, 1, 2);
+	mainLayout->addWidget(countryLabel1, 1, 1, 1, 1);
+	mainLayout->addWidget(countryLabel2, 1, 2, 1, 1);
+	mainLayout->addWidget(userLevelLabel1, 2, 1, 1, 1);
+	mainLayout->addWidget(userLevelLabel2, 2, 2, 1, 1);
+	
+	setLayout(mainLayout);
+	
+	Command_GetUserInfo *cmd = new Command_GetUserInfo;
+	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(processResponse(ProtocolResponse *)));
+	_client->sendCommand(cmd);
+}
+
+void UserInfoBox::retranslateUi()
+{
+	countryLabel1->setText(tr("Location:"));
+	userLevelLabel1->setText(tr("User level:"));
+}
+
+void UserInfoBox::processResponse(ProtocolResponse *response)
+{
+	Response_GetUserInfo *resp = qobject_cast<Response_GetUserInfo *>(response);
+	if (!resp)
+		return;
+	ServerInfo_User *user = resp->getUserInfo();
+	
+	QPixmap avatarPixmap;
+	if (!avatarPixmap.loadFromData(user->getAvatarBmp()))
+		avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, user->getUserLevel());
+	avatarLabel->setPixmap(avatarPixmap);
+	
+	nameLabel->setText(user->getName());
+	countryLabel2->setPixmap(CountryPixmapGenerator::generatePixmap(15, user->getCountry()));
+	userLevelLabel2->setPixmap(UserLevelPixmapGenerator::generatePixmap(15, user->getUserLevel()));
+}
+
 TabServer::TabServer(AbstractClient *_client, QWidget *parent)
 	: Tab(parent), client(_client)
 {
 	gameSelector = new GameSelector(client);
 	chatChannelSelector = new ChatChannelSelector(client);
 	serverMessageLog = new ServerMessageLog(client);
+	userInfoBox = new UserInfoBox(client);
 	userList = new UserList(client);
 	
 	connect(gameSelector, SIGNAL(gameJoined(int)), this, SIGNAL(gameJoined(int)));
@@ -359,9 +413,13 @@ TabServer::TabServer(AbstractClient *_client, QWidget *parent)
 	vbox->addWidget(gameSelector);
 	vbox->addLayout(hbox);
 	
+	QVBoxLayout *vbox2 = new QVBoxLayout;
+	vbox2->addWidget(userInfoBox);
+	vbox2->addWidget(userList);
+	
 	QHBoxLayout *mainLayout = new QHBoxLayout;
 	mainLayout->addLayout(vbox, 3);
-	mainLayout->addWidget(userList, 1);
+	mainLayout->addLayout(vbox2, 1);
 	
 	setLayout(mainLayout);
 }
@@ -371,5 +429,6 @@ void TabServer::retranslateUi()
 	gameSelector->retranslateUi();
 	chatChannelSelector->retranslateUi();
 	serverMessageLog->retranslateUi();
+	userInfoBox->retranslateUi();
 	userList->retranslateUi();
 }

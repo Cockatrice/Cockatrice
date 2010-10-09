@@ -12,12 +12,13 @@ ServerInfo_ChatChannel::ServerInfo_ChatChannel(const QString &_name, const QStri
 	insertItem(new SerializableItem_Bool("auto_join", _autoJoin));
 }
 
-ServerInfo_User::ServerInfo_User(const QString &_name, int _userLevel, const QString &_country)
+ServerInfo_User::ServerInfo_User(const QString &_name, int _userLevel, const QString &_country, const QByteArray &_avatarBmp)
 	: SerializableItem_Map("user")
 {
 	insertItem(new SerializableItem_String("name", _name));
 	insertItem(new SerializableItem_Int("userlevel", _userLevel));
 	insertItem(new SerializableItem_String("country", _country));
+	insertItem(new SerializableItem_ByteArray("avatar_bmp", _avatarBmp));
 }
 
 ServerInfo_User::ServerInfo_User(const ServerInfo_User *other)
@@ -26,6 +27,7 @@ ServerInfo_User::ServerInfo_User(const ServerInfo_User *other)
 	insertItem(new SerializableItem_String("name", other->getName()));
 	insertItem(new SerializableItem_Int("userlevel", other->getUserLevel()));
 	insertItem(new SerializableItem_String("country", other->getCountry()));
+	insertItem(new SerializableItem_ByteArray("avatar_bmp", other->getAvatarBmp()));
 }
 
 ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, ServerInfo_User *_creatorInfo, bool _spectatorsAllowed, bool _spectatorsNeedPassword, int _spectatorCount)
