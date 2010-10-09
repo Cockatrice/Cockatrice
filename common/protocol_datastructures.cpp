@@ -113,7 +113,7 @@ QList<ServerInfo_Card *> ServerInfo_Zone::getCardList() const
 	return result;
 }
 
-ServerInfo_Counter::ServerInfo_Counter(int _id, const QString &_name, const QColor &_color, int _radius, int _count)
+ServerInfo_Counter::ServerInfo_Counter(int _id, const QString &_name, const Color &_color, int _radius, int _count)
 	: SerializableItem_Map("counter")
 {
 	insertItem(new SerializableItem_Int("id", _id));
@@ -123,7 +123,7 @@ ServerInfo_Counter::ServerInfo_Counter(int _id, const QString &_name, const QCol
 	insertItem(new SerializableItem_Int("count", _count));
 }
 
-ServerInfo_Arrow::ServerInfo_Arrow(int _id, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, const QColor &_color)
+ServerInfo_Arrow::ServerInfo_Arrow(int _id, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, const Color &_color)
 	: SerializableItem_Map("arrow")
 {
 	insertItem(new SerializableItem_Int("id", _id));

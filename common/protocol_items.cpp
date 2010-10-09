@@ -152,7 +152,7 @@ Command_CreateToken::Command_CreateToken(int _gameId, const QString &_zone, cons
 	insertItem(new SerializableItem_Int("x", _x));
 	insertItem(new SerializableItem_Int("y", _y));
 }
-Command_CreateArrow::Command_CreateArrow(int _gameId, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, const QColor &_color)
+Command_CreateArrow::Command_CreateArrow(int _gameId, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, const Color &_color)
 	: GameCommand("create_arrow", _gameId)
 {
 	insertItem(new SerializableItem_Int("start_player_id", _startPlayerId));
@@ -207,7 +207,7 @@ Command_IncCounter::Command_IncCounter(int _gameId, int _counterId, int _delta)
 	insertItem(new SerializableItem_Int("counter_id", _counterId));
 	insertItem(new SerializableItem_Int("delta", _delta));
 }
-Command_CreateCounter::Command_CreateCounter(int _gameId, const QString &_counterName, const QColor &_color, int _radius, int _value)
+Command_CreateCounter::Command_CreateCounter(int _gameId, const QString &_counterName, const Color &_color, int _radius, int _value)
 	: GameCommand("create_counter", _gameId)
 {
 	insertItem(new SerializableItem_String("counter_name", _counterName));

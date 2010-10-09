@@ -6,8 +6,8 @@
 #include <QMap>
 #include <QList>
 #include <QHash>
-#include <QColor>
 #include <QDateTime>
+#include "color.h"
 
 class QXmlStreamReader;
 class QXmlStreamWriter;
@@ -111,17 +111,15 @@ public:
 
 class SerializableItem_Color : public SerializableItem {
 private:
-	QColor data;
-	int colorToInt(const QColor &color) const;
-	QColor colorFromInt(int colorValue) const;
+	Color data;
 protected:
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 public:
-	SerializableItem_Color(const QString &_itemType, const QColor &_data)
+	SerializableItem_Color(const QString &_itemType, const Color &_data)
 		: SerializableItem(_itemType), data(_data) { }
-	const QColor &getData() { return data; }
-	void setData(const QColor &_data) { data = _data; }
+	const Color &getData() { return data; }
+	void setData(const Color &_data) { data = _data; }
 };
  
 class SerializableItem_DateTime : public SerializableItem {

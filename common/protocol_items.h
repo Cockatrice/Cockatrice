@@ -235,14 +235,14 @@ public:
 class Command_CreateArrow : public GameCommand {
 	Q_OBJECT
 public:
-	Command_CreateArrow(int _gameId = -1, int _startPlayerId = -1, const QString &_startZone = QString(), int _startCardId = -1, int _targetPlayerId = -1, const QString &_targetZone = QString(), int _targetCardId = -1, const QColor &_color = QColor());
+	Command_CreateArrow(int _gameId = -1, int _startPlayerId = -1, const QString &_startZone = QString(), int _startCardId = -1, int _targetPlayerId = -1, const QString &_targetZone = QString(), int _targetCardId = -1, const Color &_color = Color());
 	int getStartPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("start_player_id"))->getData(); };
 	QString getStartZone() const { return static_cast<SerializableItem_String *>(itemMap.value("start_zone"))->getData(); };
 	int getStartCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("start_card_id"))->getData(); };
 	int getTargetPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("target_player_id"))->getData(); };
 	QString getTargetZone() const { return static_cast<SerializableItem_String *>(itemMap.value("target_zone"))->getData(); };
 	int getTargetCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("target_card_id"))->getData(); };
-	QColor getColor() const { return static_cast<SerializableItem_Color *>(itemMap.value("color"))->getData(); };
+	Color getColor() const { return static_cast<SerializableItem_Color *>(itemMap.value("color"))->getData(); };
 	static SerializableItem *newItem() { return new Command_CreateArrow; }
 	int getItemId() const { return ItemId_Command_CreateArrow; }
 };
@@ -314,9 +314,9 @@ public:
 class Command_CreateCounter : public GameCommand {
 	Q_OBJECT
 public:
-	Command_CreateCounter(int _gameId = -1, const QString &_counterName = QString(), const QColor &_color = QColor(), int _radius = -1, int _value = -1);
+	Command_CreateCounter(int _gameId = -1, const QString &_counterName = QString(), const Color &_color = Color(), int _radius = -1, int _value = -1);
 	QString getCounterName() const { return static_cast<SerializableItem_String *>(itemMap.value("counter_name"))->getData(); };
-	QColor getColor() const { return static_cast<SerializableItem_Color *>(itemMap.value("color"))->getData(); };
+	Color getColor() const { return static_cast<SerializableItem_Color *>(itemMap.value("color"))->getData(); };
 	int getRadius() const { return static_cast<SerializableItem_Int *>(itemMap.value("radius"))->getData(); };
 	int getValue() const { return static_cast<SerializableItem_Int *>(itemMap.value("value"))->getData(); };
 	static SerializableItem *newItem() { return new Command_CreateCounter; }

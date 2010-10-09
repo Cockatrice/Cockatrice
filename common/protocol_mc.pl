@@ -109,9 +109,9 @@ while (<file>) {
 			$constructorCode .= "\tinsertItem(new SerializableItem_Int(\"$value\", _$prettyVarName));\n";
 			$getFunctionCode .= "\t$dataType get$prettyVarName2() const { return static_cast<SerializableItem_Int *>(itemMap.value(\"$value\"))->getData(); };\n";
 		} elsif ($key eq 'c') {
-			$dataType = 'QColor';
-			$constructorParamsH .= "const QColor &_$prettyVarName = QColor()";
-			$constructorParamsCpp .= "const QColor &_$prettyVarName";
+			$dataType = 'Color';
+			$constructorParamsH .= "const Color &_$prettyVarName = Color()";
+			$constructorParamsCpp .= "const Color &_$prettyVarName";
 			$constructorCode .= "\tinsertItem(new SerializableItem_Color(\"$value\", _$prettyVarName));\n";
 			$getFunctionCode .= "\t$dataType get$prettyVarName2() const { return static_cast<SerializableItem_Color *>(itemMap.value(\"$value\"))->getData(); };\n";
 		}
