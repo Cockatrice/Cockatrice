@@ -52,8 +52,6 @@ private:
 	QModelIndex nodeToIndex(AbstractDecklistNode *node) const;
 	void emitRecursiveUpdates(const QModelIndex &index);
 	void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);
-	void debugIndexInfo(const QString &func, const QModelIndex &index) const;
-	void debugShowTree(InnerDecklistNode *node, int depth) const;
 
 	void printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node);
 

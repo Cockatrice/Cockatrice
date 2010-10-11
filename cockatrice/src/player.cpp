@@ -29,11 +29,10 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 	connect(settingsCache, SIGNAL(playerBgPathChanged()), this, SLOT(updateBgPixmap()));
 	updateBgPixmap();
 	
-//	playerTarget = new PlayerTarget(CARD_WIDTH + counterAreaWidth + 5, this);
 	playerTarget = new PlayerTarget(this);
-	playerTarget->setPos(QPointF(0, 0));
+	playerTarget->setPos(QPointF(counterAreaWidth + (CARD_WIDTH + 5 - playerTarget->boundingRect().width()) / 2.0, 5));
 
-	QPointF base = QPointF(counterAreaWidth, 50);
+	QPointF base = QPointF(counterAreaWidth, 5 + playerTarget->boundingRect().height() + 10);
 
 	PileZone *deck = new PileZone(this, "deck", true, false, this);
 	deck->setPos(base);
@@ -1049,7 +1048,7 @@ void Player::clearArrows()
 
 void Player::rearrangeCounters()
 {
-	qreal marginTop = 50;
+	qreal marginTop = 15;
 	qreal marginBottom = 15;
 	
 	// Determine total height of bounding rectangles

@@ -3,12 +3,13 @@
 
 #include "arrowtarget.h"
 #include <QFont>
+#include <QPixmap>
 
 class Player;
 
 class PlayerTarget : public ArrowTarget {
 private:
-	QFont font;
+	QPixmap fullPixmap;
 public:
 	enum { Type = typePlayerTarget };
 	int type() const { return Type; }

@@ -28,7 +28,7 @@ AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, QGraphi
 
 AbstractCardItem::~AbstractCardItem()
 {
-	qDebug(QString("AbstractCardItem destructor: %1").arg(name).toLatin1());
+	qDebug() << "AbstractCardItem destructor:" << name;
 }
 
 QRectF AbstractCardItem::boundingRect() const
@@ -61,9 +61,11 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 		
 		painter->drawPixmap(QPointF(0, 0), *translatedPixmap);
 	} else {
-		QFont f("Times");
-		f.setStyleHint(QFont::Serif);
-		f.setPixelSize(12);
+		QFont f;
+		int fontSize = h / 6;
+		if (fontSize < 9)
+			fontSize = 9;
+		f.setPixelSize(fontSize);
 		painter->setFont(f);
 		QString colorStr;
 		if (!color.isEmpty())
@@ -103,7 +105,17 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 		painter->setPen(pen);
 		painter->drawRect(QRectF(3, 3, CARD_WIDTH - 6, CARD_HEIGHT - 6));
 		painter->setPen(textColor);
-		painter->drawText(QRectF(5, 5, CARD_WIDTH - 15, CARD_HEIGHT - 15), Qt::AlignTop | Qt::AlignLeft | Qt::TextWordWrap, name);
+		
+		QRectF textRect = painter->combinedTransform().mapRect(QRectF(5, 5, CARD_WIDTH - 15, CARD_HEIGHT - 15));
+		painter->resetTransform();
+		QTransform pixmapTransform;
+		pixmapTransform.translate(totalBoundingRect.width() / 2, totalBoundingRect.height() / 2);
+		pixmapTransform.rotate(tapAngle);
+		QPointF transPoint = QPointF(-w / 2, -h / 2);
+		pixmapTransform.translate(transPoint.x(), transPoint.y());
+		painter->setTransform(pixmapTransform);
+
+		painter->drawText(textRect, Qt::AlignTop | Qt::AlignLeft | Qt::TextWrapAnywhere, name);
 	}
 	painter->restore();
 

@@ -844,14 +844,16 @@ ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Co
 		targetZone = targetPlayer->getZones().value(cmd->getTargetZone());
 	if (!startZone || (!targetZone && !playerTarget))
 		return RespNameNotFound;
+	if (startZone->getType() != PublicZone)
+		return RespContextError;
 	Server_Card *startCard = startZone->getCard(cmd->getStartCardId(), false);
 	if (!startCard)
 		return RespNameNotFound;
 	Server_Card *targetCard = 0;
 	if (!playerTarget) {
-		targetCard = targetZone->getCard(cmd->getTargetCardId(), false);
-		if ((startZone->getType() != PublicZone) || (targetZone->getType() != PublicZone))
+		if (targetZone->getType() != PublicZone)
 			return RespContextError;
+		targetCard = targetZone->getCard(cmd->getTargetCardId(), false);
 	}
 	
 	Server_ArrowTarget *targetItem;

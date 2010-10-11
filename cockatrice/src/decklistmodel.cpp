@@ -25,31 +25,6 @@ DeckListModel::~DeckListModel()
 	delete deckList;
 }
 
-
-void DeckListModel::debugIndexInfo(const QString &func, const QModelIndex &index) const
-{
-	if (!index.isValid())
-		qDebug(QString("debugIndexInfo: %1: index invalid").arg(func).toLatin1());
-	else if (InnerDecklistNode *node = getNode<InnerDecklistNode *>(index))
-		qDebug(QString("debugIndexInfo: %1: INNER index '%2', row=%3, col=%4").arg(func).arg(node->getName()).arg(index.row()).arg(index.column()).toLatin1());
-	else if (DecklistModelCardNode *node = getNode<DecklistModelCardNode *>(index))
-		qDebug(QString("debugIndexInfo: %1: CARD index '%2', row=%3, col=%4").arg(func).arg(node->getName()).arg(index.row()).arg(index.column()).toLatin1());
-}
-
-void DeckListModel::debugShowTree(InnerDecklistNode *node, int depth) const
-{
-	for (int i = 0; i < node->size(); i++) {
-		DecklistModelCardNode *foo = dynamic_cast<DecklistModelCardNode *>(node->at(i));
-		if (!foo) {
-			InnerDecklistNode *bar = dynamic_cast<InnerDecklistNode *>(node->at(i));
-			qDebug(QString("%1%2").arg(QString(depth * 4, ' ')).arg(bar->getName()).toLatin1());
-			debugShowTree(bar, depth + 1);
-		} else
-			qDebug(QString("%1%2 %3").arg(QString(depth * 4, ' ')).arg(foo->getNumber()).arg(foo->getName()).toLatin1());
-	}
-}
-
-
 void DeckListModel::rebuildTree()
 {
 	root->clearTree();
