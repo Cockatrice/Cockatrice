@@ -151,43 +151,57 @@ void GeneralSettingsPage::retranslateUi()
 
 AppearanceSettingsPage::AppearanceSettingsPage()
 {
+	QIcon deleteIcon(":/resources/icon_delete.svg");
+	
 	handBgLabel = new QLabel;
 	handBgEdit = new QLineEdit(settingsCache->getHandBgPath());
 	handBgEdit->setReadOnly(true);
+	QPushButton *handBgClearButton = new QPushButton(deleteIcon, QString());
+	connect(handBgClearButton, SIGNAL(clicked()), this, SLOT(handBgClearButtonClicked()));
 	QPushButton *handBgButton = new QPushButton("...");
 	connect(handBgButton, SIGNAL(clicked()), this, SLOT(handBgButtonClicked()));
 	
 	tableBgLabel = new QLabel;
 	tableBgEdit = new QLineEdit(settingsCache->getTableBgPath());
 	tableBgEdit->setReadOnly(true);
+	QPushButton *tableBgClearButton = new QPushButton(deleteIcon, QString());
+	connect(tableBgClearButton, SIGNAL(clicked()), this, SLOT(tableBgClearButtonClicked()));
 	QPushButton *tableBgButton = new QPushButton("...");
 	connect(tableBgButton, SIGNAL(clicked()), this, SLOT(tableBgButtonClicked()));
 	
 	playerAreaBgLabel = new QLabel;
 	playerAreaBgEdit = new QLineEdit(settingsCache->getPlayerBgPath());
 	playerAreaBgEdit->setReadOnly(true);
+	QPushButton *playerAreaBgClearButton = new QPushButton(deleteIcon, QString());
+	connect(playerAreaBgClearButton, SIGNAL(clicked()), this, SLOT(playerAreaBgClearButtonClicked()));
 	QPushButton *playerAreaBgButton = new QPushButton("...");
 	connect(playerAreaBgButton, SIGNAL(clicked()), this, SLOT(playerAreaBgButtonClicked()));
 	
 	cardBackPicturePathLabel = new QLabel;
 	cardBackPicturePathEdit = new QLineEdit(settingsCache->getCardBackPicturePath());
 	cardBackPicturePathEdit->setReadOnly(true);
+	QPushButton *cardBackPicturePathClearButton = new QPushButton(deleteIcon, QString());
+	connect(cardBackPicturePathClearButton, SIGNAL(clicked()), this, SLOT(cardBackPicturePathClearButtonClicked()));
 	QPushButton *cardBackPicturePathButton = new QPushButton("...");
 	connect(cardBackPicturePathButton, SIGNAL(clicked()), this, SLOT(cardBackPicturePathButtonClicked()));
 	
 	QGridLayout *zoneBgGrid = new QGridLayout;
 	zoneBgGrid->addWidget(handBgLabel, 0, 0);
 	zoneBgGrid->addWidget(handBgEdit, 0, 1);
-	zoneBgGrid->addWidget(handBgButton, 0, 2);
+	zoneBgGrid->addWidget(handBgClearButton, 0, 2);
+	zoneBgGrid->addWidget(handBgButton, 0, 3);
 	zoneBgGrid->addWidget(tableBgLabel, 1, 0);
 	zoneBgGrid->addWidget(tableBgEdit, 1, 1);
-	zoneBgGrid->addWidget(tableBgButton, 1, 2);
+	zoneBgGrid->addWidget(tableBgClearButton, 1, 2);
+	zoneBgGrid->addWidget(tableBgButton, 1, 3);
 	zoneBgGrid->addWidget(playerAreaBgLabel, 2, 0);
 	zoneBgGrid->addWidget(playerAreaBgEdit, 2, 1);
-	zoneBgGrid->addWidget(playerAreaBgButton, 2, 2);
+	zoneBgGrid->addWidget(playerAreaBgClearButton, 2, 2);
+	zoneBgGrid->addWidget(playerAreaBgButton, 2, 3);
 	zoneBgGrid->addWidget(cardBackPicturePathLabel, 3, 0);
 	zoneBgGrid->addWidget(cardBackPicturePathEdit, 3, 1);
-	zoneBgGrid->addWidget(cardBackPicturePathButton, 3, 2);
+	zoneBgGrid->addWidget(cardBackPicturePathClearButton, 3, 2);
+	zoneBgGrid->addWidget(cardBackPicturePathButton, 3, 3);
 
 	zoneBgGroupBox = new QGroupBox;
 	zoneBgGroupBox->setLayout(zoneBgGrid);
@@ -202,12 +216,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	handGroupBox = new QGroupBox;
 	handGroupBox->setLayout(handGrid);
 	
-	economicGridCheckBox = new QCheckBox;
-	economicGridCheckBox->setChecked(settingsCache->getEconomicGrid());
-	connect(economicGridCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setEconomicGrid(int)));
+	economicalGridCheckBox = new QCheckBox;
+	economicalGridCheckBox->setChecked(settingsCache->getEconomicalGrid());
+	connect(economicalGridCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setEconomicalGrid(int)));
 	
 	QGridLayout *tableGrid = new QGridLayout;
-	tableGrid->addWidget(economicGridCheckBox, 0, 0, 1, 2);
+	tableGrid->addWidget(economicalGridCheckBox, 0, 0, 1, 2);
 	
 	tableGroupBox = new QGroupBox;
 	tableGroupBox->setLayout(tableGrid);
@@ -248,11 +262,17 @@ void AppearanceSettingsPage::retranslateUi()
 	horizontalHandCheckBox->setText(tr("Display hand horizontally (wastes space)"));
 	
 	tableGroupBox->setTitle(tr("Table grid layout"));
-	economicGridCheckBox->setText(tr("Economic layout"));
+	economicalGridCheckBox->setText(tr("Economical layout"));
 	
 	zoneViewGroupBox->setTitle(tr("Zone view layout"));
 	zoneViewSortByNameCheckBox->setText(tr("Sort by name"));
 	zoneViewSortByTypeCheckBox->setText(tr("Sort by type"));
+}
+
+void AppearanceSettingsPage::handBgClearButtonClicked()
+{
+	handBgEdit->setText(QString());
+	settingsCache->setHandBgPath(QString());
 }
 
 void AppearanceSettingsPage::handBgButtonClicked()
@@ -265,6 +285,12 @@ void AppearanceSettingsPage::handBgButtonClicked()
 	settingsCache->setHandBgPath(path);
 }
 
+void AppearanceSettingsPage::tableBgClearButtonClicked()
+{
+	tableBgEdit->setText(QString());
+	settingsCache->setTableBgPath(QString());
+}
+
 void AppearanceSettingsPage::tableBgButtonClicked()
 {
 	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
@@ -275,6 +301,12 @@ void AppearanceSettingsPage::tableBgButtonClicked()
 	settingsCache->setTableBgPath(path);
 }
 
+void AppearanceSettingsPage::playerAreaBgClearButtonClicked()
+{
+	playerAreaBgEdit->setText(QString());
+	settingsCache->setPlayerBgPath(QString());
+}
+
 void AppearanceSettingsPage::playerAreaBgButtonClicked()
 {
 	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
@@ -283,6 +315,12 @@ void AppearanceSettingsPage::playerAreaBgButtonClicked()
 	
 	playerAreaBgEdit->setText(path);
 	settingsCache->setPlayerBgPath(path);
+}
+
+void AppearanceSettingsPage::cardBackPicturePathClearButtonClicked()
+{
+	cardBackPicturePathEdit->setText(QString());
+	settingsCache->setCardBackPicturePath(QString());
 }
 
 void AppearanceSettingsPage::cardBackPicturePathButtonClicked()
@@ -307,8 +345,19 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 	generalGroupBox = new QGroupBox;
 	generalGroupBox->setLayout(generalGrid);
 	
+	tapAnimationCheckBox = new QCheckBox;
+	tapAnimationCheckBox->setChecked(settingsCache->getTapAnimation());
+	connect(tapAnimationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setTapAnimation(int)));
+	
+	QGridLayout *animationGrid = new QGridLayout;
+	animationGrid->addWidget(tapAnimationCheckBox, 0, 0);
+	
+	animationGroupBox = new QGroupBox;
+	animationGroupBox->setLayout(animationGrid);
+
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(generalGroupBox);
+	mainLayout->addWidget(animationGroupBox);
 	
 	setLayout(mainLayout);
 }
@@ -317,6 +366,8 @@ void UserInterfaceSettingsPage::retranslateUi()
 {
 	generalGroupBox->setTitle(tr("General interface settings"));
 	doubleClickToPlayCheckBox->setText(tr("&Double-click cards to play them (instead of single-click)"));
+	animationGroupBox->setTitle(tr("Animation settings"));
+	tapAnimationCheckBox->setText(tr("&Tap/untap animation"));
 }
 
 MessagesSettingsPage::MessagesSettingsPage()
@@ -472,17 +523,22 @@ void DlgSettings::changeEvent(QEvent *event)
 
 void DlgSettings::closeEvent(QCloseEvent *event)
 {
-	if (!db->getLoadSuccess()) {
-		QMessageBox::critical(this, tr("Error"), tr("Your card database is invalid. Please check if the path is set correctly."));
-		event->ignore();
-	} else if (!QDir(settingsCache->getDeckPath()).exists()) {
-		QMessageBox::critical(this, tr("Error"), tr("The path to your deck directory is invalid."));
-		event->ignore();
-	} else if (!QDir(settingsCache->getPicsPath()).exists()) {
-		QMessageBox::critical(this, tr("Error"), tr("The path to your card pictures directory is invalid."));
-		event->ignore();
-	} else
-		event->accept();
+	if (!db->getLoadSuccess())
+		if (QMessageBox::critical(this, tr("Error"), tr("Your card database is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+			event->ignore();
+			return;
+		}
+	if (!QDir(settingsCache->getDeckPath()).exists())
+		if (QMessageBox::critical(this, tr("Error"), tr("The path to your deck directory is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+			event->ignore();
+			return;
+		}
+	if (!QDir(settingsCache->getPicsPath()).exists())
+		if (QMessageBox::critical(this, tr("Error"), tr("The path to your card pictures directory is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+			event->ignore();
+			return;
+		}
+	event->accept();
 }
 
 void DlgSettings::retranslateUi()

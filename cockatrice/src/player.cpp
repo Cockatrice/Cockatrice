@@ -528,7 +528,7 @@ void Player::setCardAttrHelper(CardItem *card, const QString &aname, const QStri
 		if (!(!tapped && card->getDoesntUntap() && allCards)) {
 			if (!allCards)
 				emit logSetTapped(this, card->getName(), tapped);
-			card->setTapped(tapped);
+			card->setTapped(tapped, true);
 		}
 	} else if (aname == "attacking")
 		card->setAttacking(avalue == "1");
@@ -958,7 +958,7 @@ void Player::addZone(CardZone *z)
 
 Counter *Player::addCounter(ServerInfo_Counter *counter)
 {
-	return addCounter(counter->getId(), counter->getName(), counter->getColor(), counter->getRadius(), counter->getCount());
+	return addCounter(counter->getId(), counter->getName(), counter->getColor().getQColor(), counter->getRadius(), counter->getCount());
 }
 
 Counter *Player::addCounter(int counterId, const QString &name, QColor color, int radius, int value)
@@ -1012,9 +1012,9 @@ ArrowItem *Player::addArrow(ServerInfo_Arrow *arrow)
 		return 0;
 	
 	if (targetCard)
-		return addArrow(arrow->getId(), startCard, targetCard, arrow->getColor());
+		return addArrow(arrow->getId(), startCard, targetCard, arrow->getColor().getQColor());
 	else
-		return addArrow(arrow->getId(), startCard, targetPlayer->getPlayerTarget(), arrow->getColor());
+		return addArrow(arrow->getId(), startCard, targetPlayer->getPlayerTarget(), arrow->getColor().getQColor());
 }
 
 ArrowItem *Player::addArrow(int arrowId, CardItem *startCard, ArrowTarget *targetItem, const QColor &color)

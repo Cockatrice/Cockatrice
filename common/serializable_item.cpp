@@ -116,29 +116,19 @@ void SerializableItem_Bool::writeElement(QXmlStreamWriter *xml)
 	xml->writeCharacters(data ? "1" : "0");
 }
 
-int SerializableItem_Color::colorToInt(const QColor &color) const
-{
-	return color.red() * 65536 + color.green() * 256 + color.blue();
-}
-
-QColor SerializableItem_Color::colorFromInt(int colorValue) const
-{
-	return QColor(colorValue / 65536, (colorValue % 65536) / 256, colorValue % 256);
-}
-
 bool SerializableItem_Color::readElement(QXmlStreamReader *xml)
 {
 	if (xml->isCharacters() && !xml->isWhitespace()) {
 		bool ok;
 		int colorValue = xml->text().toString().toInt(&ok);
-		data = ok ? colorFromInt(colorValue) : Qt::black;
+		data = ok ? Color(colorValue) : Color();
 	}
 	return SerializableItem::readElement(xml);
 }
 
 void SerializableItem_Color::writeElement(QXmlStreamWriter *xml)
 {
-	xml->writeCharacters(QString::number(colorToInt(data)));
+	xml->writeCharacters(QString::number(data.getValue()));
 }
 
 bool SerializableItem_DateTime::readElement(QXmlStreamReader *xml)
@@ -154,4 +144,17 @@ bool SerializableItem_DateTime::readElement(QXmlStreamReader *xml)
 void SerializableItem_DateTime::writeElement(QXmlStreamWriter *xml)
 {
 	xml->writeCharacters(QString::number(data.toTime_t()));
+}
+
+bool SerializableItem_ByteArray::readElement(QXmlStreamReader *xml)
+{
+	if (xml->isCharacters() && !xml->isWhitespace())
+		data = qUncompress(QByteArray::fromBase64(xml->text().toString().toAscii()));
+	
+	return SerializableItem::readElement(xml);
+}
+
+void SerializableItem_ByteArray::writeElement(QXmlStreamWriter *xml)
+{
+	xml->writeCharacters(QString(qCompress(data).toBase64()));
 }

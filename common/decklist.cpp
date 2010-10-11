@@ -1,5 +1,4 @@
 #include <QFile>
-#include <QFileDialog>
 #include <QTextStream>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>

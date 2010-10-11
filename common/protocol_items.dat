@@ -1,6 +1,7 @@
 0:ping
 0:login:s,username:s,password
 0:message:s,user_name:s,text
+0:get_user_info:s,user_name
 0:deck_list
 0:deck_new_dir:s,path:s,dir_name
 0:deck_del_dir:s,path

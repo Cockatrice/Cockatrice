@@ -5,6 +5,7 @@
 #include <QVector>
 #include <QPair>
 #include <QObject>
+#include <QStringList>
 #include "serializable_item.h"
 
 class CardDatabase;

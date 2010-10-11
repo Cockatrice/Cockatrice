@@ -13,6 +13,7 @@ class QTreeWidgetItem;
 class QPushButton;
 class QCheckBox;
 class QTextEdit;
+class QLabel;
 
 class GamesModel;
 class GamesProxyModel;
@@ -101,6 +102,17 @@ public:
 	void retranslateUi();
 };
 
+class UserInfoBox : public QWidget {
+	Q_OBJECT
+private:
+	QLabel *avatarLabel, *nameLabel, *countryLabel1, *countryLabel2, *userLevelLabel1, *userLevelLabel2;
+private slots:
+	void processResponse(ProtocolResponse *response);
+public:
+	UserInfoBox(AbstractClient *_client, QWidget *parent = 0);
+	void retranslateUi();
+};
+
 class TabServer : public Tab {
 	Q_OBJECT
 signals:
@@ -114,6 +126,7 @@ private:
 	ChatChannelSelector *chatChannelSelector;
 	ServerMessageLog *serverMessageLog;
 	UserList *userList;
+	UserInfoBox *userInfoBox;
 public:
 	TabServer(AbstractClient *_client, QWidget *parent = 0);
 	void retranslateUi();

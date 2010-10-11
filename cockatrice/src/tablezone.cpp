@@ -12,10 +12,10 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 	: CardZone(_p, "table", true, false, true, parent), active(false)
 {
 	connect(settingsCache, SIGNAL(tableBgPathChanged()), this, SLOT(updateBgPixmap()));
-	connect(settingsCache, SIGNAL(economicGridChanged()), this, SLOT(reorganizeCards()));
+	connect(settingsCache, SIGNAL(economicalGridChanged()), this, SLOT(reorganizeCards()));
 	updateBgPixmap();
 
-	if (settingsCache->getEconomicGrid())
+	if (settingsCache->getEconomicalGrid())
 		height = 2 * boxLineWidth + (int) (14.0 / 3 * CARD_HEIGHT + 3 * paddingY);
 	else
 		height = 2 * boxLineWidth + 4 * CARD_HEIGHT + 3 * paddingY;
@@ -210,7 +210,7 @@ CardItem *TableZone::getCardFromCoords(const QPointF &point) const
 QPointF TableZone::mapFromGrid(const QPoint &gridPoint) const
 {
 	qreal x, y;
-	if ((gridPoint.y() == 3) && (settingsCache->getEconomicGrid())) {
+	if ((gridPoint.y() == 3) && (settingsCache->getEconomicalGrid())) {
 		x = marginX + (CARD_WIDTH * gridPoint.x() + CARD_WIDTH * (gridPoint.x() / 3)) / 2;
 		y = boxLineWidth + (CARD_HEIGHT + paddingY) * gridPoint.y() + (gridPoint.x() % 3 * CARD_HEIGHT) / 3;
 	} else {
@@ -245,7 +245,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 	
 	int resultY = (int) (y / (CARD_HEIGHT + paddingY));
 
-	if ((resultY == 3) && (settingsCache->getEconomicGrid()))
+	if ((resultY == 3) && (settingsCache->getEconomicalGrid()))
 		return QPoint(
 			(int) (x * 2 / CARD_WIDTH - floor(x / (2 * CARD_WIDTH))),
 			3

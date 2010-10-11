@@ -19,7 +19,8 @@ SettingsCache::SettingsCache()
 	picDownload = settings->value("personal/picturedownload", false).toBool();
 	doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
 	horizontalHand = settings->value("hand/horizontal", false).toBool();
-	economicGrid = settings->value("table/economic", false).toBool();
+	economicalGrid = settings->value("table/economic", false).toBool();
+	tapAnimation = settings->value("cards/tapanimation", true).toBool();
 	
 	zoneViewSortByName = settings->value("zoneview/sortbyname", false).toBool();
 	zoneViewSortByType = settings->value("zoneview/sortbytype", false).toBool();
@@ -100,11 +101,17 @@ void SettingsCache::setHorizontalHand(int _horizontalHand)
 	emit horizontalHandChanged();
 }
 
-void SettingsCache::setEconomicGrid(int _economicGrid)
+void SettingsCache::setEconomicalGrid(int _economicalGrid)
 {
-	economicGrid = _economicGrid;
-	settings->setValue("table/economic", economicGrid);
-	emit economicGridChanged();
+	economicalGrid = _economicalGrid;
+	settings->setValue("table/economic", economicalGrid);
+	emit economicalGridChanged();
+}
+
+void SettingsCache::setTapAnimation(int _tapAnimation)
+{
+	tapAnimation = _tapAnimation;
+	settings->setValue("cards/tapanimation", tapAnimation);
 }
 
 void SettingsCache::setZoneViewSortByName(int _zoneViewSortByName)

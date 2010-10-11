@@ -67,14 +67,14 @@ void Server_Player::setupZones()
 	addZone(new Server_CardZone(this, "grave", false, PublicZone));
 	addZone(new Server_CardZone(this, "rfg", false, PublicZone));
 
-	addCounter(new Server_Counter(0, "life", Qt::white, 25, 20));
-	addCounter(new Server_Counter(1, "w", QColor(255, 255, 150), 20, 0));
-	addCounter(new Server_Counter(2, "u", QColor(150, 150, 255), 20, 0));
-	addCounter(new Server_Counter(3, "b", QColor(150, 150, 150), 20, 0));
-	addCounter(new Server_Counter(4, "r", QColor(250, 150, 150), 20, 0));
-	addCounter(new Server_Counter(5, "g", QColor(150, 255, 150), 20, 0));
-	addCounter(new Server_Counter(6, "x", QColor(255, 255, 255), 20, 0));
-	addCounter(new Server_Counter(7, "storm", QColor(255, 255, 255), 20, 0));
+	addCounter(new Server_Counter(0, "life", Color(255, 255, 255), 25, 20));
+	addCounter(new Server_Counter(1, "w", Color(255, 255, 150), 20, 0));
+	addCounter(new Server_Counter(2, "u", Color(150, 150, 255), 20, 0));
+	addCounter(new Server_Counter(3, "b", Color(150, 150, 150), 20, 0));
+	addCounter(new Server_Counter(4, "r", Color(250, 150, 150), 20, 0));
+	addCounter(new Server_Counter(5, "g", Color(150, 255, 150), 20, 0));
+	addCounter(new Server_Counter(6, "x", Color(255, 255, 255), 20, 0));
+	addCounter(new Server_Counter(7, "storm", Color(255, 255, 255), 20, 0));
 
 	initialCards = 7;
 

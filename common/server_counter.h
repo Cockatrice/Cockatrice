@@ -21,21 +21,21 @@
 #define SERVER_COUNTER_H
 
 #include <QString>
-#include <QColor>
+#include "color.h"
 
 class Server_Counter {
 protected:
 	int id;
 	QString name;
-	QColor color;
+	Color color;
 	int radius;
 	int count;
 public:
-	Server_Counter(int _id, const QString &_name, const QColor &_color, int _radius, int _count = 0) : id(_id), name(_name), color(_color), radius(_radius), count(_count) { }
+	Server_Counter(int _id, const QString &_name, const Color &_color, int _radius, int _count = 0) : id(_id), name(_name), color(_color), radius(_radius), count(_count) { }
 	~Server_Counter() { }
 	int getId() const { return id; }
 	QString getName() const { return name; }
-	QColor getColor() const { return color; }
+	Color getColor() const { return color; }
 	int getRadius() const { return radius; }
 	int getCount() const { return count; }
 	void setCount(int _count) { count = _count; }

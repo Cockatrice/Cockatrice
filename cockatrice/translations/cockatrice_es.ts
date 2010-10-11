@@ -4,70 +4,74 @@
 <context>
     <name>AppearanceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="241"/>
+        <location filename="../src/dlg_settings.cpp" line="255"/>
         <source>Zone background pictures</source>
         <translation>Imagenes de la zona de fondo</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="242"/>
+        <location filename="../src/dlg_settings.cpp" line="256"/>
         <source>Path to hand background:</source>
         <translation>Ruta a la imagen de fondo de la mano:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="243"/>
+        <location filename="../src/dlg_settings.cpp" line="257"/>
         <source>Path to table background:</source>
         <translation>Ruta a la imagen de fondo de la mesa:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="244"/>
+        <location filename="../src/dlg_settings.cpp" line="258"/>
         <source>Path to player info background:</source>
         <translation>Ruta a la imagen de fondo de la información del jugador:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="245"/>
+        <location filename="../src/dlg_settings.cpp" line="259"/>
         <source>Path to picture of card back:</source>
         <translation>Ruta al reverso de las cartas:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="247"/>
+        <location filename="../src/dlg_settings.cpp" line="261"/>
         <source>Hand layout</source>
         <translation>Disposición de la mano</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="248"/>
+        <location filename="../src/dlg_settings.cpp" line="262"/>
         <source>Display hand horizontally (wastes space)</source>
         <translation>Mostrar la mano horizontalmente (desperdicia espacio)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="250"/>
+        <location filename="../src/dlg_settings.cpp" line="264"/>
         <source>Table grid layout</source>
         <translation>Disposición de la rejilla de la mesa</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="251"/>
-        <source>Economic layout</source>
-        <translation>Disposición económica</translation>
+        <location filename="../src/dlg_settings.cpp" line="265"/>
+        <source>Economical layout</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="253"/>
+        <source>Economic layout</source>
+        <translation type="obsolete">Disposición económica</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="267"/>
         <source>Zone view layout</source>
         <translation>Distribución de la zona de visionado</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="254"/>
+        <location filename="../src/dlg_settings.cpp" line="268"/>
         <source>Sort by name</source>
         <translation>Ordenar por nombre</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="255"/>
+        <location filename="../src/dlg_settings.cpp" line="269"/>
         <source>Sort by type</source>
         <translation>Ordenar por tipo</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="260"/>
-        <location filename="../src/dlg_settings.cpp" line="270"/>
         <location filename="../src/dlg_settings.cpp" line="280"/>
-        <location filename="../src/dlg_settings.cpp" line="290"/>
+        <location filename="../src/dlg_settings.cpp" line="296"/>
+        <location filename="../src/dlg_settings.cpp" line="312"/>
+        <location filename="../src/dlg_settings.cpp" line="328"/>
         <source>Choose path</source>
         <translation>Elija ruta</translation>
     </message>
@@ -352,27 +356,27 @@
 <context>
     <name>ChatChannelSelector</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="151"/>
+        <location filename="../src/tab_server.cpp" line="152"/>
         <source>Chat channels</source>
         <translation>Canales de Chat</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="152"/>
+        <location filename="../src/tab_server.cpp" line="153"/>
         <source>Joi&amp;n</source>
         <translation>E&amp;ntrar</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="155"/>
+        <location filename="../src/tab_server.cpp" line="156"/>
         <source>Channel</source>
         <translation>Canal</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="156"/>
+        <location filename="../src/tab_server.cpp" line="157"/>
         <source>Description</source>
         <translation>Descripción</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="157"/>
+        <location filename="../src/tab_server.cpp" line="158"/>
         <source>Players</source>
         <translation>Jugadores</translation>
     </message>
@@ -735,54 +739,66 @@
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="476"/>
-        <location filename="../src/dlg_settings.cpp" line="479"/>
-        <location filename="../src/dlg_settings.cpp" line="482"/>
+        <location filename="../src/dlg_settings.cpp" line="527"/>
+        <location filename="../src/dlg_settings.cpp" line="532"/>
+        <location filename="../src/dlg_settings.cpp" line="537"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="476"/>
         <source>Your card database is invalid. Please check if the path is set correctly.</source>
-        <translation>Tu base de datos de cartas es invalida. Por favor, comprueba si la ruta está asignada correctamente.</translation>
+        <translation type="obsolete">Tu base de datos de cartas es invalida. Por favor, comprueba si la ruta está asignada correctamente.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="479"/>
         <source>The path to your deck directory is invalid.</source>
-        <translation>La ruta a tu directorio de mazos es invalida.</translation>
+        <translation type="obsolete">La ruta a tu directorio de mazos es invalida.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="482"/>
         <source>The path to your card pictures directory is invalid.</source>
-        <translation>La ruta a tu directorio de imagenes de las cartas es invalida.</translation>
+        <translation type="obsolete">La ruta a tu directorio de imagenes de las cartas es invalida.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="490"/>
+        <location filename="../src/dlg_settings.cpp" line="527"/>
+        <source>Your card database is invalid. Would you like to go back and set the correct path?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="532"/>
+        <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="537"/>
+        <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="546"/>
         <source>Settings</source>
         <translation>Preferencias</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="492"/>
+        <location filename="../src/dlg_settings.cpp" line="548"/>
         <source>General</source>
         <translation>General</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="493"/>
+        <location filename="../src/dlg_settings.cpp" line="549"/>
         <source>Appearance</source>
         <translation>Apariencia</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="494"/>
+        <location filename="../src/dlg_settings.cpp" line="550"/>
         <source>User interface</source>
         <translation>Interfaz de usuario</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="495"/>
+        <location filename="../src/dlg_settings.cpp" line="551"/>
         <source>Messages</source>
         <translation>Mensajes</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="497"/>
+        <location filename="../src/dlg_settings.cpp" line="553"/>
         <source>&amp;Close</source>
         <translation>&amp;Cerrar</translation>
     </message>
@@ -790,65 +806,65 @@
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="115"/>
+        <location filename="../src/tab_server.cpp" line="116"/>
         <source>C&amp;reate</source>
         <translation>C&amp;rear</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="116"/>
+        <location filename="../src/tab_server.cpp" line="117"/>
         <source>&amp;Join</source>
         <translation>E&amp;ntrar</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="78"/>
         <location filename="../src/tab_server.cpp" line="79"/>
         <location filename="../src/tab_server.cpp" line="80"/>
         <location filename="../src/tab_server.cpp" line="81"/>
+        <location filename="../src/tab_server.cpp" line="82"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="78"/>
+        <location filename="../src/tab_server.cpp" line="79"/>
         <source>Wrong password.</source>
         <translation>Contraseña incorrecta.</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="79"/>
+        <location filename="../src/tab_server.cpp" line="80"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>No se permiten espectadores en esta partida.</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="80"/>
+        <location filename="../src/tab_server.cpp" line="81"/>
         <source>The game is already full.</source>
         <translation>La partida no tiene plazas libres.</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="81"/>
+        <location filename="../src/tab_server.cpp" line="82"/>
         <source>The game does not exist any more.</source>
         <translation>La partida ya no existe.</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="97"/>
+        <location filename="../src/tab_server.cpp" line="98"/>
         <source>Join game</source>
         <translation>Entrar en la partida</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="97"/>
+        <location filename="../src/tab_server.cpp" line="98"/>
         <source>Password:</source>
         <translation>Contraseña:</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="113"/>
+        <location filename="../src/tab_server.cpp" line="114"/>
         <source>Games</source>
         <translation>Partidas</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="114"/>
+        <location filename="../src/tab_server.cpp" line="115"/>
         <source>&amp;Show full games</source>
         <translation>&amp;Ver partidas sin plazas libres</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="117"/>
+        <location filename="../src/tab_server.cpp" line="118"/>
         <source>J&amp;oin as spectator</source>
         <translation>Entrar como e&amp;spectador</translation>
     </message>
@@ -1489,22 +1505,22 @@
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="379"/>
+        <location filename="../src/dlg_settings.cpp" line="430"/>
         <source>&amp;Add</source>
         <translation>&amp;Añadir</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="380"/>
+        <location filename="../src/dlg_settings.cpp" line="431"/>
         <source>&amp;Remove</source>
         <translation>&amp;Quitar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="362"/>
+        <location filename="../src/dlg_settings.cpp" line="413"/>
         <source>Add message</source>
         <translation>Añadir mensaje</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="362"/>
+        <location filename="../src/dlg_settings.cpp" line="413"/>
         <source>Message:</source>
         <translation>Mensaje:</translation>
     </message>
@@ -1888,27 +1904,27 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../common/decklist.cpp" line="79"/>
+        <location filename="../../common/decklist.cpp" line="78"/>
         <source>Maindeck</source>
         <translation>Mazo principal</translation>
     </message>
     <message>
-        <location filename="../../common/decklist.cpp" line="81"/>
+        <location filename="../../common/decklist.cpp" line="80"/>
         <source>Sideboard</source>
         <translation>Reserva</translation>
     </message>
     <message>
-        <location filename="../../common/decklist.cpp" line="229"/>
+        <location filename="../../common/decklist.cpp" line="228"/>
         <source>Cockatrice decks (*.cod)</source>
         <translation>Mazos de Cockatrice (*.cod)</translation>
     </message>
     <message>
-        <location filename="../../common/decklist.cpp" line="230"/>
+        <location filename="../../common/decklist.cpp" line="229"/>
         <source>Plain text decks (*.dec *.mwDeck)</source>
         <translation>Archivos de texto plano (*.dec *.mwDeck)</translation>
     </message>
     <message>
-        <location filename="../../common/decklist.cpp" line="231"/>
+        <location filename="../../common/decklist.cpp" line="230"/>
         <source>All files (*.*)</source>
         <translation>Todos los archivos (*.*)</translation>
     </message>
@@ -1934,7 +1950,7 @@
 <context>
     <name>ServerMessageLog</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="231"/>
+        <location filename="../src/tab_server.cpp" line="232"/>
         <source>Server messages</source>
         <translation>Mensajes del servidor</translation>
     </message>
@@ -2157,28 +2173,51 @@ Por favor, introduzca un nombre:</translation>
 <context>
     <name>TabServer</name>
     <message>
-        <location filename="../src/tab_server.h" line="120"/>
+        <location filename="../src/tab_server.h" line="133"/>
         <source>Server</source>
         <translation>Servidor</translation>
     </message>
 </context>
 <context>
+    <name>UserInfoBox</name>
+    <message>
+        <location filename="../src/tab_server.cpp" line="373"/>
+        <source>Location:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/tab_server.cpp" line="374"/>
+        <source>User level:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="318"/>
+        <location filename="../src/dlg_settings.cpp" line="367"/>
         <source>General interface settings</source>
         <translation>Preferencias generales de la interfaz</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="319"/>
+        <location filename="../src/dlg_settings.cpp" line="368"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation>&amp;Doble click en las cartas para jugarlas (en lugar de un solo click)</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="369"/>
+        <source>Animation settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="370"/>
+        <source>&amp;Tap/untap animation</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>UserList</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="281"/>
+        <location filename="../src/tab_server.cpp" line="282"/>
         <source>Users online: %1</source>
         <translation>Usuarios online: %1</translation>
     </message>

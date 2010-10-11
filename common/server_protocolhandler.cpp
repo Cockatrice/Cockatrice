@@ -123,6 +123,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 			case ItemId_Command_DeckDel: return cmdDeckDel(qobject_cast<Command_DeckDel *>(command), cont);
 			case ItemId_Command_DeckUpload: return cmdDeckUpload(qobject_cast<Command_DeckUpload *>(command), cont);
 			case ItemId_Command_DeckDownload: return cmdDeckDownload(qobject_cast<Command_DeckDownload *>(command), cont);
+			case ItemId_Command_GetUserInfo: return cmdGetUserInfo(qobject_cast<Command_GetUserInfo *>(command), cont);
 			case ItemId_Command_ListChatChannels: return cmdListChatChannels(qobject_cast<Command_ListChatChannels *>(command), cont);
 			case ItemId_Command_ChatJoinChannel: return cmdChatJoinChannel(qobject_cast<Command_ChatJoinChannel *>(command), cont);
 			case ItemId_Command_ListUsers: return cmdListUsers(qobject_cast<Command_ListUsers *>(command), cont);
@@ -244,6 +245,25 @@ ResponseCode Server_ProtocolHandler::cmdMessage(Command_Message *cmd, CommandCon
 	cont->enqueueItem(new Event_Message(userInfo->getName(), receiver, cmd->getText()));
 	userHandler->sendProtocolItem(new Event_Message(userInfo->getName(), receiver, cmd->getText()));
 	return RespOk;
+}
+
+ResponseCode Server_ProtocolHandler::cmdGetUserInfo(Command_GetUserInfo *cmd, CommandContainer *cont)
+{
+	if (authState == PasswordWrong)
+		return RespLoginNeeded;
+	
+	ServerInfo_User *result;
+	if (cmd->getUserName().isEmpty())
+		result = new ServerInfo_User(userInfo);
+	else {
+		Server_ProtocolHandler *handler = server->getUsers().value(cmd->getUserName());
+		if (!handler)
+			return RespNameNotFound;
+		result = handler->getUserInfo();
+	}
+		
+	cont->setResponse(new Response_GetUserInfo(cont->getCmdId(), RespOk, result));
+	return RespNothing;
 }
 
 ResponseCode Server_ProtocolHandler::cmdListChatChannels(Command_ListChatChannels * /*cmd*/, CommandContainer *cont)

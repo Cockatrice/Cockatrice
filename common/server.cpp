@@ -56,8 +56,6 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	}
 	
 	ServerInfo_User *data = getUserData(name);
-	if (authState == PasswordRight)
-		data->setUserLevel(data->getUserLevel() | ServerInfo_User::IsRegistered);
 	session->setUserInfo(data);
 	
 	users.insert(name, session);

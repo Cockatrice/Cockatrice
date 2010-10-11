@@ -12,12 +12,13 @@ ServerInfo_ChatChannel::ServerInfo_ChatChannel(const QString &_name, const QStri
 	insertItem(new SerializableItem_Bool("auto_join", _autoJoin));
 }
 
-ServerInfo_User::ServerInfo_User(const QString &_name, int _userLevel, const QString &_country)
+ServerInfo_User::ServerInfo_User(const QString &_name, int _userLevel, const QString &_country, const QByteArray &_avatarBmp)
 	: SerializableItem_Map("user")
 {
 	insertItem(new SerializableItem_String("name", _name));
 	insertItem(new SerializableItem_Int("userlevel", _userLevel));
 	insertItem(new SerializableItem_String("country", _country));
+	insertItem(new SerializableItem_ByteArray("avatar_bmp", _avatarBmp));
 }
 
 ServerInfo_User::ServerInfo_User(const ServerInfo_User *other)
@@ -26,6 +27,7 @@ ServerInfo_User::ServerInfo_User(const ServerInfo_User *other)
 	insertItem(new SerializableItem_String("name", other->getName()));
 	insertItem(new SerializableItem_Int("userlevel", other->getUserLevel()));
 	insertItem(new SerializableItem_String("country", other->getCountry()));
+	insertItem(new SerializableItem_ByteArray("avatar_bmp", other->getAvatarBmp()));
 }
 
 ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, ServerInfo_User *_creatorInfo, bool _spectatorsAllowed, bool _spectatorsNeedPassword, int _spectatorCount)
@@ -113,7 +115,7 @@ QList<ServerInfo_Card *> ServerInfo_Zone::getCardList() const
 	return result;
 }
 
-ServerInfo_Counter::ServerInfo_Counter(int _id, const QString &_name, const QColor &_color, int _radius, int _count)
+ServerInfo_Counter::ServerInfo_Counter(int _id, const QString &_name, const Color &_color, int _radius, int _count)
 	: SerializableItem_Map("counter")
 {
 	insertItem(new SerializableItem_Int("id", _id));
@@ -123,7 +125,7 @@ ServerInfo_Counter::ServerInfo_Counter(int _id, const QString &_name, const QCol
 	insertItem(new SerializableItem_Int("count", _count));
 }
 
-ServerInfo_Arrow::ServerInfo_Arrow(int _id, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, const QColor &_color)
+ServerInfo_Arrow::ServerInfo_Arrow(int _id, int _startPlayerId, const QString &_startZone, int _startCardId, int _targetPlayerId, const QString &_targetZone, int _targetCardId, const Color &_color)
 	: SerializableItem_Map("arrow")
 {
 	insertItem(new SerializableItem_Int("id", _id));

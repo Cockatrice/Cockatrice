@@ -2,9 +2,9 @@
 #define PROTOCOL_DATASTRUCTURES_H
 
 #include <QString>
-#include <QColor>
 #include <QDateTime>
 #include "serializable_item.h"
+#include "color.h"
 
 class DeckList;
 
@@ -39,13 +39,14 @@ public:
 		IsJudge = 0x04,
 		IsAdmin = 0x08
 	};
-	ServerInfo_User(const QString &_name = QString(), int _userLevel = IsNothing, const QString &_country = QString());
+	ServerInfo_User(const QString &_name = QString(), int _userLevel = IsNothing, const QString &_country = QString(), const QByteArray &_avatarBmp = QByteArray());
 	ServerInfo_User(const ServerInfo_User *other);
 	static SerializableItem *newItem() { return new ServerInfo_User; }
 	QString getName() const { return static_cast<SerializableItem_String *>(itemMap.value("name"))->getData(); }
 	int getUserLevel() const { return static_cast<SerializableItem_Int *>(itemMap.value("userlevel"))->getData(); }
 	void setUserLevel(int _userLevel) { static_cast<SerializableItem_Int *>(itemMap.value("userlevel"))->setData(_userLevel); }
 	QString getCountry() const { return static_cast<SerializableItem_String *>(itemMap.value("country"))->getData(); }
+	QByteArray getAvatarBmp() const { return static_cast<SerializableItem_ByteArray *>(itemMap.value("avatar_bmp"))->getData(); }
 };
 
 class ServerInfo_Game : public SerializableItem_Map {
@@ -107,18 +108,18 @@ public:
 
 class ServerInfo_Counter : public SerializableItem_Map {
 public:
-	ServerInfo_Counter(int _id = -1, const QString &_name = QString(), const QColor &_color = QColor(), int _radius = -1, int _count = -1);
+	ServerInfo_Counter(int _id = -1, const QString &_name = QString(), const Color &_color = Color(), int _radius = -1, int _count = -1);
 	static SerializableItem *newItem() { return new ServerInfo_Counter; }
 	int getId() const { return static_cast<SerializableItem_Int *>(itemMap.value("id"))->getData(); }
 	QString getName() const { return static_cast<SerializableItem_String *>(itemMap.value("name"))->getData(); }
-	QColor getColor() const { return static_cast<SerializableItem_Color *>(itemMap.value("color"))->getData(); }
+	Color getColor() const { return static_cast<SerializableItem_Color *>(itemMap.value("color"))->getData(); }
 	int getRadius() const { return static_cast<SerializableItem_Int *>(itemMap.value("radius"))->getData(); }
 	int getCount() const { return static_cast<SerializableItem_Int *>(itemMap.value("count"))->getData(); }
 };
 
 class ServerInfo_Arrow : public SerializableItem_Map {
 public:
-	ServerInfo_Arrow(int _id = -1, int _startPlayerId = -1, const QString &_startZone = QString(), int _startCardId = -1, int _targetPlayerId = -1, const QString &_targetZone = QString(), int _targetCardId = -1, const QColor &_color = QColor());
+	ServerInfo_Arrow(int _id = -1, int _startPlayerId = -1, const QString &_startZone = QString(), int _startCardId = -1, int _targetPlayerId = -1, const QString &_targetZone = QString(), int _targetCardId = -1, const Color &_color = Color());
 	static SerializableItem *newItem() { return new ServerInfo_Arrow; }
 	int getId() const { return static_cast<SerializableItem_Int *>(itemMap.value("id"))->getData(); }
 	int getStartPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("start_player_id"))->getData(); }
@@ -127,7 +128,7 @@ public:
 	int getTargetPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("target_player_id"))->getData(); }
 	QString getTargetZone() const { return static_cast<SerializableItem_String *>(itemMap.value("target_zone"))->getData(); }
 	int getTargetCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("target_card_id"))->getData(); }
-	QColor getColor() const { return static_cast<SerializableItem_Color *>(itemMap.value("color"))->getData(); }
+	Color getColor() const { return static_cast<SerializableItem_Color *>(itemMap.value("color"))->getData(); }
 };
 
 class ServerInfo_PlayerProperties : public SerializableItem_Map {

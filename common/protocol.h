@@ -38,10 +38,11 @@ enum ItemId {
 	ItemId_Event_Join = ItemId_Other + 210,
 	ItemId_Event_Ping = ItemId_Other + 211,
 	ItemId_Response_ListUsers = ItemId_Other + 300,
-	ItemId_Response_DeckList = ItemId_Other + 301,
-	ItemId_Response_DeckDownload = ItemId_Other + 302,
-	ItemId_Response_DeckUpload = ItemId_Other + 303,
-	ItemId_Response_DumpZone = ItemId_Other + 304,
+	ItemId_Response_GetUserInfo = ItemId_Other + 301,
+	ItemId_Response_DeckList = ItemId_Other + 302,
+	ItemId_Response_DeckDownload = ItemId_Other + 303,
+	ItemId_Response_DeckUpload = ItemId_Other + 304,
+	ItemId_Response_DumpZone = ItemId_Other + 305,
 	ItemId_Invalid = ItemId_Other + 1000
 };
 
@@ -208,6 +209,15 @@ public:
 	int getItemId() const { return ItemId_Response_ListUsers; }
 	static SerializableItem *newItem() { return new Response_ListUsers; }
 	QList<ServerInfo_User *> getUserList() const { return typecastItemList<ServerInfo_User *>(); }
+};
+
+class Response_GetUserInfo : public ProtocolResponse {
+	Q_OBJECT
+public:
+	Response_GetUserInfo(int _cmdId = -1, ResponseCode _responseCode = RespOk, ServerInfo_User *_userInfo = 0);
+	int getItemId() const { return ItemId_Response_GetUserInfo; }
+	static SerializableItem *newItem() { return new Response_GetUserInfo; }
+	ServerInfo_User *getUserInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
 };
 
 class Response_DeckList : public ProtocolResponse {
