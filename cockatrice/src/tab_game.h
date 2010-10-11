@@ -43,6 +43,7 @@ class TabGame;
 class DeckList;
 class QVBoxLayout;
 class QHBoxLayout;
+class ServerInfo_User;
 
 class ReadyStartButton : public QPushButton {
 	Q_OBJECT
@@ -111,7 +112,7 @@ private:
 	QMenu *playersMenu;
 	QAction *aConcede, *aLeaveGame, *aNextPhase, *aNextTurn, *aRemoveLocalArrows;
 
-	Player *addPlayer(int playerId, const QString &playerName);
+	Player *addPlayer(int playerId, ServerInfo_User *info);
 
 	void startGame();
 	void stopGame();

@@ -17,6 +17,7 @@ class CardZone;
 class TableZone;
 class HandZone;
 class PlayerTarget;
+class ServerInfo_User;
 class ServerInfo_Player;
 class ServerInfo_Arrow;
 class ServerInfo_Counter;
@@ -115,7 +116,7 @@ private:
 	int defaultNumberTopCards;
 	QString lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation;
 	bool lastTokenDestroy;
-	QString name;
+	ServerInfo_User *userInfo;
 	int id;
 	bool active;
 	bool local;
@@ -183,12 +184,13 @@ public:
 	void clearArrows();
 	PlayerTarget *getPlayerTarget() const { return playerTarget; }
 
-	Player(const QString &_name, int _id, bool _local, TabGame *_parent);
+	Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent);
 	~Player();
 	void retranslateUi();
 	QMenu *getPlayerMenu() const { return playerMenu; }
 	int getId() const { return id; }
-	QString getName() const { return name; }
+	QString getName() const;
+	ServerInfo_User *getUserInfo() const { return userInfo; }
 	bool getLocal() const { return local; }
 	bool getMirrored() const { return mirrored; }
 	const QMap<QString, CardZone *> &getZones() const { return zones; }

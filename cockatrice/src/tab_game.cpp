@@ -320,10 +320,10 @@ void TabGame::actRemoveLocalArrows()
 	}
 }
 
-Player *TabGame::addPlayer(int playerId, const QString &playerName)
+Player *TabGame::addPlayer(int playerId, ServerInfo_User *info)
 {
 	bool local = ((clients.size() > 1) || (playerId == localPlayerId));
-	Player *newPlayer = new Player(playerName, playerId, local, this);
+	Player *newPlayer = new Player(info, playerId, local, this);
 	scene->addPlayer(newPlayer);
 
 	connect(newPlayer, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
@@ -494,7 +494,7 @@ void TabGame::eventGameStateChanged(Event_GameStateChanged *event, GameEventCont
 		} else {
 			Player *player = players.value(prop->getPlayerId(), 0);
 			if (!player) {
-				player = addPlayer(prop->getPlayerId(), prop->getUserInfo()->getName());
+				player = addPlayer(prop->getPlayerId(), prop->getUserInfo());
 				playerListWidget->addPlayer(prop);
 			}
 			player->processPlayerInfo(pl);
@@ -560,7 +560,7 @@ void TabGame::eventJoin(Event_Join *event, GameEventContext * /*context*/)
 		messageLog->logJoinSpectator(playerInfo->getUserInfo()->getName());
 		playerListWidget->addPlayer(playerInfo);
 	} else {
-		Player *newPlayer = addPlayer(playerInfo->getPlayerId(), playerInfo->getUserInfo()->getName());
+		Player *newPlayer = addPlayer(playerInfo->getPlayerId(), playerInfo->getUserInfo());
 		messageLog->logJoin(newPlayer);
 		playerListWidget->addPlayer(playerInfo);
 	}

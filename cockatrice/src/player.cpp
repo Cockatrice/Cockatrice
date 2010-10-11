@@ -20,8 +20,8 @@
 #include <QMenu>
 #include <QDebug>
 
-Player::Player(const QString &_name, int _id, bool _local, TabGame *_parent)
-	: QObject(_parent), shortcutsActive(false), defaultNumberTopCards(3), lastTokenDestroy(true), name(_name), id(_id), active(false), local(_local), mirrored(false), dialogSemaphore(false)
+Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
+	: QObject(_parent), shortcutsActive(false), defaultNumberTopCards(3), lastTokenDestroy(true), userInfo(new ServerInfo_User(info)), id(_id), active(false), local(_local), mirrored(false), dialogSemaphore(false)
 {
 	setCacheMode(DeviceCoordinateCache);
 	
@@ -29,7 +29,8 @@ Player::Player(const QString &_name, int _id, bool _local, TabGame *_parent)
 	connect(settingsCache, SIGNAL(playerBgPathChanged()), this, SLOT(updateBgPixmap()));
 	updateBgPixmap();
 	
-	playerTarget = new PlayerTarget(name, CARD_WIDTH + counterAreaWidth + 5, this);
+//	playerTarget = new PlayerTarget(CARD_WIDTH + counterAreaWidth + 5, this);
+	playerTarget = new PlayerTarget(this);
 	playerTarget->setPos(QPointF(0, 0));
 
 	QPointF base = QPointF(counterAreaWidth, 50);
@@ -239,6 +240,7 @@ Player::~Player()
 
 	clearCounters();
 	delete playerMenu;
+	delete userInfo;
 }
 
 void Player::rearrangeZones()
@@ -289,7 +291,7 @@ void Player::retranslateUi()
 {
 	aViewGraveyard->setText(tr("&View graveyard"));
 	aViewRfg->setText(tr("&View exile"));
-	playerMenu->setTitle(tr("Player \"%1\"").arg(name));
+	playerMenu->setTitle(tr("Player \"%1\"").arg(userInfo->getName()));
 	graveMenu->setTitle(tr("&Graveyard"));
 	rfgMenu->setTitle(tr("&Exile"));
 	
@@ -1268,6 +1270,11 @@ QMenu *Player::getCardMenu() const
 	if (aCardMenu)
 		return aCardMenu->menu();
 	return 0;
+}
+
+QString Player::getName() const
+{
+	return userInfo->getName();
 }
 
 qreal Player::getMinimumWidth() const
