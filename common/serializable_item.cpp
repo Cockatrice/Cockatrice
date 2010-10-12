@@ -78,8 +78,11 @@ void SerializableItem_Map::writeElement(QXmlStreamWriter *xml)
 
 bool SerializableItem_String::readElement(QXmlStreamReader *xml)
 {
+	// This function is sometimes called multiple times if there are
+	// entities in the strings, so we have to make sure the data is
+	// not overwritten but appended to.
 	if (xml->isCharacters() && !xml->isWhitespace())
-		data = xml->text().toString();
+		data.append(xml->text().toString());
 	return SerializableItem::readElement(xml);
 }
 
