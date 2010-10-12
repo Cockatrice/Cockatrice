@@ -41,6 +41,7 @@ Servatrice::Servatrice(QObject *parent)
 	tcpServer->listen(QHostAddress::Any, settings->value("server/port", 4747).toInt());
 	
 	QString dbType = settings->value("database/type").toString();
+	dbPrefix = settings->value("database/prefix").toString();
 	if (dbType == "mysql")
 		openDatabase();
 	
@@ -89,7 +90,7 @@ bool Servatrice::openDatabase()
 	
 	if (!nextGameId) {
 		QSqlQuery query;
-		if (!query.exec("select max(id) from games"))
+		if (!query.exec("select max(id) from " + dbPrefix + "_games"))
 			return false;
 		if (!query.next())
 			return false;
@@ -129,7 +130,7 @@ AuthenticationResult Servatrice::checkUserPassword(const QString &user, const QS
 		checkSql();
 	
 		QSqlQuery query;
-		query.prepare("select password from users where name = :name and active = 1");
+		query.prepare("select password from " + dbPrefix + "_users where name = :name and active = 1");
 		query.bindValue(":name", user);
 		if (!execSqlQuery(query))
 			return PasswordWrong;
@@ -152,7 +153,7 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 		checkSql();
 
 		QSqlQuery query;
-		query.prepare("select admin, country, avatar_bmp from users where name = :name and active = 1");
+		query.prepare("select admin, country, avatar_bmp from " + dbPrefix + "_users where name = :name and active = 1");
 		query.bindValue(":name", name);
 		if (!execSqlQuery(query))
 			return new ServerInfo_User(name);

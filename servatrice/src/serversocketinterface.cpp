@@ -106,7 +106,7 @@ int ServerSocketInterface::getDeckPathId(int basePathId, QStringList path)
 		return 0;
 	
 	QSqlQuery query;
-	query.prepare("select id from decklist_folders where id_parent = :id_parent and name = :name and user = :user");
+	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent and name = :name and user = :user");
 	query.bindValue(":id_parent", basePathId);
 	query.bindValue(":name", path.takeFirst());
 	query.bindValue(":user", userInfo->getName());
@@ -129,7 +129,7 @@ int ServerSocketInterface::getDeckPathId(const QString &path)
 bool ServerSocketInterface::deckListHelper(DeckList_Directory *folder)
 {
 	QSqlQuery query;
-	query.prepare("select id, name from decklist_folders where id_parent = :id_parent and user = :user");
+	query.prepare("select id, name from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent and user = :user");
 	query.bindValue(":id_parent", folder->getId());
 	query.bindValue(":user", userInfo->getName());
 	if (!servatrice->execSqlQuery(query))
@@ -142,7 +142,7 @@ bool ServerSocketInterface::deckListHelper(DeckList_Directory *folder)
 			return false;
 	}
 	
-	query.prepare("select id, name, upload_time from decklist_files where id_folder = :id_folder and user = :user");
+	query.prepare("select id, name, upload_time from " + servatrice->getDbPrefix() + "_decklist_files where id_folder = :id_folder and user = :user");
 	query.bindValue(":id_folder", folder->getId());
 	query.bindValue(":user", userInfo->getName());
 	if (!servatrice->execSqlQuery(query))
@@ -188,7 +188,7 @@ ResponseCode ServerSocketInterface::cmdDeckNewDir(Command_DeckNewDir *cmd, Comma
 		return RespNameNotFound;
 	
 	QSqlQuery query;
-	query.prepare("insert into decklist_folders (id_parent, user, name) values(:id_parent, :user, :name)");
+	query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_folders (id_parent, user, name) values(:id_parent, :user, :name)");
 	query.bindValue(":id_parent", folderId);
 	query.bindValue(":user", userInfo->getName());
 	query.bindValue(":name", cmd->getDirName());
@@ -203,17 +203,17 @@ void ServerSocketInterface::deckDelDirHelper(int basePathId)
 	
 	QSqlQuery query;
 	
-	query.prepare("select id from decklist_folders where id_parent = :id_parent");
+	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent");
 	query.bindValue(":id_parent", basePathId);
 	servatrice->execSqlQuery(query);
 	while (query.next())
 		deckDelDirHelper(query.value(0).toInt());
 	
-	query.prepare("delete from decklist_files where id_folder = :id_folder");
+	query.prepare("delete from " + servatrice->getDbPrefix() + "_decklist_files where id_folder = :id_folder");
 	query.bindValue(":id_folder", basePathId);
 	servatrice->execSqlQuery(query);
 	
-	query.prepare("delete from decklist_folders where id = :id");
+	query.prepare("delete from " + servatrice->getDbPrefix() + "_decklist_folders where id = :id");
 	query.bindValue(":id", basePathId);
 	servatrice->execSqlQuery(query);
 }
@@ -241,14 +241,14 @@ ResponseCode ServerSocketInterface::cmdDeckDel(Command_DeckDel *cmd, CommandCont
 	
 	QSqlQuery query;
 	
-	query.prepare("select id from decklist_files where id = :id and user = :user");
+	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_files where id = :id and user = :user");
 	query.bindValue(":id", cmd->getDeckId());
 	query.bindValue(":user", userInfo->getName());
 	servatrice->execSqlQuery(query);
 	if (!query.next())
 		return RespNameNotFound;
 	
-	query.prepare("delete from decklist_files where id = :id");
+	query.prepare("delete from " + servatrice->getDbPrefix() + "_decklist_files where id = :id");
 	query.bindValue(":id", cmd->getDeckId());
 	servatrice->execSqlQuery(query);
 	
@@ -279,7 +279,7 @@ ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd, Comma
 		deckName = "Unnamed deck";
 
 	QSqlQuery query;
-	query.prepare("insert into decklist_files (id_folder, user, name, upload_time, content) values(:id_folder, :user, :name, NOW(), :content)");
+	query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_files (id_folder, user, name, upload_time, content) values(:id_folder, :user, :name, NOW(), :content)");
 	query.bindValue(":id_folder", folderId);
 	query.bindValue(":user", userInfo->getName());
 	query.bindValue(":name", deckName);
@@ -296,7 +296,7 @@ DeckList *ServerSocketInterface::getDeckFromDatabase(int deckId)
 	
 	QSqlQuery query;
 	
-	query.prepare("select content from decklist_files where id = :id and user = :user");
+	query.prepare("select content from " + servatrice->getDbPrefix() + "_decklist_files where id = :id and user = :user");
 	query.bindValue(":id", deckId);
 	query.bindValue(":user", userInfo->getName());
 	servatrice->execSqlQuery(query);

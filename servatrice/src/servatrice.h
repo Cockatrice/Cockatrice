@@ -44,6 +44,7 @@ public:
 	bool getGameShouldPing() const { return true; }
 	int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
 	int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
+	QString getDbPrefix() const { return dbPrefix; }
 protected:
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
 	ServerInfo_User *getUserData(const QString &name);
@@ -51,6 +52,7 @@ private:
 	QTimer *pingClock;
 	QTcpServer *tcpServer;
 	QString loginMessage;
+	QString dbPrefix;
 	QSettings *settings;
 	int maxGameInactivityTime;
 	int maxPlayerInactivityTime;
