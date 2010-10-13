@@ -5,6 +5,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <math.h>
 #include "carddatabase.h"
+#include "cardinfowidget.h"
 #include "abstractcarditem.h"
 #include "settingscache.h"
 #include "main.h"
@@ -12,7 +13,7 @@
 #include <QTimer>
 
 AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, QGraphicsItem *parent)
-	: ArrowTarget(_owner, parent), info(db->getCard(_name)), name(_name), tapped(false), tapAngle(0)
+	: ArrowTarget(_owner, parent), info(db->getCard(_name)), infoWidget(0), name(_name), tapped(false), tapAngle(0)
 {
 	setCursor(Qt::OpenHandCursor);
 	setFlag(ItemIsSelectable);
@@ -180,7 +181,21 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 	}
 	if (event->button() == Qt::LeftButton)
 		setCursor(Qt::ClosedHandCursor);
+	else if (event->button() == Qt::MidButton) {
+		infoWidget = new CardInfoWidget(false, 0, Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
+		infoWidget->setCard(this);
+		infoWidget->move(event->screenPos().x() - infoWidget->width() / 2, event->screenPos().y() - infoWidget->height() / 2);
+		infoWidget->show();
+	}
 	event->accept();
+}
+
+void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+	if (infoWidget) {
+		infoWidget->deleteLater();
+		infoWidget = 0;
+	}
 }
 
 void AbstractCardItem::processHoverEvent()

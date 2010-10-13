@@ -185,7 +185,7 @@ TabGame::TabGame(QList<AbstractClient *> &_clients, int _gameId, const QString &
 	QVBoxLayout *verticalLayout = new QVBoxLayout;
 	verticalLayout->addWidget(cardInfo);
 	verticalLayout->addWidget(playerListWidget, 1);
-	verticalLayout->addWidget(messageLog, 3);
+	verticalLayout->addWidget(messageLog, 5);
 	verticalLayout->addLayout(hLayout);
 
 	mainLayout = new QHBoxLayout;

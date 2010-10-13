@@ -1,14 +1,23 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QTextEdit>
+#include <QPushButton>
+#include <QStyle>
 #include "cardinfowidget.h"
 #include "carditem.h"
 #include "carddatabase.h"
 #include "main.h"
 
-CardInfoWidget::CardInfoWidget(QWidget *parent)
-	: QFrame(parent), pixmapHeight(pixmapWidth), info(0)
+CardInfoWidget::CardInfoWidget(bool showMinimizeButton, QWidget *parent, Qt::WindowFlags flags)
+	: QFrame(parent, flags), pixmapHeight(pixmapWidth), minimized(false), minimizeButton(0), info(0)
 {
+	pixmapHeight = pixmapWidth * CARD_HEIGHT / CARD_WIDTH;
+
+	if (showMinimizeButton) {
+		minimizeButton = new QPushButton(QIcon(style()->standardIcon(QStyle::SP_ArrowUp)), QString());
+		connect(minimizeButton, SIGNAL(clicked()), this, SLOT(minimizeClicked()));
+	}
+	
 	cardPicture = new QLabel;
 	cardPicture->setAlignment(Qt::AlignCenter);
 
@@ -40,31 +49,51 @@ CardInfoWidget::CardInfoWidget(QWidget *parent)
 	textLabel->setFont(f);
 
 	QGridLayout *grid = new QGridLayout(this);
-	grid->addWidget(cardPicture, 0, 0, 1, 2);
-	grid->addWidget(nameLabel1, 1, 0);
-	grid->addWidget(nameLabel2, 1, 1);
-	grid->addWidget(manacostLabel1, 2, 0);
-	grid->addWidget(manacostLabel2, 2, 1);
-	grid->addWidget(cardtypeLabel1, 3, 0);
-	grid->addWidget(cardtypeLabel2, 3, 1);
-	grid->addWidget(powtoughLabel1, 4, 0);
-	grid->addWidget(powtoughLabel2, 4, 1);
-	grid->addWidget(textLabel, 5, 0, -1, 2);
-	grid->setRowStretch(5, 1);
+	int row = 0;
+	if (showMinimizeButton)
+		grid->addWidget(minimizeButton, row++, 1, 1, 1, Qt::AlignRight);
+	grid->addWidget(cardPicture, row++, 0, 1, 2);
+	grid->addWidget(nameLabel1, row, 0);
+	grid->addWidget(nameLabel2, row++, 1);
+	grid->addWidget(manacostLabel1, row, 0);
+	grid->addWidget(manacostLabel2, row++, 1);
+	grid->addWidget(cardtypeLabel1, row, 0);
+	grid->addWidget(cardtypeLabel2, row++, 1);
+	grid->addWidget(powtoughLabel1, row, 0);
+	grid->addWidget(powtoughLabel2, row++, 1);
+	grid->addWidget(textLabel, row, 0, -1, 2);
+	grid->setRowStretch(row, 1);
 	grid->setColumnStretch(1, 1);
 
 	CardInfo *cardBack = db->getCard();
-	QPixmap *bigPixmap = cardBack->loadPixmap();
-	if (bigPixmap->isNull())
-		pixmapHeight = pixmapWidth * CARD_HEIGHT / CARD_WIDTH;
-	else
-		pixmapHeight = pixmapWidth * bigPixmap->height() / bigPixmap->width();
 	setCard(cardBack);
 
 	retranslateUi();
 	setFrameStyle(QFrame::Panel | QFrame::Raised);
-	textLabel->setFixedHeight(100);
-	setFixedSize(sizeHint());
+	if (showMinimizeButton) {
+		textLabel->setFixedHeight(100);
+		setFixedWidth(sizeHint().width());
+	} else
+		setFixedWidth(350);
+	setFixedHeight(sizeHint().height());
+}
+
+void CardInfoWidget::minimizeClicked()
+{
+	cardPicture->setVisible(minimized);
+	nameLabel2->setVisible(minimized);
+	nameLabel1->setVisible(minimized);
+	manacostLabel1->setVisible(minimized);
+	manacostLabel2->setVisible(minimized);
+	cardtypeLabel1->setVisible(minimized);
+	cardtypeLabel2->setVisible(minimized);
+	powtoughLabel1->setVisible(minimized);
+	powtoughLabel2->setVisible(minimized);
+	textLabel->setVisible(minimized);
+	
+	minimizeButton->setIcon(style()->standardIcon(minimized ? QStyle::SP_ArrowUp : QStyle::SP_ArrowDown));
+	minimized = !minimized;
+	setFixedHeight(sizeHint().height());
 }
 
 void CardInfoWidget::setCard(CardInfo *card)

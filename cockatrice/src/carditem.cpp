@@ -325,7 +325,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 			scene()->addItem(childArrow);
 			arrow->addChildArrow(childArrow);
 		}
-	} else {
+	} else if (event->buttons().testFlag(Qt::LeftButton)) {
 		if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < 2 * QApplication::startDragDistance())
 			return;
 		if (!owner->getLocal())
@@ -384,6 +384,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 		playCard(event);
 
 	setCursor(Qt::OpenHandCursor);
+	AbstractCardItem::mouseReleaseEvent(event);
 }
 
 void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)

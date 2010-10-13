@@ -4,6 +4,7 @@
 #include "arrowtarget.h"
 
 class CardInfo;
+class CardInfoWidget;
 class Player;
 class QTimer;
 
@@ -14,6 +15,7 @@ class AbstractCardItem : public QObject, public ArrowTarget {
 	Q_OBJECT
 protected:
 	CardInfo *info;
+	CardInfoWidget *infoWidget;
 	QString name;
 	bool tapped;
 	int tapAngle;
@@ -42,6 +44,7 @@ public:
 	void processHoverEvent();
 protected:
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
+	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 	void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
 	QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
 };

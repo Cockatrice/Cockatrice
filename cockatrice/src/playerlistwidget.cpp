@@ -13,6 +13,7 @@ PlayerListWidget::PlayerListWidget(QWidget *parent)
 	playerIcon = QIcon(":/resources/icon_player.svg");
 	spectatorIcon = QIcon(":/resources/icon_spectator.svg");
 
+	setMinimumHeight(100);
 	setIconSize(QSize(20, 15));
 	setColumnCount(6);
 	setRootIsDecorated(false);

@@ -5,6 +5,7 @@
 
 class QLabel;
 class QTextEdit;
+class QPushButton;
 class AbstractCardItem;
 class CardInfo;
 
@@ -13,7 +14,9 @@ class CardInfoWidget : public QFrame {
 private:
 	static const int pixmapWidth = 160;
 	int pixmapHeight;
+	bool minimized;
 
+	QPushButton *minimizeButton;
 	QLabel *cardPicture;
 	QLabel *nameLabel1, *nameLabel2;
 	QLabel *manacostLabel1, *manacostLabel2;
@@ -23,7 +26,7 @@ private:
 	
 	CardInfo *info;
 public:
-	CardInfoWidget(QWidget *parent = 0);
+	CardInfoWidget(bool showMinimizeButton = true, QWidget *parent = 0, Qt::WindowFlags f = 0);
 	void retranslateUi();
 public slots:
 	void setCard(CardInfo *card);
@@ -31,6 +34,7 @@ public slots:
 	void setCard(AbstractCardItem *card);
 private slots:
 	void updatePixmap();
+	void minimizeClicked();
 };
 
 #endif
