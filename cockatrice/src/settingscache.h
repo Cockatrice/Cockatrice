@@ -26,6 +26,7 @@ private:
 	QString handBgPath, tableBgPath, playerBgPath, cardBackPicturePath;
 	bool picDownload;
 	bool doubleClickToPlay;
+	bool cardInfoMinimized;
 	bool horizontalHand;
 	bool economicalGrid;
 	bool tapAnimation;
@@ -42,6 +43,7 @@ public:
 	QString getCardBackPicturePath() const { return cardBackPicturePath; }
 	bool getPicDownload() const { return picDownload; }
 	bool getDoubleClickToPlay() const { return doubleClickToPlay; }
+	bool getCardInfoMinimized() const { return cardInfoMinimized; }
 	bool getHorizontalHand() const { return horizontalHand; }
 	bool getEconomicalGrid() const { return economicalGrid; }
 	bool getTapAnimation() const { return tapAnimation; }
@@ -58,6 +60,7 @@ public slots:
 	void setCardBackPicturePath(const QString &_cardBackPicturePath);
 	void setPicDownload(int _picDownload);
 	void setDoubleClickToPlay(int _doubleClickToPlay);
+	void setCardInfoMinimized(bool _cardInfoMinimized);
 	void setHorizontalHand(int _horizontalHand);
 	void setEconomicalGrid(int _economicalGrid);
 	void setTapAnimation(int _tapAnimation);

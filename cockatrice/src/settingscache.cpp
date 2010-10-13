@@ -18,6 +18,7 @@ SettingsCache::SettingsCache()
 	
 	picDownload = settings->value("personal/picturedownload", false).toBool();
 	doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
+	cardInfoMinimized = settings->value("interface/cardinfominimized", false).toBool();
 	horizontalHand = settings->value("hand/horizontal", false).toBool();
 	economicalGrid = settings->value("table/economic", false).toBool();
 	tapAnimation = settings->value("cards/tapanimation", true).toBool();
@@ -92,6 +93,12 @@ void SettingsCache::setDoubleClickToPlay(int _doubleClickToPlay)
 {
 	doubleClickToPlay = _doubleClickToPlay;
 	settings->setValue("interface/doubleclicktoplay", doubleClickToPlay);
+}
+
+void SettingsCache::setCardInfoMinimized(bool _cardInfoMinimized)
+{
+	cardInfoMinimized = _cardInfoMinimized;
+	settings->setValue("interface/cardinfominimized", cardInfoMinimized);
 }
 
 void SettingsCache::setHorizontalHand(int _horizontalHand)

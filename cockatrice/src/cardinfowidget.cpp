@@ -7,6 +7,7 @@
 #include "carditem.h"
 #include "carddatabase.h"
 #include "main.h"
+#include "settingscache.h"
 
 CardInfoWidget::CardInfoWidget(bool showMinimizeButton, QWidget *parent, Qt::WindowFlags flags)
 	: QFrame(parent, flags), pixmapHeight(pixmapWidth), minimized(false), minimizeButton(0), info(0)
@@ -73,6 +74,7 @@ CardInfoWidget::CardInfoWidget(bool showMinimizeButton, QWidget *parent, Qt::Win
 	if (showMinimizeButton) {
 		textLabel->setFixedHeight(100);
 		setFixedWidth(sizeHint().width());
+		setMinimized(settingsCache->getCardInfoMinimized());
 	} else
 		setFixedWidth(350);
 	setFixedHeight(sizeHint().height());
@@ -80,19 +82,28 @@ CardInfoWidget::CardInfoWidget(bool showMinimizeButton, QWidget *parent, Qt::Win
 
 void CardInfoWidget::minimizeClicked()
 {
-	cardPicture->setVisible(minimized);
-	nameLabel2->setVisible(minimized);
-	nameLabel1->setVisible(minimized);
-	manacostLabel1->setVisible(minimized);
-	manacostLabel2->setVisible(minimized);
-	cardtypeLabel1->setVisible(minimized);
-	cardtypeLabel2->setVisible(minimized);
-	powtoughLabel1->setVisible(minimized);
-	powtoughLabel2->setVisible(minimized);
-	textLabel->setVisible(minimized);
+	setMinimized(!minimized);
+	settingsCache->setCardInfoMinimized(minimized);
+}
+
+void CardInfoWidget::setMinimized(bool _minimized)
+{
+	minimized = _minimized;
 	
-	minimizeButton->setIcon(style()->standardIcon(minimized ? QStyle::SP_ArrowUp : QStyle::SP_ArrowDown));
-	minimized = !minimized;
+	cardPicture->setVisible(!minimized);
+	nameLabel2->setVisible(!minimized);
+	nameLabel1->setVisible(!minimized);
+	manacostLabel1->setVisible(!minimized);
+	manacostLabel2->setVisible(!minimized);
+	cardtypeLabel1->setVisible(!minimized);
+	cardtypeLabel2->setVisible(!minimized);
+	powtoughLabel1->setVisible(!minimized);
+	powtoughLabel2->setVisible(!minimized);
+	textLabel->setVisible(!minimized);
+	
+	if (minimizeButton)
+		minimizeButton->setIcon(style()->standardIcon(minimized ? QStyle::SP_ArrowDown : QStyle::SP_ArrowUp));
+	
 	setFixedHeight(sizeHint().height());
 }
 

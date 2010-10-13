@@ -25,6 +25,7 @@ private:
 	QTextEdit *textLabel;
 	
 	CardInfo *info;
+	void setMinimized(bool _minimized);
 public:
 	CardInfoWidget(bool showMinimizeButton = true, QWidget *parent = 0, Qt::WindowFlags f = 0);
 	void retranslateUi();
