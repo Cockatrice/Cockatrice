@@ -583,12 +583,27 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 		return RespNameNotFound;
 	
 	if (startzone != targetzone) {
+		// Delete all attachment relationships
 		if (card->getParentCard())
 			card->setParentCard(0);
 		
 		const QList<Server_Card *> &attachedCards = card->getAttachedCards();
 		for (int i = 0; i < attachedCards.size(); ++i)
 			unattachCard(game, attachedCards[i]->getZone()->getPlayer(), cont, attachedCards[i]);
+
+		// Delete all arrows from and to the card
+		const QList<Server_Player *> &players = game->getPlayers().values();
+		for (int i = 0; i < players.size(); ++i) {
+			QList<int> arrowsToDelete;
+			QMapIterator<int, Server_Arrow *> arrowIterator(players[i]->getArrows());
+			while (arrowIterator.hasNext()) {
+				Server_Arrow *arrow = arrowIterator.next().value();
+				if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card))
+					arrowsToDelete.append(arrow->getId());
+			}
+			for (int j = 0; j < arrowsToDelete.size(); ++j)
+				players[i]->deleteArrow(arrowsToDelete[j]);
+		}
 	}
 	
 	if (card->getDestroyOnZoneChange() && (startzone != targetzone)) {
@@ -658,22 +673,6 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 	
 	if (tapped)
 		setCardAttrHelper(cont, game, player, targetzone->getName(), card->getId(), "tapped", "1");
-
-	// If the card was moved to another zone, delete all arrows from and to the card
-	if (startzone != targetzone) {
-		const QList<Server_Player *> &players = game->getPlayers().values();
-		for (int i = 0; i < players.size(); ++i) {
-			QList<int> arrowsToDelete;
-			QMapIterator<int, Server_Arrow *> arrowIterator(players[i]->getArrows());
-			while (arrowIterator.hasNext()) {
-				Server_Arrow *arrow = arrowIterator.next().value();
-				if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card))
-					arrowsToDelete.append(arrow->getId());
-			}
-			for (int j = 0; j < arrowsToDelete.size(); ++j)
-				players[i]->deleteArrow(arrowsToDelete[j]);
-		}
-	}
 
 	return RespOk;
 }

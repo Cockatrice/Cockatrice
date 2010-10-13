@@ -206,6 +206,7 @@ ProtocolResponse::ProtocolResponse(int _cmdId, ResponseCode _responseCode, const
 
 void ProtocolResponse::initializeHash()
 {
+	responseHash.insert(QString(), RespNothing);
 	responseHash.insert("ok", RespOk);
 	responseHash.insert("invalid_command", RespInvalidCommand);
 	responseHash.insert("name_not_found", RespNameNotFound);
