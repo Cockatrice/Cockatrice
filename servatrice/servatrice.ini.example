@@ -6,6 +6,7 @@ method=none
 
 [database]
 type=none
+prefix=cockatrice
 hostname=localhost
 database=servatrice
 user=servatrice

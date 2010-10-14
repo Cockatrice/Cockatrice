@@ -194,7 +194,7 @@ class ProtocolResponse : public ProtocolItem {
 private:
 	static QHash<QString, ResponseCode> responseHash;
 public:
-	ProtocolResponse(int _cmdId = -1, ResponseCode _responseCode = RespOk, const QString &_itemName = QString());
+	ProtocolResponse(int _cmdId = -1, ResponseCode _responseCode = RespNothing, const QString &_itemName = QString());
 	int getItemId() const { return ItemId_Other; }
 	static void initializeHash();
 	static SerializableItem *newItem() { return new ProtocolResponse; }
