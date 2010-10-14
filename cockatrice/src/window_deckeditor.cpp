@@ -81,8 +81,8 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	leftFrame->addLayout(searchLayout);
 	leftFrame->addWidget(databaseView);
 
-	cardInfo = new CardInfoWidget;
-	cardInfo->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+	cardInfo = new CardInfoWidget(CardInfoWidget::ModeDeckEditor);
+	cardInfo->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
 	QToolBar *verticalToolBar = new QToolBar;
 	verticalToolBar->setOrientation(Qt::Vertical);
@@ -94,9 +94,8 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	verticalToolBarLayout->addStretch();
 
 	QVBoxLayout *middleFrame = new QVBoxLayout;
-	middleFrame->addWidget(cardInfo);
+	middleFrame->addWidget(cardInfo, 10);
 	middleFrame->addLayout(verticalToolBarLayout);
-	middleFrame->addStretch();
 
 	deckModel = new DeckListModel(this);
 	deckView = new QTreeView();

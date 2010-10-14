@@ -9,12 +9,10 @@
 #include "main.h"
 #include "settingscache.h"
 
-CardInfoWidget::CardInfoWidget(bool showMinimizeButton, QWidget *parent, Qt::WindowFlags flags)
-	: QFrame(parent, flags), pixmapHeight(pixmapWidth), minimized(false), minimizeButton(0), info(0)
+CardInfoWidget::CardInfoWidget(ResizeMode _mode, QWidget *parent, Qt::WindowFlags flags)
+	: QFrame(parent, flags), pixmapWidth(160), aspectRatio((qreal) CARD_HEIGHT / (qreal) CARD_WIDTH), minimized(false), mode(_mode), minimizeButton(0), info(0)
 {
-	pixmapHeight = pixmapWidth * CARD_HEIGHT / CARD_WIDTH;
-
-	if (showMinimizeButton) {
+	if (mode == ModeGameTab) {
 		minimizeButton = new QPushButton(QIcon(style()->standardIcon(QStyle::SP_ArrowUp)), QString());
 		connect(minimizeButton, SIGNAL(clicked()), this, SLOT(minimizeClicked()));
 	}
@@ -51,7 +49,7 @@ CardInfoWidget::CardInfoWidget(bool showMinimizeButton, QWidget *parent, Qt::Win
 
 	QGridLayout *grid = new QGridLayout(this);
 	int row = 0;
-	if (showMinimizeButton)
+	if (mode == ModeGameTab)
 		grid->addWidget(minimizeButton, row++, 1, 1, 1, Qt::AlignRight);
 	grid->addWidget(cardPicture, row++, 0, 1, 2);
 	grid->addWidget(nameLabel1, row, 0);
@@ -71,13 +69,16 @@ CardInfoWidget::CardInfoWidget(bool showMinimizeButton, QWidget *parent, Qt::Win
 
 	retranslateUi();
 	setFrameStyle(QFrame::Panel | QFrame::Raised);
-	if (showMinimizeButton) {
+	if (mode == ModeGameTab) {
 		textLabel->setFixedHeight(100);
 		setFixedWidth(sizeHint().width());
 		setMinimized(settingsCache->getCardInfoMinimized());
-	} else
+	} else if (mode == ModePopUp)
 		setFixedWidth(350);
-	setFixedHeight(sizeHint().height());
+	else
+		setFixedWidth(250);
+	if (mode != ModeDeckEditor)
+		setFixedHeight(sizeHint().height());
 }
 
 void CardInfoWidget::minimizeClicked()
@@ -134,11 +135,11 @@ void CardInfoWidget::setCard(AbstractCardItem *card)
 
 void CardInfoWidget::updatePixmap()
 {
-	QPixmap *resizedPixmap = info->getPixmap(QSize(pixmapWidth, pixmapHeight));
+	QPixmap *resizedPixmap = info->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio));
 	if (resizedPixmap)
 		cardPicture->setPixmap(*resizedPixmap);
 	else
-		cardPicture->setPixmap(*(db->getCard()->getPixmap(QSize(pixmapWidth, pixmapHeight))));
+		cardPicture->setPixmap(*(db->getCard()->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio))));
 }
 
 void CardInfoWidget::retranslateUi()
@@ -147,4 +148,12 @@ void CardInfoWidget::retranslateUi()
 	manacostLabel1->setText(tr("Mana cost:"));
 	cardtypeLabel1->setText(tr("Card type:"));
 	powtoughLabel1->setText(tr("P / T:"));
+}
+
+void CardInfoWidget::resizeEvent(QResizeEvent * /*event*/)
+{
+	if (mode == ModeDeckEditor) {
+		pixmapWidth = qMin(width() * 0.95, (height() - 200) / aspectRatio);
+		updatePixmap();
+	}
 }

@@ -8,13 +8,17 @@ class QTextEdit;
 class QPushButton;
 class AbstractCardItem;
 class CardInfo;
+class QResizeEvent;
 
 class CardInfoWidget : public QFrame {
 	Q_OBJECT
+public:
+	enum ResizeMode { ModeDeckEditor, ModeGameTab, ModePopUp };
 private:
-	static const int pixmapWidth = 160;
-	int pixmapHeight;
+	int pixmapWidth;
+	qreal aspectRatio;
 	bool minimized;
+	ResizeMode mode;
 
 	QPushButton *minimizeButton;
 	QLabel *cardPicture;
@@ -27,7 +31,7 @@ private:
 	CardInfo *info;
 	void setMinimized(bool _minimized);
 public:
-	CardInfoWidget(bool showMinimizeButton = true, QWidget *parent = 0, Qt::WindowFlags f = 0);
+	CardInfoWidget(ResizeMode _mode, QWidget *parent = 0, Qt::WindowFlags f = 0);
 	void retranslateUi();
 public slots:
 	void setCard(CardInfo *card);
@@ -36,6 +40,8 @@ public slots:
 private slots:
 	void updatePixmap();
 	void minimizeClicked();
+protected:
+	void resizeEvent(QResizeEvent *event);
 };
 
 #endif

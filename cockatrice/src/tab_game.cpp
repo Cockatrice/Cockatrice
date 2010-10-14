@@ -164,7 +164,7 @@ TabGame::TabGame(QList<AbstractClient *> &_clients, int _gameId, const QString &
 	gameView = new GameView(scene);
 	gameView->hide();
 	
-	cardInfo = new CardInfoWidget;
+	cardInfo = new CardInfoWidget(CardInfoWidget::ModeGameTab);
 	playerListWidget = new PlayerListWidget;
 	playerListWidget->setFocusPolicy(Qt::NoFocus);
 	messageLog = new MessageLogWidget;
