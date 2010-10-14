@@ -2,7 +2,6 @@
 #include <QPainter>
 #include <QMenu>
 #include <QAction>
-#include <QDebug>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include "carditem.h"
