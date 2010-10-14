@@ -28,7 +28,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
 	QRectF translatedRect = painter->combinedTransform().mapRect(boundingRect());
 	QSize translatedSize = translatedRect.size().toSize();
 	QPixmap cachedPixmap;
-	const QString cacheKey = "avatar" + QString::number(translatedSize.width()) + "_" + QString::number(fullPixmap.cacheKey());
+	const QString cacheKey = "avatar" + QString::number(translatedSize.width()) + "_" + QString::number(info->getUserLevel()) + "_" + QString::number(fullPixmap.cacheKey());
 #if QT_VERSION >= 0x040600
 	if (!QPixmapCache::find(cacheKey, &cachedPixmap)) {
 #else

@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <QMenu>
 #include <QAction>
+#include <QDebug>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include "carditem.h"
@@ -171,16 +172,15 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		++i;
 	}
 	if (!pt.isEmpty()) {
-		QFont font("Times");
-		font.setPixelSize(16);
-		painter->setFont(font);
-		QPen pen(Qt::white);
-		QBrush brush(Qt::black);
-		painter->setBackground(brush);
+		painter->save();
+		QSizeF translatedSize = getTranslatedSize(painter);
+		transformPainter(painter, translatedSize);
+		painter->setBackground(Qt::black);
 		painter->setBackgroundMode(Qt::OpaqueMode);
-		painter->setPen(pen);
+		painter->setPen(Qt::white);
 		
-		painter->drawText(QRectF(0, 0, boundingRect().width() - 5, boundingRect().height() - 5), Qt::AlignRight | Qt::AlignBottom, pt);
+		painter->drawText(QRectF(2, 2, translatedSize.width() - 4, translatedSize.height() - 4), Qt::AlignRight | Qt::AlignBottom, pt);
+		painter->restore();
 	}
 	if (getBeingPointedAt())
 		painter->fillRect(boundingRect(), QBrush(QColor(255, 0, 0, 100)));

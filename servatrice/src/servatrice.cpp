@@ -156,7 +156,7 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 		query.prepare("select admin, country, avatar_bmp from " + dbPrefix + "_users where name = :name and active = 1");
 		query.bindValue(":name", name);
 		if (!execSqlQuery(query))
-			return new ServerInfo_User(name);
+			return new ServerInfo_User(name, ServerInfo_User::IsUser);
 		
 		if (query.next()) {
 			bool is_admin = query.value(0).toInt();
@@ -174,9 +174,9 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 				avatarBmp
 			);
 		} else
-			return new ServerInfo_User(name);
+			return new ServerInfo_User(name, ServerInfo_User::IsUser);
 	} else
-		return new ServerInfo_User(name);
+		return new ServerInfo_User(name, ServerInfo_User::IsUser);
 }
 
 const QString Servatrice::versionString = "Servatrice 0.20101009";

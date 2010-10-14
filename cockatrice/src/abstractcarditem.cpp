@@ -42,32 +42,46 @@ void AbstractCardItem::pixmapUpdated()
 	update();
 }
 
+QSizeF AbstractCardItem::getTranslatedSize(QPainter *painter) const
+{
+	return QSizeF(
+		painter->combinedTransform().map(QLineF(0, 0, boundingRect().width(), 0)).length(),
+		painter->combinedTransform().map(QLineF(0, 0, 0, boundingRect().height())).length()
+	);
+}
+
+void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &translatedSize)
+{
+	QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
+	
+	painter->resetTransform();
+	
+	QTransform pixmapTransform;
+	pixmapTransform.translate(totalBoundingRect.width() / 2, totalBoundingRect.height() / 2);
+	pixmapTransform.rotate(tapAngle);
+	pixmapTransform.translate(-translatedSize.width() / 2, -translatedSize.height() / 2);
+	painter->setTransform(pixmapTransform);
+
+	QFont f;
+	int fontSize = translatedSize.height() / 6;
+	if (fontSize < 9)
+		fontSize = 9;
+	f.setPixelSize(fontSize);
+	painter->setFont(f);
+}
+
 void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
 	painter->save();
-	qreal w = painter->combinedTransform().map(QLineF(0, 0, boundingRect().width(), 0)).length();
-	qreal h = painter->combinedTransform().map(QLineF(0, 0, 0, boundingRect().height())).length();
-	QSizeF translatedSize(w, h);
+	QSizeF translatedSize = getTranslatedSize(painter);
 	QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
+	qreal scaleFactor = translatedSize.width() / boundingRect().width();
 	QPixmap *translatedPixmap = info->getPixmap(translatedSize.toSize());
 	painter->save();
 	if (translatedPixmap) {
-		painter->resetTransform();
-		QTransform pixmapTransform;
-		pixmapTransform.translate(totalBoundingRect.width() / 2, totalBoundingRect.height() / 2);
-		pixmapTransform.rotate(tapAngle);
-		QPointF transPoint = QPointF(-w / 2, -h / 2);
-		pixmapTransform.translate(transPoint.x(), transPoint.y());
-		painter->setTransform(pixmapTransform);
-		
+		transformPainter(painter, translatedSize);
 		painter->drawPixmap(QPointF(0, 0), *translatedPixmap);
 	} else {
-		QFont f;
-		int fontSize = h / 6;
-		if (fontSize < 9)
-			fontSize = 9;
-		f.setPixelSize(fontSize);
-		painter->setFont(f);
 		QString colorStr;
 		if (!color.isEmpty())
 			colorStr = color;
@@ -98,25 +112,13 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 		}
 		painter->setBrush(bgColor);
 		QPen pen(Qt::black);
+		pen.setWidth(2);
 		painter->setPen(pen);
-
-		painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
+		painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 2));
 		
-		pen.setWidth(3);
-		painter->setPen(pen);
-		painter->drawRect(QRectF(3, 3, CARD_WIDTH - 6, CARD_HEIGHT - 6));
+		transformPainter(painter, translatedSize);
 		painter->setPen(textColor);
-		
-		QRectF textRect = painter->combinedTransform().mapRect(QRectF(5, 5, CARD_WIDTH - 15, CARD_HEIGHT - 15));
-		painter->resetTransform();
-		QTransform pixmapTransform;
-		pixmapTransform.translate(totalBoundingRect.width() / 2, totalBoundingRect.height() / 2);
-		pixmapTransform.rotate(tapAngle);
-		QPointF transPoint = QPointF(-w / 2, -h / 2);
-		pixmapTransform.translate(transPoint.x(), transPoint.y());
-		painter->setTransform(pixmapTransform);
-
-		painter->drawText(textRect, Qt::AlignTop | Qt::AlignLeft | Qt::TextWrapAnywhere, name);
+		painter->drawText(QRectF(2 * scaleFactor, 2 * scaleFactor, translatedSize.width() - 4 * scaleFactor, translatedSize.height() - 4 * scaleFactor), Qt::AlignTop | Qt::AlignLeft | Qt::TextWrapAnywhere, name);
 	}
 	painter->restore();
 
