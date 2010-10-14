@@ -13,6 +13,7 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 {
 	connect(settingsCache, SIGNAL(tableBgPathChanged()), this, SLOT(updateBgPixmap()));
 	connect(settingsCache, SIGNAL(economicalGridChanged()), this, SLOT(reorganizeCards()));
+	connect(settingsCache, SIGNAL(invertVerticalCoordinateChanged()), this, SLOT(reorganizeCards()));
 	updateBgPixmap();
 
 	if (settingsCache->getEconomicalGrid())
@@ -39,6 +40,11 @@ QRectF TableZone::boundingRect() const
 	return QRectF(0, 0, width, height);
 }
 
+bool TableZone::isInverted() const
+{
+	return ((player->getMirrored() && !settingsCache->getInvertVerticalCoordinate()) || (!player->getMirrored() && settingsCache->getInvertVerticalCoordinate()));
+}
+
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
 	if (bgPixmap.isNull())
@@ -47,7 +53,7 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
 		painter->fillRect(boundingRect(), QBrush(bgPixmap));
 	painter->setPen(QColor(255, 255, 255, 40));
 	qreal separatorY = 3 * (CARD_HEIGHT + paddingY) + boxLineWidth - paddingY / 2;
-	if (player->getMirrored())
+	if (isInverted())
 		separatorY = height - separatorY;
 	painter->drawLine(QPointF(0, separatorY), QPointF(width, separatorY));
 	
@@ -220,7 +226,7 @@ QPointF TableZone::mapFromGrid(const QPoint &gridPoint) const
 		
 		y = boxLineWidth + (CARD_HEIGHT + paddingY) * gridPoint.y();
 	}
-	if (player->getMirrored())
+	if (isInverted())
 		y = height - CARD_HEIGHT - y;
 	
 	return QPointF(x, y);
@@ -230,7 +236,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 {
 	qreal x = mapPoint.x() - marginX;
 	qreal y = mapPoint.y();
-	if (player->getMirrored())
+	if (isInverted())
 		y = height - y;
 	y += paddingY / 2 - boxLineWidth;
 	

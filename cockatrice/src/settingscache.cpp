@@ -21,6 +21,7 @@ SettingsCache::SettingsCache()
 	cardInfoMinimized = settings->value("interface/cardinfominimized", false).toBool();
 	horizontalHand = settings->value("hand/horizontal", false).toBool();
 	economicalGrid = settings->value("table/economic", false).toBool();
+	invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
 	tapAnimation = settings->value("cards/tapanimation", true).toBool();
 	
 	zoneViewSortByName = settings->value("zoneview/sortbyname", false).toBool();
@@ -113,6 +114,13 @@ void SettingsCache::setEconomicalGrid(int _economicalGrid)
 	economicalGrid = _economicalGrid;
 	settings->setValue("table/economic", economicalGrid);
 	emit economicalGridChanged();
+}
+
+void SettingsCache::setInvertVerticalCoordinate(int _invertVerticalCoordinate)
+{
+	invertVerticalCoordinate = _invertVerticalCoordinate;
+	settings->setValue("table/invert_vertical", invertVerticalCoordinate);
+	emit invertVerticalCoordinateChanged();
 }
 
 void SettingsCache::setTapAnimation(int _tapAnimation)

@@ -18,6 +18,7 @@ private:
 	int currentMinimumWidth;
 	QPixmap bgPixmap;
 	bool active;
+	bool isInverted() const;
 private slots:	
 	void updateBgPixmap();
 public slots:

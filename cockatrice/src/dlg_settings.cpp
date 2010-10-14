@@ -220,8 +220,13 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	economicalGridCheckBox->setChecked(settingsCache->getEconomicalGrid());
 	connect(economicalGridCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setEconomicalGrid(int)));
 	
+	invertVerticalCoordinateCheckBox = new QCheckBox;
+	invertVerticalCoordinateCheckBox->setChecked(settingsCache->getInvertVerticalCoordinate());
+	connect(invertVerticalCoordinateCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setInvertVerticalCoordinate(int)));
+	
 	QGridLayout *tableGrid = new QGridLayout;
 	tableGrid->addWidget(economicalGridCheckBox, 0, 0, 1, 2);
+	tableGrid->addWidget(invertVerticalCoordinateCheckBox, 1, 0, 1, 2);
 	
 	tableGroupBox = new QGroupBox;
 	tableGroupBox->setLayout(tableGrid);
@@ -247,7 +252,6 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	mainLayout->addWidget(zoneViewGroupBox);
 	
 	setLayout(mainLayout);
-
 }
 
 void AppearanceSettingsPage::retranslateUi()
@@ -263,6 +267,7 @@ void AppearanceSettingsPage::retranslateUi()
 	
 	tableGroupBox->setTitle(tr("Table grid layout"));
 	economicalGridCheckBox->setText(tr("Economical layout"));
+	invertVerticalCoordinateCheckBox->setText(tr("Invert vertical coordinate"));
 	
 	zoneViewGroupBox->setTitle(tr("Zone view layout"));
 	zoneViewSortByNameCheckBox->setText(tr("Sort by name"));

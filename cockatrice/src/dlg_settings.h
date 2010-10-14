@@ -64,7 +64,7 @@ signals:
 private:
 	QLabel *handBgLabel, *tableBgLabel, *playerAreaBgLabel, *cardBackPicturePathLabel;
 	QLineEdit *handBgEdit, *tableBgEdit, *playerAreaBgEdit, *cardBackPicturePathEdit;
-	QCheckBox *horizontalHandCheckBox, *economicalGridCheckBox, *zoneViewSortByNameCheckBox, *zoneViewSortByTypeCheckBox;
+	QCheckBox *horizontalHandCheckBox, *economicalGridCheckBox, *invertVerticalCoordinateCheckBox, *zoneViewSortByNameCheckBox, *zoneViewSortByTypeCheckBox;
 	QGroupBox *zoneBgGroupBox, *handGroupBox, *tableGroupBox, *zoneViewGroupBox;
 public:
 	AppearanceSettingsPage();
