@@ -179,7 +179,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		painter->setBackgroundMode(Qt::OpaqueMode);
 		painter->setPen(Qt::white);
 		
-		painter->drawText(QRectF(4 * scaleFactor, 4 * scaleFactor, translatedSize.width() - 8, translatedSize.height() - 8), Qt::AlignRight | Qt::AlignBottom, pt);
+		painter->drawText(QRectF(4 * scaleFactor, 4 * scaleFactor, translatedSize.width() - 8 * scaleFactor, translatedSize.height() - 8 * scaleFactor), Qt::AlignRight | Qt::AlignBottom, pt);
 		painter->restore();
 	}
 	if (getBeingPointedAt())
