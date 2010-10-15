@@ -49,6 +49,7 @@ public:
 	int startDownload();
 	int importTextSpoiler(CardSet *set, const QByteArray &data);
 	QList<SetToDownload> &getSets() { return allSets; }
+	const QString &getDataDir() const { return dataDir; }
 };
 
 #endif

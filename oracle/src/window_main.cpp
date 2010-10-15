@@ -153,6 +153,23 @@ void WindowMain::updateTotalProgress(int cardsImported, int setIndex, const QStr
 	totalProgressBar->setValue(setIndex);
 	if (nextSetName.isEmpty()) {
 		QMessageBox::information(this, tr("Oracle importer"), tr("Import finished: %1 cards.").arg(importer->getCardList().size()));
+		bool ok = false;
+		QString savePath = importer->getDataDir() + "/cards.xml";
+		do {
+			QString fileName;
+			if (savePath.isEmpty())
+				fileName = QFileDialog::getSaveFileName(this, tr("Save card database"), importer->getDataDir() + "/cards.xml", tr("XML card database (*.xml)"));
+			else {
+				fileName = savePath;
+				savePath.clear();
+			}
+			if (fileName.isEmpty())
+				qApp->quit();
+			if (importer->saveToFile(fileName))
+				ok = true;
+			else
+				QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to the desired location."));
+		} while (!ok);
 		qApp->quit();
 	} else {
 		nextSetLabel2->setText(nextSetName);

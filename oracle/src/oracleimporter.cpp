@@ -266,7 +266,6 @@ void OracleImporter::httpRequestFinished(int requestId, bool error)
 	++setIndex;
 	
 	if (setIndex == setsToDownload.size()) {
-		saveToFile(dataDir + "/cards.xml");
 		emit setIndexChanged(cards, setIndex, QString());
 		setIndex = -1;
 	} else {

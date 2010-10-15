@@ -460,7 +460,8 @@ bool CardDatabase::loadFromFile(const QString &fileName)
 bool CardDatabase::saveToFile(const QString &fileName)
 {
 	QFile file(fileName);
-	file.open(QIODevice::WriteOnly);
+	if (!file.open(QIODevice::WriteOnly))
+		return false;
 	QXmlStreamWriter xml(&file);
 
 	xml.setAutoFormatting(true);
