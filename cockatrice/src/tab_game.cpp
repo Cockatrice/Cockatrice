@@ -4,6 +4,8 @@
 #include <QAction>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QApplication>
+#include <QDesktopWidget>
 #include "tab_game.h"
 #include "cardinfowidget.h"
 #include "playerlistwidget.h"
@@ -158,7 +160,7 @@ void DeckViewContainer::setDeck(DeckList *deck)
 }
 
 TabGame::TabGame(QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
-	: Tab(), clients(_clients), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), started(false), resuming(_resuming), currentPhase(-1)
+	: Tab(), clients(_clients), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), started(false), resuming(_resuming), currentPhase(-1), infoPopup(0)
 {
 	scene = new GameScene(this);
 	gameView = new GameView(scene);
@@ -168,6 +170,9 @@ TabGame::TabGame(QList<AbstractClient *> &_clients, int _gameId, const QString &
 	playerListWidget = new PlayerListWidget;
 	playerListWidget->setFocusPolicy(Qt::NoFocus);
 	messageLog = new MessageLogWidget;
+	connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfo, SLOT(setCard(QString)));
+	connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
+	connect(messageLog, SIGNAL(deleteCardInfoPopup()), this, SLOT(deleteCardInfoPopup()));
 	sayLabel = new QLabel;
 	sayEdit = new QLineEdit;
 	sayLabel->setBuddy(sayEdit);
@@ -649,6 +654,8 @@ void TabGame::eventPing(Event_Ping *event, GameEventContext * /*context*/)
 void TabGame::newCardAdded(AbstractCardItem *card)
 {
 	connect(card, SIGNAL(hovered(AbstractCardItem *)), cardInfo, SLOT(setCard(AbstractCardItem *)));
+	connect(card, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
+	connect(card, SIGNAL(deleteCardInfoPopup()), this, SLOT(deleteCardInfoPopup()));
 }
 
 CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) const
@@ -679,4 +686,24 @@ Player *TabGame::getActiveLocalPlayer() const
 	}
 	
 	return 0;
+}
+
+void TabGame::showCardInfoPopup(const QPoint &pos, const QString &cardName)
+{
+	infoPopup = new CardInfoWidget(CardInfoWidget::ModePopUp, 0, Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
+	infoPopup->setCard(cardName);
+		QRect screenRect = qApp->desktop()->screenGeometry(this);
+		infoPopup->move(
+			qMax(screenRect.left(), qMin(pos.x() - infoPopup->width() / 2, screenRect.left() + screenRect.width() - infoPopup->width())),
+			qMax(screenRect.top(), qMin(pos.y() - infoPopup->height() / 2, screenRect.top() + screenRect.height() - infoPopup->height()))
+		);
+	infoPopup->show();
+}
+
+void TabGame::deleteCardInfoPopup()
+{
+	if (infoPopup) {
+		infoPopup->deleteLater();
+		infoPopup = 0;
+	}
 }

@@ -1,19 +1,28 @@
 #ifndef MESSAGELOGWIDGET_H
 #define MESSAGELOGWIDGET_H
 
-#include <QPlainTextEdit>
+#include <QTextEdit>
 #include <QAbstractSocket>
 #include "translation.h"
 #include "protocol_datastructures.h"
 
 class Player;
 class CardZone;
+class QMouseEvent;
+class QEvent;
+class CardInfoWidget;
 
 class MessageLogWidget : public QTextEdit {
 	Q_OBJECT
 private:
+	CardInfoWidget *infoWidget;
 	QString sanitizeHtml(QString dirty) const;
 	QString trZoneName(CardZone *zone, Player *player, bool hisOwn, GrammaticalCase gc) const;
+	QString getCardNameUnderMouse(const QPoint &pos) const;
+signals:
+	void cardNameHovered(QString cardName);
+	void showCardInfoPopup(QPoint pos, QString cardName);
+	void deleteCardInfoPopup();
 public slots:
 	void logConnecting(QString hostname);
 	void logConnected();
@@ -58,6 +67,12 @@ public slots:
 public:
 	void connectToPlayer(Player *player);
 	MessageLogWidget(QWidget *parent = 0);
+protected:
+	void enterEvent(QEvent *event);
+	void leaveEvent(QEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
+	void mousePressEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
 };
 
 #endif

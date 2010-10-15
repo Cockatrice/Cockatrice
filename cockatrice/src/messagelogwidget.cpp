@@ -1,7 +1,10 @@
 #include "messagelogwidget.h"
 #include "player.h"
 #include "cardzone.h"
-#include <QApplication>
+#include "cardinfowidget.h"
+#include <QDebug>
+#include <QMouseEvent>
+#include <QTextBlock>
 
 QString MessageLogWidget::sanitizeHtml(QString dirty) const
 {
@@ -227,7 +230,7 @@ void MessageLogWidget::logUnattachCard(Player *player, QString cardName)
 
 void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt)
 {
-	append(tr("%1 creates token: %2%3.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+	append(tr("%1 creates token: %2%3.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\"><a name=\"foo\">%1</a></font>").arg(sanitizeHtml(cardName))).arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
 }
 
 void MessageLogWidget::logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard, bool playerTarget)
@@ -374,4 +377,59 @@ MessageLogWidget::MessageLogWidget(QWidget *parent)
 	QFont f;
 	f.setPixelSize(11);
 	setFont(f);
+}
+
+void MessageLogWidget::enterEvent(QEvent *event)
+{
+	setMouseTracking(true);
+}
+
+void MessageLogWidget::leaveEvent(QEvent *event)
+{
+	setMouseTracking(false);
+}
+
+QString MessageLogWidget::getCardNameUnderMouse(const QPoint &pos) const
+{
+	QTextCursor cursor(cursorForPosition(pos));
+	QTextBlock block(cursor.block());
+	QTextBlock::iterator it;
+	for (it = block.begin(); !(it.atEnd()); ++it) {
+		QTextFragment frag = it.fragment();
+		if (!frag.contains(cursor.position()))
+			continue;
+		
+		if (frag.charFormat().foreground().color() == Qt::blue)
+			return frag.text();
+		
+		break;
+	}
+	return QString();
+}
+
+void MessageLogWidget::mouseMoveEvent(QMouseEvent *event)
+{
+	QString cardName = getCardNameUnderMouse(event->pos());
+	if (!cardName.isEmpty())
+		emit cardNameHovered(cardName);
+	
+	QTextEdit::mouseMoveEvent(event);
+}
+
+void MessageLogWidget::mousePressEvent(QMouseEvent *event)
+{
+	if (event->button() == Qt::MidButton) {
+		QString cardName = getCardNameUnderMouse(event->pos());
+		if (!cardName.isEmpty())
+			emit showCardInfoPopup(event->globalPos(), cardName);
+	}
+		
+	QTextEdit::mousePressEvent(event);
+}
+
+void MessageLogWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+	emit deleteCardInfoPopup();
+	
+	QTextEdit::mouseReleaseEvent(event);
 }

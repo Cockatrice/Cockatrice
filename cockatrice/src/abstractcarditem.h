@@ -27,6 +27,8 @@ private slots:
 	void pixmapUpdated();
 signals:
 	void hovered(AbstractCardItem *card);
+	void showCardInfoPopup(QPoint pos, QString cardName);
+	void deleteCardInfoPopup();
 public:
 	enum { Type = typeCard };
 	int type() const { return Type; }

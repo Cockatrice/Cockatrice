@@ -96,6 +96,7 @@ private:
 	int currentPhase;
 	int activePlayer;
 
+	CardInfoWidget *infoPopup;
 	CardInfoWidget *cardInfo;
 	PlayerListWidget *playerListWidget;
 	MessageLogWidget *messageLog;
@@ -134,6 +135,8 @@ signals:
 	void gameClosing(TabGame *tab);
 private slots:
 	void newCardAdded(AbstractCardItem *card);
+	void showCardInfoPopup(const QPoint &pos, const QString &cardName);
+	void deleteCardInfoPopup();
 	
 	void actConcede();
 	void actLeaveGame();

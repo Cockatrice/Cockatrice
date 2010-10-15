@@ -183,21 +183,14 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 	}
 	if (event->button() == Qt::LeftButton)
 		setCursor(Qt::ClosedHandCursor);
-	else if (event->button() == Qt::MidButton) {
-		infoWidget = new CardInfoWidget(CardInfoWidget::ModePopUp, 0, Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
-		infoWidget->setCard(this);
-		infoWidget->move(event->screenPos().x() - infoWidget->width() / 2, event->screenPos().y() - infoWidget->height() / 2);
-		infoWidget->show();
-	}
+	else if (event->button() == Qt::MidButton)
+		emit showCardInfoPopup(event->screenPos(), name);
 	event->accept();
 }
 
 void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-	if (infoWidget) {
-		infoWidget->deleteLater();
-		infoWidget = 0;
-	}
+	emit deleteCardInfoPopup();
 }
 
 void AbstractCardItem::processHoverEvent()
