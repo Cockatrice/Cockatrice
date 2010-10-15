@@ -172,12 +172,14 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 	if (!pt.isEmpty()) {
 		painter->save();
 		QSizeF translatedSize = getTranslatedSize(painter);
+
+		qreal scaleFactor = translatedSize.width() / boundingRect().width();
 		transformPainter(painter, translatedSize);
 		painter->setBackground(Qt::black);
 		painter->setBackgroundMode(Qt::OpaqueMode);
 		painter->setPen(Qt::white);
 		
-		painter->drawText(QRectF(2, 2, translatedSize.width() - 4, translatedSize.height() - 4), Qt::AlignRight | Qt::AlignBottom, pt);
+		painter->drawText(QRectF(4 * scaleFactor, 4 * scaleFactor, translatedSize.width() - 8, translatedSize.height() - 8), Qt::AlignRight | Qt::AlignBottom, pt);
 		painter->restore();
 	}
 	if (getBeingPointedAt())
