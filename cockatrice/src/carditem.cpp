@@ -57,7 +57,6 @@ CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, QGraphicsI
 		connect(aMoveToBottomLibrary, SIGNAL(triggered()), owner, SLOT(cardMenuAction()));
 		connect(aMoveToGraveyard, SIGNAL(triggered()), owner, SLOT(cardMenuAction()));
 		connect(aMoveToExile, SIGNAL(triggered()), owner, SLOT(cardMenuAction()));
-	
 		
 		cardMenu = new QMenu;
 		cardMenu->addAction(aTap);
@@ -379,10 +378,11 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 	if (event->button() == Qt::RightButton) {
 		if (cardMenu)
 			cardMenu->exec(event->screenPos());
-	} else if ((event->button() == Qt::LeftButton) && !settingsCache->getDoubleClickToPlay())
+	} else if ((event->button() == Qt::LeftButton) && !settingsCache->getDoubleClickToPlay()) {
+		setCursor(Qt::OpenHandCursor);
 		playCard(event);
+	}
 
-	setCursor(Qt::OpenHandCursor);
 	AbstractCardItem::mouseReleaseEvent(event);
 }
 
