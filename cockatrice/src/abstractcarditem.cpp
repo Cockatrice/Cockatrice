@@ -118,7 +118,7 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 		
 		transformPainter(painter, translatedSize);
 		painter->setPen(textColor);
-		painter->drawText(QRectF(2 * scaleFactor, 2 * scaleFactor, translatedSize.width() - 4 * scaleFactor, translatedSize.height() - 4 * scaleFactor), Qt::AlignTop | Qt::AlignLeft | Qt::TextWrapAnywhere, name);
+		painter->drawText(QRectF(4 * scaleFactor, 4 * scaleFactor, translatedSize.width() - 8 * scaleFactor, translatedSize.height() - 8 * scaleFactor), Qt::AlignTop | Qt::AlignLeft | Qt::TextWrapAnywhere, name);
 	}
 	painter->restore();
 

@@ -6,7 +6,6 @@ MOC_DIR = build
 OBJECTS_DIR = build
 RESOURCES = cockatrice.qrc
 QT += network svg
-CONFIG += debug
 
 HEADERS += src/counter.h \
  src/dlg_creategame.h \
