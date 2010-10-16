@@ -410,9 +410,12 @@ QString MessageLogWidget::getCardNameUnderMouse(const QPoint &pos) const
 void MessageLogWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	QString cardName = getCardNameUnderMouse(event->pos());
-	if (!cardName.isEmpty())
+	if (!cardName.isEmpty()) {
+		viewport()->setCursor(Qt::PointingHandCursor);
 		emit cardNameHovered(cardName);
-	
+	} else
+		viewport()->setCursor(Qt::IBeamCursor);
+
 	QTextEdit::mouseMoveEvent(event);
 }
 
