@@ -52,7 +52,7 @@ public:
 	// getCard() finds a card by id.
 	CardItem *getCard(int cardId, const QString &cardName);
 	// takeCard() finds a card by position and removes it from the zone and from all of its views.
-	virtual CardItem *takeCard(int position, int cardId, const QString &cardName, bool canResize = true);
+	virtual CardItem *takeCard(int position, int cardId, bool canResize = true);
 	ZoneViewZone *getView() const { return view; }
 	void setView(ZoneViewZone *_view) { view = _view; }
 	virtual void reorganizeCards() = 0;

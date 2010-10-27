@@ -174,9 +174,9 @@ void TableZone::toggleTapped()
 	player->sendCommandContainer(new CommandContainer(cmdList));
 }
 
-CardItem *TableZone::takeCard(int position, int cardId, const QString &cardName, bool canResize)
+CardItem *TableZone::takeCard(int position, int cardId, bool canResize)
 {
-	CardItem *result = CardZone::takeCard(position, cardId, cardName);
+	CardItem *result = CardZone::takeCard(position, cardId);
 	if (canResize)
 		resizeToContents();
 	return result;

@@ -129,7 +129,7 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
 	return c;
 }
 
-CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName, bool /*canResize*/)
+CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
 {
 	if (position == -1) {
 		// position == -1 means either that the zone is indexed by card id
@@ -151,7 +151,6 @@ CardItem *CardZone::takeCard(int position, int cardId, const QString &cardName, 
 		view->removeCard(position);
 
 	c->setId(cardId);
-	c->setName(cardName);
 
 	reorganizeCards();
 	emit cardCountChanged();

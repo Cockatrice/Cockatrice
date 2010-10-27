@@ -35,7 +35,7 @@ public:
 	QPointF mapFromGrid(const QPoint &gridPoint) const;
 	QPoint mapToGrid(const QPointF &mapPoint) const;
 	QPointF closestGridPoint(const QPointF &point);
-	CardItem *takeCard(int position, int cardId, const QString &cardName, bool canResize = true);
+	CardItem *takeCard(int position, int cardId, bool canResize = true);
 	void resizeToContents();
 	int getMinimumWidth() const { return currentMinimumWidth; }
 	void setWidth(qreal _width);

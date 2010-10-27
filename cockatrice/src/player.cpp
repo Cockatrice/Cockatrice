@@ -696,9 +696,10 @@ void Player::eventMoveCard(Event_MoveCard *event)
 	int logX = x;
 	if (x == -1)
 		x = 0;
-	CardItem *card = startZone->takeCard(position, event->getCardId(), event->getCardName(), startZone != targetZone);
+	CardItem *card = startZone->takeCard(position, event->getCardId(), startZone != targetZone);
 	if (!card)
 		return;
+	card->setName(event->getCardName());
 	
 	if (card->getAttachedTo() && (startZone != targetZone))
 		card->setAttachedTo(0);
@@ -761,7 +762,7 @@ void Player::eventDestroyCard(Event_DestroyCard *event)
 		return;
 	
 	emit logDestroyCard(this, card->getName());
-	zone->takeCard(-1, event->getCardId(), QString(), true);
+	zone->takeCard(-1, event->getCardId(), true);
 	card->deleteLater();
 }
 
@@ -813,11 +814,15 @@ void Player::eventDrawCards(Event_DrawCards *event)
 	CardZone *hand = zones.value("hand");
 	const QList<ServerInfo_Card *> &cardList = event->getCardList();
 	if (!cardList.isEmpty())
-		for (int i = 0; i < cardList.size(); ++i)
-			hand->addCard(deck->takeCard(0, cardList[i]->getId(), cardList[i]->getName()), false, -1);
+		for (int i = 0; i < cardList.size(); ++i) {
+			CardItem *card = deck->takeCard(0, cardList[i]->getId());
+			card->setName(cardList[i]->getName());
+			hand->addCard(card, false, -1);
+		}
 	else
 		for (int i = 0; i < event->getNumberCards(); ++i)
-			hand->addCard(deck->takeCard(0, -1, QString()), false, -1);
+			hand->addCard(deck->takeCard(0, -1), false, -1);
+	
 	hand->reorganizeCards();
 	deck->reorganizeCards();
 	
