@@ -35,8 +35,9 @@ enum ItemId {
 	ItemId_Event_CreateArrows = ItemId_Other + 207,
 	ItemId_Event_CreateCounters = ItemId_Other + 208,
 	ItemId_Event_DrawCards = ItemId_Other + 209,
-	ItemId_Event_Join = ItemId_Other + 210,
-	ItemId_Event_Ping = ItemId_Other + 211,
+	ItemId_Event_RevealCards = ItemId_Other + 210,
+	ItemId_Event_Join = ItemId_Other + 211,
+	ItemId_Event_Ping = ItemId_Other + 212,
 	ItemId_Response_ListUsers = ItemId_Other + 300,
 	ItemId_Response_GetUserInfo = ItemId_Other + 301,
 	ItemId_Response_DeckList = ItemId_Other + 302,
@@ -112,6 +113,7 @@ private:
 	GameEventContainer *gameEventQueuePublic;
 	GameEventContainer *gameEventQueueOmniscient;
 	GameEventContainer *gameEventQueuePrivate;
+	int privatePlayerId;
 public:
 	CommandContainer(const QList<Command *> &_commandList = QList<Command *>(), int _cmdId = -1);
 	static SerializableItem *newItem() { return new CommandContainer; }
@@ -130,7 +132,8 @@ public:
 	GameEventContainer *getGameEventQueueOmniscient() const { return gameEventQueueOmniscient; }
 	void enqueueGameEventOmniscient(GameEvent *event, int gameId);
 	GameEventContainer *getGameEventQueuePrivate() const { return gameEventQueuePrivate; }
-	void enqueueGameEventPrivate(GameEvent *event, int gameId);
+	void enqueueGameEventPrivate(GameEvent *event, int gameId, int playerId = -1);
+	int getPrivatePlayerId() const { return privatePlayerId; }
 };
 
 class ChatCommand : public Command {
@@ -417,6 +420,18 @@ public:
 	int getItemId() const { return ItemId_Event_DrawCards; }
 	static SerializableItem *newItem() { return new Event_DrawCards; }
 	int getNumberCards() const { return static_cast<SerializableItem_Int *>(itemMap.value("number_cards"))->getData(); }
+	QList<ServerInfo_Card *> getCardList() const { return typecastItemList<ServerInfo_Card *>(); }
+};
+
+class Event_RevealCards : public GameEvent {
+	Q_OBJECT
+public:
+	Event_RevealCards(int _playerId = -1, const QString &_zoneName = QString(), int cardId = -1, int _otherPlayerId = -1, const QList<ServerInfo_Card *> &_cardList = QList<ServerInfo_Card *>());
+	int getItemId() const { return ItemId_Event_RevealCards; }
+	static SerializableItem *newItem() { return new Event_RevealCards; }
+	QString getZoneName() const { return static_cast<SerializableItem_String *>(itemMap.value("zone_name"))->getData(); }
+	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); }
+	int getOtherPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("other_player_id"))->getData(); }
 	QList<ServerInfo_Card *> getCardList() const { return typecastItemList<ServerInfo_Card *>(); }
 };
 

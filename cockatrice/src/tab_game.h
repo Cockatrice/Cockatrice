@@ -133,6 +133,8 @@ private:
 	void eventPing(Event_Ping *event, GameEventContext *context);
 signals:
 	void gameClosing(TabGame *tab);
+	void playerAdded(Player *player);
+	void playerRemoved(Player *player);
 private slots:
 	void newCardAdded(AbstractCardItem *card);
 	void showCardInfoPopup(const QPoint &pos, const QString &cardName);

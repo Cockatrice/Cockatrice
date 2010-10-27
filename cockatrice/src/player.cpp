@@ -60,6 +60,9 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 	updateBoundingRect();
 
 	if (local) {
+		connect(_parent, SIGNAL(playerAdded(Player *)), this, SLOT(addPlayer(Player *)));
+		connect(_parent, SIGNAL(playerRemoved(Player *)), this, SLOT(removePlayer(Player *)));
+		
 		aMoveHandToTopLibrary = new QAction(this);
 		aMoveHandToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
 		aMoveHandToBottomLibrary = new QAction(this);
@@ -141,6 +144,9 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 		handMenu->addAction(aMoveHandToBottomLibrary);
 		handMenu->addAction(aMoveHandToGrave);
 		handMenu->addAction(aMoveHandToRfg);
+		handMenu->addSeparator();
+		playerLists.append(mRevealHand = handMenu->addMenu(QString()));
+		playerLists.append(mRevealRandomHandCard = handMenu->addMenu(QString()));
 		hand->setMenu(handMenu);
 
 		libraryMenu = playerMenu->addMenu(QString());
@@ -151,6 +157,9 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 		libraryMenu->addSeparator();
 		libraryMenu->addAction(aViewLibrary);
 		libraryMenu->addAction(aViewTopCards);
+		libraryMenu->addSeparator();
+		playerLists.append(mRevealLibrary = libraryMenu->addMenu(QString()));
+		playerLists.append(mRevealTopCard = libraryMenu->addMenu(QString()));
 		libraryMenu->addSeparator();
 		libraryMenu->addAction(aMoveTopCardsToGrave);
 		libraryMenu->addAction(aMoveTopCardsToExile);
@@ -221,6 +230,10 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 		aCardMenu = 0;
 	}
 	
+	const QList<Player *> &players = _parent->getPlayers().values();
+	for (int i = 0; i < players.size(); ++i)
+		addPlayer(players[i]);
+	
 	rearrangeZones();
 	retranslateUi();
 }
@@ -240,6 +253,40 @@ Player::~Player()
 	clearCounters();
 	delete playerMenu;
 	delete userInfo;
+}
+
+void Player::addPlayer(Player *player)
+{
+	if (player == this)
+		return;
+	for (int i = 0; i < playerLists.size(); ++i) {
+		QAction *newAction = playerLists[i]->addAction(player->getName());
+		newAction->setData(player->getId());
+		connect(newAction, SIGNAL(triggered()), this, SLOT(playerListActionTriggered()));
+	}
+}
+
+void Player::removePlayer(Player *player)
+{
+	for (int i = 0; i < playerLists.size(); ++i) {
+		QList<QAction *> actionList = playerLists[i]->actions();
+		for (int j = 0; j < actionList.size(); ++j)
+			if (actionList[j]->data().toInt() == player->getId()) {
+				playerLists[i]->removeAction(actionList[j]);
+				actionList[j]->deleteLater();
+			}
+	}
+}
+
+void Player::playerListActionTriggered()
+{
+	QAction *action = static_cast<QAction *>(sender());
+	QMenu *menu = static_cast<QMenu *>(action->parentWidget());
+	int otherPlayerId = action->data().toInt();
+	
+	if (menu == mRevealLibrary) {
+		sendGameCommand(new Command_RevealCards(-1, "deck", -1, otherPlayerId));
+	}
 }
 
 void Player::rearrangeZones()
@@ -297,7 +344,7 @@ void Player::retranslateUi()
 	if (local) {
 		aMoveHandToTopLibrary->setText(tr("Move to &top of library"));
 		aMoveHandToBottomLibrary->setText(tr("Move to &bottom of library"));
-		aMoveHandToGrave->setText(tr("Move to g&raveyard"));
+		aMoveHandToGrave->setText(tr("Move to &graveyard"));
 		aMoveHandToRfg->setText(tr("Move to &exile"));
 		aMoveGraveToTopLibrary->setText(tr("Move to &top of library"));
 		aMoveGraveToBottomLibrary->setText(tr("Move to &bottom of library"));
@@ -306,18 +353,22 @@ void Player::retranslateUi()
 		aMoveRfgToTopLibrary->setText(tr("Move to &top of library"));
 		aMoveRfgToBottomLibrary->setText(tr("Move to &bottom of library"));
 		aMoveRfgToHand->setText(tr("Move to &hand"));
-		aMoveRfgToGrave->setText(tr("Move to g&raveyard"));
+		aMoveRfgToGrave->setText(tr("Move to &graveyard"));
 		aViewLibrary->setText(tr("&View library"));
 		aViewTopCards->setText(tr("View &top cards of library..."));
+		mRevealLibrary->setTitle(tr("Reveal &library to"));
+		mRevealTopCard->setTitle(tr("Reveal t&op card to"));
 		aViewSideboard->setText(tr("&View sideboard"));
 		aDrawCard->setText(tr("&Draw card"));
 		aDrawCards->setText(tr("D&raw cards..."));
 		aMulligan->setText(tr("Take &mulligan"));
 		aShuffle->setText(tr("&Shuffle"));
-		aMoveTopCardsToGrave->setText(tr("Move top cards to g&raveyard..."));
+		aMoveTopCardsToGrave->setText(tr("Move top cards to &graveyard..."));
 		aMoveTopCardsToExile->setText(tr("Move top cards to &exile..."));
 	
 		handMenu->setTitle(tr("&Hand"));
+		mRevealHand->setTitle(tr("&Reveal to"));
+		mRevealRandomHandCard->setTitle(tr("Reveal r&andom card to"));
 		sbMenu->setTitle(tr("&Sideboard"));
 		libraryMenu->setTitle(tr("&Library"));
 		countersMenu->setTitle(tr("&Counters"));

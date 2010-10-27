@@ -53,6 +53,7 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("game_eventcreate_arrows", Event_CreateArrows::newItem);
 	registerSerializableItem("game_eventcreate_counters", Event_CreateCounters::newItem);
 	registerSerializableItem("game_eventdraw_cards", Event_DrawCards::newItem);
+	registerSerializableItem("game_eventreveal_cards", Event_RevealCards::newItem);
 	registerSerializableItem("game_eventping", Event_Ping::newItem);
 	registerSerializableItem("chat_eventchat_list_players", Event_ChatListPlayers::newItem);
 	registerSerializableItem("chat_eventchat_join_channel", Event_ChatJoinChannel::newItem);
@@ -108,7 +109,7 @@ void Command::processResponse(ProtocolResponse *response)
 }
 
 CommandContainer::CommandContainer(const QList<Command *> &_commandList, int _cmdId)
-	: ProtocolItem("container", "cmd"), ticks(0), resp(0), gameEventQueuePublic(0), gameEventQueueOmniscient(0), gameEventQueuePrivate(0)
+	: ProtocolItem("container", "cmd"), ticks(0), resp(0), gameEventQueuePublic(0), gameEventQueueOmniscient(0), gameEventQueuePrivate(0), privatePlayerId(-1)
 {
 	if (_cmdId == -1)
 		_cmdId = lastCmdId++;
@@ -148,11 +149,12 @@ void CommandContainer::enqueueGameEventOmniscient(GameEvent *event, int gameId)
 	gameEventQueueOmniscient->addGameEvent(event);
 }
 
-void CommandContainer::enqueueGameEventPrivate(GameEvent *event, int gameId)
+void CommandContainer::enqueueGameEventPrivate(GameEvent *event, int gameId, int playerId)
 {
 	if (!gameEventQueuePrivate)
 		gameEventQueuePrivate = new GameEventContainer(QList<GameEvent *>(), gameId);
 	gameEventQueuePrivate->addGameEvent(event);
+	privatePlayerId = playerId;
 }
 
 Command_DeckUpload::Command_DeckUpload(DeckList *_deck, const QString &_path)
@@ -427,6 +429,16 @@ Event_DrawCards::Event_DrawCards(int _playerId, int _numberCards, const QList<Se
 	: GameEvent("draw_cards", _playerId)
 {
 	insertItem(new SerializableItem_Int("number_cards", _numberCards));
+	for (int i = 0; i < _cardList.size(); ++i)
+		itemList.append(_cardList[i]);
+}
+
+Event_RevealCards::Event_RevealCards(int _playerId, const QString &_zoneName, int _cardId, int _otherPlayerId, const QList<ServerInfo_Card *> &_cardList)
+	: GameEvent("reveal_cards", _playerId)
+{
+	insertItem(new SerializableItem_String("zone_name", _zoneName));
+	insertItem(new SerializableItem_Int("card_id", _cardId));
+	insertItem(new SerializableItem_Int("other_player_id", _otherPlayerId));
 	for (int i = 0; i < _cardList.size(); ++i)
 		itemList.append(_cardList[i]);
 }

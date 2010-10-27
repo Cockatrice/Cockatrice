@@ -40,6 +40,7 @@
 2:set_active_phase:i,phase
 2:dump_zone:i,player_id:s,zone_name:i,number_cards
 2:stop_dump_zone:i,player_id:s,zone_name
+2:reveal_cards:s,zone_name:i,card_id:i,player_id
 3:say:s,message
 3:leave
 3:game_closed

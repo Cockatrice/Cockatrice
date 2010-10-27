@@ -98,11 +98,17 @@ public slots:
 	void actCardCounterTrigger();
 
 private slots:
+	void addPlayer(Player *player);
+	void removePlayer(Player *player);
+	void playerListActionTriggered();
+	
 	void updateBgPixmap();
 	void updateBoundingRect();
 	void rearrangeZones();
 private:
-	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *countersMenu, *sayMenu;
+	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *countersMenu, *sayMenu,
+		*mRevealLibrary, *mRevealTopCard, *mRevealHand, *mRevealRandomHandCard;
+	QList<QMenu *> playerLists;
 	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
 		*aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg,
 		*aMoveRfgToTopLibrary, *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave,

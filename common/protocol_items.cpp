@@ -253,6 +253,13 @@ Command_StopDumpZone::Command_StopDumpZone(int _gameId, int _playerId, const QSt
 	insertItem(new SerializableItem_Int("player_id", _playerId));
 	insertItem(new SerializableItem_String("zone_name", _zoneName));
 }
+Command_RevealCards::Command_RevealCards(int _gameId, const QString &_zoneName, int _cardId, int _playerId)
+	: GameCommand("reveal_cards", _gameId)
+{
+	insertItem(new SerializableItem_String("zone_name", _zoneName));
+	insertItem(new SerializableItem_Int("card_id", _cardId));
+	insertItem(new SerializableItem_Int("player_id", _playerId));
+}
 Event_Say::Event_Say(int _playerId, const QString &_message)
 	: GameEvent("say", _playerId)
 {
@@ -476,6 +483,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdset_active_phase", Command_SetActivePhase::newItem);
 	itemNameHash.insert("cmddump_zone", Command_DumpZone::newItem);
 	itemNameHash.insert("cmdstop_dump_zone", Command_StopDumpZone::newItem);
+	itemNameHash.insert("cmdreveal_cards", Command_RevealCards::newItem);
 	itemNameHash.insert("game_eventsay", Event_Say::newItem);
 	itemNameHash.insert("game_eventleave", Event_Leave::newItem);
 	itemNameHash.insert("game_eventgame_closed", Event_GameClosed::newItem);

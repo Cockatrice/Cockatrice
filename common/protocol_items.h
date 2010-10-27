@@ -381,6 +381,16 @@ public:
 	static SerializableItem *newItem() { return new Command_StopDumpZone; }
 	int getItemId() const { return ItemId_Command_StopDumpZone; }
 };
+class Command_RevealCards : public GameCommand {
+	Q_OBJECT
+public:
+	Command_RevealCards(int _gameId = -1, const QString &_zoneName = QString(), int _cardId = -1, int _playerId = -1);
+	QString getZoneName() const { return static_cast<SerializableItem_String *>(itemMap.value("zone_name"))->getData(); };
+	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); };
+	int getPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("player_id"))->getData(); };
+	static SerializableItem *newItem() { return new Command_RevealCards; }
+	int getItemId() const { return ItemId_Command_RevealCards; }
+};
 class Event_Say : public GameEvent {
 	Q_OBJECT
 public:

@@ -351,6 +351,7 @@ Player *TabGame::addPlayer(int playerId, ServerInfo_User *info)
 	tabMenu->insertMenu(playersSeparator, newPlayer->getPlayerMenu());
 	
 	players.insert(playerId, newPlayer);
+	emit playerAdded(newPlayer);
 
 	return newPlayer;
 }
@@ -581,7 +582,8 @@ void TabGame::eventLeave(Event_Leave *event, GameEventContext * /*context*/)
 		messageLog->logLeave(player);
 		playerListWidget->removePlayer(playerId);
 		players.remove(playerId);
-		delete player;
+		emit playerRemoved(player);
+		player->deleteLater();
 	}
 	emit userEvent();
 }
