@@ -48,33 +48,33 @@ QString CardZone::getTranslatedName(bool hisOwn, GrammaticalCase gc) const
 	QString ownerName = player->getName();
 	if (name == "hand")
 		switch (gc) {
-			case CaseNominative: return hisOwn ? tr("his hand") : tr("%1's hand").arg(ownerName);
-			case CaseGenitive: return hisOwn ? tr("of his hand") : tr("of %1's hand").arg(ownerName);
-			case CaseAccusative: return hisOwn ? tr("his hand") : tr("%1's hand").arg(ownerName);
+			case CaseNominative: return hisOwn ? tr("his hand", "nominative") : tr("%1's hand", "nominative").arg(ownerName);
+			case CaseGenitive: return hisOwn ? tr("of his hand", "genitive") : tr("of %1's hand", "genitive").arg(ownerName);
+			case CaseAccusative: return hisOwn ? tr("his hand", "accusative") : tr("%1's hand", "accusative").arg(ownerName);
 		}
 	else if (name == "deck")
 		switch (gc) {
-			case CaseNominative: return hisOwn ? tr("his library") : tr("%1's library").arg(ownerName);
-			case CaseGenitive: return hisOwn ? tr("of his library") : tr("of %1's library").arg(ownerName);
-			case CaseAccusative: return hisOwn ? tr("his library") : tr("%1's library").arg(ownerName);
+			case CaseNominative: return hisOwn ? tr("his library", "nominative") : tr("%1's library", "nominative").arg(ownerName);
+			case CaseGenitive: return hisOwn ? tr("of his library", "genitive") : tr("of %1's library", "genitive").arg(ownerName);
+			case CaseAccusative: return hisOwn ? tr("his library", "accusative") : tr("%1's library", "accusative").arg(ownerName);
 		}
 	else if (name == "grave")
 		switch (gc) {
-			case CaseNominative: return hisOwn ? tr("his graveyard") : tr("%1's graveyard").arg(ownerName);
-			case CaseGenitive: return hisOwn ? tr("of his graveyard") : tr("of %1's graveyard").arg(ownerName);
-			case CaseAccusative: return hisOwn ? tr("his graveyard") : tr("%1's graveyard").arg(ownerName);
+			case CaseNominative: return hisOwn ? tr("his graveyard", "nominative") : tr("%1's graveyard", "nominative").arg(ownerName);
+			case CaseGenitive: return hisOwn ? tr("of his graveyard", "genitive") : tr("of %1's graveyard", "genitive").arg(ownerName);
+			case CaseAccusative: return hisOwn ? tr("his graveyard", "accusative") : tr("%1's graveyard", "accusative").arg(ownerName);
 		}
 	else if (name == "rfg")
 		switch (gc) {
-			case CaseNominative: return hisOwn ? tr("his exile") : tr("%1's exile").arg(ownerName);
-			case CaseGenitive: return hisOwn ? tr("of his exile") : tr("of %1's exile").arg(ownerName);
-			case CaseAccusative: return hisOwn ? tr("his exile") : tr("%1's exile").arg(ownerName);
+			case CaseNominative: return hisOwn ? tr("his exile", "nominative") : tr("%1's exile", "nominative").arg(ownerName);
+			case CaseGenitive: return hisOwn ? tr("of his exile", "genitive") : tr("of %1's exile", "genitive").arg(ownerName);
+			case CaseAccusative: return hisOwn ? tr("his exile", "accusative") : tr("%1's exile", "accusative").arg(ownerName);
 		}
 	else if (name == "sb")
 		switch (gc) {
-			case CaseNominative: return hisOwn ? tr("his sideboard") : tr("%1's sideboard").arg(ownerName);
-			case CaseGenitive: return hisOwn ? tr("of his sideboard") : tr("of %1's sideboard").arg(ownerName);
-			case CaseAccusative: return hisOwn ? tr("his sideboard") : tr("%1's sideboard").arg(ownerName);
+			case CaseNominative: return hisOwn ? tr("his sideboard", "nominative") : tr("%1's sideboard", "nominative").arg(ownerName);
+			case CaseGenitive: return hisOwn ? tr("of his sideboard", "genitive") : tr("of %1's sideboard", "genitive").arg(ownerName);
+			case CaseAccusative: return hisOwn ? tr("his sideboard", "accusative") : tr("%1's sideboard", "accusative").arg(ownerName);
 		}
 	return QString();
 }

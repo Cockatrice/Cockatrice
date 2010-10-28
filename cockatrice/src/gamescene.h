@@ -6,6 +6,8 @@
 
 class Player;
 class ZoneViewWidget;
+class CardZone;
+class ServerInfo_Card;
 
 class GameScene : public QGraphicsScene {
 	Q_OBJECT
@@ -23,6 +25,7 @@ public:
 	void processViewSizeChange(const QSize &newSize);
 public slots:
 	void toggleZoneView(Player *player, const QString &zoneName, int numberCards);
+	void addRevealedZoneView(Player *player, CardZone *zone, const QList<ServerInfo_Card *> &cardList);
 	void removeZoneView(ZoneViewWidget *item);
 	void addPlayer(Player *player);
 	void removePlayer(Player *player);

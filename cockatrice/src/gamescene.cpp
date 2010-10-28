@@ -89,6 +89,15 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
 	item->setPos(100, 100);
 }
 
+void GameScene::addRevealedZoneView(Player *player, CardZone *zone, const QList<ServerInfo_Card *> &cardList)
+{
+	ZoneViewWidget *item = new ZoneViewWidget(player, zone, -2, cardList);
+	views.append(item);
+        connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
+	addItem(item);
+	item->setPos(100, 100);
+}
+
 void GameScene::removeZoneView(ZoneViewWidget *item)
 {
         views.removeAt(views.indexOf(item));

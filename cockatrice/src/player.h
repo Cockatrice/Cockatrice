@@ -43,6 +43,7 @@ class Event_FlipCard;
 class Event_DestroyCard;
 class Event_AttachCard;
 class Event_DrawCards;
+class Event_RevealCards;
 
 class Player : public QObject, public QGraphicsItem {
 	Q_OBJECT
@@ -68,6 +69,7 @@ signals:
 	void logSetAnnotation(Player *player, QString cardName, QString newAnnotation);
 	void logDumpZone(Player *player, CardZone *zone, int numberCards);
 	void logStopDumpZone(Player *player, CardZone *zone);
+	void logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer);
 	
 	void sizeChanged();
 public slots:
@@ -109,6 +111,7 @@ private:
 	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *countersMenu, *sayMenu,
 		*mRevealLibrary, *mRevealTopCard, *mRevealHand, *mRevealRandomHandCard;
 	QList<QMenu *> playerLists;
+	QList<QAction *> allPlayersActions;
 	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
 		*aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg,
 		*aMoveRfgToTopLibrary, *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave,
@@ -166,6 +169,7 @@ private:
 	void eventDestroyCard(Event_DestroyCard *event);
 	void eventAttachCard(Event_AttachCard *event);
 	void eventDrawCards(Event_DrawCards *event);
+	void eventRevealCards(Event_RevealCards *event);
 public:
 	static const int counterAreaWidth = 65;
 	

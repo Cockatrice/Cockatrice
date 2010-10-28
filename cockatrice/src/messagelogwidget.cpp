@@ -138,14 +138,11 @@ void MessageLogWidget::logDrawCards(Player *player, int number)
 		append(tr("%1 draws %2 cards.").arg(sanitizeHtml(player->getName())).arg(number));
 }
 
-void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX)
+QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position) const
 {
-	QString startName = startZone->getName();
-	QString targetName = targetZone->getName();
-	if (((startName == "table") && (targetName == "table")) || ((startName == "hand") && (targetName == "hand")))
-		return;
-	QString fromStr;
 	bool cardNameContainsStartZone = false;
+	QString fromStr;
+	QString startName = zone->getName();
 	
 	if (startName == "table")
 		fromStr = tr(" from table");
@@ -156,13 +153,13 @@ void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *s
 	else if (startName == "hand")
 		fromStr = tr(" from hand");
 	else if (startName == "deck") {
-		if (oldX == startZone->getCards().size() - 1) {
+		if (position == zone->getCards().size() - 1) {
 			if (cardName.isEmpty()) {
 				cardName = tr("the bottom card of his library");
 				cardNameContainsStartZone = true;
 			} else
 				fromStr = tr(" from the bottom of his library");
-		} else if (oldX == 0) {
+		} else if (position == 0) {
 			if (cardName.isEmpty()) {
 				cardName = tr("the top card of his library");
 				cardNameContainsStartZone = true;
@@ -172,6 +169,25 @@ void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *s
 			fromStr = tr(" from library");
 	} else if (startName == "sb")
 		fromStr = tr(" from sideboard");
+
+	if (!cardNameContainsStartZone)
+		cardName.clear();
+	return QPair<QString, QString>(cardName, fromStr);
+}
+
+void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX)
+{
+	QString startName = startZone->getName();
+	QString targetName = targetZone->getName();
+	if (((startName == "table") && (targetName == "table")) || ((startName == "hand") && (targetName == "hand")))
+		return;
+	QPair<QString, QString> temp = getFromStr(startZone, cardName, oldX);
+	bool cardNameContainsStartZone = false;
+	if (!temp.first.isEmpty()) {
+		cardNameContainsStartZone = true;
+		cardName = temp.first;
+	}
+	QString fromStr = temp.second;
 	
 	QString finalStr;
 	if (targetName == "table")
@@ -321,6 +337,42 @@ void MessageLogWidget::logStopDumpZone(Player *player, CardZone *zone)
 	append(tr("%1 stops looking at %2.").arg(sanitizeHtml(player->getName())).arg(zoneName));
 }
 
+void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer)
+{
+	QPair<QString, QString> temp = getFromStr(zone, cardName, cardId);
+	bool cardNameContainsStartZone = false;
+	if (!temp.first.isEmpty()) {
+		cardNameContainsStartZone = true;
+		cardName = temp.first;
+	}
+	QString fromStr = temp.second;
+
+	QString cardStr;
+	if (cardNameContainsStartZone)
+		cardStr = cardName;
+	else if (cardName.isEmpty())
+		cardStr = tr("a card");
+	else
+		cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName));
+
+	if (cardId == -1) {
+		if (otherPlayer)
+			append(tr("%1 reveals %2 to %3.").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)).arg(sanitizeHtml(otherPlayer->getName())));
+		else
+			append(tr("%1 reveals %2.").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)));
+	} else if (cardId == -2) {
+		if (otherPlayer)
+			append(tr("%1 randomly reveals %2%3 to %4.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr).arg(sanitizeHtml(otherPlayer->getName())));
+		else
+			append(tr("%1 randomly reveals %2%3.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+	} else {
+		if (otherPlayer)
+			append(tr("%1 reveals %2%3 to %4.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr).arg(sanitizeHtml(otherPlayer->getName())));
+		else
+			append(tr("%1 reveals %2%3.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+	}
+}
+
 void MessageLogWidget::logSetActivePlayer(Player *player)
 {
 	append("---");
@@ -368,6 +420,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
 	connect(player, SIGNAL(logDumpZone(Player *, CardZone *, int)), this, SLOT(logDumpZone(Player *, CardZone *, int)));
 	connect(player, SIGNAL(logStopDumpZone(Player *, CardZone *)), this, SLOT(logStopDumpZone(Player *, CardZone *)));
 	connect(player, SIGNAL(logDrawCards(Player *, int)), this, SLOT(logDrawCards(Player *, int)));
+	connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *)), this, SLOT(logRevealCards(Player *, CardZone *, int, QString, Player *)));
 }
 
 MessageLogWidget::MessageLogWidget(QWidget *parent)
@@ -379,12 +432,12 @@ MessageLogWidget::MessageLogWidget(QWidget *parent)
 	setFont(f);
 }
 
-void MessageLogWidget::enterEvent(QEvent *event)
+void MessageLogWidget::enterEvent(QEvent * /*event*/)
 {
 	setMouseTracking(true);
 }
 
-void MessageLogWidget::leaveEvent(QEvent *event)
+void MessageLogWidget::leaveEvent(QEvent * /*event*/)
 {
 	setMouseTracking(false);
 }

@@ -6,6 +6,7 @@
 
 class ZoneViewWidget;
 class ProtocolResponse;
+class ServerInfo_Card;
 
 class ZoneViewZone : public CardZone, public QGraphicsLayoutItem {
 	Q_OBJECT
@@ -21,7 +22,7 @@ public:
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	void reorganizeCards();
-	void initializeCards();
+	void initializeCards(const QList<ServerInfo_Card *> &cardList = QList<ServerInfo_Card *>());
 	void removeCard(int position);
 	int getNumberCards() const { return numberCards; }
 	void setGeometry(const QRectF &rect);

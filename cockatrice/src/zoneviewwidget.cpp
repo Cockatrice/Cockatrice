@@ -9,7 +9,7 @@
 #include "protocol_items.h"
 #include "settingscache.h"
 
-ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards)
+ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, const QList<ServerInfo_Card *> &cardList)
 	: QGraphicsWidget(0, Qt::Tool | Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint/* | Qt::WindowCloseButtonHint*/), player(_player)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
@@ -21,7 +21,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 
 	QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
 	
-	if (numberCards == -1) {
+	if (numberCards < 0) {
 		sortByNameCheckBox = new QCheckBox;
 		QGraphicsProxyWidget *sortByNameProxy = new QGraphicsProxyWidget;
 		sortByNameProxy->setWidget(sortByNameCheckBox);
@@ -52,7 +52,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 	connect(zone, SIGNAL(optimumRectChanged()), this, SLOT(resizeToZoneContents()));
 	connect(zone, SIGNAL(beingDeleted()), this, SLOT(zoneDeleted()));
 	vbox->addItem(zone);
-	zone->initializeCards();
+	zone->initializeCards(cardList);
 	
 	if (sortByNameCheckBox) {
 		connect(sortByNameCheckBox, SIGNAL(stateChanged(int)), zone, SLOT(setSortByName(int)));
@@ -89,7 +89,8 @@ void ZoneViewWidget::resizeToZoneContents()
 void ZoneViewWidget::closeEvent(QCloseEvent *event)
 {
 	disconnect(zone, SIGNAL(beingDeleted()), this, 0);
-	player->sendGameCommand(new Command_StopDumpZone(-1, player->getId(), zone->getName()));
+	if (zone->getNumberCards() != -2)
+		player->sendGameCommand(new Command_StopDumpZone(-1, player->getId(), zone->getName()));
 	if (shuffleCheckBox)
 		if (shuffleCheckBox->isChecked())
 			player->sendGameCommand(new Command_Shuffle);

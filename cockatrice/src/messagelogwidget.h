@@ -17,7 +17,7 @@ class MessageLogWidget : public QTextEdit {
 private:
 	CardInfoWidget *infoWidget;
 	QString sanitizeHtml(QString dirty) const;
-	QString trZoneName(CardZone *zone, Player *player, bool hisOwn, GrammaticalCase gc) const;
+	QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position) const;
 	QString getCardNameUnderMouse(const QPoint &pos) const;
 signals:
 	void cardNameHovered(QString cardName);
@@ -62,6 +62,7 @@ public slots:
 	void logSetAnnotation(Player *player, QString cardName, QString newAnnotation);
 	void logDumpZone(Player *player, CardZone *zone, int numberCards);
 	void logStopDumpZone(Player *player, CardZone *zone);
+	void logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer);
 	void logSetActivePlayer(Player *player);
 	void logSetActivePhase(int phase);
 public:

@@ -63,6 +63,7 @@ HEADERS += src/counter.h \
  src/localserver.h \
  src/localserverinterface.h \
  src/localclient.h \
+ src/translation.h \
  	../common/color.h \
  	../common/serializable_item.h \
 	../common/decklist.h \

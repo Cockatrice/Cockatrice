@@ -26,9 +26,13 @@ void ZoneViewZone::paint(QPainter */*painter*/, const QStyleOptionGraphicsItem *
 {
 }
 
-void ZoneViewZone::initializeCards()
+void ZoneViewZone::initializeCards(const QList<ServerInfo_Card *> &cardList)
 {
-	if (!origZone->contentsKnown()) {
+	if (!cardList.isEmpty()) {
+		for (int i = 0; i < cardList.size(); ++i)
+			addCard(new CardItem(player, cardList[i]->getName(), cardList[i]->getId(), this), false, i);
+		reorganizeCards();
+	} else if (!origZone->contentsKnown()) {
 		Command_DumpZone *command = new Command_DumpZone(-1, player->getId(), name, numberCards);
 		connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(zoneDumpReceived(ProtocolResponse *)));
 		player->sendGameCommand(command);
@@ -80,6 +84,7 @@ void ZoneViewZone::reorganizeCards()
 		cols = 2;
 	
 	qDebug() << "reorganizeCards: rows=" << rows << "cols=" << cols;
+	qDebug() << "SORT BY NAME:" << sortByName << "SORT BY TYPE:" << sortByType;
 
 	CardList cardsToDisplay(cards);
 	if (sortByName || sortByType)
@@ -119,7 +124,6 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 
 void ZoneViewZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
-	qDebug(QString("handleDropEvent id=%1").arg(cardId).toLatin1());
 	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), cardId, getName(), 0, 0, false));
 }
 

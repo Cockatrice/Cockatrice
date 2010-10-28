@@ -223,6 +223,15 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 		aCardMenu = new QAction(this);
 		playerMenu->addSeparator();
 		playerMenu->addAction(aCardMenu);
+
+		for (int i = 0; i < playerLists.size(); ++i) {
+			QAction *newAction = playerLists[i]->addAction(QString());
+			newAction->setData(-1);
+			connect(newAction, SIGNAL(triggered()), this, SLOT(playerListActionTriggered()));
+			allPlayersActions.append(newAction);
+			playerLists[i]->addSeparator();
+		}
+	
 	} else {
 		countersMenu = 0;
 		sbMenu = 0;
@@ -286,6 +295,12 @@ void Player::playerListActionTriggered()
 	
 	if (menu == mRevealLibrary) {
 		sendGameCommand(new Command_RevealCards(-1, "deck", -1, otherPlayerId));
+	} else if (menu == mRevealTopCard) {
+		sendGameCommand(new Command_RevealCards(-1, "deck", 0, otherPlayerId));
+	} else if (menu == mRevealHand) {
+		sendGameCommand(new Command_RevealCards(-1, "hand", -1, otherPlayerId));
+	} else if (menu == mRevealRandomHandCard) {
+		sendGameCommand(new Command_RevealCards(-1, "hand", -2, otherPlayerId));
 	}
 }
 
@@ -384,6 +399,9 @@ void Player::retranslateUi()
 			counterIterator.next().value()->retranslateUi();
 
 		aCardMenu->setText(tr("C&ard"));
+		
+		for (int i = 0; i < allPlayersActions.size(); ++i)
+			allPlayersActions[i]->setText(tr("&All players"));
 	}
 	
 	QMapIterator<QString, CardZone *> zoneIterator(zones);
@@ -880,6 +898,28 @@ void Player::eventDrawCards(Event_DrawCards *event)
 	emit logDrawCards(this, event->getNumberCards());
 }
 
+void Player::eventRevealCards(Event_RevealCards *event)
+{
+	CardZone *zone = zones.value(event->getZoneName());
+	if (!zone)
+		return;
+	Player *otherPlayer = 0;
+	if (event->getOtherPlayerId() != -1) {
+		otherPlayer = static_cast<TabGame *>(parent())->getPlayers().value(event->getOtherPlayerId());
+		if (!otherPlayer)
+			return;
+	}
+	
+	QList<ServerInfo_Card *> cardList = event->getCardList();
+	if (!cardList.isEmpty())
+		static_cast<GameScene *>(scene())->addRevealedZoneView(this, zone, cardList);
+	
+	QString cardName;
+	if (cardList.size() == 1)
+		cardName = cardList.first()->getName();
+	emit logRevealCards(this, zone, event->getCardId(), cardName, otherPlayer);
+}
+
 void Player::processGameEvent(GameEvent *event, GameEventContext *context)
 {
 	qDebug() << "player event: id=" << event->getItemId();
@@ -902,6 +942,7 @@ void Player::processGameEvent(GameEvent *event, GameEventContext *context)
 		case ItemId_Event_DestroyCard: eventDestroyCard(qobject_cast<Event_DestroyCard *>(event)); break;
 		case ItemId_Event_AttachCard: eventAttachCard(qobject_cast<Event_AttachCard *>(event)); break;
 		case ItemId_Event_DrawCards: eventDrawCards(qobject_cast<Event_DrawCards *>(event)); break;
+		case ItemId_Event_RevealCards: eventRevealCards(qobject_cast<Event_RevealCards *>(event)); break;
 		default: {
 			qDebug() << "unhandled game event";
 		}

@@ -1161,9 +1161,12 @@ ResponseCode Server_ProtocolHandler::cmdRevealCards(Command_RevealCards *cmd, Co
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
 	
-	Server_Player *otherPlayer = game->getPlayer(cmd->getPlayerId());
-	if (!otherPlayer)
-		return RespNameNotFound;
+	Server_Player *otherPlayer = 0;
+	if (cmd->getPlayerId() != -1) {
+		otherPlayer = game->getPlayer(cmd->getPlayerId());
+		if (!otherPlayer)
+			return RespNameNotFound;
+	}
 	Server_CardZone *zone = player->getZones().value(cmd->getZoneName());
 	if (!zone)
 		return RespNameNotFound;
@@ -1171,7 +1174,11 @@ ResponseCode Server_ProtocolHandler::cmdRevealCards(Command_RevealCards *cmd, Co
 	QList<Server_Card *> cardsToReveal;
 	if (cmd->getCardId() == -1)
 		cardsToReveal = zone->cards;
-	else {
+	else if (cmd->getCardId() == -2) {
+		if (zone->cards.isEmpty())
+			return RespContextError;
+		cardsToReveal.append(zone->cards.at(rng->getNumber(0, zone->cards.size() - 1)));
+	} else {
 		Server_Card *card = zone->getCard(cmd->getCardId(), false);
 		if (!card)
 			return RespNameNotFound;
@@ -1198,13 +1205,18 @@ ResponseCode Server_ProtocolHandler::cmdRevealCards(Command_RevealCards *cmd, Co
 			attachCardId = card->getParentCard()->getId();
 		}
 		
-		respCardListPrivate.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), cardCounterList, attachPlayerId, attachZone, attachCardId));
+		if (cmd->getPlayerId() != -1)
+			respCardListPrivate.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), cardCounterList, attachPlayerId, attachZone, attachCardId));
 		respCardListOmniscient.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), cardCounterList, attachPlayerId, attachZone, attachCardId));
 	}
 	
-	cont->enqueueGameEventPublic(new Event_RevealCards(player->getPlayerId(), zone->getName(), cmd->getCardId(), otherPlayer->getPlayerId()), game->getGameId());
-	cont->enqueueGameEventPrivate(new Event_RevealCards(player->getPlayerId(), zone->getName(), cmd->getCardId(), otherPlayer->getPlayerId(), respCardListPrivate), game->getGameId(), otherPlayer->getPlayerId());
-	cont->enqueueGameEventOmniscient(new Event_RevealCards(player->getPlayerId(), zone->getName(), cmd->getCardId(), otherPlayer->getPlayerId(), respCardListOmniscient), game->getGameId());
+	if (cmd->getPlayerId() == -1)
+		cont->enqueueGameEventPublic(new Event_RevealCards(player->getPlayerId(), zone->getName(), cmd->getCardId(), -1, respCardListOmniscient), game->getGameId());
+	else {
+		cont->enqueueGameEventPublic(new Event_RevealCards(player->getPlayerId(), zone->getName(), cmd->getCardId(), otherPlayer->getPlayerId()), game->getGameId());
+		cont->enqueueGameEventPrivate(new Event_RevealCards(player->getPlayerId(), zone->getName(), cmd->getCardId(), otherPlayer->getPlayerId(), respCardListPrivate), game->getGameId(), otherPlayer->getPlayerId());
+		cont->enqueueGameEventOmniscient(new Event_RevealCards(player->getPlayerId(), zone->getName(), cmd->getCardId(), otherPlayer->getPlayerId(), respCardListOmniscient), game->getGameId());
+	}
 	
 	return RespOk;
 }
