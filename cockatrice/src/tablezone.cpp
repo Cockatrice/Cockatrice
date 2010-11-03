@@ -17,9 +17,9 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 	updateBgPixmap();
 
 	if (settingsCache->getEconomicalGrid())
-		height = 2 * boxLineWidth + (int) (14.0 / 3 * CARD_HEIGHT + 3 * paddingY);
+		height = 2 * boxLineWidth + (int) (11.0 / 3 * CARD_HEIGHT + 2 * paddingY);
 	else
-		height = 2 * boxLineWidth + 4 * CARD_HEIGHT + 3 * paddingY;
+		height = 2 * boxLineWidth + 3 * CARD_HEIGHT + 2 * paddingY;
 	width = minWidth + 2 * marginX + 2 * boxLineWidth;
 	currentMinimumWidth = minWidth;
 
@@ -52,7 +52,7 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
 	else
 		painter->fillRect(boundingRect(), QBrush(bgPixmap));
 	painter->setPen(QColor(255, 255, 255, 40));
-	qreal separatorY = 3 * (CARD_HEIGHT + paddingY) + boxLineWidth - paddingY / 2;
+	qreal separatorY = 2 * (CARD_HEIGHT + paddingY) + boxLineWidth - paddingY / 2;
 	if (isInverted())
 		separatorY = height - separatorY;
 	painter->drawLine(QPointF(0, separatorY), QPointF(width, separatorY));
@@ -216,7 +216,7 @@ CardItem *TableZone::getCardFromCoords(const QPointF &point) const
 QPointF TableZone::mapFromGrid(const QPoint &gridPoint) const
 {
 	qreal x, y;
-	if ((gridPoint.y() == 3) && (settingsCache->getEconomicalGrid())) {
+	if ((gridPoint.y() == 2) && (settingsCache->getEconomicalGrid())) {
 		x = marginX + (CARD_WIDTH * gridPoint.x() + CARD_WIDTH * (gridPoint.x() / 3)) / 2;
 		y = boxLineWidth + (CARD_HEIGHT + paddingY) * gridPoint.y() + (gridPoint.x() % 3 * CARD_HEIGHT) / 3;
 	} else {
@@ -251,10 +251,10 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 	
 	int resultY = (int) (y / (CARD_HEIGHT + paddingY));
 
-	if ((resultY == 3) && (settingsCache->getEconomicalGrid()))
+	if ((resultY == 2) && (settingsCache->getEconomicalGrid()))
 		return QPoint(
 			(int) (x * 2 / CARD_WIDTH - floor(x / (2 * CARD_WIDTH))),
-			3
+			2
 		);
 	else {
 		int resultX = -1;

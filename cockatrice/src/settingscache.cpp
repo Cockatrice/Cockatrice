@@ -12,6 +12,7 @@ SettingsCache::SettingsCache()
 	cardDatabasePath = settings->value("paths/carddatabase").toString();
 	
 	handBgPath = settings->value("zonebg/hand").toString();
+	stackBgPath = settings->value("zonebg/stack").toString();
 	tableBgPath = settings->value("zonebg/table").toString();
 	playerBgPath = settings->value("zonebg/playerarea").toString();
 	cardBackPicturePath = settings->value("paths/cardbackpicture").toString();
@@ -60,6 +61,13 @@ void SettingsCache::setHandBgPath(const QString &_handBgPath)
 	handBgPath = _handBgPath;
 	settings->setValue("zonebg/hand", handBgPath);
 	emit handBgPathChanged();
+}
+
+void SettingsCache::setStackBgPath(const QString &_stackBgPath)
+{
+	stackBgPath = _stackBgPath;
+	settings->setValue("zonebg/stack", stackBgPath);
+	emit stackBgPathChanged();
 }
 
 void SettingsCache::setTableBgPath(const QString &_tableBgPath)

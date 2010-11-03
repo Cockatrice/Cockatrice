@@ -14,6 +14,7 @@ class TabGame;
 class Counter;
 class ArrowItem;
 class CardZone;
+class StackZone;
 class TableZone;
 class HandZone;
 class PlayerTarget;
@@ -136,6 +137,7 @@ private:
 	QList<CardItem *> cardsToDelete;
 	
 	QMap<QString, CardZone *> zones;
+	StackZone *stack;
 	TableZone *table;
 	HandZone *hand;
 	PlayerTarget *playerTarget;
@@ -178,6 +180,7 @@ public:
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	
+	void playCard(CardItem *c, bool faceDown, bool tapped);
 	void addCard(CardItem *c);
 	void deleteCard(CardItem *c);
 	void addZone(CardZone *z);

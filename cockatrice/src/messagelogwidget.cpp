@@ -169,6 +169,8 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
 			fromStr = tr(" from library");
 	} else if (startName == "sb")
 		fromStr = tr(" from sideboard");
+	else if (startName == "stack")
+		fromStr = tr(" from the stack");
 
 	if (!cardNameContainsStartZone)
 		cardName.clear();
@@ -209,6 +211,8 @@ void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *s
 			finalStr = tr("%1 puts %2%3 into his library at position %4.");
 	} else if (targetName == "sb")
 		finalStr = tr("%1 moves %2%3 to sideboard.");
+	else if (targetName == "stack")
+		finalStr = tr("%1 plays %2%3.");
 	
 	QString cardStr;
 	if (cardNameContainsStartZone)
