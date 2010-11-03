@@ -50,6 +50,8 @@ class AppearanceSettingsPage : public AbstractSettingsPage {
 private slots:
 	void handBgClearButtonClicked();
 	void handBgButtonClicked();
+	void stackBgClearButtonClicked();
+	void stackBgButtonClicked();
 	void tableBgClearButtonClicked();
 	void tableBgButtonClicked();
 	void playerAreaBgClearButtonClicked();
@@ -58,12 +60,13 @@ private slots:
 	void cardBackPicturePathButtonClicked();
 signals:
 	void handBgChanged(const QString &path);
+	void stackBgChanged(const QString &path);
 	void tableBgChanged(const QString &path);
 	void playerAreaBgChanged(const QString &path);
 	void cardBackPicturePathChanged(const QString &path);
 private:
-	QLabel *handBgLabel, *tableBgLabel, *playerAreaBgLabel, *cardBackPicturePathLabel;
-	QLineEdit *handBgEdit, *tableBgEdit, *playerAreaBgEdit, *cardBackPicturePathEdit;
+	QLabel *handBgLabel, *stackBgLabel, *tableBgLabel, *playerAreaBgLabel, *cardBackPicturePathLabel;
+	QLineEdit *handBgEdit, *stackBgEdit, *tableBgEdit, *playerAreaBgEdit, *cardBackPicturePathEdit;
 	QCheckBox *horizontalHandCheckBox, *economicalGridCheckBox, *invertVerticalCoordinateCheckBox, *zoneViewSortByNameCheckBox, *zoneViewSortByTypeCheckBox;
 	QGroupBox *zoneBgGroupBox, *handGroupBox, *tableGroupBox, *zoneViewGroupBox;
 public:

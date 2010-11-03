@@ -161,6 +161,14 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	QPushButton *handBgButton = new QPushButton("...");
 	connect(handBgButton, SIGNAL(clicked()), this, SLOT(handBgButtonClicked()));
 	
+	stackBgLabel = new QLabel;
+	stackBgEdit = new QLineEdit(settingsCache->getStackBgPath());
+	stackBgEdit->setReadOnly(true);
+	QPushButton *stackBgClearButton = new QPushButton(deleteIcon, QString());
+	connect(stackBgClearButton, SIGNAL(clicked()), this, SLOT(stackBgClearButtonClicked()));
+	QPushButton *stackBgButton = new QPushButton("...");
+	connect(stackBgButton, SIGNAL(clicked()), this, SLOT(stackBgButtonClicked()));
+
 	tableBgLabel = new QLabel;
 	tableBgEdit = new QLineEdit(settingsCache->getTableBgPath());
 	tableBgEdit->setReadOnly(true);
@@ -190,18 +198,22 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	zoneBgGrid->addWidget(handBgEdit, 0, 1);
 	zoneBgGrid->addWidget(handBgClearButton, 0, 2);
 	zoneBgGrid->addWidget(handBgButton, 0, 3);
-	zoneBgGrid->addWidget(tableBgLabel, 1, 0);
-	zoneBgGrid->addWidget(tableBgEdit, 1, 1);
-	zoneBgGrid->addWidget(tableBgClearButton, 1, 2);
-	zoneBgGrid->addWidget(tableBgButton, 1, 3);
-	zoneBgGrid->addWidget(playerAreaBgLabel, 2, 0);
-	zoneBgGrid->addWidget(playerAreaBgEdit, 2, 1);
-	zoneBgGrid->addWidget(playerAreaBgClearButton, 2, 2);
-	zoneBgGrid->addWidget(playerAreaBgButton, 2, 3);
-	zoneBgGrid->addWidget(cardBackPicturePathLabel, 3, 0);
-	zoneBgGrid->addWidget(cardBackPicturePathEdit, 3, 1);
-	zoneBgGrid->addWidget(cardBackPicturePathClearButton, 3, 2);
-	zoneBgGrid->addWidget(cardBackPicturePathButton, 3, 3);
+	zoneBgGrid->addWidget(stackBgLabel, 1, 0);
+	zoneBgGrid->addWidget(stackBgEdit, 1, 1);
+	zoneBgGrid->addWidget(stackBgClearButton, 1, 2);
+	zoneBgGrid->addWidget(stackBgButton, 1, 3);
+	zoneBgGrid->addWidget(tableBgLabel, 2, 0);
+	zoneBgGrid->addWidget(tableBgEdit, 2, 1);
+	zoneBgGrid->addWidget(tableBgClearButton, 2, 2);
+	zoneBgGrid->addWidget(tableBgButton, 2, 3);
+	zoneBgGrid->addWidget(playerAreaBgLabel, 3, 0);
+	zoneBgGrid->addWidget(playerAreaBgEdit, 3, 1);
+	zoneBgGrid->addWidget(playerAreaBgClearButton, 3, 2);
+	zoneBgGrid->addWidget(playerAreaBgButton, 3, 3);
+	zoneBgGrid->addWidget(cardBackPicturePathLabel, 4, 0);
+	zoneBgGrid->addWidget(cardBackPicturePathEdit, 4, 1);
+	zoneBgGrid->addWidget(cardBackPicturePathClearButton, 4, 2);
+	zoneBgGrid->addWidget(cardBackPicturePathButton, 4, 3);
 
 	zoneBgGroupBox = new QGroupBox;
 	zoneBgGroupBox->setLayout(zoneBgGrid);
@@ -258,6 +270,7 @@ void AppearanceSettingsPage::retranslateUi()
 {
 	zoneBgGroupBox->setTitle(tr("Zone background pictures"));
 	handBgLabel->setText(tr("Path to hand background:"));
+	stackBgLabel->setText(tr("Path to stack background:"));
 	tableBgLabel->setText(tr("Path to table background:"));
 	playerAreaBgLabel->setText(tr("Path to player info background:"));
 	cardBackPicturePathLabel->setText(tr("Path to picture of card back:"));
@@ -288,6 +301,22 @@ void AppearanceSettingsPage::handBgButtonClicked()
 	
 	handBgEdit->setText(path);
 	settingsCache->setHandBgPath(path);
+}
+
+void AppearanceSettingsPage::stackBgClearButtonClicked()
+{
+	stackBgEdit->setText(QString());
+	settingsCache->setStackBgPath(QString());
+}
+
+void AppearanceSettingsPage::stackBgButtonClicked()
+{
+	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
+	if (path.isEmpty())
+		return;
+	
+	stackBgEdit->setText(path);
+	settingsCache->setStackBgPath(path);
 }
 
 void AppearanceSettingsPage::tableBgClearButtonClicked()
