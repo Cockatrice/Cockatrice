@@ -188,11 +188,6 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 	event->accept();
 }
 
-void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-	emit deleteCardInfoPopup();
-}
-
 void AbstractCardItem::processHoverEvent()
 {
 	emit hovered(this);

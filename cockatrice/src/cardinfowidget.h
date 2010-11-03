@@ -9,6 +9,7 @@ class QPushButton;
 class AbstractCardItem;
 class CardInfo;
 class QResizeEvent;
+class QMouseEvent;
 
 class CardInfoWidget : public QFrame {
 	Q_OBJECT
@@ -40,8 +41,11 @@ public slots:
 private slots:
 	void updatePixmap();
 	void minimizeClicked();
+signals:
+	void mouseReleased();
 protected:
 	void resizeEvent(QResizeEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
 };
 
 #endif

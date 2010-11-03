@@ -64,6 +64,7 @@ void Server_Player::setupZones()
 	addZone(sbZone);
 	addZone(new Server_CardZone(this, "table", true, PublicZone));
 	addZone(new Server_CardZone(this, "hand", false, PrivateZone));
+	addZone(new Server_CardZone(this, "stack", false, PublicZone));
 	addZone(new Server_CardZone(this, "grave", false, PublicZone));
 	addZone(new Server_CardZone(this, "rfg", false, PublicZone));
 

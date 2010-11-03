@@ -12,6 +12,7 @@ signals:
 	void picsPathChanged();
 	void cardDatabasePathChanged();
 	void handBgPathChanged();
+	void stackBgPathChanged();
 	void tableBgPathChanged();
 	void playerBgPathChanged();
 	void cardBackPicturePathChanged();
@@ -24,7 +25,7 @@ private:
 	
 	QString lang;
 	QString deckPath, picsPath, cardDatabasePath;
-	QString handBgPath, tableBgPath, playerBgPath, cardBackPicturePath;
+	QString handBgPath, stackBgPath, tableBgPath, playerBgPath, cardBackPicturePath;
 	bool picDownload;
 	bool doubleClickToPlay;
 	bool cardInfoMinimized;
@@ -40,6 +41,7 @@ public:
 	QString getPicsPath() const { return picsPath; }
 	QString getCardDatabasePath() const { return cardDatabasePath; }
 	QString getHandBgPath() const { return handBgPath; }
+	QString getStackBgPath() const { return stackBgPath; }
 	QString getTableBgPath() const { return tableBgPath; }
 	QString getPlayerBgPath() const { return playerBgPath; }
 	QString getCardBackPicturePath() const { return cardBackPicturePath; }
@@ -58,6 +60,7 @@ public slots:
 	void setPicsPath(const QString &_picsPath);
 	void setCardDatabasePath(const QString &_cardDatabasePath);
 	void setHandBgPath(const QString &_handBgPath);
+	void setStackBgPath(const QString &_stackBgPath);
 	void setTableBgPath(const QString &_tableBgPath);
 	void setPlayerBgPath(const QString &_playerBgPath);
 	void setCardBackPicturePath(const QString &_cardBackPicturePath);

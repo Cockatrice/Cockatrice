@@ -693,6 +693,7 @@ Player *TabGame::getActiveLocalPlayer() const
 void TabGame::showCardInfoPopup(const QPoint &pos, const QString &cardName)
 {
 	infoPopup = new CardInfoWidget(CardInfoWidget::ModePopUp, 0, Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
+	connect(infoPopup, SIGNAL(mouseReleased()), this, SLOT(deleteCardInfoPopup()));
 	infoPopup->setCard(cardName);
 		QRect screenRect = qApp->desktop()->screenGeometry(this);
 		infoPopup->move(
@@ -700,6 +701,7 @@ void TabGame::showCardInfoPopup(const QPoint &pos, const QString &cardName)
 			qMax(screenRect.top(), qMin(pos.y() - infoPopup->height() / 2, screenRect.top() + screenRect.height() - infoPopup->height()))
 		);
 	infoPopup->show();
+	infoPopup->grabMouse();
 }
 
 void TabGame::deleteCardInfoPopup()

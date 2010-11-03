@@ -6,6 +6,7 @@
 #include "zoneviewzone.h"
 #include "zoneviewwidget.h"
 #include "pilezone.h"
+#include "stackzone.h"
 #include "tablezone.h"
 #include "handzone.h"
 #include "handcounter.h"
@@ -15,6 +16,7 @@
 #include "gamescene.h"
 #include "settingscache.h"
 #include "dlg_create_token.h"
+#include "carddatabase.h"
 #include <QSettings>
 #include <QPainter>
 #include <QMenu>
@@ -53,6 +55,8 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 	
 	table = new TableZone(this, this);
 	connect(table, SIGNAL(sizeChanged()), this, SLOT(updateBoundingRect()));
+	
+	stack = new StackZone(this, (int) table->boundingRect().height(), this);
 	
 	hand = new HandZone(this, _local || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()), (int) table->boundingRect().height(), this);
 	connect(hand, SIGNAL(cardCountChanged()), handCounter, SLOT(updateNumber()));
@@ -295,16 +299,29 @@ void Player::rearrangeZones()
 	
 	if (settingsCache->getHorizontalHand()) {
 		if (mirrored) {
-			hand->setPos(counterAreaWidth + CARD_WIDTH + 5, base.y());
-			table->setPos(base.x(), base.y() + hand->boundingRect().height());
-		} else {
+			hand->setPos(base);
+			base += QPointF(0, hand->boundingRect().height());
+
+			stack->setPos(base);
+			base += QPointF(stack->boundingRect().width(), 0);
+	
 			table->setPos(base);
-			hand->setPos(counterAreaWidth + CARD_WIDTH + 5, base.y() + table->boundingRect().height());
+		} else {
+			stack->setPos(base);
+	
+			table->setPos(base.x() + stack->boundingRect().width(), 0);
+			base += QPointF(0, table->boundingRect().height());
+			
+			hand->setPos(base);
 		}
-		hand->setWidth(table->getWidth());
+		hand->setWidth(table->getWidth() + stack->boundingRect().width());
 	} else {
 		hand->setPos(base);
 		base += QPointF(hand->boundingRect().width(), 0);
+		
+		stack->setPos(base);
+		base += QPointF(stack->boundingRect().width(), 0);
+	
 		table->setPos(base);
 	}
 	hand->updateOrientation();
@@ -326,10 +343,11 @@ void Player::updateBgPixmap()
 void Player::updateBoundingRect()
 {
 	prepareGeometryChange();
+	qreal width = CARD_WIDTH + 5 + counterAreaWidth + stack->boundingRect().width();
 	if (settingsCache->getHorizontalHand())
-		bRect = QRectF(0, 0, CARD_WIDTH + 5 + counterAreaWidth + table->boundingRect().width(), table->boundingRect().height() + hand->boundingRect().height());
+		bRect = QRectF(0, 0, width + table->boundingRect().width(), table->boundingRect().height() + hand->boundingRect().height());
 	else
-		bRect = QRectF(0, 0, CARD_WIDTH + 5 + counterAreaWidth + hand->boundingRect().width() + table->boundingRect().width(), table->boundingRect().height());
+		bRect = QRectF(0, 0, width + hand->boundingRect().width() + table->boundingRect().width(), table->boundingRect().height());
 	emit sizeChanged();
 }
 
@@ -990,6 +1008,17 @@ void Player::processCardAttachment(ServerInfo_Player *info)
 				startCard->setAttachedTo(targetCard);
 			}
 		}
+	}
+}
+
+void Player::playCard(CardItem *c, bool faceDown, bool tapped)
+{
+	CardInfo *ci = c->getInfo();
+	if (ci->getTableRow() == 3)
+		stack->handleDropEvent(c->getId(), c->getZone(), QPoint(), false);
+	else {
+		QPoint gridPoint = QPoint(-1, 2 - ci->getTableRow());
+		table->handleDropEventByGrid(c->getId(), c->getZone(), gridPoint, faceDown, tapped);
 	}
 }
 

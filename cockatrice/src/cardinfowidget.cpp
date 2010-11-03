@@ -3,6 +3,7 @@
 #include <QTextEdit>
 #include <QPushButton>
 #include <QStyle>
+#include <QMouseEvent>
 #include "cardinfowidget.h"
 #include "carditem.h"
 #include "carddatabase.h"
@@ -156,4 +157,10 @@ void CardInfoWidget::resizeEvent(QResizeEvent * /*event*/)
 		pixmapWidth = qMin(width() * 0.95, (height() - 200) / aspectRatio);
 		updatePixmap();
 	}
+}
+
+void CardInfoWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+	if ((event->button() == Qt::MidButton) && (mode == ModePopUp))
+		emit mouseReleased();
 }
