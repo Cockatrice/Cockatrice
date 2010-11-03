@@ -1404,7 +1404,7 @@ QString Player::getName() const
 
 qreal Player::getMinimumWidth() const
 {
-	qreal result = table->getMinimumWidth() + CARD_WIDTH + 5 + counterAreaWidth;
+	qreal result = table->getMinimumWidth() + CARD_WIDTH + 5 + counterAreaWidth + stack->boundingRect().width();
 	if (!settingsCache->getHorizontalHand())
 		result += hand->boundingRect().width();
 	return result;
@@ -1423,10 +1423,10 @@ void Player::processSceneSizeChange(const QSizeF &newSize)
 	// This will need to be changed if player areas are displayed side by side (e.g. 2x2 for a 4-player game)
 	qreal fullPlayerWidth = newSize.width();
 	
-	qreal tableWidth = fullPlayerWidth - CARD_WIDTH - 5 - counterAreaWidth;
+	qreal tableWidth = fullPlayerWidth - CARD_WIDTH - 5 - counterAreaWidth - stack->boundingRect().width();
 	if (!settingsCache->getHorizontalHand())
 		tableWidth -= hand->boundingRect().width();
 	
 	table->setWidth(tableWidth);
-	hand->setWidth(tableWidth);
+	hand->setWidth(tableWidth + stack->boundingRect().width());
 }
