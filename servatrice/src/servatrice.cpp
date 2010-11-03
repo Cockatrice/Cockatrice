@@ -179,4 +179,4 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 		return new ServerInfo_User(name, ServerInfo_User::IsUser);
 }
 
-const QString Servatrice::versionString = "Servatrice 0.20101009";
+const QString Servatrice::versionString = "Servatrice 0.20101103";

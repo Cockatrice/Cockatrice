@@ -53,7 +53,7 @@ private:
 	static void initializeHashAuto();
 	bool receiverMayDelete;
 public:
-	static const int protocolVersion = 9;
+	static const int protocolVersion = 10;
 	static void initializeHash();
 	virtual int getItemId() const = 0;
 	bool getReceiverMayDelete() const { return receiverMayDelete; }
