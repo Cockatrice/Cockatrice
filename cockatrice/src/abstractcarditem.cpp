@@ -188,6 +188,12 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 	event->accept();
 }
 
+void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+	// This function ensures the parent function doesn't mess around with our selection.
+	event->accept();
+}
+
 void AbstractCardItem::processHoverEvent()
 {
 	emit hovered(this);

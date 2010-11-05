@@ -48,6 +48,7 @@ protected:
 	QSizeF getTranslatedSize(QPainter *painter) const;
 	void transformPainter(QPainter *painter, const QSizeF &translatedSize);
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
+	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 	void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
 	QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
 };
