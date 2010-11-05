@@ -44,7 +44,7 @@ QRectF StackZone::boundingRect() const
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
 	if (bgPixmap.isNull())
-		painter->fillRect(boundingRect(), Qt::darkBlue);
+		painter->fillRect(boundingRect(), QColor(113, 43, 43));
 	else
 		painter->fillRect(boundingRect(), QBrush(bgPixmap));
 }
