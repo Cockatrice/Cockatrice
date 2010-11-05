@@ -17,7 +17,7 @@ PlayerTarget::PlayerTarget(Player *_owner)
 
 QRectF PlayerTarget::boundingRect() const
 {
-	return QRectF(0, 0, 64, 64);
+	return QRectF(0, 0, 100, 64);
 }
 
 void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
@@ -41,7 +41,10 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
 		QPixmapCache::insert(cacheKey, cachedPixmap);
 	}
 	painter->resetTransform();
+	
+	painter->translate((translatedSize.width() - cachedPixmap.width()) / 2.0, 0);
 	painter->drawPixmap(cachedPixmap.rect(), cachedPixmap, cachedPixmap.rect());
+	painter->resetTransform();
 	
 	QString name = info->getName();
 	if (name.size() > 13)
