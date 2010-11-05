@@ -11,7 +11,7 @@ private:
 	static const int boxLineWidth = 10;
 	static const int paddingY = 20;
 	static const int marginX = 20;
-	static const int minWidth = 20 * CARD_WIDTH / 2;
+	static const int minWidth = 15 * CARD_WIDTH / 2;
 
 	QMap<int, int> gridPointWidth;
 	int width, height;
