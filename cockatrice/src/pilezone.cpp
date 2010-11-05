@@ -13,6 +13,8 @@ PileZone::PileZone(Player *_p, const QString &_name, bool _isShufflable, bool _c
 	setCacheMode(DeviceCoordinateCache); // Do not move this line to the parent constructor!
 	setAcceptsHoverEvents(true);
 	setCursor(Qt::OpenHandCursor);
+	
+	setTransform(QTransform().translate((float) CARD_WIDTH / 2, (float) CARD_HEIGHT / 2).rotate(90).translate((float) -CARD_WIDTH / 2, (float) -CARD_HEIGHT / 2));
 }
 
 QRectF PileZone::boundingRect() const
@@ -22,14 +24,15 @@ QRectF PileZone::boundingRect() const
 
 void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-	if (!cards.isEmpty()) {
-		painter->save();
-		cards.at(0)->paint(painter, option, widget);
-		painter->restore();
-	}
+	if (!cards.isEmpty())
+		cards.at(0)->paintPicture(painter, 90);
 
-	paintNumberEllipse(cards.size(), 32, Qt::white, -1, -1, painter);
 	painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
+	
+	painter->translate((float) CARD_WIDTH / 2, (float) CARD_HEIGHT / 2);
+	painter->rotate(-90);
+	painter->translate((float) -CARD_WIDTH / 2, (float) -CARD_HEIGHT / 2);
+	paintNumberEllipse(cards.size(), 28, Qt::white, -1, -1, painter);
 }
 
 void PileZone::addCardImpl(CardItem *card, int x, int /*y*/)

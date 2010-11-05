@@ -32,14 +32,13 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 	updateBgPixmap();
 	
 	playerTarget = new PlayerTarget(this);
-	playerTarget->setPos(QPointF(counterAreaWidth + (CARD_WIDTH + 5 - playerTarget->boundingRect().width()) / 2.0, 5));
-
-	QPointF base = QPointF(counterAreaWidth, 5 + playerTarget->boundingRect().height() + 10);
+	playerTarget->setPos(QPointF(counterAreaWidth + (CARD_HEIGHT + 5 - playerTarget->boundingRect().width()) / 2.0, 5));
 
 	PileZone *deck = new PileZone(this, "deck", true, false, this);
+	QPointF base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 5) / 2.0, 5 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
 	deck->setPos(base);
 
-	qreal h = deck->boundingRect().height() + 10;
+	qreal h = deck->boundingRect().width() + 5;
 
 	PileZone *grave = new PileZone(this, "grave", false, true, this);
 	grave->setPos(base + QPointF(0, h));
@@ -51,7 +50,7 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 	sb->setVisible(false);
 
 	HandCounter *handCounter = new HandCounter(this);
-	handCounter->setPos(base + QPointF(0, 3 * h));
+	handCounter->setPos(base + QPointF(0, 3 * h + 7));
 	
 	table = new TableZone(this, this);
 	connect(table, SIGNAL(sizeChanged()), this, SLOT(updateBoundingRect()));
@@ -310,7 +309,7 @@ void Player::playerListActionTriggered()
 
 void Player::rearrangeZones()
 {
-	QPointF base = QPointF(CARD_WIDTH + counterAreaWidth + 5, 0);
+	QPointF base = QPointF(CARD_HEIGHT + counterAreaWidth + 5, 0);
 	
 	if (settingsCache->getHorizontalHand()) {
 		if (mirrored) {
@@ -358,7 +357,7 @@ void Player::updateBgPixmap()
 void Player::updateBoundingRect()
 {
 	prepareGeometryChange();
-	qreal width = CARD_WIDTH + 5 + counterAreaWidth + stack->boundingRect().width();
+	qreal width = CARD_HEIGHT + 5 + counterAreaWidth + stack->boundingRect().width();
 	if (settingsCache->getHorizontalHand())
 		bRect = QRectF(0, 0, width + table->boundingRect().width(), table->boundingRect().height() + hand->boundingRect().height());
 	else
@@ -981,7 +980,7 @@ QRectF Player::boundingRect() const
 
 void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	int totalWidth = CARD_WIDTH + counterAreaWidth + 5;
+	int totalWidth = CARD_HEIGHT + counterAreaWidth + 5;
 	if (bgPixmap.isNull())
 		painter->fillRect(QRectF(0, 0, totalWidth, boundingRect().height()), QColor(200, 200, 200));
 	else
@@ -1404,7 +1403,7 @@ QString Player::getName() const
 
 qreal Player::getMinimumWidth() const
 {
-	qreal result = table->getMinimumWidth() + CARD_WIDTH + 5 + counterAreaWidth + stack->boundingRect().width();
+	qreal result = table->getMinimumWidth() + CARD_HEIGHT + 5 + counterAreaWidth + stack->boundingRect().width();
 	if (!settingsCache->getHorizontalHand())
 		result += hand->boundingRect().width();
 	return result;
@@ -1423,7 +1422,7 @@ void Player::processSceneSizeChange(const QSizeF &newSize)
 	// This will need to be changed if player areas are displayed side by side (e.g. 2x2 for a 4-player game)
 	qreal fullPlayerWidth = newSize.width();
 	
-	qreal tableWidth = fullPlayerWidth - CARD_WIDTH - 5 - counterAreaWidth - stack->boundingRect().width();
+	qreal tableWidth = fullPlayerWidth - CARD_HEIGHT - 5 - counterAreaWidth - stack->boundingRect().width();
 	if (!settingsCache->getHorizontalHand())
 		tableWidth -= hand->boundingRect().width();
 	

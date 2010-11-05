@@ -3,6 +3,7 @@
 #include "zoneviewwidget.h"
 #include "zoneviewzone.h"
 #include <QAction>
+#include <QDebug>
 
 GameScene::GameScene(QObject *parent)
 	: QGraphicsScene(parent)
@@ -131,10 +132,10 @@ void GameScene::processViewSizeChange(const QSize &newSize)
 	qreal minRatio = minWidth / sceneRect().height();
 	if (minRatio > newRatio) {
 		// Aspect ratio is dominated by table width.
-		setSceneRect(sceneRect().x(), sceneRect().y(), minWidth, sceneRect().height());
+		setSceneRect(0, 0, minWidth, sceneRect().height());
 	} else {
 		// Aspect ratio is dominated by window dimensions.
-		setSceneRect(sceneRect().x(), sceneRect().y(), newRatio * sceneRect().height(), sceneRect().height());
+		setSceneRect(0, 0, newRatio * sceneRect().height(), sceneRect().height());
 	}
 	
 	for (int i = 0; i < players.size(); ++i)

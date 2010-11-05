@@ -174,7 +174,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		QSizeF translatedSize = getTranslatedSize(painter);
 
 		qreal scaleFactor = translatedSize.width() / boundingRect().width();
-		transformPainter(painter, translatedSize);
+		transformPainter(painter, translatedSize, tapAngle);
 		painter->setBackground(Qt::black);
 		painter->setBackgroundMode(Qt::OpaqueMode);
 		painter->setPen(Qt::white);
