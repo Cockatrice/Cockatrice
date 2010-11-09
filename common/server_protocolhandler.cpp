@@ -764,6 +764,9 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 		if (!targetzone->hasCoords())
 			return RespContextError;
 		targetCard = targetzone->getCard(cmd->getTargetCardId(), false);
+		if (targetCard)
+			if (targetCard->getParentCard())
+				return RespContextError;
 	}
 	if (!startzone->hasCoords())
 		return RespContextError;
