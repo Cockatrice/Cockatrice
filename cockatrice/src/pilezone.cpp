@@ -22,7 +22,7 @@ QRectF PileZone::boundingRect() const
 	return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
 }
 
-void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
 	if (!cards.isEmpty())
 		cards.at(0)->paintPicture(painter, 90);

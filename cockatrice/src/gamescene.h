@@ -33,6 +33,8 @@ public slots:
 	void closeMostRecentZoneView();
 private slots:
 	void rearrange();
+protected:
+	bool event(QEvent *event);
 };
 
 #endif

@@ -75,7 +75,7 @@ void HandZone::reorganizeCards()
 					c->setPos(xPadding + ((qreal) i) * (totalWidth - cardWidth) / (cardCount - 1), 5);
 				else
 					c->setPos(xPadding + ((qreal) i) * cardWidth + (totalWidth - cardCount * cardWidth) / 2, 5);
-				c->setZValue(i);
+				c->setRealZValue(i);
 			}
 		} else {
 			qreal totalWidth = boundingRect().width();
@@ -95,7 +95,7 @@ void HandZone::reorganizeCards()
 					c->setPos(x, ((qreal) i) * (totalHeight - cardHeight) / (cardCount - 1));
 				else
 					c->setPos(x, ((qreal) i) * cardHeight + (totalHeight - cardCount * cardHeight) / 2);
-				c->setZValue(i);
+				c->setRealZValue(i);
 			}
 		}
 	}

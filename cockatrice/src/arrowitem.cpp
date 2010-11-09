@@ -153,12 +153,14 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	QPointF endPos = event->scenePos();
 	
 	QList<QGraphicsItem *> colliding = scene()->items(endPos);
-        ArrowTarget *cursorItem = 0;
-        for (int i = colliding.size() - 1; i >= 0; i--)
-                if (qgraphicsitem_cast<PlayerTarget *>(colliding.at(i)) || qgraphicsitem_cast<CardItem *>(colliding.at(i))) {
-			cursorItem = static_cast<ArrowTarget *>(colliding.at(i));
-                        break;
-		}
+	ArrowTarget *cursorItem = 0;
+	int cursorItemZ = -1;
+	for (int i = colliding.size() - 1; i >= 0; i--)
+		if (qgraphicsitem_cast<PlayerTarget *>(colliding.at(i)) || qgraphicsitem_cast<CardItem *>(colliding.at(i)))
+			if (colliding.at(i)->zValue() > cursorItemZ) {
+				cursorItem = static_cast<ArrowTarget *>(colliding.at(i));
+				cursorItemZ = cursorItem->zValue();
+			}
 	if ((cursorItem != targetItem) && targetItem) {
 		targetItem->setBeingPointedAt(false);
 		targetItem->removeArrowTo(this);

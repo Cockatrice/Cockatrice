@@ -128,7 +128,7 @@ void TableZone::reorganizeCards()
 			actualY += 5;
 		
 		cards[i]->setPos(actualX, actualY);
-		cards[i]->setZValue((actualY + CARD_HEIGHT) * 10000000 + (actualX + 1) * 10000);
+		cards[i]->setRealZValue((actualY + CARD_HEIGHT) * 100000 + (actualX + 1) * 100);
 		
 		QListIterator<CardItem *> attachedCardIterator(cards[i]->getAttachedCards());
 		int j = 0;
@@ -138,7 +138,7 @@ void TableZone::reorganizeCards()
 			qreal childX = actualX - j * CARD_WIDTH / 3.0;
 			qreal childY = y - 5;
 			attachedCard->setPos(childX, childY);
-			attachedCard->setZValue((childY + CARD_HEIGHT) * 10000000 + (childX + 1) * 10000);
+			attachedCard->setRealZValue((childY + CARD_HEIGHT) * 100000 + (childX + 1) * 100);
 
 			arrowsToUpdate.append(attachedCard->getArrowsFrom());
 			arrowsToUpdate.append(attachedCard->getArrowsTo());

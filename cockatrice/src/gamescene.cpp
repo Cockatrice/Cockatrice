@@ -3,7 +3,7 @@
 #include "zoneviewwidget.h"
 #include "zoneviewzone.h"
 #include <QAction>
-#include <QDebug>
+#include <QGraphicsSceneMouseEvent>
 
 GameScene::GameScene(QObject *parent)
 	: QGraphicsScene(parent)
@@ -68,8 +68,6 @@ void GameScene::rearrange()
 	
 	setSceneRect(sceneRect().x(), sceneRect().y(), sceneWidth, sceneHeight);
 	processViewSizeChange(viewSize);
-
-	qDebug(QString("rearrange(): w=%1 h=%2").arg(sceneWidth).arg(sceneHeight).toLatin1());
 }
 
 void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numberCards)
@@ -140,4 +138,36 @@ void GameScene::processViewSizeChange(const QSize &newSize)
 	
 	for (int i = 0; i < players.size(); ++i)
 		players[i]->processSceneSizeChange(sceneRect().size());
+}
+
+bool GameScene::event(QEvent *event)
+{
+	if (event->type() == QEvent::GraphicsSceneMouseMove) {
+		QGraphicsSceneMouseEvent *mouseEvent = static_cast<QGraphicsSceneMouseEvent *>(event);
+		
+		QList<QGraphicsItem *> oldItemList = items(mouseEvent->lastScenePos());
+		for (int i = 0; i < oldItemList.size(); ++i) {
+			CardItem *card = qgraphicsitem_cast<CardItem *>(oldItemList[i]);
+			if (card)
+				card->setZValue(card->getRealZValue());
+		}
+		
+		QList<QGraphicsItem *> itemList = items(mouseEvent->scenePos());
+		qreal maxZ = 0;
+		CardItem *maxZCard = 0;
+		QList<CardItem *> cardList;
+		for (int i = 0; i < itemList.size(); ++i) {
+			CardItem *card = qgraphicsitem_cast<CardItem *>(itemList[i]);
+			if (!card)
+				continue;
+			cardList.append(card);
+			if (card->getRealZValue() > maxZ) {
+				maxZ = card->getRealZValue();
+				maxZCard = card;
+			}
+		}
+		for (int i = 0; i < cardList.size(); ++i)
+			cardList[i]->setZValue(cardList[i] == maxZCard ? 2000000004 : cardList[i]->getRealZValue());
+	}
+	return QGraphicsScene::event(event);
 }

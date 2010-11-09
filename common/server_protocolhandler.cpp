@@ -791,6 +791,11 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 	}
 
 	if (targetCard) {
+		// Unattach all cards attached to the card being attached.
+		const QList<Server_Card *> &attachedList = card->getAttachedCards();
+		for (int i = 0; i < attachedList.size(); ++i)
+			unattachCard(game, player, cont, attachedList[i]);
+		
 		card->setParentCard(targetCard);
 		card->setCoords(-1, card->getY());
 		cont->enqueueGameEventPrivate(new Event_AttachCard(player->getPlayerId(), startzone->getName(), card->getId(), targetPlayer->getPlayerId(), targetzone->getName(), targetCard->getId()), game->getGameId());

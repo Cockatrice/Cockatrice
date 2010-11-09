@@ -77,7 +77,7 @@ void StackZone::reorganizeCards()
 				c->setPos(x, ((qreal) i) * (totalHeight - cardHeight) / (cardCount - 1));
 			else
 				c->setPos(x, ((qreal) i) * cardHeight + (totalHeight - cardCount * cardHeight) / 2);
-			c->setZValue(i);
+			c->setRealZValue(i);
 		}
 	}
 	update();
