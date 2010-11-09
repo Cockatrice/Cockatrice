@@ -379,9 +379,9 @@ void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId
 
 void MessageLogWidget::logSetActivePlayer(Player *player)
 {
-	append("---");
-	append("<font color=\"green\">" + tr("It is now %1's turn.").arg(player->getName()) + "</font>");
-	append("---");
+	append(QString());
+	append("<font color=\"green\"><b>" + tr("It is now %1's turn.").arg(player->getName()) + "</b></font>");
+	append(QString());
 }
 
 void MessageLogWidget::logSetActivePhase(int phase)
@@ -400,7 +400,7 @@ void MessageLogWidget::logSetActivePhase(int phase)
 		case 9: phaseName = tr("second main phase"); break;
 		case 10: phaseName = tr("ending phase"); break;
 	}
-	append("<font color=\"green\">" + tr("It is now the %1.").arg(phaseName) + "</font>");
+	append("<font color=\"green\"><b>" + tr("It is now the %1.").arg(phaseName) + "</b></font>");
 }
 
 void MessageLogWidget::connectToPlayer(Player *player)
