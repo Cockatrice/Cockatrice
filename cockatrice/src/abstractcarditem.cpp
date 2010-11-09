@@ -13,7 +13,7 @@
 #include <QTimer>
 
 AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, QGraphicsItem *parent)
-	: ArrowTarget(_owner, parent), info(db->getCard(_name)), infoWidget(0), name(_name), tapped(false), tapAngle(0)
+	: ArrowTarget(_owner, parent), info(db->getCard(_name)), infoWidget(0), name(_name), tapped(false), tapAngle(0), isHovered(false)
 {
 	setCursor(Qt::OpenHandCursor);
 	setFlag(ItemIsSelectable);
@@ -132,6 +132,9 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 	if (isSelected()) {
 		painter->setPen(Qt::red);
 		painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
+	} else if (isHovered) {
+		painter->setPen(Qt::yellow);
+		painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
 	}
 
 	painter->restore();
@@ -209,7 +212,14 @@ void AbstractCardItem::processHoverEvent()
 void AbstractCardItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
 	processHoverEvent();
+	isHovered = true;
 	QGraphicsItem::hoverEnterEvent(event);
+}
+
+void AbstractCardItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+	isHovered = false;
+	QGraphicsItem::hoverLeaveEvent(event);
 }
 
 QVariant AbstractCardItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
