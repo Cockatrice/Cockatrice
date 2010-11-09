@@ -153,21 +153,31 @@ bool GameScene::event(QEvent *event)
 		}
 		
 		QList<QGraphicsItem *> itemList = items(mouseEvent->scenePos());
-		qreal maxZ = 0;
-		CardItem *maxZCard = 0;
-		QList<CardItem *> cardList;
-		for (int i = 0; i < itemList.size(); ++i) {
-			CardItem *card = qgraphicsitem_cast<CardItem *>(itemList[i]);
-			if (!card)
-				continue;
-			cardList.append(card);
-			if (card->getRealZValue() > maxZ) {
-				maxZ = card->getRealZValue();
-				maxZCard = card;
+		
+		// Search for the topmost zone and ignore all cards not belonging to that zone.
+		CardZone *zone = 0;
+		for (int i = 0; i < itemList.size(); ++i)
+			if ((zone = qgraphicsitem_cast<CardZone *>(itemList[i])))
+				break;
+		if (zone) {
+			qreal maxZ = -1;
+			CardItem *maxZCard = 0;
+			QList<CardItem *> cardList;
+			for (int i = 0; i < itemList.size(); ++i) {
+				CardItem *card = qgraphicsitem_cast<CardItem *>(itemList[i]);
+				if (!card)
+					continue;
+				if (card->getZone() != zone)
+					continue;
+				cardList.append(card);
+				if (card->getRealZValue() > maxZ) {
+					maxZ = card->getRealZValue();
+					maxZCard = card;
+				}
 			}
+			for (int i = 0; i < cardList.size(); ++i)
+				cardList[i]->setZValue(cardList[i] == maxZCard ? 2000000004 : cardList[i]->getRealZValue());
 		}
-		for (int i = 0; i < cardList.size(); ++i)
-			cardList[i]->setZValue(cardList[i] == maxZCard ? 2000000004 : cardList[i]->getRealZValue());
 	}
 	return QGraphicsScene::event(event);
 }
