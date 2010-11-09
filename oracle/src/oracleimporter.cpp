@@ -116,9 +116,9 @@ CardInfo *OracleImporter::addCard(QString cardName, const QString &cardCost, con
 		if ((mainCardType == "Land") || mArtifact)
 			tableRow = 0;
 		else if ((mainCardType == "Sorcery") || (mainCardType == "Instant"))
-			tableRow = 2;
-		else if (mainCardType == "Creature")
 			tableRow = 3;
+		else if (mainCardType == "Creature")
+			tableRow = 2;
 		card->setTableRow(tableRow);
 
 		cardHash.insert(cardName, card);
