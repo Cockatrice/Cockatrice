@@ -41,6 +41,7 @@ public:
 	CardInfo *getInfo() const { return info; }
 	QString getName() const { return name; }
 	void setName(const QString &_name = QString());
+	void setHovered(bool _hovered);
 	QString getColor() const { return color; }
 	void setColor(const QString &_color);
 	bool getTapped() const { return tapped; }

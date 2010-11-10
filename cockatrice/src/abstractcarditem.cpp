@@ -164,6 +164,12 @@ void AbstractCardItem::setName(const QString &_name)
 	update();
 }
 
+void AbstractCardItem::setHovered(bool _hovered)
+{
+	isHovered = _hovered;
+	update();
+}
+
 void AbstractCardItem::setColor(const QString &_color)
 {
 	color = _color;
