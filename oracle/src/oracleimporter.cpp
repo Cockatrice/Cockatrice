@@ -159,7 +159,11 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 				QDomElement tr = trs.at(j).toElement();
 				QDomNodeList tds = tr.elementsByTagName("td");
 				if (tds.size() != 2) {
-					CardInfo *card = addCard(cardName, cardCost, cardType, cardPT, cardText.split("\n"));
+					QStringList cardTextSplit = cardText.split("\n");
+					for (int i = 0; i < cardTextSplit.size(); ++i)
+						cardTextSplit[i] = cardTextSplit[i].trimmed();
+					
+					CardInfo *card = addCard(cardName, cardCost, cardType, cardPT, cardTextSplit);
 					if (!set->contains(card)) {
 						card->addToSet(set);
 						cards++;
