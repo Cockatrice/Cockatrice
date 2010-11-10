@@ -313,8 +313,12 @@ void Player::rearrangeZones()
 	
 	if (settingsCache->getHorizontalHand()) {
 		if (mirrored) {
-			hand->setPos(base);
-			base += QPointF(0, hand->boundingRect().height());
+			if (hand->contentsKnown()) {
+				hand->setVisible(true);
+				hand->setPos(base);
+				base += QPointF(0, hand->boundingRect().height());
+			} else
+				hand->setVisible(false);
 
 			stack->setPos(base);
 			base += QPointF(stack->boundingRect().width(), 0);
@@ -326,10 +330,16 @@ void Player::rearrangeZones()
 			table->setPos(base.x() + stack->boundingRect().width(), 0);
 			base += QPointF(0, table->boundingRect().height());
 			
-			hand->setPos(base);
+			if (hand->contentsKnown()) {
+				hand->setVisible(true);
+				hand->setPos(base);
+			} else
+				hand->setVisible(false);
 		}
 		hand->setWidth(table->getWidth() + stack->boundingRect().width());
 	} else {
+		hand->setVisible(true);
+		
 		hand->setPos(base);
 		base += QPointF(hand->boundingRect().width(), 0);
 		
@@ -358,9 +368,10 @@ void Player::updateBoundingRect()
 {
 	prepareGeometryChange();
 	qreal width = CARD_HEIGHT + 5 + counterAreaWidth + stack->boundingRect().width();
-	if (settingsCache->getHorizontalHand())
-		bRect = QRectF(0, 0, width + table->boundingRect().width(), table->boundingRect().height() + hand->boundingRect().height());
-	else
+	if (settingsCache->getHorizontalHand()) {
+		qreal handHeight = hand->isVisible() ? hand->boundingRect().height() : 0;
+		bRect = QRectF(0, 0, width + table->boundingRect().width(), table->boundingRect().height() + handHeight);
+	} else
 		bRect = QRectF(0, 0, width + hand->boundingRect().width() + table->boundingRect().width(), table->boundingRect().height());
 	emit sizeChanged();
 }
