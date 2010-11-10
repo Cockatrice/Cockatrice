@@ -173,6 +173,9 @@ void AbstractCardItem::setName(const QString &_name)
 
 void AbstractCardItem::setHovered(bool _hovered)
 {
+	if (isHovered == _hovered)
+		return;
+	
 	isHovered = _hovered;
 	setZValue(_hovered ? 2000000004 : realZValue);
 	update();

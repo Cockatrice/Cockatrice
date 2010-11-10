@@ -145,11 +145,13 @@ bool GameScene::event(QEvent *event)
 	if (event->type() == QEvent::GraphicsSceneMouseMove) {
 		QGraphicsSceneMouseEvent *mouseEvent = static_cast<QGraphicsSceneMouseEvent *>(event);
 		
+		QSet<CardItem *> cardsToUnhover;
+		
 		QList<QGraphicsItem *> oldItemList = items(mouseEvent->lastScenePos());
 		for (int i = 0; i < oldItemList.size(); ++i) {
 			CardItem *card = qgraphicsitem_cast<CardItem *>(oldItemList[i]);
 			if (card)
-				card->setHovered(false);
+				cardsToUnhover.insert(card);
 		}
 		
 		QList<QGraphicsItem *> itemList = items(mouseEvent->scenePos());
@@ -159,24 +161,31 @@ bool GameScene::event(QEvent *event)
 		for (int i = 0; i < itemList.size(); ++i)
 			if ((zone = qgraphicsitem_cast<CardZone *>(itemList[i])))
 				break;
+		
 		if (zone) {
-			qreal maxZ = -1;
 			CardItem *maxZCard = 0;
-			QList<CardItem *> cardList;
+			qreal maxZ = -1;
 			for (int i = 0; i < itemList.size(); ++i) {
 				CardItem *card = qgraphicsitem_cast<CardItem *>(itemList[i]);
 				if (!card)
 					continue;
 				if (card->getZone() != zone)
 					continue;
-				cardList.append(card);
 				if (card->getRealZValue() > maxZ) {
 					maxZ = card->getRealZValue();
 					maxZCard = card;
 				}
+				cardsToUnhover.insert(card);
 			}
-			for (int i = 0; i < cardList.size(); ++i)
-				cardList[i]->setHovered(cardList[i] == maxZCard);
+			if (maxZCard) {
+				cardsToUnhover.remove(maxZCard);
+				maxZCard->setHovered(true);
+			}
+		}
+		QSet<CardItem *>::const_iterator i = cardsToUnhover.constBegin();
+		while (i != cardsToUnhover.constEnd()) {
+			(*i)->setHovered(false);
+			++i;
 		}
 	}
 	return QGraphicsScene::event(event);
