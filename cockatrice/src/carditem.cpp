@@ -17,7 +17,7 @@
 #include "tab_game.h"
 
 CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, QGraphicsItem *parent)
-	: AbstractCardItem(_name, _owner, parent), id(_cardid), realZValue(0), attacking(false), facedown(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(0), attachedTo(0)
+	: AbstractCardItem(_name, _owner, parent), id(_cardid), attacking(false), facedown(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(0), attachedTo(0)
 {
 	owner->addCard(this);
 
@@ -152,12 +152,6 @@ void CardItem::retranslateUi()
 		
 		moveMenu->setTitle(tr("&Move to"));
 	}
-}
-
-void CardItem::setRealZValue(qreal _zValue)
-{
-	realZValue = _zValue;
-	setZValue(_zValue);
 }
 
 void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

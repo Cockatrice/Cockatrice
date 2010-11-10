@@ -17,7 +17,6 @@ class CardItem : public AbstractCardItem {
 private:
 	CardZone *zone;
 	int id;
-	qreal realZValue;
 	bool attacking;
 	bool facedown;
 	QMap<int, int> counters;
@@ -48,8 +47,6 @@ public:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QPoint getGridPoint() const { return gridPoint; }
 	void setGridPoint(const QPoint &_gridPoint) { gridPoint = _gridPoint; }
-	qreal getRealZValue() const { return realZValue; }
-	void setRealZValue(qreal _zValue);
 	QPoint getGridPos() const { return gridPoint; }
 	Player *getOwner() const { return owner; }
 	int getId() const { return id; }

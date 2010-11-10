@@ -13,7 +13,7 @@
 #include <QTimer>
 
 AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, QGraphicsItem *parent)
-	: ArrowTarget(_owner, parent), info(db->getCard(_name)), infoWidget(0), name(_name), tapped(false), tapAngle(0), isHovered(false)
+	: ArrowTarget(_owner, parent), info(db->getCard(_name)), infoWidget(0), name(_name), tapped(false), tapAngle(0), isHovered(false), realZValue(0)
 {
 	setCursor(Qt::OpenHandCursor);
 	setFlag(ItemIsSelectable);
@@ -40,6 +40,12 @@ QRectF AbstractCardItem::boundingRect() const
 void AbstractCardItem::pixmapUpdated()
 {
 	update();
+}
+
+void AbstractCardItem::setRealZValue(qreal _zValue)
+{
+	realZValue = _zValue;
+	setZValue(_zValue);
 }
 
 QSizeF AbstractCardItem::getTranslatedSize(QPainter *painter) const
@@ -149,6 +155,7 @@ void AbstractCardItem::animationEvent()
 	tapAngle += delta;
 	
 	setTransform(QTransform().translate((float) CARD_WIDTH / 2, (float) CARD_HEIGHT / 2).rotate(tapAngle).translate((float) -CARD_WIDTH / 2, (float) -CARD_HEIGHT / 2));
+	setHovered(false);
 	update();
 
 	if ((tapped && (tapAngle >= 90)) || (!tapped && (tapAngle <= 0)))
@@ -167,6 +174,7 @@ void AbstractCardItem::setName(const QString &_name)
 void AbstractCardItem::setHovered(bool _hovered)
 {
 	isHovered = _hovered;
+	setZValue(_hovered ? 2000000004 : realZValue);
 	update();
 }
 

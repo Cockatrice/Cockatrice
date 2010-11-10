@@ -149,7 +149,7 @@ bool GameScene::event(QEvent *event)
 		for (int i = 0; i < oldItemList.size(); ++i) {
 			CardItem *card = qgraphicsitem_cast<CardItem *>(oldItemList[i]);
 			if (card)
-				card->setZValue(card->getRealZValue());
+				card->setHovered(false);
 		}
 		
 		QList<QGraphicsItem *> itemList = items(mouseEvent->scenePos());
@@ -176,7 +176,7 @@ bool GameScene::event(QEvent *event)
 				}
 			}
 			for (int i = 0; i < cardList.size(); ++i)
-				cardList[i]->setZValue(cardList[i] == maxZCard ? 2000000004 : cardList[i]->getRealZValue());
+				cardList[i]->setHovered(cardList[i] == maxZCard);
 		}
 	}
 	return QGraphicsScene::event(event);

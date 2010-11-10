@@ -23,6 +23,7 @@ protected:
 private:
 	QTimer *animationTimer;
 	bool isHovered;
+	qreal realZValue;
 private slots:
 	void animationEvent();
 	void pixmapUpdated();
@@ -41,6 +42,8 @@ public:
 	CardInfo *getInfo() const { return info; }
 	QString getName() const { return name; }
 	void setName(const QString &_name = QString());
+	qreal getRealZValue() const { return realZValue; }
+	void setRealZValue(qreal _zValue);
 	void setHovered(bool _hovered);
 	QString getColor() const { return color; }
 	void setColor(const QString &_color);
