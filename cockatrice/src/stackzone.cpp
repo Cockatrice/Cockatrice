@@ -1,4 +1,6 @@
 #include <QPainter>
+#include <QSet>
+#include "arrowitem.h"
 #include "stackzone.h"
 #include "settingscache.h"
 #include "player.h"
@@ -59,6 +61,8 @@ void StackZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/
 void StackZone::reorganizeCards()
 {
 	if (!cards.isEmpty()) {
+		QList<ArrowItem *> arrowsToUpdate;
+		
 		const int cardCount = cards.size();
 		qreal totalWidth = boundingRect().width();
 		qreal totalHeight = boundingRect().height();
@@ -78,7 +82,13 @@ void StackZone::reorganizeCards()
 			else
 				c->setPos(x, ((qreal) i) * cardHeight + (totalHeight - cardCount * cardHeight) / 2);
 			c->setRealZValue(i);
+			
+			arrowsToUpdate.append(c->getArrowsFrom());
+			arrowsToUpdate.append(c->getArrowsTo());
 		}
+		QSetIterator<ArrowItem *> arrowIterator(QSet<ArrowItem *>::fromList(arrowsToUpdate));
+		while (arrowIterator.hasNext())
+			arrowIterator.next()->updatePath();
 	}
 	update();
 }

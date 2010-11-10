@@ -1358,12 +1358,12 @@
     <message>
         <location filename="../src/messagelogwidget.cpp" line="148"/>
         <source> from table</source>
-        <translation>de la mesa</translation>
+        <translation> de la mesa</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="150"/>
         <source> from graveyard</source>
-        <translation>del cementerio</translation>
+        <translation> del cementerio</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="152"/>
@@ -1373,7 +1373,7 @@
     <message>
         <location filename="../src/messagelogwidget.cpp" line="154"/>
         <source> from hand</source>
-        <translation>de la mano</translation>
+        <translation> de la mano</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="158"/>
@@ -1383,7 +1383,7 @@
     <message>
         <location filename="../src/messagelogwidget.cpp" line="161"/>
         <source> from the bottom of his library</source>
-        <translation>del fondo de la biblioteca</translation>
+        <translation> del fondo de la biblioteca</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="164"/>
@@ -1393,22 +1393,22 @@
     <message>
         <location filename="../src/messagelogwidget.cpp" line="167"/>
         <source> from the top of his library</source>
-        <translation>de la parte superior de la biblioteca</translation>
+        <translation> de la parte superior de la biblioteca</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="169"/>
         <source> from library</source>
-        <translation>de la biblioteca</translation>
+        <translation> de la biblioteca</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="171"/>
         <source> from sideboard</source>
-        <translation>de la reserva</translation>
+        <translation> de la reserva</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="194"/>
         <source>%1 puts %2 into play%3.</source>
-        <translation>%1 pone %2 en juego %3.</translation>
+        <translation>%1 pone %2 en juego%3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="196"/>
