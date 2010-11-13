@@ -2000,7 +2000,7 @@
     <message>
         <location filename="../src/messagelogwidget.cpp" line="173"/>
         <source> from the stack</source>
-        <translation>vom Stapel</translation>
+        <translation> vom Stapel</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="196"/>
