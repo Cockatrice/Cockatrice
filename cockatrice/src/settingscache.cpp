@@ -17,16 +17,16 @@ SettingsCache::SettingsCache()
 	playerBgPath = settings->value("zonebg/playerarea").toString();
 	cardBackPicturePath = settings->value("paths/cardbackpicture").toString();
 	
-	picDownload = settings->value("personal/picturedownload", false).toBool();
+	picDownload = settings->value("personal/picturedownload", true).toBool();
 	doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
 	cardInfoMinimized = settings->value("interface/cardinfominimized", false).toBool();
-	horizontalHand = settings->value("hand/horizontal", false).toBool();
+	horizontalHand = settings->value("hand/horizontal", true).toBool();
 	economicalGrid = settings->value("table/economic", false).toBool();
 	invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
 	tapAnimation = settings->value("cards/tapanimation", true).toBool();
 	
-	zoneViewSortByName = settings->value("zoneview/sortbyname", false).toBool();
-	zoneViewSortByType = settings->value("zoneview/sortbytype", false).toBool();
+	zoneViewSortByName = settings->value("zoneview/sortbyname", true).toBool();
+	zoneViewSortByType = settings->value("zoneview/sortbytype", true).toBool();
 }
 
 void SettingsCache::setLang(const QString &_lang)

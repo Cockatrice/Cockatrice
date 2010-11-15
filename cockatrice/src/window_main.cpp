@@ -25,6 +25,7 @@
 #include <QPixmapCache>
 #include <QInputDialog>
 
+#include "main.h"
 #include "window_main.h"
 #include "dlg_connect.h"
 #include "dlg_settings.h"
@@ -43,7 +44,7 @@ void MainWindow::updateTabMenu(QMenu *menu)
 		menuBar()->removeAction(tabMenu->menuAction());
 	tabMenu = menu;
 	if (menu)
-		menuBar()->addMenu(menu);
+		menuBar()->insertMenu(helpMenu->menuAction(), menu);
 }
 
 void MainWindow::statusChanged(ClientStatus _status)
@@ -147,6 +148,11 @@ void MainWindow::actExit()
 	close();
 }
 
+void MainWindow::actAbout()
+{
+	QMessageBox::about(this, tr("About Cockatrice"), trUtf8("<font size=\"8\"><b>Cockatrice</b></font><br>Version %1<br><br><br><b>Authors:</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br>Marius van Zundert<br><br><b>Translators:</b><br>Spanish: Gocho<br>").arg(versionString));
+}
+
 void MainWindow::serverTimeout()
 {
 	QMessageBox::critical(this, tr("Error"), tr("Server timeout"));
@@ -195,6 +201,9 @@ void MainWindow::retranslateUi()
 	
 	cockatriceMenu->setTitle(tr("&Cockatrice"));
 	
+	aAbout->setText(tr("&About Cockatrice"));
+	helpMenu->setTitle(tr("&Help"));
+	
 	tabSupervisor->retranslateUi();
 }
 
@@ -216,6 +225,9 @@ void MainWindow::createActions()
 	connect(aSettings, SIGNAL(triggered()), this, SLOT(actSettings()));
 	aExit = new QAction(this);
 	connect(aExit, SIGNAL(triggered()), this, SLOT(actExit()));
+	
+	aAbout = new QAction(this);
+	connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
 }
 
 void MainWindow::createMenus()
@@ -232,6 +244,9 @@ void MainWindow::createMenus()
 	cockatriceMenu->addAction(aSettings);
 	cockatriceMenu->addSeparator();
 	cockatriceMenu->addAction(aExit);
+	
+	helpMenu = menuBar()->addMenu(QString());
+	helpMenu->addAction(aAbout);
 }
 
 MainWindow::MainWindow(QWidget *parent)

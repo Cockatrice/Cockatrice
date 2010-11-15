@@ -47,14 +47,17 @@ private slots:
 	void actFullScreen(bool checked);
 	void actSettings();
 	void actExit();
+	
+	void actAbout();
 private:
 	static const QString appName;
 	void setClientStatusTitle();
 	void retranslateUi();
 	void createActions();
 	void createMenus();
-	QMenu *cockatriceMenu, *tabMenu;
-	QAction *aConnect, *aDisconnect, *aSinglePlayer, *aDeckEditor, *aFullScreen, *aSettings, *aExit;
+	QMenu *cockatriceMenu, *tabMenu, *helpMenu;
+	QAction *aConnect, *aDisconnect, *aSinglePlayer, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
+		*aAbout;
 	TabSupervisor *tabSupervisor;
 
 	RemoteClient *client;
