@@ -65,7 +65,7 @@ void TabMessage::actLeave()
 
 void TabMessage::processMessageEvent(Event_Message *event)
 {
-	textEdit->append(QString("<font color=\"red\">%1:</font> %2").arg(sanitizeHtml(event->getSenderName())).arg(sanitizeHtml(event->getText())));
+	textEdit->append(QString("<font color=\"") + (event->getSenderName() == userName ? "#0000fe" : "red") + QString("\">%1:</font> %2").arg(sanitizeHtml(event->getSenderName())).arg(sanitizeHtml(event->getText())));
 	emit userEvent();
 }
 

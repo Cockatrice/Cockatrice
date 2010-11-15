@@ -112,7 +112,7 @@ void MessageLogWidget::logGameStart()
 
 void MessageLogWidget::logSay(Player *player, QString message)
 {
-	append(QString("<b><font color=\"red\">%1:</font></b> %2").arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(message)));
+	append(QString("<b><font color=\"") + (player->getLocal() ? "red" : "#0000fe") + QString("\">%1:</font></b> %2").arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(message)));
 }
 
 void MessageLogWidget::logSpectatorSay(QString spectatorName, QString message)
