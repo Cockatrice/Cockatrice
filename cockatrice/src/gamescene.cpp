@@ -4,6 +4,7 @@
 #include "zoneviewzone.h"
 #include <QAction>
 #include <QGraphicsSceneMouseEvent>
+#include <QSet>
 
 GameScene::GameScene(QObject *parent)
 	: QGraphicsScene(parent)
