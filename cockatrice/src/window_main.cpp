@@ -150,7 +150,7 @@ void MainWindow::actExit()
 
 void MainWindow::actAbout()
 {
-	QMessageBox::about(this, tr("About Cockatrice"), trUtf8("<font size=\"8\"><b>Cockatrice</b></font><br>Version %1<br><br><br><b>Authors:</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br>Marius van Zundert<br><br><b>Translators:</b><br>Spanish: Gocho<br>").arg(versionString));
+	QMessageBox::about(this, tr("About Cockatrice"), trUtf8("<font size=\"8\"><b>Cockatrice</b></font><br>Version %1<br><br><br><b>Authors:</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br>Marius van Zundert<br><br><b>Translators:</b><br>Spanish: Gocho<br>Portugese: Milton Gonçalves<br>").arg(versionString));
 }
 
 void MainWindow::serverTimeout()

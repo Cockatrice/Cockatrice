@@ -160,7 +160,8 @@ SOURCES += src/counter.cpp \
 TRANSLATIONS += \
 	translations/cockatrice_de.ts \
 	translations/cockatrice_en.ts \
-	translations/cockatrice_es.ts
+	translations/cockatrice_es.ts \
+	translations/cockatrice_pt.ts
 win32 {
 	RC_FILE = cockatrice.rc
 }
