@@ -111,3 +111,11 @@ CREATE TABLE IF NOT EXISTS `users` (
   `token` char(32) NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=915 ;
+
+CREATE TABLE `cockatrice_uptime` (
+  `timest` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `uptime` int(11) DEFAULT NULL,
+  `users_count` int(11) DEFAULT NULL,
+  `games_count` int(11) DEFAULT NULL,
+  PRIMARY KEY (`timest`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

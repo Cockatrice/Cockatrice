@@ -27,11 +27,15 @@
 #include "protocol.h"
 
 Servatrice::Servatrice(QObject *parent)
-	: Server(parent)
+	: Server(parent), uptime(0)
 {
 	pingClock = new QTimer(this);
 	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
 	pingClock->start(1000);
+	
+	statusUpdateClock = new QTimer(this);
+	connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
+	statusUpdateClock->start(15000);
 	
 	ProtocolItem::initializeHash();
 	settings = new QSettings("servatrice.ini", QSettings::IniFormat, this);
@@ -179,4 +183,18 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 		return new ServerInfo_User(name, ServerInfo_User::IsUser);
 }
 
-const QString Servatrice::versionString = "Servatrice 0.20101103";
+void Servatrice::statusUpdate()
+{
+	uptime += statusUpdateClock->interval() / 1000;
+	
+	checkSql();
+	
+	QSqlQuery query;
+	query.prepare("insert into " + dbPrefix + "_uptime (timest, uptime, users_count, games_count) values(NOW(), :uptime, :users_count, :games_count)");
+	query.bindValue(":uptime", uptime);
+	query.bindValue(":users_count", users.size());
+	query.bindValue(":games_count", games.size());
+	execSqlQuery(query);
+}
+
+const QString Servatrice::versionString = "Servatrice 0.20101116";

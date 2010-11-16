@@ -38,12 +38,12 @@ public:
 	virtual bool getGameShouldPing() const = 0;
 	virtual int getMaxGameInactivityTime() const = 0;
 	virtual int getMaxPlayerInactivityTime() const = 0;
-private:
+protected:
 	QMap<int, Server_Game *> games;
 	QList<Server_ProtocolHandler *> clients;
 	QMap<QString, Server_ProtocolHandler *> users;
 	QMap<QString, Server_ChatChannel *> chatChannels;
-protected:
+	
 	virtual AuthenticationResult checkUserPassword(const QString &user, const QString &password) = 0;
 	virtual ServerInfo_User *getUserData(const QString &name) = 0;
 	int nextGameId;

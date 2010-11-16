@@ -33,6 +33,7 @@ class Servatrice : public Server
 	Q_OBJECT
 private slots:
 	void newConnection();
+	void statusUpdate();
 public:
 	static const QString versionString;
 	Servatrice(QObject *parent = 0);
@@ -49,11 +50,12 @@ protected:
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
 	ServerInfo_User *getUserData(const QString &name);
 private:
-	QTimer *pingClock;
+	QTimer *pingClock, *statusUpdateClock;
 	QTcpServer *tcpServer;
 	QString loginMessage;
 	QString dbPrefix;
 	QSettings *settings;
+	int uptime;
 	int maxGameInactivityTime;
 	int maxPlayerInactivityTime;
 };
