@@ -16,7 +16,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="273"/>
         <source>Path to stack background:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruta a la imagen de fondo de la pila:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="274"/>
@@ -51,12 +51,12 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="282"/>
         <source>Economical layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Disposición Económica</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="283"/>
         <source>Invert vertical coordinate</source>
-        <translation type="unfinished"></translation>
+        <translation>Invertir coordenada vertical</translation>
     </message>
     <message>
         <source>Economic layout</source>
@@ -337,37 +337,37 @@
         <location filename="../src/cardzone.cpp" line="51"/>
         <source>his hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished">su mano</translation>
+        <translation>su mano</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="51"/>
         <source>%1&apos;s hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished">mano &amp;de %1</translation>
+        <translation>mano de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="52"/>
         <source>of his hand</source>
         <comment>genitive</comment>
-        <translation type="unfinished">de su mano</translation>
+        <translation>de su mano</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="52"/>
         <source>of %1&apos;s hand</source>
         <comment>genitive</comment>
-        <translation type="unfinished">de la mano &amp;de %1</translation>
+        <translation>de la mano de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="53"/>
         <source>his hand</source>
         <comment>accusative</comment>
-        <translation type="unfinished">su mano</translation>
+        <translation>su mano</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="53"/>
         <source>%1&apos;s hand</source>
         <comment>accusative</comment>
-        <translation type="unfinished">mano &amp;de %1</translation>
+        <translation>mano de %1</translation>
     </message>
     <message>
         <source>his hand</source>
@@ -383,37 +383,37 @@
         <location filename="../src/cardzone.cpp" line="57"/>
         <source>his library</source>
         <comment>nominative</comment>
-        <translation type="unfinished">su biblioteca</translation>
+        <translation>su biblioteca</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="57"/>
         <source>%1&apos;s library</source>
         <comment>nominative</comment>
-        <translation type="unfinished">biblioteca &amp;de %1</translation>
+        <translation>biblioteca de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="58"/>
         <source>of his library</source>
         <comment>genitive</comment>
-        <translation type="unfinished">de su biblioteca</translation>
+        <translation>de su biblioteca</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="58"/>
         <source>of %1&apos;s library</source>
         <comment>genitive</comment>
-        <translation type="unfinished">de la biblioteca &amp;de %1</translation>
+        <translation>de la biblioteca de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="59"/>
         <source>his library</source>
         <comment>accusative</comment>
-        <translation type="unfinished">su biblioteca</translation>
+        <translation>su biblioteca</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="59"/>
         <source>%1&apos;s library</source>
         <comment>accusative</comment>
-        <translation type="unfinished">biblioteca &amp;de %1</translation>
+        <translation>biblioteca de %1</translation>
     </message>
     <message>
         <source>his library</source>
@@ -429,37 +429,37 @@
         <location filename="../src/cardzone.cpp" line="63"/>
         <source>his graveyard</source>
         <comment>nominative</comment>
-        <translation type="unfinished">su cementerio</translation>
+        <translation>su cementerio</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="63"/>
         <source>%1&apos;s graveyard</source>
         <comment>nominative</comment>
-        <translation type="unfinished">cementerio &amp;de %1</translation>
+        <translation>cementerio de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="64"/>
         <source>of his graveyard</source>
         <comment>genitive</comment>
-        <translation type="unfinished">de su cementerio</translation>
+        <translation>de su cementerio</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="64"/>
         <source>of %1&apos;s graveyard</source>
         <comment>genitive</comment>
-        <translation type="unfinished">del cementerio &amp;de %1</translation>
+        <translation>del cementerio de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="65"/>
         <source>his graveyard</source>
         <comment>accusative</comment>
-        <translation type="unfinished">su cementerio</translation>
+        <translation>su cementerio</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="65"/>
         <source>%1&apos;s graveyard</source>
         <comment>accusative</comment>
-        <translation type="unfinished">cementerio &amp;de %1</translation>
+        <translation>cementerio de %1</translation>
     </message>
     <message>
         <source>his graveyard</source>
@@ -475,37 +475,37 @@
         <location filename="../src/cardzone.cpp" line="69"/>
         <source>his exile</source>
         <comment>nominative</comment>
-        <translation type="unfinished">su exilio</translation>
+        <translation>su exilio</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="69"/>
         <source>%1&apos;s exile</source>
         <comment>nominative</comment>
-        <translation type="unfinished">el exilio de %1</translation>
+        <translation>el exilio de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="70"/>
         <source>of his exile</source>
         <comment>genitive</comment>
-        <translation type="unfinished">de su exilio</translation>
+        <translation>de su exilio</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="70"/>
         <source>of %1&apos;s exile</source>
         <comment>genitive</comment>
-        <translation type="unfinished">del exilio de %1</translation>
+        <translation>del exilio de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="71"/>
         <source>his exile</source>
         <comment>accusative</comment>
-        <translation type="unfinished">su exilio</translation>
+        <translation>su exilio</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="71"/>
         <source>%1&apos;s exile</source>
         <comment>accusative</comment>
-        <translation type="unfinished">el exilio de %1</translation>
+        <translation>el exilio de %1</translation>
     </message>
     <message>
         <source>his exile</source>
@@ -521,37 +521,37 @@
         <location filename="../src/cardzone.cpp" line="75"/>
         <source>his sideboard</source>
         <comment>nominative</comment>
-        <translation type="unfinished">su reserva</translation>
+        <translation>su reserva</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="75"/>
         <source>%1&apos;s sideboard</source>
         <comment>nominative</comment>
-        <translation type="unfinished">la reserva de %1</translation>
+        <translation>la reserva de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="76"/>
         <source>of his sideboard</source>
         <comment>genitive</comment>
-        <translation type="unfinished">de su reserva</translation>
+        <translation>de su reserva</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="76"/>
         <source>of %1&apos;s sideboard</source>
         <comment>genitive</comment>
-        <translation type="unfinished">de la reserva &amp;de %1</translation>
+        <translation>de la reserva de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="77"/>
         <source>his sideboard</source>
         <comment>accusative</comment>
-        <translation type="unfinished">su reserva</translation>
+        <translation>su reserva</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="77"/>
         <source>%1&apos;s sideboard</source>
         <comment>accusative</comment>
-        <translation type="unfinished">la reserva de %1</translation>
+        <translation>la reserva de %1</translation>
     </message>
     <message>
         <source>his sideboard</source>
@@ -971,17 +971,17 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="561"/>
         <source>Your card database is invalid. Would you like to go back and set the correct path?</source>
-        <translation type="unfinished"></translation>
+        <translation>Tu base de datos de cartas es invalida. ¿Deseas volver y seleccionar la ruta correcta?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="566"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
-        <translation type="unfinished"></translation>
+        <translation>La ruta a tu directorio de mazos es invalida. ¿Deseas volver y seleccionar la ruta correcta?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="571"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
-        <translation type="unfinished"></translation>
+        <translation>La ruta a tu directorio de imagenes de las cartas es invalida.¿Deseas volver y seleccionar la ruta correcta?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="580"/>
@@ -1208,12 +1208,12 @@
     <message>
         <location filename="../src/window_main.cpp" line="153"/>
         <source>About Cockatrice</source>
-        <translation type="unfinished"></translation>
+        <translation>Acerca de Cockatrice</translation>
     </message>
     <message utf8="true">
         <location filename="../src/window_main.cpp" line="153"/>
         <source>&lt;font size=&quot;8&quot;&gt;&lt;b&gt;Cockatrice&lt;/b&gt;&lt;/font&gt;&lt;br&gt;Version %1&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Authors:&lt;/b&gt;&lt;br&gt;Max-Wilhelm Bruker&lt;br&gt;Marcus Schütz&lt;br&gt;Marius van Zundert&lt;br&gt;&lt;br&gt;&lt;b&gt;Translators:&lt;/b&gt;&lt;br&gt;Spanish: Gocho&lt;br&gt;Portugese: Milton Gonçalves&lt;br&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="158"/>
@@ -1306,12 +1306,12 @@
     <message>
         <location filename="../src/window_main.cpp" line="204"/>
         <source>&amp;About Cockatrice</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Acerca de Cockatrice</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="205"/>
         <source>&amp;Help</source>
-        <translation type="unfinished"></translation>
+        <translation>A&amp;yuda</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="281"/>
@@ -1424,7 +1424,7 @@
     <message>
         <location filename="../src/messagelogwidget.cpp" line="173"/>
         <source> from the stack</source>
-        <translation type="unfinished"></translation>
+        <translation> de la pila</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="196"/>
@@ -1474,7 +1474,7 @@
     <message>
         <location filename="../src/messagelogwidget.cpp" line="215"/>
         <source>%1 plays %2%3.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 juega %2%3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="221"/>
@@ -1651,12 +1651,12 @@
     <message>
         <location filename="../src/messagelogwidget.cpp" line="364"/>
         <source>%1 reveals %2 to %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 revela %2 a %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="366"/>
         <source>%1 reveals %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 revela %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="401"/>
@@ -1676,22 +1676,22 @@
     <message>
         <location filename="../src/messagelogwidget.cpp" line="369"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 revela aleatoriamente %2%3 a %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="371"/>
         <source>%1 randomly reveals %2%3.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 revela aleatoriamente %2%3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="374"/>
         <source>%1 reveals %2%3 to %4.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 revela %2%3 a %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="376"/>
         <source>%1 reveals %2%3.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 revela %2%3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="391"/>
@@ -1875,7 +1875,7 @@
         <location filename="../src/player.cpp" line="390"/>
         <location filename="../src/player.cpp" line="399"/>
         <source>Move to &amp;graveyard</source>
-        <translation type="unfinished"></translation>
+        <translation>Mover al &amp;cementerio</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="400"/>
@@ -1885,17 +1885,17 @@
     <message>
         <location filename="../src/player.cpp" line="402"/>
         <source>Reveal &amp;library to</source>
-        <translation type="unfinished"></translation>
+        <translation>Revelar &amp;biblioteca a</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="403"/>
         <source>Reveal t&amp;op card to</source>
-        <translation type="unfinished"></translation>
+        <translation>Revelar la carta &amp;superior de la biblioteca a</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="409"/>
         <source>Move top cards to &amp;graveyard...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mover cartas de la parte s&amp;uperior de la biblioteca al cementerio...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="444"/>
@@ -2090,12 +2090,12 @@
     <message>
         <location filename="../src/player.cpp" line="413"/>
         <source>&amp;Reveal to</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Revelar a</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="414"/>
         <source>Reveal r&amp;andom card to</source>
-        <translation type="unfinished"></translation>
+        <translation>Revelar carta &amp;aleatoriamente a</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="429"/>
@@ -2105,7 +2105,7 @@
     <message>
         <location filename="../src/player.cpp" line="432"/>
         <source>&amp;All players</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Todos los jugadores</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="545"/>
@@ -2488,12 +2488,12 @@ Por favor, introduzca un nombre:</translation>
     <message>
         <location filename="../src/tab_server.cpp" line="373"/>
         <source>Location:</source>
-        <translation type="unfinished"></translation>
+        <translation>Localización:</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="374"/>
         <source>User level:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nivel de usuario:</translation>
     </message>
 </context>
 <context>
@@ -2511,12 +2511,12 @@ Por favor, introduzca un nombre:</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="403"/>
         <source>Animation settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Opciones de animación</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="404"/>
         <source>&amp;Tap/untap animation</source>
-        <translation type="unfinished"></translation>
+        <translation>Animación de &amp;girar/enderezar</translation>
     </message>
 </context>
 <context>
@@ -2642,7 +2642,7 @@ Por favor, introduzca un nombre:</translation>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="188"/>
         <source>Add card to &amp;sideboard</source>
-        <translation>Añadir mazos a la &amp;reserva</translation>
+        <translation>Añadir carta a la &amp;reserva</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="41"/>
@@ -2698,8 +2698,8 @@ Por favor, introduzca un nombre:</translation>
         <location filename="../src/window_deckeditor.cpp" line="254"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
-        <translation>La lista del mazo ha sido modificada
-¿Desea guardar los cambios?</translation>
+        <translation type="unfinished">La lista del mazo ha sido modificada
+¿Deseas guardar los cambios?</translation>
     </message>
 </context>
 <context>
