@@ -176,6 +176,8 @@ void AbstractCardItem::setHovered(bool _hovered)
 	if (isHovered == _hovered)
 		return;
 	
+	if (_hovered)
+		processHoverEvent();
 	isHovered = _hovered;
 	setZValue(_hovered ? 2000000004 : realZValue);
 	update();
@@ -224,19 +226,6 @@ void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void AbstractCardItem::processHoverEvent()
 {
 	emit hovered(this);
-}
-
-void AbstractCardItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-{
-	processHoverEvent();
-	isHovered = true;
-	QGraphicsItem::hoverEnterEvent(event);
-}
-
-void AbstractCardItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-	isHovered = false;
-	QGraphicsItem::hoverLeaveEvent(event);
 }
 
 QVariant AbstractCardItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)

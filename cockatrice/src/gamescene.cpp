@@ -170,8 +170,12 @@ bool GameScene::event(QEvent *event)
 				CardItem *card = qgraphicsitem_cast<CardItem *>(itemList[i]);
 				if (!card)
 					continue;
-				if (card->getZone() != zone)
+				if (card->getAttachedTo()) {
+					if (card->getAttachedTo()->getZone() != zone)
+						continue;
+				} else if (card->getZone() != zone)
 					continue;
+				
 				if (card->getRealZValue() > maxZ) {
 					maxZ = card->getRealZValue();
 					maxZCard = card;

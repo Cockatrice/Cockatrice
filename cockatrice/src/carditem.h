@@ -35,6 +35,9 @@ private:
 	QMenu *cardMenu, *moveMenu;
 
 	void playCard(QGraphicsSceneMouseEvent *event);
+	void prepareDelete();
+public slots:
+	void deleteLater();
 public:
 	enum { Type = typeCard };
 	int type() const { return Type; }

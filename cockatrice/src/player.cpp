@@ -252,7 +252,7 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 
 Player::~Player()
 {
-	qDebug("Player destructor");
+	qDebug() << "Player destructor:" << getName();
 
 	static_cast<GameScene *>(scene())->removePlayer(this);
 	
@@ -889,10 +889,6 @@ void Player::eventAttachCard(Event_AttachCard *event)
 	
 	CardItem *oldParent = startCard->getAttachedTo();
 	
-	if (targetZone)
-		startCard->setParentItem(targetZone);
-	else
-		startCard->setParentItem(startZone);
 	startCard->setAttachedTo(targetCard);
 	
 	startZone->reorganizeCards();
