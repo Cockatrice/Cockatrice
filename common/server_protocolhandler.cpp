@@ -945,6 +945,7 @@ ResponseCode Server_ProtocolHandler::setCardAttrHelper(CommandContainer *cont, S
 	}
 	cont->enqueueGameEventPrivate(new Event_SetCardAttr(player->getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
 	cont->enqueueGameEventPublic(new Event_SetCardAttr(player->getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
+	cont->enqueueGameEventOmniscient(new Event_SetCardAttr(player->getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
 	return RespOk;
 }
 
