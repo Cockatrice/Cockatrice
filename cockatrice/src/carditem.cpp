@@ -107,6 +107,10 @@ CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, QGraphicsI
 CardItem::~CardItem()
 {
 	prepareDelete();
+	
+	delete cardMenu;
+	cardMenu = 0;
+	
 	deleteDragItem();
 }
 
@@ -117,8 +121,6 @@ void CardItem::prepareDelete()
 			owner->setCardMenu(0);
 		owner = 0;
 	}
-	delete cardMenu;
-	cardMenu = 0;
 	
 	while (!attachedCards.isEmpty()) {
 		attachedCards.first()->setZone(0); // so that it won't try to call reorganizeCards()
