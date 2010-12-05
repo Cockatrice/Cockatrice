@@ -106,19 +106,37 @@ CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, QGraphicsI
 
 CardItem::~CardItem()
 {
-	if (owner->getCardMenu() == cardMenu)
-		owner->setCardMenu(0);
+	prepareDelete();
+	
 	delete cardMenu;
+	cardMenu = 0;
+	
+	deleteDragItem();
+}
+
+void CardItem::prepareDelete()
+{
+	if (owner) {
+		if (owner->getCardMenu() == cardMenu)
+			owner->setCardMenu(0);
+		owner = 0;
+	}
 	
 	while (!attachedCards.isEmpty()) {
 		attachedCards.first()->setZone(0); // so that it won't try to call reorganizeCards()
 		attachedCards.first()->setAttachedTo(0);
 	}
 	
-	if (attachedTo)
+	if (attachedTo) {
 		attachedTo->removeAttachedCard(this);
+		attachedTo = 0;
+	}
+}
 
-	deleteDragItem();
+void CardItem::deleteLater()
+{
+	prepareDelete();
+	AbstractCardItem::deleteLater();
 }
 
 void CardItem::retranslateUi()
@@ -236,10 +254,12 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
 	gridPoint.setX(-1);
 	attachedTo = _attachedTo;
 	if (attachedTo) {
+		setParentItem(attachedTo->getZone());
 		attachedTo->addAttachedCard(this);
 		if (zone != attachedTo->getZone())
 			attachedTo->getZone()->reorganizeCards();
-	}
+	} else
+		setParentItem(zone);
 
 	if (zone)
 		zone->reorganizeCards();

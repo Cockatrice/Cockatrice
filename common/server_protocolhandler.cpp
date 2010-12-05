@@ -623,6 +623,8 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 		y = 0;
 		if (x == -1)
 			x = targetzone->cards.size();
+		
+		card->resetState();
 	} else if (x == -1)
 		x = targetzone->getFreeGridColumn(y);
 
@@ -680,7 +682,7 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 	
 	if (tapped)
 		setCardAttrHelper(cont, game, player, targetzone->getName(), card->getId(), "tapped", "1");
-
+	
 	return RespOk;
 }
 
@@ -943,6 +945,7 @@ ResponseCode Server_ProtocolHandler::setCardAttrHelper(CommandContainer *cont, S
 	}
 	cont->enqueueGameEventPrivate(new Event_SetCardAttr(player->getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
 	cont->enqueueGameEventPublic(new Event_SetCardAttr(player->getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
+	cont->enqueueGameEventOmniscient(new Event_SetCardAttr(player->getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
 	return RespOk;
 }
 
@@ -1197,11 +1200,12 @@ ResponseCode Server_ProtocolHandler::cmdRevealCards(Command_RevealCards *cmd, Co
 	for (int i = 0; i < cardsToReveal.size(); ++i) {
 		Server_Card *card = cardsToReveal[i];
 
-		QList<ServerInfo_CardCounter *> cardCounterList;
+		QList<ServerInfo_CardCounter *> cardCounterListPrivate, cardCounterListOmniscient;
 		QMapIterator<int, int> cardCounterIterator(card->getCounters());
 		while (cardCounterIterator.hasNext()) {
 			cardCounterIterator.next();
-			cardCounterList.append(new ServerInfo_CardCounter(cardCounterIterator.key(), cardCounterIterator.value()));
+			cardCounterListPrivate.append(new ServerInfo_CardCounter(cardCounterIterator.key(), cardCounterIterator.value()));
+			cardCounterListOmniscient.append(new ServerInfo_CardCounter(cardCounterIterator.key(), cardCounterIterator.value()));
 		}
 		
 		int attachPlayerId = -1;
@@ -1214,8 +1218,8 @@ ResponseCode Server_ProtocolHandler::cmdRevealCards(Command_RevealCards *cmd, Co
 		}
 		
 		if (cmd->getPlayerId() != -1)
-			respCardListPrivate.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), cardCounterList, attachPlayerId, attachZone, attachCardId));
-		respCardListOmniscient.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), cardCounterList, attachPlayerId, attachZone, attachCardId));
+			respCardListPrivate.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), cardCounterListPrivate, attachPlayerId, attachZone, attachCardId));
+		respCardListOmniscient.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), cardCounterListOmniscient, attachPlayerId, attachZone, attachCardId));
 	}
 	
 	if (cmd->getPlayerId() == -1)

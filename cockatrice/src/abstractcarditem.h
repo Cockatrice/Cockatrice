@@ -55,8 +55,6 @@ protected:
 	void transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle);
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-	void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-	void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 	QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
 };
  

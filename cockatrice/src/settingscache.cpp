@@ -80,7 +80,7 @@ void SettingsCache::setTableBgPath(const QString &_tableBgPath)
 void SettingsCache::setPlayerBgPath(const QString &_playerBgPath)
 {
 	playerBgPath = _playerBgPath;
-	settings->setValue("zonebg/player", playerBgPath);
+	settings->setValue("zonebg/playerarea", playerBgPath);
 	emit playerBgPathChanged();
 }
 

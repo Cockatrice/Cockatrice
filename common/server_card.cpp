@@ -37,15 +37,11 @@ Server_Card::~Server_Card()
 
 void Server_Card::resetState()
 {
-	setCoords(0, 0);
 	counters.clear();
 	setTapped(false);
 	setAttacking(false);
-	setFaceDown(false);
-	setColor(QString());
 	setPT(QString());
 	setAnnotation(QString());
-	setDestroyOnZoneChange(false);
 	setDoesntUntap(false);
 }
 
