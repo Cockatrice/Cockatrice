@@ -352,14 +352,18 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, QWidget *parent)
 	countryLabel2 = new QLabel;
 	userLevelLabel1 = new QLabel;
 	userLevelLabel2 = new QLabel;
+	userLevelLabel3 = new QLabel;
 	
 	QGridLayout *mainLayout = new QGridLayout;
-	mainLayout->addWidget(avatarLabel, 0, 0, 3, 1);
-	mainLayout->addWidget(nameLabel, 0, 1, 1, 2);
+	mainLayout->addWidget(avatarLabel, 0, 0, 3, 1, Qt::AlignCenter);
+	mainLayout->addWidget(nameLabel, 0, 1, 1, 3);
 	mainLayout->addWidget(countryLabel1, 1, 1, 1, 1);
-	mainLayout->addWidget(countryLabel2, 1, 2, 1, 1);
+	mainLayout->addWidget(countryLabel2, 1, 2, 1, 2);
 	mainLayout->addWidget(userLevelLabel1, 2, 1, 1, 1);
 	mainLayout->addWidget(userLevelLabel2, 2, 2, 1, 1);
+	mainLayout->addWidget(userLevelLabel3, 2, 3, 1, 1);
+	mainLayout->setColumnMinimumWidth(0, 80);
+	mainLayout->setColumnStretch(3, 10);
 	
 	setLayout(mainLayout);
 	
@@ -380,15 +384,26 @@ void UserInfoBox::processResponse(ProtocolResponse *response)
 	if (!resp)
 		return;
 	ServerInfo_User *user = resp->getUserInfo();
+	int userLevel = user->getUserLevel();
 	
 	QPixmap avatarPixmap;
 	if (!avatarPixmap.loadFromData(user->getAvatarBmp()))
-		avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, user->getUserLevel());
+		avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel);
 	avatarLabel->setPixmap(avatarPixmap);
 	
 	nameLabel->setText(user->getName());
 	countryLabel2->setPixmap(CountryPixmapGenerator::generatePixmap(15, user->getCountry()));
-	userLevelLabel2->setPixmap(UserLevelPixmapGenerator::generatePixmap(15, user->getUserLevel()));
+	userLevelLabel2->setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel));
+	QString userLevelText;
+	if (userLevel & ServerInfo_User::IsAdmin)
+		userLevelText = tr("Administrator");
+	else if (userLevel & ServerInfo_User::IsJudge)
+		userLevelText = tr("Judge");
+	else if (userLevel & ServerInfo_User::IsRegistered)
+		userLevelText = tr("Registered user");
+	else
+		userLevelText = tr("Unregistered user");
+	userLevelLabel3->setText(userLevelText);
 }
 
 TabServer::TabServer(AbstractClient *_client, QWidget *parent)
