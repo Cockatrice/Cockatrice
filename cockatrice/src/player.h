@@ -84,6 +84,7 @@ public slots:
         void actMulligan();
 	void actMoveTopCardsToGrave();
 	void actMoveTopCardsToExile();
+	void actMoveTopCardToBottom();
 
 	void actViewLibrary();
 	void actViewTopCards();
@@ -116,7 +117,7 @@ private:
 	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
 		*aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg,
 		*aMoveRfgToTopLibrary, *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave,
-		*aViewLibrary, *aViewTopCards, *aMoveTopCardsToGrave, *aMoveTopCardsToExile,
+		*aViewLibrary, *aViewTopCards, *aMoveTopCardsToGrave, *aMoveTopCardsToExile, *aMoveTopCardToBottom,
 		*aViewGraveyard, *aViewRfg, *aViewSideboard,
                 *aDrawCard, *aDrawCards, *aMulligan, *aShuffle,
 		*aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,

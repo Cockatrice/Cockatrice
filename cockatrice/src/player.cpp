@@ -136,6 +136,8 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 		connect(aMoveTopCardsToGrave, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToGrave()));
 		aMoveTopCardsToExile = new QAction(this);
 		connect(aMoveTopCardsToExile, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToExile()));
+		aMoveTopCardToBottom = new QAction(this);
+		connect(aMoveTopCardToBottom, SIGNAL(triggered()), this, SLOT(actMoveTopCardToBottom()));
 	}
 
 	playerMenu = new QMenu(QString());
@@ -166,6 +168,7 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 		libraryMenu->addSeparator();
 		libraryMenu->addAction(aMoveTopCardsToGrave);
 		libraryMenu->addAction(aMoveTopCardsToExile);
+		libraryMenu->addAction(aMoveTopCardToBottom);
 		deck->setMenu(libraryMenu, aDrawCard);
 	} else {
 		handMenu = 0;
@@ -408,6 +411,7 @@ void Player::retranslateUi()
 		aShuffle->setText(tr("&Shuffle"));
 		aMoveTopCardsToGrave->setText(tr("Move top cards to &graveyard..."));
 		aMoveTopCardsToExile->setText(tr("Move top cards to &exile..."));
+		aMoveTopCardToBottom->setText(tr("Put top card on &bottom"));
 	
 		handMenu->setTitle(tr("&Hand"));
 		mRevealHand->setTitle(tr("&Reveal to"));
@@ -575,6 +579,11 @@ void Player::actMoveTopCardsToExile()
 	for (int i = 0; i < number; ++i)
 		commandList.append(new Command_MoveCard(-1, "deck", 0, "rfg", 0, 0, false));
 	sendCommandContainer(new CommandContainer(commandList));
+}
+
+void Player::actMoveTopCardToBottom()
+{
+	sendGameCommand(new Command_MoveCard(-1, "deck", 0, "deck", -1, 0, false));
 }
 
 void Player::actUntapAll()
