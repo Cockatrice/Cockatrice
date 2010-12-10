@@ -594,7 +594,9 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 		if (card->getParentCard())
 			card->setParentCard(0);
 		
-		const QList<Server_Card *> &attachedCards = card->getAttachedCards();
+		// DO NOT save a reference to the list, but make a real copy.
+		// The contents of the original list change during the loop.
+		const QList<Server_Card *> attachedCards = card->getAttachedCards();
 		for (int i = 0; i < attachedCards.size(); ++i)
 			unattachCard(game, attachedCards[i]->getZone()->getPlayer(), cont, attachedCards[i]);
 
