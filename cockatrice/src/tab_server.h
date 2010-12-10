@@ -105,7 +105,7 @@ public:
 class UserInfoBox : public QWidget {
 	Q_OBJECT
 private:
-	QLabel *avatarLabel, *nameLabel, *countryLabel1, *countryLabel2, *userLevelLabel1, *userLevelLabel2;
+	QLabel *avatarLabel, *nameLabel, *countryLabel1, *countryLabel2, *userLevelLabel1, *userLevelLabel2, *userLevelLabel3;
 private slots:
 	void processResponse(ProtocolResponse *response);
 public:
