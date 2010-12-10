@@ -1,112 +1,47 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="720px" height="504px" viewBox="-2100 -1470 4200 2940">
-	<title>Flag of Brazil</title>
-
-	<defs>
-		<path id="O" d="M 0,0 a 31.5,35 0 0,0 0,-70 a 31.5,35 0 0,0 0,70 M 0,-13 a 18.5,22 0 0,0 0,-44 a 18.5,22 0 0,0 0,44" fill-rule="evenodd"/>
-		<g id="R">
-			<use xlink:href="#P"/>
-			<path d="M 28,0 c 0,-10 0,-32 -15,-32 h -19 c 22,0 22,22 22,32"/>
-		</g>
-		<path id="D" d="M -31.5,0 h 33 a 30,30 0 0,0 30,-30 v -10 a 30,30 0 0,0 -30,-30 H -31.5 z M -18.5,-13 h 19 a 19,19 0 0,0 19,-19 v -6 a 19,19 0 0,0 -19,-19 H -18.5 z" fill-rule="evenodd"/>
-		<path id="E" d="M 0,0 h 63 v -13 H 12 v -18 h 40 v -12 h -40 v -14 H 60 v -13 H 0 z" transform="translate(-31.5)"/>
-		<path id="M" d="M -31.5,0 h 12 v -48 l 14,48 h 11 l 14,-48 V 0 h 12 V -70 h -17.5 l -14,48 l -14,-48 H -31.5 z"/>
-		<path id="E_" d="M -26.25,0 h 52.5 v -12 h -40.5 v -16 h 33 v -12 h -33 v -11 H 25 v -12 H -26.25 z"/>
-		<path id="P" d="M -31.5,0 h 13 v -26 h 28 a 22,22 0 0,0 0,-44 h -40 z M -18.5,-39 h 27 a 9,9 0 0,0 0,-18 h -27 z" fill-rule="evenodd"/>
-		<g id="G">
-			<clipPath id="gcut">
-				<path d="M -31.5,0 v -70 h 63 v 70 z M 0,-47 v 12 h 31.5 v -12 z"/>
-			</clipPath>
-			<use xlink:href="#O" clip-path="url(#gcut)"/>
-			<rect x="5" y="-35" width="26.5" height="10"/>
-			<rect x="21.5" y="-35" width="10" height="35"/>
-		</g>
-		<path id="S" d="M -15.75,-22 C -15.75,-15 -9,-11.5 1,-11.5 C 11,-11.5 15.74,-14.75 15.75,-19.25 C 15.75,-33.5 -31,-24.5 -30.75,-49.5 C -30.5,-71 -6,-70 3,-70 C 12,-70 29,-66 28.75,-48.75 L 13.5,-48.75 C 13.5,-56.25 6.5,-59 -1.5,-59 C -9.25,-59 -14.75,-57.75 -14.75,-50.5 C -15,-38.75 31.5,-46.5 31.5,-21.75 C 31.5,-3.5 13.5,0 0,0 C -11.5,0 -31.55,-4.5 -31.5,-22 z"/>
-		<g id="star">
-			<g id="cone">
-				<polygon id="triangle" points="0,0 0,1 .5,1" transform="translate(0,-1) rotate(18)"/>
-				<use xlink:href="#triangle" transform="scale(-1,1)"/>
-			</g>
-			<use xlink:href="#cone" transform="rotate(72)"/>
-			<use xlink:href="#cone" transform="rotate(-72)"/>
-			<use xlink:href="#cone" transform="rotate(144)"/>
-			<use xlink:href="#cone" transform="rotate(-144)"/>
-		</g>
-		<use id="star1" xlink:href="#star" transform="scale(31.5)"/>
-		<use id="star2" xlink:href="#star" transform="scale(26.25)"/>
-		<use id="star3" xlink:href="#star" transform="scale(21)"/>
-		<use id="star4" xlink:href="#star" transform="scale(15)"/>
-		<use id="star5" xlink:href="#star" transform="scale(10.5)"/>
-	</defs>
-
-	<rect id="field" fill="#00923f" x="-50%" y="-50%" width="100%" height="100%"/>
-	<path id="rhombus" fill="#f8c300" d="M -1743,0 L 0,1113 L 1743,0 L 0,-1113 z"/>
-	<circle id="circle" fill="#28166f" r="735"/>
-	<clipPath id="clipcircle">
-		<use xlink:href="#circle"/>
-	</clipPath>
-
-	<path id="band" d="M-2205,1470 a1785,1785 0 0,1 3570,0 h-105 a1680,1680 0 1,0 -3360,0 z" clip-path="url(#clipcircle)" fill="white"/>
-	<g fill="#00923f" transform="translate(-420,1470)">
-		<g id="ORDEM" transform="rotate(-7)">
-			<use xlink:href="#O" transform="translate(0,-1697.5)"/>
-			<use xlink:href="#R" transform="rotate(3) translate(0,-1697.5)"/>
-			<use xlink:href="#D" transform="rotate(6) translate(0,-1697.5)"/>
-			<use xlink:href="#E" transform="rotate(9) translate(0,-1697.5)"/>
-			<use xlink:href="#M" transform="rotate(12) translate(0,-1697.5)"/>
-		</g>
-		<use xlink:href="#E_" transform="rotate(9.75) translate(0,-1697.5)"/>
-		<g id="PROGRESSO" transform="rotate(14.5)">
-			<use xlink:href="#P" transform="translate(0,-1697.5)"/>
-			<use xlink:href="#R" transform="rotate(3) translate(0,-1697.5)"/>
-			<use xlink:href="#O" transform="rotate(6) translate(0,-1697.5)"/>
-			<use xlink:href="#G" transform="rotate(9) translate(0,-1697.5)"/>
-			<use xlink:href="#R" transform="rotate(12) translate(0,-1697.5)"/>
-			<use xlink:href="#E" transform="rotate(15) translate(0,-1697.5)"/>
-			<use xlink:href="#S" transform="rotate(18) translate(0,-1697.5)"/>
-			<use xlink:href="#S" transform="rotate(21) translate(0,-1697.5)"/>
-			<use xlink:href="#O" transform="rotate(24) translate(0,-1697.5)"/>
-		</g>
-	</g>
-
-	<g id="stars" fill="white">
-		<use id="Alpha_Canis_Minoris" xlink:href="#star1" transform="translate(-600,-132)"/>
-		<g id="Canis_Majoris">
-			<use id="Alpha_Canis_Majoris" xlink:href="#star1" transform="translate(-535,177)"/>
-			<use id="Beta_Canis_Majoris" xlink:href="#star3" transform="translate(-625,243)"/>
-			<use id="Gamma_Canis_Majoris" xlink:href="#star4" transform="translate(-463,132)"/>
-			<use id="Delta_Canis_Majoris" xlink:href="#star2" transform="translate(-382,250)"/>
-			<use id="Epsilon_Canis_Majoris" xlink:href="#star2" transform="translate(-404,323)"/>
-		</g>
-		<use id="Alpha_Virginis" xlink:href="#star1" transform="translate(228,-228)"/>
-		<g id="Scorpio">
-			<use id="Alpha_Scorpii" xlink:href="#star1" transform="translate(515,258)"/>
-			<use id="Beta_Scorpii" xlink:href="#star3" transform="translate(617,265)"/>
-			<use id="Epsilon_Scorpii" xlink:href="#star2" transform="translate(545,323)"/>
-			<use id="Theta_Scorpii" xlink:href="#star2" transform="translate(368,477)"/>
-			<use id="Iota_Scorpii" xlink:href="#star3" transform="translate(367,551)"/>
-			<use id="Kappa_Scorpii" xlink:href="#star3" transform="translate(441,419)"/>
-			<use id="Lambda_Scorpii" xlink:href="#star2" transform="translate(500,382)"/>
-			<use id="Mu_Scorpii" xlink:href="#star3" transform="translate(365,405)"/>
-		</g>
-		<g id="Hydra">
-			<use id="Alpha_Hydrae" xlink:href="#star2" transform="translate(-280,30)"/>
-			<use id="Gamma_Hydrae" xlink:href="#star3" transform="translate(200,-37)"/>
-		</g>
-		<g id="Crux">
-			<use id="Alpha_Crucis" xlink:href="#star1" transform="translate(0,330)"/>
-			<use id="Beta_Crucis" xlink:href="#star2" transform="translate(85,184)"/>
-			<use id="Gamma_Crucis" xlink:href="#star2" transform="translate(0,118)"/>
-			<use id="Delta_Crucis" xlink:href="#star3" transform="translate(-74,184)"/>
-			<use id="Epsilon_Crucis" xlink:href="#star4" transform="translate(-37,235)"/>
-		</g>
-		<g id="Triangulum_Australe">
-			<use id="Alpha_Trianguli_Australe" xlink:href="#star2" transform="translate(220,495)"/>
-			<use id="Beta_Trianguli_Australe" xlink:href="#star3" transform="translate(283,430)"/>
-			<use id="Gamma_Trianguli_Australe" xlink:href="#star3" transform="translate(162,412)"/>
-		</g>
-		<use id="Alpha_Carinae" xlink:href="#star1" transform="translate(-295,390)"/>
-		<use id="Sigma_Octantis" xlink:href="#star5" transform="translate(0,575)"/>
-	</g>
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="500px" height="350px" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd"
+     viewBox="0 0 100000 70000">
+ <g id="Camada 1">
+  <rect fill="#00923F" x="0" y="0" width="100000" height="70000"/>
+  <path fill="#F8C300" d="M50000 8500l-41500 26500 41500 26500 41500 -26500 -41500 -26500z"/>
+  <circle fill="#28166F" cx="49963" cy="35000" r="17464"/>
+  <path fill="#FFFFFF" d="M51733 38767l211 533 571 36 -440 366 141 555 -483 -307 -484 307 142 -555 -441 -366 571 -36 212 -533zm13056 1864l180 454 487 31 -376 312 121 472 -412 -261 -413 261 121 -472 -375 -312 487 -31 180 -454zm-1869 1447l212 532 571 37 -441 365 142 555 -484 -306 -484 306 142 -555 -441 -365 572 -37 211 -532zm-693 -1873l251 631 677 44 -522 433 168 657 -574 -363 -573 363 168 -657 -522 -433 677 -44 250 -631zm-134 3262l211 532 572 36 -441 366 142 555 -484 -307 -484 307 142 -555 -441 -366 571 -36 212 -532zm-1635 860l180 453 487 32 -375 311 121 473 -413 -261 -412 261 121 -473 -376 -311 487 -32 180 -453zm-1681 1563l212 532 571 37 -441 365 142 555 -484 -307 -483 307 141 -555 -440 -365 571 -37 211 -532zm-20 1956l180 454 487 31 -375 312 121 473 -413 -261 -412 261 121 -473 -376 -312 487 -31 180 -454zm-27 -3536l180 453 487 31 -376 312 121 473 -412 -261 -413 261 121 -473 -376 -312 488 -31 180 -453zm-2060 405l181 454 487 31 -376 312 121 473 -413 -261 -412 261 121 -473 -376 -312 487 -31 180 -454zm-1321 -16761l251 631 677 43 -522 433 168 657 -574 -363 -573 363 168 -657 -522 -433 677 -43 250 -631zm-276 18360l211 533 572 36 -441 366 142 554 -484 -306 -484 306 142 -554 -441 -366 571 -36 212 -533zm-972 -13052l181 453 487 32 -376 311 121 473 -413 -261 -412 261 121 -473 -376 -311 487 -32 180 -453zm-463 11013l180 454 487 31 -375 311 121 473 -413 -261 -412 261 121 -473 -376 -311 487 -31 180 -454zm-3506 -7005l211 532 572 37 -441 365 142 555 -484 -306 -484 306 142 -555 -441 -365 571 -37 212 -532zm-102 4954l250 631 678 43 -523 433 168 658 -573 -363 -573 363 168 -658 -523 -433 678 -43 250 -631zm57 6317l96 242 260 17 -200 166 64 253 -220 -140 -220 140 64 -253 -200 -166 260 -17 96 -242zm-1103 -8349l135 340 364 23 -281 233 91 354 -309 -196 -308 196 90 -354 -281 -233 365 -23 134 -340zm-1276 -1103l180 454 487 31 -376 311 121 473 -412 -261 -413 261 121 -473 -376 -311 488 -31 180 -454zm-4536 -4170l211 533 571 36 -440 366 141 555 -483 -307 -484 307 142 -555 -441 -366 571 -36 212 -533zm-511 8821l250 631 678 44 -523 433 168 657 -573 -363 -574 363 169 -657 -523 -433 677 -44 251 -631zm-1918 -3482l212 532 571 37 -441 365 142 555 -484 -307 -483 307 141 -555 -440 -365 571 -37 211 -532zm-632 1962l180 454 487 31 -376 311 121 473 -412 -261 -413 261 121 -473 -376 -311 487 -31 181 -454zm-1303 -4463l135 339 364 24 -281 233 91 353 -309 -195 -308 195 90 -353 -281 -233 365 -24 134 -339zm-1603 704l250 631 678 43 -523 433 168 658 -573 -363 -573 363 168 -658 -523 -433 678 -43 250 -631zm-1439 -7266l251 631 677 43 -522 433 168 658 -574 -363 -573 363 168 -658 -522 -433 677 -43 250 -631zm-394 8926l212 533 571 36 -441 366 142 554 -484 -306 -484 306 142 -554 -441 -366 572 -36 211 -533z"/>
+  <path fill="#FFFFFF" d="M39537 29605c10388,0 19911,3821 27238,10127 242,-850 421,-1726 532,-2622 -7597,-6162 -17265,-9862 -27770,-9862 -1821,0 -3617,114 -5382,330 -377,805 -695,1642 -948,2507 2065,-316 4179,-480 6330,-480z"/>
+  <path fill="#00923F" d="M35044 28698c14,171 64,300 148,388 84,88 194,126 331,115 137,-12 241,-68 309,-170 69,-101 95,-237 81,-408 -15,-171 -65,-300 -149,-388 -85,-88 -196,-126 -334,-114 -137,11 -239,68 -307,169 -67,100 -94,236 -79,408zm-326 28c-22,-251 30,-456 154,-615 124,-159 302,-248 534,-268 232,-20 423,38 573,173 150,136 236,329 257,579 22,251 -30,456 -155,615 -124,159 -303,249 -534,269 -233,20 -423,-38 -573,-174 -149,-136 -235,-329 -256,-579zm2536 -290l377 -13c82,-3 141,-21 179,-56 37,-34 54,-87 52,-158 -2,-68 -23,-119 -61,-152 -39,-34 -95,-50 -169,-47l-392 13 14 413zm-291 887l-52 -1558 756 -25c169,-6 296,26 380,96 85,70 129,180 134,329 3,95 -14,175 -52,240 -37,65 -93,110 -167,136 68,22 118,57 148,105 30,49 49,125 57,229l13 184c0,1 0,3 0,6 5,93 27,149 66,167l1 48 -351 12c-12,-22 -21,-48 -28,-80 -7,-32 -13,-70 -15,-115l-10 -164c-7,-96 -27,-161 -61,-193 -34,-33 -94,-48 -179,-45l-340 11 21 606 -321 11zm2300 -350l257 5c149,3 258,-34 326,-111 68,-76 104,-203 107,-377 3,-175 -25,-303 -86,-386 -61,-83 -157,-126 -289,-128l-296 -6 -19 1003zm-320 275l30 -1558 610 11c240,5 417,73 532,204 115,131 170,328 165,591 -3,142 -27,267 -72,375 -46,108 -111,194 -194,259 -63,48 -134,82 -214,102 -79,20 -190,29 -333,26l-524 -10zm1978 35l84 -1556 1131 61 -15 270 -815 -44 -17 332 744 40 -14 266 -745 -40 -21 400 852 46 -15 288 -1169 -63zm1835 109l165 -1550 472 50 182 1213 430 -1147 473 50 -165 1550 -299 -32 133 -1250 -448 1217 -326 -35 -185 -1284 -134 1250 -298 -32zm4130 532l326 -1524 1107 237 -57 265 -797 -171 -70 325 730 156 -56 261 -730 -157 -84 392 835 179 -60 282 -1144 -245zm4125 96l300 81c81,21 144,20 190,-4 46,-25 80,-75 100,-152 20,-71 16,-130 -10,-177 -26,-46 -75,-79 -147,-98l-315 -85 -118 435zm-75 272l-144 535 -310 -83 405 -1505 670 180c158,43 266,117 326,220 59,104 67,236 24,395 -41,155 -113,264 -216,326 -102,63 -228,74 -375,35l-380 -103zm1874 245l360 111c78,24 141,26 187,5 47,-20 80,-65 101,-133 20,-64 17,-119 -8,-163 -25,-45 -74,-78 -144,-100l-375 -115 -121 395zm-564 744l457 -1490 723 222c162,50 272,122 329,215 57,94 63,212 19,355 -28,91 -70,161 -127,210 -57,49 -124,74 -202,74 57,43 93,92 106,148 12,56 5,134 -21,235l-48 178c0,1 -1,3 -2,6 -25,89 -23,149 8,179l-14 46 -336 -104c-4,-24 -5,-52 -1,-85 4,-32 11,-70 23,-113l44 -158c25,-93 27,-161 6,-202 -22,-42 -73,-76 -155,-101l-325 -100 -178 579 -306 -94zm2373 -5c-59,161 -68,299 -29,415 38,115 122,196 251,243 130,47 247,40 352,-23 105,-63 187,-175 246,-336 58,-161 68,-299 29,-414 -40,-116 -125,-198 -255,-245 -128,-47 -245,-39 -349,23 -104,63 -186,175 -245,337zm-307 -113c87,-236 220,-400 399,-492 180,-91 379,-97 598,-17 218,80 367,213 446,399 79,187 75,398 -12,634 -86,236 -219,400 -400,491 -180,92 -380,98 -598,18 -219,-80 -367,-213 -445,-399 -78,-186 -74,-398 12,-634zm2884 1831c-84,49 -167,76 -250,81 -82,5 -169,-12 -260,-51 -200,-86 -333,-224 -398,-416 -65,-193 -49,-402 47,-628 98,-229 238,-385 420,-469 182,-85 377,-83 583,5 180,77 308,182 385,317 77,134 94,281 51,441l-301 -128c14,-82 1,-155 -39,-218 -39,-63 -104,-113 -194,-152 -120,-51 -233,-47 -339,12 -106,58 -192,165 -258,320 -67,156 -83,293 -49,412 34,119 113,205 237,258 94,39 184,45 270,17 87,-29 158,-88 214,-177l-325 -139 104 -245 594 253 -331 776 -197 -84 36 -185zm1482 -41l338 166c74,36 135,47 184,34 49,-13 89,-51 121,-116 29,-60 35,-114 17,-162 -18,-48 -61,-88 -127,-121l-352 -172 -181 371zm-674 646l685 -1399 679 332c153,75 250,163 291,264 42,101 30,219 -36,353 -42,86 -95,148 -158,188 -64,39 -135,53 -212,41 50,52 77,105 82,163 3,57 -16,133 -58,228l-75 169c0,1 -1,3 -3,5 -39,84 -46,144 -20,179l-21 42 -316 -154c0,-25 4,-53 13,-84 9,-32 22,-68 41,-108l68 -149c39,-88 51,-155 37,-200 -15,-45 -61,-86 -137,-123l-305 -150 -267 544 -288 -141zm1742 895l758 -1362 989 550 -132 237 -713 -397 -161 291 652 362 -130 233 -652 -362 -195 350 747 415 -140 252 -1023 -569zm1759 483l271 163c-34,79 -37,152 -9,217 28,65 89,126 183,182 80,49 148,71 206,66 58,-3 103,-33 137,-89 48,-81 -28,-218 -228,-411 -3,-3 -5,-5 -7,-7 -5,-5 -13,-13 -24,-23 -109,-103 -179,-187 -211,-253 -30,-58 -41,-121 -35,-187 6,-66 30,-133 72,-203 78,-130 182,-202 312,-219 130,-15 279,27 445,127 156,94 256,205 299,331 44,127 27,259 -48,396l-264 -159c34,-68 39,-132 14,-192 -24,-61 -78,-117 -160,-166 -72,-44 -136,-63 -192,-59 -56,5 -99,33 -131,85 -43,71 2,169 132,296 35,34 63,61 82,80 83,84 140,145 173,183 32,39 58,75 78,111 36,63 53,127 50,193 -3,67 -25,135 -67,204 -84,139 -195,218 -335,238 -140,20 -295,-21 -465,-124 -168,-101 -277,-219 -325,-355 -48,-135 -33,-277 47,-425zm1642 1027l262 178c-38,77 -44,149 -19,216 24,66 82,130 173,191 77,52 144,78 202,77 58,-1 105,-28 141,-82 53,-79 -16,-219 -206,-423 -2,-2 -5,-5 -6,-7 -6,-5 -13,-13 -23,-25 -103,-108 -169,-195 -198,-263 -26,-59 -34,-123 -25,-188 10,-66 37,-132 83,-199 85,-126 193,-193 323,-202 131,-9 277,41 438,150 151,102 244,217 281,346 37,129 14,259 -69,392l-256 -172c38,-66 46,-130 25,-192 -21,-62 -72,-120 -151,-174 -70,-47 -133,-70 -189,-68 -56,2 -101,28 -135,78 -46,68 -7,169 116,302 34,36 60,65 78,85 78,87 132,152 163,191 30,40 54,79 72,115 33,65 46,130 40,196 -6,66 -32,133 -78,200 -90,134 -206,208 -347,220 -141,13 -293,-36 -458,-148 -162,-110 -264,-234 -305,-371 -42,-138 -19,-279 68,-423zm1981 1051c-104,137 -154,267 -150,388 3,122 60,224 169,307 110,83 225,110 344,81 118,-29 229,-113 333,-250 103,-136 153,-266 149,-388 -5,-122 -62,-225 -172,-308 -109,-83 -223,-109 -341,-79 -118,29 -229,112 -332,249zm-261 -197c152,-200 327,-318 525,-354 199,-35 391,18 577,158 186,141 289,311 310,513 20,201 -45,402 -196,602 -152,201 -328,319 -527,353 -199,35 -392,-17 -577,-157 -186,-141 -289,-312 -309,-513 -20,-200 45,-401 197,-602z"/>
+ </g>
+  <metadata>
+    <rdf:RDF xmlns="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <Work rdf:about="">
+        <dc:title>Clipart by Rodrigo Tjäder - Flag of Brazil</dc:title>
+        <dc:description>Flag of Brazil based on .CDR file available in Brazilian Government's website</dc:description>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>flags</rdf:li>
+            <rdf:li>sign</rdf:li>
+            <rdf:li>signs_and_symbols</rdf:li>
+            <rdf:li></rdf:li>
+            <rdf:li>america</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+        <dc:publisher>
+          <Agent rdf:about="http://www.openclipart.org">
+            <dc:title>Rodrigo Tjäder</dc:title>
+          </Agent>
+        </dc:publisher>
+        <dc:date></dc:date>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+        <license rdf:resource="http://web.resource.org/cc/PublicDomain">
+          <dc:date></dc:date>
+        </license>
+        <dc:language>pt</dc:language>
+      </Work>
+      <License rdf:about="http://web.resource.org/cc/PublicDomain">
+        <permits rdf:resource="http://web.resource.org/cc/Reproduction"/>
+        <permits rdf:resource="http://web.resource.org/cc/Distribution"/>
+        <permits rdf:resource="http://web.resource.org/cc/DerivativeWorks"/>
+      </License>
+    </rdf:RDF>
+  </metadata>
 </svg>
