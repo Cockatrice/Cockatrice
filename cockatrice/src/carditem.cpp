@@ -415,7 +415,7 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-	if (change == ItemSelectedHasChanged) {
+	if ((change == ItemSelectedHasChanged) && owner) {
 		if (value == true)
 			owner->setCardMenu(cardMenu);
 		else if (owner->getCardMenu() == cardMenu)
