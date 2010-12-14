@@ -26,6 +26,8 @@
 
 class Server_Card;
 class Server_Player;
+class Server_Game;
+class CommandContainer;
 
 class Server_CardZone {
 private:
@@ -47,7 +49,9 @@ public:
 	QString getName() const { return name; }
 	Server_Player *getPlayer() const { return player; }
 	
-	int getFreeGridColumn(int y) const;
+	int getFreeGridColumn(int x, int y, const QString &cardName) const;
+	void fixFreeSpaces(CommandContainer *cont, int x, int y);
+	void moveCard(CommandContainer *cont, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y);
 	QList<Server_Card *> cards;
 	void insertCard(Server_Card *card, int x, int y);
 	void shuffle();
