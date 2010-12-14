@@ -23,6 +23,10 @@ public:
 	void retranslateUi();
 	const QRectF &getPlayersRect() const { return playersRect; }
 	void processViewSizeChange(const QSize &newSize);
+	
+	void startRubberBand(const QPointF &selectionOrigin);
+	void resizeRubberBand(const QPointF &cursorPoint);
+	void stopRubberBand();
 public slots:
 	void toggleZoneView(Player *player, const QString &zoneName, int numberCards);
 	void addRevealedZoneView(Player *player, CardZone *zone, const QList<ServerInfo_Card *> &cardList);
@@ -35,6 +39,10 @@ private slots:
 	void rearrange();
 protected:
 	bool event(QEvent *event);
+signals:
+	void sigStartRubberBand(const QPointF &selectionOrigin);
+	void sigResizeRubberBand(const QPointF &cursorPoint);
+	void sigStopRubberBand();
 };
 
 #endif

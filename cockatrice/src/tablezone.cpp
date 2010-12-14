@@ -9,7 +9,7 @@
 #include "arrowitem.h"
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "table", true, false, true, parent), active(false)
+	: SelectZone(_p, "table", true, false, true, parent), active(false)
 {
 	connect(settingsCache, SIGNAL(tableBgPathChanged()), this, SLOT(updateBgPixmap()));
 	connect(settingsCache, SIGNAL(economicalGridChanged()), this, SLOT(reorganizeCards()));

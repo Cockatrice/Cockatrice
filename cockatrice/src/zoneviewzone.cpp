@@ -5,7 +5,7 @@
 #include "protocol_items.h"
 
 ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, QGraphicsItem *parent)
-	: CardZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0), numberCards(_numberCards), origZone(_origZone), sortByName(false), sortByType(false)
+	: SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0), numberCards(_numberCards), origZone(_origZone), sortByName(false), sortByType(false)
 {
 	origZone->setView(this);
 }

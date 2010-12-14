@@ -195,3 +195,18 @@ bool GameScene::event(QEvent *event)
 	}
 	return QGraphicsScene::event(event);
 }
+
+void GameScene::startRubberBand(const QPointF &selectionOrigin)
+{
+	emit sigStartRubberBand(selectionOrigin);
+}
+
+void GameScene::resizeRubberBand(const QPointF &cursorPoint)
+{
+	emit sigResizeRubberBand(cursorPoint);
+}
+
+void GameScene::stopRubberBand()
+{
+	emit sigStopRubberBand();
+}

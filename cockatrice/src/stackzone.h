@@ -1,9 +1,9 @@
 #ifndef STACKZONE_H
 #define STACKZONE_H
 
-#include "cardzone.h"
+#include "selectzone.h"
 
-class StackZone : public CardZone {
+class StackZone : public SelectZone {
 	Q_OBJECT
 private:
 	qreal zoneHeight;

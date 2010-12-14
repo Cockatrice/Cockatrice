@@ -1,9 +1,9 @@
 #ifndef TABLEZONE_H
 #define TABLEZONE_H
 
-#include "cardzone.h"
+#include "selectzone.h"
 
-class TableZone : public CardZone {
+class TableZone : public SelectZone {
 	Q_OBJECT
 signals:
 	void sizeChanged();

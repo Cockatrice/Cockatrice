@@ -1,9 +1,9 @@
 #ifndef HANDZONE_H
 #define HANDZONE_H
 
-#include "cardzone.h"
+#include "selectzone.h"
 
-class HandZone : public CardZone {
+class HandZone : public SelectZone {
 	Q_OBJECT
 private:
 	qreal width, zoneHeight;

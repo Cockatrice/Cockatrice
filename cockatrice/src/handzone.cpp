@@ -5,7 +5,7 @@
 #include "protocol_items.h"
 
 HandZone::HandZone(Player *_p, bool _contentsKnown, int _zoneHeight, QGraphicsItem *parent)
-	: CardZone(_p, "hand", false, false, _contentsKnown, parent), zoneHeight(_zoneHeight)
+	: SelectZone(_p, "hand", false, false, _contentsKnown, parent), zoneHeight(_zoneHeight)
 {
 	connect(settingsCache, SIGNAL(handBgPathChanged()), this, SLOT(updateBgPixmap()));
 	updateBgPixmap();

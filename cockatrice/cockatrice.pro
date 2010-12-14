@@ -16,6 +16,7 @@ HEADERS += src/counter.h \
  src/remoteclient.h \
  src/window_main.h \
  src/cardzone.h \
+ src/selectzone.h \
  src/player.h \
  src/playertarget.h \
  src/cardlist.h \
@@ -96,6 +97,7 @@ SOURCES += src/counter.cpp \
  src/player.cpp \
  src/playertarget.cpp \
  src/cardzone.cpp \
+ src/selectzone.cpp \
  src/cardlist.cpp \
  src/abstractcarditem.cpp \
  src/carditem.cpp \

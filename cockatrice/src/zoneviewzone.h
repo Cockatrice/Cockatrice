@@ -1,14 +1,14 @@
 #ifndef ZONEVIEWERZONE_H
 #define ZONEVIEWERZONE_H
 
-#include "cardzone.h"
+#include "selectzone.h"
 #include <QGraphicsLayoutItem>
 
 class ZoneViewWidget;
 class ProtocolResponse;
 class ServerInfo_Card;
 
-class ZoneViewZone : public CardZone, public QGraphicsLayoutItem {
+class ZoneViewZone : public SelectZone, public QGraphicsLayoutItem {
 	Q_OBJECT
 private:
 	QRectF bRect, optimumRect;

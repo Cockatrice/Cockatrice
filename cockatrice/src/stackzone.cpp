@@ -7,7 +7,7 @@
 #include "protocol_items.h"
 
 StackZone::StackZone(Player *_p, int _zoneHeight, QGraphicsItem *parent)
-	: CardZone(_p, "stack", false, false, true, parent), zoneHeight(_zoneHeight)
+	: SelectZone(_p, "stack", false, false, true, parent), zoneHeight(_zoneHeight)
 {
 	connect(settingsCache, SIGNAL(stackBgPathChanged()), this, SLOT(updateBgPixmap()));
 	updateBgPixmap();
