@@ -510,7 +510,7 @@ ResponseCode Server_ProtocolHandler::cmdMulligan(Command_Mulligan * /*cmd*/, Com
 
 	Server_CardZone *hand = player->getZones().value("hand");
 	while (!hand->cards.isEmpty())
-		moveCard(game, player, cont, "hand", hand->cards.first()->getId(), "deck", 0, 0, false, false);
+		player->moveCard(cont, "hand", hand->cards.first()->getId(), "deck", 0, 0, false, false);
 
 	player->getZones().value("deck")->shuffle();
 	cont->enqueueGameEventPrivate(new Event_Shuffle(player->getPlayerId()), game->getGameId());
@@ -565,7 +565,8 @@ ResponseCode Server_ProtocolHandler::cmdDrawCards(Command_DrawCards *cmd, Comman
 	return drawCards(game, player, cont, cmd->getNumber());
 }
 
-ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *player, CommandContainer *cont, const QString &_startZone, int _cardId, const QString &_targetZone, int x, int y, bool faceDown, bool tapped)
+
+ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -573,124 +574,7 @@ ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
 		
-	Server_CardZone *startzone = player->getZones().value(_startZone);
-	Server_CardZone *targetzone = player->getZones().value(_targetZone);
-	if ((!startzone) || (!targetzone))
-		return RespNameNotFound;
-
-	// Collision detection
-	if (targetzone->hasCoords())
-		for (int i = 0; i < targetzone->cards.size(); ++i)
-			if ((targetzone->cards[i]->getX() == x) && (targetzone->cards[i]->getY() == y) && (x != -1))
-				return RespContextError;
-		
-	int position = -1;
-	Server_Card *card = startzone->getCard(_cardId, true, &position);
-	if (!card)
-		return RespNameNotFound;
-	
-	if (startzone != targetzone) {
-		// Delete all attachment relationships
-		if (card->getParentCard())
-			card->setParentCard(0);
-		
-		// DO NOT save a reference to the list, but make a real copy.
-		// The contents of the original list change during the loop.
-		const QList<Server_Card *> attachedCards = card->getAttachedCards();
-		for (int i = 0; i < attachedCards.size(); ++i)
-			unattachCard(game, attachedCards[i]->getZone()->getPlayer(), cont, attachedCards[i]);
-
-		// Delete all arrows from and to the card
-		const QList<Server_Player *> &players = game->getPlayers().values();
-		for (int i = 0; i < players.size(); ++i) {
-			QList<int> arrowsToDelete;
-			QMapIterator<int, Server_Arrow *> arrowIterator(players[i]->getArrows());
-			while (arrowIterator.hasNext()) {
-				Server_Arrow *arrow = arrowIterator.next().value();
-				if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card))
-					arrowsToDelete.append(arrow->getId());
-			}
-			for (int j = 0; j < arrowsToDelete.size(); ++j)
-				players[i]->deleteArrow(arrowsToDelete[j]);
-		}
-	}
-	
-	if (card->getDestroyOnZoneChange() && (startzone != targetzone)) {
-		cont->enqueueGameEventPrivate(new Event_DestroyCard(player->getPlayerId(), startzone->getName(), card->getId()), game->getGameId());
-		cont->enqueueGameEventPublic(new Event_DestroyCard(player->getPlayerId(), startzone->getName(), card->getId()), game->getGameId());
-		return RespOk;
-	}
-	
-	if (!targetzone->hasCoords()) {
-		y = 0;
-		if (x == -1)
-			x = targetzone->cards.size();
-		
-		card->resetState();
-	} else if (x == -1)
-		x = targetzone->getFreeGridColumn(y);
-
-	targetzone->insertCard(card, x, y);
-
-	bool targetBeingLookedAt = (targetzone->getType() != HiddenZone) || (targetzone->getCardsBeingLookedAt() > x) || (targetzone->getCardsBeingLookedAt() == -1);
-	bool sourceBeingLookedAt = (startzone->getType() != HiddenZone) || (startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1);
-
-	bool targetHiddenToPlayer = faceDown || !targetBeingLookedAt;
-	bool targetHiddenToOthers = faceDown || (targetzone->getType() != PublicZone);
-	bool sourceHiddenToPlayer = card->getFaceDown() || !sourceBeingLookedAt;
-	bool sourceHiddenToOthers = card->getFaceDown() || (startzone->getType() != PublicZone);
-
-	QString privateCardName, publicCardName;
-	if (!(sourceHiddenToPlayer && targetHiddenToPlayer))
-		privateCardName = card->getName();
-	if (!(sourceHiddenToOthers && targetHiddenToOthers))
-		publicCardName = card->getName();
-
-	int oldCardId = card->getId();
-	if (faceDown)
-		card->setId(player->newCardId());
-	card->setFaceDown(faceDown);
-
-	// The player does not get to see which card he moved if it moves between two parts of hidden zones which
-	// are not being looked at.
-	int privateNewCardId = card->getId();
-	int privateOldCardId = oldCardId;
-	if (!targetBeingLookedAt && !sourceBeingLookedAt) {
-		privateOldCardId = -1;
-		privateNewCardId = -1;
-		privateCardName = QString();
-	}
-	int privatePosition = -1;
-	if (startzone->getType() == HiddenZone)
-		privatePosition = position;
-	cont->enqueueGameEventPrivate(new Event_MoveCard(player->getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getName(), x, y, privateNewCardId, faceDown), game->getGameId());
-	cont->enqueueGameEventOmniscient(new Event_MoveCard(player->getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getName(), x, y, privateNewCardId, faceDown), game->getGameId());
-
-	// Other players do not get to see the start and/or target position of the card if the respective
-	// part of the zone is being looked at. The information is not needed anyway because in hidden zones,
-	// all cards are equal.
-	if (
-		((startzone->getType() == HiddenZone) && ((startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1)))
-		|| (startzone->getType() == PublicZone)
-	)
-		position = -1;
-	if ((targetzone->getType() == HiddenZone) && ((targetzone->getCardsBeingLookedAt() > x) || (targetzone->getCardsBeingLookedAt() == -1)))
-		x = -1;
-
-	if ((startzone->getType() == PublicZone) || (targetzone->getType() == PublicZone))
-		cont->enqueueGameEventPublic(new Event_MoveCard(player->getPlayerId(), oldCardId, publicCardName, startzone->getName(), position, targetzone->getName(), x, y, card->getId(), faceDown), game->getGameId());
-	else
-		cont->enqueueGameEventPublic(new Event_MoveCard(player->getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getName(), x, y, -1, false), game->getGameId());
-	
-	if (tapped)
-		setCardAttrHelper(cont, game, player, targetzone->getName(), card->getId(), "tapped", "1");
-	
-	return RespOk;
-}
-
-ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
-{
-	return moveCard(game, player, cont, cmd->getStartZone(), cmd->getCardId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown(), cmd->getTapped());
+	return player->moveCard(cont, cmd->getStartZone(), cmd->getCardId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown(), cmd->getTapped());
 }
 
 ResponseCode Server_ProtocolHandler::cmdFlipCard(Command_FlipCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
@@ -720,17 +604,6 @@ ResponseCode Server_ProtocolHandler::cmdFlipCard(Command_FlipCard *cmd, CommandC
 	cont->enqueueGameEventPublic(new Event_FlipCard(player->getPlayerId(), zone->getName(), card->getId(), card->getName(), faceDown), game->getGameId());
 	
 	return RespOk;
-}
-
-void Server_ProtocolHandler::unattachCard(Server_Game *game, Server_Player *player, CommandContainer *cont, Server_Card *card)
-{
-	Server_CardZone *zone = card->getZone();
-	
-	card->setParentCard(0);
-	cont->enqueueGameEventPrivate(new Event_AttachCard(player->getPlayerId(), zone->getName(), card->getId(), -1, QString(), -1), game->getGameId());
-	cont->enqueueGameEventPublic(new Event_AttachCard(player->getPlayerId(), zone->getName(), card->getId(), -1, QString(), -1), game->getGameId());
-	
-	moveCard(game, player, cont, zone->getName(), card->getId(), zone->getName(), -1, card->getY(), card->getFaceDown(), card->getTapped());
 }
 
 ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
@@ -798,14 +671,14 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 		// Unattach all cards attached to the card being attached.
 		const QList<Server_Card *> &attachedList = card->getAttachedCards();
 		for (int i = 0; i < attachedList.size(); ++i)
-			unattachCard(game, player, cont, attachedList[i]);
+			player->unattachCard(cont, attachedList[i]);
 		
 		card->setParentCard(targetCard);
 		card->setCoords(-1, card->getY());
 		cont->enqueueGameEventPrivate(new Event_AttachCard(player->getPlayerId(), startzone->getName(), card->getId(), targetPlayer->getPlayerId(), targetzone->getName(), targetCard->getId()), game->getGameId());
 		cont->enqueueGameEventPublic(new Event_AttachCard(player->getPlayerId(), startzone->getName(), card->getId(), targetPlayer->getPlayerId(), targetzone->getName(), targetCard->getId()), game->getGameId());
 	} else
-		unattachCard(game, player, cont, card);
+		player->unattachCard(cont, card);
 	
 	return RespOk;
 }
@@ -824,8 +697,8 @@ ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, Co
 
 	int x = cmd->getX();
 	int y = cmd->getY();
-	if (zone->hasCoords() && (x == -1))
-		x = zone->getFreeGridColumn(y);
+	if (zone->hasCoords())
+		x = zone->getFreeGridColumn(x, y, cmd->getCardName());
 	if (x < 0)
 		x = 0;
 	if (y < 0)
@@ -919,7 +792,7 @@ ResponseCode Server_ProtocolHandler::cmdDeleteArrow(Command_DeleteArrow *cmd, Co
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::setCardAttrHelper(CommandContainer *cont, Server_Game *game, Server_Player *player, const QString &zoneName, int cardId, const QString &attrName, const QString &attrValue)
+ResponseCode Server_ProtocolHandler::cmdSetCardAttr(Command_SetCardAttr *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -927,33 +800,7 @@ ResponseCode Server_ProtocolHandler::setCardAttrHelper(CommandContainer *cont, S
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
 		
-	Server_CardZone *zone = player->getZones().value(zoneName);
-	if (!zone)
-		return RespNameNotFound;
-	if (!zone->hasCoords())
-		return RespContextError;
-
-	if (cardId == -1) {
-		QListIterator<Server_Card *> CardIterator(zone->cards);
-		while (CardIterator.hasNext())
-			if (!CardIterator.next()->setAttribute(attrName, attrValue, true))
-				return RespInvalidCommand;
-	} else {
-		Server_Card *card = zone->getCard(cardId, false);
-		if (!card)
-			return RespNameNotFound;
-		if (!card->setAttribute(attrName, attrValue, false))
-			return RespInvalidCommand;
-	}
-	cont->enqueueGameEventPrivate(new Event_SetCardAttr(player->getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
-	cont->enqueueGameEventPublic(new Event_SetCardAttr(player->getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
-	cont->enqueueGameEventOmniscient(new Event_SetCardAttr(player->getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
-	return RespOk;
-}
-
-ResponseCode Server_ProtocolHandler::cmdSetCardAttr(Command_SetCardAttr *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
-{
-	return setCardAttrHelper(cont, game, player, cmd->getZone(), cmd->getCardId(), cmd->getAttrName(), cmd->getAttrValue());
+	return player->setCardAttrHelper(cont, cmd->getZone(), cmd->getCardId(), cmd->getAttrName(), cmd->getAttrValue());
 }
 
 ResponseCode Server_ProtocolHandler::cmdSetCardCounter(Command_SetCardCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)

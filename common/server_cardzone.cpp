@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "server_cardzone.h"
 #include "server_card.h"
+#include "server_player.h"
 #include "rng_abstract.h"
 
 Server_CardZone::Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ZoneType _type)
@@ -73,24 +74,68 @@ Server_Card *Server_CardZone::getCard(int id, bool remove, int *position)
 	}
 }
 
-int Server_CardZone::getFreeGridColumn(int y) const
+int Server_CardZone::getFreeGridColumn(int x, int y, const QString &cardName) const
 {
-	int x = 0;
+	QMap<int, Server_Card *> coordMap;
+	for (int i = 0; i < cards.size(); ++i)
+		if (cards[i]->getY() == y)
+			coordMap.insert(cards[i]->getX(), cards[i]);
 	
-	// Stupid algorithm. For large numbers of cards, it would be more
-	// efficient to sort the cards by their x value and only need to iterate once.
-	bool occupied;
-	do {
-		occupied = false;
+	int resultX = 0;
+	if (x != -1) {
+		x = (x / 3) * 3;
+		if (!coordMap.contains(x))
+			resultX = x;
+		else if (!coordMap.contains(x + 1))
+			resultX = x + 1;
+		else if (!coordMap.contains(x + 2))
+			resultX = x + 2;
+		else {
+			resultX = x;
+			x = -1;
+		}
+	} else
 		for (int i = 0; i < cards.size(); ++i)
-			if ((cards[i]->getY() == y) && (cards[i]->getX() == x)) {
-				occupied = true;
-				++x;
-				break;
+			if ((cards[i]->getName() == cardName) && !(cards[i]->getX() % 3) && (cards[i]->getY() == y)) {
+				if (!coordMap.value(cards[i]->getX() + 1))
+					return cards[i]->getX() + 1;
+				if (!coordMap.value(cards[i]->getX() + 2))
+					return cards[i]->getX() + 2;
 			}
-	} while (occupied);
 	
-	return x;
+	if (x == -1)
+		while (coordMap.value(resultX))
+			resultX += 3;
+
+	return resultX;
+}
+
+void Server_CardZone::moveCard(CommandContainer *cont, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y)
+{
+	coordMap.remove(card->getX());
+	player->moveCard(cont, this, card->getId(), this, x, y, card->getFaceDown(), false);
+	coordMap.insert(x, card);
+}
+
+void Server_CardZone::fixFreeSpaces(CommandContainer *cont, int x, int y)
+{
+	QMap<int, Server_Card *> coordMap;
+	for (int i = 0; i < cards.size(); ++i)
+		if (cards[i]->getY() == y)
+			coordMap.insert(cards[i]->getX(), cards[i]);
+	
+	int baseX = (x / 3) * 3;
+	if (!coordMap.contains(baseX)) {
+		if (coordMap.contains(baseX + 1))
+			moveCard(cont, coordMap, coordMap.value(baseX + 1), baseX, y);
+		else if (coordMap.contains(baseX + 2)) {
+			moveCard(cont, coordMap, coordMap.value(baseX + 2), baseX, y);
+			return;
+		} else
+			return;
+	}
+	if (!coordMap.contains(baseX + 1) && coordMap.contains(baseX + 2))
+		moveCard(cont, coordMap, coordMap.value(baseX + 2), baseX + 1, y);
 }
 
 void Server_CardZone::insertCard(Server_Card *card, int x, int y)
