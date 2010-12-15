@@ -807,9 +807,12 @@ void Player::eventMoveCard(Event_MoveCard *event)
 		return;
 	card->setName(event->getCardName());
 	
-	if (card->getAttachedTo() && (startZone != targetZone))
+	if (card->getAttachedTo() && (startZone != targetZone)) {
+		CardItem *parentCard = card->getAttachedTo();
 		card->setAttachedTo(0);
-	
+		parentCard->getZone()->reorganizeCards();
+	}
+
 	card->deleteDragItem();
 
 	card->setId(event->getNewCardId());
