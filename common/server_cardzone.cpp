@@ -82,11 +82,25 @@ int Server_CardZone::getFreeGridColumn(int x, int y, const QString &cardName) co
 			coordMap.insert(cards[i]->getX(), cards[i]);
 	
 	int resultX = 0;
-	if (x != -1) {
+	if (x == -1) {
+		for (int i = 0; i < cards.size(); ++i)
+			if ((cards[i]->getName() == cardName) && !(cards[i]->getX() % 3) && (cards[i]->getY() == y)) {
+				if (!cards[i]->getAttachedCards().isEmpty())
+					continue;
+				if (!coordMap.value(cards[i]->getX() + 1))
+					return cards[i]->getX() + 1;
+				if (!coordMap.value(cards[i]->getX() + 2))
+					return cards[i]->getX() + 2;
+			}
+	} else if (x == -2) {
+	} else {
 		x = (x / 3) * 3;
 		if (!coordMap.contains(x))
 			resultX = x;
-		else if (!coordMap.contains(x + 1))
+		else if (!coordMap.value(x)->getAttachedCards().isEmpty()) {
+			resultX = x;
+			x = -1;
+		} else if (!coordMap.contains(x + 1))
 			resultX = x + 1;
 		else if (!coordMap.contains(x + 2))
 			resultX = x + 2;
@@ -94,20 +108,33 @@ int Server_CardZone::getFreeGridColumn(int x, int y, const QString &cardName) co
 			resultX = x;
 			x = -1;
 		}
-	} else
-		for (int i = 0; i < cards.size(); ++i)
-			if ((cards[i]->getName() == cardName) && !(cards[i]->getX() % 3) && (cards[i]->getY() == y)) {
-				if (!coordMap.value(cards[i]->getX() + 1))
-					return cards[i]->getX() + 1;
-				if (!coordMap.value(cards[i]->getX() + 2))
-					return cards[i]->getX() + 2;
-			}
+	}
 	
-	if (x == -1)
+	if (x < 0)
 		while (coordMap.value(resultX))
 			resultX += 3;
 
 	return resultX;
+}
+
+bool Server_CardZone::isColumnStacked(int x, int y) const
+{
+	QMap<int, Server_Card *> coordMap;
+	for (int i = 0; i < cards.size(); ++i)
+		if (cards[i]->getY() == y)
+			coordMap.insert(cards[i]->getX(), cards[i]);
+	
+	return coordMap.contains((x / 3) * 3 + 1);
+}
+
+bool Server_CardZone::isColumnEmpty(int x, int y) const
+{
+	QMap<int, Server_Card *> coordMap;
+	for (int i = 0; i < cards.size(); ++i)
+		if (cards[i]->getY() == y)
+			coordMap.insert(cards[i]->getX(), cards[i]);
+	
+	return !coordMap.contains((x / 3) * 3);
 }
 
 void Server_CardZone::moveCard(CommandContainer *cont, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y)

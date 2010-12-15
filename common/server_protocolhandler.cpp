@@ -673,6 +673,9 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 		for (int i = 0; i < attachedList.size(); ++i)
 			player->unattachCard(cont, attachedList[i]);
 		
+		if (targetzone->isColumnStacked(targetCard->getX(), targetCard->getY()))
+			targetPlayer->moveCard(cont, targetzone, targetCard->getId(), targetzone, targetzone->getFreeGridColumn(-2, targetCard->getY(), targetCard->getName()), targetCard->getY(), targetCard->getFaceDown(), false);
+		
 		card->setParentCard(targetCard);
 		card->setCoords(-1, card->getY());
 		cont->enqueueGameEventPrivate(new Event_AttachCard(player->getPlayerId(), startzone->getName(), card->getId(), targetPlayer->getPlayerId(), targetzone->getName(), targetCard->getId()), game->getGameId());

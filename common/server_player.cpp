@@ -217,9 +217,13 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 				return RespContextError;
 */		
 	int position = -1;
-	Server_Card *card = startzone->getCard(_cardId, true, &position);
+	Server_Card *card = startzone->getCard(_cardId, false, &position);
 	if (!card)
 		return RespNameNotFound;
+	if (!card->getAttachedCards().isEmpty() && !targetzone->isColumnEmpty(x, y))
+		return RespContextError;
+	startzone->getCard(_cardId, true);
+	
 	int oldX = card->getX(), oldY = card->getY();
 	
 	if (startzone != targetzone) {
@@ -244,10 +248,6 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 			for (int j = 0; j < arrowsToDelete.size(); ++j)
 				players[i]->deleteArrow(arrowsToDelete[j]);
 		}
-	}
-	
-	if (startzone->hasCoords()) {
-		
 	}
 	
 	if (card->getDestroyOnZoneChange() && (startzone != targetzone)) {

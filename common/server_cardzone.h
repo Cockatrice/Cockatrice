@@ -50,6 +50,8 @@ public:
 	Server_Player *getPlayer() const { return player; }
 	
 	int getFreeGridColumn(int x, int y, const QString &cardName) const;
+	bool isColumnEmpty(int x, int y) const;
+	bool isColumnStacked(int x, int y) const;
 	void fixFreeSpaces(CommandContainer *cont, int x, int y);
 	void moveCard(CommandContainer *cont, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y);
 	QList<Server_Card *> cards;
