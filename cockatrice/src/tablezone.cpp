@@ -12,14 +12,10 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 	: SelectZone(_p, "table", true, false, true, parent), active(false)
 {
 	connect(settingsCache, SIGNAL(tableBgPathChanged()), this, SLOT(updateBgPixmap()));
-	connect(settingsCache, SIGNAL(economicalGridChanged()), this, SLOT(reorganizeCards()));
 	connect(settingsCache, SIGNAL(invertVerticalCoordinateChanged()), this, SLOT(reorganizeCards()));
 	updateBgPixmap();
 
-	if (settingsCache->getEconomicalGrid())
-		height = 2 * boxLineWidth + (int) (11.0 / 3 * CARD_HEIGHT + 2 * paddingY);
-	else
-		height = 2 * boxLineWidth + 3 * (CARD_HEIGHT + 20) + 2 * paddingY;
+	height = 2 * boxLineWidth + 3 * (CARD_HEIGHT + 20) + 2 * paddingY;
 	width = minWidth + 2 * marginX + 2 * boxLineWidth;
 	currentMinimumWidth = minWidth;
 
@@ -276,7 +272,13 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 
 QPointF TableZone::closestGridPoint(const QPointF &point)
 {
-	return mapFromGrid(mapToGrid(point + QPoint(1, 1)));
+	QPoint gridPoint = mapToGrid(point + QPoint(1, 1));
+	gridPoint.setX((gridPoint.x() / 3) * 3);
+	if (getCardFromGrid(gridPoint))
+		gridPoint.setX(gridPoint.x() + 1);
+	if (getCardFromGrid(gridPoint))
+		gridPoint.setX(gridPoint.x() + 1);
+	return mapFromGrid(gridPoint);
 }
 
 void TableZone::setWidth(qreal _width)

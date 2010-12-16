@@ -228,17 +228,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	handGroupBox = new QGroupBox;
 	handGroupBox->setLayout(handGrid);
 	
-	economicalGridCheckBox = new QCheckBox;
-	economicalGridCheckBox->setChecked(settingsCache->getEconomicalGrid());
-	connect(economicalGridCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setEconomicalGrid(int)));
-	
 	invertVerticalCoordinateCheckBox = new QCheckBox;
 	invertVerticalCoordinateCheckBox->setChecked(settingsCache->getInvertVerticalCoordinate());
 	connect(invertVerticalCoordinateCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setInvertVerticalCoordinate(int)));
 	
 	QGridLayout *tableGrid = new QGridLayout;
-	tableGrid->addWidget(economicalGridCheckBox, 0, 0, 1, 2);
-	tableGrid->addWidget(invertVerticalCoordinateCheckBox, 1, 0, 1, 2);
+	tableGrid->addWidget(invertVerticalCoordinateCheckBox, 0, 0, 1, 2);
 	
 	tableGroupBox = new QGroupBox;
 	tableGroupBox->setLayout(tableGrid);
@@ -279,7 +274,6 @@ void AppearanceSettingsPage::retranslateUi()
 	horizontalHandCheckBox->setText(tr("Display hand horizontally (wastes space)"));
 	
 	tableGroupBox->setTitle(tr("Table grid layout"));
-	economicalGridCheckBox->setText(tr("Economical layout"));
 	invertVerticalCoordinateCheckBox->setText(tr("Invert vertical coordinate"));
 	
 	zoneViewGroupBox->setTitle(tr("Zone view layout"));

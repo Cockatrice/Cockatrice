@@ -9,7 +9,7 @@ signals:
 	void sizeChanged();
 private:
 	static const int boxLineWidth = 10;
-	static const int paddingX = 20;
+	static const int paddingX = 35;
 	static const int paddingY = 10;
 	static const int marginX = 20;
 	static const int minWidth = 15 * CARD_WIDTH / 2;
