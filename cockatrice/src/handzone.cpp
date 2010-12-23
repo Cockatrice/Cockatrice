@@ -3,6 +3,7 @@
 #include "settingscache.h"
 #include "player.h"
 #include "protocol_items.h"
+#include "carddragitem.h"
 
 HandZone::HandZone(Player *_p, bool _contentsKnown, int _zoneHeight, QGraphicsItem *parent)
 	: SelectZone(_p, "hand", false, false, _contentsKnown, parent), zoneHeight(_zoneHeight)
@@ -36,9 +37,9 @@ void HandZone::addCardImpl(CardItem *card, int x, int /*y*/)
 	card->update();
 }
 
-void HandZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
+void HandZone::handleDropEvent(CardDragItem *dragItem, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
-	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), cardId, getName(), cards.size(), -1, false));
+	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), dragItem->getId(), player->getId(), getName(), cards.size(), -1, false));
 }
 
 QRectF HandZone::boundingRect() const

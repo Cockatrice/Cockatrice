@@ -509,10 +509,11 @@ ResponseCode Server_ProtocolHandler::cmdMulligan(Command_Mulligan * /*cmd*/, Com
 		return RespContextError;
 
 	Server_CardZone *hand = player->getZones().value("hand");
+	Server_CardZone *deck = player->getZones().value("deck");
 	while (!hand->cards.isEmpty())
-		player->moveCard(cont, "hand", hand->cards.first()->getId(), "deck", 0, 0, false, false);
+		player->moveCard(cont, hand, hand->cards.first()->getId(), deck, 0, 0, false, false);
 
-	player->getZones().value("deck")->shuffle();
+	deck->shuffle();
 	cont->enqueueGameEventPrivate(new Event_Shuffle(player->getPlayerId()), game->getGameId());
 	cont->enqueueGameEventPublic(new Event_Shuffle(player->getPlayerId()), game->getGameId());
 
@@ -574,7 +575,7 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, CommandC
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
 		
-	return player->moveCard(cont, cmd->getStartZone(), cmd->getCardId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown(), cmd->getTapped());
+	return player->moveCard(cont, cmd->getStartZone(), cmd->getCardId(), cmd->getTargetPlayerId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown(), cmd->getTapped());
 }
 
 ResponseCode Server_ProtocolHandler::cmdFlipCard(Command_FlipCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)

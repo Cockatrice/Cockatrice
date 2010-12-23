@@ -94,12 +94,12 @@ public slots:
 	
 	void actSayMessage();
 
-	void actAttach();
-	void actUnattach();
-	void actSetPT();
-	void actSetAnnotation();
-	void cardMenuAction();
-	void actCardCounterTrigger();
+	void actAttach(QAction *action);
+	void actUnattach(QAction *action);
+	void actSetPT(QAction *action);
+	void actSetAnnotation(QAction *action);
+	void cardMenuAction(QAction *action);
+	void actCardCounterTrigger(QAction *action);
 
 private slots:
 	void addPlayer(Player *player);

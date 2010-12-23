@@ -3,6 +3,7 @@
 #include "zoneviewzone.h"
 #include "player.h"
 #include "protocol_items.h"
+#include "carddragitem.h"
 
 ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, QGraphicsItem *parent)
 	: SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0), numberCards(_numberCards), origZone(_origZone), sortByName(false), sortByType(false)
@@ -122,9 +123,9 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 	card->update();
 }
 
-void ZoneViewZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
+void ZoneViewZone::handleDropEvent(CardDragItem *dragItem, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
-	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), cardId, getName(), 0, 0, false));
+	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), dragItem->getId(), player->getId(), getName(), 0, 0, false));
 }
 
 void ZoneViewZone::removeCard(int position)

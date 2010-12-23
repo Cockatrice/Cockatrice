@@ -198,10 +198,13 @@ bool Server_Player::deleteCounter(int counterId)
 	return true;
 }
 
-ResponseCode Server_Player::moveCard(CommandContainer *cont, const QString &_startZone, int _cardId, const QString &_targetZone, int x, int y, bool faceDown, bool tapped)
+ResponseCode Server_Player::moveCard(CommandContainer *cont, const QString &_startZone, int _cardId, int targetPlayerId, const QString &_targetZone, int x, int y, bool faceDown, bool tapped)
 {
 	Server_CardZone *startzone = getZones().value(_startZone);
-	Server_CardZone *targetzone = getZones().value(_targetZone);
+	Server_Player *targetPlayer = game->getPlayers().value(targetPlayerId);
+	if (!targetPlayer)
+		return RespNameNotFound;
+	Server_CardZone *targetzone = targetPlayer->getZones().value(_targetZone);
 	if ((!startzone) || (!targetzone))
 		return RespNameNotFound;
 	
@@ -210,12 +213,10 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, const QString &_sta
 
 ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *startzone, int _cardId, Server_CardZone *targetzone, int x, int y, bool faceDown, bool tapped)
 {
-	// Collision detection
-/*	if (targetzone->hasCoords())
-		for (int i = 0; i < targetzone->cards.size(); ++i)
-			if ((targetzone->cards[i]->getX() == x) && (targetzone->cards[i]->getY() == y) && (x != -1))
-				return RespContextError;
-*/		
+	// Disallow controller change between different zones.
+	if ((startzone->getName() != targetzone->getName()) && (startzone->getPlayer() != targetzone->getPlayer()))
+		return RespContextError;
+	
 	int position = -1;
 	Server_Card *card = startzone->getCard(_cardId, false, &position);
 	if (!card)
@@ -226,15 +227,19 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 	
 	int oldX = card->getX(), oldY = card->getY();
 	
-	if (startzone != targetzone) {
+	// Attachment relationships can be retained when moving a card onto the opponent's table
+	if (startzone->getName() != targetzone->getName()) {
 		// Delete all attachment relationships
 		if (card->getParentCard())
 			card->setParentCard(0);
 		
-		const QList<Server_Card *> &attachedCards = card->getAttachedCards();
+		// Make a copy of the list because the original one gets modified during the loop
+		QList<Server_Card *> attachedCards = card->getAttachedCards();
 		for (int i = 0; i < attachedCards.size(); ++i)
 			attachedCards[i]->getZone()->getPlayer()->unattachCard(cont, attachedCards[i]);
-
+	}
+	
+	if (startzone != targetzone) {
 		// Delete all arrows from and to the card
 		const QList<Server_Player *> &players = game->getPlayers().values();
 		for (int i = 0; i < players.size(); ++i) {
@@ -266,7 +271,6 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 		
 		card->resetState();
 	} else
-//		if (x == -1)
 		x = targetzone->getFreeGridColumn(x, y, card->getName());
 
 	targetzone->insertCard(card, x, y);
@@ -302,8 +306,8 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 	int privatePosition = -1;
 	if (startzone->getType() == HiddenZone)
 		privatePosition = position;
-	cont->enqueueGameEventPrivate(new Event_MoveCard(getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getName(), x, y, privateNewCardId, faceDown), game->getGameId());
-	cont->enqueueGameEventOmniscient(new Event_MoveCard(getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getName(), x, y, privateNewCardId, faceDown), game->getGameId());
+	cont->enqueueGameEventPrivate(new Event_MoveCard(getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), x, y, privateNewCardId, faceDown), game->getGameId());
+	cont->enqueueGameEventOmniscient(new Event_MoveCard(getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), x, y, privateNewCardId, faceDown), game->getGameId());
 
 	// Other players do not get to see the start and/or target position of the card if the respective
 	// part of the zone is being looked at. The information is not needed anyway because in hidden zones,
@@ -317,9 +321,9 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 		x = -1;
 
 	if ((startzone->getType() == PublicZone) || (targetzone->getType() == PublicZone))
-		cont->enqueueGameEventPublic(new Event_MoveCard(getPlayerId(), oldCardId, publicCardName, startzone->getName(), position, targetzone->getName(), x, y, card->getId(), faceDown), game->getGameId());
+		cont->enqueueGameEventPublic(new Event_MoveCard(getPlayerId(), oldCardId, publicCardName, startzone->getName(), position, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), x, y, card->getId(), faceDown), game->getGameId());
 	else
-		cont->enqueueGameEventPublic(new Event_MoveCard(getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getName(), x, y, -1, false), game->getGameId());
+		cont->enqueueGameEventPublic(new Event_MoveCard(getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), x, y, -1, false), game->getGameId());
 	
 	if (tapped)
 		setCardAttrHelper(cont, targetzone->getName(), card->getId(), "tapped", "1");
@@ -338,7 +342,7 @@ void Server_Player::unattachCard(CommandContainer *cont, Server_Card *card)
 	cont->enqueueGameEventPrivate(new Event_AttachCard(getPlayerId(), zone->getName(), card->getId(), -1, QString(), -1), game->getGameId());
 	cont->enqueueGameEventPublic(new Event_AttachCard(getPlayerId(), zone->getName(), card->getId(), -1, QString(), -1), game->getGameId());
 	
-	moveCard(cont, zone->getName(), card->getId(), zone->getName(), -1, card->getY(), card->getFaceDown(), card->getTapped());
+	moveCard(cont, zone, card->getId(), zone, -1, card->getY(), card->getFaceDown(), card->getTapped());
 }
 
 ResponseCode Server_Player::setCardAttrHelper(CommandContainer *cont, const QString &zoneName, int cardId, const QString &attrName, const QString &attrValue)
