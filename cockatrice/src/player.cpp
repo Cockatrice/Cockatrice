@@ -1282,7 +1282,7 @@ void Player::cardMenuAction(QAction *a)
 				break;
 			}
 			case 4:
-				commandList.append(new Command_CreateToken(-1, card->getZone()->getName(), card->getName(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), -1, card->getGridPoint().y()));
+				commandList.append(new Command_CreateToken(-1, card->getZone()->getName(), card->getName(), card->getColor(), card->getPT(), card->getAnnotation(), true, -1, card->getGridPoint().y()));
 				break;
 			case 5:
 				commandList.append(new Command_MoveCard(-1, card->getZone()->getName(), card->getId(), getId(), "deck", 0, 0, false));
