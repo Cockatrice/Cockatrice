@@ -3,7 +3,7 @@
 #include "server_protocolhandler.h"
 #include "protocol.h"
 #include "protocol_items.h"
-#include "server_chatchannel.h"
+#include "server_room.h"
 #include "server_card.h"
 #include "server_arrow.h"
 #include "server_cardzone.h"
@@ -14,7 +14,7 @@
 #include <QDateTime>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
-	: QObject(parent), server(_server), authState(PasswordWrong), acceptsGameListChanges(false), acceptsUserListChanges(false), acceptsChatChannelListChanges(false), userInfo(0), lastCommandTime(QDateTime::currentDateTime())
+	: QObject(parent), server(_server), authState(PasswordWrong), acceptsUserListChanges(false), acceptsRoomListChanges(false), userInfo(0), lastCommandTime(QDateTime::currentDateTime())
 {
 	connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
@@ -37,9 +37,9 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 			p->setProtocolHandler(0);
 	}
 
-	QMapIterator<QString, Server_ChatChannel *> chatChannelIterator(chatChannels);
-	while (chatChannelIterator.hasNext())
-		chatChannelIterator.next().value()->removeClient(this);
+	QMapIterator<int, Server_Room *> roomIterator(rooms);
+	while (roomIterator.hasNext())
+		roomIterator.next().value()->removeClient(this);
 	
 	delete userInfo;
 }
@@ -54,20 +54,22 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 {
 	lastCommandTime = QDateTime::currentDateTime();
 
-	ChatCommand *chatCommand = qobject_cast<ChatCommand *>(command);
+	RoomCommand *roomCommand = qobject_cast<RoomCommand *>(command);
 	GameCommand *gameCommand = qobject_cast<GameCommand *>(command);
-	if (chatCommand) {
-		qDebug() << "received ChatCommand: channel =" << chatCommand->getChannel();
+	if (roomCommand) {
+		qDebug() << "received RoomCommand: roomId =" << roomCommand->getRoomId();
 		if (authState == PasswordWrong)
 			return RespLoginNeeded;
 	
-		Server_ChatChannel *channel = chatChannels.value(chatCommand->getChannel(), 0);
-		if (!channel)
+		Server_Room *room = rooms.value(roomCommand->getRoomId(), 0);
+		if (!room)
 			return RespNameNotFound;
 		
 		switch (command->getItemId()) {
-			case ItemId_Command_ChatLeaveChannel: return cmdChatLeaveChannel(qobject_cast<Command_ChatLeaveChannel *>(command), cont, channel);
-			case ItemId_Command_ChatSay: return cmdChatSay(qobject_cast<Command_ChatSay *>(command), cont, channel);
+			case ItemId_Command_LeaveRoom: return cmdLeaveRoom(qobject_cast<Command_LeaveRoom *>(command), cont, room);
+			case ItemId_Command_RoomSay: return cmdRoomSay(qobject_cast<Command_RoomSay *>(command), cont, room);
+			case ItemId_Command_CreateGame: return cmdCreateGame(qobject_cast<Command_CreateGame *>(command), cont, room);
+			case ItemId_Command_JoinGame: return cmdJoinGame(qobject_cast<Command_JoinGame *>(command), cont, room);
 		}
 	} else if (gameCommand) {
 		qDebug() << "received GameCommand: game =" << gameCommand->getGameId();
@@ -125,12 +127,9 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 			case ItemId_Command_DeckUpload: return cmdDeckUpload(qobject_cast<Command_DeckUpload *>(command), cont);
 			case ItemId_Command_DeckDownload: return cmdDeckDownload(qobject_cast<Command_DeckDownload *>(command), cont);
 			case ItemId_Command_GetUserInfo: return cmdGetUserInfo(qobject_cast<Command_GetUserInfo *>(command), cont);
-			case ItemId_Command_ListChatChannels: return cmdListChatChannels(qobject_cast<Command_ListChatChannels *>(command), cont);
-			case ItemId_Command_ChatJoinChannel: return cmdChatJoinChannel(qobject_cast<Command_ChatJoinChannel *>(command), cont);
+			case ItemId_Command_ListRooms: return cmdListRooms(qobject_cast<Command_ListRooms *>(command), cont);
+			case ItemId_Command_JoinRoom: return cmdJoinRoom(qobject_cast<Command_JoinRoom *>(command), cont);
 			case ItemId_Command_ListUsers: return cmdListUsers(qobject_cast<Command_ListUsers *>(command), cont);
-			case ItemId_Command_ListGames: return cmdListGames(qobject_cast<Command_ListGames *>(command), cont);
-			case ItemId_Command_CreateGame: return cmdCreateGame(qobject_cast<Command_CreateGame *>(command), cont);
-			case ItemId_Command_JoinGame: return cmdJoinGame(qobject_cast<Command_JoinGame *>(command), cont);
 		}
 	}
 	return RespInvalidCommand;
@@ -273,51 +272,50 @@ ResponseCode Server_ProtocolHandler::cmdGetUserInfo(Command_GetUserInfo *cmd, Co
 	return RespNothing;
 }
 
-ResponseCode Server_ProtocolHandler::cmdListChatChannels(Command_ListChatChannels * /*cmd*/, CommandContainer *cont)
+ResponseCode Server_ProtocolHandler::cmdListRooms(Command_ListRooms * /*cmd*/, CommandContainer *cont)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
 	
-	QList<ServerInfo_ChatChannel *> eventChannelList;
-	QMapIterator<QString, Server_ChatChannel *> channelIterator(server->getChatChannels());
-	while (channelIterator.hasNext()) {
-		Server_ChatChannel *c = channelIterator.next().value();
-		eventChannelList.append(new ServerInfo_ChatChannel(c->getName(), c->getDescription(), c->size(), c->getAutoJoin()));
+	QList<ServerInfo_Room *> eventRoomList;
+	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
+	while (roomIterator.hasNext()) {
+		Server_Room *r = roomIterator.next().value();
+		eventRoomList.append(new ServerInfo_Room(r->getId(), r->getName(), r->getDescription(), r->getGames().size(), r->size(), r->getAutoJoin()));
 	}
-	cont->enqueueItem(new Event_ListChatChannels(eventChannelList));
+	cont->enqueueItem(new Event_ListRooms(eventRoomList));
 	
-	acceptsChatChannelListChanges = true;
+	acceptsRoomListChanges = true;
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdChatJoinChannel(Command_ChatJoinChannel *cmd, CommandContainer *cont)
+ResponseCode Server_ProtocolHandler::cmdJoinRoom(Command_JoinRoom *cmd, CommandContainer *cont)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
 	
-	if (chatChannels.contains(cmd->getChannel()))
+	if (rooms.contains(cmd->getRoomId()))
 		return RespContextError;
 	
-	QMap<QString, Server_ChatChannel *> allChannels = server->getChatChannels();
-	Server_ChatChannel *c = allChannels.value(cmd->getChannel(), 0);
-	if (!c)
+	Server_Room *r = server->getRooms().value(cmd->getRoomId(), 0);
+	if (!r)
 		return RespNameNotFound;
 
-	c->addClient(this);
-	chatChannels.insert(cmd->getChannel(), c);
+	r->addClient(this);
+	rooms.insert(r->getId(), r);
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdChatLeaveChannel(Command_ChatLeaveChannel * /*cmd*/, CommandContainer *cont, Server_ChatChannel *channel)
+ResponseCode Server_ProtocolHandler::cmdLeaveRoom(Command_LeaveRoom * /*cmd*/, CommandContainer *cont, Server_Room *room)
 {
-	chatChannels.remove(channel->getName());
-	channel->removeClient(this);
+	rooms.remove(room->getId());
+	room->removeClient(this);
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdChatSay(Command_ChatSay *cmd, CommandContainer *cont, Server_ChatChannel *channel)
+ResponseCode Server_ProtocolHandler::cmdRoomSay(Command_RoomSay *cmd, CommandContainer *cont, Server_Room *room)
 {
-	channel->say(this, cmd->getMessage());
+	room->say(this, cmd->getMessage());
 	return RespOk;
 }
 
@@ -337,39 +335,12 @@ ResponseCode Server_ProtocolHandler::cmdListUsers(Command_ListUsers * /*cmd*/, C
 	return RespNothing;
 }
 
-ResponseCode Server_ProtocolHandler::cmdListGames(Command_ListGames * /*cmd*/, CommandContainer *cont)
+ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, CommandContainer *cont, Server_Room *room)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
 	
-	const QList<Server_Game *> &gameList = server->getGames();
-	QList<ServerInfo_Game *> eventGameList;
-	for (int i = 0; i < gameList.size(); ++i) {
-		Server_Game *g = gameList[i];
-		eventGameList.append(new ServerInfo_Game(
-			g->getGameId(),
-			g->getDescription(),
-			!g->getPassword().isEmpty(),
-			g->getPlayerCount(),
-			g->getMaxPlayers(),
-			new ServerInfo_User(g->getCreatorInfo()),
-			g->getSpectatorsAllowed(),
-			g->getSpectatorsNeedPassword(),
-			g->getSpectatorCount()
-		));
-	}
-	cont->enqueueItem(new Event_ListGames(eventGameList));
-	
-	acceptsGameListChanges = true;
-	return RespOk;
-}
-
-ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, CommandContainer *cont)
-{
-	if (authState == PasswordWrong)
-		return RespLoginNeeded;
-	
-	Server_Game *game = server->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
+	Server_Game *game = room->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
 	Server_Player *creator = game->getPlayers().values().first();
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	
@@ -378,7 +349,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandContainer *cont)
+ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandContainer *cont, Server_Room *room)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
@@ -386,7 +357,7 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandC
 	if (games.contains(cmd->getGameId()))
 		return RespContextError;
 	
-	Server_Game *g = server->getGame(cmd->getGameId());
+	Server_Game *g = room->getGames().value(cmd->getGameId());
 	if (!g)
 		return RespNameNotFound;
 		

@@ -25,9 +25,8 @@ enum ItemId {
 	ItemId_Command_DeckUpload = ItemId_Other + 100,
 	ItemId_Command_DeckSelect = ItemId_Other + 101,
 	ItemId_Command_SetSideboardPlan = ItemId_Other + 102,
-	ItemId_Event_ListChatChannels = ItemId_Other + 200,
-	ItemId_Event_ChatListPlayers = ItemId_Other + 201,
-	ItemId_Event_ChatJoinChannel = ItemId_Other + 202,
+	ItemId_Event_ListRooms = ItemId_Other + 200,
+	ItemId_Event_JoinRoom = ItemId_Other + 201,
 	ItemId_Event_ListGames = ItemId_Other + 203,
 	ItemId_Event_UserJoined = ItemId_Other + 204,
 	ItemId_Event_GameStateChanged = ItemId_Other + 205,
@@ -136,15 +135,15 @@ public:
 	int getPrivatePlayerId() const { return privatePlayerId; }
 };
 
-class ChatCommand : public Command {
+class RoomCommand : public Command {
 	Q_OBJECT
 public:
-	ChatCommand(const QString &_cmdName, const QString &_channel)
+	RoomCommand(const QString &_cmdName, int _roomId)
 		: Command(_cmdName)
 	{
-		insertItem(new SerializableItem_String("channel", _channel));
+		insertItem(new SerializableItem_Int("room_id", _roomId));
 	}
-	QString getChannel() const { return static_cast<SerializableItem_String *>(itemMap.value("channel"))->getData(); }
+	int getRoomId() const { return static_cast<SerializableItem_Int *>(itemMap.value("room_id"))->getData(); }
 };
 
 class GameCommand : public Command {
@@ -304,44 +303,35 @@ public:
 	void setGameId(int _gameId) { static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->setData(_gameId); }
 };
 
-class ChatEvent : public ProtocolItem {
+class RoomEvent : public ProtocolItem {
 	Q_OBJECT
 public:
-	ChatEvent(const QString &_eventName, const QString &_channel);
-	QString getChannel() const { return static_cast<SerializableItem_String *>(itemMap.value("channel"))->getData(); }
+	RoomEvent(const QString &_eventName, int _roomId);
+	int getRoomId() const { return static_cast<SerializableItem_Int *>(itemMap.value("room_id"))->getData(); }
 };
 
-class Event_ListChatChannels : public GenericEvent {
+class Event_ListRooms : public GenericEvent {
 	Q_OBJECT
 public:
-	Event_ListChatChannels(const QList<ServerInfo_ChatChannel *> &_channelList = QList<ServerInfo_ChatChannel *>());
-	int getItemId() const { return ItemId_Event_ListChatChannels; }
-	static SerializableItem *newItem() { return new Event_ListChatChannels; }
-	QList<ServerInfo_ChatChannel *> getChannelList() const { return typecastItemList<ServerInfo_ChatChannel *>(); }
+	Event_ListRooms(const QList<ServerInfo_Room *> &_roomList = QList<ServerInfo_Room *>());
+	int getItemId() const { return ItemId_Event_ListRooms; }
+	static SerializableItem *newItem() { return new Event_ListRooms; }
+	QList<ServerInfo_Room *> getRoomList() const { return typecastItemList<ServerInfo_Room *>(); }
 };
 
-class Event_ChatListPlayers : public ChatEvent {
+class Event_JoinRoom : public RoomEvent {
 	Q_OBJECT
 public:
-	Event_ChatListPlayers(const QString &_channel = QString(), const QList<ServerInfo_User *> &_playerList = QList<ServerInfo_User *>());
-	int getItemId() const { return ItemId_Event_ChatListPlayers; }
-	static SerializableItem *newItem() { return new Event_ChatListPlayers; }
-	QList<ServerInfo_User *> getPlayerList() const { return typecastItemList<ServerInfo_User *>(); }
-};
-
-class Event_ChatJoinChannel : public ChatEvent {
-	Q_OBJECT
-public:
-	Event_ChatJoinChannel(const QString &_channel = QString(), ServerInfo_User *_info = 0);
-	int getItemId() const { return ItemId_Event_ChatJoinChannel; }
-	static SerializableItem *newItem() { return new Event_ChatJoinChannel; }
+	Event_JoinRoom(int _roomId = -1, ServerInfo_User *_info = 0);
+	int getItemId() const { return ItemId_Event_JoinRoom; }
+	static SerializableItem *newItem() { return new Event_JoinRoom; }
 	ServerInfo_User *getUserInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
 };
 
-class Event_ListGames : public GenericEvent {
+class Event_ListGames : public RoomEvent {
 	Q_OBJECT
 public:
-	Event_ListGames(const QList<ServerInfo_Game *> &_gameList = QList<ServerInfo_Game *>());
+	Event_ListGames(int _roomId = -1, const QList<ServerInfo_Game *> &_gameList = QList<ServerInfo_Game *>());
 	int getItemId() const { return ItemId_Event_ListGames; }
 	static SerializableItem *newItem() { return new Event_ListGames; }
 	QList<ServerInfo_Game *> getGameList() const { return typecastItemList<ServerInfo_Game *>(); }

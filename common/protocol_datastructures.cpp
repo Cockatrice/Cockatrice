@@ -3,11 +3,13 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
-ServerInfo_ChatChannel::ServerInfo_ChatChannel(const QString &_name, const QString &_description, int _playerCount, bool _autoJoin)
-	: SerializableItem_Map("chat_channel")
+ServerInfo_Room::ServerInfo_Room(int _roomId, const QString &_name, const QString &_description, int _gameCount, int _playerCount, bool _autoJoin)
+	: SerializableItem_Map("room")
 {
+	insertItem(new SerializableItem_Int("room_id", _roomId));
 	insertItem(new SerializableItem_String("name", _name));
 	insertItem(new SerializableItem_String("description", _description));
+	insertItem(new SerializableItem_Int("game_count", _gameCount));
 	insertItem(new SerializableItem_Int("player_count", _playerCount));
 	insertItem(new SerializableItem_Bool("auto_join", _autoJoin));
 }
