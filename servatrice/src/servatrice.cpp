@@ -22,7 +22,7 @@
 #include <QDebug>
 #include <iostream>
 #include "servatrice.h"
-#include "server_chatchannel.h"
+#include "server_room.h"
 #include "serversocketinterface.h"
 #include "protocol.h"
 
@@ -49,16 +49,18 @@ Servatrice::Servatrice(QObject *parent)
 	if (dbType == "mysql")
 		openDatabase();
 	
-	int size = settings->beginReadArray("chatchannels");
+	int size = settings->beginReadArray("rooms");
 	for (int i = 0; i < size; ++i) {
 	  	settings->setArrayIndex(i);
-		Server_ChatChannel *newChannel = new Server_ChatChannel(
+		Server_Room *newRoom = new Server_Room(
+			i,
 			settings->value("name").toString(),
 			settings->value("description").toString(),
 			settings->value("autojoin").toBool(),
-			settings->value("joinmessage").toString()
+			settings->value("joinmessage").toString(),
+			this
 		);
-		addChatChannel(newChannel);
+		addRoom(newRoom);
 	}
 	settings->endArray();
 	

@@ -20,7 +20,7 @@
 #include "server.h"
 #include "server_game.h"
 #include "server_counter.h"
-#include "server_chatchannel.h"
+#include "server_room.h"
 #include "server_protocolhandler.h"
 #include "protocol_datastructures.h"
 #include <QDebug>
@@ -69,17 +69,6 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	return authState;
 }
 
-Server_Game *Server::createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator)
-{
-	Server_Game *newGame = new Server_Game(creator, nextGameId++, description, password, maxPlayers, spectatorsAllowed, spectatorsNeedPassword, spectatorsCanTalk, spectatorsSeeEverything, this);
-	games.insert(newGame->getGameId(), newGame);
-	connect(newGame, SIGNAL(gameClosing()), this, SLOT(gameClosing()));
-	
-	broadcastGameListUpdate(newGame);
-	
-	return newGame;
-}
-
 void Server::addClient(Server_ProtocolHandler *client)
 {
 	clients << client;
@@ -106,56 +95,29 @@ Server_Game *Server::getGame(int gameId) const
 	return games.value(gameId);
 }
 
-void Server::broadcastGameListUpdate(Server_Game *game)
+void Server::broadcastRoomUpdate()
 {
-	QList<ServerInfo_Game *> eventGameList;
-	if (game->getPlayerCount())
-		// Game is open
-		eventGameList.append(new ServerInfo_Game(
-			game->getGameId(),
-			game->getDescription(),
-			!game->getPassword().isEmpty(),
-			game->getPlayerCount(),
-			game->getMaxPlayers(),
-			new ServerInfo_User(game->getCreatorInfo()),
-			game->getSpectatorsAllowed(),
-			game->getSpectatorsNeedPassword(),
-			game->getSpectatorCount()
-		));
-	else
-		// Game is closing
-		eventGameList.append(new ServerInfo_Game(game->getGameId(), QString(), false, 0, game->getMaxPlayers(), 0, false, 0));
-	Event_ListGames *event = new Event_ListGames(eventGameList);
-	
-	for (int i = 0; i < clients.size(); i++)
-		if (clients[i]->getAcceptsGameListChanges())
-			clients[i]->sendProtocolItem(event, false);
-	delete event;
-}
-
-void Server::broadcastChannelUpdate()
-{
-	Server_ChatChannel *channel = static_cast<Server_ChatChannel *>(sender());
-	QList<ServerInfo_ChatChannel *> eventChannelList;
-	eventChannelList.append(new ServerInfo_ChatChannel(channel->getName(), channel->getDescription(), channel->size(), channel->getAutoJoin()));
-	Event_ListChatChannels *event = new Event_ListChatChannels(eventChannelList);
+	Server_Room *room = static_cast<Server_Room *>(sender());
+	QList<ServerInfo_Room *> eventRoomList;
+	eventRoomList.append(new ServerInfo_Room(room->getId(), room->getName(), room->getDescription(), room->getGames().size(), room->size(), room->getAutoJoin()));
+	Event_ListRooms *event = new Event_ListRooms(eventRoomList);
 
 	for (int i = 0; i < clients.size(); ++i)
-	  	if (clients[i]->getAcceptsChatChannelListChanges())
+	  	if (clients[i]->getAcceptsRoomListChanges())
 			clients[i]->sendProtocolItem(event, false);
 	delete event;
 }
 
-void Server::gameClosing()
+void Server::gameClosing(int gameId)
 {
 	qDebug("Server::gameClosing");
-	Server_Game *game = static_cast<Server_Game *>(sender());
-	broadcastGameListUpdate(game);
-	games.remove(games.key(game));
+	games.remove(gameId);
 }
 
-void Server::addChatChannel(Server_ChatChannel *newChannel)
+void Server::addRoom(Server_Room *newRoom)
 {
-	chatChannels.insert(newChannel->getName(), newChannel);
-	connect(newChannel, SIGNAL(channelInfoChanged()), this, SLOT(broadcastChannelUpdate()));
+	rooms.insert(newRoom->getId(), newRoom);
+	connect(newRoom, SIGNAL(roomInfoChanged()), this, SLOT(broadcastRoomUpdate()));
+	connect(newRoom, SIGNAL(gameCreated(Server_Game *)), this, SLOT(gameCreated(Server_Game *)));
+	connect(newRoom, SIGNAL(gameClosing(int)), this, SLOT(gameClosing(int)));
 }

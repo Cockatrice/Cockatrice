@@ -48,9 +48,9 @@ void PileZone::addCardImpl(CardItem *card, int x, int /*y*/)
 	card->setParentItem(this);
 }
 
-void PileZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
+void PileZone::handleDropEvent(CardDragItem *dragItem, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
-	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), cardId, getName(), 0, 0, false));
+	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), dragItem->getId(), player->getId(), getName(), 0, 0, false));
 }
 
 void PileZone::reorganizeCards()

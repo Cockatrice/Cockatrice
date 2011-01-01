@@ -20,12 +20,14 @@ enum ResponseCode { RespNothing, RespOk, RespInvalidCommand, RespInvalidData, Re
 // list index, whereas cards in any other zone are referenced by their ids.
 enum ZoneType { PrivateZone, PublicZone, HiddenZone };
 
-class ServerInfo_ChatChannel : public SerializableItem_Map {
+class ServerInfo_Room : public SerializableItem_Map {
 public:
-	ServerInfo_ChatChannel(const QString &_name = QString(), const QString &_description = QString(), int _playerCount = -1, bool _autoJoin = false);
-	static SerializableItem *newItem() { return new ServerInfo_ChatChannel; }
+	ServerInfo_Room(int _id = -1, const QString &_name = QString(), const QString &_description = QString(), int _gameCount = -1, int _playerCount = -1, bool _autoJoin = false);
+	static SerializableItem *newItem() { return new ServerInfo_Room; }
+	int getRoomId() const { return static_cast<SerializableItem_Int *>(itemMap.value("room_id"))->getData(); }
 	QString getName() const { return static_cast<SerializableItem_String *>(itemMap.value("name"))->getData(); }
 	QString getDescription() const { return static_cast<SerializableItem_String *>(itemMap.value("description"))->getData(); }
+	int getGameCount() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_count"))->getData(); }
 	int getPlayerCount() const { return static_cast<SerializableItem_Int *>(itemMap.value("player_count"))->getData(); }
 	bool getAutoJoin() const { return static_cast<SerializableItem_Bool *>(itemMap.value("auto_join"))->getData(); }
 };

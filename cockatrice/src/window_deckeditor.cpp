@@ -308,8 +308,9 @@ bool WndDeckEditor::actSaveDeck()
 	else if (deckModel->getDeckList()->saveToFile(lastFileName, lastFileFormat)) {
 		setWindowModified(false);
 		return true;
-	} else
-		return false;
+	}
+	QMessageBox::critical(this, tr("Error"), tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));
+	return false;
 }
 
 bool WndDeckEditor::actSaveDeckAs()
@@ -332,6 +333,7 @@ bool WndDeckEditor::actSaveDeckAs()
 		setWindowModified(false);
 		return true;
 	}
+	QMessageBox::critical(this, tr("Error"), tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));
 	return false;
 }
 

@@ -7,6 +7,7 @@
 #include "protocol_items.h"
 #include "settingscache.h"
 #include "arrowitem.h"
+#include "carddragitem.h"
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 	: SelectZone(_p, "table", true, false, true, parent), active(false)
@@ -84,14 +85,14 @@ void TableZone::addCardImpl(CardItem *card, int _x, int _y)
 	card->update();
 }
 
-void TableZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
+void TableZone::handleDropEvent(CardDragItem *dragItem, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
 {
-	handleDropEventByGrid(cardId, startZone, mapToGrid(dropPoint), faceDown);
+	handleDropEventByGrid(dragItem, startZone, mapToGrid(dropPoint), faceDown);
 }
 
-void TableZone::handleDropEventByGrid(int cardId, CardZone *startZone, const QPoint &gridPoint, bool faceDown, bool tapped)
+void TableZone::handleDropEventByGrid(CardDragItem *dragItem, CardZone *startZone, const QPoint &gridPoint, bool faceDown, bool tapped)
 {
-	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), cardId, getName(), gridPoint.x(), gridPoint.y(), faceDown, tapped));
+	static_cast<CardItem *>(dragItem->getItem())->getZone()->getPlayer()->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), dragItem->getId(), player->getId(), getName(), gridPoint.x(), gridPoint.y(), faceDown, tapped));
 }
 
 void TableZone::reorganizeCards()
@@ -223,18 +224,21 @@ CardItem *TableZone::getCardFromCoords(const QPointF &point) const
 	return getCardFromGrid(gridPoint);
 }
 
-QPointF TableZone::mapFromGrid(const QPoint &gridPoint) const
+QPointF TableZone::mapFromGrid(QPoint gridPoint) const
 {
 	qreal x, y;
 	x = marginX + (gridPoint.x() % 3) * CARD_WIDTH / 3.0;
 	for (int i = 0; i < gridPoint.x() / 3; ++i)
 		x += gridPointWidth.value(gridPoint.y() * 1000 + i, CARD_WIDTH) + paddingX;
 	
-	y = boxLineWidth + gridPoint.y() * (CARD_HEIGHT + paddingY + 20) + (gridPoint.x() % 3) * 10;
+	if (isInverted())
+		gridPoint.setY(2 - gridPoint.y());
 	
+	y = boxLineWidth + gridPoint.y() * (CARD_HEIGHT + paddingY + 20) + (gridPoint.x() % 3) * 10;
+/*	
 	if (isInverted())
 		y = height - CARD_HEIGHT - y;
-	
+*/	
 	return QPointF(x, y);
 }
 
@@ -242,9 +246,9 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 {
 	qreal x = mapPoint.x() - marginX;
 	qreal y = mapPoint.y();
-	if (isInverted())
+/*	if (isInverted())
 		y = height - y;
-	y -= boxLineWidth;
+*/	y -= boxLineWidth;
 	
 	if (x < 0)
 		x = 0;
@@ -256,6 +260,8 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 		y = height - CARD_HEIGHT;
 	
 	int resultY = round(y / (CARD_HEIGHT + paddingY + 20));
+	if (isInverted())
+		resultY = 2 - resultY;
 
 	int baseX = -1;
 	qreal oldTempX = 0, tempX = 0;

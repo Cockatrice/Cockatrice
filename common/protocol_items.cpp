@@ -17,6 +17,10 @@ Command_Message::Command_Message(const QString &_userName, const QString &_text)
 	insertItem(new SerializableItem_String("user_name", _userName));
 	insertItem(new SerializableItem_String("text", _text));
 }
+Command_ListUsers::Command_ListUsers()
+	: Command("list_users")
+{
+}
 Command_GetUserInfo::Command_GetUserInfo(const QString &_userName)
 	: Command("get_user_info")
 {
@@ -47,34 +51,26 @@ Command_DeckDownload::Command_DeckDownload(int _deckId)
 {
 	insertItem(new SerializableItem_Int("deck_id", _deckId));
 }
-Command_ListChatChannels::Command_ListChatChannels()
-	: Command("list_chat_channels")
+Command_ListRooms::Command_ListRooms()
+	: Command("list_rooms")
 {
 }
-Command_ChatJoinChannel::Command_ChatJoinChannel(const QString &_channel)
-	: Command("chat_join_channel")
+Command_JoinRoom::Command_JoinRoom(int _roomId)
+	: Command("join_room")
 {
-	insertItem(new SerializableItem_String("channel", _channel));
+	insertItem(new SerializableItem_Int("room_id", _roomId));
 }
-Command_ChatLeaveChannel::Command_ChatLeaveChannel(const QString &_channel)
-	: ChatCommand("chat_leave_channel", _channel)
+Command_LeaveRoom::Command_LeaveRoom(int _roomId)
+	: RoomCommand("leave_room", _roomId)
 {
 }
-Command_ChatSay::Command_ChatSay(const QString &_channel, const QString &_message)
-	: ChatCommand("chat_say", _channel)
+Command_RoomSay::Command_RoomSay(int _roomId, const QString &_message)
+	: RoomCommand("room_say", _roomId)
 {
 	insertItem(new SerializableItem_String("message", _message));
 }
-Command_ListGames::Command_ListGames()
-	: Command("list_games")
-{
-}
-Command_ListUsers::Command_ListUsers()
-	: Command("list_users")
-{
-}
-Command_CreateGame::Command_CreateGame(const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything)
-	: Command("create_game")
+Command_CreateGame::Command_CreateGame(int _roomId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything)
+	: RoomCommand("create_game", _roomId)
 {
 	insertItem(new SerializableItem_String("description", _description));
 	insertItem(new SerializableItem_String("password", _password));
@@ -84,8 +80,8 @@ Command_CreateGame::Command_CreateGame(const QString &_description, const QStrin
 	insertItem(new SerializableItem_Bool("spectators_can_talk", _spectatorsCanTalk));
 	insertItem(new SerializableItem_Bool("spectators_see_everything", _spectatorsSeeEverything));
 }
-Command_JoinGame::Command_JoinGame(int _gameId, const QString &_password, bool _spectator)
-	: Command("join_game")
+Command_JoinGame::Command_JoinGame(int _roomId, int _gameId, const QString &_password, bool _spectator)
+	: RoomCommand("join_game", _roomId)
 {
 	insertItem(new SerializableItem_Int("game_id", _gameId));
 	insertItem(new SerializableItem_String("password", _password));
@@ -118,11 +114,12 @@ Command_DrawCards::Command_DrawCards(int _gameId, int _number)
 {
 	insertItem(new SerializableItem_Int("number", _number));
 }
-Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, int _cardId, const QString &_targetZone, int _x, int _y, bool _faceDown, bool _tapped)
+Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, int _cardId, int _targetPlayerId, const QString &_targetZone, int _x, int _y, bool _faceDown, bool _tapped)
 	: GameCommand("move_card", _gameId)
 {
 	insertItem(new SerializableItem_String("start_zone", _startZone));
 	insertItem(new SerializableItem_Int("card_id", _cardId));
+	insertItem(new SerializableItem_Int("target_player_id", _targetPlayerId));
 	insertItem(new SerializableItem_String("target_zone", _targetZone));
 	insertItem(new SerializableItem_Int("x", _x));
 	insertItem(new SerializableItem_Int("y", _y));
@@ -283,13 +280,14 @@ Event_RollDie::Event_RollDie(int _playerId, int _sides, int _value)
 	insertItem(new SerializableItem_Int("sides", _sides));
 	insertItem(new SerializableItem_Int("value", _value));
 }
-Event_MoveCard::Event_MoveCard(int _playerId, int _cardId, const QString &_cardName, const QString &_startZone, int _position, const QString &_targetZone, int _x, int _y, int _newCardId, bool _faceDown)
+Event_MoveCard::Event_MoveCard(int _playerId, int _cardId, const QString &_cardName, const QString &_startZone, int _position, int _targetPlayerId, const QString &_targetZone, int _x, int _y, int _newCardId, bool _faceDown)
 	: GameEvent("move_card", _playerId)
 {
 	insertItem(new SerializableItem_Int("card_id", _cardId));
 	insertItem(new SerializableItem_String("card_name", _cardName));
 	insertItem(new SerializableItem_String("start_zone", _startZone));
 	insertItem(new SerializableItem_Int("position", _position));
+	insertItem(new SerializableItem_Int("target_player_id", _targetPlayerId));
 	insertItem(new SerializableItem_String("target_zone", _targetZone));
 	insertItem(new SerializableItem_Int("x", _x));
 	insertItem(new SerializableItem_Int("y", _y));
@@ -415,13 +413,13 @@ Event_UserLeft::Event_UserLeft(const QString &_userName)
 {
 	insertItem(new SerializableItem_String("user_name", _userName));
 }
-Event_ChatLeaveChannel::Event_ChatLeaveChannel(const QString &_channel, const QString &_playerName)
-	: ChatEvent("chat_leave_channel", _channel)
+Event_LeaveRoom::Event_LeaveRoom(int _roomId, const QString &_playerName)
+	: RoomEvent("leave_room", _roomId)
 {
 	insertItem(new SerializableItem_String("player_name", _playerName));
 }
-Event_ChatSay::Event_ChatSay(const QString &_channel, const QString &_playerName, const QString &_message)
-	: ChatEvent("chat_say", _channel)
+Event_RoomSay::Event_RoomSay(int _roomId, const QString &_playerName, const QString &_message)
+	: RoomEvent("room_say", _roomId)
 {
 	insertItem(new SerializableItem_String("player_name", _playerName));
 	insertItem(new SerializableItem_String("message", _message));
@@ -444,18 +442,17 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdping", Command_Ping::newItem);
 	itemNameHash.insert("cmdlogin", Command_Login::newItem);
 	itemNameHash.insert("cmdmessage", Command_Message::newItem);
+	itemNameHash.insert("cmdlist_users", Command_ListUsers::newItem);
 	itemNameHash.insert("cmdget_user_info", Command_GetUserInfo::newItem);
 	itemNameHash.insert("cmddeck_list", Command_DeckList::newItem);
 	itemNameHash.insert("cmddeck_new_dir", Command_DeckNewDir::newItem);
 	itemNameHash.insert("cmddeck_del_dir", Command_DeckDelDir::newItem);
 	itemNameHash.insert("cmddeck_del", Command_DeckDel::newItem);
 	itemNameHash.insert("cmddeck_download", Command_DeckDownload::newItem);
-	itemNameHash.insert("cmdlist_chat_channels", Command_ListChatChannels::newItem);
-	itemNameHash.insert("cmdchat_join_channel", Command_ChatJoinChannel::newItem);
-	itemNameHash.insert("cmdchat_leave_channel", Command_ChatLeaveChannel::newItem);
-	itemNameHash.insert("cmdchat_say", Command_ChatSay::newItem);
-	itemNameHash.insert("cmdlist_games", Command_ListGames::newItem);
-	itemNameHash.insert("cmdlist_users", Command_ListUsers::newItem);
+	itemNameHash.insert("cmdlist_rooms", Command_ListRooms::newItem);
+	itemNameHash.insert("cmdjoin_room", Command_JoinRoom::newItem);
+	itemNameHash.insert("cmdleave_room", Command_LeaveRoom::newItem);
+	itemNameHash.insert("cmdroom_say", Command_RoomSay::newItem);
 	itemNameHash.insert("cmdcreate_game", Command_CreateGame::newItem);
 	itemNameHash.insert("cmdjoin_game", Command_JoinGame::newItem);
 	itemNameHash.insert("cmdleave_game", Command_LeaveGame::newItem);
@@ -507,8 +504,8 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("generic_eventmessage", Event_Message::newItem);
 	itemNameHash.insert("generic_eventgame_joined", Event_GameJoined::newItem);
 	itemNameHash.insert("generic_eventuser_left", Event_UserLeft::newItem);
-	itemNameHash.insert("chat_eventchat_leave_channel", Event_ChatLeaveChannel::newItem);
-	itemNameHash.insert("chat_eventchat_say", Event_ChatSay::newItem);
+	itemNameHash.insert("room_eventleave_room", Event_LeaveRoom::newItem);
+	itemNameHash.insert("room_eventroom_say", Event_RoomSay::newItem);
 	itemNameHash.insert("game_event_contextready_start", Context_ReadyStart::newItem);
 	itemNameHash.insert("game_event_contextconcede", Context_Concede::newItem);
 	itemNameHash.insert("game_event_contextdeck_select", Context_DeckSelect::newItem);

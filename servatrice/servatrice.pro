@@ -27,7 +27,7 @@ HEADERS += src/servatrice.h \
 	../common/server_arrow.h \
 	../common/server_card.h \
 	../common/server_cardzone.h \
-	../common/server_chatchannel.h \
+	../common/server_room.h \
 	../common/server_counter.h \
 	../common/server_game.h \
 	../common/server_player.h \
@@ -48,7 +48,7 @@ SOURCES += src/main.cpp \
 	../common/server.cpp \
 	../common/server_card.cpp \
 	../common/server_cardzone.cpp \
-	../common/server_chatchannel.cpp \
+	../common/server_room.cpp \
 	../common/server_game.cpp \
 	../common/server_player.cpp \
 	../common/server_protocolhandler.cpp

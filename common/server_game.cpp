@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "server.h"
+#include "server_room.h"
 #include "server_game.h"
 #include "server_protocolhandler.h"
 #include "server_arrow.h"
@@ -27,12 +28,12 @@
 #include <QTimer>
 #include <QDebug>
 
-Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server *parent)
+Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent)
 	: QObject(parent), creatorInfo(new ServerInfo_User(_creator->getUserInfo())), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), activePlayer(-1), activePhase(-1), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0)
 {
 	addPlayer(_creator, false, false);
 
-	if (parent->getGameShouldPing()) {
+	if (parent->getServer()->getGameShouldPing()) {
 		pingClock = new QTimer(this);
 		connect(pingClock, SIGNAL(timeout()), this, SLOT(pingClockTimeout()));
 		pingClock->start(1000);
@@ -71,7 +72,7 @@ void Server_Game::pingClockTimeout()
 	}
 	sendGameEvent(new Event_Ping(pingList));
 	
-	const int maxTime = static_cast<Server *>(parent())->getMaxGameInactivityTime();
+	const int maxTime = static_cast<Server_Room *>(parent())->getServer()->getMaxGameInactivityTime();
 	if (allPlayersInactive) {
 		if ((++inactivityCounter >= maxTime) && (maxTime > 0))
 			deleteLater();
@@ -193,7 +194,7 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 	players.insert(playerId, newPlayer);
 
 	if (broadcastUpdate)
-		qobject_cast<Server *>(parent())->broadcastGameListUpdate(this);
+		qobject_cast<Server_Room *>(parent())->broadcastGameListUpdate(this);
 	
 	return newPlayer;
 }
@@ -231,7 +232,7 @@ void Server_Game::removePlayer(Server_Player *player)
 		deleteLater();
 	else if (!spectator)
 		stopGameIfFinished();
-	qobject_cast<Server *>(parent())->broadcastGameListUpdate(this);
+	qobject_cast<Server_Room *>(parent())->broadcastGameListUpdate(this);
 }
 
 void Server_Game::setActivePlayer(int _activePlayer)
@@ -390,4 +391,24 @@ void Server_Game::sendGameEventContainerOmniscient(GameEventContainer *cont, Ser
 void Server_Game::sendGameEventToPlayer(Server_Player *player, GameEvent *event)
 {
 	player->sendProtocolItem(new GameEventContainer(QList<GameEvent *>() << event, gameId));
+}
+
+ServerInfo_Game *Server_Game::getInfo() const
+{
+	if (players.isEmpty())
+		// Game is open
+		return new ServerInfo_Game(getGameId(), QString(), false, 0, getMaxPlayers(), 0, false, 0);
+	else
+		// Game is closing
+		return new ServerInfo_Game(
+			getGameId(),
+			getDescription(),
+			!getPassword().isEmpty(),
+			getPlayerCount(),
+			getMaxPlayers(),
+			new ServerInfo_User(getCreatorInfo()),
+			getSpectatorsAllowed(),
+			getSpectatorsNeedPassword(),
+			getSpectatorCount()
+		);
 }
