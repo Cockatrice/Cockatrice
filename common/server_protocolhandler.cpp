@@ -503,12 +503,10 @@ ResponseCode Server_ProtocolHandler::cmdMulligan(Command_Mulligan * /*cmd*/, Com
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
-	int number = player->getInitialCards();
-	if (!number)
-		return RespContextError;
-
+	
 	Server_CardZone *hand = player->getZones().value("hand");
+	int number = (hand->cards.size() <= 1) ? player->getInitialCards() : hand->cards.size() - 1;
+		
 	while (!hand->cards.isEmpty())
 		player->moveCard(cont, "hand", hand->cards.first()->getId(), "deck", 0, 0, false, false);
 
@@ -517,7 +515,6 @@ ResponseCode Server_ProtocolHandler::cmdMulligan(Command_Mulligan * /*cmd*/, Com
 	cont->enqueueGameEventPublic(new Event_Shuffle(player->getPlayerId()), game->getGameId());
 
 	drawCards(game, player, cont, number);
-	player->setInitialCards(number - 1);
 
 	return RespOk;
 }
