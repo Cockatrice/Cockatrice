@@ -37,6 +37,7 @@ void ProtocolItem::initializeHash()
 	
 	registerSerializableItem("resp", ProtocolResponse::newItem);
 	ProtocolResponse::initializeHash();
+	registerSerializableItem("respjoin_room", Response_JoinRoom::newItem);
 	registerSerializableItem("resplist_users", Response_ListUsers::newItem);
 	registerSerializableItem("respget_user_info", Response_GetUserInfo::newItem);
 	registerSerializableItem("respdeck_list", Response_DeckList::newItem);
@@ -218,6 +219,14 @@ void ProtocolResponse::initializeHash()
 	responseHash.insert("context_error", RespContextError);
 	responseHash.insert("wrong_password", RespWrongPassword);
 	responseHash.insert("spectators_not_allowed", RespSpectatorsNotAllowed);
+}
+
+Response_JoinRoom::Response_JoinRoom(int _cmdId, ResponseCode _responseCode, ServerInfo_Room *_roomInfo)
+	: ProtocolResponse(_cmdId, _responseCode, "join_room")
+{
+	if (!_roomInfo)
+		_roomInfo = new ServerInfo_Room;
+	insertItem(_roomInfo);
 }
 
 Response_ListUsers::Response_ListUsers(int _cmdId, ResponseCode _responseCode, const QList<ServerInfo_User *> &_userList)

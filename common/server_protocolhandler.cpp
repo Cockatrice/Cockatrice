@@ -279,10 +279,8 @@ ResponseCode Server_ProtocolHandler::cmdListRooms(Command_ListRooms * /*cmd*/, C
 	
 	QList<ServerInfo_Room *> eventRoomList;
 	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
-	while (roomIterator.hasNext()) {
-		Server_Room *r = roomIterator.next().value();
-		eventRoomList.append(new ServerInfo_Room(r->getId(), r->getName(), r->getDescription(), r->getGames().size(), r->size(), r->getAutoJoin()));
-	}
+	while (roomIterator.hasNext())
+		eventRoomList.append(roomIterator.next().value()->getInfo(false));
 	cont->enqueueItem(new Event_ListRooms(eventRoomList));
 	
 	acceptsRoomListChanges = true;
@@ -303,7 +301,9 @@ ResponseCode Server_ProtocolHandler::cmdJoinRoom(Command_JoinRoom *cmd, CommandC
 
 	r->addClient(this);
 	rooms.insert(r->getId(), r);
-	return RespOk;
+	
+	cont->setResponse(new Response_JoinRoom(cont->getCmdId(), RespOk, r->getInfo(true)));
+	return RespNothing;
 }
 
 ResponseCode Server_ProtocolHandler::cmdLeaveRoom(Command_LeaveRoom * /*cmd*/, CommandContainer *cont, Server_Room *room)

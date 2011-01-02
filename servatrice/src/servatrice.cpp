@@ -64,7 +64,7 @@ Servatrice::Servatrice(QObject *parent)
 	}
 	settings->endArray();
 	
-	loginMessage = settings->value("messages/login").toString();
+	updateLoginMessage();
 	
 	maxGameInactivityTime = settings->value("game/max_game_inactivity_time").toInt();
 	maxPlayerInactivityTime = settings->value("game/max_player_inactivity_time").toInt();
@@ -183,6 +183,16 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 			return new ServerInfo_User(name, ServerInfo_User::IsUser);
 	} else
 		return new ServerInfo_User(name, ServerInfo_User::IsUser);
+}
+
+void Servatrice::updateLoginMessage()
+{
+	checkSql();
+	QSqlQuery query;
+	query.prepare("select message from " + dbPrefix + "_servermessages order by timest desc limit 1");
+	if (execSqlQuery(query))
+		if (query.next())
+			loginMessage = query.value(0).toString();
 }
 
 void Servatrice::statusUpdate()

@@ -43,6 +43,7 @@ enum ItemId {
 	ItemId_Response_DeckDownload = ItemId_Other + 303,
 	ItemId_Response_DeckUpload = ItemId_Other + 304,
 	ItemId_Response_DumpZone = ItemId_Other + 305,
+	ItemId_Response_JoinRoom = ItemId_Other + 306,
 	ItemId_Invalid = ItemId_Other + 1000
 };
 
@@ -202,6 +203,15 @@ public:
 	static SerializableItem *newItem() { return new ProtocolResponse; }
 	int getCmdId() const { return static_cast<SerializableItem_Int *>(itemMap.value("cmd_id"))->getData(); }
 	ResponseCode getResponseCode() const { return responseHash.value(static_cast<SerializableItem_String *>(itemMap.value("response_code"))->getData(), RespOk); }
+};
+
+class Response_JoinRoom : public ProtocolResponse {
+	Q_OBJECT
+public:
+	Response_JoinRoom(int _cmdId = -1, ResponseCode _responseCode = RespOk, ServerInfo_Room *_roomInfo = 0);
+	int getItemId() const { return ItemId_Response_JoinRoom; }
+	static SerializableItem *newItem() { return new Response_JoinRoom; }
+	ServerInfo_Room *getRoomInfo() const { return static_cast<ServerInfo_Room *>(itemMap.value("room")); }
 };
 
 class Response_ListUsers : public ProtocolResponse {

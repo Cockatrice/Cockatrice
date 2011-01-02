@@ -1,6 +1,7 @@
 #include "server_room.h"
 #include "server_protocolhandler.h"
 #include "server_game.h"
+#include <QDebug>
 
 Server_Room::Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, Server *parent)
 	: QObject(parent), id(_id), name(_name), description(_description), autoJoin(_autoJoin), joinMessage(_joinMessage)
@@ -12,7 +13,24 @@ Server *Server_Room::getServer() const
 	return static_cast<Server *>(parent());
 }
 
-QList<ServerInfo_User *> Server_Room::addClient(Server_ProtocolHandler *client)
+ServerInfo_Room *Server_Room::getInfo(bool complete) const
+{
+	QList<ServerInfo_Game *> gameList;
+	QList<ServerInfo_User *> userList;
+	qDebug() << "getInfo: complete=" << complete;
+	if (complete) {
+		QMapIterator<int, Server_Game *> gameIterator(games);
+		while (gameIterator.hasNext())
+			gameList.append(gameIterator.next().value()->getInfo());
+		
+		for (int i = 0; i < size(); ++i)
+			userList.append(new ServerInfo_User(at(i)->getUserInfo(), false));
+	}
+	
+	return new ServerInfo_Room(id, name, description, games.size(), size(), autoJoin, gameList, userList);
+}
+
+void Server_Room::addClient(Server_ProtocolHandler *client)
 {
 	sendRoomEvent(new Event_JoinRoom(id, new ServerInfo_User(client->getUserInfo())));
 	append(client);
@@ -22,7 +40,6 @@ QList<ServerInfo_User *> Server_Room::addClient(Server_ProtocolHandler *client)
 		eventUserList.append(new ServerInfo_User(at(i)->getUserInfo()));
 
 	emit roomInfoChanged();
-	return eventUserList;
 }
 
 void Server_Room::removeClient(Server_ProtocolHandler *client)

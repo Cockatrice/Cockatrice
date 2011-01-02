@@ -52,11 +52,12 @@ HEADERS += src/counter.h \
  src/arrowtarget.h \
  src/tab.h \
  src/tab_server.h \
- src/tab_chatchannel.h \
+ src/tab_room.h \
  src/tab_message.h \
  src/tab_game.h \
  src/tab_deck_storage.h \
  src/tab_supervisor.h \
+ src/userlist.h \
  src/remotedecklist_treewidget.h \
  src/deckview.h \
  src/playerlistwidget.h \
@@ -130,11 +131,12 @@ SOURCES += src/counter.cpp \
  src/arrowitem.cpp \
  src/arrowtarget.cpp \
  src/tab_server.cpp \
- src/tab_chatchannel.cpp \
+ src/tab_room.cpp \
  src/tab_message.cpp \
  src/tab_game.cpp \
  src/tab_deck_storage.cpp \
  src/tab_supervisor.cpp \
+ src/userlist.cpp \
  src/remotedecklist_treewidget.cpp \
  src/deckview.cpp \
  src/playerlistwidget.cpp \

@@ -1,0 +1,86 @@
+#ifndef TAB_ROOM_H
+#define TAB_ROOM_H
+
+#include "tab.h"
+#include "protocol_datastructures.h"
+#include <QGroupBox>
+
+class AbstractClient;
+class UserList;
+class QLabel;
+class QTextEdit;
+class QLineEdit;
+class QTreeView;
+class QPushButton;
+class QCheckBox;
+class GamesModel;
+class GamesProxyModel;
+class RoomEvent;
+class ServerInfo_Room;
+class ServerInfo_Game;
+class Event_ListGames;
+class Event_JoinRoom;
+class Event_LeaveRoom;
+class Event_RoomSay;
+
+class GameSelector : public QGroupBox {
+	Q_OBJECT
+private slots:
+	void showFullGamesChanged(int state);
+	void actCreate();
+	void actJoin();
+	void checkResponse(ResponseCode response);
+signals:
+	void gameJoined(int gameId);
+private:
+	AbstractClient *client;
+	int roomId;
+
+	QTreeView *gameListView;
+	GamesModel *gameListModel;
+	GamesProxyModel *gameListProxyModel;
+	QPushButton *createButton, *joinButton, *spectateButton;
+	QCheckBox *showFullGamesCheckBox;
+public:
+	GameSelector(AbstractClient *_client, int _roomId, QWidget *parent = 0);
+	void retranslateUi();
+	void processGameInfo(ServerInfo_Game *info);
+};
+
+class TabRoom : public Tab {
+	Q_OBJECT
+private:
+	AbstractClient *client;
+	int roomId;
+	QString roomName;
+	
+	GameSelector *gameSelector;
+	UserList *userList;
+	QTextEdit *textEdit;
+	QLabel *sayLabel;
+	QLineEdit *sayEdit;
+	QGroupBox *chatGroupBox;
+
+	QAction *aLeaveRoom;
+	QString sanitizeHtml(QString dirty) const;
+signals:
+	void roomClosing(TabRoom *tab);
+private slots:
+	void sendMessage();
+	void actLeaveRoom();
+	
+	void processListGamesEvent(Event_ListGames *event);
+	void processJoinRoomEvent(Event_JoinRoom *event);
+	void processLeaveRoomEvent(Event_LeaveRoom *event);
+	void processSayEvent(Event_RoomSay *event);
+public:
+	TabRoom(AbstractClient *_client, ServerInfo_Room *info);
+	~TabRoom();
+	void retranslateUi();
+	void processRoomEvent(RoomEvent *event);
+	int getRoomId() const { return roomId; }
+	QString getChannelName() const { return roomName; }
+	QString getTabText() const { return roomName; }
+};
+
+#endif

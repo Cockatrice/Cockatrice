@@ -7,63 +7,33 @@
 #include "protocol_datastructures.h"
 
 class AbstractClient;
-class QTreeView;
-class QTreeWidget;
-class QTreeWidgetItem;
-class QPushButton;
-class QCheckBox;
 class QTextEdit;
 class QLabel;
+class UserList;
+class QPushButton;
 
-class GamesModel;
-class GamesProxyModel;
-
-class Event_ListGames;
-class Event_ListChatChannels;
+class Event_ListRooms;
 class Event_ServerMessage;
 class Event_UserJoined;
 class Event_UserLeft;
 class ProtocolResponse;
 
-class GameSelector : public QGroupBox {
-	Q_OBJECT
-public:
-	GameSelector(AbstractClient *_client, QWidget *parent = 0);
-	void retranslateUi();
-private slots:
-	void processListGamesEvent(Event_ListGames *event);
-	void showFullGamesChanged(int state);
-	void actCreate();
-	void actJoin();
-	void checkResponse(ResponseCode response);
-signals:
-	void gameJoined(int gameId);
-private:
-	AbstractClient *client;
-
-	QTreeView *gameListView;
-	GamesModel *gameListModel;
-	GamesProxyModel *gameListProxyModel;
-	QPushButton *createButton, *joinButton, *spectateButton;
-	QCheckBox *showFullGamesCheckBox;
-};
-
-class ChatChannelSelector : public QGroupBox {
+class RoomSelector : public QGroupBox {
 	Q_OBJECT
 private:
-	QTreeWidget *channelList;
+	QTreeWidget *roomList;
 	QPushButton *joinButton;
 	AbstractClient *client;
 	
-	void joinChannel(const QString &channelName);
+	void joinRoom(int id);
 private slots:
-	void processListChatChannelsEvent(Event_ListChatChannels *event);
+	void processListRoomsEvent(Event_ListRooms *event);
 	void joinClicked();
-	void joinFinished(ResponseCode resp);
+	void joinFinished(ProtocolResponse *resp);
 signals:
-	void channelJoined(const QString &channelName);
+	void roomJoined(ServerInfo_Room *info);
 public:
-	ChatChannelSelector(AbstractClient *_client, QWidget *parent = 0);
+	RoomSelector(AbstractClient *_client, QWidget *parent = 0);
 	void retranslateUi();
 };
 
@@ -75,30 +45,6 @@ private slots:
 	void processServerMessageEvent(Event_ServerMessage *event);
 public:
 	ServerMessageLog(AbstractClient *_client, QWidget *parent = 0);
-	void retranslateUi();
-};
-
-class UserListTWI : public QTreeWidgetItem {
-public:
-	UserListTWI();
-	bool operator<(const QTreeWidgetItem &other) const;
-};
-
-class UserList : public QGroupBox {
-	Q_OBJECT
-private:
-	QTreeWidget *userTree;
-	void processUserInfo(ServerInfo_User *user);
-private slots:
-	void processResponse(ProtocolResponse *response);
-	void processUserJoinedEvent(Event_UserJoined *event);
-	void processUserLeftEvent(Event_UserLeft *event);
-	void userClicked(QTreeWidgetItem *item, int column);
-signals:
-	void openMessageDialog(const QString &userName, bool focus);
-	void userLeft(const QString &userName);
-public:
-	UserList(AbstractClient *_client, QWidget *parent = 0);
 	void retranslateUi();
 };
 
@@ -116,14 +62,17 @@ public:
 class TabServer : public Tab {
 	Q_OBJECT
 signals:
-	void chatChannelJoined(const QString &channelName);
-	void gameJoined(int gameId);
+	void roomJoined(ServerInfo_Room *info);
+//	void gameJoined(int gameId);
 	void openMessageDialog(const QString &userName, bool focus);
 	void userLeft(const QString &userName);
+private slots:
+	void processListUsersResponse(ProtocolResponse *response);
+	void processUserJoinedEvent(Event_UserJoined *event);
+	void processUserLeftEvent(Event_UserLeft *event);
 private:
 	AbstractClient *client;
-	GameSelector *gameSelector;
-	ChatChannelSelector *chatChannelSelector;
+	RoomSelector *roomSelector;
 	ServerMessageLog *serverMessageLog;
 	UserList *userList;
 	UserInfoBox *userInfoBox;

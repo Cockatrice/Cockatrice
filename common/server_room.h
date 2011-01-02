@@ -9,6 +9,7 @@
 class Server_ProtocolHandler;
 class RoomEvent;
 class ServerInfo_User;
+class ServerInfo_Room;
 class Server_Game;
 class Server;
 
@@ -35,8 +36,9 @@ public:
 	bool getAutoJoin() const { return autoJoin; }
 	const QMap<int, Server_Game *> &getGames() const { return games; }
 	Server *getServer() const;
+	ServerInfo_Room *getInfo(bool complete) const;
 	
-	QList<ServerInfo_User *> addClient(Server_ProtocolHandler *client);
+	void addClient(Server_ProtocolHandler *client);
 	void removeClient(Server_ProtocolHandler *client);
 	void say(Server_ProtocolHandler *client, const QString &s);
 	void broadcastGameListUpdate(Server_Game *game);

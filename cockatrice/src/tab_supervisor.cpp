@@ -2,7 +2,7 @@
 #include "tab_supervisor.h"
 #include "abstractclient.h"
 #include "tab_server.h"
-#include "tab_chatchannel.h"
+#include "tab_room.h"
 #include "tab_game.h"
 #include "tab_deck_storage.h"
 #include "tab_message.h"
@@ -32,9 +32,9 @@ void TabSupervisor::retranslateUi()
 		tabs.append(tabServer);
 	if (tabDeckStorage)
 		tabs.append(tabDeckStorage);
-	QMapIterator<QString, TabChatChannel *> chatChannelIterator(chatChannelTabs);
-	while (chatChannelIterator.hasNext())
-		tabs.append(chatChannelIterator.next().value());
+	QMapIterator<int, TabRoom *> roomIterator(roomTabs);
+	while (roomIterator.hasNext())
+		tabs.append(roomIterator.next().value());
 	QMapIterator<int, TabGame *> gameIterator(gameTabs);
 	while (gameIterator.hasNext())
 		tabs.append(gameIterator.next().value());
@@ -54,14 +54,14 @@ void TabSupervisor::myAddTab(Tab *tab)
 void TabSupervisor::start(AbstractClient *_client)
 {
 	client = _client;
-	connect(client, SIGNAL(chatEventReceived(ChatEvent *)), this, SLOT(processChatEvent(ChatEvent *)));
+	connect(client, SIGNAL(roomEventReceived(RoomEvent *)), this, SLOT(processRoomEvent(RoomEvent *)));
 	connect(client, SIGNAL(gameEventContainerReceived(GameEventContainer *)), this, SLOT(processGameEventContainer(GameEventContainer *)));
 	connect(client, SIGNAL(gameJoinedEventReceived(Event_GameJoined *)), this, SLOT(gameJoined(Event_GameJoined *)));
 	connect(client, SIGNAL(messageEventReceived(Event_Message *)), this, SLOT(processMessageEvent(Event_Message *)));
 	connect(client, SIGNAL(maxPingTime(int, int)), this, SLOT(updatePingTime(int, int)));
 
 	tabServer = new TabServer(client);
-	connect(tabServer, SIGNAL(chatChannelJoined(const QString &)), this, SLOT(addChatChannelTab(const QString &)));
+	connect(tabServer, SIGNAL(roomJoined(ServerInfo_Room *)), this, SLOT(addRoomTab(ServerInfo_Room *)));
 	connect(tabServer, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
 	connect(tabServer, SIGNAL(userLeft(const QString &)), this, SLOT(processUserLeft(const QString &)));
 	myAddTab(tabServer);
@@ -107,10 +107,10 @@ void TabSupervisor::stop()
 	tabDeckStorage->deleteLater();
 	tabDeckStorage = 0;
 	
-	QMapIterator<QString, TabChatChannel *> chatChannelIterator(chatChannelTabs);
-	while (chatChannelIterator.hasNext())
-		chatChannelIterator.next().value()->deleteLater();
-	chatChannelTabs.clear();
+	QMapIterator<int, TabRoom *> roomIterator(roomTabs);
+	while (roomIterator.hasNext())
+		roomIterator.next().value()->deleteLater();
+	roomTabs.clear();
 
 	QMapIterator<int, TabGame *> gameIterator(gameTabs);
 	while (gameIterator.hasNext())
@@ -160,20 +160,20 @@ void TabSupervisor::gameLeft(TabGame *tab)
 		stop();
 }
 
-void TabSupervisor::addChatChannelTab(const QString &channelName)
+void TabSupervisor::addRoomTab(ServerInfo_Room *info)
 {
-	TabChatChannel *tab = new TabChatChannel(client, channelName);
-	connect(tab, SIGNAL(channelClosing(TabChatChannel *)), this, SLOT(chatChannelLeft(TabChatChannel *)));
+	TabRoom *tab = new TabRoom(client, info);
+	connect(tab, SIGNAL(roomClosing(TabRoom *)), this, SLOT(roomLeft(TabRoom *)));
 	myAddTab(tab);
-	chatChannelTabs.insert(channelName, tab);
+	roomTabs.insert(info->getRoomId(), tab);
 	setCurrentWidget(tab);
 }
 
-void TabSupervisor::chatChannelLeft(TabChatChannel *tab)
+void TabSupervisor::roomLeft(TabRoom *tab)
 {
 	emit setMenu(0);
 
-	chatChannelTabs.remove(tab->getChannelName());
+	roomTabs.remove(tab->getRoomId());
 	removeTab(indexOf(tab));
 }
 
@@ -206,11 +206,11 @@ void TabSupervisor::tabUserEvent()
 	QApplication::alert(this);
 }
 
-void TabSupervisor::processChatEvent(ChatEvent *event)
+void TabSupervisor::processRoomEvent(RoomEvent *event)
 {
-	TabChatChannel *tab = chatChannelTabs.value(event->getChannel(), 0);
+	TabRoom *tab = roomTabs.value(event->getRoomId(), 0);
 	if (tab)
-		tab->processChatEvent(event);
+		tab->processRoomEvent(event);
 }
 
 void TabSupervisor::processGameEventContainer(GameEventContainer *cont)

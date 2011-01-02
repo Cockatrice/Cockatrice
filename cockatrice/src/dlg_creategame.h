@@ -14,13 +14,14 @@ class QSpinBox;
 class DlgCreateGame : public QDialog {
 	Q_OBJECT
 public:
-	DlgCreateGame(AbstractClient *_client, QWidget *parent = 0);
+	DlgCreateGame(AbstractClient *_client, int _roomId, QWidget *parent = 0);
 private slots:
 	void actOK();
 	void checkResponse(ResponseCode response);
 	void spectatorsAllowedChanged(int state);
 private:
 	AbstractClient *client;
+	int roomId;
 
 	QGroupBox *spectatorsGroupBox;
 	QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel;
