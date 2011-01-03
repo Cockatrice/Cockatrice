@@ -17,10 +17,12 @@ class GameEventContainer;
 class Event_GameJoined;
 class Event_Message;
 class ServerInfo_Room;
+class ServerInfo_User;
 
 class TabSupervisor : public QTabWidget {
 	Q_OBJECT
 private:
+	QString userName;
 	QIcon *tabChangedIcon;
 	AbstractClient *client;
 	QList<AbstractClient *> localClients;
@@ -34,7 +36,7 @@ public:
 	TabSupervisor(QWidget *parent = 0);
 	~TabSupervisor();
 	void retranslateUi();
-	void start(AbstractClient *_client);
+	void start(AbstractClient *_client, ServerInfo_User *userInfo);
 	void startLocal(const QList<AbstractClient *> &_clients);
 	void stop();
 	int getGameCount() const { return gameTabs.size(); }

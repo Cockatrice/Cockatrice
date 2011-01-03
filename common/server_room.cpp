@@ -17,7 +17,6 @@ ServerInfo_Room *Server_Room::getInfo(bool complete) const
 {
 	QList<ServerInfo_Game *> gameList;
 	QList<ServerInfo_User *> userList;
-	qDebug() << "getInfo: complete=" << complete;
 	if (complete) {
 		QMapIterator<int, Server_Game *> gameIterator(games);
 		while (gameIterator.hasNext())
@@ -79,6 +78,7 @@ Server_Game *Server_Room::createGame(const QString &description, const QString &
 	broadcastGameListUpdate(newGame);
 	
 	emit gameCreated(newGame);
+	emit roomInfoChanged();
 	
 	return newGame;
 }
@@ -90,4 +90,5 @@ void Server_Room::removeGame()
 	games.remove(game->getGameId());
 	
 	emit gameClosing(game->getGameId());
+	emit roomInfoChanged();
 }

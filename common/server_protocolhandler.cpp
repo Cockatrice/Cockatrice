@@ -25,6 +25,10 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 	// so it will not receive the game update event.
 	server->removeClient(this);
 
+	QMapIterator<int, Server_Room *> roomIterator(rooms);
+	while (roomIterator.hasNext())
+		roomIterator.next().value()->removeClient(this);
+	
 	QMapIterator<int, QPair<Server_Game *, Server_Player *> > gameIterator(games);
 	while (gameIterator.hasNext()) {
 		gameIterator.next();
@@ -37,10 +41,6 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 			p->setProtocolHandler(0);
 	}
 
-	QMapIterator<int, Server_Room *> roomIterator(rooms);
-	while (roomIterator.hasNext())
-		roomIterator.next().value()->removeClient(this);
-	
 	delete userInfo;
 }
 
@@ -234,8 +234,9 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 				}
 		}
 	}
-
-	return RespOk;
+	
+	cont->setResponse(new Response_Login(cont->getCmdId(), RespOk, new ServerInfo_User(userInfo, true)));
+	return RespNothing;
 }
 
 ResponseCode Server_ProtocolHandler::cmdMessage(Command_Message *cmd, CommandContainer *cont)
@@ -301,6 +302,8 @@ ResponseCode Server_ProtocolHandler::cmdJoinRoom(Command_JoinRoom *cmd, CommandC
 
 	r->addClient(this);
 	rooms.insert(r->getId(), r);
+	
+	enqueueProtocolItem(new Event_RoomSay(r->getId(), QString(), r->getJoinMessage()));
 	
 	cont->setResponse(new Response_JoinRoom(cont->getCmdId(), RespOk, r->getInfo(true)));
 	return RespNothing;

@@ -10,12 +10,15 @@
 #include <QCheckBox>
 #include <QInputDialog>
 #include <QLabel>
+#include <QScrollBar>
 #include "dlg_creategame.h"
 #include "tab_room.h"
 #include "userlist.h"
 #include "abstractclient.h"
 #include "protocol_items.h"
 #include "gamesmodel.h"
+
+#include <QTextTable>
 
 GameSelector::GameSelector(AbstractClient *_client, int _roomId, QWidget *parent)
 	: QGroupBox(parent), client(_client), roomId(_roomId)
@@ -119,14 +122,50 @@ void GameSelector::processGameInfo(ServerInfo_Game *info)
 	gameListModel->updateGameList(info);
 }
 
-TabRoom::TabRoom(AbstractClient *_client, ServerInfo_Room *info)
-	: Tab(), client(_client), roomId(info->getRoomId()), roomName(info->getName())
+ChatView::ChatView(const QString &_ownName, QWidget *parent)
+	: QTextEdit(parent), ownName(_ownName)
+{
+	setTextInteractionFlags(Qt::TextSelectableByMouse);
+	
+	QTextTableFormat format;
+	format.setBorderStyle(QTextFrameFormat::BorderStyle_None);
+	table = textCursor().insertTable(1, 3, format);
+}
+
+void ChatView::appendMessage(const QString &sender, const QString &message)
+{
+	QTextCursor cellCursor = table->cellAt(table->rows() - 1, 0).lastCursorPosition();
+	cellCursor.insertText(QDateTime::currentDateTime().toString("[hh:mm]"));
+	QTextTableCell senderCell = table->cellAt(table->rows() - 1, 1);
+	QTextCharFormat senderFormat;
+	if (sender == ownName) {
+		senderFormat.setFontWeight(QFont::Bold);
+		senderFormat.setForeground(Qt::red);
+	} else
+		senderFormat.setForeground(Qt::blue);
+	senderCell.setFormat(senderFormat);
+	cellCursor = senderCell.lastCursorPosition();
+	cellCursor.insertText(sender);
+	QTextTableCell messageCell = table->cellAt(table->rows() - 1, 2);
+	QTextCharFormat messageFormat;
+	if (sender.isEmpty())
+		messageFormat.setForeground(Qt::darkGreen);
+	messageCell.setFormat(messageFormat);
+	cellCursor = messageCell.lastCursorPosition();
+	cellCursor.insertText(message);
+	
+	table->appendRows(1);
+	
+	verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+}
+
+TabRoom::TabRoom(AbstractClient *_client, const QString &_ownName, ServerInfo_Room *info)
+	: Tab(), client(_client), roomId(info->getRoomId()), roomName(info->getName()), ownName(_ownName)
 {
 	gameSelector = new GameSelector(client, roomId);
 	userList = new UserList(false);
 	
-	textEdit = new QTextEdit;
-	textEdit->setReadOnly(true);
+	chatView = new ChatView(ownName);
 	sayLabel = new QLabel;
 	sayEdit = new QLineEdit;
 	sayLabel->setBuddy(sayEdit);
@@ -137,7 +176,7 @@ TabRoom::TabRoom(AbstractClient *_client, ServerInfo_Room *info)
 	sayHbox->addWidget(sayEdit);
 	
 	QVBoxLayout *chatVbox = new QVBoxLayout;
-	chatVbox->addWidget(textEdit);
+	chatVbox->addWidget(chatView);
 	chatVbox->addLayout(sayHbox);
 	
 	chatGroupBox = new QGroupBox;
@@ -221,23 +260,18 @@ void TabRoom::processListGamesEvent(Event_ListGames *event)
 
 void TabRoom::processJoinRoomEvent(Event_JoinRoom *event)
 {
-	textEdit->append(tr("%1 has joined the room.").arg(sanitizeHtml(event->getUserInfo()->getName())));
+	chatView->appendMessage(QString(), tr("%1 has joined the room.").arg(event->getUserInfo()->getName()));
 	userList->processUserInfo(event->getUserInfo());
-	emit userEvent();
 }
 
 void TabRoom::processLeaveRoomEvent(Event_LeaveRoom *event)
 {
-	textEdit->append(tr("%1 has left the room.").arg(sanitizeHtml(event->getPlayerName())));
+	chatView->appendMessage(QString(), tr("%1 has left the room.").arg(event->getPlayerName()));
 	userList->deleteUser(event->getPlayerName());
-	emit userEvent();
 }
 
 void TabRoom::processSayEvent(Event_RoomSay *event)
 {
-	if (event->getPlayerName().isEmpty())
-		textEdit->append(QString("<font color=\"blue\">%1</font").arg(sanitizeHtml(event->getMessage())));
-	else
-		textEdit->append(QString("<font color=\"red\">%1:</font> %2").arg(sanitizeHtml(event->getPlayerName())).arg(sanitizeHtml(event->getMessage())));
+	chatView->appendMessage(event->getPlayerName(), event->getMessage());
 	emit userEvent();
 }

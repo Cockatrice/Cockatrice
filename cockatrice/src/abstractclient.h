@@ -46,6 +46,7 @@ signals:
 	void listRoomsEventReceived(Event_ListRooms *event);
 	void gameJoinedEventReceived(Event_GameJoined *event);
 	void messageEventReceived(Event_Message *event);
+	void userInfoChanged(ServerInfo_User *userInfo);
 protected slots:
 	void processProtocolItem(ProtocolItem *item);
 protected:

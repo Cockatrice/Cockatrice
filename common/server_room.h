@@ -34,6 +34,7 @@ public:
 	QString getName() const { return name; }
 	QString getDescription() const { return description; }
 	bool getAutoJoin() const { return autoJoin; }
+	QString getJoinMessage() const { return joinMessage; }
 	const QMap<int, Server_Game *> &getGames() const { return games; }
 	Server *getServer() const;
 	ServerInfo_Room *getInfo(bool complete) const;

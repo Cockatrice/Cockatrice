@@ -108,6 +108,11 @@ void Server::broadcastRoomUpdate()
 	delete event;
 }
 
+void Server::gameCreated(Server_Game *game)
+{
+	games.insert(game->getGameId(), game);
+}
+
 void Server::gameClosing(int gameId)
 {
 	qDebug("Server::gameClosing");

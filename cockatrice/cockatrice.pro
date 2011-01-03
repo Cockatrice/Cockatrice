@@ -5,7 +5,7 @@ INCLUDEPATH += . src ../common
 MOC_DIR = build
 OBJECTS_DIR = build
 RESOURCES = cockatrice.qrc
-QT += network svg
+QT += network svg webkit
 
 HEADERS += src/counter.h \
  src/dlg_creategame.h \

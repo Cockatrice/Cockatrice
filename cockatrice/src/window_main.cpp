@@ -64,13 +64,16 @@ void MainWindow::statusChanged(ClientStatus _status)
 			aConnect->setEnabled(false);
 			aDisconnect->setEnabled(true);
 			break;
-		case StatusLoggedIn: {
-			tabSupervisor->start(client);
+		case StatusLoggedIn:
 			break;
-		}
 		default:
 			break;
 	}
+}
+
+void MainWindow::userInfoReceived(ServerInfo_User *info)
+{
+	tabSupervisor->start(client, info);
 }
 
 // Actions
@@ -260,6 +263,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
 	connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
 	connect(client, SIGNAL(protocolVersionMismatch(int, int)), this, SLOT(protocolVersionMismatch(int, int)));
+	connect(client, SIGNAL(userInfoChanged(ServerInfo_User *)), this, SLOT(userInfoReceived(ServerInfo_User *)));
 
 	tabSupervisor = new TabSupervisor;
 	connect(tabSupervisor, SIGNAL(setMenu(QMenu *)), this, SLOT(updateTabMenu(QMenu *)));

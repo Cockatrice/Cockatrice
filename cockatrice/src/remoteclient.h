@@ -2,7 +2,6 @@
 #define REMOTECLIENT_H
 
 #include <QTcpSocket>
-#include "protocol_datastructures.h"
 #include "abstractclient.h"
 
 class QTimer;
@@ -22,7 +21,7 @@ private slots:
 	void readData();
 	void slotSocketError(QAbstractSocket::SocketError error);
 	void ping();
-	void loginResponse(ResponseCode response);
+	void loginResponse(ProtocolResponse *response);
 private:
 	static const int maxTimeout = 10;
 	

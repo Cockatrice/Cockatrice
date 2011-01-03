@@ -44,6 +44,7 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("respdeck_download", Response_DeckDownload::newItem);
 	registerSerializableItem("respdeck_upload", Response_DeckUpload::newItem);
 	registerSerializableItem("respdump_zone", Response_DumpZone::newItem);
+	registerSerializableItem("resplogin", Response_Login::newItem);
 	
 	registerSerializableItem("room_eventlist_games", Event_ListGames::newItem);
 	registerSerializableItem("room_eventjoin_room", Event_JoinRoom::newItem);
@@ -279,6 +280,14 @@ Response_DumpZone::Response_DumpZone(int _cmdId, ResponseCode _responseCode, Ser
 	if (!_zone)
 		_zone = new ServerInfo_Zone;
 	insertItem(_zone);
+}
+
+Response_Login::Response_Login(int _cmdId, ResponseCode _responseCode, ServerInfo_User *_userInfo)
+	: ProtocolResponse(_cmdId, _responseCode, "login")
+{
+	if (!_userInfo)
+		_userInfo = new ServerInfo_User;
+	insertItem(_userInfo);
 }
 
 GameEvent::GameEvent(const QString &_eventName, int _playerId)

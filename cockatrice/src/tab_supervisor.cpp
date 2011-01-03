@@ -51,16 +51,18 @@ void TabSupervisor::myAddTab(Tab *tab)
 	addTab(tab, tab->getTabText());
 }
 
-void TabSupervisor::start(AbstractClient *_client)
+void TabSupervisor::start(AbstractClient *_client, ServerInfo_User *userInfo)
 {
 	client = _client;
+	userName = userInfo->getName();
+	
 	connect(client, SIGNAL(roomEventReceived(RoomEvent *)), this, SLOT(processRoomEvent(RoomEvent *)));
 	connect(client, SIGNAL(gameEventContainerReceived(GameEventContainer *)), this, SLOT(processGameEventContainer(GameEventContainer *)));
 	connect(client, SIGNAL(gameJoinedEventReceived(Event_GameJoined *)), this, SLOT(gameJoined(Event_GameJoined *)));
 	connect(client, SIGNAL(messageEventReceived(Event_Message *)), this, SLOT(processMessageEvent(Event_Message *)));
 	connect(client, SIGNAL(maxPingTime(int, int)), this, SLOT(updatePingTime(int, int)));
 
-	tabServer = new TabServer(client);
+	tabServer = new TabServer(client, userInfo);
 	connect(tabServer, SIGNAL(roomJoined(ServerInfo_Room *)), this, SLOT(addRoomTab(ServerInfo_Room *)));
 	connect(tabServer, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
 	connect(tabServer, SIGNAL(userLeft(const QString &)), this, SLOT(processUserLeft(const QString &)));
@@ -162,7 +164,7 @@ void TabSupervisor::gameLeft(TabGame *tab)
 
 void TabSupervisor::addRoomTab(ServerInfo_Room *info)
 {
-	TabRoom *tab = new TabRoom(client, info);
+	TabRoom *tab = new TabRoom(client, userName, info);
 	connect(tab, SIGNAL(roomClosing(TabRoom *)), this, SLOT(roomLeft(TabRoom *)));
 	myAddTab(tab);
 	roomTabs.insert(info->getRoomId(), tab);
@@ -177,12 +179,15 @@ void TabSupervisor::roomLeft(TabRoom *tab)
 	removeTab(indexOf(tab));
 }
 
-TabMessage *TabSupervisor::addMessageTab(const QString &userName, bool focus)
+TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus)
 {
-	TabMessage *tab = new TabMessage(client, userName);
+	if (receiverName == userName)
+		return 0;
+	
+	TabMessage *tab = new TabMessage(client, receiverName);
 	connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
 	myAddTab(tab);
-	messageTabs.insert(userName, tab);
+	messageTabs.insert(receiverName, tab);
 	if (focus)
 		setCurrentWidget(tab);
 	return tab;
@@ -230,6 +235,8 @@ void TabSupervisor::processMessageEvent(Event_Message *event)
 		tab = messageTabs.value(event->getReceiverName());
 	if (!tab)
 		tab = addMessageTab(event->getSenderName(), false);
+	if (!tab)
+		return;
 	tab->processMessageEvent(event);
 }
 

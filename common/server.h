@@ -18,6 +18,7 @@ class Server : public QObject
 signals:
 	void pingClockTimeout();
 private slots:
+	void gameCreated(Server_Game *game);
 	void gameClosing(int gameId);
 	void broadcastRoomUpdate();
 public:

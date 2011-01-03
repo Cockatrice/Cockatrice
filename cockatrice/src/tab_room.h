@@ -4,6 +4,7 @@
 #include "tab.h"
 #include "protocol_datastructures.h"
 #include <QGroupBox>
+#include <QTextEdit>
 
 class AbstractClient;
 class UserList;
@@ -12,6 +13,7 @@ class QTextEdit;
 class QLineEdit;
 class QTreeView;
 class QPushButton;
+class QTextTable;
 class QCheckBox;
 class GamesModel;
 class GamesProxyModel;
@@ -47,16 +49,27 @@ public:
 	void processGameInfo(ServerInfo_Game *info);
 };
 
+class ChatView : public QTextEdit {
+	Q_OBJECT;
+private:
+	QTextTable *table;
+	QString ownName;
+public:
+	ChatView(const QString &_ownName, QWidget *parent = 0);
+	void appendMessage(const QString &sender, const QString &message);
+};
+
 class TabRoom : public Tab {
 	Q_OBJECT
 private:
 	AbstractClient *client;
 	int roomId;
 	QString roomName;
+	QString ownName;
 	
 	GameSelector *gameSelector;
 	UserList *userList;
-	QTextEdit *textEdit;
+	ChatView *chatView;
 	QLabel *sayLabel;
 	QLineEdit *sayEdit;
 	QGroupBox *chatGroupBox;
@@ -74,7 +87,7 @@ private slots:
 	void processLeaveRoomEvent(Event_LeaveRoom *event);
 	void processSayEvent(Event_RoomSay *event);
 public:
-	TabRoom(AbstractClient *_client, ServerInfo_Room *info);
+	TabRoom(AbstractClient *_client, const QString &_ownName, ServerInfo_Room *info);
 	~TabRoom();
 	void retranslateUi();
 	void processRoomEvent(RoomEvent *event);

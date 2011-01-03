@@ -44,6 +44,7 @@ enum ItemId {
 	ItemId_Response_DeckUpload = ItemId_Other + 304,
 	ItemId_Response_DumpZone = ItemId_Other + 305,
 	ItemId_Response_JoinRoom = ItemId_Other + 306,
+	ItemId_Response_Login = ItemId_Other + 307,
 	ItemId_Invalid = ItemId_Other + 1000
 };
 
@@ -266,6 +267,15 @@ public:
 	int getItemId() const { return ItemId_Response_DumpZone; }
 	static SerializableItem *newItem() { return new Response_DumpZone; }
 	ServerInfo_Zone *getZone() const { return static_cast<ServerInfo_Zone *>(itemMap.value("zone")); }
+};
+
+class Response_Login : public ProtocolResponse {
+	Q_OBJECT
+public:
+	Response_Login(int _cmdId = -1, ResponseCode _responseCode = RespOk, ServerInfo_User *_userInfo = 0);
+	int getItemId() const { return ItemId_Response_Login; }
+	static SerializableItem *newItem() { return new Response_Login; }
+	ServerInfo_User *getUserInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
 };
 
 // --------------

@@ -116,32 +116,7 @@ void RoomSelector::joinFinished(ProtocolResponse *r)
 	emit roomJoined(resp->getRoomInfo());
 }
 
-ServerMessageLog::ServerMessageLog(AbstractClient *_client, QWidget *parent)
-	: QGroupBox(parent)
-{
-	textEdit = new QTextEdit;
-	textEdit->setReadOnly(true);
-	
-	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(textEdit);
-	
-	setLayout(vbox);
-	retranslateUi();
-
-	connect(_client, SIGNAL(serverMessageEventReceived(Event_ServerMessage *)), this, SLOT(processServerMessageEvent(Event_ServerMessage *)));
-}
-
-void ServerMessageLog::retranslateUi()
-{
-	setTitle(tr("Server messages"));
-}
-
-void ServerMessageLog::processServerMessageEvent(Event_ServerMessage *event)
-{
-	textEdit->append(event->getMessage());
-}
-
-UserInfoBox::UserInfoBox(AbstractClient *_client, QWidget *parent)
+UserInfoBox::UserInfoBox(ServerInfo_User *userInfo, QWidget *parent)
 	: QWidget(parent)
 {
 	avatarLabel = new QLabel;
@@ -169,9 +144,7 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, QWidget *parent)
 	
 	setLayout(mainLayout);
 	
-	Command_GetUserInfo *cmd = new Command_GetUserInfo;
-	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(processResponse(ProtocolResponse *)));
-	_client->sendCommand(cmd);
+	updateInfo(userInfo);
 }
 
 void UserInfoBox::retranslateUi()
@@ -180,12 +153,8 @@ void UserInfoBox::retranslateUi()
 	userLevelLabel1->setText(tr("User level:"));
 }
 
-void UserInfoBox::processResponse(ProtocolResponse *response)
+void UserInfoBox::updateInfo(ServerInfo_User *user)
 {
-	Response_GetUserInfo *resp = qobject_cast<Response_GetUserInfo *>(response);
-	if (!resp)
-		return;
-	ServerInfo_User *user = resp->getUserInfo();
 	int userLevel = user->getUserLevel();
 	
 	QPixmap avatarPixmap;
@@ -208,21 +177,20 @@ void UserInfoBox::processResponse(ProtocolResponse *response)
 	userLevelLabel3->setText(userLevelText);
 }
 
-TabServer::TabServer(AbstractClient *_client, QWidget *parent)
+TabServer::TabServer(AbstractClient *_client, ServerInfo_User *userInfo, QWidget *parent)
 	: Tab(parent), client(_client)
 {
 	roomSelector = new RoomSelector(client);
-	serverMessageLog = new ServerMessageLog(client);
-	userInfoBox = new UserInfoBox(client);
+	serverInfoBox = new QTextBrowser;
+	userInfoBox = new UserInfoBox(userInfo);
 	userList = new UserList(true);
 	
-//	connect(gameSelector, SIGNAL(gameJoined(int)), this, SIGNAL(gameJoined(int)));
 	connect(roomSelector, SIGNAL(roomJoined(ServerInfo_Room *)), this, SIGNAL(roomJoined(ServerInfo_Room *)));
 	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
-	connect(userList, SIGNAL(userLeft(const QString &)), this, SIGNAL(userLeft(const QString &)));
 	
 	connect(client, SIGNAL(userJoinedEventReceived(Event_UserJoined *)), this, SLOT(processUserJoinedEvent(Event_UserJoined *)));
 	connect(client, SIGNAL(userLeftEventReceived(Event_UserLeft *)), this, SLOT(processUserLeftEvent(Event_UserLeft *)));
+	connect(client, SIGNAL(serverMessageEventReceived(Event_ServerMessage *)), this, SLOT(processServerMessageEvent(Event_ServerMessage *)));
 	
 	Command_ListUsers *cmd = new Command_ListUsers;
 	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(processListUsersResponse(ProtocolResponse *)));
@@ -230,7 +198,7 @@ TabServer::TabServer(AbstractClient *_client, QWidget *parent)
 	
 	QVBoxLayout *vbox = new QVBoxLayout;
 	vbox->addWidget(roomSelector);
-	vbox->addWidget(serverMessageLog);
+	vbox->addWidget(serverInfoBox);
 	
 	QVBoxLayout *vbox2 = new QVBoxLayout;
 	vbox2->addWidget(userInfoBox);
@@ -246,9 +214,13 @@ TabServer::TabServer(AbstractClient *_client, QWidget *parent)
 void TabServer::retranslateUi()
 {
 	roomSelector->retranslateUi();
-	serverMessageLog->retranslateUi();
 	userInfoBox->retranslateUi();
 	userList->retranslateUi();
+}
+
+void TabServer::processServerMessageEvent(Event_ServerMessage *event)
+{
+	serverInfoBox->setHtml(event->getMessage());
 }
 
 void TabServer::processListUsersResponse(ProtocolResponse *response)
