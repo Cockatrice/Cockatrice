@@ -78,6 +78,7 @@ private:
 	QString sanitizeHtml(QString dirty) const;
 signals:
 	void roomClosing(TabRoom *tab);
+	void openMessageDialog(const QString &userName, bool focus);
 private slots:
 	void sendMessage();
 	void actLeaveRoom();

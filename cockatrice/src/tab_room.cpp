@@ -164,6 +164,7 @@ TabRoom::TabRoom(AbstractClient *_client, const QString &_ownName, ServerInfo_Ro
 {
 	gameSelector = new GameSelector(client, roomId);
 	userList = new UserList(false);
+	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
 	
 	chatView = new ChatView(ownName);
 	sayLabel = new QLabel;
