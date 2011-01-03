@@ -202,6 +202,10 @@ TabRoom::TabRoom(AbstractClient *_client, const QString &_ownName, ServerInfo_Ro
 	const QList<ServerInfo_User *> users = info->getUserList();
 	for (int i = 0; i < users.size(); ++i)
 		userList->processUserInfo(users[i]);
+	
+	const QList<ServerInfo_Game *> games = info->getGameList();
+	for (int i = 0; i < games.size(); ++i)
+		gameSelector->processGameInfo(games[i]);
 }
 
 TabRoom::~TabRoom()
