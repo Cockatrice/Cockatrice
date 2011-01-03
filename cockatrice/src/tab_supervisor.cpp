@@ -63,7 +63,7 @@ void TabSupervisor::start(AbstractClient *_client, ServerInfo_User *userInfo)
 	connect(client, SIGNAL(maxPingTime(int, int)), this, SLOT(updatePingTime(int, int)));
 
 	tabServer = new TabServer(client, userInfo);
-	connect(tabServer, SIGNAL(roomJoined(ServerInfo_Room *)), this, SLOT(addRoomTab(ServerInfo_Room *)));
+	connect(tabServer, SIGNAL(roomJoined(ServerInfo_Room *, bool)), this, SLOT(addRoomTab(ServerInfo_Room *, bool)));
 	connect(tabServer, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
 	connect(tabServer, SIGNAL(userLeft(const QString &)), this, SLOT(processUserLeft(const QString &)));
 	myAddTab(tabServer);
@@ -162,13 +162,14 @@ void TabSupervisor::gameLeft(TabGame *tab)
 		stop();
 }
 
-void TabSupervisor::addRoomTab(ServerInfo_Room *info)
+void TabSupervisor::addRoomTab(ServerInfo_Room *info, bool setCurrent)
 {
 	TabRoom *tab = new TabRoom(client, userName, info);
 	connect(tab, SIGNAL(roomClosing(TabRoom *)), this, SLOT(roomLeft(TabRoom *)));
 	myAddTab(tab);
 	roomTabs.insert(info->getRoomId(), tab);
-	setCurrentWidget(tab);
+	if (setCurrent)
+		setCurrentWidget(tab);
 }
 
 void TabSupervisor::roomLeft(TabRoom *tab)

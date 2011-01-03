@@ -27,13 +27,13 @@ private:
 	QPushButton *joinButton;
 	AbstractClient *client;
 	
-	void joinRoom(int id);
+	void joinRoom(int id, bool setCurrent);
 private slots:
 	void processListRoomsEvent(Event_ListRooms *event);
 	void joinClicked();
 	void joinFinished(ProtocolResponse *resp);
 signals:
-	void roomJoined(ServerInfo_Room *info);
+	void roomJoined(ServerInfo_Room *info, bool setCurrent);
 public:
 	RoomSelector(AbstractClient *_client, QWidget *parent = 0);
 	void retranslateUi();
@@ -52,7 +52,7 @@ public:
 class TabServer : public Tab {
 	Q_OBJECT
 signals:
-	void roomJoined(ServerInfo_Room *info);
+	void roomJoined(ServerInfo_Room *info, bool setCurrent);
 	void openMessageDialog(const QString &userName, bool focus);
 	void userLeft(const QString &userName);
 private slots:

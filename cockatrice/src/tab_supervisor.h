@@ -49,7 +49,7 @@ private slots:
 	void gameJoined(Event_GameJoined *event);
 	void localGameJoined(Event_GameJoined *event);
 	void gameLeft(TabGame *tab);
-	void addRoomTab(ServerInfo_Room *info);
+	void addRoomTab(ServerInfo_Room *info, bool setCurrent);
 	void roomLeft(TabRoom *tab);
 	TabMessage *addMessageTab(const QString &userName, bool focus);
 	void processUserLeft(const QString &userName);

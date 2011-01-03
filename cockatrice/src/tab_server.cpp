@@ -85,13 +85,14 @@ void RoomSelector::processListRoomsEvent(Event_ListRooms *event)
 		twi->setTextAlignment(3, Qt::AlignRight);
 		roomList->addTopLevelItem(twi);
 		if (room->getAutoJoin())
-			joinRoom(room->getRoomId());
+			joinRoom(room->getRoomId(), false);
 	}
 }
 
-void RoomSelector::joinRoom(int id)
+void RoomSelector::joinRoom(int id, bool setCurrent)
 {
 	Command_JoinRoom *command = new Command_JoinRoom(id);
+	command->setExtraData(setCurrent);
 	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(joinFinished(ProtocolResponse *)));
 	client->sendCommand(command);
 }
@@ -102,7 +103,7 @@ void RoomSelector::joinClicked()
 	if (!twi)
 		return;
 	
-	joinRoom(twi->data(0, Qt::UserRole).toInt());
+	joinRoom(twi->data(0, Qt::UserRole).toInt(), true);
 }
 
 void RoomSelector::joinFinished(ProtocolResponse *r)
@@ -113,7 +114,7 @@ void RoomSelector::joinFinished(ProtocolResponse *r)
 	if (!resp)
 		return;
 	
-	emit roomJoined(resp->getRoomInfo());
+	emit roomJoined(resp->getRoomInfo(), static_cast<Command *>(sender())->getExtraData().toBool());
 }
 
 UserInfoBox::UserInfoBox(ServerInfo_User *userInfo, QWidget *parent)
@@ -185,7 +186,7 @@ TabServer::TabServer(AbstractClient *_client, ServerInfo_User *userInfo, QWidget
 	userInfoBox = new UserInfoBox(userInfo);
 	userList = new UserList(true);
 	
-	connect(roomSelector, SIGNAL(roomJoined(ServerInfo_Room *)), this, SIGNAL(roomJoined(ServerInfo_Room *)));
+	connect(roomSelector, SIGNAL(roomJoined(ServerInfo_Room *, bool)), this, SIGNAL(roomJoined(ServerInfo_Room *, bool)));
 	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
 	
 	connect(client, SIGNAL(userJoinedEventReceived(Event_UserJoined *)), this, SLOT(processUserJoinedEvent(Event_UserJoined *)));
