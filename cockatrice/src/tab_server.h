@@ -5,7 +5,6 @@
 #include <QTreeWidget>
 #include <QTextBrowser>
 #include "tab.h"
-//#include "protocol_datastructures.h"
 
 class AbstractClient;
 class QTextEdit;
