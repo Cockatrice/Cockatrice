@@ -33,16 +33,22 @@ Servatrice::Servatrice(QObject *parent)
 	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
 	pingClock->start(1000);
 	
-	statusUpdateClock = new QTimer(this);
-	connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
-	statusUpdateClock->start(15000);
-	
 	ProtocolItem::initializeHash();
 	settings = new QSettings("servatrice.ini", QSettings::IniFormat, this);
 	
+	int statusUpdateTime = settings->value("server/statusupdate").toInt();
+	statusUpdateClock = new QTimer(this);
+	connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
+	if (statusUpdateTime != 0) {
+		qDebug() << "Starting status update clock, interval " << statusUpdateTime << " ms";
+		statusUpdateClock->start(statusUpdateTime);
+	}
+	
 	tcpServer = new QTcpServer(this);
 	connect(tcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
-	tcpServer->listen(QHostAddress::Any, settings->value("server/port", 4747).toInt());
+	int port = settings->value("server/port", 4747).toInt();
+	qDebug() << "Starting server on port" << port;
+	tcpServer->listen(QHostAddress::Any, port);
 	
 	QString dbType = settings->value("database/type").toString();
 	dbPrefix = settings->value("database/prefix").toString();
