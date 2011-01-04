@@ -5,17 +5,19 @@
 #include "protocol_items.h"
 #include "carddragitem.h"
 
-ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, QGraphicsItem *parent)
-	: SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0), numberCards(_numberCards), origZone(_origZone), sortByName(false), sortByType(false)
+ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, bool _revealZone, QGraphicsItem *parent)
+	: SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0), numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone), sortByName(false), sortByType(false)
 {
-	origZone->setView(this);
+	if (!revealZone)
+		origZone->setView(this);
 }
 
 ZoneViewZone::~ZoneViewZone()
 {
 	emit beingDeleted();
 	qDebug("ZoneViewZone destructor");
-	origZone->setView(NULL);
+	if (!revealZone)
+		origZone->setView(NULL);
 }
 
 QRectF ZoneViewZone::boundingRect() const

@@ -7,7 +7,8 @@ OBJECTS_DIR = build
 RESOURCES = cockatrice.qrc
 QT += network svg
 
-HEADERS += src/counter.h \
+HEADERS += src/abstractcounter.h \
+ src/counter_general.h \
  src/dlg_creategame.h \
  src/dlg_connect.h \
  src/dlg_create_token.h \
@@ -52,11 +53,12 @@ HEADERS += src/counter.h \
  src/arrowtarget.h \
  src/tab.h \
  src/tab_server.h \
- src/tab_chatchannel.h \
+ src/tab_room.h \
  src/tab_message.h \
  src/tab_game.h \
  src/tab_deck_storage.h \
  src/tab_supervisor.h \
+ src/userlist.h \
  src/remotedecklist_treewidget.h \
  src/deckview.h \
  src/playerlistwidget.h \
@@ -78,14 +80,15 @@ HEADERS += src/counter.h \
 	../common/server_arrow.h \
 	../common/server_card.h \
 	../common/server_cardzone.h \
-	../common/server_chatchannel.h \
+	../common/server_room.h \
 	../common/server_counter.h \
 	../common/server_game.h \
 	../common/server_player.h \
 	../common/server_protocolhandler.h \
 	../common/server_arrowtarget.h
 
-SOURCES += src/counter.cpp \
+SOURCES += src/abstractcounter.cpp \
+ src/counter_general.cpp \
  src/dlg_creategame.cpp \
  src/dlg_connect.cpp \
  src/dlg_create_token.cpp \
@@ -130,11 +133,12 @@ SOURCES += src/counter.cpp \
  src/arrowitem.cpp \
  src/arrowtarget.cpp \
  src/tab_server.cpp \
- src/tab_chatchannel.cpp \
+ src/tab_room.cpp \
  src/tab_message.cpp \
  src/tab_game.cpp \
  src/tab_deck_storage.cpp \
  src/tab_supervisor.cpp \
+ src/userlist.cpp \
  src/remotedecklist_treewidget.cpp \
  src/deckview.cpp \
  src/playerlistwidget.cpp \
@@ -154,7 +158,7 @@ SOURCES += src/counter.cpp \
 	../common/server.cpp \
 	../common/server_card.cpp \
 	../common/server_cardzone.cpp \
-	../common/server_chatchannel.cpp \
+	../common/server_room.cpp \
 	../common/server_game.cpp \
 	../common/server_player.cpp \
 	../common/server_protocolhandler.cpp

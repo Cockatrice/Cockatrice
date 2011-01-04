@@ -181,7 +181,7 @@ void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *s
 {
 	QString startName = startZone->getName();
 	QString targetName = targetZone->getName();
-	if (((startName == "table") && (targetName == "table")) || ((startName == "hand") && (targetName == "hand")))
+	if (((startName == "table") && (targetName == "table") && (startZone == targetZone)) || ((startName == "hand") && (targetName == "hand")))
 		return;
 	QPair<QString, QString> temp = getFromStr(startZone, cardName, oldX);
 	bool cardNameContainsStartZone = false;
@@ -190,6 +190,18 @@ void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *s
 		cardName = temp.first;
 	}
 	QString fromStr = temp.second;
+	QString cardStr;
+	if (cardNameContainsStartZone)
+		cardStr = cardName;
+	else if (cardName.isEmpty())
+		cardStr = tr("a card");
+	else
+		cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName));
+
+	if ((startName == "table") && (targetName == "table")) {
+		append(tr("%1 gives %2 control over %3.").arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(targetZone->getPlayer()->getName())).arg(cardStr));
+		return;
+	}
 	
 	QString finalStr;
 	if (targetName == "table")
@@ -214,14 +226,6 @@ void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *s
 	else if (targetName == "stack")
 		finalStr = tr("%1 plays %2%3.");
 	
-	QString cardStr;
-	if (cardNameContainsStartZone)
-		cardStr = cardName;
-	else if (cardName.isEmpty())
-		cardStr = tr("a card");
-	else
-		cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName));
-
 	append(finalStr.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr).arg(newX));
 }
 

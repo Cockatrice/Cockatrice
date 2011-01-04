@@ -32,11 +32,10 @@ void AbstractClient::processProtocolItem(ProtocolItem *item)
 	GenericEvent *genericEvent = qobject_cast<GenericEvent *>(item);
 	if (genericEvent) {
 		switch (genericEvent->getItemId()) {
-			case ItemId_Event_ListGames: emit listGamesEventReceived(qobject_cast<Event_ListGames *>(item)); break;
 			case ItemId_Event_UserJoined: emit userJoinedEventReceived(qobject_cast<Event_UserJoined *>(item)); break;
 			case ItemId_Event_UserLeft: emit userLeftEventReceived(qobject_cast<Event_UserLeft *>(item)); break;
 			case ItemId_Event_ServerMessage: emit serverMessageEventReceived(qobject_cast<Event_ServerMessage *>(item)); break;
-			case ItemId_Event_ListChatChannels: emit listChatChannelsEventReceived(qobject_cast<Event_ListChatChannels *>(item)); break;
+			case ItemId_Event_ListRooms: emit listRoomsEventReceived(qobject_cast<Event_ListRooms *>(item)); break;
 			case ItemId_Event_GameJoined: emit gameJoinedEventReceived(qobject_cast<Event_GameJoined *>(item)); break;
 			case ItemId_Event_Message: emit messageEventReceived(qobject_cast<Event_Message *>(item)); break;
 		}
@@ -53,11 +52,11 @@ void AbstractClient::processProtocolItem(ProtocolItem *item)
 		return;
 	}
 
-	ChatEvent *chatEvent = qobject_cast<ChatEvent *>(item);
-	if (chatEvent) {
-		emit chatEventReceived(chatEvent);
-		if (chatEvent->getReceiverMayDelete())
-			delete chatEvent;
+	RoomEvent *roomEvent = qobject_cast<RoomEvent *>(item);
+	if (roomEvent) {
+		emit roomEventReceived(roomEvent);
+		if (roomEvent->getReceiverMayDelete())
+			delete roomEvent;
 		return;
 	}
 }
@@ -75,4 +74,3 @@ void AbstractClient::sendCommand(Command *cmd)
 {
 	sendCommandContainer(new CommandContainer(QList<Command *>() << cmd));
 }
-

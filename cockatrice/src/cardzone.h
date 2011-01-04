@@ -14,7 +14,7 @@ class QAction;
 class QPainter;
 class CardDragItem;
 
-class CardZone : public QObject, public AbstractGraphicsItem {
+class CardZone : public AbstractGraphicsItem {
 	Q_OBJECT
 protected:
 	Player *player;

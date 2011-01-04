@@ -15,9 +15,10 @@ private:
 	int minRows, numberCards;
 	void handleDropEvent(CardDragItem *dragItem, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
 	CardZone *origZone;
+	bool revealZone;
 	bool sortByName, sortByType;
 public:
-	ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards = -1, QGraphicsItem *parent = 0);
+	ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards = -1, bool _revealZone = false, QGraphicsItem *parent = 0);
 	~ZoneViewZone();
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

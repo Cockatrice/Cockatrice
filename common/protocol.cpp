@@ -14,7 +14,7 @@ void ProtocolItem::initializeHash()
 	initializeHashAuto();
 	
 	registerSerializableItem("move_card_to_zone", MoveCardToZone::newItem);
-	registerSerializableItem("chat_channel", ServerInfo_ChatChannel::newItem);
+	registerSerializableItem("room", ServerInfo_Room::newItem);
 	registerSerializableItem("user", ServerInfo_User::newItem);
 	registerSerializableItem("game", ServerInfo_Game::newItem);
 	registerSerializableItem("card_counter", ServerInfo_CardCounter::newItem);
@@ -37,16 +37,19 @@ void ProtocolItem::initializeHash()
 	
 	registerSerializableItem("resp", ProtocolResponse::newItem);
 	ProtocolResponse::initializeHash();
+	registerSerializableItem("respjoin_room", Response_JoinRoom::newItem);
 	registerSerializableItem("resplist_users", Response_ListUsers::newItem);
 	registerSerializableItem("respget_user_info", Response_GetUserInfo::newItem);
 	registerSerializableItem("respdeck_list", Response_DeckList::newItem);
 	registerSerializableItem("respdeck_download", Response_DeckDownload::newItem);
 	registerSerializableItem("respdeck_upload", Response_DeckUpload::newItem);
 	registerSerializableItem("respdump_zone", Response_DumpZone::newItem);
+	registerSerializableItem("resplogin", Response_Login::newItem);
 	
-	registerSerializableItem("generic_eventlist_games", Event_ListGames::newItem);
+	registerSerializableItem("room_eventlist_games", Event_ListGames::newItem);
+	registerSerializableItem("room_eventjoin_room", Event_JoinRoom::newItem);
 	registerSerializableItem("generic_eventuser_joined", Event_UserJoined::newItem);
-	registerSerializableItem("generic_eventlist_chat_channels", Event_ListChatChannels::newItem);
+	registerSerializableItem("generic_eventlist_rooms", Event_ListRooms::newItem);
 	registerSerializableItem("game_eventjoin", Event_Join::newItem);
 	registerSerializableItem("game_eventgame_state_changed", Event_GameStateChanged::newItem);
 	registerSerializableItem("game_eventplayer_properties_changed", Event_PlayerPropertiesChanged::newItem);
@@ -55,8 +58,6 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("game_eventdraw_cards", Event_DrawCards::newItem);
 	registerSerializableItem("game_eventreveal_cards", Event_RevealCards::newItem);
 	registerSerializableItem("game_eventping", Event_Ping::newItem);
-	registerSerializableItem("chat_eventchat_list_players", Event_ChatListPlayers::newItem);
-	registerSerializableItem("chat_eventchat_join_channel", Event_ChatJoinChannel::newItem);
 }
 
 TopLevelProtocolItem::TopLevelProtocolItem()
@@ -221,6 +222,14 @@ void ProtocolResponse::initializeHash()
 	responseHash.insert("spectators_not_allowed", RespSpectatorsNotAllowed);
 }
 
+Response_JoinRoom::Response_JoinRoom(int _cmdId, ResponseCode _responseCode, ServerInfo_Room *_roomInfo)
+	: ProtocolResponse(_cmdId, _responseCode, "join_room")
+{
+	if (!_roomInfo)
+		_roomInfo = new ServerInfo_Room;
+	insertItem(_roomInfo);
+}
+
 Response_ListUsers::Response_ListUsers(int _cmdId, ResponseCode _responseCode, const QList<ServerInfo_User *> &_userList)
 	: ProtocolResponse(_cmdId, _responseCode, "list_users")
 {
@@ -273,6 +282,14 @@ Response_DumpZone::Response_DumpZone(int _cmdId, ResponseCode _responseCode, Ser
 	insertItem(_zone);
 }
 
+Response_Login::Response_Login(int _cmdId, ResponseCode _responseCode, ServerInfo_User *_userInfo)
+	: ProtocolResponse(_cmdId, _responseCode, "login")
+{
+	if (!_userInfo)
+		_userInfo = new ServerInfo_User;
+	insertItem(_userInfo);
+}
+
 GameEvent::GameEvent(const QString &_eventName, int _playerId)
 	: ProtocolItem("game_event", _eventName)
 {
@@ -284,36 +301,29 @@ GameEventContext::GameEventContext(const QString &_contextName)
 {
 }
 
-ChatEvent::ChatEvent(const QString &_eventName, const QString &_channel)
-	: ProtocolItem("chat_event", _eventName)
+RoomEvent::RoomEvent(const QString &_eventName, int _roomId)
+	: ProtocolItem("room_event", _eventName)
 {
-	insertItem(new SerializableItem_String("channel", _channel));
+	insertItem(new SerializableItem_Int("room_id", _roomId));
 }
 
-Event_ListChatChannels::Event_ListChatChannels(const QList<ServerInfo_ChatChannel *> &_channelList)
-	: GenericEvent("list_chat_channels")
+Event_ListRooms::Event_ListRooms(const QList<ServerInfo_Room *> &_roomList)
+	: GenericEvent("list_rooms")
 {
-	for (int i = 0; i < _channelList.size(); ++i)
-		itemList.append(_channelList[i]);
+	for (int i = 0; i < _roomList.size(); ++i)
+		itemList.append(_roomList[i]);
 }
 
-Event_ChatListPlayers::Event_ChatListPlayers(const QString &_channel, const QList<ServerInfo_User *> &_playerList)
-	: ChatEvent("chat_list_players", _channel)
-{
-	for (int i = 0; i < _playerList.size(); ++i)
-		itemList.append(_playerList[i]);
-}
-
-Event_ChatJoinChannel::Event_ChatJoinChannel(const QString &_channel, ServerInfo_User *_info)
-	: ChatEvent("chat_join_channel", _channel)
+Event_JoinRoom::Event_JoinRoom(int _roomId, ServerInfo_User *_info)
+	: RoomEvent("join_room", _roomId)
 {
 	if (!_info)
 		_info = new ServerInfo_User;
 	insertItem(_info);
 }
 
-Event_ListGames::Event_ListGames(const QList<ServerInfo_Game *> &_gameList)
-	: GenericEvent("list_games")
+Event_ListGames::Event_ListGames(int _roomId, const QList<ServerInfo_Game *> &_gameList)
+	: RoomEvent("list_games", _roomId)
 {
 	for (int i = 0; i < _gameList.size(); ++i)
 		itemList.append(_gameList[i]);

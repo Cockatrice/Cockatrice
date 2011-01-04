@@ -1,9 +1,11 @@
 #include "localserver.h"
 #include "localserverinterface.h"
+#include "server_room.h"
 
 LocalServer::LocalServer(QObject *parent)
 	: Server(parent)
 {
+	addRoom(new Server_Room(0, QString(), QString(), false, QString(), this));
 }
 
 LocalServer::~LocalServer()

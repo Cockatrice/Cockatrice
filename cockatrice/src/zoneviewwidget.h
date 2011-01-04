@@ -30,7 +30,7 @@ private slots:
 	void resizeToZoneContents();
 	void zoneDeleted();
 public:
-	ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards = 0, const QList<ServerInfo_Card *> &cardList = QList<ServerInfo_Card *>());
+	ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards = 0, bool _revealZone = false, const QList<ServerInfo_Card *> &cardList = QList<ServerInfo_Card *>());
 	ZoneViewZone *getZone() const { return zone; }
 	void retranslateUi();
 protected:
