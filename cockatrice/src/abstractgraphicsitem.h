@@ -12,11 +12,12 @@ enum GraphicsItemType {
 	typeOther = QGraphicsItem::UserType + 6
 };
 
-class AbstractGraphicsItem : public QGraphicsItem {
+class AbstractGraphicsItem : public QObject, public QGraphicsItem {
+	Q_OBJECT
 protected:
 	void paintNumberEllipse(int number, int radius, const QColor &color, int position, int count, QPainter *painter);
 public:
-	AbstractGraphicsItem(QGraphicsItem *parent = 0) : QGraphicsItem(parent) { }
+	AbstractGraphicsItem(QGraphicsItem *parent = 0) : QObject(), QGraphicsItem(parent) { }
 };
 
 #endif

@@ -7,7 +7,8 @@ OBJECTS_DIR = build
 RESOURCES = cockatrice.qrc
 QT += network svg
 
-HEADERS += src/counter.h \
+HEADERS += src/abstractcounter.h \
+ src/counter_general.h \
  src/dlg_creategame.h \
  src/dlg_connect.h \
  src/dlg_create_token.h \
@@ -86,7 +87,8 @@ HEADERS += src/counter.h \
 	../common/server_protocolhandler.h \
 	../common/server_arrowtarget.h
 
-SOURCES += src/counter.cpp \
+SOURCES += src/abstractcounter.cpp \
+ src/counter_general.cpp \
  src/dlg_creategame.cpp \
  src/dlg_connect.cpp \
  src/dlg_create_token.cpp \
