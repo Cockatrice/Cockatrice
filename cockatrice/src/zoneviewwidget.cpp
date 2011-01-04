@@ -9,7 +9,7 @@
 #include "protocol_items.h"
 #include "settingscache.h"
 
-ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, const QList<ServerInfo_Card *> &cardList)
+ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, bool _revealZone, const QList<ServerInfo_Card *> &cardList)
 	: QGraphicsWidget(0, Qt::Tool | Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint/* | Qt::WindowCloseButtonHint*/), player(_player)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
@@ -48,7 +48,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 	extraHeight = vbox->sizeHint(Qt::PreferredSize).height();
 	resize(150, 150);
 
-	zone = new ZoneViewZone(player, _origZone, numberCards, this);
+	zone = new ZoneViewZone(player, _origZone, numberCards, _revealZone, this);
 	connect(zone, SIGNAL(optimumRectChanged()), this, SLOT(resizeToZoneContents()));
 	connect(zone, SIGNAL(beingDeleted()), this, SLOT(zoneDeleted()));
 	vbox->addItem(zone);
