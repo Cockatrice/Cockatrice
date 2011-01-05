@@ -1764,7 +1764,7 @@
     <message>
         <location filename="../src/player.cpp" line="381"/>
         <source>&amp;View graveyard</source>
-        <translation>&amp;Ver cemitério</translation>
+        <translation>V&amp;er cemitério</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="446"/>
