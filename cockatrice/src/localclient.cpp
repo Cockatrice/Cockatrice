@@ -7,6 +7,7 @@ LocalClient::LocalClient(LocalServerInterface *_lsi, const QString &_playerName,
 {
 	connect(lsi, SIGNAL(itemToClient(ProtocolItem *)), this, SLOT(itemFromServer(ProtocolItem *)));
 	sendCommand(new Command_Login(_playerName, QString()));
+	sendCommand(new Command_JoinRoom(0));
 }
 
 LocalClient::~LocalClient()

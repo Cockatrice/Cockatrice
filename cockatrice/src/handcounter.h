@@ -7,7 +7,7 @@
 class QPainter;
 class QPixmap;
 
-class HandCounter : public QObject, public AbstractGraphicsItem {
+class HandCounter : public AbstractGraphicsItem {
 	Q_OBJECT
 private:
 	int number;

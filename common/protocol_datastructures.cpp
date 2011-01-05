@@ -3,15 +3,6 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
-ServerInfo_ChatChannel::ServerInfo_ChatChannel(const QString &_name, const QString &_description, int _playerCount, bool _autoJoin)
-	: SerializableItem_Map("chat_channel")
-{
-	insertItem(new SerializableItem_String("name", _name));
-	insertItem(new SerializableItem_String("description", _description));
-	insertItem(new SerializableItem_Int("player_count", _playerCount));
-	insertItem(new SerializableItem_Bool("auto_join", _autoJoin));
-}
-
 ServerInfo_User::ServerInfo_User(const QString &_name, int _userLevel, const QString &_country, const QByteArray &_avatarBmp)
 	: SerializableItem_Map("user")
 {
@@ -21,13 +12,13 @@ ServerInfo_User::ServerInfo_User(const QString &_name, int _userLevel, const QSt
 	insertItem(new SerializableItem_ByteArray("avatar_bmp", _avatarBmp));
 }
 
-ServerInfo_User::ServerInfo_User(const ServerInfo_User *other)
+ServerInfo_User::ServerInfo_User(const ServerInfo_User *other, bool complete)
 	: SerializableItem_Map("user")
 {
 	insertItem(new SerializableItem_String("name", other->getName()));
 	insertItem(new SerializableItem_Int("userlevel", other->getUserLevel()));
 	insertItem(new SerializableItem_String("country", other->getCountry()));
-	insertItem(new SerializableItem_ByteArray("avatar_bmp", other->getAvatarBmp()));
+	insertItem(new SerializableItem_ByteArray("avatar_bmp", complete ? other->getAvatarBmp() : QByteArray()));
 }
 
 ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, ServerInfo_User *_creatorInfo, bool _spectatorsAllowed, bool _spectatorsNeedPassword, int _spectatorCount)
@@ -44,6 +35,40 @@ ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool 
 	insertItem(new SerializableItem_Bool("spectators_allowed", _spectatorsAllowed));
 	insertItem(new SerializableItem_Bool("spectators_need_password", _spectatorsNeedPassword));
 	insertItem(new SerializableItem_Int("spectator_count", _spectatorCount));
+}
+
+ServerInfo_Room::ServerInfo_Room(int _roomId, const QString &_name, const QString &_description, int _gameCount, int _playerCount, bool _autoJoin, const QList<ServerInfo_Game *> &_gameList, const QList<ServerInfo_User *> &_userList)
+	: SerializableItem_Map("room")
+{
+	insertItem(new SerializableItem_Int("room_id", _roomId));
+	insertItem(new SerializableItem_String("name", _name));
+	insertItem(new SerializableItem_String("description", _description));
+	insertItem(new SerializableItem_Int("game_count", _gameCount));
+	insertItem(new SerializableItem_Int("player_count", _playerCount));
+	insertItem(new SerializableItem_Bool("auto_join", _autoJoin));
+	
+	gameList = _gameList;
+	for (int i = 0; i < _gameList.size(); ++i)
+		itemList.append(_gameList[i]);
+	userList = _userList;
+	for (int i = 0; i < _userList.size(); ++i)
+		itemList.append(_userList[i]);
+}
+
+void ServerInfo_Room::extractData()
+{
+	for (int i = 0; i < itemList.size(); ++i) {
+		ServerInfo_User *user = dynamic_cast<ServerInfo_User *>(itemList[i]);
+		if (user) {
+			userList.append(user);
+			continue;
+		}
+		ServerInfo_Game *game = dynamic_cast<ServerInfo_Game *>(itemList[i]);
+		if (game) {
+			gameList.append(game);
+			continue;
+		}
+	}
 }
 
 ServerInfo_CardCounter::ServerInfo_CardCounter(int _id, int _value)

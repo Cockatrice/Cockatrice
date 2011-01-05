@@ -10,126 +10,24 @@
 #include <QHeaderView>
 #include <QInputDialog>
 #include "tab_server.h"
-#include "gamesmodel.h"
-#include "dlg_creategame.h"
 #include "abstractclient.h"
 #include "protocol.h"
 #include "protocol_items.h"
+#include "userlist.h"
 #include "pixmapgenerator.h"
 #include <QDebug>
 
-GameSelector::GameSelector(AbstractClient *_client, QWidget *parent)
+RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent)
 	: QGroupBox(parent), client(_client)
 {
-	gameListView = new QTreeView;
-	gameListModel = new GamesModel(this);
-	gameListProxyModel = new GamesProxyModel(this);
-	gameListProxyModel->setSourceModel(gameListModel);
-	gameListView->setModel(gameListProxyModel);
-	gameListView->header()->setResizeMode(0, QHeaderView::ResizeToContents);
-
-	showFullGamesCheckBox = new QCheckBox;
-	createButton = new QPushButton;
-	joinButton = new QPushButton;
-	spectateButton = new QPushButton;
-	QHBoxLayout *buttonLayout = new QHBoxLayout;
-	buttonLayout->addWidget(showFullGamesCheckBox);
-	buttonLayout->addStretch();
-	buttonLayout->addWidget(createButton);
-	buttonLayout->addWidget(joinButton);
-	buttonLayout->addWidget(spectateButton);
-
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addWidget(gameListView);
-	mainLayout->addLayout(buttonLayout);
-
-	retranslateUi();
-	setLayout(mainLayout);
-
-	setMinimumWidth(gameListView->columnWidth(0) * gameListModel->columnCount());
-	setMinimumHeight(400);
-
-	connect(showFullGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showFullGamesChanged(int)));
-	connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
-	connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
-	connect(spectateButton, SIGNAL(clicked()), this, SLOT(actJoin()));
-
-	connect(client, SIGNAL(listGamesEventReceived(Event_ListGames *)), this, SLOT(processListGamesEvent(Event_ListGames *)));
-	client->sendCommand(new Command_ListGames);
-}
-
-void GameSelector::showFullGamesChanged(int state)
-{
-	gameListProxyModel->setFullGamesVisible(state);
-}
-
-void GameSelector::actCreate()
-{
-	DlgCreateGame dlg(client, this);
-	dlg.exec();
-}
-
-void GameSelector::checkResponse(ResponseCode response)
-{
-	createButton->setEnabled(true);
-	joinButton->setEnabled(true);
-	spectateButton->setEnabled(true);
-
-	switch (response) {
-		case RespWrongPassword: QMessageBox::critical(this, tr("Error"), tr("Wrong password.")); break;
-		case RespSpectatorsNotAllowed: QMessageBox::critical(this, tr("Error"), tr("Spectators are not allowed in this game.")); break;
-		case RespGameFull: QMessageBox::critical(this, tr("Error"), tr("The game is already full.")); break;
-		case RespNameNotFound: QMessageBox::critical(this, tr("Error"), tr("The game does not exist any more.")); break;
-		default: ;
-	}
-}
-
-void GameSelector::actJoin()
-{
-	bool spectator = sender() == spectateButton;
-	
-	QModelIndex ind = gameListView->currentIndex();
-	if (!ind.isValid())
-		return;
-	ServerInfo_Game *game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
-	QString password;
-	if (game->getHasPassword() && !(spectator && !game->getSpectatorsNeedPassword())) {
-		bool ok;
-		password = QInputDialog::getText(this, tr("Join game"), tr("Password:"), QLineEdit::Password, QString(), &ok);
-		if (!ok)
-			return;
-	}
-
-	Command_JoinGame *commandJoinGame = new Command_JoinGame(game->getGameId(), password, spectator);
-	connect(commandJoinGame, SIGNAL(finished(ResponseCode)), this, SLOT(checkResponse(ResponseCode)));
-	client->sendCommand(commandJoinGame);
-
-	createButton->setEnabled(false);
-	joinButton->setEnabled(false);
-	spectateButton->setEnabled(false);
-}
-
-void GameSelector::retranslateUi()
-{
-	setTitle(tr("Games"));
-	showFullGamesCheckBox->setText(tr("&Show full games"));
-	createButton->setText(tr("C&reate"));
-	joinButton->setText(tr("&Join"));
-	spectateButton->setText(tr("J&oin as spectator"));
-}
-
-void GameSelector::processListGamesEvent(Event_ListGames *event)
-{
-	const QList<ServerInfo_Game *> &gamesToUpdate = event->getGameList();
-	for (int i = 0; i < gamesToUpdate.size(); ++i)
-		gameListModel->updateGameList(gamesToUpdate[i]);
-}
-
-ChatChannelSelector::ChatChannelSelector(AbstractClient *_client, QWidget *parent)
-	: QGroupBox(parent), client(_client)
-{
-	channelList = new QTreeWidget;
-	channelList->setRootIsDecorated(false);
+	roomList = new QTreeWidget;
+	roomList->setRootIsDecorated(false);
+	roomList->setColumnCount(4);
+	roomList->header()->setStretchLastSection(false);
+	roomList->header()->setResizeMode(0, QHeaderView::ResizeToContents);
+	roomList->header()->setResizeMode(1, QHeaderView::Stretch);
+	roomList->header()->setResizeMode(2, QHeaderView::ResizeToContents);
+	roomList->header()->setResizeMode(3, QHeaderView::ResizeToContents);
 	
 	joinButton = new QPushButton;
 	connect(joinButton, SIGNAL(clicked()), this, SLOT(joinClicked()));
@@ -137,209 +35,89 @@ ChatChannelSelector::ChatChannelSelector(AbstractClient *_client, QWidget *paren
 	buttonLayout->addStretch();
 	buttonLayout->addWidget(joinButton);
 	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(channelList);
+	vbox->addWidget(roomList);
 	vbox->addLayout(buttonLayout);
 	
 	retranslateUi();
 	setLayout(vbox);
 	
-	connect(client, SIGNAL(listChatChannelsEventReceived(Event_ListChatChannels *)), this, SLOT(processListChatChannelsEvent(Event_ListChatChannels *)));
-	client->sendCommand(new Command_ListChatChannels);
+	connect(client, SIGNAL(listRoomsEventReceived(Event_ListRooms *)), this, SLOT(processListRoomsEvent(Event_ListRooms *)));
+	client->sendCommand(new Command_ListRooms);
 }
 
-void ChatChannelSelector::retranslateUi()
+void RoomSelector::retranslateUi()
 {
-	setTitle(tr("Chat channels"));
+	setTitle(tr("Rooms"));
 	joinButton->setText(tr("Joi&n"));
 
-	QTreeWidgetItem *header = channelList->headerItem();
-	header->setText(0, tr("Channel"));
+	QTreeWidgetItem *header = roomList->headerItem();
+	header->setText(0, tr("Room"));
 	header->setText(1, tr("Description"));
 	header->setText(2, tr("Players"));
+	header->setText(3, tr("Games"));
 	header->setTextAlignment(2, Qt::AlignRight);
+	header->setTextAlignment(3, Qt::AlignRight);
 }
 
-void ChatChannelSelector::processListChatChannelsEvent(Event_ListChatChannels *event)
+void RoomSelector::processListRoomsEvent(Event_ListRooms *event)
 {
-	const QList<ServerInfo_ChatChannel *> &channelsToUpdate = event->getChannelList();
-	for (int i = 0; i < channelsToUpdate.size(); ++i) {
-		ServerInfo_ChatChannel *channel = channelsToUpdate[i];
+	const QList<ServerInfo_Room *> &roomsToUpdate = event->getRoomList();
+	for (int i = 0; i < roomsToUpdate.size(); ++i) {
+		ServerInfo_Room *room = roomsToUpdate[i];
 		
-		for (int j = 0; j < channelList->topLevelItemCount(); ++j) {
-		  	QTreeWidgetItem *twi = channelList->topLevelItem(j);
-			if (twi->text(0) == channel->getName()) {
-				twi->setText(1, channel->getDescription());
-				twi->setText(2, QString::number(channel->getPlayerCount()));
+		for (int j = 0; j < roomList->topLevelItemCount(); ++j) {
+		  	QTreeWidgetItem *twi = roomList->topLevelItem(j);
+			if (twi->data(0, Qt::UserRole).toInt() == room->getRoomId()) {
+				twi->setData(0, Qt::DisplayRole, room->getName());
+				twi->setData(1, Qt::DisplayRole, room->getDescription());
+				twi->setData(2, Qt::DisplayRole, room->getPlayerCount());
+				twi->setData(3, Qt::DisplayRole, room->getGameCount());
 				return;
 			}
 		}
-		QTreeWidgetItem *twi = new QTreeWidgetItem(QStringList() << channel->getName() << channel->getDescription() << QString::number(channel->getPlayerCount()));
+		QTreeWidgetItem *twi = new QTreeWidgetItem;
+		twi->setData(0, Qt::UserRole, room->getRoomId());
+		twi->setData(0, Qt::DisplayRole, room->getName());
+		twi->setData(1, Qt::DisplayRole, room->getDescription());
+		twi->setData(2, Qt::DisplayRole, room->getPlayerCount());
+		twi->setData(3, Qt::DisplayRole, room->getGameCount());
 		twi->setTextAlignment(2, Qt::AlignRight);
-		channelList->addTopLevelItem(twi);
-		channelList->resizeColumnToContents(0);
-		channelList->resizeColumnToContents(1);
-		channelList->resizeColumnToContents(2);
-		if (channel->getAutoJoin())
-			joinChannel(channel->getName());
+		twi->setTextAlignment(3, Qt::AlignRight);
+		roomList->addTopLevelItem(twi);
+		if (room->getAutoJoin())
+			joinRoom(room->getRoomId(), false);
 	}
 }
 
-void ChatChannelSelector::joinChannel(const QString &channelName)
+void RoomSelector::joinRoom(int id, bool setCurrent)
 {
-	Command_ChatJoinChannel *command = new Command_ChatJoinChannel(channelName);
-	connect(command, SIGNAL(finished(ResponseCode)), this, SLOT(joinFinished(ResponseCode)));
+	Command_JoinRoom *command = new Command_JoinRoom(id);
+	command->setExtraData(setCurrent);
+	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(joinFinished(ProtocolResponse *)));
 	client->sendCommand(command);
 }
 
-void ChatChannelSelector::joinClicked()
+void RoomSelector::joinClicked()
 {
-	QTreeWidgetItem *twi = channelList->currentItem();
+	QTreeWidgetItem *twi = roomList->currentItem();
 	if (!twi)
 		return;
-	QString channelName = twi->text(0);
 	
-	joinChannel(channelName);
+	joinRoom(twi->data(0, Qt::UserRole).toInt(), true);
 }
 
-void ChatChannelSelector::joinFinished(ResponseCode resp)
+void RoomSelector::joinFinished(ProtocolResponse *r)
 {
-	if (resp != RespOk)
+	if (r->getResponseCode() != RespOk)
 		return;
-	
-	Command_ChatJoinChannel *command = qobject_cast<Command_ChatJoinChannel *>(sender());
-	QString channelName = command->getChannel();
-	
-	emit channelJoined(channelName);
-}
-
-ServerMessageLog::ServerMessageLog(AbstractClient *_client, QWidget *parent)
-	: QGroupBox(parent)
-{
-	textEdit = new QTextEdit;
-	textEdit->setReadOnly(true);
-	
-	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(textEdit);
-	
-	setLayout(vbox);
-	retranslateUi();
-
-	connect(_client, SIGNAL(serverMessageEventReceived(Event_ServerMessage *)), this, SLOT(processServerMessageEvent(Event_ServerMessage *)));
-}
-
-void ServerMessageLog::retranslateUi()
-{
-	setTitle(tr("Server messages"));
-}
-
-void ServerMessageLog::processServerMessageEvent(Event_ServerMessage *event)
-{
-	textEdit->append(event->getMessage());
-}
-
-UserListTWI::UserListTWI()
-	: QTreeWidgetItem(Type)
-{
-}
-
-bool UserListTWI::operator<(const QTreeWidgetItem &other) const
-{
-	// Equal user level => sort by name
-	if (data(0, Qt::UserRole) == other.data(0, Qt::UserRole))
-		return data(2, Qt::UserRole).toString().toLower() < other.data(2, Qt::UserRole).toString().toLower();
-	// Else sort by user level
-	return data(0, Qt::UserRole).toInt() > other.data(0, Qt::UserRole).toInt();
-}
-
-UserList::UserList(AbstractClient *_client, QWidget *parent)
-	: QGroupBox(parent)
-{
-	userTree = new QTreeWidget;
-	userTree->setColumnCount(3);
-	userTree->header()->setResizeMode(QHeaderView::ResizeToContents);
-	userTree->setHeaderHidden(true);
-	userTree->setRootIsDecorated(false);
-	userTree->setIconSize(QSize(20, 12));
-	connect(userTree, SIGNAL(itemActivated(QTreeWidgetItem *, int)), this, SLOT(userClicked(QTreeWidgetItem *, int)));
-	
-	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(userTree);
-	
-	setLayout(vbox);
-	
-	retranslateUi();
-	
-	connect(_client, SIGNAL(userJoinedEventReceived(Event_UserJoined *)), this, SLOT(processUserJoinedEvent(Event_UserJoined *)));
-	connect(_client, SIGNAL(userLeftEventReceived(Event_UserLeft *)), this, SLOT(processUserLeftEvent(Event_UserLeft *)));
-	
-	Command_ListUsers *cmd = new Command_ListUsers;
-	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(processResponse(ProtocolResponse *)));
-	_client->sendCommand(cmd);
-}
-
-void UserList::retranslateUi()
-{
-	setTitle(tr("Users online: %1").arg(userTree->topLevelItemCount()));
-}
-
-void UserList::processUserInfo(ServerInfo_User *user)
-{
-	QTreeWidgetItem *item = 0;
-	for (int i = 0; i < userTree->topLevelItemCount(); ++i) {
-		QTreeWidgetItem *temp = userTree->topLevelItem(i);
-		if (temp->data(2, Qt::UserRole) == user->getName()) {
-			item = temp;
-			break;
-		}
-	}
-	if (!item) {
-		item = new UserListTWI;
-		userTree->addTopLevelItem(item);
-		retranslateUi();
-	}
-	item->setData(0, Qt::UserRole, user->getUserLevel());
-	item->setIcon(0, QIcon(UserLevelPixmapGenerator::generatePixmap(12, user->getUserLevel())));
-	item->setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(12, user->getCountry())));
-	item->setData(2, Qt::UserRole, user->getName());
-	item->setData(2, Qt::DisplayRole, user->getName());
-}
-
-void UserList::processResponse(ProtocolResponse *response)
-{
-	Response_ListUsers *resp = qobject_cast<Response_ListUsers *>(response);
+	Response_JoinRoom *resp = qobject_cast<Response_JoinRoom *>(r);
 	if (!resp)
 		return;
 	
-	const QList<ServerInfo_User *> &respList = resp->getUserList();
-	for (int i = 0; i < respList.size(); ++i)
-		processUserInfo(respList[i]);
-	
-	userTree->sortItems(1, Qt::AscendingOrder);
+	emit roomJoined(resp->getRoomInfo(), static_cast<Command *>(sender())->getExtraData().toBool());
 }
 
-void UserList::processUserJoinedEvent(Event_UserJoined *event)
-{
-	processUserInfo(event->getUserInfo());
-	userTree->sortItems(1, Qt::AscendingOrder);
-}
-
-void UserList::processUserLeftEvent(Event_UserLeft *event)
-{
-	for (int i = 0; i < userTree->topLevelItemCount(); ++i)
-		if (userTree->topLevelItem(i)->data(2, Qt::UserRole) == event->getUserName()) {
-			emit userLeft(event->getUserName());
-			delete userTree->takeTopLevelItem(i);
-			retranslateUi();
-			break;
-		}
-}
-
-void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
-{
-	emit openMessageDialog(item->data(2, Qt::UserRole).toString(), true);
-}
-
-UserInfoBox::UserInfoBox(AbstractClient *_client, QWidget *parent)
+UserInfoBox::UserInfoBox(ServerInfo_User *userInfo, QWidget *parent)
 	: QWidget(parent)
 {
 	avatarLabel = new QLabel;
@@ -367,9 +145,7 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, QWidget *parent)
 	
 	setLayout(mainLayout);
 	
-	Command_GetUserInfo *cmd = new Command_GetUserInfo;
-	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(processResponse(ProtocolResponse *)));
-	_client->sendCommand(cmd);
+	updateInfo(userInfo);
 }
 
 void UserInfoBox::retranslateUi()
@@ -378,12 +154,8 @@ void UserInfoBox::retranslateUi()
 	userLevelLabel1->setText(tr("User level:"));
 }
 
-void UserInfoBox::processResponse(ProtocolResponse *response)
+void UserInfoBox::updateInfo(ServerInfo_User *user)
 {
-	Response_GetUserInfo *resp = qobject_cast<Response_GetUserInfo *>(response);
-	if (!resp)
-		return;
-	ServerInfo_User *user = resp->getUserInfo();
 	int userLevel = user->getUserLevel();
 	
 	QPixmap avatarPixmap;
@@ -406,27 +178,28 @@ void UserInfoBox::processResponse(ProtocolResponse *response)
 	userLevelLabel3->setText(userLevelText);
 }
 
-TabServer::TabServer(AbstractClient *_client, QWidget *parent)
+TabServer::TabServer(AbstractClient *_client, ServerInfo_User *userInfo, QWidget *parent)
 	: Tab(parent), client(_client)
 {
-	gameSelector = new GameSelector(client);
-	chatChannelSelector = new ChatChannelSelector(client);
-	serverMessageLog = new ServerMessageLog(client);
-	userInfoBox = new UserInfoBox(client);
-	userList = new UserList(client);
+	roomSelector = new RoomSelector(client);
+	serverInfoBox = new QTextBrowser;
+	userInfoBox = new UserInfoBox(userInfo);
+	userList = new UserList(true);
 	
-	connect(gameSelector, SIGNAL(gameJoined(int)), this, SIGNAL(gameJoined(int)));
-	connect(chatChannelSelector, SIGNAL(channelJoined(const QString &)), this, SIGNAL(chatChannelJoined(const QString &)));
+	connect(roomSelector, SIGNAL(roomJoined(ServerInfo_Room *, bool)), this, SIGNAL(roomJoined(ServerInfo_Room *, bool)));
 	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
-	connect(userList, SIGNAL(userLeft(const QString &)), this, SIGNAL(userLeft(const QString &)));
 	
-	QHBoxLayout *hbox = new QHBoxLayout;
-	hbox->addWidget(chatChannelSelector);
-	hbox->addWidget(serverMessageLog);
+	connect(client, SIGNAL(userJoinedEventReceived(Event_UserJoined *)), this, SLOT(processUserJoinedEvent(Event_UserJoined *)));
+	connect(client, SIGNAL(userLeftEventReceived(Event_UserLeft *)), this, SLOT(processUserLeftEvent(Event_UserLeft *)));
+	connect(client, SIGNAL(serverMessageEventReceived(Event_ServerMessage *)), this, SLOT(processServerMessageEvent(Event_ServerMessage *)));
+	
+	Command_ListUsers *cmd = new Command_ListUsers;
+	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(processListUsersResponse(ProtocolResponse *)));
+	client->sendCommand(cmd);
 	
 	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(gameSelector);
-	vbox->addLayout(hbox);
+	vbox->addWidget(roomSelector);
+	vbox->addWidget(serverInfoBox);
 	
 	QVBoxLayout *vbox2 = new QVBoxLayout;
 	vbox2->addWidget(userInfoBox);
@@ -441,9 +214,37 @@ TabServer::TabServer(AbstractClient *_client, QWidget *parent)
 
 void TabServer::retranslateUi()
 {
-	gameSelector->retranslateUi();
-	chatChannelSelector->retranslateUi();
-	serverMessageLog->retranslateUi();
+	roomSelector->retranslateUi();
 	userInfoBox->retranslateUi();
 	userList->retranslateUi();
+}
+
+void TabServer::processServerMessageEvent(Event_ServerMessage *event)
+{
+	serverInfoBox->setHtml(event->getMessage());
+}
+
+void TabServer::processListUsersResponse(ProtocolResponse *response)
+{
+	Response_ListUsers *resp = qobject_cast<Response_ListUsers *>(response);
+	if (!resp)
+		return;
+	
+	const QList<ServerInfo_User *> &respList = resp->getUserList();
+	for (int i = 0; i < respList.size(); ++i)
+		userList->processUserInfo(respList[i]);
+	
+	userList->sortItems();
+}
+
+void TabServer::processUserJoinedEvent(Event_UserJoined *event)
+{
+	userList->processUserInfo(event->getUserInfo());
+	userList->sortItems();
+}
+
+void TabServer::processUserLeftEvent(Event_UserLeft *event)
+{
+	if (userList->deleteUser(event->getUserName()))
+		emit userLeft(event->getUserName());
 }

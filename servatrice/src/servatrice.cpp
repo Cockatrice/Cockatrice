@@ -22,7 +22,7 @@
 #include <QDebug>
 #include <iostream>
 #include "servatrice.h"
-#include "server_chatchannel.h"
+#include "server_room.h"
 #include "serversocketinterface.h"
 #include "protocol.h"
 
@@ -33,36 +33,44 @@ Servatrice::Servatrice(QObject *parent)
 	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
 	pingClock->start(1000);
 	
-	statusUpdateClock = new QTimer(this);
-	connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
-	statusUpdateClock->start(15000);
-	
 	ProtocolItem::initializeHash();
 	settings = new QSettings("servatrice.ini", QSettings::IniFormat, this);
 	
+	int statusUpdateTime = settings->value("server/statusupdate").toInt();
+	statusUpdateClock = new QTimer(this);
+	connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
+	if (statusUpdateTime != 0) {
+		qDebug() << "Starting status update clock, interval " << statusUpdateTime << " ms";
+		statusUpdateClock->start(statusUpdateTime);
+	}
+	
 	tcpServer = new QTcpServer(this);
 	connect(tcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
-	tcpServer->listen(QHostAddress::Any, settings->value("server/port", 4747).toInt());
+	int port = settings->value("server/port", 4747).toInt();
+	qDebug() << "Starting server on port" << port;
+	tcpServer->listen(QHostAddress::Any, port);
 	
 	QString dbType = settings->value("database/type").toString();
 	dbPrefix = settings->value("database/prefix").toString();
 	if (dbType == "mysql")
 		openDatabase();
 	
-	int size = settings->beginReadArray("chatchannels");
+	int size = settings->beginReadArray("rooms");
 	for (int i = 0; i < size; ++i) {
 	  	settings->setArrayIndex(i);
-		Server_ChatChannel *newChannel = new Server_ChatChannel(
+		Server_Room *newRoom = new Server_Room(
+			i,
 			settings->value("name").toString(),
 			settings->value("description").toString(),
 			settings->value("autojoin").toBool(),
-			settings->value("joinmessage").toString()
+			settings->value("joinmessage").toString(),
+			this
 		);
-		addChatChannel(newChannel);
+		addRoom(newRoom);
 	}
 	settings->endArray();
 	
-	loginMessage = settings->value("messages/login").toString();
+	updateLoginMessage();
 	
 	maxGameInactivityTime = settings->value("game/max_game_inactivity_time").toInt();
 	maxPlayerInactivityTime = settings->value("game/max_player_inactivity_time").toInt();
@@ -183,6 +191,16 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 		return new ServerInfo_User(name, ServerInfo_User::IsUser);
 }
 
+void Servatrice::updateLoginMessage()
+{
+	checkSql();
+	QSqlQuery query;
+	query.prepare("select message from " + dbPrefix + "_servermessages order by timest desc limit 1");
+	if (execSqlQuery(query))
+		if (query.next())
+			loginMessage = query.value(0).toString();
+}
+
 void Servatrice::statusUpdate()
 {
 	uptime += statusUpdateClock->interval() / 1000;
@@ -197,4 +215,4 @@ void Servatrice::statusUpdate()
 	execSqlQuery(query);
 }
 
-const QString Servatrice::versionString = "Servatrice 0.20101116";
+const QString Servatrice::versionString = "Servatrice 0.20110103";

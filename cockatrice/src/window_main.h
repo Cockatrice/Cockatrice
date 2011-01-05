@@ -28,6 +28,7 @@ class TabSupervisor;
 class RemoteClient;
 class LocalClient;
 class LocalServer;
+class ServerInfo_User;
 
 class MainWindow : public QMainWindow {
 	Q_OBJECT
@@ -38,6 +39,7 @@ private slots:
 	void serverError(ResponseCode r);
 	void socketError(const QString &errorStr);
 	void protocolVersionMismatch(int localVersion, int remoteVersion);
+	void userInfoReceived(ServerInfo_User *userInfo);
 	void localGameEnded();
 
 	void actConnect();

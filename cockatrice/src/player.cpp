@@ -1,7 +1,7 @@
 #include "player.h"
 #include "cardzone.h"
 #include "playertarget.h"
-#include "counter.h"
+#include "counter_general.h"
 #include "arrowitem.h"
 #include "zoneviewzone.h"
 #include "zoneviewwidget.h"
@@ -32,26 +32,28 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 	updateBgPixmap();
 	
 	playerTarget = new PlayerTarget(this);
-	playerTarget->setPos(QPointF(counterAreaWidth + (CARD_HEIGHT + 5 - playerTarget->boundingRect().width()) / 2.0, 5));
+	qreal avatarMargin = (counterAreaWidth + CARD_HEIGHT + 15 - playerTarget->boundingRect().width()) / 2.0;
+	playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
 
 	PileZone *deck = new PileZone(this, "deck", true, false, this);
-	QPointF base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 5) / 2.0, 5 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
+	QPointF base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 15) / 2.0, 10 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
 	deck->setPos(base);
 
 	qreal h = deck->boundingRect().width() + 5;
 
+	HandCounter *handCounter = new HandCounter(this);
+	handCounter->setPos(base + QPointF(0, h + 10));
+	qreal h2 = handCounter->boundingRect().height();
+	
 	PileZone *grave = new PileZone(this, "grave", false, true, this);
-	grave->setPos(base + QPointF(0, h));
+	grave->setPos(base + QPointF(0, h + h2 + 10));
 
 	PileZone *rfg = new PileZone(this, "rfg", false, true, this);
-	rfg->setPos(base + QPointF(0, 2 * h));
+	rfg->setPos(base + QPointF(0, 2 * h + h2 + 10));
 
 	PileZone *sb = new PileZone(this, "sb", false, false, this);
 	sb->setVisible(false);
 
-	HandCounter *handCounter = new HandCounter(this);
-	handCounter->setPos(base + QPointF(0, 3 * h + 7));
-	
 	table = new TableZone(this, this);
 	connect(table, SIGNAL(sizeChanged()), this, SLOT(updateBoundingRect()));
 	
@@ -312,7 +314,7 @@ void Player::playerListActionTriggered()
 
 void Player::rearrangeZones()
 {
-	QPointF base = QPointF(CARD_HEIGHT + counterAreaWidth + 5, 0);
+	QPointF base = QPointF(CARD_HEIGHT + counterAreaWidth + 15, 0);
 	
 	if (settingsCache->getHorizontalHand()) {
 		if (mirrored) {
@@ -370,7 +372,7 @@ void Player::updateBgPixmap()
 void Player::updateBoundingRect()
 {
 	prepareGeometryChange();
-	qreal width = CARD_HEIGHT + 5 + counterAreaWidth + stack->boundingRect().width();
+	qreal width = CARD_HEIGHT + 15 + counterAreaWidth + stack->boundingRect().width();
 	if (settingsCache->getHorizontalHand()) {
 		qreal handHeight = hand->isVisible() ? hand->boundingRect().height() : 0;
 		bRect = QRectF(0, 0, width + table->boundingRect().width(), table->boundingRect().height() + handHeight);
@@ -426,7 +428,7 @@ void Player::retranslateUi()
 		aCreateAnotherToken->setText(tr("C&reate another token"));
 		sayMenu->setTitle(tr("S&ay"));
 		
-		QMapIterator<int, Counter *> counterIterator(counters);
+		QMapIterator<int, AbstractCounter *> counterIterator(counters);
 		while (counterIterator.hasNext())
 			counterIterator.next().value()->retranslateUi();
 
@@ -457,7 +459,7 @@ void Player::setShortcutsActive()
 	aCreateToken->setShortcut(tr("Ctrl+T"));
 	aCreateAnotherToken->setShortcut(tr("Ctrl+G"));
 
-	QMapIterator<int, Counter *> counterIterator(counters);
+	QMapIterator<int, AbstractCounter *> counterIterator(counters);
 	while (counterIterator.hasNext())
 		counterIterator.next().value()->setShortcutsActive();
 }
@@ -478,7 +480,7 @@ void Player::setShortcutsInactive()
 	aCreateToken->setShortcut(QKeySequence());
 	aCreateAnotherToken->setShortcut(QKeySequence());
 
-	QMapIterator<int, Counter *> counterIterator(counters);
+	QMapIterator<int, AbstractCounter *> counterIterator(counters);
 	while (counterIterator.hasNext())
 		counterIterator.next().value()->setShortcutsInactive();
 }
@@ -752,7 +754,7 @@ void Player::eventCreateCounters(Event_CreateCounters *event)
 
 void Player::eventSetCounter(Event_SetCounter *event)
 {
-	Counter *c = counters.value(event->getCounterId(), 0);
+	AbstractCounter *c = counters.value(event->getCounterId(), 0);
 	if (!c)
 		return;
 	int oldValue = c->getValue();
@@ -1011,7 +1013,7 @@ QRectF Player::boundingRect() const
 
 void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	int totalWidth = CARD_HEIGHT + counterAreaWidth + 5;
+	int totalWidth = CARD_HEIGHT + counterAreaWidth + 15;
 	if (bgPixmap.isNull())
 		painter->fillRect(QRectF(0, 0, totalWidth, boundingRect().height()), QColor(200, 200, 200));
 	else
@@ -1111,14 +1113,22 @@ void Player::addZone(CardZone *z)
 	zones.insert(z->getName(), z);
 }
 
-Counter *Player::addCounter(ServerInfo_Counter *counter)
+AbstractCounter *Player::addCounter(ServerInfo_Counter *counter)
 {
 	return addCounter(counter->getId(), counter->getName(), counter->getColor().getQColor(), counter->getRadius(), counter->getCount());
 }
 
-Counter *Player::addCounter(int counterId, const QString &name, QColor color, int radius, int value)
+AbstractCounter *Player::addCounter(int counterId, const QString &name, QColor color, int radius, int value)
 {
-	Counter *c = new Counter(this, counterId, name, color, radius, value, this);
+	qDebug() << "addCounter:" << getName() << counterId << name;
+	if (counters.contains(counterId))
+		return 0;
+	
+	AbstractCounter *c;
+	if (name == "life")
+		c = playerTarget->addCounter(counterId, name, value);
+	else
+		c = new GeneralCounter(this, counterId, name, color, radius, value, this);
 	counters.insert(counterId, c);
 	if (countersMenu)
 		countersMenu->addMenu(c->getMenu());
@@ -1130,9 +1140,11 @@ Counter *Player::addCounter(int counterId, const QString &name, QColor color, in
 
 void Player::delCounter(int counterId)
 {
-	Counter *c = counters.value(counterId, 0);
+	AbstractCounter *c = counters.value(counterId, 0);
 	if (!c)
 		return;
+	if (c->getName() == "life")
+		playerTarget->delCounter();
 	counters.remove(counterId);
 	c->delCounter();
 	rearrangeCounters();
@@ -1140,10 +1152,11 @@ void Player::delCounter(int counterId)
 
 void Player::clearCounters()
 {
-	QMapIterator<int, Counter *> counterIterator(counters);
+	QMapIterator<int, AbstractCounter *> counterIterator(counters);
 	while (counterIterator.hasNext())
 		counterIterator.next().value()->delCounter();
 	counters.clear();
+	playerTarget->delCounter();
 }
 
 ArrowItem *Player::addArrow(ServerInfo_Arrow *arrow)
@@ -1204,15 +1217,16 @@ void Player::clearArrows()
 
 void Player::rearrangeCounters()
 {
-	qreal marginTop = 15;
-	qreal marginBottom = 15;
+	qreal marginTop = 80;
+	qreal marginBottom = 10;
 	
 	// Determine total height of bounding rectangles
 	qreal totalHeight = 0;
-	QMapIterator<int, Counter *> counterIterator(counters);
+	QMapIterator<int, AbstractCounter *> counterIterator(counters);
 	while (counterIterator.hasNext()) {
 		counterIterator.next();
-		totalHeight += counterIterator.value()->boundingRect().height();
+		if (counterIterator.value()->getShownInCounterArea())
+			totalHeight += counterIterator.value()->boundingRect().height();
 	}
 	
 	// Determine free space between objects
@@ -1226,8 +1240,11 @@ void Player::rearrangeCounters()
 	
 	// Place objects
 	for (counterIterator.toFront(); counterIterator.hasNext(); ) {
-		Counter *c = counterIterator.next().value();
+		AbstractCounter *c = counterIterator.next().value();
 
+		if (!c->getShownInCounterArea())
+			continue;
+		
 		QRectF br = c->boundingRect();
 		c->setPos((counterAreaWidth - br.width()) / 2, y);
 		y += br.height() + padding;
@@ -1282,7 +1299,7 @@ void Player::cardMenuAction(QAction *a)
 				break;
 			}
 			case 4:
-				commandList.append(new Command_CreateToken(-1, card->getZone()->getName(), card->getName(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), -1, card->getGridPoint().y()));
+				commandList.append(new Command_CreateToken(-1, card->getZone()->getName(), card->getName(), card->getColor(), card->getPT(), card->getAnnotation(), true, -1, card->getGridPoint().y()));
 				break;
 			case 5:
 				commandList.append(new Command_MoveCard(-1, card->getZone()->getName(), card->getId(), getId(), "deck", 0, 0, false));
@@ -1431,7 +1448,7 @@ QString Player::getName() const
 
 qreal Player::getMinimumWidth() const
 {
-	qreal result = table->getMinimumWidth() + CARD_HEIGHT + 5 + counterAreaWidth + stack->boundingRect().width();
+	qreal result = table->getMinimumWidth() + CARD_HEIGHT + 15 + counterAreaWidth + stack->boundingRect().width();
 	if (!settingsCache->getHorizontalHand())
 		result += hand->boundingRect().width();
 	return result;
@@ -1450,7 +1467,7 @@ void Player::processSceneSizeChange(const QSizeF &newSize)
 	// This will need to be changed if player areas are displayed side by side (e.g. 2x2 for a 4-player game)
 	qreal fullPlayerWidth = newSize.width();
 	
-	qreal tableWidth = fullPlayerWidth - CARD_HEIGHT - 5 - counterAreaWidth - stack->boundingRect().width();
+	qreal tableWidth = fullPlayerWidth - CARD_HEIGHT - 15 - counterAreaWidth - stack->boundingRect().width();
 	if (!settingsCache->getHorizontalHand())
 		tableWidth -= hand->boundingRect().width();
 	

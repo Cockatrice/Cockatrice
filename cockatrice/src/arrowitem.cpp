@@ -13,7 +13,7 @@
 ArrowItem::ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &_color)
         : QGraphicsItem(), player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), color(_color), fullColor(true)
 {
-	qDebug() << "ArrowItem constructor: startItem=" << startItem;
+	qDebug() << "ArrowItem constructor: startItem=" << static_cast<QGraphicsItem *>(startItem);
 	setZValue(2000000005);
 	
 	if (startItem)

@@ -46,6 +46,7 @@ public:
 	int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
 	int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
 	QString getDbPrefix() const { return dbPrefix; }
+	void updateLoginMessage();
 protected:
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
 	ServerInfo_User *getUserData(const QString &name);
