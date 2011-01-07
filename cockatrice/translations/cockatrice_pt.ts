@@ -11,7 +11,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="267"/>
         <source>Path to hand background:</source>
-        <translation>Directorio da imagem de fundo da mão:</translation>
+        <translation>Directório da imagem de fundo da mão:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="268"/>
@@ -138,7 +138,7 @@
     <message>
         <location filename="../src/carditem.cpp" line="171"/>
         <source>&amp;Play</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Jogar</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="173"/>
@@ -915,7 +915,7 @@
     <message>
         <location filename="../src/tab_room.cpp" line="114"/>
         <source>Show &amp;full games</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Mostrar jogos cheios</translation>
     </message>
     <message>
         <source>&amp;Show full games</source>
@@ -1074,32 +1074,32 @@
     <message>
         <location filename="../src/window_main.cpp" line="158"/>
         <source>Version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Versão %1</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="159"/>
         <source>Authors:</source>
-        <translation type="unfinished"></translation>
+        <translation>Autores:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="160"/>
         <source>Translators:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tradutores:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="161"/>
         <source>Spanish:</source>
-        <translation type="unfinished"></translation>
+        <translation>Espanhol:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="162"/>
         <source>Portugese:</source>
-        <translation type="unfinished"></translation>
+        <translation>Português:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="163"/>
         <source>French:</source>
-        <translation type="unfinished"></translation>
+        <translation>Francês:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="169"/>
@@ -1436,7 +1436,7 @@
     <message>
         <location filename="../src/messagelogwidget.cpp" line="202"/>
         <source>%1 gives %2 control over %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 dá controlo sobre %3 a %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="235"/>
@@ -1863,7 +1863,7 @@
     <message>
         <location filename="../src/player.cpp" line="414"/>
         <source>Put top card on &amp;bottom</source>
-        <translation type="unfinished"></translation>
+        <translation>Colocar carta do topo no &amp;fundo</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="416"/>
@@ -2133,32 +2133,32 @@
     <message>
         <location filename="../src/tab_server.cpp" line="50"/>
         <source>Rooms</source>
-        <translation type="unfinished"></translation>
+        <translation>Salas</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="51"/>
         <source>Joi&amp;n</source>
-        <translation type="unfinished">E&amp;ntrar</translation>
+        <translation>E&amp;ntrar</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="54"/>
         <source>Room</source>
-        <translation type="unfinished"></translation>
+        <translation>Sala</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="55"/>
         <source>Description</source>
-        <translation type="unfinished">Descrição</translation>
+        <translation>Descrição</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="56"/>
         <source>Players</source>
-        <translation type="unfinished">Jogadores</translation>
+        <translation>Jogadores</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="57"/>
         <source>Games</source>
-        <translation type="unfinished">Jogos</translation>
+        <translation>Jogos</translation>
     </message>
 </context>
 <context>
@@ -2384,32 +2384,32 @@ Por favor introduza um nome:</translation>
     <message>
         <location filename="../src/tab_room.cpp" line="218"/>
         <source>&amp;Say:</source>
-        <translation type="unfinished">&amp;Dizer:</translation>
+        <translation>&amp;Dizer:</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="219"/>
         <source>Chat</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="220"/>
         <source>&amp;Room</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Sala</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="221"/>
         <source>&amp;Leave room</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Abandonar a sala</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="267"/>
         <source>%1 has joined the room.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 entrou na sala.</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="273"/>
         <source>%1 has left the room.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 abandonou na sala.</translation>
     </message>
 </context>
 <context>
@@ -2435,22 +2435,22 @@ Por favor introduza um nome:</translation>
     <message>
         <location filename="../src/tab_server.cpp" line="171"/>
         <source>Administrator</source>
-        <translation type="unfinished"></translation>
+        <translation>Administrador</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="173"/>
         <source>Judge</source>
-        <translation type="unfinished"></translation>
+        <translation>Juiz</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="175"/>
         <source>Registered user</source>
-        <translation type="unfinished"></translation>
+        <translation>Utilizador registado</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="177"/>
         <source>Unregistered user</source>
-        <translation type="unfinished"></translation>
+        <translation>Utilizador não registado</translation>
     </message>
 </context>
 <context>
@@ -2486,7 +2486,7 @@ Por favor introduza um nome:</translation>
     <message>
         <location filename="../src/userlist.cpp" line="42"/>
         <source>Users in this room: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Utilizadores nesta sala:%1</translation>
     </message>
 </context>
 <context>
@@ -2662,14 +2662,15 @@ Gostaria de guardar as alterações?</translation>
         <location filename="../src/window_deckeditor.cpp" line="312"/>
         <location filename="../src/window_deckeditor.cpp" line="336"/>
         <source>Error</source>
-        <translation type="unfinished">Erro</translation>
+        <translation>Erro</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="312"/>
         <location filename="../src/window_deckeditor.cpp" line="336"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>O deck não pode ser guardado.
+Por favor confirme se é possível escrever do directório e tente de novo.</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="318"/>
