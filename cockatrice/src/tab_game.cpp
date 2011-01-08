@@ -169,6 +169,8 @@ TabGame::TabGame(QList<AbstractClient *> &_clients, int _gameId, const QString &
 	cardInfo = new CardInfoWidget(CardInfoWidget::ModeGameTab);
 	playerListWidget = new PlayerListWidget;
 	playerListWidget->setFocusPolicy(Qt::NoFocus);
+	timeElapsedLabel = new QLabel;
+	timeElapsedLabel->setAlignment(Qt::AlignCenter);
 	messageLog = new MessageLogWidget;
 	connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfo, SLOT(setCard(QString)));
 	connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
@@ -190,6 +192,7 @@ TabGame::TabGame(QList<AbstractClient *> &_clients, int _gameId, const QString &
 	QVBoxLayout *verticalLayout = new QVBoxLayout;
 	verticalLayout->addWidget(cardInfo);
 	verticalLayout->addWidget(playerListWidget, 1);
+	verticalLayout->addWidget(timeElapsedLabel);
 	verticalLayout->addWidget(messageLog, 5);
 	verticalLayout->addLayout(hLayout);
 
@@ -651,6 +654,13 @@ void TabGame::eventPing(Event_Ping *event, GameEventContext * /*context*/)
 	const QList<ServerInfo_PlayerPing *> &pingList = event->getPingList();
 	for (int i = 0; i < pingList.size(); ++i)
 		playerListWidget->updatePing(pingList[i]->getPlayerId(), pingList[i]->getPingTime());
+	
+	int seconds = event->getSecondsElapsed();
+	int minutes = seconds / 60;
+	seconds -= minutes * 60;
+	int hours = minutes / 60;
+	minutes -= hours * 60;
+	timeElapsedLabel->setText(QString::number(hours).rightJustified(2, '0') + ":" + QString::number(minutes).rightJustified(2, '0') + ":" + QString::number(seconds).rightJustified(2, '0'));
 }
 
 void TabGame::newCardAdded(AbstractCardItem *card)

@@ -38,7 +38,8 @@ void SelectZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 		selectionOrigin = event->pos();
 		static_cast<GameScene *>(scene())->startRubberBand(event->scenePos());
 		event->accept();
-	}
+	} else
+		CardZone::mousePressEvent(event);
 }
 
 void SelectZone::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)

@@ -399,9 +399,10 @@ public:
 class Event_Ping : public GameEvent {
 	Q_OBJECT
 public:
-	Event_Ping(const QList<ServerInfo_PlayerPing *> &_pingList = QList<ServerInfo_PlayerPing *>());
+	Event_Ping(int _secondsElapsed = -1, const QList<ServerInfo_PlayerPing *> &_pingList = QList<ServerInfo_PlayerPing *>());
 	static SerializableItem *newItem() { return new Event_Ping; }
 	int getItemId() const { return ItemId_Event_Ping; }
+	int getSecondsElapsed() const { return static_cast<SerializableItem_Int *>(itemMap.value("seconds_elapsed"))->getData(); }
 	QList<ServerInfo_PlayerPing *> getPingList() const { return typecastItemList<ServerInfo_PlayerPing *>(); }
 };
 

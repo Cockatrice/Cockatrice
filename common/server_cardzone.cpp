@@ -119,6 +119,9 @@ int Server_CardZone::getFreeGridColumn(int x, int y, const QString &cardName) co
 
 bool Server_CardZone::isColumnStacked(int x, int y) const
 {
+	if (!has_coords)
+		return false;
+	
 	QMap<int, Server_Card *> coordMap;
 	for (int i = 0; i < cards.size(); ++i)
 		if (cards[i]->getY() == y)
@@ -129,6 +132,9 @@ bool Server_CardZone::isColumnStacked(int x, int y) const
 
 bool Server_CardZone::isColumnEmpty(int x, int y) const
 {
+	if (!has_coords)
+		return true;
+	
 	QMap<int, Server_Card *> coordMap;
 	for (int i = 0; i < cards.size(); ++i)
 		if (cards[i]->getY() == y)
