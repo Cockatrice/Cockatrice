@@ -414,9 +414,10 @@ Event_PlayerPropertiesChanged::Event_PlayerPropertiesChanged(int _playerId, Serv
 	insertItem(_properties);
 }
 
-Event_Ping::Event_Ping(const QList<ServerInfo_PlayerPing *> &_pingList)
+Event_Ping::Event_Ping(int _secondsElapsed, const QList<ServerInfo_PlayerPing *> &_pingList)
 	: GameEvent("ping", -1)
 {
+	insertItem(new SerializableItem_Int("seconds_elapsed", _secondsElapsed));
 	for (int i = 0; i < _pingList.size(); ++i)
 		itemList.append(_pingList[i]);
 }

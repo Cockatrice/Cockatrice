@@ -67,9 +67,6 @@ void HandZone::reorganizeCards()
 			qreal totalWidth = boundingRect().width() - 2 * xPadding;
 			qreal cardWidth = cards.at(0)->boundingRect().width();
 			
-			if (cardWidth * cardCount < totalWidth)
-				cardWidth += 5;
-		
 			for (int i = 0; i < cardCount; i++) {
 				CardItem *c = cards.at(i);
 	

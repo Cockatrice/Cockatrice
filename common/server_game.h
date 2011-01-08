@@ -46,6 +46,7 @@ private:
 	bool spectatorsCanTalk;
 	bool spectatorsSeeEverything;
 	int inactivityCounter;
+	int secondsElapsed;
 	QTimer *pingClock;
 signals:
 	void gameClosing();

@@ -29,7 +29,7 @@
 #include <QDebug>
 
 Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent)
-	: QObject(parent), creatorInfo(new ServerInfo_User(_creator->getUserInfo())), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), activePlayer(-1), activePhase(-1), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0)
+	: QObject(parent), creatorInfo(new ServerInfo_User(_creator->getUserInfo())), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), activePlayer(-1), activePhase(-1), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0)
 {
 	addPlayer(_creator, false, false);
 
@@ -56,6 +56,8 @@ Server_Game::~Server_Game()
 
 void Server_Game::pingClockTimeout()
 {
+	++secondsElapsed;
+	
 	QDateTime now = QDateTime::currentDateTime();
 	QList<ServerInfo_PlayerPing *> pingList;
 	QMapIterator<int, Server_Player *> playerIterator(players);
@@ -70,7 +72,7 @@ void Server_Game::pingClockTimeout()
 			pingTime = -1;
 		pingList.append(new ServerInfo_PlayerPing(player->getPlayerId(), pingTime));
 	}
-	sendGameEvent(new Event_Ping(pingList));
+	sendGameEvent(new Event_Ping(secondsElapsed, pingList));
 	
 	const int maxTime = static_cast<Server_Room *>(parent())->getServer()->getMaxGameInactivityTime();
 	if (allPlayersInactive) {
