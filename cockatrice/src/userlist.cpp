@@ -129,9 +129,7 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	if (actionClicked == aDetails) {
 		UserInfoBox *infoWidget = new UserInfoBox(client, true, this, Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
 		infoWidget->setAttribute(Qt::WA_DeleteOnClose);
-		infoWidget->setFixedSize(infoWidget->sizeHint());
 		infoWidget->updateInfo(userName);
-		infoWidget->show();
 	} else if (actionClicked == aChat)
 		emit openMessageDialog(userName, true);
 	
