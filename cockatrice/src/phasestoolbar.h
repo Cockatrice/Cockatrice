@@ -13,15 +13,19 @@ class PhaseButton : public QPushButton {
 private:
 	QString phaseText;
 	bool active;
+	int activeAnimationCounter;
+	QTimer *activeAnimationTimer;
 	QAction *doubleClickAction;
-	QPixmap activePixmap, inactivePixmap;
+	QPixmap pixmap;
 	
-	void updatePixmap(QPixmap &pixmap, bool active);
+	void updatePixmap(QPixmap &pixmap);
+private slots:
+	void updateAnimation();
 public:
 	PhaseButton(const QIcon &icon, QAction *_doubleClickAction = 0);
 	void setPhaseText(const QString &_phaseText);
 	QString getPhaseText() const { return phaseText; }
-	void setActive(bool _active) { active = _active; update(); }
+	void setActive(bool _active);
 	bool getActive() const { return active; }
 	void triggerDoubleClickAction();
 protected:

@@ -2,20 +2,24 @@
 #include <QVBoxLayout>
 #include <QPainter>
 #include <QPen>
+#include <QTimer>
 #include "phasestoolbar.h"
 #include "protocol_items.h"
 
 PhaseButton::PhaseButton(const QIcon &icon, QAction *_doubleClickAction)
-	: QPushButton(icon, QString()), active(false), doubleClickAction(_doubleClickAction), activePixmap(50, 50), inactivePixmap(50, 50)
+	: QPushButton(icon, QString()), active(false), activeAnimationCounter(0), doubleClickAction(_doubleClickAction), pixmap(50, 50)
 {
 	setFocusPolicy(Qt::NoFocus);
 	setFixedSize(50, 50);
 	
-	updatePixmap(activePixmap, true);
-	updatePixmap(inactivePixmap, false);
+	activeAnimationTimer = new QTimer(this);
+	connect(activeAnimationTimer, SIGNAL(timeout()), this, SLOT(updateAnimation()));
+	activeAnimationTimer->setSingleShot(false);
+	
+	updatePixmap(pixmap);
 }
 
-void PhaseButton::updatePixmap(QPixmap &pixmap, bool active)
+void PhaseButton::updatePixmap(QPixmap &pixmap)
 {
 	pixmap.fill(Qt::transparent);
 	
@@ -23,21 +27,44 @@ void PhaseButton::updatePixmap(QPixmap &pixmap, bool active)
 	int height = pixmap.height();
 	int width = pixmap.width();
 
-	if (active)
-		painter.setBrush(Qt::red);
-	painter.setPen(Qt::gray);
-	painter.drawRect(1, 1, width - 2, height - 2);
-
 	icon().paint(&painter, 5, 5, width - 10, height - 10);
 }
 
 void PhaseButton::paintEvent(QPaintEvent */*event*/)
 {
 	QPainter painter(this);
-	if (active)
-		painter.drawPixmap(0, 0, size().width(), size().height(), activePixmap);
-	else
-		painter.drawPixmap(0, 0, size().width(), size().height(), inactivePixmap);
+
+	painter.setBrush(QColor(220 * (activeAnimationCounter / 10.0), 220 * (activeAnimationCounter / 10.0), 220 * (activeAnimationCounter / 10.0)));
+	painter.setPen(Qt::gray);
+	painter.drawRect(1, 1, pixmap.width() - 2, pixmap.height() - 2);
+
+	painter.drawPixmap(0, 0, size().width(), size().height(), pixmap);
+	
+//	painter.setBrush(QColor(220 * (activeAnimationCounter / 10.0), 220 * (activeAnimationCounter / 10.0), 220 * (activeAnimationCounter / 10.0), 255 * ((10 - activeAnimationCounter) / 15.0)));
+	painter.setBrush(QColor(0, 0, 0, 255 * ((10 - activeAnimationCounter) / 15.0)));
+	painter.setPen(Qt::gray);
+	painter.drawRect(1, 1, pixmap.width() - 2, pixmap.height() - 2);
+}
+
+void PhaseButton::setActive(bool _active)
+{
+	if (active == _active)
+		return;
+	
+	active = _active;
+	activeAnimationTimer->start(50);
+}
+
+void PhaseButton::updateAnimation()
+{
+	if (active) {
+		if (++activeAnimationCounter >= 10)
+			activeAnimationTimer->stop();
+	} else {
+		if (--activeAnimationCounter <= 0)
+			activeAnimationTimer->stop();
+	}
+	update();
 }
 
 void PhaseButton::setPhaseText(const QString &_phaseText)
@@ -60,6 +87,9 @@ void PhaseButton::triggerDoubleClickAction()
 PhasesToolbar::PhasesToolbar(QWidget *parent)
 	: QFrame(parent)
 {
+	setBackgroundRole(QPalette::Shadow);
+	setAutoFillBackground(true);
+	
 	QAction *aUntapAll = new QAction(this);
 	connect(aUntapAll, SIGNAL(triggered()), this, SLOT(actUntapAll()));
 	QAction *aDrawCard = new QAction(this);
