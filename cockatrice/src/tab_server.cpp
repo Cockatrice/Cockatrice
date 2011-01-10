@@ -14,7 +14,8 @@
 #include "protocol.h"
 #include "protocol_items.h"
 #include "userlist.h"
-#include "pixmapgenerator.h"
+#include "userinfobox.h"
+//#include "pixmapgenerator.h"
 #include <QDebug>
 
 RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent)
@@ -117,74 +118,14 @@ void RoomSelector::joinFinished(ProtocolResponse *r)
 	emit roomJoined(resp->getRoomInfo(), static_cast<Command *>(sender())->getExtraData().toBool());
 }
 
-UserInfoBox::UserInfoBox(ServerInfo_User *userInfo, QWidget *parent)
-	: QWidget(parent)
-{
-	avatarLabel = new QLabel;
-	nameLabel = new QLabel;
-	QFont nameFont = nameLabel->font();
-	nameFont.setBold(true);
-	nameFont.setPointSize(nameFont.pointSize() * 1.5);
-	nameLabel->setFont(nameFont);
-	countryLabel1 = new QLabel;
-	countryLabel2 = new QLabel;
-	userLevelLabel1 = new QLabel;
-	userLevelLabel2 = new QLabel;
-	userLevelLabel3 = new QLabel;
-	
-	QGridLayout *mainLayout = new QGridLayout;
-	mainLayout->addWidget(avatarLabel, 0, 0, 3, 1, Qt::AlignCenter);
-	mainLayout->addWidget(nameLabel, 0, 1, 1, 3);
-	mainLayout->addWidget(countryLabel1, 1, 1, 1, 1);
-	mainLayout->addWidget(countryLabel2, 1, 2, 1, 2);
-	mainLayout->addWidget(userLevelLabel1, 2, 1, 1, 1);
-	mainLayout->addWidget(userLevelLabel2, 2, 2, 1, 1);
-	mainLayout->addWidget(userLevelLabel3, 2, 3, 1, 1);
-	mainLayout->setColumnMinimumWidth(0, 80);
-	mainLayout->setColumnStretch(3, 10);
-	
-	setLayout(mainLayout);
-	
-	updateInfo(userInfo);
-}
-
-void UserInfoBox::retranslateUi()
-{
-	countryLabel1->setText(tr("Location:"));
-	userLevelLabel1->setText(tr("User level:"));
-}
-
-void UserInfoBox::updateInfo(ServerInfo_User *user)
-{
-	int userLevel = user->getUserLevel();
-	
-	QPixmap avatarPixmap;
-	if (!avatarPixmap.loadFromData(user->getAvatarBmp()))
-		avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel);
-	avatarLabel->setPixmap(avatarPixmap);
-	
-	nameLabel->setText(user->getName());
-	countryLabel2->setPixmap(CountryPixmapGenerator::generatePixmap(15, user->getCountry()));
-	userLevelLabel2->setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel));
-	QString userLevelText;
-	if (userLevel & ServerInfo_User::IsAdmin)
-		userLevelText = tr("Administrator");
-	else if (userLevel & ServerInfo_User::IsJudge)
-		userLevelText = tr("Judge");
-	else if (userLevel & ServerInfo_User::IsRegistered)
-		userLevelText = tr("Registered user");
-	else
-		userLevelText = tr("Unregistered user");
-	userLevelLabel3->setText(userLevelText);
-}
-
 TabServer::TabServer(AbstractClient *_client, ServerInfo_User *userInfo, QWidget *parent)
 	: Tab(parent), client(_client)
 {
 	roomSelector = new RoomSelector(client);
 	serverInfoBox = new QTextBrowser;
-	userInfoBox = new UserInfoBox(userInfo);
-	userList = new UserList(true);
+	userInfoBox = new UserInfoBox(_client, false);
+	userInfoBox->updateInfo(userInfo);
+	userList = new UserList(client, true);
 	
 	connect(roomSelector, SIGNAL(roomJoined(ServerInfo_Room *, bool)), this, SIGNAL(roomJoined(ServerInfo_Room *, bool)));
 	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));

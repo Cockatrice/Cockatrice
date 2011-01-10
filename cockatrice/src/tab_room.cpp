@@ -163,7 +163,7 @@ TabRoom::TabRoom(AbstractClient *_client, const QString &_ownName, ServerInfo_Ro
 	: Tab(), client(_client), roomId(info->getRoomId()), roomName(info->getName()), ownName(_ownName)
 {
 	gameSelector = new GameSelector(client, roomId);
-	userList = new UserList(false);
+	userList = new UserList(client, false);
 	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
 	
 	chatView = new ChatView(ownName);
