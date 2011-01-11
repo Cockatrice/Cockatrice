@@ -11,6 +11,7 @@ class QTextEdit;
 class QLabel;
 class UserList;
 class QPushButton;
+class UserInfoBox;
 
 class Event_ListRooms;
 class Event_ServerMessage;
@@ -36,16 +37,6 @@ signals:
 	void roomJoined(ServerInfo_Room *info, bool setCurrent);
 public:
 	RoomSelector(AbstractClient *_client, QWidget *parent = 0);
-	void retranslateUi();
-};
-
-class UserInfoBox : public QWidget {
-	Q_OBJECT
-private:
-	QLabel *avatarLabel, *nameLabel, *countryLabel1, *countryLabel2, *userLevelLabel1, *userLevelLabel2, *userLevelLabel3;
-	void updateInfo(ServerInfo_User *user);
-public:
-	UserInfoBox(ServerInfo_User *userInfo, QWidget *parent = 0);
 	void retranslateUi();
 };
 

@@ -165,15 +165,16 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 		checkSql();
 
 		QSqlQuery query;
-		query.prepare("select admin, country, avatar_bmp from " + dbPrefix + "_users where name = :name and active = 1");
+		query.prepare("select admin, realname, country, avatar_bmp from " + dbPrefix + "_users where name = :name and active = 1");
 		query.bindValue(":name", name);
 		if (!execSqlQuery(query))
 			return new ServerInfo_User(name, ServerInfo_User::IsUser);
 		
 		if (query.next()) {
 			bool is_admin = query.value(0).toInt();
-			QString country = query.value(1).toString();
-			QByteArray avatarBmp = query.value(2).toByteArray();
+			QString realName = query.value(1).toString();
+			QString country = query.value(2).toString();
+			QByteArray avatarBmp = query.value(3).toByteArray();
 			
 			int userLevel = ServerInfo_User::IsUser | ServerInfo_User::IsRegistered;
 			if (is_admin)
@@ -182,6 +183,7 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 			return new ServerInfo_User(
 				name,
 				userLevel,
+				realName,
 				country,
 				avatarBmp
 			);

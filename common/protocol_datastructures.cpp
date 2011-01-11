@@ -3,11 +3,12 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
-ServerInfo_User::ServerInfo_User(const QString &_name, int _userLevel, const QString &_country, const QByteArray &_avatarBmp)
+ServerInfo_User::ServerInfo_User(const QString &_name, int _userLevel, const QString &_realName, const QString &_country, const QByteArray &_avatarBmp)
 	: SerializableItem_Map("user")
 {
 	insertItem(new SerializableItem_String("name", _name));
 	insertItem(new SerializableItem_Int("userlevel", _userLevel));
+	insertItem(new SerializableItem_String("real_name", _realName));
 	insertItem(new SerializableItem_String("country", _country));
 	insertItem(new SerializableItem_ByteArray("avatar_bmp", _avatarBmp));
 }
@@ -17,6 +18,7 @@ ServerInfo_User::ServerInfo_User(const ServerInfo_User *other, bool complete)
 {
 	insertItem(new SerializableItem_String("name", other->getName()));
 	insertItem(new SerializableItem_Int("userlevel", other->getUserLevel()));
+	insertItem(new SerializableItem_String("real_name", other->getRealName()));
 	insertItem(new SerializableItem_String("country", other->getCountry()));
 	insertItem(new SerializableItem_ByteArray("avatar_bmp", complete ? other->getAvatarBmp() : QByteArray()));
 }
