@@ -109,7 +109,6 @@ AbstractDecklistNode *InnerDecklistNode::findChild(const QString &name)
 
 int InnerDecklistNode::height() const
 {
-	Q_ASSERT(!isEmpty());
 	return at(0)->height() + 1;
 }
 
@@ -467,11 +466,6 @@ void DeckList::cleanList()
 	root->clearTree();
 	setName();
 	setComments();
-}
-
-bool DeckList::isEmpty() const
-{
-	return root->isEmpty();
 }
 
 DecklistCardNode *DeckList::addCard(const QString &cardName, const QString &zoneName)

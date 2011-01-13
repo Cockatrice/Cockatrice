@@ -21,7 +21,6 @@ RemoteClient::RemoteClient(QObject *parent)
 	
 	xmlReader = new QXmlStreamReader;
 	xmlWriter = new QXmlStreamWriter;
-	xmlWriter->setAutoFormatting(true);
 	xmlWriter->setDevice(socket);
 }
 

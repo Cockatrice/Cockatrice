@@ -60,6 +60,7 @@ public:
 	bool getReceiverMayDelete() const { return receiverMayDelete; }
 	void setReceiverMayDelete(bool _receiverMayDelete) { receiverMayDelete = _receiverMayDelete; }
 	ProtocolItem(const QString &_itemType, const QString &_itemSubType);
+	bool isEmpty() const { return false; }
 };
 
 class ProtocolItem_Invalid : public ProtocolItem {
@@ -79,6 +80,7 @@ public:
 	TopLevelProtocolItem();
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
+	bool isEmpty() const { return false; }
 };
 
 // ----------------

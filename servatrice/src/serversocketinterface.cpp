@@ -34,7 +34,6 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_s
 {
 	xmlWriter = new QXmlStreamWriter;
 	xmlWriter->setDevice(socket);
-	xmlWriter->setAutoFormatting(true);
 	
 	xmlReader = new QXmlStreamReader;
 	
