@@ -25,6 +25,9 @@ bool SerializableItem::readElement(QXmlStreamReader *xml)
 
 void SerializableItem::write(QXmlStreamWriter *xml)
 {
+	if (isEmpty())
+		return;
+	
 	xml->writeStartElement(itemType);
 	if (!itemSubType.isEmpty())
 		xml->writeAttribute("type", itemSubType);

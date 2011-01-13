@@ -148,7 +148,7 @@ public:
 	static FileFormat getFormatFromNameFilter(const QString &selectedNameFilter);
 
 	void cleanList();
-	bool isEmpty() const;
+	bool isEmpty() const { return root->isEmpty() && name.isEmpty() && comments.isEmpty() && sideboardPlans.isEmpty(); }
 
 	InnerDecklistNode *getRoot() const { return root; }
 	DecklistCardNode *addCard(const QString &cardName, const QString &zoneName);
