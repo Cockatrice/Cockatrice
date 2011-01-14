@@ -437,6 +437,10 @@ Context_DeckSelect::Context_DeckSelect(int _deckId)
 {
 	insertItem(new SerializableItem_Int("deck_id", _deckId));
 }
+Command_UpdateServerMessage::Command_UpdateServerMessage()
+	: AdminCommand("update_server_message")
+{
+}
 void ProtocolItem::initializeHashAuto()
 {
 	itemNameHash.insert("cmdping", Command_Ping::newItem);
@@ -509,4 +513,5 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_event_contextready_start", Context_ReadyStart::newItem);
 	itemNameHash.insert("game_event_contextconcede", Context_Concede::newItem);
 	itemNameHash.insert("game_event_contextdeck_select", Context_DeckSelect::newItem);
+	itemNameHash.insert("cmdupdate_server_message", Command_UpdateServerMessage::newItem);
 }

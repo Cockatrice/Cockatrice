@@ -323,3 +323,12 @@ ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd, C
 	cont->setResponse(new Response_DeckDownload(cont->getCmdId(), RespOk, deck));
 	return RespNothing;
 }
+
+// ADMIN FUNCTIONS.
+// Permission is checked by the calling function.
+
+ResponseCode ServerSocketInterface::cmdUpdateServerMessage(Command_UpdateServerMessage *cmd, CommandContainer *cont)
+{
+	servatrice->updateLoginMessage();
+	return RespOk;
+}
