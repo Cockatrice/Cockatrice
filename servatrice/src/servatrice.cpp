@@ -192,7 +192,7 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 	} else
 		return new ServerInfo_User(name, ServerInfo_User::IsUser);
 }
-#include <QDebug>
+
 void Servatrice::updateLoginMessage()
 {
 	checkSql();
@@ -206,7 +206,6 @@ void Servatrice::updateLoginMessage()
 			QMapIterator<QString, Server_ProtocolHandler *> usersIterator(users);
 			while (usersIterator.hasNext()) {
 				usersIterator.next().value()->sendProtocolItem(event, false);
-				qDebug() << "sent message to" << usersIterator.value()->getUserInfo()->getName();
 			}
 			delete event;
 		}
@@ -226,4 +225,4 @@ void Servatrice::statusUpdate()
 	execSqlQuery(query);
 }
 
-const QString Servatrice::versionString = "Servatrice 0.20110103";
+const QString Servatrice::versionString = "Servatrice 0.20110114";
