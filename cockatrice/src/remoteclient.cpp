@@ -43,15 +43,16 @@ void RemoteClient::slotConnected()
 
 void RemoteClient::loginResponse(ProtocolResponse *response)
 {
-	Response_Login *resp = qobject_cast<Response_Login *>(response);
-	if (!resp)
-		disconnectFromServer();
-	
-	if (resp->getResponseCode() == RespOk) {
+	if (response->getResponseCode() == RespOk) {
+		Response_Login *resp = qobject_cast<Response_Login *>(response);
+		if (!resp) {
+			disconnectFromServer();
+			return;
+		}
 		setStatus(StatusLoggedIn);
 		emit userInfoChanged(resp->getUserInfo());
 	} else {
-		emit serverError(resp->getResponseCode());
+		emit serverError(response->getResponseCode());
 		setStatus(StatusDisconnecting);
 	}
 }

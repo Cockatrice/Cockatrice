@@ -69,5 +69,6 @@ ItemId_Event_RoomSay = 1067,
 ItemId_Context_ReadyStart = 1068,
 ItemId_Context_Concede = 1069,
 ItemId_Context_DeckSelect = 1070,
-ItemId_Other = 1071
+ItemId_Command_UpdateServerMessage = 1071,
+ItemId_Other = 1072
 };

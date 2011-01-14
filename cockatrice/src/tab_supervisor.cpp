@@ -5,13 +5,14 @@
 #include "tab_room.h"
 #include "tab_game.h"
 #include "tab_deck_storage.h"
+#include "tab_admin.h"
 #include "tab_message.h"
 #include "protocol_items.h"
 #include "pixmapgenerator.h"
 #include <QDebug>
 
 TabSupervisor::	TabSupervisor(QWidget *parent)
-	: QTabWidget(parent), client(0), tabServer(0), tabDeckStorage(0)
+	: QTabWidget(parent), client(0), tabServer(0), tabDeckStorage(0), tabAdmin(0)
 {
 	tabChangedIcon = new QIcon(":/resources/icon_tab_changed.svg");
 	setElideMode(Qt::ElideRight);
@@ -69,8 +70,17 @@ void TabSupervisor::start(AbstractClient *_client, ServerInfo_User *userInfo)
 	myAddTab(tabServer);
 	updatePingTime(0, -1);
 	
-	tabDeckStorage = new TabDeckStorage(client);
-	myAddTab(tabDeckStorage);
+	if (userInfo->getUserLevel() & ServerInfo_User::IsRegistered) {
+		tabDeckStorage = new TabDeckStorage(client);
+		myAddTab(tabDeckStorage);
+	} else
+		tabDeckStorage = 0;
+	
+	if (userInfo->getUserLevel() & ServerInfo_User::IsAdmin) {
+		tabAdmin = new TabAdmin(client);
+		myAddTab(tabAdmin);
+	} else
+		tabAdmin = 0;
 
 	retranslateUi();
 }
@@ -123,6 +133,8 @@ void TabSupervisor::stop()
 void TabSupervisor::updatePingTime(int value, int max)
 {
 	if (!tabServer)
+		return;
+	if (tabServer->getContentsChanged())
 		return;
 	
 	setTabIcon(0, QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));

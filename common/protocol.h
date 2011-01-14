@@ -162,6 +162,15 @@ public:
 	void setGameId(int _gameId) { static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->setData(_gameId); }
 };
 
+class AdminCommand : public Command {
+	Q_OBJECT
+public:
+	AdminCommand(const QString &_cmdName)
+		: Command(_cmdName)
+	{
+	}
+};
+
 class Command_DeckUpload : public Command {
 	Q_OBJECT
 public:

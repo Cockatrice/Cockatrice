@@ -163,6 +163,7 @@ void TabServer::retranslateUi()
 void TabServer::processServerMessageEvent(Event_ServerMessage *event)
 {
 	serverInfoBox->setHtml(event->getMessage());
+	emit userEvent();
 }
 
 void TabServer::processListUsersResponse(ProtocolResponse *response)

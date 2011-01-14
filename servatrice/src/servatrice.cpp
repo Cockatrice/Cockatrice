@@ -192,15 +192,24 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 	} else
 		return new ServerInfo_User(name, ServerInfo_User::IsUser);
 }
-
+#include <QDebug>
 void Servatrice::updateLoginMessage()
 {
 	checkSql();
 	QSqlQuery query;
 	query.prepare("select message from " + dbPrefix + "_servermessages order by timest desc limit 1");
 	if (execSqlQuery(query))
-		if (query.next())
+		if (query.next()) {
 			loginMessage = query.value(0).toString();
+			
+			Event_ServerMessage *event = new Event_ServerMessage(loginMessage);
+			QMapIterator<QString, Server_ProtocolHandler *> usersIterator(users);
+			while (usersIterator.hasNext()) {
+				usersIterator.next().value()->sendProtocolItem(event, false);
+				qDebug() << "sent message to" << usersIterator.value()->getUserInfo()->getName();
+			}
+			delete event;
+		}
 }
 
 void Servatrice::statusUpdate()
