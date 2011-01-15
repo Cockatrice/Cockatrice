@@ -343,7 +343,7 @@ ResponseCode Server_ProtocolHandler::cmdListUsers(Command_ListUsers * /*cmd*/, C
 	QList<ServerInfo_User *> resultList;
 	QMapIterator<QString, Server_ProtocolHandler *> userIterator = server->getUsers();
 	while (userIterator.hasNext())
-		resultList.append(new ServerInfo_User(userIterator.next().value()->getUserInfo()));
+		resultList.append(new ServerInfo_User(userIterator.next().value()->getUserInfo(), false));
 	
 	acceptsUserListChanges = true;
 	
