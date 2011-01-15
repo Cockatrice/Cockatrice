@@ -159,8 +159,10 @@ void MainWindow::actAbout()
 		+ "<br><br><br><b>" + tr("Authors:") + "</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>"
 		+ "<b>" + tr("Translators:") + "</b><br>"
 		+ tr("Spanish:") + " Víctor Martínez<br>"
-		+ tr("Portugese:") + " Milton Gonçalves<br>"
+		+ tr("Portugese (Portugal):") + " Milton Gonçalves<br>"
+		+ tr("Portugese (Brazil):") + " Thiago Queiroz<br>"
 		+ tr("French:") + " Yannick Hammer<br>"
+		+ tr("Japanese:") + " Takumi Nakase<br>"
 	));
 }
 
