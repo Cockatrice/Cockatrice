@@ -13,7 +13,7 @@ class ZoneViewZone : public SelectZone, public QGraphicsLayoutItem {
 private:
 	QRectF bRect, optimumRect;
 	int minRows, numberCards;
-	void handleDropEvent(CardDragItem *dragItem, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
+	void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
 	CardZone *origZone;
 	bool revealZone;
 	bool sortByName, sortByType;

@@ -25,6 +25,7 @@ enum ItemId {
 	ItemId_Command_DeckUpload = ItemId_Other + 100,
 	ItemId_Command_DeckSelect = ItemId_Other + 101,
 	ItemId_Command_SetSideboardPlan = ItemId_Other + 102,
+	ItemId_Command_MoveCard = ItemId_Other + 103,
 	ItemId_Event_ListRooms = ItemId_Other + 200,
 	ItemId_Event_JoinRoom = ItemId_Other + 201,
 	ItemId_Event_ListGames = ItemId_Other + 203,
@@ -187,6 +188,22 @@ public:
 	static SerializableItem *newItem() { return new Command_SetSideboardPlan; }
 	int getItemId() const { return ItemId_Command_SetSideboardPlan; }
 	QList<MoveCardToZone *> getMoveList() const;
+};
+
+class Command_MoveCard : public GameCommand {
+	Q_OBJECT
+public:
+	Command_MoveCard(int _gameId = -1, const QString &_startZone = QString(), const QList<CardId *> &_cardIds = QList<CardId *>(), int _targetPlayerId = -1, const QString &_targetZone = QString(), int _x = -1, int _y = -1, bool _faceDown = false, bool _tapped = false);
+	QString getStartZone() const { return static_cast<SerializableItem_String *>(itemMap.value("start_zone"))->getData(); }
+	QList<CardId *> getCardIds() const { return typecastItemList<CardId *>(); }
+	int getTargetPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("target_player_id"))->getData(); }
+	QString getTargetZone() const { return static_cast<SerializableItem_String *>(itemMap.value("target_zone"))->getData(); }
+	int getX() const { return static_cast<SerializableItem_Int *>(itemMap.value("x"))->getData(); }
+	int getY() const { return static_cast<SerializableItem_Int *>(itemMap.value("y"))->getData(); }
+	bool getFaceDown() const { return static_cast<SerializableItem_Bool *>(itemMap.value("face_down"))->getData(); }
+	bool getTapped() const { return static_cast<SerializableItem_Bool *>(itemMap.value("tapped"))->getData(); }
+	static SerializableItem *newItem() { return new Command_MoveCard; }
+	int getItemId() const { return ItemId_Command_MoveCard; }
 };
 
 // -----------------

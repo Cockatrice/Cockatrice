@@ -483,7 +483,7 @@ ResponseCode Server_ProtocolHandler::cmdMulligan(Command_Mulligan * /*cmd*/, Com
 		
 	Server_CardZone *deck = player->getZones().value("deck");
 	while (!hand->cards.isEmpty())
-		player->moveCard(cont, hand, hand->cards.first()->getId(), deck, 0, 0, false, false);
+		player->moveCard(cont, hand, QList<int>() << hand->cards.first()->getId(), deck, 0, 0, false, false);
 
 	deck->shuffle();
 	cont->enqueueGameEventPrivate(new Event_Shuffle(player->getPlayerId()), game->getGameId());
@@ -545,8 +545,13 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, CommandC
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
-	return player->moveCard(cont, cmd->getStartZone(), cmd->getCardId(), cmd->getTargetPlayerId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown(), cmd->getTapped());
+	
+	QList<int> cardIds;
+	const QList<CardId *> &temp = cmd->getCardIds();
+	for (int i = 0; i < temp.size(); ++i)
+		cardIds.append(temp[i]->getData());
+	
+	return player->moveCard(cont, cmd->getStartZone(), cardIds, cmd->getTargetPlayerId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown(), cmd->getTapped());
 }
 
 ResponseCode Server_ProtocolHandler::cmdFlipCard(Command_FlipCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
@@ -646,7 +651,7 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 			player->unattachCard(cont, attachedList[i]);
 		
 		if (targetzone->isColumnStacked(targetCard->getX(), targetCard->getY()))
-			targetPlayer->moveCard(cont, targetzone, targetCard->getId(), targetzone, targetzone->getFreeGridColumn(-2, targetCard->getY(), targetCard->getName()), targetCard->getY(), targetCard->getFaceDown(), false);
+			targetPlayer->moveCard(cont, targetzone, QList<int>() << targetCard->getId(), targetzone, targetzone->getFreeGridColumn(-2, targetCard->getY(), targetCard->getName()), targetCard->getY(), targetCard->getFaceDown(), false);
 		
 		card->setParentCard(targetCard);
 		card->setCoords(-1, card->getY());

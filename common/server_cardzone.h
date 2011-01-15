@@ -40,6 +40,7 @@ public:
 	Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ZoneType _type);
 	~Server_CardZone();
 
+	int removeCard(Server_Card *card);
 	Server_Card *getCard(int id, bool remove, int *position = NULL);
 
 	int getCardsBeingLookedAt() const { return cardsBeingLookedAt; }
@@ -52,7 +53,7 @@ public:
 	int getFreeGridColumn(int x, int y, const QString &cardName) const;
 	bool isColumnEmpty(int x, int y) const;
 	bool isColumnStacked(int x, int y) const;
-	void fixFreeSpaces(CommandContainer *cont, int x, int y);
+	void fixFreeSpaces(CommandContainer *cont);
 	void moveCard(CommandContainer *cont, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y);
 	QList<Server_Card *> cards;
 	void insertCard(Server_Card *card, int x, int y);

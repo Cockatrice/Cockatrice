@@ -21,6 +21,8 @@
 #include "server_card.h"
 #include "server_player.h"
 #include "rng_abstract.h"
+#include <QSet>
+#include <QDebug>
 
 Server_CardZone::Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ZoneType _type)
 	: player(_player), name(_name), has_coords(_has_coords), type(_type), cardsBeingLookedAt(0)
@@ -29,7 +31,7 @@ Server_CardZone::Server_CardZone(Server_Player *_player, const QString &_name, b
 
 Server_CardZone::~Server_CardZone()
 {
-	qDebug(QString("Server_CardZone destructor: %1").arg(name).toLatin1());
+	qDebug() << "Server_CardZone destructor:" << name;
 	clear();
 }
 
@@ -39,6 +41,13 @@ void Server_CardZone::shuffle()
 	for (int i = cards.size(); i; i--)
 		temp.append(cards.takeAt(rng->getNumber(0, i - 1)));
 	cards = temp;
+}
+
+int Server_CardZone::removeCard(Server_Card *card)
+{
+	int index = cards.indexOf(card);
+	cards.removeAt(index);
+	return index;
 }
 
 Server_Card *Server_CardZone::getCard(int id, bool remove, int *position)
@@ -146,29 +155,37 @@ bool Server_CardZone::isColumnEmpty(int x, int y) const
 void Server_CardZone::moveCard(CommandContainer *cont, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y)
 {
 	coordMap.remove(card->getX());
-	player->moveCard(cont, this, card->getId(), this, x, y, card->getFaceDown(), false);
+	player->moveCard(cont, this, QList<int>() << card->getId(), this, x, y, card->getFaceDown(), false);
 	coordMap.insert(x, card);
 }
 
-void Server_CardZone::fixFreeSpaces(CommandContainer *cont, int x, int y)
+void Server_CardZone::fixFreeSpaces(CommandContainer *cont)
 {
 	QMap<int, Server_Card *> coordMap;
-	for (int i = 0; i < cards.size(); ++i)
-		if (cards[i]->getY() == y)
-			coordMap.insert(cards[i]->getX(), cards[i]);
-	
-	int baseX = (x / 3) * 3;
-	if (!coordMap.contains(baseX)) {
-		if (coordMap.contains(baseX + 1))
-			moveCard(cont, coordMap, coordMap.value(baseX + 1), baseX, y);
-		else if (coordMap.contains(baseX + 2)) {
-			moveCard(cont, coordMap, coordMap.value(baseX + 2), baseX, y);
-			return;
-		} else
-			return;
+	QSet<int> placesToLook;
+	for (int i = 0; i < cards.size(); ++i) {
+		coordMap.insert(cards[i]->getY() * 10000 + cards[i]->getX(), cards[i]);
+		placesToLook.insert(cards[i]->getY() * 10000 + (cards[i]->getX() / 3) * 3);
 	}
-	if (!coordMap.contains(baseX + 1) && coordMap.contains(baseX + 2))
-		moveCard(cont, coordMap, coordMap.value(baseX + 2), baseX + 1, y);
+	
+	QSetIterator<int> placeIterator(placesToLook);
+	while (placeIterator.hasNext()) {
+		int foo = placeIterator.next();
+		int y = foo / 10000;
+		int baseX = foo - y * 10000;
+		
+		if (!coordMap.contains(y * 10000 + baseX)) {
+			if (coordMap.contains(y * 10000 + baseX + 1))
+				moveCard(cont, coordMap, coordMap.value(y * 10000 + baseX + 1), baseX, y);
+			else if (coordMap.contains(baseX + 2)) {
+				moveCard(cont, coordMap, coordMap.value(y * 10000 + baseX + 2), baseX, y);
+				return;
+			} else
+				return;
+		}
+		if (!coordMap.contains(y * 10000 + baseX + 1) && coordMap.contains(y * 10000 + baseX + 2))
+			moveCard(cont, coordMap, coordMap.value(y * 10000 + baseX + 2), baseX + 1, y);
+	}
 }
 
 void Server_CardZone::insertCard(Server_Card *card, int x, int y)
