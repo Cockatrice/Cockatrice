@@ -61,6 +61,7 @@ public:
 	bool getReceiverMayDelete() const { return receiverMayDelete; }
 	void setReceiverMayDelete(bool _receiverMayDelete) { receiverMayDelete = _receiverMayDelete; }
 	ProtocolItem(const QString &_itemType, const QString &_itemSubType);
+	bool isEmpty() const { return false; }
 };
 
 class ProtocolItem_Invalid : public ProtocolItem {
@@ -80,6 +81,7 @@ public:
 	TopLevelProtocolItem();
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
+	bool isEmpty() const { return false; }
 };
 
 // ----------------
@@ -159,6 +161,15 @@ public:
 	}
 	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); }
 	void setGameId(int _gameId) { static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->setData(_gameId); }
+};
+
+class AdminCommand : public Command {
+	Q_OBJECT
+public:
+	AdminCommand(const QString &_cmdName)
+		: Command(_cmdName)
+	{
+	}
 };
 
 class Command_DeckUpload : public Command {

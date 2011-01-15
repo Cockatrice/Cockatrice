@@ -81,6 +81,7 @@ private:
 	ResponseCode cmdDumpZone(Command_DumpZone *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdStopDumpZone(Command_StopDumpZone *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdRevealCards(Command_RevealCards *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
+	virtual ResponseCode cmdUpdateServerMessage(Command_UpdateServerMessage *cmd, CommandContainer *cont) = 0;
 	
 	ResponseCode processCommandHelper(Command *command, CommandContainer *cont);
 private slots:

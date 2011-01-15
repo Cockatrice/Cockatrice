@@ -55,7 +55,6 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 	lastCommandTime = QDateTime::currentDateTime();
 
 	RoomCommand *roomCommand = qobject_cast<RoomCommand *>(command);
-	GameCommand *gameCommand = qobject_cast<GameCommand *>(command);
 	if (roomCommand) {
 		qDebug() << "received RoomCommand: roomId =" << roomCommand->getRoomId();
 		if (authState == PasswordWrong)
@@ -66,12 +65,15 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 			return RespNameNotFound;
 		
 		switch (command->getItemId()) {
-			case ItemId_Command_LeaveRoom: return cmdLeaveRoom(qobject_cast<Command_LeaveRoom *>(command), cont, room);
-			case ItemId_Command_RoomSay: return cmdRoomSay(qobject_cast<Command_RoomSay *>(command), cont, room);
-			case ItemId_Command_CreateGame: return cmdCreateGame(qobject_cast<Command_CreateGame *>(command), cont, room);
-			case ItemId_Command_JoinGame: return cmdJoinGame(qobject_cast<Command_JoinGame *>(command), cont, room);
+			case ItemId_Command_LeaveRoom: return cmdLeaveRoom(static_cast<Command_LeaveRoom *>(command), cont, room);
+			case ItemId_Command_RoomSay: return cmdRoomSay(static_cast<Command_RoomSay *>(command), cont, room);
+			case ItemId_Command_CreateGame: return cmdCreateGame(static_cast<Command_CreateGame *>(command), cont, room);
+			case ItemId_Command_JoinGame: return cmdJoinGame(static_cast<Command_JoinGame *>(command), cont, room);
+			default: return RespInvalidCommand;
 		}
-	} else if (gameCommand) {
+	}
+	GameCommand *gameCommand = qobject_cast<GameCommand *>(command);
+	if (gameCommand) {
 		qDebug() << "received GameCommand: game =" << gameCommand->getGameId();
 		if (authState == PasswordWrong)
 			return RespLoginNeeded;
@@ -85,54 +87,65 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 		Server_Player *player = gamePair.second;
 		
 		switch (command->getItemId()) {
-			case ItemId_Command_DeckSelect: return cmdDeckSelect(qobject_cast<Command_DeckSelect *>(command), cont, game, player);
-			case ItemId_Command_SetSideboardPlan: return cmdSetSideboardPlan(qobject_cast<Command_SetSideboardPlan *>(command), cont, game, player);
-			case ItemId_Command_LeaveGame: return cmdLeaveGame(qobject_cast<Command_LeaveGame *>(command), cont, game, player);
-			case ItemId_Command_ReadyStart: return cmdReadyStart(qobject_cast<Command_ReadyStart *>(command), cont, game, player);
-			case ItemId_Command_Concede: return cmdConcede(qobject_cast<Command_Concede *>(command), cont, game, player);
-			case ItemId_Command_Say: return cmdSay(qobject_cast<Command_Say *>(command), cont, game, player);
-			case ItemId_Command_Shuffle: return cmdShuffle(qobject_cast<Command_Shuffle *>(command), cont, game, player);
-			case ItemId_Command_Mulligan: return cmdMulligan(qobject_cast<Command_Mulligan *>(command), cont, game, player);
-			case ItemId_Command_RollDie: return cmdRollDie(qobject_cast<Command_RollDie *>(command), cont, game, player);
-			case ItemId_Command_DrawCards: return cmdDrawCards(qobject_cast<Command_DrawCards *>(command), cont, game, player);
-			case ItemId_Command_MoveCard: return cmdMoveCard(qobject_cast<Command_MoveCard *>(command), cont, game, player);
-			case ItemId_Command_FlipCard: return cmdFlipCard(qobject_cast<Command_FlipCard *>(command), cont, game, player);
-			case ItemId_Command_AttachCard: return cmdAttachCard(qobject_cast<Command_AttachCard *>(command), cont, game, player);
-			case ItemId_Command_CreateToken: return cmdCreateToken(qobject_cast<Command_CreateToken *>(command), cont, game, player);
-			case ItemId_Command_CreateArrow: return cmdCreateArrow(qobject_cast<Command_CreateArrow *>(command), cont, game, player);
-			case ItemId_Command_DeleteArrow: return cmdDeleteArrow(qobject_cast<Command_DeleteArrow *>(command), cont, game, player);
-			case ItemId_Command_SetCardAttr: return cmdSetCardAttr(qobject_cast<Command_SetCardAttr *>(command), cont, game, player);
-			case ItemId_Command_SetCardCounter: return cmdSetCardCounter(qobject_cast<Command_SetCardCounter *>(command), cont, game, player);
-			case ItemId_Command_IncCardCounter: return cmdIncCardCounter(qobject_cast<Command_IncCardCounter *>(command), cont, game, player);
-			case ItemId_Command_IncCounter: return cmdIncCounter(qobject_cast<Command_IncCounter *>(command), cont, game, player);
-			case ItemId_Command_CreateCounter: return cmdCreateCounter(qobject_cast<Command_CreateCounter *>(command), cont, game, player);
-			case ItemId_Command_SetCounter: return cmdSetCounter(qobject_cast<Command_SetCounter *>(command), cont, game, player);
-			case ItemId_Command_DelCounter: return cmdDelCounter(qobject_cast<Command_DelCounter *>(command), cont, game, player);
-			case ItemId_Command_NextTurn: return cmdNextTurn(qobject_cast<Command_NextTurn *>(command), cont, game, player);
-			case ItemId_Command_SetActivePhase: return cmdSetActivePhase(qobject_cast<Command_SetActivePhase *>(command), cont, game, player);
-			case ItemId_Command_DumpZone: return cmdDumpZone(qobject_cast<Command_DumpZone *>(command), cont, game, player);
-			case ItemId_Command_StopDumpZone: return cmdStopDumpZone(qobject_cast<Command_StopDumpZone *>(command), cont, game, player);
-			case ItemId_Command_RevealCards: return cmdRevealCards(qobject_cast<Command_RevealCards *>(command), cont, game, player);
-		}
-	} else {
-		qDebug() << "received generic Command";
-		switch (command->getItemId()) {
-			case ItemId_Command_Ping: return cmdPing(qobject_cast<Command_Ping *>(command), cont);
-			case ItemId_Command_Login: return cmdLogin(qobject_cast<Command_Login *>(command), cont);
-			case ItemId_Command_Message: return cmdMessage(qobject_cast<Command_Message *>(command), cont);
-			case ItemId_Command_DeckList: return cmdDeckList(qobject_cast<Command_DeckList *>(command), cont);
-			case ItemId_Command_DeckNewDir: return cmdDeckNewDir(qobject_cast<Command_DeckNewDir *>(command), cont);
-			case ItemId_Command_DeckDelDir: return cmdDeckDelDir(qobject_cast<Command_DeckDelDir *>(command), cont);
-			case ItemId_Command_DeckDel: return cmdDeckDel(qobject_cast<Command_DeckDel *>(command), cont);
-			case ItemId_Command_DeckUpload: return cmdDeckUpload(qobject_cast<Command_DeckUpload *>(command), cont);
-			case ItemId_Command_DeckDownload: return cmdDeckDownload(qobject_cast<Command_DeckDownload *>(command), cont);
-			case ItemId_Command_GetUserInfo: return cmdGetUserInfo(qobject_cast<Command_GetUserInfo *>(command), cont);
-			case ItemId_Command_ListRooms: return cmdListRooms(qobject_cast<Command_ListRooms *>(command), cont);
-			case ItemId_Command_JoinRoom: return cmdJoinRoom(qobject_cast<Command_JoinRoom *>(command), cont);
-			case ItemId_Command_ListUsers: return cmdListUsers(qobject_cast<Command_ListUsers *>(command), cont);
+			case ItemId_Command_DeckSelect: return cmdDeckSelect(static_cast<Command_DeckSelect *>(command), cont, game, player);
+			case ItemId_Command_SetSideboardPlan: return cmdSetSideboardPlan(static_cast<Command_SetSideboardPlan *>(command), cont, game, player);
+			case ItemId_Command_LeaveGame: return cmdLeaveGame(static_cast<Command_LeaveGame *>(command), cont, game, player);
+			case ItemId_Command_ReadyStart: return cmdReadyStart(static_cast<Command_ReadyStart *>(command), cont, game, player);
+			case ItemId_Command_Concede: return cmdConcede(static_cast<Command_Concede *>(command), cont, game, player);
+			case ItemId_Command_Say: return cmdSay(static_cast<Command_Say *>(command), cont, game, player);
+			case ItemId_Command_Shuffle: return cmdShuffle(static_cast<Command_Shuffle *>(command), cont, game, player);
+			case ItemId_Command_Mulligan: return cmdMulligan(static_cast<Command_Mulligan *>(command), cont, game, player);
+			case ItemId_Command_RollDie: return cmdRollDie(static_cast<Command_RollDie *>(command), cont, game, player);
+			case ItemId_Command_DrawCards: return cmdDrawCards(static_cast<Command_DrawCards *>(command), cont, game, player);
+			case ItemId_Command_MoveCard: return cmdMoveCard(static_cast<Command_MoveCard *>(command), cont, game, player);
+			case ItemId_Command_FlipCard: return cmdFlipCard(static_cast<Command_FlipCard *>(command), cont, game, player);
+			case ItemId_Command_AttachCard: return cmdAttachCard(static_cast<Command_AttachCard *>(command), cont, game, player);
+			case ItemId_Command_CreateToken: return cmdCreateToken(static_cast<Command_CreateToken *>(command), cont, game, player);
+			case ItemId_Command_CreateArrow: return cmdCreateArrow(static_cast<Command_CreateArrow *>(command), cont, game, player);
+			case ItemId_Command_DeleteArrow: return cmdDeleteArrow(static_cast<Command_DeleteArrow *>(command), cont, game, player);
+			case ItemId_Command_SetCardAttr: return cmdSetCardAttr(static_cast<Command_SetCardAttr *>(command), cont, game, player);
+			case ItemId_Command_SetCardCounter: return cmdSetCardCounter(static_cast<Command_SetCardCounter *>(command), cont, game, player);
+			case ItemId_Command_IncCardCounter: return cmdIncCardCounter(static_cast<Command_IncCardCounter *>(command), cont, game, player);
+			case ItemId_Command_IncCounter: return cmdIncCounter(static_cast<Command_IncCounter *>(command), cont, game, player);
+			case ItemId_Command_CreateCounter: return cmdCreateCounter(static_cast<Command_CreateCounter *>(command), cont, game, player);
+			case ItemId_Command_SetCounter: return cmdSetCounter(static_cast<Command_SetCounter *>(command), cont, game, player);
+			case ItemId_Command_DelCounter: return cmdDelCounter(static_cast<Command_DelCounter *>(command), cont, game, player);
+			case ItemId_Command_NextTurn: return cmdNextTurn(static_cast<Command_NextTurn *>(command), cont, game, player);
+			case ItemId_Command_SetActivePhase: return cmdSetActivePhase(static_cast<Command_SetActivePhase *>(command), cont, game, player);
+			case ItemId_Command_DumpZone: return cmdDumpZone(static_cast<Command_DumpZone *>(command), cont, game, player);
+			case ItemId_Command_StopDumpZone: return cmdStopDumpZone(static_cast<Command_StopDumpZone *>(command), cont, game, player);
+			case ItemId_Command_RevealCards: return cmdRevealCards(static_cast<Command_RevealCards *>(command), cont, game, player);
+			default: return RespInvalidCommand;
 		}
 	}
-	return RespInvalidCommand;
+	AdminCommand *adminCommand = qobject_cast<AdminCommand *>(command);
+	if (adminCommand) {
+		qDebug() << "received AdminCommand";
+		if (!(userInfo->getUserLevel() & ServerInfo_User::IsAdmin))
+			return RespLoginNeeded;
+		
+		switch (command->getItemId()) {
+			case ItemId_Command_UpdateServerMessage: return cmdUpdateServerMessage(static_cast<Command_UpdateServerMessage *>(command), cont);
+			default: return RespInvalidCommand;
+		}
+	}
+	qDebug() << "received generic Command";
+	switch (command->getItemId()) {
+		case ItemId_Command_Ping: return cmdPing(static_cast<Command_Ping *>(command), cont);
+		case ItemId_Command_Login: return cmdLogin(static_cast<Command_Login *>(command), cont);
+		case ItemId_Command_Message: return cmdMessage(static_cast<Command_Message *>(command), cont);
+		case ItemId_Command_DeckList: return cmdDeckList(static_cast<Command_DeckList *>(command), cont);
+		case ItemId_Command_DeckNewDir: return cmdDeckNewDir(static_cast<Command_DeckNewDir *>(command), cont);
+		case ItemId_Command_DeckDelDir: return cmdDeckDelDir(static_cast<Command_DeckDelDir *>(command), cont);
+		case ItemId_Command_DeckDel: return cmdDeckDel(static_cast<Command_DeckDel *>(command), cont);
+		case ItemId_Command_DeckUpload: return cmdDeckUpload(static_cast<Command_DeckUpload *>(command), cont);
+		case ItemId_Command_DeckDownload: return cmdDeckDownload(static_cast<Command_DeckDownload *>(command), cont);
+		case ItemId_Command_GetUserInfo: return cmdGetUserInfo(static_cast<Command_GetUserInfo *>(command), cont);
+		case ItemId_Command_ListRooms: return cmdListRooms(static_cast<Command_ListRooms *>(command), cont);
+		case ItemId_Command_JoinRoom: return cmdJoinRoom(static_cast<Command_JoinRoom *>(command), cont);
+		case ItemId_Command_ListUsers: return cmdListUsers(static_cast<Command_ListUsers *>(command), cont);
+		default: return RespInvalidCommand;
+	}
 }
 
 void Server_ProtocolHandler::processCommandContainer(CommandContainer *cont)
@@ -330,7 +343,7 @@ ResponseCode Server_ProtocolHandler::cmdListUsers(Command_ListUsers * /*cmd*/, C
 	QList<ServerInfo_User *> resultList;
 	QMapIterator<QString, Server_ProtocolHandler *> userIterator = server->getUsers();
 	while (userIterator.hasNext())
-		resultList.append(new ServerInfo_User(userIterator.next().value()->getUserInfo()));
+		resultList.append(new ServerInfo_User(userIterator.next().value()->getUserInfo(), false));
 	
 	acceptsUserListChanges = true;
 	

@@ -634,5 +634,12 @@ public:
 	static SerializableItem *newItem() { return new Context_DeckSelect; }
 	int getItemId() const { return ItemId_Context_DeckSelect; }
 };
+class Command_UpdateServerMessage : public AdminCommand {
+	Q_OBJECT
+public:
+	Command_UpdateServerMessage();
+	static SerializableItem *newItem() { return new Command_UpdateServerMessage; }
+	int getItemId() const { return ItemId_Command_UpdateServerMessage; }
+};
 
 #endif

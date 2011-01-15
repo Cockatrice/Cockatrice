@@ -73,6 +73,13 @@ while (<file>) {
 		$parentConstructorCall = "$baseClass(\"$name1\")";
 		$constructorParamsH = "";
 		$constructorParamsCpp = "";
+	} elsif ($type == 7) {
+		$type = 'cmd';
+		$namePrefix = 'Command';
+		$baseClass = 'AdminCommand';
+		$parentConstructorCall = "$baseClass(\"$name1\")";
+		$constructorParamsH = "";
+		$constructorParamsCpp = "";
 	}
 	$className = $namePrefix . '_' . $name2;
 	$itemEnum .= "ItemId_$className = " . ++$itemId . ",\n";

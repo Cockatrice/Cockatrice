@@ -67,3 +67,4 @@
 6:ready_start
 6:concede
 6:deck_select:i,deck_id
+7:update_server_message

@@ -11,6 +11,7 @@ class TabServer;
 class TabRoom;
 class TabGame;
 class TabDeckStorage;
+class TabAdmin;
 class TabMessage;
 class RoomEvent;
 class GameEventContainer;
@@ -28,6 +29,7 @@ private:
 	QList<AbstractClient *> localClients;
 	TabServer *tabServer;
 	TabDeckStorage *tabDeckStorage;
+	TabAdmin *tabAdmin;
 	QMap<int, TabRoom *> roomTabs;
 	QMap<int, TabGame *> gameTabs;
 	QMap<QString, TabMessage *> messageTabs;
