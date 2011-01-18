@@ -17,6 +17,7 @@ class CardItem : public AbstractCardItem {
 private:
 	CardZone *zone;
 	int id;
+	bool revealedCard;
 	bool attacking;
 	bool facedown;
 	QMap<int, int> counters;
@@ -30,28 +31,40 @@ private:
 	QList<CardItem *> attachedCards;
 	
 	QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
-	QAction *aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aSetPT, *aSetAnnotation, *aFlip, *aClone,
+	QAction *aPlay,
+		*aHide,
+		*aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aSetPT, *aSetAnnotation, *aFlip, *aClone,
 		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile;
 	QMenu *cardMenu, *moveMenu;
 
-	void playCard(QGraphicsSceneMouseEvent *event);
+	void playCard(bool faceDown);
 	void prepareDelete();
+private slots:
+	void cardMenuAction();
+	void actCardCounterTrigger();
+	void actAttach();
+	void actUnattach();
+	void actSetPT();
+	void actSetAnnotation();
+	void actPlay();
+	void actHide();
 public slots:
 	void deleteLater();
 public:
 	enum { Type = typeCard };
 	int type() const { return Type; }
-	CardItem(Player *_owner, const QString &_name = QString(), int _cardid = -1, QGraphicsItem *parent = 0);
+	CardItem(Player *_owner, const QString &_name = QString(), int _cardid = -1, bool revealedCard = false, QGraphicsItem *parent = 0);
 	~CardItem();
 	void retranslateUi();
 	CardZone *getZone() const { return zone; }
-	void setZone(CardZone *_zone) { zone = _zone; }
+	void setZone(CardZone *_zone);
 	QMenu *getCardMenu() const { return cardMenu; }
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QPoint getGridPoint() const { return gridPoint; }
 	void setGridPoint(const QPoint &_gridPoint) { gridPoint = _gridPoint; }
 	QPoint getGridPos() const { return gridPoint; }
 	Player *getOwner() const { return owner; }
+	void setOwner(Player *_owner) { owner = _owner; }
 	int getId() const { return id; }
 	void setId(int _id) { id = _id; }
 	bool getAttacking() const { return attacking; }
@@ -75,6 +88,7 @@ public:
 	const QList<CardItem *> &getAttachedCards() const { return attachedCards; }
 	void resetState();
 	void processCardInfo(ServerInfo_Card *info);
+	void updateCardMenu();
 
 	CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);
 	void deleteDragItem();

@@ -7,19 +7,16 @@
 #include "protocol_items.h"
 #include "settingscache.h"
 #include "arrowitem.h"
+#include "carddragitem.h"
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
-	: CardZone(_p, "table", true, false, true, parent), active(false)
+	: SelectZone(_p, "table", true, false, true, parent), active(false)
 {
 	connect(settingsCache, SIGNAL(tableBgPathChanged()), this, SLOT(updateBgPixmap()));
-	connect(settingsCache, SIGNAL(economicalGridChanged()), this, SLOT(reorganizeCards()));
 	connect(settingsCache, SIGNAL(invertVerticalCoordinateChanged()), this, SLOT(reorganizeCards()));
 	updateBgPixmap();
 
-	if (settingsCache->getEconomicalGrid())
-		height = 2 * boxLineWidth + (int) (11.0 / 3 * CARD_HEIGHT + 2 * paddingY);
-	else
-		height = 2 * boxLineWidth + 3 * CARD_HEIGHT + 2 * paddingY;
+	height = 2 * boxLineWidth + 3 * (CARD_HEIGHT + 20) + 2 * paddingY;
 	width = minWidth + 2 * marginX + 2 * boxLineWidth;
 	currentMinimumWidth = minWidth;
 
@@ -52,7 +49,7 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
 	else
 		painter->fillRect(boundingRect(), QBrush(bgPixmap));
 	painter->setPen(QColor(255, 255, 255, 40));
-	qreal separatorY = 2 * (CARD_HEIGHT + paddingY) + boxLineWidth - paddingY / 2;
+	qreal separatorY = 2 * (CARD_HEIGHT + 20 + paddingY) + boxLineWidth - paddingY / 2;
 	if (isInverted())
 		separatorY = height - separatorY;
 	painter->drawLine(QPointF(0, separatorY), QPointF(width, separatorY));
@@ -88,14 +85,18 @@ void TableZone::addCardImpl(CardItem *card, int _x, int _y)
 	card->update();
 }
 
-void TableZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
+void TableZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
 {
-	handleDropEventByGrid(cardId, startZone, mapToGrid(dropPoint), faceDown);
+	handleDropEventByGrid(dragItems, startZone, mapToGrid(dropPoint), faceDown);
 }
 
-void TableZone::handleDropEventByGrid(int cardId, CardZone *startZone, const QPoint &gridPoint, bool faceDown, bool tapped)
+void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &gridPoint, bool faceDown, bool tapped)
 {
-	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), cardId, getName(), gridPoint.x(), gridPoint.y(), faceDown, tapped));
+	QList<CardId *> idList;
+	for (int i = 0; i < dragItems.size(); ++i)
+		idList.append(new CardId(dragItems[i]->getId()));
+	
+	startZone->getPlayer()->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), gridPoint.x(), gridPoint.y(), faceDown, tapped));
 }
 
 void TableZone::reorganizeCards()
@@ -103,13 +104,27 @@ void TableZone::reorganizeCards()
 	QList<ArrowItem *> arrowsToUpdate;
 	
 	// Calculate table grid distortion so that the mapping functions work properly
-	gridPointWidth.clear();
+	QMap<int, int> gridPointStackCount;
 	for (int i = 0; i < cards.size(); ++i) {
-		QPoint gridPoint = cards[i]->getGridPos();
+		const QPoint &gridPoint = cards[i]->getGridPos();
 		if (gridPoint.x() == -1)
 			continue;
 		
-		gridPointWidth.insert(gridPoint.x() + gridPoint.y() * 1000, CARD_WIDTH * (1 + cards[i]->getAttachedCards().size() / 3.0));
+		const int key = gridPoint.x() / 3 + gridPoint.y() * 1000;
+		gridPointStackCount.insert(key, gridPointStackCount.value(key, 0) + 1);
+	}
+	gridPointWidth.clear();
+	for (int i = 0; i < cards.size(); ++i) {
+		const QPoint &gridPoint = cards[i]->getGridPos();
+		if (gridPoint.x() == -1)
+			continue;
+		
+		const int key = gridPoint.x() / 3 + gridPoint.y() * 1000;
+		const int stackCount = gridPointStackCount.value(key, 0);
+		if (stackCount == 1)
+			gridPointWidth.insert(key, CARD_WIDTH * (1 + cards[i]->getAttachedCards().size() / 3.0));
+		else
+			gridPointWidth.insert(key, CARD_WIDTH * (1 + (stackCount - 1) / 3.0));
 	}
 	
 	for (int i = 0; i < cards.size(); ++i) {
@@ -213,22 +228,21 @@ CardItem *TableZone::getCardFromCoords(const QPointF &point) const
 	return getCardFromGrid(gridPoint);
 }
 
-QPointF TableZone::mapFromGrid(const QPoint &gridPoint) const
+QPointF TableZone::mapFromGrid(QPoint gridPoint) const
 {
 	qreal x, y;
-	if ((gridPoint.y() == 2) && (settingsCache->getEconomicalGrid())) {
-		x = marginX + (CARD_WIDTH * gridPoint.x() + CARD_WIDTH * (gridPoint.x() / 3)) / 2;
-		y = boxLineWidth + (CARD_HEIGHT + paddingY) * gridPoint.y() + (gridPoint.x() % 3 * CARD_HEIGHT) / 3;
-	} else {
-		x = marginX + 0.5 * CARD_WIDTH * gridPoint.x();
-		for (int i = 0; i < gridPoint.x(); ++i)
-			x += gridPointWidth.value(gridPoint.y() * 1000 + i, CARD_WIDTH);
-		
-		y = boxLineWidth + (CARD_HEIGHT + paddingY) * gridPoint.y();
-	}
+	x = marginX + (gridPoint.x() % 3) * CARD_WIDTH / 3.0;
+	for (int i = 0; i < gridPoint.x() / 3; ++i)
+		x += gridPointWidth.value(gridPoint.y() * 1000 + i, CARD_WIDTH) + paddingX;
+	
+	if (isInverted())
+		gridPoint.setY(2 - gridPoint.y());
+	
+	y = boxLineWidth + gridPoint.y() * (CARD_HEIGHT + paddingY + 20) + (gridPoint.x() % 3) * 10;
+/*	
 	if (isInverted())
 		y = height - CARD_HEIGHT - y;
-	
+*/	
 	return QPointF(x, y);
 }
 
@@ -236,9 +250,9 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 {
 	qreal x = mapPoint.x() - marginX;
 	qreal y = mapPoint.y();
-	if (isInverted())
+/*	if (isInverted())
 		y = height - y;
-	y += paddingY / 2 - boxLineWidth;
+*/	y -= boxLineWidth;
 	
 	if (x < 0)
 		x = 0;
@@ -249,27 +263,32 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 	else if (y > height - CARD_HEIGHT)
 		y = height - CARD_HEIGHT;
 	
-	int resultY = (int) (y / (CARD_HEIGHT + paddingY));
+	int resultY = round(y / (CARD_HEIGHT + paddingY + 20));
+	if (isInverted())
+		resultY = 2 - resultY;
 
-	if ((resultY == 2) && (settingsCache->getEconomicalGrid()))
-		return QPoint(
-			(int) (x * 2 / CARD_WIDTH - floor(x / (2 * CARD_WIDTH))),
-			2
-		);
-	else {
-		int resultX = -1;
-		qreal tempX = 0;
-		do {
-			++resultX;
-			tempX += gridPointWidth.value(resultY * 1000 + resultX, CARD_WIDTH) + 0.5 * CARD_WIDTH;
-		} while (tempX < x + 1);
-		return QPoint(resultX, resultY);
-	}
+	int baseX = -1;
+	qreal oldTempX = 0, tempX = 0;
+	do {
+		++baseX;
+		oldTempX = tempX;
+		tempX += gridPointWidth.value(resultY * 1000 + baseX, CARD_WIDTH) + paddingX;
+	} while (tempX < x + 1);
+	
+	qreal xdiff = x - oldTempX;
+	int resultX = baseX * 3 + qMin((int) floor(xdiff * 3 / CARD_WIDTH), 2);
+	return QPoint(resultX, resultY);
 }
 
 QPointF TableZone::closestGridPoint(const QPointF &point)
 {
-	return mapFromGrid(mapToGrid(point + QPoint(CARD_WIDTH / 2, CARD_HEIGHT / 2)));
+	QPoint gridPoint = mapToGrid(point + QPoint(1, 1));
+	gridPoint.setX((gridPoint.x() / 3) * 3);
+	if (getCardFromGrid(gridPoint))
+		gridPoint.setX(gridPoint.x() + 1);
+	if (getCardFromGrid(gridPoint))
+		gridPoint.setX(gridPoint.x() + 1);
+	return mapFromGrid(gridPoint);
 }
 
 void TableZone::setWidth(qreal _width)

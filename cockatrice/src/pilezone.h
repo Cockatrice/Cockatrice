@@ -9,7 +9,7 @@ public:
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	void reorganizeCards();
-	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
+	void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
 protected:
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);

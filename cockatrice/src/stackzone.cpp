@@ -5,9 +5,10 @@
 #include "settingscache.h"
 #include "player.h"
 #include "protocol_items.h"
+#include "carddragitem.h"
 
 StackZone::StackZone(Player *_p, int _zoneHeight, QGraphicsItem *parent)
-	: CardZone(_p, "stack", false, false, true, parent), zoneHeight(_zoneHeight)
+	: SelectZone(_p, "stack", false, false, true, parent), zoneHeight(_zoneHeight)
 {
 	connect(settingsCache, SIGNAL(stackBgPathChanged()), this, SLOT(updateBgPixmap()));
 	updateBgPixmap();
@@ -51,11 +52,16 @@ void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
 		painter->fillRect(boundingRect(), QBrush(bgPixmap));
 }
 
-void StackZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
+void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
 	if (startZone == this)
 		return;
-	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), cardId, getName(), 0, 0, false));
+	
+	QList<CardId *> idList;
+	for (int i = 0; i < dragItems.size(); ++i)
+		idList.append(new CardId(dragItems[i]->getId()));
+	
+	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), 0, 0, false));
 }
 
 void StackZone::reorganizeCards()

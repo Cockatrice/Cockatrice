@@ -55,6 +55,7 @@ private:
 	ResponseCode cmdDeckUpload(Command_DeckUpload *cmd, CommandContainer *cont);
 	DeckList *getDeckFromDatabase(int deckId);
 	ResponseCode cmdDeckDownload(Command_DeckDownload *cmd, CommandContainer *cont);
+	ResponseCode cmdUpdateServerMessage(Command_UpdateServerMessage *cmd, CommandContainer *cont);
 public:
 	ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent = 0);
 	~ServerSocketInterface();

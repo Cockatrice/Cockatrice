@@ -1,15 +1,16 @@
 #ifndef TABLEZONE_H
 #define TABLEZONE_H
 
-#include "cardzone.h"
+#include "selectzone.h"
 
-class TableZone : public CardZone {
+class TableZone : public SelectZone {
 	Q_OBJECT
 signals:
 	void sizeChanged();
 private:
 	static const int boxLineWidth = 10;
-	static const int paddingY = 20;
+	static const int paddingX = 35;
+	static const int paddingY = 10;
 	static const int marginX = 20;
 	static const int minWidth = 15 * CARD_WIDTH / 2;
 
@@ -28,11 +29,11 @@ public:
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	void toggleTapped();
-	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown = false);
-	void handleDropEventByGrid(int cardId, CardZone *startZone, const QPoint &gridPoint, bool faceDown = false, bool tapped = false);
+	void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint, bool faceDown = false);
+	void handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &gridPoint, bool faceDown = false, bool tapped = false);
 	CardItem *getCardFromGrid(const QPoint &gridPoint) const;
 	CardItem *getCardFromCoords(const QPointF &point) const;
-	QPointF mapFromGrid(const QPoint &gridPoint) const;
+	QPointF mapFromGrid(QPoint gridPoint) const;
 	QPoint mapToGrid(const QPointF &mapPoint) const;
 	QPointF closestGridPoint(const QPointF &point);
 	CardItem *takeCard(int position, int cardId, bool canResize = true);

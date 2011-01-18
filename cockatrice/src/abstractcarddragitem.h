@@ -20,6 +20,7 @@ public:
 	~AbstractCardDragItem();
 	QRectF boundingRect() const { return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT); }
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+	AbstractCardItem *getItem() const { return item; }
 	QPointF getHotSpot() const { return hotSpot; }
 	void addChildDrag(AbstractCardDragItem *child);
 	virtual void updatePosition(const QPointF &cursorScenePos) = 0;

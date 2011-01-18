@@ -25,9 +25,9 @@ enum ItemId {
 	ItemId_Command_DeckUpload = ItemId_Other + 100,
 	ItemId_Command_DeckSelect = ItemId_Other + 101,
 	ItemId_Command_SetSideboardPlan = ItemId_Other + 102,
-	ItemId_Event_ListChatChannels = ItemId_Other + 200,
-	ItemId_Event_ChatListPlayers = ItemId_Other + 201,
-	ItemId_Event_ChatJoinChannel = ItemId_Other + 202,
+	ItemId_Command_MoveCard = ItemId_Other + 103,
+	ItemId_Event_ListRooms = ItemId_Other + 200,
+	ItemId_Event_JoinRoom = ItemId_Other + 201,
 	ItemId_Event_ListGames = ItemId_Other + 203,
 	ItemId_Event_UserJoined = ItemId_Other + 204,
 	ItemId_Event_GameStateChanged = ItemId_Other + 205,
@@ -44,6 +44,8 @@ enum ItemId {
 	ItemId_Response_DeckDownload = ItemId_Other + 303,
 	ItemId_Response_DeckUpload = ItemId_Other + 304,
 	ItemId_Response_DumpZone = ItemId_Other + 305,
+	ItemId_Response_JoinRoom = ItemId_Other + 306,
+	ItemId_Response_Login = ItemId_Other + 307,
 	ItemId_Invalid = ItemId_Other + 1000
 };
 
@@ -53,12 +55,13 @@ private:
 	static void initializeHashAuto();
 	bool receiverMayDelete;
 public:
-	static const int protocolVersion = 10;
+	static const int protocolVersion = 11;
 	static void initializeHash();
 	virtual int getItemId() const = 0;
 	bool getReceiverMayDelete() const { return receiverMayDelete; }
 	void setReceiverMayDelete(bool _receiverMayDelete) { receiverMayDelete = _receiverMayDelete; }
 	ProtocolItem(const QString &_itemType, const QString &_itemSubType);
+	bool isEmpty() const { return false; }
 };
 
 class ProtocolItem_Invalid : public ProtocolItem {
@@ -78,6 +81,7 @@ public:
 	TopLevelProtocolItem();
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
+	bool isEmpty() const { return false; }
 };
 
 // ----------------
@@ -136,15 +140,15 @@ public:
 	int getPrivatePlayerId() const { return privatePlayerId; }
 };
 
-class ChatCommand : public Command {
+class RoomCommand : public Command {
 	Q_OBJECT
 public:
-	ChatCommand(const QString &_cmdName, const QString &_channel)
+	RoomCommand(const QString &_cmdName, int _roomId)
 		: Command(_cmdName)
 	{
-		insertItem(new SerializableItem_String("channel", _channel));
+		insertItem(new SerializableItem_Int("room_id", _roomId));
 	}
-	QString getChannel() const { return static_cast<SerializableItem_String *>(itemMap.value("channel"))->getData(); }
+	int getRoomId() const { return static_cast<SerializableItem_Int *>(itemMap.value("room_id"))->getData(); }
 };
 
 class GameCommand : public Command {
@@ -157,6 +161,15 @@ public:
 	}
 	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); }
 	void setGameId(int _gameId) { static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->setData(_gameId); }
+};
+
+class AdminCommand : public Command {
+	Q_OBJECT
+public:
+	AdminCommand(const QString &_cmdName)
+		: Command(_cmdName)
+	{
+	}
 };
 
 class Command_DeckUpload : public Command {
@@ -188,6 +201,22 @@ public:
 	QList<MoveCardToZone *> getMoveList() const;
 };
 
+class Command_MoveCard : public GameCommand {
+	Q_OBJECT
+public:
+	Command_MoveCard(int _gameId = -1, const QString &_startZone = QString(), const QList<CardId *> &_cardIds = QList<CardId *>(), int _targetPlayerId = -1, const QString &_targetZone = QString(), int _x = -1, int _y = -1, bool _faceDown = false, bool _tapped = false);
+	QString getStartZone() const { return static_cast<SerializableItem_String *>(itemMap.value("start_zone"))->getData(); }
+	QList<CardId *> getCardIds() const { return typecastItemList<CardId *>(); }
+	int getTargetPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("target_player_id"))->getData(); }
+	QString getTargetZone() const { return static_cast<SerializableItem_String *>(itemMap.value("target_zone"))->getData(); }
+	int getX() const { return static_cast<SerializableItem_Int *>(itemMap.value("x"))->getData(); }
+	int getY() const { return static_cast<SerializableItem_Int *>(itemMap.value("y"))->getData(); }
+	bool getFaceDown() const { return static_cast<SerializableItem_Bool *>(itemMap.value("face_down"))->getData(); }
+	bool getTapped() const { return static_cast<SerializableItem_Bool *>(itemMap.value("tapped"))->getData(); }
+	static SerializableItem *newItem() { return new Command_MoveCard; }
+	int getItemId() const { return ItemId_Command_MoveCard; }
+};
+
 // -----------------
 // --- RESPONSES ---
 // -----------------
@@ -203,6 +232,15 @@ public:
 	static SerializableItem *newItem() { return new ProtocolResponse; }
 	int getCmdId() const { return static_cast<SerializableItem_Int *>(itemMap.value("cmd_id"))->getData(); }
 	ResponseCode getResponseCode() const { return responseHash.value(static_cast<SerializableItem_String *>(itemMap.value("response_code"))->getData(), RespOk); }
+};
+
+class Response_JoinRoom : public ProtocolResponse {
+	Q_OBJECT
+public:
+	Response_JoinRoom(int _cmdId = -1, ResponseCode _responseCode = RespOk, ServerInfo_Room *_roomInfo = 0);
+	int getItemId() const { return ItemId_Response_JoinRoom; }
+	static SerializableItem *newItem() { return new Response_JoinRoom; }
+	ServerInfo_Room *getRoomInfo() const { return static_cast<ServerInfo_Room *>(itemMap.value("room")); }
 };
 
 class Response_ListUsers : public ProtocolResponse {
@@ -259,6 +297,15 @@ public:
 	ServerInfo_Zone *getZone() const { return static_cast<ServerInfo_Zone *>(itemMap.value("zone")); }
 };
 
+class Response_Login : public ProtocolResponse {
+	Q_OBJECT
+public:
+	Response_Login(int _cmdId = -1, ResponseCode _responseCode = RespOk, ServerInfo_User *_userInfo = 0);
+	int getItemId() const { return ItemId_Response_Login; }
+	static SerializableItem *newItem() { return new Response_Login; }
+	ServerInfo_User *getUserInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
+};
+
 // --------------
 // --- EVENTS ---
 // --------------
@@ -304,44 +351,35 @@ public:
 	void setGameId(int _gameId) { static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->setData(_gameId); }
 };
 
-class ChatEvent : public ProtocolItem {
+class RoomEvent : public ProtocolItem {
 	Q_OBJECT
 public:
-	ChatEvent(const QString &_eventName, const QString &_channel);
-	QString getChannel() const { return static_cast<SerializableItem_String *>(itemMap.value("channel"))->getData(); }
+	RoomEvent(const QString &_eventName, int _roomId);
+	int getRoomId() const { return static_cast<SerializableItem_Int *>(itemMap.value("room_id"))->getData(); }
 };
 
-class Event_ListChatChannels : public GenericEvent {
+class Event_ListRooms : public GenericEvent {
 	Q_OBJECT
 public:
-	Event_ListChatChannels(const QList<ServerInfo_ChatChannel *> &_channelList = QList<ServerInfo_ChatChannel *>());
-	int getItemId() const { return ItemId_Event_ListChatChannels; }
-	static SerializableItem *newItem() { return new Event_ListChatChannels; }
-	QList<ServerInfo_ChatChannel *> getChannelList() const { return typecastItemList<ServerInfo_ChatChannel *>(); }
+	Event_ListRooms(const QList<ServerInfo_Room *> &_roomList = QList<ServerInfo_Room *>());
+	int getItemId() const { return ItemId_Event_ListRooms; }
+	static SerializableItem *newItem() { return new Event_ListRooms; }
+	QList<ServerInfo_Room *> getRoomList() const { return typecastItemList<ServerInfo_Room *>(); }
 };
 
-class Event_ChatListPlayers : public ChatEvent {
+class Event_JoinRoom : public RoomEvent {
 	Q_OBJECT
 public:
-	Event_ChatListPlayers(const QString &_channel = QString(), const QList<ServerInfo_User *> &_playerList = QList<ServerInfo_User *>());
-	int getItemId() const { return ItemId_Event_ChatListPlayers; }
-	static SerializableItem *newItem() { return new Event_ChatListPlayers; }
-	QList<ServerInfo_User *> getPlayerList() const { return typecastItemList<ServerInfo_User *>(); }
-};
-
-class Event_ChatJoinChannel : public ChatEvent {
-	Q_OBJECT
-public:
-	Event_ChatJoinChannel(const QString &_channel = QString(), ServerInfo_User *_info = 0);
-	int getItemId() const { return ItemId_Event_ChatJoinChannel; }
-	static SerializableItem *newItem() { return new Event_ChatJoinChannel; }
+	Event_JoinRoom(int _roomId = -1, ServerInfo_User *_info = 0);
+	int getItemId() const { return ItemId_Event_JoinRoom; }
+	static SerializableItem *newItem() { return new Event_JoinRoom; }
 	ServerInfo_User *getUserInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
 };
 
-class Event_ListGames : public GenericEvent {
+class Event_ListGames : public RoomEvent {
 	Q_OBJECT
 public:
-	Event_ListGames(const QList<ServerInfo_Game *> &_gameList = QList<ServerInfo_Game *>());
+	Event_ListGames(int _roomId = -1, const QList<ServerInfo_Game *> &_gameList = QList<ServerInfo_Game *>());
 	int getItemId() const { return ItemId_Event_ListGames; }
 	static SerializableItem *newItem() { return new Event_ListGames; }
 	QList<ServerInfo_Game *> getGameList() const { return typecastItemList<ServerInfo_Game *>(); }
@@ -389,9 +427,10 @@ public:
 class Event_Ping : public GameEvent {
 	Q_OBJECT
 public:
-	Event_Ping(const QList<ServerInfo_PlayerPing *> &_pingList = QList<ServerInfo_PlayerPing *>());
+	Event_Ping(int _secondsElapsed = -1, const QList<ServerInfo_PlayerPing *> &_pingList = QList<ServerInfo_PlayerPing *>());
 	static SerializableItem *newItem() { return new Event_Ping; }
 	int getItemId() const { return ItemId_Event_Ping; }
+	int getSecondsElapsed() const { return static_cast<SerializableItem_Int *>(itemMap.value("seconds_elapsed"))->getData(); }
 	QList<ServerInfo_PlayerPing *> getPingList() const { return typecastItemList<ServerInfo_PlayerPing *>(); }
 };
 

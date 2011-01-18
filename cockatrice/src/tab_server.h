@@ -3,132 +3,62 @@
 
 #include <QGroupBox>
 #include <QTreeWidget>
+#include <QTextBrowser>
 #include "tab.h"
-#include "protocol_datastructures.h"
 
 class AbstractClient;
-class QTreeView;
-class QTreeWidget;
-class QTreeWidgetItem;
-class QPushButton;
-class QCheckBox;
 class QTextEdit;
 class QLabel;
+class UserList;
+class QPushButton;
+class UserInfoBox;
 
-class GamesModel;
-class GamesProxyModel;
-
-class Event_ListGames;
-class Event_ListChatChannels;
+class Event_ListRooms;
 class Event_ServerMessage;
 class Event_UserJoined;
 class Event_UserLeft;
 class ProtocolResponse;
+class ServerInfo_User;
+class ServerInfo_Room;
 
-class GameSelector : public QGroupBox {
-	Q_OBJECT
-public:
-	GameSelector(AbstractClient *_client, QWidget *parent = 0);
-	void retranslateUi();
-private slots:
-	void processListGamesEvent(Event_ListGames *event);
-	void showFullGamesChanged(int state);
-	void actCreate();
-	void actJoin();
-	void checkResponse(ResponseCode response);
-signals:
-	void gameJoined(int gameId);
-private:
-	AbstractClient *client;
-
-	QTreeView *gameListView;
-	GamesModel *gameListModel;
-	GamesProxyModel *gameListProxyModel;
-	QPushButton *createButton, *joinButton, *spectateButton;
-	QCheckBox *showFullGamesCheckBox;
-};
-
-class ChatChannelSelector : public QGroupBox {
+class RoomSelector : public QGroupBox {
 	Q_OBJECT
 private:
-	QTreeWidget *channelList;
+	QTreeWidget *roomList;
 	QPushButton *joinButton;
 	AbstractClient *client;
 	
-	void joinChannel(const QString &channelName);
+	void joinRoom(int id, bool setCurrent);
 private slots:
-	void processListChatChannelsEvent(Event_ListChatChannels *event);
+	void processListRoomsEvent(Event_ListRooms *event);
 	void joinClicked();
-	void joinFinished(ResponseCode resp);
+	void joinFinished(ProtocolResponse *resp);
 signals:
-	void channelJoined(const QString &channelName);
+	void roomJoined(ServerInfo_Room *info, bool setCurrent);
 public:
-	ChatChannelSelector(AbstractClient *_client, QWidget *parent = 0);
-	void retranslateUi();
-};
-
-class ServerMessageLog : public QGroupBox {
-	Q_OBJECT
-private:
-	QTextEdit *textEdit;
-private slots:
-	void processServerMessageEvent(Event_ServerMessage *event);
-public:
-	ServerMessageLog(AbstractClient *_client, QWidget *parent = 0);
-	void retranslateUi();
-};
-
-class UserListTWI : public QTreeWidgetItem {
-public:
-	UserListTWI();
-	bool operator<(const QTreeWidgetItem &other) const;
-};
-
-class UserList : public QGroupBox {
-	Q_OBJECT
-private:
-	QTreeWidget *userTree;
-	void processUserInfo(ServerInfo_User *user);
-private slots:
-	void processResponse(ProtocolResponse *response);
-	void processUserJoinedEvent(Event_UserJoined *event);
-	void processUserLeftEvent(Event_UserLeft *event);
-	void userClicked(QTreeWidgetItem *item, int column);
-signals:
-	void openMessageDialog(const QString &userName, bool focus);
-	void userLeft(const QString &userName);
-public:
-	UserList(AbstractClient *_client, QWidget *parent = 0);
-	void retranslateUi();
-};
-
-class UserInfoBox : public QWidget {
-	Q_OBJECT
-private:
-	QLabel *avatarLabel, *nameLabel, *countryLabel1, *countryLabel2, *userLevelLabel1, *userLevelLabel2;
-private slots:
-	void processResponse(ProtocolResponse *response);
-public:
-	UserInfoBox(AbstractClient *_client, QWidget *parent = 0);
+	RoomSelector(AbstractClient *_client, QWidget *parent = 0);
 	void retranslateUi();
 };
 
 class TabServer : public Tab {
 	Q_OBJECT
 signals:
-	void chatChannelJoined(const QString &channelName);
-	void gameJoined(int gameId);
+	void roomJoined(ServerInfo_Room *info, bool setCurrent);
 	void openMessageDialog(const QString &userName, bool focus);
 	void userLeft(const QString &userName);
+private slots:
+	void processListUsersResponse(ProtocolResponse *response);
+	void processUserJoinedEvent(Event_UserJoined *event);
+	void processUserLeftEvent(Event_UserLeft *event);
+	void processServerMessageEvent(Event_ServerMessage *event);
 private:
 	AbstractClient *client;
-	GameSelector *gameSelector;
-	ChatChannelSelector *chatChannelSelector;
-	ServerMessageLog *serverMessageLog;
+	RoomSelector *roomSelector;
+	QTextBrowser *serverInfoBox;
 	UserList *userList;
 	UserInfoBox *userInfoBox;
 public:
-	TabServer(AbstractClient *_client, QWidget *parent = 0);
+	TabServer(AbstractClient *_client, ServerInfo_User *userInfo, QWidget *parent = 0);
 	void retranslateUi();
 	QString getTabText() const { return tr("Server"); }
 };

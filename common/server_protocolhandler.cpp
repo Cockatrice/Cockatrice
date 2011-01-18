@@ -3,7 +3,7 @@
 #include "server_protocolhandler.h"
 #include "protocol.h"
 #include "protocol_items.h"
-#include "server_chatchannel.h"
+#include "server_room.h"
 #include "server_card.h"
 #include "server_arrow.h"
 #include "server_cardzone.h"
@@ -14,7 +14,7 @@
 #include <QDateTime>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
-	: QObject(parent), server(_server), authState(PasswordWrong), acceptsGameListChanges(false), acceptsUserListChanges(false), acceptsChatChannelListChanges(false), userInfo(0), lastCommandTime(QDateTime::currentDateTime())
+	: QObject(parent), server(_server), authState(PasswordWrong), acceptsUserListChanges(false), acceptsRoomListChanges(false), userInfo(0), lastCommandTime(QDateTime::currentDateTime())
 {
 	connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
@@ -25,6 +25,10 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 	// so it will not receive the game update event.
 	server->removeClient(this);
 
+	QMapIterator<int, Server_Room *> roomIterator(rooms);
+	while (roomIterator.hasNext())
+		roomIterator.next().value()->removeClient(this);
+	
 	QMapIterator<int, QPair<Server_Game *, Server_Player *> > gameIterator(games);
 	while (gameIterator.hasNext()) {
 		gameIterator.next();
@@ -37,10 +41,6 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 			p->setProtocolHandler(0);
 	}
 
-	QMapIterator<QString, Server_ChatChannel *> chatChannelIterator(chatChannels);
-	while (chatChannelIterator.hasNext())
-		chatChannelIterator.next().value()->removeClient(this);
-	
 	delete userInfo;
 }
 
@@ -54,22 +54,26 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 {
 	lastCommandTime = QDateTime::currentDateTime();
 
-	ChatCommand *chatCommand = qobject_cast<ChatCommand *>(command);
-	GameCommand *gameCommand = qobject_cast<GameCommand *>(command);
-	if (chatCommand) {
-		qDebug() << "received ChatCommand: channel =" << chatCommand->getChannel();
+	RoomCommand *roomCommand = qobject_cast<RoomCommand *>(command);
+	if (roomCommand) {
+		qDebug() << "received RoomCommand: roomId =" << roomCommand->getRoomId();
 		if (authState == PasswordWrong)
 			return RespLoginNeeded;
 	
-		Server_ChatChannel *channel = chatChannels.value(chatCommand->getChannel(), 0);
-		if (!channel)
+		Server_Room *room = rooms.value(roomCommand->getRoomId(), 0);
+		if (!room)
 			return RespNameNotFound;
 		
 		switch (command->getItemId()) {
-			case ItemId_Command_ChatLeaveChannel: return cmdChatLeaveChannel(qobject_cast<Command_ChatLeaveChannel *>(command), cont, channel);
-			case ItemId_Command_ChatSay: return cmdChatSay(qobject_cast<Command_ChatSay *>(command), cont, channel);
+			case ItemId_Command_LeaveRoom: return cmdLeaveRoom(static_cast<Command_LeaveRoom *>(command), cont, room);
+			case ItemId_Command_RoomSay: return cmdRoomSay(static_cast<Command_RoomSay *>(command), cont, room);
+			case ItemId_Command_CreateGame: return cmdCreateGame(static_cast<Command_CreateGame *>(command), cont, room);
+			case ItemId_Command_JoinGame: return cmdJoinGame(static_cast<Command_JoinGame *>(command), cont, room);
+			default: return RespInvalidCommand;
 		}
-	} else if (gameCommand) {
+	}
+	GameCommand *gameCommand = qobject_cast<GameCommand *>(command);
+	if (gameCommand) {
 		qDebug() << "received GameCommand: game =" << gameCommand->getGameId();
 		if (authState == PasswordWrong)
 			return RespLoginNeeded;
@@ -83,57 +87,65 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 		Server_Player *player = gamePair.second;
 		
 		switch (command->getItemId()) {
-			case ItemId_Command_DeckSelect: return cmdDeckSelect(qobject_cast<Command_DeckSelect *>(command), cont, game, player);
-			case ItemId_Command_SetSideboardPlan: return cmdSetSideboardPlan(qobject_cast<Command_SetSideboardPlan *>(command), cont, game, player);
-			case ItemId_Command_LeaveGame: return cmdLeaveGame(qobject_cast<Command_LeaveGame *>(command), cont, game, player);
-			case ItemId_Command_ReadyStart: return cmdReadyStart(qobject_cast<Command_ReadyStart *>(command), cont, game, player);
-			case ItemId_Command_Concede: return cmdConcede(qobject_cast<Command_Concede *>(command), cont, game, player);
-			case ItemId_Command_Say: return cmdSay(qobject_cast<Command_Say *>(command), cont, game, player);
-			case ItemId_Command_Shuffle: return cmdShuffle(qobject_cast<Command_Shuffle *>(command), cont, game, player);
-			case ItemId_Command_Mulligan: return cmdMulligan(qobject_cast<Command_Mulligan *>(command), cont, game, player);
-			case ItemId_Command_RollDie: return cmdRollDie(qobject_cast<Command_RollDie *>(command), cont, game, player);
-			case ItemId_Command_DrawCards: return cmdDrawCards(qobject_cast<Command_DrawCards *>(command), cont, game, player);
-			case ItemId_Command_MoveCard: return cmdMoveCard(qobject_cast<Command_MoveCard *>(command), cont, game, player);
-			case ItemId_Command_FlipCard: return cmdFlipCard(qobject_cast<Command_FlipCard *>(command), cont, game, player);
-			case ItemId_Command_AttachCard: return cmdAttachCard(qobject_cast<Command_AttachCard *>(command), cont, game, player);
-			case ItemId_Command_CreateToken: return cmdCreateToken(qobject_cast<Command_CreateToken *>(command), cont, game, player);
-			case ItemId_Command_CreateArrow: return cmdCreateArrow(qobject_cast<Command_CreateArrow *>(command), cont, game, player);
-			case ItemId_Command_DeleteArrow: return cmdDeleteArrow(qobject_cast<Command_DeleteArrow *>(command), cont, game, player);
-			case ItemId_Command_SetCardAttr: return cmdSetCardAttr(qobject_cast<Command_SetCardAttr *>(command), cont, game, player);
-			case ItemId_Command_SetCardCounter: return cmdSetCardCounter(qobject_cast<Command_SetCardCounter *>(command), cont, game, player);
-			case ItemId_Command_IncCardCounter: return cmdIncCardCounter(qobject_cast<Command_IncCardCounter *>(command), cont, game, player);
-			case ItemId_Command_IncCounter: return cmdIncCounter(qobject_cast<Command_IncCounter *>(command), cont, game, player);
-			case ItemId_Command_CreateCounter: return cmdCreateCounter(qobject_cast<Command_CreateCounter *>(command), cont, game, player);
-			case ItemId_Command_SetCounter: return cmdSetCounter(qobject_cast<Command_SetCounter *>(command), cont, game, player);
-			case ItemId_Command_DelCounter: return cmdDelCounter(qobject_cast<Command_DelCounter *>(command), cont, game, player);
-			case ItemId_Command_NextTurn: return cmdNextTurn(qobject_cast<Command_NextTurn *>(command), cont, game, player);
-			case ItemId_Command_SetActivePhase: return cmdSetActivePhase(qobject_cast<Command_SetActivePhase *>(command), cont, game, player);
-			case ItemId_Command_DumpZone: return cmdDumpZone(qobject_cast<Command_DumpZone *>(command), cont, game, player);
-			case ItemId_Command_StopDumpZone: return cmdStopDumpZone(qobject_cast<Command_StopDumpZone *>(command), cont, game, player);
-			case ItemId_Command_RevealCards: return cmdRevealCards(qobject_cast<Command_RevealCards *>(command), cont, game, player);
-		}
-	} else {
-		qDebug() << "received generic Command";
-		switch (command->getItemId()) {
-			case ItemId_Command_Ping: return cmdPing(qobject_cast<Command_Ping *>(command), cont);
-			case ItemId_Command_Login: return cmdLogin(qobject_cast<Command_Login *>(command), cont);
-			case ItemId_Command_Message: return cmdMessage(qobject_cast<Command_Message *>(command), cont);
-			case ItemId_Command_DeckList: return cmdDeckList(qobject_cast<Command_DeckList *>(command), cont);
-			case ItemId_Command_DeckNewDir: return cmdDeckNewDir(qobject_cast<Command_DeckNewDir *>(command), cont);
-			case ItemId_Command_DeckDelDir: return cmdDeckDelDir(qobject_cast<Command_DeckDelDir *>(command), cont);
-			case ItemId_Command_DeckDel: return cmdDeckDel(qobject_cast<Command_DeckDel *>(command), cont);
-			case ItemId_Command_DeckUpload: return cmdDeckUpload(qobject_cast<Command_DeckUpload *>(command), cont);
-			case ItemId_Command_DeckDownload: return cmdDeckDownload(qobject_cast<Command_DeckDownload *>(command), cont);
-			case ItemId_Command_GetUserInfo: return cmdGetUserInfo(qobject_cast<Command_GetUserInfo *>(command), cont);
-			case ItemId_Command_ListChatChannels: return cmdListChatChannels(qobject_cast<Command_ListChatChannels *>(command), cont);
-			case ItemId_Command_ChatJoinChannel: return cmdChatJoinChannel(qobject_cast<Command_ChatJoinChannel *>(command), cont);
-			case ItemId_Command_ListUsers: return cmdListUsers(qobject_cast<Command_ListUsers *>(command), cont);
-			case ItemId_Command_ListGames: return cmdListGames(qobject_cast<Command_ListGames *>(command), cont);
-			case ItemId_Command_CreateGame: return cmdCreateGame(qobject_cast<Command_CreateGame *>(command), cont);
-			case ItemId_Command_JoinGame: return cmdJoinGame(qobject_cast<Command_JoinGame *>(command), cont);
+			case ItemId_Command_DeckSelect: return cmdDeckSelect(static_cast<Command_DeckSelect *>(command), cont, game, player);
+			case ItemId_Command_SetSideboardPlan: return cmdSetSideboardPlan(static_cast<Command_SetSideboardPlan *>(command), cont, game, player);
+			case ItemId_Command_LeaveGame: return cmdLeaveGame(static_cast<Command_LeaveGame *>(command), cont, game, player);
+			case ItemId_Command_ReadyStart: return cmdReadyStart(static_cast<Command_ReadyStart *>(command), cont, game, player);
+			case ItemId_Command_Concede: return cmdConcede(static_cast<Command_Concede *>(command), cont, game, player);
+			case ItemId_Command_Say: return cmdSay(static_cast<Command_Say *>(command), cont, game, player);
+			case ItemId_Command_Shuffle: return cmdShuffle(static_cast<Command_Shuffle *>(command), cont, game, player);
+			case ItemId_Command_Mulligan: return cmdMulligan(static_cast<Command_Mulligan *>(command), cont, game, player);
+			case ItemId_Command_RollDie: return cmdRollDie(static_cast<Command_RollDie *>(command), cont, game, player);
+			case ItemId_Command_DrawCards: return cmdDrawCards(static_cast<Command_DrawCards *>(command), cont, game, player);
+			case ItemId_Command_MoveCard: return cmdMoveCard(static_cast<Command_MoveCard *>(command), cont, game, player);
+			case ItemId_Command_FlipCard: return cmdFlipCard(static_cast<Command_FlipCard *>(command), cont, game, player);
+			case ItemId_Command_AttachCard: return cmdAttachCard(static_cast<Command_AttachCard *>(command), cont, game, player);
+			case ItemId_Command_CreateToken: return cmdCreateToken(static_cast<Command_CreateToken *>(command), cont, game, player);
+			case ItemId_Command_CreateArrow: return cmdCreateArrow(static_cast<Command_CreateArrow *>(command), cont, game, player);
+			case ItemId_Command_DeleteArrow: return cmdDeleteArrow(static_cast<Command_DeleteArrow *>(command), cont, game, player);
+			case ItemId_Command_SetCardAttr: return cmdSetCardAttr(static_cast<Command_SetCardAttr *>(command), cont, game, player);
+			case ItemId_Command_SetCardCounter: return cmdSetCardCounter(static_cast<Command_SetCardCounter *>(command), cont, game, player);
+			case ItemId_Command_IncCardCounter: return cmdIncCardCounter(static_cast<Command_IncCardCounter *>(command), cont, game, player);
+			case ItemId_Command_IncCounter: return cmdIncCounter(static_cast<Command_IncCounter *>(command), cont, game, player);
+			case ItemId_Command_CreateCounter: return cmdCreateCounter(static_cast<Command_CreateCounter *>(command), cont, game, player);
+			case ItemId_Command_SetCounter: return cmdSetCounter(static_cast<Command_SetCounter *>(command), cont, game, player);
+			case ItemId_Command_DelCounter: return cmdDelCounter(static_cast<Command_DelCounter *>(command), cont, game, player);
+			case ItemId_Command_NextTurn: return cmdNextTurn(static_cast<Command_NextTurn *>(command), cont, game, player);
+			case ItemId_Command_SetActivePhase: return cmdSetActivePhase(static_cast<Command_SetActivePhase *>(command), cont, game, player);
+			case ItemId_Command_DumpZone: return cmdDumpZone(static_cast<Command_DumpZone *>(command), cont, game, player);
+			case ItemId_Command_StopDumpZone: return cmdStopDumpZone(static_cast<Command_StopDumpZone *>(command), cont, game, player);
+			case ItemId_Command_RevealCards: return cmdRevealCards(static_cast<Command_RevealCards *>(command), cont, game, player);
+			default: return RespInvalidCommand;
 		}
 	}
-	return RespInvalidCommand;
+	AdminCommand *adminCommand = qobject_cast<AdminCommand *>(command);
+	if (adminCommand) {
+		qDebug() << "received AdminCommand";
+		if (!(userInfo->getUserLevel() & ServerInfo_User::IsAdmin))
+			return RespLoginNeeded;
+		
+		switch (command->getItemId()) {
+			case ItemId_Command_UpdateServerMessage: return cmdUpdateServerMessage(static_cast<Command_UpdateServerMessage *>(command), cont);
+			default: return RespInvalidCommand;
+		}
+	}
+	qDebug() << "received generic Command";
+	switch (command->getItemId()) {
+		case ItemId_Command_Ping: return cmdPing(static_cast<Command_Ping *>(command), cont);
+		case ItemId_Command_Login: return cmdLogin(static_cast<Command_Login *>(command), cont);
+		case ItemId_Command_Message: return cmdMessage(static_cast<Command_Message *>(command), cont);
+		case ItemId_Command_DeckList: return cmdDeckList(static_cast<Command_DeckList *>(command), cont);
+		case ItemId_Command_DeckNewDir: return cmdDeckNewDir(static_cast<Command_DeckNewDir *>(command), cont);
+		case ItemId_Command_DeckDelDir: return cmdDeckDelDir(static_cast<Command_DeckDelDir *>(command), cont);
+		case ItemId_Command_DeckDel: return cmdDeckDel(static_cast<Command_DeckDel *>(command), cont);
+		case ItemId_Command_DeckUpload: return cmdDeckUpload(static_cast<Command_DeckUpload *>(command), cont);
+		case ItemId_Command_DeckDownload: return cmdDeckDownload(static_cast<Command_DeckDownload *>(command), cont);
+		case ItemId_Command_GetUserInfo: return cmdGetUserInfo(static_cast<Command_GetUserInfo *>(command), cont);
+		case ItemId_Command_ListRooms: return cmdListRooms(static_cast<Command_ListRooms *>(command), cont);
+		case ItemId_Command_JoinRoom: return cmdJoinRoom(static_cast<Command_JoinRoom *>(command), cont);
+		case ItemId_Command_ListUsers: return cmdListUsers(static_cast<Command_ListUsers *>(command), cont);
+		default: return RespInvalidCommand;
+	}
 }
 
 void Server_ProtocolHandler::processCommandContainer(CommandContainer *cont)
@@ -235,8 +247,9 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 				}
 		}
 	}
-
-	return RespOk;
+	
+	cont->setResponse(new Response_Login(cont->getCmdId(), RespOk, new ServerInfo_User(userInfo, true)));
+	return RespNothing;
 }
 
 ResponseCode Server_ProtocolHandler::cmdMessage(Command_Message *cmd, CommandContainer *cont)
@@ -266,58 +279,59 @@ ResponseCode Server_ProtocolHandler::cmdGetUserInfo(Command_GetUserInfo *cmd, Co
 		Server_ProtocolHandler *handler = server->getUsers().value(cmd->getUserName());
 		if (!handler)
 			return RespNameNotFound;
-		result = handler->getUserInfo();
+		result = new ServerInfo_User(handler->getUserInfo());
 	}
-		
+	
 	cont->setResponse(new Response_GetUserInfo(cont->getCmdId(), RespOk, result));
 	return RespNothing;
 }
 
-ResponseCode Server_ProtocolHandler::cmdListChatChannels(Command_ListChatChannels * /*cmd*/, CommandContainer *cont)
+ResponseCode Server_ProtocolHandler::cmdListRooms(Command_ListRooms * /*cmd*/, CommandContainer *cont)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
 	
-	QList<ServerInfo_ChatChannel *> eventChannelList;
-	QMapIterator<QString, Server_ChatChannel *> channelIterator(server->getChatChannels());
-	while (channelIterator.hasNext()) {
-		Server_ChatChannel *c = channelIterator.next().value();
-		eventChannelList.append(new ServerInfo_ChatChannel(c->getName(), c->getDescription(), c->size(), c->getAutoJoin()));
-	}
-	cont->enqueueItem(new Event_ListChatChannels(eventChannelList));
+	QList<ServerInfo_Room *> eventRoomList;
+	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
+	while (roomIterator.hasNext())
+		eventRoomList.append(roomIterator.next().value()->getInfo(false));
+	cont->enqueueItem(new Event_ListRooms(eventRoomList));
 	
-	acceptsChatChannelListChanges = true;
+	acceptsRoomListChanges = true;
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdChatJoinChannel(Command_ChatJoinChannel *cmd, CommandContainer *cont)
+ResponseCode Server_ProtocolHandler::cmdJoinRoom(Command_JoinRoom *cmd, CommandContainer *cont)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
 	
-	if (chatChannels.contains(cmd->getChannel()))
+	if (rooms.contains(cmd->getRoomId()))
 		return RespContextError;
 	
-	QMap<QString, Server_ChatChannel *> allChannels = server->getChatChannels();
-	Server_ChatChannel *c = allChannels.value(cmd->getChannel(), 0);
-	if (!c)
+	Server_Room *r = server->getRooms().value(cmd->getRoomId(), 0);
+	if (!r)
 		return RespNameNotFound;
 
-	c->addClient(this);
-	chatChannels.insert(cmd->getChannel(), c);
+	r->addClient(this);
+	rooms.insert(r->getId(), r);
+	
+	enqueueProtocolItem(new Event_RoomSay(r->getId(), QString(), r->getJoinMessage()));
+	
+	cont->setResponse(new Response_JoinRoom(cont->getCmdId(), RespOk, r->getInfo(true)));
+	return RespNothing;
+}
+
+ResponseCode Server_ProtocolHandler::cmdLeaveRoom(Command_LeaveRoom * /*cmd*/, CommandContainer *cont, Server_Room *room)
+{
+	rooms.remove(room->getId());
+	room->removeClient(this);
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdChatLeaveChannel(Command_ChatLeaveChannel * /*cmd*/, CommandContainer *cont, Server_ChatChannel *channel)
+ResponseCode Server_ProtocolHandler::cmdRoomSay(Command_RoomSay *cmd, CommandContainer *cont, Server_Room *room)
 {
-	chatChannels.remove(channel->getName());
-	channel->removeClient(this);
-	return RespOk;
-}
-
-ResponseCode Server_ProtocolHandler::cmdChatSay(Command_ChatSay *cmd, CommandContainer *cont, Server_ChatChannel *channel)
-{
-	channel->say(this, cmd->getMessage());
+	room->say(this, cmd->getMessage());
 	return RespOk;
 }
 
@@ -329,7 +343,7 @@ ResponseCode Server_ProtocolHandler::cmdListUsers(Command_ListUsers * /*cmd*/, C
 	QList<ServerInfo_User *> resultList;
 	QMapIterator<QString, Server_ProtocolHandler *> userIterator = server->getUsers();
 	while (userIterator.hasNext())
-		resultList.append(new ServerInfo_User(userIterator.next().value()->getUserInfo()));
+		resultList.append(new ServerInfo_User(userIterator.next().value()->getUserInfo(), false));
 	
 	acceptsUserListChanges = true;
 	
@@ -337,39 +351,12 @@ ResponseCode Server_ProtocolHandler::cmdListUsers(Command_ListUsers * /*cmd*/, C
 	return RespNothing;
 }
 
-ResponseCode Server_ProtocolHandler::cmdListGames(Command_ListGames * /*cmd*/, CommandContainer *cont)
+ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, CommandContainer *cont, Server_Room *room)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
 	
-	const QList<Server_Game *> &gameList = server->getGames();
-	QList<ServerInfo_Game *> eventGameList;
-	for (int i = 0; i < gameList.size(); ++i) {
-		Server_Game *g = gameList[i];
-		eventGameList.append(new ServerInfo_Game(
-			g->getGameId(),
-			g->getDescription(),
-			!g->getPassword().isEmpty(),
-			g->getPlayerCount(),
-			g->getMaxPlayers(),
-			new ServerInfo_User(g->getCreatorInfo()),
-			g->getSpectatorsAllowed(),
-			g->getSpectatorsNeedPassword(),
-			g->getSpectatorCount()
-		));
-	}
-	cont->enqueueItem(new Event_ListGames(eventGameList));
-	
-	acceptsGameListChanges = true;
-	return RespOk;
-}
-
-ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, CommandContainer *cont)
-{
-	if (authState == PasswordWrong)
-		return RespLoginNeeded;
-	
-	Server_Game *game = server->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
+	Server_Game *game = room->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
 	Server_Player *creator = game->getPlayers().values().first();
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	
@@ -378,7 +365,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandContainer *cont)
+ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandContainer *cont, Server_Room *room)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
@@ -386,7 +373,7 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandC
 	if (games.contains(cmd->getGameId()))
 		return RespContextError;
 	
-	Server_Game *g = server->getGame(cmd->getGameId());
+	Server_Game *g = room->getGames().value(cmd->getGameId());
 	if (!g)
 		return RespNameNotFound;
 		
@@ -503,21 +490,19 @@ ResponseCode Server_ProtocolHandler::cmdMulligan(Command_Mulligan * /*cmd*/, Com
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
-	int number = player->getInitialCards();
-	if (!number)
-		return RespContextError;
-
+	
 	Server_CardZone *hand = player->getZones().value("hand");
+	int number = (hand->cards.size() <= 1) ? player->getInitialCards() : hand->cards.size() - 1;
+		
+	Server_CardZone *deck = player->getZones().value("deck");
 	while (!hand->cards.isEmpty())
-		moveCard(game, player, cont, "hand", hand->cards.first()->getId(), "deck", 0, 0, false, false);
+		player->moveCard(cont, hand, QList<int>() << hand->cards.first()->getId(), deck, 0, 0, false, false);
 
-	player->getZones().value("deck")->shuffle();
+	deck->shuffle();
 	cont->enqueueGameEventPrivate(new Event_Shuffle(player->getPlayerId()), game->getGameId());
 	cont->enqueueGameEventPublic(new Event_Shuffle(player->getPlayerId()), game->getGameId());
 
 	drawCards(game, player, cont, number);
-	player->setInitialCards(number - 1);
 
 	return RespOk;
 }
@@ -565,130 +550,21 @@ ResponseCode Server_ProtocolHandler::cmdDrawCards(Command_DrawCards *cmd, Comman
 	return drawCards(game, player, cont, cmd->getNumber());
 }
 
-ResponseCode Server_ProtocolHandler::moveCard(Server_Game *game, Server_Player *player, CommandContainer *cont, const QString &_startZone, int _cardId, const QString &_targetZone, int x, int y, bool faceDown, bool tapped)
+
+ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
-	Server_CardZone *startzone = player->getZones().value(_startZone);
-	Server_CardZone *targetzone = player->getZones().value(_targetZone);
-	if ((!startzone) || (!targetzone))
-		return RespNameNotFound;
-
-	// Collision detection
-	if (targetzone->hasCoords())
-		for (int i = 0; i < targetzone->cards.size(); ++i)
-			if ((targetzone->cards[i]->getX() == x) && (targetzone->cards[i]->getY() == y) && (x != -1))
-				return RespContextError;
-		
-	int position = -1;
-	Server_Card *card = startzone->getCard(_cardId, true, &position);
-	if (!card)
-		return RespNameNotFound;
 	
-	if (startzone != targetzone) {
-		// Delete all attachment relationships
-		if (card->getParentCard())
-			card->setParentCard(0);
-		
-		const QList<Server_Card *> &attachedCards = card->getAttachedCards();
-		for (int i = 0; i < attachedCards.size(); ++i)
-			unattachCard(game, attachedCards[i]->getZone()->getPlayer(), cont, attachedCards[i]);
-
-		// Delete all arrows from and to the card
-		const QList<Server_Player *> &players = game->getPlayers().values();
-		for (int i = 0; i < players.size(); ++i) {
-			QList<int> arrowsToDelete;
-			QMapIterator<int, Server_Arrow *> arrowIterator(players[i]->getArrows());
-			while (arrowIterator.hasNext()) {
-				Server_Arrow *arrow = arrowIterator.next().value();
-				if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card))
-					arrowsToDelete.append(arrow->getId());
-			}
-			for (int j = 0; j < arrowsToDelete.size(); ++j)
-				players[i]->deleteArrow(arrowsToDelete[j]);
-		}
-	}
+	QList<int> cardIds;
+	const QList<CardId *> &temp = cmd->getCardIds();
+	for (int i = 0; i < temp.size(); ++i)
+		cardIds.append(temp[i]->getData());
 	
-	if (card->getDestroyOnZoneChange() && (startzone != targetzone)) {
-		cont->enqueueGameEventPrivate(new Event_DestroyCard(player->getPlayerId(), startzone->getName(), card->getId()), game->getGameId());
-		cont->enqueueGameEventPublic(new Event_DestroyCard(player->getPlayerId(), startzone->getName(), card->getId()), game->getGameId());
-		return RespOk;
-	}
-	
-	if (!targetzone->hasCoords()) {
-		y = 0;
-		if (x == -1)
-			x = targetzone->cards.size();
-		
-		card->resetState();
-	} else if (x == -1)
-		x = targetzone->getFreeGridColumn(y);
-
-	targetzone->insertCard(card, x, y);
-
-	bool targetBeingLookedAt = (targetzone->getType() != HiddenZone) || (targetzone->getCardsBeingLookedAt() > x) || (targetzone->getCardsBeingLookedAt() == -1);
-	bool sourceBeingLookedAt = (startzone->getType() != HiddenZone) || (startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1);
-
-	bool targetHiddenToPlayer = faceDown || !targetBeingLookedAt;
-	bool targetHiddenToOthers = faceDown || (targetzone->getType() != PublicZone);
-	bool sourceHiddenToPlayer = card->getFaceDown() || !sourceBeingLookedAt;
-	bool sourceHiddenToOthers = card->getFaceDown() || (startzone->getType() != PublicZone);
-
-	QString privateCardName, publicCardName;
-	if (!(sourceHiddenToPlayer && targetHiddenToPlayer))
-		privateCardName = card->getName();
-	if (!(sourceHiddenToOthers && targetHiddenToOthers))
-		publicCardName = card->getName();
-
-	int oldCardId = card->getId();
-	if (faceDown)
-		card->setId(player->newCardId());
-	card->setFaceDown(faceDown);
-
-	// The player does not get to see which card he moved if it moves between two parts of hidden zones which
-	// are not being looked at.
-	int privateNewCardId = card->getId();
-	int privateOldCardId = oldCardId;
-	if (!targetBeingLookedAt && !sourceBeingLookedAt) {
-		privateOldCardId = -1;
-		privateNewCardId = -1;
-		privateCardName = QString();
-	}
-	int privatePosition = -1;
-	if (startzone->getType() == HiddenZone)
-		privatePosition = position;
-	cont->enqueueGameEventPrivate(new Event_MoveCard(player->getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getName(), x, y, privateNewCardId, faceDown), game->getGameId());
-	cont->enqueueGameEventOmniscient(new Event_MoveCard(player->getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getName(), x, y, privateNewCardId, faceDown), game->getGameId());
-
-	// Other players do not get to see the start and/or target position of the card if the respective
-	// part of the zone is being looked at. The information is not needed anyway because in hidden zones,
-	// all cards are equal.
-	if (
-		((startzone->getType() == HiddenZone) && ((startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1)))
-		|| (startzone->getType() == PublicZone)
-	)
-		position = -1;
-	if ((targetzone->getType() == HiddenZone) && ((targetzone->getCardsBeingLookedAt() > x) || (targetzone->getCardsBeingLookedAt() == -1)))
-		x = -1;
-
-	if ((startzone->getType() == PublicZone) || (targetzone->getType() == PublicZone))
-		cont->enqueueGameEventPublic(new Event_MoveCard(player->getPlayerId(), oldCardId, publicCardName, startzone->getName(), position, targetzone->getName(), x, y, card->getId(), faceDown), game->getGameId());
-	else
-		cont->enqueueGameEventPublic(new Event_MoveCard(player->getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getName(), x, y, -1, false), game->getGameId());
-	
-	if (tapped)
-		setCardAttrHelper(cont, game, player, targetzone->getName(), card->getId(), "tapped", "1");
-	
-	return RespOk;
-}
-
-ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
-{
-	return moveCard(game, player, cont, cmd->getStartZone(), cmd->getCardId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown(), cmd->getTapped());
+	return player->moveCard(cont, cmd->getStartZone(), cardIds, cmd->getTargetPlayerId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown(), cmd->getTapped());
 }
 
 ResponseCode Server_ProtocolHandler::cmdFlipCard(Command_FlipCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
@@ -718,17 +594,6 @@ ResponseCode Server_ProtocolHandler::cmdFlipCard(Command_FlipCard *cmd, CommandC
 	cont->enqueueGameEventPublic(new Event_FlipCard(player->getPlayerId(), zone->getName(), card->getId(), card->getName(), faceDown), game->getGameId());
 	
 	return RespOk;
-}
-
-void Server_ProtocolHandler::unattachCard(Server_Game *game, Server_Player *player, CommandContainer *cont, Server_Card *card)
-{
-	Server_CardZone *zone = card->getZone();
-	
-	card->setParentCard(0);
-	cont->enqueueGameEventPrivate(new Event_AttachCard(player->getPlayerId(), zone->getName(), card->getId(), -1, QString(), -1), game->getGameId());
-	cont->enqueueGameEventPublic(new Event_AttachCard(player->getPlayerId(), zone->getName(), card->getId(), -1, QString(), -1), game->getGameId());
-	
-	moveCard(game, player, cont, zone->getName(), card->getId(), zone->getName(), -1, card->getY(), card->getFaceDown(), card->getTapped());
 }
 
 ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
@@ -796,14 +661,17 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 		// Unattach all cards attached to the card being attached.
 		const QList<Server_Card *> &attachedList = card->getAttachedCards();
 		for (int i = 0; i < attachedList.size(); ++i)
-			unattachCard(game, player, cont, attachedList[i]);
+			player->unattachCard(cont, attachedList[i]);
+		
+		if (targetzone->isColumnStacked(targetCard->getX(), targetCard->getY()))
+			targetPlayer->moveCard(cont, targetzone, QList<int>() << targetCard->getId(), targetzone, targetzone->getFreeGridColumn(-2, targetCard->getY(), targetCard->getName()), targetCard->getY(), targetCard->getFaceDown(), false);
 		
 		card->setParentCard(targetCard);
 		card->setCoords(-1, card->getY());
 		cont->enqueueGameEventPrivate(new Event_AttachCard(player->getPlayerId(), startzone->getName(), card->getId(), targetPlayer->getPlayerId(), targetzone->getName(), targetCard->getId()), game->getGameId());
 		cont->enqueueGameEventPublic(new Event_AttachCard(player->getPlayerId(), startzone->getName(), card->getId(), targetPlayer->getPlayerId(), targetzone->getName(), targetCard->getId()), game->getGameId());
 	} else
-		unattachCard(game, player, cont, card);
+		player->unattachCard(cont, card);
 	
 	return RespOk;
 }
@@ -822,8 +690,8 @@ ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, Co
 
 	int x = cmd->getX();
 	int y = cmd->getY();
-	if (zone->hasCoords() && (x == -1))
-		x = zone->getFreeGridColumn(y);
+	if (zone->hasCoords())
+		x = zone->getFreeGridColumn(x, y, cmd->getCardName());
 	if (x < 0)
 		x = 0;
 	if (y < 0)
@@ -917,7 +785,7 @@ ResponseCode Server_ProtocolHandler::cmdDeleteArrow(Command_DeleteArrow *cmd, Co
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::setCardAttrHelper(CommandContainer *cont, Server_Game *game, Server_Player *player, const QString &zoneName, int cardId, const QString &attrName, const QString &attrValue)
+ResponseCode Server_ProtocolHandler::cmdSetCardAttr(Command_SetCardAttr *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -925,33 +793,7 @@ ResponseCode Server_ProtocolHandler::setCardAttrHelper(CommandContainer *cont, S
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
 		
-	Server_CardZone *zone = player->getZones().value(zoneName);
-	if (!zone)
-		return RespNameNotFound;
-	if (!zone->hasCoords())
-		return RespContextError;
-
-	if (cardId == -1) {
-		QListIterator<Server_Card *> CardIterator(zone->cards);
-		while (CardIterator.hasNext())
-			if (!CardIterator.next()->setAttribute(attrName, attrValue, true))
-				return RespInvalidCommand;
-	} else {
-		Server_Card *card = zone->getCard(cardId, false);
-		if (!card)
-			return RespNameNotFound;
-		if (!card->setAttribute(attrName, attrValue, false))
-			return RespInvalidCommand;
-	}
-	cont->enqueueGameEventPrivate(new Event_SetCardAttr(player->getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
-	cont->enqueueGameEventPublic(new Event_SetCardAttr(player->getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
-	cont->enqueueGameEventOmniscient(new Event_SetCardAttr(player->getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
-	return RespOk;
-}
-
-ResponseCode Server_ProtocolHandler::cmdSetCardAttr(Command_SetCardAttr *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
-{
-	return setCardAttrHelper(cont, game, player, cmd->getZone(), cmd->getCardId(), cmd->getAttrName(), cmd->getAttrValue());
+	return player->setCardAttrHelper(cont, cmd->getZone(), cmd->getCardId(), cmd->getAttrName(), cmd->getAttrValue());
 }
 
 ResponseCode Server_ProtocolHandler::cmdSetCardCounter(Command_SetCardCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)

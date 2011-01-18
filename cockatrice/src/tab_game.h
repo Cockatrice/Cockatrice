@@ -99,6 +99,7 @@ private:
 	CardInfoWidget *infoPopup;
 	CardInfoWidget *cardInfo;
 	PlayerListWidget *playerListWidget;
+	QLabel *timeElapsedLabel;
 	MessageLogWidget *messageLog;
 	QLabel *sayLabel;
 	QLineEdit *sayEdit;

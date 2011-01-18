@@ -12,8 +12,9 @@ class ZoneViewZone;
 class QMenu;
 class QAction;
 class QPainter;
+class CardDragItem;
 
-class CardZone : public QObject, public AbstractGraphicsItem {
+class CardZone : public AbstractGraphicsItem {
 	Q_OBJECT
 protected:
 	Player *player;
@@ -34,7 +35,7 @@ public slots:
 public:
 	enum { Type = typeZone };
 	int type() const { return Type; }
-	virtual void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown) = 0;
+	virtual void handleDropEvent(const QList<CardDragItem *> &dragItem, CardZone *startZone, const QPoint &dropPoint, bool faceDown) = 0;
 	CardZone(Player *_player, const QString &_name, bool _hasCardAttr, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent = 0, bool isView = false);
 	~CardZone();
 	void retranslateUi();
@@ -53,6 +54,7 @@ public:
 	CardItem *getCard(int cardId, const QString &cardName);
 	// takeCard() finds a card by position and removes it from the zone and from all of its views.
 	virtual CardItem *takeCard(int position, int cardId, bool canResize = true);
+	void removeCard(CardItem *card);
 	ZoneViewZone *getView() const { return view; }
 	void setView(ZoneViewZone *_view) { view = _view; }
 	virtual void reorganizeCards() = 0;

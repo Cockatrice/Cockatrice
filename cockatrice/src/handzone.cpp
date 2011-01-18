@@ -3,9 +3,10 @@
 #include "settingscache.h"
 #include "player.h"
 #include "protocol_items.h"
+#include "carddragitem.h"
 
 HandZone::HandZone(Player *_p, bool _contentsKnown, int _zoneHeight, QGraphicsItem *parent)
-	: CardZone(_p, "hand", false, false, _contentsKnown, parent), zoneHeight(_zoneHeight)
+	: SelectZone(_p, "hand", false, false, _contentsKnown, parent), zoneHeight(_zoneHeight)
 {
 	connect(settingsCache, SIGNAL(handBgPathChanged()), this, SLOT(updateBgPixmap()));
 	updateBgPixmap();
@@ -36,9 +37,13 @@ void HandZone::addCardImpl(CardItem *card, int x, int /*y*/)
 	card->update();
 }
 
-void HandZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
+void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
-	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), cardId, getName(), cards.size(), -1, false));
+	QList<CardId *> idList;
+	for (int i = 0; i < dragItems.size(); ++i)
+		idList.append(new CardId(dragItems[i]->getId()));
+
+	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), cards.size(), -1, false));
 }
 
 QRectF HandZone::boundingRect() const
@@ -65,7 +70,7 @@ void HandZone::reorganizeCards()
 			const int xPadding = 5;
 			qreal totalWidth = boundingRect().width() - 2 * xPadding;
 			qreal cardWidth = cards.at(0)->boundingRect().width();
-		
+			
 			for (int i = 0; i < cardCount; i++) {
 				CardItem *c = cards.at(i);
 	

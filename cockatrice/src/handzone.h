@@ -1,9 +1,9 @@
 #ifndef HANDZONE_H
 #define HANDZONE_H
 
-#include "cardzone.h"
+#include "selectzone.h"
 
-class HandZone : public CardZone {
+class HandZone : public SelectZone {
 	Q_OBJECT
 private:
 	qreal width, zoneHeight;
@@ -14,7 +14,7 @@ public slots:
 	void updateOrientation();
 public:
 	HandZone(Player *_p, bool _contentsKnown, int _zoneHeight, QGraphicsItem *parent = 0);
-	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
+	void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	void reorganizeCards();

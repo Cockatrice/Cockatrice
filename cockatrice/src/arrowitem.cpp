@@ -13,7 +13,7 @@
 ArrowItem::ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &_color)
         : QGraphicsItem(), player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), color(_color), fullColor(true)
 {
-	qDebug() << "ArrowItem constructor: startItem=" << startItem;
+	qDebug() << "ArrowItem constructor: startItem=" << static_cast<QGraphicsItem *>(startItem);
 	setZValue(2000000005);
 	
 	if (startItem)
@@ -154,7 +154,7 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	
 	QList<QGraphicsItem *> colliding = scene()->items(endPos);
 	ArrowTarget *cursorItem = 0;
-	int cursorItemZ = -1;
+	qreal cursorItemZ = -1;
 	for (int i = colliding.size() - 1; i >= 0; i--)
 		if (qgraphicsitem_cast<PlayerTarget *>(colliding.at(i)) || qgraphicsitem_cast<CardItem *>(colliding.at(i)))
 			if (colliding.at(i)->zValue() > cursorItemZ) {
@@ -243,11 +243,14 @@ void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	
 	QList<QGraphicsItem *> colliding = scene()->items(endPos);
         ArrowTarget *cursorItem = 0;
+	qreal cursorItemZ = -1;
         for (int i = colliding.size() - 1; i >= 0; i--)
-                if (qgraphicsitem_cast<CardItem *>(colliding.at(i))) {
-			cursorItem = static_cast<ArrowTarget *>(colliding.at(i));
-                        break;
-		}
+                if (qgraphicsitem_cast<CardItem *>(colliding.at(i)))
+			if (colliding.at(i)->zValue() > cursorItemZ) {
+				cursorItem = static_cast<ArrowTarget *>(colliding.at(i));
+				cursorItemZ = cursorItem->zValue();
+			}
+			
 	if ((cursorItem != targetItem) && targetItem)
 		targetItem->setBeingPointedAt(false);
         if (!cursorItem) {

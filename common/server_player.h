@@ -5,20 +5,24 @@
 #include <QString>
 #include <QList>
 #include <QMap>
+#include "protocol_datastructures.h"
 
 class DeckList;
 class Server_Game;
 class Server_CardZone;
 class Server_Counter;
 class Server_Arrow;
+class Server_Card;
 class Server_ProtocolHandler;
 class ProtocolItem;
 class ServerInfo_User;
 class ServerInfo_PlayerProperties;
+class CommandContainer;
 
 class Server_Player : public Server_ArrowTarget {
 	Q_OBJECT
 private:
+	class MoveCardCompareFunctor;
 	Server_Game *game;
 	Server_ProtocolHandler *handler;
 	ServerInfo_User *userInfo;
@@ -70,6 +74,11 @@ public:
 	
 	void clearZones();
 	void setupZones();
+
+	ResponseCode moveCard(CommandContainer *cont, const QString &_startZone, const QList<int> &_cardId, int _targetPlayer, const QString &_targetZone, int _x, int _y, bool _faceDown, bool _tapped);
+	ResponseCode moveCard(CommandContainer *cont, Server_CardZone *startzone, const QList<int> &_cardId, Server_CardZone *targetzone, int x, int y, bool faceDown, bool tapped);
+	void unattachCard(CommandContainer *cont, Server_Card *card);
+	ResponseCode setCardAttrHelper(CommandContainer *cont, const QString &zone, int cardId, const QString &attrName, const QString &attrValue);
 
 	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
 };

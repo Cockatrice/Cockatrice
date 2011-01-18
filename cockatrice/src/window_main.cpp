@@ -64,13 +64,16 @@ void MainWindow::statusChanged(ClientStatus _status)
 			aConnect->setEnabled(false);
 			aDisconnect->setEnabled(true);
 			break;
-		case StatusLoggedIn: {
-			tabSupervisor->start(client);
+		case StatusLoggedIn:
 			break;
-		}
 		default:
 			break;
 	}
+}
+
+void MainWindow::userInfoReceived(ServerInfo_User *info)
+{
+	tabSupervisor->start(client, info);
 }
 
 // Actions
@@ -110,7 +113,7 @@ void MainWindow::actSinglePlayer()
 	}
 	tabSupervisor->startLocal(localClients);
 	
-	Command_CreateGame *createCommand = new Command_CreateGame(QString(), QString(), numberPlayers, false, false, false, false);
+	Command_CreateGame *createCommand = new Command_CreateGame(0, QString(), QString(), numberPlayers, false, false, false, false);
 	mainClient->sendCommand(createCommand);
 }
 
@@ -150,7 +153,17 @@ void MainWindow::actExit()
 
 void MainWindow::actAbout()
 {
-	QMessageBox::about(this, tr("About Cockatrice"), trUtf8("<font size=\"8\"><b>Cockatrice</b></font><br>Version %1<br><br><br><b>Authors:</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br>Marius van Zundert<br><br><b>Translators:</b><br>Spanish: Gocho<br>Portugese: Milton Gonçalves<br>").arg(versionString));
+	QMessageBox::about(this, tr("About Cockatrice"), QString(
+		"<font size=\"8\"><b>Cockatrice</b></font><br>"
+		+ tr("Version %1").arg(versionString)
+		+ "<br><br><br><b>" + tr("Authors:") + "</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>"
+		+ "<b>" + tr("Translators:") + "</b><br>"
+		+ tr("Spanish:") + " Víctor Martínez<br>"
+		+ tr("Portugese (Portugal):") + " Milton Gonçalves<br>"
+		+ tr("Portugese (Brazil):") + " Thiago Queiroz<br>"
+		+ tr("French:") + " Yannick Hammer<br>"
+		+ tr("Japanese:") + " Takumi Nakase<br>"
+	));
 }
 
 void MainWindow::serverTimeout()
@@ -260,6 +273,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
 	connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
 	connect(client, SIGNAL(protocolVersionMismatch(int, int)), this, SLOT(protocolVersionMismatch(int, int)));
+	connect(client, SIGNAL(userInfoChanged(ServerInfo_User *)), this, SLOT(userInfoReceived(ServerInfo_User *)));
 
 	tabSupervisor = new TabSupervisor;
 	connect(tabSupervisor, SIGNAL(setMenu(QMenu *)), this, SLOT(updateTabMenu(QMenu *)));

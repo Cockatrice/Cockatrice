@@ -11,8 +11,8 @@
 #include "dlg_creategame.h"
 #include "protocol_items.h"
 
-DlgCreateGame::DlgCreateGame(AbstractClient *_client, QWidget *parent)
-	: QDialog(parent), client(_client)
+DlgCreateGame::DlgCreateGame(AbstractClient *_client, int _roomId, QWidget *parent)
+	: QDialog(parent), client(_client), roomId(_roomId)
 {
 	descriptionLabel = new QLabel(tr("&Description:"));
 	descriptionEdit = new QLineEdit;
@@ -77,6 +77,7 @@ DlgCreateGame::DlgCreateGame(AbstractClient *_client, QWidget *parent)
 void DlgCreateGame::actOK()
 {
 	Command_CreateGame *createCommand = new Command_CreateGame(
+		roomId,
 		descriptionEdit->text(),
 		passwordEdit->text(),
 		maxPlayersEdit->value(),

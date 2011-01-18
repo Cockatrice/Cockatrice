@@ -11,7 +11,7 @@ class QMenu;
 class QAction;
 class ZoneViewZone;
 class TabGame;
-class Counter;
+class AbstractCounter;
 class ArrowItem;
 class CardZone;
 class StackZone;
@@ -84,6 +84,7 @@ public slots:
         void actMulligan();
 	void actMoveTopCardsToGrave();
 	void actMoveTopCardsToExile();
+	void actMoveTopCardToBottom();
 
 	void actViewLibrary();
 	void actViewTopCards();
@@ -93,12 +94,12 @@ public slots:
 	
 	void actSayMessage();
 
-	void actAttach();
-	void actUnattach();
-	void actSetPT();
-	void actSetAnnotation();
-	void cardMenuAction();
-	void actCardCounterTrigger();
+	void actAttach(QAction *action);
+	void actUnattach(QAction *action);
+	void actSetPT(QAction *action);
+	void actSetAnnotation(QAction *action);
+	void cardMenuAction(QAction *action);
+	void actCardCounterTrigger(QAction *action);
 
 private slots:
 	void addPlayer(Player *player);
@@ -116,7 +117,7 @@ private:
 	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
 		*aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg,
 		*aMoveRfgToTopLibrary, *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave,
-		*aViewLibrary, *aViewTopCards, *aMoveTopCardsToGrave, *aMoveTopCardsToExile,
+		*aViewLibrary, *aViewTopCards, *aMoveTopCardsToGrave, *aMoveTopCardsToExile, *aMoveTopCardToBottom,
 		*aViewGraveyard, *aViewRfg, *aViewSideboard,
                 *aDrawCard, *aDrawCards, *aMulligan, *aShuffle,
 		*aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,
@@ -147,7 +148,7 @@ private:
 	QPixmap bgPixmap;
 	QRectF bRect;
 
-	QMap<int, Counter *> counters;
+	QMap<int, AbstractCounter *> counters;
 	QMap<int, ArrowItem *> arrows;
 	void rearrangeCounters();
 	
@@ -173,7 +174,7 @@ private:
 	void eventDrawCards(Event_DrawCards *event);
 	void eventRevealCards(Event_RevealCards *event);
 public:
-	static const int counterAreaWidth = 65;
+	static const int counterAreaWidth = 55;
 	
 	enum { Type = typeOther };
 	int type() const { return Type; }
@@ -185,8 +186,8 @@ public:
 	void deleteCard(CardItem *c);
 	void addZone(CardZone *z);
 
-	Counter *addCounter(ServerInfo_Counter *counter);
-	Counter *addCounter(int counterId, const QString &name, QColor color, int radius, int value);
+	AbstractCounter *addCounter(ServerInfo_Counter *counter);
+	AbstractCounter *addCounter(int counterId, const QString &name, QColor color, int radius, int value);
 	void delCounter(int counterId);
 	void clearCounters();
 	

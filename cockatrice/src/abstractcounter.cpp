@@ -1,16 +1,17 @@
-#include "counter.h"
+#include "abstractcounter.h"
 #include "player.h"
 #include "protocol_items.h"
 #include <QPainter>
 #include <QMenu>
 #include <QAction>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsSceneHoverEvent>
 
-Counter::Counter(Player *_player, int _id, const QString &_name, QColor _color, int _radius, int _value, QGraphicsItem *parent)
-	: QGraphicsItem(parent), player(_player), id(_id), name(_name), color(_color), radius(_radius), value(_value), aDec(0), aInc(0), dialogSemaphore(false), deleteAfterDialog(false)
+AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name, bool _shownInCounterArea, int _value, QGraphicsItem *parent)
+	: QGraphicsItem(parent), player(_player), id(_id), name(_name), value(_value), hovered(false), aDec(0), aInc(0), dialogSemaphore(false), deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea)
 {
-	if (radius > Player::counterAreaWidth / 2)
-		radius = Player::counterAreaWidth / 2;
+	setAcceptsHoverEvents(true);
+	
 	if (player->getLocal()) {
 		menu = new QMenu(name);
 		aSet = new QAction(this);
@@ -36,12 +37,12 @@ Counter::Counter(Player *_player, int _id, const QString &_name, QColor _color, 
 	retranslateUi();
 }
 
-Counter::~Counter()
+AbstractCounter::~AbstractCounter()
 {
 	delete menu;
 }
 
-void Counter::delCounter()
+void AbstractCounter::delCounter()
 {
 	if (dialogSemaphore)
 		deleteAfterDialog = true;
@@ -49,14 +50,14 @@ void Counter::delCounter()
 		deleteLater();
 }
 
-void Counter::retranslateUi()
+void AbstractCounter::retranslateUi()
 {
 	if (menu) {
 		aSet->setText(tr("&Set counter..."));
 	}
 }
 
-void Counter::setShortcutsActive()
+void AbstractCounter::setShortcutsActive()
 {
 	if (name == "life") {
 		aSet->setShortcut(tr("Ctrl+L"));
@@ -65,7 +66,7 @@ void Counter::setShortcutsActive()
 	}
 }
 
-void Counter::setShortcutsInactive()
+void AbstractCounter::setShortcutsInactive()
 {
 	if (name == "life") {
 		aSet->setShortcut(QKeySequence());
@@ -74,31 +75,13 @@ void Counter::setShortcutsInactive()
 	}
 }
 
-QRectF Counter::boundingRect() const
-{
-	return QRectF(0, 0, radius * 2, radius * 2);
-}
-
-void Counter::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
-{
-	painter->setBrush(QBrush(color));
-	painter->drawEllipse(boundingRect());
-	if (value) {
-		QFont f("Serif");
-		f.setPixelSize(radius * 0.8);
-		f.setWeight(QFont::Bold);
-		painter->setFont(f);
-		painter->drawText(boundingRect(), Qt::AlignCenter, QString::number(value));
-	}
-}
-
-void Counter::setValue(int _value)
+void AbstractCounter::setValue(int _value)
 {
 	value = _value;
 	update();
 }
 
-void Counter::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
 	if (event->button() == Qt::LeftButton) {
 		player->sendGameCommand(new Command_IncCounter(-1, id, 1));
@@ -114,13 +97,25 @@ void Counter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 		event->ignore();
 }
 
-void Counter::incrementCounter()
+void AbstractCounter::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+	hovered = true;
+	update();
+}
+
+void AbstractCounter::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+	hovered = false;
+	update();
+}
+
+void AbstractCounter::incrementCounter()
 {
 	int delta = static_cast<QAction *>(sender())->data().toInt();
 	player->sendGameCommand(new Command_IncCounter(-1, id, delta));
 }
 
-void Counter::setCounter()
+void AbstractCounter::setCounter()
 {
 	bool ok;
 	dialogSemaphore = true;

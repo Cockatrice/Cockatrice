@@ -34,10 +34,10 @@ while (<file>) {
 	} elsif ($type == 1) {
 		$type = 'cmd';
 		$namePrefix = 'Command';
-		$baseClass = 'ChatCommand';
-		$parentConstructorCall = "$baseClass(\"$name1\", _channel)";
-		$constructorParamsH = "const QString &_channel = QString()";
-		$constructorParamsCpp = "const QString &_channel";
+		$baseClass = 'RoomCommand';
+		$parentConstructorCall = "$baseClass(\"$name1\", _roomId)";
+		$constructorParamsH = "int _roomId = -1";
+		$constructorParamsCpp = "int _roomId";
 	} elsif ($type == 2) {
 		$type = 'cmd';
 		$namePrefix = 'Command';
@@ -60,16 +60,23 @@ while (<file>) {
 		$constructorParamsH = "";
 		$constructorParamsCpp = "";
 	} elsif ($type == 5) {
-		$type = 'chat_event';
+		$type = 'room_event';
 		$namePrefix = 'Event';
-		$baseClass = 'ChatEvent';
-		$parentConstructorCall = "$baseClass(\"$name1\", _channel)";
-		$constructorParamsH = "const QString &_channel = QString()";
-		$constructorParamsCpp = "const QString &_channel";
+		$baseClass = 'RoomEvent';
+		$parentConstructorCall = "$baseClass(\"$name1\", _roomId)";
+		$constructorParamsH = "int _roomId = -1";
+		$constructorParamsCpp = "int _roomId";
 	} elsif ($type == 6) {
 		$type = 'game_event_context';
 		$namePrefix = 'Context';
 		$baseClass = 'GameEventContext';
+		$parentConstructorCall = "$baseClass(\"$name1\")";
+		$constructorParamsH = "";
+		$constructorParamsCpp = "";
+	} elsif ($type == 7) {
+		$type = 'cmd';
+		$namePrefix = 'Command';
+		$baseClass = 'AdminCommand';
 		$parentConstructorCall = "$baseClass(\"$name1\")";
 		$constructorParamsH = "";
 		$constructorParamsCpp = "";

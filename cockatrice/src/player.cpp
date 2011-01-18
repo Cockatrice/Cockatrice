@@ -1,7 +1,7 @@
 #include "player.h"
 #include "cardzone.h"
 #include "playertarget.h"
-#include "counter.h"
+#include "counter_general.h"
 #include "arrowitem.h"
 #include "zoneviewzone.h"
 #include "zoneviewwidget.h"
@@ -32,26 +32,28 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 	updateBgPixmap();
 	
 	playerTarget = new PlayerTarget(this);
-	playerTarget->setPos(QPointF(counterAreaWidth + (CARD_HEIGHT + 5 - playerTarget->boundingRect().width()) / 2.0, 5));
+	qreal avatarMargin = (counterAreaWidth + CARD_HEIGHT + 15 - playerTarget->boundingRect().width()) / 2.0;
+	playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
 
 	PileZone *deck = new PileZone(this, "deck", true, false, this);
-	QPointF base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 5) / 2.0, 5 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
+	QPointF base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 15) / 2.0, 10 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
 	deck->setPos(base);
 
 	qreal h = deck->boundingRect().width() + 5;
 
+	HandCounter *handCounter = new HandCounter(this);
+	handCounter->setPos(base + QPointF(0, h + 10));
+	qreal h2 = handCounter->boundingRect().height();
+	
 	PileZone *grave = new PileZone(this, "grave", false, true, this);
-	grave->setPos(base + QPointF(0, h));
+	grave->setPos(base + QPointF(0, h + h2 + 10));
 
 	PileZone *rfg = new PileZone(this, "rfg", false, true, this);
-	rfg->setPos(base + QPointF(0, 2 * h));
+	rfg->setPos(base + QPointF(0, 2 * h + h2 + 10));
 
 	PileZone *sb = new PileZone(this, "sb", false, false, this);
 	sb->setVisible(false);
 
-	HandCounter *handCounter = new HandCounter(this);
-	handCounter->setPos(base + QPointF(0, 3 * h + 7));
-	
 	table = new TableZone(this, this);
 	connect(table, SIGNAL(sizeChanged()), this, SLOT(updateBoundingRect()));
 	
@@ -136,6 +138,8 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 		connect(aMoveTopCardsToGrave, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToGrave()));
 		aMoveTopCardsToExile = new QAction(this);
 		connect(aMoveTopCardsToExile, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToExile()));
+		aMoveTopCardToBottom = new QAction(this);
+		connect(aMoveTopCardToBottom, SIGNAL(triggered()), this, SLOT(actMoveTopCardToBottom()));
 	}
 
 	playerMenu = new QMenu(QString());
@@ -166,6 +170,7 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 		libraryMenu->addSeparator();
 		libraryMenu->addAction(aMoveTopCardsToGrave);
 		libraryMenu->addAction(aMoveTopCardsToExile);
+		libraryMenu->addAction(aMoveTopCardToBottom);
 		deck->setMenu(libraryMenu, aDrawCard);
 	} else {
 		handMenu = 0;
@@ -309,7 +314,7 @@ void Player::playerListActionTriggered()
 
 void Player::rearrangeZones()
 {
-	QPointF base = QPointF(CARD_HEIGHT + counterAreaWidth + 5, 0);
+	QPointF base = QPointF(CARD_HEIGHT + counterAreaWidth + 15, 0);
 	
 	if (settingsCache->getHorizontalHand()) {
 		if (mirrored) {
@@ -367,7 +372,7 @@ void Player::updateBgPixmap()
 void Player::updateBoundingRect()
 {
 	prepareGeometryChange();
-	qreal width = CARD_HEIGHT + 5 + counterAreaWidth + stack->boundingRect().width();
+	qreal width = CARD_HEIGHT + 15 + counterAreaWidth + stack->boundingRect().width();
 	if (settingsCache->getHorizontalHand()) {
 		qreal handHeight = hand->isVisible() ? hand->boundingRect().height() : 0;
 		bRect = QRectF(0, 0, width + table->boundingRect().width(), table->boundingRect().height() + handHeight);
@@ -408,6 +413,7 @@ void Player::retranslateUi()
 		aShuffle->setText(tr("&Shuffle"));
 		aMoveTopCardsToGrave->setText(tr("Move top cards to &graveyard..."));
 		aMoveTopCardsToExile->setText(tr("Move top cards to &exile..."));
+		aMoveTopCardToBottom->setText(tr("Put top card on &bottom"));
 	
 		handMenu->setTitle(tr("&Hand"));
 		mRevealHand->setTitle(tr("&Reveal to"));
@@ -422,7 +428,7 @@ void Player::retranslateUi()
 		aCreateAnotherToken->setText(tr("C&reate another token"));
 		sayMenu->setTitle(tr("S&ay"));
 		
-		QMapIterator<int, Counter *> counterIterator(counters);
+		QMapIterator<int, AbstractCounter *> counterIterator(counters);
 		while (counterIterator.hasNext())
 			counterIterator.next().value()->retranslateUi();
 
@@ -453,7 +459,7 @@ void Player::setShortcutsActive()
 	aCreateToken->setShortcut(tr("Ctrl+T"));
 	aCreateAnotherToken->setShortcut(tr("Ctrl+G"));
 
-	QMapIterator<int, Counter *> counterIterator(counters);
+	QMapIterator<int, AbstractCounter *> counterIterator(counters);
 	while (counterIterator.hasNext())
 		counterIterator.next().value()->setShortcutsActive();
 }
@@ -474,7 +480,7 @@ void Player::setShortcutsInactive()
 	aCreateToken->setShortcut(QKeySequence());
 	aCreateAnotherToken->setShortcut(QKeySequence());
 
-	QMapIterator<int, Counter *> counterIterator(counters);
+	QMapIterator<int, AbstractCounter *> counterIterator(counters);
 	while (counterIterator.hasNext())
 		counterIterator.next().value()->setShortcutsInactive();
 }
@@ -557,9 +563,10 @@ void Player::actMoveTopCardsToGrave()
 	const int maxCards = zones.value("deck")->getCards().size();
 	if (number > maxCards)
 		number = maxCards;
+	QList<CardId *> idList;
 	for (int i = 0; i < number; ++i)
-		commandList.append(new Command_MoveCard(-1, "deck", 0, "grave", 0, 0, false));
-	sendCommandContainer(new CommandContainer(commandList));
+		idList.append(new CardId(i));
+	sendGameCommand(new Command_MoveCard(-1, "deck", idList, getId(), "grave", 0, 0, false));
 }
 
 void Player::actMoveTopCardsToExile()
@@ -572,9 +579,15 @@ void Player::actMoveTopCardsToExile()
 	const int maxCards = zones.value("deck")->getCards().size();
 	if (number > maxCards)
 		number = maxCards;
+	QList<CardId *> idList;
 	for (int i = 0; i < number; ++i)
-		commandList.append(new Command_MoveCard(-1, "deck", 0, "rfg", 0, 0, false));
-	sendCommandContainer(new CommandContainer(commandList));
+		idList.append(new CardId(i));
+	sendGameCommand(new Command_MoveCard(-1, "deck", idList, getId(), "rfg", 0, 0, false));
+}
+
+void Player::actMoveTopCardToBottom()
+{
+	sendGameCommand(new Command_MoveCard(-1, "deck", QList<CardId *>() << new CardId(0), getId(), "deck", -1, 0, false));
 }
 
 void Player::actUntapAll()
@@ -743,7 +756,7 @@ void Player::eventCreateCounters(Event_CreateCounters *event)
 
 void Player::eventSetCounter(Event_SetCounter *event)
 {
-	Counter *c = counters.value(event->getCounterId(), 0);
+	AbstractCounter *c = counters.value(event->getCounterId(), 0);
 	if (!c)
 		return;
 	int oldValue = c->getValue();
@@ -781,7 +794,10 @@ void Player::eventStopDumpZone(Event_StopDumpZone *event)
 void Player::eventMoveCard(Event_MoveCard *event)
 {
 	CardZone *startZone = zones.value(event->getStartZone(), 0);
-	CardZone *targetZone = zones.value(event->getTargetZone(), 0);
+	Player *targetPlayer = static_cast<TabGame *>(parent())->getPlayers().value(event->getTargetPlayerId());
+	if (!targetPlayer)
+		return;
+	CardZone *targetZone = targetPlayer->getZones().value(event->getTargetZone(), 0);
 	if (!startZone || !targetZone)
 		return;
 	
@@ -798,9 +814,12 @@ void Player::eventMoveCard(Event_MoveCard *event)
 		return;
 	card->setName(event->getCardName());
 	
-	if (card->getAttachedTo() && (startZone != targetZone))
+	if (card->getAttachedTo() && (startZone != targetZone)) {
+		CardItem *parentCard = card->getAttachedTo();
 		card->setAttachedTo(0);
-	
+		parentCard->getZone()->reorganizeCards();
+	}
+
 	card->deleteDragItem();
 
 	card->setId(event->getNewCardId());
@@ -808,6 +827,13 @@ void Player::eventMoveCard(Event_MoveCard *event)
 	if (startZone != targetZone) {
 		card->setBeingPointedAt(false);
 		card->setHovered(false);
+		
+		const QList<CardItem *> &attachedCards = card->getAttachedCards();
+		for (int i = 0; i < attachedCards.size(); ++i)
+			attachedCards[i]->setParentItem(targetZone);
+		
+		if (startZone->getPlayer() != targetZone->getPlayer())
+			card->setOwner(targetZone->getPlayer());
 	}
 
 	// The log event has to be sent before the card is added to the target zone
@@ -989,7 +1015,7 @@ QRectF Player::boundingRect() const
 
 void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	int totalWidth = CARD_HEIGHT + counterAreaWidth + 5;
+	int totalWidth = CARD_HEIGHT + counterAreaWidth + 15;
 	if (bgPixmap.isNull())
 		painter->fillRect(QRectF(0, 0, totalWidth, boundingRect().height()), QColor(200, 200, 200));
 	else
@@ -1064,10 +1090,10 @@ void Player::playCard(CardItem *c, bool faceDown, bool tapped)
 {
 	CardInfo *ci = c->getInfo();
 	if (ci->getTableRow() == 3)
-		stack->handleDropEvent(c->getId(), c->getZone(), QPoint(), false);
+		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), QList<CardId *>() << new CardId(c->getId()), getId(), "stack", 0, 0, false));
 	else {
 		QPoint gridPoint = QPoint(-1, 2 - ci->getTableRow());
-		table->handleDropEventByGrid(c->getId(), c->getZone(), gridPoint, faceDown, tapped);
+		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), QList<CardId *>() << new CardId(c->getId()), getId(), "table", gridPoint.x(), gridPoint.y(), faceDown, tapped));
 	}
 }
 
@@ -1089,14 +1115,22 @@ void Player::addZone(CardZone *z)
 	zones.insert(z->getName(), z);
 }
 
-Counter *Player::addCounter(ServerInfo_Counter *counter)
+AbstractCounter *Player::addCounter(ServerInfo_Counter *counter)
 {
 	return addCounter(counter->getId(), counter->getName(), counter->getColor().getQColor(), counter->getRadius(), counter->getCount());
 }
 
-Counter *Player::addCounter(int counterId, const QString &name, QColor color, int radius, int value)
+AbstractCounter *Player::addCounter(int counterId, const QString &name, QColor color, int radius, int value)
 {
-	Counter *c = new Counter(this, counterId, name, color, radius, value, this);
+	qDebug() << "addCounter:" << getName() << counterId << name;
+	if (counters.contains(counterId))
+		return 0;
+	
+	AbstractCounter *c;
+	if (name == "life")
+		c = playerTarget->addCounter(counterId, name, value);
+	else
+		c = new GeneralCounter(this, counterId, name, color, radius, value, this);
 	counters.insert(counterId, c);
 	if (countersMenu)
 		countersMenu->addMenu(c->getMenu());
@@ -1108,9 +1142,11 @@ Counter *Player::addCounter(int counterId, const QString &name, QColor color, in
 
 void Player::delCounter(int counterId)
 {
-	Counter *c = counters.value(counterId, 0);
+	AbstractCounter *c = counters.value(counterId, 0);
 	if (!c)
 		return;
+	if (c->getName() == "life")
+		playerTarget->delCounter();
 	counters.remove(counterId);
 	c->delCounter();
 	rearrangeCounters();
@@ -1118,10 +1154,11 @@ void Player::delCounter(int counterId)
 
 void Player::clearCounters()
 {
-	QMapIterator<int, Counter *> counterIterator(counters);
+	QMapIterator<int, AbstractCounter *> counterIterator(counters);
 	while (counterIterator.hasNext())
 		counterIterator.next().value()->delCounter();
 	counters.clear();
+	playerTarget->delCounter();
 }
 
 ArrowItem *Player::addArrow(ServerInfo_Arrow *arrow)
@@ -1182,15 +1219,16 @@ void Player::clearArrows()
 
 void Player::rearrangeCounters()
 {
-	qreal marginTop = 15;
-	qreal marginBottom = 15;
+	qreal marginTop = 80;
+	qreal marginBottom = 10;
 	
 	// Determine total height of bounding rectangles
 	qreal totalHeight = 0;
-	QMapIterator<int, Counter *> counterIterator(counters);
+	QMapIterator<int, AbstractCounter *> counterIterator(counters);
 	while (counterIterator.hasNext()) {
 		counterIterator.next();
-		totalHeight += counterIterator.value()->boundingRect().height();
+		if (counterIterator.value()->getShownInCounterArea())
+			totalHeight += counterIterator.value()->boundingRect().height();
 	}
 	
 	// Determine free space between objects
@@ -1204,8 +1242,11 @@ void Player::rearrangeCounters()
 	
 	// Place objects
 	for (counterIterator.toFront(); counterIterator.hasNext(); ) {
-		Counter *c = counterIterator.next().value();
+		AbstractCounter *c = counterIterator.next().value();
 
+		if (!c->getShownInCounterArea())
+			continue;
+		
 		QRectF br = c->boundingRect();
 		c->setPos((counterAreaWidth - br.width()) / 2, y);
 		y += br.height() + padding;
@@ -1234,46 +1275,57 @@ bool Player::clearCardsToDelete()
 	return true;
 }
 
-void Player::cardMenuAction()
+void Player::cardMenuAction(QAction *a)
 {
-	QAction *a = static_cast<QAction *>(sender());
 	QList<QGraphicsItem *> sel = scene()->selectedItems();
+	QList<CardItem *> cardList;
+	while (!sel.isEmpty())
+		cardList.append(qgraphicsitem_cast<CardItem *>(sel.takeFirst()));
+	
 	QList<Command *> commandList;
-	while (!sel.isEmpty()) {
-		unsigned int i = (unsigned int) (((double) sel.size()) * qrand() / (RAND_MAX + 1.0));
-		CardItem *card = qgraphicsitem_cast<CardItem *>(sel.takeAt(i));
-
-		switch (a->data().toInt()) {
-			case 0:
-				if (!card->getTapped())
-					commandList.append(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "tapped", "1"));
-				break;
-			case 1:
-				if (card->getTapped())
-					commandList.append(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "tapped", "0"));
-				break;
-			case 2:
-				commandList.append(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "doesnt_untap", QString::number(!card->getDoesntUntap())));
-				break;
-			case 3: {
-				QString zone = card->getZone()->getName();
-				commandList.append(new Command_FlipCard(-1, zone, card->getId(), !card->getFaceDown()));
-				break;
+	if (a->data().toInt() <= 4)
+		for (int i = 0; i < cardList.size(); ++i) {
+			CardItem *card = cardList[i];
+			switch (a->data().toInt()) {
+				case 0:
+					if (!card->getTapped())
+						commandList.append(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "tapped", "1"));
+					break;
+				case 1:
+					if (card->getTapped())
+						commandList.append(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "tapped", "0"));
+					break;
+				case 2:
+					commandList.append(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "doesnt_untap", QString::number(!card->getDoesntUntap())));
+					break;
+				case 3: {
+					QString zone = card->getZone()->getName();
+					commandList.append(new Command_FlipCard(-1, zone, card->getId(), !card->getFaceDown()));
+					break;
+				}
+				case 4:
+					commandList.append(new Command_CreateToken(-1, card->getZone()->getName(), card->getName(), card->getColor(), card->getPT(), card->getAnnotation(), true, -1, card->getGridPoint().y()));
+					break;
 			}
-			case 4:
-				commandList.append(new Command_CreateToken(-1, card->getZone()->getName(), card->getName(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), -1, card->getGridPoint().y()));
-				break;
+		}
+	else {
+		QList<CardId *> idList;
+		for (int i = 0; i < cardList.size(); ++i)
+			idList.append(new CardId(cardList[i]->getId()));
+		QString startZone = cardList[0]->getZone()->getName();
+		
+		switch (a->data().toInt()) {
 			case 5:
-				commandList.append(new Command_MoveCard(-1, card->getZone()->getName(), card->getId(), "deck", 0, 0, false));
+				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "deck", 0, 0, false));
 				break;
 			case 6:
-				commandList.append(new Command_MoveCard(-1, card->getZone()->getName(), card->getId(), "deck", -1, 0, false));
+				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "deck", -1, 0, false));
 				break;
 			case 7:
-				commandList.append(new Command_MoveCard(-1, card->getZone()->getName(), card->getId(), "grave", 0, 0, false));
+				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "grave", 0, 0, false));
 				break;
 			case 8:
-				commandList.append(new Command_MoveCard(-1, card->getZone()->getName(), card->getId(), "rfg", 0, 0, false));
+				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "rfg", 0, 0, false));
 				break;
 			default: ;
 		}
@@ -1281,7 +1333,7 @@ void Player::cardMenuAction()
 	sendCommandContainer(new CommandContainer(commandList));
 }
 
-void Player::actSetPT()
+void Player::actSetPT(QAction * /*a*/)
 {
 	QString oldPT;
 	QListIterator<QGraphicsItem *> i(scene()->selectedItems());
@@ -1306,7 +1358,7 @@ void Player::actSetPT()
 	}
 }
 
-void Player::actSetAnnotation()
+void Player::actSetAnnotation(QAction * /*a*/)
 {
 	QString oldAnnotation;
 	QListIterator<QGraphicsItem *> i(scene()->selectedItems());
@@ -1332,24 +1384,22 @@ void Player::actSetAnnotation()
 	}
 }
 
-void Player::actAttach()
+void Player::actAttach(QAction *a)
 {
-	CardItem *card = static_cast<CardItem *>(sender()->parent());
+	CardItem *card = static_cast<CardItem *>(a->parent());
 	ArrowAttachItem *arrow = new ArrowAttachItem(card);
 	scene()->addItem(arrow);
 	arrow->grabMouse();
 }
 
-void Player::actUnattach()
+void Player::actUnattach(QAction *a)
 {
-	CardItem *card = static_cast<CardItem *>(sender()->parent());
+	CardItem *card = static_cast<CardItem *>(a->parent());
 	sendGameCommand(new Command_AttachCard(-1, card->getZone()->getName(), card->getId(), -1, QString(), -1));
 }
 
-void Player::actCardCounterTrigger()
+void Player::actCardCounterTrigger(QAction *a)
 {
-	QAction *a = static_cast<QAction *>(sender());
-	
 	int counterId = a->data().toInt() / 1000;
 	int action = a->data().toInt() % 1000;
 	switch (action) {
@@ -1412,7 +1462,7 @@ QString Player::getName() const
 
 qreal Player::getMinimumWidth() const
 {
-	qreal result = table->getMinimumWidth() + CARD_HEIGHT + 5 + counterAreaWidth + stack->boundingRect().width();
+	qreal result = table->getMinimumWidth() + CARD_HEIGHT + 15 + counterAreaWidth + stack->boundingRect().width();
 	if (!settingsCache->getHorizontalHand())
 		result += hand->boundingRect().width();
 	return result;
@@ -1431,7 +1481,7 @@ void Player::processSceneSizeChange(const QSizeF &newSize)
 	// This will need to be changed if player areas are displayed side by side (e.g. 2x2 for a 4-player game)
 	qreal fullPlayerWidth = newSize.width();
 	
-	qreal tableWidth = fullPlayerWidth - CARD_HEIGHT - 5 - counterAreaWidth - stack->boundingRect().width();
+	qreal tableWidth = fullPlayerWidth - CARD_HEIGHT - 15 - counterAreaWidth - stack->boundingRect().width();
 	if (!settingsCache->getHorizontalHand())
 		tableWidth -= hand->boundingRect().width();
 	

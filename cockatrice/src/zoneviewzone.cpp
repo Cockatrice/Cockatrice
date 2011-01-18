@@ -3,18 +3,21 @@
 #include "zoneviewzone.h"
 #include "player.h"
 #include "protocol_items.h"
+#include "carddragitem.h"
 
-ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, QGraphicsItem *parent)
-	: CardZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0), numberCards(_numberCards), origZone(_origZone), sortByName(false), sortByType(false)
+ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, bool _revealZone, QGraphicsItem *parent)
+	: SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0), numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone), sortByName(false), sortByType(false)
 {
-	origZone->setView(this);
+	if (!revealZone)
+		origZone->setView(this);
 }
 
 ZoneViewZone::~ZoneViewZone()
 {
 	emit beingDeleted();
 	qDebug("ZoneViewZone destructor");
-	origZone->setView(NULL);
+	if (!revealZone)
+		origZone->setView(NULL);
 }
 
 QRectF ZoneViewZone::boundingRect() const
@@ -30,7 +33,7 @@ void ZoneViewZone::initializeCards(const QList<ServerInfo_Card *> &cardList)
 {
 	if (!cardList.isEmpty()) {
 		for (int i = 0; i < cardList.size(); ++i)
-			addCard(new CardItem(player, cardList[i]->getName(), cardList[i]->getId(), this), false, i);
+			addCard(new CardItem(player, cardList[i]->getName(), cardList[i]->getId(), revealZone, this), false, i);
 		reorganizeCards();
 	} else if (!origZone->contentsKnown()) {
 		Command_DumpZone *command = new Command_DumpZone(-1, player->getId(), name, numberCards);
@@ -41,7 +44,7 @@ void ZoneViewZone::initializeCards(const QList<ServerInfo_Card *> &cardList)
 		int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
 		for (int i = 0; i < number; i++) {
 			CardItem *card = c.at(i);
-			addCard(new CardItem(player, card->getName(), card->getId(), this), false, i);
+			addCard(new CardItem(player, card->getName(), card->getId(), revealZone, this), false, i);
 		}
 		reorganizeCards();
 	}
@@ -55,7 +58,7 @@ void ZoneViewZone::zoneDumpReceived(ProtocolResponse *r)
 	
 	const QList<ServerInfo_Card *> &respCardList = resp->getZone()->getCardList();
 	for (int i = 0; i < respCardList.size(); i++) {
-		CardItem *card = new CardItem(player, respCardList[i]->getName(), respCardList[i]->getId(), this);
+		CardItem *card = new CardItem(player, respCardList[i]->getName(), respCardList[i]->getId(), revealZone, this);
 		addCard(card, false, i);
 	}
 	
@@ -84,7 +87,6 @@ void ZoneViewZone::reorganizeCards()
 		cols = 2;
 	
 	qDebug() << "reorganizeCards: rows=" << rows << "cols=" << cols;
-	qDebug() << "SORT BY NAME:" << sortByName << "SORT BY TYPE:" << sortByType;
 
 	CardList cardsToDisplay(cards);
 	if (sortByName || sortByType)
@@ -122,9 +124,13 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 	card->update();
 }
 
-void ZoneViewZone::handleDropEvent(int cardId, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
+void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
-	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), cardId, getName(), 0, 0, false));
+	QList<CardId *> idList;
+	for (int i = 0; i < dragItems.size(); ++i)
+		idList.append(new CardId(dragItems[i]->getId()));
+	
+	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), 0, 0, false));
 }
 
 void ZoneViewZone::removeCard(int position)

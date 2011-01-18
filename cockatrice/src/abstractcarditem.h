@@ -11,7 +11,7 @@ class QTimer;
 const int CARD_WIDTH = 72;
 const int CARD_HEIGHT = 102;
 
-class AbstractCardItem : public QObject, public ArrowTarget {
+class AbstractCardItem : public ArrowTarget {
 	Q_OBJECT
 protected:
 	CardInfo *info;

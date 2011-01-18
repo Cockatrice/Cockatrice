@@ -1,23 +1,24 @@
 #ifndef ZONEVIEWERZONE_H
 #define ZONEVIEWERZONE_H
 
-#include "cardzone.h"
+#include "selectzone.h"
 #include <QGraphicsLayoutItem>
 
 class ZoneViewWidget;
 class ProtocolResponse;
 class ServerInfo_Card;
 
-class ZoneViewZone : public CardZone, public QGraphicsLayoutItem {
+class ZoneViewZone : public SelectZone, public QGraphicsLayoutItem {
 	Q_OBJECT
 private:
 	QRectF bRect, optimumRect;
 	int minRows, numberCards;
-	void handleDropEvent(int cardId, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
+	void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
 	CardZone *origZone;
+	bool revealZone;
 	bool sortByName, sortByType;
 public:
-	ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards = -1, QGraphicsItem *parent = 0);
+	ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards = -1, bool _revealZone = false, QGraphicsItem *parent = 0);
 	~ZoneViewZone();
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

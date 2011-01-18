@@ -21,7 +21,6 @@ RemoteClient::RemoteClient(QObject *parent)
 	
 	xmlReader = new QXmlStreamReader;
 	xmlWriter = new QXmlStreamWriter;
-	xmlWriter->setAutoFormatting(true);
 	xmlWriter->setDevice(socket);
 }
 
@@ -42,12 +41,18 @@ void RemoteClient::slotConnected()
 	setStatus(StatusAwaitingWelcome);
 }
 
-void RemoteClient::loginResponse(ResponseCode response)
+void RemoteClient::loginResponse(ProtocolResponse *response)
 {
-	if (response == RespOk)
+	if (response->getResponseCode() == RespOk) {
+		Response_Login *resp = qobject_cast<Response_Login *>(response);
+		if (!resp) {
+			disconnectFromServer();
+			return;
+		}
 		setStatus(StatusLoggedIn);
-	else {
-		emit serverError(response);
+		emit userInfoChanged(resp->getUserInfo());
+	} else {
+		emit serverError(response->getResponseCode());
 		setStatus(StatusDisconnecting);
 	}
 }
@@ -78,7 +83,7 @@ void RemoteClient::readData()
 			
 			setStatus(StatusLoggingIn);
 			Command_Login *cmdLogin = new Command_Login(userName, password);
-			connect(cmdLogin, SIGNAL(finished(ResponseCode)), this, SLOT(loginResponse(ResponseCode)));
+			connect(cmdLogin, SIGNAL(finished(ProtocolResponse *)), this, SLOT(loginResponse(ProtocolResponse *)));
 			sendCommand(cmdLogin);
 		}
 	}

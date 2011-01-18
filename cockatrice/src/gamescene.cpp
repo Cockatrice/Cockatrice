@@ -82,7 +82,7 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
                 }
         }
 
-	ZoneViewWidget *item = new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards);
+	ZoneViewWidget *item = new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards, false);
         views.append(item);
         connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
 	addItem(item);
@@ -91,7 +91,7 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
 
 void GameScene::addRevealedZoneView(Player *player, CardZone *zone, const QList<ServerInfo_Card *> &cardList)
 {
-	ZoneViewWidget *item = new ZoneViewWidget(player, zone, -2, cardList);
+	ZoneViewWidget *item = new ZoneViewWidget(player, zone, -2, true, cardList);
 	views.append(item);
         connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
 	addItem(item);
@@ -194,4 +194,19 @@ bool GameScene::event(QEvent *event)
 		}
 	}
 	return QGraphicsScene::event(event);
+}
+
+void GameScene::startRubberBand(const QPointF &selectionOrigin)
+{
+	emit sigStartRubberBand(selectionOrigin);
+}
+
+void GameScene::resizeRubberBand(const QPointF &cursorPoint)
+{
+	emit sigResizeRubberBand(cursorPoint);
+}
+
+void GameScene::stopRubberBand()
+{
+	emit sigStopRubberBand();
 }

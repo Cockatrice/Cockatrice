@@ -29,6 +29,7 @@ public:
 	const QString &getItemSubType() const { return itemSubType; }
 	virtual bool readElement(QXmlStreamReader *xml);
 	virtual void writeElement(QXmlStreamWriter *xml) = 0;
+	virtual bool isEmpty() const = 0;
 	void write(QXmlStreamWriter *xml);
 };
 
@@ -36,6 +37,7 @@ class SerializableItem_Invalid : public SerializableItem {
 public:
 	SerializableItem_Invalid(const QString &_itemType) : SerializableItem(_itemType) { }
 	void writeElement(QXmlStreamWriter * /*xml*/) { }
+	bool isEmpty() const { return true; }
 };
 
 class SerializableItem_Map : public SerializableItem {
@@ -67,6 +69,7 @@ public:
 	~SerializableItem_Map();
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
+	bool isEmpty() const { return itemMap.isEmpty() && itemList.isEmpty(); }
 	void appendItem(SerializableItem *item) { itemList.append(item); }
 };
 
@@ -81,6 +84,7 @@ public:
 		: SerializableItem(_itemType), data(_data) { }
 	const QString &getData() { return data; }
 	void setData(const QString &_data) { data = _data; }
+	bool isEmpty() const { return data.isEmpty(); }
 };
 
 class SerializableItem_Int : public SerializableItem {
@@ -94,6 +98,7 @@ public:
 		: SerializableItem(_itemType), data(_data) { }
 	int getData() { return data; }
 	void setData(int _data) { data = _data; }
+	bool isEmpty() const { return data == -1; }
 };
 
 class SerializableItem_Bool : public SerializableItem {
@@ -107,6 +112,7 @@ public:
 		: SerializableItem(_itemType), data(_data) { }
 	bool getData() { return data; }
 	void setData(bool _data) { data = _data; }
+	bool isEmpty() const { return data == false; }
 };
 
 class SerializableItem_Color : public SerializableItem {
@@ -120,6 +126,7 @@ public:
 		: SerializableItem(_itemType), data(_data) { }
 	const Color &getData() { return data; }
 	void setData(const Color &_data) { data = _data; }
+	bool isEmpty() const { return data.getValue() == 0; }
 };
 
 class SerializableItem_DateTime : public SerializableItem {
@@ -133,6 +140,7 @@ public:
 		: SerializableItem(_itemType), data(_data) { }
 	const QDateTime &getData() { return data; }
 	void setData(const QDateTime &_data) { data = _data; }
+	bool isEmpty() const { return data == QDateTime(); }
 };
 
 class SerializableItem_ByteArray : public SerializableItem {
@@ -146,6 +154,7 @@ public:
 		: SerializableItem(_itemType), data(_data) { }
 	const QByteArray &getData() { return data; }
 	void setData(const QByteArray &_data) { data = _data; }
+	bool isEmpty() const { return data.isEmpty(); }
 };
 
 #endif

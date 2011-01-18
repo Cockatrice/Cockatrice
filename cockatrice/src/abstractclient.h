@@ -10,13 +10,13 @@ class ProtocolItem;
 class ProtocolResponse;
 class TopLevelProtocolItem;
 class CommandContainer;
-class ChatEvent;
+class RoomEvent;
 class GameEventContainer;
 class Event_ListGames;
 class Event_UserJoined;
 class Event_UserLeft;
 class Event_ServerMessage;
-class Event_ListChatChannels;
+class Event_ListRooms;
 class Event_GameJoined;
 class Event_Message;
 
@@ -35,18 +35,18 @@ signals:
 	void statusChanged(ClientStatus _status);
 	void serverError(ResponseCode resp);
 	
-	// Chat events
-	void chatEventReceived(ChatEvent *event);
+	// Room events
+	void roomEventReceived(RoomEvent *event);
 	// Game events
 	void gameEventContainerReceived(GameEventContainer *event);
 	// Generic events
-	void listGamesEventReceived(Event_ListGames *event);
 	void userJoinedEventReceived(Event_UserJoined *event);
 	void userLeftEventReceived(Event_UserLeft *event);
 	void serverMessageEventReceived(Event_ServerMessage *event);
-	void listChatChannelsEventReceived(Event_ListChatChannels *event);
+	void listRoomsEventReceived(Event_ListRooms *event);
 	void gameJoinedEventReceived(Event_GameJoined *event);
 	void messageEventReceived(Event_Message *event);
+	void userInfoChanged(ServerInfo_User *userInfo);
 protected slots:
 	void processProtocolItem(ProtocolItem *item);
 protected:

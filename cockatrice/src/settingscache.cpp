@@ -21,7 +21,6 @@ SettingsCache::SettingsCache()
 	doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
 	cardInfoMinimized = settings->value("interface/cardinfominimized", false).toBool();
 	horizontalHand = settings->value("hand/horizontal", true).toBool();
-	economicalGrid = settings->value("table/economic", false).toBool();
 	invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
 	tapAnimation = settings->value("cards/tapanimation", true).toBool();
 	
@@ -115,13 +114,6 @@ void SettingsCache::setHorizontalHand(int _horizontalHand)
 	horizontalHand = _horizontalHand;
 	settings->setValue("hand/horizontal", horizontalHand);
 	emit horizontalHandChanged();
-}
-
-void SettingsCache::setEconomicalGrid(int _economicalGrid)
-{
-	economicalGrid = _economicalGrid;
-	settings->setValue("table/economic", economicalGrid);
-	emit economicalGridChanged();
 }
 
 void SettingsCache::setInvertVerticalCoordinate(int _invertVerticalCoordinate)
