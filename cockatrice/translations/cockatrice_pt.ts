@@ -550,7 +550,7 @@
     <message>
         <location filename="../src/tab_game.cpp" line="86"/>
         <source>Ready to s&amp;tart</source>
-        <translation>Pronto para &amp;começar</translation>
+        <translation>&amp;Pronto para começar</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="98"/>
