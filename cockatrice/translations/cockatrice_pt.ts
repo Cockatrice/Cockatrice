@@ -6,32 +6,32 @@
     <message>
         <location filename="../src/abstractcounter.cpp" line="56"/>
         <source>&amp;Set counter...</source>
-        <translation type="unfinished">Definir &amp;marcador...</translation>
+        <translation>Definir &amp;marcador...</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="63"/>
         <source>Ctrl+L</source>
-        <translation type="unfinished">Ctrl+L</translation>
+        <translation>Ctrl+L</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="64"/>
         <source>F11</source>
-        <translation type="unfinished">F11</translation>
+        <translation>F11</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="65"/>
         <source>F12</source>
-        <translation type="unfinished">F12</translation>
+        <translation>F12</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="122"/>
         <source>Set counter</source>
-        <translation type="unfinished">Definir marcador</translation>
+        <translation>Definir marcador</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="122"/>
         <source>New value for counter &apos;%1&apos;:</source>
-        <translation type="unfinished">Novo valor para o marcador &apos;%1&apos;:</translation>
+        <translation>Novo valor para o marcador &apos;%1&apos;:</translation>
     </message>
 </context>
 <context>
@@ -176,7 +176,7 @@
     <message>
         <location filename="../src/carditem.cpp" line="176"/>
         <source>&amp;Hide</source>
-        <translation type="unfinished"></translation>
+        <translation>Esco&amp;nder</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="178"/>
@@ -1130,12 +1130,12 @@
     <message>
         <location filename="../src/window_main.cpp" line="162"/>
         <source>Portugese (Portugal):</source>
-        <translation type="unfinished"></translation>
+        <translation>Português (Portugal):</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="163"/>
         <source>Portugese (Brazil):</source>
-        <translation type="unfinished"></translation>
+        <translation>Português (Brasil):</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="164"/>
@@ -1145,7 +1145,7 @@
     <message>
         <location filename="../src/window_main.cpp" line="165"/>
         <source>Japanese:</source>
-        <translation type="unfinished"></translation>
+        <translation>Japonês:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="171"/>
@@ -2232,37 +2232,37 @@
     <message>
         <location filename="../src/tab_admin.cpp" line="40"/>
         <source>Update server &amp;message</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Actualizar mensagem do servidor</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="41"/>
         <source>Server administration functions</source>
-        <translation type="unfinished"></translation>
+        <translation>Funções do administrador do servidor</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="43"/>
         <source>&amp;Unlock functions</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Desbloquear funções</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="44"/>
         <source>&amp;Lock functions</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Bloquear funções</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="54"/>
         <source>Unlock administration functions</source>
-        <translation type="unfinished"></translation>
+        <translation>Desbloquear funções de administração</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="54"/>
         <source>Do you really want to unlock the administration functions?</source>
-        <translation type="unfinished"></translation>
+        <translation>Quer mesmo desbloquear as funçõesde administração?</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.h" line="26"/>
         <source>Administration</source>
-        <translation type="unfinished"></translation>
+        <translation>Administração</translation>
     </message>
 </context>
 <context>
@@ -2509,12 +2509,12 @@ Por favor introduza um nome:</translation>
     <message>
         <location filename="../src/userinfobox.cpp" line="38"/>
         <source>User information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informação do utilizador</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="45"/>
         <source>Real name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome real:</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="46"/>
@@ -2585,12 +2585,12 @@ Por favor introduza um nome:</translation>
     <message>
         <location filename="../src/userlist.cpp" line="119"/>
         <source>User &amp;details</source>
-        <translation type="unfinished"></translation>
+        <translation>Detalhes do &amp;utilizador</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="120"/>
         <source>Direct &amp;chat</source>
-        <translation type="unfinished"></translation>
+        <translation>Conversação &amp;directa</translation>
     </message>
 </context>
 <context>
