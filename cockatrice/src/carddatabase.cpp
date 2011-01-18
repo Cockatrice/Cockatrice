@@ -60,6 +60,62 @@ void SetList::sortByKey()
 	qSort(begin(), end(), CompareFunctor());
 }
 
+PictureLoadingThread::PictureLoadingThread(QObject *parent)
+	: QThread(parent)
+{
+}
+
+PictureLoadingThread::~PictureLoadingThread()
+{
+	quit();
+	wait();
+}
+
+void PictureLoadingThread::run()
+{
+	forever {
+		mutex.lock();
+		if (loadQueue.isEmpty()) {
+			mutex.unlock();
+			return;
+		}
+		CardInfo *card = loadQueue.takeFirst();
+		QString correctedName = card->getCorrectedName();
+		QString picsPath = _picsPath;
+		SetList sortedSets = card->getSets();
+		mutex.unlock();
+		
+		sortedSets.sortByKey();
+		
+		QImage image;
+		for (int i = 0; i < sortedSets.size(); i++) {
+			if (image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(sortedSets[i]->getShortName()).arg(correctedName)))
+				break;
+			if (image.load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(sortedSets[i]->getShortName()).arg(correctedName).arg(1)))
+				break;
+		}
+		if (image.isNull())
+			image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg("downloadedPics").arg(correctedName));
+		
+		emit imageLoaded(card, image);
+	}
+}
+
+void PictureLoadingThread::loadImage(CardInfo *card)
+{
+	QMutexLocker locker(&mutex);
+	loadQueue.append(card);
+	
+	if (!isRunning())
+		start(LowPriority);
+}
+
+void PictureLoadingThread::setPicsPath(const QString &path)
+{
+	QMutexLocker locker(&mutex);
+	_picsPath = path;
+}
+
 CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QString &_text, const QStringList &_colors, bool _cipt, int _tableRow, const SetList &_sets, const QString &_picURL)
 	: db(_db), name(_name), sets(_sets), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), colors(_colors), picURL(_picURL), cipt(_cipt), tableRow(_tableRow), pixmap(NULL)
 {
@@ -119,34 +175,22 @@ QPixmap *CardInfo::loadPixmap()
 	if (pixmap)
 		return pixmap;
 	pixmap = new QPixmap();
-	QString picsPath = settingsCache->getPicsPath();
-	if (!QDir(picsPath).exists())
-		return pixmap;
 	
 	if (getName().isEmpty()) {
 		pixmap->load(settingsCache->getCardBackPicturePath());
 		return pixmap;
 	}
-	SetList sortedSets = sets;
-	sortedSets.sortByKey();
-
-	QString debugOutput = QString("CardDatabase: loading pixmap for '%1' from ").arg(getName());
-	for (int i = 0; i < sortedSets.size(); i++)
-		debugOutput.append(QString("%1, ").arg(sortedSets[i]->getShortName()));
-	qDebug(debugOutput.toLatin1());
-
-	QString correctedName = getCorrectedName();
-	for (int i = 0; i < sortedSets.size(); i++) {
-		if (pixmap->load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(sortedSets[i]->getShortName()).arg(correctedName)))
-			return pixmap;
-		if (pixmap->load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(sortedSets[i]->getShortName()).arg(correctedName).arg(1)))
-			return pixmap;
-	}
-	if (pixmap->load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg("downloadedPics").arg(correctedName)))
-		return pixmap;
-	if (settingsCache->getPicDownload())
-		db->startPicDownload(this);
+	db->loadImage(this);
 	return pixmap;
+}
+
+void CardInfo::imageLoaded(const QImage &image)
+{
+	if (!image.isNull()) {
+		*pixmap = QPixmap::fromImage(image);
+		emit pixmapUpdated();
+	} else if (settingsCache->getPicDownload())
+		db->startPicDownload(this);
 }
 
 QPixmap *CardInfo::getPixmap(QSize size)
@@ -243,6 +287,11 @@ CardDatabase::CardDatabase(QObject *parent)
 	connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
 
 	loadCardDatabase();
+	
+	loadingThread = new PictureLoadingThread(this);
+	loadingThread->setPicsPath(settingsCache->getPicsPath());
+	connect(loadingThread, SIGNAL(imageLoaded(CardInfo *, QImage)), this, SLOT(imageLoaded(CardInfo *, QImage)));
+	loadingThread->start();
 
 	noCard = new CardInfo(this);
 	noCard->loadPixmap(); // cache pixmap for card back
@@ -531,4 +580,22 @@ QStringList CardDatabase::getAllMainCardTypes() const
 	while (cardIterator.hasNext())
 		types.insert(cardIterator.next().value()->getMainCardType());
 	return types.toList();
+}
+
+void CardDatabase::cacheCardPixmaps(const QStringList &cardNames)
+{
+	qDebug("pixmapCache started");
+	for (int i = 0; i < cardNames.size(); ++i)
+		getCard(cardNames[i])->loadPixmap();
+	qDebug("pixmapCache finished");
+}
+
+void CardDatabase::loadImage(CardInfo *card)
+{
+	loadingThread->loadImage(card);
+}
+
+void CardDatabase::imageLoaded(CardInfo *card, QImage image)
+{
+	card->imageLoaded(image);
 }

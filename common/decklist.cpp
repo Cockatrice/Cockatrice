@@ -468,6 +468,24 @@ void DeckList::cleanList()
 	setComments();
 }
 
+void DeckList::getCardListHelper(InnerDecklistNode *item, QSet<QString> &result) const
+{
+	for (int i = 0; i < item->size(); ++i) {
+		DecklistCardNode *node = dynamic_cast<DecklistCardNode *>(item->at(i));
+		if (node)
+			result.insert(node->getName());
+		else
+			getCardListHelper(dynamic_cast<InnerDecklistNode *>(item->at(i)), result);
+	}
+}
+
+QStringList DeckList::getCardList() const
+{
+	QSet<QString> result;
+	getCardListHelper(root, result);
+	return result.toList();
+}
+
 DecklistCardNode *DeckList::addCard(const QString &cardName, const QString &zoneName)
 {
 	InnerDecklistNode *zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));

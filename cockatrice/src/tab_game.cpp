@@ -18,7 +18,6 @@
 #include "zoneviewwidget.h"
 #include "deckview.h"
 #include "decklist.h"
-#include "deck_picturecacher.h"
 #include "protocol_items.h"
 #include "dlg_load_remote_deck.h"
 #include "abstractclient.h"
@@ -26,6 +25,7 @@
 #include "arrowitem.h"
 #include "main.h"
 #include "settingscache.h"
+#include "carddatabase.h"
 
 ReadyStartButton::ReadyStartButton(QWidget *parent)
 	: QPushButton(parent), readyStart(false)
@@ -131,7 +131,7 @@ void DeckViewContainer::deckSelectFinished(ProtocolResponse *r)
 	if (!resp)
 		return;
 	
-	Deck_PictureCacher::cachePictures(resp->getDeck(), this);
+	db->cacheCardPixmaps(resp->getDeck()->getCardList());
 	deckView->setDeck(new DeckList(resp->getDeck()));
 	readyStartButton->setEnabled(true);
 }
@@ -508,7 +508,7 @@ void TabGame::eventGameStateChanged(Event_GameStateChanged *event, GameEventCont
 			}
 			player->processPlayerInfo(pl);
 			if (player->getLocal() && !pl->getDeck()->isEmpty()) {
-				Deck_PictureCacher::cachePictures(pl->getDeck(), this);
+				db->cacheCardPixmaps(pl->getDeck()->getCardList());
 				deckViewContainers.value(player->getId())->setDeck(new DeckList(pl->getDeck()));
 			}
 		}
