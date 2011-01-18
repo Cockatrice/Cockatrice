@@ -52,11 +52,16 @@ void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
 		painter->fillRect(boundingRect(), QBrush(bgPixmap));
 }
 
-void StackZone::handleDropEvent(CardDragItem *dragItem, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
+void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
 	if (startZone == this)
 		return;
-	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), dragItem->getId(), player->getId(), getName(), 0, 0, false));
+	
+	QList<CardId *> idList;
+	for (int i = 0; i < dragItems.size(); ++i)
+		idList.append(new CardId(dragItems[i]->getId()));
+	
+	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), 0, 0, false));
 }
 
 void StackZone::reorganizeCards()

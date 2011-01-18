@@ -157,16 +157,25 @@ CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
 	return c;
 }
 
+void CardZone::removeCard(CardItem *card)
+{
+	cards.removeAt(cards.indexOf(card));
+	reorganizeCards();
+	emit cardCountChanged();
+	player->deleteCard(card);
+}
+
 void CardZone::moveAllToZone()
 {
 	QList<QVariant> data = static_cast<QAction *>(sender())->data().toList();
 	QString targetZone = data[0].toString();
 	int targetX = data[1].toInt();
 
-	// Cards need to be moved in reverse order so that the other
-	// cards' list index doesn't change
-	for (int i = cards.size() - 1; i >= 0; i--)
-		player->sendGameCommand(new Command_MoveCard(-1, getName(), cards.at(i)->getId(), player->getId(), targetZone, targetX));
+	QList<CardId *> idList;
+	for (int i = 0; i < cards.size(); ++i)
+		idList.append(new CardId(cards[i]->getId()));
+	
+	player->sendGameCommand(new Command_MoveCard(-1, getName(), idList, player->getId(), targetZone, targetX));
 }
 
 QPointF CardZone::closestGridPoint(const QPointF &point)

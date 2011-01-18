@@ -17,6 +17,7 @@ class CardItem : public AbstractCardItem {
 private:
 	CardZone *zone;
 	int id;
+	bool revealedCard;
 	bool attacking;
 	bool facedown;
 	QMap<int, int> counters;
@@ -31,6 +32,7 @@ private:
 	
 	QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
 	QAction *aPlay,
+		*aHide,
 		*aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aSetPT, *aSetAnnotation, *aFlip, *aClone,
 		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile;
 	QMenu *cardMenu, *moveMenu;
@@ -45,12 +47,13 @@ private slots:
 	void actSetPT();
 	void actSetAnnotation();
 	void actPlay();
+	void actHide();
 public slots:
 	void deleteLater();
 public:
 	enum { Type = typeCard };
 	int type() const { return Type; }
-	CardItem(Player *_owner, const QString &_name = QString(), int _cardid = -1, QGraphicsItem *parent = 0);
+	CardItem(Player *_owner, const QString &_name = QString(), int _cardid = -1, bool revealedCard = false, QGraphicsItem *parent = 0);
 	~CardItem();
 	void retranslateUi();
 	CardZone *getZone() const { return zone; }

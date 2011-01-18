@@ -16,8 +16,8 @@
 #include "settingscache.h"
 #include "tab_game.h"
 
-CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, QGraphicsItem *parent)
-	: AbstractCardItem(_name, _owner, parent), zone(0), id(_cardid), attacking(false), facedown(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(0), attachedTo(0)
+CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _revealedCard, QGraphicsItem *parent)
+	: AbstractCardItem(_name, _owner, parent), zone(0), id(_cardid), revealedCard(_revealedCard), attacking(false), facedown(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(0), attachedTo(0)
 {
 	owner->addCard(this);
 
@@ -59,6 +59,8 @@ CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, QGraphicsI
 	
 	aPlay = new QAction(this);
 	connect(aPlay, SIGNAL(triggered()), this, SLOT(actPlay()));
+	aHide = new QAction(this);
+	connect(aHide, SIGNAL(triggered()), this, SLOT(actHide()));
 		
 	for (int i = 0; i < 3; ++i) {
 		QAction *tempAddCounter = new QAction(this);
@@ -128,7 +130,9 @@ void CardItem::updateCardMenu()
 {
 	cardMenu->clear();
 	
-	if (owner->getLocal()) {
+	if (revealedCard)
+		cardMenu->addAction(aHide);
+	else if (owner->getLocal()) {
 		if (zone) {
 			if (zone->getName() == "table") {
 				cardMenu->addAction(aTap);
@@ -169,6 +173,7 @@ void CardItem::updateCardMenu()
 void CardItem::retranslateUi()
 {
 	aPlay->setText(tr("&Play"));
+	aHide->setText(tr("&Hide"));
 	
 	aTap->setText(tr("&Tap"));
 	aUntap->setText(tr("&Untap"));
@@ -426,7 +431,10 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 				cardMenu->exec(event->screenPos());
 	} else if ((event->button() == Qt::LeftButton) && !settingsCache->getDoubleClickToPlay()) {
 		setCursor(Qt::OpenHandCursor);
-		playCard(event->modifiers().testFlag(Qt::ShiftModifier));
+		if (revealedCard)
+			actHide();
+		else
+			playCard(event->modifiers().testFlag(Qt::ShiftModifier));
 	}
 
 	AbstractCardItem::mouseReleaseEvent(event);
@@ -434,8 +442,12 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-	if (settingsCache->getDoubleClickToPlay())
-		playCard(event->modifiers().testFlag(Qt::ShiftModifier));
+	if (settingsCache->getDoubleClickToPlay()) {
+		if (revealedCard)
+			actHide();
+		else
+			playCard(event->modifiers().testFlag(Qt::ShiftModifier));
+	}
 	event->accept();
 }
 
@@ -483,4 +495,9 @@ void CardItem::actCardCounterTrigger()
 void CardItem::actPlay()
 {
 	playCard(false);
+}
+
+void CardItem::actHide()
+{
+	zone->removeCard(this);
 }

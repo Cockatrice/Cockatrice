@@ -563,9 +563,10 @@ void Player::actMoveTopCardsToGrave()
 	const int maxCards = zones.value("deck")->getCards().size();
 	if (number > maxCards)
 		number = maxCards;
+	QList<CardId *> idList;
 	for (int i = 0; i < number; ++i)
-		commandList.append(new Command_MoveCard(-1, "deck", 0, getId(), "grave", 0, 0, false));
-	sendCommandContainer(new CommandContainer(commandList));
+		idList.append(new CardId(i));
+	sendGameCommand(new Command_MoveCard(-1, "deck", idList, getId(), "grave", 0, 0, false));
 }
 
 void Player::actMoveTopCardsToExile()
@@ -578,14 +579,15 @@ void Player::actMoveTopCardsToExile()
 	const int maxCards = zones.value("deck")->getCards().size();
 	if (number > maxCards)
 		number = maxCards;
+	QList<CardId *> idList;
 	for (int i = 0; i < number; ++i)
-		commandList.append(new Command_MoveCard(-1, "deck", 0, getId(), "rfg", 0, 0, false));
-	sendCommandContainer(new CommandContainer(commandList));
+		idList.append(new CardId(i));
+	sendGameCommand(new Command_MoveCard(-1, "deck", idList, getId(), "rfg", 0, 0, false));
 }
 
 void Player::actMoveTopCardToBottom()
 {
-	sendGameCommand(new Command_MoveCard(-1, "deck", 0, getId(), "deck", -1, 0, false));
+	sendGameCommand(new Command_MoveCard(-1, "deck", QList<CardId *>() << new CardId(0), getId(), "deck", -1, 0, false));
 }
 
 void Player::actUntapAll()
@@ -1088,10 +1090,10 @@ void Player::playCard(CardItem *c, bool faceDown, bool tapped)
 {
 	CardInfo *ci = c->getInfo();
 	if (ci->getTableRow() == 3)
-		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), c->getId(), getId(), "stack", 0, 0, false));
+		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), QList<CardId *>() << new CardId(c->getId()), getId(), "stack", 0, 0, false));
 	else {
 		QPoint gridPoint = QPoint(-1, 2 - ci->getTableRow());
-		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), c->getId(), getId(), "table", gridPoint.x(), gridPoint.y(), faceDown, tapped));
+		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), QList<CardId *>() << new CardId(c->getId()), getId(), "table", gridPoint.x(), gridPoint.y(), faceDown, tapped));
 	}
 }
 
@@ -1276,42 +1278,54 @@ bool Player::clearCardsToDelete()
 void Player::cardMenuAction(QAction *a)
 {
 	QList<QGraphicsItem *> sel = scene()->selectedItems();
+	QList<CardItem *> cardList;
+	while (!sel.isEmpty())
+		cardList.append(qgraphicsitem_cast<CardItem *>(sel.takeFirst()));
+	
 	QList<Command *> commandList;
-	while (!sel.isEmpty()) {
-		unsigned int i = (unsigned int) (((double) sel.size()) * qrand() / (RAND_MAX + 1.0));
-		CardItem *card = qgraphicsitem_cast<CardItem *>(sel.takeAt(i));
-
-		switch (a->data().toInt()) {
-			case 0:
-				if (!card->getTapped())
-					commandList.append(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "tapped", "1"));
-				break;
-			case 1:
-				if (card->getTapped())
-					commandList.append(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "tapped", "0"));
-				break;
-			case 2:
-				commandList.append(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "doesnt_untap", QString::number(!card->getDoesntUntap())));
-				break;
-			case 3: {
-				QString zone = card->getZone()->getName();
-				commandList.append(new Command_FlipCard(-1, zone, card->getId(), !card->getFaceDown()));
-				break;
+	if (a->data().toInt() <= 4)
+		for (int i = 0; i < cardList.size(); ++i) {
+			CardItem *card = cardList[i];
+			switch (a->data().toInt()) {
+				case 0:
+					if (!card->getTapped())
+						commandList.append(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "tapped", "1"));
+					break;
+				case 1:
+					if (card->getTapped())
+						commandList.append(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "tapped", "0"));
+					break;
+				case 2:
+					commandList.append(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "doesnt_untap", QString::number(!card->getDoesntUntap())));
+					break;
+				case 3: {
+					QString zone = card->getZone()->getName();
+					commandList.append(new Command_FlipCard(-1, zone, card->getId(), !card->getFaceDown()));
+					break;
+				}
+				case 4:
+					commandList.append(new Command_CreateToken(-1, card->getZone()->getName(), card->getName(), card->getColor(), card->getPT(), card->getAnnotation(), true, -1, card->getGridPoint().y()));
+					break;
 			}
-			case 4:
-				commandList.append(new Command_CreateToken(-1, card->getZone()->getName(), card->getName(), card->getColor(), card->getPT(), card->getAnnotation(), true, -1, card->getGridPoint().y()));
-				break;
+		}
+	else {
+		QList<CardId *> idList;
+		for (int i = 0; i < cardList.size(); ++i)
+			idList.append(new CardId(cardList[i]->getId()));
+		QString startZone = cardList[0]->getZone()->getName();
+		
+		switch (a->data().toInt()) {
 			case 5:
-				commandList.append(new Command_MoveCard(-1, card->getZone()->getName(), card->getId(), getId(), "deck", 0, 0, false));
+				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "deck", 0, 0, false));
 				break;
 			case 6:
-				commandList.append(new Command_MoveCard(-1, card->getZone()->getName(), card->getId(), getId(), "deck", -1, 0, false));
+				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "deck", -1, 0, false));
 				break;
 			case 7:
-				commandList.append(new Command_MoveCard(-1, card->getZone()->getName(), card->getId(), getId(), "grave", 0, 0, false));
+				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "grave", 0, 0, false));
 				break;
 			case 8:
-				commandList.append(new Command_MoveCard(-1, card->getZone()->getName(), card->getId(), getId(), "rfg", 0, 0, false));
+				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "rfg", 0, 0, false));
 				break;
 			default: ;
 		}

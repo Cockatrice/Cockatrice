@@ -85,14 +85,18 @@ void TableZone::addCardImpl(CardItem *card, int _x, int _y)
 	card->update();
 }
 
-void TableZone::handleDropEvent(CardDragItem *dragItem, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
+void TableZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
 {
-	handleDropEventByGrid(dragItem, startZone, mapToGrid(dropPoint), faceDown);
+	handleDropEventByGrid(dragItems, startZone, mapToGrid(dropPoint), faceDown);
 }
 
-void TableZone::handleDropEventByGrid(CardDragItem *dragItem, CardZone *startZone, const QPoint &gridPoint, bool faceDown, bool tapped)
+void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &gridPoint, bool faceDown, bool tapped)
 {
-	static_cast<CardItem *>(dragItem->getItem())->getZone()->getPlayer()->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), dragItem->getId(), player->getId(), getName(), gridPoint.x(), gridPoint.y(), faceDown, tapped));
+	QList<CardId *> idList;
+	for (int i = 0; i < dragItems.size(); ++i)
+		idList.append(new CardId(dragItems[i]->getId()));
+	
+	startZone->getPlayer()->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), gridPoint.x(), gridPoint.y(), faceDown, tapped));
 }
 
 void TableZone::reorganizeCards()

@@ -114,18 +114,6 @@ Command_DrawCards::Command_DrawCards(int _gameId, int _number)
 {
 	insertItem(new SerializableItem_Int("number", _number));
 }
-Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, int _cardId, int _targetPlayerId, const QString &_targetZone, int _x, int _y, bool _faceDown, bool _tapped)
-	: GameCommand("move_card", _gameId)
-{
-	insertItem(new SerializableItem_String("start_zone", _startZone));
-	insertItem(new SerializableItem_Int("card_id", _cardId));
-	insertItem(new SerializableItem_Int("target_player_id", _targetPlayerId));
-	insertItem(new SerializableItem_String("target_zone", _targetZone));
-	insertItem(new SerializableItem_Int("x", _x));
-	insertItem(new SerializableItem_Int("y", _y));
-	insertItem(new SerializableItem_Bool("face_down", _faceDown));
-	insertItem(new SerializableItem_Bool("tapped", _tapped));
-}
 Command_FlipCard::Command_FlipCard(int _gameId, const QString &_zone, int _cardId, bool _faceDown)
 	: GameCommand("flip_card", _gameId)
 {
@@ -465,7 +453,6 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdmulligan", Command_Mulligan::newItem);
 	itemNameHash.insert("cmdroll_die", Command_RollDie::newItem);
 	itemNameHash.insert("cmddraw_cards", Command_DrawCards::newItem);
-	itemNameHash.insert("cmdmove_card", Command_MoveCard::newItem);
 	itemNameHash.insert("cmdflip_card", Command_FlipCard::newItem);
 	itemNameHash.insert("cmdattach_card", Command_AttachCard::newItem);
 	itemNameHash.insert("cmdcreate_token", Command_CreateToken::newItem);

@@ -20,6 +20,12 @@ enum ResponseCode { RespNothing, RespOk, RespInvalidCommand, RespInvalidData, Re
 // list index, whereas cards in any other zone are referenced by their ids.
 enum ZoneType { PrivateZone, PublicZone, HiddenZone };
 
+class CardId : public SerializableItem_Int {
+public:
+	CardId(int _cardId = -1) : SerializableItem_Int("card_id", _cardId) { }
+	static SerializableItem *newItem() { return new CardId; }
+};
+
 class ServerInfo_User : public SerializableItem_Map {
 public:
 	enum UserLevelFlags {
