@@ -235,8 +235,8 @@ public:
 
 ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *startzone, const QList<int> &_cardIds, Server_CardZone *targetzone, int x, int y, bool faceDown, bool tapped)
 {
-	// Disallow controller change between different zones.
-	if ((startzone->getName() != targetzone->getName()) && (startzone->getPlayer() != targetzone->getPlayer()))
+	// Disallow controller change to other zones than the table.
+	if (((targetzone->getType() != PublicZone) || !targetzone->hasCoords()) && (startzone->getPlayer() != targetzone->getPlayer()))
 		return RespContextError;
 	
 	if (!targetzone->hasCoords() && (x == -1))

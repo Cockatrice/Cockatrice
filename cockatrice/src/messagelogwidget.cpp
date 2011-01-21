@@ -198,7 +198,7 @@ void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *s
 	else
 		cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName));
 
-	if ((startName == "table") && (targetName == "table")) {
+	if (startZone->getPlayer() != targetZone->getPlayer()) {
 		append(tr("%1 gives %2 control over %3.").arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(targetZone->getPlayer()->getName())).arg(cardStr));
 		return;
 	}
