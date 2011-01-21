@@ -584,10 +584,8 @@ QStringList CardDatabase::getAllMainCardTypes() const
 
 void CardDatabase::cacheCardPixmaps(const QStringList &cardNames)
 {
-	qDebug("pixmapCache started");
 	for (int i = 0; i < cardNames.size(); ++i)
 		getCard(cardNames[i])->loadPixmap();
-	qDebug("pixmapCache finished");
 }
 
 void CardDatabase::loadImage(CardInfo *card)

@@ -5,7 +5,6 @@
 #include "carddatabase.h"
 #include "settingscache.h"
 #include "main.h"
-#include <QDebug>
 
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag)
 	: AbstractCardDragItem(_item, _hotSpot, parentDrag), currentZone(0)
@@ -23,7 +22,6 @@ void DeckViewCardDragItem::updatePosition(const QPointF &cursorScenePos)
 	if (!cursorZone)
 		return;
 	currentZone = cursorZone;
-	qDebug() << currentZone;
 	
 	QPointF newPos = cursorScenePos;
 	if (newPos != pos()) {
@@ -121,7 +119,6 @@ void DeckViewCard::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 DeckViewCardContainer::DeckViewCardContainer(const QString &_name)
 	: QGraphicsItem(), name(_name), width(0), height(0), maxWidth(0)
 {
-	qDebug() << "CardContainer constructor: name=" << _name << "; this=" << this;
 	QString bgPath = settingsCache->getTableBgPath();
 	if (!bgPath.isEmpty())
 		bgPixmap.load(bgPath);

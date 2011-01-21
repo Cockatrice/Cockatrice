@@ -292,6 +292,7 @@ bool DeckList::readElement(QXmlStreamReader *xml)
 			sideboardPlans.insert(currentSideboardPlan->getName(), currentSideboardPlan);
 			currentSideboardPlan = 0;
 		}
+		return false;
 	} else if (xml->isEndElement()) {
 		if (xml->name() == "deckname")
 			name = currentElementText;
@@ -301,9 +302,13 @@ bool DeckList::readElement(QXmlStreamReader *xml)
 		currentElementText.clear();
 	} else if (xml->isStartElement() && (xml->name() == "zone"))
 		currentZone = new InnerDecklistNode(xml->attributes().value("name").toString(), root);
-	else if (xml->isStartElement() && (xml->name() == "sideboard_plan"))
+	else if (xml->isStartElement() && (xml->name() == "sideboard_plan")) {
 		currentSideboardPlan = new SideboardPlan;
-	else if (xml->isCharacters() && !xml->isWhitespace())
+		if (currentSideboardPlan->readElement(xml)) {
+			sideboardPlans.insert(currentSideboardPlan->getName(), currentSideboardPlan);
+			currentSideboardPlan = 0;
+		}
+	} else if (xml->isCharacters() && !xml->isWhitespace())
 		currentElementText = xml->text().toString();
 	return SerializableItem::readElement(xml);
 }
