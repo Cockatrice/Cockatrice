@@ -91,5 +91,8 @@
 	<file>resources/userlevels/registered.svg</file>
 	<file>resources/userlevels/judge.svg</file>
 	<file>resources/userlevels/admin.svg</file>
+
+	<file>resources/news/exclamation_mark.svg</file>
+	<file>resources/news/question_mark.svg</file>
     </qresource>
 </RCC>
