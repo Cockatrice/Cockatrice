@@ -74,6 +74,19 @@
 	<file>resources/countries/uk.svg</file>
 	<file>resources/countries/us.svg</file>
 
+	<file>resources/counters/w.svg</file>
+	<file>resources/counters/w_highlight.svg</file>
+	<file>resources/counters/u.svg</file>
+	<file>resources/counters/u_highlight.svg</file>
+	<file>resources/counters/b.svg</file>
+	<file>resources/counters/b_highlight.svg</file>
+	<file>resources/counters/r.svg</file>
+	<file>resources/counters/r_highlight.svg</file>
+	<file>resources/counters/g.svg</file>
+	<file>resources/counters/g_highlight.svg</file>
+	<file>resources/counters/general.svg</file>
+	<file>resources/counters/general_highlight.svg</file>
+
 	<file>resources/userlevels/normal.svg</file>
 	<file>resources/userlevels/registered.svg</file>
 	<file>resources/userlevels/judge.svg</file>

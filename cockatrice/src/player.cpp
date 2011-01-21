@@ -1220,7 +1220,6 @@ void Player::clearArrows()
 void Player::rearrangeCounters()
 {
 	qreal marginTop = 80;
-	qreal marginBottom = 10;
 	
 	// Determine total height of bounding rectangles
 	qreal totalHeight = 0;
@@ -1231,14 +1230,8 @@ void Player::rearrangeCounters()
 			totalHeight += counterIterator.value()->boundingRect().height();
 	}
 	
-	// Determine free space between objects
-	qreal padding = (boundingRect().height() - marginTop - marginBottom - totalHeight) / (counters.size() - 1);
+	const qreal padding = 10;
 	qreal y = boundingRect().y() + marginTop;
-	
-	if (counters.size() == 1) {
-		padding = 0;
-		y += (boundingRect().height() - marginTop - marginBottom) / 2;
-	}
 	
 	// Place objects
 	for (counterIterator.toFront(); counterIterator.hasNext(); ) {

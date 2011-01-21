@@ -4,6 +4,14 @@
 #include <QPixmap>
 #include <QMap>
 
+class CounterPixmapGenerator {
+private:
+	static QMap<QString, QPixmap> pmCache;
+public:
+	static QPixmap generatePixmap(int size, QString name, bool highlight);
+	static void clear() { pmCache.clear(); }
+};
+
 class PingPixmapGenerator {
 private:
 	static QMap<int, QPixmap> pmCache;

@@ -1,9 +1,11 @@
 #include "counter_general.h"
+#include "pixmapgenerator.h"
 #include <QPainter>
 
 GeneralCounter::GeneralCounter(Player *_player, int _id, const QString &_name, const QColor &_color, int _radius, int _value, QGraphicsItem *parent)
 	: AbstractCounter(_player, _id, _name, true, _value, parent), color(_color), radius(_radius)
 {
+	setCacheMode(DeviceCoordinateCache);
 }
 
 QRectF GeneralCounter::boundingRect() const
@@ -13,14 +15,22 @@ QRectF GeneralCounter::boundingRect() const
 
 void GeneralCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	painter->setBrush(QBrush(color));
-	painter->drawEllipse(boundingRect());
+	QRectF mapRect = painter->combinedTransform().mapRect(boundingRect());
+	int translatedHeight = mapRect.size().height();
+	qreal scaleFactor = translatedHeight / boundingRect().height();
+	QPixmap pixmap = CounterPixmapGenerator::generatePixmap(translatedHeight, name, hovered);
+	
+	painter->save();
+	painter->resetTransform();
+	painter->drawPixmap(QPoint(0, 0), pixmap);
+
 	if (value) {
 		QFont f("Serif");
-		f.setPixelSize(radius * 0.8);
+		f.setPixelSize(qMax((int) (radius * scaleFactor), 10));
 		f.setWeight(QFont::Bold);
+		painter->setPen(Qt::black);
 		painter->setFont(f);
-		painter->drawText(boundingRect(), Qt::AlignCenter, QString::number(value));
+		painter->drawText(mapRect, Qt::AlignCenter, QString::number(value));
 	}
+	painter->restore();
 }
-

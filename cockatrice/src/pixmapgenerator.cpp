@@ -5,6 +5,34 @@
 #include <math.h>
 #include <QDebug>
 
+QMap<QString, QPixmap> CounterPixmapGenerator::pmCache;
+
+QPixmap CounterPixmapGenerator::generatePixmap(int height, QString name, bool highlight)
+{
+	if (highlight)
+		name.append("_highlight");
+	QString key = name + QString::number(height);
+	if (pmCache.contains(key))
+		return pmCache.value(key);
+	
+	QSvgRenderer svg(QString(":/resources/counters/" + name + ".svg"));
+	
+	if (!svg.isValid()) {
+		name = "general";
+		if (highlight)
+			name.append("_highlight");
+		svg.load(QString(":/resources/counters/" + name + ".svg"));
+	}
+	
+	int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
+	QPixmap pixmap(width, height);
+	pixmap.fill(Qt::transparent);
+	QPainter painter(&pixmap);
+	svg.render(&painter, QRectF(0, 0, width, height));
+	pmCache.insert(key, pixmap);
+	return pixmap;
+}
+
 QPixmap PingPixmapGenerator::generatePixmap(int size, int value, int max)
 {
 	int key = size * 1000000 + max * 1000 + value;
