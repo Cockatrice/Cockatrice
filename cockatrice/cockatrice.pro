@@ -28,7 +28,6 @@ HEADERS += src/abstractcounter.h \
  src/handcounter.h \
  src/carddatabase.h \
  src/gameview.h \
- src/deck_picturecacher.h \
  src/decklistmodel.h \
  src/dlg_load_deck_from_clipboard.h \
  src/dlg_load_remote_deck.h \
@@ -111,7 +110,6 @@ SOURCES += src/abstractcounter.cpp \
  src/handcounter.cpp \
  src/carddatabase.cpp \
  src/gameview.cpp \
- src/deck_picturecacher.cpp \
  src/decklistmodel.cpp \
  src/dlg_load_deck_from_clipboard.cpp \
  src/dlg_load_remote_deck.cpp \

@@ -8,6 +8,8 @@
 #include <QList>
 #include <QXmlStreamReader>
 #include <QNetworkRequest>
+#include <QThread>
+#include <QMutex>
 
 class CardDatabase;
 class CardInfo;
@@ -33,6 +35,23 @@ private:
 	class CompareFunctor;
 public:
 	void sortByKey();
+};
+
+class PictureLoadingThread : public QThread {
+	Q_OBJECT
+private:
+	QString _picsPath;
+	QList<CardInfo *> loadQueue;
+	QMutex mutex;
+protected:
+	void run();
+public:
+	PictureLoadingThread(QObject *parent);
+	~PictureLoadingThread();
+	void setPicsPath(const QString &path);
+	void loadImage(CardInfo *card);
+signals:
+	void imageLoaded(CardInfo *card, const QImage &image);
 };
 
 class CardInfo : public QObject {
@@ -85,6 +104,7 @@ public:
 	QPixmap *getPixmap(QSize size);
 	void clearPixmapCache();
 	void clearPixmapCacheMiss();
+	void imageLoaded(const QImage &image);
 public slots:
 	void updatePixmapCache();
 signals:
@@ -102,6 +122,7 @@ protected:
 	bool downloadRunning;
 	bool loadSuccess;
 	CardInfo *noCard;
+	PictureLoadingThread *loadingThread;
 private:
 	void loadCardsFromXml(QXmlStreamReader &xml);
 	void loadSetsFromXml(QXmlStreamReader &xml);
@@ -120,6 +141,8 @@ public:
 	QStringList getAllColors() const;
 	QStringList getAllMainCardTypes() const;
 	bool getLoadSuccess() const { return loadSuccess; }
+	void cacheCardPixmaps(const QStringList &cardNames);
+	void loadImage(CardInfo *card);
 public slots:
 	void clearPixmapCache();
 	bool loadCardDatabase(const QString &path);
@@ -127,6 +150,7 @@ public slots:
 private slots:
 	void picDownloadFinished(QNetworkReply *reply);
 	void picDownloadChanged();
+	void imageLoaded(CardInfo *card, QImage image);
 };
 
 #endif

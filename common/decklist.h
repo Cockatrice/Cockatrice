@@ -6,6 +6,7 @@
 #include <QPair>
 #include <QObject>
 #include <QStringList>
+#include <QSet>
 #include "serializable_item.h"
 
 class CardDatabase;
@@ -115,6 +116,7 @@ private:
 	InnerDecklistNode *currentZone;
 	SideboardPlan *currentSideboardPlan;
 	QString currentElementText;
+	void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
 signals:
 	void deckLoaded();
 public slots:
@@ -149,6 +151,7 @@ public:
 
 	void cleanList();
 	bool isEmpty() const { return root->isEmpty() && name.isEmpty() && comments.isEmpty() && sideboardPlans.isEmpty(); }
+	QStringList getCardList() const;
 
 	InnerDecklistNode *getRoot() const { return root; }
 	DecklistCardNode *addCard(const QString &cardName, const QString &zoneName);

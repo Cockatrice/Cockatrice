@@ -22,7 +22,6 @@
 #include "carddatabasemodel.h"
 #include "decklistmodel.h"
 #include "cardinfowidget.h"
-#include "deck_picturecacher.h"
 #include "dlg_cardsearch.h"
 #include "dlg_load_deck_from_clipboard.h"
 #include "main.h"
@@ -466,8 +465,8 @@ void WndDeckEditor::setDeck(DeckList *_deck, const QString &_lastFileName, DeckL
 	deckModel->sort(1);
 	deckView->expandAll();
 	setWindowModified(false);
-		
-	Deck_PictureCacher::cachePictures(_deck, this);
+	
+	db->cacheCardPixmaps(_deck->getCardList());
 	deckView->expandAll();
 	setWindowModified(false);
 }
