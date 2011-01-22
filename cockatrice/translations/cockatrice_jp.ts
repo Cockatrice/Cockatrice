@@ -6,32 +6,32 @@
     <message>
         <location filename="../src/abstractcounter.cpp" line="56"/>
         <source>&amp;Set counter...</source>
-        <translation type="unfinished">カウンターの数を決める...</translation>
+        <translation>カウンターの数を決める...</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="63"/>
         <source>Ctrl+L</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="64"/>
         <source>F11</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="65"/>
         <source>F12</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="122"/>
         <source>Set counter</source>
-        <translation type="unfinished">カウンターの設定</translation>
+        <translation>カウンターの設定</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="122"/>
         <source>New value for counter &apos;%1&apos;:</source>
-        <translation type="unfinished">カウンター &apos;%1&apos;の新しい値を設定する:</translation>
+        <translation>カウンター &apos;%1&apos;の新しい値を設定する:</translation>
     </message>
 </context>
 <context>
@@ -171,12 +171,13 @@
     <message>
         <location filename="../src/carditem.cpp" line="175"/>
         <source>&amp;Play</source>
-        <translation type="unfinished"></translation>
+        <translation>プレイ</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="176"/>
         <source>&amp;Hide</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>テスト版のため確認取れず再度チェック</translatorcomment>
+        <translation>裏にしてプレイ</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="178"/>
@@ -945,7 +946,7 @@
     <message>
         <location filename="../src/tab_room.cpp" line="114"/>
         <source>Show &amp;full games</source>
-        <translation type="unfinished"></translation>
+        <translation>全てのゲームを見る</translation>
     </message>
     <message>
         <source>&amp;Show full games</source>
@@ -1090,42 +1091,42 @@
     <message>
         <location filename="../src/window_main.cpp" line="158"/>
         <source>Version %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="159"/>
         <source>Authors:</source>
-        <translation type="unfinished"></translation>
+        <translation>著者:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="160"/>
         <source>Translators:</source>
-        <translation type="unfinished"></translation>
+        <translation>翻訳者:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="161"/>
         <source>Spanish:</source>
-        <translation type="unfinished"></translation>
+        <translation>スペイン語:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="162"/>
         <source>Portugese (Portugal):</source>
-        <translation type="unfinished"></translation>
+        <translation>ポルトガル語（ポルトガル）:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="163"/>
         <source>Portugese (Brazil):</source>
-        <translation type="unfinished"></translation>
+        <translation>ポルトガル語（ブラジル）:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="164"/>
         <source>French:</source>
-        <translation type="unfinished"></translation>
+        <translation>フランス語:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="165"/>
         <source>Japanese:</source>
-        <translation type="unfinished"></translation>
+        <translation>日本語:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="171"/>
@@ -1341,7 +1342,7 @@
     <message>
         <location filename="../src/messagelogwidget.cpp" line="202"/>
         <source>%1 gives %2 control over %3.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="208"/>
@@ -1997,7 +1998,7 @@
     <message>
         <location filename="../src/player.cpp" line="416"/>
         <source>Put top card on &amp;bottom</source>
-        <translation type="unfinished"></translation>
+        <translation>一番上のカードを一番下に置く</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="419"/>
@@ -2157,32 +2158,32 @@
     <message>
         <location filename="../src/tab_server.cpp" line="51"/>
         <source>Rooms</source>
-        <translation type="unfinished"></translation>
+        <translation>部屋</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="52"/>
         <source>Joi&amp;n</source>
-        <translation type="unfinished">参加する</translation>
+        <translation>参加する</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="55"/>
         <source>Room</source>
-        <translation type="unfinished"></translation>
+        <translation>部屋</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="56"/>
         <source>Description</source>
-        <translation type="unfinished">説明</translation>
+        <translation>説明</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="57"/>
         <source>Players</source>
-        <translation type="unfinished">プレイヤー</translation>
+        <translation>プレイヤー</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="58"/>
         <source>Games</source>
-        <translation type="unfinished">ゲーム</translation>
+        <translation>ゲーム</translation>
     </message>
 </context>
 <context>
@@ -2210,37 +2211,37 @@
     <message>
         <location filename="../src/tab_admin.cpp" line="40"/>
         <source>Update server &amp;message</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー更新&amp;メッセージ</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="41"/>
         <source>Server administration functions</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー管理機能</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="43"/>
         <source>&amp;Unlock functions</source>
-        <translation type="unfinished"></translation>
+        <translation>機能をアンロックする</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="44"/>
         <source>&amp;Lock functions</source>
-        <translation type="unfinished"></translation>
+        <translation>機能をロックする</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="54"/>
         <source>Unlock administration functions</source>
-        <translation type="unfinished"></translation>
+        <translation>管理機能をアンロックする</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="54"/>
         <source>Do you really want to unlock the administration functions?</source>
-        <translation type="unfinished"></translation>
+        <translation>本当に管理機能をアンロックしますか？</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.h" line="26"/>
         <source>Administration</source>
-        <translation type="unfinished"></translation>
+        <translation>管理者</translation>
     </message>
 </context>
 <context>
@@ -2445,32 +2446,32 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_room.cpp" line="219"/>
         <source>&amp;Say:</source>
-        <translation type="unfinished">発言する</translation>
+        <translation>発言する</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="220"/>
         <source>Chat</source>
-        <translation type="unfinished"></translation>
+        <translation>チャット</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="221"/>
         <source>&amp;Room</source>
-        <translation type="unfinished"></translation>
+        <translation>部屋</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="222"/>
         <source>&amp;Leave room</source>
-        <translation type="unfinished"></translation>
+        <translation>部屋から出る</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="268"/>
         <source>%1 has joined the room.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1は部屋に参加しました</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="274"/>
         <source>%1 has left the room.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1は部屋から退出しました</translation>
     </message>
 </context>
 <context>
@@ -2486,12 +2487,12 @@ Please enter a name:</source>
     <message>
         <location filename="../src/userinfobox.cpp" line="38"/>
         <source>User information</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー情報</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="45"/>
         <source>Real name:</source>
-        <translation type="unfinished"></translation>
+        <translation>本名:</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="46"/>
@@ -2506,22 +2507,22 @@ Please enter a name:</source>
     <message>
         <location filename="../src/userinfobox.cpp" line="65"/>
         <source>Administrator</source>
-        <translation type="unfinished"></translation>
+        <translation>管理者</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="67"/>
         <source>Judge</source>
-        <translation type="unfinished"></translation>
+        <translation>ジャッジ</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="69"/>
         <source>Registered user</source>
-        <translation type="unfinished"></translation>
+        <translation>登録ユーザー</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="71"/>
         <source>Unregistered user</source>
-        <translation type="unfinished"></translation>
+        <translation>未登録ユーザー</translation>
     </message>
 </context>
 <context>
@@ -2557,17 +2558,17 @@ Please enter a name:</source>
     <message>
         <location filename="../src/userlist.cpp" line="65"/>
         <source>Users in this room: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>部屋のユーザー数: %1</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="119"/>
         <source>User &amp;details</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー補足</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="120"/>
         <source>Direct &amp;chat</source>
-        <translation type="unfinished"></translation>
+        <translation>個人チャット</translation>
     </message>
 </context>
 <context>
@@ -2656,14 +2657,15 @@ Please enter a name:</source>
         <location filename="../src/window_deckeditor.cpp" line="312"/>
         <location filename="../src/window_deckeditor.cpp" line="336"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="312"/>
         <location filename="../src/window_deckeditor.cpp" line="336"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>要検証</translatorcomment>
+        <translation>このデッキは保存されていません. ディレクトリをチェックして再度上書きしてください.</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="318"/>
