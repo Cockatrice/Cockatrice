@@ -94,5 +94,7 @@
 
 	<file>resources/news/exclamation_mark.svg</file>
 	<file>resources/news/question_mark.svg</file>
+
+	<file>resources/mtgforum.png</file>
     </qresource>
 </RCC>

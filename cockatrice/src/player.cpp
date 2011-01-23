@@ -1230,7 +1230,7 @@ void Player::rearrangeCounters()
 			totalHeight += counterIterator.value()->boundingRect().height();
 	}
 	
-	const qreal padding = 10;
+	const qreal padding = 5;
 	qreal y = boundingRect().y() + marginTop;
 	
 	// Place objects
