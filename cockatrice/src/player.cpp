@@ -886,6 +886,11 @@ void Player::eventDestroyCard(Event_DestroyCard *event)
 	if (!card)
 		return;
 	
+	QList<CardItem *> attachedCards = card->getAttachedCards();
+	// This list is always empty except for buggy server implementations.
+	for (int i = 0; i < attachedCards.size(); ++i)
+		attachedCards[i]->setAttachedTo(0);
+	
 	emit logDestroyCard(this, card->getName());
 	zone->takeCard(-1, event->getCardId(), true);
 	card->deleteLater();

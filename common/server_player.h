@@ -76,7 +76,7 @@ public:
 	void setupZones();
 
 	ResponseCode moveCard(CommandContainer *cont, const QString &_startZone, const QList<int> &_cardId, int _targetPlayer, const QString &_targetZone, int _x, int _y, bool _faceDown, bool _tapped);
-	ResponseCode moveCard(CommandContainer *cont, Server_CardZone *startzone, const QList<int> &_cardId, Server_CardZone *targetzone, int x, int y, bool faceDown, bool tapped);
+	ResponseCode moveCard(CommandContainer *cont, Server_CardZone *startzone, const QList<int> &_cardId, Server_CardZone *targetzone, int x, int y, bool faceDown, bool tapped, bool fixFreeSpaces = true);
 	void unattachCard(CommandContainer *cont, Server_Card *card);
 	ResponseCode setCardAttrHelper(CommandContainer *cont, const QString &zone, int cardId, const QString &attrName, const QString &attrValue);
 

@@ -58,6 +58,7 @@ HEADERS += src/abstractcounter.h \
  src/tab_deck_storage.h \
  src/tab_supervisor.h \
  src/tab_admin.h \
+ src/chatview.h \
  src/userlist.h \
  src/userinfobox.h \
  src/remotedecklist_treewidget.h \
@@ -139,6 +140,7 @@ SOURCES += src/abstractcounter.cpp \
  src/tab_deck_storage.cpp \
  src/tab_supervisor.cpp \
  src/tab_admin.cpp \
+ src/chatview.cpp \
  src/userlist.cpp \
  src/userinfobox.cpp \
  src/remotedecklist_treewidget.cpp \

@@ -233,7 +233,7 @@ public:
 	}
 };
 
-ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *startzone, const QList<int> &_cardIds, Server_CardZone *targetzone, int x, int y, bool faceDown, bool tapped)
+ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *startzone, const QList<int> &_cardIds, Server_CardZone *targetzone, int x, int y, bool faceDown, bool tapped, bool fixFreeSpaces)
 {
 	// Disallow controller change to other zones than the table.
 	if (((targetzone->getType() != PublicZone) || !targetzone->hasCoords()) && (startzone->getPlayer() != targetzone->getPlayer()))
@@ -302,7 +302,7 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 			}
 		}
 		
-		if (card->getDestroyOnZoneChange() && (startzone != targetzone)) {
+		if (card->getDestroyOnZoneChange() && (startzone->getName() != targetzone->getName())) {
 			cont->enqueueGameEventPrivate(new Event_DestroyCard(getPlayerId(), startzone->getName(), card->getId()), game->getGameId());
 			cont->enqueueGameEventPublic(new Event_DestroyCard(getPlayerId(), startzone->getName(), card->getId()), game->getGameId());
 			card->deleteLater();
@@ -369,7 +369,7 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 				setCardAttrHelper(cont, targetzone->getName(), card->getId(), "tapped", "1");
 		}
 	}
-	if (startzone->hasCoords())
+	if (startzone->hasCoords() && fixFreeSpaces)
 		startzone->fixFreeSpaces(cont);
 	
 	return RespOk;
@@ -383,7 +383,7 @@ void Server_Player::unattachCard(CommandContainer *cont, Server_Card *card)
 	cont->enqueueGameEventPrivate(new Event_AttachCard(getPlayerId(), zone->getName(), card->getId(), -1, QString(), -1), game->getGameId());
 	cont->enqueueGameEventPublic(new Event_AttachCard(getPlayerId(), zone->getName(), card->getId(), -1, QString(), -1), game->getGameId());
 	
-	moveCard(cont, zone, QList<int>() << card->getId(), zone, -1, card->getY(), card->getFaceDown(), card->getTapped());
+	moveCard(cont, zone, QList<int>() << card->getId(), zone, -1, card->getY(), card->getFaceDown(), false);
 }
 
 ResponseCode Server_Player::setCardAttrHelper(CommandContainer *cont, const QString &zoneName, int cardId, const QString &attrName, const QString &attrValue)

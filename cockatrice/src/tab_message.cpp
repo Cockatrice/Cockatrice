@@ -1,4 +1,3 @@
-#include <QTextEdit>
 #include <QLineEdit>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -7,17 +6,17 @@
 #include "tab_message.h"
 #include "abstractclient.h"
 #include "protocol_items.h"
+#include "chatview.h"
 
-TabMessage::TabMessage(AbstractClient *_client, const QString &_userName)
-	: Tab(), client(_client), userName(_userName)
+TabMessage::TabMessage(AbstractClient *_client, const QString &_ownName, const QString &_userName)
+	: Tab(), client(_client), userName(_userName), userOnline(true)
 {
-	textEdit = new QTextEdit;
-	textEdit->setReadOnly(true);
+	chatView = new ChatView(_ownName);
 	sayEdit = new QLineEdit;
 	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
 	
 	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(textEdit);
+	vbox->addWidget(chatView);
 	vbox->addWidget(sayEdit);
 	
 	aLeave = new QAction(this);
@@ -41,17 +40,9 @@ void TabMessage::retranslateUi()
 	aLeave->setText(tr("&Leave"));
 }
 
-QString TabMessage::sanitizeHtml(QString dirty) const
-{
-	return dirty
-		.replace("&", "&amp;")
-		.replace("<", "&lt;")
-		.replace(">", "&gt;");
-}
-
 void TabMessage::sendMessage()
 {
-	if (sayEdit->text().isEmpty())
+	if (sayEdit->text().isEmpty() || !userOnline)
 	  	return;
 	
 	client->sendCommand(new Command_Message(userName, sayEdit->text()));
@@ -65,14 +56,18 @@ void TabMessage::actLeave()
 
 void TabMessage::processMessageEvent(Event_Message *event)
 {
-	textEdit->append(QString("<font color=\"") + (event->getSenderName() == userName ? "#0000fe" : "red") + QString("\">%1:</font> %2").arg(sanitizeHtml(event->getSenderName())).arg(sanitizeHtml(event->getText())));
+	chatView->appendMessage(event->getSenderName(), event->getText());
 	emit userEvent();
 }
 
-void TabMessage::processUserLeft(const QString &name)
+void TabMessage::processUserLeft()
 {
-	if (userName == name) {
-		textEdit->append("<font color=\"blue\">" + tr("%1 has left the server.").arg(sanitizeHtml(name)) + "</font>");
-		sayEdit->setEnabled(false);
-	}
+	chatView->appendMessage(QString(), tr("%1 has left the server.").arg(userName));
+	userOnline = false;
+}
+
+void TabMessage::processUserJoined()
+{
+	chatView->appendMessage(QString(), tr("%1 has joined the server.").arg(userName));
+	userOnline = true;
 }

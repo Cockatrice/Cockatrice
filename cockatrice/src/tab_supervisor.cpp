@@ -66,6 +66,7 @@ void TabSupervisor::start(AbstractClient *_client, ServerInfo_User *userInfo)
 	tabServer = new TabServer(client, userInfo);
 	connect(tabServer, SIGNAL(roomJoined(ServerInfo_Room *, bool)), this, SLOT(addRoomTab(ServerInfo_Room *, bool)));
 	connect(tabServer, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
+	connect(tabServer, SIGNAL(userJoined(const QString &)), this, SLOT(processUserJoined(const QString &)));
 	connect(tabServer, SIGNAL(userLeft(const QString &)), this, SLOT(processUserLeft(const QString &)));
 	myAddTab(tabServer);
 	updatePingTime(0, -1);
@@ -128,6 +129,11 @@ void TabSupervisor::stop()
 	while (gameIterator.hasNext())
 		gameIterator.next().value()->deleteLater();
 	gameTabs.clear();
+
+	QMapIterator<QString, TabMessage *> messageIterator(messageTabs);
+	while (messageIterator.hasNext())
+		messageIterator.next().value()->deleteLater();
+	messageTabs.clear();
 }
 
 void TabSupervisor::updatePingTime(int value, int max)
@@ -178,6 +184,7 @@ void TabSupervisor::addRoomTab(ServerInfo_Room *info, bool setCurrent)
 {
 	TabRoom *tab = new TabRoom(client, userName, info);
 	connect(tab, SIGNAL(roomClosing(TabRoom *)), this, SLOT(roomLeft(TabRoom *)));
+	connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
 	myAddTab(tab);
 	roomTabs.insert(info->getRoomId(), tab);
 	if (setCurrent)
@@ -197,7 +204,7 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
 	if (receiverName == userName)
 		return 0;
 	
-	TabMessage *tab = new TabMessage(client, receiverName);
+	TabMessage *tab = new TabMessage(client, userName, receiverName);
 	connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
 	myAddTab(tab);
 	messageTabs.insert(receiverName, tab);
@@ -257,7 +264,14 @@ void TabSupervisor::processUserLeft(const QString &userName)
 {
 	TabMessage *tab = messageTabs.value(userName);
 	if (tab)
-		tab->processUserLeft(userName);
+		tab->processUserLeft();
+}
+
+void TabSupervisor::processUserJoined(const QString &userName)
+{
+	TabMessage *tab = messageTabs.value(userName);
+	if (tab)
+		tab->processUserJoined();
 }
 
 void TabSupervisor::updateCurrent(int index)

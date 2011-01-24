@@ -1,4 +1,3 @@
-#include <QTextEdit>
 #include <QLineEdit>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -10,15 +9,13 @@
 #include <QCheckBox>
 #include <QInputDialog>
 #include <QLabel>
-#include <QScrollBar>
 #include "dlg_creategame.h"
 #include "tab_room.h"
 #include "userlist.h"
 #include "abstractclient.h"
 #include "protocol_items.h"
 #include "gamesmodel.h"
-
-#include <QTextTable>
+#include "chatview.h"
 
 GameSelector::GameSelector(AbstractClient *_client, int _roomId, QWidget *parent)
 	: QGroupBox(parent), client(_client), roomId(_roomId)
@@ -120,43 +117,6 @@ void GameSelector::retranslateUi()
 void GameSelector::processGameInfo(ServerInfo_Game *info)
 {
 	gameListModel->updateGameList(info);
-}
-
-ChatView::ChatView(const QString &_ownName, QWidget *parent)
-	: QTextEdit(parent), ownName(_ownName)
-{
-	setTextInteractionFlags(Qt::TextSelectableByMouse);
-	
-	QTextTableFormat format;
-	format.setBorderStyle(QTextFrameFormat::BorderStyle_None);
-	table = textCursor().insertTable(1, 3, format);
-}
-
-void ChatView::appendMessage(const QString &sender, const QString &message)
-{
-	QTextCursor cellCursor = table->cellAt(table->rows() - 1, 0).lastCursorPosition();
-	cellCursor.insertText(QDateTime::currentDateTime().toString("[hh:mm]"));
-	QTextTableCell senderCell = table->cellAt(table->rows() - 1, 1);
-	QTextCharFormat senderFormat;
-	if (sender == ownName) {
-		senderFormat.setFontWeight(QFont::Bold);
-		senderFormat.setForeground(Qt::red);
-	} else
-		senderFormat.setForeground(Qt::blue);
-	senderCell.setFormat(senderFormat);
-	cellCursor = senderCell.lastCursorPosition();
-	cellCursor.insertText(sender);
-	QTextTableCell messageCell = table->cellAt(table->rows() - 1, 2);
-	QTextCharFormat messageFormat;
-	if (sender.isEmpty())
-		messageFormat.setForeground(Qt::darkGreen);
-	messageCell.setFormat(messageFormat);
-	cellCursor = messageCell.lastCursorPosition();
-	cellCursor.insertText(message);
-	
-	table->appendRows(1);
-	
-	verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }
 
 TabRoom::TabRoom(AbstractClient *_client, const QString &_ownName, ServerInfo_Room *info)

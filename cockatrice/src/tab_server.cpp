@@ -184,6 +184,8 @@ void TabServer::processUserJoinedEvent(Event_UserJoined *event)
 {
 	userList->processUserInfo(event->getUserInfo());
 	userList->sortItems();
+	
+	emit userJoined(event->getUserInfo()->getName());
 }
 
 void TabServer::processUserLeftEvent(Event_UserLeft *event)

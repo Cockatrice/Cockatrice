@@ -129,7 +129,6 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 			default: return RespInvalidCommand;
 		}
 	}
-	qDebug() << "received generic Command";
 	switch (command->getItemId()) {
 		case ItemId_Command_Ping: return cmdPing(static_cast<Command_Ping *>(command), cont);
 		case ItemId_Command_Login: return cmdLogin(static_cast<Command_Login *>(command), cont);
@@ -659,7 +658,8 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 
 	if (targetCard) {
 		// Unattach all cards attached to the card being attached.
-		const QList<Server_Card *> &attachedList = card->getAttachedCards();
+		// Make a copy of the list because its contents change during the loop otherwise.
+		QList<Server_Card *> attachedList = card->getAttachedCards();
 		for (int i = 0; i < attachedList.size(); ++i)
 			player->unattachCard(cont, attachedList[i]);
 		
@@ -670,6 +670,7 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 		card->setCoords(-1, card->getY());
 		cont->enqueueGameEventPrivate(new Event_AttachCard(player->getPlayerId(), startzone->getName(), card->getId(), targetPlayer->getPlayerId(), targetzone->getName(), targetCard->getId()), game->getGameId());
 		cont->enqueueGameEventPublic(new Event_AttachCard(player->getPlayerId(), startzone->getName(), card->getId(), targetPlayer->getPlayerId(), targetzone->getName(), targetCard->getId()), game->getGameId());
+		startzone->fixFreeSpaces(cont);
 	} else
 		player->unattachCard(cont, card);
 	
