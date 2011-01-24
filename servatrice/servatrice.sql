@@ -25,7 +25,7 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- Tabellenstruktur für Tabelle `decklist_files`
 --
 
-CREATE TABLE IF NOT EXISTS `decklist_files` (
+CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
   `id_folder` int(7) unsigned zerofill NOT NULL,
   `user` varchar(30) NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `decklist_files` (
 -- Tabellenstruktur für Tabelle `decklist_folders`
 --
 
-CREATE TABLE IF NOT EXISTS `decklist_folders` (
+CREATE TABLE IF NOT EXISTS `cockatrice_decklist_folders` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
   `id_parent` int(7) unsigned zerofill NOT NULL,
   `user` varchar(30) NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `decklist_folders` (
 -- Tabellenstruktur für Tabelle `games`
 --
 
-CREATE TABLE IF NOT EXISTS `games` (
+CREATE TABLE IF NOT EXISTS `cockatrice_games` (
   `id` int(7) unsigned zerofill NOT NULL,
   `descr` varchar(50) default NULL,
   `password` tinyint(1) default NULL,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS `games` (
 -- Tabellenstruktur für Tabelle `games_players`
 --
 
-CREATE TABLE IF NOT EXISTS `games_players` (
+CREATE TABLE IF NOT EXISTS `cockatrice_games_players` (
   `id_game` int(7) unsigned zerofill NOT NULL,
   `player` varchar(30) default NULL,
   KEY `id_game` (`id_game`)
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `games_players` (
 -- Tabellenstruktur für Tabelle `news`
 --
 
-CREATE TABLE IF NOT EXISTS `news` (
+CREATE TABLE IF NOT EXISTS `cockatrice_news` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
   `id_user` int(7) unsigned zerofill NOT NULL,
   `news_date` datetime NOT NULL,
@@ -98,10 +98,11 @@ CREATE TABLE IF NOT EXISTS `news` (
 -- Tabellenstruktur für Tabelle `users`
 --
 
-CREATE TABLE IF NOT EXISTS `users` (
+CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
   `admin` tinyint(1) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `realname` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `country` char(2) NOT NULL,
@@ -118,4 +119,10 @@ CREATE TABLE `cockatrice_uptime` (
   `users_count` int(11) DEFAULT NULL,
   `games_count` int(11) DEFAULT NULL,
   PRIMARY KEY (`timest`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE `cockatrice_servermessages` (
+  `timest` datetime NOT NULL default '0000-00-00 00:00:00',
+  `message` text,
+  PRIMARY KEY  (`timest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
