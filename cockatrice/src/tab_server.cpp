@@ -123,6 +123,7 @@ TabServer::TabServer(AbstractClient *_client, ServerInfo_User *userInfo, QWidget
 {
 	roomSelector = new RoomSelector(client);
 	serverInfoBox = new QTextBrowser;
+	serverInfoBox->setOpenExternalLinks(true);
 	userInfoBox = new UserInfoBox(_client, false);
 	userInfoBox->updateInfo(userInfo);
 	userList = new UserList(client, true);

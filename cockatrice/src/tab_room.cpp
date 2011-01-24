@@ -203,6 +203,7 @@ TabRoom::TabRoom(AbstractClient *_client, const QString &_ownName, ServerInfo_Ro
 	const QList<ServerInfo_User *> users = info->getUserList();
 	for (int i = 0; i < users.size(); ++i)
 		userList->processUserInfo(users[i]);
+	userList->sortItems();
 	
 	const QList<ServerInfo_Game *> games = info->getGameList();
 	for (int i = 0; i < games.size(); ++i)
@@ -267,6 +268,7 @@ void TabRoom::processJoinRoomEvent(Event_JoinRoom *event)
 {
 	chatView->appendMessage(QString(), tr("%1 has joined the room.").arg(event->getUserInfo()->getName()));
 	userList->processUserInfo(event->getUserInfo());
+	userList->sortItems();
 }
 
 void TabRoom::processLeaveRoomEvent(Event_LeaveRoom *event)
