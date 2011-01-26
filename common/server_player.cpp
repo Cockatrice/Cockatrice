@@ -330,8 +330,8 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 				publicCardName = card->getName();
 		
 			int oldCardId = card->getId();
-			if (faceDown)
-				card->setId(newCardId());
+			if (faceDown || (targetzone->getPlayer() != startzone->getPlayer()))
+				card->setId(targetzone->getPlayer()->newCardId());
 			card->setFaceDown(faceDown);
 		
 			// The player does not get to see which card he moved if it moves between two parts of hidden zones which
