@@ -33,11 +33,6 @@ void Server_Room::addClient(Server_ProtocolHandler *client)
 {
 	sendRoomEvent(new Event_JoinRoom(id, new ServerInfo_User(client->getUserInfo())));
 	append(client);
-	
-	QList<ServerInfo_User *> eventUserList;
-	for (int i = 0; i < size(); ++i)
-		eventUserList.append(new ServerInfo_User(at(i)->getUserInfo()));
-
 	emit roomInfoChanged();
 }
 

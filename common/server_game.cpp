@@ -398,17 +398,17 @@ void Server_Game::sendGameEventToPlayer(Server_Player *player, GameEvent *event)
 ServerInfo_Game *Server_Game::getInfo() const
 {
 	if (players.isEmpty())
-		// Game is open
+		// Game is closing
 		return new ServerInfo_Game(getGameId(), QString(), false, 0, getMaxPlayers(), 0, false, 0);
 	else
-		// Game is closing
+		// Game is open
 		return new ServerInfo_Game(
 			getGameId(),
 			getDescription(),
 			!getPassword().isEmpty(),
 			getPlayerCount(),
 			getMaxPlayers(),
-			new ServerInfo_User(getCreatorInfo()),
+			new ServerInfo_User(getCreatorInfo(), false),
 			getSpectatorsAllowed(),
 			getSpectatorsNeedPassword(),
 			getSpectatorCount()

@@ -26,6 +26,7 @@ public:
 	const QString &getOriginZone() const { return originZone; }
 protected:
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+	void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
 };
 
 class DeckViewCardDragItem : public AbstractCardDragItem {

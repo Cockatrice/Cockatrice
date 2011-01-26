@@ -55,6 +55,7 @@ private slots:
 	void roomLeft(TabRoom *tab);
 	TabMessage *addMessageTab(const QString &userName, bool focus);
 	void processUserLeft(const QString &userName);
+	void processUserJoined(const QString &userName);
 	void talkLeft(TabMessage *tab);
 	void tabUserEvent();
 	void processRoomEvent(RoomEvent *event);

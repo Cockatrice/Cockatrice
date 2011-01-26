@@ -46,6 +46,7 @@ signals:
 	void roomJoined(ServerInfo_Room *info, bool setCurrent);
 	void openMessageDialog(const QString &userName, bool focus);
 	void userLeft(const QString &userName);
+	void userJoined(const QString &userName);
 private slots:
 	void processListUsersResponse(ProtocolResponse *response);
 	void processUserJoinedEvent(Event_UserJoined *event);

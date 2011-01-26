@@ -154,9 +154,9 @@ bool Server_CardZone::isColumnEmpty(int x, int y) const
 
 void Server_CardZone::moveCard(CommandContainer *cont, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y)
 {
-	coordMap.remove(card->getX());
-	player->moveCard(cont, this, QList<int>() << card->getId(), this, x, y, card->getFaceDown(), false);
-	coordMap.insert(x, card);
+	coordMap.remove(card->getY() * 10000 + card->getX());
+	player->moveCard(cont, this, QList<int>() << card->getId(), this, x, y, card->getFaceDown(), false, false);
+	coordMap.insert(y * 10000 + x, card);
 }
 
 void Server_CardZone::fixFreeSpaces(CommandContainer *cont)
@@ -177,7 +177,7 @@ void Server_CardZone::fixFreeSpaces(CommandContainer *cont)
 		if (!coordMap.contains(y * 10000 + baseX)) {
 			if (coordMap.contains(y * 10000 + baseX + 1))
 				moveCard(cont, coordMap, coordMap.value(y * 10000 + baseX + 1), baseX, y);
-			else if (coordMap.contains(baseX + 2)) {
+			else if (coordMap.contains(y * 10000 + baseX + 2)) {
 				moveCard(cont, coordMap, coordMap.value(y * 10000 + baseX + 2), baseX, y);
 				return;
 			} else

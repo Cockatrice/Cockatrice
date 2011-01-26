@@ -140,7 +140,7 @@ void TableZone::reorganizeCards()
 		qreal actualX = x + numberAttachedCards * CARD_WIDTH / 3.0;
 		qreal actualY = y;
 		if (numberAttachedCards)
-			actualY += 5;
+			actualY += 15;
 		
 		cards[i]->setPos(actualX, actualY);
 		cards[i]->setRealZValue((actualY + CARD_HEIGHT) * 100000 + (actualX + 1) * 100);
@@ -151,7 +151,7 @@ void TableZone::reorganizeCards()
 			++j;
 			CardItem *attachedCard = attachedCardIterator.next();
 			qreal childX = actualX - j * CARD_WIDTH / 3.0;
-			qreal childY = y - 5;
+			qreal childY = y + 5;
 			attachedCard->setPos(childX, childY);
 			attachedCard->setRealZValue((childY + CARD_HEIGHT) * 100000 + (childX + 1) * 100);
 

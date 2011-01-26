@@ -17,7 +17,6 @@ AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, QGraphi
 {
 	setCursor(Qt::OpenHandCursor);
 	setFlag(ItemIsSelectable);
-	setAcceptsHoverEvents(true);
 	setCacheMode(DeviceCoordinateCache);
 
 	connect(info, SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
