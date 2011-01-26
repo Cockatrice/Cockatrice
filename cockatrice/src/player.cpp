@@ -447,6 +447,7 @@ void Player::setShortcutsActive()
 {
 	shortcutsActive = true;
 	
+	aViewSideboard->setShortcut(tr("Ctrl+F3"));
 	aViewLibrary->setShortcut(tr("F3"));
 	aViewTopCards->setShortcut(tr("Ctrl+W"));
 	aViewGraveyard->setShortcut(tr("F4"));
@@ -468,6 +469,7 @@ void Player::setShortcutsInactive()
 {
 	shortcutsActive = false;
 	
+	aViewSideboard->setShortcut(QKeySequence());
 	aViewLibrary->setShortcut(QKeySequence());
 	aViewTopCards->setShortcut(QKeySequence());
 	aViewGraveyard->setShortcut(QKeySequence());
