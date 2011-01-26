@@ -64,6 +64,7 @@ void DeckViewCardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 DeckViewCard::DeckViewCard(const QString &_name, const QString &_originZone, QGraphicsItem *parent)
 	: AbstractCardItem(_name, 0, parent), originZone(_originZone), dragItem(0)
 {
+	setAcceptsHoverEvents(true);
 }
 
 DeckViewCard::~DeckViewCard()
@@ -114,6 +115,12 @@ void DeckViewCard::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 		scene()->addItem(drag);
 	}
 	setCursor(Qt::OpenHandCursor);
+}
+
+void DeckViewCard::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+	event->accept();
+	processHoverEvent();
 }
 
 DeckViewCardContainer::DeckViewCardContainer(const QString &_name)
