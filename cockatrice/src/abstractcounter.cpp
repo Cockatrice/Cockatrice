@@ -97,13 +97,13 @@ void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 		event->ignore();
 }
 
-void AbstractCounter::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+void AbstractCounter::hoverEnterEvent(QGraphicsSceneHoverEvent * /*event*/)
 {
 	hovered = true;
 	update();
 }
 
-void AbstractCounter::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+void AbstractCounter::hoverLeaveEvent(QGraphicsSceneHoverEvent * /*event*/)
 {
 	hovered = false;
 	update();

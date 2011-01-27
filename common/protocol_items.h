@@ -182,6 +182,13 @@ public:
 	static SerializableItem *newItem() { return new Command_DrawCards; }
 	int getItemId() const { return ItemId_Command_DrawCards; }
 };
+class Command_UndoDraw : public GameCommand {
+	Q_OBJECT
+public:
+	Command_UndoDraw(int _gameId = -1);
+	static SerializableItem *newItem() { return new Command_UndoDraw; }
+	int getItemId() const { return ItemId_Command_UndoDraw; }
+};
 class Command_FlipCard : public GameCommand {
 	Q_OBJECT
 public:
@@ -633,6 +640,13 @@ public:
 	int getDeckId() const { return static_cast<SerializableItem_Int *>(itemMap.value("deck_id"))->getData(); };
 	static SerializableItem *newItem() { return new Context_DeckSelect; }
 	int getItemId() const { return ItemId_Context_DeckSelect; }
+};
+class Context_UndoDraw : public GameEventContext {
+	Q_OBJECT
+public:
+	Context_UndoDraw();
+	static SerializableItem *newItem() { return new Context_UndoDraw; }
+	int getItemId() const { return ItemId_Context_UndoDraw; }
 };
 class Command_UpdateServerMessage : public AdminCommand {
 	Q_OBJECT

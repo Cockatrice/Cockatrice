@@ -186,7 +186,10 @@ void MainWindow::socketError(const QString &errorStr)
 
 void MainWindow::protocolVersionMismatch(int localVersion, int remoteVersion)
 {
-	QMessageBox::critical(this, tr("Error"), tr("Protocol version mismatch. Local version: %1, remote version: %2.").arg(localVersion).arg(remoteVersion));
+	if (localVersion > remoteVersion)
+		QMessageBox::critical(this, tr("Error"), tr("You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.\nLocal version is %1, remote version is %2.").arg(localVersion).arg(remoteVersion));
+	else
+		QMessageBox::critical(this, tr("Error"), tr("Your Cockatrice client is obsolete. Please update your Cockatrice version.\nLocal version is %1, remote version is %2.").arg(localVersion).arg(remoteVersion));
 }
 
 void MainWindow::setClientStatusTitle()

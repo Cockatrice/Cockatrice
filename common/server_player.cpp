@@ -150,6 +150,8 @@ void Server_Player::clearZones()
 	while (arrowIterator.hasNext())
 		delete arrowIterator.next().value();
 	arrows.clear();
+
+	lastDrawList.clear();
 }
 
 ServerInfo_PlayerProperties *Server_Player::getProperties()
@@ -199,6 +201,37 @@ bool Server_Player::deleteCounter(int counterId)
 	return true;
 }
 
+ResponseCode Server_Player::drawCards(CommandContainer *cont, int number)
+{
+	Server_CardZone *deckZone = zones.value("deck");
+	Server_CardZone *handZone = zones.value("hand");
+	if (deckZone->cards.size() < number)
+		number = deckZone->cards.size();
+
+	QList<ServerInfo_Card *> cardListPrivate;
+	QList<ServerInfo_Card *> cardListOmniscient;
+	for (int i = 0; i < number; ++i) {
+		Server_Card *card = deckZone->cards.takeFirst();
+		handZone->cards.append(card);
+		lastDrawList.append(card->getId());
+		cardListPrivate.append(new ServerInfo_Card(card->getId(), card->getName()));
+		cardListOmniscient.append(new ServerInfo_Card(card->getId(), card->getName()));
+	}
+	cont->enqueueGameEventPrivate(new Event_DrawCards(playerId, cardListPrivate.size(), cardListPrivate), game->getGameId());
+	cont->enqueueGameEventOmniscient(new Event_DrawCards(playerId, cardListOmniscient.size(), cardListOmniscient), game->getGameId());
+	cont->enqueueGameEventPublic(new Event_DrawCards(playerId, cardListPrivate.size()), game->getGameId());
+
+	return RespOk;
+}
+
+ResponseCode Server_Player::undoDraw(CommandContainer *cont)
+{
+	if (lastDrawList.isEmpty())
+		return RespContextError;
+	
+	return moveCard(cont, zones.value("hand"), QList<int>() << lastDrawList.takeLast(), zones.value("deck"), 0, 0, false, false, false, true);
+}
+
 ResponseCode Server_Player::moveCard(CommandContainer *cont, const QString &_startZone, const QList<int> &_cardIds, int targetPlayerId, const QString &_targetZone, int x, int y, bool faceDown, bool tapped)
 {
 	Server_CardZone *startzone = getZones().value(_startZone);
@@ -233,7 +266,7 @@ public:
 	}
 };
 
-ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *startzone, const QList<int> &_cardIds, Server_CardZone *targetzone, int x, int y, bool faceDown, bool tapped, bool fixFreeSpaces)
+ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *startzone, const QList<int> &_cardIds, Server_CardZone *targetzone, int x, int y, bool faceDown, bool tapped, bool fixFreeSpaces, bool undoingDraw)
 {
 	// Disallow controller change to other zones than the table.
 	if (((targetzone->getType() != PublicZone) || !targetzone->hasCoords()) && (startzone->getPlayer() != targetzone->getPlayer()))
@@ -262,6 +295,13 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 		Server_Card *card = cardsToMove[cardIndex].first;
 		int originalPosition = cardsToMove[cardIndex].second;
 		int position = startzone->removeCard(card);
+		if (startzone->getName() == "hand") {
+			if (undoingDraw)
+				lastDrawList.removeAt(lastDrawList.indexOf(card->getId()));
+			else if (lastDrawList.contains(card->getId()))
+				lastDrawList.clear();
+		}
+		
 		if ((startzone == targetzone) && !startzone->hasCoords()) {
 			if (!secondHalf && (originalPosition < x)) {
 				xIndex = -1;
@@ -346,8 +386,8 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 			int privatePosition = -1;
 			if (startzone->getType() == HiddenZone)
 				privatePosition = position;
-			cont->enqueueGameEventPrivate(new Event_MoveCard(getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, privateNewCardId, faceDown), game->getGameId());
-			cont->enqueueGameEventOmniscient(new Event_MoveCard(getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, privateNewCardId, faceDown), game->getGameId());
+			cont->enqueueGameEventPrivate(new Event_MoveCard(getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, privateNewCardId, faceDown), game->getGameId(), -1, undoingDraw ? new Context_UndoDraw : 0);
+			cont->enqueueGameEventOmniscient(new Event_MoveCard(getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, privateNewCardId, faceDown), game->getGameId(), undoingDraw ? new Context_UndoDraw : 0);
 			
 			// Other players do not get to see the start and/or target position of the card if the respective
 			// part of the zone is being looked at. The information is not needed anyway because in hidden zones,
@@ -361,9 +401,9 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 				newX = -1;
 		
 			if ((startzone->getType() == PublicZone) || (targetzone->getType() == PublicZone))
-				cont->enqueueGameEventPublic(new Event_MoveCard(getPlayerId(), oldCardId, publicCardName, startzone->getName(), position, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, card->getId(), faceDown), game->getGameId());
+				cont->enqueueGameEventPublic(new Event_MoveCard(getPlayerId(), oldCardId, publicCardName, startzone->getName(), position, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, card->getId(), faceDown), game->getGameId(), undoingDraw ? new Context_UndoDraw : 0);
 			else
-				cont->enqueueGameEventPublic(new Event_MoveCard(getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, -1, false), game->getGameId());
+				cont->enqueueGameEventPublic(new Event_MoveCard(getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, -1, false), game->getGameId(), undoingDraw ? new Context_UndoDraw : 0);
 			
 			if (tapped)
 				setCardAttrHelper(cont, targetzone->getName(), card->getId(), "tapped", "1");

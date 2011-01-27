@@ -20,6 +20,7 @@
 2:mulligan
 2:roll_die:i,sides
 2:draw_cards:i,number
+2:undo_draw
 2:flip_card:s,zone:i,card_id:b,face_down
 2:attach_card:s,start_zone:i,card_id:i,target_player_id:s,target_zone:i,target_card_id
 2:create_token:s,zone:s,card_name:s,color:s,pt:s,annotation:b,destroy:i,x:i,y
@@ -67,4 +68,5 @@
 6:ready_start
 6:concede
 6:deck_select:i,deck_id
+6:undo_draw
 7:update_server_message

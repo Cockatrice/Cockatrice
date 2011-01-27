@@ -61,8 +61,8 @@ private:
 	ResponseCode cmdShuffle(Command_Shuffle *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdMulligan(Command_Mulligan *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdRollDie(Command_RollDie *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode drawCards(Server_Game *game, Server_Player *player, CommandContainer *cont, int number);
 	ResponseCode cmdDrawCards(Command_DrawCards *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
+	ResponseCode cmdUndoDraw(Command_UndoDraw *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdMoveCard(Command_MoveCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdFlipCard(Command_FlipCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdAttachCard(Command_AttachCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);

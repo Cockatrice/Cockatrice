@@ -138,26 +138,32 @@ void CommandContainer::setResponse(ProtocolResponse *_resp)
 	resp = _resp;
 }
 
-void CommandContainer::enqueueGameEventPublic(GameEvent *event, int gameId)
+void CommandContainer::enqueueGameEventPublic(GameEvent *event, int gameId, GameEventContext *context)
 {
 	if (!gameEventQueuePublic)
 		gameEventQueuePublic = new GameEventContainer(QList<GameEvent *>(), gameId);
 	gameEventQueuePublic->addGameEvent(event);
+	if (context)
+		gameEventQueuePublic->setContext(context);
 }
 
-void CommandContainer::enqueueGameEventOmniscient(GameEvent *event, int gameId)
+void CommandContainer::enqueueGameEventOmniscient(GameEvent *event, int gameId, GameEventContext *context)
 {
 	if (!gameEventQueueOmniscient)
 		gameEventQueueOmniscient = new GameEventContainer(QList<GameEvent *>(), gameId);
 	gameEventQueueOmniscient->addGameEvent(event);
+	if (context)
+		gameEventQueueOmniscient->setContext(context);
 }
 
-void CommandContainer::enqueueGameEventPrivate(GameEvent *event, int gameId, int playerId)
+void CommandContainer::enqueueGameEventPrivate(GameEvent *event, int gameId, int playerId, GameEventContext *context)
 {
 	if (!gameEventQueuePrivate)
 		gameEventQueuePrivate = new GameEventContainer(QList<GameEvent *>(), gameId);
 	gameEventQueuePrivate->addGameEvent(event);
 	privatePlayerId = playerId;
+	if (context)
+		gameEventQueuePrivate->setContext(context);
 }
 
 Command_DeckUpload::Command_DeckUpload(DeckList *_deck, const QString &_path)

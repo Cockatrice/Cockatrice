@@ -17,6 +17,7 @@ class ProtocolResponse;
 class DeckList;
 class GameEvent;
 class GameEventContainer;
+class GameEventContext;
 class MoveCardToZone;
 
 enum ItemId {
@@ -55,7 +56,7 @@ private:
 	static void initializeHashAuto();
 	bool receiverMayDelete;
 public:
-	static const int protocolVersion = 11;
+	static const int protocolVersion = 12;
 	static void initializeHash();
 	virtual int getItemId() const = 0;
 	bool getReceiverMayDelete() const { return receiverMayDelete; }
@@ -132,11 +133,11 @@ public:
 	const QList<ProtocolItem *> &getItemQueue() const { return itemQueue; }
 	void enqueueItem(ProtocolItem *item) { itemQueue.append(item); }
 	GameEventContainer *getGameEventQueuePublic() const { return gameEventQueuePublic; }
-	void enqueueGameEventPublic(GameEvent *event, int gameId);
+	void enqueueGameEventPublic(GameEvent *event, int gameId, GameEventContext *context = 0);
 	GameEventContainer *getGameEventQueueOmniscient() const { return gameEventQueueOmniscient; }
-	void enqueueGameEventOmniscient(GameEvent *event, int gameId);
+	void enqueueGameEventOmniscient(GameEvent *event, int gameId, GameEventContext *context = 0);
 	GameEventContainer *getGameEventQueuePrivate() const { return gameEventQueuePrivate; }
-	void enqueueGameEventPrivate(GameEvent *event, int gameId, int playerId = -1);
+	void enqueueGameEventPrivate(GameEvent *event, int gameId, int playerId = -1, GameEventContext *context = 0);
 	int getPrivatePlayerId() const { return privatePlayerId; }
 };
 

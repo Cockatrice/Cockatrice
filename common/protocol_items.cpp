@@ -114,6 +114,10 @@ Command_DrawCards::Command_DrawCards(int _gameId, int _number)
 {
 	insertItem(new SerializableItem_Int("number", _number));
 }
+Command_UndoDraw::Command_UndoDraw(int _gameId)
+	: GameCommand("undo_draw", _gameId)
+{
+}
 Command_FlipCard::Command_FlipCard(int _gameId, const QString &_zone, int _cardId, bool _faceDown)
 	: GameCommand("flip_card", _gameId)
 {
@@ -425,6 +429,10 @@ Context_DeckSelect::Context_DeckSelect(int _deckId)
 {
 	insertItem(new SerializableItem_Int("deck_id", _deckId));
 }
+Context_UndoDraw::Context_UndoDraw()
+	: GameEventContext("undo_draw")
+{
+}
 Command_UpdateServerMessage::Command_UpdateServerMessage()
 	: AdminCommand("update_server_message")
 {
@@ -453,6 +461,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdmulligan", Command_Mulligan::newItem);
 	itemNameHash.insert("cmdroll_die", Command_RollDie::newItem);
 	itemNameHash.insert("cmddraw_cards", Command_DrawCards::newItem);
+	itemNameHash.insert("cmdundo_draw", Command_UndoDraw::newItem);
 	itemNameHash.insert("cmdflip_card", Command_FlipCard::newItem);
 	itemNameHash.insert("cmdattach_card", Command_AttachCard::newItem);
 	itemNameHash.insert("cmdcreate_token", Command_CreateToken::newItem);
@@ -500,5 +509,6 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_event_contextready_start", Context_ReadyStart::newItem);
 	itemNameHash.insert("game_event_contextconcede", Context_Concede::newItem);
 	itemNameHash.insert("game_event_contextdeck_select", Context_DeckSelect::newItem);
+	itemNameHash.insert("game_event_contextundo_draw", Context_UndoDraw::newItem);
 	itemNameHash.insert("cmdupdate_server_message", Command_UpdateServerMessage::newItem);
 }
