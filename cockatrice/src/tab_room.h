@@ -23,6 +23,7 @@ class Event_ListGames;
 class Event_JoinRoom;
 class Event_LeaveRoom;
 class Event_RoomSay;
+class TabRoom;
 
 class GameSelector : public QGroupBox {
 	Q_OBJECT
@@ -35,7 +36,7 @@ signals:
 	void gameJoined(int gameId);
 private:
 	AbstractClient *client;
-	int roomId;
+	TabRoom *room;
 
 	QTreeView *gameListView;
 	GamesModel *gameListModel;
@@ -43,7 +44,7 @@ private:
 	QPushButton *createButton, *joinButton, *spectateButton;
 	QCheckBox *showFullGamesCheckBox;
 public:
-	GameSelector(AbstractClient *_client, int _roomId, QWidget *parent = 0);
+	GameSelector(AbstractClient *_client, TabRoom *_room, QWidget *parent = 0);
 	void retranslateUi();
 	void processGameInfo(ServerInfo_Game *info);
 };
@@ -55,6 +56,7 @@ private:
 	int roomId;
 	QString roomName;
 	QString ownName;
+	QMap<int, QString> gameTypes;
 	
 	GameSelector *gameSelector;
 	UserList *userList;
@@ -82,6 +84,7 @@ public:
 	void retranslateUi();
 	void processRoomEvent(RoomEvent *event);
 	int getRoomId() const { return roomId; }
+	const QMap<int, QString> &getGameTypes() const { return gameTypes; }
 	QString getChannelName() const { return roomName; }
 	QString getTabText() const { return roomName; }
 };

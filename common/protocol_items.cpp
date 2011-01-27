@@ -69,17 +69,6 @@ Command_RoomSay::Command_RoomSay(int _roomId, const QString &_message)
 {
 	insertItem(new SerializableItem_String("message", _message));
 }
-Command_CreateGame::Command_CreateGame(int _roomId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything)
-	: RoomCommand("create_game", _roomId)
-{
-	insertItem(new SerializableItem_String("description", _description));
-	insertItem(new SerializableItem_String("password", _password));
-	insertItem(new SerializableItem_Int("max_players", _maxPlayers));
-	insertItem(new SerializableItem_Bool("spectators_allowed", _spectatorsAllowed));
-	insertItem(new SerializableItem_Bool("spectators_need_password", _spectatorsNeedPassword));
-	insertItem(new SerializableItem_Bool("spectators_can_talk", _spectatorsCanTalk));
-	insertItem(new SerializableItem_Bool("spectators_see_everything", _spectatorsSeeEverything));
-}
 Command_JoinGame::Command_JoinGame(int _roomId, int _gameId, const QString &_password, bool _spectator)
 	: RoomCommand("join_game", _roomId)
 {
@@ -453,7 +442,6 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdjoin_room", Command_JoinRoom::newItem);
 	itemNameHash.insert("cmdleave_room", Command_LeaveRoom::newItem);
 	itemNameHash.insert("cmdroom_say", Command_RoomSay::newItem);
-	itemNameHash.insert("cmdcreate_game", Command_CreateGame::newItem);
 	itemNameHash.insert("cmdjoin_game", Command_JoinGame::newItem);
 	itemNameHash.insert("cmdleave_game", Command_LeaveGame::newItem);
 	itemNameHash.insert("cmdsay", Command_Say::newItem);

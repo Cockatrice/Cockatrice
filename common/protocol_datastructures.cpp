@@ -23,7 +23,7 @@ ServerInfo_User::ServerInfo_User(const ServerInfo_User *other, bool complete)
 	insertItem(new SerializableItem_ByteArray("avatar_bmp", complete ? other->getAvatarBmp() : QByteArray()));
 }
 
-ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, ServerInfo_User *_creatorInfo, bool _spectatorsAllowed, bool _spectatorsNeedPassword, int _spectatorCount)
+ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, const QList<GameTypeId *> &_gameTypes, ServerInfo_User *_creatorInfo, bool _spectatorsAllowed, bool _spectatorsNeedPassword, int _spectatorCount)
 	: SerializableItem_Map("game")
 {
 	insertItem(new SerializableItem_Int("game_id", _gameId));
@@ -37,9 +37,19 @@ ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool 
 	insertItem(new SerializableItem_Bool("spectators_allowed", _spectatorsAllowed));
 	insertItem(new SerializableItem_Bool("spectators_need_password", _spectatorsNeedPassword));
 	insertItem(new SerializableItem_Int("spectator_count", _spectatorCount));
+	
+	for (int i = 0; i < _gameTypes.size(); ++i)
+		itemList.append(_gameTypes[i]);
 }
 
-ServerInfo_Room::ServerInfo_Room(int _roomId, const QString &_name, const QString &_description, int _gameCount, int _playerCount, bool _autoJoin, const QList<ServerInfo_Game *> &_gameList, const QList<ServerInfo_User *> &_userList)
+ServerInfo_GameType::ServerInfo_GameType(int _gameTypeId, const QString &_description)
+	: SerializableItem_Map("game_type")
+{
+	insertItem(new SerializableItem_Int("game_type_id", _gameTypeId));
+	insertItem(new SerializableItem_String("description", _description));
+}
+
+ServerInfo_Room::ServerInfo_Room(int _roomId, const QString &_name, const QString &_description, int _gameCount, int _playerCount, bool _autoJoin, const QList<ServerInfo_Game *> &_gameList, const QList<ServerInfo_User *> &_userList, const QList<ServerInfo_GameType *> &_gameTypeList)
 	: SerializableItem_Map("room")
 {
 	insertItem(new SerializableItem_Int("room_id", _roomId));
@@ -55,6 +65,9 @@ ServerInfo_Room::ServerInfo_Room(int _roomId, const QString &_name, const QStrin
 	userList = _userList;
 	for (int i = 0; i < _userList.size(); ++i)
 		itemList.append(_userList[i]);
+	gameTypeList = _gameTypeList;
+	for (int i = 0; i < _gameTypeList.size(); ++i)
+		itemList.append(_gameTypeList[i]);
 }
 
 void ServerInfo_Room::extractData()
@@ -68,6 +81,11 @@ void ServerInfo_Room::extractData()
 		ServerInfo_Game *game = dynamic_cast<ServerInfo_Game *>(itemList[i]);
 		if (game) {
 			gameList.append(game);
+			continue;
+		}
+		ServerInfo_GameType *gameType = dynamic_cast<ServerInfo_GameType *>(itemList[i]);
+		if (gameType) {
+			gameTypeList.append(gameType);
 			continue;
 		}
 	}

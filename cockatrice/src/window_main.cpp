@@ -113,7 +113,7 @@ void MainWindow::actSinglePlayer()
 	}
 	tabSupervisor->startLocal(localClients);
 	
-	Command_CreateGame *createCommand = new Command_CreateGame(0, QString(), QString(), numberPlayers, false, false, false, false);
+	Command_CreateGame *createCommand = new Command_CreateGame(0, QString(), QString(), numberPlayers, QList<GameTypeId *>(), false, false, false, false);
 	mainClient->sendCommand(createCommand);
 }
 

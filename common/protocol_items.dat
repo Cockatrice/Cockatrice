@@ -12,7 +12,6 @@
 0:join_room:i,room_id
 1:leave_room
 1:room_say:s,message
-1:create_game:s,description:s,password:i,max_players:b,spectators_allowed:b,spectators_need_password:b,spectators_can_talk:b,spectators_see_everything
 1:join_game:i,game_id:s,password:b,spectator
 2:leave_game
 2:say:s,message

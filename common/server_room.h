@@ -25,11 +25,12 @@ private:
 	QString description;
 	bool autoJoin;
 	QString joinMessage;
+	QStringList gameTypes;
 	QMap<int, Server_Game *> games;
 private slots:
 	void removeGame();
 public:
-	Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, Server *parent);
+	Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent);
 	int getId() const { return id; }
 	QString getName() const { return name; }
 	QString getDescription() const { return description; }
@@ -43,7 +44,7 @@ public:
 	void removeClient(Server_ProtocolHandler *client);
 	void say(Server_ProtocolHandler *client, const QString &s);
 	void broadcastGameListUpdate(Server_Game *game);
-	Server_Game *createGame(const QString &description, const QString &password, int maxPlayers, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator);
+	Server_Game *createGame(const QString &description, const QString &password, int maxPlayers, const QList<int> &_gameTypes, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator);
 	
 	void sendRoomEvent(RoomEvent *event);
 };

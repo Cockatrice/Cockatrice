@@ -58,12 +58,22 @@ Servatrice::Servatrice(QObject *parent)
 	int size = settings->beginReadArray("rooms");
 	for (int i = 0; i < size; ++i) {
 	  	settings->setArrayIndex(i);
+		
+		QStringList gameTypes;
+		int size2 = settings->beginReadArray("game_types");
+		for (int j = 0; j < size2; ++j) {
+			settings->setArrayIndex(j);
+			gameTypes.append(settings->value("name").toString());
+		}
+		settings->endArray();
+			
 		Server_Room *newRoom = new Server_Room(
 			i,
 			settings->value("name").toString(),
 			settings->value("description").toString(),
 			settings->value("autojoin").toBool(),
 			settings->value("joinmessage").toString(),
+			gameTypes,
 			this
 		);
 		addRoom(newRoom);

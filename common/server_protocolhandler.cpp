@@ -356,7 +356,12 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
 	
-	Server_Game *game = room->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
+	QList<int> gameTypes;
+	QList<GameTypeId *> gameTypeList = cmd->getGameTypes();
+	for (int i = 0; i < gameTypeList.size(); ++i)
+		gameTypes.append(gameTypeList[i]->getData());
+	
+	Server_Game *game = room->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), gameTypes, cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
 	Server_Player *creator = game->getPlayers().values().first();
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	
