@@ -85,7 +85,7 @@ void ServerSocketInterface::readClient()
 
 void ServerSocketInterface::catchSocketError(QAbstractSocket::SocketError socketError)
 {
-	qDebug(QString("socket error: %1").arg(socketError).toLatin1());
+	qDebug() << "Socket error:" << socketError;
 	
 	deleteLater();
 }
@@ -327,7 +327,7 @@ ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd, C
 // ADMIN FUNCTIONS.
 // Permission is checked by the calling function.
 
-ResponseCode ServerSocketInterface::cmdUpdateServerMessage(Command_UpdateServerMessage *cmd, CommandContainer *cont)
+ResponseCode ServerSocketInterface::cmdUpdateServerMessage(Command_UpdateServerMessage * /*cmd*/, CommandContainer * /*cont*/)
 {
 	servatrice->updateLoginMessage();
 	return RespOk;

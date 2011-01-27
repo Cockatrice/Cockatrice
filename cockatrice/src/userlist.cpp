@@ -8,7 +8,7 @@
 #include <QMenu>
 
 UserListItemDelegate::UserListItemDelegate(QObject *const parent)
-	: QItemDelegate(parent)
+	: QStyledItemDelegate(parent)
 {
 }
 
@@ -21,7 +21,7 @@ bool UserListItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model,
 			return true;
 		}
 	}
-	return QItemDelegate::editorEvent(event, model, option, index);
+	return QStyledItemDelegate::editorEvent(event, model, option, index);
 }
 
 UserListTWI::UserListTWI()

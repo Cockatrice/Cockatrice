@@ -24,13 +24,6 @@
 	<file>resources/icon_search.svg</file>
 	<file>resources/icon_clearsearch.svg</file>
         <file>resources/hr.jpg</file>
-        <file>translations/cockatrice_de.qm</file>
-        <file>translations/cockatrice_en.qm</file>
-	<file>translations/cockatrice_es.qm</file>
-	<file>translations/cockatrice_pt.qm</file>
-	<file>translations/cockatrice_pt-br.qm</file>
-	<file>translations/cockatrice_fr.qm</file>
-	<file>translations/cockatrice_ja.qm</file>
         <file>resources/appicon.svg</file>
         <file>resources/add_to_sideboard.svg</file>
         <file>resources/decrement.svg</file>
@@ -43,6 +36,15 @@
 	<file>resources/icon_conceded.svg</file>
 	<file>resources/icon_player.svg</file>
 	<file>resources/icon_spectator.svg</file>
+
+        <file>translations/cockatrice_de.qm</file>
+        <file>translations/cockatrice_en.qm</file>
+	<file>translations/cockatrice_es.qm</file>
+	<file>translations/cockatrice_pt.qm</file>
+	<file>translations/cockatrice_pt-br.qm</file>
+	<file>translations/cockatrice_fr.qm</file>
+	<file>translations/cockatrice_ja.qm</file>
+	<file>translations/cockatrice_ru.qm</file>
 
 	<file>resources/countries/at.svg</file>
 	<file>resources/countries/au.svg</file>

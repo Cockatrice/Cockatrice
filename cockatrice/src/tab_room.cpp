@@ -226,14 +226,12 @@ void TabRoom::processListGamesEvent(Event_ListGames *event)
 
 void TabRoom::processJoinRoomEvent(Event_JoinRoom *event)
 {
-	chatView->appendMessage(QString(), tr("%1 has joined the room.").arg(event->getUserInfo()->getName()));
 	userList->processUserInfo(event->getUserInfo());
 	userList->sortItems();
 }
 
 void TabRoom::processLeaveRoomEvent(Event_LeaveRoom *event)
 {
-	chatView->appendMessage(QString(), tr("%1 has left the room.").arg(event->getPlayerName()));
 	userList->deleteUser(event->getPlayerName());
 }
 

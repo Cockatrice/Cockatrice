@@ -1424,20 +1424,20 @@
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/tab_room.cpp" line="115"/>
+        <location filename="../src/tab_room.cpp" line="112"/>
         <source>C&amp;reate</source>
         <translation>Spiel e&amp;rstellen</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="116"/>
+        <location filename="../src/tab_room.cpp" line="113"/>
         <source>&amp;Join</source>
         <translation>&amp;Teilnehmen</translation>
     </message>
     <message>
+        <location filename="../src/tab_room.cpp" line="75"/>
+        <location filename="../src/tab_room.cpp" line="76"/>
+        <location filename="../src/tab_room.cpp" line="77"/>
         <location filename="../src/tab_room.cpp" line="78"/>
-        <location filename="../src/tab_room.cpp" line="79"/>
-        <location filename="../src/tab_room.cpp" line="80"/>
-        <location filename="../src/tab_room.cpp" line="81"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
@@ -1446,42 +1446,42 @@
         <translation type="obsolete">XXX</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="78"/>
+        <location filename="../src/tab_room.cpp" line="75"/>
         <source>Wrong password.</source>
         <translation>Falsches Passwort.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="79"/>
+        <location filename="../src/tab_room.cpp" line="76"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>In diesem Spiel sind keine Zuschauer zugelassen.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="80"/>
+        <location filename="../src/tab_room.cpp" line="77"/>
         <source>The game is already full.</source>
         <translation>Das Spiel ist bereits voll.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="81"/>
+        <location filename="../src/tab_room.cpp" line="78"/>
         <source>The game does not exist any more.</source>
         <translation>Dieses Spiel gibt es nicht mehr.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="97"/>
+        <location filename="../src/tab_room.cpp" line="94"/>
         <source>Join game</source>
         <translation>Spiel beitreten</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="97"/>
+        <location filename="../src/tab_room.cpp" line="94"/>
         <source>Password:</source>
         <translation>Passwort:</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="113"/>
+        <location filename="../src/tab_room.cpp" line="110"/>
         <source>Games</source>
         <translation>Spiele</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="114"/>
+        <location filename="../src/tab_room.cpp" line="111"/>
         <source>Show &amp;full games</source>
         <translation>&amp;Volle Spiele anzeigen</translation>
     </message>
@@ -1490,7 +1490,7 @@
         <translation type="obsolete">&amp;Volle Spiele anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="117"/>
+        <location filename="../src/tab_room.cpp" line="114"/>
         <source>J&amp;oin as spectator</source>
         <translation>&amp;Zuschauen</translation>
     </message>
@@ -2681,7 +2681,7 @@
         <translation>Oberste Karten ins &amp;Exil schicken...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="450"/>
+        <location filename="../src/player.cpp" line="451"/>
         <source>F3</source>
         <translation>F3</translation>
     </message>
@@ -2701,7 +2701,12 @@
         <translation>&amp;allen Spielern</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="452"/>
+        <location filename="../src/player.cpp" line="450"/>
+        <source>Ctrl+F3</source>
+        <translation>Ctrl+F3</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="453"/>
         <source>F4</source>
         <translation>F4</translation>
     </message>
@@ -2793,12 +2798,12 @@
         <translation type="obsolete">&amp;Hinweis setzen...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="512"/>
+        <location filename="../src/player.cpp" line="514"/>
         <source>View top cards of library</source>
         <translation>Zeige die obersten Karten der Bibliothek</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="512"/>
+        <location filename="../src/player.cpp" line="514"/>
         <source>Number of cards:</source>
         <translation>Anzahl der Karten:</translation>
     </message>
@@ -2834,12 +2839,12 @@
         <translation>ins &amp;Exil schicken</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="451"/>
+        <location filename="../src/player.cpp" line="452"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="453"/>
+        <location filename="../src/player.cpp" line="454"/>
         <source>Ctrl+D</source>
         <translation>Ctrl+D</translation>
     </message>
@@ -2849,7 +2854,7 @@
         <translation>Ka&amp;rten ziehen...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="454"/>
+        <location filename="../src/player.cpp" line="455"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
@@ -2858,7 +2863,7 @@
         <translation type="obsolete">&amp;Mulligan nehmen...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="455"/>
+        <location filename="../src/player.cpp" line="456"/>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
     </message>
@@ -2868,7 +2873,7 @@
         <translation>Mi&amp;schen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="456"/>
+        <location filename="../src/player.cpp" line="457"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
@@ -2883,7 +2888,7 @@
         <translation>&amp;Enttappe alle bleibenden Karten</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="457"/>
+        <location filename="../src/player.cpp" line="458"/>
         <source>Ctrl+U</source>
         <translation>Ctrl+U</translation>
     </message>
@@ -2917,7 +2922,7 @@
         <translation>&amp;Würfeln...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="458"/>
+        <location filename="../src/player.cpp" line="459"/>
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
     </message>
@@ -2927,7 +2932,7 @@
         <translation>Spiels&amp;tein erstellen...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="459"/>
+        <location filename="../src/player.cpp" line="460"/>
         <source>Ctrl+T</source>
         <translation>Ctrl+T</translation>
     </message>
@@ -2937,7 +2942,7 @@
         <translation>&amp;Noch einen Spielstein erstellen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="460"/>
+        <location filename="../src/player.cpp" line="461"/>
         <source>Ctrl+G</source>
         <translation>Ctrl+G</translation>
     </message>
@@ -3040,50 +3045,50 @@
         <translation type="obsolete">F10</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="551"/>
+        <location filename="../src/player.cpp" line="553"/>
         <source>Draw cards</source>
         <translation>Karten ziehen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="551"/>
-        <location filename="../src/player.cpp" line="558"/>
-        <location filename="../src/player.cpp" line="574"/>
-        <location filename="../src/player.cpp" line="1420"/>
+        <location filename="../src/player.cpp" line="553"/>
+        <location filename="../src/player.cpp" line="560"/>
+        <location filename="../src/player.cpp" line="576"/>
+        <location filename="../src/player.cpp" line="1427"/>
         <source>Number:</source>
         <translation>Anzahl:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="558"/>
+        <location filename="../src/player.cpp" line="560"/>
         <source>Move top cards to grave</source>
         <translation>Oberste Karten in den Friedhof legen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="574"/>
+        <location filename="../src/player.cpp" line="576"/>
         <source>Move top cards to exile</source>
         <translation>Oberste Karten ins Exil schicken</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1340"/>
+        <location filename="../src/player.cpp" line="1347"/>
         <source>Set power/toughness</source>
         <translation>Kampfwerte setzen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1340"/>
+        <location filename="../src/player.cpp" line="1347"/>
         <source>Please enter the new PT:</source>
         <translation>Bitte die neuen Kampfwerte eingeben:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1366"/>
+        <location filename="../src/player.cpp" line="1373"/>
         <source>Set annotation</source>
         <translation>Hinweis setzen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1366"/>
+        <location filename="../src/player.cpp" line="1373"/>
         <source>Please enter the new annotation:</source>
         <translation>Bitte den Hinweis eingeben:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1420"/>
+        <location filename="../src/player.cpp" line="1427"/>
         <source>Set counters</source>
         <translation>Setze Zählmarken</translation>
     </message>
@@ -3096,12 +3101,12 @@
         <translation type="obsolete">Neue Lebenspunkte insgesamt:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="601"/>
+        <location filename="../src/player.cpp" line="603"/>
         <source>Roll die</source>
         <translation>Würfeln</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="601"/>
+        <location filename="../src/player.cpp" line="603"/>
         <source>Number of sides:</source>
         <translation>Anzahl der Seiten:</translation>
     </message>
@@ -3509,22 +3514,27 @@ Bitte geben Sie einen Namen ein:</translation>
 <context>
     <name>TabMessage</name>
     <message>
-        <location filename="../src/tab_message.cpp" line="40"/>
+        <location filename="../src/tab_message.cpp" line="39"/>
         <source>Personal &amp;talk</source>
         <translation>Persönliches &amp;Gespräch</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="41"/>
+        <location filename="../src/tab_message.cpp" line="40"/>
         <source>&amp;Leave</source>
         <translation>Ver&amp;lassen</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="75"/>
+        <location filename="../src/tab_message.cpp" line="65"/>
         <source>%1 has left the server.</source>
         <translation>%1 hat den Server verlassen.</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.h" line="35"/>
+        <location filename="../src/tab_message.cpp" line="71"/>
+        <source>%1 has joined the server.</source>
+        <translation>%1 hat den Server betreten.</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_message.h" line="32"/>
         <source>Talking to %1</source>
         <translation>Gespräch mit %1</translation>
     </message>
@@ -3532,40 +3542,38 @@ Bitte geben Sie einen Namen ein:</translation>
 <context>
     <name>TabRoom</name>
     <message>
-        <location filename="../src/tab_room.cpp" line="219"/>
+        <location filename="../src/tab_room.cpp" line="180"/>
         <source>&amp;Say:</source>
         <translation>&amp;Sagen:</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="220"/>
+        <location filename="../src/tab_room.cpp" line="181"/>
         <source>Chat</source>
         <translation>Unterhaltung</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="221"/>
+        <location filename="../src/tab_room.cpp" line="182"/>
         <source>&amp;Room</source>
         <translation>&amp;Raum</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="222"/>
+        <location filename="../src/tab_room.cpp" line="183"/>
         <source>&amp;Leave room</source>
         <translation>Raum ver&amp;lassen</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="268"/>
         <source>%1 has joined the room.</source>
-        <translation>%1 hat den Raum betreten.</translation>
+        <translation type="obsolete">%1 hat den Raum betreten.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="274"/>
         <source>%1 has left the room.</source>
-        <translation>%1 hat den Raum verlassen.</translation>
+        <translation type="obsolete">%1 hat den Raum verlassen.</translation>
     </message>
 </context>
 <context>
     <name>TabServer</name>
     <message>
-        <location filename="../src/tab_server.h" line="63"/>
+        <location filename="../src/tab_server.h" line="64"/>
         <source>Server</source>
         <translation>Server</translation>
     </message>
