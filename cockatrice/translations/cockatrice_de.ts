@@ -873,12 +873,17 @@
         <translation>&amp;Spieler:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="32"/>
+        <location filename="../src/dlg_creategame.cpp" line="40"/>
+        <source>Game type</source>
+        <translation>Spieltyp</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_creategame.cpp" line="43"/>
         <source>&amp;Spectators allowed</source>
         <translation>&amp;Zuschauer zugelassen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="35"/>
+        <location filename="../src/dlg_creategame.cpp" line="46"/>
         <source>Spectators &amp;need a password to join</source>
         <translation>Zuschauer brauchen &amp;auch ein Passwort</translation>
     </message>
@@ -887,37 +892,37 @@
         <translation type="obsolete">Zuschauer können sp&amp;rechen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="36"/>
+        <location filename="../src/dlg_creategame.cpp" line="47"/>
         <source>Spectators can &amp;chat</source>
         <translation>Zuschauer können s&amp;chreiben</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="37"/>
+        <location filename="../src/dlg_creategame.cpp" line="48"/>
         <source>Spectators see &amp;everything</source>
         <translation>Zuschauer sehen &amp;alles</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="43"/>
+        <location filename="../src/dlg_creategame.cpp" line="54"/>
         <source>Spectators</source>
         <translation>Zuschauer</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="55"/>
+        <location filename="../src/dlg_creategame.cpp" line="67"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="57"/>
+        <location filename="../src/dlg_creategame.cpp" line="69"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Abbruch</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="70"/>
+        <location filename="../src/dlg_creategame.cpp" line="82"/>
         <source>Create game</source>
         <translation>Spiel erstellen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="104"/>
+        <location filename="../src/dlg_creategame.cpp" line="125"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
@@ -926,7 +931,7 @@
         <translation type="obsolete">Ungültige Anzahl an Spielern.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="104"/>
+        <location filename="../src/dlg_creategame.cpp" line="125"/>
         <source>Server error.</source>
         <translation>Serverfehler.</translation>
     </message>
@@ -1424,20 +1429,20 @@
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/tab_room.cpp" line="112"/>
+        <location filename="../src/tab_room.cpp" line="113"/>
         <source>C&amp;reate</source>
         <translation>Spiel e&amp;rstellen</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="113"/>
+        <location filename="../src/tab_room.cpp" line="114"/>
         <source>&amp;Join</source>
         <translation>&amp;Teilnehmen</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="75"/>
         <location filename="../src/tab_room.cpp" line="76"/>
         <location filename="../src/tab_room.cpp" line="77"/>
         <location filename="../src/tab_room.cpp" line="78"/>
+        <location filename="../src/tab_room.cpp" line="79"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
@@ -1446,42 +1451,42 @@
         <translation type="obsolete">XXX</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="75"/>
+        <location filename="../src/tab_room.cpp" line="76"/>
         <source>Wrong password.</source>
         <translation>Falsches Passwort.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="76"/>
+        <location filename="../src/tab_room.cpp" line="77"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>In diesem Spiel sind keine Zuschauer zugelassen.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="77"/>
+        <location filename="../src/tab_room.cpp" line="78"/>
         <source>The game is already full.</source>
         <translation>Das Spiel ist bereits voll.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="78"/>
+        <location filename="../src/tab_room.cpp" line="79"/>
         <source>The game does not exist any more.</source>
         <translation>Dieses Spiel gibt es nicht mehr.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="94"/>
+        <location filename="../src/tab_room.cpp" line="95"/>
         <source>Join game</source>
         <translation>Spiel beitreten</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="94"/>
+        <location filename="../src/tab_room.cpp" line="95"/>
         <source>Password:</source>
         <translation>Passwort:</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="110"/>
+        <location filename="../src/tab_room.cpp" line="111"/>
         <source>Games</source>
         <translation>Spiele</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="111"/>
+        <location filename="../src/tab_room.cpp" line="112"/>
         <source>Show &amp;full games</source>
         <translation>&amp;Volle Spiele anzeigen</translation>
     </message>
@@ -1490,7 +1495,7 @@
         <translation type="obsolete">&amp;Volle Spiele anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="114"/>
+        <location filename="../src/tab_room.cpp" line="115"/>
         <source>J&amp;oin as spectator</source>
         <translation>&amp;Zuschauen</translation>
     </message>
@@ -1506,12 +1511,12 @@
 <context>
     <name>GamesModel</name>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="30"/>
+        <location filename="../src/gamesmodel.cpp" line="42"/>
         <source>yes</source>
         <translation>ja</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="30"/>
+        <location filename="../src/gamesmodel.cpp" line="42"/>
         <source>no</source>
         <translation>nein</translation>
     </message>
@@ -1520,37 +1525,42 @@
         <translation type="obsolete">Spiel ID</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="43"/>
+        <location filename="../src/gamesmodel.cpp" line="55"/>
         <source>Creator</source>
         <translation>Ersteller</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="42"/>
+        <location filename="../src/gamesmodel.cpp" line="54"/>
         <source>Description</source>
         <translation>Beschreibung</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="30"/>
+        <location filename="../src/gamesmodel.cpp" line="42"/>
         <source>yes, free for spectators</source>
         <translation>ja, außer für Zuschauer</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="32"/>
+        <location filename="../src/gamesmodel.cpp" line="44"/>
         <source>not allowed</source>
         <translation>nicht erlaubt</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="44"/>
+        <location filename="../src/gamesmodel.cpp" line="56"/>
+        <source>Game type</source>
+        <translation>Spieltyp</translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="57"/>
         <source>Password</source>
         <translation>Passwort</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="45"/>
+        <location filename="../src/gamesmodel.cpp" line="58"/>
         <source>Players</source>
         <translation>Spieler</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="46"/>
+        <location filename="../src/gamesmodel.cpp" line="59"/>
         <source>Spectators</source>
         <translation>Zuschauer</translation>
     </message>
@@ -3576,22 +3586,22 @@ Bitte geben Sie einen Namen ein:</translation>
 <context>
     <name>TabRoom</name>
     <message>
-        <location filename="../src/tab_room.cpp" line="180"/>
+        <location filename="../src/tab_room.cpp" line="185"/>
         <source>&amp;Say:</source>
         <translation>&amp;Sagen:</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="181"/>
+        <location filename="../src/tab_room.cpp" line="186"/>
         <source>Chat</source>
         <translation>Unterhaltung</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="182"/>
+        <location filename="../src/tab_room.cpp" line="187"/>
         <source>&amp;Room</source>
         <translation>&amp;Raum</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="183"/>
+        <location filename="../src/tab_room.cpp" line="188"/>
         <source>&amp;Leave room</source>
         <translation>Raum ver&amp;lassen</translation>
     </message>

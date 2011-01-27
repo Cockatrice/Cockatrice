@@ -641,52 +641,57 @@
         <translation>プレイヤー人数:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="32"/>
+        <location filename="../src/dlg_creategame.cpp" line="40"/>
+        <source>Game type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_creategame.cpp" line="43"/>
         <source>&amp;Spectators allowed</source>
         <translation>観戦者を許可する</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="35"/>
+        <location filename="../src/dlg_creategame.cpp" line="46"/>
         <source>Spectators &amp;need a password to join</source>
         <translation>観戦者は参加にパスワードが必要</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="36"/>
+        <location filename="../src/dlg_creategame.cpp" line="47"/>
         <source>Spectators can &amp;chat</source>
         <translation>観戦者はチャットに参加できる</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="37"/>
+        <location filename="../src/dlg_creategame.cpp" line="48"/>
         <source>Spectators see &amp;everything</source>
         <translation>観戦者は全て見れる</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="43"/>
+        <location filename="../src/dlg_creategame.cpp" line="54"/>
         <source>Spectators</source>
         <translation>観戦者</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="55"/>
+        <location filename="../src/dlg_creategame.cpp" line="67"/>
         <source>&amp;OK</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="57"/>
+        <location filename="../src/dlg_creategame.cpp" line="69"/>
         <source>&amp;Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="70"/>
+        <location filename="../src/dlg_creategame.cpp" line="82"/>
         <source>Create game</source>
         <translation>部屋を作る</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="104"/>
+        <location filename="../src/dlg_creategame.cpp" line="125"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="104"/>
+        <location filename="../src/dlg_creategame.cpp" line="125"/>
         <source>Server error.</source>
         <translation>サーバーエラー.</translation>
     </message>
@@ -883,60 +888,60 @@
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/tab_room.cpp" line="112"/>
+        <location filename="../src/tab_room.cpp" line="113"/>
         <source>C&amp;reate</source>
         <translation>部屋を作る</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="113"/>
+        <location filename="../src/tab_room.cpp" line="114"/>
         <source>&amp;Join</source>
         <translation>参加する</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="75"/>
         <location filename="../src/tab_room.cpp" line="76"/>
         <location filename="../src/tab_room.cpp" line="77"/>
         <location filename="../src/tab_room.cpp" line="78"/>
+        <location filename="../src/tab_room.cpp" line="79"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="75"/>
+        <location filename="../src/tab_room.cpp" line="76"/>
         <source>Wrong password.</source>
         <translation>パスワードが間違っています.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="76"/>
+        <location filename="../src/tab_room.cpp" line="77"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>この試合は観戦者は許可されていません.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="77"/>
+        <location filename="../src/tab_room.cpp" line="78"/>
         <source>The game is already full.</source>
         <translation>このゲームはすでに満員です.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="78"/>
+        <location filename="../src/tab_room.cpp" line="79"/>
         <source>The game does not exist any more.</source>
         <translation>このゲームはもう存在しません.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="94"/>
+        <location filename="../src/tab_room.cpp" line="95"/>
         <source>Join game</source>
         <translation>参加</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="94"/>
+        <location filename="../src/tab_room.cpp" line="95"/>
         <source>Password:</source>
         <translation>パスワード:</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="110"/>
+        <location filename="../src/tab_room.cpp" line="111"/>
         <source>Games</source>
         <translation>ゲーム</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="111"/>
+        <location filename="../src/tab_room.cpp" line="112"/>
         <source>Show &amp;full games</source>
         <translation>全てのゲームを見る</translation>
     </message>
@@ -945,7 +950,7 @@
         <translation type="obsolete">全てのゲームを見る</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="114"/>
+        <location filename="../src/tab_room.cpp" line="115"/>
         <source>J&amp;oin as spectator</source>
         <translation>観戦者として参加</translation>
     </message>
@@ -961,47 +966,52 @@
 <context>
     <name>GamesModel</name>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="30"/>
+        <location filename="../src/gamesmodel.cpp" line="42"/>
         <source>yes</source>
         <translation>あり</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="30"/>
+        <location filename="../src/gamesmodel.cpp" line="42"/>
         <source>no</source>
         <translation>なし</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="43"/>
+        <location filename="../src/gamesmodel.cpp" line="55"/>
         <source>Creator</source>
         <translation>作成者</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="42"/>
+        <location filename="../src/gamesmodel.cpp" line="54"/>
         <source>Description</source>
         <translation>説明</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="30"/>
+        <location filename="../src/gamesmodel.cpp" line="42"/>
         <source>yes, free for spectators</source>
         <translation>あり,観戦は自由</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="32"/>
+        <location filename="../src/gamesmodel.cpp" line="44"/>
         <source>not allowed</source>
         <translation>不許可</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="44"/>
+        <location filename="../src/gamesmodel.cpp" line="56"/>
+        <source>Game type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="57"/>
         <source>Password</source>
         <translation>パスワード</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="45"/>
+        <location filename="../src/gamesmodel.cpp" line="58"/>
         <source>Players</source>
         <translation>プレイヤー</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="46"/>
+        <location filename="../src/gamesmodel.cpp" line="59"/>
         <source>Spectators</source>
         <translation>観戦者</translation>
     </message>
@@ -2474,22 +2484,22 @@ Please enter a name:</source>
 <context>
     <name>TabRoom</name>
     <message>
-        <location filename="../src/tab_room.cpp" line="180"/>
+        <location filename="../src/tab_room.cpp" line="185"/>
         <source>&amp;Say:</source>
         <translation>発言する</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="181"/>
+        <location filename="../src/tab_room.cpp" line="186"/>
         <source>Chat</source>
         <translation>チャット</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="182"/>
+        <location filename="../src/tab_room.cpp" line="187"/>
         <source>&amp;Room</source>
         <translation>部屋</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="183"/>
+        <location filename="../src/tab_room.cpp" line="188"/>
         <source>&amp;Leave room</source>
         <translation>部屋から出る</translation>
     </message>
