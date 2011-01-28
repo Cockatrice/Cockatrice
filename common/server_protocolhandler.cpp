@@ -97,6 +97,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 			case ItemId_Command_Mulligan: return cmdMulligan(static_cast<Command_Mulligan *>(command), cont, game, player);
 			case ItemId_Command_RollDie: return cmdRollDie(static_cast<Command_RollDie *>(command), cont, game, player);
 			case ItemId_Command_DrawCards: return cmdDrawCards(static_cast<Command_DrawCards *>(command), cont, game, player);
+			case ItemId_Command_UndoDraw: return cmdUndoDraw(static_cast<Command_UndoDraw *>(command), cont, game, player);
 			case ItemId_Command_MoveCard: return cmdMoveCard(static_cast<Command_MoveCard *>(command), cont, game, player);
 			case ItemId_Command_FlipCard: return cmdFlipCard(static_cast<Command_FlipCard *>(command), cont, game, player);
 			case ItemId_Command_AttachCard: return cmdAttachCard(static_cast<Command_AttachCard *>(command), cont, game, player);
@@ -355,7 +356,12 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
 	
-	Server_Game *game = room->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
+	QList<int> gameTypes;
+	QList<GameTypeId *> gameTypeList = cmd->getGameTypes();
+	for (int i = 0; i < gameTypeList.size(); ++i)
+		gameTypes.append(gameTypeList[i]->getData());
+	
+	Server_Game *game = room->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), gameTypes, cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
 	Server_Player *creator = game->getPlayers().values().first();
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	
@@ -501,7 +507,7 @@ ResponseCode Server_ProtocolHandler::cmdMulligan(Command_Mulligan * /*cmd*/, Com
 	cont->enqueueGameEventPrivate(new Event_Shuffle(player->getPlayerId()), game->getGameId());
 	cont->enqueueGameEventPublic(new Event_Shuffle(player->getPlayerId()), game->getGameId());
 
-	drawCards(game, player, cont, number);
+	player->drawCards(cont, number);
 
 	return RespOk;
 }
@@ -515,7 +521,7 @@ ResponseCode Server_ProtocolHandler::cmdRollDie(Command_RollDie *cmd, CommandCon
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::drawCards(Server_Game *game, Server_Player *player, CommandContainer *cont, int number)
+ResponseCode Server_ProtocolHandler::cmdDrawCards(Command_DrawCards *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -523,32 +529,19 @@ ResponseCode Server_ProtocolHandler::drawCards(Server_Game *game, Server_Player 
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
 		
-	Server_CardZone *deck = player->getZones().value("deck");
-	Server_CardZone *hand = player->getZones().value("hand");
-	if (deck->cards.size() < number)
-		number = deck->cards.size();
-
-	QList<ServerInfo_Card *> cardListPrivate;
-	QList<ServerInfo_Card *> cardListOmniscient;
-	for (int i = 0; i < number; ++i) {
-		Server_Card *card = deck->cards.takeFirst();
-		hand->cards.append(card);
-		cardListPrivate.append(new ServerInfo_Card(card->getId(), card->getName()));
-		cardListOmniscient.append(new ServerInfo_Card(card->getId(), card->getName()));
-	}
-	cont->enqueueGameEventPrivate(new Event_DrawCards(player->getPlayerId(), cardListPrivate.size(), cardListPrivate), game->getGameId());
-	cont->enqueueGameEventOmniscient(new Event_DrawCards(player->getPlayerId(), cardListOmniscient.size(), cardListOmniscient), game->getGameId());
-	cont->enqueueGameEventPublic(new Event_DrawCards(player->getPlayerId(), cardListPrivate.size()), game->getGameId());
-
-	return RespOk;
+	return player->drawCards(cont, cmd->getNumber());
 }
 
-
-ResponseCode Server_ProtocolHandler::cmdDrawCards(Command_DrawCards *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdUndoDraw(Command_UndoDraw *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
 {
-	return drawCards(game, player, cont, cmd->getNumber());
+	if (player->getSpectator())
+		return RespFunctionNotAllowed;
+	
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
+		
+	return player->undoDraw(cont);
 }
-
 
 ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
 {

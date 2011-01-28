@@ -14,7 +14,7 @@ class QSpinBox;
 class DlgCreateGame : public QDialog {
 	Q_OBJECT
 public:
-	DlgCreateGame(AbstractClient *_client, int _roomId, QWidget *parent = 0);
+	DlgCreateGame(AbstractClient *_client, int _roomId, const QMap<int, QString> &_gameTypes, QWidget *parent = 0);
 private slots:
 	void actOK();
 	void checkResponse(ResponseCode response);
@@ -22,6 +22,8 @@ private slots:
 private:
 	AbstractClient *client;
 	int roomId;
+	QMap<int, QString> gameTypes;
+	QMap<int, QCheckBox *> gameTypeCheckBoxes;
 
 	QGroupBox *spectatorsGroupBox;
 	QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel;

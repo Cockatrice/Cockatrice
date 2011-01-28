@@ -17,15 +17,16 @@
 #include "gamesmodel.h"
 #include "chatview.h"
 
-GameSelector::GameSelector(AbstractClient *_client, int _roomId, QWidget *parent)
-	: QGroupBox(parent), client(_client), roomId(_roomId)
+GameSelector::GameSelector(AbstractClient *_client, TabRoom *_room, QWidget *parent)
+	: QGroupBox(parent), client(_client), room(_room)
 {
 	gameListView = new QTreeView;
-	gameListModel = new GamesModel(this);
+	gameListModel = new GamesModel(room->getGameTypes(), this);
 	gameListProxyModel = new GamesProxyModel(this);
 	gameListProxyModel->setSourceModel(gameListModel);
 	gameListView->setModel(gameListProxyModel);
 	gameListView->header()->setResizeMode(0, QHeaderView::ResizeToContents);
+	gameListView->setSortingEnabled(true);
 
 	showFullGamesCheckBox = new QCheckBox;
 	createButton = new QPushButton;
@@ -61,7 +62,7 @@ void GameSelector::showFullGamesChanged(int state)
 
 void GameSelector::actCreate()
 {
-	DlgCreateGame dlg(client, roomId, this);
+	DlgCreateGame dlg(client, room->getRoomId(), room->getGameTypes(), this);
 	dlg.exec();
 }
 
@@ -96,7 +97,7 @@ void GameSelector::actJoin()
 			return;
 	}
 
-	Command_JoinGame *commandJoinGame = new Command_JoinGame(roomId, game->getGameId(), password, spectator);
+	Command_JoinGame *commandJoinGame = new Command_JoinGame(room->getRoomId(), game->getGameId(), password, spectator);
 	connect(commandJoinGame, SIGNAL(finished(ResponseCode)), this, SLOT(checkResponse(ResponseCode)));
 	client->sendCommand(commandJoinGame);
 
@@ -122,7 +123,11 @@ void GameSelector::processGameInfo(ServerInfo_Game *info)
 TabRoom::TabRoom(AbstractClient *_client, const QString &_ownName, ServerInfo_Room *info)
 	: Tab(), client(_client), roomId(info->getRoomId()), roomName(info->getName()), ownName(_ownName)
 {
-	gameSelector = new GameSelector(client, roomId);
+	const QList<ServerInfo_GameType *> gameTypeList = info->getGameTypeList();
+	for (int i = 0; i < gameTypeList.size(); ++i)
+		gameTypes.insert(gameTypeList[i]->getGameTypeId(), gameTypeList[i]->getDescription());
+	
+	gameSelector = new GameSelector(client, this);
 	userList = new UserList(client, false);
 	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
 	
@@ -226,14 +231,12 @@ void TabRoom::processListGamesEvent(Event_ListGames *event)
 
 void TabRoom::processJoinRoomEvent(Event_JoinRoom *event)
 {
-	chatView->appendMessage(QString(), tr("%1 has joined the room.").arg(event->getUserInfo()->getName()));
 	userList->processUserInfo(event->getUserInfo());
 	userList->sortItems();
 }
 
 void TabRoom::processLeaveRoomEvent(Event_LeaveRoom *event)
 {
-	chatView->appendMessage(QString(), tr("%1 has left the room.").arg(event->getPlayerName()));
 	userList->deleteUser(event->getPlayerName());
 }
 

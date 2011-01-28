@@ -57,6 +57,7 @@ signals:
 	void logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard, bool _playerTarget);
 	void logCreateToken(Player *player, QString cardName, QString pt);
 	void logDrawCards(Player *player, int number);
+	void logUndoDraw(Player *player, QString cardName);
 	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
 	void logFlipCard(Player *player, QString cardName, bool faceDown);
 	void logDestroyCard(Player *player, QString cardName);
@@ -81,6 +82,7 @@ public slots:
 	void actShuffle();
 	void actDrawCard();
 	void actDrawCards();
+	void actUndoDraw();
         void actMulligan();
 	void actMoveTopCardsToGrave();
 	void actMoveTopCardsToExile();
@@ -119,7 +121,7 @@ private:
 		*aMoveRfgToTopLibrary, *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave,
 		*aViewLibrary, *aViewTopCards, *aMoveTopCardsToGrave, *aMoveTopCardsToExile, *aMoveTopCardToBottom,
 		*aViewGraveyard, *aViewRfg, *aViewSideboard,
-                *aDrawCard, *aDrawCards, *aMulligan, *aShuffle,
+                *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle,
 		*aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,
 		*aCardMenu;
 
@@ -167,7 +169,7 @@ private:
 	void eventDelCounter(Event_DelCounter *event);
 	void eventDumpZone(Event_DumpZone *event);
 	void eventStopDumpZone(Event_StopDumpZone *event);
-	void eventMoveCard(Event_MoveCard *event);
+	void eventMoveCard(Event_MoveCard *event, GameEventContext *context);
 	void eventFlipCard(Event_FlipCard *event);
 	void eventDestroyCard(Event_DestroyCard *event);
 	void eventAttachCard(Event_AttachCard *event);

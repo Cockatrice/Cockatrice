@@ -5,7 +5,7 @@
 LocalServer::LocalServer(QObject *parent)
 	: Server(parent)
 {
-	addRoom(new Server_Room(0, QString(), QString(), false, QString(), this));
+	addRoom(new Server_Room(0, QString(), QString(), false, QString(), QStringList(), this));
 }
 
 LocalServer::~LocalServer()

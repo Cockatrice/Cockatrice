@@ -19,6 +19,10 @@ size=1
 1\description="Play anything here."
 1\autojoin=true
 1\joinmessage="This message is only here to show that rooms can have a join message."
+1\game_types\size=3
+1\game_types\1\name="GameType1"
+1\game_types\2\name="GameType2"
+1\game_types\3\name="GameType3"
 
 [game]
 max_game_inactivity_time=120

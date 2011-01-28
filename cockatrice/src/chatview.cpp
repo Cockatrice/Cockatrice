@@ -8,35 +8,37 @@ ChatView::ChatView(const QString &_ownName, QWidget *parent)
 	: QTextEdit(parent), ownName(_ownName)
 {
 	setTextInteractionFlags(Qt::TextSelectableByMouse);
-	
-	QTextTableFormat format;
-	format.setBorderStyle(QTextFrameFormat::BorderStyle_None);
-	table = textCursor().insertTable(1, 3, format);
 }
 
 void ChatView::appendMessage(const QString &sender, const QString &message)
 {
-	QTextCursor cellCursor = table->cellAt(table->rows() - 1, 0).lastCursorPosition();
-	cellCursor.insertText(QDateTime::currentDateTime().toString("[hh:mm]"));
-	QTextTableCell senderCell = table->cellAt(table->rows() - 1, 1);
+	QTextCursor cursor(document()->lastBlock());
+	cursor.movePosition(QTextCursor::End);
+	
+	QTextBlockFormat blockFormat;
+	blockFormat.setBottomMargin(3);
+	cursor.insertBlock(blockFormat);
+	
+	QTextCharFormat timeFormat;
+	timeFormat.setForeground(Qt::black);
+	cursor.setCharFormat(timeFormat);
+	cursor.insertText(QDateTime::currentDateTime().toString("[hh:mm] "));
+	
 	QTextCharFormat senderFormat;
 	if (sender == ownName) {
 		senderFormat.setFontWeight(QFont::Bold);
 		senderFormat.setForeground(Qt::red);
 	} else
 		senderFormat.setForeground(Qt::blue);
-	senderCell.setFormat(senderFormat);
-	cellCursor = senderCell.lastCursorPosition();
-	cellCursor.insertText(sender);
-	QTextTableCell messageCell = table->cellAt(table->rows() - 1, 2);
+	cursor.setCharFormat(senderFormat);
+	cursor.insertText(sender + " ");
+	
 	QTextCharFormat messageFormat;
 	if (sender.isEmpty())
 		messageFormat.setForeground(Qt::darkGreen);
-	messageCell.setFormat(messageFormat);
-	cellCursor = messageCell.lastCursorPosition();
-	cellCursor.insertText(message);
+	cursor.setCharFormat(messageFormat);
+	cursor.insertText(message);
 	
-	table->appendRows(1);
 	
 	verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }

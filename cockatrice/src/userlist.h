@@ -3,13 +3,13 @@
 
 #include <QGroupBox>
 #include <QTreeWidgetItem>
-#include <QItemDelegate>
+#include <QStyledItemDelegate>
 
 class QTreeWidget;
 class ServerInfo_User;
 class AbstractClient;
 
-class UserListItemDelegate : public QItemDelegate {
+class UserListItemDelegate : public QStyledItemDelegate {
 public:
 	UserListItemDelegate(QObject *const parent);
 	bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);

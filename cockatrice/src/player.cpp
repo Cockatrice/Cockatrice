@@ -130,6 +130,8 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 		connect(aDrawCard, SIGNAL(triggered()), this, SLOT(actDrawCard()));
 		aDrawCards = new QAction(this);
 		connect(aDrawCards, SIGNAL(triggered()), this, SLOT(actDrawCards()));
+		aUndoDraw = new QAction(this);
+		connect(aUndoDraw, SIGNAL(triggered()), this, SLOT(actUndoDraw()));
 		aShuffle = new QAction(this);
 		connect(aShuffle, SIGNAL(triggered()), this, SLOT(actShuffle()));
                 aMulligan = new QAction(this);
@@ -159,6 +161,7 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 		libraryMenu = playerMenu->addMenu(QString());
 		libraryMenu->addAction(aDrawCard);
 		libraryMenu->addAction(aDrawCards);
+		libraryMenu->addAction(aUndoDraw);
 		libraryMenu->addSeparator();
 		libraryMenu->addAction(aShuffle);
 		libraryMenu->addSeparator();
@@ -409,6 +412,7 @@ void Player::retranslateUi()
 		aViewSideboard->setText(tr("&View sideboard"));
 		aDrawCard->setText(tr("&Draw card"));
 		aDrawCards->setText(tr("D&raw cards..."));
+		aUndoDraw->setText(tr("&Undo last draw"));
 		aMulligan->setText(tr("Take &mulligan"));
 		aShuffle->setText(tr("&Shuffle"));
 		aMoveTopCardsToGrave->setText(tr("Move top cards to &graveyard..."));
@@ -447,11 +451,13 @@ void Player::setShortcutsActive()
 {
 	shortcutsActive = true;
 	
+	aViewSideboard->setShortcut(tr("Ctrl+F3"));
 	aViewLibrary->setShortcut(tr("F3"));
 	aViewTopCards->setShortcut(tr("Ctrl+W"));
 	aViewGraveyard->setShortcut(tr("F4"));
 	aDrawCard->setShortcut(tr("Ctrl+D"));
 	aDrawCards->setShortcut(tr("Ctrl+E"));
+	aUndoDraw->setShortcut(tr("Ctrl+Shift+D"));
 	aMulligan->setShortcut(tr("Ctrl+M"));
 	aShuffle->setShortcut(tr("Ctrl+S"));
 	aUntapAll->setShortcut(tr("Ctrl+U"));
@@ -468,11 +474,13 @@ void Player::setShortcutsInactive()
 {
 	shortcutsActive = false;
 	
+	aViewSideboard->setShortcut(QKeySequence());
 	aViewLibrary->setShortcut(QKeySequence());
 	aViewTopCards->setShortcut(QKeySequence());
 	aViewGraveyard->setShortcut(QKeySequence());
 	aDrawCard->setShortcut(QKeySequence());
 	aDrawCards->setShortcut(QKeySequence());
+	aUndoDraw->setShortcut(QKeySequence());
 	aMulligan->setShortcut(QKeySequence());
 	aShuffle->setShortcut(QKeySequence());
 	aUntapAll->setShortcut(QKeySequence());
@@ -551,6 +559,11 @@ void Player::actDrawCards()
 	int number = QInputDialog::getInteger(0, tr("Draw cards"), tr("Number:"));
         if (number)
 		sendGameCommand(new Command_DrawCards(-1, number));
+}
+
+void Player::actUndoDraw()
+{
+	sendGameCommand(new Command_UndoDraw);
 }
 
 void Player::actMoveTopCardsToGrave()
@@ -791,7 +804,7 @@ void Player::eventStopDumpZone(Event_StopDumpZone *event)
 	emit logStopDumpZone(this, zone);
 }
 
-void Player::eventMoveCard(Event_MoveCard *event)
+void Player::eventMoveCard(Event_MoveCard *event, GameEventContext *context)
 {
 	CardZone *startZone = zones.value(event->getStartZone(), 0);
 	Player *targetPlayer = static_cast<TabGame *>(parent())->getPlayers().value(event->getTargetPlayerId());
@@ -838,7 +851,13 @@ void Player::eventMoveCard(Event_MoveCard *event)
 
 	// The log event has to be sent before the card is added to the target zone
 	// because the addCard function can modify the card object.
-	emit logMoveCard(this, card->getName(), startZone, logPosition, targetZone, logX);
+	if (context)
+		switch (context->getItemId()) {
+			case ItemId_Context_UndoDraw: emit logUndoDraw(this, card->getName()); break;
+			default: ;
+		}
+	else
+		emit logMoveCard(this, card->getName(), startZone, logPosition, targetZone, logX);
 
 	targetZone->addCard(card, true, x, y);
 
@@ -981,25 +1000,25 @@ void Player::processGameEvent(GameEvent *event, GameEventContext *context)
 {
 	qDebug() << "player event: id=" << event->getItemId();
 	switch (event->getItemId()) {
-		case ItemId_Event_Say: eventSay(qobject_cast<Event_Say *>(event)); break;
-		case ItemId_Event_Shuffle: eventShuffle(qobject_cast<Event_Shuffle *>(event)); break;
-		case ItemId_Event_RollDie: eventRollDie(qobject_cast<Event_RollDie *>(event)); break;
-		case ItemId_Event_CreateArrows: eventCreateArrows(qobject_cast<Event_CreateArrows *>(event)); break;
-		case ItemId_Event_DeleteArrow: eventDeleteArrow(qobject_cast<Event_DeleteArrow *>(event)); break;
-		case ItemId_Event_CreateToken: eventCreateToken(qobject_cast<Event_CreateToken *>(event)); break;
-		case ItemId_Event_SetCardAttr: eventSetCardAttr(qobject_cast<Event_SetCardAttr *>(event)); break;
-		case ItemId_Event_SetCardCounter: eventSetCardCounter(qobject_cast<Event_SetCardCounter *>(event)); break;
-		case ItemId_Event_CreateCounters: eventCreateCounters(qobject_cast<Event_CreateCounters *>(event)); break;
-		case ItemId_Event_SetCounter: eventSetCounter(qobject_cast<Event_SetCounter *>(event)); break;
-		case ItemId_Event_DelCounter: eventDelCounter(qobject_cast<Event_DelCounter *>(event)); break;
-		case ItemId_Event_DumpZone: eventDumpZone(qobject_cast<Event_DumpZone *>(event)); break;
-		case ItemId_Event_StopDumpZone: eventStopDumpZone(qobject_cast<Event_StopDumpZone *>(event)); break;
-		case ItemId_Event_MoveCard: eventMoveCard(qobject_cast<Event_MoveCard *>(event)); break;
-		case ItemId_Event_FlipCard: eventFlipCard(qobject_cast<Event_FlipCard *>(event)); break;
-		case ItemId_Event_DestroyCard: eventDestroyCard(qobject_cast<Event_DestroyCard *>(event)); break;
-		case ItemId_Event_AttachCard: eventAttachCard(qobject_cast<Event_AttachCard *>(event)); break;
-		case ItemId_Event_DrawCards: eventDrawCards(qobject_cast<Event_DrawCards *>(event)); break;
-		case ItemId_Event_RevealCards: eventRevealCards(qobject_cast<Event_RevealCards *>(event)); break;
+		case ItemId_Event_Say: eventSay(static_cast<Event_Say *>(event)); break;
+		case ItemId_Event_Shuffle: eventShuffle(static_cast<Event_Shuffle *>(event)); break;
+		case ItemId_Event_RollDie: eventRollDie(static_cast<Event_RollDie *>(event)); break;
+		case ItemId_Event_CreateArrows: eventCreateArrows(static_cast<Event_CreateArrows *>(event)); break;
+		case ItemId_Event_DeleteArrow: eventDeleteArrow(static_cast<Event_DeleteArrow *>(event)); break;
+		case ItemId_Event_CreateToken: eventCreateToken(static_cast<Event_CreateToken *>(event)); break;
+		case ItemId_Event_SetCardAttr: eventSetCardAttr(static_cast<Event_SetCardAttr *>(event)); break;
+		case ItemId_Event_SetCardCounter: eventSetCardCounter(static_cast<Event_SetCardCounter *>(event)); break;
+		case ItemId_Event_CreateCounters: eventCreateCounters(static_cast<Event_CreateCounters *>(event)); break;
+		case ItemId_Event_SetCounter: eventSetCounter(static_cast<Event_SetCounter *>(event)); break;
+		case ItemId_Event_DelCounter: eventDelCounter(static_cast<Event_DelCounter *>(event)); break;
+		case ItemId_Event_DumpZone: eventDumpZone(static_cast<Event_DumpZone *>(event)); break;
+		case ItemId_Event_StopDumpZone: eventStopDumpZone(static_cast<Event_StopDumpZone *>(event)); break;
+		case ItemId_Event_MoveCard: eventMoveCard(static_cast<Event_MoveCard *>(event), context); break;
+		case ItemId_Event_FlipCard: eventFlipCard(static_cast<Event_FlipCard *>(event)); break;
+		case ItemId_Event_DestroyCard: eventDestroyCard(static_cast<Event_DestroyCard *>(event)); break;
+		case ItemId_Event_AttachCard: eventAttachCard(static_cast<Event_AttachCard *>(event)); break;
+		case ItemId_Event_DrawCards: eventDrawCards(static_cast<Event_DrawCards *>(event)); break;
+		case ItemId_Event_RevealCards: eventRevealCards(static_cast<Event_RevealCards *>(event)); break;
 		default: {
 			qDebug() << "unhandled game event";
 		}

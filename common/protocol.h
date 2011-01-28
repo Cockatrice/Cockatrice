@@ -17,11 +17,13 @@ class ProtocolResponse;
 class DeckList;
 class GameEvent;
 class GameEventContainer;
+class GameEventContext;
 class MoveCardToZone;
 
 enum ItemId {
 	ItemId_CommandContainer = ItemId_Other + 50,
 	ItemId_GameEventContainer = ItemId_Other + 51,
+	ItemId_Command_CreateGame = ItemId_Other + 99,
 	ItemId_Command_DeckUpload = ItemId_Other + 100,
 	ItemId_Command_DeckSelect = ItemId_Other + 101,
 	ItemId_Command_SetSideboardPlan = ItemId_Other + 102,
@@ -55,7 +57,7 @@ private:
 	static void initializeHashAuto();
 	bool receiverMayDelete;
 public:
-	static const int protocolVersion = 11;
+	static const int protocolVersion = 12;
 	static void initializeHash();
 	virtual int getItemId() const = 0;
 	bool getReceiverMayDelete() const { return receiverMayDelete; }
@@ -132,11 +134,11 @@ public:
 	const QList<ProtocolItem *> &getItemQueue() const { return itemQueue; }
 	void enqueueItem(ProtocolItem *item) { itemQueue.append(item); }
 	GameEventContainer *getGameEventQueuePublic() const { return gameEventQueuePublic; }
-	void enqueueGameEventPublic(GameEvent *event, int gameId);
+	void enqueueGameEventPublic(GameEvent *event, int gameId, GameEventContext *context = 0);
 	GameEventContainer *getGameEventQueueOmniscient() const { return gameEventQueueOmniscient; }
-	void enqueueGameEventOmniscient(GameEvent *event, int gameId);
+	void enqueueGameEventOmniscient(GameEvent *event, int gameId, GameEventContext *context = 0);
 	GameEventContainer *getGameEventQueuePrivate() const { return gameEventQueuePrivate; }
-	void enqueueGameEventPrivate(GameEvent *event, int gameId, int playerId = -1);
+	void enqueueGameEventPrivate(GameEvent *event, int gameId, int playerId = -1, GameEventContext *context = 0);
 	int getPrivatePlayerId() const { return privatePlayerId; }
 };
 
@@ -170,6 +172,22 @@ public:
 		: Command(_cmdName)
 	{
 	}
+};
+
+class Command_CreateGame : public RoomCommand {
+	Q_OBJECT
+public:
+	Command_CreateGame(int _roomId = -1, const QString &_description = QString(), const QString &_password = QString(), int _maxPlayers = -1, const QList<GameTypeId *> &_gameTypes = QList<GameTypeId *>(), bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, bool _spectatorsCanTalk = false, bool _spectatorsSeeEverything = false);
+	QString getDescription() const { return static_cast<SerializableItem_String *>(itemMap.value("description"))->getData(); };
+	QString getPassword() const { return static_cast<SerializableItem_String *>(itemMap.value("password"))->getData(); };
+	int getMaxPlayers() const { return static_cast<SerializableItem_Int *>(itemMap.value("max_players"))->getData(); };
+	bool getSpectatorsAllowed() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_allowed"))->getData(); };
+	bool getSpectatorsNeedPassword() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_need_password"))->getData(); };
+	bool getSpectatorsCanTalk() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_can_talk"))->getData(); };
+	bool getSpectatorsSeeEverything() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_see_everything"))->getData(); };
+	QList<GameTypeId *> getGameTypes() const { return typecastItemList<GameTypeId *>(); }
+	static SerializableItem *newItem() { return new Command_CreateGame; }
+	int getItemId() const { return ItemId_Command_CreateGame; }
 };
 
 class Command_DeckUpload : public Command {

@@ -113,20 +113,6 @@ public:
 	static SerializableItem *newItem() { return new Command_RoomSay; }
 	int getItemId() const { return ItemId_Command_RoomSay; }
 };
-class Command_CreateGame : public RoomCommand {
-	Q_OBJECT
-public:
-	Command_CreateGame(int _roomId = -1, const QString &_description = QString(), const QString &_password = QString(), int _maxPlayers = -1, bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, bool _spectatorsCanTalk = false, bool _spectatorsSeeEverything = false);
-	QString getDescription() const { return static_cast<SerializableItem_String *>(itemMap.value("description"))->getData(); };
-	QString getPassword() const { return static_cast<SerializableItem_String *>(itemMap.value("password"))->getData(); };
-	int getMaxPlayers() const { return static_cast<SerializableItem_Int *>(itemMap.value("max_players"))->getData(); };
-	bool getSpectatorsAllowed() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_allowed"))->getData(); };
-	bool getSpectatorsNeedPassword() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_need_password"))->getData(); };
-	bool getSpectatorsCanTalk() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_can_talk"))->getData(); };
-	bool getSpectatorsSeeEverything() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_see_everything"))->getData(); };
-	static SerializableItem *newItem() { return new Command_CreateGame; }
-	int getItemId() const { return ItemId_Command_CreateGame; }
-};
 class Command_JoinGame : public RoomCommand {
 	Q_OBJECT
 public:
@@ -181,6 +167,13 @@ public:
 	int getNumber() const { return static_cast<SerializableItem_Int *>(itemMap.value("number"))->getData(); };
 	static SerializableItem *newItem() { return new Command_DrawCards; }
 	int getItemId() const { return ItemId_Command_DrawCards; }
+};
+class Command_UndoDraw : public GameCommand {
+	Q_OBJECT
+public:
+	Command_UndoDraw(int _gameId = -1);
+	static SerializableItem *newItem() { return new Command_UndoDraw; }
+	int getItemId() const { return ItemId_Command_UndoDraw; }
 };
 class Command_FlipCard : public GameCommand {
 	Q_OBJECT
@@ -633,6 +626,13 @@ public:
 	int getDeckId() const { return static_cast<SerializableItem_Int *>(itemMap.value("deck_id"))->getData(); };
 	static SerializableItem *newItem() { return new Context_DeckSelect; }
 	int getItemId() const { return ItemId_Context_DeckSelect; }
+};
+class Context_UndoDraw : public GameEventContext {
+	Q_OBJECT
+public:
+	Context_UndoDraw();
+	static SerializableItem *newItem() { return new Context_UndoDraw; }
+	int getItemId() const { return ItemId_Context_UndoDraw; }
 };
 class Command_UpdateServerMessage : public AdminCommand {
 	Q_OBJECT

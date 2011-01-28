@@ -69,17 +69,6 @@ Command_RoomSay::Command_RoomSay(int _roomId, const QString &_message)
 {
 	insertItem(new SerializableItem_String("message", _message));
 }
-Command_CreateGame::Command_CreateGame(int _roomId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything)
-	: RoomCommand("create_game", _roomId)
-{
-	insertItem(new SerializableItem_String("description", _description));
-	insertItem(new SerializableItem_String("password", _password));
-	insertItem(new SerializableItem_Int("max_players", _maxPlayers));
-	insertItem(new SerializableItem_Bool("spectators_allowed", _spectatorsAllowed));
-	insertItem(new SerializableItem_Bool("spectators_need_password", _spectatorsNeedPassword));
-	insertItem(new SerializableItem_Bool("spectators_can_talk", _spectatorsCanTalk));
-	insertItem(new SerializableItem_Bool("spectators_see_everything", _spectatorsSeeEverything));
-}
 Command_JoinGame::Command_JoinGame(int _roomId, int _gameId, const QString &_password, bool _spectator)
 	: RoomCommand("join_game", _roomId)
 {
@@ -113,6 +102,10 @@ Command_DrawCards::Command_DrawCards(int _gameId, int _number)
 	: GameCommand("draw_cards", _gameId)
 {
 	insertItem(new SerializableItem_Int("number", _number));
+}
+Command_UndoDraw::Command_UndoDraw(int _gameId)
+	: GameCommand("undo_draw", _gameId)
+{
 }
 Command_FlipCard::Command_FlipCard(int _gameId, const QString &_zone, int _cardId, bool _faceDown)
 	: GameCommand("flip_card", _gameId)
@@ -425,6 +418,10 @@ Context_DeckSelect::Context_DeckSelect(int _deckId)
 {
 	insertItem(new SerializableItem_Int("deck_id", _deckId));
 }
+Context_UndoDraw::Context_UndoDraw()
+	: GameEventContext("undo_draw")
+{
+}
 Command_UpdateServerMessage::Command_UpdateServerMessage()
 	: AdminCommand("update_server_message")
 {
@@ -445,7 +442,6 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdjoin_room", Command_JoinRoom::newItem);
 	itemNameHash.insert("cmdleave_room", Command_LeaveRoom::newItem);
 	itemNameHash.insert("cmdroom_say", Command_RoomSay::newItem);
-	itemNameHash.insert("cmdcreate_game", Command_CreateGame::newItem);
 	itemNameHash.insert("cmdjoin_game", Command_JoinGame::newItem);
 	itemNameHash.insert("cmdleave_game", Command_LeaveGame::newItem);
 	itemNameHash.insert("cmdsay", Command_Say::newItem);
@@ -453,6 +449,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdmulligan", Command_Mulligan::newItem);
 	itemNameHash.insert("cmdroll_die", Command_RollDie::newItem);
 	itemNameHash.insert("cmddraw_cards", Command_DrawCards::newItem);
+	itemNameHash.insert("cmdundo_draw", Command_UndoDraw::newItem);
 	itemNameHash.insert("cmdflip_card", Command_FlipCard::newItem);
 	itemNameHash.insert("cmdattach_card", Command_AttachCard::newItem);
 	itemNameHash.insert("cmdcreate_token", Command_CreateToken::newItem);
@@ -500,5 +497,6 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_event_contextready_start", Context_ReadyStart::newItem);
 	itemNameHash.insert("game_event_contextconcede", Context_Concede::newItem);
 	itemNameHash.insert("game_event_contextdeck_select", Context_DeckSelect::newItem);
+	itemNameHash.insert("game_event_contextundo_draw", Context_UndoDraw::newItem);
 	itemNameHash.insert("cmdupdate_server_message", Command_UpdateServerMessage::newItem);
 }

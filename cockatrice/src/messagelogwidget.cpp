@@ -138,6 +138,14 @@ void MessageLogWidget::logDrawCards(Player *player, int number)
 		append(tr("%1 draws %2 cards.").arg(sanitizeHtml(player->getName())).arg(number));
 }
 
+void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
+{
+	if (cardName.isEmpty())
+		append(tr("%1 undoes his last draw.").arg(sanitizeHtml(player->getName())));
+	else
+		append(tr("%1 undoes his last draw (%2).").arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(cardName)));
+}
+
 QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position) const
 {
 	bool cardNameContainsStartZone = false;
@@ -428,6 +436,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
 	connect(player, SIGNAL(logDumpZone(Player *, CardZone *, int)), this, SLOT(logDumpZone(Player *, CardZone *, int)));
 	connect(player, SIGNAL(logStopDumpZone(Player *, CardZone *)), this, SLOT(logStopDumpZone(Player *, CardZone *)));
 	connect(player, SIGNAL(logDrawCards(Player *, int)), this, SLOT(logDrawCards(Player *, int)));
+	connect(player, SIGNAL(logUndoDraw(Player *, QString)), this, SLOT(logUndoDraw(Player *, QString)));
 	connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *)), this, SLOT(logRevealCards(Player *, CardZone *, int, QString, Player *)));
 }
 

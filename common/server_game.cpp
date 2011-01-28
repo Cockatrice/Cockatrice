@@ -28,8 +28,8 @@
 #include <QTimer>
 #include <QDebug>
 
-Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent)
-	: QObject(parent), creatorInfo(new ServerInfo_User(_creator->getUserInfo())), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), activePlayer(-1), activePhase(-1), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0)
+Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent)
+	: QObject(parent), creatorInfo(new ServerInfo_User(_creator->getUserInfo())), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0)
 {
 	addPlayer(_creator, false, false);
 
@@ -399,18 +399,25 @@ ServerInfo_Game *Server_Game::getInfo() const
 {
 	if (players.isEmpty())
 		// Game is closing
-		return new ServerInfo_Game(getGameId(), QString(), false, 0, getMaxPlayers(), 0, false, 0);
-	else
+		return new ServerInfo_Game(getGameId(), QString(), false, 0, getMaxPlayers(), QList<GameTypeId *>(), 0, false, 0);
+	else {
 		// Game is open
+		
+		QList<GameTypeId *> gameTypeList;
+		for (int i = 0; i < gameTypes.size(); ++i)
+			gameTypeList.append(new GameTypeId(gameTypes[i]));
+		
 		return new ServerInfo_Game(
 			getGameId(),
 			getDescription(),
 			!getPassword().isEmpty(),
 			getPlayerCount(),
 			getMaxPlayers(),
+			gameTypeList,
 			new ServerInfo_User(getCreatorInfo(), false),
 			getSpectatorsAllowed(),
 			getSpectatorsNeedPassword(),
 			getSpectatorCount()
 		);
+	}
 }

@@ -17,6 +17,7 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("room", ServerInfo_Room::newItem);
 	registerSerializableItem("user", ServerInfo_User::newItem);
 	registerSerializableItem("game", ServerInfo_Game::newItem);
+	registerSerializableItem("game_type", ServerInfo_GameType::newItem);
 	registerSerializableItem("card_counter", ServerInfo_CardCounter::newItem);
 	registerSerializableItem("card", ServerInfo_Card::newItem);
 	registerSerializableItem("zone", ServerInfo_Zone::newItem);
@@ -28,10 +29,12 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("file", DeckList_File::newItem);
 	registerSerializableItem("directory", DeckList_Directory::newItem);
 	registerSerializableItem("card_id", CardId::newItem);
+	registerSerializableItem("game_type_id", GameTypeId::newItem);
 	
 	registerSerializableItem("containercmd", CommandContainer::newItem);
 	registerSerializableItem("containergame_event", GameEventContainer::newItem);
 	
+	registerSerializableItem("cmdcreate_game", Command_CreateGame::newItem);
 	registerSerializableItem("cmddeck_upload", Command_DeckUpload::newItem);
 	registerSerializableItem("cmddeck_select", Command_DeckSelect::newItem);
 	registerSerializableItem("cmdset_sideboard_plan", Command_SetSideboardPlan::newItem);
@@ -138,26 +141,47 @@ void CommandContainer::setResponse(ProtocolResponse *_resp)
 	resp = _resp;
 }
 
-void CommandContainer::enqueueGameEventPublic(GameEvent *event, int gameId)
+void CommandContainer::enqueueGameEventPublic(GameEvent *event, int gameId, GameEventContext *context)
 {
 	if (!gameEventQueuePublic)
 		gameEventQueuePublic = new GameEventContainer(QList<GameEvent *>(), gameId);
 	gameEventQueuePublic->addGameEvent(event);
+	if (context)
+		gameEventQueuePublic->setContext(context);
 }
 
-void CommandContainer::enqueueGameEventOmniscient(GameEvent *event, int gameId)
+void CommandContainer::enqueueGameEventOmniscient(GameEvent *event, int gameId, GameEventContext *context)
 {
 	if (!gameEventQueueOmniscient)
 		gameEventQueueOmniscient = new GameEventContainer(QList<GameEvent *>(), gameId);
 	gameEventQueueOmniscient->addGameEvent(event);
+	if (context)
+		gameEventQueueOmniscient->setContext(context);
 }
 
-void CommandContainer::enqueueGameEventPrivate(GameEvent *event, int gameId, int playerId)
+void CommandContainer::enqueueGameEventPrivate(GameEvent *event, int gameId, int playerId, GameEventContext *context)
 {
 	if (!gameEventQueuePrivate)
 		gameEventQueuePrivate = new GameEventContainer(QList<GameEvent *>(), gameId);
 	gameEventQueuePrivate->addGameEvent(event);
 	privatePlayerId = playerId;
+	if (context)
+		gameEventQueuePrivate->setContext(context);
+}
+
+Command_CreateGame::Command_CreateGame(int _roomId, const QString &_description, const QString &_password, int _maxPlayers, const QList<GameTypeId *> &_gameTypes, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything)
+	: RoomCommand("create_game", _roomId)
+{
+	insertItem(new SerializableItem_String("description", _description));
+	insertItem(new SerializableItem_String("password", _password));
+	insertItem(new SerializableItem_Int("max_players", _maxPlayers));
+	insertItem(new SerializableItem_Bool("spectators_allowed", _spectatorsAllowed));
+	insertItem(new SerializableItem_Bool("spectators_need_password", _spectatorsNeedPassword));
+	insertItem(new SerializableItem_Bool("spectators_can_talk", _spectatorsCanTalk));
+	insertItem(new SerializableItem_Bool("spectators_see_everything", _spectatorsSeeEverything));
+	
+	for (int i = 0; i < _gameTypes.size(); ++i)
+		itemList.append(_gameTypes[i]);
 }
 
 Command_DeckUpload::Command_DeckUpload(DeckList *_deck, const QString &_path)

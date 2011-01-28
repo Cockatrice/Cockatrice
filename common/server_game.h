@@ -40,6 +40,7 @@ private:
 	QString description;
 	QString password;
 	int maxPlayers;
+	QList<int> gameTypes;
 	int activePlayer, activePhase;
 	bool spectatorsAllowed;
 	bool spectatorsNeedPassword;
@@ -53,7 +54,7 @@ signals:
 private slots:
 	void pingClockTimeout();
 public:
-	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent);
+	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent);
 	~Server_Game();
 	ServerInfo_Game *getInfo() const;
 	ServerInfo_User *getCreatorInfo() const { return creatorInfo; }

@@ -11,8 +11,8 @@
 #include "dlg_creategame.h"
 #include "protocol_items.h"
 
-DlgCreateGame::DlgCreateGame(AbstractClient *_client, int _roomId, QWidget *parent)
-	: QDialog(parent), client(_client), roomId(_roomId)
+DlgCreateGame::DlgCreateGame(AbstractClient *_client, int _roomId, const QMap<int, QString> &_gameTypes, QWidget *parent)
+	: QDialog(parent), client(_client), roomId(_roomId), gameTypes(_gameTypes)
 {
 	descriptionLabel = new QLabel(tr("&Description:"));
 	descriptionEdit = new QLineEdit;
@@ -28,6 +28,17 @@ DlgCreateGame::DlgCreateGame(AbstractClient *_client, int _roomId, QWidget *pare
 	maxPlayersEdit->setMaximum(100);
 	maxPlayersEdit->setValue(2);
 	maxPlayersLabel->setBuddy(maxPlayersEdit);
+	
+	QVBoxLayout *gameTypeLayout = new QVBoxLayout;
+	QMapIterator<int, QString> gameTypeIterator(gameTypes);
+	while (gameTypeIterator.hasNext()) {
+		gameTypeIterator.next();
+		QCheckBox *gameTypeCheckBox = new QCheckBox(gameTypeIterator.value());
+		gameTypeLayout->addWidget(gameTypeCheckBox);
+		gameTypeCheckBoxes.insert(gameTypeIterator.key(), gameTypeCheckBox);
+	}
+	QGroupBox *gameTypeGroupBox = new QGroupBox(tr("Game type"));
+	gameTypeGroupBox->setLayout(gameTypeLayout);
 	
 	spectatorsAllowedCheckBox = new QCheckBox(tr("&Spectators allowed"));
 	spectatorsAllowedCheckBox->setChecked(true);
@@ -50,7 +61,8 @@ DlgCreateGame::DlgCreateGame(AbstractClient *_client, int _roomId, QWidget *pare
 	grid->addWidget(passwordEdit, 1, 1);
 	grid->addWidget(maxPlayersLabel, 2, 0);
 	grid->addWidget(maxPlayersEdit, 2, 1);
-	grid->addWidget(spectatorsGroupBox, 3, 0, 1, 2);
+	grid->addWidget(gameTypeGroupBox, 3, 0, 1, 2);
+	grid->addWidget(spectatorsGroupBox, 4, 0, 1, 2);
 
 	okButton = new QPushButton(tr("&OK"));
 	okButton->setDefault(true);
@@ -76,11 +88,20 @@ DlgCreateGame::DlgCreateGame(AbstractClient *_client, int _roomId, QWidget *pare
 
 void DlgCreateGame::actOK()
 {
+	QList<GameTypeId *> gameTypeList;
+	QMapIterator<int, QCheckBox *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
+	while (gameTypeCheckBoxIterator.hasNext()) {
+		gameTypeCheckBoxIterator.next();
+		if (gameTypeCheckBoxIterator.value()->isChecked())
+			gameTypeList.append(new GameTypeId(gameTypeCheckBoxIterator.key()));
+	}
+	
 	Command_CreateGame *createCommand = new Command_CreateGame(
 		roomId,
 		descriptionEdit->text(),
 		passwordEdit->text(),
 		maxPlayersEdit->value(),
+		gameTypeList,
 		spectatorsAllowedCheckBox->isChecked(),
 		spectatorsNeedPasswordCheckBox->isChecked(),
 		spectatorsCanTalkCheckBox->isChecked(),

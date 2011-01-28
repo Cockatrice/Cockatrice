@@ -25,6 +25,11 @@ public:
 	CardId(int _cardId = -1) : SerializableItem_Int("card_id", _cardId) { }
 	static SerializableItem *newItem() { return new CardId; }
 };
+class GameTypeId : public SerializableItem_Int {
+public:
+	GameTypeId(int _gameTypeId = -1) : SerializableItem_Int("game_type_id", _gameTypeId) { }
+	static SerializableItem *newItem() { return new GameTypeId; }
+};
 
 class ServerInfo_User : public SerializableItem_Map {
 public:
@@ -48,27 +53,37 @@ public:
 
 class ServerInfo_Game : public SerializableItem_Map {
 public:
-	ServerInfo_Game(int _gameId = -1, const QString &_description = QString(), bool _hasPassword = false, int _playerCount = -1, int _maxPlayers = -1, ServerInfo_User *creatorInfo = 0, bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, int _spectatorCount = -1);
+	ServerInfo_Game(int _gameId = -1, const QString &_description = QString(), bool _hasPassword = false, int _playerCount = -1, int _maxPlayers = -1, const QList<GameTypeId *> &_gameTypes = QList<GameTypeId *>(), ServerInfo_User *creatorInfo = 0, bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, int _spectatorCount = -1);
 	static SerializableItem *newItem() { return new ServerInfo_Game; }
 	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); }
 	QString getDescription() const { return static_cast<SerializableItem_String *>(itemMap.value("description"))->getData(); }
 	bool getHasPassword() const { return static_cast<SerializableItem_Bool *>(itemMap.value("has_password"))->getData(); }
 	int getPlayerCount() const { return static_cast<SerializableItem_Int *>(itemMap.value("player_count"))->getData(); }
 	int getMaxPlayers() const { return static_cast<SerializableItem_Int *>(itemMap.value("max_players"))->getData(); }
+	QList<GameTypeId *> getGameTypes() const { return typecastItemList<GameTypeId *>(); }
 	ServerInfo_User *getCreatorInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
 	bool getSpectatorsAllowed() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_allowed"))->getData(); }
 	bool getSpectatorsNeedPassword() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_need_password"))->getData(); }
 	int getSpectatorCount() const { return static_cast<SerializableItem_Int *>(itemMap.value("spectator_count"))->getData(); }
 };
 
+class ServerInfo_GameType : public SerializableItem_Map {
+public:
+	ServerInfo_GameType(int _gameTypeId = -1, const QString &_description = QString());
+	static SerializableItem *newItem() { return new ServerInfo_GameType; }
+	int getGameTypeId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_type_id"))->getData(); }
+	QString getDescription() const { return static_cast<SerializableItem_String *>(itemMap.value("description"))->getData(); }
+};
+
 class ServerInfo_Room : public SerializableItem_Map {
 private:
 	QList<ServerInfo_Game *> gameList;
 	QList<ServerInfo_User *> userList;
+	QList<ServerInfo_GameType *> gameTypeList;
 protected:
 	void extractData();
 public:
-	ServerInfo_Room(int _id = -1, const QString &_name = QString(), const QString &_description = QString(), int _gameCount = -1, int _playerCount = -1, bool _autoJoin = false, const QList<ServerInfo_Game *> &_gameList = QList<ServerInfo_Game *>(), const QList<ServerInfo_User *> &_userList = QList<ServerInfo_User *>());
+	ServerInfo_Room(int _id = -1, const QString &_name = QString(), const QString &_description = QString(), int _gameCount = -1, int _playerCount = -1, bool _autoJoin = false, const QList<ServerInfo_Game *> &_gameList = QList<ServerInfo_Game *>(), const QList<ServerInfo_User *> &_userList = QList<ServerInfo_User *>(), const QList<ServerInfo_GameType *> &_gameTypeList = QList<ServerInfo_GameType *>());
 	static SerializableItem *newItem() { return new ServerInfo_Room; }
 	int getRoomId() const { return static_cast<SerializableItem_Int *>(itemMap.value("room_id"))->getData(); }
 	QString getName() const { return static_cast<SerializableItem_String *>(itemMap.value("name"))->getData(); }
@@ -78,6 +93,7 @@ public:
 	bool getAutoJoin() const { return static_cast<SerializableItem_Bool *>(itemMap.value("auto_join"))->getData(); }
 	const QList<ServerInfo_Game *> &getGameList() const { return gameList; }
 	const QList<ServerInfo_User *> &getUserList() const { return userList; }
+	const QList<ServerInfo_GameType *> &getGameTypeList() const { return gameTypeList; }
 };
 
 class ServerInfo_CardCounter : public SerializableItem_Map {
