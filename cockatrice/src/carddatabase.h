@@ -66,7 +66,7 @@ private:
 	QString powtough;
 	QString text;
 	QStringList colors;
-	QString picURL;
+	QMap<QString, QString> picURLs;
 	bool cipt;
 	int tableRow;
 	QPixmap *pixmap;
@@ -82,7 +82,7 @@ public:
 		bool cipt = false,
 		int _tableRow = 0,
 		const SetList &_sets = SetList(),
-		const QString &_picURL = QString());
+		const QMap<QString, QString> &_picURLs = QMap<QString, QString>());
 	~CardInfo();
 	const QString &getName() const { return name; }
 	const SetList &getSets() const { return sets; }
@@ -93,12 +93,14 @@ public:
 	bool getCipt() const { return cipt; }
 	void setText(const QString &_text) { text = _text; }
 	const QStringList &getColors() const { return colors; }
-	const QString &getPicURL() const { return picURL; }
+	QString getPicURL(const QString &set) const { return picURLs.value(set); }
+	QString getPicURL() const;
+	const QMap<QString, QString> &getPicURLs() const { return picURLs; }
 	QString getMainCardType() const;
 	QString getCorrectedName() const;
 	int getTableRow() const { return tableRow; }
 	void setTableRow(int _tableRow) { tableRow = _tableRow; }
-	void setPicURL(const QString &_picURL) { picURL = _picURL; }
+	void setPicURL(const QString &_set, const QString &_picURL) { picURLs.insert(_set, _picURL); }
 	void addToSet(CardSet *set);
 	QPixmap *loadPixmap();
 	QPixmap *getPixmap(QSize size);
@@ -151,6 +153,7 @@ private slots:
 	void picDownloadFinished(QNetworkReply *reply);
 	void picDownloadChanged();
 	void imageLoaded(CardInfo *card, QImage image);
+	void picsPathChanged();
 };
 
 #endif

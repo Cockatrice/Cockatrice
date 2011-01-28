@@ -64,7 +64,7 @@ void OracleImporter::readSetsFromXml(QXmlStreamReader &xml)
 	}
 }
 
-CardInfo *OracleImporter::addCard(QString cardName, const QString &cardCost, const QString &cardType, const QString &cardPT, const QStringList &cardText)
+CardInfo *OracleImporter::addCard(const QString &setName, QString cardName, int cardId, const QString &cardCost, const QString &cardType, const QString &cardPT, const QStringList &cardText)
 {
 	QString fullCardText = cardText.join("\n");
 	bool splitCard = false;
@@ -110,7 +110,6 @@ CardInfo *OracleImporter::addCard(QString cardName, const QString &cardCost, con
 		bool cipt = (cardText.contains(cardName + " enters the battlefield tapped."));
 		
 		card = new CardInfo(this, cardName, cardCost, cardType, cardPT, fullCardText, colors, cipt);
-		card->setPicURL(getURLFromName(cardName));
 		int tableRow = 1;
 		QString mainCardType = card->getMainCardType();
 		if ((mainCardType == "Land") || mArtifact)
@@ -123,6 +122,7 @@ CardInfo *OracleImporter::addCard(QString cardName, const QString &cardCost, con
 
 		cardHash.insert(cardName, card);
 	}
+	card->setPicURL(setName, pictureUrl.arg(cardId));
 	return card;
 }
 
@@ -153,6 +153,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 		QDomNode divClass = div.attributes().namedItem("class");
 		if (divClass.nodeValue() == "textspoiler") {
 			QString cardName, cardCost, cardType, cardPT, cardText;
+			int cardId = 0;
 			
 			QDomNodeList trs = div.elementsByTagName("tr");
 			for (int j = 0; j < trs.size(); ++j) {
@@ -163,7 +164,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 					for (int i = 0; i < cardTextSplit.size(); ++i)
 						cardTextSplit[i] = cardTextSplit[i].trimmed();
 					
-					CardInfo *card = addCard(cardName, cardCost, cardType, cardPT, cardTextSplit);
+					CardInfo *card = addCard(set->getShortName(), cardName, cardId, cardCost, cardType, cardPT, cardTextSplit);
 					if (!set->contains(card)) {
 						card->addToSet(set);
 						cards++;
@@ -173,9 +174,12 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 					QString v1 = tds.at(0).toElement().text().simplified();
 					QString v2 = tds.at(1).toElement().text().replace(trUtf8("—"), "-");
 					
-					if (v1 == "Name:")
+					if (v1 == "Name:") {
+						QDomElement a = tds.at(1).toElement().elementsByTagName("a").at(0).toElement();
+						QString href = a.attributes().namedItem("href").nodeValue();
+						cardId = href.mid(href.indexOf("multiverseid=") + 13).toInt();
 						cardName = v2.simplified();
-					else if (v1 == "Cost:")
+					} else if (v1 == "Cost:")
 						cardCost = v2.simplified();
 					else if (v1 == "Type:")
 						cardType = v2.simplified();

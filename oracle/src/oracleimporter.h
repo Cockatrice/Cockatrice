@@ -35,7 +35,7 @@ private:
 	
 	void downloadNextFile();
 	void readSetsFromXml(QXmlStreamReader &xml);
-	CardInfo *addCard(QString cardName, const QString &cardCost, const QString &cardType, const QString &cardPT, const QStringList &cardText);
+	CardInfo *addCard(const QString &setName, QString cardName, int cardId, const QString &cardCost, const QString &cardType, const QString &cardPT, const QStringList &cardText);
 private slots:
 	void httpRequestFinished(int requestId, bool error);
 	void readResponseHeader(const QHttpResponseHeader &responseHeader);
