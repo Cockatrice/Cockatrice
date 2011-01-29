@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
+#include <math.h>
 #include "deckview.h"
 #include "decklist.h"
 #include "carddatabase.h"
@@ -124,7 +125,7 @@ void DeckViewCard::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 }
 
 DeckViewCardContainer::DeckViewCardContainer(const QString &_name)
-	: QGraphicsItem(), name(_name), width(0), height(0), maxWidth(0)
+	: QGraphicsItem(), name(_name), width(0), height(0)
 {
 	QString bgPath = settingsCache->getTableBgPath();
 	if (!bgPath.isEmpty())
@@ -140,6 +141,8 @@ QRectF DeckViewCardContainer::boundingRect() const
 
 void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
+	qreal totalTextWidth = getCardTypeTextWidth();
+	
 	if (bgPixmap.isNull())
 		painter->fillRect(boundingRect(), QColor(0, 0, 100));
 	else
@@ -154,43 +157,108 @@ void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsI
 	f.setWeight(QFont::Bold);
 	painter->setFont(f);
 	painter->drawText(10, 0, width - 20, separatorY, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine, InnerDecklistNode::visibleNameFromName(name) + QString(": %1").arg(cards.size()));
+	
+	f.setPixelSize(16);
+	painter->setFont(f);
+	QList<QString> cardTypeList = cardsByType.uniqueKeys();
+	qreal yUntilNow = separatorY + paddingY;
+	for (int i = 0; i < cardTypeList.size(); ++i) {
+		if (i != 0) {
+			painter->setPen(QColor(255, 255, 255, 100));
+			painter->drawLine(QPointF(0, yUntilNow - paddingY / 2), QPointF(width, yUntilNow - paddingY / 2));
+		}
+		
+		qreal thisRowHeight = CARD_HEIGHT * currentRowsAndCols[i].first;
+		QRectF textRect(0, yUntilNow, totalTextWidth, thisRowHeight);
+		yUntilNow += thisRowHeight + paddingY;
+		
+		painter->setPen(Qt::white);
+		painter->drawText(textRect, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, cardTypeList[i]);
+	}
 }
 
 void DeckViewCardContainer::addCard(DeckViewCard *card)
 {
 	cards.append(card);
+	cardsByType.insert(card->getInfo()->getMainCardType(), card);
 }
 
 void DeckViewCardContainer::removeCard(DeckViewCard *card)
 {
 	cards.removeAt(cards.indexOf(card));
+	cardsByType.remove(card->getInfo()->getMainCardType(), card);
 }
 
-void DeckViewCardContainer::rearrangeItems()
+QList<QPair<int, int> > DeckViewCardContainer::getRowsAndCols() const
 {
-	separatorY = 30;
-	
-	QMap<QString, DeckViewCard *> cardsByType;
-	for (int i = 0; i < cards.size(); ++i)
-		cardsByType.insertMulti(cards[i]->getInfo()->getMainCardType(), cards[i]);
-	
+	QList<QPair<int, int> > result;
 	QList<QString> cardTypeList = cardsByType.uniqueKeys();
-	int rows = cardTypeList.size();
-	int cols = 0;
-	for (int i = 0; i < rows; ++i) {
+	for (int i = 0; i < cardTypeList.size(); ++i)
+		result.append(QPair<int, int>(1, cardsByType.count(cardTypeList[i])));
+	return result;
+}
+
+int DeckViewCardContainer::getCardTypeTextWidth() const
+{
+	QFont f("Serif");
+	f.setStyleHint(QFont::Serif);
+	f.setPixelSize(16);
+	f.setWeight(QFont::Bold);
+	QFontMetrics fm(f);
+	
+	int maxCardTypeWidth = 0;
+	QMapIterator<QString, DeckViewCard *> i(cardsByType);
+	while (i.hasNext()) {
+		int cardTypeWidth = fm.size(Qt::TextSingleLine, i.next().key()).width();
+		if (cardTypeWidth > maxCardTypeWidth)
+			maxCardTypeWidth = cardTypeWidth;
+	}
+	
+	return maxCardTypeWidth + 15;
+}
+
+QSizeF DeckViewCardContainer::calculateBoundingRect(const QList<QPair<int, int> > &rowsAndCols) const
+{
+	qreal totalHeight = 0;
+	qreal totalWidth = 0;
+	
+	// Calculate space needed for cards
+	for (int i = 0; i < rowsAndCols.size(); ++i) {
+		totalHeight += CARD_HEIGHT * rowsAndCols[i].first + paddingY;
+		if (CARD_WIDTH * rowsAndCols[i].second > totalWidth)
+			totalWidth = CARD_WIDTH * rowsAndCols[i].second;
+	}
+	
+	return QSizeF(getCardTypeTextWidth() + totalWidth, totalHeight + separatorY + paddingY);
+}
+
+void DeckViewCardContainer::rearrangeItems(const QList<QPair<int, int> > &rowsAndCols)
+{
+	currentRowsAndCols = rowsAndCols;
+	
+	int totalCols = 0, totalRows = 0;
+	qreal yUntilNow = separatorY + paddingY;
+	qreal x = (qreal) getCardTypeTextWidth();
+	for (int i = 0; i < rowsAndCols.size(); ++i) {
+		const int tempRows = rowsAndCols[i].first;
+		const int tempCols = rowsAndCols[i].second;
+		totalRows += tempRows;
+		if (tempCols > totalCols)
+			totalCols = tempCols;
+		
+		QList<QString> cardTypeList = cardsByType.uniqueKeys();
 		QList<DeckViewCard *> row = cardsByType.values(cardTypeList[i]);
-		if (row.size() > cols)
-			cols = row.size();
 		for (int j = 0; j < row.size(); ++j) {
 			DeckViewCard *card = row[j];
-			card->setPos(j * CARD_WIDTH, separatorY + 10 + i * (CARD_HEIGHT + rowSpacing));
+			card->setPos(x + (j % tempCols) * CARD_WIDTH, yUntilNow + (j / tempCols) * CARD_HEIGHT);
 		}
+		yUntilNow += tempRows * CARD_HEIGHT + paddingY;
 	}
 	
 	prepareGeometryChange();
-	if (cols * CARD_WIDTH > maxWidth)
-		width = maxWidth = cols * CARD_WIDTH;
-	height = separatorY + 10 + rows * CARD_HEIGHT + rowSpacing * (rows - 1);
+	QSizeF bRect = calculateBoundingRect(rowsAndCols);
+	width = bRect.width();
+	height = bRect.height();
 }
 
 void DeckViewCardContainer::setWidth(qreal _width)
@@ -201,7 +269,7 @@ void DeckViewCardContainer::setWidth(qreal _width)
 }
 
 DeckViewScene::DeckViewScene(QObject *parent)
-	: QGraphicsScene(parent), locked(false), deck(0)
+	: QGraphicsScene(parent), locked(false), deck(0), optimalAspectRatio(1.0)
 {
 }
 
@@ -281,16 +349,60 @@ void DeckViewScene::rearrangeItems()
 {
 	const int spacing = CARD_HEIGHT / 3;
 	QList<DeckViewCardContainer *> contList = cardContainers.values();
-	qreal totalHeight = -spacing;
-	qreal totalWidth = 0;
+	
+	// Initialize space requirements
+	QList<QList<QPair<int, int> > > rowsAndColsList;
+	QList<QList<int> > cardCountList;
+	for (int i = 0; i < contList.size(); ++i) {
+		QList<QPair<int, int> > rowsAndCols = contList[i]->getRowsAndCols();
+		rowsAndColsList.append(rowsAndCols);
+		
+		cardCountList.append(QList<int>());
+		for (int j = 0; j < rowsAndCols.size(); ++j)
+			cardCountList[i].append(rowsAndCols[j].second);
+	}
+	
+	qreal totalHeight, totalWidth;
+	for (;;) {
+		// Calculate total size before this iteration
+		totalHeight = -spacing;
+		totalWidth = 0;
+		for (int i = 0; i < contList.size(); ++i) {
+			QSizeF contSize = contList[i]->calculateBoundingRect(rowsAndColsList[i]);
+			totalHeight += contSize.height() + spacing;
+			if (contSize.width() > totalWidth)
+				totalWidth = contSize.width();
+		}
+		
+		// We're done when the aspect ratio shifts from too high to too low.
+		if (totalWidth / totalHeight <= optimalAspectRatio)
+			break;
+		
+		// Find category with highest column count
+		int maxIndex1 = -1, maxIndex2 = -1, maxCols = 0;
+		for (int i = 0; i < rowsAndColsList.size(); ++i)
+			for (int j = 0; j < rowsAndColsList[i].size(); ++j)
+				if (rowsAndColsList[i][j].second > maxCols) {
+					maxIndex1 = i;
+					maxIndex2 = j;
+					maxCols = rowsAndColsList[i][j].second;
+				}
+		
+		// Add row to category
+		const int maxRows = rowsAndColsList[maxIndex1][maxIndex2].first;
+		const int maxCardCount = cardCountList[maxIndex1][maxIndex2];
+		rowsAndColsList[maxIndex1][maxIndex2] = QPair<int, int>(maxRows + 1, (int) ceil((qreal) maxCardCount / (qreal) (maxRows + 1)));
+	}
+	
+	totalHeight = -spacing;
 	for (int i = 0; i < contList.size(); ++i) {
 		DeckViewCardContainer *c = contList[i];
-		c->rearrangeItems();
+		c->rearrangeItems(rowsAndColsList[i]);
 		c->setPos(0, totalHeight + spacing);
 		totalHeight += c->boundingRect().height() + spacing;
-		if (c->boundingRect().width() > totalWidth)
-			totalWidth = c->boundingRect().width();
 	}
+	
+	totalWidth = totalHeight * optimalAspectRatio;
 	for (int i = 0; i < contList.size(); ++i)
 		contList[i]->setWidth(totalWidth);
 	
@@ -335,7 +447,8 @@ DeckView::DeckView(QWidget *parent)
 void DeckView::resizeEvent(QResizeEvent *event)
 {
 	QGraphicsView::resizeEvent(event);
-	updateSceneRect(scene()->sceneRect());
+	deckViewScene->setOptimalAspectRatio((qreal) width() / (qreal) height());
+	deckViewScene->rearrangeItems();
 }
 
 void DeckView::updateSceneRect(const QRectF &rect)
