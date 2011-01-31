@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QMap>
+#include <QMultiMap>
 #include <QPixmap>
 #include "abstractcarditem.h"
 #include "abstractcarddragitem.h"
@@ -42,13 +43,16 @@ protected:
 
 class DeckViewCardContainer : public QGraphicsItem {
 private:
+	static const int separatorY = 20;
+	static const int paddingY = 10;
+	
 	QString name;
 	QList<DeckViewCard *> cards;
+	QMultiMap<QString, DeckViewCard *> cardsByType;
+	QList<QPair<int, int> > currentRowsAndCols;
 	qreal width, height;
-	qreal maxWidth;
-	qreal separatorY;
 	QPixmap bgPixmap;
-	static const int rowSpacing = 5;
+	int getCardTypeTextWidth() const;
 public:
 	enum { Type = typeDeckViewCardContainer };
 	int type() const { return Type; }
@@ -59,8 +63,11 @@ public:
 	void removeCard(DeckViewCard *card);
 	const QList<DeckViewCard *> &getCards() const { return cards; }
 	const QString &getName() const { return name; }
-	void rearrangeItems();
 	void setWidth(qreal _width);
+
+	QList<QPair<int, int> > getRowsAndCols() const;
+	QSizeF calculateBoundingRect(const QList<QPair<int, int> > &rowsAndCols) const;
+	void rearrangeItems(const QList<QPair<int, int> > &rowsAndCols);
 };
 
 class DeckViewScene : public QGraphicsScene {
@@ -72,15 +79,17 @@ private:
 	bool locked;
 	DeckList *deck;
 	QMap<QString, DeckViewCardContainer *> cardContainers;
+	qreal optimalAspectRatio;
 	void rebuildTree();
 	void applySideboardPlan(const QList<MoveCardToZone *> &plan);
-	void rearrangeItems();
 public:
 	DeckViewScene(QObject *parent = 0);
 	~DeckViewScene();
 	void setLocked(bool _locked) { locked = _locked; }
 	bool getLocked() const { return locked; }
 	void setDeck(DeckList *_deck);
+	void setOptimalAspectRatio(qreal _optimalAspectRatio) { optimalAspectRatio = _optimalAspectRatio; }
+	void rearrangeItems();
 	void updateContents();
 	QList<MoveCardToZone *> getSideboardPlan() const;
 };
