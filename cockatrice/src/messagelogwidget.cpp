@@ -132,10 +132,7 @@ void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
 
 void MessageLogWidget::logDrawCards(Player *player, int number)
 {
-	if (number == 1)
-		append(tr("%1 draws a card.").arg(sanitizeHtml(player->getName())));
-	else
-		append(tr("%1 draws %2 cards.").arg(sanitizeHtml(player->getName())).arg(number));
+	append(tr("%1 draws %n card(s).", "", number).arg(sanitizeHtml(player->getName())));
 }
 
 void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
@@ -290,14 +287,14 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
 	
 	int delta = abs(oldValue - value);
 	if (value > oldValue)
-		finalStr = tr("%1 places %n counter(s) (%2) on %3 (now %4).", "", delta);
+		finalStr = tr("%1 places %n %2 counter(s) on %3 (now %4).", "", delta);
 	else
-		finalStr = tr("%1 removes %n counter(s) (%2) from %3 (now %4).", "", delta);
+		finalStr = tr("%1 removes %n %2 counter(s) from %3 (now %4).", "", delta);
 	
 	switch (counterId) {
-		case 0: colorStr = tr("red"); break;
-		case 1: colorStr = tr("yellow"); break;
-		case 2: colorStr = tr("green"); break;
+		case 0: colorStr = tr("red", "", delta); break;
+		case 1: colorStr = tr("yellow", "", delta); break;
+		case 2: colorStr = tr("green", "", delta); break;
 		default: ;
 	}
 	
