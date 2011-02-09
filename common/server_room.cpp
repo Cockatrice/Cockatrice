@@ -35,7 +35,7 @@ ServerInfo_Room *Server_Room::getInfo(bool complete) const
 
 void Server_Room::addClient(Server_ProtocolHandler *client)
 {
-	sendRoomEvent(new Event_JoinRoom(id, new ServerInfo_User(client->getUserInfo())));
+	sendRoomEvent(new Event_JoinRoom(id, new ServerInfo_User(client->getUserInfo(), false)));
 	append(client);
 	emit roomInfoChanged();
 }

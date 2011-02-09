@@ -146,6 +146,10 @@
             <name>MR</name>
             <longname>Mirrodin</longname>
         </set>
+	<set import="1">
+	    <name>MBS</name>
+	    <longname>Mirrodin Besieged</longname>
+	</set>
         <set import="1">
             <name>MOR</name>
             <longname>Morningtide</longname>
