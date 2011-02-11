@@ -1084,120 +1084,125 @@
         <translation>Японский:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="171"/>
-        <location filename="../src/window_main.cpp" line="177"/>
-        <location filename="../src/window_main.cpp" line="184"/>
-        <location filename="../src/window_main.cpp" line="190"/>
-        <location filename="../src/window_main.cpp" line="192"/>
+        <location filename="../src/window_main.cpp" line="166"/>
+        <source>Russian:</source>
+        <translation>Русский:</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="172"/>
+        <location filename="../src/window_main.cpp" line="178"/>
+        <location filename="../src/window_main.cpp" line="185"/>
+        <location filename="../src/window_main.cpp" line="191"/>
+        <location filename="../src/window_main.cpp" line="193"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="171"/>
+        <location filename="../src/window_main.cpp" line="172"/>
         <source>Server timeout</source>
         <translation>Временная ошибка</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="177"/>
+        <location filename="../src/window_main.cpp" line="178"/>
         <source>Invalid login data.</source>
         <translation>Неверный логин/пароль.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="184"/>
+        <location filename="../src/window_main.cpp" line="185"/>
         <source>Socket error: %1</source>
         <translation>Ошибка сокета: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="190"/>
+        <location filename="../src/window_main.cpp" line="191"/>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
         <translation>Вы пытаетесь подключиться к несуществующему серверу. Пожалуйста, обновите Cockatrice или выберите другой сервер.
 Локальная версия %1, удаленная версия %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="192"/>
+        <location filename="../src/window_main.cpp" line="193"/>
         <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
 Local version is %1, remote version is %2.</source>
         <translation>Ваш клиент Cockatrice устарел. Пожалуйста, обновите Cockatrice.
 Локальная версия %1, удаленная версия %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="198"/>
+        <location filename="../src/window_main.cpp" line="199"/>
         <source>Connecting to %1...</source>
         <translation>Подключение к %1...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="199"/>
+        <location filename="../src/window_main.cpp" line="200"/>
         <source>Disconnected</source>
         <translation>Подключение прервано</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="200"/>
+        <location filename="../src/window_main.cpp" line="201"/>
         <source>Logged in at %1</source>
         <translation>Подключено к %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="209"/>
+        <location filename="../src/window_main.cpp" line="210"/>
         <source>&amp;Connect...</source>
         <translation>&amp;Подключение...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="210"/>
+        <location filename="../src/window_main.cpp" line="211"/>
         <source>&amp;Disconnect</source>
         <translation>П&amp;рервать подключение</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="211"/>
+        <location filename="../src/window_main.cpp" line="212"/>
         <source>Start &amp;local game...</source>
         <translation>&amp;Начать локальную игру...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="212"/>
+        <location filename="../src/window_main.cpp" line="213"/>
         <source>&amp;Deck editor</source>
         <translation>Редактор &amp;колод</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="213"/>
+        <location filename="../src/window_main.cpp" line="214"/>
         <source>&amp;Full screen</source>
         <translation>П&amp;олный экран</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="214"/>
+        <location filename="../src/window_main.cpp" line="215"/>
         <source>Ctrl+F</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="215"/>
+        <location filename="../src/window_main.cpp" line="216"/>
         <source>&amp;Settings...</source>
         <translation>Н&amp;астройки</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="216"/>
+        <location filename="../src/window_main.cpp" line="217"/>
         <source>&amp;Exit</source>
         <translation>&amp;Выход</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="218"/>
+        <location filename="../src/window_main.cpp" line="219"/>
         <source>&amp;Cockatrice</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="220"/>
+        <location filename="../src/window_main.cpp" line="221"/>
         <source>&amp;About Cockatrice</source>
         <translation>О про&amp;грамме</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="221"/>
+        <location filename="../src/window_main.cpp" line="222"/>
         <source>&amp;Help</source>
         <translation>&amp;Справка</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="298"/>
+        <location filename="../src/window_main.cpp" line="299"/>
         <source>Are you sure?</source>
         <translation>Вы уверены?</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="298"/>
+        <location filename="../src/window_main.cpp" line="299"/>
         <source>There are still open games. Are you sure you want to quit?</source>
         <translation>Вы подключены к игре. Выйти?</translation>
     </message>
@@ -1396,7 +1401,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="215"/>
         <source>%1 puts %2%3 into graveyard.</source>
-        <translation>%1 поместил%2%3 на кладбище. Скорбим.</translation>
+        <translation>%1 поместил %2%3 на кладбище.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="217"/>
@@ -1497,55 +1502,55 @@ Local version is %1, remote version is %2.</source>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="135"/>
         <source>%1 draws %n card(s).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 взял %n карту.</numerusform>
+            <numerusform>%1 взял %n карты.</numerusform>
+            <numerusform>%1 взял %n карт(ы).</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="290"/>
         <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 поместил %n %2 жетон на %3 (теперь %4).</numerusform>
+            <numerusform>%1 поместил %n %2 жетона на %3 (теперь %4).</numerusform>
+            <numerusform>%1 поместил %n %2 жетонов на %3 (теперь %4).</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="292"/>
         <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 снял %n %2 жетон с %3 (теперь %4).</numerusform>
+            <numerusform>%1 снял %n %2 жетона с %3 (теперь %4).</numerusform>
+            <numerusform>%1 снял %n %2 жетонов с %3 (теперь %4).</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="295"/>
         <source>red</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>красный</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>красных</numerusform>
+            <numerusform>красных</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="296"/>
         <source>yellow</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>желтый</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>желтых</numerusform>
+            <numerusform>желтых</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="297"/>
         <source>green</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>зеленый</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>зеленых</numerusform>
+            <numerusform>зеленых</numerusform>
         </translation>
     </message>
     <message>
@@ -1701,7 +1706,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="412"/>
         <source>It is now the %1.</source>
-        <translation> </translation>
+        <translation>Сейчас %1.</translation>
     </message>
 </context>
 <context>
