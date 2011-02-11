@@ -204,6 +204,8 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 
 QString OracleImporter::getPictureUrl(QString url, int cardId, QString name, const QString &setName) const
 {
+	if ((name == "Island") || (name == "Swamp") || (name == "Mountain") || (name == "Plains") || (name == "Forest"))
+		name.append("1");
 	return url.replace("!cardid!", QString::number(cardId)).replace("!set!", setName).replace("!name!", name
 		.replace("ö", "o")
 //		.remove('\'')

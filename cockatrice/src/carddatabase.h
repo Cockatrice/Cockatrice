@@ -37,19 +37,63 @@ public:
 	void sortByKey();
 };
 
-class PictureLoadingThread : public QThread {
+class PictureToLoad {
+private:
+	CardInfo *card;
+	bool stripped;
+	SetList sortedSets;
+	int setIndex;
+	bool hq;
+public:
+	PictureToLoad(CardInfo *_card = 0, bool _stripped = false, bool _hq = true);
+	CardInfo *getCard() const { return card; }
+	bool getStripped() const { return stripped; }
+	QString getSetName() const { return sortedSets[setIndex]->getShortName(); }
+	bool nextSet();
+		
+	bool getHq() const { return hq; }
+	void setHq(bool _hq) { hq = _hq; }
+	
+};
+
+class PictureLoader : public QObject {
 	Q_OBJECT
 private:
 	QString _picsPath;
-	QList<CardInfo *> loadQueue;
+	QList<PictureToLoad> loadQueue;
 	QMutex mutex;
+	QNetworkAccessManager *networkManager;
+	QList<PictureToLoad> cardsToDownload;
+	PictureToLoad cardBeingDownloaded;
+	bool picDownload, downloadRunning, loadQueueRunning;
+	void startNextPicDownload();
+public:
+	PictureLoader(QObject *parent = 0);
+	void setPicsPath(const QString &path);
+	void setPicDownload(bool _picDownload);
+	void loadImage(CardInfo *card, bool stripped);
+private slots:
+	void picDownloadFinished(QNetworkReply *reply);
+public slots:
+	void processLoadQueue();
+signals:
+	void startLoadQueue();
+	void imageLoaded(CardInfo *card, const QImage &image);
+};
+
+class PictureLoadingThread : public QThread {
+	Q_OBJECT
+private:
+	QString picsPath;
+	bool picDownload;
+	PictureLoader *pictureLoader;
+	mutable QMutex initMutex;
 protected:
 	void run();
 public:
-	PictureLoadingThread(QObject *parent);
+	PictureLoadingThread(const QString &_picsPath, bool _picDownload, QObject *parent);
 	~PictureLoadingThread();
-	void setPicsPath(const QString &path);
-	void loadImage(CardInfo *card);
+	PictureLoader *getPictureLoader() const { QMutexLocker locker(&initMutex); return pictureLoader; }
 signals:
 	void imageLoaded(CardInfo *card, const QImage &image);
 };
@@ -119,38 +163,17 @@ signals:
 	void pixmapUpdated();
 };
 
-class PictureToDownload {
-private:
-	CardInfo *card;
-	bool stripped;
-	QString setName;
-	bool hq;
-public:
-	PictureToDownload(CardInfo *_card = 0, bool _stripped = false, const QString &_setName = QString(), bool _hq = true)
-		: card(_card), stripped(_stripped), setName(_setName), hq(_hq) { }
-	CardInfo *getCard() const { return card; }
-	bool getStripped() const { return stripped; }
-	QString getSetName() const { return setName; }
-	bool getHq() const { return hq; }
-	void setHq(bool _hq) { hq = _hq; }
-};
-
 class CardDatabase : public QObject {
 	Q_OBJECT
 protected:
 	QHash<QString, CardInfo *> cardHash;
 	QHash<QString, CardSet *> setHash;
-	QNetworkAccessManager *networkManager;
-	QList<PictureToDownload> cardsToDownload;
-	PictureToDownload cardBeingDownloaded;
-	bool downloadRunning;
 	bool loadSuccess;
 	CardInfo *noCard;
 	PictureLoadingThread *loadingThread;
 private:
 	void loadCardsFromXml(QXmlStreamReader &xml);
 	void loadSetsFromXml(QXmlStreamReader &xml);
-	void startNextPicDownload();
 public:
 	CardDatabase(QObject *parent = 0);
 	~CardDatabase();
@@ -161,7 +184,6 @@ public:
 	SetList getSetList() const;
 	bool loadFromFile(const QString &fileName);
 	bool saveToFile(const QString &fileName);
-	void startPicDownload(CardInfo *card, bool stripped);
 	QStringList getAllColors() const;
 	QStringList getAllMainCardTypes() const;
 	bool getLoadSuccess() const { return loadSuccess; }
@@ -172,9 +194,8 @@ public slots:
 	bool loadCardDatabase(const QString &path);
 	bool loadCardDatabase();
 private slots:
-	void picDownloadFinished(QNetworkReply *reply);
-	void picDownloadChanged();
 	void imageLoaded(CardInfo *card, QImage image);
+	void picDownloadChanged();
 	void picsPathChanged();
 };
 

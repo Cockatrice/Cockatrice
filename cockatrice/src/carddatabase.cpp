@@ -61,9 +61,169 @@ void SetList::sortByKey()
 	qSort(begin(), end(), CompareFunctor());
 }
 
-PictureLoadingThread::PictureLoadingThread(QObject *parent)
-	: QThread(parent)
+PictureToLoad::PictureToLoad(CardInfo *_card, bool _stripped, bool _hq)
+	: card(_card), stripped(_stripped), setIndex(0), hq(_hq)
 {
+	if (card) {
+		sortedSets = card->getSets();
+		sortedSets.sortByKey();
+	}
+}
+
+bool PictureToLoad::nextSet()
+{
+	if (setIndex == sortedSets.size() - 1)
+		return false;
+	++setIndex;
+	return true;
+}
+
+PictureLoader::PictureLoader(QObject *parent)
+	: QObject(parent), downloadRunning(false), loadQueueRunning(false)
+{
+	connect(this, SIGNAL(startLoadQueue()), this, SLOT(processLoadQueue()), Qt::QueuedConnection);
+	
+	networkManager = new QNetworkAccessManager(this);
+	connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
+}
+
+void PictureLoader::processLoadQueue()
+{
+	if (loadQueueRunning)
+		return;
+	
+	loadQueueRunning = true;
+	forever {
+		mutex.lock();
+		if (loadQueue.isEmpty()) {
+			mutex.unlock();
+			loadQueueRunning = false;
+			return;
+		}
+		PictureToLoad ptl = loadQueue.takeFirst();
+		mutex.unlock();
+		QString correctedName = ptl.getCard()->getCorrectedName();
+		QString picsPath = _picsPath;
+		QString setName = ptl.getSetName();
+		
+		QImage image;
+		if (!image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(setName).arg(correctedName)))
+			if (!image.load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(setName).arg(correctedName).arg(1)))
+				if (!image.load(QString("%1/%2/%3/%4.full.jpg").arg(picsPath).arg("downloadedPics").arg(setName).arg(correctedName))) {
+					if (picDownload) {
+						cardsToDownload.append(ptl);
+						if (!downloadRunning)
+							startNextPicDownload();
+					} else {
+						if (ptl.nextSet())
+							loadQueue.prepend(ptl);
+						else
+							emit imageLoaded(ptl.getCard(), QImage());
+					}
+					continue;
+				}
+		
+		emit imageLoaded(ptl.getCard(), image);
+	}
+}
+
+void PictureLoader::startNextPicDownload()
+{
+	if (cardsToDownload.isEmpty()) {
+		cardBeingDownloaded = 0;
+		downloadRunning = false;
+		return;
+	}
+	
+	downloadRunning = true;
+	
+	cardBeingDownloaded = cardsToDownload.takeFirst();
+	QString picUrl;
+	if (cardBeingDownloaded.getStripped())
+		picUrl = cardBeingDownloaded.getCard()->getPicURLSt(cardBeingDownloaded.getSetName());
+	else if (cardBeingDownloaded.getHq())
+		picUrl = cardBeingDownloaded.getCard()->getPicURLHq(cardBeingDownloaded.getSetName());
+	else
+		picUrl = cardBeingDownloaded.getCard()->getPicURL(cardBeingDownloaded.getSetName());
+	QUrl url(picUrl);
+	
+	QNetworkRequest req(url);
+	qDebug() << "starting picture download:" << req.url();
+	networkManager->get(req);
+}
+
+void PictureLoader::picDownloadFinished(QNetworkReply *reply)
+{
+	QString picsPath = _picsPath;
+	const QByteArray &picData = reply->readAll();
+	QImage testImage;
+	if (testImage.loadFromData(picData)) {
+		if (!QDir(QString(picsPath + "/downloadedPics/")).exists()) {
+			QDir dir(picsPath);
+			if (!dir.exists())
+				return;
+			dir.mkdir("downloadedPics");
+		}
+		if (!QDir(QString(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName())).exists()) {
+			QDir dir(QString(picsPath + "/downloadedPics"));
+			dir.mkdir(cardBeingDownloaded.getSetName());
+		}
+		
+		QString suffix;
+		if (!cardBeingDownloaded.getStripped())
+			suffix = ".full";
+		
+		QFile newPic(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + ".jpg");
+		if (!newPic.open(QIODevice::WriteOnly))
+			return;
+		newPic.write(picData);
+		newPic.close();
+		
+		emit imageLoaded(cardBeingDownloaded.getCard(), testImage);
+	} else if (cardBeingDownloaded.getHq()) {
+		qDebug() << "HQ: received invalid picture. URL:" << reply->request().url();
+		cardBeingDownloaded.setHq(false);
+		cardsToDownload.prepend(cardBeingDownloaded);
+	} else {
+		qDebug() << "LQ: received invalid picture. URL:" << reply->request().url();
+		if (cardBeingDownloaded.nextSet()) {
+			cardBeingDownloaded.setHq(true);
+			mutex.lock();
+			loadQueue.prepend(cardBeingDownloaded);
+			mutex.unlock();
+			emit startLoadQueue();
+		} else
+			emit imageLoaded(cardBeingDownloaded.getCard(), QImage());
+	}
+	
+	reply->deleteLater();
+	startNextPicDownload();
+}
+
+void PictureLoader::loadImage(CardInfo *card, bool stripped)
+{
+	QMutexLocker locker(&mutex);
+	
+	loadQueue.append(PictureToLoad(card, stripped));
+	emit startLoadQueue();
+}
+
+void PictureLoader::setPicsPath(const QString &path)
+{
+	QMutexLocker locker(&mutex);
+	_picsPath = path;
+}
+
+void PictureLoader::setPicDownload(bool _picDownload)
+{
+	QMutexLocker locker(&mutex);
+	picDownload = _picDownload;
+}
+
+PictureLoadingThread::PictureLoadingThread(const QString &_picsPath, bool _picDownload, QObject *parent)
+	: QThread(parent), picsPath(_picsPath), picDownload(_picDownload)
+{
+	initMutex.lock();
 }
 
 PictureLoadingThread::~PictureLoadingThread()
@@ -74,47 +234,15 @@ PictureLoadingThread::~PictureLoadingThread()
 
 void PictureLoadingThread::run()
 {
-	forever {
-		mutex.lock();
-		if (loadQueue.isEmpty()) {
-			mutex.unlock();
-			return;
-		}
-		CardInfo *card = loadQueue.takeFirst();
-		QString correctedName = card->getCorrectedName();
-		QString picsPath = _picsPath;
-		SetList sortedSets = card->getSets();
-		mutex.unlock();
-		
-		sortedSets.sortByKey();
-		
-		QImage image;
-		for (int i = 0; i < sortedSets.size(); i++) {
-			if (image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(sortedSets[i]->getShortName()).arg(correctedName)))
-				break;
-			if (image.load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(sortedSets[i]->getShortName()).arg(correctedName).arg(1)))
-				break;
-			if (image.load(QString("%1/%2/%3/%4.full.jpg").arg(picsPath).arg("downloadedPics").arg(sortedSets[i]->getShortName()).arg(correctedName)))
-				break;
-		}
-		
-		emit imageLoaded(card, image);
-	}
-}
-
-void PictureLoadingThread::loadImage(CardInfo *card)
-{
-	QMutexLocker locker(&mutex);
-	loadQueue.append(card);
+	pictureLoader = new PictureLoader;
+	connect(pictureLoader, SIGNAL(imageLoaded(CardInfo *, const QImage &)), this, SIGNAL(imageLoaded(CardInfo *, const QImage &)));
+	pictureLoader->setPicsPath(picsPath);
+	pictureLoader->setPicDownload(picDownload);
 	
-	if (!isRunning())
-		start(LowPriority);
-}
-
-void PictureLoadingThread::setPicsPath(const QString &path)
-{
-	QMutexLocker locker(&mutex);
-	_picsPath = path;
+	initMutex.unlock();
+	exec();
+	
+	delete pictureLoader;
 }
 
 CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QString &_text, const QStringList &_colors, bool _cipt, int _tableRow, const SetList &_sets, const QMap<QString, QString> &_picURLs, const QMap<QString, QString> &_picURLsHq, const QMap<QString, QString> &_picURLsSt)
@@ -197,8 +325,7 @@ void CardInfo::imageLoaded(const QImage &image)
 	if (!image.isNull()) {
 		*pixmap = QPixmap::fromImage(image);
 		emit pixmapUpdated();
-	} else if (settingsCache->getPicDownload())
-		db->startPicDownload(this, false);
+	}
 }
 
 QPixmap *CardInfo::getPixmap(QSize size)
@@ -290,21 +417,17 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 }
 
 CardDatabase::CardDatabase(QObject *parent)
-	: QObject(parent), downloadRunning(false), loadSuccess(false), noCard(0)
+	: QObject(parent), loadSuccess(false), noCard(0)
 {
 	connect(settingsCache, SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
 	connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabase()));
 	connect(settingsCache, SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
 	
-	networkManager = new QNetworkAccessManager(this);
-	connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
-
 	loadCardDatabase();
 	
-	loadingThread = new PictureLoadingThread(this);
-	loadingThread->setPicsPath(settingsCache->getPicsPath());
+	loadingThread = new PictureLoadingThread(settingsCache->getPicsPath(), settingsCache->getPicDownload(), this);
 	connect(loadingThread, SIGNAL(imageLoaded(CardInfo *, QImage)), this, SLOT(imageLoaded(CardInfo *, QImage)));
-	loadingThread->start();
+	loadingThread->start(QThread::LowPriority);
 
 	noCard = new CardInfo(this);
 	noCard->loadPixmap(); // cache pixmap for card back
@@ -379,83 +502,6 @@ void CardDatabase::clearPixmapCache()
 	}
 	if (noCard)
 		noCard->clearPixmapCache();
-}
-
-void CardDatabase::startPicDownload(CardInfo *card, bool stripped)
-{
-	SetList sortedSets = card->getSets();
-	if (sortedSets.isEmpty())
-		return;
-	sortedSets.sortByKey();
-	for (int i = 0; i < sortedSets.size(); ++i)
-	qDebug() << sortedSets[i]->getShortName();
-	
-	cardsToDownload.append(PictureToDownload(card, stripped, sortedSets.first()->getShortName()));
-	if (!downloadRunning)
-		startNextPicDownload();
-}
-
-void CardDatabase::startNextPicDownload()
-{
-	if (cardsToDownload.isEmpty()) {
-		cardBeingDownloaded = 0;
-		downloadRunning = false;
-		return;
-	}
-	
-	downloadRunning = true;
-	
-	cardBeingDownloaded = cardsToDownload.takeFirst();
-	QString picUrl;
-	if (cardBeingDownloaded.getStripped())
-		picUrl = cardBeingDownloaded.getCard()->getPicURLSt(cardBeingDownloaded.getSetName());
-	else if (cardBeingDownloaded.getHq())
-		picUrl = cardBeingDownloaded.getCard()->getPicURLHq(cardBeingDownloaded.getSetName());
-	else
-		picUrl = cardBeingDownloaded.getCard()->getPicURL(cardBeingDownloaded.getSetName());
-	QUrl url(picUrl);
-	
-	QNetworkRequest req(url);
-	qDebug() << "starting picture download:" << req.url();
-	networkManager->get(req);
-}
-
-void CardDatabase::picDownloadFinished(QNetworkReply *reply)
-{
-	QString picsPath = settingsCache->getPicsPath();
-	const QByteArray &picData = reply->readAll();
-	QPixmap testPixmap;
-	if (testPixmap.loadFromData(picData)) {
-		if (!QDir(QString(picsPath + "/downloadedPics/")).exists()) {
-			QDir dir(picsPath);
-			if (!dir.exists())
-				return;
-			dir.mkdir("downloadedPics");
-		}
-		if (!QDir(QString(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName())).exists()) {
-			QDir dir(QString(picsPath + "/downloadedPics"));
-			dir.mkdir(cardBeingDownloaded.getSetName());
-		}
-		
-		QString suffix;
-		if (!cardBeingDownloaded.getStripped())
-			suffix = ".full";
-		
-		QFile newPic(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + ".jpg");
-		if (!newPic.open(QIODevice::WriteOnly))
-			return;
-		newPic.write(picData);
-		newPic.close();
-		
-		cardBeingDownloaded.getCard()->updatePixmapCache();
-	} else {
-		qDebug() << "Download finished, received invalid picture. URL:" << reply->request().url();
-		cardBeingDownloaded.setHq(false);
-		cardsToDownload.prepend(cardBeingDownloaded);
-	}
-	
-	reply->deleteLater();
-	startNextPicDownload();
 }
 
 void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
@@ -582,6 +628,7 @@ bool CardDatabase::saveToFile(const QString &fileName)
 
 void CardDatabase::picDownloadChanged()
 {
+	loadingThread->getPictureLoader()->setPicDownload(settingsCache->getPicDownload());
 	if (settingsCache->getPicDownload()) {
 		QHashIterator<QString, CardInfo *> cardIterator(cardHash);
 		while (cardIterator.hasNext())
@@ -645,7 +692,7 @@ void CardDatabase::cacheCardPixmaps(const QStringList &cardNames)
 
 void CardDatabase::loadImage(CardInfo *card)
 {
-	loadingThread->loadImage(card);
+	loadingThread->getPictureLoader()->loadImage(card, false);
 }
 
 void CardDatabase::imageLoaded(CardInfo *card, QImage image)
@@ -655,6 +702,6 @@ void CardDatabase::imageLoaded(CardInfo *card, QImage image)
 
 void CardDatabase::picsPathChanged()
 {
-	loadingThread->setPicsPath(settingsCache->getPicsPath());
+	loadingThread->getPictureLoader()->setPicsPath(settingsCache->getPicsPath());
 	clearPixmapCache();
 }

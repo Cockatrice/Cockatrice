@@ -2,6 +2,7 @@
 #include "carddatabase.h"
 #include <QCursor>
 #include <QGraphicsSceneMouseEvent>
+#include <QDebug>
 
 AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag)
 	: QGraphicsItem(), item(_item), hotSpot(_hotSpot)
@@ -11,10 +12,10 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item, const QPoint
 		setZValue(2000000007 + hotSpot.x() * 1000000 + hotSpot.y() * 1000 + 1000);
 	} else {
 		if ((hotSpot.x() < 0) || (hotSpot.y() < 0)) {
-			qDebug(QString("CardDragItem: coordinate overflow: x = %1, y = %2").arg(hotSpot.x()).arg(hotSpot.y()).toLatin1());
+			qDebug() << "CardDragItem: coordinate overflow: x =" << hotSpot.x() << ", y =" << hotSpot.y();
 			hotSpot = QPointF();
 		} else if ((hotSpot.x() > CARD_WIDTH) || (hotSpot.y() > CARD_HEIGHT)) {
-			qDebug(QString("CardDragItem: coordinate overflow: x = %1, y = %2").arg(hotSpot.x()).arg(hotSpot.y()).toLatin1());
+			qDebug() << "CardDragItem: coordinate overflow: x =" << hotSpot.x() << ", y =" << hotSpot.y();
 			hotSpot = QPointF(CARD_WIDTH, CARD_HEIGHT);
 		}
 		setCursor(Qt::ClosedHandCursor);
