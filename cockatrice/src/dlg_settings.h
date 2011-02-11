@@ -67,8 +67,8 @@ signals:
 private:
 	QLabel *handBgLabel, *stackBgLabel, *tableBgLabel, *playerAreaBgLabel, *cardBackPicturePathLabel;
 	QLineEdit *handBgEdit, *stackBgEdit, *tableBgEdit, *playerAreaBgEdit, *cardBackPicturePathEdit;
-	QCheckBox *horizontalHandCheckBox, *invertVerticalCoordinateCheckBox, *zoneViewSortByNameCheckBox, *zoneViewSortByTypeCheckBox;
-	QGroupBox *zoneBgGroupBox, *handGroupBox, *tableGroupBox, *zoneViewGroupBox;
+	QCheckBox *displayCardNamesCheckBox, *horizontalHandCheckBox, *invertVerticalCoordinateCheckBox, *zoneViewSortByNameCheckBox, *zoneViewSortByTypeCheckBox;
+	QGroupBox *zoneBgGroupBox, *cardsGroupBox, *handGroupBox, *tableGroupBox, *zoneViewGroupBox;
 public:
 	AppearanceSettingsPage();
 	void retranslateUi();

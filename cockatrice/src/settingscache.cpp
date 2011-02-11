@@ -20,6 +20,7 @@ SettingsCache::SettingsCache()
 	picDownload = settings->value("personal/picturedownload", true).toBool();
 	doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
 	cardInfoMinimized = settings->value("interface/cardinfominimized", false).toBool();
+	displayCardNames = settings->value("cards/displaycardnames", true).toBool();
 	horizontalHand = settings->value("hand/horizontal", true).toBool();
 	invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
 	tapAnimation = settings->value("cards/tapanimation", true).toBool();
@@ -107,6 +108,13 @@ void SettingsCache::setCardInfoMinimized(bool _cardInfoMinimized)
 {
 	cardInfoMinimized = _cardInfoMinimized;
 	settings->setValue("interface/cardinfominimized", cardInfoMinimized);
+}
+
+void SettingsCache::setDisplayCardNames(int _displayCardNames)
+{
+	displayCardNames = _displayCardNames;
+	settings->setValue("cards/displaycardnames", displayCardNames);
+	emit displayCardNamesChanged();
 }
 
 void SettingsCache::setHorizontalHand(int _horizontalHand)

@@ -17,6 +17,7 @@ signals:
 	void playerBgPathChanged();
 	void cardBackPicturePathChanged();
 	void picDownloadChanged();
+	void displayCardNamesChanged();
 	void horizontalHandChanged();
 	void invertVerticalCoordinateChanged();
 private:
@@ -28,6 +29,7 @@ private:
 	bool picDownload;
 	bool doubleClickToPlay;
 	bool cardInfoMinimized;
+	bool displayCardNames;
 	bool horizontalHand;
 	bool invertVerticalCoordinate;
 	bool tapAnimation;
@@ -46,6 +48,7 @@ public:
 	bool getPicDownload() const { return picDownload; }
 	bool getDoubleClickToPlay() const { return doubleClickToPlay; }
 	bool getCardInfoMinimized() const { return cardInfoMinimized; }
+	bool getDisplayCardNames() const { return displayCardNames; }
 	bool getHorizontalHand() const { return horizontalHand; }
 	bool getInvertVerticalCoordinate() const { return invertVerticalCoordinate; }
 	bool getTapAnimation() const { return tapAnimation; }
@@ -64,6 +67,7 @@ public slots:
 	void setPicDownload(int _picDownload);
 	void setDoubleClickToPlay(int _doubleClickToPlay);
 	void setCardInfoMinimized(bool _cardInfoMinimized);
+	void setDisplayCardNames(int _displayCardNames);
 	void setHorizontalHand(int _horizontalHand);
 	void setInvertVerticalCoordinate(int _invertVerticalCoordinate);
 	void setTapAnimation(int _tapAnimation);

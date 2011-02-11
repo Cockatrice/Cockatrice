@@ -20,6 +20,7 @@ AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, QGraphi
 	setCacheMode(DeviceCoordinateCache);
 
 	connect(info, SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
+	connect(settingsCache, SIGNAL(displayCardNamesChanged()), this, SLOT(update()));
 	
 	animationTimer = new QTimer(this);
 	animationTimer->setSingleShot(false);
@@ -68,9 +69,11 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
 	painter->setTransform(pixmapTransform);
 
 	QFont f;
-	int fontSize = translatedSize.height() / 6;
+	int fontSize = translatedSize.height() / 8;
 	if (fontSize < 9)
 		fontSize = 9;
+	if (fontSize > 12)
+		fontSize = 12;
 	f.setPixelSize(fontSize);
 	painter->setFont(f);
 }
@@ -120,11 +123,18 @@ void AbstractCardItem::paintPicture(QPainter *painter, int angle)
 		pen.setWidth(2);
 		painter->setPen(pen);
 		painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 2));
-		
-		transformPainter(painter, translatedSize, angle);
-		painter->setPen(textColor);
-		painter->drawText(QRectF(4 * scaleFactor, 4 * scaleFactor, translatedSize.width() - 8 * scaleFactor, translatedSize.height() - 8 * scaleFactor), Qt::AlignTop | Qt::AlignLeft | Qt::TextWrapAnywhere, name);
 	}
+	painter->restore();
+	
+	if (!translatedPixmap || settingsCache->getDisplayCardNames()) {
+		painter->save();
+		transformPainter(painter, translatedSize, angle);
+		painter->setPen(Qt::white);
+		painter->setBackground(Qt::black);
+		painter->setBackgroundMode(Qt::OpaqueMode);
+		painter->drawText(QRectF(3 * scaleFactor, 3 * scaleFactor, translatedSize.width() - 6 * scaleFactor, translatedSize.height() - 6 * scaleFactor), Qt::AlignTop | Qt::AlignLeft | Qt::TextWrapAnywhere, name);
+	}
+	
 	painter->restore();
 }
 

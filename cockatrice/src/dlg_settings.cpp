@@ -218,6 +218,16 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	zoneBgGroupBox = new QGroupBox;
 	zoneBgGroupBox->setLayout(zoneBgGrid);
 
+	displayCardNamesCheckBox = new QCheckBox;
+	displayCardNamesCheckBox->setChecked(settingsCache->getDisplayCardNames());
+	connect(displayCardNamesCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDisplayCardNames(int)));
+	
+	QGridLayout *cardsGrid = new QGridLayout;
+	cardsGrid->addWidget(displayCardNamesCheckBox, 0, 0, 1, 2);
+	
+	cardsGroupBox = new QGroupBox;
+	cardsGroupBox->setLayout(cardsGrid);
+	
 	horizontalHandCheckBox = new QCheckBox;
 	horizontalHandCheckBox->setChecked(settingsCache->getHorizontalHand());
 	connect(horizontalHandCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setHorizontalHand(int)));
@@ -254,6 +264,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(zoneBgGroupBox);
+	mainLayout->addWidget(cardsGroupBox);
 	mainLayout->addWidget(handGroupBox);
 	mainLayout->addWidget(tableGroupBox);
 	mainLayout->addWidget(zoneViewGroupBox);
@@ -269,6 +280,9 @@ void AppearanceSettingsPage::retranslateUi()
 	tableBgLabel->setText(tr("Path to table background:"));
 	playerAreaBgLabel->setText(tr("Path to player info background:"));
 	cardBackPicturePathLabel->setText(tr("Path to picture of card back:"));
+	
+	cardsGroupBox->setTitle(tr("Card rendering"));
+	displayCardNamesCheckBox->setText(tr("Display card names on cards having a picture"));
 	
 	handGroupBox->setTitle(tr("Hand layout"));
 	horizontalHandCheckBox->setText(tr("Display hand horizontally (wastes space)"));
@@ -468,8 +482,8 @@ DlgSettings::DlgSettings(QWidget *parent)
 	contentsWidget->setViewMode(QListView::IconMode);
 	contentsWidget->setIconSize(QSize(96, 84));
 	contentsWidget->setMovement(QListView::Static);
-	contentsWidget->setMinimumWidth(115);
-	contentsWidget->setMaximumWidth(130);
+	contentsWidget->setMinimumWidth(130);
+	contentsWidget->setMaximumWidth(150);
 	contentsWidget->setSpacing(12);
 	
 	pagesWidget = new QStackedWidget;
@@ -500,7 +514,7 @@ DlgSettings::DlgSettings(QWidget *parent)
 	
 	retranslateUi();
 	
-	resize(700, 450);
+	resize(800, 450);
 }
 
 void DlgSettings::createIcons()
