@@ -66,7 +66,7 @@ private:
 	QString powtough;
 	QString text;
 	QStringList colors;
-	QMap<QString, QString> picURLs;
+	QMap<QString, QString> picURLs, picURLsHq, picURLsSt;
 	bool cipt;
 	int tableRow;
 	QPixmap *pixmap;
@@ -82,7 +82,9 @@ public:
 		bool cipt = false,
 		int _tableRow = 0,
 		const SetList &_sets = SetList(),
-		const QMap<QString, QString> &_picURLs = QMap<QString, QString>());
+		const QMap<QString, QString> &_picURLs = QMap<QString, QString>(),
+		const QMap<QString, QString> &_picURLsHq = QMap<QString, QString>(),
+		const QMap<QString, QString> &_picURLsSt = QMap<QString, QString>());
 	~CardInfo();
 	const QString &getName() const { return name; }
 	const SetList &getSets() const { return sets; }
@@ -94,6 +96,8 @@ public:
 	void setText(const QString &_text) { text = _text; }
 	const QStringList &getColors() const { return colors; }
 	QString getPicURL(const QString &set) const { return picURLs.value(set); }
+	QString getPicURLHq(const QString &set) const { return picURLsHq.value(set); }
+	QString getPicURLSt(const QString &set) const { return picURLsSt.value(set); }
 	QString getPicURL() const;
 	const QMap<QString, QString> &getPicURLs() const { return picURLs; }
 	QString getMainCardType() const;
@@ -101,6 +105,8 @@ public:
 	int getTableRow() const { return tableRow; }
 	void setTableRow(int _tableRow) { tableRow = _tableRow; }
 	void setPicURL(const QString &_set, const QString &_picURL) { picURLs.insert(_set, _picURL); }
+	void setPicURLHq(const QString &_set, const QString &_picURL) { picURLsHq.insert(_set, _picURL); }
+	void setPicURLSt(const QString &_set, const QString &_picURL) { picURLsSt.insert(_set, _picURL); }
 	void addToSet(CardSet *set);
 	QPixmap *loadPixmap();
 	QPixmap *getPixmap(QSize size);
@@ -113,14 +119,30 @@ signals:
 	void pixmapUpdated();
 };
 
+class PictureToDownload {
+private:
+	CardInfo *card;
+	bool stripped;
+	QString setName;
+	bool hq;
+public:
+	PictureToDownload(CardInfo *_card = 0, bool _stripped = false, const QString &_setName = QString(), bool _hq = true)
+		: card(_card), stripped(_stripped), setName(_setName), hq(_hq) { }
+	CardInfo *getCard() const { return card; }
+	bool getStripped() const { return stripped; }
+	QString getSetName() const { return setName; }
+	bool getHq() const { return hq; }
+	void setHq(bool _hq) { hq = _hq; }
+};
+
 class CardDatabase : public QObject {
 	Q_OBJECT
 protected:
 	QHash<QString, CardInfo *> cardHash;
 	QHash<QString, CardSet *> setHash;
 	QNetworkAccessManager *networkManager;
-	QList<CardInfo *> cardsToDownload;
-	CardInfo *cardBeingDownloaded;
+	QList<PictureToDownload> cardsToDownload;
+	PictureToDownload cardBeingDownloaded;
 	bool downloadRunning;
 	bool loadSuccess;
 	CardInfo *noCard;
@@ -139,7 +161,7 @@ public:
 	SetList getSetList() const;
 	bool loadFromFile(const QString &fileName);
 	bool saveToFile(const QString &fileName);
-	void startPicDownload(CardInfo *card);
+	void startPicDownload(CardInfo *card, bool stripped);
 	QStringList getAllColors() const;
 	QStringList getAllMainCardTypes() const;
 	bool getLoadSuccess() const { return loadSuccess; }

@@ -94,9 +94,9 @@ void PictureLoadingThread::run()
 				break;
 			if (image.load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(sortedSets[i]->getShortName()).arg(correctedName).arg(1)))
 				break;
+			if (image.load(QString("%1/%2/%3/%4.full.jpg").arg(picsPath).arg("downloadedPics").arg(sortedSets[i]->getShortName()).arg(correctedName)))
+				break;
 		}
-		if (image.isNull())
-			image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg("downloadedPics").arg(correctedName));
 		
 		emit imageLoaded(card, image);
 	}
@@ -117,8 +117,8 @@ void PictureLoadingThread::setPicsPath(const QString &path)
 	_picsPath = path;
 }
 
-CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QString &_text, const QStringList &_colors, bool _cipt, int _tableRow, const SetList &_sets, const QMap<QString, QString> &_picURLs)
-	: db(_db), name(_name), sets(_sets), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), colors(_colors), picURLs(_picURLs), cipt(_cipt), tableRow(_tableRow), pixmap(NULL)
+CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QString &_text, const QStringList &_colors, bool _cipt, int _tableRow, const SetList &_sets, const QMap<QString, QString> &_picURLs, const QMap<QString, QString> &_picURLsHq, const QMap<QString, QString> &_picURLsSt)
+	: db(_db), name(_name), sets(_sets), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), colors(_colors), picURLs(_picURLs), picURLsHq(_picURLsHq), picURLsSt(_picURLsSt), cipt(_cipt), tableRow(_tableRow), pixmap(NULL)
 {
 	for (int i = 0; i < sets.size(); i++)
 		sets[i]->append(this);
@@ -198,7 +198,7 @@ void CardInfo::imageLoaded(const QImage &image)
 		*pixmap = QPixmap::fromImage(image);
 		emit pixmapUpdated();
 	} else if (settingsCache->getPicDownload())
-		db->startPicDownload(this);
+		db->startPicDownload(this, false);
 }
 
 QPixmap *CardInfo::getPixmap(QSize size)
@@ -267,6 +267,8 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 	for (int i = 0; i < sets.size(); i++) {
 		xml.writeStartElement("set");
 		xml.writeAttribute("picURL", info->getPicURL(sets[i]->getShortName()));
+		xml.writeAttribute("picURLHq", info->getPicURLHq(sets[i]->getShortName()));
+		xml.writeAttribute("picURLSt", info->getPicURLSt(sets[i]->getShortName()));
 		xml.writeCharacters(sets[i]->getShortName());
 		xml.writeEndElement();
 	}
@@ -379,12 +381,16 @@ void CardDatabase::clearPixmapCache()
 		noCard->clearPixmapCache();
 }
 
-void CardDatabase::startPicDownload(CardInfo *card)
+void CardDatabase::startPicDownload(CardInfo *card, bool stripped)
 {
-	if (card->getPicURLs().isEmpty())
+	SetList sortedSets = card->getSets();
+	if (sortedSets.isEmpty())
 		return;
+	sortedSets.sortByKey();
+	for (int i = 0; i < sortedSets.size(); ++i)
+	qDebug() << sortedSets[i]->getShortName();
 	
-	cardsToDownload.append(card);
+	cardsToDownload.append(PictureToDownload(card, stripped, sortedSets.first()->getShortName()));
 	if (!downloadRunning)
 		startNextPicDownload();
 }
@@ -400,7 +406,17 @@ void CardDatabase::startNextPicDownload()
 	downloadRunning = true;
 	
 	cardBeingDownloaded = cardsToDownload.takeFirst();
-	QNetworkRequest req(QUrl(cardBeingDownloaded->getPicURL()));
+	QString picUrl;
+	if (cardBeingDownloaded.getStripped())
+		picUrl = cardBeingDownloaded.getCard()->getPicURLSt(cardBeingDownloaded.getSetName());
+	else if (cardBeingDownloaded.getHq())
+		picUrl = cardBeingDownloaded.getCard()->getPicURLHq(cardBeingDownloaded.getSetName());
+	else
+		picUrl = cardBeingDownloaded.getCard()->getPicURL(cardBeingDownloaded.getSetName());
+	QUrl url(picUrl);
+	
+	QNetworkRequest req(url);
+	qDebug() << "starting picture download:" << req.url();
 	networkManager->get(req);
 }
 
@@ -416,13 +432,26 @@ void CardDatabase::picDownloadFinished(QNetworkReply *reply)
 				return;
 			dir.mkdir("downloadedPics");
 		}
-		QFile newPic(picsPath + "/downloadedPics/" + cardBeingDownloaded->getCorrectedName() + ".full.jpg");
+		if (!QDir(QString(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName())).exists()) {
+			QDir dir(QString(picsPath + "/downloadedPics"));
+			dir.mkdir(cardBeingDownloaded.getSetName());
+		}
+		
+		QString suffix;
+		if (!cardBeingDownloaded.getStripped())
+			suffix = ".full";
+		
+		QFile newPic(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + ".jpg");
 		if (!newPic.open(QIODevice::WriteOnly))
 			return;
 		newPic.write(picData);
 		newPic.close();
 		
-		cardBeingDownloaded->updatePixmapCache();
+		cardBeingDownloaded.getCard()->updatePixmapCache();
+	} else {
+		qDebug() << "Download finished, received invalid picture. URL:" << reply->request().url();
+		cardBeingDownloaded.setHq(false);
+		cardsToDownload.prepend(cardBeingDownloaded);
 	}
 	
 	reply->deleteLater();
@@ -457,7 +486,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 		if (xml.name() == "card") {
 			QString name, manacost, type, pt, text;
 			QStringList colors;
-			QMap<QString, QString> picURLs;
+			QMap<QString, QString> picURLs, picURLsHq, picURLsSt;
 			SetList sets;
 			int tableRow = 0;
 			bool cipt = false;
@@ -475,10 +504,14 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 				else if (xml.name() == "text")
 					text = xml.readElementText();
 				else if (xml.name() == "set") {
-					QString url = xml.attributes().value("picURL").toString();
+					QString picURL = xml.attributes().value("picURL").toString();
+					QString picURLHq = xml.attributes().value("picURLHq").toString();
+					QString picURLSt = xml.attributes().value("picURLSt").toString();
 					QString setName = xml.readElementText();
 					sets.append(getSet(setName));
-					picURLs.insert(setName, url);
+					picURLs.insert(setName, picURL);
+					picURLsHq.insert(setName, picURLHq);
+					picURLsSt.insert(setName, picURLSt);
 				} else if (xml.name() == "color")
 					colors << xml.readElementText();
 				else if (xml.name() == "tablerow")
@@ -486,7 +519,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 				else if (xml.name() == "cipt")
 					cipt = (xml.readElementText() == "1");
 			}
-			cardHash.insert(name, new CardInfo(this, name, manacost, type, pt, text, colors, cipt, tableRow, sets, picURLs));
+			cardHash.insert(name, new CardInfo(this, name, manacost, type, pt, text, colors, cipt, tableRow, sets, picURLs, picURLsHq, picURLsSt));
 		}
 	}
 }
@@ -561,6 +594,17 @@ bool CardDatabase::loadCardDatabase(const QString &path)
 	if (!path.isEmpty())
 		loadSuccess = loadFromFile(path);
 	else loadSuccess = false;
+	
+	if (loadSuccess) {
+		SetList allSets;
+		QHashIterator<QString, CardSet *> setsIterator(setHash);
+		while (setsIterator.hasNext())
+			allSets.append(setsIterator.next().value());
+		allSets.sortByKey();
+		for (int i = 0; i < allSets.size(); ++i)
+			allSets[i]->setSortKey(i);
+	}
+	
 	return loadSuccess;
 }
 

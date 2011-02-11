@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cockatrice_setdatabase version="20110126">
-	<picture_url>http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=%1&amp;type=card</picture_url>
+	<picture_url>http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&amp;type=card</picture_url>
+	<picture_url_hq>http://mtgpics.chutography.com/!set!/!name!.full.jpg</picture_url_hq>
+	<picture_url_st>http://mtgpics.chutography.com/!set!/!name!.jpg</picture_url_st>
 	<set_url>http://gatherer.wizards.com/Pages/Search/Default.aspx?output=spoiler&amp;method=text&amp;set=[&quot;!longname!&quot;]</set_url>
         <set import="1">
             <name>ARB</name>

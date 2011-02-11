@@ -25,13 +25,13 @@ class OracleImporter : public CardDatabase {
 	Q_OBJECT
 private:
 	QList<SetToDownload> allSets, setsToDownload;
-	QString pictureUrl, setUrl;
+	QString pictureUrl, pictureUrlHq, pictureUrlSt, setUrl;
 	QString dataDir;
 	int setIndex;
 	int reqId;
 	QBuffer *buffer;
 	QHttp *http;
-	QString getURLFromName(QString name) const;
+	QString getPictureUrl(QString url, int cardId, QString name, const QString &setName) const;
 	
 	void downloadNextFile();
 	void readSetsFromXml(QXmlStreamReader &xml);

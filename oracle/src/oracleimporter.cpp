@@ -3,6 +3,7 @@
 #include <QtNetwork>
 #include <QXmlStreamReader>
 #include <QDomDocument>
+#include <QDebug>
 
 OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent)
 	: CardDatabase(parent), dataDir(_dataDir), setIndex(-1)
@@ -59,6 +60,10 @@ void OracleImporter::readSetsFromXml(QXmlStreamReader &xml)
 			edition = editionLong = editionURL = QString();
 		} else if (xml.name() == "picture_url")
 			pictureUrl = xml.readElementText();
+		else if (xml.name() == "picture_url_hq")
+			pictureUrlHq = xml.readElementText();
+		else if (xml.name() == "picture_url_st")
+			pictureUrlSt = xml.readElementText();
 		else if (xml.name() == "set_url")
 			setUrl = xml.readElementText();
 	}
@@ -82,7 +87,7 @@ CardInfo *OracleImporter::addCard(const QString &setName, QString cardName, int 
 		// Workaround for card name weirdness
 		if (cardName.contains("XX"))
 			cardName.remove("XX");
-		cardName = cardName.replace("Æ", "Ae");
+		cardName = cardName.replace("Æ", "AE");
 		
 		bool mArtifact = false;
 		if (cardType.endsWith("Artifact"))
@@ -122,7 +127,9 @@ CardInfo *OracleImporter::addCard(const QString &setName, QString cardName, int 
 
 		cardHash.insert(cardName, card);
 	}
-	card->setPicURL(setName, pictureUrl.arg(cardId));
+	card->setPicURL(setName, getPictureUrl(pictureUrl, cardId, cardName, setName));
+	card->setPicURLHq(setName, getPictureUrl(pictureUrlHq, cardId, cardName, setName));
+	card->setPicURLSt(setName, getPictureUrl(pictureUrlSt, cardId, cardName, setName));
 	return card;
 }
 
@@ -145,7 +152,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 	QString errorMsg;
 	int errorLine, errorColumn;
 	if (!doc.setContent(bufferContents, &errorMsg, &errorLine, &errorColumn))
-		qDebug(QString("error: %1, line=%2, column=%3").arg(errorMsg).arg(errorLine).arg(errorColumn).toLatin1());
+		qDebug() << "error:" << errorMsg << "line:" << errorLine << "column:" << errorColumn;
 
 	QDomNodeList divs = doc.elementsByTagName("div");
 	for (int i = 0; i < divs.size(); ++i) {
@@ -195,21 +202,19 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 	return cards;
 }
 
-QString OracleImporter::getURLFromName(QString name) const
+QString OracleImporter::getPictureUrl(QString url, int cardId, QString name, const QString &setName) const
 {
-	return pictureUrl.arg(
-		name
-                .replace("Æther", "Aether")
+	return url.replace("!cardid!", QString::number(cardId)).replace("!set!", setName).replace("!name!", name
 		.replace("ö", "o")
-		.remove('\'')
-		.remove("//")
-		.remove(',')
-		.remove(':')
-		.remove('.')
+//		.remove('\'')
+		.remove(" // ")
+//		.remove(',')
+//		.remove(':')
+//		.remove('.')
 		.remove(QRegExp("\\(.*\\)"))
 		.simplified()
-		.replace(' ', '_')
-		.replace('-', '_')
+//		.replace(' ', '_')
+//		.replace('-', '_')
 	);
 }
 
