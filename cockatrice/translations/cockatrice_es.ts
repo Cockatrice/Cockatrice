@@ -37,47 +37,57 @@
 <context>
     <name>AppearanceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="266"/>
+        <location filename="../src/dlg_settings.cpp" line="277"/>
         <source>Zone background pictures</source>
         <translation>Imagenes de la zona de fondo</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="267"/>
+        <location filename="../src/dlg_settings.cpp" line="278"/>
         <source>Path to hand background:</source>
         <translation>Ruta a la imagen de fondo de la mano:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="268"/>
+        <location filename="../src/dlg_settings.cpp" line="279"/>
         <source>Path to stack background:</source>
         <translation>Ruta a la imagen de fondo de la pila:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="269"/>
+        <location filename="../src/dlg_settings.cpp" line="280"/>
         <source>Path to table background:</source>
         <translation>Ruta a la imagen de fondo de la mesa:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="270"/>
+        <location filename="../src/dlg_settings.cpp" line="281"/>
         <source>Path to player info background:</source>
         <translation>Ruta a la imagen de fondo de la información del jugador:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="271"/>
+        <location filename="../src/dlg_settings.cpp" line="282"/>
         <source>Path to picture of card back:</source>
         <translation>Ruta al reverso de las cartas:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="273"/>
+        <location filename="../src/dlg_settings.cpp" line="284"/>
+        <source>Card rendering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="285"/>
+        <source>Display card names on cards having a picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="287"/>
         <source>Hand layout</source>
         <translation>Disposición de la mano</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="274"/>
+        <location filename="../src/dlg_settings.cpp" line="288"/>
         <source>Display hand horizontally (wastes space)</source>
         <translation>Mostrar la mano horizontalmente (desperdicia espacio)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="276"/>
+        <location filename="../src/dlg_settings.cpp" line="290"/>
         <source>Table grid layout</source>
         <translation>Disposición de la rejilla de la mesa</translation>
     </message>
@@ -86,7 +96,7 @@
         <translation type="obsolete">Disposición Económica</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="277"/>
+        <location filename="../src/dlg_settings.cpp" line="291"/>
         <source>Invert vertical coordinate</source>
         <translation>Invertir coordenada vertical</translation>
     </message>
@@ -95,26 +105,26 @@
         <translation type="obsolete">Disposición económica</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="279"/>
+        <location filename="../src/dlg_settings.cpp" line="293"/>
         <source>Zone view layout</source>
         <translation>Distribución de la zona de visionado</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="280"/>
+        <location filename="../src/dlg_settings.cpp" line="294"/>
         <source>Sort by name</source>
         <translation>Ordenar por nombre</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="281"/>
+        <location filename="../src/dlg_settings.cpp" line="295"/>
         <source>Sort by type</source>
         <translation>Ordenar por tipo</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="292"/>
-        <location filename="../src/dlg_settings.cpp" line="308"/>
-        <location filename="../src/dlg_settings.cpp" line="324"/>
-        <location filename="../src/dlg_settings.cpp" line="340"/>
-        <location filename="../src/dlg_settings.cpp" line="356"/>
+        <location filename="../src/dlg_settings.cpp" line="306"/>
+        <location filename="../src/dlg_settings.cpp" line="322"/>
+        <location filename="../src/dlg_settings.cpp" line="338"/>
+        <location filename="../src/dlg_settings.cpp" line="354"/>
+        <location filename="../src/dlg_settings.cpp" line="370"/>
         <source>Choose path</source>
         <translation>Elija ruta</translation>
     </message>
@@ -985,9 +995,9 @@
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="555"/>
-        <location filename="../src/dlg_settings.cpp" line="560"/>
-        <location filename="../src/dlg_settings.cpp" line="565"/>
+        <location filename="../src/dlg_settings.cpp" line="569"/>
+        <location filename="../src/dlg_settings.cpp" line="574"/>
+        <location filename="../src/dlg_settings.cpp" line="579"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
@@ -1004,47 +1014,47 @@
         <translation type="obsolete">La ruta a tu directorio de imagenes de las cartas es invalida.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="555"/>
+        <location filename="../src/dlg_settings.cpp" line="569"/>
         <source>Your card database is invalid. Would you like to go back and set the correct path?</source>
         <translation>Tu base de datos de cartas es invalida. ¿Deseas volver y seleccionar la ruta correcta?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="560"/>
+        <location filename="../src/dlg_settings.cpp" line="574"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>La ruta a tu directorio de mazos es invalida. ¿Deseas volver y seleccionar la ruta correcta?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="565"/>
+        <location filename="../src/dlg_settings.cpp" line="579"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>La ruta a tu directorio de imagenes de las cartas es invalida.¿Deseas volver y seleccionar la ruta correcta?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="574"/>
+        <location filename="../src/dlg_settings.cpp" line="588"/>
         <source>Settings</source>
         <translation>Preferencias</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="576"/>
+        <location filename="../src/dlg_settings.cpp" line="590"/>
         <source>General</source>
         <translation>General</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="577"/>
+        <location filename="../src/dlg_settings.cpp" line="591"/>
         <source>Appearance</source>
         <translation>Apariencia</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="578"/>
+        <location filename="../src/dlg_settings.cpp" line="592"/>
         <source>User interface</source>
         <translation>Interfaz de usuario</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="579"/>
+        <location filename="../src/dlg_settings.cpp" line="593"/>
         <source>Messages</source>
         <translation>Mensajes</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="581"/>
+        <location filename="../src/dlg_settings.cpp" line="595"/>
         <source>&amp;Close</source>
         <translation>&amp;Cerrar</translation>
     </message>
@@ -1917,22 +1927,22 @@ Local version is %1, remote version is %2.</source>
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="458"/>
+        <location filename="../src/dlg_settings.cpp" line="472"/>
         <source>&amp;Add</source>
         <translation>&amp;Añadir</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="459"/>
+        <location filename="../src/dlg_settings.cpp" line="473"/>
         <source>&amp;Remove</source>
         <translation>&amp;Quitar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="441"/>
+        <location filename="../src/dlg_settings.cpp" line="455"/>
         <source>Add message</source>
         <translation>Añadir mensaje</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="441"/>
+        <location filename="../src/dlg_settings.cpp" line="455"/>
         <source>Message:</source>
         <translation>Mensaje:</translation>
     </message>
@@ -1940,57 +1950,57 @@ Local version is %1, remote version is %2.</source>
 <context>
     <name>PhasesToolbar</name>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="158"/>
+        <location filename="../src/phasestoolbar.cpp" line="150"/>
         <source>Untap step</source>
         <translation>Paso de enderezar</translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="159"/>
+        <location filename="../src/phasestoolbar.cpp" line="151"/>
         <source>Upkeep step</source>
         <translation>Paso de mantenimiento</translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="160"/>
+        <location filename="../src/phasestoolbar.cpp" line="152"/>
         <source>Draw step</source>
         <translation>Paso de robar</translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="161"/>
+        <location filename="../src/phasestoolbar.cpp" line="153"/>
         <source>First main phase</source>
         <translation>Primera fase principal</translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="162"/>
+        <location filename="../src/phasestoolbar.cpp" line="154"/>
         <source>Beginning of combat step</source>
         <translation>Paso de inicio del combate</translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="163"/>
+        <location filename="../src/phasestoolbar.cpp" line="155"/>
         <source>Declare attackers step</source>
         <translation>Paso de declarar atacantes</translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="164"/>
+        <location filename="../src/phasestoolbar.cpp" line="156"/>
         <source>Declare blockers step</source>
         <translation>Paso de declarar bloqueadores</translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="165"/>
+        <location filename="../src/phasestoolbar.cpp" line="157"/>
         <source>Combat damage step</source>
         <translation>Paso de daño de combate</translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="166"/>
+        <location filename="../src/phasestoolbar.cpp" line="158"/>
         <source>End of combat step</source>
         <translation>Paso de final del combate</translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="167"/>
+        <location filename="../src/phasestoolbar.cpp" line="159"/>
         <source>Second main phase</source>
         <translation>Segunda fase principal</translation>
     </message>
     <message>
-        <location filename="../src/phasestoolbar.cpp" line="168"/>
+        <location filename="../src/phasestoolbar.cpp" line="160"/>
         <source>End of turn step</source>
         <translation>Paso final</translation>
     </message>
@@ -2593,87 +2603,122 @@ Por favor, introduzca un nombre:</translation>
 <context>
     <name>TabGame</name>
     <message>
-        <location filename="../src/tab_game.cpp" line="254"/>
+        <location filename="../src/tab_game.cpp" line="228"/>
+        <source>F5</source>
+        <translation type="unfinished">F5</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="229"/>
+        <source>F6</source>
+        <translation type="unfinished">F6</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="230"/>
+        <source>F7</source>
+        <translation type="unfinished">F7</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="231"/>
+        <source>F8</source>
+        <translation type="unfinished">F8</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="232"/>
+        <source>F9</source>
+        <translation type="unfinished">F9</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="233"/>
+        <source>F10</source>
+        <translation type="unfinished">F10</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="274"/>
+        <source>&amp;Phases</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="276"/>
         <source>&amp;Game</source>
         <translation>&amp;Partida</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="255"/>
+        <location filename="../src/tab_game.cpp" line="277"/>
         <source>Next &amp;phase</source>
         <translation>Próxima &amp;fase</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="256"/>
+        <location filename="../src/tab_game.cpp" line="278"/>
         <source>Ctrl+Space</source>
         <translation>Ctrl+Space</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="257"/>
+        <location filename="../src/tab_game.cpp" line="279"/>
         <source>Next &amp;turn</source>
         <translation>Próximo &amp;turno</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="258"/>
+        <location filename="../src/tab_game.cpp" line="280"/>
         <source>Ctrl+Return</source>
         <translation>Ctrl+Return</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="258"/>
+        <location filename="../src/tab_game.cpp" line="280"/>
         <source>Ctrl+Enter</source>
         <translation>Ctrl+Enter</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="259"/>
+        <location filename="../src/tab_game.cpp" line="281"/>
         <source>&amp;Remove all local arrows</source>
         <translation>&amp;Retirar todas las flechas locales</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="260"/>
+        <location filename="../src/tab_game.cpp" line="282"/>
         <source>Ctrl+R</source>
         <translation>Ctrl+R</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="261"/>
+        <location filename="../src/tab_game.cpp" line="283"/>
         <source>&amp;Concede</source>
         <translation>&amp;Conceder</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="262"/>
+        <location filename="../src/tab_game.cpp" line="284"/>
         <source>F2</source>
         <translation>F2</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="263"/>
+        <location filename="../src/tab_game.cpp" line="285"/>
         <source>&amp;Leave game</source>
         <translation>&amp;Abandonar la partida</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="265"/>
+        <location filename="../src/tab_game.cpp" line="287"/>
         <source>&amp;Say:</source>
         <translation>&amp;Decir:</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="280"/>
+        <location filename="../src/tab_game.cpp" line="302"/>
         <source>Concede</source>
         <translation>Conceder</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="280"/>
+        <location filename="../src/tab_game.cpp" line="302"/>
         <source>Are you sure you want to concede this game?</source>
         <translation>¿Estás seguro de que quieres conceder esta partida?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="288"/>
+        <location filename="../src/tab_game.cpp" line="310"/>
         <source>Leave game</source>
         <translation>Abandonar la partida</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="288"/>
+        <location filename="../src/tab_game.cpp" line="310"/>
         <source>Are you sure you want to leave this game?</source>
         <translation>¿Estás seguro de que quieres abandonar la partida?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.h" line="157"/>
+        <location filename="../src/tab_game.h" line="160"/>
         <source>Game %1: %2</source>
         <translation>Partida %1: %2</translation>
     </message>
@@ -2791,22 +2836,22 @@ Por favor, introduzca un nombre:</translation>
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="395"/>
+        <location filename="../src/dlg_settings.cpp" line="409"/>
         <source>General interface settings</source>
         <translation>Preferencias generales de la interfaz</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="396"/>
+        <location filename="../src/dlg_settings.cpp" line="410"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation>&amp;Doble click en las cartas para jugarlas (en lugar de un solo click)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="397"/>
+        <location filename="../src/dlg_settings.cpp" line="411"/>
         <source>Animation settings</source>
         <translation>Opciones de animación</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="398"/>
+        <location filename="../src/dlg_settings.cpp" line="412"/>
         <source>&amp;Tap/untap animation</source>
         <translation>Animación de &amp;girar/enderezar</translation>
     </message>
