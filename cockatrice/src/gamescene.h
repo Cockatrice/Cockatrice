@@ -8,18 +8,20 @@ class Player;
 class ZoneViewWidget;
 class CardZone;
 class ServerInfo_Card;
+class PhasesToolbar;
 
 class GameScene : public QGraphicsScene {
 	Q_OBJECT
 private:
 	static const int playerAreaSpacing = 5;
 	
+	PhasesToolbar *phasesToolbar;
 	QList<Player *> players;
 	QRectF playersRect;
 	QList<ZoneViewWidget *> views;
 	QSize viewSize;
 public:
-	GameScene(QObject *parent = 0);
+	GameScene(PhasesToolbar *_phasesToolbar, QObject *parent = 0);
 	void retranslateUi();
 	const QRectF &getPlayersRect() const { return playersRect; }
 	void processViewSizeChange(const QSize &newSize);

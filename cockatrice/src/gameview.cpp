@@ -37,7 +37,6 @@ void GameView::resizeEvent(QResizeEvent *event)
 
 void GameView::updateSceneRect(const QRectF &rect)
 {
-	qDebug(QString("updateSceneRect = %1,%2").arg(rect.width()).arg(rect.height()).toLatin1());
 	fitInView(rect, Qt::KeepAspectRatio);
 }
 

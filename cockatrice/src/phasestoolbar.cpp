@@ -1,54 +1,60 @@
 #include <QAction>
-#include <QVBoxLayout>
 #include <QPainter>
 #include <QPen>
 #include <QTimer>
+#include <QDebug>
+#include <math.h>
 #include "phasestoolbar.h"
 #include "protocol_items.h"
+#include "pixmapgenerator.h"
 
-PhaseButton::PhaseButton(const QIcon &icon, QAction *_doubleClickAction)
-	: QPushButton(icon, QString()), active(false), activeAnimationCounter(0), doubleClickAction(_doubleClickAction), pixmap(50, 50)
+PhaseButton::PhaseButton(const QString &_name, QGraphicsItem *parent, QAction *_doubleClickAction, bool _highlightable)
+	: QObject(), QGraphicsItem(parent), name(_name), active(false), highlightable(_highlightable), activeAnimationCounter(0), doubleClickAction(_doubleClickAction), width(50)
 {
-	setFocusPolicy(Qt::NoFocus);
-	setFixedSize(50, 50);
+	if (highlightable) {
+		activeAnimationTimer = new QTimer(this);
+		connect(activeAnimationTimer, SIGNAL(timeout()), this, SLOT(updateAnimation()));
+		activeAnimationTimer->setSingleShot(false);
+	} else
+		activeAnimationCounter = 9.0;
 	
-	activeAnimationTimer = new QTimer(this);
-	connect(activeAnimationTimer, SIGNAL(timeout()), this, SLOT(updateAnimation()));
-	activeAnimationTimer->setSingleShot(false);
-	
-	updatePixmap(pixmap);
+	setCacheMode(DeviceCoordinateCache);
 }
 
-void PhaseButton::updatePixmap(QPixmap &pixmap)
+QRectF PhaseButton::boundingRect() const
 {
-	pixmap.fill(Qt::transparent);
-	
-	QPainter painter(&pixmap);
-	int height = pixmap.height();
-	int width = pixmap.width();
-
-	icon().paint(&painter, 5, 5, width - 10, height - 10);
+	return QRectF(0, 0, width, width);
 }
 
-void PhaseButton::paintEvent(QPaintEvent */*event*/)
+void PhaseButton::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-	QPainter painter(this);
-
-	painter.setBrush(QColor(220 * (activeAnimationCounter / 10.0), 220 * (activeAnimationCounter / 10.0), 220 * (activeAnimationCounter / 10.0)));
-	painter.setPen(Qt::gray);
-	painter.drawRect(1, 1, pixmap.width() - 2, pixmap.height() - 2);
-
-	painter.drawPixmap(0, 0, size().width(), size().height(), pixmap);
+	QRectF iconRect = boundingRect().adjusted(3, 3, -3, -3);
+	QRectF translatedIconRect = painter->combinedTransform().mapRect(iconRect);
+	qreal scaleFactor = translatedIconRect.width() / iconRect.width();
+	QPixmap iconPixmap = PhasePixmapGenerator::generatePixmap(round(translatedIconRect.height()), name);
 	
-//	painter.setBrush(QColor(220 * (activeAnimationCounter / 10.0), 220 * (activeAnimationCounter / 10.0), 220 * (activeAnimationCounter / 10.0), 255 * ((10 - activeAnimationCounter) / 15.0)));
-	painter.setBrush(QColor(0, 0, 0, 255 * ((10 - activeAnimationCounter) / 15.0)));
-	painter.setPen(Qt::gray);
-	painter.drawRect(1, 1, pixmap.width() - 2, pixmap.height() - 2);
+	painter->setBrush(QColor(220 * (activeAnimationCounter / 10.0), 220 * (activeAnimationCounter / 10.0), 220 * (activeAnimationCounter / 10.0)));
+	painter->setPen(Qt::gray);
+	painter->drawRect(0.5, 0.5, width - 1, width - 1);
+	painter->save();
+	painter->resetTransform();
+	painter->drawPixmap(iconPixmap.rect().translated(round(3 * scaleFactor), round(3 * scaleFactor)), iconPixmap, iconPixmap.rect());
+	painter->restore();
+	
+	painter->setBrush(QColor(0, 0, 0, 255 * ((10 - activeAnimationCounter) / 15.0)));
+	painter->setPen(Qt::gray);
+	painter->drawRect(0.5, 0.5, width - 1, width - 1);
+}
+
+void PhaseButton::setWidth(double _width)
+{
+	prepareGeometryChange();
+	width = _width;
 }
 
 void PhaseButton::setActive(bool _active)
 {
-	if (active == _active)
+	if ((active == _active) || !highlightable)
 		return;
 	
 	active = _active;
@@ -57,6 +63,9 @@ void PhaseButton::setActive(bool _active)
 
 void PhaseButton::updateAnimation()
 {
+	if (!highlightable)
+		return;
+	
 	if (active) {
 		if (++activeAnimationCounter >= 10)
 			activeAnimationTimer->stop();
@@ -67,13 +76,12 @@ void PhaseButton::updateAnimation()
 	update();
 }
 
-void PhaseButton::setPhaseText(const QString &_phaseText)
+void PhaseButton::mousePressEvent(QGraphicsSceneMouseEvent * /*event*/)
 {
-	phaseText = _phaseText;
-	setToolTip(phaseText);
+	emit clicked();
 }
 
-void PhaseButton::mouseDoubleClickEvent(QMouseEvent */*event*/)
+void PhaseButton::mouseDoubleClickEvent(QGraphicsSceneMouseEvent */*event*/)
 {
 	triggerDoubleClickAction();
 }
@@ -84,34 +92,31 @@ void PhaseButton::triggerDoubleClickAction()
 		doubleClickAction->trigger();
 }
 
-PhasesToolbar::PhasesToolbar(QWidget *parent)
-	: QFrame(parent)
+PhasesToolbar::PhasesToolbar(QGraphicsItem *parent)
+	: QGraphicsItem(parent), width(100), height(100)
 {
-	setBackgroundRole(QPalette::Shadow);
-	setAutoFillBackground(true);
-	
 	QAction *aUntapAll = new QAction(this);
 	connect(aUntapAll, SIGNAL(triggered()), this, SLOT(actUntapAll()));
 	QAction *aDrawCard = new QAction(this);
 	connect(aDrawCard, SIGNAL(triggered()), this, SLOT(actDrawCard()));
 	
-	PhaseButton *untapButton = new PhaseButton(QIcon(":/resources/icon_phase_untap.svg"), aUntapAll);
-	untapButton->setShortcut(QKeySequence("F5"));
-	PhaseButton *upkeepButton = new PhaseButton(QIcon(":/resources/icon_phase_upkeep.svg"));
-	PhaseButton *drawButton = new PhaseButton(QIcon(":/resources/icon_phase_draw.svg"), aDrawCard);
-	drawButton->setShortcut(QKeySequence("F6"));
-	PhaseButton *main1Button = new PhaseButton(QIcon(":/resources/icon_phase_main1.svg"));
-	main1Button->setShortcut(QKeySequence("F7"));
-	PhaseButton *combatStartButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_start.svg"));
-	combatStartButton->setShortcut(QKeySequence("F8"));
-	PhaseButton *combatAttackersButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_attackers.svg"));
-	PhaseButton *combatBlockersButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_blockers.svg"));
-	PhaseButton *combatDamageButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_damage.svg"));
-	PhaseButton *combatEndButton = new PhaseButton(QIcon(":/resources/icon_phase_combat_end.svg"));
-	PhaseButton *main2Button = new PhaseButton(QIcon(":/resources/icon_phase_main2.svg"));
-	main2Button->setShortcut(QKeySequence("F9"));
-	PhaseButton *cleanupButton = new PhaseButton(QIcon(":/resources/icon_phase_cleanup.svg"));
-	cleanupButton->setShortcut(QKeySequence("F10"));
+	PhaseButton *untapButton = new PhaseButton("untap", this, aUntapAll);
+//	untapButton->setShortcut(QKeySequence("F5"));
+	PhaseButton *upkeepButton = new PhaseButton("upkeep", this);
+	PhaseButton *drawButton = new PhaseButton("draw", this, aDrawCard);
+//	drawButton->setShortcut(QKeySequence("F6"));
+	PhaseButton *main1Button = new PhaseButton("main1", this);
+//	main1Button->setShortcut(QKeySequence("F7"));
+	PhaseButton *combatStartButton = new PhaseButton("combat_start", this);
+//	combatStartButton->setShortcut(QKeySequence("F8"));
+	PhaseButton *combatAttackersButton = new PhaseButton("combat_attackers", this);
+	PhaseButton *combatBlockersButton = new PhaseButton("combat_blockers", this);
+	PhaseButton *combatDamageButton = new PhaseButton("combat_damage", this);
+	PhaseButton *combatEndButton = new PhaseButton("combat_end", this);
+	PhaseButton *main2Button = new PhaseButton("main2", this);
+//	main2Button->setShortcut(QKeySequence("F9"));
+	PhaseButton *cleanupButton = new PhaseButton("cleanup", this);
+//	cleanupButton->setShortcut(QKeySequence("F10"));
 	
 	buttonList << untapButton << upkeepButton << drawButton << main1Button << combatStartButton
 		<< combatAttackersButton << combatBlockersButton << combatDamageButton << combatEndButton
@@ -120,52 +125,85 @@ PhasesToolbar::PhasesToolbar(QWidget *parent)
 	for (int i = 0; i < buttonList.size(); ++i)
 		connect(buttonList[i], SIGNAL(clicked()), this, SLOT(phaseButtonClicked()));
 	
-	QPushButton *nextTurnButton = new QPushButton(QIcon(":/resources/icon_nextturn.svg"), QString());
-	nextTurnButton->setFocusPolicy(Qt::NoFocus);
-	nextTurnButton->setIconSize(QSize(40, 40));
-	nextTurnButton->setFixedSize(50, 50);
+	nextTurnButton = new PhaseButton("nextturn", this, 0, false);
 	connect(nextTurnButton, SIGNAL(clicked()), this, SLOT(actNextTurn()));
-		
-	QVBoxLayout *layout = new QVBoxLayout;
-	layout->setSpacing(0);
 	
-	layout->addStretch(1);
-	layout->addWidget(untapButton);
-	layout->addWidget(upkeepButton);
-	layout->addWidget(drawButton);
-	layout->addSpacing(10);
-	layout->addWidget(main1Button);
-	layout->addSpacing(10);
-	layout->addWidget(combatStartButton);
-	layout->addWidget(combatAttackersButton);
-	layout->addWidget(combatBlockersButton);
-	layout->addWidget(combatDamageButton);
-	layout->addWidget(combatEndButton);
-	layout->addSpacing(10);
-	layout->addWidget(main2Button);
-	layout->addSpacing(10);
-	layout->addWidget(cleanupButton);
-	layout->addSpacing(20);
-	layout->addWidget(nextTurnButton);
-	layout->addStretch(1);
+	rearrangeButtons();
 	
 	retranslateUi();
-	setLayout(layout);
+}
+
+QRectF PhasesToolbar::boundingRect() const
+{
+	return QRectF(0, 0, width, height);
 }
 
 void PhasesToolbar::retranslateUi()
 {
-	buttonList[0]->setPhaseText(tr("Untap step"));
-	buttonList[1]->setPhaseText(tr("Upkeep step"));
-	buttonList[2]->setPhaseText(tr("Draw step"));
-	buttonList[3]->setPhaseText(tr("First main phase"));
-	buttonList[4]->setPhaseText(tr("Beginning of combat step"));
-	buttonList[5]->setPhaseText(tr("Declare attackers step"));
-	buttonList[6]->setPhaseText(tr("Declare blockers step"));
-	buttonList[7]->setPhaseText(tr("Combat damage step"));
-	buttonList[8]->setPhaseText(tr("End of combat step"));
-	buttonList[9]->setPhaseText(tr("Second main phase"));
-	buttonList[10]->setPhaseText(tr("End of turn step"));
+	for (int i = 0; i < buttonList.size(); ++i)
+		buttonList[i]->setToolTip(getLongPhaseName(i));
+}
+
+QString PhasesToolbar::getLongPhaseName(int phase) const
+{
+	switch (phase) {
+		case 0: return tr("Untap step");
+		case 1: return tr("Upkeep step");
+		case 2: return tr("Draw step");
+		case 3: return tr("First main phase");
+		case 4: return tr("Beginning of combat step");
+		case 5: return tr("Declare attackers step");
+		case 6: return tr("Declare blockers step");
+		case 7: return tr("Combat damage step");
+		case 8: return tr("End of combat step");
+		case 9: return tr("Second main phase");
+		case 10: return tr("End of turn step");
+		default: return QString();
+	}
+}
+
+void PhasesToolbar::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
+{
+	painter->fillRect(boundingRect(), QColor(50, 50, 50));
+}
+
+void PhasesToolbar::rearrangeButtons()
+{
+	for (int i = 0; i < buttonList.size(); ++i)
+		buttonList[i]->setWidth(symbolSize);
+	nextTurnButton->setWidth(symbolSize);
+	
+	double y = margin;
+	buttonList[0]->setPos(margin, y);
+	buttonList[1]->setPos(margin, y += symbolSize);
+	buttonList[2]->setPos(margin, y += symbolSize);
+	y += ySpacing;
+	buttonList[3]->setPos(margin, y += symbolSize);
+	y += ySpacing;
+	buttonList[4]->setPos(margin, y += symbolSize);
+	buttonList[5]->setPos(margin, y += symbolSize);
+	buttonList[6]->setPos(margin, y += symbolSize);
+	buttonList[7]->setPos(margin, y += symbolSize);
+	buttonList[8]->setPos(margin, y += symbolSize);
+	y += ySpacing;
+	buttonList[9]->setPos(margin, y += symbolSize);
+	y += ySpacing;
+	buttonList[10]->setPos(margin, y += symbolSize);
+	y += ySpacing;
+	y += ySpacing;
+	nextTurnButton->setPos(margin, y += symbolSize);
+}
+
+void PhasesToolbar::setHeight(double _height)
+{
+	prepareGeometryChange();
+	
+	height = _height;
+	ySpacing = (height - 2 * margin) / (buttonCount * 5 + spaceCount);
+	symbolSize = ySpacing * 5;
+	width = symbolSize + 2 * margin;
+	
+	rearrangeButtons();
 }
 
 void PhasesToolbar::setActivePhase(int phase)

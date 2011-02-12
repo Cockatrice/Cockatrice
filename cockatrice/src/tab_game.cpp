@@ -162,7 +162,11 @@ void DeckViewContainer::setDeck(DeckList *deck)
 TabGame::TabGame(QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
 	: Tab(), clients(_clients), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), started(false), resuming(_resuming), currentPhase(-1), infoPopup(0)
 {
-	scene = new GameScene(this);
+	phasesToolbar = new PhasesToolbar;
+	phasesToolbar->hide();
+	connect(phasesToolbar, SIGNAL(sendGameCommand(GameCommand *, int)), this, SLOT(sendGameCommand(GameCommand *, int)));
+	
+	scene = new GameScene(phasesToolbar, this);
 	gameView = new GameView(scene);
 	gameView->hide();
 	
@@ -185,10 +189,6 @@ TabGame::TabGame(QList<AbstractClient *> &_clients, int _gameId, const QString &
 	
 	deckViewContainerLayout = new QVBoxLayout;
 
-	phasesToolbar = new PhasesToolbar;
-	phasesToolbar->hide();
-	connect(phasesToolbar, SIGNAL(sendGameCommand(GameCommand *, int)), this, SLOT(sendGameCommand(GameCommand *, int)));
-	
 	QVBoxLayout *verticalLayout = new QVBoxLayout;
 	verticalLayout->addWidget(cardInfo);
 	verticalLayout->addWidget(playerListWidget, 1);
@@ -197,7 +197,6 @@ TabGame::TabGame(QList<AbstractClient *> &_clients, int _gameId, const QString &
 	verticalLayout->addLayout(hLayout);
 
 	mainLayout = new QHBoxLayout;
-	mainLayout->addWidget(phasesToolbar);
 	mainLayout->addWidget(gameView, 10);
 	mainLayout->addLayout(deckViewContainerLayout, 10);
 	mainLayout->addLayout(verticalLayout);
@@ -221,9 +220,28 @@ TabGame::TabGame(QList<AbstractClient *> &_clients, int _gameId, const QString &
 	aLeaveGame = new QAction(this);
 	connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
 	
+	phasesMenu = new QMenu(this);
+	for (int i = 0; i < phasesToolbar->phaseCount(); ++i) {
+		QAction *temp = new QAction(QString(), this);
+		connect(temp, SIGNAL(triggered()), this, SLOT(actPhaseAction()));
+		switch (i) {
+			case 0: temp->setShortcut(tr("F5")); break;
+			case 2: temp->setShortcut(tr("F6")); break;
+			case 3: temp->setShortcut(tr("F7")); break;
+			case 4: temp->setShortcut(tr("F8")); break;
+			case 9: temp->setShortcut(tr("F9")); break;
+			case 10: temp->setShortcut(tr("F10")); break;
+			default: ;
+		}
+		phasesMenu->addAction(temp);
+		phaseActions.append(temp);
+	}
+	phasesMenu->addSeparator();
+	phasesMenu->addAction(aNextPhase);
+	
 	tabMenu = new QMenu(this);
 	playersSeparator = tabMenu->addSeparator();
-	tabMenu->addAction(aNextPhase);
+	tabMenu->addMenu(phasesMenu);
 	tabMenu->addAction(aNextTurn);
 	tabMenu->addSeparator();
 	tabMenu->addAction(aRemoveLocalArrows);
@@ -251,6 +269,10 @@ TabGame::~TabGame()
 
 void TabGame::retranslateUi()
 {
+	for (int i = 0; i < phaseActions.size(); ++i)
+		phaseActions[i]->setText(phasesToolbar->getLongPhaseName(i));
+	phasesMenu->setTitle(tr("&Phases"));
+	
 	tabMenu->setTitle(tr("&Game"));
 	aNextPhase->setText(tr("Next &phase"));
 	aNextPhase->setShortcut(tr("Ctrl+Space"));
@@ -298,6 +320,12 @@ void TabGame::actSay()
 		sendGameCommand(new Command_Say(-1, sayEdit->text()));
 		sayEdit->clear();
 	}
+}
+
+void TabGame::actPhaseAction()
+{
+	int phase = phaseActions.indexOf(static_cast<QAction *>(sender()));
+	emit sendGameCommand(new Command_SetActivePhase(-1, phase), -1);
 }
 
 void TabGame::actNextPhase()

@@ -2,13 +2,15 @@
 #include "player.h"
 #include "zoneviewwidget.h"
 #include "zoneviewzone.h"
+#include "phasestoolbar.h"
 #include <QAction>
 #include <QGraphicsSceneMouseEvent>
 #include <QSet>
 
-GameScene::GameScene(QObject *parent)
-	: QGraphicsScene(parent)
+GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
+	: QGraphicsScene(parent), phasesToolbar(_phasesToolbar)
 {
+	addItem(phasesToolbar);
 }
 
 void GameScene::retranslateUi()
@@ -37,34 +39,37 @@ void GameScene::removePlayer(Player *player)
 void GameScene::rearrange()
 {
 	struct PlayerProcessor {
-		static void processPlayer(Player *p, qreal &w, qreal &h, QPointF &b, bool singlePlayer)
+		static void processPlayer(Player *p, qreal &w, QPointF &b, bool singlePlayer)
 		{
 			const QRectF br = p->boundingRect();
 			if (br.width() > w)
 				w = br.width();
-			if (h)
-				h += playerAreaSpacing;
-			h += br.height();
 			p->setPos(b);
 			p->setMirrored((b.y() < playerAreaSpacing) && !singlePlayer);
 			b += QPointF(0, br.height() + playerAreaSpacing);
 		}
 	};
-
-	QPointF base;
-	qreal sceneWidth = 0;
-	qreal sceneHeight = 0;
+	
+	qreal sceneHeight = -playerAreaSpacing;
+	for (int i = 0; i < players.size(); ++i)
+		sceneHeight += players[i]->boundingRect().height() + playerAreaSpacing;
+	phasesToolbar->setHeight(sceneHeight);
+	qreal phasesWidth = phasesToolbar->getWidth();
+	
+	QPointF base(phasesWidth, 0);
+	qreal sceneWidth;
 	QList<Player *> localPlayers;
 
 	for (int i = 0; i < players.size(); ++i)
 		if (!players[i]->getLocal())
-			PlayerProcessor::processPlayer(players[i], sceneWidth, sceneHeight, base, players.size() == 1);
+			PlayerProcessor::processPlayer(players[i], sceneWidth, base, players.size() == 1);
 		else
 			localPlayers.append(players[i]);
 	
 	for (int i = 0; i < localPlayers.size(); ++i)
-		PlayerProcessor::processPlayer(localPlayers[i], sceneWidth, sceneHeight, base, players.size() == 1);
+		PlayerProcessor::processPlayer(localPlayers[i], sceneWidth, base, players.size() == 1);
 
+	sceneWidth += phasesWidth;
 	playersRect = QRectF(0, 0, sceneWidth, sceneHeight);
 	
 	setSceneRect(sceneRect().x(), sceneRect().y(), sceneWidth, sceneHeight);
@@ -127,6 +132,7 @@ void GameScene::processViewSizeChange(const QSize &newSize)
 		if (w > minWidth)
 			minWidth = w;
 	}
+	minWidth += phasesToolbar->getWidth();
 	
 	qreal minRatio = minWidth / sceneRect().height();
 	if (minRatio > newRatio) {
@@ -138,7 +144,7 @@ void GameScene::processViewSizeChange(const QSize &newSize)
 	}
 	
 	for (int i = 0; i < players.size(); ++i)
-		players[i]->processSceneSizeChange(sceneRect().size());
+		players[i]->processSceneSizeChange(sceneRect().size() - QSizeF(phasesToolbar->getWidth(), 0));
 }
 
 bool GameScene::event(QEvent *event)

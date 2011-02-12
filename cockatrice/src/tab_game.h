@@ -93,6 +93,7 @@ private:
 	QMap<int, QString> spectators;
 	bool started;
 	bool resuming;
+	QStringList phasesList;
 	int currentPhase;
 	int activePlayer;
 
@@ -111,8 +112,9 @@ private:
 	QHBoxLayout *mainLayout;
 	ZoneViewLayout *zoneLayout;
 	QAction *playersSeparator;
-	QMenu *playersMenu;
+	QMenu *phasesMenu;
 	QAction *aConcede, *aLeaveGame, *aNextPhase, *aNextTurn, *aRemoveLocalArrows;
+	QList<QAction *> phaseActions;
 
 	Player *addPlayer(int playerId, ServerInfo_User *info);
 
@@ -145,6 +147,7 @@ private slots:
 	void actLeaveGame();
 	void actRemoveLocalArrows();
 	void actSay();
+	void actPhaseAction();
 	void actNextPhase();
 	void actNextTurn();
 public:

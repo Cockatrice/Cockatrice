@@ -3,44 +3,57 @@
 
 #include <QFrame>
 #include <QList>
-#include <QPushButton>
+#include <QGraphicsObject>
 
 class Player;
 class GameCommand;
 
-class PhaseButton : public QPushButton {
+class PhaseButton : public QObject, public QGraphicsItem {
 	Q_OBJECT
 private:
-	QString phaseText;
-	bool active;
+	QString name;
+	bool active, highlightable;
 	int activeAnimationCounter;
 	QTimer *activeAnimationTimer;
 	QAction *doubleClickAction;
-	QPixmap pixmap;
+	double width;
 	
 	void updatePixmap(QPixmap &pixmap);
 private slots:
 	void updateAnimation();
 public:
-	PhaseButton(const QIcon &icon, QAction *_doubleClickAction = 0);
-	void setPhaseText(const QString &_phaseText);
-	QString getPhaseText() const { return phaseText; }
+	PhaseButton(const QString &_name, QGraphicsItem *parent = 0, QAction *_doubleClickAction = 0, bool _highlightable = true);
+	QRectF boundingRect() const;
+	void setWidth(double _width);
 	void setActive(bool _active);
 	bool getActive() const { return active; }
 	void triggerDoubleClickAction();
+signals:
+	void clicked();
 protected:
-	void paintEvent(QPaintEvent *event);
-	void mouseDoubleClickEvent(QMouseEvent *event);
+	void paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/);
+	void mousePressEvent(QGraphicsSceneMouseEvent *event);
+	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 };
 
-class PhasesToolbar : public QFrame {
+class PhasesToolbar : public QObject, public QGraphicsItem {
 	Q_OBJECT
 private:
 	QList<PhaseButton *> buttonList;
+	PhaseButton *nextTurnButton;
+	double width, height, ySpacing, symbolSize;
+	static const int buttonCount = 12;
+	static const int spaceCount = 6;
+	static const double margin = 3;
+	void rearrangeButtons();
 public:
-	PhasesToolbar(QWidget *parent = 0);
+	PhasesToolbar(QGraphicsItem *parent = 0);
+	QRectF boundingRect() const;
 	void retranslateUi();
+	void setHeight(double _height);
+	double getWidth() const { return width; }
 	int phaseCount() const { return buttonList.size(); }
+	QString getLongPhaseName(int phase) const;
 public slots:
 	void setActivePhase(int phase);
 private slots:
@@ -50,6 +63,8 @@ private slots:
 	void actDrawCard();
 signals:
 	void sendGameCommand(GameCommand *command, int playerId);
+protected:
+	void paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/);
 };
 
 #endif

@@ -4,6 +4,14 @@
 #include <QPixmap>
 #include <QMap>
 
+class PhasePixmapGenerator {
+private:
+	static QMap<QString, QPixmap> pmCache;
+public:
+	static QPixmap generatePixmap(int size, QString name);
+	static void clear() { pmCache.clear(); }
+};
+
 class CounterPixmapGenerator {
 private:
 	static QMap<QString, QPixmap> pmCache;

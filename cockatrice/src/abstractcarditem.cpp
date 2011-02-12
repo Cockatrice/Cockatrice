@@ -20,7 +20,7 @@ AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, QGraphi
 	setCacheMode(DeviceCoordinateCache);
 
 	connect(info, SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
-	connect(settingsCache, SIGNAL(displayCardNamesChanged()), this, SLOT(update()));
+	connect(settingsCache, SIGNAL(displayCardNamesChanged()), this, SLOT(callUpdate()));
 	
 	animationTimer = new QTimer(this);
 	animationTimer->setSingleShot(false);
@@ -86,9 +86,12 @@ void AbstractCardItem::paintPicture(QPainter *painter, int angle)
 
 	QPixmap *translatedPixmap = info->getPixmap(translatedSize.toSize());
 	painter->save();
+	QColor bgColor = Qt::transparent;
 	if (translatedPixmap) {
+		painter->save();
 		transformPainter(painter, translatedSize, angle);
 		painter->drawPixmap(QPointF(0, 0), *translatedPixmap);
+		painter->restore();
 	} else {
 		QString colorStr;
 		if (!color.isEmpty())
@@ -98,33 +101,26 @@ void AbstractCardItem::paintPicture(QPainter *painter, int angle)
 		else if (!info->getColors().isEmpty())
 			colorStr = info->getColors().first().toLower();
 		
-		QColor bgColor;
-		QColor textColor = Qt::white;
 		if (colorStr == "b")
 			bgColor = QColor(0, 0, 0);
 		else if (colorStr == "u")
 			bgColor = QColor(0, 140, 180);
-		else if (colorStr == "w") {
+		else if (colorStr == "w")
 			bgColor = QColor(255, 250, 140);
-			textColor = Qt::black;
-		} else if (colorStr == "r")
+		else if (colorStr == "r")
 			bgColor = QColor(230, 0, 0);
 		else if (colorStr == "g")
 			bgColor = QColor(0, 160, 0);
-		else if (colorStr == "m") {
+		else if (colorStr == "m")
 			bgColor = QColor(250, 190, 30);
-			textColor = Qt::black;
-		} else {
+		else
 			bgColor = QColor(230, 230, 230);
-			textColor = Qt::black;
-		}
-		painter->setBrush(bgColor);
-		QPen pen(Qt::black);
-		pen.setWidth(2);
-		painter->setPen(pen);
-		painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 2));
 	}
-	painter->restore();
+	painter->setBrush(bgColor);
+	QPen pen(Qt::black);
+	pen.setWidth(2);
+	painter->setPen(pen);
+	painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 2));
 	
 	if (!translatedPixmap || settingsCache->getDisplayCardNames()) {
 		painter->save();
@@ -133,6 +129,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, int angle)
 		painter->setBackground(Qt::black);
 		painter->setBackgroundMode(Qt::OpaqueMode);
 		painter->drawText(QRectF(3 * scaleFactor, 3 * scaleFactor, translatedSize.width() - 6 * scaleFactor, translatedSize.height() - 6 * scaleFactor), Qt::AlignTop | Qt::AlignLeft | Qt::TextWrapAnywhere, name);
+		painter->restore();
 	}
 	
 	painter->restore();

@@ -5,6 +5,24 @@
 #include <math.h>
 #include <QDebug>
 
+QMap<QString, QPixmap> PhasePixmapGenerator::pmCache;
+
+QPixmap PhasePixmapGenerator::generatePixmap(int height, QString name)
+{
+	QString key = name + QString::number(height);
+	if (pmCache.contains(key))
+		return pmCache.value(key);
+	
+	QSvgRenderer svg(QString(":/resources/phases/icon_phase_" + name + ".svg"));
+	
+	QPixmap pixmap(height, height);
+	pixmap.fill(Qt::transparent);
+	QPainter painter(&pixmap);
+	svg.render(&painter, QRectF(0, 0, height, height));
+	pmCache.insert(key, pixmap);
+	return pixmap;
+}
+
 QMap<QString, QPixmap> CounterPixmapGenerator::pmCache;
 
 QPixmap CounterPixmapGenerator::generatePixmap(int height, QString name, bool highlight)
