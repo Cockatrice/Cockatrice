@@ -69,12 +69,12 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="284"/>
         <source>Card rendering</source>
-        <translation type="unfinished"></translation>
+        <translation>Отрисовка карт</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="285"/>
         <source>Display card names on cards having a picture</source>
-        <translation type="unfinished"></translation>
+        <translation>Отображать название карты поверх изображения</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="287"/>
@@ -2354,37 +2354,37 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="228"/>
         <source>F5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="229"/>
         <source>F6</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="230"/>
         <source>F7</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="231"/>
         <source>F8</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="232"/>
         <source>F9</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="233"/>
         <source>F10</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="274"/>
         <source>&amp;Phases</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Фазы</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="276"/>
