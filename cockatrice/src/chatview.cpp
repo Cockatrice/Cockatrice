@@ -10,7 +10,7 @@ ChatView::ChatView(const QString &_ownName, QWidget *parent)
 	setTextInteractionFlags(Qt::TextSelectableByMouse);
 }
 
-void ChatView::appendMessage(const QString &sender, const QString &message)
+void ChatView::appendMessage(QString sender, const QString &message)
 {
 	QTextCursor cursor(document()->lastBlock());
 	cursor.movePosition(QTextCursor::End);
@@ -31,14 +31,15 @@ void ChatView::appendMessage(const QString &sender, const QString &message)
 	} else
 		senderFormat.setForeground(Qt::blue);
 	cursor.setCharFormat(senderFormat);
-	cursor.insertText(sender + " ");
+	if (!sender.isEmpty())
+		sender.append(" ");
+	cursor.insertText(sender);
 	
 	QTextCharFormat messageFormat;
 	if (sender.isEmpty())
 		messageFormat.setForeground(Qt::darkGreen);
 	cursor.setCharFormat(messageFormat);
 	cursor.insertText(message);
-	
 	
 	verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }

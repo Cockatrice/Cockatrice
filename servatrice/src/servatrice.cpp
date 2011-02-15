@@ -235,4 +235,4 @@ void Servatrice::statusUpdate()
 	execSqlQuery(query);
 }
 
-const QString Servatrice::versionString = "Servatrice 0.20110127";
+const QString Servatrice::versionString = "Servatrice 0.20110215";

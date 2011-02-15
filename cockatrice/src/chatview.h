@@ -12,7 +12,7 @@ private:
 	QString ownName;
 public:
 	ChatView(const QString &_ownName, QWidget *parent = 0);
-	void appendMessage(const QString &sender, const QString &message);
+	void appendMessage(QString sender, const QString &message);
 };
 
 #endif
