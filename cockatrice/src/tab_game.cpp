@@ -493,7 +493,7 @@ void TabGame::stopGame()
 		i.next();
 		i.value()->show();
 	}
-	mainLayout->insertLayout(2, deckViewContainerLayout, 10);
+	mainLayout->insertLayout(1, deckViewContainerLayout, 10);
 
 	playerListWidget->setActivePlayer(-1);
 	playerListWidget->setGameStarted(false);
