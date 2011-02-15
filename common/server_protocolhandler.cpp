@@ -322,14 +322,14 @@ ResponseCode Server_ProtocolHandler::cmdJoinRoom(Command_JoinRoom *cmd, CommandC
 	return RespNothing;
 }
 
-ResponseCode Server_ProtocolHandler::cmdLeaveRoom(Command_LeaveRoom * /*cmd*/, CommandContainer *cont, Server_Room *room)
+ResponseCode Server_ProtocolHandler::cmdLeaveRoom(Command_LeaveRoom * /*cmd*/, CommandContainer * /*cont*/, Server_Room *room)
 {
 	rooms.remove(room->getId());
 	room->removeClient(this);
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdRoomSay(Command_RoomSay *cmd, CommandContainer *cont, Server_Room *room)
+ResponseCode Server_ProtocolHandler::cmdRoomSay(Command_RoomSay *cmd, CommandContainer * /*cont*/, Server_Room *room)
 {
 	room->say(this, cmd->getMessage());
 	return RespOk;
@@ -351,7 +351,7 @@ ResponseCode Server_ProtocolHandler::cmdListUsers(Command_ListUsers * /*cmd*/, C
 	return RespNothing;
 }
 
-ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, CommandContainer *cont, Server_Room *room)
+ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, CommandContainer * /*cont*/, Server_Room *room)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
@@ -370,7 +370,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandContainer *cont, Server_Room *room)
+ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandContainer * /*cont*/, Server_Room *room)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
@@ -392,7 +392,7 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandC
 	return result;
 }
 
-ResponseCode Server_ProtocolHandler::cmdLeaveGame(Command_LeaveGame * /*cmd*/, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdLeaveGame(Command_LeaveGame * /*cmd*/, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	game->removePlayer(player);
 	return RespOk;
@@ -423,7 +423,7 @@ ResponseCode Server_ProtocolHandler::cmdDeckSelect(Command_DeckSelect *cmd, Comm
 	return RespNothing;
 }
 
-ResponseCode Server_ProtocolHandler::cmdSetSideboardPlan(Command_SetSideboardPlan *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdSetSideboardPlan(Command_SetSideboardPlan *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -438,18 +438,24 @@ ResponseCode Server_ProtocolHandler::cmdSetSideboardPlan(Command_SetSideboardPla
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdConcede(Command_Concede * /*cmd*/, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdConcede(Command_Concede * /*cmd*/, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
+	if (player->getConceded())
+		return RespContextError;
 	
 	player->setConceded(true);
+	player->clearZones();
 	game->sendGameEvent(new Event_PlayerPropertiesChanged(player->getPlayerId(), player->getProperties()), new Context_Concede);
 	game->stopGameIfFinished();
+	if (game->getGameStarted() && (game->getActivePlayer() == player->getPlayerId()))
+		game->nextTurn();
+	
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdReadyStart(Command_ReadyStart *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdReadyStart(Command_ReadyStart *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -466,7 +472,7 @@ ResponseCode Server_ProtocolHandler::cmdReadyStart(Command_ReadyStart *cmd, Comm
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdSay(Command_Say *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdSay(Command_Say *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator() && !game->getSpectatorsCanTalk())
 		return RespFunctionNotAllowed;
@@ -475,13 +481,15 @@ ResponseCode Server_ProtocolHandler::cmdSay(Command_Say *cmd, CommandContainer *
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdShuffle(Command_Shuffle * /*cmd*/, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdShuffle(Command_Shuffle * /*cmd*/, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
+	if (player->getConceded())
+		return RespContextError;
 		
 	player->getZones().value("deck")->shuffle();
 	game->sendGameEvent(new Event_Shuffle(player->getPlayerId()));
@@ -495,6 +503,8 @@ ResponseCode Server_ProtocolHandler::cmdMulligan(Command_Mulligan * /*cmd*/, Com
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
+	if (player->getConceded())
+		return RespContextError;
 	
 	Server_CardZone *hand = player->getZones().value("hand");
 	int number = (hand->cards.size() <= 1) ? player->getInitialCards() : hand->cards.size() - 1;
@@ -512,10 +522,12 @@ ResponseCode Server_ProtocolHandler::cmdMulligan(Command_Mulligan * /*cmd*/, Com
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdRollDie(Command_RollDie *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdRollDie(Command_RollDie *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
+	if (player->getConceded())
+		return RespContextError;
 	
 	game->sendGameEvent(new Event_RollDie(player->getPlayerId(), cmd->getSides(), rng->getNumber(1, cmd->getSides())));
 	return RespOk;
@@ -528,17 +540,21 @@ ResponseCode Server_ProtocolHandler::cmdDrawCards(Command_DrawCards *cmd, Comman
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
+	if (player->getConceded())
+		return RespContextError;
 		
 	return player->drawCards(cont, cmd->getNumber());
 }
 
-ResponseCode Server_ProtocolHandler::cmdUndoDraw(Command_UndoDraw *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdUndoDraw(Command_UndoDraw * /*cmd*/, CommandContainer *cont, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
+	if (player->getConceded())
+		return RespContextError;
 		
 	return player->undoDraw(cont);
 }
@@ -550,6 +566,8 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, CommandC
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
+	if (player->getConceded())
+		return RespContextError;
 	
 	QList<int> cardIds;
 	const QList<CardId *> &temp = cmd->getCardIds();
@@ -566,7 +584,9 @@ ResponseCode Server_ProtocolHandler::cmdFlipCard(Command_FlipCard *cmd, CommandC
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
+	if (player->getConceded())
+		return RespContextError;
+	
 	Server_CardZone *zone = player->getZones().value(cmd->getZone());
 	if (!zone)
 		return RespNameNotFound;
@@ -595,6 +615,8 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
+	if (player->getConceded())
+		return RespContextError;
 		
 	Server_CardZone *startzone = player->getZones().value(cmd->getStartZone());
 	if (!startzone)
@@ -670,13 +692,15 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
+	if (player->getConceded())
+		return RespContextError;
 		
 	Server_CardZone *zone = player->getZones().value(cmd->getZone());
 	if (!zone)
@@ -703,14 +727,16 @@ ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, Co
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
+	if (player->getConceded())
+		return RespContextError;
+	
 	Server_Player *startPlayer = game->getPlayer(cmd->getStartPlayerId());
 	Server_Player *targetPlayer = game->getPlayer(cmd->getTargetPlayerId());
 	if (!startPlayer || !targetPlayer)
@@ -764,14 +790,16 @@ ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Co
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdDeleteArrow(Command_DeleteArrow *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdDeleteArrow(Command_DeleteArrow *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
+	if (player->getConceded())
+		return RespContextError;
+	
 	if (!player->deleteArrow(cmd->getArrowId()))
 		return RespNameNotFound;
 	
@@ -786,7 +814,9 @@ ResponseCode Server_ProtocolHandler::cmdSetCardAttr(Command_SetCardAttr *cmd, Co
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
+	if (player->getConceded())
+		return RespContextError;
+	
 	return player->setCardAttrHelper(cont, cmd->getZone(), cmd->getCardId(), cmd->getAttrName(), cmd->getAttrValue());
 }
 
@@ -797,7 +827,9 @@ ResponseCode Server_ProtocolHandler::cmdSetCardCounter(Command_SetCardCounter *c
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
+	if (player->getConceded())
+		return RespContextError;
+	
 	Server_CardZone *zone = player->getZones().value(cmd->getZone());
 	if (!zone)
 		return RespNameNotFound;
@@ -822,7 +854,9 @@ ResponseCode Server_ProtocolHandler::cmdIncCardCounter(Command_IncCardCounter *c
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
+	if (player->getConceded())
+		return RespContextError;
+	
 	Server_CardZone *zone = player->getZones().value(cmd->getZone());
 	if (!zone)
 		return RespNameNotFound;
@@ -841,14 +875,16 @@ ResponseCode Server_ProtocolHandler::cmdIncCardCounter(Command_IncCardCounter *c
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdIncCounter(Command_IncCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdIncCounter(Command_IncCounter *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
+	if (player->getConceded())
+		return RespContextError;
+	
 	const QMap<int, Server_Counter *> counters = player->getCounters();
 	Server_Counter *c = counters.value(cmd->getCounterId(), 0);
 	if (!c)
@@ -859,14 +895,16 @@ ResponseCode Server_ProtocolHandler::cmdIncCounter(Command_IncCounter *cmd, Comm
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdCreateCounter(Command_CreateCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdCreateCounter(Command_CreateCounter *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
+	if (player->getConceded())
+		return RespContextError;
+	
 	Server_Counter *c = new Server_Counter(player->newCounterId(), cmd->getCounterName(), cmd->getColor(), cmd->getRadius(), cmd->getValue());
 	player->addCounter(c);
 	game->sendGameEvent(new Event_CreateCounters(player->getPlayerId(), QList<ServerInfo_Counter *>() << new ServerInfo_Counter(c->getId(), c->getName(), c->getColor(), c->getRadius(), c->getCount())));
@@ -874,14 +912,16 @@ ResponseCode Server_ProtocolHandler::cmdCreateCounter(Command_CreateCounter *cmd
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdSetCounter(Command_SetCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdSetCounter(Command_SetCounter *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
+	if (player->getConceded())
+		return RespContextError;
+	
 	Server_Counter *c = player->getCounters().value(cmd->getCounterId(), 0);;
 	if (!c)
 		return RespNameNotFound;
@@ -891,40 +931,46 @@ ResponseCode Server_ProtocolHandler::cmdSetCounter(Command_SetCounter *cmd, Comm
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdDelCounter(Command_DelCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdDelCounter(Command_DelCounter *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
+	if (player->getConceded())
+		return RespContextError;
+	
 	if (!player->deleteCounter(cmd->getCounterId()))
 		return RespNameNotFound;
 	game->sendGameEvent(new Event_DelCounter(player->getPlayerId(), cmd->getCounterId()));
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdNextTurn(Command_NextTurn * /*cmd*/, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdNextTurn(Command_NextTurn * /*cmd*/, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
+	if (player->getConceded())
+		return RespContextError;
 	
 	game->nextTurn();
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdSetActivePhase(Command_SetActivePhase *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdSetActivePhase(Command_SetActivePhase *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
+	if (player->getConceded())
+		return RespContextError;
+	
 	if (game->getActivePlayer() != player->getPlayerId())
 		return RespContextError;
 	game->setActivePhase(cmd->getPhase());
@@ -936,7 +982,7 @@ ResponseCode Server_ProtocolHandler::cmdDumpZone(Command_DumpZone *cmd, CommandC
 {
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
+	
 	Server_Player *otherPlayer = game->getPlayer(cmd->getPlayerId());
 	if (!otherPlayer)
 		return RespNameNotFound;
@@ -981,11 +1027,13 @@ ResponseCode Server_ProtocolHandler::cmdDumpZone(Command_DumpZone *cmd, CommandC
 	return RespNothing;
 }
 
-ResponseCode Server_ProtocolHandler::cmdStopDumpZone(Command_StopDumpZone *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
+ResponseCode Server_ProtocolHandler::cmdStopDumpZone(Command_StopDumpZone *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
-		
+	if (player->getConceded())
+		return RespContextError;
+	
 	Server_Player *otherPlayer = game->getPlayer(cmd->getPlayerId());
 	if (!otherPlayer)
 		return RespNameNotFound;
@@ -1007,6 +1055,8 @@ ResponseCode Server_ProtocolHandler::cmdRevealCards(Command_RevealCards *cmd, Co
 	
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
+	if (player->getConceded())
+		return RespContextError;
 	
 	Server_Player *otherPlayer = 0;
 	if (cmd->getPlayerId() != -1) {

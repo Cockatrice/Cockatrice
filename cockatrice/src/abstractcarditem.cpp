@@ -69,12 +69,13 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
 	painter->setTransform(pixmapTransform);
 
 	QFont f;
-	int fontSize = translatedSize.height() / 8;
+	int fontSize = round(translatedSize.height() / 8);
 	if (fontSize < 9)
 		fontSize = 9;
-	if (fontSize > 12)
-		fontSize = 12;
+	if (fontSize > 10)
+		fontSize = 10;
 	f.setPixelSize(fontSize);
+
 	painter->setFont(f);
 }
 

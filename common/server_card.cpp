@@ -24,7 +24,6 @@ Server_Card::Server_Card(QString _name, int _id, int _coord_x, int _coord_y)
 {
 }
 
-
 Server_Card::~Server_Card()
 {
 	// setParentCard(0) leads to the item being removed from our list, so we can't iterate properly

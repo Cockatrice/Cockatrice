@@ -330,7 +330,6 @@ void CardInfo::imageLoaded(const QImage &image)
 
 QPixmap *CardInfo::getPixmap(QSize size)
 {
-	qDebug() << "CardInfo::getPixmap(" << size.width() << size.height() << ") for" << getName();
 	QPixmap *cachedPixmap = scaledPixmapCache.value(size.width());
 	if (cachedPixmap)
 		return cachedPixmap;

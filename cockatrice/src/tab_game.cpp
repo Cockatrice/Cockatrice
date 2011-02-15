@@ -477,6 +477,10 @@ void TabGame::startGame()
 	}
 	mainLayout->removeItem(deckViewContainerLayout);
 	
+	QMapIterator<int, Player *> playerIterator(players);
+	while (playerIterator.hasNext())
+		playerIterator.next().value()->setConceded(false);
+	
 	playerListWidget->setGameStarted(true);
 	started = true;
 	gameView->show();
@@ -581,7 +585,16 @@ void TabGame::eventPlayerPropertiesChanged(Event_PlayerPropertiesChanged *event,
 				messageLog->logNotReadyStart(player);
 			break;
 		}
-		case ItemId_Context_Concede: messageLog->logConcede(player); break;
+		case ItemId_Context_Concede: {
+			messageLog->logConcede(player);
+			player->setConceded(true);
+			
+			QMapIterator<int, Player *> playerIterator(players);
+			while (playerIterator.hasNext())
+				playerIterator.next().value()->updateZones();
+			
+			break;
+		}
 		case ItemId_Context_DeckSelect: messageLog->logDeckSelect(player, static_cast<Context_DeckSelect *>(context)->getDeckId()); break;
 		default: ;
 	}
@@ -609,13 +622,21 @@ void TabGame::eventLeave(Event_Leave *event, GameEventContext * /*context*/)
 	int playerId = event->getPlayerId();
 
 	Player *player = players.value(playerId, 0);
-	if (player) {
-		messageLog->logLeave(player);
-		playerListWidget->removePlayer(playerId);
-		players.remove(playerId);
-		emit playerRemoved(player);
-		player->deleteLater();
-	}
+	if (!player)
+		return;
+	
+	messageLog->logLeave(player);
+	playerListWidget->removePlayer(playerId);
+	players.remove(playerId);
+	emit playerRemoved(player);
+	player->clear();
+	player->deleteLater();
+	
+	// Rearrange all remaining zones so that attachment relationship updates take place
+	QMapIterator<int, Player *> playerIterator(players);
+	while (playerIterator.hasNext())
+		playerIterator.next().value()->updateZones();
+	
 	emit userEvent();
 }
 

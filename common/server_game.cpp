@@ -227,13 +227,17 @@ void Server_Game::removePlayer(Server_Player *player)
 	}
 	
 	sendGameEvent(new Event_Leave(player->getPlayerId()));
+	bool playerActive = activePlayer == player->getPlayerId();
 	bool spectator = player->getSpectator();
 	delete player;
 	
 	if (!getPlayerCount())
 		deleteLater();
-	else if (!spectator)
+	else if (!spectator) {
 		stopGameIfFinished();
+		if (gameStarted && playerActive)
+			nextTurn();
+	}
 	qobject_cast<Server_Room *>(parent())->broadcastGameListUpdate(this);
 }
 
@@ -271,7 +275,7 @@ void Server_Game::nextTurn()
 		++listPos;
 		if (listPos == keys.size())
 			listPos = 0;
-	} while (players.value(keys[listPos])->getSpectator());
+	} while (players.value(keys[listPos])->getSpectator() || players.value(keys[listPos])->getConceded());
 	
 	setActivePlayer(keys[listPos]);
 }

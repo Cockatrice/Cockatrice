@@ -23,7 +23,7 @@
 #include <QDebug>
 
 Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
-	: QObject(_parent), shortcutsActive(false), defaultNumberTopCards(3), lastTokenDestroy(true), userInfo(new ServerInfo_User(info)), id(_id), active(false), local(_local), mirrored(false), dialogSemaphore(false)
+	: QObject(_parent), shortcutsActive(false), defaultNumberTopCards(3), lastTokenDestroy(true), userInfo(new ServerInfo_User(info)), id(_id), active(false), local(_local), mirrored(false), conceded(false), dialogSemaphore(false)
 {
 	setCacheMode(DeviceCoordinateCache);
 	
@@ -264,15 +264,25 @@ Player::~Player()
 
 	static_cast<GameScene *>(scene())->removePlayer(this);
 	
-	clearArrows();
-
+	clear();
 	QMapIterator<QString, CardZone *> i(zones);
 	while (i.hasNext())
 		delete i.next().value();
-
-	clearCounters();
+	zones.clear();
+	
 	delete playerMenu;
 	delete userInfo;
+}
+
+void Player::clear()
+{
+	clearArrows();
+	
+	QMapIterator<QString, CardZone *> i(zones);
+	while (i.hasNext())
+		i.next().value()->clearContents();
+	
+	clearCounters();
 }
 
 void Player::addPlayer(Player *player)
@@ -360,6 +370,11 @@ void Player::rearrangeZones()
 	table->reorganizeCards();
 	updateBoundingRect();
 	rearrangeCounters();
+}
+
+void Player::updateZones()
+{
+	table->reorganizeCards();
 }
 
 void Player::updateBgPixmap()
@@ -1483,6 +1498,16 @@ qreal Player::getMinimumWidth() const
 	if (!settingsCache->getHorizontalHand())
 		result += hand->boundingRect().width();
 	return result;
+}
+
+void Player::setConceded(bool _conceded)
+{
+	conceded = _conceded;
+	setVisible(!conceded);
+	if (conceded) {
+		clear();
+		emit gameConceded();
+	}
 }
 
 void Player::setMirrored(bool _mirrored)

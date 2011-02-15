@@ -22,6 +22,8 @@ Server_Player::~Server_Player()
 	if (handler)
 		handler->playerRemovedFromGame(game);
 	delete userInfo;
+	
+	clearZones();
 }
 
 int Server_Player::newCardId()

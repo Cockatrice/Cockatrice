@@ -26,6 +26,7 @@ void GameScene::addPlayer(Player *player)
 	addItem(player);
 	rearrange();
 	connect(player, SIGNAL(sizeChanged()), this, SLOT(rearrange()));
+	connect(player, SIGNAL(gameConceded()), this, SLOT(rearrange()));
 }
 
 void GameScene::removePlayer(Player *player)
@@ -41,6 +42,9 @@ void GameScene::rearrange()
 	struct PlayerProcessor {
 		static void processPlayer(Player *p, qreal &w, QPointF &b, bool singlePlayer)
 		{
+			if (p->getConceded())
+				return;
+			
 			const QRectF br = p->boundingRect();
 			if (br.width() > w)
 				w = br.width();
@@ -52,7 +56,8 @@ void GameScene::rearrange()
 	
 	qreal sceneHeight = -playerAreaSpacing;
 	for (int i = 0; i < players.size(); ++i)
-		sceneHeight += players[i]->boundingRect().height() + playerAreaSpacing;
+		if (!players[i]->getConceded())
+			sceneHeight += players[i]->boundingRect().height() + playerAreaSpacing;
 	phasesToolbar->setHeight(sceneHeight);
 	qreal phasesWidth = phasesToolbar->getWidth();
 	

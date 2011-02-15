@@ -74,6 +74,7 @@ signals:
 	void logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer);
 	
 	void sizeChanged();
+	void gameConceded();
 public slots:
 	void actUntapAll();
 	void actRollDie();
@@ -102,7 +103,6 @@ public slots:
 	void actSetAnnotation(QAction *action);
 	void cardMenuAction(QAction *action);
 	void actCardCounterTrigger(QAction *action);
-
 private slots:
 	void addPlayer(Player *player);
 	void removePlayer(Player *player);
@@ -134,6 +134,7 @@ private:
 	bool active;
 	bool local;
 	bool mirrored;
+	bool conceded;
 	
 	bool dialogSemaphore;
 	bool clearCardsToDelete();
@@ -203,6 +204,7 @@ public:
 	Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent);
 	~Player();
 	void retranslateUi();
+	void clear();
 	QMenu *getPlayerMenu() const { return playerMenu; }
 	int getId() const { return id; }
 	QString getName() const;
@@ -211,13 +213,16 @@ public:
 	bool getMirrored() const { return mirrored; }
 	const QMap<QString, CardZone *> &getZones() const { return zones; }
 	const QMap<int, ArrowItem *> &getArrows() const { return arrows; }
-	TableZone *getTable() const { return table; }
 	void setCardMenu(QMenu *menu);
 	QMenu *getCardMenu() const;
 	bool getActive() const { return active; }
 	void setActive(bool _active);
 	void setShortcutsActive();
 	void setShortcutsInactive();
+	void updateZones();
+	
+	void setConceded(bool _conceded);
+	bool getConceded() const { return conceded; }
 	
 	qreal getMinimumWidth() const;
 	void setMirrored(bool _mirrored);
