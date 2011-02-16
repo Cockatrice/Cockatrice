@@ -591,9 +591,9 @@ void Player::actMoveTopCardsToGrave()
 	const int maxCards = zones.value("deck")->getCards().size();
 	if (number > maxCards)
 		number = maxCards;
-	QList<CardId *> idList;
+	QList<CardToMove *> idList;
 	for (int i = 0; i < number; ++i)
-		idList.append(new CardId(i));
+		idList.append(new CardToMove(i));
 	sendGameCommand(new Command_MoveCard(-1, "deck", idList, getId(), "grave", 0, 0, false));
 }
 
@@ -607,15 +607,15 @@ void Player::actMoveTopCardsToExile()
 	const int maxCards = zones.value("deck")->getCards().size();
 	if (number > maxCards)
 		number = maxCards;
-	QList<CardId *> idList;
+	QList<CardToMove *> idList;
 	for (int i = 0; i < number; ++i)
-		idList.append(new CardId(i));
+		idList.append(new CardToMove(i));
 	sendGameCommand(new Command_MoveCard(-1, "deck", idList, getId(), "rfg", 0, 0, false));
 }
 
 void Player::actMoveTopCardToBottom()
 {
-	sendGameCommand(new Command_MoveCard(-1, "deck", QList<CardId *>() << new CardId(0), getId(), "deck", -1, 0, false));
+	sendGameCommand(new Command_MoveCard(-1, "deck", QList<CardToMove *>() << new CardToMove(0), getId(), "deck", -1, 0, false));
 }
 
 void Player::actUntapAll()
@@ -658,28 +658,29 @@ void Player::actSayMessage()
 	sendGameCommand(new Command_Say(-1, a->text()));
 }
 
-void Player::setCardAttrHelper(CardItem *card, const QString &aname, const QString &avalue, bool allCards)
+void Player::setCardAttrHelper(GameEventContext *context, CardItem *card, const QString &aname, const QString &avalue, bool allCards)
 {
+	bool moveCardContext = qobject_cast<Context_MoveCard *>(context);
 	if (aname == "tapped") {
 		bool tapped = avalue == "1";
 		if (!(!tapped && card->getDoesntUntap() && allCards)) {
 			if (!allCards)
-				emit logSetTapped(this, card->getName(), tapped);
-			card->setTapped(tapped, true);
+				emit logSetTapped(this, card, tapped);
+			card->setTapped(tapped, !moveCardContext);
 		}
 	} else if (aname == "attacking")
 		card->setAttacking(avalue == "1");
 	else if (aname == "facedown")
 		card->setFaceDown(avalue == "1");
 	else if (aname == "annotation") {
-		emit logSetAnnotation(this, card->getName(), avalue);
+		emit logSetAnnotation(this, card, avalue);
 		card->setAnnotation(avalue);
 	} else if (aname == "doesnt_untap") {
 		bool value = (avalue == "1");
-		emit logSetDoesntUntap(this, card->getName(), value);
+		emit logSetDoesntUntap(this, card, value);
 		card->setDoesntUntap(value);
 	} else if (aname == "pt") {
-		emit logSetPT(this, card->getName(), avalue);
+		emit logSetPT(this, card, avalue);
 		card->setPT(avalue);
 	}
 }
@@ -738,7 +739,7 @@ void Player::eventCreateToken(Event_CreateToken *event)
 
 }
 
-void Player::eventSetCardAttr(Event_SetCardAttr *event)
+void Player::eventSetCardAttr(Event_SetCardAttr *event, GameEventContext *context)
 {
 	CardZone *zone = zones.value(event->getZone(), 0);
 	if (!zone)
@@ -747,16 +748,16 @@ void Player::eventSetCardAttr(Event_SetCardAttr *event)
 	if (event->getCardId() == -1) {
 		const CardList &cards = zone->getCards();
 		for (int i = 0; i < cards.size(); i++)
-			setCardAttrHelper(cards.at(i), event->getAttrName(), event->getAttrValue(), true);
+			setCardAttrHelper(context, cards.at(i), event->getAttrName(), event->getAttrValue(), true);
 		if (event->getAttrName() == "tapped")
-			emit logSetTapped(this, QString("-1"), event->getAttrValue() == "1");
+			emit logSetTapped(this, 0, event->getAttrValue() == "1");
 	} else {
 		CardItem *card = zone->getCard(event->getCardId(), QString());
 		if (!card) {
 			qDebug() << "Player::eventSetCardAttr: card id=" << event->getCardId() << "not found";
 			return;
 		}
-		setCardAttrHelper(card, event->getAttrName(), event->getAttrValue(), false);
+		setCardAttrHelper(context, card, event->getAttrName(), event->getAttrValue(), false);
 	}
 }
 
@@ -869,10 +870,11 @@ void Player::eventMoveCard(Event_MoveCard *event, GameEventContext *context)
 	if (context)
 		switch (context->getItemId()) {
 			case ItemId_Context_UndoDraw: emit logUndoDraw(this, card->getName()); break;
+			case ItemId_Context_MoveCard: emit logMoveCard(this, card, startZone, logPosition, targetZone, logX);
 			default: ;
 		}
 	else
-		emit logMoveCard(this, card->getName(), startZone, logPosition, targetZone, logX);
+		emit logMoveCard(this, card, startZone, logPosition, targetZone, logX);
 
 	targetZone->addCard(card, true, x, y);
 
@@ -1021,7 +1023,7 @@ void Player::processGameEvent(GameEvent *event, GameEventContext *context)
 		case ItemId_Event_CreateArrows: eventCreateArrows(static_cast<Event_CreateArrows *>(event)); break;
 		case ItemId_Event_DeleteArrow: eventDeleteArrow(static_cast<Event_DeleteArrow *>(event)); break;
 		case ItemId_Event_CreateToken: eventCreateToken(static_cast<Event_CreateToken *>(event)); break;
-		case ItemId_Event_SetCardAttr: eventSetCardAttr(static_cast<Event_SetCardAttr *>(event)); break;
+		case ItemId_Event_SetCardAttr: eventSetCardAttr(static_cast<Event_SetCardAttr *>(event), context); break;
 		case ItemId_Event_SetCardCounter: eventSetCardCounter(static_cast<Event_SetCardCounter *>(event)); break;
 		case ItemId_Event_CreateCounters: eventCreateCounters(static_cast<Event_CreateCounters *>(event)); break;
 		case ItemId_Event_SetCounter: eventSetCounter(static_cast<Event_SetCounter *>(event)); break;
@@ -1129,10 +1131,10 @@ void Player::playCard(CardItem *c, bool faceDown, bool tapped)
 {
 	CardInfo *ci = c->getInfo();
 	if (ci->getTableRow() == 3)
-		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), QList<CardId *>() << new CardId(c->getId()), getId(), "stack", 0, 0, false));
+		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), QList<CardToMove *>() << new CardToMove(c->getId()), getId(), "stack", 0, 0, false));
 	else {
 		QPoint gridPoint = QPoint(-1, 2 - ci->getTableRow());
-		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), QList<CardId *>() << new CardId(c->getId()), getId(), "table", gridPoint.x(), gridPoint.y(), faceDown, tapped));
+		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), QList<CardToMove *>() << new CardToMove(c->getId(), ci->getPowTough(), tapped), getId(), "table", gridPoint.x(), gridPoint.y(), faceDown));
 	}
 }
 
@@ -1341,9 +1343,9 @@ void Player::cardMenuAction(QAction *a)
 			}
 		}
 	else {
-		QList<CardId *> idList;
+		QList<CardToMove *> idList;
 		for (int i = 0; i < cardList.size(); ++i)
-			idList.append(new CardId(cardList[i]->getId()));
+			idList.append(new CardToMove(cardList[i]->getId()));
 		QString startZone = cardList[0]->getZone()->getName();
 		
 		switch (a->data().toInt()) {

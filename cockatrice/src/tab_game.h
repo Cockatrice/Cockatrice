@@ -138,6 +138,8 @@ signals:
 	void gameClosing(TabGame *tab);
 	void playerAdded(Player *player);
 	void playerRemoved(Player *player);
+	void containerProcessingStarted(GameEventContext *context);
+	void containerProcessingDone();
 private slots:
 	void newCardAdded(AbstractCardItem *card);
 	void showCardInfoPopup(const QPoint &pos, const QString &cardName);

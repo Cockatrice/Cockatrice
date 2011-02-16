@@ -3,6 +3,14 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
+CardToMove::CardToMove(int _cardId, const QString &_pt, bool _tapped)
+	: SerializableItem_Map("card_to_move")
+{
+	insertItem(new SerializableItem_Int("card_id", _cardId));
+	insertItem(new SerializableItem_String("pt", _pt));
+	insertItem(new SerializableItem_Bool("tapped", _tapped));
+}
+
 ServerInfo_User::ServerInfo_User(const QString &_name, int _userLevel, const QString &_realName, const QString &_country, const QByteArray &_avatarBmp)
 	: SerializableItem_Map("user")
 {

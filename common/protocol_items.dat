@@ -68,4 +68,5 @@
 6:concede
 6:deck_select:i,deck_id
 6:undo_draw
+6:move_card
 7:update_server_message

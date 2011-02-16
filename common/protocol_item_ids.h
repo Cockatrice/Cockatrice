@@ -69,6 +69,7 @@ ItemId_Context_ReadyStart = 1067,
 ItemId_Context_Concede = 1068,
 ItemId_Context_DeckSelect = 1069,
 ItemId_Context_UndoDraw = 1070,
-ItemId_Command_UpdateServerMessage = 1071,
-ItemId_Other = 1072
+ItemId_Context_MoveCard = 1071,
+ItemId_Command_UpdateServerMessage = 1072,
+ItemId_Other = 1073
 };

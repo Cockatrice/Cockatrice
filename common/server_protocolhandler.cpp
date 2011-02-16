@@ -510,8 +510,11 @@ ResponseCode Server_ProtocolHandler::cmdMulligan(Command_Mulligan * /*cmd*/, Com
 	int number = (hand->cards.size() <= 1) ? player->getInitialCards() : hand->cards.size() - 1;
 		
 	Server_CardZone *deck = player->getZones().value("deck");
-	while (!hand->cards.isEmpty())
-		player->moveCard(cont, hand, QList<int>() << hand->cards.first()->getId(), deck, 0, 0, false, false);
+	while (!hand->cards.isEmpty()) {
+		CardToMove *cardToMove = new CardToMove(hand->cards.first()->getId());
+		player->moveCard(cont, hand, QList<CardToMove *>() << cardToMove, deck, 0, 0, false);
+		delete cardToMove;
+	}
 
 	deck->shuffle();
 	cont->enqueueGameEventPrivate(new Event_Shuffle(player->getPlayerId()), game->getGameId());
@@ -569,12 +572,7 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, CommandC
 	if (player->getConceded())
 		return RespContextError;
 	
-	QList<int> cardIds;
-	const QList<CardId *> &temp = cmd->getCardIds();
-	for (int i = 0; i < temp.size(); ++i)
-		cardIds.append(temp[i]->getData());
-	
-	return player->moveCard(cont, cmd->getStartZone(), cardIds, cmd->getTargetPlayerId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown(), cmd->getTapped());
+	return player->moveCard(cont, cmd->getStartZone(), cmd->getCards(), cmd->getTargetPlayerId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown());
 }
 
 ResponseCode Server_ProtocolHandler::cmdFlipCard(Command_FlipCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)
@@ -678,8 +676,11 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 		for (int i = 0; i < attachedList.size(); ++i)
 			player->unattachCard(cont, attachedList[i]);
 		
-		if (targetzone->isColumnStacked(targetCard->getX(), targetCard->getY()))
-			targetPlayer->moveCard(cont, targetzone, QList<int>() << targetCard->getId(), targetzone, targetzone->getFreeGridColumn(-2, targetCard->getY(), targetCard->getName()), targetCard->getY(), targetCard->getFaceDown(), false);
+		if (targetzone->isColumnStacked(targetCard->getX(), targetCard->getY())) {
+			CardToMove *cardToMove = new CardToMove(targetCard->getId());
+			targetPlayer->moveCard(cont, targetzone, QList<CardToMove *>() << cardToMove, targetzone, targetzone->getFreeGridColumn(-2, targetCard->getY(), targetCard->getName()), targetCard->getY(), targetCard->getFaceDown());
+			delete cardToMove;
+		}
 		
 		card->setParentCard(targetCard);
 		card->setCoords(-1, card->getY());

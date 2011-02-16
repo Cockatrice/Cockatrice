@@ -116,6 +116,7 @@ private:
 	// XXX Move these out. They are only for processing inside the server.
 	ProtocolResponse *resp;
 	QList<ProtocolItem *> itemQueue;
+	GameEventContext *gameEventContext;
 	GameEventContainer *gameEventQueuePublic;
 	GameEventContainer *gameEventQueueOmniscient;
 	GameEventContainer *gameEventQueuePrivate;
@@ -222,15 +223,14 @@ public:
 class Command_MoveCard : public GameCommand {
 	Q_OBJECT
 public:
-	Command_MoveCard(int _gameId = -1, const QString &_startZone = QString(), const QList<CardId *> &_cardIds = QList<CardId *>(), int _targetPlayerId = -1, const QString &_targetZone = QString(), int _x = -1, int _y = -1, bool _faceDown = false, bool _tapped = false);
+	Command_MoveCard(int _gameId = -1, const QString &_startZone = QString(), const QList<CardToMove *> &_cards = QList<CardToMove *>(), int _targetPlayerId = -1, const QString &_targetZone = QString(), int _x = -1, int _y = -1, bool _faceDown = false);
 	QString getStartZone() const { return static_cast<SerializableItem_String *>(itemMap.value("start_zone"))->getData(); }
-	QList<CardId *> getCardIds() const { return typecastItemList<CardId *>(); }
+	QList<CardToMove *> getCards() const { return typecastItemList<CardToMove *>(); }
 	int getTargetPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("target_player_id"))->getData(); }
 	QString getTargetZone() const { return static_cast<SerializableItem_String *>(itemMap.value("target_zone"))->getData(); }
 	int getX() const { return static_cast<SerializableItem_Int *>(itemMap.value("x"))->getData(); }
 	int getY() const { return static_cast<SerializableItem_Int *>(itemMap.value("y"))->getData(); }
 	bool getFaceDown() const { return static_cast<SerializableItem_Bool *>(itemMap.value("face_down"))->getData(); }
-	bool getTapped() const { return static_cast<SerializableItem_Bool *>(itemMap.value("tapped"))->getData(); }
 	static SerializableItem *newItem() { return new Command_MoveCard; }
 	int getItemId() const { return ItemId_Command_MoveCard; }
 };

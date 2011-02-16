@@ -58,17 +58,17 @@ signals:
 	void logCreateToken(Player *player, QString cardName, QString pt);
 	void logDrawCards(Player *player, int number);
 	void logUndoDraw(Player *player, QString cardName);
-	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
+	void logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
 	void logFlipCard(Player *player, QString cardName, bool faceDown);
 	void logDestroyCard(Player *player, QString cardName);
 	void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);
 	void logUnattachCard(Player *player, QString cardName);
 	void logSetCardCounter(Player *player, QString cardName, int counterId, int value, int oldValue);
-	void logSetTapped(Player *player, QString cardName, bool tapped);
+	void logSetTapped(Player *player, CardItem *card, bool tapped);
 	void logSetCounter(Player *player, QString counterName, int value, int oldValue);
-	void logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap);
-	void logSetPT(Player *player, QString cardName, QString newPT);
-	void logSetAnnotation(Player *player, QString cardName, QString newAnnotation);
+	void logSetDoesntUntap(Player *player, CardItem *card, bool doesntUntap);
+	void logSetPT(Player *player, CardItem *card, QString newPT);
+	void logSetAnnotation(Player *player, CardItem *card, QString newAnnotation);
 	void logDumpZone(Player *player, CardZone *zone, int numberCards);
 	void logStopDumpZone(Player *player, CardZone *zone);
 	void logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer);
@@ -147,7 +147,7 @@ private:
 	HandZone *hand;
 	PlayerTarget *playerTarget;
 	
-	void setCardAttrHelper(CardItem *card, const QString &aname, const QString &avalue, bool allCards);
+	void setCardAttrHelper(GameEventContext *context, CardItem *card, const QString &aname, const QString &avalue, bool allCards);
 
 	QPixmap bgPixmap;
 	QRectF bRect;
@@ -164,7 +164,7 @@ private:
 	void eventCreateArrows(Event_CreateArrows *event);
 	void eventDeleteArrow(Event_DeleteArrow *event);
 	void eventCreateToken(Event_CreateToken *event);
-	void eventSetCardAttr(Event_SetCardAttr *event);
+	void eventSetCardAttr(Event_SetCardAttr *event, GameEventContext *context);
 	void eventSetCardCounter(Event_SetCardCounter *event);
 	void eventCreateCounters(Event_CreateCounters *event);
 	void eventSetCounter(Event_SetCounter *event);

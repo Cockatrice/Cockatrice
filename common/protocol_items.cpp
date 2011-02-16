@@ -422,6 +422,10 @@ Context_UndoDraw::Context_UndoDraw()
 	: GameEventContext("undo_draw")
 {
 }
+Context_MoveCard::Context_MoveCard()
+	: GameEventContext("move_card")
+{
+}
 Command_UpdateServerMessage::Command_UpdateServerMessage()
 	: AdminCommand("update_server_message")
 {
@@ -498,5 +502,6 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_event_contextconcede", Context_Concede::newItem);
 	itemNameHash.insert("game_event_contextdeck_select", Context_DeckSelect::newItem);
 	itemNameHash.insert("game_event_contextundo_draw", Context_UndoDraw::newItem);
+	itemNameHash.insert("game_event_contextmove_card", Context_MoveCard::newItem);
 	itemNameHash.insert("cmdupdate_server_message", Command_UpdateServerMessage::newItem);
 }

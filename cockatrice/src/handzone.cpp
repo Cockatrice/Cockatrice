@@ -39,9 +39,9 @@ void HandZone::addCardImpl(CardItem *card, int x, int /*y*/)
 
 void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
 {
-	QList<CardId *> idList;
+	QList<CardToMove *> idList;
 	for (int i = 0; i < dragItems.size(); ++i)
-		idList.append(new CardId(dragItems[i]->getId()));
+		idList.append(new CardToMove(dragItems[i]->getId()));
 
 	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), cards.size(), -1, false));
 }

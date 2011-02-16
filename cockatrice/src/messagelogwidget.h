@@ -11,14 +11,31 @@ class CardZone;
 class QMouseEvent;
 class QEvent;
 class CardInfoWidget;
+class GameEventContext;
+class CardItem;
+
+struct LogMoveCard {
+	Player *player;
+	CardItem *card;
+	CardZone *startZone;
+	int oldX;
+	CardZone *targetZone;
+	int newX;
+};
 
 class MessageLogWidget : public QTextEdit {
 	Q_OBJECT
 private:
+	enum MessageContext { MessageContext_None, MessageContext_MoveCard };
+	
 	CardInfoWidget *infoWidget;
 	QString sanitizeHtml(QString dirty) const;
 	QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position) const;
 	QString getCardNameUnderMouse(const QPoint &pos) const;
+	MessageContext currentContext;
+	QList<LogMoveCard> moveCardQueue;
+	QMap<CardItem *, QString> moveCardPT;
+	QMap<CardItem *, bool> moveCardTapped;
 signals:
 	void cardNameHovered(QString cardName);
 	void showCardInfoPopup(QPoint pos, QString cardName);
@@ -48,7 +65,8 @@ public slots:
 	void logRollDie(Player *player, int sides, int roll);
 	void logDrawCards(Player *player, int number);
 	void logUndoDraw(Player *player, QString cardName);
-	void logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
+	void doMoveCard(LogMoveCard &attributes);
+	void logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
 	void logFlipCard(Player *player, QString cardName, bool faceDown);
 	void logDestroyCard(Player *player, QString cardName);
 	void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);
@@ -56,16 +74,18 @@ public slots:
 	void logCreateToken(Player *player, QString cardName, QString pt);
 	void logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard, bool playerTarget);
 	void logSetCardCounter(Player *player, QString cardName, int counterId, int value, int oldValue);
-	void logSetTapped(Player *player, QString cardName, bool tapped);
+	void logSetTapped(Player *player, CardItem *card, bool tapped);
 	void logSetCounter(Player *player, QString counterName, int value, int oldValue);
-	void logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap);
-	void logSetPT(Player *player, QString cardName, QString newPT);
-	void logSetAnnotation(Player *player, QString cardName, QString newAnnotation);
+	void logSetDoesntUntap(Player *player, CardItem *card, bool doesntUntap);
+	void logSetPT(Player *player, CardItem *card, QString newPT);
+	void logSetAnnotation(Player *player, CardItem *card, QString newAnnotation);
 	void logDumpZone(Player *player, CardZone *zone, int numberCards);
 	void logStopDumpZone(Player *player, CardZone *zone);
 	void logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer);
 	void logSetActivePlayer(Player *player);
 	void logSetActivePhase(int phase);
+	void containerProcessingStarted(GameEventContext *context);
+	void containerProcessingDone();
 public:
 	void connectToPlayer(Player *player);
 	MessageLogWidget(QWidget *parent = 0);

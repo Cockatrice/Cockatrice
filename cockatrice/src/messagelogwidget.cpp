@@ -2,6 +2,7 @@
 #include "player.h"
 #include "cardzone.h"
 #include "cardinfowidget.h"
+#include "protocol_items.h"
 #include <QDebug>
 #include <QMouseEvent>
 #include <QTextBlock>
@@ -182,13 +183,14 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
 	return QPair<QString, QString>(cardName, fromStr);
 }
 
-void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *startZone, int oldX, CardZone *targetZone, int newX)
+void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
 {
-	QString startName = startZone->getName();
-	QString targetName = targetZone->getName();
-	if (((startName == "table") && (targetName == "table") && (startZone == targetZone)) || ((startName == "hand") && (targetName == "hand")))
+	QString startName = attributes.startZone->getName();
+	QString targetName = attributes.targetZone->getName();
+	if (((startName == "table") && (targetName == "table") && (attributes.startZone == attributes.targetZone)) || ((startName == "hand") && (targetName == "hand")))
 		return;
-	QPair<QString, QString> temp = getFromStr(startZone, cardName, oldX);
+	QString cardName = attributes.card->getName();
+	QPair<QString, QString> temp = getFromStr(attributes.startZone, cardName, attributes.oldX);
 	bool cardNameContainsStartZone = false;
 	if (!temp.first.isEmpty()) {
 		cardNameContainsStartZone = true;
@@ -203,26 +205,29 @@ void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *s
 	else
 		cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName));
 
-	if (startZone->getPlayer() != targetZone->getPlayer()) {
-		append(tr("%1 gives %2 control over %3.").arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(targetZone->getPlayer()->getName())).arg(cardStr));
+	if (attributes.startZone->getPlayer() != attributes.targetZone->getPlayer()) {
+		append(tr("%1 gives %2 control over %3.").arg(sanitizeHtml(attributes.player->getName())).arg(sanitizeHtml(attributes.targetZone->getPlayer()->getName())).arg(cardStr));
 		return;
 	}
 	
 	QString finalStr;
-	if (targetName == "table")
-		finalStr = tr("%1 puts %2 into play%3.");
-	else if (targetName == "grave")
+	if (targetName == "table") {
+		if (moveCardTapped.value(attributes.card))
+			finalStr = tr("%1 puts %2 into play tapped%3.");
+		else
+			finalStr = tr("%1 puts %2 into play%3.");
+	} else if (targetName == "grave")
 		finalStr = tr("%1 puts %2%3 into graveyard.");
 	else if (targetName == "rfg")
 		finalStr = tr("%1 exiles %2%3.");
 	else if (targetName == "hand")
 		finalStr = tr("%1 moves %2%3 to hand.");
 	else if (targetName == "deck") {
-		if (newX == -1)
+		if (attributes.newX == -1)
 			finalStr = tr("%1 puts %2%3 into his library.");
-		else if (newX == targetZone->getCards().size())
+		else if (attributes.newX == attributes.targetZone->getCards().size())
 			finalStr = tr("%1 puts %2%3 on bottom of his library.");
-		else if (newX == 0)
+		else if (attributes.newX == 0)
 			finalStr = tr("%1 puts %2%3 on top of his library.");
 		else
 			finalStr = tr("%1 puts %2%3 into his library at position %4.");
@@ -231,7 +236,16 @@ void MessageLogWidget::logMoveCard(Player *player, QString cardName, CardZone *s
 	else if (targetName == "stack")
 		finalStr = tr("%1 plays %2%3.");
 	
-	append(finalStr.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr).arg(newX));
+	append(finalStr.arg(sanitizeHtml(attributes.player->getName())).arg(cardStr).arg(fromStr).arg(attributes.newX));
+}
+
+void MessageLogWidget::logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX)
+{
+	LogMoveCard attributes = {player, card, startZone, oldX, targetZone, newX};
+	if (currentContext == MessageContext_MoveCard)
+		moveCardQueue.append(attributes);
+	else
+		doMoveCard(attributes);
 }
 
 void MessageLogWidget::logFlipCard(Player *player, QString cardName, bool faceDown)
@@ -301,14 +315,18 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
 	append(finalStr.arg(sanitizeHtml(player->getName())).arg(colorStr).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(value));
 }
 
-void MessageLogWidget::logSetTapped(Player *player, QString cardName, bool tapped)
+void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
 {
-	QString cardStr;
-	if (cardName == "-1")
-		cardStr = tr("his permanents");
-	else
-		cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName));
-	append(tr("%1 %2 %3.").arg(sanitizeHtml(player->getName())).arg(tapped ? tr("taps") : tr("untaps")).arg(cardStr));
+	if (currentContext == MessageContext_MoveCard)
+		moveCardTapped.insert(card, tapped);
+	else {
+		QString cardStr;
+		if (!card)
+			cardStr = tr("his permanents");
+		else
+			cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()));
+		append(tr("%1 %2 %3.").arg(sanitizeHtml(player->getName())).arg(tapped ? tr("taps") : tr("untaps")).arg(cardStr));
+	}
 }
 
 void MessageLogWidget::logSetCounter(Player *player, QString counterName, int value, int oldValue)
@@ -316,24 +334,27 @@ void MessageLogWidget::logSetCounter(Player *player, QString counterName, int va
 	append(tr("%1 sets counter %2 to %3 (%4%5).").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(counterName))).arg(QString("<font color=\"blue\">%1</font>").arg(value)).arg(value > oldValue ? "+" : "").arg(value - oldValue));
 }
 
-void MessageLogWidget::logSetDoesntUntap(Player *player, QString cardName, bool doesntUntap)
+void MessageLogWidget::logSetDoesntUntap(Player *player, CardItem *card, bool doesntUntap)
 {
 	QString finalStr;
 	if (doesntUntap)
 		finalStr = tr("%1 sets %2 to not untap normally.");
 	else
 		finalStr = tr("%1 sets %2 to untap normally.");
-	append(finalStr.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+	append(finalStr.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()))));
 }
 
-void MessageLogWidget::logSetPT(Player *player, QString cardName, QString newPT)
+void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
 {
-	append(tr("%1 sets PT of %2 to %3.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newPT))));
+	if (currentContext == MessageContext_MoveCard)
+		moveCardPT.insert(card, newPT);
+	else
+		append(tr("%1 sets PT of %2 to %3.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()))).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newPT))));
 }
 
-void MessageLogWidget::logSetAnnotation(Player *player, QString cardName, QString newAnnotation)
+void MessageLogWidget::logSetAnnotation(Player *player, CardItem *card, QString newAnnotation)
 {
-	append(tr("%1 sets annotation of %2 to %3.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newAnnotation))));
+	append(tr("%1 sets annotation of %2 to %3.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()))).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newAnnotation))));
 }
 
 void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCards)
@@ -412,6 +433,25 @@ void MessageLogWidget::logSetActivePhase(int phase)
 	append("<font color=\"green\"><b>" + tr("It is now the %1.").arg(phaseName) + "</b></font>");
 }
 
+void MessageLogWidget::containerProcessingStarted(GameEventContext *_context)
+{
+	if (qobject_cast<Context_MoveCard *>(_context))
+		currentContext = MessageContext_MoveCard;
+}
+
+void MessageLogWidget::containerProcessingDone()
+{
+	if (currentContext == MessageContext_MoveCard) {
+		for (int i = 0; i < moveCardQueue.size(); ++i)
+			doMoveCard(moveCardQueue[i]);
+		moveCardQueue.clear();
+		moveCardPT.clear();
+		moveCardTapped.clear();
+	}
+	
+	currentContext = MessageContext_None;
+}
+
 void MessageLogWidget::connectToPlayer(Player *player)
 {
 	connect(player, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));
@@ -421,11 +461,11 @@ void MessageLogWidget::connectToPlayer(Player *player)
 	connect(player, SIGNAL(logCreateToken(Player *, QString, QString)), this, SLOT(logCreateToken(Player *, QString, QString)));
 	connect(player, SIGNAL(logSetCounter(Player *, QString, int, int)), this, SLOT(logSetCounter(Player *, QString, int, int)));
 	connect(player, SIGNAL(logSetCardCounter(Player *, QString, int, int, int)), this, SLOT(logSetCardCounter(Player *, QString, int, int, int)));
-	connect(player, SIGNAL(logSetTapped(Player *, QString, bool)), this, SLOT(logSetTapped(Player *, QString, bool)));
-	connect(player, SIGNAL(logSetDoesntUntap(Player *, QString, bool)), this, SLOT(logSetDoesntUntap(Player *, QString, bool)));
-	connect(player, SIGNAL(logSetPT(Player *, QString, QString)), this, SLOT(logSetPT(Player *, QString, QString)));
-	connect(player, SIGNAL(logSetAnnotation(Player *, QString, QString)), this, SLOT(logSetAnnotation(Player *, QString, QString)));
-	connect(player, SIGNAL(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)), this, SLOT(logMoveCard(Player *, QString, CardZone *, int, CardZone *, int)));
+	connect(player, SIGNAL(logSetTapped(Player *, CardItem *, bool)), this, SLOT(logSetTapped(Player *, CardItem *, bool)));
+	connect(player, SIGNAL(logSetDoesntUntap(Player *, CardItem *, bool)), this, SLOT(logSetDoesntUntap(Player *, CardItem *, bool)));
+	connect(player, SIGNAL(logSetPT(Player *, CardItem *, QString)), this, SLOT(logSetPT(Player *, CardItem *, QString)));
+	connect(player, SIGNAL(logSetAnnotation(Player *, CardItem *, QString)), this, SLOT(logSetAnnotation(Player *, CardItem *, QString)));
+	connect(player, SIGNAL(logMoveCard(Player *, CardItem *, CardZone *, int, CardZone *, int)), this, SLOT(logMoveCard(Player *, CardItem *, CardZone *, int, CardZone *, int)));
 	connect(player, SIGNAL(logFlipCard(Player *, QString, bool)), this, SLOT(logFlipCard(Player *, QString, bool)));
 	connect(player, SIGNAL(logDestroyCard(Player *, QString)), this, SLOT(logDestroyCard(Player *, QString)));
 	connect(player, SIGNAL(logAttachCard(Player *, QString, Player *, QString)), this, SLOT(logAttachCard(Player *, QString, Player *, QString)));

@@ -28,7 +28,7 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("player_ping", ServerInfo_PlayerPing::newItem);
 	registerSerializableItem("file", DeckList_File::newItem);
 	registerSerializableItem("directory", DeckList_Directory::newItem);
-	registerSerializableItem("card_id", CardId::newItem);
+	registerSerializableItem("card_to_move", CardToMove::newItem);
 	registerSerializableItem("game_type_id", GameTypeId::newItem);
 	
 	registerSerializableItem("containercmd", CommandContainer::newItem);
@@ -224,7 +224,7 @@ QList<MoveCardToZone *> Command_SetSideboardPlan::getMoveList() const
 	return typecastItemList<MoveCardToZone *>();
 }
 
-Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, const QList<CardId *> &_cardIds, int _targetPlayerId, const QString &_targetZone, int _x, int _y, bool _faceDown, bool _tapped)
+Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, const QList<CardToMove *> &_cards, int _targetPlayerId, const QString &_targetZone, int _x, int _y, bool _faceDown)
 	: GameCommand("move_card", _gameId)
 {
 	insertItem(new SerializableItem_String("start_zone", _startZone));
@@ -233,10 +233,9 @@ Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, const
 	insertItem(new SerializableItem_Int("x", _x));
 	insertItem(new SerializableItem_Int("y", _y));
 	insertItem(new SerializableItem_Bool("face_down", _faceDown));
-	insertItem(new SerializableItem_Bool("tapped", _tapped));
 
-	for (int i = 0; i < _cardIds.size(); ++i)
-		itemList.append(_cardIds[i]);
+	for (int i = 0; i < _cards.size(); ++i)
+		itemList.append(_cards[i]);
 }
 
 QHash<QString, ResponseCode> ProtocolResponse::responseHash;

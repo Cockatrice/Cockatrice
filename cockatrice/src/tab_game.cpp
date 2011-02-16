@@ -391,6 +391,7 @@ void TabGame::processGameEventContainer(GameEventContainer *cont, AbstractClient
 {
 	const QList<GameEvent *> &eventList = cont->getEventList();
 	GameEventContext *context = cont->getContext();
+	messageLog->containerProcessingStarted(context);
 	for (int i = 0; i < eventList.size(); ++i) {
 		GameEvent *event = eventList[i];
 		
@@ -430,6 +431,7 @@ void TabGame::processGameEventContainer(GameEventContainer *cont, AbstractClient
 			}
 		}
 	}
+	messageLog->containerProcessingDone();
 }
 
 void TabGame::sendGameCommand(GameCommand *command, int playerId)

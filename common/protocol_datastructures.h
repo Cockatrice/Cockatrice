@@ -20,11 +20,15 @@ enum ResponseCode { RespNothing, RespOk, RespInvalidCommand, RespInvalidData, Re
 // list index, whereas cards in any other zone are referenced by their ids.
 enum ZoneType { PrivateZone, PublicZone, HiddenZone };
 
-class CardId : public SerializableItem_Int {
+class CardToMove : public SerializableItem_Map {
 public:
-	CardId(int _cardId = -1) : SerializableItem_Int("card_id", _cardId) { }
-	static SerializableItem *newItem() { return new CardId; }
+	CardToMove(int _cardId = -1, const QString &_pt = QString(), bool _tapped = false);
+	static SerializableItem *newItem() { return new CardToMove; }
+	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); }
+	QString getPT() const { return static_cast<SerializableItem_String *>(itemMap.value("pt"))->getData(); }
+	bool getTapped() const { return static_cast<SerializableItem_Bool *>(itemMap.value("tapped"))->getData(); }
 };
+
 class GameTypeId : public SerializableItem_Int {
 public:
 	GameTypeId(int _gameTypeId = -1) : SerializableItem_Int("game_type_id", _gameTypeId) { }

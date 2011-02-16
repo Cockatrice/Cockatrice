@@ -8,6 +8,7 @@
 #include "settingscache.h"
 #include "arrowitem.h"
 #include "carddragitem.h"
+#include "carddatabase.h"
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 	: SelectZone(_p, "table", true, false, true, parent), active(false)
@@ -92,11 +93,11 @@ void TableZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone
 
 void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &gridPoint, bool faceDown, bool tapped)
 {
-	QList<CardId *> idList;
+	QList<CardToMove *> idList;
 	for (int i = 0; i < dragItems.size(); ++i)
-		idList.append(new CardId(dragItems[i]->getId()));
+		idList.append(new CardToMove(dragItems[i]->getId(), startZone->getName() == name ? QString() : dragItems[i]->getItem()->getInfo()->getPowTough(), tapped));
 	
-	startZone->getPlayer()->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), gridPoint.x(), gridPoint.y(), faceDown, tapped));
+	startZone->getPlayer()->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), gridPoint.x(), gridPoint.y(), faceDown));
 }
 
 void TableZone::reorganizeCards()

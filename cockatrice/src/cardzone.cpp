@@ -171,9 +171,9 @@ void CardZone::moveAllToZone()
 	QString targetZone = data[0].toString();
 	int targetX = data[1].toInt();
 
-	QList<CardId *> idList;
+	QList<CardToMove *> idList;
 	for (int i = 0; i < cards.size(); ++i)
-		idList.append(new CardId(cards[i]->getId()));
+		idList.append(new CardToMove(cards[i]->getId()));
 	
 	player->sendGameCommand(new Command_MoveCard(-1, getName(), idList, player->getId(), targetZone, targetX));
 }

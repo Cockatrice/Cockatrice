@@ -634,6 +634,13 @@ public:
 	static SerializableItem *newItem() { return new Context_UndoDraw; }
 	int getItemId() const { return ItemId_Context_UndoDraw; }
 };
+class Context_MoveCard : public GameEventContext {
+	Q_OBJECT
+public:
+	Context_MoveCard();
+	static SerializableItem *newItem() { return new Context_MoveCard; }
+	int getItemId() const { return ItemId_Context_MoveCard; }
+};
 class Command_UpdateServerMessage : public AdminCommand {
 	Q_OBJECT
 public:
