@@ -436,21 +436,25 @@ ResponseCode Server_Player::setCardAttrHelper(CommandContainer *cont, const QStr
 	if (!zone->hasCoords())
 		return RespContextError;
 
+	QString result;
 	if (cardId == -1) {
 		QListIterator<Server_Card *> CardIterator(zone->cards);
-		while (CardIterator.hasNext())
-			if (!CardIterator.next()->setAttribute(attrName, attrValue, true))
+		while (CardIterator.hasNext()) {
+			result = CardIterator.next()->setAttribute(attrName, attrValue, true);
+			if (result.isNull())
 				return RespInvalidCommand;
+		}
 	} else {
 		Server_Card *card = zone->getCard(cardId, false);
 		if (!card)
 			return RespNameNotFound;
-		if (!card->setAttribute(attrName, attrValue, false))
+		result = card->setAttribute(attrName, attrValue, false);
+		if (result.isNull())
 			return RespInvalidCommand;
 	}
-	cont->enqueueGameEventPrivate(new Event_SetCardAttr(getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
-	cont->enqueueGameEventPublic(new Event_SetCardAttr(getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
-	cont->enqueueGameEventOmniscient(new Event_SetCardAttr(getPlayerId(), zone->getName(), cardId, attrName, attrValue), game->getGameId());
+	cont->enqueueGameEventPrivate(new Event_SetCardAttr(getPlayerId(), zone->getName(), cardId, attrName, result), game->getGameId());
+	cont->enqueueGameEventPublic(new Event_SetCardAttr(getPlayerId(), zone->getName(), cardId, attrName, result), game->getGameId());
+	cont->enqueueGameEventOmniscient(new Event_SetCardAttr(getPlayerId(), zone->getName(), cardId, attrName, result), game->getGameId());
 	return RespOk;
 }
 

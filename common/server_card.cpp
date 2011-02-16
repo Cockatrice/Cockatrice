@@ -20,7 +20,7 @@
 #include "server_card.h"
 
 Server_Card::Server_Card(QString _name, int _id, int _coord_x, int _coord_y)
-	: id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), tapped(false), attacking(false), facedown(false), color(QString()), pt(QString()), annotation(QString()), destroyOnZoneChange(false), doesntUntap(false), parentCard(0)
+	: id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), tapped(false), attacking(false), facedown(false), color(QString()), power(-1), toughness(-1), annotation(QString()), destroyOnZoneChange(false), doesntUntap(false), parentCard(0)
 {
 }
 
@@ -39,12 +39,13 @@ void Server_Card::resetState()
 	counters.clear();
 	setTapped(false);
 	setAttacking(false);
-	setPT(QString());
+	power = 0;
+	toughness = 0;
 	setAnnotation(QString());
 	setDoesntUntap(false);
 }
 
-bool Server_Card::setAttribute(const QString &aname, const QString &avalue, bool allCards)
+QString Server_Card::setAttribute(const QString &aname, const QString &avalue, bool allCards)
 {
 	if (aname == "tapped") {
 		bool value = avalue == "1";
@@ -58,14 +59,15 @@ bool Server_Card::setAttribute(const QString &aname, const QString &avalue, bool
 		setColor(avalue);
 	} else if (aname == "pt") {
 		setPT(avalue);
+		return getPT();
 	} else if (aname == "annotation") {
 		setAnnotation(avalue);
 	} else if (aname == "doesnt_untap") {
 		setDoesntUntap(avalue == "1");
 	} else
-		return false;
+		return QString();
 	
-	return true;
+	return avalue;
 }
 
 void Server_Card::setCounter(int id, int value)
@@ -74,6 +76,36 @@ void Server_Card::setCounter(int id, int value)
 		counters.insert(id, value);
 	else
 		counters.remove(id);
+}
+
+void Server_Card::setPT(const QString &_pt)
+{
+	int sep = _pt.indexOf('/');
+	QString p1 = _pt.left(sep);
+	QString p2 = _pt.mid(sep + 1);
+	if (p1.isEmpty() || p2.isEmpty())
+		return;
+	if ((p1[0] == '+') || (p2[0] == '+')) {
+		if (power < 0)
+			power = 0;
+		if (toughness < 0)
+			toughness = 0;
+	}
+	if (p1[0] == '+')
+		power += p1.mid(1).toInt();
+	else
+		power = p1.toInt();
+	if (p2[0] == '+')
+		toughness += p2.mid(1).toInt();
+	else
+		toughness = p2.toInt();
+}
+
+QString Server_Card::getPT() const
+{
+	if (toughness < 0)
+		return QString("");
+	return QString::number(power) + "/" + QString::number(toughness);
 }
 
 void Server_Card::setParentCard(Server_Card *_parentCard)

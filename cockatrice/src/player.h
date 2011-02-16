@@ -99,6 +99,7 @@ public slots:
 
 	void actAttach(QAction *action);
 	void actUnattach(QAction *action);
+	void actIncPT(int deltaP, int deltaT);
 	void actSetPT(QAction *action);
 	void actSetAnnotation(QAction *action);
 	void cardMenuAction(QAction *action);

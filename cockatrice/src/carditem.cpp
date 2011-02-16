@@ -34,6 +34,18 @@ CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _reve
 	connect(aAttach, SIGNAL(triggered()), this, SLOT(actAttach()));
 	aUnattach = new QAction(this);
 	connect(aUnattach, SIGNAL(triggered()), this, SLOT(actUnattach()));
+	aIncP = new QAction(this);
+	connect(aIncP, SIGNAL(triggered()), this, SLOT(actIncP()));
+	aDecP = new QAction(this);
+	connect(aDecP, SIGNAL(triggered()), this, SLOT(actDecP()));
+	aIncT = new QAction(this);
+	connect(aIncT, SIGNAL(triggered()), this, SLOT(actIncT()));
+	aDecT = new QAction(this);
+	connect(aDecT, SIGNAL(triggered()), this, SLOT(actDecT()));
+	aIncPT = new QAction(this);
+	connect(aIncPT, SIGNAL(triggered()), this, SLOT(actIncPT()));
+	aDecPT = new QAction(this);
+	connect(aDecPT, SIGNAL(triggered()), this, SLOT(actDecPT()));
 	aSetPT = new QAction(this);
 	connect(aSetPT, SIGNAL(triggered()), this, SLOT(actSetPT()));
 	aSetAnnotation = new QAction(this);
@@ -77,6 +89,17 @@ CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _reve
 		connect(tempSetCounter, SIGNAL(triggered()), this, SLOT(actCardCounterTrigger()));
 	}
 	cardMenu = new QMenu;
+	ptMenu = new QMenu;
+	ptMenu->addAction(aIncP);
+	ptMenu->addAction(aDecP);
+	ptMenu->addSeparator();
+	ptMenu->addAction(aIncT);
+	ptMenu->addAction(aDecT);
+	ptMenu->addSeparator();
+	ptMenu->addAction(aIncPT);
+	ptMenu->addAction(aDecPT);
+	ptMenu->addSeparator();
+	ptMenu->addAction(aSetPT);
 	moveMenu = new QMenu;
 	
 	retranslateUi();
@@ -144,7 +167,7 @@ void CardItem::updateCardMenu()
 				if (attachedTo)
 					cardMenu->addAction(aUnattach);
 				cardMenu->addSeparator();
-				cardMenu->addAction(aSetPT);
+				cardMenu->addMenu(ptMenu);
 				cardMenu->addAction(aSetAnnotation);
 				cardMenu->addSeparator();
 				cardMenu->addAction(aClone);
@@ -180,10 +203,25 @@ void CardItem::retranslateUi()
 	aDoesntUntap->setText(tr("Toggle &normal untapping"));
 	aFlip->setText(tr("&Flip"));
 	aClone->setText(tr("&Clone"));
+	aClone->setShortcut(tr("Ctrl+H"));
 	aAttach->setText(tr("&Attach to card..."));
 	aAttach->setShortcut(tr("Ctrl+A"));
 	aUnattach->setText(tr("Unattac&h"));
-	aSetPT->setText(tr("Set &P/T..."));
+	ptMenu->setTitle(tr("&Power / toughness"));
+	aIncP->setText(tr("&Increase power"));
+	aIncP->setShortcut(tr("Ctrl++"));
+	aDecP->setText(tr("&Decrease power"));
+	aDecP->setShortcut(tr("Ctrl+-"));
+	aIncT->setText(tr("I&ncrease toughness"));
+	aIncT->setShortcut(tr("Alt++"));
+	aDecT->setText(tr("D&ecrease toughness"));
+	aDecT->setShortcut(tr("Alt+-"));
+	aIncPT->setText(tr("In&crease power and toughness"));
+	aIncPT->setShortcut(tr("Ctrl+Alt++"));
+	aDecPT->setText(tr("Dec&rease power and toughness"));
+	aDecPT->setShortcut(tr("Ctrl+Alt+-"));
+	aSetPT->setText(tr("Set &power and toughness..."));
+	aSetPT->setShortcut(tr("Ctrl+P"));
 	aSetAnnotation->setText(tr("&Set annotation..."));
 	QStringList counterColors;
 	counterColors.append(tr("red"));
@@ -219,17 +257,30 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		paintNumberEllipse(counterIterator.value(), 14, color, i, counters.size(), painter);
 		++i;
 	}
+	
+	QSizeF translatedSize = getTranslatedSize(painter);
+	qreal scaleFactor = translatedSize.width() / boundingRect().width();
+	
 	if (!pt.isEmpty()) {
 		painter->save();
-		QSizeF translatedSize = getTranslatedSize(painter);
-
-		qreal scaleFactor = translatedSize.width() / boundingRect().width();
+		
 		transformPainter(painter, translatedSize, tapAngle);
 		painter->setBackground(Qt::black);
 		painter->setBackgroundMode(Qt::OpaqueMode);
 		painter->setPen(Qt::white);
 		
 		painter->drawText(QRectF(4 * scaleFactor, 4 * scaleFactor, translatedSize.width() - 8 * scaleFactor, translatedSize.height() - 8 * scaleFactor), Qt::AlignRight | Qt::AlignBottom, pt);
+		painter->restore();
+	}
+	if (!annotation.isEmpty()) {
+		painter->save();
+
+		transformPainter(painter, translatedSize, tapAngle);
+		painter->setBackground(Qt::black);
+		painter->setBackgroundMode(Qt::OpaqueMode);
+		painter->setPen(Qt::white);
+		
+		painter->drawText(QRectF(4 * scaleFactor, 4 * scaleFactor, translatedSize.width() - 8 * scaleFactor, translatedSize.height() - 8 * scaleFactor), Qt::AlignCenter | Qt::TextWrapAnywhere, annotation);
 		painter->restore();
 	}
 	if (getBeingPointedAt())
@@ -263,7 +314,6 @@ void CardItem::setCounter(int _id, int _value)
 void CardItem::setAnnotation(const QString &_annotation)
 {
 	annotation = _annotation;
-	setToolTip(annotation);
 	update();
 }
 
@@ -475,6 +525,36 @@ void CardItem::actAttach()
 void CardItem::actUnattach()
 {
 	owner->actUnattach(static_cast<QAction *>(sender()));
+}
+
+void CardItem::actIncP()
+{
+	owner->actIncPT(1, 0);
+}
+
+void CardItem::actDecP()
+{
+	owner->actIncPT(-1, 0);
+}
+
+void CardItem::actIncT()
+{
+	owner->actIncPT(0, 1);
+}
+
+void CardItem::actDecT()
+{
+	owner->actIncPT(0, -1);
+}
+
+void CardItem::actIncPT()
+{
+	owner->actIncPT(1, 1);
+}
+
+void CardItem::actDecPT()
+{
+	owner->actIncPT(-1, -1);
 }
 
 void CardItem::actSetPT()

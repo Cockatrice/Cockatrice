@@ -191,7 +191,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 					else if (v1 == "Type:")
 						cardType = v2.simplified();
 					else if (v1 == "Pow/Tgh:")
-						cardPT = v2.simplified();
+						cardPT = v2.simplified().remove('(').remove(')');
 					else if (v1 == "Rules Text:")
 						cardText = v2.trimmed();
 				}

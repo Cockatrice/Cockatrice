@@ -1365,6 +1365,16 @@ void Player::cardMenuAction(QAction *a)
 	sendCommandContainer(new CommandContainer(commandList));
 }
 
+void Player::actIncPT(int deltaP, int deltaT)
+{
+	QString ptString = "+" + QString::number(deltaP) + "/+" + QString::number(deltaT);
+	QListIterator<QGraphicsItem *> j(scene()->selectedItems());
+	while (j.hasNext()) {
+		CardItem *card = static_cast<CardItem *>(j.next());
+		sendGameCommand(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "pt", ptString));
+	}
+}
+
 void Player::actSetPT(QAction * /*a*/)
 {
 	QString oldPT;

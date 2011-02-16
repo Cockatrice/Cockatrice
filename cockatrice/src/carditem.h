@@ -33,9 +33,9 @@ private:
 	QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
 	QAction *aPlay,
 		*aHide,
-		*aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aSetPT, *aSetAnnotation, *aFlip, *aClone,
+		*aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aSetPT, *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aSetAnnotation, *aFlip, *aClone,
 		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile;
-	QMenu *cardMenu, *moveMenu;
+	QMenu *cardMenu, *ptMenu, *moveMenu;
 
 	void playCard(bool faceDown);
 	void prepareDelete();
@@ -45,6 +45,12 @@ private slots:
 	void actAttach();
 	void actUnattach();
 	void actSetPT();
+	void actIncP();
+	void actDecP();
+	void actIncT();
+	void actDecT();
+	void actIncPT();
+	void actDecPT();
 	void actSetAnnotation();
 	void actPlay();
 	void actHide();

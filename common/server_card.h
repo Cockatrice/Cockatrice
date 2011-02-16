@@ -38,7 +38,7 @@ private:
 	bool attacking;
 	bool facedown;
 	QString color;
-	QString pt;
+	int power, toughness;
 	QString annotation;
 	bool destroyOnZoneChange;
 	bool doesntUntap;
@@ -62,7 +62,7 @@ public:
 	bool getAttacking() const { return attacking; }
 	bool getFaceDown() const { return facedown; }
 	QString getColor() const { return color; }
-	QString getPT() const { return pt; }
+	QString getPT() const;
 	QString getAnnotation() const { return annotation; }
 	bool getDoesntUntap() const { return doesntUntap; }
 	bool getDestroyOnZoneChange() const { return destroyOnZoneChange; }
@@ -77,7 +77,7 @@ public:
 	void setAttacking(bool _attacking) { attacking = _attacking; }
 	void setFaceDown(bool _facedown) { facedown = _facedown; }
 	void setColor(const QString &_color) { color = _color; }
-	void setPT(const QString &_pt) { pt = _pt; }
+	void setPT(const QString &_pt);
 	void setAnnotation(const QString &_annotation) { annotation = _annotation; }
 	void setDestroyOnZoneChange(bool _destroy) { destroyOnZoneChange = _destroy; }
 	void setDoesntUntap(bool _doesntUntap) { doesntUntap = _doesntUntap; }
@@ -86,7 +86,7 @@ public:
 	void removeAttachedCard(Server_Card *card) { attachedCards.removeAt(attachedCards.indexOf(card)); }
 	
 	void resetState();
-	bool setAttribute(const QString &aname, const QString &avalue, bool allCards);
+	QString setAttribute(const QString &aname, const QString &avalue, bool allCards);
 };
 
 #endif
