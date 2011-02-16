@@ -218,122 +218,201 @@
 <context>
     <name>CardItem</name>
     <message>
-        <location filename="../src/carditem.cpp" line="175"/>
+        <location filename="../src/carditem.cpp" line="198"/>
         <source>&amp;Play</source>
         <translation>&amp;Ausspielen</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="176"/>
+        <location filename="../src/carditem.cpp" line="199"/>
         <source>&amp;Hide</source>
         <translation>&amp;Verstecken</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="178"/>
+        <location filename="../src/carditem.cpp" line="201"/>
         <source>&amp;Tap</source>
         <translation>&amp;Tappen</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="179"/>
+        <location filename="../src/carditem.cpp" line="202"/>
         <source>&amp;Untap</source>
         <translation>E&amp;nttappen</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="180"/>
+        <location filename="../src/carditem.cpp" line="203"/>
         <source>Toggle &amp;normal untapping</source>
         <translation>N&amp;ormales Enttappen umschalten</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="181"/>
+        <location filename="../src/carditem.cpp" line="204"/>
         <source>&amp;Flip</source>
         <translation>&amp;Umdrehen</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="182"/>
+        <location filename="../src/carditem.cpp" line="205"/>
         <source>&amp;Clone</source>
         <translation>&amp;Kopieren</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="183"/>
+        <location filename="../src/carditem.cpp" line="206"/>
+        <source>Ctrl+H</source>
+        <translation>Ctrl+H</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="207"/>
         <source>&amp;Attach to card...</source>
         <translation>&amp;An Karte anlegen...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="184"/>
+        <location filename="../src/carditem.cpp" line="208"/>
         <source>Ctrl+A</source>
         <translation>Ctrl+A</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="185"/>
+        <location filename="../src/carditem.cpp" line="209"/>
         <source>Unattac&amp;h</source>
         <translation>&amp;Von Karte lösen</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="186"/>
         <source>Set &amp;P/T...</source>
+        <translation type="obsolete">&amp;Kampfwerte setzen...</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="210"/>
+        <source>&amp;Power / toughness</source>
+        <translation>&amp;Kampfwerte</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="211"/>
+        <source>&amp;Increase power</source>
+        <translation>&amp;Stärke erhöhen</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="212"/>
+        <source>Ctrl++</source>
+        <translation>Ctrl++</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="213"/>
+        <source>&amp;Decrease power</source>
+        <translation>S&amp;tärke senken</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="214"/>
+        <source>Ctrl+-</source>
+        <translation>Ctrl+-</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="215"/>
+        <source>I&amp;ncrease toughness</source>
+        <translation>&amp;Widerstandskraft erhöhen</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="216"/>
+        <source>Alt++</source>
+        <translation>Alt++</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="217"/>
+        <source>D&amp;ecrease toughness</source>
+        <translation>W&amp;iderstandskraft senken</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="218"/>
+        <source>Alt+-</source>
+        <translation>Alt+-</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="219"/>
+        <source>In&amp;crease power and toughness</source>
+        <translation>Stärke und Widerstandskraft &amp;erhöhen</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="220"/>
+        <source>Ctrl+Alt++</source>
+        <translation>Ctrl+Alt++</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="221"/>
+        <source>Dec&amp;rease power and toughness</source>
+        <translation>Stärke und Widerstandskraft s&amp;enken</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="222"/>
+        <source>Ctrl+Alt+-</source>
+        <translation>Ctrl+Alt+-</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="223"/>
+        <source>Set &amp;power and toughness...</source>
         <translation>&amp;Kampfwerte setzen...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="187"/>
+        <location filename="../src/carditem.cpp" line="224"/>
+        <source>Ctrl+P</source>
+        <translation>Ctrl+P</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="225"/>
         <source>&amp;Set annotation...</source>
         <translation>&amp;Hinweis setzen...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="189"/>
+        <location filename="../src/carditem.cpp" line="227"/>
         <source>red</source>
         <translation>rot</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="190"/>
+        <location filename="../src/carditem.cpp" line="228"/>
         <source>yellow</source>
         <translation>gelb</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="191"/>
+        <location filename="../src/carditem.cpp" line="229"/>
         <source>green</source>
         <translation>grün</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="193"/>
+        <location filename="../src/carditem.cpp" line="231"/>
         <source>&amp;Add counter (%1)</source>
         <translation>Zählmarke &amp;hinzufügen (%1)</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="195"/>
+        <location filename="../src/carditem.cpp" line="233"/>
         <source>&amp;Remove counter (%1)</source>
         <translation>Zählmarke &amp;entfernen (%1)</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="197"/>
+        <location filename="../src/carditem.cpp" line="235"/>
         <source>&amp;Set counters (%1)...</source>
         <translation>Zählmarken &amp;setzen (%1)...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="198"/>
+        <location filename="../src/carditem.cpp" line="236"/>
         <source>&amp;top of library</source>
         <translation>&amp;auf die Bibliothek</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="199"/>
+        <location filename="../src/carditem.cpp" line="237"/>
         <source>&amp;bottom of library</source>
         <translation>&amp;unter die Bibliothek</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="200"/>
+        <location filename="../src/carditem.cpp" line="238"/>
         <source>&amp;graveyard</source>
         <translation>in den &amp;Friedhof</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="201"/>
+        <location filename="../src/carditem.cpp" line="239"/>
         <source>Ctrl+Del</source>
         <translation>Ctrl+Del</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="202"/>
+        <location filename="../src/carditem.cpp" line="240"/>
         <source>&amp;exile</source>
         <translation>ins &amp;Exil</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="204"/>
+        <location filename="../src/carditem.cpp" line="242"/>
         <source>&amp;Move to</source>
         <translation>&amp;Verschieben</translation>
     </message>
@@ -1860,22 +1939,22 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
 <context>
     <name>MessageLogWidget</name>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="19"/>
+        <location filename="../src/messagelogwidget.cpp" line="20"/>
         <source>Connecting to %1...</source>
         <translation>Verbinde zu %1...</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="24"/>
+        <location filename="../src/messagelogwidget.cpp" line="25"/>
         <source>Connected.</source>
         <translation>Verbunden.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="29"/>
+        <location filename="../src/messagelogwidget.cpp" line="30"/>
         <source>Disconnected from server.</source>
         <translation>Verbindung zum Server getrennt.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="40"/>
+        <location filename="../src/messagelogwidget.cpp" line="41"/>
         <source>Invalid password.</source>
         <translation>Ungültiges Passwort.</translation>
     </message>
@@ -1916,8 +1995,8 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">%1 zieht %2 Karten</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="202"/>
-        <location filename="../src/messagelogwidget.cpp" line="367"/>
+        <location filename="../src/messagelogwidget.cpp" line="204"/>
+        <location filename="../src/messagelogwidget.cpp" line="388"/>
         <source>a card</source>
         <translation>eine Karte</translation>
     </message>
@@ -1974,12 +2053,12 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">%1s Sideboard</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="110"/>
+        <location filename="../src/messagelogwidget.cpp" line="111"/>
         <source>The game has started.</source>
         <translation>Das Spiel hat begonnen.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="125"/>
+        <location filename="../src/messagelogwidget.cpp" line="126"/>
         <source>%1 shuffles his library.</source>
         <translation>%1 mischt seine Bibliothek.</translation>
     </message>
@@ -1996,72 +2075,72 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">Protokollversion stimmt nicht überein.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="47"/>
+        <location filename="../src/messagelogwidget.cpp" line="48"/>
         <source>Protocol version mismatch. Client: %1, Server: %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="52"/>
+        <location filename="../src/messagelogwidget.cpp" line="53"/>
         <source>Protocol error.</source>
         <translation>Protokollfehler.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="57"/>
+        <location filename="../src/messagelogwidget.cpp" line="58"/>
         <source>You have joined game #%1.</source>
         <translation>Sie sind dem Spiel %1 beigetreten.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="62"/>
+        <location filename="../src/messagelogwidget.cpp" line="63"/>
         <source>%1 has joined the game.</source>
         <translation>%1 ist dem Spiel beigetreten.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="67"/>
+        <location filename="../src/messagelogwidget.cpp" line="68"/>
         <source>%1 has left the game.</source>
         <translation>%1 hat das Spiel verlassen.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="72"/>
+        <location filename="../src/messagelogwidget.cpp" line="73"/>
         <source>The game has been closed.</source>
         <translation>Das Spiel wurde geschlossen.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="77"/>
+        <location filename="../src/messagelogwidget.cpp" line="78"/>
         <source>%1 is now watching the game.</source>
         <translation>%1 schaut nun dem Spiel zu.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="82"/>
+        <location filename="../src/messagelogwidget.cpp" line="83"/>
         <source>%1 is not watching the game any more.</source>
         <translation>%1 schaut dem Spiel nicht mehr zu.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="88"/>
+        <location filename="../src/messagelogwidget.cpp" line="89"/>
         <source>%1 has loaded a local deck.</source>
         <translation>%1 hat ein lokales Deck geladen.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="90"/>
+        <location filename="../src/messagelogwidget.cpp" line="91"/>
         <source>%1 has loaded deck #%2.</source>
         <translation>%1 hat das Deck Nr. %2 geladen.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="95"/>
+        <location filename="../src/messagelogwidget.cpp" line="96"/>
         <source>%1 is ready to start the game.</source>
         <translation>%1 ist bereit, das Spiel zu starten.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="100"/>
+        <location filename="../src/messagelogwidget.cpp" line="101"/>
         <source>%1 is not ready to start the game any more.</source>
         <translation>%1 ist nicht mehr bereit, das Spiel zu starten.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="105"/>
+        <location filename="../src/messagelogwidget.cpp" line="106"/>
         <source>%1 has conceded the game.</source>
         <translation>%1 hat das Spiel aufgegeben.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="130"/>
+        <location filename="../src/messagelogwidget.cpp" line="131"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
         <translation>%1 würfelt eine %2 mit einem %3-seitigen Würfel.</translation>
     </message>
@@ -2074,7 +2153,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">%1 zieht %2 Karten.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="135"/>
+        <location filename="../src/messagelogwidget.cpp" line="136"/>
         <source>%1 draws %n card(s).</source>
         <translation>
             <numerusform>%1 zieht eine Karte.</numerusform>
@@ -2082,162 +2161,167 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="141"/>
+        <location filename="../src/messagelogwidget.cpp" line="142"/>
         <source>%1 undoes his last draw.</source>
         <translation>%1 legt die zuletzt gezogene Karte zurück.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="143"/>
+        <location filename="../src/messagelogwidget.cpp" line="144"/>
         <source>%1 undoes his last draw (%2).</source>
         <translation>%1 legt die zuletzt gezogene Karte zurück (%2).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="153"/>
+        <location filename="../src/messagelogwidget.cpp" line="154"/>
         <source> from table</source>
         <translation> vom Spielfeld</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="155"/>
+        <location filename="../src/messagelogwidget.cpp" line="156"/>
         <source> from graveyard</source>
         <translation> aus dem Friedhof</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="157"/>
+        <location filename="../src/messagelogwidget.cpp" line="158"/>
         <source> from exile</source>
         <translation> aus dem Exil</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="159"/>
+        <location filename="../src/messagelogwidget.cpp" line="160"/>
         <source> from hand</source>
         <translation> von der Hand</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="163"/>
+        <location filename="../src/messagelogwidget.cpp" line="164"/>
         <source>the bottom card of his library</source>
         <translation>die unterste Karte seiner Bibliothek</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="166"/>
+        <location filename="../src/messagelogwidget.cpp" line="167"/>
         <source> from the bottom of his library</source>
         <translation>, die unterste Karte seiner Bibliothek,</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="169"/>
+        <location filename="../src/messagelogwidget.cpp" line="170"/>
         <source>the top card of his library</source>
         <translation>die oberste Karte seiner Bibliothek</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="172"/>
+        <location filename="../src/messagelogwidget.cpp" line="173"/>
         <source> from the top of his library</source>
         <translation>, die oberste Karte seiner Bibliothek,</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="174"/>
+        <location filename="../src/messagelogwidget.cpp" line="175"/>
         <source> from library</source>
         <translation> aus der Bibliothek</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="176"/>
+        <location filename="../src/messagelogwidget.cpp" line="177"/>
         <source> from sideboard</source>
         <translation> aus dem Sideboard</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="178"/>
+        <location filename="../src/messagelogwidget.cpp" line="179"/>
         <source> from the stack</source>
         <translation> vom Stapel</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="207"/>
+        <location filename="../src/messagelogwidget.cpp" line="209"/>
         <source>%1 gives %2 control over %3.</source>
         <translation>%1 überlässt %2 die Kontrolle über %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="213"/>
+        <location filename="../src/messagelogwidget.cpp" line="216"/>
+        <source>%1 puts %2 into play tapped%3.</source>
+        <translation>%1 bringt %2 getappt%3 ins Spiel.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="218"/>
         <source>%1 puts %2 into play%3.</source>
         <translation>%1 bringt %2%3 ins Spiel.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="215"/>
+        <location filename="../src/messagelogwidget.cpp" line="220"/>
         <source>%1 puts %2%3 into graveyard.</source>
         <translation>%1 legt %2%3 auf den Friedhof.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="217"/>
+        <location filename="../src/messagelogwidget.cpp" line="222"/>
         <source>%1 exiles %2%3.</source>
         <translation>%1 schickt %2%3 ins Exil.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="219"/>
+        <location filename="../src/messagelogwidget.cpp" line="224"/>
         <source>%1 moves %2%3 to hand.</source>
         <translation>%1 nimmt %2%3 auf die Hand.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="222"/>
+        <location filename="../src/messagelogwidget.cpp" line="227"/>
         <source>%1 puts %2%3 into his library.</source>
         <translation>%1 legt %2%3 in seine Bibliothek.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="224"/>
+        <location filename="../src/messagelogwidget.cpp" line="229"/>
         <source>%1 puts %2%3 on bottom of his library.</source>
         <translation>%1 legt %2%3 unter seine Bibliothek.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="226"/>
+        <location filename="../src/messagelogwidget.cpp" line="231"/>
         <source>%1 puts %2%3 on top of his library.</source>
         <translation>%1 legt %2%3 auf die Bibliothek.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="228"/>
+        <location filename="../src/messagelogwidget.cpp" line="233"/>
         <source>%1 puts %2%3 into his library at position %4.</source>
         <translation>%1 legt %2%3 in seine Bibliothek an %4. Stelle.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="230"/>
+        <location filename="../src/messagelogwidget.cpp" line="235"/>
         <source>%1 moves %2%3 to sideboard.</source>
         <translation>%1 legt %2%3 in sein Sideboard.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="232"/>
+        <location filename="../src/messagelogwidget.cpp" line="237"/>
         <source>%1 plays %2%3.</source>
         <translation>%1 spielt %2%3 aus.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="240"/>
+        <location filename="../src/messagelogwidget.cpp" line="254"/>
         <source>%1 flips %2 face-down.</source>
         <translation>%1 wendet %2 auf die Rückseite.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="242"/>
+        <location filename="../src/messagelogwidget.cpp" line="256"/>
         <source>%1 flips %2 face-up.</source>
         <translation>%1 wendet %2 auf die Vorderseite.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="247"/>
+        <location filename="../src/messagelogwidget.cpp" line="261"/>
         <source>%1 destroys %2.</source>
         <translation>%1 zerstört %2.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="252"/>
+        <location filename="../src/messagelogwidget.cpp" line="266"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <translation>%1 legt %2 an %3s %4 an.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="257"/>
+        <location filename="../src/messagelogwidget.cpp" line="271"/>
         <source>%1 unattaches %2.</source>
         <translation>%1 löst %2 ab.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="262"/>
+        <location filename="../src/messagelogwidget.cpp" line="276"/>
         <source>%1 creates token: %2%3.</source>
         <translation>%1 erstellt Token: %2%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="268"/>
+        <location filename="../src/messagelogwidget.cpp" line="282"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <translation>%1 zeigt von %2s %3 auf %4.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="290"/>
+        <location filename="../src/messagelogwidget.cpp" line="304"/>
         <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
         <translation>
             <numerusform>%1 legt eine %2 Marke auf %3 (jetzt %4).</numerusform>
@@ -2245,7 +2329,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="292"/>
+        <location filename="../src/messagelogwidget.cpp" line="306"/>
         <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
         <translation>
             <numerusform>%1 entfernt eine %2 Marke von %3 (jetzt %4).</numerusform>
@@ -2253,22 +2337,22 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="378"/>
+        <location filename="../src/messagelogwidget.cpp" line="399"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <translation>%1 zeigt %4 zufällig %2%3 vor.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="380"/>
+        <location filename="../src/messagelogwidget.cpp" line="401"/>
         <source>%1 randomly reveals %2%3.</source>
         <translation>%1 zeigt zufällig %2%3 offen vor.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="383"/>
+        <location filename="../src/messagelogwidget.cpp" line="404"/>
         <source>%1 reveals %2%3 to %4.</source>
         <translation>%1 zeigt %4 %2%3 vor.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="385"/>
+        <location filename="../src/messagelogwidget.cpp" line="406"/>
         <source>%1 reveals %2%3.</source>
         <translation>%1 zeigt %2%3 offen vor.</translation>
     </message>
@@ -2277,7 +2361,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">%1 erstellt einen Spielstein: %2 (%3).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="275"/>
+        <location filename="../src/messagelogwidget.cpp" line="289"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <translation>%1 zeigt von %2s %3 auf %4s %5.</translation>
     </message>
@@ -2296,7 +2380,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="295"/>
+        <location filename="../src/messagelogwidget.cpp" line="309"/>
         <source>red</source>
         <translation>
             <numerusform>rote</numerusform>
@@ -2304,7 +2388,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="296"/>
+        <location filename="../src/messagelogwidget.cpp" line="310"/>
         <source>yellow</source>
         <translation>
             <numerusform>gelbe</numerusform>
@@ -2312,7 +2396,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="297"/>
+        <location filename="../src/messagelogwidget.cpp" line="311"/>
         <source>green</source>
         <translation>
             <numerusform>grüne</numerusform>
@@ -2320,22 +2404,22 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="316"/>
+        <location filename="../src/messagelogwidget.cpp" line="334"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
         <translation>%1 setzt Zähler %2 auf %3 (%4%5).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="331"/>
+        <location filename="../src/messagelogwidget.cpp" line="352"/>
         <source>%1 sets PT of %2 to %3.</source>
         <translation>%1 setzt Kampfwerte von %2 auf %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="336"/>
+        <location filename="../src/messagelogwidget.cpp" line="357"/>
         <source>%1 sets annotation of %2 to %3.</source>
         <translation>%1 versieht %2 mit dem Hinweis %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="342"/>
+        <location filename="../src/messagelogwidget.cpp" line="363"/>
         <source>%1 is looking at the top %2 cards %3.</source>
         <translation>%1 sieht sich die obersten %2 Karten %3 an.</translation>
     </message>
@@ -2432,7 +2516,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">%1 entfernt %2 Zählmarken von %3 (jetzt %4).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="311"/>
+        <location filename="../src/messagelogwidget.cpp" line="328"/>
         <source>%1 %2 %3.</source>
         <translation>%1 %2 %3.</translation>
     </message>
@@ -2445,22 +2529,22 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">%1 sieht sich die obersten %2 Karten %3 an.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="344"/>
+        <location filename="../src/messagelogwidget.cpp" line="365"/>
         <source>%1 is looking at %2.</source>
         <translation>%1 sieht sich %2 an.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="350"/>
+        <location filename="../src/messagelogwidget.cpp" line="371"/>
         <source>%1 stops looking at %2.</source>
         <translation>%1 sieht sich %2 nicht mehr an.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="373"/>
+        <location filename="../src/messagelogwidget.cpp" line="394"/>
         <source>%1 reveals %2 to %3.</source>
         <translation>%1 zeigt %3 %2.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="375"/>
+        <location filename="../src/messagelogwidget.cpp" line="396"/>
         <source>%1 reveals %2.</source>
         <translation>%1 zeigt %2 offen vor.</translation>
     </message>
@@ -2481,7 +2565,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">%1 zeigt %2 aus %3 offen vor.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="410"/>
+        <location filename="../src/messagelogwidget.cpp" line="431"/>
         <source>ending phase</source>
         <translation>die Zugendphase</translation>
     </message>
@@ -2510,57 +2594,57 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">%1 sieht sich %2s %3 nicht mehr an</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="392"/>
+        <location filename="../src/messagelogwidget.cpp" line="413"/>
         <source>It is now %1&apos;s turn.</source>
         <translation>%1 ist am Zug.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="400"/>
+        <location filename="../src/messagelogwidget.cpp" line="421"/>
         <source>untap step</source>
         <translation>das Enttappsegment</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="401"/>
+        <location filename="../src/messagelogwidget.cpp" line="422"/>
         <source>upkeep step</source>
         <translation>das Versorgungssegment</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="402"/>
+        <location filename="../src/messagelogwidget.cpp" line="423"/>
         <source>draw step</source>
         <translation>das Ziehsegment</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="403"/>
+        <location filename="../src/messagelogwidget.cpp" line="424"/>
         <source>first main phase</source>
         <translation>die erste Hauptphase</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="404"/>
+        <location filename="../src/messagelogwidget.cpp" line="425"/>
         <source>beginning of combat step</source>
         <translation>das Anfangssegment der Kampfphase</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="405"/>
+        <location filename="../src/messagelogwidget.cpp" line="426"/>
         <source>declare attackers step</source>
         <translation>das Angreifer-Deklarieren-Segment</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="406"/>
+        <location filename="../src/messagelogwidget.cpp" line="427"/>
         <source>declare blockers step</source>
         <translation>das Blocker-Deklarieren-Segment</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="407"/>
+        <location filename="../src/messagelogwidget.cpp" line="428"/>
         <source>combat damage step</source>
         <translation>das Kampfschadenssegment</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="408"/>
+        <location filename="../src/messagelogwidget.cpp" line="429"/>
         <source>end of combat step</source>
         <translation>das Endsegment der Kampfphase</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="409"/>
+        <location filename="../src/messagelogwidget.cpp" line="430"/>
         <source>second main phase</source>
         <translation>die zweite Hauptphase</translation>
     </message>
@@ -2569,7 +2653,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">das Ende-des-Zuges-Segment</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="412"/>
+        <location filename="../src/messagelogwidget.cpp" line="433"/>
         <source>It is now the %1.</source>
         <translation>Es ist nun %1.</translation>
     </message>
@@ -2578,12 +2662,12 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">%1 bewegt %2 %3 nach %4</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="311"/>
+        <location filename="../src/messagelogwidget.cpp" line="328"/>
         <source>taps</source>
         <translation>tappt</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="311"/>
+        <location filename="../src/messagelogwidget.cpp" line="328"/>
         <source>untaps</source>
         <translation>enttappt</translation>
     </message>
@@ -2608,7 +2692,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">%1 entfernt %2 Zählmarken von %3 (jetzt %4)</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="308"/>
+        <location filename="../src/messagelogwidget.cpp" line="325"/>
         <source>his permanents</source>
         <translation>seine bleibenden Karten</translation>
     </message>
@@ -2621,12 +2705,12 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">%1 setzt Zähler &quot;%2&quot; auf %3 (%4%5)</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="323"/>
+        <location filename="../src/messagelogwidget.cpp" line="341"/>
         <source>%1 sets %2 to not untap normally.</source>
         <translation>%1 setzt %2 auf explizites Enttappen.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="325"/>
+        <location filename="../src/messagelogwidget.cpp" line="343"/>
         <source>%1 sets %2 to untap normally.</source>
         <translation>%1 setzt %2 auf normales Enttappen.</translation>
     </message>
@@ -2731,21 +2815,21 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
 <context>
     <name>Player</name>
     <message>
-        <location filename="../src/player.cpp" line="396"/>
-        <location filename="../src/player.cpp" line="400"/>
-        <location filename="../src/player.cpp" line="404"/>
+        <location filename="../src/player.cpp" line="411"/>
+        <location filename="../src/player.cpp" line="415"/>
+        <location filename="../src/player.cpp" line="419"/>
         <source>Move to &amp;top of library</source>
         <translation>Oben auf die Biblio&amp;thek legen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="397"/>
-        <location filename="../src/player.cpp" line="401"/>
-        <location filename="../src/player.cpp" line="405"/>
+        <location filename="../src/player.cpp" line="412"/>
+        <location filename="../src/player.cpp" line="416"/>
+        <location filename="../src/player.cpp" line="420"/>
         <source>Move to &amp;bottom of library</source>
         <translation>Unter die &amp;Bibliothek legen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="408"/>
+        <location filename="../src/player.cpp" line="423"/>
         <source>&amp;View library</source>
         <translation>&amp;Zeige Bibliothek</translation>
     </message>
@@ -2754,37 +2838,37 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">Oberste Karten in den F&amp;riedhof legen...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="419"/>
+        <location filename="../src/player.cpp" line="434"/>
         <source>Move top cards to &amp;exile...</source>
         <translation>Oberste Karten ins &amp;Exil schicken...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="455"/>
+        <location filename="../src/player.cpp" line="470"/>
         <source>F3</source>
         <translation>F3</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="409"/>
+        <location filename="../src/player.cpp" line="424"/>
         <source>View &amp;top cards of library...</source>
         <translation>Zeige die oberen Kar&amp;ten der Bibliothek...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="389"/>
+        <location filename="../src/player.cpp" line="404"/>
         <source>&amp;View graveyard</source>
         <translation>&amp;Zeige Friedhof</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="442"/>
+        <location filename="../src/player.cpp" line="457"/>
         <source>&amp;All players</source>
         <translation>&amp;allen Spielern</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="454"/>
+        <location filename="../src/player.cpp" line="469"/>
         <source>Ctrl+F3</source>
         <translation>Ctrl+F3</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="457"/>
+        <location filename="../src/player.cpp" line="472"/>
         <source>F4</source>
         <translation>F4</translation>
     </message>
@@ -2793,73 +2877,73 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">Zeige ent&amp;fernte Karten</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="412"/>
+        <location filename="../src/player.cpp" line="427"/>
         <source>&amp;View sideboard</source>
         <translation>Zeige &amp;Sideboard</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="391"/>
+        <location filename="../src/player.cpp" line="406"/>
         <source>Player &quot;%1&quot;</source>
         <translation>Spieler &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="398"/>
-        <location filename="../src/player.cpp" line="407"/>
+        <location filename="../src/player.cpp" line="413"/>
+        <location filename="../src/player.cpp" line="422"/>
         <source>Move to &amp;graveyard</source>
         <translation>Auf den &amp;Friedhof legen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="410"/>
+        <location filename="../src/player.cpp" line="425"/>
         <source>Reveal &amp;library to</source>
         <translation>&amp;Bibliothek jemandem zeigen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="411"/>
+        <location filename="../src/player.cpp" line="426"/>
         <source>Reveal t&amp;op card to</source>
         <translation>&amp;Oberste Karte jemandem zeigen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="415"/>
+        <location filename="../src/player.cpp" line="430"/>
         <source>&amp;Undo last draw</source>
         <translation>Zuletzt gezogene Karte zur&amp;ücklegen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="416"/>
+        <location filename="../src/player.cpp" line="431"/>
         <source>Take &amp;mulligan</source>
         <translation>&amp;Mulligan nehmen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="418"/>
+        <location filename="../src/player.cpp" line="433"/>
         <source>Move top cards to &amp;graveyard...</source>
         <translation>Oberste Karten auf den F&amp;riedhof legen...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="420"/>
+        <location filename="../src/player.cpp" line="435"/>
         <source>Put top card on &amp;bottom</source>
         <translation>Oberste Karte nach &amp;unten legen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="422"/>
+        <location filename="../src/player.cpp" line="437"/>
         <source>&amp;Hand</source>
         <translation>&amp;Hand</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="423"/>
+        <location filename="../src/player.cpp" line="438"/>
         <source>&amp;Reveal to</source>
         <translation>Jemandem &amp;zeigen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="424"/>
+        <location filename="../src/player.cpp" line="439"/>
         <source>Reveal r&amp;andom card to</source>
         <translation>Z&amp;ufällige Karte jemandem zeigen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="426"/>
+        <location filename="../src/player.cpp" line="441"/>
         <source>&amp;Library</source>
         <translation>Bib&amp;liothek</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="392"/>
+        <location filename="../src/player.cpp" line="407"/>
         <source>&amp;Graveyard</source>
         <translation>&amp;Friedhof</translation>
     </message>
@@ -2868,7 +2952,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">Entfe&amp;rnte Karten</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="425"/>
+        <location filename="../src/player.cpp" line="440"/>
         <source>&amp;Sideboard</source>
         <translation>&amp;Sideboard</translation>
     </message>
@@ -2881,33 +2965,33 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">&amp;Hinweis setzen...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="520"/>
+        <location filename="../src/player.cpp" line="535"/>
         <source>View top cards of library</source>
         <translation>Zeige die obersten Karten der Bibliothek</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="520"/>
+        <location filename="../src/player.cpp" line="535"/>
         <source>Number of cards:</source>
         <translation>Anzahl der Karten:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="413"/>
+        <location filename="../src/player.cpp" line="428"/>
         <source>&amp;Draw card</source>
         <translation>Karte &amp;ziehen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="390"/>
+        <location filename="../src/player.cpp" line="405"/>
         <source>&amp;View exile</source>
         <translation>&amp;Zeige Exil</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="393"/>
+        <location filename="../src/player.cpp" line="408"/>
         <source>&amp;Exile</source>
         <translation>&amp;Exil</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="402"/>
-        <location filename="../src/player.cpp" line="406"/>
+        <location filename="../src/player.cpp" line="417"/>
+        <location filename="../src/player.cpp" line="421"/>
         <source>Move to &amp;hand</source>
         <translation>auf die &amp;Hand nehmen</translation>
     </message>
@@ -2916,28 +3000,28 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">auf den &amp;Friedhof legen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="399"/>
-        <location filename="../src/player.cpp" line="403"/>
+        <location filename="../src/player.cpp" line="414"/>
+        <location filename="../src/player.cpp" line="418"/>
         <source>Move to &amp;exile</source>
         <translation>ins &amp;Exil schicken</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="456"/>
+        <location filename="../src/player.cpp" line="471"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="458"/>
+        <location filename="../src/player.cpp" line="473"/>
         <source>Ctrl+D</source>
         <translation>Ctrl+D</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="414"/>
+        <location filename="../src/player.cpp" line="429"/>
         <source>D&amp;raw cards...</source>
         <translation>Ka&amp;rten ziehen...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="459"/>
+        <location filename="../src/player.cpp" line="474"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
@@ -2946,37 +3030,37 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">&amp;Mulligan nehmen...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="461"/>
+        <location filename="../src/player.cpp" line="476"/>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="417"/>
+        <location filename="../src/player.cpp" line="432"/>
         <source>&amp;Shuffle</source>
         <translation>Mi&amp;schen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="462"/>
+        <location filename="../src/player.cpp" line="477"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="427"/>
+        <location filename="../src/player.cpp" line="442"/>
         <source>&amp;Counters</source>
         <translation>&amp;Zähler</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="429"/>
+        <location filename="../src/player.cpp" line="444"/>
         <source>&amp;Untap all permanents</source>
         <translation>&amp;Enttappe alle bleibenden Karten</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="460"/>
+        <location filename="../src/player.cpp" line="475"/>
         <source>Ctrl+Shift+D</source>
         <translation>Ctrl+Shift+D</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="463"/>
+        <location filename="../src/player.cpp" line="478"/>
         <source>Ctrl+U</source>
         <translation>Ctrl+U</translation>
     </message>
@@ -3005,42 +3089,42 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">Ctrl+L</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="430"/>
+        <location filename="../src/player.cpp" line="445"/>
         <source>R&amp;oll die...</source>
         <translation>&amp;Würfeln...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="464"/>
+        <location filename="../src/player.cpp" line="479"/>
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="431"/>
+        <location filename="../src/player.cpp" line="446"/>
         <source>&amp;Create token...</source>
         <translation>Spiels&amp;tein erstellen...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="465"/>
+        <location filename="../src/player.cpp" line="480"/>
         <source>Ctrl+T</source>
         <translation>Ctrl+T</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="432"/>
+        <location filename="../src/player.cpp" line="447"/>
         <source>C&amp;reate another token</source>
         <translation>&amp;Noch einen Spielstein erstellen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="466"/>
+        <location filename="../src/player.cpp" line="481"/>
         <source>Ctrl+G</source>
         <translation>Ctrl+G</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="433"/>
+        <location filename="../src/player.cpp" line="448"/>
         <source>S&amp;ay</source>
         <translation>S&amp;agen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="439"/>
+        <location filename="../src/player.cpp" line="454"/>
         <source>C&amp;ard</source>
         <translation>&amp;Karte</translation>
     </message>
@@ -3133,50 +3217,50 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">F10</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="559"/>
+        <location filename="../src/player.cpp" line="574"/>
         <source>Draw cards</source>
         <translation>Karten ziehen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="559"/>
-        <location filename="../src/player.cpp" line="571"/>
-        <location filename="../src/player.cpp" line="587"/>
-        <location filename="../src/player.cpp" line="1444"/>
+        <location filename="../src/player.cpp" line="574"/>
+        <location filename="../src/player.cpp" line="586"/>
+        <location filename="../src/player.cpp" line="602"/>
+        <location filename="../src/player.cpp" line="1471"/>
         <source>Number:</source>
         <translation>Anzahl:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="571"/>
+        <location filename="../src/player.cpp" line="586"/>
         <source>Move top cards to grave</source>
         <translation>Oberste Karten in den Friedhof legen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="587"/>
+        <location filename="../src/player.cpp" line="602"/>
         <source>Move top cards to exile</source>
         <translation>Oberste Karten ins Exil schicken</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1364"/>
+        <location filename="../src/player.cpp" line="1391"/>
         <source>Set power/toughness</source>
         <translation>Kampfwerte setzen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1364"/>
+        <location filename="../src/player.cpp" line="1391"/>
         <source>Please enter the new PT:</source>
         <translation>Bitte die neuen Kampfwerte eingeben:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1390"/>
+        <location filename="../src/player.cpp" line="1417"/>
         <source>Set annotation</source>
         <translation>Hinweis setzen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1390"/>
+        <location filename="../src/player.cpp" line="1417"/>
         <source>Please enter the new annotation:</source>
         <translation>Bitte den Hinweis eingeben:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1444"/>
+        <location filename="../src/player.cpp" line="1471"/>
         <source>Set counters</source>
         <translation>Setze Zählmarken</translation>
     </message>
@@ -3189,12 +3273,12 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">Neue Lebenspunkte insgesamt:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="614"/>
+        <location filename="../src/player.cpp" line="629"/>
         <source>Roll die</source>
         <translation>Würfeln</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="614"/>
+        <location filename="../src/player.cpp" line="629"/>
         <source>Number of sides:</source>
         <translation>Anzahl der Seiten:</translation>
     </message>
@@ -3629,7 +3713,7 @@ Bitte geben Sie einen Namen ein:</translation>
         <translation type="obsolete">Deck laden</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.h" line="160"/>
+        <location filename="../src/tab_game.h" line="162"/>
         <source>Game %1: %2</source>
         <translation>Spiel %1: %2</translation>
     </message>
