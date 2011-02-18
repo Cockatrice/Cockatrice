@@ -354,7 +354,8 @@ void WndDeckEditor::actSaveDeckToClipboard()
 	QString buffer;
 	QTextStream stream(&buffer);
 	deckModel->getDeckList()->saveToStream_Plain(stream);
-	QApplication::clipboard()->setText(buffer);
+	QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
+	QApplication::clipboard()->setText(buffer, QClipboard::Selection);
 }
 
 void WndDeckEditor::actPrintDeck()
