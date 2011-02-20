@@ -20,6 +20,8 @@ public:
 	LocalServerInterface *newConnection();
 protected:
 	ServerInfo_User *getUserData(const QString &name);
+	QList<ServerInfo_User *> getBuddyList(const QString & /*name*/) { return QList<ServerInfo_User *>(); }
+	QList<ServerInfo_User *> getIgnoreList(const QString & /*name*/) { return QList<ServerInfo_User *>(); }
 };
 
 #endif

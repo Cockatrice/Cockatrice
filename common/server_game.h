@@ -42,6 +42,7 @@ private:
 	int maxPlayers;
 	QList<int> gameTypes;
 	int activePlayer, activePhase;
+	bool onlyBuddies, onlyRegistered;
 	bool spectatorsAllowed;
 	bool spectatorsNeedPassword;
 	bool spectatorsCanTalk;
@@ -54,7 +55,7 @@ signals:
 private slots:
 	void pingClockTimeout();
 public:
-	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent);
+	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent);
 	~Server_Game();
 	ServerInfo_Game *getInfo() const;
 	ServerInfo_User *getCreatorInfo() const { return creatorInfo; }
@@ -71,7 +72,7 @@ public:
 	bool getSpectatorsNeedPassword() const { return spectatorsNeedPassword; }
 	bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
 	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
-	ResponseCode checkJoin(const QString &_password, bool spectator);
+	ResponseCode checkJoin(ServerInfo_User *user, const QString &_password, bool spectator);
 	Server_Player *addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate = true);
 	void removePlayer(Server_Player *player);
 	void startGameIfReady();

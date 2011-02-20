@@ -15,7 +15,6 @@
 #include "protocol_items.h"
 #include "userlist.h"
 #include "userinfobox.h"
-//#include "pixmapgenerator.h"
 #include <QDebug>
 
 RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent)

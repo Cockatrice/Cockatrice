@@ -169,12 +169,14 @@ void CommandContainer::enqueueGameEventPrivate(GameEvent *event, int gameId, int
 		gameEventQueuePrivate->setContext(context);
 }
 
-Command_CreateGame::Command_CreateGame(int _roomId, const QString &_description, const QString &_password, int _maxPlayers, const QList<GameTypeId *> &_gameTypes, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything)
+Command_CreateGame::Command_CreateGame(int _roomId, const QString &_description, const QString &_password, int _maxPlayers, const QList<GameTypeId *> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything)
 	: RoomCommand("create_game", _roomId)
 {
 	insertItem(new SerializableItem_String("description", _description));
 	insertItem(new SerializableItem_String("password", _password));
 	insertItem(new SerializableItem_Int("max_players", _maxPlayers));
+	insertItem(new SerializableItem_Bool("only_buddies", _onlyBuddies));
+	insertItem(new SerializableItem_Bool("only_registered", _onlyRegistered));
 	insertItem(new SerializableItem_Bool("spectators_allowed", _spectatorsAllowed));
 	insertItem(new SerializableItem_Bool("spectators_need_password", _spectatorsNeedPassword));
 	insertItem(new SerializableItem_Bool("spectators_can_talk", _spectatorsCanTalk));
@@ -260,6 +262,8 @@ void ProtocolResponse::initializeHash()
 	responseHash.insert("context_error", RespContextError);
 	responseHash.insert("wrong_password", RespWrongPassword);
 	responseHash.insert("spectators_not_allowed", RespSpectatorsNotAllowed);
+	responseHash.insert("only_buddies", RespOnlyBuddies);
+	responseHash.insert("user_level_too_low", RespUserLevelTooLow);
 }
 
 Response_JoinRoom::Response_JoinRoom(int _cmdId, ResponseCode _responseCode, ServerInfo_Room *_roomInfo)
@@ -322,12 +326,15 @@ Response_DumpZone::Response_DumpZone(int _cmdId, ResponseCode _responseCode, Ser
 	insertItem(_zone);
 }
 
-Response_Login::Response_Login(int _cmdId, ResponseCode _responseCode, ServerInfo_User *_userInfo)
+Response_Login::Response_Login(int _cmdId, ResponseCode _responseCode, ServerInfo_User *_userInfo, const QList<ServerInfo_User *> &_buddyList, const QList<ServerInfo_User *> &_ignoreList)
 	: ProtocolResponse(_cmdId, _responseCode, "login")
 {
 	if (!_userInfo)
 		_userInfo = new ServerInfo_User;
 	insertItem(_userInfo);
+	
+	insertItem(new ServerInfo_UserList("buddy_list", _buddyList));
+	insertItem(new ServerInfo_UserList("ignore_list", _ignoreList));
 }
 
 GameEvent::GameEvent(const QString &_eventName, int _playerId)

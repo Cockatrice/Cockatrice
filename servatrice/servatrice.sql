@@ -110,7 +110,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `registrationDate` datetime NOT NULL,
   `active` tinyint(1) NOT NULL,
   `token` char(32) NOT NULL,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=915 ;
 
 CREATE TABLE `cockatrice_uptime` (

@@ -47,6 +47,8 @@ signals:
 	void gameJoinedEventReceived(Event_GameJoined *event);
 	void messageEventReceived(Event_Message *event);
 	void userInfoChanged(ServerInfo_User *userInfo);
+	void buddyListReceived(const QList<ServerInfo_User *> &buddyList);
+	void ignoreListReceived(const QList<ServerInfo_User *> &ignoreList);
 protected slots:
 	void processProtocolItem(ProtocolItem *item);
 protected:

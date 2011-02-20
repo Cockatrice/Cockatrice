@@ -51,6 +51,8 @@ void RemoteClient::loginResponse(ProtocolResponse *response)
 		}
 		setStatus(StatusLoggedIn);
 		emit userInfoChanged(resp->getUserInfo());
+		emit buddyListReceived(resp->getBuddyList());
+		emit ignoreListReceived(resp->getIgnoreList());
 	} else {
 		emit serverError(response->getResponseCode());
 		setStatus(StatusDisconnecting);

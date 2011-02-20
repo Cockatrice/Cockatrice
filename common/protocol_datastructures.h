@@ -8,7 +8,7 @@
 
 class DeckList;
 
-enum ResponseCode { RespNothing, RespOk, RespInvalidCommand, RespInvalidData, RespNameNotFound, RespLoginNeeded, RespFunctionNotAllowed, RespGameNotStarted, RespGameFull, RespContextError, RespWrongPassword, RespSpectatorsNotAllowed };
+enum ResponseCode { RespNothing, RespOk, RespInvalidCommand, RespInvalidData, RespNameNotFound, RespLoginNeeded, RespFunctionNotAllowed, RespGameNotStarted, RespGameFull, RespContextError, RespWrongPassword, RespSpectatorsNotAllowed, RespOnlyBuddies, RespUserLevelTooLow };
 
 // PrivateZone: Contents of the zone are always visible to the owner,
 // but not to anyone else.
@@ -55,9 +55,15 @@ public:
 	QByteArray getAvatarBmp() const { return static_cast<SerializableItem_ByteArray *>(itemMap.value("avatar_bmp"))->getData(); }
 };
 
+class ServerInfo_UserList : public SerializableItem_Map {
+public:
+	ServerInfo_UserList(const QString &_itemType, const QList<ServerInfo_User *> &_userList = QList<ServerInfo_User *>());
+	QList<ServerInfo_User *> getUserList() const { return typecastItemList<ServerInfo_User *>(); }
+};
+
 class ServerInfo_Game : public SerializableItem_Map {
 public:
-	ServerInfo_Game(int _gameId = -1, const QString &_description = QString(), bool _hasPassword = false, int _playerCount = -1, int _maxPlayers = -1, const QList<GameTypeId *> &_gameTypes = QList<GameTypeId *>(), ServerInfo_User *creatorInfo = 0, bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, int _spectatorCount = -1);
+	ServerInfo_Game(int _gameId = -1, const QString &_description = QString(), bool _hasPassword = false, int _playerCount = -1, int _maxPlayers = -1, const QList<GameTypeId *> &_gameTypes = QList<GameTypeId *>(), ServerInfo_User *creatorInfo = 0, bool _onlyBuddies = false, bool _onlyRegistered = false, bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, int _spectatorCount = -1);
 	static SerializableItem *newItem() { return new ServerInfo_Game; }
 	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); }
 	QString getDescription() const { return static_cast<SerializableItem_String *>(itemMap.value("description"))->getData(); }
@@ -66,6 +72,8 @@ public:
 	int getMaxPlayers() const { return static_cast<SerializableItem_Int *>(itemMap.value("max_players"))->getData(); }
 	QList<GameTypeId *> getGameTypes() const { return typecastItemList<GameTypeId *>(); }
 	ServerInfo_User *getCreatorInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
+	bool getOnlyBuddies() const { return static_cast<SerializableItem_Bool *>(itemMap.value("only_buddies"))->getData(); }
+	bool getOnlyRegistered() const { return static_cast<SerializableItem_Bool *>(itemMap.value("only_registered"))->getData(); }
 	bool getSpectatorsAllowed() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_allowed"))->getData(); }
 	bool getSpectatorsNeedPassword() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_need_password"))->getData(); }
 	int getSpectatorCount() const { return static_cast<SerializableItem_Int *>(itemMap.value("spectator_count"))->getData(); }

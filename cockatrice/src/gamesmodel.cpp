@@ -40,8 +40,16 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
 			return result.join(", ");
 		}
 		case 3: return g->getHasPassword() ? (g->getSpectatorsNeedPassword() ? tr("yes") : tr("yes, free for spectators")) : tr("no");
-		case 4: return QString("%1/%2").arg(g->getPlayerCount()).arg(g->getMaxPlayers());
-		case 5: return g->getSpectatorsAllowed() ? QVariant(g->getSpectatorCount()) : QVariant(tr("not allowed"));
+		case 4: {
+			QStringList result;
+			if (g->getOnlyBuddies())
+				result.append(tr("buddies only"));
+			if (g->getOnlyRegistered())
+				result.append(tr("reg. users only"));
+			return result.join(", ");
+		}
+		case 5: return QString("%1/%2").arg(g->getPlayerCount()).arg(g->getMaxPlayers());
+		case 6: return g->getSpectatorsAllowed() ? QVariant(g->getSpectatorCount()) : QVariant(tr("not allowed"));
 		default: return QVariant();
 	}
 }
@@ -55,8 +63,9 @@ QVariant GamesModel::headerData(int section, Qt::Orientation orientation, int ro
 		case 1: return tr("Creator");
 		case 2: return tr("Game type");
 		case 3: return tr("Password");
-		case 4: return tr("Players");
-		case 5: return tr("Spectators");
+		case 4: return tr("Restrictions");
+		case 5: return tr("Players");
+		case 6: return tr("Spectators");
 		default: return QVariant();
 	}
 }
@@ -73,7 +82,7 @@ void GamesModel::updateGameList(ServerInfo_Game *_game)
 	for (int i = 0; i < oldGameTypeList.size(); ++i)
 		gameTypeList.append(new GameTypeId(oldGameTypeList[i]->getData()));
 	
-	ServerInfo_Game *game = new ServerInfo_Game(_game->getGameId(), _game->getDescription(), _game->getHasPassword(), _game->getPlayerCount(), _game->getMaxPlayers(), gameTypeList, new ServerInfo_User(_game->getCreatorInfo()), _game->getSpectatorsAllowed(), _game->getSpectatorsNeedPassword(), _game->getSpectatorCount());
+	ServerInfo_Game *game = new ServerInfo_Game(_game->getGameId(), _game->getDescription(), _game->getHasPassword(), _game->getPlayerCount(), _game->getMaxPlayers(), gameTypeList, new ServerInfo_User(_game->getCreatorInfo()), _game->getOnlyBuddies(), _game->getOnlyRegistered(), _game->getSpectatorsAllowed(), _game->getSpectatorsNeedPassword(), _game->getSpectatorCount());
 	for (int i = 0; i < gameList.size(); i++)
 		if (gameList[i]->getGameId() == game->getGameId()) {
 			if (game->getPlayerCount() == 0) {

@@ -29,6 +29,7 @@ private:
 	QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel;
 	QLineEdit *descriptionEdit, *passwordEdit;
 	QSpinBox *maxPlayersEdit;
+	QCheckBox *onlyBuddiesCheckBox, *onlyRegisteredCheckBox;
 	QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox, *spectatorsSeeEverythingCheckBox;
 	QPushButton *okButton, *cancelButton;
 };

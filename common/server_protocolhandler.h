@@ -27,7 +27,7 @@ protected:
 	bool acceptsUserListChanges;
 	bool acceptsRoomListChanges;
 	ServerInfo_User *userInfo;
-	
+	QList<ServerInfo_User *> buddyList, ignoreList;
 private:
 	QList<ProtocolItem *> itemQueue;
 	QDateTime lastCommandTime;
@@ -95,6 +95,8 @@ public:
 	bool getAcceptsRoomListChanges() const { return acceptsRoomListChanges; }
 	ServerInfo_User *getUserInfo() const { return userInfo; }
 	void setUserInfo(ServerInfo_User *_userInfo) { userInfo = _userInfo; }
+	const QList<ServerInfo_User *> &getBuddyList() const { return buddyList; }
+	const QList<ServerInfo_User *> &getIgnoreList() const { return ignoreList; }
 	const QDateTime &getLastCommandTime() const { return lastCommandTime; }
 
 	void processCommandContainer(CommandContainer *cont);

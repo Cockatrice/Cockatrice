@@ -44,7 +44,7 @@ public:
 	void removeClient(Server_ProtocolHandler *client);
 	void say(Server_ProtocolHandler *client, const QString &s);
 	void broadcastGameListUpdate(Server_Game *game);
-	Server_Game *createGame(const QString &description, const QString &password, int maxPlayers, const QList<int> &_gameTypes, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator);
+	Server_Game *createGame(const QString &description, const QString &password, int maxPlayers, const QList<int> &_gameTypes, bool onlyBuddies, bool onlyRegistered, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator);
 	
 	void sendRoomEvent(RoomEvent *event);
 };

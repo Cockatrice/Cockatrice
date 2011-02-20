@@ -46,7 +46,7 @@ GameSelector::GameSelector(AbstractClient *_client, TabRoom *_room, QWidget *par
 	retranslateUi();
 	setLayout(mainLayout);
 
-	setMinimumWidth(gameListView->columnWidth(0) * gameListModel->columnCount());
+	setMinimumWidth((qreal) (gameListView->columnWidth(0) * gameListModel->columnCount()) / 1.5);
 	setMinimumHeight(400);
 
 	connect(showFullGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showFullGamesChanged(int)));
@@ -77,6 +77,8 @@ void GameSelector::checkResponse(ResponseCode response)
 		case RespSpectatorsNotAllowed: QMessageBox::critical(this, tr("Error"), tr("Spectators are not allowed in this game.")); break;
 		case RespGameFull: QMessageBox::critical(this, tr("Error"), tr("The game is already full.")); break;
 		case RespNameNotFound: QMessageBox::critical(this, tr("Error"), tr("The game does not exist any more.")); break;
+		case RespUserLevelTooLow: QMessageBox::critical(this, tr("Error"), tr("This game is only open to registered users.")); break;
+		case RespOnlyBuddies: QMessageBox::critical(this, tr("Error"), tr("This game is only open to its creator's buddies.")); break;
 		default: ;
 	}
 }

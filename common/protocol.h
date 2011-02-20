@@ -178,10 +178,12 @@ public:
 class Command_CreateGame : public RoomCommand {
 	Q_OBJECT
 public:
-	Command_CreateGame(int _roomId = -1, const QString &_description = QString(), const QString &_password = QString(), int _maxPlayers = -1, const QList<GameTypeId *> &_gameTypes = QList<GameTypeId *>(), bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, bool _spectatorsCanTalk = false, bool _spectatorsSeeEverything = false);
+	Command_CreateGame(int _roomId = -1, const QString &_description = QString(), const QString &_password = QString(), int _maxPlayers = -1, const QList<GameTypeId *> &_gameTypes = QList<GameTypeId *>(), bool _onlyBuddies = false, bool _onlyRegistered = false, bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, bool _spectatorsCanTalk = false, bool _spectatorsSeeEverything = false);
 	QString getDescription() const { return static_cast<SerializableItem_String *>(itemMap.value("description"))->getData(); };
 	QString getPassword() const { return static_cast<SerializableItem_String *>(itemMap.value("password"))->getData(); };
 	int getMaxPlayers() const { return static_cast<SerializableItem_Int *>(itemMap.value("max_players"))->getData(); };
+	bool getOnlyBuddies() const { return static_cast<SerializableItem_Bool *>(itemMap.value("only_buddies"))->getData(); };
+	bool getOnlyRegistered() const { return static_cast<SerializableItem_Bool *>(itemMap.value("only_registered"))->getData(); };
 	bool getSpectatorsAllowed() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_allowed"))->getData(); };
 	bool getSpectatorsNeedPassword() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_need_password"))->getData(); };
 	bool getSpectatorsCanTalk() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_can_talk"))->getData(); };
@@ -318,10 +320,12 @@ public:
 class Response_Login : public ProtocolResponse {
 	Q_OBJECT
 public:
-	Response_Login(int _cmdId = -1, ResponseCode _responseCode = RespOk, ServerInfo_User *_userInfo = 0);
+	Response_Login(int _cmdId = -1, ResponseCode _responseCode = RespOk, ServerInfo_User *_userInfo = 0, const QList<ServerInfo_User *> &_buddyList = QList<ServerInfo_User *>(), const QList<ServerInfo_User *> &_ignoreList = QList<ServerInfo_User *>());
 	int getItemId() const { return ItemId_Response_Login; }
 	static SerializableItem *newItem() { return new Response_Login; }
 	ServerInfo_User *getUserInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
+	QList<ServerInfo_User *> getBuddyList() const { return static_cast<ServerInfo_UserList *>(itemMap.value("buddy_list"))->getUserList(); }
+	QList<ServerInfo_User *> getIgnoreList() const { return static_cast<ServerInfo_UserList *>(itemMap.value("ignore_list"))->getUserList(); }
 };
 
 // --------------

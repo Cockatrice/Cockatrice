@@ -31,7 +31,14 @@ ServerInfo_User::ServerInfo_User(const ServerInfo_User *other, bool complete)
 	insertItem(new SerializableItem_ByteArray("avatar_bmp", complete ? other->getAvatarBmp() : QByteArray()));
 }
 
-ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, const QList<GameTypeId *> &_gameTypes, ServerInfo_User *_creatorInfo, bool _spectatorsAllowed, bool _spectatorsNeedPassword, int _spectatorCount)
+ServerInfo_UserList::ServerInfo_UserList(const QString &_itemType, const QList<ServerInfo_User *> &_userList)
+	: SerializableItem_Map(_itemType)
+{
+	for (int i = 0; i < _userList.size(); ++i)
+		itemList.append(_userList[i]);
+}
+
+ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, const QList<GameTypeId *> &_gameTypes, ServerInfo_User *_creatorInfo, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, int _spectatorCount)
 	: SerializableItem_Map("game")
 {
 	insertItem(new SerializableItem_Int("game_id", _gameId));
@@ -42,6 +49,8 @@ ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool 
 	if (!_creatorInfo)
 		_creatorInfo = new ServerInfo_User;
 	insertItem(_creatorInfo);
+	insertItem(new SerializableItem_Bool("only_buddies", _onlyBuddies));
+	insertItem(new SerializableItem_Bool("only_registered", _onlyRegistered));
 	insertItem(new SerializableItem_Bool("spectators_allowed", _spectatorsAllowed));
 	insertItem(new SerializableItem_Bool("spectators_need_password", _spectatorsNeedPassword));
 	insertItem(new SerializableItem_Int("spectator_count", _spectatorCount));

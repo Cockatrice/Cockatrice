@@ -42,6 +42,10 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 	}
 
 	delete userInfo;
+	for (int i = 0; i < buddyList.size(); ++i)
+		delete buddyList[i];
+	for (int i = 0; i < ignoreList.size(); ++i)
+		delete ignoreList[i];
 }
 
 void Server_ProtocolHandler::playerRemovedFromGame(Server_Game *game)
@@ -233,6 +237,9 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 	enqueueProtocolItem(new Event_ServerMessage(server->getLoginMessage()));
 
 	if (authState == PasswordRight) {
+		buddyList = server->getBuddyList(userInfo->getName());
+		ignoreList = server->getIgnoreList(userInfo->getName());
+		
 		// This might not scale very well. Use an extra QMap if it becomes a problem.
 		const QList<Server_Game *> &serverGames = server->getGames();
 		for (int i = 0; i < serverGames.size(); ++i) {
@@ -248,7 +255,14 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 		}
 	}
 	
-	cont->setResponse(new Response_Login(cont->getCmdId(), RespOk, new ServerInfo_User(userInfo, true)));
+	QList<ServerInfo_User *> _buddyList;
+	for (int i = 0; i < buddyList.size(); ++i)
+		_buddyList.append(new ServerInfo_User(buddyList[i]));
+	QList<ServerInfo_User *> _ignoreList;
+	for (int i = 0; i < ignoreList.size(); ++i)
+		_ignoreList.append(new ServerInfo_User(ignoreList[i]));
+	
+	cont->setResponse(new Response_Login(cont->getCmdId(), RespOk, new ServerInfo_User(userInfo, true), _buddyList, _ignoreList));
 	return RespNothing;
 }
 
@@ -361,7 +375,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 	for (int i = 0; i < gameTypeList.size(); ++i)
 		gameTypes.append(gameTypeList[i]->getData());
 	
-	Server_Game *game = room->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), gameTypes, cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
+	Server_Game *game = room->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), gameTypes, cmd->getOnlyBuddies(), cmd->getOnlyRegistered(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
 	Server_Player *creator = game->getPlayers().values().first();
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	
@@ -382,7 +396,7 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandC
 	if (!g)
 		return RespNameNotFound;
 		
-	ResponseCode result = g->checkJoin(cmd->getPassword(), cmd->getSpectator());
+	ResponseCode result = g->checkJoin(userInfo, cmd->getPassword(), cmd->getSpectator());
 	if (result == RespOk) {
 		Server_Player *player = g->addPlayer(this, cmd->getSpectator());
 		games.insert(cmd->getGameId(), QPair<Server_Game *, Server_Player *>(g, player));

@@ -168,6 +168,29 @@ AuthenticationResult Servatrice::checkUserPassword(const QString &user, const QS
 		return UnknownUser;
 }
 
+ServerInfo_User *Servatrice::evalUserQueryResult(const QSqlQuery &query, bool complete)
+{
+	QString name = query.value(0).toString();
+	bool is_admin = query.value(1).toInt();
+	QString realName = query.value(2).toString();
+	QString country = query.value(3).toString();
+	QByteArray avatarBmp;
+	if (complete)
+		avatarBmp = query.value(4).toByteArray();
+	
+	int userLevel = ServerInfo_User::IsUser | ServerInfo_User::IsRegistered;
+	if (is_admin)
+		userLevel |= ServerInfo_User::IsAdmin;
+	
+	return new ServerInfo_User(
+		name,
+		userLevel,
+		realName,
+		country,
+		avatarBmp
+	);
+}
+
 ServerInfo_User *Servatrice::getUserData(const QString &name)
 {
 	const QString method = settings->value("authentication/method").toString();
@@ -175,32 +198,57 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 		checkSql();
 
 		QSqlQuery query;
-		query.prepare("select admin, realname, country, avatar_bmp from " + dbPrefix + "_users where name = :name and active = 1");
+		query.prepare("select name, admin, realname, country, avatar_bmp from " + dbPrefix + "_users where name = :name and active = 1");
 		query.bindValue(":name", name);
 		if (!execSqlQuery(query))
 			return new ServerInfo_User(name, ServerInfo_User::IsUser);
 		
-		if (query.next()) {
-			bool is_admin = query.value(0).toInt();
-			QString realName = query.value(1).toString();
-			QString country = query.value(2).toString();
-			QByteArray avatarBmp = query.value(3).toByteArray();
-			
-			int userLevel = ServerInfo_User::IsUser | ServerInfo_User::IsRegistered;
-			if (is_admin)
-				userLevel |= ServerInfo_User::IsAdmin;
-			
-			return new ServerInfo_User(
-				name,
-				userLevel,
-				realName,
-				country,
-				avatarBmp
-			);
-		} else
+		if (query.next())
+			return evalUserQueryResult(query, true);
+		else
 			return new ServerInfo_User(name, ServerInfo_User::IsUser);
 	} else
 		return new ServerInfo_User(name, ServerInfo_User::IsUser);
+}
+
+QList<ServerInfo_User *> Servatrice::getBuddyList(const QString &name)
+{
+	QList<ServerInfo_User *> result;
+	
+	const QString method = settings->value("authentication/method").toString();
+	if (method == "sql") {
+		checkSql();
+
+		QSqlQuery query;
+		query.prepare("select a.name, a.admin, a.realname, a.country from " + dbPrefix + "_users a left join " + dbPrefix + "_buddylist b on a.id = b.id_user2 left join " + dbPrefix + "_users c on b.id_user1 = c.id where c.name = :name");
+		query.bindValue(":name", name);
+		if (!execSqlQuery(query))
+			return result;
+		
+		while (query.next())
+			result.append(evalUserQueryResult(query, false));
+	}
+	return result;
+}
+
+QList<ServerInfo_User *> Servatrice::getIgnoreList(const QString &name)
+{
+	QList<ServerInfo_User *> result;
+	
+	const QString method = settings->value("authentication/method").toString();
+	if (method == "sql") {
+		checkSql();
+
+		QSqlQuery query;
+		query.prepare("select a.name, a.admin, a.realname, a.country from " + dbPrefix + "_users a left join " + dbPrefix + "_ignorelist b on a.id = b.id_user2 left join " + dbPrefix + "_users c on b.id_user1 = c.id where c.name = :name");
+		query.bindValue(":name", name);
+		if (!execSqlQuery(query))
+			return result;
+		
+		while (query.next())
+			result.append(evalUserQueryResult(query, false));
+	}
+	return result;
 }
 
 void Servatrice::updateLoginMessage()

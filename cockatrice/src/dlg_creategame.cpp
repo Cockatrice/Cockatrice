@@ -18,10 +18,6 @@ DlgCreateGame::DlgCreateGame(AbstractClient *_client, int _roomId, const QMap<in
 	descriptionEdit = new QLineEdit;
 	descriptionLabel->setBuddy(descriptionEdit);
 
-	passwordLabel = new QLabel(tr("&Password:"));
-	passwordEdit = new QLineEdit;
-	passwordLabel->setBuddy(passwordEdit);
-
 	maxPlayersLabel = new QLabel(tr("P&layers:"));
 	maxPlayersEdit = new QSpinBox();
 	maxPlayersEdit->setMinimum(1);
@@ -40,6 +36,22 @@ DlgCreateGame::DlgCreateGame(AbstractClient *_client, int _roomId, const QMap<in
 	QGroupBox *gameTypeGroupBox = new QGroupBox(tr("Game type"));
 	gameTypeGroupBox->setLayout(gameTypeLayout);
 	
+	passwordLabel = new QLabel(tr("&Password:"));
+	passwordEdit = new QLineEdit;
+	passwordLabel->setBuddy(passwordEdit);
+
+	onlyBuddiesCheckBox = new QCheckBox(tr("Only &buddies can join"));
+	onlyRegisteredCheckBox = new QCheckBox(tr("Only &registered users can join"));
+	
+	QGridLayout *joinRestrictionsLayout = new QGridLayout;
+	joinRestrictionsLayout->addWidget(passwordLabel, 0, 0);
+	joinRestrictionsLayout->addWidget(passwordEdit, 0, 1);
+	joinRestrictionsLayout->addWidget(onlyBuddiesCheckBox, 1, 0, 1, 2);
+	joinRestrictionsLayout->addWidget(onlyRegisteredCheckBox, 2, 0, 1, 2);
+	
+	QGroupBox *joinRestrictionsGroupBox = new QGroupBox(tr("Joining restrictions"));
+	joinRestrictionsGroupBox->setLayout(joinRestrictionsLayout);
+	
 	spectatorsAllowedCheckBox = new QCheckBox(tr("&Spectators allowed"));
 	spectatorsAllowedCheckBox->setChecked(true);
 	connect(spectatorsAllowedCheckBox, SIGNAL(stateChanged(int)), this, SLOT(spectatorsAllowedChanged(int)));
@@ -57,11 +69,10 @@ DlgCreateGame::DlgCreateGame(AbstractClient *_client, int _roomId, const QMap<in
 	QGridLayout *grid = new QGridLayout;
 	grid->addWidget(descriptionLabel, 0, 0);
 	grid->addWidget(descriptionEdit, 0, 1);
-	grid->addWidget(passwordLabel, 1, 0);
-	grid->addWidget(passwordEdit, 1, 1);
-	grid->addWidget(maxPlayersLabel, 2, 0);
-	grid->addWidget(maxPlayersEdit, 2, 1);
-	grid->addWidget(gameTypeGroupBox, 3, 0, 1, 2);
+	grid->addWidget(maxPlayersLabel, 1, 0);
+	grid->addWidget(maxPlayersEdit, 1, 1);
+	grid->addWidget(gameTypeGroupBox, 2, 0, 1, 2);
+	grid->addWidget(joinRestrictionsGroupBox, 3, 0, 1, 2);
 	grid->addWidget(spectatorsGroupBox, 4, 0, 1, 2);
 
 	okButton = new QPushButton(tr("&OK"));
@@ -102,6 +113,8 @@ void DlgCreateGame::actOK()
 		passwordEdit->text(),
 		maxPlayersEdit->value(),
 		gameTypeList,
+		onlyBuddiesCheckBox->isChecked(),
+		onlyRegisteredCheckBox->isChecked(),
 		spectatorsAllowedCheckBox->isChecked(),
 		spectatorsNeedPasswordCheckBox->isChecked(),
 		spectatorsCanTalkCheckBox->isChecked(),

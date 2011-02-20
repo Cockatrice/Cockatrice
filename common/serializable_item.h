@@ -7,6 +7,7 @@
 #include <QList>
 #include <QHash>
 #include <QDateTime>
+#include <QStringList>
 #include "color.h"
 
 class QXmlStreamReader;
@@ -80,7 +81,7 @@ protected:
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 public:
-	SerializableItem_String(const QString &_itemType, const QString &_data)
+	SerializableItem_String(const QString &_itemType, const QString &_data = QString())
 		: SerializableItem(_itemType), data(_data) { }
 	const QString &getData() { return data; }
 	void setData(const QString &_data) { data = _data; }
@@ -94,7 +95,7 @@ protected:
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 public:
-	SerializableItem_Int(const QString &_itemType, int _data)
+	SerializableItem_Int(const QString &_itemType, int _data = -1)
 		: SerializableItem(_itemType), data(_data) { }
 	int getData() { return data; }
 	void setData(int _data) { data = _data; }
@@ -108,7 +109,7 @@ protected:
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 public:
-	SerializableItem_Bool(const QString &_itemType, bool _data)
+	SerializableItem_Bool(const QString &_itemType, bool _data = false)
 		: SerializableItem(_itemType), data(_data) { }
 	bool getData() { return data; }
 	void setData(bool _data) { data = _data; }
@@ -122,7 +123,7 @@ protected:
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 public:
-	SerializableItem_Color(const QString &_itemType, const Color &_data)
+	SerializableItem_Color(const QString &_itemType, const Color &_data = Color())
 		: SerializableItem(_itemType), data(_data) { }
 	const Color &getData() { return data; }
 	void setData(const Color &_data) { data = _data; }
@@ -136,7 +137,7 @@ protected:
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 public:
-	SerializableItem_DateTime(const QString &_itemType, const QDateTime &_data)
+	SerializableItem_DateTime(const QString &_itemType, const QDateTime &_data = QDateTime())
 		: SerializableItem(_itemType), data(_data) { }
 	const QDateTime &getData() { return data; }
 	void setData(const QDateTime &_data) { data = _data; }
@@ -150,7 +151,7 @@ protected:
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 public:
-	SerializableItem_ByteArray(const QString &_itemType, const QByteArray &_data)
+	SerializableItem_ByteArray(const QString &_itemType, const QByteArray &_data = QByteArray())
 		: SerializableItem(_itemType), data(_data) { }
 	const QByteArray &getData() { return data; }
 	void setData(const QByteArray &_data) { data = _data; }

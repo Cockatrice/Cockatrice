@@ -28,8 +28,8 @@
 #include <QTimer>
 #include <QDebug>
 
-Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent)
-	: QObject(parent), creatorInfo(new ServerInfo_User(_creator->getUserInfo())), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0)
+Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent)
+	: QObject(parent), creatorInfo(new ServerInfo_User(_creator->getUserInfo())), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies), onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0)
 {
 	addPlayer(_creator, false, false);
 
@@ -173,10 +173,12 @@ void Server_Game::stopGameIfFinished()
 	}
 }
 
-ResponseCode Server_Game::checkJoin(const QString &_password, bool spectator)
+ResponseCode Server_Game::checkJoin(ServerInfo_User *user, const QString &_password, bool spectator)
 {
 	if ((_password != password) && !(spectator && !spectatorsNeedPassword))
 		return RespWrongPassword;
+	if (!(user->getUserLevel() & ServerInfo_User::IsRegistered) && onlyRegistered)
+		return RespUserLevelTooLow;
 	if (spectator) {
 		if (!spectatorsAllowed)
 			return RespSpectatorsNotAllowed;
@@ -419,6 +421,8 @@ ServerInfo_Game *Server_Game::getInfo() const
 			getMaxPlayers(),
 			gameTypeList,
 			new ServerInfo_User(getCreatorInfo(), false),
+			onlyBuddies,
+			onlyRegistered,
 			getSpectatorsAllowed(),
 			getSpectatorsNeedPassword(),
 			getSpectatorCount()

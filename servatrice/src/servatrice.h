@@ -50,6 +50,8 @@ public:
 protected:
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
 	ServerInfo_User *getUserData(const QString &name);
+	QList<ServerInfo_User *> getBuddyList(const QString &name);
+	QList<ServerInfo_User *> getIgnoreList(const QString &name);
 private:
 	QTimer *pingClock, *statusUpdateClock;
 	QTcpServer *tcpServer;
@@ -59,6 +61,7 @@ private:
 	int uptime;
 	int maxGameInactivityTime;
 	int maxPlayerInactivityTime;
+	ServerInfo_User *evalUserQueryResult(const QSqlQuery &query, bool complete);
 };
 
 #endif

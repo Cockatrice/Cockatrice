@@ -16,7 +16,7 @@ public:
 	GamesModel(const QMap<int, QString> &_gameTypes, QObject *parent = 0);
 	~GamesModel();
 	int rowCount(const QModelIndex &parent = QModelIndex()) const { return parent.isValid() ? 0 : gameList.size(); }
-	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return 5; }
+	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return 7; }
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	
