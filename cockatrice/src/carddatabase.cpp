@@ -223,7 +223,6 @@ void PictureLoader::setPicDownload(bool _picDownload)
 PictureLoadingThread::PictureLoadingThread(const QString &_picsPath, bool _picDownload, QObject *parent)
 	: QThread(parent), picsPath(_picsPath), picDownload(_picDownload)
 {
-	initMutex.lock();
 }
 
 PictureLoadingThread::~PictureLoadingThread()
@@ -239,10 +238,20 @@ void PictureLoadingThread::run()
 	pictureLoader->setPicsPath(picsPath);
 	pictureLoader->setPicDownload(picDownload);
 	
-	initMutex.unlock();
+	usleep(100);
+	initWaitCondition.wakeAll();
+	
 	exec();
 	
 	delete pictureLoader;
+}
+
+void PictureLoadingThread::waitForInit()
+{
+	QMutex mutex;
+	mutex.lock();
+	initWaitCondition.wait(&mutex);
+	mutex.unlock();
 }
 
 CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QString &_text, const QStringList &_colors, bool _cipt, int _tableRow, const SetList &_sets, const QMap<QString, QString> &_picURLs, const QMap<QString, QString> &_picURLsHq, const QMap<QString, QString> &_picURLsSt)
@@ -427,6 +436,7 @@ CardDatabase::CardDatabase(QObject *parent)
 	loadingThread = new PictureLoadingThread(settingsCache->getPicsPath(), settingsCache->getPicDownload(), this);
 	connect(loadingThread, SIGNAL(imageLoaded(CardInfo *, QImage)), this, SLOT(imageLoaded(CardInfo *, QImage)));
 	loadingThread->start(QThread::LowPriority);
+	loadingThread->waitForInit();
 
 	noCard = new CardInfo(this);
 	noCard->loadPixmap(); // cache pixmap for card back

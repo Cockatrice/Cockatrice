@@ -10,6 +10,7 @@
 #include <QNetworkRequest>
 #include <QThread>
 #include <QMutex>
+#include <QWaitCondition>
 
 class CardDatabase;
 class CardInfo;
@@ -87,13 +88,14 @@ private:
 	QString picsPath;
 	bool picDownload;
 	PictureLoader *pictureLoader;
-	mutable QMutex initMutex;
+	QWaitCondition initWaitCondition;
 protected:
 	void run();
 public:
 	PictureLoadingThread(const QString &_picsPath, bool _picDownload, QObject *parent);
 	~PictureLoadingThread();
-	PictureLoader *getPictureLoader() const { QMutexLocker locker(&initMutex); return pictureLoader; }
+	PictureLoader *getPictureLoader() const { return pictureLoader; }
+	void waitForInit();
 signals:
 	void imageLoaded(CardInfo *card, const QImage &image);
 };
