@@ -18,6 +18,8 @@ class QNetworkAccessManager;
 class QNetworkReply;
 class QNetworkRequest;
 
+typedef QMap<QString, QString> QStringMap;
+
 class CardSet : public QList<CardInfo *> {
 private:
 	QString shortName, longName;
@@ -128,9 +130,9 @@ public:
 		bool cipt = false,
 		int _tableRow = 0,
 		const SetList &_sets = SetList(),
-		const QMap<QString, QString> &_picURLs = QMap<QString, QString>(),
-		const QMap<QString, QString> &_picURLsHq = QMap<QString, QString>(),
-		const QMap<QString, QString> &_picURLsSt = QMap<QString, QString>());
+		const QStringMap &_picURLs = QStringMap(),
+		const QStringMap &_picURLsHq = QStringMap(),
+		const QStringMap &_picURLsSt = QStringMap());
 	~CardInfo();
 	const QString &getName() const { return name; }
 	const SetList &getSets() const { return sets; }
