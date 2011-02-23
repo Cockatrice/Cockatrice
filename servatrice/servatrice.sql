@@ -109,6 +109,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `avatar_bmp` blob NOT NULL,
   `registrationDate` datetime NOT NULL,
   `active` tinyint(1) NOT NULL,
+  `banned` tinyint(1) NOT NULL,
   `token` char(32) NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `name` (`name`)

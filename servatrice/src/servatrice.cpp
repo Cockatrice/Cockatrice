@@ -152,13 +152,15 @@ AuthenticationResult Servatrice::checkUserPassword(const QString &user, const QS
 		checkSql();
 	
 		QSqlQuery query;
-		query.prepare("select password from " + dbPrefix + "_users where name = :name and active = 1");
+		query.prepare("select banned, password from " + dbPrefix + "_users where name = :name and active = 1");
 		query.bindValue(":name", user);
 		if (!execSqlQuery(query))
 			return PasswordWrong;
 		
 		if (query.next()) {
-			if (query.value(0).toString() == password)
+			if (query.value(0).toInt())
+				return PasswordWrong;
+			if (query.value(1).toString() == password)
 				return PasswordRight;
 			else
 				return PasswordWrong;
