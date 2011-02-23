@@ -179,13 +179,9 @@ bool Servatrice::userExists(const QString &user)
 		QSqlQuery query;
 		query.prepare("select 1 from " + dbPrefix + "_users where name = :name");
 		query.bindValue(":name", user);
-		qDebug() << "a";
 		if (!execSqlQuery(query))
 			return false;
-		qDebug() << "b";
-		bool res = query.next();
-		qDebug() << res << user;
-		return res;
+		return query.next();
 	} else return false;
 }
 
