@@ -48,6 +48,7 @@ public:
 	QString getDbPrefix() const { return dbPrefix; }
 	void updateLoginMessage();
 protected:
+	bool userExists(const QString &user);
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
 	ServerInfo_User *getUserData(const QString &name);
 	QList<ServerInfo_User *> getBuddyList(const QString &name);

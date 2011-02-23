@@ -47,6 +47,7 @@ protected:
 	QMap<QString, Server_ProtocolHandler *> users;
 	QMap<int, Server_Room *> rooms;
 	
+	virtual bool userExists(const QString &user) = 0;
 	virtual AuthenticationResult checkUserPassword(const QString &user, const QString &password) = 0;
 	virtual ServerInfo_User *getUserData(const QString &name) = 0;
 	int nextGameId;

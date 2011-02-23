@@ -38,6 +38,8 @@ Server::~Server()
 
 AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password)
 {
+	if (name.size() > 35)
+		name = name.left(35);
 	AuthenticationResult authState = checkUserPassword(name, password);
 	if (authState == PasswordWrong)
 		return authState;
@@ -47,10 +49,11 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 		if (oldSession)
 			delete oldSession; // ~Server_ProtocolHandler() will call Server::removeClient
 	} else if (authState == UnknownUser) {
-		// Change user name so that no two users have the same names
+		// Change user name so that no two users have the same names,
+		// don't interfere with registered user names though.
 		QString tempName = name;
 		int i = 0;
-		while (users.contains(tempName))
+		while (users.contains(tempName) || userExists(tempName))
 			tempName = name + "_" + QString::number(++i);
 		name = tempName;
 	}

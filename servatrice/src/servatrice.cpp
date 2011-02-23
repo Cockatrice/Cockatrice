@@ -170,6 +170,25 @@ AuthenticationResult Servatrice::checkUserPassword(const QString &user, const QS
 		return UnknownUser;
 }
 
+bool Servatrice::userExists(const QString &user)
+{
+	const QString method = settings->value("authentication/method").toString();
+	if (method == "sql") {
+		checkSql();
+	
+		QSqlQuery query;
+		query.prepare("select 1 from " + dbPrefix + "_users where name = :name");
+		query.bindValue(":name", user);
+		qDebug() << "a";
+		if (!execSqlQuery(query))
+			return false;
+		qDebug() << "b";
+		bool res = query.next();
+		qDebug() << res << user;
+		return res;
+	} else return false;
+}
+
 ServerInfo_User *Servatrice::evalUserQueryResult(const QSqlQuery &query, bool complete)
 {
 	QString name = query.value(0).toString();
