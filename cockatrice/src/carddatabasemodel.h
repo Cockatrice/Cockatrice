@@ -20,6 +20,8 @@ public:
 private:
 	QList<CardInfo *> cardList;
 	CardDatabase *db;
+private slots:
+	void updateCardList();
 };
 
 class CardDatabaseDisplayModel : public QSortFilterProxyModel {

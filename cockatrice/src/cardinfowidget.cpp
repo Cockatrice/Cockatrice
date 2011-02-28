@@ -115,6 +115,7 @@ void CardInfoWidget::setCard(CardInfo *card)
 		disconnect(info, 0, this, 0);
 	info = card;
 	connect(info, SIGNAL(pixmapUpdated()), this, SLOT(updatePixmap()));
+	connect(info, SIGNAL(destroyed()), this, SLOT(clear()));
 
 	updatePixmap();
 	nameLabel2->setText(card->getName());
@@ -132,6 +133,11 @@ void CardInfoWidget::setCard(const QString &cardName)
 void CardInfoWidget::setCard(AbstractCardItem *card)
 {
 	setCard(card->getInfo());
+}
+
+void CardInfoWidget::clear()
+{
+	setCard(db->getCard());
 }
 
 void CardInfoWidget::updatePixmap()

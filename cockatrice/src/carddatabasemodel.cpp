@@ -3,6 +3,7 @@
 CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, QObject *parent)
 	: QAbstractListModel(parent), db(_db)
 {
+	connect(db, SIGNAL(cardListChanged()), this, SLOT(updateCardList()));
 	cardList = db->getCardList();
 }
 
@@ -61,6 +62,12 @@ QVariant CardDatabaseModel::headerData(int section, Qt::Orientation orientation,
 		case 4: return QString(tr("P/T"));
 		default: return QVariant();
 	}
+}
+
+void CardDatabaseModel::updateCardList()
+{
+	cardList = db->getCardList();
+	reset();
 }
 
 CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)

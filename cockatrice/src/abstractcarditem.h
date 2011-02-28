@@ -27,6 +27,7 @@ private:
 private slots:
 	void animationEvent();
 	void pixmapUpdated();
+	void cardInfoUpdated();
 	void callUpdate() { update(); }
 signals:
 	void hovered(AbstractCardItem *card);

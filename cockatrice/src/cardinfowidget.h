@@ -39,6 +39,7 @@ public slots:
 	void setCard(const QString &cardName);
 	void setCard(AbstractCardItem *card);
 private slots:
+	void clear();
 	void updatePixmap();
 	void minimizeClicked();
 signals:

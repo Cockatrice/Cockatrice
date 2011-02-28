@@ -659,6 +659,8 @@ bool CardDatabase::loadCardDatabase(const QString &path)
 		allSets.sortByKey();
 		for (int i = 0; i < allSets.size(); ++i)
 			allSets[i]->setSortKey(i);
+		
+		emit cardListChanged();
 	}
 	
 	return loadSuccess;

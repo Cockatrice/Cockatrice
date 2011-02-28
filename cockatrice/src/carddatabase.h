@@ -201,6 +201,8 @@ private slots:
 	void imageLoaded(CardInfo *card, QImage image);
 	void picDownloadChanged();
 	void picsPathChanged();
+signals:
+	void cardListChanged();
 };
 
 #endif

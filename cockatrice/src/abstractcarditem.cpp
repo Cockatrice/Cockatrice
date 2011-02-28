@@ -13,14 +13,15 @@
 #include <QTimer>
 
 AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, QGraphicsItem *parent)
-	: ArrowTarget(_owner, parent), info(db->getCard(_name)), infoWidget(0), name(_name), tapped(false), tapAngle(0), isHovered(false), realZValue(0)
+	: ArrowTarget(_owner, parent), infoWidget(0), name(_name), tapped(false), tapAngle(0), isHovered(false), realZValue(0)
 {
 	setCursor(Qt::OpenHandCursor);
 	setFlag(ItemIsSelectable);
 	setCacheMode(DeviceCoordinateCache);
-
-	connect(info, SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
+	
+	connect(db, SIGNAL(cardListChanged()), this, SLOT(cardInfoUpdated()));
 	connect(settingsCache, SIGNAL(displayCardNamesChanged()), this, SLOT(callUpdate()));
+	cardInfoUpdated();
 	
 	animationTimer = new QTimer(this);
 	animationTimer->setSingleShot(false);
@@ -40,6 +41,12 @@ QRectF AbstractCardItem::boundingRect() const
 void AbstractCardItem::pixmapUpdated()
 {
 	update();
+}
+
+void AbstractCardItem::cardInfoUpdated()
+{
+	info = db->getCard(name);
+	connect(info, SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
 }
 
 void AbstractCardItem::setRealZValue(qreal _zValue)
