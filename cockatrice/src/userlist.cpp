@@ -1,4 +1,5 @@
 #include "userlist.h"
+#include "tab_userlists.h"
 #include "abstractclient.h"
 #include "pixmapgenerator.h"
 #include "userinfobox.h"
@@ -31,15 +32,20 @@ UserListTWI::UserListTWI()
 
 bool UserListTWI::operator<(const QTreeWidgetItem &other) const
 {
-	// Equal user level => sort by name
-	if (data(0, Qt::UserRole) == other.data(0, Qt::UserRole))
-		return data(2, Qt::UserRole).toString().toLower() < other.data(2, Qt::UserRole).toString().toLower();
-	// Else sort by user level
-	return data(0, Qt::UserRole).toInt() > other.data(0, Qt::UserRole).toInt();
+	// Sort by online/offline
+	if (data(0, Qt::UserRole + 1) != other.data(0, Qt::UserRole + 1))
+		return data(0, Qt::UserRole + 1).toBool();
+	
+	// Sort by user level
+	if (data(0, Qt::UserRole) != other.data(0, Qt::UserRole))
+		return data(0, Qt::UserRole).toInt() > other.data(0, Qt::UserRole).toInt();
+	
+	// Sort by name
+	return data(2, Qt::UserRole).toString().toLower() < other.data(2, Qt::UserRole).toString().toLower();
 }
 
-UserList::UserList(AbstractClient *_client, bool _global, QWidget *parent)
-	: QGroupBox(parent), client(_client), global(_global)
+UserList::UserList(TabUserLists *_tabUserLists, AbstractClient *_client, UserListType _type, QWidget *parent)
+	: QGroupBox(parent), tabUserLists(_tabUserLists), client(_client), type(_type), onlineCount(0)
 {
 	itemDelegate = new UserListItemDelegate(this);
 	
@@ -62,11 +68,16 @@ UserList::UserList(AbstractClient *_client, bool _global, QWidget *parent)
 
 void UserList::retranslateUi()
 {
-	titleStr = global ? tr("Users online: %1") : tr("Users in this room: %1");
+	switch (type) {
+		case AllUsersList: titleStr = tr("Users online: %1"); break;
+		case RoomList: titleStr = tr("Users in this room: %1"); break;
+		case BuddyList: titleStr = tr("Buddies online: %1 / %2"); break;
+		case IgnoreList: titleStr = tr("Ignored users online: %1 / %2"); break;
+	}
 	updateCount();
 }
 
-void UserList::processUserInfo(ServerInfo_User *user)
+void UserList::processUserInfo(ServerInfo_User *user, bool online)
 {
 	QTreeWidgetItem *item = 0;
 	for (int i = 0; i < userTree->topLevelItemCount(); ++i) {
@@ -86,6 +97,12 @@ void UserList::processUserInfo(ServerInfo_User *user)
 	item->setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(12, user->getCountry())));
 	item->setData(2, Qt::UserRole, user->getName());
 	item->setData(2, Qt::DisplayRole, user->getName());
+	
+	item->setData(0, Qt::UserRole + 1, online);
+	if (online)
+		item->setData(2, Qt::ForegroundRole, QBrush());
+	else
+		item->setData(2, Qt::ForegroundRole, QBrush(Qt::gray));
 }
 
 bool UserList::deleteUser(const QString &userName)
@@ -100,9 +117,37 @@ bool UserList::deleteUser(const QString &userName)
 	return false;
 }
 
+void UserList::setUserOnline(QTreeWidgetItem *item, bool online)
+{
+	item->setData(0, Qt::UserRole + 1, online);
+	
+	if (online) {
+		item->setData(2, Qt::ForegroundRole, QBrush());
+		++onlineCount;
+	} else {
+		item->setData(2, Qt::ForegroundRole, QBrush(Qt::gray));
+		--onlineCount;
+	}
+	updateCount();
+}
+
+void UserList::setUserOnline(const QString &userName, bool online)
+{
+	for (int i = 0; i < userTree->topLevelItemCount(); ++i) {
+		QTreeWidgetItem *item = userTree->topLevelItem(i);
+		if (item->data(2, Qt::UserRole) == userName) {
+			setUserOnline(item, online);
+			break;
+		}
+	}
+}
+
 void UserList::updateCount()
 {
-	setTitle(titleStr.arg(userTree->topLevelItemCount()));
+	QString str = titleStr;
+	if ((type == BuddyList) || (type == IgnoreList))
+		str = str.arg(onlineCount);
+	setTitle(str.arg(userTree->topLevelItemCount()));
 }
 
 void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
@@ -118,12 +163,25 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	aUserName->setEnabled(false);
 	QAction *aDetails = new QAction(tr("User &details"), this);
 	QAction *aChat = new QAction(tr("Direct &chat"), this);
+	QAction *aAddToBuddyList = new QAction(tr("Add to &buddy list"), this);
+	QAction *aRemoveFromBuddyList = new QAction(tr("Remove from &buddy list"), this);
+	QAction *aAddToIgnoreList = new QAction(tr("Remove from &ignore list"), this);
+	QAction *aRemoveFromIgnoreList = new QAction(tr("Remove from &ignore list"), this);
 	
 	QMenu *menu = new QMenu(this);
 	menu->addAction(aUserName);
 	menu->addSeparator();
 	menu->addAction(aDetails);
 	menu->addAction(aChat);
+	menu->addSeparator();
+	if (tabUserLists->getBuddyList()->userInList(userName))
+		menu->addAction(aRemoveFromBuddyList);
+	else
+		menu->addAction(aAddToBuddyList);
+	if (tabUserLists->getIgnoreList()->userInList(userName))
+		menu->addAction(aRemoveFromIgnoreList);
+	else
+		menu->addAction(aAddToIgnoreList);
 	
 	QAction *actionClicked = menu->exec(pos);
 	if (actionClicked == aDetails) {
@@ -132,11 +190,27 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 		infoWidget->updateInfo(userName);
 	} else if (actionClicked == aChat)
 		emit openMessageDialog(userName, true);
+	else if (actionClicked == aAddToBuddyList)
+		emit addBuddy(userName);
+	else if (actionClicked == aRemoveFromBuddyList)
+		emit removeBuddy(userName);
+	else if (actionClicked == aAddToIgnoreList)
+		emit addIgnore(userName);
+	else if (actionClicked == aRemoveFromIgnoreList)
+		emit removeIgnore(userName);
 	
 	delete menu;
 	delete aUserName;
 	delete aDetails;
 	delete aChat;
+}
+
+bool UserList::userInList(const QString &userName) const
+{
+	for (int i = 0; i < userTree->topLevelItemCount(); ++i)
+		if (userTree->topLevelItem(i)->data(2, Qt::UserRole) == userName)
+			return true;
+	return false;
 }
 
 void UserList::sortItems()

@@ -8,6 +8,7 @@
 class QTreeWidget;
 class ServerInfo_User;
 class AbstractClient;
+class TabUserLists;
 
 class UserListItemDelegate : public QStyledItemDelegate {
 public:
@@ -23,22 +24,33 @@ public:
 
 class UserList : public QGroupBox {
 	Q_OBJECT
+public:
+	enum UserListType { AllUsersList, RoomList, BuddyList, IgnoreList };
 private:
+	TabUserLists *tabUserLists;
 	AbstractClient *client;
+	UserListType type;
 	QTreeWidget *userTree;
 	UserListItemDelegate *itemDelegate;
-	bool global;
+	int onlineCount;
 	QString titleStr;
 	void updateCount();
+	void setUserOnline(QTreeWidgetItem *user, bool online);
 private slots:
 	void userClicked(QTreeWidgetItem *item, int column);
 signals:
 	void openMessageDialog(const QString &userName, bool focus);
+	void addBuddy(const QString &userName);
+	void removeBuddy(const QString &userName);
+	void addIgnore(const QString &userName);
+	void removeIgnore(const QString &userName);
 public:
-	UserList(AbstractClient *_client, bool _global, QWidget *parent = 0);
+	UserList(TabUserLists *_tabUserLists, AbstractClient *_client, UserListType _type, QWidget *parent = 0);
 	void retranslateUi();
-	void processUserInfo(ServerInfo_User *user);
+	void processUserInfo(ServerInfo_User *user, bool online);
 	bool deleteUser(const QString &userName);
+	void setUserOnline(const QString &userName, bool online);
+	bool userInList(const QString &userName) const;
 	void showContextMenu(const QPoint &pos, const QModelIndex &index);
 	void sortItems();
 };

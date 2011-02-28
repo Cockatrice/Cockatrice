@@ -117,78 +117,31 @@ void RoomSelector::joinFinished(ProtocolResponse *r)
 	emit roomJoined(resp->getRoomInfo(), static_cast<Command *>(sender())->getExtraData().toBool());
 }
 
-TabServer::TabServer(AbstractClient *_client, ServerInfo_User *userInfo, QWidget *parent)
-	: Tab(parent), client(_client)
+TabServer::TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent)
+	: Tab(_tabSupervisor, parent), client(_client)
 {
 	roomSelector = new RoomSelector(client);
 	serverInfoBox = new QTextBrowser;
 	serverInfoBox->setOpenExternalLinks(true);
-	userInfoBox = new UserInfoBox(_client, false);
-	userInfoBox->updateInfo(userInfo);
-	userList = new UserList(client, true);
 	
 	connect(roomSelector, SIGNAL(roomJoined(ServerInfo_Room *, bool)), this, SIGNAL(roomJoined(ServerInfo_Room *, bool)));
-	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
 	
-	connect(client, SIGNAL(userJoinedEventReceived(Event_UserJoined *)), this, SLOT(processUserJoinedEvent(Event_UserJoined *)));
-	connect(client, SIGNAL(userLeftEventReceived(Event_UserLeft *)), this, SLOT(processUserLeftEvent(Event_UserLeft *)));
 	connect(client, SIGNAL(serverMessageEventReceived(Event_ServerMessage *)), this, SLOT(processServerMessageEvent(Event_ServerMessage *)));
-	
-	Command_ListUsers *cmd = new Command_ListUsers;
-	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(processListUsersResponse(ProtocolResponse *)));
-	client->sendCommand(cmd);
 	
 	QVBoxLayout *vbox = new QVBoxLayout;
 	vbox->addWidget(roomSelector);
 	vbox->addWidget(serverInfoBox);
 	
-	QVBoxLayout *vbox2 = new QVBoxLayout;
-	vbox2->addWidget(userInfoBox);
-	vbox2->addWidget(userList);
-	
-	QHBoxLayout *mainLayout = new QHBoxLayout;
-	mainLayout->addLayout(vbox, 3);
-	mainLayout->addLayout(vbox2, 1);
-	
-	setLayout(mainLayout);
+	setLayout(vbox);
 }
 
 void TabServer::retranslateUi()
 {
 	roomSelector->retranslateUi();
-	userInfoBox->retranslateUi();
-	userList->retranslateUi();
 }
 
 void TabServer::processServerMessageEvent(Event_ServerMessage *event)
 {
 	serverInfoBox->setHtml(event->getMessage());
 	emit userEvent();
-}
-
-void TabServer::processListUsersResponse(ProtocolResponse *response)
-{
-	Response_ListUsers *resp = qobject_cast<Response_ListUsers *>(response);
-	if (!resp)
-		return;
-	
-	const QList<ServerInfo_User *> &respList = resp->getUserList();
-	for (int i = 0; i < respList.size(); ++i)
-		userList->processUserInfo(respList[i]);
-	
-	userList->sortItems();
-}
-
-void TabServer::processUserJoinedEvent(Event_UserJoined *event)
-{
-	userList->processUserInfo(event->getUserInfo());
-	userList->sortItems();
-	
-	emit userJoined(event->getUserInfo()->getName());
-}
-
-void TabServer::processUserLeftEvent(Event_UserLeft *event)
-{
-	if (userList->deleteUser(event->getUserName()))
-		emit userLeft(event->getUserName());
 }

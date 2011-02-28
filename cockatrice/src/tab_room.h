@@ -79,7 +79,7 @@ private slots:
 	void processLeaveRoomEvent(Event_LeaveRoom *event);
 	void processSayEvent(Event_RoomSay *event);
 public:
-	TabRoom(AbstractClient *_client, const QString &_ownName, ServerInfo_Room *info);
+	TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, ServerInfo_Room *info);
 	~TabRoom();
 	void retranslateUi();
 	void processRoomEvent(RoomEvent *event);

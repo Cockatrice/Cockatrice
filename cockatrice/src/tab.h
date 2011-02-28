@@ -4,6 +4,7 @@
 #include <QWidget>
 
 class QMenu;
+class TabSupervisor;
 
 class Tab : public QWidget {
 	Q_OBJECT
@@ -11,11 +12,12 @@ signals:
 	void userEvent();
 protected:
 	QMenu *tabMenu;
+	TabSupervisor *tabSupervisor;
 private:
 	bool contentsChanged;
 public:
-	Tab(QWidget *parent = 0)
-		: QWidget(parent), tabMenu(0), contentsChanged(false) { }
+	Tab(TabSupervisor *_tabSupervisor, QWidget *parent = 0)
+		: QWidget(parent), tabMenu(0), tabSupervisor(_tabSupervisor), contentsChanged(false) { }
 	QMenu *getTabMenu() const { return tabMenu; }
 	bool getContentsChanged() const { return contentsChanged; }
 	void setContentsChanged(bool _contentsChanged) { contentsChanged = _contentsChanged; }

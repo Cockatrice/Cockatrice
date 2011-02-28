@@ -6,8 +6,8 @@
 #include "abstractclient.h"
 #include "protocol_items.h"
 
-TabAdmin::TabAdmin(AbstractClient *_client, QWidget *parent)
-	: Tab(parent), client(_client)
+TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent)
+	: Tab(_tabSupervisor, parent), client(_client)
 {
 	updateServerMessageButton = new QPushButton;
 	connect(updateServerMessageButton, SIGNAL(clicked()), this, SLOT(actUpdateServerMessage()));

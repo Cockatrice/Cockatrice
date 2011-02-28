@@ -26,6 +26,26 @@ Command_GetUserInfo::Command_GetUserInfo(const QString &_userName)
 {
 	insertItem(new SerializableItem_String("user_name", _userName));
 }
+Command_AddBuddy::Command_AddBuddy(const QString &_userName)
+	: Command("add_buddy")
+{
+	insertItem(new SerializableItem_String("user_name", _userName));
+}
+Command_RemoveBuddy::Command_RemoveBuddy(const QString &_userName)
+	: Command("remove_buddy")
+{
+	insertItem(new SerializableItem_String("user_name", _userName));
+}
+Command_AddIgnore::Command_AddIgnore(const QString &_userName)
+	: Command("add_ignore")
+{
+	insertItem(new SerializableItem_String("user_name", _userName));
+}
+Command_RemoveIgnore::Command_RemoveIgnore(const QString &_userName)
+	: Command("remove_ignore")
+{
+	insertItem(new SerializableItem_String("user_name", _userName));
+}
 Command_DeckList::Command_DeckList()
 	: Command("deck_list")
 {
@@ -437,6 +457,10 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdmessage", Command_Message::newItem);
 	itemNameHash.insert("cmdlist_users", Command_ListUsers::newItem);
 	itemNameHash.insert("cmdget_user_info", Command_GetUserInfo::newItem);
+	itemNameHash.insert("cmdadd_buddy", Command_AddBuddy::newItem);
+	itemNameHash.insert("cmdremove_buddy", Command_RemoveBuddy::newItem);
+	itemNameHash.insert("cmdadd_ignore", Command_AddIgnore::newItem);
+	itemNameHash.insert("cmdremove_ignore", Command_RemoveIgnore::newItem);
 	itemNameHash.insert("cmddeck_list", Command_DeckList::newItem);
 	itemNameHash.insert("cmddeck_new_dir", Command_DeckNewDir::newItem);
 	itemNameHash.insert("cmddeck_del_dir", Command_DeckDelDir::newItem);

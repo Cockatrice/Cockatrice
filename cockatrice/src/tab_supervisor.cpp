@@ -7,6 +7,7 @@
 #include "tab_deck_storage.h"
 #include "tab_admin.h"
 #include "tab_message.h"
+#include "tab_userlists.h"
 #include "protocol_items.h"
 #include "pixmapgenerator.h"
 #include <QDebug>
@@ -63,22 +64,26 @@ void TabSupervisor::start(AbstractClient *_client, ServerInfo_User *userInfo)
 	connect(client, SIGNAL(messageEventReceived(Event_Message *)), this, SLOT(processMessageEvent(Event_Message *)));
 	connect(client, SIGNAL(maxPingTime(int, int)), this, SLOT(updatePingTime(int, int)));
 
-	tabServer = new TabServer(client, userInfo);
+	tabServer = new TabServer(this, client);
 	connect(tabServer, SIGNAL(roomJoined(ServerInfo_Room *, bool)), this, SLOT(addRoomTab(ServerInfo_Room *, bool)));
-	connect(tabServer, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
-	connect(tabServer, SIGNAL(userJoined(const QString &)), this, SLOT(processUserJoined(const QString &)));
-	connect(tabServer, SIGNAL(userLeft(const QString &)), this, SLOT(processUserLeft(const QString &)));
 	myAddTab(tabServer);
+	
+	tabUserLists = new TabUserLists(this, client, userInfo);
+	connect(tabUserLists, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
+	connect(tabUserLists, SIGNAL(userJoined(const QString &)), this, SLOT(processUserJoined(const QString &)));
+	connect(tabUserLists, SIGNAL(userLeft(const QString &)), this, SLOT(processUserLeft(const QString &)));
+	myAddTab(tabUserLists);
+	
 	updatePingTime(0, -1);
 	
 	if (userInfo->getUserLevel() & ServerInfo_User::IsRegistered) {
-		tabDeckStorage = new TabDeckStorage(client);
+		tabDeckStorage = new TabDeckStorage(this, client);
 		myAddTab(tabDeckStorage);
 	} else
 		tabDeckStorage = 0;
 	
 	if (userInfo->getUserLevel() & ServerInfo_User::IsAdmin) {
-		tabAdmin = new TabAdmin(client);
+		tabAdmin = new TabAdmin(this, client);
 		myAddTab(tabAdmin);
 	} else
 		tabAdmin = 0;
@@ -148,7 +153,7 @@ void TabSupervisor::updatePingTime(int value, int max)
 
 void TabSupervisor::gameJoined(Event_GameJoined *event)
 {
-	TabGame *tab = new TabGame(QList<AbstractClient *>() << client, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
+	TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	myAddTab(tab);
 	gameTabs.insert(event->getGameId(), tab);
@@ -157,7 +162,7 @@ void TabSupervisor::gameJoined(Event_GameJoined *event)
 
 void TabSupervisor::localGameJoined(Event_GameJoined *event)
 {
-	TabGame *tab = new TabGame(localClients, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
+	TabGame *tab = new TabGame(this, localClients, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	myAddTab(tab);
 	gameTabs.insert(event->getGameId(), tab);
@@ -182,7 +187,7 @@ void TabSupervisor::gameLeft(TabGame *tab)
 
 void TabSupervisor::addRoomTab(ServerInfo_Room *info, bool setCurrent)
 {
-	TabRoom *tab = new TabRoom(client, userName, info);
+	TabRoom *tab = new TabRoom(this, client, userName, info);
 	connect(tab, SIGNAL(roomClosing(TabRoom *)), this, SLOT(roomLeft(TabRoom *)));
 	connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
 	myAddTab(tab);
@@ -204,7 +209,7 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
 	if (receiverName == userName)
 		return 0;
 	
-	TabMessage *tab = new TabMessage(client, userName, receiverName);
+	TabMessage *tab = new TabMessage(this, client, userName, receiverName);
 	connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
 	myAddTab(tab);
 	messageTabs.insert(receiverName, tab);

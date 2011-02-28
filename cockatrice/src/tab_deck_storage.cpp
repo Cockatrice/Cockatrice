@@ -17,8 +17,8 @@
 #include "window_deckeditor.h"
 #include "settingscache.h"
 
-TabDeckStorage::TabDeckStorage(AbstractClient *_client)
-	: Tab(), client(_client)
+TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client)
+	: Tab(_tabSupervisor), client(_client)
 {
 	localDirModel = new QFileSystemModel(this);
 	localDirModel->setRootPath(settingsCache->getDeckPath());

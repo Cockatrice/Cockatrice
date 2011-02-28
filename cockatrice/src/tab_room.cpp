@@ -10,6 +10,7 @@
 #include <QInputDialog>
 #include <QLabel>
 #include "dlg_creategame.h"
+#include "tab_supervisor.h"
 #include "tab_room.h"
 #include "userlist.h"
 #include "abstractclient.h"
@@ -122,15 +123,15 @@ void GameSelector::processGameInfo(ServerInfo_Game *info)
 	gameListModel->updateGameList(info);
 }
 
-TabRoom::TabRoom(AbstractClient *_client, const QString &_ownName, ServerInfo_Room *info)
-	: Tab(), client(_client), roomId(info->getRoomId()), roomName(info->getName()), ownName(_ownName)
+TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, ServerInfo_Room *info)
+	: Tab(_tabSupervisor), client(_client), roomId(info->getRoomId()), roomName(info->getName()), ownName(_ownName)
 {
 	const QList<ServerInfo_GameType *> gameTypeList = info->getGameTypeList();
 	for (int i = 0; i < gameTypeList.size(); ++i)
 		gameTypes.insert(gameTypeList[i]->getGameTypeId(), gameTypeList[i]->getDescription());
 	
 	gameSelector = new GameSelector(client, this);
-	userList = new UserList(client, false);
+	userList = new UserList(tabSupervisor->getUserListsTab(), client, UserList::RoomList);
 	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
 	
 	chatView = new ChatView(ownName);
@@ -169,7 +170,7 @@ TabRoom::TabRoom(AbstractClient *_client, const QString &_ownName, ServerInfo_Ro
 	
 	const QList<ServerInfo_User *> users = info->getUserList();
 	for (int i = 0; i < users.size(); ++i)
-		userList->processUserInfo(users[i]);
+		userList->processUserInfo(users[i], true);
 	userList->sortItems();
 	
 	const QList<ServerInfo_Game *> games = info->getGameList();
@@ -233,7 +234,7 @@ void TabRoom::processListGamesEvent(Event_ListGames *event)
 
 void TabRoom::processJoinRoomEvent(Event_JoinRoom *event)
 {
-	userList->processUserInfo(event->getUserInfo());
+	userList->processUserInfo(event->getUserInfo(), true);
 	userList->sortItems();
 }
 

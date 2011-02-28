@@ -45,7 +45,7 @@ private slots:
 	void actDelete();
 	void deleteFinished(ResponseCode resp);
 public:
-	TabDeckStorage(AbstractClient *_client);
+	TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client);
 	void retranslateUi();
 	QString getTabText() const { return tr("Deck storage"); }
 };

@@ -25,7 +25,7 @@ private slots:
 	void sendMessage();
 	void actLeave();
 public:
-	TabMessage(AbstractClient *_client, const QString &_ownName, const QString &_userName);
+	TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, const QString &_userName);
 	~TabMessage();
 	void retranslateUi();
 	QString getUserName() const { return userName; }

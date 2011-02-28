@@ -43,6 +43,38 @@ public:
 	static SerializableItem *newItem() { return new Command_GetUserInfo; }
 	int getItemId() const { return ItemId_Command_GetUserInfo; }
 };
+class Command_AddBuddy : public Command {
+	Q_OBJECT
+public:
+	Command_AddBuddy(const QString &_userName = QString());
+	QString getUserName() const { return static_cast<SerializableItem_String *>(itemMap.value("user_name"))->getData(); };
+	static SerializableItem *newItem() { return new Command_AddBuddy; }
+	int getItemId() const { return ItemId_Command_AddBuddy; }
+};
+class Command_RemoveBuddy : public Command {
+	Q_OBJECT
+public:
+	Command_RemoveBuddy(const QString &_userName = QString());
+	QString getUserName() const { return static_cast<SerializableItem_String *>(itemMap.value("user_name"))->getData(); };
+	static SerializableItem *newItem() { return new Command_RemoveBuddy; }
+	int getItemId() const { return ItemId_Command_RemoveBuddy; }
+};
+class Command_AddIgnore : public Command {
+	Q_OBJECT
+public:
+	Command_AddIgnore(const QString &_userName = QString());
+	QString getUserName() const { return static_cast<SerializableItem_String *>(itemMap.value("user_name"))->getData(); };
+	static SerializableItem *newItem() { return new Command_AddIgnore; }
+	int getItemId() const { return ItemId_Command_AddIgnore; }
+};
+class Command_RemoveIgnore : public Command {
+	Q_OBJECT
+public:
+	Command_RemoveIgnore(const QString &_userName = QString());
+	QString getUserName() const { return static_cast<SerializableItem_String *>(itemMap.value("user_name"))->getData(); };
+	static SerializableItem *newItem() { return new Command_RemoveIgnore; }
+	int getItemId() const { return ItemId_Command_RemoveIgnore; }
+};
 class Command_DeckList : public Command {
 	Q_OBJECT
 public:

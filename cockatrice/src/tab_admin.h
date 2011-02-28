@@ -21,7 +21,7 @@ private slots:
 	void actUnlock();
 	void actLock();
 public:
-	TabAdmin(AbstractClient *_client, QWidget *parent = 0);
+	TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = 0);
 	void retranslateUi();
 	QString getTabText() const { return tr("Administration"); }
 };

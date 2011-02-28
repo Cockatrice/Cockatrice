@@ -8,8 +8,8 @@
 #include "protocol_items.h"
 #include "chatview.h"
 
-TabMessage::TabMessage(AbstractClient *_client, const QString &_ownName, const QString &_userName)
-	: Tab(), client(_client), userName(_userName), userOnline(true)
+TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, const QString &_userName)
+	: Tab(_tabSupervisor), client(_client), userName(_userName), userOnline(true)
 {
 	chatView = new ChatView(_ownName);
 	sayEdit = new QLineEdit;

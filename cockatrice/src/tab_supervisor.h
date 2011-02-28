@@ -13,6 +13,7 @@ class TabGame;
 class TabDeckStorage;
 class TabAdmin;
 class TabMessage;
+class TabUserLists;
 class RoomEvent;
 class GameEventContainer;
 class Event_GameJoined;
@@ -28,6 +29,7 @@ private:
 	AbstractClient *client;
 	QList<AbstractClient *> localClients;
 	TabServer *tabServer;
+	TabUserLists *tabUserLists;
 	TabDeckStorage *tabDeckStorage;
 	TabAdmin *tabAdmin;
 	QMap<int, TabRoom *> roomTabs;
@@ -42,6 +44,7 @@ public:
 	void startLocal(const QList<AbstractClient *> &_clients);
 	void stop();
 	int getGameCount() const { return gameTabs.size(); }
+	TabUserLists *getUserListsTab() const { return tabUserLists; }
 signals:
 	void setMenu(QMenu *menu);
 	void localGameEnded();
