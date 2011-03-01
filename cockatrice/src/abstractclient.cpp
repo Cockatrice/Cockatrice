@@ -32,6 +32,8 @@ void AbstractClient::processProtocolItem(ProtocolItem *item)
 	GenericEvent *genericEvent = qobject_cast<GenericEvent *>(item);
 	if (genericEvent) {
 		switch (genericEvent->getItemId()) {
+			case ItemId_Event_AddToList: emit addToListEventReceived(qobject_cast<Event_AddToList *>(item)); break;
+			case ItemId_Event_RemoveFromList: emit removeFromListEventReceived(qobject_cast<Event_RemoveFromList *>(item)); break;
 			case ItemId_Event_UserJoined: emit userJoinedEventReceived(qobject_cast<Event_UserJoined *>(item)); break;
 			case ItemId_Event_UserLeft: emit userLeftEventReceived(qobject_cast<Event_UserLeft *>(item)); break;
 			case ItemId_Event_ServerMessage: emit serverMessageEventReceived(qobject_cast<Event_ServerMessage *>(item)); break;

@@ -3,6 +3,7 @@
 #include "abstractclient.h"
 #include "pixmapgenerator.h"
 #include "userinfobox.h"
+#include "protocol_items.h"
 #include <QHeaderView>
 #include <QVBoxLayout>
 #include <QMouseEvent>
@@ -90,7 +91,9 @@ void UserList::processUserInfo(ServerInfo_User *user, bool online)
 	if (!item) {
 		item = new UserListTWI;
 		userTree->addTopLevelItem(item);
-		retranslateUi();
+		if (online)
+			++onlineCount;
+		updateCount();
 	}
 	item->setData(0, Qt::UserRole, user->getUserLevel());
 	item->setIcon(0, QIcon(UserLevelPixmapGenerator::generatePixmap(12, user->getUserLevel())));
@@ -109,7 +112,10 @@ bool UserList::deleteUser(const QString &userName)
 {
 	for (int i = 0; i < userTree->topLevelItemCount(); ++i)
 		if (userTree->topLevelItem(i)->data(2, Qt::UserRole) == userName) {
-			delete userTree->takeTopLevelItem(i);
+			QTreeWidgetItem *item = userTree->takeTopLevelItem(i);
+			if (item->data(0, Qt::UserRole + 1).toBool())
+				--onlineCount;
+			delete item;
 			updateCount();
 			return true;
 		}
@@ -165,7 +171,7 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	QAction *aChat = new QAction(tr("Direct &chat"), this);
 	QAction *aAddToBuddyList = new QAction(tr("Add to &buddy list"), this);
 	QAction *aRemoveFromBuddyList = new QAction(tr("Remove from &buddy list"), this);
-	QAction *aAddToIgnoreList = new QAction(tr("Remove from &ignore list"), this);
+	QAction *aAddToIgnoreList = new QAction(tr("Add to &ignore list"), this);
 	QAction *aRemoveFromIgnoreList = new QAction(tr("Remove from &ignore list"), this);
 	
 	QMenu *menu = new QMenu(this);
@@ -191,18 +197,22 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	} else if (actionClicked == aChat)
 		emit openMessageDialog(userName, true);
 	else if (actionClicked == aAddToBuddyList)
-		emit addBuddy(userName);
+		client->sendCommand(new Command_AddToList("buddy", userName));
 	else if (actionClicked == aRemoveFromBuddyList)
-		emit removeBuddy(userName);
+		client->sendCommand(new Command_RemoveFromList("buddy", userName));
 	else if (actionClicked == aAddToIgnoreList)
-		emit addIgnore(userName);
+		client->sendCommand(new Command_AddToList("ignore", userName));
 	else if (actionClicked == aRemoveFromIgnoreList)
-		emit removeIgnore(userName);
+		client->sendCommand(new Command_RemoveFromList("ignore", userName));
 	
 	delete menu;
 	delete aUserName;
 	delete aDetails;
 	delete aChat;
+	delete aAddToBuddyList;
+	delete aRemoveFromBuddyList;
+	delete aAddToIgnoreList;
+	delete aRemoveFromIgnoreList;
 }
 
 bool UserList::userInList(const QString &userName) const

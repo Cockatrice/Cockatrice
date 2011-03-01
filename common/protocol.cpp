@@ -53,6 +53,7 @@ void ProtocolItem::initializeHash()
 	
 	registerSerializableItem("room_eventlist_games", Event_ListGames::newItem);
 	registerSerializableItem("room_eventjoin_room", Event_JoinRoom::newItem);
+	registerSerializableItem("generic_eventadd_to_list", Event_AddToList::newItem);
 	registerSerializableItem("generic_eventuser_joined", Event_UserJoined::newItem);
 	registerSerializableItem("generic_eventlist_rooms", Event_ListRooms::newItem);
 	registerSerializableItem("game_eventjoin", Event_Join::newItem);
@@ -253,6 +254,7 @@ void ProtocolResponse::initializeHash()
 {
 	responseHash.insert(QString(), RespNothing);
 	responseHash.insert("ok", RespOk);
+	responseHash.insert("internal_error", RespInternalError);
 	responseHash.insert("invalid_command", RespInvalidCommand);
 	responseHash.insert("name_not_found", RespNameNotFound);
 	responseHash.insert("login_needed", RespLoginNeeded);
@@ -374,6 +376,15 @@ Event_ListGames::Event_ListGames(int _roomId, const QList<ServerInfo_Game *> &_g
 {
 	for (int i = 0; i < _gameList.size(); ++i)
 		itemList.append(_gameList[i]);
+}
+
+Event_AddToList::Event_AddToList(const QString &_list, ServerInfo_User *_userInfo)
+	: GenericEvent("add_to_list")
+{
+	if (!_userInfo)
+		_userInfo = new ServerInfo_User;
+	insertItem(_userInfo);
+	insertItem(new SerializableItem_String("list", _list));
 }
 
 Event_UserJoined::Event_UserJoined(ServerInfo_User *_userInfo)

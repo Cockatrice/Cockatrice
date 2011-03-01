@@ -97,6 +97,92 @@ void ServerSocketInterface::sendProtocolItem(ProtocolItem *item, bool deleteItem
 		delete item;
 }
 
+int ServerSocketInterface::getUserIdInDB(const QString &name) const
+{
+	QSqlQuery query;
+	query.prepare("select id from " + servatrice->getDbPrefix() + "_users where name = :name");
+	query.bindValue(":name", name);
+	if (!servatrice->execSqlQuery(query))
+		return -1;
+	if (!query.next())
+		return -1;
+	return query.value(0).toInt();
+}
+
+ResponseCode ServerSocketInterface::cmdAddToList(Command_AddToList *cmd, CommandContainer *cont)
+{
+	QString list = cmd->getList();
+	QString user = cmd->getUserName();
+	
+	if ((list != "buddy") && (list != "ignore"))
+		return RespContextError;
+	
+	if ((list == "buddy") && buddyList.contains(user))
+		return RespContextError;
+	if ((list == "ignore") && ignoreList.contains(user))
+		return RespContextError;
+	
+	int id1 = getUserIdInDB(userInfo->getName());
+	int id2 = getUserIdInDB(user);
+	if (id2 < 0)
+		return RespNameNotFound;
+	if (id1 == id2)
+		return RespContextError;
+	
+	QSqlQuery query;
+	query.prepare("insert into " + servatrice->getDbPrefix() + "_" + list + "list (id_user1, id_user2) values(:id1, :id2)");
+	query.bindValue(":id1", id1);
+	query.bindValue(":id2", id2);
+	if (!servatrice->execSqlQuery(query))
+		return RespInternalError;
+	
+	ServerInfo_User *info = servatrice->getUserData(user);
+	if (list == "buddy")
+		buddyList.insert(info->getName(), info);
+	else if (list == "ignore")
+		ignoreList.insert(info->getName(), info);
+	
+	cont->enqueueItem(new Event_AddToList(list, new ServerInfo_User(info)));
+	return RespOk;
+}
+
+ResponseCode ServerSocketInterface::cmdRemoveFromList(Command_RemoveFromList *cmd, CommandContainer *cont)
+{
+	QString list = cmd->getList();
+	QString user = cmd->getUserName();
+	
+	if ((list != "buddy") && (list != "ignore"))
+		return RespContextError;
+	
+	if ((list == "buddy") && !buddyList.contains(user))
+		return RespContextError;
+	if ((list == "ignore") && !ignoreList.contains(user))
+		return RespContextError;
+	
+	int id1 = getUserIdInDB(userInfo->getName());
+	int id2 = getUserIdInDB(user);
+	if (id2 < 0)
+		return RespNameNotFound;
+	
+	QSqlQuery query;
+	query.prepare("delete from " + servatrice->getDbPrefix() + "_" + list + "list where id_user1 = :id1 and id_user2 = :id2");
+	query.bindValue(":id1", id1);
+	query.bindValue(":id2", id2);
+	if (!servatrice->execSqlQuery(query))
+		return RespInternalError;
+	
+	if (list == "buddy") {
+		delete buddyList.value(user);
+		buddyList.remove(user);
+	} else if (list == "ignore") {
+		delete ignoreList.value(user);
+		ignoreList.remove(user);
+	}
+	
+	cont->enqueueItem(new Event_RemoveFromList(list, user));
+	return RespOk;
+}
+
 int ServerSocketInterface::getDeckPathId(int basePathId, QStringList path)
 {
 	if (path.isEmpty())

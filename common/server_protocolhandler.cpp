@@ -42,10 +42,12 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 	}
 
 	delete userInfo;
-	for (int i = 0; i < buddyList.size(); ++i)
-		delete buddyList[i];
-	for (int i = 0; i < ignoreList.size(); ++i)
-		delete ignoreList[i];
+	QMapIterator<QString, ServerInfo_User *> i(buddyList);
+	while (i.hasNext())
+		delete i.next().value();
+	QMapIterator<QString, ServerInfo_User *> j(ignoreList);
+	while (i.hasNext())
+		delete i.next().value();
 }
 
 void Server_ProtocolHandler::playerRemovedFromGame(Server_Game *game)
@@ -138,6 +140,8 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 		case ItemId_Command_Ping: return cmdPing(static_cast<Command_Ping *>(command), cont);
 		case ItemId_Command_Login: return cmdLogin(static_cast<Command_Login *>(command), cont);
 		case ItemId_Command_Message: return cmdMessage(static_cast<Command_Message *>(command), cont);
+		case ItemId_Command_AddToList: return cmdAddToList(static_cast<Command_AddToList *>(command), cont);
+		case ItemId_Command_RemoveFromList: return cmdRemoveFromList(static_cast<Command_RemoveFromList *>(command), cont);
 		case ItemId_Command_DeckList: return cmdDeckList(static_cast<Command_DeckList *>(command), cont);
 		case ItemId_Command_DeckNewDir: return cmdDeckNewDir(static_cast<Command_DeckNewDir *>(command), cont);
 		case ItemId_Command_DeckDelDir: return cmdDeckDelDir(static_cast<Command_DeckDelDir *>(command), cont);
@@ -237,8 +241,12 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 	enqueueProtocolItem(new Event_ServerMessage(server->getLoginMessage()));
 
 	if (authState == PasswordRight) {
-		buddyList = server->getBuddyList(userInfo->getName());
-		ignoreList = server->getIgnoreList(userInfo->getName());
+		QList<ServerInfo_User *> _buddyList = server->getBuddyList(userInfo->getName());
+		for (int i = 0; i < _buddyList.size(); ++i)
+			buddyList.insert(_buddyList[i]->getName(), _buddyList[i]);
+		QList<ServerInfo_User *> _ignoreList = server->getIgnoreList(userInfo->getName());
+		for (int i = 0; i < _ignoreList.size(); ++i)
+			ignoreList.insert(_ignoreList[i]->getName(), _ignoreList[i]);
 		
 		// This might not scale very well. Use an extra QMap if it becomes a problem.
 		const QList<Server_Game *> &serverGames = server->getGames();
@@ -256,11 +264,13 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 	}
 	
 	QList<ServerInfo_User *> _buddyList;
-	for (int i = 0; i < buddyList.size(); ++i)
-		_buddyList.append(new ServerInfo_User(buddyList[i]));
+	QMapIterator<QString, ServerInfo_User *> buddyIterator(buddyList);
+	while (buddyIterator.hasNext())
+		_buddyList.append(new ServerInfo_User(buddyIterator.next().value()));
 	QList<ServerInfo_User *> _ignoreList;
-	for (int i = 0; i < ignoreList.size(); ++i)
-		_ignoreList.append(new ServerInfo_User(ignoreList[i]));
+	QMapIterator<QString, ServerInfo_User *> ignoreIterator(ignoreList);
+	while (ignoreIterator.hasNext())
+		_ignoreList.append(new ServerInfo_User(ignoreIterator.next().value()));
 	
 	cont->setResponse(new Response_Login(cont->getCmdId(), RespOk, new ServerInfo_User(userInfo, true), _buddyList, _ignoreList));
 	return RespNothing;

@@ -43,7 +43,10 @@ private:
 	QXmlStreamWriter *xmlWriter;
 	QXmlStreamReader *xmlReader;
 	TopLevelProtocolItem *topLevelItem;
+	int getUserIdInDB(const QString &name) const;
 
+	ResponseCode cmdAddToList(Command_AddToList *cmd, CommandContainer *cont);
+	ResponseCode cmdRemoveFromList(Command_RemoveFromList *cmd, CommandContainer *cont);
 	int getDeckPathId(int basePathId, QStringList path);
 	int getDeckPathId(const QString &path);
 	bool deckListHelper(DeckList_Directory *folder);

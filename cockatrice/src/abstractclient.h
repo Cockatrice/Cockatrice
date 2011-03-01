@@ -12,7 +12,8 @@ class TopLevelProtocolItem;
 class CommandContainer;
 class RoomEvent;
 class GameEventContainer;
-class Event_ListGames;
+class Event_AddToList;
+class Event_RemoveFromList;
 class Event_UserJoined;
 class Event_UserLeft;
 class Event_ServerMessage;
@@ -40,6 +41,8 @@ signals:
 	// Game events
 	void gameEventContainerReceived(GameEventContainer *event);
 	// Generic events
+	void addToListEventReceived(Event_AddToList *event);
+	void removeFromListEventReceived(Event_RemoveFromList *event);
 	void userJoinedEventReceived(Event_UserJoined *event);
 	void userLeftEventReceived(Event_UserLeft *event);
 	void serverMessageEventReceived(Event_ServerMessage *event);

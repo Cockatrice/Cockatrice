@@ -27,7 +27,7 @@ protected:
 	bool acceptsUserListChanges;
 	bool acceptsRoomListChanges;
 	ServerInfo_User *userInfo;
-	QList<ServerInfo_User *> buddyList, ignoreList;
+	QMap<QString, ServerInfo_User *> buddyList, ignoreList;
 private:
 	QList<ProtocolItem *> itemQueue;
 	QDateTime lastCommandTime;
@@ -38,6 +38,8 @@ private:
 	ResponseCode cmdPing(Command_Ping *cmd, CommandContainer *cont);
 	ResponseCode cmdLogin(Command_Login *cmd, CommandContainer *cont);
 	ResponseCode cmdMessage(Command_Message *cmd, CommandContainer *cont);
+	virtual ResponseCode cmdAddToList(Command_AddToList *cmd, CommandContainer *cont) = 0;
+	virtual ResponseCode cmdRemoveFromList(Command_RemoveFromList *cmd, CommandContainer *cont) = 0;
 	virtual ResponseCode cmdDeckList(Command_DeckList *cmd, CommandContainer *cont) = 0;
 	virtual ResponseCode cmdDeckNewDir(Command_DeckNewDir *cmd, CommandContainer *cont) = 0;
 	virtual ResponseCode cmdDeckDelDir(Command_DeckDelDir *cmd, CommandContainer *cont) = 0;
@@ -95,8 +97,8 @@ public:
 	bool getAcceptsRoomListChanges() const { return acceptsRoomListChanges; }
 	ServerInfo_User *getUserInfo() const { return userInfo; }
 	void setUserInfo(ServerInfo_User *_userInfo) { userInfo = _userInfo; }
-	const QList<ServerInfo_User *> &getBuddyList() const { return buddyList; }
-	const QList<ServerInfo_User *> &getIgnoreList() const { return ignoreList; }
+	const QMap<QString, ServerInfo_User *> &getBuddyList() const { return buddyList; }
+	const QMap<QString, ServerInfo_User *> &getIgnoreList() const { return ignoreList; }
 	const QDateTime &getLastCommandTime() const { return lastCommandTime; }
 
 	void processCommandContainer(CommandContainer *cont);

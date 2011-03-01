@@ -3,10 +3,8 @@
 0:message:s,user_name:s,text
 0:list_users
 0:get_user_info:s,user_name
-0:add_buddy:s,user_name
-0:remove_buddy:s,user_name
-0:add_ignore:s,user_name
-0:remove_ignore:s,user_name
+0:add_to_list:s,list:s,user_name
+0:remove_from_list:s,list:s,user_name
 0:deck_list
 0:deck_new_dir:s,path:s,dir_name
 0:deck_del_dir:s,path
@@ -62,6 +60,7 @@
 3:set_active_phase:i,phase
 3:dump_zone:i,zone_owner_id:s,zone:i,number_cards
 3:stop_dump_zone:i,zone_owner_id:s,zone
+4:remove_from_list:s,list:s,user_name
 4:server_message:s,message
 4:message:s,sender_name:s,receiver_name:s,text
 4:game_joined:i,game_id:s,game_description:i,player_id:b,spectator:b,spectators_can_talk:b,spectators_see_everything:b,resuming

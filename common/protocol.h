@@ -40,6 +40,7 @@ enum ItemId {
 	ItemId_Event_RevealCards = ItemId_Other + 210,
 	ItemId_Event_Join = ItemId_Other + 211,
 	ItemId_Event_Ping = ItemId_Other + 212,
+	ItemId_Event_AddToList = ItemId_Other + 213,
 	ItemId_Response_ListUsers = ItemId_Other + 300,
 	ItemId_Response_GetUserInfo = ItemId_Other + 301,
 	ItemId_Response_DeckList = ItemId_Other + 302,
@@ -405,6 +406,16 @@ public:
 	int getItemId() const { return ItemId_Event_ListGames; }
 	static SerializableItem *newItem() { return new Event_ListGames; }
 	QList<ServerInfo_Game *> getGameList() const { return typecastItemList<ServerInfo_Game *>(); }
+};
+
+class Event_AddToList : public GenericEvent {
+	Q_OBJECT
+public:
+	Event_AddToList(const QString &_list = QString(), ServerInfo_User *_userInfo = 0);
+	int getItemId() const { return ItemId_Event_AddToList; }
+	static SerializableItem *newItem() { return new Event_AddToList; }
+	ServerInfo_User *getUserInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
+	QString getList() const { return static_cast<SerializableItem_String *>(itemMap.value("list"))->getData(); }
 };
 
 class Event_UserJoined : public GenericEvent {

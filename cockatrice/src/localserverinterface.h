@@ -10,6 +10,8 @@ class LocalServerInterface : public Server_ProtocolHandler
 	Q_OBJECT
 private:
 	DeckList *getDeckFromDatabase(int /*deckId*/) { return 0; }
+	ResponseCode cmdAddToList(Command_AddToList * /*cmd*/, CommandContainer * /*cont*/) { return RespFunctionNotAllowed; }
+	ResponseCode cmdRemoveFromList(Command_RemoveFromList * /*cmd*/, CommandContainer * /*cont*/) { return RespFunctionNotAllowed; }
 	ResponseCode cmdDeckList(Command_DeckList * /*cmd*/, CommandContainer * /*cont*/) { return RespFunctionNotAllowed; }
 	ResponseCode cmdDeckNewDir(Command_DeckNewDir * /*cmd*/, CommandContainer * /*cont*/) { return RespFunctionNotAllowed; }
 	ResponseCode cmdDeckDelDir(Command_DeckDelDir * /*cmd*/, CommandContainer * /*cont*/) { return RespFunctionNotAllowed; }

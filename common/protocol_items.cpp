@@ -26,24 +26,16 @@ Command_GetUserInfo::Command_GetUserInfo(const QString &_userName)
 {
 	insertItem(new SerializableItem_String("user_name", _userName));
 }
-Command_AddBuddy::Command_AddBuddy(const QString &_userName)
-	: Command("add_buddy")
+Command_AddToList::Command_AddToList(const QString &_list, const QString &_userName)
+	: Command("add_to_list")
 {
+	insertItem(new SerializableItem_String("list", _list));
 	insertItem(new SerializableItem_String("user_name", _userName));
 }
-Command_RemoveBuddy::Command_RemoveBuddy(const QString &_userName)
-	: Command("remove_buddy")
+Command_RemoveFromList::Command_RemoveFromList(const QString &_list, const QString &_userName)
+	: Command("remove_from_list")
 {
-	insertItem(new SerializableItem_String("user_name", _userName));
-}
-Command_AddIgnore::Command_AddIgnore(const QString &_userName)
-	: Command("add_ignore")
-{
-	insertItem(new SerializableItem_String("user_name", _userName));
-}
-Command_RemoveIgnore::Command_RemoveIgnore(const QString &_userName)
-	: Command("remove_ignore")
-{
+	insertItem(new SerializableItem_String("list", _list));
 	insertItem(new SerializableItem_String("user_name", _userName));
 }
 Command_DeckList::Command_DeckList()
@@ -386,6 +378,12 @@ Event_StopDumpZone::Event_StopDumpZone(int _playerId, int _zoneOwnerId, const QS
 	insertItem(new SerializableItem_Int("zone_owner_id", _zoneOwnerId));
 	insertItem(new SerializableItem_String("zone", _zone));
 }
+Event_RemoveFromList::Event_RemoveFromList(const QString &_list, const QString &_userName)
+	: GenericEvent("remove_from_list")
+{
+	insertItem(new SerializableItem_String("list", _list));
+	insertItem(new SerializableItem_String("user_name", _userName));
+}
 Event_ServerMessage::Event_ServerMessage(const QString &_message)
 	: GenericEvent("server_message")
 {
@@ -457,10 +455,8 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdmessage", Command_Message::newItem);
 	itemNameHash.insert("cmdlist_users", Command_ListUsers::newItem);
 	itemNameHash.insert("cmdget_user_info", Command_GetUserInfo::newItem);
-	itemNameHash.insert("cmdadd_buddy", Command_AddBuddy::newItem);
-	itemNameHash.insert("cmdremove_buddy", Command_RemoveBuddy::newItem);
-	itemNameHash.insert("cmdadd_ignore", Command_AddIgnore::newItem);
-	itemNameHash.insert("cmdremove_ignore", Command_RemoveIgnore::newItem);
+	itemNameHash.insert("cmdadd_to_list", Command_AddToList::newItem);
+	itemNameHash.insert("cmdremove_from_list", Command_RemoveFromList::newItem);
 	itemNameHash.insert("cmddeck_list", Command_DeckList::newItem);
 	itemNameHash.insert("cmddeck_new_dir", Command_DeckNewDir::newItem);
 	itemNameHash.insert("cmddeck_del_dir", Command_DeckDelDir::newItem);
@@ -516,6 +512,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventset_active_phase", Event_SetActivePhase::newItem);
 	itemNameHash.insert("game_eventdump_zone", Event_DumpZone::newItem);
 	itemNameHash.insert("game_eventstop_dump_zone", Event_StopDumpZone::newItem);
+	itemNameHash.insert("generic_eventremove_from_list", Event_RemoveFromList::newItem);
 	itemNameHash.insert("generic_eventserver_message", Event_ServerMessage::newItem);
 	itemNameHash.insert("generic_eventmessage", Event_Message::newItem);
 	itemNameHash.insert("generic_eventgame_joined", Event_GameJoined::newItem);
