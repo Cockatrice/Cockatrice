@@ -228,9 +228,9 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 		return new ServerInfo_User(name, ServerInfo_User::IsUser);
 }
 
-QList<ServerInfo_User *> Servatrice::getBuddyList(const QString &name)
+QMap<QString, ServerInfo_User *> Servatrice::getBuddyList(const QString &name)
 {
-	QList<ServerInfo_User *> result;
+	QMap<QString, ServerInfo_User *> result;
 	
 	const QString method = settings->value("authentication/method").toString();
 	if (method == "sql") {
@@ -242,15 +242,17 @@ QList<ServerInfo_User *> Servatrice::getBuddyList(const QString &name)
 		if (!execSqlQuery(query))
 			return result;
 		
-		while (query.next())
-			result.append(evalUserQueryResult(query, false));
+		while (query.next()) {
+			ServerInfo_User *temp = evalUserQueryResult(query, false);
+			result.insert(temp->getName(), temp);
+		}
 	}
 	return result;
 }
 
-QList<ServerInfo_User *> Servatrice::getIgnoreList(const QString &name)
+QMap<QString, ServerInfo_User *> Servatrice::getIgnoreList(const QString &name)
 {
-	QList<ServerInfo_User *> result;
+	QMap<QString, ServerInfo_User *> result;
 	
 	const QString method = settings->value("authentication/method").toString();
 	if (method == "sql") {
@@ -262,8 +264,10 @@ QList<ServerInfo_User *> Servatrice::getIgnoreList(const QString &name)
 		if (!execSqlQuery(query))
 			return result;
 		
-		while (query.next())
-			result.append(evalUserQueryResult(query, false));
+		while (query.next()) {
+			ServerInfo_User *temp = evalUserQueryResult(query, false);
+			result.insert(temp->getName(), temp);
+		}
 	}
 	return result;
 }

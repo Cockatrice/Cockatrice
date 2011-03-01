@@ -51,8 +51,8 @@ public:
 protected:
 	bool userExists(const QString &user);
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
-	QList<ServerInfo_User *> getBuddyList(const QString &name);
-	QList<ServerInfo_User *> getIgnoreList(const QString &name);
+	QMap<QString, ServerInfo_User *> getBuddyList(const QString &name);
+	QMap<QString, ServerInfo_User *> getIgnoreList(const QString &name);
 private:
 	QTimer *pingClock, *statusUpdateClock;
 	QTcpServer *tcpServer;

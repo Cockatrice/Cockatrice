@@ -21,8 +21,8 @@ public:
 protected:
 	bool userExists(const QString & /*name*/) { return false; }
 	ServerInfo_User *getUserData(const QString &name);
-	QList<ServerInfo_User *> getBuddyList(const QString & /*name*/) { return QList<ServerInfo_User *>(); }
-	QList<ServerInfo_User *> getIgnoreList(const QString & /*name*/) { return QList<ServerInfo_User *>(); }
+	QMap<QString, ServerInfo_User *> getBuddyList(const QString & /*name*/) { return QMap<QString, ServerInfo_User *>(); }
+	QMap<QString, ServerInfo_User *> getIgnoreList(const QString & /*name*/) { return QMap<QString, ServerInfo_User *>(); }
 };
 
 #endif

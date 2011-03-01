@@ -241,12 +241,8 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 	enqueueProtocolItem(new Event_ServerMessage(server->getLoginMessage()));
 
 	if (authState == PasswordRight) {
-		QList<ServerInfo_User *> _buddyList = server->getBuddyList(userInfo->getName());
-		for (int i = 0; i < _buddyList.size(); ++i)
-			buddyList.insert(_buddyList[i]->getName(), _buddyList[i]);
-		QList<ServerInfo_User *> _ignoreList = server->getIgnoreList(userInfo->getName());
-		for (int i = 0; i < _ignoreList.size(); ++i)
-			ignoreList.insert(_ignoreList[i]->getName(), _ignoreList[i]);
+		buddyList = server->getBuddyList(userInfo->getName());
+		ignoreList = server->getIgnoreList(userInfo->getName());
 		
 		// This might not scale very well. Use an extra QMap if it becomes a problem.
 		const QList<Server_Game *> &serverGames = server->getGames();

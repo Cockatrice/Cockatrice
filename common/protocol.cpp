@@ -266,6 +266,7 @@ void ProtocolResponse::initializeHash()
 	responseHash.insert("spectators_not_allowed", RespSpectatorsNotAllowed);
 	responseHash.insert("only_buddies", RespOnlyBuddies);
 	responseHash.insert("user_level_too_low", RespUserLevelTooLow);
+	responseHash.insert("on_ignore_list", RespOnIgnoreList);
 }
 
 Response_JoinRoom::Response_JoinRoom(int _cmdId, ResponseCode _responseCode, ServerInfo_Room *_roomInfo)

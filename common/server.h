@@ -39,8 +39,8 @@ public:
 	virtual int getMaxGameInactivityTime() const = 0;
 	virtual int getMaxPlayerInactivityTime() const = 0;
 	
-	virtual QList<ServerInfo_User *> getBuddyList(const QString &name) = 0;
-	virtual QList<ServerInfo_User *> getIgnoreList(const QString &name) = 0;
+	virtual QMap<QString, ServerInfo_User *> getBuddyList(const QString &name) = 0;
+	virtual QMap<QString, ServerInfo_User *> getIgnoreList(const QString &name) = 0;
 protected:
 	QMap<int, Server_Game *> games;
 	QList<Server_ProtocolHandler *> clients;
