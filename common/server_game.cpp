@@ -183,7 +183,7 @@ ResponseCode Server_Game::checkJoin(ServerInfo_User *user, const QString &_passw
 		if (!static_cast<Server_Room *>(parent())->getServer()->getBuddyList(creatorInfo->getName()).contains(user->getName()))
 			return RespOnlyBuddies;
 	if (static_cast<Server_Room *>(parent())->getServer()->getIgnoreList(creatorInfo->getName()).contains(user->getName()))
-		return RespOnIgnoreList;
+		return RespInIgnoreList;
 	if (spectator) {
 		if (!spectatorsAllowed)
 			return RespSpectatorsNotAllowed;

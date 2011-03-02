@@ -111,6 +111,9 @@ int ServerSocketInterface::getUserIdInDB(const QString &name) const
 
 ResponseCode ServerSocketInterface::cmdAddToList(Command_AddToList *cmd, CommandContainer *cont)
 {
+	if (authState != PasswordRight)
+		return RespFunctionNotAllowed;
+	
 	QString list = cmd->getList();
 	QString user = cmd->getUserName();
 	
@@ -148,6 +151,9 @@ ResponseCode ServerSocketInterface::cmdAddToList(Command_AddToList *cmd, Command
 
 ResponseCode ServerSocketInterface::cmdRemoveFromList(Command_RemoveFromList *cmd, CommandContainer *cont)
 {
+	if (authState != PasswordRight)
+		return RespFunctionNotAllowed;
+	
 	QString list = cmd->getList();
 	QString user = cmd->getUserName();
 	

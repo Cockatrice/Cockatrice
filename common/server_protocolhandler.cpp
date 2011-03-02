@@ -281,6 +281,8 @@ ResponseCode Server_ProtocolHandler::cmdMessage(Command_Message *cmd, CommandCon
 	Server_ProtocolHandler *userHandler = server->getUsers().value(receiver);
 	if (!userHandler)
 		return RespNameNotFound;
+	if (userHandler->getIgnoreList().contains(userInfo->getName()))
+		return RespInIgnoreList;
 	
 	cont->enqueueItem(new Event_Message(userInfo->getName(), receiver, cmd->getText()));
 	userHandler->sendProtocolItem(new Event_Message(userInfo->getName(), receiver, cmd->getText()));

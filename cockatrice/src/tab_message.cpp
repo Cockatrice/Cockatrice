@@ -45,8 +45,16 @@ void TabMessage::sendMessage()
 	if (sayEdit->text().isEmpty() || !userOnline)
 	  	return;
 	
-	client->sendCommand(new Command_Message(userName, sayEdit->text()));
+	Command_Message *cmd = new Command_Message(userName, sayEdit->text());
+	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(messageSent(ProtocolResponse *)));
+	client->sendCommand(cmd);
 	sayEdit->clear();
+}
+
+void TabMessage::messageSent(ProtocolResponse *response)
+{
+	if (response->getResponseCode() == RespInIgnoreList)
+		chatView->appendMessage(QString(), tr("This user is ignoring you."));
 }
 
 void TabMessage::actLeave()

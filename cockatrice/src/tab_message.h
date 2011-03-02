@@ -7,6 +7,7 @@ class AbstractClient;
 class ChatView;
 class QLineEdit;
 class Event_Message;
+class ProtocolResponse;
 
 class TabMessage : public Tab {
 	Q_OBJECT
@@ -24,6 +25,7 @@ signals:
 private slots:
 	void sendMessage();
 	void actLeave();
+	void messageSent(ProtocolResponse *response);
 public:
 	TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, const QString &_userName);
 	~TabMessage();

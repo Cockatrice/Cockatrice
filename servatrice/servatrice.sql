@@ -128,3 +128,16 @@ CREATE TABLE `cockatrice_servermessages` (
   `message` text,
   PRIMARY KEY  (`timest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE `cockatrice_ignorelist` (
+  `id_user1` int(7) unsigned NOT NULL,
+  `id_user2` int(7) unsigned NOT NULL,
+  UNIQUE KEY `key` (`id_user1`, `id_user2`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE `cockatrice_buddylist` (
+  `id_user1` int(7) unsigned NOT NULL,
+  `id_user2` int(7) unsigned NOT NULL,
+  UNIQUE KEY `key` (`id_user1`, `id_user2`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
