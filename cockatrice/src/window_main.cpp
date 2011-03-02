@@ -176,6 +176,7 @@ void MainWindow::serverError(ResponseCode r)
 {
 	switch (r) {
 		case RespWrongPassword: QMessageBox::critical(this, tr("Error"), tr("Invalid login data.")); break;
+		case RespWouldOverwriteOldSession: QMessageBox::critical(this, tr("Error"), tr("There is already an active session using this user name.\nPlease close that session first and re-login.")); break;
 		default: ;
 	}
 }

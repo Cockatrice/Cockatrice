@@ -46,8 +46,11 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	
 	if (authState == PasswordRight) {
 		Server_ProtocolHandler *oldSession = users.value(name);
-		if (oldSession)
+		if (oldSession) {
+			if (!(oldSession->getUserInfo()->getUserLevel() & ServerInfo_User::IsRegistered))
+				return WouldOverwriteOldSession;
 			delete oldSession; // ~Server_ProtocolHandler() will call Server::removeClient
+		}
 	} else if (authState == UnknownUser) {
 		// Change user name so that no two users have the same names,
 		// don't interfere with registered user names though.

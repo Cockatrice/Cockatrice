@@ -237,6 +237,8 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 	authState = server->loginUser(this, userName, cmd->getPassword());
 	if (authState == PasswordWrong)
 		return RespWrongPassword;
+	if (authState == WouldOverwriteOldSession)
+		return RespWouldOverwriteOldSession;
 
 	enqueueProtocolItem(new Event_ServerMessage(server->getLoginMessage()));
 

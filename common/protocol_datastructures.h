@@ -8,7 +8,7 @@
 
 class DeckList;
 
-enum ResponseCode { RespNothing, RespOk, RespInternalError, RespInvalidCommand, RespInvalidData, RespNameNotFound, RespLoginNeeded, RespFunctionNotAllowed, RespGameNotStarted, RespGameFull, RespContextError, RespWrongPassword, RespSpectatorsNotAllowed, RespOnlyBuddies, RespUserLevelTooLow, RespInIgnoreList };
+enum ResponseCode { RespNothing, RespOk, RespInternalError, RespInvalidCommand, RespInvalidData, RespNameNotFound, RespLoginNeeded, RespFunctionNotAllowed, RespGameNotStarted, RespGameFull, RespContextError, RespWrongPassword, RespSpectatorsNotAllowed, RespOnlyBuddies, RespUserLevelTooLow, RespInIgnoreList, RespWouldOverwriteOldSession };
 
 // PrivateZone: Contents of the zone are always visible to the owner,
 // but not to anyone else.
