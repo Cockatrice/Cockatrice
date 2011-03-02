@@ -38,6 +38,9 @@ public:
 	virtual bool getGameShouldPing() const = 0;
 	virtual int getMaxGameInactivityTime() const = 0;
 	virtual int getMaxPlayerInactivityTime() const = 0;
+	virtual int getMessageCountingInterval() const { return 0; }
+	virtual int getMaxMessageCountPerInterval() const { return 0; }
+	virtual int getMaxMessageSizePerInterval() const { return 0; }
 	
 	virtual QMap<QString, ServerInfo_User *> getBuddyList(const QString &name) = 0;
 	virtual QMap<QString, ServerInfo_User *> getIgnoreList(const QString &name) = 0;

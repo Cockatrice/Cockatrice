@@ -208,6 +208,16 @@ void Server_ProtocolHandler::processCommandContainer(CommandContainer *cont)
 
 void Server_ProtocolHandler::pingClockTimeout()
 {
+	int interval = server->getMessageCountingInterval();
+	if (interval > 0) {
+		messageSizeOverTime.prepend(0);
+		if (messageSizeOverTime.size() > server->getMessageCountingInterval())
+			messageSizeOverTime.removeLast();
+		messageCountOverTime.prepend(0);
+		if (messageCountOverTime.size() > server->getMessageCountingInterval())
+			messageCountOverTime.removeLast();
+	}
+	
 	if (lastCommandTime.secsTo(QDateTime::currentDateTime()) > server->getMaxPlayerInactivityTime())
 		deleteLater();
 }
@@ -355,6 +365,26 @@ ResponseCode Server_ProtocolHandler::cmdLeaveRoom(Command_LeaveRoom * /*cmd*/, C
 
 ResponseCode Server_ProtocolHandler::cmdRoomSay(Command_RoomSay *cmd, CommandContainer * /*cont*/, Server_Room *room)
 {
+	QString msg = cmd->getMessage();
+	
+	if (server->getMessageCountingInterval() > 0) {
+		int totalSize = 0, totalCount = 0;
+		if (messageSizeOverTime.isEmpty())
+			messageSizeOverTime.prepend(0);
+		messageSizeOverTime[0] += msg.size();
+		for (int i = 0; i < messageSizeOverTime.size(); ++i)
+			totalSize += messageSizeOverTime[i];
+		
+		if (messageCountOverTime.isEmpty())
+			messageCountOverTime.prepend(0);
+		++messageCountOverTime[0];
+		for (int i = 0; i < messageCountOverTime.size(); ++i)
+			totalCount += messageCountOverTime[i];
+		
+		if ((totalSize > server->getMaxMessageSizePerInterval()) || (totalCount > server->getMaxMessageCountPerInterval()))
+			return RespChatFlood;
+	}
+	
 	room->say(this, cmd->getMessage());
 	return RespOk;
 }

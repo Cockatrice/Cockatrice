@@ -84,6 +84,10 @@ Servatrice::Servatrice(QObject *parent)
 	
 	maxGameInactivityTime = settings->value("game/max_game_inactivity_time").toInt();
 	maxPlayerInactivityTime = settings->value("game/max_player_inactivity_time").toInt();
+	
+	messageCountingInterval = settings->value("security/message_counting_interval").toInt();
+	maxMessageCountPerInterval = settings->value("security/max_message_count_per_interval").toInt();
+	maxMessageSizePerInterval = settings->value("security/max_message_size_per_interval").toInt();
 }
 
 Servatrice::~Servatrice()

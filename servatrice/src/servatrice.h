@@ -45,6 +45,9 @@ public:
 	bool getGameShouldPing() const { return true; }
 	int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
 	int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
+	int getMessageCountingInterval() const { return messageCountingInterval; }
+	int getMaxMessageCountPerInterval() const { return maxMessageCountPerInterval; }
+	int getMaxMessageSizePerInterval() const { return maxMessageSizePerInterval; }
 	QString getDbPrefix() const { return dbPrefix; }
 	void updateLoginMessage();
 	ServerInfo_User *getUserData(const QString &name);
@@ -62,6 +65,7 @@ private:
 	int uptime;
 	int maxGameInactivityTime;
 	int maxPlayerInactivityTime;
+	int messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval;
 	ServerInfo_User *evalUserQueryResult(const QSqlQuery &query, bool complete);
 };
 

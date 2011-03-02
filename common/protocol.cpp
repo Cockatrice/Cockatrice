@@ -268,6 +268,7 @@ void ProtocolResponse::initializeHash()
 	responseHash.insert("user_level_too_low", RespUserLevelTooLow);
 	responseHash.insert("in_ignore_list", RespInIgnoreList);
 	responseHash.insert("would_overwrite_old_session", RespWouldOverwriteOldSession);
+	responseHash.insert("chat_flood", RespChatFlood);
 }
 
 Response_JoinRoom::Response_JoinRoom(int _cmdId, ResponseCode _responseCode, ServerInfo_Room *_roomInfo)

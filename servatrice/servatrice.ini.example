@@ -27,3 +27,8 @@ size=1
 [game]
 max_game_inactivity_time=120
 max_player_inactivity_time=15
+
+[security]
+message_counting_interval=10
+max_message_size_per_interval=1000
+max_message_count_per_interval=10

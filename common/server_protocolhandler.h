@@ -30,6 +30,7 @@ protected:
 	QMap<QString, ServerInfo_User *> buddyList, ignoreList;
 private:
 	QList<ProtocolItem *> itemQueue;
+	QList<int> messageSizeOverTime, messageCountOverTime;
 	QDateTime lastCommandTime;
 	QTimer *pingClock;
 
