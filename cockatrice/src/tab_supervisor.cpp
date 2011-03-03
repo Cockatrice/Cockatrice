@@ -57,6 +57,7 @@ void TabSupervisor::start(AbstractClient *_client, ServerInfo_User *userInfo)
 {
 	client = _client;
 	userName = userInfo->getName();
+	userLevel = userInfo->getUserLevel();
 	
 	connect(client, SIGNAL(roomEventReceived(RoomEvent *)), this, SLOT(processRoomEvent(RoomEvent *)));
 	connect(client, SIGNAL(gameEventContainerReceived(GameEventContainer *)), this, SLOT(processGameEventContainer(GameEventContainer *)));
