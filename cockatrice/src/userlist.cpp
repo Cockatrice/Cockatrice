@@ -166,6 +166,7 @@ void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
 void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 {
 	const QString &userName = index.sibling(index.row(), 2).data(Qt::UserRole).toString();
+	ServerInfo_User::UserLevelFlags userLevel = static_cast<ServerInfo_User::UserLevelFlags>(index.sibling(index.row(), 0).data(Qt::UserRole).toInt());
 	
 	QAction *aUserName = new QAction(userName, this);
 	aUserName->setEnabled(false);
@@ -182,15 +183,17 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	menu->addSeparator();
 	menu->addAction(aDetails);
 	menu->addAction(aChat);
-	menu->addSeparator();
-	if (tabSupervisor->getUserListsTab()->getBuddyList()->userInList(userName))
-		menu->addAction(aRemoveFromBuddyList);
-	else
-		menu->addAction(aAddToBuddyList);
-	if (tabSupervisor->getUserListsTab()->getIgnoreList()->userInList(userName))
-		menu->addAction(aRemoveFromIgnoreList);
-	else
-		menu->addAction(aAddToIgnoreList);
+	if (userLevel & ServerInfo_User::IsRegistered) {
+		menu->addSeparator();
+		if (tabSupervisor->getUserListsTab()->getBuddyList()->userInList(userName))
+			menu->addAction(aRemoveFromBuddyList);
+		else
+			menu->addAction(aAddToBuddyList);
+		if (tabSupervisor->getUserListsTab()->getIgnoreList()->userInList(userName))
+			menu->addAction(aRemoveFromIgnoreList);
+		else
+			menu->addAction(aAddToIgnoreList);
+	}
 	if (!tabSupervisor->getAdminLocked()) {
 		menu->addSeparator();
 		menu->addAction(aBan);
