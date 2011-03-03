@@ -88,6 +88,11 @@ Command_JoinGame::Command_JoinGame(int _roomId, int _gameId, const QString &_pas
 	insertItem(new SerializableItem_String("password", _password));
 	insertItem(new SerializableItem_Bool("spectator", _spectator));
 }
+Command_KickFromGame::Command_KickFromGame(int _gameId, int _playerId)
+	: GameCommand("kick_from_game", _gameId)
+{
+	insertItem(new SerializableItem_Int("player_id", _playerId));
+}
 Command_LeaveGame::Command_LeaveGame(int _gameId)
 	: GameCommand("leave_game", _gameId)
 {
@@ -261,6 +266,10 @@ Event_Leave::Event_Leave(int _playerId)
 }
 Event_GameClosed::Event_GameClosed(int _playerId)
 	: GameEvent("game_closed", _playerId)
+{
+}
+Event_Kicked::Event_Kicked(int _playerId)
+	: GameEvent("kicked", _playerId)
 {
 }
 Event_Shuffle::Event_Shuffle(int _playerId)
@@ -478,6 +487,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdleave_room", Command_LeaveRoom::newItem);
 	itemNameHash.insert("cmdroom_say", Command_RoomSay::newItem);
 	itemNameHash.insert("cmdjoin_game", Command_JoinGame::newItem);
+	itemNameHash.insert("cmdkick_from_game", Command_KickFromGame::newItem);
 	itemNameHash.insert("cmdleave_game", Command_LeaveGame::newItem);
 	itemNameHash.insert("cmdsay", Command_Say::newItem);
 	itemNameHash.insert("cmdshuffle", Command_Shuffle::newItem);
@@ -507,6 +517,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventsay", Event_Say::newItem);
 	itemNameHash.insert("game_eventleave", Event_Leave::newItem);
 	itemNameHash.insert("game_eventgame_closed", Event_GameClosed::newItem);
+	itemNameHash.insert("game_eventkicked", Event_Kicked::newItem);
 	itemNameHash.insert("game_eventshuffle", Event_Shuffle::newItem);
 	itemNameHash.insert("game_eventroll_die", Event_RollDie::newItem);
 	itemNameHash.insert("game_eventmove_card", Event_MoveCard::newItem);

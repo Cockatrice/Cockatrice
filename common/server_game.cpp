@@ -247,6 +247,18 @@ void Server_Game::removePlayer(Server_Player *player)
 	qobject_cast<Server_Room *>(parent())->broadcastGameListUpdate(this);
 }
 
+bool Server_Game::kickPlayer(int playerId)
+{
+	Server_Player *playerToKick = players.value(playerId);
+	if (!playerToKick)
+		return false;
+	
+	removePlayer(playerToKick);
+	sendGameEventToPlayer(playerToKick, new Event_Kicked);
+	
+	return true;
+}
+
 void Server_Game::setActivePlayer(int _activePlayer)
 {
 	activePlayer = _activePlayer;

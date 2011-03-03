@@ -35,6 +35,7 @@ class Event_SetActivePlayer;
 class Event_SetActivePhase;
 class Event_Ping;
 class Event_Say;
+class Event_Kicked;
 class Player;
 class CardZone;
 class AbstractCardItem;
@@ -128,6 +129,7 @@ private:
 	void eventPlayerPropertiesChanged(Event_PlayerPropertiesChanged *event, GameEventContext *context);
 	void eventJoin(Event_Join *event, GameEventContext *context);
 	void eventLeave(Event_Leave *event, GameEventContext *context);
+	void eventKicked(Event_Kicked *event, GameEventContext *context);
 	void eventGameClosed(Event_GameClosed *event, GameEventContext *context);
 	Player *setActivePlayer(int id);
 	void eventSetActivePlayer(Event_SetActivePlayer *event, GameEventContext *context);
@@ -140,6 +142,7 @@ signals:
 	void playerRemoved(Player *player);
 	void containerProcessingStarted(GameEventContext *context);
 	void containerProcessingDone();
+	void openMessageDialog(const QString &userName, bool focus);
 private slots:
 	void newCardAdded(AbstractCardItem *card);
 	void showCardInfoPopup(const QPoint &pos, const QString &cardName);

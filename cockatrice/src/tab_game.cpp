@@ -171,8 +171,10 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	gameView->hide();
 	
 	cardInfo = new CardInfoWidget(CardInfoWidget::ModeGameTab);
-	playerListWidget = new PlayerListWidget;
+	playerListWidget = new PlayerListWidget(tabSupervisor, clients.first(), this, true);
 	playerListWidget->setFocusPolicy(Qt::NoFocus);
+	connect(playerListWidget, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
+	
 	timeElapsedLabel = new QLabel;
 	timeElapsedLabel->setAlignment(Qt::AlignCenter);
 	messageLog = new MessageLogWidget;
@@ -397,8 +399,8 @@ void TabGame::processGameEventContainer(GameEventContainer *cont, AbstractClient
 		
 		if (spectators.contains(event->getPlayerId())) {
 			switch (event->getItemId()) {
-				case ItemId_Event_Say: eventSpectatorSay(qobject_cast<Event_Say *>(event), context); break;
-				case ItemId_Event_Leave: eventSpectatorLeave(qobject_cast<Event_Leave *>(event), context); break;
+				case ItemId_Event_Say: eventSpectatorSay(static_cast<Event_Say *>(event), context); break;
+				case ItemId_Event_Leave: eventSpectatorLeave(static_cast<Event_Leave *>(event), context); break;
 				default: {
 					qDebug() << "unhandled spectator game event";
 					break;
@@ -410,14 +412,15 @@ void TabGame::processGameEventContainer(GameEventContainer *cont, AbstractClient
 					continue;
 				
 			switch (event->getItemId()) {
-				case ItemId_Event_GameStateChanged: eventGameStateChanged(qobject_cast<Event_GameStateChanged *>(event), context); break;
-				case ItemId_Event_PlayerPropertiesChanged: eventPlayerPropertiesChanged(qobject_cast<Event_PlayerPropertiesChanged *>(event), context); break;
-				case ItemId_Event_Join: eventJoin(qobject_cast<Event_Join *>(event), context); break;
-				case ItemId_Event_Leave: eventLeave(qobject_cast<Event_Leave *>(event), context); break;
-				case ItemId_Event_GameClosed: eventGameClosed(qobject_cast<Event_GameClosed *>(event), context); break;
-				case ItemId_Event_SetActivePlayer: eventSetActivePlayer(qobject_cast<Event_SetActivePlayer *>(event), context); break;
-				case ItemId_Event_SetActivePhase: eventSetActivePhase(qobject_cast<Event_SetActivePhase *>(event), context); break;
-				case ItemId_Event_Ping: eventPing(qobject_cast<Event_Ping *>(event), context); break;
+				case ItemId_Event_GameStateChanged: eventGameStateChanged(static_cast<Event_GameStateChanged *>(event), context); break;
+				case ItemId_Event_PlayerPropertiesChanged: eventPlayerPropertiesChanged(static_cast<Event_PlayerPropertiesChanged *>(event), context); break;
+				case ItemId_Event_Join: eventJoin(static_cast<Event_Join *>(event), context); break;
+				case ItemId_Event_Leave: eventLeave(static_cast<Event_Leave *>(event), context); break;
+				case ItemId_Event_Kicked: eventKicked(static_cast<Event_Kicked *>(event), context); break;
+				case ItemId_Event_GameClosed: eventGameClosed(static_cast<Event_GameClosed *>(event), context); break;
+				case ItemId_Event_SetActivePlayer: eventSetActivePlayer(static_cast<Event_SetActivePlayer *>(event), context); break;
+				case ItemId_Event_SetActivePhase: eventSetActivePhase(static_cast<Event_SetActivePhase *>(event), context); break;
+				case ItemId_Event_Ping: eventPing(static_cast<Event_Ping *>(event), context); break;
 		
 				default: {
 					Player *player = players.value(event->getPlayerId(), 0);
@@ -640,6 +643,13 @@ void TabGame::eventLeave(Event_Leave *event, GameEventContext * /*context*/)
 		playerIterator.next().value()->updateZones();
 	
 	emit userEvent();
+}
+
+void TabGame::eventKicked(Event_Kicked * /*event*/, GameEventContext * /*context*/)
+{
+	emit userEvent();
+	QMessageBox::critical(this, tr("Kicked"), tr("You have been kicked out of the game."));
+	deleteLater();
 }
 
 void TabGame::eventGameClosed(Event_GameClosed * /*event*/, GameEventContext * /*context*/)

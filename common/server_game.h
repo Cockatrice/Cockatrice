@@ -75,6 +75,7 @@ public:
 	ResponseCode checkJoin(ServerInfo_User *user, const QString &_password, bool spectator);
 	Server_Player *addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate = true);
 	void removePlayer(Server_Player *player);
+	bool kickPlayer(int playerId);
 	void startGameIfReady();
 	void stopGameIfFinished();
 	int getActivePlayer() const { return activePlayer; }

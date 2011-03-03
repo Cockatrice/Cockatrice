@@ -141,6 +141,14 @@ public:
 	static SerializableItem *newItem() { return new Command_JoinGame; }
 	int getItemId() const { return ItemId_Command_JoinGame; }
 };
+class Command_KickFromGame : public GameCommand {
+	Q_OBJECT
+public:
+	Command_KickFromGame(int _gameId = -1, int _playerId = -1);
+	int getPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("player_id"))->getData(); };
+	static SerializableItem *newItem() { return new Command_KickFromGame; }
+	int getItemId() const { return ItemId_Command_KickFromGame; }
+};
 class Command_LeaveGame : public GameCommand {
 	Q_OBJECT
 public:
@@ -402,6 +410,13 @@ public:
 	Event_GameClosed(int _playerId = -1);
 	static SerializableItem *newItem() { return new Event_GameClosed; }
 	int getItemId() const { return ItemId_Event_GameClosed; }
+};
+class Event_Kicked : public GameEvent {
+	Q_OBJECT
+public:
+	Event_Kicked(int _playerId = -1);
+	static SerializableItem *newItem() { return new Event_Kicked; }
+	int getItemId() const { return ItemId_Event_Kicked; }
 };
 class Event_Shuffle : public GameEvent {
 	Q_OBJECT

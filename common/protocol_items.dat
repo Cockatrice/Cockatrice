@@ -15,6 +15,7 @@
 1:leave_room
 1:room_say:s,message
 1:join_game:i,game_id:s,password:b,spectator
+2:kick_from_game:i,player_id
 2:leave_game
 2:say:s,message
 2:shuffle
@@ -44,6 +45,7 @@
 3:say:s,message
 3:leave
 3:game_closed
+3:kicked
 3:shuffle
 3:roll_die:i,sides:i,value
 3:move_card:i,card_id:s,card_name:s,start_zone:i,position:i,target_player_id:s,target_zone:i,x:i,y:i,new_card_id:b,face_down

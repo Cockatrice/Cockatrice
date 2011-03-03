@@ -94,6 +94,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 			case ItemId_Command_DeckSelect: return cmdDeckSelect(static_cast<Command_DeckSelect *>(command), cont, game, player);
 			case ItemId_Command_SetSideboardPlan: return cmdSetSideboardPlan(static_cast<Command_SetSideboardPlan *>(command), cont, game, player);
 			case ItemId_Command_LeaveGame: return cmdLeaveGame(static_cast<Command_LeaveGame *>(command), cont, game, player);
+			case ItemId_Command_KickFromGame: return cmdKickFromGame(static_cast<Command_KickFromGame *>(command), cont, game, player);
 			case ItemId_Command_ReadyStart: return cmdReadyStart(static_cast<Command_ReadyStart *>(command), cont, game, player);
 			case ItemId_Command_Concede: return cmdConcede(static_cast<Command_Concede *>(command), cont, game, player);
 			case ItemId_Command_Say: return cmdSay(static_cast<Command_Say *>(command), cont, game, player);
@@ -453,6 +454,17 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandC
 ResponseCode Server_ProtocolHandler::cmdLeaveGame(Command_LeaveGame * /*cmd*/, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
 	game->removePlayer(player);
+	return RespOk;
+}
+
+ResponseCode Server_ProtocolHandler::cmdKickFromGame(Command_KickFromGame *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
+{
+	if (game->getCreatorInfo()->getName() != player->getUserInfo()->getName())
+		return RespFunctionNotAllowed;
+	
+	if (!game->kickPlayer(cmd->getPlayerId()))
+		return RespNameNotFound;
+	
 	return RespOk;
 }
 

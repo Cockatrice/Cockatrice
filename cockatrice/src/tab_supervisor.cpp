@@ -155,6 +155,7 @@ void TabSupervisor::gameJoined(Event_GameJoined *event)
 {
 	TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
+	connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
 	myAddTab(tab);
 	gameTabs.insert(event->getGameId(), tab);
 	setCurrentWidget(tab);

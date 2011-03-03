@@ -56,6 +56,7 @@ private:
 	ResponseCode cmdCreateGame(Command_CreateGame *cmd, CommandContainer *cont, Server_Room *room);
 	ResponseCode cmdJoinGame(Command_JoinGame *cmd, CommandContainer *cont, Server_Room *room);
 	ResponseCode cmdLeaveGame(Command_LeaveGame *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
+	ResponseCode cmdKickFromGame(Command_KickFromGame *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdConcede(Command_Concede *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdReadyStart(Command_ReadyStart *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdDeckSelect(Command_DeckSelect *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
