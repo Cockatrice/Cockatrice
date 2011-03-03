@@ -35,7 +35,7 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 		Server_Game *g = gameIterator.value().first;
 		Server_Player *p = gameIterator.value().second;
 		
-		if (authState == UnknownUser)
+		if ((authState == UnknownUser) || p->getSpectator())
 			g->removePlayer(p);
 		else
 			p->setProtocolHandler(0);
