@@ -29,6 +29,7 @@ max_game_inactivity_time=120
 max_player_inactivity_time=15
 
 [security]
+max_users_per_address=4
 message_counting_interval=10
 max_message_size_per_interval=1000
 max_message_count_per_interval=10
