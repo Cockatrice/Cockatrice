@@ -58,7 +58,6 @@ void Server_Game::pingClockTimeout()
 {
 	++secondsElapsed;
 	
-	QDateTime now = QDateTime::currentDateTime();
 	QList<ServerInfo_PlayerPing *> pingList;
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	bool allPlayersInactive = true;
@@ -66,7 +65,7 @@ void Server_Game::pingClockTimeout()
 		Server_Player *player = playerIterator.next().value();
 		int pingTime;
 		if (player->getProtocolHandler()) {
-			pingTime = player->getProtocolHandler()->getLastCommandTime().secsTo(now);
+			pingTime = player->getProtocolHandler()->getLastCommandTime();
 			allPlayersInactive = false;
 		} else
 			pingTime = -1;

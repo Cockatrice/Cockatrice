@@ -6,7 +6,7 @@
 #include "protocol_items.h"
 
 RemoteClient::RemoteClient(QObject *parent)
-	: AbstractClient(parent), topLevelItem(0)
+	: AbstractClient(parent), timeRunning(0), lastDataReceived(0), topLevelItem(0)
 {
 	ProtocolItem::initializeHash();
 	
@@ -38,6 +38,7 @@ void RemoteClient::slotSocketError(QAbstractSocket::SocketError /*error*/)
 
 void RemoteClient::slotConnected()
 {
+	timeRunning = lastDataReceived = 0;
 	timer->start();
 	setStatus(StatusAwaitingWelcome);
 }
@@ -65,6 +66,7 @@ void RemoteClient::readData()
 	QByteArray data = socket->readAll();
 	qDebug() << data;
 	xmlReader->addData(data);
+	lastDataReceived = timeRunning;
 
 	while (!xmlReader->atEnd()) {
 		xmlReader->readNext();
@@ -130,17 +132,21 @@ void RemoteClient::disconnectFromServer()
 
 void RemoteClient::ping()
 {
-	int maxTime = 0;
-	QMapIterator<int, CommandContainer *> i(pendingCommands);
-	while (i.hasNext()) {
-		int time = i.next().value()->tick();
-		if (time > maxTime)
-			maxTime = time;
-	}
+	QMutableMapIterator<int, CommandContainer *> i(pendingCommands);
+	while (i.hasNext())
+		if (i.next().value()->tick() > maxTimeout) {
+			CommandContainer *cont = i.value();
+			i.remove();
+			cont->deleteLater();
+		}
+	
+	int maxTime = timeRunning - lastDataReceived;
 	emit maxPingTime(maxTime, maxTimeout);
 	if (maxTime >= maxTimeout) {
-		emit serverTimeout();
 		disconnectFromServer();
-	} else
+		emit serverTimeout();
+	} else {
 		sendCommand(new Command_Ping);
+		++timeRunning;
+	}
 }

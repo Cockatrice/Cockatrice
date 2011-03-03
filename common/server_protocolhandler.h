@@ -31,7 +31,7 @@ protected:
 private:
 	QList<ProtocolItem *> itemQueue;
 	QList<int> messageSizeOverTime, messageCountOverTime;
-	QDateTime lastCommandTime;
+	int timeRunning, lastDataReceived;
 	QTimer *pingClock;
 
 	virtual DeckList *getDeckFromDatabase(int deckId) = 0;
@@ -101,8 +101,8 @@ public:
 	void setUserInfo(ServerInfo_User *_userInfo) { userInfo = _userInfo; }
 	const QMap<QString, ServerInfo_User *> &getBuddyList() const { return buddyList; }
 	const QMap<QString, ServerInfo_User *> &getIgnoreList() const { return ignoreList; }
-	const QDateTime &getLastCommandTime() const { return lastCommandTime; }
 
+	int getLastCommandTime() const { return timeRunning - lastDataReceived; }
 	void processCommandContainer(CommandContainer *cont);
 	virtual void sendProtocolItem(ProtocolItem *item, bool deleteItem = true) = 0;
 	void enqueueProtocolItem(ProtocolItem *item);

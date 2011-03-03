@@ -14,7 +14,7 @@
 #include <QDateTime>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
-	: QObject(parent), server(_server), authState(PasswordWrong), acceptsUserListChanges(false), acceptsRoomListChanges(false), userInfo(0), lastCommandTime(QDateTime::currentDateTime())
+	: QObject(parent), server(_server), authState(PasswordWrong), acceptsUserListChanges(false), acceptsRoomListChanges(false), userInfo(0), timeRunning(0), lastDataReceived(0)
 {
 	connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
@@ -58,8 +58,6 @@ void Server_ProtocolHandler::playerRemovedFromGame(Server_Game *game)
 
 ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, CommandContainer *cont)
 {
-	lastCommandTime = QDateTime::currentDateTime();
-
 	RoomCommand *roomCommand = qobject_cast<RoomCommand *>(command);
 	if (roomCommand) {
 		qDebug() << "received RoomCommand: roomId =" << roomCommand->getRoomId();
@@ -159,6 +157,8 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 
 void Server_ProtocolHandler::processCommandContainer(CommandContainer *cont)
 {
+	lastDataReceived = timeRunning;
+	
 	const QList<Command *> &cmdList = cont->getCommandList();
 	ResponseCode finalResponseCode = RespOk;
 	for (int i = 0; i < cmdList.size(); ++i) {
@@ -219,8 +219,9 @@ void Server_ProtocolHandler::pingClockTimeout()
 			messageCountOverTime.removeLast();
 	}
 	
-	if (lastCommandTime.secsTo(QDateTime::currentDateTime()) > server->getMaxPlayerInactivityTime())
+	if (timeRunning - lastDataReceived > server->getMaxPlayerInactivityTime())
 		deleteLater();
+	++timeRunning;
 }
 
 void Server_ProtocolHandler::enqueueProtocolItem(ProtocolItem *item)

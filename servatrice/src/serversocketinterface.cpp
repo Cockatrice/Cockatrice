@@ -432,7 +432,7 @@ ResponseCode ServerSocketInterface::cmdUpdateServerMessage(Command_UpdateServerM
 	return RespOk;
 }
 
-ResponseCode ServerSocketInterface::cmdBanFromServer(Command_BanFromServer *cmd, CommandContainer *cont)
+ResponseCode ServerSocketInterface::cmdBanFromServer(Command_BanFromServer *cmd, CommandContainer * /*cont*/)
 {
 	QString userName = cmd->getUserName();
 	if (!server->getUsers().contains(userName))

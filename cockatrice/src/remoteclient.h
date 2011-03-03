@@ -24,6 +24,7 @@ private slots:
 	void loginResponse(ProtocolResponse *response);
 private:
 	static const int maxTimeout = 10;
+	int timeRunning, lastDataReceived;
 	
 	QTimer *timer;
 	QTcpSocket *socket;
