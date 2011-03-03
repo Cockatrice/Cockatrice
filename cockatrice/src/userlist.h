@@ -8,7 +8,7 @@
 class QTreeWidget;
 class ServerInfo_User;
 class AbstractClient;
-class TabUserLists;
+class TabSupervisor;
 
 class UserListItemDelegate : public QStyledItemDelegate {
 public:
@@ -27,7 +27,7 @@ class UserList : public QGroupBox {
 public:
 	enum UserListType { AllUsersList, RoomList, BuddyList, IgnoreList };
 private:
-	TabUserLists *tabUserLists;
+	TabSupervisor *tabSupervisor;
 	AbstractClient *client;
 	UserListType type;
 	QTreeWidget *userTree;
@@ -45,7 +45,7 @@ signals:
 	void addIgnore(const QString &userName);
 	void removeIgnore(const QString &userName);
 public:
-	UserList(TabUserLists *_tabUserLists, AbstractClient *_client, UserListType _type, QWidget *parent = 0);
+	UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserListType _type, QWidget *parent = 0);
 	void retranslateUi();
 	void processUserInfo(ServerInfo_User *user, bool online);
 	bool deleteUser(const QString &userName);

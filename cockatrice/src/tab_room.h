@@ -23,6 +23,7 @@ class Event_ListGames;
 class Event_JoinRoom;
 class Event_LeaveRoom;
 class Event_RoomSay;
+class ProtocolResponse;
 class TabRoom;
 
 class GameSelector : public QGroupBox {
@@ -73,6 +74,7 @@ signals:
 private slots:
 	void sendMessage();
 	void actLeaveRoom();
+	void sayFinished(ProtocolResponse *response);
 	
 	void processListGamesEvent(Event_ListGames *event);
 	void processJoinRoomEvent(Event_JoinRoom *event);

@@ -33,6 +33,10 @@ Servatrice::Servatrice(QObject *parent)
 	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
 	pingClock->start(1000);
 	
+	banTimeoutClock = new QTimer(this);
+	connect(banTimeoutClock, SIGNAL(timeout()), this, SLOT(updateBanTimer()));
+	banTimeoutClock->start(60000);
+	
 	ProtocolItem::initializeHash();
 	settings = new QSettings("servatrice.ini", QSettings::IniFormat, this);
 	
@@ -85,6 +89,7 @@ Servatrice::Servatrice(QObject *parent)
 	maxGameInactivityTime = settings->value("game/max_game_inactivity_time").toInt();
 	maxPlayerInactivityTime = settings->value("game/max_player_inactivity_time").toInt();
 	
+	maxUsersPerAddress = settings->value("security/max_users_per_address").toInt();
 	messageCountingInterval = settings->value("security/message_counting_interval").toInt();
 	maxMessageCountPerInterval = settings->value("security/max_message_count_per_interval").toInt();
 	maxMessageSizePerInterval = settings->value("security/max_message_size_per_interval").toInt();
@@ -232,6 +237,15 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 		return new ServerInfo_User(name, ServerInfo_User::IsUser);
 }
 
+int Servatrice::getUsersWithAddress(const QHostAddress &address) const
+{
+	int result = 0;
+	for (int i = 0; i < clients.size(); ++i)
+		if (static_cast<ServerSocketInterface *>(clients[i])->getPeerAddress() == address)
+			++result;
+	return result;
+}
+
 QMap<QString, ServerInfo_User *> Servatrice::getBuddyList(const QString &name)
 {
 	QMap<QString, ServerInfo_User *> result;
@@ -276,6 +290,32 @@ QMap<QString, ServerInfo_User *> Servatrice::getIgnoreList(const QString &name)
 	return result;
 }
 
+bool Servatrice::getUserBanned(Server_ProtocolHandler *client, const QString &userName) const
+{
+	QHostAddress address = static_cast<ServerSocketInterface *>(client)->getPeerAddress();
+	for (int i = 0; i < addressBanList.size(); ++i)
+		if (address == addressBanList[i].first)
+			return true;
+	for (int i = 0; i < nameBanList.size(); ++i)
+		if (userName == nameBanList[i].first)
+			return true;
+	return false;
+}
+
+void Servatrice::updateBanTimer()
+{
+	for (int i = 0; i < addressBanList.size(); )
+		if (--(addressBanList[i].second) <= 0)
+			addressBanList.removeAt(i);
+		else
+			++i;
+	for (int i = 0; i < nameBanList.size(); )
+		if (--(nameBanList[i].second) <= 0)
+			nameBanList.removeAt(i);
+		else
+			++i;
+}
+
 void Servatrice::updateLoginMessage()
 {
 	checkSql();
@@ -308,4 +348,4 @@ void Servatrice::statusUpdate()
 	execSqlQuery(query);
 }
 
-const QString Servatrice::versionString = "Servatrice 0.20110215";
+const QString Servatrice::versionString = "Servatrice 0.20110303";

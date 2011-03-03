@@ -583,6 +583,14 @@ public:
 	static SerializableItem *newItem() { return new Event_ServerMessage; }
 	int getItemId() const { return ItemId_Event_ServerMessage; }
 };
+class Event_ConnectionClosed : public GenericEvent {
+	Q_OBJECT
+public:
+	Event_ConnectionClosed(const QString &_reason = QString());
+	QString getReason() const { return static_cast<SerializableItem_String *>(itemMap.value("reason"))->getData(); };
+	static SerializableItem *newItem() { return new Event_ConnectionClosed; }
+	int getItemId() const { return ItemId_Event_ConnectionClosed; }
+};
 class Event_Message : public GenericEvent {
 	Q_OBJECT
 public:
@@ -674,6 +682,15 @@ public:
 	Command_UpdateServerMessage();
 	static SerializableItem *newItem() { return new Command_UpdateServerMessage; }
 	int getItemId() const { return ItemId_Command_UpdateServerMessage; }
+};
+class Command_BanFromServer : public AdminCommand {
+	Q_OBJECT
+public:
+	Command_BanFromServer(const QString &_userName = QString(), int _minutes = -1);
+	QString getUserName() const { return static_cast<SerializableItem_String *>(itemMap.value("user_name"))->getData(); };
+	int getMinutes() const { return static_cast<SerializableItem_Int *>(itemMap.value("minutes"))->getData(); };
+	static SerializableItem *newItem() { return new Command_BanFromServer; }
+	int getItemId() const { return ItemId_Command_BanFromServer; }
 };
 
 #endif

@@ -1,5 +1,6 @@
 #include "userlist.h"
 #include "tab_userlists.h"
+#include "tab_supervisor.h"
 #include "abstractclient.h"
 #include "pixmapgenerator.h"
 #include "userinfobox.h"
@@ -8,6 +9,7 @@
 #include <QVBoxLayout>
 #include <QMouseEvent>
 #include <QMenu>
+#include <QInputDialog>
 
 UserListItemDelegate::UserListItemDelegate(QObject *const parent)
 	: QStyledItemDelegate(parent)
@@ -45,8 +47,8 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
 	return data(2, Qt::UserRole).toString().toLower() < other.data(2, Qt::UserRole).toString().toLower();
 }
 
-UserList::UserList(TabUserLists *_tabUserLists, AbstractClient *_client, UserListType _type, QWidget *parent)
-	: QGroupBox(parent), tabUserLists(_tabUserLists), client(_client), type(_type), onlineCount(0)
+UserList::UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserListType _type, QWidget *parent)
+	: QGroupBox(parent), tabSupervisor(_tabSupervisor), client(_client), type(_type), onlineCount(0)
 {
 	itemDelegate = new UserListItemDelegate(this);
 	
@@ -173,6 +175,7 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	QAction *aRemoveFromBuddyList = new QAction(tr("Remove from &buddy list"), this);
 	QAction *aAddToIgnoreList = new QAction(tr("Add to &ignore list"), this);
 	QAction *aRemoveFromIgnoreList = new QAction(tr("Remove from &ignore list"), this);
+	QAction *aBan = new QAction(tr("Ban from &server"), this);
 	
 	QMenu *menu = new QMenu(this);
 	menu->addAction(aUserName);
@@ -180,14 +183,18 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	menu->addAction(aDetails);
 	menu->addAction(aChat);
 	menu->addSeparator();
-	if (tabUserLists->getBuddyList()->userInList(userName))
+	if (tabSupervisor->getUserListsTab()->getBuddyList()->userInList(userName))
 		menu->addAction(aRemoveFromBuddyList);
 	else
 		menu->addAction(aAddToBuddyList);
-	if (tabUserLists->getIgnoreList()->userInList(userName))
+	if (tabSupervisor->getUserListsTab()->getIgnoreList()->userInList(userName))
 		menu->addAction(aRemoveFromIgnoreList);
 	else
 		menu->addAction(aAddToIgnoreList);
+	if (!tabSupervisor->getAdminLocked()) {
+		menu->addSeparator();
+		menu->addAction(aBan);
+	}
 	
 	QAction *actionClicked = menu->exec(pos);
 	if (actionClicked == aDetails) {
@@ -204,6 +211,11 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 		client->sendCommand(new Command_AddToList("ignore", userName));
 	else if (actionClicked == aRemoveFromIgnoreList)
 		client->sendCommand(new Command_RemoveFromList("ignore", userName));
+	else if (actionClicked == aBan) {
+		bool ok;
+		int minutes = QInputDialog::getInt(this, tr("Duration"), tr("Please enter the duration of the ban (in minutes).\nEnter 0 for an indefinite ban."), 0, 0, 2147483647, 10, &ok);
+		client->sendCommand(new Command_BanFromServer(userName, minutes));
+	}
 	
 	delete menu;
 	delete aUserName;
@@ -213,6 +225,7 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	delete aRemoveFromBuddyList;
 	delete aAddToIgnoreList;
 	delete aRemoveFromIgnoreList;
+	delete aBan;
 }
 
 bool UserList::userInList(const QString &userName) const

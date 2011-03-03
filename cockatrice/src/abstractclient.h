@@ -20,6 +20,7 @@ class Event_ServerMessage;
 class Event_ListRooms;
 class Event_GameJoined;
 class Event_Message;
+class Event_ConnectionClosed;
 
 enum ClientStatus {
 	StatusDisconnected,
@@ -41,6 +42,7 @@ signals:
 	// Game events
 	void gameEventContainerReceived(GameEventContainer *event);
 	// Generic events
+	void connectionClosedEventReceived(Event_ConnectionClosed *event);
 	void addToListEventReceived(Event_AddToList *event);
 	void removeFromListEventReceived(Event_RemoveFromList *event);
 	void userJoinedEventReceived(Event_UserJoined *event);

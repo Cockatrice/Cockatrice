@@ -47,6 +47,20 @@ void MainWindow::updateTabMenu(QMenu *menu)
 		menuBar()->insertMenu(helpMenu->menuAction(), menu);
 }
 
+void MainWindow::processConnectionClosedEvent(Event_ConnectionClosed *event)
+{
+	QString reason = event->getReason();
+	client->disconnectFromServer();
+	QString reasonStr;
+	if (reason == "too_many_connections")
+		reasonStr = tr("There are too many concurrent connections from your address.");
+	else if (reason == "banned")
+		reasonStr = tr("Banned by moderator.");
+	else
+		reasonStr = tr("Unknown reason.");
+	QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.\nReason: %1").arg(reasonStr));
+}
+
 void MainWindow::statusChanged(ClientStatus _status)
 {
 	setClientStatusTitle();
@@ -273,6 +287,7 @@ MainWindow::MainWindow(QWidget *parent)
 	QPixmapCache::setCacheLimit(200000);
 
 	client = new RemoteClient(this);
+	connect(client, SIGNAL(connectionClosedEventReceived(Event_ConnectionClosed *)), this, SLOT(processConnectionClosedEvent(Event_ConnectionClosed *)));
 	connect(client, SIGNAL(serverError(ResponseCode)), this, SLOT(serverError(ResponseCode)));
 	connect(client, SIGNAL(socketError(const QString &)), this, SLOT(socketError(const QString &)));
 	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));

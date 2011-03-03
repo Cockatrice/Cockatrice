@@ -132,7 +132,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
 		gameTypes.insert(gameTypeList[i]->getGameTypeId(), gameTypeList[i]->getDescription());
 	
 	gameSelector = new GameSelector(client, this);
-	userList = new UserList(tabSupervisor->getUserListsTab(), client, UserList::RoomList);
+	userList = new UserList(tabSupervisor, client, UserList::RoomList);
 	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
 	
 	chatView = new ChatView(ownName);
@@ -205,8 +205,16 @@ void TabRoom::sendMessage()
 	if (sayEdit->text().isEmpty())
 	  	return;
 	
-	client->sendCommand(new Command_RoomSay(roomId, sayEdit->text()));
+	Command_RoomSay *cmd = new Command_RoomSay(roomId, sayEdit->text());
+	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(sayFinished(ProtocolResponse *)));
+	client->sendCommand(cmd);
 	sayEdit->clear();
+}
+
+void TabRoom::sayFinished(ProtocolResponse *response)
+{
+	if (response->getResponseCode() == RespChatFlood)
+		chatView->appendMessage(QString(), tr("You are flooding the chat. Please wait a couple of seconds."));
 }
 
 void TabRoom::actLeaveRoom()

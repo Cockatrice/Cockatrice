@@ -389,6 +389,11 @@ Event_ServerMessage::Event_ServerMessage(const QString &_message)
 {
 	insertItem(new SerializableItem_String("message", _message));
 }
+Event_ConnectionClosed::Event_ConnectionClosed(const QString &_reason)
+	: GenericEvent("connection_closed")
+{
+	insertItem(new SerializableItem_String("reason", _reason));
+}
 Event_Message::Event_Message(const QString &_senderName, const QString &_receiverName, const QString &_text)
 	: GenericEvent("message")
 {
@@ -447,6 +452,12 @@ Context_MoveCard::Context_MoveCard()
 Command_UpdateServerMessage::Command_UpdateServerMessage()
 	: AdminCommand("update_server_message")
 {
+}
+Command_BanFromServer::Command_BanFromServer(const QString &_userName, int _minutes)
+	: AdminCommand("ban_from_server")
+{
+	insertItem(new SerializableItem_String("user_name", _userName));
+	insertItem(new SerializableItem_Int("minutes", _minutes));
 }
 void ProtocolItem::initializeHashAuto()
 {
@@ -514,6 +525,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventstop_dump_zone", Event_StopDumpZone::newItem);
 	itemNameHash.insert("generic_eventremove_from_list", Event_RemoveFromList::newItem);
 	itemNameHash.insert("generic_eventserver_message", Event_ServerMessage::newItem);
+	itemNameHash.insert("generic_eventconnection_closed", Event_ConnectionClosed::newItem);
 	itemNameHash.insert("generic_eventmessage", Event_Message::newItem);
 	itemNameHash.insert("generic_eventgame_joined", Event_GameJoined::newItem);
 	itemNameHash.insert("generic_eventuser_left", Event_UserLeft::newItem);
@@ -525,4 +537,5 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_event_contextundo_draw", Context_UndoDraw::newItem);
 	itemNameHash.insert("game_event_contextmove_card", Context_MoveCard::newItem);
 	itemNameHash.insert("cmdupdate_server_message", Command_UpdateServerMessage::newItem);
+	itemNameHash.insert("cmdban_from_server", Command_BanFromServer::newItem);
 }

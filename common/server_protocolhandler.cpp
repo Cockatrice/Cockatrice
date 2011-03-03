@@ -133,6 +133,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 		
 		switch (command->getItemId()) {
 			case ItemId_Command_UpdateServerMessage: return cmdUpdateServerMessage(static_cast<Command_UpdateServerMessage *>(command), cont);
+			case ItemId_Command_BanFromServer: return cmdBanFromServer(static_cast<Command_BanFromServer *>(command), cont);
 			default: return RespInvalidCommand;
 		}
 	}
@@ -244,6 +245,8 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 	QString userName = cmd->getUsername().simplified();
 	if (userName.isEmpty() || (userInfo != 0))
 		return RespContextError;
+	if (server->getUserBanned(this, userName))
+		return RespWrongPassword;
 	authState = server->loginUser(this, userName, cmd->getPassword());
 	if (authState == PasswordWrong)
 		return RespWrongPassword;

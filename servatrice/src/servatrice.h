@@ -34,6 +34,7 @@ class Servatrice : public Server
 private slots:
 	void newConnection();
 	void statusUpdate();
+	void updateBanTimer();
 public:
 	static const QString versionString;
 	Servatrice(QObject *parent = 0);
@@ -45,27 +46,33 @@ public:
 	bool getGameShouldPing() const { return true; }
 	int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
 	int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
+	int getMaxUsersPerAddress() const { return maxUsersPerAddress; }
 	int getMessageCountingInterval() const { return messageCountingInterval; }
 	int getMaxMessageCountPerInterval() const { return maxMessageCountPerInterval; }
 	int getMaxMessageSizePerInterval() const { return maxMessageSizePerInterval; }
 	QString getDbPrefix() const { return dbPrefix; }
 	void updateLoginMessage();
 	ServerInfo_User *getUserData(const QString &name);
+	int getUsersWithAddress(const QHostAddress &address) const;
+	QMap<QString, ServerInfo_User *> getBuddyList(const QString &name);
+	QMap<QString, ServerInfo_User *> getIgnoreList(const QString &name);
+	bool getUserBanned(Server_ProtocolHandler *client, const QString &userName) const;
+	void addAddressBan(const QHostAddress &address, int minutes) { addressBanList.append(QPair<QHostAddress, int>(address, minutes)); }
+	void addNameBan(const QString &name, int minutes) { nameBanList.append(QPair<QString, int>(name, minutes)); }
 protected:
 	bool userExists(const QString &user);
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
-	QMap<QString, ServerInfo_User *> getBuddyList(const QString &name);
-	QMap<QString, ServerInfo_User *> getIgnoreList(const QString &name);
 private:
-	QTimer *pingClock, *statusUpdateClock;
+	QTimer *pingClock, *statusUpdateClock, *banTimeoutClock;
 	QTcpServer *tcpServer;
 	QString loginMessage;
 	QString dbPrefix;
 	QSettings *settings;
 	int uptime;
-	int maxGameInactivityTime;
-	int maxPlayerInactivityTime;
-	int messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval;
+	QList<QPair<QHostAddress, int> > addressBanList;
+	QList<QPair<QString, int> > nameBanList;
+	int maxGameInactivityTime, maxPlayerInactivityTime;
+	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval;
 	ServerInfo_User *evalUserQueryResult(const QSqlQuery &query, bool complete);
 };
 

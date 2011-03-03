@@ -7,7 +7,7 @@
 #include "protocol_items.h"
 
 TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent)
-	: Tab(_tabSupervisor, parent), client(_client)
+	: Tab(_tabSupervisor, parent), locked(true), client(_client)
 {
 	updateServerMessageButton = new QPushButton;
 	connect(updateServerMessageButton, SIGNAL(clicked()), this, SLOT(actUpdateServerMessage()));
@@ -55,6 +55,7 @@ void TabAdmin::actUnlock()
 		adminGroupBox->setEnabled(true);
 		lockButton->setEnabled(true);
 		unlockButton->setEnabled(false);
+		locked = false;
 	}
 }
 
@@ -63,4 +64,5 @@ void TabAdmin::actLock()
 	adminGroupBox->setEnabled(false);
 	lockButton->setEnabled(false);
 	unlockButton->setEnabled(true);
+	locked = true;
 }

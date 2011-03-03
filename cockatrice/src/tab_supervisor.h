@@ -45,6 +45,7 @@ public:
 	void stop();
 	int getGameCount() const { return gameTabs.size(); }
 	TabUserLists *getUserListsTab() const { return tabUserLists; }
+	bool getAdminLocked() const;
 signals:
 	void setMenu(QMenu *menu);
 	void localGameEnded();

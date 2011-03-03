@@ -291,3 +291,10 @@ void TabSupervisor::updateCurrent(int index)
 	} else
 		emit setMenu(0);
 }
+
+bool TabSupervisor::getAdminLocked() const
+{
+	if (!tabAdmin)
+		return true;
+	return tabAdmin->getLocked();
+}

@@ -31,8 +31,9 @@ RemoteClient::~RemoteClient()
 
 void RemoteClient::slotSocketError(QAbstractSocket::SocketError /*error*/)
 {
-	emit socketError(socket->errorString());
+	QString errorString = socket->errorString();
 	disconnectFromServer();
+	emit socketError(errorString);
 }
 
 void RemoteClient::slotConnected()

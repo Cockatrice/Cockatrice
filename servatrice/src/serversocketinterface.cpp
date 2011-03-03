@@ -21,6 +21,7 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QtSql>
+#include <QHostAddress>
 #include <QDebug>
 #include "serversocketinterface.h"
 #include "servatrice.h"
@@ -45,13 +46,19 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_s
 	xmlWriter->writeStartElement("cockatrice_server_stream");
 	xmlWriter->writeAttribute("version", QString::number(ProtocolItem::protocolVersion));
 	
-	sendProtocolItem(new Event_ServerMessage(Servatrice::versionString));
+	int maxUsers = _server->getMaxUsersPerAddress();
+	if ((maxUsers > 0) && (_server->getUsersWithAddress(socket->peerAddress()) >= maxUsers)) {
+		sendProtocolItem(new Event_ConnectionClosed("too_many_connections"));
+		deleteLater();
+	} else
+		sendProtocolItem(new Event_ServerMessage(Servatrice::versionString));
 }
 
 ServerSocketInterface::~ServerSocketInterface()
 {
 	qDebug("ServerSocketInterface destructor");
 	
+	socket->flush();
 	delete xmlWriter;
 	delete xmlReader;
 	delete socket;
@@ -422,5 +429,37 @@ ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd, C
 ResponseCode ServerSocketInterface::cmdUpdateServerMessage(Command_UpdateServerMessage * /*cmd*/, CommandContainer * /*cont*/)
 {
 	servatrice->updateLoginMessage();
+	return RespOk;
+}
+
+ResponseCode ServerSocketInterface::cmdBanFromServer(Command_BanFromServer *cmd, CommandContainer *cont)
+{
+	QString userName = cmd->getUserName();
+	if (!server->getUsers().contains(userName))
+		return RespNameNotFound;
+	
+	int minutes = cmd->getMinutes();
+	
+	ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
+	if (user->getUserInfo()->getUserLevel() & ServerInfo_User::IsRegistered) {
+		// Registered users can be banned by name.
+		if (minutes == 0) {
+			QSqlQuery query;
+			query.prepare("update " + servatrice->getDbPrefix() + "_users set banned=1 where name = :name");
+			query.bindValue(":name", userName);
+			servatrice->execSqlQuery(query);
+		} else
+			servatrice->addNameBan(userName, minutes);
+	} else {
+		// Unregistered users must be banned by IP address.
+		// Indefinite address bans are not reasonable -> default to 30 minutes.
+		if (minutes == 0)
+			minutes = 30;
+		servatrice->addAddressBan(user->getPeerAddress(), minutes);
+	}
+	
+	user->sendProtocolItem(new Event_ConnectionClosed("banned"));
+	user->deleteLater();
+	
 	return RespOk;
 }

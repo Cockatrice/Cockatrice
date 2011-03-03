@@ -11,6 +11,7 @@ class QPushButton;
 class TabAdmin : public Tab {
 	Q_OBJECT
 private:
+	bool locked;
 	AbstractClient *client;
 	QPushButton *updateServerMessageButton;
 	QGroupBox *adminGroupBox;
@@ -24,6 +25,7 @@ public:
 	TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = 0);
 	void retranslateUi();
 	QString getTabText() const { return tr("Administration"); }
+	bool getLocked() const { return locked; }
 };
 
 #endif

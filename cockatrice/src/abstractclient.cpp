@@ -32,6 +32,7 @@ void AbstractClient::processProtocolItem(ProtocolItem *item)
 	GenericEvent *genericEvent = qobject_cast<GenericEvent *>(item);
 	if (genericEvent) {
 		switch (genericEvent->getItemId()) {
+			case ItemId_Event_ConnectionClosed: emit connectionClosedEventReceived(qobject_cast<Event_ConnectionClosed *>(item)); break;
 			case ItemId_Event_AddToList: emit addToListEventReceived(qobject_cast<Event_AddToList *>(item)); break;
 			case ItemId_Event_RemoveFromList: emit removeFromListEventReceived(qobject_cast<Event_RemoveFromList *>(item)); break;
 			case ItemId_Event_UserJoined: emit userJoinedEventReceived(qobject_cast<Event_UserJoined *>(item)); break;
@@ -62,7 +63,6 @@ void AbstractClient::processProtocolItem(ProtocolItem *item)
 		return;
 	}
 }
-
 
 void AbstractClient::setStatus(const ClientStatus _status)
 {

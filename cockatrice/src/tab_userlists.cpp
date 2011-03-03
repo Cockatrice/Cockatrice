@@ -10,9 +10,9 @@
 TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerInfo_User *userInfo, QWidget *parent)
 	: Tab(_tabSupervisor, parent), client(_client)
 {
-	allUsersList = new UserList(this, client, UserList::AllUsersList);
-	buddyList = new UserList(this, client, UserList::BuddyList);
-	ignoreList = new UserList(this, client, UserList::IgnoreList);
+	allUsersList = new UserList(_tabSupervisor, client, UserList::AllUsersList);
+	buddyList = new UserList(_tabSupervisor, client, UserList::BuddyList);
+	ignoreList = new UserList(_tabSupervisor, client, UserList::IgnoreList);
 	userInfoBox = new UserInfoBox(client, false);
 	userInfoBox->updateInfo(userInfo);
 	

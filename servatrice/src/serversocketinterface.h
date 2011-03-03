@@ -21,6 +21,7 @@
 #define SERVERSOCKETINTERFACE_H
 
 #include <QTcpSocket>
+#include <QHostAddress>
 #include "server_protocolhandler.h"
 
 class QTcpSocket;
@@ -59,9 +60,11 @@ private:
 	DeckList *getDeckFromDatabase(int deckId);
 	ResponseCode cmdDeckDownload(Command_DeckDownload *cmd, CommandContainer *cont);
 	ResponseCode cmdUpdateServerMessage(Command_UpdateServerMessage *cmd, CommandContainer *cont);
+	ResponseCode cmdBanFromServer(Command_BanFromServer *cmd, CommandContainer *cont);
 public:
 	ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent = 0);
 	~ServerSocketInterface();
+	QHostAddress getPeerAddress() const { return socket->peerAddress(); }
 
 	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
 };
