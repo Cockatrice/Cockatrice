@@ -212,7 +212,7 @@
     <message>
         <location filename="../src/carditem.cpp" line="206"/>
         <source>Ctrl+H</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+H</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="207"/>
@@ -236,77 +236,77 @@
     <message>
         <location filename="../src/carditem.cpp" line="210"/>
         <source>&amp;Power / toughness</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Сила / защита</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="211"/>
         <source>&amp;Increase power</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Увеличить силу</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="212"/>
         <source>Ctrl++</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="213"/>
         <source>&amp;Decrease power</source>
-        <translation type="unfinished"></translation>
+        <translation>У&amp;меньшить силу</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="214"/>
         <source>Ctrl+-</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="215"/>
         <source>I&amp;ncrease toughness</source>
-        <translation type="unfinished"></translation>
+        <translation>У&amp;величить защиту</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="216"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="217"/>
         <source>D&amp;ecrease toughness</source>
-        <translation type="unfinished"></translation>
+        <translation>Уменьшить &amp;защиту</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="218"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="219"/>
         <source>In&amp;crease power and toughness</source>
-        <translation type="unfinished"></translation>
+        <translation>Увеличить силу &amp;и защиту</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="220"/>
         <source>Ctrl+Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="221"/>
         <source>Dec&amp;rease power and toughness</source>
-        <translation type="unfinished"></translation>
+        <translation>Уменьшить силу и за&amp;щиту</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="222"/>
         <source>Ctrl+Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="223"/>
         <source>Set &amp;power and toughness...</source>
-        <translation type="unfinished"></translation>
+        <translation>Уст&amp;ановить силу / защиту...</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="224"/>
         <source>Ctrl+P</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="225"/>
@@ -694,17 +694,17 @@
     <message>
         <location filename="../src/dlg_creategame.cpp" line="43"/>
         <source>Only &amp;buddies can join</source>
-        <translation type="unfinished"></translation>
+        <translation>Только для &amp;своих</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="44"/>
         <source>Only &amp;registered users can join</source>
-        <translation type="unfinished"></translation>
+        <translation>Только для &amp;зарег. пользователей</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="52"/>
         <source>Joining restrictions</source>
-        <translation type="unfinished"></translation>
+        <translation>Ограничения</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="55"/>
@@ -982,17 +982,17 @@
     <message>
         <location filename="../src/tab_room.cpp" line="81"/>
         <source>This game is only open to registered users.</source>
-        <translation type="unfinished"></translation>
+        <translation>Доступно только для зарегистрированных.</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="82"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
-        <translation type="unfinished"></translation>
+        <translation>Доступно только для друзей.</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="83"/>
         <source>You are being ignored by the creator of this game.</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы добавлены в игнор-лист данного игрока.</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="99"/>
@@ -1058,12 +1058,12 @@
     <message>
         <location filename="../src/gamesmodel.cpp" line="46"/>
         <source>buddies only</source>
-        <translation type="unfinished"></translation>
+        <translation>только свои</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="48"/>
         <source>reg. users only</source>
-        <translation type="unfinished"></translation>
+        <translation>только зарег.</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="52"/>
@@ -1093,7 +1093,7 @@
     <message>
         <location filename="../src/gamesmodel.cpp" line="66"/>
         <source>Restrictions</source>
-        <translation type="unfinished"></translation>
+        <translation>Ограничения</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="67"/>
@@ -1162,28 +1162,29 @@
     <message>
         <location filename="../src/window_main.cpp" line="56"/>
         <source>There are too many concurrent connections from your address.</source>
-        <translation type="unfinished"></translation>
+        <translation>Слишком много одновременных подключений с Вашего адреса.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="58"/>
         <source>Banned by moderator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Забанено модератором.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="60"/>
         <source>Unknown reason.</source>
-        <translation type="unfinished"></translation>
+        <translation>Неизвестная причина.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="61"/>
         <source>Connection closed</source>
-        <translation type="unfinished"></translation>
+        <translation>Соединение прервано</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="61"/>
         <source>The server has terminated your connection.
 Reason: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ваше подключение было прервано сервером.
+Причина: %1</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="110"/>
@@ -1275,7 +1276,8 @@ Reason: %1</source>
         <location filename="../src/window_main.cpp" line="193"/>
         <source>There is already an active session using this user name.
 Please close that session first and re-login.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пользователь с таким именем уже подключен.
+Пожалуйста, закройте это подключение и войдите заново.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="200"/>
@@ -1681,7 +1683,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="216"/>
         <source>%1 puts %2 into play tapped%3.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 положил %2 повернутым на поле битвы%3.</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="304"/>
@@ -2305,47 +2307,47 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/playerlistwidget.cpp" line="86"/>
         <source>local deck</source>
-        <translation type="unfinished"></translation>
+        <translation>колода на диске</translation>
     </message>
     <message>
         <location filename="../src/playerlistwidget.cpp" line="87"/>
         <source>deck #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>колода №%1</translation>
     </message>
     <message>
         <location filename="../src/playerlistwidget.cpp" line="137"/>
         <source>User &amp;details</source>
-        <translation type="unfinished">&amp;Данные о пользователе</translation>
+        <translation>&amp;Данные о пользователе</translation>
     </message>
     <message>
         <location filename="../src/playerlistwidget.cpp" line="138"/>
         <source>Direct &amp;chat</source>
-        <translation type="unfinished">Обратиться &amp;лично</translation>
+        <translation>Обратиться &amp;лично</translation>
     </message>
     <message>
         <location filename="../src/playerlistwidget.cpp" line="139"/>
         <source>Add to &amp;buddy list</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить в &amp;друзья</translation>
     </message>
     <message>
         <location filename="../src/playerlistwidget.cpp" line="140"/>
         <source>Remove from &amp;buddy list</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Удалить из друзей</translation>
     </message>
     <message>
         <location filename="../src/playerlistwidget.cpp" line="141"/>
         <source>Add to &amp;ignore list</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить в &amp;игнор-лист</translation>
     </message>
     <message>
         <location filename="../src/playerlistwidget.cpp" line="142"/>
         <source>Remove from &amp;ignore list</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить и&amp;з игнор-листа</translation>
     </message>
     <message>
         <location filename="../src/playerlistwidget.cpp" line="143"/>
         <source>Kick from &amp;game</source>
-        <translation type="unfinished"></translation>
+        <translation>В&amp;ыкинуть из игры</translation>
     </message>
 </context>
 <context>
@@ -2666,12 +2668,12 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="651"/>
         <source>Kicked</source>
-        <translation type="unfinished"></translation>
+        <translation>Выкинут</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="651"/>
         <source>You have been kicked out of the game.</source>
-        <translation type="unfinished"></translation>
+        <translation>Вас выкинули из игры.</translation>
     </message>
     <message>
         <location filename="../src/tab_game.h" line="165"/>
@@ -2694,7 +2696,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_message.cpp" line="57"/>
         <source>This user is ignoring you.</source>
-        <translation type="unfinished"></translation>
+        <translation>Этот пользователь добавил вас в игнор-лист.</translation>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="73"/>
@@ -2737,7 +2739,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_room.cpp" line="217"/>
         <source>You are flooding the chat. Please wait a couple of seconds.</source>
-        <translation type="unfinished"></translation>
+        <translation>Кажется, Вы нафлудили. Пожалуйста, подождите пару секунд.</translation>
     </message>
 </context>
 <context>
@@ -2753,7 +2755,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_userlists.h" line="41"/>
         <source>User lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Панели пользователей</translation>
     </message>
 </context>
 <context>
@@ -2827,7 +2829,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/userlist.cpp" line="75"/>
         <source>Users online: %1</source>
-        <translation>Пользователей в сети: %1</translation>
+        <translation>Пользователей онлайн: %1</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="76"/>
@@ -2837,17 +2839,17 @@ Please enter a name:</source>
     <message>
         <location filename="../src/userlist.cpp" line="77"/>
         <source>Buddies online: %1 / %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Друзей онлайн: %1 / %2</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="78"/>
         <source>Ignored users online: %1 / %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Игнорируемых пользователей онлайн: %1 / %2</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="172"/>
         <source>User &amp;details</source>
-        <translation>&amp;Данные о пользователе</translation>
+        <translation>Данные о &amp;пользователе</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="173"/>
@@ -2857,38 +2859,39 @@ Please enter a name:</source>
     <message>
         <location filename="../src/userlist.cpp" line="174"/>
         <source>Add to &amp;buddy list</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить в список &amp;друзей</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="175"/>
         <source>Remove from &amp;buddy list</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Удалить из друзей</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="176"/>
         <source>Add to &amp;ignore list</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить в &amp;игнор-лист</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="177"/>
         <source>Remove from &amp;ignore list</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить и&amp;з игнор-листа</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="178"/>
         <source>Ban from &amp;server</source>
-        <translation type="unfinished"></translation>
+        <translation>За&amp;банить на сервере</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="216"/>
         <source>Duration</source>
-        <translation type="unfinished"></translation>
+        <translation>Продолжительность</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="216"/>
         <source>Please enter the duration of the ban (in minutes).
 Enter 0 for an indefinite ban.</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите продолжительность бана (в минутах).
+Введите 0 чтобы забанить пожизненно.</translation>
     </message>
 </context>
 <context>
