@@ -488,6 +488,7 @@ void TabGame::startGame()
 	
 	playerListWidget->setGameStarted(true);
 	started = true;
+	static_cast<GameScene *>(gameView->scene())->rearrange();
 	gameView->show();
 	phasesToolbar->show();
 }
