@@ -189,7 +189,7 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
 	QString targetName = attributes.targetZone->getName();
 	if (((startName == "table") && (targetName == "table") && (attributes.startZone == attributes.targetZone)) || ((startName == "hand") && (targetName == "hand")))
 		return;
-	QString cardName = attributes.card->getName();
+	QString cardName = attributes.cardName;
 	QPair<QString, QString> temp = getFromStr(attributes.startZone, cardName, attributes.oldX);
 	bool cardNameContainsStartZone = false;
 	if (!temp.first.isEmpty()) {
@@ -225,7 +225,7 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
 	else if (targetName == "deck") {
 		if (attributes.newX == -1)
 			finalStr = tr("%1 puts %2%3 into his library.");
-		else if (attributes.newX == attributes.targetZone->getCards().size())
+		else if (attributes.newX == attributes.targetZone->getCards().size() - 1)
 			finalStr = tr("%1 puts %2%3 on bottom of his library.");
 		else if (attributes.newX == 0)
 			finalStr = tr("%1 puts %2%3 on top of his library.");
@@ -241,7 +241,7 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
 
 void MessageLogWidget::logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX)
 {
-	LogMoveCard attributes = {player, card, startZone, oldX, targetZone, newX};
+	LogMoveCard attributes = {player, card, card->getName(), startZone, oldX, targetZone, newX};
 	if (currentContext == MessageContext_MoveCard)
 		moveCardQueue.append(attributes);
 	else

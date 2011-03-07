@@ -17,6 +17,7 @@ class CardItem;
 struct LogMoveCard {
 	Player *player;
 	CardItem *card;
+	QString cardName;
 	CardZone *startZone;
 	int oldX;
 	CardZone *targetZone;

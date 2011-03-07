@@ -25,6 +25,12 @@ DlgCreateGame::DlgCreateGame(AbstractClient *_client, int _roomId, const QMap<in
 	maxPlayersEdit->setValue(2);
 	maxPlayersLabel->setBuddy(maxPlayersEdit);
 	
+	QGridLayout *generalGrid = new QGridLayout;
+	generalGrid->addWidget(descriptionLabel, 0, 0);
+	generalGrid->addWidget(descriptionEdit, 0, 1);
+	generalGrid->addWidget(maxPlayersLabel, 1, 0);
+	generalGrid->addWidget(maxPlayersEdit, 1, 1);
+	
 	QVBoxLayout *gameTypeLayout = new QVBoxLayout;
 	QMapIterator<int, QString> gameTypeIterator(gameTypes);
 	while (gameTypeIterator.hasNext()) {
@@ -67,13 +73,10 @@ DlgCreateGame::DlgCreateGame(AbstractClient *_client, int _roomId, const QMap<in
 	spectatorsGroupBox->setLayout(spectatorsLayout);
 
 	QGridLayout *grid = new QGridLayout;
-	grid->addWidget(descriptionLabel, 0, 0);
-	grid->addWidget(descriptionEdit, 0, 1);
-	grid->addWidget(maxPlayersLabel, 1, 0);
-	grid->addWidget(maxPlayersEdit, 1, 1);
-	grid->addWidget(gameTypeGroupBox, 2, 0, 1, 2);
-	grid->addWidget(joinRestrictionsGroupBox, 3, 0, 1, 2);
-	grid->addWidget(spectatorsGroupBox, 4, 0, 1, 2);
+	grid->addLayout(generalGrid, 0, 0);
+	grid->addWidget(spectatorsGroupBox, 1, 0);
+	grid->addWidget(joinRestrictionsGroupBox, 0, 1);
+	grid->addWidget(gameTypeGroupBox, 1, 1);
 
 	okButton = new QPushButton(tr("&OK"));
 	okButton->setDefault(true);

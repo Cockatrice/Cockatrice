@@ -156,6 +156,12 @@ void CardItem::updateCardMenu()
 	if (revealedCard)
 		cardMenu->addAction(aHide);
 	else if (owner->getLocal()) {
+		moveMenu->clear();
+		moveMenu->addAction(aMoveToTopLibrary);
+		moveMenu->addAction(aMoveToBottomLibrary);
+		moveMenu->addAction(aMoveToGraveyard);
+		moveMenu->addAction(aMoveToExile);
+		
 		if (zone) {
 			if (zone->getName() == "table") {
 				cardMenu->addAction(aTap);
@@ -171,6 +177,7 @@ void CardItem::updateCardMenu()
 				cardMenu->addAction(aSetAnnotation);
 				cardMenu->addSeparator();
 				cardMenu->addAction(aClone);
+				cardMenu->addMenu(moveMenu);
 				
 				for (int i = 0; i < aAddCounter.size(); ++i) {
 					cardMenu->addSeparator();
@@ -181,15 +188,10 @@ void CardItem::updateCardMenu()
 				cardMenu->addSeparator();
 			} else {
 				cardMenu->addAction(aPlay);
+				cardMenu->addMenu(moveMenu);
 			}
-		}
-		
-		moveMenu->clear();
-		moveMenu->addAction(aMoveToTopLibrary);
-		moveMenu->addAction(aMoveToBottomLibrary);
-		moveMenu->addAction(aMoveToGraveyard);
-		moveMenu->addAction(aMoveToExile);
-		cardMenu->addMenu(moveMenu);
+		} else
+			cardMenu->addMenu(moveMenu);
 	}
 }
 
