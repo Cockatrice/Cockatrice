@@ -100,6 +100,7 @@ void ServerSocketInterface::catchSocketError(QAbstractSocket::SocketError socket
 void ServerSocketInterface::sendProtocolItem(ProtocolItem *item, bool deleteItem)
 {
 	item->write(xmlWriter);
+	socket->flush();
 	if (deleteItem)
 		delete item;
 }
