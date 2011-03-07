@@ -37,7 +37,6 @@ public slots:
 	void removePlayer(Player *player);
 	void clearViews();
 	void closeMostRecentZoneView();
-private slots:
 	void rearrange();
 protected:
 	bool event(QEvent *event);
