@@ -21,32 +21,20 @@ CardInfoWidget::CardInfoWidget(ResizeMode _mode, QWidget *parent, Qt::WindowFlag
 	cardPicture = new QLabel;
 	cardPicture->setAlignment(Qt::AlignCenter);
 
-	QFont f;
-	f.setPixelSize(11);
-
 	nameLabel1 = new QLabel;
-	nameLabel1->setFont(f);
 	nameLabel2 = new QLabel;
 	nameLabel2->setWordWrap(true);
-	nameLabel2->setFont(f);
 	manacostLabel1 = new QLabel;
-	manacostLabel1->setFont(f);
 	manacostLabel2 = new QLabel;
-	manacostLabel2->setFont(f);
 	manacostLabel2->setWordWrap(true);
 	cardtypeLabel1 = new QLabel;
-	cardtypeLabel1->setFont(f);
 	cardtypeLabel2 = new QLabel;
-	cardtypeLabel2->setFont(f);
 	cardtypeLabel2->setWordWrap(true);
 	powtoughLabel1 = new QLabel;
-	powtoughLabel1->setFont(f);
 	powtoughLabel2 = new QLabel;
-	powtoughLabel2->setFont(f);
 
 	textLabel = new QTextEdit();
 	textLabel->setReadOnly(true);
-	textLabel->setFont(f);
 
 	QGridLayout *grid = new QGridLayout(this);
 	int row = 0;

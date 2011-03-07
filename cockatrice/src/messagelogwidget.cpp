@@ -481,9 +481,6 @@ MessageLogWidget::MessageLogWidget(QWidget *parent)
 	: QTextEdit(parent)
 {
 	setReadOnly(true);
-	QFont f;
-	f.setPixelSize(11);
-	setFont(f);
 }
 
 void MessageLogWidget::enterEvent(QEvent * /*event*/)

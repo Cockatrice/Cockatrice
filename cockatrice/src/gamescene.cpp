@@ -6,11 +6,18 @@
 #include <QAction>
 #include <QGraphicsSceneMouseEvent>
 #include <QSet>
+#include <QBasicTimer>
 
 GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 	: QGraphicsScene(parent), phasesToolbar(_phasesToolbar)
 {
+	animationTimer = new QBasicTimer;
 	addItem(phasesToolbar);
+}
+
+GameScene::~GameScene()
+{
+	delete animationTimer;
 }
 
 void GameScene::retranslateUi()
@@ -152,59 +159,67 @@ void GameScene::processViewSizeChange(const QSize &newSize)
 		players[i]->processSceneSizeChange(sceneRect().size() - QSizeF(phasesToolbar->getWidth(), 0));
 }
 
-bool GameScene::event(QEvent *event)
+void GameScene::updateHover(const QPointF &scenePos)
 {
-	if (event->type() == QEvent::GraphicsSceneMouseMove) {
-		QGraphicsSceneMouseEvent *mouseEvent = static_cast<QGraphicsSceneMouseEvent *>(event);
-		
-		QSet<CardItem *> cardsToUnhover;
-		
-		QList<QGraphicsItem *> oldItemList = items(mouseEvent->lastScenePos());
-		for (int i = 0; i < oldItemList.size(); ++i) {
-			CardItem *card = qgraphicsitem_cast<CardItem *>(oldItemList[i]);
-			if (card)
-				cardsToUnhover.insert(card);
-		}
-		
-		QList<QGraphicsItem *> itemList = items(mouseEvent->scenePos());
-		
-		// Search for the topmost zone and ignore all cards not belonging to that zone.
-		CardZone *zone = 0;
-		for (int i = 0; i < itemList.size(); ++i)
-			if ((zone = qgraphicsitem_cast<CardZone *>(itemList[i])))
-				break;
-		
-		if (zone) {
-			CardItem *maxZCard = 0;
-			qreal maxZ = -1;
-			for (int i = 0; i < itemList.size(); ++i) {
-				CardItem *card = qgraphicsitem_cast<CardItem *>(itemList[i]);
-				if (!card)
+	QList<QGraphicsItem *> itemList = items(scenePos);
+	
+	// Search for the topmost zone and ignore all cards not belonging to that zone.
+	CardZone *zone = 0;
+	for (int i = 0; i < itemList.size(); ++i)
+		if ((zone = qgraphicsitem_cast<CardZone *>(itemList[i])))
+			break;
+	
+	CardItem *maxZCard = 0;
+	if (zone) {
+		qreal maxZ = -1;
+		for (int i = 0; i < itemList.size(); ++i) {
+			CardItem *card = qgraphicsitem_cast<CardItem *>(itemList[i]);
+			if (!card)
+				continue;
+			if (card->getAttachedTo()) {
+				if (card->getAttachedTo()->getZone() != zone)
 					continue;
-				if (card->getAttachedTo()) {
-					if (card->getAttachedTo()->getZone() != zone)
-						continue;
-				} else if (card->getZone() != zone)
-					continue;
-				
-				if (card->getRealZValue() > maxZ) {
-					maxZ = card->getRealZValue();
-					maxZCard = card;
-				}
-				cardsToUnhover.insert(card);
+			} else if (card->getZone() != zone)
+				continue;
+			
+			if (card->getRealZValue() > maxZ) {
+				maxZ = card->getRealZValue();
+				maxZCard = card;
 			}
-			if (maxZCard) {
-				cardsToUnhover.remove(maxZCard);
-				maxZCard->setHovered(true);
-			}
-		}
-		QSet<CardItem *>::const_iterator i = cardsToUnhover.constBegin();
-		while (i != cardsToUnhover.constEnd()) {
-			(*i)->setHovered(false);
-			++i;
 		}
 	}
+	if (hoveredCard && (maxZCard != hoveredCard))
+		hoveredCard->setHovered(false);
+	if (maxZCard && (maxZCard != hoveredCard))
+		maxZCard->setHovered(true);
+	hoveredCard = maxZCard;
+}
+
+bool GameScene::event(QEvent *event)
+{
+	if (event->type() == QEvent::GraphicsSceneMouseMove)
+		updateHover(static_cast<QGraphicsSceneMouseEvent *>(event)->scenePos());
+	
 	return QGraphicsScene::event(event);
+}
+
+void GameScene::timerEvent(QTimerEvent * /*event*/)
+{
+	QMutableSetIterator<CardItem *> i(cardsToAnimate);
+	while (i.hasNext()) {
+		i.next();
+		if (!i.value()->animationEvent())
+			i.remove();
+	}
+	if (cardsToAnimate.isEmpty())
+		animationTimer->stop();
+}
+
+void GameScene::registerAnimationItem(AbstractCardItem *card)
+{
+	cardsToAnimate.insert(static_cast<CardItem *>(card));
+	if (!animationTimer->isActive())
+		animationTimer->start(50, this);
 }
 
 void GameScene::startRubberBand(const QPointF &selectionOrigin)

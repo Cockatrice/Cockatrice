@@ -96,6 +96,7 @@ public:
 	void processCardInfo(ServerInfo_Card *info);
 	void updateCardMenu();
 
+	bool animationEvent();
 	CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);
 	void deleteDragItem();
 protected:

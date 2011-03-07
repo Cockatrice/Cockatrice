@@ -1,7 +1,6 @@
 #include <QPainter>
 #include <QGraphicsScene>
 #include <QCursor>
-#include <QStyleOptionGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 #include <math.h>
 #include "carddatabase.h"
@@ -9,8 +8,8 @@
 #include "abstractcarditem.h"
 #include "settingscache.h"
 #include "main.h"
+#include "gamescene.h"
 #include <QDebug>
-#include <QTimer>
 
 AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, QGraphicsItem *parent)
 	: ArrowTarget(_owner, parent), infoWidget(0), name(_name), tapped(false), tapAngle(0), isHovered(false), realZValue(0)
@@ -22,10 +21,6 @@ AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, QGraphi
 	connect(db, SIGNAL(cardListChanged()), this, SLOT(cardInfoUpdated()));
 	connect(settingsCache, SIGNAL(displayCardNamesChanged()), this, SLOT(callUpdate()));
 	cardInfoUpdated();
-	
-	animationTimer = new QTimer(this);
-	animationTimer->setSingleShot(false);
-	connect(animationTimer, SIGNAL(timeout()), this, SLOT(animationEvent()));
 }
 
 AbstractCardItem::~AbstractCardItem()
@@ -160,22 +155,6 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 	painter->restore();
 }
 
-void AbstractCardItem::animationEvent()
-{
-	int delta = 18;
-	if (!tapped)
-		delta *= -1;
-	
-	tapAngle += delta;
-	
-	setTransform(QTransform().translate((float) CARD_WIDTH / 2, (float) CARD_HEIGHT / 2).rotate(tapAngle).translate((float) -CARD_WIDTH / 2, (float) -CARD_HEIGHT / 2));
-	setHovered(false);
-	update();
-
-	if ((tapped && (tapAngle >= 90)) || (!tapped && (tapAngle <= 0)))
-		animationTimer->stop();
-}
-
 void AbstractCardItem::setName(const QString &_name)
 {
 	disconnect(info, 0, this, 0);
@@ -210,7 +189,7 @@ void AbstractCardItem::setTapped(bool _tapped, bool canAnimate)
 	
 	tapped = _tapped;
 	if (settingsCache->getTapAnimation() && canAnimate)
-		animationTimer->start(25);
+		static_cast<GameScene *>(scene())->registerAnimationItem(this);
 	else {
 		tapAngle = tapped ? 90 : 0;
 		setTransform(QTransform().translate((float) CARD_WIDTH / 2, (float) CARD_HEIGHT / 2).rotate(tapAngle).translate((float) -CARD_WIDTH / 2, (float) -CARD_HEIGHT / 2));

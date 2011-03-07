@@ -21,11 +21,9 @@ protected:
 	int tapAngle;
 	QString color;
 private:
-	QTimer *animationTimer;
 	bool isHovered;
 	qreal realZValue;
 private slots:
-	void animationEvent();
 	void pixmapUpdated();
 	void cardInfoUpdated();
 	void callUpdate() { update(); }
