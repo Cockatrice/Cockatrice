@@ -156,22 +156,22 @@
 <context>
     <name>CardInfoWidget</name>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="154"/>
+        <location filename="../src/cardinfowidget.cpp" line="142"/>
         <source>Name:</source>
         <translation>Nome:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="155"/>
+        <location filename="../src/cardinfowidget.cpp" line="143"/>
         <source>Mana cost:</source>
         <translation>Custo de mana:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="156"/>
+        <location filename="../src/cardinfowidget.cpp" line="144"/>
         <source>Card type:</source>
         <translation>Tipo de card:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="157"/>
+        <location filename="../src/cardinfowidget.cpp" line="145"/>
         <source>P / T:</source>
         <translation>P / R:</translation>
     </message>
@@ -179,57 +179,57 @@
 <context>
     <name>CardItem</name>
     <message>
-        <location filename="../src/carditem.cpp" line="198"/>
+        <location filename="../src/carditem.cpp" line="200"/>
         <source>&amp;Play</source>
         <translation>&amp;Jogar</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="199"/>
+        <location filename="../src/carditem.cpp" line="201"/>
         <source>&amp;Hide</source>
         <translation>&amp;Ocultar</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="201"/>
+        <location filename="../src/carditem.cpp" line="203"/>
         <source>&amp;Tap</source>
         <translation>&amp;Virar</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="202"/>
+        <location filename="../src/carditem.cpp" line="204"/>
         <source>&amp;Untap</source>
         <translation>&amp;Desvirar</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="203"/>
+        <location filename="../src/carditem.cpp" line="205"/>
         <source>Toggle &amp;normal untapping</source>
         <translation>&amp;Trocar o modo de desvirar</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="204"/>
+        <location filename="../src/carditem.cpp" line="206"/>
         <source>&amp;Flip</source>
         <translation>Virar a &amp;face</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="205"/>
+        <location filename="../src/carditem.cpp" line="207"/>
         <source>&amp;Clone</source>
         <translation>Clo&amp;nar</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="206"/>
+        <location filename="../src/carditem.cpp" line="208"/>
         <source>Ctrl+H</source>
         <translation>Ctrl+H</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="207"/>
+        <location filename="../src/carditem.cpp" line="209"/>
         <source>&amp;Attach to card...</source>
         <translation>Ane&amp;xar ao card...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="208"/>
+        <location filename="../src/carditem.cpp" line="210"/>
         <source>Ctrl+A</source>
         <translation>Ctrl+A</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="209"/>
+        <location filename="../src/carditem.cpp" line="211"/>
         <source>Unattac&amp;h</source>
         <translation>De&amp;sanexar</translation>
     </message>
@@ -238,142 +238,142 @@
         <translation type="obsolete">Alterar &amp;P/R...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="210"/>
+        <location filename="../src/carditem.cpp" line="212"/>
         <source>&amp;Power / toughness</source>
         <translation>Po&amp;der / resistência</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="211"/>
+        <location filename="../src/carditem.cpp" line="213"/>
         <source>&amp;Increase power</source>
         <translation>Au&amp;mentar poder</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="212"/>
+        <location filename="../src/carditem.cpp" line="214"/>
         <source>Ctrl++</source>
         <translation>Ctrl++</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="213"/>
+        <location filename="../src/carditem.cpp" line="215"/>
         <source>&amp;Decrease power</source>
         <translation>Dimi&amp;nuir poder</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="214"/>
+        <location filename="../src/carditem.cpp" line="216"/>
         <source>Ctrl+-</source>
         <translation>Ctrl+-</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="215"/>
+        <location filename="../src/carditem.cpp" line="217"/>
         <source>I&amp;ncrease toughness</source>
         <translation>A&amp;umentar resistência</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="216"/>
+        <location filename="../src/carditem.cpp" line="218"/>
         <source>Alt++</source>
         <translation>Alt++</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="217"/>
+        <location filename="../src/carditem.cpp" line="219"/>
         <source>D&amp;ecrease toughness</source>
         <translation>D&amp;iminuir resistência</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="218"/>
+        <location filename="../src/carditem.cpp" line="220"/>
         <source>Alt+-</source>
         <translation>Alt+-</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="219"/>
+        <location filename="../src/carditem.cpp" line="221"/>
         <source>In&amp;crease power and toughness</source>
         <translation>Aumen&amp;tar poder e resistência</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="220"/>
+        <location filename="../src/carditem.cpp" line="222"/>
         <source>Ctrl+Alt++</source>
         <translation>Ctrl+Alt++</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="221"/>
+        <location filename="../src/carditem.cpp" line="223"/>
         <source>Dec&amp;rease power and toughness</source>
         <translation>Diminuir p&amp;oder e resistência</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="222"/>
+        <location filename="../src/carditem.cpp" line="224"/>
         <source>Ctrl+Alt+-</source>
         <translation>Ctrl+Alt+-</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="223"/>
+        <location filename="../src/carditem.cpp" line="225"/>
         <source>Set &amp;power and toughness...</source>
         <translation>Alterar poder e resis&amp;tência...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="224"/>
+        <location filename="../src/carditem.cpp" line="226"/>
         <source>Ctrl+P</source>
         <translation>Ctrl+P</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="225"/>
+        <location filename="../src/carditem.cpp" line="227"/>
         <source>&amp;Set annotation...</source>
         <translation>Alterar &amp;nota...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="227"/>
+        <location filename="../src/carditem.cpp" line="229"/>
         <source>red</source>
         <translation>vermelho</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="228"/>
+        <location filename="../src/carditem.cpp" line="230"/>
         <source>yellow</source>
         <translation>amarelo</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="229"/>
+        <location filename="../src/carditem.cpp" line="231"/>
         <source>green</source>
         <translation>verde</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="231"/>
+        <location filename="../src/carditem.cpp" line="233"/>
         <source>&amp;Add counter (%1)</source>
         <translation>Adicionar &amp;marcador (%1)</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="233"/>
+        <location filename="../src/carditem.cpp" line="235"/>
         <source>&amp;Remove counter (%1)</source>
         <translation>&amp;Remover marcador (%1)</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="235"/>
+        <location filename="../src/carditem.cpp" line="237"/>
         <source>&amp;Set counters (%1)...</source>
         <translation>&amp;Alterar marcadores (%1)...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="236"/>
+        <location filename="../src/carditem.cpp" line="238"/>
         <source>&amp;top of library</source>
         <translation>topo do &amp;grimório</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="237"/>
+        <location filename="../src/carditem.cpp" line="239"/>
         <source>&amp;bottom of library</source>
         <translation>&amp;fundo do grimório</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="238"/>
+        <location filename="../src/carditem.cpp" line="240"/>
         <source>&amp;graveyard</source>
         <translation>&amp;cemitério</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="239"/>
+        <location filename="../src/carditem.cpp" line="241"/>
         <source>Ctrl+Del</source>
         <translation>Ctrl+Del</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="240"/>
+        <location filename="../src/carditem.cpp" line="242"/>
         <source>&amp;exile</source>
         <translation>&amp;exílio</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="242"/>
+        <location filename="../src/carditem.cpp" line="244"/>
         <source>&amp;Move to</source>
         <translation>Mo&amp;ver para</translation>
     </message>
@@ -738,7 +738,7 @@
         <translation>&amp;Descrição:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="39"/>
+        <location filename="../src/dlg_creategame.cpp" line="45"/>
         <source>&amp;Password:</source>
         <translation>S&amp;enha:</translation>
     </message>
@@ -748,72 +748,72 @@
         <translation>&amp;Jogadores:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="36"/>
+        <location filename="../src/dlg_creategame.cpp" line="42"/>
         <source>Game type</source>
         <translation>Tipo de jogo</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="43"/>
+        <location filename="../src/dlg_creategame.cpp" line="49"/>
         <source>Only &amp;buddies can join</source>
         <translation>Apenas ami&amp;gos podem entrar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="44"/>
+        <location filename="../src/dlg_creategame.cpp" line="50"/>
         <source>Only &amp;registered users can join</source>
         <translation>Apenas usuários re&amp;gistrados podem entrar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="52"/>
+        <location filename="../src/dlg_creategame.cpp" line="58"/>
         <source>Joining restrictions</source>
         <translation>Restrições para entrar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="55"/>
+        <location filename="../src/dlg_creategame.cpp" line="61"/>
         <source>&amp;Spectators allowed</source>
         <translation>&amp;Permitir visitantes</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="58"/>
+        <location filename="../src/dlg_creategame.cpp" line="64"/>
         <source>Spectators &amp;need a password to join</source>
         <translation>Visitantes &amp;precisam de senha para entrar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="59"/>
+        <location filename="../src/dlg_creategame.cpp" line="65"/>
         <source>Spectators can &amp;chat</source>
         <translation>Visitantes podem c&amp;onversar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="60"/>
+        <location filename="../src/dlg_creategame.cpp" line="66"/>
         <source>Spectators see &amp;everything</source>
         <translation>Visitantes podem ver &amp;tudo</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="66"/>
+        <location filename="../src/dlg_creategame.cpp" line="72"/>
         <source>Spectators</source>
         <translation>Visitantes</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="78"/>
+        <location filename="../src/dlg_creategame.cpp" line="81"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="80"/>
+        <location filename="../src/dlg_creategame.cpp" line="83"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Cancelar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="93"/>
+        <location filename="../src/dlg_creategame.cpp" line="96"/>
         <source>Create game</source>
         <translation>Criar jogo</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="138"/>
+        <location filename="../src/dlg_creategame.cpp" line="141"/>
         <source>Error</source>
         <translation>Erro</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="138"/>
+        <location filename="../src/dlg_creategame.cpp" line="141"/>
         <source>Server error.</source>
         <translation>Erro do servidor.</translation>
     </message>
@@ -2378,47 +2378,47 @@ A versão local é %1 e a versão remota é %2.</translation>
         <translation type="obsolete">nº %1</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="86"/>
+        <location filename="../src/playerlistwidget.cpp" line="87"/>
         <source>local deck</source>
         <translation>deck local</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="87"/>
+        <location filename="../src/playerlistwidget.cpp" line="88"/>
         <source>deck #%1</source>
         <translation>deck #%1</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="137"/>
+        <location filename="../src/playerlistwidget.cpp" line="139"/>
         <source>User &amp;details</source>
         <translation>&amp;Detalhes do usuário</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="138"/>
+        <location filename="../src/playerlistwidget.cpp" line="140"/>
         <source>Direct &amp;chat</source>
         <translation>&amp;Chat direto</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="139"/>
+        <location filename="../src/playerlistwidget.cpp" line="141"/>
         <source>Add to &amp;buddy list</source>
         <translation>Adicionar à &amp;lista de amigos</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="140"/>
+        <location filename="../src/playerlistwidget.cpp" line="142"/>
         <source>Remove from &amp;buddy list</source>
         <translation>Remover da li&amp;sta de amigos</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="141"/>
+        <location filename="../src/playerlistwidget.cpp" line="143"/>
         <source>Add to &amp;ignore list</source>
         <translation>Adicionar à li&amp;sta dos ignorados</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="142"/>
+        <location filename="../src/playerlistwidget.cpp" line="144"/>
         <source>Remove from &amp;ignore list</source>
         <translation>Remover da lista dos i&amp;gnorados</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="143"/>
+        <location filename="../src/playerlistwidget.cpp" line="145"/>
         <source>Kick from &amp;game</source>
         <translation>C&amp;hutar do jogo</translation>
     </message>
@@ -2765,12 +2765,12 @@ Por favor, entre um nome:</translation>
         <translation>Você tem certeza que deseja sair deste jogo?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="651"/>
+        <location filename="../src/tab_game.cpp" line="652"/>
         <source>Kicked</source>
         <translation>Chutado</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="651"/>
+        <location filename="../src/tab_game.cpp" line="652"/>
         <source>You have been kicked out of the game.</source>
         <translation>Você foi chutado do jogo.</translation>
     </message>
@@ -2954,47 +2954,47 @@ Por favor, entre um nome:</translation>
         <translation>Usuários ignorados online: %1 / %2</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="172"/>
+        <location filename="../src/userlist.cpp" line="173"/>
         <source>User &amp;details</source>
         <translation>&amp;Detalhes do usuário</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="173"/>
+        <location filename="../src/userlist.cpp" line="174"/>
         <source>Direct &amp;chat</source>
         <translation>&amp;Chat direto</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="174"/>
+        <location filename="../src/userlist.cpp" line="175"/>
         <source>Add to &amp;buddy list</source>
         <translation>Adicionar à &amp;lista de amigos</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="175"/>
+        <location filename="../src/userlist.cpp" line="176"/>
         <source>Remove from &amp;buddy list</source>
         <translation>Remover da li&amp;sta de amigos</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="176"/>
+        <location filename="../src/userlist.cpp" line="177"/>
         <source>Add to &amp;ignore list</source>
         <translation>Adicionar à li&amp;sta dos ignorados</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="177"/>
+        <location filename="../src/userlist.cpp" line="178"/>
         <source>Remove from &amp;ignore list</source>
         <translation>Remover da lista dos i&amp;gnorados</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="178"/>
+        <location filename="../src/userlist.cpp" line="179"/>
         <source>Ban from &amp;server</source>
         <translation>Ban&amp;ir do servidor</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="216"/>
+        <location filename="../src/userlist.cpp" line="219"/>
         <source>Duration</source>
         <translation>Duração</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="216"/>
+        <location filename="../src/userlist.cpp" line="219"/>
         <source>Please enter the duration of the ban (in minutes).
 Enter 0 for an indefinite ban.</source>
         <translation>Por favor, digite a duração do banimento (em minutos).

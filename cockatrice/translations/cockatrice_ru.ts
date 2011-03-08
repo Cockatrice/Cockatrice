@@ -152,22 +152,22 @@
 <context>
     <name>CardInfoWidget</name>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="154"/>
+        <location filename="../src/cardinfowidget.cpp" line="142"/>
         <source>Name:</source>
         <translation>Название:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="155"/>
+        <location filename="../src/cardinfowidget.cpp" line="143"/>
         <source>Mana cost:</source>
         <translation>Манакост:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="156"/>
+        <location filename="../src/cardinfowidget.cpp" line="144"/>
         <source>Card type:</source>
         <translation>Тип:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="157"/>
+        <location filename="../src/cardinfowidget.cpp" line="145"/>
         <source>P / T:</source>
         <translation>Сила/Защита:</translation>
     </message>
@@ -175,57 +175,57 @@
 <context>
     <name>CardItem</name>
     <message>
-        <location filename="../src/carditem.cpp" line="198"/>
+        <location filename="../src/carditem.cpp" line="200"/>
         <source>&amp;Play</source>
         <translation>&amp;Разыграть</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="199"/>
+        <location filename="../src/carditem.cpp" line="201"/>
         <source>&amp;Hide</source>
         <translation>&amp;Cкрыть</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="201"/>
+        <location filename="../src/carditem.cpp" line="203"/>
         <source>&amp;Tap</source>
         <translation>&amp;Повернуть</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="202"/>
+        <location filename="../src/carditem.cpp" line="204"/>
         <source>&amp;Untap</source>
         <translation>&amp;Развернуть</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="203"/>
+        <location filename="../src/carditem.cpp" line="205"/>
         <source>Toggle &amp;normal untapping</source>
         <translation>(Не) &amp;Разворачивать как обычно</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="204"/>
+        <location filename="../src/carditem.cpp" line="206"/>
         <source>&amp;Flip</source>
         <translation>&amp;Рубашкой вверх (вниз)</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="205"/>
+        <location filename="../src/carditem.cpp" line="207"/>
         <source>&amp;Clone</source>
         <translation>&amp;Клонировать</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="206"/>
+        <location filename="../src/carditem.cpp" line="208"/>
         <source>Ctrl+H</source>
         <translation>Ctrl+H</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="207"/>
+        <location filename="../src/carditem.cpp" line="209"/>
         <source>&amp;Attach to card...</source>
         <translation>&amp;Прикрепить к...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="208"/>
+        <location filename="../src/carditem.cpp" line="210"/>
         <source>Ctrl+A</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="209"/>
+        <location filename="../src/carditem.cpp" line="211"/>
         <source>Unattac&amp;h</source>
         <translation>&amp;Открепить</translation>
     </message>
@@ -234,142 +234,142 @@
         <translation type="obsolete">Установить &amp;Силу/Защиту...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="210"/>
+        <location filename="../src/carditem.cpp" line="212"/>
         <source>&amp;Power / toughness</source>
         <translation>&amp;Сила / защита</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="211"/>
+        <location filename="../src/carditem.cpp" line="213"/>
         <source>&amp;Increase power</source>
         <translation>&amp;Увеличить силу</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="212"/>
+        <location filename="../src/carditem.cpp" line="214"/>
         <source>Ctrl++</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="213"/>
+        <location filename="../src/carditem.cpp" line="215"/>
         <source>&amp;Decrease power</source>
         <translation>У&amp;меньшить силу</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="214"/>
+        <location filename="../src/carditem.cpp" line="216"/>
         <source>Ctrl+-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="215"/>
+        <location filename="../src/carditem.cpp" line="217"/>
         <source>I&amp;ncrease toughness</source>
         <translation>У&amp;величить защиту</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="216"/>
+        <location filename="../src/carditem.cpp" line="218"/>
         <source>Alt++</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="217"/>
+        <location filename="../src/carditem.cpp" line="219"/>
         <source>D&amp;ecrease toughness</source>
         <translation>Уменьшить &amp;защиту</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="218"/>
+        <location filename="../src/carditem.cpp" line="220"/>
         <source>Alt+-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="219"/>
+        <location filename="../src/carditem.cpp" line="221"/>
         <source>In&amp;crease power and toughness</source>
         <translation>Увеличить силу &amp;и защиту</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="220"/>
+        <location filename="../src/carditem.cpp" line="222"/>
         <source>Ctrl+Alt++</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="221"/>
+        <location filename="../src/carditem.cpp" line="223"/>
         <source>Dec&amp;rease power and toughness</source>
         <translation>Уменьшить силу и за&amp;щиту</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="222"/>
+        <location filename="../src/carditem.cpp" line="224"/>
         <source>Ctrl+Alt+-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="223"/>
+        <location filename="../src/carditem.cpp" line="225"/>
         <source>Set &amp;power and toughness...</source>
         <translation>Уст&amp;ановить силу / защиту...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="224"/>
+        <location filename="../src/carditem.cpp" line="226"/>
         <source>Ctrl+P</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="225"/>
+        <location filename="../src/carditem.cpp" line="227"/>
         <source>&amp;Set annotation...</source>
         <translation>&amp;Пометить...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="227"/>
+        <location filename="../src/carditem.cpp" line="229"/>
         <source>red</source>
         <translation>Красный</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="228"/>
+        <location filename="../src/carditem.cpp" line="230"/>
         <source>yellow</source>
         <translation>Желтый</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="229"/>
+        <location filename="../src/carditem.cpp" line="231"/>
         <source>green</source>
         <translation>Зеленый</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="231"/>
+        <location filename="../src/carditem.cpp" line="233"/>
         <source>&amp;Add counter (%1)</source>
         <translation>&amp;Добавить жетон (%1)</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="233"/>
+        <location filename="../src/carditem.cpp" line="235"/>
         <source>&amp;Remove counter (%1)</source>
         <translation>&amp;Убрать жетон (%1)</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="235"/>
+        <location filename="../src/carditem.cpp" line="237"/>
         <source>&amp;Set counters (%1)...</source>
         <translation>&amp;Установить жетоны (%1)...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="236"/>
+        <location filename="../src/carditem.cpp" line="238"/>
         <source>&amp;top of library</source>
         <translation>&amp;Наверх библиотеки</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="237"/>
+        <location filename="../src/carditem.cpp" line="239"/>
         <source>&amp;bottom of library</source>
         <translation>&amp;Вниз библиотеки</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="238"/>
+        <location filename="../src/carditem.cpp" line="240"/>
         <source>&amp;graveyard</source>
         <translation>&amp;На кладбище</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="239"/>
+        <location filename="../src/carditem.cpp" line="241"/>
         <source>Ctrl+Del</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="240"/>
+        <location filename="../src/carditem.cpp" line="242"/>
         <source>&amp;exile</source>
         <translation>&amp;Изгнать</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="242"/>
+        <location filename="../src/carditem.cpp" line="244"/>
         <source>&amp;Move to</source>
         <translation>&amp;Переместить...</translation>
     </message>
@@ -677,7 +677,7 @@
         <translation>&amp;Подпись:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="39"/>
+        <location filename="../src/dlg_creategame.cpp" line="45"/>
         <source>&amp;Password:</source>
         <translation>&amp;Пароль:</translation>
     </message>
@@ -687,72 +687,72 @@
         <translation>&amp;Количество игроков:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="36"/>
+        <location filename="../src/dlg_creategame.cpp" line="42"/>
         <source>Game type</source>
         <translation>Формат игры</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="43"/>
+        <location filename="../src/dlg_creategame.cpp" line="49"/>
         <source>Only &amp;buddies can join</source>
         <translation>Только для &amp;своих</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="44"/>
+        <location filename="../src/dlg_creategame.cpp" line="50"/>
         <source>Only &amp;registered users can join</source>
         <translation>Только для &amp;зарег. пользователей</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="52"/>
+        <location filename="../src/dlg_creategame.cpp" line="58"/>
         <source>Joining restrictions</source>
         <translation>Ограничения</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="55"/>
+        <location filename="../src/dlg_creategame.cpp" line="61"/>
         <source>&amp;Spectators allowed</source>
         <translation>&amp;Разрешить зрителей</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="58"/>
+        <location filename="../src/dlg_creategame.cpp" line="64"/>
         <source>Spectators &amp;need a password to join</source>
         <translation>Требовать &amp;пароль у зрителей</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="59"/>
+        <location filename="../src/dlg_creategame.cpp" line="65"/>
         <source>Spectators can &amp;chat</source>
         <translation>Позволить зрителям &amp;комментировать</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="60"/>
+        <location filename="../src/dlg_creategame.cpp" line="66"/>
         <source>Spectators see &amp;everything</source>
         <translation>Показывать зрителям &amp;все</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="66"/>
+        <location filename="../src/dlg_creategame.cpp" line="72"/>
         <source>Spectators</source>
         <translation>Зрители</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="78"/>
+        <location filename="../src/dlg_creategame.cpp" line="81"/>
         <source>&amp;OK</source>
         <translation>&amp;Ок</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="80"/>
+        <location filename="../src/dlg_creategame.cpp" line="83"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Отмена</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="93"/>
+        <location filename="../src/dlg_creategame.cpp" line="96"/>
         <source>Create game</source>
         <translation>Создать игру</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="138"/>
+        <location filename="../src/dlg_creategame.cpp" line="141"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="138"/>
+        <location filename="../src/dlg_creategame.cpp" line="141"/>
         <source>Server error.</source>
         <translation>Ошибка сервера.</translation>
     </message>
@@ -2305,47 +2305,47 @@ Local version is %1, remote version is %2.</source>
         <translation type="obsolete">локальная</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="86"/>
+        <location filename="../src/playerlistwidget.cpp" line="87"/>
         <source>local deck</source>
         <translation>колода на диске</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="87"/>
+        <location filename="../src/playerlistwidget.cpp" line="88"/>
         <source>deck #%1</source>
         <translation>колода №%1</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="137"/>
+        <location filename="../src/playerlistwidget.cpp" line="139"/>
         <source>User &amp;details</source>
         <translation>&amp;Данные о пользователе</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="138"/>
+        <location filename="../src/playerlistwidget.cpp" line="140"/>
         <source>Direct &amp;chat</source>
         <translation>Обратиться &amp;лично</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="139"/>
+        <location filename="../src/playerlistwidget.cpp" line="141"/>
         <source>Add to &amp;buddy list</source>
         <translation>Добавить в &amp;друзья</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="140"/>
+        <location filename="../src/playerlistwidget.cpp" line="142"/>
         <source>Remove from &amp;buddy list</source>
         <translation>&amp;Удалить из друзей</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="141"/>
+        <location filename="../src/playerlistwidget.cpp" line="143"/>
         <source>Add to &amp;ignore list</source>
         <translation>Добавить в &amp;игнор-лист</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="142"/>
+        <location filename="../src/playerlistwidget.cpp" line="144"/>
         <source>Remove from &amp;ignore list</source>
         <translation>Удалить и&amp;з игнор-листа</translation>
     </message>
     <message>
-        <location filename="../src/playerlistwidget.cpp" line="143"/>
+        <location filename="../src/playerlistwidget.cpp" line="145"/>
         <source>Kick from &amp;game</source>
         <translation>В&amp;ыкинуть из игры</translation>
     </message>
@@ -2666,12 +2666,12 @@ Please enter a name:</source>
         <translation>Вы уверены, что хотите уйти?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="651"/>
+        <location filename="../src/tab_game.cpp" line="652"/>
         <source>Kicked</source>
         <translation>Выкинут</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="651"/>
+        <location filename="../src/tab_game.cpp" line="652"/>
         <source>You have been kicked out of the game.</source>
         <translation>Вас выкинули из игры.</translation>
     </message>
@@ -2847,47 +2847,47 @@ Please enter a name:</source>
         <translation>Игнорируемых пользователей онлайн: %1 / %2</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="172"/>
+        <location filename="../src/userlist.cpp" line="173"/>
         <source>User &amp;details</source>
         <translation>Данные о &amp;пользователе</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="173"/>
+        <location filename="../src/userlist.cpp" line="174"/>
         <source>Direct &amp;chat</source>
         <translation>Обратиться &amp;лично</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="174"/>
+        <location filename="../src/userlist.cpp" line="175"/>
         <source>Add to &amp;buddy list</source>
         <translation>Добавить в список &amp;друзей</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="175"/>
+        <location filename="../src/userlist.cpp" line="176"/>
         <source>Remove from &amp;buddy list</source>
         <translation>&amp;Удалить из друзей</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="176"/>
+        <location filename="../src/userlist.cpp" line="177"/>
         <source>Add to &amp;ignore list</source>
         <translation>Добавить в &amp;игнор-лист</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="177"/>
+        <location filename="../src/userlist.cpp" line="178"/>
         <source>Remove from &amp;ignore list</source>
         <translation>Удалить и&amp;з игнор-листа</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="178"/>
+        <location filename="../src/userlist.cpp" line="179"/>
         <source>Ban from &amp;server</source>
         <translation>За&amp;банить на сервере</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="216"/>
+        <location filename="../src/userlist.cpp" line="219"/>
         <source>Duration</source>
         <translation>Продолжительность</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="216"/>
+        <location filename="../src/userlist.cpp" line="219"/>
         <source>Please enter the duration of the ban (in minutes).
 Enter 0 for an indefinite ban.</source>
         <translation>Введите продолжительность бана (в минутах).
