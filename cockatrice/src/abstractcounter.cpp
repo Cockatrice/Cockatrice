@@ -119,7 +119,7 @@ void AbstractCounter::setCounter()
 {
 	bool ok;
 	dialogSemaphore = true;
-	int newValue = QInputDialog::getInteger(0, tr("Set counter"), tr("New value for counter '%1':").arg(name), value, 0, 2000000000, 1, &ok);
+	int newValue = QInputDialog::getInteger(0, tr("Set counter"), tr("New value for counter '%1':").arg(name), value, -2000000000, 2000000000, 1, &ok);
 	if (deleteAfterDialog) {
 		deleteLater();
 		return;
