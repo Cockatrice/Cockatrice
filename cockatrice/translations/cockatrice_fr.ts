@@ -1833,12 +1833,12 @@ La version la plus récente est %1, l&apos;ancienne version est %2.</translation
         <location filename="../src/messagelogwidget.cpp" line="341"/>
         <source>%1 sets %2 to not untap normally.</source>
         <translatorcomment>need exemple</translatorcomment>
-        <translation>%2 ne se dégagera pas lors de l&apos;étape de dégagement.</translation>
+        <translation>%2 de %1 ne se dégagera pas lors de l&apos;étape de dégagement.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="343"/>
         <source>%1 sets %2 to untap normally.</source>
-        <translation>%2 se dégagera lors de l&apos;étape de dégagement.</translation>
+        <translation>%2 de %1 se dégagera lors de l&apos;étape de dégagement.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="352"/>
