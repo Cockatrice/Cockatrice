@@ -141,7 +141,7 @@ void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
 	if (cardName.isEmpty())
 		append(tr("%1 undoes his last draw.").arg(sanitizeHtml(player->getName())));
 	else
-		append(tr("%1 undoes his last draw (%2).").arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(cardName)));
+		append(tr("%1 undoes his last draw (%2).").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
 }
 
 QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position) const

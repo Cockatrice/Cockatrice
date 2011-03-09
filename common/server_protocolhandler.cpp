@@ -512,6 +512,8 @@ ResponseCode Server_ProtocolHandler::cmdConcede(Command_Concede * /*cmd*/, Comma
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
+	if (!game->getGameStarted())
+		return RespGameNotStarted;
 	if (player->getConceded())
 		return RespContextError;
 	
@@ -530,7 +532,7 @@ ResponseCode Server_ProtocolHandler::cmdReadyStart(Command_ReadyStart *cmd, Comm
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
 	
-	if (!player->getDeck())
+	if (!player->getDeck() || game->getGameStarted())
 		return RespContextError;
 
 	if (player->getReadyStart() == cmd->getReady())
