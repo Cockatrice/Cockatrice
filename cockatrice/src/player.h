@@ -135,6 +135,7 @@ private:
 	bool active;
 	bool local;
 	bool mirrored;
+	bool handVisible;
 	bool conceded;
 	
 	bool dialogSemaphore;

@@ -23,7 +23,7 @@
 #include <QDebug>
 
 Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
-	: QObject(_parent), shortcutsActive(false), defaultNumberTopCards(3), lastTokenDestroy(true), userInfo(new ServerInfo_User(info)), id(_id), active(false), local(_local), mirrored(false), conceded(false), dialogSemaphore(false)
+	: QObject(_parent), shortcutsActive(false), defaultNumberTopCards(3), lastTokenDestroy(true), userInfo(new ServerInfo_User(info)), id(_id), active(false), local(_local), mirrored(false), handVisible(false), conceded(false), dialogSemaphore(false)
 {
 	setCacheMode(DeviceCoordinateCache);
 	
@@ -328,44 +328,44 @@ void Player::playerListActionTriggered()
 void Player::rearrangeZones()
 {
 	QPointF base = QPointF(CARD_HEIGHT + counterAreaWidth + 15, 0);
-	
 	if (settingsCache->getHorizontalHand()) {
 		if (mirrored) {
 			if (hand->contentsKnown()) {
-				hand->setVisible(true);
+				handVisible = true;
 				hand->setPos(base);
 				base += QPointF(0, hand->boundingRect().height());
 			} else
-				hand->setVisible(false);
-
+				handVisible = false;
+			
 			stack->setPos(base);
 			base += QPointF(stack->boundingRect().width(), 0);
-	
+			
 			table->setPos(base);
 		} else {
 			stack->setPos(base);
-	
+			
 			table->setPos(base.x() + stack->boundingRect().width(), 0);
 			base += QPointF(0, table->boundingRect().height());
 			
 			if (hand->contentsKnown()) {
-				hand->setVisible(true);
+				handVisible = true;
 				hand->setPos(base);
 			} else
-				hand->setVisible(false);
+				handVisible = false;
 		}
 		hand->setWidth(table->getWidth() + stack->boundingRect().width());
 	} else {
-		hand->setVisible(true);
+		handVisible = true;
 		
 		hand->setPos(base);
 		base += QPointF(hand->boundingRect().width(), 0);
 		
 		stack->setPos(base);
 		base += QPointF(stack->boundingRect().width(), 0);
-	
+		
 		table->setPos(base);
 	}
+	hand->setVisible(handVisible);
 	hand->updateOrientation();
 	table->reorganizeCards();
 	updateBoundingRect();
@@ -392,7 +392,7 @@ void Player::updateBoundingRect()
 	prepareGeometryChange();
 	qreal width = CARD_HEIGHT + 15 + counterAreaWidth + stack->boundingRect().width();
 	if (settingsCache->getHorizontalHand()) {
-		qreal handHeight = hand->isVisible() ? hand->boundingRect().height() : 0;
+		qreal handHeight = handVisible ? hand->boundingRect().height() : 0;
 		bRect = QRectF(0, 0, width + table->boundingRect().width(), table->boundingRect().height() + handHeight);
 	} else
 		bRect = QRectF(0, 0, width + hand->boundingRect().width() + table->boundingRect().width(), table->boundingRect().height());
