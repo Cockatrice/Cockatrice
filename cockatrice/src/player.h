@@ -46,6 +46,24 @@ class Event_AttachCard;
 class Event_DrawCards;
 class Event_RevealCards;
 
+class PlayerArea : public QObject, public QGraphicsItem {
+	Q_OBJECT
+private:	
+	QBrush bgPixmapBrush;
+	QRectF bRect;
+private slots:
+	void updateBgPixmap();
+public:
+	enum { Type = typeOther };
+	int type() const { return Type; }
+	
+	PlayerArea(QGraphicsItem *parent = 0);
+	QRectF boundingRect() const { return bRect; }
+	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+	
+	void setSize(qreal width, qreal height);
+};
+
 class Player : public QObject, public QGraphicsItem {
 	Q_OBJECT
 signals:
@@ -109,7 +127,6 @@ private slots:
 	void removePlayer(Player *player);
 	void playerListActionTriggered();
 	
-	void updateBgPixmap();
 	void updateBoundingRect();
 	void rearrangeZones();
 private:
@@ -142,6 +159,7 @@ private:
 	bool clearCardsToDelete();
 	QList<CardItem *> cardsToDelete;
 	
+	PlayerArea *playerArea;
 	QMap<QString, CardZone *> zones;
 	StackZone *stack;
 	TableZone *table;
@@ -150,7 +168,6 @@ private:
 	
 	void setCardAttrHelper(GameEventContext *context, CardItem *card, const QString &aname, const QString &avalue, bool allCards);
 
-	QPixmap bgPixmap;
 	QRectF bRect;
 
 	QMap<int, AbstractCounter *> counters;

@@ -27,7 +27,7 @@ public:
 	enum { Type = typePlayerTarget };
 	int type() const { return Type; }
 	
-	PlayerTarget(Player *parent = 0);
+	PlayerTarget(Player *_player = 0, QGraphicsItem *parentItem = 0);
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	

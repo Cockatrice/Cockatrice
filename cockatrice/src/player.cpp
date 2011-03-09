@@ -22,36 +22,65 @@
 #include <QMenu>
 #include <QDebug>
 
+PlayerArea::PlayerArea(QGraphicsItem *parentItem)
+	: QObject(), QGraphicsItem(parentItem)
+{
+	setCacheMode(DeviceCoordinateCache);
+	connect(settingsCache, SIGNAL(playerBgPathChanged()), this, SLOT(updateBgPixmap()));
+	updateBgPixmap();
+}
+
+void PlayerArea::updateBgPixmap()
+{
+	QString bgPath = settingsCache->getPlayerBgPath();
+	if (bgPath.isEmpty())
+		bgPixmapBrush = QBrush(QColor(200, 200, 200));
+	else {
+		qDebug() << "loading" << bgPath;
+		bgPixmapBrush = QBrush(QPixmap(bgPath));
+	}
+	update();
+}
+
+void PlayerArea::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+{
+	painter->fillRect(bRect, bgPixmapBrush);
+}
+
+void PlayerArea::setSize(qreal width, qreal height)
+{
+	prepareGeometryChange();
+	bRect = QRectF(0, 0, width, height);
+}
+
 Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 	: QObject(_parent), shortcutsActive(false), defaultNumberTopCards(3), lastTokenDestroy(true), userInfo(new ServerInfo_User(info)), id(_id), active(false), local(_local), mirrored(false), handVisible(false), conceded(false), dialogSemaphore(false)
 {
-	setCacheMode(DeviceCoordinateCache);
-	
 	connect(settingsCache, SIGNAL(horizontalHandChanged()), this, SLOT(rearrangeZones()));
-	connect(settingsCache, SIGNAL(playerBgPathChanged()), this, SLOT(updateBgPixmap()));
-	updateBgPixmap();
 	
-	playerTarget = new PlayerTarget(this);
+	playerArea = new PlayerArea(this);
+	
+	playerTarget = new PlayerTarget(this, playerArea);
 	qreal avatarMargin = (counterAreaWidth + CARD_HEIGHT + 15 - playerTarget->boundingRect().width()) / 2.0;
 	playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
 
-	PileZone *deck = new PileZone(this, "deck", true, false, this);
+	PileZone *deck = new PileZone(this, "deck", true, false, playerArea);
 	QPointF base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 15) / 2.0, 10 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
 	deck->setPos(base);
 
 	qreal h = deck->boundingRect().width() + 5;
 
-	HandCounter *handCounter = new HandCounter(this);
+	HandCounter *handCounter = new HandCounter(playerArea);
 	handCounter->setPos(base + QPointF(0, h + 10));
 	qreal h2 = handCounter->boundingRect().height();
 	
-	PileZone *grave = new PileZone(this, "grave", false, true, this);
+	PileZone *grave = new PileZone(this, "grave", false, true, playerArea);
 	grave->setPos(base + QPointF(0, h + h2 + 10));
 
-	PileZone *rfg = new PileZone(this, "rfg", false, true, this);
+	PileZone *rfg = new PileZone(this, "rfg", false, true, playerArea);
 	rfg->setPos(base + QPointF(0, 2 * h + h2 + 10));
 
-	PileZone *sb = new PileZone(this, "sb", false, false, this);
+	PileZone *sb = new PileZone(this, "sb", false, false, playerArea);
 	sb->setVisible(false);
 
 	table = new TableZone(this, this);
@@ -377,16 +406,6 @@ void Player::updateZones()
 	table->reorganizeCards();
 }
 
-void Player::updateBgPixmap()
-{
-	QString bgPath = settingsCache->getPlayerBgPath();
-	if (!bgPath.isEmpty()) {
-		qDebug() << "loading" << bgPath;
-		bgPixmap.load(bgPath);
-	}
-	update();
-}
-
 void Player::updateBoundingRect()
 {
 	prepareGeometryChange();
@@ -396,6 +415,8 @@ void Player::updateBoundingRect()
 		bRect = QRectF(0, 0, width + table->boundingRect().width(), table->boundingRect().height() + handHeight);
 	} else
 		bRect = QRectF(0, 0, width + hand->boundingRect().width() + table->boundingRect().width(), table->boundingRect().height());
+	playerArea->setSize(CARD_HEIGHT + counterAreaWidth + 15, bRect.height());
+	
 	emit sizeChanged();
 }
 
@@ -1054,13 +1075,8 @@ QRectF Player::boundingRect() const
 	return bRect;
 }
 
-void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+void Player::paint(QPainter * /*painter*/, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-	int totalWidth = CARD_HEIGHT + counterAreaWidth + 15;
-	if (bgPixmap.isNull())
-		painter->fillRect(QRectF(0, 0, totalWidth, boundingRect().height()), QColor(200, 200, 200));
-	else
-		painter->fillRect(QRectF(0, 0, totalWidth, boundingRect().height()), QBrush(bgPixmap));
 }
 
 void Player::processPlayerInfo(ServerInfo_Player *info)

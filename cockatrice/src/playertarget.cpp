@@ -46,8 +46,8 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
 	painter->drawText(translatedRect, Qt::AlignCenter, QString::number(value));
 }
 
-PlayerTarget::PlayerTarget(Player *_owner)
-	: ArrowTarget(_owner, _owner), playerCounter(0)
+PlayerTarget::PlayerTarget(Player *_owner, QGraphicsItem *parentItem)
+	: ArrowTarget(_owner, parentItem), playerCounter(0)
 {
 	setCacheMode(DeviceCoordinateCache);
 
