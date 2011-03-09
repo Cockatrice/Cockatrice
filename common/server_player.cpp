@@ -416,7 +416,7 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 			
 			if (thisCardProperties->getTapped())
 				setCardAttrHelper(cont, targetzone->getName(), card->getId(), "tapped", "1");
-			if (!thisCardProperties->getPT().isEmpty())
+			if (!thisCardProperties->getPT().isEmpty() && !faceDown)
 				setCardAttrHelper(cont, targetzone->getName(), card->getId(), "pt", thisCardProperties->getPT());
 		}
 	}
