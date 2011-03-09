@@ -253,8 +253,8 @@ bool Server_Game::kickPlayer(int playerId)
 	if (!playerToKick)
 		return false;
 	
-	removePlayer(playerToKick);
 	sendGameEventToPlayer(playerToKick, new Event_Kicked);
+	removePlayer(playerToKick);
 	
 	return true;
 }
