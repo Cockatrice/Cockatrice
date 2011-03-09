@@ -175,7 +175,7 @@ void MainWindow::actAbout()
 		+ tr("Spanish:") + " Víctor Martínez<br>"
 		+ tr("Portugese (Portugal):") + " Milton Gonçalves<br>"
 		+ tr("Portugese (Brazil):") + " Thiago Queiroz<br>"
-		+ tr("French:") + " Yannick Hammer<br>"
+		+ tr("French:") + " Yannick Hammer, Arnaud Faes<br>"
 		+ tr("Japanese:") + " Nagase Task<br>"
 		+ tr("Russian:") + " Alexander Davidov<br>"
 	));
