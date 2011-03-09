@@ -62,6 +62,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	}
 	
 	ServerInfo_User *data = getUserData(name);
+	name = data->getName(); // Compensate for case indifference
 	session->setUserInfo(data);
 	
 	users.insert(name, session);
