@@ -210,7 +210,25 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 void Server_Game::removePlayer(Server_Player *player)
 {
 	players.remove(player->getPlayerId());
+	removeArrowsToPlayer(player);
 	
+	sendGameEvent(new Event_Leave(player->getPlayerId()));
+	bool playerActive = activePlayer == player->getPlayerId();
+	bool spectator = player->getSpectator();
+	delete player;
+	
+	if (!getPlayerCount())
+		deleteLater();
+	else if (!spectator) {
+		stopGameIfFinished();
+		if (gameStarted && playerActive)
+			nextTurn();
+	}
+	qobject_cast<Server_Room *>(parent())->broadcastGameListUpdate(this);
+}
+
+void Server_Game::removeArrowsToPlayer(Server_Player *player)
+{
 	// Remove all arrows of other players pointing to the player being removed or to one of his cards.
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	while (playerIterator.hasNext()) {
@@ -231,20 +249,6 @@ void Server_Game::removePlayer(Server_Player *player)
 			p->deleteArrow(toDelete[i]->getId());
 		}
 	}
-	
-	sendGameEvent(new Event_Leave(player->getPlayerId()));
-	bool playerActive = activePlayer == player->getPlayerId();
-	bool spectator = player->getSpectator();
-	delete player;
-	
-	if (!getPlayerCount())
-		deleteLater();
-	else if (!spectator) {
-		stopGameIfFinished();
-		if (gameStarted && playerActive)
-			nextTurn();
-	}
-	qobject_cast<Server_Room *>(parent())->broadcastGameListUpdate(this);
 }
 
 bool Server_Game::kickPlayer(int playerId)

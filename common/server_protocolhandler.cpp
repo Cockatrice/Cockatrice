@@ -518,6 +518,7 @@ ResponseCode Server_ProtocolHandler::cmdConcede(Command_Concede * /*cmd*/, Comma
 		return RespContextError;
 	
 	player->setConceded(true);
+	game->removeArrowsToPlayer(player);
 	player->clearZones();
 	game->sendGameEvent(new Event_PlayerPropertiesChanged(player->getPlayerId(), player->getProperties()), new Context_Concede);
 	game->stopGameIfFinished();
