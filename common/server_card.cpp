@@ -80,25 +80,30 @@ void Server_Card::setCounter(int id, int value)
 
 void Server_Card::setPT(const QString &_pt)
 {
-	int sep = _pt.indexOf('/');
-	QString p1 = _pt.left(sep);
-	QString p2 = _pt.mid(sep + 1);
-	if (p1.isEmpty() || p2.isEmpty())
-		return;
-	if ((p1[0] == '+') || (p2[0] == '+')) {
-		if (power < 0)
-			power = 0;
-		if (toughness < 0)
-			toughness = 0;
+	if (_pt.isEmpty()) {
+		power = 0;
+		toughness = -1;
+	} else {
+		int sep = _pt.indexOf('/');
+		QString p1 = _pt.left(sep);
+		QString p2 = _pt.mid(sep + 1);
+		if (p1.isEmpty() || p2.isEmpty())
+			return;
+		if ((p1[0] == '+') || (p2[0] == '+')) {
+			if (power < 0)
+				power = 0;
+			if (toughness < 0)
+				toughness = 0;
+		}
+		if (p1[0] == '+')
+			power += p1.mid(1).toInt();
+		else
+			power = p1.toInt();
+		if (p2[0] == '+')
+			toughness += p2.mid(1).toInt();
+		else
+			toughness = p2.toInt();
 	}
-	if (p1[0] == '+')
-		power += p1.mid(1).toInt();
-	else
-		power = p1.toInt();
-	if (p2[0] == '+')
-		toughness += p2.mid(1).toInt();
-	else
-		toughness = p2.toInt();
 }
 
 QString Server_Card::getPT() const
