@@ -67,7 +67,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	
 	users.insert(name, session);
 	
-	Event_UserJoined *event = new Event_UserJoined(new ServerInfo_User(data));
+	Event_UserJoined *event = new Event_UserJoined(new ServerInfo_User(data, false));
 	for (int i = 0; i < clients.size(); ++i)
 		if (clients[i]->getAcceptsUserListChanges())
 			clients[i]->sendProtocolItem(event, false);
