@@ -77,6 +77,10 @@ CardInfo *OracleImporter::addCard(const QString &setName, QString cardName, int 
 		cardName.remove(QRegExp(" \\(.*\\)"));
 		splitCard = true;
 	}
+	// Workaround for card name weirdness
+	if (cardName.contains("XX"))
+		cardName.remove("XX");
+	cardName = cardName.replace("Æ", "AE");
 	
 	CardInfo *card;
 	if (cardHash.contains(cardName)) {
@@ -84,11 +88,6 @@ CardInfo *OracleImporter::addCard(const QString &setName, QString cardName, int 
 		if (splitCard && !card->getText().contains(fullCardText))
 			card->setText(card->getText() + "\n---\n" + fullCardText);
 	} else {
-		// Workaround for card name weirdness
-		if (cardName.contains("XX"))
-			cardName.remove("XX");
-		cardName = cardName.replace("Æ", "AE");
-		
 		bool mArtifact = false;
 		if (cardType.endsWith("Artifact"))
 			for (int i = 0; i < cardText.size(); ++i)
