@@ -25,6 +25,7 @@ GameSelector::GameSelector(AbstractClient *_client, TabRoom *_room, QWidget *par
 	gameListModel = new GamesModel(room->getGameTypes(), this);
 	gameListProxyModel = new GamesProxyModel(this);
 	gameListProxyModel->setSourceModel(gameListModel);
+	gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 	gameListView->setModel(gameListProxyModel);
 	gameListView->header()->setResizeMode(0, QHeaderView::ResizeToContents);
 	gameListView->setSortingEnabled(true);
