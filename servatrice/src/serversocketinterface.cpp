@@ -29,6 +29,8 @@
 #include "protocol_items.h"
 #include "decklist.h"
 #include "server_player.h"
+#include "main.h"
+#include "server_logger.h"
 
 ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent)
 	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), topLevelItem(0)
@@ -76,7 +78,7 @@ void ServerSocketInterface::processProtocolItem(ProtocolItem *item)
 void ServerSocketInterface::readClient()
 {
 	QByteArray data = socket->readAll();
-	qDebug() << data;
+	logger->logMessage(QString(data));
 	xmlReader->addData(data);
 	
 	while (!xmlReader->atEnd()) {

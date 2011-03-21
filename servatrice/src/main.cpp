@@ -22,18 +22,14 @@
 #include <QTextCodec>
 #include <iostream>
 #include "servatrice.h"
+#include "server_logger.h"
 #include "rng_sfmt.h"
+#ifdef Q_OS_UNIX
+#include <signal.h>
+#endif
 
 RNG_Abstract *rng;
-
-//void myMessageOutput(QtMsgType /*type*/, const char *msg)
-//{
-//	static FILE *f = NULL;
-//	if (!f)
-//		f = fopen("qdebug.txt", "w");
-//	fprintf(f, "%s\n", msg);
-//	fflush(f);
-//}
+ServerLogger *logger;
 
 void testRNG()
 {
@@ -71,14 +67,20 @@ void testRNG()
 
 int main(int argc, char *argv[])
 {
-//	qInstallMsgHandler(myMessageOutput);
-
 	QCoreApplication app(argc, argv);
 	app.setOrganizationName("Cockatrice");
 	app.setApplicationName("Servatrice");
 	
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-
+	logger = new ServerLogger;
+#ifdef Q_OS_UNIX	
+	struct sigaction hup;
+	hup.sa_handler = ServerLogger::hupSignalHandler;
+	sigemptyset(&hup.sa_mask);
+	hup.sa_flags = 0;
+	hup.sa_flags |= SA_RESTART;
+	sigaction(SIGHUP, &hup, 0);
+#endif
 	rng = new RNG_SFMT;
 	
 	std::cerr << "Servatrice " << Servatrice::versionString.toStdString() << " starting." << std::endl;

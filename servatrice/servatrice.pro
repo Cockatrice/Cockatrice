@@ -13,8 +13,10 @@ CONFIG += qt debug
 QT += network sql
 QT -= gui
 
-HEADERS += src/servatrice.h \
+HEADERS += src/main.h \
+	src/servatrice.h \
 	src/serversocketinterface.h \
+	src/server_logger.h \
 	../common/color.h \
 	../common/serializable_item.h \
 	../common/decklist.h \
@@ -37,6 +39,7 @@ HEADERS += src/servatrice.h \
 SOURCES += src/main.cpp \
 	src/servatrice.cpp \
 	src/serversocketinterface.cpp \
+	src/server_logger.cpp \
 	../common/serializable_item.cpp \
 	../common/decklist.cpp \
 	../common/protocol.cpp \
