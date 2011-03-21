@@ -58,7 +58,7 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_s
 
 ServerSocketInterface::~ServerSocketInterface()
 {
-	qDebug("ServerSocketInterface destructor");
+	logger->logMessage("ServerSocketInterface destructor");
 	
 	socket->flush();
 	delete xmlWriter;
