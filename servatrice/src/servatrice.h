@@ -86,6 +86,7 @@ private:
 	QString loginMessage;
 	QString dbPrefix;
 	QSettings *settings;
+	int serverId;
 	int uptime;
 	QList<QPair<QHostAddress, int> > addressBanList;
 	QList<QPair<QString, int> > nameBanList;

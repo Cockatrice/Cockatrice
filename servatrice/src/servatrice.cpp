@@ -47,6 +47,7 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	
 	ProtocolItem::initializeHash();
 	
+	serverId = settings->value("server/id", 0).toInt();
 	int statusUpdateTime = settings->value("server/statusupdate").toInt();
 	statusUpdateClock = new QTimer(this);
 	connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
@@ -354,7 +355,8 @@ void Servatrice::statusUpdate()
 	checkSql();
 	
 	QSqlQuery query;
-	query.prepare("insert into " + dbPrefix + "_uptime (timest, uptime, users_count, games_count) values(NOW(), :uptime, :users_count, :games_count)");
+	query.prepare("insert into " + dbPrefix + "_uptime (id_server, timest, uptime, users_count, games_count) values(:id, NOW(), :uptime, :users_count, :games_count)");
+	query.bindValue(":id", serverId);
 	query.bindValue(":uptime", uptime);
 	query.bindValue(":users_count", users.size());
 	query.bindValue(":games_count", games.size());
