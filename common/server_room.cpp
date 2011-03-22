@@ -4,7 +4,7 @@
 #include <QDebug>
 
 Server_Room::Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent)
-	: QObject(parent), id(_id), name(_name), description(_description), autoJoin(_autoJoin), joinMessage(_joinMessage), gameTypes(_gameTypes)
+	: QObject(parent), id(_id), name(_name), description(_description), autoJoin(_autoJoin), joinMessage(_joinMessage), gameTypes(_gameTypes), roomMutex(QMutex::Recursive)
 {
 	connect(this, SIGNAL(sigCreateGame(const QString &, const QString &, int, const QList<int> &, bool, bool, bool, bool, bool, bool, Server_ProtocolHandler *)), this, SLOT(doCreateGame(const QString &, const QString &, int, const QList<int> &, bool, bool, bool, bool, bool, bool, Server_ProtocolHandler *)));
 }
@@ -16,6 +16,8 @@ Server *Server_Room::getServer() const
 
 ServerInfo_Room *Server_Room::getInfo(bool complete) const
 {
+	QMutexLocker locker(&roomMutex);
+	
 	QList<ServerInfo_Game *> gameList;
 	QList<ServerInfo_User *> userList;
 	QList<ServerInfo_GameType *> gameTypeList;
@@ -36,6 +38,8 @@ ServerInfo_Room *Server_Room::getInfo(bool complete) const
 
 void Server_Room::addClient(Server_ProtocolHandler *client)
 {
+	QMutexLocker locker(&roomMutex);
+	
 	sendRoomEvent(new Event_JoinRoom(id, new ServerInfo_User(client->getUserInfo(), false)));
 	append(client);
 	emit roomInfoChanged();
@@ -43,6 +47,8 @@ void Server_Room::addClient(Server_ProtocolHandler *client)
 
 void Server_Room::removeClient(Server_ProtocolHandler *client)
 {
+	QMutexLocker locker(&roomMutex);
+	
 	removeAt(indexOf(client));
 	sendRoomEvent(new Event_LeaveRoom(id, client->getUserInfo()->getName()));
 	emit roomInfoChanged();
@@ -55,6 +61,8 @@ void Server_Room::say(Server_ProtocolHandler *client, const QString &s)
 
 void Server_Room::sendRoomEvent(RoomEvent *event)
 {
+	QMutexLocker locker(&roomMutex);
+	
 	for (int i = 0; i < size(); ++i)
 		at(i)->sendProtocolItem(event, false);
 	delete event;
@@ -62,6 +70,8 @@ void Server_Room::sendRoomEvent(RoomEvent *event)
 
 void Server_Room::broadcastGameListUpdate(Server_Game *game)
 {
+	QMutexLocker locker(&roomMutex);
+	
 	Event_ListGames *event = new Event_ListGames(id, QList<ServerInfo_Game *>() << game->getInfo());
 	
 	for (int i = 0; i < size(); i++)
@@ -71,6 +81,8 @@ void Server_Room::broadcastGameListUpdate(Server_Game *game)
 
 void Server_Room::doCreateGame(const QString &description, const QString &password, int maxPlayers, const QList<int> &gameTypes, bool onlyBuddies, bool onlyRegistered, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator)
 {
+	QMutexLocker locker(&roomMutex);
+	
 	Server_Game *newGame = new Server_Game(creator, static_cast<Server *>(parent())->getNextGameId(), description, password, maxPlayers, gameTypes, onlyBuddies, onlyRegistered, spectatorsAllowed, spectatorsNeedPassword, spectatorsCanTalk, spectatorsSeeEverything, this);
 	games.insert(newGame->getGameId(), newGame);
 	connect(newGame, SIGNAL(gameClosing()), this, SLOT(removeGame()));
@@ -89,6 +101,8 @@ void Server_Room::createGame(const QString &description, const QString &password
 
 void Server_Room::removeGame()
 {
+	QMutexLocker locker(&roomMutex);
+	
 	Server_Game *game = static_cast<Server_Game *>(sender());
 	broadcastGameListUpdate(game);
 	games.remove(game->getGameId());

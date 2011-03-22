@@ -29,7 +29,7 @@
 #include <QDebug>
 
 Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent)
-	: QObject(parent), creatorInfo(new ServerInfo_User(_creator->getUserInfo())), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies), onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0)
+	: QObject(parent), creatorInfo(new ServerInfo_User(_creator->getUserInfo())), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies), onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0), gameMutex(QMutex::Recursive)
 {
 	addPlayer(_creator, false, false);
 
@@ -42,6 +42,8 @@ Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QS
 
 Server_Game::~Server_Game()
 {
+	QMutexLocker locker(&gameMutex);
+	
 	sendGameEvent(new Event_GameClosed);
 	
 	QMapIterator<int, Server_Player *> playerIterator(players);
@@ -56,6 +58,7 @@ Server_Game::~Server_Game()
 
 void Server_Game::pingClockTimeout()
 {
+	QMutexLocker locker(&gameMutex);
 	++secondsElapsed;
 	
 	QList<ServerInfo_PlayerPing *> pingList;
@@ -83,6 +86,8 @@ void Server_Game::pingClockTimeout()
 
 int Server_Game::getPlayerCount() const
 {
+	QMutexLocker locker(&gameMutex);
+	
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	int result = 0;
 	while (playerIterator.hasNext())
@@ -93,6 +98,8 @@ int Server_Game::getPlayerCount() const
 
 int Server_Game::getSpectatorCount() const
 {
+	QMutexLocker locker(&gameMutex);
+	
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	int result = 0;
 	while (playerIterator.hasNext())
@@ -103,6 +110,8 @@ int Server_Game::getSpectatorCount() const
 
 void Server_Game::startGameIfReady()
 {
+	QMutexLocker locker(&gameMutex);
+	
 	if (getPlayerCount() < maxPlayers)
 		return;
 	QMapIterator<int, Server_Player *> playerIterator(players);
@@ -149,6 +158,8 @@ void Server_Game::startGameIfReady()
 
 void Server_Game::stopGameIfFinished()
 {
+	QMutexLocker locker(&gameMutex);
+	
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	int playing = 0;
 	while (playerIterator.hasNext()) {
@@ -194,6 +205,8 @@ ResponseCode Server_Game::checkJoin(ServerInfo_User *user, const QString &_passw
 
 Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate)
 {
+	QMutexLocker locker(&gameMutex);
+	
 	const QList<int> &keyList = players.keys();
 	int playerId = keyList.isEmpty() ? 0 : (keyList.last() + 1);
 	
@@ -209,6 +222,8 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 
 void Server_Game::removePlayer(Server_Player *player)
 {
+	QMutexLocker locker(&gameMutex);
+	
 	players.remove(player->getPlayerId());
 	removeArrowsToPlayer(player);
 	
@@ -229,6 +244,8 @@ void Server_Game::removePlayer(Server_Player *player)
 
 void Server_Game::removeArrowsToPlayer(Server_Player *player)
 {
+	QMutexLocker locker(&gameMutex);
+	
 	// Remove all arrows of other players pointing to the player being removed or to one of his cards.
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	while (playerIterator.hasNext()) {
@@ -253,6 +270,8 @@ void Server_Game::removeArrowsToPlayer(Server_Player *player)
 
 bool Server_Game::kickPlayer(int playerId)
 {
+	QMutexLocker locker(&gameMutex);
+	
 	Server_Player *playerToKick = players.value(playerId);
 	if (!playerToKick)
 		return false;
@@ -265,6 +284,8 @@ bool Server_Game::kickPlayer(int playerId)
 
 void Server_Game::setActivePlayer(int _activePlayer)
 {
+	QMutexLocker locker(&gameMutex);
+	
 	activePlayer = _activePlayer;
 	sendGameEvent(new Event_SetActivePlayer(activePlayer, activePlayer));
 	setActivePhase(0);
@@ -272,6 +293,8 @@ void Server_Game::setActivePlayer(int _activePlayer)
 
 void Server_Game::setActivePhase(int _activePhase)
 {
+	QMutexLocker locker(&gameMutex);
+	
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	while (playerIterator.hasNext()) {
 		Server_Player *player = playerIterator.next().value();
@@ -289,6 +312,8 @@ void Server_Game::setActivePhase(int _activePhase)
 
 void Server_Game::nextTurn()
 {
+	QMutexLocker locker(&gameMutex);
+	
 	const QList<int> keys = players.keys();
 	int listPos = -1;
 	if (activePlayer != -1)
@@ -304,6 +329,8 @@ void Server_Game::nextTurn()
 
 QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAsking) const
 {
+	QMutexLocker locker(&gameMutex);
+	
 	QList<ServerInfo_Player *> result;
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	while (playerIterator.hasNext()) {
@@ -392,6 +419,8 @@ void Server_Game::sendGameEvent(GameEvent *event, GameEventContext *context, Ser
 
 void Server_Game::sendGameEventContainer(GameEventContainer *cont, Server_Player *exclude, bool excludeOmniscient)
 {
+	QMutexLocker locker(&gameMutex);
+	
 	cont->setGameId(gameId);
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	while (playerIterator.hasNext()) {
@@ -405,6 +434,8 @@ void Server_Game::sendGameEventContainer(GameEventContainer *cont, Server_Player
 
 void Server_Game::sendGameEventContainerOmniscient(GameEventContainer *cont, Server_Player *exclude)
 {
+	QMutexLocker locker(&gameMutex);
+	
 	cont->setGameId(gameId);
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	while (playerIterator.hasNext()) {
@@ -423,6 +454,8 @@ void Server_Game::sendGameEventToPlayer(Server_Player *player, GameEvent *event)
 
 ServerInfo_Game *Server_Game::getInfo() const
 {
+	QMutexLocker locker(&gameMutex);
+	
 	if (players.isEmpty())
 		// Game is closing
 		return new ServerInfo_Game(getGameId(), QString(), false, 0, getMaxPlayers(), QList<GameTypeId *>(), 0, false, 0);

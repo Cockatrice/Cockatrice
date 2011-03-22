@@ -68,6 +68,8 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 		if (!room)
 			return RespNameNotFound;
 		
+		QMutexLocker locker(&room->roomMutex);
+		
 		switch (command->getItemId()) {
 			case ItemId_Command_LeaveRoom: return cmdLeaveRoom(static_cast<Command_LeaveRoom *>(command), cont, room);
 			case ItemId_Command_RoomSay: return cmdRoomSay(static_cast<Command_RoomSay *>(command), cont, room);
@@ -89,6 +91,8 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 		QPair<Server_Game *, Server_Player *> gamePair = games.value(gameCommand->getGameId());
 		Server_Game *game = gamePair.first;
 		Server_Player *player = gamePair.second;
+		
+		QMutexLocker locker(&game->gameMutex);
 		
 		switch (command->getItemId()) {
 			case ItemId_Command_DeckSelect: return cmdDeckSelect(static_cast<Command_DeckSelect *>(command), cont, game, player);

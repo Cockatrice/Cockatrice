@@ -2,6 +2,7 @@
 #define SERVER_LOGGER_H
 
 #include <QObject>
+#include <QMutex>
 
 class QSocketNotifier;
 class QFile;
@@ -20,6 +21,7 @@ private:
 	static int sigHupFD[2];
 	QSocketNotifier *snHup;
 	static QFile *logFile;
+	QMutex logFileMutex;
 };
 
 #endif

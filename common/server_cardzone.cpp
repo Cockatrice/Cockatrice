@@ -23,6 +23,7 @@
 #include "rng_abstract.h"
 #include <QSet>
 #include <QDebug>
+#include "server_game.h"
 
 Server_CardZone::Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ZoneType _type)
 	: player(_player), name(_name), has_coords(_has_coords), type(_type), cardsBeingLookedAt(0)
@@ -37,6 +38,8 @@ Server_CardZone::~Server_CardZone()
 
 void Server_CardZone::shuffle()
 {
+	QMutexLocker locker(&player->getGame()->gameMutex);
+	
 	QList<Server_Card *> temp;
 	for (int i = cards.size(); i; i--)
 		temp.append(cards.takeAt(rng->getNumber(0, i - 1)));
@@ -45,6 +48,8 @@ void Server_CardZone::shuffle()
 
 int Server_CardZone::removeCard(Server_Card *card)
 {
+	QMutexLocker locker(&player->getGame()->gameMutex);
+	
 	int index = cards.indexOf(card);
 	cards.removeAt(index);
 	return index;
@@ -52,6 +57,8 @@ int Server_CardZone::removeCard(Server_Card *card)
 
 Server_Card *Server_CardZone::getCard(int id, bool remove, int *position)
 {
+	QMutexLocker locker(&player->getGame()->gameMutex);
+	
 	if (type != HiddenZone) {
 		QListIterator<Server_Card *> CardIterator(cards);
 		int i = 0;
@@ -85,6 +92,8 @@ Server_Card *Server_CardZone::getCard(int id, bool remove, int *position)
 
 int Server_CardZone::getFreeGridColumn(int x, int y, const QString &cardName) const
 {
+	QMutexLocker locker(&player->getGame()->gameMutex);
+	
 	QMap<int, Server_Card *> coordMap;
 	for (int i = 0; i < cards.size(); ++i)
 		if (cards[i]->getY() == y)
@@ -131,6 +140,8 @@ bool Server_CardZone::isColumnStacked(int x, int y) const
 	if (!has_coords)
 		return false;
 	
+	QMutexLocker locker(&player->getGame()->gameMutex);
+	
 	QMap<int, Server_Card *> coordMap;
 	for (int i = 0; i < cards.size(); ++i)
 		if (cards[i]->getY() == y)
@@ -144,6 +155,8 @@ bool Server_CardZone::isColumnEmpty(int x, int y) const
 	if (!has_coords)
 		return true;
 	
+	QMutexLocker locker(&player->getGame()->gameMutex);
+	
 	QMap<int, Server_Card *> coordMap;
 	for (int i = 0; i < cards.size(); ++i)
 		if (cards[i]->getY() == y)
@@ -154,6 +167,8 @@ bool Server_CardZone::isColumnEmpty(int x, int y) const
 
 void Server_CardZone::moveCard(CommandContainer *cont, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y)
 {
+	QMutexLocker locker(&player->getGame()->gameMutex);
+	
 	coordMap.remove(card->getY() * 10000 + card->getX());
 	
 	CardToMove *cardToMove = new CardToMove(card->getId());
@@ -165,6 +180,8 @@ void Server_CardZone::moveCard(CommandContainer *cont, QMap<int, Server_Card *> 
 
 void Server_CardZone::fixFreeSpaces(CommandContainer *cont)
 {
+	QMutexLocker locker(&player->getGame()->gameMutex);
+	
 	QMap<int, Server_Card *> coordMap;
 	QSet<int> placesToLook;
 	for (int i = 0; i < cards.size(); ++i) {
@@ -194,6 +211,8 @@ void Server_CardZone::fixFreeSpaces(CommandContainer *cont)
 
 void Server_CardZone::insertCard(Server_Card *card, int x, int y)
 {
+	QMutexLocker locker(&player->getGame()->gameMutex);
+	
 	if (hasCoords()) {
 		card->setCoords(x, y);
 		cards.append(card);
@@ -206,6 +225,8 @@ void Server_CardZone::insertCard(Server_Card *card, int x, int y)
 
 void Server_CardZone::clear()
 {
+	QMutexLocker locker(&player->getGame()->gameMutex);
+	
 	for (int i = 0; i < cards.size(); i++)
 		delete cards.at(i);
 	cards.clear();

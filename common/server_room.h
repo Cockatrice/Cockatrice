@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QObject>
 #include <QStringList>
+#include <QMutex>
 
 class Server_ProtocolHandler;
 class RoomEvent;
@@ -33,6 +34,7 @@ private slots:
 	void doCreateGame(const QString &description, const QString &password, int maxPlayers, const QList<int> &_gameTypes, bool onlyBuddies, bool onlyRegistered, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator);
 	void removeGame();
 public:
+	mutable QMutex roomMutex;
 	Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent);
 	int getId() const { return id; }
 	QString getName() const { return name; }

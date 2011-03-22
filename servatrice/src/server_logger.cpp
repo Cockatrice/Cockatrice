@@ -2,7 +2,6 @@
 #include <QSocketNotifier>
 #include <QFile>
 #include <QTextStream>
-#include <QMutex>
 #include <QDateTime>
 #include <QThread>
 #ifdef Q_OS_UNIX
@@ -34,11 +33,11 @@ void ServerLogger::logMessage(QString message)
 	if (!logFile)
 		return;
 	
-	static QMutex mutex;
-	mutex.lock();
+	logFileMutex.lock();
 	QTextStream stream(logFile);
 	stream << QDateTime::currentDateTime().toString() << " " << ((void *) QThread::currentThread()) << " " << message << "\n";
-	mutex.unlock();
+	stream.flush();
+	logFileMutex.unlock();
 }
 
 void ServerLogger::hupSignalHandler(int /*unused*/)
