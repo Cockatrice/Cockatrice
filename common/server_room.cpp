@@ -77,6 +77,7 @@ void Server_Room::doCreateGame(const QString &description, const QString &passwo
 	
 	broadcastGameListUpdate(newGame);
 	
+	creator->gameCreated(newGame);
 	emit gameCreated(newGame);
 	emit roomInfoChanged();
 }

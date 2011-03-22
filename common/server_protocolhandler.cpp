@@ -353,7 +353,6 @@ ResponseCode Server_ProtocolHandler::cmdJoinRoom(Command_JoinRoom *cmd, CommandC
 		return RespNameNotFound;
 
 	r->addClient(this);
-	connect(r, SIGNAL(gameCreated(Server_Game *)), this, SLOT(gameCreated(Server_Game *)));
 	rooms.insert(r->getId(), r);
 	
 	enqueueProtocolItem(new Event_RoomSay(r->getId(), QString(), r->getJoinMessage()));
