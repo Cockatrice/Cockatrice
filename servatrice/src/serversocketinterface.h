@@ -22,6 +22,7 @@
 
 #include <QTcpSocket>
 #include <QHostAddress>
+#include <QMutex>
 #include "server_protocolhandler.h"
 
 class QTcpSocket;
@@ -30,6 +31,7 @@ class QXmlStreamReader;
 class QXmlStreamWriter;
 class DeckList;
 class TopLevelProtocolItem;
+class QByteArray;
 
 class ServerSocketInterface : public Server_ProtocolHandler
 {
@@ -38,11 +40,16 @@ private slots:
 	void readClient();
 	void catchSocketError(QAbstractSocket::SocketError socketError);
 	void processProtocolItem(ProtocolItem *item);
+	void flushXmlBuffer();
+signals:
+	void xmlBufferChanged();
 private:
+	QMutex xmlBufferMutex;
 	Servatrice *servatrice;
 	QTcpSocket *socket;
 	QXmlStreamWriter *xmlWriter;
 	QXmlStreamReader *xmlReader;
+	QString xmlBuffer;
 	TopLevelProtocolItem *topLevelItem;
 	int getUserIdInDB(const QString &name) const;
 

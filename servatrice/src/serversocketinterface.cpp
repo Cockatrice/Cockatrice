@@ -35,18 +35,18 @@
 ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent)
 	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), topLevelItem(0)
 {
-	xmlWriter = new QXmlStreamWriter;
-	xmlWriter->setDevice(socket);
-	
+	xmlWriter = new QXmlStreamWriter(&xmlBuffer);
 	xmlReader = new QXmlStreamReader;
 	
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
 	connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(catchSocketError(QAbstractSocket::SocketError)));
+	connect(this, SIGNAL(xmlBufferChanged()), this, SLOT(flushXmlBuffer()), Qt::QueuedConnection);
 	
 	xmlWriter->writeStartDocument();
 	xmlWriter->writeStartElement("cockatrice_server_stream");
 	xmlWriter->writeAttribute("version", QString::number(ProtocolItem::protocolVersion));
+	flushXmlBuffer();
 	
 	int maxUsers = _server->getMaxUsersPerAddress();
 	if ((maxUsers > 0) && (_server->getUsersWithAddress(socket->peerAddress()) >= maxUsers)) {
@@ -58,6 +58,8 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_s
 
 ServerSocketInterface::~ServerSocketInterface()
 {
+	QMutexLocker locker(&protocolHandlerMutex);
+	
 	logger->logMessage("ServerSocketInterface destructor");
 	
 	socket->flush();
@@ -75,8 +77,18 @@ void ServerSocketInterface::processProtocolItem(ProtocolItem *item)
 		processCommandContainer(cont);
 }
 
+void ServerSocketInterface::flushXmlBuffer()
+{
+	QMutexLocker locker(&xmlBufferMutex);
+	socket->write(xmlBuffer.toUtf8());
+	socket->flush();
+	xmlBuffer.clear();
+}
+
 void ServerSocketInterface::readClient()
 {
+	QMutexLocker locker(&protocolHandlerMutex);
+	
 	QByteArray data = socket->readAll();
 	logger->logMessage(QString(data));
 	xmlReader->addData(data);
@@ -101,13 +113,13 @@ void ServerSocketInterface::catchSocketError(QAbstractSocket::SocketError socket
 
 void ServerSocketInterface::sendProtocolItem(ProtocolItem *item, bool deleteItem)
 {
-	static QMutex mutex;
-	mutex.lock();
+	QMutexLocker locker(&xmlBufferMutex);
+	
 	item->write(xmlWriter);
-	socket->flush();
-	mutex.unlock();
 	if (deleteItem)
 		delete item;
+	
+	emit xmlBufferChanged();
 }
 
 int ServerSocketInterface::getUserIdInDB(const QString &name) const

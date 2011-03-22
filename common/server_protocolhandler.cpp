@@ -17,6 +17,7 @@ Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
 	: QObject(parent), server(_server), authState(PasswordWrong), acceptsUserListChanges(false), acceptsRoomListChanges(false), userInfo(0), timeRunning(0), lastDataReceived(0)
 {
 	connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
+	connect(this, SIGNAL(sigGameCreated(Server_Game *)), this, SLOT(processSigGameCreated(Server_Game *)), Qt::QueuedConnection);
 }
 
 Server_ProtocolHandler::~Server_ProtocolHandler()
@@ -430,6 +431,13 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 
 void Server_ProtocolHandler::gameCreated(Server_Game *game)
 {
+	emit sigGameCreated(game);
+}
+
+void Server_ProtocolHandler::processSigGameCreated(Server_Game *game)
+{
+	QMutexLocker locker(&game->gameMutex);
+	
 	Server_Player *creator = game->getPlayers().values().first();
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QStringList>
 #include <QMap>
+#include <QMutex>
 
 class Server_Game;
 class Server_Room;
@@ -22,6 +23,7 @@ private slots:
 	void gameClosing(int gameId);
 	void broadcastRoomUpdate();
 public:
+	mutable QMutex serverMutex;
 	Server(QObject *parent = 0);
 	~Server();
 	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password);

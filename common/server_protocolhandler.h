@@ -91,7 +91,11 @@ private:
 	ResponseCode processCommandHelper(Command *command, CommandContainer *cont);
 private slots:
 	void pingClockTimeout();
+	void processSigGameCreated(Server_Game *game);
+signals:
+	void sigGameCreated(Server_Game *game);
 public:
+	mutable QMutex protocolHandlerMutex;
 	Server_ProtocolHandler(Server *_server, QObject *parent = 0);
 	~Server_ProtocolHandler();
 	void playerRemovedFromGame(Server_Game *game);
