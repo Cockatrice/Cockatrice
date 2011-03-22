@@ -38,6 +38,7 @@ Server::~Server()
 
 AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password)
 {
+	QMutexLocker locker(&serverMutex);
 	if (name.size() > 35)
 		name = name.left(35);
 	AuthenticationResult authState = checkUserPassword(name, password);
@@ -78,11 +79,13 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 
 void Server::addClient(Server_ProtocolHandler *client)
 {
+	QMutexLocker locker(&serverMutex);
 	clients << client;
 }
 
 void Server::removeClient(Server_ProtocolHandler *client)
 {
+	QMutexLocker locker(&serverMutex);
 	clients.removeAt(clients.indexOf(client));
 	ServerInfo_User *data = client->getUserInfo();
 	if (data) {
@@ -104,6 +107,7 @@ Server_Game *Server::getGame(int gameId) const
 
 void Server::broadcastRoomUpdate()
 {
+	QMutexLocker locker(&serverMutex);
 	Server_Room *room = static_cast<Server_Room *>(sender());
 	QList<ServerInfo_Room *> eventRoomList;
 	eventRoomList.append(new ServerInfo_Room(room->getId(), room->getName(), room->getDescription(), room->getGames().size(), room->size(), room->getAutoJoin()));
@@ -117,17 +121,20 @@ void Server::broadcastRoomUpdate()
 
 void Server::gameCreated(Server_Game *game)
 {
+	QMutexLocker locker(&serverMutex);
 	games.insert(game->getGameId(), game);
 }
 
 void Server::gameClosing(int gameId)
 {
+	QMutexLocker locker(&serverMutex);
 	qDebug("Server::gameClosing");
 	games.remove(gameId);
 }
 
 void Server::addRoom(Server_Room *newRoom)
 {
+	QMutexLocker locker(&serverMutex);
 	rooms.insert(newRoom->getId(), newRoom);
 	connect(newRoom, SIGNAL(roomInfoChanged()), this, SLOT(broadcastRoomUpdate()));
 	connect(newRoom, SIGNAL(gameCreated(Server_Game *)), this, SLOT(gameCreated(Server_Game *)));

@@ -58,12 +58,17 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_s
 
 ServerSocketInterface::~ServerSocketInterface()
 {
+	QMutexLocker locker(&servatrice->serverMutex);
 	logger->logMessage("ServerSocketInterface destructor");
 	
 	flushXmlBuffer();
 	delete xmlWriter;
 	delete xmlReader;
 	delete socket;
+	socket = 0;
+	
+	// This call has to stay here so that the mutex is not freed prematurely.
+	server->removeClient(this);
 }
 
 void ServerSocketInterface::processProtocolItem(ProtocolItem *item)

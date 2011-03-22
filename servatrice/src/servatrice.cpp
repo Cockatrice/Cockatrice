@@ -249,6 +249,7 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 
 int Servatrice::getUsersWithAddress(const QHostAddress &address) const
 {
+	QMutexLocker locker(&serverMutex);
 	int result = 0;
 	for (int i = 0; i < clients.size(); ++i)
 		if (static_cast<ServerSocketInterface *>(clients[i])->getPeerAddress() == address)
@@ -304,6 +305,7 @@ QMap<QString, ServerInfo_User *> Servatrice::getIgnoreList(const QString &name)
 
 bool Servatrice::getUserBanned(Server_ProtocolHandler *client, const QString &userName) const
 {
+	QMutexLocker locker(&serverMutex);
 	QHostAddress address = static_cast<ServerSocketInterface *>(client)->getPeerAddress();
 	for (int i = 0; i < addressBanList.size(); ++i)
 		if (address == addressBanList[i].first)
@@ -316,6 +318,7 @@ bool Servatrice::getUserBanned(Server_ProtocolHandler *client, const QString &us
 
 void Servatrice::updateBanTimer()
 {
+	QMutexLocker locker(&serverMutex);
 	for (int i = 0; i < addressBanList.size(); )
 		if (--(addressBanList[i].second) <= 0)
 			addressBanList.removeAt(i);

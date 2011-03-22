@@ -22,10 +22,6 @@ Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
 
 Server_ProtocolHandler::~Server_ProtocolHandler()
 {
-	// The socket has to be removed from the server's list before it is removed from the game's list
-	// so it will not receive the game update event.
-	server->removeClient(this);
-
 	QMapIterator<int, Server_Room *> roomIterator(rooms);
 	while (roomIterator.hasNext())
 		roomIterator.next().value()->removeClient(this);
