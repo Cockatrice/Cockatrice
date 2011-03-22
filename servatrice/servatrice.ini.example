@@ -1,6 +1,8 @@
 [server]
 port=4747
 statusupdate=15000
+logfile=server.log
+id=1
 
 [authentication]
 method=none
