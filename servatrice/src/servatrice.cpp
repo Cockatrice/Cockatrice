@@ -24,10 +24,18 @@
 #include "servatrice.h"
 #include "server_room.h"
 #include "serversocketinterface.h"
+#include "serversocketthread.h"
 #include "protocol.h"
 
-Servatrice::Servatrice(QObject *parent)
-	: Server(parent), uptime(0)
+void Servatrice_TcpServer::incomingConnection(int socketDescriptor)
+{
+	ServerSocketThread *sst = new ServerSocketThread(socketDescriptor, server, this);
+	connect(sst, SIGNAL(clientAdded(ServerSocketInterface *)), this, SIGNAL(clientAdded(ServerSocketInterface *)));
+	sst->start();
+}
+
+Servatrice::Servatrice(QSettings *_settings, QObject *parent)
+	: Server(parent), dbMutex(QMutex::Recursive), settings(_settings), uptime(0)
 {
 	pingClock = new QTimer(this);
 	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
@@ -38,7 +46,6 @@ Servatrice::Servatrice(QObject *parent)
 	banTimeoutClock->start(60000);
 	
 	ProtocolItem::initializeHash();
-	settings = new QSettings("servatrice.ini", QSettings::IniFormat, this);
 	
 	int statusUpdateTime = settings->value("server/statusupdate").toInt();
 	statusUpdateClock = new QTimer(this);
@@ -48,8 +55,8 @@ Servatrice::Servatrice(QObject *parent)
 		statusUpdateClock->start(statusUpdateTime);
 	}
 	
-	tcpServer = new QTcpServer(this);
-	connect(tcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
+	tcpServer = new Servatrice_TcpServer(this);
+	connect(tcpServer, SIGNAL(clientAdded(ServerSocketInterface *)), this, SLOT(newConnection(ServerSocketInterface *)));
 	int port = settings->value("server/port", 4747).toInt();
 	qDebug() << "Starting server on port" << port;
 	tcpServer->listen(QHostAddress::Any, port);
@@ -133,6 +140,7 @@ bool Servatrice::openDatabase()
 
 void Servatrice::checkSql()
 {
+	QMutexLocker locker(&dbMutex);
 	if (!QSqlDatabase::database().exec("select 1").isActive())
 		openDatabase();
 }
@@ -145,15 +153,14 @@ bool Servatrice::execSqlQuery(QSqlQuery &query)
 	return false;
 }
 
-void Servatrice::newConnection()
+void Servatrice::newConnection(ServerSocketInterface *client)
 {
-	QTcpSocket *socket = tcpServer->nextPendingConnection();
-	ServerSocketInterface *ssi = new ServerSocketInterface(this, socket);
-	addClient(ssi);
+	addClient(client);
 }
 
 AuthenticationResult Servatrice::checkUserPassword(const QString &user, const QString &password)
 {
+	QMutexLocker locker(&dbMutex);
 	const QString method = settings->value("authentication/method").toString();
 	if (method == "none")
 		return UnknownUser;
@@ -181,6 +188,7 @@ AuthenticationResult Servatrice::checkUserPassword(const QString &user, const QS
 
 bool Servatrice::userExists(const QString &user)
 {
+	QMutexLocker locker(&dbMutex);
 	const QString method = settings->value("authentication/method").toString();
 	if (method == "sql") {
 		checkSql();
@@ -219,6 +227,7 @@ ServerInfo_User *Servatrice::evalUserQueryResult(const QSqlQuery &query, bool co
 
 ServerInfo_User *Servatrice::getUserData(const QString &name)
 {
+	QMutexLocker locker(&dbMutex);
 	const QString method = settings->value("authentication/method").toString();
 	if (method == "sql") {
 		checkSql();
@@ -248,6 +257,7 @@ int Servatrice::getUsersWithAddress(const QHostAddress &address) const
 
 QMap<QString, ServerInfo_User *> Servatrice::getBuddyList(const QString &name)
 {
+	QMutexLocker locker(&dbMutex);
 	QMap<QString, ServerInfo_User *> result;
 	
 	const QString method = settings->value("authentication/method").toString();
@@ -270,6 +280,7 @@ QMap<QString, ServerInfo_User *> Servatrice::getBuddyList(const QString &name)
 
 QMap<QString, ServerInfo_User *> Servatrice::getIgnoreList(const QString &name)
 {
+	QMutexLocker locker(&dbMutex);
 	QMap<QString, ServerInfo_User *> result;
 	
 	const QString method = settings->value("authentication/method").toString();
@@ -318,6 +329,7 @@ void Servatrice::updateBanTimer()
 
 void Servatrice::updateLoginMessage()
 {
+	QMutexLocker locker(&dbMutex);
 	checkSql();
 	QSqlQuery query;
 	query.prepare("select message from " + dbPrefix + "_servermessages order by timest desc limit 1");
@@ -336,6 +348,7 @@ void Servatrice::updateLoginMessage()
 
 void Servatrice::statusUpdate()
 {
+	QMutexLocker locker(&dbMutex);
 	uptime += statusUpdateClock->interval() / 1000;
 	
 	checkSql();

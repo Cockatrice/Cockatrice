@@ -21,6 +21,7 @@
 #define SERVATRICE_H
 
 #include <QTcpServer>
+#include <QMutex>
 #include "server.h"
 
 class QSqlDatabase;
@@ -28,16 +29,33 @@ class QSettings;
 class QSqlQuery;
 class QTimer;
 
+class Servatrice;
+class ServerSocketInterface;
+
+class Servatrice_TcpServer : public QTcpServer {
+	Q_OBJECT
+private:
+	Servatrice *server;
+public:
+	Servatrice_TcpServer(Servatrice *_server, QObject *parent = 0)
+		: QTcpServer(parent), server(_server) { }
+protected:
+	void incomingConnection(int socketDescriptor);
+signals:
+	void clientAdded(ServerSocketInterface *client);
+};
+
 class Servatrice : public Server
 {
 	Q_OBJECT
 private slots:
-	void newConnection();
+	void newConnection(ServerSocketInterface *client);
 	void statusUpdate();
 	void updateBanTimer();
 public:
+	QMutex dbMutex;
 	static const QString versionString;
-	Servatrice(QObject *parent = 0);
+	Servatrice(QSettings *_settings, QObject *parent = 0);
 	~Servatrice();
 	bool openDatabase();
 	void checkSql();

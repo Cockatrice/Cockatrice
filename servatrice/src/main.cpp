@@ -21,6 +21,8 @@
 #include <QCoreApplication>
 #include <QTextCodec>
 #include <iostream>
+#include <QMetaType>
+#include <QSettings>
 #include "servatrice.h"
 #include "server_logger.h"
 #include "rng_sfmt.h"
@@ -65,14 +67,27 @@ void testRNG()
 	std::cerr << std::endl << std::endl;
 }
 
+void myMessageOutput(QtMsgType /*type*/, const char *msg)
+{
+	logger->logMessage(msg);
+}
+
 int main(int argc, char *argv[])
 {
 	QCoreApplication app(argc, argv);
 	app.setOrganizationName("Cockatrice");
 	app.setApplicationName("Servatrice");
 	
+	QStringList args = app.arguments();
+	bool testRandom = args.contains("--test-random");
+	
+	qRegisterMetaType<QList<int> >("QList<int>");
+	
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-	logger = new ServerLogger;
+	
+	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
+	logger = new ServerLogger(settings->value("server/logfile").toString());
+	qInstallMsgHandler(myMessageOutput);
 #ifdef Q_OS_UNIX	
 	struct sigaction hup;
 	hup.sa_handler = ServerLogger::hupSignalHandler;
@@ -85,10 +100,11 @@ int main(int argc, char *argv[])
 	
 	std::cerr << "Servatrice " << Servatrice::versionString.toStdString() << " starting." << std::endl;
 	std::cerr << "-------------------------" << std::endl;
-
-	testRNG();
 	
-	Servatrice server;
+	if (testRandom)
+		testRNG();
+	
+	Servatrice server(settings);
 	
 	std::cerr << "-------------------------" << std::endl;
 	std::cerr << "Server initialized." << std::endl;
@@ -96,6 +112,7 @@ int main(int argc, char *argv[])
 	int retval = app.exec();
 
 	delete rng;
+	delete settings;
 
 	return retval;
 }

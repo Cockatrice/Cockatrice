@@ -91,6 +91,7 @@ private:
 	ResponseCode processCommandHelper(Command *command, CommandContainer *cont);
 private slots:
 	void pingClockTimeout();
+	void gameCreated(Server_Game *game);
 public:
 	Server_ProtocolHandler(Server *_server, QObject *parent = 0);
 	~Server_ProtocolHandler();

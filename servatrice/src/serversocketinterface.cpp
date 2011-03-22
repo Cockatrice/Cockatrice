@@ -101,14 +101,18 @@ void ServerSocketInterface::catchSocketError(QAbstractSocket::SocketError socket
 
 void ServerSocketInterface::sendProtocolItem(ProtocolItem *item, bool deleteItem)
 {
+	static QMutex mutex;
+	mutex.lock();
 	item->write(xmlWriter);
 	socket->flush();
+	mutex.unlock();
 	if (deleteItem)
 		delete item;
 }
 
 int ServerSocketInterface::getUserIdInDB(const QString &name) const
 {
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("select id from " + servatrice->getDbPrefix() + "_users where name = :name");
 	query.bindValue(":name", name);
@@ -142,6 +146,7 @@ ResponseCode ServerSocketInterface::cmdAddToList(Command_AddToList *cmd, Command
 	if (id1 == id2)
 		return RespContextError;
 	
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("insert into " + servatrice->getDbPrefix() + "_" + list + "list (id_user1, id_user2) values(:id1, :id2)");
 	query.bindValue(":id1", id1);
@@ -180,6 +185,7 @@ ResponseCode ServerSocketInterface::cmdRemoveFromList(Command_RemoveFromList *cm
 	if (id2 < 0)
 		return RespNameNotFound;
 	
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("delete from " + servatrice->getDbPrefix() + "_" + list + "list where id_user1 = :id1 and id_user2 = :id2");
 	query.bindValue(":id1", id1);
@@ -206,6 +212,7 @@ int ServerSocketInterface::getDeckPathId(int basePathId, QStringList path)
 	if (path[0].isEmpty())
 		return 0;
 	
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent and name = :name and user = :user");
 	query.bindValue(":id_parent", basePathId);
@@ -229,6 +236,7 @@ int ServerSocketInterface::getDeckPathId(const QString &path)
 
 bool ServerSocketInterface::deckListHelper(DeckList_Directory *folder)
 {
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("select id, name from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent and user = :user");
 	query.bindValue(":id_parent", folder->getId());
@@ -288,6 +296,7 @@ ResponseCode ServerSocketInterface::cmdDeckNewDir(Command_DeckNewDir *cmd, Comma
 	if (folderId == -1)
 		return RespNameNotFound;
 	
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_folders (id_parent, user, name) values(:id_parent, :user, :name)");
 	query.bindValue(":id_parent", folderId);
@@ -302,6 +311,7 @@ void ServerSocketInterface::deckDelDirHelper(int basePathId)
 {
 	servatrice->checkSql();
 	
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	
 	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent");
@@ -340,6 +350,7 @@ ResponseCode ServerSocketInterface::cmdDeckDel(Command_DeckDel *cmd, CommandCont
 	
 	servatrice->checkSql();
 	
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	
 	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_files where id = :id and user = :user");
@@ -379,6 +390,7 @@ ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd, Comma
 	if (deckName.isEmpty())
 		deckName = "Unnamed deck";
 
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_files (id_folder, user, name, upload_time, content) values(:id_folder, :user, :name, NOW(), :content)");
 	query.bindValue(":id_folder", folderId);
@@ -395,6 +407,7 @@ DeckList *ServerSocketInterface::getDeckFromDatabase(int deckId)
 {
 	servatrice->checkSql();
 	
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	
 	query.prepare("select content from " + servatrice->getDbPrefix() + "_decklist_files where id = :id and user = :user");
@@ -447,6 +460,7 @@ ResponseCode ServerSocketInterface::cmdBanFromServer(Command_BanFromServer *cmd,
 	if (user->getUserInfo()->getUserLevel() & ServerInfo_User::IsRegistered) {
 		// Registered users can be banned by name.
 		if (minutes == 0) {
+			QMutexLocker locker(&servatrice->dbMutex);
 			QSqlQuery query;
 			query.prepare("update " + servatrice->getDbPrefix() + "_users set banned=1 where name = :name");
 			query.bindValue(":name", userName);

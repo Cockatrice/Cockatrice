@@ -353,6 +353,7 @@ ResponseCode Server_ProtocolHandler::cmdJoinRoom(Command_JoinRoom *cmd, CommandC
 		return RespNameNotFound;
 
 	r->addClient(this);
+	connect(r, SIGNAL(gameCreated(Server_Game *)), this, SLOT(gameCreated(Server_Game *)));
 	rooms.insert(r->getId(), r);
 	
 	enqueueProtocolItem(new Event_RoomSay(r->getId(), QString(), r->getJoinMessage()));
@@ -420,13 +421,17 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 	for (int i = 0; i < gameTypeList.size(); ++i)
 		gameTypes.append(gameTypeList[i]->getData());
 	
-	Server_Game *game = room->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), gameTypes, cmd->getOnlyBuddies(), cmd->getOnlyRegistered(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
+	room->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), gameTypes, cmd->getOnlyBuddies(), cmd->getOnlyRegistered(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
+	return RespOk;
+}
+
+void Server_ProtocolHandler::gameCreated(Server_Game *game)
+{
 	Server_Player *creator = game->getPlayers().values().first();
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	
-	enqueueProtocolItem(new Event_GameJoined(game->getGameId(), game->getDescription(), creator->getPlayerId(), false, game->getSpectatorsCanTalk(), game->getSpectatorsSeeEverything(), false));
-	enqueueProtocolItem(GameEventContainer::makeNew(new Event_GameStateChanged(game->getGameStarted(), game->getActivePlayer(), game->getActivePhase(), game->getGameState(creator)), game->getGameId()));
-	return RespOk;
+	sendProtocolItem(new Event_GameJoined(game->getGameId(), game->getDescription(), creator->getPlayerId(), false, game->getSpectatorsCanTalk(), game->getSpectatorsSeeEverything(), false));
+	sendProtocolItem(GameEventContainer::makeNew(new Event_GameStateChanged(game->getGameStarted(), game->getActivePlayer(), game->getActivePhase(), game->getGameState(creator)), game->getGameId()));
 }
 
 ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandContainer * /*cont*/, Server_Room *room)

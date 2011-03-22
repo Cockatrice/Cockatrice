@@ -9,7 +9,7 @@ class QFile;
 class ServerLogger : public QObject {
 	Q_OBJECT
 public:
-	ServerLogger(QObject *parent = 0);
+	ServerLogger(const QString &logFileName, QObject *parent = 0);
 	~ServerLogger();
 	static void hupSignalHandler(int unused);
 public slots:

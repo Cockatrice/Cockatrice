@@ -6,6 +6,7 @@
 Server_Room::Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent)
 	: QObject(parent), id(_id), name(_name), description(_description), autoJoin(_autoJoin), joinMessage(_joinMessage), gameTypes(_gameTypes)
 {
+	connect(this, SIGNAL(sigCreateGame(const QString &, const QString &, int, const QList<int> &, bool, bool, bool, bool, bool, bool, Server_ProtocolHandler *)), this, SLOT(doCreateGame(const QString &, const QString &, int, const QList<int> &, bool, bool, bool, bool, bool, bool, Server_ProtocolHandler *)));
 }
 
 Server *Server_Room::getServer() const
@@ -68,7 +69,7 @@ void Server_Room::broadcastGameListUpdate(Server_Game *game)
 	delete event;
 }
 
-Server_Game *Server_Room::createGame(const QString &description, const QString &password, int maxPlayers, const QList<int> &gameTypes, bool onlyBuddies, bool onlyRegistered, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator)
+void Server_Room::doCreateGame(const QString &description, const QString &password, int maxPlayers, const QList<int> &gameTypes, bool onlyBuddies, bool onlyRegistered, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator)
 {
 	Server_Game *newGame = new Server_Game(creator, static_cast<Server *>(parent())->getNextGameId(), description, password, maxPlayers, gameTypes, onlyBuddies, onlyRegistered, spectatorsAllowed, spectatorsNeedPassword, spectatorsCanTalk, spectatorsSeeEverything, this);
 	games.insert(newGame->getGameId(), newGame);
@@ -78,8 +79,11 @@ Server_Game *Server_Room::createGame(const QString &description, const QString &
 	
 	emit gameCreated(newGame);
 	emit roomInfoChanged();
-	
-	return newGame;
+}
+
+void Server_Room::createGame(const QString &description, const QString &password, int maxPlayers, const QList<int> &gameTypes, bool onlyBuddies, bool onlyRegistered, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator)
+{
+	emit sigCreateGame(description, password, maxPlayers, gameTypes, onlyBuddies, onlyRegistered, spectatorsAllowed, spectatorsNeedPassword, spectatorsCanTalk, spectatorsSeeEverything, creator);
 }
 
 void Server_Room::removeGame()

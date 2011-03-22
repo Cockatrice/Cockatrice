@@ -19,6 +19,8 @@ signals:
 	void roomInfoChanged();
 	void gameCreated(Server_Game *game);
 	void gameClosing(int gameId);
+
+	void sigCreateGame(const QString &description, const QString &password, int maxPlayers, const QList<int> &_gameTypes, bool onlyBuddies, bool onlyRegistered, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator);
 private:
 	int id;
 	QString name;
@@ -28,6 +30,7 @@ private:
 	QStringList gameTypes;
 	QMap<int, Server_Game *> games;
 private slots:
+	void doCreateGame(const QString &description, const QString &password, int maxPlayers, const QList<int> &_gameTypes, bool onlyBuddies, bool onlyRegistered, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator);
 	void removeGame();
 public:
 	Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent);
@@ -44,7 +47,7 @@ public:
 	void removeClient(Server_ProtocolHandler *client);
 	void say(Server_ProtocolHandler *client, const QString &s);
 	void broadcastGameListUpdate(Server_Game *game);
-	Server_Game *createGame(const QString &description, const QString &password, int maxPlayers, const QList<int> &_gameTypes, bool onlyBuddies, bool onlyRegistered, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator);
+	void createGame(const QString &description, const QString &password, int maxPlayers, const QList<int> &_gameTypes, bool onlyBuddies, bool onlyRegistered, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator);
 	
 	void sendRoomEvent(RoomEvent *event);
 };
