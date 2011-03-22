@@ -58,11 +58,9 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_s
 
 ServerSocketInterface::~ServerSocketInterface()
 {
-	QMutexLocker locker(&protocolHandlerMutex);
-	
 	logger->logMessage("ServerSocketInterface destructor");
 	
-	socket->flush();
+	flushXmlBuffer();
 	delete xmlWriter;
 	delete xmlReader;
 	delete socket;
@@ -80,6 +78,8 @@ void ServerSocketInterface::processProtocolItem(ProtocolItem *item)
 void ServerSocketInterface::flushXmlBuffer()
 {
 	QMutexLocker locker(&xmlBufferMutex);
+	if (xmlBuffer.isEmpty())
+		return;
 	socket->write(xmlBuffer.toUtf8());
 	socket->flush();
 	xmlBuffer.clear();
