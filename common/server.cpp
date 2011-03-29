@@ -26,7 +26,7 @@
 #include <QDebug>
 
 Server::Server(QObject *parent)
-	: QObject(parent), nextGameId(0)
+	: QObject(parent), serverMutex(QMutex::Recursive), nextGameId(0)
 {
 }
 
@@ -46,12 +46,8 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 		return authState;
 	
 	if (authState == PasswordRight) {
-		Server_ProtocolHandler *oldSession = users.value(name);
-		if (oldSession) {
-			if (!(oldSession->getUserInfo()->getUserLevel() & ServerInfo_User::IsRegistered))
-				return WouldOverwriteOldSession;
-			delete oldSession; // ~Server_ProtocolHandler() will call Server::removeClient
-		}
+		if (users.contains(name))
+			return WouldOverwriteOldSession;
 	} else if (authState == UnknownUser) {
 		// Change user name so that no two users have the same names,
 		// don't interfere with registered user names though.
@@ -98,11 +94,6 @@ void Server::removeClient(Server_ProtocolHandler *client)
 		users.remove(data->getName());
 	}
 	qDebug() << "Server::removeClient: " << clients.size() << "clients; " << users.size() << "users left";
-}
-
-Server_Game *Server::getGame(int gameId) const
-{
-	return games.value(gameId);
 }
 
 void Server::broadcastRoomUpdate()

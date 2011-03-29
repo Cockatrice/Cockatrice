@@ -263,8 +263,10 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 		ignoreList = server->getIgnoreList(userInfo->getName());
 		
 		// This might not scale very well. Use an extra QMap if it becomes a problem.
+		QMutexLocker serverLocker(&server->serverMutex);
 		const QList<Server_Game *> &serverGames = server->getGames();
 		for (int i = 0; i < serverGames.size(); ++i) {
+			QMutexLocker gameLocker(&serverGames[i]->gameMutex);
 			const QList<Server_Player *> &gamePlayers = serverGames[i]->getPlayers().values();
 			for (int j = 0; j < gamePlayers.size(); ++j)
 				if (gamePlayers[j]->getUserInfo()->getName() == userInfo->getName()) {

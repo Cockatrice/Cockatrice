@@ -28,7 +28,6 @@ public:
 	~Server();
 	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password);
 	QList<Server_Game *> getGames() const { return games.values(); }
-	Server_Game *getGame(int gameId) const;
 	const QMap<int, Server_Room *> &getRooms() { return rooms; }
 	int getNextGameId() { return nextGameId++; }
 	

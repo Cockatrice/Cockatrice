@@ -64,8 +64,11 @@ void Server_Game::pingClockTimeout()
 	QList<ServerInfo_PlayerPing *> pingList;
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	bool allPlayersInactive = true;
+	int playerCount = 0;
 	while (playerIterator.hasNext()) {
 		Server_Player *player = playerIterator.next().value();
+		if (!player->getSpectator())
+			++playerCount;
 		int pingTime;
 		if (player->getProtocolHandler()) {
 			pingTime = player->getProtocolHandler()->getLastCommandTime();
@@ -78,7 +81,7 @@ void Server_Game::pingClockTimeout()
 	
 	const int maxTime = static_cast<Server_Room *>(parent())->getServer()->getMaxGameInactivityTime();
 	if (allPlayersInactive) {
-		if ((++inactivityCounter >= maxTime) && (maxTime > 0))
+		if (((++inactivityCounter >= maxTime) && (maxTime > 0)) || (playerCount < maxPlayers))
 			deleteLater();
 	} else
 		inactivityCounter = 0;
