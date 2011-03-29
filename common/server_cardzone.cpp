@@ -183,9 +183,9 @@ void Server_CardZone::fixFreeSpaces(CommandContainer *cont)
 				moveCard(cont, coordMap, coordMap.value(y * 10000 + baseX + 1), baseX, y);
 			else if (coordMap.contains(y * 10000 + baseX + 2)) {
 				moveCard(cont, coordMap, coordMap.value(y * 10000 + baseX + 2), baseX, y);
-				return;
+				continue;
 			} else
-				return;
+				continue;
 		}
 		if (!coordMap.contains(y * 10000 + baseX + 1) && coordMap.contains(y * 10000 + baseX + 2))
 			moveCard(cont, coordMap, coordMap.value(y * 10000 + baseX + 2), baseX + 1, y);
