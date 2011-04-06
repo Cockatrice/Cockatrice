@@ -28,7 +28,7 @@ private:
 	QString handBgPath, stackBgPath, tableBgPath, playerBgPath, cardBackPicturePath;
 	bool picDownload;
 	bool doubleClickToPlay;
-	bool cardInfoMinimized;
+	QByteArray tabGameSplitterSizes;
 	bool displayCardNames;
 	bool horizontalHand;
 	bool invertVerticalCoordinate;
@@ -47,7 +47,7 @@ public:
 	QString getCardBackPicturePath() const { return cardBackPicturePath; }
 	bool getPicDownload() const { return picDownload; }
 	bool getDoubleClickToPlay() const { return doubleClickToPlay; }
-	bool getCardInfoMinimized() const { return cardInfoMinimized; }
+	QByteArray getTabGameSplitterSizes() const { return tabGameSplitterSizes; }
 	bool getDisplayCardNames() const { return displayCardNames; }
 	bool getHorizontalHand() const { return horizontalHand; }
 	bool getInvertVerticalCoordinate() const { return invertVerticalCoordinate; }
@@ -66,7 +66,7 @@ public slots:
 	void setCardBackPicturePath(const QString &_cardBackPicturePath);
 	void setPicDownload(int _picDownload);
 	void setDoubleClickToPlay(int _doubleClickToPlay);
-	void setCardInfoMinimized(bool _cardInfoMinimized);
+	void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
 	void setDisplayCardNames(int _displayCardNames);
 	void setHorizontalHand(int _horizontalHand);
 	void setInvertVerticalCoordinate(int _invertVerticalCoordinate);

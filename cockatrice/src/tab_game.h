@@ -12,6 +12,7 @@ class DeckView;
 class GameScene;
 class CardInfoWidget;
 class MessageLogWidget;
+class QSplitter;
 class QLabel;
 class QLineEdit;
 class QPushButton;
@@ -98,6 +99,7 @@ private:
 	int currentPhase;
 	int activePlayer;
 
+	QSplitter *splitter;
 	CardInfoWidget *infoPopup;
 	CardInfoWidget *cardInfo;
 	PlayerListWidget *playerListWidget;

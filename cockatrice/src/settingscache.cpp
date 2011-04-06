@@ -19,7 +19,7 @@ SettingsCache::SettingsCache()
 	
 	picDownload = settings->value("personal/picturedownload", true).toBool();
 	doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
-	cardInfoMinimized = settings->value("interface/cardinfominimized", false).toBool();
+	tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
 	displayCardNames = settings->value("cards/displaycardnames", true).toBool();
 	horizontalHand = settings->value("hand/horizontal", true).toBool();
 	invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
@@ -104,10 +104,10 @@ void SettingsCache::setDoubleClickToPlay(int _doubleClickToPlay)
 	settings->setValue("interface/doubleclicktoplay", doubleClickToPlay);
 }
 
-void SettingsCache::setCardInfoMinimized(bool _cardInfoMinimized)
+void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes)
 {
-	cardInfoMinimized = _cardInfoMinimized;
-	settings->setValue("interface/cardinfominimized", cardInfoMinimized);
+	tabGameSplitterSizes = _tabGameSplitterSizes;
+	settings->setValue("interface/tabgame_splittersizes", tabGameSplitterSizes);
 }
 
 void SettingsCache::setDisplayCardNames(int _displayCardNames)

@@ -21,7 +21,6 @@ private:
 	bool minimized;
 	ResizeMode mode;
 
-	QPushButton *minimizeButton;
 	QLabel *cardPicture;
 	QLabel *nameLabel1, *nameLabel2;
 	QLabel *manacostLabel1, *manacostLabel2;
@@ -30,7 +29,6 @@ private:
 	QTextEdit *textLabel;
 	
 	CardInfo *info;
-	void setMinimized(bool _minimized);
 public:
 	CardInfoWidget(ResizeMode _mode, QWidget *parent = 0, Qt::WindowFlags f = 0);
 	void retranslateUi();
@@ -41,7 +39,6 @@ public slots:
 private slots:
 	void clear();
 	void updatePixmap();
-	void minimizeClicked();
 signals:
 	void mouseReleased();
 protected:

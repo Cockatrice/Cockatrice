@@ -1,5 +1,6 @@
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QSplitter>
 #include <QMenu>
 #include <QAction>
 #include <QMessageBox>
@@ -191,17 +192,23 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	
 	deckViewContainerLayout = new QVBoxLayout;
 
-	QVBoxLayout *verticalLayout = new QVBoxLayout;
-	verticalLayout->addWidget(cardInfo);
-	verticalLayout->addWidget(playerListWidget, 1);
-	verticalLayout->addWidget(timeElapsedLabel);
-	verticalLayout->addWidget(messageLog, 5);
-	verticalLayout->addLayout(hLayout);
+	QVBoxLayout *messageLogLayout = new QVBoxLayout;
+	messageLogLayout->addWidget(timeElapsedLabel);
+	messageLogLayout->addWidget(messageLog);
+	messageLogLayout->addLayout(hLayout);
+	
+	QWidget *messageLogLayoutWidget = new QWidget;
+	messageLogLayoutWidget->setLayout(messageLogLayout);
+	
+	splitter = new QSplitter(Qt::Vertical);
+	splitter->addWidget(cardInfo);
+	splitter->addWidget(playerListWidget);
+	splitter->addWidget(messageLogLayoutWidget);
 
 	mainLayout = new QHBoxLayout;
 	mainLayout->addWidget(gameView, 10);
 	mainLayout->addLayout(deckViewContainerLayout, 10);
-	mainLayout->addLayout(verticalLayout);
+	mainLayout->addWidget(splitter);
 
 	if (spectator && !spectatorsCanTalk) {
 		sayLabel->hide();
@@ -253,12 +260,16 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	
 	retranslateUi();
 	setLayout(mainLayout);
+
+	splitter->restoreState(settingsCache->getTabGameSplitterSizes());
 	
 	messageLog->logGameJoined(gameId);
 }
 
 TabGame::~TabGame()
 {
+	settingsCache->setTabGameSplitterSizes(splitter->saveState());
+
 	QMapIterator<int, Player *> i(players);
 	while (i.hasNext())
 		delete i.next().value();
@@ -767,12 +778,12 @@ void TabGame::showCardInfoPopup(const QPoint &pos, const QString &cardName)
 	infoPopup = new CardInfoWidget(CardInfoWidget::ModePopUp, 0, Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
 	connect(infoPopup, SIGNAL(mouseReleased()), this, SLOT(deleteCardInfoPopup()));
 	infoPopup->setCard(cardName);
-		QRect screenRect = qApp->desktop()->screenGeometry(this);
-		infoPopup->move(
-			qMax(screenRect.left(), qMin(pos.x() - infoPopup->width() / 2, screenRect.left() + screenRect.width() - infoPopup->width())),
-			qMax(screenRect.top(), qMin(pos.y() - infoPopup->height() / 2, screenRect.top() + screenRect.height() - infoPopup->height()))
-		);
+	QRect screenRect = qApp->desktop()->screenGeometry(this);
 	infoPopup->show();
+	infoPopup->move(
+		qMax(screenRect.left(), qMin(pos.x() - infoPopup->width() / 2, screenRect.left() + screenRect.width() - infoPopup->width())),
+		qMax(screenRect.top(), qMin(pos.y() - infoPopup->height() / 2, screenRect.top() + screenRect.height() - infoPopup->height()))
+	);
 	infoPopup->grabMouse();
 }
 
