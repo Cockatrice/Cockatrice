@@ -22,8 +22,12 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 			pos.setY(br.height());
 		
 		QRectF selectionRect = QRectF(selectionOrigin, pos).normalized();
-		for (int i = 0; i < cards.size(); ++i)
+		for (int i = 0; i < cards.size(); ++i) {
+			if (cards[i]->getAttachedTo())
+				if (cards[i]->getAttachedTo()->getZone() != this)
+					continue;
 			cards[i]->setSelected(selectionRect.intersects(cards[i]->mapRectToParent(cards[i]->boundingRect())));
+		}
 		
 		static_cast<GameScene *>(scene())->resizeRubberBand(scenePos() + pos);
 		event->accept();

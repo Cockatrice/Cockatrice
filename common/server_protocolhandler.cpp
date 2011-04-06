@@ -761,7 +761,7 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 		// Make a copy of the list because its contents change during the loop otherwise.
 		QList<Server_Card *> attachedList = card->getAttachedCards();
 		for (int i = 0; i < attachedList.size(); ++i)
-			player->unattachCard(cont, attachedList[i]);
+			attachedList[i]->getZone()->getPlayer()->unattachCard(cont, attachedList[i]);
 		
 		if (targetzone->isColumnStacked(targetCard->getX(), targetCard->getY())) {
 			CardToMove *cardToMove = new CardToMove(targetCard->getId());
