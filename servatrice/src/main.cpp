@@ -32,6 +32,7 @@
 
 RNG_Abstract *rng;
 ServerLogger *logger;
+ServerLoggerThread *loggerThread;
 
 void testRNG()
 {
@@ -72,6 +73,14 @@ void myMessageOutput(QtMsgType /*type*/, const char *msg)
 	logger->logMessage(msg);
 }
 
+void sigSegvHandler(int sig)
+{
+	logger->logMessage("SIGSEGV");
+	usleep(1000);
+	delete loggerThread;
+	raise(sig);
+}
+
 int main(int argc, char *argv[])
 {
 	QCoreApplication app(argc, argv);
@@ -86,7 +95,12 @@ int main(int argc, char *argv[])
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 	
 	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
-	logger = new ServerLogger(settings->value("server/logfile").toString());
+	
+	loggerThread = new ServerLoggerThread(settings->value("server/logfile").toString());
+	loggerThread->start();
+	loggerThread->waitForInit();
+	logger = loggerThread->getLogger();
+	
 	qInstallMsgHandler(myMessageOutput);
 #ifdef Q_OS_UNIX	
 	struct sigaction hup;
@@ -95,6 +109,12 @@ int main(int argc, char *argv[])
 	hup.sa_flags = 0;
 	hup.sa_flags |= SA_RESTART;
 	sigaction(SIGHUP, &hup, 0);
+	
+	struct sigaction segv;
+	segv.sa_handler = sigSegvHandler;
+	segv.sa_flags = SA_RESETHAND;
+	sigemptyset(&segv.sa_mask);
+	sigaction(SIGSEGV, &segv, 0);
 #endif
 	rng = new RNG_SFMT;
 	

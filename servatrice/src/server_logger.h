@@ -2,7 +2,10 @@
 #define SERVER_LOGGER_H
 
 #include <QObject>
+#include <QThread>
 #include <QMutex>
+#include <QWaitCondition>
+#include <QStringList>
 
 class QSocketNotifier;
 class QFile;
@@ -17,11 +20,31 @@ public slots:
 	void logMessage(QString message);
 private slots:
 	void handleSigHup();
+	void flushBuffer();
+signals:
+	void sigFlushBuffer();
 private:
 	static int sigHupFD[2];
 	QSocketNotifier *snHup;
 	static QFile *logFile;
-	QMutex logFileMutex;
+	bool flushRunning;
+	QStringList buffer;
+	QMutex bufferMutex;
+};
+
+class ServerLoggerThread : public QThread {
+	Q_OBJECT
+private:
+	QString fileName;
+	ServerLogger *logger;
+	QWaitCondition initWaitCondition;
+protected:
+	void run();
+public:
+	ServerLoggerThread(const QString &_fileName, QObject *parent = 0);
+	~ServerLoggerThread();
+	ServerLogger *getLogger() const { return logger; }
+	void waitForInit();
 };
 
 #endif

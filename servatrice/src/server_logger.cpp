@@ -3,17 +3,14 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
-#include <QThread>
-#ifdef Q_OS_UNIX
 #include <sys/types.h>
 #include <sys/socket.h>
-#endif
 
 ServerLogger::ServerLogger(const QString &logFileName, QObject *parent)
-	: QObject(parent)
+	: QObject(parent), flushRunning(false)
 {
 	if (!logFileName.isEmpty()) {
-		logFile = new QFile(logFileName, this);
+		logFile = new QFile("server.log", this);
 		logFile->open(QIODevice::Append);
 #ifdef Q_OS_UNIX
 		::socketpair(AF_UNIX, SOCK_STREAM, 0, sigHupFD);
@@ -22,6 +19,8 @@ ServerLogger::ServerLogger(const QString &logFileName, QObject *parent)
 		connect(snHup, SIGNAL(activated(int)), this, SLOT(handleSigHup()));
 	} else
 		logFile = 0;
+	
+	connect(this, SIGNAL(sigFlushBuffer()), this, SLOT(flushBuffer()), Qt::QueuedConnection);
 }
 
 ServerLogger::~ServerLogger()
@@ -33,11 +32,33 @@ void ServerLogger::logMessage(QString message)
 	if (!logFile)
 		return;
 	
-	logFileMutex.lock();
+	bufferMutex.lock();
+	buffer.append(QDateTime::currentDateTime().toString() + " " + QString::number((qulonglong) QThread::currentThread(), 16) + " " + message);
+	bufferMutex.unlock();
+	
+	emit sigFlushBuffer();
+}
+
+void ServerLogger::flushBuffer()
+{
+	if (flushRunning)
+		return;
+	
+	flushRunning = true;
 	QTextStream stream(logFile);
-	stream << QDateTime::currentDateTime().toString() << " " << ((void *) QThread::currentThread()) << " " << message << "\n";
-	stream.flush();
-	logFileMutex.unlock();
+	forever {
+		bufferMutex.lock();
+		if (buffer.isEmpty()) {
+			bufferMutex.unlock();
+			flushRunning = false;
+			return;
+		}
+		QString message = buffer.takeFirst();
+		bufferMutex.unlock();
+		
+		stream << message << "\n";
+		stream.flush();
+	}
 }
 
 void ServerLogger::hupSignalHandler(int /*unused*/)
@@ -66,3 +87,34 @@ void ServerLogger::handleSigHup()
 
 QFile *ServerLogger::logFile;
 int ServerLogger::sigHupFD[2];
+
+ServerLoggerThread::ServerLoggerThread(const QString &_fileName, QObject *parent)
+	: QThread(parent), fileName(_fileName)
+{
+}
+
+ServerLoggerThread::~ServerLoggerThread()
+{
+	quit();
+	wait();
+}
+
+void ServerLoggerThread::run()
+{
+	logger = new ServerLogger(fileName);
+	
+	usleep(100);
+	initWaitCondition.wakeAll();
+	
+	exec();
+	
+	delete logger;
+}
+
+void ServerLoggerThread::waitForInit()
+{
+	QMutex mutex;
+	mutex.lock();
+	initWaitCondition.wait(&mutex);
+	mutex.unlock();
+}
