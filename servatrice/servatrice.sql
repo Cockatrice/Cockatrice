@@ -117,6 +117,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=915 ;
 
 CREATE TABLE `cockatrice_uptime` (
+  `id_server` tinyint(3) NOT NULL,
   `timest` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `uptime` int(11) DEFAULT NULL,
   `users_count` int(11) DEFAULT NULL,

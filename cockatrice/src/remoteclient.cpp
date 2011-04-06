@@ -1,6 +1,7 @@
 #include <QTimer>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
+#include <QCryptographicHash>
 #include "remoteclient.h"
 #include "protocol.h"
 #include "protocol_items.h"
@@ -87,7 +88,7 @@ void RemoteClient::readData()
 			connect(topLevelItem, SIGNAL(protocolItemReceived(ProtocolItem *)), this, SLOT(processProtocolItem(ProtocolItem *)));
 			
 			setStatus(StatusLoggingIn);
-			Command_Login *cmdLogin = new Command_Login(userName, password);
+			Command_Login *cmdLogin = new Command_Login(userName, QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha1).toBase64());
 			connect(cmdLogin, SIGNAL(finished(ProtocolResponse *)), this, SLOT(loginResponse(ProtocolResponse *)));
 			sendCommand(cmdLogin);
 		}
