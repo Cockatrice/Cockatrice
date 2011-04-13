@@ -41,15 +41,12 @@ public:
 		: QTcpServer(parent), server(_server) { }
 protected:
 	void incomingConnection(int socketDescriptor);
-signals:
-	void clientAdded(ServerSocketInterface *client);
 };
 
 class Servatrice : public Server
 {
 	Q_OBJECT
 private slots:
-	void newConnection(ServerSocketInterface *client);
 	void statusUpdate();
 	void updateBanTimer();
 public:

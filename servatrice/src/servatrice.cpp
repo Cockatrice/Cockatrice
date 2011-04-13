@@ -30,7 +30,6 @@
 void Servatrice_TcpServer::incomingConnection(int socketDescriptor)
 {
 	ServerSocketThread *sst = new ServerSocketThread(socketDescriptor, server, this);
-	connect(sst, SIGNAL(clientAdded(ServerSocketInterface *)), this, SIGNAL(clientAdded(ServerSocketInterface *)));
 	sst->start();
 }
 
@@ -57,7 +56,6 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	}
 	
 	tcpServer = new Servatrice_TcpServer(this);
-	connect(tcpServer, SIGNAL(clientAdded(ServerSocketInterface *)), this, SLOT(newConnection(ServerSocketInterface *)));
 	int port = settings->value("server/port", 4747).toInt();
 	qDebug() << "Starting server on port" << port;
 	tcpServer->listen(QHostAddress::Any, port);
@@ -152,11 +150,6 @@ bool Servatrice::execSqlQuery(QSqlQuery &query)
 		return true;
 	qCritical() << "Database error:" << query.lastError().text();
 	return false;
-}
-
-void Servatrice::newConnection(ServerSocketInterface *client)
-{
-	addClient(client);
 }
 
 AuthenticationResult Servatrice::checkUserPassword(const QString &user, const QString &password)

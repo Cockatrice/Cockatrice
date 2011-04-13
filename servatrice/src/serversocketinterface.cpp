@@ -54,6 +54,8 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_s
 		deleteLater();
 	} else
 		sendProtocolItem(new Event_ServerMessage(Servatrice::versionString));
+	
+	server->addClient(this);
 }
 
 ServerSocketInterface::~ServerSocketInterface()

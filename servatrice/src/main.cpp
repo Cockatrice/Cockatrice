@@ -76,7 +76,6 @@ void myMessageOutput(QtMsgType /*type*/, const char *msg)
 void sigSegvHandler(int sig)
 {
 	logger->logMessage("SIGSEGV");
-	usleep(1000);
 	delete loggerThread;
 	raise(sig);
 }

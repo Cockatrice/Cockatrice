@@ -17,8 +17,6 @@ public:
 	~ServerSocketThread();
 protected:
 	void run();
-signals:
-	void clientAdded(ServerSocketInterface *client);
 };
 
 #endif

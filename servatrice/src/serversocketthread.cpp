@@ -23,7 +23,5 @@ void ServerSocketThread::run()
 	ssi = new ServerSocketInterface(server, socket);
 	connect(ssi, SIGNAL(destroyed()), this, SLOT(deleteLater()));
 	
-	emit clientAdded(ssi);
-	
 	exec();
 }

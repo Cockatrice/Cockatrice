@@ -25,6 +25,7 @@ ServerLogger::ServerLogger(const QString &logFileName, QObject *parent)
 
 ServerLogger::~ServerLogger()
 {
+	flushBuffer();
 }
 
 void ServerLogger::logMessage(QString message)
