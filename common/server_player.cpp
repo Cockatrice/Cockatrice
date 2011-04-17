@@ -18,6 +18,7 @@ Server_Player::Server_Player(Server_Game *_game, int _playerId, ServerInfo_User 
 Server_Player::~Server_Player()
 {
 	QMutexLocker locker(&game->gameMutex);
+	QMutexLocker locker2(&playerMutex);
 	
 	delete deck;
 	

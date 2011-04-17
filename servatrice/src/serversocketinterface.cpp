@@ -63,13 +63,13 @@ ServerSocketInterface::~ServerSocketInterface()
 	QMutexLocker locker(&servatrice->serverMutex);
 	logger->logMessage("ServerSocketInterface destructor");
 	
+	prepareDestroy();
+	
 	flushXmlBuffer();
 	delete xmlWriter;
 	delete xmlReader;
 	delete socket;
 	socket = 0;
-	
-	prepareDestroy();
 }
 
 void ServerSocketInterface::processProtocolItem(ProtocolItem *item)

@@ -94,6 +94,8 @@ private:
 private slots:
 	void pingClockTimeout();
 public:
+	QMutex gameListMutex;
+	
 	Server_ProtocolHandler(Server *_server, QObject *parent = 0);
 	~Server_ProtocolHandler();
 	void playerRemovedFromGame(Server_Game *game);

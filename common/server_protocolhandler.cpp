@@ -14,7 +14,7 @@
 #include <QDateTime>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
-	: QObject(parent), server(_server), authState(PasswordWrong), acceptsUserListChanges(false), acceptsRoomListChanges(false), userInfo(0), timeRunning(0), lastDataReceived(0)
+	: QObject(parent), server(_server), authState(PasswordWrong), acceptsUserListChanges(false), acceptsRoomListChanges(false), userInfo(0), timeRunning(0), lastDataReceived(0), gameListMutex(QMutex::Recursive)
 {
 	connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
@@ -35,6 +35,7 @@ void Server_ProtocolHandler::prepareDestroy()
 	while (roomIterator.hasNext())
 		roomIterator.next().value()->removeClient(this);
 	
+	gameListMutex.lock();
 	QMapIterator<int, QPair<Server_Game *, Server_Player *> > gameIterator(games);
 	while (gameIterator.hasNext()) {
 		gameIterator.next();
@@ -46,6 +47,7 @@ void Server_ProtocolHandler::prepareDestroy()
 		else
 			p->setProtocolHandler(0);
 	}
+	gameListMutex.unlock();
 
 	delete userInfo;
 	QMapIterator<QString, ServerInfo_User *> i(buddyList);
@@ -59,6 +61,8 @@ void Server_ProtocolHandler::prepareDestroy()
 void Server_ProtocolHandler::playerRemovedFromGame(Server_Game *game)
 {
 	qDebug() << "Server_ProtocolHandler::playerRemovedFromGame(): gameId =" << game->getGameId();
+	
+	QMutexLocker locker(&gameListMutex);
 	games.remove(game->getGameId());
 }
 
@@ -89,7 +93,8 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 		qDebug() << "received GameCommand: game =" << gameCommand->getGameId();
 		if (authState == PasswordWrong)
 			return RespLoginNeeded;
-	
+		
+		gameListMutex.lock();
 		if (!games.contains(gameCommand->getGameId())) {
 			qDebug() << "invalid game";
 			return RespNameNotFound;
@@ -99,6 +104,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 		Server_Player *player = gamePair.second;
 		
 		QMutexLocker locker(&game->gameMutex);
+		gameListMutex.unlock();
 		
 		switch (command->getItemId()) {
 			case ItemId_Command_DeckSelect: return cmdDeckSelect(static_cast<Command_DeckSelect *>(command), cont, game, player);
@@ -181,7 +187,8 @@ void Server_ProtocolHandler::processCommandContainer(CommandContainer *cont)
 	ProtocolResponse *pr = cont->getResponse();
 	if (!pr)
 		pr = new ProtocolResponse(cont->getCmdId(), finalResponseCode);
-
+	
+	gameListMutex.lock();
 	GameEventContainer *gQPublic = cont->getGameEventQueuePublic();
 	if (gQPublic) {
 		Server_Game *game = games.value(gQPublic->getGameId()).first;
@@ -204,6 +211,7 @@ void Server_ProtocolHandler::processCommandContainer(CommandContainer *cont)
 		} else
 			game->sendGameEventContainer(gQPublic);
 	}
+	gameListMutex.unlock();
 	
 	const QList<ProtocolItem *> &iQ = cont->getItemQueue();
 	for (int i = 0; i < iQ.size(); ++i)
@@ -273,6 +281,7 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 		
 		// This might not scale very well. Use an extra QMap if it becomes a problem.
 		QMutexLocker serverLocker(&server->serverMutex);
+		QMutexLocker gameListLocker(&gameListMutex);
 		const QList<Server_Game *> &serverGames = server->getGames();
 		for (int i = 0; i < serverGames.size(); ++i) {
 			QMutexLocker gameLocker(&serverGames[i]->gameMutex);
@@ -435,6 +444,8 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 	Server_Game *game = room->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), gameTypes, cmd->getOnlyBuddies(), cmd->getOnlyRegistered(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
 	
 	Server_Player *creator = game->getPlayers().values().first();
+	
+	QMutexLocker gameListLocker(&gameListMutex);
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	
 	sendProtocolItem(new Event_GameJoined(game->getGameId(), game->getDescription(), creator->getPlayerId(), false, game->getSpectatorsCanTalk(), game->getSpectatorsSeeEverything(), false));
@@ -449,6 +460,8 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandC
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
+	
+	QMutexLocker gameListLocker(&gameListMutex);
 	
 	if (games.contains(cmd->getGameId()))
 		return RespContextError;
