@@ -28,6 +28,8 @@ protected:
 	bool acceptsRoomListChanges;
 	ServerInfo_User *userInfo;
 	QMap<QString, ServerInfo_User *> buddyList, ignoreList;
+	
+	void prepareDestroy();
 private:
 	QList<ProtocolItem *> itemQueue;
 	QList<int> messageSizeOverTime, messageCountOverTime;
@@ -91,11 +93,7 @@ private:
 	ResponseCode processCommandHelper(Command *command, CommandContainer *cont);
 private slots:
 	void pingClockTimeout();
-	void processSigGameCreated(Server_Game *game);
-signals:
-	void sigGameCreated(Server_Game *game);
 public:
-	mutable QMutex protocolHandlerMutex;
 	Server_ProtocolHandler(Server *_server, QObject *parent = 0);
 	~Server_ProtocolHandler();
 	void playerRemovedFromGame(Server_Game *game);
@@ -107,7 +105,6 @@ public:
 	const QMap<QString, ServerInfo_User *> &getBuddyList() const { return buddyList; }
 	const QMap<QString, ServerInfo_User *> &getIgnoreList() const { return ignoreList; }
 
-	void gameCreated(Server_Game *game);
 	int getLastCommandTime() const { return timeRunning - lastDataReceived; }
 	void processCommandContainer(CommandContainer *cont);
 	virtual void sendProtocolItem(ProtocolItem *item, bool deleteItem = true) = 0;

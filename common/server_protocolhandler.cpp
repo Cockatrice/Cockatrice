@@ -17,11 +17,20 @@ Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
 	: QObject(parent), server(_server), authState(PasswordWrong), acceptsUserListChanges(false), acceptsRoomListChanges(false), userInfo(0), timeRunning(0), lastDataReceived(0)
 {
 	connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
-	connect(this, SIGNAL(sigGameCreated(Server_Game *)), this, SLOT(processSigGameCreated(Server_Game *)), Qt::QueuedConnection);
 }
 
 Server_ProtocolHandler::~Server_ProtocolHandler()
 {
+}
+
+// This is essentially the destructor, but it needs to be called from the
+// child's destructor with the server mutex locked. Otherwise, the mutex
+// could get unlocked while the object is not finished being destroyed,
+// leading to calls to pure virtual functions.
+void Server_ProtocolHandler::prepareDestroy()
+{
+	server->removeClient(this);
+	
 	QMapIterator<int, Server_Room *> roomIterator(rooms);
 	while (roomIterator.hasNext())
 		roomIterator.next().value()->removeClient(this);
@@ -423,24 +432,17 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 	for (int i = 0; i < gameTypeList.size(); ++i)
 		gameTypes.append(gameTypeList[i]->getData());
 	
-	room->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), gameTypes, cmd->getOnlyBuddies(), cmd->getOnlyRegistered(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
-	return RespOk;
-}
-
-void Server_ProtocolHandler::gameCreated(Server_Game *game)
-{
-	emit sigGameCreated(game);
-}
-
-void Server_ProtocolHandler::processSigGameCreated(Server_Game *game)
-{
-	QMutexLocker locker(&game->gameMutex);
+	Server_Game *game = room->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), gameTypes, cmd->getOnlyBuddies(), cmd->getOnlyRegistered(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
 	
 	Server_Player *creator = game->getPlayers().values().first();
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	
 	sendProtocolItem(new Event_GameJoined(game->getGameId(), game->getDescription(), creator->getPlayerId(), false, game->getSpectatorsCanTalk(), game->getSpectatorsSeeEverything(), false));
 	sendProtocolItem(GameEventContainer::makeNew(new Event_GameStateChanged(game->getGameStarted(), game->getActivePlayer(), game->getActivePhase(), game->getGameState(creator)), game->getGameId()));
+	
+	game->gameMutex.unlock();
+	
+	return RespOk;
 }
 
 ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandContainer * /*cont*/, Server_Room *room)
@@ -454,7 +456,9 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandC
 	Server_Game *g = room->getGames().value(cmd->getGameId());
 	if (!g)
 		return RespNameNotFound;
-		
+	
+	QMutexLocker locker(&g->gameMutex);
+	
 	ResponseCode result = g->checkJoin(userInfo, cmd->getPassword(), cmd->getSpectator());
 	if (result == RespOk) {
 		Server_Player *player = g->addPlayer(this, cmd->getSpectator());

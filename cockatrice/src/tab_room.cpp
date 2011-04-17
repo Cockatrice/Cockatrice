@@ -49,7 +49,7 @@ GameSelector::GameSelector(AbstractClient *_client, TabRoom *_room, QWidget *par
 	setLayout(mainLayout);
 
 	setMinimumWidth((qreal) (gameListView->columnWidth(0) * gameListModel->columnCount()) / 1.5);
-	setMinimumHeight(400);
+	setMinimumHeight(200);
 
 	connect(showFullGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showFullGamesChanged(int)));
 	connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));

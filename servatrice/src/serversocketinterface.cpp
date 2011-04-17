@@ -69,8 +69,7 @@ ServerSocketInterface::~ServerSocketInterface()
 	delete socket;
 	socket = 0;
 	
-	// This call has to stay here so that the mutex is not freed prematurely.
-	server->removeClient(this);
+	prepareDestroy();
 }
 
 void ServerSocketInterface::processProtocolItem(ProtocolItem *item)
@@ -94,8 +93,6 @@ void ServerSocketInterface::flushXmlBuffer()
 
 void ServerSocketInterface::readClient()
 {
-	QMutexLocker locker(&protocolHandlerMutex);
-	
 	QByteArray data = socket->readAll();
 	logger->logMessage(QString(data));
 	xmlReader->addData(data);

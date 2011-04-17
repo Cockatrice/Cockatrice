@@ -34,6 +34,7 @@ class ServerInfo_User;
 class Server_Game : public QObject {
 	Q_OBJECT
 private:
+	Server_Room *room;
 	ServerInfo_User *creatorInfo;
 	QMap<int, Server_Player *> players;
 	bool gameStarted;

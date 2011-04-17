@@ -9,7 +9,7 @@ LocalServerInterface::LocalServerInterface(LocalServer *_server)
 
 LocalServerInterface::~LocalServerInterface()
 {
-	server->removeClient(this);
+	prepareDestroy();
 }
 
 void LocalServerInterface::sendProtocolItem(ProtocolItem *item, bool deleteItem)

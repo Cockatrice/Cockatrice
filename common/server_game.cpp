@@ -28,12 +28,12 @@
 #include <QTimer>
 #include <QDebug>
 
-Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent)
-	: QObject(parent), creatorInfo(new ServerInfo_User(_creator->getUserInfo())), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies), onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0), gameMutex(QMutex::Recursive)
+Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *_room)
+	: QObject(), room(_room), creatorInfo(new ServerInfo_User(_creator->getUserInfo())), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies), onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0), gameMutex(QMutex::Recursive)
 {
 	addPlayer(_creator, false, false);
 
-	if (parent->getServer()->getGameShouldPing()) {
+	if (room->getServer()->getGameShouldPing()) {
 		pingClock = new QTimer(this);
 		connect(pingClock, SIGNAL(timeout()), this, SLOT(pingClockTimeout()));
 		pingClock->start(1000);
@@ -79,7 +79,7 @@ void Server_Game::pingClockTimeout()
 	}
 	sendGameEvent(new Event_Ping(secondsElapsed, pingList));
 	
-	const int maxTime = static_cast<Server_Room *>(parent())->getServer()->getMaxGameInactivityTime();
+	const int maxTime = room->getServer()->getMaxGameInactivityTime();
 	if (allPlayersInactive) {
 		if (((++inactivityCounter >= maxTime) && (maxTime > 0)) || (playerCount < maxPlayers))
 			deleteLater();
@@ -193,9 +193,9 @@ ResponseCode Server_Game::checkJoin(ServerInfo_User *user, const QString &_passw
 	if (!(user->getUserLevel() & ServerInfo_User::IsRegistered) && onlyRegistered)
 		return RespUserLevelTooLow;
 	if (onlyBuddies)
-		if (!static_cast<Server_Room *>(parent())->getServer()->getBuddyList(creatorInfo->getName()).contains(user->getName()))
+		if (!room->getServer()->getBuddyList(creatorInfo->getName()).contains(user->getName()))
 			return RespOnlyBuddies;
-	if (static_cast<Server_Room *>(parent())->getServer()->getIgnoreList(creatorInfo->getName()).contains(user->getName()))
+	if (room->getServer()->getIgnoreList(creatorInfo->getName()).contains(user->getName()))
 		return RespInIgnoreList;
 	if (spectator) {
 		if (!spectatorsAllowed)
@@ -218,7 +218,7 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 	players.insert(playerId, newPlayer);
 
 	if (broadcastUpdate)
-		qobject_cast<Server_Room *>(parent())->broadcastGameListUpdate(this);
+		room->broadcastGameListUpdate(this);
 	
 	return newPlayer;
 }
@@ -242,7 +242,7 @@ void Server_Game::removePlayer(Server_Player *player)
 		if (gameStarted && playerActive)
 			nextTurn();
 	}
-	qobject_cast<Server_Room *>(parent())->broadcastGameListUpdate(this);
+	room->broadcastGameListUpdate(this);
 }
 
 void Server_Game::removeArrowsToPlayer(Server_Player *player)
