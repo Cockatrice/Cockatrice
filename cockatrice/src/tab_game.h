@@ -161,6 +161,7 @@ public:
 	TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming);
 	~TabGame();
 	void retranslateUi();
+	void closeRequest();
 	const QMap<int, Player *> &getPlayers() const { return players; }
 	CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;
 	int getGameId() const { return gameId; }

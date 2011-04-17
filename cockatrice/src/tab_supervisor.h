@@ -3,6 +3,7 @@
 
 #include <QTabWidget>
 #include <QMap>
+#include <QAbstractButton>
 
 class QMenu;
 class AbstractClient;
@@ -21,6 +22,18 @@ class Event_Message;
 class ServerInfo_Room;
 class ServerInfo_User;
 
+class CloseButton : public QAbstractButton {
+	Q_OBJECT
+public:
+	CloseButton(QWidget *parent = 0);
+	QSize sizeHint() const;
+	inline QSize minimumSizeHint() const { return sizeHint(); }
+protected:
+	void enterEvent(QEvent *event);
+	void leaveEvent(QEvent *event);
+	void paintEvent(QPaintEvent *event);
+};
+
 class TabSupervisor : public QTabWidget {
 	Q_OBJECT
 private:
@@ -36,7 +49,8 @@ private:
 	QMap<int, TabRoom *> roomTabs;
 	QMap<int, TabGame *> gameTabs;
 	QMap<QString, TabMessage *> messageTabs;
-	void myAddTab(Tab *tab);
+	int myAddTab(Tab *tab);
+	void addCloseButtonToTab(Tab *tab, int tabIndex);
 public:
 	TabSupervisor(QWidget *parent = 0);
 	~TabSupervisor();
@@ -52,6 +66,7 @@ signals:
 	void setMenu(QMenu *menu);
 	void localGameEnded();
 private slots:
+	void closeButtonPressed();
 	void updateCurrent(int index);
 	void updatePingTime(int value, int max);
 	void gameJoined(Event_GameJoined *event);

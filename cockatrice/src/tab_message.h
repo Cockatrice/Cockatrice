@@ -30,6 +30,7 @@ public:
 	TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, const QString &_userName);
 	~TabMessage();
 	void retranslateUi();
+	void closeRequest();
 	QString getUserName() const { return userName; }
 	QString getTabText() const { return tr("Talking to %1").arg(userName); }
 

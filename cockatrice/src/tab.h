@@ -23,6 +23,7 @@ public:
 	void setContentsChanged(bool _contentsChanged) { contentsChanged = _contentsChanged; }
 	virtual QString getTabText() const = 0;
 	virtual void retranslateUi() = 0;
+	virtual void closeRequest() { }
 };
 
 #endif

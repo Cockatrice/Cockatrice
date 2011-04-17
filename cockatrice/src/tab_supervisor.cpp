@@ -11,8 +11,60 @@
 #include "protocol_items.h"
 #include "pixmapgenerator.h"
 #include <QDebug>
+#include <QPainter>
 
-TabSupervisor::	TabSupervisor(QWidget *parent)
+CloseButton::CloseButton(QWidget *parent)
+	: QAbstractButton(parent)
+{
+	setFocusPolicy(Qt::NoFocus);
+	setCursor(Qt::ArrowCursor);
+	resize(sizeHint());
+}
+
+QSize CloseButton::sizeHint() const
+{
+	ensurePolished();
+	int width = style()->pixelMetric(QStyle::PM_TabCloseIndicatorWidth, 0, this);
+	int height = style()->pixelMetric(QStyle::PM_TabCloseIndicatorHeight, 0, this);
+	return QSize(width, height);
+}
+
+void CloseButton::enterEvent(QEvent *event)
+{
+	update();
+	QAbstractButton::enterEvent(event);
+}
+
+void CloseButton::leaveEvent(QEvent *event)
+{
+	update();
+	QAbstractButton::leaveEvent(event);
+}
+
+void CloseButton::paintEvent(QPaintEvent * /*event*/)
+{
+	QPainter p(this);
+	QStyleOption opt;
+	opt.init(this);
+	opt.state |= QStyle::State_AutoRaise;
+	if (isEnabled() && underMouse() && !isChecked() && !isDown())
+		opt.state |= QStyle::State_Raised;
+	if (isChecked())
+		opt.state |= QStyle::State_On;
+	if (isDown())
+		opt.state |= QStyle::State_Sunken;
+	
+	if (const QTabBar *tb = qobject_cast<const QTabBar *>(parent())) {
+		int index = tb->currentIndex();
+		QTabBar::ButtonPosition position = (QTabBar::ButtonPosition) style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, 0, tb);
+		if (tb->tabButton(index, position) == this)
+			opt.state |= QStyle::State_Selected;
+	}
+	
+	style()->drawPrimitive(QStyle::PE_IndicatorTabClose, &opt, &p, this);
+}
+
+TabSupervisor::TabSupervisor(QWidget *parent)
 	: QTabWidget(parent), client(0), tabServer(0), tabDeckStorage(0), tabAdmin(0)
 {
 	tabChangedIcon = new QIcon(":/resources/icon_tab_changed.svg");
@@ -47,10 +99,10 @@ void TabSupervisor::retranslateUi()
 	}
 }
 
-void TabSupervisor::myAddTab(Tab *tab)
+int TabSupervisor::myAddTab(Tab *tab)
 {
 	connect(tab, SIGNAL(userEvent()), this, SLOT(tabUserEvent()));
-	addTab(tab, tab->getTabText());
+	return addTab(tab, tab->getTabText());
 }
 
 void TabSupervisor::start(AbstractClient *_client, ServerInfo_User *userInfo)
@@ -152,12 +204,28 @@ void TabSupervisor::updatePingTime(int value, int max)
 	setTabIcon(0, QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));
 }
 
+void TabSupervisor::closeButtonPressed()
+{
+	Tab *tab = static_cast<Tab *>(static_cast<CloseButton *>(sender())->property("tab").value<QObject *>());
+	tab->closeRequest();
+}
+
+void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex)
+{
+	QTabBar::ButtonPosition closeSide = (QTabBar::ButtonPosition) tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, 0, tabBar());
+	CloseButton *closeButton = new CloseButton;
+	connect(closeButton, SIGNAL(clicked()), this, SLOT(closeButtonPressed()));
+	closeButton->setProperty("tab", qVariantFromValue((QObject *) tab));
+	tabBar()->setTabButton(tabIndex, closeSide, closeButton);
+}
+
 void TabSupervisor::gameJoined(Event_GameJoined *event)
 {
 	TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
-	myAddTab(tab);
+	int tabIndex = myAddTab(tab);
+	addCloseButtonToTab(tab, tabIndex);
 	gameTabs.insert(event->getGameId(), tab);
 	setCurrentWidget(tab);
 }
@@ -166,7 +234,8 @@ void TabSupervisor::localGameJoined(Event_GameJoined *event)
 {
 	TabGame *tab = new TabGame(this, localClients, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
-	myAddTab(tab);
+	int tabIndex = myAddTab(tab);
+	addCloseButtonToTab(tab, tabIndex);
 	gameTabs.insert(event->getGameId(), tab);
 	setCurrentWidget(tab);
 	
@@ -192,7 +261,8 @@ void TabSupervisor::addRoomTab(ServerInfo_Room *info, bool setCurrent)
 	TabRoom *tab = new TabRoom(this, client, userName, info);
 	connect(tab, SIGNAL(roomClosing(TabRoom *)), this, SLOT(roomLeft(TabRoom *)));
 	connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
-	myAddTab(tab);
+	int tabIndex = myAddTab(tab);
+	addCloseButtonToTab(tab, tabIndex);
 	roomTabs.insert(info->getRoomId(), tab);
 	if (setCurrent)
 		setCurrentWidget(tab);
@@ -213,7 +283,8 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
 	
 	TabMessage *tab = new TabMessage(this, client, userName, receiverName);
 	connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
-	myAddTab(tab);
+	int tabIndex = myAddTab(tab);
+	addCloseButtonToTab(tab, tabIndex);
 	messageTabs.insert(receiverName, tab);
 	if (focus)
 		setCurrentWidget(tab);

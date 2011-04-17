@@ -193,6 +193,11 @@ void TabRoom::retranslateUi()
 	aLeaveRoom->setText(tr("&Leave room"));
 }
 
+void TabRoom::closeRequest()
+{
+	actLeaveRoom();
+}
+
 QString TabRoom::sanitizeHtml(QString dirty) const
 {
 	return dirty

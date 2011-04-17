@@ -310,6 +310,11 @@ void TabGame::retranslateUi()
 	scene->retranslateUi();
 }
 
+void TabGame::closeRequest()
+{
+	actLeaveGame();
+}
+
 void TabGame::actConcede()
 {
 	if (QMessageBox::question(this, tr("Concede"), tr("Are you sure you want to concede this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
@@ -320,8 +325,9 @@ void TabGame::actConcede()
 
 void TabGame::actLeaveGame()
 {
-	if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
-		return;
+	if (!spectator)
+		if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+			return;
 
 	sendGameCommand(new Command_LeaveGame);
 	deleteLater();

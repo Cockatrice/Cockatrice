@@ -40,6 +40,11 @@ void TabMessage::retranslateUi()
 	aLeave->setText(tr("&Leave"));
 }
 
+void TabMessage::closeRequest()
+{
+	actLeave();
+}
+
 void TabMessage::sendMessage()
 {
 	if (sayEdit->text().isEmpty() || !userOnline)

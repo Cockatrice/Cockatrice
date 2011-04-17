@@ -84,6 +84,7 @@ public:
 	TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, ServerInfo_Room *info);
 	~TabRoom();
 	void retranslateUi();
+	void closeRequest();
 	void processRoomEvent(RoomEvent *event);
 	int getRoomId() const { return roomId; }
 	const QMap<int, QString> &getGameTypes() const { return gameTypes; }
