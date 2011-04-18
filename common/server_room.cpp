@@ -103,6 +103,8 @@ void Server_Room::removeGame()
 	QMutexLocker locker(&roomMutex);
 	
 	Server_Game *game = static_cast<Server_Game *>(sender());
+	QMutexLocker gameLocker(&game->gameMutex);
+	
 	broadcastGameListUpdate(game);
 	games.remove(game->getGameId());
 	

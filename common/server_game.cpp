@@ -31,6 +31,8 @@
 Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *_room)
 	: QObject(), room(_room), creatorInfo(new ServerInfo_User(_creator->getUserInfo())), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies), onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0), gameMutex(QMutex::Recursive)
 {
+	connect(this, SIGNAL(sigStartGameIfReady()), this, SLOT(doStartGameIfReady()), Qt::QueuedConnection);
+	
 	addPlayer(_creator, false, false);
 
 	if (room->getServer()->getGameShouldPing()) {
@@ -111,7 +113,7 @@ int Server_Game::getSpectatorCount() const
 	return result;
 }
 
-void Server_Game::startGameIfReady()
+void Server_Game::doStartGameIfReady()
 {
 	QMutexLocker locker(&gameMutex);
 	
@@ -157,6 +159,11 @@ void Server_Game::startGameIfReady()
 */	
 	activePlayer = -1;
 	nextTurn();
+}
+
+void Server_Game::startGameIfReady()
+{
+	emit sigStartGameIfReady();
 }
 
 void Server_Game::stopGameIfFinished()
@@ -214,6 +221,7 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 	int playerId = keyList.isEmpty() ? 0 : (keyList.last() + 1);
 	
 	Server_Player *newPlayer = new Server_Player(this, playerId, handler->getUserInfo(), spectator, handler);
+	newPlayer->moveToThread(thread());
 	sendGameEvent(new Event_Join(newPlayer->getProperties()));
 	players.insert(playerId, newPlayer);
 

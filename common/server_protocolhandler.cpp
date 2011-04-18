@@ -821,6 +821,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateToken(Command_CreateToken *cmd, Co
 		y = 0;
 
 	Server_Card *card = new Server_Card(cmd->getCardName(), player->newCardId(), x, y);
+	card->moveToThread(player->thread());
 	card->setPT(cmd->getPt());
 	card->setColor(cmd->getColor());
 	card->setAnnotation(cmd->getAnnotation());

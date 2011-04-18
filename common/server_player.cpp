@@ -29,6 +29,12 @@ Server_Player::~Server_Player()
 	clearZones();
 }
 
+void Server_Player::moveToThread(QThread *thread)
+{
+	QObject::moveToThread(thread);
+	userInfo->moveToThread(thread);
+}
+
 int Server_Player::newCardId()
 {
 	QMutexLocker locker(&game->gameMutex);

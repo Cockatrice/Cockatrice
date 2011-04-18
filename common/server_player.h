@@ -43,6 +43,7 @@ private:
 public:
 	Server_Player(Server_Game *_game, int _playerId, ServerInfo_User *_userInfo, bool _spectator, Server_ProtocolHandler *_handler);
 	~Server_Player();
+	void moveToThread(QThread *thread);
 	Server_ProtocolHandler *getProtocolHandler() const { return handler; }
 	void setProtocolHandler(Server_ProtocolHandler *_handler) { playerMutex.lock(); handler = _handler; playerMutex.unlock(); }
 	

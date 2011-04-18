@@ -101,7 +101,9 @@ void Server::broadcastRoomUpdate()
 	QMutexLocker locker(&serverMutex);
 	Server_Room *room = static_cast<Server_Room *>(sender());
 	QList<ServerInfo_Room *> eventRoomList;
+	room->roomMutex.lock();
 	eventRoomList.append(new ServerInfo_Room(room->getId(), room->getName(), room->getDescription(), room->getGames().size(), room->size(), room->getAutoJoin()));
+	room->roomMutex.unlock();
 	Event_ListRooms *event = new Event_ListRooms(eventRoomList);
 
 	for (int i = 0; i < clients.size(); ++i)

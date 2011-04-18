@@ -54,8 +54,10 @@ private:
 	QTimer *pingClock;
 signals:
 	void gameClosing();
+	void sigStartGameIfReady();
 private slots:
 	void pingClockTimeout();
+	void doStartGameIfReady();
 public:
 	mutable QMutex gameMutex;
 	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent);
