@@ -58,7 +58,10 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	tcpServer = new Servatrice_TcpServer(this);
 	int port = settings->value("server/port", 4747).toInt();
 	qDebug() << "Starting server on port" << port;
-	tcpServer->listen(QHostAddress::Any, port);
+	if (tcpServer->listen(QHostAddress::Any, port))
+		qDebug() << "Server listening.";
+	else
+		qDebug() << "tcpServer->listen(): Error.";
 	
 	QString dbType = settings->value("database/type").toString();
 	dbPrefix = settings->value("database/prefix").toString();
