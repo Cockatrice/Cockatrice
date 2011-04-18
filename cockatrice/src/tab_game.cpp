@@ -296,6 +296,7 @@ void TabGame::retranslateUi()
 	aConcede->setText(tr("&Concede"));
 	aConcede->setShortcut(tr("F2"));
 	aLeaveGame->setText(tr("&Leave game"));
+	aLeaveGame->setShortcut(tr("Esc"));
 	
 	sayLabel->setText(tr("&Say:"));
 	cardInfo->retranslateUi();
