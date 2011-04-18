@@ -84,7 +84,6 @@ Server_Game *Server_Room::createGame(const QString &description, const QString &
 	
 	Server_Game *newGame = new Server_Game(creator, static_cast<Server *>(parent())->getNextGameId(), description, password, maxPlayers, gameTypes, onlyBuddies, onlyRegistered, spectatorsAllowed, spectatorsNeedPassword, spectatorsCanTalk, spectatorsSeeEverything, this);
 	newGame->moveToThread(thread());
-	newGame->setParent(this);
 	// This mutex needs to be unlocked by the caller.
 	newGame->gameMutex.lock();
 	games.insert(newGame->getGameId(), newGame);

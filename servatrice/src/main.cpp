@@ -75,7 +75,10 @@ void myMessageOutput(QtMsgType /*type*/, const char *msg)
 
 void sigSegvHandler(int sig)
 {
-	logger->logMessage("SIGSEGV");
+	if (sig == SIGSEGV)
+		logger->logMessage("CRASH: SIGSEGV");
+	else if (sig == SIGABRT)
+		logger->logMessage("CRASH: SIGABRT");
 	delete loggerThread;
 	raise(sig);
 }
@@ -114,6 +117,7 @@ int main(int argc, char *argv[])
 	segv.sa_flags = SA_RESETHAND;
 	sigemptyset(&segv.sa_mask);
 	sigaction(SIGSEGV, &segv, 0);
+	sigaction(SIGABRT, &segv, 0);
 #endif
 	rng = new RNG_SFMT;
 	
