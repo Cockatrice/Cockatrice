@@ -31,11 +31,11 @@ private:
 	QSet<QString> cardTypes, cardColors;
 public:
 	CardDatabaseDisplayModel(QObject *parent = 0);
-	void setCardNameBeginning(const QString &_beginning) { cardNameBeginning = _beginning; invalidateFilter(); }
-	void setCardName(const QString &_cardName) { cardName = _cardName; invalidateFilter(); }
-	void setCardText(const QString &_cardText) { cardText = _cardText; invalidateFilter(); }
-	void setCardTypes(const QSet<QString> &_cardTypes) { cardTypes = _cardTypes; invalidateFilter(); }
-	void setCardColors(const QSet<QString> &_cardColors) { cardColors = _cardColors; invalidateFilter(); }
+	void setCardNameBeginning(const QString &_beginning) { cardNameBeginning = _beginning; invalidate(); }
+	void setCardName(const QString &_cardName) { cardName = _cardName; invalidate(); }
+	void setCardText(const QString &_cardText) { cardText = _cardText; invalidate(); }
+	void setCardTypes(const QSet<QString> &_cardTypes) { cardTypes = _cardTypes; invalidate(); }
+	void setCardColors(const QSet<QString> &_cardColors) { cardColors = _cardColors; invalidate(); }
 	void clearSearch();
 protected:
 	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;

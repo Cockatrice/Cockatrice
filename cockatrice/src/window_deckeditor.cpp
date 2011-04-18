@@ -68,6 +68,7 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	databaseView = new QTreeView();
 	databaseView->setModel(databaseDisplayModel);
 	databaseView->setUniformRowHeights(true);
+	databaseView->setRootIsDecorated(false);
 	databaseView->setAlternatingRowColors(true);
 	databaseView->setSortingEnabled(true);
 	databaseView->sortByColumn(0, Qt::AscendingOrder);
