@@ -60,7 +60,6 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_s
 
 ServerSocketInterface::~ServerSocketInterface()
 {
-	QMutexLocker locker(&servatrice->serverMutex);
 	logger->logMessage("ServerSocketInterface destructor");
 	
 	prepareDestroy();

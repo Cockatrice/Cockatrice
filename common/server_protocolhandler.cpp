@@ -24,11 +24,12 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 }
 
 // This is essentially the destructor, but it needs to be called from the
-// child's destructor with the server mutex locked. Otherwise, the mutex
-// could get unlocked while the object is not finished being destroyed,
-// leading to calls to pure virtual functions.
+// child's destructor so that the server mutex does not get unlocked during
+// finalization.
 void Server_ProtocolHandler::prepareDestroy()
 {
+	QMutexLocker locker(&server->serverMutex);
+	
 	server->removeClient(this);
 	
 	QMapIterator<int, Server_Room *> roomIterator(rooms);
