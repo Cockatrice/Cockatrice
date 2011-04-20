@@ -44,6 +44,7 @@ Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QS
 
 Server_Game::~Server_Game()
 {
+	QMutexLocker roomLocker(&room->roomMutex);
 	QMutexLocker locker(&gameMutex);
 	
 	sendGameEvent(new Event_GameClosed);
@@ -53,7 +54,7 @@ Server_Game::~Server_Game()
 		delete playerIterator.next().value();
 	players.clear();
 	
-	emit gameClosing();
+	room->removeGame(this);
 	delete creatorInfo;
 	qDebug("Server_Game destructor");
 }
@@ -233,6 +234,7 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 
 void Server_Game::removePlayer(Server_Player *player)
 {
+	QMutexLocker roomLocker(&room->roomMutex);
 	QMutexLocker locker(&gameMutex);
 	
 	players.remove(player->getPlayerId());
@@ -281,6 +283,7 @@ void Server_Game::removeArrowsToPlayer(Server_Player *player)
 
 bool Server_Game::kickPlayer(int playerId)
 {
+	QMutexLocker roomLocker(&room->roomMutex);
 	QMutexLocker locker(&gameMutex);
 	
 	Server_Player *playerToKick = players.value(playerId);

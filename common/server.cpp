@@ -112,24 +112,28 @@ void Server::broadcastRoomUpdate()
 	delete event;
 }
 
-void Server::gameCreated(Server_Game *game)
-{
-	QMutexLocker locker(&serverMutex);
-	games.insert(game->getGameId(), game);
-}
-
-void Server::gameClosing(int gameId)
-{
-	QMutexLocker locker(&serverMutex);
-	qDebug("Server::gameClosing");
-	games.remove(gameId);
-}
-
 void Server::addRoom(Server_Room *newRoom)
 {
 	QMutexLocker locker(&serverMutex);
 	rooms.insert(newRoom->getId(), newRoom);
 	connect(newRoom, SIGNAL(roomInfoChanged()), this, SLOT(broadcastRoomUpdate()));
-	connect(newRoom, SIGNAL(gameCreated(Server_Game *)), this, SLOT(gameCreated(Server_Game *)));
-	connect(newRoom, SIGNAL(gameClosing(int)), this, SLOT(gameClosing(int)));
+}
+
+int Server::getUsersCount() const
+{
+	QMutexLocker locker(&serverMutex);
+	return users.size();
+}
+
+int Server::getGamesCount() const
+{
+	int result = 0;
+	QMutexLocker locker(&serverMutex);
+	QMapIterator<int, Server_Room *> roomIterator(rooms);
+	while (roomIterator.hasNext()) {
+		Server_Room *room = roomIterator.next().value();
+		QMutexLocker roomLocker(&room->roomMutex);
+		result += room->getGames().size();
+	}
+	return result;
 }

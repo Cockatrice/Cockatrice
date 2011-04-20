@@ -276,36 +276,20 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 
 	enqueueProtocolItem(new Event_ServerMessage(server->getLoginMessage()));
 
+	QList<ServerInfo_User *> _buddyList, _ignoreList;
 	if (authState == PasswordRight) {
 		buddyList = server->getBuddyList(userInfo->getName());
+		
+		QMapIterator<QString, ServerInfo_User *> buddyIterator(buddyList);
+		while (buddyIterator.hasNext())
+			_buddyList.append(new ServerInfo_User(buddyIterator.next().value()));
+	
 		ignoreList = server->getIgnoreList(userInfo->getName());
 		
-		// This might not scale very well. Use an extra QMap if it becomes a problem.
-		QMutexLocker serverLocker(&server->serverMutex);
-		QMutexLocker gameListLocker(&gameListMutex);
-		const QList<Server_Game *> &serverGames = server->getGames();
-		for (int i = 0; i < serverGames.size(); ++i) {
-			QMutexLocker gameLocker(&serverGames[i]->gameMutex);
-			const QList<Server_Player *> &gamePlayers = serverGames[i]->getPlayers().values();
-			for (int j = 0; j < gamePlayers.size(); ++j)
-				if (gamePlayers[j]->getUserInfo()->getName() == userInfo->getName()) {
-					gamePlayers[j]->setProtocolHandler(this);
-					games.insert(serverGames[i]->getGameId(), QPair<Server_Game *, Server_Player *>(serverGames[i], gamePlayers[j]));
-					
-					enqueueProtocolItem(new Event_GameJoined(serverGames[i]->getGameId(), serverGames[i]->getDescription(), gamePlayers[j]->getPlayerId(), gamePlayers[j]->getSpectator(), serverGames[i]->getSpectatorsCanTalk(), serverGames[i]->getSpectatorsSeeEverything(), true));
-					enqueueProtocolItem(GameEventContainer::makeNew(new Event_GameStateChanged(serverGames[i]->getGameStarted(), serverGames[i]->getActivePlayer(), serverGames[i]->getActivePhase(), serverGames[i]->getGameState(gamePlayers[j])), serverGames[i]->getGameId()));
-				}
-		}
+		QMapIterator<QString, ServerInfo_User *> ignoreIterator(ignoreList);
+		while (ignoreIterator.hasNext())
+			_ignoreList.append(new ServerInfo_User(ignoreIterator.next().value()));
 	}
-	
-	QList<ServerInfo_User *> _buddyList;
-	QMapIterator<QString, ServerInfo_User *> buddyIterator(buddyList);
-	while (buddyIterator.hasNext())
-		_buddyList.append(new ServerInfo_User(buddyIterator.next().value()));
-	QList<ServerInfo_User *> _ignoreList;
-	QMapIterator<QString, ServerInfo_User *> ignoreIterator(ignoreList);
-	while (ignoreIterator.hasNext())
-		_ignoreList.append(new ServerInfo_User(ignoreIterator.next().value()));
 	
 	cont->setResponse(new Response_Login(cont->getCmdId(), RespOk, new ServerInfo_User(userInfo, true), _buddyList, _ignoreList));
 	return RespNothing;
@@ -373,11 +357,31 @@ ResponseCode Server_ProtocolHandler::cmdJoinRoom(Command_JoinRoom *cmd, CommandC
 	Server_Room *r = server->getRooms().value(cmd->getRoomId(), 0);
 	if (!r)
 		return RespNameNotFound;
-
+	
+	QMutexLocker roomLocker(&r->roomMutex);
 	r->addClient(this);
 	rooms.insert(r->getId(), r);
 	
 	enqueueProtocolItem(new Event_RoomSay(r->getId(), QString(), r->getJoinMessage()));
+	
+	// This might not scale very well. Use an extra QMap if it becomes a problem.
+	QMutexLocker gameListLocker(&gameListMutex);
+	QMapIterator<int, Server_Game *> gameIterator(r->getGames());
+	while (gameIterator.hasNext()) {
+		Server_Game *game = gameIterator.next().value();
+		QMutexLocker gameLocker(&game->gameMutex);
+		const QList<Server_Player *> &gamePlayers = game->getPlayers().values();
+		for (int j = 0; j < gamePlayers.size(); ++j)
+			if (gamePlayers[j]->getUserInfo()->getName() == userInfo->getName()) {
+				gamePlayers[j]->setProtocolHandler(this);
+				games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, gamePlayers[j]));
+				
+				enqueueProtocolItem(new Event_GameJoined(game->getGameId(), game->getDescription(), gamePlayers[j]->getPlayerId(), gamePlayers[j]->getSpectator(), game->getSpectatorsCanTalk(), game->getSpectatorsSeeEverything(), true));
+				enqueueProtocolItem(GameEventContainer::makeNew(new Event_GameStateChanged(game->getGameStarted(), game->getActivePlayer(), game->getActivePhase(), game->getGameState(gamePlayers[j])), game->getGameId()));
+				
+				break;
+			}
+	}
 	
 	cont->setResponse(new Response_JoinRoom(cont->getCmdId(), RespOk, r->getInfo(true)));
 	return RespNothing;
@@ -436,6 +440,10 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
+
+	if (server->getMaxGamesPerUser() > 0)
+		if (room->getGamesCreatedByUser(userInfo->getName()) >= server->getMaxGamesPerUser())
+			return RespContextError;
 	
 	QList<int> gameTypes;
 	QList<GameTypeId *> gameTypeList = cmd->getGameTypes();

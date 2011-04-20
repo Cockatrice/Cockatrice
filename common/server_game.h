@@ -53,7 +53,6 @@ private:
 	int secondsElapsed;
 	QTimer *pingClock;
 signals:
-	void gameClosing();
 	void sigStartGameIfReady();
 private slots:
 	void pingClockTimeout();

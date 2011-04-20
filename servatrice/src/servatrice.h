@@ -65,6 +65,7 @@ public:
 	int getMessageCountingInterval() const { return messageCountingInterval; }
 	int getMaxMessageCountPerInterval() const { return maxMessageCountPerInterval; }
 	int getMaxMessageSizePerInterval() const { return maxMessageSizePerInterval; }
+	int getMaxGamesPerUser() const { return maxGamesPerUser; }
 	QString getDbPrefix() const { return dbPrefix; }
 	void updateLoginMessage();
 	ServerInfo_User *getUserData(const QString &name);
@@ -88,7 +89,7 @@ private:
 	QList<QPair<QHostAddress, int> > addressBanList;
 	QList<QPair<QString, int> > nameBanList;
 	int maxGameInactivityTime, maxPlayerInactivityTime;
-	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval;
+	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser;
 	ServerInfo_User *evalUserQueryResult(const QSqlQuery &query, bool complete);
 };
 

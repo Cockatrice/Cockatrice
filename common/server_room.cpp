@@ -87,26 +87,33 @@ Server_Game *Server_Room::createGame(const QString &description, const QString &
 	// This mutex needs to be unlocked by the caller.
 	newGame->gameMutex.lock();
 	games.insert(newGame->getGameId(), newGame);
-	connect(newGame, SIGNAL(gameClosing()), this, SLOT(removeGame()));
 	
 	broadcastGameListUpdate(newGame);
 	
-	emit gameCreated(newGame);
 	emit roomInfoChanged();
 	
 	return newGame;
 }
 
-void Server_Room::removeGame()
+void Server_Room::removeGame(Server_Game *game)
 {
-	QMutexLocker locker(&roomMutex);
-	
-	Server_Game *game = static_cast<Server_Game *>(sender());
-	QMutexLocker gameLocker(&game->gameMutex);
+	// No need to lock roomMutex or gameMutex. This method is only
+	// called from ~Server_Game, which locks both mutexes anyway beforehand.
 	
 	broadcastGameListUpdate(game);
 	games.remove(game->getGameId());
 	
-	emit gameClosing(game->getGameId());
 	emit roomInfoChanged();
+}
+
+int Server_Room::getGamesCreatedByUser(const QString &userName) const
+{
+	QMutexLocker locker(&roomMutex);
+	
+	QMapIterator<int, Server_Game *> gamesIterator(games);
+	int result = 0;
+	while (gamesIterator.hasNext())
+		if (gamesIterator.next().value()->getCreatorInfo()->getName() == userName)
+			++result;
+	return result;
 }
