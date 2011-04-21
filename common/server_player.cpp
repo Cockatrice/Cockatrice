@@ -17,16 +17,24 @@ Server_Player::Server_Player(Server_Game *_game, int _playerId, ServerInfo_User 
 
 Server_Player::~Server_Player()
 {
+}
+
+void Server_Player::prepareDestroy()
+{
 	QMutexLocker locker(&game->gameMutex);
-	QMutexLocker locker2(&playerMutex);
 	
 	delete deck;
 	
+	playerMutex.lock();
 	if (handler)
 		handler->playerRemovedFromGame(game);
+	playerMutex.unlock();
+	
 	delete userInfo;
 	
 	clearZones();
+	
+	deleteLater();
 }
 
 void Server_Player::moveToThread(QThread *thread)

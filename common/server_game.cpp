@@ -51,7 +51,7 @@ Server_Game::~Server_Game()
 	
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	while (playerIterator.hasNext())
-		delete playerIterator.next().value();
+		playerIterator.next().value()->prepareDestroy();
 	players.clear();
 	
 	room->removeGame(this);
@@ -243,7 +243,7 @@ void Server_Game::removePlayer(Server_Player *player)
 	sendGameEvent(new Event_Leave(player->getPlayerId()));
 	bool playerActive = activePlayer == player->getPlayerId();
 	bool spectator = player->getSpectator();
-	delete player;
+	player->prepareDestroy();
 	
 	if (!getPlayerCount())
 		deleteLater();
