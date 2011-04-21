@@ -333,7 +333,8 @@ void Servatrice::updateLoginMessage()
 	QMutexLocker locker(&dbMutex);
 	checkSql();
 	QSqlQuery query;
-	query.prepare("select message from " + dbPrefix + "_servermessages order by timest desc limit 1");
+	query.prepare("select message from " + dbPrefix + "_servermessages where id_server = :id_server order by timest desc limit 1");
+	query.bindValue(":id_server", serverId);
 	if (execSqlQuery(query))
 		if (query.next()) {
 			loginMessage = query.value(0).toString();

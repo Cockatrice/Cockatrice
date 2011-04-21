@@ -126,6 +126,7 @@ CREATE TABLE `cockatrice_uptime` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE `cockatrice_servermessages` (
+  `id_server` tinyint(3) not null default 0,
   `timest` datetime NOT NULL default '0000-00-00 00:00:00',
   `message` text,
   PRIMARY KEY  (`timest`)
