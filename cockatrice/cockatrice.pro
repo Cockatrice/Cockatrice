@@ -177,7 +177,8 @@ TRANSLATIONS += \
 	translations/cockatrice_pt-br.ts \
 	translations/cockatrice_fr.ts \
 	translations/cockatrice_ja.ts \
-	translations/cockatrice_ru.ts
+	translations/cockatrice_ru.ts \
+	translations/cockatrice_pl.ts
 win32 {
 	RC_FILE = cockatrice.rc
 }
