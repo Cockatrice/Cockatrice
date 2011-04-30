@@ -197,6 +197,10 @@
 	    <longname>Nemesis</longname>
 	</set>
 	<set import="1">
+	    <name>NPH</name>
+	    <longname>New Phyrexia</longname>
+	</set>
+	<set import="1">
 	    <name>9E</name>
 	    <longname>Ninth Edition</longname>
 	</set>
