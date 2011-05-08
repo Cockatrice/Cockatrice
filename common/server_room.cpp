@@ -8,6 +8,19 @@ Server_Room::Server_Room(int _id, const QString &_name, const QString &_descript
 {
 }
 
+Server_Room::~Server_Room()
+{
+	QMutexLocker locker(&roomMutex);
+	qDebug("Server_Room destructor");
+	
+	const QList<Server_Game *> gameList = games.values();
+	for (int i = 0; i < gameList.size(); ++i)
+		delete gameList[i];
+	games.clear();
+	
+	clear();
+}
+
 Server *Server_Room::getServer() const
 {
 	return static_cast<Server *>(parent());

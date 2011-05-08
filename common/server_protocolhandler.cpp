@@ -29,6 +29,7 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 void Server_ProtocolHandler::prepareDestroy()
 {
 	QMutexLocker locker(&server->serverMutex);
+	qDebug("Server_ProtocolHandler::prepareDestroy");
 	
 	server->removeClient(this);
 	

@@ -45,6 +45,7 @@ public:
 	virtual QMap<QString, ServerInfo_User *> getIgnoreList(const QString &name) = 0;
 	virtual bool getUserBanned(Server_ProtocolHandler * /*client*/, const QString & /*userName*/) const { return false; }
 protected:
+	void prepareDestroy();
 	QList<Server_ProtocolHandler *> clients;
 	QMap<QString, Server_ProtocolHandler *> users;
 	QMap<int, Server_Room *> rooms;

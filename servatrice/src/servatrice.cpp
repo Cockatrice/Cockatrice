@@ -107,6 +107,7 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 
 Servatrice::~Servatrice()
 {
+	prepareDestroy();
 }
 
 bool Servatrice::openDatabase()

@@ -32,8 +32,18 @@ Server::Server(QObject *parent)
 
 Server::~Server()
 {
+}
+
+void Server::prepareDestroy()
+{
+	QMutexLocker locker(&serverMutex);
+	
 	while (!clients.isEmpty())
 		delete clients.takeFirst();
+	
+	QMapIterator<int, Server_Room *> roomIterator(rooms);
+	while (roomIterator.hasNext())
+		delete roomIterator.next().value();
 }
 
 AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password)

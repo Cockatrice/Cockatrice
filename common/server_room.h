@@ -29,6 +29,7 @@ private:
 public:
 	mutable QMutex roomMutex;
 	Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent);
+	~Server_Room();
 	int getId() const { return id; }
 	QString getName() const { return name; }
 	QString getDescription() const { return description; }
