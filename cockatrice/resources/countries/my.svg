@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="896" height="448" viewBox="0 0 28 14">
+<rect fill="#dc241f" width="28" height="14"/>
+<rect fill="#fff" width="28" height="1"  y="1"/>
+<rect fill="#fff" width="28" height="1"  y="3"/>
+<rect fill="#fff" width="28" height="1"  y="5"/>
+<rect fill="#fff" width="28" height="1"  y="7"/>
+<rect fill="#fff" width="28" height="1"  y="9"/>
+<rect fill="#fff" width="28" height="1"  y="11"/>
+<rect fill="#fff" width="28" height="1"  y="13"/>
+<rect fill="#0035ad" width="14" height="8"/>
+<circle fill="#ffd100" cx="5.75" cy="4" r="3"/>
+<circle fill="#0035ad" cx="6.5" cy="4" r="2.60"/>
+<polygon fill="#ffd100" points="71.7802,39.7994 70,52 68.2198,39.7994 61.3223,50.0194 65.0121,38.2547 54.3634,44.4698 62.7922,35.4711 50.5014,36.4504 62,32 50.5014,27.5496 62.7922,28.5289 54.3634,19.5302 65.0121,25.7453 61.3223,13.9806 68.2198,24.2006 70,12 71.7802,24.2006 78.6777,13.9806 74.9879,25.7453 85.6366,19.5302 77.2078,28.5289 89.4986,27.5496 78,32 89.4986,36.4504 77.2078,35.4711 85.6366,44.4698 74.9879,38.2547 78.6777,50.0194" transform="matrix(0.1282144,0,0,0.125,-0.22500672,0)"/>
+</svg>
