@@ -360,7 +360,7 @@ void CardItem::resetState()
 	annotation.clear();
 	attachedTo = 0;
 	attachedCards.clear();
-	setTapped(false);
+	setTapped(false, false);
 	setDoesntUntap(false);
 	update();
 }

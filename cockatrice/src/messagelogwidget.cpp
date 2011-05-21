@@ -3,6 +3,7 @@
 #include "cardzone.h"
 #include "cardinfowidget.h"
 #include "protocol_items.h"
+#include "soundengine.h"
 #include <QDebug>
 #include <QMouseEvent>
 #include <QTextBlock>
@@ -60,6 +61,7 @@ void MessageLogWidget::logGameJoined(int gameId)
 
 void MessageLogWidget::logJoin(Player *player)
 {
+	soundEngine->notification();
 	append(tr("%1 has joined the game.").arg(sanitizeHtml(player->getName())));
 }
 
@@ -123,6 +125,7 @@ void MessageLogWidget::logSpectatorSay(QString spectatorName, QString message)
 
 void MessageLogWidget::logShuffle(Player *player)
 {
+	soundEngine->shuffle();
 	append(tr("%1 shuffles his library.").arg(sanitizeHtml(player->getName())));
 }
 
@@ -133,6 +136,7 @@ void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
 
 void MessageLogWidget::logDrawCards(Player *player, int number)
 {
+	soundEngine->draw();
 	append(tr("%1 draws %n card(s).", "", number).arg(sanitizeHtml(player->getName())));
 }
 
@@ -212,6 +216,7 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
 	
 	QString finalStr;
 	if (targetName == "table") {
+		soundEngine->playCard();
 		if (moveCardTapped.value(attributes.card))
 			finalStr = tr("%1 puts %2 into play tapped%3.");
 		else
@@ -233,8 +238,10 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
 			finalStr = tr("%1 puts %2%3 into his library at position %4.");
 	} else if (targetName == "sb")
 		finalStr = tr("%1 moves %2%3 to sideboard.");
-	else if (targetName == "stack")
+	else if (targetName == "stack") {
+		soundEngine->playCard();
 		finalStr = tr("%1 plays %2%3.");
+	}
 	
 	append(finalStr.arg(sanitizeHtml(attributes.player->getName())).arg(cardStr).arg(fromStr).arg(attributes.newX));
 }
@@ -317,6 +324,11 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
 
 void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
 {
+	if (tapped)
+		soundEngine->tap();
+	else
+		soundEngine->untap();
+	
 	if (currentContext == MessageContext_MoveCard)
 		moveCardTapped.insert(card, tapped);
 	else {
@@ -409,6 +421,7 @@ void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId
 
 void MessageLogWidget::logSetActivePlayer(Player *player)
 {
+	soundEngine->notification();
 	append(QString());
 	append("<font color=\"green\"><b>" + tr("It is now %1's turn.").arg(player->getName()) + "</b></font>");
 	append(QString());
@@ -416,6 +429,7 @@ void MessageLogWidget::logSetActivePlayer(Player *player)
 
 void MessageLogWidget::logSetActivePhase(int phase)
 {
+	soundEngine->notification();
 	QString phaseName;
 	switch (phase) {
 		case 0: phaseName = tr("untap step"); break;

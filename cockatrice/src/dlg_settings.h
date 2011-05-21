@@ -76,10 +76,18 @@ public:
 
 class UserInterfaceSettingsPage : public AbstractSettingsPage {
 	Q_OBJECT
+private slots:
+	void soundPathClearButtonClicked();
+	void soundPathButtonClicked();
+signals:
+	void soundPathChanged();
 private:
 	QCheckBox *doubleClickToPlayCheckBox;
 	QCheckBox *tapAnimationCheckBox;
-	QGroupBox *generalGroupBox, *animationGroupBox;
+	QCheckBox *soundEnabledCheckBox;
+	QLabel *soundPathLabel;
+	QLineEdit *soundPathEdit;
+	QGroupBox *generalGroupBox, *animationGroupBox, *soundGroupBox;
 public:
 	UserInterfaceSettingsPage();
 	void retranslateUi();

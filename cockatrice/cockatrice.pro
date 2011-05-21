@@ -5,7 +5,7 @@ INCLUDEPATH += . src ../common
 MOC_DIR = build
 OBJECTS_DIR = build
 RESOURCES = cockatrice.qrc
-QT += network svg
+QT += network svg multimedia
 
 HEADERS += src/abstractcounter.h \
  src/counter_general.h \
@@ -71,6 +71,7 @@ HEADERS += src/abstractcounter.h \
  src/localserverinterface.h \
  src/localclient.h \
  src/translation.h \
+ src/soundengine.h \
  	../common/color.h \
  	../common/serializable_item.h \
 	../common/decklist.h \
@@ -153,6 +154,7 @@ SOURCES += src/abstractcounter.cpp \
  src/localserver.cpp \
  src/localserverinterface.cpp \
  src/localclient.cpp \
+ src/soundengine.cpp \
  	../common/serializable_item.cpp \
 	../common/decklist.cpp \
 	../common/protocol.cpp \

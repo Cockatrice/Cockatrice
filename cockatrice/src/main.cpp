@@ -36,6 +36,7 @@
 #include "settingscache.h"
 #include "pixmapgenerator.h"
 #include "rng_sfmt.h"
+#include "soundengine.h"
 
 //Q_IMPORT_PLUGIN(qjpeg)
 
@@ -43,6 +44,7 @@ CardDatabase *db;
 QTranslator *translator, *qtTranslator;
 SettingsCache *settingsCache;
 RNG_Abstract *rng;
+SoundEngine *soundEngine;
 
 void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
@@ -114,6 +116,8 @@ int main(int argc, char *argv[])
 	}
 	
 	if (startMainProgram) {
+		soundEngine = new SoundEngine;
+		
 		MainWindow ui;
 		qDebug("main(): MainWindow constructor finished");
 		

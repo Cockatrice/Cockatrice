@@ -20,6 +20,7 @@ signals:
 	void displayCardNamesChanged();
 	void horizontalHandChanged();
 	void invertVerticalCoordinateChanged();
+	void soundPathChanged();
 private:
 	QSettings *settings;
 	
@@ -34,6 +35,8 @@ private:
 	bool invertVerticalCoordinate;
 	bool tapAnimation;
 	bool zoneViewSortByName, zoneViewSortByType;
+	bool soundEnabled;
+	QString soundPath;
 public:
 	SettingsCache();
 	QString getLang() const { return lang; }
@@ -54,6 +57,8 @@ public:
 	bool getTapAnimation() const { return tapAnimation; }
 	bool getZoneViewSortByName() const { return zoneViewSortByName; }
 	bool getZoneViewSortByType() const { return zoneViewSortByType; }
+	bool getSoundEnabled() const { return soundEnabled; }
+	QString getSoundPath() const { return soundPath; }
 public slots:
 	void setLang(const QString &_lang);
 	void setDeckPath(const QString &_deckPath);
@@ -73,6 +78,8 @@ public slots:
 	void setTapAnimation(int _tapAnimation);
 	void setZoneViewSortByName(int _zoneViewSortByName);
 	void setZoneViewSortByType(int _zoneViewSortByType);
+	void setSoundEnabled(int _soundEnabled);
+	void setSoundPath(const QString &_soundPath);
 };
 
 extern SettingsCache *settingsCache;

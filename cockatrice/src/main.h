@@ -3,6 +3,7 @@
 
 class CardDatabase;
 class QTranslator;
+class SoundEngine;
 
 extern CardDatabase *db;
 

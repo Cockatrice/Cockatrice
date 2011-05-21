@@ -377,6 +377,8 @@ void AppearanceSettingsPage::cardBackPicturePathButtonClicked()
 
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
+	QIcon deleteIcon(":/resources/icon_delete.svg");
+
 	doubleClickToPlayCheckBox = new QCheckBox;
 	doubleClickToPlayCheckBox->setChecked(settingsCache->getDoubleClickToPlay());
 	connect(doubleClickToPlayCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDoubleClickToPlay(int)));
@@ -391,6 +393,28 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 	tapAnimationCheckBox->setChecked(settingsCache->getTapAnimation());
 	connect(tapAnimationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setTapAnimation(int)));
 	
+	soundEnabledCheckBox = new QCheckBox;
+	soundEnabledCheckBox->setChecked(settingsCache->getSoundEnabled());
+	connect(soundEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setSoundEnabled(int)));
+	
+	soundPathLabel = new QLabel;
+	soundPathEdit = new QLineEdit(settingsCache->getSoundPath());
+	soundPathEdit->setReadOnly(true);
+	QPushButton *soundPathClearButton = new QPushButton(deleteIcon, QString());
+	connect(soundPathClearButton, SIGNAL(clicked()), this, SLOT(soundPathClearButtonClicked()));
+	QPushButton *soundPathButton = new QPushButton("...");
+	connect(soundPathButton, SIGNAL(clicked()), this, SLOT(soundPathButtonClicked()));
+	
+	QGridLayout *soundGrid = new QGridLayout;
+	soundGrid->addWidget(soundEnabledCheckBox, 0, 0, 1, 4);
+	soundGrid->addWidget(soundPathLabel, 1, 0);
+	soundGrid->addWidget(soundPathEdit, 1, 1);
+	soundGrid->addWidget(soundPathClearButton, 1, 2);
+	soundGrid->addWidget(soundPathButton, 1, 3);
+	
+	soundGroupBox = new QGroupBox;
+	soundGroupBox->setLayout(soundGrid);
+	
 	QGridLayout *animationGrid = new QGridLayout;
 	animationGrid->addWidget(tapAnimationCheckBox, 0, 0);
 	
@@ -400,6 +424,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(generalGroupBox);
 	mainLayout->addWidget(animationGroupBox);
+	mainLayout->addWidget(soundGroupBox);
 	
 	setLayout(mainLayout);
 }
@@ -410,6 +435,24 @@ void UserInterfaceSettingsPage::retranslateUi()
 	doubleClickToPlayCheckBox->setText(tr("&Double-click cards to play them (instead of single-click)"));
 	animationGroupBox->setTitle(tr("Animation settings"));
 	tapAnimationCheckBox->setText(tr("&Tap/untap animation"));
+	soundEnabledCheckBox->setText(tr("Enable &sounds"));
+	soundPathLabel->setText(tr("Path to sounds directory:"));
+}
+
+void UserInterfaceSettingsPage::soundPathClearButtonClicked()
+{
+	soundPathEdit->setText(QString());
+	settingsCache->setSoundPath(QString());
+}
+
+void UserInterfaceSettingsPage::soundPathButtonClicked()
+{
+	QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"));
+	if (path.isEmpty())
+		return;
+	
+	soundPathEdit->setText(path);
+	settingsCache->setSoundPath(path);
 }
 
 MessagesSettingsPage::MessagesSettingsPage()
