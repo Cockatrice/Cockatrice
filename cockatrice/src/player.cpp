@@ -891,8 +891,7 @@ void Player::eventMoveCard(Event_MoveCard *event, GameEventContext *context)
 	if (context)
 		switch (context->getItemId()) {
 			case ItemId_Context_UndoDraw: emit logUndoDraw(this, card->getName()); break;
-			case ItemId_Context_MoveCard: emit logMoveCard(this, card, startZone, logPosition, targetZone, logX);
-			default: ;
+			default: emit logMoveCard(this, card, startZone, logPosition, targetZone, logX);
 		}
 	else
 		emit logMoveCard(this, card, startZone, logPosition, targetZone, logX);

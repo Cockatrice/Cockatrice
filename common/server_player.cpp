@@ -402,6 +402,7 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 		
 		if (card->getDestroyOnZoneChange() && (startzone->getName() != targetzone->getName())) {
 			cont->enqueueGameEventPrivate(new Event_DestroyCard(getPlayerId(), startzone->getName(), card->getId()), game->getGameId(), -1, new Context_MoveCard);
+			cont->enqueueGameEventOmniscient(new Event_DestroyCard(getPlayerId(), startzone->getName(), card->getId()), game->getGameId(), new Context_MoveCard);
 			cont->enqueueGameEventPublic(new Event_DestroyCard(getPlayerId(), startzone->getName(), card->getId()), game->getGameId(), new Context_MoveCard);
 			card->deleteLater();
 		} else {

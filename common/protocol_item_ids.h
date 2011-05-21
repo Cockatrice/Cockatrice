@@ -76,7 +76,8 @@ ItemId_Context_Concede = 1074,
 ItemId_Context_DeckSelect = 1075,
 ItemId_Context_UndoDraw = 1076,
 ItemId_Context_MoveCard = 1077,
-ItemId_Command_UpdateServerMessage = 1078,
-ItemId_Command_BanFromServer = 1079,
-ItemId_Other = 1080
+ItemId_Context_Mulligan = 1078,
+ItemId_Command_UpdateServerMessage = 1079,
+ItemId_Command_BanFromServer = 1080,
+ItemId_Other = 1081
 };

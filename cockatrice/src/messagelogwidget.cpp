@@ -126,7 +126,8 @@ void MessageLogWidget::logSpectatorSay(QString spectatorName, QString message)
 void MessageLogWidget::logShuffle(Player *player)
 {
 	soundEngine->shuffle();
-	append(tr("%1 shuffles his library.").arg(sanitizeHtml(player->getName())));
+	if (currentContext != MessageContext_Mulligan)
+		append(tr("%1 shuffles his library.").arg(sanitizeHtml(player->getName())));
 }
 
 void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
@@ -136,8 +137,12 @@ void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
 
 void MessageLogWidget::logDrawCards(Player *player, int number)
 {
-	soundEngine->draw();
-	append(tr("%1 draws %n card(s).", "", number).arg(sanitizeHtml(player->getName())));
+	if (currentContext == MessageContext_Mulligan)
+		mulliganPlayer = player;
+	else {
+		soundEngine->draw();
+		append(tr("%1 draws %n card(s).", "", number).arg(sanitizeHtml(player->getName())));
+	}
 }
 
 void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
@@ -251,8 +256,18 @@ void MessageLogWidget::logMoveCard(Player *player, CardItem *card, CardZone *sta
 	LogMoveCard attributes = {player, card, card->getName(), startZone, oldX, targetZone, newX};
 	if (currentContext == MessageContext_MoveCard)
 		moveCardQueue.append(attributes);
+	else if (currentContext == MessageContext_Mulligan)
+		mulliganPlayer = player;
 	else
 		doMoveCard(attributes);
+}
+
+void MessageLogWidget::logMulligan(Player *player, int number)
+{
+	if (number > -1)
+		append(tr("%1 takes a mulligan to %n.", "", number).arg(sanitizeHtml(player->getName())));
+	else
+		append(tr("%1 draws his initial hand.").arg(sanitizeHtml(player->getName())));
 }
 
 void MessageLogWidget::logFlipCard(Player *player, QString cardName, bool faceDown)
@@ -451,6 +466,10 @@ void MessageLogWidget::containerProcessingStarted(GameEventContext *_context)
 {
 	if (qobject_cast<Context_MoveCard *>(_context))
 		currentContext = MessageContext_MoveCard;
+	else if (qobject_cast<Context_Mulligan *>(_context)) {
+		currentContext = MessageContext_Mulligan;
+		mulliganNumber = static_cast<Context_Mulligan *>(_context)->getNumber();
+	}
 }
 
 void MessageLogWidget::containerProcessingDone()
@@ -461,6 +480,9 @@ void MessageLogWidget::containerProcessingDone()
 		moveCardQueue.clear();
 		moveCardPT.clear();
 		moveCardTapped.clear();
+	} else if (currentContext == MessageContext_Mulligan) {
+		logMulligan(mulliganPlayer, mulliganNumber);
+		mulliganNumber = 0;
 	}
 	
 	currentContext = MessageContext_None;

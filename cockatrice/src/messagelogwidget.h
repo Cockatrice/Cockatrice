@@ -27,16 +27,20 @@ struct LogMoveCard {
 class MessageLogWidget : public QTextEdit {
 	Q_OBJECT
 private:
-	enum MessageContext { MessageContext_None, MessageContext_MoveCard };
+	enum MessageContext { MessageContext_None, MessageContext_MoveCard, MessageContext_Mulligan };
 	
 	CardInfoWidget *infoWidget;
 	QString sanitizeHtml(QString dirty) const;
 	QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position) const;
 	QString getCardNameUnderMouse(const QPoint &pos) const;
 	MessageContext currentContext;
+	
 	QList<LogMoveCard> moveCardQueue;
 	QMap<CardItem *, QString> moveCardPT;
 	QMap<CardItem *, bool> moveCardTapped;
+	
+	Player *mulliganPlayer;
+	int mulliganNumber;
 signals:
 	void cardNameHovered(QString cardName);
 	void showCardInfoPopup(QPoint pos, QString cardName);
@@ -68,6 +72,7 @@ public slots:
 	void logUndoDraw(Player *player, QString cardName);
 	void doMoveCard(LogMoveCard &attributes);
 	void logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
+	void logMulligan(Player *player, int number);
 	void logFlipCard(Player *player, QString cardName, bool faceDown);
 	void logDestroyCard(Player *player, QString cardName);
 	void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);

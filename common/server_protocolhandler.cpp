@@ -632,9 +632,16 @@ ResponseCode Server_ProtocolHandler::cmdMulligan(Command_Mulligan * /*cmd*/, Com
 
 	deck->shuffle();
 	cont->enqueueGameEventPrivate(new Event_Shuffle(player->getPlayerId()), game->getGameId());
+	cont->enqueueGameEventOmniscient(new Event_Shuffle(player->getPlayerId()), game->getGameId());
 	cont->enqueueGameEventPublic(new Event_Shuffle(player->getPlayerId()), game->getGameId());
 
 	player->drawCards(cont, number);
+	
+	if (number == player->getInitialCards())
+		number = -1;
+	cont->getGameEventQueuePrivate()->setContext(new Context_Mulligan(number));
+	cont->getGameEventQueuePublic()->setContext(new Context_Mulligan(number));
+	cont->getGameEventQueueOmniscient()->setContext(new Context_Mulligan(number));
 
 	return RespOk;
 }

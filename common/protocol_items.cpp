@@ -458,6 +458,11 @@ Context_MoveCard::Context_MoveCard()
 	: GameEventContext("move_card")
 {
 }
+Context_Mulligan::Context_Mulligan(int _number)
+	: GameEventContext("mulligan")
+{
+	insertItem(new SerializableItem_Int("number", _number));
+}
 Command_UpdateServerMessage::Command_UpdateServerMessage()
 	: AdminCommand("update_server_message")
 {
@@ -547,6 +552,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_event_contextdeck_select", Context_DeckSelect::newItem);
 	itemNameHash.insert("game_event_contextundo_draw", Context_UndoDraw::newItem);
 	itemNameHash.insert("game_event_contextmove_card", Context_MoveCard::newItem);
+	itemNameHash.insert("game_event_contextmulligan", Context_Mulligan::newItem);
 	itemNameHash.insert("cmdupdate_server_message", Command_UpdateServerMessage::newItem);
 	itemNameHash.insert("cmdban_from_server", Command_BanFromServer::newItem);
 }

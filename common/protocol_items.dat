@@ -75,5 +75,6 @@
 6:deck_select:i,deck_id
 6:undo_draw
 6:move_card
+6:mulligan:i,number
 7:update_server_message
 7:ban_from_server:s,user_name:i,minutes

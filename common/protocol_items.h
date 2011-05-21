@@ -691,6 +691,14 @@ public:
 	static SerializableItem *newItem() { return new Context_MoveCard; }
 	int getItemId() const { return ItemId_Context_MoveCard; }
 };
+class Context_Mulligan : public GameEventContext {
+	Q_OBJECT
+public:
+	Context_Mulligan(int _number = -1);
+	int getNumber() const { return static_cast<SerializableItem_Int *>(itemMap.value("number"))->getData(); };
+	static SerializableItem *newItem() { return new Context_Mulligan; }
+	int getItemId() const { return ItemId_Context_Mulligan; }
+};
 class Command_UpdateServerMessage : public AdminCommand {
 	Q_OBJECT
 public:

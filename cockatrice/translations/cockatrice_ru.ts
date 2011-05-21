@@ -894,54 +894,54 @@
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="569"/>
-        <location filename="../src/dlg_settings.cpp" line="574"/>
-        <location filename="../src/dlg_settings.cpp" line="579"/>
+        <location filename="../src/dlg_settings.cpp" line="612"/>
+        <location filename="../src/dlg_settings.cpp" line="617"/>
+        <location filename="../src/dlg_settings.cpp" line="622"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="569"/>
+        <location filename="../src/dlg_settings.cpp" line="612"/>
         <source>Your card database is invalid. Would you like to go back and set the correct path?</source>
         <translation>База карт не найдена. Вернуться и задать правильный путь?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="574"/>
+        <location filename="../src/dlg_settings.cpp" line="617"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>Ваши колоды отсутствуют в указанной папке. Вернуться и задать правильный путь?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="579"/>
+        <location filename="../src/dlg_settings.cpp" line="622"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>Изображения карт не найдены. Вернуться и задать правильный путь?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="588"/>
+        <location filename="../src/dlg_settings.cpp" line="631"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="590"/>
+        <location filename="../src/dlg_settings.cpp" line="633"/>
         <source>General</source>
         <translation>Основные</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="591"/>
+        <location filename="../src/dlg_settings.cpp" line="634"/>
         <source>Appearance</source>
         <translation>Внешний вид</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="592"/>
+        <location filename="../src/dlg_settings.cpp" line="635"/>
         <source>User interface</source>
         <translation>Интерфейс</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="593"/>
+        <location filename="../src/dlg_settings.cpp" line="636"/>
         <source>Messages</source>
         <translation>Сообщения</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="595"/>
+        <location filename="../src/dlg_settings.cpp" line="638"/>
         <source>&amp;Close</source>
         <translation>&amp;Закрыть</translation>
     </message>
@@ -1382,102 +1382,102 @@ Local version is %1, remote version is %2.</source>
 <context>
     <name>MessageLogWidget</name>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="20"/>
+        <location filename="../src/messagelogwidget.cpp" line="21"/>
         <source>Connecting to %1...</source>
         <translation>Подключение к %1...</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="25"/>
+        <location filename="../src/messagelogwidget.cpp" line="26"/>
         <source>Connected.</source>
         <translation>Подключено.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="30"/>
+        <location filename="../src/messagelogwidget.cpp" line="31"/>
         <source>Disconnected from server.</source>
         <translation>Нет соединения с сервером.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="41"/>
+        <location filename="../src/messagelogwidget.cpp" line="42"/>
         <source>Invalid password.</source>
         <translation>Неверный пароль.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="48"/>
+        <location filename="../src/messagelogwidget.cpp" line="49"/>
         <source>Protocol version mismatch. Client: %1, Server: %2</source>
         <translation>Несовпадение версий. Клиент: %1, Сервер: %2</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="53"/>
+        <location filename="../src/messagelogwidget.cpp" line="54"/>
         <source>Protocol error.</source>
         <translation>Ошибка протокола.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="58"/>
+        <location filename="../src/messagelogwidget.cpp" line="59"/>
         <source>You have joined game #%1.</source>
         <translation>Вы присоединились к игре #%1.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="63"/>
+        <location filename="../src/messagelogwidget.cpp" line="65"/>
         <source>%1 has joined the game.</source>
         <translation>%1 присоединился к игре.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="68"/>
+        <location filename="../src/messagelogwidget.cpp" line="70"/>
         <source>%1 has left the game.</source>
         <translation>%1 покиул игру.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="73"/>
+        <location filename="../src/messagelogwidget.cpp" line="75"/>
         <source>The game has been closed.</source>
         <translation>Игра закрыта.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="78"/>
+        <location filename="../src/messagelogwidget.cpp" line="80"/>
         <source>%1 is now watching the game.</source>
         <translation>%1 вошел как зритель.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="83"/>
+        <location filename="../src/messagelogwidget.cpp" line="85"/>
         <source>%1 is not watching the game any more.</source>
         <translation>%1 покинул зрительскую ложу.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="89"/>
+        <location filename="../src/messagelogwidget.cpp" line="91"/>
         <source>%1 has loaded a local deck.</source>
         <translation>%1 загрузил колоду с диска.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="91"/>
+        <location filename="../src/messagelogwidget.cpp" line="93"/>
         <source>%1 has loaded deck #%2.</source>
         <translation>%1 загрузил колоду #%2.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="96"/>
+        <location filename="../src/messagelogwidget.cpp" line="98"/>
         <source>%1 is ready to start the game.</source>
         <translation>%1 готов начать игру.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="101"/>
+        <location filename="../src/messagelogwidget.cpp" line="103"/>
         <source>%1 is not ready to start the game any more.</source>
         <translation>%1 все еще не готов.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="106"/>
+        <location filename="../src/messagelogwidget.cpp" line="108"/>
         <source>%1 has conceded the game.</source>
         <translation>%1 решил сдаться.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="111"/>
+        <location filename="../src/messagelogwidget.cpp" line="113"/>
         <source>The game has started.</source>
         <translation>Игра началась.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="126"/>
+        <location filename="../src/messagelogwidget.cpp" line="130"/>
         <source>%1 shuffles his library.</source>
         <translation>%1 размешивает библиотеку.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="131"/>
+        <location filename="../src/messagelogwidget.cpp" line="135"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
         <translation>%1 выкинул %2 / %3.</translation>
     </message>
@@ -1490,168 +1490,168 @@ Local version is %1, remote version is %2.</source>
         <translation type="obsolete">%1 взял %2 карт.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="142"/>
+        <location filename="../src/messagelogwidget.cpp" line="151"/>
         <source>%1 undoes his last draw.</source>
         <translation>%1 отменил последнее взятие.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="144"/>
+        <location filename="../src/messagelogwidget.cpp" line="153"/>
         <source>%1 undoes his last draw (%2).</source>
         <translation>%1 отменил %2 последних взятий.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="154"/>
+        <location filename="../src/messagelogwidget.cpp" line="163"/>
         <source> from table</source>
         <translation> с поля битвы</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="156"/>
+        <location filename="../src/messagelogwidget.cpp" line="165"/>
         <source> from graveyard</source>
         <translation> из кладбища</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="158"/>
+        <location filename="../src/messagelogwidget.cpp" line="167"/>
         <source> from exile</source>
         <translation> из изгнания</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="160"/>
+        <location filename="../src/messagelogwidget.cpp" line="169"/>
         <source> from hand</source>
         <translation> из руки</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="164"/>
+        <location filename="../src/messagelogwidget.cpp" line="173"/>
         <source>the bottom card of his library</source>
         <translation>нижнюю карту своей библиотеки</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="167"/>
+        <location filename="../src/messagelogwidget.cpp" line="176"/>
         <source> from the bottom of his library</source>
         <translation> со дна своей библиотеки</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="170"/>
+        <location filename="../src/messagelogwidget.cpp" line="179"/>
         <source>the top card of his library</source>
         <translation>верхнюю карту своей библиотеки</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="173"/>
+        <location filename="../src/messagelogwidget.cpp" line="182"/>
         <source> from the top of his library</source>
         <translation> с верха своей библиотеки</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="175"/>
+        <location filename="../src/messagelogwidget.cpp" line="184"/>
         <source> from library</source>
         <translation> из библиотеки</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="177"/>
+        <location filename="../src/messagelogwidget.cpp" line="186"/>
         <source> from sideboard</source>
         <translation> из сайда</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="179"/>
+        <location filename="../src/messagelogwidget.cpp" line="188"/>
         <source> from the stack</source>
         <translation> из стека</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="204"/>
-        <location filename="../src/messagelogwidget.cpp" line="388"/>
+        <location filename="../src/messagelogwidget.cpp" line="213"/>
+        <location filename="../src/messagelogwidget.cpp" line="415"/>
         <source>a card</source>
         <translation>карту</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="209"/>
+        <location filename="../src/messagelogwidget.cpp" line="218"/>
         <source>%1 gives %2 control over %3.</source>
         <translation>%1 передает %2 контроль над %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="218"/>
+        <location filename="../src/messagelogwidget.cpp" line="228"/>
         <source>%1 puts %2 into play%3.</source>
         <translation>%1 поместил %2 на поле битвы %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="220"/>
+        <location filename="../src/messagelogwidget.cpp" line="230"/>
         <source>%1 puts %2%3 into graveyard.</source>
         <translation>%1 поместил %2%3 на кладбище.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="222"/>
+        <location filename="../src/messagelogwidget.cpp" line="232"/>
         <source>%1 exiles %2%3.</source>
         <translation>%1 изгоняет %2%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="224"/>
+        <location filename="../src/messagelogwidget.cpp" line="234"/>
         <source>%1 moves %2%3 to hand.</source>
         <translation>%1 поместил %2%3 в руку.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="227"/>
+        <location filename="../src/messagelogwidget.cpp" line="237"/>
         <source>%1 puts %2%3 into his library.</source>
         <translation>%1 поместил %2%3 в свою библиотеку.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="229"/>
+        <location filename="../src/messagelogwidget.cpp" line="239"/>
         <source>%1 puts %2%3 on bottom of his library.</source>
         <translation>%1 поместил %2%3 на дно своей библиотеки.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="231"/>
+        <location filename="../src/messagelogwidget.cpp" line="241"/>
         <source>%1 puts %2%3 on top of his library.</source>
         <translation>%1 поместил %2%3 на верх своей библиотеки.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="233"/>
+        <location filename="../src/messagelogwidget.cpp" line="243"/>
         <source>%1 puts %2%3 into his library at position %4.</source>
         <translation>%1 поместил %2%3 в свою библиотеку %4 сверху.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="235"/>
+        <location filename="../src/messagelogwidget.cpp" line="245"/>
         <source>%1 moves %2%3 to sideboard.</source>
         <translation>%1 поместил %2%3 в сайд.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="237"/>
+        <location filename="../src/messagelogwidget.cpp" line="248"/>
         <source>%1 plays %2%3.</source>
         <translation>%1 разыгрывает %2%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="254"/>
+        <location filename="../src/messagelogwidget.cpp" line="276"/>
         <source>%1 flips %2 face-down.</source>
         <translation>%1 перевернул %2 лицом вниз.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="256"/>
+        <location filename="../src/messagelogwidget.cpp" line="278"/>
         <source>%1 flips %2 face-up.</source>
         <translation>%1 перевернул %2 лицом вверх.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="261"/>
+        <location filename="../src/messagelogwidget.cpp" line="283"/>
         <source>%1 destroys %2.</source>
         <translation>%1 уничтожил %2.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="266"/>
+        <location filename="../src/messagelogwidget.cpp" line="288"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <translation>%1 присоединил %2 к %4 игрока %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="271"/>
+        <location filename="../src/messagelogwidget.cpp" line="293"/>
         <source>%1 unattaches %2.</source>
         <translation>%1 отсоединил %2.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="276"/>
+        <location filename="../src/messagelogwidget.cpp" line="298"/>
         <source>%1 creates token: %2%3.</source>
         <translation>%1 создал фишку: %2%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="282"/>
+        <location filename="../src/messagelogwidget.cpp" line="304"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <translation>%1 указывает с %3 контролируемого %2 на %4.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="289"/>
+        <location filename="../src/messagelogwidget.cpp" line="311"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <translation>%1 указывает с %3 контролируемого %2 на %5 контролируемого %4.</translation>
     </message>
@@ -1672,7 +1672,7 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="136"/>
+        <location filename="../src/messagelogwidget.cpp" line="144"/>
         <source>%1 draws %n card(s).</source>
         <translation>
             <numerusform>%1 взял %n карту.</numerusform>
@@ -1681,12 +1681,26 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="216"/>
+        <location filename="../src/messagelogwidget.cpp" line="226"/>
         <source>%1 puts %2 into play tapped%3.</source>
         <translation>%1 положил %2 повернутым на поле битвы%3.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="304"/>
+        <location filename="../src/messagelogwidget.cpp" line="268"/>
+        <source>%1 takes a mulligan to %n.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="270"/>
+        <source>%1 draws his initial hand.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="326"/>
         <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
         <translation>
             <numerusform>%1 поместил %n %2 жетон на %3 (теперь %4).</numerusform>
@@ -1695,7 +1709,7 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="306"/>
+        <location filename="../src/messagelogwidget.cpp" line="328"/>
         <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
         <translation>
             <numerusform>%1 снял %n %2 жетон с %3 (теперь %4).</numerusform>
@@ -1704,7 +1718,7 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="309"/>
+        <location filename="../src/messagelogwidget.cpp" line="331"/>
         <source>red</source>
         <translation>
             <numerusform>красный</numerusform>
@@ -1713,7 +1727,7 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="310"/>
+        <location filename="../src/messagelogwidget.cpp" line="332"/>
         <source>yellow</source>
         <translation>
             <numerusform>желтый</numerusform>
@@ -1722,7 +1736,7 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="311"/>
+        <location filename="../src/messagelogwidget.cpp" line="333"/>
         <source>green</source>
         <translation>
             <numerusform>зеленый</numerusform>
@@ -1731,157 +1745,157 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="325"/>
+        <location filename="../src/messagelogwidget.cpp" line="352"/>
         <source>his permanents</source>
         <translation>свои перманенты</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="328"/>
+        <location filename="../src/messagelogwidget.cpp" line="355"/>
         <source>%1 %2 %3.</source>
         <translation>%1 %2 %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="328"/>
+        <location filename="../src/messagelogwidget.cpp" line="355"/>
         <source>taps</source>
         <translation>повернул</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="328"/>
+        <location filename="../src/messagelogwidget.cpp" line="355"/>
         <source>untaps</source>
         <translation>развернул</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="334"/>
+        <location filename="../src/messagelogwidget.cpp" line="361"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
         <translation>%1 установил жетон %2 на %3 (%4%5).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="341"/>
+        <location filename="../src/messagelogwidget.cpp" line="368"/>
         <source>%1 sets %2 to not untap normally.</source>
         <translation>%2 теперь не разворачивается как обычно (%1).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="343"/>
+        <location filename="../src/messagelogwidget.cpp" line="370"/>
         <source>%1 sets %2 to untap normally.</source>
         <translation>%2 теперь разворачивается как обычно (%1).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="352"/>
+        <location filename="../src/messagelogwidget.cpp" line="379"/>
         <source>%1 sets PT of %2 to %3.</source>
         <translation>%1 установил Силу/Защиту %2 %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="357"/>
+        <location filename="../src/messagelogwidget.cpp" line="384"/>
         <source>%1 sets annotation of %2 to %3.</source>
         <translation>%1 сделал пометку на %2 &quot;%3&quot;.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="363"/>
+        <location filename="../src/messagelogwidget.cpp" line="390"/>
         <source>%1 is looking at the top %2 cards %3.</source>
         <translation>%1 смотрит верхние %2 карт библиотеки %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="365"/>
+        <location filename="../src/messagelogwidget.cpp" line="392"/>
         <source>%1 is looking at %2.</source>
         <translation>%1 просматривает %2.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="371"/>
+        <location filename="../src/messagelogwidget.cpp" line="398"/>
         <source>%1 stops looking at %2.</source>
         <translation>%1 закончил просматривать %2.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="394"/>
+        <location filename="../src/messagelogwidget.cpp" line="421"/>
         <source>%1 reveals %2 to %3.</source>
         <translation>%1 показывает его %2 %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="396"/>
+        <location filename="../src/messagelogwidget.cpp" line="423"/>
         <source>%1 reveals %2.</source>
         <translation>%1 открыл его %2.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="399"/>
+        <location filename="../src/messagelogwidget.cpp" line="426"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <translation>%1 показывает случайно выбранную%3 карту (%2) %4.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="401"/>
+        <location filename="../src/messagelogwidget.cpp" line="428"/>
         <source>%1 randomly reveals %2%3.</source>
         <translation>%1 открывает случайно выбранную%3 карту (%2).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="404"/>
+        <location filename="../src/messagelogwidget.cpp" line="431"/>
         <source>%1 reveals %2%3 to %4.</source>
         <translation>%1 показывает%2%3 %4.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="406"/>
+        <location filename="../src/messagelogwidget.cpp" line="433"/>
         <source>%1 reveals %2%3.</source>
         <translation>%1 открывает%2%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="413"/>
+        <location filename="../src/messagelogwidget.cpp" line="441"/>
         <source>It is now %1&apos;s turn.</source>
         <translation>Ход игрока %1.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="421"/>
+        <location filename="../src/messagelogwidget.cpp" line="450"/>
         <source>untap step</source>
         <translation>шаг разворота</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="422"/>
+        <location filename="../src/messagelogwidget.cpp" line="451"/>
         <source>upkeep step</source>
         <translation>шаг поддержки</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="423"/>
+        <location filename="../src/messagelogwidget.cpp" line="452"/>
         <source>draw step</source>
         <translation>шаг взятия карты</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="424"/>
+        <location filename="../src/messagelogwidget.cpp" line="453"/>
         <source>first main phase</source>
         <translation>первая главная фаза</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="425"/>
+        <location filename="../src/messagelogwidget.cpp" line="454"/>
         <source>beginning of combat step</source>
         <translation>шаг начала битвы</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="426"/>
+        <location filename="../src/messagelogwidget.cpp" line="455"/>
         <source>declare attackers step</source>
         <translation>шаг назначения атакующих</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="427"/>
+        <location filename="../src/messagelogwidget.cpp" line="456"/>
         <source>declare blockers step</source>
         <translation>шаг назначения блокирующих</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="428"/>
+        <location filename="../src/messagelogwidget.cpp" line="457"/>
         <source>combat damage step</source>
         <translation>шаг нанесения повреждений</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="429"/>
+        <location filename="../src/messagelogwidget.cpp" line="458"/>
         <source>end of combat step</source>
         <translation>шаг завершения битвы</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="430"/>
+        <location filename="../src/messagelogwidget.cpp" line="459"/>
         <source>second main phase</source>
         <translation>вторая главная фаза</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="431"/>
+        <location filename="../src/messagelogwidget.cpp" line="460"/>
         <source>ending phase</source>
         <translation>заключительный шаг</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="433"/>
+        <location filename="../src/messagelogwidget.cpp" line="462"/>
         <source>It is now the %1.</source>
         <translation>Сейчас %1.</translation>
     </message>
@@ -1889,22 +1903,22 @@ Local version is %1, remote version is %2.</source>
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="455"/>
+        <location filename="../src/dlg_settings.cpp" line="498"/>
         <source>Add message</source>
         <translation>Добавить сообщение</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="455"/>
+        <location filename="../src/dlg_settings.cpp" line="498"/>
         <source>Message:</source>
         <translation>Сообщение:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="472"/>
+        <location filename="../src/dlg_settings.cpp" line="515"/>
         <source>&amp;Add</source>
         <translation>&amp;Добавить</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="473"/>
+        <location filename="../src/dlg_settings.cpp" line="516"/>
         <source>&amp;Remove</source>
         <translation>&amp;Удалить</translation>
     </message>
@@ -2240,7 +2254,7 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/player.cpp" line="595"/>
         <location filename="../src/player.cpp" line="607"/>
         <location filename="../src/player.cpp" line="623"/>
-        <location filename="../src/player.cpp" line="1487"/>
+        <location filename="../src/player.cpp" line="1486"/>
         <source>Number:</source>
         <translation>Количество:</translation>
     </message>
@@ -2265,27 +2279,27 @@ Local version is %1, remote version is %2.</source>
         <translation>Количество граней:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1407"/>
+        <location filename="../src/player.cpp" line="1406"/>
         <source>Set power/toughness</source>
         <translation>Установить Силу/Защиту</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1407"/>
+        <location filename="../src/player.cpp" line="1406"/>
         <source>Please enter the new PT:</source>
         <translation>Введите новые Силу/Защиту:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1433"/>
+        <location filename="../src/player.cpp" line="1432"/>
         <source>Set annotation</source>
         <translation>Пометка</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1433"/>
+        <location filename="../src/player.cpp" line="1432"/>
         <source>Please enter the new annotation:</source>
         <translation>Введите текст:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1487"/>
+        <location filename="../src/player.cpp" line="1486"/>
         <source>Set counters</source>
         <translation>Установить жетоны</translation>
     </message>
@@ -2809,24 +2823,39 @@ Please enter a name:</source>
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="409"/>
+        <location filename="../src/dlg_settings.cpp" line="434"/>
         <source>General interface settings</source>
         <translation>Основные настройки интерфейса</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="410"/>
+        <location filename="../src/dlg_settings.cpp" line="435"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation>&amp;Двойной клик чтобы разыграть карту (вместо одинарного)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="411"/>
+        <location filename="../src/dlg_settings.cpp" line="436"/>
         <source>Animation settings</source>
         <translation>Настройки анимации</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="412"/>
+        <location filename="../src/dlg_settings.cpp" line="437"/>
         <source>&amp;Tap/untap animation</source>
         <translation>&amp;Анимировать поворот/разворот карты</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="438"/>
+        <source>Enable &amp;sounds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="439"/>
+        <source>Path to sounds directory:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="450"/>
+        <source>Choose path</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
