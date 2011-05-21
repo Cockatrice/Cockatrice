@@ -26,11 +26,21 @@
 #include "serversocketinterface.h"
 #include "serversocketthread.h"
 #include "protocol.h"
+#include "server_logger.h"
+#include "main.h"
 
 void Servatrice_TcpServer::incomingConnection(int socketDescriptor)
 {
-	ServerSocketThread *sst = new ServerSocketThread(socketDescriptor, server, this);
-	sst->start();
+	if (threaded) {
+		ServerSocketThread *sst = new ServerSocketThread(socketDescriptor, server, this);
+		sst->start();
+	} else {
+		QTcpSocket *socket = new QTcpSocket;
+		socket->setSocketDescriptor(socketDescriptor);
+		logger->logMessage(QString("incoming connection: %1").arg(socket->peerAddress().toString()));
+		
+		new ServerSocketInterface(server, socket);
+	}
 }
 
 Servatrice::Servatrice(QSettings *_settings, QObject *parent)
@@ -55,7 +65,8 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 		statusUpdateClock->start(statusUpdateTime);
 	}
 	
-	tcpServer = new Servatrice_TcpServer(this);
+	bool threaded = settings->value("server/threaded", false).toInt();
+	tcpServer = new Servatrice_TcpServer(this, threaded);
 	int port = settings->value("server/port", 4747).toInt();
 	qDebug() << "Starting server on port" << port;
 	if (tcpServer->listen(QHostAddress::Any, port))

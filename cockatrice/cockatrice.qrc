@@ -97,13 +97,6 @@
 	<file>resources/counters/general.svg</file>
 	<file>resources/counters/general_highlight.svg</file>
 
-	<file>resources/sounds/draw.raw</file>
-	<file>resources/sounds/notification.raw</file>
-	<file>resources/sounds/playcard.raw</file>
-	<file>resources/sounds/shuffle.raw</file>
-	<file>resources/sounds/tap.raw</file>
-	<file>resources/sounds/untap.raw</file>
-
 	<file>resources/userlevels/normal.svg</file>
 	<file>resources/userlevels/registered.svg</file>
 	<file>resources/userlevels/judge.svg</file>

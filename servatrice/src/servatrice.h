@@ -36,9 +36,10 @@ class Servatrice_TcpServer : public QTcpServer {
 	Q_OBJECT
 private:
 	Servatrice *server;
+	bool threaded;
 public:
-	Servatrice_TcpServer(Servatrice *_server, QObject *parent = 0)
-		: QTcpServer(parent), server(_server) { }
+	Servatrice_TcpServer(Servatrice *_server, bool _threaded, QObject *parent = 0)
+		: QTcpServer(parent), server(_server), threaded(_threaded) { }
 protected:
 	void incomingConnection(int socketDescriptor);
 };
