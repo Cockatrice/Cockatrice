@@ -157,22 +157,22 @@
 <context>
     <name>CardInfoWidget</name>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="142"/>
+        <location filename="../src/cardinfowidget.cpp" line="107"/>
         <source>Name:</source>
         <translation>カード名:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="143"/>
+        <location filename="../src/cardinfowidget.cpp" line="108"/>
         <source>Mana cost:</source>
         <translation>マナコスト:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="144"/>
+        <location filename="../src/cardinfowidget.cpp" line="109"/>
         <source>Card type:</source>
         <translation>カードタイプ:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="145"/>
+        <location filename="../src/cardinfowidget.cpp" line="110"/>
         <source>P / T:</source>
         <translation></translation>
     </message>
@@ -617,22 +617,22 @@
 <context>
     <name>DeckViewContainer</name>
     <message>
-        <location filename="../src/tab_game.cpp" line="84"/>
+        <location filename="../src/tab_game.cpp" line="85"/>
         <source>Load &amp;local deck</source>
         <translation>ローカルからデッキをロード</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="85"/>
+        <location filename="../src/tab_game.cpp" line="86"/>
         <source>Load d&amp;eck from server</source>
         <translation>サーバーからデッキをロード</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="86"/>
+        <location filename="../src/tab_game.cpp" line="87"/>
         <source>Ready to s&amp;tart</source>
         <translation>開始準備完了</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="98"/>
+        <location filename="../src/tab_game.cpp" line="99"/>
         <source>Load deck</source>
         <translation>デッキをロード</translation>
     </message>
@@ -993,78 +993,78 @@
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/tab_room.cpp" line="117"/>
+        <location filename="../src/tab_room.cpp" line="118"/>
         <source>C&amp;reate</source>
         <translation>部屋を作る</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="118"/>
+        <location filename="../src/tab_room.cpp" line="119"/>
         <source>&amp;Join</source>
         <translation>参加する</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="77"/>
         <location filename="../src/tab_room.cpp" line="78"/>
         <location filename="../src/tab_room.cpp" line="79"/>
         <location filename="../src/tab_room.cpp" line="80"/>
         <location filename="../src/tab_room.cpp" line="81"/>
         <location filename="../src/tab_room.cpp" line="82"/>
         <location filename="../src/tab_room.cpp" line="83"/>
+        <location filename="../src/tab_room.cpp" line="84"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="77"/>
+        <location filename="../src/tab_room.cpp" line="78"/>
         <source>Wrong password.</source>
         <translation>パスワードが間違っています.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="78"/>
+        <location filename="../src/tab_room.cpp" line="79"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>この試合は観戦者は許可されていません.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="79"/>
+        <location filename="../src/tab_room.cpp" line="80"/>
         <source>The game is already full.</source>
         <translation>このゲームはすでに満員です.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="80"/>
+        <location filename="../src/tab_room.cpp" line="81"/>
         <source>The game does not exist any more.</source>
         <translation>このゲームはもう存在しません.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="81"/>
+        <location filename="../src/tab_room.cpp" line="82"/>
         <source>This game is only open to registered users.</source>
         <translation>このゲームは登録済みプレイヤーにのみ公開されています.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="82"/>
+        <location filename="../src/tab_room.cpp" line="83"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
         <translation>このゲームは作成者のフレンドのみに公開されています.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="83"/>
+        <location filename="../src/tab_room.cpp" line="84"/>
         <source>You are being ignored by the creator of this game.</source>
         <translation>あなたはこのゲームの作成者によって拒否されています.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="99"/>
+        <location filename="../src/tab_room.cpp" line="100"/>
         <source>Join game</source>
         <translation>参加</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="99"/>
+        <location filename="../src/tab_room.cpp" line="100"/>
         <source>Password:</source>
         <translation>パスワード:</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="115"/>
+        <location filename="../src/tab_room.cpp" line="116"/>
         <source>Games</source>
         <translation>ゲーム</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="116"/>
+        <location filename="../src/tab_room.cpp" line="117"/>
         <source>Show &amp;full games</source>
         <translation>全てのゲームを見る</translation>
     </message>
@@ -1073,7 +1073,7 @@
         <translation type="obsolete">全てのゲームを見る</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="119"/>
+        <location filename="../src/tab_room.cpp" line="120"/>
         <source>J&amp;oin as spectator</source>
         <translation>観戦者として参加</translation>
     </message>
@@ -1995,322 +1995,322 @@ Local version is %1, remote version is %2.</source>
 <context>
     <name>Player</name>
     <message>
-        <location filename="../src/player.cpp" line="411"/>
-        <location filename="../src/player.cpp" line="415"/>
-        <location filename="../src/player.cpp" line="419"/>
+        <location filename="../src/player.cpp" line="432"/>
+        <location filename="../src/player.cpp" line="436"/>
+        <location filename="../src/player.cpp" line="440"/>
         <source>Move to &amp;top of library</source>
         <translation>ライブラリーの一番上へ移動</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="412"/>
-        <location filename="../src/player.cpp" line="416"/>
-        <location filename="../src/player.cpp" line="420"/>
+        <location filename="../src/player.cpp" line="433"/>
+        <location filename="../src/player.cpp" line="437"/>
+        <location filename="../src/player.cpp" line="441"/>
         <source>Move to &amp;bottom of library</source>
         <translation>ライブラリーの一番下へ移動</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="413"/>
-        <location filename="../src/player.cpp" line="422"/>
+        <location filename="../src/player.cpp" line="434"/>
+        <location filename="../src/player.cpp" line="443"/>
         <source>Move to &amp;graveyard</source>
         <translation>墓地へ移動</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="423"/>
+        <location filename="../src/player.cpp" line="444"/>
         <source>&amp;View library</source>
         <translation>ライブラリーを見る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="425"/>
+        <location filename="../src/player.cpp" line="446"/>
         <source>Reveal &amp;library to</source>
         <translation>ライブラリーを公開する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="426"/>
+        <location filename="../src/player.cpp" line="447"/>
         <source>Reveal t&amp;op card to</source>
         <translation>一番上のカードを公開する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="433"/>
+        <location filename="../src/player.cpp" line="454"/>
         <source>Move top cards to &amp;graveyard...</source>
         <translation>カードを上から墓地へ置く...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="470"/>
+        <location filename="../src/player.cpp" line="491"/>
         <source>F3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="424"/>
+        <location filename="../src/player.cpp" line="445"/>
         <source>View &amp;top cards of library...</source>
         <translation>ライブラリーのカードを上からX枚見る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="404"/>
+        <location filename="../src/player.cpp" line="425"/>
         <source>&amp;View graveyard</source>
         <translation>墓地を見る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="472"/>
+        <location filename="../src/player.cpp" line="493"/>
         <source>F4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="427"/>
+        <location filename="../src/player.cpp" line="448"/>
         <source>&amp;View sideboard</source>
         <translation>サイドボードを見る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="406"/>
+        <location filename="../src/player.cpp" line="427"/>
         <source>Player &quot;%1&quot;</source>
         <translation>プレイヤー &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="437"/>
+        <location filename="../src/player.cpp" line="458"/>
         <source>&amp;Hand</source>
         <translation>手札</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="441"/>
+        <location filename="../src/player.cpp" line="462"/>
         <source>&amp;Library</source>
         <translation>ライブラリー</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="407"/>
+        <location filename="../src/player.cpp" line="428"/>
         <source>&amp;Graveyard</source>
         <translation>墓地</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="440"/>
+        <location filename="../src/player.cpp" line="461"/>
         <source>&amp;Sideboard</source>
         <translation>サイドボード</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="535"/>
+        <location filename="../src/player.cpp" line="556"/>
         <source>View top cards of library</source>
         <translation>ライブラリーのカードを上からX枚見る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="535"/>
+        <location filename="../src/player.cpp" line="556"/>
         <source>Number of cards:</source>
         <translation>カードの枚数:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="428"/>
+        <location filename="../src/player.cpp" line="449"/>
         <source>&amp;Draw card</source>
         <translation>カードを引く</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="405"/>
+        <location filename="../src/player.cpp" line="426"/>
         <source>&amp;View exile</source>
         <translation>追放領域を見る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="408"/>
+        <location filename="../src/player.cpp" line="429"/>
         <source>&amp;Exile</source>
         <translation>追放領域</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="417"/>
-        <location filename="../src/player.cpp" line="421"/>
+        <location filename="../src/player.cpp" line="438"/>
+        <location filename="../src/player.cpp" line="442"/>
         <source>Move to &amp;hand</source>
         <translation>手札に移動する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="414"/>
-        <location filename="../src/player.cpp" line="418"/>
+        <location filename="../src/player.cpp" line="435"/>
+        <location filename="../src/player.cpp" line="439"/>
         <source>Move to &amp;exile</source>
         <translation>追放領域へ移動する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="471"/>
+        <location filename="../src/player.cpp" line="492"/>
         <source>Ctrl+W</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="473"/>
+        <location filename="../src/player.cpp" line="494"/>
         <source>Ctrl+D</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="429"/>
+        <location filename="../src/player.cpp" line="450"/>
         <source>D&amp;raw cards...</source>
         <translation>カードをX枚引く</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="474"/>
+        <location filename="../src/player.cpp" line="495"/>
         <source>Ctrl+E</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="431"/>
+        <location filename="../src/player.cpp" line="452"/>
         <source>Take &amp;mulligan</source>
         <translation>マリガンする</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="476"/>
+        <location filename="../src/player.cpp" line="497"/>
         <source>Ctrl+M</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="432"/>
+        <location filename="../src/player.cpp" line="453"/>
         <source>&amp;Shuffle</source>
         <translation>シャッフル</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="477"/>
+        <location filename="../src/player.cpp" line="498"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="442"/>
+        <location filename="../src/player.cpp" line="463"/>
         <source>&amp;Counters</source>
         <translation>カウンター</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="444"/>
+        <location filename="../src/player.cpp" line="465"/>
         <source>&amp;Untap all permanents</source>
         <translation>全てのパーマネントをアンタップする</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="478"/>
+        <location filename="../src/player.cpp" line="499"/>
         <source>Ctrl+U</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="445"/>
+        <location filename="../src/player.cpp" line="466"/>
         <source>R&amp;oll die...</source>
         <translation>X面ダイスを振る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="479"/>
+        <location filename="../src/player.cpp" line="500"/>
         <source>Ctrl+I</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="446"/>
+        <location filename="../src/player.cpp" line="467"/>
         <source>&amp;Create token...</source>
         <translation>トークンを作成する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="480"/>
+        <location filename="../src/player.cpp" line="501"/>
         <source>Ctrl+T</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="447"/>
+        <location filename="../src/player.cpp" line="468"/>
         <source>C&amp;reate another token</source>
         <translation>同じトークンを作成する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="481"/>
+        <location filename="../src/player.cpp" line="502"/>
         <source>Ctrl+G</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="448"/>
+        <location filename="../src/player.cpp" line="469"/>
         <source>S&amp;ay</source>
         <translation>発言する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="430"/>
+        <location filename="../src/player.cpp" line="451"/>
         <source>&amp;Undo last draw</source>
         <translation>最後のドローを取り消す</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="434"/>
+        <location filename="../src/player.cpp" line="455"/>
         <source>Move top cards to &amp;exile...</source>
         <translation>ライブラリーの一番上からX枚追放する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="435"/>
+        <location filename="../src/player.cpp" line="456"/>
         <source>Put top card on &amp;bottom</source>
         <translation>一番上のカードを一番下に置く</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="438"/>
+        <location filename="../src/player.cpp" line="459"/>
         <source>&amp;Reveal to</source>
         <translation>公開する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="439"/>
+        <location filename="../src/player.cpp" line="460"/>
         <source>Reveal r&amp;andom card to</source>
         <translation>ランダムに公開する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="454"/>
+        <location filename="../src/player.cpp" line="475"/>
         <source>C&amp;ard</source>
         <translation>カード</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="457"/>
+        <location filename="../src/player.cpp" line="478"/>
         <source>&amp;All players</source>
         <translation>全てのプレイヤー</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="469"/>
+        <location filename="../src/player.cpp" line="490"/>
         <source>Ctrl+F3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="475"/>
+        <location filename="../src/player.cpp" line="496"/>
         <source>Ctrl+Shift+D</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="574"/>
+        <location filename="../src/player.cpp" line="595"/>
         <source>Draw cards</source>
         <translation>カードを引く</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="574"/>
-        <location filename="../src/player.cpp" line="586"/>
-        <location filename="../src/player.cpp" line="602"/>
-        <location filename="../src/player.cpp" line="1471"/>
+        <location filename="../src/player.cpp" line="595"/>
+        <location filename="../src/player.cpp" line="607"/>
+        <location filename="../src/player.cpp" line="623"/>
+        <location filename="../src/player.cpp" line="1487"/>
         <source>Number:</source>
         <translation>枚数</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="586"/>
+        <location filename="../src/player.cpp" line="607"/>
         <source>Move top cards to grave</source>
         <translation>ライブラリーのトップからX枚墓地へ置く</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="602"/>
+        <location filename="../src/player.cpp" line="623"/>
         <source>Move top cards to exile</source>
         <translation>ライブラリーのトップからX枚追放領域へ置く</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="629"/>
+        <location filename="../src/player.cpp" line="650"/>
         <source>Roll die</source>
         <translation>ダイスを振る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="629"/>
+        <location filename="../src/player.cpp" line="650"/>
         <source>Number of sides:</source>
         <translation>面の数:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1391"/>
+        <location filename="../src/player.cpp" line="1407"/>
         <source>Set power/toughness</source>
         <translation>パワーとタフネスを設定する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1391"/>
+        <location filename="../src/player.cpp" line="1407"/>
         <source>Please enter the new PT:</source>
         <translation>新しいP/Tを入力してください</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1417"/>
+        <location filename="../src/player.cpp" line="1433"/>
         <source>Set annotation</source>
         <translation>補足を付ける</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1417"/>
+        <location filename="../src/player.cpp" line="1433"/>
         <source>Please enter the new annotation:</source>
         <translation>新しい補足を付けてください</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1471"/>
+        <location filename="../src/player.cpp" line="1487"/>
         <source>Set counters</source>
         <translation>カウンターを設定する</translation>
     </message>
@@ -2601,132 +2601,137 @@ Please enter a name:</source>
 <context>
     <name>TabGame</name>
     <message>
-        <location filename="../src/tab_game.cpp" line="230"/>
+        <location filename="../src/tab_game.cpp" line="237"/>
         <source>F5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="231"/>
+        <location filename="../src/tab_game.cpp" line="238"/>
         <source>F6</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="232"/>
+        <location filename="../src/tab_game.cpp" line="239"/>
         <source>F7</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="233"/>
+        <location filename="../src/tab_game.cpp" line="240"/>
         <source>F8</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="234"/>
+        <location filename="../src/tab_game.cpp" line="241"/>
         <source>F9</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="235"/>
+        <location filename="../src/tab_game.cpp" line="242"/>
         <source>F10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="276"/>
+        <location filename="../src/tab_game.cpp" line="287"/>
         <source>&amp;Phases</source>
         <translation>フェイズ</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="278"/>
+        <location filename="../src/tab_game.cpp" line="289"/>
         <source>&amp;Game</source>
         <translation>ゲーム</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="279"/>
+        <location filename="../src/tab_game.cpp" line="290"/>
         <source>Next &amp;phase</source>
         <translation>次のフェイズ</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="280"/>
+        <location filename="../src/tab_game.cpp" line="291"/>
         <source>Ctrl+Space</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="281"/>
+        <location filename="../src/tab_game.cpp" line="292"/>
         <source>Next &amp;turn</source>
         <translation>次のターン</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="282"/>
+        <location filename="../src/tab_game.cpp" line="293"/>
         <source>Ctrl+Return</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="282"/>
+        <location filename="../src/tab_game.cpp" line="293"/>
         <source>Ctrl+Enter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="283"/>
+        <location filename="../src/tab_game.cpp" line="294"/>
         <source>&amp;Remove all local arrows</source>
         <translation>全ての矢印を消す</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="284"/>
+        <location filename="../src/tab_game.cpp" line="295"/>
         <source>Ctrl+R</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="285"/>
+        <location filename="../src/tab_game.cpp" line="296"/>
         <source>&amp;Concede</source>
         <translation>投了する</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="286"/>
+        <location filename="../src/tab_game.cpp" line="297"/>
         <source>F2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="287"/>
+        <location filename="../src/tab_game.cpp" line="298"/>
         <source>&amp;Leave game</source>
         <translation>ゲームを退出する</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="289"/>
+        <location filename="../src/tab_game.cpp" line="299"/>
+        <source>Ctrl+Q</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="301"/>
         <source>&amp;Say:</source>
         <translation>発言する</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="304"/>
+        <location filename="../src/tab_game.cpp" line="321"/>
         <source>Concede</source>
         <translation>投了する</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="304"/>
+        <location filename="../src/tab_game.cpp" line="321"/>
         <source>Are you sure you want to concede this game?</source>
         <translation>本当にこのゲームに投了しますか?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="312"/>
+        <location filename="../src/tab_game.cpp" line="330"/>
         <source>Leave game</source>
         <translation>ゲームから退出する</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="312"/>
+        <location filename="../src/tab_game.cpp" line="330"/>
         <source>Are you sure you want to leave this game?</source>
         <translation>本当にこのゲームから退出しますか?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="652"/>
+        <location filename="../src/tab_game.cpp" line="670"/>
         <source>Kicked</source>
         <translation>キック</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="652"/>
+        <location filename="../src/tab_game.cpp" line="670"/>
         <source>You have been kicked out of the game.</source>
         <translation>あなたはこのゲームからキックされました.</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.h" line="165"/>
+        <location filename="../src/tab_game.h" line="168"/>
         <source>Game %1: %2</source>
         <translation>ゲーム %1: %2</translation>
     </message>
@@ -2744,22 +2749,22 @@ Please enter a name:</source>
         <translation>退出する</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="57"/>
+        <location filename="../src/tab_message.cpp" line="62"/>
         <source>This user is ignoring you.</source>
         <translation>このユーザーはあなたを無視しています.</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="73"/>
+        <location filename="../src/tab_message.cpp" line="78"/>
         <source>%1 has left the server.</source>
         <translation>%1はサーバーから退出しました.</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="79"/>
+        <location filename="../src/tab_message.cpp" line="84"/>
         <source>%1 has joined the server.</source>
         <translation>%1がサーバーに参加しました.</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.h" line="34"/>
+        <location filename="../src/tab_message.h" line="35"/>
         <source>Talking to %1</source>
         <translation>%1と会話</translation>
     </message>
@@ -2767,27 +2772,27 @@ Please enter a name:</source>
 <context>
     <name>TabRoom</name>
     <message>
-        <location filename="../src/tab_room.cpp" line="189"/>
+        <location filename="../src/tab_room.cpp" line="190"/>
         <source>&amp;Say:</source>
         <translation>発言する</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="190"/>
+        <location filename="../src/tab_room.cpp" line="191"/>
         <source>Chat</source>
         <translation>チャット</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="191"/>
+        <location filename="../src/tab_room.cpp" line="192"/>
         <source>&amp;Room</source>
         <translation>部屋</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="192"/>
+        <location filename="../src/tab_room.cpp" line="193"/>
         <source>&amp;Leave room</source>
         <translation>部屋から出る</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="217"/>
+        <location filename="../src/tab_room.cpp" line="223"/>
         <source>You are flooding the chat. Please wait a couple of seconds.</source>
         <translation>あなたはチャットルームから弾かれました.少々お待ちください.</translation>
     </message>
@@ -2959,126 +2964,126 @@ Enter 0 for an indefinite ban.</source>
         <translation>検索:</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="106"/>
+        <location filename="../src/window_deckeditor.cpp" line="107"/>
         <source>Deck &amp;name:</source>
         <translation>デッキ名:</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="110"/>
+        <location filename="../src/window_deckeditor.cpp" line="111"/>
         <source>&amp;Comments:</source>
         <translation>コメント:</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="134"/>
+        <location filename="../src/window_deckeditor.cpp" line="135"/>
         <source>Deck editor [*]</source>
         <translation>デッキエディター [*]</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="136"/>
+        <location filename="../src/window_deckeditor.cpp" line="137"/>
         <source>&amp;New deck</source>
         <translation>新しいデッキ</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="139"/>
+        <location filename="../src/window_deckeditor.cpp" line="140"/>
         <source>&amp;Load deck...</source>
         <translation>デッキをロード...</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="148"/>
+        <location filename="../src/window_deckeditor.cpp" line="149"/>
         <source>Load deck from cl&amp;ipboard...</source>
         <translation>クリップボードからデッキをロード...</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="142"/>
+        <location filename="../src/window_deckeditor.cpp" line="143"/>
         <source>&amp;Save deck</source>
         <translation>デッキを保存</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="145"/>
+        <location filename="../src/window_deckeditor.cpp" line="146"/>
         <source>Save deck &amp;as...</source>
         <translation>名前を付けてデッキを保存...</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="151"/>
+        <location filename="../src/window_deckeditor.cpp" line="152"/>
         <source>Save deck to clip&amp;board</source>
         <translation>クリップボードにデッキを保存</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="154"/>
+        <location filename="../src/window_deckeditor.cpp" line="155"/>
         <source>&amp;Print deck...</source>
         <translation>デッキを印刷...</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="157"/>
+        <location filename="../src/window_deckeditor.cpp" line="158"/>
         <source>&amp;Close</source>
         <translation>閉じる</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="158"/>
+        <location filename="../src/window_deckeditor.cpp" line="159"/>
         <source>Ctrl+Q</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="161"/>
+        <location filename="../src/window_deckeditor.cpp" line="162"/>
         <source>&amp;Edit sets...</source>
         <translation>セットの設定...</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="164"/>
+        <location filename="../src/window_deckeditor.cpp" line="165"/>
         <source>&amp;Deck</source>
         <translation>デッキ</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="288"/>
+        <location filename="../src/window_deckeditor.cpp" line="289"/>
         <source>Load deck</source>
         <translation>デッキをロード</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="311"/>
-        <location filename="../src/window_deckeditor.cpp" line="335"/>
+        <location filename="../src/window_deckeditor.cpp" line="312"/>
+        <location filename="../src/window_deckeditor.cpp" line="336"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="311"/>
-        <location filename="../src/window_deckeditor.cpp" line="335"/>
+        <location filename="../src/window_deckeditor.cpp" line="312"/>
+        <location filename="../src/window_deckeditor.cpp" line="336"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
         <translatorcomment>要検証</translatorcomment>
         <translation>このデッキは保存されていません. ディレクトリをチェックして再度上書きしてください.</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="317"/>
+        <location filename="../src/window_deckeditor.cpp" line="318"/>
         <source>Save deck</source>
         <translation>デッキを保存</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="183"/>
+        <location filename="../src/window_deckeditor.cpp" line="184"/>
         <source>Add card to &amp;maindeck</source>
         <translation>メインデッキにカードを加える</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="184"/>
+        <location filename="../src/window_deckeditor.cpp" line="185"/>
         <source>Return</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="184"/>
+        <location filename="../src/window_deckeditor.cpp" line="185"/>
         <source>Enter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="189"/>
+        <location filename="../src/window_deckeditor.cpp" line="190"/>
         <source>Ctrl+Return</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="189"/>
+        <location filename="../src/window_deckeditor.cpp" line="190"/>
         <source>Ctrl+Enter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="187"/>
+        <location filename="../src/window_deckeditor.cpp" line="188"/>
         <source>Add card to &amp;sideboard</source>
         <translation>サイドボードにカードを加える</translation>
     </message>
@@ -3093,47 +3098,47 @@ Please check that the directory is writable and try again.</source>
         <translation>検索を解除</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="177"/>
+        <location filename="../src/window_deckeditor.cpp" line="178"/>
         <source>&amp;Card database</source>
         <translation>カードデータベース</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="191"/>
+        <location filename="../src/window_deckeditor.cpp" line="192"/>
         <source>&amp;Remove row</source>
         <translation>全て取り除く</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="192"/>
+        <location filename="../src/window_deckeditor.cpp" line="193"/>
         <source>Del</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="195"/>
+        <location filename="../src/window_deckeditor.cpp" line="196"/>
         <source>&amp;Increment number</source>
         <translation>枚数を増やす</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="196"/>
+        <location filename="../src/window_deckeditor.cpp" line="197"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="199"/>
+        <location filename="../src/window_deckeditor.cpp" line="200"/>
         <source>&amp;Decrement number</source>
         <translation>枚数を減らす</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="201"/>
+        <location filename="../src/window_deckeditor.cpp" line="202"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="252"/>
+        <location filename="../src/window_deckeditor.cpp" line="253"/>
         <source>Are you sure?</source>
         <translation>本当によろしいですか?</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="253"/>
+        <location filename="../src/window_deckeditor.cpp" line="254"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
         <translation>このデッキリストは変更されています.変更を保存しますか?</translation>
