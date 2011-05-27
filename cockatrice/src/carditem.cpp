@@ -380,6 +380,7 @@ void CardItem::processCardInfo(ServerInfo_Card *info)
 	setColor(info->getColor());
 	setTapped(info->getTapped());
 	setDestroyOnZoneChange(info->getDestroyOnZoneChange());
+	setDoesntUntap(info->getDoesntUntap());
 }
 
 CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown)
