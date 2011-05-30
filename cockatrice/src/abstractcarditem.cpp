@@ -212,6 +212,9 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+	if (event->button() == Qt::MidButton)
+		emit deleteCardInfoPopup();
+	
 	// This function ensures the parent function doesn't mess around with our selection.
 	event->accept();
 }

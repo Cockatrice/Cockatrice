@@ -572,7 +572,8 @@ void MessageLogWidget::mousePressEvent(QMouseEvent *event)
 
 void MessageLogWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-	emit deleteCardInfoPopup();
+	if (event->button() == Qt::MidButton)
+		emit deleteCardInfoPopup();
 	
 	QTextEdit::mouseReleaseEvent(event);
 }
