@@ -786,11 +786,11 @@ void TabGame::showCardInfoPopup(const QPoint &pos, const QString &cardName)
 	infoPopup->setAttribute(Qt::WA_TransparentForMouseEvents);
 	infoPopup->setCard(cardName);
 	QRect screenRect = qApp->desktop()->screenGeometry(this);
-	infoPopup->show();
 	infoPopup->move(
 		qMax(screenRect.left(), qMin(pos.x() - infoPopup->width() / 2, screenRect.left() + screenRect.width() - infoPopup->width())),
 		qMax(screenRect.top(), qMin(pos.y() - infoPopup->height() / 2, screenRect.top() + screenRect.height() - infoPopup->height()))
 	);
+	infoPopup->show();
 }
 
 void TabGame::deleteCardInfoPopup()
