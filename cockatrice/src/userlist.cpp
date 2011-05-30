@@ -217,7 +217,8 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	else if (actionClicked == aBan) {
 		bool ok;
 		int minutes = QInputDialog::getInt(this, tr("Duration"), tr("Please enter the duration of the ban (in minutes).\nEnter 0 for an indefinite ban."), 0, 0, 2147483647, 10, &ok);
-		client->sendCommand(new Command_BanFromServer(userName, minutes));
+		if (ok)
+			client->sendCommand(new Command_BanFromServer(userName, minutes));
 	}
 	
 	delete menu;
