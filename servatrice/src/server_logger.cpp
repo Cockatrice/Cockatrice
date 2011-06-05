@@ -3,8 +3,10 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
-#include <sys/types.h>
-#include <sys/socket.h>
+#ifdef Q_OS_UNIX
+# include <sys/types.h>
+# include <sys/socket.h>
+#endif
 
 ServerLogger::ServerLogger(const QString &logFileName, QObject *parent)
 	: QObject(parent), flushRunning(false)
@@ -14,9 +16,10 @@ ServerLogger::ServerLogger(const QString &logFileName, QObject *parent)
 		logFile->open(QIODevice::Append);
 #ifdef Q_OS_UNIX
 		::socketpair(AF_UNIX, SOCK_STREAM, 0, sigHupFD);
-#endif
+
 		snHup = new QSocketNotifier(sigHupFD[1], QSocketNotifier::Read, this);
 		connect(snHup, SIGNAL(activated(int)), this, SLOT(handleSigHup()));
+#endif
 	} else
 		logFile = 0;
 	
@@ -62,6 +65,7 @@ void ServerLogger::flushBuffer()
 	}
 }
 
+#ifdef Q_OS_UNIX
 void ServerLogger::hupSignalHandler(int /*unused*/)
 {
 	if (!logFile)
@@ -85,6 +89,7 @@ void ServerLogger::handleSigHup()
 	
 	snHup->setEnabled(true);
 }
+#endif
 
 QFile *ServerLogger::logFile;
 int ServerLogger::sigHupFD[2];

@@ -245,7 +245,7 @@ public:
 	
 	qreal getMinimumWidth() const;
 	void setMirrored(bool _mirrored);
-	void processSceneSizeChange(const QSizeF &newSize);
+	void processSceneSizeChange(int newPlayerWidth);
 	
 	void processPlayerInfo(ServerInfo_Player *info);
 	void processCardAttachment(ServerInfo_Player *info);

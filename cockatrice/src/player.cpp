@@ -1007,7 +1007,6 @@ void Player::eventDrawCards(Event_DrawCards *event)
 	
 	hand->reorganizeCards();
 	deck->reorganizeCards();
-	
 	emit logDrawCards(this, event->getNumberCards());
 }
 
@@ -1545,12 +1544,9 @@ void Player::setMirrored(bool _mirrored)
 	}
 }
 
-void Player::processSceneSizeChange(const QSizeF &newSize)
+void Player::processSceneSizeChange(int newPlayerWidth)
 {
-	// This will need to be changed if player areas are displayed side by side (e.g. 2x2 for a 4-player game)
-	qreal fullPlayerWidth = newSize.width();
-	
-	qreal tableWidth = fullPlayerWidth - CARD_HEIGHT - 15 - counterAreaWidth - stack->boundingRect().width();
+	qreal tableWidth = newPlayerWidth - CARD_HEIGHT - 15 - counterAreaWidth - stack->boundingRect().width();
 	if (!settingsCache->getHorizontalHand())
 		tableWidth -= hand->boundingRect().width();
 	

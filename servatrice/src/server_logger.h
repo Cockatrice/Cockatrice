@@ -19,7 +19,9 @@ public:
 public slots:
 	void logMessage(QString message);
 private slots:
+#ifdef Q_OS_UNIX
 	void handleSigHup();
+#endif
 	void flushBuffer();
 signals:
 	void sigFlushBuffer();

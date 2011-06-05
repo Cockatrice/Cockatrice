@@ -4,7 +4,6 @@
 #include "cardinfowidget.h"
 #include "protocol_items.h"
 #include "soundengine.h"
-#include <QDebug>
 #include <QMouseEvent>
 #include <QTextBlock>
 
@@ -264,6 +263,9 @@ void MessageLogWidget::logMoveCard(Player *player, CardItem *card, CardZone *sta
 
 void MessageLogWidget::logMulligan(Player *player, int number)
 {
+	if (!player)
+		return;
+
 	if (number > -1)
 		append(tr("%1 takes a mulligan to %n.", "", number).arg(sanitizeHtml(player->getName())));
 	else
@@ -468,6 +470,7 @@ void MessageLogWidget::containerProcessingStarted(GameEventContext *_context)
 		currentContext = MessageContext_MoveCard;
 	else if (qobject_cast<Context_Mulligan *>(_context)) {
 		currentContext = MessageContext_Mulligan;
+		mulliganPlayer = 0;
 		mulliganNumber = static_cast<Context_Mulligan *>(_context)->getNumber();
 	}
 }
@@ -482,6 +485,7 @@ void MessageLogWidget::containerProcessingDone()
 		moveCardTapped.clear();
 	} else if (currentContext == MessageContext_Mulligan) {
 		logMulligan(mulliganPlayer, mulliganNumber);
+		mulliganPlayer = 0;
 		mulliganNumber = 0;
 	}
 	

@@ -73,6 +73,7 @@ void myMessageOutput(QtMsgType /*type*/, const char *msg)
 	logger->logMessage(msg);
 }
 
+#ifdef Q_OS_UNIX
 void sigSegvHandler(int sig)
 {
 	if (sig == SIGSEGV)
@@ -82,6 +83,7 @@ void sigSegvHandler(int sig)
 	delete loggerThread;
 	raise(sig);
 }
+#endif
 
 int main(int argc, char *argv[])
 {
