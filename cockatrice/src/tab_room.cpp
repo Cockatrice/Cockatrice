@@ -9,6 +9,7 @@
 #include <QCheckBox>
 #include <QInputDialog>
 #include <QLabel>
+#include <QSplitter>
 #include "dlg_creategame.h"
 #include "tab_supervisor.h"
 #include "tab_room.h"
@@ -153,12 +154,12 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
 	chatGroupBox = new QGroupBox;
 	chatGroupBox->setLayout(chatVbox);
 	
-	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(gameSelector);
-	vbox->addWidget(chatGroupBox);
+	QSplitter *splitter = new QSplitter(Qt::Vertical);
+	splitter->addWidget(gameSelector);
+	splitter->addWidget(chatGroupBox);
 	
 	QHBoxLayout *hbox = new QHBoxLayout;
-	hbox->addLayout(vbox, 3);
+	hbox->addWidget(splitter, 3);
 	hbox->addWidget(userList, 1);
 	
 	aLeaveRoom = new QAction(this);
