@@ -31,6 +31,8 @@ SettingsCache::SettingsCache()
 	
 	soundEnabled = settings->value("sound/enabled", false).toBool();
 	soundPath = settings->value("sound/path").toString();
+	
+	priceTagFeature = settings->value("deckeditor/pricetags", false).toBool();
 }
 
 void SettingsCache::setLang(const QString &_lang)
@@ -170,4 +172,10 @@ void SettingsCache::setSoundPath(const QString &_soundPath)
 	soundPath = _soundPath;
 	settings->setValue("sound/path", soundPath);
 	emit soundPathChanged();
+}
+
+void SettingsCache::setPriceTagFeature(int _priceTagFeature)
+{
+	priceTagFeature = _priceTagFeature;
+	settings->setValue("deckeditor/pricetags", priceTagFeature);
 }

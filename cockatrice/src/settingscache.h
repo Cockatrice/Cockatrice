@@ -38,6 +38,7 @@ private:
 	bool zoneViewSortByName, zoneViewSortByType;
 	bool soundEnabled;
 	QString soundPath;
+	bool priceTagFeature;
 public:
 	SettingsCache();
 	QString getLang() const { return lang; }
@@ -61,6 +62,7 @@ public:
 	bool getZoneViewSortByType() const { return zoneViewSortByType; }
 	bool getSoundEnabled() const { return soundEnabled; }
 	QString getSoundPath() const { return soundPath; }
+	bool getPriceTagFeature() const { return priceTagFeature; }
 public slots:
 	void setLang(const QString &_lang);
 	void setDeckPath(const QString &_deckPath);
@@ -83,6 +85,7 @@ public slots:
 	void setZoneViewSortByType(int _zoneViewSortByType);
 	void setSoundEnabled(int _soundEnabled);
 	void setSoundPath(const QString &_soundPath);
+	void setPriceTagFeature(int _priceTagFeature);
 };
 
 extern SettingsCache *settingsCache;

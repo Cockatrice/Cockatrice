@@ -23,6 +23,7 @@
 	<file>resources/pencil.svg</file>
 	<file>resources/icon_search.svg</file>
 	<file>resources/icon_clearsearch.svg</file>
+        <file>resources/icon_update.png</file>
         <file>resources/hr.jpg</file>
         <file>resources/appicon.svg</file>
         <file>resources/add_to_sideboard.svg</file>

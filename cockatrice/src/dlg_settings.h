@@ -93,6 +93,16 @@ public:
 	void retranslateUi();
 };
 
+class DeckEditorSettingsPage : public AbstractSettingsPage {
+	Q_OBJECT
+public:
+	DeckEditorSettingsPage();
+	void retranslateUi();
+private:
+	QCheckBox *priceTagsCheckBox;
+	QGroupBox *generalGroupBox;
+};
+
 class MessagesSettingsPage : public AbstractSettingsPage {
 	Q_OBJECT
 public:
@@ -118,7 +128,7 @@ private slots:
 private:
 	QListWidget *contentsWidget;
 	QStackedWidget *pagesWidget;
-	QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *messagesButton;
+	QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *messagesButton;
 	QPushButton *closeButton;
 	void createIcons();
 	void retranslateUi();
