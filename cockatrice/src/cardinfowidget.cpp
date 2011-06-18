@@ -11,8 +11,24 @@
 #include "settingscache.h"
 
 CardInfoWidget::CardInfoWidget(ResizeMode _mode, QWidget *parent, Qt::WindowFlags flags)
-	: QFrame(parent, flags), pixmapWidth(160), aspectRatio((qreal) CARD_HEIGHT / (qreal) CARD_WIDTH), minimized(false), mode(_mode), info(0)
+	: QFrame(parent, flags)
+	, pixmapWidth(160)
+	, aspectRatio((qreal) CARD_HEIGHT / (qreal) CARD_WIDTH)
+	, minimized(settingsCache->getCardInfoMinimized()) // Initialize the cardinfo view status from cache.
+	, mode(_mode)
+	, info(0)
 {
+	if (mode == ModeGameTab) {
+		// Create indexed list of status views for card.
+		const QStringList cardInfoStatus = QStringList() << tr("Hide card info") << tr("Show card only") << tr("Show text only") << tr("Show full info");
+		
+		// Create droplist for cardinfo view selection, and set right current index.
+		dropList = new QComboBox();
+		dropList->addItems(cardInfoStatus);
+		dropList->setCurrentIndex(minimized);
+		connect(dropList, SIGNAL(currentIndexChanged(int)), this, SLOT(minimizeClicked(int)));
+	}
+
 	cardPicture = new QLabel;
 	cardPicture->setAlignment(Qt::AlignCenter);
 
@@ -33,6 +49,8 @@ CardInfoWidget::CardInfoWidget(ResizeMode _mode, QWidget *parent, Qt::WindowFlag
 
 	QGridLayout *grid = new QGridLayout(this);
 	int row = 0;
+	if (mode == ModeGameTab)
+		grid->addWidget(dropList, row++, 1, 1, 1, Qt::AlignRight);
 	grid->addWidget(cardPicture, row++, 0, 1, 2);
 	grid->addWidget(nameLabel1, row, 0);
 	grid->addWidget(nameLabel2, row++, 1);
@@ -51,15 +69,51 @@ CardInfoWidget::CardInfoWidget(ResizeMode _mode, QWidget *parent, Qt::WindowFlag
 
 	retranslateUi();
 	setFrameStyle(QFrame::Panel | QFrame::Raised);
-	setMinimumHeight(350);
 	if (mode == ModeGameTab) {
 		textLabel->setFixedHeight(100);
 		setFixedWidth(sizeHint().width());
-		setMaximumHeight(580);
+		setMinimized(settingsCache->getCardInfoMinimized());
 	} else if (mode == ModePopUp)
 		setFixedWidth(350);
 	else
 		setFixedWidth(250);
+	if (mode != ModeDeckEditor)
+		setFixedHeight(sizeHint().height());
+}
+
+void CardInfoWidget::minimizeClicked(int newMinimized)
+{
+	// Set new status, and store it in the settings cache.
+	setMinimized(newMinimized);
+	settingsCache->setCardInfoMinimized(newMinimized);
+}
+
+void CardInfoWidget::setMinimized(int _minimized)
+{
+	minimized = _minimized;
+
+	// Set the picture to be shown only at "card only" (1) and "full info" (3)
+	if (minimized == 1 || minimized == 3) {
+		cardPicture->setVisible(true);
+	} else {
+		cardPicture->setVisible(false);
+	}
+
+	// Set the rest of the fields to be shown only at "full info" (3) and "oracle only" (2)
+	bool showAll = (minimized == 2 || minimized == 3) ? true : false;
+
+	// Toggle oracle fields as according to selected view.
+	nameLabel2->setVisible(showAll);
+	nameLabel1->setVisible(showAll);
+	manacostLabel1->setVisible(showAll);
+	manacostLabel2->setVisible(showAll);
+	cardtypeLabel1->setVisible(showAll);
+	cardtypeLabel2->setVisible(showAll);
+	powtoughLabel1->setVisible(showAll);
+	powtoughLabel2->setVisible(showAll);
+	textLabel->setVisible(showAll);
+
+	setFixedHeight(sizeHint().height());
 }
 
 void CardInfoWidget::setCard(CardInfo *card)
@@ -112,7 +166,7 @@ void CardInfoWidget::retranslateUi()
 
 void CardInfoWidget::resizeEvent(QResizeEvent * /*event*/)
 {
-	if ((mode == ModeDeckEditor) || (mode == ModeGameTab)) {
+	if (mode == ModeDeckEditor) {
 		pixmapWidth = qMin(width() * 0.95, (height() - 200) / aspectRatio);
 		updatePixmap();
 	}

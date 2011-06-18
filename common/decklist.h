@@ -69,6 +69,7 @@ public:
 	AbstractDecklistNode *findChild(const QString &name);
 	int height() const;
 	int recursiveCount(bool countTotalCards = false) const;
+        float recursivePrice(bool countTotalCards = false) const;
 	bool compare(AbstractDecklistNode *other) const;
 	QVector<QPair<int, int> > sort(Qt::SortOrder order = Qt::AscendingOrder);
 	
@@ -83,6 +84,9 @@ public:
 	virtual void setNumber(int _number) = 0;
 	virtual QString getName() const = 0;
 	virtual void setName(const QString &_name) = 0;
+        virtual float getPrice() const = 0;
+        virtual void setPrice(float _price) = 0;
+        float getTotalPrice() const { return getNumber() * getPrice(); }
 	int height() const { return 0; }
 	bool compare(AbstractDecklistNode *other) const;
 	
@@ -94,14 +98,18 @@ class DecklistCardNode : public AbstractDecklistCardNode {
 private:
 	QString name;
 	int number;
+        float price;
 public:
-	DecklistCardNode(const QString &_name = QString(), int _number = 1, InnerDecklistNode *_parent = 0) : AbstractDecklistCardNode(_parent), name(_name), number(_number) { }
+        DecklistCardNode(const QString &_name = QString(), int _number = 1, float _price = 0, InnerDecklistNode *_parent = 0) : AbstractDecklistCardNode(_parent), name(_name), number(_number), price(_price) { }
+        DecklistCardNode(const QString &_name = QString(), int _number = 1, InnerDecklistNode *_parent = 0) : AbstractDecklistCardNode(_parent), name(_name), number(_number), price(0) { }
 	DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent);
 	int getNumber() const { return number; }
 	void setNumber(int _number) { number = _number; }
 	QString getName() const { return name; }
 	void setName(const QString &_name) { name = _name; }
-};
+        float getPrice() const { return price; }
+        void setPrice(const float _price) { price = _price; }
+    };
 
 class DeckList : public SerializableItem {
 	Q_OBJECT

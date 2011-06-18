@@ -19,6 +19,7 @@ SettingsCache::SettingsCache()
 	
 	picDownload = settings->value("personal/picturedownload", true).toBool();
 	doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
+	cardInfoMinimized = settings->value("interface/cardinfominimized", 0).toInt();
 	tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
 	displayCardNames = settings->value("cards/displaycardnames", true).toBool();
 	horizontalHand = settings->value("hand/horizontal", true).toBool();
@@ -30,6 +31,8 @@ SettingsCache::SettingsCache()
 	
 	soundEnabled = settings->value("sound/enabled", false).toBool();
 	soundPath = settings->value("sound/path").toString();
+	
+	priceTagFeature = settings->value("deckeditor/pricetags", false).toBool();
 }
 
 void SettingsCache::setLang(const QString &_lang)
@@ -107,6 +110,12 @@ void SettingsCache::setDoubleClickToPlay(int _doubleClickToPlay)
 	settings->setValue("interface/doubleclicktoplay", doubleClickToPlay);
 }
 
+void SettingsCache::setCardInfoMinimized(int _cardInfoMinimized)
+{
+        cardInfoMinimized = _cardInfoMinimized;
+	settings->setValue("interface/cardinfominimized", cardInfoMinimized);
+}
+
 void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes)
 {
 	tabGameSplitterSizes = _tabGameSplitterSizes;
@@ -163,4 +172,10 @@ void SettingsCache::setSoundPath(const QString &_soundPath)
 	soundPath = _soundPath;
 	settings->setValue("sound/path", soundPath);
 	emit soundPathChanged();
+}
+
+void SettingsCache::setPriceTagFeature(int _priceTagFeature)
+{
+	priceTagFeature = _priceTagFeature;
+	settings->setValue("deckeditor/pricetags", priceTagFeature);
 }

@@ -455,6 +455,30 @@ void UserInterfaceSettingsPage::soundPathButtonClicked()
 	settingsCache->setSoundPath(path);
 }
 
+DeckEditorSettingsPage::DeckEditorSettingsPage()
+{
+	priceTagsCheckBox = new QCheckBox;
+	priceTagsCheckBox->setChecked(settingsCache->getPriceTagFeature());
+	connect(priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
+	
+	QGridLayout *generalGrid = new QGridLayout;
+	generalGrid->addWidget(priceTagsCheckBox, 0, 0);
+	
+	generalGroupBox = new QGroupBox;
+	generalGroupBox->setLayout(generalGrid);
+	
+	QVBoxLayout *mainLayout = new QVBoxLayout;
+	mainLayout->addWidget(generalGroupBox);
+	
+	setLayout(mainLayout);
+}
+
+void DeckEditorSettingsPage::retranslateUi()
+{
+	priceTagsCheckBox->setText(tr("Enable &price tag feature (using data from blacklotusproject.com)"));
+	generalGroupBox->setTitle(tr("General"));
+}
+
 MessagesSettingsPage::MessagesSettingsPage()
 {
 	aAdd = new QAction(this);
@@ -533,6 +557,7 @@ DlgSettings::DlgSettings(QWidget *parent)
 	pagesWidget->addWidget(new GeneralSettingsPage);
 	pagesWidget->addWidget(new AppearanceSettingsPage);
 	pagesWidget->addWidget(new UserInterfaceSettingsPage);
+	pagesWidget->addWidget(new DeckEditorSettingsPage);
 	pagesWidget->addWidget(new MessagesSettingsPage);
 	
 	closeButton = new QPushButton;
@@ -576,6 +601,11 @@ void DlgSettings::createIcons()
 	userInterfaceButton->setTextAlignment(Qt::AlignHCenter);
 	userInterfaceButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 	userInterfaceButton->setIcon(QIcon(":/resources/icon_config_interface.svg"));
+	
+	deckEditorButton = new QListWidgetItem(contentsWidget);
+	deckEditorButton->setTextAlignment(Qt::AlignHCenter);
+	deckEditorButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+	deckEditorButton->setIcon(QIcon(":/resources/icon_deckeditor.svg"));
 	
 	messagesButton = new QListWidgetItem(contentsWidget);
 	messagesButton->setTextAlignment(Qt::AlignHCenter);
@@ -633,6 +663,7 @@ void DlgSettings::retranslateUi()
 	generalButton->setText(tr("General"));
 	appearanceButton->setText(tr("Appearance"));
 	userInterfaceButton->setText(tr("User interface"));
+	deckEditorButton->setText(tr("Deck editor"));
 	messagesButton->setText(tr("Messages"));
 	
 	closeButton->setText(tr("&Close"));

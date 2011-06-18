@@ -127,6 +127,19 @@ int InnerDecklistNode::recursiveCount(bool countTotalCards) const
 	return result;
 }
 
+float InnerDecklistNode::recursivePrice(bool countTotalCards) const
+{
+        float result = 0;
+        for (int i = 0; i < size(); i++) {
+                InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(at(i));
+                if (node)
+                        result += node->recursivePrice(countTotalCards);
+                else if (countTotalCards)
+                        result += dynamic_cast<AbstractDecklistCardNode *>(at(i))->getTotalPrice();
+        }
+        return result;
+}
+
 bool InnerDecklistNode::compare(AbstractDecklistNode *other) const
 {
 	InnerDecklistNode *other2 = dynamic_cast<InnerDecklistNode *>(other);
@@ -165,11 +178,12 @@ bool InnerDecklistNode::readElement(QXmlStreamReader *xml)
 	}
 	if (xml->isStartElement() && (xml->name() == "zone"))
 		currentItem = new InnerDecklistNode(xml->attributes().value("name").toString(), this);
-	else if (xml->isStartElement() && (xml->name() == "card"))
-		currentItem = new DecklistCardNode(xml->attributes().value("name").toString(), xml->attributes().value("number").toString().toInt(), this);
-	else if (xml->isEndElement() && (xml->name() == "zone"))
+        else if (xml->isStartElement() && (xml->name() == "card")) {
+                float price = (xml->attributes().value("price") != NULL) ? xml->attributes().value("price").toString().toFloat() : 0;
+                currentItem = new DecklistCardNode(xml->attributes().value("name").toString(), xml->attributes().value("number").toString().toInt(), price, this);
+        } else if (xml->isEndElement() && (xml->name() == "zone"))
 		return true;
-	
+
 	return false;
 }
 
@@ -194,6 +208,7 @@ void AbstractDecklistCardNode::writeElement(QXmlStreamWriter *xml)
 {
 	xml->writeEmptyElement("card");
 	xml->writeAttribute("number", QString::number(getNumber()));
+        xml->writeAttribute("price", QString::number(getPrice()));
 	xml->writeAttribute("name", getName());
 }
 

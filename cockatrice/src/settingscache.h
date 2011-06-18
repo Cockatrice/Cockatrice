@@ -29,6 +29,7 @@ private:
 	QString handBgPath, stackBgPath, tableBgPath, playerBgPath, cardBackPicturePath;
 	bool picDownload;
 	bool doubleClickToPlay;
+	int cardInfoMinimized;
 	QByteArray tabGameSplitterSizes;
 	bool displayCardNames;
 	bool horizontalHand;
@@ -37,6 +38,7 @@ private:
 	bool zoneViewSortByName, zoneViewSortByType;
 	bool soundEnabled;
 	QString soundPath;
+	bool priceTagFeature;
 public:
 	SettingsCache();
 	QString getLang() const { return lang; }
@@ -50,6 +52,7 @@ public:
 	QString getCardBackPicturePath() const { return cardBackPicturePath; }
 	bool getPicDownload() const { return picDownload; }
 	bool getDoubleClickToPlay() const { return doubleClickToPlay; }
+	int  getCardInfoMinimized() const { return cardInfoMinimized; }
 	QByteArray getTabGameSplitterSizes() const { return tabGameSplitterSizes; }
 	bool getDisplayCardNames() const { return displayCardNames; }
 	bool getHorizontalHand() const { return horizontalHand; }
@@ -59,6 +62,7 @@ public:
 	bool getZoneViewSortByType() const { return zoneViewSortByType; }
 	bool getSoundEnabled() const { return soundEnabled; }
 	QString getSoundPath() const { return soundPath; }
+	bool getPriceTagFeature() const { return priceTagFeature; }
 public slots:
 	void setLang(const QString &_lang);
 	void setDeckPath(const QString &_deckPath);
@@ -71,6 +75,7 @@ public slots:
 	void setCardBackPicturePath(const QString &_cardBackPicturePath);
 	void setPicDownload(int _picDownload);
 	void setDoubleClickToPlay(int _doubleClickToPlay);
+	void setCardInfoMinimized(int _cardInfoMinimized);
 	void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
 	void setDisplayCardNames(int _displayCardNames);
 	void setHorizontalHand(int _horizontalHand);
@@ -80,6 +85,7 @@ public slots:
 	void setZoneViewSortByType(int _zoneViewSortByType);
 	void setSoundEnabled(int _soundEnabled);
 	void setSoundPath(const QString &_soundPath);
+	void setPriceTagFeature(int _priceTagFeature);
 };
 
 extern SettingsCache *settingsCache;

@@ -32,7 +32,7 @@ void ChatView::appendMessage(QString sender, const QString &message)
 		senderFormat.setForeground(Qt::blue);
 	cursor.setCharFormat(senderFormat);
 	if (!sender.isEmpty())
-		sender.append(" ");
+		sender.append(": ");
 	cursor.insertText(sender);
 	
 	QTextCharFormat messageFormat;
