@@ -179,6 +179,7 @@ void MainWindow::actAbout()
 		+ tr("Japanese:") + " Nagase Task<br>"
 		+ tr("Russian:") + " Alexander Davidov<br>"
 		+ tr("Czech:") + " Ondřej Trhoň<br>"
+		+ tr("Slovak:") + " Ganjalf Rendy<br>"
 	));
 }
 
