@@ -15,27 +15,27 @@ OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent)
 	connect(http, SIGNAL(dataReadProgress(int, int)), this, SIGNAL(dataReadProgress(int, int)));
 }
 
-void OracleImporter::readSetsFromFile(const QString &fileName)
+bool OracleImporter::readSetsFromFile(const QString &fileName)
 {
 	QFile setsFile(fileName);
 	if (!setsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		QMessageBox::critical(0, tr("Error"), tr("Cannot open file '%1'.").arg(fileName));
-		return;
+		return false;
 	}
 
 	QXmlStreamReader xml(&setsFile);
-	readSetsFromXml(xml);
+	return readSetsFromXml(xml);
 }
 
-void OracleImporter::readSetsFromByteArray(const QByteArray &data)
+bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
 {
 	QXmlStreamReader xml(data);
-	readSetsFromXml(xml);
+	return readSetsFromXml(xml);
 }
 
-void OracleImporter::readSetsFromXml(QXmlStreamReader &xml)
+bool OracleImporter::readSetsFromXml(QXmlStreamReader &xml)
 {
-	allSets.clear();
+	QList<SetToDownload> newSetList;
 	
 	QString edition;
 	QString editionLong;
@@ -56,7 +56,7 @@ void OracleImporter::readSetsFromXml(QXmlStreamReader &xml)
 				else if (xml.name() == "url")
 					editionURL = xml.readElementText();
 			}
-			allSets << SetToDownload(edition, editionLong, editionURL, import);
+			newSetList.append(SetToDownload(edition, editionLong, editionURL, import));
 			edition = editionLong = editionURL = QString();
 		} else if (xml.name() == "picture_url")
 			pictureUrl = xml.readElementText();
@@ -67,6 +67,10 @@ void OracleImporter::readSetsFromXml(QXmlStreamReader &xml)
 		else if (xml.name() == "set_url")
 			setUrl = xml.readElementText();
 	}
+	if (newSetList.isEmpty())
+		return false;
+	allSets = newSetList;
+	return true;
 }
 
 CardInfo *OracleImporter::addCard(const QString &setName, QString cardName, int cardId, const QString &cardCost, const QString &cardType, const QString &cardPT, const QStringList &cardText)
