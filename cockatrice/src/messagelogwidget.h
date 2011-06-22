@@ -31,6 +31,7 @@ private:
 	
 	CardInfoWidget *infoWidget;
 	QString sanitizeHtml(QString dirty) const;
+	bool isFemale(Player *player) const;
 	QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position) const;
 	QString getCardNameUnderMouse(const QPoint &pos) const;
 	MessageContext currentContext;
@@ -66,7 +67,7 @@ public slots:
 	void logGameStart();
 	void logSay(Player *player, QString message);
 	void logSpectatorSay(QString spectatorName, QString message);
-	void logShuffle(Player *player);
+	void logShuffle(Player *player, CardZone *zone);
 	void logRollDie(Player *player, int sides, int roll);
 	void logDrawCards(Player *player, int number);
 	void logUndoDraw(Player *player, QString cardName);

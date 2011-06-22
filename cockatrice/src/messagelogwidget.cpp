@@ -15,6 +15,11 @@ QString MessageLogWidget::sanitizeHtml(QString dirty) const
 		.replace(">", "&gt;");
 }
 
+bool MessageLogWidget::isFemale(Player *player) const
+{
+	return player->getUserInfo()->getGender() == ServerInfo_User::Female;
+}
+
 void MessageLogWidget::logConnecting(QString hostname)
 {
 	append(tr("Connecting to %1...").arg(sanitizeHtml(hostname)));
@@ -122,11 +127,11 @@ void MessageLogWidget::logSpectatorSay(QString spectatorName, QString message)
 	append(QString("<font color=\"red\">%1:</font> %2").arg(sanitizeHtml(spectatorName)).arg(sanitizeHtml(message)));
 }
 
-void MessageLogWidget::logShuffle(Player *player)
+void MessageLogWidget::logShuffle(Player *player, CardZone *zone)
 {
 	soundEngine->shuffle();
 	if (currentContext != MessageContext_Mulligan)
-		append(tr("%1 shuffles his library.").arg(sanitizeHtml(player->getName())));
+		append(tr("%1 shuffles %2.").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)));
 }
 
 void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
@@ -147,9 +152,9 @@ void MessageLogWidget::logDrawCards(Player *player, int number)
 void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
 {
 	if (cardName.isEmpty())
-		append(tr("%1 undoes his last draw.").arg(sanitizeHtml(player->getName())));
+		append((isFemale(player) ? tr("%1 undoes her last draw.") : tr("%1 undoes his last draw.")).arg(sanitizeHtml(player->getName())));
 	else
-		append(tr("%1 undoes his last draw (%2).").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+		append((isFemale(player) ? tr("%1 undoes her last draw (%2).") : tr("%1 undoes his last draw (%2).")).arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
 }
 
 QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position) const
@@ -169,16 +174,16 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
 	else if (startName == "deck") {
 		if (position == zone->getCards().size() - 1) {
 			if (cardName.isEmpty()) {
-				cardName = tr("the bottom card of his library");
+				cardName = isFemale(zone->getPlayer()) ? tr("the bottom card of her library") : tr("the bottom card of his library");
 				cardNameContainsStartZone = true;
 			} else
-				fromStr = tr(" from the bottom of his library");
+				fromStr = isFemale(zone->getPlayer()) ? tr(" from the bottom of her library") : tr(" from the bottom of his library");
 		} else if (position == 0) {
 			if (cardName.isEmpty()) {
-				cardName = tr("the top card of his library");
+				cardName = isFemale(zone->getPlayer()) ? tr("the top card of her library") : tr("the top card of his library");
 				cardNameContainsStartZone = true;
 			} else
-				fromStr = tr(" from the top of his library");
+				fromStr = isFemale(zone->getPlayer()) ? tr(" from the top of her library") : tr(" from the top of his library");
 		} else
 			fromStr = tr(" from library");
 	} else if (startName == "sb")
@@ -233,13 +238,13 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
 		finalStr = tr("%1 moves %2%3 to hand.");
 	else if (targetName == "deck") {
 		if (attributes.newX == -1)
-			finalStr = tr("%1 puts %2%3 into his library.");
+			finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 puts %2%3 into her library.") : tr("%1 puts %2%3 into his library.");
 		else if (attributes.newX == attributes.targetZone->getCards().size() - 1)
-			finalStr = tr("%1 puts %2%3 on bottom of his library.");
+			finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 puts %2%3 on bottom of her library.") : tr("%1 puts %2%3 on bottom of his library.");
 		else if (attributes.newX == 0)
-			finalStr = tr("%1 puts %2%3 on top of his library.");
+			finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 puts %2%3 on top of her library.") : tr("%1 puts %2%3 on top of his library.");
 		else
-			finalStr = tr("%1 puts %2%3 into his library at position %4.");
+			finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 puts %2%3 into her library at position %4.") : tr("%1 puts %2%3 into his library at position %4.");
 	} else if (targetName == "sb")
 		finalStr = tr("%1 moves %2%3 to sideboard.");
 	else if (targetName == "stack") {
@@ -269,7 +274,7 @@ void MessageLogWidget::logMulligan(Player *player, int number)
 	if (number > -1)
 		append(tr("%1 takes a mulligan to %n.", "", number).arg(sanitizeHtml(player->getName())));
 	else
-		append(tr("%1 draws his initial hand.").arg(sanitizeHtml(player->getName())));
+		append((isFemale(player) ? tr("%1 draws her initial hand.") : tr("%1 draws his initial hand.")).arg(sanitizeHtml(player->getName())));
 }
 
 void MessageLogWidget::logFlipCard(Player *player, QString cardName, bool faceDown)
@@ -351,7 +356,7 @@ void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
 	else {
 		QString cardStr;
 		if (!card)
-			cardStr = tr("his permanents");
+			cardStr = isFemale(player) ? tr("her permanents") : tr("his permanents");
 		else
 			cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()));
 		append(tr("%1 %2 %3.").arg(sanitizeHtml(player->getName())).arg(tapped ? tr("taps") : tr("untaps")).arg(cardStr));
@@ -495,7 +500,7 @@ void MessageLogWidget::containerProcessingDone()
 void MessageLogWidget::connectToPlayer(Player *player)
 {
 	connect(player, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));
-	connect(player, SIGNAL(logShuffle(Player *)), this, SLOT(logShuffle(Player *)));
+	connect(player, SIGNAL(logShuffle(Player *, CardZone *)), this, SLOT(logShuffle(Player *, CardZone *)));
 	connect(player, SIGNAL(logRollDie(Player *, int, int)), this, SLOT(logRollDie(Player *, int, int)));
 	connect(player, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)), this, SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)));
 	connect(player, SIGNAL(logCreateToken(Player *, QString, QString)), this, SLOT(logCreateToken(Player *, QString, QString)));

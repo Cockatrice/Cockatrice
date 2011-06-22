@@ -38,6 +38,10 @@
 	<file>resources/icon_player.svg</file>
 	<file>resources/icon_spectator.svg</file>
 
+	<file>resources/genders/male.svg</file>
+	<file>resources/genders/female.svg</file>
+	<file>resources/genders/unknown.svg</file>
+
         <file>translations/cockatrice_de.qm</file>
         <file>translations/cockatrice_en.qm</file>
 	<file>translations/cockatrice_es.qm</file>
@@ -103,7 +107,7 @@
 
 	<file>resources/userlevels/normal.svg</file>
 	<file>resources/userlevels/registered.svg</file>
-	<file>resources/userlevels/judge.svg</file>
+	<file>resources/userlevels/moderator.svg</file>
 	<file>resources/userlevels/admin.svg</file>
 
 	<file>resources/news/exclamation_mark.svg</file>

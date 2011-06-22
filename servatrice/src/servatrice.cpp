@@ -217,19 +217,31 @@ ServerInfo_User *Servatrice::evalUserQueryResult(const QSqlQuery &query, bool co
 	QString name = query.value(0).toString();
 	bool is_admin = query.value(1).toInt();
 	QString realName = query.value(2).toString();
-	QString country = query.value(3).toString();
+	QString genderStr = query.value(3).toString();
+	QString country = query.value(4).toString();
 	QByteArray avatarBmp;
 	if (complete)
-		avatarBmp = query.value(4).toByteArray();
+		avatarBmp = query.value(5).toByteArray();
+	
+	ServerInfo_User::Gender gender;
+	if (genderStr == "m")
+		gender = ServerInfo_User::Male;
+	else if (genderStr == "f")
+		gender = ServerInfo_User::Female;
+	else
+		gender = ServerInfo_User::GenderUnknown;
 	
 	int userLevel = ServerInfo_User::IsUser | ServerInfo_User::IsRegistered;
-	if (is_admin)
+	if (is_admin == 1)
 		userLevel |= ServerInfo_User::IsAdmin;
+	else if (is_admin == 2)
+		userLevel |= ServerInfo_User::IsModerator;
 	
 	return new ServerInfo_User(
 		name,
 		userLevel,
 		realName,
+		gender,
 		country,
 		avatarBmp
 	);
@@ -243,7 +255,7 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 		checkSql();
 
 		QSqlQuery query;
-		query.prepare("select name, admin, realname, country, avatar_bmp from " + dbPrefix + "_users where name = :name and active = 1");
+		query.prepare("select name, admin, realname, gender, country, avatar_bmp from " + dbPrefix + "_users where name = :name and active = 1");
 		query.bindValue(":name", name);
 		if (!execSqlQuery(query))
 			return new ServerInfo_User(name, ServerInfo_User::IsUser);
@@ -276,7 +288,7 @@ QMap<QString, ServerInfo_User *> Servatrice::getBuddyList(const QString &name)
 		checkSql();
 
 		QSqlQuery query;
-		query.prepare("select a.name, a.admin, a.realname, a.country from " + dbPrefix + "_users a left join " + dbPrefix + "_buddylist b on a.id = b.id_user2 left join " + dbPrefix + "_users c on b.id_user1 = c.id where c.name = :name");
+		query.prepare("select a.name, a.admin, a.realname, a.gender, a.country from " + dbPrefix + "_users a left join " + dbPrefix + "_buddylist b on a.id = b.id_user2 left join " + dbPrefix + "_users c on b.id_user1 = c.id where c.name = :name");
 		query.bindValue(":name", name);
 		if (!execSqlQuery(query))
 			return result;
@@ -299,7 +311,7 @@ QMap<QString, ServerInfo_User *> Servatrice::getIgnoreList(const QString &name)
 		checkSql();
 
 		QSqlQuery query;
-		query.prepare("select a.name, a.admin, a.realname, a.country from " + dbPrefix + "_users a left join " + dbPrefix + "_ignorelist b on a.id = b.id_user2 left join " + dbPrefix + "_users c on b.id_user1 = c.id where c.name = :name");
+		query.prepare("select a.name, a.admin, a.realname, a.gender, a.country from " + dbPrefix + "_users a left join " + dbPrefix + "_ignorelist b on a.id = b.id_user2 left join " + dbPrefix + "_users c on b.id_user1 = c.id where c.name = :name");
 		query.bindValue(":name", name);
 		if (!execSqlQuery(query))
 			return result;

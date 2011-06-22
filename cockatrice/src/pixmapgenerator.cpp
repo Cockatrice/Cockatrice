@@ -78,6 +78,36 @@ QPixmap PingPixmapGenerator::generatePixmap(int size, int value, int max)
 
 QMap<int, QPixmap> PingPixmapGenerator::pmCache;
 
+QPixmap GenderPixmapGenerator::generatePixmap(int height, int _gender)
+{
+	ServerInfo_User::Gender gender = static_cast<ServerInfo_User::Gender>(_gender);
+	if ((gender != ServerInfo_User::Male) && (gender != ServerInfo_User::Female))
+		gender = ServerInfo_User::GenderUnknown;
+	
+	int key = gender * 100000 + height;
+	if (pmCache.contains(key))
+		return pmCache.value(key);
+	
+	QString genderStr;
+	switch (gender) {
+		case ServerInfo_User::Male: genderStr = "male"; break;
+		case ServerInfo_User::Female: genderStr = "female"; break;
+		default: genderStr = "unknown";
+	};
+	
+	QSvgRenderer svg(QString(":/resources/genders/" + genderStr + ".svg"));
+	int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
+	QPixmap pixmap(width, height);
+	pixmap.fill(Qt::transparent);
+	QPainter painter(&pixmap);
+	svg.render(&painter, QRectF(0, 0, width, height));
+	
+	pmCache.insert(key, pixmap);
+	return pixmap;
+}
+
+QMap<int, QPixmap> GenderPixmapGenerator::pmCache;
+
 QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countryCode)
 {
 	if (countryCode.size() != 2)
@@ -110,8 +140,8 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height, int userLevel)
 	QString levelString;
 	if (userLevel & ServerInfo_User::IsAdmin)
 		levelString = "admin";
-	else if (userLevel & ServerInfo_User::IsJudge)
-		levelString = "judge";
+	else if (userLevel & ServerInfo_User::IsModerator)
+		levelString = "moderator";
 	else if (userLevel &ServerInfo_User::IsRegistered)
 		levelString = "registered";
 	else

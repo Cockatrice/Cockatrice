@@ -713,7 +713,7 @@ void Player::eventSay(Event_Say *event)
 
 void Player::eventShuffle(Event_Shuffle * /*event*/)
 {
-	emit logShuffle(this);
+	emit logShuffle(this, zones.value("deck"));
 }
 
 void Player::eventRollDie(Event_RollDie *event)

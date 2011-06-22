@@ -104,6 +104,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `admin` tinyint(1) NOT NULL,
   `name` varchar(35) NOT NULL,
   `realname` varchar(255) NOT NULL,
+  `gender` char(1) NOT NULL,
   `password` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `country` char(2) NOT NULL,
