@@ -605,7 +605,7 @@ void DlgSettings::createIcons()
 	deckEditorButton = new QListWidgetItem(contentsWidget);
 	deckEditorButton->setTextAlignment(Qt::AlignHCenter);
 	deckEditorButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-	deckEditorButton->setIcon(QIcon(":/resources/icon_deckeditor.svg"));
+	deckEditorButton->setIcon(QIcon(":/resources/icon_config_deckeditor.svg"));
 	
 	messagesButton = new QListWidgetItem(contentsWidget);
 	messagesButton->setTextAlignment(Qt::AlignHCenter);
