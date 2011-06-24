@@ -78,7 +78,7 @@ private slots:
 	void processUserLeft(const QString &userName);
 	void processUserJoined(const QString &userName);
 	void talkLeft(TabMessage *tab);
-	void tabUserEvent();
+	void tabUserEvent(bool globalEvent);
 	void processRoomEvent(RoomEvent *event);
 	void processGameEventContainer(GameEventContainer *cont);
 	void processMessageEvent(Event_Message *event);

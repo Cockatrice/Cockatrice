@@ -9,7 +9,7 @@ class TabSupervisor;
 class Tab : public QWidget {
 	Q_OBJECT
 signals:
-	void userEvent();
+	void userEvent(bool globalEvent = true);
 protected:
 	QMenu *tabMenu;
 	TabSupervisor *tabSupervisor;

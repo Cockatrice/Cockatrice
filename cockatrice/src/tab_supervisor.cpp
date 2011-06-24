@@ -101,7 +101,7 @@ void TabSupervisor::retranslateUi()
 
 int TabSupervisor::myAddTab(Tab *tab)
 {
-	connect(tab, SIGNAL(userEvent()), this, SLOT(tabUserEvent()));
+	connect(tab, SIGNAL(userEvent(bool)), this, SLOT(tabUserEvent(bool)));
 	return addTab(tab, tab->getTabText());
 }
 
@@ -299,14 +299,15 @@ void TabSupervisor::talkLeft(TabMessage *tab)
 	removeTab(indexOf(tab));
 }
 
-void TabSupervisor::tabUserEvent()
+void TabSupervisor::tabUserEvent(bool globalEvent)
 {
 	Tab *tab = static_cast<Tab *>(sender());
 	if (tab != currentWidget()) {
 		tab->setContentsChanged(true);
 		setTabIcon(indexOf(tab), *tabChangedIcon);
 	}
-	QApplication::alert(this);
+	if (globalEvent)
+		QApplication::alert(this);
 }
 
 void TabSupervisor::processRoomEvent(RoomEvent *event)

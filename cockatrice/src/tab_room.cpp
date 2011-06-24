@@ -262,5 +262,5 @@ void TabRoom::processLeaveRoomEvent(Event_LeaveRoom *event)
 void TabRoom::processSayEvent(Event_RoomSay *event)
 {
 	chatView->appendMessage(event->getPlayerName(), event->getMessage());
-	emit userEvent();
+	emit userEvent(false);
 }
