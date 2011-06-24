@@ -135,8 +135,8 @@ void TabSupervisor::start(AbstractClient *_client, ServerInfo_User *userInfo)
 	} else
 		tabDeckStorage = 0;
 	
-	if (userInfo->getUserLevel() & ServerInfo_User::IsAdmin) {
-		tabAdmin = new TabAdmin(this, client);
+	if (userInfo->getUserLevel() & ServerInfo_User::IsModerator) {
+		tabAdmin = new TabAdmin(this, client, (userInfo->getUserLevel() & ServerInfo_User::IsAdmin));
 		myAddTab(tabAdmin);
 	} else
 		tabAdmin = 0;

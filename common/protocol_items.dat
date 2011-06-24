@@ -64,6 +64,7 @@
 3:stop_dump_zone:i,zone_owner_id:s,zone
 4:remove_from_list:s,list:s,user_name
 4:server_message:s,message
+4:server_shutdown:s,reason:i,minutes
 4:connection_closed:s,reason
 4:message:s,sender_name:s,receiver_name:s,text
 4:game_joined:i,game_id:s,game_description:i,player_id:b,spectator:b,spectators_can_talk:b,spectators_see_everything:b,resuming
@@ -77,4 +78,5 @@
 6:move_card
 6:mulligan:i,number
 7:update_server_message
-7:ban_from_server:s,user_name:i,minutes
+7:shutdown_server:s,reason:i,minutes
+8:ban_from_server:s,user_name:i,minutes

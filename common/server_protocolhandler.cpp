@@ -142,6 +142,17 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 			default: return RespInvalidCommand;
 		}
 	}
+	ModeratorCommand *moderatorCommand = qobject_cast<ModeratorCommand *>(command);
+	if (moderatorCommand) {
+		qDebug() << "received ModeratorCommand";
+		if (!(userInfo->getUserLevel() & ServerInfo_User::IsModerator))
+			return RespLoginNeeded;
+		
+		switch (command->getItemId()) {
+			case ItemId_Command_BanFromServer: return cmdBanFromServer(static_cast<Command_BanFromServer *>(command), cont);
+			default: return RespInvalidCommand;
+		}
+	}
 	AdminCommand *adminCommand = qobject_cast<AdminCommand *>(command);
 	if (adminCommand) {
 		qDebug() << "received AdminCommand";
@@ -149,8 +160,8 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 			return RespLoginNeeded;
 		
 		switch (command->getItemId()) {
+			case ItemId_Command_ShutdownServer: return cmdShutdownServer(static_cast<Command_ShutdownServer *>(command), cont);
 			case ItemId_Command_UpdateServerMessage: return cmdUpdateServerMessage(static_cast<Command_UpdateServerMessage *>(command), cont);
-			case ItemId_Command_BanFromServer: return cmdBanFromServer(static_cast<Command_BanFromServer *>(command), cont);
 			default: return RespInvalidCommand;
 		}
 	}

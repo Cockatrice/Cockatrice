@@ -1443,220 +1443,239 @@
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="60"/>
+        <source>Scheduled server shutdown.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="62"/>
         <source>Unknown reason.</source>
         <translation>不明な理由.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="61"/>
+        <location filename="../src/window_main.cpp" line="63"/>
         <source>Connection closed</source>
         <translation>通信切断</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="61"/>
+        <location filename="../src/window_main.cpp" line="63"/>
         <source>The server has terminated your connection.
 Reason: %1</source>
         <translation>サーバーはあなたの接続を切断しました.
 理由: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="110"/>
+        <location filename="../src/window_main.cpp" line="68"/>
+        <source>Scheduled server shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/window_main.cpp" line="68"/>
+        <source>The server is going to be restarted in %n minute(s).
+All running games will be lost.
+Reason for shutdown: %1</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="117"/>
         <source>Number of players</source>
         <translation>プレイヤー人数</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="110"/>
+        <location filename="../src/window_main.cpp" line="117"/>
         <source>Please enter the number of players.</source>
         <translation>プレイヤーの人数を入れてください.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="119"/>
-        <location filename="../src/window_main.cpp" line="125"/>
+        <location filename="../src/window_main.cpp" line="126"/>
+        <location filename="../src/window_main.cpp" line="132"/>
         <source>Player %1</source>
         <translation>プレイヤー %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="170"/>
+        <location filename="../src/window_main.cpp" line="177"/>
         <source>About Cockatrice</source>
         <translation>Cockatriceについて</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="172"/>
+        <location filename="../src/window_main.cpp" line="179"/>
         <source>Version %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="173"/>
+        <location filename="../src/window_main.cpp" line="180"/>
         <source>Authors:</source>
         <translation>著者:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="174"/>
+        <location filename="../src/window_main.cpp" line="181"/>
         <source>Translators:</source>
         <translation>翻訳者:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="175"/>
+        <location filename="../src/window_main.cpp" line="182"/>
         <source>Spanish:</source>
         <translation>スペイン語:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="176"/>
+        <location filename="../src/window_main.cpp" line="183"/>
         <source>Portugese (Portugal):</source>
         <translation>ポルトガル語（ポルトガル）:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="177"/>
+        <location filename="../src/window_main.cpp" line="184"/>
         <source>Portugese (Brazil):</source>
         <translation>ポルトガル語（ブラジル）:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="178"/>
+        <location filename="../src/window_main.cpp" line="185"/>
         <source>French:</source>
         <translation>フランス語:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="179"/>
+        <location filename="../src/window_main.cpp" line="186"/>
         <source>Japanese:</source>
         <translation>日本語:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="180"/>
+        <location filename="../src/window_main.cpp" line="187"/>
         <source>Russian:</source>
         <translation>ロシア語:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="181"/>
+        <location filename="../src/window_main.cpp" line="188"/>
         <source>Czech:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="182"/>
+        <location filename="../src/window_main.cpp" line="189"/>
         <source>Slovak:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="188"/>
-        <location filename="../src/window_main.cpp" line="194"/>
         <location filename="../src/window_main.cpp" line="195"/>
+        <location filename="../src/window_main.cpp" line="201"/>
         <location filename="../src/window_main.cpp" line="202"/>
-        <location filename="../src/window_main.cpp" line="208"/>
-        <location filename="../src/window_main.cpp" line="210"/>
+        <location filename="../src/window_main.cpp" line="209"/>
+        <location filename="../src/window_main.cpp" line="215"/>
+        <location filename="../src/window_main.cpp" line="217"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="188"/>
+        <location filename="../src/window_main.cpp" line="195"/>
         <source>Server timeout</source>
         <translation>サーバータイムアウト</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="194"/>
+        <location filename="../src/window_main.cpp" line="201"/>
         <source>Invalid login data.</source>
         <translation>無効なログインデータです.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="195"/>
+        <location filename="../src/window_main.cpp" line="202"/>
         <source>There is already an active session using this user name.
 Please close that session first and re-login.</source>
         <translation>これはすでにこのユーザー名で使われているアクティブなセッションです.
 まずこのセッションを閉じてログインしなおしてください.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="202"/>
+        <location filename="../src/window_main.cpp" line="209"/>
         <source>Socket error: %1</source>
         <translation>ソケットエラー: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="208"/>
+        <location filename="../src/window_main.cpp" line="215"/>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
         <translation>あなたは古いVerのサーバーに接続しようとしています.CockatriceのVerをダウングレードするか適正なサーバーに接続してください.
 ローカルVer %1,リモートVer %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="210"/>
+        <location filename="../src/window_main.cpp" line="217"/>
         <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
 Local version is %1, remote version is %2.</source>
         <translation>あなたのCockatriceのVerが古いです.Cockatriceをアップデートしてください.
 ローカルVer %1,リモートVer %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="216"/>
+        <location filename="../src/window_main.cpp" line="223"/>
         <source>Connecting to %1...</source>
         <translation>%1へ接続しています...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="217"/>
+        <location filename="../src/window_main.cpp" line="224"/>
         <source>Disconnected</source>
         <translation>切断されました</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="218"/>
+        <location filename="../src/window_main.cpp" line="225"/>
         <source>Logged in at %1</source>
         <translation>%1にログイン中</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="227"/>
+        <location filename="../src/window_main.cpp" line="234"/>
         <source>&amp;Connect...</source>
         <translation>接続...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="228"/>
+        <location filename="../src/window_main.cpp" line="235"/>
         <source>&amp;Disconnect</source>
         <translation>切断</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="229"/>
+        <location filename="../src/window_main.cpp" line="236"/>
         <source>Start &amp;local game...</source>
         <translation>ローカルゲームを開始...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="230"/>
+        <location filename="../src/window_main.cpp" line="237"/>
         <source>&amp;Deck editor</source>
         <translation>デッキエディター</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="231"/>
+        <location filename="../src/window_main.cpp" line="238"/>
         <source>&amp;Full screen</source>
         <translation>フルスクリーン</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="232"/>
+        <location filename="../src/window_main.cpp" line="239"/>
         <source>Ctrl+F</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="233"/>
+        <location filename="../src/window_main.cpp" line="240"/>
         <source>&amp;Settings...</source>
         <translation>設定...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="234"/>
+        <location filename="../src/window_main.cpp" line="241"/>
         <source>&amp;Exit</source>
         <translation>終了</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="236"/>
+        <location filename="../src/window_main.cpp" line="243"/>
         <source>&amp;Cockatrice</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="238"/>
+        <location filename="../src/window_main.cpp" line="245"/>
         <source>&amp;About Cockatrice</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="239"/>
+        <location filename="../src/window_main.cpp" line="246"/>
         <source>&amp;Help</source>
         <translation>ヘルプ</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="317"/>
+        <location filename="../src/window_main.cpp" line="325"/>
         <source>Are you sure?</source>
         <translation>よろしいですか?</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="317"/>
+        <location filename="../src/window_main.cpp" line="325"/>
         <source>There are still open games. Are you sure you want to quit?</source>
         <translation>ゲームがまだ開いています.本当に退出しますか?</translation>
     </message>
@@ -2780,39 +2799,72 @@ Local version is %1, remote version is %2.</source>
     </message>
 </context>
 <context>
+    <name>ShutdownDialog</name>
+    <message>
+        <location filename="../src/tab_admin.cpp" line="17"/>
+        <source>&amp;Reason for shutdown:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/tab_admin.cpp" line="20"/>
+        <source>&amp;Time until shutdown (minutes):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/tab_admin.cpp" line="26"/>
+        <source>&amp;OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/tab_admin.cpp" line="30"/>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/tab_admin.cpp" line="46"/>
+        <source>Shut down server</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TabAdmin</name>
     <message>
-        <location filename="../src/tab_admin.cpp" line="40"/>
+        <location filename="../src/tab_admin.cpp" line="93"/>
         <source>Update server &amp;message</source>
         <translation>サーバー更新&amp;メッセージ</translation>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="41"/>
+        <location filename="../src/tab_admin.cpp" line="94"/>
+        <source>&amp;Shut down server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/tab_admin.cpp" line="95"/>
         <source>Server administration functions</source>
         <translation>サーバー管理機能</translation>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="43"/>
+        <location filename="../src/tab_admin.cpp" line="97"/>
         <source>&amp;Unlock functions</source>
         <translation>機能をアンロックする</translation>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="44"/>
+        <location filename="../src/tab_admin.cpp" line="98"/>
         <source>&amp;Lock functions</source>
         <translation>機能をロックする</translation>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="54"/>
+        <location filename="../src/tab_admin.cpp" line="115"/>
         <source>Unlock administration functions</source>
         <translation>管理機能をアンロックする</translation>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="54"/>
+        <location filename="../src/tab_admin.cpp" line="115"/>
         <source>Do you really want to unlock the administration functions?</source>
         <translation>本当に管理機能をアンロックしますか？</translation>
     </message>
     <message>
-        <location filename="../src/tab_admin.h" line="27"/>
+        <location filename="../src/tab_admin.h" line="43"/>
         <source>Administration</source>
         <translation>管理者</translation>
     </message>

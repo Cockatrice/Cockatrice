@@ -36,6 +36,7 @@ private slots:
 	void updateTabMenu(QMenu *menu);
 	void statusChanged(ClientStatus _status);
 	void processConnectionClosedEvent(Event_ConnectionClosed *event);
+	void processServerShutdownEvent(Event_ServerShutdown *event);
 	void serverTimeout();
 	void serverError(ResponseCode r);
 	void socketError(const QString &errorStr);

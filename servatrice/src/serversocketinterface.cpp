@@ -454,12 +454,21 @@ ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd, C
 	return RespNothing;
 }
 
-// ADMIN FUNCTIONS.
-// Permission is checked by the calling function.
+// MODERATOR FUNCTIONS.
+// May be called by admins and moderators. Permission is checked by the calling function.
 
 ResponseCode ServerSocketInterface::cmdUpdateServerMessage(Command_UpdateServerMessage * /*cmd*/, CommandContainer * /*cont*/)
 {
 	servatrice->updateLoginMessage();
+	return RespOk;
+}
+
+// ADMIN FUNCTIONS.
+// Permission is checked by the calling function.
+
+ResponseCode ServerSocketInterface::cmdShutdownServer(Command_ShutdownServer *cmd, CommandContainer * /*cont*/)
+{
+	servatrice->scheduleShutdown(cmd->getReason(), cmd->getMinutes());
 	return RespOk;
 }
 

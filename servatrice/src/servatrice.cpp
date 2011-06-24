@@ -44,7 +44,7 @@ void Servatrice_TcpServer::incomingConnection(int socketDescriptor)
 }
 
 Servatrice::Servatrice(QSettings *_settings, QObject *parent)
-	: Server(parent), dbMutex(QMutex::Recursive), settings(_settings), uptime(0)
+	: Server(parent), dbMutex(QMutex::Recursive), settings(_settings), uptime(0), shutdownTimer(0)
 {
 	pingClock = new QTimer(this);
 	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
@@ -119,6 +119,7 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 Servatrice::~Servatrice()
 {
 	prepareDestroy();
+	QSqlDatabase::database().close();
 }
 
 bool Servatrice::openDatabase()
@@ -233,7 +234,7 @@ ServerInfo_User *Servatrice::evalUserQueryResult(const QSqlQuery &query, bool co
 	
 	int userLevel = ServerInfo_User::IsUser | ServerInfo_User::IsRegistered;
 	if (is_admin == 1)
-		userLevel |= ServerInfo_User::IsAdmin;
+		userLevel |= ServerInfo_User::IsAdmin | ServerInfo_User::IsModerator;
 	else if (is_admin == 2)
 		userLevel |= ServerInfo_User::IsModerator;
 	
@@ -386,6 +387,40 @@ void Servatrice::statusUpdate()
 	query.bindValue(":users_count", getUsersCount());
 	query.bindValue(":games_count", getGamesCount());
 	execSqlQuery(query);
+}
+
+void Servatrice::scheduleShutdown(const QString &reason, int minutes)
+{
+	QMutexLocker locker(&serverMutex);
+
+	shutdownReason = reason;
+	shutdownMinutes = minutes + 1;
+	if (minutes > 0) {
+		shutdownTimer = new QTimer;
+		connect(shutdownTimer, SIGNAL(timeout()), this, SLOT(shutdownTimeout()));
+		shutdownTimer->start(60000);
+	}
+	shutdownTimeout();
+}
+
+void Servatrice::shutdownTimeout()
+{
+	QMutexLocker locker(&serverMutex);
+	
+	--shutdownMinutes;
+	
+	GenericEvent *event;
+	if (shutdownMinutes)
+		event = new Event_ServerShutdown(shutdownReason, shutdownMinutes);
+	else
+		event = new Event_ConnectionClosed("server_shutdown");
+
+	for (int i = 0; i < clients.size(); ++i)
+		clients[i]->sendProtocolItem(event, false);
+	delete event;
+	
+	if (!shutdownMinutes)
+		deleteLater();
 }
 
 const QString Servatrice::versionString = "Servatrice 0.20110527";

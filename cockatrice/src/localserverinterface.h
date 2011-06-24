@@ -18,8 +18,9 @@ private:
 	ResponseCode cmdDeckDel(Command_DeckDel * /*cmd*/, CommandContainer * /*cont*/) { return RespFunctionNotAllowed; }
 	ResponseCode cmdDeckUpload(Command_DeckUpload * /*cmd*/, CommandContainer * /*cont*/) { return RespFunctionNotAllowed; }
 	ResponseCode cmdDeckDownload(Command_DeckDownload * /*cmd*/, CommandContainer * /*cont*/) { return RespFunctionNotAllowed; }
-	ResponseCode cmdUpdateServerMessage(Command_UpdateServerMessage * /*cmd*/, CommandContainer * /*cont*/) { return RespFunctionNotAllowed; }
 	ResponseCode cmdBanFromServer(Command_BanFromServer * /*cmd*/, CommandContainer * /*cont*/) { return RespFunctionNotAllowed; }
+	ResponseCode cmdShutdownServer(Command_ShutdownServer * /*cmd*/, CommandContainer * /*cont*/) { return RespFunctionNotAllowed; }
+	ResponseCode cmdUpdateServerMessage(Command_UpdateServerMessage * /*cmd*/, CommandContainer * /*cont*/) { return RespFunctionNotAllowed; }
 public:
 	LocalServerInterface(LocalServer *_server);
 	~LocalServerInterface();

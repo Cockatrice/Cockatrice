@@ -23,6 +23,7 @@
 #include "server_room.h"
 #include "server_protocolhandler.h"
 #include "protocol_datastructures.h"
+#include <QCoreApplication>
 #include <QDebug>
 
 Server::Server(QObject *parent)

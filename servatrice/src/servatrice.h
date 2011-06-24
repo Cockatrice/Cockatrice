@@ -50,6 +50,7 @@ class Servatrice : public Server
 private slots:
 	void statusUpdate();
 	void updateBanTimer();
+	void shutdownTimeout();
 public:
 	QMutex dbMutex;
 	static const QString versionString;
@@ -76,6 +77,7 @@ public:
 	bool getUserBanned(Server_ProtocolHandler *client, const QString &userName) const;
 	void addAddressBan(const QHostAddress &address, int minutes) { addressBanList.append(QPair<QHostAddress, int>(address, minutes)); }
 	void addNameBan(const QString &name, int minutes) { nameBanList.append(QPair<QString, int>(name, minutes)); }
+	void scheduleShutdown(const QString &reason, int minutes);
 protected:
 	bool userExists(const QString &user);
 	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
@@ -92,6 +94,10 @@ private:
 	int maxGameInactivityTime, maxPlayerInactivityTime;
 	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser;
 	ServerInfo_User *evalUserQueryResult(const QSqlQuery &query, bool complete);
+	
+	QString shutdownReason;
+	int shutdownMinutes;
+	QTimer *shutdownTimer;
 };
 
 #endif

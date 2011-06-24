@@ -130,12 +130,16 @@ int main(int argc, char *argv[])
 		testRNG();
 	
 	Servatrice server(settings);
+	QObject::connect(&server, SIGNAL(destroyed()), &app, SLOT(quit()), Qt::QueuedConnection);
 	
 	std::cerr << "-------------------------" << std::endl;
 	std::cerr << "Server initialized." << std::endl;
 	
 	int retval = app.exec();
 
+	std::cerr << "Server quit." << std::endl;
+	std::cerr << "-------------------------" << std::endl;
+	
 	delete rng;
 	delete settings;
 

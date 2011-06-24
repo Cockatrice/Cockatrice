@@ -167,6 +167,15 @@ public:
 	void setGameId(int _gameId) { static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->setData(_gameId); }
 };
 
+class ModeratorCommand : public Command {
+	Q_OBJECT
+public:
+	ModeratorCommand(const QString &_cmdName)
+		: Command(_cmdName)
+	{
+	}
+};
+
 class AdminCommand : public Command {
 	Q_OBJECT
 public:
