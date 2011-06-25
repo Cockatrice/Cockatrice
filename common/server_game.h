@@ -88,6 +88,7 @@ public:
 	void setActivePlayer(int _activePlayer);
 	void setActivePhase(int _activePhase);
 	void nextTurn();
+	void postConnectionStatusUpdate(Server_Player *player, bool connectionStatus);
 
 	QList<ServerInfo_Player *> getGameState(Server_Player *playerWhosAsking) const;
 	void sendGameEvent(GameEvent *event, GameEventContext *context = 0, Server_Player *exclude = 0);

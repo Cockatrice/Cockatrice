@@ -26,6 +26,7 @@ class CommandContainer;
 class GameCommand;
 class GameEvent;
 class GameEventContext;
+class Event_ConnectionStateChanged;
 class Event_Say;
 class Event_Shuffle;
 class Event_RollDie;
@@ -69,6 +70,7 @@ class Player : public QObject, public QGraphicsItem {
 signals:
 	void newCardAdded(AbstractCardItem *card);
 	// Log events
+	void logConnectionStateChanged(Player *player, bool connectionState);
 	void logSay(Player *player, QString message);
 	void logShuffle(Player *player, CardZone *zone);
 	void logRollDie(Player *player, int sides, int roll);
@@ -176,6 +178,7 @@ private:
 	
 	void initSayMenu();
 	
+	void eventConnectionStateChanged(Event_ConnectionStateChanged *event);
 	void eventSay(Event_Say *event);
 	void eventShuffle(Event_Shuffle *event);
 	void eventRollDie(Event_RollDie *event);

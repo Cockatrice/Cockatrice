@@ -341,6 +341,13 @@ void Server_Game::nextTurn()
 	setActivePlayer(keys[listPos]);
 }
 
+void Server_Game::postConnectionStatusUpdate(Server_Player *player, bool connectionStatus)
+{
+	QMutexLocker locker(&gameMutex);
+	
+	sendGameEvent(new Event_ConnectionStateChanged(player->getPlayerId(), connectionStatus));
+}
+
 QList<ServerInfo_Player *> Server_Game::getGameState(Server_Player *playerWhosAsking) const
 {
 	QMutexLocker locker(&gameMutex);

@@ -46,8 +46,10 @@ void Server_ProtocolHandler::prepareDestroy()
 		
 		if ((authState == UnknownUser) || p->getSpectator())
 			g->removePlayer(p);
-		else
+		else {
 			p->setProtocolHandler(0);
+			g->postConnectionStatusUpdate(p, false);
+		}
 	}
 	gameListMutex.unlock();
 
@@ -392,6 +394,7 @@ ResponseCode Server_ProtocolHandler::cmdJoinRoom(Command_JoinRoom *cmd, CommandC
 		for (int j = 0; j < gamePlayers.size(); ++j)
 			if (gamePlayers[j]->getUserInfo()->getName() == userInfo->getName()) {
 				gamePlayers[j]->setProtocolHandler(this);
+				game->postConnectionStatusUpdate(gamePlayers[j], true);
 				games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, gamePlayers[j]));
 				
 				enqueueProtocolItem(new Event_GameJoined(game->getGameId(), game->getDescription(), gamePlayers[j]->getPlayerId(), gamePlayers[j]->getSpectator(), game->getSpectatorsCanTalk(), game->getSpectatorsSeeEverything(), true));

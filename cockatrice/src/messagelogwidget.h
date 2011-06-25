@@ -65,6 +65,7 @@ public slots:
 	void logNotReadyStart(Player *player);
 	void logConcede(Player *player);
 	void logGameStart();
+	void logConnectionStateChanged(Player *player, bool connectionState);
 	void logSay(Player *player, QString message);
 	void logSpectatorSay(QString spectatorName, QString message);
 	void logShuffle(Player *player, CardZone *zone);

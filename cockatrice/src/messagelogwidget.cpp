@@ -117,6 +117,14 @@ void MessageLogWidget::logGameStart()
 	append(tr("The game has started."));
 }
 
+void MessageLogWidget::logConnectionStateChanged(Player *player, bool connectionState)
+{
+	if (connectionState)
+		append(tr("%1 has restored connection to the game.").arg(sanitizeHtml(player->getName())));
+	else
+		append(tr("%1 has lost connection to the game.").arg(sanitizeHtml(player->getName())));
+}
+
 void MessageLogWidget::logSay(Player *player, QString message)
 {
 	append(QString("<b><font color=\"") + (player->getLocal() ? "red" : "#0000fe") + QString("\">%1:</font></b> %2").arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(message)));
@@ -499,6 +507,7 @@ void MessageLogWidget::containerProcessingDone()
 
 void MessageLogWidget::connectToPlayer(Player *player)
 {
+	connect(player, SIGNAL(logConnectionStateChanged(Player *, bool)), this, SLOT(logConnectionStateChanged(Player *, bool)));
 	connect(player, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));
 	connect(player, SIGNAL(logShuffle(Player *, CardZone *)), this, SLOT(logShuffle(Player *, CardZone *)));
 	connect(player, SIGNAL(logRollDie(Player *, int, int)), this, SLOT(logRollDie(Player *, int, int)));

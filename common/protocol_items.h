@@ -389,6 +389,14 @@ public:
 	static SerializableItem *newItem() { return new Command_RevealCards; }
 	int getItemId() const { return ItemId_Command_RevealCards; }
 };
+class Event_ConnectionStateChanged : public GameEvent {
+	Q_OBJECT
+public:
+	Event_ConnectionStateChanged(int _playerId = -1, bool _connected = false);
+	bool getConnected() const { return static_cast<SerializableItem_Bool *>(itemMap.value("connected"))->getData(); };
+	static SerializableItem *newItem() { return new Event_ConnectionStateChanged; }
+	int getItemId() const { return ItemId_Event_ConnectionStateChanged; }
+};
 class Event_Say : public GameEvent {
 	Q_OBJECT
 public:
