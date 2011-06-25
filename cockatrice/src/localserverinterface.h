@@ -21,12 +21,13 @@ private:
 	ResponseCode cmdBanFromServer(Command_BanFromServer * /*cmd*/, CommandContainer * /*cont*/) { return RespFunctionNotAllowed; }
 	ResponseCode cmdShutdownServer(Command_ShutdownServer * /*cmd*/, CommandContainer * /*cont*/) { return RespFunctionNotAllowed; }
 	ResponseCode cmdUpdateServerMessage(Command_UpdateServerMessage * /*cmd*/, CommandContainer * /*cont*/) { return RespFunctionNotAllowed; }
+protected:
+	bool getCompressionSupport() const { return false; }
 public:
 	LocalServerInterface(LocalServer *_server);
 	~LocalServerInterface();
 	
 	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
-	
 signals:
 	void itemToClient(ProtocolItem *item);
 public slots:

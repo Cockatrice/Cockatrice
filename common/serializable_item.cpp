@@ -1,7 +1,8 @@
 #include "serializable_item.h"
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
-#include <QDebug>
+#include <QBuffer>
+
 QHash<QString, SerializableItem::NewItemFunction> SerializableItem::itemNameHash;
 
 SerializableItem *SerializableItem::getNewItem(const QString &name)
@@ -14,6 +15,32 @@ SerializableItem *SerializableItem::getNewItem(const QString &name)
 void SerializableItem::registerSerializableItem(const QString &name, NewItemFunction func)
 {
 	itemNameHash.insert(name, func);
+}
+
+bool SerializableItem::read(QXmlStreamReader *xml)
+{
+	if (!compressed)
+		return readElement(xml);
+	if (xml->isEndElement() && (xml->name() == itemType)) {
+		QByteArray uncompressedData = "<d>" + qUncompress(QByteArray::fromBase64(compressedData)) + "</d>";
+		compressedData.clear();
+		QBuffer compressedBuffer(&uncompressedData);
+		compressedBuffer.open(QIODevice::ReadOnly);
+		QXmlStreamReader *xml2 = new QXmlStreamReader(&compressedBuffer);
+		while (!xml2->atEnd())  {
+			xml2->readNext();
+			if (xml2->name() == "d")
+				continue;
+			readElement(xml2);
+		}
+		delete xml2;
+		compressedBuffer.close();
+		
+		return readElement(xml);
+	} else {
+		compressedData.append(xml->text().toString());
+		return false;
+	}
 }
 
 bool SerializableItem::readElement(QXmlStreamReader *xml)
@@ -31,7 +58,19 @@ void SerializableItem::write(QXmlStreamWriter *xml)
 	xml->writeStartElement(itemType);
 	if (!itemSubType.isEmpty())
 		xml->writeAttribute("type", itemSubType);
-	writeElement(xml);
+	if (compressed) {
+		xml->writeAttribute("comp", "1");
+
+		QBuffer compressBuffer;
+		compressBuffer.open(QIODevice::WriteOnly);
+		QXmlStreamWriter *xml2 = new QXmlStreamWriter(&compressBuffer);
+		writeElement(xml2);
+		delete xml2;
+		compressBuffer.close();
+
+		xml->writeCharacters(qCompress(compressBuffer.data()).toBase64());
+	} else
+		writeElement(xml);
 	xml->writeEndElement();
 }
 
@@ -47,7 +86,7 @@ SerializableItem_Map::~SerializableItem_Map()
 bool SerializableItem_Map::readElement(QXmlStreamReader *xml)
 {
 	if (currentItem) {
-		if (currentItem->readElement(xml))
+		if (currentItem->read(xml))
 			currentItem = 0;
 		return false;
 	} else if (firstItem)
@@ -57,6 +96,7 @@ bool SerializableItem_Map::readElement(QXmlStreamReader *xml)
 	else if (xml->isStartElement()) {
 		QString childName = xml->name().toString();
 		QString childSubType = xml->attributes().value("type").toString();
+		bool childCompressed = xml->attributes().value("comp").toString().toInt() == 1;
 		currentItem = itemMap.value(childName);
 		if (!currentItem) {
 			currentItem = getNewItem(childName + childSubType);
@@ -64,7 +104,8 @@ bool SerializableItem_Map::readElement(QXmlStreamReader *xml)
 			if (!currentItem)
 				currentItem = new SerializableItem_Invalid(childName);
 		}
-		if (currentItem->readElement(xml))
+		currentItem->setCompressed(childCompressed);
+		if (currentItem->read(xml))
 			currentItem = 0;
 	}
 	return SerializableItem::readElement(xml);

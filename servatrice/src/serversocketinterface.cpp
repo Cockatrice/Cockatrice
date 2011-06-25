@@ -33,7 +33,7 @@
 #include "server_logger.h"
 
 ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent)
-	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), topLevelItem(0)
+	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), topLevelItem(0), compressionSupport(false)
 {
 	xmlWriter = new QXmlStreamWriter(&xmlBuffer);
 	xmlReader = new QXmlStreamReader;
@@ -101,6 +101,8 @@ void ServerSocketInterface::readClient()
 		if (topLevelItem)
 			topLevelItem->readElement(xmlReader);
 		else if (xmlReader->isStartElement() && (xmlReader->name().toString() == "cockatrice_client_stream")) {
+			if (xmlReader->attributes().value("comp").toString().toInt() == 1)
+				compressionSupport = true;
 			topLevelItem = new TopLevelProtocolItem;
 			connect(topLevelItem, SIGNAL(protocolItemReceived(ProtocolItem *)), this, SLOT(processProtocolItem(ProtocolItem *)));
 		}
@@ -295,7 +297,10 @@ ResponseCode ServerSocketInterface::cmdDeckList(Command_DeckList * /*cmd*/, Comm
 	if (!deckListHelper(root))
 		return RespContextError;
 	
-	cont->setResponse(new Response_DeckList(cont->getCmdId(), RespOk, root));
+	ProtocolResponse *resp = new Response_DeckList(cont->getCmdId(), RespOk, root);
+	if (getCompressionSupport())
+		resp->setCompressed(true);
+	cont->setResponse(resp);
 	
 	return RespNothing;
 }

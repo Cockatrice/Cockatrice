@@ -286,7 +286,10 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 	if (authState == WouldOverwriteOldSession)
 		return RespWouldOverwriteOldSession;
 
-	enqueueProtocolItem(new Event_ServerMessage(server->getLoginMessage()));
+	ProtocolItem *serverMessage = new Event_ServerMessage(server->getLoginMessage());
+	if (getCompressionSupport())
+		serverMessage->setCompressed(true);
+	enqueueProtocolItem(serverMessage);
 
 	QList<ServerInfo_User *> _buddyList, _ignoreList;
 	if (authState == PasswordRight) {
@@ -303,7 +306,10 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 			_ignoreList.append(new ServerInfo_User(ignoreIterator.next().value()));
 	}
 	
-	cont->setResponse(new Response_Login(cont->getCmdId(), RespOk, new ServerInfo_User(userInfo, true), _buddyList, _ignoreList));
+	ProtocolResponse *resp = new Response_Login(cont->getCmdId(), RespOk, new ServerInfo_User(userInfo, true), _buddyList, _ignoreList);
+	if (getCompressionSupport())
+		resp->setCompressed(true);
+	cont->setResponse(resp);
 	return RespNothing;
 }
 
@@ -395,7 +401,10 @@ ResponseCode Server_ProtocolHandler::cmdJoinRoom(Command_JoinRoom *cmd, CommandC
 			}
 	}
 	
-	cont->setResponse(new Response_JoinRoom(cont->getCmdId(), RespOk, r->getInfo(true)));
+	ServerInfo_Room *info = r->getInfo(true);
+	if (getCompressionSupport())
+		info->setCompressed(true);
+	cont->setResponse(new Response_JoinRoom(cont->getCmdId(), RespOk, info));
 	return RespNothing;
 }
 
@@ -444,7 +453,10 @@ ResponseCode Server_ProtocolHandler::cmdListUsers(Command_ListUsers * /*cmd*/, C
 	
 	acceptsUserListChanges = true;
 	
-	cont->setResponse(new Response_ListUsers(cont->getCmdId(), RespOk, resultList));
+	ProtocolResponse *resp = new Response_ListUsers(cont->getCmdId(), RespOk, resultList);
+	if (getCompressionSupport())
+		resp->setCompressed(true);
+	cont->setResponse(resp);
 	return RespNothing;
 }
 

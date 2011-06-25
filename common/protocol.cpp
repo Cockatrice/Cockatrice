@@ -74,7 +74,7 @@ TopLevelProtocolItem::TopLevelProtocolItem()
 bool TopLevelProtocolItem::readCurrentItem(QXmlStreamReader *xml)
 {
 	if (currentItem) {
-		if (currentItem->readElement(xml)) {
+		if (currentItem->read(xml)) {
 			emit protocolItemReceived(currentItem);
 			currentItem = 0;
 		}
@@ -92,6 +92,8 @@ bool TopLevelProtocolItem::readElement(QXmlStreamReader *xml)
 		currentItem = dynamic_cast<ProtocolItem *>(getNewItem(childName + childSubType));
 		if (!currentItem)
 			currentItem = new ProtocolItem_Invalid;
+		if (xml->attributes().value("comp").toString().toInt() == 1)
+			currentItem->setCompressed(true);
 		
 		readCurrentItem(xml);
 	}

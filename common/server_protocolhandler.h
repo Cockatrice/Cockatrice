@@ -30,6 +30,7 @@ protected:
 	QMap<QString, ServerInfo_User *> buddyList, ignoreList;
 	
 	void prepareDestroy();
+	virtual bool getCompressionSupport() const = 0;
 private:
 	QList<ProtocolItem *> itemQueue;
 	QList<int> messageSizeOverTime, messageCountOverTime;

@@ -83,6 +83,7 @@ void RemoteClient::readData()
 			xmlWriter->writeStartDocument();
 			xmlWriter->writeStartElement("cockatrice_client_stream");
 			xmlWriter->writeAttribute("version", QString::number(ProtocolItem::protocolVersion));
+			xmlWriter->writeAttribute("comp", "1");
 			
 			topLevelItem = new TopLevelProtocolItem;
 			connect(topLevelItem, SIGNAL(protocolItemReceived(ProtocolItem *)), this, SLOT(processProtocolItem(ProtocolItem *)));
