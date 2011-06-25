@@ -100,7 +100,6 @@ private:
 	int activePlayer;
 
 	QSplitter *splitter;
-	CardInfoWidget *infoPopup;
 	CardInfoWidget *cardInfo;
 	PlayerListWidget *playerListWidget;
 	QLabel *timeElapsedLabel;
@@ -147,8 +146,6 @@ signals:
 	void openMessageDialog(const QString &userName, bool focus);
 private slots:
 	void newCardAdded(AbstractCardItem *card);
-	void showCardInfoPopup(const QPoint &pos, const QString &cardName);
-	void deleteCardInfoPopup();
 	
 	void actConcede();
 	void actLeaveGame();
@@ -158,7 +155,7 @@ private slots:
 	void actNextPhase();
 	void actNextTurn();
 public:
-	TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming);
+	TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, const QString &_userName, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming);
 	~TabGame();
 	void retranslateUi();
 	void closeRequest();

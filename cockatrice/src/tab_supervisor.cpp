@@ -221,7 +221,7 @@ void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex)
 
 void TabSupervisor::gameJoined(Event_GameJoined *event)
 {
-	TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
+	TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event->getGameId(), event->getGameDescription(), event->getPlayerId(), userName, event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
 	int tabIndex = myAddTab(tab);
@@ -232,7 +232,7 @@ void TabSupervisor::gameJoined(Event_GameJoined *event)
 
 void TabSupervisor::localGameJoined(Event_GameJoined *event)
 {
-	TabGame *tab = new TabGame(this, localClients, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
+	TabGame *tab = new TabGame(this, localClients, event->getGameId(), event->getGameDescription(), event->getPlayerId(), QString(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	int tabIndex = myAddTab(tab);
 	addCloseButtonToTab(tab, tabIndex);

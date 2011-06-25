@@ -74,13 +74,11 @@ public:
 	int getUsersWithAddress(const QHostAddress &address) const;
 	QMap<QString, ServerInfo_User *> getBuddyList(const QString &name);
 	QMap<QString, ServerInfo_User *> getIgnoreList(const QString &name);
-	bool getUserBanned(Server_ProtocolHandler *client, const QString &userName) const;
 	void addAddressBan(const QHostAddress &address, int minutes) { addressBanList.append(QPair<QHostAddress, int>(address, minutes)); }
-	void addNameBan(const QString &name, int minutes) { nameBanList.append(QPair<QString, int>(name, minutes)); }
 	void scheduleShutdown(const QString &reason, int minutes);
 protected:
 	bool userExists(const QString &user);
-	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
+	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password);
 private:
 	QTimer *pingClock, *statusUpdateClock, *banTimeoutClock;
 	QTcpServer *tcpServer;
@@ -90,7 +88,6 @@ private:
 	int serverId;
 	int uptime;
 	QList<QPair<QHostAddress, int> > addressBanList;
-	QList<QPair<QString, int> > nameBanList;
 	int maxGameInactivityTime, maxPlayerInactivityTime;
 	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser;
 	ServerInfo_User *evalUserQueryResult(const QSqlQuery &query, bool complete);

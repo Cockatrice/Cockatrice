@@ -10,6 +10,53 @@
 #include <QMouseEvent>
 #include <QMenu>
 #include <QInputDialog>
+#include <QLabel>
+#include <QSpinBox>
+#include <QPlainTextEdit>
+#include <QPushButton>
+#include <QHBoxLayout>
+
+BanDialog::BanDialog(QWidget *parent)
+	: QDialog(parent)
+{
+	QLabel *durationLabel = new QLabel(tr("Please enter the duration of the ban (in minutes).\nEnter 0 for an indefinite ban."));
+	durationEdit = new QSpinBox;
+	durationEdit->setMinimum(0);
+	durationEdit->setValue(5);
+	QLabel *reasonLabel = new QLabel(tr("Please enter the reason for the ban.\nThis is only saved for moderators and cannot be seen by the banned person."));
+	reasonEdit = new QPlainTextEdit;
+	
+	QPushButton *okButton = new QPushButton(tr("&OK"));
+	okButton->setAutoDefault(true);
+	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
+	QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
+	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+	
+	QHBoxLayout *buttonLayout = new QHBoxLayout;
+	buttonLayout->addStretch();
+	buttonLayout->addWidget(okButton);
+	buttonLayout->addWidget(cancelButton);
+	
+	QVBoxLayout *vbox = new QVBoxLayout;
+	vbox->addWidget(durationLabel);
+	vbox->addWidget(durationEdit);
+	vbox->addWidget(reasonLabel);
+	vbox->addWidget(reasonEdit);
+	vbox->addLayout(buttonLayout);
+	
+	setLayout(vbox);
+	setWindowTitle(tr("Ban user from server"));
+}
+
+int BanDialog::getMinutes() const
+{
+	return durationEdit->value();
+}
+
+QString BanDialog::getReason() const
+{
+	return reasonEdit->toPlainText();
+}
 
 UserListItemDelegate::UserListItemDelegate(QObject *const parent)
 	: QStyledItemDelegate(parent)
@@ -215,10 +262,9 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	else if (actionClicked == aRemoveFromIgnoreList)
 		client->sendCommand(new Command_RemoveFromList("ignore", userName));
 	else if (actionClicked == aBan) {
-		bool ok;
-		int minutes = QInputDialog::getInt(this, tr("Duration"), tr("Please enter the duration of the ban (in minutes).\nEnter 0 for an indefinite ban."), 0, 0, 2147483647, 10, &ok);
-		if (ok)
-			client->sendCommand(new Command_BanFromServer(userName, minutes));
+		BanDialog dlg(this);
+		if (dlg.exec())
+			client->sendCommand(new Command_BanFromServer(userName, dlg.getMinutes(), dlg.getReason()));
 	}
 	
 	delete menu;

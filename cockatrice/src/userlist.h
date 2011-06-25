@@ -1,6 +1,7 @@
 #ifndef USERLIST_H
 #define USERLIST_H
 
+#include <QDialog>
 #include <QGroupBox>
 #include <QTreeWidgetItem>
 #include <QStyledItemDelegate>
@@ -9,6 +10,19 @@ class QTreeWidget;
 class ServerInfo_User;
 class AbstractClient;
 class TabSupervisor;
+class QSpinBox;
+class QPlainTextEdit;
+
+class BanDialog : public QDialog {
+	Q_OBJECT
+private:
+	QSpinBox *durationEdit;
+	QPlainTextEdit *reasonEdit;
+public:
+	BanDialog(QWidget *parent = 0);
+	int getMinutes() const;
+	QString getReason() const;
+};
 
 class UserListItemDelegate : public QStyledItemDelegate {
 public:

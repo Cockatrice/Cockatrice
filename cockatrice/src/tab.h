@@ -5,6 +5,7 @@
 
 class QMenu;
 class TabSupervisor;
+class CardInfoWidget;
 
 class Tab : public QWidget {
 	Q_OBJECT
@@ -13,11 +14,14 @@ signals:
 protected:
 	QMenu *tabMenu;
 	TabSupervisor *tabSupervisor;
+protected slots:
+	void showCardInfoPopup(const QPoint &pos, const QString &cardName);
+	void deleteCardInfoPopup();
 private:
 	bool contentsChanged;
+	CardInfoWidget *infoPopup;
 public:
-	Tab(TabSupervisor *_tabSupervisor, QWidget *parent = 0)
-		: QWidget(parent), tabMenu(0), tabSupervisor(_tabSupervisor), contentsChanged(false) { }
+	Tab(TabSupervisor *_tabSupervisor, QWidget *parent = 0);
 	QMenu *getTabMenu() const { return tabMenu; }
 	bool getContentsChanged() const { return contentsChanged; }
 	void setContentsChanged(bool _contentsChanged) { contentsChanged = _contentsChanged; }

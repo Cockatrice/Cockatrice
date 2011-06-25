@@ -137,7 +137,9 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
 	userList = new UserList(tabSupervisor, client, UserList::RoomList);
 	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
 	
-	chatView = new ChatView(ownName);
+	chatView = new ChatView(ownName, true);
+	connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
+	connect(chatView, SIGNAL(deleteCardInfoPopup()), this, SLOT(deleteCardInfoPopup()));
 	sayLabel = new QLabel;
 	sayEdit = new QLineEdit;
 	sayLabel->setBuddy(sayEdit);

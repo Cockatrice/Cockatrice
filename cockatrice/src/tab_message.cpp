@@ -11,7 +11,9 @@
 TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, const QString &_userName)
 	: Tab(_tabSupervisor), client(_client), userName(_userName), userOnline(true)
 {
-	chatView = new ChatView(_ownName);
+	chatView = new ChatView(_ownName, true);
+	connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
+	connect(chatView, SIGNAL(deleteCardInfoPopup()), this, SLOT(deleteCardInfoPopup()));
 	sayEdit = new QLineEdit;
 	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
 	

@@ -169,25 +169,32 @@ bool Servatrice::execSqlQuery(QSqlQuery &query)
 	return false;
 }
 
-AuthenticationResult Servatrice::checkUserPassword(const QString &user, const QString &password)
+AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password)
 {
+	serverMutex.lock();
+	QHostAddress address = static_cast<ServerSocketInterface *>(handler)->getPeerAddress();
+	for (int i = 0; i < addressBanList.size(); ++i)
+		if (address == addressBanList[i].first)
+			return PasswordWrong;
+	serverMutex.unlock();
+
 	QMutexLocker locker(&dbMutex);
 	const QString method = settings->value("authentication/method").toString();
 	if (method == "none")
 		return UnknownUser;
 	else if (method == "sql") {
 		checkSql();
-	
+		
 		QSqlQuery query;
-		query.prepare("select banned, password from " + dbPrefix + "_users where name = :name and active = 1");
+		query.prepare("select a.password, timediff(now(), date_add(b.time_from, interval b.minutes minute)) < 0, b.minutes <=> 0 from " + dbPrefix + "_users a left join " + dbPrefix + "_bans b on b.id_user = a.id and b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.id_user = a.id) where a.name = :name and a.active = 1");
 		query.bindValue(":name", user);
 		if (!execSqlQuery(query))
 			return PasswordWrong;
 		
 		if (query.next()) {
-			if (query.value(0).toInt())
+			if (query.value(1).toInt() || query.value(2).toInt())
 				return PasswordWrong;
-			if (query.value(1).toString() == password)
+			if (query.value(0).toString() == password)
 				return PasswordRight;
 			else
 				return PasswordWrong;
@@ -325,30 +332,12 @@ QMap<QString, ServerInfo_User *> Servatrice::getIgnoreList(const QString &name)
 	return result;
 }
 
-bool Servatrice::getUserBanned(Server_ProtocolHandler *client, const QString &userName) const
-{
-	QMutexLocker locker(&serverMutex);
-	QHostAddress address = static_cast<ServerSocketInterface *>(client)->getPeerAddress();
-	for (int i = 0; i < addressBanList.size(); ++i)
-		if (address == addressBanList[i].first)
-			return true;
-	for (int i = 0; i < nameBanList.size(); ++i)
-		if (userName == nameBanList[i].first)
-			return true;
-	return false;
-}
-
 void Servatrice::updateBanTimer()
 {
 	QMutexLocker locker(&serverMutex);
 	for (int i = 0; i < addressBanList.size(); )
 		if (--(addressBanList[i].second) <= 0)
 			addressBanList.removeAt(i);
-		else
-			++i;
-	for (int i = 0; i < nameBanList.size(); )
-		if (--(nameBanList[i].second) <= 0)
-			nameBanList.removeAt(i);
 		else
 			++i;
 }

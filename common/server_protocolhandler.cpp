@@ -280,8 +280,6 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 	QString userName = cmd->getUsername().simplified();
 	if (userName.isEmpty() || (userInfo != 0))
 		return RespContextError;
-	if (server->getUserBanned(this, userName))
-		return RespWrongPassword;
 	authState = server->loginUser(this, userName, cmd->getPassword());
 	if (authState == PasswordWrong)
 		return RespWrongPassword;

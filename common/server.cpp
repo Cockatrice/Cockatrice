@@ -52,7 +52,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	QMutexLocker locker(&serverMutex);
 	if (name.size() > 35)
 		name = name.left(35);
-	AuthenticationResult authState = checkUserPassword(name, password);
+	AuthenticationResult authState = checkUserPassword(session, name, password);
 	if (authState == PasswordWrong)
 		return authState;
 	

@@ -136,6 +136,7 @@ SOURCES += src/abstractcounter.cpp \
  src/gamescene.cpp \
  src/arrowitem.cpp \
  src/arrowtarget.cpp \
+ src/tab.cpp \
  src/tab_server.cpp \
  src/tab_room.cpp \
  src/tab_message.cpp \

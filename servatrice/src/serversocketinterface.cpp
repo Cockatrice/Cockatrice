@@ -488,14 +488,14 @@ ResponseCode ServerSocketInterface::cmdBanFromServer(Command_BanFromServer *cmd,
 	ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
 	if (user->getUserInfo()->getUserLevel() & ServerInfo_User::IsRegistered) {
 		// Registered users can be banned by name.
-		if (minutes == 0) {
-			QMutexLocker locker(&servatrice->dbMutex);
-			QSqlQuery query;
-			query.prepare("update " + servatrice->getDbPrefix() + "_users set banned=1 where name = :name");
-			query.bindValue(":name", userName);
-			servatrice->execSqlQuery(query);
-		} else
-			servatrice->addNameBan(userName, minutes);
+		QMutexLocker locker(&servatrice->dbMutex);
+		QSqlQuery query;
+		query.prepare("insert into " + servatrice->getDbPrefix() + "_bans (id_user, id_admin, time_from, minutes, reason) values(:id_user, :id_admin, NOW(), :minutes, :reason)");
+		query.bindValue(":id_user", getUserIdInDB(userName));
+		query.bindValue(":id_admin", getUserIdInDB(userInfo->getName()));
+		query.bindValue(":minutes", minutes);
+		query.bindValue(":reason", cmd->getReason());
+		servatrice->execSqlQuery(query);
 	} else {
 		// Unregistered users must be banned by IP address.
 		// Indefinite address bans are not reasonable -> default to 30 minutes.

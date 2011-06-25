@@ -1,15 +1,13 @@
 #ifndef MESSAGELOGWIDGET_H
 #define MESSAGELOGWIDGET_H
 
-#include <QTextEdit>
+#include "chatview.h"
 #include <QAbstractSocket>
 #include "translation.h"
 #include "protocol_datastructures.h"
 
 class Player;
 class CardZone;
-class QMouseEvent;
-class QEvent;
 class CardInfoWidget;
 class GameEventContext;
 class CardItem;
@@ -24,16 +22,15 @@ struct LogMoveCard {
 	int newX;
 };
 
-class MessageLogWidget : public QTextEdit {
+class MessageLogWidget : public ChatView {
 	Q_OBJECT
 private:
 	enum MessageContext { MessageContext_None, MessageContext_MoveCard, MessageContext_Mulligan };
 	
-	CardInfoWidget *infoWidget;
 	QString sanitizeHtml(QString dirty) const;
+	void myAppend(const QString &message);
 	bool isFemale(Player *player) const;
 	QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position) const;
-	QString getCardNameUnderMouse(const QPoint &pos) const;
 	MessageContext currentContext;
 	
 	QList<LogMoveCard> moveCardQueue;
@@ -42,10 +39,6 @@ private:
 	
 	Player *mulliganPlayer;
 	int mulliganNumber;
-signals:
-	void cardNameHovered(QString cardName);
-	void showCardInfoPopup(QPoint pos, QString cardName);
-	void deleteCardInfoPopup();
 public slots:
 	void logConnecting(QString hostname);
 	void logConnected();
@@ -96,13 +89,7 @@ public slots:
 	void containerProcessingDone();
 public:
 	void connectToPlayer(Player *player);
-	MessageLogWidget(QWidget *parent = 0);
-protected:
-	void enterEvent(QEvent *event);
-	void leaveEvent(QEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
-	void mousePressEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
+	MessageLogWidget(const QString &_ownName, QWidget *parent = 0);
 };
 
 #endif
