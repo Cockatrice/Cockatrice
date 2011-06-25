@@ -25,7 +25,7 @@ SoundEngine::SoundEngine(QObject *parent)
 void SoundEngine::cacheData()
 {
 	static const QStringList fileNames = QStringList()
-		<< "notification" << "draw" << "playcard" << "shuffle" << "tap" << "untap";
+		<< "notification" << "draw" << "playcard" << "shuffle" << "tap" << "untap" << "cuckoo";
 	for (int i = 0; i < fileNames.size(); ++i) {
 		QFile file(settingsCache->getSoundPath() + "/" + fileNames[i] + ".raw");
 		file.open(QIODevice::ReadOnly);
@@ -74,4 +74,9 @@ void SoundEngine::tap()
 void SoundEngine::untap()
 {
 	playSound("untap");
+}
+
+void SoundEngine::cuckoo()
+{
+	playSound("cuckoo");
 }

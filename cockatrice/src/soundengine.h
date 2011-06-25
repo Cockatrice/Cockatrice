@@ -25,6 +25,7 @@ public slots:
 	void shuffle();
 	void tap();
 	void untap();
+	void cuckoo();
 };
 
 extern SoundEngine *soundEngine;

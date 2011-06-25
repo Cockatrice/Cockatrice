@@ -77,7 +77,7 @@ void MessageLogWidget::logGameJoined(int gameId)
 
 void MessageLogWidget::logJoin(Player *player)
 {
-	soundEngine->notification();
+	soundEngine->cuckoo();
 	myAppend(tr("%1 has joined the game.").arg(sanitizeHtml(player->getName())));
 }
 
