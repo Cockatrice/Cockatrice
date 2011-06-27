@@ -16,6 +16,7 @@
 #include <QSettings>
 #include <QApplication>
 #include <QInputDialog>
+#include <QSpinBox>
 #include "carddatabase.h"
 #include "dlg_settings.h"
 #include "main.h"
@@ -242,8 +243,17 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	invertVerticalCoordinateCheckBox->setChecked(settingsCache->getInvertVerticalCoordinate());
 	connect(invertVerticalCoordinateCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setInvertVerticalCoordinate(int)));
 	
+	minPlayersForMultiColumnLayoutLabel = new QLabel;
+	minPlayersForMultiColumnLayoutEdit = new QSpinBox;
+	minPlayersForMultiColumnLayoutEdit->setMinimum(2);
+	minPlayersForMultiColumnLayoutEdit->setValue(settingsCache->getMinPlayersForMultiColumnLayout());
+	connect(minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMinPlayersForMultiColumnLayout(int)));
+	minPlayersForMultiColumnLayoutLabel->setBuddy(minPlayersForMultiColumnLayoutEdit);
+	
 	QGridLayout *tableGrid = new QGridLayout;
 	tableGrid->addWidget(invertVerticalCoordinateCheckBox, 0, 0, 1, 2);
+	tableGrid->addWidget(minPlayersForMultiColumnLayoutLabel, 1, 0, 1, 1);
+	tableGrid->addWidget(minPlayersForMultiColumnLayoutEdit, 1, 1, 1, 1);
 	
 	tableGroupBox = new QGroupBox;
 	tableGroupBox->setLayout(tableGrid);
@@ -289,6 +299,7 @@ void AppearanceSettingsPage::retranslateUi()
 	
 	tableGroupBox->setTitle(tr("Table grid layout"));
 	invertVerticalCoordinateCheckBox->setText(tr("Invert vertical coordinate"));
+	minPlayersForMultiColumnLayoutLabel->setText(tr("Minimum player count for multi-column layout:"));
 	
 	zoneViewGroupBox->setTitle(tr("Zone view layout"));
 	zoneViewSortByNameCheckBox->setText(tr("Sort by name"));

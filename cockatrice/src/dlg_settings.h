@@ -14,6 +14,7 @@ class QGroupBox;
 class QCheckBox;
 class QLabel;
 class QCloseEvent;
+class QSpinBox;
 
 class AbstractSettingsPage : public QWidget {
 public:
@@ -65,10 +66,11 @@ signals:
 	void playerAreaBgChanged(const QString &path);
 	void cardBackPicturePathChanged(const QString &path);
 private:
-	QLabel *handBgLabel, *stackBgLabel, *tableBgLabel, *playerAreaBgLabel, *cardBackPicturePathLabel;
+	QLabel *handBgLabel, *stackBgLabel, *tableBgLabel, *playerAreaBgLabel, *cardBackPicturePathLabel, *minPlayersForMultiColumnLayoutLabel;
 	QLineEdit *handBgEdit, *stackBgEdit, *tableBgEdit, *playerAreaBgEdit, *cardBackPicturePathEdit;
 	QCheckBox *displayCardNamesCheckBox, *horizontalHandCheckBox, *invertVerticalCoordinateCheckBox, *zoneViewSortByNameCheckBox, *zoneViewSortByTypeCheckBox;
 	QGroupBox *zoneBgGroupBox, *cardsGroupBox, *handGroupBox, *tableGroupBox, *zoneViewGroupBox;
+	QSpinBox *minPlayersForMultiColumnLayoutEdit;
 public:
 	AppearanceSettingsPage();
 	void retranslateUi();

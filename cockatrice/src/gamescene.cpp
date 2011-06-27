@@ -3,6 +3,7 @@
 #include "zoneviewwidget.h"
 #include "zoneviewzone.h"
 #include "phasestoolbar.h"
+#include "settingscache.h"
 #include <math.h>
 #include <QAction>
 #include <QGraphicsSceneMouseEvent>
@@ -14,6 +15,7 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 {
 	animationTimer = new QBasicTimer;
 	addItem(phasesToolbar);
+	connect(settingsCache, SIGNAL(minPlayersForMultiColumnLayoutChanged()), this, SLOT(rearrange()));
 }
 
 GameScene::~GameScene()
@@ -59,7 +61,7 @@ void GameScene::rearrange()
 	if (firstPlayer == -1)
 		firstPlayer = 0;
 	const int playersCount = playersPlaying.size();
-	const int columns = playersCount < 4 ? 1 : 2;
+	const int columns = playersCount < settingsCache->getMinPlayersForMultiColumnLayout() ? 1 : 2;
 	const int rows = ceil((qreal) playersCount / columns);
 
 	qreal sceneHeight = 0, sceneWidth = -playerAreaSpacing;

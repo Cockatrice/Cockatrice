@@ -24,6 +24,7 @@ SettingsCache::SettingsCache()
 	displayCardNames = settings->value("cards/displaycardnames", true).toBool();
 	horizontalHand = settings->value("hand/horizontal", true).toBool();
 	invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
+	minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 5).toInt();
 	tapAnimation = settings->value("cards/tapanimation", true).toBool();
 	
 	zoneViewSortByName = settings->value("zoneview/sortbyname", true).toBool();
@@ -141,6 +142,13 @@ void SettingsCache::setInvertVerticalCoordinate(int _invertVerticalCoordinate)
 	invertVerticalCoordinate = _invertVerticalCoordinate;
 	settings->setValue("table/invert_vertical", invertVerticalCoordinate);
 	emit invertVerticalCoordinateChanged();
+}
+
+void SettingsCache::setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout)
+{
+	minPlayersForMultiColumnLayout = _minPlayersForMultiColumnLayout;
+	settings->setValue("interface/min_players_multicolumn", minPlayersForMultiColumnLayout);
+	emit minPlayersForMultiColumnLayoutChanged();
 }
 
 void SettingsCache::setTapAnimation(int _tapAnimation)

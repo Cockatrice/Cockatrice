@@ -20,6 +20,7 @@ signals:
 	void displayCardNamesChanged();
 	void horizontalHandChanged();
 	void invertVerticalCoordinateChanged();
+	void minPlayersForMultiColumnLayoutChanged();
 	void soundPathChanged();
 private:
 	QSettings *settings;
@@ -34,6 +35,7 @@ private:
 	bool displayCardNames;
 	bool horizontalHand;
 	bool invertVerticalCoordinate;
+	int minPlayersForMultiColumnLayout;
 	bool tapAnimation;
 	bool zoneViewSortByName, zoneViewSortByType;
 	bool soundEnabled;
@@ -57,6 +59,7 @@ public:
 	bool getDisplayCardNames() const { return displayCardNames; }
 	bool getHorizontalHand() const { return horizontalHand; }
 	bool getInvertVerticalCoordinate() const { return invertVerticalCoordinate; }
+	int getMinPlayersForMultiColumnLayout() const { return minPlayersForMultiColumnLayout; }
 	bool getTapAnimation() const { return tapAnimation; }
 	bool getZoneViewSortByName() const { return zoneViewSortByName; }
 	bool getZoneViewSortByType() const { return zoneViewSortByType; }
@@ -80,6 +83,7 @@ public slots:
 	void setDisplayCardNames(int _displayCardNames);
 	void setHorizontalHand(int _horizontalHand);
 	void setInvertVerticalCoordinate(int _invertVerticalCoordinate);
+	void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
 	void setTapAnimation(int _tapAnimation);
 	void setZoneViewSortByName(int _zoneViewSortByName);
 	void setZoneViewSortByType(int _zoneViewSortByType);
