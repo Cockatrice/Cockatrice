@@ -39,8 +39,8 @@ void Server_Card::resetState()
 	counters.clear();
 	setTapped(false);
 	setAttacking(false);
-	power = 0;
-	toughness = 0;
+	power = -1;
+	toughness = -1;
 	setAnnotation(QString());
 	setDoesntUntap(false);
 }
