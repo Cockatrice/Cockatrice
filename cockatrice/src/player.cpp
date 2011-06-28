@@ -867,6 +867,8 @@ void Player::eventMoveCard(Event_MoveCard *event, GameEventContext *context)
 	CardItem *card = startZone->takeCard(position, event->getCardId(), startZone != targetZone);
 	if (!card)
 		return;
+	if (startZone != targetZone)
+		card->deleteCardInfoPopup();
 	card->setName(event->getCardName());
 	
 	if (card->getAttachedTo() && (startZone != targetZone)) {

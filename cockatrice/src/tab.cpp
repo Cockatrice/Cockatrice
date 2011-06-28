@@ -21,10 +21,12 @@ void Tab::showCardInfoPopup(const QPoint &pos, const QString &cardName)
 	infoPopup->show();
 }
 
-void Tab::deleteCardInfoPopup()
+void Tab::deleteCardInfoPopup(const QString &cardName)
 {
 	if (infoPopup) {
-		infoPopup->deleteLater();
-		infoPopup = 0;
+		if ((infoPopup->getCardName() == cardName) || (cardName == "_")) {
+			infoPopup->deleteLater();
+			infoPopup = 0;
+		}
 	}
 }

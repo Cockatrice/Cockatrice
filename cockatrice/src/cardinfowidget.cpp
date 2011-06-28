@@ -172,8 +172,7 @@ void CardInfoWidget::resizeEvent(QResizeEvent * /*event*/)
 	}
 }
 
-void CardInfoWidget::mouseReleaseEvent(QMouseEvent *event)
+QString CardInfoWidget::getCardName() const
 {
-	if ((event->button() == Qt::MidButton) && (mode == ModePopUp))
-		emit mouseReleased();
+	return nameLabel2->text();
 }

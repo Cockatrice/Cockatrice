@@ -139,7 +139,7 @@ void MessageLogWidget::logConnectionStateChanged(Player *player, bool connection
 
 void MessageLogWidget::logSay(Player *player, QString message)
 {
-	appendMessage(player->getName(), message);
+	appendMessage(player->getName(), message, QColor(), true);
 }
 
 void MessageLogWidget::logSpectatorSay(QString spectatorName, QString message)

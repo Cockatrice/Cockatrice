@@ -13,7 +13,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
 {
 	chatView = new ChatView(_ownName, true);
 	connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
-	connect(chatView, SIGNAL(deleteCardInfoPopup()), this, SLOT(deleteCardInfoPopup()));
+	connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
 	sayEdit = new QLineEdit;
 	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
 	

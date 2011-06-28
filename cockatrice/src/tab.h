@@ -16,7 +16,7 @@ protected:
 	TabSupervisor *tabSupervisor;
 protected slots:
 	void showCardInfoPopup(const QPoint &pos, const QString &cardName);
-	void deleteCardInfoPopup();
+	void deleteCardInfoPopup(const QString &cardName);
 private:
 	bool contentsChanged;
 	CardInfoWidget *infoPopup;

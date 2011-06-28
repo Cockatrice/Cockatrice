@@ -3,6 +3,7 @@
 
 #include <QTextBrowser>
 #include <QTextFragment>
+#include <QColor>
 
 class QTextTable;
 class QMouseEvent;
@@ -20,7 +21,7 @@ private slots:
 	void openLink(const QUrl &link);
 public:
 	ChatView(const QString &_ownName, bool _showTimestamps, QWidget *parent = 0);
-	void appendMessage(QString sender, QString message);
+	void appendMessage(QString sender, QString message, QColor playerColor = QColor(), bool playerBold = false);
 protected:
 	void enterEvent(QEvent *event);
 	void leaveEvent(QEvent *event);
@@ -30,7 +31,7 @@ protected:
 signals:
 	void cardNameHovered(QString cardName);
 	void showCardInfoPopup(QPoint pos, QString cardName);
-	void deleteCardInfoPopup();
+	void deleteCardInfoPopup(QString cardName);
 };
 
 #endif

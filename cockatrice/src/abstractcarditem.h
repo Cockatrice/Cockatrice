@@ -30,7 +30,7 @@ private slots:
 signals:
 	void hovered(AbstractCardItem *card);
 	void showCardInfoPopup(QPoint pos, QString cardName);
-	void deleteCardInfoPopup();
+	void deleteCardInfoPopup(QString cardName);
 public:
 	enum { Type = typeCard };
 	int type() const { return Type; }
@@ -50,6 +50,7 @@ public:
 	bool getTapped() const { return tapped; }
 	void setTapped(bool _tapped, bool canAnimate = false);
 	void processHoverEvent();
+	void deleteCardInfoPopup() { emit deleteCardInfoPopup(name); }
 protected:
 	QSizeF getTranslatedSize(QPainter *painter) const;
 	void transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle);

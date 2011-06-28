@@ -179,7 +179,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	messageLog = new MessageLogWidget(_userName);
 	connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfo, SLOT(setCard(QString)));
 	connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
-	connect(messageLog, SIGNAL(deleteCardInfoPopup()), this, SLOT(deleteCardInfoPopup()));
+	connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
 	sayLabel = new QLabel;
 	sayEdit = new QLineEdit;
 	sayLabel->setBuddy(sayEdit);
@@ -745,7 +745,7 @@ void TabGame::newCardAdded(AbstractCardItem *card)
 {
 	connect(card, SIGNAL(hovered(AbstractCardItem *)), cardInfo, SLOT(setCard(AbstractCardItem *)));
 	connect(card, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
-	connect(card, SIGNAL(deleteCardInfoPopup()), this, SLOT(deleteCardInfoPopup()));
+	connect(card, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
 }
 
 CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) const

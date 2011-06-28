@@ -39,6 +39,7 @@ private:
 public:
 	CardInfoWidget(ResizeMode _mode, QWidget *parent = 0, Qt::WindowFlags f = 0);
 	void retranslateUi();
+	QString getCardName() const;
 
 public slots:
 	void setCard(CardInfo *card);
@@ -50,12 +51,8 @@ private slots:
 	void updatePixmap();
 	void minimizeClicked(int newMinimized);
 
-signals:
-	void mouseReleased();
-
 protected:
 	void resizeEvent(QResizeEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
 };
 
 #endif

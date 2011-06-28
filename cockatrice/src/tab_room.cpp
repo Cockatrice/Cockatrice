@@ -139,7 +139,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
 	
 	chatView = new ChatView(ownName, true);
 	connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
-	connect(chatView, SIGNAL(deleteCardInfoPopup()), this, SLOT(deleteCardInfoPopup()));
+	connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
 	sayLabel = new QLabel;
 	sayEdit = new QLineEdit;
 	sayLabel->setBuddy(sayEdit);

@@ -26,6 +26,7 @@ AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, QGraphi
 AbstractCardItem::~AbstractCardItem()
 {
 	qDebug() << "AbstractCardItem destructor:" << name;
+	emit deleteCardInfoPopup(name);
 }
 
 QRectF AbstractCardItem::boundingRect() const
@@ -157,6 +158,10 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 void AbstractCardItem::setName(const QString &_name)
 {
+	if (name == _name)
+		return;
+	
+	emit deleteCardInfoPopup(name);
 	disconnect(info, 0, this, 0);
 	name = _name;
 	info = db->getCard(name);
@@ -213,7 +218,7 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
 	if (event->button() == Qt::MidButton)
-		emit deleteCardInfoPopup();
+		emit deleteCardInfoPopup(name);
 	
 	// This function ensures the parent function doesn't mess around with our selection.
 	event->accept();

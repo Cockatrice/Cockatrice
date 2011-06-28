@@ -15,7 +15,7 @@ ChatView::ChatView(const QString &_ownName, bool _showTimestamps, QWidget *paren
 	connect(this, SIGNAL(anchorClicked(const QUrl &)), this, SLOT(openLink(const QUrl &)));
 }
 
-void ChatView::appendMessage(QString sender, QString message)
+void ChatView::appendMessage(QString sender, QString message, QColor playerColor, bool playerBold)
 {
 	QTextCursor cursor(document()->lastBlock());
 	cursor.movePosition(QTextCursor::End);
@@ -35,8 +35,14 @@ void ChatView::appendMessage(QString sender, QString message)
 	if (sender == ownName) {
 		senderFormat.setFontWeight(QFont::Bold);
 		senderFormat.setForeground(Qt::red);
-	} else
-		senderFormat.setForeground(QColor(0, 0, 254));
+	} else {
+		if (playerColor == QColor())
+			senderFormat.setForeground(QColor(0, 0, 254));
+		else
+			senderFormat.setForeground(playerColor);
+		if (playerBold)
+			senderFormat.setFontWeight(QFont::Bold);
+	}
 	cursor.setCharFormat(senderFormat);
 	if (!sender.isEmpty())
 		sender.append(": ");
@@ -156,7 +162,7 @@ void ChatView::mousePressEvent(QMouseEvent *event)
 void ChatView::mouseReleaseEvent(QMouseEvent *event)
 {
 	if (event->button() == Qt::MidButton)
-		emit deleteCardInfoPopup();
+		emit deleteCardInfoPopup(QString("_"));
 	
 	QTextBrowser::mouseReleaseEvent(event);
 }
