@@ -17,6 +17,7 @@ DlgCreateGame::DlgCreateGame(AbstractClient *_client, int _roomId, const QMap<in
 	descriptionLabel = new QLabel(tr("&Description:"));
 	descriptionEdit = new QLineEdit;
 	descriptionLabel->setBuddy(descriptionEdit);
+	descriptionEdit->setMaxLength(60);
 
 	maxPlayersLabel = new QLabel(tr("P&layers:"));
 	maxPlayersEdit = new QSpinBox();
