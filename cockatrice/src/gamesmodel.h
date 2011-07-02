@@ -4,6 +4,7 @@
 #include <QAbstractTableModel>
 #include <QSortFilterProxyModel>
 #include <QList>
+#include "gametypemap.h"
 
 class ServerInfo_Game;
 
@@ -11,12 +12,13 @@ class GamesModel : public QAbstractTableModel {
 	Q_OBJECT
 private:
 	QList<ServerInfo_Game *> gameList;
-	QMap<int, QString> gameTypes;
+	QMap<int, QString> rooms;
+	QMap<int, GameTypeMap> gameTypes;
 public:
-	GamesModel(const QMap<int, QString> &_gameTypes, QObject *parent = 0);
+	GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent = 0);
 	~GamesModel();
 	int rowCount(const QModelIndex &parent = QModelIndex()) const { return parent.isValid() ? 0 : gameList.size(); }
-	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return 7; }
+	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return 8; }
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	

@@ -12,6 +12,7 @@ class AbstractClient;
 class TabSupervisor;
 class QSpinBox;
 class QPlainTextEdit;
+class ProtocolResponse;
 
 class BanDialog : public QDialog {
 	Q_OBJECT
@@ -52,6 +53,7 @@ private:
 	void setUserOnline(QTreeWidgetItem *user, bool online);
 private slots:
 	void userClicked(QTreeWidgetItem *item, int column);
+	void gamesOfUserReceived(ProtocolResponse *resp);
 signals:
 	void openMessageDialog(const QString &userName, bool focus);
 	void addBuddy(const QString &userName);

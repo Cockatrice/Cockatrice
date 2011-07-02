@@ -80,7 +80,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 	
 		Server_Room *room = rooms.value(roomCommand->getRoomId(), 0);
 		if (!room)
-			return RespNameNotFound;
+			return RespNotInRoom;
 		
 		QMutexLocker locker(&room->roomMutex);
 		
@@ -101,7 +101,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 		gameListMutex.lock();
 		if (!games.contains(gameCommand->getGameId())) {
 			qDebug() << "invalid game";
-			return RespNameNotFound;
+			return RespNotInRoom;
 		}
 		QPair<Server_Game *, Server_Player *> gamePair = games.value(gameCommand->getGameId());
 		Server_Game *game = gamePair.first;
@@ -340,13 +340,19 @@ ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(Command_GetGamesOfUser *c
 	if (!server->getUsers().contains(cmd->getUserName()))
 		return RespNameNotFound;
 	
+	QList<ServerInfo_Room *> roomList;
 	QList<ServerInfo_Game *> gameList;
 	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
-	while (roomIterator.hasNext())
-		gameList.append(roomIterator.next().value()->getGamesOfUser(cmd->getUserName()));
+	while (roomIterator.hasNext()) {
+		Server_Room *room = roomIterator.next().value();
+		room->roomMutex.lock();
+		roomList.append(room->getInfo(false, true));
+		gameList.append(room->getGamesOfUser(cmd->getUserName()));
+		room->roomMutex.unlock();
+	}
 	server->serverMutex.unlock();
 	
-	ProtocolResponse *resp = new Response_GetGamesOfUser(cont->getCmdId(), RespOk, gameList);
+	ProtocolResponse *resp = new Response_GetGamesOfUser(cont->getCmdId(), RespOk, roomList, gameList);
 	if (getCompressionSupport())
 		resp->setCompressed(true);
 	cont->setResponse(resp);

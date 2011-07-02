@@ -285,11 +285,17 @@ public:
 
 class Response_GetGamesOfUser : public ProtocolResponse {
 	Q_OBJECT
+private:
+	QList<ServerInfo_Game *> gameList;
+	QList<ServerInfo_Room *> roomList;
+protected:
+	void extractData();
 public:
-	Response_GetGamesOfUser(int _cmdId = -1, ResponseCode _responseCode = RespOk, const QList<ServerInfo_Game *> &_gameList = QList<ServerInfo_Game *>());
+	Response_GetGamesOfUser(int _cmdId = -1, ResponseCode _responseCode = RespOk, const QList<ServerInfo_Room *> &_roomList = QList<ServerInfo_Room *>(), const QList<ServerInfo_Game *> &_gameList = QList<ServerInfo_Game *>());
 	int getItemId() const { return ItemId_Response_GetGamesOfUser; }
 	static SerializableItem *newItem() { return new Response_GetGamesOfUser; }
-	QList<ServerInfo_Game *> getGameList() const { return typecastItemList<ServerInfo_Game *>(); }
+	QList<ServerInfo_Room *> getRoomList() const { return roomList; }
+	QList<ServerInfo_Game *> getGameList() const { return gameList; }
 };
 
 class Response_GetUserInfo : public ProtocolResponse {

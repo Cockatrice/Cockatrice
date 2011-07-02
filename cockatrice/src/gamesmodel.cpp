@@ -1,8 +1,8 @@
 #include "gamesmodel.h"
 #include "protocol_datastructures.h"
 
-GamesModel::GamesModel(const QMap<int, QString> &_gameTypes, QObject *parent)
-	: QAbstractTableModel(parent), gameTypes(_gameTypes)
+GamesModel::GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent)
+	: QAbstractTableModel(parent), rooms(_rooms), gameTypes(_gameTypes)
 {
 }
 
@@ -30,17 +30,19 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
 	
 	ServerInfo_Game *g = gameList[index.row()];
 	switch (index.column()) {
-		case 0: return g->getDescription();
-		case 1: return g->getCreatorInfo()->getName();
-		case 2: {
+		case 0: return rooms.value(g->getRoomId());
+		case 1: return g->getDescription();
+		case 2: return g->getCreatorInfo()->getName();
+		case 3: {
 			QStringList result;
 			QList<GameTypeId *> gameTypeList = g->getGameTypes();
+			GameTypeMap gameTypeMap = gameTypes.value(g->getRoomId());
 			for (int i = 0; i < gameTypeList.size(); ++i)
-				result.append(gameTypes.value(gameTypeList[i]->getData()));
+				result.append(gameTypeMap.value(gameTypeList[i]->getData()));
 			return result.join(", ");
 		}
-		case 3: return g->getHasPassword() ? (g->getSpectatorsNeedPassword() ? tr("yes") : tr("yes, free for spectators")) : tr("no");
-		case 4: {
+		case 4: return g->getHasPassword() ? (g->getSpectatorsNeedPassword() ? tr("yes") : tr("yes, free for spectators")) : tr("no");
+		case 5: {
 			QStringList result;
 			if (g->getOnlyBuddies())
 				result.append(tr("buddies only"));
@@ -48,8 +50,8 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
 				result.append(tr("reg. users only"));
 			return result.join(", ");
 		}
-		case 5: return QString("%1/%2").arg(g->getPlayerCount()).arg(g->getMaxPlayers());
-		case 6: return g->getSpectatorsAllowed() ? QVariant(g->getSpectatorCount()) : QVariant(tr("not allowed"));
+		case 6: return QString("%1/%2").arg(g->getPlayerCount()).arg(g->getMaxPlayers());
+		case 7: return g->getSpectatorsAllowed() ? QVariant(g->getSpectatorCount()) : QVariant(tr("not allowed"));
 		default: return QVariant();
 	}
 }
@@ -59,13 +61,14 @@ QVariant GamesModel::headerData(int section, Qt::Orientation orientation, int ro
 	if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal))
 		return QVariant();
 	switch (section) {
-		case 0: return tr("Description");
-		case 1: return tr("Creator");
-		case 2: return tr("Game type");
-		case 3: return tr("Password");
-		case 4: return tr("Restrictions");
-		case 5: return tr("Players");
-		case 6: return tr("Spectators");
+		case 0: return tr("Room");
+		case 1: return tr("Description");
+		case 2: return tr("Creator");
+		case 3: return tr("Game type");
+		case 4: return tr("Password");
+		case 5: return tr("Restrictions");
+		case 6: return tr("Players");
+		case 7: return tr("Spectators");
 		default: return QVariant();
 	}
 }
@@ -82,7 +85,7 @@ void GamesModel::updateGameList(ServerInfo_Game *_game)
 	for (int i = 0; i < oldGameTypeList.size(); ++i)
 		gameTypeList.append(new GameTypeId(oldGameTypeList[i]->getData()));
 	
-	ServerInfo_Game *game = new ServerInfo_Game(_game->getGameId(), _game->getDescription(), _game->getHasPassword(), _game->getPlayerCount(), _game->getMaxPlayers(), gameTypeList, new ServerInfo_User(_game->getCreatorInfo()), _game->getOnlyBuddies(), _game->getOnlyRegistered(), _game->getSpectatorsAllowed(), _game->getSpectatorsNeedPassword(), _game->getSpectatorCount());
+	ServerInfo_Game *game = new ServerInfo_Game(_game->getRoomId(), _game->getGameId(), _game->getDescription(), _game->getHasPassword(), _game->getPlayerCount(), _game->getMaxPlayers(), gameTypeList, new ServerInfo_User(_game->getCreatorInfo()), _game->getOnlyBuddies(), _game->getOnlyRegistered(), _game->getSpectatorsAllowed(), _game->getSpectatorsNeedPassword(), _game->getSpectatorCount());
 	for (int i = 0; i < gameList.size(); i++)
 		if (gameList[i]->getGameId() == game->getGameId()) {
 			if (game->getPlayerCount() == 0) {
@@ -92,7 +95,7 @@ void GamesModel::updateGameList(ServerInfo_Game *_game)
 			} else {
 				delete gameList[i];
 				gameList[i] = game;
-				emit dataChanged(index(i, 0), index(i, 4));
+				emit dataChanged(index(i, 0), index(i, 7));
 			}
 			return;
 		}

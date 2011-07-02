@@ -257,6 +257,7 @@ void ProtocolResponse::initializeHash()
 {
 	responseHash.insert(QString(), RespNothing);
 	responseHash.insert("ok", RespOk);
+	responseHash.insert("not_in_room", RespNotInRoom);
 	responseHash.insert("internal_error", RespInternalError);
 	responseHash.insert("invalid_command", RespInvalidCommand);
 	responseHash.insert("name_not_found", RespNameNotFound);
@@ -297,10 +298,32 @@ Response_DeckList::Response_DeckList(int _cmdId, ResponseCode _responseCode, Dec
 	insertItem(_root);
 }
 
-Response_GetGamesOfUser::Response_GetGamesOfUser(int _cmdId, ResponseCode _responseCode, const QList<ServerInfo_Game *> &_gameList)
+Response_GetGamesOfUser::Response_GetGamesOfUser(int _cmdId, ResponseCode _responseCode, const QList<ServerInfo_Room *> &_roomList, const QList<ServerInfo_Game *> &_gameList)
+	: ProtocolResponse(_cmdId, _responseCode, "get_games_of_user")
 {
+	roomList = _roomList;
+	for (int i = 0; i < _roomList.size(); ++i)
+		itemList.append(_roomList[i]);
+	
+	gameList = _gameList;
 	for (int i = 0; i < _gameList.size(); ++i)
 		itemList.append(_gameList[i]);
+}
+
+void Response_GetGamesOfUser::extractData()
+{
+	for (int i = 0; i < itemList.size(); ++i) {
+		ServerInfo_Room *room = dynamic_cast<ServerInfo_Room *>(itemList[i]);
+		if (room) {
+			roomList.append(room);
+			continue;
+		}
+		ServerInfo_Game *game = dynamic_cast<ServerInfo_Game *>(itemList[i]);
+		if (game) {
+			gameList.append(game);
+			continue;
+		}
+	}
 }
 
 Response_GetUserInfo::Response_GetUserInfo(int _cmdId, ResponseCode _responseCode, ServerInfo_User *_user)

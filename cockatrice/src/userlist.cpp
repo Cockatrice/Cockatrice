@@ -5,6 +5,7 @@
 #include "pixmapgenerator.h"
 #include "userinfobox.h"
 #include "protocol_items.h"
+#include "gameselector.h"
 #include <QHeaderView>
 #include <QVBoxLayout>
 #include <QMouseEvent>
@@ -210,6 +211,35 @@ void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
 	emit openMessageDialog(item->data(2, Qt::UserRole).toString(), true);
 }
 
+void UserList::gamesOfUserReceived(ProtocolResponse *resp)
+{
+	Command_GetGamesOfUser *command = static_cast<Command_GetGamesOfUser *>(sender());
+	Response_GetGamesOfUser *response = qobject_cast<Response_GetGamesOfUser *>(resp);
+	if (!response)
+		return;
+	
+	QMap<int, GameTypeMap> gameTypeMap;
+	QMap<int, QString> roomMap;
+	const QList<ServerInfo_Room *> roomList = response->getRoomList();
+	for (int i = 0; i < roomList.size(); ++i) {
+		roomMap.insert(roomList[i]->getRoomId(), roomList[i]->getName());
+		const QList<ServerInfo_GameType *> gameTypeList = roomList[i]->getGameTypeList();
+		GameTypeMap tempMap;
+		for (int j = 0; j < gameTypeList.size(); ++j)
+			tempMap.insert(gameTypeList[j]->getGameTypeId(), gameTypeList[j]->getDescription());
+		gameTypeMap.insert(roomList[i]->getRoomId(), tempMap);
+	}
+	
+	GameSelector *selector = new GameSelector(client, 0, roomMap, gameTypeMap);
+	const QList<ServerInfo_Game *> gameList = response->getGameList();
+	for (int i = 0; i < gameList.size(); ++i)
+		selector->processGameInfo(gameList[i]);
+	
+	selector->setWindowTitle(tr("%1's games").arg(command->getUserName()));
+	selector->setAttribute(Qt::WA_DeleteOnClose);
+	selector->show();
+}
+
 void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 {
 	const QString &userName = index.sibling(index.row(), 2).data(Qt::UserRole).toString();
@@ -230,6 +260,7 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	menu->addAction(aUserName);
 	menu->addSeparator();
 	menu->addAction(aDetails);
+	menu->addAction(aShowGames);
 	menu->addAction(aChat);
 	if ((userLevel & ServerInfo_User::IsRegistered) && (tabSupervisor->getUserLevel() & ServerInfo_User::IsRegistered)) {
 		menu->addSeparator();
@@ -260,7 +291,7 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 		client->sendCommand(new Command_RemoveFromList("buddy", userName));
 	else if (actionClicked == aShowGames) {
 		Command *cmd = new Command_GetGamesOfUser(userName);
-		connect(cmd, SIGNAL(responseReceived(ProtocolResponse *)), this, SLOT(gamesOfUserReceived(ProtocolResponse *)));
+		connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(gamesOfUserReceived(ProtocolResponse *)));
 		client->sendCommand(cmd);
 	} else if (actionClicked == aAddToIgnoreList)
 		client->sendCommand(new Command_AddToList("ignore", userName));
