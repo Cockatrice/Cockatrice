@@ -179,6 +179,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 		case ItemId_Command_DeckDel: return cmdDeckDel(static_cast<Command_DeckDel *>(command), cont);
 		case ItemId_Command_DeckUpload: return cmdDeckUpload(static_cast<Command_DeckUpload *>(command), cont);
 		case ItemId_Command_DeckDownload: return cmdDeckDownload(static_cast<Command_DeckDownload *>(command), cont);
+		case ItemId_Command_GetGamesOfUser: return cmdGetGamesOfUser(static_cast<Command_GetGamesOfUser *>(command), cont);
 		case ItemId_Command_GetUserInfo: return cmdGetUserInfo(static_cast<Command_GetUserInfo *>(command), cont);
 		case ItemId_Command_ListRooms: return cmdListRooms(static_cast<Command_ListRooms *>(command), cont);
 		case ItemId_Command_JoinRoom: return cmdJoinRoom(static_cast<Command_JoinRoom *>(command), cont);
@@ -328,6 +329,28 @@ ResponseCode Server_ProtocolHandler::cmdMessage(Command_Message *cmd, CommandCon
 	cont->enqueueItem(new Event_Message(userInfo->getName(), receiver, cmd->getText()));
 	userHandler->sendProtocolItem(new Event_Message(userInfo->getName(), receiver, cmd->getText()));
 	return RespOk;
+}
+
+ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(Command_GetGamesOfUser *cmd, CommandContainer *cont)
+{
+	if (authState == PasswordWrong)
+		return RespLoginNeeded;
+	
+	server->serverMutex.lock();
+	if (!server->getUsers().contains(cmd->getUserName()))
+		return RespNameNotFound;
+	
+	QList<ServerInfo_Game *> gameList;
+	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
+	while (roomIterator.hasNext())
+		gameList.append(roomIterator.next().value()->getGamesOfUser(cmd->getUserName()));
+	server->serverMutex.unlock();
+	
+	ProtocolResponse *resp = new Response_GetGamesOfUser(cont->getCmdId(), RespOk, gameList);
+	if (getCompressionSupport())
+		resp->setCompressed(true);
+	cont->setResponse(resp);
+	return RespNothing;
 }
 
 ResponseCode Server_ProtocolHandler::cmdGetUserInfo(Command_GetUserInfo *cmd, CommandContainer *cont)

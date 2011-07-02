@@ -50,6 +50,7 @@ private:
 	virtual ResponseCode cmdDeckDel(Command_DeckDel *cmd, CommandContainer *cont) = 0;
 	virtual ResponseCode cmdDeckUpload(Command_DeckUpload *cmd, CommandContainer *cont) = 0;
 	virtual ResponseCode cmdDeckDownload(Command_DeckDownload *cmd, CommandContainer *cont) = 0;
+	ResponseCode cmdGetGamesOfUser(Command_GetGamesOfUser *cmd, CommandContainer *cont);
 	ResponseCode cmdGetUserInfo(Command_GetUserInfo *cmd, CommandContainer *cont);
 	ResponseCode cmdListRooms(Command_ListRooms *cmd, CommandContainer *cont);
 	ResponseCode cmdJoinRoom(Command_JoinRoom *cmd, CommandContainer *cont);

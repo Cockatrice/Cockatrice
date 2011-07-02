@@ -219,6 +219,7 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	aUserName->setEnabled(false);
 	QAction *aDetails = new QAction(tr("User &details"), this);
 	QAction *aChat = new QAction(tr("Direct &chat"), this);
+	QAction *aShowGames = new QAction(tr("Show this user's &games"), this);
 	QAction *aAddToBuddyList = new QAction(tr("Add to &buddy list"), this);
 	QAction *aRemoveFromBuddyList = new QAction(tr("Remove from &buddy list"), this);
 	QAction *aAddToIgnoreList = new QAction(tr("Add to &ignore list"), this);
@@ -257,7 +258,11 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 		client->sendCommand(new Command_AddToList("buddy", userName));
 	else if (actionClicked == aRemoveFromBuddyList)
 		client->sendCommand(new Command_RemoveFromList("buddy", userName));
-	else if (actionClicked == aAddToIgnoreList)
+	else if (actionClicked == aShowGames) {
+		Command *cmd = new Command_GetGamesOfUser(userName);
+		connect(cmd, SIGNAL(responseReceived(ProtocolResponse *)), this, SLOT(gamesOfUserReceived(ProtocolResponse *)));
+		client->sendCommand(cmd);
+	} else if (actionClicked == aAddToIgnoreList)
 		client->sendCommand(new Command_AddToList("ignore", userName));
 	else if (actionClicked == aRemoveFromIgnoreList)
 		client->sendCommand(new Command_RemoveFromList("ignore", userName));

@@ -214,6 +214,17 @@ ResponseCode Server_Game::checkJoin(ServerInfo_User *user, const QString &_passw
 	return RespOk;
 }
 
+bool Server_Game::containsUser(const QString &userName) const
+{
+	QMutexLocker locker(&gameMutex);
+	
+	QMapIterator<int, Server_Player *> playerIterator(players);
+	while (playerIterator.hasNext())
+		if (playerIterator.next().value()->getUserInfo()->getName() == userName)
+			return true;
+	return false;
+}
+
 Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate)
 {
 	QMutexLocker locker(&gameMutex);
@@ -479,7 +490,7 @@ ServerInfo_Game *Server_Game::getInfo() const
 	
 	if (players.isEmpty())
 		// Game is closing
-		return new ServerInfo_Game(getGameId(), QString(), false, 0, getMaxPlayers(), QList<GameTypeId *>(), 0, false, 0);
+		return new ServerInfo_Game(room->getId(), getGameId(), QString(), false, 0, getMaxPlayers(), QList<GameTypeId *>(), 0, false, 0);
 	else {
 		// Game is open
 		
@@ -488,6 +499,7 @@ ServerInfo_Game *Server_Game::getInfo() const
 			gameTypeList.append(new GameTypeId(gameTypes[i]));
 		
 		return new ServerInfo_Game(
+			room->getId(),
 			getGameId(),
 			getDescription(),
 			!getPassword().isEmpty(),
