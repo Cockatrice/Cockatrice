@@ -21,6 +21,11 @@ Command_ListUsers::Command_ListUsers()
 	: Command("list_users")
 {
 }
+Command_GetGamesOfUser::Command_GetGamesOfUser(const QString &_userName)
+	: Command("get_games_of_user")
+{
+	insertItem(new SerializableItem_String("user_name", _userName));
+}
 Command_GetUserInfo::Command_GetUserInfo(const QString &_userName)
 	: Command("get_user_info")
 {
@@ -497,6 +502,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdlogin", Command_Login::newItem);
 	itemNameHash.insert("cmdmessage", Command_Message::newItem);
 	itemNameHash.insert("cmdlist_users", Command_ListUsers::newItem);
+	itemNameHash.insert("cmdget_games_of_user", Command_GetGamesOfUser::newItem);
 	itemNameHash.insert("cmdget_user_info", Command_GetUserInfo::newItem);
 	itemNameHash.insert("cmdadd_to_list", Command_AddToList::newItem);
 	itemNameHash.insert("cmdremove_from_list", Command_RemoveFromList::newItem);

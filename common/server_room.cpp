@@ -130,3 +130,17 @@ int Server_Room::getGamesCreatedByUser(const QString &userName) const
 			++result;
 	return result;
 }
+
+QList<ServerInfo_Game *> Server_Room::getGamesOfUser(const QString &userName) const
+{
+	QMutexLocker locker(&roomMutex);
+	
+	QList<ServerInfo_Game *> result;
+	QMapIterator<int, Server_Game *> gamesIterator(games);
+	while (gamesIterator.hasNext()) {
+		Server_Game *game = gamesIterator.next().value();
+		if (game->containsUser(userName))
+			result.append(game->getInfo());
+	}
+	return result;
+}

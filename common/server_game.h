@@ -77,6 +77,7 @@ public:
 	bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
 	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
 	ResponseCode checkJoin(ServerInfo_User *user, const QString &_password, bool spectator);
+	bool containsUser(const QString &userName) const;
 	Server_Player *addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate = true);
 	void removePlayer(Server_Player *player);
 	void removeArrowsToPlayer(Server_Player *player);

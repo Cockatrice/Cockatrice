@@ -35,6 +35,14 @@ public:
 	static SerializableItem *newItem() { return new Command_ListUsers; }
 	int getItemId() const { return ItemId_Command_ListUsers; }
 };
+class Command_GetGamesOfUser : public Command {
+	Q_OBJECT
+public:
+	Command_GetGamesOfUser(const QString &_userName = QString());
+	QString getUserName() const { return static_cast<SerializableItem_String *>(itemMap.value("user_name"))->getData(); };
+	static SerializableItem *newItem() { return new Command_GetGamesOfUser; }
+	int getItemId() const { return ItemId_Command_GetGamesOfUser; }
+};
 class Command_GetUserInfo : public Command {
 	Q_OBJECT
 public:

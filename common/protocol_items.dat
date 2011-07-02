@@ -2,6 +2,7 @@
 0:login:s,username:s,password
 0:message:s,user_name:s,text
 0:list_users
+0:get_games_of_user:s,user_name
 0:get_user_info:s,user_name
 0:add_to_list:s,list:s,user_name
 0:remove_from_list:s,list:s,user_name

@@ -44,6 +44,7 @@ void ProtocolItem::initializeHash()
 	ProtocolResponse::initializeHash();
 	registerSerializableItem("respjoin_room", Response_JoinRoom::newItem);
 	registerSerializableItem("resplist_users", Response_ListUsers::newItem);
+	registerSerializableItem("respget_games_of_user", Response_GetGamesOfUser::newItem);
 	registerSerializableItem("respget_user_info", Response_GetUserInfo::newItem);
 	registerSerializableItem("respdeck_list", Response_DeckList::newItem);
 	registerSerializableItem("respdeck_download", Response_DeckDownload::newItem);
@@ -294,6 +295,12 @@ Response_DeckList::Response_DeckList(int _cmdId, ResponseCode _responseCode, Dec
 	if (!_root)
 		_root = new DeckList_Directory;
 	insertItem(_root);
+}
+
+Response_GetGamesOfUser::Response_GetGamesOfUser(int _cmdId, ResponseCode _responseCode, const QList<ServerInfo_Game *> &_gameList)
+{
+	for (int i = 0; i < _gameList.size(); ++i)
+		itemList.append(_gameList[i]);
 }
 
 Response_GetUserInfo::Response_GetUserInfo(int _cmdId, ResponseCode _responseCode, ServerInfo_User *_user)
