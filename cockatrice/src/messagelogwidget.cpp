@@ -144,7 +144,7 @@ void MessageLogWidget::logSay(Player *player, QString message)
 
 void MessageLogWidget::logSpectatorSay(QString spectatorName, QString message)
 {
-	myAppend(QString("<font color=\"red\">%1:</font> %2").arg(sanitizeHtml(spectatorName)).arg(sanitizeHtml(message)));
+	appendMessage(spectatorName, message, QColor(), false);
 }
 
 void MessageLogWidget::logShuffle(Player *player, CardZone *zone)

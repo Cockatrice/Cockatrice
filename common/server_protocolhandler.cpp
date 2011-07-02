@@ -476,8 +476,8 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 		gameTypes.append(gameTypeList[i]->getData());
 	
 	QString description = cmd->getDescription();
-	if (description.size() > 50)
-		description = description.left(50);
+	if (description.size() > 60)
+		description = description.left(60);
 	Server_Game *game = room->createGame(description, cmd->getPassword(), cmd->getMaxPlayers(), gameTypes, cmd->getOnlyBuddies(), cmd->getOnlyRegistered(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
 	
 	Server_Player *creator = game->getPlayers().values().first();
