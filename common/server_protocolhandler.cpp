@@ -347,7 +347,7 @@ ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(Command_GetGamesOfUser *c
 		Server_Room *room = roomIterator.next().value();
 		room->roomMutex.lock();
 		roomList.append(room->getInfo(false, true));
-		gameList.append(room->getGamesOfUser(cmd->getUserName()));
+		gameList << room->getGamesOfUser(cmd->getUserName());
 		room->roomMutex.unlock();
 	}
 	server->serverMutex.unlock();
