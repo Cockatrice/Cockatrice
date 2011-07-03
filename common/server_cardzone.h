@@ -41,7 +41,7 @@ public:
 	~Server_CardZone();
 
 	int removeCard(Server_Card *card);
-	Server_Card *getCard(int id, bool remove, int *position = NULL);
+	Server_Card *getCard(int id, int *position = NULL);
 
 	int getCardsBeingLookedAt() const { return cardsBeingLookedAt; }
 	void setCardsBeingLookedAt(int _cardsBeingLookedAt) { cardsBeingLookedAt = _cardsBeingLookedAt; }

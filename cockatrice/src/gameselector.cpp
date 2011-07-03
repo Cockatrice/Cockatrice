@@ -27,23 +27,34 @@ GameSelector::GameSelector(AbstractClient *_client, TabRoom *_room, const QMap<i
 	gameListView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
 
 	showFullGamesCheckBox = new QCheckBox;
+	showRunningGamesCheckBox = new QCheckBox;
+	
+	QVBoxLayout *filterLayout = new QVBoxLayout;
+	filterLayout->addWidget(showFullGamesCheckBox);
+	filterLayout->addWidget(showRunningGamesCheckBox);
+	
 	if (room)
 		createButton = new QPushButton;
 	else
 		createButton = 0;
 	joinButton = new QPushButton;
 	spectateButton = new QPushButton;
+	
 	QHBoxLayout *buttonLayout = new QHBoxLayout;
-	buttonLayout->addWidget(showFullGamesCheckBox);
-	buttonLayout->addStretch();
 	if (room)
 		buttonLayout->addWidget(createButton);
 	buttonLayout->addWidget(joinButton);
 	buttonLayout->addWidget(spectateButton);
+	buttonLayout->setAlignment(Qt::AlignTop);
+	
+	QHBoxLayout *hbox = new QHBoxLayout;
+	hbox->addLayout(filterLayout);
+	hbox->addStretch();
+	hbox->addLayout(buttonLayout);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(gameListView);
-	mainLayout->addLayout(buttonLayout);
+	mainLayout->addLayout(hbox);
 
 	retranslateUi();
 	setLayout(mainLayout);
@@ -52,6 +63,7 @@ GameSelector::GameSelector(AbstractClient *_client, TabRoom *_room, const QMap<i
 	setMinimumHeight(200);
 
 	connect(showFullGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showFullGamesChanged(int)));
+	connect(showRunningGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showRunningGamesChanged(int)));
 	connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
 	connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
 	connect(spectateButton, SIGNAL(clicked()), this, SLOT(actJoin()));
@@ -60,6 +72,11 @@ GameSelector::GameSelector(AbstractClient *_client, TabRoom *_room, const QMap<i
 void GameSelector::showFullGamesChanged(int state)
 {
 	gameListProxyModel->setFullGamesVisible(state);
+}
+
+void GameSelector::showRunningGamesChanged(int state)
+{
+	gameListProxyModel->setRunningGamesVisible(state);
 }
 
 void GameSelector::actCreate()
@@ -118,6 +135,7 @@ void GameSelector::retranslateUi()
 {
 	setTitle(tr("Games"));
 	showFullGamesCheckBox->setText(tr("Show &full games"));
+	showRunningGamesCheckBox->setText(tr("Show &running games"));
 	if (createButton)
 		createButton->setText(tr("C&reate"));
 	joinButton->setText(tr("&Join"));

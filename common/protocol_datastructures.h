@@ -69,7 +69,7 @@ public:
 
 class ServerInfo_Game : public SerializableItem_Map {
 public:
-	ServerInfo_Game(int _roomId = -1, int _gameId = -1, const QString &_description = QString(), bool _hasPassword = false, int _playerCount = -1, int _maxPlayers = -1, const QList<GameTypeId *> &_gameTypes = QList<GameTypeId *>(), ServerInfo_User *creatorInfo = 0, bool _onlyBuddies = false, bool _onlyRegistered = false, bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, int _spectatorCount = -1);
+	ServerInfo_Game(int _roomId = -1, int _gameId = -1, const QString &_description = QString(), bool _hasPassword = false, int _playerCount = -1, int _maxPlayers = -1, bool _started = false, const QList<GameTypeId *> &_gameTypes = QList<GameTypeId *>(), ServerInfo_User *creatorInfo = 0, bool _onlyBuddies = false, bool _onlyRegistered = false, bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, int _spectatorCount = -1);
 	static SerializableItem *newItem() { return new ServerInfo_Game; }
 	int getRoomId() const { return static_cast<SerializableItem_Int *>(itemMap.value("room_id"))->getData(); }
 	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); }
@@ -77,6 +77,7 @@ public:
 	bool getHasPassword() const { return static_cast<SerializableItem_Bool *>(itemMap.value("has_password"))->getData(); }
 	int getPlayerCount() const { return static_cast<SerializableItem_Int *>(itemMap.value("player_count"))->getData(); }
 	int getMaxPlayers() const { return static_cast<SerializableItem_Int *>(itemMap.value("max_players"))->getData(); }
+	bool getStarted() const { return static_cast<SerializableItem_Bool *>(itemMap.value("started"))->getData(); }
 	QList<GameTypeId *> getGameTypes() const { return typecastItemList<GameTypeId *>(); }
 	ServerInfo_User *getCreatorInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
 	bool getOnlyBuddies() const { return static_cast<SerializableItem_Bool *>(itemMap.value("only_buddies"))->getData(); }

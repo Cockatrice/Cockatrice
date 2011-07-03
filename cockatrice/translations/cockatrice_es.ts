@@ -1565,93 +1565,98 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/gameselector.cpp" line="122"/>
+        <location filename="../src/gameselector.cpp" line="138"/>
         <source>C&amp;reate</source>
         <translation>C&amp;rear</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="123"/>
+        <location filename="../src/gameselector.cpp" line="139"/>
         <source>&amp;Join</source>
         <translation>E&amp;ntrar</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="79"/>
-        <location filename="../src/gameselector.cpp" line="80"/>
-        <location filename="../src/gameselector.cpp" line="81"/>
-        <location filename="../src/gameselector.cpp" line="82"/>
-        <location filename="../src/gameselector.cpp" line="83"/>
-        <location filename="../src/gameselector.cpp" line="84"/>
-        <location filename="../src/gameselector.cpp" line="85"/>
-        <location filename="../src/gameselector.cpp" line="86"/>
+        <location filename="../src/gameselector.cpp" line="94"/>
+        <location filename="../src/gameselector.cpp" line="95"/>
+        <location filename="../src/gameselector.cpp" line="96"/>
+        <location filename="../src/gameselector.cpp" line="97"/>
+        <location filename="../src/gameselector.cpp" line="98"/>
+        <location filename="../src/gameselector.cpp" line="99"/>
+        <location filename="../src/gameselector.cpp" line="100"/>
+        <location filename="../src/gameselector.cpp" line="101"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="79"/>
+        <location filename="../src/gameselector.cpp" line="94"/>
         <source>Please join the appropriate room first.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="80"/>
+        <location filename="../src/gameselector.cpp" line="95"/>
         <source>Wrong password.</source>
         <translation>Contraseña incorrecta.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="81"/>
+        <location filename="../src/gameselector.cpp" line="96"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>No se permiten espectadores en esta partida.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="82"/>
+        <location filename="../src/gameselector.cpp" line="97"/>
         <source>The game is already full.</source>
         <translation>La partida no tiene plazas libres.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="83"/>
+        <location filename="../src/gameselector.cpp" line="98"/>
         <source>The game does not exist any more.</source>
         <translation>La partida ya no existe.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="84"/>
+        <location filename="../src/gameselector.cpp" line="99"/>
         <source>This game is only open to registered users.</source>
         <translation>Esta partida está abierta sólo a usuarios registrados.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="85"/>
+        <location filename="../src/gameselector.cpp" line="100"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
         <translation>Esta partida está abierta sólo a los amigos del creador.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="86"/>
+        <location filename="../src/gameselector.cpp" line="101"/>
         <source>You are being ignored by the creator of this game.</source>
         <translation>Estas siendo ignorado por el creador de la partida.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="102"/>
+        <location filename="../src/gameselector.cpp" line="117"/>
         <source>Join game</source>
         <translation>Entrar en la partida</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="102"/>
+        <location filename="../src/gameselector.cpp" line="117"/>
         <source>Password:</source>
         <translation>Contraseña:</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="119"/>
+        <location filename="../src/gameselector.cpp" line="134"/>
         <source>Games</source>
         <translation>Partidas</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="120"/>
+        <location filename="../src/gameselector.cpp" line="135"/>
         <source>Show &amp;full games</source>
         <translation>Ver partidas &amp;sin plazas libres</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="136"/>
+        <source>Show &amp;running games</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>&amp;Show full games</source>
         <translation type="obsolete">&amp;Ver partidas sin plazas libres</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="124"/>
+        <location filename="../src/gameselector.cpp" line="140"/>
         <source>J&amp;oin as spectator</source>
         <translation>Entrar como e&amp;spectador</translation>
     </message>

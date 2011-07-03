@@ -40,7 +40,7 @@ ServerInfo_UserList::ServerInfo_UserList(const QString &_itemType, const QList<S
 		itemList.append(_userList[i]);
 }
 
-ServerInfo_Game::ServerInfo_Game(int _roomId, int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, const QList<GameTypeId *> &_gameTypes, ServerInfo_User *_creatorInfo, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, int _spectatorCount)
+ServerInfo_Game::ServerInfo_Game(int _roomId, int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, bool _started, const QList<GameTypeId *> &_gameTypes, ServerInfo_User *_creatorInfo, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, int _spectatorCount)
 	: SerializableItem_Map("game")
 {
 	insertItem(new SerializableItem_Int("room_id", _roomId));
@@ -49,6 +49,7 @@ ServerInfo_Game::ServerInfo_Game(int _roomId, int _gameId, const QString &_descr
 	insertItem(new SerializableItem_Bool("has_password", _hasPassword));
 	insertItem(new SerializableItem_Int("player_count", _playerCount));
 	insertItem(new SerializableItem_Int("max_players", _maxPlayers));
+	insertItem(new SerializableItem_Bool("started", _started));
 	if (!_creatorInfo)
 		_creatorInfo = new ServerInfo_User;
 	insertItem(_creatorInfo);

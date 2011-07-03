@@ -768,7 +768,7 @@ ResponseCode Server_ProtocolHandler::cmdFlipCard(Command_FlipCard *cmd, CommandC
 	if (!zone->hasCoords())
 		return RespContextError;
 	
-	Server_Card *card = zone->getCard(cmd->getCardId(), false);
+	Server_Card *card = zone->getCard(cmd->getCardId());
 	if (!card)
 		return RespNameNotFound;
 	
@@ -797,7 +797,7 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 	if (!startzone)
 		return RespNameNotFound;
 	
-	Server_Card *card = startzone->getCard(cmd->getCardId(), false);
+	Server_Card *card = startzone->getCard(cmd->getCardId());
 	if (!card)
 		return RespNameNotFound;
 
@@ -819,7 +819,7 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 		// Possibly a flag will have to be introduced for this sometime.
 		if (!targetzone->hasCoords())
 			return RespContextError;
-		targetCard = targetzone->getCard(cmd->getTargetCardId(), false);
+		targetCard = targetzone->getCard(cmd->getTargetCardId());
 		if (targetCard)
 			if (targetCard->getParentCard())
 				return RespContextError;
@@ -929,14 +929,14 @@ ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Co
 		return RespNameNotFound;
 	if (startZone->getType() != PublicZone)
 		return RespContextError;
-	Server_Card *startCard = startZone->getCard(cmd->getStartCardId(), false);
+	Server_Card *startCard = startZone->getCard(cmd->getStartCardId());
 	if (!startCard)
 		return RespNameNotFound;
 	Server_Card *targetCard = 0;
 	if (!playerTarget) {
 		if (targetZone->getType() != PublicZone)
 			return RespContextError;
-		targetCard = targetZone->getCard(cmd->getTargetCardId(), false);
+		targetCard = targetZone->getCard(cmd->getTargetCardId());
 	}
 	
 	Server_ArrowTarget *targetItem;
@@ -1015,7 +1015,7 @@ ResponseCode Server_ProtocolHandler::cmdSetCardCounter(Command_SetCardCounter *c
 	if (!zone->hasCoords())
 		return RespContextError;
 
-	Server_Card *card = zone->getCard(cmd->getCardId(), false);
+	Server_Card *card = zone->getCard(cmd->getCardId());
 	if (!card)
 		return RespNameNotFound;
 	
@@ -1042,7 +1042,7 @@ ResponseCode Server_ProtocolHandler::cmdIncCardCounter(Command_IncCardCounter *c
 	if (!zone->hasCoords())
 		return RespContextError;
 
-	Server_Card *card = zone->getCard(cmd->getCardId(), false);
+	Server_Card *card = zone->getCard(cmd->getCardId());
 	if (!card)
 		return RespNameNotFound;
 	
@@ -1255,7 +1255,7 @@ ResponseCode Server_ProtocolHandler::cmdRevealCards(Command_RevealCards *cmd, Co
 			return RespContextError;
 		cardsToReveal.append(zone->cards.at(rng->getNumber(0, zone->cards.size() - 1)));
 	} else {
-		Server_Card *card = zone->getCard(cmd->getCardId(), false);
+		Server_Card *card = zone->getCard(cmd->getCardId());
 		if (!card)
 			return RespNameNotFound;
 		cardsToReveal.append(card);

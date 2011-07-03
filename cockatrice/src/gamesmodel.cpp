@@ -85,7 +85,7 @@ void GamesModel::updateGameList(ServerInfo_Game *_game)
 	for (int i = 0; i < oldGameTypeList.size(); ++i)
 		gameTypeList.append(new GameTypeId(oldGameTypeList[i]->getData()));
 	
-	ServerInfo_Game *game = new ServerInfo_Game(_game->getRoomId(), _game->getGameId(), _game->getDescription(), _game->getHasPassword(), _game->getPlayerCount(), _game->getMaxPlayers(), gameTypeList, new ServerInfo_User(_game->getCreatorInfo()), _game->getOnlyBuddies(), _game->getOnlyRegistered(), _game->getSpectatorsAllowed(), _game->getSpectatorsNeedPassword(), _game->getSpectatorCount());
+	ServerInfo_Game *game = new ServerInfo_Game(_game->getRoomId(), _game->getGameId(), _game->getDescription(), _game->getHasPassword(), _game->getPlayerCount(), _game->getMaxPlayers(), _game->getStarted(), gameTypeList, new ServerInfo_User(_game->getCreatorInfo()), _game->getOnlyBuddies(), _game->getOnlyRegistered(), _game->getSpectatorsAllowed(), _game->getSpectatorsNeedPassword(), _game->getSpectatorCount());
 	for (int i = 0; i < gameList.size(); i++)
 		if (gameList[i]->getGameId() == game->getGameId()) {
 			if (game->getPlayerCount() == 0) {
@@ -118,17 +118,22 @@ void GamesProxyModel::setFullGamesVisible(bool _fullGamesVisible)
 	invalidateFilter();
 }
 
+void GamesProxyModel::setRunningGamesVisible(bool _runningGamesVisible)
+{
+	runningGamesVisible = _runningGamesVisible;
+	invalidateFilter();
+}
+
 bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourceParent*/) const
 {
-	if (fullGamesVisible)
-		return true;
-	
 	GamesModel *model = qobject_cast<GamesModel *>(sourceModel());
 	if (!model)
 		return false;
 	
 	ServerInfo_Game *game = model->getGame(sourceRow);
-	if (game->getPlayerCount() == game->getMaxPlayers())
+	if ((game->getPlayerCount() == game->getMaxPlayers()) && !fullGamesVisible)
+		return false;
+	if (game->getStarted() && !runningGamesVisible)
 		return false;
 	
 	return true;

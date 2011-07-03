@@ -160,6 +160,8 @@ void Server_Game::doStartGameIfReady()
 */	
 	activePlayer = -1;
 	nextTurn();
+	
+	room->broadcastGameListUpdate(this);
 }
 
 void Server_Game::startGameIfReady()
@@ -490,7 +492,7 @@ ServerInfo_Game *Server_Game::getInfo() const
 	
 	if (players.isEmpty())
 		// Game is closing
-		return new ServerInfo_Game(room->getId(), getGameId(), QString(), false, 0, getMaxPlayers(), QList<GameTypeId *>(), 0, false, 0);
+		return new ServerInfo_Game(room->getId(), getGameId(), QString(), false, 0, getMaxPlayers(), false, QList<GameTypeId *>(), 0, false, 0);
 	else {
 		// Game is open
 		
@@ -505,6 +507,7 @@ ServerInfo_Game *Server_Game::getInfo() const
 			!getPassword().isEmpty(),
 			getPlayerCount(),
 			getMaxPlayers(),
+			gameStarted,
 			gameTypeList,
 			new ServerInfo_User(getCreatorInfo(), false),
 			onlyBuddies,

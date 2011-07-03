@@ -52,10 +52,12 @@ int Server_CardZone::removeCard(Server_Card *card)
 	
 	int index = cards.indexOf(card);
 	cards.removeAt(index);
+	card->setZone(0);
+	
 	return index;
 }
 
-Server_Card *Server_CardZone::getCard(int id, bool remove, int *position)
+Server_Card *Server_CardZone::getCard(int id, int *position)
 {
 	QMutexLocker locker(&player->getGame()->gameMutex);
 	
@@ -65,10 +67,6 @@ Server_Card *Server_CardZone::getCard(int id, bool remove, int *position)
 		while (CardIterator.hasNext()) {
 			Server_Card *tmp = CardIterator.next();
 			if (tmp->getId() == id) {
-				if (remove) {
-					cards.removeAt(i);
-					tmp->setZone(0);
-				}
 				if (position)
 					*position = i;
 				return tmp;
@@ -80,10 +78,6 @@ Server_Card *Server_CardZone::getCard(int id, bool remove, int *position)
 		if ((id >= cards.size()) || (id < 0))
 			return NULL;
 		Server_Card *tmp = cards[id];
-		if (remove) {
-			cards.removeAt(id);
-			tmp->setZone(0);
-		}
 		if (position)
 			*position = id;
 		return tmp;

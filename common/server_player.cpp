@@ -127,7 +127,7 @@ void Server_Player::setupZones()
 			if (!currentCard)
 				continue;
 			for (int k = 0; k < currentCard->getNumber(); ++k)
-				z->cards.append(new Server_Card(currentCard->getName(), nextCardId++, 0, 0));
+				z->cards.append(new Server_Card(currentCard->getName(), nextCardId++, 0, 0, z));
 		}
 	}
 	
@@ -334,7 +334,7 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 	QMap<Server_Card *, CardToMove *> cardProperties;
 	for (int i = 0; i < _cards.size(); ++i) {
 		int position;
-		Server_Card *card = startzone->getCard(_cards[i]->getCardId(), false, &position);
+		Server_Card *card = startzone->getCard(_cards[i]->getCardId(), &position);
 		if (!card)
 			return RespNameNotFound;
 		if (!card->getAttachedCards().isEmpty() && !targetzone->isColumnEmpty(x, y))
@@ -510,7 +510,7 @@ ResponseCode Server_Player::setCardAttrHelper(CommandContainer *cont, const QStr
 				return RespInvalidCommand;
 		}
 	} else {
-		Server_Card *card = zone->getCard(cardId, false);
+		Server_Card *card = zone->getCard(cardId);
 		if (!card)
 			return RespNameNotFound;
 		result = card->setAttribute(attrName, attrValue, false);
