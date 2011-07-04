@@ -129,8 +129,8 @@ int main(int argc, char *argv[])
 	if (testRandom)
 		testRNG();
 	
-	Servatrice server(settings);
-	QObject::connect(&server, SIGNAL(destroyed()), &app, SLOT(quit()), Qt::QueuedConnection);
+	Servatrice *server = new Servatrice(settings);
+	QObject::connect(server, SIGNAL(destroyed()), &app, SLOT(quit()), Qt::QueuedConnection);
 	
 	std::cerr << "-------------------------" << std::endl;
 	std::cerr << "Server initialized." << std::endl;
@@ -142,6 +142,7 @@ int main(int argc, char *argv[])
 	
 	delete rng;
 	delete settings;
+	delete loggerThread;
 
 	return retval;
 }

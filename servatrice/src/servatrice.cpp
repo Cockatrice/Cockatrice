@@ -66,7 +66,7 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	}
 	
 	bool threaded = settings->value("server/threaded", false).toInt();
-	tcpServer = new Servatrice_TcpServer(this, threaded);
+	tcpServer = new Servatrice_TcpServer(this, threaded, this);
 	int port = settings->value("server/port", 4747).toInt();
 	qDebug() << "Starting server on port" << port;
 	if (tcpServer->listen(QHostAddress::Any, port))
@@ -364,17 +364,20 @@ void Servatrice::updateLoginMessage()
 
 void Servatrice::statusUpdate()
 {
-	QMutexLocker locker(&dbMutex);
+	const int uc = getUsersCount(); // for correct mutex locking order
+	const int gc = getGamesCount();
+	
 	uptime += statusUpdateClock->interval() / 1000;
 	
+	QMutexLocker locker(&dbMutex);
 	checkSql();
 	
 	QSqlQuery query;
 	query.prepare("insert into " + dbPrefix + "_uptime (id_server, timest, uptime, users_count, games_count) values(:id, NOW(), :uptime, :users_count, :games_count)");
 	query.bindValue(":id", serverId);
 	query.bindValue(":uptime", uptime);
-	query.bindValue(":users_count", getUsersCount());
-	query.bindValue(":games_count", getGamesCount());
+	query.bindValue(":users_count", uc);
+	query.bindValue(":games_count", gc);
 	execSqlQuery(query);
 }
 
