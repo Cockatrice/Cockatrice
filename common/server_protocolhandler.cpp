@@ -405,6 +405,7 @@ ResponseCode Server_ProtocolHandler::cmdJoinRoom(Command_JoinRoom *cmd, CommandC
 	if (!r)
 		return RespNameNotFound;
 	
+	QMutexLocker serverLocker(&server->serverMutex);
 	QMutexLocker roomLocker(&r->roomMutex);
 	r->addClient(this);
 	rooms.insert(r->getId(), r);

@@ -69,6 +69,7 @@ ServerSocketInterface::~ServerSocketInterface()
 	delete xmlReader;
 	delete socket;
 	socket = 0;
+	delete topLevelItem;
 }
 
 void ServerSocketInterface::processProtocolItem(ProtocolItem *item)
