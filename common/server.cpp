@@ -74,6 +74,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	session->setUserInfo(data);
 	
 	users.insert(name, session);
+	qDebug() << "Server::loginUser: name=" << name;
 	
 	Event_UserJoined *event = new Event_UserJoined(new ServerInfo_User(data, false));
 	for (int i = 0; i < clients.size(); ++i)
@@ -103,8 +104,9 @@ void Server::removeClient(Server_ProtocolHandler *client)
 		delete event;
 		
 		users.remove(data->getName());
+		qDebug() << "Server::removeClient: name=" << data->getName();
 	}
-	qDebug() << "Server::removeClient: " << clients.size() << "clients; " << users.size() << "users left";
+	qDebug() << "Server::removeClient:" << clients.size() << "clients; " << users.size() << "users left";
 }
 
 void Server::broadcastRoomUpdate()

@@ -494,7 +494,7 @@ ResponseCode ServerSocketInterface::cmdBanFromServer(Command_BanFromServer *cmd,
 		query.bindValue(":id_user", getUserIdInDB(userName));
 		query.bindValue(":id_admin", getUserIdInDB(userInfo->getName()));
 		query.bindValue(":minutes", minutes);
-		query.bindValue(":reason", cmd->getReason());
+		query.bindValue(":reason", cmd->getReason() + "\n");
 		servatrice->execSqlQuery(query);
 	} else {
 		// Unregistered users must be banned by IP address.
