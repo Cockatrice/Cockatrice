@@ -321,6 +321,7 @@ ResponseCode Server_ProtocolHandler::cmdMessage(Command_Message *cmd, CommandCon
 	
 	QString receiver = cmd->getUserName();
 	Server_ProtocolHandler *userHandler = server->getUsers().value(receiver);
+	qDebug() << "cmdMessage: recv=" << receiver << (userHandler == 0 ? "not found" : "found");
 	if (!userHandler)
 		return RespNameNotFound;
 	if (userHandler->getIgnoreList().contains(userInfo->getName()))

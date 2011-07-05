@@ -186,7 +186,7 @@ AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handl
 		checkSql();
 		
 		QSqlQuery query;
-		query.prepare("select a.password, timediff(now(), date_add(b.time_from, interval b.minutes minute)) < 0, b.minutes <=> 0 from " + dbPrefix + "_users a left join " + dbPrefix + "_bans b on b.id_user = a.id and b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.id_user = a.id) where a.name = :name and a.active = 1");
+		query.prepare("select a.password, time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_users a left join " + dbPrefix + "_bans b on b.id_user = a.id and b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.id_user = a.id) where a.name = :name and a.active = 1");
 		query.bindValue(":name", user);
 		if (!execSqlQuery(query))
 			return PasswordWrong;
