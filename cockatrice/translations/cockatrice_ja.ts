@@ -235,58 +235,58 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardItem</name>
     <message>
-        <location filename="../src/carditem.cpp" line="200"/>
+        <location filename="../src/carditem.cpp" line="203"/>
         <source>&amp;Play</source>
         <translation>プレイ</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="201"/>
+        <location filename="../src/carditem.cpp" line="204"/>
         <source>&amp;Hide</source>
         <translatorcomment>テスト版のため確認取れず再度チェック</translatorcomment>
         <translation>裏にしてプレイ</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="203"/>
+        <location filename="../src/carditem.cpp" line="206"/>
         <source>&amp;Tap</source>
         <translation>タップ</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="204"/>
+        <location filename="../src/carditem.cpp" line="207"/>
         <source>&amp;Untap</source>
         <translation>アンタップ</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="205"/>
+        <location filename="../src/carditem.cpp" line="208"/>
         <source>Toggle &amp;normal untapping</source>
         <translation>通常のアンタップをしない</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="206"/>
+        <location filename="../src/carditem.cpp" line="209"/>
         <source>&amp;Flip</source>
         <translation>裏にする</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="207"/>
+        <location filename="../src/carditem.cpp" line="210"/>
         <source>&amp;Clone</source>
         <translation>複製する</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="208"/>
+        <location filename="../src/carditem.cpp" line="211"/>
         <source>Ctrl+H</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="209"/>
+        <location filename="../src/carditem.cpp" line="212"/>
         <source>&amp;Attach to card...</source>
         <translation>カードに付ける...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="210"/>
+        <location filename="../src/carditem.cpp" line="213"/>
         <source>Ctrl+A</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="211"/>
+        <location filename="../src/carditem.cpp" line="214"/>
         <source>Unattac&amp;h</source>
         <translation>取り外す</translation>
     </message>
@@ -295,142 +295,147 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation type="obsolete">P/Tを決める...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="212"/>
+        <location filename="../src/carditem.cpp" line="215"/>
+        <source>&amp;Draw arrow...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="216"/>
         <source>&amp;Power / toughness</source>
         <translation>パワー / タフネス</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="213"/>
+        <location filename="../src/carditem.cpp" line="217"/>
         <source>&amp;Increase power</source>
         <translation>パワーを上げる</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="214"/>
+        <location filename="../src/carditem.cpp" line="218"/>
         <source>Ctrl++</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="215"/>
+        <location filename="../src/carditem.cpp" line="219"/>
         <source>&amp;Decrease power</source>
         <translation>パワーを下げる</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="216"/>
+        <location filename="../src/carditem.cpp" line="220"/>
         <source>Ctrl+-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="217"/>
+        <location filename="../src/carditem.cpp" line="221"/>
         <source>I&amp;ncrease toughness</source>
         <translation>タフネスを上げる</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="218"/>
+        <location filename="../src/carditem.cpp" line="222"/>
         <source>Alt++</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="219"/>
+        <location filename="../src/carditem.cpp" line="223"/>
         <source>D&amp;ecrease toughness</source>
         <translation>タフネスを下げる</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="220"/>
+        <location filename="../src/carditem.cpp" line="224"/>
         <source>Alt+-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="221"/>
+        <location filename="../src/carditem.cpp" line="225"/>
         <source>In&amp;crease power and toughness</source>
         <translation>パワーとタフネスを上げる</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="222"/>
+        <location filename="../src/carditem.cpp" line="226"/>
         <source>Ctrl+Alt++</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="223"/>
+        <location filename="../src/carditem.cpp" line="227"/>
         <source>Dec&amp;rease power and toughness</source>
         <translation>パワーとタフネスを下げる</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="224"/>
+        <location filename="../src/carditem.cpp" line="228"/>
         <source>Ctrl+Alt+-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="225"/>
+        <location filename="../src/carditem.cpp" line="229"/>
         <source>Set &amp;power and toughness...</source>
         <translation>パワーとタフネスを設定する...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="226"/>
+        <location filename="../src/carditem.cpp" line="230"/>
         <source>Ctrl+P</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="227"/>
+        <location filename="../src/carditem.cpp" line="231"/>
         <source>&amp;Set annotation...</source>
         <translation>注釈を付ける...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="229"/>
+        <location filename="../src/carditem.cpp" line="233"/>
         <source>red</source>
         <translation>赤</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="230"/>
+        <location filename="../src/carditem.cpp" line="234"/>
         <source>yellow</source>
         <translation>黄</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="231"/>
+        <location filename="../src/carditem.cpp" line="235"/>
         <source>green</source>
         <translation>緑</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="233"/>
+        <location filename="../src/carditem.cpp" line="237"/>
         <source>&amp;Add counter (%1)</source>
         <translation>カウンターを乗せる (%1)</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="235"/>
+        <location filename="../src/carditem.cpp" line="239"/>
         <source>&amp;Remove counter (%1)</source>
         <translation>カウンターを取り除く (%1)</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="237"/>
+        <location filename="../src/carditem.cpp" line="241"/>
         <source>&amp;Set counters (%1)...</source>
         <translation>カウンターの数を決める (%1)...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="238"/>
+        <location filename="../src/carditem.cpp" line="242"/>
         <source>&amp;top of library</source>
         <translation>ライブラリーの一番上へ</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="239"/>
+        <location filename="../src/carditem.cpp" line="243"/>
         <source>&amp;bottom of library</source>
         <translation>ライブラリーの一番下へ</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="240"/>
+        <location filename="../src/carditem.cpp" line="244"/>
         <source>&amp;graveyard</source>
         <translation>墓地へ</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="241"/>
+        <location filename="../src/carditem.cpp" line="245"/>
         <source>Ctrl+Del</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="242"/>
+        <location filename="../src/carditem.cpp" line="246"/>
         <source>&amp;exile</source>
         <translation>追放領域へ</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="244"/>
+        <location filename="../src/carditem.cpp" line="248"/>
         <source>&amp;Move to</source>
         <translation>移動させる</translation>
     </message>
@@ -1251,89 +1256,89 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/gameselector.cpp" line="138"/>
+        <location filename="../src/gameselector.cpp" line="140"/>
         <source>C&amp;reate</source>
         <translation>部屋を作る</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="139"/>
+        <location filename="../src/gameselector.cpp" line="141"/>
         <source>&amp;Join</source>
         <translation>参加する</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="94"/>
-        <location filename="../src/gameselector.cpp" line="95"/>
         <location filename="../src/gameselector.cpp" line="96"/>
         <location filename="../src/gameselector.cpp" line="97"/>
         <location filename="../src/gameselector.cpp" line="98"/>
         <location filename="../src/gameselector.cpp" line="99"/>
         <location filename="../src/gameselector.cpp" line="100"/>
         <location filename="../src/gameselector.cpp" line="101"/>
+        <location filename="../src/gameselector.cpp" line="102"/>
+        <location filename="../src/gameselector.cpp" line="103"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="94"/>
+        <location filename="../src/gameselector.cpp" line="96"/>
         <source>Please join the appropriate room first.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="95"/>
+        <location filename="../src/gameselector.cpp" line="97"/>
         <source>Wrong password.</source>
         <translation>パスワードが間違っています.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="96"/>
+        <location filename="../src/gameselector.cpp" line="98"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>この試合は観戦者は許可されていません.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="97"/>
+        <location filename="../src/gameselector.cpp" line="99"/>
         <source>The game is already full.</source>
         <translation>このゲームはすでに満員です.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="98"/>
+        <location filename="../src/gameselector.cpp" line="100"/>
         <source>The game does not exist any more.</source>
         <translation>このゲームはもう存在しません.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="99"/>
+        <location filename="../src/gameselector.cpp" line="101"/>
         <source>This game is only open to registered users.</source>
         <translation>このゲームは登録済みプレイヤーにのみ公開されています.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="100"/>
+        <location filename="../src/gameselector.cpp" line="102"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
         <translation>このゲームは作成者のフレンドのみに公開されています.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="101"/>
+        <location filename="../src/gameselector.cpp" line="103"/>
         <source>You are being ignored by the creator of this game.</source>
         <translation>あなたはこのゲームの作成者によって拒否されています.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="117"/>
+        <location filename="../src/gameselector.cpp" line="119"/>
         <source>Join game</source>
         <translation>参加</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="117"/>
+        <location filename="../src/gameselector.cpp" line="119"/>
         <source>Password:</source>
         <translation>パスワード:</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="134"/>
+        <location filename="../src/gameselector.cpp" line="136"/>
         <source>Games</source>
         <translation>ゲーム</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="135"/>
+        <location filename="../src/gameselector.cpp" line="137"/>
         <source>Show &amp;full games</source>
         <translation>全てのゲームを見る</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="136"/>
+        <location filename="../src/gameselector.cpp" line="138"/>
         <source>Show &amp;running games</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1342,7 +1347,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation type="obsolete">全てのゲームを見る</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="140"/>
+        <location filename="../src/gameselector.cpp" line="142"/>
         <source>J&amp;oin as spectator</source>
         <translation>観戦者として参加</translation>
     </message>

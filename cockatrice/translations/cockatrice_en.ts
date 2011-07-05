@@ -230,197 +230,202 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardItem</name>
     <message>
-        <location filename="../src/carditem.cpp" line="200"/>
+        <location filename="../src/carditem.cpp" line="203"/>
         <source>&amp;Play</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="201"/>
+        <location filename="../src/carditem.cpp" line="204"/>
         <source>&amp;Hide</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="203"/>
+        <location filename="../src/carditem.cpp" line="206"/>
         <source>&amp;Tap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="204"/>
+        <location filename="../src/carditem.cpp" line="207"/>
         <source>&amp;Untap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="205"/>
+        <location filename="../src/carditem.cpp" line="208"/>
         <source>Toggle &amp;normal untapping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="206"/>
+        <location filename="../src/carditem.cpp" line="209"/>
         <source>&amp;Flip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="207"/>
+        <location filename="../src/carditem.cpp" line="210"/>
         <source>&amp;Clone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="208"/>
+        <location filename="../src/carditem.cpp" line="211"/>
         <source>Ctrl+H</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="209"/>
+        <location filename="../src/carditem.cpp" line="212"/>
         <source>&amp;Attach to card...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="210"/>
+        <location filename="../src/carditem.cpp" line="213"/>
         <source>Ctrl+A</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="211"/>
+        <location filename="../src/carditem.cpp" line="214"/>
         <source>Unattac&amp;h</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="212"/>
-        <source>&amp;Power / toughness</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/carditem.cpp" line="213"/>
-        <source>&amp;Increase power</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/carditem.cpp" line="214"/>
-        <source>Ctrl++</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/carditem.cpp" line="215"/>
-        <source>&amp;Decrease power</source>
+        <source>&amp;Draw arrow...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="216"/>
-        <source>Ctrl+-</source>
+        <source>&amp;Power / toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="217"/>
-        <source>I&amp;ncrease toughness</source>
+        <source>&amp;Increase power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="218"/>
-        <source>Alt++</source>
+        <source>Ctrl++</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="219"/>
-        <source>D&amp;ecrease toughness</source>
+        <source>&amp;Decrease power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="220"/>
-        <source>Alt+-</source>
+        <source>Ctrl+-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="221"/>
-        <source>In&amp;crease power and toughness</source>
+        <source>I&amp;ncrease toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="222"/>
-        <source>Ctrl+Alt++</source>
+        <source>Alt++</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="223"/>
-        <source>Dec&amp;rease power and toughness</source>
+        <source>D&amp;ecrease toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="224"/>
-        <source>Ctrl+Alt+-</source>
+        <source>Alt+-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="225"/>
-        <source>Set &amp;power and toughness...</source>
+        <source>In&amp;crease power and toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="226"/>
-        <source>Ctrl+P</source>
+        <source>Ctrl+Alt++</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="227"/>
-        <source>&amp;Set annotation...</source>
+        <source>Dec&amp;rease power and toughness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="228"/>
+        <source>Ctrl+Alt+-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="229"/>
-        <source>red</source>
+        <source>Set &amp;power and toughness...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="230"/>
-        <source>yellow</source>
+        <source>Ctrl+P</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="231"/>
-        <source>green</source>
+        <source>&amp;Set annotation...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="233"/>
-        <source>&amp;Add counter (%1)</source>
+        <source>red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="234"/>
+        <source>yellow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="235"/>
-        <source>&amp;Remove counter (%1)</source>
+        <source>green</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="237"/>
-        <source>&amp;Set counters (%1)...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/carditem.cpp" line="238"/>
-        <source>&amp;top of library</source>
+        <source>&amp;Add counter (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="239"/>
-        <source>&amp;bottom of library</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/carditem.cpp" line="240"/>
-        <source>&amp;graveyard</source>
+        <source>&amp;Remove counter (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="241"/>
-        <source>Ctrl+Del</source>
+        <source>&amp;Set counters (%1)...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="242"/>
-        <source>&amp;exile</source>
+        <source>&amp;top of library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="243"/>
+        <source>&amp;bottom of library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="244"/>
+        <source>&amp;graveyard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="245"/>
+        <source>Ctrl+Del</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="246"/>
+        <source>&amp;exile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="248"/>
         <source>&amp;Move to</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1203,94 +1208,94 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/gameselector.cpp" line="138"/>
+        <location filename="../src/gameselector.cpp" line="140"/>
         <source>C&amp;reate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="139"/>
+        <location filename="../src/gameselector.cpp" line="141"/>
         <source>&amp;Join</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="94"/>
-        <location filename="../src/gameselector.cpp" line="95"/>
         <location filename="../src/gameselector.cpp" line="96"/>
         <location filename="../src/gameselector.cpp" line="97"/>
         <location filename="../src/gameselector.cpp" line="98"/>
         <location filename="../src/gameselector.cpp" line="99"/>
         <location filename="../src/gameselector.cpp" line="100"/>
         <location filename="../src/gameselector.cpp" line="101"/>
+        <location filename="../src/gameselector.cpp" line="102"/>
+        <location filename="../src/gameselector.cpp" line="103"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="94"/>
+        <location filename="../src/gameselector.cpp" line="96"/>
         <source>Please join the appropriate room first.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="95"/>
+        <location filename="../src/gameselector.cpp" line="97"/>
         <source>Wrong password.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="96"/>
+        <location filename="../src/gameselector.cpp" line="98"/>
         <source>Spectators are not allowed in this game.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="97"/>
+        <location filename="../src/gameselector.cpp" line="99"/>
         <source>The game is already full.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="98"/>
+        <location filename="../src/gameselector.cpp" line="100"/>
         <source>The game does not exist any more.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="99"/>
+        <location filename="../src/gameselector.cpp" line="101"/>
         <source>This game is only open to registered users.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="100"/>
+        <location filename="../src/gameselector.cpp" line="102"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="101"/>
+        <location filename="../src/gameselector.cpp" line="103"/>
         <source>You are being ignored by the creator of this game.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="117"/>
+        <location filename="../src/gameselector.cpp" line="119"/>
         <source>Join game</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="117"/>
+        <location filename="../src/gameselector.cpp" line="119"/>
         <source>Password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="134"/>
+        <location filename="../src/gameselector.cpp" line="136"/>
         <source>Games</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="135"/>
+        <location filename="../src/gameselector.cpp" line="137"/>
         <source>Show &amp;full games</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="136"/>
+        <location filename="../src/gameselector.cpp" line="138"/>
         <source>Show &amp;running games</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="140"/>
+        <location filename="../src/gameselector.cpp" line="142"/>
         <source>J&amp;oin as spectator</source>
         <translation type="unfinished"></translation>
     </message>

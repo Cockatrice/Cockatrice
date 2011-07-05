@@ -9,6 +9,7 @@ class CardZone;
 class ServerInfo_Card;
 class Player;
 class QAction;
+class QColor;
 
 const int MAX_COUNTERS_ON_CARD = 999;
 
@@ -33,17 +34,19 @@ private:
 	QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
 	QAction *aPlay,
 		*aHide,
-		*aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aSetPT, *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aSetAnnotation, *aFlip, *aClone,
+		*aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aSetAnnotation, *aFlip, *aClone,
 		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile;
 	QMenu *cardMenu, *ptMenu, *moveMenu;
 
 	void playCard(bool faceDown);
+	void drawArrow(const QColor &arrowColor);
 	void prepareDelete();
 private slots:
 	void cardMenuAction();
 	void actCardCounterTrigger();
 	void actAttach();
 	void actUnattach();
+	void actDrawArrow();
 	void actSetPT();
 	void actIncP();
 	void actDecP();
