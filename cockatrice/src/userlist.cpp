@@ -107,6 +107,7 @@ UserList::UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserL
 	userTree->setRootIsDecorated(false);
 	userTree->setIconSize(QSize(20, 12));
 	userTree->setItemDelegate(itemDelegate);
+	userTree->setAlternatingRowColors(true);
 	connect(userTree, SIGNAL(itemActivated(QTreeWidgetItem *, int)), this, SLOT(userClicked(QTreeWidgetItem *, int)));
 	
 	QVBoxLayout *vbox = new QVBoxLayout;

@@ -22,6 +22,7 @@ GameSelector::GameSelector(AbstractClient *_client, TabRoom *_room, const QMap<i
 	gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 	gameListView->setModel(gameListProxyModel);
 	gameListView->setSortingEnabled(true);
+	gameListView->setAlternatingRowColors(true);
 	if (_room)
 		gameListView->header()->hideSection(0);
 	gameListView->header()->setResizeMode(1, QHeaderView::ResizeToContents);

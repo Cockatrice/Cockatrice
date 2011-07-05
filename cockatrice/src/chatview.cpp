@@ -6,7 +6,7 @@
 #include "chatview.h"
 
 ChatView::ChatView(const QString &_ownName, bool _showTimestamps, QWidget *parent)
-	: QTextBrowser(parent), evenNumber(false), ownName(_ownName), showTimestamps(_showTimestamps)
+	: QTextBrowser(parent), evenNumber(true), ownName(_ownName), showTimestamps(_showTimestamps)
 {
 	setReadOnly(true);
 	setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse);
@@ -14,16 +14,20 @@ ChatView::ChatView(const QString &_ownName, bool _showTimestamps, QWidget *paren
 	connect(this, SIGNAL(anchorClicked(const QUrl &)), this, SLOT(openLink(const QUrl &)));
 }
 
-QTextCursor ChatView::prepareBlock()
+QTextCursor ChatView::prepareBlock(bool same)
 {
+	lastSender.clear();
+	
 	QTextCursor cursor(document()->lastBlock());
 	cursor.movePosition(QTextCursor::End);
-	
-	QTextBlockFormat blockFormat;
-	if ((evenNumber = !evenNumber))
-		blockFormat.setBackground(palette().alternateBase());
-	blockFormat.setBottomMargin(2);
-	cursor.insertBlock(blockFormat);
+	if (!same) {
+		QTextBlockFormat blockFormat;
+		if ((evenNumber = !evenNumber))
+			blockFormat.setBackground(palette().alternateBase());
+		blockFormat.setBottomMargin(2);
+		cursor.insertBlock(blockFormat);
+	} else
+		cursor.insertHtml("<br>");
 	
 	return cursor;
 }
@@ -36,11 +40,16 @@ void ChatView::appendHtml(const QString &html)
 
 void ChatView::appendMessage(QString sender, QString message, QColor playerColor, bool playerBold)
 {
-	QTextCursor cursor = prepareBlock();
+	bool sameSender = (sender == lastSender) && !lastSender.isEmpty();
+	QTextCursor cursor = prepareBlock(sameSender);
+	lastSender = sender;
 	
 	if (showTimestamps) {
 		QTextCharFormat timeFormat;
-		timeFormat.setForeground(Qt::black);
+		if (sameSender)
+			timeFormat.setForeground(Qt::transparent);
+		else
+			timeFormat.setForeground(Qt::black);
 		cursor.setCharFormat(timeFormat);
 		cursor.insertText(QDateTime::currentDateTime().toString("[hh:mm] "));
 	}
@@ -57,6 +66,8 @@ void ChatView::appendMessage(QString sender, QString message, QColor playerColor
 		if (playerBold)
 			senderFormat.setFontWeight(QFont::Bold);
 	}
+	if (sameSender)
+		senderFormat.setForeground(Qt::transparent);
 	cursor.setCharFormat(senderFormat);
 	if (!sender.isEmpty())
 		sender.append(": ");

@@ -12,13 +12,14 @@ class QMouseEvent;
 class ChatView : public QTextBrowser {
 	Q_OBJECT;
 private:
+	QString lastSender;
 	bool evenNumber;
 	QString ownName;
 	bool showTimestamps;
 	QTextFragment getFragmentUnderMouse(const QPoint &pos) const;
 	QString getCardNameUnderMouse(QTextFragment frag) const;
 	QString getCardNameUnderMouse(const QPoint &pos) const;
-	QTextCursor prepareBlock();
+	QTextCursor prepareBlock(bool same = false);
 private slots:
 	void openLink(const QUrl &link);
 public:
