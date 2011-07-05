@@ -65,7 +65,7 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 		statusUpdateClock->start(statusUpdateTime);
 	}
 	
-	bool threaded = settings->value("server/threaded", false).toInt();
+	threaded = settings->value("server/threaded", false).toInt();
 	tcpServer = new Servatrice_TcpServer(this, threaded, this);
 	int port = settings->value("server/port", 4747).toInt();
 	qDebug() << "Starting server on port" << port;

@@ -68,6 +68,7 @@ public:
 	int getMaxMessageCountPerInterval() const { return maxMessageCountPerInterval; }
 	int getMaxMessageSizePerInterval() const { return maxMessageSizePerInterval; }
 	int getMaxGamesPerUser() const { return maxGamesPerUser; }
+	bool getThreaded() const { return threaded; }
 	QString getDbPrefix() const { return dbPrefix; }
 	void updateLoginMessage();
 	ServerInfo_User *getUserData(const QString &name);
@@ -86,6 +87,7 @@ private:
 	QString dbPrefix;
 	QSettings *settings;
 	int serverId;
+	bool threaded;
 	int uptime;
 	QList<QPair<QHostAddress, int> > addressBanList;
 	int maxGameInactivityTime, maxPlayerInactivityTime;
