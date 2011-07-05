@@ -1,13 +1,12 @@
 #include <QTextEdit>
 #include <QDateTime>
-#include <QTextTable>
 #include <QScrollBar>
 #include <QMouseEvent>
 #include <QDesktopServices>
 #include "chatview.h"
 
 ChatView::ChatView(const QString &_ownName, bool _showTimestamps, QWidget *parent)
-	: QTextBrowser(parent), ownName(_ownName), showTimestamps(_showTimestamps)
+	: QTextBrowser(parent), evenNumber(false), ownName(_ownName), showTimestamps(_showTimestamps)
 {
 	setReadOnly(true);
 	setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse);
@@ -15,14 +14,29 @@ ChatView::ChatView(const QString &_ownName, bool _showTimestamps, QWidget *paren
 	connect(this, SIGNAL(anchorClicked(const QUrl &)), this, SLOT(openLink(const QUrl &)));
 }
 
-void ChatView::appendMessage(QString sender, QString message, QColor playerColor, bool playerBold)
+QTextCursor ChatView::prepareBlock()
 {
 	QTextCursor cursor(document()->lastBlock());
 	cursor.movePosition(QTextCursor::End);
 	
 	QTextBlockFormat blockFormat;
+	if ((evenNumber = !evenNumber))
+		blockFormat.setBackground(palette().alternateBase());
 	blockFormat.setBottomMargin(2);
 	cursor.insertBlock(blockFormat);
+	
+	return cursor;
+}
+
+void ChatView::appendHtml(const QString &html)
+{
+	prepareBlock().insertHtml(html);
+	verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+}
+
+void ChatView::appendMessage(QString sender, QString message, QColor playerColor, bool playerBold)
+{
+	QTextCursor cursor = prepareBlock();
 	
 	if (showTimestamps) {
 		QTextCharFormat timeFormat;

@@ -28,7 +28,6 @@ private:
 	enum MessageContext { MessageContext_None, MessageContext_MoveCard, MessageContext_Mulligan };
 	
 	QString sanitizeHtml(QString dirty) const;
-	void myAppend(const QString &message);
 	bool isFemale(Player *player) const;
 	QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position) const;
 	MessageContext currentContext;
