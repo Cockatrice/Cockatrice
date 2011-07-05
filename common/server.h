@@ -40,6 +40,7 @@ public:
 	virtual int getMaxMessageCountPerInterval() const { return 0; }
 	virtual int getMaxMessageSizePerInterval() const { return 0; }
 	virtual int getMaxGamesPerUser() const { return 0; }
+	virtual bool getThreaded() const = 0;
 	
 	virtual QMap<QString, ServerInfo_User *> getBuddyList(const QString &name) = 0;
 	virtual QMap<QString, ServerInfo_User *> getIgnoreList(const QString &name) = 0;

@@ -16,6 +16,7 @@ public:
 	bool getGameShouldPing() const { return false; }
 	int getMaxGameInactivityTime() const { return 9999999; }
 	int getMaxPlayerInactivityTime() const { return 9999999; }
+	bool getThreaded() const { return false; }
 	
 	LocalServerInterface *newConnection();
 protected:
