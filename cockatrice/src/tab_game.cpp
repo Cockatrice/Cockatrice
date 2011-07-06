@@ -158,7 +158,7 @@ void DeckViewContainer::setDeck(DeckList *deck)
 	readyStartButton->setEnabled(true);
 }
 
-TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, const QString &_userName, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
+TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, ServerInfo_User *_userInfo, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
 	: Tab(_tabSupervisor), clients(_clients), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), started(false), resuming(_resuming), currentPhase(-1)
 {
 	phasesToolbar = new PhasesToolbar;
@@ -176,7 +176,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	
 	timeElapsedLabel = new QLabel;
 	timeElapsedLabel->setAlignment(Qt::AlignCenter);
-	messageLog = new MessageLogWidget(_userName);
+	messageLog = new MessageLogWidget(_userInfo->getName(), _userInfo->getGender() == ServerInfo_User::Female);
 	connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfo, SLOT(setCard(QString)));
 	connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
 	connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));

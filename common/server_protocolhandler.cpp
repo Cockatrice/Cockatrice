@@ -468,8 +468,9 @@ ResponseCode Server_ProtocolHandler::cmdRoomSay(Command_RoomSay *cmd, CommandCon
 		if ((totalSize > server->getMaxMessageSizePerInterval()) || (totalCount > server->getMaxMessageCountPerInterval()))
 			return RespChatFlood;
 	}
+	msg.replace(QChar('\n'), QChar(' '));
 	
-	room->say(this, cmd->getMessage());
+	room->say(this, msg);
 	return RespOk;
 }
 

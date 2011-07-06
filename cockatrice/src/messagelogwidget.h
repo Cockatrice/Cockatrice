@@ -31,6 +31,7 @@ private:
 	bool isFemale(Player *player) const;
 	QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position) const;
 	MessageContext currentContext;
+	bool female;
 	
 	QList<LogMoveCard> moveCardQueue;
 	QMap<CardItem *, QString> moveCardPT;
@@ -39,13 +40,6 @@ private:
 	Player *mulliganPlayer;
 	int mulliganNumber;
 public slots:
-	void logConnecting(QString hostname);
-	void logConnected();
-	void logDisconnected();
-	void logSocketError(const QString &errorString);
-	void logServerError(ResponseCode response);
-	void logProtocolVersionMismatch(int clientVersion, int serverVersion);
-	void logProtocolError();
 	void logGameJoined(int gameId);
 	void logJoin(Player *player);
 	void logLeave(Player *player);
@@ -88,7 +82,7 @@ public slots:
 	void containerProcessingDone();
 public:
 	void connectToPlayer(Player *player);
-	MessageLogWidget(const QString &_ownName, QWidget *parent = 0);
+	MessageLogWidget(const QString &_ownName, bool _female, QWidget *parent = 0);
 };
 
 #endif

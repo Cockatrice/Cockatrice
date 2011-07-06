@@ -155,7 +155,7 @@ private slots:
 	void actNextPhase();
 	void actNextTurn();
 public:
-	TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, const QString &_userName, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming);
+	TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, ServerInfo_User *_userInfo, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming);
 	~TabGame();
 	void retranslateUi();
 	void closeRequest();

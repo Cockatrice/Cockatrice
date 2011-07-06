@@ -235,57 +235,57 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardItem</name>
     <message>
-        <location filename="../src/carditem.cpp" line="203"/>
+        <location filename="../src/carditem.cpp" line="206"/>
         <source>&amp;Play</source>
         <translation>&amp;Jogar</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="204"/>
+        <location filename="../src/carditem.cpp" line="207"/>
         <source>&amp;Hide</source>
         <translation>&amp;Ocultar</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="206"/>
+        <location filename="../src/carditem.cpp" line="209"/>
         <source>&amp;Tap</source>
         <translation>&amp;Virar</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="207"/>
+        <location filename="../src/carditem.cpp" line="210"/>
         <source>&amp;Untap</source>
         <translation>&amp;Desvirar</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="208"/>
+        <location filename="../src/carditem.cpp" line="211"/>
         <source>Toggle &amp;normal untapping</source>
         <translation>&amp;Trocar o modo de desvirar</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="209"/>
+        <location filename="../src/carditem.cpp" line="212"/>
         <source>&amp;Flip</source>
         <translation>Virar a &amp;face</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="210"/>
+        <location filename="../src/carditem.cpp" line="213"/>
         <source>&amp;Clone</source>
         <translation>Clo&amp;nar</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="211"/>
+        <location filename="../src/carditem.cpp" line="214"/>
         <source>Ctrl+H</source>
         <translation>Ctrl+H</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="212"/>
+        <location filename="../src/carditem.cpp" line="215"/>
         <source>&amp;Attach to card...</source>
         <translation>Ane&amp;xar ao card...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="213"/>
+        <location filename="../src/carditem.cpp" line="216"/>
         <source>Ctrl+A</source>
         <translation>Ctrl+A</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="214"/>
+        <location filename="../src/carditem.cpp" line="217"/>
         <source>Unattac&amp;h</source>
         <translation>De&amp;sanexar</translation>
     </message>
@@ -294,147 +294,147 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation type="obsolete">Alterar &amp;P/R...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="215"/>
+        <location filename="../src/carditem.cpp" line="218"/>
         <source>&amp;Draw arrow...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="216"/>
+        <location filename="../src/carditem.cpp" line="219"/>
         <source>&amp;Power / toughness</source>
         <translation>Po&amp;der / resistência</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="217"/>
+        <location filename="../src/carditem.cpp" line="220"/>
         <source>&amp;Increase power</source>
         <translation>Au&amp;mentar poder</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="218"/>
+        <location filename="../src/carditem.cpp" line="221"/>
         <source>Ctrl++</source>
         <translation>Ctrl++</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="219"/>
+        <location filename="../src/carditem.cpp" line="222"/>
         <source>&amp;Decrease power</source>
         <translation>Dimi&amp;nuir poder</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="220"/>
+        <location filename="../src/carditem.cpp" line="223"/>
         <source>Ctrl+-</source>
         <translation>Ctrl+-</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="221"/>
+        <location filename="../src/carditem.cpp" line="224"/>
         <source>I&amp;ncrease toughness</source>
         <translation>A&amp;umentar resistência</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="222"/>
+        <location filename="../src/carditem.cpp" line="225"/>
         <source>Alt++</source>
         <translation>Alt++</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="223"/>
+        <location filename="../src/carditem.cpp" line="226"/>
         <source>D&amp;ecrease toughness</source>
         <translation>D&amp;iminuir resistência</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="224"/>
+        <location filename="../src/carditem.cpp" line="227"/>
         <source>Alt+-</source>
         <translation>Alt+-</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="225"/>
+        <location filename="../src/carditem.cpp" line="228"/>
         <source>In&amp;crease power and toughness</source>
         <translation>Aumen&amp;tar poder e resistência</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="226"/>
+        <location filename="../src/carditem.cpp" line="229"/>
         <source>Ctrl+Alt++</source>
         <translation>Ctrl+Alt++</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="227"/>
+        <location filename="../src/carditem.cpp" line="230"/>
         <source>Dec&amp;rease power and toughness</source>
         <translation>Diminuir p&amp;oder e resistência</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="228"/>
+        <location filename="../src/carditem.cpp" line="231"/>
         <source>Ctrl+Alt+-</source>
         <translation>Ctrl+Alt+-</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="229"/>
+        <location filename="../src/carditem.cpp" line="232"/>
         <source>Set &amp;power and toughness...</source>
         <translation>Alterar poder e resis&amp;tência...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="230"/>
+        <location filename="../src/carditem.cpp" line="233"/>
         <source>Ctrl+P</source>
         <translation>Ctrl+P</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="231"/>
+        <location filename="../src/carditem.cpp" line="234"/>
         <source>&amp;Set annotation...</source>
         <translation>Alterar &amp;nota...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="233"/>
+        <location filename="../src/carditem.cpp" line="236"/>
         <source>red</source>
         <translation>vermelho</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="234"/>
+        <location filename="../src/carditem.cpp" line="237"/>
         <source>yellow</source>
         <translation>amarelo</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="235"/>
+        <location filename="../src/carditem.cpp" line="238"/>
         <source>green</source>
         <translation>verde</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="237"/>
+        <location filename="../src/carditem.cpp" line="240"/>
         <source>&amp;Add counter (%1)</source>
         <translation>Adicionar &amp;marcador (%1)</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="239"/>
+        <location filename="../src/carditem.cpp" line="242"/>
         <source>&amp;Remove counter (%1)</source>
         <translation>&amp;Remover marcador (%1)</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="241"/>
+        <location filename="../src/carditem.cpp" line="244"/>
         <source>&amp;Set counters (%1)...</source>
         <translation>&amp;Alterar marcadores (%1)...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="242"/>
+        <location filename="../src/carditem.cpp" line="245"/>
         <source>&amp;top of library</source>
         <translation>topo do &amp;grimório</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="243"/>
+        <location filename="../src/carditem.cpp" line="246"/>
         <source>&amp;bottom of library</source>
         <translation>&amp;fundo do grimório</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="244"/>
+        <location filename="../src/carditem.cpp" line="247"/>
         <source>&amp;graveyard</source>
         <translation>&amp;cemitério</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="245"/>
+        <location filename="../src/carditem.cpp" line="248"/>
         <source>Ctrl+Del</source>
         <translation>Ctrl+Del</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="246"/>
+        <location filename="../src/carditem.cpp" line="249"/>
         <source>&amp;exile</source>
         <translation>&amp;exílio</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="248"/>
+        <location filename="../src/carditem.cpp" line="251"/>
         <source>&amp;Move to</source>
         <translation>Mo&amp;ver para</translation>
     </message>
@@ -1424,17 +1424,16 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/gameselector.cpp" line="140"/>
+        <location filename="../src/gameselector.cpp" line="141"/>
         <source>C&amp;reate</source>
         <translation>&amp;Criar</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="141"/>
+        <location filename="../src/gameselector.cpp" line="142"/>
         <source>&amp;Join</source>
         <translation>&amp;Entrar</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="96"/>
         <location filename="../src/gameselector.cpp" line="97"/>
         <location filename="../src/gameselector.cpp" line="98"/>
         <location filename="../src/gameselector.cpp" line="99"/>
@@ -1442,71 +1441,72 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <location filename="../src/gameselector.cpp" line="101"/>
         <location filename="../src/gameselector.cpp" line="102"/>
         <location filename="../src/gameselector.cpp" line="103"/>
+        <location filename="../src/gameselector.cpp" line="104"/>
         <source>Error</source>
         <translation>Erro</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="96"/>
+        <location filename="../src/gameselector.cpp" line="97"/>
         <source>Please join the appropriate room first.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="97"/>
+        <location filename="../src/gameselector.cpp" line="98"/>
         <source>Wrong password.</source>
         <translation>Senha incorreta.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="98"/>
+        <location filename="../src/gameselector.cpp" line="99"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>Não são permitidos visitantes neste jogo.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="99"/>
+        <location filename="../src/gameselector.cpp" line="100"/>
         <source>The game is already full.</source>
         <translation>O jogo está cheio.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="100"/>
+        <location filename="../src/gameselector.cpp" line="101"/>
         <source>The game does not exist any more.</source>
         <translation>O jogo não existe mais.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="101"/>
+        <location filename="../src/gameselector.cpp" line="102"/>
         <source>This game is only open to registered users.</source>
         <translation>Este jogo é aberto apenas para usuários registrados.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="102"/>
+        <location filename="../src/gameselector.cpp" line="103"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
         <translation>Este jogo é aberto apenas para os amigos de quem criou o jogo.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="103"/>
+        <location filename="../src/gameselector.cpp" line="104"/>
         <source>You are being ignored by the creator of this game.</source>
         <translation>Você está sendo ignorado pelo criador deste jogo.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="119"/>
+        <location filename="../src/gameselector.cpp" line="120"/>
         <source>Join game</source>
         <translation>Entrar no jogo</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="119"/>
+        <location filename="../src/gameselector.cpp" line="120"/>
         <source>Password:</source>
         <translation>Senha:</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="136"/>
+        <location filename="../src/gameselector.cpp" line="137"/>
         <source>Games</source>
         <translation>Jogos</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="137"/>
+        <location filename="../src/gameselector.cpp" line="138"/>
         <source>Show &amp;full games</source>
         <translation>&amp;Mostrar os jogos cheios</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="138"/>
+        <location filename="../src/gameselector.cpp" line="139"/>
         <source>Show &amp;running games</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1515,7 +1515,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation type="obsolete">&amp;Mostrar os jogos cheios</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="142"/>
+        <location filename="../src/gameselector.cpp" line="143"/>
         <source>J&amp;oin as spectator</source>
         <translation>E&amp;ntrar como visitante</translation>
     </message>
@@ -1915,278 +1915,1041 @@ A versão local é %1 e a versão remota é %2.</translation>
 <context>
     <name>MessageLogWidget</name>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="37"/>
         <source>Connecting to %1...</source>
-        <translation>Conectando a %1...</translation>
+        <translation type="obsolete">Conectando a %1...</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="47"/>
         <source>Disconnected from server.</source>
-        <translation>Desconectado do servidor.</translation>
+        <translation type="obsolete">Desconectado do servidor.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="58"/>
         <source>Invalid password.</source>
-        <translation>Senha incorreta.</translation>
+        <translation type="obsolete">Senha incorreta.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="70"/>
         <source>Protocol error.</source>
-        <translation>Erro de protocolo.</translation>
+        <translation type="obsolete">Erro de protocolo.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="91"/>
+        <location filename="../src/messagelogwidget.cpp" line="48"/>
         <source>The game has been closed.</source>
         <translation>O jogo foi fechado.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="96"/>
+        <location filename="../src/messagelogwidget.cpp" line="53"/>
         <source>%1 is now watching the game.</source>
         <translation>%1 está assistindo o jogo agora.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="101"/>
+        <location filename="../src/messagelogwidget.cpp" line="58"/>
         <source>%1 is not watching the game any more.</source>
         <translation>%1 não está mais assistindo o jogo.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="119"/>
         <source>%1 is not ready to start the game any more.</source>
-        <translation>%1 não está mais pronto para começar o jogo.</translation>
+        <translation type="obsolete">%1 não está mais pronto para começar o jogo.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="135"/>
-        <source>%1 has restored connection to the game.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="137"/>
-        <source>%1 has lost connection to the game.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="154"/>
-        <source>%1 shuffles %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="159"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
-        <translation>%1 tirou um %2 com um dado de %3 lados.</translation>
+        <translation type="obsolete">%1 tirou um %2 com um dado de %3 lados.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="168"/>
         <source>%1 draws %n card(s).</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%1 compra %n card.</numerusform>
             <numerusform>%1 compra %n cards.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="175"/>
+        <location filename="../src/messagelogwidget.cpp" line="24"/>
+        <source>You have joined game #%1.</source>
+        <comment>female</comment>
+        <translation type="unfinished">Você entrou no jogo nº %1.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="26"/>
+        <source>You have joined game #%1.</source>
+        <comment>male</comment>
+        <translation type="unfinished">Você entrou no jogo nº %1.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="33"/>
+        <source>%1 has joined the game.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 entrou no jogo.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="35"/>
+        <source>%1 has joined the game.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 entrou no jogo.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="41"/>
+        <source>%1 has left the game.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 saiu do jogo.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="43"/>
+        <source>%1 has left the game.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 saiu do jogo.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="65"/>
+        <source>%1 has loaded a local deck.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 carregou um deck local.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="67"/>
+        <source>%1 has loaded a local deck.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 carregou um deck local.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="70"/>
+        <source>%1 has loaded deck #%2.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 carregou o deck nº %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="72"/>
+        <source>%1 has loaded deck #%2.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 carregou o deck nº %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="79"/>
+        <source>%1 is ready to start the game.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 está pronto para começar o jogo.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="81"/>
+        <source>%1 is ready to start the game.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 está pronto para começar o jogo.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="87"/>
+        <source>%1 is not ready to start the game any more.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 não está mais pronto para começar o jogo.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="89"/>
+        <source>%1 is not ready to start the game any more.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 não está mais pronto para começar o jogo.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="95"/>
+        <source>%1 has conceded the game.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 concedeu o jogo.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="97"/>
+        <source>%1 has conceded the game.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 concedeu o jogo.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="109"/>
+        <source>%1 has restored connection to the game.</source>
+        <comment>female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="111"/>
+        <source>%1 has restored connection to the game.</source>
+        <comment>male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="114"/>
+        <source>%1 has lost connection to the game.</source>
+        <comment>female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="116"/>
+        <source>%1 has lost connection to the game.</source>
+        <comment>male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="135"/>
+        <source>%1 shuffles %2.</source>
+        <comment>female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="137"/>
+        <source>%1 shuffles %2.</source>
+        <comment>male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="144"/>
+        <source>%1 rolls a %2 with a %3-sided die.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 tirou um %2 com um dado de %3 lados.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="146"/>
+        <source>%1 rolls a %2 with a %3-sided die.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 tirou um %2 com um dado de %3 lados.</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="156"/>
+        <source>%1 draws %n card(s).</source>
+        <comment>female</comment>
+        <translation type="unfinished">
+            <numerusform>%1 compra %n card.</numerusform>
+            <numerusform>%1 compra %n cards.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="158"/>
+        <source>%1 draws %n card(s).</source>
+        <comment>male</comment>
+        <translation type="unfinished">
+            <numerusform>%1 compra %n card.</numerusform>
+            <numerusform>%1 compra %n cards.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="165"/>
         <source>%1 undoes his last draw.</source>
         <translation>%1 desfaz sua última compra.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="175"/>
+        <location filename="../src/messagelogwidget.cpp" line="165"/>
         <source>%1 undoes her last draw.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="177"/>
+        <location filename="../src/messagelogwidget.cpp" line="167"/>
         <source>%1 undoes his last draw (%2).</source>
         <translation>%1 desfaz sua última compra (%2).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="177"/>
+        <location filename="../src/messagelogwidget.cpp" line="167"/>
         <source>%1 undoes her last draw (%2).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="187"/>
+        <location filename="../src/messagelogwidget.cpp" line="177"/>
         <source> from table</source>
         <translation> vindo do campo de batalha</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="189"/>
+        <location filename="../src/messagelogwidget.cpp" line="179"/>
         <source> from graveyard</source>
         <translation> vindo do cemitério</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="191"/>
+        <location filename="../src/messagelogwidget.cpp" line="181"/>
         <source> from exile</source>
         <translation> vindo do exílio</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="193"/>
+        <location filename="../src/messagelogwidget.cpp" line="183"/>
         <source> from hand</source>
         <translation> vindo da mão</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="197"/>
+        <location filename="../src/messagelogwidget.cpp" line="187"/>
         <source>the bottom card of his library</source>
         <translation>o card do fundo do seu grimório</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="197"/>
+        <location filename="../src/messagelogwidget.cpp" line="187"/>
         <source>the bottom card of her library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="200"/>
+        <location filename="../src/messagelogwidget.cpp" line="190"/>
         <source> from the bottom of his library</source>
         <translation> vindo do fundo do seu grimório</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="200"/>
+        <location filename="../src/messagelogwidget.cpp" line="190"/>
         <source> from the bottom of her library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="203"/>
+        <location filename="../src/messagelogwidget.cpp" line="193"/>
         <source>the top card of his library</source>
         <translation>o card do topo do seu grimório</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="203"/>
+        <location filename="../src/messagelogwidget.cpp" line="193"/>
         <source>the top card of her library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="206"/>
+        <location filename="../src/messagelogwidget.cpp" line="196"/>
         <source> from the top of his library</source>
         <translation> vindo do topo do seu grimório</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="206"/>
+        <location filename="../src/messagelogwidget.cpp" line="196"/>
         <source> from the top of her library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="208"/>
+        <location filename="../src/messagelogwidget.cpp" line="198"/>
         <source> from library</source>
         <translation> vindo do grimório</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="210"/>
+        <location filename="../src/messagelogwidget.cpp" line="200"/>
         <source> from sideboard</source>
         <translation> vindo do sideboard</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="212"/>
+        <location filename="../src/messagelogwidget.cpp" line="202"/>
         <source> from the stack</source>
         <translation> vindo da pilha</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="242"/>
+        <location filename="../src/messagelogwidget.cpp" line="232"/>
         <source>%1 gives %2 control over %3.</source>
         <translation>%1 dá controle para %2 sobre %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="250"/>
+        <location filename="../src/messagelogwidget.cpp" line="240"/>
         <source>%1 puts %2 into play tapped%3.</source>
         <translation>%1 põe %2 em jogo virado%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="252"/>
+        <location filename="../src/messagelogwidget.cpp" line="242"/>
         <source>%1 puts %2 into play%3.</source>
         <translation>%1 põe %2 no campo de batalha %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="254"/>
+        <location filename="../src/messagelogwidget.cpp" line="244"/>
         <source>%1 puts %2%3 into graveyard.</source>
         <translation>%1 põe %2 no cemitério%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="256"/>
+        <location filename="../src/messagelogwidget.cpp" line="246"/>
         <source>%1 exiles %2%3.</source>
         <translation>%1 exila %2%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="258"/>
+        <location filename="../src/messagelogwidget.cpp" line="248"/>
         <source>%1 moves %2%3 to hand.</source>
         <translation>%1 move %2 para a mão%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="261"/>
+        <location filename="../src/messagelogwidget.cpp" line="251"/>
         <source>%1 puts %2%3 into his library.</source>
         <translation>%1 põe %2 no seu grimório%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="261"/>
+        <location filename="../src/messagelogwidget.cpp" line="251"/>
         <source>%1 puts %2%3 into her library.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="263"/>
+        <location filename="../src/messagelogwidget.cpp" line="253"/>
         <source>%1 puts %2%3 on bottom of his library.</source>
         <translation>%1 põe %2 no fundo do seu grimório%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="263"/>
+        <location filename="../src/messagelogwidget.cpp" line="253"/>
         <source>%1 puts %2%3 on bottom of her library.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="265"/>
+        <location filename="../src/messagelogwidget.cpp" line="255"/>
         <source>%1 puts %2%3 on top of his library.</source>
         <translation>%1 põe %2 no topo do seu grimório%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="265"/>
+        <location filename="../src/messagelogwidget.cpp" line="255"/>
         <source>%1 puts %2%3 on top of her library.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="267"/>
+        <location filename="../src/messagelogwidget.cpp" line="257"/>
         <source>%1 puts %2%3 into his library at position %4.</source>
         <translation>%1 põe %2 no seu grimório na posição %4%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="267"/>
+        <location filename="../src/messagelogwidget.cpp" line="257"/>
         <source>%1 puts %2%3 into her library at position %4.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="269"/>
+        <location filename="../src/messagelogwidget.cpp" line="259"/>
         <source>%1 moves %2%3 to sideboard.</source>
         <translation>%1 move %2 para o sideboard%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="272"/>
+        <location filename="../src/messagelogwidget.cpp" line="262"/>
         <source>%1 plays %2%3.</source>
         <translation>%1 põe %2 na pilha%3.</translation>
     </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="286"/>
+        <source>%1 takes a mulligan to %n.</source>
+        <comment>female</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="288"/>
+        <source>%1 takes a mulligan to %n.</source>
+        <comment>male</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="237"/>
-        <location filename="../src/messagelogwidget.cpp" line="442"/>
+        <location filename="../src/messagelogwidget.cpp" line="297"/>
+        <source>%1 flips %2 face-down.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 vira %2 para baixo.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="299"/>
+        <source>%1 flips %2 face-down.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 vira %2 para baixo.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="302"/>
+        <source>%1 flips %2 face-up.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 vira %2 para cima.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="304"/>
+        <source>%1 flips %2 face-up.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 vira %2 para cima.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="311"/>
+        <source>%1 destroys %2.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 destrói %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="313"/>
+        <source>%1 destroys %2.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 destrói %2.</translation>
+    </message>
+    <message>
+        <source>%1 attaches %2 to %3&apos;s %4.</source>
+        <comment>female</comment>
+        <translation type="obsolete">%1 anexa %2 a %4 de %3.</translation>
+    </message>
+    <message>
+        <source>%1 attaches %2 to %3&apos;s %4.</source>
+        <comment>male</comment>
+        <translation type="obsolete">%1 anexa %2 a %4 de %3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="321"/>
+        <source>%1 attaches %2 to %3&apos;s %4.</source>
+        <comment>p1 female, p2 female</comment>
+        <translation type="unfinished">%1 anexa %2 a %4 de %3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="323"/>
+        <source>%1 attaches %2 to %3&apos;s %4.</source>
+        <comment>p1 female, p2 male</comment>
+        <translation type="unfinished">%1 anexa %2 a %4 de %3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="326"/>
+        <source>%1 attaches %2 to %3&apos;s %4.</source>
+        <comment>p1 male, p2 female</comment>
+        <translation type="unfinished">%1 anexa %2 a %4 de %3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="328"/>
+        <source>%1 attaches %2 to %3&apos;s %4.</source>
+        <comment>p1 male, p2 male</comment>
+        <translation type="unfinished">%1 anexa %2 a %4 de %3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="337"/>
+        <source>%1 unattaches %2.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 desanexa %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="339"/>
+        <source>%1 unattaches %2.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 desanexa %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="345"/>
+        <source>%1 creates token: %2%3.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 cria a ficha: %2%3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="347"/>
+        <source>%1 creates token: %2%3.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 cria a ficha: %2%3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="358"/>
+        <source>%1 points from her %2 to herself.</source>
+        <comment>female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="360"/>
+        <source>%1 points from his %2 to himself.</source>
+        <comment>male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="365"/>
+        <source>%1 points from her %2 to %3.</source>
+        <comment>p1 female, p2 female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="367"/>
+        <source>%1 points from her %2 to %3.</source>
+        <comment>p1 female, p2 male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="370"/>
+        <source>%1 points from his %2 to %3.</source>
+        <comment>p1 male, p2 female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="372"/>
+        <source>%1 points from his %2 to %3.</source>
+        <comment>p1 male, p2 male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="378"/>
+        <source>%1 points from %2&apos;s %3 to herself.</source>
+        <comment>card owner female, target female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="380"/>
+        <source>%1 points from %2&apos;s %3 to herself.</source>
+        <comment>card owner male, target female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="383"/>
+        <source>%1 points from %2&apos;s %3 to himself.</source>
+        <comment>card owner female, target male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="385"/>
+        <source>%1 points from %2&apos;s %3 to himself.</source>
+        <comment>card owner male, target male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="392"/>
+        <source>%1 points from %2&apos;s %3 to %4.</source>
+        <comment>p1 female, p2 female, p3 female</comment>
+        <translation type="unfinished">%1 aponta para %4 com %3 de %2 .</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="394"/>
+        <source>%1 points from %2&apos;s %3 to %4.</source>
+        <comment>p1 female, p2 female, p3 male</comment>
+        <translation type="unfinished">%1 aponta para %4 com %3 de %2 .</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="397"/>
+        <source>%1 points from %2&apos;s %3 to %4.</source>
+        <comment>p1 female, p2 male, p3 female</comment>
+        <translation type="unfinished">%1 aponta para %4 com %3 de %2 .</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="399"/>
+        <source>%1 points from %2&apos;s %3 to %4.</source>
+        <comment>p1 female, p2 male, p3 male</comment>
+        <translation type="unfinished">%1 aponta para %4 com %3 de %2 .</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="404"/>
+        <source>%1 points from %2&apos;s %3 to %4.</source>
+        <comment>p1 male, p2 female, p3 female</comment>
+        <translation type="unfinished">%1 aponta para %4 com %3 de %2 .</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="406"/>
+        <source>%1 points from %2&apos;s %3 to %4.</source>
+        <comment>p1 male, p2 female, p3 male</comment>
+        <translation type="unfinished">%1 aponta para %4 com %3 de %2 .</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="409"/>
+        <source>%1 points from %2&apos;s %3 to %4.</source>
+        <comment>p1 male, p2 male, p3 female</comment>
+        <translation type="unfinished">%1 aponta para %4 com %3 de %2 .</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="411"/>
+        <source>%1 points from %2&apos;s %3 to %4.</source>
+        <comment>p1 male, p2 male, p3 male</comment>
+        <translation type="unfinished">%1 aponta para %4 com %3 de %2 .</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="419"/>
+        <source>%1 points from her %2 to her %3.</source>
+        <comment>female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="421"/>
+        <source>%1 points from his %2 to his %3.</source>
+        <comment>male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="426"/>
+        <source>%1 points from her %2 to %3&apos;s %4.</source>
+        <comment>p1 female, p2 female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="428"/>
+        <source>%1 points from her %2 to %3&apos;s %4.</source>
+        <comment>p1 female, p2 male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="431"/>
+        <source>%1 points from his %2 to %3&apos;s %4.</source>
+        <comment>p1 male, p2 female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="433"/>
+        <source>%1 points from his %2 to %3&apos;s %4.</source>
+        <comment>p1 male, p2 male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="439"/>
+        <source>%1 points from %2&apos;s %3 to her own %4.</source>
+        <comment>card owner female, target female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="441"/>
+        <source>%1 points from %2&apos;s %3 to her own %4.</source>
+        <comment>card owner male, target female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="444"/>
+        <source>%1 points from %2&apos;s %3 to his own %4.</source>
+        <comment>card owner female, target male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="446"/>
+        <source>%1 points from %2&apos;s %3 to his own %4.</source>
+        <comment>card owner male, target male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="453"/>
+        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
+        <comment>p1 female, p2 female, p3 female</comment>
+        <translation type="unfinished">%1 aponta para %5 de %4 com %3 de %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="455"/>
+        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
+        <comment>p1 female, p2 female, p3 male</comment>
+        <translation type="unfinished">%1 aponta para %5 de %4 com %3 de %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="458"/>
+        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
+        <comment>p1 female, p2 male, p3 female</comment>
+        <translation type="unfinished">%1 aponta para %5 de %4 com %3 de %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="460"/>
+        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
+        <comment>p1 female, p2 male, p3 male</comment>
+        <translation type="unfinished">%1 aponta para %5 de %4 com %3 de %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="465"/>
+        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
+        <comment>p1 male, p2 female, p3 female</comment>
+        <translation type="unfinished">%1 aponta para %5 de %4 com %3 de %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="467"/>
+        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
+        <comment>p1 male, p2 female, p3 male</comment>
+        <translation type="unfinished">%1 aponta para %5 de %4 com %3 de %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="470"/>
+        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
+        <comment>p1 male, p2 male, p3 female</comment>
+        <translation type="unfinished">%1 aponta para %5 de %4 com %3 de %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="472"/>
+        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
+        <comment>p1 male, p2 male, p3 male</comment>
+        <translation type="unfinished">%1 aponta para %5 de %4 com %3 de %2.</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="487"/>
+        <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
+        <comment>female</comment>
+        <translation type="unfinished">
+            <numerusform>%1 põe %n marcador %2 em %3 (agora %4).</numerusform>
+            <numerusform>%1 põe %n marcadores %2 em %3 (agora %4).</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="489"/>
+        <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
+        <comment>male</comment>
+        <translation type="unfinished">
+            <numerusform>%1 põe %n marcador %2 em %3 (agora %4).</numerusform>
+            <numerusform>%1 põe %n marcadores %2 em %3 (agora %4).</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="492"/>
+        <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
+        <comment>female</comment>
+        <translation type="unfinished">
+            <numerusform>%1 tira %n marcador %2 em %3 (agora %4).</numerusform>
+            <numerusform>%1 tira %n marcadores %2 em %3 (agora %4).</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="494"/>
+        <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
+        <comment>male</comment>
+        <translation type="unfinished">
+            <numerusform>%1 tira %n marcador %2 em %3 (agora %4).</numerusform>
+            <numerusform>%1 tira %n marcadores %2 em %3 (agora %4).</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="521"/>
+        <source>%1 taps her permanents.</source>
+        <comment>female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="523"/>
+        <source>%1 untaps her permanents.</source>
+        <comment>female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="526"/>
+        <source>%1 taps his permanents.</source>
+        <comment>male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="528"/>
+        <source>%1 untaps his permanents.</source>
+        <comment>male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="534"/>
+        <source>%1 taps %2.</source>
+        <comment>female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="536"/>
+        <source>%1 untaps %2.</source>
+        <comment>female</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="539"/>
+        <source>%1 taps %2.</source>
+        <comment>male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="541"/>
+        <source>%1 untaps %2.</source>
+        <comment>male</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="553"/>
+        <source>%1 sets counter %2 to %3 (%4%5).</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 altera o marcador %2 para %3 (%4%5).</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="555"/>
+        <source>%1 sets counter %2 to %3 (%4%5).</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 altera o marcador %2 para %3 (%4%5).</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="564"/>
+        <source>%1 sets %2 to not untap normally.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 define que %2 não desvira normalmente.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="566"/>
+        <source>%1 sets %2 to not untap normally.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 define que %2 não desvira normalmente.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="569"/>
+        <source>%1 sets %2 to untap normally.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 define que %2 desvira normalmente.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="571"/>
+        <source>%1 sets %2 to untap normally.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 define que %2 desvira normalmente.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="583"/>
+        <source>%1 sets PT of %2 to %3.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 altera o P/R de %2 para %3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="585"/>
+        <source>%1 sets PT of %2 to %3.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 altera o P/R de %2 para %3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="594"/>
+        <source>%1 sets annotation of %2 to %3.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 altera a nota de %2 para%3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="596"/>
+        <source>%1 sets annotation of %2 to %3.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 altera a nota de %2 para%3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="604"/>
+        <source>%1 is looking at the top %2 cards %3.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 está olhando para os %2 cards do topo %3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="606"/>
+        <source>%1 is looking at the top %2 cards %3.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 está olhando para os %2 cards do topo %3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="609"/>
+        <source>%1 is looking at %2.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 está olhando para %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="611"/>
+        <source>%1 is looking at %2.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 está olhando para %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="619"/>
+        <source>%1 stops looking at %2.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 para de olhar para %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="621"/>
+        <source>%1 stops looking at %2.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 para de olhar para %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="647"/>
+        <source>%1 reveals %2 to %3.</source>
+        <comment>p1 female, p2 female</comment>
+        <translation type="unfinished">%1 revela %2 para %3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="649"/>
+        <source>%1 reveals %2 to %3.</source>
+        <comment>p1 female, p2 male</comment>
+        <translation type="unfinished">%1 revela %2 para %3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="652"/>
+        <source>%1 reveals %2 to %3.</source>
+        <comment>p1 male, p2 female</comment>
+        <translation type="unfinished">%1 revela %2 para %3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="654"/>
+        <source>%1 reveals %2 to %3.</source>
+        <comment>p1 male, p2 male</comment>
+        <translation type="unfinished">%1 revela %2 para %3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="659"/>
+        <source>%1 reveals %2.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 revela %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="661"/>
+        <source>%1 reveals %2.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 revela %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="667"/>
+        <source>%1 randomly reveals %2%3 to %4.</source>
+        <comment>p1 female, p2 female</comment>
+        <translation type="unfinished">%1 revela aleatoriamente %2%3. para %4.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="669"/>
+        <source>%1 randomly reveals %2%3 to %4.</source>
+        <comment>p1 female, p2 male</comment>
+        <translation type="unfinished">%1 revela aleatoriamente %2%3. para %4.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="672"/>
+        <source>%1 randomly reveals %2%3 to %4.</source>
+        <comment>p1 male, p2 female</comment>
+        <translation type="unfinished">%1 revela aleatoriamente %2%3. para %4.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="674"/>
+        <source>%1 randomly reveals %2%3 to %4.</source>
+        <comment>p1 male, p2 male</comment>
+        <translation type="unfinished">%1 revela aleatoriamente %2%3. para %4.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="679"/>
+        <source>%1 randomly reveals %2%3.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 revela aleatoriamente %2%3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="681"/>
+        <source>%1 randomly reveals %2%3.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 revela aleatoriamente %2%3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="687"/>
+        <source>%1 reveals %2%3 to %4.</source>
+        <comment>p1 female, p2 female</comment>
+        <translation type="unfinished">%1 revela %2%3 para %4.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="689"/>
+        <source>%1 reveals %2%3 to %4.</source>
+        <comment>p1 female, p2 male</comment>
+        <translation type="unfinished">%1 revela %2%3 para %4.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="692"/>
+        <source>%1 reveals %2%3 to %4.</source>
+        <comment>p1 male, p2 female</comment>
+        <translation type="unfinished">%1 revela %2%3 para %4.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="694"/>
+        <source>%1 reveals %2%3 to %4.</source>
+        <comment>p1 male, p2 male</comment>
+        <translation type="unfinished">%1 revela %2%3 para %4.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="699"/>
+        <source>%1 reveals %2%3.</source>
+        <comment>female</comment>
+        <translation type="unfinished">%1 revela %2%3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="701"/>
+        <source>%1 reveals %2%3.</source>
+        <comment>male</comment>
+        <translation type="unfinished">%1 revela %2%3.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="712"/>
+        <source>It is now %1&apos;s turn.</source>
+        <comment>female</comment>
+        <translation type="unfinished">Agora é o turno de %1.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="714"/>
+        <source>It is now %1&apos;s turn.</source>
+        <comment>male</comment>
+        <translation type="unfinished">Agora é o turno de %1.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="227"/>
+        <location filename="../src/messagelogwidget.cpp" line="638"/>
         <source>a card</source>
         <translation>um card</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="303"/>
         <source>%1 flips %2 face-down.</source>
-        <translation>%1 vira %2 para baixo.</translation>
+        <translation type="obsolete">%1 vira %2 para baixo.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="305"/>
         <source>%1 flips %2 face-up.</source>
-        <translation>%1 vira %2 para cima.</translation>
+        <translation type="obsolete">%1 vira %2 para cima.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="315"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
-        <translation>%1 anexa %2 a %4 de %3.</translation>
+        <translation type="obsolete">%1 anexa %2 a %4 de %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="320"/>
         <source>%1 unattaches %2.</source>
-        <translation>%1 desanexa %2.</translation>
+        <translation type="obsolete">%1 desanexa %2.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="338"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
-        <translation>%1 aponta para %5 de %4 com %3 de %2.</translation>
+        <translation type="obsolete">%1 aponta para %5 de %4 com %3 de %2.</translation>
     </message>
     <message numerus="yes">
         <source>%1 places %n counter(s) (%2) on %3 (now %4).</source>
@@ -2203,7 +2966,7 @@ A versão local é %1 e a versão remota é %2.</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="358"/>
+        <location filename="../src/messagelogwidget.cpp" line="498"/>
         <source>red</source>
         <translation>
             <numerusform>vermelho</numerusform>
@@ -2211,7 +2974,7 @@ A versão local é %1 e a versão remota é %2.</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="359"/>
+        <location filename="../src/messagelogwidget.cpp" line="499"/>
         <source>yellow</source>
         <translation>
             <numerusform>amarelo</numerusform>
@@ -2219,7 +2982,7 @@ A versão local é %1 e a versão remota é %2.</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="360"/>
+        <location filename="../src/messagelogwidget.cpp" line="500"/>
         <source>green</source>
         <translation>
             <numerusform>verde</numerusform>
@@ -2227,74 +2990,61 @@ A versão local é %1 e a versão remota é %2.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="388"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
-        <translation>%1 altera o marcador %2 para %3 (%4%5).</translation>
+        <translation type="obsolete">%1 altera o marcador %2 para %3 (%4%5).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="406"/>
         <source>%1 sets PT of %2 to %3.</source>
-        <translation>%1 altera o P/R de %2 para %3.</translation>
+        <translation type="obsolete">%1 altera o P/R de %2 para %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="411"/>
         <source>%1 sets annotation of %2 to %3.</source>
-        <translation>%1 altera a nota de %2 para%3.</translation>
+        <translation type="obsolete">%1 altera a nota de %2 para%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="417"/>
         <source>%1 is looking at the top %2 cards %3.</source>
-        <translation>%1 está olhando para os %2 cards do topo %3.</translation>
+        <translation type="obsolete">%1 está olhando para os %2 cards do topo %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="129"/>
+        <location filename="../src/messagelogwidget.cpp" line="102"/>
         <source>The game has started.</source>
         <translation>O jogo começou.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="42"/>
         <source>Connected.</source>
-        <translation>Conectado.</translation>
+        <translation type="obsolete">Conectado.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="65"/>
         <source>Protocol version mismatch. Client: %1, Server: %2</source>
-        <translation>Versão dos protocolos incompatível. Versão do utilizador:%1, versão do servidor:%2</translation>
+        <translation type="obsolete">Versão dos protocolos incompatível. Versão do utilizador:%1, versão do servidor:%2</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="75"/>
         <source>You have joined game #%1.</source>
-        <translation>Você entrou no jogo nº %1.</translation>
+        <translation type="obsolete">Você entrou no jogo nº %1.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="81"/>
         <source>%1 has joined the game.</source>
-        <translation>%1 entrou no jogo.</translation>
+        <translation type="obsolete">%1 entrou no jogo.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="86"/>
         <source>%1 has left the game.</source>
-        <translation>%1 saiu do jogo.</translation>
+        <translation type="obsolete">%1 saiu do jogo.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="107"/>
         <source>%1 has loaded a local deck.</source>
-        <translation>%1 carregou um deck local.</translation>
+        <translation type="obsolete">%1 carregou um deck local.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="109"/>
         <source>%1 has loaded deck #%2.</source>
-        <translation>%1 carregou o deck nº %2.</translation>
+        <translation type="obsolete">%1 carregou o deck nº %2.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="114"/>
         <source>%1 is ready to start the game.</source>
-        <translation>%1 está pronto para começar o jogo.</translation>
+        <translation type="obsolete">%1 está pronto para começar o jogo.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="124"/>
         <source>%1 has conceded the game.</source>
-        <translation>%1 concedeu o jogo.</translation>
+        <translation type="obsolete">%1 concedeu o jogo.</translation>
     </message>
     <message>
         <source>%1 draws a card.</source>
@@ -2305,197 +3055,164 @@ A versão local é %1 e a versão remota é %2.</translation>
         <translation type="obsolete">%1 compra %2 cards.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="310"/>
         <source>%1 destroys %2.</source>
-        <translation>%1 destrói %2.</translation>
+        <translation type="obsolete">%1 destrói %2.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="325"/>
         <source>%1 creates token: %2%3.</source>
-        <translation>%1 cria a ficha: %2%3.</translation>
+        <translation type="obsolete">%1 cria a ficha: %2%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="331"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
-        <translation>%1 aponta para %4 com %3 de %2 .</translation>
+        <translation type="obsolete">%1 aponta para %4 com %3 de %2 .</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="353"/>
         <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%1 põe %n marcador %2 em %3 (agora %4).</numerusform>
             <numerusform>%1 põe %n marcadores %2 em %3 (agora %4).</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="355"/>
         <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%1 tira %n marcador %2 em %3 (agora %4).</numerusform>
             <numerusform>%1 tira %n marcadores %2 em %3 (agora %4).</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="382"/>
         <source>%1 %2 %3.</source>
-        <translation>%1 %2 %3.</translation>
+        <translation type="obsolete">%1 %2 %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="419"/>
         <source>%1 is looking at %2.</source>
-        <translation>%1 está olhando para %2.</translation>
+        <translation type="obsolete">%1 está olhando para %2.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="425"/>
         <source>%1 stops looking at %2.</source>
-        <translation>%1 para de olhar para %2.</translation>
+        <translation type="obsolete">%1 para de olhar para %2.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="448"/>
         <source>%1 reveals %2 to %3.</source>
-        <translation>%1 revela %2 para %3.</translation>
+        <translation type="obsolete">%1 revela %2 para %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="450"/>
         <source>%1 reveals %2.</source>
-        <translation>%1 revela %2.</translation>
+        <translation type="obsolete">%1 revela %2.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="487"/>
+        <location filename="../src/messagelogwidget.cpp" line="733"/>
         <source>ending phase</source>
         <translation>fase final</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="468"/>
         <source>It is now %1&apos;s turn.</source>
-        <translation>Agora é o turno de %1.</translation>
+        <translation type="obsolete">Agora é o turno de %1.</translation>
     </message>
     <message>
         <source>%1 shuffles his library.</source>
         <translation type="obsolete">%1 embaralha o seu grimório.</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="295"/>
-        <source>%1 takes a mulligan to %n.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="297"/>
+        <location filename="../src/messagelogwidget.cpp" line="290"/>
         <source>%1 draws his initial hand.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="297"/>
+        <location filename="../src/messagelogwidget.cpp" line="290"/>
         <source>%1 draws her initial hand.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="379"/>
-        <source>her permanents</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="453"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
-        <translation>%1 revela aleatoriamente %2%3. para %4.</translation>
+        <translation type="obsolete">%1 revela aleatoriamente %2%3. para %4.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="455"/>
         <source>%1 randomly reveals %2%3.</source>
-        <translation>%1 revela aleatoriamente %2%3.</translation>
+        <translation type="obsolete">%1 revela aleatoriamente %2%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="458"/>
         <source>%1 reveals %2%3 to %4.</source>
-        <translation>%1 revela %2%3 para %4.</translation>
+        <translation type="obsolete">%1 revela %2%3 para %4.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="460"/>
         <source>%1 reveals %2%3.</source>
-        <translation>%1 revela %2%3.</translation>
+        <translation type="obsolete">%1 revela %2%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="477"/>
+        <location filename="../src/messagelogwidget.cpp" line="723"/>
         <source>untap step</source>
         <translation>etapa de desvirar</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="478"/>
+        <location filename="../src/messagelogwidget.cpp" line="724"/>
         <source>upkeep step</source>
         <translation>etapa de manutenção</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="479"/>
+        <location filename="../src/messagelogwidget.cpp" line="725"/>
         <source>draw step</source>
         <translation>etapa de compra</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="480"/>
+        <location filename="../src/messagelogwidget.cpp" line="726"/>
         <source>first main phase</source>
         <translation>primeira fase principal</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="481"/>
+        <location filename="../src/messagelogwidget.cpp" line="727"/>
         <source>beginning of combat step</source>
         <translation>etapa de início de combate</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="482"/>
+        <location filename="../src/messagelogwidget.cpp" line="728"/>
         <source>declare attackers step</source>
         <translation>etapa de declaracão de atacantes</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="483"/>
+        <location filename="../src/messagelogwidget.cpp" line="729"/>
         <source>declare blockers step</source>
         <translation>etapa de declaração de bloqueadores</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="484"/>
+        <location filename="../src/messagelogwidget.cpp" line="730"/>
         <source>combat damage step</source>
         <translation>etapa de dano de combate</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="485"/>
+        <location filename="../src/messagelogwidget.cpp" line="731"/>
         <source>end of combat step</source>
         <translation>etapa de fim de combate</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="486"/>
+        <location filename="../src/messagelogwidget.cpp" line="732"/>
         <source>second main phase</source>
         <translation>segunda fase principal</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="489"/>
+        <location filename="../src/messagelogwidget.cpp" line="735"/>
         <source>It is now the %1.</source>
         <translation>Agora é a %1.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="382"/>
         <source>taps</source>
-        <translation>vira</translation>
+        <translation type="obsolete">vira</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="382"/>
         <source>untaps</source>
-        <translation>desvira</translation>
+        <translation type="obsolete">desvira</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="395"/>
         <source>%1 sets %2 to not untap normally.</source>
-        <translation>%1 define que %2 não desvira normalmente.</translation>
+        <translation type="obsolete">%1 define que %2 não desvira normalmente.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="397"/>
         <source>%1 sets %2 to untap normally.</source>
-        <translation>%1 define que %2 desvira normalmente.</translation>
+        <translation type="obsolete">%1 define que %2 desvira normalmente.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="379"/>
         <source>his permanents</source>
-        <translation>as suas permanentes</translation>
+        <translation type="obsolete">as suas permanentes</translation>
     </message>
 </context>
 <context>
@@ -3543,67 +4260,67 @@ Por favor, entre um nome:</translation>
 <context>
     <name>UserList</name>
     <message>
-        <location filename="../src/userlist.cpp" line="123"/>
+        <location filename="../src/userlist.cpp" line="124"/>
         <source>Users online: %1</source>
         <translation>Usuários online: %1</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="124"/>
+        <location filename="../src/userlist.cpp" line="125"/>
         <source>Users in this room: %1</source>
         <translation>Usuários nesta sala: %1</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="125"/>
+        <location filename="../src/userlist.cpp" line="126"/>
         <source>Buddies online: %1 / %2</source>
         <translation>Amigos online: %1 / %2</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="126"/>
+        <location filename="../src/userlist.cpp" line="127"/>
         <source>Ignored users online: %1 / %2</source>
         <translation>Usuários ignorados online: %1 / %2</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="238"/>
+        <location filename="../src/userlist.cpp" line="239"/>
         <source>%1&apos;s games</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="250"/>
+        <location filename="../src/userlist.cpp" line="251"/>
         <source>User &amp;details</source>
         <translation>&amp;Detalhes do usuário</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="251"/>
+        <location filename="../src/userlist.cpp" line="252"/>
         <source>Direct &amp;chat</source>
         <translation>&amp;Chat direto</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="252"/>
+        <location filename="../src/userlist.cpp" line="253"/>
         <source>Show this user&apos;s &amp;games</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="253"/>
+        <location filename="../src/userlist.cpp" line="254"/>
         <source>Add to &amp;buddy list</source>
         <translation>Adicionar à &amp;lista de amigos</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="254"/>
+        <location filename="../src/userlist.cpp" line="255"/>
         <source>Remove from &amp;buddy list</source>
         <translation>Remover da li&amp;sta de amigos</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="255"/>
+        <location filename="../src/userlist.cpp" line="256"/>
         <source>Add to &amp;ignore list</source>
         <translation>Adicionar à li&amp;sta dos ignorados</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="256"/>
+        <location filename="../src/userlist.cpp" line="257"/>
         <source>Remove from &amp;ignore list</source>
         <translation>Remover da lista dos i&amp;gnorados</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="257"/>
+        <location filename="../src/userlist.cpp" line="258"/>
         <source>Ban from &amp;server</source>
         <translation>Ban&amp;ir do servidor</translation>
     </message>
