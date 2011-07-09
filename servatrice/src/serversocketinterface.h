@@ -51,6 +51,7 @@ private:
 	QXmlStreamReader *xmlReader;
 	QString xmlBuffer;
 	TopLevelProtocolItem *topLevelItem;
+	bool compressionSupport;
 	int getUserIdInDB(const QString &name) const;
 
 	ResponseCode cmdAddToList(Command_AddToList *cmd, CommandContainer *cont);
@@ -66,8 +67,11 @@ private:
 	ResponseCode cmdDeckUpload(Command_DeckUpload *cmd, CommandContainer *cont);
 	DeckList *getDeckFromDatabase(int deckId);
 	ResponseCode cmdDeckDownload(Command_DeckDownload *cmd, CommandContainer *cont);
-	ResponseCode cmdUpdateServerMessage(Command_UpdateServerMessage *cmd, CommandContainer *cont);
 	ResponseCode cmdBanFromServer(Command_BanFromServer *cmd, CommandContainer *cont);
+	ResponseCode cmdShutdownServer(Command_ShutdownServer *cmd, CommandContainer *cont);
+	ResponseCode cmdUpdateServerMessage(Command_UpdateServerMessage *cmd, CommandContainer *cont);
+protected:
+	bool getCompressionSupport() const { return compressionSupport; }
 public:
 	ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent = 0);
 	~ServerSocketInterface();

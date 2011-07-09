@@ -44,7 +44,7 @@ void Servatrice_TcpServer::incomingConnection(int socketDescriptor)
 }
 
 Servatrice::Servatrice(QSettings *_settings, QObject *parent)
-	: Server(parent), dbMutex(QMutex::Recursive), settings(_settings), uptime(0)
+	: Server(parent), dbMutex(QMutex::Recursive), settings(_settings), uptime(0), shutdownTimer(0)
 {
 	pingClock = new QTimer(this);
 	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
@@ -65,8 +65,8 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 		statusUpdateClock->start(statusUpdateTime);
 	}
 	
-	bool threaded = settings->value("server/threaded", false).toInt();
-	tcpServer = new Servatrice_TcpServer(this, threaded);
+	threaded = settings->value("server/threaded", false).toInt();
+	tcpServer = new Servatrice_TcpServer(this, threaded, this);
 	int port = settings->value("server/port", 4747).toInt();
 	qDebug() << "Starting server on port" << port;
 	if (tcpServer->listen(QHostAddress::Any, port))
@@ -119,6 +119,7 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 Servatrice::~Servatrice()
 {
 	prepareDestroy();
+	QSqlDatabase::database().close();
 }
 
 bool Servatrice::openDatabase()
@@ -168,25 +169,32 @@ bool Servatrice::execSqlQuery(QSqlQuery &query)
 	return false;
 }
 
-AuthenticationResult Servatrice::checkUserPassword(const QString &user, const QString &password)
+AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password)
 {
+	serverMutex.lock();
+	QHostAddress address = static_cast<ServerSocketInterface *>(handler)->getPeerAddress();
+	for (int i = 0; i < addressBanList.size(); ++i)
+		if (address == addressBanList[i].first)
+			return PasswordWrong;
+	serverMutex.unlock();
+
 	QMutexLocker locker(&dbMutex);
 	const QString method = settings->value("authentication/method").toString();
 	if (method == "none")
 		return UnknownUser;
 	else if (method == "sql") {
 		checkSql();
-	
+		
 		QSqlQuery query;
-		query.prepare("select banned, password from " + dbPrefix + "_users where name = :name and active = 1");
+		query.prepare("select a.password, time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_users a left join " + dbPrefix + "_bans b on b.id_user = a.id and b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.id_user = a.id) where a.name = :name and a.active = 1");
 		query.bindValue(":name", user);
 		if (!execSqlQuery(query))
 			return PasswordWrong;
 		
 		if (query.next()) {
-			if (query.value(0).toInt())
+			if (query.value(1).toInt() || query.value(2).toInt())
 				return PasswordWrong;
-			if (query.value(1).toString() == password)
+			if (query.value(0).toString() == password)
 				return PasswordRight;
 			else
 				return PasswordWrong;
@@ -233,7 +241,7 @@ ServerInfo_User *Servatrice::evalUserQueryResult(const QSqlQuery &query, bool co
 	
 	int userLevel = ServerInfo_User::IsUser | ServerInfo_User::IsRegistered;
 	if (is_admin == 1)
-		userLevel |= ServerInfo_User::IsAdmin;
+		userLevel |= ServerInfo_User::IsAdmin | ServerInfo_User::IsModerator;
 	else if (is_admin == 2)
 		userLevel |= ServerInfo_User::IsModerator;
 	
@@ -324,30 +332,12 @@ QMap<QString, ServerInfo_User *> Servatrice::getIgnoreList(const QString &name)
 	return result;
 }
 
-bool Servatrice::getUserBanned(Server_ProtocolHandler *client, const QString &userName) const
-{
-	QMutexLocker locker(&serverMutex);
-	QHostAddress address = static_cast<ServerSocketInterface *>(client)->getPeerAddress();
-	for (int i = 0; i < addressBanList.size(); ++i)
-		if (address == addressBanList[i].first)
-			return true;
-	for (int i = 0; i < nameBanList.size(); ++i)
-		if (userName == nameBanList[i].first)
-			return true;
-	return false;
-}
-
 void Servatrice::updateBanTimer()
 {
 	QMutexLocker locker(&serverMutex);
 	for (int i = 0; i < addressBanList.size(); )
 		if (--(addressBanList[i].second) <= 0)
 			addressBanList.removeAt(i);
-		else
-			++i;
-	for (int i = 0; i < nameBanList.size(); )
-		if (--(nameBanList[i].second) <= 0)
-			nameBanList.removeAt(i);
 		else
 			++i;
 }
@@ -374,18 +364,55 @@ void Servatrice::updateLoginMessage()
 
 void Servatrice::statusUpdate()
 {
-	QMutexLocker locker(&dbMutex);
+	const int uc = getUsersCount(); // for correct mutex locking order
+	const int gc = getGamesCount();
+	
 	uptime += statusUpdateClock->interval() / 1000;
 	
+	QMutexLocker locker(&dbMutex);
 	checkSql();
 	
 	QSqlQuery query;
 	query.prepare("insert into " + dbPrefix + "_uptime (id_server, timest, uptime, users_count, games_count) values(:id, NOW(), :uptime, :users_count, :games_count)");
 	query.bindValue(":id", serverId);
 	query.bindValue(":uptime", uptime);
-	query.bindValue(":users_count", getUsersCount());
-	query.bindValue(":games_count", getGamesCount());
+	query.bindValue(":users_count", uc);
+	query.bindValue(":games_count", gc);
 	execSqlQuery(query);
 }
 
-const QString Servatrice::versionString = "Servatrice 0.20110527";
+void Servatrice::scheduleShutdown(const QString &reason, int minutes)
+{
+	QMutexLocker locker(&serverMutex);
+
+	shutdownReason = reason;
+	shutdownMinutes = minutes + 1;
+	if (minutes > 0) {
+		shutdownTimer = new QTimer;
+		connect(shutdownTimer, SIGNAL(timeout()), this, SLOT(shutdownTimeout()));
+		shutdownTimer->start(60000);
+	}
+	shutdownTimeout();
+}
+
+void Servatrice::shutdownTimeout()
+{
+	QMutexLocker locker(&serverMutex);
+	
+	--shutdownMinutes;
+	
+	GenericEvent *event;
+	if (shutdownMinutes)
+		event = new Event_ServerShutdown(shutdownReason, shutdownMinutes);
+	else
+		event = new Event_ConnectionClosed("server_shutdown");
+
+	for (int i = 0; i < clients.size(); ++i)
+		clients[i]->sendProtocolItem(event, false);
+	delete event;
+	
+	if (!shutdownMinutes)
+		deleteLater();
+}
+
+const QString Servatrice::versionString = "Servatrice 0.20110625";

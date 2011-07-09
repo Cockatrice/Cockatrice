@@ -101,15 +101,14 @@ void TabSupervisor::retranslateUi()
 
 int TabSupervisor::myAddTab(Tab *tab)
 {
-	connect(tab, SIGNAL(userEvent()), this, SLOT(tabUserEvent()));
+	connect(tab, SIGNAL(userEvent(bool)), this, SLOT(tabUserEvent(bool)));
 	return addTab(tab, tab->getTabText());
 }
 
-void TabSupervisor::start(AbstractClient *_client, ServerInfo_User *userInfo)
+void TabSupervisor::start(AbstractClient *_client, ServerInfo_User *_userInfo)
 {
 	client = _client;
-	userName = userInfo->getName();
-	userLevel = userInfo->getUserLevel();
+	userInfo = new ServerInfo_User(_userInfo);
 	
 	connect(client, SIGNAL(roomEventReceived(RoomEvent *)), this, SLOT(processRoomEvent(RoomEvent *)));
 	connect(client, SIGNAL(gameEventContainerReceived(GameEventContainer *)), this, SLOT(processGameEventContainer(GameEventContainer *)));
@@ -135,8 +134,8 @@ void TabSupervisor::start(AbstractClient *_client, ServerInfo_User *userInfo)
 	} else
 		tabDeckStorage = 0;
 	
-	if (userInfo->getUserLevel() & ServerInfo_User::IsAdmin) {
-		tabAdmin = new TabAdmin(this, client);
+	if (userInfo->getUserLevel() & ServerInfo_User::IsModerator) {
+		tabAdmin = new TabAdmin(this, client, (userInfo->getUserLevel() & ServerInfo_User::IsAdmin));
 		myAddTab(tabAdmin);
 	} else
 		tabAdmin = 0;
@@ -146,6 +145,7 @@ void TabSupervisor::start(AbstractClient *_client, ServerInfo_User *userInfo)
 
 void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
 {
+	userInfo = new ServerInfo_User;
 	localClients = _clients;
 	for (int i = 0; i < localClients.size(); ++i)
 		connect(localClients[i], SIGNAL(gameEventContainerReceived(GameEventContainer *)), this, SLOT(processGameEventContainer(GameEventContainer *)));
@@ -192,6 +192,9 @@ void TabSupervisor::stop()
 	while (messageIterator.hasNext())
 		messageIterator.next().value()->deleteLater();
 	messageTabs.clear();
+	
+	delete userInfo;
+	userInfo = 0;
 }
 
 void TabSupervisor::updatePingTime(int value, int max)
@@ -221,7 +224,7 @@ void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex)
 
 void TabSupervisor::gameJoined(Event_GameJoined *event)
 {
-	TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
+	TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event->getGameId(), event->getGameDescription(), event->getPlayerId(), userInfo, event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
 	int tabIndex = myAddTab(tab);
@@ -232,7 +235,7 @@ void TabSupervisor::gameJoined(Event_GameJoined *event)
 
 void TabSupervisor::localGameJoined(Event_GameJoined *event)
 {
-	TabGame *tab = new TabGame(this, localClients, event->getGameId(), event->getGameDescription(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
+	TabGame *tab = new TabGame(this, localClients, event->getGameId(), event->getGameDescription(), event->getPlayerId(), userInfo, event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	int tabIndex = myAddTab(tab);
 	addCloseButtonToTab(tab, tabIndex);
@@ -258,7 +261,7 @@ void TabSupervisor::gameLeft(TabGame *tab)
 
 void TabSupervisor::addRoomTab(ServerInfo_Room *info, bool setCurrent)
 {
-	TabRoom *tab = new TabRoom(this, client, userName, info);
+	TabRoom *tab = new TabRoom(this, client, userInfo->getName(), info);
 	connect(tab, SIGNAL(roomClosing(TabRoom *)), this, SLOT(roomLeft(TabRoom *)));
 	connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
 	int tabIndex = myAddTab(tab);
@@ -278,10 +281,10 @@ void TabSupervisor::roomLeft(TabRoom *tab)
 
 TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus)
 {
-	if (receiverName == userName)
+	if (receiverName == userInfo->getName())
 		return 0;
 	
-	TabMessage *tab = new TabMessage(this, client, userName, receiverName);
+	TabMessage *tab = new TabMessage(this, client, userInfo->getName(), receiverName);
 	connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
 	int tabIndex = myAddTab(tab);
 	addCloseButtonToTab(tab, tabIndex);
@@ -299,14 +302,15 @@ void TabSupervisor::talkLeft(TabMessage *tab)
 	removeTab(indexOf(tab));
 }
 
-void TabSupervisor::tabUserEvent()
+void TabSupervisor::tabUserEvent(bool globalEvent)
 {
 	Tab *tab = static_cast<Tab *>(sender());
 	if (tab != currentWidget()) {
 		tab->setContentsChanged(true);
 		setTabIcon(indexOf(tab), *tabChangedIcon);
 	}
-	QApplication::alert(this);
+	if (globalEvent)
+		QApplication::alert(this);
 }
 
 void TabSupervisor::processRoomEvent(RoomEvent *event)
@@ -370,4 +374,9 @@ bool TabSupervisor::getAdminLocked() const
 	if (!tabAdmin)
 		return true;
 	return tabAdmin->getLocked();
+}
+
+int TabSupervisor::getUserLevel() const
+{
+	return userInfo->getUserLevel();
 }

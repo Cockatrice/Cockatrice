@@ -26,7 +26,7 @@ Server *Server_Room::getServer() const
 	return static_cast<Server *>(parent());
 }
 
-ServerInfo_Room *Server_Room::getInfo(bool complete) const
+ServerInfo_Room *Server_Room::getInfo(bool complete, bool showGameTypes) const
 {
 	QMutexLocker locker(&roomMutex);
 	
@@ -40,10 +40,10 @@ ServerInfo_Room *Server_Room::getInfo(bool complete) const
 		
 		for (int i = 0; i < size(); ++i)
 			userList.append(new ServerInfo_User(at(i)->getUserInfo(), false));
-		
+	}
+	if (complete || showGameTypes)
 		for (int i = 0; i < gameTypes.size(); ++i)
 			gameTypeList.append(new ServerInfo_GameType(i, gameTypes[i]));
-	}
 	
 	return new ServerInfo_Room(id, name, description, games.size(), size(), autoJoin, gameList, userList, gameTypeList);
 }
@@ -128,5 +128,17 @@ int Server_Room::getGamesCreatedByUser(const QString &userName) const
 	while (gamesIterator.hasNext())
 		if (gamesIterator.next().value()->getCreatorInfo()->getName() == userName)
 			++result;
+	return result;
+}
+
+QList<ServerInfo_Game *> Server_Room::getGamesOfUser(const QString &userName) const
+{
+	QList<ServerInfo_Game *> result;
+	QMapIterator<int, Server_Game *> gamesIterator(games);
+	while (gamesIterator.hasNext()) {
+		Server_Game *game = gamesIterator.next().value();
+		if (game->containsUser(userName))
+			result.append(game->getInfo());
+	}
 	return result;
 }

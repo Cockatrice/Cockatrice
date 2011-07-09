@@ -706,6 +706,11 @@ void Player::setCardAttrHelper(GameEventContext *context, CardItem *card, const 
 	}
 }
 
+void Player::eventConnectionStateChanged(Event_ConnectionStateChanged *event)
+{
+	emit logConnectionStateChanged(this, event->getConnected());
+}
+
 void Player::eventSay(Event_Say *event)
 {
 	emit logSay(this, event->getMessage());
@@ -862,6 +867,8 @@ void Player::eventMoveCard(Event_MoveCard *event, GameEventContext *context)
 	CardItem *card = startZone->takeCard(position, event->getCardId(), startZone != targetZone);
 	if (!card)
 		return;
+	if (startZone != targetZone)
+		card->deleteCardInfoPopup();
 	card->setName(event->getCardName());
 	
 	if (card->getAttachedTo() && (startZone != targetZone)) {
@@ -1036,6 +1043,7 @@ void Player::processGameEvent(GameEvent *event, GameEventContext *context)
 {
 	qDebug() << "player event: id=" << event->getItemId();
 	switch (event->getItemId()) {
+		case ItemId_Event_ConnectionStateChanged: eventConnectionStateChanged(static_cast<Event_ConnectionStateChanged *>(event)); break;
 		case ItemId_Event_Say: eventSay(static_cast<Event_Say *>(event)); break;
 		case ItemId_Event_Shuffle: eventShuffle(static_cast<Event_Shuffle *>(event)); break;
 		case ItemId_Event_RollDie: eventRollDie(static_cast<Event_RollDie *>(event)); break;

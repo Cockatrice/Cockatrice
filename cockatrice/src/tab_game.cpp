@@ -5,8 +5,6 @@
 #include <QAction>
 #include <QMessageBox>
 #include <QFileDialog>
-#include <QApplication>
-#include <QDesktopWidget>
 #include "tab_game.h"
 #include "cardinfowidget.h"
 #include "playerlistwidget.h"
@@ -160,8 +158,8 @@ void DeckViewContainer::setDeck(DeckList *deck)
 	readyStartButton->setEnabled(true);
 }
 
-TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
-	: Tab(_tabSupervisor), clients(_clients), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), started(false), resuming(_resuming), currentPhase(-1), infoPopup(0)
+TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, ServerInfo_User *_userInfo, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
+	: Tab(_tabSupervisor), clients(_clients), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), started(false), resuming(_resuming), currentPhase(-1)
 {
 	phasesToolbar = new PhasesToolbar;
 	phasesToolbar->hide();
@@ -178,10 +176,10 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	
 	timeElapsedLabel = new QLabel;
 	timeElapsedLabel->setAlignment(Qt::AlignCenter);
-	messageLog = new MessageLogWidget;
+	messageLog = new MessageLogWidget(_userInfo->getName(), _userInfo->getGender() == ServerInfo_User::Female);
 	connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfo, SLOT(setCard(QString)));
 	connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
-	connect(messageLog, SIGNAL(deleteCardInfoPopup()), this, SLOT(deleteCardInfoPopup()));
+	connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
 	sayLabel = new QLabel;
 	sayEdit = new QLineEdit;
 	sayLabel->setBuddy(sayEdit);
@@ -747,7 +745,7 @@ void TabGame::newCardAdded(AbstractCardItem *card)
 {
 	connect(card, SIGNAL(hovered(AbstractCardItem *)), cardInfo, SLOT(setCard(AbstractCardItem *)));
 	connect(card, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
-	connect(card, SIGNAL(deleteCardInfoPopup()), this, SLOT(deleteCardInfoPopup()));
+	connect(card, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
 }
 
 CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) const
@@ -778,25 +776,4 @@ Player *TabGame::getActiveLocalPlayer() const
 	}
 	
 	return 0;
-}
-
-void TabGame::showCardInfoPopup(const QPoint &pos, const QString &cardName)
-{
-	infoPopup = new CardInfoWidget(CardInfoWidget::ModePopUp, 0, Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
-	infoPopup->setAttribute(Qt::WA_TransparentForMouseEvents);
-	infoPopup->setCard(cardName);
-	QRect screenRect = qApp->desktop()->screenGeometry(this);
-	infoPopup->move(
-		qMax(screenRect.left(), qMin(pos.x() - infoPopup->width() / 2, screenRect.left() + screenRect.width() - infoPopup->width())),
-		qMax(screenRect.top(), qMin(pos.y() - infoPopup->height() / 2, screenRect.top() + screenRect.height() - infoPopup->height()))
-	);
-	infoPopup->show();
-}
-
-void TabGame::deleteCardInfoPopup()
-{
-	if (infoPopup) {
-		infoPopup->deleteLater();
-		infoPopup = 0;
-	}
 }

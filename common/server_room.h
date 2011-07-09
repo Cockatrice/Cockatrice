@@ -11,6 +11,7 @@ class Server_ProtocolHandler;
 class RoomEvent;
 class ServerInfo_User;
 class ServerInfo_Room;
+class ServerInfo_Game;
 class Server_Game;
 class Server;
 
@@ -37,8 +38,9 @@ public:
 	QString getJoinMessage() const { return joinMessage; }
 	const QMap<int, Server_Game *> &getGames() const { return games; }
 	Server *getServer() const;
-	ServerInfo_Room *getInfo(bool complete) const;
+	ServerInfo_Room *getInfo(bool complete, bool showGameTypes = false) const;
 	int getGamesCreatedByUser(const QString &name) const;
+	QList<ServerInfo_Game *> getGamesOfUser(const QString &name) const;
 	
 	void addClient(Server_ProtocolHandler *client);
 	void removeClient(Server_ProtocolHandler *client);

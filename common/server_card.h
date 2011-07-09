@@ -46,7 +46,7 @@ private:
 	Server_Card *parentCard;
 	QList<Server_Card *> attachedCards;
 public:
-	Server_Card(QString _name, int _id, int _coord_x, int _coord_y);
+	Server_Card(QString _name, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone = 0);
 	~Server_Card();
 	
 	Server_CardZone *getZone() const { return zone; }

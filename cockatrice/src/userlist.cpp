@@ -5,11 +5,59 @@
 #include "pixmapgenerator.h"
 #include "userinfobox.h"
 #include "protocol_items.h"
+#include "gameselector.h"
 #include <QHeaderView>
 #include <QVBoxLayout>
 #include <QMouseEvent>
 #include <QMenu>
 #include <QInputDialog>
+#include <QLabel>
+#include <QSpinBox>
+#include <QPlainTextEdit>
+#include <QPushButton>
+#include <QHBoxLayout>
+
+BanDialog::BanDialog(QWidget *parent)
+	: QDialog(parent)
+{
+	QLabel *durationLabel = new QLabel(tr("Please enter the duration of the ban (in minutes).\nEnter 0 for an indefinite ban."));
+	durationEdit = new QSpinBox;
+	durationEdit->setMinimum(0);
+	durationEdit->setValue(5);
+	QLabel *reasonLabel = new QLabel(tr("Please enter the reason for the ban.\nThis is only saved for moderators and cannot be seen by the banned person."));
+	reasonEdit = new QPlainTextEdit;
+	
+	QPushButton *okButton = new QPushButton(tr("&OK"));
+	okButton->setAutoDefault(true);
+	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
+	QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
+	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+	
+	QHBoxLayout *buttonLayout = new QHBoxLayout;
+	buttonLayout->addStretch();
+	buttonLayout->addWidget(okButton);
+	buttonLayout->addWidget(cancelButton);
+	
+	QVBoxLayout *vbox = new QVBoxLayout;
+	vbox->addWidget(durationLabel);
+	vbox->addWidget(durationEdit);
+	vbox->addWidget(reasonLabel);
+	vbox->addWidget(reasonEdit);
+	vbox->addLayout(buttonLayout);
+	
+	setLayout(vbox);
+	setWindowTitle(tr("Ban user from server"));
+}
+
+int BanDialog::getMinutes() const
+{
+	return durationEdit->value();
+}
+
+QString BanDialog::getReason() const
+{
+	return reasonEdit->toPlainText();
+}
 
 UserListItemDelegate::UserListItemDelegate(QObject *const parent)
 	: QStyledItemDelegate(parent)
@@ -59,6 +107,7 @@ UserList::UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserL
 	userTree->setRootIsDecorated(false);
 	userTree->setIconSize(QSize(20, 12));
 	userTree->setItemDelegate(itemDelegate);
+	userTree->setAlternatingRowColors(true);
 	connect(userTree, SIGNAL(itemActivated(QTreeWidgetItem *, int)), this, SLOT(userClicked(QTreeWidgetItem *, int)));
 	
 	QVBoxLayout *vbox = new QVBoxLayout;
@@ -163,6 +212,35 @@ void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
 	emit openMessageDialog(item->data(2, Qt::UserRole).toString(), true);
 }
 
+void UserList::gamesOfUserReceived(ProtocolResponse *resp)
+{
+	Command_GetGamesOfUser *command = static_cast<Command_GetGamesOfUser *>(sender());
+	Response_GetGamesOfUser *response = qobject_cast<Response_GetGamesOfUser *>(resp);
+	if (!response)
+		return;
+	
+	QMap<int, GameTypeMap> gameTypeMap;
+	QMap<int, QString> roomMap;
+	const QList<ServerInfo_Room *> roomList = response->getRoomList();
+	for (int i = 0; i < roomList.size(); ++i) {
+		roomMap.insert(roomList[i]->getRoomId(), roomList[i]->getName());
+		const QList<ServerInfo_GameType *> gameTypeList = roomList[i]->getGameTypeList();
+		GameTypeMap tempMap;
+		for (int j = 0; j < gameTypeList.size(); ++j)
+			tempMap.insert(gameTypeList[j]->getGameTypeId(), gameTypeList[j]->getDescription());
+		gameTypeMap.insert(roomList[i]->getRoomId(), tempMap);
+	}
+	
+	GameSelector *selector = new GameSelector(client, 0, roomMap, gameTypeMap);
+	const QList<ServerInfo_Game *> gameList = response->getGameList();
+	for (int i = 0; i < gameList.size(); ++i)
+		selector->processGameInfo(gameList[i]);
+	
+	selector->setWindowTitle(tr("%1's games").arg(command->getUserName()));
+	selector->setAttribute(Qt::WA_DeleteOnClose);
+	selector->show();
+}
+
 void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 {
 	const QString &userName = index.sibling(index.row(), 2).data(Qt::UserRole).toString();
@@ -172,6 +250,7 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	aUserName->setEnabled(false);
 	QAction *aDetails = new QAction(tr("User &details"), this);
 	QAction *aChat = new QAction(tr("Direct &chat"), this);
+	QAction *aShowGames = new QAction(tr("Show this user's &games"), this);
 	QAction *aAddToBuddyList = new QAction(tr("Add to &buddy list"), this);
 	QAction *aRemoveFromBuddyList = new QAction(tr("Remove from &buddy list"), this);
 	QAction *aAddToIgnoreList = new QAction(tr("Add to &ignore list"), this);
@@ -182,6 +261,7 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	menu->addAction(aUserName);
 	menu->addSeparator();
 	menu->addAction(aDetails);
+	menu->addAction(aShowGames);
 	menu->addAction(aChat);
 	if ((userLevel & ServerInfo_User::IsRegistered) && (tabSupervisor->getUserLevel() & ServerInfo_User::IsRegistered)) {
 		menu->addSeparator();
@@ -210,15 +290,18 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 		client->sendCommand(new Command_AddToList("buddy", userName));
 	else if (actionClicked == aRemoveFromBuddyList)
 		client->sendCommand(new Command_RemoveFromList("buddy", userName));
-	else if (actionClicked == aAddToIgnoreList)
+	else if (actionClicked == aShowGames) {
+		Command *cmd = new Command_GetGamesOfUser(userName);
+		connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(gamesOfUserReceived(ProtocolResponse *)));
+		client->sendCommand(cmd);
+	} else if (actionClicked == aAddToIgnoreList)
 		client->sendCommand(new Command_AddToList("ignore", userName));
 	else if (actionClicked == aRemoveFromIgnoreList)
 		client->sendCommand(new Command_RemoveFromList("ignore", userName));
 	else if (actionClicked == aBan) {
-		bool ok;
-		int minutes = QInputDialog::getInt(this, tr("Duration"), tr("Please enter the duration of the ban (in minutes).\nEnter 0 for an indefinite ban."), 0, 0, 2147483647, 10, &ok);
-		if (ok)
-			client->sendCommand(new Command_BanFromServer(userName, minutes));
+		BanDialog dlg(this);
+		if (dlg.exec())
+			client->sendCommand(new Command_BanFromServer(userName, dlg.getMinutes(), dlg.getReason()));
 	}
 	
 	delete menu;

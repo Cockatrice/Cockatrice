@@ -30,6 +30,7 @@ protected:
 	QMap<QString, ServerInfo_User *> buddyList, ignoreList;
 	
 	void prepareDestroy();
+	virtual bool getCompressionSupport() const = 0;
 private:
 	QList<ProtocolItem *> itemQueue;
 	QList<int> messageSizeOverTime, messageCountOverTime;
@@ -49,6 +50,7 @@ private:
 	virtual ResponseCode cmdDeckDel(Command_DeckDel *cmd, CommandContainer *cont) = 0;
 	virtual ResponseCode cmdDeckUpload(Command_DeckUpload *cmd, CommandContainer *cont) = 0;
 	virtual ResponseCode cmdDeckDownload(Command_DeckDownload *cmd, CommandContainer *cont) = 0;
+	ResponseCode cmdGetGamesOfUser(Command_GetGamesOfUser *cmd, CommandContainer *cont);
 	ResponseCode cmdGetUserInfo(Command_GetUserInfo *cmd, CommandContainer *cont);
 	ResponseCode cmdListRooms(Command_ListRooms *cmd, CommandContainer *cont);
 	ResponseCode cmdJoinRoom(Command_JoinRoom *cmd, CommandContainer *cont);
@@ -87,8 +89,9 @@ private:
 	ResponseCode cmdDumpZone(Command_DumpZone *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdStopDumpZone(Command_StopDumpZone *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
 	ResponseCode cmdRevealCards(Command_RevealCards *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	virtual ResponseCode cmdUpdateServerMessage(Command_UpdateServerMessage *cmd, CommandContainer *cont) = 0;
 	virtual ResponseCode cmdBanFromServer(Command_BanFromServer *cmd, CommandContainer *cont) = 0;
+	virtual ResponseCode cmdShutdownServer(Command_ShutdownServer *cmd, CommandContainer *cont) = 0;
+	virtual ResponseCode cmdUpdateServerMessage(Command_UpdateServerMessage *cmd, CommandContainer *cont) = 0;
 	
 	ResponseCode processCommandHelper(Command *command, CommandContainer *cont);
 private slots:

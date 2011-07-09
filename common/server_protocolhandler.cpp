@@ -46,8 +46,10 @@ void Server_ProtocolHandler::prepareDestroy()
 		
 		if ((authState == UnknownUser) || p->getSpectator())
 			g->removePlayer(p);
-		else
+		else {
 			p->setProtocolHandler(0);
+			g->postConnectionStatusUpdate(p, false);
+		}
 	}
 	gameListMutex.unlock();
 
@@ -78,7 +80,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 	
 		Server_Room *room = rooms.value(roomCommand->getRoomId(), 0);
 		if (!room)
-			return RespNameNotFound;
+			return RespNotInRoom;
 		
 		QMutexLocker locker(&room->roomMutex);
 		
@@ -99,7 +101,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 		gameListMutex.lock();
 		if (!games.contains(gameCommand->getGameId())) {
 			qDebug() << "invalid game";
-			return RespNameNotFound;
+			return RespNotInRoom;
 		}
 		QPair<Server_Game *, Server_Player *> gamePair = games.value(gameCommand->getGameId());
 		Server_Game *game = gamePair.first;
@@ -142,6 +144,17 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 			default: return RespInvalidCommand;
 		}
 	}
+	ModeratorCommand *moderatorCommand = qobject_cast<ModeratorCommand *>(command);
+	if (moderatorCommand) {
+		qDebug() << "received ModeratorCommand";
+		if (!(userInfo->getUserLevel() & ServerInfo_User::IsModerator))
+			return RespLoginNeeded;
+		
+		switch (command->getItemId()) {
+			case ItemId_Command_BanFromServer: return cmdBanFromServer(static_cast<Command_BanFromServer *>(command), cont);
+			default: return RespInvalidCommand;
+		}
+	}
 	AdminCommand *adminCommand = qobject_cast<AdminCommand *>(command);
 	if (adminCommand) {
 		qDebug() << "received AdminCommand";
@@ -149,8 +162,8 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 			return RespLoginNeeded;
 		
 		switch (command->getItemId()) {
+			case ItemId_Command_ShutdownServer: return cmdShutdownServer(static_cast<Command_ShutdownServer *>(command), cont);
 			case ItemId_Command_UpdateServerMessage: return cmdUpdateServerMessage(static_cast<Command_UpdateServerMessage *>(command), cont);
-			case ItemId_Command_BanFromServer: return cmdBanFromServer(static_cast<Command_BanFromServer *>(command), cont);
 			default: return RespInvalidCommand;
 		}
 	}
@@ -166,6 +179,7 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 		case ItemId_Command_DeckDel: return cmdDeckDel(static_cast<Command_DeckDel *>(command), cont);
 		case ItemId_Command_DeckUpload: return cmdDeckUpload(static_cast<Command_DeckUpload *>(command), cont);
 		case ItemId_Command_DeckDownload: return cmdDeckDownload(static_cast<Command_DeckDownload *>(command), cont);
+		case ItemId_Command_GetGamesOfUser: return cmdGetGamesOfUser(static_cast<Command_GetGamesOfUser *>(command), cont);
 		case ItemId_Command_GetUserInfo: return cmdGetUserInfo(static_cast<Command_GetUserInfo *>(command), cont);
 		case ItemId_Command_ListRooms: return cmdListRooms(static_cast<Command_ListRooms *>(command), cont);
 		case ItemId_Command_JoinRoom: return cmdJoinRoom(static_cast<Command_JoinRoom *>(command), cont);
@@ -267,15 +281,16 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 	QString userName = cmd->getUsername().simplified();
 	if (userName.isEmpty() || (userInfo != 0))
 		return RespContextError;
-	if (server->getUserBanned(this, userName))
-		return RespWrongPassword;
 	authState = server->loginUser(this, userName, cmd->getPassword());
 	if (authState == PasswordWrong)
 		return RespWrongPassword;
 	if (authState == WouldOverwriteOldSession)
 		return RespWouldOverwriteOldSession;
 
-	enqueueProtocolItem(new Event_ServerMessage(server->getLoginMessage()));
+	ProtocolItem *serverMessage = new Event_ServerMessage(server->getLoginMessage());
+	if (getCompressionSupport())
+		serverMessage->setCompressed(true);
+	enqueueProtocolItem(serverMessage);
 
 	QList<ServerInfo_User *> _buddyList, _ignoreList;
 	if (authState == PasswordRight) {
@@ -292,7 +307,10 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 			_ignoreList.append(new ServerInfo_User(ignoreIterator.next().value()));
 	}
 	
-	cont->setResponse(new Response_Login(cont->getCmdId(), RespOk, new ServerInfo_User(userInfo, true), _buddyList, _ignoreList));
+	ProtocolResponse *resp = new Response_Login(cont->getCmdId(), RespOk, new ServerInfo_User(userInfo, true), _buddyList, _ignoreList);
+	if (getCompressionSupport())
+		resp->setCompressed(true);
+	cont->setResponse(resp);
 	return RespNothing;
 }
 
@@ -303,6 +321,7 @@ ResponseCode Server_ProtocolHandler::cmdMessage(Command_Message *cmd, CommandCon
 	
 	QString receiver = cmd->getUserName();
 	Server_ProtocolHandler *userHandler = server->getUsers().value(receiver);
+	qDebug() << "cmdMessage: recv=" << receiver << (userHandler == 0 ? "not found" : "found");
 	if (!userHandler)
 		return RespNameNotFound;
 	if (userHandler->getIgnoreList().contains(userInfo->getName()))
@@ -311,6 +330,34 @@ ResponseCode Server_ProtocolHandler::cmdMessage(Command_Message *cmd, CommandCon
 	cont->enqueueItem(new Event_Message(userInfo->getName(), receiver, cmd->getText()));
 	userHandler->sendProtocolItem(new Event_Message(userInfo->getName(), receiver, cmd->getText()));
 	return RespOk;
+}
+
+ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(Command_GetGamesOfUser *cmd, CommandContainer *cont)
+{
+	if (authState == PasswordWrong)
+		return RespLoginNeeded;
+	
+	server->serverMutex.lock();
+	if (!server->getUsers().contains(cmd->getUserName()))
+		return RespNameNotFound;
+	
+	QList<ServerInfo_Room *> roomList;
+	QList<ServerInfo_Game *> gameList;
+	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
+	while (roomIterator.hasNext()) {
+		Server_Room *room = roomIterator.next().value();
+		room->roomMutex.lock();
+		roomList.append(room->getInfo(false, true));
+		gameList << room->getGamesOfUser(cmd->getUserName());
+		room->roomMutex.unlock();
+	}
+	server->serverMutex.unlock();
+	
+	ProtocolResponse *resp = new Response_GetGamesOfUser(cont->getCmdId(), RespOk, roomList, gameList);
+	if (getCompressionSupport())
+		resp->setCompressed(true);
+	cont->setResponse(resp);
+	return RespNothing;
 }
 
 ResponseCode Server_ProtocolHandler::cmdGetUserInfo(Command_GetUserInfo *cmd, CommandContainer *cont)
@@ -359,6 +406,7 @@ ResponseCode Server_ProtocolHandler::cmdJoinRoom(Command_JoinRoom *cmd, CommandC
 	if (!r)
 		return RespNameNotFound;
 	
+	QMutexLocker serverLocker(&server->serverMutex);
 	QMutexLocker roomLocker(&r->roomMutex);
 	r->addClient(this);
 	rooms.insert(r->getId(), r);
@@ -375,6 +423,7 @@ ResponseCode Server_ProtocolHandler::cmdJoinRoom(Command_JoinRoom *cmd, CommandC
 		for (int j = 0; j < gamePlayers.size(); ++j)
 			if (gamePlayers[j]->getUserInfo()->getName() == userInfo->getName()) {
 				gamePlayers[j]->setProtocolHandler(this);
+				game->postConnectionStatusUpdate(gamePlayers[j], true);
 				games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, gamePlayers[j]));
 				
 				enqueueProtocolItem(new Event_GameJoined(game->getGameId(), game->getDescription(), gamePlayers[j]->getPlayerId(), gamePlayers[j]->getSpectator(), game->getSpectatorsCanTalk(), game->getSpectatorsSeeEverything(), true));
@@ -384,7 +433,10 @@ ResponseCode Server_ProtocolHandler::cmdJoinRoom(Command_JoinRoom *cmd, CommandC
 			}
 	}
 	
-	cont->setResponse(new Response_JoinRoom(cont->getCmdId(), RespOk, r->getInfo(true)));
+	ServerInfo_Room *info = r->getInfo(true);
+	if (getCompressionSupport())
+		info->setCompressed(true);
+	cont->setResponse(new Response_JoinRoom(cont->getCmdId(), RespOk, info));
 	return RespNothing;
 }
 
@@ -416,8 +468,9 @@ ResponseCode Server_ProtocolHandler::cmdRoomSay(Command_RoomSay *cmd, CommandCon
 		if ((totalSize > server->getMaxMessageSizePerInterval()) || (totalCount > server->getMaxMessageCountPerInterval()))
 			return RespChatFlood;
 	}
+	msg.replace(QChar('\n'), QChar(' '));
 	
-	room->say(this, cmd->getMessage());
+	room->say(this, msg);
 	return RespOk;
 }
 
@@ -433,7 +486,10 @@ ResponseCode Server_ProtocolHandler::cmdListUsers(Command_ListUsers * /*cmd*/, C
 	
 	acceptsUserListChanges = true;
 	
-	cont->setResponse(new Response_ListUsers(cont->getCmdId(), RespOk, resultList));
+	ProtocolResponse *resp = new Response_ListUsers(cont->getCmdId(), RespOk, resultList);
+	if (getCompressionSupport())
+		resp->setCompressed(true);
+	cont->setResponse(resp);
 	return RespNothing;
 }
 
@@ -451,7 +507,10 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 	for (int i = 0; i < gameTypeList.size(); ++i)
 		gameTypes.append(gameTypeList[i]->getData());
 	
-	Server_Game *game = room->createGame(cmd->getDescription(), cmd->getPassword(), cmd->getMaxPlayers(), gameTypes, cmd->getOnlyBuddies(), cmd->getOnlyRegistered(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
+	QString description = cmd->getDescription();
+	if (description.size() > 60)
+		description = description.left(60);
+	Server_Game *game = room->createGame(description, cmd->getPassword(), cmd->getMaxPlayers(), gameTypes, cmd->getOnlyBuddies(), cmd->getOnlyRegistered(), cmd->getSpectatorsAllowed(), cmd->getSpectatorsNeedPassword(), cmd->getSpectatorsCanTalk(), cmd->getSpectatorsSeeEverything(), this);
 	
 	Server_Player *creator = game->getPlayers().values().first();
 	
@@ -712,7 +771,7 @@ ResponseCode Server_ProtocolHandler::cmdFlipCard(Command_FlipCard *cmd, CommandC
 	if (!zone->hasCoords())
 		return RespContextError;
 	
-	Server_Card *card = zone->getCard(cmd->getCardId(), false);
+	Server_Card *card = zone->getCard(cmd->getCardId());
 	if (!card)
 		return RespNameNotFound;
 	
@@ -741,7 +800,7 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 	if (!startzone)
 		return RespNameNotFound;
 	
-	Server_Card *card = startzone->getCard(cmd->getCardId(), false);
+	Server_Card *card = startzone->getCard(cmd->getCardId());
 	if (!card)
 		return RespNameNotFound;
 
@@ -763,7 +822,7 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(Command_AttachCard *cmd, Comm
 		// Possibly a flag will have to be introduced for this sometime.
 		if (!targetzone->hasCoords())
 			return RespContextError;
-		targetCard = targetzone->getCard(cmd->getTargetCardId(), false);
+		targetCard = targetzone->getCard(cmd->getTargetCardId());
 		if (targetCard)
 			if (targetCard->getParentCard())
 				return RespContextError;
@@ -873,14 +932,14 @@ ResponseCode Server_ProtocolHandler::cmdCreateArrow(Command_CreateArrow *cmd, Co
 		return RespNameNotFound;
 	if (startZone->getType() != PublicZone)
 		return RespContextError;
-	Server_Card *startCard = startZone->getCard(cmd->getStartCardId(), false);
+	Server_Card *startCard = startZone->getCard(cmd->getStartCardId());
 	if (!startCard)
 		return RespNameNotFound;
 	Server_Card *targetCard = 0;
 	if (!playerTarget) {
 		if (targetZone->getType() != PublicZone)
 			return RespContextError;
-		targetCard = targetZone->getCard(cmd->getTargetCardId(), false);
+		targetCard = targetZone->getCard(cmd->getTargetCardId());
 	}
 	
 	Server_ArrowTarget *targetItem;
@@ -959,7 +1018,7 @@ ResponseCode Server_ProtocolHandler::cmdSetCardCounter(Command_SetCardCounter *c
 	if (!zone->hasCoords())
 		return RespContextError;
 
-	Server_Card *card = zone->getCard(cmd->getCardId(), false);
+	Server_Card *card = zone->getCard(cmd->getCardId());
 	if (!card)
 		return RespNameNotFound;
 	
@@ -986,7 +1045,7 @@ ResponseCode Server_ProtocolHandler::cmdIncCardCounter(Command_IncCardCounter *c
 	if (!zone->hasCoords())
 		return RespContextError;
 
-	Server_Card *card = zone->getCard(cmd->getCardId(), false);
+	Server_Card *card = zone->getCard(cmd->getCardId());
 	if (!card)
 		return RespNameNotFound;
 	
@@ -1199,7 +1258,7 @@ ResponseCode Server_ProtocolHandler::cmdRevealCards(Command_RevealCards *cmd, Co
 			return RespContextError;
 		cardsToReveal.append(zone->cards.at(rng->getNumber(0, zone->cards.size() - 1)));
 	} else {
-		Server_Card *card = zone->getCard(cmd->getCardId(), false);
+		Server_Card *card = zone->getCard(cmd->getCardId());
 		if (!card)
 			return RespNameNotFound;
 		cardsToReveal.append(card);

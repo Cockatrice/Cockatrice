@@ -37,8 +37,7 @@ protected:
 class TabSupervisor : public QTabWidget {
 	Q_OBJECT
 private:
-	QString userName;
-	int userLevel;
+	ServerInfo_User *userInfo;
 	QIcon *tabChangedIcon;
 	AbstractClient *client;
 	QList<AbstractClient *> localClients;
@@ -61,7 +60,7 @@ public:
 	int getGameCount() const { return gameTabs.size(); }
 	TabUserLists *getUserListsTab() const { return tabUserLists; }
 	bool getAdminLocked() const;
-	int getUserLevel() const { return userLevel; }
+	int getUserLevel() const;
 signals:
 	void setMenu(QMenu *menu);
 	void localGameEnded();
@@ -78,7 +77,7 @@ private slots:
 	void processUserLeft(const QString &userName);
 	void processUserJoined(const QString &userName);
 	void talkLeft(TabMessage *tab);
-	void tabUserEvent();
+	void tabUserEvent(bool globalEvent);
 	void processRoomEvent(RoomEvent *event);
 	void processGameEventContainer(GameEventContainer *cont);
 	void processMessageEvent(Event_Message *event);

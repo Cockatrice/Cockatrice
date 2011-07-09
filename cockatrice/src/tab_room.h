@@ -2,20 +2,16 @@
 #define TAB_ROOM_H
 
 #include "tab.h"
-#include "protocol_datastructures.h"
 #include <QGroupBox>
+#include <QMap>
 
 class AbstractClient;
 class UserList;
 class QLabel;
 class ChatView;
 class QLineEdit;
-class QTreeView;
 class QPushButton;
 class QTextTable;
-class QCheckBox;
-class GamesModel;
-class GamesProxyModel;
 class RoomEvent;
 class ServerInfo_Room;
 class ServerInfo_Game;
@@ -24,31 +20,7 @@ class Event_JoinRoom;
 class Event_LeaveRoom;
 class Event_RoomSay;
 class ProtocolResponse;
-class TabRoom;
-
-class GameSelector : public QGroupBox {
-	Q_OBJECT
-private slots:
-	void showFullGamesChanged(int state);
-	void actCreate();
-	void actJoin();
-	void checkResponse(ResponseCode response);
-signals:
-	void gameJoined(int gameId);
-private:
-	AbstractClient *client;
-	TabRoom *room;
-
-	QTreeView *gameListView;
-	GamesModel *gameListModel;
-	GamesProxyModel *gameListProxyModel;
-	QPushButton *createButton, *joinButton, *spectateButton;
-	QCheckBox *showFullGamesCheckBox;
-public:
-	GameSelector(AbstractClient *_client, TabRoom *_room, QWidget *parent = 0);
-	void retranslateUi();
-	void processGameInfo(ServerInfo_Game *info);
-};
+class GameSelector;
 
 class TabRoom : public Tab {
 	Q_OBJECT

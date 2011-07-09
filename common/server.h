@@ -40,10 +40,10 @@ public:
 	virtual int getMaxMessageCountPerInterval() const { return 0; }
 	virtual int getMaxMessageSizePerInterval() const { return 0; }
 	virtual int getMaxGamesPerUser() const { return 0; }
+	virtual bool getThreaded() const = 0;
 	
 	virtual QMap<QString, ServerInfo_User *> getBuddyList(const QString &name) = 0;
 	virtual QMap<QString, ServerInfo_User *> getIgnoreList(const QString &name) = 0;
-	virtual bool getUserBanned(Server_ProtocolHandler * /*client*/, const QString & /*userName*/) const { return false; }
 protected:
 	void prepareDestroy();
 	QList<Server_ProtocolHandler *> clients;
@@ -51,7 +51,7 @@ protected:
 	QMap<int, Server_Room *> rooms;
 	
 	virtual bool userExists(const QString &user) = 0;
-	virtual AuthenticationResult checkUserPassword(const QString &user, const QString &password) = 0;
+	virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password) = 0;
 	virtual ServerInfo_User *getUserData(const QString &name) = 0;
 	int getUsersCount() const;
 	int getGamesCount() const;

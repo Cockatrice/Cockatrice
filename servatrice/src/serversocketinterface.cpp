@@ -33,7 +33,7 @@
 #include "server_logger.h"
 
 ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent)
-	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), topLevelItem(0)
+	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), topLevelItem(0), compressionSupport(false)
 {
 	xmlWriter = new QXmlStreamWriter(&xmlBuffer);
 	xmlReader = new QXmlStreamReader;
@@ -69,6 +69,7 @@ ServerSocketInterface::~ServerSocketInterface()
 	delete xmlReader;
 	delete socket;
 	socket = 0;
+	delete topLevelItem;
 }
 
 void ServerSocketInterface::processProtocolItem(ProtocolItem *item)
@@ -102,6 +103,8 @@ void ServerSocketInterface::readClient()
 		if (topLevelItem)
 			topLevelItem->readElement(xmlReader);
 		else if (xmlReader->isStartElement() && (xmlReader->name().toString() == "cockatrice_client_stream")) {
+			if (xmlReader->attributes().value("comp").toString().toInt() == 1)
+				compressionSupport = true;
 			topLevelItem = new TopLevelProtocolItem;
 			connect(topLevelItem, SIGNAL(protocolItemReceived(ProtocolItem *)), this, SLOT(processProtocolItem(ProtocolItem *)));
 		}
@@ -296,7 +299,10 @@ ResponseCode ServerSocketInterface::cmdDeckList(Command_DeckList * /*cmd*/, Comm
 	if (!deckListHelper(root))
 		return RespContextError;
 	
-	cont->setResponse(new Response_DeckList(cont->getCmdId(), RespOk, root));
+	ProtocolResponse *resp = new Response_DeckList(cont->getCmdId(), RespOk, root);
+	if (getCompressionSupport())
+		resp->setCompressed(true);
+	cont->setResponse(resp);
 	
 	return RespNothing;
 }
@@ -455,12 +461,21 @@ ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd, C
 	return RespNothing;
 }
 
-// ADMIN FUNCTIONS.
-// Permission is checked by the calling function.
+// MODERATOR FUNCTIONS.
+// May be called by admins and moderators. Permission is checked by the calling function.
 
 ResponseCode ServerSocketInterface::cmdUpdateServerMessage(Command_UpdateServerMessage * /*cmd*/, CommandContainer * /*cont*/)
 {
 	servatrice->updateLoginMessage();
+	return RespOk;
+}
+
+// ADMIN FUNCTIONS.
+// Permission is checked by the calling function.
+
+ResponseCode ServerSocketInterface::cmdShutdownServer(Command_ShutdownServer *cmd, CommandContainer * /*cont*/)
+{
+	servatrice->scheduleShutdown(cmd->getReason(), cmd->getMinutes());
 	return RespOk;
 }
 
@@ -475,14 +490,14 @@ ResponseCode ServerSocketInterface::cmdBanFromServer(Command_BanFromServer *cmd,
 	ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
 	if (user->getUserInfo()->getUserLevel() & ServerInfo_User::IsRegistered) {
 		// Registered users can be banned by name.
-		if (minutes == 0) {
-			QMutexLocker locker(&servatrice->dbMutex);
-			QSqlQuery query;
-			query.prepare("update " + servatrice->getDbPrefix() + "_users set banned=1 where name = :name");
-			query.bindValue(":name", userName);
-			servatrice->execSqlQuery(query);
-		} else
-			servatrice->addNameBan(userName, minutes);
+		QMutexLocker locker(&servatrice->dbMutex);
+		QSqlQuery query;
+		query.prepare("insert into " + servatrice->getDbPrefix() + "_bans (id_user, id_admin, time_from, minutes, reason) values(:id_user, :id_admin, NOW(), :minutes, :reason)");
+		query.bindValue(":id_user", getUserIdInDB(userName));
+		query.bindValue(":id_admin", getUserIdInDB(userInfo->getName()));
+		query.bindValue(":minutes", minutes);
+		query.bindValue(":reason", cmd->getReason() + "\n");
+		servatrice->execSqlQuery(query);
 	} else {
 		// Unregistered users must be banned by IP address.
 		// Indefinite address bans are not reasonable -> default to 30 minutes.

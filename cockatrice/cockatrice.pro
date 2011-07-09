@@ -28,6 +28,8 @@ HEADERS += src/abstractcounter.h \
  src/handcounter.h \
  src/carddatabase.h \
  src/gameview.h \
+ src/gameselector.h \
+ src/gametypemap.h \
  src/decklistmodel.h \
  src/dlg_load_deck_from_clipboard.h \
  src/dlg_load_remote_deck.h \
@@ -114,6 +116,7 @@ SOURCES += src/abstractcounter.cpp \
  src/handcounter.cpp \
  src/carddatabase.cpp \
  src/gameview.cpp \
+ src/gameselector.cpp \
  src/decklistmodel.cpp \
  src/dlg_load_deck_from_clipboard.cpp \
  src/dlg_load_remote_deck.cpp \
@@ -136,6 +139,7 @@ SOURCES += src/abstractcounter.cpp \
  src/gamescene.cpp \
  src/arrowitem.cpp \
  src/arrowtarget.cpp \
+ src/tab.cpp \
  src/tab_server.cpp \
  src/tab_room.cpp \
  src/tab_message.cpp \
