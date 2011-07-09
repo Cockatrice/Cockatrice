@@ -93,7 +93,8 @@ void ServerSocketInterface::flushXmlBuffer()
 void ServerSocketInterface::readClient()
 {
 	QByteArray data = socket->readAll();
-	logger->logMessage(QString(data));
+	if (!data.contains("<cmd type=\"ping\""))
+		logger->logMessage(QString(data), this);
 	xmlReader->addData(data);
 	
 	while (!xmlReader->atEnd()) {

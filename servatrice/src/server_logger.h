@@ -9,6 +9,7 @@
 
 class QSocketNotifier;
 class QFile;
+class ServerSocketInterface;
 
 class ServerLogger : public QObject {
 	Q_OBJECT
@@ -17,7 +18,7 @@ public:
 	~ServerLogger();
 	static void hupSignalHandler(int unused);
 public slots:
-	void logMessage(QString message);
+	void logMessage(QString message, ServerSocketInterface *ssi = 0);
 private slots:
 #ifdef Q_OS_UNIX
 	void handleSigHup();
