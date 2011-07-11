@@ -56,9 +56,16 @@ void MainWindow::processConnectionClosedEvent(Event_ConnectionClosed *event)
 		reasonStr = tr("There are too many concurrent connections from your address.");
 	else if (reason == "banned")
 		reasonStr = tr("Banned by moderator.");
+	else if (reason == "server_shutdown")
+		reasonStr = tr("Scheduled server shutdown.");
 	else
 		reasonStr = tr("Unknown reason.");
 	QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.\nReason: %1").arg(reasonStr));
+}
+
+void MainWindow::processServerShutdownEvent(Event_ServerShutdown *event)
+{
+	QMessageBox::information(this, tr("Scheduled server shutdown"), tr("The server is going to be restarted in %n minute(s).\nAll running games will be lost.\nReason for shutdown: %1", "", event->getMinutes()).arg(event->getReason()));
 }
 
 void MainWindow::statusChanged(ClientStatus _status)
@@ -178,6 +185,8 @@ void MainWindow::actAbout()
 		+ tr("French:") + " Yannick Hammer, Arnaud Faes<br>"
 		+ tr("Japanese:") + " Nagase Task<br>"
 		+ tr("Russian:") + " Alexander Davidov<br>"
+		+ tr("Czech:") + " Ondřej Trhoň<br>"
+		+ tr("Slovak:") + " Ganjalf Rendy<br>"
 	));
 }
 
@@ -288,6 +297,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 	client = new RemoteClient(this);
 	connect(client, SIGNAL(connectionClosedEventReceived(Event_ConnectionClosed *)), this, SLOT(processConnectionClosedEvent(Event_ConnectionClosed *)));
+	connect(client, SIGNAL(serverShutdownEventReceived(Event_ServerShutdown *)), this, SLOT(processServerShutdownEvent(Event_ServerShutdown *)));
 	connect(client, SIGNAL(serverError(ResponseCode)), this, SLOT(serverError(ResponseCode)));
 	connect(client, SIGNAL(socketError(const QString &)), this, SLOT(socketError(const QString &)));
 	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));

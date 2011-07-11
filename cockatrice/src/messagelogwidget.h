@@ -1,15 +1,13 @@
 #ifndef MESSAGELOGWIDGET_H
 #define MESSAGELOGWIDGET_H
 
-#include <QTextEdit>
+#include "chatview.h"
 #include <QAbstractSocket>
 #include "translation.h"
 #include "protocol_datastructures.h"
 
 class Player;
 class CardZone;
-class QMouseEvent;
-class QEvent;
 class CardInfoWidget;
 class GameEventContext;
 class CardItem;
@@ -24,31 +22,24 @@ struct LogMoveCard {
 	int newX;
 };
 
-class MessageLogWidget : public QTextEdit {
+class MessageLogWidget : public ChatView {
 	Q_OBJECT
 private:
-	enum MessageContext { MessageContext_None, MessageContext_MoveCard };
+	enum MessageContext { MessageContext_None, MessageContext_MoveCard, MessageContext_Mulligan };
 	
-	CardInfoWidget *infoWidget;
 	QString sanitizeHtml(QString dirty) const;
+	bool isFemale(Player *player) const;
 	QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position) const;
-	QString getCardNameUnderMouse(const QPoint &pos) const;
 	MessageContext currentContext;
+	bool female;
+	
 	QList<LogMoveCard> moveCardQueue;
 	QMap<CardItem *, QString> moveCardPT;
 	QMap<CardItem *, bool> moveCardTapped;
-signals:
-	void cardNameHovered(QString cardName);
-	void showCardInfoPopup(QPoint pos, QString cardName);
-	void deleteCardInfoPopup();
+	
+	Player *mulliganPlayer;
+	int mulliganNumber;
 public slots:
-	void logConnecting(QString hostname);
-	void logConnected();
-	void logDisconnected();
-	void logSocketError(const QString &errorString);
-	void logServerError(ResponseCode response);
-	void logProtocolVersionMismatch(int clientVersion, int serverVersion);
-	void logProtocolError();
 	void logGameJoined(int gameId);
 	void logJoin(Player *player);
 	void logLeave(Player *player);
@@ -60,14 +51,16 @@ public slots:
 	void logNotReadyStart(Player *player);
 	void logConcede(Player *player);
 	void logGameStart();
+	void logConnectionStateChanged(Player *player, bool connectionState);
 	void logSay(Player *player, QString message);
 	void logSpectatorSay(QString spectatorName, QString message);
-	void logShuffle(Player *player);
+	void logShuffle(Player *player, CardZone *zone);
 	void logRollDie(Player *player, int sides, int roll);
 	void logDrawCards(Player *player, int number);
 	void logUndoDraw(Player *player, QString cardName);
 	void doMoveCard(LogMoveCard &attributes);
 	void logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
+	void logMulligan(Player *player, int number);
 	void logFlipCard(Player *player, QString cardName, bool faceDown);
 	void logDestroyCard(Player *player, QString cardName);
 	void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);
@@ -89,13 +82,7 @@ public slots:
 	void containerProcessingDone();
 public:
 	void connectToPlayer(Player *player);
-	MessageLogWidget(QWidget *parent = 0);
-protected:
-	void enterEvent(QEvent *event);
-	void leaveEvent(QEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
-	void mousePressEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
+	MessageLogWidget(const QString &_ownName, bool _female, QWidget *parent = 0);
 };
 
 #endif

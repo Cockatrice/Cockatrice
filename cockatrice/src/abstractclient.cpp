@@ -32,15 +32,16 @@ void AbstractClient::processProtocolItem(ProtocolItem *item)
 	GenericEvent *genericEvent = qobject_cast<GenericEvent *>(item);
 	if (genericEvent) {
 		switch (genericEvent->getItemId()) {
-			case ItemId_Event_ConnectionClosed: emit connectionClosedEventReceived(qobject_cast<Event_ConnectionClosed *>(item)); break;
-			case ItemId_Event_AddToList: emit addToListEventReceived(qobject_cast<Event_AddToList *>(item)); break;
-			case ItemId_Event_RemoveFromList: emit removeFromListEventReceived(qobject_cast<Event_RemoveFromList *>(item)); break;
-			case ItemId_Event_UserJoined: emit userJoinedEventReceived(qobject_cast<Event_UserJoined *>(item)); break;
-			case ItemId_Event_UserLeft: emit userLeftEventReceived(qobject_cast<Event_UserLeft *>(item)); break;
-			case ItemId_Event_ServerMessage: emit serverMessageEventReceived(qobject_cast<Event_ServerMessage *>(item)); break;
-			case ItemId_Event_ListRooms: emit listRoomsEventReceived(qobject_cast<Event_ListRooms *>(item)); break;
-			case ItemId_Event_GameJoined: emit gameJoinedEventReceived(qobject_cast<Event_GameJoined *>(item)); break;
-			case ItemId_Event_Message: emit messageEventReceived(qobject_cast<Event_Message *>(item)); break;
+			case ItemId_Event_ConnectionClosed: emit connectionClosedEventReceived(static_cast<Event_ConnectionClosed *>(item)); break;
+			case ItemId_Event_ServerShutdown: emit serverShutdownEventReceived(static_cast<Event_ServerShutdown *>(item)); break;
+			case ItemId_Event_AddToList: emit addToListEventReceived(static_cast<Event_AddToList *>(item)); break;
+			case ItemId_Event_RemoveFromList: emit removeFromListEventReceived(static_cast<Event_RemoveFromList *>(item)); break;
+			case ItemId_Event_UserJoined: emit userJoinedEventReceived(static_cast<Event_UserJoined *>(item)); break;
+			case ItemId_Event_UserLeft: emit userLeftEventReceived(static_cast<Event_UserLeft *>(item)); break;
+			case ItemId_Event_ServerMessage: emit serverMessageEventReceived(static_cast<Event_ServerMessage *>(item)); break;
+			case ItemId_Event_ListRooms: emit listRoomsEventReceived(static_cast<Event_ListRooms *>(item)); break;
+			case ItemId_Event_GameJoined: emit gameJoinedEventReceived(static_cast<Event_GameJoined *>(item)); break;
+			case ItemId_Event_Message: emit messageEventReceived(static_cast<Event_Message *>(item)); break;
 		}
 		if (genericEvent->getReceiverMayDelete())
 			delete genericEvent;

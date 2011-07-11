@@ -11,12 +11,13 @@ CardToMove::CardToMove(int _cardId, const QString &_pt, bool _tapped)
 	insertItem(new SerializableItem_Bool("tapped", _tapped));
 }
 
-ServerInfo_User::ServerInfo_User(const QString &_name, int _userLevel, const QString &_realName, const QString &_country, const QByteArray &_avatarBmp)
+ServerInfo_User::ServerInfo_User(const QString &_name, int _userLevel, const QString &_realName, Gender _gender, const QString &_country, const QByteArray &_avatarBmp)
 	: SerializableItem_Map("user")
 {
 	insertItem(new SerializableItem_String("name", _name));
 	insertItem(new SerializableItem_Int("userlevel", _userLevel));
 	insertItem(new SerializableItem_String("real_name", _realName));
+	insertItem(new SerializableItem_Int("gender", _gender));
 	insertItem(new SerializableItem_String("country", _country));
 	insertItem(new SerializableItem_ByteArray("avatar_bmp", _avatarBmp));
 }
@@ -27,6 +28,7 @@ ServerInfo_User::ServerInfo_User(const ServerInfo_User *other, bool complete)
 	insertItem(new SerializableItem_String("name", other->getName()));
 	insertItem(new SerializableItem_Int("userlevel", other->getUserLevel()));
 	insertItem(new SerializableItem_String("real_name", other->getRealName()));
+	insertItem(new SerializableItem_Int("gender", other->getGender()));
 	insertItem(new SerializableItem_String("country", other->getCountry()));
 	insertItem(new SerializableItem_ByteArray("avatar_bmp", complete ? other->getAvatarBmp() : QByteArray()));
 }
@@ -38,14 +40,16 @@ ServerInfo_UserList::ServerInfo_UserList(const QString &_itemType, const QList<S
 		itemList.append(_userList[i]);
 }
 
-ServerInfo_Game::ServerInfo_Game(int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, const QList<GameTypeId *> &_gameTypes, ServerInfo_User *_creatorInfo, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, int _spectatorCount)
+ServerInfo_Game::ServerInfo_Game(int _roomId, int _gameId, const QString &_description, bool _hasPassword, int _playerCount, int _maxPlayers, bool _started, const QList<GameTypeId *> &_gameTypes, ServerInfo_User *_creatorInfo, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, int _spectatorCount)
 	: SerializableItem_Map("game")
 {
+	insertItem(new SerializableItem_Int("room_id", _roomId));
 	insertItem(new SerializableItem_Int("game_id", _gameId));
 	insertItem(new SerializableItem_String("description", _description));
 	insertItem(new SerializableItem_Bool("has_password", _hasPassword));
 	insertItem(new SerializableItem_Int("player_count", _playerCount));
 	insertItem(new SerializableItem_Int("max_players", _maxPlayers));
+	insertItem(new SerializableItem_Bool("started", _started));
 	if (!_creatorInfo)
 		_creatorInfo = new ServerInfo_User;
 	insertItem(_creatorInfo);
@@ -115,7 +119,7 @@ ServerInfo_CardCounter::ServerInfo_CardCounter(int _id, int _value)
 	insertItem(new SerializableItem_Int("value", _value));
 }
 
-ServerInfo_Card::ServerInfo_Card(int _id, const QString &_name, int _x, int _y, bool _tapped, bool _attacking, const QString &_color, const QString &_pt, const QString &_annotation, bool _destroyOnZoneChange, const QList<ServerInfo_CardCounter *> &_counters, int _attachPlayerId, const QString &_attachZone, int _attachCardId)
+ServerInfo_Card::ServerInfo_Card(int _id, const QString &_name, int _x, int _y, bool _tapped, bool _attacking, const QString &_color, const QString &_pt, const QString &_annotation, bool _destroyOnZoneChange, bool _doesntUntap, const QList<ServerInfo_CardCounter *> &_counters, int _attachPlayerId, const QString &_attachZone, int _attachCardId)
 	: SerializableItem_Map("card")
 {
 	insertItem(new SerializableItem_Int("id", _id));
@@ -128,6 +132,7 @@ ServerInfo_Card::ServerInfo_Card(int _id, const QString &_name, int _x, int _y, 
 	insertItem(new SerializableItem_String("pt", _pt));
 	insertItem(new SerializableItem_String("annotation", _annotation));
 	insertItem(new SerializableItem_Bool("destroy_on_zone_change", _destroyOnZoneChange));
+	insertItem(new SerializableItem_Bool("doesnt_untap", _doesntUntap));
 	insertItem(new SerializableItem_Int("attach_player_id", _attachPlayerId));
 	insertItem(new SerializableItem_String("attach_zone", _attachZone));
 	insertItem(new SerializableItem_Int("attach_card_id", _attachCardId));

@@ -15,6 +15,10 @@ class QXmlStreamWriter;
 
 class SerializableItem : public QObject {
 	Q_OBJECT
+private:
+	bool compressed;
+	QByteArray compressedData;
+	QXmlStreamReader *compressedReader;
 protected:
 	typedef SerializableItem *(*NewItemFunction)();
 	static QHash<QString, NewItemFunction> itemNameHash;
@@ -23,7 +27,7 @@ protected:
 	bool firstItem;
 public:
 	SerializableItem(const QString &_itemType, const QString &_itemSubType = QString())
-		: QObject(), itemType(_itemType), itemSubType(_itemSubType), firstItem(true) { }
+		: QObject(), compressed(false), itemType(_itemType), itemSubType(_itemSubType), firstItem(true) { }
 	static void registerSerializableItem(const QString &name, NewItemFunction func);
 	static SerializableItem *getNewItem(const QString &name);
 	const QString &getItemType() const { return itemType; }
@@ -31,6 +35,8 @@ public:
 	virtual bool readElement(QXmlStreamReader *xml);
 	virtual void writeElement(QXmlStreamWriter *xml) = 0;
 	virtual bool isEmpty() const = 0;
+	void setCompressed(bool _compressed) { compressed = _compressed; }
+	bool read(QXmlStreamReader *xml);
 	void write(QXmlStreamWriter *xml);
 };
 

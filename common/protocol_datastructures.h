@@ -8,7 +8,7 @@
 
 class DeckList;
 
-enum ResponseCode { RespNothing, RespOk, RespInternalError, RespInvalidCommand, RespInvalidData, RespNameNotFound, RespLoginNeeded, RespFunctionNotAllowed, RespGameNotStarted, RespGameFull, RespContextError, RespWrongPassword, RespSpectatorsNotAllowed, RespOnlyBuddies, RespUserLevelTooLow, RespInIgnoreList, RespWouldOverwriteOldSession, RespChatFlood };
+enum ResponseCode { RespNothing, RespOk, RespNotInRoom, RespInternalError, RespInvalidCommand, RespInvalidData, RespNameNotFound, RespLoginNeeded, RespFunctionNotAllowed, RespGameNotStarted, RespGameFull, RespContextError, RespWrongPassword, RespSpectatorsNotAllowed, RespOnlyBuddies, RespUserLevelTooLow, RespInIgnoreList, RespWouldOverwriteOldSession, RespChatFlood };
 
 // PrivateZone: Contents of the zone are always visible to the owner,
 // but not to anyone else.
@@ -41,16 +41,22 @@ public:
 		IsNothing = 0x00,
 		IsUser = 0x01,
 		IsRegistered = 0x02,
-		IsJudge = 0x04,
+		IsModerator = 0x04,
 		IsAdmin = 0x08
 	};
-	ServerInfo_User(const QString &_name = QString(), int _userLevel = IsNothing, const QString &_realName = QString(), const QString &_country = QString(), const QByteArray &_avatarBmp = QByteArray());
+	enum Gender {
+		GenderUnknown = -1,
+		Male = 0,
+		Female = 1
+	};
+	ServerInfo_User(const QString &_name = QString(), int _userLevel = IsNothing, const QString &_realName = QString(), Gender _gender = GenderUnknown, const QString &_country = QString(), const QByteArray &_avatarBmp = QByteArray());
 	ServerInfo_User(const ServerInfo_User *other, bool complete = true);
 	static SerializableItem *newItem() { return new ServerInfo_User; }
 	QString getName() const { return static_cast<SerializableItem_String *>(itemMap.value("name"))->getData(); }
 	int getUserLevel() const { return static_cast<SerializableItem_Int *>(itemMap.value("userlevel"))->getData(); }
 	void setUserLevel(int _userLevel) { static_cast<SerializableItem_Int *>(itemMap.value("userlevel"))->setData(_userLevel); }
 	QString getRealName() const { return static_cast<SerializableItem_String *>(itemMap.value("real_name"))->getData(); }
+	Gender getGender() const { return static_cast<Gender>(static_cast<SerializableItem_Int *>(itemMap.value("gender"))->getData()); }
 	QString getCountry() const { return static_cast<SerializableItem_String *>(itemMap.value("country"))->getData(); }
 	QByteArray getAvatarBmp() const { return static_cast<SerializableItem_ByteArray *>(itemMap.value("avatar_bmp"))->getData(); }
 };
@@ -63,13 +69,15 @@ public:
 
 class ServerInfo_Game : public SerializableItem_Map {
 public:
-	ServerInfo_Game(int _gameId = -1, const QString &_description = QString(), bool _hasPassword = false, int _playerCount = -1, int _maxPlayers = -1, const QList<GameTypeId *> &_gameTypes = QList<GameTypeId *>(), ServerInfo_User *creatorInfo = 0, bool _onlyBuddies = false, bool _onlyRegistered = false, bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, int _spectatorCount = -1);
+	ServerInfo_Game(int _roomId = -1, int _gameId = -1, const QString &_description = QString(), bool _hasPassword = false, int _playerCount = -1, int _maxPlayers = -1, bool _started = false, const QList<GameTypeId *> &_gameTypes = QList<GameTypeId *>(), ServerInfo_User *creatorInfo = 0, bool _onlyBuddies = false, bool _onlyRegistered = false, bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, int _spectatorCount = -1);
 	static SerializableItem *newItem() { return new ServerInfo_Game; }
+	int getRoomId() const { return static_cast<SerializableItem_Int *>(itemMap.value("room_id"))->getData(); }
 	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); }
 	QString getDescription() const { return static_cast<SerializableItem_String *>(itemMap.value("description"))->getData(); }
 	bool getHasPassword() const { return static_cast<SerializableItem_Bool *>(itemMap.value("has_password"))->getData(); }
 	int getPlayerCount() const { return static_cast<SerializableItem_Int *>(itemMap.value("player_count"))->getData(); }
 	int getMaxPlayers() const { return static_cast<SerializableItem_Int *>(itemMap.value("max_players"))->getData(); }
+	bool getStarted() const { return static_cast<SerializableItem_Bool *>(itemMap.value("started"))->getData(); }
 	QList<GameTypeId *> getGameTypes() const { return typecastItemList<GameTypeId *>(); }
 	ServerInfo_User *getCreatorInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
 	bool getOnlyBuddies() const { return static_cast<SerializableItem_Bool *>(itemMap.value("only_buddies"))->getData(); }
@@ -118,7 +126,7 @@ public:
 
 class ServerInfo_Card : public SerializableItem_Map {
 public:
-	ServerInfo_Card(int _id = -1, const QString &_name = QString(), int _x = -1, int _y = -1, bool _tapped = false, bool _attacking = false, const QString &_color = QString(), const QString &_pt = QString(), const QString &_annotation = QString(), bool _destroyOnZoneChange = false, const QList<ServerInfo_CardCounter *> &_counterList = QList<ServerInfo_CardCounter *>(), int attachPlayerId = -1, const QString &_attachZone = QString(), int attachCardId = -1);
+	ServerInfo_Card(int _id = -1, const QString &_name = QString(), int _x = -1, int _y = -1, bool _tapped = false, bool _attacking = false, const QString &_color = QString(), const QString &_pt = QString(), const QString &_annotation = QString(), bool _destroyOnZoneChange = false, bool _doesntUntap = false, const QList<ServerInfo_CardCounter *> &_counterList = QList<ServerInfo_CardCounter *>(), int attachPlayerId = -1, const QString &_attachZone = QString(), int attachCardId = -1);
 	static SerializableItem *newItem() { return new ServerInfo_Card; }
 	int getId() const { return static_cast<SerializableItem_Int *>(itemMap.value("id"))->getData(); }
 	QString getName() const { return static_cast<SerializableItem_String *>(itemMap.value("name"))->getData(); }
@@ -130,6 +138,7 @@ public:
 	QString getPT() const { return static_cast<SerializableItem_String *>(itemMap.value("pt"))->getData(); }
 	QString getAnnotation() const { return static_cast<SerializableItem_String *>(itemMap.value("annotation"))->getData(); }
 	bool getDestroyOnZoneChange() const { return static_cast<SerializableItem_Bool *>(itemMap.value("destroy_on_zone_change"))->getData(); }
+	bool getDoesntUntap() const { return static_cast<SerializableItem_Bool *>(itemMap.value("doesnt_untap"))->getData(); }
 	QList<ServerInfo_CardCounter *> getCounters() const { return typecastItemList<ServerInfo_CardCounter *>(); }
 	int getAttachPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("attach_player_id"))->getData(); }
 	QString getAttachZone() const { return static_cast<SerializableItem_String *>(itemMap.value("attach_zone"))->getData(); }

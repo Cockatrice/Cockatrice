@@ -2,6 +2,7 @@
 0:login:s,username:s,password
 0:message:s,user_name:s,text
 0:list_users
+0:get_games_of_user:s,user_name
 0:get_user_info:s,user_name
 0:add_to_list:s,list:s,user_name
 0:remove_from_list:s,list:s,user_name
@@ -42,6 +43,7 @@
 2:dump_zone:i,player_id:s,zone_name:i,number_cards
 2:stop_dump_zone:i,player_id:s,zone_name
 2:reveal_cards:s,zone_name:i,card_id:i,player_id
+3:connection_state_changed:b,connected
 3:say:s,message
 3:leave
 3:game_closed
@@ -64,6 +66,7 @@
 3:stop_dump_zone:i,zone_owner_id:s,zone
 4:remove_from_list:s,list:s,user_name
 4:server_message:s,message
+4:server_shutdown:s,reason:i,minutes
 4:connection_closed:s,reason
 4:message:s,sender_name:s,receiver_name:s,text
 4:game_joined:i,game_id:s,game_description:i,player_id:b,spectator:b,spectators_can_talk:b,spectators_see_everything:b,resuming
@@ -75,5 +78,7 @@
 6:deck_select:i,deck_id
 6:undo_draw
 6:move_card
+6:mulligan:i,number
 7:update_server_message
-7:ban_from_server:s,user_name:i,minutes
+7:shutdown_server:s,reason:i,minutes
+8:ban_from_server:s,user_name:i,minutes:s,reason

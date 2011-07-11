@@ -1,11 +1,9 @@
 #include "messagelogwidget.h"
 #include "player.h"
 #include "cardzone.h"
-#include "cardinfowidget.h"
 #include "protocol_items.h"
-#include <QDebug>
-#include <QMouseEvent>
-#include <QTextBlock>
+#include "soundengine.h"
+#include <QScrollBar>
 
 QString MessageLogWidget::sanitizeHtml(QString dirty) const
 {
@@ -15,133 +13,158 @@ QString MessageLogWidget::sanitizeHtml(QString dirty) const
 		.replace(">", "&gt;");
 }
 
-void MessageLogWidget::logConnecting(QString hostname)
+bool MessageLogWidget::isFemale(Player *player) const
 {
-	append(tr("Connecting to %1...").arg(sanitizeHtml(hostname)));
-}
-
-void MessageLogWidget::logConnected()
-{
-	append(tr("Connected."));
-}
-
-void MessageLogWidget::logDisconnected()
-{
-	append(tr("Disconnected from server."));
-}
-
-void MessageLogWidget::logSocketError(const QString &errorString)
-{
-	append(sanitizeHtml(errorString));
-}
-
-void MessageLogWidget::logServerError(ResponseCode response)
-{
-	switch (response) {
-		case RespWrongPassword: append(tr("Invalid password.")); break;
-		default: ;
-	}
-}
-
-void MessageLogWidget::logProtocolVersionMismatch(int clientVersion, int serverVersion)
-{
-	append(tr("Protocol version mismatch. Client: %1, Server: %2").arg(clientVersion).arg(serverVersion));
-}
-
-void MessageLogWidget::logProtocolError()
-{
-	append(tr("Protocol error."));
+	return player->getUserInfo()->getGender() == ServerInfo_User::Female;
 }
 
 void MessageLogWidget::logGameJoined(int gameId)
 {
-	append(tr("You have joined game #%1.").arg(gameId));
+	if (female)
+		appendHtml(tr("You have joined game #%1.", "female").arg(gameId));
+	else
+		appendHtml(tr("You have joined game #%1.", "male").arg(gameId));
 }
 
 void MessageLogWidget::logJoin(Player *player)
 {
-	append(tr("%1 has joined the game.").arg(sanitizeHtml(player->getName())));
+	soundEngine->cuckoo();
+	if (isFemale(player))
+		appendHtml(tr("%1 has joined the game.", "female").arg(sanitizeHtml(player->getName())));
+	else
+		appendHtml(tr("%1 has joined the game.", "male").arg(sanitizeHtml(player->getName())));
 }
 
 void MessageLogWidget::logLeave(Player *player)
 {
-	append(tr("%1 has left the game.").arg(sanitizeHtml(player->getName())));
+	if (isFemale(player))
+		appendHtml(tr("%1 has left the game.", "female").arg(sanitizeHtml(player->getName())));
+	else
+		appendHtml(tr("%1 has left the game.", "male").arg(sanitizeHtml(player->getName())));
 }
 
 void MessageLogWidget::logGameClosed()
 {
-	append(tr("The game has been closed."));
+	appendHtml(tr("The game has been closed."));
 }
 
 void MessageLogWidget::logJoinSpectator(QString name)
 {
-	append(tr("%1 is now watching the game.").arg(sanitizeHtml(name)));
+	appendHtml(tr("%1 is now watching the game.").arg(sanitizeHtml(name)));
 }
 
 void MessageLogWidget::logLeaveSpectator(QString name)
 {
-	append(tr("%1 is not watching the game any more.").arg(sanitizeHtml(name)));
+	appendHtml(tr("%1 is not watching the game any more.").arg(sanitizeHtml(name)));
 }
 
 void MessageLogWidget::logDeckSelect(Player *player, int deckId)
 {
-	if (deckId == -1)
-		append(tr("%1 has loaded a local deck.").arg(sanitizeHtml(player->getName())));
-	else
-		append(tr("%1 has loaded deck #%2.").arg(sanitizeHtml(player->getName())).arg(deckId));
+	if (deckId == -1) {
+		if (isFemale(player))
+			appendHtml(tr("%1 has loaded a local deck.", "female").arg(sanitizeHtml(player->getName())));
+		else
+			appendHtml(tr("%1 has loaded a local deck.", "male").arg(sanitizeHtml(player->getName())));
+	} else {
+		if (isFemale(player))
+			appendHtml(tr("%1 has loaded deck #%2.", "female").arg(sanitizeHtml(player->getName())).arg(deckId));
+		else
+			appendHtml(tr("%1 has loaded deck #%2.", "male").arg(sanitizeHtml(player->getName())).arg(deckId));
+	}
 }
 
 void MessageLogWidget::logReadyStart(Player *player)
 {
-	append(tr("%1 is ready to start the game.").arg(sanitizeHtml(player->getName())));
+	if (isFemale(player))
+		appendHtml(tr("%1 is ready to start the game.", "female").arg(sanitizeHtml(player->getName())));
+	else
+		appendHtml(tr("%1 is ready to start the game.", "male").arg(sanitizeHtml(player->getName())));
 }
 
 void MessageLogWidget::logNotReadyStart(Player *player)
 {
-	append(tr("%1 is not ready to start the game any more.").arg(sanitizeHtml(player->getName())));
+	if (isFemale(player))
+		appendHtml(tr("%1 is not ready to start the game any more.", "female").arg(sanitizeHtml(player->getName())));
+	else
+		appendHtml(tr("%1 is not ready to start the game any more.", "male").arg(sanitizeHtml(player->getName())));
 }
 
 void MessageLogWidget::logConcede(Player *player)
 {
-	append(tr("%1 has conceded the game.").arg(sanitizeHtml(player->getName())));
+	if (isFemale(player))
+		appendHtml(tr("%1 has conceded the game.", "female").arg(sanitizeHtml(player->getName())));
+	else
+		appendHtml(tr("%1 has conceded the game.", "male").arg(sanitizeHtml(player->getName())));
 }
 
 void MessageLogWidget::logGameStart()
 {
-	append(tr("The game has started."));
+	appendHtml(tr("The game has started."));
+}
+
+void MessageLogWidget::logConnectionStateChanged(Player *player, bool connectionState)
+{
+	if (connectionState) {
+		if (isFemale(player))
+			appendHtml(tr("%1 has restored connection to the game.", "female").arg(sanitizeHtml(player->getName())));
+		else
+			appendHtml(tr("%1 has restored connection to the game.", "male").arg(sanitizeHtml(player->getName())));
+	} else {
+		if (isFemale(player))
+			appendHtml(tr("%1 has lost connection to the game.", "female").arg(sanitizeHtml(player->getName())));
+		else
+			appendHtml(tr("%1 has lost connection to the game.", "male").arg(sanitizeHtml(player->getName())));
+	}
 }
 
 void MessageLogWidget::logSay(Player *player, QString message)
 {
-	append(QString("<b><font color=\"") + (player->getLocal() ? "red" : "#0000fe") + QString("\">%1:</font></b> %2").arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(message)));
+	appendMessage(player->getName(), message, QColor(), true);
 }
 
 void MessageLogWidget::logSpectatorSay(QString spectatorName, QString message)
 {
-	append(QString("<font color=\"red\">%1:</font> %2").arg(sanitizeHtml(spectatorName)).arg(sanitizeHtml(message)));
+	appendMessage(spectatorName, message, QColor(), false);
 }
 
-void MessageLogWidget::logShuffle(Player *player)
+void MessageLogWidget::logShuffle(Player *player, CardZone *zone)
 {
-	append(tr("%1 shuffles his library.").arg(sanitizeHtml(player->getName())));
+	soundEngine->shuffle();
+	if (currentContext != MessageContext_Mulligan) {
+		if (isFemale(player))
+			appendHtml(tr("%1 shuffles %2.", "female").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)));
+		else
+			appendHtml(tr("%1 shuffles %2.", "male").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)));
+	}
 }
 
 void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
 {
-	append(tr("%1 rolls a %2 with a %3-sided die.").arg(sanitizeHtml(player->getName())).arg(roll).arg(sides));
+	if (isFemale(player))
+		appendHtml(tr("%1 rolls a %2 with a %3-sided die.", "female").arg(sanitizeHtml(player->getName())).arg(roll).arg(sides));
+	else
+		appendHtml(tr("%1 rolls a %2 with a %3-sided die.", "male").arg(sanitizeHtml(player->getName())).arg(roll).arg(sides));
 }
 
 void MessageLogWidget::logDrawCards(Player *player, int number)
 {
-	append(tr("%1 draws %n card(s).", "", number).arg(sanitizeHtml(player->getName())));
+	if (currentContext == MessageContext_Mulligan)
+		mulliganPlayer = player;
+	else {
+		soundEngine->draw();
+		if (isFemale(player))
+			appendHtml(tr("%1 draws %n card(s).", "female", number).arg(sanitizeHtml(player->getName())));
+		else
+			appendHtml(tr("%1 draws %n card(s).", "male", number).arg(sanitizeHtml(player->getName())));
+	}
 }
 
 void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
 {
 	if (cardName.isEmpty())
-		append(tr("%1 undoes his last draw.").arg(sanitizeHtml(player->getName())));
+		appendHtml((isFemale(player) ? tr("%1 undoes her last draw.") : tr("%1 undoes his last draw.")).arg(sanitizeHtml(player->getName())));
 	else
-		append(tr("%1 undoes his last draw (%2).").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+		appendHtml((isFemale(player) ? tr("%1 undoes her last draw (%2).") : tr("%1 undoes his last draw (%2).")).arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
 }
 
 QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position) const
@@ -161,16 +184,16 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
 	else if (startName == "deck") {
 		if (position == zone->getCards().size() - 1) {
 			if (cardName.isEmpty()) {
-				cardName = tr("the bottom card of his library");
+				cardName = isFemale(zone->getPlayer()) ? tr("the bottom card of her library") : tr("the bottom card of his library");
 				cardNameContainsStartZone = true;
 			} else
-				fromStr = tr(" from the bottom of his library");
+				fromStr = isFemale(zone->getPlayer()) ? tr(" from the bottom of her library") : tr(" from the bottom of his library");
 		} else if (position == 0) {
 			if (cardName.isEmpty()) {
-				cardName = tr("the top card of his library");
+				cardName = isFemale(zone->getPlayer()) ? tr("the top card of her library") : tr("the top card of his library");
 				cardNameContainsStartZone = true;
 			} else
-				fromStr = tr(" from the top of his library");
+				fromStr = isFemale(zone->getPlayer()) ? tr(" from the top of her library") : tr(" from the top of his library");
 		} else
 			fromStr = tr(" from library");
 	} else if (startName == "sb")
@@ -206,12 +229,13 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
 		cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName));
 
 	if (attributes.startZone->getPlayer() != attributes.targetZone->getPlayer()) {
-		append(tr("%1 gives %2 control over %3.").arg(sanitizeHtml(attributes.player->getName())).arg(sanitizeHtml(attributes.targetZone->getPlayer()->getName())).arg(cardStr));
+		appendHtml(tr("%1 gives %2 control over %3.").arg(sanitizeHtml(attributes.player->getName())).arg(sanitizeHtml(attributes.targetZone->getPlayer()->getName())).arg(cardStr));
 		return;
 	}
 	
 	QString finalStr;
 	if (targetName == "table") {
+		soundEngine->playCard();
 		if (moveCardTapped.value(attributes.card))
 			finalStr = tr("%1 puts %2 into play tapped%3.");
 		else
@@ -224,19 +248,21 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
 		finalStr = tr("%1 moves %2%3 to hand.");
 	else if (targetName == "deck") {
 		if (attributes.newX == -1)
-			finalStr = tr("%1 puts %2%3 into his library.");
+			finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 puts %2%3 into her library.") : tr("%1 puts %2%3 into his library.");
 		else if (attributes.newX == attributes.targetZone->getCards().size() - 1)
-			finalStr = tr("%1 puts %2%3 on bottom of his library.");
+			finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 puts %2%3 on bottom of her library.") : tr("%1 puts %2%3 on bottom of his library.");
 		else if (attributes.newX == 0)
-			finalStr = tr("%1 puts %2%3 on top of his library.");
+			finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 puts %2%3 on top of her library.") : tr("%1 puts %2%3 on top of his library.");
 		else
-			finalStr = tr("%1 puts %2%3 into his library at position %4.");
+			finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 puts %2%3 into her library at position %4.") : tr("%1 puts %2%3 into his library at position %4.");
 	} else if (targetName == "sb")
 		finalStr = tr("%1 moves %2%3 to sideboard.");
-	else if (targetName == "stack")
+	else if (targetName == "stack") {
+		soundEngine->playCard();
 		finalStr = tr("%1 plays %2%3.");
+	}
 	
-	append(finalStr.arg(sanitizeHtml(attributes.player->getName())).arg(cardStr).arg(fromStr).arg(attributes.newX));
+	appendHtml(finalStr.arg(sanitizeHtml(attributes.player->getName())).arg(cardStr).arg(fromStr).arg(attributes.newX));
 }
 
 void MessageLogWidget::logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX)
@@ -244,55 +270,211 @@ void MessageLogWidget::logMoveCard(Player *player, CardItem *card, CardZone *sta
 	LogMoveCard attributes = {player, card, card->getName(), startZone, oldX, targetZone, newX};
 	if (currentContext == MessageContext_MoveCard)
 		moveCardQueue.append(attributes);
+	else if (currentContext == MessageContext_Mulligan)
+		mulliganPlayer = player;
 	else
 		doMoveCard(attributes);
 }
 
+void MessageLogWidget::logMulligan(Player *player, int number)
+{
+	if (!player)
+		return;
+
+	if (number > -1) {
+		if (isFemale(player))
+			appendHtml(tr("%1 takes a mulligan to %n.", "female", number).arg(sanitizeHtml(player->getName())));
+		else
+			appendHtml(tr("%1 takes a mulligan to %n.", "male", number).arg(sanitizeHtml(player->getName())));
+	} else
+		appendHtml((isFemale(player) ? tr("%1 draws her initial hand.") : tr("%1 draws his initial hand.")).arg(sanitizeHtml(player->getName())));
+}
+
 void MessageLogWidget::logFlipCard(Player *player, QString cardName, bool faceDown)
 {
-	if (faceDown)
-		append(tr("%1 flips %2 face-down.").arg(sanitizeHtml(player->getName())).arg(cardName));
-	else
-		append(tr("%1 flips %2 face-up.").arg(sanitizeHtml(player->getName())).arg(cardName));
+	if (faceDown) {
+		if (isFemale(player))
+			appendHtml(tr("%1 flips %2 face-down.", "female").arg(sanitizeHtml(player->getName())).arg(cardName));
+		else
+			appendHtml(tr("%1 flips %2 face-down.", "male").arg(sanitizeHtml(player->getName())).arg(cardName));
+	} else {
+		if (isFemale(player))
+			appendHtml(tr("%1 flips %2 face-up.", "female").arg(sanitizeHtml(player->getName())).arg(cardName));
+		else
+			appendHtml(tr("%1 flips %2 face-up.", "male").arg(sanitizeHtml(player->getName())).arg(cardName));
+	}
 }
 
 void MessageLogWidget::logDestroyCard(Player *player, QString cardName)
 {
-	append(tr("%1 destroys %2.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+	if (isFemale(player))
+		appendHtml(tr("%1 destroys %2.", "female").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+	else
+		appendHtml(tr("%1 destroys %2.", "male").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
 }
 
 void MessageLogWidget::logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName)
 {
-	append(tr("%1 attaches %2 to %3's %4.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(sanitizeHtml(targetPlayer->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(targetCardName))));
+	QString str;
+	if (isFemale(player)) {
+		if (isFemale(targetPlayer))
+			str = tr("%1 attaches %2 to %3's %4.", "p1 female, p2 female");
+		else
+			str = tr("%1 attaches %2 to %3's %4.", "p1 female, p2 male");
+	} else {
+		if (isFemale(targetPlayer))
+			str = tr("%1 attaches %2 to %3's %4.", "p1 male, p2 female");
+		else
+			str = tr("%1 attaches %2 to %3's %4.", "p1 male, p2 male");
+	}
+	
+	appendHtml(str.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(sanitizeHtml(targetPlayer->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(targetCardName))));
 }
 
 void MessageLogWidget::logUnattachCard(Player *player, QString cardName)
 {
-	append(tr("%1 unattaches %2.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+	if (isFemale(player))
+		appendHtml(tr("%1 unattaches %2.", "female").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+	else
+		appendHtml(tr("%1 unattaches %2.", "male").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
 }
 
 void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt)
 {
-	append(tr("%1 creates token: %2%3.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\"><a name=\"foo\">%1</a></font>").arg(sanitizeHtml(cardName))).arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+	if (isFemale(player))
+		appendHtml(tr("%1 creates token: %2%3.", "female").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+	else
+		appendHtml(tr("%1 creates token: %2%3.", "male").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
 }
 
 void MessageLogWidget::logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard, bool playerTarget)
 {
-	if (playerTarget)
-		append(tr("%1 points from %2's %3 to %4.")
-			.arg(sanitizeHtml(player->getName()))
-			.arg(sanitizeHtml(startPlayer->getName()))
-			.arg(sanitizeHtml(startCard))
-			.arg(sanitizeHtml(targetPlayer->getName()))
-		);
-	else
-		append(tr("%1 points from %2's %3 to %4's %5.")
-			.arg(sanitizeHtml(player->getName()))
-			.arg(sanitizeHtml(startPlayer->getName()))
-			.arg(sanitizeHtml(startCard))
-			.arg(sanitizeHtml(targetPlayer->getName()))
-			.arg(sanitizeHtml(targetCard))
-		);
+	startCard = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(startCard));
+	targetCard = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(targetCard));
+	QString str;
+	if (playerTarget) {
+		if ((player == startPlayer) && (player == targetPlayer)) {
+			if (isFemale(player))
+				str = tr("%1 points from her %2 to herself.", "female");
+			else
+				str = tr("%1 points from his %2 to himself.", "male");
+			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(startCard));
+		} else if (player == startPlayer) {
+			if (isFemale(player)) {
+				if (isFemale(targetPlayer))
+					str = tr("%1 points from her %2 to %3.", "p1 female, p2 female");
+				else
+					str = tr("%1 points from her %2 to %3.", "p1 female, p2 male");
+			} else {
+				if (isFemale(targetPlayer))
+					str = tr("%1 points from his %2 to %3.", "p1 male, p2 female");
+				else
+					str = tr("%1 points from his %2 to %3.", "p1 male, p2 male");
+			}
+			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(startCard).arg(sanitizeHtml(targetPlayer->getName())));
+		} else if (player == targetPlayer) {
+			if (isFemale(player)) {
+				if (isFemale(startPlayer))
+					str = tr("%1 points from %2's %3 to herself.", "card owner female, target female");
+				else
+					str = tr("%1 points from %2's %3 to herself.", "card owner male, target female");
+			} else {
+				if (isFemale(startPlayer))
+					str = tr("%1 points from %2's %3 to himself.", "card owner female, target male");
+				else
+					str = tr("%1 points from %2's %3 to himself.", "card owner male, target male");
+			}
+			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(startPlayer->getName())).arg(startCard));
+		} else {
+			if (isFemale(player)) {
+				if (isFemale(startPlayer)) {
+					if (isFemale(targetPlayer))
+						str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 female, p3 female");
+					else
+						str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 female, p3 male");
+				} else {
+					if (isFemale(targetPlayer))
+						str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 male, p3 female");
+					else
+						str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 male, p3 male");
+				}
+			} else {
+				if (isFemale(startPlayer)) {
+					if (isFemale(targetPlayer))
+						str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 female, p3 female");
+					else
+						str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 female, p3 male");
+				} else {
+					if (isFemale(targetPlayer))
+						str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 male, p3 female");
+					else
+						str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 male, p3 male");
+				}
+			}
+			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(startPlayer->getName())).arg(startCard).arg(sanitizeHtml(targetPlayer->getName())));
+		}
+	} else {
+		if ((player == startPlayer) && (player == targetPlayer)) {
+			if (isFemale(player))
+				str = tr("%1 points from her %2 to her %3.", "female");
+			else
+				str = tr("%1 points from his %2 to his %3.", "male");
+			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(startCard).arg(targetCard));
+		} else if (player == startPlayer) {
+			if (isFemale(player)) {
+				if (isFemale(targetPlayer))
+					str = tr("%1 points from her %2 to %3's %4.", "p1 female, p2 female");
+				else
+					str = tr("%1 points from her %2 to %3's %4.", "p1 female, p2 male");
+			} else {
+				if (isFemale(targetPlayer))
+					str = tr("%1 points from his %2 to %3's %4.", "p1 male, p2 female");
+				else
+					str = tr("%1 points from his %2 to %3's %4.", "p1 male, p2 male");
+			}
+			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(startCard).arg(sanitizeHtml(targetPlayer->getName())).arg(targetCard));
+		} else if (player == targetPlayer) {
+			if (isFemale(player)) {
+				if (isFemale(startPlayer))
+					str = tr("%1 points from %2's %3 to her own %4.", "card owner female, target female");
+				else
+					str = tr("%1 points from %2's %3 to her own %4.", "card owner male, target female");
+			} else {
+				if (isFemale(startPlayer))
+					str = tr("%1 points from %2's %3 to his own %4.", "card owner female, target male");
+				else
+					str = tr("%1 points from %2's %3 to his own %4.", "card owner male, target male");
+			}
+			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(startPlayer->getName())).arg(startCard).arg(targetCard));
+		} else {
+			if (isFemale(player)) {
+				if (isFemale(startPlayer)) {
+					if (isFemale(targetPlayer))
+						str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 female, p3 female");
+					else
+						str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 female, p3 male");
+				} else {
+					if (isFemale(targetPlayer))
+						str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 male, p3 female");
+					else
+						str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 male, p3 male");
+				}
+			} else {
+				if (isFemale(startPlayer)) {
+					if (isFemale(targetPlayer))
+						str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 female, p3 female");
+					else
+						str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 female, p3 male");
+				} else {
+					if (isFemale(targetPlayer))
+						str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 male, p3 female");
+					else
+						str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 male, p3 male");
+				}
+			}
+			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(startPlayer->getName())).arg(startCard).arg(sanitizeHtml(targetPlayer->getName())).arg(targetCard));
+		}
+	}
 }
 
 void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int counterId, int value, int oldValue)
@@ -300,10 +482,17 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
 	QString finalStr, colorStr;
 	
 	int delta = abs(oldValue - value);
-	if (value > oldValue)
-		finalStr = tr("%1 places %n %2 counter(s) on %3 (now %4).", "", delta);
-	else
-		finalStr = tr("%1 removes %n %2 counter(s) from %3 (now %4).", "", delta);
+	if (value > oldValue) {
+		if (isFemale(player))
+			finalStr = tr("%1 places %n %2 counter(s) on %3 (now %4).", "female", delta);
+		else
+			finalStr = tr("%1 places %n %2 counter(s) on %3 (now %4).", "male", delta);
+	} else {
+		if (isFemale(player))
+			finalStr = tr("%1 removes %n %2 counter(s) from %3 (now %4).", "female", delta);
+		else
+			finalStr = tr("%1 removes %n %2 counter(s) from %3 (now %4).", "male", delta);
+	}
 	
 	switch (counterId) {
 		case 0: colorStr = tr("red", "", delta); break;
@@ -312,63 +501,124 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
 		default: ;
 	}
 	
-	append(finalStr.arg(sanitizeHtml(player->getName())).arg(colorStr).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(value));
+	appendHtml(finalStr.arg(sanitizeHtml(player->getName())).arg(colorStr).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(value));
 }
 
 void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
 {
+	if (tapped)
+		soundEngine->tap();
+	else
+		soundEngine->untap();
+	
 	if (currentContext == MessageContext_MoveCard)
 		moveCardTapped.insert(card, tapped);
 	else {
-		QString cardStr;
-		if (!card)
-			cardStr = tr("his permanents");
-		else
-			cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()));
-		append(tr("%1 %2 %3.").arg(sanitizeHtml(player->getName())).arg(tapped ? tr("taps") : tr("untaps")).arg(cardStr));
+		QString str;
+		if (!card) {
+			if (isFemale(player)) {
+				if (tapped)
+					str = tr("%1 taps her permanents.", "female");
+				else
+					str = tr("%1 untaps her permanents.", "female");
+			} else {
+				if (tapped)
+					str = tr("%1 taps his permanents.", "male");
+				else
+					str = tr("%1 untaps his permanents.", "male");
+			}
+			appendHtml(str.arg(sanitizeHtml(player->getName())));
+		} else {
+			if (isFemale(player)) {
+				if (tapped)
+					str = tr("%1 taps %2.", "female");
+				else
+					str = tr("%1 untaps %2.", "female");
+			} else {
+				if (tapped)
+					str = tr("%1 taps %2.", "male");
+				else
+					str = tr("%1 untaps %2.", "male");
+			}
+			QString cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()));
+			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardStr));
+		}
 	}
 }
 
 void MessageLogWidget::logSetCounter(Player *player, QString counterName, int value, int oldValue)
 {
-	append(tr("%1 sets counter %2 to %3 (%4%5).").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(counterName))).arg(QString("<font color=\"blue\">%1</font>").arg(value)).arg(value > oldValue ? "+" : "").arg(value - oldValue));
+	QString str;
+	if (isFemale(player))
+		str = tr("%1 sets counter %2 to %3 (%4%5).", "female");
+	else
+		str = tr("%1 sets counter %2 to %3 (%4%5).", "male");
+	appendHtml(str.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(counterName))).arg(QString("<font color=\"blue\">%1</font>").arg(value)).arg(value > oldValue ? "+" : "").arg(value - oldValue));
 }
 
 void MessageLogWidget::logSetDoesntUntap(Player *player, CardItem *card, bool doesntUntap)
 {
-	QString finalStr;
-	if (doesntUntap)
-		finalStr = tr("%1 sets %2 to not untap normally.");
-	else
-		finalStr = tr("%1 sets %2 to untap normally.");
-	append(finalStr.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()))));
+	QString str;
+	if (doesntUntap) {
+		if (isFemale(player))
+			str = tr("%1 sets %2 to not untap normally.", "female");
+		else
+			str = tr("%1 sets %2 to not untap normally.", "male");
+	} else {
+		if (isFemale(player))
+			str = tr("%1 sets %2 to untap normally.", "female");
+		else
+			str = tr("%1 sets %2 to untap normally.", "male");
+	}
+	appendHtml(str.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()))));
 }
 
 void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
 {
 	if (currentContext == MessageContext_MoveCard)
 		moveCardPT.insert(card, newPT);
-	else
-		append(tr("%1 sets PT of %2 to %3.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()))).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newPT))));
+	else {
+		QString str;
+		if (isFemale(player))
+			str = tr("%1 sets PT of %2 to %3.", "female");
+		else
+			str = tr("%1 sets PT of %2 to %3.", "male");
+		appendHtml(str.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()))).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newPT))));
+	}
 }
 
 void MessageLogWidget::logSetAnnotation(Player *player, CardItem *card, QString newAnnotation)
 {
-	append(tr("%1 sets annotation of %2 to %3.").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()))).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newAnnotation))));
+	QString str;
+	if (isFemale(player))
+		str = tr("%1 sets annotation of %2 to %3.", "female");
+	else
+		str = tr("%1 sets annotation of %2 to %3.", "male");
+	appendHtml(str.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()))).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newAnnotation))));
 }
 
 void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCards)
 {
-	if (numberCards != -1)
-		append(tr("%1 is looking at the top %2 cards %3.").arg(sanitizeHtml(player->getName())).arg(numberCards).arg(zone->getTranslatedName(zone->getPlayer() == player, CaseGenitive)));
-	else
-		append(tr("%1 is looking at %2.").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(zone->getPlayer() == player, CaseAccusative)));
+	if (numberCards != -1) {
+		if (isFemale(player))
+			appendHtml(tr("%1 is looking at the top %2 cards %3.", "female").arg(sanitizeHtml(player->getName())).arg(numberCards).arg(zone->getTranslatedName(zone->getPlayer() == player, CaseGenitive)));
+		else
+			appendHtml(tr("%1 is looking at the top %2 cards %3.", "male").arg(sanitizeHtml(player->getName())).arg(numberCards).arg(zone->getTranslatedName(zone->getPlayer() == player, CaseGenitive)));
+	} else {
+		if (isFemale(player))
+			appendHtml(tr("%1 is looking at %2.", "female").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(zone->getPlayer() == player, CaseAccusative)));
+		else
+			appendHtml(tr("%1 is looking at %2.", "male").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(zone->getPlayer() == player, CaseAccusative)));
+	}
 }
 
 void MessageLogWidget::logStopDumpZone(Player *player, CardZone *zone)
 {
 	QString zoneName = zone->getTranslatedName(zone->getPlayer() == player, CaseAccusative);
-	append(tr("%1 stops looking at %2.").arg(sanitizeHtml(player->getName())).arg(zoneName));
+	if (isFemale(player))
+		appendHtml(tr("%1 stops looking at %2.", "female").arg(sanitizeHtml(player->getName())).arg(zoneName));
+	else
+		appendHtml(tr("%1 stops looking at %2.", "male").arg(sanitizeHtml(player->getName())).arg(zoneName));
 }
 
 void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer)
@@ -389,33 +639,85 @@ void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId
 	else
 		cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName));
 
+	QString str;
 	if (cardId == -1) {
-		if (otherPlayer)
-			append(tr("%1 reveals %2 to %3.").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)).arg(sanitizeHtml(otherPlayer->getName())));
-		else
-			append(tr("%1 reveals %2.").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)));
+		if (otherPlayer) {
+			if (isFemale(player)) {
+				if (isFemale(otherPlayer))
+					str = tr("%1 reveals %2 to %3.", "p1 female, p2 female");
+				else
+					str = tr("%1 reveals %2 to %3.", "p1 female, p2 male");
+			} else {
+				if (isFemale(otherPlayer))
+					str = tr("%1 reveals %2 to %3.", "p1 male, p2 female");
+				else
+					str = tr("%1 reveals %2 to %3.", "p1 male, p2 male");
+			}
+			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)).arg(sanitizeHtml(otherPlayer->getName())));
+		} else {
+			if (isFemale(player))
+				appendHtml(tr("%1 reveals %2.", "female").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)));
+			else
+				appendHtml(tr("%1 reveals %2.", "male").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)));
+		}
 	} else if (cardId == -2) {
-		if (otherPlayer)
-			append(tr("%1 randomly reveals %2%3 to %4.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr).arg(sanitizeHtml(otherPlayer->getName())));
-		else
-			append(tr("%1 randomly reveals %2%3.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+		if (otherPlayer) {
+			if (isFemale(player)) {
+				if (isFemale(otherPlayer))
+					str = tr("%1 randomly reveals %2%3 to %4.", "p1 female, p2 female");
+				else
+					str = tr("%1 randomly reveals %2%3 to %4.", "p1 female, p2 male");
+			} else {
+				if (isFemale(otherPlayer))
+					str = tr("%1 randomly reveals %2%3 to %4.", "p1 male, p2 female");
+				else
+					str = tr("%1 randomly reveals %2%3 to %4.", "p1 male, p2 male");
+			}
+			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr).arg(sanitizeHtml(otherPlayer->getName())));
+		} else {
+			if (isFemale(player))
+				appendHtml(tr("%1 randomly reveals %2%3.", "female").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)));
+			else
+				appendHtml(tr("%1 randomly reveals %2%3.", "male").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+		}
 	} else {
-		if (otherPlayer)
-			append(tr("%1 reveals %2%3 to %4.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr).arg(sanitizeHtml(otherPlayer->getName())));
-		else
-			append(tr("%1 reveals %2%3.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+		if (otherPlayer) {
+			if (isFemale(player)) {
+				if (isFemale(otherPlayer))
+					str = tr("%1 reveals %2%3 to %4.", "p1 female, p2 female");
+				else
+					str = tr("%1 reveals %2%3 to %4.", "p1 female, p2 male");
+			} else {
+				if (isFemale(otherPlayer))
+					str = tr("%1 reveals %2%3 to %4.", "p1 male, p2 female");
+				else
+					str = tr("%1 reveals %2%3 to %4.", "p1 male, p2 male");
+			}
+			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr).arg(sanitizeHtml(otherPlayer->getName())));
+		} else {
+			if (isFemale(player))
+				appendHtml(tr("%1 reveals %2%3.", "female").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)));
+			else
+				appendHtml(tr("%1 reveals %2%3.", "male").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+		}
 	}
 }
 
 void MessageLogWidget::logSetActivePlayer(Player *player)
 {
-	append(QString());
-	append("<font color=\"green\"><b>" + tr("It is now %1's turn.").arg(player->getName()) + "</b></font>");
-	append(QString());
+	soundEngine->notification();
+	
+	QString str;
+	if (isFemale(player))
+		str = tr("It is now %1's turn.", "female");
+	else
+		str = tr("It is now %1's turn.", "male");
+	appendHtml("<br><font color=\"green\"><b>" + str.arg(player->getName()) + "</b></font><br>");
 }
 
 void MessageLogWidget::logSetActivePhase(int phase)
 {
+	soundEngine->notification();
 	QString phaseName;
 	switch (phase) {
 		case 0: phaseName = tr("untap step"); break;
@@ -430,13 +732,18 @@ void MessageLogWidget::logSetActivePhase(int phase)
 		case 9: phaseName = tr("second main phase"); break;
 		case 10: phaseName = tr("ending phase"); break;
 	}
-	append("<font color=\"green\"><b>" + tr("It is now the %1.").arg(phaseName) + "</b></font>");
+	appendHtml("<font color=\"green\"><b>" + tr("It is now the %1.").arg(phaseName) + "</b></font>");
 }
 
 void MessageLogWidget::containerProcessingStarted(GameEventContext *_context)
 {
 	if (qobject_cast<Context_MoveCard *>(_context))
 		currentContext = MessageContext_MoveCard;
+	else if (qobject_cast<Context_Mulligan *>(_context)) {
+		currentContext = MessageContext_Mulligan;
+		mulliganPlayer = 0;
+		mulliganNumber = static_cast<Context_Mulligan *>(_context)->getNumber();
+	}
 }
 
 void MessageLogWidget::containerProcessingDone()
@@ -447,6 +754,10 @@ void MessageLogWidget::containerProcessingDone()
 		moveCardQueue.clear();
 		moveCardPT.clear();
 		moveCardTapped.clear();
+	} else if (currentContext == MessageContext_Mulligan) {
+		logMulligan(mulliganPlayer, mulliganNumber);
+		mulliganPlayer = 0;
+		mulliganNumber = 0;
 	}
 	
 	currentContext = MessageContext_None;
@@ -454,8 +765,9 @@ void MessageLogWidget::containerProcessingDone()
 
 void MessageLogWidget::connectToPlayer(Player *player)
 {
+	connect(player, SIGNAL(logConnectionStateChanged(Player *, bool)), this, SLOT(logConnectionStateChanged(Player *, bool)));
 	connect(player, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));
-	connect(player, SIGNAL(logShuffle(Player *)), this, SLOT(logShuffle(Player *)));
+	connect(player, SIGNAL(logShuffle(Player *, CardZone *)), this, SLOT(logShuffle(Player *, CardZone *)));
 	connect(player, SIGNAL(logRollDie(Player *, int, int)), this, SLOT(logRollDie(Player *, int, int)));
 	connect(player, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)), this, SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)));
 	connect(player, SIGNAL(logCreateToken(Player *, QString, QString)), this, SLOT(logCreateToken(Player *, QString, QString)));
@@ -477,66 +789,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
 	connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *)), this, SLOT(logRevealCards(Player *, CardZone *, int, QString, Player *)));
 }
 
-MessageLogWidget::MessageLogWidget(QWidget *parent)
-	: QTextEdit(parent)
+MessageLogWidget::MessageLogWidget(const QString &_ownName, bool _female, QWidget *parent)
+	: ChatView(_ownName, false, parent), female(_female)
 {
-	setReadOnly(true);
-}
-
-void MessageLogWidget::enterEvent(QEvent * /*event*/)
-{
-	setMouseTracking(true);
-}
-
-void MessageLogWidget::leaveEvent(QEvent * /*event*/)
-{
-	setMouseTracking(false);
-}
-
-QString MessageLogWidget::getCardNameUnderMouse(const QPoint &pos) const
-{
-	QTextCursor cursor(cursorForPosition(pos));
-	QTextBlock block(cursor.block());
-	QTextBlock::iterator it;
-	for (it = block.begin(); !(it.atEnd()); ++it) {
-		QTextFragment frag = it.fragment();
-		if (!frag.contains(cursor.position()))
-			continue;
-		
-		if (frag.charFormat().foreground().color() == Qt::blue)
-			return frag.text();
-		
-		break;
-	}
-	return QString();
-}
-
-void MessageLogWidget::mouseMoveEvent(QMouseEvent *event)
-{
-	QString cardName = getCardNameUnderMouse(event->pos());
-	if (!cardName.isEmpty()) {
-		viewport()->setCursor(Qt::PointingHandCursor);
-		emit cardNameHovered(cardName);
-	} else
-		viewport()->setCursor(Qt::IBeamCursor);
-
-	QTextEdit::mouseMoveEvent(event);
-}
-
-void MessageLogWidget::mousePressEvent(QMouseEvent *event)
-{
-	if (event->button() == Qt::MidButton) {
-		QString cardName = getCardNameUnderMouse(event->pos());
-		if (!cardName.isEmpty())
-			emit showCardInfoPopup(event->globalPos(), cardName);
-	}
-		
-	QTextEdit::mousePressEvent(event);
-}
-
-void MessageLogWidget::mouseReleaseEvent(QMouseEvent *event)
-{
-	emit deleteCardInfoPopup();
-	
-	QTextEdit::mouseReleaseEvent(event);
 }

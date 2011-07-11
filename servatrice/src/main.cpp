@@ -21,6 +21,8 @@
 #include <QCoreApplication>
 #include <QTextCodec>
 #include <iostream>
+#include <QMetaType>
+#include <QSettings>
 #include "servatrice.h"
 #include "server_logger.h"
 #include "rng_sfmt.h"
@@ -30,6 +32,7 @@
 
 RNG_Abstract *rng;
 ServerLogger *logger;
+ServerLoggerThread *loggerThread;
 
 void testRNG()
 {
@@ -65,14 +68,44 @@ void testRNG()
 	std::cerr << std::endl << std::endl;
 }
 
+void myMessageOutput(QtMsgType /*type*/, const char *msg)
+{
+	logger->logMessage(msg);
+}
+
+#ifdef Q_OS_UNIX
+void sigSegvHandler(int sig)
+{
+	if (sig == SIGSEGV)
+		logger->logMessage("CRASH: SIGSEGV");
+	else if (sig == SIGABRT)
+		logger->logMessage("CRASH: SIGABRT");
+	delete loggerThread;
+	raise(sig);
+}
+#endif
+
 int main(int argc, char *argv[])
 {
 	QCoreApplication app(argc, argv);
 	app.setOrganizationName("Cockatrice");
 	app.setApplicationName("Servatrice");
 	
+	QStringList args = app.arguments();
+	bool testRandom = args.contains("--test-random");
+	
+	qRegisterMetaType<QList<int> >("QList<int>");
+	
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-	logger = new ServerLogger;
+	
+	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
+	
+	loggerThread = new ServerLoggerThread(settings->value("server/logfile").toString());
+	loggerThread->start();
+	loggerThread->waitForInit();
+	logger = loggerThread->getLogger();
+	
+	qInstallMsgHandler(myMessageOutput);
 #ifdef Q_OS_UNIX	
 	struct sigaction hup;
 	hup.sa_handler = ServerLogger::hupSignalHandler;
@@ -80,22 +113,36 @@ int main(int argc, char *argv[])
 	hup.sa_flags = 0;
 	hup.sa_flags |= SA_RESTART;
 	sigaction(SIGHUP, &hup, 0);
+	
+	struct sigaction segv;
+	segv.sa_handler = sigSegvHandler;
+	segv.sa_flags = SA_RESETHAND;
+	sigemptyset(&segv.sa_mask);
+	sigaction(SIGSEGV, &segv, 0);
+	sigaction(SIGABRT, &segv, 0);
 #endif
 	rng = new RNG_SFMT;
 	
 	std::cerr << "Servatrice " << Servatrice::versionString.toStdString() << " starting." << std::endl;
 	std::cerr << "-------------------------" << std::endl;
-
-	testRNG();
 	
-	Servatrice server;
+	if (testRandom)
+		testRNG();
+	
+	Servatrice *server = new Servatrice(settings);
+	QObject::connect(server, SIGNAL(destroyed()), &app, SLOT(quit()), Qt::QueuedConnection);
 	
 	std::cerr << "-------------------------" << std::endl;
 	std::cerr << "Server initialized." << std::endl;
 	
 	int retval = app.exec();
 
+	std::cerr << "Server quit." << std::endl;
+	std::cerr << "-------------------------" << std::endl;
+	
 	delete rng;
+	delete settings;
+	delete loggerThread;
 
 	return retval;
 }

@@ -26,6 +26,7 @@
 #include "dlg_load_deck_from_clipboard.h"
 #include "main.h"
 #include "settingscache.h"
+#include "priceupdater.h"
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
@@ -68,6 +69,7 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	databaseView = new QTreeView();
 	databaseView->setModel(databaseDisplayModel);
 	databaseView->setUniformRowHeights(true);
+	databaseView->setRootIsDecorated(false);
 	databaseView->setAlternatingRowColors(true);
 	databaseView->setSortingEnabled(true);
 	databaseView->sortByColumn(0, Qt::AscendingOrder);
@@ -112,15 +114,37 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	commentsEdit->setMaximumHeight(70);
 	commentsLabel->setBuddy(commentsEdit);
 	connect(commentsEdit, SIGNAL(textChanged()), this, SLOT(updateComments()));
+
 	QGridLayout *grid = new QGridLayout;
 	grid->addWidget(nameLabel, 0, 0);
 	grid->addWidget(nameEdit, 0, 1);
+
 	grid->addWidget(commentsLabel, 1, 0);
 	grid->addWidget(commentsEdit, 1, 1);
+
+        // Update price
+        aUpdatePrices = new QAction(tr("&Update prices"), this);
+        aUpdatePrices->setShortcut(tr("Ctrl+U"));
+        aUpdatePrices->setIcon(QIcon(":/resources/icon_update.png"));
+        connect(aUpdatePrices, SIGNAL(triggered()), this, SLOT(actUpdatePrices()));
+	if (!settingsCache->getPriceTagFeature())
+		aUpdatePrices->setVisible(false);
+	
+        QToolBar *deckToolBar = new QToolBar;
+        deckToolBar->setOrientation(Qt::Vertical);
+        deckToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        deckToolBar->setIconSize(QSize(24, 24));
+        deckToolBar->addAction(aUpdatePrices);
+        QHBoxLayout *deckToolbarLayout = new QHBoxLayout;
+        deckToolbarLayout->addStretch();
+        deckToolbarLayout->addWidget(deckToolBar);
+        deckToolbarLayout->addStretch();
+	
 
 	QVBoxLayout *rightFrame = new QVBoxLayout;
 	rightFrame->addLayout(grid);
 	rightFrame->addWidget(deckView);
+        rightFrame->addLayout(deckToolbarLayout);
 
 	QHBoxLayout *mainLayout = new QHBoxLayout;
 	mainLayout->addLayout(leftFrame, 10);
@@ -454,6 +478,21 @@ void WndDeckEditor::actDecrement()
 	else
 		deckModel->setData(numberIndex, count - 1, Qt::EditRole);
 	setWindowModified(true);
+}
+
+void WndDeckEditor::actUpdatePrices()
+{
+	aUpdatePrices->setDisabled(true);
+	PriceUpdater *up = new PriceUpdater(deckModel->getDeckList());
+	connect(up, SIGNAL(finishedUpdate()), this, SLOT(finishedUpdatingPrices()));
+	up->updatePrices();
+}
+
+void WndDeckEditor::finishedUpdatingPrices()
+{
+	deckModel->pricesUpdated();
+	setWindowModified(true);
+	aUpdatePrices->setDisabled(false);
 }
 
 void WndDeckEditor::setDeck(DeckList *_deck, const QString &_lastFileName, DeckList::FileFormat _lastFileFormat)

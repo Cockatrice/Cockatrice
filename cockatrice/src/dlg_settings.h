@@ -14,6 +14,7 @@ class QGroupBox;
 class QCheckBox;
 class QLabel;
 class QCloseEvent;
+class QSpinBox;
 
 class AbstractSettingsPage : public QWidget {
 public:
@@ -65,10 +66,11 @@ signals:
 	void playerAreaBgChanged(const QString &path);
 	void cardBackPicturePathChanged(const QString &path);
 private:
-	QLabel *handBgLabel, *stackBgLabel, *tableBgLabel, *playerAreaBgLabel, *cardBackPicturePathLabel;
+	QLabel *handBgLabel, *stackBgLabel, *tableBgLabel, *playerAreaBgLabel, *cardBackPicturePathLabel, *minPlayersForMultiColumnLayoutLabel;
 	QLineEdit *handBgEdit, *stackBgEdit, *tableBgEdit, *playerAreaBgEdit, *cardBackPicturePathEdit;
 	QCheckBox *displayCardNamesCheckBox, *horizontalHandCheckBox, *invertVerticalCoordinateCheckBox, *zoneViewSortByNameCheckBox, *zoneViewSortByTypeCheckBox;
 	QGroupBox *zoneBgGroupBox, *cardsGroupBox, *handGroupBox, *tableGroupBox, *zoneViewGroupBox;
+	QSpinBox *minPlayersForMultiColumnLayoutEdit;
 public:
 	AppearanceSettingsPage();
 	void retranslateUi();
@@ -76,13 +78,31 @@ public:
 
 class UserInterfaceSettingsPage : public AbstractSettingsPage {
 	Q_OBJECT
+private slots:
+	void soundPathClearButtonClicked();
+	void soundPathButtonClicked();
+signals:
+	void soundPathChanged();
 private:
 	QCheckBox *doubleClickToPlayCheckBox;
 	QCheckBox *tapAnimationCheckBox;
-	QGroupBox *generalGroupBox, *animationGroupBox;
+	QCheckBox *soundEnabledCheckBox;
+	QLabel *soundPathLabel;
+	QLineEdit *soundPathEdit;
+	QGroupBox *generalGroupBox, *animationGroupBox, *soundGroupBox;
 public:
 	UserInterfaceSettingsPage();
 	void retranslateUi();
+};
+
+class DeckEditorSettingsPage : public AbstractSettingsPage {
+	Q_OBJECT
+public:
+	DeckEditorSettingsPage();
+	void retranslateUi();
+private:
+	QCheckBox *priceTagsCheckBox;
+	QGroupBox *generalGroupBox;
 };
 
 class MessagesSettingsPage : public AbstractSettingsPage {
@@ -110,7 +130,7 @@ private slots:
 private:
 	QListWidget *contentsWidget;
 	QStackedWidget *pagesWidget;
-	QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *messagesButton;
+	QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *messagesButton;
 	QPushButton *closeButton;
 	void createIcons();
 	void retranslateUi();

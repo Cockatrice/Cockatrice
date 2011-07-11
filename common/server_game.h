@@ -23,6 +23,7 @@
 #include <QStringList>
 #include <QPointer>
 #include <QObject>
+#include <QMutex>
 #include "server_player.h"
 #include "protocol.h"
 
@@ -33,6 +34,7 @@ class ServerInfo_User;
 class Server_Game : public QObject {
 	Q_OBJECT
 private:
+	Server_Room *room;
 	ServerInfo_User *creatorInfo;
 	QMap<int, Server_Player *> players;
 	bool gameStarted;
@@ -51,10 +53,12 @@ private:
 	int secondsElapsed;
 	QTimer *pingClock;
 signals:
-	void gameClosing();
+	void sigStartGameIfReady();
 private slots:
 	void pingClockTimeout();
+	void doStartGameIfReady();
 public:
+	mutable QMutex gameMutex;
 	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent);
 	~Server_Game();
 	ServerInfo_Game *getInfo() const;
@@ -73,6 +77,7 @@ public:
 	bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
 	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
 	ResponseCode checkJoin(ServerInfo_User *user, const QString &_password, bool spectator);
+	bool containsUser(const QString &userName) const;
 	Server_Player *addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate = true);
 	void removePlayer(Server_Player *player);
 	void removeArrowsToPlayer(Server_Player *player);
@@ -84,6 +89,7 @@ public:
 	void setActivePlayer(int _activePlayer);
 	void setActivePhase(int _activePhase);
 	void nextTurn();
+	void postConnectionStatusUpdate(Server_Player *player, bool connectionStatus);
 
 	QList<ServerInfo_Player *> getGameState(Server_Player *playerWhosAsking) const;
 	void sendGameEvent(GameEvent *event, GameEventContext *context = 0, Server_Player *exclude = 0);

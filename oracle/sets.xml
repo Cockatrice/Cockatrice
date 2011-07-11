@@ -173,6 +173,10 @@
 	    <longname>Magic 2011</longname>
 	</set>
 	<set import="1">
+	    <name>COM</name>
+	    <longname>Magic: The Gathering-Commander</longname>
+	</set>
+	<set import="1">
 	    <name>MM</name>
 	    <longname>Mercadian Masques</longname>
 	</set>
@@ -195,6 +199,10 @@
 	<set import="1">
 	    <name>NE</name>
 	    <longname>Nemesis</longname>
+	</set>
+	<set import="1">
+	    <name>NPH</name>
+	    <longname>New Phyrexia</longname>
 	</set>
 	<set import="1">
 	    <name>9E</name>

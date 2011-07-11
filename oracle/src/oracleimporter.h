@@ -34,7 +34,7 @@ private:
 	QString getPictureUrl(QString url, int cardId, QString name, const QString &setName) const;
 	
 	void downloadNextFile();
-	void readSetsFromXml(QXmlStreamReader &xml);
+	bool readSetsFromXml(QXmlStreamReader &xml);
 	CardInfo *addCard(const QString &setName, QString cardName, int cardId, const QString &cardCost, const QString &cardType, const QString &cardPT, const QStringList &cardText);
 private slots:
 	void httpRequestFinished(int requestId, bool error);
@@ -44,8 +44,8 @@ signals:
 	void dataReadProgress(int bytesRead, int totalBytes);
 public:
 	OracleImporter(const QString &_dataDir, QObject *parent = 0);
-	void readSetsFromByteArray(const QByteArray &data);
-	void readSetsFromFile(const QString &fileName);
+	bool readSetsFromByteArray(const QByteArray &data);
+	bool readSetsFromFile(const QString &fileName);
 	int startDownload();
 	int importTextSpoiler(CardSet *set, const QByteArray &data);
 	QList<SetToDownload> &getSets() { return allSets; }

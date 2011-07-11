@@ -5,7 +5,7 @@ INCLUDEPATH += . src ../common
 MOC_DIR = build
 OBJECTS_DIR = build
 RESOURCES = cockatrice.qrc
-QT += network svg
+QT += network script svg multimedia
 
 HEADERS += src/abstractcounter.h \
  src/counter_general.h \
@@ -28,6 +28,8 @@ HEADERS += src/abstractcounter.h \
  src/handcounter.h \
  src/carddatabase.h \
  src/gameview.h \
+ src/gameselector.h \
+ src/gametypemap.h \
  src/decklistmodel.h \
  src/dlg_load_deck_from_clipboard.h \
  src/dlg_load_remote_deck.h \
@@ -71,6 +73,8 @@ HEADERS += src/abstractcounter.h \
  src/localserverinterface.h \
  src/localclient.h \
  src/translation.h \
+ src/priceupdater.h \
+ src/soundengine.h \
  	../common/color.h \
  	../common/serializable_item.h \
 	../common/decklist.h \
@@ -112,6 +116,7 @@ SOURCES += src/abstractcounter.cpp \
  src/handcounter.cpp \
  src/carddatabase.cpp \
  src/gameview.cpp \
+ src/gameselector.cpp \
  src/decklistmodel.cpp \
  src/dlg_load_deck_from_clipboard.cpp \
  src/dlg_load_remote_deck.cpp \
@@ -134,6 +139,7 @@ SOURCES += src/abstractcounter.cpp \
  src/gamescene.cpp \
  src/arrowitem.cpp \
  src/arrowtarget.cpp \
+ src/tab.cpp \
  src/tab_server.cpp \
  src/tab_room.cpp \
  src/tab_message.cpp \
@@ -153,6 +159,8 @@ SOURCES += src/abstractcounter.cpp \
  src/localserver.cpp \
  src/localserverinterface.cpp \
  src/localclient.cpp \
+ src/priceupdater.cpp \
+ src/soundengine.cpp \
  	../common/serializable_item.cpp \
 	../common/decklist.cpp \
 	../common/protocol.cpp \
@@ -177,7 +185,11 @@ TRANSLATIONS += \
 	translations/cockatrice_pt-br.ts \
 	translations/cockatrice_fr.ts \
 	translations/cockatrice_ja.ts \
-	translations/cockatrice_ru.ts
+	translations/cockatrice_ru.ts \
+	translations/cockatrice_cs.ts \
+	translations/cockatrice_pl.ts \
+	translations/cockatrice_sk.ts
+
 win32 {
 	RC_FILE = cockatrice.rc
 }

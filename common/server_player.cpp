@@ -17,22 +17,43 @@ Server_Player::Server_Player(Server_Game *_game, int _playerId, ServerInfo_User 
 
 Server_Player::~Server_Player()
 {
+}
+
+void Server_Player::prepareDestroy()
+{
+	QMutexLocker locker(&game->gameMutex);
+	
 	delete deck;
 	
+	playerMutex.lock();
 	if (handler)
 		handler->playerRemovedFromGame(game);
+	playerMutex.unlock();
+	
 	delete userInfo;
 	
 	clearZones();
+	
+	deleteLater();
+}
+
+void Server_Player::moveToThread(QThread *thread)
+{
+	QObject::moveToThread(thread);
+	userInfo->moveToThread(thread);
 }
 
 int Server_Player::newCardId()
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	return nextCardId++;
 }
 
 int Server_Player::newCounterId() const
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	int id = 0;
 	QMapIterator<int, Server_Counter *> i(counters);
 	while (i.hasNext()) {
@@ -45,6 +66,8 @@ int Server_Player::newCounterId() const
 
 int Server_Player::newArrowId() const
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	int id = 0;
 	QMapIterator<int, Server_Arrow *> i(arrows);
 	while (i.hasNext()) {
@@ -57,6 +80,8 @@ int Server_Player::newArrowId() const
 
 void Server_Player::setupZones()
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	// This may need to be customized according to the game rules.
 	// ------------------------------------------------------------------
 
@@ -102,7 +127,7 @@ void Server_Player::setupZones()
 			if (!currentCard)
 				continue;
 			for (int k = 0; k < currentCard->getNumber(); ++k)
-				z->cards.append(new Server_Card(currentCard->getName(), nextCardId++, 0, 0));
+				z->cards.append(new Server_Card(currentCard->getName(), nextCardId++, 0, 0, z));
 		}
 	}
 	
@@ -138,6 +163,8 @@ void Server_Player::setupZones()
 
 void Server_Player::clearZones()
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	QMapIterator<QString, Server_CardZone *> zoneIterator(zones);
 	while (zoneIterator.hasNext())
 		delete zoneIterator.next().value();
@@ -158,11 +185,15 @@ void Server_Player::clearZones()
 
 ServerInfo_PlayerProperties *Server_Player::getProperties()
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	return new ServerInfo_PlayerProperties(playerId, new ServerInfo_User(userInfo), spectator, conceded, readyStart, deckId);
 }
 
 void Server_Player::setDeck(DeckList *_deck, int _deckId)
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	delete deck;
 	deck = _deck;
 	deckId = _deckId;
@@ -170,16 +201,22 @@ void Server_Player::setDeck(DeckList *_deck, int _deckId)
 
 void Server_Player::addZone(Server_CardZone *zone)
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	zones.insert(zone->getName(), zone);
 }
 
 void Server_Player::addArrow(Server_Arrow *arrow)
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	arrows.insert(arrow->getId(), arrow);
 }
 
 bool Server_Player::deleteArrow(int arrowId)
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	Server_Arrow *arrow = arrows.value(arrowId, 0);
 	if (!arrow)
 		return false;
@@ -190,11 +227,15 @@ bool Server_Player::deleteArrow(int arrowId)
 
 void Server_Player::addCounter(Server_Counter *counter)
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	counters.insert(counter->getId(), counter);
 }
 
 bool Server_Player::deleteCounter(int counterId)
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	Server_Counter *counter = counters.value(counterId, 0);
 	if (!counter)
 		return false;
@@ -205,6 +246,8 @@ bool Server_Player::deleteCounter(int counterId)
 
 ResponseCode Server_Player::drawCards(CommandContainer *cont, int number)
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	Server_CardZone *deckZone = zones.value("deck");
 	Server_CardZone *handZone = zones.value("hand");
 	if (deckZone->cards.size() < number)
@@ -228,6 +271,8 @@ ResponseCode Server_Player::drawCards(CommandContainer *cont, int number)
 
 ResponseCode Server_Player::undoDraw(CommandContainer *cont)
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	if (lastDrawList.isEmpty())
 		return RespContextError;
 	
@@ -240,6 +285,8 @@ ResponseCode Server_Player::undoDraw(CommandContainer *cont)
 
 ResponseCode Server_Player::moveCard(CommandContainer *cont, const QString &_startZone, const QList<CardToMove *> &_cards, int targetPlayerId, const QString &_targetZone, int x, int y, bool faceDown)
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	Server_CardZone *startzone = getZones().value(_startZone);
 	Server_Player *targetPlayer = game->getPlayers().value(targetPlayerId);
 	if (!targetPlayer)
@@ -274,6 +321,8 @@ public:
 
 ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *startzone, const QList<CardToMove *> &_cards, Server_CardZone *targetzone, int x, int y, bool faceDown, bool fixFreeSpaces, bool undoingDraw)
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	// Disallow controller change to other zones than the table.
 	if (((targetzone->getType() != PublicZone) || !targetzone->hasCoords()) && (startzone->getPlayer() != targetzone->getPlayer()))
 		return RespContextError;
@@ -285,7 +334,7 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 	QMap<Server_Card *, CardToMove *> cardProperties;
 	for (int i = 0; i < _cards.size(); ++i) {
 		int position;
-		Server_Card *card = startzone->getCard(_cards[i]->getCardId(), false, &position);
+		Server_Card *card = startzone->getCard(_cards[i]->getCardId(), &position);
 		if (!card)
 			return RespNameNotFound;
 		if (!card->getAttachedCards().isEmpty() && !targetzone->isColumnEmpty(x, y))
@@ -353,6 +402,7 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 		
 		if (card->getDestroyOnZoneChange() && (startzone->getName() != targetzone->getName())) {
 			cont->enqueueGameEventPrivate(new Event_DestroyCard(getPlayerId(), startzone->getName(), card->getId()), game->getGameId(), -1, new Context_MoveCard);
+			cont->enqueueGameEventOmniscient(new Event_DestroyCard(getPlayerId(), startzone->getName(), card->getId()), game->getGameId(), new Context_MoveCard);
 			cont->enqueueGameEventPublic(new Event_DestroyCard(getPlayerId(), startzone->getName(), card->getId()), game->getGameId(), new Context_MoveCard);
 			card->deleteLater();
 		} else {
@@ -428,6 +478,8 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 
 void Server_Player::unattachCard(CommandContainer *cont, Server_Card *card)
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	Server_CardZone *zone = card->getZone();
 	
 	card->setParentCard(0);
@@ -441,6 +493,8 @@ void Server_Player::unattachCard(CommandContainer *cont, Server_Card *card)
 
 ResponseCode Server_Player::setCardAttrHelper(CommandContainer *cont, const QString &zoneName, int cardId, const QString &attrName, const QString &attrValue)
 {
+	QMutexLocker locker(&game->gameMutex);
+	
 	Server_CardZone *zone = getZones().value(zoneName);
 	if (!zone)
 		return RespNameNotFound;
@@ -456,7 +510,7 @@ ResponseCode Server_Player::setCardAttrHelper(CommandContainer *cont, const QStr
 				return RespInvalidCommand;
 		}
 	} else {
-		Server_Card *card = zone->getCard(cardId, false);
+		Server_Card *card = zone->getCard(cardId);
 		if (!card)
 			return RespNameNotFound;
 		result = card->setAttribute(attrName, attrValue, false);
@@ -471,6 +525,8 @@ ResponseCode Server_Player::setCardAttrHelper(CommandContainer *cont, const QStr
 
 void Server_Player::sendProtocolItem(ProtocolItem *item, bool deleteItem)
 {
+	QMutexLocker locker(&playerMutex);
+	
 	if (handler)
 		handler->sendProtocolItem(item, deleteItem);
 }

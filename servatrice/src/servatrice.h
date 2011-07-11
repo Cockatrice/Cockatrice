@@ -21,6 +21,7 @@
 #define SERVATRICE_H
 
 #include <QTcpServer>
+#include <QMutex>
 #include "server.h"
 
 class QSqlDatabase;
@@ -28,16 +29,32 @@ class QSettings;
 class QSqlQuery;
 class QTimer;
 
+class Servatrice;
+class ServerSocketInterface;
+
+class Servatrice_TcpServer : public QTcpServer {
+	Q_OBJECT
+private:
+	Servatrice *server;
+	bool threaded;
+public:
+	Servatrice_TcpServer(Servatrice *_server, bool _threaded, QObject *parent = 0)
+		: QTcpServer(parent), server(_server), threaded(_threaded) { }
+protected:
+	void incomingConnection(int socketDescriptor);
+};
+
 class Servatrice : public Server
 {
 	Q_OBJECT
 private slots:
-	void newConnection();
 	void statusUpdate();
 	void updateBanTimer();
+	void shutdownTimeout();
 public:
+	QMutex dbMutex;
 	static const QString versionString;
-	Servatrice(QObject *parent = 0);
+	Servatrice(QSettings *_settings, QObject *parent = 0);
 	~Servatrice();
 	bool openDatabase();
 	void checkSql();
@@ -50,30 +67,36 @@ public:
 	int getMessageCountingInterval() const { return messageCountingInterval; }
 	int getMaxMessageCountPerInterval() const { return maxMessageCountPerInterval; }
 	int getMaxMessageSizePerInterval() const { return maxMessageSizePerInterval; }
+	int getMaxGamesPerUser() const { return maxGamesPerUser; }
+	bool getThreaded() const { return threaded; }
 	QString getDbPrefix() const { return dbPrefix; }
 	void updateLoginMessage();
 	ServerInfo_User *getUserData(const QString &name);
 	int getUsersWithAddress(const QHostAddress &address) const;
 	QMap<QString, ServerInfo_User *> getBuddyList(const QString &name);
 	QMap<QString, ServerInfo_User *> getIgnoreList(const QString &name);
-	bool getUserBanned(Server_ProtocolHandler *client, const QString &userName) const;
 	void addAddressBan(const QHostAddress &address, int minutes) { addressBanList.append(QPair<QHostAddress, int>(address, minutes)); }
-	void addNameBan(const QString &name, int minutes) { nameBanList.append(QPair<QString, int>(name, minutes)); }
+	void scheduleShutdown(const QString &reason, int minutes);
 protected:
 	bool userExists(const QString &user);
-	AuthenticationResult checkUserPassword(const QString &user, const QString &password);
+	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password);
 private:
 	QTimer *pingClock, *statusUpdateClock, *banTimeoutClock;
 	QTcpServer *tcpServer;
 	QString loginMessage;
 	QString dbPrefix;
 	QSettings *settings;
+	int serverId;
+	bool threaded;
 	int uptime;
 	QList<QPair<QHostAddress, int> > addressBanList;
-	QList<QPair<QString, int> > nameBanList;
 	int maxGameInactivityTime, maxPlayerInactivityTime;
-	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval;
+	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser;
 	ServerInfo_User *evalUserQueryResult(const QSqlQuery &query, bool complete);
+	
+	QString shutdownReason;
+	int shutdownMinutes;
+	QTimer *shutdownTimer;
 };
 
 #endif

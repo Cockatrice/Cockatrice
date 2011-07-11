@@ -19,14 +19,21 @@ SettingsCache::SettingsCache()
 	
 	picDownload = settings->value("personal/picturedownload", true).toBool();
 	doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
-	cardInfoMinimized = settings->value("interface/cardinfominimized", false).toBool();
+	cardInfoMinimized = settings->value("interface/cardinfominimized", 0).toInt();
+	tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
 	displayCardNames = settings->value("cards/displaycardnames", true).toBool();
 	horizontalHand = settings->value("hand/horizontal", true).toBool();
 	invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
+	minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 5).toInt();
 	tapAnimation = settings->value("cards/tapanimation", true).toBool();
 	
 	zoneViewSortByName = settings->value("zoneview/sortbyname", true).toBool();
 	zoneViewSortByType = settings->value("zoneview/sortbytype", true).toBool();
+	
+	soundEnabled = settings->value("sound/enabled", false).toBool();
+	soundPath = settings->value("sound/path").toString();
+	
+	priceTagFeature = settings->value("deckeditor/pricetags", false).toBool();
 }
 
 void SettingsCache::setLang(const QString &_lang)
@@ -104,10 +111,16 @@ void SettingsCache::setDoubleClickToPlay(int _doubleClickToPlay)
 	settings->setValue("interface/doubleclicktoplay", doubleClickToPlay);
 }
 
-void SettingsCache::setCardInfoMinimized(bool _cardInfoMinimized)
+void SettingsCache::setCardInfoMinimized(int _cardInfoMinimized)
 {
-	cardInfoMinimized = _cardInfoMinimized;
+        cardInfoMinimized = _cardInfoMinimized;
 	settings->setValue("interface/cardinfominimized", cardInfoMinimized);
+}
+
+void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes)
+{
+	tabGameSplitterSizes = _tabGameSplitterSizes;
+	settings->setValue("interface/tabgame_splittersizes", tabGameSplitterSizes);
 }
 
 void SettingsCache::setDisplayCardNames(int _displayCardNames)
@@ -131,6 +144,13 @@ void SettingsCache::setInvertVerticalCoordinate(int _invertVerticalCoordinate)
 	emit invertVerticalCoordinateChanged();
 }
 
+void SettingsCache::setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout)
+{
+	minPlayersForMultiColumnLayout = _minPlayersForMultiColumnLayout;
+	settings->setValue("interface/min_players_multicolumn", minPlayersForMultiColumnLayout);
+	emit minPlayersForMultiColumnLayoutChanged();
+}
+
 void SettingsCache::setTapAnimation(int _tapAnimation)
 {
 	tapAnimation = _tapAnimation;
@@ -147,4 +167,23 @@ void SettingsCache::setZoneViewSortByType(int _zoneViewSortByType)
 {
 	zoneViewSortByType = _zoneViewSortByType;
 	settings->setValue("zoneview/sortbytype", zoneViewSortByType);
+}
+
+void SettingsCache::setSoundEnabled(int _soundEnabled)
+{
+	soundEnabled = _soundEnabled;
+	settings->setValue("sound/enabled", soundEnabled);
+}
+
+void SettingsCache::setSoundPath(const QString &_soundPath)
+{
+	soundPath = _soundPath;
+	settings->setValue("sound/path", soundPath);
+	emit soundPathChanged();
+}
+
+void SettingsCache::setPriceTagFeature(int _priceTagFeature)
+{
+	priceTagFeature = _priceTagFeature;
+	settings->setValue("deckeditor/pricetags", priceTagFeature);
 }

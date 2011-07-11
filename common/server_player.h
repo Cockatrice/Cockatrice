@@ -5,6 +5,7 @@
 #include <QString>
 #include <QList>
 #include <QMap>
+#include <QMutex>
 #include "protocol_datastructures.h"
 
 class DeckList;
@@ -22,6 +23,7 @@ class CommandContainer;
 class Server_Player : public Server_ArrowTarget {
 	Q_OBJECT
 private:
+	mutable QMutex playerMutex;
 	class MoveCardCompareFunctor;
 	Server_Game *game;
 	Server_ProtocolHandler *handler;
@@ -41,8 +43,10 @@ private:
 public:
 	Server_Player(Server_Game *_game, int _playerId, ServerInfo_User *_userInfo, bool _spectator, Server_ProtocolHandler *_handler);
 	~Server_Player();
+	void prepareDestroy();
+	void moveToThread(QThread *thread);
 	Server_ProtocolHandler *getProtocolHandler() const { return handler; }
-	void setProtocolHandler(Server_ProtocolHandler *_handler) { handler = _handler; }
+	void setProtocolHandler(Server_ProtocolHandler *_handler) { playerMutex.lock(); handler = _handler; playerMutex.unlock(); }
 	
 	void setPlayerId(int _id) { playerId = _id; }
 	int getInitialCards() const { return initialCards; }
@@ -57,6 +61,7 @@ public:
 	ServerInfo_User *getUserInfo() const { return userInfo; }
 	void setDeck(DeckList *_deck, int _deckId);
 	DeckList *getDeck() const { return deck; }
+	Server_Game *getGame() const { return game; }
 	const QMap<QString, Server_CardZone *> &getZones() const { return zones; }
 	const QMap<int, Server_Counter *> &getCounters() const { return counters; }
 	const QMap<int, Server_Arrow *> &getArrows() const { return arrows; }

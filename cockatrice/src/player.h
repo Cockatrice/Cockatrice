@@ -26,6 +26,7 @@ class CommandContainer;
 class GameCommand;
 class GameEvent;
 class GameEventContext;
+class Event_ConnectionStateChanged;
 class Event_Say;
 class Event_Shuffle;
 class Event_RollDie;
@@ -69,8 +70,9 @@ class Player : public QObject, public QGraphicsItem {
 signals:
 	void newCardAdded(AbstractCardItem *card);
 	// Log events
+	void logConnectionStateChanged(Player *player, bool connectionState);
 	void logSay(Player *player, QString message);
-	void logShuffle(Player *player);
+	void logShuffle(Player *player, CardZone *zone);
 	void logRollDie(Player *player, int sides, int roll);
 	void logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard, bool _playerTarget);
 	void logCreateToken(Player *player, QString cardName, QString pt);
@@ -176,6 +178,7 @@ private:
 	
 	void initSayMenu();
 	
+	void eventConnectionStateChanged(Event_ConnectionStateChanged *event);
 	void eventSay(Event_Say *event);
 	void eventShuffle(Event_Shuffle *event);
 	void eventRollDie(Event_RollDie *event);
@@ -245,7 +248,7 @@ public:
 	
 	qreal getMinimumWidth() const;
 	void setMirrored(bool _mirrored);
-	void processSceneSizeChange(const QSizeF &newSize);
+	void processSceneSizeChange(int newPlayerWidth);
 	
 	void processPlayerInfo(ServerInfo_Player *info);
 	void processCardAttachment(ServerInfo_Player *info);

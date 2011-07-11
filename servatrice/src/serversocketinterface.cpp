@@ -33,20 +33,20 @@
 #include "server_logger.h"
 
 ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent)
-	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), topLevelItem(0)
+	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), topLevelItem(0), compressionSupport(false)
 {
-	xmlWriter = new QXmlStreamWriter;
-	xmlWriter->setDevice(socket);
-	
+	xmlWriter = new QXmlStreamWriter(&xmlBuffer);
 	xmlReader = new QXmlStreamReader;
 	
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
 	connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(catchSocketError(QAbstractSocket::SocketError)));
+	connect(this, SIGNAL(xmlBufferChanged()), this, SLOT(flushXmlBuffer()), Qt::QueuedConnection);
 	
 	xmlWriter->writeStartDocument();
 	xmlWriter->writeStartElement("cockatrice_server_stream");
 	xmlWriter->writeAttribute("version", QString::number(ProtocolItem::protocolVersion));
+	flushXmlBuffer();
 	
 	int maxUsers = _server->getMaxUsersPerAddress();
 	if ((maxUsers > 0) && (_server->getUsersWithAddress(socket->peerAddress()) >= maxUsers)) {
@@ -54,16 +54,22 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_s
 		deleteLater();
 	} else
 		sendProtocolItem(new Event_ServerMessage(Servatrice::versionString));
+	
+	server->addClient(this);
 }
 
 ServerSocketInterface::~ServerSocketInterface()
 {
 	logger->logMessage("ServerSocketInterface destructor");
 	
-	socket->flush();
+	prepareDestroy();
+	
+	flushXmlBuffer();
 	delete xmlWriter;
 	delete xmlReader;
 	delete socket;
+	socket = 0;
+	delete topLevelItem;
 }
 
 void ServerSocketInterface::processProtocolItem(ProtocolItem *item)
@@ -75,10 +81,21 @@ void ServerSocketInterface::processProtocolItem(ProtocolItem *item)
 		processCommandContainer(cont);
 }
 
+void ServerSocketInterface::flushXmlBuffer()
+{
+	QMutexLocker locker(&xmlBufferMutex);
+	if (xmlBuffer.isEmpty())
+		return;
+	socket->write(xmlBuffer.toUtf8());
+	socket->flush();
+	xmlBuffer.clear();
+}
+
 void ServerSocketInterface::readClient()
 {
 	QByteArray data = socket->readAll();
-	logger->logMessage(QString(data));
+	if (!data.contains("<cmd type=\"ping\""))
+		logger->logMessage(QString(data), this);
 	xmlReader->addData(data);
 	
 	while (!xmlReader->atEnd()) {
@@ -86,6 +103,8 @@ void ServerSocketInterface::readClient()
 		if (topLevelItem)
 			topLevelItem->readElement(xmlReader);
 		else if (xmlReader->isStartElement() && (xmlReader->name().toString() == "cockatrice_client_stream")) {
+			if (xmlReader->attributes().value("comp").toString().toInt() == 1)
+				compressionSupport = true;
 			topLevelItem = new TopLevelProtocolItem;
 			connect(topLevelItem, SIGNAL(protocolItemReceived(ProtocolItem *)), this, SLOT(processProtocolItem(ProtocolItem *)));
 		}
@@ -101,14 +120,18 @@ void ServerSocketInterface::catchSocketError(QAbstractSocket::SocketError socket
 
 void ServerSocketInterface::sendProtocolItem(ProtocolItem *item, bool deleteItem)
 {
+	QMutexLocker locker(&xmlBufferMutex);
+	
 	item->write(xmlWriter);
-	socket->flush();
 	if (deleteItem)
 		delete item;
+	
+	emit xmlBufferChanged();
 }
 
 int ServerSocketInterface::getUserIdInDB(const QString &name) const
 {
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("select id from " + servatrice->getDbPrefix() + "_users where name = :name");
 	query.bindValue(":name", name);
@@ -142,6 +165,7 @@ ResponseCode ServerSocketInterface::cmdAddToList(Command_AddToList *cmd, Command
 	if (id1 == id2)
 		return RespContextError;
 	
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("insert into " + servatrice->getDbPrefix() + "_" + list + "list (id_user1, id_user2) values(:id1, :id2)");
 	query.bindValue(":id1", id1);
@@ -180,6 +204,7 @@ ResponseCode ServerSocketInterface::cmdRemoveFromList(Command_RemoveFromList *cm
 	if (id2 < 0)
 		return RespNameNotFound;
 	
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("delete from " + servatrice->getDbPrefix() + "_" + list + "list where id_user1 = :id1 and id_user2 = :id2");
 	query.bindValue(":id1", id1);
@@ -206,6 +231,7 @@ int ServerSocketInterface::getDeckPathId(int basePathId, QStringList path)
 	if (path[0].isEmpty())
 		return 0;
 	
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent and name = :name and user = :user");
 	query.bindValue(":id_parent", basePathId);
@@ -229,6 +255,7 @@ int ServerSocketInterface::getDeckPathId(const QString &path)
 
 bool ServerSocketInterface::deckListHelper(DeckList_Directory *folder)
 {
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("select id, name from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent and user = :user");
 	query.bindValue(":id_parent", folder->getId());
@@ -272,7 +299,10 @@ ResponseCode ServerSocketInterface::cmdDeckList(Command_DeckList * /*cmd*/, Comm
 	if (!deckListHelper(root))
 		return RespContextError;
 	
-	cont->setResponse(new Response_DeckList(cont->getCmdId(), RespOk, root));
+	ProtocolResponse *resp = new Response_DeckList(cont->getCmdId(), RespOk, root);
+	if (getCompressionSupport())
+		resp->setCompressed(true);
+	cont->setResponse(resp);
 	
 	return RespNothing;
 }
@@ -288,6 +318,7 @@ ResponseCode ServerSocketInterface::cmdDeckNewDir(Command_DeckNewDir *cmd, Comma
 	if (folderId == -1)
 		return RespNameNotFound;
 	
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_folders (id_parent, user, name) values(:id_parent, :user, :name)");
 	query.bindValue(":id_parent", folderId);
@@ -302,6 +333,7 @@ void ServerSocketInterface::deckDelDirHelper(int basePathId)
 {
 	servatrice->checkSql();
 	
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	
 	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent");
@@ -340,6 +372,7 @@ ResponseCode ServerSocketInterface::cmdDeckDel(Command_DeckDel *cmd, CommandCont
 	
 	servatrice->checkSql();
 	
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	
 	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_files where id = :id and user = :user");
@@ -379,6 +412,7 @@ ResponseCode ServerSocketInterface::cmdDeckUpload(Command_DeckUpload *cmd, Comma
 	if (deckName.isEmpty())
 		deckName = "Unnamed deck";
 
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_files (id_folder, user, name, upload_time, content) values(:id_folder, :user, :name, NOW(), :content)");
 	query.bindValue(":id_folder", folderId);
@@ -395,6 +429,7 @@ DeckList *ServerSocketInterface::getDeckFromDatabase(int deckId)
 {
 	servatrice->checkSql();
 	
+	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	
 	query.prepare("select content from " + servatrice->getDbPrefix() + "_decklist_files where id = :id and user = :user");
@@ -426,12 +461,21 @@ ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd, C
 	return RespNothing;
 }
 
-// ADMIN FUNCTIONS.
-// Permission is checked by the calling function.
+// MODERATOR FUNCTIONS.
+// May be called by admins and moderators. Permission is checked by the calling function.
 
 ResponseCode ServerSocketInterface::cmdUpdateServerMessage(Command_UpdateServerMessage * /*cmd*/, CommandContainer * /*cont*/)
 {
 	servatrice->updateLoginMessage();
+	return RespOk;
+}
+
+// ADMIN FUNCTIONS.
+// Permission is checked by the calling function.
+
+ResponseCode ServerSocketInterface::cmdShutdownServer(Command_ShutdownServer *cmd, CommandContainer * /*cont*/)
+{
+	servatrice->scheduleShutdown(cmd->getReason(), cmd->getMinutes());
 	return RespOk;
 }
 
@@ -446,13 +490,14 @@ ResponseCode ServerSocketInterface::cmdBanFromServer(Command_BanFromServer *cmd,
 	ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
 	if (user->getUserInfo()->getUserLevel() & ServerInfo_User::IsRegistered) {
 		// Registered users can be banned by name.
-		if (minutes == 0) {
-			QSqlQuery query;
-			query.prepare("update " + servatrice->getDbPrefix() + "_users set banned=1 where name = :name");
-			query.bindValue(":name", userName);
-			servatrice->execSqlQuery(query);
-		} else
-			servatrice->addNameBan(userName, minutes);
+		QMutexLocker locker(&servatrice->dbMutex);
+		QSqlQuery query;
+		query.prepare("insert into " + servatrice->getDbPrefix() + "_bans (id_user, id_admin, time_from, minutes, reason) values(:id_user, :id_admin, NOW(), :minutes, :reason)");
+		query.bindValue(":id_user", getUserIdInDB(userName));
+		query.bindValue(":id_admin", getUserIdInDB(userInfo->getName()));
+		query.bindValue(":minutes", minutes);
+		query.bindValue(":reason", cmd->getReason() + "\n");
+		servatrice->execSqlQuery(query);
 	} else {
 		// Unregistered users must be banned by IP address.
 		// Indefinite address bans are not reasonable -> default to 30 minutes.

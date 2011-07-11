@@ -17,6 +17,8 @@ public:
 	DecklistModelCardNode(DecklistCardNode *_dataNode, InnerDecklistNode *_parent) : AbstractDecklistCardNode(_parent), dataNode(_dataNode) { }
 	int getNumber() const { return dataNode->getNumber(); }
 	void setNumber(int _number) { dataNode->setNumber(_number); }
+        float getPrice() const { return dataNode->getPrice(); }
+        void setPrice(float _price) { dataNode->setPrice(_price); }
 	QString getName() const { return dataNode->getName(); }
 	void setName(const QString &_name) { dataNode->setName(_name); }
 	DecklistCardNode *getDataNode() const { return dataNode; }
@@ -32,7 +34,7 @@ public:
 	DeckListModel(QObject *parent = 0);
 	~DeckListModel();
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return 2; }
+        int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
@@ -45,6 +47,7 @@ public:
 	void cleanList();
 	DeckList *getDeckList() const { return deckList; }
 	void setDeckList(DeckList *_deck);
+	void pricesUpdated(InnerDecklistNode *node = 0);
 private:
 	DeckList *deckList;
 	InnerDecklistNode *root;

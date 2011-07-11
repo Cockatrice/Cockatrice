@@ -7,6 +7,7 @@
         <file>resources/icon_config_appearance.svg</file>
         <file>resources/icon_config_interface.svg</file>
         <file>resources/icon_config_messages.svg</file>
+	<file>resources/icon_config_deckeditor.svg</file>
         <file>resources/phases/icon_phase_untap.svg</file>
         <file>resources/phases/icon_phase_upkeep.svg</file>
         <file>resources/phases/icon_phase_draw.svg</file>
@@ -23,6 +24,7 @@
 	<file>resources/pencil.svg</file>
 	<file>resources/icon_search.svg</file>
 	<file>resources/icon_clearsearch.svg</file>
+        <file>resources/icon_update.png</file>
         <file>resources/hr.jpg</file>
         <file>resources/appicon.svg</file>
         <file>resources/add_to_sideboard.svg</file>
@@ -37,6 +39,10 @@
 	<file>resources/icon_player.svg</file>
 	<file>resources/icon_spectator.svg</file>
 
+	<file>resources/genders/male.svg</file>
+	<file>resources/genders/female.svg</file>
+	<file>resources/genders/unknown.svg</file>
+
         <file>translations/cockatrice_de.qm</file>
         <file>translations/cockatrice_en.qm</file>
 	<file>translations/cockatrice_es.qm</file>
@@ -45,12 +51,18 @@
 	<file>translations/cockatrice_fr.qm</file>
 	<file>translations/cockatrice_ja.qm</file>
 	<file>translations/cockatrice_ru.qm</file>
+	<file>translations/cockatrice_cs.qm</file>
+	<file>translations/cockatrice_pl.qm</file>
+	<file>translations/cockatrice_sk.qm</file>
 
+	<file>resources/countries/ar.svg</file>
 	<file>resources/countries/at.svg</file>
 	<file>resources/countries/au.svg</file>
 	<file>resources/countries/be.svg</file>
 	<file>resources/countries/br.svg</file>
+	<file>resources/countries/by.svg</file>
 	<file>resources/countries/ca.svg</file>
+	<file>resources/countries/cz.svg</file>
 	<file>resources/countries/ch.svg</file>
 	<file>resources/countries/cn.svg</file>
 	<file>resources/countries/de.svg</file>
@@ -65,16 +77,22 @@
 	<file>resources/countries/it.svg</file>
 	<file>resources/countries/jp.svg</file>
 	<file>resources/countries/mx.svg</file>
+	<file>resources/countries/my.svg</file>
 	<file>resources/countries/nl.svg</file>
 	<file>resources/countries/no.svg</file>
 	<file>resources/countries/ph.svg</file>
 	<file>resources/countries/pl.svg</file>
 	<file>resources/countries/pt.svg</file>
+	<file>resources/countries/ro.svg</file>
 	<file>resources/countries/ru.svg</file>
 	<file>resources/countries/se.svg</file>
+	<file>resources/countries/sg.svg</file>
+	<file>resources/countries/sk.svg</file>
 	<file>resources/countries/tr.svg</file>
+	<file>resources/countries/ua.svg</file>
 	<file>resources/countries/uk.svg</file>
 	<file>resources/countries/us.svg</file>
+	<file>resources/countries/za.svg</file>
 
 	<file>resources/counters/w.svg</file>
 	<file>resources/counters/w_highlight.svg</file>
@@ -91,7 +109,7 @@
 
 	<file>resources/userlevels/normal.svg</file>
 	<file>resources/userlevels/registered.svg</file>
-	<file>resources/userlevels/judge.svg</file>
+	<file>resources/userlevels/moderator.svg</file>
 	<file>resources/userlevels/admin.svg</file>
 
 	<file>resources/news/exclamation_mark.svg</file>

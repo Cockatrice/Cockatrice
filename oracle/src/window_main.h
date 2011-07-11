@@ -31,6 +31,7 @@ private:
 	QTextEdit *messageLog;
 	QVBoxLayout *checkBoxLayout;
 	QList<QCheckBox *> checkBoxList;
+	QLabel *statusLabel;
 	
 	void downloadSetsFile(const QString &url);
 private slots:

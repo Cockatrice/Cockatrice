@@ -2,6 +2,8 @@
 #define CARDINFOWIDGET_H
 
 #include <QFrame>
+#include <QStringList>
+#include <QComboBox>
 
 class QLabel;
 class QTextEdit;
@@ -13,40 +15,44 @@ class QMouseEvent;
 
 class CardInfoWidget : public QFrame {
 	Q_OBJECT
+
 public:
 	enum ResizeMode { ModeDeckEditor, ModeGameTab, ModePopUp };
+
 private:
 	int pixmapWidth;
 	qreal aspectRatio;
-	bool minimized;
+	int minimized; // 0 - minimized, 1 - card, 2 - oracle only, 3 - full
 	ResizeMode mode;
 
-	QPushButton *minimizeButton;
+	QComboBox *dropList;
 	QLabel *cardPicture;
 	QLabel *nameLabel1, *nameLabel2;
 	QLabel *manacostLabel1, *manacostLabel2;
 	QLabel *cardtypeLabel1, *cardtypeLabel2;
 	QLabel *powtoughLabel1, *powtoughLabel2;
 	QTextEdit *textLabel;
-	
+
 	CardInfo *info;
-	void setMinimized(bool _minimized);
+	void setMinimized(int _minimized);
+
 public:
 	CardInfoWidget(ResizeMode _mode, QWidget *parent = 0, Qt::WindowFlags f = 0);
 	void retranslateUi();
+	QString getCardName() const;
+
 public slots:
 	void setCard(CardInfo *card);
 	void setCard(const QString &cardName);
 	void setCard(AbstractCardItem *card);
+
 private slots:
 	void clear();
 	void updatePixmap();
-	void minimizeClicked();
-signals:
-	void mouseReleased();
+	void minimizeClicked(int newMinimized);
+
 protected:
 	void resizeEvent(QResizeEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
 };
 
 #endif

@@ -16,6 +16,7 @@
 #include <QSettings>
 #include <QApplication>
 #include <QInputDialog>
+#include <QSpinBox>
 #include "carddatabase.h"
 #include "dlg_settings.h"
 #include "main.h"
@@ -242,8 +243,17 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 	invertVerticalCoordinateCheckBox->setChecked(settingsCache->getInvertVerticalCoordinate());
 	connect(invertVerticalCoordinateCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setInvertVerticalCoordinate(int)));
 	
+	minPlayersForMultiColumnLayoutLabel = new QLabel;
+	minPlayersForMultiColumnLayoutEdit = new QSpinBox;
+	minPlayersForMultiColumnLayoutEdit->setMinimum(2);
+	minPlayersForMultiColumnLayoutEdit->setValue(settingsCache->getMinPlayersForMultiColumnLayout());
+	connect(minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMinPlayersForMultiColumnLayout(int)));
+	minPlayersForMultiColumnLayoutLabel->setBuddy(minPlayersForMultiColumnLayoutEdit);
+	
 	QGridLayout *tableGrid = new QGridLayout;
 	tableGrid->addWidget(invertVerticalCoordinateCheckBox, 0, 0, 1, 2);
+	tableGrid->addWidget(minPlayersForMultiColumnLayoutLabel, 1, 0, 1, 1);
+	tableGrid->addWidget(minPlayersForMultiColumnLayoutEdit, 1, 1, 1, 1);
 	
 	tableGroupBox = new QGroupBox;
 	tableGroupBox->setLayout(tableGrid);
@@ -289,6 +299,7 @@ void AppearanceSettingsPage::retranslateUi()
 	
 	tableGroupBox->setTitle(tr("Table grid layout"));
 	invertVerticalCoordinateCheckBox->setText(tr("Invert vertical coordinate"));
+	minPlayersForMultiColumnLayoutLabel->setText(tr("Minimum player count for multi-column layout:"));
 	
 	zoneViewGroupBox->setTitle(tr("Zone view layout"));
 	zoneViewSortByNameCheckBox->setText(tr("Sort by name"));
@@ -377,6 +388,8 @@ void AppearanceSettingsPage::cardBackPicturePathButtonClicked()
 
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
+	QIcon deleteIcon(":/resources/icon_delete.svg");
+
 	doubleClickToPlayCheckBox = new QCheckBox;
 	doubleClickToPlayCheckBox->setChecked(settingsCache->getDoubleClickToPlay());
 	connect(doubleClickToPlayCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDoubleClickToPlay(int)));
@@ -391,6 +404,28 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 	tapAnimationCheckBox->setChecked(settingsCache->getTapAnimation());
 	connect(tapAnimationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setTapAnimation(int)));
 	
+	soundEnabledCheckBox = new QCheckBox;
+	soundEnabledCheckBox->setChecked(settingsCache->getSoundEnabled());
+	connect(soundEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setSoundEnabled(int)));
+	
+	soundPathLabel = new QLabel;
+	soundPathEdit = new QLineEdit(settingsCache->getSoundPath());
+	soundPathEdit->setReadOnly(true);
+	QPushButton *soundPathClearButton = new QPushButton(deleteIcon, QString());
+	connect(soundPathClearButton, SIGNAL(clicked()), this, SLOT(soundPathClearButtonClicked()));
+	QPushButton *soundPathButton = new QPushButton("...");
+	connect(soundPathButton, SIGNAL(clicked()), this, SLOT(soundPathButtonClicked()));
+	
+	QGridLayout *soundGrid = new QGridLayout;
+	soundGrid->addWidget(soundEnabledCheckBox, 0, 0, 1, 4);
+	soundGrid->addWidget(soundPathLabel, 1, 0);
+	soundGrid->addWidget(soundPathEdit, 1, 1);
+	soundGrid->addWidget(soundPathClearButton, 1, 2);
+	soundGrid->addWidget(soundPathButton, 1, 3);
+	
+	soundGroupBox = new QGroupBox;
+	soundGroupBox->setLayout(soundGrid);
+	
 	QGridLayout *animationGrid = new QGridLayout;
 	animationGrid->addWidget(tapAnimationCheckBox, 0, 0);
 	
@@ -400,6 +435,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(generalGroupBox);
 	mainLayout->addWidget(animationGroupBox);
+	mainLayout->addWidget(soundGroupBox);
 	
 	setLayout(mainLayout);
 }
@@ -410,6 +446,48 @@ void UserInterfaceSettingsPage::retranslateUi()
 	doubleClickToPlayCheckBox->setText(tr("&Double-click cards to play them (instead of single-click)"));
 	animationGroupBox->setTitle(tr("Animation settings"));
 	tapAnimationCheckBox->setText(tr("&Tap/untap animation"));
+	soundEnabledCheckBox->setText(tr("Enable &sounds"));
+	soundPathLabel->setText(tr("Path to sounds directory:"));
+}
+
+void UserInterfaceSettingsPage::soundPathClearButtonClicked()
+{
+	soundPathEdit->setText(QString());
+	settingsCache->setSoundPath(QString());
+}
+
+void UserInterfaceSettingsPage::soundPathButtonClicked()
+{
+	QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"));
+	if (path.isEmpty())
+		return;
+	
+	soundPathEdit->setText(path);
+	settingsCache->setSoundPath(path);
+}
+
+DeckEditorSettingsPage::DeckEditorSettingsPage()
+{
+	priceTagsCheckBox = new QCheckBox;
+	priceTagsCheckBox->setChecked(settingsCache->getPriceTagFeature());
+	connect(priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
+	
+	QGridLayout *generalGrid = new QGridLayout;
+	generalGrid->addWidget(priceTagsCheckBox, 0, 0);
+	
+	generalGroupBox = new QGroupBox;
+	generalGroupBox->setLayout(generalGrid);
+	
+	QVBoxLayout *mainLayout = new QVBoxLayout;
+	mainLayout->addWidget(generalGroupBox);
+	
+	setLayout(mainLayout);
+}
+
+void DeckEditorSettingsPage::retranslateUi()
+{
+	priceTagsCheckBox->setText(tr("Enable &price tag feature (using data from blacklotusproject.com)"));
+	generalGroupBox->setTitle(tr("General"));
 }
 
 MessagesSettingsPage::MessagesSettingsPage()
@@ -490,6 +568,7 @@ DlgSettings::DlgSettings(QWidget *parent)
 	pagesWidget->addWidget(new GeneralSettingsPage);
 	pagesWidget->addWidget(new AppearanceSettingsPage);
 	pagesWidget->addWidget(new UserInterfaceSettingsPage);
+	pagesWidget->addWidget(new DeckEditorSettingsPage);
 	pagesWidget->addWidget(new MessagesSettingsPage);
 	
 	closeButton = new QPushButton;
@@ -533,6 +612,11 @@ void DlgSettings::createIcons()
 	userInterfaceButton->setTextAlignment(Qt::AlignHCenter);
 	userInterfaceButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 	userInterfaceButton->setIcon(QIcon(":/resources/icon_config_interface.svg"));
+	
+	deckEditorButton = new QListWidgetItem(contentsWidget);
+	deckEditorButton->setTextAlignment(Qt::AlignHCenter);
+	deckEditorButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+	deckEditorButton->setIcon(QIcon(":/resources/icon_config_deckeditor.svg"));
 	
 	messagesButton = new QListWidgetItem(contentsWidget);
 	messagesButton->setTextAlignment(Qt::AlignHCenter);
@@ -590,6 +674,7 @@ void DlgSettings::retranslateUi()
 	generalButton->setText(tr("General"));
 	appearanceButton->setText(tr("Appearance"));
 	userInterfaceButton->setText(tr("User interface"));
+	deckEditorButton->setText(tr("Deck editor"));
 	messagesButton->setText(tr("Messages"));
 	
 	closeButton->setText(tr("&Close"));

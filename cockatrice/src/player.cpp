@@ -706,6 +706,11 @@ void Player::setCardAttrHelper(GameEventContext *context, CardItem *card, const 
 	}
 }
 
+void Player::eventConnectionStateChanged(Event_ConnectionStateChanged *event)
+{
+	emit logConnectionStateChanged(this, event->getConnected());
+}
+
 void Player::eventSay(Event_Say *event)
 {
 	emit logSay(this, event->getMessage());
@@ -713,7 +718,7 @@ void Player::eventSay(Event_Say *event)
 
 void Player::eventShuffle(Event_Shuffle * /*event*/)
 {
-	emit logShuffle(this);
+	emit logShuffle(this, zones.value("deck"));
 }
 
 void Player::eventRollDie(Event_RollDie *event)
@@ -862,6 +867,8 @@ void Player::eventMoveCard(Event_MoveCard *event, GameEventContext *context)
 	CardItem *card = startZone->takeCard(position, event->getCardId(), startZone != targetZone);
 	if (!card)
 		return;
+	if (startZone != targetZone)
+		card->deleteCardInfoPopup();
 	card->setName(event->getCardName());
 	
 	if (card->getAttachedTo() && (startZone != targetZone)) {
@@ -891,8 +898,7 @@ void Player::eventMoveCard(Event_MoveCard *event, GameEventContext *context)
 	if (context)
 		switch (context->getItemId()) {
 			case ItemId_Context_UndoDraw: emit logUndoDraw(this, card->getName()); break;
-			case ItemId_Context_MoveCard: emit logMoveCard(this, card, startZone, logPosition, targetZone, logX);
-			default: ;
+			default: emit logMoveCard(this, card, startZone, logPosition, targetZone, logX);
 		}
 	else
 		emit logMoveCard(this, card, startZone, logPosition, targetZone, logX);
@@ -1008,7 +1014,6 @@ void Player::eventDrawCards(Event_DrawCards *event)
 	
 	hand->reorganizeCards();
 	deck->reorganizeCards();
-	
 	emit logDrawCards(this, event->getNumberCards());
 }
 
@@ -1038,6 +1043,7 @@ void Player::processGameEvent(GameEvent *event, GameEventContext *context)
 {
 	qDebug() << "player event: id=" << event->getItemId();
 	switch (event->getItemId()) {
+		case ItemId_Event_ConnectionStateChanged: eventConnectionStateChanged(static_cast<Event_ConnectionStateChanged *>(event)); break;
 		case ItemId_Event_Say: eventSay(static_cast<Event_Say *>(event)); break;
 		case ItemId_Event_Shuffle: eventShuffle(static_cast<Event_Shuffle *>(event)); break;
 		case ItemId_Event_RollDie: eventRollDie(static_cast<Event_RollDie *>(event)); break;
@@ -1546,12 +1552,9 @@ void Player::setMirrored(bool _mirrored)
 	}
 }
 
-void Player::processSceneSizeChange(const QSizeF &newSize)
+void Player::processSceneSizeChange(int newPlayerWidth)
 {
-	// This will need to be changed if player areas are displayed side by side (e.g. 2x2 for a 4-player game)
-	qreal fullPlayerWidth = newSize.width();
-	
-	qreal tableWidth = fullPlayerWidth - CARD_HEIGHT - 15 - counterAreaWidth - stack->boundingRect().width();
+	qreal tableWidth = newPlayerWidth - CARD_HEIGHT - 15 - counterAreaWidth - stack->boundingRect().width();
 	if (!settingsCache->getHorizontalHand())
 		tableWidth -= hand->boundingRect().width();
 	

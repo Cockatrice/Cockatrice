@@ -10,6 +10,7 @@ LocalServer::LocalServer(QObject *parent)
 
 LocalServer::~LocalServer()
 {
+	prepareDestroy();
 }
 
 LocalServerInterface *LocalServer::newConnection()

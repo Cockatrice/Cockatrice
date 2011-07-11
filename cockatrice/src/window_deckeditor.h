@@ -52,6 +52,9 @@ private slots:
 	void actRemoveCard();
 	void actIncrement();
 	void actDecrement();
+        void actUpdatePrices();
+
+        void finishedUpdatingPrices();
 private:
 	void addCardHelper(const QString &zoneName);
 	void recursiveExpand(const QModelIndex &index);
@@ -74,7 +77,7 @@ private:
 	QMenu *deckMenu, *dbMenu;
 	QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aClose;
 	QAction *aEditSets, *aSearch, *aClearSearch;
-	QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;
+        QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement, *aUpdatePrices;
 public:
 	WndDeckEditor(QWidget *parent = 0);
 	~WndDeckEditor();

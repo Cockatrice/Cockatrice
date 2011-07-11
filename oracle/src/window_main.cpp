@@ -94,6 +94,10 @@ WindowMain::WindowMain(QWidget *parent)
 	QStringList args = qApp->arguments();
 	if (args.contains("-dlsets"))
 		downloadSetsFile(defaultSetsUrl);
+	
+	statusLabel = new QLabel;
+	statusBar()->addWidget(statusLabel);
+	statusLabel->setText(tr("Sets data not loaded."));
 }
 
 void WindowMain::updateSetList()
@@ -110,6 +114,7 @@ void WindowMain::updateSetList()
 		checkBoxLayout->addWidget(checkBox);
 		checkBoxList << checkBox;
 	}
+	statusLabel->setText(tr("Ready."));
 }
 
 void WindowMain::actLoadSetsFile()
@@ -121,8 +126,10 @@ void WindowMain::actLoadSetsFile()
 		return;
 
 	QString fileName = dialog.selectedFiles().at(0);
-	importer->readSetsFromFile(fileName);
-	updateSetList();
+	if (importer->readSetsFromFile(fileName))
+		updateSetList();
+	else
+		QMessageBox::critical(this, tr("Error"), tr("This file does not contain any sets data."));
 }
 
 void WindowMain::actDownloadSetsFile()
@@ -141,9 +148,15 @@ void WindowMain::downloadSetsFile(const QString &url)
 void WindowMain::setsDownloadFinished()
 {
 	QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
-	importer->readSetsFromByteArray(reply->readAll());
+	QNetworkReply::NetworkError errorCode = reply->error();
+	if (errorCode == QNetworkReply::NoError) {
+		if (importer->readSetsFromByteArray(reply->readAll()))
+			updateSetList();
+		else
+			QMessageBox::critical(this, tr("Error"), tr("The file was retrieved successfully, but it does not contain any sets data."));
+	} else
+		QMessageBox::critical(this, tr("Error"), tr("Network error: %1.").arg(reply->errorString()));
 	reply->deleteLater();
-	updateSetList();
 }
 
 void WindowMain::updateTotalProgress(int cardsImported, int setIndex, const QString &nextSetName)
@@ -205,6 +218,7 @@ void WindowMain::actStart()
 		checkBoxList[i]->setEnabled(false);
 	startButton->setEnabled(false);
 	totalProgressBar->setMaximum(setsCount);
+	statusLabel->setText(tr("Downloading card data..."));
 }
 
 void WindowMain::checkBoxChanged(int state)

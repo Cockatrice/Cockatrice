@@ -17,6 +17,7 @@ HEADERS += src/main.h \
 	src/servatrice.h \
 	src/serversocketinterface.h \
 	src/server_logger.h \
+	src/serversocketthread.h \
 	../common/color.h \
 	../common/serializable_item.h \
 	../common/decklist.h \
@@ -40,6 +41,7 @@ SOURCES += src/main.cpp \
 	src/servatrice.cpp \
 	src/serversocketinterface.cpp \
 	src/server_logger.cpp \
+	src/serversocketthread.cpp \
 	../common/serializable_item.cpp \
 	../common/decklist.cpp \
 	../common/protocol.cpp \

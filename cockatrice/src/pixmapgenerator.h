@@ -28,6 +28,14 @@ public:
 	static void clear() { pmCache.clear(); }
 };
 
+class GenderPixmapGenerator {
+private:
+	static QMap<int, QPixmap> pmCache;
+public:
+	static QPixmap generatePixmap(int height, int gender);
+	static void clear() { pmCache.clear(); }
+};
+
 class CountryPixmapGenerator {
 private:
 	static QMap<QString, QPixmap> pmCache;

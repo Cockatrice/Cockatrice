@@ -23,34 +23,42 @@
 #include "server_room.h"
 #include "server_protocolhandler.h"
 #include "protocol_datastructures.h"
+#include <QCoreApplication>
 #include <QDebug>
 
 Server::Server(QObject *parent)
-	: QObject(parent), nextGameId(0)
+	: QObject(parent), serverMutex(QMutex::Recursive), nextGameId(0)
 {
 }
 
 Server::~Server()
 {
+}
+
+void Server::prepareDestroy()
+{
+	QMutexLocker locker(&serverMutex);
+	
 	while (!clients.isEmpty())
 		delete clients.takeFirst();
+	
+	QMapIterator<int, Server_Room *> roomIterator(rooms);
+	while (roomIterator.hasNext())
+		delete roomIterator.next().value();
 }
 
 AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password)
 {
+	QMutexLocker locker(&serverMutex);
 	if (name.size() > 35)
 		name = name.left(35);
-	AuthenticationResult authState = checkUserPassword(name, password);
+	AuthenticationResult authState = checkUserPassword(session, name, password);
 	if (authState == PasswordWrong)
 		return authState;
 	
 	if (authState == PasswordRight) {
-		Server_ProtocolHandler *oldSession = users.value(name);
-		if (oldSession) {
-			if (!(oldSession->getUserInfo()->getUserLevel() & ServerInfo_User::IsRegistered))
-				return WouldOverwriteOldSession;
-			delete oldSession; // ~Server_ProtocolHandler() will call Server::removeClient
-		}
+		if (users.contains(name))
+			return WouldOverwriteOldSession;
 	} else if (authState == UnknownUser) {
 		// Change user name so that no two users have the same names,
 		// don't interfere with registered user names though.
@@ -66,6 +74,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	session->setUserInfo(data);
 	
 	users.insert(name, session);
+	qDebug() << "Server::loginUser: name=" << name;
 	
 	Event_UserJoined *event = new Event_UserJoined(new ServerInfo_User(data, false));
 	for (int i = 0; i < clients.size(); ++i)
@@ -78,11 +87,13 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 
 void Server::addClient(Server_ProtocolHandler *client)
 {
+	QMutexLocker locker(&serverMutex);
 	clients << client;
 }
 
 void Server::removeClient(Server_ProtocolHandler *client)
 {
+	QMutexLocker locker(&serverMutex);
 	clients.removeAt(clients.indexOf(client));
 	ServerInfo_User *data = client->getUserInfo();
 	if (data) {
@@ -93,20 +104,19 @@ void Server::removeClient(Server_ProtocolHandler *client)
 		delete event;
 		
 		users.remove(data->getName());
+		qDebug() << "Server::removeClient: name=" << data->getName();
 	}
-	qDebug() << "Server::removeClient: " << clients.size() << "clients; " << users.size() << "users left";
-}
-
-Server_Game *Server::getGame(int gameId) const
-{
-	return games.value(gameId);
+	qDebug() << "Server::removeClient:" << clients.size() << "clients; " << users.size() << "users left";
 }
 
 void Server::broadcastRoomUpdate()
 {
+	QMutexLocker locker(&serverMutex);
 	Server_Room *room = static_cast<Server_Room *>(sender());
 	QList<ServerInfo_Room *> eventRoomList;
+	room->roomMutex.lock();
 	eventRoomList.append(new ServerInfo_Room(room->getId(), room->getName(), room->getDescription(), room->getGames().size(), room->size(), room->getAutoJoin()));
+	room->roomMutex.unlock();
 	Event_ListRooms *event = new Event_ListRooms(eventRoomList);
 
 	for (int i = 0; i < clients.size(); ++i)
@@ -115,21 +125,28 @@ void Server::broadcastRoomUpdate()
 	delete event;
 }
 
-void Server::gameCreated(Server_Game *game)
-{
-	games.insert(game->getGameId(), game);
-}
-
-void Server::gameClosing(int gameId)
-{
-	qDebug("Server::gameClosing");
-	games.remove(gameId);
-}
-
 void Server::addRoom(Server_Room *newRoom)
 {
+	QMutexLocker locker(&serverMutex);
 	rooms.insert(newRoom->getId(), newRoom);
 	connect(newRoom, SIGNAL(roomInfoChanged()), this, SLOT(broadcastRoomUpdate()));
-	connect(newRoom, SIGNAL(gameCreated(Server_Game *)), this, SLOT(gameCreated(Server_Game *)));
-	connect(newRoom, SIGNAL(gameClosing(int)), this, SLOT(gameClosing(int)));
+}
+
+int Server::getUsersCount() const
+{
+	QMutexLocker locker(&serverMutex);
+	return users.size();
+}
+
+int Server::getGamesCount() const
+{
+	int result = 0;
+	QMutexLocker locker(&serverMutex);
+	QMapIterator<int, Server_Room *> roomIterator(rooms);
+	while (roomIterator.hasNext()) {
+		Server_Room *room = roomIterator.next().value();
+		QMutexLocker roomLocker(&room->roomMutex);
+		result += room->getGames().size();
+	}
+	return result;
 }

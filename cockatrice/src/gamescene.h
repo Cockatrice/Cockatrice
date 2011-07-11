@@ -22,7 +22,7 @@ private:
 	
 	PhasesToolbar *phasesToolbar;
 	QList<Player *> players;
-	QRectF playersRect;
+	QList<QList<Player *> > playersByColumn;
 	QList<ZoneViewWidget *> views;
 	QSize viewSize;
 	QPointer<CardItem> hoveredCard;
@@ -33,7 +33,6 @@ public:
 	GameScene(PhasesToolbar *_phasesToolbar, QObject *parent = 0);
 	~GameScene();
 	void retranslateUi();
-	const QRectF &getPlayersRect() const { return playersRect; }
 	void processViewSizeChange(const QSize &newSize);
 	
 	void startRubberBand(const QPointF &selectionOrigin);

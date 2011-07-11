@@ -34,6 +34,8 @@ CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _reve
 	connect(aAttach, SIGNAL(triggered()), this, SLOT(actAttach()));
 	aUnattach = new QAction(this);
 	connect(aUnattach, SIGNAL(triggered()), this, SLOT(actUnattach()));
+	aDrawArrow = new QAction(this);
+	connect(aDrawArrow, SIGNAL(triggered()), this, SLOT(actDrawArrow()));
 	aIncP = new QAction(this);
 	connect(aIncP, SIGNAL(triggered()), this, SLOT(actIncP()));
 	aDecP = new QAction(this);
@@ -172,6 +174,7 @@ void CardItem::updateCardMenu()
 				cardMenu->addAction(aAttach);
 				if (attachedTo)
 					cardMenu->addAction(aUnattach);
+				cardMenu->addAction(aDrawArrow);
 				cardMenu->addSeparator();
 				cardMenu->addMenu(ptMenu);
 				cardMenu->addAction(aSetAnnotation);
@@ -186,6 +189,9 @@ void CardItem::updateCardMenu()
 					cardMenu->addAction(aSetCounter[i]);
 				}
 				cardMenu->addSeparator();
+			} else if (zone->getName() == "stack") {
+				cardMenu->addAction(aDrawArrow);
+				cardMenu->addMenu(moveMenu);
 			} else {
 				cardMenu->addAction(aPlay);
 				cardMenu->addMenu(moveMenu);
@@ -209,6 +215,7 @@ void CardItem::retranslateUi()
 	aAttach->setText(tr("&Attach to card..."));
 	aAttach->setShortcut(tr("Ctrl+A"));
 	aUnattach->setText(tr("Unattac&h"));
+	aDrawArrow->setText(tr("&Draw arrow..."));
 	ptMenu->setTitle(tr("&Power / toughness"));
 	aIncP->setText(tr("&Increase power"));
 	aIncP->setShortcut(tr("Ctrl++"));
@@ -360,7 +367,7 @@ void CardItem::resetState()
 	annotation.clear();
 	attachedTo = 0;
 	attachedCards.clear();
-	setTapped(false);
+	setTapped(false, false);
 	setDoesntUntap(false);
 	update();
 }
@@ -380,6 +387,7 @@ void CardItem::processCardInfo(ServerInfo_Card *info)
 	setColor(info->getColor());
 	setTapped(info->getTapped());
 	setDestroyOnZoneChange(info->getDestroyOnZoneChange());
+	setDoesntUntap(info->getDoesntUntap());
 }
 
 CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown)
@@ -398,12 +406,34 @@ void CardItem::deleteDragItem()
 	dragItem = NULL;
 }
 
+void CardItem::drawArrow(const QColor &arrowColor)
+{
+	if (static_cast<TabGame *>(owner->parent())->getSpectator())
+		return;
+	
+	Player *arrowOwner = static_cast<TabGame *>(owner->parent())->getActiveLocalPlayer();
+	ArrowDragItem *arrow = new ArrowDragItem(arrowOwner, this, arrowColor);
+	scene()->addItem(arrow);
+	arrow->grabMouse();
+	
+	QListIterator<QGraphicsItem *> itemIterator(scene()->selectedItems());
+	while (itemIterator.hasNext()) {
+		CardItem *c = qgraphicsitem_cast<CardItem *>(itemIterator.next());
+		if (!c || (c == this))
+			continue;
+		if (c->getZone() != zone)
+			continue;
+		
+		ArrowDragItem *childArrow = new ArrowDragItem(arrowOwner, c, arrowColor);
+		scene()->addItem(childArrow);
+		arrow->addChildArrow(childArrow);
+	}
+}
+
 void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
 	if (event->buttons().testFlag(Qt::RightButton)) {
 		if ((event->screenPos() - event->buttonDownScreenPos(Qt::RightButton)).manhattanLength() < 2 * QApplication::startDragDistance())
-			return;
-		if (static_cast<TabGame *>(owner->parent())->getSpectator())
 			return;
 		
 		QColor arrowColor = Qt::red;
@@ -414,23 +444,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 		else if (event->modifiers().testFlag(Qt::ShiftModifier))
 			arrowColor = Qt::green;
 		
-		Player *arrowOwner = static_cast<TabGame *>(owner->parent())->getActiveLocalPlayer();
-		ArrowDragItem *arrow = new ArrowDragItem(arrowOwner, this, arrowColor);
-		scene()->addItem(arrow);
-		arrow->grabMouse();
-		
-		QListIterator<QGraphicsItem *> itemIterator(scene()->selectedItems());
-		while (itemIterator.hasNext()) {
-			CardItem *c = qgraphicsitem_cast<CardItem *>(itemIterator.next());
-			if (!c || (c == this))
-				continue;
-			if (c->getZone() != zone)
-				continue;
-			
-			ArrowDragItem *childArrow = new ArrowDragItem(arrowOwner, c, arrowColor);
-			scene()->addItem(childArrow);
-			arrow->addChildArrow(childArrow);
-		}
+		drawArrow(arrowColor);
 	} else if (event->buttons().testFlag(Qt::LeftButton)) {
 		if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < 2 * QApplication::startDragDistance())
 			return;
@@ -544,6 +558,11 @@ void CardItem::actAttach()
 void CardItem::actUnattach()
 {
 	owner->actUnattach(static_cast<QAction *>(sender()));
+}
+
+void CardItem::actDrawArrow()
+{
+	drawArrow(Qt::red);
 }
 
 void CardItem::actIncP()

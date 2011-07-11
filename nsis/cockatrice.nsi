@@ -40,12 +40,16 @@ Section "Application" SecApplication
 	File data\QtNetwork4.dll
 	File data\QtSvg4.dll
 	File data\QtXml4.dll
+	File data\QtMultimedia4.dll
 
 	SetOutPath "$INSTDIR\zonebg"
 	File /r ..\zonebg\*.*
 	
 	SetOutPath "$INSTDIR\plugins"
 	File /r data\plugins\*.*
+
+	SetOutPath "$INSTDIR\sounds"
+	File /r ..\sounds\*.*
 
 	SetOutPath "$INSTDIR\pics"
 	SetOutPath "$INSTDIR\decks"
@@ -77,6 +81,7 @@ SectionEnd
 Section Uninstall
         RMDir /r "$INSTDIR\zonebg"
         RMDir /r "$INSTDIR\plugins"
+        RMDir /r "$INSTDIR\sounds"
         RMDir "$INSTDIR\decks"
         RMDir /r "$INSTDIR\pics\downloadedPics"
         RMDir "$INSTDIR\pics"

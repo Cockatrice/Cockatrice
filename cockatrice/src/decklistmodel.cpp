@@ -10,6 +10,7 @@
 #include "main.h"
 #include "decklistmodel.h"
 #include "carddatabase.h"
+#include "settingscache.h"
 
 DeckListModel::DeckListModel(QObject *parent)
 	: QAbstractItemModel(parent)
@@ -65,12 +66,20 @@ int DeckListModel::rowCount(const QModelIndex &parent) const
 		return 0;
 }
 
+int DeckListModel::columnCount(const QModelIndex &/*parent*/) const
+{
+	if (settingsCache->getPriceTagFeature())
+		return 3;
+	else
+		return 2;
+}
+
 QVariant DeckListModel::data(const QModelIndex &index, int role) const
 {
 //	debugIndexInfo("data", index);
 	if (!index.isValid())
 		return QVariant();
-	if (index.column() >= 2)
+        if (index.column() >= columnCount())
 		return QVariant();
 
 	AbstractDecklistNode *temp = static_cast<AbstractDecklistNode *>(index.internalPointer());
@@ -86,8 +95,9 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
 			case Qt::DisplayRole:
 			case Qt::EditRole:
 				switch (index.column()) {
-					case 0: return node->recursiveCount(true);
-					case 1: return node->getVisibleName();
+                                        case 0: return node->recursiveCount(true);
+                                        case 1: return node->getVisibleName();
+                                        case 2: return QString().sprintf("$%.2f", node->recursivePrice(true));
 					default: return QVariant();
 				}
 			case Qt::BackgroundRole: {
@@ -101,8 +111,9 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
 			case Qt::DisplayRole:
 			case Qt::EditRole: {
 				switch (index.column()) {
-					case 0: return card->getNumber();
-					case 1: return card->getName();
+                                        case 0: return card->getNumber();
+                                        case 1: return card->getName();
+                                        case 2: return QString().sprintf("$%.2f", card->getTotalPrice());
 					default: return QVariant();
 				}
 			}
@@ -119,9 +130,12 @@ QVariant DeckListModel::headerData(int section, Qt::Orientation orientation, int
 {
 	if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal))
 		return QVariant();
+        if (section >= columnCount())
+		return QVariant();
 	switch (section) {
-		case 0: return tr("Number");
-		case 1: return tr("Card");
+                case 0: return tr("Number");
+                case 1: return tr("Card");
+                case 2: return tr("Price");
 		default: return QVariant();
 	}
 }
@@ -174,8 +188,9 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, int
 		return false;
 
 	switch (index.column()) {
-		case 0: node->setNumber(value.toInt()); break;
-		case 1: node->setName(value.toString()); break;
+                case 0: node->setNumber(value.toInt()); break;
+                case 1: node->setName(value.toString()); break;
+                case 2: node->setPrice(value.toFloat()); break;
 		default: return false;
 	}
 	emitRecursiveUpdates(index);
@@ -300,7 +315,7 @@ void DeckListModel::setDeckList(DeckList *_deck)
 
 void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
 {
-	static const int totalColumns = 3;
+	const int totalColumns = settingsCache->getPriceTagFeature() ? 3 : 2;
 
 	if (node->height() == 1) {
 		QTextBlockFormat blockFormat;
@@ -308,13 +323,16 @@ void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *no
 		charFormat.setFontPointSize(11);
 		charFormat.setFontWeight(QFont::Bold);
 		cursor->insertBlock(blockFormat, charFormat);
-		cursor->insertText(QString("%1: %2").arg(node->getVisibleName()).arg(node->recursiveCount(true)));
+		QString priceStr;
+		if (settingsCache->getPriceTagFeature())
+			priceStr = QString().sprintf(": $%.2f", node->recursivePrice(true));
+                cursor->insertText(QString("%1: %2").arg(node->getVisibleName()).arg(node->recursiveCount(true)).append(priceStr));
 
 		QTextTableFormat tableFormat;
 		tableFormat.setCellPadding(0);
 		tableFormat.setCellSpacing(0);
 		tableFormat.setBorder(0);
-		QTextTable *table = cursor->insertTable(node->size() + 1, 2, tableFormat);
+                QTextTable *table = cursor->insertTable(node->size() + 1, totalColumns, tableFormat);
 		for (int i = 0; i < node->size(); i++) {
 			AbstractDecklistCardNode *card = dynamic_cast<AbstractDecklistCardNode *>(node->at(i));
 
@@ -330,6 +348,13 @@ void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *no
 			cell.setFormat(cellCharFormat);
 			cellCursor = cell.firstCursorPosition();
 			cellCursor.insertText(card->getName());
+
+			if (settingsCache->getPriceTagFeature()) {
+	                        cell = table->cellAt(i, 2);
+	                        cell.setFormat(cellCharFormat);
+	                        cellCursor = cell.firstCursorPosition();
+	                        cellCursor.insertText(QString().sprintf("$%.2f ", card->getTotalPrice()));
+			}
 		}
 	} else if (node->height() == 2) {
 		QTextBlockFormat blockFormat;
@@ -338,7 +363,10 @@ void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *no
 		charFormat.setFontWeight(QFont::Bold);
 
 		cursor->insertBlock(blockFormat, charFormat);
-		cursor->insertText(QString("%1: %2").arg(node->getVisibleName()).arg(node->recursiveCount(true)));
+		QString priceStr;
+		if (settingsCache->getPriceTagFeature())
+			priceStr = QString().sprintf(": $%.2f", node->recursivePrice(true));
+                cursor->insertText(QString("%1: %2").arg(node->getVisibleName()).arg(node->recursiveCount(true)).append(priceStr));
 
 		QTextTableFormat tableFormat;
 		tableFormat.setCellPadding(10);
@@ -390,4 +418,15 @@ void DeckListModel::printDeckList(QPrinter *printer)
 	}
 
 	doc.print(printer);
+}
+
+void DeckListModel::pricesUpdated(InnerDecklistNode *node)
+{
+	if (!node)
+		node = root;
+	
+	if (node->isEmpty())
+		return;
+	
+	emit dataChanged(createIndex(0, 2, node->at(0)), createIndex(node->size() - 1, 2, node->last()));
 }

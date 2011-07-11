@@ -21,6 +21,11 @@ Command_ListUsers::Command_ListUsers()
 	: Command("list_users")
 {
 }
+Command_GetGamesOfUser::Command_GetGamesOfUser(const QString &_userName)
+	: Command("get_games_of_user")
+{
+	insertItem(new SerializableItem_String("user_name", _userName));
+}
 Command_GetUserInfo::Command_GetUserInfo(const QString &_userName)
 	: Command("get_user_info")
 {
@@ -255,6 +260,11 @@ Command_RevealCards::Command_RevealCards(int _gameId, const QString &_zoneName, 
 	insertItem(new SerializableItem_Int("card_id", _cardId));
 	insertItem(new SerializableItem_Int("player_id", _playerId));
 }
+Event_ConnectionStateChanged::Event_ConnectionStateChanged(int _playerId, bool _connected)
+	: GameEvent("connection_state_changed", _playerId)
+{
+	insertItem(new SerializableItem_Bool("connected", _connected));
+}
 Event_Say::Event_Say(int _playerId, const QString &_message)
 	: GameEvent("say", _playerId)
 {
@@ -398,6 +408,12 @@ Event_ServerMessage::Event_ServerMessage(const QString &_message)
 {
 	insertItem(new SerializableItem_String("message", _message));
 }
+Event_ServerShutdown::Event_ServerShutdown(const QString &_reason, int _minutes)
+	: GenericEvent("server_shutdown")
+{
+	insertItem(new SerializableItem_String("reason", _reason));
+	insertItem(new SerializableItem_Int("minutes", _minutes));
+}
 Event_ConnectionClosed::Event_ConnectionClosed(const QString &_reason)
 	: GenericEvent("connection_closed")
 {
@@ -458,15 +474,27 @@ Context_MoveCard::Context_MoveCard()
 	: GameEventContext("move_card")
 {
 }
+Context_Mulligan::Context_Mulligan(int _number)
+	: GameEventContext("mulligan")
+{
+	insertItem(new SerializableItem_Int("number", _number));
+}
 Command_UpdateServerMessage::Command_UpdateServerMessage()
 	: AdminCommand("update_server_message")
 {
 }
-Command_BanFromServer::Command_BanFromServer(const QString &_userName, int _minutes)
-	: AdminCommand("ban_from_server")
+Command_ShutdownServer::Command_ShutdownServer(const QString &_reason, int _minutes)
+	: AdminCommand("shutdown_server")
+{
+	insertItem(new SerializableItem_String("reason", _reason));
+	insertItem(new SerializableItem_Int("minutes", _minutes));
+}
+Command_BanFromServer::Command_BanFromServer(const QString &_userName, int _minutes, const QString &_reason)
+	: ModeratorCommand("ban_from_server")
 {
 	insertItem(new SerializableItem_String("user_name", _userName));
 	insertItem(new SerializableItem_Int("minutes", _minutes));
+	insertItem(new SerializableItem_String("reason", _reason));
 }
 void ProtocolItem::initializeHashAuto()
 {
@@ -474,6 +502,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmdlogin", Command_Login::newItem);
 	itemNameHash.insert("cmdmessage", Command_Message::newItem);
 	itemNameHash.insert("cmdlist_users", Command_ListUsers::newItem);
+	itemNameHash.insert("cmdget_games_of_user", Command_GetGamesOfUser::newItem);
 	itemNameHash.insert("cmdget_user_info", Command_GetUserInfo::newItem);
 	itemNameHash.insert("cmdadd_to_list", Command_AddToList::newItem);
 	itemNameHash.insert("cmdremove_from_list", Command_RemoveFromList::newItem);
@@ -514,6 +543,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("cmddump_zone", Command_DumpZone::newItem);
 	itemNameHash.insert("cmdstop_dump_zone", Command_StopDumpZone::newItem);
 	itemNameHash.insert("cmdreveal_cards", Command_RevealCards::newItem);
+	itemNameHash.insert("game_eventconnection_state_changed", Event_ConnectionStateChanged::newItem);
 	itemNameHash.insert("game_eventsay", Event_Say::newItem);
 	itemNameHash.insert("game_eventleave", Event_Leave::newItem);
 	itemNameHash.insert("game_eventgame_closed", Event_GameClosed::newItem);
@@ -536,6 +566,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventstop_dump_zone", Event_StopDumpZone::newItem);
 	itemNameHash.insert("generic_eventremove_from_list", Event_RemoveFromList::newItem);
 	itemNameHash.insert("generic_eventserver_message", Event_ServerMessage::newItem);
+	itemNameHash.insert("generic_eventserver_shutdown", Event_ServerShutdown::newItem);
 	itemNameHash.insert("generic_eventconnection_closed", Event_ConnectionClosed::newItem);
 	itemNameHash.insert("generic_eventmessage", Event_Message::newItem);
 	itemNameHash.insert("generic_eventgame_joined", Event_GameJoined::newItem);
@@ -547,6 +578,8 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_event_contextdeck_select", Context_DeckSelect::newItem);
 	itemNameHash.insert("game_event_contextundo_draw", Context_UndoDraw::newItem);
 	itemNameHash.insert("game_event_contextmove_card", Context_MoveCard::newItem);
+	itemNameHash.insert("game_event_contextmulligan", Context_Mulligan::newItem);
 	itemNameHash.insert("cmdupdate_server_message", Command_UpdateServerMessage::newItem);
+	itemNameHash.insert("cmdshutdown_server", Command_ShutdownServer::newItem);
 	itemNameHash.insert("cmdban_from_server", Command_BanFromServer::newItem);
 }
