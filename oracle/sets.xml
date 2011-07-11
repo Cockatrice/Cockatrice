@@ -173,6 +173,10 @@
 	    <longname>Magic 2011</longname>
 	</set>
 	<set import="1">
+	    <name>M12</name>
+	    <longname>Magic 2012</longname>
+	</set>
+	<set import="1">
 	    <name>COM</name>
 	    <longname>Magic: The Gathering-Commander</longname>
 	</set>

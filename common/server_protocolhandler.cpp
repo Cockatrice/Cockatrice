@@ -58,8 +58,8 @@ void Server_ProtocolHandler::prepareDestroy()
 	while (i.hasNext())
 		delete i.next().value();
 	QMapIterator<QString, ServerInfo_User *> j(ignoreList);
-	while (i.hasNext())
-		delete i.next().value();
+	while (j.hasNext())
+		delete j.next().value();
 }
 
 void Server_ProtocolHandler::playerRemovedFromGame(Server_Game *game)

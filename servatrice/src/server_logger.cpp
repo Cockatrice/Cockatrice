@@ -39,7 +39,7 @@ void ServerLogger::logMessage(QString message, ServerSocketInterface *ssi)
 	bufferMutex.lock();
 	QString ssiString;
 	if (ssi)
-		ssiString = QString::number((qulonglong) ssi) + " ";
+		ssiString = QString::number((qulonglong) ssi, 16) + " ";
 	buffer.append(QDateTime::currentDateTime().toString() + " " + QString::number((qulonglong) QThread::currentThread(), 16) + " " + ssiString + message);
 	bufferMutex.unlock();
 	

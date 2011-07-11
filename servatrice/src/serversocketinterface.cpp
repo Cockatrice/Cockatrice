@@ -60,7 +60,7 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_s
 
 ServerSocketInterface::~ServerSocketInterface()
 {
-	logger->logMessage("ServerSocketInterface destructor");
+	logger->logMessage("ServerSocketInterface destructor", this);
 	
 	prepareDestroy();
 	
