@@ -344,6 +344,7 @@ bool WndDeckEditor::actSaveDeckAs()
 	dialog.setConfirmOverwrite(true);
 	dialog.setDefaultSuffix("cod");
 	dialog.setNameFilters(DeckList::fileNameFilters);
+	dialog.selectFile(deckModel->getDeckList()->getName());
 	if (!dialog.exec())
 		return false;
 
