@@ -82,9 +82,8 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
 	painter->setFont(f);
 }
 
-void AbstractCardItem::paintPicture(QPainter *painter, int angle)
+void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedSize, int angle)
 {
-	QSizeF translatedSize = getTranslatedSize(painter);
 	QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
 	qreal scaleFactor = translatedSize.width() / boundingRect().width();
 
@@ -143,15 +142,20 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 {
 	painter->save();
 
-	paintPicture(painter, tapAngle);
+	QSizeF translatedSize = getTranslatedSize(painter);
+	paintPicture(painter, translatedSize, tapAngle);
 	
+	painter->save();
+	painter->setRenderHint(QPainter::Antialiasing, false);
+	transformPainter(painter, translatedSize, tapAngle);
 	if (isSelected()) {
 		painter->setPen(Qt::red);
-		painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
+		painter->drawRect(QRectF(0.5, 0.5, translatedSize.width() - 1, translatedSize.height() - 1));
 	} else if (isHovered) {
 		painter->setPen(Qt::yellow);
-		painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
+		painter->drawRect(QRectF(0.5, 0.5, translatedSize.width() - 1, translatedSize.height() - 1));
 	}
+	painter->restore();
 
 	painter->restore();
 }

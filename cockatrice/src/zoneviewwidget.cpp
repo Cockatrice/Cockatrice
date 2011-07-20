@@ -1,6 +1,11 @@
 #include <QGraphicsLinearLayout>
 #include <QGraphicsProxyWidget>
+#include <QGraphicsSceneMouseEvent>
 #include <QCheckBox>
+#include <QLabel>
+#include <QPushButton>
+#include <QPainter>
+#include <QPalette>
 #include "zoneviewwidget.h"
 #include "carditem.h"
 #include "zoneviewzone.h"
@@ -8,18 +13,69 @@
 #include "gamescene.h"
 #include "protocol_items.h"
 #include "settingscache.h"
+#include "gamescene.h"
+
+TitleLabel::TitleLabel()
+	: QGraphicsWidget(), text(" ")
+{
+	setAcceptHoverEvents(true);
+}
+
+void TitleLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
+{
+	QBrush windowBrush = palette().window();
+	windowBrush.setColor(windowBrush.color().darker(150));
+	painter->fillRect(boundingRect(), windowBrush);
+	painter->drawText(boundingRect(), Qt::AlignLeft | Qt::AlignVCenter, text);
+}
+
+QSizeF TitleLabel::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+{
+	QFont f;
+	QFontMetrics fm(f);
+	if (which == Qt::MaximumSize)
+		return QSizeF(constraint.width(), fm.size(Qt::TextSingleLine, text).height() + 10);
+	else
+		return fm.size(Qt::TextSingleLine, text);
+}
+
+void TitleLabel::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+	if (event->button() == Qt::LeftButton) {
+		buttonDownPos = static_cast<GameScene *>(scene())->getViewTransform().inverted().map(event->pos());
+		event->accept();
+	} else
+		event->ignore();
+}
+
+void TitleLabel::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+	emit mouseMoved(event->scenePos() - buttonDownPos);
+}
 
 ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, bool _revealZone, const QList<ServerInfo_Card *> &cardList)
-	: QGraphicsWidget(0, Qt::Tool | Qt::CustomizeWindowHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint/* | Qt::WindowCloseButtonHint*/), player(_player)
+	: QGraphicsWidget(0, Qt::Tool | Qt::FramelessWindowHint), player(_player)
 {
+	setAcceptHoverEvents(true);
 	setAttribute(Qt::WA_DeleteOnClose);
 	setZValue(2000000006);
+	setFlag(ItemIgnoresTransformations);
+	setAutoFillBackground(true);
 	
-	QFont font;
-	font.setPixelSize(10);
-	setFont(font);
-
+	QGraphicsLinearLayout *hbox = new QGraphicsLinearLayout(Qt::Horizontal);
+	titleLabel = new TitleLabel;
+	connect(titleLabel, SIGNAL(mouseMoved(QPointF)), this, SLOT(moveWidget(QPointF)));
+	closeButton = new QPushButton("X");
+	connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
+	closeButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	QGraphicsProxyWidget *closeButtonProxy = new QGraphicsProxyWidget;
+	closeButtonProxy->setWidget(closeButton);
+	
+	hbox->addItem(titleLabel);
+	hbox->addItem(closeButtonProxy);
 	QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
+	
+	vbox->addItem(hbox);
 	
 	if (numberCards < 0) {
 		sortByNameCheckBox = new QCheckBox;
@@ -67,13 +123,18 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 
 void ZoneViewWidget::retranslateUi()
 {
-	setWindowTitle(zone->getTranslatedName(false, CaseNominative));
+	titleLabel->setText(zone->getTranslatedName(false, CaseNominative));
 	if (sortByNameCheckBox)
 		sortByNameCheckBox->setText(tr("sort by name"));
 	if (sortByTypeCheckBox)
 		sortByTypeCheckBox->setText(tr("sort by type"));
 	if (shuffleCheckBox)
 		shuffleCheckBox->setText(tr("shuffle when closing"));
+}
+
+void ZoneViewWidget::moveWidget(QPointF scenePos)
+{
+	setPos(scenePos);
 }
 
 void ZoneViewWidget::resizeToZoneContents()

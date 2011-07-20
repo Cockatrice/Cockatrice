@@ -25,7 +25,7 @@ QRectF PileZone::boundingRect() const
 void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
 	if (!cards.isEmpty())
-		cards.at(0)->paintPicture(painter, 90);
+		cards.at(0)->paintPicture(painter, cards.at(0)->getTranslatedSize(painter), 90);
 
 	painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
 	
