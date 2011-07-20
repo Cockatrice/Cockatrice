@@ -268,6 +268,9 @@ void WndDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
 void WndDeckEditor::updateSearch(const QString &search)
 {
 	databaseDisplayModel->setCardNameBeginning(search);
+	QModelIndexList sel = databaseView->selectionModel()->selectedRows();
+	if (sel.isEmpty() && databaseDisplayModel->rowCount())
+		databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
 }
 
 bool WndDeckEditor::confirmClose()
