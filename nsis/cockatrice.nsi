@@ -41,6 +41,7 @@ Section "Application" SecApplication
 	File data\QtSvg4.dll
 	File data\QtXml4.dll
 	File data\QtMultimedia4.dll
+	File data\QtScript4.dll
 
 	SetOutPath "$INSTDIR\zonebg"
 	File /r ..\zonebg\*.*
