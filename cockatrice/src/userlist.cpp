@@ -92,7 +92,7 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
 		return data(0, Qt::UserRole).toInt() > other.data(0, Qt::UserRole).toInt();
 	
 	// Sort by name
-	return data(2, Qt::UserRole).toString().toLower() < other.data(2, Qt::UserRole).toString().toLower();
+	return QString::localeAwareCompare(data(2, Qt::UserRole).toString(), other.data(2, Qt::UserRole).toString()) < 0;
 }
 
 UserList::UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserListType _type, QWidget *parent)

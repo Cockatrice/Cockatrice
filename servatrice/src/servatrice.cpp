@@ -37,9 +37,8 @@ void Servatrice_TcpServer::incomingConnection(int socketDescriptor)
 	} else {
 		QTcpSocket *socket = new QTcpSocket;
 		socket->setSocketDescriptor(socketDescriptor);
-		logger->logMessage(QString("incoming connection: %1").arg(socket->peerAddress().toString()));
-		
-		new ServerSocketInterface(server, socket);
+		ServerSocketInterface *ssi = new ServerSocketInterface(server, socket);
+		logger->logMessage(QString("incoming connection: %1").arg(socket->peerAddress().toString()), ssi);
 	}
 }
 
@@ -188,18 +187,27 @@ AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handl
 		QSqlQuery query;
 		query.prepare("select a.password, time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_users a left join " + dbPrefix + "_bans b on b.id_user = a.id and b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.id_user = a.id) where a.name = :name and a.active = 1");
 		query.bindValue(":name", user);
-		if (!execSqlQuery(query))
+		if (!execSqlQuery(query)) {
+			qDebug("Login denied: SQL error");
 			return PasswordWrong;
+		}
 		
 		if (query.next()) {
-			if (query.value(1).toInt() || query.value(2).toInt())
+			if (query.value(1).toInt() || query.value(2).toInt()) {
+				qDebug("Login denied: banned");
 				return PasswordWrong;
-			if (query.value(0).toString() == password)
+			}
+			if (query.value(0).toString() == password) {
+				qDebug("Login accepted: password right");
 				return PasswordRight;
-			else
+			} else {
+				qDebug("Login denied: password wrong");
 				return PasswordWrong;
-		} else
+			}
+		} else {
+			qDebug("Login accepted: unknown user");
 			return UnknownUser;
+		}
 	} else
 		return UnknownUser;
 }

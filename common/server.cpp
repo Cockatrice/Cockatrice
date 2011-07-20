@@ -57,8 +57,10 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 		return authState;
 	
 	if (authState == PasswordRight) {
-		if (users.contains(name))
+		if (users.contains(name)) {
+			qDebug("Login denied: would overwrite old session");
 			return WouldOverwriteOldSession;
+		}
 	} else if (authState == UnknownUser) {
 		// Change user name so that no two users have the same names,
 		// don't interfere with registered user names though.

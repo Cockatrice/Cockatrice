@@ -58,8 +58,8 @@ void Server_ProtocolHandler::prepareDestroy()
 	while (i.hasNext())
 		delete i.next().value();
 	QMapIterator<QString, ServerInfo_User *> j(ignoreList);
-	while (i.hasNext())
-		delete i.next().value();
+	while (j.hasNext())
+		delete j.next().value();
 }
 
 void Server_ProtocolHandler::playerRemovedFromGame(Server_Game *game)
@@ -207,25 +207,26 @@ void Server_ProtocolHandler::processCommandContainer(CommandContainer *cont)
 	gameListMutex.lock();
 	GameEventContainer *gQPublic = cont->getGameEventQueuePublic();
 	if (gQPublic) {
-		Server_Game *game = games.value(gQPublic->getGameId()).first;
-		Server_Player *player = games.value(gQPublic->getGameId()).second;
-		GameEventContainer *gQPrivate = cont->getGameEventQueuePrivate();
-		GameEventContainer *gQOmniscient = cont->getGameEventQueueOmniscient();
-		if (gQPrivate) {
-			int privatePlayerId = cont->getPrivatePlayerId();
-			Server_Player *privatePlayer;
-			if (privatePlayerId == -1)
-				privatePlayer = player;
-			else
-				privatePlayer = game->getPlayer(privatePlayerId);
-			if (gQOmniscient) {
-				game->sendGameEventContainer(gQPublic, privatePlayer, true);
-				game->sendGameEventContainerOmniscient(gQOmniscient, privatePlayer);
+		QPair<Server_Game *, Server_Player *> gamePlayerPair = games.value(gQPublic->getGameId());
+		if (gamePlayerPair.first) {
+			GameEventContainer *gQPrivate = cont->getGameEventQueuePrivate();
+			GameEventContainer *gQOmniscient = cont->getGameEventQueueOmniscient();
+			if (gQPrivate) {
+				int privatePlayerId = cont->getPrivatePlayerId();
+				Server_Player *privatePlayer;
+				if (privatePlayerId == -1)
+					privatePlayer = gamePlayerPair.second;
+				else
+					privatePlayer = gamePlayerPair.first->getPlayer(privatePlayerId);
+				if (gQOmniscient) {
+					gamePlayerPair.first->sendGameEventContainer(gQPublic, privatePlayer, true);
+					gamePlayerPair.first->sendGameEventContainerOmniscient(gQOmniscient, privatePlayer);
+				} else
+					gamePlayerPair.first->sendGameEventContainer(gQPublic, privatePlayer);
+				privatePlayer->sendProtocolItem(gQPrivate);
 			} else
-				game->sendGameEventContainer(gQPublic, privatePlayer);
-			privatePlayer->sendProtocolItem(gQPrivate);
-		} else
-			game->sendGameEventContainer(gQPublic);
+				gamePlayerPair.first->sendGameEventContainer(gQPublic);
+		}
 	}
 	gameListMutex.unlock();
 	

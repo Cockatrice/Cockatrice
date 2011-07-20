@@ -56,7 +56,7 @@ Server_Game::~Server_Game()
 	
 	room->removeGame(this);
 	delete creatorInfo;
-	qDebug("Server_Game destructor");
+	qDebug() << "Server_Game destructor: gameId=" << gameId;
 }
 
 void Server_Game::pingClockTimeout()
