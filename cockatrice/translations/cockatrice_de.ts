@@ -5095,7 +5095,7 @@ Bitte geben Sie einen Namen ein:</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="294"/>
         <source>&amp;Concede</source>
-        <translation></translation>
+        <translation>&amp;Aufgeben</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="295"/>
