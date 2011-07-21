@@ -1,10 +1,10 @@
 #ifndef ZONEVIEWWIDGET_H
 #define ZONEVIEWWIDGET_H
 
-#include <QDialog>
-#include <QGraphicsScene>
 #include <QGraphicsWidget>
 
+class QLabel;
+class QPushButton;
 class CardZone;
 class ZoneViewZone;
 class Player;
@@ -13,12 +13,32 @@ class QScrollBar;
 class QCheckBox;
 class GameScene;
 class ServerInfo_Card;
+class QGraphicsSceneMouseEvent;
+
+class TitleLabel : public QGraphicsWidget {
+	Q_OBJECT
+private:
+	QString text;
+	QPointF buttonDownPos;
+public:
+	TitleLabel();
+	void paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/);
+	void setText(const QString &_text) { text = _text; update(); }
+signals:
+	void mouseMoved(QPointF scenePos);
+protected:
+	QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const;
+	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+	void mousePressEvent(QGraphicsSceneMouseEvent *event);
+};
 
 class ZoneViewWidget : public QGraphicsWidget {
 	Q_OBJECT
 private:
 	ZoneViewZone *zone;
 	
+	TitleLabel *titleLabel;
+	QPushButton *closeButton;
 	QScrollBar *scrollBar;
 	QCheckBox *sortByNameCheckBox, *sortByTypeCheckBox, *shuffleCheckBox;
 	
@@ -29,6 +49,7 @@ signals:
 private slots:
 	void resizeToZoneContents();
 	void zoneDeleted();
+	void moveWidget(QPointF scenePos);
 public:
 	ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards = 0, bool _revealZone = false, const QList<ServerInfo_Card *> &cardList = QList<ServerInfo_Card *>());
 	ZoneViewZone *getZone() const { return zone; }

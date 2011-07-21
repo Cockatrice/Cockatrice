@@ -94,12 +94,12 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="301"/>
         <source>Invert vertical coordinate</source>
-        <translation>Инвертировать вертикальные координату</translation>
+        <translation>Инвертировать вертикальные координаты</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="302"/>
         <source>Minimum player count for multi-column layout:</source>
-        <translation type="unfinished"></translation>
+        <translation>Минимальное количество игроков для столбчатого расположения:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="304"/>
@@ -132,29 +132,30 @@
         <location filename="../src/userlist.cpp" line="23"/>
         <source>Please enter the duration of the ban (in minutes).
 Enter 0 for an indefinite ban.</source>
-        <translation type="unfinished">Введите продолжительность бана (в минутах).
+        <translation>Введите продолжительность бана (в минутах).
 Введите 0 чтобы забанить пожизненно.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="27"/>
         <source>Please enter the reason for the ban.
 This is only saved for moderators and cannot be seen by the banned person.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста, назовите причину бана.
+Это необходимо для модераторов и не будет прочитано забаненным игроком.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="30"/>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;Ок</translation>
+        <translation>&amp;Ок</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="33"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
+        <translation>&amp;Отмена</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="49"/>
         <source>Ban user from server</source>
-        <translation type="unfinished"></translation>
+        <translation>Забанить игрока на этом сервере</translation>
     </message>
 </context>
 <context>
@@ -190,22 +191,22 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardinfowidget.cpp" line="23"/>
         <source>Hide card info</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть информацию о карте</translation>
     </message>
     <message>
         <location filename="../src/cardinfowidget.cpp" line="23"/>
         <source>Show card only</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать только карту</translation>
     </message>
     <message>
         <location filename="../src/cardinfowidget.cpp" line="23"/>
         <source>Show text only</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать только текст</translation>
     </message>
     <message>
         <location filename="../src/cardinfowidget.cpp" line="23"/>
         <source>Show full info</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать полную информацию</translation>
     </message>
     <message>
         <location filename="../src/cardinfowidget.cpp" line="161"/>
@@ -292,7 +293,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/carditem.cpp" line="218"/>
         <source>&amp;Draw arrow...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Нарисовать стрелку...</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="219"/>
@@ -501,361 +502,361 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <location filename="../src/cardzone.cpp" line="52"/>
         <source>her hand</source>
         <comment>nominative, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>её рука</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="52"/>
         <source>%1&apos;s hand</source>
         <comment>nominative, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>рука %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="52"/>
         <source>his hand</source>
         <comment>nominative, male owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>его рука</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="52"/>
         <source>%1&apos;s hand</source>
         <comment>nominative, male owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>рука %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="53"/>
         <source>of her hand</source>
         <comment>genitive, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>её руки</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="53"/>
         <source>of %1&apos;s hand</source>
         <comment>genitive, female owner</comment>
-        <translation type="unfinished">руки %1-го игрока</translation>
+        <translation>руки %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="53"/>
         <source>of his hand</source>
         <comment>genitive, male owner</comment>
-        <translation type="unfinished">его руки</translation>
+        <translation>его руки</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="53"/>
         <source>of %1&apos;s hand</source>
         <comment>genitive, male owner</comment>
-        <translation type="unfinished">руки %1-го игрока</translation>
+        <translation>руки %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="54"/>
         <source>her hand</source>
         <comment>accusative, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>её руку</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="54"/>
         <source>%1&apos;s hand</source>
         <comment>accusative, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>руку %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="54"/>
         <source>his hand</source>
         <comment>accusative, male owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>его руку</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="54"/>
         <source>%1&apos;s hand</source>
         <comment>accusative, male owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>руку %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="58"/>
         <source>her library</source>
         <comment>nominative, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>её библиотека</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="58"/>
         <source>%1&apos;s library</source>
         <comment>nominative, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>библиотека %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="58"/>
         <source>his library</source>
         <comment>nominative, male owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>его библиотека</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="58"/>
         <source>%1&apos;s library</source>
         <comment>nominative, male owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>библиотека %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="59"/>
         <source>of her library</source>
         <comment>genitive, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>её библиотеки</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="59"/>
         <source>of %1&apos;s library</source>
         <comment>genitive, female owner</comment>
-        <translation type="unfinished">библиотеки %1-го игрока</translation>
+        <translation>библиотеки %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="59"/>
         <source>of his library</source>
         <comment>genitive, male owner</comment>
-        <translation type="unfinished">его библиотеки</translation>
+        <translation>его библиотеки</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="59"/>
         <source>of %1&apos;s library</source>
         <comment>genitive, male owner</comment>
-        <translation type="unfinished">библиотеки %1-го игрока</translation>
+        <translation>библиотеки %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="60"/>
         <source>her library</source>
         <comment>accusative, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>её библиотеку</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="60"/>
         <source>%1&apos;s library</source>
         <comment>accusative, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>библиотеку %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="60"/>
         <source>his library</source>
         <comment>accusative, male owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>его библиотеку</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="60"/>
         <source>%1&apos;s library</source>
         <comment>accusative, male owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>библиотеку %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="64"/>
         <source>her graveyard</source>
         <comment>nominative, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>её кладбище</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="64"/>
         <source>%1&apos;s graveyard</source>
         <comment>nominative, female owner</comment>
-        <translation type="unfinished">кладбище %1-го игрока</translation>
+        <translation>кладбище %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="64"/>
         <source>his graveyard</source>
         <comment>nominative, male owner</comment>
-        <translation type="unfinished">его кладбище</translation>
+        <translation>его кладбище</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="64"/>
         <source>%1&apos;s graveyard</source>
         <comment>nominative, male owner</comment>
-        <translation type="unfinished">кладбище %1-го игрока</translation>
+        <translation>кладбище %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="65"/>
         <source>of her graveyard</source>
         <comment>genitive, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>её кладбища</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="65"/>
         <source>of %1&apos;s graveyard</source>
         <comment>genitive, female owner</comment>
-        <translation type="unfinished">кладбища %1-го игрока</translation>
+        <translation>кладбища %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="65"/>
         <source>of his graveyard</source>
         <comment>genitive, male owner</comment>
-        <translation type="unfinished">его кладбища</translation>
+        <translation>его кладбища</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="65"/>
         <source>of %1&apos;s graveyard</source>
         <comment>genitive, male owner</comment>
-        <translation type="unfinished">кладбища %1-го игрока</translation>
+        <translation>кладбища %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="66"/>
         <source>her graveyard</source>
         <comment>accusative, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>её кладбище</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="66"/>
         <source>%1&apos;s graveyard</source>
         <comment>accusative, female owner</comment>
-        <translation type="unfinished">кладбище %1-го игрока</translation>
+        <translation>кладбище %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="66"/>
         <source>his graveyard</source>
         <comment>accusative, male owner</comment>
-        <translation type="unfinished">его кладбище</translation>
+        <translation>его кладбище</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="66"/>
         <source>%1&apos;s graveyard</source>
         <comment>accusative, male owner</comment>
-        <translation type="unfinished">кладбище %1-го игрока</translation>
+        <translation>кладбище %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="70"/>
         <source>her exile</source>
         <comment>nominative, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>её изгнание</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="70"/>
         <source>%1&apos;s exile</source>
         <comment>nominative, female owner</comment>
-        <translation type="unfinished">изгнание %1-го игрока</translation>
+        <translation>изгнание %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="70"/>
         <source>his exile</source>
         <comment>nominative, male owner</comment>
-        <translation type="unfinished">его изгнание</translation>
+        <translation>его изгнание</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="70"/>
         <source>%1&apos;s exile</source>
         <comment>nominative, male owner</comment>
-        <translation type="unfinished">изгнание %1-го игрока</translation>
+        <translation>изгнание %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="71"/>
         <source>of her exile</source>
         <comment>genitive, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>её изгнания</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="71"/>
         <source>of %1&apos;s exile</source>
         <comment>genitive, female owner</comment>
-        <translation type="unfinished">изгнания %1-го игрока</translation>
+        <translation>изгнания %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="71"/>
         <source>of his exile</source>
         <comment>genitive, male owner</comment>
-        <translation type="unfinished">его изгнания</translation>
+        <translation>его изгнания</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="71"/>
         <source>of %1&apos;s exile</source>
         <comment>genitive, male owner</comment>
-        <translation type="unfinished">изгнания %1-го игрока</translation>
+        <translation>изгнания %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="72"/>
         <source>her exile</source>
         <comment>accusative, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>её изгнание</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="72"/>
         <source>%1&apos;s exile</source>
         <comment>accusative, female owner</comment>
-        <translation type="unfinished">изгнание %1-го игрока</translation>
+        <translation>изгнание %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="72"/>
         <source>his exile</source>
         <comment>accusative, male owner</comment>
-        <translation type="unfinished">его изгнание</translation>
+        <translation>его изгнание</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="72"/>
         <source>%1&apos;s exile</source>
         <comment>accusative, male owner</comment>
-        <translation type="unfinished">изгнание %1-го игрока</translation>
+        <translation>изгнание %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="76"/>
         <source>her sideboard</source>
         <comment>nominative, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>её сайд</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="76"/>
         <source>%1&apos;s sideboard</source>
         <comment>nominative, female owner</comment>
-        <translation type="unfinished">сайд %1-го игрока</translation>
+        <translation>сайд %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="76"/>
         <source>his sideboard</source>
         <comment>nominative, male owner</comment>
-        <translation type="unfinished">его сайд</translation>
+        <translation>его сайд</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="76"/>
         <source>%1&apos;s sideboard</source>
         <comment>nominative, male owner</comment>
-        <translation type="unfinished">сайд %1-го игрока</translation>
+        <translation>сайд %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="77"/>
         <source>of her sideboard</source>
         <comment>genitive, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>её сайда</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="77"/>
         <source>of %1&apos;s sideboard</source>
         <comment>genitive, female owner</comment>
-        <translation type="unfinished">сайда %1-го игрока</translation>
+        <translation>сайда %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="77"/>
         <source>of his sideboard</source>
         <comment>genitive, male owner</comment>
-        <translation type="unfinished">его сайда</translation>
+        <translation>его сайда</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="77"/>
         <source>of %1&apos;s sideboard</source>
         <comment>genitive, male owner</comment>
-        <translation type="unfinished">сайда %1-го игрока</translation>
+        <translation>сайда %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="78"/>
         <source>her sideboard</source>
         <comment>accusative, female owner</comment>
-        <translation type="unfinished"></translation>
+        <translation>её сайд</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="78"/>
         <source>%1&apos;s sideboard</source>
         <comment>accusative, female owner</comment>
-        <translation type="unfinished">сайд %1-го игрока</translation>
+        <translation>сайд %1-го игрока</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="78"/>
         <source>his sideboard</source>
         <comment>accusative, male owner</comment>
-        <translation type="unfinished">его сайд</translation>
+        <translation>его сайд</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="78"/>
         <source>%1&apos;s sideboard</source>
         <comment>accusative, male owner</comment>
-        <translation type="unfinished">сайд %1-го игрока</translation>
+        <translation>сайд %1-го игрока</translation>
     </message>
     <message>
         <source>his graveyard</source>
@@ -953,12 +954,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_settings.cpp" line="489"/>
         <source>Enable &amp;price tag feature (using data from blacklotusproject.com)</source>
-        <translation type="unfinished"></translation>
+        <translation>Подписывать &amp;цены (по данным blacklotusproject.com)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="490"/>
         <source>General</source>
-        <translation type="unfinished">Основные</translation>
+        <translation>Основные</translation>
     </message>
 </context>
 <context>
@@ -976,7 +977,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/decklistmodel.cpp" line="138"/>
         <source>Price</source>
-        <translation type="unfinished"></translation>
+        <translation>Цена</translation>
     </message>
 </context>
 <context>
@@ -1347,7 +1348,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_settings.cpp" line="677"/>
         <source>Deck editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактор колод</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="678"/>
@@ -1377,7 +1378,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/gameselector.cpp" line="97"/>
         <source>Please join the appropriate room first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста, сперва войдите в соответствующую комнату.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="98"/>
@@ -1437,7 +1438,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/gameselector.cpp" line="139"/>
         <source>Show &amp;running games</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать &amp;текущие</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="141"/>
@@ -1498,7 +1499,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/gamesmodel.cpp" line="64"/>
         <source>Room</source>
-        <translation type="unfinished">Комната</translation>
+        <translation>Комната</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="65"/>
@@ -1602,7 +1603,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/window_main.cpp" line="60"/>
         <source>Scheduled server shutdown.</source>
-        <translation type="unfinished"></translation>
+        <translation>Плановый перерыв в работе сервера.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="62"/>
@@ -1624,15 +1625,17 @@ Reason: %1</source>
     <message>
         <location filename="../src/window_main.cpp" line="68"/>
         <source>Scheduled server shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Плановый перерыв в работе сервера</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/window_main.cpp" line="68"/>
         <source>The server is going to be restarted in %n minute(s).
 All running games will be lost.
 Reason for shutdown: %1</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Сервер будет перезагружен через %n минут(ы).
+Все незавершенные игры будут потеряны.
+Причина перезагрузки: %1</numerusform>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
@@ -1706,12 +1709,12 @@ Reason for shutdown: %1</source>
     <message>
         <location filename="../src/window_main.cpp" line="188"/>
         <source>Czech:</source>
-        <translation type="unfinished"></translation>
+        <translation>Чешский:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="189"/>
         <source>Slovak:</source>
-        <translation type="unfinished"></translation>
+        <translation>Словацкий:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="195"/>
@@ -1938,161 +1941,161 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="24"/>
         <source>You have joined game #%1.</source>
         <comment>female</comment>
-        <translation type="unfinished">Вы присоединились к игре #%1.</translation>
+        <translation>Вы присоединились к игре #%1.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="26"/>
         <source>You have joined game #%1.</source>
         <comment>male</comment>
-        <translation type="unfinished">Вы присоединились к игре #%1.</translation>
+        <translation>Вы присоединились к игре #%1.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="33"/>
         <source>%1 has joined the game.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 присоединился к игре.</translation>
+        <translation>%1 присоединилась к игре.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="35"/>
         <source>%1 has joined the game.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 присоединился к игре.</translation>
+        <translation>%1 присоединился к игре.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="41"/>
         <source>%1 has left the game.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 покиул игру.</translation>
+        <translation>%1 покинула игру.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="43"/>
         <source>%1 has left the game.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 покиул игру.</translation>
+        <translation>%1 покинул игру.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="65"/>
         <source>%1 has loaded a local deck.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 загрузил колоду с диска.</translation>
+        <translation>%1 загрузила колоду с диска.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="67"/>
         <source>%1 has loaded a local deck.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 загрузил колоду с диска.</translation>
+        <translation>%1 загрузил колоду с диска.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="70"/>
         <source>%1 has loaded deck #%2.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 загрузил колоду #%2.</translation>
+        <translation>%1 загрузила колоду #%2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="72"/>
         <source>%1 has loaded deck #%2.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 загрузил колоду #%2.</translation>
+        <translation>%1 загрузил колоду #%2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="79"/>
         <source>%1 is ready to start the game.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 готов начать игру.</translation>
+        <translation>%1 готова начать игру.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="81"/>
         <source>%1 is ready to start the game.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 готов начать игру.</translation>
+        <translation>%1 готов начать игру.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="87"/>
         <source>%1 is not ready to start the game any more.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 все еще не готов.</translation>
+        <translation>%1 все еще не готова.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="89"/>
         <source>%1 is not ready to start the game any more.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 все еще не готов.</translation>
+        <translation>%1 все еще не готов.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="95"/>
         <source>%1 has conceded the game.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 решил сдаться.</translation>
+        <translation>%1 решила сдаться.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="97"/>
         <source>%1 has conceded the game.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 решил сдаться.</translation>
+        <translation>%1 решил сдаться.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="109"/>
         <source>%1 has restored connection to the game.</source>
         <comment>female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 вернулась к игре.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="111"/>
         <source>%1 has restored connection to the game.</source>
         <comment>male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 вернулся к игре.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="114"/>
         <source>%1 has lost connection to the game.</source>
         <comment>female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 потеряла соединение с сервером.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="116"/>
         <source>%1 has lost connection to the game.</source>
         <comment>male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 потерял соединение с сервером.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="135"/>
         <source>%1 shuffles %2.</source>
         <comment>female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 размешивает %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="137"/>
         <source>%1 shuffles %2.</source>
         <comment>male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 размешивает %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="144"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 выкинул %2 / %3.</translation>
+        <translation>%1 выкинул %2 / %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="146"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 выкинул %2 / %3.</translation>
+        <translation>%1 выкинул %2 / %3.</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="156"/>
         <source>%1 draws %n card(s).</source>
         <comment>female</comment>
-        <translation type="unfinished">
-            <numerusform>%1 взял %n карту.</numerusform>
-            <numerusform>%1 взял %n карты.</numerusform>
-            <numerusform>%1 взял %n карт(ы).</numerusform>
+        <translation>
+            <numerusform>%1 взяла %n карту.</numerusform>
+            <numerusform>%1 взяла %n карты.</numerusform>
+            <numerusform>%1 взяла %n карт(ы).</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="158"/>
         <source>%1 draws %n card(s).</source>
         <comment>male</comment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%1 взял %n карту.</numerusform>
             <numerusform>%1 взял %n карты.</numerusform>
             <numerusform>%1 взял %n карт(ы).</numerusform>
@@ -2228,57 +2231,57 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="286"/>
         <source>%1 takes a mulligan to %n.</source>
         <comment>female</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 взяла страховку до %n.</numerusform>
+            <numerusform>%1 взяла страховку до %n.</numerusform>
+            <numerusform>%1 взяла страховку до %n.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="288"/>
         <source>%1 takes a mulligan to %n.</source>
         <comment>male</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 взял страховку до %n.</numerusform>
+            <numerusform>%1 взял страховку до %n.</numerusform>
+            <numerusform>%1 взял страховку до %n.</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="297"/>
         <source>%1 flips %2 face-down.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 перевернул %2 лицом вниз.</translation>
+        <translation>%1 перевернула %2 лицом вниз.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="299"/>
         <source>%1 flips %2 face-down.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 перевернул %2 лицом вниз.</translation>
+        <translation>%1 перевернул %2 лицом вниз.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="302"/>
         <source>%1 flips %2 face-up.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 перевернул %2 лицом вверх.</translation>
+        <translation>%1 перевернула %2 лицом вверх.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="304"/>
         <source>%1 flips %2 face-up.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 перевернул %2 лицом вверх.</translation>
+        <translation>%1 перевернул %2 лицом вверх.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="311"/>
         <source>%1 destroys %2.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 уничтожил %2.</translation>
+        <translation>%1 уничтожила %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="313"/>
         <source>%1 destroys %2.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 уничтожил %2.</translation>
+        <translation>%1 уничтожил %2.</translation>
     </message>
     <message>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
@@ -2294,281 +2297,281 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="321"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <comment>p1 female, p2 female</comment>
-        <translation type="unfinished">%1 присоединил %2 к %4 игрока %3.</translation>
+        <translation>%1 присоединила %2 к %4 игрока %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="323"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <comment>p1 female, p2 male</comment>
-        <translation type="unfinished">%1 присоединил %2 к %4 игрока %3.</translation>
+        <translation>%1 присоединила %2 к %4 игрока %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="326"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <comment>p1 male, p2 female</comment>
-        <translation type="unfinished">%1 присоединил %2 к %4 игрока %3.</translation>
+        <translation>%1 присоединил %2 к %4 игрока %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="328"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <comment>p1 male, p2 male</comment>
-        <translation type="unfinished">%1 присоединил %2 к %4 игрока %3.</translation>
+        <translation>%1 присоединил %2 к %4 игрока %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="337"/>
         <source>%1 unattaches %2.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 отсоединил %2.</translation>
+        <translation>%1 отсоединила %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="339"/>
         <source>%1 unattaches %2.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 отсоединил %2.</translation>
+        <translation>%1 отсоединил %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="345"/>
         <source>%1 creates token: %2%3.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 создал фишку: %2%3.</translation>
+        <translation>%1 создала фишку: %2%3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="347"/>
         <source>%1 creates token: %2%3.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 создал фишку: %2%3.</translation>
+        <translation>%1 создал фишку: %2%3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="358"/>
         <source>%1 points from her %2 to herself.</source>
         <comment>female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с %2 на себя-любимую.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="360"/>
         <source>%1 points from his %2 to himself.</source>
         <comment>male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с %2 на себя.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="365"/>
         <source>%1 points from her %2 to %3.</source>
         <comment>p1 female, p2 female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с %2  на %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="367"/>
         <source>%1 points from her %2 to %3.</source>
         <comment>p1 female, p2 male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с %2  на %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="370"/>
         <source>%1 points from his %2 to %3.</source>
         <comment>p1 male, p2 female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с %2  на %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="372"/>
         <source>%1 points from his %2 to %3.</source>
         <comment>p1 male, p2 male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с %2  на %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="378"/>
         <source>%1 points from %2&apos;s %3 to herself.</source>
         <comment>card owner female, target female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с %3, контролируемого %2, на себя.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="380"/>
         <source>%1 points from %2&apos;s %3 to herself.</source>
         <comment>card owner male, target female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с %3, контролируемого %2, на себя.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="383"/>
         <source>%1 points from %2&apos;s %3 to himself.</source>
         <comment>card owner female, target male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с %3, контролируемого %2, на себя.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="385"/>
         <source>%1 points from %2&apos;s %3 to himself.</source>
         <comment>card owner male, target male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с %3, контролируемого %2, на себя.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="392"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 female, p2 female, p3 female</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %4.</translation>
+        <translation>%1 указывает с %3, контролируемого %2, на %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="394"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 female, p2 female, p3 male</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %4.</translation>
+        <translation>%1 указывает с %3, контролируемого %2, на %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="397"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 female, p2 male, p3 female</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %4.</translation>
+        <translation>%1 указывает с %3, контролируемого %2, на %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="399"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 female, p2 male, p3 male</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %4.</translation>
+        <translation>%1 указывает с %3, контролируемого %2, на %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="404"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 male, p2 female, p3 female</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %4.</translation>
+        <translation>%1 указывает с %3, контролируемого %2, на %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="406"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 male, p2 female, p3 male</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %4.</translation>
+        <translation>%1 указывает с %3, контролируемого %2, на %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="409"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 male, p2 male, p3 female</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %4.</translation>
+        <translation>%1 указывает с %3, контролируемого %2, на %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="411"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 male, p2 male, p3 male</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %4.</translation>
+        <translation>%1 указывает с %3, контролируемого %2 на %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="419"/>
         <source>%1 points from her %2 to her %3.</source>
         <comment>female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с её %2  на её %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="421"/>
         <source>%1 points from his %2 to his %3.</source>
         <comment>male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с его %2  на его %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="426"/>
         <source>%1 points from her %2 to %3&apos;s %4.</source>
         <comment>p1 female, p2 female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с её %2  на %4 под контролем %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="428"/>
         <source>%1 points from her %2 to %3&apos;s %4.</source>
         <comment>p1 female, p2 male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с её %2  на %4 под контролем %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="431"/>
         <source>%1 points from his %2 to %3&apos;s %4.</source>
         <comment>p1 male, p2 female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с его %2  на %4 под контролем %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="433"/>
         <source>%1 points from his %2 to %3&apos;s %4.</source>
         <comment>p1 male, p2 male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с его %2  на %4 под контролем %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="439"/>
         <source>%1 points from %2&apos;s %3 to her own %4.</source>
         <comment>card owner female, target female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с %3 под контролем %2 на %4, владельцем которого она является.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="441"/>
         <source>%1 points from %2&apos;s %3 to her own %4.</source>
         <comment>card owner male, target female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с %3 под контролем %2 на %4, владельцем которого он является.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="444"/>
         <source>%1 points from %2&apos;s %3 to his own %4.</source>
         <comment>card owner female, target male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с %3 под контролем %2 на %4, владельцем которого она является.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="446"/>
         <source>%1 points from %2&apos;s %3 to his own %4.</source>
         <comment>card owner male, target male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 указывает с %3 под контролем %2 на %4, владельцем которого он является.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="453"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 female, p2 female, p3 female</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %5 контролируемого %4.</translation>
+        <translation>%1 указывает с %3 контролируемого %2 на %5 под контролем %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="455"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 female, p2 female, p3 male</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %5 контролируемого %4.</translation>
+        <translation>%1 указывает с %3 контролируемого %2 на %5 под контролем %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="458"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 female, p2 male, p3 female</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %5 контролируемого %4.</translation>
+        <translation>%1 указывает с %3 контролируемого %2 на %5 под контролем %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="460"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 female, p2 male, p3 male</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %5 контролируемого %4.</translation>
+        <translation>%1 указывает с %3 контролируемого %2 на %5 под контролем %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="465"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 male, p2 female, p3 female</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %5 контролируемого %4.</translation>
+        <translation>%1 указывает с %3 контролируемого %2 на %5 под контролем %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="467"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 male, p2 female, p3 male</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %5 контролируемого %4.</translation>
+        <translation>%1 указывает с %3 контролируемого %2 на %5 под контролем %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="470"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 male, p2 male, p3 female</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %5 контролируемого %4.</translation>
+        <translation>%1 указывает с %3 контролируемого %2 на %5 под контролем %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="472"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 male, p2 male, p3 male</comment>
-        <translation type="unfinished">%1 указывает с %3 контролируемого %2 на %5 контролируемого %4.</translation>
+        <translation>%1 указывает с %3 контролируемого %2 на %5 под контролем %4.</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="487"/>
         <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
         <comment>female</comment>
-        <translation type="unfinished">
-            <numerusform>%1 поместил %n %2 жетон на %3 (теперь %4).</numerusform>
-            <numerusform>%1 поместил %n %2 жетона на %3 (теперь %4).</numerusform>
-            <numerusform>%1 поместил %n %2 жетонов на %3 (теперь %4).</numerusform>
+        <translation>
+            <numerusform>%1 поместила %n %2 жетон на %3 (теперь %4).</numerusform>
+            <numerusform>%1 поместила %n %2 жетона на %3 (теперь %4).</numerusform>
+            <numerusform>%1 поместила %n %2 жетонов на %3 (теперь %4).</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="489"/>
         <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
         <comment>male</comment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%1 поместил %n %2 жетон на %3 (теперь %4).</numerusform>
             <numerusform>%1 поместил %n %2 жетона на %3 (теперь %4).</numerusform>
             <numerusform>%1 поместил %n %2 жетонов на %3 (теперь %4).</numerusform>
@@ -2578,17 +2581,17 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="492"/>
         <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
         <comment>female</comment>
-        <translation type="unfinished">
-            <numerusform>%1 снял %n %2 жетон с %3 (теперь %4).</numerusform>
-            <numerusform>%1 снял %n %2 жетона с %3 (теперь %4).</numerusform>
-            <numerusform>%1 снял %n %2 жетонов с %3 (теперь %4).</numerusform>
+        <translation>
+            <numerusform>%1 сняла %n %2 жетон с %3 (теперь %4).</numerusform>
+            <numerusform>%1 сняла %n %2 жетона с %3 (теперь %4).</numerusform>
+            <numerusform>%1 сняла %n %2 жетонов с %3 (теперь %4).</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="494"/>
         <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
         <comment>male</comment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%1 снял %n %2 жетон с %3 (теперь %4).</numerusform>
             <numerusform>%1 снял %n %2 жетона с %3 (теперь %4).</numerusform>
             <numerusform>%1 снял %n %2 жетонов с %3 (теперь %4).</numerusform>
@@ -2598,265 +2601,265 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="521"/>
         <source>%1 taps her permanents.</source>
         <comment>female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 повернула свои перманенты.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="523"/>
         <source>%1 untaps her permanents.</source>
         <comment>female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 развернула свои перманенты.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="526"/>
         <source>%1 taps his permanents.</source>
         <comment>male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 повернул свои перманенты.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="528"/>
         <source>%1 untaps his permanents.</source>
         <comment>male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 развернул свои перманенты.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="534"/>
         <source>%1 taps %2.</source>
         <comment>female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 повернула %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="536"/>
         <source>%1 untaps %2.</source>
         <comment>female</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 развернула %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="539"/>
         <source>%1 taps %2.</source>
         <comment>male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 повернул %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="541"/>
         <source>%1 untaps %2.</source>
         <comment>male</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 развернул %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="553"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 установил жетон %2 на %3 (%4%5).</translation>
+        <translation>%1 установила жетон %2 на %3 (%4%5).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="555"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 установил жетон %2 на %3 (%4%5).</translation>
+        <translation>%1 установил жетон %2 на %3 (%4%5).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="564"/>
         <source>%1 sets %2 to not untap normally.</source>
         <comment>female</comment>
-        <translation type="unfinished">%2 теперь не разворачивается как обычно (%1).</translation>
+        <translation>%2 теперь не разворачивается как обычно (%1).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="566"/>
         <source>%1 sets %2 to not untap normally.</source>
         <comment>male</comment>
-        <translation type="unfinished">%2 теперь не разворачивается как обычно (%1).</translation>
+        <translation>%2 теперь не разворачивается как обычно (%1).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="569"/>
         <source>%1 sets %2 to untap normally.</source>
         <comment>female</comment>
-        <translation type="unfinished">%2 теперь разворачивается как обычно (%1).</translation>
+        <translation>%2 теперь разворачивается как обычно (%1).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="571"/>
         <source>%1 sets %2 to untap normally.</source>
         <comment>male</comment>
-        <translation type="unfinished">%2 теперь разворачивается как обычно (%1).</translation>
+        <translation>%2 теперь разворачивается как обычно (%1).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="583"/>
         <source>%1 sets PT of %2 to %3.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 установил Силу/Защиту %2 %3.</translation>
+        <translation>%1 установила Силу/Защиту %2 %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="585"/>
         <source>%1 sets PT of %2 to %3.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 установил Силу/Защиту %2 %3.</translation>
+        <translation>%1 установил Силу/Защиту %2 %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="594"/>
         <source>%1 sets annotation of %2 to %3.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 сделал пометку на %2 &quot;%3&quot;.</translation>
+        <translation>%1 пометила %2 &quot;%3&quot;.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="596"/>
         <source>%1 sets annotation of %2 to %3.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 сделал пометку на %2 &quot;%3&quot;.</translation>
+        <translation>%1 пометил %2 &quot;%3&quot;.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="604"/>
         <source>%1 is looking at the top %2 cards %3.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 смотрит верхние %2 карт библиотеки %3.</translation>
+        <translation>%1 смотрит верхние %2 карт библиотеки %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="606"/>
         <source>%1 is looking at the top %2 cards %3.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 смотрит верхние %2 карт библиотеки %3.</translation>
+        <translation>%1 смотрит верхние %2 карт библиотеки %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="609"/>
         <source>%1 is looking at %2.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 просматривает %2.</translation>
+        <translation>%1 просматривает %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="611"/>
         <source>%1 is looking at %2.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 просматривает %2.</translation>
+        <translation>%1 просматривает %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="619"/>
         <source>%1 stops looking at %2.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 закончил просматривать %2.</translation>
+        <translation>%1 закончила просматривать %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="621"/>
         <source>%1 stops looking at %2.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 закончил просматривать %2.</translation>
+        <translation>%1 закончил просматривать %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="647"/>
         <source>%1 reveals %2 to %3.</source>
         <comment>p1 female, p2 female</comment>
-        <translation type="unfinished">%1 показывает его %2 %3.</translation>
+        <translation>%1 показывает её %2 %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="649"/>
         <source>%1 reveals %2 to %3.</source>
         <comment>p1 female, p2 male</comment>
-        <translation type="unfinished">%1 показывает его %2 %3.</translation>
+        <translation>%1 показывает её %2 %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="652"/>
         <source>%1 reveals %2 to %3.</source>
         <comment>p1 male, p2 female</comment>
-        <translation type="unfinished">%1 показывает его %2 %3.</translation>
+        <translation>%1 показывает его %2 %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="654"/>
         <source>%1 reveals %2 to %3.</source>
         <comment>p1 male, p2 male</comment>
-        <translation type="unfinished">%1 показывает его %2 %3.</translation>
+        <translation>%1 показывает его %2 %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="659"/>
         <source>%1 reveals %2.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 открыл его %2.</translation>
+        <translation>%1 открыла её %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="661"/>
         <source>%1 reveals %2.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 открыл его %2.</translation>
+        <translation>%1 открыл его %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="667"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <comment>p1 female, p2 female</comment>
-        <translation type="unfinished">%1 показывает случайно выбранную%3 карту (%2) %4.</translation>
+        <translation>%1 показывает случайно выбранную%3 карту (%2) %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="669"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <comment>p1 female, p2 male</comment>
-        <translation type="unfinished">%1 показывает случайно выбранную%3 карту (%2) %4.</translation>
+        <translation>%1 показывает случайно выбранную%3 карту (%2) %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="672"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <comment>p1 male, p2 female</comment>
-        <translation type="unfinished">%1 показывает случайно выбранную%3 карту (%2) %4.</translation>
+        <translation>%1 показывает случайно выбранную%3 карту (%2) %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="674"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <comment>p1 male, p2 male</comment>
-        <translation type="unfinished">%1 показывает случайно выбранную%3 карту (%2) %4.</translation>
+        <translation>%1 показывает случайно выбранную%3 карту (%2) %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="679"/>
         <source>%1 randomly reveals %2%3.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 открывает случайно выбранную%3 карту (%2).</translation>
+        <translation>%1 показывает случайно выбранную%3 карту (%2).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="681"/>
         <source>%1 randomly reveals %2%3.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 открывает случайно выбранную%3 карту (%2).</translation>
+        <translation>%1 показывает случайно выбранную%3 карту (%2).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="687"/>
         <source>%1 reveals %2%3 to %4.</source>
         <comment>p1 female, p2 female</comment>
-        <translation type="unfinished">%1 показывает%2%3 %4.</translation>
+        <translation>%1 показывает%2%3 %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="689"/>
         <source>%1 reveals %2%3 to %4.</source>
         <comment>p1 female, p2 male</comment>
-        <translation type="unfinished">%1 показывает%2%3 %4.</translation>
+        <translation>%1 показывает%2%3 %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="692"/>
         <source>%1 reveals %2%3 to %4.</source>
         <comment>p1 male, p2 female</comment>
-        <translation type="unfinished">%1 показывает%2%3 %4.</translation>
+        <translation>%1 показывает%2%3 %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="694"/>
         <source>%1 reveals %2%3 to %4.</source>
         <comment>p1 male, p2 male</comment>
-        <translation type="unfinished">%1 показывает%2%3 %4.</translation>
+        <translation>%1 показывает%2%3 %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="699"/>
         <source>%1 reveals %2%3.</source>
         <comment>female</comment>
-        <translation type="unfinished">%1 открывает%2%3.</translation>
+        <translation>%1 показывает%2%3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="701"/>
         <source>%1 reveals %2%3.</source>
         <comment>male</comment>
-        <translation type="unfinished">%1 открывает%2%3.</translation>
+        <translation>%1 показывает%2%3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="712"/>
         <source>It is now %1&apos;s turn.</source>
         <comment>female</comment>
-        <translation type="unfinished">Ход игрока %1.</translation>
+        <translation>Ход очаровательной %1.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="714"/>
         <source>It is now %1&apos;s turn.</source>
         <comment>male</comment>
-        <translation type="unfinished">Ход игрока %1.</translation>
+        <translation>Ход игрока %1.</translation>
     </message>
     <message>
         <source>%1 flips %2 face-down.</source>
@@ -2917,32 +2920,32 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="165"/>
         <source>%1 undoes her last draw.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 отменила последнее взятие.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="167"/>
         <source>%1 undoes her last draw (%2).</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 отменила %2 последних взятий.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="187"/>
         <source>the bottom card of her library</source>
-        <translation type="unfinished"></translation>
+        <translation>нижнюю карту своей библиотеки</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="190"/>
         <source> from the bottom of her library</source>
-        <translation type="unfinished"></translation>
+        <translation> со дна своей библиотеки</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="193"/>
         <source>the top card of her library</source>
-        <translation type="unfinished"></translation>
+        <translation>верхнюю карту своей библиотеки</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="196"/>
         <source> from the top of her library</source>
-        <translation type="unfinished"></translation>
+        <translation> с верха своей библиотеки</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="240"/>
@@ -2952,32 +2955,32 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="251"/>
         <source>%1 puts %2%3 into her library.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 поместила %2%3 в свою библиотеку.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="253"/>
         <source>%1 puts %2%3 on bottom of her library.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 поместила %2%3 на дно своей библиотеки.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="255"/>
         <source>%1 puts %2%3 on top of her library.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 поместила %2%3 на верх своей библиотеки.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="257"/>
         <source>%1 puts %2%3 into her library at position %4.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 поместила %2%3 в свою библиотеку %4 сверху.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="290"/>
         <source>%1 draws his initial hand.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 взял свою стартовую руку.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="290"/>
         <source>%1 draws her initial hand.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 взяла свою стартовую руку.</translation>
     </message>
     <message numerus="yes">
         <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
@@ -3720,27 +3723,27 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/tab_admin.cpp" line="17"/>
         <source>&amp;Reason for shutdown:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Причина отключения:</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="20"/>
         <source>&amp;Time until shutdown (minutes):</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Время до отключения (в минутах):</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="26"/>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;Ок</translation>
+        <translation>&amp;Ок</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="30"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Отмена</translation>
+        <translation>&amp;Отмена</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="46"/>
         <source>Shut down server</source>
-        <translation type="unfinished"></translation>
+        <translation>Отключение сервера</translation>
     </message>
 </context>
 <context>
@@ -3753,7 +3756,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/tab_admin.cpp" line="94"/>
         <source>&amp;Shut down server</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Отключение сервера</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="95"/>
@@ -3934,7 +3937,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="294"/>
         <source>&amp;Concede</source>
-        <translation>Сда&amp;юсь!</translation>
+        <translation>&amp;Сдаться...</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="295"/>
@@ -3949,7 +3952,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="297"/>
         <source>Ctrl+Q</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+Q</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="299"/>
@@ -3964,7 +3967,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="319"/>
         <source>Are you sure you want to concede this game?</source>
-        <translation>Испугался?</translation>
+        <translation>Вы точно хотите сдаться?</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="328"/>
@@ -4007,7 +4010,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_message.cpp" line="64"/>
         <source>This user is ignoring you.</source>
-        <translation>Этот пользователь добавил вас в игнор-лист.</translation>
+        <translation>Этот пользователь добавил вас в игнор.</translation>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="80"/>
@@ -4084,7 +4087,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/userinfobox.cpp" line="50"/>
         <source>Gender:</source>
-        <translation type="unfinished"></translation>
+        <translation>Пол:</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="51"/>
@@ -4104,7 +4107,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/userinfobox.cpp" line="73"/>
         <source>Moderator</source>
-        <translation type="unfinished"></translation>
+        <translation>Модератор</translation>
     </message>
     <message>
         <source>Judge</source>
@@ -4146,17 +4149,18 @@ Please enter a name:</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="449"/>
         <source>Enable &amp;sounds</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Yaaaaahoooo!  All I needed for full happiness :)</translatorcomment>
+        <translation>Вкючить &amp;звуки</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="450"/>
         <source>Path to sounds directory:</source>
-        <translation type="unfinished"></translation>
+        <translation>Путь к папке со звуками:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="461"/>
         <source>Choose path</source>
-        <translation type="unfinished"></translation>
+        <translation>Укажите путь</translation>
     </message>
 </context>
 <context>
@@ -4184,7 +4188,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/userlist.cpp" line="239"/>
         <source>%1&apos;s games</source>
-        <translation type="unfinished"></translation>
+        <translation>Игры %1</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="251"/>
@@ -4199,7 +4203,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/userlist.cpp" line="253"/>
         <source>Show this user&apos;s &amp;games</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать игры &amp;этого пользователя</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="254"/>
@@ -4267,12 +4271,12 @@ Enter 0 for an indefinite ban.</source>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="126"/>
         <source>&amp;Update prices</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Обновить цены</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="127"/>
         <source>Ctrl+U</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+U</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="158"/>

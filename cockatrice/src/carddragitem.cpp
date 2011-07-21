@@ -2,7 +2,7 @@
 #include "cardzone.h"
 #include "tablezone.h"
 #include "zoneviewzone.h"
-#include <QGraphicsScene>
+#include "gamescene.h"
 #include <QGraphicsSceneMouseEvent>
 #include <QCursor>
 #include <QPainter>
@@ -22,7 +22,7 @@ void CardDragItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
 void CardDragItem::updatePosition(const QPointF &cursorScenePos)
 {
-	QList<QGraphicsItem *> colliding = scene()->items(cursorScenePos);
+	QList<QGraphicsItem *> colliding = scene()->items(cursorScenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder, static_cast<GameScene *>(scene())->getViewTransform());
 
 	CardZone *cardZone = 0;
 	ZoneViewZone *zoneViewZone = 0;

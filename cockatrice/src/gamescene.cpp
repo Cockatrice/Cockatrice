@@ -9,6 +9,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QSet>
 #include <QBasicTimer>
+#include <QGraphicsView>
 
 GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 	: QGraphicsScene(parent), phasesToolbar(_phasesToolbar)
@@ -25,8 +26,8 @@ GameScene::~GameScene()
 
 void GameScene::retranslateUi()
 {
-	for (int i = 0; i < views.size(); ++i)
-		views[i]->retranslateUi();
+	for (int i = 0; i < zoneViews.size(); ++i)
+		zoneViews[i]->retranslateUi();
 }
 
 void GameScene::addPlayer(Player *player)
@@ -111,47 +112,52 @@ void GameScene::rearrange()
 
 void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numberCards)
 {
-        for (int i = 0; i < views.size(); i++) {
-                ZoneViewZone *temp = views[i]->getZone();
+        for (int i = 0; i < zoneViews.size(); i++) {
+                ZoneViewZone *temp = zoneViews[i]->getZone();
                 if ((temp->getName() == zoneName) && (temp->getPlayer() == player)) { // view is already open
-                        views[i]->close();
+                        zoneViews[i]->close();
                         if (temp->getNumberCards() == numberCards)
                                 return;
                 }
         }
 
 	ZoneViewWidget *item = new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards, false);
-        views.append(item);
+        zoneViews.append(item);
         connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
 	addItem(item);
-	item->setPos(100, 100);
+	item->setPos(50, 50);
 }
 
 void GameScene::addRevealedZoneView(Player *player, CardZone *zone, const QList<ServerInfo_Card *> &cardList)
 {
 	ZoneViewWidget *item = new ZoneViewWidget(player, zone, -2, true, cardList);
-	views.append(item);
+	zoneViews.append(item);
         connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
 	addItem(item);
-	item->setPos(100, 100);
+	item->setPos(50, 50);
 }
 
 void GameScene::removeZoneView(ZoneViewWidget *item)
 {
-        views.removeAt(views.indexOf(item));
+        zoneViews.removeAt(zoneViews.indexOf(item));
 	removeItem(item);
 }
 
 void GameScene::clearViews()
 {
-	for (int i = 0; i < views.size(); ++i)
-		views[i]->close();
+	for (int i = 0; i < zoneViews.size(); ++i)
+		zoneViews[i]->close();
 }
 
 void GameScene::closeMostRecentZoneView()
 {
-	if (!views.isEmpty())
-		views.last()->close();
+	if (!zoneViews.isEmpty())
+		zoneViews.last()->close();
+}
+
+QTransform GameScene::getViewTransform() const
+{
+	return views().at(0)->transform();
 }
 
 void GameScene::processViewSizeChange(const QSize &newSize)
@@ -191,7 +197,7 @@ void GameScene::processViewSizeChange(const QSize &newSize)
 
 void GameScene::updateHover(const QPointF &scenePos)
 {
-	QList<QGraphicsItem *> itemList = items(scenePos);
+	QList<QGraphicsItem *> itemList = items(scenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder, getViewTransform());
 	
 	// Search for the topmost zone and ignore all cards not belonging to that zone.
 	CardZone *zone = 0;

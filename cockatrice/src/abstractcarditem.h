@@ -37,7 +37,8 @@ public:
 	AbstractCardItem(const QString &_name = QString(), Player *_owner = 0, QGraphicsItem *parent = 0);
 	~AbstractCardItem();
 	QRectF boundingRect() const;
-	void paintPicture(QPainter *painter, int angle);
+	QSizeF getTranslatedSize(QPainter *painter) const;
+	void paintPicture(QPainter *painter, const QSizeF &translatedSize, int angle);
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	CardInfo *getInfo() const { return info; }
 	QString getName() const { return name; }
@@ -52,7 +53,6 @@ public:
 	void processHoverEvent();
 	void deleteCardInfoPopup() { emit deleteCardInfoPopup(name); }
 protected:
-	QSizeF getTranslatedSize(QPainter *painter) const;
 	void transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle);
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
