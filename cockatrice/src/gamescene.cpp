@@ -160,6 +160,11 @@ QTransform GameScene::getViewTransform() const
 	return views().at(0)->transform();
 }
 
+QTransform GameScene::getViewportTransform() const
+{
+	return views().at(0)->viewportTransform();
+}
+
 void GameScene::processViewSizeChange(const QSize &newSize)
 {
 	viewSize = newSize;

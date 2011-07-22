@@ -96,11 +96,11 @@ void ZoneViewZone::reorganizeCards()
 		CardItem *c = cardsToDisplay.at(i);
 		qreal x = (i / rows) * CARD_WIDTH;
 		qreal y = (i % rows) * CARD_HEIGHT / 3;
-		c->setPos(x, y);
+		c->setPos(x + 5, y + 5);
 		c->setRealZValue(i);
 	}
 
-	optimumRect = QRectF(0, 0, cols * CARD_WIDTH, ((rows - 1) * CARD_HEIGHT) / 3 + CARD_HEIGHT);
+	optimumRect = QRectF(0, 0, qMax(cols, 3) * CARD_WIDTH + 10, ((rows - 1) * CARD_HEIGHT) / 3 + CARD_HEIGHT + 10);
 	updateGeometry();
 	emit optimumRectChanged();
 }

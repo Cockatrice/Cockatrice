@@ -51,7 +51,7 @@ void GameView::startRubberBand(const QPointF &_selectionOrigin)
 void GameView::resizeRubberBand(const QPointF &cursorPoint)
 {
 	if (rubberBand)
-		rubberBand->setGeometry(QRect(mapFromScene(selectionOrigin), mapFromScene(cursorPoint)).normalized());
+		rubberBand->setGeometry(QRect(mapFromScene(selectionOrigin), cursorPoint.toPoint()).normalized());
 }
 
 void GameView::stopRubberBand()

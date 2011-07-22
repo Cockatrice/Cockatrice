@@ -1,7 +1,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include "selectzone.h"
 #include "gamescene.h"
-
+#include <QDebug>
 SelectZone::SelectZone(Player *_player, const QString &_name, bool _hasCardAttr, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent, bool isView)
 	: CardZone(_player, _name, _hasCardAttr, _isShufflable, _contentsKnown, parent, isView)
 {
@@ -28,8 +28,7 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 					continue;
 			cards[i]->setSelected(selectionRect.intersects(cards[i]->mapRectToParent(cards[i]->boundingRect())));
 		}
-		
-		static_cast<GameScene *>(scene())->resizeRubberBand(scenePos() + pos);
+		static_cast<GameScene *>(scene())->resizeRubberBand(deviceTransform(static_cast<GameScene *>(scene())->getViewportTransform()).map(pos));
 		event->accept();
 	}
 }

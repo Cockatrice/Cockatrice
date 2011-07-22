@@ -35,6 +35,7 @@ public:
 	void retranslateUi();
 	void processViewSizeChange(const QSize &newSize);
 	QTransform getViewTransform() const;
+	QTransform getViewportTransform() const;
 	
 	void startRubberBand(const QPointF &selectionOrigin);
 	void resizeRubberBand(const QPointF &cursorPoint);

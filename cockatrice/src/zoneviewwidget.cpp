@@ -36,7 +36,7 @@ QSizeF TitleLabel::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 	if (which == Qt::MaximumSize)
 		return QSizeF(constraint.width(), fm.size(Qt::TextSingleLine, text).height() + 10);
 	else
-		return fm.size(Qt::TextSingleLine, text);
+		return fm.size(Qt::TextSingleLine, text) + QSizeF(10, 10);
 }
 
 void TitleLabel::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -105,10 +105,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 	resize(150, 150);
 
 	zone = new ZoneViewZone(player, _origZone, numberCards, _revealZone, this);
-	connect(zone, SIGNAL(optimumRectChanged()), this, SLOT(resizeToZoneContents()));
-	connect(zone, SIGNAL(beingDeleted()), this, SLOT(zoneDeleted()));
 	vbox->addItem(zone);
-	zone->initializeCards(cardList);
 	
 	if (sortByNameCheckBox) {
 		connect(sortByNameCheckBox, SIGNAL(stateChanged(int)), zone, SLOT(setSortByName(int)));
@@ -117,8 +114,12 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 		sortByTypeCheckBox->setChecked(settingsCache->getZoneViewSortByType());
 	}
 
-	setLayout(vbox);
 	retranslateUi();
+	setLayout(vbox);
+	
+	connect(zone, SIGNAL(optimumRectChanged()), this, SLOT(resizeToZoneContents()));
+	connect(zone, SIGNAL(beingDeleted()), this, SLOT(zoneDeleted()));
+	zone->initializeCards(cardList);
 }
 
 void ZoneViewWidget::retranslateUi()
@@ -140,7 +141,7 @@ void ZoneViewWidget::moveWidget(QPointF scenePos)
 void ZoneViewWidget::resizeToZoneContents()
 {
 	QRectF zoneRect = zone->getOptimumRect();
-	QSizeF newSize(zoneRect.width() + 10, zoneRect.height() + extraHeight + 10);
+	QSizeF newSize(qMax(QGraphicsWidget::layout()->effectiveSizeHint(Qt::MinimumSize, QSizeF()).width(), zoneRect.width() + 10), zoneRect.height() + extraHeight + 10);
 	setMaximumSize(newSize);
 	resize(newSize);
 	if (layout())
