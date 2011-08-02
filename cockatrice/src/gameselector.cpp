@@ -23,8 +23,9 @@ GameSelector::GameSelector(AbstractClient *_client, TabRoom *_room, const QMap<i
 	gameListView->setModel(gameListProxyModel);
 	gameListView->setSortingEnabled(true);
 	gameListView->setAlternatingRowColors(true);
+	gameListView->setRootIsDecorated(true);
 	if (_room)
-		gameListView->header()->hideSection(0);
+		gameListView->header()->hideSection(1);
 	gameListView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
 
 	showFullGamesCheckBox = new QCheckBox;

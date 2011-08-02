@@ -30,8 +30,8 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
 	
 	ServerInfo_Game *g = gameList[index.row()];
 	switch (index.column()) {
-		case 0: return rooms.value(g->getRoomId());
-		case 1: return g->getDescription();
+		case 0: return g->getDescription();
+		case 1: return rooms.value(g->getRoomId());
 		case 2: return g->getCreatorInfo()->getName();
 		case 3: {
 			QStringList result;
@@ -61,8 +61,8 @@ QVariant GamesModel::headerData(int section, Qt::Orientation orientation, int ro
 	if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal))
 		return QVariant();
 	switch (section) {
-		case 0: return tr("Room");
-		case 1: return tr("Description");
+		case 0: return tr("Description");
+		case 1: return tr("Room");
 		case 2: return tr("Creator");
 		case 3: return tr("Game type");
 		case 4: return tr("Password");

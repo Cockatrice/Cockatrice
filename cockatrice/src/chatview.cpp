@@ -47,12 +47,9 @@ void ChatView::appendMessage(QString sender, QString message, QColor playerColor
 	QTextCursor cursor = prepareBlock(sameSender);
 	lastSender = sender;
 	
-	if (showTimestamps) {
+	if (showTimestamps && !sameSender) {
 		QTextCharFormat timeFormat;
-		if (sameSender)
-			timeFormat.setForeground(Qt::transparent);
-		else
-			timeFormat.setForeground(Qt::black);
+		timeFormat.setForeground(Qt::black);
 		cursor.setCharFormat(timeFormat);
 		cursor.insertText(QDateTime::currentDateTime().toString("[hh:mm] "));
 	}
@@ -69,12 +66,13 @@ void ChatView::appendMessage(QString sender, QString message, QColor playerColor
 		if (playerBold)
 			senderFormat.setFontWeight(QFont::Bold);
 	}
-	if (sameSender)
-		senderFormat.setForeground(Qt::transparent);
-	cursor.setCharFormat(senderFormat);
-	if (!sender.isEmpty())
-		sender.append(": ");
-	cursor.insertText(sender);
+	if (!sameSender) {
+		cursor.setCharFormat(senderFormat);
+		if (!sender.isEmpty())
+			sender.append(": ");
+		cursor.insertText(sender);
+	} else
+		cursor.insertText("    ");
 	
 	QTextCharFormat messageFormat;
 	if (sender.isEmpty())
@@ -179,7 +177,7 @@ void ChatView::mouseMoveEvent(QMouseEvent *event)
 
 void ChatView::mousePressEvent(QMouseEvent *event)
 {
-	if (event->button() == Qt::MidButton) {
+	if ((event->button() == Qt::MidButton) || (event->button() == Qt::LeftButton)) {
 		QString cardName = getCardNameUnderMouse(event->pos());
 		if (!cardName.isEmpty())
 			emit showCardInfoPopup(event->globalPos(), cardName);
@@ -190,7 +188,7 @@ void ChatView::mousePressEvent(QMouseEvent *event)
 
 void ChatView::mouseReleaseEvent(QMouseEvent *event)
 {
-	if (event->button() == Qt::MidButton)
+	if ((event->button() == Qt::MidButton) || (event->button() == Qt::LeftButton))
 		emit deleteCardInfoPopup(QString("_"));
 	
 	QTextBrowser::mouseReleaseEvent(event);

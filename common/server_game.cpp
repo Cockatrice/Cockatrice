@@ -75,7 +75,8 @@ void Server_Game::pingClockTimeout()
 		int pingTime;
 		if (player->getProtocolHandler()) {
 			pingTime = player->getProtocolHandler()->getLastCommandTime();
-			allPlayersInactive = false;
+			if (!player->getSpectator())
+				allPlayersInactive = false;
 		} else
 			pingTime = -1;
 		pingList.append(new ServerInfo_PlayerPing(player->getPlayerId(), pingTime));
