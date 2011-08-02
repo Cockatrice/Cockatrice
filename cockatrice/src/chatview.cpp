@@ -34,12 +34,15 @@ QTextCursor ChatView::prepareBlock(bool same)
 
 void ChatView::appendHtml(const QString &html)
 {
+	bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
 	prepareBlock().insertHtml(html);
-	verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+	if (atBottom)
+		verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }
 
 void ChatView::appendMessage(QString sender, QString message, QColor playerColor, bool playerBold)
 {
+	bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
 	bool sameSender = (sender == lastSender) && !lastSender.isEmpty();
 	QTextCursor cursor = prepareBlock(sameSender);
 	lastSender = sender;
@@ -120,7 +123,8 @@ void ChatView::appendMessage(QString sender, QString message, QColor playerColor
 	if (!message.isEmpty())
 		cursor.insertText(message);
 	
-	verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+	if (atBottom)
+		verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }
 
 void ChatView::enterEvent(QEvent * /*event*/)
