@@ -89,7 +89,7 @@ void RemoteClient::readData()
 			connect(topLevelItem, SIGNAL(protocolItemReceived(ProtocolItem *)), this, SLOT(processProtocolItem(ProtocolItem *)));
 			
 			setStatus(StatusLoggingIn);
-			Command_Login *cmdLogin = new Command_Login(userName, QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha1).toBase64());
+			Command_Login *cmdLogin = new Command_Login(userName, password);
 			connect(cmdLogin, SIGNAL(finished(ProtocolResponse *)), this, SLOT(loginResponse(ProtocolResponse *)));
 			sendCommand(cmdLogin);
 		}
