@@ -56,9 +56,13 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	if (authState == PasswordWrong)
 		return authState;
 	
+	ServerInfo_User *data = getUserData(name);
+	name = data->getName(); // Compensate for case indifference
+	
 	if (authState == PasswordRight) {
 		if (users.contains(name)) {
 			qDebug("Login denied: would overwrite old session");
+			delete data;
 			return WouldOverwriteOldSession;
 		}
 	} else if (authState == UnknownUser) {
@@ -71,8 +75,6 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 		name = tempName;
 	}
 	
-	ServerInfo_User *data = getUserData(name);
-	name = data->getName(); // Compensate for case indifference
 	session->setUserInfo(data);
 	
 	users.insert(name, session);
