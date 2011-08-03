@@ -73,6 +73,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 		while (users.contains(tempName) || userExists(tempName))
 			tempName = name + "_" + QString::number(++i);
 		name = tempName;
+		data->setName(name);
 	}
 	
 	session->setUserInfo(data);

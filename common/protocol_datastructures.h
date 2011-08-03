@@ -53,6 +53,7 @@ public:
 	ServerInfo_User(const ServerInfo_User *other, bool complete = true);
 	static SerializableItem *newItem() { return new ServerInfo_User; }
 	QString getName() const { return static_cast<SerializableItem_String *>(itemMap.value("name"))->getData(); }
+	void setName(const QString &_name) { static_cast<SerializableItem_String *>(itemMap.value("name"))->setData(_name); }
 	int getUserLevel() const { return static_cast<SerializableItem_Int *>(itemMap.value("userlevel"))->getData(); }
 	void setUserLevel(int _userLevel) { static_cast<SerializableItem_Int *>(itemMap.value("userlevel"))->setData(_userLevel); }
 	QString getRealName() const { return static_cast<SerializableItem_String *>(itemMap.value("real_name"))->getData(); }

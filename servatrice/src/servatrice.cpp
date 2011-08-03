@@ -220,7 +220,7 @@ bool Servatrice::userExists(const QString &user)
 		checkSql();
 	
 		QSqlQuery query;
-		query.prepare("select 1 from " + dbPrefix + "_users where name = :name");
+		query.prepare("select 1 from " + dbPrefix + "_users where name = :name and active = 1");
 		query.bindValue(":name", user);
 		if (!execSqlQuery(query))
 			return false;
@@ -423,4 +423,4 @@ void Servatrice::shutdownTimeout()
 		deleteLater();
 }
 
-const QString Servatrice::versionString = "Servatrice 0.20110625";
+const QString Servatrice::versionString = "Servatrice 0.20110803";
