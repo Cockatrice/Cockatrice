@@ -31,6 +31,21 @@ bool PlayerListItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *mode
 	return QStyledItemDelegate::editorEvent(event, model, option, index);
 }
 
+PlayerListTWI::PlayerListTWI()
+	: QTreeWidgetItem(Type)
+{
+}
+
+bool PlayerListTWI::operator<(const QTreeWidgetItem &other) const
+{
+	// Sort by spectator/player
+	if (data(1, Qt::UserRole) != other.data(1, Qt::UserRole))
+		return data(1, Qt::UserRole).toBool();
+	
+	// Sort by player ID
+	return data(4, Qt::UserRole + 1).toInt() < other.data(4, Qt::UserRole + 1).toInt();
+}
+
 PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, bool _gameCreator, QWidget *parent)
 	: QTreeWidget(parent), tabSupervisor(_tabSupervisor), client(_client), game(_game), gameCreator(_gameCreator), gameStarted(false)
 {
@@ -58,10 +73,11 @@ void PlayerListWidget::retranslateUi()
 
 void PlayerListWidget::addPlayer(ServerInfo_PlayerProperties *player)
 {
-	QTreeWidgetItem *newPlayer = new QTreeWidgetItem;
+	QTreeWidgetItem *newPlayer = new PlayerListTWI;
 	players.insert(player->getPlayerId(), newPlayer);
 	updatePlayerProperties(player);
 	addTopLevelItem(newPlayer);
+	sortItems(1, Qt::AscendingOrder);
 }
 
 void PlayerListWidget::updatePlayerProperties(ServerInfo_PlayerProperties *prop)
@@ -71,6 +87,7 @@ void PlayerListWidget::updatePlayerProperties(ServerInfo_PlayerProperties *prop)
 		return;
 
 	player->setIcon(1, prop->getSpectator() ? spectatorIcon : playerIcon);
+	player->setData(1, Qt::UserRole, !prop->getSpectator());
 	player->setIcon(2, gameStarted ? (prop->getConceded() ? concededIcon : QIcon()) : (prop->getReadyStart() ? readyIcon : notReadyIcon));
 	player->setData(3, Qt::UserRole, prop->getUserInfo()->getUserLevel());
 	player->setIcon(3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, prop->getUserInfo()->getUserLevel())));

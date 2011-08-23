@@ -1571,17 +1571,16 @@ Se almacenará unicamente para moderadores y no podrá ser visto por la persona 
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/gameselector.cpp" line="141"/>
+        <location filename="../src/gameselector.cpp" line="142"/>
         <source>C&amp;reate</source>
         <translation>C&amp;rear</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="142"/>
+        <location filename="../src/gameselector.cpp" line="143"/>
         <source>&amp;Join</source>
         <translation>E&amp;ntrar</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="97"/>
         <location filename="../src/gameselector.cpp" line="98"/>
         <location filename="../src/gameselector.cpp" line="99"/>
         <location filename="../src/gameselector.cpp" line="100"/>
@@ -1589,71 +1588,72 @@ Se almacenará unicamente para moderadores y no podrá ser visto por la persona 
         <location filename="../src/gameselector.cpp" line="102"/>
         <location filename="../src/gameselector.cpp" line="103"/>
         <location filename="../src/gameselector.cpp" line="104"/>
+        <location filename="../src/gameselector.cpp" line="105"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="97"/>
+        <location filename="../src/gameselector.cpp" line="98"/>
         <source>Please join the appropriate room first.</source>
         <translation>Por favor, entre en la sala adecuada primero.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="98"/>
+        <location filename="../src/gameselector.cpp" line="99"/>
         <source>Wrong password.</source>
         <translation>Contraseña incorrecta.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="99"/>
+        <location filename="../src/gameselector.cpp" line="100"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>No se permiten espectadores en esta partida.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="100"/>
+        <location filename="../src/gameselector.cpp" line="101"/>
         <source>The game is already full.</source>
         <translation>La partida no tiene plazas libres.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="101"/>
+        <location filename="../src/gameselector.cpp" line="102"/>
         <source>The game does not exist any more.</source>
         <translation>La partida ya no existe.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="102"/>
+        <location filename="../src/gameselector.cpp" line="103"/>
         <source>This game is only open to registered users.</source>
         <translation>Esta partida está abierta sólo a usuarios registrados.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="103"/>
+        <location filename="../src/gameselector.cpp" line="104"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
         <translation>Esta partida está abierta sólo a los amigos del creador.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="104"/>
+        <location filename="../src/gameselector.cpp" line="105"/>
         <source>You are being ignored by the creator of this game.</source>
         <translation>Estas siendo ignorado por el creador de la partida.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="120"/>
+        <location filename="../src/gameselector.cpp" line="121"/>
         <source>Join game</source>
         <translation>Entrar en la partida</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="120"/>
+        <location filename="../src/gameselector.cpp" line="121"/>
         <source>Password:</source>
         <translation>Contraseña:</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="137"/>
+        <location filename="../src/gameselector.cpp" line="138"/>
         <source>Games</source>
         <translation>Partidas</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="138"/>
+        <location filename="../src/gameselector.cpp" line="139"/>
         <source>Show &amp;full games</source>
         <translation>Ver partidas &amp;sin plazas libres</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="139"/>
+        <location filename="../src/gameselector.cpp" line="140"/>
         <source>Show &amp;running games</source>
         <translation>Mostrar partidas en &amp;curso</translation>
     </message>
@@ -1662,7 +1662,7 @@ Se almacenará unicamente para moderadores y no podrá ser visto por la persona 
         <translation type="obsolete">&amp;Ver partidas sin plazas libres</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="143"/>
+        <location filename="../src/gameselector.cpp" line="144"/>
         <source>J&amp;oin as spectator</source>
         <translation>Entrar como e&amp;spectador</translation>
     </message>
@@ -1693,7 +1693,7 @@ Se almacenará unicamente para moderadores y no podrá ser visto por la persona 
         <translation>Creador</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="65"/>
+        <location filename="../src/gamesmodel.cpp" line="64"/>
         <source>Description</source>
         <translation>Descripción</translation>
     </message>
@@ -1718,7 +1718,7 @@ Se almacenará unicamente para moderadores y no podrá ser visto por la persona 
         <translation>no permitido</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="64"/>
+        <location filename="../src/gamesmodel.cpp" line="65"/>
         <source>Room</source>
         <translation>Sala</translation>
     </message>
@@ -4069,7 +4069,7 @@ La versión local es %1, la versión remota es %2.</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="112"/>
-        <location filename="../src/tab_deck_storage.cpp" line="231"/>
+        <location filename="../src/tab_deck_storage.cpp" line="233"/>
         <source>New folder</source>
         <translation>Nueva carpeta</translation>
     </message>
@@ -4079,25 +4079,24 @@ La versión local es %1, la versión remota es %2.</translation>
         <translation>Borrar</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="142"/>
+        <location filename="../src/tab_deck_storage.cpp" line="144"/>
         <source>Enter deck name</source>
         <translation>Introduzca el nombre del mazo</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="142"/>
+        <location filename="../src/tab_deck_storage.cpp" line="144"/>
         <source>This decklist does not have a name.
 Please enter a name:</source>
         <translation>Esta lista de mazo no tiene un nombre.
 Por favor, introduzca un nombre:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="142"/>
-        <location filename="../src/tab_deck_storage.cpp" line="146"/>
+        <location filename="../src/tab_deck_storage.cpp" line="148"/>
         <source>Unnamed deck</source>
         <translation>Mazo sin nombre</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="231"/>
+        <location filename="../src/tab_deck_storage.cpp" line="233"/>
         <source>Name of new folder:</source>
         <translation>Nombre de la nueva carpeta:</translation>
     </message>
@@ -4586,26 +4585,26 @@ Indica 0 para un ban indefinido.</translation>
         <translation>&amp;Mazo</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="312"/>
+        <location filename="../src/window_deckeditor.cpp" line="315"/>
         <source>Load deck</source>
         <translation>Cargar mazo</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="335"/>
-        <location filename="../src/window_deckeditor.cpp" line="359"/>
+        <location filename="../src/window_deckeditor.cpp" line="338"/>
+        <location filename="../src/window_deckeditor.cpp" line="363"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="335"/>
-        <location filename="../src/window_deckeditor.cpp" line="359"/>
+        <location filename="../src/window_deckeditor.cpp" line="338"/>
+        <location filename="../src/window_deckeditor.cpp" line="363"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
         <translation>El mazo no puede guardarse
 Por favor, compruebe que tiene permisos de escritura en el directorio e intentelo de nuevo.</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="341"/>
+        <location filename="../src/window_deckeditor.cpp" line="344"/>
         <source>Save deck</source>
         <translation>Guardar mazo</translation>
     </message>
@@ -4685,12 +4684,12 @@ Por favor, compruebe que tiene permisos de escritura en el directorio e intentel
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="276"/>
+        <location filename="../src/window_deckeditor.cpp" line="279"/>
         <source>Are you sure?</source>
         <translation>¿Estás seguro?</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="277"/>
+        <location filename="../src/window_deckeditor.cpp" line="280"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
         <translation>La lista del mazo ha sido modificada
@@ -4708,17 +4707,17 @@ Do you want to save the changes?</source>
 <context>
     <name>ZoneViewWidget</name>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="72"/>
+        <location filename="../src/zoneviewwidget.cpp" line="129"/>
         <source>sort by name</source>
         <translation>ordenar por nombre</translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="74"/>
+        <location filename="../src/zoneviewwidget.cpp" line="131"/>
         <source>sort by type</source>
         <translation>ordenar por tipo</translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="76"/>
+        <location filename="../src/zoneviewwidget.cpp" line="133"/>
         <source>shuffle when closing</source>
         <translation>barajar al cerrar</translation>
     </message>

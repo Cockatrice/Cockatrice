@@ -17,6 +17,12 @@ public:
 	bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
 };
 
+class PlayerListTWI : public QTreeWidgetItem {
+public:
+	PlayerListTWI();
+	bool operator<(const QTreeWidgetItem &other) const;
+};
+
 class PlayerListWidget : public QTreeWidget {
 	Q_OBJECT
 private:

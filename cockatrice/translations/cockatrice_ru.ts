@@ -1364,7 +1364,6 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/gameselector.cpp" line="97"/>
         <location filename="../src/gameselector.cpp" line="98"/>
         <location filename="../src/gameselector.cpp" line="99"/>
         <location filename="../src/gameselector.cpp" line="100"/>
@@ -1372,86 +1371,87 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <location filename="../src/gameselector.cpp" line="102"/>
         <location filename="../src/gameselector.cpp" line="103"/>
         <location filename="../src/gameselector.cpp" line="104"/>
+        <location filename="../src/gameselector.cpp" line="105"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="97"/>
+        <location filename="../src/gameselector.cpp" line="98"/>
         <source>Please join the appropriate room first.</source>
         <translation>Пожалуйста, сперва войдите в соответствующую комнату.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="98"/>
+        <location filename="../src/gameselector.cpp" line="99"/>
         <source>Wrong password.</source>
         <translation>Неверный пароль.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="99"/>
+        <location filename="../src/gameselector.cpp" line="100"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>В эту игру не пускают зрителей.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="100"/>
+        <location filename="../src/gameselector.cpp" line="101"/>
         <source>The game is already full.</source>
         <translation>Все места заняты! =Ь</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="101"/>
+        <location filename="../src/gameselector.cpp" line="102"/>
         <source>The game does not exist any more.</source>
         <translation>Эта игра была удалена.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="102"/>
+        <location filename="../src/gameselector.cpp" line="103"/>
         <source>This game is only open to registered users.</source>
         <translation>Доступно только для зарегистрированных.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="103"/>
+        <location filename="../src/gameselector.cpp" line="104"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
         <translation>Доступно только для друзей.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="104"/>
+        <location filename="../src/gameselector.cpp" line="105"/>
         <source>You are being ignored by the creator of this game.</source>
         <translation>Вы добавлены в игнор-лист данного игрока.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="120"/>
+        <location filename="../src/gameselector.cpp" line="121"/>
         <source>Join game</source>
         <translation>Присоединиться</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="120"/>
+        <location filename="../src/gameselector.cpp" line="121"/>
         <source>Password:</source>
         <translation>Пароль:</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="137"/>
+        <location filename="../src/gameselector.cpp" line="138"/>
         <source>Games</source>
         <translation>Игры</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="138"/>
+        <location filename="../src/gameselector.cpp" line="139"/>
         <source>Show &amp;full games</source>
         <translation>Показывать &amp;текущие</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="139"/>
+        <location filename="../src/gameselector.cpp" line="140"/>
         <source>Show &amp;running games</source>
         <translation>Показывать &amp;текущие</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="141"/>
+        <location filename="../src/gameselector.cpp" line="142"/>
         <source>C&amp;reate</source>
         <translation>С&amp;оздать</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="142"/>
+        <location filename="../src/gameselector.cpp" line="143"/>
         <source>&amp;Join</source>
         <translation>&amp;Присоединиться</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="143"/>
+        <location filename="../src/gameselector.cpp" line="144"/>
         <source>J&amp;oin as spectator</source>
         <translation>П&amp;рисоединиться как зритель</translation>
     </message>
@@ -1497,12 +1497,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation>Не допускаются</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="64"/>
+        <location filename="../src/gamesmodel.cpp" line="65"/>
         <source>Room</source>
         <translation>Комната</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="65"/>
+        <location filename="../src/gamesmodel.cpp" line="64"/>
         <source>Description</source>
         <translation>Подпись</translation>
     </message>
@@ -3819,7 +3819,7 @@ Local version is %1, remote version is %2.</source>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="112"/>
-        <location filename="../src/tab_deck_storage.cpp" line="231"/>
+        <location filename="../src/tab_deck_storage.cpp" line="233"/>
         <source>New folder</source>
         <translation>Новая папка</translation>
     </message>
@@ -3829,25 +3829,24 @@ Local version is %1, remote version is %2.</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="142"/>
+        <location filename="../src/tab_deck_storage.cpp" line="144"/>
         <source>Enter deck name</source>
         <translation>Введите название колоды</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="142"/>
+        <location filename="../src/tab_deck_storage.cpp" line="144"/>
         <source>This decklist does not have a name.
 Please enter a name:</source>
         <translation>У этой колоды нет названия.
 Пожалуйста, проявите фантазию:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="142"/>
-        <location filename="../src/tab_deck_storage.cpp" line="146"/>
+        <location filename="../src/tab_deck_storage.cpp" line="148"/>
         <source>Unnamed deck</source>
         <translation>Еще одна унылая дека</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="231"/>
+        <location filename="../src/tab_deck_storage.cpp" line="233"/>
         <source>Name of new folder:</source>
         <translation>Название новой папки:</translation>
     </message>
@@ -4404,38 +4403,38 @@ Enter 0 for an indefinite ban.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="276"/>
+        <location filename="../src/window_deckeditor.cpp" line="279"/>
         <source>Are you sure?</source>
         <translation>Вы уверены?</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="277"/>
+        <location filename="../src/window_deckeditor.cpp" line="280"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
         <translation>Деклист был отредактирован.
 Сохранить изменения?</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="312"/>
+        <location filename="../src/window_deckeditor.cpp" line="315"/>
         <source>Load deck</source>
         <translation>Загрузить колоду</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="335"/>
-        <location filename="../src/window_deckeditor.cpp" line="359"/>
+        <location filename="../src/window_deckeditor.cpp" line="338"/>
+        <location filename="../src/window_deckeditor.cpp" line="363"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="335"/>
-        <location filename="../src/window_deckeditor.cpp" line="359"/>
+        <location filename="../src/window_deckeditor.cpp" line="338"/>
+        <location filename="../src/window_deckeditor.cpp" line="363"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
         <translation>Колода не может быть сохранена.
 Убедитесь, что директория указана верно,а затем повторите попытку.</translation>
     </message>
     <message>
-        <location filename="../src/window_deckeditor.cpp" line="341"/>
+        <location filename="../src/window_deckeditor.cpp" line="344"/>
         <source>Save deck</source>
         <translation>Сохранить колоду</translation>
     </message>
@@ -4451,17 +4450,17 @@ Please check that the directory is writable and try again.</source>
 <context>
     <name>ZoneViewWidget</name>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="72"/>
+        <location filename="../src/zoneviewwidget.cpp" line="129"/>
         <source>sort by name</source>
         <translation>Сортировать по имени</translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="74"/>
+        <location filename="../src/zoneviewwidget.cpp" line="131"/>
         <source>sort by type</source>
         <translation>сортировать по типу</translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="76"/>
+        <location filename="../src/zoneviewwidget.cpp" line="133"/>
         <source>shuffle when closing</source>
         <translation>Перемешать после просмотра</translation>
     </message>
