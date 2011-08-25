@@ -1490,7 +1490,7 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     <message>
         <location filename="../src/gameselector.cpp" line="138"/>
         <source>Show &amp;full games</source>
-        <translation>Montrer &amp;toutes les parties</translation>
+        <translation>Montrer les pa&amp;rties pleines</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="139"/>
