@@ -498,10 +498,6 @@ void TabGame::startGame()
 	}
 	mainLayout->removeItem(deckViewContainerLayout);
 	
-	QMapIterator<int, Player *> playerIterator(players);
-	while (playerIterator.hasNext())
-		playerIterator.next().value()->setConceded(false);
-	
 	playerListWidget->setGameStarted(true);
 	started = true;
 	static_cast<GameScene *>(gameView->scene())->rearrange();
@@ -514,6 +510,10 @@ void TabGame::stopGame()
 	currentPhase = -1;
 	activePlayer = -1;
 	
+	QMapIterator<int, Player *> playerIterator(players);
+	while (playerIterator.hasNext())
+		playerIterator.next().value()->setConceded(false);
+
 	QMapIterator<int, DeckViewContainer *> i(deckViewContainers);
 	while (i.hasNext()) {
 		i.next();

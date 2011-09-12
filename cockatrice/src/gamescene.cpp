@@ -64,7 +64,6 @@ void GameScene::rearrange()
 	const int playersCount = playersPlaying.size();
 	const int columns = playersCount < settingsCache->getMinPlayersForMultiColumnLayout() ? 1 : 2;
 	const int rows = ceil((qreal) playersCount / columns);
-
 	qreal sceneHeight = 0, sceneWidth = -playerAreaSpacing;
 	QList<int> columnWidth;
 	int firstPlayerOfColumn = firstPlayer;
@@ -72,7 +71,7 @@ void GameScene::rearrange()
 		playersByColumn.append(QList<Player *>());
 		columnWidth.append(0);
 		qreal thisColumnHeight = -playerAreaSpacing;
-		const int rowsInColumn = rows - (playersCount % columns);
+		const int rowsInColumn = rows - (playersCount % columns) * col; // only correct for max. 2 cols
 		for (int j = 0; j < rowsInColumn; ++j) {
 			Player *player = playersPlaying[(firstPlayerOfColumn + j) % playersCount];
 			if (col == 0)

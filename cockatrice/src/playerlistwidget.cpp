@@ -88,6 +88,8 @@ void PlayerListWidget::updatePlayerProperties(ServerInfo_PlayerProperties *prop)
 
 	player->setIcon(1, prop->getSpectator() ? spectatorIcon : playerIcon);
 	player->setData(1, Qt::UserRole, !prop->getSpectator());
+	player->setData(2, Qt::UserRole, prop->getConceded());
+	player->setData(2, Qt::UserRole + 1, prop->getReadyStart());
 	player->setIcon(2, gameStarted ? (prop->getConceded() ? concededIcon : QIcon()) : (prop->getReadyStart() ? readyIcon : notReadyIcon));
 	player->setData(3, Qt::UserRole, prop->getUserInfo()->getUserLevel());
 	player->setIcon(3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, prop->getUserInfo()->getUserLevel())));
@@ -141,7 +143,7 @@ void PlayerListWidget::setGameStarted(bool _gameStarted)
 	QMapIterator<int, QTreeWidgetItem *> i(players);
 	while (i.hasNext()) {
 		QTreeWidgetItem *twi = i.next().value();
-		twi->setIcon(2, gameStarted ? QIcon() : notReadyIcon);
+		twi->setIcon(2, gameStarted ? (twi->data(2, Qt::UserRole).toBool() ? concededIcon : QIcon()) : (twi->data(2, Qt::UserRole + 1).toBool() ? readyIcon : notReadyIcon));
 	}
 }
 

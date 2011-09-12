@@ -1123,6 +1123,8 @@ void Player::processPlayerInfo(ServerInfo_Player *info)
 	QList<ServerInfo_Arrow *> al = info->getArrowList();
 	for (int i = 0; i < al.size(); ++i)
 		addArrow(al.at(i));
+
+	setConceded(info->getProperties()->getConceded());
 }
 
 void Player::processCardAttachment(ServerInfo_Player *info)
