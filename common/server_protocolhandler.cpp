@@ -308,6 +308,35 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 			_ignoreList.append(new ServerInfo_User(ignoreIterator.next().value()));
 	}
 	
+	server->serverMutex.lock();
+	
+	QList<ServerInfo_Game *> gameList;
+	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
+	QMutexLocker gameListLocker(&gameListMutex);
+	while (roomIterator.hasNext()) {
+		Server_Room *room = roomIterator.next().value();
+		room->roomMutex.lock();
+		QMapIterator<int, Server_Game *> gameIterator(room->getGames());
+		while (gameIterator.hasNext()) {
+			Server_Game *game = gameIterator.next().value();
+			QMutexLocker gameLocker(&game->gameMutex);
+			const QList<Server_Player *> &gamePlayers = game->getPlayers().values();
+			for (int j = 0; j < gamePlayers.size(); ++j)
+				if (gamePlayers[j]->getUserInfo()->getName() == userInfo->getName()) {
+					gamePlayers[j]->setProtocolHandler(this);
+					game->postConnectionStatusUpdate(gamePlayers[j], true);
+					games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, gamePlayers[j]));
+					
+					enqueueProtocolItem(new Event_GameJoined(game->getGameId(), game->getDescription(), gamePlayers[j]->getPlayerId(), gamePlayers[j]->getSpectator(), game->getSpectatorsCanTalk(), game->getSpectatorsSeeEverything(), true));
+					enqueueProtocolItem(GameEventContainer::makeNew(new Event_GameStateChanged(game->getGameStarted(), game->getActivePlayer(), game->getActivePhase(), game->getGameState(gamePlayers[j])), game->getGameId()));
+					
+					break;
+				}
+		}
+		room->roomMutex.unlock();
+	}
+	server->serverMutex.unlock();
+	
 	ProtocolResponse *resp = new Response_Login(cont->getCmdId(), RespOk, new ServerInfo_User(userInfo, true), _buddyList, _ignoreList);
 	if (getCompressionSupport())
 		resp->setCompressed(true);
@@ -413,26 +442,6 @@ ResponseCode Server_ProtocolHandler::cmdJoinRoom(Command_JoinRoom *cmd, CommandC
 	rooms.insert(r->getId(), r);
 	
 	enqueueProtocolItem(new Event_RoomSay(r->getId(), QString(), r->getJoinMessage()));
-	
-	// This might not scale very well. Use an extra QMap if it becomes a problem.
-	QMutexLocker gameListLocker(&gameListMutex);
-	QMapIterator<int, Server_Game *> gameIterator(r->getGames());
-	while (gameIterator.hasNext()) {
-		Server_Game *game = gameIterator.next().value();
-		QMutexLocker gameLocker(&game->gameMutex);
-		const QList<Server_Player *> &gamePlayers = game->getPlayers().values();
-		for (int j = 0; j < gamePlayers.size(); ++j)
-			if (gamePlayers[j]->getUserInfo()->getName() == userInfo->getName()) {
-				gamePlayers[j]->setProtocolHandler(this);
-				game->postConnectionStatusUpdate(gamePlayers[j], true);
-				games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, gamePlayers[j]));
-				
-				enqueueProtocolItem(new Event_GameJoined(game->getGameId(), game->getDescription(), gamePlayers[j]->getPlayerId(), gamePlayers[j]->getSpectator(), game->getSpectatorsCanTalk(), game->getSpectatorsSeeEverything(), true));
-				enqueueProtocolItem(GameEventContainer::makeNew(new Event_GameStateChanged(game->getGameStarted(), game->getActivePlayer(), game->getActivePhase(), game->getGameState(gamePlayers[j])), game->getGameId()));
-				
-				break;
-			}
-	}
 	
 	ServerInfo_Room *info = r->getInfo(true);
 	if (getCompressionSupport())
