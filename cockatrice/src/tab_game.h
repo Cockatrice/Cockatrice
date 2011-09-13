@@ -93,6 +93,7 @@ private:
 	bool spectatorsCanTalk, spectatorsSeeEverything;
 	QMap<int, Player *> players;
 	QMap<int, QString> spectators;
+	bool gameStateKnown;
 	bool started;
 	bool resuming;
 	QStringList phasesList;
@@ -120,7 +121,7 @@ private:
 
 	Player *addPlayer(int playerId, ServerInfo_User *info);
 
-	void startGame();
+	void startGame(bool resuming);
 	void stopGame();
 
 	void eventSpectatorSay(Event_Say *event, GameEventContext *context);

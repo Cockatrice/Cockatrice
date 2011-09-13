@@ -137,13 +137,21 @@ void PlayerListWidget::updatePing(int playerId, int pingTime)
 	twi->setIcon(0, QIcon(PingPixmapGenerator::generatePixmap(12, pingTime, 10)));
 }
 
-void PlayerListWidget::setGameStarted(bool _gameStarted)
+void PlayerListWidget::setGameStarted(bool _gameStarted, bool resuming)
 {
 	gameStarted = _gameStarted;
 	QMapIterator<int, QTreeWidgetItem *> i(players);
 	while (i.hasNext()) {
 		QTreeWidgetItem *twi = i.next().value();
-		twi->setIcon(2, gameStarted ? (twi->data(2, Qt::UserRole).toBool() ? concededIcon : QIcon()) : (twi->data(2, Qt::UserRole + 1).toBool() ? readyIcon : notReadyIcon));
+		if (gameStarted) {
+			if (resuming)
+				twi->setIcon(2, twi->data(2, Qt::UserRole).toBool() ? concededIcon : QIcon());
+			else {
+				twi->setData(2, Qt::UserRole, false);
+				twi->setIcon(2, QIcon());
+			}
+		} else
+			twi->setIcon(2, notReadyIcon);
 	}
 }
 

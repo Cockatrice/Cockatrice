@@ -44,7 +44,7 @@ public:
 	void setActivePlayer(int playerId);
 	void updatePing(int playerId, int pingTime);
 	void updatePlayerProperties(ServerInfo_PlayerProperties *prop);
-	void setGameStarted(bool _gameStarted);
+	void setGameStarted(bool _gameStarted, bool resuming);
 	void showContextMenu(const QPoint &pos, const QModelIndex &index);
 };
 

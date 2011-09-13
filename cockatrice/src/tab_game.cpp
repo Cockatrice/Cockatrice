@@ -159,7 +159,7 @@ void DeckViewContainer::setDeck(DeckList *deck)
 }
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, ServerInfo_User *_userInfo, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
-	: Tab(_tabSupervisor), clients(_clients), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), started(false), resuming(_resuming), currentPhase(-1)
+	: Tab(_tabSupervisor), clients(_clients), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), gameStateKnown(false), started(false), resuming(_resuming), currentPhase(-1)
 {
 	phasesToolbar = new PhasesToolbar;
 	phasesToolbar->hide();
@@ -486,7 +486,7 @@ void TabGame::sendCommandContainer(CommandContainer *cont, int playerId)
 	client->sendCommandContainer(cont);
 }
 
-void TabGame::startGame()
+void TabGame::startGame(bool resuming)
 {
 	currentPhase = -1;
 
@@ -498,7 +498,13 @@ void TabGame::startGame()
 	}
 	mainLayout->removeItem(deckViewContainerLayout);
 	
-	playerListWidget->setGameStarted(true);
+	if (!resuming) {
+		QMapIterator<int, Player *> playerIterator(players);
+		while (playerIterator.hasNext())
+			playerIterator.next().value()->setConceded(false);
+	}
+
+	playerListWidget->setGameStarted(true, resuming);
 	started = true;
 	static_cast<GameScene *>(gameView->scene())->rearrange();
 	gameView->show();
@@ -510,10 +516,6 @@ void TabGame::stopGame()
 	currentPhase = -1;
 	activePlayer = -1;
 	
-	QMapIterator<int, Player *> playerIterator(players);
-	while (playerIterator.hasNext())
-		playerIterator.next().value()->setConceded(false);
-
 	QMapIterator<int, DeckViewContainer *> i(deckViewContainers);
 	while (i.hasNext()) {
 		i.next();
@@ -522,7 +524,7 @@ void TabGame::stopGame()
 	mainLayout->insertLayout(1, deckViewContainerLayout, 10);
 
 	playerListWidget->setActivePlayer(-1);
-	playerListWidget->setGameStarted(false);
+	playerListWidget->setGameStarted(false, false);
 	started = false;
 	gameView->hide();
 	phasesToolbar->hide();
@@ -578,8 +580,8 @@ void TabGame::eventGameStateChanged(Event_GameStateChanged *event, GameEventCont
 		}
 	}
 	if (event->getGameStarted() && !started) {
-		startGame();
-		if (!resuming)
+		startGame(!gameStateKnown);
+		if (gameStateKnown)
 			messageLog->logGameStart();
 		setActivePlayer(event->getActivePlayer());
 		setActivePhase(event->getActivePhase());
@@ -587,6 +589,7 @@ void TabGame::eventGameStateChanged(Event_GameStateChanged *event, GameEventCont
 		stopGame();
 		scene->clearViews();
 	}
+	gameStateKnown = true;
 	emit userEvent();
 }
 
