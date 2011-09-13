@@ -172,6 +172,9 @@ void TabSupervisor::stop()
 
 	clear();
 	
+	tabUserLists->deleteLater();
+	tabUserLists = 0;
+	
 	tabServer->deleteLater();
 	tabServer = 0;
 	
