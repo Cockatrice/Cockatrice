@@ -12,7 +12,7 @@ private slots:
 	void updateBgPixmap();
 public:
 	StackZone(Player *_p, int _zoneHeight, QGraphicsItem *parent = 0);
-	void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint, bool faceDown);
+	void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint);
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	void reorganizeCards();

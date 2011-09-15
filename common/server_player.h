@@ -83,8 +83,8 @@ public:
 
 	ResponseCode drawCards(CommandContainer *cont, int number);
 	ResponseCode undoDraw(CommandContainer *cont);
-	ResponseCode moveCard(CommandContainer *cont, const QString &_startZone, const QList<CardToMove *> &_cards, int _targetPlayer, const QString &_targetZone, int _x, int _y, bool _faceDown);
-	ResponseCode moveCard(CommandContainer *cont, Server_CardZone *startzone, const QList<CardToMove *> &_cards, Server_CardZone *targetzone, int x, int y, bool faceDown, bool fixFreeSpaces = true, bool undoingDraw = false);
+	ResponseCode moveCard(CommandContainer *cont, const QString &_startZone, const QList<CardToMove *> &_cards, int _targetPlayer, const QString &_targetZone, int _x, int _y);
+	ResponseCode moveCard(CommandContainer *cont, Server_CardZone *startzone, const QList<CardToMove *> &_cards, Server_CardZone *targetzone, int x, int y, bool fixFreeSpaces = true, bool undoingDraw = false);
 	void unattachCard(CommandContainer *cont, Server_Card *card);
 	ResponseCode setCardAttrHelper(CommandContainer *cont, const QString &zone, int cardId, const QString &attrName, const QString &attrValue);
 

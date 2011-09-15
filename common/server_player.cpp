@@ -278,12 +278,12 @@ ResponseCode Server_Player::undoDraw(CommandContainer *cont)
 	
 	ResponseCode retVal;
 	CardToMove *cardToMove = new CardToMove(lastDrawList.takeLast());
-	retVal = moveCard(cont, zones.value("hand"), QList<CardToMove *>() << cardToMove, zones.value("deck"), 0, 0, false, false, true);
+	retVal = moveCard(cont, zones.value("hand"), QList<CardToMove *>() << cardToMove, zones.value("deck"), 0, 0, false, true);
 	delete cardToMove;
 	return retVal;
 }
 
-ResponseCode Server_Player::moveCard(CommandContainer *cont, const QString &_startZone, const QList<CardToMove *> &_cards, int targetPlayerId, const QString &_targetZone, int x, int y, bool faceDown)
+ResponseCode Server_Player::moveCard(CommandContainer *cont, const QString &_startZone, const QList<CardToMove *> &_cards, int targetPlayerId, const QString &_targetZone, int x, int y)
 {
 	QMutexLocker locker(&game->gameMutex);
 	
@@ -295,7 +295,7 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, const QString &_sta
 	if ((!startzone) || (!targetzone))
 		return RespNameNotFound;
 	
-	return moveCard(cont, startzone, _cards, targetzone, x, y, faceDown);
+	return moveCard(cont, startzone, _cards, targetzone, x, y);
 }
 
 class Server_Player::MoveCardCompareFunctor {
@@ -319,7 +319,7 @@ public:
 	}
 };
 
-ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *startzone, const QList<CardToMove *> &_cards, Server_CardZone *targetzone, int x, int y, bool faceDown, bool fixFreeSpaces, bool undoingDraw)
+ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *startzone, const QList<CardToMove *> &_cards, Server_CardZone *targetzone, int x, int y, bool fixFreeSpaces, bool undoingDraw)
 {
 	QMutexLocker locker(&game->gameMutex);
 	
@@ -417,8 +417,8 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 			bool targetBeingLookedAt = (targetzone->getType() != HiddenZone) || (targetzone->getCardsBeingLookedAt() > newX) || (targetzone->getCardsBeingLookedAt() == -1);
 			bool sourceBeingLookedAt = (startzone->getType() != HiddenZone) || (startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1);
 		
-			bool targetHiddenToPlayer = faceDown || !targetBeingLookedAt;
-			bool targetHiddenToOthers = faceDown || (targetzone->getType() != PublicZone);
+			bool targetHiddenToPlayer = thisCardProperties->getFaceDown() || !targetBeingLookedAt;
+			bool targetHiddenToOthers = thisCardProperties->getFaceDown() || (targetzone->getType() != PublicZone);
 			bool sourceHiddenToPlayer = card->getFaceDown() || !sourceBeingLookedAt;
 			bool sourceHiddenToOthers = card->getFaceDown() || (startzone->getType() != PublicZone);
 		
@@ -429,9 +429,9 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 				publicCardName = card->getName();
 		
 			int oldCardId = card->getId();
-			if (faceDown || (targetzone->getPlayer() != startzone->getPlayer()))
+			if (thisCardProperties->getFaceDown() || (targetzone->getPlayer() != startzone->getPlayer()))
 				card->setId(targetzone->getPlayer()->newCardId());
-			card->setFaceDown(faceDown);
+			card->setFaceDown(thisCardProperties->getFaceDown());
 		
 			// The player does not get to see which card he moved if it moves between two parts of hidden zones which
 			// are not being looked at.
@@ -445,8 +445,8 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 			int privatePosition = -1;
 			if (startzone->getType() == HiddenZone)
 				privatePosition = position;
-			cont->enqueueGameEventPrivate(new Event_MoveCard(getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, privateNewCardId, faceDown), game->getGameId(), -1, undoingDraw ? static_cast<GameEventContext *>(new Context_UndoDraw) : static_cast<GameEventContext *>(new Context_MoveCard));
-			cont->enqueueGameEventOmniscient(new Event_MoveCard(getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, privateNewCardId, faceDown), game->getGameId(), undoingDraw ? static_cast<GameEventContext *>(new Context_UndoDraw) : static_cast<GameEventContext *>(new Context_MoveCard));
+			cont->enqueueGameEventPrivate(new Event_MoveCard(getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, privateNewCardId, thisCardProperties->getFaceDown()), game->getGameId(), -1, undoingDraw ? static_cast<GameEventContext *>(new Context_UndoDraw) : static_cast<GameEventContext *>(new Context_MoveCard));
+			cont->enqueueGameEventOmniscient(new Event_MoveCard(getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, privateNewCardId, thisCardProperties->getFaceDown()), game->getGameId(), undoingDraw ? static_cast<GameEventContext *>(new Context_UndoDraw) : static_cast<GameEventContext *>(new Context_MoveCard));
 			
 			// Other players do not get to see the start and/or target position of the card if the respective
 			// part of the zone is being looked at. The information is not needed anyway because in hidden zones,
@@ -460,13 +460,13 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 				newX = -1;
 		
 			if ((startzone->getType() == PublicZone) || (targetzone->getType() == PublicZone))
-				cont->enqueueGameEventPublic(new Event_MoveCard(getPlayerId(), oldCardId, publicCardName, startzone->getName(), position, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, card->getId(), faceDown), game->getGameId(), undoingDraw ? static_cast<GameEventContext *>(new Context_UndoDraw) : static_cast<GameEventContext *>(new Context_MoveCard));
+				cont->enqueueGameEventPublic(new Event_MoveCard(getPlayerId(), oldCardId, publicCardName, startzone->getName(), position, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, card->getId(), thisCardProperties->getFaceDown()), game->getGameId(), undoingDraw ? static_cast<GameEventContext *>(new Context_UndoDraw) : static_cast<GameEventContext *>(new Context_MoveCard));
 			else
 				cont->enqueueGameEventPublic(new Event_MoveCard(getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, -1, false), game->getGameId(), undoingDraw ? static_cast<GameEventContext *>(new Context_UndoDraw) : static_cast<GameEventContext *>(new Context_MoveCard));
 			
 			if (thisCardProperties->getTapped())
 				setCardAttrHelper(cont, targetzone->getName(), card->getId(), "tapped", "1");
-			if (!thisCardProperties->getPT().isEmpty() && !faceDown)
+			if (!thisCardProperties->getPT().isEmpty() && !thisCardProperties->getFaceDown())
 				setCardAttrHelper(cont, targetzone->getName(), card->getId(), "pt", thisCardProperties->getPT());
 		}
 	}

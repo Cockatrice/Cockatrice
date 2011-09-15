@@ -615,7 +615,7 @@ void Player::actMoveTopCardsToGrave()
 	QList<CardToMove *> idList;
 	for (int i = 0; i < number; ++i)
 		idList.append(new CardToMove(i));
-	sendGameCommand(new Command_MoveCard(-1, "deck", idList, getId(), "grave", 0, 0, false));
+	sendGameCommand(new Command_MoveCard(-1, "deck", idList, getId(), "grave", 0, 0));
 }
 
 void Player::actMoveTopCardsToExile()
@@ -631,12 +631,12 @@ void Player::actMoveTopCardsToExile()
 	QList<CardToMove *> idList;
 	for (int i = 0; i < number; ++i)
 		idList.append(new CardToMove(i));
-	sendGameCommand(new Command_MoveCard(-1, "deck", idList, getId(), "rfg", 0, 0, false));
+	sendGameCommand(new Command_MoveCard(-1, "deck", idList, getId(), "rfg", 0, 0));
 }
 
 void Player::actMoveTopCardToBottom()
 {
-	sendGameCommand(new Command_MoveCard(-1, "deck", QList<CardToMove *>() << new CardToMove(0), getId(), "deck", -1, 0, false));
+	sendGameCommand(new Command_MoveCard(-1, "deck", QList<CardToMove *>() << new CardToMove(0), getId(), "deck", -1, 0));
 }
 
 void Player::actUntapAll()
@@ -1155,10 +1155,10 @@ void Player::playCard(CardItem *c, bool faceDown, bool tapped)
 {
 	CardInfo *ci = c->getInfo();
 	if (ci->getTableRow() == 3)
-		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), QList<CardToMove *>() << new CardToMove(c->getId()), getId(), "stack", 0, 0, false));
+		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), QList<CardToMove *>() << new CardToMove(c->getId()), getId(), "stack", 0, 0));
 	else {
 		QPoint gridPoint = QPoint(-1, 2 - ci->getTableRow());
-		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), QList<CardToMove *>() << new CardToMove(c->getId(), ci->getPowTough(), tapped), getId(), "table", gridPoint.x(), gridPoint.y(), faceDown));
+		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), QList<CardToMove *>() << new CardToMove(c->getId(), faceDown, ci->getPowTough(), tapped), getId(), "table", gridPoint.x(), gridPoint.y()));
 	}
 }
 
@@ -1374,16 +1374,16 @@ void Player::cardMenuAction(QAction *a)
 		
 		switch (a->data().toInt()) {
 			case 5:
-				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "deck", 0, 0, false));
+				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "deck", 0, 0));
 				break;
 			case 6:
-				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "deck", -1, 0, false));
+				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "deck", -1, 0));
 				break;
 			case 7:
-				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "grave", 0, 0, false));
+				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "grave", 0, 0));
 				break;
 			case 8:
-				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "rfg", 0, 0, false));
+				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "rfg", 0, 0));
 				break;
 			default: ;
 		}

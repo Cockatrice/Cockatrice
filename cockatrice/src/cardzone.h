@@ -35,7 +35,7 @@ public slots:
 public:
 	enum { Type = typeZone };
 	int type() const { return Type; }
-	virtual void handleDropEvent(const QList<CardDragItem *> &dragItem, CardZone *startZone, const QPoint &dropPoint, bool faceDown) = 0;
+	virtual void handleDropEvent(const QList<CardDragItem *> &dragItem, CardZone *startZone, const QPoint &dropPoint) = 0;
 	CardZone(Player *_player, const QString &_name, bool _hasCardAttr, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent = 0, bool isView = false);
 	~CardZone();
 	void retranslateUi();

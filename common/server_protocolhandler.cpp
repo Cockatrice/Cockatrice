@@ -762,7 +762,7 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(Command_MoveCard *cmd, CommandC
 	if (player->getConceded())
 		return RespContextError;
 	
-	return player->moveCard(cont, cmd->getStartZone(), cmd->getCards(), cmd->getTargetPlayerId(), cmd->getTargetZone(), cmd->getX(), cmd->getY(), cmd->getFaceDown());
+	return player->moveCard(cont, cmd->getStartZone(), cmd->getCards(), cmd->getTargetPlayerId(), cmd->getTargetZone(), cmd->getX(), cmd->getY());
 }
 
 ResponseCode Server_ProtocolHandler::cmdFlipCard(Command_FlipCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player)

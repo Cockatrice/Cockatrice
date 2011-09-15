@@ -29,8 +29,8 @@ public:
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	void toggleTapped();
-	void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint, bool faceDown = false);
-	void handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &gridPoint, bool faceDown = false, bool tapped = false);
+	void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint);
+	void handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &gridPoint);
 	CardItem *getCardFromGrid(const QPoint &gridPoint) const;
 	CardItem *getCardFromCoords(const QPointF &point) const;
 	QPointF mapFromGrid(QPoint gridPoint) const;

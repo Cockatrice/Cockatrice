@@ -230,7 +230,7 @@ QList<MoveCardToZone *> Command_SetSideboardPlan::getMoveList() const
 	return typecastItemList<MoveCardToZone *>();
 }
 
-Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, const QList<CardToMove *> &_cards, int _targetPlayerId, const QString &_targetZone, int _x, int _y, bool _faceDown)
+Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, const QList<CardToMove *> &_cards, int _targetPlayerId, const QString &_targetZone, int _x, int _y)
 	: GameCommand("move_card", _gameId)
 {
 	insertItem(new SerializableItem_String("start_zone", _startZone));
@@ -238,7 +238,6 @@ Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, const
 	insertItem(new SerializableItem_String("target_zone", _targetZone));
 	insertItem(new SerializableItem_Int("x", _x));
 	insertItem(new SerializableItem_Int("y", _y));
-	insertItem(new SerializableItem_Bool("face_down", _faceDown));
 
 	for (int i = 0; i < _cards.size(); ++i)
 		itemList.append(_cards[i]);

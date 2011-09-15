@@ -22,9 +22,10 @@ enum ZoneType { PrivateZone, PublicZone, HiddenZone };
 
 class CardToMove : public SerializableItem_Map {
 public:
-	CardToMove(int _cardId = -1, const QString &_pt = QString(), bool _tapped = false);
+	CardToMove(int _cardId = -1, bool _faceDown = false, const QString &_pt = QString(), bool _tapped = false);
 	static SerializableItem *newItem() { return new CardToMove; }
 	int getCardId() const { return static_cast<SerializableItem_Int *>(itemMap.value("card_id"))->getData(); }
+	bool getFaceDown() const { return static_cast<SerializableItem_Bool *>(itemMap.value("facedown"))->getData(); }
 	QString getPT() const { return static_cast<SerializableItem_String *>(itemMap.value("pt"))->getData(); }
 	bool getTapped() const { return static_cast<SerializableItem_Bool *>(itemMap.value("tapped"))->getData(); }
 };

@@ -124,13 +124,13 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 	card->update();
 }
 
-void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &/*dropPoint*/, bool /*faceDown*/)
+void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &/*dropPoint*/)
 {
 	QList<CardToMove *> idList;
 	for (int i = 0; i < dragItems.size(); ++i)
 		idList.append(new CardToMove(dragItems[i]->getId()));
 	
-	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), 0, 0, false));
+	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), 0, 0));
 }
 
 void ZoneViewZone::removeCard(int position)

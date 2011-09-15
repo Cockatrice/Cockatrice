@@ -86,18 +86,18 @@ void TableZone::addCardImpl(CardItem *card, int _x, int _y)
 	card->update();
 }
 
-void TableZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint, bool faceDown)
+void TableZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint)
 {
-	handleDropEventByGrid(dragItems, startZone, mapToGrid(dropPoint), faceDown);
+	handleDropEventByGrid(dragItems, startZone, mapToGrid(dropPoint));
 }
 
-void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &gridPoint, bool faceDown, bool tapped)
+void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &gridPoint)
 {
 	QList<CardToMove *> idList;
 	for (int i = 0; i < dragItems.size(); ++i)
-		idList.append(new CardToMove(dragItems[i]->getId(), startZone->getName() == name ? QString() : dragItems[i]->getItem()->getInfo()->getPowTough(), tapped));
+		idList.append(new CardToMove(dragItems[i]->getId(), dragItems[i]->getFaceDown(), startZone->getName() == name ? QString() : dragItems[i]->getItem()->getInfo()->getPowTough()));
 	
-	startZone->getPlayer()->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), gridPoint.x(), gridPoint.y(), faceDown));
+	startZone->getPlayer()->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), gridPoint.x(), gridPoint.y()));
 }
 
 void TableZone::reorganizeCards()
