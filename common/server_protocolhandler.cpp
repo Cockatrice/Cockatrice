@@ -1208,7 +1208,7 @@ ResponseCode Server_ProtocolHandler::cmdDumpZone(Command_DumpZone *cmd, CommandC
 				attachCardId = card->getParentCard()->getId();
 			}
 			
-			respCardList.append(new ServerInfo_Card(card->getId(), displayedName, card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), card->getDoesntUntap(), cardCounterList, attachPlayerId, attachZone, attachCardId));
+			respCardList.append(new ServerInfo_Card(card->getId(), displayedName, card->getX(), card->getY(), card->getFaceDown(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), card->getDoesntUntap(), cardCounterList, attachPlayerId, attachZone, attachCardId));
 		}
 	}
 	if (zone->getType() == HiddenZone) {
@@ -1296,8 +1296,8 @@ ResponseCode Server_ProtocolHandler::cmdRevealCards(Command_RevealCards *cmd, Co
 		}
 		
 		if (cmd->getPlayerId() != -1)
-			respCardListPrivate.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), card->getDoesntUntap(), cardCounterListPrivate, attachPlayerId, attachZone, attachCardId));
-		respCardListOmniscient.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), card->getDoesntUntap(), cardCounterListOmniscient, attachPlayerId, attachZone, attachCardId));
+			respCardListPrivate.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getFaceDown(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), card->getDoesntUntap(), cardCounterListPrivate, attachPlayerId, attachZone, attachCardId));
+		respCardListOmniscient.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getFaceDown(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), card->getDoesntUntap(), cardCounterListOmniscient, attachPlayerId, attachZone, attachCardId));
 	}
 	
 	if (cmd->getPlayerId() == -1)

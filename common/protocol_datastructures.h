@@ -127,12 +127,13 @@ public:
 
 class ServerInfo_Card : public SerializableItem_Map {
 public:
-	ServerInfo_Card(int _id = -1, const QString &_name = QString(), int _x = -1, int _y = -1, bool _tapped = false, bool _attacking = false, const QString &_color = QString(), const QString &_pt = QString(), const QString &_annotation = QString(), bool _destroyOnZoneChange = false, bool _doesntUntap = false, const QList<ServerInfo_CardCounter *> &_counterList = QList<ServerInfo_CardCounter *>(), int attachPlayerId = -1, const QString &_attachZone = QString(), int attachCardId = -1);
+	ServerInfo_Card(int _id = -1, const QString &_name = QString(), int _x = -1, int _y = -1, bool _faceDown = false, bool _tapped = false, bool _attacking = false, const QString &_color = QString(), const QString &_pt = QString(), const QString &_annotation = QString(), bool _destroyOnZoneChange = false, bool _doesntUntap = false, const QList<ServerInfo_CardCounter *> &_counterList = QList<ServerInfo_CardCounter *>(), int attachPlayerId = -1, const QString &_attachZone = QString(), int attachCardId = -1);
 	static SerializableItem *newItem() { return new ServerInfo_Card; }
 	int getId() const { return static_cast<SerializableItem_Int *>(itemMap.value("id"))->getData(); }
 	QString getName() const { return static_cast<SerializableItem_String *>(itemMap.value("name"))->getData(); }
 	int getX() const { return static_cast<SerializableItem_Int *>(itemMap.value("x"))->getData(); }
 	int getY() const { return static_cast<SerializableItem_Int *>(itemMap.value("y"))->getData(); }
+	bool getFaceDown() const { return static_cast<SerializableItem_Bool *>(itemMap.value("facedown"))->getData(); }
 	bool getTapped() const { return static_cast<SerializableItem_Bool *>(itemMap.value("tapped"))->getData(); }
 	bool getAttacking() const { return static_cast<SerializableItem_Bool *>(itemMap.value("attacking"))->getData(); }
 	QString getColor() const { return static_cast<SerializableItem_String *>(itemMap.value("color"))->getData(); }

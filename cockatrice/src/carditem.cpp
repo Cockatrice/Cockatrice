@@ -382,6 +382,7 @@ void CardItem::processCardInfo(ServerInfo_Card *info)
 	setId(info->getId());
 	setName(info->getName());
 	setAttacking(info->getAttacking());
+	setFaceDown(info->getFaceDown());
 	setPT(info->getPT());
 	setAnnotation(info->getAnnotation());
 	setColor(info->getColor());
