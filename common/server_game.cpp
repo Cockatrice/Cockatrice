@@ -140,6 +140,10 @@ void Server_Game::doStartGameIfReady()
 		Server_Player *player = playerIterator.next().value();
 		player->setConceded(false);
 		player->setReadyStart(false);
+	}
+	playerIterator.toFront();
+	while (playerIterator.hasNext()) {
+		Server_Player *player = playerIterator.next().value();
 		sendGameEventToPlayer(player, new Event_GameStateChanged(gameStarted, 0, 0, getGameState(player)));
 	}
 	
