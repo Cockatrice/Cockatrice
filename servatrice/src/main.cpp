@@ -23,6 +23,8 @@
 #include <iostream>
 #include <QMetaType>
 #include <QSettings>
+#include <QDateTime>
+#include "passwordhasher.h"
 #include "servatrice.h"
 #include "server_logger.h"
 #include "rng_sfmt.h"
@@ -68,6 +70,17 @@ void testRNG()
 	std::cerr << std::endl << std::endl;
 }
 
+void testHash()
+{
+	const int n = 5000;
+	std::cerr << "Benchmarking password hash function (n =" << n << ")..." << std::endl;
+	QDateTime startTime = QDateTime::currentDateTime();
+	for (int i = 0; i < n; ++i)
+		PasswordHasher::computeHash("aaaaaa", "aaaaaaaaaaaaaaaa");
+	QDateTime endTime = QDateTime::currentDateTime();
+	std::cerr << startTime.secsTo(endTime) << "secs" << std::endl;
+}
+
 void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
 	logger->logMessage(msg);
@@ -93,6 +106,7 @@ int main(int argc, char *argv[])
 	
 	QStringList args = app.arguments();
 	bool testRandom = args.contains("--test-random");
+	bool testHashFunction = args.contains("--test-hash");
 	
 	qRegisterMetaType<QList<int> >("QList<int>");
 	
@@ -128,6 +142,8 @@ int main(int argc, char *argv[])
 	
 	if (testRandom)
 		testRNG();
+	if (testHashFunction)
+		testHash();
 	
 	Servatrice *server = new Servatrice(settings);
 	QObject::connect(server, SIGNAL(destroyed()), &app, SLOT(quit()), Qt::QueuedConnection);
