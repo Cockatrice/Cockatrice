@@ -24,6 +24,7 @@ BanDialog::BanDialog(QWidget *parent)
 	durationEdit = new QSpinBox;
 	durationEdit->setMinimum(0);
 	durationEdit->setValue(5);
+	durationEdit->setMaximum(99999999);
 	QLabel *reasonLabel = new QLabel(tr("Please enter the reason for the ban.\nThis is only saved for moderators and cannot be seen by the banned person."));
 	reasonEdit = new QPlainTextEdit;
 	
