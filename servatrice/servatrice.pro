@@ -8,6 +8,7 @@ DEPENDPATH += . src ../common
 INCLUDEPATH += . src ../common
 MOC_DIR = build
 OBJECTS_DIR = build
+LIBS += -lgcrypt
 
 CONFIG += qt debug
 QT += network sql
@@ -18,6 +19,7 @@ HEADERS += src/main.h \
 	src/serversocketinterface.h \
 	src/server_logger.h \
 	src/serversocketthread.h \
+	src/passwordhasher.h \
 	../common/color.h \
 	../common/serializable_item.h \
 	../common/decklist.h \
@@ -42,6 +44,7 @@ SOURCES += src/main.cpp \
 	src/serversocketinterface.cpp \
 	src/server_logger.cpp \
 	src/serversocketthread.cpp \
+	src/passwordhasher.cpp \
 	../common/serializable_item.cpp \
 	../common/decklist.cpp \
 	../common/protocol.cpp \

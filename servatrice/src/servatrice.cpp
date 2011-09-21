@@ -28,6 +28,7 @@
 #include "protocol.h"
 #include "server_logger.h"
 #include "main.h"
+#include "passwordhasher.h"
 
 void Servatrice_TcpServer::incomingConnection(int socketDescriptor)
 {
@@ -185,7 +186,7 @@ AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handl
 		checkSql();
 		
 		QSqlQuery query;
-		query.prepare("select a.password, time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_users a left join " + dbPrefix + "_bans b on b.id_user = a.id and b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.id_user = a.id) where a.name = :name and a.active = 1");
+		query.prepare("select a.password_sha512, time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_users a left join " + dbPrefix + "_bans b on b.id_user = a.id and b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.id_user = a.id) where a.name = :name and a.active = 1");
 		query.bindValue(":name", user);
 		if (!execSqlQuery(query)) {
 			qDebug("Login denied: SQL error");
@@ -197,7 +198,7 @@ AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handl
 				qDebug("Login denied: banned");
 				return PasswordWrong;
 			}
-			if (query.value(0).toString() == password) {
+			if (query.value(0).toString() == PasswordHasher::computeHash(password, query.value(0).toString().left(16))) {
 				qDebug("Login accepted: password right");
 				return PasswordRight;
 			} else {
@@ -423,4 +424,4 @@ void Servatrice::shutdownTimeout()
 		deleteLater();
 }
 
-const QString Servatrice::versionString = "Servatrice 0.20110803";
+const QString Servatrice::versionString = "Servatrice 0.20110921";
