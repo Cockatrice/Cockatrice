@@ -5,9 +5,13 @@ INCLUDEPATH += . src ../common
 MOC_DIR = build
 OBJECTS_DIR = build
 RESOURCES = cockatrice.qrc
-QT += network script svg multimedia
-CONFIG += mobility
-MOBILITY = multimedia
+QT += network script svg
+linux-g++ {
+	CONFIG += mobility
+	MOBILITY = multimedia
+} else {
+	QT += multimedia
+}
 
 HEADERS += src/abstractcounter.h \
  src/counter_general.h \
