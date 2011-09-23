@@ -137,6 +137,10 @@
 	    <longname>Ice Age</longname>
 	</set>
 	<set import="1">
+	    <name>ISD</name>
+	    <longname>Innistrad</longname>
+	</set>
+	<set import="1">
 	    <name>IN</name>
 	    <longname>Invasion</longname>
 	</set>
