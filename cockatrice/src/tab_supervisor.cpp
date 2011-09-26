@@ -145,6 +145,9 @@ void TabSupervisor::start(AbstractClient *_client, ServerInfo_User *_userInfo)
 
 void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
 {
+	tabUserLists = 0;
+	tabDeckStorage = 0;
+	tabAdmin = 0;
 	userInfo = new ServerInfo_User;
 	localClients = _clients;
 	for (int i = 0; i < localClients.size(); ++i)
@@ -168,18 +171,15 @@ void TabSupervisor::stop()
 		localClients.clear();
 		
 		emit localGameEnded();
+	} else {
+		tabUserLists->deleteLater();
+		tabServer->deleteLater();
+		tabDeckStorage->deleteLater();
 	}
-
-	clear();
-	
-	tabUserLists->deleteLater();
 	tabUserLists = 0;
-	
-	tabServer->deleteLater();
 	tabServer = 0;
-	
-	tabDeckStorage->deleteLater();
 	tabDeckStorage = 0;
+	clear();
 	
 	QMapIterator<int, TabRoom *> roomIterator(roomTabs);
 	while (roomIterator.hasNext())
