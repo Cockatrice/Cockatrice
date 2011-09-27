@@ -2699,13 +2699,13 @@ La tua versione è la %1, la versione online è la %2.</translation>
         <location filename="../src/messagelogwidget.cpp" line="712"/>
         <source>It is now %1&apos;s turn.</source>
         <comment>female</comment>
-        <translation>è il turno di %1.</translation>
+        <translation>È il turno di %1.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="714"/>
         <source>It is now %1&apos;s turn.</source>
         <comment>male</comment>
-        <translation>è il turno di %1.</translation>
+        <translation>È il turno di %1.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="723"/>
@@ -2765,7 +2765,7 @@ La tua versione è la %1, la versione online è la %2.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="735"/>
         <source>It is now the %1.</source>
-        <translation>è adesso la %1.</translation>
+        <translation>È adesso la %1.</translation>
     </message>
 </context>
 <context>
