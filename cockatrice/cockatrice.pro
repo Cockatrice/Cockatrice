@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET =
+TARGET = cockatrice
 DEPENDPATH += . src ../common
 INCLUDEPATH += . src ../common
 MOC_DIR = build
@@ -202,6 +202,6 @@ win32 {
 }
 macx {
 	ICON = resources/appicon.icns
-	CONFIG += x86 ppc
+	CONFIG += x86_64 release
 	LIBS += -bind_at_load
 }

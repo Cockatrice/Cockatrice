@@ -395,7 +395,7 @@ void WndDeckEditor::actPrintDeck()
 
 void WndDeckEditor::actEditSets()
 {
-	WndSets *w = new WndSets(this);
+	WndSets *w = new WndSets;
 	w->setWindowModality(Qt::WindowModal);
 	w->show();
 }

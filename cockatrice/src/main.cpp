@@ -73,11 +73,11 @@ int main(int argc, char *argv[])
 #ifdef Q_OS_MAC
 	QDir baseDir(app.applicationDirPath());
 	baseDir.cdUp();
+	baseDir.cdUp();
+	baseDir.cdUp();
 	QDir pluginsDir = baseDir;
 	pluginsDir.cd("PlugIns");
 	app.addLibraryPath(pluginsDir.absolutePath());
-	baseDir.cdUp();
-	baseDir.cdUp();
 #endif
 #ifdef Q_OS_WIN
 	app.addLibraryPath(app.applicationDirPath() + "/plugins");
@@ -116,8 +116,10 @@ int main(int argc, char *argv[])
 	}
 	
 	if (startMainProgram) {
+		qDebug("main(): starting main program");
 		soundEngine = new SoundEngine;
-		
+		qDebug("main(): SoundEngine constructor finished");
+
 		MainWindow ui;
 		qDebug("main(): MainWindow constructor finished");
 		
@@ -129,7 +131,8 @@ int main(int argc, char *argv[])
 		
 		app.exec();
 	}
-
+	
+	qDebug("Event loop finished, terminating...");
 	delete db;
 	delete settingsCache;
 	delete rng;
