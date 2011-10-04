@@ -96,7 +96,7 @@ void InnerDecklistNode::clearTree()
 }
 
 DecklistCardNode::DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent)
-	: AbstractDecklistCardNode(_parent), name(other->getName()), number(other->getNumber())
+	: AbstractDecklistCardNode(_parent), name(other->getName()), number(other->getNumber()), price(other->getPrice())
 {
 }
 
@@ -357,6 +357,7 @@ void DeckList::loadFromXml(QXmlStreamReader *xml)
 			}
 		}
 	}
+	updateDeckHash();
 }
 
 bool DeckList::loadFromFile_Native(QIODevice *device)
@@ -415,6 +416,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 		++okRows;
 		new DecklistCardNode(line.mid(i + 1), number, zone);
 	}
+	updateDeckHash();
 	return (okRows > 0);
 }
 
@@ -455,10 +457,8 @@ bool DeckList::loadFromFile(const QString &fileName, FileFormat fmt)
 		case PlainTextFormat: result = loadFromFile_Plain(&file); break;
 		case CockatriceFormat: result = loadFromFile_Native(&file); break;
 	}
-	if (result) {
-		updateDeckHash();
+	if (result)
 		emit deckLoaded();
-	}
 	return result;
 }
 
