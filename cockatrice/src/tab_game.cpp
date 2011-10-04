@@ -620,7 +620,7 @@ void TabGame::eventPlayerPropertiesChanged(Event_PlayerPropertiesChanged *event,
 			
 			break;
 		}
-		case ItemId_Context_DeckSelect: messageLog->logDeckSelect(player, static_cast<Context_DeckSelect *>(context)->getDeckId()); break;
+		case ItemId_Context_DeckSelect: messageLog->logDeckSelect(player, static_cast<Context_DeckSelect *>(context)->getDeckHash()); break;
 		default: ;
 	}
 }

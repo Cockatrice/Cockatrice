@@ -595,9 +595,9 @@ ResponseCode Server_ProtocolHandler::cmdDeckSelect(Command_DeckSelect *cmd, Comm
 			return r;
 		}
 	}
-	player->setDeck(deck, cmd->getDeckId());
+	player->setDeck(deck);
 	
-	game->sendGameEvent(new Event_PlayerPropertiesChanged(player->getPlayerId(), player->getProperties()), new Context_DeckSelect(cmd->getDeckId()));
+	game->sendGameEvent(new Event_PlayerPropertiesChanged(player->getPlayerId(), player->getProperties()), new Context_DeckSelect(deck->getDeckHash()));
 
 	cont->setResponse(new Response_DeckDownload(cont->getCmdId(), RespOk, new DeckList(deck)));
 	return RespNothing;

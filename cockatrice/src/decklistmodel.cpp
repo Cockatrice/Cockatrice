@@ -17,6 +17,7 @@ DeckListModel::DeckListModel(QObject *parent)
 {
 	deckList = new DeckList;
 	connect(deckList, SIGNAL(deckLoaded()), this, SLOT(rebuildTree()));
+	connect(deckList, SIGNAL(deckHashChanged()), this, SIGNAL(deckHashChanged()));
 	root = new InnerDecklistNode;
 }
 
@@ -194,6 +195,7 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, int
 		default: return false;
 	}
 	emitRecursiveUpdates(index);
+	deckList->updateDeckHash();
 	return true;
 }
 
@@ -310,6 +312,8 @@ void DeckListModel::setDeckList(DeckList *_deck)
 {
 	delete deckList;
 	deckList = _deck;
+	connect(deckList, SIGNAL(deckLoaded()), this, SLOT(rebuildTree()));
+	connect(deckList, SIGNAL(deckHashChanged()), this, SIGNAL(deckHashChanged()));
 	rebuildTree();
 }
 

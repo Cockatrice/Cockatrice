@@ -461,10 +461,10 @@ Context_Concede::Context_Concede()
 	: GameEventContext("concede")
 {
 }
-Context_DeckSelect::Context_DeckSelect(int _deckId)
+Context_DeckSelect::Context_DeckSelect(const QString &_deckHash)
 	: GameEventContext("deck_select")
 {
-	insertItem(new SerializableItem_Int("deck_id", _deckId));
+	insertItem(new SerializableItem_String("deck_hash", _deckHash));
 }
 Context_UndoDraw::Context_UndoDraw()
 	: GameEventContext("undo_draw")

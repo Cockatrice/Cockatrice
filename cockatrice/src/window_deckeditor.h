@@ -14,6 +14,7 @@ class QTableView;
 class CardInfoWidget;
 class QTextEdit;
 class DlgCardSearch;
+class QLabel;
 
 class SearchLineEdit : public QLineEdit {
 	private:
@@ -30,6 +31,7 @@ class WndDeckEditor : public QMainWindow {
 private slots:
 	void updateName(const QString &name);
 	void updateComments();
+	void updateHash();
 	void updateCardInfoLeft(const QModelIndex &current, const QModelIndex &previous);
 	void updateCardInfoRight(const QModelIndex &current, const QModelIndex &previous);
 	void updateSearch(const QString &search);
@@ -72,6 +74,7 @@ private:
 	SearchLineEdit *searchEdit;
 	QLineEdit *nameEdit;
 	QTextEdit *commentsEdit;
+	QLabel *hashLabel;
 	DlgCardSearch *dlgCardSearch;
 
 	QMenu *deckMenu, *dbMenu;

@@ -3,6 +3,7 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QVariant>
+#include <QCryptographicHash>
 #include "decklist.h"
 
 MoveCardToZone::MoveCardToZone(const QString &_cardName, const QString &_startZone, const QString &_targetZone)
@@ -263,6 +264,7 @@ DeckList::DeckList(DeckList *other)
 			newMoveList.append(new MoveCardToZone(oldMoveList[i]));
 		sideboardPlans.insert(spIterator.key(), new SideboardPlan(spIterator.key(), newMoveList));
 	}
+	updateDeckHash();
 }
 
 DeckList::~DeckList()
@@ -453,8 +455,10 @@ bool DeckList::loadFromFile(const QString &fileName, FileFormat fmt)
 		case PlainTextFormat: result = loadFromFile_Plain(&file); break;
 		case CockatriceFormat: result = loadFromFile_Native(&file); break;
 	}
-	if (result)
+	if (result) {
+		updateDeckHash();
 		emit deckLoaded();
+	}
 	return result;
 }
 
@@ -486,6 +490,7 @@ void DeckList::cleanList()
 	root->clearTree();
 	setName();
 	setComments();
+	updateDeckHash();
 }
 
 void DeckList::getCardListHelper(InnerDecklistNode *item, QSet<QString> &result) const
@@ -512,28 +517,55 @@ DecklistCardNode *DeckList::addCard(const QString &cardName, const QString &zone
 	if (!zoneNode)
 		zoneNode = new InnerDecklistNode(zoneName, root);
 	
-	return new DecklistCardNode(cardName, 1, zoneNode);
+	DecklistCardNode *node = new DecklistCardNode(cardName, 1, zoneNode);
+	updateDeckHash();
+	return node;
 }
 
 bool DeckList::deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNode)
 {
 	if (node == root)
 		return true;
-	if (!rootNode)
+	bool updateHash = false;
+	if (!rootNode) {
 		rootNode = root;
+		updateHash = true;
+	}
 	
 	int index = rootNode->indexOf(node);
 	if (index != -1) {
 		delete rootNode->takeAt(index);
 		if (!rootNode->size())
 			deleteNode(rootNode, rootNode->getParent());
+		if (updateHash)
+			updateDeckHash();
 		return true;
 	}
 	for (int i = 0; i < rootNode->size(); i++) {
 		InnerDecklistNode *inner = dynamic_cast<InnerDecklistNode *>(rootNode->at(i));
 		if (inner)
-			if (deleteNode(node, inner))
+			if (deleteNode(node, inner)) {
+				if (updateHash)
+					updateDeckHash();
 				return true;
+			}
 	}
 	return false;
+}
+
+void DeckList::updateDeckHash()
+{
+	QStringList cardList;
+	for (int i = 0; i < root->size(); i++) {
+		InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
+		for (int j = 0; j < node->size(); j++) {
+			DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
+			for (int k = 0; k < card->getNumber(); ++k)
+				cardList.append((node->getName() == "side" ? "SB:" : "") + card->getName().toLower());
+		}
+	}
+	cardList.sort();
+	deckHash = QCryptographicHash::hash(cardList.join(";").toUtf8(), QCryptographicHash::Sha1).toBase64().left(10);
+	
+	emit deckHashChanged();
 }

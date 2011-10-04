@@ -39,7 +39,6 @@ private:
 	int nextCardId;
 	bool readyStart;
 	bool conceded;
-	int deckId;
 public:
 	Server_Player(Server_Game *_game, int _playerId, ServerInfo_User *_userInfo, bool _spectator, Server_ProtocolHandler *_handler);
 	~Server_Player();
@@ -57,9 +56,8 @@ public:
 	bool getSpectator() const { return spectator; }
 	bool getConceded() const { return conceded; }
 	void setConceded(bool _conceded) { conceded = _conceded; }
-	int getDeckId() const { return deckId; }
 	ServerInfo_User *getUserInfo() const { return userInfo; }
-	void setDeck(DeckList *_deck, int _deckId);
+	void setDeck(DeckList *_deck);
 	DeckList *getDeck() const { return deck; }
 	Server_Game *getGame() const { return game; }
 	const QMap<QString, Server_CardZone *> &getZones() const { return zones; }

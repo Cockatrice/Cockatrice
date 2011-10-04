@@ -207,7 +207,7 @@ ServerInfo_Arrow::ServerInfo_Arrow(int _id, int _startPlayerId, const QString &_
 	insertItem(new SerializableItem_Color("color", _color));
 }
 
-ServerInfo_PlayerProperties::ServerInfo_PlayerProperties(int _playerId, ServerInfo_User *_userInfo, bool _spectator, bool _conceded, bool _readyStart, int _deckId)
+ServerInfo_PlayerProperties::ServerInfo_PlayerProperties(int _playerId, ServerInfo_User *_userInfo, bool _spectator, bool _conceded, bool _readyStart, const QString &_deckHash)
 	: SerializableItem_Map("player_properties")
 {
 	insertItem(new SerializableItem_Int("player_id", _playerId));
@@ -217,7 +217,7 @@ ServerInfo_PlayerProperties::ServerInfo_PlayerProperties(int _playerId, ServerIn
 	insertItem(new SerializableItem_Bool("spectator", _spectator));
 	insertItem(new SerializableItem_Bool("conceded", _conceded));
 	insertItem(new SerializableItem_Bool("ready_start", _readyStart));
-	insertItem(new SerializableItem_Int("deck_id", _deckId));
+	insertItem(new SerializableItem_String("deck_hash", _deckHash));
 }
 
 ServerInfo_Player::ServerInfo_Player(ServerInfo_PlayerProperties *_properties, DeckList *_deck, const QList<ServerInfo_Zone *> &_zoneList, const QList<ServerInfo_Counter *> &_counterList, const QList<ServerInfo_Arrow *> &_arrowList)

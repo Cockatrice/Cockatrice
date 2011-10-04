@@ -98,15 +98,7 @@ void PlayerListWidget::updatePlayerProperties(ServerInfo_PlayerProperties *prop)
 		player->setIcon(4, QIcon(CountryPixmapGenerator::generatePixmap(12, prop->getUserInfo()->getCountry())));
 	player->setData(4, Qt::UserRole, prop->getUserInfo()->getName());
 	player->setData(4, Qt::UserRole + 1, prop->getPlayerId());
-
-	QString deckText;
-	if (!prop->getSpectator())
-		switch (prop->getDeckId()) {
-			case -2: deckText = QString(); break;
-			case -1: deckText = tr("local deck"); break;
-			default: deckText = tr("deck #%1").arg(prop->getDeckId());
-		}
-	player->setText(5, deckText);
+	player->setText(5, prop->getDeckHash());
 }
 
 void PlayerListWidget::removePlayer(int playerId)

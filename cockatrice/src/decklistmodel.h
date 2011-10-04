@@ -30,6 +30,8 @@ private slots:
 	void rebuildTree();
 public slots:
 	void printDeckList(QPrinter *printer);
+signals:
+	void deckHashChanged();
 public:
 	DeckListModel(QObject *parent = 0);
 	~DeckListModel();

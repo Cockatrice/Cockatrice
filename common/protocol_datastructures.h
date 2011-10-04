@@ -189,14 +189,14 @@ public:
 
 class ServerInfo_PlayerProperties : public SerializableItem_Map {
 public:
-	ServerInfo_PlayerProperties(int _playerId = -1, ServerInfo_User *_userInfo = 0, bool _spectator = false, bool _conceded = false, bool _readyStart = false, int _deckId = -1);
+	ServerInfo_PlayerProperties(int _playerId = -1, ServerInfo_User *_userInfo = 0, bool _spectator = false, bool _conceded = false, bool _readyStart = false, const QString &_deckHash = QString());
 	static SerializableItem *newItem() { return new ServerInfo_PlayerProperties; }
 	int getPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("player_id"))->getData(); }
 	ServerInfo_User *getUserInfo() const { return static_cast<ServerInfo_User *>(itemMap.value("user")); }
 	bool getSpectator() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectator"))->getData(); }
 	bool getConceded() const { return static_cast<SerializableItem_Bool *>(itemMap.value("conceded"))->getData(); }
 	bool getReadyStart() const { return static_cast<SerializableItem_Bool *>(itemMap.value("ready_start"))->getData(); }
-	int getDeckId() const { return static_cast<SerializableItem_Int *>(itemMap.value("deck_id"))->getData(); }
+	QString getDeckHash() const { return static_cast<SerializableItem_String *>(itemMap.value("deck_hash"))->getData(); }
 };
 
 class ServerInfo_Player : public SerializableItem_Map {

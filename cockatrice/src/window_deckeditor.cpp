@@ -99,6 +99,7 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	middleFrame->addLayout(verticalToolBarLayout);
 
 	deckModel = new DeckListModel(this);
+	connect(deckModel, SIGNAL(deckHashChanged()), this, SLOT(updateHash()));
 	deckView = new QTreeView();
 	deckView->setModel(deckModel);
 	deckView->setUniformRowHeights(true);
@@ -114,6 +115,8 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	commentsEdit->setMaximumHeight(70);
 	commentsLabel->setBuddy(commentsEdit);
 	connect(commentsEdit, SIGNAL(textChanged()), this, SLOT(updateComments()));
+	QLabel *hashLabel1 = new QLabel(tr("Hash:"));
+	hashLabel = new QLabel;
 
 	QGridLayout *grid = new QGridLayout;
 	grid->addWidget(nameLabel, 0, 0);
@@ -121,6 +124,9 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 
 	grid->addWidget(commentsLabel, 1, 0);
 	grid->addWidget(commentsEdit, 1, 1);
+	
+	grid->addWidget(hashLabel1, 2, 0);
+	grid->addWidget(hashLabel, 2, 1);
 
         // Update price
         aUpdatePrices = new QAction(tr("&Update prices"), this);
@@ -140,10 +146,9 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
         deckToolbarLayout->addWidget(deckToolBar);
         deckToolbarLayout->addStretch();
 	
-
 	QVBoxLayout *rightFrame = new QVBoxLayout;
 	rightFrame->addLayout(grid);
-	rightFrame->addWidget(deckView);
+	rightFrame->addWidget(deckView, 10);
         rightFrame->addLayout(deckToolbarLayout);
 
 	QHBoxLayout *mainLayout = new QHBoxLayout;
@@ -230,6 +235,7 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	verticalToolBar->addAction(aRemoveCard);
 	verticalToolBar->addAction(aIncrement);
 	verticalToolBar->addAction(aDecrement);
+	verticalToolBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	
 	dlgCardSearch = new DlgCardSearch(this);
 	
@@ -273,6 +279,11 @@ void WndDeckEditor::updateSearch(const QString &search)
 		databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
 }
 
+void WndDeckEditor::updateHash()
+{
+	hashLabel->setText(deckModel->getDeckList()->getDeckHash());
+}
+
 bool WndDeckEditor::confirmClose()
 {
 	if (isWindowModified()) {
@@ -305,6 +316,7 @@ void WndDeckEditor::actNewDeck()
 	nameEdit->setText(QString());
 	commentsEdit->setText(QString());
 	lastFileName = QString();
+	setWindowModified(false);
 }
 
 void WndDeckEditor::actLoadDeck()
@@ -506,6 +518,7 @@ void WndDeckEditor::setDeck(DeckList *_deck, const QString &_lastFileName, DeckL
 	lastFileFormat = _lastFileFormat;
 	nameEdit->setText(_deck->getName());
 	commentsEdit->setText(_deck->getComments());
+	updateHash();
 	deckModel->sort(1);
 	deckView->expandAll();
 	setWindowModified(false);

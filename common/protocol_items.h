@@ -697,8 +697,8 @@ public:
 class Context_DeckSelect : public GameEventContext {
 	Q_OBJECT
 public:
-	Context_DeckSelect(int _deckId = -1);
-	int getDeckId() const { return static_cast<SerializableItem_Int *>(itemMap.value("deck_id"))->getData(); };
+	Context_DeckSelect(const QString &_deckHash = QString());
+	QString getDeckHash() const { return static_cast<SerializableItem_String *>(itemMap.value("deck_hash"))->getData(); };
 	static SerializableItem *newItem() { return new Context_DeckSelect; }
 	int getItemId() const { return ItemId_Context_DeckSelect; }
 };

@@ -11,7 +11,7 @@
 #include <QDebug>
 
 Server_Player::Server_Player(Server_Game *_game, int _playerId, ServerInfo_User *_userInfo, bool _spectator, Server_ProtocolHandler *_handler)
-	: game(_game), handler(_handler), userInfo(new ServerInfo_User(_userInfo)), deck(0), playerId(_playerId), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false), deckId(-2)
+	: game(_game), handler(_handler), userInfo(new ServerInfo_User(_userInfo)), deck(0), playerId(_playerId), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false)
 {
 }
 
@@ -187,16 +187,15 @@ ServerInfo_PlayerProperties *Server_Player::getProperties()
 {
 	QMutexLocker locker(&game->gameMutex);
 	
-	return new ServerInfo_PlayerProperties(playerId, new ServerInfo_User(userInfo), spectator, conceded, readyStart, deckId);
+	return new ServerInfo_PlayerProperties(playerId, new ServerInfo_User(userInfo), spectator, conceded, readyStart, deck ? deck->getDeckHash() : QString());
 }
 
-void Server_Player::setDeck(DeckList *_deck, int _deckId)
+void Server_Player::setDeck(DeckList *_deck)
 {
 	QMutexLocker locker(&game->gameMutex);
 	
 	delete deck;
 	deck = _deck;
-	deckId = _deckId;
 }
 
 void Server_Player::addZone(Server_CardZone *zone)

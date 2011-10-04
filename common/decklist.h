@@ -118,6 +118,7 @@ public:
 private:
 	QString name, comments;
 	QString lastFileName;
+	QString deckHash;
 	FileFormat lastFileFormat;
 	QMap<QString, SideboardPlan *> sideboardPlans;
 	InnerDecklistNode *root;
@@ -127,6 +128,7 @@ private:
 	void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
 signals:
 	void deckLoaded();
+	void deckHashChanged();
 public slots:
 	void setName(const QString &_name = QString()) { name = _name; }
 	void setComments(const QString &_comments = QString()) { comments = _comments; }
@@ -160,6 +162,9 @@ public:
 	void cleanList();
 	bool isEmpty() const { return root->isEmpty() && name.isEmpty() && comments.isEmpty() && sideboardPlans.isEmpty(); }
 	QStringList getCardList() const;
+	
+	QString getDeckHash() const { return deckHash; }
+	void updateDeckHash();
 
 	InnerDecklistNode *getRoot() const { return root; }
 	DecklistCardNode *addCard(const QString &cardName, const QString &zoneName);

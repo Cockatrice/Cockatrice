@@ -75,7 +75,7 @@
 5:room_say:s,player_name:s,message
 6:ready_start
 6:concede
-6:deck_select:i,deck_id
+6:deck_select:s,deck_hash
 6:undo_draw
 6:move_card
 6:mulligan:i,number
