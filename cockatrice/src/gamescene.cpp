@@ -144,8 +144,8 @@ void GameScene::removeZoneView(ZoneViewWidget *item)
 
 void GameScene::clearViews()
 {
-	for (int i = 0; i < zoneViews.size(); ++i)
-		zoneViews[i]->close();
+	while (!zoneViews.isEmpty())
+		zoneViews.first()->close();
 }
 
 void GameScene::closeMostRecentZoneView()
