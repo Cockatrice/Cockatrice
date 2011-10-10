@@ -1725,27 +1725,32 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation>Russo:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="195"/>
-        <location filename="../src/window_main.cpp" line="201"/>
+        <location filename="../src/window_main.cpp" line="190"/>
+        <source>Italian:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="196"/>
         <location filename="../src/window_main.cpp" line="202"/>
-        <location filename="../src/window_main.cpp" line="209"/>
-        <location filename="../src/window_main.cpp" line="215"/>
-        <location filename="../src/window_main.cpp" line="217"/>
+        <location filename="../src/window_main.cpp" line="203"/>
+        <location filename="../src/window_main.cpp" line="210"/>
+        <location filename="../src/window_main.cpp" line="216"/>
+        <location filename="../src/window_main.cpp" line="218"/>
         <source>Error</source>
         <translation>Erro</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="195"/>
+        <location filename="../src/window_main.cpp" line="196"/>
         <source>Server timeout</source>
         <translation>Tempo esgotado do servidor</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="201"/>
+        <location filename="../src/window_main.cpp" line="202"/>
         <source>Invalid login data.</source>
         <translation>Informações de login inválidas.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="209"/>
+        <location filename="../src/window_main.cpp" line="210"/>
         <source>Socket error: %1</source>
         <translation>Erro de ligação:%1</translation>
     </message>
@@ -1797,6 +1802,7 @@ All running games will be lost.
 Reason for shutdown: %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -1805,108 +1811,103 @@ Reason for shutdown: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="189"/>
-        <source>Slovak:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/window_main.cpp" line="202"/>
+        <location filename="../src/window_main.cpp" line="203"/>
         <source>There is already an active session using this user name.
 Please close that session first and re-login.</source>
         <translation>Já existe uma sessão ativa usando este nome de usuário.
 Por favor, feche a sessão primeiro e logue novamente.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="215"/>
+        <location filename="../src/window_main.cpp" line="216"/>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
         <translation>Você está tentando conectar a um servidor obsoleto. Por favor, faça um downgrade na versão do seu Cockatrice ou conecte-se ao servidor correto.
 A versão local é %1 e a versão remota é %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="217"/>
+        <location filename="../src/window_main.cpp" line="218"/>
         <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
 Local version is %1, remote version is %2.</source>
         <translation>A versão do seu Cockatrice é obsoleta. Por favor, atualize a sua versão.
 A versão local é %1 e a versão remota é %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="223"/>
+        <location filename="../src/window_main.cpp" line="224"/>
         <source>Connecting to %1...</source>
         <translation>Conectando a %1...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="224"/>
+        <location filename="../src/window_main.cpp" line="225"/>
         <source>Disconnected</source>
         <translation>Desconectado</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="225"/>
+        <location filename="../src/window_main.cpp" line="226"/>
         <source>Logged in at %1</source>
         <translation>Logado em %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="234"/>
+        <location filename="../src/window_main.cpp" line="235"/>
         <source>&amp;Connect...</source>
         <translation>&amp;Conectar...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="235"/>
+        <location filename="../src/window_main.cpp" line="236"/>
         <source>&amp;Disconnect</source>
         <translation>&amp;Desconectar</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="236"/>
+        <location filename="../src/window_main.cpp" line="237"/>
         <source>Start &amp;local game...</source>
         <translation>Iniciar jogo &amp;local...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="237"/>
+        <location filename="../src/window_main.cpp" line="238"/>
         <source>&amp;Deck editor</source>
         <translation>Editor de &amp;decks</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="238"/>
+        <location filename="../src/window_main.cpp" line="239"/>
         <source>&amp;Full screen</source>
         <translation>Tela &amp;cheia</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="239"/>
+        <location filename="../src/window_main.cpp" line="240"/>
         <source>Ctrl+F</source>
         <translation>Ctrl+F</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="240"/>
+        <location filename="../src/window_main.cpp" line="241"/>
         <source>&amp;Settings...</source>
         <translation>&amp;Configurações...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="241"/>
+        <location filename="../src/window_main.cpp" line="242"/>
         <source>&amp;Exit</source>
         <translation>&amp;Sair</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="243"/>
+        <location filename="../src/window_main.cpp" line="244"/>
         <source>&amp;Cockatrice</source>
         <translation>&amp;Cockatrice</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="245"/>
+        <location filename="../src/window_main.cpp" line="246"/>
         <source>&amp;About Cockatrice</source>
         <translation>So&amp;bre o Cockatrice</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="246"/>
+        <location filename="../src/window_main.cpp" line="247"/>
         <source>&amp;Help</source>
         <translation>&amp;Ajuda</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="325"/>
+        <location filename="../src/window_main.cpp" line="326"/>
         <source>Are you sure?</source>
         <translation>Você tem certeza?</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="325"/>
+        <location filename="../src/window_main.cpp" line="326"/>
         <source>There are still open games. Are you sure you want to quit?</source>
         <translation>Ainda existem jogos abertos. Você tem certeza que deseja sair?</translation>
     </message>
@@ -2298,6 +2299,7 @@ A versão local é %1 e a versão remota é %2.</translation>
         <comment>female</comment>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2305,6 +2307,7 @@ A versão local é %1 e a versão remota é %2.</translation>
         <source>%1 takes a mulligan to %n.</source>
         <comment>male</comment>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>

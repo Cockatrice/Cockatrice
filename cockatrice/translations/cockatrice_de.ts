@@ -2313,51 +2313,55 @@ Grund für die Abschaltung: %1</numerusform>
         <translation>Tschechisch:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="189"/>
-        <source>Slovak:</source>
-        <translation>Slowakisch:</translation>
+        <location filename="../src/window_main.cpp" line="190"/>
+        <source>Italian:</source>
+        <translation>Italienisch:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="195"/>
-        <location filename="../src/window_main.cpp" line="201"/>
+        <source>Slovak:</source>
+        <translation type="obsolete">Slowakisch:</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="196"/>
         <location filename="../src/window_main.cpp" line="202"/>
-        <location filename="../src/window_main.cpp" line="209"/>
-        <location filename="../src/window_main.cpp" line="215"/>
-        <location filename="../src/window_main.cpp" line="217"/>
+        <location filename="../src/window_main.cpp" line="203"/>
+        <location filename="../src/window_main.cpp" line="210"/>
+        <location filename="../src/window_main.cpp" line="216"/>
+        <location filename="../src/window_main.cpp" line="218"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="195"/>
+        <location filename="../src/window_main.cpp" line="196"/>
         <source>Server timeout</source>
         <translation>Server Zeitüberschreitung</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="201"/>
+        <location filename="../src/window_main.cpp" line="202"/>
         <source>Invalid login data.</source>
         <translation>Ungültige Anmeldedaten.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="202"/>
+        <location filename="../src/window_main.cpp" line="203"/>
         <source>There is already an active session using this user name.
 Please close that session first and re-login.</source>
         <translation>Es gibt bereits eine aktive Verbindung mit diesem Benutzernamen.
 Bitte schließen Sie diese Verbindung zuerst und versuchen Sie es dann erneut.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="209"/>
+        <location filename="../src/window_main.cpp" line="210"/>
         <source>Socket error: %1</source>
         <translation>Netzwerkfehler: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="215"/>
+        <location filename="../src/window_main.cpp" line="216"/>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
         <translation>Sie versuchen sich an einem veralteten Server anzumelden. Bitte verwenden Sie eine ältere Cockatrice-Version oder melden Sie sich an einem aktuellen Server an.
 Lokale Version ist %1, Serverversion ist %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="217"/>
+        <location filename="../src/window_main.cpp" line="218"/>
         <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
 Local version is %1, remote version is %2.</source>
         <translation>Ihr Cockatrice-Client ist veraltet. Bitte laden Sie sich die neueste Version herunter.
@@ -2368,52 +2372,52 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">Protokollversionen stimmen nicht überein. Lokale Version: %1, Serverversion: %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="223"/>
+        <location filename="../src/window_main.cpp" line="224"/>
         <source>Connecting to %1...</source>
         <translation>Verbinde zu %1...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="224"/>
+        <location filename="../src/window_main.cpp" line="225"/>
         <source>Disconnected</source>
         <translation>nicht verbunden</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="225"/>
+        <location filename="../src/window_main.cpp" line="226"/>
         <source>Logged in at %1</source>
         <translation>Angemeldet bei %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="234"/>
+        <location filename="../src/window_main.cpp" line="235"/>
         <source>&amp;Connect...</source>
         <translation>&amp;Verbinden...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="235"/>
+        <location filename="../src/window_main.cpp" line="236"/>
         <source>&amp;Disconnect</source>
         <translation>Verbindung &amp;trennen</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="236"/>
+        <location filename="../src/window_main.cpp" line="237"/>
         <source>Start &amp;local game...</source>
         <translation>&amp;Lokales Spiel starten...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="245"/>
+        <location filename="../src/window_main.cpp" line="246"/>
         <source>&amp;About Cockatrice</source>
         <translation>&amp;Über Cockatrice</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="246"/>
+        <location filename="../src/window_main.cpp" line="247"/>
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="325"/>
+        <location filename="../src/window_main.cpp" line="326"/>
         <source>Are you sure?</source>
         <translation>Sind Sie sicher?</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="325"/>
+        <location filename="../src/window_main.cpp" line="326"/>
         <source>There are still open games. Are you sure you want to quit?</source>
         <translation>Es gibt noch offene Spiele. Wollen Sie das Programm wirklich beenden?</translation>
     </message>
@@ -2430,27 +2434,27 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">Spiel ver&amp;lassen</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="237"/>
+        <location filename="../src/window_main.cpp" line="238"/>
         <source>&amp;Deck editor</source>
         <translation>&amp;Deck-Editor</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="238"/>
+        <location filename="../src/window_main.cpp" line="239"/>
         <source>&amp;Full screen</source>
         <translation>&amp;Vollbild</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="239"/>
+        <location filename="../src/window_main.cpp" line="240"/>
         <source>Ctrl+F</source>
         <translation>Ctrl+F</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="240"/>
+        <location filename="../src/window_main.cpp" line="241"/>
         <source>&amp;Settings...</source>
         <translation>&amp;Einstellungen...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="241"/>
+        <location filename="../src/window_main.cpp" line="242"/>
         <source>&amp;Exit</source>
         <translation>&amp;Beenden</translation>
     </message>
@@ -2463,7 +2467,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">Esc</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="243"/>
+        <location filename="../src/window_main.cpp" line="244"/>
         <source>&amp;Cockatrice</source>
         <translation>&amp;Cockatrice</translation>
     </message>

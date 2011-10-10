@@ -74,7 +74,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="295"/>
         <source>Display card names on cards having a picture</source>
-        <translation>Visualizzare nome delle carte sulle figure di esse</translation>
+        <translation>Visualizza nome delle carte sulle immagini di esse</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="297"/>
@@ -1411,7 +1411,7 @@ Questo è solo visibile ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="146"/>
         <source>Download card pictures on the fly</source>
-        <translation>Download figure delle carte</translation>
+        <translation>Download immagini delle carte</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="147"/>
@@ -1559,133 +1559,137 @@ Ragione dello spegnimento: %1</numerusform>
         <translation>Ceco:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="189"/>
         <source>Slovak:</source>
-        <translation>Slovacco:</translation>
+        <translation type="obsolete">Slovacco:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="195"/>
-        <location filename="../src/window_main.cpp" line="201"/>
+        <location filename="../src/window_main.cpp" line="190"/>
+        <source>Italian:</source>
+        <translation>Italiano:</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="196"/>
         <location filename="../src/window_main.cpp" line="202"/>
-        <location filename="../src/window_main.cpp" line="209"/>
-        <location filename="../src/window_main.cpp" line="215"/>
-        <location filename="../src/window_main.cpp" line="217"/>
+        <location filename="../src/window_main.cpp" line="203"/>
+        <location filename="../src/window_main.cpp" line="210"/>
+        <location filename="../src/window_main.cpp" line="216"/>
+        <location filename="../src/window_main.cpp" line="218"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="195"/>
+        <location filename="../src/window_main.cpp" line="196"/>
         <source>Server timeout</source>
         <translation>Timeout del server</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="201"/>
+        <location filename="../src/window_main.cpp" line="202"/>
         <source>Invalid login data.</source>
         <translation>Dati login non validi.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="202"/>
+        <location filename="../src/window_main.cpp" line="203"/>
         <source>There is already an active session using this user name.
 Please close that session first and re-login.</source>
         <translation>Sei già loggato in un&apos;altra sessione con questo username.
 Chiudi prima quella sessione e riprova a loggare.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="209"/>
+        <location filename="../src/window_main.cpp" line="210"/>
         <source>Socket error: %1</source>
         <translation>Errore nella connessione: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="215"/>
+        <location filename="../src/window_main.cpp" line="216"/>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
         <translation>Stai cercando di connetterti a un server obsoleto. Declassa la versione di Cockatrice per farlo funzionare o connetti ad un altro server.
 La tua versione è la %1, la versione remota è la %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="217"/>
+        <location filename="../src/window_main.cpp" line="218"/>
         <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
 Local version is %1, remote version is %2.</source>
         <translation>La tua versione di Cockatrice è obsoleta. Aggiorna la tua versione di Cockatrice.
 La tua versione è la %1, la versione online è la %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="223"/>
+        <location filename="../src/window_main.cpp" line="224"/>
         <source>Connecting to %1...</source>
         <translation>Connettendo a %1...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="224"/>
+        <location filename="../src/window_main.cpp" line="225"/>
         <source>Disconnected</source>
         <translation>Disconnesso</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="225"/>
+        <location filename="../src/window_main.cpp" line="226"/>
         <source>Logged in at %1</source>
         <translation>Loggato su %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="234"/>
+        <location filename="../src/window_main.cpp" line="235"/>
         <source>&amp;Connect...</source>
         <translation>&amp;Connetti...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="235"/>
+        <location filename="../src/window_main.cpp" line="236"/>
         <source>&amp;Disconnect</source>
         <translation>&amp;Disconnetti</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="236"/>
+        <location filename="../src/window_main.cpp" line="237"/>
         <source>Start &amp;local game...</source>
         <translation>Inizia &amp;partita in locale...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="237"/>
+        <location filename="../src/window_main.cpp" line="238"/>
         <source>&amp;Deck editor</source>
         <translation>&amp;Editore di mazzi</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="238"/>
+        <location filename="../src/window_main.cpp" line="239"/>
         <source>&amp;Full screen</source>
         <translation>&amp;Schermo intero</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="239"/>
+        <location filename="../src/window_main.cpp" line="240"/>
         <source>Ctrl+F</source>
         <translation>Ctrl+F</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="240"/>
+        <location filename="../src/window_main.cpp" line="241"/>
         <source>&amp;Settings...</source>
         <translation>&amp;Impostazioni...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="241"/>
+        <location filename="../src/window_main.cpp" line="242"/>
         <source>&amp;Exit</source>
         <translation>&amp;Esci</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="243"/>
+        <location filename="../src/window_main.cpp" line="244"/>
         <source>&amp;Cockatrice</source>
         <translation>&amp;Cockatrice</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="245"/>
+        <location filename="../src/window_main.cpp" line="246"/>
         <source>&amp;About Cockatrice</source>
         <translation>&amp;Info su Cockatrice</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="246"/>
+        <location filename="../src/window_main.cpp" line="247"/>
         <source>&amp;Help</source>
         <translation>&amp;Aiuto</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="325"/>
+        <location filename="../src/window_main.cpp" line="326"/>
         <source>Are you sure?</source>
         <translation>Sei sicuro?</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="325"/>
+        <location filename="../src/window_main.cpp" line="326"/>
         <source>There are still open games. Are you sure you want to quit?</source>
         <translation>Hai delle partite aperte. Sei sicuro di voler chiudere?</translation>
     </message>
@@ -3515,7 +3519,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="291"/>
         <source>Ctrl+Return</source>
-        <translation>Ctrl+Backspace</translation>
+        <translation>Ctrl+Return</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="291"/>
@@ -3939,7 +3943,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="213"/>
         <source>Return</source>
-        <translation>Backspace</translation>
+        <translation>Return</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="213"/>
@@ -3954,7 +3958,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="218"/>
         <source>Ctrl+Return</source>
-        <translation>Ctrl+Backspace</translation>
+        <translation>Ctrl+Return</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="218"/>

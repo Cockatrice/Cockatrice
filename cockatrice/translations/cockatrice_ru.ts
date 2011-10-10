@@ -1712,133 +1712,137 @@ Reason for shutdown: %1</source>
         <translation>Чешский:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="189"/>
         <source>Slovak:</source>
-        <translation>Словацкий:</translation>
+        <translation type="obsolete">Словацкий:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="195"/>
-        <location filename="../src/window_main.cpp" line="201"/>
+        <location filename="../src/window_main.cpp" line="190"/>
+        <source>Italian:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="196"/>
         <location filename="../src/window_main.cpp" line="202"/>
-        <location filename="../src/window_main.cpp" line="209"/>
-        <location filename="../src/window_main.cpp" line="215"/>
-        <location filename="../src/window_main.cpp" line="217"/>
+        <location filename="../src/window_main.cpp" line="203"/>
+        <location filename="../src/window_main.cpp" line="210"/>
+        <location filename="../src/window_main.cpp" line="216"/>
+        <location filename="../src/window_main.cpp" line="218"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="195"/>
+        <location filename="../src/window_main.cpp" line="196"/>
         <source>Server timeout</source>
         <translation>Временная ошибка</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="201"/>
+        <location filename="../src/window_main.cpp" line="202"/>
         <source>Invalid login data.</source>
         <translation>Неверный логин/пароль.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="202"/>
+        <location filename="../src/window_main.cpp" line="203"/>
         <source>There is already an active session using this user name.
 Please close that session first and re-login.</source>
         <translation>Пользователь с таким именем уже подключен.
 Пожалуйста, закройте это подключение и войдите заново.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="209"/>
+        <location filename="../src/window_main.cpp" line="210"/>
         <source>Socket error: %1</source>
         <translation>Ошибка сокета: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="215"/>
+        <location filename="../src/window_main.cpp" line="216"/>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
         <translation>Вы пытаетесь подключиться к несуществующему серверу. Пожалуйста, обновите Cockatrice или выберите другой сервер.
 Локальная версия %1, удаленная версия %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="217"/>
+        <location filename="../src/window_main.cpp" line="218"/>
         <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
 Local version is %1, remote version is %2.</source>
         <translation>Ваш клиент Cockatrice устарел. Пожалуйста, обновите Cockatrice.
 Локальная версия %1, удаленная версия %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="223"/>
+        <location filename="../src/window_main.cpp" line="224"/>
         <source>Connecting to %1...</source>
         <translation>Подключение к %1...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="224"/>
+        <location filename="../src/window_main.cpp" line="225"/>
         <source>Disconnected</source>
         <translation>Подключение прервано</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="225"/>
+        <location filename="../src/window_main.cpp" line="226"/>
         <source>Logged in at %1</source>
         <translation>Подключено к %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="234"/>
+        <location filename="../src/window_main.cpp" line="235"/>
         <source>&amp;Connect...</source>
         <translation>&amp;Подключение...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="235"/>
+        <location filename="../src/window_main.cpp" line="236"/>
         <source>&amp;Disconnect</source>
         <translation>П&amp;рервать подключение</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="236"/>
+        <location filename="../src/window_main.cpp" line="237"/>
         <source>Start &amp;local game...</source>
         <translation>&amp;Начать локальную игру...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="237"/>
+        <location filename="../src/window_main.cpp" line="238"/>
         <source>&amp;Deck editor</source>
         <translation>Редактор &amp;колод</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="238"/>
+        <location filename="../src/window_main.cpp" line="239"/>
         <source>&amp;Full screen</source>
         <translation>П&amp;олный экран</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="239"/>
+        <location filename="../src/window_main.cpp" line="240"/>
         <source>Ctrl+F</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="240"/>
+        <location filename="../src/window_main.cpp" line="241"/>
         <source>&amp;Settings...</source>
         <translation>Н&amp;астройки</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="241"/>
+        <location filename="../src/window_main.cpp" line="242"/>
         <source>&amp;Exit</source>
         <translation>&amp;Выход</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="243"/>
+        <location filename="../src/window_main.cpp" line="244"/>
         <source>&amp;Cockatrice</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="245"/>
+        <location filename="../src/window_main.cpp" line="246"/>
         <source>&amp;About Cockatrice</source>
         <translation>О про&amp;грамме</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="246"/>
+        <location filename="../src/window_main.cpp" line="247"/>
         <source>&amp;Help</source>
         <translation>&amp;Справка</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="325"/>
+        <location filename="../src/window_main.cpp" line="326"/>
         <source>Are you sure?</source>
         <translation>Вы уверены?</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="325"/>
+        <location filename="../src/window_main.cpp" line="326"/>
         <source>There are still open games. Are you sure you want to quit?</source>
         <translation>Вы подключены к игре. Выйти?</translation>
     </message>
