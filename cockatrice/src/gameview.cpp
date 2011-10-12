@@ -22,6 +22,8 @@ GameView::GameView(QGraphicsScene *scene, QWidget *parent)
 	aCloseMostRecentZoneView->setShortcut(tr("Esc"));
 	connect(aCloseMostRecentZoneView, SIGNAL(triggered()), scene, SLOT(closeMostRecentZoneView()));
 	addAction(aCloseMostRecentZoneView);
+
+	rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
 }
 
 void GameView::resizeEvent(QResizeEvent *event)
@@ -43,7 +45,6 @@ void GameView::updateSceneRect(const QRectF &rect)
 void GameView::startRubberBand(const QPointF &_selectionOrigin)
 {
 	selectionOrigin = _selectionOrigin;
-	rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
 	rubberBand->setGeometry(QRect(mapFromScene(selectionOrigin), QSize(0, 0)));
 	rubberBand->show();
 }
@@ -56,8 +57,5 @@ void GameView::resizeRubberBand(const QPointF &cursorPoint)
 
 void GameView::stopRubberBand()
 {
-	if (rubberBand) {
-		rubberBand->deleteLater();
-		rubberBand = 0;
-	}
+	rubberBand->hide();
 }

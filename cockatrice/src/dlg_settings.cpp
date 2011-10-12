@@ -654,12 +654,12 @@ void DlgSettings::closeEvent(QCloseEvent *event)
 			event->ignore();
 			return;
 		}
-	if (!QDir(settingsCache->getDeckPath()).exists())
+	if (!QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty())
 		if (QMessageBox::critical(this, tr("Error"), tr("The path to your deck directory is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
 			event->ignore();
 			return;
 		}
-	if (!QDir(settingsCache->getPicsPath()).exists())
+	if (!QDir(settingsCache->getPicsPath()).exists() || settingsCache->getPicsPath().isEmpty())
 		if (QMessageBox::critical(this, tr("Error"), tr("The path to your card pictures directory is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
 			event->ignore();
 			return;

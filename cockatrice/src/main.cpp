@@ -108,11 +108,11 @@ int main(int argc, char *argv[])
 	if (!QDir(settingsCache->getPicsPath()).exists())
 		settingsCache->setPicsPath(baseDir.absolutePath() + "/pics");
 #endif
-	if (!db->getLoadSuccess() || !QDir(settingsCache->getDeckPath()).exists() || !QDir(settingsCache->getPicsPath()).exists()) {
+	if (!db->getLoadSuccess() || !QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty() || settingsCache->getPicsPath().isEmpty() || !QDir(settingsCache->getPicsPath()).exists()) {
 		DlgSettings dlgSettings;
 		dlgSettings.show();
 		app.exec();
-		startMainProgram = (db->getLoadSuccess() && QDir(settingsCache->getDeckPath()).exists() && QDir(settingsCache->getPicsPath()).exists());
+		startMainProgram = (db->getLoadSuccess() && QDir(settingsCache->getDeckPath()).exists() && !settingsCache->getDeckPath().isEmpty() && QDir(settingsCache->getPicsPath()).exists() && !settingsCache->getPicsPath().isEmpty());
 	}
 	
 	if (startMainProgram) {
