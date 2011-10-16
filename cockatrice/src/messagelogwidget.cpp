@@ -175,7 +175,7 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
 	else if (startName == "hand")
 		fromStr = tr(" from hand");
 	else if (startName == "deck") {
-		if (position == zone->getCards().size() - 1) {
+		if (position >= zone->getCards().size() - 1) {
 			if (cardName.isEmpty()) {
 				cardName = isFemale(zone->getPlayer()) ? tr("the bottom card of her library") : tr("the bottom card of his library");
 				cardNameContainsStartZone = true;

@@ -4218,7 +4218,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
     <message>
         <location filename="../src/player.cpp" line="444"/>
         <source>&amp;View library</source>
-        <translation>&amp;Zeige Bibliothek</translation>
+        <translation>Bibliothek &amp;ansehen</translation>
     </message>
     <message>
         <source>Move top cards to g&amp;raveyard...</source>
@@ -4237,7 +4237,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
     <message>
         <location filename="../src/player.cpp" line="445"/>
         <source>View &amp;top cards of library...</source>
-        <translation>Zeige die oberen Kar&amp;ten der Bibliothek...</translation>
+        <translation>Oberste Karten der Bibliothek a&amp;nsehen...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="425"/>
@@ -5589,7 +5589,7 @@ Geben Sie 0 ein für einen unbefristeten Bann.</translation>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="118"/>
         <source>Hash:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hash:</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="132"/>

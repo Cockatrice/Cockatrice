@@ -84,8 +84,9 @@ void PileZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 		return;
 
 	bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier);
-	CardItem *card = cards.at(0);
-	const int cardid = contentsKnown() ? card->getId() : 0;
+	bool bottomCard = event->modifiers().testFlag(Qt::ControlModifier);
+	CardItem *card = bottomCard ? cards.last() : cards.first();
+	const int cardid = contentsKnown() ? card->getId() : (bottomCard ? cards.size() - 1 : 0);
 	CardDragItem *drag = card->createDragItem(cardid, event->pos(), event->scenePos(), faceDown);
 	drag->grabMouse();
 	setCursor(Qt::OpenHandCursor);
