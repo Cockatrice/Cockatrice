@@ -1,6 +1,7 @@
 #include <QPainter>
 #include <QSvgRenderer>
 #include <QPixmapCache>
+#include <QGraphicsSceneMouseEvent>
 #include "handcounter.h"
 #include "cardzone.h"
 
@@ -47,4 +48,12 @@ void HandCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
 	painter->restore();
 	
 	paintNumberEllipse(number, 24, Qt::white, -1, -1, painter);
+}
+
+void HandCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+	if (event->button() == Qt::RightButton) {
+		emit showContextMenu(event->screenPos());
+		event->accept();
+	}
 }

@@ -32,6 +32,7 @@ signals:
 	void cardCountChanged();
 public slots:
 	void moveAllToZone();
+	bool showContextMenu(const QPoint &screenPos);
 public:
 	enum { Type = typeZone };
 	int type() const { return Type; }

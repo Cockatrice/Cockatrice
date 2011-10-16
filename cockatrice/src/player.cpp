@@ -90,6 +90,7 @@ Player::Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent)
 	
 	hand = new HandZone(this, _local || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()), (int) table->boundingRect().height(), this);
 	connect(hand, SIGNAL(cardCountChanged()), handCounter, SLOT(updateNumber()));
+	connect(handCounter, SIGNAL(showContextMenu(const QPoint &)), hand, SLOT(showContextMenu(const QPoint &)));
 	
 	updateBoundingRect();
 

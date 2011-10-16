@@ -86,13 +86,21 @@ void CardZone::mouseDoubleClickEvent(QGraphicsSceneMouseEvent */*event*/)
 		doubleClickAction->trigger();
 }
 
+bool CardZone::showContextMenu(const QPoint &screenPos)
+{
+	if (menu) {
+		menu->exec(screenPos);
+		return true;
+	}
+	return false;
+}
+
 void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
 	if (event->button() == Qt::RightButton) {
-		if (menu) {
-			menu->exec(event->screenPos());
+		if (showContextMenu(event->screenPos()))
 			event->accept();
-		} else
+		else
 			event->ignore();
 	} else
 		event->ignore();
