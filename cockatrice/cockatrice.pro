@@ -6,7 +6,7 @@ MOC_DIR = build
 OBJECTS_DIR = build
 RESOURCES = cockatrice.qrc
 QT += network script svg
-unix {
+unix:!macx {
 	CONFIG += mobility
 	MOBILITY = multimedia
 } else {

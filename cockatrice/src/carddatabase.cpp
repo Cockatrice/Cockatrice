@@ -238,7 +238,7 @@ void PictureLoadingThread::run()
 	pictureLoader->setPicsPath(picsPath);
 	pictureLoader->setPicDownload(picDownload);
 	
-	usleep(10000);
+	usleep(100000);
 	initWaitCondition.wakeAll();
 	
 	exec();
