@@ -59,6 +59,7 @@ public:
 	void stop();
 	int getGameCount() const { return gameTabs.size(); }
 	TabUserLists *getUserListsTab() const { return tabUserLists; }
+	ServerInfo_User *getUserInfo() const { return userInfo; }
 	bool getAdminLocked() const;
 	int getUserLevel() const;
 signals:

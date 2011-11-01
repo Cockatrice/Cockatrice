@@ -489,10 +489,11 @@ Command_ShutdownServer::Command_ShutdownServer(const QString &_reason, int _minu
 	insertItem(new SerializableItem_String("reason", _reason));
 	insertItem(new SerializableItem_Int("minutes", _minutes));
 }
-Command_BanFromServer::Command_BanFromServer(const QString &_userName, int _minutes, const QString &_reason)
+Command_BanFromServer::Command_BanFromServer(const QString &_userName, const QString &_address, int _minutes, const QString &_reason)
 	: ModeratorCommand("ban_from_server")
 {
 	insertItem(new SerializableItem_String("user_name", _userName));
+	insertItem(new SerializableItem_String("address", _address));
 	insertItem(new SerializableItem_Int("minutes", _minutes));
 	insertItem(new SerializableItem_String("reason", _reason));
 }

@@ -49,7 +49,6 @@ class Servatrice : public Server
 	Q_OBJECT
 private slots:
 	void statusUpdate();
-	void updateBanTimer();
 	void shutdownTimeout();
 public:
 	QMutex dbMutex;
@@ -75,13 +74,12 @@ public:
 	int getUsersWithAddress(const QHostAddress &address) const;
 	QMap<QString, ServerInfo_User *> getBuddyList(const QString &name);
 	QMap<QString, ServerInfo_User *> getIgnoreList(const QString &name);
-	void addAddressBan(const QHostAddress &address, int minutes) { addressBanList.append(QPair<QHostAddress, int>(address, minutes)); }
 	void scheduleShutdown(const QString &reason, int minutes);
 protected:
 	bool userExists(const QString &user);
 	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password);
 private:
-	QTimer *pingClock, *statusUpdateClock, *banTimeoutClock;
+	QTimer *pingClock, *statusUpdateClock;
 	QTcpServer *tcpServer;
 	QString loginMessage;
 	QString dbPrefix;
@@ -89,7 +87,6 @@ private:
 	int serverId;
 	bool threaded;
 	int uptime;
-	QList<QPair<QHostAddress, int> > addressBanList;
 	int maxGameInactivityTime, maxPlayerInactivityTime;
 	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser;
 	ServerInfo_User *evalUserQueryResult(const QSqlQuery &query, bool complete);

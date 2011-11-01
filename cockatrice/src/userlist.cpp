@@ -13,24 +13,72 @@
 #include <QInputDialog>
 #include <QLabel>
 #include <QSpinBox>
+#include <QRadioButton>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QHBoxLayout>
+#include <QCheckBox>
+#include <QMessageBox>
 
-BanDialog::BanDialog(QWidget *parent)
+BanDialog::BanDialog(ServerInfo_User *info, QWidget *parent)
 	: QDialog(parent)
 {
-	QLabel *durationLabel = new QLabel(tr("Please enter the duration of the ban (in minutes).\nEnter 0 for an indefinite ban."));
-	durationEdit = new QSpinBox;
-	durationEdit->setMinimum(0);
-	durationEdit->setValue(5);
-	durationEdit->setMaximum(99999999);
+	setAttribute(Qt::WA_DeleteOnClose);
+	
+	nameBanCheckBox = new QCheckBox(tr("ban &user name"));
+	nameBanCheckBox->setChecked(true);
+	nameBanEdit = new QLineEdit(info->getName());
+	ipBanCheckBox = new QCheckBox(tr("ban &IP address"));
+	ipBanCheckBox->setChecked(true);
+	ipBanEdit = new QLineEdit(info->getAddress());
+	QGridLayout *banTypeGrid = new QGridLayout;
+	banTypeGrid->addWidget(nameBanCheckBox, 0, 0);
+	banTypeGrid->addWidget(nameBanEdit, 0, 1);
+	banTypeGrid->addWidget(ipBanCheckBox, 1, 0);
+	banTypeGrid->addWidget(ipBanEdit, 1, 1);
+	QGroupBox *banTypeGroupBox = new QGroupBox(tr("Ban type"));
+	banTypeGroupBox->setLayout(banTypeGrid);
+	
+	permanentRadio = new QRadioButton(tr("&permanent ban"));
+	temporaryRadio = new QRadioButton(tr("&temporary ban"));
+	temporaryRadio->setChecked(true);
+	connect(temporaryRadio, SIGNAL(toggled(bool)), this, SLOT(enableTemporaryEdits(bool)));
+	daysLabel = new QLabel(tr("&Days:"));
+	daysEdit = new QSpinBox;
+	daysEdit->setMinimum(0);
+	daysEdit->setValue(0);
+	daysEdit->setMaximum(10000);
+	daysLabel->setBuddy(daysEdit);
+	hoursLabel = new QLabel(tr("&Hours:"));
+	hoursEdit = new QSpinBox;
+	hoursEdit->setMinimum(0);
+	hoursEdit->setValue(0);
+	hoursEdit->setMaximum(24);
+	hoursLabel->setBuddy(hoursEdit);
+	minutesLabel = new QLabel(tr("&Minutes:"));
+	minutesEdit = new QSpinBox;
+	minutesEdit->setMinimum(0);
+	minutesEdit->setValue(5);
+	minutesEdit->setMaximum(60);
+	minutesLabel->setBuddy(minutesEdit);
+	QGridLayout *durationLayout = new QGridLayout;
+	durationLayout->addWidget(permanentRadio, 0, 0, 1, 6);
+	durationLayout->addWidget(temporaryRadio, 1, 0, 1, 6);
+	durationLayout->addWidget(daysLabel, 2, 0);
+	durationLayout->addWidget(daysEdit, 2, 1);
+	durationLayout->addWidget(hoursLabel, 2, 2);
+	durationLayout->addWidget(hoursEdit, 2, 3);
+	durationLayout->addWidget(minutesLabel, 2, 4);
+	durationLayout->addWidget(minutesEdit, 2, 5);
+	QGroupBox *durationGroupBox = new QGroupBox(tr("Duration of the ban"));
+	durationGroupBox->setLayout(durationLayout);
+	
 	QLabel *reasonLabel = new QLabel(tr("Please enter the reason for the ban.\nThis is only saved for moderators and cannot be seen by the banned person."));
 	reasonEdit = new QPlainTextEdit;
 	
 	QPushButton *okButton = new QPushButton(tr("&OK"));
 	okButton->setAutoDefault(true);
-	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
+	connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
 	QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
 	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 	
@@ -40,8 +88,8 @@ BanDialog::BanDialog(QWidget *parent)
 	buttonLayout->addWidget(cancelButton);
 	
 	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(durationLabel);
-	vbox->addWidget(durationEdit);
+	vbox->addWidget(banTypeGroupBox);
+	vbox->addWidget(durationGroupBox);
 	vbox->addWidget(reasonLabel);
 	vbox->addWidget(reasonEdit);
 	vbox->addLayout(buttonLayout);
@@ -50,9 +98,38 @@ BanDialog::BanDialog(QWidget *parent)
 	setWindowTitle(tr("Ban user from server"));
 }
 
+void BanDialog::okClicked()
+{
+	if (!nameBanCheckBox->isChecked() && !ipBanCheckBox->isChecked()) {
+		QMessageBox::critical(this, tr("Error"), tr("You have to select a name-based or IP-based ban, or both."));
+		return;
+	}
+	accept();
+}
+
+void BanDialog::enableTemporaryEdits(bool enabled)
+{
+	daysLabel->setEnabled(enabled);
+	daysEdit->setEnabled(enabled);
+	hoursLabel->setEnabled(enabled);
+	hoursEdit->setEnabled(enabled);
+	minutesLabel->setEnabled(enabled);
+	minutesEdit->setEnabled(enabled);
+}
+
+QString BanDialog::getBanName() const
+{
+	return nameBanCheckBox->isChecked() ? nameBanEdit->text() : QString();
+}
+
+QString BanDialog::getBanIP() const
+{
+	return ipBanCheckBox->isChecked() ? ipBanEdit->text() : QString();
+}
+
 int BanDialog::getMinutes() const
 {
-	return durationEdit->value();
+	return permanentRadio->isChecked() ? 0 : (daysEdit->value() * 24 * 60 + hoursEdit->value() * 60 + minutesEdit->value());
 }
 
 QString BanDialog::getReason() const
@@ -242,6 +319,24 @@ void UserList::gamesOfUserReceived(ProtocolResponse *resp)
 	selector->show();
 }
 
+void UserList::banUser_processUserInfoResponse(ProtocolResponse *r)
+{
+	Response_GetUserInfo *response = qobject_cast<Response_GetUserInfo *>(r);
+	if (!response)
+		return;
+	
+	// The dialog needs to be non-modal in order to not block the event queue of the client.
+	BanDialog *dlg = new BanDialog(response->getUserInfo(), this);
+	connect(dlg, SIGNAL(accepted()), this, SLOT(banUser_dialogFinished()));
+	dlg->show();
+}
+
+void UserList::banUser_dialogFinished()
+{
+	BanDialog *dlg = static_cast<BanDialog *>(sender());
+	client->sendCommand(new Command_BanFromServer(dlg->getBanName(), dlg->getBanIP(), dlg->getMinutes(), dlg->getReason()));
+}
+
 void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 {
 	const QString &userName = index.sibling(index.row(), 2).data(Qt::UserRole).toString();
@@ -279,6 +374,14 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 		menu->addSeparator();
 		menu->addAction(aBan);
 	}
+	if (userName == tabSupervisor->getUserInfo()->getName()) {
+		aChat->setEnabled(false);
+		aAddToBuddyList->setEnabled(false);
+		aRemoveFromBuddyList->setEnabled(false);
+		aAddToIgnoreList->setEnabled(false);
+		aRemoveFromIgnoreList->setEnabled(false);
+		aBan->setEnabled(false);
+	}
 	
 	QAction *actionClicked = menu->exec(pos);
 	if (actionClicked == aDetails) {
@@ -300,9 +403,9 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	else if (actionClicked == aRemoveFromIgnoreList)
 		client->sendCommand(new Command_RemoveFromList("ignore", userName));
 	else if (actionClicked == aBan) {
-		BanDialog dlg(this);
-		if (dlg.exec())
-			client->sendCommand(new Command_BanFromServer(userName, dlg.getMinutes(), dlg.getReason()));
+		Command_GetUserInfo *command = new Command_GetUserInfo(userName);
+		connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(banUser_processUserInfoResponse(ProtocolResponse *)));
+		client->sendCommand(command);
 	}
 	
 	delete menu;

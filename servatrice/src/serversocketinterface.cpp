@@ -464,50 +464,43 @@ ResponseCode ServerSocketInterface::cmdDeckDownload(Command_DeckDownload *cmd, C
 // MODERATOR FUNCTIONS.
 // May be called by admins and moderators. Permission is checked by the calling function.
 
-ResponseCode ServerSocketInterface::cmdUpdateServerMessage(Command_UpdateServerMessage * /*cmd*/, CommandContainer * /*cont*/)
+ResponseCode ServerSocketInterface::cmdBanFromServer(Command_BanFromServer *cmd, CommandContainer * /*cont*/)
 {
-	servatrice->updateLoginMessage();
+	QString userName = cmd->getUserName();
+	QString address = cmd->getAddress();
+	int minutes = cmd->getMinutes();
+	
+	servatrice->dbMutex.lock();
+	QSqlQuery query;
+	query.prepare("insert into " + servatrice->getDbPrefix() + "_bans (user_name, ip_address, id_admin, time_from, minutes, reason) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason)");
+	query.bindValue(":user_name", userName);
+	query.bindValue(":ip_address", address);
+	query.bindValue(":id_admin", getUserIdInDB(userInfo->getName()));
+	query.bindValue(":minutes", minutes);
+	query.bindValue(":reason", cmd->getReason() + "\n");
+	servatrice->execSqlQuery(query);
+	servatrice->dbMutex.unlock();
+	
+	ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
+	if (user) {
+		user->sendProtocolItem(new Event_ConnectionClosed("banned"));
+		user->deleteLater();
+	}
+	
 	return RespOk;
 }
 
 // ADMIN FUNCTIONS.
 // Permission is checked by the calling function.
 
-ResponseCode ServerSocketInterface::cmdShutdownServer(Command_ShutdownServer *cmd, CommandContainer * /*cont*/)
+ResponseCode ServerSocketInterface::cmdUpdateServerMessage(Command_UpdateServerMessage * /*cmd*/, CommandContainer * /*cont*/)
 {
-	servatrice->scheduleShutdown(cmd->getReason(), cmd->getMinutes());
+	servatrice->updateLoginMessage();
 	return RespOk;
 }
 
-ResponseCode ServerSocketInterface::cmdBanFromServer(Command_BanFromServer *cmd, CommandContainer * /*cont*/)
+ResponseCode ServerSocketInterface::cmdShutdownServer(Command_ShutdownServer *cmd, CommandContainer * /*cont*/)
 {
-	QString userName = cmd->getUserName();
-	if (!server->getUsers().contains(userName))
-		return RespNameNotFound;
-	
-	int minutes = cmd->getMinutes();
-	
-	ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
-	if (user->getUserInfo()->getUserLevel() & ServerInfo_User::IsRegistered) {
-		// Registered users can be banned by name.
-		QMutexLocker locker(&servatrice->dbMutex);
-		QSqlQuery query;
-		query.prepare("insert into " + servatrice->getDbPrefix() + "_bans (id_user, id_admin, time_from, minutes, reason) values(:id_user, :id_admin, NOW(), :minutes, :reason)");
-		query.bindValue(":id_user", getUserIdInDB(userName));
-		query.bindValue(":id_admin", getUserIdInDB(userInfo->getName()));
-		query.bindValue(":minutes", minutes);
-		query.bindValue(":reason", cmd->getReason() + "\n");
-		servatrice->execSqlQuery(query);
-	} else {
-		// Unregistered users must be banned by IP address.
-		// Indefinite address bans are not reasonable -> default to 30 minutes.
-		if (minutes == 0)
-			minutes = 30;
-		servatrice->addAddressBan(user->getPeerAddress(), minutes);
-	}
-	
-	user->sendProtocolItem(new Event_ConnectionClosed("banned"));
-	user->deleteLater();
-	
+	servatrice->scheduleShutdown(cmd->getReason(), cmd->getMinutes());
 	return RespOk;
 }

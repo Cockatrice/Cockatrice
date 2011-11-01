@@ -106,6 +106,7 @@ public:
 	bool getAcceptsUserListChanges() const { return acceptsUserListChanges; }
 	bool getAcceptsRoomListChanges() const { return acceptsRoomListChanges; }
 	ServerInfo_User *getUserInfo() const { return userInfo; }
+	virtual QString getAddress() const = 0;
 	void setUserInfo(ServerInfo_User *_userInfo) { userInfo = _userInfo; }
 	const QMap<QString, ServerInfo_User *> &getBuddyList() const { return buddyList; }
 	const QMap<QString, ServerInfo_User *> &getIgnoreList() const { return ignoreList; }

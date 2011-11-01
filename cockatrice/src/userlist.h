@@ -10,17 +10,29 @@ class QTreeWidget;
 class ServerInfo_User;
 class AbstractClient;
 class TabSupervisor;
+class QLabel;
+class QCheckBox;
 class QSpinBox;
+class QRadioButton;
 class QPlainTextEdit;
 class ProtocolResponse;
 
 class BanDialog : public QDialog {
 	Q_OBJECT
 private:
-	QSpinBox *durationEdit;
+	QLabel *daysLabel, *hoursLabel, *minutesLabel;
+	QCheckBox *nameBanCheckBox, *ipBanCheckBox;
+	QLineEdit *nameBanEdit, *ipBanEdit;
+	QSpinBox *daysEdit, *hoursEdit, *minutesEdit;
+	QRadioButton *permanentRadio, *temporaryRadio;
 	QPlainTextEdit *reasonEdit;
+private slots:
+	void okClicked();
+	void enableTemporaryEdits(bool enabled);
 public:
-	BanDialog(QWidget *parent = 0);
+	BanDialog(ServerInfo_User *info, QWidget *parent = 0);
+	QString getBanName() const;
+	QString getBanIP() const;
 	int getMinutes() const;
 	QString getReason() const;
 };
@@ -53,6 +65,8 @@ private:
 	void setUserOnline(QTreeWidgetItem *user, bool online);
 private slots:
 	void userClicked(QTreeWidgetItem *item, int column);
+	void banUser_processUserInfoResponse(ProtocolResponse *resp);
+	void banUser_dialogFinished();
 	void gamesOfUserReceived(ProtocolResponse *resp);
 signals:
 	void openMessageDialog(const QString &userName, bool focus);

@@ -84,7 +84,6 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
 
 void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedSize, int angle)
 {
-	QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
 	qreal scaleFactor = translatedSize.width() / boundingRect().width();
 
 	QPixmap *translatedPixmap = info->getPixmap(translatedSize.toSize());

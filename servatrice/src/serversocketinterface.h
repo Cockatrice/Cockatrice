@@ -76,6 +76,7 @@ public:
 	ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent = 0);
 	~ServerSocketInterface();
 	QHostAddress getPeerAddress() const { return socket->peerAddress(); }
+	QString getAddress() const { return socket->peerAddress().toString(); }
 
 	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
 };

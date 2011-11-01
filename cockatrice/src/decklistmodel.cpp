@@ -257,6 +257,7 @@ QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneN
 		cardNode->setNumber(cardNode->getNumber() + 1);
 		QModelIndex ind = nodeToIndex(cardNode);
 		emitRecursiveUpdates(ind);
+		deckList->updateDeckHash();
 		return ind;
 	}
 }

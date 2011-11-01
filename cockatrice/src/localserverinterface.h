@@ -27,6 +27,7 @@ public:
 	LocalServerInterface(LocalServer *_server);
 	~LocalServerInterface();
 	
+	QString getAddress() const { return QString(); }
 	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
 signals:
 	void itemToClient(ProtocolItem *item);

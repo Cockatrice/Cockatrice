@@ -50,10 +50,6 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
 	pingClock->start(1000);
 	
-	banTimeoutClock = new QTimer(this);
-	connect(banTimeoutClock, SIGNAL(timeout()), this, SLOT(updateBanTimer()));
-	banTimeoutClock->start(60000);
-	
 	ProtocolItem::initializeHash();
 	
 	serverId = settings->value("server/id", 0).toInt();
@@ -171,13 +167,6 @@ bool Servatrice::execSqlQuery(QSqlQuery &query)
 
 AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password)
 {
-	serverMutex.lock();
-	QHostAddress address = static_cast<ServerSocketInterface *>(handler)->getPeerAddress();
-	for (int i = 0; i < addressBanList.size(); ++i)
-		if (address == addressBanList[i].first)
-			return PasswordWrong;
-	serverMutex.unlock();
-
 	QMutexLocker locker(&dbMutex);
 	const QString method = settings->value("authentication/method").toString();
 	if (method == "none")
@@ -185,8 +174,23 @@ AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handl
 	else if (method == "sql") {
 		checkSql();
 		
+		QSqlQuery ipBanQuery;
+		ipBanQuery.prepare("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_bans b where b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.ip_address = :address) and b.ip_address = :address2");
+		ipBanQuery.bindValue(":address", static_cast<ServerSocketInterface *>(handler)->getPeerAddress().toString());
+		ipBanQuery.bindValue(":address2", static_cast<ServerSocketInterface *>(handler)->getPeerAddress().toString());
+		if (!execSqlQuery(ipBanQuery)) {
+			qDebug("Login denied: SQL error");
+			return PasswordWrong;
+		}
+		
+		if (ipBanQuery.next())
+			if (ipBanQuery.value(0).toInt() || ipBanQuery.value(1).toInt()) {
+				qDebug("Login denied: banned by address");
+				return PasswordWrong;
+			}
+		
 		QSqlQuery query;
-		query.prepare("select a.password_sha512, time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_users a left join " + dbPrefix + "_bans b on b.id_user = a.id and b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.id_user = a.id) where a.name = :name and a.active = 1");
+		query.prepare("select a.password_sha512, time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_users a left join " + dbPrefix + "_bans b on b.user_name = a.name and b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.user_name = a.name) where a.name = :name and a.active = 1");
 		query.bindValue(":name", user);
 		if (!execSqlQuery(query)) {
 			qDebug("Login denied: SQL error");
@@ -195,7 +199,7 @@ AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handl
 		
 		if (query.next()) {
 			if (query.value(1).toInt() || query.value(2).toInt()) {
-				qDebug("Login denied: banned");
+				qDebug("Login denied: banned by name");
 				return PasswordWrong;
 			}
 			if (query.value(0).toString() == PasswordHasher::computeHash(password, query.value(0).toString().left(16))) {
@@ -257,6 +261,7 @@ ServerInfo_User *Servatrice::evalUserQueryResult(const QSqlQuery &query, bool co
 	return new ServerInfo_User(
 		name,
 		userLevel,
+		QString(),
 		realName,
 		gender,
 		country,
@@ -341,16 +346,6 @@ QMap<QString, ServerInfo_User *> Servatrice::getIgnoreList(const QString &name)
 	return result;
 }
 
-void Servatrice::updateBanTimer()
-{
-	QMutexLocker locker(&serverMutex);
-	for (int i = 0; i < addressBanList.size(); )
-		if (--(addressBanList[i].second) <= 0)
-			addressBanList.removeAt(i);
-		else
-			++i;
-}
-
 void Servatrice::updateLoginMessage()
 {
 	QMutexLocker locker(&dbMutex);
@@ -424,4 +419,4 @@ void Servatrice::shutdownTimeout()
 		deleteLater();
 }
 
-const QString Servatrice::versionString = "Servatrice 0.20111004";
+const QString Servatrice::versionString = "Servatrice 0.20111101";

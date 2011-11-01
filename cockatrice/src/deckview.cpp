@@ -45,7 +45,6 @@ void DeckViewCardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
 	setCursor(Qt::OpenHandCursor);
 	DeckViewScene *sc = static_cast<DeckViewScene *>(scene());
-	QPointF sp = pos();
 	sc->removeItem(this);
 
 	if (currentZone) {

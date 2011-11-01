@@ -743,8 +743,9 @@ public:
 class Command_BanFromServer : public ModeratorCommand {
 	Q_OBJECT
 public:
-	Command_BanFromServer(const QString &_userName = QString(), int _minutes = -1, const QString &_reason = QString());
+	Command_BanFromServer(const QString &_userName = QString(), const QString &_address = QString(), int _minutes = -1, const QString &_reason = QString());
 	QString getUserName() const { return static_cast<SerializableItem_String *>(itemMap.value("user_name"))->getData(); };
+	QString getAddress() const { return static_cast<SerializableItem_String *>(itemMap.value("address"))->getData(); };
 	int getMinutes() const { return static_cast<SerializableItem_Int *>(itemMap.value("minutes"))->getData(); };
 	QString getReason() const { return static_cast<SerializableItem_String *>(itemMap.value("reason"))->getData(); };
 	static SerializableItem *newItem() { return new Command_BanFromServer; }

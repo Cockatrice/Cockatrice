@@ -402,7 +402,7 @@ ResponseCode Server_ProtocolHandler::cmdGetUserInfo(Command_GetUserInfo *cmd, Co
 		Server_ProtocolHandler *handler = server->getUsers().value(cmd->getUserName());
 		if (!handler)
 			return RespNameNotFound;
-		result = new ServerInfo_User(handler->getUserInfo());
+		result = new ServerInfo_User(handler->getUserInfo(), true, userInfo->getUserLevel() & ServerInfo_User::IsModerator);
 	}
 	
 	cont->setResponse(new Response_GetUserInfo(cont->getCmdId(), RespOk, result));

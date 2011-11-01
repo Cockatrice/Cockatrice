@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `name` varchar(35) NOT NULL,
   `realname` varchar(255) NOT NULL,
   `gender` char(1) NOT NULL,
-  `password` varchar(255) NOT NULL,
+  `password_sha512` char(120) NOT NULL,
   `email` varchar(255) NOT NULL,
   `country` char(2) NOT NULL,
   `avatar_bmp` blob NOT NULL,
@@ -149,7 +149,8 @@ CREATE TABLE `cockatrice_buddylist` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE `cockatrice_bans` (
- `id_user` int(7) unsigned zerofill NOT NULL,
+ `user_name` varchar(255) unsigned zerofill NOT NULL,
+ `ip_address` varchar(255) NOT NULL,
  `id_admin` int(7) unsigned zerofill NOT NULL,
  `time_from` datetime NOT NULL,
  `minutes` int(6) NOT NULL,

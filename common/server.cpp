@@ -57,6 +57,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 		return authState;
 	
 	ServerInfo_User *data = getUserData(name);
+	data->setAddress(session->getAddress());
 	name = data->getName(); // Compensate for case indifference
 	
 	if (authState == PasswordRight) {

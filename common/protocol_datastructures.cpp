@@ -12,22 +12,24 @@ CardToMove::CardToMove(int _cardId, bool _faceDown, const QString &_pt, bool _ta
 	insertItem(new SerializableItem_Bool("tapped", _tapped));
 }
 
-ServerInfo_User::ServerInfo_User(const QString &_name, int _userLevel, const QString &_realName, Gender _gender, const QString &_country, const QByteArray &_avatarBmp)
+ServerInfo_User::ServerInfo_User(const QString &_name, int _userLevel, const QString &_address, const QString &_realName, Gender _gender, const QString &_country, const QByteArray &_avatarBmp)
 	: SerializableItem_Map("user")
 {
 	insertItem(new SerializableItem_String("name", _name));
 	insertItem(new SerializableItem_Int("userlevel", _userLevel));
+	insertItem(new SerializableItem_String("address", _address));
 	insertItem(new SerializableItem_String("real_name", _realName));
 	insertItem(new SerializableItem_Int("gender", _gender));
 	insertItem(new SerializableItem_String("country", _country));
 	insertItem(new SerializableItem_ByteArray("avatar_bmp", _avatarBmp));
 }
 
-ServerInfo_User::ServerInfo_User(const ServerInfo_User *other, bool complete)
+ServerInfo_User::ServerInfo_User(const ServerInfo_User *other, bool complete, bool moderatorInfo)
 	: SerializableItem_Map("user")
 {
 	insertItem(new SerializableItem_String("name", other->getName()));
 	insertItem(new SerializableItem_Int("userlevel", other->getUserLevel()));
+	insertItem(new SerializableItem_String("address", moderatorInfo ? other->getAddress() : QString()));
 	insertItem(new SerializableItem_String("real_name", other->getRealName()));
 	insertItem(new SerializableItem_Int("gender", other->getGender()));
 	insertItem(new SerializableItem_String("country", other->getCountry()));

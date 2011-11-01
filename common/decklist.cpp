@@ -565,7 +565,13 @@ void DeckList::updateDeckHash()
 		}
 	}
 	cardList.sort();
-	deckHash = QCryptographicHash::hash(cardList.join(";").toUtf8(), QCryptographicHash::Sha1).toBase64().left(10);
+	QByteArray deckHashArray = QCryptographicHash::hash(cardList.join(";").toUtf8(), QCryptographicHash::Sha1);
+	quint64 number = (((quint64) (unsigned char) deckHashArray[0]) << 32)
+	                + (((quint64) (unsigned char) deckHashArray[1]) << 24)
+	                + (((quint64) (unsigned char) deckHashArray[2] << 16))
+	                + (((quint64) (unsigned char) deckHashArray[3]) << 8)
+	                + (quint64) (unsigned char) deckHashArray[4];
+	deckHash = QString::number(number, 32).rightJustified(8, '0');
 	
 	emit deckHashChanged();
 }
