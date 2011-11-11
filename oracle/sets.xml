@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cockatrice_setdatabase version="20110126">
 	<picture_url>http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&amp;type=card</picture_url>
-	<picture_url_hq>http://mtgpics.chutography.com/!set!/!name!.full.jpg</picture_url_hq>
-	<picture_url_st>http://mtgpics.chutography.com/!set!/!name!.jpg</picture_url_st>
+<!--	<picture_url_hq>http://mtgpics.chutography.com/!set!/!name!.full.jpg</picture_url_hq>-->
+<!--	<picture_url_st>http://mtgpics.chutography.com/!set!/!name!.jpg</picture_url_st>-->
 	<set_url>http://gatherer.wizards.com/Pages/Search/Default.aspx?output=spoiler&amp;method=text&amp;set=[&quot;!longname!&quot;]&amp;special=true</set_url>
 	<set import="1">
 	    <name>ARB</name>
@@ -61,11 +61,15 @@
 	    <longname>Dissension</longname>
 	</set>
 	<set import="1">
-	    <name>DVD</name>
+	    <name>DDH</name>
+	    <longname>Duel Decks: Ajani vs. Nicol Bolas</longname>
+	</set>
+	<set import="1">
+	    <name>DDC</name>
 	    <longname>Duel Decks: Divine vs. Demonic</longname>
 	</set>
 	<set import="1">
-	    <name>DDE</name>
+	    <name>DDF</name>
 	    <longname>Duel Decks: Elspeth vs. Tezzeret</longname>
 	</set>
 	<set import="1">
@@ -73,11 +77,19 @@
 	    <longname>Duel Decks: Elves vs. Goblins</longname>
 	</set>
 	<set import="1">
+	    <name>DDD</name>
+	    <longname>Duel Decks: Garruk vs. Liliana</longname>
+	</set>
+	<set import="1">
 	    <name>DD2</name>
 	    <longname>Duel Decks: Jace vs. Chandra</longname>
 	</set>
 	<set import="1">
-	    <name>DDD</name>
+	    <name>DDG</name>
+	    <longname>Duel Decks: Knights vs. Dragons</longname>
+	</set>
+	<set import="1">
+	    <name>DDE</name>
 	    <longname>Duel Decks: Phyrexia vs. the Coalition</longname>
 	</set>
 	<set import="1">

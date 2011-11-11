@@ -141,9 +141,11 @@ void PictureLoader::startNextPicDownload()
 	QString picUrl;
 	if (cardBeingDownloaded.getStripped())
 		picUrl = cardBeingDownloaded.getCard()->getPicURLSt(cardBeingDownloaded.getSetName());
-	else if (cardBeingDownloaded.getHq())
+	else if (cardBeingDownloaded.getHq()) {
 		picUrl = cardBeingDownloaded.getCard()->getPicURLHq(cardBeingDownloaded.getSetName());
-	else
+		if (picUrl.isEmpty())
+			picUrl = cardBeingDownloaded.getCard()->getPicURL(cardBeingDownloaded.getSetName());
+	} else
 		picUrl = cardBeingDownloaded.getCard()->getPicURL(cardBeingDownloaded.getSetName());
 	QUrl url(picUrl);
 	
