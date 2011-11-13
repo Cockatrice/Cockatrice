@@ -10,6 +10,7 @@
 #include <QSplitter>
 #include "tab_supervisor.h"
 #include "tab_room.h"
+#include "tab_userlists.h"
 #include "userlist.h"
 #include "abstractclient.h"
 #include "protocol_items.h"
@@ -156,6 +157,7 @@ void TabRoom::processLeaveRoomEvent(Event_LeaveRoom *event)
 
 void TabRoom::processSayEvent(Event_RoomSay *event)
 {
-	chatView->appendMessage(event->getPlayerName(), event->getMessage());
+	if (!tabSupervisor->getUserListsTab()->getIgnoreList()->userInList(event->getPlayerName()))
+		chatView->appendMessage(event->getPlayerName(), event->getMessage());
 	emit userEvent(false);
 }
