@@ -236,7 +236,7 @@ bool Servatrice::userExists(const QString &user)
 ServerInfo_User *Servatrice::evalUserQueryResult(const QSqlQuery &query, bool complete)
 {
 	QString name = query.value(0).toString();
-	bool is_admin = query.value(1).toInt();
+	int is_admin = query.value(1).toInt();
 	QString realName = query.value(2).toString();
 	QString genderStr = query.value(3).toString();
 	QString country = query.value(4).toString();
