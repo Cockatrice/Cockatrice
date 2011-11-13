@@ -246,6 +246,10 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 	newPlayer->moveToThread(thread());
 	sendGameEvent(new Event_Join(newPlayer->getProperties()));
 	players.insert(playerId, newPlayer);
+	if (newPlayer->getUserInfo()->getName() == creatorInfo->getName()) {
+		hostId = playerId;
+		sendGameEvent(new Event_GameHostChanged(playerId));
+	}
 
 	if (broadcastUpdate)
 		room->broadcastGameListUpdate(this);
