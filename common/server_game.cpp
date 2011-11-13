@@ -29,7 +29,7 @@
 #include <QDebug>
 
 Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *_room)
-	: QObject(), room(_room), creatorInfo(new ServerInfo_User(_creator->getUserInfo())), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies), onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0), gameMutex(QMutex::Recursive)
+	: QObject(), room(_room), hostId(0), creatorInfo(new ServerInfo_User(_creator->getUserInfo())), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies), onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0), gameMutex(QMutex::Recursive)
 {
 	connect(this, SIGNAL(sigStartGameIfReady()), this, SLOT(doStartGameIfReady()), Qt::QueuedConnection);
 	
@@ -201,21 +201,24 @@ void Server_Game::stopGameIfFinished()
 	}
 }
 
-ResponseCode Server_Game::checkJoin(ServerInfo_User *user, const QString &_password, bool spectator)
+ResponseCode Server_Game::checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions)
 {
-	if ((_password != password) && !(spectator && !spectatorsNeedPassword))
-		return RespWrongPassword;
-	if (!(user->getUserLevel() & ServerInfo_User::IsRegistered) && onlyRegistered)
-		return RespUserLevelTooLow;
-	if (onlyBuddies)
-		if (!room->getServer()->getBuddyList(creatorInfo->getName()).contains(user->getName()))
-			return RespOnlyBuddies;
-	if (room->getServer()->getIgnoreList(creatorInfo->getName()).contains(user->getName()))
-		return RespInIgnoreList;
-	if (spectator) {
-		if (!spectatorsAllowed)
-			return RespSpectatorsNotAllowed;
-	} else if (gameStarted || (getPlayerCount() >= getMaxPlayers()))
+	if (!(overrideRestrictions && (user->getUserLevel() & ServerInfo_User::IsModerator))) {
+		if ((_password != password) && !(spectator && !spectatorsNeedPassword))
+			return RespWrongPassword;
+		if (!(user->getUserLevel() & ServerInfo_User::IsRegistered) && onlyRegistered)
+			return RespUserLevelTooLow;
+		if (onlyBuddies)
+			if (!room->getServer()->getBuddyList(creatorInfo->getName()).contains(user->getName()))
+				return RespOnlyBuddies;
+		if (room->getServer()->getIgnoreList(creatorInfo->getName()).contains(user->getName()))
+			return RespInIgnoreList;
+		if (spectator) {
+			if (!spectatorsAllowed)
+				return RespSpectatorsNotAllowed;
+		}
+	}
+	if (!spectator && (gameStarted || (getPlayerCount() >= getMaxPlayers())))
 		return RespGameFull;
 	
 	return RespOk;
@@ -260,12 +263,28 @@ void Server_Game::removePlayer(Server_Player *player)
 	
 	sendGameEvent(new Event_Leave(player->getPlayerId()));
 	bool playerActive = activePlayer == player->getPlayerId();
+	bool playerHost = hostId == player->getPlayerId();
 	bool spectator = player->getSpectator();
 	player->prepareDestroy();
 	
 	if (!getPlayerCount())
 		deleteLater();
 	else if (!spectator) {
+		if (playerHost) {
+			int newHostId = -1;
+			QMapIterator<int, Server_Player *> playerIterator(players);
+			while (playerIterator.hasNext()) {
+				Server_Player *p = playerIterator.next().value();
+				if (!p->getSpectator()) {
+					newHostId = p->getPlayerId();
+					break;
+				}
+			}
+			if (newHostId != -1) {
+				hostId = newHostId;
+				sendGameEvent(new Event_GameHostChanged(hostId));
+			}
+		}
 		stopGameIfFinished();
 		if (gameStarted && playerActive)
 			nextTurn();

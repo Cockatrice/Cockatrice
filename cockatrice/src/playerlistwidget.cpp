@@ -9,7 +9,6 @@
 #include "protocol_items.h"
 #include "userlist.h"
 #include "userinfobox.h"
-#include <QDebug>
 #include <QMouseEvent>
 #include <QAction>
 #include <QMenu>
@@ -46,8 +45,8 @@ bool PlayerListTWI::operator<(const QTreeWidgetItem &other) const
 	return data(4, Qt::UserRole + 1).toInt() < other.data(4, Qt::UserRole + 1).toInt();
 }
 
-PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, bool _gameCreator, QWidget *parent)
-	: QTreeWidget(parent), tabSupervisor(_tabSupervisor), client(_client), game(_game), gameCreator(_gameCreator), gameStarted(false)
+PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, QWidget *parent)
+	: QTreeWidget(parent), tabSupervisor(_tabSupervisor), client(_client), game(_game), gameStarted(false)
 {
 	readyIcon = QIcon(":/resources/icon_ready_start.svg");
 	notReadyIcon = QIcon(":/resources/icon_not_ready_start.svg");
@@ -179,9 +178,17 @@ void PlayerListWidget::showContextMenu(const QPoint &pos, const QModelIndex &ind
 		else
 			menu->addAction(aAddToIgnoreList);
 	}
-	if (gameCreator) {
+	if (game->isHost() || !game->getTabSupervisor()->getAdminLocked()) {
 		menu->addSeparator();
 		menu->addAction(aKick);
+	}
+	if (userName == game->getTabSupervisor()->getUserInfo()->getName()) {
+		aChat->setEnabled(false);
+		aAddToBuddyList->setEnabled(false);
+		aRemoveFromBuddyList->setEnabled(false);
+		aAddToIgnoreList->setEnabled(false);
+		aRemoveFromIgnoreList->setEnabled(false);
+		aKick->setEnabled(false);
 	}
 	
 	QAction *actionClicked = menu->exec(pos);

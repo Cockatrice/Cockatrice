@@ -136,6 +136,7 @@ void TabSupervisor::start(AbstractClient *_client, ServerInfo_User *_userInfo)
 	
 	if (userInfo->getUserLevel() & ServerInfo_User::IsModerator) {
 		tabAdmin = new TabAdmin(this, client, (userInfo->getUserLevel() & ServerInfo_User::IsAdmin));
+		connect(tabAdmin, SIGNAL(adminLockChanged(bool)), this, SIGNAL(adminLockChanged(bool)));
 		myAddTab(tabAdmin);
 	} else
 		tabAdmin = 0;
@@ -227,7 +228,7 @@ void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex)
 
 void TabSupervisor::gameJoined(Event_GameJoined *event)
 {
-	TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event->getGameId(), event->getGameDescription(), event->getPlayerId(), userInfo, event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
+	TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event->getGameId(), event->getGameDescription(), event->getHostId(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
 	int tabIndex = myAddTab(tab);
@@ -238,7 +239,7 @@ void TabSupervisor::gameJoined(Event_GameJoined *event)
 
 void TabSupervisor::localGameJoined(Event_GameJoined *event)
 {
-	TabGame *tab = new TabGame(this, localClients, event->getGameId(), event->getGameDescription(), event->getPlayerId(), userInfo, event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
+	TabGame *tab = new TabGame(this, localClients, event->getGameId(), event->getGameDescription(), event->getHostId(), event->getPlayerId(), event->getSpectator(), event->getSpectatorsCanTalk(), event->getSpectatorsSeeEverything(), event->getResuming());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	int tabIndex = myAddTab(tab);
 	addCloseButtonToTab(tab, tabIndex);

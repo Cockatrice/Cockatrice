@@ -26,7 +26,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
 	
 	QMap<int, GameTypeMap> tempMap;
 	tempMap.insert(info->getRoomId(), gameTypes);
-	gameSelector = new GameSelector(client, this, QMap<int, QString>(), tempMap);
+	gameSelector = new GameSelector(client, tabSupervisor, this, QMap<int, QString>(), tempMap);
 	userList = new UserList(tabSupervisor, client, UserList::RoomList);
 	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
 	

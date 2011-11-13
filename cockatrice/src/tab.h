@@ -23,6 +23,7 @@ private:
 public:
 	Tab(TabSupervisor *_tabSupervisor, QWidget *parent = 0);
 	QMenu *getTabMenu() const { return tabMenu; }
+	TabSupervisor *getTabSupervisor() const { return tabSupervisor; }
 	bool getContentsChanged() const { return contentsChanged; }
 	void setContentsChanged(bool _contentsChanged) { contentsChanged = _contentsChanged; }
 	virtual QString getTabText() const = 0;

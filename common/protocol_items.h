@@ -142,10 +142,11 @@ public:
 class Command_JoinGame : public RoomCommand {
 	Q_OBJECT
 public:
-	Command_JoinGame(int _roomId = -1, int _gameId = -1, const QString &_password = QString(), bool _spectator = false);
+	Command_JoinGame(int _roomId = -1, int _gameId = -1, const QString &_password = QString(), bool _spectator = false, bool _overrideRestrictions = false);
 	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); };
 	QString getPassword() const { return static_cast<SerializableItem_String *>(itemMap.value("password"))->getData(); };
 	bool getSpectator() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectator"))->getData(); };
+	bool getOverrideRestrictions() const { return static_cast<SerializableItem_Bool *>(itemMap.value("override_restrictions"))->getData(); };
 	static SerializableItem *newItem() { return new Command_JoinGame; }
 	int getItemId() const { return ItemId_Command_JoinGame; }
 };
@@ -427,6 +428,13 @@ public:
 	static SerializableItem *newItem() { return new Event_GameClosed; }
 	int getItemId() const { return ItemId_Event_GameClosed; }
 };
+class Event_GameHostChanged : public GameEvent {
+	Q_OBJECT
+public:
+	Event_GameHostChanged(int _playerId = -1);
+	static SerializableItem *newItem() { return new Event_GameHostChanged; }
+	int getItemId() const { return ItemId_Event_GameHostChanged; }
+};
 class Event_Kicked : public GameEvent {
 	Q_OBJECT
 public:
@@ -644,9 +652,10 @@ public:
 class Event_GameJoined : public GenericEvent {
 	Q_OBJECT
 public:
-	Event_GameJoined(int _gameId = -1, const QString &_gameDescription = QString(), int _playerId = -1, bool _spectator = false, bool _spectatorsCanTalk = false, bool _spectatorsSeeEverything = false, bool _resuming = false);
+	Event_GameJoined(int _gameId = -1, const QString &_gameDescription = QString(), int _hostId = -1, int _playerId = -1, bool _spectator = false, bool _spectatorsCanTalk = false, bool _spectatorsSeeEverything = false, bool _resuming = false);
 	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); };
 	QString getGameDescription() const { return static_cast<SerializableItem_String *>(itemMap.value("game_description"))->getData(); };
+	int getHostId() const { return static_cast<SerializableItem_Int *>(itemMap.value("host_id"))->getData(); };
 	int getPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("player_id"))->getData(); };
 	bool getSpectator() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectator"))->getData(); };
 	bool getSpectatorsCanTalk() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_can_talk"))->getData(); };

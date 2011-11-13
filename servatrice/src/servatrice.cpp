@@ -419,4 +419,4 @@ void Servatrice::shutdownTimeout()
 		deleteLater();
 }
 
-const QString Servatrice::versionString = "Servatrice 0.20111101";
+const QString Servatrice::versionString = "Servatrice 0.20111113";

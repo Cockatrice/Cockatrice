@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include "tab_game.h"
+#include "tab_supervisor.h"
 #include "cardinfowidget.h"
 #include "playerlistwidget.h"
 #include "messagelogwidget.h"
@@ -158,8 +159,8 @@ void DeckViewContainer::setDeck(DeckList *deck)
 	readyStartButton->setEnabled(true);
 }
 
-TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, ServerInfo_User *_userInfo, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
-	: Tab(_tabSupervisor), clients(_clients), gameId(_gameId), gameDescription(_gameDescription), localPlayerId(_localPlayerId), spectator(_spectator), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), gameStateKnown(false), started(false), resuming(_resuming), currentPhase(-1)
+TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _hostId, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
+	: Tab(_tabSupervisor), clients(_clients), gameId(_gameId), gameDescription(_gameDescription), hostId(_hostId), localPlayerId(_localPlayerId), spectator(_spectator), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), gameStateKnown(false), started(false), resuming(_resuming), currentPhase(-1)
 {
 	phasesToolbar = new PhasesToolbar;
 	phasesToolbar->hide();
@@ -170,13 +171,13 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	gameView->hide();
 	
 	cardInfo = new CardInfoWidget(CardInfoWidget::ModeGameTab);
-	playerListWidget = new PlayerListWidget(tabSupervisor, clients.first(), this, true);
+	playerListWidget = new PlayerListWidget(tabSupervisor, clients.first(), this);
 	playerListWidget->setFocusPolicy(Qt::NoFocus);
 	connect(playerListWidget, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
 	
 	timeElapsedLabel = new QLabel;
 	timeElapsedLabel->setAlignment(Qt::AlignCenter);
-	messageLog = new MessageLogWidget(_userInfo->getName(), _userInfo->getGender() == ServerInfo_User::Female);
+	messageLog = new MessageLogWidget(tabSupervisor->getUserInfo()->getName(), tabSupervisor->getUserInfo()->getGender() == ServerInfo_User::Female);
 	connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfo, SLOT(setCard(QString)));
 	connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
 	connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
@@ -208,11 +209,11 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	mainLayout->addLayout(deckViewContainerLayout, 10);
 	mainLayout->addWidget(splitter);
 
-	if (spectator && !spectatorsCanTalk) {
+	if (spectator && !spectatorsCanTalk && tabSupervisor->getAdminLocked()) {
 		sayLabel->hide();
 		sayEdit->hide();
 	}
-
+	connect(tabSupervisor, SIGNAL(adminLockChanged(bool)), this, SLOT(adminLockChanged(bool)));
 	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(actSay()));
 
 	// Menu actions
@@ -312,6 +313,13 @@ void TabGame::retranslateUi()
 void TabGame::closeRequest()
 {
 	actLeaveGame();
+}
+
+void TabGame::adminLockChanged(bool lock)
+{
+	bool v = !(spectator && !spectatorsCanTalk && lock);
+	sayLabel->setVisible(v);
+	sayEdit->setVisible(v);
 }
 
 void TabGame::actConcede()
@@ -433,6 +441,7 @@ void TabGame::processGameEventContainer(GameEventContainer *cont, AbstractClient
 				case ItemId_Event_Join: eventJoin(static_cast<Event_Join *>(event), context); break;
 				case ItemId_Event_Leave: eventLeave(static_cast<Event_Leave *>(event), context); break;
 				case ItemId_Event_Kicked: eventKicked(static_cast<Event_Kicked *>(event), context); break;
+				case ItemId_Event_GameHostChanged: eventGameHostChanged(static_cast<Event_GameHostChanged *>(event), context); break;
 				case ItemId_Event_GameClosed: eventGameClosed(static_cast<Event_GameClosed *>(event), context); break;
 				case ItemId_Event_SetActivePlayer: eventSetActivePlayer(static_cast<Event_SetActivePlayer *>(event), context); break;
 				case ItemId_Event_SetActivePhase: eventSetActivePhase(static_cast<Event_SetActivePhase *>(event), context); break;
@@ -670,6 +679,11 @@ void TabGame::eventKicked(Event_Kicked * /*event*/, GameEventContext * /*context
 	emit userEvent();
 	QMessageBox::critical(this, tr("Kicked"), tr("You have been kicked out of the game."));
 	deleteLater();
+}
+
+void TabGame::eventGameHostChanged(Event_GameHostChanged *event, GameEventContext * /*context*/)
+{
+	hostId = event->getPlayerId();
 }
 
 void TabGame::eventGameClosed(Event_GameClosed * /*event*/, GameEventContext * /*context*/)

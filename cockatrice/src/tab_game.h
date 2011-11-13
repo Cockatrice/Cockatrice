@@ -30,6 +30,7 @@ class Event_GameStateChanged;
 class Event_PlayerPropertiesChanged;
 class Event_Join;
 class Event_Leave;
+class Event_GameHostChanged;
 class Event_GameClosed;
 class Event_GameStart;
 class Event_SetActivePlayer;
@@ -88,6 +89,7 @@ private:
 	QList<AbstractClient *> clients;
 	int gameId;
 	QString gameDescription;
+	int hostId;
 	int localPlayerId;
 	bool spectator;
 	bool spectatorsCanTalk, spectatorsSeeEverything;
@@ -132,6 +134,7 @@ private:
 	void eventJoin(Event_Join *event, GameEventContext *context);
 	void eventLeave(Event_Leave *event, GameEventContext *context);
 	void eventKicked(Event_Kicked *event, GameEventContext *context);
+	void eventGameHostChanged(Event_GameHostChanged *event, GameEventContext *context);
 	void eventGameClosed(Event_GameClosed *event, GameEventContext *context);
 	Player *setActivePlayer(int id);
 	void eventSetActivePlayer(Event_SetActivePlayer *event, GameEventContext *context);
@@ -146,6 +149,7 @@ signals:
 	void containerProcessingDone();
 	void openMessageDialog(const QString &userName, bool focus);
 private slots:
+	void adminLockChanged(bool lock);
 	void newCardAdded(AbstractCardItem *card);
 	
 	void actConcede();
@@ -156,12 +160,13 @@ private slots:
 	void actNextPhase();
 	void actNextTurn();
 public:
-	TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _localPlayerId, ServerInfo_User *_userInfo, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming);
+	TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _hostId, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming);
 	~TabGame();
 	void retranslateUi();
 	void closeRequest();
 	const QMap<int, Player *> &getPlayers() const { return players; }
 	CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;
+	bool isHost() const { return hostId == localPlayerId; }
 	int getGameId() const { return gameId; }
 	QString getTabText() const { return tr("Game %1: %2").arg(gameId).arg(gameDescription); }
 	bool getSpectator() const { return spectator; }

@@ -15,7 +15,7 @@
 0:join_room:i,room_id
 1:leave_room
 1:room_say:s,message
-1:join_game:i,game_id:s,password:b,spectator
+1:join_game:i,game_id:s,password:b,spectator:b,override_restrictions
 2:kick_from_game:i,player_id
 2:leave_game
 2:say:s,message
@@ -47,6 +47,7 @@
 3:say:s,message
 3:leave
 3:game_closed
+3:game_host_changed
 3:kicked
 3:shuffle
 3:roll_die:i,sides:i,value
@@ -69,7 +70,7 @@
 4:server_shutdown:s,reason:i,minutes
 4:connection_closed:s,reason
 4:message:s,sender_name:s,receiver_name:s,text
-4:game_joined:i,game_id:s,game_description:i,player_id:b,spectator:b,spectators_can_talk:b,spectators_see_everything:b,resuming
+4:game_joined:i,game_id:s,game_description:i,host_id:i,player_id:b,spectator:b,spectators_can_talk:b,spectators_see_everything:b,resuming
 4:user_left:s,user_name
 5:leave_room:s,player_name
 5:room_say:s,player_name:s,message

@@ -31,6 +31,8 @@ private:
 	QPushButton *updateServerMessageButton, *shutdownServerButton;
 	QGroupBox *adminGroupBox;
 	QPushButton *unlockButton, *lockButton;
+signals:
+	void adminLockChanged(bool lock);
 private slots:
 	void actUpdateServerMessage();
 	void actShutdownServer();

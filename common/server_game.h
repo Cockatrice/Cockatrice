@@ -35,6 +35,7 @@ class Server_Game : public QObject {
 	Q_OBJECT
 private:
 	Server_Room *room;
+	int hostId;
 	ServerInfo_User *creatorInfo;
 	QMap<int, Server_Player *> players;
 	bool gameStarted;
@@ -62,6 +63,7 @@ public:
 	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent);
 	~Server_Game();
 	ServerInfo_Game *getInfo() const;
+	int getHostId() const { return hostId; }
 	ServerInfo_User *getCreatorInfo() const { return creatorInfo; }
 	bool getGameStarted() const { return gameStarted; }
 	int getPlayerCount() const;
@@ -76,7 +78,7 @@ public:
 	bool getSpectatorsNeedPassword() const { return spectatorsNeedPassword; }
 	bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
 	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
-	ResponseCode checkJoin(ServerInfo_User *user, const QString &_password, bool spectator);
+	ResponseCode checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions);
 	bool containsUser(const QString &userName) const;
 	Server_Player *addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate = true);
 	void removePlayer(Server_Player *player);

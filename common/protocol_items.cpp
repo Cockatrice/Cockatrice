@@ -86,12 +86,13 @@ Command_RoomSay::Command_RoomSay(int _roomId, const QString &_message)
 {
 	insertItem(new SerializableItem_String("message", _message));
 }
-Command_JoinGame::Command_JoinGame(int _roomId, int _gameId, const QString &_password, bool _spectator)
+Command_JoinGame::Command_JoinGame(int _roomId, int _gameId, const QString &_password, bool _spectator, bool _overrideRestrictions)
 	: RoomCommand("join_game", _roomId)
 {
 	insertItem(new SerializableItem_Int("game_id", _gameId));
 	insertItem(new SerializableItem_String("password", _password));
 	insertItem(new SerializableItem_Bool("spectator", _spectator));
+	insertItem(new SerializableItem_Bool("override_restrictions", _overrideRestrictions));
 }
 Command_KickFromGame::Command_KickFromGame(int _gameId, int _playerId)
 	: GameCommand("kick_from_game", _gameId)
@@ -278,6 +279,10 @@ Event_GameClosed::Event_GameClosed(int _playerId)
 	: GameEvent("game_closed", _playerId)
 {
 }
+Event_GameHostChanged::Event_GameHostChanged(int _playerId)
+	: GameEvent("game_host_changed", _playerId)
+{
+}
 Event_Kicked::Event_Kicked(int _playerId)
 	: GameEvent("kicked", _playerId)
 {
@@ -426,11 +431,12 @@ Event_Message::Event_Message(const QString &_senderName, const QString &_receive
 	insertItem(new SerializableItem_String("receiver_name", _receiverName));
 	insertItem(new SerializableItem_String("text", _text));
 }
-Event_GameJoined::Event_GameJoined(int _gameId, const QString &_gameDescription, int _playerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
+Event_GameJoined::Event_GameJoined(int _gameId, const QString &_gameDescription, int _hostId, int _playerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming)
 	: GenericEvent("game_joined")
 {
 	insertItem(new SerializableItem_Int("game_id", _gameId));
 	insertItem(new SerializableItem_String("game_description", _gameDescription));
+	insertItem(new SerializableItem_Int("host_id", _hostId));
 	insertItem(new SerializableItem_Int("player_id", _playerId));
 	insertItem(new SerializableItem_Bool("spectator", _spectator));
 	insertItem(new SerializableItem_Bool("spectators_can_talk", _spectatorsCanTalk));
@@ -548,6 +554,7 @@ void ProtocolItem::initializeHashAuto()
 	itemNameHash.insert("game_eventsay", Event_Say::newItem);
 	itemNameHash.insert("game_eventleave", Event_Leave::newItem);
 	itemNameHash.insert("game_eventgame_closed", Event_GameClosed::newItem);
+	itemNameHash.insert("game_eventgame_host_changed", Event_GameHostChanged::newItem);
 	itemNameHash.insert("game_eventkicked", Event_Kicked::newItem);
 	itemNameHash.insert("game_eventshuffle", Event_Shuffle::newItem);
 	itemNameHash.insert("game_eventroll_die", Event_RollDie::newItem);

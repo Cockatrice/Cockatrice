@@ -6,14 +6,15 @@
 #include <QMessageBox>
 #include <QHeaderView>
 #include <QInputDialog>
+#include "tab_supervisor.h"
 #include "dlg_creategame.h"
 #include "abstractclient.h"
 #include "protocol_items.h"
 #include "gameselector.h"
 #include "gamesmodel.h"
 
-GameSelector::GameSelector(AbstractClient *_client, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QWidget *parent)
-	: QGroupBox(parent), client(_client), room(_room)
+GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSupervisor, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QWidget *parent)
+	: QGroupBox(parent), client(_client), tabSupervisor(_tabSupervisor), room(_room)
 {
 	gameListView = new QTreeView;
 	gameListModel = new GamesModel(_rooms, _gameTypes, this);
@@ -115,15 +116,16 @@ void GameSelector::actJoin()
 	if (!ind.isValid())
 		return;
 	ServerInfo_Game *game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
+	bool overrideRestrictions = !tabSupervisor->getAdminLocked();
 	QString password;
-	if (game->getHasPassword() && !(spectator && !game->getSpectatorsNeedPassword())) {
+	if (game->getHasPassword() && !(spectator && !game->getSpectatorsNeedPassword()) && !overrideRestrictions) {
 		bool ok;
 		password = QInputDialog::getText(this, tr("Join game"), tr("Password:"), QLineEdit::Password, QString(), &ok);
 		if (!ok)
 			return;
 	}
 
-	Command_JoinGame *commandJoinGame = new Command_JoinGame(game->getRoomId(), game->getGameId(), password, spectator);
+	Command_JoinGame *commandJoinGame = new Command_JoinGame(game->getRoomId(), game->getGameId(), password, spectator, overrideRestrictions);
 	connect(commandJoinGame, SIGNAL(finished(ResponseCode)), this, SLOT(checkResponse(ResponseCode)));
 	client->sendCommand(commandJoinGame);
 

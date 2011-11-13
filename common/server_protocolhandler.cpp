@@ -327,7 +327,7 @@ ResponseCode Server_ProtocolHandler::cmdLogin(Command_Login *cmd, CommandContain
 					game->postConnectionStatusUpdate(gamePlayers[j], true);
 					games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, gamePlayers[j]));
 					
-					enqueueProtocolItem(new Event_GameJoined(game->getGameId(), game->getDescription(), gamePlayers[j]->getPlayerId(), gamePlayers[j]->getSpectator(), game->getSpectatorsCanTalk(), game->getSpectatorsSeeEverything(), true));
+					enqueueProtocolItem(new Event_GameJoined(game->getGameId(), game->getDescription(), game->getHostId(), gamePlayers[j]->getPlayerId(), gamePlayers[j]->getSpectator(), game->getSpectatorsCanTalk(), game->getSpectatorsSeeEverything(), true));
 					enqueueProtocolItem(GameEventContainer::makeNew(new Event_GameStateChanged(game->getGameStarted(), game->getActivePlayer(), game->getActivePhase(), game->getGameState(gamePlayers[j])), game->getGameId()));
 					
 					break;
@@ -527,7 +527,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(Command_CreateGame *cmd, Comm
 	QMutexLocker gameListLocker(&gameListMutex);
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	
-	sendProtocolItem(new Event_GameJoined(game->getGameId(), game->getDescription(), creator->getPlayerId(), false, game->getSpectatorsCanTalk(), game->getSpectatorsSeeEverything(), false));
+	sendProtocolItem(new Event_GameJoined(game->getGameId(), game->getDescription(), creator->getPlayerId(), creator->getPlayerId(), false, game->getSpectatorsCanTalk(), game->getSpectatorsSeeEverything(), false));
 	sendProtocolItem(GameEventContainer::makeNew(new Event_GameStateChanged(game->getGameStarted(), game->getActivePlayer(), game->getActivePhase(), game->getGameState(creator)), game->getGameId()));
 	
 	game->gameMutex.unlock();
@@ -551,11 +551,11 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(Command_JoinGame *cmd, CommandC
 	
 	QMutexLocker locker(&g->gameMutex);
 	
-	ResponseCode result = g->checkJoin(userInfo, cmd->getPassword(), cmd->getSpectator());
+	ResponseCode result = g->checkJoin(userInfo, cmd->getPassword(), cmd->getSpectator(), cmd->getOverrideRestrictions());
 	if (result == RespOk) {
 		Server_Player *player = g->addPlayer(this, cmd->getSpectator());
 		games.insert(cmd->getGameId(), QPair<Server_Game *, Server_Player *>(g, player));
-		enqueueProtocolItem(new Event_GameJoined(cmd->getGameId(), g->getDescription(), player->getPlayerId(), cmd->getSpectator(), g->getSpectatorsCanTalk(), g->getSpectatorsSeeEverything(), false));
+		enqueueProtocolItem(new Event_GameJoined(cmd->getGameId(), g->getDescription(), g->getHostId(), player->getPlayerId(), cmd->getSpectator(), g->getSpectatorsCanTalk(), g->getSpectatorsSeeEverything(), false));
 		enqueueProtocolItem(GameEventContainer::makeNew(new Event_GameStateChanged(g->getGameStarted(), g->getActivePlayer(), g->getActivePhase(), g->getGameState(player)), cmd->getGameId()));
 	}
 	return result;
@@ -569,7 +569,7 @@ ResponseCode Server_ProtocolHandler::cmdLeaveGame(Command_LeaveGame * /*cmd*/, C
 
 ResponseCode Server_ProtocolHandler::cmdKickFromGame(Command_KickFromGame *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
-	if (game->getCreatorInfo()->getName() != player->getUserInfo()->getName())
+	if ((game->getHostId() != player->getPlayerId()) && !(userInfo->getUserLevel() & ServerInfo_User::IsModerator))
 		return RespFunctionNotAllowed;
 	
 	if (!game->kickPlayer(cmd->getPlayerId()))
@@ -657,7 +657,7 @@ ResponseCode Server_ProtocolHandler::cmdReadyStart(Command_ReadyStart *cmd, Comm
 
 ResponseCode Server_ProtocolHandler::cmdSay(Command_Say *cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player)
 {
-	if (player->getSpectator() && !game->getSpectatorsCanTalk())
+	if (player->getSpectator() && !game->getSpectatorsCanTalk() && !(userInfo->getUserLevel() & ServerInfo_User::IsModerator))
 		return RespFunctionNotAllowed;
 	
 	game->sendGameEvent(new Event_Say(player->getPlayerId(), cmd->getMessage()));

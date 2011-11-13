@@ -65,6 +65,7 @@ public:
 signals:
 	void setMenu(QMenu *menu);
 	void localGameEnded();
+	void adminLockChanged(bool lock);
 private slots:
 	void closeButtonPressed();
 	void updateCurrent(int index);

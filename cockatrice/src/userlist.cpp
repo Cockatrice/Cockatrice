@@ -309,7 +309,7 @@ void UserList::gamesOfUserReceived(ProtocolResponse *resp)
 		gameTypeMap.insert(roomList[i]->getRoomId(), tempMap);
 	}
 	
-	GameSelector *selector = new GameSelector(client, 0, roomMap, gameTypeMap);
+	GameSelector *selector = new GameSelector(client, tabSupervisor, 0, roomMap, gameTypeMap);
 	const QList<ServerInfo_Game *> gameList = response->getGameList();
 	for (int i = 0; i < gameList.size(); ++i)
 		selector->processGameInfo(gameList[i]);

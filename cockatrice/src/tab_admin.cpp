@@ -118,6 +118,7 @@ void TabAdmin::actUnlock()
 		lockButton->setEnabled(true);
 		unlockButton->setEnabled(false);
 		locked = false;
+		emit adminLockChanged(false);
 	}
 }
 
@@ -128,4 +129,5 @@ void TabAdmin::actLock()
 	lockButton->setEnabled(false);
 	unlockButton->setEnabled(true);
 	locked = true;
+	emit adminLockChanged(true);
 }

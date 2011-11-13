@@ -31,13 +31,12 @@ private:
 	TabSupervisor *tabSupervisor;
 	AbstractClient *client;
 	TabGame *game;
-	bool gameCreator;
 	QIcon readyIcon, notReadyIcon, concededIcon, playerIcon, spectatorIcon;
 	bool gameStarted;
 signals:
 	void openMessageDialog(const QString &userName, bool focus);
 public:
-	PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, bool _gameCreator, QWidget *parent = 0);
+	PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, QWidget *parent = 0);
 	void retranslateUi();
 	void addPlayer(ServerInfo_PlayerProperties *player);
 	void removePlayer(int playerId);

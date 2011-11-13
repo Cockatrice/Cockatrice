@@ -9,7 +9,7 @@ extern CardDatabase *db;
 
 extern QTranslator *translator;
 const QString translationPrefix = "cockatrice";
-const QString versionString = "0.20111101";
+const QString versionString = "0.20111113";
 
 void installNewTranslator();
 
