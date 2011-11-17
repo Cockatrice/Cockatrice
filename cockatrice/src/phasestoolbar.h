@@ -44,7 +44,7 @@ private:
 	double width, height, ySpacing, symbolSize;
 	static const int buttonCount = 12;
 	static const int spaceCount = 6;
-	static const double margin = 3;
+	static const double marginSize;
 	void rearrangeButtons();
 public:
 	PhasesToolbar(QGraphicsItem *parent = 0);
