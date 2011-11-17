@@ -155,6 +155,7 @@ CREATE TABLE `cockatrice_bans` (
  `time_from` datetime NOT NULL,
  `minutes` int(6) NOT NULL,
  `reason` text NOT NULL,
- KEY `id_user` (`id_user`)
+  PRIMARY KEY (`user_name`,`time_from`),
+  KEY `time_from` (`time_from`,`ip_address`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

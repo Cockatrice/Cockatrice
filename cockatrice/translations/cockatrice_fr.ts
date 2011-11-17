@@ -4385,7 +4385,7 @@ Entrez un nom s&apos;il vous plaît:</translation>
         <location filename="../src/userlist.cpp" line="349"/>
         <source>Show this user&apos;s &amp;games</source>
         <translatorcomment>Missing the female version : &quot;Montrer les parties de cette joueuse&quot;</translatorcomment>
-        <translation>Montrer les &amp;parties de de ce joueur</translation>
+        <translation>Montrer les &amp;parties de ce joueur</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="350"/>

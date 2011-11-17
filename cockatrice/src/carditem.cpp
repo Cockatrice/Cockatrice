@@ -454,9 +454,9 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 		if (!owner->getLocal())
 			return;
 		
-		bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier) || facedown;
+		bool forceFaceDown = event->modifiers().testFlag(Qt::ShiftModifier);
 	
-		createDragItem(id, event->pos(), event->scenePos(), faceDown);
+		createDragItem(id, event->pos(), event->scenePos(), facedown || forceFaceDown);
 		dragItem->grabMouse();
 		
 		QList<QGraphicsItem *> sel = scene()->selectedItems();
@@ -471,7 +471,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 				childPos = c->pos() - pos();
 			else
 				childPos = QPointF(j * CARD_WIDTH / 2, 0);
-			CardDragItem *drag = new CardDragItem(c, c->getId(), childPos, c->getFaceDown(), dragItem);
+			CardDragItem *drag = new CardDragItem(c, c->getId(), childPos, c->getFaceDown() || forceFaceDown, dragItem);
 			drag->setPos(dragItem->pos() + childPos);
 			scene()->addItem(drag);
 		}
