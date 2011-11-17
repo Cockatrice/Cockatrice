@@ -167,31 +167,33 @@ void PhasesToolbar::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
 	painter->fillRect(boundingRect(), QColor(50, 50, 50));
 }
 
+const double PhasesToolbar::marginSize = 3;
+
 void PhasesToolbar::rearrangeButtons()
 {
 	for (int i = 0; i < buttonList.size(); ++i)
 		buttonList[i]->setWidth(symbolSize);
 	nextTurnButton->setWidth(symbolSize);
 	
-	double y = margin;
-	buttonList[0]->setPos(margin, y);
-	buttonList[1]->setPos(margin, y += symbolSize);
-	buttonList[2]->setPos(margin, y += symbolSize);
+	double y = marginSize;
+	buttonList[0]->setPos(marginSize, y);
+	buttonList[1]->setPos(marginSize, y += symbolSize);
+	buttonList[2]->setPos(marginSize, y += symbolSize);
 	y += ySpacing;
-	buttonList[3]->setPos(margin, y += symbolSize);
+	buttonList[3]->setPos(marginSize, y += symbolSize);
 	y += ySpacing;
-	buttonList[4]->setPos(margin, y += symbolSize);
-	buttonList[5]->setPos(margin, y += symbolSize);
-	buttonList[6]->setPos(margin, y += symbolSize);
-	buttonList[7]->setPos(margin, y += symbolSize);
-	buttonList[8]->setPos(margin, y += symbolSize);
+	buttonList[4]->setPos(marginSize, y += symbolSize);
+	buttonList[5]->setPos(marginSize, y += symbolSize);
+	buttonList[6]->setPos(marginSize, y += symbolSize);
+	buttonList[7]->setPos(marginSize, y += symbolSize);
+	buttonList[8]->setPos(marginSize, y += symbolSize);
 	y += ySpacing;
-	buttonList[9]->setPos(margin, y += symbolSize);
+	buttonList[9]->setPos(marginSize, y += symbolSize);
 	y += ySpacing;
-	buttonList[10]->setPos(margin, y += symbolSize);
+	buttonList[10]->setPos(marginSize, y += symbolSize);
 	y += ySpacing;
 	y += ySpacing;
-	nextTurnButton->setPos(margin, y += symbolSize);
+	nextTurnButton->setPos(marginSize, y += symbolSize);
 }
 
 void PhasesToolbar::setHeight(double _height)
@@ -199,9 +201,9 @@ void PhasesToolbar::setHeight(double _height)
 	prepareGeometryChange();
 	
 	height = _height;
-	ySpacing = (height - 2 * margin) / (buttonCount * 5 + spaceCount);
+	ySpacing = (height - 2 * marginSize) / (buttonCount * 5 + spaceCount);
 	symbolSize = ySpacing * 5;
-	width = symbolSize + 2 * margin;
+	width = symbolSize + 2 * marginSize;
 	
 	rearrangeButtons();
 }

@@ -202,6 +202,6 @@ win32 {
 }
 macx {
 	ICON = resources/appicon.icns
-	CONFIG += x86_64 release
+	CONFIG += x86 ppc x86_64 release
 	LIBS += -bind_at_load
 }

@@ -10,7 +10,6 @@ HEADERS += src/oracleimporter.h src/window_main.h ../cockatrice/src/carddatabase
 SOURCES += src/main.cpp src/oracleimporter.cpp src/window_main.cpp ../cockatrice/src/carddatabase.cpp ../cockatrice/src/settingscache.cpp
 
 macx {
-#	CONFIG += x86 ppc
-CONFIG += x86_64 release
+	CONFIG += x86 ppc x86_64 release
 	LIBS += -bind_at_load
 }
