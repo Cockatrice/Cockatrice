@@ -56,6 +56,7 @@ public:
 	void retranslateUi();
 protected:
 	void closeEvent(QCloseEvent *event);
+	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 };
 
 #endif

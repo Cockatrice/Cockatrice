@@ -60,7 +60,6 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 	setAttribute(Qt::WA_DeleteOnClose);
 	setZValue(2000000006);
 	setFlag(ItemIgnoresTransformations);
-	setAutoFillBackground(true);
 	
 	QGraphicsLinearLayout *hbox = new QGraphicsLinearLayout(Qt::Horizontal);
 	titleLabel = new TitleLabel;
@@ -131,6 +130,12 @@ void ZoneViewWidget::retranslateUi()
 		sortByTypeCheckBox->setText(tr("sort by type"));
 	if (shuffleCheckBox)
 		shuffleCheckBox->setText(tr("shuffle when closing"));
+}
+
+void ZoneViewWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+	painter->fillRect(boundingRect(), palette().color(QPalette::Window));
+	QGraphicsWidget::paint(painter, option, widget);
 }
 
 void ZoneViewWidget::moveWidget(QPointF scenePos)
