@@ -21,8 +21,9 @@ public:
 
 private:
 	int pixmapWidth;
+	qreal cardHeightOffset;
 	qreal aspectRatio;
-	int minimized; // 0 - minimized, 1 - card, 2 - oracle only, 3 - full
+	int minimized; // 0 - card, 1 - oracle only, 2 - full
 	ResizeMode mode;
 
 	QComboBox *dropList;
