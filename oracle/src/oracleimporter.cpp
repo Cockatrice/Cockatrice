@@ -73,7 +73,14 @@ bool OracleImporter::readSetsFromXml(QXmlStreamReader &xml)
 	return true;
 }
 
-CardInfo *OracleImporter::addCard(const QString &setName, QString cardName, int cardId, const QString &cardCost, const QString &cardType, const QString &cardPT, const QStringList &cardText)
+CardInfo *OracleImporter::addCard(const QString &setName,
+								  QString cardName,
+								  int cardId,
+								  const QString &cardCost,
+								  const QString &cardType,
+								  const QString &cardPT,
+								  int cardLoyalty,
+								  const QStringList &cardText)
 {
 	QString fullCardText = cardText.join("\n");
 	bool splitCard = false;
@@ -128,6 +135,9 @@ CardInfo *OracleImporter::addCard(const QString &setName, QString cardName, int 
 			tableRow = 2;
 		card->setTableRow(tableRow);
 
+		if (mainCardType == "Planeswalker")
+			card->setLoyalty(cardLoyalty);
+
 		cardHash.insert(cardName, card);
 	}
 	card->setPicURL(setName, getPictureUrl(pictureUrl, cardId, cardName, setName));
@@ -164,6 +174,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 		if (divClass.nodeValue() == "textspoiler") {
 			QString cardName, cardCost, cardType, cardPT, cardText;
 			int cardId = 0;
+			int cardLoyalty = 0;
 			
 			QDomNodeList trs = div.elementsByTagName("tr");
 			for (int j = 0; j < trs.size(); ++j) {
@@ -174,7 +185,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 					for (int i = 0; i < cardTextSplit.size(); ++i)
 						cardTextSplit[i] = cardTextSplit[i].trimmed();
 					
-					CardInfo *card = addCard(set->getShortName(), cardName, cardId, cardCost, cardType, cardPT, cardTextSplit);
+					CardInfo *card = addCard(set->getShortName(), cardName, cardId, cardCost, cardType, cardPT, cardLoyalty, cardTextSplit);
 					if (!set->contains(card)) {
 						card->addToSet(set);
 						cards++;
@@ -197,6 +208,8 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 						cardPT = v2.simplified().remove('(').remove(')');
 					else if (v1 == "Rules Text:")
 						cardText = v2.trimmed();
+					else if (v1 == "Loyalty:")
+						cardLoyalty = v2.trimmed().remove('(').remove(')').toInt();
 				}
 			}
 			break;

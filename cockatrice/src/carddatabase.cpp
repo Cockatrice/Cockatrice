@@ -256,8 +256,35 @@ void PictureLoadingThread::waitForInit()
 	mutex.unlock();
 }
 
-CardInfo::CardInfo(CardDatabase *_db, const QString &_name, const QString &_manacost, const QString &_cardtype, const QString &_powtough, const QString &_text, const QStringList &_colors, bool _cipt, int _tableRow, const SetList &_sets, const QMap<QString, QString> &_picURLs, const QMap<QString, QString> &_picURLsHq, const QMap<QString, QString> &_picURLsSt)
-	: db(_db), name(_name), sets(_sets), manacost(_manacost), cardtype(_cardtype), powtough(_powtough), text(_text), colors(_colors), picURLs(_picURLs), picURLsHq(_picURLsHq), picURLsSt(_picURLsSt), cipt(_cipt), tableRow(_tableRow), pixmap(NULL)
+CardInfo::CardInfo(CardDatabase *_db,
+				   const QString &_name,
+				   const QString &_manacost,
+				   const QString &_cardtype,
+				   const QString &_powtough,
+				   const QString &_text,
+				   const QStringList &_colors,
+				   int _loyalty,
+				   bool _cipt,
+				   int _tableRow,
+				   const SetList &_sets,
+				   const QMap<QString, QString> &_picURLs,
+				   const QMap<QString, QString> &_picURLsHq,
+				   const QMap<QString, QString> &_picURLsSt)
+	: db(_db),
+	  name(_name),
+	  sets(_sets),
+	  manacost(_manacost),
+	  cardtype(_cardtype),
+	  powtough(_powtough),
+	  text(_text),
+	  colors(_colors),
+	  loyalty(_loyalty),
+	  picURLs(_picURLs),
+	  picURLsHq(_picURLsHq),
+	  picURLsSt(_picURLsSt),
+	  cipt(_cipt),
+	  tableRow(_tableRow),
+	  pixmap(NULL)
 {
 	for (int i = 0; i < sets.size(); i++)
 		sets[i]->append(this);
@@ -419,6 +446,8 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 		xml.writeTextElement("pt", info->getPowTough());
 	xml.writeTextElement("tablerow", QString::number(info->getTableRow()));
 	xml.writeTextElement("text", info->getText());
+	if (info->getMainCardType() == "Planeswalker")
+		xml.writeTextElement("loyalty", QString::number(info->getLoyalty()));
 	if (info->getCipt())
 		xml.writeTextElement("cipt", "1");
 	xml.writeEndElement(); // card
@@ -546,6 +575,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 			QMap<QString, QString> picURLs, picURLsHq, picURLsSt;
 			SetList sets;
 			int tableRow = 0;
+			int loyalty = 0;
 			bool cipt = false;
 			while (!xml.atEnd()) {
 				if (xml.readNext() == QXmlStreamReader::EndElement)
@@ -575,8 +605,10 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 					tableRow = xml.readElementText().toInt();
 				else if (xml.name() == "cipt")
 					cipt = (xml.readElementText() == "1");
+				else if (xml.name() == "loyalty")
+					loyalty = xml.readElementText().toInt();
 			}
-			cardHash.insert(name, new CardInfo(this, name, manacost, type, pt, text, colors, cipt, tableRow, sets, picURLs, picURLsHq, picURLsSt));
+			cardHash.insert(name, new CardInfo(this, name, manacost, type, pt, text, colors, loyalty, cipt, tableRow, sets, picURLs, picURLsHq, picURLsSt));
 		}
 	}
 }

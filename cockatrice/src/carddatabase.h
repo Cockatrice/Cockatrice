@@ -114,6 +114,7 @@ private:
 	QString powtough;
 	QString text;
 	QStringList colors;
+	int loyalty;
 	QMap<QString, QString> picURLs, picURLsHq, picURLsSt;
 	bool cipt;
 	int tableRow;
@@ -127,6 +128,7 @@ public:
 		const QString &_powtough = QString(),
 		const QString &_text = QString(),
 		const QStringList &_colors = QStringList(),
+		int _loyalty = 0,
 		bool cipt = false,
 		int _tableRow = 0,
 		const SetList &_sets = SetList(),
@@ -140,6 +142,7 @@ public:
 	const QString &getCardType() const { return cardtype; }
 	const QString &getPowTough() const { return powtough; }
 	const QString &getText() const { return text; }
+	const int &getLoyalty() const { return loyalty; }
 	bool getCipt() const { return cipt; }
 	void setText(const QString &_text) { text = _text; }
 	const QStringList &getColors() const { return colors; }
@@ -152,6 +155,7 @@ public:
 	QString getCorrectedName() const;
 	int getTableRow() const { return tableRow; }
 	void setTableRow(int _tableRow) { tableRow = _tableRow; }
+	void setLoyalty(int _loyalty) { loyalty = _loyalty; }
 	void setPicURL(const QString &_set, const QString &_picURL) { picURLs.insert(_set, _picURL); }
 	void setPicURLHq(const QString &_set, const QString &_picURL) { picURLsHq.insert(_set, _picURL); }
 	void setPicURLSt(const QString &_set, const QString &_picURL) { picURLsSt.insert(_set, _picURL); }
