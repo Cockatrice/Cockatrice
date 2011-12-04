@@ -262,6 +262,13 @@ void GameScene::registerAnimationItem(AbstractCardItem *card)
 		animationTimer->start(50, this);
 }
 
+void GameScene::unregisterAnimationItem(AbstractCardItem *card)
+{
+	cardsToAnimate.remove(static_cast<CardItem *>(card));
+	if (cardsToAnimate.isEmpty())
+		animationTimer->stop();
+}
+
 void GameScene::startRubberBand(const QPointF &selectionOrigin)
 {
 	emit sigStartRubberBand(selectionOrigin);

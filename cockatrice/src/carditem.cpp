@@ -2,8 +2,8 @@
 #include <QPainter>
 #include <QMenu>
 #include <QAction>
-#include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include "gamescene.h"
 #include "carditem.h"
 #include "carddragitem.h"
 #include "carddatabase.h"
@@ -369,6 +369,8 @@ void CardItem::resetState()
 	attachedCards.clear();
 	setTapped(false, false);
 	setDoesntUntap(false);
+	if (scene())
+		static_cast<GameScene *>(scene())->unregisterAnimationItem(this);
 	update();
 }
 
