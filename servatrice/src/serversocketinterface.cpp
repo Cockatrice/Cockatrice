@@ -86,6 +86,7 @@ void ServerSocketInterface::flushXmlBuffer()
 	QMutexLocker locker(&xmlBufferMutex);
 	if (xmlBuffer.isEmpty())
 		return;
+	servatrice->incTxBytes(xmlBuffer.size());
 	socket->write(xmlBuffer.toUtf8());
 	socket->flush();
 	xmlBuffer.clear();
@@ -94,6 +95,7 @@ void ServerSocketInterface::flushXmlBuffer()
 void ServerSocketInterface::readClient()
 {
 	QByteArray data = socket->readAll();
+	servatrice->incRxBytes(data.size());
 	if (!data.contains("<cmd type=\"ping\""))
 		logger->logMessage(QString(data), this);
 	xmlReader->addData(data);

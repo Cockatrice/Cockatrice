@@ -119,9 +119,11 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
 CREATE TABLE `cockatrice_uptime` (
   `id_server` tinyint(3) NOT NULL,
   `timest` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `uptime` int(11) DEFAULT NULL,
-  `users_count` int(11) DEFAULT NULL,
-  `games_count` int(11) DEFAULT NULL,
+  `uptime` int(11) NOT NULL,
+  `users_count` int(11) NOT NULL,
+  `games_count` int(11) NOT NULL,
+  `rx_bytes` int(11) NOT NULL,
+  `tx_bytes` int(11) NOT NULL,
   PRIMARY KEY (`timest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

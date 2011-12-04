@@ -398,15 +398,26 @@ void Servatrice::statusUpdate()
 	
 	uptime += statusUpdateClock->interval() / 1000;
 	
+	txBytesMutex.lock();
+	quint64 tx = txBytes;
+	txBytes = 0;
+	txBytesMutex.unlock();
+	rxBytesMutex.lock();
+	quint64 rx = rxBytes;
+	rxBytes = 0;
+	rxBytesMutex.unlock();
+	
 	QMutexLocker locker(&dbMutex);
 	checkSql();
 	
 	QSqlQuery query;
-	query.prepare("insert into " + dbPrefix + "_uptime (id_server, timest, uptime, users_count, games_count) values(:id, NOW(), :uptime, :users_count, :games_count)");
+	query.prepare("insert into " + dbPrefix + "_uptime (id_server, timest, uptime, users_count, games_count, tx_bytes, rx_bytes) values(:id, NOW(), :uptime, :users_count, :games_count, :tx, :rx)");
 	query.bindValue(":id", serverId);
 	query.bindValue(":uptime", uptime);
 	query.bindValue(":users_count", uc);
 	query.bindValue(":games_count", gc);
+	query.bindValue(":tx", tx);
+	query.bindValue(":rx", rx);
 	execSqlQuery(query);
 }
 
@@ -422,6 +433,20 @@ void Servatrice::scheduleShutdown(const QString &reason, int minutes)
 		shutdownTimer->start(60000);
 	}
 	shutdownTimeout();
+}
+
+void Servatrice::incTxBytes(quint64 num)
+{
+	txBytesMutex.lock();
+	txBytes += num;
+	txBytesMutex.unlock();
+}
+
+void Servatrice::incRxBytes(quint64 num)
+{
+	rxBytesMutex.lock();
+	rxBytes += num;
+	rxBytesMutex.unlock();
 }
 
 void Servatrice::shutdownTimeout()

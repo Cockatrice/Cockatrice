@@ -75,6 +75,8 @@ public:
 	QMap<QString, ServerInfo_User *> getBuddyList(const QString &name);
 	QMap<QString, ServerInfo_User *> getIgnoreList(const QString &name);
 	void scheduleShutdown(const QString &reason, int minutes);
+	void incTxBytes(quint64 num);
+	void incRxBytes(quint64 num);
 protected:
 	int startSession(const QString &userName, const QString &address);
 	void endSession(int sessionId);
@@ -89,6 +91,8 @@ private:
 	int serverId;
 	bool threaded;
 	int uptime;
+	QMutex txBytesMutex, rxBytesMutex;
+	quint64 txBytes, rxBytes;
 	int maxGameInactivityTime, maxPlayerInactivityTime;
 	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser;
 	ServerInfo_User *evalUserQueryResult(const QSqlQuery &query, bool complete);
