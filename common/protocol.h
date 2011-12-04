@@ -91,7 +91,7 @@ public:
 // ----------------
 // --- COMMANDS ---
 // ----------------
-
+/*
 class Command : public ProtocolItem {
 	Q_OBJECT
 signals:
@@ -105,17 +105,10 @@ public:
 	QVariant getExtraData() const { return extraData; }
 	void processResponse(ProtocolResponse *response);
 };
-
-class CommandContainer : public ProtocolItem {
+*/
+class BlaContainer : public ProtocolItem {
 	Q_OBJECT
-signals:
-	void finished(ProtocolResponse *response);
-	void finished(ResponseCode response);
 private:
-	int ticks;
-	static int lastCmdId;
-	
-	// XXX Move these out. They are only for processing inside the server.
 	ProtocolResponse *resp;
 	QList<ProtocolItem *> itemQueue;
 	GameEventContext *gameEventContext;
@@ -124,13 +117,8 @@ private:
 	GameEventContainer *gameEventQueuePrivate;
 	int privatePlayerId;
 public:
-	CommandContainer(const QList<Command *> &_commandList = QList<Command *>(), int _cmdId = -1);
-	static SerializableItem *newItem() { return new CommandContainer; }
-	int getItemId() const { return ItemId_CommandContainer; }
-	int getCmdId() const { return static_cast<SerializableItem_Int *>(itemMap.value("cmd_id"))->getData(); }
-	int tick() { return ++ticks; }
-	void processResponse(ProtocolResponse *response);
-	QList<Command *> getCommandList() const { return typecastItemList<Command *>(); }
+	BlaContainer();
+	int getItemId() const { return 102332456; }
 	
 	ProtocolResponse *getResponse() const { return resp; }
 	void setResponse(ProtocolResponse *_resp);
@@ -144,7 +132,7 @@ public:
 	void enqueueGameEventPrivate(GameEvent *event, int gameId, int playerId = -1, GameEventContext *context = 0);
 	int getPrivatePlayerId() const { return privatePlayerId; }
 };
-
+/*
 class RoomCommand : public Command {
 	Q_OBJECT
 public:
@@ -184,24 +172,6 @@ public:
 		: Command(_cmdName)
 	{
 	}
-};
-
-class Command_CreateGame : public RoomCommand {
-	Q_OBJECT
-public:
-	Command_CreateGame(int _roomId = -1, const QString &_description = QString(), const QString &_password = QString(), int _maxPlayers = -1, const QList<GameTypeId *> &_gameTypes = QList<GameTypeId *>(), bool _onlyBuddies = false, bool _onlyRegistered = false, bool _spectatorsAllowed = false, bool _spectatorsNeedPassword = false, bool _spectatorsCanTalk = false, bool _spectatorsSeeEverything = false);
-	QString getDescription() const { return static_cast<SerializableItem_String *>(itemMap.value("description"))->getData(); };
-	QString getPassword() const { return static_cast<SerializableItem_String *>(itemMap.value("password"))->getData(); };
-	int getMaxPlayers() const { return static_cast<SerializableItem_Int *>(itemMap.value("max_players"))->getData(); };
-	bool getOnlyBuddies() const { return static_cast<SerializableItem_Bool *>(itemMap.value("only_buddies"))->getData(); };
-	bool getOnlyRegistered() const { return static_cast<SerializableItem_Bool *>(itemMap.value("only_registered"))->getData(); };
-	bool getSpectatorsAllowed() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_allowed"))->getData(); };
-	bool getSpectatorsNeedPassword() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_need_password"))->getData(); };
-	bool getSpectatorsCanTalk() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_can_talk"))->getData(); };
-	bool getSpectatorsSeeEverything() const { return static_cast<SerializableItem_Bool *>(itemMap.value("spectators_see_everything"))->getData(); };
-	QList<GameTypeId *> getGameTypes() const { return typecastItemList<GameTypeId *>(); }
-	static SerializableItem *newItem() { return new Command_CreateGame; }
-	int getItemId() const { return ItemId_Command_CreateGame; }
 };
 
 class Command_DeckUpload : public Command {
@@ -246,7 +216,7 @@ public:
 	static SerializableItem *newItem() { return new Command_MoveCard; }
 	int getItemId() const { return ItemId_Command_MoveCard; }
 };
-
+*/
 // -----------------
 // --- RESPONSES ---
 // -----------------

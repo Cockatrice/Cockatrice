@@ -39,7 +39,7 @@ class ServerSocketInterface : public Server_ProtocolHandler
 private slots:
 	void readClient();
 	void catchSocketError(QAbstractSocket::SocketError socketError);
-	void processProtocolItem(ProtocolItem *item);
+//	void processProtocolItem(ProtocolItem *item);
 	void flushXmlBuffer();
 signals:
 	void xmlBufferChanged();
@@ -52,24 +52,29 @@ private:
 	QString xmlBuffer;
 	TopLevelProtocolItem *topLevelItem;
 	bool compressionSupport;
+	
+	QByteArray inputBuffer;
+	bool messageInProgress;
+	int messageLength;
+	
 	int getUserIdInDB(const QString &name) const;
 
-	ResponseCode cmdAddToList(Command_AddToList *cmd, CommandContainer *cont);
-	ResponseCode cmdRemoveFromList(Command_RemoveFromList *cmd, CommandContainer *cont);
+	ResponseCode cmdAddToList(const Command_AddToList &cmd, CommandContainer *cont);
+	ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, CommandContainer *cont);
 	int getDeckPathId(int basePathId, QStringList path);
 	int getDeckPathId(const QString &path);
 	bool deckListHelper(DeckList_Directory *folder);
-	ResponseCode cmdDeckList(Command_DeckList *cmd, CommandContainer *cont);
-	ResponseCode cmdDeckNewDir(Command_DeckNewDir *cmd, CommandContainer *cont);
+	ResponseCode cmdDeckList(const Command_DeckList &cmd, CommandContainer *cont);
+	ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, CommandContainer *cont);
 	void deckDelDirHelper(int basePathId);
-	ResponseCode cmdDeckDelDir(Command_DeckDelDir *cmd, CommandContainer *cont);
-	ResponseCode cmdDeckDel(Command_DeckDel *cmd, CommandContainer *cont);
-	ResponseCode cmdDeckUpload(Command_DeckUpload *cmd, CommandContainer *cont);
+	ResponseCode cmdDeckDelDir(const Command_DeckDelDir &cmd, CommandContainer *cont);
+	ResponseCode cmdDeckDel(const Command_DeckDel &cmd, CommandContainer *cont);
+	ResponseCode cmdDeckUpload(const Command_DeckUpload &cmd, CommandContainer *cont);
 	DeckList *getDeckFromDatabase(int deckId);
-	ResponseCode cmdDeckDownload(Command_DeckDownload *cmd, CommandContainer *cont);
-	ResponseCode cmdBanFromServer(Command_BanFromServer *cmd, CommandContainer *cont);
-	ResponseCode cmdShutdownServer(Command_ShutdownServer *cmd, CommandContainer *cont);
-	ResponseCode cmdUpdateServerMessage(Command_UpdateServerMessage *cmd, CommandContainer *cont);
+	ResponseCode cmdDeckDownload(const Command_DeckDownload &cmd, CommandContainer *cont);
+	ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, CommandContainer *cont);
+	ResponseCode cmdShutdownServer(const Command_ShutdownServer &cmd, CommandContainer *cont);
+	ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, CommandContainer *cont);
 protected:
 	bool getCompressionSupport() const { return compressionSupport; }
 public:

@@ -1,0 +1,237 @@
+import "color.proto";
+import "move_card_to_zone.proto";
+
+message Command_KickFromGame {
+	optional sint32 player_id = 1;
+}
+
+message Command_LeaveGame {
+}
+
+message Command_GameSay {
+	optional string message = 1;
+}
+
+message Command_Shuffle {
+}
+
+message Command_Mulligan {
+}
+
+message Command_RollDie {
+	optional uint32 sides = 1;
+}
+
+message Command_DrawCards {
+	optional uint32 number = 1;
+}
+
+message Command_UndoDraw {
+}
+
+message Command_FlipCard {
+	optional string zone = 1;
+	optional sint32 card_id = 2;
+	optional bool face_down = 3;
+}
+
+message Command_AttachCard {
+	optional string start_zone = 1;
+	optional sint32 card_id = 2;
+	optional sint32 target_player_id = 3;
+	optional string target_zone = 4;
+	optional sint32 target_card_id = 5;
+}
+
+message Command_CreateToken {
+	optional string zone = 1;
+	optional string card_name = 2;
+	optional string color = 3;
+	optional string pt = 4;
+	optional string annotation = 5;
+	optional bool destroy_on_zone_change = 6;
+	optional sint32 x = 7;
+	optional sint32 y = 8;
+}
+
+message Command_CreateArrow {
+	optional sint32 start_player_id = 1;
+	optional string start_zone = 2;
+	optional sint32 start_card_id = 3;
+	optional sint32 target_player_id = 4;
+	optional string target_zone = 5;
+	optional sint32 target_card_id = 6;
+	optional color arrow_color = 7;
+}
+
+message Command_DeleteArrow {
+	optional sint32 arrow_id = 1;
+}
+
+message Command_SetCardAttr {
+	optional string zone = 1;
+	optional sint32 card_id = 2;
+	optional string attr_name = 3;
+	optional string attr_value = 4;
+}
+
+message Command_SetCardCounter {
+	optional string zone = 1;
+	optional sint32 card_id = 2;
+	optional sint32 counter_id = 3;
+	optional sint32 counter_value = 4;
+}
+
+message Command_IncCardCounter {
+	optional string zone = 1;
+	optional sint32 card_id = 2;
+	optional sint32 counter_id = 3;
+	optional sint32 counter_delta = 4;
+}
+
+message Command_ReadyStart {
+	optional bool ready = 1;
+}
+
+message Command_Concede {
+}
+
+message Command_IncCounter {
+	optional sint32 counter_id = 1;
+	optional sint32 delta = 2;
+}
+
+message Command_CreateCounter {
+	optional string counter_name = 1;
+	optional color counter_color = 2;
+	optional uint32 radius = 3;
+	optional sint32 value = 4;
+}
+
+message Command_SetCounter {
+	optional sint32 counter_id = 1;
+	optional sint32 value = 2;
+}
+
+message Command_DelCounter {
+	optional sint32 counter_id = 1;
+}
+
+message Command_NextTurn {
+}
+
+message Command_SetActivePhase {
+	optional uint32 phase = 1;
+}
+
+message Command_DumpZone {
+	optional sint32 player_id = 1;
+	optional string zone_name = 2;
+	optional sint32 number_cards = 3;
+}
+
+message Command_StopDumpZone {
+	optional sint32 player_id = 1;
+	optional string zone_name = 2;
+}
+
+message Command_RevealCards {
+	optional string zone_name = 1;
+	optional sint32 card_id = 2;
+	optional sint32 player_id = 3;
+}
+
+message CardToMove {
+	optional sint32 card_id = 1;
+	optional bool face_down = 2;
+	optional string pt = 3;
+	optional bool tapped = 4;
+}
+
+message Command_MoveCard {
+	optional string start_zone = 1;
+	repeated CardToMove cards_to_move = 2;
+	optional sint32 target_player_id = 3;
+	optional string target_zone = 4;
+	optional sint32 x = 5;
+	optional sint32 y = 6;
+}
+
+message Command_SetSideboardPlan {
+	repeated MoveCard_ToZone move_list = 1;
+}
+
+message Command_DeckSelect {
+	optional string deck = 1;
+	optional sint32 deck_id = 2;
+}
+
+message GameCommand {
+	enum GameCommandType {
+		KICK_FROM_GAME = 1000;
+		LEAVE_GAME = 1001;
+		GAME_SAY = 1002;
+		SHUFFLE = 1003;
+		MULLIGAN = 1004;
+		ROLL_DIE = 1005;
+		DRAW_CARDS = 1006;
+		UNDO_DRAW = 1007;
+		FLIP_CARD = 1008;
+		ATTACH_CARD = 1009;
+		CREATE_TOKEN = 1010;
+		CREATE_ARROW = 1011;
+		DELETE_ARROW = 1012;
+		SET_CARD_ATTR = 1013;
+		SET_CARD_COUNTER = 1014;
+		INC_CARD_COUNTER = 1015;
+		READY_START = 1016;
+		CONCEDE = 1017;
+		INC_COUNTER = 1018;
+		CREATE_COUNTER = 1019;
+		SET_COUNTER = 1020;
+		DEL_COUNTER = 1021;
+		NEXT_TURN = 1022;
+		SET_ACTIVE_PHASE = 1023;
+		DUMP_ZONE = 1024;
+		STOP_DUMP_ZONE = 1025;
+		REVEAL_CARDS = 1026;
+		MOVE_CARD = 1027;
+		SET_SIDEBOARD_PLAN = 1028;
+		DECK_SELECT = 1029;
+	}
+	extensions 100 to max;
+}
+
+extend GameCommand {
+	optional Command_KickFromGame command_kick_from_game = 1000;
+	optional Command_LeaveGame command_leave_game = 1001;
+	optional Command_GameSay command_game_say = 1002;
+	optional Command_Shuffle command_shuffle = 1003;
+	optional Command_Mulligan command_mulligan = 1004;
+	optional Command_RollDie command_roll_die = 1005;
+	optional Command_DrawCards command_draw_cards = 1006;
+	optional Command_UndoDraw command_undo_draw = 1007;
+	optional Command_FlipCard command_flip_card = 1008;
+	optional Command_AttachCard command_attach_card = 1009;
+	optional Command_CreateToken command_create_token = 1010;
+	optional Command_CreateArrow command_create_arrow = 1011;
+	optional Command_DeleteArrow command_delete_arrow = 1012;
+	optional Command_SetCardAttr command_set_card_attr = 1013;
+	optional Command_SetCardCounter command_set_card_counter = 1014;
+	optional Command_IncCardCounter command_inc_card_counter = 1015;
+	optional Command_ReadyStart command_ready_start = 1016;
+	optional Command_Concede command_concede = 1017;
+	optional Command_IncCounter command_inc_counter = 1018;
+	optional Command_CreateCounter command_create_counter = 1019;
+	optional Command_SetCounter command_set_counter = 1020;
+	optional Command_DelCounter command_del_counter = 1021;
+	optional Command_NextTurn command_next_turn = 1022;
+	optional Command_SetActivePhase command_set_active_phase = 1023;
+	optional Command_DumpZone command_dump_zone = 1024;
+	optional Command_StopDumpZone command_stop_dump_zone = 1025;
+	optional Command_RevealCards command_reveal_cards = 1026;
+	optional Command_MoveCard command_move_card = 1027;
+	optional Command_SetSideboardPlan command_set_sideboard_plan = 1028;
+	optional Command_DeckSelect command_deck_select = 1029;
+}
+ 

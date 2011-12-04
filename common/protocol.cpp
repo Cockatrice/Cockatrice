@@ -28,9 +28,9 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("player_ping", ServerInfo_PlayerPing::newItem);
 	registerSerializableItem("file", DeckList_File::newItem);
 	registerSerializableItem("directory", DeckList_Directory::newItem);
-	registerSerializableItem("card_to_move", CardToMove::newItem);
+//	registerSerializableItem("card_to_move", CardToMove::newItem);
 	registerSerializableItem("game_type_id", GameTypeId::newItem);
-	
+/*	
 	registerSerializableItem("containercmd", CommandContainer::newItem);
 	registerSerializableItem("containergame_event", GameEventContainer::newItem);
 	
@@ -39,7 +39,7 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("cmddeck_select", Command_DeckSelect::newItem);
 	registerSerializableItem("cmdset_sideboard_plan", Command_SetSideboardPlan::newItem);
 	registerSerializableItem("cmdmove_card", Command_MoveCard::newItem);
-	
+*/	
 	registerSerializableItem("resp", ProtocolResponse::newItem);
 	ProtocolResponse::initializeHash();
 	registerSerializableItem("respjoin_room", Response_JoinRoom::newItem);
@@ -105,6 +105,7 @@ void TopLevelProtocolItem::writeElement(QXmlStreamWriter * /*xml*/)
 {
 }
 
+/*
 int CommandContainer::lastCmdId = 0;
 
 Command::Command(const QString &_itemName)
@@ -138,14 +139,19 @@ void CommandContainer::processResponse(ProtocolResponse *response)
 	for (int i = 0; i < cmdList.size(); ++i)
 		cmdList[i]->processResponse(response);
 }
+*/
+BlaContainer::BlaContainer()
+	: ProtocolItem("container", "cmd"), resp(0), gameEventQueuePublic(0), gameEventQueueOmniscient(0), gameEventQueuePrivate(0), privatePlayerId(-1)
+{
+}
 
-void CommandContainer::setResponse(ProtocolResponse *_resp)
+void BlaContainer::setResponse(ProtocolResponse *_resp)
 {
 	delete resp;
 	resp = _resp;
 }
 
-void CommandContainer::enqueueGameEventPublic(GameEvent *event, int gameId, GameEventContext *context)
+void BlaContainer::enqueueGameEventPublic(GameEvent *event, int gameId, GameEventContext *context)
 {
 	if (!gameEventQueuePublic)
 		gameEventQueuePublic = new GameEventContainer(QList<GameEvent *>(), gameId);
@@ -154,7 +160,7 @@ void CommandContainer::enqueueGameEventPublic(GameEvent *event, int gameId, Game
 		gameEventQueuePublic->setContext(context);
 }
 
-void CommandContainer::enqueueGameEventOmniscient(GameEvent *event, int gameId, GameEventContext *context)
+void BlaContainer::enqueueGameEventOmniscient(GameEvent *event, int gameId, GameEventContext *context)
 {
 	if (!gameEventQueueOmniscient)
 		gameEventQueueOmniscient = new GameEventContainer(QList<GameEvent *>(), gameId);
@@ -163,7 +169,7 @@ void CommandContainer::enqueueGameEventOmniscient(GameEvent *event, int gameId, 
 		gameEventQueueOmniscient->setContext(context);
 }
 
-void CommandContainer::enqueueGameEventPrivate(GameEvent *event, int gameId, int playerId, GameEventContext *context)
+void BlaContainer::enqueueGameEventPrivate(GameEvent *event, int gameId, int playerId, GameEventContext *context)
 {
 	if (!gameEventQueuePrivate)
 		gameEventQueuePrivate = new GameEventContainer(QList<GameEvent *>(), gameId);
@@ -172,7 +178,7 @@ void CommandContainer::enqueueGameEventPrivate(GameEvent *event, int gameId, int
 	if (context)
 		gameEventQueuePrivate->setContext(context);
 }
-
+/*
 Command_CreateGame::Command_CreateGame(int _roomId, const QString &_description, const QString &_password, int _maxPlayers, const QList<GameTypeId *> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything)
 	: RoomCommand("create_game", _roomId)
 {
@@ -242,7 +248,7 @@ Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, const
 	for (int i = 0; i < _cards.size(); ++i)
 		itemList.append(_cards[i]);
 }
-
+*/
 QHash<QString, ResponseCode> ProtocolResponse::responseHash;
 
 ProtocolResponse::ProtocolResponse(int _cmdId, ResponseCode _responseCode, const QString &_itemName)

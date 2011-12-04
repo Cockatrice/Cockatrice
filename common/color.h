@@ -5,10 +5,13 @@
 #include <QColor>
 #endif
 
+#include "pb/color.pb.h"
+
 class Color {
 private:
 	int value;
 public:
+	Color(const color &other) : value(other.r() * 65536 + other.g() * 256 + other.b()) { } // TEMPORARY HACK
 	Color(int _value = 0) : value(_value) { }
 	Color(int r, int g, int b) : value(r * 65536 + g * 256 + b) { }
 	int getValue() const { return value; }

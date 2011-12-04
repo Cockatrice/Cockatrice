@@ -1,0 +1,5 @@
+message MoveCard_ToZone {
+	optional string card_name = 1;
+	optional string start_zone = 2;
+	optional string target_zone = 3;
+}

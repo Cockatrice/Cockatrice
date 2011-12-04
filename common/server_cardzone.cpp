@@ -24,6 +24,7 @@
 #include <QSet>
 #include <QDebug>
 #include "server_game.h"
+#include "pb/game_commands.pb.h"
 
 Server_CardZone::Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ZoneType _type)
 	: player(_player), name(_name), has_coords(_has_coords), type(_type), cardsBeingLookedAt(0)
@@ -159,20 +160,21 @@ bool Server_CardZone::isColumnEmpty(int x, int y) const
 	return !coordMap.contains((x / 3) * 3);
 }
 
-void Server_CardZone::moveCard(CommandContainer *cont, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y)
+void Server_CardZone::moveCard(BlaContainer *bla, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y)
 {
 	QMutexLocker locker(&player->getGame()->gameMutex);
 	
 	coordMap.remove(card->getY() * 10000 + card->getX());
 	
-	CardToMove *cardToMove = new CardToMove(card->getId());
-	player->moveCard(cont, this, QList<CardToMove *>() << cardToMove, this, x, y, card->getFaceDown(), false);
+	CardToMove *cardToMove = new CardToMove;
+	cardToMove->set_card_id(card->getId());
+	player->moveCard(bla, this, QList<const CardToMove *>() << cardToMove, this, x, y, card->getFaceDown(), false);
 	delete cardToMove;
 	
 	coordMap.insert(y * 10000 + x, card);
 }
 
-void Server_CardZone::fixFreeSpaces(CommandContainer *cont)
+void Server_CardZone::fixFreeSpaces(BlaContainer *bla)
 {
 	QMutexLocker locker(&player->getGame()->gameMutex);
 	
@@ -191,15 +193,15 @@ void Server_CardZone::fixFreeSpaces(CommandContainer *cont)
 		
 		if (!coordMap.contains(y * 10000 + baseX)) {
 			if (coordMap.contains(y * 10000 + baseX + 1))
-				moveCard(cont, coordMap, coordMap.value(y * 10000 + baseX + 1), baseX, y);
+				moveCard(bla, coordMap, coordMap.value(y * 10000 + baseX + 1), baseX, y);
 			else if (coordMap.contains(y * 10000 + baseX + 2)) {
-				moveCard(cont, coordMap, coordMap.value(y * 10000 + baseX + 2), baseX, y);
+				moveCard(bla, coordMap, coordMap.value(y * 10000 + baseX + 2), baseX, y);
 				continue;
 			} else
 				continue;
 		}
 		if (!coordMap.contains(y * 10000 + baseX + 1) && coordMap.contains(y * 10000 + baseX + 2))
-			moveCard(cont, coordMap, coordMap.value(y * 10000 + baseX + 2), baseX + 1, y);
+			moveCard(bla, coordMap, coordMap.value(y * 10000 + baseX + 2), baseX + 1, y);
 	}
 }
 

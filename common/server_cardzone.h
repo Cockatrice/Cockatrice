@@ -27,7 +27,7 @@
 class Server_Card;
 class Server_Player;
 class Server_Game;
-class CommandContainer;
+class BlaContainer;
 
 class Server_CardZone {
 private:
@@ -53,8 +53,8 @@ public:
 	int getFreeGridColumn(int x, int y, const QString &cardName) const;
 	bool isColumnEmpty(int x, int y) const;
 	bool isColumnStacked(int x, int y) const;
-	void fixFreeSpaces(CommandContainer *cont);
-	void moveCard(CommandContainer *cont, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y);
+	void fixFreeSpaces(BlaContainer *bla);
+	void moveCard(BlaContainer *bla, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y);
 	QList<Server_Card *> cards;
 	void insertCard(Server_Card *card, int x, int y);
 	void shuffle();

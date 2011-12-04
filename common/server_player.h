@@ -19,6 +19,8 @@ class ProtocolItem;
 class ServerInfo_User;
 class ServerInfo_PlayerProperties;
 class CommandContainer;
+class CardToMove;
+class BlaContainer;
 
 class Server_Player : public Server_ArrowTarget {
 	Q_OBJECT
@@ -79,12 +81,12 @@ public:
 	void clearZones();
 	void setupZones();
 
-	ResponseCode drawCards(CommandContainer *cont, int number);
-	ResponseCode undoDraw(CommandContainer *cont);
-	ResponseCode moveCard(CommandContainer *cont, const QString &_startZone, const QList<CardToMove *> &_cards, int _targetPlayer, const QString &_targetZone, int _x, int _y);
-	ResponseCode moveCard(CommandContainer *cont, Server_CardZone *startzone, const QList<CardToMove *> &_cards, Server_CardZone *targetzone, int x, int y, bool fixFreeSpaces = true, bool undoingDraw = false);
-	void unattachCard(CommandContainer *cont, Server_Card *card);
-	ResponseCode setCardAttrHelper(CommandContainer *cont, const QString &zone, int cardId, const QString &attrName, const QString &attrValue);
+	ResponseCode drawCards(BlaContainer *bla, int number);
+	ResponseCode undoDraw(BlaContainer *bla);
+	ResponseCode moveCard(BlaContainer *bla, const QString &_startZone, const QList<const CardToMove *> &_cards, int _targetPlayer, const QString &_targetZone, int _x, int _y);
+	ResponseCode moveCard(BlaContainer *bla, Server_CardZone *startzone, const QList<const CardToMove *> &_cards, Server_CardZone *targetzone, int x, int y, bool fixFreeSpaces = true, bool undoingDraw = false);
+	void unattachCard(BlaContainer *bla, Server_Card *card);
+	ResponseCode setCardAttrHelper(BlaContainer *bla, const QString &zone, int cardId, const QString &attrName, const QString &attrValue);
 
 	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
 };
