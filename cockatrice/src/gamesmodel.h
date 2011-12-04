@@ -29,12 +29,10 @@ public:
 class GamesProxyModel : public QSortFilterProxyModel {
 	Q_OBJECT
 private:
-	bool fullGamesVisible;
-	bool runningGamesVisible;
+	bool unjoinableGamesVisible;
 public:
 	GamesProxyModel(QObject *parent = 0);
-	void setFullGamesVisible(bool _fullGamesVisible);
-	void setRunningGamesVisible(bool _runningGamesVisible);
+	void setUnjoinableGamesVisible(bool _unjoinableGamesVisible);
 protected:
 	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 };

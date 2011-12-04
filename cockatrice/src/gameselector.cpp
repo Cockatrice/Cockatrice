@@ -29,12 +29,10 @@ GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSuperviso
 		gameListView->header()->hideSection(1);
 	gameListView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
 
-	showFullGamesCheckBox = new QCheckBox;
-	showRunningGamesCheckBox = new QCheckBox;
+	showUnjoinableGamesCheckBox = new QCheckBox;
 	
 	QVBoxLayout *filterLayout = new QVBoxLayout;
-	filterLayout->addWidget(showFullGamesCheckBox);
-	filterLayout->addWidget(showRunningGamesCheckBox);
+	filterLayout->addWidget(showUnjoinableGamesCheckBox);
 	
 	if (room)
 		createButton = new QPushButton;
@@ -65,21 +63,15 @@ GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSuperviso
 	setMinimumWidth((qreal) (gameListView->columnWidth(0) * gameListModel->columnCount()) / 1.5);
 	setMinimumHeight(200);
 
-	connect(showFullGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showFullGamesChanged(int)));
-	connect(showRunningGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showRunningGamesChanged(int)));
+	connect(showUnjoinableGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showUnjoinableGamesChanged(int)));
 	connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
 	connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
 	connect(spectateButton, SIGNAL(clicked()), this, SLOT(actJoin()));
 }
 
-void GameSelector::showFullGamesChanged(int state)
+void GameSelector::showUnjoinableGamesChanged(int state)
 {
-	gameListProxyModel->setFullGamesVisible(state);
-}
-
-void GameSelector::showRunningGamesChanged(int state)
-{
-	gameListProxyModel->setRunningGamesVisible(state);
+	gameListProxyModel->setUnjoinableGamesVisible(state);
 }
 
 void GameSelector::actCreate()
@@ -138,8 +130,7 @@ void GameSelector::actJoin()
 void GameSelector::retranslateUi()
 {
 	setTitle(tr("Games"));
-	showFullGamesCheckBox->setText(tr("Show &full games"));
-	showRunningGamesCheckBox->setText(tr("Show &running games"));
+	showUnjoinableGamesCheckBox->setText(tr("Show u&njoinable games"));
 	if (createButton)
 		createButton->setText(tr("C&reate"));
 	joinButton->setText(tr("&Join"));
