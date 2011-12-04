@@ -106,8 +106,8 @@ void GamesModel::updateGameList(ServerInfo_Game *_game)
 	endInsertRows();
 }
 
-GamesProxyModel::GamesProxyModel(QObject *parent)
-	: QSortFilterProxyModel(parent), unjoinableGamesVisible(false)
+GamesProxyModel::GamesProxyModel(QObject *parent, ServerInfo_User *_ownUser)
+	: QSortFilterProxyModel(parent), ownUser(_ownUser), unjoinableGamesVisible(false)
 {
 	setDynamicSortFilter(true);
 }
@@ -130,6 +130,9 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourc
 			return false;
 		if (game->getStarted())
 			return false;
+		if (!(ownUser->getUserLevel() & ServerInfo_User::IsRegistered))
+			if (game->getOnlyRegistered())
+				return false;
 	}
 	
 	return true;

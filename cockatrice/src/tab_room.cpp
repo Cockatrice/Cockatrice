@@ -17,8 +17,8 @@
 #include "chatview.h"
 #include "gameselector.h"
 
-TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, ServerInfo_Room *info)
-	: Tab(_tabSupervisor), client(_client), roomId(info->getRoomId()), roomName(info->getName()), ownName(_ownName)
+TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerInfo_User *_ownUser, ServerInfo_Room *info)
+	: Tab(_tabSupervisor), client(_client), roomId(info->getRoomId()), roomName(info->getName()), ownUser(_ownUser)
 {
 	const QList<ServerInfo_GameType *> gameTypeList = info->getGameTypeList();
 	for (int i = 0; i < gameTypeList.size(); ++i)
@@ -30,7 +30,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
 	userList = new UserList(tabSupervisor, client, UserList::RoomList);
 	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
 	
-	chatView = new ChatView(ownName, true);
+	chatView = new ChatView(ownUser->getName(), true);
 	connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
 	connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
 	sayLabel = new QLabel;

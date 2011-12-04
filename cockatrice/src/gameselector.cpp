@@ -18,7 +18,7 @@ GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSuperviso
 {
 	gameListView = new QTreeView;
 	gameListModel = new GamesModel(_rooms, _gameTypes, this);
-	gameListProxyModel = new GamesProxyModel(this);
+	gameListProxyModel = new GamesProxyModel(this, room->getCurrentUser());
 	gameListProxyModel->setSourceModel(gameListModel);
 	gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 	gameListView->setModel(gameListProxyModel);

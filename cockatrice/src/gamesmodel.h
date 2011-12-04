@@ -5,6 +5,7 @@
 #include <QSortFilterProxyModel>
 #include <QList>
 #include "gametypemap.h"
+#include "protocol_datastructures.h"
 
 class ServerInfo_Game;
 
@@ -29,9 +30,10 @@ public:
 class GamesProxyModel : public QSortFilterProxyModel {
 	Q_OBJECT
 private:
+	ServerInfo_User *ownUser;
 	bool unjoinableGamesVisible;
 public:
-	GamesProxyModel(QObject *parent = 0);
+	GamesProxyModel(QObject *parent = 0, ServerInfo_User *_ownUser = 0);
 	void setUnjoinableGamesVisible(bool _unjoinableGamesVisible);
 protected:
 	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
