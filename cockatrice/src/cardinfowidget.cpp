@@ -43,6 +43,8 @@ CardInfoWidget::CardInfoWidget(ResizeMode _mode, QWidget *parent, Qt::WindowFlag
 	cardtypeLabel2->setWordWrap(true);
 	powtoughLabel1 = new QLabel;
 	powtoughLabel2 = new QLabel;
+	loyaltyLabel1 = new QLabel;
+	loyaltyLabel2 = new QLabel;
 
 	textLabel = new QTextEdit();
 	textLabel->setReadOnly(true);
@@ -60,6 +62,8 @@ CardInfoWidget::CardInfoWidget(ResizeMode _mode, QWidget *parent, Qt::WindowFlag
 	grid->addWidget(cardtypeLabel2, row++, 1);
 	grid->addWidget(powtoughLabel1, row, 0);
 	grid->addWidget(powtoughLabel2, row++, 1);
+	grid->addWidget(loyaltyLabel1, row, 0);
+	grid->addWidget(loyaltyLabel2, row++, 1);
 	grid->addWidget(textLabel, row, 0, -1, 2);
 	grid->setRowStretch(row, 1);
 	grid->setColumnStretch(1, 1);
@@ -86,12 +90,24 @@ void CardInfoWidget::minimizeClicked(int newMinimized)
 	settingsCache->setCardInfoMinimized(newMinimized);
 }
 
+bool CardInfoWidget::shouldShowPowTough()
+{
+	return (!info->getPowTough().isEmpty());
+}
+
+bool CardInfoWidget::shouldShowLoyalty()
+{
+	return (info->getMainCardType() == "Planeswalker");
+}
+
 void CardInfoWidget::setMinimized(int _minimized)
 {
 	minimized = _minimized;
 
 	// Toggle oracle fields according to selected view.
 	bool showAll = ((minimized == 1) || (minimized == 2));
+	bool showPowTough = showAll && shouldShowPowTough();
+	bool showLoyalty = showAll && shouldShowLoyalty();
 	if (mode == ModeGameTab) {
 		nameLabel1->setVisible(showAll);
 		nameLabel2->setVisible(showAll);
@@ -99,8 +115,10 @@ void CardInfoWidget::setMinimized(int _minimized)
 		manacostLabel2->setVisible(showAll);
 		cardtypeLabel1->setVisible(showAll);
 		cardtypeLabel2->setVisible(showAll);
-		powtoughLabel1->setVisible(showAll);
-		powtoughLabel2->setVisible(showAll);
+		powtoughLabel1->setVisible(showPowTough);
+		powtoughLabel2->setVisible(showPowTough);
+		loyaltyLabel1->setVisible(showLoyalty);
+		loyaltyLabel2->setVisible(showLoyalty);
 		textLabel->setVisible(showAll);
 	}
 
@@ -133,7 +151,13 @@ void CardInfoWidget::setCard(CardInfo *card)
 	manacostLabel2->setText(card->getManaCost());
 	cardtypeLabel2->setText(card->getCardType());
 	powtoughLabel2->setText(card->getPowTough());
+	loyaltyLabel2->setText(QString::number(card->getLoyalty()));
 	textLabel->setText(card->getText());
+
+	powtoughLabel1->setVisible(shouldShowPowTough());
+	powtoughLabel2->setVisible(shouldShowPowTough());
+	loyaltyLabel1->setVisible(shouldShowLoyalty());
+	loyaltyLabel2->setVisible(shouldShowLoyalty());
 }
 
 void CardInfoWidget::setCard(const QString &cardName)
@@ -166,6 +190,7 @@ void CardInfoWidget::retranslateUi()
 	manacostLabel1->setText(tr("Mana cost:"));
 	cardtypeLabel1->setText(tr("Card type:"));
 	powtoughLabel1->setText(tr("P / T:"));
+	loyaltyLabel1->setText(tr("Loyalty:"));
 }
 
 void CardInfoWidget::resizeEvent(QResizeEvent * /*event*/)

@@ -23,6 +23,7 @@ private:
 	int pixmapWidth;
 	qreal cardHeightOffset;
 	qreal aspectRatio;
+	// XXX: Why isn't this an eunm?
 	int minimized; // 0 - card, 1 - oracle only, 2 - full
 	ResizeMode mode;
 
@@ -32,7 +33,11 @@ private:
 	QLabel *manacostLabel1, *manacostLabel2;
 	QLabel *cardtypeLabel1, *cardtypeLabel2;
 	QLabel *powtoughLabel1, *powtoughLabel2;
+	QLabel *loyaltyLabel1, *loyaltyLabel2;
 	QTextEdit *textLabel;
+
+	bool shouldShowPowTough();
+	bool shouldShowLoyalty();
 
 	CardInfo *info;
 	void setMinimized(int _minimized);
