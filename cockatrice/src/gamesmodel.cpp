@@ -107,14 +107,14 @@ void GamesModel::updateGameList(ServerInfo_Game *_game)
 }
 
 GamesProxyModel::GamesProxyModel(QObject *parent, ServerInfo_User *_ownUser)
-	: QSortFilterProxyModel(parent), ownUser(_ownUser), unjoinableGamesVisible(false)
+	: QSortFilterProxyModel(parent), ownUser(_ownUser), unavailableGamesVisible(false)
 {
 	setDynamicSortFilter(true);
 }
 
-void GamesProxyModel::setUnjoinableGamesVisible(bool _unjoinableGamesVisible)
+void GamesProxyModel::setUnavailableGamesVisible(bool _unavailableGamesVisible)
 {
-	unjoinableGamesVisible = _unjoinableGamesVisible;
+	unavailableGamesVisible = _unavailableGamesVisible;
 	invalidateFilter();
 }
 
@@ -125,7 +125,7 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourc
 		return false;
 	
 	ServerInfo_Game *game = model->getGame(sourceRow);
-	if (!unjoinableGamesVisible) {
+	if (!unavailableGamesVisible) {
 		if (game->getPlayerCount() == game->getMaxPlayers())
 			return false;
 		if (game->getStarted())

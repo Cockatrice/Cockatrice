@@ -29,10 +29,10 @@ GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSuperviso
 		gameListView->header()->hideSection(1);
 	gameListView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
 
-	showUnjoinableGamesCheckBox = new QCheckBox;
+	showUnavailableGamesCheckBox = new QCheckBox;
 	
 	QVBoxLayout *filterLayout = new QVBoxLayout;
-	filterLayout->addWidget(showUnjoinableGamesCheckBox);
+	filterLayout->addWidget(showUnavailableGamesCheckBox);
 	
 	if (room)
 		createButton = new QPushButton;
@@ -63,15 +63,15 @@ GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSuperviso
 	setMinimumWidth((qreal) (gameListView->columnWidth(0) * gameListModel->columnCount()) / 1.5);
 	setMinimumHeight(200);
 
-	connect(showUnjoinableGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showUnjoinableGamesChanged(int)));
+	connect(showUnavailableGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showUnavailableGamesChanged(int)));
 	connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
 	connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
 	connect(spectateButton, SIGNAL(clicked()), this, SLOT(actJoin()));
 }
 
-void GameSelector::showUnjoinableGamesChanged(int state)
+void GameSelector::showUnavailableGamesChanged(int state)
 {
-	gameListProxyModel->setUnjoinableGamesVisible(state);
+	gameListProxyModel->setUnavailableGamesVisible(state);
 }
 
 void GameSelector::actCreate()
@@ -130,7 +130,7 @@ void GameSelector::actJoin()
 void GameSelector::retranslateUi()
 {
 	setTitle(tr("Games"));
-	showUnjoinableGamesCheckBox->setText(tr("Show u&njoinable games"));
+	showUnavailableGamesCheckBox->setText(tr("Show u&navailable games"));
 	if (createButton)
 		createButton->setText(tr("C&reate"));
 	joinButton->setText(tr("&Join"));
