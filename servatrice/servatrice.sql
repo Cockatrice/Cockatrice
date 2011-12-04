@@ -149,7 +149,7 @@ CREATE TABLE `cockatrice_buddylist` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE `cockatrice_bans` (
- `user_name` varchar(255) unsigned zerofill NOT NULL,
+ `user_name` varchar(255) NOT NULL,
  `ip_address` varchar(255) NOT NULL,
  `id_admin` int(7) unsigned zerofill NOT NULL,
  `time_from` datetime NOT NULL,
@@ -159,3 +159,12 @@ CREATE TABLE `cockatrice_bans` (
   KEY `time_from` (`time_from`,`ip_address`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+CREATE TABLE `cockatrice_sessions` (
+  `id` int(9) NOT NULL AUTO_INCREMENT,
+  `user_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `ip_address` char(15) COLLATE utf8_unicode_ci NOT NULL,
+  `start_time` datetime NOT NULL,
+  `end_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `username` (`user_name`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

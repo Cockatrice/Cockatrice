@@ -82,6 +82,9 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	users.insert(name, session);
 	qDebug() << "Server::loginUser: name=" << name;
 	
+	session->setSessionId(startSession(name, session->getAddress()));
+	qDebug() << "session id:" << session->getSessionId();
+	
 	Event_UserJoined *event = new Event_UserJoined(new ServerInfo_User(data, false));
 	for (int i = 0; i < clients.size(); ++i)
 		if (clients[i]->getAcceptsUserListChanges())
@@ -111,6 +114,10 @@ void Server::removeClient(Server_ProtocolHandler *client)
 		
 		users.remove(data->getName());
 		qDebug() << "Server::removeClient: name=" << data->getName();
+		
+		if (client->getSessionId() != -1)
+			endSession(client->getSessionId());
+		qDebug() << "closed session id:" << client->getSessionId();
 	}
 	qDebug() << "Server::removeClient:" << clients.size() << "clients; " << users.size() << "users left";
 }

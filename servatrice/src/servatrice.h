@@ -76,6 +76,8 @@ public:
 	QMap<QString, ServerInfo_User *> getIgnoreList(const QString &name);
 	void scheduleShutdown(const QString &reason, int minutes);
 protected:
+	int startSession(const QString &userName, const QString &address);
+	void endSession(int sessionId);
 	bool userExists(const QString &user);
 	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password);
 private:

@@ -300,6 +300,31 @@ int Servatrice::getUsersWithAddress(const QHostAddress &address) const
 	return result;
 }
 
+int Servatrice::startSession(const QString &userName, const QString &address)
+{
+	QMutexLocker locker(&dbMutex);
+	checkSql();
+	
+	QSqlQuery query;
+	query.prepare("insert into " + dbPrefix + "_sessions (user_name, ip_address, start_time) values(:user_name, :ip_address, NOW())");
+	query.bindValue(":user_name", userName);
+	query.bindValue(":ip_address", address);
+	if (execSqlQuery(query))
+		return query.lastInsertId().toInt();
+	return -1;
+}
+
+void Servatrice::endSession(int sessionId)
+{
+	QMutexLocker locker(&dbMutex);
+	checkSql();
+	
+	QSqlQuery query;
+	query.prepare("update " + dbPrefix + "_sessions set end_time=NOW() where id = :id_session");
+	query.bindValue(":id_session", sessionId);
+	execSqlQuery(query);
+}
+
 QMap<QString, ServerInfo_User *> Servatrice::getBuddyList(const QString &name)
 {
 	QMutexLocker locker(&dbMutex);
