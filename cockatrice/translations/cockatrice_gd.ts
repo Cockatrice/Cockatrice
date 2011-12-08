@@ -146,12 +146,13 @@
     <message>
         <location filename="../src/userlist.cpp" line="42"/>
         <source>&amp;permanent ban</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Not sure if buan should be lenited or not. Sort of feels better lenited.</translatorcomment>
+        <translation>&amp;Bac bhuan</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="43"/>
         <source>&amp;temporary ban</source>
-        <translation type="unfinished"></translation>
+        <translation>Bac &amp;sealach</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="46"/>
@@ -187,7 +188,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/userlist.cpp" line="82"/>
         <source>&amp;Cancel</source>
-        <translation>C&amp;uir dheth</translation>
+        <translation>&amp;Sguir dheth</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="98"/>
@@ -225,7 +226,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="61"/>
         <source>Card type</source>
-        <translation type="unfinished"></translation>
+        <translation>Cairt seòrsa</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="62"/>
@@ -263,7 +264,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardinfowidget.cpp" line="167"/>
         <source>Card type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Cairt seòrsa:</translation>
     </message>
     <message>
         <location filename="../src/cardinfowidget.cpp" line="168"/>
@@ -901,7 +902,8 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_cardsearch.cpp" line="18"/>
         <source>Card text:</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Not sure if this should be Teacsa cairt.</translatorcomment>
+        <translation>Cairt teacsa:</translation>
     </message>
     <message>
         <location filename="../src/dlg_cardsearch.cpp" line="21"/>
@@ -916,12 +918,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_cardsearch.cpp" line="41"/>
         <source>O&amp;K</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ceart ma-thà</translation>
     </message>
     <message>
         <location filename="../src/dlg_cardsearch.cpp" line="44"/>
         <source>&amp;Cancel</source>
-        <translation>C&amp;uir dheth</translation>
+        <translation>&amp;Sguir dheth</translation>
     </message>
     <message>
         <location filename="../src/dlg_cardsearch.cpp" line="66"/>
@@ -934,12 +936,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_connect.cpp" line="14"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ò&amp;stair:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="18"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Port:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="22"/>
@@ -959,12 +961,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_connect.cpp" line="33"/>
         <source>&amp;Cancel</source>
-        <translation>C&amp;uir dheth</translation>
+        <translation>&amp;Sguir dheth</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="55"/>
         <source>Connect to server</source>
-        <translation type="unfinished"></translation>
+        <translation>Dèan ceangal ris an fhrithealaiche</translation>
     </message>
 </context>
 <context>
@@ -1027,7 +1029,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_creategame.cpp" line="73"/>
         <source>Spectators</source>
-        <translation type="unfinished"></translation>
+        <translation>Amharcaiche</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="82"/>
@@ -1037,12 +1039,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_creategame.cpp" line="84"/>
         <source>&amp;Cancel</source>
-        <translation>C&amp;uir dheth</translation>
+        <translation>&amp;Sguir dheth</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="97"/>
         <source>Create game</source>
-        <translation type="unfinished"></translation>
+        <translation>Cruthaich gaema</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="142"/>
@@ -1052,7 +1054,8 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_creategame.cpp" line="142"/>
         <source>Server error.</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Not sure if this is correct</translatorcomment>
+        <translation>Mearachd Fhrithealaiche.</translation>
     </message>
 </context>
 <context>
@@ -1070,7 +1073,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_create_token.cpp" line="19"/>
         <source>C&amp;olor:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Dath:</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="21"/>
@@ -1105,7 +1108,8 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_create_token.cpp" line="27"/>
         <source>colorless</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>&quot;without color&quot; - not sure if there&apos;s something more idiomatic</translatorcomment>
+        <translation>gun dath</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="30"/>
@@ -1130,7 +1134,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_create_token.cpp" line="43"/>
         <source>&amp;Cancel</source>
-        <translation>C&amp;uir dheth</translation>
+        <translation>&amp;Sguir dheth</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="66"/>
@@ -1143,7 +1147,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="18"/>
         <source>&amp;Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Ù&amp;raich</translation>
     </message>
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="20"/>
@@ -1153,7 +1157,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="22"/>
         <source>&amp;Cancel</source>
-        <translation>C&amp;uir dheth</translation>
+        <translation>&amp;Sguir dheth</translation>
     </message>
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="36"/>
@@ -1181,7 +1185,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_load_remote_deck.cpp" line="17"/>
         <source>&amp;Cancel</source>
-        <translation>C&amp;uir dheth</translation>
+        <translation>&amp;Sguir dheth</translation>
     </message>
     <message>
         <location filename="../src/dlg_load_remote_deck.cpp" line="30"/>
@@ -1246,7 +1250,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_settings.cpp" line="680"/>
         <source>&amp;Close</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Dùin</translation>
     </message>
 </context>
 <context>
@@ -1417,7 +1421,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/gamesmodel.cpp" line="71"/>
         <source>Spectators</source>
-        <translation type="unfinished"></translation>
+        <translation>Amharcaiche</translation>
     </message>
 </context>
 <context>
@@ -2434,8 +2438,6 @@ Local version is %1, remote version is %2.</source>
         <source>red</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2724,7 +2726,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="717"/>
         <source>upkeep step</source>
-        <translation type="unfinished"></translation>
+        <translation>Ceum beòshlaint</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="718"/>
@@ -2810,7 +2812,8 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="151"/>
         <source>Upkeep step</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>I don&apos;t know if Ceum is the right word here - literally &quot;step&quot;, but I don&apos;t know if there&apos;s some idiom that might work better.</translatorcomment>
+        <translation>Ceum Beòshlaint</translation>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="152"/>
@@ -3005,7 +3008,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/player.cpp" line="463"/>
         <source>&amp;Library</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Leabhar-lann</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="464"/>
@@ -3275,7 +3278,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/tab_server.cpp" line="51"/>
         <source>Joi&amp;n</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Gabh pàirt</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="54"/>
@@ -3285,7 +3288,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/tab_server.cpp" line="55"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuairisgeul</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="56"/>
@@ -3331,7 +3334,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/tab_admin.cpp" line="30"/>
         <source>&amp;Cancel</source>
-        <translation>C&amp;uir dheth</translation>
+        <translation>&amp;Sguir dheth</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="46"/>
@@ -3902,7 +3905,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="186"/>
         <source>&amp;Close</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Dùin</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="187"/>
@@ -3962,7 +3965,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="221"/>
         <source>Del</source>
-        <translation type="unfinished"></translation>
+        <translation>Del</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="224"/>
