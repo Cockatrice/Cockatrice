@@ -302,7 +302,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/carditem.cpp" line="212"/>
         <source>&amp;Flip</source>
-        <translation type="unfinished"></translation>
+        <translation>Dèan &amp;flip</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="213"/>
@@ -848,7 +848,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_settings.cpp" line="490"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Coitcheann</translation>
     </message>
 </context>
 <context>
@@ -974,7 +974,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_creategame.cpp" line="17"/>
         <source>&amp;Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Tuairisgeul:</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="22"/>
@@ -1225,12 +1225,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_settings.cpp" line="674"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Coitcheann</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="675"/>
         <source>Appearance</source>
-        <translation type="unfinished"></translation>
+        <translation>Coltas</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="676"/>
@@ -1386,7 +1386,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/gamesmodel.cpp" line="64"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuairisgeul</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="65"/>
@@ -1396,7 +1396,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/gamesmodel.cpp" line="66"/>
         <source>Creator</source>
-        <translation type="unfinished"></translation>
+        <translation>Cruthadair</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="67"/>
@@ -1525,7 +1525,7 @@ Reason for shutdown: %1</source>
     <message>
         <location filename="../src/window_main.cpp" line="117"/>
         <source>Number of players</source>
-        <translation type="unfinished"></translation>
+        <translation>Àireamh de  cluicheadairean</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="117"/>
@@ -1680,7 +1680,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/window_main.cpp" line="239"/>
         <source>&amp;Full screen</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Làn-sgrìn</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="240"/>
@@ -1828,7 +1828,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="95"/>
         <source>The game has started.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tha an geama air tòiseachadh.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="102"/>
@@ -1993,7 +1993,7 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="220"/>
         <location filename="../src/messagelogwidget.cpp" line="631"/>
         <source>a card</source>
-        <translation type="unfinished"></translation>
+        <translation>cairt</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="225"/>
@@ -2438,6 +2438,8 @@ Local version is %1, remote version is %2.</source>
         <source>red</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2731,7 +2733,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="718"/>
         <source>draw step</source>
-        <translation type="unfinished"></translation>
+        <translation>ceum tarraing</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="719"/>
@@ -2818,7 +2820,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="152"/>
         <source>Draw step</source>
-        <translation type="unfinished"></translation>
+        <translation>Ceum tarraing</translation>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="153"/>
@@ -3306,12 +3308,12 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/setsmodel.cpp" line="39"/>
         <source>Short name</source>
-        <translation type="unfinished"></translation>
+        <translation>Ainm goirid</translation>
     </message>
     <message>
         <location filename="../src/setsmodel.cpp" line="40"/>
         <source>Long name</source>
-        <translation type="unfinished"></translation>
+        <translation>Anim fada</translation>
     </message>
 </context>
 <context>
@@ -3339,7 +3341,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/tab_admin.cpp" line="46"/>
         <source>Shut down server</source>
-        <translation type="unfinished"></translation>
+        <translation>Dùin am frithealaiche</translation>
     </message>
 </context>
 <context>
@@ -3352,7 +3354,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/tab_admin.cpp" line="94"/>
         <source>&amp;Shut down server</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Dùin am frithealaiche</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="95"/>
@@ -3422,7 +3424,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="113"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Sguab às</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="144"/>
@@ -3531,7 +3533,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="295"/>
         <source>&amp;Concede</source>
-        <translation>&amp;Gèill</translation>
+        <translation>&amp;Gèill an geama</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="296"/>
@@ -3541,7 +3543,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="297"/>
         <source>&amp;Leave game</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Fàg an geama</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="298"/>
@@ -3556,32 +3558,32 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="327"/>
         <source>Concede</source>
-        <translation>Gèill</translation>
+        <translation>Gèill an geama</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="327"/>
         <source>Are you sure you want to concede this game?</source>
-        <translation type="unfinished"></translation>
+        <translation>A bheil thu cinnteach gu bheil thu airson gèilleadh an geama seo?</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="336"/>
         <source>Leave game</source>
-        <translation type="unfinished"></translation>
+        <translation>Fàg an geama</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="336"/>
         <source>Are you sure you want to leave this game?</source>
-        <translation type="unfinished"></translation>
+        <translation>A bheil thu cinnteach gu bheil thu airson fàgail an geama seo?</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="680"/>
         <source>Kicked</source>
-        <translation type="unfinished"></translation>
+        <translation>Air a bhreabadh</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="680"/>
         <source>You have been kicked out of the game.</source>
-        <translation type="unfinished"></translation>
+        <translation>Chaidh do bhreabadh far an geama seo.</translation>
     </message>
     <message>
         <location filename="../src/tab_game.h" line="171"/>
@@ -3642,7 +3644,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_room.cpp" line="90"/>
         <source>&amp;Leave room</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Fàg an seòmar</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="120"/>
@@ -3671,7 +3673,8 @@ Please enter a name:</source>
     <message>
         <location filename="../src/userinfobox.cpp" line="42"/>
         <source>User information</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>No clue if this is right.</translatorcomment>
+        <translation>Fiosrachadh a&apos; cleachdaiche</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="49"/>
@@ -3681,7 +3684,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/userinfobox.cpp" line="50"/>
         <source>Gender:</source>
-        <translation type="unfinished"></translation>
+        <translation>Gnè:</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="51"/>
