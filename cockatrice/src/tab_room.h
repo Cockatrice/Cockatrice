@@ -63,7 +63,6 @@ public:
 	const QMap<int, QString> &getGameTypes() const { return gameTypes; }
 	QString getChannelName() const { return roomName; }
 	QString getTabText() const { return roomName; }
-	ServerInfo_User *getCurrentUser() { return ownUser; }
 };
 
 #endif
