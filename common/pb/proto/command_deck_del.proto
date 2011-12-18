@@ -4,5 +4,5 @@ message Command_DeckDel {
 	extend SessionCommand {
 		optional Command_DeckDel ext = 1011;
 	}
-	optional uint32 deck_id = 1;
+	optional sint32 deck_id = 1 [default = -1];
 }

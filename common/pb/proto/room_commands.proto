@@ -41,7 +41,7 @@ message Command_JoinGame {
 	extend RoomCommand {
 		optional Command_JoinGame ext = 1003;
 	}
-	optional uint32 game_id = 1;
+	optional sint32 game_id = 1 [default = -1];
 	optional string password = 2;
 	optional bool spectator = 3;
 	optional bool override_restrictions = 4;

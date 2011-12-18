@@ -3,6 +3,6 @@ message Command_SetCounter {
 	extend GameCommand {
 		optional Command_SetCounter ext = 1020;
 	}
-	optional sint32 counter_id = 1;
+	optional sint32 counter_id = 1 [default = -1];
 	optional sint32 value = 2;
 }

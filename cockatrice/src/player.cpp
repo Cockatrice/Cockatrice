@@ -357,33 +357,26 @@ void Player::playerListActionTriggered()
 {
 	QAction *action = static_cast<QAction *>(sender());
 	QMenu *menu = static_cast<QMenu *>(action->parentWidget());
-	int otherPlayerId = action->data().toInt();
 	
-	if (menu == mRevealLibrary) {
-		Command_RevealCards cmd;
-		cmd.set_zone_name("deck");
-		cmd.set_card_id(-1);
+	Command_RevealCards cmd;
+	const int otherPlayerId = action->data().toInt();
+	if (otherPlayerId != -1)
 		cmd.set_player_id(otherPlayerId);
-		sendGameCommand(cmd);
-	} else if (menu == mRevealTopCard) {
-		Command_RevealCards cmd;
+	
+	if (menu == mRevealLibrary)
+		cmd.set_zone_name("deck");
+	else if (menu == mRevealTopCard) {
 		cmd.set_zone_name("deck");
 		cmd.set_card_id(0);
-		cmd.set_player_id(otherPlayerId);
-		sendGameCommand(cmd);
-	} else if (menu == mRevealHand) {
-		Command_RevealCards cmd;
+	} else if (menu == mRevealHand)
 		cmd.set_zone_name("hand");
-		cmd.set_card_id(-1);
-		cmd.set_player_id(otherPlayerId);
-		sendGameCommand(cmd);
-	} else if (menu == mRevealRandomHandCard) {
-		Command_RevealCards cmd;
+	else if (menu == mRevealRandomHandCard) {
 		cmd.set_zone_name("hand");
 		cmd.set_card_id(-2);
-		cmd.set_player_id(otherPlayerId);
-		sendGameCommand(cmd);
-	}
+	} else
+		return;
+	
+	sendGameCommand(cmd);
 }
 
 void Player::rearrangeZones()
