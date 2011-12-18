@@ -6,7 +6,8 @@
 #include "carditem.h"
 #include "player.h"
 #include "zoneviewzone.h"
-#include "protocol_items.h"
+#include "protocol_datastructures.h"
+#include "pb/command_move_card.pb.h"
 
 CardZone::CardZone(Player *_p, const QString &_name, bool _hasCardAttr, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent, bool isView)
 	: AbstractGraphicsItem(parent), player(_p), name(_name), cards(_contentsKnown), view(NULL), menu(NULL), doubleClickAction(0), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable)
@@ -179,12 +180,17 @@ void CardZone::moveAllToZone()
 	QList<QVariant> data = static_cast<QAction *>(sender())->data().toList();
 	QString targetZone = data[0].toString();
 	int targetX = data[1].toInt();
-
-	QList<CardToMove *> idList;
-	for (int i = 0; i < cards.size(); ++i)
-		idList.append(new CardToMove(cards[i]->getId()));
 	
-	player->sendGameCommand(new Command_MoveCard(-1, getName(), idList, player->getId(), targetZone, targetX));
+	Command_MoveCard cmd;
+	cmd.set_start_zone(getName().toStdString());
+	cmd.set_target_player_id(player->getId());
+	cmd.set_target_zone(targetZone.toStdString());
+	cmd.set_x(targetX);
+	
+	for (int i = 0; i < cards.size(); ++i)
+		cmd.mutable_cards_to_move()->add_card()->set_card_id(cards[i]->getId());
+	
+	player->sendGameCommand(cmd);
 }
 
 QPointF CardZone::closestGridPoint(const QPointF &point)

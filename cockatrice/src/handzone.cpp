@@ -2,8 +2,9 @@
 #include "handzone.h"
 #include "settingscache.h"
 #include "player.h"
-#include "protocol_items.h"
 #include "carddragitem.h"
+
+#include "pb/command_move_card.pb.h"
 
 HandZone::HandZone(Player *_p, bool _contentsKnown, int _zoneHeight, QGraphicsItem *parent)
 	: SelectZone(_p, "hand", false, false, _contentsKnown, parent), zoneHeight(_zoneHeight)
@@ -39,11 +40,17 @@ void HandZone::addCardImpl(CardItem *card, int x, int /*y*/)
 
 void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &/*dropPoint*/)
 {
-	QList<CardToMove *> idList;
+	Command_MoveCard cmd;
+	cmd.set_start_zone(startZone->getName().toStdString());
+	cmd.set_target_player_id(player->getId());
+	cmd.set_target_zone(getName().toStdString());
+	cmd.set_x(cards.size());
+	cmd.set_y(-1);
+	
 	for (int i = 0; i < dragItems.size(); ++i)
-		idList.append(new CardToMove(dragItems[i]->getId()));
+		cmd.mutable_cards_to_move()->add_card()->set_card_id(dragItems[i]->getId());
 
-	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), cards.size(), -1));
+	player->sendGameCommand(cmd);
 }
 
 QRectF HandZone::boundingRect() const

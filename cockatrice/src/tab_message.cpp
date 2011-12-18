@@ -8,6 +8,9 @@
 #include "protocol_items.h"
 #include "chatview.h"
 
+#include "pending_command.h"
+#include "pb/session_commands.pb.h"
+
 TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, const QString &_userName)
 	: Tab(_tabSupervisor), client(_client), userName(_userName), userOnline(true)
 {
@@ -52,9 +55,14 @@ void TabMessage::sendMessage()
 	if (sayEdit->text().isEmpty() || !userOnline)
 	  	return;
 	
-	Command_Message *cmd = new Command_Message(userName, sayEdit->text());
-	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(messageSent(ProtocolResponse *)));
-	client->sendCommand(cmd);
+	Command_Message cmd;
+	cmd.set_user_name(userName.toStdString());
+	cmd.set_message(sayEdit->text().toStdString());
+	
+	PendingCommand *pend = client->prepareSessionCommand(cmd);
+	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(messageSent(ProtocolResponse *)));
+	client->sendCommand(pend);
+	
 	sayEdit->clear();
 }
 

@@ -6,6 +6,9 @@
 #include <QLabel>
 #include <QGridLayout>
 
+#include "pending_command.h"
+#include "pb/session_commands.pb.h"
+
 UserInfoBox::UserInfoBox(AbstractClient *_client, bool _fullInfo, QWidget *parent, Qt::WindowFlags flags)
 	: QWidget(parent, flags), client(_client), fullInfo(_fullInfo)
 {
@@ -80,9 +83,13 @@ void UserInfoBox::updateInfo(ServerInfo_User *user)
 
 void UserInfoBox::updateInfo(const QString &userName)
 {
-	Command_GetUserInfo *command = new Command_GetUserInfo(userName);
-	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(processResponse(ProtocolResponse *)));
-	client->sendCommand(command);
+	Command_GetUserInfo cmd;
+	cmd.set_user_name(userName.toStdString());
+	
+	PendingCommand *pend = client->prepareSessionCommand(cmd);
+	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(processResponse(ProtocolResponse *)));
+	
+	client->sendCommand(pend);
 }
 
 void UserInfoBox::processResponse(ProtocolResponse *r)

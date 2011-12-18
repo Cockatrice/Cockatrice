@@ -13,9 +13,13 @@
 #include "tab_userlists.h"
 #include "userlist.h"
 #include "abstractclient.h"
-#include "protocol_items.h"
 #include "chatview.h"
 #include "gameselector.h"
+#include "protocol_items.h"
+
+#include "pending_command.h"
+#include <google/protobuf/descriptor.h>
+#include "pb/room_commands.pb.h"
 
 TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, ServerInfo_Room *info)
 	: Tab(_tabSupervisor), client(_client), roomId(info->getRoomId()), roomName(info->getName()), ownName(_ownName)
@@ -108,9 +112,12 @@ void TabRoom::sendMessage()
 	if (sayEdit->text().isEmpty())
 	  	return;
 	
-	Command_RoomSay *cmd = new Command_RoomSay(roomId, sayEdit->text());
-	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(sayFinished(ProtocolResponse *)));
-	client->sendCommand(cmd);
+	Command_RoomSay cmd;
+	cmd.set_message(sayEdit->text().toStdString());
+	
+	PendingCommand *pend = prepareRoomCommand(cmd);
+	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(sayFinished(ProtocolResponse *)));
+	sendRoomCommand(pend);
 	sayEdit->clear();
 }
 
@@ -122,7 +129,7 @@ void TabRoom::sayFinished(ProtocolResponse *response)
 
 void TabRoom::actLeaveRoom()
 {
-	client->sendCommand(new Command_LeaveRoom(roomId));
+	sendRoomCommand(prepareRoomCommand(Command_LeaveRoom()));
 	deleteLater();
 }
 
@@ -160,4 +167,18 @@ void TabRoom::processSayEvent(Event_RoomSay *event)
 	if (!tabSupervisor->getUserListsTab()->getIgnoreList()->userInList(event->getPlayerName()))
 		chatView->appendMessage(event->getPlayerName(), event->getMessage());
 	emit userEvent(false);
+}
+
+PendingCommand *TabRoom::prepareRoomCommand(const ::google::protobuf::Message &cmd)
+{
+	CommandContainer cont;
+	RoomCommand *c = cont.add_room_command();
+	cont.set_room_id(roomId);
+	c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
+	return new PendingCommand(cont);
+}
+
+void TabRoom::sendRoomCommand(PendingCommand *pend)
+{
+	client->sendCommand(pend);
 }

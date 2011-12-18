@@ -29,8 +29,9 @@ private:
 	QTimer *timer;
 	QTcpSocket *socket;
 	QXmlStreamReader *xmlReader;
-	QXmlStreamWriter *xmlWriter;
 	TopLevelProtocolItem *topLevelItem;
+	
+	void sendCommandContainer(const CommandContainer &cont);
 public:
 	RemoteClient(QObject *parent = 0);
 	~RemoteClient();
@@ -38,8 +39,6 @@ public:
 
 	void connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
 	void disconnectFromServer();
-	
-	void sendCommandContainer(CommandContainer *cont);
 };
 
 #endif

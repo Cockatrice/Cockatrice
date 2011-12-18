@@ -13,7 +13,7 @@ public:
 	LocalClient(LocalServerInterface *_lsi, const QString &_playerName, QObject *parent = 0);
 	~LocalClient();
 	
-	void sendCommandContainer(CommandContainer *cont);
+	void sendCommandContainer(const CommandContainer &cont);
 	
 private slots:
 	void itemFromServer(ProtocolItem *item);

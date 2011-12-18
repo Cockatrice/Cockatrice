@@ -13,6 +13,41 @@
 #include "decklist.h"
 #include <QDateTime>
 #include "pb/commands.pb.h"
+#include "pb/command_attach_card.pb.h"
+#include "pb/command_concede.pb.h"
+#include "pb/command_create_arrow.pb.h"
+#include "pb/command_create_counter.pb.h"
+#include "pb/command_create_token.pb.h"
+#include "pb/command_deck_select.pb.h"
+#include "pb/command_del_counter.pb.h"
+#include "pb/command_delete_arrow.pb.h"
+#include "pb/command_draw_cards.pb.h"
+#include "pb/command_dump_zone.pb.h"
+#include "pb/command_flip_card.pb.h"
+#include "pb/command_game_say.pb.h"
+#include "pb/command_inc_card_counter.pb.h"
+#include "pb/command_inc_counter.pb.h"
+#include "pb/command_kick_from_game.pb.h"
+#include "pb/command_leave_game.pb.h"
+#include "pb/command_move_card.pb.h"
+#include "pb/command_mulligan.pb.h"
+#include "pb/command_next_turn.pb.h"
+#include "pb/command_ready_start.pb.h"
+#include "pb/command_reveal_cards.pb.h"
+#include "pb/command_roll_die.pb.h"
+#include "pb/command_set_active_phase.pb.h"
+#include "pb/command_set_card_attr.pb.h"
+#include "pb/command_set_card_counter.pb.h"
+#include "pb/command_set_counter.pb.h"
+#include "pb/command_set_sideboard_plan.pb.h"
+#include "pb/command_shuffle.pb.h"
+#include "pb/command_stop_dump_zone.pb.h"
+#include "pb/command_undo_draw.pb.h"
+#include "pb/command_deck_upload.pb.h"
+#include "pb/command_deck_download.pb.h"
+#include "pb/command_deck_new_dir.pb.h"
+#include "pb/command_deck_del_dir.pb.h"
+#include "pb/command_deck_del.pb.h"
 #include <google/protobuf/descriptor.h>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
@@ -76,33 +111,33 @@ ResponseCode Server_ProtocolHandler::processSessionCommandContainer(CommandConta
 {
 	ResponseCode finalResponseCode = RespOk;
 	for (int i = cont->session_command_size() - 1; i >= 0; --i) {
-		ResponseCode resp;
+		ResponseCode resp = RespInvalidCommand;
 		const SessionCommand &sc = cont->session_command(i);
 		std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
 		sc.GetReflection()->ListFields(sc, &fieldList);
 		int num = 0;
 		for (unsigned int j = 0; j < fieldList.size(); ++j)
-			if (fieldList[j]->number() >= 100) {
+			if (fieldList[j]->is_extension()) {
 				num = fieldList[j]->number();
 				break;
 			}
 		switch ((SessionCommand::SessionCommandType) num) {
-			case SessionCommand::PING: resp = cmdPing(sc.GetExtension(command_ping), cont); break;
-			case SessionCommand::LOGIN: resp = cmdLogin(sc.GetExtension(command_login), cont, bla); break;
-			case SessionCommand::MESSAGE: resp = cmdMessage(sc.GetExtension(command_message), cont, bla); break;
-			case SessionCommand::ADD_TO_LIST: resp = cmdAddToList(sc.GetExtension(command_add_to_list), cont); break;
-			case SessionCommand::REMOVE_FROM_LIST: resp = cmdRemoveFromList(sc.GetExtension(command_remove_from_list), cont); break;
-			case SessionCommand::DECK_LIST: resp = cmdDeckList(sc.GetExtension(command_deck_list), cont); break;
-			case SessionCommand::DECK_NEW_DIR: resp = cmdDeckNewDir(sc.GetExtension(command_deck_new_dir), cont); break;
-			case SessionCommand::DECK_DEL_DIR: resp = cmdDeckDelDir(sc.GetExtension(command_deck_del_dir), cont); break;
-			case SessionCommand::DECK_DEL: resp = cmdDeckDel(sc.GetExtension(command_deck_del), cont); break;
-			case SessionCommand::DECK_UPLOAD: resp = cmdDeckUpload(sc.GetExtension(command_deck_upload), cont); break;
-			case SessionCommand::DECK_DOWNLOAD: resp = cmdDeckDownload(sc.GetExtension(command_deck_download), cont); break;
-			case SessionCommand::GET_GAMES_OF_USER: resp = cmdGetGamesOfUser(sc.GetExtension(command_get_games_of_user), cont, bla); break;
-			case SessionCommand::GET_USER_INFO: resp = cmdGetUserInfo(sc.GetExtension(command_get_user_info), cont, bla); break;
-			case SessionCommand::LIST_ROOMS: resp = cmdListRooms(sc.GetExtension(command_list_rooms), cont, bla); break;
-			case SessionCommand::JOIN_ROOM: resp = cmdJoinRoom(sc.GetExtension(command_join_room), cont, bla); break;
-			case SessionCommand::LIST_USERS: resp = cmdListUsers(sc.GetExtension(command_list_users), cont, bla); break;
+			case SessionCommand::PING: resp = cmdPing(sc.GetExtension(Command_Ping::ext), cont); break;
+			case SessionCommand::LOGIN: resp = cmdLogin(sc.GetExtension(Command_Login::ext), cont, bla); break;
+			case SessionCommand::MESSAGE: resp = cmdMessage(sc.GetExtension(Command_Message::ext), cont, bla); break;
+			case SessionCommand::ADD_TO_LIST: resp = cmdAddToList(sc.GetExtension(Command_AddToList::ext), cont); break;
+			case SessionCommand::REMOVE_FROM_LIST: resp = cmdRemoveFromList(sc.GetExtension(Command_RemoveFromList::ext), cont); break;
+			case SessionCommand::DECK_LIST: resp = cmdDeckList(sc.GetExtension(Command_DeckList::ext), cont); break;
+			case SessionCommand::DECK_NEW_DIR: resp = cmdDeckNewDir(sc.GetExtension(Command_DeckNewDir::ext), cont); break;
+			case SessionCommand::DECK_DEL_DIR: resp = cmdDeckDelDir(sc.GetExtension(Command_DeckDelDir::ext), cont); break;
+			case SessionCommand::DECK_DEL: resp = cmdDeckDel(sc.GetExtension(Command_DeckDel::ext), cont); break;
+			case SessionCommand::DECK_UPLOAD: resp = cmdDeckUpload(sc.GetExtension(Command_DeckUpload::ext), cont); break;
+			case SessionCommand::DECK_DOWNLOAD: resp = cmdDeckDownload(sc.GetExtension(Command_DeckDownload::ext), cont); break;
+			case SessionCommand::GET_GAMES_OF_USER: resp = cmdGetGamesOfUser(sc.GetExtension(Command_GetGamesOfUser::ext), cont, bla); break;
+			case SessionCommand::GET_USER_INFO: resp = cmdGetUserInfo(sc.GetExtension(Command_GetUserInfo::ext), cont, bla); break;
+			case SessionCommand::LIST_ROOMS: resp = cmdListRooms(sc.GetExtension(Command_ListRooms::ext), cont, bla); break;
+			case SessionCommand::JOIN_ROOM: resp = cmdJoinRoom(sc.GetExtension(Command_JoinRoom::ext), cont, bla); break;
+			case SessionCommand::LIST_USERS: resp = cmdListUsers(sc.GetExtension(Command_ListUsers::ext), cont, bla); break;
 		}
 		if ((resp != RespOk) && (resp != RespNothing))
 			finalResponseCode = resp;
@@ -123,21 +158,21 @@ ResponseCode Server_ProtocolHandler::processRoomCommandContainer(CommandContaine
 
 	ResponseCode finalResponseCode = RespOk;
 	for (int i = cont->room_command_size() - 1; i >= 0; --i) {
-		ResponseCode resp;
+		ResponseCode resp = RespInvalidCommand;
 		const RoomCommand &sc = cont->room_command(i);
 		std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
 		sc.GetReflection()->ListFields(sc, &fieldList);
 		int num = 0;
 		for (unsigned int j = 0; j < fieldList.size(); ++j)
-			if (fieldList[j]->number() >= 100) {
+			if (fieldList[j]->is_extension()) {
 				num = fieldList[j]->number();
 				break;
 			}
 		switch ((RoomCommand::RoomCommandType) num) {
-			case RoomCommand::LEAVE_ROOM: resp = cmdLeaveRoom(sc.GetExtension(command_leave_room), cont, room); break;
-			case RoomCommand::ROOM_SAY: resp = cmdRoomSay(sc.GetExtension(command_room_say), cont, room); break;
-			case RoomCommand::CREATE_GAME: resp = cmdCreateGame(sc.GetExtension(command_create_game), cont, room); break;
-			case RoomCommand::JOIN_GAME: resp = cmdJoinGame(sc.GetExtension(command_join_game), cont, room); break;
+			case RoomCommand::LEAVE_ROOM: resp = cmdLeaveRoom(sc.GetExtension(Command_LeaveRoom::ext), cont, room); break;
+			case RoomCommand::ROOM_SAY: resp = cmdRoomSay(sc.GetExtension(Command_RoomSay::ext), cont, room); break;
+			case RoomCommand::CREATE_GAME: resp = cmdCreateGame(sc.GetExtension(Command_CreateGame::ext), cont, room); break;
+			case RoomCommand::JOIN_GAME: resp = cmdJoinGame(sc.GetExtension(Command_JoinGame::ext), cont, room); break;
 		}
 		if ((resp != RespOk) && (resp != RespNothing))
 			finalResponseCode = resp;
@@ -164,47 +199,47 @@ ResponseCode Server_ProtocolHandler::processGameCommandContainer(CommandContaine
 
 	ResponseCode finalResponseCode = RespOk;
 	for (int i = cont->game_command_size() - 1; i >= 0; --i) {
-		ResponseCode resp;
+		ResponseCode resp = RespInvalidCommand;
 		const GameCommand &sc = cont->game_command(i);
 		std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
 		sc.GetReflection()->ListFields(sc, &fieldList);
 		int num = 0;
 		for (unsigned int j = 0; j < fieldList.size(); ++j)
-			if (fieldList[j]->number() >= 100) {
+			if (fieldList[j]->is_extension()) {
 				num = fieldList[j]->number();
 				break;
 			}
 		switch ((GameCommand::GameCommandType) num) {
-			case GameCommand::KICK_FROM_GAME: resp = cmdKickFromGame(sc.GetExtension(command_kick_from_game), cont, game, player, bla); break;
-			case GameCommand::LEAVE_GAME: resp = cmdLeaveGame(sc.GetExtension(command_leave_game), cont, game, player, bla); break;
-			case GameCommand::GAME_SAY: resp = cmdGameSay(sc.GetExtension(command_game_say), cont, game, player, bla); break;
-			case GameCommand::SHUFFLE: resp = cmdShuffle(sc.GetExtension(command_shuffle), cont, game, player, bla); break;
-			case GameCommand::MULLIGAN: resp = cmdMulligan(sc.GetExtension(command_mulligan), cont, game, player, bla); break;
-			case GameCommand::ROLL_DIE: resp = cmdRollDie(sc.GetExtension(command_roll_die), cont, game, player, bla); break;
-			case GameCommand::DRAW_CARDS: resp = cmdDrawCards(sc.GetExtension(command_draw_cards), cont, game, player, bla); break;
-			case GameCommand::UNDO_DRAW: resp = cmdUndoDraw(sc.GetExtension(command_undo_draw), cont, game, player, bla); break;
-			case GameCommand::FLIP_CARD: resp = cmdFlipCard(sc.GetExtension(command_flip_card), cont, game, player, bla); break;
-			case GameCommand::ATTACH_CARD: resp = cmdAttachCard(sc.GetExtension(command_attach_card), cont, game, player, bla); break;
-			case GameCommand::CREATE_TOKEN: resp = cmdCreateToken(sc.GetExtension(command_create_token), cont, game, player, bla); break;
-			case GameCommand::CREATE_ARROW: resp = cmdCreateArrow(sc.GetExtension(command_create_arrow), cont, game, player, bla); break;
-			case GameCommand::DELETE_ARROW: resp = cmdDeleteArrow(sc.GetExtension(command_delete_arrow), cont, game, player, bla); break;
-			case GameCommand::SET_CARD_ATTR: resp = cmdSetCardAttr(sc.GetExtension(command_set_card_attr), cont, game, player, bla); break;
-			case GameCommand::SET_CARD_COUNTER: resp = cmdSetCardCounter(sc.GetExtension(command_set_card_counter), cont, game, player, bla); break;
-			case GameCommand::INC_CARD_COUNTER: resp = cmdIncCardCounter(sc.GetExtension(command_inc_card_counter), cont, game, player, bla); break;
-			case GameCommand::READY_START: resp = cmdReadyStart(sc.GetExtension(command_ready_start), cont, game, player, bla); break;
-			case GameCommand::CONCEDE: resp = cmdConcede(sc.GetExtension(command_concede), cont, game, player, bla); break;
-			case GameCommand::INC_COUNTER: resp = cmdIncCounter(sc.GetExtension(command_inc_counter), cont, game, player, bla); break;
-			case GameCommand::CREATE_COUNTER: resp = cmdCreateCounter(sc.GetExtension(command_create_counter), cont, game, player, bla); break;
-			case GameCommand::SET_COUNTER: resp = cmdSetCounter(sc.GetExtension(command_set_counter), cont, game, player, bla); break;
-			case GameCommand::DEL_COUNTER: resp = cmdDelCounter(sc.GetExtension(command_del_counter), cont, game, player, bla); break;
-			case GameCommand::NEXT_TURN: resp = cmdNextTurn(sc.GetExtension(command_next_turn), cont, game, player, bla); break;
-			case GameCommand::SET_ACTIVE_PHASE: resp = cmdSetActivePhase(sc.GetExtension(command_set_active_phase), cont, game, player, bla); break;
-			case GameCommand::DUMP_ZONE: resp = cmdDumpZone(sc.GetExtension(command_dump_zone), cont, game, player, bla); break;
-			case GameCommand::STOP_DUMP_ZONE: resp = cmdStopDumpZone(sc.GetExtension(command_stop_dump_zone), cont, game, player, bla); break;
-			case GameCommand::REVEAL_CARDS: resp = cmdRevealCards(sc.GetExtension(command_reveal_cards), cont, game, player, bla); break;
-			case GameCommand::MOVE_CARD: resp = cmdMoveCard(sc.GetExtension(command_move_card), cont, game, player, bla); break;
-			case GameCommand::SET_SIDEBOARD_PLAN: resp = cmdSetSideboardPlan(sc.GetExtension(command_set_sideboard_plan), cont, game, player, bla); break;
-			case GameCommand::DECK_SELECT: resp = cmdDeckSelect(sc.GetExtension(command_deck_select), cont, game, player, bla); break;
+			case GameCommand::KICK_FROM_GAME: resp = cmdKickFromGame(sc.GetExtension(Command_KickFromGame::ext), cont, game, player, bla); break;
+			case GameCommand::LEAVE_GAME: resp = cmdLeaveGame(sc.GetExtension(Command_LeaveGame::ext), cont, game, player, bla); break;
+			case GameCommand::GAME_SAY: resp = cmdGameSay(sc.GetExtension(Command_GameSay::ext), cont, game, player, bla); break;
+			case GameCommand::SHUFFLE: resp = cmdShuffle(sc.GetExtension(Command_Shuffle::ext), cont, game, player, bla); break;
+			case GameCommand::MULLIGAN: resp = cmdMulligan(sc.GetExtension(Command_Mulligan::ext), cont, game, player, bla); break;
+			case GameCommand::ROLL_DIE: resp = cmdRollDie(sc.GetExtension(Command_RollDie::ext), cont, game, player, bla); break;
+			case GameCommand::DRAW_CARDS: resp = cmdDrawCards(sc.GetExtension(Command_DrawCards::ext), cont, game, player, bla); break;
+			case GameCommand::UNDO_DRAW: resp = cmdUndoDraw(sc.GetExtension(Command_UndoDraw::ext), cont, game, player, bla); break;
+			case GameCommand::FLIP_CARD: resp = cmdFlipCard(sc.GetExtension(Command_FlipCard::ext), cont, game, player, bla); break;
+			case GameCommand::ATTACH_CARD: resp = cmdAttachCard(sc.GetExtension(Command_AttachCard::ext), cont, game, player, bla); break;
+			case GameCommand::CREATE_TOKEN: resp = cmdCreateToken(sc.GetExtension(Command_CreateToken::ext), cont, game, player, bla); break;
+			case GameCommand::CREATE_ARROW: resp = cmdCreateArrow(sc.GetExtension(Command_CreateArrow::ext), cont, game, player, bla); break;
+			case GameCommand::DELETE_ARROW: resp = cmdDeleteArrow(sc.GetExtension(Command_DeleteArrow::ext), cont, game, player, bla); break;
+			case GameCommand::SET_CARD_ATTR: resp = cmdSetCardAttr(sc.GetExtension(Command_SetCardAttr::ext), cont, game, player, bla); break;
+			case GameCommand::SET_CARD_COUNTER: resp = cmdSetCardCounter(sc.GetExtension(Command_SetCardCounter::ext), cont, game, player, bla); break;
+			case GameCommand::INC_CARD_COUNTER: resp = cmdIncCardCounter(sc.GetExtension(Command_IncCardCounter::ext), cont, game, player, bla); break;
+			case GameCommand::READY_START: resp = cmdReadyStart(sc.GetExtension(Command_ReadyStart::ext), cont, game, player, bla); break;
+			case GameCommand::CONCEDE: resp = cmdConcede(sc.GetExtension(Command_Concede::ext), cont, game, player, bla); break;
+			case GameCommand::INC_COUNTER: resp = cmdIncCounter(sc.GetExtension(Command_IncCounter::ext), cont, game, player, bla); break;
+			case GameCommand::CREATE_COUNTER: resp = cmdCreateCounter(sc.GetExtension(Command_CreateCounter::ext), cont, game, player, bla); break;
+			case GameCommand::SET_COUNTER: resp = cmdSetCounter(sc.GetExtension(Command_SetCounter::ext), cont, game, player, bla); break;
+			case GameCommand::DEL_COUNTER: resp = cmdDelCounter(sc.GetExtension(Command_DelCounter::ext), cont, game, player, bla); break;
+			case GameCommand::NEXT_TURN: resp = cmdNextTurn(sc.GetExtension(Command_NextTurn::ext), cont, game, player, bla); break;
+			case GameCommand::SET_ACTIVE_PHASE: resp = cmdSetActivePhase(sc.GetExtension(Command_SetActivePhase::ext), cont, game, player, bla); break;
+			case GameCommand::DUMP_ZONE: resp = cmdDumpZone(sc.GetExtension(Command_DumpZone::ext), cont, game, player, bla); break;
+			case GameCommand::STOP_DUMP_ZONE: resp = cmdStopDumpZone(sc.GetExtension(Command_StopDumpZone::ext), cont, game, player, bla); break;
+			case GameCommand::REVEAL_CARDS: resp = cmdRevealCards(sc.GetExtension(Command_RevealCards::ext), cont, game, player, bla); break;
+			case GameCommand::MOVE_CARD: resp = cmdMoveCard(sc.GetExtension(Command_MoveCard::ext), cont, game, player, bla); break;
+			case GameCommand::SET_SIDEBOARD_PLAN: resp = cmdSetSideboardPlan(sc.GetExtension(Command_SetSideboardPlan::ext), cont, game, player, bla); break;
+			case GameCommand::DECK_SELECT: resp = cmdDeckSelect(sc.GetExtension(Command_DeckSelect::ext), cont, game, player, bla); break;
 		}
 		if ((resp != RespOk) && (resp != RespNothing))
 			finalResponseCode = resp;
@@ -214,23 +249,25 @@ ResponseCode Server_ProtocolHandler::processGameCommandContainer(CommandContaine
 
 ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(CommandContainer *cont, BlaContainer *bla)
 {
+	if (!userInfo)
+		return RespLoginNeeded;
 	if (!(userInfo->getUserLevel() & ServerInfo_User::IsModerator))
 		return RespLoginNeeded;
 
 	ResponseCode finalResponseCode = RespOk;
 	for (int i = cont->moderator_command_size() - 1; i >= 0; --i) {
-		ResponseCode resp;
+		ResponseCode resp = RespInvalidCommand;
 		const ModeratorCommand &sc = cont->moderator_command(i);
 		std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
 		sc.GetReflection()->ListFields(sc, &fieldList);
 		int num = 0;
 		for (unsigned int j = 0; j < fieldList.size(); ++j)
-			if (fieldList[j]->number() >= 100) {
+			if (fieldList[j]->is_extension()) {
 				num = fieldList[j]->number();
 				break;
 			}
 		switch ((ModeratorCommand::ModeratorCommandType) num) {
-			case ModeratorCommand::BAN_FROM_SERVER: resp = cmdBanFromServer(sc.GetExtension(command_ban_from_server), cont); break;
+			case ModeratorCommand::BAN_FROM_SERVER: resp = cmdBanFromServer(sc.GetExtension(Command_BanFromServer::ext), cont); break;
 		}
 		if ((resp != RespOk) && (resp != RespNothing))
 			finalResponseCode = resp;
@@ -240,24 +277,26 @@ ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(CommandCon
 
 ResponseCode Server_ProtocolHandler::processAdminCommandContainer(CommandContainer *cont, BlaContainer *bla)
 {
+	if (!userInfo)
+		return RespLoginNeeded;
 	if (!(userInfo->getUserLevel() & ServerInfo_User::IsAdmin))
 		return RespLoginNeeded;
 
 	ResponseCode finalResponseCode = RespOk;
 	for (int i = cont->admin_command_size() - 1; i >= 0; --i) {
-		ResponseCode resp;
+		ResponseCode resp = RespInvalidCommand;
 		const AdminCommand &sc = cont->admin_command(i);
 		std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
 		sc.GetReflection()->ListFields(sc, &fieldList);
 		int num = 0;
 		for (unsigned int j = 0; j < fieldList.size(); ++j)
-			if (fieldList[j]->number() >= 100) {
+			if (fieldList[j]->is_extension()) {
 				num = fieldList[j]->number();
 				break;
 			}
 		switch ((AdminCommand::AdminCommandType) num) {
-			case AdminCommand::SHUTDOWN_SERVER: resp = cmdShutdownServer(sc.GetExtension(command_shutdown_server), cont); break;
-			case AdminCommand::UPDATE_SERVER_MESSAGE: resp = cmdUpdateServerMessage(sc.GetExtension(command_update_server_message), cont); break;
+			case AdminCommand::SHUTDOWN_SERVER: resp = cmdShutdownServer(sc.GetExtension(Command_ShutdownServer::ext), cont); break;
+			case AdminCommand::UPDATE_SERVER_MESSAGE: resp = cmdUpdateServerMessage(sc.GetExtension(Command_UpdateServerMessage::ext), cont); break;
 		}
 		if ((resp != RespOk) && (resp != RespNothing))
 			finalResponseCode = resp;
@@ -857,8 +896,8 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(const Command_MoveCard &cmd, Co
 		return RespContextError;
 	
 	QList<const CardToMove *> cardsToMove;
-	for (int i = 0; i < cmd.cards_to_move_size(); ++i)
-		cardsToMove.append(&cmd.cards_to_move(i));
+	for (int i = 0; i < cmd.cards_to_move().card_size(); ++i)
+		cardsToMove.append(&cmd.cards_to_move().card(i));
 	
 	return player->moveCard(bla, QString::fromStdString(cmd.start_zone()), cardsToMove, cmd.target_player_id(), QString::fromStdString(cmd.target_zone()), cmd.x(), cmd.y());
 }

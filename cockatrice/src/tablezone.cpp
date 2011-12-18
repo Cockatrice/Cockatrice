@@ -4,11 +4,13 @@
 #include <math.h>
 #include "tablezone.h"
 #include "player.h"
-#include "protocol_items.h"
 #include "settingscache.h"
 #include "arrowitem.h"
 #include "carddragitem.h"
 #include "carddatabase.h"
+
+#include "pb/command_move_card.pb.h"
+#include "pb/command_set_card_attr.pb.h"
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 	: SelectZone(_p, "table", true, false, true, parent), active(false)
@@ -93,11 +95,21 @@ void TableZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone
 
 void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &gridPoint)
 {
-	QList<CardToMove *> idList;
-	for (int i = 0; i < dragItems.size(); ++i)
-		idList.append(new CardToMove(dragItems[i]->getId(), dragItems[i]->getFaceDown(), startZone->getName() == name ? QString() : dragItems[i]->getItem()->getInfo()->getPowTough()));
+	Command_MoveCard cmd;
+	cmd.set_start_zone(startZone->getName().toStdString());
+	cmd.set_target_player_id(player->getId());
+	cmd.set_target_zone(getName().toStdString());
+	cmd.set_x(gridPoint.x());
+	cmd.set_y(gridPoint.y());
 	
-	startZone->getPlayer()->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), gridPoint.x(), gridPoint.y()));
+	for (int i = 0; i < dragItems.size(); ++i) {
+		CardToMove *ctm = cmd.mutable_cards_to_move()->add_card();
+		ctm->set_card_id(dragItems[i]->getId());
+		ctm->set_face_down(dragItems[i]->getFaceDown());
+		ctm->set_pt(startZone->getName() == name ? std::string() : dragItems[i]->getItem()->getInfo()->getPowTough().toStdString());
+	}
+	
+	startZone->getPlayer()->sendGameCommand(cmd);
 }
 
 void TableZone::reorganizeCards()
@@ -181,13 +193,19 @@ void TableZone::toggleTapped()
 			tapAll = true;
 			break;
 		}
-	QList<Command *> cmdList;
+	QList< const ::google::protobuf::Message * > cmdList;
 	for (int i = 0; i < selectedItems.size(); i++) {
 		CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItems[i]);
-		if (temp->getTapped() != tapAll)
-			cmdList.append(new Command_SetCardAttr(-1, name, temp->getId(), "tapped", tapAll ? "1" : "0"));
+		if (temp->getTapped() != tapAll) {
+			Command_SetCardAttr *cmd = new Command_SetCardAttr;
+			cmd->set_zone(name.toStdString());
+			cmd->set_card_id(temp->getId());
+			cmd->set_attr_name("tapped");
+			cmd->set_attr_value(tapAll ? "1" : "0");
+			cmdList.append(cmd);
+		}
 	}
-	player->sendCommandContainer(new CommandContainer(cmdList));
+	player->sendGameCommand(player->prepareGameCommand(cmdList));
 }
 
 CardItem *TableZone::takeCard(int position, int cardId, bool canResize)

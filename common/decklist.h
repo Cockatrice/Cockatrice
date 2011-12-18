@@ -9,6 +9,8 @@
 #include <QSet>
 #include "serializable_item.h"
 
+#include "pb/move_card_to_zone.pb.h"
+
 class CardDatabase;
 class QIODevice;
 class QTextStream;
@@ -25,6 +27,7 @@ public:
 	QString getCardName() const { return static_cast<SerializableItem_String *>(itemMap.value("card_name"))->getData(); }
 	QString getStartZone() const { return static_cast<SerializableItem_String *>(itemMap.value("start_zone"))->getData(); }
 	QString getTargetZone() const { return static_cast<SerializableItem_String *>(itemMap.value("target_zone"))->getData(); }
+	MoveCard_ToZone toPB() { MoveCard_ToZone foo; foo.set_card_name(getCardName().toStdString()); foo.set_start_zone(getStartZone().toStdString()); foo.set_target_zone(getTargetZone().toStdString()); return foo; } // XXX
 };
 
 class SideboardPlan : public SerializableItem_Map {

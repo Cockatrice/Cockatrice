@@ -2,8 +2,13 @@
 #include <QDebug>
 #include "zoneviewzone.h"
 #include "player.h"
-#include "protocol_items.h"
 #include "carddragitem.h"
+#include "protocol_items.h"
+
+#include "protocol_datastructures.h"
+#include "pb/command_dump_zone.pb.h"
+#include "pb/command_move_card.pb.h"
+#include "pending_command.h"
 
 ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, bool _revealZone, QGraphicsItem *parent)
 	: SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0), numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone), sortByName(false), sortByType(false)
@@ -36,9 +41,14 @@ void ZoneViewZone::initializeCards(const QList<ServerInfo_Card *> &cardList)
 			addCard(new CardItem(player, cardList[i]->getName(), cardList[i]->getId(), revealZone, this), false, i);
 		reorganizeCards();
 	} else if (!origZone->contentsKnown()) {
-		Command_DumpZone *command = new Command_DumpZone(-1, player->getId(), name, numberCards);
-		connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(zoneDumpReceived(ProtocolResponse *)));
-		player->sendGameCommand(command);
+		Command_DumpZone cmd;
+		cmd.set_player_id(player->getId());
+		cmd.set_zone_name(name.toStdString());
+		cmd.set_number_cards(numberCards);
+		
+		PendingCommand *pend = player->prepareGameCommand(cmd);
+		connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(zoneDumpReceived(ProtocolResponse *)));
+		player->sendGameCommand(pend);
 	} else {
 		const CardList &c = origZone->getCards();
 		int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
@@ -126,11 +136,17 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 
 void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &/*dropPoint*/)
 {
-	QList<CardToMove *> idList;
-	for (int i = 0; i < dragItems.size(); ++i)
-		idList.append(new CardToMove(dragItems[i]->getId()));
+	Command_MoveCard cmd;
+	cmd.set_start_zone(startZone->getName().toStdString());
+	cmd.set_target_player_id(player->getId());
+	cmd.set_target_zone(getName().toStdString());
+	cmd.set_x(0);
+	cmd.set_y(0);
 	
-	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), 0, 0));
+	for (int i = 0; i < dragItems.size(); ++i)
+		cmd.mutable_cards_to_move()->add_card()->set_card_id(dragItems[i]->getId());
+
+	player->sendGameCommand(cmd);
 }
 
 void ZoneViewZone::removeCard(int position)

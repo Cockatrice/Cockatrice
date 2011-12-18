@@ -22,6 +22,21 @@
 #include <QMenu>
 #include <QDebug>
 
+#include "pb/command_reveal_cards.pb.h"
+#include "pb/command_shuffle.pb.h"
+#include "pb/command_attach_card.pb.h"
+#include "pb/command_set_card_attr.pb.h"
+#include "pb/command_set_card_counter.pb.h"
+#include "pb/command_mulligan.pb.h"
+#include "pb/command_move_card.pb.h"
+#include "pb/command_draw_cards.pb.h"
+#include "pb/command_undo_draw.pb.h"
+#include "pb/command_roll_die.pb.h"
+#include "pb/command_create_token.pb.h"
+#include "pb/command_flip_card.pb.h"
+#include "pb/command_game_say.pb.h"
+
+
 PlayerArea::PlayerArea(QGraphicsItem *parentItem)
 	: QObject(), QGraphicsItem(parentItem)
 {
@@ -345,13 +360,29 @@ void Player::playerListActionTriggered()
 	int otherPlayerId = action->data().toInt();
 	
 	if (menu == mRevealLibrary) {
-		sendGameCommand(new Command_RevealCards(-1, "deck", -1, otherPlayerId));
+		Command_RevealCards cmd;
+		cmd.set_zone_name("deck");
+		cmd.set_card_id(-1);
+		cmd.set_player_id(otherPlayerId);
+		sendGameCommand(cmd);
 	} else if (menu == mRevealTopCard) {
-		sendGameCommand(new Command_RevealCards(-1, "deck", 0, otherPlayerId));
+		Command_RevealCards cmd;
+		cmd.set_zone_name("deck");
+		cmd.set_card_id(0);
+		cmd.set_player_id(otherPlayerId);
+		sendGameCommand(cmd);
 	} else if (menu == mRevealHand) {
-		sendGameCommand(new Command_RevealCards(-1, "hand", -1, otherPlayerId));
+		Command_RevealCards cmd;
+		cmd.set_zone_name("hand");
+		cmd.set_card_id(-1);
+		cmd.set_player_id(otherPlayerId);
+		sendGameCommand(cmd);
 	} else if (menu == mRevealRandomHandCard) {
-		sendGameCommand(new Command_RevealCards(-1, "hand", -2, otherPlayerId));
+		Command_RevealCards cmd;
+		cmd.set_zone_name("hand");
+		cmd.set_card_id(-2);
+		cmd.set_player_id(otherPlayerId);
+		sendGameCommand(cmd);
 	}
 }
 
@@ -578,29 +609,34 @@ void Player::actViewSideboard()
 
 void Player::actShuffle()
 {
-	sendGameCommand(new Command_Shuffle);
+	sendGameCommand(Command_Shuffle());
 }
 
 void Player::actDrawCard()
 {
-	sendGameCommand(new Command_DrawCards(-1, 1));
+	Command_DrawCards cmd;
+	cmd.set_number(1);
+	sendGameCommand(cmd);
 }
 
 void Player::actMulligan()
 {
-	sendGameCommand(new Command_Mulligan);
+	sendGameCommand(Command_Mulligan());
 }
 
 void Player::actDrawCards()
 {
 	int number = QInputDialog::getInteger(0, tr("Draw cards"), tr("Number:"));
-        if (number)
-		sendGameCommand(new Command_DrawCards(-1, number));
+        if (number) {
+		Command_DrawCards cmd;
+		cmd.set_number(number);
+		sendGameCommand(cmd);
+	}
 }
 
 void Player::actUndoDraw()
 {
-	sendGameCommand(new Command_UndoDraw);
+	sendGameCommand(Command_UndoDraw());
 }
 
 void Player::actMoveTopCardsToGrave()
@@ -609,14 +645,21 @@ void Player::actMoveTopCardsToGrave()
         if (!number)
 		return;
 
-	QList<Command *> commandList;
 	const int maxCards = zones.value("deck")->getCards().size();
 	if (number > maxCards)
 		number = maxCards;
-	QList<CardToMove *> idList;
+
+	Command_MoveCard cmd;
+	cmd.set_start_zone("deck");
+	cmd.set_target_player_id(getId());
+	cmd.set_target_zone("grave");
+	cmd.set_x(0);
+	cmd.set_y(0);
+
 	for (int i = 0; i < number; ++i)
-		idList.append(new CardToMove(i));
-	sendGameCommand(new Command_MoveCard(-1, "deck", idList, getId(), "grave", 0, 0));
+		cmd.mutable_cards_to_move()->add_card()->set_card_id(i);
+	
+	sendGameCommand(cmd);
 }
 
 void Player::actMoveTopCardsToExile()
@@ -625,32 +668,56 @@ void Player::actMoveTopCardsToExile()
         if (!number)
 		return;
 
-	QList<Command *> commandList;
 	const int maxCards = zones.value("deck")->getCards().size();
 	if (number > maxCards)
 		number = maxCards;
-	QList<CardToMove *> idList;
+	
+	Command_MoveCard cmd;
+	cmd.set_start_zone("deck");
+	cmd.set_target_player_id(getId());
+	cmd.set_target_zone("rfg");
+	cmd.set_x(0);
+	cmd.set_y(0);
+
 	for (int i = 0; i < number; ++i)
-		idList.append(new CardToMove(i));
-	sendGameCommand(new Command_MoveCard(-1, "deck", idList, getId(), "rfg", 0, 0));
+		cmd.mutable_cards_to_move()->add_card()->set_card_id(i);
+	
+	sendGameCommand(cmd);
 }
 
 void Player::actMoveTopCardToBottom()
 {
-	sendGameCommand(new Command_MoveCard(-1, "deck", QList<CardToMove *>() << new CardToMove(0), getId(), "deck", -1, 0));
+	Command_MoveCard cmd;
+	cmd.set_start_zone("deck");
+	cmd.mutable_cards_to_move()->add_card()->set_card_id(0);
+	cmd.set_target_player_id(getId());
+	cmd.set_target_zone("deck");
+	cmd.set_x(-1);
+	cmd.set_y(0);
+	
+	sendGameCommand(cmd);
 }
 
 void Player::actUntapAll()
 {
-	sendGameCommand(new Command_SetCardAttr(-1, "table", -1, "tapped", "0"));
+	Command_SetCardAttr cmd;
+	cmd.set_zone("table");
+	cmd.set_card_id(-1);
+	cmd.set_attr_name("tapped");
+	cmd.set_attr_value("0");
+	
+	sendGameCommand(cmd);
 }
 
 void Player::actRollDie()
 {
 	bool ok;
 	int sides = QInputDialog::getInteger(0, tr("Roll die"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
-	if (ok)
-		sendGameCommand(new Command_RollDie(-1, sides));
+	if (ok) {
+		Command_RollDie cmd;
+		cmd.set_sides(sides);
+		sendGameCommand(cmd);
+	}
 }
 
 void Player::actCreateToken()
@@ -666,18 +733,30 @@ void Player::actCreateToken()
 	lastTokenDestroy = dlg.getDestroy();
 	aCreateAnotherToken->setEnabled(true);
 	
-	sendGameCommand(new Command_CreateToken(-1, "table", dlg.getName(), dlg.getColor(), dlg.getPT(), dlg.getAnnotation(), dlg.getDestroy(), -1, 0));
+	actCreateAnotherToken();
 }
 
 void Player::actCreateAnotherToken()
 {
-	sendGameCommand(new Command_CreateToken(-1, "table", lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation, lastTokenDestroy, -1, 0));
+	Command_CreateToken cmd;
+	cmd.set_zone("table");
+	cmd.set_card_name(lastTokenName.toStdString());
+	cmd.set_color(lastTokenColor.toStdString());
+	cmd.set_pt(lastTokenPT.toStdString());
+	cmd.set_annotation(lastTokenAnnotation.toStdString());
+	cmd.set_destroy_on_zone_change(lastTokenDestroy);
+	cmd.set_x(-1);
+	cmd.set_y(0);
+	
+	sendGameCommand(cmd);
 }
 
 void Player::actSayMessage()
 {
 	QAction *a = qobject_cast<QAction *>(sender());
-	sendGameCommand(new Command_Say(-1, a->text()));
+	Command_GameSay cmd;
+	cmd.set_message(a->text().toStdString());
+	sendGameCommand(cmd);
 }
 
 void Player::setCardAttrHelper(GameEventContext *context, CardItem *card, const QString &aname, const QString &avalue, bool allCards)
@@ -1154,13 +1233,27 @@ void Player::processCardAttachment(ServerInfo_Player *info)
 
 void Player::playCard(CardItem *c, bool faceDown, bool tapped)
 {
+	Command_MoveCard cmd;
+	cmd.set_start_zone(c->getZone()->getName().toStdString());
+	cmd.set_target_player_id(getId());
+	CardToMove *cardToMove = cmd.mutable_cards_to_move()->add_card();
+	cardToMove->set_card_id(c->getId());
+	
 	CardInfo *ci = c->getInfo();
-	if (ci->getTableRow() == 3)
-		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), QList<CardToMove *>() << new CardToMove(c->getId()), getId(), "stack", 0, 0));
-	else {
+	if (ci->getTableRow() == 3) {
+		cmd.set_target_zone("stack");
+		cmd.set_x(0);
+		cmd.set_y(0);
+	} else {
 		QPoint gridPoint = QPoint(-1, 2 - ci->getTableRow());
-		sendGameCommand(new Command_MoveCard(-1, c->getZone()->getName(), QList<CardToMove *>() << new CardToMove(c->getId(), faceDown, ci->getPowTough(), tapped), getId(), "table", gridPoint.x(), gridPoint.y()));
+		cardToMove->set_face_down(faceDown);
+		cardToMove->set_pt(ci->getPowTough().toStdString());
+		cardToMove->set_tapped(tapped);
+		cmd.set_target_zone("table");
+		cmd.set_x(gridPoint.x());
+		cmd.set_y(gridPoint.y());
 	}
+	sendGameCommand(cmd);
 }
 
 void Player::addCard(CardItem *c)
@@ -1312,14 +1405,29 @@ void Player::rearrangeCounters()
 	}
 }
 
-void Player::sendGameCommand(GameCommand *command)
+PendingCommand * Player::prepareGameCommand(const google::protobuf::Message &cmd)
+{
+	return static_cast<TabGame *>(parent())->prepareGameCommand(cmd);
+}
+
+PendingCommand * Player::prepareGameCommand(const QList<const::google::protobuf::Message *> &cmdList)
+{
+	return static_cast<TabGame *>(parent())->prepareGameCommand(cmdList);
+}
+
+void Player::sendGameCommand(const google::protobuf::Message &command)
 {
 	static_cast<TabGame *>(parent())->sendGameCommand(command, id);
 }
 
-void Player::sendCommandContainer(CommandContainer *cont)
+void Player::sendCommandContainer(CommandContainer &cont)
 {
 	static_cast<TabGame *>(parent())->sendCommandContainer(cont, id);
+}
+
+void Player::sendGameCommand(PendingCommand *pend)
+{
+	static_cast<TabGame *>(parent())->sendGameCommand(pend, id);
 }
 
 bool Player::clearCardsToDelete()
@@ -1341,55 +1449,118 @@ void Player::cardMenuAction(QAction *a)
 	while (!sel.isEmpty())
 		cardList.append(qgraphicsitem_cast<CardItem *>(sel.takeFirst()));
 	
-	QList<Command *> commandList;
+	QList< const ::google::protobuf::Message * > commandList;
 	if (a->data().toInt() <= 4)
 		for (int i = 0; i < cardList.size(); ++i) {
 			CardItem *card = cardList[i];
 			switch (a->data().toInt()) {
 				case 0:
-					if (!card->getTapped())
-						commandList.append(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "tapped", "1"));
+					if (!card->getTapped()) {
+						Command_SetCardAttr *cmd = new Command_SetCardAttr;
+						cmd->set_zone(card->getZone()->getName().toStdString());
+						cmd->set_card_id(card->getId());
+						cmd->set_attr_name("tapped");
+						cmd->set_attr_value("1");
+						commandList.append(cmd);
+					}
 					break;
 				case 1:
-					if (card->getTapped())
-						commandList.append(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "tapped", "0"));
+					if (card->getTapped()) {
+						Command_SetCardAttr *cmd = new Command_SetCardAttr;
+						cmd->set_zone(card->getZone()->getName().toStdString());
+						cmd->set_card_id(card->getId());
+						cmd->set_attr_name("tapped");
+						cmd->set_attr_value("0");
+						commandList.append(cmd);
+					}
 					break;
-				case 2:
-					commandList.append(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "doesnt_untap", QString::number(!card->getDoesntUntap())));
-					break;
-				case 3: {
-					QString zone = card->getZone()->getName();
-					commandList.append(new Command_FlipCard(-1, zone, card->getId(), !card->getFaceDown()));
+				case 2: {
+					Command_SetCardAttr *cmd = new Command_SetCardAttr;
+					cmd->set_zone(card->getZone()->getName().toStdString());
+					cmd->set_card_id(card->getId());
+					cmd->set_attr_name("doesnt_untap");
+					cmd->set_attr_value(card->getDoesntUntap() ? "1" : "0");
+					commandList.append(cmd);
 					break;
 				}
-				case 4:
-					commandList.append(new Command_CreateToken(-1, card->getZone()->getName(), card->getName(), card->getColor(), card->getPT(), card->getAnnotation(), true, -1, card->getGridPoint().y()));
+				case 3: {
+					Command_FlipCard *cmd = new Command_FlipCard;
+					cmd->set_zone(card->getZone()->getName().toStdString());
+					cmd->set_card_id(card->getId());
+					cmd->set_face_down(!card->getFaceDown());
+					commandList.append(cmd);
 					break;
+				}
+				case 4: {
+					Command_CreateToken *cmd = new Command_CreateToken;
+					cmd->set_zone(card->getZone()->getName().toStdString());
+					cmd->set_card_name(card->getName().toStdString());
+					cmd->set_color(card->getColor().toStdString());
+					cmd->set_pt(card->getPT().toStdString());
+					cmd->set_annotation(card->getAnnotation().toStdString());
+					cmd->set_destroy_on_zone_change(true);
+					cmd->set_x(-1);
+					cmd->set_y(card->getGridPoint().y());
+					commandList.append(cmd);
+					break;
+				}
 			}
 		}
 	else {
-		QList<CardToMove *> idList;
+		ListOfCardsToMove idList;
 		for (int i = 0; i < cardList.size(); ++i)
-			idList.append(new CardToMove(cardList[i]->getId()));
+			idList.add_card()->set_card_id(cardList[i]->getId());
 		QString startZone = cardList[0]->getZone()->getName();
 		
 		switch (a->data().toInt()) {
-			case 5:
-				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "deck", 0, 0));
+			case 5: {
+				Command_MoveCard *cmd = new Command_MoveCard;
+				cmd->set_start_zone(startZone.toStdString());
+				cmd->mutable_cards_to_move()->CopyFrom(idList);
+				cmd->set_target_player_id(getId());
+				cmd->set_target_zone("deck");
+				cmd->set_x(0);
+				cmd->set_y(0);
+				commandList.append(cmd);
 				break;
-			case 6:
-				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "deck", -1, 0));
+			}
+			case 6: {
+				Command_MoveCard *cmd = new Command_MoveCard;
+				cmd->set_start_zone(startZone.toStdString());
+				cmd->mutable_cards_to_move()->CopyFrom(idList);
+				cmd->set_target_player_id(getId());
+				cmd->set_target_zone("deck");
+				cmd->set_x(-1);
+				cmd->set_y(0);
+				commandList.append(cmd);
 				break;
-			case 7:
-				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "grave", 0, 0));
+			}
+			case 7: {
+				Command_MoveCard *cmd = new Command_MoveCard;
+				cmd->set_start_zone(startZone.toStdString());
+				cmd->mutable_cards_to_move()->CopyFrom(idList);
+				cmd->set_target_player_id(getId());
+				cmd->set_target_zone("grave");
+				cmd->set_x(0);
+				cmd->set_y(0);
+				commandList.append(cmd);
 				break;
-			case 8:
-				commandList.append(new Command_MoveCard(-1, startZone, idList, getId(), "rfg", 0, 0));
+			}
+			case 8: {
+				Command_MoveCard *cmd = new Command_MoveCard;
+				cmd->set_start_zone(startZone.toStdString());
+				cmd->mutable_cards_to_move()->CopyFrom(idList);
+				cmd->set_target_player_id(getId());
+				cmd->set_target_zone("rfg");
+				cmd->set_x(0);
+				cmd->set_y(0);
+				commandList.append(cmd);
 				break;
+			}
 			default: ;
 		}
 	}
-	sendCommandContainer(new CommandContainer(commandList));
+	static_cast<TabGame *>(parent())->sendGameCommand(prepareGameCommand(commandList));
 }
 
 void Player::actIncPT(int deltaP, int deltaT)
@@ -1398,7 +1569,11 @@ void Player::actIncPT(int deltaP, int deltaT)
 	QListIterator<QGraphicsItem *> j(scene()->selectedItems());
 	while (j.hasNext()) {
 		CardItem *card = static_cast<CardItem *>(j.next());
-		sendGameCommand(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "pt", ptString));
+		Command_SetCardAttr cmd;
+		cmd.set_zone(card->getZone()->getName().toStdString());
+		cmd.set_card_id(card->getId());
+		cmd.set_attr_name("pt");
+		cmd.set_attr_value(ptString.toStdString());
 	}
 }
 
@@ -1423,7 +1598,11 @@ void Player::actSetPT(QAction * /*a*/)
 	QListIterator<QGraphicsItem *> j(scene()->selectedItems());
 	while (j.hasNext()) {
 		CardItem *card = static_cast<CardItem *>(j.next());
-		sendGameCommand(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "pt", pt));
+		Command_SetCardAttr cmd;
+		cmd.set_zone(card->getZone()->getName().toStdString());
+		cmd.set_card_id(card->getId());
+		cmd.set_attr_name("pt");
+		cmd.set_attr_value(pt.toStdString());
 	}
 }
 
@@ -1449,7 +1628,11 @@ void Player::actSetAnnotation(QAction * /*a*/)
 	i.toFront();
 	while (i.hasNext()) {
 		CardItem *card = static_cast<CardItem *>(i.next());
-		sendGameCommand(new Command_SetCardAttr(-1, card->getZone()->getName(), card->getId(), "annotation", annotation));
+		Command_SetCardAttr cmd;
+		cmd.set_zone(card->getZone()->getName().toStdString());
+		cmd.set_card_id(card->getId());
+		cmd.set_attr_name("annotation");
+		cmd.set_attr_value(annotation.toStdString());
 	}
 }
 
@@ -1464,7 +1647,10 @@ void Player::actAttach(QAction *a)
 void Player::actUnattach(QAction *a)
 {
 	CardItem *card = static_cast<CardItem *>(a->parent());
-	sendGameCommand(new Command_AttachCard(-1, card->getZone()->getName(), card->getId(), -1, QString(), -1));
+	Command_AttachCard cmd;
+	cmd.set_start_zone(card->getZone()->getName().toStdString());
+	cmd.set_card_id(card->getId());
+	sendGameCommand(cmd);
 }
 
 void Player::actCardCounterTrigger(QAction *a)
@@ -1476,8 +1662,14 @@ void Player::actCardCounterTrigger(QAction *a)
 			QListIterator<QGraphicsItem *> i(scene()->selectedItems());
 			while (i.hasNext()) {
 				CardItem *card = static_cast<CardItem *>(i.next());
-				if (card->getCounters().value(counterId, 0) < MAX_COUNTERS_ON_CARD)
-					sendGameCommand(new Command_SetCardCounter(-1, card->getZone()->getName(), card->getId(), counterId, card->getCounters().value(counterId, 0) + 1));
+				if (card->getCounters().value(counterId, 0) < MAX_COUNTERS_ON_CARD) {
+					Command_SetCardCounter cmd;
+					cmd.set_zone(card->getZone()->getName().toStdString());
+					cmd.set_card_id(card->getId());
+					cmd.set_counter_id(counterId);
+					cmd.set_counter_value(card->getCounters().value(counterId, 0) + 1);
+					sendGameCommand(cmd);
+				}
 			}
 			break;
 		}
@@ -1485,8 +1677,14 @@ void Player::actCardCounterTrigger(QAction *a)
 			QListIterator<QGraphicsItem *> i(scene()->selectedItems());
 			while (i.hasNext()) {
 				CardItem *card = static_cast<CardItem *>(i.next());
-				if (card->getCounters().value(counterId, 0))
-					sendGameCommand(new Command_SetCardCounter(-1, card->getZone()->getName(), card->getId(), counterId, card->getCounters().value(counterId, 0) - 1));
+				if (card->getCounters().value(counterId, 0)) {
+					Command_SetCardCounter cmd;
+					cmd.set_zone(card->getZone()->getName().toStdString());
+					cmd.set_card_id(card->getId());
+					cmd.set_counter_id(counterId);
+					cmd.set_counter_value(card->getCounters().value(counterId, 0) - 1);
+					sendGameCommand(cmd);
+				}
 			}
 			break;
 		}
@@ -1503,7 +1701,12 @@ void Player::actCardCounterTrigger(QAction *a)
 			QListIterator<QGraphicsItem *> i(scene()->selectedItems());
 			while (i.hasNext()) {
 				CardItem *card = static_cast<CardItem *>(i.next());
-				sendGameCommand(new Command_SetCardCounter(-1, card->getZone()->getName(), card->getId(), counterId, number));
+				Command_SetCardCounter cmd;
+				cmd.set_zone(card->getZone()->getName().toStdString());
+				cmd.set_card_id(card->getId());
+				cmd.set_counter_id(counterId);
+				cmd.set_counter_value(number);
+				sendGameCommand(cmd);
 			}
 			break;
 		}

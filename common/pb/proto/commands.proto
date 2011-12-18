@@ -5,13 +5,6 @@ import "moderator_commands.proto";
 import "admin_commands.proto";
 
 message CommandContainer {
-	enum CommandType {
-		SESSION = 0;
-		GAME = 1;
-		ROOM = 2;
-		MODERATOR = 3;
-		ADMIN = 4;
-	}
 	required uint64 cmd_id = 1;
 	
 	optional uint32 game_id = 10;

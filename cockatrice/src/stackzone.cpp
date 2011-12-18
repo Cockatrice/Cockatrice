@@ -4,8 +4,9 @@
 #include "stackzone.h"
 #include "settingscache.h"
 #include "player.h"
-#include "protocol_items.h"
 #include "carddragitem.h"
+
+#include "pb/command_move_card.pb.h"
 
 StackZone::StackZone(Player *_p, int _zoneHeight, QGraphicsItem *parent)
 	: SelectZone(_p, "stack", false, false, true, parent), zoneHeight(_zoneHeight)
@@ -57,11 +58,17 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone
 	if (startZone == this)
 		return;
 	
-	QList<CardToMove *> idList;
-	for (int i = 0; i < dragItems.size(); ++i)
-		idList.append(new CardToMove(dragItems[i]->getId()));
+	Command_MoveCard cmd;
+	cmd.set_start_zone(startZone->getName().toStdString());
+	cmd.set_target_player_id(player->getId());
+	cmd.set_target_zone(getName().toStdString());
+	cmd.set_x(0);
+	cmd.set_y(0);
 	
-	player->sendGameCommand(new Command_MoveCard(-1, startZone->getName(), idList, player->getId(), getName(), 0, 0));
+	for (int i = 0; i < dragItems.size(); ++i)
+		cmd.mutable_cards_to_move()->add_card()->set_card_id(dragItems[i]->getId());
+
+	player->sendGameCommand(cmd);
 }
 
 void StackZone::reorganizeCards()

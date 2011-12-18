@@ -22,5 +22,5 @@ void LocalServerInterface::sendProtocolItem(ProtocolItem *item, bool deleteItem)
 
 void LocalServerInterface::itemFromClient(ProtocolItem *item)
 {
-	processCommandContainer(static_cast<CommandContainer *>(item));
+	//processCommandContainer(static_cast<CommandContainer *>(item));
 }

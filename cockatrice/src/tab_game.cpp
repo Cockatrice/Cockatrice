@@ -27,6 +27,18 @@
 #include "settingscache.h"
 #include "carddatabase.h"
 
+#include <google/protobuf/descriptor.h>
+#include "pending_command.h"
+#include "pb/command_concede.pb.h"
+#include "pb/command_deck_select.pb.h"
+#include "pb/command_ready_start.pb.h"
+#include "pb/command_set_sideboard_plan.pb.h"
+#include "pb/command_leave_game.pb.h"
+#include "pb/command_game_say.pb.h"
+#include "pb/command_set_active_phase.pb.h"
+#include "pb/command_next_turn.pb.h"
+#include "pb/command_delete_arrow.pb.h"
+
 ReadyStartButton::ReadyStartButton(QWidget *parent)
 	: QPushButton(parent), readyStart(false)
 {
@@ -50,8 +62,8 @@ void ReadyStartButton::setReadyStart(bool _readyStart)
 	update();
 }
 
-DeckViewContainer::DeckViewContainer(AbstractClient *_client, TabGame *parent)
-	: QWidget(parent), client(_client)
+DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
+	: QWidget(parent), playerId(_playerId)
 {
 	loadLocalButton = new QPushButton;
 	loadRemoteButton = new QPushButton;
@@ -110,18 +122,22 @@ void DeckViewContainer::loadLocalDeck()
 		return;
 	}
 	
-	Command_DeckSelect *cmd = new Command_DeckSelect(static_cast<TabGame *>(parent())->getGameId(), deck, -1);
-	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(deckSelectFinished(ProtocolResponse *)));
-	client->sendCommand(cmd);
+	Command_DeckSelect cmd;
+	cmd.set_deck(""); // XXX
+	PendingCommand *pend = static_cast<TabGame *>(parent())->prepareGameCommand(cmd);
+	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(deckSelectFinished(ProtocolResponse *)));
+	static_cast<TabGame *>(parent())->sendGameCommand(pend, playerId);
 }
 
 void DeckViewContainer::loadRemoteDeck()
 {
-	DlgLoadRemoteDeck dlg(client);
+	DlgLoadRemoteDeck dlg(static_cast<TabGame *>(parent())->getClientForPlayer(playerId));
 	if (dlg.exec()) {
-		Command_DeckSelect *cmd = new Command_DeckSelect(static_cast<TabGame *>(parent())->getGameId(), 0, dlg.getDeckId());
-		connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(deckSelectFinished(ProtocolResponse *)));
-		client->sendCommand(cmd);
+		Command_DeckSelect cmd;
+		cmd.set_deck_id(dlg.getDeckId());
+		PendingCommand *pend = static_cast<TabGame *>(parent())->prepareGameCommand(cmd);
+		connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(deckSelectFinished(ProtocolResponse *)));
+		static_cast<TabGame *>(parent())->sendGameCommand(pend, playerId);
 	}
 }
 
@@ -138,13 +154,18 @@ void DeckViewContainer::deckSelectFinished(ProtocolResponse *r)
 
 void DeckViewContainer::readyStart()
 {
-	client->sendCommand(new Command_ReadyStart(static_cast<TabGame *>(parent())->getGameId(), !readyStartButton->getReadyStart()));
+	Command_ReadyStart cmd;
+	cmd.set_ready(!readyStartButton->getReadyStart());
+	static_cast<TabGame *>(parent())->sendGameCommand(cmd);
 }
 
 void DeckViewContainer::sideboardPlanChanged()
 {
+	Command_SetSideboardPlan cmd;
 	QList<MoveCardToZone *> newPlan = deckView->getSideboardPlan();
-	client->sendCommand(new Command_SetSideboardPlan(static_cast<TabGame *>(parent())->getGameId(), newPlan));
+	for (int i = 0; i < newPlan.size(); ++i)
+		cmd.add_move_list()->CopyFrom(newPlan[i]->toPB());
+	static_cast<TabGame *>(parent())->sendGameCommand(cmd);
 }
 
 void DeckViewContainer::setReadyStart(bool ready)
@@ -164,7 +185,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 {
 	phasesToolbar = new PhasesToolbar;
 	phasesToolbar->hide();
-	connect(phasesToolbar, SIGNAL(sendGameCommand(GameCommand *, int)), this, SLOT(sendGameCommand(GameCommand *, int)));
+	connect(phasesToolbar, SIGNAL(sendGameCommand(const ::google::protobuf::Message &, int)), this, SLOT(sendGameCommand(const ::google::protobuf::Message &, int)));
 	
 	scene = new GameScene(phasesToolbar, this);
 	gameView = new GameView(scene);
@@ -327,7 +348,7 @@ void TabGame::actConcede()
 	if (QMessageBox::question(this, tr("Concede"), tr("Are you sure you want to concede this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
 		return;
 
-	sendGameCommand(new Command_Concede);
+	sendGameCommand(Command_Concede());
 }
 
 void TabGame::actLeaveGame()
@@ -336,14 +357,16 @@ void TabGame::actLeaveGame()
 		if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
 			return;
 
-	sendGameCommand(new Command_LeaveGame);
+	sendGameCommand(Command_LeaveGame());
 	deleteLater();
 }
 
 void TabGame::actSay()
 {
 	if (!sayEdit->text().isEmpty()) {
-		sendGameCommand(new Command_Say(-1, sayEdit->text()));
+		Command_GameSay cmd;
+		cmd.set_message(sayEdit->text().toStdString());
+		sendGameCommand(cmd);
 		sayEdit->clear();
 	}
 }
@@ -351,7 +374,9 @@ void TabGame::actSay()
 void TabGame::actPhaseAction()
 {
 	int phase = phaseActions.indexOf(static_cast<QAction *>(sender()));
-	emit sendGameCommand(new Command_SetActivePhase(-1, phase), -1);
+	Command_SetActivePhase cmd;
+	cmd.set_phase(phase);
+	sendGameCommand(cmd);
 }
 
 void TabGame::actNextPhase()
@@ -359,12 +384,14 @@ void TabGame::actNextPhase()
 	int phase = currentPhase;
 	if (++phase >= phasesToolbar->phaseCount())
 		phase = 0;
-	sendGameCommand(new Command_SetActivePhase(-1, phase));
+	Command_SetActivePhase cmd;
+	cmd.set_phase(phase);
+	sendGameCommand(cmd);
 }
 
 void TabGame::actNextTurn()
 {
-	sendGameCommand(new Command_NextTurn);
+	sendGameCommand(Command_NextTurn());
 }
 
 void TabGame::actRemoveLocalArrows()
@@ -377,7 +404,9 @@ void TabGame::actRemoveLocalArrows()
 		QMapIterator<int, ArrowItem *> arrowIterator(player->getArrows());
 		while (arrowIterator.hasNext()) {
 			ArrowItem *a = arrowIterator.next().value();
-			sendGameCommand(new Command_DeleteArrow(-1, a->getId()));
+			Command_DeleteArrow cmd;
+			cmd.set_arrow_id(a->getId());
+			sendGameCommand(cmd);
 		}
 	}
 }
@@ -392,14 +421,10 @@ Player *TabGame::addPlayer(int playerId, ServerInfo_User *info)
 	messageLog->connectToPlayer(newPlayer);
 	
 	if (local && !spectator) {
-		AbstractClient *client;
-		if (clients.size() > 1)
-			client = clients.at(playerId);
-		else {
-			client = clients.first();
+		if (clients.size() == 1)
 			newPlayer->setShortcutsActive();
-		}
-		DeckViewContainer *deckView = new DeckViewContainer(client, this);
+		
+		DeckViewContainer *deckView = new DeckViewContainer(playerId, this);
 		connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
 		deckViewContainers.insert(playerId, deckView);
 		deckViewContainerLayout->addWidget(deckView);
@@ -462,37 +487,53 @@ void TabGame::processGameEventContainer(GameEventContainer *cont, AbstractClient
 	messageLog->containerProcessingDone();
 }
 
-void TabGame::sendGameCommand(GameCommand *command, int playerId)
+AbstractClient *TabGame::getClientForPlayer(int playerId) const
 {
-	command->setGameId(gameId);
-	AbstractClient *client;
 	if (clients.size() > 1) {
 		if (playerId == -1)
 			playerId = getActiveLocalPlayer()->getId();
 
-		client = clients.at(playerId);
+		return clients.at(playerId);
 	} else
-		client = clients.first();
-	client->sendCommand(command);
+		return clients.first();
 }
 
-void TabGame::sendCommandContainer(CommandContainer *cont, int playerId)
+void TabGame::sendGameCommand(PendingCommand *pend, int playerId)
 {
-	const QList<Command *> &cmdList = cont->getCommandList();
-	for (int i = 0; i < cmdList.size(); ++i) {
-		GameCommand *cmd = qobject_cast<GameCommand *>(cmdList[i]);
-		if (cmd)
-			cmd->setGameId(gameId);
-	}
+	getClientForPlayer(playerId)->sendCommand(pend);
+}
 
-	AbstractClient *client;
-	if (clients.size() > 1) {
-		if (playerId == -1)
-			playerId = getActiveLocalPlayer()->getId();
-		client = clients.at(playerId);
-	} else
-		client = clients.first();
-	client->sendCommandContainer(cont);
+void TabGame::sendGameCommand(const google::protobuf::Message &command, int playerId)
+{
+	AbstractClient *client = getClientForPlayer(playerId);
+	client->sendCommand(prepareGameCommand(command));
+}
+
+void TabGame::sendCommandContainer(CommandContainer &cont, int playerId)
+{
+	cont.set_game_id(gameId);
+	getClientForPlayer(playerId)->sendCommand(cont);
+}
+
+PendingCommand *TabGame::prepareGameCommand(const ::google::protobuf::Message &cmd)
+{
+	CommandContainer cont;
+	cont.set_game_id(gameId);
+	GameCommand *c = cont.add_game_command();
+	c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
+	return new PendingCommand(cont);
+}
+
+PendingCommand *TabGame::prepareGameCommand(const QList< const ::google::protobuf::Message * > &cmdList)
+{
+	CommandContainer cont;
+	cont.set_game_id(gameId);
+	for (int i = 0; i < cmdList.size(); ++i) {
+		GameCommand *c = cont.add_game_command();
+		c->GetReflection()->MutableMessage(c, cmdList[i]->GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(*cmdList[i]);
+		delete cmdList[i];
+	}
+	return new PendingCommand(cont);
 }
 
 void TabGame::startGame(bool resuming)

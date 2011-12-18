@@ -30,10 +30,10 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("directory", DeckList_Directory::newItem);
 //	registerSerializableItem("card_to_move", CardToMove::newItem);
 	registerSerializableItem("game_type_id", GameTypeId::newItem);
-/*	
-	registerSerializableItem("containercmd", CommandContainer::newItem);
-	registerSerializableItem("containergame_event", GameEventContainer::newItem);
 	
+//	registerSerializableItem("containercmd", CommandContainer::newItem);
+	registerSerializableItem("containergame_event", GameEventContainer::newItem);
+/*	
 	registerSerializableItem("cmdcreate_game", Command_CreateGame::newItem);
 	registerSerializableItem("cmddeck_upload", Command_DeckUpload::newItem);
 	registerSerializableItem("cmddeck_select", Command_DeckSelect::newItem);

@@ -9,10 +9,13 @@
 #include <QGroupBox>
 #include <QMessageBox>
 #include "dlg_creategame.h"
-#include "protocol_items.h"
+#include "tab_room.h"
 
-DlgCreateGame::DlgCreateGame(AbstractClient *_client, int _roomId, const QMap<int, QString> &_gameTypes, QWidget *parent)
-	: QDialog(parent), client(_client), roomId(_roomId), gameTypes(_gameTypes)
+#include "pending_command.h"
+#include "pb/room_commands.pb.h"
+
+DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent)
+	: QDialog(parent), room(_room), gameTypes(_gameTypes)
 {
 	descriptionLabel = new QLabel(tr("&Description:"));
 	descriptionEdit = new QLineEdit;
@@ -103,29 +106,27 @@ DlgCreateGame::DlgCreateGame(AbstractClient *_client, int _roomId, const QMap<in
 
 void DlgCreateGame::actOK()
 {
-	QList<GameTypeId *> gameTypeList;
+	Command_CreateGame cmd;
+	cmd.set_description(descriptionEdit->text().toStdString());
+	cmd.set_password(passwordEdit->text().toStdString());
+	cmd.set_max_players(maxPlayersEdit->value());
+	cmd.set_only_buddies(onlyBuddiesCheckBox->isChecked());
+	cmd.set_only_registered(onlyRegisteredCheckBox->isChecked());
+	cmd.set_spectators_allowed(spectatorsAllowedCheckBox->isChecked());
+	cmd.set_spectators_need_password(spectatorsNeedPasswordCheckBox->isChecked());
+	cmd.set_spectators_can_talk(spectatorsCanTalkCheckBox->isChecked());
+	cmd.set_spectators_see_everything(spectatorsSeeEverythingCheckBox->isChecked());
+	
 	QMapIterator<int, QCheckBox *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
 	while (gameTypeCheckBoxIterator.hasNext()) {
 		gameTypeCheckBoxIterator.next();
 		if (gameTypeCheckBoxIterator.value()->isChecked())
-			gameTypeList.append(new GameTypeId(gameTypeCheckBoxIterator.key()));
+			cmd.add_game_type_ids(gameTypeCheckBoxIterator.key());
 	}
 	
-	Command_CreateGame *createCommand = new Command_CreateGame(
-		roomId,
-		descriptionEdit->text(),
-		passwordEdit->text(),
-		maxPlayersEdit->value(),
-		gameTypeList,
-		onlyBuddiesCheckBox->isChecked(),
-		onlyRegisteredCheckBox->isChecked(),
-		spectatorsAllowedCheckBox->isChecked(),
-		spectatorsNeedPasswordCheckBox->isChecked(),
-		spectatorsCanTalkCheckBox->isChecked(),
-		spectatorsSeeEverythingCheckBox->isChecked()
-	);
-	connect(createCommand, SIGNAL(finished(ResponseCode)), this, SLOT(checkResponse(ResponseCode)));
-	client->sendCommand(createCommand);
+	PendingCommand *pend = room->prepareRoomCommand(cmd);
+	connect(pend, SIGNAL(finished(ResponseCode)), this, SLOT(checkResponse(ResponseCode)));
+	room->sendRoomCommand(pend);
 	
 	okButton->setEnabled(false);
 	cancelButton->setEnabled(false);

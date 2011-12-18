@@ -1,11 +1,12 @@
 #include "abstractcounter.h"
 #include "player.h"
-#include "protocol_items.h"
 #include <QPainter>
 #include <QMenu>
 #include <QAction>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneHoverEvent>
+#include "pb/command_inc_counter.pb.h"
+#include "pb/command_set_counter.pb.h"
 
 AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name, bool _shownInCounterArea, int _value, QGraphicsItem *parent)
 	: QGraphicsItem(parent), player(_player), id(_id), name(_name), value(_value), hovered(false), aDec(0), aInc(0), dialogSemaphore(false), deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea)
@@ -84,10 +85,16 @@ void AbstractCounter::setValue(int _value)
 void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
 	if (event->button() == Qt::LeftButton) {
-		player->sendGameCommand(new Command_IncCounter(-1, id, 1));
+		Command_IncCounter cmd;
+		cmd.set_counter_id(id);
+		cmd.set_delta(1);
+		player->sendGameCommand(cmd);
 		event->accept();
 	} else if (event->button() == Qt::RightButton) {
-		player->sendGameCommand(new Command_IncCounter(-1, id, -1));
+		Command_IncCounter cmd;
+		cmd.set_counter_id(id);
+		cmd.set_delta(-1);
+		player->sendGameCommand(cmd);
 		event->accept();
 	} else if (event->button() == Qt::MidButton) {
 		if (menu)
@@ -111,8 +118,11 @@ void AbstractCounter::hoverLeaveEvent(QGraphicsSceneHoverEvent * /*event*/)
 
 void AbstractCounter::incrementCounter()
 {
-	int delta = static_cast<QAction *>(sender())->data().toInt();
-	player->sendGameCommand(new Command_IncCounter(-1, id, delta));
+	const int delta = static_cast<QAction *>(sender())->data().toInt();
+	Command_IncCounter cmd;
+	cmd.set_counter_id(id);
+	cmd.set_delta(delta);
+	player->sendGameCommand(cmd);
 }
 
 void AbstractCounter::setCounter()
@@ -125,6 +135,11 @@ void AbstractCounter::setCounter()
 		return;
 	}
 	dialogSemaphore = false;
-	if (ok)
-		player->sendGameCommand(new Command_SetCounter(-1, id, newValue));
+	if (!ok)
+		return;
+	
+	Command_SetCounter cmd;
+	cmd.set_counter_id(id);
+	cmd.set_value(newValue);
+	player->sendGameCommand(cmd);
 }

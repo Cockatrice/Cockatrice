@@ -13,6 +13,8 @@
 #include <QDebug>
 #include <QPainter>
 
+#include "pb/room_commands.pb.h"
+
 CloseButton::CloseButton(QWidget *parent)
 	: QAbstractButton(parent)
 {
@@ -247,8 +249,9 @@ void TabSupervisor::localGameJoined(Event_GameJoined *event)
 	setCurrentWidget(tab);
 	
 	for (int i = 1; i < localClients.size(); ++i) {
-		Command_JoinGame *cmd = new Command_JoinGame(0, event->getGameId());
-		localClients[i]->sendCommand(cmd);
+//		Command_JoinGame *cmd = new Command_JoinGame(0, event->getGameId());
+//		localClients[i]->sendCommand(cmd);
+		// XXX
 	}
 }
 

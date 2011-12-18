@@ -8,10 +8,11 @@
 #include <QInputDialog>
 #include "tab_supervisor.h"
 #include "dlg_creategame.h"
-#include "abstractclient.h"
-#include "protocol_items.h"
 #include "gameselector.h"
 #include "gamesmodel.h"
+
+#include "pending_command.h"
+#include "pb/room_commands.pb.h"
 
 GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSupervisor, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QWidget *parent)
 	: QGroupBox(parent), client(_client), tabSupervisor(_tabSupervisor), room(_room)
@@ -84,7 +85,7 @@ void GameSelector::showRunningGamesChanged(int state)
 
 void GameSelector::actCreate()
 {
-	DlgCreateGame dlg(client, room->getRoomId(), room->getGameTypes(), this);
+	DlgCreateGame dlg(room, room->getGameTypes(), this);
 	dlg.exec();
 }
 
@@ -124,10 +125,16 @@ void GameSelector::actJoin()
 		if (!ok)
 			return;
 	}
-
-	Command_JoinGame *commandJoinGame = new Command_JoinGame(game->getRoomId(), game->getGameId(), password, spectator, overrideRestrictions);
-	connect(commandJoinGame, SIGNAL(finished(ResponseCode)), this, SLOT(checkResponse(ResponseCode)));
-	client->sendCommand(commandJoinGame);
+	
+	Command_JoinGame cmd;
+	cmd.set_game_id(game->getGameId());
+	cmd.set_password(password.toStdString());
+	cmd.set_spectator(spectator);
+	cmd.set_override_restrictions(overrideRestrictions);
+	
+	PendingCommand *pend = room->prepareRoomCommand(cmd);
+	connect(pend, SIGNAL(finished(ResponseCode)), this, SLOT(checkResponse(ResponseCode)));
+	room->sendRoomCommand(pend);
 
 	if (createButton)
 		createButton->setEnabled(false);

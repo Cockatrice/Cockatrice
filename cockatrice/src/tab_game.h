@@ -4,6 +4,7 @@
 #include <QMap>
 #include <QPushButton>
 #include "tab.h"
+#include <google/protobuf/message.h>
 
 class AbstractClient;
 class CardDatabase;
@@ -47,6 +48,7 @@ class DeckList;
 class QVBoxLayout;
 class QHBoxLayout;
 class ServerInfo_User;
+class PendingCommand;
 
 class ReadyStartButton : public QPushButton {
 	Q_OBJECT
@@ -66,7 +68,7 @@ private:
 	QPushButton *loadLocalButton, *loadRemoteButton;
 	ReadyStartButton *readyStartButton;
 	DeckView *deckView;
-	AbstractClient *client;
+	int playerId;
 private slots:
 	void loadLocalDeck();
 	void loadRemoteDeck();
@@ -76,7 +78,7 @@ private slots:
 signals:
 	void newCardAdded(AbstractCardItem *card);
 public:
-	DeckViewContainer(AbstractClient *_client, TabGame *parent = 0);
+	DeckViewContainer(int _playerId, TabGame *parent = 0);
 	void retranslateUi();
 	void setButtonsVisible(bool _visible);
 	void setReadyStart(bool ready);
@@ -173,11 +175,15 @@ public:
 	bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
 	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
 	Player *getActiveLocalPlayer() const;
+	AbstractClient *getClientForPlayer(int playerId) const;
 
 	void processGameEventContainer(GameEventContainer *cont, AbstractClient *client);
+	PendingCommand *prepareGameCommand(const ::google::protobuf::Message &cmd);
+	PendingCommand *prepareGameCommand(const QList< const ::google::protobuf::Message * > &cmdList);
 public slots:
-	void sendGameCommand(GameCommand *command, int playerId = -1);
-	void sendCommandContainer(CommandContainer *cont, int playerId = -1);
+	void sendGameCommand(PendingCommand *pend, int playerId = -1);
+	void sendGameCommand(const ::google::protobuf::Message &command, int playerId = -1);
+	void sendCommandContainer(CommandContainer &cont, int playerId = -1);
 };
 
 #endif

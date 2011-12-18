@@ -1,12 +1,30 @@
+message RoomCommand {
+	enum RoomCommandType {
+		LEAVE_ROOM = 1000;
+		ROOM_SAY = 1001;
+		CREATE_GAME = 1002;
+		JOIN_GAME = 1003;
+	}
+	extensions 100 to max;
+}
 
 message Command_LeaveRoom {
+	extend RoomCommand {
+		optional Command_LeaveRoom ext = 1000;
+	}
 }
 
 message Command_RoomSay {
+	extend RoomCommand {
+		optional Command_RoomSay ext = 1001;
+	}
 	optional string message = 1;
 }
 
 message Command_CreateGame {
+	extend RoomCommand {
+		optional Command_CreateGame ext = 1002;
+	}
 	optional string description = 1;
 	optional string password = 2;
 	optional uint32 max_players = 3;
@@ -20,27 +38,11 @@ message Command_CreateGame {
 }
 
 message Command_JoinGame {
+	extend RoomCommand {
+		optional Command_JoinGame ext = 1003;
+	}
 	optional uint32 game_id = 1;
 	optional string password = 2;
 	optional bool spectator = 3;
 	optional bool override_restrictions = 4;
 }
-
-message RoomCommand {
-	enum RoomCommandType {
-		LEAVE_ROOM = 1000;
-		ROOM_SAY = 1001;
-		CREATE_GAME = 1002;
-		JOIN_GAME = 1003;
-	}
-	extensions 100 to max;
-}
-
-extend RoomCommand {
-	optional Command_LeaveRoom command_leave_room = 1000;
-	optional Command_RoomSay command_room_say = 1001;
-	optional Command_CreateGame command_create_game = 1002;
-	optional Command_JoinGame command_join_game = 1003;
-}
-
- 

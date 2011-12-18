@@ -17,6 +17,9 @@
 #include "userinfobox.h"
 #include <QDebug>
 
+#include "pending_command.h"
+#include "pb/session_commands.pb.h"
+
 RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent)
 	: QGroupBox(parent), client(_client)
 {
@@ -42,7 +45,7 @@ RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent)
 	setLayout(vbox);
 	
 	connect(client, SIGNAL(listRoomsEventReceived(Event_ListRooms *)), this, SLOT(processListRoomsEvent(Event_ListRooms *)));
-	client->sendCommand(new Command_ListRooms);
+	client->sendCommand(client->prepareSessionCommand(Command_ListRooms()));
 }
 
 void RoomSelector::retranslateUi()
@@ -91,10 +94,14 @@ void RoomSelector::processListRoomsEvent(Event_ListRooms *event)
 
 void RoomSelector::joinRoom(int id, bool setCurrent)
 {
-	Command_JoinRoom *command = new Command_JoinRoom(id);
-	command->setExtraData(setCurrent);
-	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(joinFinished(ProtocolResponse *)));
-	client->sendCommand(command);
+	Command_JoinRoom cmd;
+	cmd.set_room_id(id);
+	
+	PendingCommand *pend = client->prepareSessionCommand(cmd);
+	pend->setExtraData(setCurrent);
+	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(joinFinished(ProtocolResponse *)));
+	
+	client->sendCommand(pend);
 }
 
 void RoomSelector::joinClicked()
@@ -114,7 +121,7 @@ void RoomSelector::joinFinished(ProtocolResponse *r)
 	if (!resp)
 		return;
 	
-	emit roomJoined(resp->getRoomInfo(), static_cast<Command *>(sender())->getExtraData().toBool());
+	emit roomJoined(resp->getRoomInfo(), static_cast<PendingCommand *>(sender())->getExtraData().toBool());
 }
 
 TabServer::TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent)

@@ -1,0 +1,10 @@
+import "session_commands.proto";
+
+message Command_DeckUpload {
+	extend SessionCommand {
+		optional Command_DeckUpload ext = 1013;
+	}
+	optional string path = 1;
+	optional string deck_list = 2;
+}
+ 

@@ -8,7 +8,7 @@
 #include "protocol.h"
 #include "protocol_items.h"
 #include "decklist.h"
-#include "pb/game_commands.pb.h"
+#include "pb/command_move_card.pb.h"
 #include <QDebug>
 
 Server_Player::Server_Player(Server_Game *_game, int _playerId, ServerInfo_User *_userInfo, bool _spectator, Server_ProtocolHandler *_handler)

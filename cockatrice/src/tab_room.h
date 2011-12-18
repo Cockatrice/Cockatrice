@@ -4,6 +4,7 @@
 #include "tab.h"
 #include <QGroupBox>
 #include <QMap>
+#include <google/protobuf/message.h>
 
 class AbstractClient;
 class UserList;
@@ -21,6 +22,7 @@ class Event_LeaveRoom;
 class Event_RoomSay;
 class ProtocolResponse;
 class GameSelector;
+class PendingCommand;
 
 class TabRoom : public Tab {
 	Q_OBJECT
@@ -62,6 +64,9 @@ public:
 	const QMap<int, QString> &getGameTypes() const { return gameTypes; }
 	QString getChannelName() const { return roomName; }
 	QString getTabText() const { return roomName; }
+
+	PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd);
+	void sendRoomCommand(PendingCommand *pend);
 };
 
 #endif

@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QList>
 #include <QGraphicsObject>
+#include <google/protobuf/message.h>
 
 class Player;
 class GameCommand;
@@ -62,7 +63,7 @@ private slots:
 	void actUntapAll();
 	void actDrawCard();
 signals:
-	void sendGameCommand(GameCommand *command, int playerId);
+	void sendGameCommand(const ::google::protobuf::Message &command, int playerId);
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/);
 };

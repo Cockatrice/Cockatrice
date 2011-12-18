@@ -24,6 +24,14 @@ public:
 	{
 		return QColor(value / 65536, (value % 65536) / 256, value % 256);
 	}
+	color get_color() const // HACK
+	{
+		color c;
+		c.set_r(value / 65536);
+		c.set_g((value % 65536) / 256);
+		c.set_b(value % 256);
+		return c;
+	}
 #endif
 };
 

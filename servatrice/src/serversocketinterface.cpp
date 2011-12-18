@@ -33,11 +33,17 @@
 #include "server_logger.h"
 
 #include "pb/commands.pb.h"
+#include "pb/command_deck_upload.pb.h"
+#include "pb/command_deck_download.pb.h"
+#include "pb/command_deck_new_dir.pb.h"
+#include "pb/command_deck_del_dir.pb.h"
+#include "pb/command_deck_del.pb.h"
+
 #include <string>
 #include <iostream>
 
 ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent)
-	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), topLevelItem(0), compressionSupport(false)
+	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), topLevelItem(0), compressionSupport(false), messageInProgress(false)
 {
 	xmlWriter = new QXmlStreamWriter(&xmlBuffer);
 	xmlReader = new QXmlStreamReader;
@@ -107,6 +113,7 @@ void ServerSocketInterface::readClient()
 		
 		CommandContainer *newCommandContainer = new CommandContainer;
 		newCommandContainer->ParseFromArray(inputBuffer.data(), messageLength);
+		logger->logMessage(QString::fromStdString(newCommandContainer->ShortDebugString()), this);
 		inputBuffer.remove(0, messageLength);
 		messageInProgress = false;
 		

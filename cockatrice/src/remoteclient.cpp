@@ -6,6 +6,10 @@
 #include "protocol.h"
 #include "protocol_items.h"
 
+#include "pending_command.h"
+#include "pb/commands.pb.h"
+#include "pb/session_commands.pb.h"
+
 RemoteClient::RemoteClient(QObject *parent)
 	: AbstractClient(parent), timeRunning(0), lastDataReceived(0), topLevelItem(0)
 {
@@ -21,8 +25,6 @@ RemoteClient::RemoteClient(QObject *parent)
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slotSocketError(QAbstractSocket::SocketError)));
 	
 	xmlReader = new QXmlStreamReader;
-	xmlWriter = new QXmlStreamWriter;
-	xmlWriter->setDevice(socket);
 }
 
 RemoteClient::~RemoteClient()
@@ -80,28 +82,41 @@ void RemoteClient::readData()
 				disconnectFromServer();
 				return;
 			}
-			xmlWriter->writeStartDocument();
+/*			xmlWriter->writeStartDocument();
 			xmlWriter->writeStartElement("cockatrice_client_stream");
 			xmlWriter->writeAttribute("version", QString::number(ProtocolItem::protocolVersion));
 			xmlWriter->writeAttribute("comp", "1");
-			
+*/			
 			topLevelItem = new TopLevelProtocolItem;
 			connect(topLevelItem, SIGNAL(protocolItemReceived(ProtocolItem *)), this, SLOT(processProtocolItem(ProtocolItem *)));
 			
 			setStatus(StatusLoggingIn);
-			Command_Login *cmdLogin = new Command_Login(userName, password);
-			connect(cmdLogin, SIGNAL(finished(ProtocolResponse *)), this, SLOT(loginResponse(ProtocolResponse *)));
-			sendCommand(cmdLogin);
+			
+			Command_Login cmdLogin;
+			cmdLogin.set_user_name(userName.toStdString());
+			cmdLogin.set_password(password.toStdString());
+			
+			PendingCommand *pend = prepareSessionCommand(cmdLogin);
+			connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(loginResponse(ProtocolResponse *)));
+			sendCommand(pend);
 		}
 	}
 	if (status == StatusDisconnecting)
 		disconnectFromServer();
 }
 
-void RemoteClient::sendCommandContainer(CommandContainer *cont)
+void RemoteClient::sendCommandContainer(const CommandContainer &cont)
 {
-	cont->write(xmlWriter);
-	pendingCommands.insert(cont->getCmdId(), cont);
+	QByteArray buf;
+	unsigned int size = cont.ByteSize();
+	buf.resize(size + 4);
+	cont.SerializeToArray(buf.data() + 4, size);
+	buf.data()[3] = (unsigned char) size;
+	buf.data()[2] = (unsigned char) (size >> 8);
+	buf.data()[1] = (unsigned char) (size >> 16);
+	buf.data()[0] = (unsigned char) (size >> 24);
+	
+	socket->write(buf);
 }
 
 void RemoteClient::connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password)
@@ -123,7 +138,7 @@ void RemoteClient::disconnectFromServer()
 	
 	timer->stop();
 
-	QList<CommandContainer *> pc = pendingCommands.values();
+	QList<PendingCommand *> pc = pendingCommands.values();
 	for (int i = 0; i < pc.size(); i++)
 		delete pc[i];
 	pendingCommands.clear();
@@ -134,21 +149,21 @@ void RemoteClient::disconnectFromServer()
 
 void RemoteClient::ping()
 {
-	QMutableMapIterator<int, CommandContainer *> i(pendingCommands);
+/*	QMutableMapIterator<int, PendingCommand *> i(pendingCommands);
 	while (i.hasNext())
 		if (i.next().value()->tick() > maxTimeout) {
 			CommandContainer *cont = i.value();
 			i.remove();
 			cont->deleteLater();
 		}
-	
+*/	
 	int maxTime = timeRunning - lastDataReceived;
 	emit maxPingTime(maxTime, maxTimeout);
 	if (maxTime >= maxTimeout) {
 		disconnectFromServer();
 		emit serverTimeout();
 	} else {
-		sendCommand(new Command_Ping);
+		sendCommand(prepareSessionCommand(Command_Ping()));
 		++timeRunning;
 	}
 }

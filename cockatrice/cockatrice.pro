@@ -6,6 +6,7 @@ MOC_DIR = build
 OBJECTS_DIR = build
 RESOURCES = cockatrice.qrc
 QT += network script svg
+LIBS += -lprotobuf
 unix:!macx {
 	CONFIG += mobility
 	MOBILITY = multimedia
@@ -81,6 +82,7 @@ HEADERS += src/abstractcounter.h \
  src/translation.h \
  src/priceupdater.h \
  src/soundengine.h \
+ src/pending_command.h \
  	../common/color.h \
  	../common/serializable_item.h \
 	../common/decklist.h \
@@ -167,6 +169,7 @@ SOURCES += src/abstractcounter.cpp \
  src/localclient.cpp \
  src/priceupdater.cpp \
  src/soundengine.cpp \
+ src/pending_command.cpp \
  	../common/serializable_item.cpp \
 	../common/decklist.cpp \
 	../common/protocol.cpp \
@@ -182,6 +185,9 @@ SOURCES += src/abstractcounter.cpp \
 	../common/server_game.cpp \
 	../common/server_player.cpp \
 	../common/server_protocolhandler.cpp
+
+include ( ../pb_headers )
+include ( ../pb_sources )
 
 TRANSLATIONS += \
 	translations/cockatrice_de.ts \

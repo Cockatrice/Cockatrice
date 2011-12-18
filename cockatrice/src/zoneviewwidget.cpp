@@ -15,6 +15,9 @@
 #include "settingscache.h"
 #include "gamescene.h"
 
+#include "pb/command_stop_dump_zone.pb.h"
+#include "pb/command_shuffle.pb.h"
+
 TitleLabel::TitleLabel()
 	: QGraphicsWidget(), text(" ")
 {
@@ -156,11 +159,15 @@ void ZoneViewWidget::resizeToZoneContents()
 void ZoneViewWidget::closeEvent(QCloseEvent *event)
 {
 	disconnect(zone, SIGNAL(beingDeleted()), this, 0);
-	if (zone->getNumberCards() != -2)
-		player->sendGameCommand(new Command_StopDumpZone(-1, player->getId(), zone->getName()));
+	if (zone->getNumberCards() != -2) {
+		Command_StopDumpZone cmd;
+		cmd.set_player_id(player->getId());
+		cmd.set_zone_name(zone->getName().toStdString());
+		player->sendGameCommand(cmd);
+	}
 	if (shuffleCheckBox)
 		if (shuffleCheckBox->isChecked())
-			player->sendGameCommand(new Command_Shuffle);
+			player->sendGameCommand(Command_Shuffle());
 	emit closePressed(this);
 	deleteLater();
 	event->accept();

@@ -5,6 +5,7 @@
 #include <QPoint>
 #include <QMap>
 #include "carditem.h"
+#include <google/protobuf/message.h>
 
 class CardDatabase;
 class QMenu;
@@ -46,6 +47,7 @@ class Event_DestroyCard;
 class Event_AttachCard;
 class Event_DrawCards;
 class Event_RevealCards;
+class PendingCommand;
 
 class PlayerArea : public QObject, public QGraphicsItem {
 	Q_OBJECT
@@ -254,8 +256,12 @@ public:
 	void processCardAttachment(ServerInfo_Player *info);
 	
 	void processGameEvent(GameEvent *event, GameEventContext *context);
-	void sendGameCommand(GameCommand *command);
-	void sendCommandContainer(CommandContainer *cont);
+
+	PendingCommand *prepareGameCommand(const ::google::protobuf::Message &cmd);
+	PendingCommand *prepareGameCommand(const QList< const ::google::protobuf::Message * > &cmdList);
+	void sendGameCommand(PendingCommand *pend);
+	void sendGameCommand(const google::protobuf::Message &command);
+	void sendCommandContainer(CommandContainer &cont);
 };
 
 #endif

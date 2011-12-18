@@ -5,8 +5,12 @@
 #include <QDebug>
 #include <math.h>
 #include "phasestoolbar.h"
-#include "protocol_items.h"
 #include "pixmapgenerator.h"
+
+#include "pb/command_set_active_phase.pb.h"
+#include "pb/command_next_turn.pb.h"
+#include "pb/command_set_card_attr.pb.h"
+#include "pb/command_draw_cards.pb.h"
 
 PhaseButton::PhaseButton(const QString &_name, QGraphicsItem *parent, QAction *_doubleClickAction, bool _highlightable)
 	: QObject(), QGraphicsItem(parent), name(_name), active(false), highlightable(_highlightable), activeAnimationCounter(0), doubleClickAction(_doubleClickAction), width(50)
@@ -222,20 +226,33 @@ void PhasesToolbar::phaseButtonClicked()
 	PhaseButton *button = qobject_cast<PhaseButton *>(sender());
 	if (button->getActive())
 		button->triggerDoubleClickAction();
-	emit sendGameCommand(new Command_SetActivePhase(-1, buttonList.indexOf(button)), -1);
+	
+	Command_SetActivePhase cmd;
+	cmd.set_phase(buttonList.indexOf(button));
+	
+	emit sendGameCommand(cmd, -1);
 }
 
 void PhasesToolbar::actNextTurn()
 {
-	emit sendGameCommand(new Command_NextTurn, -1);
+	emit sendGameCommand(Command_NextTurn(), -1);
 }
 
 void PhasesToolbar::actUntapAll()
 {
-	emit sendGameCommand(new Command_SetCardAttr(-1, "table", -1, "tapped", "0"), -1);
+	Command_SetCardAttr cmd;
+	cmd.set_zone("table");
+	cmd.set_card_id(-1);
+	cmd.set_attr_name("tapped");
+	cmd.set_attr_value("0");
+	
+	emit sendGameCommand(cmd, -1);
 }
 
 void PhasesToolbar::actDrawCard()
 {
-	emit sendGameCommand(new Command_DrawCards(-1, 1), -1);
+	Command_DrawCards cmd;
+	cmd.set_number(1);
+	
+	emit sendGameCommand(cmd, -1);
 }

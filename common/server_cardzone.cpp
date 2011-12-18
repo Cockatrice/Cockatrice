@@ -24,7 +24,7 @@
 #include <QSet>
 #include <QDebug>
 #include "server_game.h"
-#include "pb/game_commands.pb.h"
+#include "pb/command_move_card.pb.h"
 
 Server_CardZone::Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ZoneType _type)
 	: player(_player), name(_name), has_coords(_has_coords), type(_type), cardsBeingLookedAt(0)

@@ -13,6 +13,9 @@
 #include <QAction>
 #include <QMenu>
 
+#include "pb/session_commands.pb.h"
+#include "pb/command_kick_from_game.pb.h"
+
 PlayerListItemDelegate::PlayerListItemDelegate(QObject *const parent)
 	: QStyledItemDelegate(parent)
 {
@@ -198,16 +201,35 @@ void PlayerListWidget::showContextMenu(const QPoint &pos, const QModelIndex &ind
 		infoWidget->updateInfo(userName);
 	} else if (actionClicked == aChat)
 		emit openMessageDialog(userName, true);
-	else if (actionClicked == aAddToBuddyList)
-		client->sendCommand(new Command_AddToList("buddy", userName));
-	else if (actionClicked == aRemoveFromBuddyList)
-		client->sendCommand(new Command_RemoveFromList("buddy", userName));
-	else if (actionClicked == aAddToIgnoreList)
-		client->sendCommand(new Command_AddToList("ignore", userName));
-	else if (actionClicked == aRemoveFromIgnoreList)
-		client->sendCommand(new Command_RemoveFromList("ignore", userName));
-	else if (actionClicked == aKick)
-		game->sendGameCommand(new Command_KickFromGame(-1, playerId));
+	else if (actionClicked == aAddToBuddyList) {
+		Command_AddToList cmd;
+		cmd.set_list("buddy");
+		cmd.set_user_name(userName.toStdString());
+		
+		client->sendCommand(client->prepareSessionCommand(cmd));
+	} else if (actionClicked == aRemoveFromBuddyList) {
+		Command_RemoveFromList cmd;
+		cmd.set_list("buddy");
+		cmd.set_user_name(userName.toStdString());
+		
+		client->sendCommand(client->prepareSessionCommand(cmd));
+	} else if (actionClicked == aAddToIgnoreList) {
+		Command_AddToList cmd;
+		cmd.set_list("ignore");
+		cmd.set_user_name(userName.toStdString());
+		
+		client->sendCommand(client->prepareSessionCommand(cmd));
+	} else if (actionClicked == aRemoveFromIgnoreList) {
+		Command_RemoveFromList cmd;
+		cmd.set_list("ignore");
+		cmd.set_user_name(userName.toStdString());
+		
+		client->sendCommand(client->prepareSessionCommand(cmd));
+	} else if (actionClicked == aKick) {
+		Command_KickFromGame cmd;
+		cmd.set_player_id(playerId);
+		game->sendGameCommand(cmd);
+	}
 	
 	delete menu;
 	delete aUserName;

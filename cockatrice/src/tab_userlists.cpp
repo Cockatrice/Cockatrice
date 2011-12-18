@@ -1,11 +1,14 @@
 #include "tab_userlists.h"
 #include "userlist.h"
 #include "userinfobox.h"
-#include "protocol_items.h"
 #include "abstractclient.h"
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include "protocol_items.h"
+
+#include "pending_command.h"
+#include "pb/session_commands.pb.h"
 
 TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerInfo_User *userInfo, QWidget *parent)
 	: Tab(_tabSupervisor, parent), client(_client)
@@ -27,9 +30,9 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
 	connect(client, SIGNAL(addToListEventReceived(Event_AddToList *)), this, SLOT(processAddToListEvent(Event_AddToList *)));
 	connect(client, SIGNAL(removeFromListEventReceived(Event_RemoveFromList *)), this, SLOT(processRemoveFromListEvent(Event_RemoveFromList *)));
 	
-	Command_ListUsers *cmd = new Command_ListUsers;
-	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(processListUsersResponse(ProtocolResponse *)));
-	client->sendCommand(cmd);
+	PendingCommand *pend = client->prepareSessionCommand(Command_ListUsers());
+	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(processListUsersResponse(ProtocolResponse *)));
+	client->sendCommand(pend);
 	
 	QVBoxLayout *vbox = new QVBoxLayout;
 	vbox->addWidget(userInfoBox);

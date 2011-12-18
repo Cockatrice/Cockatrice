@@ -9,7 +9,8 @@
 #include <QLineEdit>
 #include "tab_admin.h"
 #include "abstractclient.h"
-#include "protocol_items.h"
+
+#include "pb/admin_commands.pb.h"
 
 ShutdownDialog::ShutdownDialog(QWidget *parent)
 	: QDialog(parent)
@@ -100,14 +101,19 @@ void TabAdmin::retranslateUi()
 
 void TabAdmin::actUpdateServerMessage()
 {
-	client->sendCommand(new Command_UpdateServerMessage());
+	client->sendCommand(client->prepareAdminCommand(Command_UpdateServerMessage()));
 }
 
 void TabAdmin::actShutdownServer()
 {
 	ShutdownDialog dlg;
-	if (dlg.exec())
-		client->sendCommand(new Command_ShutdownServer(dlg.getReason(), dlg.getMinutes()));
+	if (dlg.exec()) {
+		Command_ShutdownServer cmd;
+		cmd.set_reason(dlg.getReason().toStdString());
+		cmd.set_minutes(dlg.getMinutes());
+		
+		client->sendCommand(client->prepareAdminCommand(cmd));
+	}
 }
 
 void TabAdmin::actUnlock()

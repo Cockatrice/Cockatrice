@@ -37,15 +37,7 @@ HEADERS += src/main.h \
 	../common/server_game.h \
 	../common/server_player.h \
 	../common/server_protocolhandler.h \
-	../common/server_arrowtarget.h \
-	../common/pb/commands.pb.h \
-	../common/pb/color.pb.h \
-	../common/pb/move_card_to_zone.pb.h \
-	../common/pb/game_commands.pb.h \
-	../common/pb/room_commands.pb.h \
-	../common/pb/session_commands.pb.h \
-	../common/pb/moderator_commands.pb.h \
-	../common/pb/admin_commands.pb.h
+	../common/server_arrowtarget.h
 
  
 SOURCES += src/main.cpp \
@@ -68,13 +60,7 @@ SOURCES += src/main.cpp \
 	../common/server_room.cpp \
 	../common/server_game.cpp \
 	../common/server_player.cpp \
-	../common/server_protocolhandler.cpp \
-	../common/pb/commands.pb.cc \
-	../common/pb/color.pb.cc \
-	../common/pb/move_card_to_zone.pb.cc \
-	../common/pb/game_commands.pb.cc \
-	../common/pb/room_commands.pb.cc \
-	../common/pb/session_commands.pb.cc \
-	../common/pb/moderator_commands.pb.cc \
-	../common/pb/admin_commands.pb.cc
-	
+	../common/server_protocolhandler.cpp
+
+include ( ../pb_headers )
+include ( ../pb_sources )

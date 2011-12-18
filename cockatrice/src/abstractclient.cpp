@@ -1,10 +1,14 @@
 #include "abstractclient.h"
 #include "protocol.h"
 #include "protocol_items.h"
+
+#include "pending_command.h"
+#include "pb/commands.pb.h"
+#include <google/protobuf/descriptor.h>
 #include <QDebug>
 
 AbstractClient::AbstractClient(QObject *parent)
-	: QObject(parent), status(StatusDisconnected)
+	: QObject(parent), nextCmdId(0), status(StatusDisconnected)
 {
 }
 
@@ -16,15 +20,16 @@ void AbstractClient::processProtocolItem(ProtocolItem *item)
 {
 	ProtocolResponse *response = qobject_cast<ProtocolResponse *>(item);
 	if (response) {
-		CommandContainer *cmdCont = pendingCommands.value(response->getCmdId(), 0);
-		if (!cmdCont)
+		const int cmdId = response->getCmdId();
+		PendingCommand *pend = pendingCommands.value(cmdId, 0);
+		if (!pend)
 			return;
 		
-		pendingCommands.remove(cmdCont->getCmdId());
-		cmdCont->processResponse(response);
+		pendingCommands.remove(cmdId);
+		pend->processResponse(response);
 		if (response->getReceiverMayDelete())
 			delete response;
-		cmdCont->deleteLater();
+		pend->deleteLater();
 		
 		return;
 	}
@@ -73,7 +78,39 @@ void AbstractClient::setStatus(const ClientStatus _status)
 	}
 }
 
-void AbstractClient::sendCommand(Command *cmd)
+void AbstractClient::sendCommand(const CommandContainer &cont)
 {
-	sendCommandContainer(new CommandContainer(QList<Command *>() << cmd));
+	sendCommand(new PendingCommand(cont));
+}
+
+void AbstractClient::sendCommand(PendingCommand *pend)
+{
+	const int cmdId = nextCmdId++;
+	pendingCommands.insert(cmdId, pend);
+	pend->getCommandContainer().set_cmd_id(cmdId);
+	sendCommandContainer(pend->getCommandContainer());
+}
+
+PendingCommand *AbstractClient::prepareSessionCommand(const ::google::protobuf::Message &cmd)
+{
+	CommandContainer cont;
+	SessionCommand *c = cont.add_session_command();
+	c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
+	return new PendingCommand(cont);
+}
+
+PendingCommand *AbstractClient::prepareModeratorCommand(const ::google::protobuf::Message &cmd)
+{
+	CommandContainer cont;
+	ModeratorCommand *c = cont.add_moderator_command();
+	c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
+	return new PendingCommand(cont);
+}
+
+PendingCommand *AbstractClient::prepareAdminCommand(const ::google::protobuf::Message &cmd)
+{
+	CommandContainer cont;
+	AdminCommand *c = cont.add_admin_command();
+	c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
+	return new PendingCommand(cont);
 }

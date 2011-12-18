@@ -2,9 +2,11 @@
 #define ABSTRACTCLIENT_H
 
 #include <QObject>
+#include <QVariant>
+#include <google/protobuf/message.h>
 #include "protocol_datastructures.h"
 
-class Command;
+class PendingCommand;
 class CommandContainer;
 class ProtocolItem;
 class ProtocolResponse;
@@ -56,20 +58,27 @@ signals:
 	void userInfoChanged(ServerInfo_User *userInfo);
 	void buddyListReceived(const QList<ServerInfo_User *> &buddyList);
 	void ignoreListReceived(const QList<ServerInfo_User *> &ignoreList);
+private:
+	int nextCmdId;
 protected slots:
 	void processProtocolItem(ProtocolItem *item);
 protected:
-	QMap<int, CommandContainer *> pendingCommands;
+	QMap<int, PendingCommand *> pendingCommands;
 	ClientStatus status;
 	QString userName, password;
 	void setStatus(ClientStatus _status);
+	virtual void sendCommandContainer(const CommandContainer &cont) = 0;
 public:
 	AbstractClient(QObject *parent = 0);
 	~AbstractClient();
 	
 	ClientStatus getStatus() const { return status; }
-	virtual void sendCommand(Command *cmd);
-	virtual void sendCommandContainer(CommandContainer *cont) = 0;
+	void sendCommand(const CommandContainer &cont);
+	void sendCommand(PendingCommand *pend);
+	
+	PendingCommand *prepareSessionCommand(const ::google::protobuf::Message &cmd);
+	PendingCommand *prepareModeratorCommand(const ::google::protobuf::Message &cmd);
+	PendingCommand *prepareAdminCommand(const ::google::protobuf::Message &cmd);
 };
 
 #endif

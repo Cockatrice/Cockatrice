@@ -20,6 +20,10 @@
 #include <QCheckBox>
 #include <QMessageBox>
 
+#include "pending_command.h"
+#include "pb/session_commands.pb.h"
+#include "pb/moderator_commands.pb.h"
+
 BanDialog::BanDialog(ServerInfo_User *info, QWidget *parent)
 	: QDialog(parent)
 {
@@ -292,7 +296,7 @@ void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
 
 void UserList::gamesOfUserReceived(ProtocolResponse *resp)
 {
-	Command_GetGamesOfUser *command = static_cast<Command_GetGamesOfUser *>(sender());
+	//Command_GetGamesOfUser *command = static_cast<Command_GetGamesOfUser *>(sender());
 	Response_GetGamesOfUser *response = qobject_cast<Response_GetGamesOfUser *>(resp);
 	if (!response)
 		return;
@@ -314,7 +318,7 @@ void UserList::gamesOfUserReceived(ProtocolResponse *resp)
 	for (int i = 0; i < gameList.size(); ++i)
 		selector->processGameInfo(gameList[i]);
 	
-	selector->setWindowTitle(tr("%1's games").arg(command->getUserName()));
+//	selector->setWindowTitle(tr("%1's games").arg(command->getUserName()));
 	selector->setAttribute(Qt::WA_DeleteOnClose);
 	selector->show();
 }
@@ -334,7 +338,14 @@ void UserList::banUser_processUserInfoResponse(ProtocolResponse *r)
 void UserList::banUser_dialogFinished()
 {
 	BanDialog *dlg = static_cast<BanDialog *>(sender());
-	client->sendCommand(new Command_BanFromServer(dlg->getBanName(), dlg->getBanIP(), dlg->getMinutes(), dlg->getReason()));
+	
+	Command_BanFromServer cmd;
+	cmd.set_user_name(dlg->getBanName().toStdString());
+	cmd.set_address(dlg->getBanIP().toStdString());
+	cmd.set_minutes(dlg->getMinutes());
+	cmd.set_reason(dlg->getReason().toStdString());
+	
+	client->sendCommand(client->prepareModeratorCommand(cmd));
 }
 
 void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
@@ -390,22 +401,46 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 		infoWidget->updateInfo(userName);
 	} else if (actionClicked == aChat)
 		emit openMessageDialog(userName, true);
-	else if (actionClicked == aAddToBuddyList)
-		client->sendCommand(new Command_AddToList("buddy", userName));
-	else if (actionClicked == aRemoveFromBuddyList)
-		client->sendCommand(new Command_RemoveFromList("buddy", userName));
-	else if (actionClicked == aShowGames) {
-		Command *cmd = new Command_GetGamesOfUser(userName);
-		connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(gamesOfUserReceived(ProtocolResponse *)));
-		client->sendCommand(cmd);
-	} else if (actionClicked == aAddToIgnoreList)
-		client->sendCommand(new Command_AddToList("ignore", userName));
-	else if (actionClicked == aRemoveFromIgnoreList)
-		client->sendCommand(new Command_RemoveFromList("ignore", userName));
-	else if (actionClicked == aBan) {
-		Command_GetUserInfo *command = new Command_GetUserInfo(userName);
-		connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(banUser_processUserInfoResponse(ProtocolResponse *)));
-		client->sendCommand(command);
+	else if (actionClicked == aAddToBuddyList) {
+		Command_AddToList cmd;
+		cmd.set_list("buddy");
+		cmd.set_user_name(userName.toStdString());
+		
+		client->sendCommand(client->prepareSessionCommand(cmd));
+	} else if (actionClicked == aRemoveFromBuddyList) {
+		Command_RemoveFromList cmd;
+		cmd.set_list("buddy");
+		cmd.set_user_name(userName.toStdString());
+		
+		client->sendCommand(client->prepareSessionCommand(cmd));
+	} else if (actionClicked == aShowGames) {
+		Command_GetGamesOfUser cmd;
+		cmd.set_user_name(userName.toStdString());
+		
+		PendingCommand *pend = client->prepareSessionCommand(cmd);
+		connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(gamesOfUserReceived(ProtocolResponse *)));
+		
+		client->sendCommand(pend);
+	} else if (actionClicked == aAddToIgnoreList) {
+		Command_AddToList cmd;
+		cmd.set_list("ignore");
+		cmd.set_user_name(userName.toStdString());
+		
+		client->sendCommand(client->prepareSessionCommand(cmd));
+	} else if (actionClicked == aRemoveFromIgnoreList) {
+		Command_RemoveFromList cmd;
+		cmd.set_list("ignore");
+		cmd.set_user_name(userName.toStdString());
+		
+		client->sendCommand(client->prepareSessionCommand(cmd));
+	} else if (actionClicked == aBan) {
+		Command_GetUserInfo cmd;
+		cmd.set_user_name(userName.toStdString());
+		
+		PendingCommand *pend = client->prepareSessionCommand(cmd);
+		connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(banUser_processUserInfoResponse(ProtocolResponse *)));
+		
+		client->sendCommand(pend);
 	}
 	
 	delete menu;

@@ -5,6 +5,9 @@
 #include "protocol_items.h"
 #include "abstractclient.h"
 
+#include "pending_command.h"
+#include "pb/session_commands.pb.h"
+
 RemoteDeckList_TreeModel::DirectoryNode::DirectoryNode(const QString &_name, RemoteDeckList_TreeModel::DirectoryNode *_parent)
 	: RemoteDeckList_TreeModel::Node(_name, _parent)
 {
@@ -238,9 +241,10 @@ void RemoteDeckList_TreeModel::removeNode(RemoteDeckList_TreeModel::Node *node)
 
 void RemoteDeckList_TreeModel::refreshTree()
 {
-	Command_DeckList *command = new Command_DeckList;
-	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(deckListFinished(ProtocolResponse *)));
-	client->sendCommand(command);
+	PendingCommand *pend = client->prepareSessionCommand(Command_DeckList());
+	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(deckListFinished(ProtocolResponse *)));
+	
+	client->sendCommand(pend);
 }
 
 void RemoteDeckList_TreeModel::deckListFinished(ProtocolResponse *r)

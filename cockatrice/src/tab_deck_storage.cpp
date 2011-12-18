@@ -17,6 +17,13 @@
 #include "window_deckeditor.h"
 #include "settingscache.h"
 
+#include "pending_command.h"
+#include "pb/command_deck_upload.pb.h"
+#include "pb/command_deck_download.pb.h"
+#include "pb/command_deck_new_dir.pb.h"
+#include "pb/command_deck_del_dir.pb.h"
+#include "pb/command_deck_del.pb.h"
+
 TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client)
 	: Tab(_tabSupervisor), client(_client)
 {
@@ -157,9 +164,9 @@ void TabDeckStorage::actUpload()
 		curRight = curRight->getParent();
 	targetPath = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight)->getPath();
 
-	Command_DeckUpload *command = new Command_DeckUpload(deck, targetPath);
-	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(uploadFinished(ProtocolResponse *)));
-	client->sendCommand(command);
+//	Command_DeckUpload *command = new Command_DeckUpload(deck, targetPath);
+//	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(uploadFinished(ProtocolResponse *)));
+//	client->sendCommand(command);
 }
 
 void TabDeckStorage::uploadFinished(ProtocolResponse *r)
@@ -167,9 +174,9 @@ void TabDeckStorage::uploadFinished(ProtocolResponse *r)
 	Response_DeckUpload *resp = qobject_cast<Response_DeckUpload *>(r);
 	if (!resp)
 		return;
-	Command_DeckUpload *cmd = static_cast<Command_DeckUpload *>(sender());
-
-	serverDirView->addFileToTree(resp->getFile(), serverDirView->getNodeByPath(cmd->getPath()));
+//	Command_DeckUpload *cmd = static_cast<Command_DeckUpload *>(sender());
+//
+//	serverDirView->addFileToTree(resp->getFile(), serverDirView->getNodeByPath(cmd->getPath()));
 }
 
 void TabDeckStorage::actOpenRemoteDeck()
@@ -178,9 +185,9 @@ void TabDeckStorage::actOpenRemoteDeck()
 	if (!curRight)
 		return;
 
-	Command_DeckDownload *command = new Command_DeckDownload(curRight->getId());
-	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(openRemoteDeckFinished(ProtocolResponse *)));
-	client->sendCommand(command);
+//	Command_DeckDownload *command = new Command_DeckDownload(curRight->getId());
+//	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(openRemoteDeckFinished(ProtocolResponse *)));
+//	client->sendCommand(command);
 }
 
 void TabDeckStorage::openRemoteDeckFinished(ProtocolResponse *r)
@@ -211,10 +218,10 @@ void TabDeckStorage::actDownload()
 		return;
 	filePath += QString("/deck_%1.cod").arg(curRight->getId());
 
-	Command_DeckDownload *command = new Command_DeckDownload(curRight->getId());
-	command->setExtraData(filePath);
-	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(downloadFinished(ProtocolResponse *)));
-	client->sendCommand(command);
+//	Command_DeckDownload *command = new Command_DeckDownload(curRight->getId());
+//	command->setExtraData(filePath);
+//	connect(command, SIGNAL(finished(ProtocolResponse *)), this, SLOT(downloadFinished(ProtocolResponse *)));
+//	client->sendCommand(command);
 }
 
 void TabDeckStorage::downloadFinished(ProtocolResponse *r)
@@ -222,10 +229,10 @@ void TabDeckStorage::downloadFinished(ProtocolResponse *r)
 	Response_DeckDownload *resp = qobject_cast<Response_DeckDownload *>(r);
 	if (!resp)
 		return;
-	Command_DeckDownload *cmd = static_cast<Command_DeckDownload *>(sender());
-
-	QString filePath = cmd->getExtraData().toString();
-	resp->getDeck()->saveToFile(filePath, DeckList::CockatriceFormat);
+//	Command_DeckDownload *cmd = static_cast<Command_DeckDownload *>(sender());
+//
+//	QString filePath = cmd->getExtraData().toString();
+//	resp->getDeck()->saveToFile(filePath, DeckList::CockatriceFormat);
 }
 
 void TabDeckStorage::actNewFolder()
@@ -242,10 +249,14 @@ void TabDeckStorage::actNewFolder()
 		curRight = curRight->getParent();
 	RemoteDeckList_TreeModel::DirectoryNode *dir = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight);
 	targetPath = dir->getPath();
-
-	Command_DeckNewDir *command = new Command_DeckNewDir(targetPath, folderName);
-	connect(command, SIGNAL(finished(ResponseCode)), this, SLOT(newFolderFinished(ResponseCode)));
-	client->sendCommand(command);
+	
+	Command_DeckNewDir cmd;
+	cmd.set_path(targetPath.toStdString());
+	cmd.set_dir_name(folderName.toStdString());
+	
+	PendingCommand *pend = client->prepareSessionCommand(cmd);
+	connect(pend, SIGNAL(finished(ResponseCode)), this, SLOT(newFolderFinished(ResponseCode)));
+	client->sendCommand(pend);
 }
 
 void TabDeckStorage::newFolderFinished(ResponseCode resp)
@@ -253,13 +264,13 @@ void TabDeckStorage::newFolderFinished(ResponseCode resp)
 	if (resp != RespOk)
 		return;
 
-	Command_DeckNewDir *cmd = static_cast<Command_DeckNewDir *>(sender());
-	serverDirView->addFolderToTree(cmd->getDirName(), serverDirView->getNodeByPath(cmd->getPath()));
+//	Command_DeckNewDir *cmd = static_cast<Command_DeckNewDir *>(sender());
+//	serverDirView->addFolderToTree(cmd->getDirName(), serverDirView->getNodeByPath(cmd->getPath()));
 }
 
 void TabDeckStorage::actDelete()
 {
-	Command *command;
+	PendingCommand *pend;
 	RemoteDeckList_TreeModel::Node *curRight = serverDirView->getCurrentItem();
 	if (!curRight)
 		return;
@@ -268,11 +279,17 @@ void TabDeckStorage::actDelete()
 		QString path = dir->getPath();
 		if (path.isEmpty())
 			return;
-		command = new Command_DeckDelDir(path);
-	} else
-		command = new Command_DeckDel(dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight)->getId());
-	connect(command, SIGNAL(finished(ResponseCode)), this, SLOT(deleteFinished(ResponseCode)));
-	client->sendCommand(command);
+		Command_DeckDelDir cmd;
+		cmd.set_path(path.toStdString());
+		pend = client->prepareSessionCommand(cmd);
+	} else {
+		Command_DeckDel cmd;
+		cmd.set_deck_id(dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight)->getId());
+		pend = client->prepareSessionCommand(cmd);
+	}
+	
+	connect(pend, SIGNAL(finished(ResponseCode)), this, SLOT(deleteFinished(ResponseCode)));
+	client->sendCommand(pend);
 }
 
 void TabDeckStorage::deleteFinished(ResponseCode resp)
@@ -281,11 +298,11 @@ void TabDeckStorage::deleteFinished(ResponseCode resp)
 		return;
 
 	RemoteDeckList_TreeModel::Node *toDelete = 0;
-	Command_DeckDelDir *cmdDelDir = qobject_cast<Command_DeckDelDir *>(sender());
-	if (cmdDelDir)
-		toDelete = serverDirView->getNodeByPath(cmdDelDir->getPath());
-	else
-		toDelete = serverDirView->getNodeById(static_cast<Command_DeckDel *>(sender())->getDeckId());
+//	Command_DeckDelDir *cmdDelDir = qobject_cast<Command_DeckDelDir *>(sender());
+//	if (cmdDelDir)
+//		toDelete = serverDirView->getNodeByPath(cmdDelDir->getPath());
+//	else
+//		toDelete = serverDirView->getNodeById(static_cast<Command_DeckDel *>(sender())->getDeckId());
 	
 	if (toDelete)
 		serverDirView->removeNode(toDelete);
