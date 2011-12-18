@@ -1420,11 +1420,6 @@ void Player::sendGameCommand(const google::protobuf::Message &command)
 	static_cast<TabGame *>(parent())->sendGameCommand(command, id);
 }
 
-void Player::sendCommandContainer(CommandContainer &cont)
-{
-	static_cast<TabGame *>(parent())->sendCommandContainer(cont, id);
-}
-
 void Player::sendGameCommand(PendingCommand *pend)
 {
 	static_cast<TabGame *>(parent())->sendGameCommand(pend, id);

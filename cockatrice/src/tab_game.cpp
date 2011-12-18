@@ -156,7 +156,7 @@ void DeckViewContainer::readyStart()
 {
 	Command_ReadyStart cmd;
 	cmd.set_ready(!readyStartButton->getReadyStart());
-	static_cast<TabGame *>(parent())->sendGameCommand(cmd);
+	static_cast<TabGame *>(parent())->sendGameCommand(cmd, playerId);
 }
 
 void DeckViewContainer::sideboardPlanChanged()
@@ -165,7 +165,7 @@ void DeckViewContainer::sideboardPlanChanged()
 	QList<MoveCardToZone *> newPlan = deckView->getSideboardPlan();
 	for (int i = 0; i < newPlan.size(); ++i)
 		cmd.add_move_list()->CopyFrom(newPlan[i]->toPB());
-	static_cast<TabGame *>(parent())->sendGameCommand(cmd);
+	static_cast<TabGame *>(parent())->sendGameCommand(cmd, playerId);
 }
 
 void DeckViewContainer::setReadyStart(bool ready)
@@ -507,12 +507,6 @@ void TabGame::sendGameCommand(const google::protobuf::Message &command, int play
 {
 	AbstractClient *client = getClientForPlayer(playerId);
 	client->sendCommand(prepareGameCommand(command));
-}
-
-void TabGame::sendCommandContainer(CommandContainer &cont, int playerId)
-{
-	cont.set_game_id(gameId);
-	getClientForPlayer(playerId)->sendCommand(cont);
 }
 
 PendingCommand *TabGame::prepareGameCommand(const ::google::protobuf::Message &cmd)

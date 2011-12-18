@@ -183,7 +183,6 @@ public:
 public slots:
 	void sendGameCommand(PendingCommand *pend, int playerId = -1);
 	void sendGameCommand(const ::google::protobuf::Message &command, int playerId = -1);
-	void sendCommandContainer(CommandContainer &cont, int playerId = -1);
 };
 
 #endif

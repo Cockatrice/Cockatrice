@@ -60,6 +60,7 @@ public:
 	int getGameCount() const { return gameTabs.size(); }
 	TabUserLists *getUserListsTab() const { return tabUserLists; }
 	ServerInfo_User *getUserInfo() const { return userInfo; }
+	const QMap<int, TabRoom *> &getRoomTabs() const { return roomTabs; }
 	bool getAdminLocked() const;
 	int getUserLevel() const;
 signals:

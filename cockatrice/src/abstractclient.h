@@ -77,6 +77,7 @@ public:
 	void sendCommand(PendingCommand *pend);
 	
 	PendingCommand *prepareSessionCommand(const ::google::protobuf::Message &cmd);
+	PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd, int roomId);
 	PendingCommand *prepareModeratorCommand(const ::google::protobuf::Message &cmd);
 	PendingCommand *prepareAdminCommand(const ::google::protobuf::Message &cmd);
 };

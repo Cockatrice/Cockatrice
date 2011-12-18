@@ -105,22 +105,16 @@ PhasesToolbar::PhasesToolbar(QGraphicsItem *parent)
 	connect(aDrawCard, SIGNAL(triggered()), this, SLOT(actDrawCard()));
 	
 	PhaseButton *untapButton = new PhaseButton("untap", this, aUntapAll);
-//	untapButton->setShortcut(QKeySequence("F5"));
 	PhaseButton *upkeepButton = new PhaseButton("upkeep", this);
 	PhaseButton *drawButton = new PhaseButton("draw", this, aDrawCard);
-//	drawButton->setShortcut(QKeySequence("F6"));
 	PhaseButton *main1Button = new PhaseButton("main1", this);
-//	main1Button->setShortcut(QKeySequence("F7"));
 	PhaseButton *combatStartButton = new PhaseButton("combat_start", this);
-//	combatStartButton->setShortcut(QKeySequence("F8"));
 	PhaseButton *combatAttackersButton = new PhaseButton("combat_attackers", this);
 	PhaseButton *combatBlockersButton = new PhaseButton("combat_blockers", this);
 	PhaseButton *combatDamageButton = new PhaseButton("combat_damage", this);
 	PhaseButton *combatEndButton = new PhaseButton("combat_end", this);
 	PhaseButton *main2Button = new PhaseButton("main2", this);
-//	main2Button->setShortcut(QKeySequence("F9"));
 	PhaseButton *cleanupButton = new PhaseButton("cleanup", this);
-//	cleanupButton->setShortcut(QKeySequence("F10"));
 	
 	buttonList << untapButton << upkeepButton << drawButton << main1Button << combatStartButton
 		<< combatAttackersButton << combatBlockersButton << combatDamageButton << combatEndButton

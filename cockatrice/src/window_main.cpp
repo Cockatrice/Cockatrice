@@ -36,6 +36,8 @@
 #include "localserverinterface.h"
 #include "localclient.h"
 
+#include "pb/room_commands.pb.h"
+
 const QString MainWindow::appName = "Cockatrice";
 
 void MainWindow::updateTabMenu(QMenu *menu)
@@ -134,8 +136,9 @@ void MainWindow::actSinglePlayer()
 	}
 	tabSupervisor->startLocal(localClients);
 	
-//	Command_CreateGame *createCommand = new Command_CreateGame(0, QString(), QString(), numberPlayers, QList<GameTypeId *>(), false, false, false, false);
-//	mainClient->sendCommand(createCommand);
+	Command_CreateGame createCommand;
+	createCommand.set_max_players(numberPlayers);
+	mainClient->sendCommand(mainClient->prepareRoomCommand(createCommand, 0));
 }
 
 void MainWindow::localGameEnded()

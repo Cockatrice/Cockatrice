@@ -37,9 +37,10 @@ GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSuperviso
 	filterLayout->addWidget(showFullGamesCheckBox);
 	filterLayout->addWidget(showRunningGamesCheckBox);
 	
-	if (room)
+	if (room) {
 		createButton = new QPushButton;
-	else
+		connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
+	} else
 		createButton = 0;
 	joinButton = new QPushButton;
 	spectateButton = new QPushButton;
@@ -68,7 +69,6 @@ GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSuperviso
 
 	connect(showFullGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showFullGamesChanged(int)));
 	connect(showRunningGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showRunningGamesChanged(int)));
-	connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
 	connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
 	connect(spectateButton, SIGNAL(clicked()), this, SLOT(actJoin()));
 }
@@ -132,9 +132,15 @@ void GameSelector::actJoin()
 	cmd.set_spectator(spectator);
 	cmd.set_override_restrictions(overrideRestrictions);
 	
-	PendingCommand *pend = room->prepareRoomCommand(cmd);
+	TabRoom *r = tabSupervisor->getRoomTabs().value(game->getRoomId());
+	if (!r) {
+		QMessageBox::critical(this, tr("Error"), tr("Please join the respective room first."));
+		return;
+	}
+	
+	PendingCommand *pend = r->prepareRoomCommand(cmd);
 	connect(pend, SIGNAL(finished(ResponseCode)), this, SLOT(checkResponse(ResponseCode)));
-	room->sendRoomCommand(pend);
+	r->sendRoomCommand(pend);
 
 	if (createButton)
 		createButton->setEnabled(false);

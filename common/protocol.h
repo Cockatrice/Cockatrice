@@ -91,21 +91,7 @@ public:
 // ----------------
 // --- COMMANDS ---
 // ----------------
-/*
-class Command : public ProtocolItem {
-	Q_OBJECT
-signals:
-	void finished(ProtocolResponse *response);
-	void finished(ResponseCode response);
-private:
-	QVariant extraData;
-public:
-	Command(const QString &_itemName = QString());
-	void setExtraData(const QVariant &_extraData) { extraData = _extraData; }
-	QVariant getExtraData() const { return extraData; }
-	void processResponse(ProtocolResponse *response);
-};
-*/
+
 class BlaContainer : public ProtocolItem {
 	Q_OBJECT
 private:
@@ -132,91 +118,7 @@ public:
 	void enqueueGameEventPrivate(GameEvent *event, int gameId, int playerId = -1, GameEventContext *context = 0);
 	int getPrivatePlayerId() const { return privatePlayerId; }
 };
-/*
-class RoomCommand : public Command {
-	Q_OBJECT
-public:
-	RoomCommand(const QString &_cmdName, int _roomId)
-		: Command(_cmdName)
-	{
-		insertItem(new SerializableItem_Int("room_id", _roomId));
-	}
-	int getRoomId() const { return static_cast<SerializableItem_Int *>(itemMap.value("room_id"))->getData(); }
-};
 
-class GameCommand : public Command {
-	Q_OBJECT
-public:
-	GameCommand(const QString &_cmdName, int _gameId)
-		: Command(_cmdName)
-	{
-		insertItem(new SerializableItem_Int("game_id", _gameId));
-	}
-	int getGameId() const { return static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->getData(); }
-	void setGameId(int _gameId) { static_cast<SerializableItem_Int *>(itemMap.value("game_id"))->setData(_gameId); }
-};
-
-class ModeratorCommand : public Command {
-	Q_OBJECT
-public:
-	ModeratorCommand(const QString &_cmdName)
-		: Command(_cmdName)
-	{
-	}
-};
-
-class AdminCommand : public Command {
-	Q_OBJECT
-public:
-	AdminCommand(const QString &_cmdName)
-		: Command(_cmdName)
-	{
-	}
-};
-
-class Command_DeckUpload : public Command {
-	Q_OBJECT
-public:
-	Command_DeckUpload(DeckList *_deck = 0, const QString &_path = QString());
-	static SerializableItem *newItem() { return new Command_DeckUpload; }
-	int getItemId() const { return ItemId_Command_DeckUpload; }
-	DeckList *getDeck() const;
-	QString getPath() const { return static_cast<SerializableItem_String *>(itemMap.value("path"))->getData(); }
-};
-
-class Command_DeckSelect : public GameCommand {
-	Q_OBJECT
-public:
-	Command_DeckSelect(int _gameId = -1, DeckList *_deck = 0, int _deckId = -1);
-	static SerializableItem *newItem() { return new Command_DeckSelect; }
-	int getItemId() const { return ItemId_Command_DeckSelect; }
-	DeckList *getDeck() const;
-	int getDeckId() const { return static_cast<SerializableItem_Int *>(itemMap.value("deck_id"))->getData(); }
-};
-
-class Command_SetSideboardPlan : public GameCommand {
-	Q_OBJECT
-public:
-	Command_SetSideboardPlan(int _gameId = -1, const QList<MoveCardToZone *> &_moveList = QList<MoveCardToZone *>());
-	static SerializableItem *newItem() { return new Command_SetSideboardPlan; }
-	int getItemId() const { return ItemId_Command_SetSideboardPlan; }
-	QList<MoveCardToZone *> getMoveList() const;
-};
-
-class Command_MoveCard : public GameCommand {
-	Q_OBJECT
-public:
-	Command_MoveCard(int _gameId = -1, const QString &_startZone = QString(), const QList<CardToMove *> &_cards = QList<CardToMove *>(), int _targetPlayerId = -1, const QString &_targetZone = QString(), int _x = -1, int _y = -1);
-	QString getStartZone() const { return static_cast<SerializableItem_String *>(itemMap.value("start_zone"))->getData(); }
-	QList<CardToMove *> getCards() const { return typecastItemList<CardToMove *>(); }
-	int getTargetPlayerId() const { return static_cast<SerializableItem_Int *>(itemMap.value("target_player_id"))->getData(); }
-	QString getTargetZone() const { return static_cast<SerializableItem_String *>(itemMap.value("target_zone"))->getData(); }
-	int getX() const { return static_cast<SerializableItem_Int *>(itemMap.value("x"))->getData(); }
-	int getY() const { return static_cast<SerializableItem_Int *>(itemMap.value("y"))->getData(); }
-	static SerializableItem *newItem() { return new Command_MoveCard; }
-	int getItemId() const { return ItemId_Command_MoveCard; }
-};
-*/
 // -----------------
 // --- RESPONSES ---
 // -----------------
@@ -231,6 +133,7 @@ public:
 	static void initializeHash();
 	static SerializableItem *newItem() { return new ProtocolResponse; }
 	int getCmdId() const { return static_cast<SerializableItem_Int *>(itemMap.value("cmd_id"))->getData(); }
+	void setCmdId(int _cmdId) { static_cast<SerializableItem_Int *>(itemMap.value("cmd_id"))->setData(_cmdId); }
 	ResponseCode getResponseCode() const { return responseHash.value(static_cast<SerializableItem_String *>(itemMap.value("response_code"))->getData(), RespOk); }
 };
 

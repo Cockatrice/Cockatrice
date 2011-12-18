@@ -19,8 +19,9 @@ void LocalServerInterface::sendProtocolItem(ProtocolItem *item, bool deleteItem)
 	if (deleteItem)
 		delete item;
 }
-
-void LocalServerInterface::itemFromClient(ProtocolItem *item)
+#include "pb/commands.pb.h"
+void LocalServerInterface::itemFromClient(const CommandContainer &item)
 {
-	//processCommandContainer(static_cast<CommandContainer *>(item));
+	qDebug() << "READ" << QString::fromStdString(item.ShortDebugString());
+	processCommandContainer(item);
 }

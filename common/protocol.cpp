@@ -28,18 +28,10 @@ void ProtocolItem::initializeHash()
 	registerSerializableItem("player_ping", ServerInfo_PlayerPing::newItem);
 	registerSerializableItem("file", DeckList_File::newItem);
 	registerSerializableItem("directory", DeckList_Directory::newItem);
-//	registerSerializableItem("card_to_move", CardToMove::newItem);
 	registerSerializableItem("game_type_id", GameTypeId::newItem);
 	
-//	registerSerializableItem("containercmd", CommandContainer::newItem);
 	registerSerializableItem("containergame_event", GameEventContainer::newItem);
-/*	
-	registerSerializableItem("cmdcreate_game", Command_CreateGame::newItem);
-	registerSerializableItem("cmddeck_upload", Command_DeckUpload::newItem);
-	registerSerializableItem("cmddeck_select", Command_DeckSelect::newItem);
-	registerSerializableItem("cmdset_sideboard_plan", Command_SetSideboardPlan::newItem);
-	registerSerializableItem("cmdmove_card", Command_MoveCard::newItem);
-*/	
+
 	registerSerializableItem("resp", ProtocolResponse::newItem);
 	ProtocolResponse::initializeHash();
 	registerSerializableItem("respjoin_room", Response_JoinRoom::newItem);
@@ -105,41 +97,6 @@ void TopLevelProtocolItem::writeElement(QXmlStreamWriter * /*xml*/)
 {
 }
 
-/*
-int CommandContainer::lastCmdId = 0;
-
-Command::Command(const QString &_itemName)
-	: ProtocolItem("cmd", _itemName)
-{
-}
-
-void Command::processResponse(ProtocolResponse *response)
-{
-	emit finished(response);
-	emit finished(response->getResponseCode());
-}
-
-CommandContainer::CommandContainer(const QList<Command *> &_commandList, int _cmdId)
-	: ProtocolItem("container", "cmd"), ticks(0), resp(0), gameEventQueuePublic(0), gameEventQueueOmniscient(0), gameEventQueuePrivate(0), privatePlayerId(-1)
-{
-	if (_cmdId == -1)
-		_cmdId = lastCmdId++;
-	insertItem(new SerializableItem_Int("cmd_id", _cmdId));
-	
-	for (int i = 0; i < _commandList.size(); ++i)
-		itemList.append(_commandList[i]);
-}
-
-void CommandContainer::processResponse(ProtocolResponse *response)
-{
-	emit finished(response);
-	emit finished(response->getResponseCode());
-	
-	const QList<Command *> &cmdList = getCommandList();
-	for (int i = 0; i < cmdList.size(); ++i)
-		cmdList[i]->processResponse(response);
-}
-*/
 BlaContainer::BlaContainer()
 	: ProtocolItem("container", "cmd"), resp(0), gameEventQueuePublic(0), gameEventQueueOmniscient(0), gameEventQueuePrivate(0), privatePlayerId(-1)
 {
@@ -178,77 +135,7 @@ void BlaContainer::enqueueGameEventPrivate(GameEvent *event, int gameId, int pla
 	if (context)
 		gameEventQueuePrivate->setContext(context);
 }
-/*
-Command_CreateGame::Command_CreateGame(int _roomId, const QString &_description, const QString &_password, int _maxPlayers, const QList<GameTypeId *> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything)
-	: RoomCommand("create_game", _roomId)
-{
-	insertItem(new SerializableItem_String("description", _description));
-	insertItem(new SerializableItem_String("password", _password));
-	insertItem(new SerializableItem_Int("max_players", _maxPlayers));
-	insertItem(new SerializableItem_Bool("only_buddies", _onlyBuddies));
-	insertItem(new SerializableItem_Bool("only_registered", _onlyRegistered));
-	insertItem(new SerializableItem_Bool("spectators_allowed", _spectatorsAllowed));
-	insertItem(new SerializableItem_Bool("spectators_need_password", _spectatorsNeedPassword));
-	insertItem(new SerializableItem_Bool("spectators_can_talk", _spectatorsCanTalk));
-	insertItem(new SerializableItem_Bool("spectators_see_everything", _spectatorsSeeEverything));
-	
-	for (int i = 0; i < _gameTypes.size(); ++i)
-		itemList.append(_gameTypes[i]);
-}
 
-Command_DeckUpload::Command_DeckUpload(DeckList *_deck, const QString &_path)
-	: Command("deck_upload")
-{
-	insertItem(new SerializableItem_String("path", _path));
-	if (!_deck)
-		_deck = new DeckList;
-	insertItem(_deck);
-}
-
-DeckList *Command_DeckUpload::getDeck() const
-{
-	return static_cast<DeckList *>(itemMap.value("cockatrice_deck"));
-}
-
-Command_DeckSelect::Command_DeckSelect(int _gameId, DeckList *_deck, int _deckId)
-	: GameCommand("deck_select", _gameId)
-{
-	insertItem(new SerializableItem_Int("deck_id", _deckId));
-	if (!_deck)
-		_deck = new DeckList;
-	insertItem(_deck);
-}
-
-DeckList *Command_DeckSelect::getDeck() const
-{
-	return static_cast<DeckList *>(itemMap.value("cockatrice_deck"));
-}
-
-Command_SetSideboardPlan::Command_SetSideboardPlan(int _gameId, const QList<MoveCardToZone *> &_moveList)
-	: GameCommand("set_sideboard_plan", _gameId)
-{
-	for (int i = 0; i < _moveList.size(); ++i)
-		itemList.append(_moveList[i]);
-}
-
-QList<MoveCardToZone *> Command_SetSideboardPlan::getMoveList() const
-{
-	return typecastItemList<MoveCardToZone *>();
-}
-
-Command_MoveCard::Command_MoveCard(int _gameId, const QString &_startZone, const QList<CardToMove *> &_cards, int _targetPlayerId, const QString &_targetZone, int _x, int _y)
-	: GameCommand("move_card", _gameId)
-{
-	insertItem(new SerializableItem_String("start_zone", _startZone));
-	insertItem(new SerializableItem_Int("target_player_id", _targetPlayerId));
-	insertItem(new SerializableItem_String("target_zone", _targetZone));
-	insertItem(new SerializableItem_Int("x", _x));
-	insertItem(new SerializableItem_Int("y", _y));
-
-	for (int i = 0; i < _cards.size(); ++i)
-		itemList.append(_cards[i]);
-}
-*/
 QHash<QString, ResponseCode> ProtocolResponse::responseHash;
 
 ProtocolResponse::ProtocolResponse(int _cmdId, ResponseCode _responseCode, const QString &_itemName)

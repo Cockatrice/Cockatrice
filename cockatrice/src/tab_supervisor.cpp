@@ -249,9 +249,9 @@ void TabSupervisor::localGameJoined(Event_GameJoined *event)
 	setCurrentWidget(tab);
 	
 	for (int i = 1; i < localClients.size(); ++i) {
-//		Command_JoinGame *cmd = new Command_JoinGame(0, event->getGameId());
-//		localClients[i]->sendCommand(cmd);
-		// XXX
+		Command_JoinGame cmd;
+		cmd.set_game_id(event->getGameId());
+		localClients[i]->sendCommand(localClients[i]->prepareRoomCommand(cmd, 0));
 	}
 }
 

@@ -296,10 +296,10 @@ void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
 
 void UserList::gamesOfUserReceived(ProtocolResponse *resp)
 {
-	//Command_GetGamesOfUser *command = static_cast<Command_GetGamesOfUser *>(sender());
 	Response_GetGamesOfUser *response = qobject_cast<Response_GetGamesOfUser *>(resp);
 	if (!response)
 		return;
+	const Command_GetGamesOfUser &cmd = static_cast<const Command_GetGamesOfUser &>(static_cast<PendingCommand *>(sender())->getCommandContainer().session_command(0).GetExtension(Command_GetGamesOfUser::ext));
 	
 	QMap<int, GameTypeMap> gameTypeMap;
 	QMap<int, QString> roomMap;
@@ -318,7 +318,7 @@ void UserList::gamesOfUserReceived(ProtocolResponse *resp)
 	for (int i = 0; i < gameList.size(); ++i)
 		selector->processGameInfo(gameList[i]);
 	
-//	selector->setWindowTitle(tr("%1's games").arg(command->getUserName()));
+	selector->setWindowTitle(tr("%1's games").arg(QString::fromStdString(cmd.user_name())));
 	selector->setAttribute(Qt::WA_DeleteOnClose);
 	selector->show();
 }

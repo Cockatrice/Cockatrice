@@ -59,22 +59,22 @@ private:
 	
 	int getUserIdInDB(const QString &name) const;
 
-	ResponseCode cmdAddToList(const Command_AddToList &cmd, CommandContainer *cont);
-	ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, CommandContainer *cont);
+	ResponseCode cmdAddToList(const Command_AddToList &cmd, BlaContainer *bla);
+	ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, BlaContainer *bla);
 	int getDeckPathId(int basePathId, QStringList path);
 	int getDeckPathId(const QString &path);
 	bool deckListHelper(DeckList_Directory *folder);
-	ResponseCode cmdDeckList(const Command_DeckList &cmd, CommandContainer *cont);
-	ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, CommandContainer *cont);
+	ResponseCode cmdDeckList(const Command_DeckList &cmd, BlaContainer *bla);
+	ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, BlaContainer *bla);
 	void deckDelDirHelper(int basePathId);
-	ResponseCode cmdDeckDelDir(const Command_DeckDelDir &cmd, CommandContainer *cont);
-	ResponseCode cmdDeckDel(const Command_DeckDel &cmd, CommandContainer *cont);
-	ResponseCode cmdDeckUpload(const Command_DeckUpload &cmd, CommandContainer *cont);
+	ResponseCode cmdDeckDelDir(const Command_DeckDelDir &cmd, BlaContainer *bla);
+	ResponseCode cmdDeckDel(const Command_DeckDel &cmd, BlaContainer *bla);
+	ResponseCode cmdDeckUpload(const Command_DeckUpload &cmd, BlaContainer *bla);
 	DeckList *getDeckFromDatabase(int deckId);
-	ResponseCode cmdDeckDownload(const Command_DeckDownload &cmd, CommandContainer *cont);
-	ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, CommandContainer *cont);
-	ResponseCode cmdShutdownServer(const Command_ShutdownServer &cmd, CommandContainer *cont);
-	ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, CommandContainer *cont);
+	ResponseCode cmdDeckDownload(const Command_DeckDownload &cmd, BlaContainer *bla);
+	ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, BlaContainer *bla);
+	ResponseCode cmdShutdownServer(const Command_ShutdownServer &cmd, BlaContainer *bla);
+	ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, BlaContainer *bla);
 protected:
 	bool getCompressionSupport() const { return compressionSupport; }
 public:

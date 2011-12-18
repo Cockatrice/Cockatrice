@@ -43,7 +43,8 @@ private slots:
 	void newFolderFinished(ResponseCode resp);
 
 	void actDelete();
-	void deleteFinished(ResponseCode resp);
+	void deleteFolderFinished(ResponseCode resp);
+	void deleteDeckFinished(ResponseCode resp);
 public:
 	TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client);
 	void retranslateUi();

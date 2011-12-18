@@ -261,7 +261,6 @@ public:
 	PendingCommand *prepareGameCommand(const QList< const ::google::protobuf::Message * > &cmdList);
 	void sendGameCommand(PendingCommand *pend);
 	void sendGameCommand(const google::protobuf::Message &command);
-	void sendCommandContainer(CommandContainer &cont);
 };
 
 #endif

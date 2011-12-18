@@ -24,9 +24,7 @@ LocalClient::~LocalClient()
 
 void LocalClient::sendCommandContainer(const CommandContainer &cont)
 {
-//	cont->setReceiverMayDelete(false);
-//	pendingCommands.insert(cont->getCmdId(), cont);
-//	lsi->itemFromClient(cont);
+	lsi->itemFromClient(cont);
 }
 
 void LocalClient::itemFromServer(ProtocolItem *item)

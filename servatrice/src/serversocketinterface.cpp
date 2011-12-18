@@ -114,31 +114,14 @@ void ServerSocketInterface::readClient()
 		if (inputBuffer.size() < messageLength)
 			return;
 		
-		CommandContainer *newCommandContainer = new CommandContainer;
-		newCommandContainer->ParseFromArray(inputBuffer.data(), messageLength);
-		logger->logMessage(QString::fromStdString(newCommandContainer->ShortDebugString()), this);
+		CommandContainer newCommandContainer;
+		newCommandContainer.ParseFromArray(inputBuffer.data(), messageLength);
+		logger->logMessage(QString::fromStdString(newCommandContainer.ShortDebugString()), this);
 		inputBuffer.remove(0, messageLength);
 		messageInProgress = false;
 		
 		processCommandContainer(newCommandContainer);
 	} while (!inputBuffer.isEmpty());
-		
-/*	if (!data.contains("<cmd type=\"ping\""))
-		logger->logMessage(QString(data), this);
-	xmlReader->addData(data);
-	
-	while (!xmlReader->atEnd()) {
-		xmlReader->readNext();
-		if (topLevelItem)
-			topLevelItem->readElement(xmlReader);
-		else if (xmlReader->isStartElement() && (xmlReader->name().toString() == "cockatrice_client_stream")) {
-			if (xmlReader->attributes().value("comp").toString().toInt() == 1)
-				compressionSupport = true;
-			topLevelItem = new TopLevelProtocolItem;
-			connect(topLevelItem, SIGNAL(protocolItemReceived(ProtocolItem *)), this, SLOT(processProtocolItem(ProtocolItem *)));
-		}
-	}
-*/
 }
 
 void ServerSocketInterface::catchSocketError(QAbstractSocket::SocketError socketError)
@@ -172,7 +155,7 @@ int ServerSocketInterface::getUserIdInDB(const QString &name) const
 	return query.value(0).toInt();
 }
 
-ResponseCode ServerSocketInterface::cmdAddToList(const Command_AddToList &cmd, CommandContainer *cont)
+ResponseCode ServerSocketInterface::cmdAddToList(const Command_AddToList &cmd, BlaContainer *bla)
 {
 	if (authState != PasswordRight)
 		return RespFunctionNotAllowed;
@@ -209,11 +192,11 @@ ResponseCode ServerSocketInterface::cmdAddToList(const Command_AddToList &cmd, C
 	else if (list == "ignore")
 		ignoreList.insert(info->getName(), info);
 	
-	//cont->enqueueItem(new Event_AddToList(list, new ServerInfo_User(info)));
+	bla->enqueueItem(new Event_AddToList(list, new ServerInfo_User(info)));
 	return RespOk;
 }
 
-ResponseCode ServerSocketInterface::cmdRemoveFromList(const Command_RemoveFromList &cmd, CommandContainer *cont)
+ResponseCode ServerSocketInterface::cmdRemoveFromList(const Command_RemoveFromList &cmd, BlaContainer *bla)
 {
 	if (authState != PasswordRight)
 		return RespFunctionNotAllowed;
@@ -250,7 +233,7 @@ ResponseCode ServerSocketInterface::cmdRemoveFromList(const Command_RemoveFromLi
 		ignoreList.remove(user);
 	}
 	
-	//cont->enqueueItem(new Event_RemoveFromList(list, user));
+	bla->enqueueItem(new Event_RemoveFromList(list, user));
 	return RespOk;
 }
 
@@ -317,7 +300,7 @@ bool ServerSocketInterface::deckListHelper(DeckList_Directory *folder)
 // CHECK AUTHENTICATION!
 // Also check for every function that data belonging to other users cannot be accessed.
 
-ResponseCode ServerSocketInterface::cmdDeckList(const Command_DeckList & /*cmd*/, CommandContainer *cont)
+ResponseCode ServerSocketInterface::cmdDeckList(const Command_DeckList & /*cmd*/, BlaContainer *bla)
 {
 	if (authState != PasswordRight)
 		return RespFunctionNotAllowed;
@@ -329,15 +312,15 @@ ResponseCode ServerSocketInterface::cmdDeckList(const Command_DeckList & /*cmd*/
 	if (!deckListHelper(root))
 		return RespContextError;
 	
-	ProtocolResponse *resp = new Response_DeckList(cont->cmd_id(), RespOk, root);
+	ProtocolResponse *resp = new Response_DeckList(-1, RespOk, root);
 	if (getCompressionSupport())
 		resp->setCompressed(true);
-//	cont->setResponse(resp);
+	bla->setResponse(resp);
 	
 	return RespNothing;
 }
 
-ResponseCode ServerSocketInterface::cmdDeckNewDir(const Command_DeckNewDir &cmd, CommandContainer * /*cont*/)
+ResponseCode ServerSocketInterface::cmdDeckNewDir(const Command_DeckNewDir &cmd, BlaContainer * /*cont*/)
 {
 	if (authState != PasswordRight)
 		return RespFunctionNotAllowed;
@@ -381,7 +364,7 @@ void ServerSocketInterface::deckDelDirHelper(int basePathId)
 	servatrice->execSqlQuery(query);
 }
 
-ResponseCode ServerSocketInterface::cmdDeckDelDir(const Command_DeckDelDir &cmd, CommandContainer * /*cont*/)
+ResponseCode ServerSocketInterface::cmdDeckDelDir(const Command_DeckDelDir &cmd, BlaContainer * /*cont*/)
 {
 	if (authState != PasswordRight)
 		return RespFunctionNotAllowed;
@@ -395,7 +378,7 @@ ResponseCode ServerSocketInterface::cmdDeckDelDir(const Command_DeckDelDir &cmd,
 	return RespOk;
 }
 
-ResponseCode ServerSocketInterface::cmdDeckDel(const Command_DeckDel &cmd, CommandContainer * /*cont*/)
+ResponseCode ServerSocketInterface::cmdDeckDel(const Command_DeckDel &cmd, BlaContainer * /*cont*/)
 {
 	if (authState != PasswordRight)
 		return RespFunctionNotAllowed;
@@ -419,26 +402,23 @@ ResponseCode ServerSocketInterface::cmdDeckDel(const Command_DeckDel &cmd, Comma
 	return RespOk;
 }
 
-ResponseCode ServerSocketInterface::cmdDeckUpload(const Command_DeckUpload &cmd, CommandContainer *cont)
+ResponseCode ServerSocketInterface::cmdDeckUpload(const Command_DeckUpload &cmd, BlaContainer *bla)
 {
 	if (authState != PasswordRight)
 		return RespFunctionNotAllowed;
 	
 	servatrice->checkSql();
-/*	
-	if (!cmd->getDeck())
+	
+	if (!cmd.has_deck_list())
 		return RespInvalidData;
-	int folderId = getDeckPathId(cmd->getPath());
+	int folderId = getDeckPathId(QString::fromStdString(cmd.path()));
 	if (folderId == -1)
 		return RespNameNotFound;
 	
-	QString deckContents;
-	QXmlStreamWriter deckWriter(&deckContents);
-	deckWriter.writeStartDocument();
-	cmd->getDeck()->write(&deckWriter);
-	deckWriter.writeEndDocument();
+	QString deckStr = QString::fromStdString(cmd.deck_list());
+	DeckList deck(deckStr);
 	
-	QString deckName = cmd->getDeck()->getName();
+	QString deckName = deck.getName();
 	if (deckName.isEmpty())
 		deckName = "Unnamed deck";
 
@@ -448,11 +428,11 @@ ResponseCode ServerSocketInterface::cmdDeckUpload(const Command_DeckUpload &cmd,
 	query.bindValue(":id_folder", folderId);
 	query.bindValue(":user", userInfo->getName());
 	query.bindValue(":name", deckName);
-	query.bindValue(":content", deckContents);
+	query.bindValue(":content", deckStr);
 	servatrice->execSqlQuery(query);
 	
-	cont->setResponse(new Response_DeckUpload(cont->cmd_id(), RespOk, new DeckList_File(deckName, query.lastInsertId().toInt(), QDateTime::currentDateTime())));
-*/	return RespNothing;
+	bla->setResponse(new Response_DeckUpload(-1, RespOk, new DeckList_File(deckName, query.lastInsertId().toInt(), QDateTime::currentDateTime())));
+	return RespNothing;
 }
 
 DeckList *ServerSocketInterface::getDeckFromDatabase(int deckId)
@@ -476,7 +456,7 @@ DeckList *ServerSocketInterface::getDeckFromDatabase(int deckId)
 	return deck;
 }
 
-ResponseCode ServerSocketInterface::cmdDeckDownload(const Command_DeckDownload &cmd, CommandContainer *cont)
+ResponseCode ServerSocketInterface::cmdDeckDownload(const Command_DeckDownload &cmd, BlaContainer *bla)
 {
 	if (authState != PasswordRight)
 		return RespFunctionNotAllowed;
@@ -487,14 +467,14 @@ ResponseCode ServerSocketInterface::cmdDeckDownload(const Command_DeckDownload &
 	} catch(ResponseCode r) {
 		return r;
 	}
-	//cont->setResponse(new Response_DeckDownload(cont->cmd_id(), RespOk, deck));
+	bla->setResponse(new Response_DeckDownload(-1, RespOk, deck));
 	return RespNothing;
 }
 
 // MODERATOR FUNCTIONS.
 // May be called by admins and moderators. Permission is checked by the calling function.
 
-ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_BanFromServer &cmd, CommandContainer * /*cont*/)
+ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_BanFromServer &cmd, BlaContainer * /*cont*/)
 {
 	QString userName = QString::fromStdString(cmd.user_name());
 	QString address = QString::fromStdString(cmd.address());
@@ -523,13 +503,13 @@ ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_BanFromServer
 // ADMIN FUNCTIONS.
 // Permission is checked by the calling function.
 
-ResponseCode ServerSocketInterface::cmdUpdateServerMessage(const Command_UpdateServerMessage & /*cmd*/, CommandContainer * /*cont*/)
+ResponseCode ServerSocketInterface::cmdUpdateServerMessage(const Command_UpdateServerMessage & /*cmd*/, BlaContainer * /*cont*/)
 {
 	servatrice->updateLoginMessage();
 	return RespOk;
 }
 
-ResponseCode ServerSocketInterface::cmdShutdownServer(const Command_ShutdownServer &cmd, CommandContainer * /*cont*/)
+ResponseCode ServerSocketInterface::cmdShutdownServer(const Command_ShutdownServer &cmd, BlaContainer * /*cont*/)
 {
 	servatrice->scheduleShutdown(QString::fromStdString(cmd.reason()), cmd.minutes());
 	return RespOk;

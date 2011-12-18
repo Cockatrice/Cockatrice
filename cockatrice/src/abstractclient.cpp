@@ -98,6 +98,15 @@ PendingCommand *AbstractClient::prepareSessionCommand(const ::google::protobuf::
 	return new PendingCommand(cont);
 }
 
+PendingCommand *AbstractClient::prepareRoomCommand(const ::google::protobuf::Message &cmd, int roomId)
+{
+	CommandContainer cont;
+	RoomCommand *c = cont.add_room_command();
+	cont.set_room_id(roomId);
+	c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
+	return new PendingCommand(cont);
+}
+
 PendingCommand *AbstractClient::prepareModeratorCommand(const ::google::protobuf::Message &cmd)
 {
 	CommandContainer cont;

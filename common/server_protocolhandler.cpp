@@ -107,12 +107,12 @@ void Server_ProtocolHandler::playerRemovedFromGame(Server_Game *game)
 	games.remove(game->getGameId());
 }
 
-ResponseCode Server_ProtocolHandler::processSessionCommandContainer(CommandContainer *cont, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::processSessionCommandContainer(const CommandContainer &cont, BlaContainer *bla)
 {
 	ResponseCode finalResponseCode = RespOk;
-	for (int i = cont->session_command_size() - 1; i >= 0; --i) {
+	for (int i = cont.session_command_size() - 1; i >= 0; --i) {
 		ResponseCode resp = RespInvalidCommand;
-		const SessionCommand &sc = cont->session_command(i);
+		const SessionCommand &sc = cont.session_command(i);
 		std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
 		sc.GetReflection()->ListFields(sc, &fieldList);
 		int num = 0;
@@ -122,22 +122,22 @@ ResponseCode Server_ProtocolHandler::processSessionCommandContainer(CommandConta
 				break;
 			}
 		switch ((SessionCommand::SessionCommandType) num) {
-			case SessionCommand::PING: resp = cmdPing(sc.GetExtension(Command_Ping::ext), cont); break;
-			case SessionCommand::LOGIN: resp = cmdLogin(sc.GetExtension(Command_Login::ext), cont, bla); break;
-			case SessionCommand::MESSAGE: resp = cmdMessage(sc.GetExtension(Command_Message::ext), cont, bla); break;
-			case SessionCommand::ADD_TO_LIST: resp = cmdAddToList(sc.GetExtension(Command_AddToList::ext), cont); break;
-			case SessionCommand::REMOVE_FROM_LIST: resp = cmdRemoveFromList(sc.GetExtension(Command_RemoveFromList::ext), cont); break;
-			case SessionCommand::DECK_LIST: resp = cmdDeckList(sc.GetExtension(Command_DeckList::ext), cont); break;
-			case SessionCommand::DECK_NEW_DIR: resp = cmdDeckNewDir(sc.GetExtension(Command_DeckNewDir::ext), cont); break;
-			case SessionCommand::DECK_DEL_DIR: resp = cmdDeckDelDir(sc.GetExtension(Command_DeckDelDir::ext), cont); break;
-			case SessionCommand::DECK_DEL: resp = cmdDeckDel(sc.GetExtension(Command_DeckDel::ext), cont); break;
-			case SessionCommand::DECK_UPLOAD: resp = cmdDeckUpload(sc.GetExtension(Command_DeckUpload::ext), cont); break;
-			case SessionCommand::DECK_DOWNLOAD: resp = cmdDeckDownload(sc.GetExtension(Command_DeckDownload::ext), cont); break;
-			case SessionCommand::GET_GAMES_OF_USER: resp = cmdGetGamesOfUser(sc.GetExtension(Command_GetGamesOfUser::ext), cont, bla); break;
-			case SessionCommand::GET_USER_INFO: resp = cmdGetUserInfo(sc.GetExtension(Command_GetUserInfo::ext), cont, bla); break;
-			case SessionCommand::LIST_ROOMS: resp = cmdListRooms(sc.GetExtension(Command_ListRooms::ext), cont, bla); break;
-			case SessionCommand::JOIN_ROOM: resp = cmdJoinRoom(sc.GetExtension(Command_JoinRoom::ext), cont, bla); break;
-			case SessionCommand::LIST_USERS: resp = cmdListUsers(sc.GetExtension(Command_ListUsers::ext), cont, bla); break;
+			case SessionCommand::PING: resp = cmdPing(sc.GetExtension(Command_Ping::ext)); break;
+			case SessionCommand::LOGIN: resp = cmdLogin(sc.GetExtension(Command_Login::ext), bla); break;
+			case SessionCommand::MESSAGE: resp = cmdMessage(sc.GetExtension(Command_Message::ext), bla); break;
+			case SessionCommand::ADD_TO_LIST: resp = cmdAddToList(sc.GetExtension(Command_AddToList::ext), bla); break;
+			case SessionCommand::REMOVE_FROM_LIST: resp = cmdRemoveFromList(sc.GetExtension(Command_RemoveFromList::ext), bla); break;
+			case SessionCommand::DECK_LIST: resp = cmdDeckList(sc.GetExtension(Command_DeckList::ext), bla); break;
+			case SessionCommand::DECK_NEW_DIR: resp = cmdDeckNewDir(sc.GetExtension(Command_DeckNewDir::ext), bla); break;
+			case SessionCommand::DECK_DEL_DIR: resp = cmdDeckDelDir(sc.GetExtension(Command_DeckDelDir::ext), bla); break;
+			case SessionCommand::DECK_DEL: resp = cmdDeckDel(sc.GetExtension(Command_DeckDel::ext), bla); break;
+			case SessionCommand::DECK_UPLOAD: resp = cmdDeckUpload(sc.GetExtension(Command_DeckUpload::ext), bla); break;
+			case SessionCommand::DECK_DOWNLOAD: resp = cmdDeckDownload(sc.GetExtension(Command_DeckDownload::ext), bla); break;
+			case SessionCommand::GET_GAMES_OF_USER: resp = cmdGetGamesOfUser(sc.GetExtension(Command_GetGamesOfUser::ext), bla); break;
+			case SessionCommand::GET_USER_INFO: resp = cmdGetUserInfo(sc.GetExtension(Command_GetUserInfo::ext), bla); break;
+			case SessionCommand::LIST_ROOMS: resp = cmdListRooms(sc.GetExtension(Command_ListRooms::ext), bla); break;
+			case SessionCommand::JOIN_ROOM: resp = cmdJoinRoom(sc.GetExtension(Command_JoinRoom::ext), bla); break;
+			case SessionCommand::LIST_USERS: resp = cmdListUsers(sc.GetExtension(Command_ListUsers::ext), bla); break;
 		}
 		if ((resp != RespOk) && (resp != RespNothing))
 			finalResponseCode = resp;
@@ -145,21 +145,21 @@ ResponseCode Server_ProtocolHandler::processSessionCommandContainer(CommandConta
 	return finalResponseCode;
 }
 
-ResponseCode Server_ProtocolHandler::processRoomCommandContainer(CommandContainer *cont, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const CommandContainer &cont, BlaContainer *bla)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
 
-	Server_Room *room = rooms.value(cont->room_id(), 0);
+	Server_Room *room = rooms.value(cont.room_id(), 0);
 	if (!room)
 		return RespNotInRoom;
 	
 	QMutexLocker locker(&room->roomMutex);
 
 	ResponseCode finalResponseCode = RespOk;
-	for (int i = cont->room_command_size() - 1; i >= 0; --i) {
+	for (int i = cont.room_command_size() - 1; i >= 0; --i) {
 		ResponseCode resp = RespInvalidCommand;
-		const RoomCommand &sc = cont->room_command(i);
+		const RoomCommand &sc = cont.room_command(i);
 		std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
 		sc.GetReflection()->ListFields(sc, &fieldList);
 		int num = 0;
@@ -169,10 +169,10 @@ ResponseCode Server_ProtocolHandler::processRoomCommandContainer(CommandContaine
 				break;
 			}
 		switch ((RoomCommand::RoomCommandType) num) {
-			case RoomCommand::LEAVE_ROOM: resp = cmdLeaveRoom(sc.GetExtension(Command_LeaveRoom::ext), cont, room); break;
-			case RoomCommand::ROOM_SAY: resp = cmdRoomSay(sc.GetExtension(Command_RoomSay::ext), cont, room); break;
-			case RoomCommand::CREATE_GAME: resp = cmdCreateGame(sc.GetExtension(Command_CreateGame::ext), cont, room); break;
-			case RoomCommand::JOIN_GAME: resp = cmdJoinGame(sc.GetExtension(Command_JoinGame::ext), cont, room); break;
+			case RoomCommand::LEAVE_ROOM: resp = cmdLeaveRoom(sc.GetExtension(Command_LeaveRoom::ext), room); break;
+			case RoomCommand::ROOM_SAY: resp = cmdRoomSay(sc.GetExtension(Command_RoomSay::ext), room); break;
+			case RoomCommand::CREATE_GAME: resp = cmdCreateGame(sc.GetExtension(Command_CreateGame::ext), room); break;
+			case RoomCommand::JOIN_GAME: resp = cmdJoinGame(sc.GetExtension(Command_JoinGame::ext), room); break;
 		}
 		if ((resp != RespOk) && (resp != RespNothing))
 			finalResponseCode = resp;
@@ -180,17 +180,17 @@ ResponseCode Server_ProtocolHandler::processRoomCommandContainer(CommandContaine
 	return finalResponseCode;
 }
 
-ResponseCode Server_ProtocolHandler::processGameCommandContainer(CommandContainer *cont, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::processGameCommandContainer(const CommandContainer &cont, BlaContainer *bla)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
 	
 	gameListMutex.lock();
-	if (!games.contains(cont->game_id())) {
+	if (!games.contains(cont.game_id())) {
 		qDebug() << "invalid game";
 		return RespNotInRoom;
 	}
-	QPair<Server_Game *, Server_Player *> gamePair = games.value(cont->game_id());
+	QPair<Server_Game *, Server_Player *> gamePair = games.value(cont.game_id());
 	Server_Game *game = gamePair.first;
 	Server_Player *player = gamePair.second;
 	
@@ -198,9 +198,9 @@ ResponseCode Server_ProtocolHandler::processGameCommandContainer(CommandContaine
 	gameListMutex.unlock();
 
 	ResponseCode finalResponseCode = RespOk;
-	for (int i = cont->game_command_size() - 1; i >= 0; --i) {
+	for (int i = cont.game_command_size() - 1; i >= 0; --i) {
 		ResponseCode resp = RespInvalidCommand;
-		const GameCommand &sc = cont->game_command(i);
+		const GameCommand &sc = cont.game_command(i);
 		std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
 		sc.GetReflection()->ListFields(sc, &fieldList);
 		int num = 0;
@@ -210,36 +210,36 @@ ResponseCode Server_ProtocolHandler::processGameCommandContainer(CommandContaine
 				break;
 			}
 		switch ((GameCommand::GameCommandType) num) {
-			case GameCommand::KICK_FROM_GAME: resp = cmdKickFromGame(sc.GetExtension(Command_KickFromGame::ext), cont, game, player, bla); break;
-			case GameCommand::LEAVE_GAME: resp = cmdLeaveGame(sc.GetExtension(Command_LeaveGame::ext), cont, game, player, bla); break;
-			case GameCommand::GAME_SAY: resp = cmdGameSay(sc.GetExtension(Command_GameSay::ext), cont, game, player, bla); break;
-			case GameCommand::SHUFFLE: resp = cmdShuffle(sc.GetExtension(Command_Shuffle::ext), cont, game, player, bla); break;
-			case GameCommand::MULLIGAN: resp = cmdMulligan(sc.GetExtension(Command_Mulligan::ext), cont, game, player, bla); break;
-			case GameCommand::ROLL_DIE: resp = cmdRollDie(sc.GetExtension(Command_RollDie::ext), cont, game, player, bla); break;
-			case GameCommand::DRAW_CARDS: resp = cmdDrawCards(sc.GetExtension(Command_DrawCards::ext), cont, game, player, bla); break;
-			case GameCommand::UNDO_DRAW: resp = cmdUndoDraw(sc.GetExtension(Command_UndoDraw::ext), cont, game, player, bla); break;
-			case GameCommand::FLIP_CARD: resp = cmdFlipCard(sc.GetExtension(Command_FlipCard::ext), cont, game, player, bla); break;
-			case GameCommand::ATTACH_CARD: resp = cmdAttachCard(sc.GetExtension(Command_AttachCard::ext), cont, game, player, bla); break;
-			case GameCommand::CREATE_TOKEN: resp = cmdCreateToken(sc.GetExtension(Command_CreateToken::ext), cont, game, player, bla); break;
-			case GameCommand::CREATE_ARROW: resp = cmdCreateArrow(sc.GetExtension(Command_CreateArrow::ext), cont, game, player, bla); break;
-			case GameCommand::DELETE_ARROW: resp = cmdDeleteArrow(sc.GetExtension(Command_DeleteArrow::ext), cont, game, player, bla); break;
-			case GameCommand::SET_CARD_ATTR: resp = cmdSetCardAttr(sc.GetExtension(Command_SetCardAttr::ext), cont, game, player, bla); break;
-			case GameCommand::SET_CARD_COUNTER: resp = cmdSetCardCounter(sc.GetExtension(Command_SetCardCounter::ext), cont, game, player, bla); break;
-			case GameCommand::INC_CARD_COUNTER: resp = cmdIncCardCounter(sc.GetExtension(Command_IncCardCounter::ext), cont, game, player, bla); break;
-			case GameCommand::READY_START: resp = cmdReadyStart(sc.GetExtension(Command_ReadyStart::ext), cont, game, player, bla); break;
-			case GameCommand::CONCEDE: resp = cmdConcede(sc.GetExtension(Command_Concede::ext), cont, game, player, bla); break;
-			case GameCommand::INC_COUNTER: resp = cmdIncCounter(sc.GetExtension(Command_IncCounter::ext), cont, game, player, bla); break;
-			case GameCommand::CREATE_COUNTER: resp = cmdCreateCounter(sc.GetExtension(Command_CreateCounter::ext), cont, game, player, bla); break;
-			case GameCommand::SET_COUNTER: resp = cmdSetCounter(sc.GetExtension(Command_SetCounter::ext), cont, game, player, bla); break;
-			case GameCommand::DEL_COUNTER: resp = cmdDelCounter(sc.GetExtension(Command_DelCounter::ext), cont, game, player, bla); break;
-			case GameCommand::NEXT_TURN: resp = cmdNextTurn(sc.GetExtension(Command_NextTurn::ext), cont, game, player, bla); break;
-			case GameCommand::SET_ACTIVE_PHASE: resp = cmdSetActivePhase(sc.GetExtension(Command_SetActivePhase::ext), cont, game, player, bla); break;
-			case GameCommand::DUMP_ZONE: resp = cmdDumpZone(sc.GetExtension(Command_DumpZone::ext), cont, game, player, bla); break;
-			case GameCommand::STOP_DUMP_ZONE: resp = cmdStopDumpZone(sc.GetExtension(Command_StopDumpZone::ext), cont, game, player, bla); break;
-			case GameCommand::REVEAL_CARDS: resp = cmdRevealCards(sc.GetExtension(Command_RevealCards::ext), cont, game, player, bla); break;
-			case GameCommand::MOVE_CARD: resp = cmdMoveCard(sc.GetExtension(Command_MoveCard::ext), cont, game, player, bla); break;
-			case GameCommand::SET_SIDEBOARD_PLAN: resp = cmdSetSideboardPlan(sc.GetExtension(Command_SetSideboardPlan::ext), cont, game, player, bla); break;
-			case GameCommand::DECK_SELECT: resp = cmdDeckSelect(sc.GetExtension(Command_DeckSelect::ext), cont, game, player, bla); break;
+			case GameCommand::KICK_FROM_GAME: resp = cmdKickFromGame(sc.GetExtension(Command_KickFromGame::ext), game, player, bla); break;
+			case GameCommand::LEAVE_GAME: resp = cmdLeaveGame(sc.GetExtension(Command_LeaveGame::ext), game, player, bla); break;
+			case GameCommand::GAME_SAY: resp = cmdGameSay(sc.GetExtension(Command_GameSay::ext), game, player, bla); break;
+			case GameCommand::SHUFFLE: resp = cmdShuffle(sc.GetExtension(Command_Shuffle::ext), game, player, bla); break;
+			case GameCommand::MULLIGAN: resp = cmdMulligan(sc.GetExtension(Command_Mulligan::ext), game, player, bla); break;
+			case GameCommand::ROLL_DIE: resp = cmdRollDie(sc.GetExtension(Command_RollDie::ext), game, player, bla); break;
+			case GameCommand::DRAW_CARDS: resp = cmdDrawCards(sc.GetExtension(Command_DrawCards::ext), game, player, bla); break;
+			case GameCommand::UNDO_DRAW: resp = cmdUndoDraw(sc.GetExtension(Command_UndoDraw::ext), game, player, bla); break;
+			case GameCommand::FLIP_CARD: resp = cmdFlipCard(sc.GetExtension(Command_FlipCard::ext), game, player, bla); break;
+			case GameCommand::ATTACH_CARD: resp = cmdAttachCard(sc.GetExtension(Command_AttachCard::ext), game, player, bla); break;
+			case GameCommand::CREATE_TOKEN: resp = cmdCreateToken(sc.GetExtension(Command_CreateToken::ext), game, player, bla); break;
+			case GameCommand::CREATE_ARROW: resp = cmdCreateArrow(sc.GetExtension(Command_CreateArrow::ext), game, player, bla); break;
+			case GameCommand::DELETE_ARROW: resp = cmdDeleteArrow(sc.GetExtension(Command_DeleteArrow::ext), game, player, bla); break;
+			case GameCommand::SET_CARD_ATTR: resp = cmdSetCardAttr(sc.GetExtension(Command_SetCardAttr::ext), game, player, bla); break;
+			case GameCommand::SET_CARD_COUNTER: resp = cmdSetCardCounter(sc.GetExtension(Command_SetCardCounter::ext), game, player, bla); break;
+			case GameCommand::INC_CARD_COUNTER: resp = cmdIncCardCounter(sc.GetExtension(Command_IncCardCounter::ext), game, player, bla); break;
+			case GameCommand::READY_START: resp = cmdReadyStart(sc.GetExtension(Command_ReadyStart::ext), game, player, bla); break;
+			case GameCommand::CONCEDE: resp = cmdConcede(sc.GetExtension(Command_Concede::ext), game, player, bla); break;
+			case GameCommand::INC_COUNTER: resp = cmdIncCounter(sc.GetExtension(Command_IncCounter::ext), game, player, bla); break;
+			case GameCommand::CREATE_COUNTER: resp = cmdCreateCounter(sc.GetExtension(Command_CreateCounter::ext), game, player, bla); break;
+			case GameCommand::SET_COUNTER: resp = cmdSetCounter(sc.GetExtension(Command_SetCounter::ext), game, player, bla); break;
+			case GameCommand::DEL_COUNTER: resp = cmdDelCounter(sc.GetExtension(Command_DelCounter::ext), game, player, bla); break;
+			case GameCommand::NEXT_TURN: resp = cmdNextTurn(sc.GetExtension(Command_NextTurn::ext), game, player, bla); break;
+			case GameCommand::SET_ACTIVE_PHASE: resp = cmdSetActivePhase(sc.GetExtension(Command_SetActivePhase::ext), game, player, bla); break;
+			case GameCommand::DUMP_ZONE: resp = cmdDumpZone(sc.GetExtension(Command_DumpZone::ext), game, player, bla); break;
+			case GameCommand::STOP_DUMP_ZONE: resp = cmdStopDumpZone(sc.GetExtension(Command_StopDumpZone::ext), game, player, bla); break;
+			case GameCommand::REVEAL_CARDS: resp = cmdRevealCards(sc.GetExtension(Command_RevealCards::ext), game, player, bla); break;
+			case GameCommand::MOVE_CARD: resp = cmdMoveCard(sc.GetExtension(Command_MoveCard::ext), game, player, bla); break;
+			case GameCommand::SET_SIDEBOARD_PLAN: resp = cmdSetSideboardPlan(sc.GetExtension(Command_SetSideboardPlan::ext), game, player, bla); break;
+			case GameCommand::DECK_SELECT: resp = cmdDeckSelect(sc.GetExtension(Command_DeckSelect::ext), game, player, bla); break;
 		}
 		if ((resp != RespOk) && (resp != RespNothing))
 			finalResponseCode = resp;
@@ -247,7 +247,7 @@ ResponseCode Server_ProtocolHandler::processGameCommandContainer(CommandContaine
 	return finalResponseCode;
 }
 
-ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(CommandContainer *cont, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(const CommandContainer &cont, BlaContainer *bla)
 {
 	if (!userInfo)
 		return RespLoginNeeded;
@@ -255,9 +255,9 @@ ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(CommandCon
 		return RespLoginNeeded;
 
 	ResponseCode finalResponseCode = RespOk;
-	for (int i = cont->moderator_command_size() - 1; i >= 0; --i) {
+	for (int i = cont.moderator_command_size() - 1; i >= 0; --i) {
 		ResponseCode resp = RespInvalidCommand;
-		const ModeratorCommand &sc = cont->moderator_command(i);
+		const ModeratorCommand &sc = cont.moderator_command(i);
 		std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
 		sc.GetReflection()->ListFields(sc, &fieldList);
 		int num = 0;
@@ -267,7 +267,7 @@ ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(CommandCon
 				break;
 			}
 		switch ((ModeratorCommand::ModeratorCommandType) num) {
-			case ModeratorCommand::BAN_FROM_SERVER: resp = cmdBanFromServer(sc.GetExtension(Command_BanFromServer::ext), cont); break;
+			case ModeratorCommand::BAN_FROM_SERVER: resp = cmdBanFromServer(sc.GetExtension(Command_BanFromServer::ext), bla); break;
 		}
 		if ((resp != RespOk) && (resp != RespNothing))
 			finalResponseCode = resp;
@@ -275,7 +275,7 @@ ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(CommandCon
 	return finalResponseCode;
 }
 
-ResponseCode Server_ProtocolHandler::processAdminCommandContainer(CommandContainer *cont, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::processAdminCommandContainer(const CommandContainer &cont, BlaContainer *bla)
 {
 	if (!userInfo)
 		return RespLoginNeeded;
@@ -283,9 +283,9 @@ ResponseCode Server_ProtocolHandler::processAdminCommandContainer(CommandContain
 		return RespLoginNeeded;
 
 	ResponseCode finalResponseCode = RespOk;
-	for (int i = cont->admin_command_size() - 1; i >= 0; --i) {
+	for (int i = cont.admin_command_size() - 1; i >= 0; --i) {
 		ResponseCode resp = RespInvalidCommand;
-		const AdminCommand &sc = cont->admin_command(i);
+		const AdminCommand &sc = cont.admin_command(i);
 		std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
 		sc.GetReflection()->ListFields(sc, &fieldList);
 		int num = 0;
@@ -295,8 +295,8 @@ ResponseCode Server_ProtocolHandler::processAdminCommandContainer(CommandContain
 				break;
 			}
 		switch ((AdminCommand::AdminCommandType) num) {
-			case AdminCommand::SHUTDOWN_SERVER: resp = cmdShutdownServer(sc.GetExtension(Command_ShutdownServer::ext), cont); break;
-			case AdminCommand::UPDATE_SERVER_MESSAGE: resp = cmdUpdateServerMessage(sc.GetExtension(Command_UpdateServerMessage::ext), cont); break;
+			case AdminCommand::SHUTDOWN_SERVER: resp = cmdShutdownServer(sc.GetExtension(Command_ShutdownServer::ext), bla); break;
+			case AdminCommand::UPDATE_SERVER_MESSAGE: resp = cmdUpdateServerMessage(sc.GetExtension(Command_UpdateServerMessage::ext), bla); break;
 		}
 		if ((resp != RespOk) && (resp != RespNothing))
 			finalResponseCode = resp;
@@ -304,28 +304,31 @@ ResponseCode Server_ProtocolHandler::processAdminCommandContainer(CommandContain
 	return finalResponseCode;
 }
 
-void Server_ProtocolHandler::processCommandContainer(CommandContainer *cont)
+void Server_ProtocolHandler::processCommandContainer(const CommandContainer &cont)
 {
 	lastDataReceived = timeRunning;
 	
 	BlaContainer *bla = new BlaContainer;
 	ResponseCode finalResponseCode;
 	
-	if (cont->game_command_size()) {
+	if (cont.game_command_size())
 		finalResponseCode = processGameCommandContainer(cont, bla);
-	} else if (cont->room_command_size()) {
+	else if (cont.room_command_size())
 		finalResponseCode = processRoomCommandContainer(cont, bla);
-	} else if (cont->session_command_size()) {
+	else if (cont.session_command_size())
 		finalResponseCode = processSessionCommandContainer(cont, bla);
-	} else if (cont->moderator_command_size()) {
+	else if (cont.moderator_command_size())
 		finalResponseCode = processModeratorCommandContainer(cont, bla);
-	} else if (cont->admin_command_size()) {
+	else if (cont.admin_command_size())
 		finalResponseCode = processAdminCommandContainer(cont, bla);
-	}
+	else
+		finalResponseCode = RespInvalidCommand;
 	
 	ProtocolResponse *pr = bla->getResponse();
 	if (!pr)
-		pr = new ProtocolResponse(cont->cmd_id(), finalResponseCode);
+		pr = new ProtocolResponse(cont.cmd_id(), finalResponseCode);
+	else
+		pr->setCmdId(cont.cmd_id());
 	
 	gameListMutex.lock();
 	GameEventContainer *gQPublic = bla->getGameEventQueuePublic();
@@ -361,9 +364,6 @@ void Server_ProtocolHandler::processCommandContainer(CommandContainer *cont)
 	
 	while (!itemQueue.isEmpty())
 		sendProtocolItem(itemQueue.takeFirst());
-
-//	if (cont->getReceiverMayDelete())
-		delete cont;
 }
 
 void Server_ProtocolHandler::pingClockTimeout()
@@ -395,12 +395,12 @@ QPair<Server_Game *, Server_Player *> Server_ProtocolHandler::getGame(int gameId
 	return QPair<Server_Game *, Server_Player *>(0, 0);
 }
 
-ResponseCode Server_ProtocolHandler::cmdPing(const Command_Ping & /*cmd*/, CommandContainer * /*cont*/)
+ResponseCode Server_ProtocolHandler::cmdPing(const Command_Ping & /*cmd*/)
 {
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd, CommandContainer *cont, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd, BlaContainer *bla)
 {
 	QString userName = QString::fromStdString(cmd.user_name()).simplified();
 	if (userName.isEmpty() || (userInfo != 0))
@@ -460,14 +460,14 @@ ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd, CommandC
 	}
 	server->serverMutex.unlock();
 	
-	ProtocolResponse *resp = new Response_Login(cont->cmd_id(), RespOk, new ServerInfo_User(userInfo, true), _buddyList, _ignoreList);
+	ProtocolResponse *resp = new Response_Login(-1, RespOk, new ServerInfo_User(userInfo, true), _buddyList, _ignoreList);
 	if (getCompressionSupport())
 		resp->setCompressed(true);
 	bla->setResponse(resp);
 	return RespNothing;
 }
 
-ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message &cmd, CommandContainer *cont, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message &cmd, BlaContainer *bla)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
@@ -486,7 +486,7 @@ ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message &cmd, Comm
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_GetGamesOfUser &cmd, CommandContainer *cont, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_GetGamesOfUser &cmd, BlaContainer *bla)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
@@ -507,14 +507,14 @@ ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_GetGamesOfU
 	}
 	server->serverMutex.unlock();
 	
-	ProtocolResponse *resp = new Response_GetGamesOfUser(cont->cmd_id(), RespOk, roomList, gameList);
+	ProtocolResponse *resp = new Response_GetGamesOfUser(-1, RespOk, roomList, gameList);
 	if (getCompressionSupport())
 		resp->setCompressed(true);
 	bla->setResponse(resp);
 	return RespNothing;
 }
 
-ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetUserInfo &cmd, CommandContainer *cont, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetUserInfo &cmd, BlaContainer *bla)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
@@ -530,11 +530,11 @@ ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetUserInfo &c
 		result = new ServerInfo_User(handler->getUserInfo(), true, userInfo->getUserLevel() & ServerInfo_User::IsModerator);
 	}
 	
-	bla->setResponse(new Response_GetUserInfo(cont->cmd_id(), RespOk, result));
+	bla->setResponse(new Response_GetUserInfo(-1, RespOk, result));
 	return RespNothing;
 }
 
-ResponseCode Server_ProtocolHandler::cmdListRooms(const Command_ListRooms & /*cmd*/, CommandContainer *cont, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdListRooms(const Command_ListRooms & /*cmd*/, BlaContainer *bla)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
@@ -549,7 +549,7 @@ ResponseCode Server_ProtocolHandler::cmdListRooms(const Command_ListRooms & /*cm
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoom &cmd, CommandContainer *cont, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoom &cmd, BlaContainer *bla)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
@@ -571,11 +571,11 @@ ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoom &cmd, Co
 	ServerInfo_Room *info = r->getInfo(true);
 	if (getCompressionSupport())
 		info->setCompressed(true);
-	bla->setResponse(new Response_JoinRoom(cont->cmd_id(), RespOk, info));
+	bla->setResponse(new Response_JoinRoom(-1, RespOk, info));
 	return RespNothing;
 }
 
-ResponseCode Server_ProtocolHandler::cmdListUsers(const Command_ListUsers & /*cmd*/, CommandContainer *cont, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdListUsers(const Command_ListUsers & /*cmd*/, BlaContainer *bla)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
@@ -587,21 +587,21 @@ ResponseCode Server_ProtocolHandler::cmdListUsers(const Command_ListUsers & /*cm
 	
 	acceptsUserListChanges = true;
 
-	ProtocolResponse *resp = new Response_ListUsers(cont->cmd_id(), RespOk, resultList);
+	ProtocolResponse *resp = new Response_ListUsers(-1, RespOk, resultList);
 	if (getCompressionSupport())
 		resp->setCompressed(true);
 	bla->setResponse(resp);
 	return RespNothing;
 }
 
-ResponseCode Server_ProtocolHandler::cmdLeaveRoom(const Command_LeaveRoom & /*cmd*/, CommandContainer * /*cont*/, Server_Room *room)
+ResponseCode Server_ProtocolHandler::cmdLeaveRoom(const Command_LeaveRoom & /*cmd*/, Server_Room *room)
 {
 	rooms.remove(room->getId());
 	room->removeClient(this);
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay &cmd, CommandContainer * /*cont*/, Server_Room *room)
+ResponseCode Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room)
 {
 	QString msg = QString::fromStdString(cmd.message());
 	
@@ -628,7 +628,7 @@ ResponseCode Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay &cmd, Comm
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, CommandContainer * /*cont*/, Server_Room *room)
+ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room *room)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
@@ -659,7 +659,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdJoinGame(const Command_JoinGame &cmd, CommandContainer * /*cont*/, Server_Room *room)
+ResponseCode Server_ProtocolHandler::cmdJoinGame(const Command_JoinGame &cmd, Server_Room *room)
 {
 	if (authState == PasswordWrong)
 		return RespLoginNeeded;
@@ -685,13 +685,13 @@ ResponseCode Server_ProtocolHandler::cmdJoinGame(const Command_JoinGame &cmd, Co
 	return result;
 }
 
-ResponseCode Server_ProtocolHandler::cmdLeaveGame(const Command_LeaveGame & /*cmd*/, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdLeaveGame(const Command_LeaveGame & /*cmd*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	game->removePlayer(player);
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdKickFromGame(const Command_KickFromGame &cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdKickFromGame(const Command_KickFromGame &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if ((game->getHostId() != player->getPlayerId()) && !(userInfo->getUserLevel() & ServerInfo_User::IsModerator))
 		return RespFunctionNotAllowed;
@@ -702,7 +702,7 @@ ResponseCode Server_ProtocolHandler::cmdKickFromGame(const Command_KickFromGame 
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdDeckSelect(const Command_DeckSelect &cmd, CommandContainer *cont, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdDeckSelect(const Command_DeckSelect &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -721,11 +721,11 @@ ResponseCode Server_ProtocolHandler::cmdDeckSelect(const Command_DeckSelect &cmd
 	
 	game->sendGameEvent(new Event_PlayerPropertiesChanged(player->getPlayerId(), player->getProperties()), new Context_DeckSelect(deck->getDeckHash()));
 
-	bla->setResponse(new Response_DeckDownload(cont->cmd_id(), RespOk, new DeckList(deck)));
+	bla->setResponse(new Response_DeckDownload(-1, RespOk, new DeckList(deck)));
 	return RespNothing;
 }
 
-ResponseCode Server_ProtocolHandler::cmdSetSideboardPlan(const Command_SetSideboardPlan &cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdSetSideboardPlan(const Command_SetSideboardPlan &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -748,7 +748,7 @@ ResponseCode Server_ProtocolHandler::cmdSetSideboardPlan(const Command_SetSidebo
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdConcede(const Command_Concede & /*cmd*/, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdConcede(const Command_Concede & /*cmd*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -768,7 +768,7 @@ ResponseCode Server_ProtocolHandler::cmdConcede(const Command_Concede & /*cmd*/,
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdReadyStart(const Command_ReadyStart &cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdReadyStart(const Command_ReadyStart &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -785,7 +785,7 @@ ResponseCode Server_ProtocolHandler::cmdReadyStart(const Command_ReadyStart &cmd
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdGameSay(const Command_GameSay &cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdGameSay(const Command_GameSay &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator() && !game->getSpectatorsCanTalk() && !(userInfo->getUserLevel() & ServerInfo_User::IsModerator))
 		return RespFunctionNotAllowed;
@@ -794,7 +794,7 @@ ResponseCode Server_ProtocolHandler::cmdGameSay(const Command_GameSay &cmd, Comm
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdShuffle(const Command_Shuffle & /*cmd*/, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdShuffle(const Command_Shuffle & /*cmd*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -809,7 +809,7 @@ ResponseCode Server_ProtocolHandler::cmdShuffle(const Command_Shuffle & /*cmd*/,
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdMulligan(const Command_Mulligan & /*cmd*/, CommandContainer *cont, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdMulligan(const Command_Mulligan & /*cmd*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -846,7 +846,7 @@ ResponseCode Server_ProtocolHandler::cmdMulligan(const Command_Mulligan & /*cmd*
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdRollDie(const Command_RollDie &cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdRollDie(const Command_RollDie &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -857,7 +857,7 @@ ResponseCode Server_ProtocolHandler::cmdRollDie(const Command_RollDie &cmd, Comm
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdDrawCards(const Command_DrawCards &cmd, CommandContainer *cont, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdDrawCards(const Command_DrawCards &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -870,7 +870,7 @@ ResponseCode Server_ProtocolHandler::cmdDrawCards(const Command_DrawCards &cmd, 
 	return player->drawCards(bla, cmd.number());
 }
 
-ResponseCode Server_ProtocolHandler::cmdUndoDraw(const Command_UndoDraw & /*cmd*/, CommandContainer *cont, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdUndoDraw(const Command_UndoDraw & /*cmd*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -883,7 +883,7 @@ ResponseCode Server_ProtocolHandler::cmdUndoDraw(const Command_UndoDraw & /*cmd*
 	return player->undoDraw(bla);
 }
 
-ResponseCode Server_ProtocolHandler::cmdMoveCard(const Command_MoveCard &cmd, CommandContainer *cont, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdMoveCard(const Command_MoveCard &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -900,7 +900,7 @@ ResponseCode Server_ProtocolHandler::cmdMoveCard(const Command_MoveCard &cmd, Co
 	return player->moveCard(bla, QString::fromStdString(cmd.start_zone()), cardsToMove, cmd.target_player_id(), QString::fromStdString(cmd.target_zone()), cmd.x(), cmd.y());
 }
 
-ResponseCode Server_ProtocolHandler::cmdFlipCard(const Command_FlipCard &cmd, CommandContainer *cont, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdFlipCard(const Command_FlipCard &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -931,7 +931,7 @@ ResponseCode Server_ProtocolHandler::cmdFlipCard(const Command_FlipCard &cmd, Co
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdAttachCard(const Command_AttachCard &cmd, CommandContainer *cont, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdAttachCard(const Command_AttachCard &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -954,6 +954,7 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(const Command_AttachCard &cmd
 	Server_CardZone *targetzone = 0;
 	Server_Card *targetCard = 0;
 	
+	qDebug() << "playerId="<<playerId;
 	if (playerId != -1) {
 		targetPlayer = game->getPlayer(cmd.target_player_id());
 		if (!targetPlayer)
@@ -1019,7 +1020,7 @@ ResponseCode Server_ProtocolHandler::cmdAttachCard(const Command_AttachCard &cmd
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdCreateToken(const Command_CreateToken &cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdCreateToken(const Command_CreateToken &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -1056,7 +1057,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateToken(const Command_CreateToken &c
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdCreateArrow(const Command_CreateArrow &cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdCreateArrow(const Command_CreateArrow &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -1121,7 +1122,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateArrow(const Command_CreateArrow &c
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdDeleteArrow(const Command_DeleteArrow &cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdDeleteArrow(const Command_DeleteArrow &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -1138,7 +1139,7 @@ ResponseCode Server_ProtocolHandler::cmdDeleteArrow(const Command_DeleteArrow &c
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdSetCardAttr(const Command_SetCardAttr &cmd, CommandContainer *cont, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdSetCardAttr(const Command_SetCardAttr &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -1151,7 +1152,7 @@ ResponseCode Server_ProtocolHandler::cmdSetCardAttr(const Command_SetCardAttr &c
 	return player->setCardAttrHelper(bla, QString::fromStdString(cmd.zone()), cmd.card_id(), QString::fromStdString(cmd.attr_name()), QString::fromStdString(cmd.attr_value()));
 }
 
-ResponseCode Server_ProtocolHandler::cmdSetCardCounter(const Command_SetCardCounter &cmd, CommandContainer *cont, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdSetCardCounter(const Command_SetCardCounter &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -1178,7 +1179,7 @@ ResponseCode Server_ProtocolHandler::cmdSetCardCounter(const Command_SetCardCoun
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdIncCardCounter(const Command_IncCardCounter &cmd, CommandContainer *cont, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdIncCardCounter(const Command_IncCardCounter &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -1206,7 +1207,7 @@ ResponseCode Server_ProtocolHandler::cmdIncCardCounter(const Command_IncCardCoun
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdIncCounter(const Command_IncCounter &cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdIncCounter(const Command_IncCounter &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -1226,7 +1227,7 @@ ResponseCode Server_ProtocolHandler::cmdIncCounter(const Command_IncCounter &cmd
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdCreateCounter(const Command_CreateCounter &cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdCreateCounter(const Command_CreateCounter &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -1243,7 +1244,7 @@ ResponseCode Server_ProtocolHandler::cmdCreateCounter(const Command_CreateCounte
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdSetCounter(const Command_SetCounter &cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdSetCounter(const Command_SetCounter &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -1262,7 +1263,7 @@ ResponseCode Server_ProtocolHandler::cmdSetCounter(const Command_SetCounter &cmd
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdDelCounter(const Command_DelCounter &cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdDelCounter(const Command_DelCounter &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -1278,7 +1279,7 @@ ResponseCode Server_ProtocolHandler::cmdDelCounter(const Command_DelCounter &cmd
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdNextTurn(const Command_NextTurn & /*cmd*/, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdNextTurn(const Command_NextTurn & /*cmd*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -1292,7 +1293,7 @@ ResponseCode Server_ProtocolHandler::cmdNextTurn(const Command_NextTurn & /*cmd*
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdSetActivePhase(const Command_SetActivePhase &cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdSetActivePhase(const Command_SetActivePhase &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;
@@ -1309,7 +1310,7 @@ ResponseCode Server_ProtocolHandler::cmdSetActivePhase(const Command_SetActivePh
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdDumpZone(const Command_DumpZone &cmd, CommandContainer *cont, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdDumpZone(const Command_DumpZone &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
@@ -1354,11 +1355,11 @@ ResponseCode Server_ProtocolHandler::cmdDumpZone(const Command_DumpZone &cmd, Co
 		zone->setCardsBeingLookedAt(numberCards);
 		game->sendGameEvent(new Event_DumpZone(player->getPlayerId(), otherPlayer->getPlayerId(), zone->getName(), numberCards));
 	}
-	bla->setResponse(new Response_DumpZone(cont->cmd_id(), RespOk, new ServerInfo_Zone(zone->getName(), zone->getType(), zone->hasCoords(), numberCards < zone->cards.size() ? zone->cards.size() : numberCards, respCardList)));
+	bla->setResponse(new Response_DumpZone(-1, RespOk, new ServerInfo_Zone(zone->getName(), zone->getType(), zone->hasCoords(), numberCards < zone->cards.size() ? zone->cards.size() : numberCards, respCardList)));
 	return RespNothing;
 }
 
-ResponseCode Server_ProtocolHandler::cmdStopDumpZone(const Command_StopDumpZone &cmd, CommandContainer * /*cont*/, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdStopDumpZone(const Command_StopDumpZone &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (!game->getGameStarted())
 		return RespGameNotStarted;
@@ -1379,7 +1380,7 @@ ResponseCode Server_ProtocolHandler::cmdStopDumpZone(const Command_StopDumpZone 
 	return RespOk;
 }
 
-ResponseCode Server_ProtocolHandler::cmdRevealCards(const Command_RevealCards &cmd, CommandContainer *cont, Server_Game *game, Server_Player *player, BlaContainer *bla)
+ResponseCode Server_ProtocolHandler::cmdRevealCards(const Command_RevealCards &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla)
 {
 	if (player->getSpectator())
 		return RespFunctionNotAllowed;

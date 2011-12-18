@@ -171,11 +171,7 @@ void TabRoom::processSayEvent(Event_RoomSay *event)
 
 PendingCommand *TabRoom::prepareRoomCommand(const ::google::protobuf::Message &cmd)
 {
-	CommandContainer cont;
-	RoomCommand *c = cont.add_room_command();
-	cont.set_room_id(roomId);
-	c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
-	return new PendingCommand(cont);
+	return client->prepareRoomCommand(cmd, roomId);
 }
 
 void TabRoom::sendRoomCommand(PendingCommand *pend)
