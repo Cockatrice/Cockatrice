@@ -267,6 +267,15 @@ DeckList::DeckList(DeckList *other)
 	updateDeckHash();
 }
 
+DeckList::DeckList(const QString &nativeString)
+	: SerializableItem("cockatrice_deck"), currentZone(0), currentSideboardPlan(0)
+{
+	root = new InnerDecklistNode;
+	
+	QXmlStreamReader xml(nativeString);
+	loadFromXml(&xml);
+}
+
 DeckList::~DeckList()
 {
 	delete root;
@@ -358,6 +367,16 @@ void DeckList::loadFromXml(QXmlStreamReader *xml)
 		}
 	}
 	updateDeckHash();
+}
+
+QString DeckList::writeToString_Native()
+{
+	QString result;
+	QXmlStreamWriter xml(&result);
+	xml.writeStartDocument();
+	write(&xml);
+	xml.writeEndDocument();
+	return result;
 }
 
 bool DeckList::loadFromFile_Native(QIODevice *device)

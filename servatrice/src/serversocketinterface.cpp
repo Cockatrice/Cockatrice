@@ -102,7 +102,10 @@ void ServerSocketInterface::readClient()
 	do {
 		if (!messageInProgress) {
 			if (inputBuffer.size() >= 4) {
-				messageLength = (int) (((quint32) inputBuffer[0]) << 24) + (((quint32) inputBuffer[1]) << 16) + (((quint32) inputBuffer[2]) << 8) + ((quint32) inputBuffer[3]);
+				messageLength =   (((quint32) (unsigned char) inputBuffer[0]) << 24)
+				                + (((quint32) (unsigned char) inputBuffer[1]) << 16)
+				                + (((quint32) (unsigned char) inputBuffer[2]) << 8)
+				                + ((quint32) (unsigned char) inputBuffer[3]);
 				inputBuffer.remove(0, 4);
 				messageInProgress = true;
 			} else

@@ -139,6 +139,7 @@ public:
 	static const QStringList fileNameFilters;
 	DeckList();
 	DeckList(DeckList *other);
+	DeckList(const QString &nativeString);
 	~DeckList();
 	QString getName() const { return name; }
 	QString getComments() const { return comments; }
@@ -151,7 +152,7 @@ public:
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 	void loadFromXml(QXmlStreamReader *xml);
-	
+	QString writeToString_Native();
 	bool loadFromFile_Native(QIODevice *device);
 	bool saveToFile_Native(QIODevice *device);
 	bool loadFromStream_Plain(QTextStream &stream);

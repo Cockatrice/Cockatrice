@@ -708,17 +708,15 @@ ResponseCode Server_ProtocolHandler::cmdDeckSelect(const Command_DeckSelect &cmd
 		return RespFunctionNotAllowed;
 	
 	DeckList *deck;
-	if (cmd.deck_id() == -1) {
-//		if (!cmd->getDeck())
-//			return RespInvalidData;
-//		deck = new DeckList(cmd->getDeck());
-	} else {
+	if (cmd.has_deck_id()) {
 		try {
 			deck = getDeckFromDatabase(cmd.deck_id());
 		} catch(ResponseCode r) {
 			return r;
 		}
-	}
+	} else
+		deck = new DeckList(QString::fromStdString(cmd.deck()));
+
 	player->setDeck(deck);
 	
 	game->sendGameEvent(new Event_PlayerPropertiesChanged(player->getPlayerId(), player->getProperties()), new Context_DeckSelect(deck->getDeckHash()));

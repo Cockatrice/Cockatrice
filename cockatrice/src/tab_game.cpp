@@ -123,7 +123,7 @@ void DeckViewContainer::loadLocalDeck()
 	}
 	
 	Command_DeckSelect cmd;
-	cmd.set_deck(""); // XXX
+	cmd.set_deck(deck->writeToString_Native().toStdString());
 	PendingCommand *pend = static_cast<TabGame *>(parent())->prepareGameCommand(cmd);
 	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(deckSelectFinished(ProtocolResponse *)));
 	static_cast<TabGame *>(parent())->sendGameCommand(pend, playerId);

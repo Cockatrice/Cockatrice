@@ -5,7 +5,6 @@
 #include "pending_command.h"
 #include "pb/commands.pb.h"
 #include <google/protobuf/descriptor.h>
-#include <QDebug>
 
 AbstractClient::AbstractClient(QObject *parent)
 	: QObject(parent), nextCmdId(0), status(StatusDisconnected)
