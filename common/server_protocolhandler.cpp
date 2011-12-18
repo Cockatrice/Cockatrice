@@ -147,6 +147,8 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 	ModeratorCommand *moderatorCommand = qobject_cast<ModeratorCommand *>(command);
 	if (moderatorCommand) {
 		qDebug() << "received ModeratorCommand";
+		if (!userInfo)
+			return RespLoginNeeded;
 		if (!(userInfo->getUserLevel() & ServerInfo_User::IsModerator))
 			return RespLoginNeeded;
 		
@@ -158,6 +160,8 @@ ResponseCode Server_ProtocolHandler::processCommandHelper(Command *command, Comm
 	AdminCommand *adminCommand = qobject_cast<AdminCommand *>(command);
 	if (adminCommand) {
 		qDebug() << "received AdminCommand";
+		if (!userInfo)
+			return RespLoginNeeded;
 		if (!(userInfo->getUserLevel() & ServerInfo_User::IsAdmin))
 			return RespLoginNeeded;
 		
