@@ -50,6 +50,8 @@ protected:
 	QMap<QString, Server_ProtocolHandler *> users;
 	QMap<int, Server_Room *> rooms;
 	
+	virtual int startSession(const QString &userName, const QString &address) = 0;
+	virtual void endSession(int sessionId) = 0;
 	virtual bool userExists(const QString &user) = 0;
 	virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password) = 0;
 	virtual ServerInfo_User *getUserData(const QString &name) = 0;

@@ -20,6 +20,8 @@ public:
 	
 	LocalServerInterface *newConnection();
 protected:
+	int startSession(const QString & /*userName*/, const QString & /*address*/) { return -1; }
+	void endSession(int /*sessionId*/) { }
 	bool userExists(const QString & /*name*/) { return false; }
 	ServerInfo_User *getUserData(const QString &name);
 	QMap<QString, ServerInfo_User *> getBuddyList(const QString & /*name*/) { return QMap<QString, ServerInfo_User *>(); }

@@ -31,6 +31,7 @@ protected:
 	
 	void prepareDestroy();
 	virtual bool getCompressionSupport() const = 0;
+	int sessionId;
 private:
 	QList<ProtocolItem *> itemQueue;
 	QList<int> messageSizeOverTime, messageCountOverTime;
@@ -110,6 +111,8 @@ public:
 	void setUserInfo(ServerInfo_User *_userInfo) { userInfo = _userInfo; }
 	const QMap<QString, ServerInfo_User *> &getBuddyList() const { return buddyList; }
 	const QMap<QString, ServerInfo_User *> &getIgnoreList() const { return ignoreList; }
+	int getSessionId() const { return sessionId; }
+	void setSessionId(int _sessionId) { sessionId = _sessionId; }
 
 	int getLastCommandTime() const { return timeRunning - lastDataReceived; }
 	void processCommandContainer(CommandContainer *cont);

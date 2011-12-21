@@ -189,20 +189,32 @@ AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handl
 				return PasswordWrong;
 			}
 		
-		QSqlQuery query;
-		query.prepare("select a.password_sha512, time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_users a left join " + dbPrefix + "_bans b on b.user_name = a.name and b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.user_name = a.name) where a.name = :name and a.active = 1");
-		query.bindValue(":name", user);
-		if (!execSqlQuery(query)) {
+		QSqlQuery nameBanQuery;
+		nameBanQuery.prepare("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_bans b where b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.user_name = :name2) and b.user_name = :name1");
+		nameBanQuery.bindValue(":name1", user);
+		nameBanQuery.bindValue(":name2", user);
+		if (!execSqlQuery(nameBanQuery)) {
 			qDebug("Login denied: SQL error");
 			return PasswordWrong;
 		}
 		
-		if (query.next()) {
-			if (query.value(1).toInt() || query.value(2).toInt()) {
+		if (nameBanQuery.next())
+			if (nameBanQuery.value(0).toInt() || nameBanQuery.value(1).toInt()) {
 				qDebug("Login denied: banned by name");
 				return PasswordWrong;
 			}
-			if (query.value(0).toString() == PasswordHasher::computeHash(password, query.value(0).toString().left(16))) {
+		
+		QSqlQuery passwordQuery;
+		passwordQuery.prepare("select password_sha512 from " + dbPrefix + "_users where name = :name and active = 1");
+		passwordQuery.bindValue(":name", user);
+		if (!execSqlQuery(passwordQuery)) {
+			qDebug("Login denied: SQL error");
+			return PasswordWrong;
+		}
+		
+		if (passwordQuery.next()) {
+			const QString correctPassword = passwordQuery.value(0).toString();
+			if (correctPassword == PasswordHasher::computeHash(password, correctPassword.left(16))) {
 				qDebug("Login accepted: password right");
 				return PasswordRight;
 			} else {
@@ -300,6 +312,31 @@ int Servatrice::getUsersWithAddress(const QHostAddress &address) const
 	return result;
 }
 
+int Servatrice::startSession(const QString &userName, const QString &address)
+{
+	QMutexLocker locker(&dbMutex);
+	checkSql();
+	
+	QSqlQuery query;
+	query.prepare("insert into " + dbPrefix + "_sessions (user_name, ip_address, start_time) values(:user_name, :ip_address, NOW())");
+	query.bindValue(":user_name", userName);
+	query.bindValue(":ip_address", address);
+	if (execSqlQuery(query))
+		return query.lastInsertId().toInt();
+	return -1;
+}
+
+void Servatrice::endSession(int sessionId)
+{
+	QMutexLocker locker(&dbMutex);
+	checkSql();
+	
+	QSqlQuery query;
+	query.prepare("update " + dbPrefix + "_sessions set end_time=NOW() where id = :id_session");
+	query.bindValue(":id_session", sessionId);
+	execSqlQuery(query);
+}
+
 QMap<QString, ServerInfo_User *> Servatrice::getBuddyList(const QString &name)
 {
 	QMutexLocker locker(&dbMutex);
@@ -373,15 +410,26 @@ void Servatrice::statusUpdate()
 	
 	uptime += statusUpdateClock->interval() / 1000;
 	
+	txBytesMutex.lock();
+	quint64 tx = txBytes;
+	txBytes = 0;
+	txBytesMutex.unlock();
+	rxBytesMutex.lock();
+	quint64 rx = rxBytes;
+	rxBytes = 0;
+	rxBytesMutex.unlock();
+	
 	QMutexLocker locker(&dbMutex);
 	checkSql();
 	
 	QSqlQuery query;
-	query.prepare("insert into " + dbPrefix + "_uptime (id_server, timest, uptime, users_count, games_count) values(:id, NOW(), :uptime, :users_count, :games_count)");
+	query.prepare("insert into " + dbPrefix + "_uptime (id_server, timest, uptime, users_count, games_count, tx_bytes, rx_bytes) values(:id, NOW(), :uptime, :users_count, :games_count, :tx, :rx)");
 	query.bindValue(":id", serverId);
 	query.bindValue(":uptime", uptime);
 	query.bindValue(":users_count", uc);
 	query.bindValue(":games_count", gc);
+	query.bindValue(":tx", tx);
+	query.bindValue(":rx", rx);
 	execSqlQuery(query);
 }
 
@@ -397,6 +445,20 @@ void Servatrice::scheduleShutdown(const QString &reason, int minutes)
 		shutdownTimer->start(60000);
 	}
 	shutdownTimeout();
+}
+
+void Servatrice::incTxBytes(quint64 num)
+{
+	txBytesMutex.lock();
+	txBytes += num;
+	txBytesMutex.unlock();
+}
+
+void Servatrice::incRxBytes(quint64 num)
+{
+	rxBytesMutex.lock();
+	rxBytes += num;
+	rxBytesMutex.unlock();
 }
 
 void Servatrice::shutdownTimeout()

@@ -42,6 +42,7 @@ public:
 	void stopRubberBand();
 	
 	void registerAnimationItem(AbstractCardItem *item);
+	void unregisterAnimationItem(AbstractCardItem *card);
 public slots:
 	void toggleZoneView(Player *player, const QString &zoneName, int numberCards);
 	void addRevealedZoneView(Player *player, CardZone *zone, const QList<ServerInfo_Card *> &cardList);
