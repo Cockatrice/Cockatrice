@@ -1,0 +1,8 @@
+import "session_event.proto";
+
+message Event_ConnectionClosed {
+	extend SessionEvent {
+		optional Event_ConnectionClosed ext = 1002;
+	}
+	optional string reason = 1;
+}

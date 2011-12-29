@@ -1,0 +1,12 @@
+import "response.proto";
+import "serverinfo_game.proto";
+import "serverinfo_room.proto";
+
+message Response_GetGamesOfUser {
+	extend Response {
+		optional Response_GetGamesOfUser ext = 1002;
+	}
+	repeated ServerInfo_Room room_list = 1;
+	repeated ServerInfo_Game game_list = 2;
+}
+ 

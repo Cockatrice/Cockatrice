@@ -1,0 +1,15 @@
+import "serverinfo_game.proto";
+import "serverinfo_user.proto";
+import "serverinfo_gametype.proto";
+
+message ServerInfo_Room {
+	optional sint32 room_id = 1;
+	optional string name = 2;
+	optional string description = 3;
+	optional uint32 game_count = 4;
+	optional uint32 player_count = 5;
+	optional bool auto_join = 6;
+	repeated ServerInfo_Game game_list = 7;
+	repeated ServerInfo_User user_list = 8;
+	repeated ServerInfo_GameType gametype_list = 9;
+}

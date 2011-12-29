@@ -1,0 +1,11 @@
+message GameEventContext {
+	enum ContextType {
+		READY_START = 1000;
+		CONCEDE = 1001;
+		DECK_SELECT = 1002;
+		UNDO_DRAW = 1003;
+		MOVE_CARD = 1004;
+		MULLIGAN = 1005;
+	}
+	extensions 100 to max;
+}

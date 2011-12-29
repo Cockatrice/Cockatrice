@@ -1,0 +1,15 @@
+import "session_event.proto";
+
+message Event_GameJoined {
+	extend SessionEvent {
+		optional Event_GameJoined ext = 1009;
+	}
+	optional sint32 game_id = 1;
+	optional string game_description = 2;
+	optional sint32 host_id = 3;
+	optional sint32 player_id = 4;
+	optional bool spectator = 5;
+	optional bool spectators_can_talk = 6;
+	optional bool spectators_see_everything = 7;
+	optional bool resuming = 8;
+}

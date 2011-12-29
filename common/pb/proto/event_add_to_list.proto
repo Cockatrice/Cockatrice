@@ -1,0 +1,10 @@
+import "session_event.proto";
+import "serverinfo_user.proto";
+
+message Event_AddToList {
+	extend SessionEvent {
+		optional Event_AddToList ext = 1005;
+	}
+	optional string list_name = 1;
+	optional ServerInfo_User user_info = 2;
+}

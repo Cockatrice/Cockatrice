@@ -1,0 +1,17 @@
+import "response.proto";
+import "session_event.proto";
+import "game_event_container.proto";
+import "room_event.proto";
+
+message ServerMessage {
+	enum MessageType {
+		RESPONSE = 0;
+		SESSION_EVENT = 1;
+		GAME_EVENT_CONTAINER = 2;
+		ROOM_EVENT = 3;
+	}
+	optional Response response = 1;
+	optional SessionEvent session_event = 2;
+	optional GameEventContainer game_event_container = 3;
+	optional RoomEvent room_event = 4;
+}

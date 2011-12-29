@@ -1,0 +1,7 @@
+import "game_event_context.proto";
+
+message Context_UndoDraw {
+	extend GameEventContext {
+		optional Context_UndoDraw ext = 1003;
+	}
+}

@@ -1,0 +1,12 @@
+import "color.proto";
+
+message ServerInfo_Arrow {
+	optional sint32 id = 1;
+	optional sint32 start_player_id = 2;
+	optional string start_zone = 3;
+	optional sint32 start_card_id = 4;
+	optional sint32 target_player_id = 5;
+	optional string target_zone = 6;
+	optional sint32 target_card_id = 7;
+	optional color arrow_color = 8;
+}

@@ -1,0 +1,7 @@
+import "game_event.proto";
+
+message Event_Shuffle {
+	extend GameEvent {
+		optional Event_Shuffle ext = 2007;
+	}
+}

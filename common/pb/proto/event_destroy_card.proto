@@ -1,0 +1,9 @@
+import "game_event.proto";
+
+message Event_DestroyCard {
+	extend GameEvent {
+		optional Event_DestroyCard ext = 2011;
+	}
+	optional string zone_name = 1;
+	optional uint32 card_id = 2;
+}

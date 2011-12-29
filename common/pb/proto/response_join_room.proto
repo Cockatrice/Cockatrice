@@ -1,0 +1,9 @@
+import "response.proto";
+import "serverinfo_room.proto";
+
+message Response_JoinRoom {
+	extend Response {
+		optional Response_JoinRoom ext = 1000;
+	}
+	optional ServerInfo_Room room_info = 1;
+}

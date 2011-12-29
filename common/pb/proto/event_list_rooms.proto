@@ -1,0 +1,9 @@
+import "session_event.proto";
+import "serverinfo_room.proto";
+
+message Event_ListRooms {
+	extend SessionEvent {
+		optional Event_ListRooms ext = 1004;
+	}
+	repeated ServerInfo_Room room_list = 1;
+}

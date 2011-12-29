@@ -1,0 +1,11 @@
+import "response.proto";
+import "serverinfo_user.proto";
+
+message Response_Login {
+	extend Response {
+		optional Response_Login ext = 1005;
+	}
+	optional ServerInfo_User user_info = 1;
+	repeated ServerInfo_User buddy_list = 2;
+	repeated ServerInfo_User ignore_list = 3;
+}

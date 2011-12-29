@@ -1,0 +1,8 @@
+import "game_event_context.proto";
+
+message Context_Mulligan {
+	extend GameEventContext {
+		optional Context_Mulligan ext = 1005;
+	}
+	optional uint32 number = 1;
+}

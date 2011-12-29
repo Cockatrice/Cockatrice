@@ -1,0 +1,7 @@
+import "game_event.proto";
+
+message Event_GameClosed {
+	extend GameEvent {
+		optional Event_GameClosed ext = 1002;
+	}
+}

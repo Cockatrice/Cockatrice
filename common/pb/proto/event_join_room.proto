@@ -1,0 +1,9 @@
+import "room_event.proto";
+import "serverinfo_user.proto";
+
+message Event_JoinRoom {
+	extend RoomEvent {
+		optional Event_JoinRoom ext = 1001;
+	}
+	optional ServerInfo_User user_info = 1;
+}

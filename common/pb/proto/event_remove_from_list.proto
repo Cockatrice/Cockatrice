@@ -1,0 +1,9 @@
+import "session_event.proto";
+
+message Event_RemoveFromList {
+	extend SessionEvent {
+		optional Event_RemoveFromList ext = 1006;
+	}
+	optional string list_name = 1;
+	optional string user_name = 2;
+}

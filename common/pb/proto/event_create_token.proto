@@ -1,0 +1,16 @@
+import "game_event.proto";
+
+message Event_CreateToken {
+	extend GameEvent {
+		optional Event_CreateToken ext = 2013;
+	}
+	optional string zone_name = 1;
+	optional sint32 card_id = 2;
+	optional string card_name = 3;
+	optional string color = 4;
+	optional string pt = 5;
+	optional string annotation = 6;
+	optional bool destroy_on_zone_change = 7;
+	optional sint32 x = 8;
+	optional sint32 y = 9;
+}
