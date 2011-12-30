@@ -5,13 +5,22 @@
 #include <QPair>
 #include "server.h"
 #include "protocol.h"
-#include "protocol_items.h"
+#include "pb/response.pb.h"
+#include "pb/server_message.pb.h"
 
 class Server_Player;
 class Server_Card;
 class ServerInfo_User;
 class Server_Room;
 class QTimer;
+
+class Message;
+class ServerMessage;
+
+class Response;
+class SessionEvent;
+class GameEventContainer;
+class RoomEvent;
 
 class CommandContainer;
 class Command_Ping;
@@ -90,72 +99,74 @@ protected:
 	virtual bool getCompressionSupport() const = 0;
 	int sessionId;
 private:
-	QList<ProtocolItem *> itemQueue;
+	QString thisUserName;
 	QList<int> messageSizeOverTime, messageCountOverTime;
 	int timeRunning, lastDataReceived;
 	QTimer *pingClock;
 
+	virtual void transmitProtocolItem(const ServerMessage &item) = 0;
+
 	virtual DeckList *getDeckFromDatabase(int deckId) = 0;
 
-	ResponseCode cmdPing(const Command_Ping &cmd);
-	ResponseCode cmdLogin(const Command_Login &cmd, BlaContainer *bla);
-	ResponseCode cmdMessage(const Command_Message &cmd, BlaContainer *bla);
-	virtual ResponseCode cmdAddToList(const Command_AddToList &cmd, BlaContainer *bla) = 0;
-	virtual ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, BlaContainer *bla) = 0;
-	virtual ResponseCode cmdDeckList(const Command_DeckList &cmd, BlaContainer *bla) = 0;
-	virtual ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, BlaContainer *bla) = 0;
-	virtual ResponseCode cmdDeckDelDir(const Command_DeckDelDir &cmd, BlaContainer *bla) = 0;
-	virtual ResponseCode cmdDeckDel(const Command_DeckDel &cmd, BlaContainer *bla) = 0;
-	virtual ResponseCode cmdDeckUpload(const Command_DeckUpload &cmd, BlaContainer *bla) = 0;
-	virtual ResponseCode cmdDeckDownload(const Command_DeckDownload &cmd, BlaContainer *bla) = 0;
-	ResponseCode cmdGetGamesOfUser(const Command_GetGamesOfUser &cmd, BlaContainer *bla);
-	ResponseCode cmdGetUserInfo(const Command_GetUserInfo &cmd, BlaContainer *bla);
-	ResponseCode cmdListRooms(const Command_ListRooms &cmd, BlaContainer *bla);
-	ResponseCode cmdJoinRoom(const Command_JoinRoom &cmd, BlaContainer *bla);
-	ResponseCode cmdListUsers(const Command_ListUsers &cmd, BlaContainer *bla);
-	ResponseCode cmdLeaveRoom(const Command_LeaveRoom &cmd, Server_Room *room);
-	ResponseCode cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room);
-	ResponseCode cmdCreateGame(const Command_CreateGame &cmd, Server_Room *room);
-	ResponseCode cmdJoinGame(const Command_JoinGame &cmd, Server_Room *room);
-	ResponseCode cmdLeaveGame(const Command_LeaveGame &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdKickFromGame(const Command_KickFromGame &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdConcede(const Command_Concede &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdReadyStart(const Command_ReadyStart &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdDeckSelect(const Command_DeckSelect &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdSetSideboardPlan(const Command_SetSideboardPlan &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdGameSay(const Command_GameSay &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdShuffle(const Command_Shuffle &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdMulligan(const Command_Mulligan &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdRollDie(const Command_RollDie &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdDrawCards(const Command_DrawCards &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdUndoDraw(const Command_UndoDraw &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdMoveCard(const Command_MoveCard &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdFlipCard(const Command_FlipCard &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdAttachCard(const Command_AttachCard &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdCreateToken(const Command_CreateToken &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdCreateArrow(const Command_CreateArrow &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdDeleteArrow(const Command_DeleteArrow &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdSetCardAttr(const Command_SetCardAttr &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdSetCardCounter(const Command_SetCardCounter &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdIncCardCounter(const Command_IncCardCounter &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdIncCounter(const Command_IncCounter &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdCreateCounter(const Command_CreateCounter &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdSetCounter(const Command_SetCounter &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdDelCounter(const Command_DelCounter &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdNextTurn(const Command_NextTurn &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdSetActivePhase(const Command_SetActivePhase &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdDumpZone(const Command_DumpZone &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdStopDumpZone(const Command_StopDumpZone &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	ResponseCode cmdRevealCards(const Command_RevealCards &cmd, Server_Game *game, Server_Player *player, BlaContainer *bla);
-	virtual ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, BlaContainer *bla) = 0;
-	virtual ResponseCode cmdShutdownServer(const Command_ShutdownServer &cmd, BlaContainer *bla) = 0;
-	virtual ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, BlaContainer *bla) = 0;
+	Response::ResponseCode cmdPing(const Command_Ping &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdLogin(const Command_Login &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdMessage(const Command_Message &cmd, ResponseContainer &rc);
+	virtual Response::ResponseCode cmdAddToList(const Command_AddToList &cmd, ResponseContainer &rc) = 0;
+	virtual Response::ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, ResponseContainer &rc) = 0;
+	virtual Response::ResponseCode cmdDeckList(const Command_DeckList &cmd, ResponseContainer &rc) = 0;
+	virtual Response::ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, ResponseContainer &rc) = 0;
+	virtual Response::ResponseCode cmdDeckDelDir(const Command_DeckDelDir &cmd, ResponseContainer &rc) = 0;
+	virtual Response::ResponseCode cmdDeckDel(const Command_DeckDel &cmd, ResponseContainer &rc) = 0;
+	virtual Response::ResponseCode cmdDeckUpload(const Command_DeckUpload &cmd, ResponseContainer &rc) = 0;
+	virtual Response::ResponseCode cmdDeckDownload(const Command_DeckDownload &cmd, ResponseContainer &rc) = 0;
+	Response::ResponseCode cmdGetGamesOfUser(const Command_GetGamesOfUser &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdGetUserInfo(const Command_GetUserInfo &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdListRooms(const Command_ListRooms &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdJoinRoom(const Command_JoinRoom &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdListUsers(const Command_ListUsers &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdLeaveRoom(const Command_LeaveRoom &cmd, Server_Room *room, ResponseContainer &rc);
+	Response::ResponseCode cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room, ResponseContainer &rc);
+	Response::ResponseCode cmdCreateGame(const Command_CreateGame &cmd, Server_Room *room, ResponseContainer &rc);
+	Response::ResponseCode cmdJoinGame(const Command_JoinGame &cmd, Server_Room *room, ResponseContainer &rc);
+	Response::ResponseCode cmdLeaveGame(const Command_LeaveGame &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdKickFromGame(const Command_KickFromGame &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdConcede(const Command_Concede &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdReadyStart(const Command_ReadyStart &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdDeckSelect(const Command_DeckSelect &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdSetSideboardPlan(const Command_SetSideboardPlan &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdGameSay(const Command_GameSay &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdShuffle(const Command_Shuffle &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdMulligan(const Command_Mulligan &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdRollDie(const Command_RollDie &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdDrawCards(const Command_DrawCards &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdUndoDraw(const Command_UndoDraw &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdMoveCard(const Command_MoveCard &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdFlipCard(const Command_FlipCard &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdAttachCard(const Command_AttachCard &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdCreateToken(const Command_CreateToken &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdCreateArrow(const Command_CreateArrow &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdDeleteArrow(const Command_DeleteArrow &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdSetCardAttr(const Command_SetCardAttr &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdSetCardCounter(const Command_SetCardCounter &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdIncCardCounter(const Command_IncCardCounter &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdIncCounter(const Command_IncCounter &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdCreateCounter(const Command_CreateCounter &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdSetCounter(const Command_SetCounter &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdDelCounter(const Command_DelCounter &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdNextTurn(const Command_NextTurn &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdSetActivePhase(const Command_SetActivePhase &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdDumpZone(const Command_DumpZone &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdStopDumpZone(const Command_StopDumpZone &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdRevealCards(const Command_RevealCards &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges);
+	virtual Response::ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, ResponseContainer &rc) = 0;
+	virtual Response::ResponseCode cmdShutdownServer(const Command_ShutdownServer &cmd, ResponseContainer &rc) = 0;
+	virtual Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, ResponseContainer &rc) = 0;
 	
-	ResponseCode processSessionCommandContainer(const CommandContainer &cont, BlaContainer *bla);
-	ResponseCode processRoomCommandContainer(const CommandContainer &cont, BlaContainer *bla);
-	ResponseCode processGameCommandContainer(const CommandContainer &cont, BlaContainer *bla);
-	ResponseCode processModeratorCommandContainer(const CommandContainer &cont, BlaContainer *bla);
-	ResponseCode processAdminCommandContainer(const CommandContainer &cont, BlaContainer *bla);
+	Response::ResponseCode processSessionCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
+	Response::ResponseCode processRoomCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
+	Response::ResponseCode processGameCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
+	Response::ResponseCode processModeratorCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
+	Response::ResponseCode processAdminCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
 private slots:
 	void pingClockTimeout();
 public:
@@ -168,6 +179,8 @@ public:
 	bool getAcceptsUserListChanges() const { return acceptsUserListChanges; }
 	bool getAcceptsRoomListChanges() const { return acceptsRoomListChanges; }
 	ServerInfo_User *getUserInfo() const { return userInfo; }
+	ServerInfo_User copyUserInfo(bool complete, bool moderatorInfo = false) const;
+	const QString &getUserName() const { return thisUserName; }
 	virtual QString getAddress() const = 0;
 	void setUserInfo(ServerInfo_User *_userInfo) { userInfo = _userInfo; }
 	const QMap<QString, ServerInfo_User *> &getBuddyList() const { return buddyList; }
@@ -177,8 +190,14 @@ public:
 
 	int getLastCommandTime() const { return timeRunning - lastDataReceived; }
 	void processCommandContainer(const CommandContainer &cont);
-	virtual void sendProtocolItem(ProtocolItem *item, bool deleteItem = true) = 0;
-	void enqueueProtocolItem(ProtocolItem *item);
+	
+	void sendProtocolItem(const Response &item);
+	void sendProtocolItem(const SessionEvent &item);
+	void sendProtocolItem(const GameEventContainer &item);
+	void sendProtocolItem(const RoomEvent &item);
+	void sendProtocolItem(ServerMessage::MessageType type, const ::google::protobuf::Message &item);
+	
+	SessionEvent *prepareSessionEvent(const ::google::protobuf::Message &sessionEvent);
 };
 
 #endif

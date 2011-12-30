@@ -184,7 +184,7 @@ void Server_Player::clearZones()
 	lastDrawList.clear();
 }
 
-ServerInfo_PlayerProperties *Server_Player::getProperties()
+ServerInfo_PlayerProperties Server_Player::getProperties()
 {
 	QMutexLocker locker(&game->gameMutex);
 	

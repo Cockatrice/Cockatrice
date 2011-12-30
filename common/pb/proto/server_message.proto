@@ -10,8 +10,10 @@ message ServerMessage {
 		GAME_EVENT_CONTAINER = 2;
 		ROOM_EVENT = 3;
 	}
-	optional Response response = 1;
-	optional SessionEvent session_event = 2;
-	optional GameEventContainer game_event_container = 3;
-	optional RoomEvent room_event = 4;
+	optional MessageType message_type = 1;
+	
+	optional Response response = 2;
+	optional SessionEvent session_event = 3;
+	optional GameEventContainer game_event_container = 4;
+	optional RoomEvent room_event = 5;
 }

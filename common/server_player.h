@@ -6,7 +6,6 @@
 #include <QList>
 #include <QMap>
 #include <QMutex>
-#include "protocol_datastructures.h"
 
 class DeckList;
 class Server_Game;
@@ -20,7 +19,7 @@ class ServerInfo_User;
 class ServerInfo_PlayerProperties;
 class CommandContainer;
 class CardToMove;
-class BlaContainer;
+class GameEventStorage;
 
 class Server_Player : public Server_ArrowTarget {
 	Q_OBJECT
@@ -66,7 +65,7 @@ public:
 	const QMap<int, Server_Counter *> &getCounters() const { return counters; }
 	const QMap<int, Server_Arrow *> &getArrows() const { return arrows; }
 
-	ServerInfo_PlayerProperties *getProperties();
+	ServerInfo_PlayerProperties getProperties();
 	
 	int newCardId();
 	int newCounterId() const;
@@ -81,12 +80,12 @@ public:
 	void clearZones();
 	void setupZones();
 
-	ResponseCode drawCards(BlaContainer *bla, int number);
-	ResponseCode undoDraw(BlaContainer *bla);
-	ResponseCode moveCard(BlaContainer *bla, const QString &_startZone, const QList<const CardToMove *> &_cards, int _targetPlayer, const QString &_targetZone, int _x, int _y);
-	ResponseCode moveCard(BlaContainer *bla, Server_CardZone *startzone, const QList<const CardToMove *> &_cards, Server_CardZone *targetzone, int x, int y, bool fixFreeSpaces = true, bool undoingDraw = false);
-	void unattachCard(BlaContainer *bla, Server_Card *card);
-	ResponseCode setCardAttrHelper(BlaContainer *bla, const QString &zone, int cardId, const QString &attrName, const QString &attrValue);
+	Response::ResponseCode drawCards(GameEventStorage &ges, int number);
+	Response::ResponseCode undoDraw(GameEventStorage &ges);
+	Response::ResponseCode moveCard(GameEventStorage &ges, const QString &_startZone, const QList<const CardToMove *> &_cards, int _targetPlayer, const QString &_targetZone, int _x, int _y);
+	Response::ResponseCode moveCard(GameEventStorage &ges, Server_CardZone *startzone, const QList<const CardToMove *> &_cards, Server_CardZone *targetzone, int x, int y, bool fixFreeSpaces = true, bool undoingDraw = false);
+	void unattachCard(GameEventStorage &ges, Server_Card *card);
+	Response::ResponseCode setCardAttrHelper(GameEventStorage &ges, const QString &zone, int cardId, const QString &attrName, const QString &attrValue);
 
 	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
 };

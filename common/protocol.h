@@ -6,7 +6,11 @@
 #include <QHash>
 #include <QObject>
 #include <QVariant>
-#include "protocol_datastructures.h"
+#include "serializable_item.h"
+#include <QPair>
+
+#include <google/protobuf/message.h>
+#include "pb/server_message.pb.h"
 
 class QXmlStreamReader;
 class QXmlStreamWriter;
@@ -22,11 +26,9 @@ class MoveCardToZone;
 class ProtocolItem : public SerializableItem_Map {
 	Q_OBJECT
 private:
-	static void initializeHashAuto();
 	bool receiverMayDelete;
 public:
 	static const int protocolVersion = 13;
-	static void initializeHash();
 	virtual int getItemId() const = 0;
 	bool getReceiverMayDelete() const { return receiverMayDelete; }
 	void setReceiverMayDelete(bool _receiverMayDelete) { receiverMayDelete = _receiverMayDelete; }
@@ -38,32 +40,49 @@ public:
 // --- COMMANDS ---
 // ----------------
 
-class BlaContainer : public ProtocolItem {
-	Q_OBJECT
+class GameEventStorage {
 private:
-	ProtocolResponse *resp;
-	QList<ProtocolItem *> itemQueue;
-	GameEventContext *gameEventContext;
+	::google::protobuf::Message *gameEventContext;
 	GameEventContainer *gameEventQueuePublic;
 	GameEventContainer *gameEventQueueOmniscient;
 	GameEventContainer *gameEventQueuePrivate;
 	int privatePlayerId;
 public:
-	BlaContainer();
-	int getItemId() const { return 102332456; }
+	GameEventStorage();
+	~GameEventStorage();
 	
-	ProtocolResponse *getResponse() const { return resp; }
-	void setResponse(ProtocolResponse *_resp);
-	const QList<ProtocolItem *> &getItemQueue() const { return itemQueue; }
-	void enqueueItem(ProtocolItem *item) { itemQueue.append(item); }
+	void setGameEventContext(::google::protobuf::Message *_gameEventContext) { gameEventContext = _gameEventContext; }
+	::google::protobuf::Message *getGameEventContext() const { return gameEventContext; }
+	
 	GameEventContainer *getGameEventQueuePublic() const { return gameEventQueuePublic; }
-	void enqueueGameEventPublic(GameEvent *event, int gameId, GameEventContext *context = 0);
+	void enqueueGameEventPublic(const ::google::protobuf::Message &event, int playerId);
+	
 	GameEventContainer *getGameEventQueueOmniscient() const { return gameEventQueueOmniscient; }
-	void enqueueGameEventOmniscient(GameEvent *event, int gameId, GameEventContext *context = 0);
+	void enqueueGameEventOmniscient(const ::google::protobuf::Message &event, int playerId);
+	
 	GameEventContainer *getGameEventQueuePrivate() const { return gameEventQueuePrivate; }
-	void enqueueGameEventPrivate(GameEvent *event, int gameId, int playerId = -1, GameEventContext *context = 0);
+	void enqueueGameEventPrivate(const ::google::protobuf::Message &event, int playerId);
+	// XXX - DRAN DENKEN, dass privatePlayerId gesetzt wird
 	int getPrivatePlayerId() const { return privatePlayerId; }
+	
+	void enqueueGameEvent(const ::google::protobuf::Message &event, int playerId);
 };
+
+class ResponseContainer {
+private:
+	::google::protobuf::Message *responseExtension;
+	QList<QPair<ServerMessage::MessageType, ::google::protobuf::Message *> > preResponseQueue, postResponseQueue;
+public:
+	ResponseContainer() : responseExtension(0) { }
+	~ResponseContainer() { /* XXX responseExtension und Inhalt beider Listen löschen */ }
+	void setResponseExtension(::google::protobuf::Message *_responseExtension) { responseExtension = _responseExtension; }
+	::google::protobuf::Message *getResponseExtension() const { return responseExtension; }
+	void enqueuePreResponseItem(ServerMessage::MessageType type, ::google::protobuf::Message *item) { preResponseQueue.append(qMakePair(type, item)); }
+	void enqueuePostResponseItem(ServerMessage::MessageType type, ::google::protobuf::Message *item) { postResponseQueue.append(qMakePair(type, item)); }
+	const QList<QPair<ServerMessage::MessageType, ::google::protobuf::Message *> > &getPreResponseQueue() const { return preResponseQueue; }
+	const QList<QPair<ServerMessage::MessageType, ::google::protobuf::Message *> > &getPostResponseQueue() const { return postResponseQueue; }
+};
+
 /*
  * XXX
  * 

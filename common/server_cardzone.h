@@ -22,22 +22,22 @@
 
 #include <QList>
 #include <QString>
-#include "protocol_datastructures.h"
+#include "pb/serverinfo_zone.pb.h"
 
 class Server_Card;
 class Server_Player;
 class Server_Game;
-class BlaContainer;
+class GameEventStorage;
 
 class Server_CardZone {
 private:
 	Server_Player *player;
 	QString name;
 	bool has_coords;
-	ZoneType type;
+	ServerInfo_Zone::ZoneType type;
 	int cardsBeingLookedAt;
 public:
-	Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ZoneType _type);
+	Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ServerInfo_Zone::ZoneType _type);
 	~Server_CardZone();
 
 	int removeCard(Server_Card *card);
@@ -46,15 +46,15 @@ public:
 	int getCardsBeingLookedAt() const { return cardsBeingLookedAt; }
 	void setCardsBeingLookedAt(int _cardsBeingLookedAt) { cardsBeingLookedAt = _cardsBeingLookedAt; }
 	bool hasCoords() const { return has_coords; }
-	ZoneType getType() const { return type; }
+	ServerInfo_Zone::ZoneType getType() const { return type; }
 	QString getName() const { return name; }
 	Server_Player *getPlayer() const { return player; }
 	
 	int getFreeGridColumn(int x, int y, const QString &cardName) const;
 	bool isColumnEmpty(int x, int y) const;
 	bool isColumnStacked(int x, int y) const;
-	void fixFreeSpaces(BlaContainer *bla);
-	void moveCard(BlaContainer *bla, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y);
+	void fixFreeSpaces(GameEventStorage &ges);
+	void moveCard(GameEventStorage &ges, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y);
 	QList<Server_Card *> cards;
 	void insertCard(Server_Card *card, int x, int y);
 	void shuffle();

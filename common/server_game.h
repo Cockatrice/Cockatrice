@@ -26,8 +26,11 @@
 #include <QMutex>
 #include "server_player.h"
 #include "protocol.h"
+#include "pb/response.pb.h"
+#include "pb/serverinfo_player.pb.h"
 
 class QTimer;
+class GameEventContainer;
 class Server_Room;
 class ServerInfo_User;
 
@@ -78,7 +81,7 @@ public:
 	bool getSpectatorsNeedPassword() const { return spectatorsNeedPassword; }
 	bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
 	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
-	ResponseCode checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions);
+	Response::ResponseCode checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions);
 	bool containsUser(const QString &userName) const;
 	Server_Player *addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate = true);
 	void removePlayer(Server_Player *player);
@@ -93,8 +96,13 @@ public:
 	void nextTurn();
 	void postConnectionStatusUpdate(Server_Player *player, bool connectionStatus);
 
-	QList<ServerInfo_Player *> getGameState(Server_Player *playerWhosAsking) const;
-	void sendGameEvent(GameEvent *event, GameEventContext *context = 0, Server_Player *exclude = 0);
+	QList<ServerInfo_Player> getGameState(Server_Player *playerWhosAsking) const;
+	
+	GameEventContainer *prepareGameEvent(const ::google::protobuf::Message &gameEvent, int playerId);
+	GameEventContainer *prepareGameEvent(const ::google::protobuf::Message &gameEvent, int playerId, const GameEventContext &context);
+	GameEventContext prepareGameEventContext(const ::google::protobuf::Message &gameEventContext);
+	
+//	void sendGameEvent(GameEvent *event, GameEventContext *context = 0, Server_Player *exclude = 0);
 	void sendGameEventContainer(GameEventContainer *cont, Server_Player *exclude = 0, bool excludeOmniscient = false);
 	void sendGameEventContainerOmniscient(GameEventContainer *cont, Server_Player *exclude = 0);
 	void sendGameEventToPlayer(Server_Player *player, GameEvent *event);

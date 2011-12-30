@@ -1,9 +1,0 @@
-import "game_event.proto";
-import "serverinfo_counter.proto";
-
-message Event_CreateCounters {
-	extend GameEvent {
-		optional Event_CreateCounters ext = 2002;
-	}
-	repeated ServerInfo_Counter counter_list = 1;
-}
