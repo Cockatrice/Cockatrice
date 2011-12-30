@@ -6,66 +6,70 @@
 #include <QHash>
 #include <QObject>
 #include <QVariant>
-#include "serializable_item.h"
 #include <QPair>
 
 #include <google/protobuf/message.h>
 #include "pb/server_message.pb.h"
 
-class QXmlStreamReader;
-class QXmlStreamWriter;
-class QXmlStreamAttributes;
-
-class ProtocolResponse;
 class DeckList;
 class GameEvent;
 class GameEventContainer;
 class GameEventContext;
-class MoveCardToZone;
 
-class ProtocolItem : public SerializableItem_Map {
-	Q_OBJECT
-private:
-	bool receiverMayDelete;
+static const int protocolVersion = 13;
+
+class GameEventStorageItem {
 public:
-	static const int protocolVersion = 13;
-	virtual int getItemId() const = 0;
-	bool getReceiverMayDelete() const { return receiverMayDelete; }
-	void setReceiverMayDelete(bool _receiverMayDelete) { receiverMayDelete = _receiverMayDelete; }
-	ProtocolItem(const QString &_itemType, const QString &_itemSubType);
-	bool isEmpty() const { return false; }
+	enum EventRecipient { SendToPrivate = 0x01, SendToOthers = 0x02};
+	Q_DECLARE_FLAGS(EventRecipients, EventRecipient)
+private:
+	::google::protobuf::Message *event;
+	int playerId;
+	EventRecipients recipients;
+public:
+	GameEventStorageItem(const ::google::protobuf::Message &_event, int _playerId, EventRecipients _recipients)
+		: event(_event.New()), playerId(_playerId), recipients(_recipients)
+	{
+		event->CopyFrom(_event);
+	}
+	~GameEventStorageItem()
+	{
+		delete event;
+	}
+	const ::google::protobuf::Message &getEvent() const { return *event; }
+	int getPlayerId() const { return playerId; }
+	EventRecipients getRecipients() const { return recipients; }
 };
-
-// ----------------
-// --- COMMANDS ---
-// ----------------
+Q_DECLARE_OPERATORS_FOR_FLAGS(GameEventStorageItem::EventRecipients)
 
 class GameEventStorage {
 private:
 	::google::protobuf::Message *gameEventContext;
-	GameEventContainer *gameEventQueuePublic;
-	GameEventContainer *gameEventQueueOmniscient;
-	GameEventContainer *gameEventQueuePrivate;
+	QList<GameEventStorageItem *> gameEventList;
 	int privatePlayerId;
 public:
-	GameEventStorage();
-	~GameEventStorage();
+	GameEventStorage()
+		: gameEventContext(0)
+	{
+	}
+	~GameEventStorage()
+	{
+		delete gameEventContext;
+		for (int i = 0; i < gameEventList.size(); ++i)
+			delete gameEventList[i];
+	}
 	
 	void setGameEventContext(::google::protobuf::Message *_gameEventContext) { gameEventContext = _gameEventContext; }
 	::google::protobuf::Message *getGameEventContext() const { return gameEventContext; }
 	
-	GameEventContainer *getGameEventQueuePublic() const { return gameEventQueuePublic; }
-	void enqueueGameEventPublic(const ::google::protobuf::Message &event, int playerId);
-	
-	GameEventContainer *getGameEventQueueOmniscient() const { return gameEventQueueOmniscient; }
-	void enqueueGameEventOmniscient(const ::google::protobuf::Message &event, int playerId);
-	
-	GameEventContainer *getGameEventQueuePrivate() const { return gameEventQueuePrivate; }
-	void enqueueGameEventPrivate(const ::google::protobuf::Message &event, int playerId);
-	// XXX - DRAN DENKEN, dass privatePlayerId gesetzt wird
 	int getPrivatePlayerId() const { return privatePlayerId; }
 	
-	void enqueueGameEvent(const ::google::protobuf::Message &event, int playerId);
+	void enqueueGameEvent(const ::google::protobuf::Message &event, int playerId, GameEventStorageItem::EventRecipients recipients = GameEventStorageItem::SendToPrivate | GameEventStorageItem::SendToOthers, int _privatePlayerId = -1)
+	{
+		gameEventList.append(new GameEventStorageItem(event, playerId, recipients));
+		if (_privatePlayerId != -1)
+			privatePlayerId = _privatePlayerId;
+	}
 };
 
 class ResponseContainer {
@@ -74,7 +78,14 @@ private:
 	QList<QPair<ServerMessage::MessageType, ::google::protobuf::Message *> > preResponseQueue, postResponseQueue;
 public:
 	ResponseContainer() : responseExtension(0) { }
-	~ResponseContainer() { /* XXX responseExtension und Inhalt beider Listen löschen */ }
+	~ResponseContainer()
+	{
+		delete responseExtension;
+		for (int i = 0; i < preResponseQueue.size(); ++i)
+			delete preResponseQueue[i].second;
+		for (int i = 0; i < postResponseQueue.size(); ++i)
+			delete postResponseQueue[i].second;
+	}
 	void setResponseExtension(::google::protobuf::Message *_responseExtension) { responseExtension = _responseExtension; }
 	::google::protobuf::Message *getResponseExtension() const { return responseExtension; }
 	void enqueuePreResponseItem(ServerMessage::MessageType type, ::google::protobuf::Message *item) { preResponseQueue.append(qMakePair(type, item)); }

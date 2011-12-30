@@ -77,6 +77,7 @@
 #include "pb/event_set_counter.pb.h"
 #include "pb/event_dump_zone.pb.h"
 #include "pb/event_stop_dump_zone.pb.h"
+#include "pb/event_reveal_cards.pb.h"
 #include "pb/context_deck_select.pb.h"
 #include "pb/context_concede.pb.h"
 #include "pb/context_ready_start.pb.h"
@@ -124,12 +125,25 @@ void Server_ProtocolHandler::prepareDestroy()
 	gameListMutex.unlock();
 
 	delete userInfo;
-	QMapIterator<QString, ServerInfo_User *> i(buddyList);
-	while (i.hasNext())
-		delete i.next().value();
-	QMapIterator<QString, ServerInfo_User *> j(ignoreList);
-	while (j.hasNext())
-		delete j.next().value();
+}
+
+void Server_ProtocolHandler::setUserInfo(const ServerInfo_User &_userInfo)
+{
+	userInfo = new ServerInfo_User;
+	userInfo->CopyFrom(_userInfo);
+}
+
+ServerInfo_User Server_ProtocolHandler::copyUserInfo(bool complete, bool moderatorInfo) const
+{
+	ServerInfo_User result;
+	if (userInfo) {
+		result.CopyFrom(*userInfo);
+		if (!moderatorInfo)
+			result.clear_address();
+		if (!complete)
+			result.clear_avatar_bmp();
+	}
+	return result;
 }
 
 void Server_ProtocolHandler::playerRemovedFromGame(Server_Game *game)
@@ -184,6 +198,13 @@ void Server_ProtocolHandler::sendProtocolItem(ServerMessage::MessageType type, c
 		case ServerMessage::GAME_EVENT_CONTAINER: sendProtocolItem(static_cast<const GameEventContainer &>(item)); break;
 		case ServerMessage::ROOM_EVENT: sendProtocolItem(static_cast<const RoomEvent &>(item)); break;
 	}
+}
+
+SessionEvent *Server_ProtocolHandler::prepareSessionEvent(const ::google::protobuf::Message &sessionEvent)
+{
+	SessionEvent *event = new SessionEvent;
+	event->GetReflection()->MutableMessage(event, sessionEvent.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(sessionEvent);
+	return event;
 }
 
 Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(const CommandContainer &cont, ResponseContainer &rc)
@@ -499,19 +520,14 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 	// XXX stimmt so nicht, beim alten Kopierkonstruktor wurde hier "true" übergeben
 	re->mutable_user_info()->CopyFrom(*userInfo);
 	
-	QList<ServerInfo_User *> _buddyList, _ignoreList;
 	if (authState == PasswordRight) {
-		buddyList = server->getBuddyList(userName);
-		
-		QMapIterator<QString, ServerInfo_User *> buddyIterator(buddyList);
+		QMapIterator<QString, ServerInfo_User> buddyIterator(server->getBuddyList(userName));
 		while (buddyIterator.hasNext())
-			re->add_buddy_list()->CopyFrom(*buddyIterator.next().value());
+			re->add_buddy_list()->CopyFrom(buddyIterator.next().value());
 	
-		ignoreList = server->getIgnoreList(userName);
-		
-		QMapIterator<QString, ServerInfo_User *> ignoreIterator(ignoreList);
+		QMapIterator<QString, ServerInfo_User> ignoreIterator(server->getIgnoreList(userName));
 		while (ignoreIterator.hasNext())
-			re->add_ignore_list()->CopyFrom(*ignoreIterator.next().value());
+			re->add_ignore_list()->CopyFrom(ignoreIterator.next().value());
 	}
 	
 	server->serverMutex.lock();
@@ -573,7 +589,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
 	Server_ProtocolHandler *userHandler = server->getUsers().value(receiver);
 	if (!userHandler)
 		return Response::RespNameNotFound;
-	if (userHandler->getIgnoreList().contains(getUserName()))
+	if (server->isInIgnoreList(receiver, QString::fromStdString(userInfo->name())))
 		return Response::RespInIgnoreList;
 	
 	Event_UserMessage event;
@@ -856,7 +872,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdDeckSelect(const Command_DeckS
 	
 	Event_PlayerPropertiesChanged event;
 	event.mutable_player_properties()->CopyFrom(player->getProperties());
-	ges.enqueueGameEventPublic(event, player->getPlayerId());
+	ges.enqueueGameEvent(event, player->getPlayerId());
 	
 	Context_DeckSelect *context = new Context_DeckSelect;
 	context->set_deck_hash(deck->getDeckHash().toStdString());
@@ -907,7 +923,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdConcede(const Command_Concede 
 	
 	Event_PlayerPropertiesChanged event;
 	event.mutable_player_properties()->CopyFrom(player->getProperties());
-	ges.enqueueGameEventPublic(event, player->getPlayerId());
+	ges.enqueueGameEvent(event, player->getPlayerId());
 	ges.setGameEventContext(new Context_Concede());
 	
 	game->stopGameIfFinished();
@@ -932,7 +948,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdReadyStart(const Command_Ready
 	
 	Event_PlayerPropertiesChanged event;
 	event.mutable_player_properties()->CopyFrom(player->getProperties());
-	ges.enqueueGameEventPublic(event, player->getPlayerId());
+	ges.enqueueGameEvent(event, player->getPlayerId());
 	ges.setGameEventContext(new Context_ReadyStart());
 	
 	game->startGameIfReady();
@@ -946,7 +962,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdGameSay(const Command_GameSay 
 	
 	Event_GameSay event;
 	event.set_message(cmd.message());
-	ges.enqueueGameEventPublic(event, player->getPlayerId());
+	ges.enqueueGameEvent(event, player->getPlayerId());
 	
 	return Response::RespOk;
 }
@@ -963,7 +979,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdShuffle(const Command_Shuffle 
 		
 	player->getZones().value("deck")->shuffle();
 	
-	ges.enqueueGameEventPublic(Event_Shuffle(), player->getPlayerId());
+	ges.enqueueGameEvent(Event_Shuffle(), player->getPlayerId());
 	return Response::RespOk;
 }
 
@@ -1630,7 +1646,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdStopDumpZone(const Command_Sto
 	return Response::RespOk;
 }
 
-Response::ResponseCode Server_ProtocolHandler::cmdRevealCards(const Command_RevealCards &cmd, Server_Game *game, Server_Player *player, ResponseContainer &rc, GameEventStorage &ges)
+Response::ResponseCode Server_ProtocolHandler::cmdRevealCards(const Command_RevealCards &cmd, Server_Game *game, Server_Player *player, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
 	if (player->getSpectator())
 		return Response::RespFunctionNotAllowed;
@@ -1664,39 +1680,54 @@ Response::ResponseCode Server_ProtocolHandler::cmdRevealCards(const Command_Reve
 		cardsToReveal.append(card);
 	}
 	
+	Event_RevealCards eventOthers;
+	eventOthers.set_zone_name(zone->getName().toStdString());
+	if (cmd.has_card_id())
+		eventOthers.set_card_id(cmd.card_id());
+	if (cmd.has_player_id())
+		eventOthers.set_other_player_id(cmd.player_id());
+	
+	Event_RevealCards eventPrivate(eventOthers);
+	
 	QList<ServerInfo_Card *> respCardListPrivate, respCardListOmniscient;
 	for (int i = 0; i < cardsToReveal.size(); ++i) {
 		Server_Card *card = cardsToReveal[i];
+		ServerInfo_Card *cardInfo = eventPrivate.add_cards();
 
-		QList<ServerInfo_CardCounter *> cardCounterListPrivate, cardCounterListOmniscient;
+		cardInfo->set_id(card->getId());
+		cardInfo->set_name(card->getName().toStdString());
+		cardInfo->set_x(card->getX());
+		cardInfo->set_y(card->getY());
+		cardInfo->set_face_down(card->getFaceDown());
+		cardInfo->set_tapped(card->getTapped());
+		cardInfo->set_attacking(card->getAttacking());
+		cardInfo->set_color(card->getColor().toStdString());
+		cardInfo->set_pt(card->getPT().toStdString());
+		cardInfo->set_annotation(card->getAnnotation().toStdString());
+		cardInfo->set_destroy_on_zone_change(card->getDestroyOnZoneChange());
+		cardInfo->set_doesnt_untap(card->getDoesntUntap());
+		
+		QList<ServerInfo_CardCounter *> cardCounterList;
 		QMapIterator<int, int> cardCounterIterator(card->getCounters());
 		while (cardCounterIterator.hasNext()) {
 			cardCounterIterator.next();
-			cardCounterListPrivate.append(new ServerInfo_CardCounter(cardCounterIterator.key(), cardCounterIterator.value()));
-			cardCounterListOmniscient.append(new ServerInfo_CardCounter(cardCounterIterator.key(), cardCounterIterator.value()));
+			ServerInfo_CardCounter *counterInfo = cardInfo->add_counter_list();
+			counterInfo->set_id(cardCounterIterator.key());
+			counterInfo->set_value(cardCounterIterator.value());
 		}
 		
-		int attachPlayerId = -1;
-		QString attachZone;
-		int attachCardId = -1;
 		if (card->getParentCard()) {
-			attachPlayerId = card->getParentCard()->getZone()->getPlayer()->getPlayerId();
-			attachZone = card->getParentCard()->getZone()->getName();
-			attachCardId = card->getParentCard()->getId();
+			cardInfo->set_attach_player_id(card->getParentCard()->getZone()->getPlayer()->getPlayerId());
+			cardInfo->set_attach_zone(card->getParentCard()->getZone()->getName().toStdString());
+			cardInfo->set_attach_card_id(card->getParentCard()->getId());
 		}
-		
-		if (cmd.has_player_id())
-			respCardListPrivate.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getFaceDown(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), card->getDoesntUntap(), cardCounterListPrivate, attachPlayerId, attachZone, attachCardId));
-		respCardListOmniscient.append(new ServerInfo_Card(card->getId(), card->getName(), card->getX(), card->getY(), card->getFaceDown(), card->getTapped(), card->getAttacking(), card->getColor(), card->getPT(), card->getAnnotation(), card->getDestroyOnZoneChange(), card->getDoesntUntap(), cardCounterListOmniscient, attachPlayerId, attachZone, attachCardId));
 	}
 	
-	if (!cmd.has_player_id())
-		bla->enqueueGameEventPublic(new Event_RevealCards(player->getPlayerId(), zone->getName(), cmd.card_id(), -1, respCardListOmniscient), game->getGameId());
-	else {
-		bla->enqueueGameEventPublic(new Event_RevealCards(player->getPlayerId(), zone->getName(), cmd.card_id(), otherPlayer->getPlayerId()), game->getGameId());
-		bla->enqueueGameEventPrivate(new Event_RevealCards(player->getPlayerId(), zone->getName(), cmd.card_id(), otherPlayer->getPlayerId(), respCardListPrivate), game->getGameId(), otherPlayer->getPlayerId());
-		bla->enqueueGameEventOmniscient(new Event_RevealCards(player->getPlayerId(), zone->getName(), cmd.card_id(), otherPlayer->getPlayerId(), respCardListOmniscient), game->getGameId());
-	}
+	if (cmd.has_player_id()) {
+		ges.enqueueGameEvent(eventPrivate, player->getPlayerId(), GameEventStorageItem::SendToPrivate, cmd.player_id());
+		ges.enqueueGameEvent(eventOthers, player->getPlayerId(), GameEventStorageItem::SendToOthers);
+	} else
+		ges.enqueueGameEvent(eventPrivate, player->getPlayerId());
 	
 	return Response::RespOk;
 }

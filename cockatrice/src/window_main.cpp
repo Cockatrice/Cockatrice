@@ -51,7 +51,7 @@ void MainWindow::updateTabMenu(QMenu *menu)
 
 void MainWindow::processConnectionClosedEvent(Event_ConnectionClosed *event)
 {
-	QString reason = event->getReason();
+/*	QString reason = event->getReason();
 	client->disconnectFromServer();
 	QString reasonStr;
 	if (reason == "too_many_connections")
@@ -63,11 +63,13 @@ void MainWindow::processConnectionClosedEvent(Event_ConnectionClosed *event)
 	else
 		reasonStr = tr("Unknown reason.");
 	QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.\nReason: %1").arg(reasonStr));
+*/
 }
 
 void MainWindow::processServerShutdownEvent(Event_ServerShutdown *event)
 {
-	QMessageBox::information(this, tr("Scheduled server shutdown"), tr("The server is going to be restarted in %n minute(s).\nAll running games will be lost.\nReason for shutdown: %1", "", event->getMinutes()).arg(event->getReason()));
+/*	QMessageBox::information(this, tr("Scheduled server shutdown"), tr("The server is going to be restarted in %n minute(s).\nAll running games will be lost.\nReason for shutdown: %1", "", event->getMinutes()).arg(event->getReason()));
+ * */
 }
 
 void MainWindow::statusChanged(ClientStatus _status)
@@ -199,11 +201,11 @@ void MainWindow::serverTimeout()
 	QMessageBox::critical(this, tr("Error"), tr("Server timeout"));
 }
 
-void MainWindow::serverError(ResponseCode r)
+void MainWindow::serverError(Response::ResponseCode r)
 {
 	switch (r) {
-		case RespWrongPassword: QMessageBox::critical(this, tr("Error"), tr("Invalid login data.")); break;
-		case RespWouldOverwriteOldSession: QMessageBox::critical(this, tr("Error"), tr("There is already an active session using this user name.\nPlease close that session first and re-login.")); break;
+		case Response::RespWrongPassword: QMessageBox::critical(this, tr("Error"), tr("Invalid login data.")); break;
+		case Response::RespWouldOverwriteOldSession: QMessageBox::critical(this, tr("Error"), tr("There is already an active session using this user name.\nPlease close that session first and re-login.")); break;
 		default: ;
 	}
 }
@@ -302,7 +304,7 @@ MainWindow::MainWindow(QWidget *parent)
 	client = new RemoteClient(this);
 	connect(client, SIGNAL(connectionClosedEventReceived(Event_ConnectionClosed *)), this, SLOT(processConnectionClosedEvent(Event_ConnectionClosed *)));
 	connect(client, SIGNAL(serverShutdownEventReceived(Event_ServerShutdown *)), this, SLOT(processServerShutdownEvent(Event_ServerShutdown *)));
-	connect(client, SIGNAL(serverError(ResponseCode)), this, SLOT(serverError(ResponseCode)));
+	connect(client, SIGNAL(serverError(Response::ResponseCode)), this, SLOT(serverError(Response::ResponseCode)));
 	connect(client, SIGNAL(socketError(const QString &)), this, SLOT(socketError(const QString &)));
 	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
 	connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));

@@ -29,6 +29,9 @@
 #include "server_logger.h"
 #include "main.h"
 #include "passwordhasher.h"
+#include "pb/event_server_message.pb.h"
+#include "pb/event_server_shutdown.pb.h"
+#include "pb/event_connection_closed.pb.h"
 
 void Servatrice_TcpServer::incomingConnection(int socketDescriptor)
 {
@@ -50,8 +53,7 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
 	pingClock->start(1000);
 	
-	ProtocolItem::initializeHash();
-	
+	serverName = settings->value("server/name").toString();
 	serverId = settings->value("server/id", 0).toInt();
 	int statusUpdateTime = settings->value("server/statusupdate").toInt();
 	statusUpdateClock = new QTimer(this);
@@ -245,7 +247,54 @@ bool Servatrice::userExists(const QString &user)
 	} else return false;
 }
 
-ServerInfo_User *Servatrice::evalUserQueryResult(const QSqlQuery &query, bool complete)
+int Servatrice::getUserIdInDB(const QString &name)
+{
+	QMutexLocker locker(&dbMutex);
+	QSqlQuery query;
+	query.prepare("select id from " + dbPrefix + "_users where name = :name and active = 1");
+	query.bindValue(":name", name);
+	if (!execSqlQuery(query))
+		return -1;
+	if (!query.next())
+		return -1;
+	return query.value(0).toInt();
+}
+
+bool Servatrice::isInBuddyList(const QString &whoseList, const QString &who)
+{
+	QMutexLocker locker(&dbMutex);
+	checkSql();
+	
+	int id1 = getUserIdInDB(whoseList);
+	int id2 = getUserIdInDB(who);
+	
+	QSqlQuery query;
+	query.prepare("select 1 from " + dbPrefix + "_buddylist where id_user1 = :id_user1 and id_user2 = :id_user2");
+	query.bindValue(":id_user1", id1);
+	query.bindValue(":id_user2", id2);
+	if (!execSqlQuery(query))
+		return false;
+	return query.next();
+}
+
+bool Servatrice::isInIgnoreList(const QString &whoseList, const QString &who)
+{
+	QMutexLocker locker(&dbMutex);
+	checkSql();
+	
+	int id1 = getUserIdInDB(whoseList);
+	int id2 = getUserIdInDB(who);
+	
+	QSqlQuery query;
+	query.prepare("select 1 from " + dbPrefix + "_ignorelist where id_user1 = :id_user1 and id_user2 = :id_user2");
+	query.bindValue(":id_user1", id1);
+	query.bindValue(":id_user2", id2);
+	if (!execSqlQuery(query))
+		return false;
+	return query.next();
+}
+
+ServerInfo_User Servatrice::evalUserQueryResult(const QSqlQuery &query, bool complete)
 {
 	QString name = query.value(0).toString();
 	int is_admin = query.value(1).toInt();
@@ -270,21 +319,23 @@ ServerInfo_User *Servatrice::evalUserQueryResult(const QSqlQuery &query, bool co
 	else if (is_admin == 2)
 		userLevel |= ServerInfo_User::IsModerator;
 	
-	return new ServerInfo_User(
-		name,
-		userLevel,
-		QString(),
-		realName,
-		gender,
-		country,
-		avatarBmp
-	);
+	ServerInfo_User result;
+	result.set_name(name.toStdString());
+	result.set_user_level(userLevel);
+	result.set_real_name(realName.toStdString());
+	result.set_gender(gender);
+	result.set_country(country.toStdString());
+	result.set_avatar_bmp(avatarBmp.data(), avatarBmp.size());
+	return result;
 }
 
-ServerInfo_User *Servatrice::getUserData(const QString &name)
+ServerInfo_User Servatrice::getUserData(const QString &name)
 {
 	QMutexLocker locker(&dbMutex);
 	const QString method = settings->value("authentication/method").toString();
+	ServerInfo_User result;
+	result.set_name(name.toStdString());
+	result.set_user_level(ServerInfo_User::IsUser);
 	if (method == "sql") {
 		checkSql();
 
@@ -292,14 +343,14 @@ ServerInfo_User *Servatrice::getUserData(const QString &name)
 		query.prepare("select name, admin, realname, gender, country, avatar_bmp from " + dbPrefix + "_users where name = :name and active = 1");
 		query.bindValue(":name", name);
 		if (!execSqlQuery(query))
-			return new ServerInfo_User(name, ServerInfo_User::IsUser);
+			return result;
 		
 		if (query.next())
 			return evalUserQueryResult(query, true);
 		else
-			return new ServerInfo_User(name, ServerInfo_User::IsUser);
+			return result;
 	} else
-		return new ServerInfo_User(name, ServerInfo_User::IsUser);
+		return result;
 }
 
 int Servatrice::getUsersWithAddress(const QHostAddress &address) const
@@ -337,10 +388,10 @@ void Servatrice::endSession(int sessionId)
 	execSqlQuery(query);
 }
 
-QMap<QString, ServerInfo_User *> Servatrice::getBuddyList(const QString &name)
+QMap<QString, ServerInfo_User> Servatrice::getBuddyList(const QString &name)
 {
 	QMutexLocker locker(&dbMutex);
-	QMap<QString, ServerInfo_User *> result;
+	QMap<QString, ServerInfo_User> result;
 	
 	const QString method = settings->value("authentication/method").toString();
 	if (method == "sql") {
@@ -353,17 +404,17 @@ QMap<QString, ServerInfo_User *> Servatrice::getBuddyList(const QString &name)
 			return result;
 		
 		while (query.next()) {
-			ServerInfo_User *temp = evalUserQueryResult(query, false);
-			result.insert(temp->getName(), temp);
+			const ServerInfo_User &temp = evalUserQueryResult(query, false);
+			result.insert(QString::fromStdString(temp.name()), temp);
 		}
 	}
 	return result;
 }
 
-QMap<QString, ServerInfo_User *> Servatrice::getIgnoreList(const QString &name)
+QMap<QString, ServerInfo_User> Servatrice::getIgnoreList(const QString &name)
 {
 	QMutexLocker locker(&dbMutex);
-	QMap<QString, ServerInfo_User *> result;
+	QMap<QString, ServerInfo_User> result;
 	
 	const QString method = settings->value("authentication/method").toString();
 	if (method == "sql") {
@@ -376,8 +427,8 @@ QMap<QString, ServerInfo_User *> Servatrice::getIgnoreList(const QString &name)
 			return result;
 		
 		while (query.next()) {
-			ServerInfo_User *temp = evalUserQueryResult(query, false);
-			result.insert(temp->getName(), temp);
+			ServerInfo_User temp = evalUserQueryResult(query, false);
+			result.insert(QString::fromStdString(temp.name()), temp);
 		}
 	}
 	return result;
@@ -394,12 +445,13 @@ void Servatrice::updateLoginMessage()
 		if (query.next()) {
 			loginMessage = query.value(0).toString();
 			
-			Event_ServerMessage *event = new Event_ServerMessage(loginMessage);
+			Event_ServerMessage event;
+			event.set_message(loginMessage.toStdString());
+			SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
 			QMapIterator<QString, Server_ProtocolHandler *> usersIterator(users);
-			while (usersIterator.hasNext()) {
-				usersIterator.next().value()->sendProtocolItem(event, false);
-			}
-			delete event;
+			while (usersIterator.hasNext())
+				usersIterator.next().value()->sendProtocolItem(*se);
+			delete se;
 		}
 }
 
@@ -467,15 +519,21 @@ void Servatrice::shutdownTimeout()
 	
 	--shutdownMinutes;
 	
-	GenericEvent *event;
-	if (shutdownMinutes)
-		event = new Event_ServerShutdown(shutdownReason, shutdownMinutes);
-	else
-		event = new Event_ConnectionClosed("server_shutdown");
+	SessionEvent *se;
+	if (shutdownMinutes) {
+		Event_ServerShutdown event;
+		event.set_reason(shutdownReason.toStdString());
+		event.set_minutes(shutdownMinutes);
+		se = Server_ProtocolHandler::prepareSessionEvent(event);
+	} else {
+		Event_ConnectionClosed event;
+		event.set_reason("server_shutdown");
+		se = Server_ProtocolHandler::prepareSessionEvent(event);
+	}
 
 	for (int i = 0; i < clients.size(); ++i)
-		clients[i]->sendProtocolItem(event, false);
-	delete event;
+		clients[i]->sendProtocolItem(*se);
+	delete se;
 	
 	if (!shutdownMinutes)
 		deleteLater();

@@ -42,8 +42,10 @@ public:
 	virtual int getMaxGamesPerUser() const { return 0; }
 	virtual bool getThreaded() const = 0;
 	
-	virtual QMap<QString, ServerInfo_User *> getBuddyList(const QString &name) = 0;
-	virtual QMap<QString, ServerInfo_User *> getIgnoreList(const QString &name) = 0;
+	virtual QMap<QString, ServerInfo_User> getBuddyList(const QString &name) = 0;
+	virtual QMap<QString, ServerInfo_User> getIgnoreList(const QString &name) = 0;
+	virtual bool isInBuddyList(const QString &whoseList, const QString &who) = 0;
+	virtual bool isInIgnoreList(const QString &whoseList, const QString &who) = 0;
 protected:
 	void prepareDestroy();
 	QList<Server_ProtocolHandler *> clients;
@@ -54,7 +56,7 @@ protected:
 	virtual void endSession(int sessionId) = 0;
 	virtual bool userExists(const QString &user) = 0;
 	virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password) = 0;
-	virtual ServerInfo_User *getUserData(const QString &name) = 0;
+	virtual ServerInfo_User getUserData(const QString &name) = 0;
 	int getUsersCount() const;
 	int getGamesCount() const;
 	int nextGameId;

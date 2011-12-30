@@ -1,20 +1,15 @@
 #include <QTimer>
-#include <QXmlStreamReader>
-#include <QXmlStreamWriter>
-#include <QCryptographicHash>
 #include "remoteclient.h"
 #include "protocol.h"
-#include "protocol_items.h"
 
 #include "pending_command.h"
 #include "pb/commands.pb.h"
 #include "pb/session_commands.pb.h"
+#include "pb/response_login.pb.h"
 
 RemoteClient::RemoteClient(QObject *parent)
-	: AbstractClient(parent), timeRunning(0), lastDataReceived(0), topLevelItem(0)
+	: AbstractClient(parent), timeRunning(0), lastDataReceived(0), messageInProgress(false), messageLength(0)
 {
-	ProtocolItem::initializeHash();
-	
 	timer = new QTimer(this);
 	timer->setInterval(1000);
 	connect(timer, SIGNAL(timeout()), this, SLOT(ping()));
@@ -24,7 +19,7 @@ RemoteClient::RemoteClient(QObject *parent)
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readData()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slotSocketError(QAbstractSocket::SocketError)));
 	
-	xmlReader = new QXmlStreamReader;
+	connect(this, SIGNAL(serverIdentificationEventReceived(const Event_ServerIdentification &)), this, SLOT(processServerIdentificationEvent(const Event_ServerIdentification &)));
 }
 
 RemoteClient::~RemoteClient()
@@ -46,61 +41,72 @@ void RemoteClient::slotConnected()
 	setStatus(StatusAwaitingWelcome);
 }
 
-void RemoteClient::loginResponse(ProtocolResponse *response)
+void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentification & /*event*/)
 {
-	if (response->getResponseCode() == RespOk) {
-		Response_Login *resp = qobject_cast<Response_Login *>(response);
-		if (!resp) {
-			disconnectFromServer();
-			return;
-		}
+	setStatus(StatusLoggingIn);
+	
+	Command_Login cmdLogin;
+	cmdLogin.set_user_name(userName.toStdString());
+	cmdLogin.set_password(password.toStdString());
+	
+	PendingCommand *pend = prepareSessionCommand(cmdLogin);
+	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(loginResponse(const Response &)));
+	sendCommand(pend);
+}
+
+void RemoteClient::loginResponse(const Response &response)
+{
+	if (response.response_code() == Response::RespOk) {
+		const Response_Login &resp = response.GetExtension(Response_Login::ext);
 		setStatus(StatusLoggedIn);
-		emit userInfoChanged(resp->getUserInfo());
-		emit buddyListReceived(resp->getBuddyList());
-		emit ignoreListReceived(resp->getIgnoreList());
+		emit userInfoChanged(resp.user_info());
+		
+		QList<ServerInfo_User> buddyList;
+		for (int i = resp.buddy_list_size() - 1; i >= 0; --i)
+			buddyList.append(resp.buddy_list(i));
+		emit buddyListReceived(buddyList);
+		
+		QList<ServerInfo_User> ignoreList;
+		for (int i = resp.ignore_list_size() - 1; i >= 0; --i)
+			ignoreList.append(resp.ignore_list(i));
+		emit ignoreListReceived(ignoreList);
 	} else {
-		emit serverError(response->getResponseCode());
+		emit serverError(response.response_code());
 		setStatus(StatusDisconnecting);
 	}
 }
 
 void RemoteClient::readData()
 {
-	QByteArray data = socket->readAll();
-	qDebug() << data;
-	xmlReader->addData(data);
 	lastDataReceived = timeRunning;
+	QByteArray data = socket->readAll();
 
-	while (!xmlReader->atEnd()) {
-		xmlReader->readNext();
-		if (topLevelItem)
-			topLevelItem->readElement(xmlReader);
-		else if (xmlReader->isStartElement() && (xmlReader->name().toString() == "cockatrice_server_stream")) {
-			int serverVersion = xmlReader->attributes().value("version").toString().toInt();
-			if (serverVersion != ProtocolItem::protocolVersion) {
-				emit protocolVersionMismatch(ProtocolItem::protocolVersion, serverVersion);
-				disconnectFromServer();
+	inputBuffer.append(data);
+	
+	do {
+		if (!messageInProgress) {
+			if (inputBuffer.size() >= 4) {
+				messageLength =   (((quint32) (unsigned char) inputBuffer[0]) << 24)
+				                + (((quint32) (unsigned char) inputBuffer[1]) << 16)
+				                + (((quint32) (unsigned char) inputBuffer[2]) << 8)
+				                + ((quint32) (unsigned char) inputBuffer[3]);
+				inputBuffer.remove(0, 4);
+				messageInProgress = true;
+			} else
 				return;
-			}
-/*			xmlWriter->writeStartDocument();
-			xmlWriter->writeStartElement("cockatrice_client_stream");
-			xmlWriter->writeAttribute("version", QString::number(ProtocolItem::protocolVersion));
-			xmlWriter->writeAttribute("comp", "1");
-*/			
-			topLevelItem = new TopLevelProtocolItem;
-			connect(topLevelItem, SIGNAL(protocolItemReceived(ProtocolItem *)), this, SLOT(processProtocolItem(ProtocolItem *)));
-			
-			setStatus(StatusLoggingIn);
-			
-			Command_Login cmdLogin;
-			cmdLogin.set_user_name(userName.toStdString());
-			cmdLogin.set_password(password.toStdString());
-			
-			PendingCommand *pend = prepareSessionCommand(cmdLogin);
-			connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(loginResponse(ProtocolResponse *)));
-			sendCommand(pend);
 		}
-	}
+		if (inputBuffer.size() < messageLength)
+			return;
+		
+		ServerMessage newServerMessage;
+		newServerMessage.ParseFromArray(inputBuffer.data(), messageLength);
+		qDebug(QString::fromStdString(newServerMessage.ShortDebugString()).toUtf8());
+		inputBuffer.remove(0, messageLength);
+		messageInProgress = false;
+		
+		processProtocolItem(newServerMessage);
+	} while (!inputBuffer.isEmpty());
+	
 	if (status == StatusDisconnecting)
 		disconnectFromServer();
 }
@@ -131,12 +137,10 @@ void RemoteClient::connectToServer(const QString &hostname, unsigned int port, c
 
 void RemoteClient::disconnectFromServer()
 {
-	delete topLevelItem;
-	topLevelItem = 0;
-	
-	xmlReader->clear();
-	
 	timer->stop();
+	
+	messageInProgress = false;
+	messageLength = 0;
 
 	QList<PendingCommand *> pc = pendingCommands.values();
 	for (int i = 0; i < pc.size(); i++)

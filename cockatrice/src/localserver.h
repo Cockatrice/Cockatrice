@@ -23,9 +23,11 @@ protected:
 	int startSession(const QString & /*userName*/, const QString & /*address*/) { return -1; }
 	void endSession(int /*sessionId*/) { }
 	bool userExists(const QString & /*name*/) { return false; }
-	ServerInfo_User *getUserData(const QString &name);
-	QMap<QString, ServerInfo_User *> getBuddyList(const QString & /*name*/) { return QMap<QString, ServerInfo_User *>(); }
-	QMap<QString, ServerInfo_User *> getIgnoreList(const QString & /*name*/) { return QMap<QString, ServerInfo_User *>(); }
+	ServerInfo_User getUserData(const QString &name);
+	QMap<QString, ServerInfo_User> getBuddyList(const QString & /*name*/) { return QMap<QString, ServerInfo_User>(); }
+	QMap<QString, ServerInfo_User> getIgnoreList(const QString & /*name*/) { return QMap<QString, ServerInfo_User>(); }
+	bool isInBuddyList(const QString & /*whoseList*/, const QString & /*who*/) { return false; }
+	bool isInIgnoreList(const QString & /*whoseList*/, const QString & /*who*/) { return false; }
 };
 
 #endif

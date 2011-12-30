@@ -14,11 +14,8 @@ public:
 	~LocalClient();
 	
 	void sendCommandContainer(const CommandContainer &cont);
-	
 private slots:
-	void itemFromServer(ProtocolItem *item);
-signals:
-	void itemToServer(ProtocolItem *item);
+	void itemFromServer(const ServerMessage &item);
 };
 
 #endif

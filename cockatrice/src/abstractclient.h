@@ -3,17 +3,15 @@
 
 #include <QObject>
 #include <QVariant>
-#include <google/protobuf/message.h>
-#include "protocol_datastructures.h"
+#include "pb/response.pb.h"
+#include "pb/serverinfo_user.pb.h"
 
 class PendingCommand;
 class CommandContainer;
-class ProtocolItem;
-class ProtocolResponse;
-class TopLevelProtocolItem;
-class CommandContainer;
 class RoomEvent;
 class GameEventContainer;
+class ServerMessage;
+class Event_ServerIdentification;
 class Event_AddToList;
 class Event_RemoveFromList;
 class Event_UserJoined;
@@ -21,7 +19,7 @@ class Event_UserLeft;
 class Event_ServerMessage;
 class Event_ListRooms;
 class Event_GameJoined;
-class Event_Message;
+class Event_UserMessage;
 class Event_ConnectionClosed;
 class Event_ServerShutdown;
 
@@ -38,30 +36,31 @@ class AbstractClient : public QObject {
 	Q_OBJECT
 signals:
 	void statusChanged(ClientStatus _status);
-	void serverError(ResponseCode resp);
+	void serverError(Response::ResponseCode resp);
 	
 	// Room events
-	void roomEventReceived(RoomEvent *event);
+	void roomEventReceived(const RoomEvent &event);
 	// Game events
-	void gameEventContainerReceived(GameEventContainer *event);
-	// Generic events
-	void connectionClosedEventReceived(Event_ConnectionClosed *event);
-	void serverShutdownEventReceived(Event_ServerShutdown *event);
-	void addToListEventReceived(Event_AddToList *event);
-	void removeFromListEventReceived(Event_RemoveFromList *event);
-	void userJoinedEventReceived(Event_UserJoined *event);
-	void userLeftEventReceived(Event_UserLeft *event);
-	void serverMessageEventReceived(Event_ServerMessage *event);
-	void listRoomsEventReceived(Event_ListRooms *event);
-	void gameJoinedEventReceived(Event_GameJoined *event);
-	void messageEventReceived(Event_Message *event);
-	void userInfoChanged(ServerInfo_User *userInfo);
-	void buddyListReceived(const QList<ServerInfo_User *> &buddyList);
-	void ignoreListReceived(const QList<ServerInfo_User *> &ignoreList);
+	void gameEventContainerReceived(const GameEventContainer &event);
+	// Session events
+	void serverIdentificationEventReceived(const Event_ServerIdentification &event);
+	void connectionClosedEventReceived(const Event_ConnectionClosed &event);
+	void serverShutdownEventReceived(const Event_ServerShutdown &event);
+	void addToListEventReceived(const Event_AddToList &event);
+	void removeFromListEventReceived(const Event_RemoveFromList &event);
+	void userJoinedEventReceived(const Event_UserJoined &event);
+	void userLeftEventReceived(const Event_UserLeft &event);
+	void serverMessageEventReceived(const Event_ServerMessage &event);
+	void listRoomsEventReceived(const Event_ListRooms &event);
+	void gameJoinedEventReceived(const Event_GameJoined &event);
+	void userMessageEventReceived(const Event_UserMessage &event);
+	void userInfoChanged(const ServerInfo_User &userInfo);
+	void buddyListReceived(const QList<ServerInfo_User> &buddyList);
+	void ignoreListReceived(const QList<ServerInfo_User> &ignoreList);
 private:
 	int nextCmdId;
 protected slots:
-	void processProtocolItem(ProtocolItem *item);
+	void processProtocolItem(const ServerMessage &item);
 protected:
 	QMap<int, PendingCommand *> pendingCommands;
 	ClientStatus status;

@@ -22,6 +22,7 @@
 
 #include <QList>
 #include <QString>
+#include <QMap>
 #include "pb/serverinfo_zone.pb.h"
 
 class Server_Card;

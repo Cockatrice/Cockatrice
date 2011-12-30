@@ -22,7 +22,9 @@
 #include "server_counter.h"
 #include "server_room.h"
 #include "server_protocolhandler.h"
-#include "protocol_datastructures.h"
+#include "pb/event_user_joined.pb.h"
+#include "pb/event_user_left.pb.h"
+#include "pb/event_list_rooms.pb.h"
 #include <QCoreApplication>
 #include <QDebug>
 
@@ -56,14 +58,13 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	if (authState == PasswordWrong)
 		return authState;
 	
-	ServerInfo_User *data = getUserData(name);
-	data->setAddress(session->getAddress());
-	name = data->getName(); // Compensate for case indifference
+	ServerInfo_User data = getUserData(name);
+	data.set_address(session->getAddress().toStdString());
+	name = QString::fromStdString(data.name()); // Compensate for case indifference
 	
 	if (authState == PasswordRight) {
 		if (users.contains(name)) {
 			qDebug("Login denied: would overwrite old session");
-			delete data;
 			return WouldOverwriteOldSession;
 		}
 	} else if (authState == UnknownUser) {
@@ -74,7 +75,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 		while (users.contains(tempName) || userExists(tempName))
 			tempName = name + "_" + QString::number(++i);
 		name = tempName;
-		data->setName(name);
+		data.set_name(name.toStdString());
 	}
 	
 	session->setUserInfo(data);
@@ -85,11 +86,13 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	session->setSessionId(startSession(name, session->getAddress()));
 	qDebug() << "session id:" << session->getSessionId();
 	
-	Event_UserJoined *event = new Event_UserJoined(new ServerInfo_User(data, false));
+	Event_UserJoined event;
+	event.mutable_user_info()->CopyFrom(session->copyUserInfo(false));
+	SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
 	for (int i = 0; i < clients.size(); ++i)
 		if (clients[i]->getAcceptsUserListChanges())
-			clients[i]->sendProtocolItem(event, false);
-	delete event;
+			clients[i]->sendProtocolItem(*se);
+	delete se;
 	
 	return authState;
 }
@@ -106,14 +109,16 @@ void Server::removeClient(Server_ProtocolHandler *client)
 	clients.removeAt(clients.indexOf(client));
 	ServerInfo_User *data = client->getUserInfo();
 	if (data) {
-		Event_UserLeft *event = new Event_UserLeft(data->getName());
+		Event_UserLeft event;
+		event.set_name(data->name());
+		SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
 		for (int i = 0; i < clients.size(); ++i)
 			if (clients[i]->getAcceptsUserListChanges())
-				clients[i]->sendProtocolItem(event, false);
-		delete event;
+				clients[i]->sendProtocolItem(*se);
+		delete se;
 		
-		users.remove(data->getName());
-		qDebug() << "Server::removeClient: name=" << data->getName();
+		users.remove(QString::fromStdString(data->name()));
+		qDebug() << "Server::removeClient: name=" << QString::fromStdString(data->name());
 		
 		if (client->getSessionId() != -1)
 			endSession(client->getSessionId());
@@ -126,16 +131,19 @@ void Server::broadcastRoomUpdate()
 {
 	QMutexLocker locker(&serverMutex);
 	Server_Room *room = static_cast<Server_Room *>(sender());
-	QList<ServerInfo_Room *> eventRoomList;
+	Event_ListRooms event;
+	
+	ServerInfo_Room *roomInfo = event.add_room_list();
 	room->roomMutex.lock();
-	eventRoomList.append(new ServerInfo_Room(room->getId(), room->getName(), room->getDescription(), room->getGames().size(), room->size(), room->getAutoJoin()));
+	roomInfo->CopyFrom(room->getInfo(false));
 	room->roomMutex.unlock();
-	Event_ListRooms *event = new Event_ListRooms(eventRoomList);
+	
+	SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
 
 	for (int i = 0; i < clients.size(); ++i)
 	  	if (clients[i]->getAcceptsRoomListChanges())
-			clients[i]->sendProtocolItem(event, false);
-	delete event;
+			clients[i]->sendProtocolItem(*se);
+	delete se;
 }
 
 void Server::addRoom(Server_Room *newRoom)

@@ -93,10 +93,8 @@ protected:
 	bool acceptsUserListChanges;
 	bool acceptsRoomListChanges;
 	ServerInfo_User *userInfo;
-	QMap<QString, ServerInfo_User *> buddyList, ignoreList;
 	
 	void prepareDestroy();
-	virtual bool getCompressionSupport() const = 0;
 	int sessionId;
 private:
 	QString thisUserName;
@@ -182,9 +180,7 @@ public:
 	ServerInfo_User copyUserInfo(bool complete, bool moderatorInfo = false) const;
 	const QString &getUserName() const { return thisUserName; }
 	virtual QString getAddress() const = 0;
-	void setUserInfo(ServerInfo_User *_userInfo) { userInfo = _userInfo; }
-	const QMap<QString, ServerInfo_User *> &getBuddyList() const { return buddyList; }
-	const QMap<QString, ServerInfo_User *> &getIgnoreList() const { return ignoreList; }
+	void setUserInfo(const ServerInfo_User &_userInfo);
 	int getSessionId() const { return sessionId; }
 	void setSessionId(int _sessionId) { sessionId = _sessionId; }
 
@@ -197,7 +193,7 @@ public:
 	void sendProtocolItem(const RoomEvent &item);
 	void sendProtocolItem(ServerMessage::MessageType type, const ::google::protobuf::Message &item);
 	
-	SessionEvent *prepareSessionEvent(const ::google::protobuf::Message &sessionEvent);
+	static SessionEvent *prepareSessionEvent(const ::google::protobuf::Message &sessionEvent);
 };
 
 #endif

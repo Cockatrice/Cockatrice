@@ -27,11 +27,7 @@
 
 class QTcpSocket;
 class Servatrice;
-class QXmlStreamReader;
-class QXmlStreamWriter;
 class DeckList;
-class TopLevelProtocolItem;
-class QByteArray;
 
 class ServerSocketInterface : public Server_ProtocolHandler
 {
@@ -39,51 +35,41 @@ class ServerSocketInterface : public Server_ProtocolHandler
 private slots:
 	void readClient();
 	void catchSocketError(QAbstractSocket::SocketError socketError);
-//	void processProtocolItem(ProtocolItem *item);
-	void flushXmlBuffer();
+	void flushOutputBuffer();
 signals:
-	void xmlBufferChanged();
+	void outputBufferChanged();
 private:
-	QMutex xmlBufferMutex;
+	QMutex outputBufferMutex;
 	Servatrice *servatrice;
 	QTcpSocket *socket;
-	QXmlStreamWriter *xmlWriter;
-	QXmlStreamReader *xmlReader;
-	QString xmlBuffer;
-	TopLevelProtocolItem *topLevelItem;
-	bool compressionSupport;
 	
-	QByteArray inputBuffer;
+	QByteArray inputBuffer, outputBuffer;
 	bool messageInProgress;
 	int messageLength;
 	
-	int getUserIdInDB(const QString &name) const;
-
-	ResponseCode cmdAddToList(const Command_AddToList &cmd, BlaContainer *bla);
-	ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, BlaContainer *bla);
+	Response::ResponseCode cmdAddToList(const Command_AddToList &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, ResponseContainer &rc);
 	int getDeckPathId(int basePathId, QStringList path);
 	int getDeckPathId(const QString &path);
-	bool deckListHelper(DeckList_Directory *folder);
-	ResponseCode cmdDeckList(const Command_DeckList &cmd, BlaContainer *bla);
-	ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, BlaContainer *bla);
+//	bool deckListHelper(DeckList_Directory *folder);
+	Response::ResponseCode cmdDeckList(const Command_DeckList &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, ResponseContainer &rc);
 	void deckDelDirHelper(int basePathId);
-	ResponseCode cmdDeckDelDir(const Command_DeckDelDir &cmd, BlaContainer *bla);
-	ResponseCode cmdDeckDel(const Command_DeckDel &cmd, BlaContainer *bla);
-	ResponseCode cmdDeckUpload(const Command_DeckUpload &cmd, BlaContainer *bla);
+	Response::ResponseCode cmdDeckDelDir(const Command_DeckDelDir &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdDeckDel(const Command_DeckDel &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdDeckUpload(const Command_DeckUpload &cmd, ResponseContainer &rc);
 	DeckList *getDeckFromDatabase(int deckId);
-	ResponseCode cmdDeckDownload(const Command_DeckDownload &cmd, BlaContainer *bla);
-	ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, BlaContainer *bla);
-	ResponseCode cmdShutdownServer(const Command_ShutdownServer &cmd, BlaContainer *bla);
-	ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, BlaContainer *bla);
-protected:
-	bool getCompressionSupport() const { return compressionSupport; }
+	Response::ResponseCode cmdDeckDownload(const Command_DeckDownload &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdShutdownServer(const Command_ShutdownServer &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, ResponseContainer &rc);
 public:
 	ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent = 0);
 	~ServerSocketInterface();
 	QHostAddress getPeerAddress() const { return socket->peerAddress(); }
 	QString getAddress() const { return socket->peerAddress().toString(); }
 
-	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
+	void transmitProtocolItem(const ServerMessage &item);
 };
 
 #endif

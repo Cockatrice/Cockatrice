@@ -5,8 +5,6 @@
 #include "abstractclient.h"
 
 class QTimer;
-class QXmlStreamReader;
-class QXmlStreamWriter;
 
 class RemoteClient : public AbstractClient {
 	Q_OBJECT
@@ -21,15 +19,18 @@ private slots:
 	void readData();
 	void slotSocketError(QAbstractSocket::SocketError error);
 	void ping();
-	void loginResponse(ProtocolResponse *response);
+	void processServerIdentificationEvent(const Event_ServerIdentification &event);
+	void loginResponse(const Response &response);
 private:
 	static const int maxTimeout = 10;
 	int timeRunning, lastDataReceived;
+
+	QByteArray inputBuffer;
+	bool messageInProgress;
+	int messageLength;
 	
 	QTimer *timer;
 	QTcpSocket *socket;
-	QXmlStreamReader *xmlReader;
-	TopLevelProtocolItem *topLevelItem;
 	
 	void sendCommandContainer(const CommandContainer &cont);
 public:

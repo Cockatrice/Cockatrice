@@ -2,6 +2,7 @@
 port=4747
 statusupdate=15000
 logfile=server.log
+name="My Cockatrice server"
 id=1
 threaded=0
 

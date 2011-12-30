@@ -88,8 +88,6 @@ HEADERS += src/abstractcounter.h \
  	../common/serializable_item.h \
 	../common/decklist.h \
 	../common/protocol.h \
-	../common/protocol_items.h \
-	../common/protocol_datastructures.h \
 	../common/rng_abstract.h \
 	../common/rng_sfmt.h \
 	../common/server.h \
@@ -170,12 +168,9 @@ SOURCES += src/abstractcounter.cpp \
  src/localclient.cpp \
  src/priceupdater.cpp \
  src/soundengine.cpp \
- src/pending_command.cpp \
  	../common/serializable_item.cpp \
 	../common/decklist.cpp \
 	../common/protocol.cpp \
-	../common/protocol_items.cpp \
-	../common/protocol_datastructures.cpp \
 	../common/rng_abstract.cpp \
 	../common/rng_sfmt.cpp \
 	../common/sfmt/SFMT.c \

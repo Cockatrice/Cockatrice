@@ -7,7 +7,7 @@
 LocalClient::LocalClient(LocalServerInterface *_lsi, const QString &_playerName, QObject *parent)
 	: AbstractClient(parent), lsi(_lsi)
 {
-	connect(lsi, SIGNAL(itemToClient(ProtocolItem *)), this, SLOT(itemFromServer(ProtocolItem *)));
+	connect(lsi, SIGNAL(itemToClient(const ServerMessage &)), this, SLOT(itemFromServer(const ServerMessage &)));
 	
 	Command_Login loginCmd;
 	loginCmd.set_user_name(_playerName.toStdString());
@@ -27,7 +27,7 @@ void LocalClient::sendCommandContainer(const CommandContainer &cont)
 	lsi->itemFromClient(cont);
 }
 
-void LocalClient::itemFromServer(ProtocolItem *item)
+void LocalClient::itemFromServer(const ServerMessage &item)
 {
 	processProtocolItem(item);
 }

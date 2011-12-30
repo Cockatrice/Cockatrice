@@ -12,7 +12,6 @@
 #include "handcounter.h"
 #include "cardlist.h"
 #include "tab_game.h"
-#include "protocol_items.h"
 #include "gamescene.h"
 #include "settingscache.h"
 #include "dlg_create_token.h"

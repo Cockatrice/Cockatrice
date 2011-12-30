@@ -28,6 +28,7 @@
 #include "protocol.h"
 #include "pb/response.pb.h"
 #include "pb/serverinfo_player.pb.h"
+#include "pb/serverinfo_game.pb.h"
 
 class QTimer;
 class GameEventContainer;
@@ -65,7 +66,7 @@ public:
 	mutable QMutex gameMutex;
 	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent);
 	~Server_Game();
-	ServerInfo_Game *getInfo() const;
+	ServerInfo_Game getInfo() const;
 	int getHostId() const { return hostId; }
 	ServerInfo_User *getCreatorInfo() const { return creatorInfo; }
 	bool getGameStarted() const { return gameStarted; }
@@ -98,14 +99,10 @@ public:
 
 	QList<ServerInfo_Player> getGameState(Server_Player *playerWhosAsking) const;
 	
-	GameEventContainer *prepareGameEvent(const ::google::protobuf::Message &gameEvent, int playerId);
-	GameEventContainer *prepareGameEvent(const ::google::protobuf::Message &gameEvent, int playerId, const GameEventContext &context);
+	GameEventContainer *prepareGameEvent(const ::google::protobuf::Message &gameEvent, int playerId, GameEventContext *context = 0);
 	GameEventContext prepareGameEventContext(const ::google::protobuf::Message &gameEventContext);
 	
-//	void sendGameEvent(GameEvent *event, GameEventContext *context = 0, Server_Player *exclude = 0);
-	void sendGameEventContainer(GameEventContainer *cont, Server_Player *exclude = 0, bool excludeOmniscient = false);
-	void sendGameEventContainerOmniscient(GameEventContainer *cont, Server_Player *exclude = 0);
-	void sendGameEventToPlayer(Server_Player *player, GameEvent *event);
+	void sendGameEventContainer(GameEventContainer *cont, GameEventStorageItem::EventRecipients recipients = GameEventStorageItem::SendToPrivate | GameEventStorageItem::SendToOthers, int privatePlayerId = -1);
 };
 
 #endif

@@ -22,7 +22,7 @@
 
 #include <QMainWindow>
 #include "abstractclient.h"
-#include "protocol_datastructures.h"
+#include "pb/response.pb.h"
 
 class TabSupervisor;
 class RemoteClient;
@@ -38,7 +38,7 @@ private slots:
 	void processConnectionClosedEvent(Event_ConnectionClosed *event);
 	void processServerShutdownEvent(Event_ServerShutdown *event);
 	void serverTimeout();
-	void serverError(ResponseCode r);
+	void serverError(Response::ResponseCode r);
 	void socketError(const QString &errorStr);
 	void protocolVersionMismatch(int localVersion, int remoteVersion);
 	void userInfoReceived(ServerInfo_User *userInfo);

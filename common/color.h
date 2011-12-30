@@ -24,6 +24,7 @@ public:
 	{
 		return QColor(value / 65536, (value % 65536) / 256, value % 256);
 	}
+#endif
 	color get_color() const // HACK
 	{
 		color c;
@@ -32,7 +33,6 @@ public:
 		c.set_b(value % 256);
 		return c;
 	}
-#endif
 };
 
 #endif

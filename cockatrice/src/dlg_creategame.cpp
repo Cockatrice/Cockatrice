@@ -125,19 +125,19 @@ void DlgCreateGame::actOK()
 	}
 	
 	PendingCommand *pend = room->prepareRoomCommand(cmd);
-	connect(pend, SIGNAL(finished(ResponseCode)), this, SLOT(checkResponse(ResponseCode)));
+	connect(pend, SIGNAL(finished(Response::ResponseCode)), this, SLOT(checkResponse(Response::ResponseCode)));
 	room->sendRoomCommand(pend);
 	
 	okButton->setEnabled(false);
 	cancelButton->setEnabled(false);
 }
 
-void DlgCreateGame::checkResponse(ResponseCode response)
+void DlgCreateGame::checkResponse(Response::ResponseCode response)
 {
 	okButton->setEnabled(true);
 	cancelButton->setEnabled(true);
 
-	if (response == RespOk)
+	if (response == Response::RespOk)
 		accept();
 	else {
 		QMessageBox::critical(this, tr("Error"), tr("Server error."));

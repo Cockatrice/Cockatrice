@@ -2,7 +2,8 @@
 #define DLG_CREATEGAME_H
 
 #include <QDialog>
-#include "protocol_datastructures.h"
+#include <QMap>
+#include "pb/response.pb.h"
 
 class QLabel;
 class QLineEdit;
@@ -18,7 +19,7 @@ public:
 	DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent = 0);
 private slots:
 	void actOK();
-	void checkResponse(ResponseCode response);
+	void checkResponse(Response::ResponseCode response);
 	void spectatorsAllowedChanged(int state);
 private:
 	TabRoom *room;

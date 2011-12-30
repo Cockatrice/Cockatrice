@@ -12,16 +12,12 @@ LocalServerInterface::~LocalServerInterface()
 	prepareDestroy();
 }
 
-void LocalServerInterface::sendProtocolItem(ProtocolItem *item, bool deleteItem)
+void LocalServerInterface::transmitProtocolItem(const ServerMessage &item)
 {
-	item->setReceiverMayDelete(false);
 	emit itemToClient(item);
-	if (deleteItem)
-		delete item;
 }
-#include "pb/commands.pb.h"
+
 void LocalServerInterface::itemFromClient(const CommandContainer &item)
 {
-	qDebug() << "READ" << QString::fromStdString(item.ShortDebugString());
 	processCommandContainer(item);
 }

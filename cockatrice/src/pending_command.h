@@ -1,17 +1,15 @@
 #ifndef PENDING_COMMAND_H
 #define PENDING_COMMAND_H
 
-#include "protocol_datastructures.h"
 #include "pb/commands.pb.h"
+#include "pb/response.pb.h"
 #include <QVariant>
-
-class ProtocolResponse;
 
 class PendingCommand : public QObject {
 	Q_OBJECT
 signals:
-	void finished(ProtocolResponse *response);
-	void finished(ResponseCode response);
+	void finished(const Response &response);
+	void finished(Response::ResponseCode response);
 private:
 	CommandContainer commandContainer;
 	QVariant extraData;
@@ -22,7 +20,11 @@ public:
 	CommandContainer &getCommandContainer() { return commandContainer; }
 	void setExtraData(const QVariant &_extraData) { extraData = _extraData; }
 	QVariant getExtraData() const { return extraData; }
-	void processResponse(ProtocolResponse *response);
+	void processResponse(const Response &response)
+	{
+		emit finished(response);
+		emit finished(response.response_code());
+	}
 	int tick() { return ++ticks; }
 };
 

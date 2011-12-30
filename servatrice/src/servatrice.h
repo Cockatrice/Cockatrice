@@ -51,13 +51,14 @@ private slots:
 	void statusUpdate();
 	void shutdownTimeout();
 public:
-	QMutex dbMutex;
+	mutable QMutex dbMutex;
 	static const QString versionString;
 	Servatrice(QSettings *_settings, QObject *parent = 0);
 	~Servatrice();
 	bool openDatabase();
 	void checkSql();
 	bool execSqlQuery(QSqlQuery &query);
+	QString getServerName() const { return serverName; }
 	QString getLoginMessage() const { return loginMessage; }
 	bool getGameShouldPing() const { return true; }
 	int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
@@ -70,13 +71,16 @@ public:
 	bool getThreaded() const { return threaded; }
 	QString getDbPrefix() const { return dbPrefix; }
 	void updateLoginMessage();
-	ServerInfo_User *getUserData(const QString &name);
+	ServerInfo_User getUserData(const QString &name);
 	int getUsersWithAddress(const QHostAddress &address) const;
-	QMap<QString, ServerInfo_User *> getBuddyList(const QString &name);
-	QMap<QString, ServerInfo_User *> getIgnoreList(const QString &name);
+	QMap<QString, ServerInfo_User> getBuddyList(const QString &name);
+	QMap<QString, ServerInfo_User> getIgnoreList(const QString &name);
+	bool isInBuddyList(const QString &whoseList, const QString &who);
+	bool isInIgnoreList(const QString &whoseList, const QString &who);
 	void scheduleShutdown(const QString &reason, int minutes);
 	void incTxBytes(quint64 num);
 	void incRxBytes(quint64 num);
+	int getUserIdInDB(const QString &name);
 protected:
 	int startSession(const QString &userName, const QString &address);
 	void endSession(int sessionId);
@@ -85,6 +89,7 @@ protected:
 private:
 	QTimer *pingClock, *statusUpdateClock;
 	QTcpServer *tcpServer;
+	QString serverName;
 	QString loginMessage;
 	QString dbPrefix;
 	QSettings *settings;
@@ -95,7 +100,7 @@ private:
 	quint64 txBytes, rxBytes;
 	int maxGameInactivityTime, maxPlayerInactivityTime;
 	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser;
-	ServerInfo_User *evalUserQueryResult(const QSqlQuery &query, bool complete);
+	ServerInfo_User evalUserQueryResult(const QSqlQuery &query, bool complete);
 	
 	QString shutdownReason;
 	int shutdownMinutes;

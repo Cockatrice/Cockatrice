@@ -20,7 +20,9 @@ LocalServerInterface *LocalServer::newConnection()
 	return lsi;
 }
 
-ServerInfo_User *LocalServer::getUserData(const QString &name)
+ServerInfo_User LocalServer::getUserData(const QString &name)
 {
-	return new ServerInfo_User(name);
+	ServerInfo_User result;
+	result.set_name(name.toStdString());
+	return result;
 }

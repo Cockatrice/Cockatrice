@@ -7,6 +7,8 @@
 #include <QMap>
 #include <QMutex>
 
+#include "pb/response.pb.h"
+
 class DeckList;
 class Server_Game;
 class Server_CardZone;
@@ -14,11 +16,11 @@ class Server_Counter;
 class Server_Arrow;
 class Server_Card;
 class Server_ProtocolHandler;
-class ProtocolItem;
 class ServerInfo_User;
 class ServerInfo_PlayerProperties;
 class CommandContainer;
 class CardToMove;
+class GameEventContainer;
 class GameEventStorage;
 
 class Server_Player : public Server_ArrowTarget {
@@ -41,10 +43,9 @@ private:
 	bool readyStart;
 	bool conceded;
 public:
-	Server_Player(Server_Game *_game, int _playerId, ServerInfo_User *_userInfo, bool _spectator, Server_ProtocolHandler *_handler);
+	Server_Player(Server_Game *_game, int _playerId, const ServerInfo_User &_userInfo, bool _spectator, Server_ProtocolHandler *_handler);
 	~Server_Player();
 	void prepareDestroy();
-	void moveToThread(QThread *thread);
 	Server_ProtocolHandler *getProtocolHandler() const { return handler; }
 	void setProtocolHandler(Server_ProtocolHandler *_handler) { playerMutex.lock(); handler = _handler; playerMutex.unlock(); }
 	
@@ -87,7 +88,7 @@ public:
 	void unattachCard(GameEventStorage &ges, Server_Card *card);
 	Response::ResponseCode setCardAttrHelper(GameEventStorage &ges, const QString &zone, int cardId, const QString &attrName, const QString &attrValue);
 
-	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
+	void sendGameEvent(GameEventContainer *event);
 };
 
 #endif

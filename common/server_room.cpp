@@ -3,6 +3,12 @@
 #include "server_game.h"
 #include <QDebug>
 
+#include "pb/event_join_room.pb.h"
+#include "pb/event_leave_room.pb.h"
+#include "pb/event_list_games.pb.h"
+#include "pb/event_room_say.pb.h"
+#include <google/protobuf/descriptor.h>
+
 Server_Room::Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent)
 	: QObject(parent), id(_id), name(_name), description(_description), autoJoin(_autoJoin), joinMessage(_joinMessage), gameTypes(_gameTypes), roomMutex(QMutex::Recursive)
 {
@@ -26,33 +32,52 @@ Server *Server_Room::getServer() const
 	return static_cast<Server *>(parent());
 }
 
-ServerInfo_Room *Server_Room::getInfo(bool complete, bool showGameTypes) const
+ServerInfo_Room Server_Room::getInfo(bool complete, bool showGameTypes) const
 {
 	QMutexLocker locker(&roomMutex);
 	
-	QList<ServerInfo_Game *> gameList;
-	QList<ServerInfo_User *> userList;
-	QList<ServerInfo_GameType *> gameTypeList;
+	ServerInfo_Room result;
+	result.set_room_id(id);
+	result.set_name(name.toStdString());
+	result.set_description(description.toStdString());
+	result.set_game_count(games.size());
+	result.set_player_count(size());
+	result.set_auto_join(autoJoin);
+	
 	if (complete) {
 		QMapIterator<int, Server_Game *> gameIterator(games);
 		while (gameIterator.hasNext())
-			gameList.append(gameIterator.next().value()->getInfo());
+			result.add_game_list()->CopyFrom(gameIterator.next().value()->getInfo());
 		
 		for (int i = 0; i < size(); ++i)
-			userList.append(new ServerInfo_User(at(i)->getUserInfo(), false));
+			result.add_user_list()->CopyFrom(at(i)->copyUserInfo(false));
 	}
 	if (complete || showGameTypes)
-		for (int i = 0; i < gameTypes.size(); ++i)
-			gameTypeList.append(new ServerInfo_GameType(i, gameTypes[i]));
+		for (int i = 0; i < gameTypes.size(); ++i) {
+			ServerInfo_GameType *gameTypeInfo = result.add_gametype_list();
+			gameTypeInfo->set_game_type_id(i);
+			gameTypeInfo->set_description(gameTypes[i].toStdString());
+		}
 	
-	return new ServerInfo_Room(id, name, description, games.size(), size(), autoJoin, gameList, userList, gameTypeList);
+	return result;
+}
+
+RoomEvent *Server_Room::prepareRoomEvent(const ::google::protobuf::Message &roomEvent)
+{
+	RoomEvent *event = new RoomEvent;
+	event->set_room_id(id);
+	event->GetReflection()->MutableMessage(event, roomEvent.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(roomEvent);
+	return event;
 }
 
 void Server_Room::addClient(Server_ProtocolHandler *client)
 {
 	QMutexLocker locker(&roomMutex);
 	
-	sendRoomEvent(new Event_JoinRoom(id, new ServerInfo_User(client->getUserInfo(), false)));
+	Event_JoinRoom event;
+	event.mutable_user_info()->CopyFrom(client->copyUserInfo(false));
+	sendRoomEvent(prepareRoomEvent(event));
+	
 	append(client);
 	emit roomInfoChanged();
 }
@@ -62,13 +87,20 @@ void Server_Room::removeClient(Server_ProtocolHandler *client)
 	QMutexLocker locker(&roomMutex);
 	
 	removeAt(indexOf(client));
-	sendRoomEvent(new Event_LeaveRoom(id, client->getUserInfo()->getName()));
+	
+	Event_LeaveRoom event;
+	event.set_name(client->getUserInfo()->name());
+	sendRoomEvent(prepareRoomEvent(event));
+	
 	emit roomInfoChanged();
 }
 
 void Server_Room::say(Server_ProtocolHandler *client, const QString &s)
 {
-	sendRoomEvent(new Event_RoomSay(id, client->getUserInfo()->getName(), s));
+	Event_RoomSay event;
+	event.set_name(client->getUserInfo()->name());
+	event.set_message(s.toStdString());
+	sendRoomEvent(prepareRoomEvent(event));
 }
 
 void Server_Room::sendRoomEvent(RoomEvent *event)
@@ -76,7 +108,7 @@ void Server_Room::sendRoomEvent(RoomEvent *event)
 	QMutexLocker locker(&roomMutex);
 	
 	for (int i = 0; i < size(); ++i)
-		at(i)->sendProtocolItem(event, false);
+		at(i)->sendProtocolItem(*event);
 	delete event;
 }
 
@@ -84,11 +116,9 @@ void Server_Room::broadcastGameListUpdate(Server_Game *game)
 {
 	QMutexLocker locker(&roomMutex);
 	
-	Event_ListGames *event = new Event_ListGames(id, QList<ServerInfo_Game *>() << game->getInfo());
-	
-	for (int i = 0; i < size(); i++)
-		at(i)->sendProtocolItem(event, false);
-	delete event;
+	Event_ListGames event;
+	event.add_game_list()->CopyFrom(game->getInfo());
+	sendRoomEvent(prepareRoomEvent(event));
 }
 
 Server_Game *Server_Room::createGame(const QString &description, const QString &password, int maxPlayers, const QList<int> &gameTypes, bool onlyBuddies, bool onlyRegistered, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator)
@@ -126,14 +156,14 @@ int Server_Room::getGamesCreatedByUser(const QString &userName) const
 	QMapIterator<int, Server_Game *> gamesIterator(games);
 	int result = 0;
 	while (gamesIterator.hasNext())
-		if (gamesIterator.next().value()->getCreatorInfo()->getName() == userName)
+		if (gamesIterator.next().value()->getCreatorInfo()->name() == userName.toStdString())
 			++result;
 	return result;
 }
 
-QList<ServerInfo_Game *> Server_Room::getGamesOfUser(const QString &userName) const
+QList<ServerInfo_Game> Server_Room::getGamesOfUser(const QString &userName) const
 {
-	QList<ServerInfo_Game *> result;
+	QList<ServerInfo_Game> result;
 	QMapIterator<int, Server_Game *> gamesIterator(games);
 	while (gamesIterator.hasNext()) {
 		Server_Game *game = gamesIterator.next().value();

@@ -6,12 +6,19 @@
 #include "server_game.h"
 #include "server_protocolhandler.h"
 #include "protocol.h"
-#include "protocol_items.h"
 #include "decklist.h"
+#include "pb/response.pb.h"
 #include "pb/command_move_card.pb.h"
+#include "pb/serverinfo_user.pb.h"
+#include "pb/event_attach_card.pb.h"
+#include "pb/event_draw_cards.pb.h"
+#include "pb/event_destroy_card.pb.h"
+#include "pb/event_move_card.pb.h"
+#include "pb/event_set_card_attr.pb.h"
+#include "pb/context_move_card.pb.h"
 #include <QDebug>
 
-Server_Player::Server_Player(Server_Game *_game, int _playerId, ServerInfo_User *_userInfo, bool _spectator, Server_ProtocolHandler *_handler)
+Server_Player::Server_Player(Server_Game *_game, int _playerId, const ServerInfo_User &_userInfo, bool _spectator, Server_ProtocolHandler *_handler)
 	: game(_game), handler(_handler), userInfo(new ServerInfo_User(_userInfo)), deck(0), playerId(_playerId), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false)
 {
 }
@@ -32,16 +39,11 @@ void Server_Player::prepareDestroy()
 	playerMutex.unlock();
 	
 	delete userInfo;
+	userInfo = 0;
 	
 	clearZones();
 	
 	deleteLater();
-}
-
-void Server_Player::moveToThread(QThread *thread)
-{
-	QObject::moveToThread(thread);
-	userInfo->moveToThread(thread);
 }
 
 int Server_Player::newCardId()
@@ -87,15 +89,15 @@ void Server_Player::setupZones()
 	// ------------------------------------------------------------------
 
 	// Create zones
-	Server_CardZone *deckZone = new Server_CardZone(this, "deck", false, HiddenZone);
+	Server_CardZone *deckZone = new Server_CardZone(this, "deck", false, ServerInfo_Zone::HiddenZone);
 	addZone(deckZone);
-	Server_CardZone *sbZone = new Server_CardZone(this, "sb", false, HiddenZone);
+	Server_CardZone *sbZone = new Server_CardZone(this, "sb", false, ServerInfo_Zone::HiddenZone);
 	addZone(sbZone);
-	addZone(new Server_CardZone(this, "table", true, PublicZone));
-	addZone(new Server_CardZone(this, "hand", false, PrivateZone));
-	addZone(new Server_CardZone(this, "stack", false, PublicZone));
-	addZone(new Server_CardZone(this, "grave", false, PublicZone));
-	addZone(new Server_CardZone(this, "rfg", false, PublicZone));
+	addZone(new Server_CardZone(this, "table", true, ServerInfo_Zone::PublicZone));
+	addZone(new Server_CardZone(this, "hand", false, ServerInfo_Zone::PrivateZone));
+	addZone(new Server_CardZone(this, "stack", false, ServerInfo_Zone::PublicZone));
+	addZone(new Server_CardZone(this, "grave", false, ServerInfo_Zone::PublicZone));
+	addZone(new Server_CardZone(this, "rfg", false, ServerInfo_Zone::PublicZone));
 
 	addCounter(new Server_Counter(0, "life", Color(255, 255, 255), 25, 20));
 	addCounter(new Server_Counter(1, "w", Color(255, 255, 150), 20, 0));
@@ -188,7 +190,15 @@ ServerInfo_PlayerProperties Server_Player::getProperties()
 {
 	QMutexLocker locker(&game->gameMutex);
 	
-	return new ServerInfo_PlayerProperties(playerId, new ServerInfo_User(userInfo), spectator, conceded, readyStart, deck ? deck->getDeckHash() : QString());
+	ServerInfo_PlayerProperties result;
+	result.set_player_id(playerId);
+	result.mutable_user_info()->CopyFrom(*userInfo);
+	result.set_spectator(spectator);
+	result.set_conceded(conceded);
+	result.set_ready_start(readyStart);
+	result.set_deck_hash(deck ? deck->getDeckHash().toStdString() : std::string());
+	
+	return result;
 }
 
 void Server_Player::setDeck(DeckList *_deck)
@@ -244,7 +254,7 @@ bool Server_Player::deleteCounter(int counterId)
 	return true;
 }
 
-ResponseCode Server_Player::drawCards(BlaContainer *bla, int number)
+Response::ResponseCode Server_Player::drawCards(GameEventStorage &ges, int number)
 {
 	QMutexLocker locker(&game->gameMutex);
 	
@@ -252,51 +262,55 @@ ResponseCode Server_Player::drawCards(BlaContainer *bla, int number)
 	Server_CardZone *handZone = zones.value("hand");
 	if (deckZone->cards.size() < number)
 		number = deckZone->cards.size();
-
-	QList<ServerInfo_Card *> cardListPrivate;
-	QList<ServerInfo_Card *> cardListOmniscient;
+	
+	Event_DrawCards eventOthers;
+	eventOthers.set_number(number);
+	Event_DrawCards eventPrivate(eventOthers);
+	
 	for (int i = 0; i < number; ++i) {
 		Server_Card *card = deckZone->cards.takeFirst();
 		handZone->cards.append(card);
 		lastDrawList.append(card->getId());
-		cardListPrivate.append(new ServerInfo_Card(card->getId(), card->getName()));
-		cardListOmniscient.append(new ServerInfo_Card(card->getId(), card->getName()));
+		
+		ServerInfo_Card *cardInfo = eventPrivate.add_cards();
+		cardInfo->set_id(card->getId());
+		cardInfo->set_name(card->getName().toStdString());
 	}
-	bla->enqueueGameEventPrivate(new Event_DrawCards(playerId, cardListPrivate.size(), cardListPrivate), game->getGameId());
-	bla->enqueueGameEventOmniscient(new Event_DrawCards(playerId, cardListOmniscient.size(), cardListOmniscient), game->getGameId());
-	bla->enqueueGameEventPublic(new Event_DrawCards(playerId, cardListPrivate.size()), game->getGameId());
-
-	return RespOk;
+	
+	ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
+	ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
+	
+	return Response::RespOk;
 }
 
-ResponseCode Server_Player::undoDraw(BlaContainer *bla)
+Response::ResponseCode Server_Player::undoDraw(GameEventStorage &ges)
 {
 	QMutexLocker locker(&game->gameMutex);
 	
 	if (lastDrawList.isEmpty())
-		return RespContextError;
+		return Response::RespContextError;
 	
-	ResponseCode retVal;
+	Response::ResponseCode retVal;
 	CardToMove *cardToMove = new CardToMove;
 	cardToMove->set_card_id(lastDrawList.takeLast());
-	retVal = moveCard(bla, zones.value("hand"), QList<const CardToMove *>() << cardToMove, zones.value("deck"), 0, 0, false, true);
+	retVal = moveCard(ges, zones.value("hand"), QList<const CardToMove *>() << cardToMove, zones.value("deck"), 0, 0, false, true);
 	delete cardToMove;
 	return retVal;
 }
 
-ResponseCode Server_Player::moveCard(BlaContainer *bla, const QString &_startZone, const QList<const CardToMove *> &_cards, int targetPlayerId, const QString &_targetZone, int x, int y)
+Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, const QString &_startZone, const QList<const CardToMove *> &_cards, int targetPlayerId, const QString &_targetZone, int x, int y)
 {
 	QMutexLocker locker(&game->gameMutex);
 	
 	Server_CardZone *startzone = getZones().value(_startZone);
 	Server_Player *targetPlayer = game->getPlayers().value(targetPlayerId);
 	if (!targetPlayer)
-		return RespNameNotFound;
+		return Response::RespNameNotFound;
 	Server_CardZone *targetzone = targetPlayer->getZones().value(_targetZone);
 	if ((!startzone) || (!targetzone))
-		return RespNameNotFound;
+		return Response::RespNameNotFound;
 	
-	return moveCard(bla, startzone, _cards, targetzone, x, y);
+	return moveCard(ges, startzone, _cards, targetzone, x, y);
 }
 
 class Server_Player::MoveCardCompareFunctor {
@@ -320,13 +334,13 @@ public:
 	}
 };
 
-ResponseCode Server_Player::moveCard(BlaContainer *bla, Server_CardZone *startzone, const QList<const CardToMove *> &_cards, Server_CardZone *targetzone, int x, int y, bool fixFreeSpaces, bool undoingDraw)
+Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_CardZone *startzone, const QList<const CardToMove *> &_cards, Server_CardZone *targetzone, int x, int y, bool fixFreeSpaces, bool undoingDraw)
 {
 	QMutexLocker locker(&game->gameMutex);
 	
 	// Disallow controller change to other zones than the table.
-	if (((targetzone->getType() != PublicZone) || !targetzone->hasCoords()) && (startzone->getPlayer() != targetzone->getPlayer()))
-		return RespContextError;
+	if (((targetzone->getType() != ServerInfo_Zone::PublicZone) || !targetzone->hasCoords()) && (startzone->getPlayer() != targetzone->getPlayer()))
+		return Response::RespContextError;
 	
 	if (!targetzone->hasCoords() && (x == -1))
 		x = targetzone->cards.size();
@@ -337,9 +351,9 @@ ResponseCode Server_Player::moveCard(BlaContainer *bla, Server_CardZone *startzo
 		int position;
 		Server_Card *card = startzone->getCard(_cards[i]->card_id(), &position);
 		if (!card)
-			return RespNameNotFound;
+			return Response::RespNameNotFound;
 		if (!card->getAttachedCards().isEmpty() && !targetzone->isColumnEmpty(x, y))
-			return RespContextError;
+			return Response::RespContextError;
 		cardsToMove.append(QPair<Server_Card *, int>(card, position));
 		cardProperties.insert(card, _cards[i]);
 	}
@@ -382,7 +396,7 @@ ResponseCode Server_Player::moveCard(BlaContainer *bla, Server_CardZone *startzo
 			// Make a copy of the list because the original one gets modified during the loop
 			QList<Server_Card *> attachedCards = card->getAttachedCards();
 			for (int i = 0; i < attachedCards.size(); ++i)
-				attachedCards[i]->getZone()->getPlayer()->unattachCard(bla, attachedCards[i]);
+				attachedCards[i]->getZone()->getPlayer()->unattachCard(ges, attachedCards[i]);
 		}
 		
 		if (startzone != targetzone) {
@@ -402,9 +416,12 @@ ResponseCode Server_Player::moveCard(BlaContainer *bla, Server_CardZone *startzo
 		}
 		
 		if (card->getDestroyOnZoneChange() && (startzone->getName() != targetzone->getName())) {
-			bla->enqueueGameEventPrivate(new Event_DestroyCard(getPlayerId(), startzone->getName(), card->getId()), game->getGameId(), -1, new Context_MoveCard);
-			bla->enqueueGameEventOmniscient(new Event_DestroyCard(getPlayerId(), startzone->getName(), card->getId()), game->getGameId(), new Context_MoveCard);
-			bla->enqueueGameEventPublic(new Event_DestroyCard(getPlayerId(), startzone->getName(), card->getId()), game->getGameId(), new Context_MoveCard);
+			Event_DestroyCard event;
+			event.set_zone_name(startzone->getName().toStdString());
+			event.set_card_id(card->getId());
+			ges.setGameEventContext(new Context_MoveCard);
+			ges.enqueueGameEvent(event, playerId);
+			
 			card->deleteLater();
 		} else {
 			if (!targetzone->hasCoords()) {
@@ -415,13 +432,13 @@ ResponseCode Server_Player::moveCard(BlaContainer *bla, Server_CardZone *startzo
 		
 			targetzone->insertCard(card, newX, y);
 		
-			bool targetBeingLookedAt = (targetzone->getType() != HiddenZone) || (targetzone->getCardsBeingLookedAt() > newX) || (targetzone->getCardsBeingLookedAt() == -1);
-			bool sourceBeingLookedAt = (startzone->getType() != HiddenZone) || (startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1);
+			bool targetBeingLookedAt = (targetzone->getType() != ServerInfo_Zone::HiddenZone) || (targetzone->getCardsBeingLookedAt() > newX) || (targetzone->getCardsBeingLookedAt() == -1);
+			bool sourceBeingLookedAt = (startzone->getType() != ServerInfo_Zone::HiddenZone) || (startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1);
 		
 			bool targetHiddenToPlayer = thisCardProperties->face_down() || !targetBeingLookedAt;
-			bool targetHiddenToOthers = thisCardProperties->face_down() || (targetzone->getType() != PublicZone);
+			bool targetHiddenToOthers = thisCardProperties->face_down() || (targetzone->getType() != ServerInfo_Zone::PublicZone);
 			bool sourceHiddenToPlayer = card->getFaceDown() || !sourceBeingLookedAt;
-			bool sourceHiddenToOthers = card->getFaceDown() || (startzone->getType() != PublicZone);
+			bool sourceHiddenToOthers = card->getFaceDown() || (startzone->getType() != ServerInfo_Zone::PublicZone);
 		
 			QString privateCardName, publicCardName;
 			if (!(sourceHiddenToPlayer && targetHiddenToPlayer))
@@ -444,65 +461,85 @@ ResponseCode Server_Player::moveCard(BlaContainer *bla, Server_CardZone *startzo
 				privateCardName = QString();
 			}
 			int privatePosition = -1;
-			if (startzone->getType() == HiddenZone)
+			if (startzone->getType() == ServerInfo_Zone::HiddenZone)
 				privatePosition = position;
-			bla->enqueueGameEventPrivate(new Event_MoveCard(getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, privateNewCardId, thisCardProperties->face_down()), game->getGameId(), -1, undoingDraw ? static_cast<GameEventContext *>(new Context_UndoDraw) : static_cast<GameEventContext *>(new Context_MoveCard));
-			bla->enqueueGameEventOmniscient(new Event_MoveCard(getPlayerId(), privateOldCardId, privateCardName, startzone->getName(), privatePosition, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, privateNewCardId, thisCardProperties->face_down()), game->getGameId(), undoingDraw ? static_cast<GameEventContext *>(new Context_UndoDraw) : static_cast<GameEventContext *>(new Context_MoveCard));
+			
+			Event_MoveCard eventOthers;
+			eventOthers.set_start_zone(startzone->getName().toStdString());
+			eventOthers.set_target_player_id(targetzone->getPlayer()->getPlayerId());
+			eventOthers.set_target_zone(targetzone->getName().toStdString());
+			eventOthers.set_x(newX);
+			eventOthers.set_y(y);
+			eventOthers.set_face_down(thisCardProperties->face_down());
+			
+			Event_MoveCard eventPrivate(eventOthers);
+			eventPrivate.set_card_id(privateOldCardId);
+			eventPrivate.set_card_name(privateCardName.toStdString());
+			eventPrivate.set_position(privatePosition);
+			eventPrivate.set_new_card_id(privateNewCardId);
 			
 			// Other players do not get to see the start and/or target position of the card if the respective
 			// part of the zone is being looked at. The information is not needed anyway because in hidden zones,
 			// all cards are equal.
 			if (
-				((startzone->getType() == HiddenZone) && ((startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1)))
-				|| (startzone->getType() == PublicZone)
+				((startzone->getType() == ServerInfo_Zone::HiddenZone) && ((startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1)))
+				|| (startzone->getType() == ServerInfo_Zone::PublicZone)
 			)
 				position = -1;
-			if ((targetzone->getType() == HiddenZone) && ((targetzone->getCardsBeingLookedAt() > newX) || (targetzone->getCardsBeingLookedAt() == -1)))
+			if ((targetzone->getType() == ServerInfo_Zone::HiddenZone) && ((targetzone->getCardsBeingLookedAt() > newX) || (targetzone->getCardsBeingLookedAt() == -1)))
 				newX = -1;
-		
-			if ((startzone->getType() == PublicZone) || (targetzone->getType() == PublicZone))
-				bla->enqueueGameEventPublic(new Event_MoveCard(getPlayerId(), oldCardId, publicCardName, startzone->getName(), position, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, card->getId(), thisCardProperties->face_down()), game->getGameId(), undoingDraw ? static_cast<GameEventContext *>(new Context_UndoDraw) : static_cast<GameEventContext *>(new Context_MoveCard));
-			else
-				bla->enqueueGameEventPublic(new Event_MoveCard(getPlayerId(), -1, QString(), startzone->getName(), position, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), newX, y, -1, false), game->getGameId(), undoingDraw ? static_cast<GameEventContext *>(new Context_UndoDraw) : static_cast<GameEventContext *>(new Context_MoveCard));
+			
+			eventOthers.set_position(position);
+			if ((startzone->getType() == ServerInfo_Zone::PublicZone) || (targetzone->getType() == ServerInfo_Zone::PublicZone)) {
+				eventOthers.set_card_id(oldCardId);
+				eventOthers.set_card_name(publicCardName.toStdString());
+				eventOthers.set_new_card_id(card->getId());
+			}
+			
+			ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
+			ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
 			
 			if (thisCardProperties->tapped())
-				setCardAttrHelper(bla, targetzone->getName(), card->getId(), "tapped", "1");
+				setCardAttrHelper(ges, targetzone->getName(), card->getId(), "tapped", "1");
 			QString ptString = QString::fromStdString(thisCardProperties->pt());
 			if (!ptString.isEmpty() && !thisCardProperties->face_down())
-				setCardAttrHelper(bla, targetzone->getName(), card->getId(), "pt", ptString);
+				setCardAttrHelper(ges, targetzone->getName(), card->getId(), "pt", ptString);
 		}
 	}
 	if (startzone->hasCoords() && fixFreeSpaces)
-		startzone->fixFreeSpaces(bla);
+		startzone->fixFreeSpaces(ges);
 	
-	return RespOk;
+	return Response::RespOk;
 }
 
-void Server_Player::unattachCard(BlaContainer *bla, Server_Card *card)
+void Server_Player::unattachCard(GameEventStorage &ges, Server_Card *card)
 {
 	QMutexLocker locker(&game->gameMutex);
 	
 	Server_CardZone *zone = card->getZone();
 	
 	card->setParentCard(0);
-	bla->enqueueGameEventPrivate(new Event_AttachCard(getPlayerId(), zone->getName(), card->getId(), -1, QString(), -1), game->getGameId());
-	bla->enqueueGameEventPublic(new Event_AttachCard(getPlayerId(), zone->getName(), card->getId(), -1, QString(), -1), game->getGameId());
+	
+	Event_AttachCard event;
+	event.set_start_zone(zone->getName().toStdString());
+	event.set_card_id(card->getId());
+	ges.enqueueGameEvent(event, playerId);
 	
 	CardToMove *cardToMove = new CardToMove;
 	cardToMove->set_card_id(card->getId());
-	moveCard(bla, zone, QList<const CardToMove *>() << cardToMove, zone, -1, card->getY(), card->getFaceDown());
+	moveCard(ges, zone, QList<const CardToMove *>() << cardToMove, zone, -1, card->getY(), card->getFaceDown());
 	delete cardToMove;
 }
 
-ResponseCode Server_Player::setCardAttrHelper(BlaContainer *bla, const QString &zoneName, int cardId, const QString &attrName, const QString &attrValue)
+Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, const QString &zoneName, int cardId, const QString &attrName, const QString &attrValue)
 {
 	QMutexLocker locker(&game->gameMutex);
 	
 	Server_CardZone *zone = getZones().value(zoneName);
 	if (!zone)
-		return RespNameNotFound;
+		return Response::RespNameNotFound;
 	if (!zone->hasCoords())
-		return RespContextError;
+		return Response::RespContextError;
 
 	QString result;
 	if (cardId == -1) {
@@ -510,26 +547,31 @@ ResponseCode Server_Player::setCardAttrHelper(BlaContainer *bla, const QString &
 		while (CardIterator.hasNext()) {
 			result = CardIterator.next()->setAttribute(attrName, attrValue, true);
 			if (result.isNull())
-				return RespInvalidCommand;
+				return Response::RespInvalidCommand;
 		}
 	} else {
 		Server_Card *card = zone->getCard(cardId);
 		if (!card)
-			return RespNameNotFound;
+			return Response::RespNameNotFound;
 		result = card->setAttribute(attrName, attrValue, false);
 		if (result.isNull())
-			return RespInvalidCommand;
+			return Response::RespInvalidCommand;
 	}
-	bla->enqueueGameEventPrivate(new Event_SetCardAttr(getPlayerId(), zone->getName(), cardId, attrName, result), game->getGameId());
-	bla->enqueueGameEventPublic(new Event_SetCardAttr(getPlayerId(), zone->getName(), cardId, attrName, result), game->getGameId());
-	bla->enqueueGameEventOmniscient(new Event_SetCardAttr(getPlayerId(), zone->getName(), cardId, attrName, result), game->getGameId());
-	return RespOk;
+	
+	Event_SetCardAttr event;
+	event.set_zone_name(zone->getName().toStdString());
+	event.set_card_id(cardId);
+	event.set_attr_name(attrName.toStdString());
+	event.set_attr_value(result.toStdString());
+	ges.enqueueGameEvent(event, playerId);
+	
+	return Response::RespOk;
 }
 
-void Server_Player::sendProtocolItem(ProtocolItem *item, bool deleteItem)
+void Server_Player::sendGameEvent(GameEventContainer *cont)
 {
 	QMutexLocker locker(&playerMutex);
 	
 	if (handler)
-		handler->sendProtocolItem(item, deleteItem);
+		handler->sendProtocolItem(*cont);
 }
