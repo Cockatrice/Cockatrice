@@ -2,7 +2,7 @@
 #define HANDCOUNTER_H
 
 #include <QString>
-#include "abstractcarditem.h"
+#include "abstractgraphicsitem.h"
 
 class QPainter;
 class QPixmap;

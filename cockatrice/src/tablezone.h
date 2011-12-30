@@ -2,6 +2,7 @@
 #define TABLEZONE_H
 
 #include "selectzone.h"
+#include "abstractcarditem.h"
 
 class TableZone : public SelectZone {
 	Q_OBJECT

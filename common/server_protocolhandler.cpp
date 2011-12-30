@@ -979,7 +979,10 @@ Response::ResponseCode Server_ProtocolHandler::cmdShuffle(const Command_Shuffle 
 		
 	player->getZones().value("deck")->shuffle();
 	
-	ges.enqueueGameEvent(Event_Shuffle(), player->getPlayerId());
+	Event_Shuffle event;
+	event.set_zone_name("deck");
+	ges.enqueueGameEvent(event, player->getPlayerId());
+	
 	return Response::RespOk;
 }
 

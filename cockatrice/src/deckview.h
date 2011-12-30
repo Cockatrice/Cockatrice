@@ -6,7 +6,6 @@
 #include <QMap>
 #include <QMultiMap>
 #include <QPixmap>
-#include "abstractcarditem.h"
 #include "abstractcarddragitem.h"
 
 class DeckList;

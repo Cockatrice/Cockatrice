@@ -4,7 +4,7 @@
 #include <QInputDialog>
 #include <QPoint>
 #include <QMap>
-#include "carditem.h"
+#include "abstractgraphicsitem.h"
 #include <google/protobuf/message.h>
 
 class CardDatabase;
@@ -13,6 +13,9 @@ class QAction;
 class ZoneViewZone;
 class TabGame;
 class AbstractCounter;
+class AbstractCardItem;
+class CardItem;
+class ArrowTarget;
 class ArrowItem;
 class CardZone;
 class StackZone;
@@ -28,15 +31,15 @@ class GameCommand;
 class GameEvent;
 class GameEventContext;
 class Event_ConnectionStateChanged;
-class Event_Say;
+class Event_GameSay;
 class Event_Shuffle;
 class Event_RollDie;
-class Event_CreateArrows;
+class Event_CreateArrow;
 class Event_DeleteArrow;
 class Event_CreateToken;
 class Event_SetCardAttr;
 class Event_SetCardCounter;
-class Event_CreateCounters;
+class Event_CreateCounter;
 class Event_SetCounter;
 class Event_DelCounter;
 class Event_DumpZone;
@@ -170,7 +173,7 @@ private:
 	HandZone *hand;
 	PlayerTarget *playerTarget;
 	
-	void setCardAttrHelper(GameEventContext *context, CardItem *card, const QString &aname, const QString &avalue, bool allCards);
+	void setCardAttrHelper(const GameEventContext &context, CardItem *card, const QString &aname, const QString &avalue, bool allCards);
 
 	QRectF bRect;
 
@@ -180,26 +183,26 @@ private:
 	
 	void initSayMenu();
 	
-	void eventConnectionStateChanged(Event_ConnectionStateChanged *event);
-	void eventSay(Event_Say *event);
-	void eventShuffle(Event_Shuffle *event);
-	void eventRollDie(Event_RollDie *event);
-	void eventCreateArrows(Event_CreateArrows *event);
-	void eventDeleteArrow(Event_DeleteArrow *event);
-	void eventCreateToken(Event_CreateToken *event);
-	void eventSetCardAttr(Event_SetCardAttr *event, GameEventContext *context);
-	void eventSetCardCounter(Event_SetCardCounter *event);
-	void eventCreateCounters(Event_CreateCounters *event);
-	void eventSetCounter(Event_SetCounter *event);
-	void eventDelCounter(Event_DelCounter *event);
-	void eventDumpZone(Event_DumpZone *event);
-	void eventStopDumpZone(Event_StopDumpZone *event);
-	void eventMoveCard(Event_MoveCard *event, GameEventContext *context);
-	void eventFlipCard(Event_FlipCard *event);
-	void eventDestroyCard(Event_DestroyCard *event);
-	void eventAttachCard(Event_AttachCard *event);
-	void eventDrawCards(Event_DrawCards *event);
-	void eventRevealCards(Event_RevealCards *event);
+	void eventConnectionStateChanged(const Event_ConnectionStateChanged &event);
+	void eventGameSay(const Event_GameSay &event);
+	void eventShuffle(const Event_Shuffle &event);
+	void eventRollDie(const Event_RollDie &event);
+	void eventCreateArrow(const Event_CreateArrow &event);
+	void eventDeleteArrow(const Event_DeleteArrow &event);
+	void eventCreateToken(const Event_CreateToken &event);
+	void eventSetCardAttr(const Event_SetCardAttr &event, const GameEventContext &context);
+	void eventSetCardCounter(const Event_SetCardCounter &event);
+	void eventCreateCounter(const Event_CreateCounter &event);
+	void eventSetCounter(const Event_SetCounter &event);
+	void eventDelCounter(const Event_DelCounter &event);
+	void eventDumpZone(const Event_DumpZone &event);
+	void eventStopDumpZone(const Event_StopDumpZone &event);
+	void eventMoveCard(const Event_MoveCard &event, GameEventContext &context);
+	void eventFlipCard(const Event_FlipCard &event);
+	void eventDestroyCard(const Event_DestroyCard &event);
+	void eventAttachCard(const Event_AttachCard &event);
+	void eventDrawCards(const Event_DrawCards &event);
+	void eventRevealCards(const Event_RevealCards &event);
 public:
 	static const int counterAreaWidth = 55;
 	
@@ -213,19 +216,19 @@ public:
 	void deleteCard(CardItem *c);
 	void addZone(CardZone *z);
 
-	AbstractCounter *addCounter(ServerInfo_Counter *counter);
+	AbstractCounter *addCounter(const ServerInfo_Counter &counter);
 	AbstractCounter *addCounter(int counterId, const QString &name, QColor color, int radius, int value);
 	void delCounter(int counterId);
 	void clearCounters();
 	
-	ArrowItem *addArrow(ServerInfo_Arrow *arrow);
+	ArrowItem *addArrow(const ServerInfo_Arrow &arrow);
 	ArrowItem *addArrow(int arrowId, CardItem *startCard, ArrowTarget *targetItem, const QColor &color);
 	void delArrow(int arrowId);
 	void removeArrow(ArrowItem *arrow);
 	void clearArrows();
 	PlayerTarget *getPlayerTarget() const { return playerTarget; }
 
-	Player(ServerInfo_User *info, int _id, bool _local, TabGame *_parent);
+	Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_parent);
 	~Player();
 	void retranslateUi();
 	void clear();
