@@ -1,12 +1,10 @@
 #include <QHeaderView>
 #include "playerlistwidget.h"
-#include "protocol_datastructures.h"
 #include "pixmapgenerator.h"
 #include "abstractclient.h"
 #include "tab_game.h"
 #include "tab_supervisor.h"
 #include "tab_userlists.h"
-#include "protocol_items.h"
 #include "userlist.h"
 #include "userinfobox.h"
 #include <QMouseEvent>
@@ -15,6 +13,7 @@
 
 #include "pb/session_commands.pb.h"
 #include "pb/command_kick_from_game.pb.h"
+#include "pb/serverinfo_playerproperties.pb.h"
 
 PlayerListItemDelegate::PlayerListItemDelegate(QObject *const parent)
 	: QStyledItemDelegate(parent)
@@ -73,34 +72,35 @@ void PlayerListWidget::retranslateUi()
 {
 }
 
-void PlayerListWidget::addPlayer(ServerInfo_PlayerProperties *player)
+void PlayerListWidget::addPlayer(const ServerInfo_PlayerProperties &player)
 {
 	QTreeWidgetItem *newPlayer = new PlayerListTWI;
-	players.insert(player->getPlayerId(), newPlayer);
+	players.insert(player.player_id(), newPlayer);
 	updatePlayerProperties(player);
 	addTopLevelItem(newPlayer);
 	sortItems(1, Qt::AscendingOrder);
 }
 
-void PlayerListWidget::updatePlayerProperties(ServerInfo_PlayerProperties *prop)
+void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties &prop)
 {
-	QTreeWidgetItem *player = players.value(prop->getPlayerId(), 0);
+	QTreeWidgetItem *player = players.value(prop.player_id(), 0);
 	if (!player)
 		return;
 
-	player->setIcon(1, prop->getSpectator() ? spectatorIcon : playerIcon);
-	player->setData(1, Qt::UserRole, !prop->getSpectator());
-	player->setData(2, Qt::UserRole, prop->getConceded());
-	player->setData(2, Qt::UserRole + 1, prop->getReadyStart());
-	player->setIcon(2, gameStarted ? (prop->getConceded() ? concededIcon : QIcon()) : (prop->getReadyStart() ? readyIcon : notReadyIcon));
-	player->setData(3, Qt::UserRole, prop->getUserInfo()->getUserLevel());
-	player->setIcon(3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, prop->getUserInfo()->getUserLevel())));
-	player->setText(4, prop->getUserInfo()->getName());
-	if (!prop->getUserInfo()->getCountry().isEmpty())
-		player->setIcon(4, QIcon(CountryPixmapGenerator::generatePixmap(12, prop->getUserInfo()->getCountry())));
-	player->setData(4, Qt::UserRole, prop->getUserInfo()->getName());
-	player->setData(4, Qt::UserRole + 1, prop->getPlayerId());
-	player->setText(5, prop->getDeckHash());
+	player->setIcon(1, prop.spectator() ? spectatorIcon : playerIcon);
+	player->setData(1, Qt::UserRole, !prop.spectator());
+	player->setData(2, Qt::UserRole, prop.conceded());
+	player->setData(2, Qt::UserRole + 1, prop.ready_start());
+	player->setIcon(2, gameStarted ? (prop.conceded() ? concededIcon : QIcon()) : (prop.ready_start() ? readyIcon : notReadyIcon));
+	player->setData(3, Qt::UserRole, prop.user_info().user_level());
+	player->setIcon(3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, prop.user_info().user_level())));
+	player->setText(4, QString::fromStdString(prop.user_info().name()));
+	const QString country = QString::fromStdString(prop.user_info().country());
+	if (!country.isEmpty())
+		player->setIcon(4, QIcon(CountryPixmapGenerator::generatePixmap(12, country)));
+	player->setData(4, Qt::UserRole, QString::fromStdString(prop.user_info().name()));
+	player->setData(4, Qt::UserRole + 1, prop.player_id());
+	player->setText(5, QString::fromStdString(prop.deck_hash()));
 }
 
 void PlayerListWidget::removePlayer(int playerId)
@@ -185,7 +185,7 @@ void PlayerListWidget::showContextMenu(const QPoint &pos, const QModelIndex &ind
 		menu->addSeparator();
 		menu->addAction(aKick);
 	}
-	if (userName == game->getTabSupervisor()->getUserInfo()->getName()) {
+	if (userName == QString::fromStdString(game->getTabSupervisor()->getUserInfo()->name())) {
 		aChat->setEnabled(false);
 		aAddToBuddyList->setEnabled(false);
 		aRemoveFromBuddyList->setEnabled(false);

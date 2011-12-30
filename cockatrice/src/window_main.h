@@ -35,8 +35,8 @@ class MainWindow : public QMainWindow {
 private slots:
 	void updateTabMenu(QMenu *menu);
 	void statusChanged(ClientStatus _status);
-	void processConnectionClosedEvent(Event_ConnectionClosed *event);
-	void processServerShutdownEvent(Event_ServerShutdown *event);
+	void processConnectionClosedEvent(const Event_ConnectionClosed &event);
+	void processServerShutdownEvent(const Event_ServerShutdown &event);
 	void serverTimeout();
 	void serverError(Response::ResponseCode r);
 	void socketError(const QString &errorStr);

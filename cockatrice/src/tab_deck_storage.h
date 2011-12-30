@@ -2,7 +2,7 @@
 #define TAB_DECK_STORAGE_H
 
 #include "tab.h"
-#include "protocol.h"
+#include "pb/response.pb.h"
 
 class AbstractClient;
 class QTreeView;
@@ -31,20 +31,20 @@ private slots:
 	void actOpenLocalDeck();
 	
 	void actUpload();
-	void uploadFinished(ProtocolResponse *r);
+	void uploadFinished(const Response &r);
 
 	void actOpenRemoteDeck();
-	void openRemoteDeckFinished(ProtocolResponse *r);
+	void openRemoteDeckFinished(const Response &r);
 	
 	void actDownload();
-	void downloadFinished(ProtocolResponse *r);
+	void downloadFinished(const Response &r);
 
 	void actNewFolder();
-	void newFolderFinished(ResponseCode resp);
+	void newFolderFinished(Response::ResponseCode resp);
 
 	void actDelete();
-	void deleteFolderFinished(ResponseCode resp);
-	void deleteDeckFinished(ResponseCode resp);
+	void deleteFolderFinished(Response::ResponseCode resp);
+	void deleteDeckFinished(Response::ResponseCode resp);
 public:
 	TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client);
 	void retranslateUi();

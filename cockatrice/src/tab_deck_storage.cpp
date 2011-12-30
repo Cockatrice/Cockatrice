@@ -13,11 +13,11 @@
 #include "remotedecklist_treewidget.h"
 #include "abstractclient.h"
 #include "decklist.h"
-#include "protocol_items.h"
 #include "window_deckeditor.h"
 #include "settingscache.h"
 
 #include "pending_command.h"
+#include "pb/response.pb.h"
 #include "pb/command_deck_upload.pb.h"
 #include "pb/command_deck_download.pb.h"
 #include "pb/command_deck_new_dir.pb.h"
@@ -173,15 +173,15 @@ void TabDeckStorage::actUpload()
 	client->sendCommand(pend);
 }
 
-void TabDeckStorage::uploadFinished(ProtocolResponse *r)
+void TabDeckStorage::uploadFinished(const Response &r)
 {
-	Response_DeckUpload *resp = qobject_cast<Response_DeckUpload *>(r);
+/*	Response_DeckUpload *resp = qobject_cast<Response_DeckUpload *>(r);
 	if (!resp)
 		return;
 	const Command_DeckUpload &cmd = static_cast<const Command_DeckUpload &>(static_cast<PendingCommand *>(sender())->getCommandContainer().session_command(0).GetExtension(Command_DeckUpload::ext));
 	
 	serverDirView->addFileToTree(resp->getFile(), serverDirView->getNodeByPath(QString::fromStdString(cmd.path())));
-}
+*/}
 
 void TabDeckStorage::actOpenRemoteDeck()
 {
@@ -197,16 +197,16 @@ void TabDeckStorage::actOpenRemoteDeck()
 	client->sendCommand(pend);
 }
 
-void TabDeckStorage::openRemoteDeckFinished(ProtocolResponse *r)
+void TabDeckStorage::openRemoteDeckFinished(const Response &r)
 {
-	Response_DeckDownload *resp = qobject_cast<Response_DeckDownload *>(r);
+/*	Response_DeckDownload *resp = qobject_cast<Response_DeckDownload *>(r);
 	if (!resp)
 		return;
 	
 	WndDeckEditor *deckEditor = new WndDeckEditor;
 	deckEditor->setDeck(new DeckList(resp->getDeck()));
 	deckEditor->show();
-}
+*/}
 
 void TabDeckStorage::actDownload()
 {
@@ -234,16 +234,16 @@ void TabDeckStorage::actDownload()
 	client->sendCommand(pend);
 }
 
-void TabDeckStorage::downloadFinished(ProtocolResponse *r)
+void TabDeckStorage::downloadFinished(const Response &r)
 {
-	Response_DeckDownload *resp = qobject_cast<Response_DeckDownload *>(r);
+/*	Response_DeckDownload *resp = qobject_cast<Response_DeckDownload *>(r);
 	if (!resp)
 		return;
 	
 	PendingCommand *pend = static_cast<PendingCommand *>(sender());
 	QString filePath = pend->getExtraData().toString();
 	resp->getDeck()->saveToFile(filePath, DeckList::CockatriceFormat);
-}
+*/}
 
 void TabDeckStorage::actNewFolder()
 {
@@ -265,13 +265,13 @@ void TabDeckStorage::actNewFolder()
 	cmd.set_dir_name(folderName.toStdString());
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
-	connect(pend, SIGNAL(finished(ResponseCode)), this, SLOT(newFolderFinished(ResponseCode)));
+	connect(pend, SIGNAL(finished(Response::ResponseCode)), this, SLOT(newFolderFinished(Response::ResponseCode)));
 	client->sendCommand(pend);
 }
 
-void TabDeckStorage::newFolderFinished(ResponseCode resp)
+void TabDeckStorage::newFolderFinished(Response::ResponseCode resp)
 {
-	if (resp != RespOk)
+	if (resp != Response::RespOk)
 		return;
 	
 	const Command_DeckNewDir &cmd = static_cast<const Command_DeckNewDir &>(static_cast<PendingCommand *>(sender())->getCommandContainer().session_command(0).GetExtension(Command_DeckNewDir::ext));
@@ -292,20 +292,20 @@ void TabDeckStorage::actDelete()
 		Command_DeckDelDir cmd;
 		cmd.set_path(path.toStdString());
 		pend = client->prepareSessionCommand(cmd);
-		connect(pend, SIGNAL(finished(ResponseCode)), this, SLOT(deleteFolderFinished(ResponseCode)));
+		connect(pend, SIGNAL(finished(Response::ResponseCode)), this, SLOT(deleteFolderFinished(Response::ResponseCode)));
 	} else {
 		Command_DeckDel cmd;
 		cmd.set_deck_id(dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight)->getId());
 		pend = client->prepareSessionCommand(cmd);
-		connect(pend, SIGNAL(finished(ResponseCode)), this, SLOT(deleteDeckFinished(ResponseCode)));
+		connect(pend, SIGNAL(finished(Response::ResponseCode)), this, SLOT(deleteDeckFinished(Response::ResponseCode)));
 	}
 	
 	client->sendCommand(pend);
 }
 
-void TabDeckStorage::deleteDeckFinished(ResponseCode resp)
+void TabDeckStorage::deleteDeckFinished(Response::ResponseCode resp)
 {
-	if (resp != RespOk)
+	if (resp != Response::RespOk)
 		return;
 	
 	const Command_DeckDel &cmd = static_cast<const Command_DeckDel &>(static_cast<PendingCommand *>(sender())->getCommandContainer().session_command(0).GetExtension(Command_DeckDel::ext));
@@ -314,9 +314,9 @@ void TabDeckStorage::deleteDeckFinished(ResponseCode resp)
 		serverDirView->removeNode(toDelete);
 }
 
-void TabDeckStorage::deleteFolderFinished(ResponseCode resp)
+void TabDeckStorage::deleteFolderFinished(Response::ResponseCode resp)
 {
-	if (resp != RespOk)
+	if (resp != Response::RespOk)
 		return;
 	
 	const Command_DeckDelDir &cmd = static_cast<const Command_DeckDelDir &>(static_cast<PendingCommand *>(sender())->getCommandContainer().session_command(0).GetExtension(Command_DeckDelDir::ext));

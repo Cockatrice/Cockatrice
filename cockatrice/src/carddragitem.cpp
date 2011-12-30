@@ -1,4 +1,5 @@
 #include "carddragitem.h"
+#include "carditem.h"
 #include "cardzone.h"
 #include "tablezone.h"
 #include "zoneviewzone.h"

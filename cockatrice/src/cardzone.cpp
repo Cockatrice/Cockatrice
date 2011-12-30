@@ -6,8 +6,8 @@
 #include "carditem.h"
 #include "player.h"
 #include "zoneviewzone.h"
-#include "protocol_datastructures.h"
 #include "pb/command_move_card.pb.h"
+#include "pb/serverinfo_user.pb.h"
 
 CardZone::CardZone(Player *_p, const QString &_name, bool _hasCardAttr, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent, bool isView)
 	: AbstractGraphicsItem(parent), player(_p), name(_name), cards(_contentsKnown), view(NULL), menu(NULL), doubleClickAction(0), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable)
@@ -47,7 +47,7 @@ void CardZone::clearContents()
 QString CardZone::getTranslatedName(bool hisOwn, GrammaticalCase gc) const
 {
 	QString ownerName = player->getName();
-	bool female = player->getUserInfo()->getGender() == ServerInfo_User::Female;
+	bool female = player->getUserInfo()->gender() == ServerInfo_User::Female;
 	if (name == "hand")
 		switch (gc) {
 			case CaseNominative: return female ? (hisOwn ? tr("her hand", "nominative, female owner") : tr("%1's hand", "nominative, female owner").arg(ownerName)) : (hisOwn ? tr("his hand", "nominative, male owner") : tr("%1's hand", "nominative, male owner").arg(ownerName));

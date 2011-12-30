@@ -1,7 +1,9 @@
 #include <QGraphicsSceneMouseEvent>
 #include "selectzone.h"
 #include "gamescene.h"
+#include "carditem.h"
 #include <QDebug>
+
 SelectZone::SelectZone(Player *_player, const QString &_name, bool _hasCardAttr, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent, bool isView)
 	: CardZone(_player, _name, _hasCardAttr, _isShufflable, _contentsKnown, parent, isView)
 {

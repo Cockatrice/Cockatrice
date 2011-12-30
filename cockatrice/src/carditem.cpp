@@ -12,7 +12,6 @@
 #include "player.h"
 #include "arrowitem.h"
 #include "main.h"
-#include "protocol_datastructures.h"
 #include "settingscache.h"
 #include "tab_game.h"
 

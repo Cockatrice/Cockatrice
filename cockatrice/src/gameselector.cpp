@@ -10,9 +10,10 @@
 #include "dlg_creategame.h"
 #include "gameselector.h"
 #include "gamesmodel.h"
-
+#include "tab_room.h"
 #include "pending_command.h"
 #include "pb/room_commands.pb.h"
+#include "pb/serverinfo_game.pb.h"
 
 GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSupervisor, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QWidget *parent)
 	: QGroupBox(parent), client(_client), tabSupervisor(_tabSupervisor), room(_room)
@@ -89,7 +90,7 @@ void GameSelector::actCreate()
 	dlg.exec();
 }
 
-void GameSelector::checkResponse(ResponseCode response)
+void GameSelector::checkResponse(Response::ResponseCode response)
 {
 	if (createButton)
 		createButton->setEnabled(true);
@@ -97,14 +98,14 @@ void GameSelector::checkResponse(ResponseCode response)
 	spectateButton->setEnabled(true);
 
 	switch (response) {
-		case RespNotInRoom: QMessageBox::critical(this, tr("Error"), tr("Please join the appropriate room first.")); break;
-		case RespWrongPassword: QMessageBox::critical(this, tr("Error"), tr("Wrong password.")); break;
-		case RespSpectatorsNotAllowed: QMessageBox::critical(this, tr("Error"), tr("Spectators are not allowed in this game.")); break;
-		case RespGameFull: QMessageBox::critical(this, tr("Error"), tr("The game is already full.")); break;
-		case RespNameNotFound: QMessageBox::critical(this, tr("Error"), tr("The game does not exist any more.")); break;
-		case RespUserLevelTooLow: QMessageBox::critical(this, tr("Error"), tr("This game is only open to registered users.")); break;
-		case RespOnlyBuddies: QMessageBox::critical(this, tr("Error"), tr("This game is only open to its creator's buddies.")); break;
-		case RespInIgnoreList: QMessageBox::critical(this, tr("Error"), tr("You are being ignored by the creator of this game.")); break;
+		case Response::RespNotInRoom: QMessageBox::critical(this, tr("Error"), tr("Please join the appropriate room first.")); break;
+		case Response::RespWrongPassword: QMessageBox::critical(this, tr("Error"), tr("Wrong password.")); break;
+		case Response::RespSpectatorsNotAllowed: QMessageBox::critical(this, tr("Error"), tr("Spectators are not allowed in this game.")); break;
+		case Response::RespGameFull: QMessageBox::critical(this, tr("Error"), tr("The game is already full.")); break;
+		case Response::RespNameNotFound: QMessageBox::critical(this, tr("Error"), tr("The game does not exist any more.")); break;
+		case Response::RespUserLevelTooLow: QMessageBox::critical(this, tr("Error"), tr("This game is only open to registered users.")); break;
+		case Response::RespOnlyBuddies: QMessageBox::critical(this, tr("Error"), tr("This game is only open to its creator's buddies.")); break;
+		case Response::RespInIgnoreList: QMessageBox::critical(this, tr("Error"), tr("You are being ignored by the creator of this game.")); break;
 		default: ;
 	}
 }
@@ -116,10 +117,10 @@ void GameSelector::actJoin()
 	QModelIndex ind = gameListView->currentIndex();
 	if (!ind.isValid())
 		return;
-	ServerInfo_Game *game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
+	const ServerInfo_Game &game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
 	bool overrideRestrictions = !tabSupervisor->getAdminLocked();
 	QString password;
-	if (game->getHasPassword() && !(spectator && !game->getSpectatorsNeedPassword()) && !overrideRestrictions) {
+	if (game.with_password() && !(spectator && !game.spectators_need_password()) && !overrideRestrictions) {
 		bool ok;
 		password = QInputDialog::getText(this, tr("Join game"), tr("Password:"), QLineEdit::Password, QString(), &ok);
 		if (!ok)
@@ -127,19 +128,19 @@ void GameSelector::actJoin()
 	}
 	
 	Command_JoinGame cmd;
-	cmd.set_game_id(game->getGameId());
+	cmd.set_game_id(game.game_id());
 	cmd.set_password(password.toStdString());
 	cmd.set_spectator(spectator);
 	cmd.set_override_restrictions(overrideRestrictions);
 	
-	TabRoom *r = tabSupervisor->getRoomTabs().value(game->getRoomId());
+	TabRoom *r = tabSupervisor->getRoomTabs().value(game.room_id());
 	if (!r) {
 		QMessageBox::critical(this, tr("Error"), tr("Please join the respective room first."));
 		return;
 	}
 	
 	PendingCommand *pend = r->prepareRoomCommand(cmd);
-	connect(pend, SIGNAL(finished(ResponseCode)), this, SLOT(checkResponse(ResponseCode)));
+	connect(pend, SIGNAL(finished(Response::ResponseCode)), this, SLOT(checkResponse(Response::ResponseCode)));
 	r->sendRoomCommand(pend);
 
 	if (createButton)
@@ -159,8 +160,7 @@ void GameSelector::retranslateUi()
 	spectateButton->setText(tr("J&oin as spectator"));
 }
 
-void GameSelector::processGameInfo(ServerInfo_Game *info)
+void GameSelector::processGameInfo(const ServerInfo_Game &info)
 {
 	gameListModel->updateGameList(info);
 }
- 

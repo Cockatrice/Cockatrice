@@ -2,9 +2,9 @@
 #define GAMESELECTOR_H
 
 #include <QGroupBox>
-#include "protocol_datastructures.h"
-#include "tab_room.h"
+//#include "tab_room.h"
 #include "gametypemap.h"
+#include "pb/response.pb.h"
 
 class QTreeView;
 class GamesModel;
@@ -14,6 +14,7 @@ class QCheckBox;
 class AbstractClient;
 class TabSupervisor;
 class TabRoom;
+class ServerInfo_Game;
 
 class GameSelector : public QGroupBox {
 	Q_OBJECT
@@ -22,7 +23,7 @@ private slots:
 	void showRunningGamesChanged(int state);
 	void actCreate();
 	void actJoin();
-	void checkResponse(ResponseCode response);
+	void checkResponse(Response::ResponseCode response);
 signals:
 	void gameJoined(int gameId);
 private:
@@ -38,7 +39,7 @@ private:
 public:
 	GameSelector(AbstractClient *_client, TabSupervisor *_tabSupervisor, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QWidget *parent = 0);
 	void retranslateUi();
-	void processGameInfo(ServerInfo_Game *info);
+	void processGameInfo(const ServerInfo_Game &info);
 };
 
 #endif

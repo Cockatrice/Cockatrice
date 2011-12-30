@@ -38,11 +38,11 @@ signals:
 public:
 	PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, QWidget *parent = 0);
 	void retranslateUi();
-	void addPlayer(ServerInfo_PlayerProperties *player);
+	void addPlayer(const ServerInfo_PlayerProperties &player);
 	void removePlayer(int playerId);
 	void setActivePlayer(int playerId);
 	void updatePing(int playerId, int pingTime);
-	void updatePlayerProperties(ServerInfo_PlayerProperties *prop);
+	void updatePlayerProperties(const ServerInfo_PlayerProperties &prop);
 	void setGameStarted(bool _gameStarted, bool resuming);
 	void showContextMenu(const QPoint &pos, const QModelIndex &index);
 };

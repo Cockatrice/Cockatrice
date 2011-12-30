@@ -5,11 +5,11 @@
 #include <QStringList>
 #include <QMap>
 #include <QMutex>
+#include "pb/serverinfo_user.pb.h"
 
 class Server_Game;
 class Server_Room;
 class Server_ProtocolHandler;
-class ServerInfo_User;
 
 enum AuthenticationResult { PasswordWrong = 0, PasswordRight = 1, UnknownUser = 2, WouldOverwriteOldSession = 3 };
 

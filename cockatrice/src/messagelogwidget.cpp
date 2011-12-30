@@ -1,8 +1,10 @@
 #include "messagelogwidget.h"
 #include "player.h"
 #include "cardzone.h"
-#include "protocol_items.h"
 #include "soundengine.h"
+#include "pb/serverinfo_user.pb.h"
+#include "pb/context_move_card.pb.h"
+#include "pb/context_mulligan.pb.h"
 #include <QScrollBar>
 
 QString MessageLogWidget::sanitizeHtml(QString dirty) const
@@ -15,7 +17,7 @@ QString MessageLogWidget::sanitizeHtml(QString dirty) const
 
 bool MessageLogWidget::isFemale(Player *player) const
 {
-	return player->getUserInfo()->getGender() == ServerInfo_User::Female;
+	return player->getUserInfo()->gender() == ServerInfo_User::Female;
 }
 
 void MessageLogWidget::logGameJoined(int gameId)
@@ -728,14 +730,15 @@ void MessageLogWidget::logSetActivePhase(int phase)
 	appendHtml("<font color=\"green\"><b>" + tr("It is now the %1.").arg(phaseName) + "</b></font>");
 }
 
-void MessageLogWidget::containerProcessingStarted(GameEventContext *_context)
+void MessageLogWidget::containerProcessingStarted(const GameEventContext &_context)
 {
-	if (qobject_cast<Context_MoveCard *>(_context))
+	if (_context.HasExtension(Context_MoveCard::ext))
 		currentContext = MessageContext_MoveCard;
-	else if (qobject_cast<Context_Mulligan *>(_context)) {
+	else if (_context.HasExtension(Context_Mulligan::ext)) {
+		const Context_Mulligan &contextMulligan = _context.GetExtension(Context_Mulligan::ext);
 		currentContext = MessageContext_Mulligan;
 		mulliganPlayer = 0;
-		mulliganNumber = static_cast<Context_Mulligan *>(_context)->getNumber();
+		mulliganNumber = contextMulligan.number();
 	}
 }
 

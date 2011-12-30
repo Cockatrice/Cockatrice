@@ -11,7 +11,7 @@ class ServerInfo_Game;
 class GamesModel : public QAbstractTableModel {
 	Q_OBJECT
 private:
-	QList<ServerInfo_Game *> gameList;
+	QList<ServerInfo_Game> gameList;
 	QMap<int, QString> rooms;
 	QMap<int, GameTypeMap> gameTypes;
 public:
@@ -22,8 +22,8 @@ public:
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	
-	ServerInfo_Game *getGame(int row);
-	void updateGameList(ServerInfo_Game *game);
+	const ServerInfo_Game &getGame(int row);
+	void updateGameList(const ServerInfo_Game &game);
 };
 
 class GamesProxyModel : public QSortFilterProxyModel {

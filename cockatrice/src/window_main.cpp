@@ -37,6 +37,8 @@
 #include "localclient.h"
 
 #include "pb/room_commands.pb.h"
+#include "pb/event_connection_closed.pb.h"
+#include "pb/event_server_shutdown.pb.h"
 
 const QString MainWindow::appName = "Cockatrice";
 
@@ -49,9 +51,9 @@ void MainWindow::updateTabMenu(QMenu *menu)
 		menuBar()->insertMenu(helpMenu->menuAction(), menu);
 }
 
-void MainWindow::processConnectionClosedEvent(Event_ConnectionClosed *event)
+void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &event)
 {
-/*	QString reason = event->getReason();
+	QString reason = QString::fromStdString(event.reason());
 	client->disconnectFromServer();
 	QString reasonStr;
 	if (reason == "too_many_connections")
@@ -63,13 +65,11 @@ void MainWindow::processConnectionClosedEvent(Event_ConnectionClosed *event)
 	else
 		reasonStr = tr("Unknown reason.");
 	QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.\nReason: %1").arg(reasonStr));
-*/
 }
 
-void MainWindow::processServerShutdownEvent(Event_ServerShutdown *event)
+void MainWindow::processServerShutdownEvent(const Event_ServerShutdown &event)
 {
-/*	QMessageBox::information(this, tr("Scheduled server shutdown"), tr("The server is going to be restarted in %n minute(s).\nAll running games will be lost.\nReason for shutdown: %1", "", event->getMinutes()).arg(event->getReason()));
- * */
+	QMessageBox::information(this, tr("Scheduled server shutdown"), tr("The server is going to be restarted in %n minute(s).\nAll running games will be lost.\nReason for shutdown: %1", "", event.minutes()).arg(QString::fromStdString(event.reason())));
 }
 
 void MainWindow::statusChanged(ClientStatus _status)

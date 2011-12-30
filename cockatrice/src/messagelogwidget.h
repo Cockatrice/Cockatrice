@@ -4,7 +4,6 @@
 #include "chatview.h"
 #include <QAbstractSocket>
 #include "translation.h"
-#include "protocol_datastructures.h"
 
 class Player;
 class CardZone;
@@ -78,7 +77,7 @@ public slots:
 	void logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer);
 	void logSetActivePlayer(Player *player);
 	void logSetActivePhase(int phase);
-	void containerProcessingStarted(GameEventContext *context);
+	void containerProcessingStarted(const GameEventContext &context);
 	void containerProcessingDone();
 public:
 	void connectToPlayer(Player *player);
