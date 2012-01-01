@@ -4,6 +4,7 @@ DEPENDPATH += . src
 INCLUDEPATH += . src ../cockatrice/src
 MOC_DIR = build
 OBJECTS_DIR = build
+QMAKE_CXXFLAGS_RELEASE += -O2
 QT += network svg xml
 
 HEADERS += src/oracleimporter.h src/window_main.h ../cockatrice/src/carddatabase.h ../cockatrice/src/settingscache.h

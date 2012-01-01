@@ -345,35 +345,23 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 		if ((resp != Response::RespOk) && (resp != Response::RespNothing))
 			finalResponseCode = resp;
 	}
-	/*
-	 * XXX konvertieren zu GameEventStorage (oben deklariert als "ges")
-	 * 
-	GameEventContainer *gQPublic = bla->getGameEventQueuePublic();
-	if (gQPublic) {
-		gameListMutex.lock();
-		QPair<Server_Game *, Server_Player *> gamePlayerPair = games.value(gQPublic->game_id());
-		if (gamePlayerPair.first) {
-			GameEventContainer *gQPrivate = bla->getGameEventQueuePrivate();
-			GameEventContainer *gQOmniscient = bla->getGameEventQueueOmniscient();
-			if (gQPrivate) {
-				int privatePlayerId = bla->getPrivatePlayerId();
-				Server_Player *privatePlayer;
-				if (privatePlayerId == -1)
-					privatePlayer = gamePlayerPair.second;
-				else
-					privatePlayer = gamePlayerPair.first->getPlayer(privatePlayerId);
-				if (gQOmniscient) {
-					gamePlayerPair.first->sendGameEventContainer(gQPublic, privatePlayer, true);
-					gamePlayerPair.first->sendGameEventContainerOmniscient(gQOmniscient, privatePlayer);
-				} else
-					gamePlayerPair.first->sendGameEventContainer(gQPublic, privatePlayer);
-				privatePlayer->sendProtocolItem(gQPrivate);
-			} else
-				gamePlayerPair.first->sendGameEventContainer(gQPublic);
-		}
-		gameListMutex.unlock();
+	GameEventContainer *contPrivate = new GameEventContainer;
+	GameEventContainer *contOthers = new GameEventContainer;
+	const QList<GameEventStorageItem *> &gameEventList = ges.getGameEventList();
+	for (int i = 0; i < gameEventList.size(); ++i) {
+		const GameEvent &event = gameEventList[i]->getGameEvent();
+		const GameEventStorageItem::EventRecipients recipients = gameEventList[i]->getRecipients();
+		if (recipients.testFlag(GameEventStorageItem::SendToPrivate))
+			contPrivate->add_event_list()->CopyFrom(event);
+		if (recipients.testFlag(GameEventStorageItem::SendToOthers))
+			contOthers->add_event_list()->CopyFrom(event);
 	}
-	*/
+	if (ges.getGameEventContext()) {
+		contPrivate->mutable_context()->CopyFrom(*ges.getGameEventContext());
+		contOthers->mutable_context()->CopyFrom(*ges.getGameEventContext());
+	}
+	game->sendGameEventContainer(contPrivate, GameEventStorageItem::SendToPrivate, ges.getPrivatePlayerId());
+	game->sendGameEventContainer(contOthers, GameEventStorageItem::SendToOthers, ges.getPrivatePlayerId());
 	return finalResponseCode;
 }
 
@@ -871,8 +859,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdDeckSelect(const Command_DeckS
 	event.mutable_player_properties()->CopyFrom(player->getProperties());
 	ges.enqueueGameEvent(event, player->getPlayerId());
 	
-	Context_DeckSelect *context = new Context_DeckSelect;
-	context->set_deck_hash(deck->getDeckHash().toStdString());
+	Context_DeckSelect context;
+	context.set_deck_hash(deck->getDeckHash().toStdString());
 	ges.setGameEventContext(context);
 	
 	Response_DeckDownload *re = new Response_DeckDownload;
@@ -921,7 +909,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdConcede(const Command_Concede 
 	Event_PlayerPropertiesChanged event;
 	event.mutable_player_properties()->CopyFrom(player->getProperties());
 	ges.enqueueGameEvent(event, player->getPlayerId());
-	ges.setGameEventContext(new Context_Concede());
+	ges.setGameEventContext(Context_Concede());
 	
 	game->stopGameIfFinished();
 	if (game->getGameStarted() && (game->getActivePlayer() == player->getPlayerId()))
@@ -946,7 +934,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdReadyStart(const Command_Ready
 	Event_PlayerPropertiesChanged event;
 	event.mutable_player_properties()->CopyFrom(player->getProperties());
 	ges.enqueueGameEvent(event, player->getPlayerId());
-	ges.setGameEventContext(new Context_ReadyStart());
+	ges.setGameEventContext(Context_ReadyStart());
 	
 	game->startGameIfReady();
 	return Response::RespOk;
@@ -1012,8 +1000,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdMulligan(const Command_Mulliga
 	if (number == player->getInitialCards())
 		number = -1;
 	
-	Context_Mulligan *context = new Context_Mulligan;
-	context->set_number(number);
+	Context_Mulligan context;
+	context.set_number(number);
 	ges.setGameEventContext(context);
 
 	return Response::RespOk;

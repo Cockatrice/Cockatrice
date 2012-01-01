@@ -124,7 +124,7 @@ CardInfo *OracleImporter::addCard(const QString &setName,
 		
 		bool cipt = (cardText.contains(cardName + " enters the battlefield tapped."));
 		
-		card = new CardInfo(this, cardName, cardCost, cardType, cardPT, fullCardText, colors, cipt);
+		card = new CardInfo(this, cardName, cardCost, cardType, cardPT, fullCardText, colors, cardLoyalty, cipt);
 		int tableRow = 1;
 		QString mainCardType = card->getMainCardType();
 		if ((mainCardType == "Land") || mArtifact)
@@ -134,10 +134,7 @@ CardInfo *OracleImporter::addCard(const QString &setName,
 		else if (mainCardType == "Creature")
 			tableRow = 2;
 		card->setTableRow(tableRow);
-
-		if (mainCardType == "Planeswalker")
-			card->setLoyalty(cardLoyalty);
-
+		
 		cardHash.insert(cardName, card);
 	}
 	card->setPicURL(setName, getPictureUrl(pictureUrl, cardId, cardName, setName));

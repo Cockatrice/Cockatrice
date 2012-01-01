@@ -9,13 +9,14 @@
 #include <QPair>
 
 #include <google/protobuf/message.h>
+#include <google/protobuf/descriptor.h>
 #include "pb/server_message.pb.h"
 
 class DeckList;
 class GameEvent;
 class GameEventContainer;
 class GameEventContext;
-
+#include <QDebug>
 static const int protocolVersion = 13;
 
 class GameEventStorageItem {
@@ -23,21 +24,20 @@ public:
 	enum EventRecipient { SendToPrivate = 0x01, SendToOthers = 0x02};
 	Q_DECLARE_FLAGS(EventRecipients, EventRecipient)
 private:
-	::google::protobuf::Message *event;
-	int playerId;
+	GameEvent *event;
 	EventRecipients recipients;
 public:
 	GameEventStorageItem(const ::google::protobuf::Message &_event, int _playerId, EventRecipients _recipients)
-		: event(_event.New()), playerId(_playerId), recipients(_recipients)
+		: event(new GameEvent), recipients(_recipients)
 	{
-		event->CopyFrom(_event);
+		event->GetReflection()->MutableMessage(event, _event.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(_event);
+		event->set_player_id(_playerId);
 	}
 	~GameEventStorageItem()
 	{
 		delete event;
 	}
-	const ::google::protobuf::Message &getEvent() const { return *event; }
-	int getPlayerId() const { return playerId; }
+	const GameEvent &getGameEvent() const { return *event; }
 	EventRecipients getRecipients() const { return recipients; }
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(GameEventStorageItem::EventRecipients)
@@ -59,9 +59,13 @@ public:
 			delete gameEventList[i];
 	}
 	
-	void setGameEventContext(::google::protobuf::Message *_gameEventContext) { gameEventContext = _gameEventContext; }
+	void setGameEventContext(const ::google::protobuf::Message &_gameEventContext) {
+		delete gameEventContext;
+		gameEventContext = new GameEventContext;
+		gameEventContext->GetReflection()->MutableMessage(gameEventContext, _gameEventContext.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(_gameEventContext);
+	}
 	::google::protobuf::Message *getGameEventContext() const { return gameEventContext; }
-	
+	const QList<GameEventStorageItem *> &getGameEventList() const { return gameEventList; }
 	int getPrivatePlayerId() const { return privatePlayerId; }
 	
 	void enqueueGameEvent(const ::google::protobuf::Message &event, int playerId, GameEventStorageItem::EventRecipients recipients = GameEventStorageItem::SendToPrivate | GameEventStorageItem::SendToOthers, int _privatePlayerId = -1)

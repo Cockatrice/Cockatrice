@@ -419,7 +419,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 			Event_DestroyCard event;
 			event.set_zone_name(startzone->getName().toStdString());
 			event.set_card_id(card->getId());
-			ges.setGameEventContext(new Context_MoveCard);
+			ges.setGameEventContext(Context_MoveCard());
 			ges.enqueueGameEvent(event, playerId);
 			
 			card->deleteLater();
@@ -561,7 +561,8 @@ Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, c
 	
 	Event_SetCardAttr event;
 	event.set_zone_name(zone->getName().toStdString());
-	event.set_card_id(cardId);
+	if (cardId != -1)
+		event.set_card_id(cardId);
 	event.set_attr_name(attrName.toStdString());
 	event.set_attr_value(result.toStdString());
 	ges.enqueueGameEvent(event, playerId);

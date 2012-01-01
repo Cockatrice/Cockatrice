@@ -129,7 +129,7 @@ public:
 		const QString &_text = QString(),
 		const QStringList &_colors = QStringList(),
 		int _loyalty = 0,
-		bool cipt = false,
+		bool _cipt = false,
 		int _tableRow = 0,
 		const SetList &_sets = SetList(),
 		const QStringMap &_picURLs = QStringMap(),
