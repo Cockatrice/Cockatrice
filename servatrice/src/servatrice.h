@@ -85,7 +85,7 @@ protected:
 	int startSession(const QString &userName, const QString &address);
 	void endSession(int sessionId);
 	bool userExists(const QString &user);
-	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password);
+	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr);
 private:
 	QTimer *pingClock, *statusUpdateClock;
 	QTcpServer *tcpServer;

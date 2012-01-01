@@ -25,7 +25,7 @@ private:
 	QLineEdit *nameBanEdit, *ipBanEdit;
 	QSpinBox *daysEdit, *hoursEdit, *minutesEdit;
 	QRadioButton *permanentRadio, *temporaryRadio;
-	QPlainTextEdit *reasonEdit;
+	QPlainTextEdit *reasonEdit, *visibleReasonEdit;
 private slots:
 	void okClicked();
 	void enableTemporaryEdits(bool enabled);
@@ -35,6 +35,7 @@ public:
 	QString getBanIP() const;
 	int getMinutes() const;
 	QString getReason() const;
+	QString getVisibleReason() const;
 };
 
 class UserListItemDelegate : public QStyledItemDelegate {

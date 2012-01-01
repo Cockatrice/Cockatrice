@@ -19,6 +19,7 @@ message Response {
 		RespInIgnoreList = 16;
 		RespWouldOverwriteOldSession = 17;
 		RespChatFlood = 18;
+		RespUserIsBanned = 19;
 	}
 	enum ResponseType {
 		JOIN_ROOM = 1000;

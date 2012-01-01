@@ -9,8 +9,9 @@ INCLUDEPATH += . src ../common
 MOC_DIR = build
 OBJECTS_DIR = build
 LIBS += -lgcrypt -lprotobuf
+QMAKE_CXXFLAGS_RELEASE += -O2
 
-CONFIG += qt debug
+CONFIG += qt
 QT += network sql
 QT -= gui
 

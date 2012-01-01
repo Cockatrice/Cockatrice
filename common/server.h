@@ -11,7 +11,7 @@ class Server_Game;
 class Server_Room;
 class Server_ProtocolHandler;
 
-enum AuthenticationResult { PasswordWrong = 0, PasswordRight = 1, UnknownUser = 2, WouldOverwriteOldSession = 3 };
+enum AuthenticationResult { NotLoggedIn = 0, PasswordRight = 1, UnknownUser = 2, WouldOverwriteOldSession = 3, UserIsBanned = 4 };
 
 class Server : public QObject
 {
@@ -24,7 +24,7 @@ public:
 	mutable QMutex serverMutex;
 	Server(QObject *parent = 0);
 	~Server();
-	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password);
+	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason);
 	const QMap<int, Server_Room *> &getRooms() { return rooms; }
 	int getNextGameId() { return nextGameId++; }
 	
@@ -55,7 +55,7 @@ protected:
 	virtual int startSession(const QString &userName, const QString &address) = 0;
 	virtual void endSession(int sessionId) = 0;
 	virtual bool userExists(const QString &user) = 0;
-	virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password) = 0;
+	virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reason) = 0;
 	virtual ServerInfo_User getUserData(const QString &name) = 0;
 	int getUsersCount() const;
 	int getGamesCount() const;

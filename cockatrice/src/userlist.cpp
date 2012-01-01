@@ -81,6 +81,9 @@ BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent)
 	QLabel *reasonLabel = new QLabel(tr("Please enter the reason for the ban.\nThis is only saved for moderators and cannot be seen by the banned person."));
 	reasonEdit = new QPlainTextEdit;
 	
+	QLabel *visibleReasonLabel = new QLabel(tr("Please enter the reason for the ban that will be visible to the banned person."));
+	visibleReasonEdit = new QPlainTextEdit;
+	
 	QPushButton *okButton = new QPushButton(tr("&OK"));
 	okButton->setAutoDefault(true);
 	connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
@@ -97,6 +100,8 @@ BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent)
 	vbox->addWidget(durationGroupBox);
 	vbox->addWidget(reasonLabel);
 	vbox->addWidget(reasonEdit);
+	vbox->addWidget(visibleReasonLabel);
+	vbox->addWidget(visibleReasonEdit);
 	vbox->addLayout(buttonLayout);
 	
 	setLayout(vbox);
@@ -140,6 +145,11 @@ int BanDialog::getMinutes() const
 QString BanDialog::getReason() const
 {
 	return reasonEdit->toPlainText();
+}
+
+QString BanDialog::getVisibleReason() const
+{
+	return visibleReasonEdit->toPlainText();
 }
 
 UserListItemDelegate::UserListItemDelegate(QObject *const parent)
@@ -344,6 +354,7 @@ void UserList::banUser_dialogFinished()
 	cmd.set_address(dlg->getBanIP().toStdString());
 	cmd.set_minutes(dlg->getMinutes());
 	cmd.set_reason(dlg->getReason().toStdString());
+	cmd.set_visible_reason(dlg->getVisibleReason().toStdString());
 	
 	client->sendCommand(client->prepareModeratorCommand(cmd));
 }
@@ -418,7 +429,7 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 		cmd.set_user_name(userName.toStdString());
 		
 		PendingCommand *pend = client->prepareSessionCommand(cmd);
-		connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(gamesOfUserReceived(ProtocolResponse *)));
+		connect(pend, SIGNAL(finished(const Response &)), this, SLOT(gamesOfUserReceived(const Response &)));
 		
 		client->sendCommand(pend);
 	} else if (actionClicked == aAddToIgnoreList) {
@@ -438,7 +449,7 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 		cmd.set_user_name(userName.toStdString());
 		
 		PendingCommand *pend = client->prepareSessionCommand(cmd);
-		connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(banUser_processUserInfoResponse(ProtocolResponse *)));
+		connect(pend, SIGNAL(finished(const Response &)), this, SLOT(banUser_processUserInfoResponse(const Response &)));
 		
 		client->sendCommand(pend);
 	}

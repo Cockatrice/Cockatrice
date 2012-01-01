@@ -11,7 +11,7 @@ class LocalServer : public Server
 public:
 	LocalServer(QObject *parent = 0);
 	~LocalServer();
-	AuthenticationResult checkUserPassword(Server_ProtocolHandler * /*handler*/, const QString & /*user*/, const QString & /*password*/) { return UnknownUser; }
+	AuthenticationResult checkUserPassword(Server_ProtocolHandler * /*handler*/, const QString & /*user*/, const QString & /*password*/, QString & /*reasonStr*/) { return UnknownUser; }
 	QString getLoginMessage() const { return QString(); }
 	bool getGameShouldPing() const { return false; }
 	int getMaxGameInactivityTime() const { return 9999999; }

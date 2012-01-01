@@ -85,7 +85,7 @@
 #include <google/protobuf/descriptor.h>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
-	: QObject(parent), server(_server), authState(PasswordWrong), acceptsUserListChanges(false), acceptsRoomListChanges(false), userInfo(0), sessionId(-1), timeRunning(0), lastDataReceived(0), gameListMutex(QMutex::Recursive)
+	: QObject(parent), server(_server), authState(NotLoggedIn), acceptsUserListChanges(false), acceptsRoomListChanges(false), userInfo(0), sessionId(-1), timeRunning(0), lastDataReceived(0), gameListMutex(QMutex::Recursive)
 {
 	connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
@@ -247,7 +247,7 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
 
 Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const CommandContainer &cont, ResponseContainer &rc)
 {
-	if (authState == PasswordWrong)
+	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 
 	Server_Room *room = rooms.value(cont.room_id(), 0);
@@ -282,7 +282,7 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
 
 Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const CommandContainer &cont, ResponseContainer &rc)
 {
-	if (authState == PasswordWrong)
+	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
 	gameListMutex.lock();
@@ -493,11 +493,19 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 	QString userName = QString::fromStdString(cmd.user_name()).simplified();
 	if (userName.isEmpty() || (userInfo != 0))
 		return Response::RespContextError;
-	authState = server->loginUser(this, userName, QString::fromStdString(cmd.password()));
-	if (authState == PasswordWrong)
-		return Response::RespWrongPassword;
-	if (authState == WouldOverwriteOldSession)
-		return Response::RespWouldOverwriteOldSession;
+	QString reasonStr;
+	AuthenticationResult res = server->loginUser(this, userName, QString::fromStdString(cmd.password()), reasonStr);
+	switch (res) {
+		case UserIsBanned: {
+			Response_Login *re = new Response_Login;
+			re->set_denied_reason_str(reasonStr.toStdString());
+			rc.setResponseExtension(re);
+			return Response::RespUserIsBanned;
+		}
+		case NotLoggedIn: return Response::RespWrongPassword;
+		case WouldOverwriteOldSession: return Response::RespWouldOverwriteOldSession;
+		default: authState = res;
+	}
 	
 	userName = QString::fromStdString(userInfo->name());
 	Event_ServerMessage event;
@@ -505,8 +513,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 	rc.enqueuePostResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event));
 	
 	Response_Login *re = new Response_Login;
-	// XXX stimmt so nicht, beim alten Kopierkonstruktor wurde hier "true" übergeben
-	re->mutable_user_info()->CopyFrom(*userInfo);
+	re->mutable_user_info()->CopyFrom(copyUserInfo(true));
 	
 	if (authState == PasswordRight) {
 		QMapIterator<QString, ServerInfo_User> buddyIterator(server->getBuddyList(userName));
@@ -569,7 +576,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 
 Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message &cmd, ResponseContainer &rc)
 {
-	if (authState == PasswordWrong)
+	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
 	QString receiver = QString::fromStdString(cmd.user_name());
@@ -592,7 +599,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
 
 Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_GetGamesOfUser &cmd, ResponseContainer &rc)
 {
-	if (authState == PasswordWrong)
+	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
 	server->serverMutex.lock();
@@ -618,7 +625,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_G
 
 Response::ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetUserInfo &cmd, ResponseContainer &rc)
 {
-	if (authState == PasswordWrong)
+	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
 	QString userName = QString::fromStdString(cmd.user_name());
@@ -638,7 +645,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetU
 
 Response::ResponseCode Server_ProtocolHandler::cmdListRooms(const Command_ListRooms & /*cmd*/, ResponseContainer &rc)
 {
-	if (authState == PasswordWrong)
+	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
 	Event_ListRooms event;
@@ -653,7 +660,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdListRooms(const Command_ListRo
 
 Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoom &cmd, ResponseContainer &rc)
 {
-	if (authState == PasswordWrong)
+	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
 	if (rooms.contains(cmd.room_id()))
@@ -681,7 +688,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
 
 Response::ResponseCode Server_ProtocolHandler::cmdListUsers(const Command_ListUsers & /*cmd*/, ResponseContainer &rc)
 {
-	if (authState == PasswordWrong)
+	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
 	Response_ListUsers *re = new Response_ListUsers;
@@ -731,7 +738,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay 
 
 Response::ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room *room, ResponseContainer &rc)
 {
-	if (authState == PasswordWrong)
+	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 
 	if (server->getMaxGamesPerUser() > 0)
@@ -779,7 +786,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_Creat
 
 Response::ResponseCode Server_ProtocolHandler::cmdJoinGame(const Command_JoinGame &cmd, Server_Room *room, ResponseContainer &rc)
 {
-	if (authState == PasswordWrong)
+	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
 	QMutexLocker gameListLocker(&gameListMutex);

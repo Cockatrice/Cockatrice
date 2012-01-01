@@ -167,7 +167,7 @@ bool Servatrice::execSqlQuery(QSqlQuery &query)
 	return false;
 }
 
-AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password)
+AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr)
 {
 	QMutexLocker locker(&dbMutex);
 	const QString method = settings->value("authentication/method").toString();
@@ -177,33 +177,35 @@ AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handl
 		checkSql();
 		
 		QSqlQuery ipBanQuery;
-		ipBanQuery.prepare("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_bans b where b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.ip_address = :address) and b.ip_address = :address2");
+		ipBanQuery.prepare("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0, b.visible_reason from " + dbPrefix + "_bans b where b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.ip_address = :address) and b.ip_address = :address2");
 		ipBanQuery.bindValue(":address", static_cast<ServerSocketInterface *>(handler)->getPeerAddress().toString());
 		ipBanQuery.bindValue(":address2", static_cast<ServerSocketInterface *>(handler)->getPeerAddress().toString());
 		if (!execSqlQuery(ipBanQuery)) {
 			qDebug("Login denied: SQL error");
-			return PasswordWrong;
+			return NotLoggedIn;
 		}
 		
 		if (ipBanQuery.next())
 			if (ipBanQuery.value(0).toInt() || ipBanQuery.value(1).toInt()) {
+				reasonStr = ipBanQuery.value(2).toString();
 				qDebug("Login denied: banned by address");
-				return PasswordWrong;
+				return UserIsBanned;
 			}
 		
 		QSqlQuery nameBanQuery;
-		nameBanQuery.prepare("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_bans b where b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.user_name = :name2) and b.user_name = :name1");
+		nameBanQuery.prepare("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0, b.visible_reason from " + dbPrefix + "_bans b where b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.user_name = :name2) and b.user_name = :name1");
 		nameBanQuery.bindValue(":name1", user);
 		nameBanQuery.bindValue(":name2", user);
 		if (!execSqlQuery(nameBanQuery)) {
 			qDebug("Login denied: SQL error");
-			return PasswordWrong;
+			return NotLoggedIn;
 		}
 		
 		if (nameBanQuery.next())
 			if (nameBanQuery.value(0).toInt() || nameBanQuery.value(1).toInt()) {
+				reasonStr = nameBanQuery.value(2).toString();
 				qDebug("Login denied: banned by name");
-				return PasswordWrong;
+				return UserIsBanned;
 			}
 		
 		QSqlQuery passwordQuery;
@@ -211,7 +213,7 @@ AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handl
 		passwordQuery.bindValue(":name", user);
 		if (!execSqlQuery(passwordQuery)) {
 			qDebug("Login denied: SQL error");
-			return PasswordWrong;
+			return NotLoggedIn;
 		}
 		
 		if (passwordQuery.next()) {
@@ -221,7 +223,7 @@ AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handl
 				return PasswordRight;
 			} else {
 				qDebug("Login denied: password wrong");
-				return PasswordWrong;
+				return NotLoggedIn;
 			}
 		} else {
 			qDebug("Login accepted: unknown user");
@@ -527,7 +529,7 @@ void Servatrice::shutdownTimeout()
 		se = Server_ProtocolHandler::prepareSessionEvent(event);
 	} else {
 		Event_ConnectionClosed event;
-		event.set_reason("server_shutdown");
+		event.set_reason(Event_ConnectionClosed::SERVER_SHUTDOWN);
 		se = Server_ProtocolHandler::prepareSessionEvent(event);
 	}
 

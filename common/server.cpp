@@ -49,13 +49,13 @@ void Server::prepareDestroy()
 		delete roomIterator.next().value();
 }
 
-AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password)
+AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr)
 {
 	QMutexLocker locker(&serverMutex);
 	if (name.size() > 35)
 		name = name.left(35);
-	AuthenticationResult authState = checkUserPassword(session, name, password);
-	if (authState == PasswordWrong)
+	AuthenticationResult authState = checkUserPassword(session, name, password, reasonStr);
+	if ((authState == NotLoggedIn) || (authState == UserIsBanned))
 		return authState;
 	
 	ServerInfo_User data = getUserData(name);

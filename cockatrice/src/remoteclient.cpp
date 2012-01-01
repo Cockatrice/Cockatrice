@@ -56,8 +56,8 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
 
 void RemoteClient::loginResponse(const Response &response)
 {
+	const Response_Login &resp = response.GetExtension(Response_Login::ext);
 	if (response.response_code() == Response::RespOk) {
-		const Response_Login &resp = response.GetExtension(Response_Login::ext);
 		setStatus(StatusLoggedIn);
 		emit userInfoChanged(resp.user_info());
 		
@@ -71,7 +71,7 @@ void RemoteClient::loginResponse(const Response &response)
 			ignoreList.append(resp.ignore_list(i));
 		emit ignoreListReceived(ignoreList);
 	} else {
-		emit serverError(response.response_code());
+		emit serverError(response.response_code(), QString::fromStdString(resp.denied_reason_str()));
 		setStatus(StatusDisconnecting);
 	}
 }

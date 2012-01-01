@@ -53,17 +53,19 @@ void MainWindow::updateTabMenu(QMenu *menu)
 
 void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &event)
 {
-	QString reason = QString::fromStdString(event.reason());
 	client->disconnectFromServer();
 	QString reasonStr;
-	if (reason == "too_many_connections")
-		reasonStr = tr("There are too many concurrent connections from your address.");
-	else if (reason == "banned")
-		reasonStr = tr("Banned by moderator.");
-	else if (reason == "server_shutdown")
-		reasonStr = tr("Scheduled server shutdown.");
-	else
-		reasonStr = tr("Unknown reason.");
+	switch (event.reason()) {
+		case Event_ConnectionClosed::TOO_MANY_CONNECTIONS: reasonStr = tr("There are too many concurrent connections from your address."); break;
+		case Event_ConnectionClosed::BANNED: {
+			reasonStr = tr("Banned by moderator");
+			if (event.has_reason_str())
+				reasonStr.append("\n\n" + QString::fromStdString(event.reason_str()));
+			break;
+		}
+		case Event_ConnectionClosed::SERVER_SHUTDOWN: reasonStr = tr("Scheduled server shutdown."); break;
+		default: reasonStr = QString::fromStdString(event.reason_str());
+	}
 	QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.\nReason: %1").arg(reasonStr));
 }
 
@@ -201,11 +203,12 @@ void MainWindow::serverTimeout()
 	QMessageBox::critical(this, tr("Error"), tr("Server timeout"));
 }
 
-void MainWindow::serverError(Response::ResponseCode r)
+void MainWindow::serverError(Response::ResponseCode r, QString reasonStr)
 {
 	switch (r) {
 		case Response::RespWrongPassword: QMessageBox::critical(this, tr("Error"), tr("Invalid login data.")); break;
 		case Response::RespWouldOverwriteOldSession: QMessageBox::critical(this, tr("Error"), tr("There is already an active session using this user name.\nPlease close that session first and re-login.")); break;
+		case Response::RespUserIsBanned: QMessageBox::critical(this, tr("Error"), tr("You are banned.\n%1").arg(reasonStr)); break;
 		default: ;
 	}
 }
@@ -304,7 +307,7 @@ MainWindow::MainWindow(QWidget *parent)
 	client = new RemoteClient(this);
 	connect(client, SIGNAL(connectionClosedEventReceived(const Event_ConnectionClosed &)), this, SLOT(processConnectionClosedEvent(const Event_ConnectionClosed &)));
 	connect(client, SIGNAL(serverShutdownEventReceived(const Event_ServerShutdown &)), this, SLOT(processServerShutdownEvent(const Event_ServerShutdown &)));
-	connect(client, SIGNAL(serverError(Response::ResponseCode)), this, SLOT(serverError(Response::ResponseCode)));
+	connect(client, SIGNAL(serverError(Response::ResponseCode, QString)), this, SLOT(serverError(Response::ResponseCode, QString)));
 	connect(client, SIGNAL(socketError(const QString &)), this, SLOT(socketError(const QString &)));
 	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
 	connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));

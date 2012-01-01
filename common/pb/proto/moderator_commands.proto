@@ -13,4 +13,5 @@ message Command_BanFromServer {
 	optional string address = 2;
 	optional uint32 minutes = 3;
 	optional string reason = 4;
+	optional string visible_reason = 5;
 }

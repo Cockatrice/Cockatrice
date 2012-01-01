@@ -65,7 +65,7 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_s
 	int maxUsers = _server->getMaxUsersPerAddress();
 	if ((maxUsers > 0) && (_server->getUsersWithAddress(socket->peerAddress()) >= maxUsers)) {
 		Event_ConnectionClosed event;
-		event.set_reason("too_many_connections");
+		event.set_reason(Event_ConnectionClosed::TOO_MANY_CONNECTIONS);
 		SessionEvent *se = prepareSessionEvent(event);
 		sendProtocolItem(*se);
 		delete se;
@@ -482,19 +482,22 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 	
 	servatrice->dbMutex.lock();
 	QSqlQuery query;
-	query.prepare("insert into " + servatrice->getDbPrefix() + "_bans (user_name, ip_address, id_admin, time_from, minutes, reason) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason)");
+	query.prepare("insert into " + servatrice->getDbPrefix() + "_bans (user_name, ip_address, id_admin, time_from, minutes, reason, visible_reason) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason, :visible_reason)");
 	query.bindValue(":user_name", userName);
 	query.bindValue(":ip_address", address);
 	query.bindValue(":id_admin", servatrice->getUserIdInDB(QString::fromStdString(userInfo->name())));
 	query.bindValue(":minutes", minutes);
 	query.bindValue(":reason", QString::fromStdString(cmd.reason()) + "\n");
+	query.bindValue(":visible_reason", QString::fromStdString(cmd.visible_reason()) + "\n");
 	servatrice->execSqlQuery(query);
 	servatrice->dbMutex.unlock();
 	
 	ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
 	if (user) {
 		Event_ConnectionClosed event;
-		event.set_reason("banned");
+		event.set_reason(Event_ConnectionClosed::BANNED);
+		if (cmd.has_visible_reason())
+			event.set_reason_str(cmd.visible_reason());
 		SessionEvent *se = user->prepareSessionEvent(event);
 		user->sendProtocolItem(*se);
 		delete se;
