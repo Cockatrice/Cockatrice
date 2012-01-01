@@ -15,7 +15,7 @@ message ServerInfo_User {
 	optional uint32 user_level = 2;
 	optional string address = 3;
 	optional string real_name = 4;
-	optional Gender gender = 5;
+	optional Gender gender = 5 [default = GenderUnknown];
 	optional string country = 6;
 	optional bytes avatar_bmp = 7;
 }

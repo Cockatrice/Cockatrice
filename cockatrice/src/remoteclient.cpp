@@ -1,11 +1,14 @@
 #include <QTimer>
 #include "remoteclient.h"
-#include "protocol.h"
 
 #include "pending_command.h"
 #include "pb/commands.pb.h"
 #include "pb/session_commands.pb.h"
 #include "pb/response_login.pb.h"
+#include "pb/server_message.pb.h"
+#include "pb/event_server_identification.pb.h"
+
+static const unsigned int protocolVersion = 13;
 
 RemoteClient::RemoteClient(QObject *parent)
 	: AbstractClient(parent), timeRunning(0), lastDataReceived(0), messageInProgress(false), messageLength(0)
@@ -41,8 +44,13 @@ void RemoteClient::slotConnected()
 	setStatus(StatusAwaitingWelcome);
 }
 
-void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentification & /*event*/)
+void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentification &event)
 {
+	if (event.protocol_version() != protocolVersion) {
+		emit protocolVersionMismatch(protocolVersion, event.protocol_version());
+		setStatus(StatusDisconnected);
+		return;
+	}
 	setStatus(StatusLoggingIn);
 	
 	Command_Login cmdLogin;

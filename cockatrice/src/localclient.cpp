@@ -1,6 +1,5 @@
 #include "localclient.h"
 #include "localserverinterface.h"
-#include "protocol.h"
 
 #include "pb/session_commands.pb.h"
 

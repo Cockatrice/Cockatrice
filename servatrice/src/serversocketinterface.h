@@ -28,6 +28,7 @@
 class QTcpSocket;
 class Servatrice;
 class DeckList;
+class ServerInfo_DeckStorage_Folder;
 
 class ServerSocketInterface : public Server_ProtocolHandler
 {
@@ -51,7 +52,7 @@ private:
 	Response::ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, ResponseContainer &rc);
 	int getDeckPathId(int basePathId, QStringList path);
 	int getDeckPathId(const QString &path);
-//	bool deckListHelper(DeckList_Directory *folder);
+	bool deckListHelper(int folderId, ServerInfo_DeckStorage_Folder *folder);
 	Response::ResponseCode cmdDeckList(const Command_DeckList &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, ResponseContainer &rc);
 	void deckDelDirHelper(int basePathId);

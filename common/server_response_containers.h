@@ -16,8 +16,6 @@ class DeckList;
 class GameEvent;
 class GameEventContainer;
 class GameEventContext;
-#include <QDebug>
-static const int protocolVersion = 13;
 
 class GameEventStorageItem {
 public:

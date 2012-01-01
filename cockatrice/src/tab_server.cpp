@@ -11,7 +11,6 @@
 #include <QInputDialog>
 #include "tab_server.h"
 #include "abstractclient.h"
-#include "protocol.h"
 #include "userlist.h"
 #include "userinfobox.h"
 #include <QDebug>

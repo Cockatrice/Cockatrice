@@ -1,7 +1,6 @@
 #include <QDebug>
 #include "rng_abstract.h"
 #include "server_protocolhandler.h"
-#include "protocol.h"
 #include "server_room.h"
 #include "server_card.h"
 #include "server_arrow.h"

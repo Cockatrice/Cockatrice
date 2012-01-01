@@ -5,7 +5,6 @@
 #include "server_cardzone.h"
 #include "server_game.h"
 #include "server_protocolhandler.h"
-#include "protocol.h"
 #include "decklist.h"
 #include "pb/response.pb.h"
 #include "pb/command_move_card.pb.h"

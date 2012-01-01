@@ -25,7 +25,7 @@
 #include <QObject>
 #include <QMutex>
 #include "server_player.h"
-#include "protocol.h"
+#include "server_response_containers.h"
 #include "pb/response.pb.h"
 #include "pb/serverinfo_player.pb.h"
 #include "pb/serverinfo_game.pb.h"

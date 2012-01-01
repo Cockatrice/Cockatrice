@@ -1,8 +1,8 @@
 #include "abstractclient.h"
-#include "protocol.h"
 
 #include "pending_command.h"
 #include "pb/commands.pb.h"
+#include "pb/server_message.pb.h"
 #include "pb/event_server_identification.pb.h"
 #include "pb/event_server_message.pb.h"
 #include "pb/event_server_shutdown.pb.h"

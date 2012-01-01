@@ -23,12 +23,11 @@
 #include <QDebug>
 #include "serversocketinterface.h"
 #include "servatrice.h"
-#include "protocol.h"
 #include "decklist.h"
 #include "server_player.h"
 #include "main.h"
 #include "server_logger.h"
-
+#include "server_response_containers.h"
 #include "pb/commands.pb.h"
 #include "pb/command_deck_upload.pb.h"
 #include "pb/command_deck_download.pb.h"
@@ -40,11 +39,16 @@
 #include "pb/event_server_identification.pb.h"
 #include "pb/event_add_to_list.pb.h"
 #include "pb/event_remove_from_list.pb.h"
+#include "pb/response_deck_list.pb.h"
 #include "pb/response_deck_download.pb.h"
+#include "pb/response_deck_upload.pb.h"
 #include "pb/serverinfo_user.pb.h"
+#include "pb/serverinfo_deckstorage.pb.h"
 
 #include <string>
 #include <iostream>
+
+static const int protocolVersion = 13;
 
 ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent)
 	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), messageInProgress(false)
@@ -260,38 +264,44 @@ int ServerSocketInterface::getDeckPathId(const QString &path)
 {
 	return getDeckPathId(0, path.split("/"));
 }
-/*
-bool ServerSocketInterface::deckListHelper(DeckList_Directory *folder)
+
+bool ServerSocketInterface::deckListHelper(int folderId, ServerInfo_DeckStorage_Folder *folder)
 {
 	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("select id, name from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent and user = :user");
-	query.bindValue(":id_parent", folder->getId());
-	query.bindValue(":user", userInfo->getName());
+	query.bindValue(":id_parent", folderId);
+	query.bindValue(":user", QString::fromStdString(userInfo->name()));
 	if (!servatrice->execSqlQuery(query))
 		return false;
 	
 	while (query.next()) {
-		DeckList_Directory *newFolder = new DeckList_Directory(query.value(1).toString(), query.value(0).toInt());
-		folder->appendItem(newFolder);
-		if (!deckListHelper(newFolder))
+		ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
+		newItem->set_id(query.value(0).toInt());
+		newItem->set_name(query.value(1).toString().toStdString());
+		
+		if (!deckListHelper(newItem->id(), newItem->mutable_folder()))
 			return false;
 	}
 	
 	query.prepare("select id, name, upload_time from " + servatrice->getDbPrefix() + "_decklist_files where id_folder = :id_folder and user = :user");
-	query.bindValue(":id_folder", folder->getId());
-	query.bindValue(":user", userInfo->getName());
+	query.bindValue(":id_folder", folderId);
+	query.bindValue(":user", QString::fromStdString(userInfo->name()));
 	if (!servatrice->execSqlQuery(query))
 		return false;
 	
 	while (query.next()) {
-		DeckList_File *newFile = new DeckList_File(query.value(1).toString(), query.value(0).toInt(), query.value(2).toDateTime());
-		folder->appendItem(newFile);
+		ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
+		newItem->set_id(query.value(0).toInt());
+		newItem->set_name(query.value(1).toString().toStdString());
+		
+		ServerInfo_DeckStorage_File *newFile = newItem->mutable_file();
+		newFile->set_creation_time(query.value(2).toDateTime().toMSecsSinceEpoch());
 	}
 	
 	return true;
 }
-*/
+
 // CHECK AUTHENTICATION!
 // Also check for every function that data belonging to other users cannot be accessed.
 
@@ -302,17 +312,14 @@ Response::ResponseCode ServerSocketInterface::cmdDeckList(const Command_DeckList
 	
 	servatrice->checkSql();
 	
-/*	DeckList_Directory *root = new DeckList_Directory(QString());
-	QSqlQuery query;
-	if (!deckListHelper(root))
+	Response_DeckList *re = new Response_DeckList;
+	ServerInfo_DeckStorage_Folder *root = re->mutable_root();
+	
+	if (!deckListHelper(0, root))
 		return Response::RespContextError;
 	
-	ProtocolResponse *resp = new Response_DeckList(-1, RespOk, root);
-	if (getCompressionSupport())
-		resp->setCompressed(true);
-	bla->setResponse(resp);
-*/	
-	return Response::RespNothing;
+	rc.setResponseExtension(re);
+	return Response::RespOk;
 }
 
 Response::ResponseCode ServerSocketInterface::cmdDeckNewDir(const Command_DeckNewDir &cmd, ResponseContainer & /*rc*/)
@@ -426,8 +433,14 @@ Response::ResponseCode ServerSocketInterface::cmdDeckUpload(const Command_DeckUp
 	query.bindValue(":content", deckStr);
 	servatrice->execSqlQuery(query);
 	
-//	bla->setResponse(new Response_DeckUpload(-1, RespOk, new DeckList_File(deckName, query.lastInsertId().toInt(), QDateTime::currentDateTime())));
-	return Response::RespNothing;
+	Response_DeckUpload *re = new Response_DeckUpload;
+	ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
+	fileInfo->set_id(query.lastInsertId().toInt());
+	fileInfo->set_name(deckName.toStdString());
+	fileInfo->mutable_file()->set_creation_time(QDateTime::currentMSecsSinceEpoch());
+	rc.setResponseExtension(re);
+	
+	return Response::RespOk;
 }
 
 DeckList *ServerSocketInterface::getDeckFromDatabase(int deckId)

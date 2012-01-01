@@ -24,10 +24,10 @@ HEADERS += src/main.h \
 	../common/color.h \
 	../common/serializable_item.h \
 	../common/decklist.h \
-	../common/protocol.h \
 	../common/rng_abstract.h \
 	../common/rng_sfmt.h \
 	../common/server.h \
+	../common/server_response_containers.h \
 	../common/server_arrow.h \
 	../common/server_card.h \
 	../common/server_cardzone.h \
@@ -47,11 +47,11 @@ SOURCES += src/main.cpp \
 	src/passwordhasher.cpp \
 	../common/serializable_item.cpp \
 	../common/decklist.cpp \
-	../common/protocol.cpp \
 	../common/rng_abstract.cpp \
 	../common/rng_sfmt.cpp \
 	../common/sfmt/SFMT.c \
 	../common/server.cpp \
+	../common/server_response_containers.cpp \
 	../common/server_card.cpp \
 	../common/server_cardzone.cpp \
 	../common/server_room.cpp \

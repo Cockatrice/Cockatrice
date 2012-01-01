@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QPair>
 #include "server.h"
-#include "protocol.h"
 #include "pb/response.pb.h"
 #include "pb/server_message.pb.h"
 
@@ -13,6 +12,7 @@ class Server_Card;
 class ServerInfo_User;
 class Server_Room;
 class QTimer;
+class DeckList;
 
 class Message;
 class ServerMessage;
@@ -21,6 +21,8 @@ class Response;
 class SessionEvent;
 class GameEventContainer;
 class RoomEvent;
+class GameEventStorage;
+class ResponseContainer;
 
 class CommandContainer;
 class Command_Ping;

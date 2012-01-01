@@ -25,7 +25,6 @@
 #include "server_room.h"
 #include "serversocketinterface.h"
 #include "serversocketthread.h"
-#include "protocol.h"
 #include "server_logger.h"
 #include "main.h"
 #include "passwordhasher.h"
@@ -298,36 +297,38 @@ bool Servatrice::isInIgnoreList(const QString &whoseList, const QString &who)
 
 ServerInfo_User Servatrice::evalUserQueryResult(const QSqlQuery &query, bool complete)
 {
-	QString name = query.value(0).toString();
-	int is_admin = query.value(1).toInt();
-	QString realName = query.value(2).toString();
-	QString genderStr = query.value(3).toString();
-	QString country = query.value(4).toString();
-	QByteArray avatarBmp;
-	if (complete)
-		avatarBmp = query.value(5).toByteArray();
+	ServerInfo_User result;
 	
-	ServerInfo_User::Gender gender;
+	result.set_name(query.value(0).toString().toStdString());
+	
+	const QString country = query.value(4).toString();
+	if (!country.isEmpty())
+		result.set_country(country.toStdString());
+	
+	if (complete) {
+		const QByteArray avatarBmp = query.value(5).toByteArray();
+		if (avatarBmp.size())
+			result.set_avatar_bmp(avatarBmp.data(), avatarBmp.size());
+	}
+	
+	const QString genderStr = query.value(3).toString();
 	if (genderStr == "m")
-		gender = ServerInfo_User::Male;
+		result.set_gender(ServerInfo_User::Male);
 	else if (genderStr == "f")
-		gender = ServerInfo_User::Female;
-	else
-		gender = ServerInfo_User::GenderUnknown;
+		result.set_gender(ServerInfo_User::Female);
 	
+	const int is_admin = query.value(1).toInt();
 	int userLevel = ServerInfo_User::IsUser | ServerInfo_User::IsRegistered;
 	if (is_admin == 1)
 		userLevel |= ServerInfo_User::IsAdmin | ServerInfo_User::IsModerator;
 	else if (is_admin == 2)
 		userLevel |= ServerInfo_User::IsModerator;
-	
-	ServerInfo_User result;
-	result.set_name(name.toStdString());
 	result.set_user_level(userLevel);
-	result.set_real_name(realName.toStdString());
-	result.set_gender(gender);
-	result.set_country(country.toStdString());
-	result.set_avatar_bmp(avatarBmp.data(), avatarBmp.size());
+	
+	const QString realName = query.value(2).toString();
+	if (!realName.isEmpty())
+		result.set_real_name(realName.toStdString());
+	
 	return result;
 }
 

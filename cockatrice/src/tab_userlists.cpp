@@ -31,8 +31,8 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
 	connect(client, SIGNAL(userLeftEventReceived(const Event_UserLeft &)), this, SLOT(processUserLeftEvent(const Event_UserLeft &)));
 	connect(client, SIGNAL(buddyListReceived(const QList<ServerInfo_User> &)), this, SLOT(buddyListReceived(const QList<ServerInfo_User> &)));
 	connect(client, SIGNAL(ignoreListReceived(const QList<ServerInfo_User> &)), this, SLOT(ignoreListReceived(const QList<ServerInfo_User> &)));
-	connect(client, SIGNAL(addToListEventReceived(const Event_AddToList *)), this, SLOT(processAddToListEvent(const Event_AddToList &)));
-	connect(client, SIGNAL(removeFromListEventReceived(const Event_RemoveFromList *)), this, SLOT(processRemoveFromListEvent(const Event_RemoveFromList &)));
+	connect(client, SIGNAL(addToListEventReceived(const Event_AddToList &)), this, SLOT(processAddToListEvent(const Event_AddToList &)));
+	connect(client, SIGNAL(removeFromListEventReceived(const Event_RemoveFromList &)), this, SLOT(processRemoveFromListEvent(const Event_RemoveFromList &)));
 	
 	PendingCommand *pend = client->prepareSessionCommand(Command_ListUsers());
 	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(processListUsersResponse(const Response &)));

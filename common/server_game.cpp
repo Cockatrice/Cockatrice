@@ -39,7 +39,6 @@
 #include "pb/event_set_active_phase.pb.h"
 #include "pb/serverinfo_playerping.pb.h"
 #include <google/protobuf/descriptor.h>
-#include "protocol.h"
 #include <QTimer>
 #include <QDebug>
 
