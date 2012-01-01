@@ -96,7 +96,7 @@ public:
 	void removeAttachedCard(CardItem *card) { attachedCards.removeAt(attachedCards.indexOf(card)); }
 	const QList<CardItem *> &getAttachedCards() const { return attachedCards; }
 	void resetState();
-	void processCardInfo(ServerInfo_Card *info);
+	void processCardInfo(const ServerInfo_Card &info);
 	void updateCardMenu();
 
 	bool animationEvent();

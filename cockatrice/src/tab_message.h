@@ -6,8 +6,8 @@
 class AbstractClient;
 class ChatView;
 class QLineEdit;
-class Event_Message;
-class ProtocolResponse;
+class Event_UserMessage;
+class Response;
 
 class TabMessage : public Tab {
 	Q_OBJECT
@@ -25,7 +25,7 @@ signals:
 private slots:
 	void sendMessage();
 	void actLeave();
-	void messageSent(ProtocolResponse *response);
+	void messageSent(const Response &response);
 public:
 	TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, const QString &_userName);
 	~TabMessage();
@@ -34,7 +34,7 @@ public:
 	QString getUserName() const { return userName; }
 	QString getTabText() const { return tr("Talking to %1").arg(userName); }
 
-	void processMessageEvent(Event_Message *event);
+	void processUserMessageEvent(const Event_UserMessage &event);
 	void processUserLeft();
 	void processUserJoined();
 };

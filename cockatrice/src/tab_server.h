@@ -14,7 +14,7 @@ class QPushButton;
 
 class Event_ListRooms;
 class Event_ServerMessage;
-class ProtocolResponse;
+class Response;
 class ServerInfo_Room;
 
 class RoomSelector : public QGroupBox {
@@ -26,11 +26,11 @@ private:
 	
 	void joinRoom(int id, bool setCurrent);
 private slots:
-	void processListRoomsEvent(Event_ListRooms *event);
+	void processListRoomsEvent(const Event_ListRooms &event);
 	void joinClicked();
-	void joinFinished(ProtocolResponse *resp);
+	void joinFinished(const Response &resp);
 signals:
-	void roomJoined(ServerInfo_Room *info, bool setCurrent);
+	void roomJoined(const ServerInfo_Room &info, bool setCurrent);
 public:
 	RoomSelector(AbstractClient *_client, QWidget *parent = 0);
 	void retranslateUi();
@@ -39,9 +39,9 @@ public:
 class TabServer : public Tab {
 	Q_OBJECT
 signals:
-	void roomJoined(ServerInfo_Room *info, bool setCurrent);
+	void roomJoined(const ServerInfo_Room &info, bool setCurrent);
 private slots:
-	void processServerMessageEvent(Event_ServerMessage *event);
+	void processServerMessageEvent(const Event_ServerMessage &event);
 private:
 	AbstractClient *client;
 	RoomSelector *roomSelector;

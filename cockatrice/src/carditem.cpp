@@ -14,6 +14,7 @@
 #include "main.h"
 #include "settingscache.h"
 #include "tab_game.h"
+#include "pb/serverinfo_card.pb.h"
 
 CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _revealedCard, QGraphicsItem *parent)
 	: AbstractCardItem(_name, _owner, parent), zone(0), id(_cardid), revealedCard(_revealedCard), attacking(false), facedown(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(0), attachedTo(0)
@@ -373,23 +374,25 @@ void CardItem::resetState()
 	update();
 }
 
-void CardItem::processCardInfo(ServerInfo_Card *info)
+void CardItem::processCardInfo(const ServerInfo_Card &info)
 {
 	counters.clear();
-	const QList<ServerInfo_CardCounter *> &_counterList = info->getCounters();
-	for (int i = 0; i < _counterList.size(); ++i)
-		counters.insert(_counterList[i]->getId(), _counterList[i]->getValue());
+	const int counterListSize = info.counter_list_size();
+	for (int i = 0; i < counterListSize; ++i) {
+		const ServerInfo_CardCounter &counterInfo = info.counter_list(i);
+		counters.insert(counterInfo.id(), counterInfo.value());
+	}
 	
-	setId(info->getId());
-	setName(info->getName());
-	setAttacking(info->getAttacking());
-	setFaceDown(info->getFaceDown());
-	setPT(info->getPT());
-	setAnnotation(info->getAnnotation());
-	setColor(info->getColor());
-	setTapped(info->getTapped());
-	setDestroyOnZoneChange(info->getDestroyOnZoneChange());
-	setDoesntUntap(info->getDoesntUntap());
+	setId(info.id());
+	setName(QString::fromStdString(info.name()));
+	setAttacking(info.attacking());
+	setFaceDown(info.face_down());
+	setPT(QString::fromStdString(info.pt()));
+	setAnnotation(QString::fromStdString(info.annotation()));
+	setColor(QString::fromStdString(info.color()));
+	setTapped(info.tapped());
+	setDestroyOnZoneChange(info.destroy_on_zone_change());
+	setDoesntUntap(info.doesnt_untap());
 }
 
 CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown)

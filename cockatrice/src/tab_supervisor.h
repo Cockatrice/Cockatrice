@@ -18,7 +18,7 @@ class TabUserLists;
 class RoomEvent;
 class GameEventContainer;
 class Event_GameJoined;
-class Event_Message;
+class Event_UserMessage;
 class ServerInfo_Room;
 class ServerInfo_User;
 
@@ -54,7 +54,7 @@ public:
 	TabSupervisor(QWidget *parent = 0);
 	~TabSupervisor();
 	void retranslateUi();
-	void start(AbstractClient *_client, ServerInfo_User *userInfo);
+	void start(AbstractClient *_client, const ServerInfo_User &userInfo);
 	void startLocal(const QList<AbstractClient *> &_clients);
 	void stop();
 	int getGameCount() const { return gameTabs.size(); }
@@ -71,19 +71,19 @@ private slots:
 	void closeButtonPressed();
 	void updateCurrent(int index);
 	void updatePingTime(int value, int max);
-	void gameJoined(Event_GameJoined *event);
-	void localGameJoined(Event_GameJoined *event);
+	void gameJoined(const Event_GameJoined &event);
+	void localGameJoined(const Event_GameJoined &event);
 	void gameLeft(TabGame *tab);
-	void addRoomTab(ServerInfo_Room *info, bool setCurrent);
+	void addRoomTab(const ServerInfo_Room &info, bool setCurrent);
 	void roomLeft(TabRoom *tab);
 	TabMessage *addMessageTab(const QString &userName, bool focus);
 	void processUserLeft(const QString &userName);
 	void processUserJoined(const QString &userName);
 	void talkLeft(TabMessage *tab);
 	void tabUserEvent(bool globalEvent);
-	void processRoomEvent(RoomEvent *event);
-	void processGameEventContainer(GameEventContainer *cont);
-	void processMessageEvent(Event_Message *event);
+	void processRoomEvent(const RoomEvent &event);
+	void processGameEventContainer(const GameEventContainer &cont);
+	void processUserMessageEvent(const Event_UserMessage &event);
 };
 
 #endif

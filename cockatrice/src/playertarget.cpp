@@ -1,7 +1,7 @@
 #include "playertarget.h"
 #include "player.h"
-#include "protocol_datastructures.h"
 #include "pixmapgenerator.h"
+#include "pb/serverinfo_user.pb.h"
 #include <QPainter>
 #include <QPixmapCache>
 #include <QDebug>
@@ -50,8 +50,9 @@ PlayerTarget::PlayerTarget(Player *_owner, QGraphicsItem *parentItem)
 	: ArrowTarget(_owner, parentItem), playerCounter(0)
 {
 	setCacheMode(DeviceCoordinateCache);
-
-	if (!fullPixmap.loadFromData(_owner->getUserInfo()->getAvatarBmp()))
+	
+	const std::string bmp = _owner->getUserInfo()->avatar_bmp();
+	if (!fullPixmap.loadFromData((const uchar *) bmp.data(), bmp.size()))
 		fullPixmap = QPixmap();
 }
 
@@ -62,7 +63,7 @@ QRectF PlayerTarget::boundingRect() const
 
 void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-	ServerInfo_User *info = owner->getUserInfo();
+	const ServerInfo_User *const info = owner->getUserInfo();
 
 	const qreal border = 2;
 
@@ -70,7 +71,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
 	QRectF translatedRect = painter->combinedTransform().mapRect(avatarBoundingRect);
 	QSize translatedSize = translatedRect.size().toSize();
 	QPixmap cachedPixmap;
-	const QString cacheKey = "avatar" + QString::number(translatedSize.width()) + "_" + QString::number(info->getUserLevel()) + "_" + QString::number(fullPixmap.cacheKey());
+	const QString cacheKey = "avatar" + QString::number(translatedSize.width()) + "_" + QString::number(info->user_level()) + "_" + QString::number(fullPixmap.cacheKey());
 #if QT_VERSION >= 0x040600
 	if (!QPixmapCache::find(cacheKey, &cachedPixmap)) {
 #else
@@ -86,7 +87,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
 		
 		QPixmap tempPixmap;
 		if (fullPixmap.isNull())
-			tempPixmap = UserLevelPixmapGenerator::generatePixmap(translatedSize.height(), info->getUserLevel());
+			tempPixmap = UserLevelPixmapGenerator::generatePixmap(translatedSize.height(), info->user_level());
 		else
 			tempPixmap = fullPixmap.scaled(translatedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 		
@@ -107,7 +108,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
 	painter->save();
 	painter->resetTransform();
 	
-	QString name = info->getName();
+	QString name = QString::fromStdString(info->name());
 	if (name.size() > 13)
 		name = name.mid(0, 10) + "...";
 	

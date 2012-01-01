@@ -5,8 +5,9 @@
 #include <QPoint>
 #include <QMap>
 #include "abstractgraphicsitem.h"
-#include <google/protobuf/message.h>
+#include "pb/game_event.pb.h"
 
+namespace google { namespace protobuf { class Message; } }
 class CardDatabase;
 class QMenu;
 class QAction;
@@ -197,7 +198,7 @@ private:
 	void eventDelCounter(const Event_DelCounter &event);
 	void eventDumpZone(const Event_DumpZone &event);
 	void eventStopDumpZone(const Event_StopDumpZone &event);
-	void eventMoveCard(const Event_MoveCard &event, GameEventContext &context);
+	void eventMoveCard(const Event_MoveCard &event, const GameEventContext &context);
 	void eventFlipCard(const Event_FlipCard &event);
 	void eventDestroyCard(const Event_DestroyCard &event);
 	void eventAttachCard(const Event_AttachCard &event);
@@ -255,10 +256,10 @@ public:
 	void setMirrored(bool _mirrored);
 	void processSceneSizeChange(int newPlayerWidth);
 	
-	void processPlayerInfo(ServerInfo_Player *info);
-	void processCardAttachment(ServerInfo_Player *info);
+	void processPlayerInfo(const ServerInfo_Player &info);
+	void processCardAttachment(const ServerInfo_Player &info);
 	
-	void processGameEvent(GameEvent *event, GameEventContext *context);
+	void processGameEvent(GameEvent::GameEventType type, const GameEvent &event, const GameEventContext &context);
 
 	PendingCommand *prepareGameCommand(const ::google::protobuf::Message &cmd);
 	PendingCommand *prepareGameCommand(const QList< const ::google::protobuf::Message * > &cmdList);

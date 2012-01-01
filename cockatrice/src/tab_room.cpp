@@ -15,21 +15,25 @@
 #include "abstractclient.h"
 #include "chatview.h"
 #include "gameselector.h"
-#include "protocol_items.h"
 
-#include "pending_command.h"
-#include <google/protobuf/descriptor.h>
+#include "get_pb_extension.h"
 #include "pb/room_commands.pb.h"
+#include "pb/serverinfo_room.pb.h"
+#include "pb/event_list_games.pb.h"
+#include "pb/event_join_room.pb.h"
+#include "pb/event_leave_room.pb.h"
+#include "pb/event_room_say.pb.h"
+#include "pending_command.h"
 
-TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, ServerInfo_Room *info)
-	: Tab(_tabSupervisor), client(_client), roomId(info->getRoomId()), roomName(info->getName()), ownName(_ownName)
+TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, const ServerInfo_Room &info)
+	: Tab(_tabSupervisor), client(_client), roomId(info.room_id()), roomName(QString::fromStdString(info.name())), ownName(_ownName)
 {
-	const QList<ServerInfo_GameType *> gameTypeList = info->getGameTypeList();
-	for (int i = 0; i < gameTypeList.size(); ++i)
-		gameTypes.insert(gameTypeList[i]->getGameTypeId(), gameTypeList[i]->getDescription());
+	const int gameTypeListSize = info.gametype_list_size();
+	for (int i = 0; i < gameTypeListSize; ++i)
+		gameTypes.insert(info.gametype_list(i).game_type_id(), QString::fromStdString(info.gametype_list(i).description()));
 	
 	QMap<int, GameTypeMap> tempMap;
-	tempMap.insert(info->getRoomId(), gameTypes);
+	tempMap.insert(info.room_id(), gameTypes);
 	gameSelector = new GameSelector(client, tabSupervisor, this, QMap<int, QString>(), tempMap);
 	userList = new UserList(tabSupervisor, client, UserList::RoomList);
 	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
@@ -70,14 +74,14 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
 	retranslateUi();
 	setLayout(hbox);
 	
-	const QList<ServerInfo_User *> users = info->getUserList();
-	for (int i = 0; i < users.size(); ++i)
-		userList->processUserInfo(users[i], true);
+	const int userListSize = info.user_list_size();
+	for (int i = 0; i < userListSize; ++i)
+		userList->processUserInfo(info.user_list(i), true);
 	userList->sortItems();
 	
-	const QList<ServerInfo_Game *> games = info->getGameList();
-	for (int i = 0; i < games.size(); ++i)
-		gameSelector->processGameInfo(games[i]);
+	const int gameListSize = info.game_list_size();
+	for (int i = 0; i < gameListSize; ++i)
+		gameSelector->processGameInfo(info.game_list(i));
 }
 
 TabRoom::~TabRoom()
@@ -116,14 +120,14 @@ void TabRoom::sendMessage()
 	cmd.set_message(sayEdit->text().toStdString());
 	
 	PendingCommand *pend = prepareRoomCommand(cmd);
-	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(sayFinished(ProtocolResponse *)));
+	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(sayFinished(const Response &)));
 	sendRoomCommand(pend);
 	sayEdit->clear();
 }
 
-void TabRoom::sayFinished(ProtocolResponse *response)
+void TabRoom::sayFinished(const Response &response)
 {
-	if (response->getResponseCode() == RespChatFlood)
+	if (response.response_code() == Response::RespChatFlood)
 		chatView->appendMessage(QString(), tr("You are flooding the chat. Please wait a couple of seconds."));
 }
 
@@ -133,39 +137,39 @@ void TabRoom::actLeaveRoom()
 	deleteLater();
 }
 
-void TabRoom::processRoomEvent(RoomEvent *event)
+void TabRoom::processRoomEvent(const RoomEvent &event)
 {
-	switch (event->getItemId()) {
-		case ItemId_Event_ListGames: processListGamesEvent(qobject_cast<Event_ListGames *>(event)); break;
-		case ItemId_Event_JoinRoom: processJoinRoomEvent(qobject_cast<Event_JoinRoom *>(event)); break;
-		case ItemId_Event_LeaveRoom: processLeaveRoomEvent(qobject_cast<Event_LeaveRoom *>(event)); break;
-		case ItemId_Event_RoomSay: processSayEvent(qobject_cast<Event_RoomSay *>(event)); break;
+	switch (static_cast<RoomEvent::RoomEventType>(getPbExtension(event))) {
+		case RoomEvent::LIST_GAMES: processListGamesEvent(event.GetExtension(Event_ListGames::ext)); break;
+		case RoomEvent::JOIN_ROOM: processJoinRoomEvent(event.GetExtension(Event_JoinRoom::ext)); break;
+		case RoomEvent::LEAVE_ROOM: processLeaveRoomEvent(event.GetExtension(Event_LeaveRoom::ext)); break;
+		case RoomEvent::ROOM_SAY: processRoomSayEvent(event.GetExtension(Event_RoomSay::ext)); break;
 		default: ;
 	}
 }
 
-void TabRoom::processListGamesEvent(Event_ListGames *event)
+void TabRoom::processListGamesEvent(const Event_ListGames &event)
 {
-	const QList<ServerInfo_Game *> &gameList = event->getGameList();
-	for (int i = 0; i < gameList.size(); ++i)
-		gameSelector->processGameInfo(gameList[i]);
+	const int gameListSize = event.game_list_size();
+	for (int i = 0; i < gameListSize; ++i)
+		gameSelector->processGameInfo(event.game_list(i));
 }
 
-void TabRoom::processJoinRoomEvent(Event_JoinRoom *event)
+void TabRoom::processJoinRoomEvent(const Event_JoinRoom &event)
 {
-	userList->processUserInfo(event->getUserInfo(), true);
+	userList->processUserInfo(event.user_info(), true);
 	userList->sortItems();
 }
 
-void TabRoom::processLeaveRoomEvent(Event_LeaveRoom *event)
+void TabRoom::processLeaveRoomEvent(const Event_LeaveRoom &event)
 {
-	userList->deleteUser(event->getPlayerName());
+	userList->deleteUser(QString::fromStdString(event.name()));
 }
 
-void TabRoom::processSayEvent(Event_RoomSay *event)
+void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
 {
-	if (!tabSupervisor->getUserListsTab()->getIgnoreList()->userInList(event->getPlayerName()))
-		chatView->appendMessage(event->getPlayerName(), event->getMessage());
+	if (!tabSupervisor->getUserListsTab()->getIgnoreList()->userInList(QString::fromStdString(event.name())))
+		chatView->appendMessage(QString::fromStdString(event.name()), QString::fromStdString(event.message()));
 	emit userEvent(false);
 }
 

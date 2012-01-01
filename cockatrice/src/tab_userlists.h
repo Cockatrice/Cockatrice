@@ -2,6 +2,7 @@
 #define TAB_USERLISTS_H
 
 #include "tab.h"
+#include "pb/serverinfo_user.pb.h"
 
 class AbstractClient;
 class UserList;
@@ -10,7 +11,7 @@ class UserInfoBox;
 class Event_ListRooms;
 class Event_UserJoined;
 class Event_UserLeft;
-class ProtocolResponse;
+class Response;
 class ServerInfo_User;
 class Event_AddToList;
 class Event_RemoveFromList;
@@ -22,13 +23,13 @@ signals:
 	void userLeft(const QString &userName);
 	void userJoined(const QString &userName);
 private slots:
-	void processListUsersResponse(ProtocolResponse *response);
-	void processUserJoinedEvent(Event_UserJoined *event);
-	void processUserLeftEvent(Event_UserLeft *event);
-	void buddyListReceived(const QList<ServerInfo_User *> &_buddyList);
-	void ignoreListReceived(const QList<ServerInfo_User *> &_ignoreList);
-	void processAddToListEvent(Event_AddToList *event);
-	void processRemoveFromListEvent(Event_RemoveFromList *event);
+	void processListUsersResponse(const Response &response);
+	void processUserJoinedEvent(const Event_UserJoined &event);
+	void processUserLeftEvent(const Event_UserLeft &event);
+	void buddyListReceived(const QList<ServerInfo_User> &_buddyList);
+	void ignoreListReceived(const QList<ServerInfo_User> &_ignoreList);
+	void processAddToListEvent(const Event_AddToList &event);
+	void processRemoveFromListEvent(const Event_RemoveFromList &event);
 private:
 	AbstractClient *client;
 	UserList *allUsersList;
@@ -36,7 +37,7 @@ private:
 	UserList *ignoreList;
 	UserInfoBox *userInfoBox;
 public:
-	TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerInfo_User *userInfo, QWidget *parent = 0);
+	TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo, QWidget *parent = 0);
 	void retranslateUi();
 	QString getTabText() const { return tr("User lists"); }
 	UserList *getBuddyList() const { return buddyList; }

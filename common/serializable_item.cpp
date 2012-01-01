@@ -163,21 +163,6 @@ void SerializableItem_Bool::writeElement(QXmlStreamWriter *xml)
 	xml->writeCharacters(data ? "1" : "0");
 }
 
-bool SerializableItem_Color::readElement(QXmlStreamReader *xml)
-{
-	if (xml->isCharacters() && !xml->isWhitespace()) {
-		bool ok;
-		int colorValue = xml->text().toString().toInt(&ok);
-		data = ok ? Color(colorValue) : Color();
-	}
-	return SerializableItem::readElement(xml);
-}
-
-void SerializableItem_Color::writeElement(QXmlStreamWriter *xml)
-{
-	xml->writeCharacters(QString::number(data.getValue()));
-}
-
 bool SerializableItem_DateTime::readElement(QXmlStreamReader *xml)
 {
 	if (xml->isCharacters() && !xml->isWhitespace()) {

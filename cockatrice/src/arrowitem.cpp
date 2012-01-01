@@ -10,7 +10,6 @@
 #include <QDebug>
 
 #include "color.h"
-// XXX
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_create_arrow.pb.h"
 #include "pb/command_delete_arrow.pb.h"
@@ -207,7 +206,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 		CardItem *targetCard = qgraphicsitem_cast<CardItem *>(targetItem);
 
 		Command_CreateArrow cmd;
-		cmd.mutable_arrow_color()->CopyFrom(Color(color).get_color()); // XXX
+		cmd.mutable_arrow_color()->CopyFrom(convertQColorToColor(color));
 		cmd.set_start_player_id(startZone->getPlayer()->getId());
 		cmd.set_start_zone(startZone->getName().toStdString());
 		cmd.set_start_card_id(startCard->getId());

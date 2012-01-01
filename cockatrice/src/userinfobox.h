@@ -6,7 +6,7 @@
 class QLabel;
 class ServerInfo_User;
 class AbstractClient;
-class ProtocolResponse;
+class Response;
 
 class UserInfoBox : public QWidget {
 	Q_OBJECT
@@ -18,9 +18,9 @@ public:
 	UserInfoBox(AbstractClient *_client, bool fullInfo, QWidget *parent = 0, Qt::WindowFlags flags = 0);
 	void retranslateUi();
 private slots:
-	void processResponse(ProtocolResponse *r);
+	void processResponse(const Response &r);
 public slots:
-	void updateInfo(ServerInfo_User *user);
+	void updateInfo(const ServerInfo_User &user);
 	void updateInfo(const QString &userName);
 };
 

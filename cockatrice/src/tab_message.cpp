@@ -5,11 +5,11 @@
 #include <QAction>
 #include "tab_message.h"
 #include "abstractclient.h"
-#include "protocol_items.h"
 #include "chatview.h"
 
 #include "pending_command.h"
 #include "pb/session_commands.pb.h"
+#include "pb/event_user_message.pb.h"
 
 TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, const QString &_userName)
 	: Tab(_tabSupervisor), client(_client), userName(_userName), userOnline(true)
@@ -60,15 +60,15 @@ void TabMessage::sendMessage()
 	cmd.set_message(sayEdit->text().toStdString());
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
-	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(messageSent(ProtocolResponse *)));
+	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(messageSent(const Response &)));
 	client->sendCommand(pend);
 	
 	sayEdit->clear();
 }
 
-void TabMessage::messageSent(ProtocolResponse *response)
+void TabMessage::messageSent(const Response &response)
 {
-	if (response->getResponseCode() == RespInIgnoreList)
+	if (response.response_code() == Response::RespInIgnoreList)
 		chatView->appendMessage(QString(), tr("This user is ignoring you."));
 }
 
@@ -77,9 +77,9 @@ void TabMessage::actLeave()
 	deleteLater();
 }
 
-void TabMessage::processMessageEvent(Event_Message *event)
+void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
 {
-	chatView->appendMessage(event->getSenderName(), event->getText());
+	chatView->appendMessage(QString::fromStdString(event.sender_name()), QString::fromStdString(event.message()));
 	emit userEvent();
 }
 

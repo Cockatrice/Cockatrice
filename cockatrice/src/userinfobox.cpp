@@ -1,13 +1,12 @@
 #include "userinfobox.h"
-#include "protocol_datastructures.h"
 #include "pixmapgenerator.h"
-#include "protocol_items.h"
 #include "abstractclient.h"
 #include <QLabel>
 #include <QGridLayout>
 
 #include "pending_command.h"
 #include "pb/session_commands.pb.h"
+#include "pb/response_get_user_info.pb.h"
 
 UserInfoBox::UserInfoBox(AbstractClient *_client, bool _fullInfo, QWidget *parent, Qt::WindowFlags flags)
 	: QWidget(parent, flags), client(_client), fullInfo(_fullInfo)
@@ -55,19 +54,20 @@ void UserInfoBox::retranslateUi()
 	userLevelLabel1->setText(tr("User level:"));
 }
 
-void UserInfoBox::updateInfo(ServerInfo_User *user)
+void UserInfoBox::updateInfo(const ServerInfo_User &user)
 {
-	int userLevel = user->getUserLevel();
+	const int userLevel = user.user_level();
 	
 	QPixmap avatarPixmap;
-	if (!avatarPixmap.loadFromData(user->getAvatarBmp()))
+	const std::string bmp = user.avatar_bmp();
+	if (!avatarPixmap.loadFromData((const uchar *) bmp.data(), bmp.size()))
 		avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel);
 	avatarLabel->setPixmap(avatarPixmap);
 	
-	nameLabel->setText(user->getName());
-	realNameLabel2->setText(user->getRealName());
-	genderLabel2->setPixmap(GenderPixmapGenerator::generatePixmap(15, user->getGender()));
-	countryLabel2->setPixmap(CountryPixmapGenerator::generatePixmap(15, user->getCountry()));
+	nameLabel->setText(QString::fromStdString(user.name()));
+	realNameLabel2->setText(QString::fromStdString(user.real_name()));
+	genderLabel2->setPixmap(GenderPixmapGenerator::generatePixmap(15, user.gender()));
+	countryLabel2->setPixmap(CountryPixmapGenerator::generatePixmap(15, QString::fromStdString(user.country())));
 	userLevelLabel2->setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel));
 	QString userLevelText;
 	if (userLevel & ServerInfo_User::IsAdmin)
@@ -87,18 +87,15 @@ void UserInfoBox::updateInfo(const QString &userName)
 	cmd.set_user_name(userName.toStdString());
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
-	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(processResponse(ProtocolResponse *)));
+	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(processResponse(const Response &)));
 	
 	client->sendCommand(pend);
 }
 
-void UserInfoBox::processResponse(ProtocolResponse *r)
+void UserInfoBox::processResponse(const Response &r)
 {
-	Response_GetUserInfo *response = qobject_cast<Response_GetUserInfo *>(r);
-	if (!response)
-		return;
-	
-	updateInfo(response->getUserInfo());
+	const Response_GetUserInfo &response = r.GetExtension(Response_GetUserInfo::ext);
+	updateInfo(response.user_info());
 	setFixedSize(sizeHint());
 	show();
 }

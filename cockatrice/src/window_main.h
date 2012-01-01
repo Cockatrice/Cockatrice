@@ -41,7 +41,7 @@ private slots:
 	void serverError(Response::ResponseCode r);
 	void socketError(const QString &errorStr);
 	void protocolVersionMismatch(int localVersion, int remoteVersion);
-	void userInfoReceived(ServerInfo_User *userInfo);
+	void userInfoReceived(const ServerInfo_User &userInfo);
 	void localGameEnded();
 
 	void actConnect();

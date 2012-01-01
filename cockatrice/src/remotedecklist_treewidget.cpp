@@ -2,11 +2,11 @@
 #include <QHeaderView>
 #include <QSortFilterProxyModel>
 #include "remotedecklist_treewidget.h"
-#include "protocol_items.h"
 #include "abstractclient.h"
 
 #include "pending_command.h"
 #include "pb/session_commands.pb.h"
+//#include "pb/response_deck_list.pb.h"
 
 RemoteDeckList_TreeModel::DirectoryNode::DirectoryNode(const QString &_name, RemoteDeckList_TreeModel::DirectoryNode *_parent)
 	: RemoteDeckList_TreeModel::Node(_name, _parent)
@@ -204,19 +204,21 @@ QModelIndex RemoteDeckList_TreeModel::nodeToIndex(Node *node) const
 
 void RemoteDeckList_TreeModel::addFileToTree(DeckList_File *file, DirectoryNode *parent)
 {
-	beginInsertRows(nodeToIndex(parent), parent->size(), parent->size());
+/*	beginInsertRows(nodeToIndex(parent), parent->size(), parent->size());
 	parent->append(new FileNode(file->getName(), file->getId(), file->getUploadTime(), parent));
 	endInsertRows();
+*/
+	
 }
 
 void RemoteDeckList_TreeModel::addFolderToTree(DeckList_Directory *folder, DirectoryNode *parent)
 {
-	addFolderToTree(folder->getName(), folder->getTreeItems(), parent);
+//	addFolderToTree(folder->getName(), folder->getTreeItems(), parent);
 }
 
 void RemoteDeckList_TreeModel::addFolderToTree(const QString &name, const QList<DeckList_TreeItem *> &folderItems, DirectoryNode *parent)
 {
-	DirectoryNode *newItem = new DirectoryNode(name, parent);
+/*	DirectoryNode *newItem = new DirectoryNode(name, parent);
 	beginInsertRows(nodeToIndex(parent), parent->size(), parent->size());
 	parent->append(newItem);
 	endInsertRows();
@@ -228,6 +230,7 @@ void RemoteDeckList_TreeModel::addFolderToTree(const QString &name, const QList<
 		else
 			addFileToTree(dynamic_cast<DeckList_File *>(folderItems[i]), newItem);
 	}
+*/
 }
 
 void RemoteDeckList_TreeModel::removeNode(RemoteDeckList_TreeModel::Node *node)
@@ -242,22 +245,21 @@ void RemoteDeckList_TreeModel::removeNode(RemoteDeckList_TreeModel::Node *node)
 void RemoteDeckList_TreeModel::refreshTree()
 {
 	PendingCommand *pend = client->prepareSessionCommand(Command_DeckList());
-	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(deckListFinished(ProtocolResponse *)));
+	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(deckListFinished(const Response &)));
 	
 	client->sendCommand(pend);
 }
 
-void RemoteDeckList_TreeModel::deckListFinished(ProtocolResponse *r)
+void RemoteDeckList_TreeModel::deckListFinished(const Response &r)
 {
-	Response_DeckList *resp = qobject_cast<Response_DeckList *>(r);
-	if (!resp)
-		return;
+/*	const Response_DeckList &resp = r.GetExtension(Response_DeckList::ext);
 
 	root->clearTree();
 	reset();
 	
 	addFolderToTree(resp->getRoot(), root);
 	emit treeRefreshed();
+*/
 }
 
 RemoteDeckList_TreeWidget::RemoteDeckList_TreeWidget(AbstractClient *_client, QWidget *parent)

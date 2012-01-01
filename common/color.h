@@ -7,32 +7,29 @@
 
 #include "pb/color.pb.h"
 
-class Color {
-private:
-	int value;
-public:
-	Color(const color &other) : value(other.r() * 65536 + other.g() * 256 + other.b()) { } // TEMPORARY HACK
-	Color(int _value = 0) : value(_value) { }
-	Color(int r, int g, int b) : value(r * 65536 + g * 256 + b) { }
-	int getValue() const { return value; }
 #ifdef QT_GUI_LIB
-	Color(const QColor &_color)
-	{
-		value = _color.red() * 65536 + _color.green() * 256 + _color.blue();
-	}
-	QColor getQColor() const
-	{
-		return QColor(value / 65536, (value % 65536) / 256, value % 256);
-	}
+inline QColor convertColorToQColor(const color &c)
+{
+	return QColor(c.r(), c.g(), c.b());
+}
+
+inline color convertQColorToColor(const QColor &c)
+{
+	color result;
+	result.set_r(c.red());
+	result.set_g(c.green());
+	result.set_b(c.blue());
+	return result;
+}
 #endif
-	color get_color() const // HACK
-	{
-		color c;
-		c.set_r(value / 65536);
-		c.set_g((value % 65536) / 256);
-		c.set_b(value % 256);
-		return c;
-	}
-};
+
+inline color makeColor(int r, int g, int b)
+{
+	color result;
+	result.set_r(r);
+	result.set_g(g);
+	result.set_b(b);
+	return result;
+}
 
 #endif

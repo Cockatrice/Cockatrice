@@ -15,7 +15,7 @@ class QCheckBox;
 class QSpinBox;
 class QRadioButton;
 class QPlainTextEdit;
-class ProtocolResponse;
+class Response;
 
 class BanDialog : public QDialog {
 	Q_OBJECT
@@ -30,7 +30,7 @@ private slots:
 	void okClicked();
 	void enableTemporaryEdits(bool enabled);
 public:
-	BanDialog(ServerInfo_User *info, QWidget *parent = 0);
+	BanDialog(const ServerInfo_User &info, QWidget *parent = 0);
 	QString getBanName() const;
 	QString getBanIP() const;
 	int getMinutes() const;
@@ -65,9 +65,9 @@ private:
 	void setUserOnline(QTreeWidgetItem *user, bool online);
 private slots:
 	void userClicked(QTreeWidgetItem *item, int column);
-	void banUser_processUserInfoResponse(ProtocolResponse *resp);
+	void banUser_processUserInfoResponse(const Response &resp);
 	void banUser_dialogFinished();
-	void gamesOfUserReceived(ProtocolResponse *resp);
+	void gamesOfUserReceived(const Response &resp);
 signals:
 	void openMessageDialog(const QString &userName, bool focus);
 	void addBuddy(const QString &userName);
@@ -77,7 +77,7 @@ signals:
 public:
 	UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserListType _type, QWidget *parent = 0);
 	void retranslateUi();
-	void processUserInfo(ServerInfo_User *user, bool online);
+	void processUserInfo(const ServerInfo_User &user, bool online);
 	bool deleteUser(const QString &userName);
 	void setUserOnline(const QString &userName, bool online);
 	bool userInList(const QString &userName) const;

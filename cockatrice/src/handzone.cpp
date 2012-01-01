@@ -3,6 +3,7 @@
 #include "settingscache.h"
 #include "player.h"
 #include "carddragitem.h"
+#include "carditem.h"
 
 #include "pb/command_move_card.pb.h"
 

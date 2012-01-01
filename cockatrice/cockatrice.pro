@@ -5,6 +5,8 @@ INCLUDEPATH += . src ../common
 MOC_DIR = build
 OBJECTS_DIR = build
 RESOURCES = cockatrice.qrc
+QMAKE_CXXFLAGS_RELEASE += -O2
+CPPFLAGS += -O2
 QT += network script svg
 LIBS += -lprotobuf
 unix:!macx {
@@ -84,6 +86,7 @@ HEADERS += src/abstractcounter.h \
  src/priceupdater.h \
  src/soundengine.h \
  src/pending_command.h \
+ 	../common/get_pb_extension.h \
  	../common/color.h \
  	../common/serializable_item.h \
 	../common/decklist.h \
@@ -168,6 +171,7 @@ SOURCES += src/abstractcounter.cpp \
  src/localclient.cpp \
  src/priceupdater.cpp \
  src/soundengine.cpp \
+ 	../common/get_pb_extension.cpp \
  	../common/serializable_item.cpp \
 	../common/decklist.cpp \
 	../common/protocol.cpp \

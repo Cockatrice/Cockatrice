@@ -460,7 +460,8 @@ QList<ServerInfo_Player> Server_Game::getGameState(Server_Player *playerWhosAski
 		ServerInfo_Player playerInfo;
 		playerInfo.mutable_properties()->CopyFrom(player->getProperties());
 		if (player == playerWhosAsking)
-			playerInfo.set_deck_list(player->getDeck()->writeToString_Native().toStdString());
+			if (player->getDeck())
+				playerInfo.set_deck_list(player->getDeck()->writeToString_Native().toStdString());
 		
 		QList<ServerInfo_Arrow *> arrowList;
 		QMapIterator<int, Server_Arrow *> arrowIterator(player->getArrows());
@@ -472,7 +473,7 @@ QList<ServerInfo_Player> Server_Game::getGameState(Server_Player *playerWhosAski
 			arrowInfo->set_start_player_id(arrow->getStartCard()->getZone()->getPlayer()->getPlayerId());
 			arrowInfo->set_start_zone(arrow->getStartCard()->getZone()->getName().toStdString());
 			arrowInfo->set_start_card_id(arrow->getStartCard()->getId());
-			arrowInfo->mutable_arrow_color()->CopyFrom(arrow->getColor().get_color());
+			arrowInfo->mutable_arrow_color()->CopyFrom(arrow->getColor());
 			if (targetCard) {
 				arrowInfo->set_target_player_id(targetCard->getZone()->getPlayer()->getPlayerId());
 				arrowInfo->set_target_zone(targetCard->getZone()->getName().toStdString());
@@ -487,7 +488,7 @@ QList<ServerInfo_Player> Server_Game::getGameState(Server_Player *playerWhosAski
 			ServerInfo_Counter *counterInfo = playerInfo.add_counter_list();
 			counterInfo->set_id(counter->getId());
 			counterInfo->set_name(counter->getName().toStdString());
-			counterInfo->mutable_counter_color()->CopyFrom(counter->getColor().get_color());
+			counterInfo->mutable_counter_color()->CopyFrom(counter->getColor());
 			counterInfo->set_radius(counter->getRadius());
 			counterInfo->set_count(counter->getCount());
 		}

@@ -3,11 +3,11 @@
 #include "zoneviewzone.h"
 #include "player.h"
 #include "carddragitem.h"
-#include "protocol_items.h"
-
-#include "protocol_datastructures.h"
+#include "carditem.h"
 #include "pb/command_dump_zone.pb.h"
 #include "pb/command_move_card.pb.h"
+#include "pb/serverinfo_card.pb.h"
+#include "pb/response_dump_zone.pb.h"
 #include "pending_command.h"
 
 ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, bool _revealZone, QGraphicsItem *parent)
@@ -34,11 +34,11 @@ void ZoneViewZone::paint(QPainter */*painter*/, const QStyleOptionGraphicsItem *
 {
 }
 
-void ZoneViewZone::initializeCards(const QList<ServerInfo_Card *> &cardList)
+void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardList)
 {
 	if (!cardList.isEmpty()) {
 		for (int i = 0; i < cardList.size(); ++i)
-			addCard(new CardItem(player, cardList[i]->getName(), cardList[i]->getId(), revealZone, this), false, i);
+			addCard(new CardItem(player, QString::fromStdString(cardList[i]->name()), cardList[i]->id(), revealZone, this), false, i);
 		reorganizeCards();
 	} else if (!origZone->contentsKnown()) {
 		Command_DumpZone cmd;
@@ -47,7 +47,7 @@ void ZoneViewZone::initializeCards(const QList<ServerInfo_Card *> &cardList)
 		cmd.set_number_cards(numberCards);
 		
 		PendingCommand *pend = player->prepareGameCommand(cmd);
-		connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(zoneDumpReceived(ProtocolResponse *)));
+		connect(pend, SIGNAL(finished(const Response &)), this, SLOT(zoneDumpReceived(const Response &)));
 		player->sendGameCommand(pend);
 	} else {
 		const CardList &c = origZone->getCards();
@@ -60,15 +60,13 @@ void ZoneViewZone::initializeCards(const QList<ServerInfo_Card *> &cardList)
 	}
 }
 
-void ZoneViewZone::zoneDumpReceived(ProtocolResponse *r)
+void ZoneViewZone::zoneDumpReceived(const Response &r)
 {
-	Response_DumpZone *resp = qobject_cast<Response_DumpZone *>(r);
-	if (!resp)
-		return;
-	
-	const QList<ServerInfo_Card *> &respCardList = resp->getZone()->getCardList();
-	for (int i = 0; i < respCardList.size(); i++) {
-		CardItem *card = new CardItem(player, respCardList[i]->getName(), respCardList[i]->getId(), revealZone, this);
+	const Response_DumpZone &resp = r.GetExtension(Response_DumpZone::ext);
+	const int respCardListSize = resp.zone_info().card_list_size();
+	for (int i = 0; i < respCardListSize; ++i) {
+		const ServerInfo_Card &cardInfo = resp.zone_info().card_list(i);
+		CardItem *card = new CardItem(player, QString::fromStdString(cardInfo.name()), cardInfo.id(), revealZone, this);
 		addCard(card, false, i);
 	}
 	

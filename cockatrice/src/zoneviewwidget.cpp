@@ -11,7 +11,6 @@
 #include "zoneviewzone.h"
 #include "player.h"
 #include "gamescene.h"
-#include "protocol_items.h"
 #include "settingscache.h"
 #include "gamescene.h"
 
@@ -56,7 +55,7 @@ void TitleLabel::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	emit mouseMoved(event->scenePos() - buttonDownPos);
 }
 
-ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, bool _revealZone, const QList<ServerInfo_Card *> &cardList)
+ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, bool _revealZone, const QList<const ServerInfo_Card *> &cardList)
 	: QGraphicsWidget(0, Qt::Tool | Qt::FramelessWindowHint), player(_player)
 {
 	setAcceptHoverEvents(true);

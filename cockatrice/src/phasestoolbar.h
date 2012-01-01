@@ -4,8 +4,8 @@
 #include <QFrame>
 #include <QList>
 #include <QGraphicsObject>
-#include <google/protobuf/message.h>
 
+namespace google { namespace protobuf { class Message; } }
 class Player;
 class GameCommand;
 

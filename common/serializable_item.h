@@ -122,20 +122,6 @@ public:
 	bool isEmpty() const { return data == false; }
 };
 
-class SerializableItem_Color : public SerializableItem {
-private:
-	Color data;
-protected:
-	bool readElement(QXmlStreamReader *xml);
-	void writeElement(QXmlStreamWriter *xml);
-public:
-	SerializableItem_Color(const QString &_itemType, const Color &_data = Color())
-		: SerializableItem(_itemType), data(_data) { }
-	const Color &getData() { return data; }
-	void setData(const Color &_data) { data = _data; }
-	bool isEmpty() const { return data.getValue() == 0; }
-};
-
 class SerializableItem_DateTime : public SerializableItem {
 private:
 	QDateTime data;

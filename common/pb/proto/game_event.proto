@@ -31,6 +31,6 @@ message GameEvent {
 		DUMP_ZONE = 2018;
 		STOP_DUMP_ZONE = 2019;
 	}
-	optional sint32 player_id = 1;
+	optional sint32 player_id = 1 [default = -1];
 	extensions 100 to max;
 }

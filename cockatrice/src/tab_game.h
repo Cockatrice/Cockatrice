@@ -4,8 +4,8 @@
 #include <QMap>
 #include <QPushButton>
 #include "tab.h"
-#include <google/protobuf/message.h>
 
+namespace google { namespace protobuf { class Message; } }
 class AbstractClient;
 class CardDatabase;
 class GameView;
@@ -22,11 +22,12 @@ class ZoneViewLayout;
 class ZoneViewWidget;
 class PhasesToolbar;
 class PlayerListWidget;
-class ProtocolResponse;
+class Response;
 class GameEventContainer;
 class GameEventContext;
 class GameCommand;
 class CommandContainer;
+class Event_GameJoined;
 class Event_GameStateChanged;
 class Event_PlayerPropertiesChanged;
 class Event_Join;
@@ -37,7 +38,7 @@ class Event_GameStart;
 class Event_SetActivePlayer;
 class Event_SetActivePhase;
 class Event_Ping;
-class Event_Say;
+class Event_GameSay;
 class Event_Kicked;
 class Player;
 class CardZone;
@@ -73,7 +74,7 @@ private slots:
 	void loadLocalDeck();
 	void loadRemoteDeck();
 	void readyStart();
-	void deckSelectFinished(ProtocolResponse *r);
+	void deckSelectFinished(const Response &r);
 	void sideboardPlanChanged();
 signals:
 	void newCardAdded(AbstractCardItem *card);
@@ -123,31 +124,31 @@ private:
 	QAction *aConcede, *aLeaveGame, *aNextPhase, *aNextTurn, *aRemoveLocalArrows;
 	QList<QAction *> phaseActions;
 
-	Player *addPlayer(int playerId, ServerInfo_User *info);
+	Player *addPlayer(int playerId, const ServerInfo_User &info);
 
 	void startGame(bool resuming);
 	void stopGame();
 
-	void eventSpectatorSay(Event_Say *event, GameEventContext *context);
-	void eventSpectatorLeave(Event_Leave *event, GameEventContext *context);
+	void eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, const GameEventContext &context);
+	void eventSpectatorLeave(const Event_Leave &event, int eventPlayerId, const GameEventContext &context);
 	
-	void eventGameStateChanged(Event_GameStateChanged *event, GameEventContext *context);
-	void eventPlayerPropertiesChanged(Event_PlayerPropertiesChanged *event, GameEventContext *context);
-	void eventJoin(Event_Join *event, GameEventContext *context);
-	void eventLeave(Event_Leave *event, GameEventContext *context);
-	void eventKicked(Event_Kicked *event, GameEventContext *context);
-	void eventGameHostChanged(Event_GameHostChanged *event, GameEventContext *context);
-	void eventGameClosed(Event_GameClosed *event, GameEventContext *context);
+	void eventGameStateChanged(const Event_GameStateChanged &event, int eventPlayerId, const GameEventContext &context);
+	void eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &event, int eventPlayerId, const GameEventContext &context);
+	void eventJoin(const Event_Join &event, int eventPlayerId, const GameEventContext &context);
+	void eventLeave(const Event_Leave &event, int eventPlayerId, const GameEventContext &context);
+	void eventKicked(const Event_Kicked &event, int eventPlayerId, const GameEventContext &context);
+	void eventGameHostChanged(const Event_GameHostChanged &event, int eventPlayerId, const GameEventContext &context);
+	void eventGameClosed(const Event_GameClosed &event, int eventPlayerId, const GameEventContext &context);
 	Player *setActivePlayer(int id);
-	void eventSetActivePlayer(Event_SetActivePlayer *event, GameEventContext *context);
+	void eventSetActivePlayer(const Event_SetActivePlayer &event, int eventPlayerId, const GameEventContext &context);
 	void setActivePhase(int phase);
-	void eventSetActivePhase(Event_SetActivePhase *event, GameEventContext *context);
-	void eventPing(Event_Ping *event, GameEventContext *context);
+	void eventSetActivePhase(const Event_SetActivePhase &event, int eventPlayerId, const GameEventContext &context);
+	void eventPing(const Event_Ping &event, int eventPlayerId, const GameEventContext &context);
 signals:
 	void gameClosing(TabGame *tab);
 	void playerAdded(Player *player);
 	void playerRemoved(Player *player);
-	void containerProcessingStarted(GameEventContext *context);
+	void containerProcessingStarted(const GameEventContext &context);
 	void containerProcessingDone();
 	void openMessageDialog(const QString &userName, bool focus);
 private slots:
@@ -162,7 +163,7 @@ private slots:
 	void actNextPhase();
 	void actNextTurn();
 public:
-	TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, int _gameId, const QString &_gameDescription, int _hostId, int _localPlayerId, bool _spectator, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, bool _resuming);
+	TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event);
 	~TabGame();
 	void retranslateUi();
 	void closeRequest();
@@ -177,7 +178,7 @@ public:
 	Player *getActiveLocalPlayer() const;
 	AbstractClient *getClientForPlayer(int playerId) const;
 
-	void processGameEventContainer(GameEventContainer *cont, AbstractClient *client);
+	void processGameEventContainer(const GameEventContainer &cont, AbstractClient *client);
 	PendingCommand *prepareGameCommand(const ::google::protobuf::Message &cmd);
 	PendingCommand *prepareGameCommand(const QList< const ::google::protobuf::Message * > &cmdList);
 public slots:

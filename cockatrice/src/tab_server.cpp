@@ -12,13 +12,15 @@
 #include "tab_server.h"
 #include "abstractclient.h"
 #include "protocol.h"
-#include "protocol_items.h"
 #include "userlist.h"
 #include "userinfobox.h"
 #include <QDebug>
 
 #include "pending_command.h"
 #include "pb/session_commands.pb.h"
+#include "pb/event_list_rooms.pb.h"
+#include "pb/event_server_message.pb.h"
+#include "pb/response_join_room.pb.h"
 
 RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent)
 	: QGroupBox(parent), client(_client)
@@ -44,7 +46,7 @@ RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent)
 	retranslateUi();
 	setLayout(vbox);
 	
-	connect(client, SIGNAL(listRoomsEventReceived(Event_ListRooms *)), this, SLOT(processListRoomsEvent(Event_ListRooms *)));
+	connect(client, SIGNAL(listRoomsEventReceived(const Event_ListRooms &)), this, SLOT(processListRoomsEvent(const Event_ListRooms &)));
 	client->sendCommand(client->prepareSessionCommand(Command_ListRooms()));
 }
 
@@ -62,33 +64,33 @@ void RoomSelector::retranslateUi()
 	header->setTextAlignment(3, Qt::AlignRight);
 }
 
-void RoomSelector::processListRoomsEvent(Event_ListRooms *event)
+void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
 {
-	const QList<ServerInfo_Room *> &roomsToUpdate = event->getRoomList();
-	for (int i = 0; i < roomsToUpdate.size(); ++i) {
-		ServerInfo_Room *room = roomsToUpdate[i];
+	const int roomListSize = event.room_list_size();
+	for (int i = 0; i < roomListSize; ++i) {
+		const ServerInfo_Room &room = event.room_list(i);
 		
 		for (int j = 0; j < roomList->topLevelItemCount(); ++j) {
 		  	QTreeWidgetItem *twi = roomList->topLevelItem(j);
-			if (twi->data(0, Qt::UserRole).toInt() == room->getRoomId()) {
-				twi->setData(0, Qt::DisplayRole, room->getName());
-				twi->setData(1, Qt::DisplayRole, room->getDescription());
-				twi->setData(2, Qt::DisplayRole, room->getPlayerCount());
-				twi->setData(3, Qt::DisplayRole, room->getGameCount());
+			if (twi->data(0, Qt::UserRole).toInt() == room.room_id()) {
+				twi->setData(0, Qt::DisplayRole, QString::fromStdString(room.name()));
+				twi->setData(1, Qt::DisplayRole, QString::fromStdString(room.description()));
+				twi->setData(2, Qt::DisplayRole, room.player_count());
+				twi->setData(3, Qt::DisplayRole, room.game_count());
 				return;
 			}
 		}
 		QTreeWidgetItem *twi = new QTreeWidgetItem;
-		twi->setData(0, Qt::UserRole, room->getRoomId());
-		twi->setData(0, Qt::DisplayRole, room->getName());
-		twi->setData(1, Qt::DisplayRole, room->getDescription());
-		twi->setData(2, Qt::DisplayRole, room->getPlayerCount());
-		twi->setData(3, Qt::DisplayRole, room->getGameCount());
+		twi->setData(0, Qt::UserRole, room.room_id());
+		twi->setData(0, Qt::DisplayRole, QString::fromStdString(room.name()));
+		twi->setData(1, Qt::DisplayRole, QString::fromStdString(room.description()));
+		twi->setData(2, Qt::DisplayRole, room.player_count());
+		twi->setData(3, Qt::DisplayRole, room.game_count());
 		twi->setTextAlignment(2, Qt::AlignRight);
 		twi->setTextAlignment(3, Qt::AlignRight);
 		roomList->addTopLevelItem(twi);
-		if (room->getAutoJoin())
-			joinRoom(room->getRoomId(), false);
+		if (room.auto_join())
+			joinRoom(room.room_id(), false);
 	}
 }
 
@@ -99,7 +101,7 @@ void RoomSelector::joinRoom(int id, bool setCurrent)
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
 	pend->setExtraData(setCurrent);
-	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(joinFinished(ProtocolResponse *)));
+	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(joinFinished(const Response &)));
 	
 	client->sendCommand(pend);
 }
@@ -113,15 +115,13 @@ void RoomSelector::joinClicked()
 	joinRoom(twi->data(0, Qt::UserRole).toInt(), true);
 }
 
-void RoomSelector::joinFinished(ProtocolResponse *r)
+void RoomSelector::joinFinished(const Response &r)
 {
-	if (r->getResponseCode() != RespOk)
+	if (r.response_code() != Response::RespOk)
 		return;
-	Response_JoinRoom *resp = qobject_cast<Response_JoinRoom *>(r);
-	if (!resp)
-		return;
+	const Response_JoinRoom &resp = r.GetExtension(Response_JoinRoom::ext);
 	
-	emit roomJoined(resp->getRoomInfo(), static_cast<PendingCommand *>(sender())->getExtraData().toBool());
+	emit roomJoined(resp.room_info(), static_cast<PendingCommand *>(sender())->getExtraData().toBool());
 }
 
 TabServer::TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent)
@@ -131,9 +131,9 @@ TabServer::TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWi
 	serverInfoBox = new QTextBrowser;
 	serverInfoBox->setOpenExternalLinks(true);
 	
-	connect(roomSelector, SIGNAL(roomJoined(ServerInfo_Room *, bool)), this, SIGNAL(roomJoined(ServerInfo_Room *, bool)));
+	connect(roomSelector, SIGNAL(roomJoined(const ServerInfo_Room &, bool)), this, SIGNAL(roomJoined(const ServerInfo_Room &, bool)));
 	
-	connect(client, SIGNAL(serverMessageEventReceived(Event_ServerMessage *)), this, SLOT(processServerMessageEvent(Event_ServerMessage *)));
+	connect(client, SIGNAL(serverMessageEventReceived(const Event_ServerMessage &)), this, SLOT(processServerMessageEvent(const Event_ServerMessage &)));
 	
 	QVBoxLayout *vbox = new QVBoxLayout;
 	vbox->addWidget(roomSelector);
@@ -147,8 +147,8 @@ void TabServer::retranslateUi()
 	roomSelector->retranslateUi();
 }
 
-void TabServer::processServerMessageEvent(Event_ServerMessage *event)
+void TabServer::processServerMessageEvent(const Event_ServerMessage &event)
 {
-	serverInfoBox->setHtml(event->getMessage());
+	serverInfoBox->setHtml(QString::fromStdString(event.message()));
 	emit userEvent();
 }

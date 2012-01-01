@@ -4,6 +4,7 @@
 #include "zoneviewzone.h"
 #include "phasestoolbar.h"
 #include "settingscache.h"
+#include "carditem.h"
 #include <math.h>
 #include <QAction>
 #include <QGraphicsSceneMouseEvent>
@@ -127,7 +128,7 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
 	item->setPos(50, 50);
 }
 
-void GameScene::addRevealedZoneView(Player *player, CardZone *zone, const QList<ServerInfo_Card *> &cardList)
+void GameScene::addRevealedZoneView(Player *player, CardZone *zone, const QList<const ServerInfo_Card *> &cardList)
 {
 	ZoneViewWidget *item = new ZoneViewWidget(player, zone, -2, true, cardList);
 	zoneViews.append(item);

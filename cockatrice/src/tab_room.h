@@ -4,8 +4,8 @@
 #include "tab.h"
 #include <QGroupBox>
 #include <QMap>
-#include <google/protobuf/message.h>
 
+namespace google { namespace protobuf { class Message; } }
 class AbstractClient;
 class UserList;
 class QLabel;
@@ -20,8 +20,8 @@ class Event_ListGames;
 class Event_JoinRoom;
 class Event_LeaveRoom;
 class Event_RoomSay;
-class ProtocolResponse;
 class GameSelector;
+class Response;
 class PendingCommand;
 
 class TabRoom : public Tab {
@@ -48,18 +48,18 @@ signals:
 private slots:
 	void sendMessage();
 	void actLeaveRoom();
-	void sayFinished(ProtocolResponse *response);
+	void sayFinished(const Response &response);
 	
-	void processListGamesEvent(Event_ListGames *event);
-	void processJoinRoomEvent(Event_JoinRoom *event);
-	void processLeaveRoomEvent(Event_LeaveRoom *event);
-	void processSayEvent(Event_RoomSay *event);
+	void processListGamesEvent(const Event_ListGames &event);
+	void processJoinRoomEvent(const Event_JoinRoom &event);
+	void processLeaveRoomEvent(const Event_LeaveRoom &event);
+	void processRoomSayEvent(const Event_RoomSay &event);
 public:
-	TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, ServerInfo_Room *info);
+	TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, const ServerInfo_Room &info);
 	~TabRoom();
 	void retranslateUi();
 	void closeRequest();
-	void processRoomEvent(RoomEvent *event);
+	void processRoomEvent(const RoomEvent &event);
 	int getRoomId() const { return roomId; }
 	const QMap<int, QString> &getGameTypes() const { return gameTypes; }
 	QString getChannelName() const { return roomName; }

@@ -14,6 +14,7 @@
 #include "pb/event_user_joined.pb.h"
 #include "pb/event_user_left.pb.h"
 #include "pb/event_game_joined.pb.h"
+#include "get_pb_extension.h"
 #include <google/protobuf/descriptor.h>
 
 AbstractClient::AbstractClient(QObject *parent)
@@ -42,15 +43,7 @@ void AbstractClient::processProtocolItem(const ServerMessage &item)
 		}
 		case ServerMessage::SESSION_EVENT: {
 			const SessionEvent &event = item.session_event();
-			std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
-			event.GetReflection()->ListFields(event, &fieldList);
-			int num = 0;
-			for (unsigned int j = 0; j < fieldList.size(); ++j)
-				if (fieldList[j]->is_extension()) {
-					num = fieldList[j]->number();
-					break;
-				}
-			switch ((SessionEvent::SessionEventType) num) {
+			switch ((SessionEvent::SessionEventType) getPbExtension(event)) {
 				case SessionEvent::SERVER_IDENTIFICATION: emit serverIdentificationEventReceived(event.GetExtension(Event_ServerIdentification::ext)); break;
 				case SessionEvent::SERVER_MESSAGE: emit serverMessageEventReceived(event.GetExtension(Event_ServerMessage::ext)); break;
 				case SessionEvent::SERVER_SHUTDOWN: emit serverShutdownEventReceived(event.GetExtension(Event_ServerShutdown::ext)); break;

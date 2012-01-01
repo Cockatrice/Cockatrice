@@ -8,6 +8,7 @@
 #include "arrowitem.h"
 #include "carddragitem.h"
 #include "carddatabase.h"
+#include "carditem.h"
 
 #include "pb/command_move_card.pb.h"
 #include "pb/command_set_card_attr.pb.h"

@@ -5,7 +5,7 @@
 #include <QGraphicsLayoutItem>
 
 class ZoneViewWidget;
-class ProtocolResponse;
+class Response;
 class ServerInfo_Card;
 
 class ZoneViewZone : public SelectZone, public QGraphicsLayoutItem {
@@ -23,7 +23,7 @@ public:
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	void reorganizeCards();
-	void initializeCards(const QList<ServerInfo_Card *> &cardList = QList<ServerInfo_Card *>());
+	void initializeCards(const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>());
 	void removeCard(int position);
 	int getNumberCards() const { return numberCards; }
 	void setGeometry(const QRectF &rect);
@@ -32,7 +32,7 @@ public slots:
 	void setSortByName(int _sortByName);
 	void setSortByType(int _sortByType);
 private slots:
-	void zoneDumpReceived(ProtocolResponse *r);
+	void zoneDumpReceived(const Response &r);
 signals:
 	void beingDeleted();
 	void optimumRectChanged();

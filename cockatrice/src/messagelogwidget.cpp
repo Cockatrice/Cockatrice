@@ -1,6 +1,7 @@
 #include "messagelogwidget.h"
 #include "player.h"
 #include "cardzone.h"
+#include "carditem.h"
 #include "soundengine.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/context_move_card.pb.h"

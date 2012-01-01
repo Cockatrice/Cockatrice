@@ -5,7 +5,7 @@
 #include <QDateTime>
 #include <QTreeView>
 
-class ProtocolResponse;
+class Response;
 class AbstractClient;
 class QSortFilterProxyModel;
 class DeckList_File;
@@ -64,7 +64,7 @@ private:
 signals:
 	void treeRefreshed();
 private slots:
-	void deckListFinished(ProtocolResponse *r);
+	void deckListFinished(const Response &r);
 public:
 	RemoteDeckList_TreeModel(AbstractClient *_client, QObject *parent = 0);
 	~RemoteDeckList_TreeModel();

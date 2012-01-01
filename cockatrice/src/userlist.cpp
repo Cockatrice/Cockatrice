@@ -4,7 +4,6 @@
 #include "abstractclient.h"
 #include "pixmapgenerator.h"
 #include "userinfobox.h"
-#include "protocol_items.h"
 #include "gameselector.h"
 #include <QHeaderView>
 #include <QVBoxLayout>
@@ -23,18 +22,20 @@
 #include "pending_command.h"
 #include "pb/session_commands.pb.h"
 #include "pb/moderator_commands.pb.h"
+#include "pb/response_get_games_of_user.pb.h"
+#include "pb/response_get_user_info.pb.h"
 
-BanDialog::BanDialog(ServerInfo_User *info, QWidget *parent)
+BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent)
 	: QDialog(parent)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	
 	nameBanCheckBox = new QCheckBox(tr("ban &user name"));
 	nameBanCheckBox->setChecked(true);
-	nameBanEdit = new QLineEdit(info->getName());
+	nameBanEdit = new QLineEdit(QString::fromStdString(info.name()));
 	ipBanCheckBox = new QCheckBox(tr("ban &IP address"));
 	ipBanCheckBox->setChecked(true);
-	ipBanEdit = new QLineEdit(info->getAddress());
+	ipBanEdit = new QLineEdit(QString::fromStdString(info.address()));
 	QGridLayout *banTypeGrid = new QGridLayout;
 	banTypeGrid->addWidget(nameBanCheckBox, 0, 0);
 	banTypeGrid->addWidget(nameBanEdit, 0, 1);
@@ -211,12 +212,12 @@ void UserList::retranslateUi()
 	updateCount();
 }
 
-void UserList::processUserInfo(ServerInfo_User *user, bool online)
+void UserList::processUserInfo(const ServerInfo_User &user, bool online)
 {
 	QTreeWidgetItem *item = 0;
 	for (int i = 0; i < userTree->topLevelItemCount(); ++i) {
 		QTreeWidgetItem *temp = userTree->topLevelItem(i);
-		if (temp->data(2, Qt::UserRole) == user->getName()) {
+		if (temp->data(2, Qt::UserRole) == QString::fromStdString(user.name())) {
 			item = temp;
 			break;
 		}
@@ -228,11 +229,11 @@ void UserList::processUserInfo(ServerInfo_User *user, bool online)
 			++onlineCount;
 		updateCount();
 	}
-	item->setData(0, Qt::UserRole, user->getUserLevel());
-	item->setIcon(0, QIcon(UserLevelPixmapGenerator::generatePixmap(12, user->getUserLevel())));
-	item->setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(12, user->getCountry())));
-	item->setData(2, Qt::UserRole, user->getName());
-	item->setData(2, Qt::DisplayRole, user->getName());
+	item->setData(0, Qt::UserRole, user.user_level());
+	item->setIcon(0, QIcon(UserLevelPixmapGenerator::generatePixmap(12, user.user_level())));
+	item->setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(12, QString::fromStdString(user.country()))));
+	item->setData(2, Qt::UserRole, QString::fromStdString(user.name()));
+	item->setData(2, Qt::DisplayRole, QString::fromStdString(user.name()));
 	
 	item->setData(0, Qt::UserRole + 1, online);
 	if (online)
@@ -294,43 +295,42 @@ void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
 	emit openMessageDialog(item->data(2, Qt::UserRole).toString(), true);
 }
 
-void UserList::gamesOfUserReceived(ProtocolResponse *resp)
+void UserList::gamesOfUserReceived(const Response &resp)
 {
-	Response_GetGamesOfUser *response = qobject_cast<Response_GetGamesOfUser *>(resp);
-	if (!response)
-		return;
+	const Response_GetGamesOfUser &response = resp.GetExtension(Response_GetGamesOfUser::ext);
 	const Command_GetGamesOfUser &cmd = static_cast<const Command_GetGamesOfUser &>(static_cast<PendingCommand *>(sender())->getCommandContainer().session_command(0).GetExtension(Command_GetGamesOfUser::ext));
 	
 	QMap<int, GameTypeMap> gameTypeMap;
 	QMap<int, QString> roomMap;
-	const QList<ServerInfo_Room *> roomList = response->getRoomList();
-	for (int i = 0; i < roomList.size(); ++i) {
-		roomMap.insert(roomList[i]->getRoomId(), roomList[i]->getName());
-		const QList<ServerInfo_GameType *> gameTypeList = roomList[i]->getGameTypeList();
+	const int roomListSize = response.room_list_size();
+	for (int i = 0; i < roomListSize; ++i) {
+		const ServerInfo_Room &roomInfo = response.room_list(i);
+		roomMap.insert(roomInfo.room_id(), QString::fromStdString(roomInfo.name()));
 		GameTypeMap tempMap;
-		for (int j = 0; j < gameTypeList.size(); ++j)
-			tempMap.insert(gameTypeList[j]->getGameTypeId(), gameTypeList[j]->getDescription());
-		gameTypeMap.insert(roomList[i]->getRoomId(), tempMap);
+		const int gameTypeListSize = roomInfo.gametype_list_size();
+		for (int j = 0; j < gameTypeListSize; ++j) {
+			const ServerInfo_GameType &gameTypeInfo = roomInfo.gametype_list(j);
+			tempMap.insert(gameTypeInfo.game_type_id(), QString::fromStdString(gameTypeInfo.description()));
+		}
+		gameTypeMap.insert(roomInfo.room_id(), tempMap);
 	}
 	
 	GameSelector *selector = new GameSelector(client, tabSupervisor, 0, roomMap, gameTypeMap);
-	const QList<ServerInfo_Game *> gameList = response->getGameList();
-	for (int i = 0; i < gameList.size(); ++i)
-		selector->processGameInfo(gameList[i]);
+	const int gameListSize = response.game_list_size();
+	for (int i = 0; i < gameListSize; ++i)
+		selector->processGameInfo(response.game_list(i));
 	
 	selector->setWindowTitle(tr("%1's games").arg(QString::fromStdString(cmd.user_name())));
 	selector->setAttribute(Qt::WA_DeleteOnClose);
 	selector->show();
 }
 
-void UserList::banUser_processUserInfoResponse(ProtocolResponse *r)
+void UserList::banUser_processUserInfoResponse(const Response &r)
 {
-	Response_GetUserInfo *response = qobject_cast<Response_GetUserInfo *>(r);
-	if (!response)
-		return;
+	const Response_GetUserInfo &response = r.GetExtension(Response_GetUserInfo::ext);
 	
 	// The dialog needs to be non-modal in order to not block the event queue of the client.
-	BanDialog *dlg = new BanDialog(response->getUserInfo(), this);
+	BanDialog *dlg = new BanDialog(response.user_info(), this);
 	connect(dlg, SIGNAL(accepted()), this, SLOT(banUser_dialogFinished()));
 	dlg->show();
 }
@@ -385,7 +385,7 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 		menu->addSeparator();
 		menu->addAction(aBan);
 	}
-	if (userName == tabSupervisor->getUserInfo()->getName()) {
+	if (userName == QString::fromStdString(tabSupervisor->getUserInfo()->name())) {
 		aChat->setEnabled(false);
 		aAddToBuddyList->setEnabled(false);
 		aRemoveFromBuddyList->setEnabled(false);

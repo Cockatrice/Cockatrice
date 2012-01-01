@@ -99,14 +99,14 @@ void Server_Player::setupZones()
 	addZone(new Server_CardZone(this, "grave", false, ServerInfo_Zone::PublicZone));
 	addZone(new Server_CardZone(this, "rfg", false, ServerInfo_Zone::PublicZone));
 
-	addCounter(new Server_Counter(0, "life", Color(255, 255, 255), 25, 20));
-	addCounter(new Server_Counter(1, "w", Color(255, 255, 150), 20, 0));
-	addCounter(new Server_Counter(2, "u", Color(150, 150, 255), 20, 0));
-	addCounter(new Server_Counter(3, "b", Color(150, 150, 150), 20, 0));
-	addCounter(new Server_Counter(4, "r", Color(250, 150, 150), 20, 0));
-	addCounter(new Server_Counter(5, "g", Color(150, 255, 150), 20, 0));
-	addCounter(new Server_Counter(6, "x", Color(255, 255, 255), 20, 0));
-	addCounter(new Server_Counter(7, "storm", Color(255, 255, 255), 20, 0));
+	addCounter(new Server_Counter(0, "life", makeColor(255, 255, 255), 25, 20));
+	addCounter(new Server_Counter(1, "w", makeColor(255, 255, 150), 20, 0));
+	addCounter(new Server_Counter(2, "u", makeColor(150, 150, 255), 20, 0));
+	addCounter(new Server_Counter(3, "b", makeColor(150, 150, 150), 20, 0));
+	addCounter(new Server_Counter(4, "r", makeColor(250, 150, 150), 20, 0));
+	addCounter(new Server_Counter(5, "g", makeColor(150, 255, 150), 20, 0));
+	addCounter(new Server_Counter(6, "x", makeColor(255, 255, 255), 20, 0));
+	addCounter(new Server_Counter(7, "storm", makeColor(255, 255, 255), 20, 0));
 
 	initialCards = 7;
 
@@ -467,7 +467,8 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 			Event_MoveCard eventOthers;
 			eventOthers.set_start_zone(startzone->getName().toStdString());
 			eventOthers.set_target_player_id(targetzone->getPlayer()->getPlayerId());
-			eventOthers.set_target_zone(targetzone->getName().toStdString());
+			if (startzone != targetzone)
+				eventOthers.set_target_zone(targetzone->getName().toStdString());
 			eventOthers.set_x(newX);
 			eventOthers.set_y(y);
 			eventOthers.set_face_down(thisCardProperties->face_down());

@@ -532,7 +532,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 	
 	server->serverMutex.lock();
 	
-	QList<ServerInfo_Game *> gameList;
 	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
 	QMutexLocker gameListLocker(&gameListMutex);
 	while (roomIterator.hasNext()) {
@@ -613,8 +612,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_G
 		return Response::RespNameNotFound;
 	
 	Response_GetGamesOfUser *re = new Response_GetGamesOfUser;
-	QList<ServerInfo_Room *> roomList;
-	QList<ServerInfo_Game *> gameList;
 	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
 	while (roomIterator.hasNext()) {
 		Server_Room *room = roomIterator.next().value();
@@ -1574,7 +1571,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdDumpZone(const Command_DumpZon
 	zoneInfo->set_with_coords(zone->hasCoords());
 	zoneInfo->set_card_count(numberCards < zone->cards.size() ? zone->cards.size() : numberCards);
 	
-	QList<ServerInfo_Card *> respCardList;
 	for (int i = 0; (i < zone->cards.size()) && (i < numberCards || numberCards == -1); ++i) {
 		Server_Card *card = zone->cards[i];
 		QString displayedName = card->getFaceDown() ? QString() : card->getName();
@@ -1595,7 +1591,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdDumpZone(const Command_DumpZon
 			cardInfo->set_destroy_on_zone_change(card->getDestroyOnZoneChange());
 			cardInfo->set_doesnt_untap(card->getDoesntUntap());
 			
-			QList<ServerInfo_CardCounter *> cardCounterList;
 			QMapIterator<int, int> cardCounterIterator(card->getCounters());
 			while (cardCounterIterator.hasNext()) {
 				cardCounterIterator.next();
@@ -1692,7 +1687,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdRevealCards(const Command_Reve
 	
 	Event_RevealCards eventPrivate(eventOthers);
 	
-	QList<ServerInfo_Card *> respCardListPrivate, respCardListOmniscient;
 	for (int i = 0; i < cardsToReveal.size(); ++i) {
 		Server_Card *card = cardsToReveal[i];
 		ServerInfo_Card *cardInfo = eventPrivate.add_cards();
@@ -1710,7 +1704,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdRevealCards(const Command_Reve
 		cardInfo->set_destroy_on_zone_change(card->getDestroyOnZoneChange());
 		cardInfo->set_doesnt_untap(card->getDoesntUntap());
 		
-		QList<ServerInfo_CardCounter *> cardCounterList;
 		QMapIterator<int, int> cardCounterIterator(card->getCounters());
 		while (cardCounterIterator.hasNext()) {
 			cardCounterIterator.next();
