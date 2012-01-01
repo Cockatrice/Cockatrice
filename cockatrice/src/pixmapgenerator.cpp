@@ -1,5 +1,5 @@
 #include "pixmapgenerator.h"
-#include "protocol_datastructures.h"
+#include "pb/serverinfo_user.pb.h"
 #include <QPainter>
 #include <QSvgRenderer>
 #include <math.h>
