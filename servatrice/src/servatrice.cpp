@@ -189,20 +189,32 @@ AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handl
 				return PasswordWrong;
 			}
 		
-		QSqlQuery query;
-		query.prepare("select a.password_sha512, time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_users a left join " + dbPrefix + "_bans b on b.user_name = a.name and b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.user_name = a.name) where a.name = :name and a.active = 1");
-		query.bindValue(":name", user);
-		if (!execSqlQuery(query)) {
+		QSqlQuery nameBanQuery;
+		nameBanQuery.prepare("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_bans b where b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.user_name = :name2) and b.user_name = :name1");
+		nameBanQuery.bindValue(":name1", user);
+		nameBanQuery.bindValue(":name2", user);
+		if (!execSqlQuery(nameBanQuery)) {
 			qDebug("Login denied: SQL error");
 			return PasswordWrong;
 		}
 		
-		if (query.next()) {
-			if (query.value(1).toInt() || query.value(2).toInt()) {
+		if (nameBanQuery.next())
+			if (nameBanQuery.value(0).toInt() || nameBanQuery.value(1).toInt()) {
 				qDebug("Login denied: banned by name");
 				return PasswordWrong;
 			}
-			if (query.value(0).toString() == PasswordHasher::computeHash(password, query.value(0).toString().left(16))) {
+		
+		QSqlQuery passwordQuery;
+		passwordQuery.prepare("select password_sha512 from " + dbPrefix + "_users where name = :name and active = 1");
+		passwordQuery.bindValue(":name", user);
+		if (!execSqlQuery(passwordQuery)) {
+			qDebug("Login denied: SQL error");
+			return PasswordWrong;
+		}
+		
+		if (passwordQuery.next()) {
+			const QString correctPassword = passwordQuery.value(0).toString();
+			if (correctPassword == PasswordHasher::computeHash(password, correctPassword.left(16))) {
 				qDebug("Login accepted: password right");
 				return PasswordRight;
 			} else {
