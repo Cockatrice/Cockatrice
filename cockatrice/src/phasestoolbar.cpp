@@ -236,8 +236,7 @@ void PhasesToolbar::actUntapAll()
 {
 	Command_SetCardAttr cmd;
 	cmd.set_zone("table");
-	cmd.set_card_id(-1);
-	cmd.set_attr_name("tapped");
+	cmd.set_attribute(AttrTapped);
 	cmd.set_attr_value("0");
 	
 	emit sendGameCommand(cmd, -1);

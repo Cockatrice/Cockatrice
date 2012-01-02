@@ -21,6 +21,7 @@
 #define SERVER_CARD_H
 
 #include "server_arrowtarget.h"
+#include "pb/card_attributes.pb.h"
 #include <QString>
 #include <QMap>
 
@@ -86,7 +87,7 @@ public:
 	void removeAttachedCard(Server_Card *card) { attachedCards.removeAt(attachedCards.indexOf(card)); }
 	
 	void resetState();
-	QString setAttribute(const QString &aname, const QString &avalue, bool allCards);
+	QString setAttribute(CardAttribute attribute, const QString &avalue, bool allCards);
 };
 
 #endif

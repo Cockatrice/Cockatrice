@@ -501,10 +501,10 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 			ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
 			
 			if (thisCardProperties->tapped())
-				setCardAttrHelper(ges, targetzone->getName(), card->getId(), "tapped", "1");
+				setCardAttrHelper(ges, targetzone->getName(), card->getId(), AttrTapped, "1");
 			QString ptString = QString::fromStdString(thisCardProperties->pt());
 			if (!ptString.isEmpty() && !thisCardProperties->face_down())
-				setCardAttrHelper(ges, targetzone->getName(), card->getId(), "pt", ptString);
+				setCardAttrHelper(ges, targetzone->getName(), card->getId(), AttrPT, ptString);
 		}
 	}
 	if (startzone->hasCoords() && fixFreeSpaces)
@@ -532,7 +532,7 @@ void Server_Player::unattachCard(GameEventStorage &ges, Server_Card *card)
 	delete cardToMove;
 }
 
-Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, const QString &zoneName, int cardId, const QString &attrName, const QString &attrValue)
+Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, const QString &zoneName, int cardId, CardAttribute attribute, const QString &attrValue)
 {
 	QMutexLocker locker(&game->gameMutex);
 	
@@ -546,7 +546,7 @@ Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, c
 	if (cardId == -1) {
 		QListIterator<Server_Card *> CardIterator(zone->cards);
 		while (CardIterator.hasNext()) {
-			result = CardIterator.next()->setAttribute(attrName, attrValue, true);
+			result = CardIterator.next()->setAttribute(attribute, attrValue, true);
 			if (result.isNull())
 				return Response::RespInvalidCommand;
 		}
@@ -554,7 +554,7 @@ Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, c
 		Server_Card *card = zone->getCard(cardId);
 		if (!card)
 			return Response::RespNameNotFound;
-		result = card->setAttribute(attrName, attrValue, false);
+		result = card->setAttribute(attribute, attrValue, false);
 		if (result.isNull())
 			return Response::RespInvalidCommand;
 	}
@@ -563,7 +563,7 @@ Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, c
 	event.set_zone_name(zone->getName().toStdString());
 	if (cardId != -1)
 		event.set_card_id(cardId);
-	event.set_attr_name(attrName.toStdString());
+	event.set_attribute(attribute);
 	event.set_attr_value(result.toStdString());
 	ges.enqueueGameEvent(event, playerId);
 	

@@ -45,28 +45,22 @@ void Server_Card::resetState()
 	setDoesntUntap(false);
 }
 
-QString Server_Card::setAttribute(const QString &aname, const QString &avalue, bool allCards)
+QString Server_Card::setAttribute(CardAttribute attribute, const QString &avalue, bool allCards)
 {
-	if (aname == "tapped") {
-		bool value = avalue == "1";
-		if (!(!value && allCards && doesntUntap))
-			setTapped(value);
-	} else if (aname == "attacking") {
-		setAttacking(avalue == "1");
-	} else if (aname == "facedown") {
-		setFaceDown(avalue == "1");
-	} else if (aname == "color") {
-		setColor(avalue);
-	} else if (aname == "pt") {
-		setPT(avalue);
-		return getPT();
-	} else if (aname == "annotation") {
-		setAnnotation(avalue);
-	} else if (aname == "doesnt_untap") {
-		setDoesntUntap(avalue == "1");
-	} else
-		return QString();
-	
+	switch (attribute) {
+		case AttrTapped: {
+			bool value = avalue == "1";
+			if (!(!value && allCards && doesntUntap))
+				setTapped(value);
+			break;
+		}
+		case AttrAttacking: setAttacking(avalue == "1"); break;
+		case AttrFaceDown: setFaceDown(avalue == "1"); break;
+		case AttrColor: setColor(avalue); break;
+		case AttrPT: setPT(avalue); return getPT();
+		case AttrAnnotation: setAnnotation(avalue); break;
+		case AttrDoesntUntap: setDoesntUntap(avalue == "1"); break;
+	}
 	return avalue;
 }
 

@@ -6,6 +6,7 @@
 #include <QMap>
 #include "abstractgraphicsitem.h"
 #include "pb/game_event.pb.h"
+#include "pb/card_attributes.pb.h"
 
 namespace google { namespace protobuf { class Message; } }
 class CardDatabase;
@@ -174,7 +175,7 @@ private:
 	HandZone *hand;
 	PlayerTarget *playerTarget;
 	
-	void setCardAttrHelper(const GameEventContext &context, CardItem *card, const QString &aname, const QString &avalue, bool allCards);
+	void setCardAttrHelper(const GameEventContext &context, CardItem *card, CardAttribute attribute, const QString &avalue, bool allCards);
 
 	QRectF bRect;
 

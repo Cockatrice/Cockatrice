@@ -1349,7 +1349,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdSetCardAttr(const Command_SetC
 	if (player->getConceded())
 		return Response::RespContextError;
 	
-	return player->setCardAttrHelper(ges, QString::fromStdString(cmd.zone()), cmd.card_id(), QString::fromStdString(cmd.attr_name()), QString::fromStdString(cmd.attr_value()));
+	return player->setCardAttrHelper(ges, QString::fromStdString(cmd.zone()), cmd.card_id(), cmd.attribute(), QString::fromStdString(cmd.attr_value()));
 }
 
 Response::ResponseCode Server_ProtocolHandler::cmdSetCardCounter(const Command_SetCardCounter &cmd, Server_Game *game, Server_Player *player, ResponseContainer & /*rc*/, GameEventStorage &ges)

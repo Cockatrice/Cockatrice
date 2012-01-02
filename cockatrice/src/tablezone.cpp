@@ -201,7 +201,7 @@ void TableZone::toggleTapped()
 			Command_SetCardAttr *cmd = new Command_SetCardAttr;
 			cmd->set_zone(name.toStdString());
 			cmd->set_card_id(temp->getId());
-			cmd->set_attr_name("tapped");
+			cmd->set_attribute(AttrTapped);
 			cmd->set_attr_value(tapAll ? "1" : "0");
 			cmdList.append(cmd);
 		}

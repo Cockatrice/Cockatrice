@@ -723,8 +723,7 @@ void Player::actUntapAll()
 {
 	Command_SetCardAttr cmd;
 	cmd.set_zone("table");
-	cmd.set_card_id(-1);
-	cmd.set_attr_name("tapped");
+	cmd.set_attribute(AttrTapped);
 	cmd.set_attr_value("0");
 	
 	sendGameCommand(cmd);
@@ -780,30 +779,38 @@ void Player::actSayMessage()
 	sendGameCommand(cmd);
 }
 
-void Player::setCardAttrHelper(const GameEventContext &context, CardItem *card, const QString &aname, const QString &avalue, bool allCards)
+void Player::setCardAttrHelper(const GameEventContext &context, CardItem *card, CardAttribute attribute, const QString &avalue, bool allCards)
 {
 	bool moveCardContext = context.HasExtension(Context_MoveCard::ext);
-	if (aname == "tapped") {
-		bool tapped = avalue == "1";
-		if (!(!tapped && card->getDoesntUntap() && allCards)) {
-			if (!allCards)
-				emit logSetTapped(this, card, tapped);
-			card->setTapped(tapped, !moveCardContext);
+	switch (attribute) {
+		case AttrTapped: {
+			bool tapped = avalue == "1";
+			if (!(!tapped && card->getDoesntUntap() && allCards)) {
+				if (!allCards)
+					emit logSetTapped(this, card, tapped);
+				card->setTapped(tapped, !moveCardContext);
+			}
+			break;
 		}
-	} else if (aname == "attacking")
-		card->setAttacking(avalue == "1");
-	else if (aname == "facedown")
-		card->setFaceDown(avalue == "1");
-	else if (aname == "annotation") {
-		emit logSetAnnotation(this, card, avalue);
-		card->setAnnotation(avalue);
-	} else if (aname == "doesnt_untap") {
-		bool value = (avalue == "1");
-		emit logSetDoesntUntap(this, card, value);
-		card->setDoesntUntap(value);
-	} else if (aname == "pt") {
-		emit logSetPT(this, card, avalue);
-		card->setPT(avalue);
+		case AttrAttacking: card->setAttacking(avalue == "1"); break;
+		case AttrFaceDown: card->setFaceDown(avalue == "1"); break;
+		case AttrColor: card->setColor(avalue); break;
+		case AttrAnnotation: {
+			emit logSetAnnotation(this, card, avalue);
+			card->setAnnotation(avalue);
+			break;
+		}
+		case AttrDoesntUntap: {
+			bool value = (avalue == "1");
+			emit logSetDoesntUntap(this, card, value);
+			card->setDoesntUntap(value);
+			break;
+		}
+		case AttrPT: {
+			emit logSetPT(this, card, avalue);
+			card->setPT(avalue);
+			break;
+		}
 	}
 }
 
@@ -875,8 +882,8 @@ void Player::eventSetCardAttr(const Event_SetCardAttr &event, const GameEventCon
 	if (!event.has_card_id()) {
 		const CardList &cards = zone->getCards();
 		for (int i = 0; i < cards.size(); i++)
-			setCardAttrHelper(context, cards.at(i), QString::fromStdString(event.attr_name()), QString::fromStdString(event.attr_value()), true);
-		if (event.attr_name() == "tapped")
+			setCardAttrHelper(context, cards.at(i), event.attribute(), QString::fromStdString(event.attr_value()), true);
+		if (event.attribute() == AttrTapped)
 			emit logSetTapped(this, 0, event.attr_value() == "1");
 	} else {
 		CardItem *card = zone->getCard(event.card_id(), QString());
@@ -884,7 +891,7 @@ void Player::eventSetCardAttr(const Event_SetCardAttr &event, const GameEventCon
 			qDebug() << "Player::eventSetCardAttr: card id=" << event.card_id() << "not found";
 			return;
 		}
-		setCardAttrHelper(context, card, QString::fromStdString(event.attr_name()), QString::fromStdString(event.attr_value()), false);
+		setCardAttrHelper(context, card, event.attribute(), QString::fromStdString(event.attr_value()), false);
 	}
 }
 
@@ -1485,7 +1492,7 @@ void Player::cardMenuAction(QAction *a)
 						Command_SetCardAttr *cmd = new Command_SetCardAttr;
 						cmd->set_zone(card->getZone()->getName().toStdString());
 						cmd->set_card_id(card->getId());
-						cmd->set_attr_name("tapped");
+						cmd->set_attribute(AttrTapped);
 						cmd->set_attr_value("1");
 						commandList.append(cmd);
 					}
@@ -1495,7 +1502,7 @@ void Player::cardMenuAction(QAction *a)
 						Command_SetCardAttr *cmd = new Command_SetCardAttr;
 						cmd->set_zone(card->getZone()->getName().toStdString());
 						cmd->set_card_id(card->getId());
-						cmd->set_attr_name("tapped");
+						cmd->set_attribute(AttrTapped);
 						cmd->set_attr_value("0");
 						commandList.append(cmd);
 					}
@@ -1504,7 +1511,7 @@ void Player::cardMenuAction(QAction *a)
 					Command_SetCardAttr *cmd = new Command_SetCardAttr;
 					cmd->set_zone(card->getZone()->getName().toStdString());
 					cmd->set_card_id(card->getId());
-					cmd->set_attr_name("doesnt_untap");
+					cmd->set_attribute(AttrDoesntUntap);
 					cmd->set_attr_value(card->getDoesntUntap() ? "1" : "0");
 					commandList.append(cmd);
 					break;
@@ -1600,7 +1607,7 @@ void Player::actIncPT(int deltaP, int deltaT)
 		Command_SetCardAttr *cmd = new Command_SetCardAttr;
 		cmd->set_zone(card->getZone()->getName().toStdString());
 		cmd->set_card_id(card->getId());
-		cmd->set_attr_name("pt");
+		cmd->set_attribute(AttrPT);
 		cmd->set_attr_value(ptString.toStdString());
 		commandList.append(cmd);
 	}
@@ -1632,7 +1639,7 @@ void Player::actSetPT(QAction * /*a*/)
 		Command_SetCardAttr *cmd = new Command_SetCardAttr;
 		cmd->set_zone(card->getZone()->getName().toStdString());
 		cmd->set_card_id(card->getId());
-		cmd->set_attr_name("pt");
+		cmd->set_attribute(AttrPT);
 		cmd->set_attr_value(pt.toStdString());
 		commandList.append(cmd);
 	}
@@ -1665,7 +1672,7 @@ void Player::actSetAnnotation(QAction * /*a*/)
 		Command_SetCardAttr *cmd = new Command_SetCardAttr;
 		cmd->set_zone(card->getZone()->getName().toStdString());
 		cmd->set_card_id(card->getId());
-		cmd->set_attr_name("annotation");
+		cmd->set_attribute(AttrAnnotation);
 		cmd->set_attr_value(annotation.toStdString());
 		commandList.append(cmd);
 	}
