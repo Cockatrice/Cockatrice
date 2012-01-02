@@ -56,7 +56,7 @@ public:
 	Servatrice(QSettings *_settings, QObject *parent = 0);
 	~Servatrice();
 	bool openDatabase();
-	void checkSql();
+	bool checkSql();
 	bool execSqlQuery(QSqlQuery &query);
 	QString getServerName() const { return serverName; }
 	QString getLoginMessage() const { return loginMessage; }
@@ -87,6 +87,10 @@ protected:
 	bool userExists(const QString &user);
 	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr);
 private:
+	enum AuthenticationMethod { AuthenticationNone, AuthenticationSql };
+	enum DatabaseType { DatabaseNone, DatabaseMySql };
+	AuthenticationMethod authenticationMethod;
+	DatabaseType databaseType;
 	QTimer *pingClock, *statusUpdateClock;
 	QTcpServer *tcpServer;
 	QString serverName;

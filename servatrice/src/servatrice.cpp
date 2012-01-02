@@ -71,9 +71,19 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	else
 		qDebug() << "tcpServer->listen(): Error.";
 	
-	QString dbType = settings->value("database/type").toString();
+	const QString authenticationMethodStr = settings->value("authentication/method").toString();
+	if (authenticationMethodStr == "sql")
+		authenticationMethod = AuthenticationSql;
+	else
+		authenticationMethod = AuthenticationNone;
+	
+	QString dbTypeStr = settings->value("database/type").toString();
+	if (dbTypeStr == "mysql")
+		databaseType = DatabaseMySql;
+	else
+		databaseType = DatabaseNone;
 	dbPrefix = settings->value("database/prefix").toString();
-	if (dbType == "mysql")
+	if (databaseType != DatabaseNone)
 		openDatabase();
 	
 	int size = settings->beginReadArray("rooms");
@@ -151,11 +161,15 @@ bool Servatrice::openDatabase()
 	return true;
 }
 
-void Servatrice::checkSql()
+bool Servatrice::checkSql()
 {
+	if (databaseType == DatabaseNone)
+		return false;
+	
 	QMutexLocker locker(&dbMutex);
 	if (!QSqlDatabase::database().exec("select 1").isActive())
-		openDatabase();
+		return openDatabase();
+	return true;
 }
 
 bool Servatrice::execSqlQuery(QSqlQuery &query)
@@ -170,10 +184,11 @@ AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handl
 {
 	QMutexLocker locker(&dbMutex);
 	const QString method = settings->value("authentication/method").toString();
-	if (method == "none")
-		return UnknownUser;
-	else if (method == "sql") {
-		checkSql();
+	switch (authenticationMethod) {
+	case AuthenticationNone: return UnknownUser;
+	case AuthenticationSql: {
+		if (!checkSql())
+			return UnknownUser;
 		
 		QSqlQuery ipBanQuery;
 		ipBanQuery.prepare("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0, b.visible_reason from " + dbPrefix + "_bans b where b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.ip_address = :address) and b.ip_address = :address2");
@@ -228,15 +243,15 @@ AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handl
 			qDebug("Login accepted: unknown user");
 			return UnknownUser;
 		}
-	} else
-		return UnknownUser;
+	}
+	}
+	return UnknownUser;
 }
 
 bool Servatrice::userExists(const QString &user)
 {
-	QMutexLocker locker(&dbMutex);
-	const QString method = settings->value("authentication/method").toString();
-	if (method == "sql") {
+	if (authenticationMethod == AuthenticationSql) {
+		QMutexLocker locker(&dbMutex);
 		checkSql();
 	
 		QSqlQuery query;
@@ -245,26 +260,34 @@ bool Servatrice::userExists(const QString &user)
 		if (!execSqlQuery(query))
 			return false;
 		return query.next();
-	} else return false;
+	}
+	return false;
 }
 
 int Servatrice::getUserIdInDB(const QString &name)
 {
-	QMutexLocker locker(&dbMutex);
-	QSqlQuery query;
-	query.prepare("select id from " + dbPrefix + "_users where name = :name and active = 1");
-	query.bindValue(":name", name);
-	if (!execSqlQuery(query))
-		return -1;
-	if (!query.next())
-		return -1;
-	return query.value(0).toInt();
+	if (authenticationMethod == AuthenticationSql) {
+		QMutexLocker locker(&dbMutex);
+		QSqlQuery query;
+		query.prepare("select id from " + dbPrefix + "_users where name = :name and active = 1");
+		query.bindValue(":name", name);
+		if (!execSqlQuery(query))
+			return -1;
+		if (!query.next())
+			return -1;
+		return query.value(0).toInt();
+	}
+	return -1;
 }
 
 bool Servatrice::isInBuddyList(const QString &whoseList, const QString &who)
 {
+	if (authenticationMethod == AuthenticationNone)
+		return false;
+	
 	QMutexLocker locker(&dbMutex);
-	checkSql();
+	if (!checkSql())
+		return false;
 	
 	int id1 = getUserIdInDB(whoseList);
 	int id2 = getUserIdInDB(who);
@@ -280,8 +303,12 @@ bool Servatrice::isInBuddyList(const QString &whoseList, const QString &who)
 
 bool Servatrice::isInIgnoreList(const QString &whoseList, const QString &who)
 {
+	if (authenticationMethod == AuthenticationNone)
+		return false;
+	
 	QMutexLocker locker(&dbMutex);
-	checkSql();
+	if (!checkSql())
+		return false;
 	
 	int id1 = getUserIdInDB(whoseList);
 	int id2 = getUserIdInDB(who);
@@ -334,14 +361,15 @@ ServerInfo_User Servatrice::evalUserQueryResult(const QSqlQuery &query, bool com
 
 ServerInfo_User Servatrice::getUserData(const QString &name)
 {
-	QMutexLocker locker(&dbMutex);
-	const QString method = settings->value("authentication/method").toString();
 	ServerInfo_User result;
 	result.set_name(name.toStdString());
 	result.set_user_level(ServerInfo_User::IsUser);
-	if (method == "sql") {
-		checkSql();
-
+	
+	if (authenticationMethod == AuthenticationSql) {
+		QMutexLocker locker(&dbMutex);
+		if (!checkSql())
+			return result;
+		
 		QSqlQuery query;
 		query.prepare("select name, admin, realname, gender, country, avatar_bmp from " + dbPrefix + "_users where name = :name and active = 1");
 		query.bindValue(":name", name);
@@ -368,8 +396,12 @@ int Servatrice::getUsersWithAddress(const QHostAddress &address) const
 
 int Servatrice::startSession(const QString &userName, const QString &address)
 {
+	if (authenticationMethod == AuthenticationNone)
+		return -1;
+	
 	QMutexLocker locker(&dbMutex);
-	checkSql();
+	if (!checkSql())
+		return -1;
 	
 	QSqlQuery query;
 	query.prepare("insert into " + dbPrefix + "_sessions (user_name, ip_address, start_time) values(:user_name, :ip_address, NOW())");
@@ -382,8 +414,12 @@ int Servatrice::startSession(const QString &userName, const QString &address)
 
 void Servatrice::endSession(int sessionId)
 {
+	if (authenticationMethod == AuthenticationNone)
+		return;
+	
 	QMutexLocker locker(&dbMutex);
-	checkSql();
+	if (!checkSql())
+		return;
 	
 	QSqlQuery query;
 	query.prepare("update " + dbPrefix + "_sessions set end_time=NOW() where id = :id_session");
@@ -393,11 +429,10 @@ void Servatrice::endSession(int sessionId)
 
 QMap<QString, ServerInfo_User> Servatrice::getBuddyList(const QString &name)
 {
-	QMutexLocker locker(&dbMutex);
 	QMap<QString, ServerInfo_User> result;
 	
-	const QString method = settings->value("authentication/method").toString();
-	if (method == "sql") {
+	if (authenticationMethod == AuthenticationSql) {
+		QMutexLocker locker(&dbMutex);
 		checkSql();
 
 		QSqlQuery query;
@@ -416,11 +451,10 @@ QMap<QString, ServerInfo_User> Servatrice::getBuddyList(const QString &name)
 
 QMap<QString, ServerInfo_User> Servatrice::getIgnoreList(const QString &name)
 {
-	QMutexLocker locker(&dbMutex);
 	QMap<QString, ServerInfo_User> result;
 	
-	const QString method = settings->value("authentication/method").toString();
-	if (method == "sql") {
+	if (authenticationMethod == AuthenticationSql) {
+		QMutexLocker locker(&dbMutex);
 		checkSql();
 
 		QSqlQuery query;
@@ -440,7 +474,9 @@ QMap<QString, ServerInfo_User> Servatrice::getIgnoreList(const QString &name)
 void Servatrice::updateLoginMessage()
 {
 	QMutexLocker locker(&dbMutex);
-	checkSql();
+	if (!checkSql())
+		return;
+	
 	QSqlQuery query;
 	query.prepare("select message from " + dbPrefix + "_servermessages where id_server = :id_server order by timest desc limit 1");
 	query.bindValue(":id_server", serverId);
@@ -475,7 +511,8 @@ void Servatrice::statusUpdate()
 	rxBytesMutex.unlock();
 	
 	QMutexLocker locker(&dbMutex);
-	checkSql();
+	if (!checkSql())
+		return;
 	
 	QSqlQuery query;
 	query.prepare("insert into " + dbPrefix + "_uptime (id_server, timest, uptime, users_count, games_count, tx_bytes, rx_bytes) values(:id, NOW(), :uptime, :users_count, :games_count, :tx, :rx)");

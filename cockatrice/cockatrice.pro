@@ -15,7 +15,6 @@ unix:!macx {
 } else {
 	QT += multimedia
 }
-	QT += multimedia
 
 HEADERS += src/abstractcounter.h \
  src/counter_general.h \

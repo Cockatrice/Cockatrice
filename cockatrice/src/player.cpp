@@ -1592,15 +1592,19 @@ void Player::cardMenuAction(QAction *a)
 void Player::actIncPT(int deltaP, int deltaT)
 {
 	QString ptString = "+" + QString::number(deltaP) + "/+" + QString::number(deltaT);
+	
+	QList< const ::google::protobuf::Message * > commandList;
 	QListIterator<QGraphicsItem *> j(scene()->selectedItems());
 	while (j.hasNext()) {
 		CardItem *card = static_cast<CardItem *>(j.next());
-		Command_SetCardAttr cmd;
-		cmd.set_zone(card->getZone()->getName().toStdString());
-		cmd.set_card_id(card->getId());
-		cmd.set_attr_name("pt");
-		cmd.set_attr_value(ptString.toStdString());
+		Command_SetCardAttr *cmd = new Command_SetCardAttr;
+		cmd->set_zone(card->getZone()->getName().toStdString());
+		cmd->set_card_id(card->getId());
+		cmd->set_attr_name("pt");
+		cmd->set_attr_value(ptString.toStdString());
+		commandList.append(cmd);
 	}
+	sendGameCommand(prepareGameCommand(commandList));
 }
 
 void Player::actSetPT(QAction * /*a*/)
@@ -1621,15 +1625,18 @@ void Player::actSetPT(QAction * /*a*/)
 	if (!ok)
 		return;
 	
+	QList< const ::google::protobuf::Message * > commandList;
 	QListIterator<QGraphicsItem *> j(scene()->selectedItems());
 	while (j.hasNext()) {
 		CardItem *card = static_cast<CardItem *>(j.next());
-		Command_SetCardAttr cmd;
-		cmd.set_zone(card->getZone()->getName().toStdString());
-		cmd.set_card_id(card->getId());
-		cmd.set_attr_name("pt");
-		cmd.set_attr_value(pt.toStdString());
+		Command_SetCardAttr *cmd = new Command_SetCardAttr;
+		cmd->set_zone(card->getZone()->getName().toStdString());
+		cmd->set_card_id(card->getId());
+		cmd->set_attr_name("pt");
+		cmd->set_attr_value(pt.toStdString());
+		commandList.append(cmd);
 	}
+	sendGameCommand(prepareGameCommand(commandList));
 }
 
 void Player::actSetAnnotation(QAction * /*a*/)
@@ -1651,15 +1658,18 @@ void Player::actSetAnnotation(QAction * /*a*/)
 	if (!ok)
 		return;
 	
+	QList< const ::google::protobuf::Message * > commandList;
 	i.toFront();
 	while (i.hasNext()) {
 		CardItem *card = static_cast<CardItem *>(i.next());
-		Command_SetCardAttr cmd;
-		cmd.set_zone(card->getZone()->getName().toStdString());
-		cmd.set_card_id(card->getId());
-		cmd.set_attr_name("annotation");
-		cmd.set_attr_value(annotation.toStdString());
+		Command_SetCardAttr *cmd = new Command_SetCardAttr;
+		cmd->set_zone(card->getZone()->getName().toStdString());
+		cmd->set_card_id(card->getId());
+		cmd->set_attr_name("annotation");
+		cmd->set_attr_value(annotation.toStdString());
+		commandList.append(cmd);
 	}
+	sendGameCommand(prepareGameCommand(commandList));
 }
 
 void Player::actAttach(QAction *a)
@@ -1683,18 +1693,19 @@ void Player::actCardCounterTrigger(QAction *a)
 {
 	int counterId = a->data().toInt() / 1000;
 	int action = a->data().toInt() % 1000;
+	QList< const ::google::protobuf::Message * > commandList;
 	switch (action) {
 		case 9: {
 			QListIterator<QGraphicsItem *> i(scene()->selectedItems());
 			while (i.hasNext()) {
 				CardItem *card = static_cast<CardItem *>(i.next());
 				if (card->getCounters().value(counterId, 0) < MAX_COUNTERS_ON_CARD) {
-					Command_SetCardCounter cmd;
-					cmd.set_zone(card->getZone()->getName().toStdString());
-					cmd.set_card_id(card->getId());
-					cmd.set_counter_id(counterId);
-					cmd.set_counter_value(card->getCounters().value(counterId, 0) + 1);
-					sendGameCommand(cmd);
+					Command_SetCardCounter *cmd = new Command_SetCardCounter;
+					cmd->set_zone(card->getZone()->getName().toStdString());
+					cmd->set_card_id(card->getId());
+					cmd->set_counter_id(counterId);
+					cmd->set_counter_value(card->getCounters().value(counterId, 0) + 1);
+					commandList.append(cmd);
 				}
 			}
 			break;
@@ -1704,12 +1715,12 @@ void Player::actCardCounterTrigger(QAction *a)
 			while (i.hasNext()) {
 				CardItem *card = static_cast<CardItem *>(i.next());
 				if (card->getCounters().value(counterId, 0)) {
-					Command_SetCardCounter cmd;
-					cmd.set_zone(card->getZone()->getName().toStdString());
-					cmd.set_card_id(card->getId());
-					cmd.set_counter_id(counterId);
-					cmd.set_counter_value(card->getCounters().value(counterId, 0) - 1);
-					sendGameCommand(cmd);
+					Command_SetCardCounter *cmd = new Command_SetCardCounter;
+					cmd->set_zone(card->getZone()->getName().toStdString());
+					cmd->set_card_id(card->getId());
+					cmd->set_counter_id(counterId);
+					cmd->set_counter_value(card->getCounters().value(counterId, 0) - 1);
+					commandList.append(cmd);
 				}
 			}
 			break;
@@ -1727,17 +1738,18 @@ void Player::actCardCounterTrigger(QAction *a)
 			QListIterator<QGraphicsItem *> i(scene()->selectedItems());
 			while (i.hasNext()) {
 				CardItem *card = static_cast<CardItem *>(i.next());
-				Command_SetCardCounter cmd;
-				cmd.set_zone(card->getZone()->getName().toStdString());
-				cmd.set_card_id(card->getId());
-				cmd.set_counter_id(counterId);
-				cmd.set_counter_value(number);
-				sendGameCommand(cmd);
+				Command_SetCardCounter *cmd = new Command_SetCardCounter;
+				cmd->set_zone(card->getZone()->getName().toStdString());
+				cmd->set_card_id(card->getId());
+				cmd->set_counter_id(counterId);
+				cmd->set_counter_value(number);
+				commandList.append(cmd);
 			}
 			break;
 		}
 		default: ;
 	}
+	sendGameCommand(prepareGameCommand(commandList));
 }
 
 void Player::setCardMenu(QMenu *menu)
