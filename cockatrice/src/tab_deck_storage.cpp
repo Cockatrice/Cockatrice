@@ -18,6 +18,8 @@
 
 #include "pending_command.h"
 #include "pb/response.pb.h"
+#include "pb/response_deck_download.pb.h"
+#include "pb/response_deck_upload.pb.h"
 #include "pb/command_deck_upload.pb.h"
 #include "pb/command_deck_download.pb.h"
 #include "pb/command_deck_new_dir.pb.h"
@@ -169,19 +171,17 @@ void TabDeckStorage::actUpload()
 	cmd.set_deck_list(deck.writeToString_Native().toStdString());
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
-	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(uploadFinished(ProtocolResponse *)));
+	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(uploadFinished(const Response &)));
 	client->sendCommand(pend);
 }
 
 void TabDeckStorage::uploadFinished(const Response &r)
 {
-/*	Response_DeckUpload *resp = qobject_cast<Response_DeckUpload *>(r);
-	if (!resp)
-		return;
+	const Response_DeckUpload &resp = r.GetExtension(Response_DeckUpload::ext);
 	const Command_DeckUpload &cmd = static_cast<const Command_DeckUpload &>(static_cast<PendingCommand *>(sender())->getCommandContainer().session_command(0).GetExtension(Command_DeckUpload::ext));
 	
-	serverDirView->addFileToTree(resp->getFile(), serverDirView->getNodeByPath(QString::fromStdString(cmd.path())));
-*/}
+	serverDirView->addFileToTree(resp.new_file(), serverDirView->getNodeByPath(QString::fromStdString(cmd.path())));
+}
 
 void TabDeckStorage::actOpenRemoteDeck()
 {
@@ -193,20 +193,18 @@ void TabDeckStorage::actOpenRemoteDeck()
 	cmd.set_deck_id(curRight->getId());
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
-	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(openRemoteDeckFinished(ProtocolResponse *)));
+	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(openRemoteDeckFinished(const Response &)));
 	client->sendCommand(pend);
 }
 
 void TabDeckStorage::openRemoteDeckFinished(const Response &r)
 {
-/*	Response_DeckDownload *resp = qobject_cast<Response_DeckDownload *>(r);
-	if (!resp)
-		return;
+	const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
 	
 	WndDeckEditor *deckEditor = new WndDeckEditor;
-	deckEditor->setDeck(new DeckList(resp->getDeck()));
+	deckEditor->setDeck(new DeckList(QString::fromStdString(resp.deck())));
 	deckEditor->show();
-*/}
+}
 
 void TabDeckStorage::actDownload()
 {
@@ -230,20 +228,20 @@ void TabDeckStorage::actDownload()
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
 	pend->setExtraData(filePath);
-	connect(pend, SIGNAL(finished(ProtocolResponse *)), this, SLOT(downloadFinished(ProtocolResponse *)));
+	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(downloadFinished(const Response &)));
 	client->sendCommand(pend);
 }
 
 void TabDeckStorage::downloadFinished(const Response &r)
 {
-/*	Response_DeckDownload *resp = qobject_cast<Response_DeckDownload *>(r);
-	if (!resp)
-		return;
+	const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
 	
 	PendingCommand *pend = static_cast<PendingCommand *>(sender());
 	QString filePath = pend->getExtraData().toString();
-	resp->getDeck()->saveToFile(filePath, DeckList::CockatriceFormat);
-*/}
+	
+	DeckList deck(QString::fromStdString(resp.deck()));
+	deck.saveToFile(filePath, DeckList::CockatriceFormat);
+}
 
 void TabDeckStorage::actNewFolder()
 {

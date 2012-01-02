@@ -108,7 +108,7 @@ void RemoteClient::readData()
 		
 		ServerMessage newServerMessage;
 		newServerMessage.ParseFromArray(inputBuffer.data(), messageLength);
-		qDebug(QString::fromStdString(newServerMessage.ShortDebugString()).toUtf8());
+		qDebug((QString::number(messageLength) + ": " + QString::fromStdString(newServerMessage.ShortDebugString())).toUtf8());
 		inputBuffer.remove(0, messageLength);
 		messageInProgress = false;
 		

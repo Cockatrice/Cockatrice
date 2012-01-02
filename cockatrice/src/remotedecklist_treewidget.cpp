@@ -6,7 +6,8 @@
 
 #include "pending_command.h"
 #include "pb/session_commands.pb.h"
-//#include "pb/response_deck_list.pb.h"
+#include "pb/response_deck_list.pb.h"
+#include "pb/serverinfo_deckstorage.pb.h"
 
 RemoteDeckList_TreeModel::DirectoryNode::DirectoryNode(const QString &_name, RemoteDeckList_TreeModel::DirectoryNode *_parent)
 	: RemoteDeckList_TreeModel::Node(_name, _parent)
@@ -202,35 +203,38 @@ QModelIndex RemoteDeckList_TreeModel::nodeToIndex(Node *node) const
 	return createIndex(node->getParent()->indexOf(node), 0, node);
 }
 
-void RemoteDeckList_TreeModel::addFileToTree(DeckList_File *file, DirectoryNode *parent)
+void RemoteDeckList_TreeModel::addFileToTree(const ServerInfo_DeckStorage_TreeItem &file, DirectoryNode *parent)
 {
-/*	beginInsertRows(nodeToIndex(parent), parent->size(), parent->size());
-	parent->append(new FileNode(file->getName(), file->getId(), file->getUploadTime(), parent));
-	endInsertRows();
-*/
+	const ServerInfo_DeckStorage_File &fileInfo = file.file();
+	QDateTime time;
+	time.setMSecsSinceEpoch(fileInfo.creation_time());
 	
+	beginInsertRows(nodeToIndex(parent), parent->size(), parent->size());
+	parent->append(new FileNode(QString::fromStdString(file.name()), file.id(), time, parent));
+	endInsertRows();
 }
 
-void RemoteDeckList_TreeModel::addFolderToTree(DeckList_Directory *folder, DirectoryNode *parent)
+void RemoteDeckList_TreeModel::addFolderToTree(const ServerInfo_DeckStorage_TreeItem &folder, DirectoryNode *parent)
 {
-//	addFolderToTree(folder->getName(), folder->getTreeItems(), parent);
+	DirectoryNode *newItem = addNamedFolderToTree(QString::fromStdString(folder.name()), parent);
+	const ServerInfo_DeckStorage_Folder &folderInfo = folder.folder();
+	const int folderItemsSize = folderInfo.items_size();
+	for (int i = 0; i < folderItemsSize; ++i) {
+		const ServerInfo_DeckStorage_TreeItem &subItem = folderInfo.items(i);
+		if (subItem.has_folder())
+			addFolderToTree(subItem, newItem);
+		else
+			addFileToTree(subItem, newItem);
+	}
 }
 
-void RemoteDeckList_TreeModel::addFolderToTree(const QString &name, const QList<DeckList_TreeItem *> &folderItems, DirectoryNode *parent)
+RemoteDeckList_TreeModel::DirectoryNode *RemoteDeckList_TreeModel::addNamedFolderToTree(const QString &name, DirectoryNode *parent)
 {
-/*	DirectoryNode *newItem = new DirectoryNode(name, parent);
+	DirectoryNode *newItem = new DirectoryNode(name, parent);
 	beginInsertRows(nodeToIndex(parent), parent->size(), parent->size());
 	parent->append(newItem);
 	endInsertRows();
-	
-	for (int i = 0; i < folderItems.size(); ++i) {
-		DeckList_Directory *subFolder = dynamic_cast<DeckList_Directory *>(folderItems[i]);
-		if (subFolder)
-			addFolderToTree(subFolder, newItem);
-		else
-			addFileToTree(dynamic_cast<DeckList_File *>(folderItems[i]), newItem);
-	}
-*/
+	return newItem;
 }
 
 void RemoteDeckList_TreeModel::removeNode(RemoteDeckList_TreeModel::Node *node)
@@ -252,14 +256,17 @@ void RemoteDeckList_TreeModel::refreshTree()
 
 void RemoteDeckList_TreeModel::deckListFinished(const Response &r)
 {
-/*	const Response_DeckList &resp = r.GetExtension(Response_DeckList::ext);
+	const Response_DeckList &resp = r.GetExtension(Response_DeckList::ext);
 
 	root->clearTree();
 	reset();
 	
-	addFolderToTree(resp->getRoot(), root);
+	ServerInfo_DeckStorage_TreeItem tempRoot;
+	tempRoot.set_id(0);
+	tempRoot.mutable_folder()->CopyFrom(resp.root());
+	addFolderToTree(tempRoot, root);
+	
 	emit treeRefreshed();
-*/
 }
 
 RemoteDeckList_TreeWidget::RemoteDeckList_TreeWidget(AbstractClient *_client, QWidget *parent)
@@ -300,19 +307,19 @@ RemoteDeckList_TreeModel::FileNode *RemoteDeckList_TreeWidget::getNodeById(int i
 	return treeModel->getRoot()->getNodeById(id);
 }
 
-void RemoteDeckList_TreeWidget::addFileToTree(DeckList_File *file, RemoteDeckList_TreeModel::DirectoryNode *parent)
+void RemoteDeckList_TreeWidget::addFileToTree(const ServerInfo_DeckStorage_TreeItem &file, RemoteDeckList_TreeModel::DirectoryNode *parent)
 {
 	treeModel->addFileToTree(file, parent);
 }
 
-void RemoteDeckList_TreeWidget::addFolderToTree(DeckList_Directory *folder, RemoteDeckList_TreeModel::DirectoryNode *parent)
+void RemoteDeckList_TreeWidget::addFolderToTree(const ServerInfo_DeckStorage_TreeItem &folder, RemoteDeckList_TreeModel::DirectoryNode *parent)
 {
 	treeModel->addFolderToTree(folder, parent);
 }
 
 void RemoteDeckList_TreeWidget::addFolderToTree(const QString &name, RemoteDeckList_TreeModel::DirectoryNode *parent)
 {
-	treeModel->addFolderToTree(name, QList<DeckList_TreeItem *>(), parent);
+	treeModel->addNamedFolderToTree(name, parent);
 }
 
 void RemoteDeckList_TreeWidget::removeNode(RemoteDeckList_TreeModel::Node *node)

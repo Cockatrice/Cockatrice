@@ -32,17 +32,20 @@ Server *Server_Room::getServer() const
 	return static_cast<Server *>(parent());
 }
 
-ServerInfo_Room Server_Room::getInfo(bool complete, bool showGameTypes) const
+ServerInfo_Room Server_Room::getInfo(bool complete, bool showGameTypes, bool updating) const
 {
 	QMutexLocker locker(&roomMutex);
 	
 	ServerInfo_Room result;
 	result.set_room_id(id);
-	result.set_name(name.toStdString());
-	result.set_description(description.toStdString());
 	result.set_game_count(games.size());
 	result.set_player_count(size());
-	result.set_auto_join(autoJoin);
+	
+	if (!updating) {
+		result.set_name(name.toStdString());
+		result.set_description(description.toStdString());
+		result.set_auto_join(autoJoin);
+	}
 	
 	if (complete) {
 		QMapIterator<int, Server_Game *> gameIterator(games);

@@ -195,7 +195,8 @@ ServerInfo_PlayerProperties Server_Player::getProperties()
 	result.set_spectator(spectator);
 	result.set_conceded(conceded);
 	result.set_ready_start(readyStart);
-	result.set_deck_hash(deck ? deck->getDeckHash().toStdString() : std::string());
+	if (deck)
+		result.set_deck_hash(deck->getDeckHash().toStdString());
 	
 	return result;
 }

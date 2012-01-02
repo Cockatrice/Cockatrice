@@ -39,7 +39,7 @@ public:
 	QString getJoinMessage() const { return joinMessage; }
 	const QMap<int, Server_Game *> &getGames() const { return games; }
 	Server *getServer() const;
-	ServerInfo_Room getInfo(bool complete, bool showGameTypes = false) const;
+	ServerInfo_Room getInfo(bool complete, bool showGameTypes = false, bool updating = false) const;
 	int getGamesCreatedByUser(const QString &name) const;
 	QList<ServerInfo_Game> getGamesOfUser(const QString &name) const;
 	

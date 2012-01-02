@@ -72,8 +72,10 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
 		for (int j = 0; j < roomList->topLevelItemCount(); ++j) {
 		  	QTreeWidgetItem *twi = roomList->topLevelItem(j);
 			if (twi->data(0, Qt::UserRole).toInt() == room.room_id()) {
-				twi->setData(0, Qt::DisplayRole, QString::fromStdString(room.name()));
-				twi->setData(1, Qt::DisplayRole, QString::fromStdString(room.description()));
+				if (room.has_name())
+					twi->setData(0, Qt::DisplayRole, QString::fromStdString(room.name()));
+				if (room.has_description())
+					twi->setData(1, Qt::DisplayRole, QString::fromStdString(room.description()));
 				twi->setData(2, Qt::DisplayRole, room.player_count());
 				twi->setData(3, Qt::DisplayRole, room.game_count());
 				return;
@@ -81,15 +83,18 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
 		}
 		QTreeWidgetItem *twi = new QTreeWidgetItem;
 		twi->setData(0, Qt::UserRole, room.room_id());
-		twi->setData(0, Qt::DisplayRole, QString::fromStdString(room.name()));
-		twi->setData(1, Qt::DisplayRole, QString::fromStdString(room.description()));
+		if (room.has_name())
+			twi->setData(0, Qt::DisplayRole, QString::fromStdString(room.name()));
+		if (room.has_description())
+			twi->setData(1, Qt::DisplayRole, QString::fromStdString(room.description()));
 		twi->setData(2, Qt::DisplayRole, room.player_count());
 		twi->setData(3, Qt::DisplayRole, room.game_count());
 		twi->setTextAlignment(2, Qt::AlignRight);
 		twi->setTextAlignment(3, Qt::AlignRight);
 		roomList->addTopLevelItem(twi);
-		if (room.auto_join())
-			joinRoom(room.room_id(), false);
+		if (room.has_auto_join())
+			if (room.auto_join())
+				joinRoom(room.room_id(), false);
 	}
 }
 

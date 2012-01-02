@@ -135,7 +135,7 @@ void Server::broadcastRoomUpdate()
 	
 	ServerInfo_Room *roomInfo = event.add_room_list();
 	room->roomMutex.lock();
-	roomInfo->CopyFrom(room->getInfo(false));
+	roomInfo->CopyFrom(room->getInfo(false, false, true));
 	room->roomMutex.unlock();
 	
 	SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);

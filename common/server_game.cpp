@@ -583,11 +583,11 @@ ServerInfo_Game Server_Game::getInfo() const
 	ServerInfo_Game result;
 	result.set_room_id(room->getId());
 	result.set_game_id(getGameId());
-	result.set_max_players(getMaxPlayers());
 	if (!players.isEmpty()) {
 		for (int i = 0; i < gameTypes.size(); ++i)
 			result.add_game_types(gameTypes[i]);
 		
+		result.set_max_players(getMaxPlayers());
 		result.set_description(getDescription().toStdString());
 		result.set_with_password(!getPassword().isEmpty());
 		result.set_player_count(getPlayerCount());
