@@ -296,7 +296,7 @@ bool ServerSocketInterface::deckListHelper(int folderId, ServerInfo_DeckStorage_
 		newItem->set_name(query.value(1).toString().toStdString());
 		
 		ServerInfo_DeckStorage_File *newFile = newItem->mutable_file();
-		newFile->set_creation_time(query.value(2).toDateTime().toMSecsSinceEpoch());
+		newFile->set_creation_time(query.value(2).toDateTime().toTime_t());
 	}
 	
 	return true;
@@ -437,7 +437,7 @@ Response::ResponseCode ServerSocketInterface::cmdDeckUpload(const Command_DeckUp
 	ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
 	fileInfo->set_id(query.lastInsertId().toInt());
 	fileInfo->set_name(deckName.toStdString());
-	fileInfo->mutable_file()->set_creation_time(QDateTime::currentMSecsSinceEpoch());
+	fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toTime_t());
 	rc.setResponseExtension(re);
 	
 	return Response::RespOk;

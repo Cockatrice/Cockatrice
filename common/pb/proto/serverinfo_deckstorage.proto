@@ -1,5 +1,5 @@
 message ServerInfo_DeckStorage_File {
-	optional uint64 creation_time = 1;
+	optional uint32 creation_time = 1;
 }
 
 message ServerInfo_DeckStorage_Folder {
