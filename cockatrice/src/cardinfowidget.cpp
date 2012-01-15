@@ -173,7 +173,7 @@ void CardInfoWidget::resizeEvent(QResizeEvent * /*event*/)
 	if ((mode == ModeGameTab) && (minimized == 1))
 		return;
 	
-	pixmapWidth = qMax(100.0, qMin((qreal) cardPicture->width(), (height() - cardHeightOffset) / aspectRatio));
+	pixmapWidth = qMax((qreal) 100.0, qMin((qreal) cardPicture->width(), (qreal) ((height() - cardHeightOffset) / aspectRatio)));
 	updatePixmap();
 }
 
