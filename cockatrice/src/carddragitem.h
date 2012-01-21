@@ -6,6 +6,7 @@
 class CardItem;
 
 class CardDragItem : public AbstractCardDragItem {
+	Q_OBJECT
 private:
 	int id;
 	bool faceDown;

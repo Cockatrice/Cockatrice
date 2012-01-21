@@ -4,6 +4,7 @@
 #include "cardzone.h"
 
 class PileZone : public CardZone {
+	Q_OBJECT
 public:
 	PileZone(Player *_p, const QString &_name, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent = 0);
 	QRectF boundingRect() const;

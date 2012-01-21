@@ -8,6 +8,7 @@ class Player;
 class ArrowItem;
 
 class ArrowTarget : public AbstractGraphicsItem {
+	Q_OBJECT
 protected:
 	Player *owner;
 private:
