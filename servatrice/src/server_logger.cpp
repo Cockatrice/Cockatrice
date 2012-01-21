@@ -68,18 +68,20 @@ void ServerLogger::flushBuffer()
 	}
 }
 
-#ifdef Q_OS_UNIX
 void ServerLogger::hupSignalHandler(int /*unused*/)
 {
+#ifdef Q_OS_UNIX
 	if (!logFile)
 		return;
 	
 	char a = 1;
 	::write(sigHupFD[0], &a, sizeof(a));
+#endif
 }
 
 void ServerLogger::handleSigHup()
 {
+#ifdef Q_OS_UNIX
 	if (!logFile)
 		return;
 	
@@ -91,8 +93,8 @@ void ServerLogger::handleSigHup()
 	logFile->open(QIODevice::Append);
 	
 	snHup->setEnabled(true);
-}
 #endif
+}
 
 QFile *ServerLogger::logFile;
 int ServerLogger::sigHupFD[2];

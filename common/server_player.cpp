@@ -16,6 +16,7 @@
 #include "pb/event_move_card.pb.h"
 #include "pb/event_set_card_attr.pb.h"
 #include "pb/context_move_card.pb.h"
+#include "pb/context_undo_draw.pb.h"
 #include <QDebug>
 
 Server_Player::Server_Player(Server_Game *_game, int _playerId, const ServerInfo_User &_userInfo, bool _spectator, Server_ProtocolHandler *_handler)
@@ -422,7 +423,6 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 			Event_DestroyCard event;
 			event.set_zone_name(startzone->getName().toStdString());
 			event.set_card_id(card->getId());
-			ges.setGameEventContext(Context_MoveCard());
 			ges.enqueueGameEvent(event, playerId);
 			
 			card->deleteLater();
@@ -510,6 +510,11 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 				setCardAttrHelper(ges, targetzone->getName(), card->getId(), AttrPT, ptString);
 		}
 	}
+	if (undoingDraw)
+		ges.setGameEventContext(Context_UndoDraw());
+	else
+		ges.setGameEventContext(Context_MoveCard());
+	
 	if (startzone->hasCoords() && fixFreeSpaces)
 		startzone->fixFreeSpaces(ges);
 	

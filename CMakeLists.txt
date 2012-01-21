@@ -3,3 +3,8 @@ add_subdirectory(common)
 add_subdirectory(servatrice)
 add_subdirectory(cockatrice)
 add_subdirectory(oracle)
+
+FILE(GLOB sounds "${CMAKE_CURRENT_SOURCE_DIR}/sounds/*.raw")
+INSTALL(FILES ${sounds} DESTINATION share/cockatrice/sounds)
+FILE(GLOB zonebg "${CMAKE_CURRENT_SOURCE_DIR}/zonebg/*.*")
+INSTALL(FILES ${zonebg} DESTINATION share/cockatrice/zonebg)
