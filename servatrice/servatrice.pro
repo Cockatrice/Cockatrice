@@ -22,7 +22,6 @@ HEADERS += src/main.h \
 	src/serversocketthread.h \
 	src/passwordhasher.h \
 	../common/color.h \
-	../common/serializable_item.h \
 	../common/decklist.h \
 	../common/rng_abstract.h \
 	../common/rng_sfmt.h \
@@ -45,7 +44,6 @@ SOURCES += src/main.cpp \
 	src/server_logger.cpp \
 	src/serversocketthread.cpp \
 	src/passwordhasher.cpp \
-	../common/serializable_item.cpp \
 	../common/decklist.cpp \
 	../common/rng_abstract.cpp \
 	../common/rng_sfmt.cpp \

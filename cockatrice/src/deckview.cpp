@@ -318,20 +318,19 @@ void DeckViewScene::rebuildTree()
 	}
 }
 
-void DeckViewScene::applySideboardPlan(const QList<MoveCardToZone *> &plan)
+void DeckViewScene::applySideboardPlan(const QList<MoveCard_ToZone> &plan)
 {
 	for (int i = 0; i < plan.size(); ++i) {
-		MoveCardToZone *m = plan[i];
-		
-		DeckViewCardContainer *start = cardContainers.value(m->getStartZone());
-		DeckViewCardContainer *target = cardContainers.value(m->getTargetZone());
+		const MoveCard_ToZone &m = plan[i];
+		DeckViewCardContainer *start = cardContainers.value(QString::fromStdString(m.start_zone()));
+		DeckViewCardContainer *target = cardContainers.value(QString::fromStdString(m.target_zone()));
 		if (!start || !target)
 			continue;
 		
 		DeckViewCard *card = 0;
 		const QList<DeckViewCard *> &cardList = start->getCards();
 		for (int j = 0; j < cardList.size(); ++j)
-			if (cardList[j]->getName() == m->getCardName()) {
+			if (cardList[j]->getName() == QString::fromStdString(m.card_name())) {
 				card = cardList[j];
 				break;
 			}
@@ -414,16 +413,21 @@ void DeckViewScene::updateContents()
 	emit sideboardPlanChanged();
 }
 
-QList<MoveCardToZone *> DeckViewScene::getSideboardPlan() const
+QList<MoveCard_ToZone> DeckViewScene::getSideboardPlan() const
 {
-	QList<MoveCardToZone *> result;
+	QList<MoveCard_ToZone> result;
 	QMapIterator<QString, DeckViewCardContainer *> containerIterator(cardContainers);
 	while (containerIterator.hasNext()) {
 		DeckViewCardContainer *cont = containerIterator.next().value();
 		const QList<DeckViewCard *> cardList = cont->getCards();
 		for (int i = 0; i < cardList.size(); ++i)
-			if (cardList[i]->getOriginZone() != cont->getName())
-				result.append(new MoveCardToZone(cardList[i]->getName(), cardList[i]->getOriginZone(), cont->getName()));
+			if (cardList[i]->getOriginZone() != cont->getName()) {
+				MoveCard_ToZone m;
+				m.set_card_name(cardList[i]->getName().toStdString());
+				m.set_start_zone(cardList[i]->getOriginZone().toStdString());
+				m.set_target_zone(cont->getName().toStdString());
+				result.append(m);
+			}
 	}
 	return result;
 }

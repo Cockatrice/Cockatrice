@@ -8,6 +8,8 @@
 #include <QPixmap>
 #include "abstractcarddragitem.h"
 
+#include "pb/move_card_to_zone.pb.h"
+
 class DeckList;
 class InnerDecklistNode;
 class CardInfo;
@@ -80,7 +82,7 @@ private:
 	QMap<QString, DeckViewCardContainer *> cardContainers;
 	qreal optimalAspectRatio;
 	void rebuildTree();
-	void applySideboardPlan(const QList<MoveCardToZone *> &plan);
+	void applySideboardPlan(const QList<MoveCard_ToZone> &plan);
 public:
 	DeckViewScene(QObject *parent = 0);
 	~DeckViewScene();
@@ -90,7 +92,7 @@ public:
 	void setOptimalAspectRatio(qreal _optimalAspectRatio) { optimalAspectRatio = _optimalAspectRatio; }
 	void rearrangeItems();
 	void updateContents();
-	QList<MoveCardToZone *> getSideboardPlan() const;
+	QList<MoveCard_ToZone> getSideboardPlan() const;
 };
 
 class DeckView : public QGraphicsView {
@@ -108,7 +110,7 @@ public:
 	DeckView(QWidget *parent = 0);
 	void setDeck(DeckList *_deck);
 	void setLocked(bool _locked) { deckViewScene->setLocked(_locked); }
-	QList<MoveCardToZone *> getSideboardPlan() const { return deckViewScene->getSideboardPlan(); }
+	QList<MoveCard_ToZone> getSideboardPlan() const { return deckViewScene->getSideboardPlan(); }
 };
 
 #endif

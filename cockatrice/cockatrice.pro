@@ -87,7 +87,6 @@ HEADERS += src/abstractcounter.h \
  src/pending_command.h \
  	../common/get_pb_extension.h \
  	../common/color.h \
- 	../common/serializable_item.h \
 	../common/decklist.h \
 	../common/rng_abstract.h \
 	../common/rng_sfmt.h \
@@ -171,7 +170,6 @@ SOURCES += src/abstractcounter.cpp \
  src/priceupdater.cpp \
  src/soundengine.cpp \
  	../common/get_pb_extension.cpp \
- 	../common/serializable_item.cpp \
 	../common/decklist.cpp \
 	../common/rng_abstract.cpp \
 	../common/rng_sfmt.cpp \

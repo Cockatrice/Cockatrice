@@ -6,6 +6,7 @@
 #include "server_game.h"
 #include "server_protocolhandler.h"
 #include "decklist.h"
+#include "color.h"
 #include "pb/response.pb.h"
 #include "pb/command_move_card.pb.h"
 #include "pb/serverinfo_user.pb.h"
@@ -133,26 +134,28 @@ void Server_Player::setupZones()
 		}
 	}
 	
-	const QList<MoveCardToZone *> &sideboardPlan = deck->getCurrentSideboardPlan();
+	const QList<MoveCard_ToZone> &sideboardPlan = deck->getCurrentSideboardPlan();
 	for (int i = 0; i < sideboardPlan.size(); ++i) {
-		MoveCardToZone *m = sideboardPlan[i];
+		const MoveCard_ToZone &m = sideboardPlan[i];
+		const QString startZone = QString::fromStdString(m.start_zone());
+		const QString targetZone = QString::fromStdString(m.target_zone());
 		
 		Server_CardZone *start, *target;
-		if (m->getStartZone() == "main")
+		if (startZone == "main")
 			start = deckZone;
-		else if (m->getStartZone() == "side")
+		else if (startZone == "side")
 			start = sbZone;
 		else
 			continue;
-		if (m->getTargetZone() == "main")
+		if (targetZone == "main")
 			target = deckZone;
-		else if (m->getTargetZone() == "side")
+		else if (targetZone == "side")
 			target = sbZone;
 		else
 			continue;
 		
 		for (int j = 0; j < start->cards.size(); ++j)
-			if (start->cards[j]->getName() == m->getCardName()) {
+			if (start->cards[j]->getName() == QString::fromStdString(m.card_name())) {
 				Server_Card *card = start->cards[j];
 				start->cards.removeAt(j);
 				target->cards.append(card);

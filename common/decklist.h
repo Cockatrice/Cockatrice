@@ -7,7 +7,7 @@
 #include <QObject>
 #include <QStringList>
 #include <QSet>
-#include "serializable_item.h"
+#include <QMap>
 
 #include "pb/move_card_to_zone.pb.h"
 
@@ -19,30 +19,23 @@ class QXmlStreamWriter;
 
 class InnerDecklistNode;
 
-class MoveCardToZone : public SerializableItem_Map {
+class SideboardPlan {
+private:
+	QString name;
+	QList<MoveCard_ToZone> moveList;
 public:
-	MoveCardToZone(const QString &_cardName = QString(), const QString &_startZone = QString(), const QString &_targetZone = QString());
-	MoveCardToZone(MoveCardToZone *other);
-	static SerializableItem *newItem() { return new MoveCardToZone; }
-	QString getCardName() const { return static_cast<SerializableItem_String *>(itemMap.value("card_name"))->getData(); }
-	QString getStartZone() const { return static_cast<SerializableItem_String *>(itemMap.value("start_zone"))->getData(); }
-	QString getTargetZone() const { return static_cast<SerializableItem_String *>(itemMap.value("target_zone"))->getData(); }
-	MoveCard_ToZone toPB() { MoveCard_ToZone foo; foo.set_card_name(getCardName().toStdString()); foo.set_start_zone(getStartZone().toStdString()); foo.set_target_zone(getTargetZone().toStdString()); return foo; } // XXX
-};
-
-class SideboardPlan : public SerializableItem_Map {
-public:
-	SideboardPlan(const QString &_name = QString(), const QList<MoveCardToZone *> &_moveList = QList<MoveCardToZone *>());
-	static SerializableItem *newItem() { return new SideboardPlan; }
-	QString getName() const { return static_cast<SerializableItem_String *>(itemMap.value("name"))->getData(); }
-	QList<MoveCardToZone *> getMoveList() const { return typecastItemList<MoveCardToZone *>(); }
-	void setMoveList(const QList<MoveCardToZone *> &_moveList);
+	SideboardPlan(const QString &_name = QString(), const QList<MoveCard_ToZone> &_moveList = QList<MoveCard_ToZone>());
+	bool readElement(QXmlStreamReader *xml);
+	void write(QXmlStreamWriter *xml);
+	
+	QString getName() const { return name; }
+	const QList<MoveCard_ToZone> &getMoveList() const { return moveList; }
+	void setMoveList(const QList<MoveCard_ToZone> &_moveList);
 };
 
 class AbstractDecklistNode {
 protected:
 	InnerDecklistNode *parent;
-	AbstractDecklistNode *currentItem;
 public:
 	AbstractDecklistNode(InnerDecklistNode *_parent = 0);
 	virtual ~AbstractDecklistNode() { }
@@ -114,7 +107,7 @@ public:
         void setPrice(const float _price) { price = _price; }
     };
 
-class DeckList : public SerializableItem {
+class DeckList : public QObject {
 	Q_OBJECT
 public:
 	enum FileFormat { PlainTextFormat, CockatriceFormat };
@@ -125,8 +118,6 @@ private:
 	FileFormat lastFileFormat;
 	QMap<QString, SideboardPlan *> sideboardPlans;
 	InnerDecklistNode *root;
-	InnerDecklistNode *currentZone;
-	SideboardPlan *currentSideboardPlan;
 	QString currentElementText;
 	void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
 signals:
@@ -145,12 +136,12 @@ public:
 	QString getComments() const { return comments; }
 	QString getLastFileName() const { return lastFileName; }
 	FileFormat getLastFileFormat() const { return lastFileFormat; }
-	QList<MoveCardToZone *> getCurrentSideboardPlan();
-	void setCurrentSideboardPlan(const QList<MoveCardToZone *> &plan);
+	QList<MoveCard_ToZone> getCurrentSideboardPlan();
+	void setCurrentSideboardPlan(const QList<MoveCard_ToZone> &plan);
 	const QMap<QString, SideboardPlan *> &getSideboardPlans() const { return sideboardPlans; }
 
 	bool readElement(QXmlStreamReader *xml);
-	void writeElement(QXmlStreamWriter *xml);
+	void write(QXmlStreamWriter *xml);
 	void loadFromXml(QXmlStreamReader *xml);
 	QString writeToString_Native();
 	bool loadFromFile_Native(QIODevice *device);

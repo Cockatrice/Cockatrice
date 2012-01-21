@@ -887,15 +887,11 @@ Response::ResponseCode Server_ProtocolHandler::cmdSetSideboardPlan(const Command
 	if (!deck)
 		return Response::RespContextError;
 	
-	QList<MoveCardToZone *> sideboardPlan;
-	for (int i = 0; i < cmd.move_list_size(); ++i) {
-		const MoveCard_ToZone &temp = cmd.move_list(i);
-		sideboardPlan.append(new MoveCardToZone(QString::fromStdString(temp.card_name()), QString::fromStdString(temp.start_zone()), QString::fromStdString(temp.target_zone())));
-	}
+	QList<MoveCard_ToZone> sideboardPlan;
+	for (int i = 0; i < cmd.move_list_size(); ++i)
+		sideboardPlan.append(cmd.move_list(i));
 	deck->setCurrentSideboardPlan(sideboardPlan);
-	for (int i = 0; i < sideboardPlan.size(); ++i)
-		delete sideboardPlan[i];
-	// XXX TEMPORARY HACK
+	
 	return Response::RespOk;
 }
 

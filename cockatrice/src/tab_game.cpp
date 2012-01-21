@@ -175,9 +175,9 @@ void DeckViewContainer::readyStart()
 void DeckViewContainer::sideboardPlanChanged()
 {
 	Command_SetSideboardPlan cmd;
-	QList<MoveCardToZone *> newPlan = deckView->getSideboardPlan();
+	const QList<MoveCard_ToZone> &newPlan = deckView->getSideboardPlan();
 	for (int i = 0; i < newPlan.size(); ++i)
-		cmd.add_move_list()->CopyFrom(newPlan[i]->toPB());
+		cmd.add_move_list()->CopyFrom(newPlan[i]);
 	static_cast<TabGame *>(parent())->sendGameCommand(cmd, playerId);
 }
 
