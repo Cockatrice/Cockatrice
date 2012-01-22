@@ -27,6 +27,7 @@
 #include <QSettings>
 #include <QIcon>
 #include <QDir>
+#include <QDesktopServices>
 #include <stdio.h>
 
 #include "main.h"
@@ -99,15 +100,18 @@ int main(int argc, char *argv[])
 	qsrand(QDateTime::currentDateTime().toTime_t());
 	
 	bool startMainProgram = true;
-#ifdef Q_OS_MAC
+	const QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 	if (!db->getLoadSuccess())
-		if (db->loadCardDatabase(baseDir.absolutePath() + "/cards.xml"))
-			settingsCache->setCardDatabasePath(baseDir.absolutePath() + "/cards.xml");
-	if (!QDir(settingsCache->getDeckPath()).exists())
-		settingsCache->setDeckPath(baseDir.absolutePath() + "/decks");
-	if (!QDir(settingsCache->getPicsPath()).exists())
-		settingsCache->setPicsPath(baseDir.absolutePath() + "/pics");
-#endif
+		if (db->loadCardDatabase(dataDir + "/cards.xml"))
+			settingsCache->setCardDatabasePath(dataDir + "/cards.xml");
+	if (!QDir(settingsCache->getDeckPath()).exists()) {
+		QDir().mkpath(dataDir + "/decks");
+		settingsCache->setDeckPath(dataDir + "/decks");
+	}
+	if (!QDir(settingsCache->getPicsPath()).exists()) {
+		QDir().mkpath(dataDir + "/pics");
+		settingsCache->setPicsPath(dataDir + "/pics");
+	}
 	if (!db->getLoadSuccess() || !QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty() || settingsCache->getPicsPath().isEmpty() || !QDir(settingsCache->getPicsPath()).exists()) {
 		DlgSettings dlgSettings;
 		dlgSettings.show();

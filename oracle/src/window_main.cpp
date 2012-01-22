@@ -1,4 +1,19 @@
-#include <QtGui>
+#include <QApplication>
+#include <QMenu>
+#include <QMenuBar>
+#include <QStatusBar>
+#include <QLineEdit>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QScrollArea>
+#include <QTextEdit>
+#include <QInputDialog>
+#include <QLabel>
+#include <QPushButton>
+#include <QCheckBox>
+#include <QProgressBar>
+#include <QVBoxLayout>
+#include <QDesktopServices>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include "window_main.h"
@@ -9,13 +24,7 @@ const QString WindowMain::defaultSetsUrl = QString("http://www.cockatrice.de/fil
 WindowMain::WindowMain(QWidget *parent)
 	: QMainWindow(parent)
 {
-	QDir dataDir(qApp->applicationDirPath());
-#ifdef Q_OS_MAC
-	dataDir.cdUp();
-	dataDir.cdUp();
-	dataDir.cdUp();
-#endif
-	importer = new OracleImporter(dataDir.absolutePath(), this);
+	importer = new OracleImporter(QDesktopServices::storageLocation(QDesktopServices::DataLocation), this);
 	nam = new QNetworkAccessManager(this);
 	
 	checkBoxLayout = new QVBoxLayout;
@@ -167,17 +176,23 @@ void WindowMain::updateTotalProgress(int cardsImported, int setIndex, const QStr
 	if (nextSetName.isEmpty()) {
 		QMessageBox::information(this, tr("Oracle importer"), tr("Import finished: %1 cards.").arg(importer->getCardList().size()));
 		bool ok = false;
-		QString savePath = importer->getDataDir() + "/cards.xml";
+		const QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+		QDir dir(dataDir);
+		if (!dir.exists())
+			dir.mkpath(dataDir);
+		QString savePath = dataDir + "/cards.xml";
 		do {
 			QString fileName;
 			if (savePath.isEmpty())
-				fileName = QFileDialog::getSaveFileName(this, tr("Save card database"), importer->getDataDir() + "/cards.xml", tr("XML card database (*.xml)"));
+				fileName = QFileDialog::getSaveFileName(this, tr("Save card database"), dataDir + "/cards.xml", tr("XML card database (*.xml)"));
 			else {
 				fileName = savePath;
 				savePath.clear();
 			}
-			if (fileName.isEmpty())
+			if (fileName.isEmpty()) {
 				qApp->quit();
+				return;
+			}
 			if (importer->saveToFile(fileName))
 				ok = true;
 			else

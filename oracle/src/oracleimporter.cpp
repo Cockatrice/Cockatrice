@@ -235,6 +235,8 @@ QString OracleImporter::getPictureUrl(QString url, int cardId, QString name, con
 
 int OracleImporter::startDownload()
 {
+	clear();
+	
 	setsToDownload.clear();
 	for (int i = 0; i < allSets.size(); ++i)
 		if (allSets[i].getImport())

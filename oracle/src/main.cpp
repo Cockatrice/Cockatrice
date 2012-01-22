@@ -1,6 +1,5 @@
 #include <QApplication>
 #include <QTextCodec>
-#include "oracleimporter.h"
 #include "window_main.h"
 #include "settingscache.h"
 
@@ -11,7 +10,11 @@ int main(int argc, char *argv[])
 	QApplication app(argc, argv);
 	
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-
+	
+	QCoreApplication::setOrganizationName("Cockatrice");
+	QCoreApplication::setOrganizationDomain("cockatrice.de");
+	QCoreApplication::setApplicationName("Cockatrice");
+	
 	settingsCache = new SettingsCache;
 	
 	WindowMain wnd;
