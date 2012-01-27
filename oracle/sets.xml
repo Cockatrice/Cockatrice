@@ -53,6 +53,10 @@
 	    <longname>Conflux</longname>
 	</set>
 	<set import="1">
+	    <name>DKA</name>
+	    <longname>Dark Ascension</longname>
+	</set>
+	<set import="1">
 	    <name>DS</name>
 	    <longname>Darksteel</longname>
 	</set>
