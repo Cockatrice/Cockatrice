@@ -98,21 +98,15 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
 	endInsertRows();
 }
 
-GamesProxyModel::GamesProxyModel(QObject *parent)
-	: QSortFilterProxyModel(parent), fullGamesVisible(false)
+GamesProxyModel::GamesProxyModel(QObject *parent, ServerInfo_User *_ownUser)
+	: QSortFilterProxyModel(parent), ownUser(_ownUser), unavailableGamesVisible(false)
 {
 	setDynamicSortFilter(true);
 }
 
-void GamesProxyModel::setFullGamesVisible(bool _fullGamesVisible)
+void GamesProxyModel::setUnavailableGamesVisible(bool _unavailableGamesVisible)
 {
-	fullGamesVisible = _fullGamesVisible;
-	invalidateFilter();
-}
-
-void GamesProxyModel::setRunningGamesVisible(bool _runningGamesVisible)
-{
-	runningGamesVisible = _runningGamesVisible;
+	unavailableGamesVisible = _unavailableGamesVisible;
 	invalidateFilter();
 }
 
@@ -123,10 +117,15 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourc
 		return false;
 	
 	const ServerInfo_Game &game = model->getGame(sourceRow);
-	if ((game.player_count() == game.max_players()) && !fullGamesVisible)
-		return false;
-	if (game.started() && !runningGamesVisible)
-		return false;
+	if (!unavailableGamesVisible) {
+		if (game.player_count() == game.max_players())
+			return false;
+		if (game.started())
+			return false;
+		if (!(ownUser->user_level() & ServerInfo_User::IsRegistered))
+			if (game.only_registered())
+				return false;
+	}
 	
 	return true;
 }

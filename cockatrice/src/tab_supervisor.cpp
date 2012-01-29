@@ -273,7 +273,7 @@ void TabSupervisor::gameLeft(TabGame *tab)
 
 void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
 {
-	TabRoom *tab = new TabRoom(this, client, QString::fromStdString(userInfo->name()), info);
+	TabRoom *tab = new TabRoom(this, client, userInfo, info);
 	connect(tab, SIGNAL(roomClosing(TabRoom *)), this, SLOT(roomLeft(TabRoom *)));
 	connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
 	int tabIndex = myAddTab(tab);

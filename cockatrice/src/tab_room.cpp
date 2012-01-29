@@ -25,8 +25,8 @@
 #include "pb/event_room_say.pb.h"
 #include "pending_command.h"
 
-TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, const ServerInfo_Room &info)
-	: Tab(_tabSupervisor), client(_client), roomId(info.room_id()), roomName(QString::fromStdString(info.name())), ownName(_ownName)
+TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerInfo_User *_ownUser, const ServerInfo_Room &info)
+	: Tab(_tabSupervisor), client(_client), roomId(info.room_id()), roomName(QString::fromStdString(info.name())), ownUser(_ownUser)
 {
 	const int gameTypeListSize = info.gametype_list_size();
 	for (int i = 0; i < gameTypeListSize; ++i)
@@ -38,7 +38,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
 	userList = new UserList(tabSupervisor, client, UserList::RoomList);
 	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
 	
-	chatView = new ChatView(ownName, true);
+	chatView = new ChatView(QString::fromStdString(ownUser->name()), true);
 	connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
 	connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
 	sayLabel = new QLabel;

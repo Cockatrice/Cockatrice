@@ -23,6 +23,7 @@ class Event_RoomSay;
 class GameSelector;
 class Response;
 class PendingCommand;
+class ServerInfo_User;
 
 class TabRoom : public Tab {
 	Q_OBJECT
@@ -30,7 +31,7 @@ private:
 	AbstractClient *client;
 	int roomId;
 	QString roomName;
-	QString ownName;
+	ServerInfo_User *ownUser;
 	QMap<int, QString> gameTypes;
 	
 	GameSelector *gameSelector;
@@ -55,7 +56,7 @@ private slots:
 	void processLeaveRoomEvent(const Event_LeaveRoom &event);
 	void processRoomSayEvent(const Event_RoomSay &event);
 public:
-	TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, const ServerInfo_Room &info);
+	TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerInfo_User *_ownUser, const ServerInfo_Room &info);
 	~TabRoom();
 	void retranslateUi();
 	void closeRequest();
