@@ -73,9 +73,9 @@ WindowMain::WindowMain(QWidget *parent)
 	grid->addWidget(messageLog, 3, 0, 1, 2);
 	
 	QHBoxLayout *mainLayout = new QHBoxLayout;
-	mainLayout->addLayout(settingsLayout);
+	mainLayout->addLayout(settingsLayout, 6);
 	mainLayout->addSpacing(10);
-	mainLayout->addLayout(grid);
+	mainLayout->addLayout(grid, 10);
 	
 	QWidget *centralWidget = new QWidget;
 	centralWidget->setLayout(mainLayout);
@@ -98,7 +98,7 @@ WindowMain::WindowMain(QWidget *parent)
 	fileMenu->addAction(aExit);
 	
 	setWindowTitle(tr("Oracle importer"));
-	setFixedSize(600, 500);
+	setMinimumSize(750, 500);
 
 	QStringList args = qApp->arguments();
 	if (args.contains("-dlsets"))
