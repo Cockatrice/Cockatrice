@@ -97,7 +97,7 @@ bool CardInfoWidget::shouldShowPowTough()
 
 bool CardInfoWidget::shouldShowLoyalty()
 {
-	return (info->getMainCardType() == "Planeswalker");
+	return (info->getLoyalty() > 0);
 }
 
 void CardInfoWidget::setMinimized(int _minimized)
