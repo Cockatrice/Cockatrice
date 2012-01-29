@@ -7,6 +7,7 @@
 #include "gametypemap.h"
 
 class ServerInfo_Game;
+class ServerInfo_User;
 
 class GamesModel : public QAbstractTableModel {
 	Q_OBJECT
@@ -29,12 +30,11 @@ public:
 class GamesProxyModel : public QSortFilterProxyModel {
 	Q_OBJECT
 private:
-	bool fullGamesVisible;
-	bool runningGamesVisible;
+	ServerInfo_User *ownUser;
+	bool unavailableGamesVisible;
 public:
-	GamesProxyModel(QObject *parent = 0);
-	void setFullGamesVisible(bool _fullGamesVisible);
-	void setRunningGamesVisible(bool _runningGamesVisible);
+	GamesProxyModel(QObject *parent = 0, ServerInfo_User *_ownUser = 0);
+	void setUnavailableGamesVisible(bool _unavailableGamesVisible);
 protected:
 	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 };
