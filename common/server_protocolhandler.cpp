@@ -897,7 +897,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdConcede(const Command_Concede 
 		return Response::RespContextError;
 	
 	player->setConceded(true);
-	game->removeArrowsToPlayer(player);
+	game->removeArrowsToPlayer(ges, player);
+	game->unattachCards(ges, player);
 	player->clearZones();
 	
 	Event_PlayerPropertiesChanged event;

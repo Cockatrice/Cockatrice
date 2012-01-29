@@ -317,9 +317,13 @@ void Server_Game::removePlayer(Server_Player *player)
 	QMutexLocker locker(&gameMutex);
 	
 	players.remove(player->getPlayerId());
-	removeArrowsToPlayer(player);
 	
-	sendGameEventContainer(prepareGameEvent(Event_Leave(), player->getPlayerId()));
+	GameEventStorage ges;
+	removeArrowsToPlayer(ges, player);
+	unattachCards(ges, player);
+	ges.enqueueGameEvent(Event_Leave(), player->getPlayerId());
+	ges.sendToGame(this);
+	
 	bool playerActive = activePlayer == player->getPlayerId();
 	bool playerHost = hostId == player->getPlayerId();
 	bool spectator = player->getSpectator();
@@ -350,7 +354,7 @@ void Server_Game::removePlayer(Server_Player *player)
 	room->broadcastGameListUpdate(this);
 }
 
-void Server_Game::removeArrowsToPlayer(Server_Player *player)
+void Server_Game::removeArrowsToPlayer(GameEventStorage &ges, Server_Player *player)
 {
 	QMutexLocker locker(&gameMutex);
 	
@@ -372,9 +376,27 @@ void Server_Game::removeArrowsToPlayer(Server_Player *player)
 		for (int i = 0; i < toDelete.size(); ++i) {
 			Event_DeleteArrow event;
 			event.set_arrow_id(toDelete[i]->getId());
-			sendGameEventContainer(prepareGameEvent(event, p->getPlayerId()));
+			ges.enqueueGameEvent(event, p->getPlayerId());
 			
 			p->deleteArrow(toDelete[i]->getId());
+		}
+	}
+}
+
+void Server_Game::unattachCards(GameEventStorage &ges, Server_Player *player)
+{
+	QMutexLocker locker(&gameMutex);
+	
+	QMapIterator<QString, Server_CardZone *> zoneIterator(player->getZones());
+	while (zoneIterator.hasNext()) {
+		Server_CardZone *zone = zoneIterator.next().value();
+		for (int i = 0; i < zone->cards.size(); ++i) {
+			Server_Card *card = zone->cards.at(i);
+			
+			// Make a copy of the list because the original one gets modified during the loop
+			QList<Server_Card *> attachedCards = card->getAttachedCards();
+			for (int i = 0; i < attachedCards.size(); ++i)
+				attachedCards[i]->getZone()->getPlayer()->unattachCard(ges, attachedCards[i]);
 		}
 	}
 }
@@ -519,14 +541,21 @@ QList<ServerInfo_Player> Server_Game::getGameState(Server_Player *playerWhosAski
 					cardInfo->set_name(displayedName.toStdString());
 					cardInfo->set_x(card->getX());
 					cardInfo->set_y(card->getY());
-					cardInfo->set_face_down(card->getFaceDown());
+					if (card->getFaceDown())
+						cardInfo->set_face_down(true);
 					cardInfo->set_tapped(card->getTapped());
-					cardInfo->set_attacking(card->getAttacking());
-					cardInfo->set_color(card->getColor().toStdString());
-					cardInfo->set_pt(card->getPT().toStdString());
-					cardInfo->set_annotation(card->getAnnotation().toStdString());
-					cardInfo->set_destroy_on_zone_change(card->getDestroyOnZoneChange());
-					cardInfo->set_doesnt_untap(card->getDoesntUntap());
+					if (card->getAttacking())
+						cardInfo->set_attacking(true);
+					if (!card->getColor().isEmpty())
+						cardInfo->set_color(card->getColor().toStdString());
+					if (!card->getPT().isEmpty())
+						cardInfo->set_pt(card->getPT().toStdString());
+					if (!card->getAnnotation().isEmpty())
+						cardInfo->set_annotation(card->getAnnotation().toStdString());
+					if (card->getDestroyOnZoneChange())
+						cardInfo->set_destroy_on_zone_change(true);
+					if (card->getDoesntUntap())
+						cardInfo->set_doesnt_untap(true);
 					
 					QList<ServerInfo_CardCounter *> cardCounterList;
 					QMapIterator<int, int> cardCounterIterator(card->getCounters());
