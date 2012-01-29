@@ -1,7 +1,5 @@
 #include <QFile>
 #include <QTextStream>
-#include <QXmlStreamReader>
-#include <QXmlStreamWriter>
 #include <QVariant>
 #include <QCryptographicHash>
 #include "decklist.h"

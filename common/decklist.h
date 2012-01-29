@@ -9,13 +9,15 @@
 #include <QSet>
 #include <QMap>
 
+// Required on Mac. Forward declaration doesn't work. Don't ask why.
+#include <QtCore/QXmlStreamReader>
+#include <QtCore/QXmlStreamWriter>
+
 #include "pb/move_card_to_zone.pb.h"
 
 class CardDatabase;
 class QIODevice;
 class QTextStream;
-class QXmlStreamReader;
-class QXmlStreamWriter;
 
 class InnerDecklistNode;
 

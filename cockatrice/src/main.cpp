@@ -104,11 +104,11 @@ int main(int argc, char *argv[])
 	if (!db->getLoadSuccess())
 		if (db->loadCardDatabase(dataDir + "/cards.xml"))
 			settingsCache->setCardDatabasePath(dataDir + "/cards.xml");
-	if (!QDir(settingsCache->getDeckPath()).exists()) {
+	if (!QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty()) {
 		QDir().mkpath(dataDir + "/decks");
 		settingsCache->setDeckPath(dataDir + "/decks");
 	}
-	if (!QDir(settingsCache->getPicsPath()).exists()) {
+	if (!QDir(settingsCache->getPicsPath()).exists() || settingsCache->getPicsPath().isEmpty()) {
 		QDir().mkpath(dataDir + "/pics");
 		settingsCache->setPicsPath(dataDir + "/pics");
 	}
