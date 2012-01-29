@@ -2,6 +2,7 @@
 #define TAB_ROOM_H
 
 #include "tab.h"
+#include "protocol_datastructures.h"
 #include <QGroupBox>
 #include <QMap>
 
@@ -28,7 +29,7 @@ private:
 	AbstractClient *client;
 	int roomId;
 	QString roomName;
-	QString ownName;
+	ServerInfo_User *ownUser;
 	QMap<int, QString> gameTypes;
 	
 	GameSelector *gameSelector;
@@ -53,7 +54,7 @@ private slots:
 	void processLeaveRoomEvent(Event_LeaveRoom *event);
 	void processSayEvent(Event_RoomSay *event);
 public:
-	TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, ServerInfo_Room *info);
+	TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerInfo_User *_ownUser, ServerInfo_Room *info);
 	~TabRoom();
 	void retranslateUi();
 	void closeRequest();

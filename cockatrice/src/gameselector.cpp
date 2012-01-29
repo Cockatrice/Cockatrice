@@ -18,7 +18,7 @@ GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSuperviso
 {
 	gameListView = new QTreeView;
 	gameListModel = new GamesModel(_rooms, _gameTypes, this);
-	gameListProxyModel = new GamesProxyModel(this);
+	gameListProxyModel = new GamesProxyModel(this, tabSupervisor->getUserInfo());
 	gameListProxyModel->setSourceModel(gameListModel);
 	gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 	gameListView->setModel(gameListProxyModel);
@@ -29,12 +29,10 @@ GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSuperviso
 		gameListView->header()->hideSection(1);
 	gameListView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
 
-	showFullGamesCheckBox = new QCheckBox;
-	showRunningGamesCheckBox = new QCheckBox;
+	showUnavailableGamesCheckBox = new QCheckBox;
 	
 	QVBoxLayout *filterLayout = new QVBoxLayout;
-	filterLayout->addWidget(showFullGamesCheckBox);
-	filterLayout->addWidget(showRunningGamesCheckBox);
+	filterLayout->addWidget(showUnavailableGamesCheckBox);
 	
 	if (room)
 		createButton = new QPushButton;
@@ -65,21 +63,15 @@ GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSuperviso
 	setMinimumWidth((qreal) (gameListView->columnWidth(0) * gameListModel->columnCount()) / 1.5);
 	setMinimumHeight(200);
 
-	connect(showFullGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showFullGamesChanged(int)));
-	connect(showRunningGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showRunningGamesChanged(int)));
+	connect(showUnavailableGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showUnavailableGamesChanged(int)));
 	connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
 	connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
 	connect(spectateButton, SIGNAL(clicked()), this, SLOT(actJoin()));
 }
 
-void GameSelector::showFullGamesChanged(int state)
+void GameSelector::showUnavailableGamesChanged(int state)
 {
-	gameListProxyModel->setFullGamesVisible(state);
-}
-
-void GameSelector::showRunningGamesChanged(int state)
-{
-	gameListProxyModel->setRunningGamesVisible(state);
+	gameListProxyModel->setUnavailableGamesVisible(state);
 }
 
 void GameSelector::actCreate()
@@ -138,8 +130,7 @@ void GameSelector::actJoin()
 void GameSelector::retranslateUi()
 {
 	setTitle(tr("Games"));
-	showFullGamesCheckBox->setText(tr("Show &full games"));
-	showRunningGamesCheckBox->setText(tr("Show &running games"));
+	showUnavailableGamesCheckBox->setText(tr("Show u&navailable games"));
 	if (createButton)
 		createButton->setText(tr("C&reate"));
 	joinButton->setText(tr("&Join"));
