@@ -73,6 +73,7 @@ public:
 	void updateLoginMessage();
 	ServerInfo_User getUserData(const QString &name);
 	int getUsersWithAddress(const QHostAddress &address) const;
+	QList<ServerSocketInterface *> getUsersWithAddressAsList(const QHostAddress &address) const;
 	QMap<QString, ServerInfo_User> getBuddyList(const QString &name);
 	QMap<QString, ServerInfo_User> getIgnoreList(const QString &name);
 	bool isInBuddyList(const QString &whoseList, const QString &who);

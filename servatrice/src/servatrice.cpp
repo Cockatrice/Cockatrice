@@ -394,6 +394,16 @@ int Servatrice::getUsersWithAddress(const QHostAddress &address) const
 	return result;
 }
 
+QList<ServerSocketInterface *> Servatrice::getUsersWithAddressAsList(const QHostAddress &address) const
+{
+	QMutexLocker locker(&serverMutex);
+	QList<ServerSocketInterface *> result;
+	for (int i = 0; i < clients.size(); ++i)
+		if (static_cast<ServerSocketInterface *>(clients[i])->getPeerAddress() == address)
+			result.append(static_cast<ServerSocketInterface *>(clients[i]));
+	return result;
+}
+
 int Servatrice::startSession(const QString &userName, const QString &address)
 {
 	if (authenticationMethod == AuthenticationNone)

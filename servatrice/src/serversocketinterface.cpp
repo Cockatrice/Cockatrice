@@ -505,16 +505,21 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 	servatrice->execSqlQuery(query);
 	servatrice->dbMutex.unlock();
 	
+	QList<ServerSocketInterface *> userList = servatrice->getUsersWithAddressAsList(QHostAddress(address));
 	ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
-	if (user) {
+	if (user && !userList.contains(user))
+		userList.append(user);
+	if (!userList.isEmpty()) {
 		Event_ConnectionClosed event;
 		event.set_reason(Event_ConnectionClosed::BANNED);
 		if (cmd.has_visible_reason())
 			event.set_reason_str(cmd.visible_reason());
-		SessionEvent *se = user->prepareSessionEvent(event);
-		user->sendProtocolItem(*se);
-		delete se;
-		user->deleteLater();
+		for (int i = 0; i < userList.size(); ++i) {
+			SessionEvent *se = userList[i]->prepareSessionEvent(event);
+			userList[i]->sendProtocolItem(*se);
+			userList[i]->deleteLater();
+			delete se;
+		}
 	}
 	
 	return Response::RespOk;
