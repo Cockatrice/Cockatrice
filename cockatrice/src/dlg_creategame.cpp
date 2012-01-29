@@ -52,6 +52,7 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
 
 	onlyBuddiesCheckBox = new QCheckBox(tr("Only &buddies can join"));
 	onlyRegisteredCheckBox = new QCheckBox(tr("Only &registered users can join"));
+	onlyRegisteredCheckBox->setChecked(true);
 	
 	QGridLayout *joinRestrictionsLayout = new QGridLayout;
 	joinRestrictionsLayout->addWidget(passwordLabel, 0, 0);
