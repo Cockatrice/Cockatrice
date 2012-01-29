@@ -9,4 +9,5 @@ message Event_GameStateChanged {
 	optional bool game_started = 2;
 	optional sint32 active_player_id = 3;
 	optional sint32 active_phase = 4;
+	optional uint32 seconds_elapsed = 5;
 }

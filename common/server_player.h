@@ -27,7 +27,6 @@ class GameEventStorage;
 class Server_Player : public Server_ArrowTarget {
 	Q_OBJECT
 private:
-	mutable QMutex playerMutex;
 	class MoveCardCompareFunctor;
 	Server_Game *game;
 	Server_ProtocolHandler *handler;
@@ -37,6 +36,7 @@ private:
 	QMap<int, Server_Counter *> counters;
 	QMap<int, Server_Arrow *> arrows;
 	QList<int> lastDrawList;
+	int pingTime;
 	int playerId;
 	bool spectator;
 	int initialCards;
@@ -44,11 +44,12 @@ private:
 	bool readyStart;
 	bool conceded;
 public:
+	mutable QMutex playerMutex;
 	Server_Player(Server_Game *_game, int _playerId, const ServerInfo_User &_userInfo, bool _spectator, Server_ProtocolHandler *_handler);
 	~Server_Player();
 	void prepareDestroy();
 	Server_ProtocolHandler *getProtocolHandler() const { return handler; }
-	void setProtocolHandler(Server_ProtocolHandler *_handler) { playerMutex.lock(); handler = _handler; playerMutex.unlock(); }
+	void setProtocolHandler(Server_ProtocolHandler *_handler);
 	
 	void setPlayerId(int _id) { playerId = _id; }
 	int getInitialCards() const { return initialCards; }
@@ -66,7 +67,9 @@ public:
 	const QMap<QString, Server_CardZone *> &getZones() const { return zones; }
 	const QMap<int, Server_Counter *> &getCounters() const { return counters; }
 	const QMap<int, Server_Arrow *> &getArrows() const { return arrows; }
-
+	
+	int getPingTime() const { return pingTime; }
+	void setPingTime(int _pingTime) { pingTime = _pingTime; }
 	ServerInfo_PlayerProperties getProperties();
 	
 	int newCardId();

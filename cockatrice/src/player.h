@@ -77,7 +77,6 @@ class Player : public QObject, public QGraphicsItem {
 signals:
 	void newCardAdded(AbstractCardItem *card);
 	// Log events
-	void logConnectionStateChanged(Player *player, bool connectionState);
 	void logSay(Player *player, QString message);
 	void logShuffle(Player *player, CardZone *zone);
 	void logRollDie(Player *player, int sides, int roll);

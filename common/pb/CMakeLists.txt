@@ -41,15 +41,16 @@ SET(PROTO_FILES
 	command_stop_dump_zone.proto
 	command_undo_draw.proto
 	context_concede.proto
+	context_connection_state_changed.proto
 	context_deck_select.proto
 	context_move_card.proto
 	context_mulligan.proto
+	context_ping_changed.proto
 	context_ready_start.proto
 	context_undo_draw.proto
 	event_add_to_list.proto
 	event_attach_card.proto
 	event_connection_closed.proto
-	event_connection_state_changed.proto
 	event_create_arrow.proto
 	event_create_counter.proto
 	event_create_token.proto
@@ -72,7 +73,6 @@ SET(PROTO_FILES
 	event_list_games.proto
 	event_list_rooms.proto
 	event_move_card.proto
-	event_ping.proto
 	event_player_properties_changed.proto
 	event_remove_from_list.proto
 	event_reveal_cards.proto

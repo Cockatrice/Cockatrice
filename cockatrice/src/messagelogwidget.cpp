@@ -762,7 +762,6 @@ void MessageLogWidget::containerProcessingDone()
 
 void MessageLogWidget::connectToPlayer(Player *player)
 {
-	connect(player, SIGNAL(logConnectionStateChanged(Player *, bool)), this, SLOT(logConnectionStateChanged(Player *, bool)));
 	connect(player, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));
 	connect(player, SIGNAL(logShuffle(Player *, CardZone *)), this, SLOT(logShuffle(Player *, CardZone *)));
 	connect(player, SIGNAL(logRollDie(Player *, int, int)), this, SLOT(logRollDie(Player *, int, int)));

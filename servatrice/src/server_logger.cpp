@@ -31,7 +31,7 @@ ServerLogger::~ServerLogger()
 	flushBuffer();
 }
 
-void ServerLogger::logMessage(QString message, ServerSocketInterface *ssi)
+void ServerLogger::logMessage(QString message, Server_ProtocolHandler *ssi)
 {
 	if (!logFile)
 		return;

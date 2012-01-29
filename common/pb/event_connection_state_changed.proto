@@ -1,8 +1,0 @@
-import "game_event.proto";
-
-message Event_ConnectionStateChanged {
-	extend GameEvent {
-		optional Event_ConnectionStateChanged ext = 1006;
-	}
-	optional bool connected = 1;
-}

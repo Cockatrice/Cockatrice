@@ -13,6 +13,7 @@ class DeckView;
 class GameScene;
 class CardInfoWidget;
 class MessageLogWidget;
+class QTimer;
 class QSplitter;
 class QLabel;
 class QLineEdit;
@@ -89,6 +90,8 @@ public:
 class TabGame : public Tab {
 	Q_OBJECT
 private:
+	QTimer *gameTimer;
+	int secondsElapsed;
 	QList<AbstractClient *> clients;
 	int gameId;
 	QString gameDescription;
@@ -152,6 +155,7 @@ signals:
 	void containerProcessingDone();
 	void openMessageDialog(const QString &userName, bool focus);
 private slots:
+	void incrementGameTime();
 	void adminLockChanged(bool lock);
 	void newCardAdded(AbstractCardItem *card);
 	

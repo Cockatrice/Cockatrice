@@ -5,6 +5,7 @@
 #include <QAction>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QTimer>
 #include "tab_game.h"
 #include "tab_supervisor.h"
 #include "cardinfowidget.h"
@@ -50,8 +51,9 @@
 #include "pb/event_game_closed.pb.h"
 #include "pb/event_set_active_player.pb.h"
 #include "pb/event_set_active_phase.pb.h"
-#include "pb/event_ping.pb.h"
 #include "pb/context_deck_select.pb.h"
+#include "pb/context_connection_state_changed.pb.h"
+#include "pb/context_ping_changed.pb.h"
 #include "get_pb_extension.h"
 
 ReadyStartButton::ReadyStartButton(QWidget *parent)
@@ -208,6 +210,11 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	resuming(event.resuming()),
 	currentPhase(-1)
 {
+	gameTimer = new QTimer(this);
+	gameTimer->setInterval(1000);
+	connect(gameTimer, SIGNAL(timeout()), this, SLOT(incrementGameTime()));
+	gameTimer->start();
+	
 	phasesToolbar = new PhasesToolbar;
 	phasesToolbar->hide();
 	connect(phasesToolbar, SIGNAL(sendGameCommand(const ::google::protobuf::Message &, int)), this, SLOT(sendGameCommand(const ::google::protobuf::Message &, int)));
@@ -361,6 +368,17 @@ void TabGame::closeRequest()
 	actLeaveGame();
 }
 
+void TabGame::incrementGameTime()
+{
+	int seconds = ++secondsElapsed;
+	int minutes = seconds / 60;
+	seconds -= minutes * 60;
+	int hours = minutes / 60;
+	minutes -= hours * 60;
+	
+	timeElapsedLabel->setText(QString::number(hours).rightJustified(2, '0') + ":" + QString::number(minutes).rightJustified(2, '0') + ":" + QString::number(seconds).rightJustified(2, '0'));
+}
+
 void TabGame::adminLockChanged(bool lock)
 {
 	bool v = !(spectator && !spectatorsCanTalk && lock);
@@ -496,7 +514,6 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont, Abstract
 				case GameEvent::GAME_CLOSED: eventGameClosed(event.GetExtension(Event_GameClosed::ext), playerId, context); break;
 				case GameEvent::SET_ACTIVE_PLAYER: eventSetActivePlayer(event.GetExtension(Event_SetActivePlayer::ext), playerId, context); break;
 				case GameEvent::SET_ACTIVE_PHASE: eventSetActivePhase(event.GetExtension(Event_SetActivePhase::ext), playerId, context); break;
-				case GameEvent::PING: eventPing(event.GetExtension(Event_Ping::ext), playerId, context); break;
 		
 				default: {
 					Player *player = players.value(playerId, 0);
@@ -650,6 +667,9 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*e
 			player->processCardAttachment(playerInfo);
 		}
 	}
+	
+	secondsElapsed = event.seconds_elapsed();
+	
 	if (event.game_started() && !started) {
 		startGame(!gameStateKnown);
 		if (gameStateKnown)
@@ -669,7 +689,7 @@ void TabGame::eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &
 	Player *player = players.value(eventPlayerId, 0);
 	if (!player)
 		return;
-	playerListWidget->updatePlayerProperties(event.player_properties());
+	playerListWidget->updatePlayerProperties(event.player_properties(), eventPlayerId);
 	
 	const GameEventContext::ContextType contextType = static_cast<const GameEventContext::ContextType>(getPbExtension(context));
 	switch (contextType) {
@@ -695,6 +715,10 @@ void TabGame::eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &
 		}
 		case GameEventContext::DECK_SELECT: {
 			messageLog->logDeckSelect(player, QString::fromStdString(context.GetExtension(Context_DeckSelect::ext).deck_hash()));
+			break;
+		}
+		case GameEventContext::CONNECTION_STATE_CHANGED: {
+			messageLog->logConnectionStateChanged(player, event.player_properties().ping_seconds() != -1);
 			break;
 		}
 		default: ;
@@ -807,20 +831,6 @@ void TabGame::eventSetActivePhase(const Event_SetActivePhase &event, int /*event
 		messageLog->logSetActivePhase(phase);
 	setActivePhase(phase);
 	emit userEvent();
-}
-
-void TabGame::eventPing(const Event_Ping &event, int /*eventPlayerId*/, const GameEventContext & /*context*/)
-{
-	const int pingListSize = event.ping_list_size();
-	for (int i = 0; i < pingListSize; ++i)
-		playerListWidget->updatePing(event.ping_list(i).player_id(), event.ping_list(i).ping_time());
-	
-	int seconds = event.seconds_elapsed();
-	int minutes = seconds / 60;
-	seconds -= minutes * 60;
-	int hours = minutes / 60;
-	minutes -= hours * 60;
-	timeElapsedLabel->setText(QString::number(hours).rightJustified(2, '0') + ":" + QString::number(minutes).rightJustified(2, '0') + ":" + QString::number(seconds).rightJustified(2, '0'));
 }
 
 void TabGame::newCardAdded(AbstractCardItem *card)

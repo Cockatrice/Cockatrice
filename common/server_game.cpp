@@ -26,12 +26,13 @@
 #include "server_cardzone.h"
 #include "server_counter.h"
 #include "decklist.h"
+#include "pb/context_connection_state_changed.pb.h"
+#include "pb/context_ping_changed.pb.h"
+#include "pb/event_player_properties_changed.pb.h"
 #include "pb/event_game_closed.pb.h"
 #include "pb/event_game_host_changed.pb.h"
 #include "pb/event_game_state_changed.pb.h"
-#include "pb/event_connection_state_changed.pb.h"
 #include "pb/event_kicked.pb.h"
-#include "pb/event_ping.pb.h"
 #include "pb/event_join.pb.h"
 #include "pb/event_leave.pb.h"
 #include "pb/event_delete_arrow.pb.h"
@@ -77,9 +78,10 @@ Server_Game::~Server_Game()
 void Server_Game::pingClockTimeout()
 {
 	QMutexLocker locker(&gameMutex);
+	++secondsElapsed;
 	
-	Event_Ping event;
-	event.set_seconds_elapsed(++secondsElapsed);
+	GameEventStorage ges;
+	ges.setGameEventContext(Context_PingChanged());
 	
 	QList<ServerInfo_PlayerPing *> pingList;
 	QMapIterator<int, Server_Player *> playerIterator(players);
@@ -89,19 +91,28 @@ void Server_Game::pingClockTimeout()
 		Server_Player *player = playerIterator.next().value();
 		if (!player->getSpectator())
 			++playerCount;
-		int pingTime;
-		if (player->getProtocolHandler()) {
-			pingTime = player->getProtocolHandler()->getLastCommandTime();
-			if (!player->getSpectator())
-				allPlayersInactive = false;
-		} else
-			pingTime = -1;
 		
-		ServerInfo_PlayerPing *pingInfo = event.add_ping_list();
-		pingInfo->set_player_id(player->getPlayerId());
-		pingInfo->set_ping_time(pingTime);
+		const int oldPingTime = player->getPingTime();
+		player->playerMutex.lock();
+		int newPingTime;
+		if (player->getProtocolHandler())
+			newPingTime = player->getProtocolHandler()->getLastCommandTime();
+		else
+			newPingTime = -1;
+		player->playerMutex.unlock();
+		
+		if ((newPingTime != -1) && !player->getSpectator())
+			allPlayersInactive = false;
+		
+		if ((abs(oldPingTime - newPingTime) > 1) || ((newPingTime == -1) && (oldPingTime != -1)) || ((newPingTime != -1) && (oldPingTime == -1))) {
+			player->setPingTime(newPingTime);
+			
+			Event_PlayerPropertiesChanged event;
+			event.mutable_player_properties()->set_ping_seconds(newPingTime);
+			ges.enqueueGameEvent(event, player->getPlayerId());
+		}
 	}
-	sendGameEventContainer(prepareGameEvent(event, -1));
+	ges.sendToGame(this);
 	
 	const int maxTime = room->getServer()->getMaxGameInactivityTime();
 	if (allPlayersInactive) {
@@ -165,6 +176,7 @@ void Server_Game::doStartGameIfReady()
 	while (playerIterator.hasNext()) {
 		Server_Player *player = playerIterator.next().value();
 		Event_GameStateChanged event;
+		event.set_seconds_elapsed(secondsElapsed);
 		event.set_game_started(true);
 		event.set_active_player_id(0);
 		event.set_active_phase(0);
@@ -229,6 +241,7 @@ void Server_Game::stopGameIfFinished()
 	while (playerIterator.hasNext()) {
 		Server_Player *player = playerIterator.next().value();
 		Event_GameStateChanged event;
+		event.set_seconds_elapsed(secondsElapsed);
 		event.set_game_started(false);
 		QListIterator<ServerInfo_Player> gameStateIterator(getGameState(player));
 		while (gameStateIterator.hasNext())
@@ -436,15 +449,6 @@ void Server_Game::nextTurn()
 	} while (players.value(keys[listPos])->getSpectator() || players.value(keys[listPos])->getConceded());
 	
 	setActivePlayer(keys[listPos]);
-}
-
-void Server_Game::postConnectionStatusUpdate(Server_Player *player, bool connectionStatus)
-{
-	QMutexLocker locker(&gameMutex);
-	
-	Event_ConnectionStateChanged event;
-	event.set_connected(connectionStatus);
-	sendGameEventContainer(prepareGameEvent(event, player->getPlayerId()));
 }
 
 QList<ServerInfo_Player> Server_Game::getGameState(Server_Player *playerWhosAsking) const

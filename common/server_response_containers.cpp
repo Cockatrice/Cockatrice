@@ -1,74 +1,78 @@
-/*
-Response_DeckDownload::Response_DeckDownload(int _cmdId, ResponseCode _responseCode, DeckList *_deck)
-	: ProtocolResponse(_cmdId, _responseCode, "deck_download")
+#include "server_response_containers.h"
+#include <google/protobuf/descriptor.h>
+#include "server_game.h"
+
+GameEventStorageItem::GameEventStorageItem(const ::google::protobuf::Message &_event, int _playerId, EventRecipients _recipients)
+	: event(new GameEvent), recipients(_recipients)
 {
-	if (!_deck)
-		_deck = new DeckList;
-	insertItem(_deck);
+	event->GetReflection()->MutableMessage(event, _event.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(_event);
+	event->set_player_id(_playerId);
 }
 
-DeckList *Response_DeckDownload::getDeck() const
+GameEventStorageItem::~GameEventStorageItem()
 {
-	return static_cast<DeckList *>(itemMap.value("cockatrice_deck"));
+	delete event;
 }
 
-Response_DeckUpload::Response_DeckUpload(int _cmdId, ResponseCode _responseCode, DeckList_File *_file)
-	: ProtocolResponse(_cmdId, _responseCode, "deck_upload")
+GameEventStorage::GameEventStorage()
+	: gameEventContext(0)
 {
-	if (!_file)
-		_file = new DeckList_File;
-	insertItem(_file);
 }
-*/
-/*
-GameEventContainer::GameEventContainer(const QList<GameEvent *> &_eventList, int _gameId, GameEventContext *_context)
-	: ProtocolItem("container", "game_event")
+
+GameEventStorage::~GameEventStorage()
 {
-	insertItem(new SerializableItem_Int("game_id", _gameId));
+	delete gameEventContext;
+	for (int i = 0; i < gameEventList.size(); ++i)
+		delete gameEventList[i];
+}
+
+void GameEventStorage::setGameEventContext(const ::google::protobuf::Message &_gameEventContext)
+{
+	delete gameEventContext;
+	gameEventContext = new GameEventContext;
+	gameEventContext->GetReflection()->MutableMessage(gameEventContext, _gameEventContext.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(_gameEventContext);
+}
+
+void GameEventStorage::enqueueGameEvent(const ::google::protobuf::Message &event, int playerId, GameEventStorageItem::EventRecipients recipients, int _privatePlayerId)
+{
+	gameEventList.append(new GameEventStorageItem(event, playerId, recipients));
+	if (_privatePlayerId != -1)
+		privatePlayerId = _privatePlayerId;
+}
+
+void GameEventStorage::sendToGame(Server_Game *game)
+{
+	if (gameEventList.isEmpty())
+		return;
 	
-	context = _context;
-	if (_context)
-		itemList.append(_context);
-
-	eventList = _eventList;
-	for (int i = 0; i < _eventList.size(); ++i)
-		itemList.append(_eventList[i]);
-}
-
-void GameEventContainer::extractData()
-{
-	for (int i = 0; i < itemList.size(); ++i) {
-		GameEvent *_event = dynamic_cast<GameEvent *>(itemList[i]);
-		GameEventContext *_context = dynamic_cast<GameEventContext *>(itemList[i]);
-		if (_event)
-			eventList.append(_event);
-		else if (_context)
-			context = _context;
+	GameEventContainer *contPrivate = new GameEventContainer;
+	GameEventContainer *contOthers = new GameEventContainer;
+	for (int i = 0; i < gameEventList.size(); ++i) {
+		const GameEvent &event = gameEventList[i]->getGameEvent();
+		const GameEventStorageItem::EventRecipients recipients = gameEventList[i]->getRecipients();
+		if (recipients.testFlag(GameEventStorageItem::SendToPrivate))
+			contPrivate->add_event_list()->CopyFrom(event);
+		if (recipients.testFlag(GameEventStorageItem::SendToOthers))
+			contOthers->add_event_list()->CopyFrom(event);
 	}
-}
-
-void GameEventContainer::setContext(GameEventContext *_context)
-{
-	for (int i = 0; i < itemList.size(); ++i) {
-		GameEventContext *temp = qobject_cast<GameEventContext *>(itemList[i]);
-		if (temp) {
-			delete temp;
-			itemList.removeAt(i);
-			break;
-		}
+	if (gameEventContext) {
+		contPrivate->mutable_context()->CopyFrom(*gameEventContext);
+		contOthers->mutable_context()->CopyFrom(*gameEventContext);
 	}
-	itemList.append(_context);
-	context = _context;
+	game->sendGameEventContainer(contPrivate, GameEventStorageItem::SendToPrivate, privatePlayerId);
+	game->sendGameEventContainer(contOthers, GameEventStorageItem::SendToOthers, privatePlayerId);
 }
 
-void GameEventContainer::addGameEvent(GameEvent *event)
+ResponseContainer::ResponseContainer()
+        : responseExtension(0)
 {
-	appendItem(event);
-	eventList.append(event);
 }
 
-GameEventContainer *GameEventContainer::makeNew(GameEvent *event, int _gameId)
+ResponseContainer::~ResponseContainer()
 {
-	return new GameEventContainer(QList<GameEvent *>() << event, _gameId);
+	delete responseExtension;
+	for (int i = 0; i < preResponseQueue.size(); ++i)
+		delete preResponseQueue[i].second;
+	for (int i = 0; i < postResponseQueue.size(); ++i)
+		delete postResponseQueue[i].second;
 }
-*/

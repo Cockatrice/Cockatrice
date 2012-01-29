@@ -41,7 +41,6 @@
 #include "pb/serverinfo_zone.pb.h"
 #include "pb/context_move_card.pb.h"
 #include "pb/context_undo_draw.pb.h"
-#include "pb/event_connection_state_changed.pb.h"
 #include "pb/event_game_say.pb.h"
 #include "pb/event_shuffle.pb.h"
 #include "pb/event_roll_die.pb.h"
@@ -814,11 +813,6 @@ void Player::setCardAttrHelper(const GameEventContext &context, CardItem *card, 
 	}
 }
 
-void Player::eventConnectionStateChanged(const Event_ConnectionStateChanged &event)
-{
-	emit logConnectionStateChanged(this, event.connected());
-}
-
 void Player::eventGameSay(const Event_GameSay &event)
 {
 	emit logSay(this, QString::fromStdString(event.message()));
@@ -1159,7 +1153,6 @@ void Player::eventRevealCards(const Event_RevealCards &event)
 void Player::processGameEvent(GameEvent::GameEventType type, const GameEvent &event, const GameEventContext &context)
 {
 	switch (type) {
-		case GameEvent::CONNECTION_STATE_CHANGED: eventConnectionStateChanged(event.GetExtension(Event_ConnectionStateChanged::ext)); break;
 		case GameEvent::GAME_SAY: eventGameSay(event.GetExtension(Event_GameSay::ext)); break;
 		case GameEvent::SHUFFLE: eventShuffle(event.GetExtension(Event_Shuffle::ext)); break;
 		case GameEvent::ROLL_DIE: eventRollDie(event.GetExtension(Event_RollDie::ext)); break;

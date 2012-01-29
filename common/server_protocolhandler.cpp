@@ -114,12 +114,12 @@ void Server_ProtocolHandler::prepareDestroy()
 		Server_Game *g = gameIterator.value().first;
 		Server_Player *p = gameIterator.value().second;
 		
+		g->gameMutex.lock();
 		if ((authState == UnknownUser) || p->getSpectator())
 			g->removePlayer(p);
-		else {
+		else
 			p->setProtocolHandler(0);
-			g->postConnectionStatusUpdate(p, false);
-		}
+		g->gameMutex.unlock();
 	}
 	gameListMutex.unlock();
 
@@ -220,6 +220,8 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
 				num = fieldList[j]->number();
 				break;
 			}
+		if (num != SessionCommand::PING)
+			emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
 		switch ((SessionCommand::SessionCommandType) num) {
 			case SessionCommand::PING: resp = cmdPing(sc.GetExtension(Command_Ping::ext), rc); break;
 			case SessionCommand::LOGIN: resp = cmdLogin(sc.GetExtension(Command_Login::ext), rc); break;
@@ -267,6 +269,7 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
 				num = fieldList[j]->number();
 				break;
 			}
+		emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
 		switch ((RoomCommand::RoomCommandType) num) {
 			case RoomCommand::LEAVE_ROOM: resp = cmdLeaveRoom(sc.GetExtension(Command_LeaveRoom::ext), room, rc); break;
 			case RoomCommand::ROOM_SAY: resp = cmdRoomSay(sc.GetExtension(Command_RoomSay::ext), room, rc); break;
@@ -309,6 +312,7 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 				num = fieldList[j]->number();
 				break;
 			}
+		emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
 		switch ((GameCommand::GameCommandType) num) {
 			case GameCommand::KICK_FROM_GAME: resp = cmdKickFromGame(sc.GetExtension(Command_KickFromGame::ext), game, player, rc, ges); break;
 			case GameCommand::LEAVE_GAME: resp = cmdLeaveGame(sc.GetExtension(Command_LeaveGame::ext), game, player, rc, ges); break;
@@ -344,23 +348,7 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 		if ((resp != Response::RespOk) && (resp != Response::RespNothing))
 			finalResponseCode = resp;
 	}
-	GameEventContainer *contPrivate = new GameEventContainer;
-	GameEventContainer *contOthers = new GameEventContainer;
-	const QList<GameEventStorageItem *> &gameEventList = ges.getGameEventList();
-	for (int i = 0; i < gameEventList.size(); ++i) {
-		const GameEvent &event = gameEventList[i]->getGameEvent();
-		const GameEventStorageItem::EventRecipients recipients = gameEventList[i]->getRecipients();
-		if (recipients.testFlag(GameEventStorageItem::SendToPrivate))
-			contPrivate->add_event_list()->CopyFrom(event);
-		if (recipients.testFlag(GameEventStorageItem::SendToOthers))
-			contOthers->add_event_list()->CopyFrom(event);
-	}
-	if (ges.getGameEventContext()) {
-		contPrivate->mutable_context()->CopyFrom(*ges.getGameEventContext());
-		contOthers->mutable_context()->CopyFrom(*ges.getGameEventContext());
-	}
-	game->sendGameEventContainer(contPrivate, GameEventStorageItem::SendToPrivate, ges.getPrivatePlayerId());
-	game->sendGameEventContainer(contOthers, GameEventStorageItem::SendToOthers, ges.getPrivatePlayerId());
+	ges.sendToGame(game);
 	return finalResponseCode;
 }
 
@@ -383,6 +371,7 @@ Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(
 				num = fieldList[j]->number();
 				break;
 			}
+		emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
 		switch ((ModeratorCommand::ModeratorCommandType) num) {
 			case ModeratorCommand::BAN_FROM_SERVER: resp = cmdBanFromServer(sc.GetExtension(Command_BanFromServer::ext), rc); break;
 		}
@@ -411,6 +400,7 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
 				num = fieldList[j]->number();
 				break;
 			}
+		emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
 		switch ((AdminCommand::AdminCommandType) num) {
 			case AdminCommand::SHUTDOWN_SERVER: resp = cmdShutdownServer(sc.GetExtension(Command_ShutdownServer::ext), rc); break;
 			case AdminCommand::UPDATE_SERVER_MESSAGE: resp = cmdUpdateServerMessage(sc.GetExtension(Command_UpdateServerMessage::ext), rc); break;
@@ -539,7 +529,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 			for (int j = 0; j < gamePlayers.size(); ++j)
 				if (gamePlayers[j]->getUserInfo()->name() == userInfo->name()) {
 					gamePlayers[j]->setProtocolHandler(this);
-					game->postConnectionStatusUpdate(gamePlayers[j], true);
 					games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, gamePlayers[j]));
 					
 					Event_GameJoined event1;
@@ -557,6 +546,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 					QListIterator<ServerInfo_Player> gameStateIterator(game->getGameState(gamePlayers[j]));
 					while (gameStateIterator.hasNext())
 						event2.add_player_list()->CopyFrom(gameStateIterator.next());
+					event2.set_seconds_elapsed(game->getSecondsElapsed());
 					event2.set_game_started(game->getGameStarted());
 					event2.set_active_player_id(game->getActivePlayer());
 					event2.set_active_phase(game->getActivePhase());
@@ -773,6 +763,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_Creat
 	QListIterator<ServerInfo_Player> gameStateIterator(game->getGameState(creator));
 	while (gameStateIterator.hasNext())
 		event2.add_player_list()->CopyFrom(gameStateIterator.next());
+	event2.set_seconds_elapsed(0);
 	event2.set_game_started(game->getGameStarted());
 	event2.set_active_player_id(game->getActivePlayer());
 	event2.set_active_phase(game->getActivePhase());
@@ -819,6 +810,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinGame(const Command_JoinGam
 		QListIterator<ServerInfo_Player> gameStateIterator(g->getGameState(player));
 		while (gameStateIterator.hasNext())
 			event2.add_player_list()->CopyFrom(gameStateIterator.next());
+		event2.set_seconds_elapsed(g->getSecondsElapsed());
 		event2.set_game_started(g->getGameStarted());
 		event2.set_active_player_id(g->getActivePlayer());
 		event2.set_active_phase(g->getActivePhase());

@@ -14,13 +14,15 @@
 #include "pb/event_draw_cards.pb.h"
 #include "pb/event_destroy_card.pb.h"
 #include "pb/event_move_card.pb.h"
+#include "pb/event_player_properties_changed.pb.h"
 #include "pb/event_set_card_attr.pb.h"
+#include "pb/context_connection_state_changed.pb.h"
 #include "pb/context_move_card.pb.h"
 #include "pb/context_undo_draw.pb.h"
 #include <QDebug>
 
 Server_Player::Server_Player(Server_Game *_game, int _playerId, const ServerInfo_User &_userInfo, bool _spectator, Server_ProtocolHandler *_handler)
-	: game(_game), handler(_handler), userInfo(new ServerInfo_User(_userInfo)), deck(0), playerId(_playerId), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false)
+	: game(_game), handler(_handler), userInfo(new ServerInfo_User(_userInfo)), deck(0), pingTime(0), playerId(_playerId), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false)
 {
 }
 
@@ -201,6 +203,7 @@ ServerInfo_PlayerProperties Server_Player::getProperties()
 	result.set_ready_start(readyStart);
 	if (deck)
 		result.set_deck_hash(deck->getDeckHash().toStdString());
+	result.set_ping_seconds(pingTime);
 	
 	return result;
 }
@@ -584,4 +587,21 @@ void Server_Player::sendGameEvent(GameEventContainer *cont)
 	
 	if (handler)
 		handler->sendProtocolItem(*cont);
+}
+
+void Server_Player::setProtocolHandler(Server_ProtocolHandler *_handler)
+{
+	playerMutex.lock();
+	handler = _handler;
+	playerMutex.unlock();
+	
+	pingTime = _handler ? 0 : -1;
+	
+	Event_PlayerPropertiesChanged event;
+	event.mutable_player_properties()->set_ping_seconds(pingTime);
+	
+	GameEventStorage ges;
+	ges.setGameEventContext(Context_ConnectionStateChanged());
+	ges.enqueueGameEvent(event, playerId);
+	ges.sendToGame(game);
 }

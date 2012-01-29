@@ -95,7 +95,7 @@ public:
 	void setActivePlayer(int _activePlayer);
 	void setActivePhase(int _activePhase);
 	void nextTurn();
-	void postConnectionStatusUpdate(Server_Player *player, bool connectionStatus);
+	int getSecondsElapsed() const { return secondsElapsed; }
 
 	QList<ServerInfo_Player> getGameState(Server_Player *playerWhosAsking) const;
 	

@@ -7,4 +7,5 @@ message ServerInfo_PlayerProperties {
 	optional bool conceded = 4;
 	optional bool ready_start = 5;
 	optional string deck_hash = 6;
+	optional sint32 ping_seconds = 7;
 }

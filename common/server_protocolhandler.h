@@ -169,6 +169,8 @@ private:
 	Response::ResponseCode processAdminCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
 private slots:
 	void pingClockTimeout();
+signals:
+	void logDebugMessage(const QString &message, Server_ProtocolHandler *session);
 public:
 	QMutex gameListMutex;
 	
