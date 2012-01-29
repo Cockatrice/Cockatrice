@@ -1,0 +1,8 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Cockatrice Oracle downloader
+Exec=oracle
+Icon=cockatrice
+Categories=Game;CardGame;
