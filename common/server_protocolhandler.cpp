@@ -1256,11 +1256,10 @@ Response::ResponseCode Server_ProtocolHandler::cmdCreateArrow(const Command_Crea
 		return Response::RespNameNotFound;
 	QString startZoneName = QString::fromStdString(cmd.start_zone());
 	Server_CardZone *startZone = startPlayer->getZones().value(startZoneName);
-	QString targetZoneName = QString::fromStdString(cmd.target_zone());
-	bool playerTarget = targetZoneName.isEmpty();
+	bool playerTarget = !cmd.has_target_zone();
 	Server_CardZone *targetZone = 0;
 	if (!playerTarget)
-		targetZone = targetPlayer->getZones().value(targetZoneName);
+		targetZone = targetPlayer->getZones().value(QString::fromStdString(cmd.target_zone()));
 	if (!startZone || (!targetZone && !playerTarget))
 		return Response::RespNameNotFound;
 	if (startZone->getType() != ServerInfo_Zone::PublicZone)
@@ -1300,8 +1299,10 @@ Response::ResponseCode Server_ProtocolHandler::cmdCreateArrow(const Command_Crea
 	arrowInfo->set_start_zone(startZoneName.toStdString());
 	arrowInfo->set_start_card_id(startCard->getId());
 	arrowInfo->set_target_player_id(targetPlayer->getPlayerId());
-	arrowInfo->set_target_zone(targetZoneName.toStdString());
-	arrowInfo->set_target_card_id(cmd.target_card_id());
+	if (!playerTarget) {
+		arrowInfo->set_target_zone(cmd.target_zone());
+		arrowInfo->set_target_card_id(cmd.target_card_id());
+	}
 	arrowInfo->mutable_arrow_color()->CopyFrom(cmd.arrow_color());
 	ges.enqueueGameEvent(event, player->getPlayerId());
 	
