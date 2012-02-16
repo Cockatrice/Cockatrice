@@ -143,8 +143,10 @@ void PictureLoader::startNextPicDownload()
 		picUrl = cardBeingDownloaded.getCard()->getPicURLSt(cardBeingDownloaded.getSetName());
 	else if (cardBeingDownloaded.getHq()) {
 		picUrl = cardBeingDownloaded.getCard()->getPicURLHq(cardBeingDownloaded.getSetName());
-		if (picUrl.isEmpty())
+		if (picUrl.isEmpty()) {
 			picUrl = cardBeingDownloaded.getCard()->getPicURL(cardBeingDownloaded.getSetName());
+			cardBeingDownloaded.setHq(false);
+		}
 	} else
 		picUrl = cardBeingDownloaded.getCard()->getPicURL(cardBeingDownloaded.getSetName());
 	QUrl url(picUrl);
