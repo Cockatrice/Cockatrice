@@ -20,92 +20,13 @@ CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _reve
 	: AbstractCardItem(_name, _owner, parent), zone(0), id(_cardid), revealedCard(_revealedCard), attacking(false), facedown(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(0), attachedTo(0)
 {
 	owner->addCard(this);
-
-	aTap = new QAction(this);
-	aTap->setData(0);
-	connect(aTap, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
-	aUntap = new QAction(this);
-	aUntap->setData(1);
-	connect(aUntap, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
-	aDoesntUntap = new QAction(this);
-	aDoesntUntap->setData(2);
-	connect(aDoesntUntap, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
-	aAttach = new QAction(this);
-	connect(aAttach, SIGNAL(triggered()), this, SLOT(actAttach()));
-	aUnattach = new QAction(this);
-	connect(aUnattach, SIGNAL(triggered()), this, SLOT(actUnattach()));
-	aDrawArrow = new QAction(this);
-	connect(aDrawArrow, SIGNAL(triggered()), this, SLOT(actDrawArrow()));
-	aIncP = new QAction(this);
-	connect(aIncP, SIGNAL(triggered()), this, SLOT(actIncP()));
-	aDecP = new QAction(this);
-	connect(aDecP, SIGNAL(triggered()), this, SLOT(actDecP()));
-	aIncT = new QAction(this);
-	connect(aIncT, SIGNAL(triggered()), this, SLOT(actIncT()));
-	aDecT = new QAction(this);
-	connect(aDecT, SIGNAL(triggered()), this, SLOT(actDecT()));
-	aIncPT = new QAction(this);
-	connect(aIncPT, SIGNAL(triggered()), this, SLOT(actIncPT()));
-	aDecPT = new QAction(this);
-	connect(aDecPT, SIGNAL(triggered()), this, SLOT(actDecPT()));
-	aSetPT = new QAction(this);
-	connect(aSetPT, SIGNAL(triggered()), this, SLOT(actSetPT()));
-	aSetAnnotation = new QAction(this);
-	connect(aSetAnnotation, SIGNAL(triggered()), this, SLOT(actSetAnnotation()));
-	aFlip = new QAction(this);
-	aFlip->setData(3);
-	connect(aFlip, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
-	aClone = new QAction(this);
-	aClone->setData(4);
-	connect(aClone, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
-	aMoveToTopLibrary = new QAction(this);
-	aMoveToTopLibrary->setData(5);
-	aMoveToBottomLibrary = new QAction(this);
-	aMoveToBottomLibrary->setData(6);
-	aMoveToGraveyard = new QAction(this);
-	aMoveToGraveyard->setData(7);
-	aMoveToExile = new QAction(this);
-	aMoveToExile->setData(8);
-	connect(aMoveToTopLibrary, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
-	connect(aMoveToBottomLibrary, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
-	connect(aMoveToGraveyard, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
-	connect(aMoveToExile, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
 	
-	aPlay = new QAction(this);
-	connect(aPlay, SIGNAL(triggered()), this, SLOT(actPlay()));
-	aHide = new QAction(this);
-	connect(aHide, SIGNAL(triggered()), this, SLOT(actHide()));
-		
-	for (int i = 0; i < 3; ++i) {
-		QAction *tempAddCounter = new QAction(this);
-		tempAddCounter->setData(9 + i * 1000);
-		QAction *tempRemoveCounter = new QAction(this);
-		tempRemoveCounter->setData(10 + i * 1000);
-		QAction *tempSetCounter = new QAction(this);
-		tempSetCounter->setData(11 + i * 1000);
-		aAddCounter.append(tempAddCounter);
-		aRemoveCounter.append(tempRemoveCounter);
-		aSetCounter.append(tempSetCounter);
-		connect(tempAddCounter, SIGNAL(triggered()), this, SLOT(actCardCounterTrigger()));
-		connect(tempRemoveCounter, SIGNAL(triggered()), this, SLOT(actCardCounterTrigger()));
-		connect(tempSetCounter, SIGNAL(triggered()), this, SLOT(actCardCounterTrigger()));
-	}
 	cardMenu = new QMenu;
 	ptMenu = new QMenu;
-	ptMenu->addAction(aIncP);
-	ptMenu->addAction(aDecP);
-	ptMenu->addSeparator();
-	ptMenu->addAction(aIncT);
-	ptMenu->addAction(aDecT);
-	ptMenu->addSeparator();
-	ptMenu->addAction(aIncPT);
-	ptMenu->addAction(aDecPT);
-	ptMenu->addSeparator();
-	ptMenu->addAction(aSetPT);
 	moveMenu = new QMenu;
 	
 	retranslateUi();
-	updateCardMenu();
+	owner->updateCardMenu(this, cardMenu, ptMenu, moveMenu);
 }
 
 CardItem::~CardItem()
@@ -113,9 +34,8 @@ CardItem::~CardItem()
 	prepareDelete();
 	
 	delete cardMenu;
-	cardMenu = 0;
+	delete ptMenu;
 	delete moveMenu;
-	moveMenu = 0;
 	
 	deleteDragItem();
 }
@@ -123,8 +43,10 @@ CardItem::~CardItem()
 void CardItem::prepareDelete()
 {
 	if (owner) {
-		if (owner->getCardMenu() == cardMenu)
+		if (owner->getCardMenu() == cardMenu) {
 			owner->setCardMenu(0);
+			owner->setActiveCard(0);
+		}
 		owner = 0;
 	}
 	
@@ -148,107 +70,13 @@ void CardItem::deleteLater()
 void CardItem::setZone(CardZone *_zone)
 {
 	zone = _zone;
-	updateCardMenu();
-}
-
-void CardItem::updateCardMenu()
-{
-	cardMenu->clear();
-	
-	if (revealedCard)
-		cardMenu->addAction(aHide);
-	else if (owner->getLocal()) {
-		moveMenu->clear();
-		moveMenu->addAction(aMoveToTopLibrary);
-		moveMenu->addAction(aMoveToBottomLibrary);
-		moveMenu->addAction(aMoveToGraveyard);
-		moveMenu->addAction(aMoveToExile);
-		
-		if (zone) {
-			if (zone->getName() == "table") {
-				cardMenu->addAction(aTap);
-				cardMenu->addAction(aUntap);
-				cardMenu->addAction(aDoesntUntap);
-				cardMenu->addAction(aFlip);
-				cardMenu->addSeparator();
-				cardMenu->addAction(aAttach);
-				if (attachedTo)
-					cardMenu->addAction(aUnattach);
-				cardMenu->addAction(aDrawArrow);
-				cardMenu->addSeparator();
-				cardMenu->addMenu(ptMenu);
-				cardMenu->addAction(aSetAnnotation);
-				cardMenu->addSeparator();
-				cardMenu->addAction(aClone);
-				cardMenu->addMenu(moveMenu);
-				
-				for (int i = 0; i < aAddCounter.size(); ++i) {
-					cardMenu->addSeparator();
-					cardMenu->addAction(aAddCounter[i]);
-					cardMenu->addAction(aRemoveCounter[i]);
-					cardMenu->addAction(aSetCounter[i]);
-				}
-				cardMenu->addSeparator();
-			} else if (zone->getName() == "stack") {
-				cardMenu->addAction(aDrawArrow);
-				cardMenu->addMenu(moveMenu);
-			} else {
-				cardMenu->addAction(aPlay);
-				cardMenu->addMenu(moveMenu);
-			}
-		} else
-			cardMenu->addMenu(moveMenu);
-	}
+	owner->updateCardMenu(this, cardMenu, ptMenu, moveMenu);
 }
 
 void CardItem::retranslateUi()
 {
-	aPlay->setText(tr("&Play"));
-	aHide->setText(tr("&Hide"));
-	
-	aTap->setText(tr("&Tap"));
-	aUntap->setText(tr("&Untap"));
-	aDoesntUntap->setText(tr("Toggle &normal untapping"));
-	aFlip->setText(tr("&Flip"));
-	aClone->setText(tr("&Clone"));
-	aClone->setShortcut(tr("Ctrl+H"));
-	aAttach->setText(tr("&Attach to card..."));
-	aAttach->setShortcut(tr("Ctrl+A"));
-	aUnattach->setText(tr("Unattac&h"));
-	aDrawArrow->setText(tr("&Draw arrow..."));
-	ptMenu->setTitle(tr("&Power / toughness"));
-	aIncP->setText(tr("&Increase power"));
-	aIncP->setShortcut(tr("Ctrl++"));
-	aDecP->setText(tr("&Decrease power"));
-	aDecP->setShortcut(tr("Ctrl+-"));
-	aIncT->setText(tr("I&ncrease toughness"));
-	aIncT->setShortcut(tr("Alt++"));
-	aDecT->setText(tr("D&ecrease toughness"));
-	aDecT->setShortcut(tr("Alt+-"));
-	aIncPT->setText(tr("In&crease power and toughness"));
-	aIncPT->setShortcut(tr("Ctrl+Alt++"));
-	aDecPT->setText(tr("Dec&rease power and toughness"));
-	aDecPT->setShortcut(tr("Ctrl+Alt+-"));
-	aSetPT->setText(tr("Set &power and toughness..."));
-	aSetPT->setShortcut(tr("Ctrl+P"));
-	aSetAnnotation->setText(tr("&Set annotation..."));
-	QStringList counterColors;
-	counterColors.append(tr("red"));
-	counterColors.append(tr("yellow"));
-	counterColors.append(tr("green"));
-	for (int i = 0; i < aAddCounter.size(); ++i)
-		aAddCounter[i]->setText(tr("&Add counter (%1)").arg(counterColors[i]));
-	for (int i = 0; i < aRemoveCounter.size(); ++i)
-		aRemoveCounter[i]->setText(tr("&Remove counter (%1)").arg(counterColors[i]));
-	for (int i = 0; i < aSetCounter.size(); ++i)
-		aSetCounter[i]->setText(tr("&Set counters (%1)...").arg(counterColors[i]));
-	aMoveToTopLibrary->setText(tr("&top of library"));
-	aMoveToBottomLibrary->setText(tr("&bottom of library"));
-	aMoveToGraveyard->setText(tr("&graveyard"));
-	aMoveToGraveyard->setShortcut(tr("Ctrl+Del"));
-	aMoveToExile->setText(tr("&exile"));
-	
 	moveMenu->setTitle(tr("&Move to"));
+	ptMenu->setTitle(tr("&Power / toughness"));
 }
 
 void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -355,7 +183,7 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
 	if (zone)
 		zone->reorganizeCards();
 	
-	updateCardMenu();
+	owner->updateCardMenu(this, cardMenu, ptMenu, moveMenu);
 }
 
 void CardItem::resetState()
@@ -505,7 +333,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 	} else if ((event->button() == Qt::LeftButton) && !settingsCache->getDoubleClickToPlay()) {
 		setCursor(Qt::OpenHandCursor);
 		if (revealedCard)
-			actHide();
+			zone->removeCard(this);
 		else
 			playCard(event->modifiers().testFlag(Qt::ShiftModifier));
 	}
@@ -517,7 +345,7 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
 	if (settingsCache->getDoubleClickToPlay()) {
 		if (revealedCard)
-			actHide();
+			zone->removeCard(this);
 		else
 			playCard(event->modifiers().testFlag(Qt::ShiftModifier));
 	}
@@ -544,85 +372,13 @@ bool CardItem::animationEvent()
 QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
 	if ((change == ItemSelectedHasChanged) && owner) {
-		if (value == true)
+		if (value == true) {
 			owner->setCardMenu(cardMenu);
-		else if (owner->getCardMenu() == cardMenu)
+			owner->setActiveCard(this);
+		} else if (owner->getCardMenu() == cardMenu) {
 			owner->setCardMenu(0);
+			owner->setActiveCard(0);
+		}
 	}
 	return QGraphicsItem::itemChange(change, value);
-}
-
-void CardItem::cardMenuAction()
-{
-	owner->cardMenuAction(static_cast<QAction *>(sender()));
-}
-
-void CardItem::actAttach()
-{
-	owner->actAttach(static_cast<QAction *>(sender()));
-}
-
-void CardItem::actUnattach()
-{
-	owner->actUnattach(static_cast<QAction *>(sender()));
-}
-
-void CardItem::actDrawArrow()
-{
-	drawArrow(Qt::red);
-}
-
-void CardItem::actIncP()
-{
-	owner->actIncPT(1, 0);
-}
-
-void CardItem::actDecP()
-{
-	owner->actIncPT(-1, 0);
-}
-
-void CardItem::actIncT()
-{
-	owner->actIncPT(0, 1);
-}
-
-void CardItem::actDecT()
-{
-	owner->actIncPT(0, -1);
-}
-
-void CardItem::actIncPT()
-{
-	owner->actIncPT(1, 1);
-}
-
-void CardItem::actDecPT()
-{
-	owner->actIncPT(-1, -1);
-}
-
-void CardItem::actSetPT()
-{
-	owner->actSetPT(static_cast<QAction *>(sender()));
-}
-
-void CardItem::actSetAnnotation()
-{
-	owner->actSetAnnotation(static_cast<QAction *>(sender()));
-}
-
-void CardItem::actCardCounterTrigger()
-{
-	owner->actCardCounterTrigger(static_cast<QAction *>(sender()));
-}
-
-void CardItem::actPlay()
-{
-	playCard(false);
-}
-
-void CardItem::actHide()
-{
-	zone->removeCard(this);
 }

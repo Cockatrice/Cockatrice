@@ -122,14 +122,6 @@ public slots:
 	void actViewSideboard();
 	
 	void actSayMessage();
-
-	void actAttach(QAction *action);
-	void actUnattach(QAction *action);
-	void actIncPT(int deltaP, int deltaT);
-	void actSetPT(QAction *action);
-	void actSetAnnotation(QAction *action);
-	void cardMenuAction(QAction *action);
-	void actCardCounterTrigger(QAction *action);
 private slots:
 	void addPlayer(Player *player);
 	void removePlayer(Player *player);
@@ -137,6 +129,24 @@ private slots:
 	
 	void updateBoundingRect();
 	void rearrangeZones();
+	
+	void cardMenuAction();
+	void actCardCounterTrigger();
+	void actAttach();
+	void actUnattach();
+	void actDrawArrow();
+	void actIncPT(int deltaP, int deltaT);
+	void actSetPT();
+	void actIncP();
+	void actDecP();
+	void actIncT();
+	void actDecT();
+	void actIncPT();
+	void actDecPT();
+	void actSetAnnotation();
+	void actPlay();
+	void actHide();
+
 private:
 	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *countersMenu, *sayMenu,
 		*mRevealLibrary, *mRevealTopCard, *mRevealHand, *mRevealRandomHandCard;
@@ -150,6 +160,13 @@ private:
                 *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle,
 		*aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,
 		*aCardMenu;
+	CardItem *activeCard;
+	
+	QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
+	QAction *aPlay,
+		*aHide,
+		*aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aSetAnnotation, *aFlip, *aClone,
+		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile;
 
 	bool shortcutsActive;
 	int defaultNumberTopCards;
@@ -243,6 +260,8 @@ public:
 	const QMap<int, ArrowItem *> &getArrows() const { return arrows; }
 	void setCardMenu(QMenu *menu);
 	QMenu *getCardMenu() const;
+	void setActiveCard(CardItem *card) { activeCard = card; }
+	void updateCardMenu(CardItem *card, QMenu *cardMenu, QMenu *ptMenu, QMenu *moveMenu);
 	bool getActive() const { return active; }
 	void setActive(bool _active);
 	void setShortcutsActive();

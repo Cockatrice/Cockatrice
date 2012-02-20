@@ -31,32 +31,9 @@ private:
 	CardItem *attachedTo;
 	QList<CardItem *> attachedCards;
 	
-	QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
-	QAction *aPlay,
-		*aHide,
-		*aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aSetAnnotation, *aFlip, *aClone,
-		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile;
 	QMenu *cardMenu, *ptMenu, *moveMenu;
 
-	void playCard(bool faceDown);
-	void drawArrow(const QColor &arrowColor);
 	void prepareDelete();
-private slots:
-	void cardMenuAction();
-	void actCardCounterTrigger();
-	void actAttach();
-	void actUnattach();
-	void actDrawArrow();
-	void actSetPT();
-	void actIncP();
-	void actDecP();
-	void actIncT();
-	void actDecT();
-	void actIncPT();
-	void actDecPT();
-	void actSetAnnotation();
-	void actPlay();
-	void actHide();
 public slots:
 	void deleteLater();
 public:
@@ -67,7 +44,6 @@ public:
 	void retranslateUi();
 	CardZone *getZone() const { return zone; }
 	void setZone(CardZone *_zone);
-	QMenu *getCardMenu() const { return cardMenu; }
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QPoint getGridPoint() const { return gridPoint; }
 	void setGridPoint(const QPoint &_gridPoint) { gridPoint = _gridPoint; }
@@ -76,6 +52,7 @@ public:
 	void setOwner(Player *_owner) { owner = _owner; }
 	int getId() const { return id; }
 	void setId(int _id) { id = _id; }
+	bool getRevealedCard() const { return revealedCard; }
 	bool getAttacking() const { return attacking; }
 	void setAttacking(bool _attacking);
 	bool getFaceDown() const { return facedown; }
@@ -102,6 +79,8 @@ public:
 	bool animationEvent();
 	CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);
 	void deleteDragItem();
+	void drawArrow(const QColor &arrowColor);
+	void playCard(bool faceDown);
 protected:
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);

@@ -93,7 +93,7 @@ void PlayerArea::setSize(qreal width, qreal height)
 }
 
 Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_parent)
-	: QObject(_parent), shortcutsActive(false), defaultNumberTopCards(3), lastTokenDestroy(true), id(_id), active(false), local(_local), mirrored(false), handVisible(false), conceded(false), dialogSemaphore(false)
+	: QObject(_parent), activeCard(0), shortcutsActive(false), defaultNumberTopCards(3), lastTokenDestroy(true), id(_id), active(false), local(_local), mirrored(false), handVisible(false), conceded(false), dialogSemaphore(false)
 {
 	userInfo = new ServerInfo_User;
 	userInfo->CopyFrom(info);
@@ -322,6 +322,76 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 		aCardMenu = 0;
 	}
 	
+	aTap = new QAction(this);
+	aTap->setData(0);
+	connect(aTap, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+	aUntap = new QAction(this);
+	aUntap->setData(1);
+	connect(aUntap, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+	aDoesntUntap = new QAction(this);
+	aDoesntUntap->setData(2);
+	connect(aDoesntUntap, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+	aAttach = new QAction(this);
+	connect(aAttach, SIGNAL(triggered()), this, SLOT(actAttach()));
+	aUnattach = new QAction(this);
+	connect(aUnattach, SIGNAL(triggered()), this, SLOT(actUnattach()));
+	aDrawArrow = new QAction(this);
+	connect(aDrawArrow, SIGNAL(triggered()), this, SLOT(actDrawArrow()));
+	aIncP = new QAction(this);
+	connect(aIncP, SIGNAL(triggered()), this, SLOT(actIncP()));
+	aDecP = new QAction(this);
+	connect(aDecP, SIGNAL(triggered()), this, SLOT(actDecP()));
+	aIncT = new QAction(this);
+	connect(aIncT, SIGNAL(triggered()), this, SLOT(actIncT()));
+	aDecT = new QAction(this);
+	connect(aDecT, SIGNAL(triggered()), this, SLOT(actDecT()));
+	aIncPT = new QAction(this);
+	connect(aIncPT, SIGNAL(triggered()), this, SLOT(actIncPT()));
+	aDecPT = new QAction(this);
+	connect(aDecPT, SIGNAL(triggered()), this, SLOT(actDecPT()));
+	aSetPT = new QAction(this);
+	connect(aSetPT, SIGNAL(triggered()), this, SLOT(actSetPT()));
+	aSetAnnotation = new QAction(this);
+	connect(aSetAnnotation, SIGNAL(triggered()), this, SLOT(actSetAnnotation()));
+	aFlip = new QAction(this);
+	aFlip->setData(3);
+	connect(aFlip, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+	aClone = new QAction(this);
+	aClone->setData(4);
+	connect(aClone, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+	aMoveToTopLibrary = new QAction(this);
+	aMoveToTopLibrary->setData(5);
+	aMoveToBottomLibrary = new QAction(this);
+	aMoveToBottomLibrary->setData(6);
+	aMoveToGraveyard = new QAction(this);
+	aMoveToGraveyard->setData(7);
+	aMoveToExile = new QAction(this);
+	aMoveToExile->setData(8);
+	connect(aMoveToTopLibrary, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+	connect(aMoveToBottomLibrary, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+	connect(aMoveToGraveyard, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+	connect(aMoveToExile, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+	
+	aPlay = new QAction(this);
+	connect(aPlay, SIGNAL(triggered()), this, SLOT(actPlay()));
+	aHide = new QAction(this);
+	connect(aHide, SIGNAL(triggered()), this, SLOT(actHide()));
+		
+	for (int i = 0; i < 3; ++i) {
+		QAction *tempAddCounter = new QAction(this);
+		tempAddCounter->setData(9 + i * 1000);
+		QAction *tempRemoveCounter = new QAction(this);
+		tempRemoveCounter->setData(10 + i * 1000);
+		QAction *tempSetCounter = new QAction(this);
+		tempSetCounter->setData(11 + i * 1000);
+		aAddCounter.append(tempAddCounter);
+		aRemoveCounter.append(tempRemoveCounter);
+		aSetCounter.append(tempSetCounter);
+		connect(tempAddCounter, SIGNAL(triggered()), this, SLOT(actCardCounterTrigger()));
+		connect(tempRemoveCounter, SIGNAL(triggered()), this, SLOT(actCardCounterTrigger()));
+		connect(tempSetCounter, SIGNAL(triggered()), this, SLOT(actCardCounterTrigger()));
+	}
+
 	const QList<Player *> &players = _parent->getPlayers().values();
 	for (int i = 0; i < players.size(); ++i)
 		addPlayer(players[i]);
@@ -529,6 +599,50 @@ void Player::retranslateUi()
 		for (int i = 0; i < allPlayersActions.size(); ++i)
 			allPlayersActions[i]->setText(tr("&All players"));
 	}
+	
+	aPlay->setText(tr("&Play"));
+	aHide->setText(tr("&Hide"));
+	
+	aTap->setText(tr("&Tap"));
+	aUntap->setText(tr("&Untap"));
+	aDoesntUntap->setText(tr("Toggle &normal untapping"));
+	aFlip->setText(tr("&Flip"));
+	aClone->setText(tr("&Clone"));
+	aClone->setShortcut(tr("Ctrl+H"));
+	aAttach->setText(tr("&Attach to card..."));
+	aAttach->setShortcut(tr("Ctrl+A"));
+	aUnattach->setText(tr("Unattac&h"));
+	aDrawArrow->setText(tr("&Draw arrow..."));
+	aIncP->setText(tr("&Increase power"));
+	aIncP->setShortcut(tr("Ctrl++"));
+	aDecP->setText(tr("&Decrease power"));
+	aDecP->setShortcut(tr("Ctrl+-"));
+	aIncT->setText(tr("I&ncrease toughness"));
+	aIncT->setShortcut(tr("Alt++"));
+	aDecT->setText(tr("D&ecrease toughness"));
+	aDecT->setShortcut(tr("Alt+-"));
+	aIncPT->setText(tr("In&crease power and toughness"));
+	aIncPT->setShortcut(tr("Ctrl+Alt++"));
+	aDecPT->setText(tr("Dec&rease power and toughness"));
+	aDecPT->setShortcut(tr("Ctrl+Alt+-"));
+	aSetPT->setText(tr("Set &power and toughness..."));
+	aSetPT->setShortcut(tr("Ctrl+P"));
+	aSetAnnotation->setText(tr("&Set annotation..."));
+	QStringList counterColors;
+	counterColors.append(tr("red"));
+	counterColors.append(tr("yellow"));
+	counterColors.append(tr("green"));
+	for (int i = 0; i < aAddCounter.size(); ++i)
+		aAddCounter[i]->setText(tr("&Add counter (%1)").arg(counterColors[i]));
+	for (int i = 0; i < aRemoveCounter.size(); ++i)
+		aRemoveCounter[i]->setText(tr("&Remove counter (%1)").arg(counterColors[i]));
+	for (int i = 0; i < aSetCounter.size(); ++i)
+		aSetCounter[i]->setText(tr("&Set counters (%1)...").arg(counterColors[i]));
+	aMoveToTopLibrary->setText(tr("&top of library"));
+	aMoveToBottomLibrary->setText(tr("&bottom of library"));
+	aMoveToGraveyard->setText(tr("&graveyard"));
+	aMoveToGraveyard->setShortcut(tr("Ctrl+Del"));
+	aMoveToExile->setText(tr("&exile"));
 	
 	QMapIterator<QString, CardZone *> zoneIterator(zones);
 	while (zoneIterator.hasNext())
@@ -1468,8 +1582,9 @@ bool Player::clearCardsToDelete()
 	return true;
 }
 
-void Player::cardMenuAction(QAction *a)
+void Player::cardMenuAction()
 {
+	QAction *a = static_cast<QAction *>(sender());
 	QList<QGraphicsItem *> sel = scene()->selectedItems();
 	QList<CardItem *> cardList;
 	while (!sel.isEmpty())
@@ -1505,7 +1620,7 @@ void Player::cardMenuAction(QAction *a)
 					cmd->set_zone(card->getZone()->getName().toStdString());
 					cmd->set_card_id(card->getId());
 					cmd->set_attribute(AttrDoesntUntap);
-					cmd->set_attr_value(card->getDoesntUntap() ? "1" : "0");
+					cmd->set_attr_value(card->getDoesntUntap() ? "0" : "1");
 					commandList.append(cmd);
 					break;
 				}
@@ -1607,7 +1722,7 @@ void Player::actIncPT(int deltaP, int deltaT)
 	sendGameCommand(prepareGameCommand(commandList));
 }
 
-void Player::actSetPT(QAction * /*a*/)
+void Player::actSetPT()
 {
 	QString oldPT;
 	QListIterator<QGraphicsItem *> i(scene()->selectedItems());
@@ -1639,7 +1754,42 @@ void Player::actSetPT(QAction * /*a*/)
 	sendGameCommand(prepareGameCommand(commandList));
 }
 
-void Player::actSetAnnotation(QAction * /*a*/)
+void Player::actDrawArrow()
+{
+	activeCard->drawArrow(Qt::red);
+}
+
+void Player::actIncP()
+{
+	actIncPT(1, 0);
+}
+
+void Player::actDecP()
+{
+	actIncPT(-1, 0);
+}
+
+void Player::actIncT()
+{
+	actIncPT(0, 1);
+}
+
+void Player::actDecT()
+{
+	actIncPT(0, -1);
+}
+
+void Player::actIncPT()
+{
+	actIncPT(1, 1);
+}
+
+void Player::actDecPT()
+{
+	actIncPT(-1, -1);
+}
+
+void Player::actSetAnnotation()
 {
 	QString oldAnnotation;
 	QListIterator<QGraphicsItem *> i(scene()->selectedItems());
@@ -1672,25 +1822,24 @@ void Player::actSetAnnotation(QAction * /*a*/)
 	sendGameCommand(prepareGameCommand(commandList));
 }
 
-void Player::actAttach(QAction *a)
+void Player::actAttach()
 {
-	CardItem *card = static_cast<CardItem *>(a->parent());
-	ArrowAttachItem *arrow = new ArrowAttachItem(card);
+	ArrowAttachItem *arrow = new ArrowAttachItem(activeCard);
 	scene()->addItem(arrow);
 	arrow->grabMouse();
 }
 
-void Player::actUnattach(QAction *a)
+void Player::actUnattach()
 {
-	CardItem *card = static_cast<CardItem *>(a->parent());
 	Command_AttachCard cmd;
-	cmd.set_start_zone(card->getZone()->getName().toStdString());
-	cmd.set_card_id(card->getId());
+	cmd.set_start_zone(activeCard->getZone()->getName().toStdString());
+	cmd.set_card_id(activeCard->getId());
 	sendGameCommand(cmd);
 }
 
-void Player::actCardCounterTrigger(QAction *a)
+void Player::actCardCounterTrigger()
 {
+	QAction *a = static_cast<QAction *>(sender());
 	int counterId = a->data().toInt() / 1000;
 	int action = a->data().toInt() % 1000;
 	QList< const ::google::protobuf::Message * > commandList;
@@ -1750,6 +1899,80 @@ void Player::actCardCounterTrigger(QAction *a)
 		default: ;
 	}
 	sendGameCommand(prepareGameCommand(commandList));
+}
+
+void Player::actPlay()
+{
+	activeCard->playCard(false);
+}
+
+void Player::actHide()
+{
+	activeCard->getZone()->removeCard(activeCard);
+}
+
+void Player::updateCardMenu(CardItem *card, QMenu *cardMenu, QMenu *ptMenu, QMenu *moveMenu)
+{
+	cardMenu->clear();
+	
+	if (card->getRevealedCard())
+		cardMenu->addAction(aHide);
+	else if (getLocal()) {
+		if (moveMenu->isEmpty()) {
+			moveMenu->addAction(aMoveToTopLibrary);
+			moveMenu->addAction(aMoveToBottomLibrary);
+			moveMenu->addAction(aMoveToGraveyard);
+			moveMenu->addAction(aMoveToExile);
+		}
+		
+		if (card->getZone()) {
+			if (card->getZone()->getName() == "table") {
+				if (ptMenu->isEmpty()) {
+					ptMenu->addAction(aIncP);
+					ptMenu->addAction(aDecP);
+					ptMenu->addSeparator();
+					ptMenu->addAction(aIncT);
+					ptMenu->addAction(aDecT);
+					ptMenu->addSeparator();
+					ptMenu->addAction(aIncPT);
+					ptMenu->addAction(aDecPT);
+					ptMenu->addSeparator();
+					ptMenu->addAction(aSetPT);
+				}
+				
+				cardMenu->addAction(aTap);
+				cardMenu->addAction(aUntap);
+				cardMenu->addAction(aDoesntUntap);
+				cardMenu->addAction(aFlip);
+				cardMenu->addSeparator();
+				cardMenu->addAction(aAttach);
+				if (card->getAttachedTo())
+					cardMenu->addAction(aUnattach);
+				cardMenu->addAction(aDrawArrow);
+				cardMenu->addSeparator();
+				cardMenu->addMenu(ptMenu);
+				cardMenu->addAction(aSetAnnotation);
+				cardMenu->addSeparator();
+				cardMenu->addAction(aClone);
+				cardMenu->addMenu(moveMenu);
+				
+				for (int i = 0; i < aAddCounter.size(); ++i) {
+					cardMenu->addSeparator();
+					cardMenu->addAction(aAddCounter[i]);
+					cardMenu->addAction(aRemoveCounter[i]);
+					cardMenu->addAction(aSetCounter[i]);
+				}
+				cardMenu->addSeparator();
+			} else if (card->getZone()->getName() == "stack") {
+				cardMenu->addAction(aDrawArrow);
+				cardMenu->addMenu(moveMenu);
+			} else {
+				cardMenu->addAction(aPlay);
+				cardMenu->addMenu(moveMenu);
+			}
+		} else
+			cardMenu->addMenu(moveMenu);
+	}
 }
 
 void Player::setCardMenu(QMenu *menu)
