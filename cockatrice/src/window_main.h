@@ -47,6 +47,7 @@ private slots:
 	void actConnect();
 	void actDisconnect();
 	void actSinglePlayer();
+	void actWatchReplay();
 	void actDeckEditor();
 	void actFullScreen(bool checked);
 	void actSettings();
@@ -60,7 +61,7 @@ private:
 	void createActions();
 	void createMenus();
 	QMenu *cockatriceMenu, *tabMenu, *helpMenu;
-	QAction *aConnect, *aDisconnect, *aSinglePlayer, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
+	QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
 		*aAbout;
 	TabSupervisor *tabSupervisor;
 

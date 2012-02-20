@@ -55,9 +55,11 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient
 	concededIcon = QIcon(":/resources/icon_conceded.svg");
 	playerIcon = QIcon(":/resources/icon_player.svg");
 	spectatorIcon = QIcon(":/resources/icon_spectator.svg");
-
-	itemDelegate = new PlayerListItemDelegate(this);
-	setItemDelegate(itemDelegate);
+	
+	if (tabSupervisor) {
+		itemDelegate = new PlayerListItemDelegate(this);
+		setItemDelegate(itemDelegate);
+	}
 	
 	setMinimumHeight(60);
 	setIconSize(QSize(20, 15));

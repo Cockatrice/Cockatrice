@@ -49,6 +49,7 @@ class TabGame;
 class DeckList;
 class QVBoxLayout;
 class QHBoxLayout;
+class GameReplay;
 class ServerInfo_User;
 class PendingCommand;
 
@@ -107,7 +108,9 @@ private:
 	QStringList phasesList;
 	int currentPhase;
 	int activePlayer;
-
+	GameReplay *replay;
+	int currentReplayStep;
+	
 	QSplitter *splitter;
 	CardInfoWidget *cardInfo;
 	PlayerListWidget *playerListWidget;
@@ -155,6 +158,7 @@ signals:
 	void containerProcessingDone();
 	void openMessageDialog(const QString &userName, bool focus);
 private slots:
+	void nextReplayStep();
 	void incrementGameTime();
 	void adminLockChanged(bool lock);
 	void newCardAdded(AbstractCardItem *card);
@@ -168,6 +172,7 @@ private slots:
 	void actNextTurn();
 public:
 	TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event);
+	TabGame(GameReplay *replay);
 	~TabGame();
 	void retranslateUi();
 	void closeRequest();

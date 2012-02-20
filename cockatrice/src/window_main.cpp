@@ -24,6 +24,8 @@
 #include <QMenuBar>
 #include <QPixmapCache>
 #include <QInputDialog>
+#include <QFile>
+#include <QFileDialog>
 
 #include "main.h"
 #include "window_main.h"
@@ -35,7 +37,10 @@
 #include "localserver.h"
 #include "localserverinterface.h"
 #include "localclient.h"
+#include "settingscache.h"
+#include "tab_game.h"
 
+#include "pb/game_replay.pb.h"
 #include "pb/room_commands.pb.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_server_shutdown.pb.h"
@@ -145,6 +150,28 @@ void MainWindow::actSinglePlayer()
 	mainClient->sendCommand(mainClient->prepareRoomCommand(createCommand, 0));
 }
 
+void MainWindow::actWatchReplay()
+{
+	QFileDialog dlg(this, tr("Load replay"));
+	dlg.setDirectory(settingsCache->getReplaysPath());
+	dlg.setNameFilters(QStringList() << QObject::tr("Cockatrice replays (*.cor)"));
+	if (!dlg.exec())
+		return;
+	
+	QString fileName = dlg.selectedFiles().at(0);
+	QFile file(fileName);
+	if (!file.open(QIODevice::ReadOnly))
+		return;
+	QByteArray buf = file.readAll();
+	file.close();
+	
+	GameReplay *replay = new GameReplay;
+	replay->ParseFromArray(buf.data(), buf.size());
+	
+	TabGame *replayWatcher = new TabGame(replay);
+	replayWatcher->show();
+}
+
 void MainWindow::localGameEnded()
 {
 	delete localServer;
@@ -243,6 +270,7 @@ void MainWindow::retranslateUi()
 	aConnect->setText(tr("&Connect..."));
 	aDisconnect->setText(tr("&Disconnect"));
 	aSinglePlayer->setText(tr("Start &local game..."));
+	aWatchReplay->setText(tr("&Watch replay..."));
 	aDeckEditor->setText(tr("&Deck editor"));
 	aFullScreen->setText(tr("&Full screen"));
 	aFullScreen->setShortcut(tr("Ctrl+F"));
@@ -266,6 +294,8 @@ void MainWindow::createActions()
 	connect(aDisconnect, SIGNAL(triggered()), this, SLOT(actDisconnect()));
 	aSinglePlayer = new QAction(this);
 	connect(aSinglePlayer, SIGNAL(triggered()), this, SLOT(actSinglePlayer()));
+	aWatchReplay = new QAction(this);
+	connect(aWatchReplay, SIGNAL(triggered()), this, SLOT(actWatchReplay()));
 	aDeckEditor = new QAction(this);
 	connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
 	aFullScreen = new QAction(this);
@@ -286,6 +316,7 @@ void MainWindow::createMenus()
 	cockatriceMenu->addAction(aConnect);
 	cockatriceMenu->addAction(aDisconnect);
 	cockatriceMenu->addAction(aSinglePlayer);
+	cockatriceMenu->addAction(aWatchReplay);
 	cockatriceMenu->addSeparator();
 	cockatriceMenu->addAction(aDeckEditor);
 	cockatriceMenu->addSeparator();

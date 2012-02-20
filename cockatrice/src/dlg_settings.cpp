@@ -56,6 +56,12 @@ GeneralSettingsPage::GeneralSettingsPage()
 	QPushButton *deckPathButton = new QPushButton("...");
 	connect(deckPathButton, SIGNAL(clicked()), this, SLOT(deckPathButtonClicked()));
 	
+	replaysPathLabel = new QLabel;
+	replaysPathEdit = new QLineEdit(settingsCache->getReplaysPath());
+	replaysPathEdit->setReadOnly(true);
+	QPushButton *replaysPathButton = new QPushButton("...");
+	connect(replaysPathButton, SIGNAL(clicked()), this, SLOT(replaysPathButtonClicked()));
+	
 	picsPathLabel = new QLabel;
 	picsPathEdit = new QLineEdit(settingsCache->getPicsPath());
 	picsPathEdit->setReadOnly(true);
@@ -72,12 +78,15 @@ GeneralSettingsPage::GeneralSettingsPage()
 	pathsGrid->addWidget(deckPathLabel, 0, 0);
 	pathsGrid->addWidget(deckPathEdit, 0, 1);
 	pathsGrid->addWidget(deckPathButton, 0, 2);
-	pathsGrid->addWidget(picsPathLabel, 1, 0);
-	pathsGrid->addWidget(picsPathEdit, 1, 1);
-	pathsGrid->addWidget(picsPathButton, 1, 2);
-	pathsGrid->addWidget(cardDatabasePathLabel, 2, 0);
-	pathsGrid->addWidget(cardDatabasePathEdit, 2, 1);
-	pathsGrid->addWidget(cardDatabasePathButton, 2, 2);
+	pathsGrid->addWidget(replaysPathLabel, 1, 0);
+	pathsGrid->addWidget(replaysPathEdit, 1, 1);
+	pathsGrid->addWidget(replaysPathButton, 1, 2);
+	pathsGrid->addWidget(picsPathLabel, 2, 0);
+	pathsGrid->addWidget(picsPathEdit, 2, 1);
+	pathsGrid->addWidget(picsPathButton, 2, 2);
+	pathsGrid->addWidget(cardDatabasePathLabel, 3, 0);
+	pathsGrid->addWidget(cardDatabasePathEdit, 3, 1);
+	pathsGrid->addWidget(cardDatabasePathButton, 3, 2);
 	pathsGroupBox = new QGroupBox;
 	pathsGroupBox->setLayout(pathsGrid);
 
@@ -114,6 +123,16 @@ void GeneralSettingsPage::deckPathButtonClicked()
 	settingsCache->setDeckPath(path);
 }
 
+void GeneralSettingsPage::replaysPathButtonClicked()
+{
+	QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"));
+	if (path.isEmpty())
+		return;
+	
+	replaysPathEdit->setText(path);
+	settingsCache->setReplaysPath(path);
+}
+
 void GeneralSettingsPage::picsPathButtonClicked()
 {
 	QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"));
@@ -146,6 +165,7 @@ void GeneralSettingsPage::retranslateUi()
 	picDownloadCheckBox->setText(tr("Download card pictures on the fly"));
 	pathsGroupBox->setTitle(tr("Paths"));
 	deckPathLabel->setText(tr("Decks directory:"));
+	replaysPathLabel->setText(tr("Replays directory:"));
 	picsPathLabel->setText(tr("Pictures directory:"));
 	cardDatabasePathLabel->setText(tr("Path to card database:"));
 }

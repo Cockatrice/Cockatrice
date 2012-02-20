@@ -8,6 +8,7 @@ SettingsCache::SettingsCache()
 	lang = settings->value("personal/lang").toString();
 	
 	deckPath = settings->value("paths/decks").toString();
+	replaysPath = settings->value("paths/replays").toString();
 	picsPath = settings->value("paths/pics").toString();
 	cardDatabasePath = settings->value("paths/carddatabase").toString();
 	
@@ -47,6 +48,12 @@ void SettingsCache::setDeckPath(const QString &_deckPath)
 {
 	deckPath = _deckPath;
 	settings->setValue("paths/decks", deckPath);
+}
+
+void SettingsCache::setReplaysPath(const QString &_replaysPath)
+{
+	replaysPath = _replaysPath;
+	settings->setValue("paths/replays", replaysPath);
 }
 
 void SettingsCache::setPicsPath(const QString &_picsPath)

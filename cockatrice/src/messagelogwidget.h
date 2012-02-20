@@ -40,6 +40,7 @@ private:
 	int mulliganNumber;
 public slots:
 	void logGameJoined(int gameId);
+	void logReplayStarted(int gameId);
 	void logJoin(Player *player);
 	void logLeave(Player *player);
 	void logGameClosed();

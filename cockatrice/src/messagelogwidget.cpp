@@ -29,6 +29,14 @@ void MessageLogWidget::logGameJoined(int gameId)
 		appendHtml(tr("You have joined game #%1.", "male").arg(gameId));
 }
 
+void MessageLogWidget::logReplayStarted(int gameId)
+{
+	if (female)
+		appendHtml(tr("You are watching a replay of game #%1.", "female").arg(gameId));
+	else
+		appendHtml(tr("You are watching a replay of game #%1.", "male").arg(gameId));
+}
+
 void MessageLogWidget::logJoin(Player *player)
 {
 	soundEngine->cuckoo();

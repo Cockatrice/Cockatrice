@@ -26,7 +26,7 @@ private:
 	QSettings *settings;
 	
 	QString lang;
-	QString deckPath, picsPath, cardDatabasePath;
+	QString deckPath, replaysPath, picsPath, cardDatabasePath;
 	QString handBgPath, stackBgPath, tableBgPath, playerBgPath, cardBackPicturePath;
 	bool picDownload;
 	bool doubleClickToPlay;
@@ -45,6 +45,7 @@ public:
 	SettingsCache();
 	QString getLang() const { return lang; }
 	QString getDeckPath() const { return deckPath; }
+	QString getReplaysPath() const { return replaysPath; }
 	QString getPicsPath() const { return picsPath; }
 	QString getCardDatabasePath() const { return cardDatabasePath; }
 	QString getHandBgPath() const { return handBgPath; }
@@ -69,6 +70,7 @@ public:
 public slots:
 	void setLang(const QString &_lang);
 	void setDeckPath(const QString &_deckPath);
+	void setReplaysPath(const QString &_replaysPath);
 	void setPicsPath(const QString &_picsPath);
 	void setCardDatabasePath(const QString &_cardDatabasePath);
 	void setHandBgPath(const QString &_handBgPath);

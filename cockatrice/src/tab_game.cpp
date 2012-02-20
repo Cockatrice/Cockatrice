@@ -29,6 +29,7 @@
 
 #include <google/protobuf/descriptor.h>
 #include "pending_command.h"
+#include "pb/game_replay.pb.h"
 #include "pb/command_concede.pb.h"
 #include "pb/command_deck_select.pb.h"
 #include "pb/command_ready_start.pb.h"
@@ -195,6 +196,85 @@ void DeckViewContainer::setDeck(DeckList *deck)
 	readyStartButton->setEnabled(true);
 }
 
+TabGame::TabGame(GameReplay *_replay)
+	: Tab(0),
+	hostId(-1),
+	localPlayerId(-1),
+	spectator(true),
+	spectatorsCanTalk(false),
+	spectatorsSeeEverything(true),
+	gameStateKnown(false),
+	started(false),
+	resuming(false),
+	currentPhase(-1),
+	replay(_replay),
+	currentReplayStep(0)
+{
+	gameId = replay->game_info().game_id();
+	gameDescription = QString::fromStdString(replay->game_info().description());
+	
+	phasesToolbar = new PhasesToolbar;
+	phasesToolbar->hide();
+	
+	scene = new GameScene(phasesToolbar, this);
+	gameView = new GameView(scene);
+	gameView->hide();
+	
+	cardInfo = new CardInfoWidget(CardInfoWidget::ModeGameTab);
+	playerListWidget = new PlayerListWidget(0, 0, this);
+	playerListWidget->setFocusPolicy(Qt::NoFocus);
+	
+	timeElapsedLabel = new QLabel;
+	timeElapsedLabel->setAlignment(Qt::AlignCenter);
+	messageLog = new MessageLogWidget(QString(), false);
+	connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfo, SLOT(setCard(QString)));
+	connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
+	connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
+	sayLabel = 0;
+
+	deckViewContainerLayout = new QVBoxLayout;
+
+	QVBoxLayout *messageLogLayout = new QVBoxLayout;
+	messageLogLayout->addWidget(timeElapsedLabel);
+	messageLogLayout->addWidget(messageLog);
+	
+	QWidget *messageLogLayoutWidget = new QWidget;
+	messageLogLayoutWidget->setLayout(messageLogLayout);
+	
+	splitter = new QSplitter(Qt::Vertical);
+	splitter->addWidget(cardInfo);
+	splitter->addWidget(playerListWidget);
+	splitter->addWidget(messageLogLayoutWidget);
+
+	mainLayout = new QHBoxLayout;
+	mainLayout->addWidget(gameView, 10);
+	mainLayout->addLayout(deckViewContainerLayout, 10);
+	mainLayout->addWidget(splitter);
+	
+	aNextPhase = 0;
+	aNextTurn = 0;
+	aRemoveLocalArrows = 0;
+	aConcede = 0;
+	aLeaveGame = new QAction(this);
+	connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
+	
+	phasesMenu = 0;
+	tabMenu = new QMenu(this);
+	tabMenu->addAction(aLeaveGame);
+	
+	retranslateUi();
+	setLayout(mainLayout);
+
+	splitter->restoreState(settingsCache->getTabGameSplitterSizes());
+	
+	messageLog->logReplayStarted(gameId);
+
+	gameTimer = new QTimer(this);
+	gameTimer->setInterval(1000);
+	connect(gameTimer, SIGNAL(timeout()), this, SLOT(nextReplayStep()));
+	gameTimer->start();
+}
+
 TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event)
 	: Tab(_tabSupervisor),
 	clients(_clients),
@@ -205,10 +285,11 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	spectator(event.spectator()),
 	spectatorsCanTalk(event.spectators_can_talk()),
 	spectatorsSeeEverything(event.spectators_see_everything()),
-	gameStateKnown(false),
+	gameStateKnown(true),
 	started(false),
 	resuming(event.resuming()),
-	currentPhase(-1)
+	currentPhase(-1),
+	replay(0)
 {
 	gameTimer = new QTimer(this);
 	gameTimer->setInterval(1000);
@@ -261,7 +342,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	mainLayout->addWidget(gameView, 10);
 	mainLayout->addLayout(deckViewContainerLayout, 10);
 	mainLayout->addWidget(splitter);
-
+	
 	if (spectator && !spectatorsCanTalk && tabSupervisor->getAdminLocked()) {
 		sayLabel->hide();
 		sayEdit->hide();
@@ -320,6 +401,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 
 TabGame::~TabGame()
 {
+	delete replay;
 	settingsCache->setTabGameSplitterSizes(splitter->saveState());
 
 	QMapIterator<int, Player *> i(players);
@@ -334,23 +416,34 @@ TabGame::~TabGame()
 
 void TabGame::retranslateUi()
 {
-	for (int i = 0; i < phaseActions.size(); ++i)
-		phaseActions[i]->setText(phasesToolbar->getLongPhaseName(i));
-	phasesMenu->setTitle(tr("&Phases"));
+	if (phasesMenu) {
+		for (int i = 0; i < phaseActions.size(); ++i)
+			phaseActions[i]->setText(phasesToolbar->getLongPhaseName(i));
+		phasesMenu->setTitle(tr("&Phases"));
+	}
 	
 	tabMenu->setTitle(tr("&Game"));
-	aNextPhase->setText(tr("Next &phase"));
-	aNextPhase->setShortcut(tr("Ctrl+Space"));
-	aNextTurn->setText(tr("Next &turn"));
-	aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
-	aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
-	aRemoveLocalArrows->setShortcut(tr("Ctrl+R"));
-	aConcede->setText(tr("&Concede"));
-	aConcede->setShortcut(tr("F2"));
+	if (aNextPhase) {
+		aNextPhase->setText(tr("Next &phase"));
+		aNextPhase->setShortcut(tr("Ctrl+Space"));
+	}
+	if (aNextTurn) {
+		aNextTurn->setText(tr("Next &turn"));
+		aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
+	}
+	if (aRemoveLocalArrows) {
+		aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
+		aRemoveLocalArrows->setShortcut(tr("Ctrl+R"));
+	}
+	if (aConcede) {
+		aConcede->setText(tr("&Concede"));
+		aConcede->setShortcut(tr("F2"));
+	}
 	aLeaveGame->setText(tr("&Leave game"));
 	aLeaveGame->setShortcut(tr("Ctrl+Q"));
 	
-	sayLabel->setText(tr("&Say:"));
+	if (sayLabel)
+		sayLabel->setText(tr("&Say:"));
 	cardInfo->retranslateUi();
 
 	QMapIterator<int, Player *> i(players);
@@ -366,6 +459,17 @@ void TabGame::retranslateUi()
 void TabGame::closeRequest()
 {
 	actLeaveGame();
+}
+
+void TabGame::nextReplayStep()
+{
+	if (replay->event_list_size() <= currentReplayStep) {
+		QMessageBox::information(this, "", "done");
+		gameTimer->stop();
+		return;
+	}
+	processGameEventContainer(replay->event_list(currentReplayStep), 0);
+	++currentReplayStep;
 }
 
 void TabGame::incrementGameTime()

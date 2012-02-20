@@ -108,6 +108,10 @@ int main(int argc, char *argv[])
 		QDir().mkpath(dataDir + "/decks");
 		settingsCache->setDeckPath(dataDir + "/decks");
 	}
+	if (!QDir(settingsCache->getReplaysPath()).exists() || settingsCache->getReplaysPath().isEmpty()) {
+		QDir().mkpath(dataDir + "/replays");
+		settingsCache->setReplaysPath(dataDir + "/replays");
+	}
 	if (!QDir(settingsCache->getPicsPath()).exists() || settingsCache->getPicsPath().isEmpty()) {
 		QDir().mkpath(dataDir + "/pics");
 		settingsCache->setPicsPath(dataDir + "/pics");
