@@ -2,7 +2,7 @@
 #include "cardinfowidget.h"
 #include <QDesktopWidget>
 #include <QApplication>
-
+#include <QDebug>
 Tab::Tab(TabSupervisor *_tabSupervisor, QWidget *parent)
 	: QWidget(parent), tabMenu(0), tabSupervisor(_tabSupervisor), contentsChanged(false), infoPopup(0)
 {
@@ -10,9 +10,8 @@ Tab::Tab(TabSupervisor *_tabSupervisor, QWidget *parent)
 
 void Tab::showCardInfoPopup(const QPoint &pos, const QString &cardName)
 {
-	infoPopup = new CardInfoWidget(CardInfoWidget::ModePopUp, 0, Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
+	infoPopup = new CardInfoWidget(CardInfoWidget::ModePopUp, cardName, 0, Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
 	infoPopup->setAttribute(Qt::WA_TransparentForMouseEvents);
-	infoPopup->setCard(cardName);
 	QRect screenRect = qApp->desktop()->screenGeometry(this);
 	infoPopup->move(
 		qMax(screenRect.left(), qMin(pos.x() - infoPopup->width() / 2, screenRect.left() + screenRect.width() - infoPopup->width())),

@@ -10,9 +10,9 @@
 #include "main.h"
 #include "settingscache.h"
 
-CardInfoWidget::CardInfoWidget(ResizeMode _mode, QWidget *parent, Qt::WindowFlags flags)
+CardInfoWidget::CardInfoWidget(ResizeMode _mode, const QString &cardName, QWidget *parent, Qt::WindowFlags flags)
 	: QFrame(parent, flags)
-	, pixmapWidth(160)
+	, pixmapWidth(0)
 	, aspectRatio((qreal) CARD_HEIGHT / (qreal) CARD_WIDTH)
 	, minimized(settingsCache->getCardInfoMinimized()) // Initialize the cardinfo view status from cache.
 	, mode(_mode)
@@ -68,18 +68,18 @@ CardInfoWidget::CardInfoWidget(ResizeMode _mode, QWidget *parent, Qt::WindowFlag
 	grid->setRowStretch(row, 1);
 	grid->setColumnStretch(1, 1);
 
-	CardInfo *cardBack = db->getCard();
-	setCard(cardBack);
-
 	retranslateUi();
 	setFrameStyle(QFrame::Panel | QFrame::Raised);
 	if (mode == ModeGameTab) {
 		textLabel->setMinimumHeight(100);
 		setFixedWidth(sizeHint().width());
-	} else if (mode == ModePopUp)
+	} else if (mode == ModePopUp) {
 		setFixedWidth(350);
-	else
+		pixmapWidth = 250;
+	} else
 		setFixedWidth(250);
+	
+	setCard(db->getCard(cardName));
 	setMinimized(settingsCache->getCardInfoMinimized());
 }
 
@@ -106,8 +106,8 @@ void CardInfoWidget::setMinimized(int _minimized)
 
 	// Toggle oracle fields according to selected view.
 	bool showAll = ((minimized == 1) || (minimized == 2));
-	bool showPowTough = showAll && shouldShowPowTough();
-	bool showLoyalty = showAll && shouldShowLoyalty();
+	bool showPowTough = info ? (showAll && shouldShowPowTough()) : true;
+	bool showLoyalty = info ? (showAll && shouldShowLoyalty()) : true;
 	if (mode == ModeGameTab) {
 		nameLabel1->setVisible(showAll);
 		nameLabel2->setVisible(showAll);
@@ -177,6 +177,9 @@ void CardInfoWidget::clear()
 
 void CardInfoWidget::updatePixmap()
 {
+	if (pixmapWidth == 0)
+		return;
+	
 	QPixmap *resizedPixmap = info->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio));
 	if (resizedPixmap)
 		cardPicture->setPixmap(*resizedPixmap);
@@ -192,14 +195,19 @@ void CardInfoWidget::retranslateUi()
 	powtoughLabel1->setText(tr("P / T:"));
 	loyaltyLabel1->setText(tr("Loyalty:"));
 }
-
 void CardInfoWidget::resizeEvent(QResizeEvent * /*event*/)
 {
-	if ((mode == ModeGameTab) && (minimized == 1))
+	if (mode == ModePopUp)
 		return;
-	
-	pixmapWidth = qMax((qreal) 100.0, qMin((qreal) cardPicture->width(), (qreal) ((height() - cardHeightOffset) / aspectRatio)));
-	updatePixmap();
+	if ((minimized == 1) && (mode == ModeGameTab)) {
+		pixmapWidth = 0;
+		return;
+	}
+	qreal newPixmapWidth = qMax((qreal) 100.0, qMin((qreal) cardPicture->width(), (qreal) ((height() - cardHeightOffset) / aspectRatio)));
+	if (newPixmapWidth != pixmapWidth) {
+		pixmapWidth = newPixmapWidth;
+		updatePixmap();
+	}
 }
 
 QString CardInfoWidget::getCardName() const
