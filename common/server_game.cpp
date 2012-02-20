@@ -39,13 +39,17 @@
 #include "pb/event_set_active_player.pb.h"
 #include "pb/event_set_active_phase.pb.h"
 #include "pb/serverinfo_playerping.pb.h"
+#include "pb/game_replay.pb.h"
 #include <google/protobuf/descriptor.h>
 #include <QTimer>
 #include <QDebug>
 
 Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *_room)
-	: QObject(), room(_room), hostId(0), creatorInfo(new ServerInfo_User(_creator->copyUserInfo(false))), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies), onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0), gameMutex(QMutex::Recursive)
+	: QObject(), room(_room), hostId(0), creatorInfo(new ServerInfo_User(_creator->copyUserInfo(false))), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies), onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0), startTime(QDateTime::currentDateTime()), gameMutex(QMutex::Recursive)
 {
+	replay = new GameReplay;
+	replay->mutable_game_info()->CopyFrom(getInfo());
+	
 	connect(this, SIGNAL(sigStartGameIfReady()), this, SLOT(doStartGameIfReady()), Qt::QueuedConnection);
 	
 	addPlayer(_creator, false, false);
@@ -59,8 +63,8 @@ Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QS
 
 Server_Game::~Server_Game()
 {
-	QMutexLocker roomLocker(&room->roomMutex);
-	QMutexLocker locker(&gameMutex);
+	room->roomMutex.lock();
+	gameMutex.lock();
 	
 	sendGameEventContainer(prepareGameEvent(Event_GameClosed(), -1));
 	
@@ -72,6 +76,13 @@ Server_Game::~Server_Game()
 	room->removeGame(this);
 	delete creatorInfo;
 	creatorInfo = 0;
+	
+	gameMutex.unlock();
+	room->roomMutex.unlock();
+	
+	room->getServer()->storeGameInformation(secondsElapsed, allPlayersEver.toList(), *replay);
+	delete replay;
+	
 	qDebug() << "Server_Game destructor: gameId=" << gameId;
 }
 
@@ -146,6 +157,59 @@ int Server_Game::getSpectatorCount() const
 	return result;
 }
 
+void Server_Game::sendGameStateToPlayers()
+{
+	// Prepare game state information that everyone can see
+	Event_GameStateChanged gameStateChangedEvent;
+	gameStateChangedEvent.set_seconds_elapsed(secondsElapsed);
+	if (gameStarted) {
+		gameStateChangedEvent.set_game_started(true);
+		gameStateChangedEvent.set_active_player_id(0);
+		gameStateChangedEvent.set_active_phase(0);
+	} else
+		gameStateChangedEvent.set_game_started(false);
+	
+	// game state information for replay and omniscient spectators
+	Event_GameStateChanged omniscientEvent(gameStateChangedEvent);
+	QListIterator<ServerInfo_Player> omniscientGameStateIterator(getGameState(0, true));
+	while (omniscientGameStateIterator.hasNext())
+		omniscientEvent.add_player_list()->CopyFrom(omniscientGameStateIterator.next());
+	
+	GameEventContainer *replayCont = prepareGameEvent(omniscientEvent, -1);
+	replayCont->set_seconds_elapsed(secondsElapsed);
+	replayCont->clear_game_id();
+	replay->add_event_list()->CopyFrom(*replayCont);
+	delete replayCont;
+	
+	// If spectators are not omniscient, we need an additional getGameState call, otherwise we can use the data we used for the replay.
+	// All spectators are equal, so we don't need to make a getGameState call for each one.
+	Event_GameStateChanged spectatorEvent(spectatorsSeeEverything ? omniscientEvent : gameStateChangedEvent);
+	if (!spectatorsSeeEverything) {
+		QListIterator<ServerInfo_Player> spectatorGameStateIterator(getGameState(0, false));
+		while (spectatorGameStateIterator.hasNext())
+			spectatorEvent.add_player_list()->CopyFrom(spectatorGameStateIterator.next());
+	}
+	
+	// send game state info to clients according to their role in the game
+	QMapIterator<int, Server_Player *> playerIterator(players);
+	while (playerIterator.hasNext()) {
+		Server_Player *player = playerIterator.next().value();
+		GameEventContainer *gec;
+		if (player->getSpectator())
+			gec = prepareGameEvent(spectatorEvent, -1);
+		else {
+			Event_GameStateChanged event(gameStateChangedEvent);
+			QListIterator<ServerInfo_Player> gameStateIterator(getGameState(player));
+			while (gameStateIterator.hasNext())
+				event.add_player_list()->CopyFrom(gameStateIterator.next());
+			
+			gec = prepareGameEvent(event, -1);
+		}
+		player->sendGameEvent(*gec);
+		delete gec;
+	}
+}
+
 void Server_Game::doStartGameIfReady()
 {
 	QMutexLocker locker(&gameMutex);
@@ -172,37 +236,9 @@ void Server_Game::doStartGameIfReady()
 		player->setConceded(false);
 		player->setReadyStart(false);
 	}
-	playerIterator.toFront();
-	while (playerIterator.hasNext()) {
-		Server_Player *player = playerIterator.next().value();
-		Event_GameStateChanged event;
-		event.set_seconds_elapsed(secondsElapsed);
-		event.set_game_started(true);
-		event.set_active_player_id(0);
-		event.set_active_phase(0);
-		QListIterator<ServerInfo_Player> gameStateIterator(getGameState(player));
-		while (gameStateIterator.hasNext())
-			event.add_player_list()->CopyFrom(gameStateIterator.next());
-		
-		player->sendGameEvent(prepareGameEvent(event, -1));
-	}
 	
-/*	QSqlQuery query;
-	query.prepare("insert into games (id, descr, password, time_started) values(:id, :descr, :password, now())");
-	query.bindValue(":id", gameId);
-	query.bindValue(":descr", description);
-	query.bindValue(":password", !password.isEmpty());
-	query.exec();
+	sendGameStateToPlayers();
 	
-	QMapIterator<int, Server_Player *> playerIterator2(players);
-	while (playerIterator2.hasNext()) {
-		Server_Player *player = playerIterator2.next().value();
-		query.prepare("insert into games_players (id_game, player) values(:id, :player)");
-		query.bindValue(":id", gameId);
-		query.bindValue(":player", player->getPlayerName());
-		query.exec();
-	}
-*/	
 	activePlayer = -1;
 	nextTurn();
 	
@@ -237,18 +273,7 @@ void Server_Game::stopGameIfFinished()
 		p->setConceded(false);
 	}
 
-	playerIterator.toFront();
-	while (playerIterator.hasNext()) {
-		Server_Player *player = playerIterator.next().value();
-		Event_GameStateChanged event;
-		event.set_seconds_elapsed(secondsElapsed);
-		event.set_game_started(false);
-		QListIterator<ServerInfo_Player> gameStateIterator(getGameState(player));
-		while (gameStateIterator.hasNext())
-			event.add_player_list()->CopyFrom(gameStateIterator.next());
-		
-		player->sendGameEvent(prepareGameEvent(event, -1));
-	}
+	sendGameStateToPlayers();
 }
 
 Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions)
@@ -296,9 +321,10 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 	newPlayer->moveToThread(thread());
 	
 	Event_Join joinEvent;
-	joinEvent.mutable_player_properties()->CopyFrom(newPlayer->getProperties());
+	joinEvent.mutable_player_properties()->CopyFrom(newPlayer->getProperties(true));
 	sendGameEventContainer(prepareGameEvent(joinEvent, -1));
 	
+	allPlayersEver.insert(QString::fromStdString(newPlayer->getUserInfo()->name()));
 	players.insert(playerId, newPlayer);
 	if (newPlayer->getUserInfo()->name() == creatorInfo->name()) {
 		hostId = playerId;
@@ -410,7 +436,9 @@ bool Server_Game::kickPlayer(int playerId)
 	if (!playerToKick)
 		return false;
 	
-	playerToKick->sendGameEvent(prepareGameEvent(Event_Kicked(), -1));
+	GameEventContainer *gec = prepareGameEvent(Event_Kicked(), -1);
+	playerToKick->sendGameEvent(*gec);
+	delete gec;
 	
 	removePlayer(playerToKick);
 	
@@ -473,7 +501,7 @@ void Server_Game::nextTurn()
 	setActivePlayer(keys[listPos]);
 }
 
-QList<ServerInfo_Player> Server_Game::getGameState(Server_Player *playerWhosAsking) const
+QList<ServerInfo_Player> Server_Game::getGameState(Server_Player *playerWhosAsking, bool omniscient, bool withUserInfo) const
 {
 	QMutexLocker locker(&gameMutex);
 	
@@ -483,7 +511,7 @@ QList<ServerInfo_Player> Server_Game::getGameState(Server_Player *playerWhosAski
 		Server_Player *player = playerIterator.next().value();
 		
 		ServerInfo_Player playerInfo;
-		playerInfo.mutable_properties()->CopyFrom(player->getProperties());
+		playerInfo.mutable_properties()->CopyFrom(player->getProperties(withUserInfo));
 		if (player == playerWhosAsking)
 			if (player->getDeck())
 				playerInfo.set_deck_list(player->getDeck()->writeToString_Native().toStdString());
@@ -528,7 +556,7 @@ QList<ServerInfo_Player> Server_Game::getGameState(Server_Player *playerWhosAski
 			zoneInfo->set_with_coords(zone->hasCoords());
 			zoneInfo->set_card_count(zone->cards.size());
 			if (
-				(((playerWhosAsking == player) || (playerWhosAsking->getSpectator() && spectatorsSeeEverything)) && (zone->getType() != ServerInfo_Zone::HiddenZone))
+				(((playerWhosAsking == player) || omniscient) && (zone->getType() != ServerInfo_Zone::HiddenZone))
 				|| ((playerWhosAsking != player) && (zone->getType() == ServerInfo_Zone::PublicZone))
 			) {
 				QListIterator<Server_Card *> cardIterator(zone->cards);
@@ -590,7 +618,12 @@ void Server_Game::sendGameEventContainer(GameEventContainer *cont, GameEventStor
 		Server_Player *p = playerIterator.next().value();
 		const bool playerPrivate = (p->getPlayerId() == privatePlayerId) || (p->getSpectator() && spectatorsSeeEverything);
 		if ((recipients.testFlag(GameEventStorageItem::SendToPrivate) && playerPrivate) || (recipients.testFlag(GameEventStorageItem::SendToOthers) && !playerPrivate))
-			p->sendGameEvent(cont);
+			p->sendGameEvent(*cont);
+	}
+	if (recipients.testFlag(GameEventStorageItem::SendToPrivate)) {
+		cont->set_seconds_elapsed(secondsElapsed);
+		cont->clear_game_id();
+		replay->add_event_list()->CopyFrom(*cont);
 	}
 	
 	delete cont;
@@ -631,6 +664,7 @@ ServerInfo_Game Server_Game::getInfo() const
 		result.set_spectators_allowed(getSpectatorsAllowed());
 		result.set_spectators_need_password(getSpectatorsNeedPassword());
 		result.set_spectators_count(getSpectatorCount());
+		result.set_start_time(startTime.toTime_t());
 	}
 	return result;
 }

@@ -24,6 +24,8 @@
 #include <QPointer>
 #include <QObject>
 #include <QMutex>
+#include <QSet>
+#include <QDateTime>
 #include "server_player.h"
 #include "server_response_containers.h"
 #include "pb/response.pb.h"
@@ -32,6 +34,7 @@
 
 class QTimer;
 class GameEventContainer;
+class GameReplay;
 class Server_Room;
 class ServerInfo_User;
 
@@ -42,6 +45,7 @@ private:
 	int hostId;
 	ServerInfo_User *creatorInfo;
 	QMap<int, Server_Player *> players;
+	QSet<QString> allPlayersEver;
 	bool gameStarted;
 	int gameId;
 	QString description;
@@ -56,7 +60,9 @@ private:
 	bool spectatorsSeeEverything;
 	int inactivityCounter;
 	int secondsElapsed;
+	QDateTime startTime;
 	QTimer *pingClock;
+	GameReplay *replay;
 signals:
 	void sigStartGameIfReady();
 private slots:
@@ -98,7 +104,8 @@ public:
 	void nextTurn();
 	int getSecondsElapsed() const { return secondsElapsed; }
 
-	QList<ServerInfo_Player> getGameState(Server_Player *playerWhosAsking) const;
+	void sendGameStateToPlayers();
+	QList<ServerInfo_Player> getGameState(Server_Player *playerWhosAsking, bool omniscient = false, bool withUserInfo = false) const;
 	
 	GameEventContainer *prepareGameEvent(const ::google::protobuf::Message &gameEvent, int playerId, GameEventContext *context = 0);
 	GameEventContext prepareGameEventContext(const ::google::protobuf::Message &gameEventContext);

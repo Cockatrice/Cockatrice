@@ -10,6 +10,7 @@
 class Server_Game;
 class Server_Room;
 class Server_ProtocolHandler;
+class GameReplay;
 
 enum AuthenticationResult { NotLoggedIn = 0, PasswordRight = 1, UnknownUser = 2, WouldOverwriteOldSession = 3, UserIsBanned = 4 };
 
@@ -31,31 +32,33 @@ public:
 	const QMap<QString, Server_ProtocolHandler *> &getUsers() const { return users; }
 	void addClient(Server_ProtocolHandler *player);
 	void removeClient(Server_ProtocolHandler *player);
-	virtual QString getLoginMessage() const = 0;
+	virtual QString getLoginMessage() const { return QString(); }
 	
-	virtual bool getGameShouldPing() const = 0;
-	virtual int getMaxGameInactivityTime() const = 0;
-	virtual int getMaxPlayerInactivityTime() const = 0;
+	virtual bool getGameShouldPing() const { return false; }
+	virtual int getMaxGameInactivityTime() const { return 9999999; }
+	virtual int getMaxPlayerInactivityTime() const { return 9999999; }
 	virtual int getMessageCountingInterval() const { return 0; }
 	virtual int getMaxMessageCountPerInterval() const { return 0; }
 	virtual int getMaxMessageSizePerInterval() const { return 0; }
 	virtual int getMaxGamesPerUser() const { return 0; }
-	virtual bool getThreaded() const = 0;
+	virtual bool getThreaded() const { return false; }
 	
-	virtual QMap<QString, ServerInfo_User> getBuddyList(const QString &name) = 0;
-	virtual QMap<QString, ServerInfo_User> getIgnoreList(const QString &name) = 0;
-	virtual bool isInBuddyList(const QString &whoseList, const QString &who) = 0;
-	virtual bool isInIgnoreList(const QString &whoseList, const QString &who) = 0;
+	virtual QMap<QString, ServerInfo_User> getBuddyList(const QString &name) { return QMap<QString, ServerInfo_User>(); }
+	virtual QMap<QString, ServerInfo_User> getIgnoreList(const QString &name) { return QMap<QString, ServerInfo_User>(); }
+	virtual bool isInBuddyList(const QString &whoseList, const QString &who) { return false; }
+	virtual bool isInIgnoreList(const QString &whoseList, const QString &who) { return false; }
+	
+	virtual void storeGameInformation(int secondsElapsed, const QStringList &allPlayersEver, const GameReplay &replay) { }
 protected:
 	void prepareDestroy();
 	QList<Server_ProtocolHandler *> clients;
 	QMap<QString, Server_ProtocolHandler *> users;
 	QMap<int, Server_Room *> rooms;
 	
-	virtual int startSession(const QString &userName, const QString &address) = 0;
-	virtual void endSession(int sessionId) = 0;
-	virtual bool userExists(const QString &user) = 0;
-	virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reason) = 0;
+	virtual int startSession(const QString &userName, const QString &address) { return -1; }
+	virtual void endSession(int sessionId) { }
+	virtual bool userExists(const QString &user) { return false; }
+	virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reason) { return UnknownUser; }
 	virtual ServerInfo_User getUserData(const QString &name) = 0;
 	int getUsersCount() const;
 	int getGamesCount() const;

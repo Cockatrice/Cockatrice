@@ -70,7 +70,7 @@ public:
 	
 	int getPingTime() const { return pingTime; }
 	void setPingTime(int _pingTime) { pingTime = _pingTime; }
-	ServerInfo_PlayerProperties getProperties();
+	ServerInfo_PlayerProperties getProperties(bool withUserInfo);
 	
 	int newCardId();
 	int newCounterId() const;
@@ -92,7 +92,7 @@ public:
 	void unattachCard(GameEventStorage &ges, Server_Card *card);
 	Response::ResponseCode setCardAttrHelper(GameEventStorage &ges, const QString &zone, int cardId, CardAttribute attribute, const QString &attrValue);
 
-	void sendGameEvent(GameEventContainer *event);
+	void sendGameEvent(const GameEventContainer &event);
 };
 
 #endif

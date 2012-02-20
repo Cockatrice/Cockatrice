@@ -95,6 +95,7 @@ SET(PROTO_FILES
 	game_event_container.proto
 	game_event_context.proto
 	game_event.proto
+	game_replay.proto
 	moderator_commands.proto
 	move_card_to_zone.proto
 	response_deck_download.proto

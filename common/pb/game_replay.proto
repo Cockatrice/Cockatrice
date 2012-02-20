@@ -1,0 +1,7 @@
+import "serverinfo_game.proto";
+import "game_event_container.proto";
+
+message GameReplay {
+	optional ServerInfo_Game game_info = 1;
+	repeated GameEventContainer event_list = 2;
+}

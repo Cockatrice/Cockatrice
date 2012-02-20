@@ -191,13 +191,14 @@ void Server_Player::clearZones()
 	lastDrawList.clear();
 }
 
-ServerInfo_PlayerProperties Server_Player::getProperties()
+ServerInfo_PlayerProperties Server_Player::getProperties(bool withUserInfo)
 {
 	QMutexLocker locker(&game->gameMutex);
 	
 	ServerInfo_PlayerProperties result;
 	result.set_player_id(playerId);
-	result.mutable_user_info()->CopyFrom(*userInfo);
+	if (withUserInfo)
+		result.mutable_user_info()->CopyFrom(*userInfo);
 	result.set_spectator(spectator);
 	result.set_conceded(conceded);
 	result.set_ready_start(readyStart);
@@ -581,12 +582,12 @@ Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, c
 	return Response::RespOk;
 }
 
-void Server_Player::sendGameEvent(GameEventContainer *cont)
+void Server_Player::sendGameEvent(const GameEventContainer &cont)
 {
 	QMutexLocker locker(&playerMutex);
 	
 	if (handler)
-		handler->sendProtocolItem(*cont);
+		handler->sendProtocolItem(cont);
 }
 
 void Server_Player::setProtocolHandler(Server_ProtocolHandler *_handler)

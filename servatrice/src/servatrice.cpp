@@ -28,6 +28,7 @@
 #include "server_logger.h"
 #include "main.h"
 #include "passwordhasher.h"
+#include "pb/game_replay.pb.h"
 #include "pb/event_server_message.pb.h"
 #include "pb/event_server_shutdown.pb.h"
 #include "pb/event_connection_closed.pb.h"
@@ -533,6 +534,47 @@ void Servatrice::statusUpdate()
 	query.bindValue(":tx", tx);
 	query.bindValue(":rx", rx);
 	execSqlQuery(query);
+}
+
+void Servatrice::storeGameInformation(int secondsElapsed, const QStringList &allPlayersEver, const GameReplay &replay)
+{
+	QStringList gameTypes;
+	for (int i = replay.game_info().game_types_size() - 1; i >= 0; --i)
+		gameTypes.append(QString::number(replay.game_info().game_types(i)));
+	
+	QByteArray replayBlob;
+	const unsigned int size = replay.ByteSize();
+	replayBlob.resize(size);
+	replay.SerializeToArray(replayBlob.data(), size);
+	
+	QMutexLocker locker(&dbMutex);
+	if (!checkSql())
+		return;
+	
+	QSqlQuery query1;
+	query1.prepare("insert into " + dbPrefix + "_games (id_room, id, descr, creator_name, password, game_types, player_count, time_started, time_finished, replay) values (:id_room, :id_game, :descr, :creator_name, :password, :game_types, :player_count, date_sub(now(), interval :seconds second), now(), :replay)");
+	query1.bindValue(":id_room", replay.game_info().room_id());
+	query1.bindValue(":id_game", replay.game_info().game_id());
+	query1.bindValue(":descr", QString::fromStdString(replay.game_info().description()));
+	query1.bindValue(":creator_name", QString::fromStdString(replay.game_info().creator_info().name()));
+	query1.bindValue(":password", replay.game_info().with_password() ? 1 : 0);
+	query1.bindValue(":game_types", gameTypes.isEmpty() ? QString("") : gameTypes.join(","));
+	query1.bindValue(":player_count", replay.game_info().max_players());
+	query1.bindValue(":seconds", secondsElapsed);
+	query1.bindValue(":replay", replayBlob);
+	if (!execSqlQuery(query1))
+		return;
+	
+	QSqlQuery query2;
+	query2.prepare("insert into " + dbPrefix + "_games_players (id_game, player_name) values (:id_game, :player_name)");
+	QVariantList gameIds, playerNames;
+	for (int i = allPlayersEver.size() - 1; i >= 0; --i) {
+		gameIds.append(replay.game_info().game_id());
+		playerNames.append(allPlayersEver[i]);
+	}
+	query2.bindValue(":id_game", gameIds);
+	query2.bindValue(":player_name", playerNames);
+	query2.execBatch();
 }
 
 void Servatrice::scheduleShutdown(const QString &reason, int minutes)

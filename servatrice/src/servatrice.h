@@ -29,6 +29,7 @@ class QSettings;
 class QSqlQuery;
 class QTimer;
 
+class GameReplay;
 class Servatrice;
 class ServerSocketInterface;
 
@@ -82,6 +83,7 @@ public:
 	void incTxBytes(quint64 num);
 	void incRxBytes(quint64 num);
 	int getUserIdInDB(const QString &name);
+	void storeGameInformation(int secondsElapsed, const QStringList &allPlayersEver, const GameReplay &replay);
 protected:
 	int startSession(const QString &userName, const QString &address);
 	void endSession(int sessionId);

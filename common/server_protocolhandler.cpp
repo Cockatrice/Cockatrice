@@ -760,7 +760,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_Creat
 	rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event1));
 	
 	Event_GameStateChanged event2;
-	QListIterator<ServerInfo_Player> gameStateIterator(game->getGameState(creator));
+	QListIterator<ServerInfo_Player> gameStateIterator(game->getGameState(creator, false, true));
 	while (gameStateIterator.hasNext())
 		event2.add_player_list()->CopyFrom(gameStateIterator.next());
 	event2.set_seconds_elapsed(0);
@@ -807,7 +807,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinGame(const Command_JoinGam
 		rc.enqueuePostResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event1));
 		
 		Event_GameStateChanged event2;
-		QListIterator<ServerInfo_Player> gameStateIterator(g->getGameState(player));
+		QListIterator<ServerInfo_Player> gameStateIterator(g->getGameState(player, false, true));
 		while (gameStateIterator.hasNext())
 			event2.add_player_list()->CopyFrom(gameStateIterator.next());
 		event2.set_seconds_elapsed(g->getSecondsElapsed());
@@ -854,7 +854,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdDeckSelect(const Command_DeckS
 	player->setDeck(deck);
 	
 	Event_PlayerPropertiesChanged event;
-	event.mutable_player_properties()->CopyFrom(player->getProperties());
+	event.mutable_player_properties()->set_deck_hash(deck->getDeckHash().toStdString());
 	ges.enqueueGameEvent(event, player->getPlayerId());
 	
 	Context_DeckSelect context;
@@ -902,7 +902,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdConcede(const Command_Concede 
 	player->clearZones();
 	
 	Event_PlayerPropertiesChanged event;
-	event.mutable_player_properties()->CopyFrom(player->getProperties());
+	event.mutable_player_properties()->set_conceded(true);
 	ges.enqueueGameEvent(event, player->getPlayerId());
 	ges.setGameEventContext(Context_Concede());
 	
@@ -927,11 +927,13 @@ Response::ResponseCode Server_ProtocolHandler::cmdReadyStart(const Command_Ready
 	player->setReadyStart(cmd.ready());
 	
 	Event_PlayerPropertiesChanged event;
-	event.mutable_player_properties()->CopyFrom(player->getProperties());
+	event.mutable_player_properties()->set_ready_start(cmd.ready());
 	ges.enqueueGameEvent(event, player->getPlayerId());
 	ges.setGameEventContext(Context_ReadyStart());
 	
-	game->startGameIfReady();
+	if (cmd.ready())
+		game->startGameIfReady();
+	
 	return Response::RespOk;
 }
 
