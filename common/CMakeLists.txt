@@ -46,9 +46,3 @@ add_subdirectory(pb)
 add_library(cockatrice_common ${common_SOURCES} ${common_HEADERS_MOC})
 target_link_libraries(cockatrice_common cockatrice_protocol)
 
-add_custom_target(versionheader ALL DEPENDS version_header)
-add_custom_command(
-	OUTPUT version_header ${CMAKE_CURRENT_BINARY_DIR}/versionheader.h
-	COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/getversion.cmake
-)
-

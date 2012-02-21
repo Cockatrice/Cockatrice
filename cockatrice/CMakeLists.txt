@@ -70,7 +70,7 @@ SET(cockatrice_SOURCES
  src/localclient.cpp 
  src/priceupdater.cpp 
  src/soundengine.cpp
- ${CMAKE_CURRENT_BINARY_DIR}/../common/version_string.cpp
+ ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
 )
 SET(cockatrice_HEADERS
  src/abstractcounter.h 
@@ -188,6 +188,7 @@ INCLUDE(${QT_USE_FILE})
 INCLUDE_DIRECTORIES(../common)
 INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/../common)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(${QT_MOBILITY_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${QT_MOBILITY_MULTIMEDIAKIT_INCLUDE_DIR})
 
@@ -200,4 +201,9 @@ if (NOT WIN32 AND NOT APPLE)
 	INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.svg DESTINATION share/icons/hicolor/scalable/apps)
 	INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice.desktop DESTINATION share/applications)
 ENDIF(NOT WIN32 AND NOT APPLE)
+
+add_custom_command(
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp ${CMAKE_CURRENT_BINARY_DIR}/version_string.h
+	COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/../common/getversion.cmake
+)
 

@@ -9,7 +9,7 @@ SET(servatrice_SOURCES
  src/server_logger.cpp 
  src/serversocketinterface.cpp 
  src/serversocketthread.cpp
- ${CMAKE_CURRENT_BINARY_DIR}/../common/version_string.cpp
+ ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
 )
 SET(servatrice_HEADERS
  src/servatrice.h 
@@ -39,3 +39,10 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/../common)
 
 ADD_EXECUTABLE(servatrice ${servatrice_SOURCES} ${servatrice_HEADERS_MOC})
 TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${QT_LIBRARIES} ${PROTOBUF_LIBRARIES} ${LIBGCRYPT_LIBRARY})
+
+#add_custom_target(versionheader ALL DEPENDS version_header)
+add_custom_command(
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version_string.h ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
+	COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/../common/getversion.cmake
+)
+
