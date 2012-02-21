@@ -40,6 +40,8 @@
 #include "settingscache.h"
 #include "tab_game.h"
 
+#include "version_string.h"
+
 #include "pb/game_replay.pb.h"
 #include "pb/room_commands.pb.h"
 #include "pb/event_connection_closed.pb.h"
@@ -210,7 +212,7 @@ void MainWindow::actAbout()
 {
 	QMessageBox::about(this, tr("About Cockatrice"), QString(
 		"<font size=\"8\"><b>Cockatrice</b></font><br>"
-		+ tr("Version %1").arg(versionString)
+		+ tr("Version %1").arg(VERSION_STRING)
 		+ "<br><br><br><b>" + tr("Authors:") + "</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>"
 		+ "<b>" + tr("Translators:") + "</b><br>"
 		+ tr("Spanish:") + " Víctor Martínez<br>"

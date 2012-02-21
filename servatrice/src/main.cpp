@@ -28,6 +28,7 @@
 #include "servatrice.h"
 #include "server_logger.h"
 #include "rng_sfmt.h"
+#include "version_string.h"
 #ifdef Q_OS_UNIX
 #include <signal.h>
 #endif
@@ -137,7 +138,7 @@ int main(int argc, char *argv[])
 #endif
 	rng = new RNG_SFMT;
 	
-	std::cerr << "Servatrice " << Servatrice::versionString.toStdString() << " starting." << std::endl;
+	std::cerr << "Servatrice " << VERSION_STRING << " starting." << std::endl;
 	std::cerr << "-------------------------" << std::endl;
 	
 	if (testRandom)

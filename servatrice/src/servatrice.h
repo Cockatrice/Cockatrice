@@ -53,7 +53,6 @@ private slots:
 	void shutdownTimeout();
 public:
 	mutable QMutex dbMutex;
-	static const QString versionString;
 	Servatrice(QSettings *_settings, QObject *parent = 0);
 	~Servatrice();
 	bool openDatabase();

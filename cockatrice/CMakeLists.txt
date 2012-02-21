@@ -69,7 +69,8 @@ SET(cockatrice_SOURCES
  src/localserverinterface.cpp 
  src/localclient.cpp 
  src/priceupdater.cpp 
- src/soundengine.cpp 
+ src/soundengine.cpp
+ ${CMAKE_CURRENT_BINARY_DIR}/../common/version_string.cpp
 )
 SET(cockatrice_HEADERS
  src/abstractcounter.h 
@@ -153,7 +154,7 @@ set(cockatrice_TS
         translations/cockatrice_pt.ts
         translations/cockatrice_ru.ts
         translations/cockatrice_sk.ts
-)	
+)
 
 if(WIN32)
   set(cockatrice_SOURCES ${cockatrice_SOURCES} cockatrice.rc)

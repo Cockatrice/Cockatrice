@@ -2,8 +2,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 PROJECT(servatrice)
 
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../common ${CMAKE_CURRENT_BINARY_DIR}/common)
-
 SET(servatrice_SOURCES
  src/main.cpp
  src/passwordhasher.cpp
@@ -11,6 +9,7 @@ SET(servatrice_SOURCES
  src/server_logger.cpp 
  src/serversocketinterface.cpp 
  src/serversocketthread.cpp
+ ${CMAKE_CURRENT_BINARY_DIR}/../common/version_string.cpp
 )
 SET(servatrice_HEADERS
  src/servatrice.h 
@@ -26,7 +25,8 @@ FIND_PACKAGE(Qt4 REQUIRED)
 FIND_PACKAGE(Protobuf REQUIRED)
 FIND_PACKAGE(Libgcrypt REQUIRED)
 
-set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O2")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 QT4_WRAP_CPP(servatrice_HEADERS_MOC ${servatrice_HEADERS})

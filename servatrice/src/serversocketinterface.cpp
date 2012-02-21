@@ -45,6 +45,7 @@
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_deckstorage.pb.h"
 
+#include "version_string.h"
 #include <string>
 #include <iostream>
 
@@ -61,7 +62,7 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_s
 	
 	Event_ServerIdentification identEvent;
 	identEvent.set_server_name(servatrice->getServerName().toStdString());
-	identEvent.set_server_version(Servatrice::versionString.toStdString());
+	identEvent.set_server_version(VERSION_STRING);
 	identEvent.set_protocol_version(protocolVersion);
 	SessionEvent *identSe = prepareSessionEvent(identEvent);
 	sendProtocolItem(*identSe);
