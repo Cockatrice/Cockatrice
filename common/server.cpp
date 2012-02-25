@@ -58,7 +58,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	if ((authState == NotLoggedIn) || (authState == UserIsBanned))
 		return authState;
 	
-	ServerInfo_User data = getUserData(name);
+	ServerInfo_User data = getUserData(name, true);
 	data.set_address(session->getAddress().toStdString());
 	name = QString::fromStdString(data.name()); // Compensate for case indifference
 	

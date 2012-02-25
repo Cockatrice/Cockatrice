@@ -12,6 +12,7 @@ SET(PROTO_FILES
 	command_deck_del_dir.proto
 	command_deck_del.proto
 	command_deck_download.proto
+	command_deck_list.proto
 	command_deck_new_dir.proto
 	command_deck_select.proto
 	command_deck_upload.proto
@@ -29,6 +30,8 @@ SET(PROTO_FILES
 	command_mulligan.proto
 	command_next_turn.proto
 	command_ready_start.proto
+	command_replay_list.proto
+	command_replay_download.proto
 	command_reveal_cards.proto
 	command_roll_die.proto
 	command_set_active_phase.proto
@@ -107,6 +110,8 @@ SET(PROTO_FILES
 	response_join_room.proto
 	response_list_users.proto
 	response_login.proto
+	response_replay_download.proto
+	response_replay_list.proto
 	response.proto
 	room_commands.proto
 	room_event.proto
@@ -120,6 +125,7 @@ SET(PROTO_FILES
 	serverinfo_playerping.proto
 	serverinfo_playerproperties.proto
 	serverinfo_player.proto
+	serverinfo_replay.proto
 	serverinfo_room.proto
 	serverinfo_user.proto
 	serverinfo_zone.proto

@@ -42,11 +42,14 @@
 #include "pb/command_shuffle.pb.h"
 #include "pb/command_stop_dump_zone.pb.h"
 #include "pb/command_undo_draw.pb.h"
+#include "pb/command_deck_list.pb.h"
 #include "pb/command_deck_upload.pb.h"
 #include "pb/command_deck_download.pb.h"
 #include "pb/command_deck_new_dir.pb.h"
 #include "pb/command_deck_del_dir.pb.h"
 #include "pb/command_deck_del.pb.h"
+#include "pb/command_replay_list.pb.h"
+#include "pb/command_replay_download.pb.h"
 #include "pb/response.pb.h"
 #include "pb/response_login.pb.h"
 #include "pb/response_list_users.pb.h"
@@ -137,8 +140,10 @@ ServerInfo_User Server_ProtocolHandler::copyUserInfo(bool complete, bool moderat
 	ServerInfo_User result;
 	if (userInfo) {
 		result.CopyFrom(*userInfo);
-		if (!moderatorInfo)
+		if (!moderatorInfo) {
 			result.clear_address();
+			result.clear_id();
+		}
 		if (!complete)
 			result.clear_avatar_bmp();
 	}
@@ -234,6 +239,8 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
 			case SessionCommand::DECK_DEL: resp = cmdDeckDel(sc.GetExtension(Command_DeckDel::ext), rc); break;
 			case SessionCommand::DECK_UPLOAD: resp = cmdDeckUpload(sc.GetExtension(Command_DeckUpload::ext), rc); break;
 			case SessionCommand::DECK_DOWNLOAD: resp = cmdDeckDownload(sc.GetExtension(Command_DeckDownload::ext), rc); break;
+			case SessionCommand::REPLAY_LIST: resp = cmdReplayList(sc.GetExtension(Command_ReplayList::ext), rc); break;
+			case SessionCommand::REPLAY_DOWNLOAD: resp = cmdReplayDownload(sc.GetExtension(Command_ReplayDownload::ext), rc); break;
 			case SessionCommand::GET_GAMES_OF_USER: resp = cmdGetGamesOfUser(sc.GetExtension(Command_GetGamesOfUser::ext), rc); break;
 			case SessionCommand::GET_USER_INFO: resp = cmdGetUserInfo(sc.GetExtension(Command_GetUserInfo::ext), rc); break;
 			case SessionCommand::LIST_ROOMS: resp = cmdListRooms(sc.GetExtension(Command_ListRooms::ext), rc); break;

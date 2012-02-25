@@ -20,6 +20,7 @@ message Response {
 		RespWouldOverwriteOldSession = 17;
 		RespChatFlood = 18;
 		RespUserIsBanned = 19;
+		RespAccessDenied = 20;
 	}
 	enum ResponseType {
 		JOIN_ROOM = 1000;
@@ -31,6 +32,8 @@ message Response {
 		DECK_LIST = 1006;
 		DECK_DOWNLOAD = 1007;
 		DECK_UPLOAD = 1008;
+		REPLAY_LIST = 1100;
+		REPLAY_DOWNLOAD = 1101;
 	}
 	required uint64 cmd_id = 1;
 	optional ResponseCode response_code = 2;

@@ -34,6 +34,8 @@
 #include "pb/command_deck_new_dir.pb.h"
 #include "pb/command_deck_del_dir.pb.h"
 #include "pb/command_deck_del.pb.h"
+#include "pb/command_replay_list.pb.h"
+#include "pb/command_replay_download.pb.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_server_message.pb.h"
 #include "pb/event_server_identification.pb.h"
@@ -42,6 +44,9 @@
 #include "pb/response_deck_list.pb.h"
 #include "pb/response_deck_download.pb.h"
 #include "pb/response_deck_upload.pb.h"
+#include "pb/response_replay_list.pb.h"
+#include "pb/response_replay_download.pb.h"
+#include "pb/serverinfo_replay.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_deckstorage.pb.h"
 
@@ -175,7 +180,7 @@ Response::ResponseCode ServerSocketInterface::cmdAddToList(const Command_AddToLi
 		if (servatrice->isInIgnoreList(QString::fromStdString(userInfo->name()), user))
 			return Response::RespContextError;
 	
-	int id1 = servatrice->getUserIdInDB(QString::fromStdString(userInfo->name()));
+	int id1 = userInfo->id();
 	int id2 = servatrice->getUserIdInDB(user);
 	if (id2 < 0)
 		return Response::RespNameNotFound;
@@ -216,7 +221,7 @@ Response::ResponseCode ServerSocketInterface::cmdRemoveFromList(const Command_Re
 		if (!servatrice->isInIgnoreList(QString::fromStdString(userInfo->name()), user))
 			return Response::RespContextError;
 	
-	int id1 = servatrice->getUserIdInDB(QString::fromStdString(userInfo->name()));
+	int id1 = userInfo->id();
 	int id2 = servatrice->getUserIdInDB(user);
 	if (id2 < 0)
 		return Response::RespNameNotFound;
@@ -485,6 +490,77 @@ Response::ResponseCode ServerSocketInterface::cmdDeckDownload(const Command_Deck
 	return Response::RespOk;
 }
 
+Response::ResponseCode ServerSocketInterface::cmdReplayList(const Command_ReplayList & /*cmd*/, ResponseContainer &rc)
+{
+	if (authState != PasswordRight)
+		return Response::RespFunctionNotAllowed;
+	
+	Response_ReplayList *re = new Response_ReplayList;
+	
+	servatrice->dbMutex.lock();
+	QSqlQuery query1;
+	query1.prepare("select a.id_game, a.replay_name, b.room_name, b.time_started, b.time_finished, b.descr from cockatrice_replays_access a left join cockatrice_games b on b.id = a.id_game where a.id_player = :id_player");
+	query1.bindValue(":id_player", userInfo->id());
+	servatrice->execSqlQuery(query1);
+	while (query1.next()) {
+		ServerInfo_Replay *replayInfo = re->add_replay_list();
+		const int gameId = query1.value(0).toInt();
+		replayInfo->set_game_id(gameId);
+		replayInfo->set_room_name(query1.value(2).toString().toStdString());
+		const int timeStarted = query1.value(3).toDateTime().toTime_t();
+		const int timeFinished = query1.value(4).toDateTime().toTime_t();
+		replayInfo->set_time_started(timeStarted);
+		replayInfo->set_length(timeFinished - timeStarted);
+		replayInfo->set_game_name(query1.value(5).toString().toStdString());
+		replayInfo->set_replay_name(query1.value(1).toString().toStdString());
+		
+		QSqlQuery query2;
+		query2.prepare("select player_name from cockatrice_games_players where id_game = :id_game");
+		query2.bindValue(":id_game", gameId);
+		servatrice->execSqlQuery(query2);
+		while (query2.next())
+			replayInfo->add_player_names(query2.value(0).toString().toStdString());
+	}
+	servatrice->dbMutex.unlock();
+	
+	rc.setResponseExtension(re);
+	return Response::RespOk;
+}
+
+Response::ResponseCode ServerSocketInterface::cmdReplayDownload(const Command_ReplayDownload &cmd, ResponseContainer &rc)
+{
+	if (authState != PasswordRight)
+		return Response::RespFunctionNotAllowed;
+	
+	QMutexLocker dbLocker(&servatrice->dbMutex);
+	
+	QSqlQuery query1;
+	query1.prepare("select 1 from " + servatrice->getDbPrefix() + "_replays_access where id_game = :id_game and id_player = :id_player");
+	query1.bindValue(":id_game", cmd.game_id());
+	query1.bindValue(":id_player", userInfo->id());
+	if (!servatrice->execSqlQuery(query1))
+		return Response::RespInternalError;
+	if (!query1.next())
+		return Response::RespAccessDenied;
+	
+	QSqlQuery query2;
+	query2.prepare("select replay from " + servatrice->getDbPrefix() + "_games where id = :id_game");
+	query2.bindValue(":id_game", cmd.game_id());
+	if (!servatrice->execSqlQuery(query2))
+		return Response::RespInternalError;
+	if (!query2.next())
+		return Response::RespNameNotFound;
+	
+	QByteArray data = query2.value(0).toByteArray();
+	
+	Response_ReplayDownload *re = new Response_ReplayDownload;
+	re->set_replay_data(data.data(), data.size());
+	rc.setResponseExtension(re);
+	
+	return Response::RespOk;
+}
+
+
 // MODERATOR FUNCTIONS.
 // May be called by admins and moderators. Permission is checked by the calling function.
 
@@ -499,7 +575,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 	query.prepare("insert into " + servatrice->getDbPrefix() + "_bans (user_name, ip_address, id_admin, time_from, minutes, reason, visible_reason) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason, :visible_reason)");
 	query.bindValue(":user_name", userName);
 	query.bindValue(":ip_address", address);
-	query.bindValue(":id_admin", servatrice->getUserIdInDB(QString::fromStdString(userInfo->name())));
+	query.bindValue(":id_admin", userInfo->id());
 	query.bindValue(":minutes", minutes);
 	query.bindValue(":reason", QString::fromStdString(cmd.reason()) + "\n");
 	query.bindValue(":visible_reason", QString::fromStdString(cmd.visible_reason()) + "\n");

@@ -12,7 +12,6 @@ class QToolBar;
 class QTreeWidget;
 class QTreeWidgetItem;
 class QGroupBox;
-class ProtocolResponse;
 class RemoteDeckList_TreeWidget;
 
 class TabDeckStorage : public Tab {

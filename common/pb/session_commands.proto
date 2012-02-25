@@ -16,6 +16,8 @@ message SessionCommand {
 		DECK_UPLOAD = 1013;
 		LIST_ROOMS = 1014;
 		JOIN_ROOM = 1015;
+		REPLAY_LIST = 1100;
+		REPLAY_DOWNLOAD = 1101;
 	}
 	extensions 100 to max;
 }
@@ -76,12 +78,6 @@ message Command_RemoveFromList {
 	}
 	optional string list = 1;
 	optional string user_name = 2;
-}
-
-message Command_DeckList {
-	extend SessionCommand {
-		optional Command_DeckList ext = 1008;
-	}
 }
 
 message Command_ListRooms {

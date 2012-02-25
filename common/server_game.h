@@ -45,7 +45,7 @@ private:
 	int hostId;
 	ServerInfo_User *creatorInfo;
 	QMap<int, Server_Player *> players;
-	QSet<QString> allPlayersEver;
+	QSet<QString> allPlayersEver, allSpectatorsEver;
 	bool gameStarted;
 	int gameId;
 	QString description;

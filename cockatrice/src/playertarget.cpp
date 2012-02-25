@@ -51,7 +51,7 @@ PlayerTarget::PlayerTarget(Player *_owner, QGraphicsItem *parentItem)
 {
 	setCacheMode(DeviceCoordinateCache);
 	
-	const std::string bmp = _owner->getUserInfo()->avatar_bmp();
+	const std::string &bmp = _owner->getUserInfo()->avatar_bmp();
 	if (!fullPixmap.loadFromData((const uchar *) bmp.data(), bmp.size()))
 		fullPixmap = QPixmap();
 }

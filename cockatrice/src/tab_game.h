@@ -180,7 +180,7 @@ public:
 	CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;
 	bool isHost() const { return hostId == localPlayerId; }
 	int getGameId() const { return gameId; }
-	QString getTabText() const { return tr("Game %1: %2").arg(gameId).arg(gameDescription); }
+	QString getTabText() const;
 	bool getSpectator() const { return spectator; }
 	bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
 	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }

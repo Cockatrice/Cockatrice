@@ -48,7 +48,7 @@ public:
 	virtual bool isInBuddyList(const QString &whoseList, const QString &who) { return false; }
 	virtual bool isInIgnoreList(const QString &whoseList, const QString &who) { return false; }
 	
-	virtual void storeGameInformation(int secondsElapsed, const QStringList &allPlayersEver, const GameReplay &replay) { }
+	virtual void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const GameReplay &replay) { }
 protected:
 	void prepareDestroy();
 	QList<Server_ProtocolHandler *> clients;
@@ -59,7 +59,7 @@ protected:
 	virtual void endSession(int sessionId) { }
 	virtual bool userExists(const QString &user) { return false; }
 	virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reason) { return UnknownUser; }
-	virtual ServerInfo_User getUserData(const QString &name) = 0;
+	virtual ServerInfo_User getUserData(const QString &name, bool withId = false) = 0;
 	int getUsersCount() const;
 	int getGamesCount() const;
 	int nextGameId;

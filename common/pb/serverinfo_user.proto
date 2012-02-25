@@ -18,4 +18,5 @@ message ServerInfo_User {
 	optional Gender gender = 5 [default = GenderUnknown];
 	optional string country = 6;
 	optional bytes avatar_bmp = 7;
+	optional sint32 id = 8 [default = -1];
 }

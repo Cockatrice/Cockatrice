@@ -5,6 +5,7 @@
 #include "tab_room.h"
 #include "tab_game.h"
 #include "tab_deck_storage.h"
+#include "tab_replays.h"
 #include "tab_admin.h"
 #include "tab_message.h"
 #include "tab_userlists.h"
@@ -138,8 +139,14 @@ void TabSupervisor::start(AbstractClient *_client, const ServerInfo_User &_userI
 	if (userInfo->user_level() & ServerInfo_User::IsRegistered) {
 		tabDeckStorage = new TabDeckStorage(this, client);
 		myAddTab(tabDeckStorage);
-	} else
+		
+		tabReplays = new TabReplays(this, client);
+		connect(tabReplays, SIGNAL(openReplay(GameReplay *)), this, SLOT(openReplay(GameReplay *)));
+		myAddTab(tabReplays);
+	} else {
 		tabDeckStorage = 0;
+		tabReplays = 0;
+	}
 	
 	if (userInfo->user_level() & ServerInfo_User::IsModerator) {
 		tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
@@ -155,6 +162,7 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
 {
 	tabUserLists = 0;
 	tabDeckStorage = 0;
+	tabReplays = 0;
 	tabAdmin = 0;
 	userInfo = new ServerInfo_User;
 	localClients = _clients;
@@ -183,10 +191,12 @@ void TabSupervisor::stop()
 		tabUserLists->deleteLater();
 		tabServer->deleteLater();
 		tabDeckStorage->deleteLater();
+		tabReplays->deleteLater();
 	}
 	tabUserLists = 0;
 	tabServer = 0;
 	tabDeckStorage = 0;
+	tabReplays = 0;
 	clear();
 	
 	QMapIterator<int, TabRoom *> roomIterator(roomTabs);
@@ -304,6 +314,12 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
 	if (focus)
 		setCurrentWidget(tab);
 	return tab;
+}
+
+void TabSupervisor::openReplay(GameReplay *replay)
+{
+	TabGame *replayTab = new TabGame(replay);
+	myAddTab(replayTab);
 }
 
 void TabSupervisor::talkLeft(TabMessage *tab)

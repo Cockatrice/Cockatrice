@@ -5,7 +5,7 @@
 #include "abstractclient.h"
 
 #include "pending_command.h"
-#include "pb/session_commands.pb.h"
+#include "pb/command_deck_list.pb.h"
 #include "pb/response_deck_list.pb.h"
 #include "pb/serverinfo_deckstorage.pb.h"
 

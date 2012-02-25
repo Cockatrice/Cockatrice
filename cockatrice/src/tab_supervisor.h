@@ -12,6 +12,7 @@ class TabServer;
 class TabRoom;
 class TabGame;
 class TabDeckStorage;
+class TabReplays;
 class TabAdmin;
 class TabMessage;
 class TabUserLists;
@@ -21,6 +22,7 @@ class Event_GameJoined;
 class Event_UserMessage;
 class ServerInfo_Room;
 class ServerInfo_User;
+class GameReplay;
 
 class CloseButton : public QAbstractButton {
 	Q_OBJECT
@@ -44,6 +46,7 @@ private:
 	TabServer *tabServer;
 	TabUserLists *tabUserLists;
 	TabDeckStorage *tabDeckStorage;
+	TabReplays *tabReplays;
 	TabAdmin *tabAdmin;
 	QMap<int, TabRoom *> roomTabs;
 	QMap<int, TabGame *> gameTabs;
@@ -77,6 +80,7 @@ private slots:
 	void addRoomTab(const ServerInfo_Room &info, bool setCurrent);
 	void roomLeft(TabRoom *tab);
 	TabMessage *addMessageTab(const QString &userName, bool focus);
+	void openReplay(GameReplay *replay);
 	void processUserLeft(const QString &userName);
 	void processUserJoined(const QString &userName);
 	void talkLeft(TabMessage *tab);

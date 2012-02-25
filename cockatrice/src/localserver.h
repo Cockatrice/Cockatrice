@@ -14,7 +14,7 @@ public:
 	
 	LocalServerInterface *newConnection();
 protected:
-	ServerInfo_User getUserData(const QString &name);
+	ServerInfo_User getUserData(const QString &name, bool withId = false);
 };
 
 #endif

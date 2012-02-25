@@ -54,6 +54,7 @@ SET(cockatrice_SOURCES
  src/tab_message.cpp 
  src/tab_game.cpp 
  src/tab_deck_storage.cpp 
+ src/tab_replays.cpp 
  src/tab_supervisor.cpp 
  src/tab_admin.cpp 
  src/tab_userlists.cpp 
@@ -61,6 +62,7 @@ SET(cockatrice_SOURCES
  src/userlist.cpp 
  src/userinfobox.cpp 
  src/remotedecklist_treewidget.cpp 
+ src/remotereplaylist_treewidget.cpp 
  src/deckview.cpp 
  src/playerlistwidget.cpp 
  src/pixmapgenerator.cpp 
@@ -122,6 +124,7 @@ SET(cockatrice_HEADERS
  src/tab_message.h 
  src/tab_game.h 
  src/tab_deck_storage.h 
+ src/tab_replays.h 
  src/tab_supervisor.h 
  src/tab_admin.h 
  src/tab_userlists.h 
@@ -129,6 +132,7 @@ SET(cockatrice_HEADERS
  src/userlist.h 
  src/userinfobox.h 
  src/remotedecklist_treewidget.h 
+ src/remotereplaylist_treewidget.h 
  src/deckview.h 
  src/playerlistwidget.h 
  src/settingscache.h 

@@ -71,7 +71,7 @@ public:
 	bool getThreaded() const { return threaded; }
 	QString getDbPrefix() const { return dbPrefix; }
 	void updateLoginMessage();
-	ServerInfo_User getUserData(const QString &name);
+	ServerInfo_User getUserData(const QString &name, bool withId = false);
 	int getUsersWithAddress(const QHostAddress &address) const;
 	QList<ServerSocketInterface *> getUsersWithAddressAsList(const QHostAddress &address) const;
 	QMap<QString, ServerInfo_User> getBuddyList(const QString &name);
@@ -82,7 +82,7 @@ public:
 	void incTxBytes(quint64 num);
 	void incRxBytes(quint64 num);
 	int getUserIdInDB(const QString &name);
-	void storeGameInformation(int secondsElapsed, const QStringList &allPlayersEver, const GameReplay &replay);
+	void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const GameReplay &replay);
 protected:
 	int startSession(const QString &userName, const QString &address);
 	void endSession(int sessionId);
@@ -106,7 +106,7 @@ private:
 	quint64 txBytes, rxBytes;
 	int maxGameInactivityTime, maxPlayerInactivityTime;
 	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser;
-	ServerInfo_User evalUserQueryResult(const QSqlQuery &query, bool complete);
+	ServerInfo_User evalUserQueryResult(const QSqlQuery &query, bool complete, bool withId = false);
 	
 	QString shutdownReason;
 	int shutdownMinutes;

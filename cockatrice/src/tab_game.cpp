@@ -957,6 +957,14 @@ CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) co
 	return zone->getCard(cardId, QString());
 }
 
+QString TabGame::getTabText() const
+{
+	if (replay)
+		return tr("Replay %1: %2").arg(gameId).arg(gameDescription);
+	else
+		return tr("Game %1: %2").arg(gameId).arg(gameDescription);
+}
+
 Player *TabGame::getActiveLocalPlayer() const
 {
 	Player *active = players.value(activePlayer, 0);

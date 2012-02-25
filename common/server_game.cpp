@@ -48,11 +48,11 @@ Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QS
 	: QObject(), room(_room), hostId(0), creatorInfo(new ServerInfo_User(_creator->copyUserInfo(false))), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies), onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0), startTime(QDateTime::currentDateTime()), gameMutex(QMutex::Recursive)
 {
 	replay = new GameReplay;
-	replay->mutable_game_info()->CopyFrom(getInfo());
 	
 	connect(this, SIGNAL(sigStartGameIfReady()), this, SLOT(doStartGameIfReady()), Qt::QueuedConnection);
 	
 	addPlayer(_creator, false, false);
+	replay->mutable_game_info()->CopyFrom(getInfo());
 
 	if (room->getServer()->getGameShouldPing()) {
 		pingClock = new QTimer(this);
@@ -80,7 +80,7 @@ Server_Game::~Server_Game()
 	gameMutex.unlock();
 	room->roomMutex.unlock();
 	
-	room->getServer()->storeGameInformation(secondsElapsed, allPlayersEver.toList(), *replay);
+	room->getServer()->storeGameInformation(secondsElapsed, allPlayersEver, allSpectatorsEver, *replay);
 	delete replay;
 	
 	qDebug() << "Server_Game destructor: gameId=" << gameId;
@@ -324,7 +324,10 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 	joinEvent.mutable_player_properties()->CopyFrom(newPlayer->getProperties(true));
 	sendGameEventContainer(prepareGameEvent(joinEvent, -1));
 	
-	allPlayersEver.insert(QString::fromStdString(newPlayer->getUserInfo()->name()));
+	if (spectator)
+		allSpectatorsEver.insert(QString::fromStdString(newPlayer->getUserInfo()->name()));
+	else
+		allPlayersEver.insert(QString::fromStdString(newPlayer->getUserInfo()->name()));
 	players.insert(playerId, newPlayer);
 	if (newPlayer->getUserInfo()->name() == creatorInfo->name()) {
 		hostId = playerId;

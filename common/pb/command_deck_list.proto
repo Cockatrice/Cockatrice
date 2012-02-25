@@ -1,0 +1,7 @@
+import "session_commands.proto";
+
+message Command_DeckList {
+	extend SessionCommand {
+		optional Command_DeckList ext = 1008;
+	}
+}
