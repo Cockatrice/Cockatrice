@@ -1,4 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+add_subdirectory(pb)
 
 SET(common_SOURCES
 	decklist.cpp
@@ -42,7 +43,6 @@ INCLUDE_DIRECTORIES(sfmt)
 INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
-add_subdirectory(pb)
 add_library(cockatrice_common ${common_SOURCES} ${common_HEADERS_MOC})
 target_link_libraries(cockatrice_common cockatrice_protocol)
 
