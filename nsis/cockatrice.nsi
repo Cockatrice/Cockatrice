@@ -31,29 +31,37 @@ InstallDir "$PROGRAMFILES\Cockatrice"
 
 Section "Application" SecApplication
 	SetOutPath "$INSTDIR"
-	File ..\cockatrice\release\cockatrice.exe
-	File ..\oracle\release\oracle.exe
-	File data\libgcc_s_dw2-1.dll
-	File data\mingwm10.dll
-	File data\QtCore4.dll
-	File data\QtGui4.dll
-	File data\QtNetwork4.dll
-	File data\QtSvg4.dll
-	File data\QtXml4.dll
-	File data\QtMultimedia4.dll
-	File data\QtScript4.dll
+	File ..\build\cockatrice\cockatrice.exe
+	File ..\build\oracle\oracle.exe
+	File C:\MinGW\bin\libstdc++-6.dll
+	File C:\MinGW\bin\libgcc_s_dw2-1.dll
+	File C:\MinGW\bin\mingwm10.dll
+	File C:\MinGW\bin\libprotobuf-7.dll
+	File C:\MinGW\bin\QtCore4.dll
+	File C:\MinGW\bin\QtGui4.dll
+	File C:\MinGW\bin\QtNetwork4.dll
+	File C:\MinGW\bin\QtSvg4.dll
+	File C:\MinGW\bin\QtXml4.dll
+	File C:\MinGW\bin\QtMultimedia4.dll
+	File C:\MinGW\bin\QtScript4.dll
 
 	SetOutPath "$INSTDIR\zonebg"
 	File /r ..\zonebg\*.*
 	
 	SetOutPath "$INSTDIR\plugins"
-	File /r data\plugins\*.*
+	SetOutPath "$INSTDIR\plugins\codecs"
+	File C:\MinGW\plugins\codecs\qcncodecs4.dll
+	File C:\MinGW\plugins\codecs\qjpcodecs4.dll
+	File C:\MinGW\plugins\codecs\qkrcodecs4.dll
+	File C:\MinGW\plugins\codecs\qtwcodecs4.dll
+	SetOutPath "$INSTDIR\plugins\iconengines"
+	File C:\MinGW\plugins\iconengines\qsvgicon4.dll
+	SetOutPath "$INSTDIR\plugins\imageformats"
+	File C:\MinGW\plugins\imageformats\qjpeg4.dll
+	File c:\MinGW\plugins\imageformats\qsvg4.dll
 
 	SetOutPath "$INSTDIR\sounds"
 	File /r ..\sounds\*.*
-
-	SetOutPath "$INSTDIR\pics"
-	SetOutPath "$INSTDIR\decks"
 
         WriteUninstaller "$INSTDIR\uninstall.exe"
         ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
@@ -83,13 +91,11 @@ Section Uninstall
         RMDir /r "$INSTDIR\zonebg"
         RMDir /r "$INSTDIR\plugins"
         RMDir /r "$INSTDIR\sounds"
-        RMDir "$INSTDIR\decks"
-        RMDir /r "$INSTDIR\pics\downloadedPics"
-        RMDir "$INSTDIR\pics"
         Delete "$INSTDIR\uninstall.exe"
         Delete "$INSTDIR\cockatrice.exe"
         Delete "$INSTDIR\oracle.exe"
-        Delete "$INSTDIR\cards.xml"
+	Delete "$INSTDIR\libstdc++-6.dll"
+	Delete "$INSTDIR\libprotobuf-7.dll"
         Delete "$INSTDIR\libgcc_s_dw2-1.dll"
         Delete "$INSTDIR\mingwm10.dll"
         Delete "$INSTDIR\QtCore4.dll"

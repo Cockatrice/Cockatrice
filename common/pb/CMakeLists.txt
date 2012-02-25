@@ -133,7 +133,5 @@ include_directories(${PROTOBUF_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 
-set(CMAKE_BUILD_TYPE Release)
-
 add_library(cockatrice_protocol ${PROTO_SRCS} ${PROTO_HDRS})
-#target_link_libraries(${PROTOBUF_LIBRARIES})
+target_link_libraries(cockatrice_protocol general $(PROTOBUF_LIBRARIES) general -lprotobuf)
