@@ -39,7 +39,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/../common)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 ADD_EXECUTABLE(servatrice ${servatrice_SOURCES} ${servatrice_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${QT_LIBRARIES} ${PROTOBUF_LIBRARIES} ${LIBGCRYPT_LIBRARY})
+TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${QT_LIBRARIES} ${LIBGCRYPT_LIBRARY})
 
 #add_custom_target(versionheader ALL DEPENDS version_header)
 add_custom_command(

@@ -140,6 +140,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 
 add_library(cockatrice_protocol ${PROTO_SRCS} ${PROTO_HDRS})
+set(cockatrice_protocol_LIBS ${PROTOBUF_LIBRARIES})
 if (WIN32)
         set(cockatrice_protocol_LIBS ${cockatrice_protocol_LIBS} -lprotobuf)
 endif (WIN32)
