@@ -22,6 +22,8 @@
 
 #include <QTcpServer>
 #include <QMutex>
+#include <QSslCertificate>
+#include <QSslKey>
 #include "server.h"
 
 class QSqlDatabase;
@@ -33,14 +35,27 @@ class GameReplay;
 class Servatrice;
 class ServerSocketInterface;
 
-class Servatrice_TcpServer : public QTcpServer {
+class Servatrice_GameServer : public QTcpServer {
 	Q_OBJECT
 private:
 	Servatrice *server;
 	bool threaded;
 public:
-	Servatrice_TcpServer(Servatrice *_server, bool _threaded, QObject *parent = 0)
+	Servatrice_GameServer(Servatrice *_server, bool _threaded, QObject *parent = 0)
 		: QTcpServer(parent), server(_server), threaded(_threaded) { }
+protected:
+	void incomingConnection(int socketDescriptor);
+};
+
+class Servatrice_NetworkServer : public QTcpServer {
+	Q_OBJECT
+private:
+	Servatrice *server;
+	QSslCertificate cert;
+	QSslKey privateKey;
+public:
+	Servatrice_NetworkServer(Servatrice *_server, const QSslCertificate &_cert, const QSslKey &_privateKey, QObject *parent = 0)
+		: QTcpServer(parent), server(_server), cert(_cert), privateKey(_privateKey) { }
 protected:
 	void incomingConnection(int socketDescriptor);
 };
@@ -94,7 +109,8 @@ private:
 	AuthenticationMethod authenticationMethod;
 	DatabaseType databaseType;
 	QTimer *pingClock, *statusUpdateClock;
-	QTcpServer *tcpServer;
+	Servatrice_GameServer *gameServer;
+	Servatrice_NetworkServer *networkServer;
 	QString serverName;
 	QString loginMessage;
 	QString dbPrefix;

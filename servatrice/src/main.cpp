@@ -87,6 +87,12 @@ void myMessageOutput(QtMsgType /*type*/, const char *msg)
 	logger->logMessage(msg);
 }
 
+void myMessageOutput2(QtMsgType /*type*/, const char *msg)
+{
+	logger->logMessage(msg);
+	std::cerr << msg << std::endl;
+}
+
 #ifdef Q_OS_UNIX
 void sigSegvHandler(int sig)
 {
@@ -120,7 +126,7 @@ int main(int argc, char *argv[])
 	loggerThread->waitForInit();
 	logger = loggerThread->getLogger();
 	
-	qInstallMsgHandler(myMessageOutput);
+	qInstallMsgHandler(myMessageOutput2);
 #ifdef Q_OS_UNIX	
 	struct sigaction hup;
 	hup.sa_handler = ServerLogger::hupSignalHandler;
@@ -152,6 +158,7 @@ int main(int argc, char *argv[])
 	std::cerr << "-------------------------" << std::endl;
 	std::cerr << "Server initialized." << std::endl;
 	
+	qInstallMsgHandler(myMessageOutput);
 	int retval = app.exec();
 
 	std::cerr << "Server quit." << std::endl;

@@ -21,6 +21,7 @@
 #include <QSettings>
 #include <QDebug>
 #include <iostream>
+#include <QSslSocket>
 #include "servatrice.h"
 #include "server_room.h"
 #include "serversocketinterface.h"
@@ -33,7 +34,7 @@
 #include "pb/event_server_shutdown.pb.h"
 #include "pb/event_connection_closed.pb.h"
 
-void Servatrice_TcpServer::incomingConnection(int socketDescriptor)
+void Servatrice_GameServer::incomingConnection(int socketDescriptor)
 {
 	if (threaded) {
 		ServerSocketThread *sst = new ServerSocketThread(socketDescriptor, server, this);
@@ -44,6 +45,17 @@ void Servatrice_TcpServer::incomingConnection(int socketDescriptor)
 		ServerSocketInterface *ssi = new ServerSocketInterface(server, socket);
 		logger->logMessage(QString("incoming connection: %1").arg(socket->peerAddress().toString()), ssi);
 	}
+}
+
+void Servatrice_NetworkServer::incomingConnection(int socketDescriptor)
+{
+	QSslSocket *socket = new QSslSocket;
+	socket->setLocalCertificate(cert);
+	socket->setPrivateKey(privateKey);
+	socket->setSocketDescriptor(socketDescriptor);
+	socket->startServerEncryption();
+//	SocketInterface *ssi = new ServerSocketInterface(server, socket);
+//	logger->logMessage(QString("Incoming server network connection: %1").arg(socket->peerAddress().toString()), ssi);
 }
 
 Servatrice::Servatrice(QSettings *_settings, QObject *parent)
@@ -64,13 +76,13 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	}
 	
 	threaded = settings->value("server/threaded", false).toInt();
-	tcpServer = new Servatrice_TcpServer(this, threaded, this);
-	int port = settings->value("server/port", 4747).toInt();
-	qDebug() << "Starting server on port" << port;
-	if (tcpServer->listen(QHostAddress::Any, port))
+	gameServer = new Servatrice_GameServer(this, threaded, this);
+	const int gamePort = settings->value("server/port", 4747).toInt();
+	qDebug() << "Starting server on port" << gamePort;
+	if (gameServer->listen(QHostAddress::Any, gamePort))
 		qDebug() << "Server listening.";
 	else
-		qDebug() << "tcpServer->listen(): Error.";
+		qDebug() << "gameServer->listen(): Error.";
 	
 	const QString authenticationMethodStr = settings->value("authentication/method").toString();
 	if (authenticationMethodStr == "sql")
@@ -86,6 +98,38 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	dbPrefix = settings->value("database/prefix").toString();
 	if (databaseType != DatabaseNone)
 		openDatabase();
+	
+	try { if (settings->value("servernetwork/active", 0).toInt()) {
+		qDebug() << "Connecting to server network.";
+		const QString certFileName = settings->value("servernetwork/ssl_cert").toString();
+		const QString keyFileName = settings->value("servernetwork/ssl_key").toString();
+		const QString passphrase = settings->value("servernetwork/ssl_passphrase").toString();
+		qDebug() << "Loading certificate...";
+		QFile certFile(certFileName);
+		if (!certFile.open(QIODevice::ReadOnly))
+			throw QString("Error opening certificate file: %1").arg(certFileName);
+		QSslCertificate cert(&certFile);
+		if (!cert.isValid())
+			throw(QString("Invalid certificate."));
+		qDebug() << "Loading private key...";
+		QFile keyFile(keyFileName);
+		if (!keyFile.open(QIODevice::ReadOnly))
+			throw QString("Error opening private key file: %1").arg(keyFileName);
+		QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey, passphrase.toAscii());
+		if (key.isNull())
+			throw QString("Invalid private key.");
+		
+		const int networkPort = settings->value("servernetwork/port", 14747).toInt();
+		qDebug() << "Starting network server on port" << networkPort;
+		
+		networkServer = new Servatrice_NetworkServer(this, cert, key, this);
+		if (networkServer->listen(QHostAddress::Any, networkPort))
+			qDebug() << "Network server listening.";
+		else
+			throw QString("networkServer->listen(): Error.");
+	} } catch (QString error) {
+		qDebug() << "ERROR --" << error;
+	}
 	
 	int size = settings->beginReadArray("rooms");
 	for (int i = 0; i < size; ++i) {
