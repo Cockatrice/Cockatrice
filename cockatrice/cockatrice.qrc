@@ -38,6 +38,14 @@
 	<file>resources/icon_conceded.svg</file>
 	<file>resources/icon_player.svg</file>
 	<file>resources/icon_spectator.svg</file>
+	
+	<file>resources/replay_start.svg</file>
+	<file>resources/replay_stop.svg</file>
+	<file>resources/replay_fastforward.svg</file>
+	<file>resources/replay_rewind.svg</file>
+	<file>resources/replay_toend.svg</file>
+	<file>resources/replay_tostart.svg</file>
+	<file>resources/replay_pause.svg</file>
 
 	<file>resources/genders/male.svg</file>
 	<file>resources/genders/female.svg</file>

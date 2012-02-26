@@ -18,11 +18,13 @@ class QSplitter;
 class QLabel;
 class QLineEdit;
 class QPushButton;
+class QToolButton;
 class QMenu;
 class ZoneViewLayout;
 class ZoneViewWidget;
 class PhasesToolbar;
 class PlayerListWidget;
+class ReplayTimelineWidget;
 class Response;
 class GameEventContainer;
 class GameEventContext;
@@ -108,8 +110,13 @@ private:
 	QStringList phasesList;
 	int currentPhase;
 	int activePlayer;
+	
+	// Replay related members
 	GameReplay *replay;
 	int currentReplayStep;
+	QList<int> replayTimeline;
+	ReplayTimelineWidget *timelineWidget;
+	QToolButton *replayToStartButton, *replayStartButton, *replayPauseButton, *replayStopButton, *replayFastForwardButton, *replayToEndButton;
 	
 	QSplitter *splitter;
 	CardInfoWidget *cardInfo;
@@ -158,7 +165,15 @@ signals:
 	void containerProcessingDone();
 	void openMessageDialog(const QString &userName, bool focus);
 private slots:
-	void nextReplayStep();
+	void replayNextEvent();
+	void replayFinished();
+	void replayToStartButtonClicked();
+	void replayStartButtonClicked();
+	void replayPauseButtonClicked();
+	void replayStopButtonClicked();
+	void replayFastForwardButtonToggled(bool checked);
+	void replayToEndButtonClicked();
+	
 	void incrementGameTime();
 	void adminLockChanged(bool lock);
 	void newCardAdded(AbstractCardItem *card);

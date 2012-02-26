@@ -58,6 +58,7 @@ SET(cockatrice_SOURCES
  src/tab_supervisor.cpp 
  src/tab_admin.cpp 
  src/tab_userlists.cpp 
+ src/replay_timeline_widget.cpp
  src/chatview.cpp 
  src/userlist.cpp 
  src/userinfobox.cpp 
@@ -128,6 +129,7 @@ SET(cockatrice_HEADERS
  src/tab_supervisor.h 
  src/tab_admin.h 
  src/tab_userlists.h 
+ src/replay_timeline_widget.h
  src/chatview.h 
  src/userlist.h 
  src/userinfobox.h 
