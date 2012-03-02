@@ -4,5 +4,5 @@ message Command_ReplayDownload {
 	extend SessionCommand {
 		optional Command_ReplayDownload ext = 1101;
 	}
-	optional sint32 game_id = 1 [default = -1];
+	optional sint32 replay_id = 1 [default = -1];
 }

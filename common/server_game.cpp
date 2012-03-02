@@ -45,14 +45,15 @@
 #include <QDebug>
 
 Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *_room)
-	: QObject(), room(_room), hostId(0), creatorInfo(new ServerInfo_User(_creator->copyUserInfo(false))), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies), onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), secondsElapsed(0), startTime(QDateTime::currentDateTime()), gameMutex(QMutex::Recursive)
+	: QObject(), room(_room), hostId(0), creatorInfo(new ServerInfo_User(_creator->copyUserInfo(false))), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies), onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0), firstGameStarted(false), startTime(QDateTime::currentDateTime()), gameMutex(QMutex::Recursive)
 {
-	replay = new GameReplay;
+	currentReplay = new GameReplay;
 	
 	connect(this, SIGNAL(sigStartGameIfReady()), this, SLOT(doStartGameIfReady()), Qt::QueuedConnection);
 	
 	addPlayer(_creator, false, false);
-	replay->mutable_game_info()->CopyFrom(getInfo());
+
+	currentReplay->mutable_game_info()->CopyFrom(getInfo());
 
 	if (room->getServer()->getGameShouldPing()) {
 		pingClock = new QTimer(this);
@@ -80,8 +81,12 @@ Server_Game::~Server_Game()
 	gameMutex.unlock();
 	room->roomMutex.unlock();
 	
-	room->getServer()->storeGameInformation(secondsElapsed, allPlayersEver, allSpectatorsEver, *replay);
-	delete replay;
+	currentReplay->set_duration_seconds(secondsElapsed - startTimeOfThisGame);
+	replayList.append(currentReplay);
+	room->getServer()->storeGameInformation(secondsElapsed, allPlayersEver, allSpectatorsEver, replayList);
+	
+	for (int i = 0; i < replayList.size(); ++i)
+		delete replayList[i];
 	
 	qDebug() << "Server_Game destructor: gameId=" << gameId;
 }
@@ -176,9 +181,9 @@ void Server_Game::sendGameStateToPlayers()
 		omniscientEvent.add_player_list()->CopyFrom(omniscientGameStateIterator.next());
 	
 	GameEventContainer *replayCont = prepareGameEvent(omniscientEvent, -1);
-	replayCont->set_seconds_elapsed(secondsElapsed);
+	replayCont->set_seconds_elapsed(secondsElapsed - startTimeOfThisGame);
 	replayCont->clear_game_id();
-	replay->add_event_list()->CopyFrom(*replayCont);
+	currentReplay->add_event_list()->CopyFrom(*replayCont);
 	delete replayCont;
 	
 	// If spectators are not omniscient, we need an additional getGameState call, otherwise we can use the data we used for the replay.
@@ -236,6 +241,27 @@ void Server_Game::doStartGameIfReady()
 		player->setConceded(false);
 		player->setReadyStart(false);
 	}
+	
+	if (firstGameStarted) {
+		currentReplay->set_duration_seconds(secondsElapsed - startTimeOfThisGame);
+		replayList.append(currentReplay);
+		currentReplay = new GameReplay;
+		currentReplay->mutable_game_info()->CopyFrom(getInfo());
+		
+		Event_GameStateChanged omniscientEvent;
+		QListIterator<ServerInfo_Player> omniscientGameStateIterator(getGameState(0, true, true));
+		while (omniscientGameStateIterator.hasNext())
+			omniscientEvent.add_player_list()->CopyFrom(omniscientGameStateIterator.next());
+		
+		GameEventContainer *replayCont = prepareGameEvent(omniscientEvent, -1);
+		replayCont->set_seconds_elapsed(0);
+		replayCont->clear_game_id();
+		currentReplay->add_event_list()->CopyFrom(*replayCont);
+		delete replayCont;
+		
+		startTimeOfThisGame = secondsElapsed;
+	} else
+		firstGameStarted = true;
 	
 	sendGameStateToPlayers();
 	
@@ -624,9 +650,9 @@ void Server_Game::sendGameEventContainer(GameEventContainer *cont, GameEventStor
 			p->sendGameEvent(*cont);
 	}
 	if (recipients.testFlag(GameEventStorageItem::SendToPrivate)) {
-		cont->set_seconds_elapsed(secondsElapsed);
+		cont->set_seconds_elapsed(secondsElapsed - startTimeOfThisGame);
 		cont->clear_game_id();
-		replay->add_event_list()->CopyFrom(*cont);
+		currentReplay->add_event_list()->CopyFrom(*cont);
 	}
 	
 	delete cont;

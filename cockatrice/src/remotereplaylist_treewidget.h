@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QTreeView>
 #include "pb/serverinfo_replay.pb.h"
+#include "pb/serverinfo_replay_match.pb.h"
 
 class Response;
 class AbstractClient;
@@ -13,10 +14,42 @@ class QSortFilterProxyModel;
 class RemoteReplayList_TreeModel : public QAbstractItemModel {
 	Q_OBJECT
 private:
-	AbstractClient *client;
-	QList<ServerInfo_Replay> replays;
+	class MatchNode;
+	class ReplayNode;
+	class Node {
+	protected:
+		QString name;
+	public:
+		Node(const QString &_name)
+			: name(_name) { }
+		virtual ~Node() { };
+		QString getName() const { return name; }
+	};
+	class MatchNode : public Node, public QList<ReplayNode *> {
+	private:
+		ServerInfo_ReplayMatch matchInfo;
+	public:
+		MatchNode(const ServerInfo_ReplayMatch &_matchInfo);
+		~MatchNode();
+		void clearTree();
+		const ServerInfo_ReplayMatch &getMatchInfo() { return matchInfo; }
+	};
+	class ReplayNode : public Node {
+	private:
+		MatchNode *parent;
+		ServerInfo_Replay replayInfo;
+	public:
+		ReplayNode(const ServerInfo_Replay &_replayInfo, MatchNode *_parent = 0)
+			: Node(QString::fromStdString(_replayInfo.replay_name())), parent(_parent), replayInfo(_replayInfo) { }
+		MatchNode *getParent() const { return parent; }
+		const ServerInfo_Replay &getReplayInfo() { return replayInfo; }
+	};
 	
-	QIcon fileIcon;
+	AbstractClient *client;
+	QList<MatchNode *> replayMatches;
+	
+	QIcon dirIcon, fileIcon;
+	void clearTree();
 signals:
 	void treeRefreshed();
 private slots:
@@ -32,7 +65,8 @@ public:
 	QModelIndex parent(const QModelIndex &index) const;
 	Qt::ItemFlags flags(const QModelIndex &index) const;
 	void refreshTree();
-	ServerInfo_Replay const *getNode(const QModelIndex &index) const;
+	ServerInfo_Replay const* getReplay(const QModelIndex &index) const;
+	ServerInfo_ReplayMatch const* getReplayMatch(const QModelIndex &index) const;
 };
 
 class RemoteReplayList_TreeWidget : public QTreeView {
@@ -42,7 +76,8 @@ private:
 	ServerInfo_Replay const *getNode(const QModelIndex &ind) const;
 public:
 	RemoteReplayList_TreeWidget(AbstractClient *_client, QWidget *parent = 0);
-	ServerInfo_Replay const *getCurrentItem() const;
+	ServerInfo_Replay const *getCurrentReplay() const;
+	ServerInfo_ReplayMatch const *getCurrentReplayMatch() const;
 	void refreshTree();
 };
 

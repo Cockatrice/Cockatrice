@@ -126,6 +126,7 @@ SET(PROTO_FILES
 	serverinfo_playerproperties.proto
 	serverinfo_player.proto
 	serverinfo_replay.proto
+	serverinfo_replay_match.proto
 	serverinfo_room.proto
 	serverinfo_user.proto
 	serverinfo_zone.proto

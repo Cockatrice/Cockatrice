@@ -198,7 +198,7 @@ void DeckViewContainer::setDeck(DeckList *deck)
 	deckView->setDeck(deck);
 	readyStartButton->setEnabled(true);
 }
-#include <QDebug>
+
 TabGame::TabGame(GameReplay *_replay)
 	: Tab(0),
 	hostId(-1),

@@ -503,23 +503,35 @@ Response::ResponseCode ServerSocketInterface::cmdReplayList(const Command_Replay
 	query1.bindValue(":id_player", userInfo->id());
 	servatrice->execSqlQuery(query1);
 	while (query1.next()) {
-		ServerInfo_Replay *replayInfo = re->add_replay_list();
+		ServerInfo_ReplayMatch *matchInfo = re->add_match_list();
+		
 		const int gameId = query1.value(0).toInt();
-		replayInfo->set_game_id(gameId);
-		replayInfo->set_room_name(query1.value(2).toString().toStdString());
+		matchInfo->set_game_id(gameId);
+		matchInfo->set_room_name(query1.value(2).toString().toStdString());
 		const int timeStarted = query1.value(3).toDateTime().toTime_t();
 		const int timeFinished = query1.value(4).toDateTime().toTime_t();
-		replayInfo->set_time_started(timeStarted);
-		replayInfo->set_length(timeFinished - timeStarted);
-		replayInfo->set_game_name(query1.value(5).toString().toStdString());
-		replayInfo->set_replay_name(query1.value(1).toString().toStdString());
+		matchInfo->set_time_started(timeStarted);
+		matchInfo->set_length(timeFinished - timeStarted);
+		matchInfo->set_game_name(query1.value(5).toString().toStdString());
+		const QString replayName = query1.value(1).toString();
 		
 		QSqlQuery query2;
 		query2.prepare("select player_name from cockatrice_games_players where id_game = :id_game");
 		query2.bindValue(":id_game", gameId);
 		servatrice->execSqlQuery(query2);
 		while (query2.next())
-			replayInfo->add_player_names(query2.value(0).toString().toStdString());
+			matchInfo->add_player_names(query2.value(0).toString().toStdString());
+		
+		QSqlQuery query3;
+		query3.prepare("select id, duration from " + servatrice->getDbPrefix() + "_replays where id_game = :id_game");
+		query3.bindValue(":id_game", gameId);
+		servatrice->execSqlQuery(query3);
+		while (query3.next()) {
+			ServerInfo_Replay *replayInfo = matchInfo->add_replay_list();
+			replayInfo->set_replay_id(query3.value(0).toInt());
+			replayInfo->set_replay_name(replayName.toStdString());
+			replayInfo->set_duration(query3.value(1).toInt());
+		}
 	}
 	servatrice->dbMutex.unlock();
 	
@@ -535,8 +547,8 @@ Response::ResponseCode ServerSocketInterface::cmdReplayDownload(const Command_Re
 	QMutexLocker dbLocker(&servatrice->dbMutex);
 	
 	QSqlQuery query1;
-	query1.prepare("select 1 from " + servatrice->getDbPrefix() + "_replays_access where id_game = :id_game and id_player = :id_player");
-	query1.bindValue(":id_game", cmd.game_id());
+	query1.prepare("select 1 from " + servatrice->getDbPrefix() + "_replays_access a left join " + servatrice->getDbPrefix() + "_replays b on a.id_game = b.id_game where b.id = :id_replay and a.id_player = :id_player");
+	query1.bindValue(":id_replay", cmd.replay_id());
 	query1.bindValue(":id_player", userInfo->id());
 	if (!servatrice->execSqlQuery(query1))
 		return Response::RespInternalError;
@@ -544,8 +556,8 @@ Response::ResponseCode ServerSocketInterface::cmdReplayDownload(const Command_Re
 		return Response::RespAccessDenied;
 	
 	QSqlQuery query2;
-	query2.prepare("select replay from " + servatrice->getDbPrefix() + "_games where id = :id_game");
-	query2.bindValue(":id_game", cmd.game_id());
+	query2.prepare("select replay from " + servatrice->getDbPrefix() + "_replays where id = :id_replay");
+	query2.bindValue(":id_replay", cmd.replay_id());
 	if (!servatrice->execSqlQuery(query2))
 		return Response::RespInternalError;
 	if (!query2.next())

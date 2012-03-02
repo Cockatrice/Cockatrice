@@ -123,12 +123,12 @@ void TabReplays::actOpenLocalReplay()
 
 void TabReplays::actOpenRemoteReplay()
 {
-	ServerInfo_Replay const *curRight = serverDirView->getCurrentItem();
+	ServerInfo_Replay const *curRight = serverDirView->getCurrentReplay();
 	if (!curRight)
 		return;
 	
 	Command_ReplayDownload cmd;
-	cmd.set_game_id(curRight->game_id());
+	cmd.set_replay_id(curRight->replay_id());
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
 	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(openRemoteReplayFinished(const Response &)));
@@ -156,13 +156,13 @@ void TabReplays::actDownload()
 		filePath = localDirModel->filePath(curLeft);
 	}
 
-	ServerInfo_Replay const *curRight = serverDirView->getCurrentItem();
+	ServerInfo_Replay const *curRight = serverDirView->getCurrentReplay();
 	if (!curRight)
 		return;
-	filePath += QString("/game_%1.cor").arg(curRight->game_id());
+	filePath += QString("/replay_%1.cor").arg(curRight->replay_id());
 	
 	Command_ReplayDownload cmd;
-	cmd.set_game_id(curRight->game_id());
+	cmd.set_replay_id(curRight->replay_id());
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
 	pend->setExtraData(filePath);

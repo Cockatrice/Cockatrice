@@ -48,7 +48,7 @@ public:
 	virtual bool isInBuddyList(const QString &whoseList, const QString &who) { return false; }
 	virtual bool isInIgnoreList(const QString &whoseList, const QString &who) { return false; }
 	
-	virtual void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const GameReplay &replay) { }
+	virtual void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays) { }
 protected:
 	void prepareDestroy();
 	QList<Server_ProtocolHandler *> clients;
