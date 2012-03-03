@@ -11,6 +11,7 @@ message SessionEvent {
 		USER_JOINED = 1007;
 		USER_LEFT = 1008;
 		GAME_JOINED = 1009;
+		REPLAY_ADDED = 1100;
 	}
 	extensions 100 to max;
 }

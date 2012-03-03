@@ -29,6 +29,7 @@
 #include "main.h"
 #include "passwordhasher.h"
 #include "pb/game_replay.pb.h"
+#include "pb/event_replay_added.pb.h"
 #include "pb/event_server_message.pb.h"
 #include "pb/event_server_shutdown.pb.h"
 #include "pb/event_connection_closed.pb.h"
@@ -158,6 +159,15 @@ bool Servatrice::openDatabase()
 			return false;
 		nextGameId = query.value(0).toInt() + 1;
 		qDebug() << "set nextGameId to " << nextGameId;
+	}
+	if (!nextReplayId) {
+		QSqlQuery query;
+		if (!query.exec("select max(id) from " + dbPrefix + "_replays"))
+			return false;
+		if (!query.next())
+			return false;
+		nextReplayId = query.value(0).toInt() + 1;
+		qDebug() << "set nextReplayId to " << nextReplayId;
 	}
 	return true;
 }
@@ -544,6 +554,14 @@ void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &a
 	
 	Server_Room *room = rooms.value(gameInfo.room_id());
 	
+	Event_ReplayAdded replayEvent;
+	ServerInfo_ReplayMatch *replayMatchInfo = replayEvent.mutable_match_info();
+	replayMatchInfo->set_game_id(gameInfo.game_id());
+	replayMatchInfo->set_room_name(room->getName().toStdString());
+	replayMatchInfo->set_time_started(QDateTime::currentDateTime().addSecs(-secondsElapsed).toTime_t());
+	replayMatchInfo->set_length(secondsElapsed);
+	replayMatchInfo->set_game_name(gameInfo.description());
+	
 	const QStringList &allGameTypes = room->getGameTypes();
 	QStringList gameTypes;
 	for (int i = gameInfo.game_types_size() - 1; i >= 0; --i)
@@ -553,7 +571,9 @@ void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &a
 	QSetIterator<QString> playerIterator(allPlayersEver);
 	while (playerIterator.hasNext()) {
 		gameIds1.append(gameInfo.game_id());
-		playerNames.append(playerIterator.next());
+		const QString &playerName = playerIterator.next();
+		playerNames.append(playerName);
+		replayMatchInfo->add_player_names(playerName.toStdString());
 	}
 	QSet<QString> allUsersInGame = allPlayersEver + allSpectatorsEver;
 	QSetIterator<QString> allUsersIterator(allUsersInGame);
@@ -566,17 +586,34 @@ void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &a
 		replayNames.append(QString::fromStdString(gameInfo.description()));
 	}
 	
-	QVariantList replayGameIds, replayDurations, replayBlobs;
+	QVariantList replayIds, replayGameIds, replayDurations, replayBlobs;
 	for (int i = 0; i < replayList.size(); ++i) {
 		QByteArray blob;
 		const unsigned int size = replayList[i]->ByteSize();
 		blob.resize(size);
 		replayList[i]->SerializeToArray(blob.data(), size);
 		
+		replayIds.append(QVariant((qulonglong) replayList[i]->replay_id()));
 		replayGameIds.append(gameInfo.game_id());
 		replayDurations.append(replayList[i]->duration_seconds());
 		replayBlobs.append(blob);
+		
+		ServerInfo_Replay *replayInfo = replayMatchInfo->add_replay_list();
+		replayInfo->set_replay_id(replayList[i]->replay_id());
+		replayInfo->set_replay_name(gameInfo.description());
+		replayInfo->set_duration(replayList[i]->duration_seconds());
 	}
+	
+	SessionEvent *sessionEvent = Server_ProtocolHandler::prepareSessionEvent(replayEvent);
+	allUsersIterator.toFront();
+	serverMutex.lock();
+	while (allUsersIterator.hasNext()) {
+		Server_ProtocolHandler *userHandler = users.value(allUsersIterator.next());
+		if (userHandler)
+			userHandler->sendProtocolItem(*sessionEvent);
+	}
+	serverMutex.unlock();
+	delete sessionEvent;
 	
 	QMutexLocker locker(&dbMutex);
 	if (!checkSql())
@@ -602,7 +639,8 @@ void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &a
 	query2.execBatch();
 	
 	QSqlQuery replayQuery1;
-	replayQuery1.prepare("insert into " + dbPrefix + "_replays (id_game, duration, replay) values (:id_game, :duration, :replay)");
+	replayQuery1.prepare("insert into " + dbPrefix + "_replays (id, id_game, duration, replay) values (:id_replay, :id_game, :duration, :replay)");
+	replayQuery1.bindValue(":id_replay", replayIds);
 	replayQuery1.bindValue(":id_game", replayGameIds);
 	replayQuery1.bindValue(":duration", replayDurations);
 	replayQuery1.bindValue(":replay", replayBlobs);

@@ -14,6 +14,7 @@
 #include "pb/event_user_joined.pb.h"
 #include "pb/event_user_left.pb.h"
 #include "pb/event_game_joined.pb.h"
+#include "pb/event_replay_added.pb.h"
 #include "get_pb_extension.h"
 #include <google/protobuf/descriptor.h>
 
@@ -55,6 +56,7 @@ void AbstractClient::processProtocolItem(const ServerMessage &item)
 				case SessionEvent::USER_JOINED: emit userJoinedEventReceived(event.GetExtension(Event_UserJoined::ext)); break;
 				case SessionEvent::USER_LEFT: emit userLeftEventReceived(event.GetExtension(Event_UserLeft::ext)); break;
 				case SessionEvent::GAME_JOINED: emit gameJoinedEventReceived(event.GetExtension(Event_GameJoined::ext)); break;
+				case SessionEvent::REPLAY_ADDED: emit replayAddedEventReceived(event.GetExtension(Event_ReplayAdded::ext)); break;
 			}
 			break;
 		}

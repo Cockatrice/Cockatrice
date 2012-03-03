@@ -20,6 +20,7 @@
 #include "pb/response.pb.h"
 #include "pb/response_replay_download.pb.h"
 #include "pb/command_replay_download.pb.h"
+#include "pb/event_replay_added.pb.h"
 
 TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client)
 	: Tab(_tabSupervisor), client(_client)
@@ -90,6 +91,8 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client)
 	
 	retranslateUi();
 	setLayout(hbox);
+	
+	connect(client, SIGNAL(replayAddedEventReceived(const Event_ReplayAdded &)), this, SLOT(replayAddedEventReceived(const Event_ReplayAdded &)));
 }
 
 void TabReplays::retranslateUi()
@@ -182,4 +185,9 @@ void TabReplays::downloadFinished(const Response &r)
 	f.open(QIODevice::WriteOnly);
 	f.write((const char *) data.data(), data.size());
 	f.close();
+}
+
+void TabReplays::replayAddedEventReceived(const Event_ReplayAdded &event)
+{
+	serverDirView->addMatchInfo(event.match_info());
 }

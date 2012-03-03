@@ -28,6 +28,7 @@ public:
 	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason);
 	const QMap<int, Server_Room *> &getRooms() { return rooms; }
 	int getNextGameId() { return nextGameId++; }
+	int getNextReplayId() { return nextReplayId++; }
 	
 	const QMap<QString, Server_ProtocolHandler *> &getUsers() const { return users; }
 	void addClient(Server_ProtocolHandler *player);
@@ -62,7 +63,7 @@ protected:
 	virtual ServerInfo_User getUserData(const QString &name, bool withId = false) = 0;
 	int getUsersCount() const;
 	int getGamesCount() const;
-	int nextGameId;
+	int nextGameId, nextReplayId;
 	void addRoom(Server_Room *newRoom);
 };
 

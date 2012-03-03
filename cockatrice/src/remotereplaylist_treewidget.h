@@ -39,7 +39,7 @@ private:
 		MatchNode *parent;
 		ServerInfo_Replay replayInfo;
 	public:
-		ReplayNode(const ServerInfo_Replay &_replayInfo, MatchNode *_parent = 0)
+		ReplayNode(const ServerInfo_Replay &_replayInfo, MatchNode *_parent)
 			: Node(QString::fromStdString(_replayInfo.replay_name())), parent(_parent), replayInfo(_replayInfo) { }
 		MatchNode *getParent() const { return parent; }
 		const ServerInfo_Replay &getReplayInfo() { return replayInfo; }
@@ -67,6 +67,7 @@ public:
 	void refreshTree();
 	ServerInfo_Replay const* getReplay(const QModelIndex &index) const;
 	ServerInfo_ReplayMatch const* getReplayMatch(const QModelIndex &index) const;
+	void addMatchInfo(const ServerInfo_ReplayMatch &matchInfo);
 };
 
 class RemoteReplayList_TreeWidget : public QTreeView {
@@ -79,6 +80,7 @@ public:
 	ServerInfo_Replay const *getCurrentReplay() const;
 	ServerInfo_ReplayMatch const *getCurrentReplayMatch() const;
 	void refreshTree();
+	void addMatchInfo(const ServerInfo_ReplayMatch &matchInfo);
 };
 
 #endif

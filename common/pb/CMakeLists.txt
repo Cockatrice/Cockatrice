@@ -78,6 +78,7 @@ SET(PROTO_FILES
 	event_move_card.proto
 	event_player_properties_changed.proto
 	event_remove_from_list.proto
+	event_replay_added.proto
 	event_reveal_cards.proto
 	event_roll_die.proto
 	event_room_say.proto

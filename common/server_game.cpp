@@ -48,6 +48,7 @@ Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QS
 	: QObject(), room(_room), hostId(0), creatorInfo(new ServerInfo_User(_creator->copyUserInfo(false))), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies), onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0), firstGameStarted(false), startTime(QDateTime::currentDateTime()), gameMutex(QMutex::Recursive)
 {
 	currentReplay = new GameReplay;
+	currentReplay->set_replay_id(room->getServer()->getNextReplayId());
 	
 	connect(this, SIGNAL(sigStartGameIfReady()), this, SLOT(doStartGameIfReady()), Qt::QueuedConnection);
 	
@@ -246,6 +247,7 @@ void Server_Game::doStartGameIfReady()
 		currentReplay->set_duration_seconds(secondsElapsed - startTimeOfThisGame);
 		replayList.append(currentReplay);
 		currentReplay = new GameReplay;
+		currentReplay->set_replay_id(room->getServer()->getNextReplayId());
 		currentReplay->mutable_game_info()->CopyFrom(getInfo());
 		
 		Event_GameStateChanged omniscientEvent;

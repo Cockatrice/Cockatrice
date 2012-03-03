@@ -13,7 +13,7 @@ RemoteReplayList_TreeModel::MatchNode::MatchNode(const ServerInfo_ReplayMatch &_
 	: RemoteReplayList_TreeModel::Node(QString::fromStdString(_matchInfo.game_name())), matchInfo(_matchInfo)
 {
 	for (int i = 0; i < matchInfo.replay_list_size(); ++i)
-		append(new ReplayNode(matchInfo.replay_list(i)));
+		append(new ReplayNode(matchInfo.replay_list(i), this));
 }
 
 RemoteReplayList_TreeModel::MatchNode::~MatchNode()
@@ -200,6 +200,15 @@ void RemoteReplayList_TreeModel::refreshTree()
 	client->sendCommand(pend);
 }
 
+void RemoteReplayList_TreeModel::addMatchInfo(const ServerInfo_ReplayMatch &matchInfo)
+{
+	beginInsertRows(QModelIndex(), replayMatches.size(), replayMatches.size());
+	replayMatches.append(new MatchNode(matchInfo));
+	endInsertRows();
+	
+	emit treeRefreshed();
+}
+
 void RemoteReplayList_TreeModel::replayListFinished(const Response &r)
 {
 	const Response_ReplayList &resp = r.GetExtension(Response_ReplayList::ext);
@@ -235,4 +244,9 @@ RemoteReplayList_TreeWidget::RemoteReplayList_TreeWidget(AbstractClient *_client
 ServerInfo_Replay const *RemoteReplayList_TreeWidget::getCurrentReplay() const
 {
 	return treeModel->getReplay(proxyModel->mapToSource(selectionModel()->currentIndex()));
+}
+
+void RemoteReplayList_TreeWidget::addMatchInfo(const ServerInfo_ReplayMatch &matchInfo)
+{
+	treeModel->addMatchInfo(matchInfo);
 }
