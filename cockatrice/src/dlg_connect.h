@@ -6,6 +6,7 @@
 
 class QLabel;
 class QPushButton;
+class QCheckBox;
 
 class DlgConnect : public QDialog {
 	Q_OBJECT
@@ -20,6 +21,7 @@ private slots:
 private:
 	QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel;
 	QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit;
+	QCheckBox *savePasswordCheckBox;
 	QPushButton *okButton, *cancelButton;
 };
 
