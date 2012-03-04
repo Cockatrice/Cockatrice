@@ -22,6 +22,7 @@ class Event_GameJoined;
 class Event_UserMessage;
 class Event_ConnectionClosed;
 class Event_ServerShutdown;
+class Event_ReplayAdded;
 
 enum ClientStatus {
 	StatusDisconnected,
@@ -57,6 +58,7 @@ signals:
 	void userInfoChanged(const ServerInfo_User &userInfo);
 	void buddyListReceived(const QList<ServerInfo_User> &buddyList);
 	void ignoreListReceived(const QList<ServerInfo_User> &ignoreList);
+	void replayAddedEventReceived(const Event_ReplayAdded &event);
 private:
 	int nextCmdId;
 protected slots:

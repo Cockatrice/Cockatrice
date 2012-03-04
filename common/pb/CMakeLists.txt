@@ -32,6 +32,7 @@ SET(PROTO_FILES
 	command_ready_start.proto
 	command_replay_list.proto
 	command_replay_download.proto
+	command_replay_modify_match.proto
 	command_reveal_cards.proto
 	command_roll_die.proto
 	command_set_active_phase.proto
@@ -78,6 +79,7 @@ SET(PROTO_FILES
 	event_move_card.proto
 	event_player_properties_changed.proto
 	event_remove_from_list.proto
+	event_replay_added.proto
 	event_reveal_cards.proto
 	event_roll_die.proto
 	event_room_say.proto
@@ -126,6 +128,7 @@ SET(PROTO_FILES
 	serverinfo_playerproperties.proto
 	serverinfo_player.proto
 	serverinfo_replay.proto
+	serverinfo_replay_match.proto
 	serverinfo_room.proto
 	serverinfo_user.proto
 	serverinfo_zone.proto

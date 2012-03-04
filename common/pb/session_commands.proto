@@ -18,6 +18,7 @@ message SessionCommand {
 		JOIN_ROOM = 1015;
 		REPLAY_LIST = 1100;
 		REPLAY_DOWNLOAD = 1101;
+		REPLAY_MODIFY_MATCH = 1102;
 	}
 	extensions 100 to max;
 }

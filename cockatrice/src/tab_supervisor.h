@@ -50,6 +50,7 @@ private:
 	TabAdmin *tabAdmin;
 	QMap<int, TabRoom *> roomTabs;
 	QMap<int, TabGame *> gameTabs;
+	QList<TabGame *> replayTabs;
 	QMap<QString, TabMessage *> messageTabs;
 	int myAddTab(Tab *tab);
 	void addCloseButtonToTab(Tab *tab, int tabIndex);
@@ -81,6 +82,7 @@ private slots:
 	void roomLeft(TabRoom *tab);
 	TabMessage *addMessageTab(const QString &userName, bool focus);
 	void openReplay(GameReplay *replay);
+	void replayLeft(TabGame *tab);
 	void processUserLeft(const QString &userName);
 	void processUserJoined(const QString &userName);
 	void talkLeft(TabMessage *tab);

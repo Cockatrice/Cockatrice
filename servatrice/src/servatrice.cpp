@@ -30,6 +30,7 @@
 #include "main.h"
 #include "passwordhasher.h"
 #include "pb/game_replay.pb.h"
+#include "pb/event_replay_added.pb.h"
 #include "pb/event_server_message.pb.h"
 #include "pb/event_server_shutdown.pb.h"
 #include "pb/event_connection_closed.pb.h"
@@ -202,6 +203,15 @@ bool Servatrice::openDatabase()
 			return false;
 		nextGameId = query.value(0).toInt() + 1;
 		qDebug() << "set nextGameId to " << nextGameId;
+	}
+	if (!nextReplayId) {
+		QSqlQuery query;
+		if (!query.exec("select max(id) from " + dbPrefix + "_replays"))
+			return false;
+		if (!query.next())
+			return false;
+		nextReplayId = query.value(0).toInt() + 1;
+		qDebug() << "set nextReplayId to " << nextReplayId;
 	}
 	return true;
 }
@@ -582,43 +592,32 @@ void Servatrice::statusUpdate()
 	execSqlQuery(query);
 }
 
-void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const GameReplay &replay)
+void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replayList)
 {
-	Server_Room *room = rooms.value(replay.game_info().room_id());
+	const ServerInfo_Game &gameInfo = replayList.first()->game_info();
+	
+	Server_Room *room = rooms.value(gameInfo.room_id());
+	
+	Event_ReplayAdded replayEvent;
+	ServerInfo_ReplayMatch *replayMatchInfo = replayEvent.mutable_match_info();
+	replayMatchInfo->set_game_id(gameInfo.game_id());
+	replayMatchInfo->set_room_name(room->getName().toStdString());
+	replayMatchInfo->set_time_started(QDateTime::currentDateTime().addSecs(-secondsElapsed).toTime_t());
+	replayMatchInfo->set_length(secondsElapsed);
+	replayMatchInfo->set_game_name(gameInfo.description());
 	
 	const QStringList &allGameTypes = room->getGameTypes();
 	QStringList gameTypes;
-	for (int i = replay.game_info().game_types_size() - 1; i >= 0; --i)
-		gameTypes.append(allGameTypes[replay.game_info().game_types(i)]);
-	
-	QByteArray replayBlob;
-	const unsigned int size = replay.ByteSize();
-	replayBlob.resize(size);
-	replay.SerializeToArray(replayBlob.data(), size);
-	
-	QMutexLocker locker(&dbMutex);
-	if (!checkSql())
-		return;
-	
-	QSqlQuery query1;
-	query1.prepare("insert into " + dbPrefix + "_games (room_name, id, descr, creator_name, password, game_types, player_count, time_started, time_finished, replay) values (:id_room, :id_game, :descr, :creator_name, :password, :game_types, :player_count, date_sub(now(), interval :seconds second), now(), :replay)");
-	query1.bindValue(":room_name", room->getName());
-	query1.bindValue(":id_game", replay.game_info().game_id());
-	query1.bindValue(":descr", QString::fromStdString(replay.game_info().description()));
-	query1.bindValue(":creator_name", QString::fromStdString(replay.game_info().creator_info().name()));
-	query1.bindValue(":password", replay.game_info().with_password() ? 1 : 0);
-	query1.bindValue(":game_types", gameTypes.isEmpty() ? QString("") : gameTypes.join(", "));
-	query1.bindValue(":player_count", replay.game_info().max_players());
-	query1.bindValue(":seconds", secondsElapsed);
-	query1.bindValue(":replay", replayBlob);
-	if (!execSqlQuery(query1))
-		return;
+	for (int i = gameInfo.game_types_size() - 1; i >= 0; --i)
+		gameTypes.append(allGameTypes[gameInfo.game_types(i)]);
 	
 	QVariantList gameIds1, playerNames, gameIds2, userIds, replayNames;
 	QSetIterator<QString> playerIterator(allPlayersEver);
 	while (playerIterator.hasNext()) {
-		gameIds1.append(replay.game_info().game_id());
-		playerNames.append(playerIterator.next());
+		gameIds1.append(gameInfo.game_id());
+		const QString &playerName = playerIterator.next();
+		playerNames.append(playerName);
+		replayMatchInfo->add_player_names(playerName.toStdString());
 	}
 	QSet<QString> allUsersInGame = allPlayersEver + allSpectatorsEver;
 	QSetIterator<QString> allUsersIterator(allUsersInGame);
@@ -626,16 +625,70 @@ void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &a
 		int id = getUserIdInDB(allUsersIterator.next());
 		if (id == -1)
 			continue;
-		gameIds2.append(replay.game_info().game_id());
+		gameIds2.append(gameInfo.game_id());
 		userIds.append(id);
-		replayNames.append(QString::fromStdString(replay.game_info().description()));
+		replayNames.append(QString::fromStdString(gameInfo.description()));
 	}
+	
+	QVariantList replayIds, replayGameIds, replayDurations, replayBlobs;
+	for (int i = 0; i < replayList.size(); ++i) {
+		QByteArray blob;
+		const unsigned int size = replayList[i]->ByteSize();
+		blob.resize(size);
+		replayList[i]->SerializeToArray(blob.data(), size);
+		
+		replayIds.append(QVariant((qulonglong) replayList[i]->replay_id()));
+		replayGameIds.append(gameInfo.game_id());
+		replayDurations.append(replayList[i]->duration_seconds());
+		replayBlobs.append(blob);
+		
+		ServerInfo_Replay *replayInfo = replayMatchInfo->add_replay_list();
+		replayInfo->set_replay_id(replayList[i]->replay_id());
+		replayInfo->set_replay_name(gameInfo.description());
+		replayInfo->set_duration(replayList[i]->duration_seconds());
+	}
+	
+	SessionEvent *sessionEvent = Server_ProtocolHandler::prepareSessionEvent(replayEvent);
+	allUsersIterator.toFront();
+	serverMutex.lock();
+	while (allUsersIterator.hasNext()) {
+		Server_ProtocolHandler *userHandler = users.value(allUsersIterator.next());
+		if (userHandler)
+			userHandler->sendProtocolItem(*sessionEvent);
+	}
+	serverMutex.unlock();
+	delete sessionEvent;
+	
+	QMutexLocker locker(&dbMutex);
+	if (!checkSql())
+		return;
+	
+	QSqlQuery query1;
+	query1.prepare("insert into " + dbPrefix + "_games (room_name, id, descr, creator_name, password, game_types, player_count, time_started, time_finished) values (:id_room, :id_game, :descr, :creator_name, :password, :game_types, :player_count, date_sub(now(), interval :seconds second), now())");
+	query1.bindValue(":room_name", room->getName());
+	query1.bindValue(":id_game", gameInfo.game_id());
+	query1.bindValue(":descr", QString::fromStdString(gameInfo.description()));
+	query1.bindValue(":creator_name", QString::fromStdString(gameInfo.creator_info().name()));
+	query1.bindValue(":password", gameInfo.with_password() ? 1 : 0);
+	query1.bindValue(":game_types", gameTypes.isEmpty() ? QString("") : gameTypes.join(", "));
+	query1.bindValue(":player_count", gameInfo.max_players());
+	query1.bindValue(":seconds", secondsElapsed);
+	if (!execSqlQuery(query1))
+		return;
 	
 	QSqlQuery query2;
 	query2.prepare("insert into " + dbPrefix + "_games_players (id_game, player_name) values (:id_game, :player_name)");
 	query2.bindValue(":id_game", gameIds1);
 	query2.bindValue(":player_name", playerNames);
 	query2.execBatch();
+	
+	QSqlQuery replayQuery1;
+	replayQuery1.prepare("insert into " + dbPrefix + "_replays (id, id_game, duration, replay) values (:id_replay, :id_game, :duration, :replay)");
+	replayQuery1.bindValue(":id_replay", replayIds);
+	replayQuery1.bindValue(":id_game", replayGameIds);
+	replayQuery1.bindValue(":duration", replayDurations);
+	replayQuery1.bindValue(":replay", replayBlobs);
+	replayQuery1.execBatch();
 	
 	QSqlQuery query3;
 	query3.prepare("insert into " + dbPrefix + "_replays_access (id_game, id_player, replay_name) values (:id_game, :id_player, :replay_name)");

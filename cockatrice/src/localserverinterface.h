@@ -20,6 +20,7 @@ private:
 	Response::ResponseCode cmdDeckDownload(const Command_DeckDownload & /*cmd*/, ResponseContainer & /*rc*/) { return Response::RespFunctionNotAllowed; }
 	Response::ResponseCode cmdReplayList(const Command_ReplayList & /*cmd*/, ResponseContainer & /*rc*/) { return Response::RespFunctionNotAllowed; }
 	Response::ResponseCode cmdReplayDownload(const Command_ReplayDownload & /*cmd*/, ResponseContainer & /*rc*/) { return Response::RespFunctionNotAllowed; }
+	Response::ResponseCode cmdReplayModifyMatch(const Command_ReplayModifyMatch &cmd, ResponseContainer &rc) { return Response::RespFunctionNotAllowed; }
 	Response::ResponseCode cmdBanFromServer(const Command_BanFromServer & /*cmd*/, ResponseContainer & /*rc*/) { return Response::RespFunctionNotAllowed; }
 	Response::ResponseCode cmdShutdownServer(const Command_ShutdownServer & /*cmd*/, ResponseContainer & /*rc*/) { return Response::RespFunctionNotAllowed; }
 	Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage & /*cmd*/, ResponseContainer & /*rc*/) { return Response::RespFunctionNotAllowed; }

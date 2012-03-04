@@ -134,7 +134,7 @@ private:
 	ZoneViewLayout *zoneLayout;
 	QAction *playersSeparator;
 	QMenu *phasesMenu;
-	QAction *aConcede, *aLeaveGame, *aNextPhase, *aNextTurn, *aRemoveLocalArrows;
+	QAction *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextTurn, *aRemoveLocalArrows;
 	QList<QAction *> phaseActions;
 
 	Player *addPlayer(int playerId, const ServerInfo_User &info);

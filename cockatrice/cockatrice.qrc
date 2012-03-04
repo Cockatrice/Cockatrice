@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/" >
         <file alias="back.svg" >resources/back.svg</file>
+	<file>resources/lock.svg</file>
 	<file>resources/icon_delete.svg</file>
 	<file>resources/icon_tab_changed.svg</file>
         <file>resources/icon_config_general.svg</file>

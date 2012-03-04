@@ -59,10 +59,12 @@ private:
 	bool spectatorsCanTalk;
 	bool spectatorsSeeEverything;
 	int inactivityCounter;
-	int secondsElapsed;
+	int startTimeOfThisGame, secondsElapsed;
+	bool firstGameStarted;
 	QDateTime startTime;
 	QTimer *pingClock;
-	GameReplay *replay;
+	QList<GameReplay *> replayList;
+	GameReplay *currentReplay;
 signals:
 	void sigStartGameIfReady();
 private slots:

@@ -97,7 +97,7 @@ public:
 	void incTxBytes(quint64 num);
 	void incRxBytes(quint64 num);
 	int getUserIdInDB(const QString &name);
-	void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const GameReplay &replay);
+	void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays);
 protected:
 	int startSession(const QString &userName, const QString &address);
 	void endSession(int sessionId);

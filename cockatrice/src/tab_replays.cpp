@@ -20,6 +20,8 @@
 #include "pb/response.pb.h"
 #include "pb/response_replay_download.pb.h"
 #include "pb/command_replay_download.pb.h"
+#include "pb/command_replay_modify_match.pb.h"
+#include "pb/event_replay_added.pb.h"
 
 TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client)
 	: Tab(_tabSupervisor), client(_client)
@@ -83,13 +85,19 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client)
 	aDownload = new QAction(this);
 	aDownload->setIcon(QIcon(":/resources/arrow_left_green.svg"));
 	connect(aDownload, SIGNAL(triggered()), this, SLOT(actDownload()));
+	aKeep = new QAction(this);
+	aKeep->setIcon(QIcon(":/resources/lock.svg"));
+	connect(aKeep, SIGNAL(triggered()), this, SLOT(actKeepRemoteReplay()));
 	
 	leftToolBar->addAction(aOpenLocalReplay);
 	rightToolBar->addAction(aOpenRemoteReplay);
 	rightToolBar->addAction(aDownload);
+	rightToolBar->addAction(aKeep);
 	
 	retranslateUi();
 	setLayout(hbox);
+	
+	connect(client, SIGNAL(replayAddedEventReceived(const Event_ReplayAdded &)), this, SLOT(replayAddedEventReceived(const Event_ReplayAdded &)));
 }
 
 void TabReplays::retranslateUi()
@@ -100,6 +108,7 @@ void TabReplays::retranslateUi()
 	aOpenLocalReplay->setText(tr("Watch replay"));
 	aOpenRemoteReplay->setText(tr("Watch replay"));
 	aDownload->setText(tr("Download replay"));
+	aKeep->setText(tr("Toggle expiration lock"));
 }
 
 void TabReplays::actOpenLocalReplay()
@@ -123,12 +132,12 @@ void TabReplays::actOpenLocalReplay()
 
 void TabReplays::actOpenRemoteReplay()
 {
-	ServerInfo_Replay const *curRight = serverDirView->getCurrentItem();
+	ServerInfo_Replay const *curRight = serverDirView->getCurrentReplay();
 	if (!curRight)
 		return;
 	
 	Command_ReplayDownload cmd;
-	cmd.set_game_id(curRight->game_id());
+	cmd.set_replay_id(curRight->replay_id());
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
 	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(openRemoteReplayFinished(const Response &)));
@@ -156,13 +165,13 @@ void TabReplays::actDownload()
 		filePath = localDirModel->filePath(curLeft);
 	}
 
-	ServerInfo_Replay const *curRight = serverDirView->getCurrentItem();
+	ServerInfo_Replay const *curRight = serverDirView->getCurrentReplay();
 	if (!curRight)
 		return;
-	filePath += QString("/game_%1.cor").arg(curRight->game_id());
+	filePath += QString("/replay_%1.cor").arg(curRight->replay_id());
 	
 	Command_ReplayDownload cmd;
-	cmd.set_game_id(curRight->game_id());
+	cmd.set_replay_id(curRight->replay_id());
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
 	pend->setExtraData(filePath);
@@ -182,4 +191,38 @@ void TabReplays::downloadFinished(const Response &r)
 	f.open(QIODevice::WriteOnly);
 	f.write((const char *) data.data(), data.size());
 	f.close();
+}
+
+void TabReplays::actKeepRemoteReplay()
+{
+	ServerInfo_ReplayMatch const *curRight = serverDirView->getCurrentReplayMatch();
+	if (!curRight)
+		return;
+	
+	Command_ReplayModifyMatch cmd;
+	cmd.set_game_id(curRight->game_id());
+	cmd.set_do_not_hide(!curRight->do_not_hide());
+	
+	PendingCommand *pend = client->prepareSessionCommand(cmd);
+	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(keepRemoteReplayFinished(const Response &)));
+	client->sendCommand(pend);
+}
+
+void TabReplays::keepRemoteReplayFinished(const Response &r)
+{
+	if (r.response_code() != Response::RespOk)
+		return;
+	
+	PendingCommand *pend = static_cast<PendingCommand *>(sender());
+	const Command_ReplayModifyMatch &cmd = pend->getCommandContainer().session_command(0).GetExtension(Command_ReplayModifyMatch::ext);
+	
+	ServerInfo_ReplayMatch temp;
+	temp.set_do_not_hide(cmd.do_not_hide());
+	                
+	serverDirView->updateMatchInfo(cmd.game_id(), temp);
+}
+
+void TabReplays::replayAddedEventReceived(const Event_ReplayAdded &event)
+{
+	serverDirView->addMatchInfo(event.match_info());
 }

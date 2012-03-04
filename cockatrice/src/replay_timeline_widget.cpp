@@ -63,6 +63,11 @@ QSize ReplayTimelineWidget::sizeHint() const
 	return QSize(-1, 50);
 }
 
+QSize ReplayTimelineWidget::minimumSizeHint() const
+{
+	return QSize(400, 50);
+}
+
 void ReplayTimelineWidget::replayTimerTimeout()
 {
 	currentTime += 200;

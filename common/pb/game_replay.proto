@@ -2,6 +2,8 @@ import "serverinfo_game.proto";
 import "game_event_container.proto";
 
 message GameReplay {
-	optional ServerInfo_Game game_info = 1;
-	repeated GameEventContainer event_list = 2;
+	optional uint64 replay_id = 1;
+	optional ServerInfo_Game game_info = 2;
+	repeated GameEventContainer event_list = 3;
+	optional uint32 duration_seconds = 4;
 }

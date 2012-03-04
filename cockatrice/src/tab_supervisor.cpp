@@ -209,6 +209,11 @@ void TabSupervisor::stop()
 		gameIterator.next().value()->deleteLater();
 	gameTabs.clear();
 
+	QListIterator<TabGame *> replayIterator(replayTabs);
+	while (replayIterator.hasNext())
+		replayIterator.next()->deleteLater();
+	replayTabs.clear();
+
 	QMapIterator<QString, TabMessage *> messageIterator(messageTabs);
 	while (messageIterator.hasNext())
 		messageIterator.next().value()->deleteLater();
@@ -272,7 +277,8 @@ void TabSupervisor::localGameJoined(const Event_GameJoined &event)
 
 void TabSupervisor::gameLeft(TabGame *tab)
 {
-	emit setMenu(0);
+	if (tab == currentWidget())
+		emit setMenu(0);
 
 	gameTabs.remove(tab->getGameId());
 	removeTab(indexOf(tab));
@@ -295,10 +301,29 @@ void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
 
 void TabSupervisor::roomLeft(TabRoom *tab)
 {
-	emit setMenu(0);
-
+	if (tab == currentWidget())
+		emit setMenu(0);
+	
 	roomTabs.remove(tab->getRoomId());
 	removeTab(indexOf(tab));
+}
+
+void TabSupervisor::openReplay(GameReplay *replay)
+{
+	TabGame *replayTab = new TabGame(replay);
+	connect(replayTab, SIGNAL(gameClosing(TabGame *)), this, SLOT(replayLeft(TabGame *)));
+	int tabIndex = myAddTab(replayTab);
+	addCloseButtonToTab(replayTab, tabIndex);
+	replayTabs.append(replayTab);
+	setCurrentWidget(replayTab);
+}
+
+void TabSupervisor::replayLeft(TabGame *tab)
+{
+	if (tab == currentWidget())
+		emit setMenu(0);
+	
+	replayTabs.removeAt(replayTabs.indexOf(tab));
 }
 
 TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus)
@@ -316,15 +341,10 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
 	return tab;
 }
 
-void TabSupervisor::openReplay(GameReplay *replay)
-{
-	TabGame *replayTab = new TabGame(replay);
-	myAddTab(replayTab);
-}
-
 void TabSupervisor::talkLeft(TabMessage *tab)
 {
-	emit setMenu(0);
+	if (tab == currentWidget())
+		emit setMenu(0);
 
 	messageTabs.remove(tab->getUserName());
 	removeTab(indexOf(tab));

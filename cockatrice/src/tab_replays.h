@@ -2,8 +2,8 @@
 #define TAB_REPLAYS_H
 
 #include "tab.h"
-#include "pb/response.pb.h"
 
+class Response;
 class AbstractClient;
 class QTreeView;
 class QFileSystemModel;
@@ -12,6 +12,7 @@ class QToolBar;
 class QGroupBox;
 class RemoteReplayList_TreeWidget;
 class GameReplay;
+class Event_ReplayAdded;
 
 class TabReplays : public Tab {
 	Q_OBJECT
@@ -24,7 +25,7 @@ private:
 	RemoteReplayList_TreeWidget *serverDirView;
 	QGroupBox *leftGroupBox, *rightGroupBox;
 	
-	QAction *aOpenLocalReplay, *aOpenRemoteReplay, *aDownload;
+	QAction *aOpenLocalReplay, *aOpenRemoteReplay, *aDownload, *aKeep;
 private slots:
 	void actOpenLocalReplay();
 	
@@ -33,6 +34,11 @@ private slots:
 	
 	void actDownload();
 	void downloadFinished(const Response &r);
+	
+	void actKeepRemoteReplay();
+	void keepRemoteReplayFinished(const Response &r);
+	
+	void replayAddedEventReceived(const Event_ReplayAdded &event);
 signals:
 	void openReplay(GameReplay *replay);
 public:

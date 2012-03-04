@@ -29,7 +29,7 @@
 #include <QDebug>
 
 Server::Server(QObject *parent)
-	: QObject(parent), serverMutex(QMutex::Recursive), nextGameId(0)
+	: QObject(parent), serverMutex(QMutex::Recursive), nextGameId(0), nextReplayId(0)
 {
 }
 

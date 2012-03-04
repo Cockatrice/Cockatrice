@@ -27,6 +27,7 @@ public:
 	ReplayTimelineWidget(QWidget *parent = 0);
 	void setTimeline(const QList<int> &_replayTimeline);
 	QSize sizeHint() const;
+	QSize minimumSizeHint() const;
 	void setTimeScaleFactor(qreal _timeScaleFactor);
 	int getCurrentEvent() const { return currentEvent; }
 public slots:
