@@ -32,6 +32,7 @@ SET(PROTO_FILES
 	command_ready_start.proto
 	command_replay_list.proto
 	command_replay_download.proto
+	command_replay_modify_match.proto
 	command_reveal_cards.proto
 	command_roll_die.proto
 	command_set_active_phase.proto

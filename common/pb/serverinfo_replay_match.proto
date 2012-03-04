@@ -9,4 +9,5 @@ message ServerInfo_ReplayMatch {
 	optional uint32 length = 5;
 	optional string game_name = 6;
 	repeated string player_names = 7;
+	optional bool do_not_hide = 8;
 }

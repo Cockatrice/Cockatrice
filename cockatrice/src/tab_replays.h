@@ -25,7 +25,7 @@ private:
 	RemoteReplayList_TreeWidget *serverDirView;
 	QGroupBox *leftGroupBox, *rightGroupBox;
 	
-	QAction *aOpenLocalReplay, *aOpenRemoteReplay, *aDownload;
+	QAction *aOpenLocalReplay, *aOpenRemoteReplay, *aDownload, *aKeep;
 private slots:
 	void actOpenLocalReplay();
 	
@@ -34,6 +34,9 @@ private slots:
 	
 	void actDownload();
 	void downloadFinished(const Response &r);
+	
+	void actKeepRemoteReplay();
+	void keepRemoteReplayFinished(const Response &r);
 	
 	void replayAddedEventReceived(const Event_ReplayAdded &event);
 signals:

@@ -33,6 +33,7 @@ private:
 		~MatchNode();
 		void clearTree();
 		const ServerInfo_ReplayMatch &getMatchInfo() { return matchInfo; }
+		void updateMatchInfo(const ServerInfo_ReplayMatch &_matchInfo);
 	};
 	class ReplayNode : public Node {
 	private:
@@ -48,8 +49,10 @@ private:
 	AbstractClient *client;
 	QList<MatchNode *> replayMatches;
 	
-	QIcon dirIcon, fileIcon;
+	QIcon dirIcon, fileIcon, lockIcon;
 	void clearTree();
+	
+	static const int numberOfColumns;
 signals:
 	void treeRefreshed();
 private slots:
@@ -58,7 +61,7 @@ public:
 	RemoteReplayList_TreeModel(AbstractClient *_client, QObject *parent = 0);
 	~RemoteReplayList_TreeModel();
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const;
+	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return numberOfColumns; }
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
@@ -68,6 +71,7 @@ public:
 	ServerInfo_Replay const* getReplay(const QModelIndex &index) const;
 	ServerInfo_ReplayMatch const* getReplayMatch(const QModelIndex &index) const;
 	void addMatchInfo(const ServerInfo_ReplayMatch &matchInfo);
+	void updateMatchInfo(int gameId, const ServerInfo_ReplayMatch &matchInfo);
 };
 
 class RemoteReplayList_TreeWidget : public QTreeView {
@@ -80,7 +84,8 @@ public:
 	ServerInfo_Replay const *getCurrentReplay() const;
 	ServerInfo_ReplayMatch const *getCurrentReplayMatch() const;
 	void refreshTree();
-	void addMatchInfo(const ServerInfo_ReplayMatch &matchInfo);
+	void addMatchInfo(const ServerInfo_ReplayMatch &matchInfo) { treeModel->addMatchInfo(matchInfo); }
+	void updateMatchInfo(int gameId, const ServerInfo_ReplayMatch &matchInfo) { treeModel->updateMatchInfo(gameId, matchInfo); }
 };
 
 #endif

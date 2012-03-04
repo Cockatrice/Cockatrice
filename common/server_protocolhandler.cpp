@@ -50,6 +50,7 @@
 #include "pb/command_deck_del.pb.h"
 #include "pb/command_replay_list.pb.h"
 #include "pb/command_replay_download.pb.h"
+#include "pb/command_replay_modify_match.pb.h"
 #include "pb/response.pb.h"
 #include "pb/response_login.pb.h"
 #include "pb/response_list_users.pb.h"
@@ -241,6 +242,7 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
 			case SessionCommand::DECK_DOWNLOAD: resp = cmdDeckDownload(sc.GetExtension(Command_DeckDownload::ext), rc); break;
 			case SessionCommand::REPLAY_LIST: resp = cmdReplayList(sc.GetExtension(Command_ReplayList::ext), rc); break;
 			case SessionCommand::REPLAY_DOWNLOAD: resp = cmdReplayDownload(sc.GetExtension(Command_ReplayDownload::ext), rc); break;
+			case SessionCommand::REPLAY_MODIFY_MATCH: resp = cmdReplayModifyMatch(sc.GetExtension(Command_ReplayModifyMatch::ext), rc); break;
 			case SessionCommand::GET_GAMES_OF_USER: resp = cmdGetGamesOfUser(sc.GetExtension(Command_GetGamesOfUser::ext), rc); break;
 			case SessionCommand::GET_USER_INFO: resp = cmdGetUserInfo(sc.GetExtension(Command_GetUserInfo::ext), rc); break;
 			case SessionCommand::LIST_ROOMS: resp = cmdListRooms(sc.GetExtension(Command_ListRooms::ext), rc); break;
