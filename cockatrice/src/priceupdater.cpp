@@ -41,18 +41,8 @@ void PriceUpdater::updatePrices()
  */
 void PriceUpdater::downloadFinished()
 {
-    QMap<QString, DecklistCardNode *> cmap;
-    InnerDecklistNode *listRoot = deck->getRoot();
-    for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        for (int j = 0; j < currentZone->size(); j++) {
-            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard)
-                continue;
-            cmap.insert(currentCard->getName().toLower(), currentCard);
-            currentCard->setPrice(0);
-        }
-    }
+
+
 
     QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
     QByteArray result = reply->readAll();
@@ -60,20 +50,28 @@ void PriceUpdater::downloadFinished()
     QScriptEngine engine;
     sc = engine.evaluate("value = " + result);
 
+    QMap<QString, float> cardsPrice;
+
     if (sc.property("cards").isArray()) {
         QScriptValueIterator it(sc.property("cards"));
         while (it.hasNext()) {
             it.next();
             QString name = it.value().property("name").toString().toLower();
             float price = it.value().property("average").toString().toFloat();
-            DecklistCardNode *c = cmap[name];
-            if (!c)
-                continue;
-            if (c->getPrice() == 0 || c->getPrice() > price) {
-                c->setPrice(price);
-            }
+            cardsPrice.insert(name, price);
         }
      }
+
+    InnerDecklistNode *listRoot = deck->getRoot();
+    for (int i = 0; i < listRoot->size(); i++) {
+        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        for (int j = 0; j < currentZone->size(); j++) {
+            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+            if (!currentCard)
+                continue;
+            currentCard->setPrice(cardsPrice[currentCard->getName().toLower()]);
+        }
+    }
 
     reply->deleteLater();
     deleteLater();
