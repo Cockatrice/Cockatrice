@@ -213,6 +213,8 @@ TabGame::TabGame(GameReplay *_replay)
 	replay(_replay),
 	currentReplayStep(0)
 {
+	setAttribute(Qt::WA_DeleteOnClose);
+	
 	gameId = replay->game_info().game_id();
 	gameDescription = QString::fromStdString(replay->game_info().description());
 	
@@ -323,12 +325,13 @@ TabGame::TabGame(GameReplay *_replay)
 	aNextTurn = 0;
 	aRemoveLocalArrows = 0;
 	aConcede = 0;
-	aLeaveGame = new QAction(this);
-	connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
+	aLeaveGame = 0;
+	aCloseReplay = new QAction(this);
+	connect(aCloseReplay, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
 	
 	phasesMenu = 0;
 	tabMenu = new QMenu(this);
-	tabMenu->addAction(aLeaveGame);
+	tabMenu->addAction(aCloseReplay);
 	
 	retranslateUi();
 	setLayout(superMainLayout);
@@ -424,6 +427,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	connect(aConcede, SIGNAL(triggered()), this, SLOT(actConcede()));
 	aLeaveGame = new QAction(this);
 	connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
+	aCloseReplay = 0;
 	
 	phasesMenu = new QMenu(this);
 	for (int i = 0; i < phasesToolbar->phaseCount(); ++i) {
@@ -502,8 +506,14 @@ void TabGame::retranslateUi()
 		aConcede->setText(tr("&Concede"));
 		aConcede->setShortcut(tr("F2"));
 	}
-	aLeaveGame->setText(tr("&Leave game"));
-	aLeaveGame->setShortcut(tr("Ctrl+Q"));
+	if (aLeaveGame) {
+		aLeaveGame->setText(tr("&Leave game"));
+		aLeaveGame->setShortcut(tr("Ctrl+Q"));
+	}
+	if (aCloseReplay) {
+		aCloseReplay->setText(tr("C&lose replay"));
+		aCloseReplay->setShortcut(tr("Ctrl+Q"));
+	}
 	
 	if (sayLabel)
 		sayLabel->setText(tr("&Say:"));
@@ -613,8 +623,9 @@ void TabGame::actLeaveGame()
 	if (!spectator)
 		if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
 			return;
-
-	sendGameCommand(Command_LeaveGame());
+	
+	if (!replay)
+		sendGameCommand(Command_LeaveGame());
 	deleteLater();
 }
 

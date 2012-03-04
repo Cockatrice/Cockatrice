@@ -38,6 +38,8 @@ void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 WndDeckEditor::WndDeckEditor(QWidget *parent)
 	: QMainWindow(parent)
 {
+	setAttribute(Qt::WA_DeleteOnClose);
+	
 	aSearch = new QAction(tr("&Search..."), this);
 	aSearch->setIcon(QIcon(":/resources/icon_search.svg"));
 	connect(aSearch, SIGNAL(triggered()), this, SLOT(actSearch()));
