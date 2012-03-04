@@ -24,6 +24,7 @@
 #include <QMutex>
 #include <QSslCertificate>
 #include <QSslKey>
+#include <QHostAddress>
 #include "server.h"
 
 class QSqlDatabase;
@@ -34,6 +35,7 @@ class QTimer;
 class GameReplay;
 class Servatrice;
 class ServerSocketInterface;
+class NetworkServerInterface;
 
 class Servatrice_GameServer : public QTcpServer {
 	Q_OBJECT
@@ -58,6 +60,19 @@ public:
 		: QTcpServer(parent), server(_server), cert(_cert), privateKey(_privateKey) { }
 protected:
 	void incomingConnection(int socketDescriptor);
+};
+
+class ServerProperties {
+public:
+	int id;
+	QSslCertificate cert;
+	QString hostname;
+	QHostAddress address;
+	int gamePort;
+	int controlPort;
+	
+	ServerProperties(int _id, const QSslCertificate &_cert, const QString &_hostname, const QHostAddress &_address, int _gamePort, int _controlPort)
+		: id(_id), cert(_cert), hostname(_hostname), address(_address), gamePort(_gamePort), controlPort(_controlPort) { }
 };
 
 class Servatrice : public Server
@@ -85,6 +100,7 @@ public:
 	int getMaxGamesPerUser() const { return maxGamesPerUser; }
 	bool getThreaded() const { return threaded; }
 	QString getDbPrefix() const { return dbPrefix; }
+	int getServerId() const { return serverId; }
 	void updateLoginMessage();
 	ServerInfo_User getUserData(const QString &name, bool withId = false);
 	int getUsersWithAddress(const QHostAddress &address) const;
@@ -98,11 +114,21 @@ public:
 	void incRxBytes(quint64 num);
 	int getUserIdInDB(const QString &name);
 	void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays);
+	
+	void addNetworkServerInterface(NetworkServerInterface *interface);
+	void removeNetworkServerInterface(NetworkServerInterface *interface);
+
+	QList<ServerProperties> getServerList() const;
 protected:
 	int startSession(const QString &userName, const QString &address);
 	void endSession(int sessionId);
 	bool userExists(const QString &user);
 	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr);
+	
+	void clearSessionTables();
+	void lockSessionTables();
+	void unlockSessionTables();
+	bool userSessionExists(const QString &userName);
 private:
 	enum AuthenticationMethod { AuthenticationNone, AuthenticationSql };
 	enum DatabaseType { DatabaseNone, DatabaseMySql };
@@ -127,6 +153,12 @@ private:
 	QString shutdownReason;
 	int shutdownMinutes;
 	QTimer *shutdownTimer;
+	
+	mutable QMutex serverListMutex;
+	QList<ServerProperties> serverList;
+	void updateServerList();
+	
+	QList<NetworkServerInterface *> networkServerInterfaces;
 };
 
 #endif

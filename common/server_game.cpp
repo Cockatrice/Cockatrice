@@ -270,6 +270,7 @@ void Server_Game::doStartGameIfReady()
 	activePlayer = -1;
 	nextTurn();
 	
+	locker.unlock();
 	room->broadcastGameListUpdate(this);
 }
 

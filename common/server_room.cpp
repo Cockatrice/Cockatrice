@@ -24,7 +24,7 @@ Server_Room::~Server_Room()
 		delete gameList[i];
 	games.clear();
 	
-	clear();
+	userList.clear();
 }
 
 Server *Server_Room::getServer() const
@@ -39,7 +39,7 @@ ServerInfo_Room Server_Room::getInfo(bool complete, bool showGameTypes, bool upd
 	ServerInfo_Room result;
 	result.set_room_id(id);
 	result.set_game_count(games.size());
-	result.set_player_count(size());
+	result.set_player_count(userList.size());
 	
 	if (!updating) {
 		result.set_name(name.toStdString());
@@ -52,8 +52,8 @@ ServerInfo_Room Server_Room::getInfo(bool complete, bool showGameTypes, bool upd
 		while (gameIterator.hasNext())
 			result.add_game_list()->CopyFrom(gameIterator.next().value()->getInfo());
 		
-		for (int i = 0; i < size(); ++i)
-			result.add_user_list()->CopyFrom(at(i)->copyUserInfo(false));
+		for (int i = 0; i < userList.size(); ++i)
+			result.add_user_list()->CopyFrom(userList[i]->copyUserInfo(false));
 	}
 	if (complete || showGameTypes)
 		for (int i = 0; i < gameTypes.size(); ++i) {
@@ -75,21 +75,22 @@ RoomEvent *Server_Room::prepareRoomEvent(const ::google::protobuf::Message &room
 
 void Server_Room::addClient(Server_ProtocolHandler *client)
 {
-	QMutexLocker locker(&roomMutex);
-	
 	Event_JoinRoom event;
 	event.mutable_user_info()->CopyFrom(client->copyUserInfo(false));
 	sendRoomEvent(prepareRoomEvent(event));
 	
-	append(client);
+	roomMutex.lock();
+	userList.append(client);
+	roomMutex.unlock();
+	
 	emit roomInfoChanged();
 }
 
 void Server_Room::removeClient(Server_ProtocolHandler *client)
 {
-	QMutexLocker locker(&roomMutex);
-	
-	removeAt(indexOf(client));
+	roomMutex.lock();
+	userList.removeAt(userList.indexOf(client));
+	roomMutex.unlock();
 	
 	Event_LeaveRoom event;
 	event.set_name(client->getUserInfo()->name());
@@ -110,8 +111,8 @@ void Server_Room::sendRoomEvent(RoomEvent *event)
 {
 	QMutexLocker locker(&roomMutex);
 	
-	for (int i = 0; i < size(); ++i)
-		at(i)->sendProtocolItem(*event);
+	for (int i = 0; i < userList.size(); ++i)
+		userList[i]->sendProtocolItem(*event);
 	delete event;
 }
 

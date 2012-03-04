@@ -83,6 +83,7 @@ SET(PROTO_FILES
 	event_reveal_cards.proto
 	event_roll_die.proto
 	event_room_say.proto
+	event_server_complete_list.proto
 	event_server_identification.proto
 	event_server_message.proto
 	event_server_shutdown.proto
@@ -132,6 +133,7 @@ SET(PROTO_FILES
 	serverinfo_room.proto
 	serverinfo_user.proto
 	serverinfo_zone.proto
+	servernetwork_message.proto
 	server_message.proto
 	session_commands.proto
 	session_event.proto

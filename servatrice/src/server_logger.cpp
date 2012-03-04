@@ -31,16 +31,16 @@ ServerLogger::~ServerLogger()
 	flushBuffer();
 }
 
-void ServerLogger::logMessage(QString message, Server_ProtocolHandler *ssi)
+void ServerLogger::logMessage(QString message, void *caller)
 {
 	if (!logFile)
 		return;
 	
 	bufferMutex.lock();
-	QString ssiString;
-	if (ssi)
-		ssiString = QString::number((qulonglong) ssi, 16) + " ";
-	buffer.append(QDateTime::currentDateTime().toString() + " " + QString::number((qulonglong) QThread::currentThread(), 16) + " " + ssiString + message);
+	QString callerString;
+	if (caller)
+		callerString = QString::number((qulonglong) caller, 16) + " ";
+	buffer.append(QDateTime::currentDateTime().toString() + " " + QString::number((qulonglong) QThread::currentThread(), 16) + " " + callerString + message);
 	bufferMutex.unlock();
 	
 	emit sigFlushBuffer();

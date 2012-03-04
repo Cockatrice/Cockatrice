@@ -9,6 +9,8 @@ SET(servatrice_SOURCES
  src/server_logger.cpp 
  src/serversocketinterface.cpp 
  src/serversocketthread.cpp
+ src/networkserverinterface.cpp
+ src/networkserverthread.cpp
  ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
 )
 SET(servatrice_HEADERS
@@ -16,6 +18,8 @@ SET(servatrice_HEADERS
  src/server_logger.h 
  src/serversocketinterface.h 
  src/serversocketthread.h
+ src/networkserverinterface.h
+ src/networkserverthread.h
 )
 
 SET(QT_DONTUSE_QTGUI)

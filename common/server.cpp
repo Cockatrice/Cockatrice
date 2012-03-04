@@ -54,6 +54,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	QMutexLocker locker(&serverMutex);
 	if (name.size() > 35)
 		name = name.left(35);
+	
 	AuthenticationResult authState = checkUserPassword(session, name, password, reasonStr);
 	if ((authState == NotLoggedIn) || (authState == UserIsBanned))
 		return authState;
@@ -62,8 +63,10 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	data.set_address(session->getAddress().toStdString());
 	name = QString::fromStdString(data.name()); // Compensate for case indifference
 	
+	lockSessionTables();
+	
 	if (authState == PasswordRight) {
-		if (users.contains(name)) {
+		if (users.contains(name) || userSessionExists(name)) {
 			qDebug("Login denied: would overwrite old session");
 			return WouldOverwriteOldSession;
 		}
@@ -72,7 +75,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 		// don't interfere with registered user names though.
 		QString tempName = name;
 		int i = 0;
-		while (users.contains(tempName) || userExists(tempName))
+		while (users.contains(tempName) || userExists(tempName) || userSessionExists(tempName))
 			tempName = name + "_" + QString::number(++i);
 		name = tempName;
 		data.set_name(name.toStdString());
@@ -83,7 +86,9 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	users.insert(name, session);
 	qDebug() << "Server::loginUser: name=" << name;
 	
-	session->setSessionId(startSession(name, session->getAddress()));
+	session->setSessionId(startSession(name, session->getAddress()));	
+	unlockSessionTables();
+	
 	qDebug() << "session id:" << session->getSessionId();
 	
 	Event_UserJoined event;

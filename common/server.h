@@ -65,6 +65,11 @@ protected:
 	int getGamesCount() const;
 	int nextGameId, nextReplayId;
 	void addRoom(Server_Room *newRoom);
+
+	virtual void clearSessionTables() { }
+	virtual void lockSessionTables() { }
+	virtual void unlockSessionTables() { }
+	virtual bool userSessionExists(const QString &userName) { return false; }
 };
 
 #endif

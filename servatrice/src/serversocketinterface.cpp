@@ -64,7 +64,6 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_s
 	connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(catchSocketError(QAbstractSocket::SocketError)));
 	connect(this, SIGNAL(outputBufferChanged()), this, SLOT(flushOutputBuffer()), Qt::QueuedConnection);
-	connect(this, SIGNAL(logDebugMessage(const QString &, Server_ProtocolHandler *)), logger, SLOT(logMessage(QString, Server_ProtocolHandler *)));
 	
 	Event_ServerIdentification identEvent;
 	identEvent.set_server_name(servatrice->getServerName().toStdString());

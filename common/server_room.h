@@ -16,7 +16,7 @@ class ServerInfo_Game;
 class Server_Game;
 class Server;
 
-class Server_Room : public QObject, public QList<Server_ProtocolHandler *> {
+class Server_Room : public QObject {
 	Q_OBJECT
 signals:
 	void roomInfoChanged();
@@ -28,6 +28,7 @@ private:
 	QString joinMessage;
 	QStringList gameTypes;
 	QMap<int, Server_Game *> games;
+	QList<Server_ProtocolHandler *> userList;
 public:
 	mutable QMutex roomMutex;
 	Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent);

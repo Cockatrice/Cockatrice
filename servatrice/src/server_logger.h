@@ -18,7 +18,7 @@ public:
 	~ServerLogger();
 	static void hupSignalHandler(int unused);
 public slots:
-	void logMessage(QString message, Server_ProtocolHandler *ssi = 0);
+	void logMessage(QString message, void *caller = 0);
 private slots:
 	void handleSigHup();
 	void flushBuffer();

@@ -577,6 +577,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
 	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
+	server->serverMutex.lock();
 	QString receiver = QString::fromStdString(cmd.user_name());
 	Server_ProtocolHandler *userHandler = server->getUsers().value(receiver);
 	if (!userHandler)
@@ -592,6 +593,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
 	SessionEvent *se = prepareSessionEvent(event);
 	userHandler->sendProtocolItem(*se);
 	rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, se);
+	server->serverMutex.unlock();
+	
 	return Response::RespOk;
 }
 
@@ -631,10 +634,12 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetU
 	if (userName.isEmpty())
 		re->mutable_user_info()->CopyFrom(*userInfo);
 	else {
+		server->serverMutex.lock();
 		Server_ProtocolHandler *handler = server->getUsers().value(userName);
 		if (!handler)
 			return Response::RespNameNotFound;
 		re->mutable_user_info()->CopyFrom(handler->copyUserInfo(true, userInfo->user_level() & ServerInfo_User::IsModerator));
+		server->serverMutex.unlock();
 	}
 	
 	rc.setResponseExtension(re);
@@ -690,9 +695,11 @@ Response::ResponseCode Server_ProtocolHandler::cmdListUsers(const Command_ListUs
 		return Response::RespLoginNeeded;
 	
 	Response_ListUsers *re = new Response_ListUsers;
+	server->serverMutex.lock();
 	QMapIterator<QString, Server_ProtocolHandler *> userIterator = server->getUsers();
 	while (userIterator.hasNext())
 		re->add_user_list()->CopyFrom(userIterator.next().value()->copyUserInfo(false));
+	server->serverMutex.unlock();
 	
 	acceptsUserListChanges = true;
 	

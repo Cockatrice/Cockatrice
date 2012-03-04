@@ -1,0 +1,24 @@
+import "response.proto";
+import "session_event.proto";
+import "commands.proto";
+import "game_event_container.proto";
+import "room_event.proto";
+
+message ServerNetworkMessage {
+	enum MessageType {
+		RESPONSE = 0;
+		SESSION_EVENT = 1;
+		GAME_COMMAND_CONTAINER = 2;
+		GAME_EVENT_CONTAINER = 3;
+		ROOM_EVENT = 4;
+	}
+	optional MessageType message_type = 1;
+	
+	optional sint32 game_id = 10;
+	
+	optional Response response = 100;
+	optional SessionEvent session_event = 101;
+	optional CommandContainer game_command = 102;
+	optional GameEventContainer game_event_container = 103;
+	optional RoomEvent room_event = 104;
+}
