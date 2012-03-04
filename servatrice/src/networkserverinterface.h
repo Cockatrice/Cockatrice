@@ -25,8 +25,10 @@ private:
 	int messageLength;
 	
 	void processMessage(const ServerNetworkMessage &item);
+	void sharedCtor();
 public:
 	NetworkServerInterface(Servatrice *_server, QSslSocket *_socket);
+	NetworkServerInterface(const QString &peerHostName, const QString &peerAddress, int peerPort, Servatrice *_server, QSslSocket *_socket);
 	~NetworkServerInterface();
 	
 	void transmitMessage(const ServerNetworkMessage &item);

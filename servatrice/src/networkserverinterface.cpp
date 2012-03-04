@@ -9,14 +9,17 @@
 #include "pb/event_server_complete_list.pb.h"
 #include <google/protobuf/descriptor.h>
 
-NetworkServerInterface::NetworkServerInterface(Servatrice *_server, QSslSocket *_socket)
-	: QObject(), server(_server), socket(_socket), messageInProgress(false)
+void NetworkServerInterface::sharedCtor()
 {
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
 	connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(catchSocketError(QAbstractSocket::SocketError)));
 	connect(this, SIGNAL(outputBufferChanged()), this, SLOT(flushOutputBuffer()), Qt::QueuedConnection);
-	
+}
+
+NetworkServerInterface::NetworkServerInterface(Servatrice *_server, QSslSocket *_socket)
+	: QObject(), server(_server), socket(_socket), messageInProgress(false)
+{
 	Event_ServerCompleteList event;
 	event.set_server_id(server->getServerId());
 	
@@ -46,6 +49,29 @@ NetworkServerInterface::NetworkServerInterface(Servatrice *_server, QSslSocket *
 	server->serverMutex.unlock();
 }
 
+NetworkServerInterface::NetworkServerInterface(const QString &peerHostName, const QString &peerAddress, int peerPort, Servatrice *_server, QSslSocket *_socket)
+	: QObject(), server(_server), socket(_socket), messageInProgress(false)
+{
+	sharedCtor();
+	
+	socket->connectToHostEncrypted(peerAddress, peerPort, peerHostName);
+	if (!socket->waitForConnected(5000)) {
+		qDebug() << "[SN] Socket error:" << socket->errorString();
+		deleteLater();
+		return;
+	}
+	if (!socket->waitForEncrypted(5000)) {
+		QList<QSslError> sslErrors(socket->sslErrors());
+		if (sslErrors.isEmpty())
+			qDebug() << "[SN] SSL handshake timeout, terminating connection";
+		else
+			qDebug() << "[SN] SSL errors:" << sslErrors;
+		deleteLater();
+		return;
+	}
+	server->addNetworkServerInterface(this);
+}
+
 NetworkServerInterface::~NetworkServerInterface()
 {
 	logger->logMessage("[SN] session ended", this);
@@ -56,6 +82,7 @@ NetworkServerInterface::~NetworkServerInterface()
 void NetworkServerInterface::flushOutputBuffer()
 {
 	QMutexLocker locker(&outputBufferMutex);
+	qDebug("FLUSH");
 	if (outputBuffer.isEmpty())
 		return;
 	server->incTxBytes(outputBuffer.size());
@@ -96,7 +123,7 @@ void NetworkServerInterface::readClient()
 
 void NetworkServerInterface::catchSocketError(QAbstractSocket::SocketError socketError)
 {
-	qDebug() << "Socket error:" << socketError;
+	qDebug() << "[SN] Socket error:" << socketError;
 	
 	deleteLater();
 }
@@ -112,11 +139,14 @@ void NetworkServerInterface::transmitMessage(const ServerNetworkMessage &item)
 	buf.data()[1] = (unsigned char) (size >> 16);
 	buf.data()[0] = (unsigned char) (size >> 24);
 	
-	QMutexLocker locker(&outputBufferMutex);
+	outputBufferMutex.lock();
 	outputBuffer.append(buf);
+	outputBufferMutex.unlock();
+	qDebug("TRANSMIT");
 	emit outputBufferChanged();
 }
 
 void NetworkServerInterface::processMessage(const ServerNetworkMessage &item)
 {
+	qDebug() << QString::fromStdString(item.DebugString());
 }

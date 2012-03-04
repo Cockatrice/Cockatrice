@@ -57,28 +57,8 @@ void Servatrice_NetworkServer::incomingConnection(int socketDescriptor)
 Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	: Server(parent), dbMutex(QMutex::Recursive), settings(_settings), uptime(0), shutdownTimer(0)
 {
-	pingClock = new QTimer(this);
-	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
-	pingClock->start(1000);
-	
 	serverName = settings->value("server/name").toString();
 	serverId = settings->value("server/id", 0).toInt();
-	int statusUpdateTime = settings->value("server/statusupdate").toInt();
-	statusUpdateClock = new QTimer(this);
-	connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
-	if (statusUpdateTime != 0) {
-		qDebug() << "Starting status update clock, interval " << statusUpdateTime << " ms";
-		statusUpdateClock->start(statusUpdateTime);
-	}
-	
-	threaded = settings->value("server/threaded", false).toInt();
-	gameServer = new Servatrice_GameServer(this, threaded, this);
-	const int gamePort = settings->value("server/port", 4747).toInt();
-	qDebug() << "Starting server on port" << gamePort;
-	if (gameServer->listen(QHostAddress::Any, gamePort))
-		qDebug() << "Server listening.";
-	else
-		qDebug() << "gameServer->listen(): Error.";
 	
 	const QString authenticationMethodStr = settings->value("authentication/method").toString();
 	if (authenticationMethodStr == "sql")
@@ -97,37 +77,6 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	
 	updateServerList();
 	clearSessionTables();
-	
-	try { if (settings->value("servernetwork/active", 0).toInt()) {
-		qDebug() << "Connecting to server network.";
-		const QString certFileName = settings->value("servernetwork/ssl_cert").toString();
-		const QString keyFileName = settings->value("servernetwork/ssl_key").toString();
-		qDebug() << "Loading certificate...";
-		QFile certFile(certFileName);
-		if (!certFile.open(QIODevice::ReadOnly))
-			throw QString("Error opening certificate file: %1").arg(certFileName);
-		QSslCertificate cert(&certFile);
-		if (!cert.isValid())
-			throw(QString("Invalid certificate."));
-		qDebug() << "Loading private key...";
-		QFile keyFile(keyFileName);
-		if (!keyFile.open(QIODevice::ReadOnly))
-			throw QString("Error opening private key file: %1").arg(keyFileName);
-		QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
-		if (key.isNull())
-			throw QString("Invalid private key.");
-		
-		const int networkPort = settings->value("servernetwork/port", 14747).toInt();
-		qDebug() << "Starting network server on port" << networkPort;
-		
-		networkServer = new Servatrice_NetworkServer(this, cert, key, this);
-		if (networkServer->listen(QHostAddress::Any, networkPort))
-			qDebug() << "Network server listening.";
-		else
-			throw QString("networkServer->listen(): Error.");
-	} } catch (QString error) {
-		qDebug() << "ERROR --" << error;
-	}
 	
 	int size = settings->beginReadArray("rooms");
 	for (int i = 0; i < size; ++i) {
@@ -164,6 +113,76 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	maxMessageCountPerInterval = settings->value("security/max_message_count_per_interval").toInt();
 	maxMessageSizePerInterval = settings->value("security/max_message_size_per_interval").toInt();
 	maxGamesPerUser = settings->value("security/max_games_per_user").toInt();
+
+	try { if (settings->value("servernetwork/active", 0).toInt()) {
+		qDebug() << "Connecting to server network.";
+		const QString certFileName = settings->value("servernetwork/ssl_cert").toString();
+		const QString keyFileName = settings->value("servernetwork/ssl_key").toString();
+		qDebug() << "Loading certificate...";
+		QFile certFile(certFileName);
+		if (!certFile.open(QIODevice::ReadOnly))
+			throw QString("Error opening certificate file: %1").arg(certFileName);
+		QSslCertificate cert(&certFile);
+		if (!cert.isValid())
+			throw(QString("Invalid certificate."));
+		qDebug() << "Loading private key...";
+		QFile keyFile(keyFileName);
+		if (!keyFile.open(QIODevice::ReadOnly))
+			throw QString("Error opening private key file: %1").arg(keyFileName);
+		QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
+		if (key.isNull())
+			throw QString("Invalid private key.");
+		
+		const int networkPort = settings->value("servernetwork/port", 14747).toInt();
+		qDebug() << "Starting network server on port" << networkPort;
+		
+		networkServer = new Servatrice_NetworkServer(this, cert, key, this);
+		if (networkServer->listen(QHostAddress::Any, networkPort))
+			qDebug() << "Network server listening.";
+		else
+			throw QString("networkServer->listen(): Error.");
+		
+		QMutableListIterator<ServerProperties> serverIterator(serverList);
+		while (serverIterator.hasNext()) {
+			const ServerProperties &prop = serverIterator.next();
+			if (prop.cert == cert) {
+				serverIterator.remove();
+				continue;
+			}
+			
+			NetworkServerThread *thread = new NetworkServerThread(prop.hostname, prop.address.toString(), prop.controlPort, prop.cert, this, cert, key);
+			thread->start();
+			
+			QMutex initMutex;
+			initMutex.lock();
+			thread->initWaitCondition.wait(&initMutex);
+		}
+			
+	} } catch (QString error) {
+		qDebug() << "ERROR --" << error;
+	}
+	
+	pingClock = new QTimer(this);
+	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
+	pingClock->start(1000);
+	
+	int statusUpdateTime = settings->value("server/statusupdate").toInt();
+	statusUpdateClock = new QTimer(this);
+	connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
+	if (statusUpdateTime != 0) {
+		qDebug() << "Starting status update clock, interval " << statusUpdateTime << " ms";
+		statusUpdateClock->start(statusUpdateTime);
+	}
+	
+	threaded = settings->value("server/threaded", false).toInt();
+	gameServer = new Servatrice_GameServer(this, threaded, this);
+	const int gamePort = settings->value("server/port", 4747).toInt();
+	qDebug() << "Starting server on port" << gamePort;
+	if (gameServer->listen(QHostAddress::Any, gamePort))
+		qDebug() << "Server listening.";
+	else
+		qDebug() << "gameServer->listen(): Error.";
+	
 }
 
 Servatrice::~Servatrice()
