@@ -25,7 +25,7 @@
 #include "server_room.h"
 #include "serversocketinterface.h"
 #include "serversocketthread.h"
-#include "networkserverthread.h"
+#include "networkserverinterface.h"
 #include "server_logger.h"
 #include "main.h"
 #include "passwordhasher.h"
@@ -50,8 +50,15 @@ void Servatrice_GameServer::incomingConnection(int socketDescriptor)
 
 void Servatrice_NetworkServer::incomingConnection(int socketDescriptor)
 {
-	NetworkServerThread *thread = new NetworkServerThread(socketDescriptor, server, cert, privateKey);
+	QThread *thread = new QThread;
+	connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+	
+	NetworkServerInterface *interface = new NetworkServerInterface(socketDescriptor, cert, privateKey, server);
+	interface->moveToThread(thread);
+	connect(interface, SIGNAL(destroyed()), thread, SLOT(quit()));
+	
 	thread->start();
+	QMetaObject::invokeMethod(interface, "initServer", Qt::QueuedConnection);
 }
 
 Servatrice::Servatrice(QSettings *_settings, QObject *parent)
@@ -150,12 +157,15 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 				continue;
 			}
 			
-			NetworkServerThread *thread = new NetworkServerThread(prop.hostname, prop.address.toString(), prop.controlPort, prop.cert, this, cert, key);
-			thread->start();
+			QThread *thread = new QThread;
+			connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 			
-			QMutex initMutex;
-			initMutex.lock();
-			thread->initWaitCondition.wait(&initMutex);
+			NetworkServerInterface *interface = new NetworkServerInterface(prop.hostname, prop.address.toString(), prop.controlPort, prop.cert, cert, key, this);
+			interface->moveToThread(thread);
+			connect(interface, SIGNAL(destroyed()), thread, SLOT(quit()));
+			
+			thread->start();
+			QMetaObject::invokeMethod(interface, "initClient", Qt::BlockingQueuedConnection);
 		}
 			
 	} } catch (QString error) {

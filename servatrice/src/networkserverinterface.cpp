@@ -9,17 +9,75 @@
 #include "pb/event_server_complete_list.pb.h"
 #include <google/protobuf/descriptor.h>
 
-void NetworkServerInterface::sharedCtor()
+void NetworkServerInterface::sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey)
 {
+	socket = new QSslSocket(this);
+	socket->setLocalCertificate(cert);
+	socket->setPrivateKey(privateKey);
+	
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
 	connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(catchSocketError(QAbstractSocket::SocketError)));
 	connect(this, SIGNAL(outputBufferChanged()), this, SLOT(flushOutputBuffer()), Qt::QueuedConnection);
 }
 
-NetworkServerInterface::NetworkServerInterface(Servatrice *_server, QSslSocket *_socket)
-	: QObject(), server(_server), socket(_socket), messageInProgress(false)
+NetworkServerInterface::NetworkServerInterface(int _socketDescriptor, const QSslCertificate &cert, const QSslKey &privateKey, Servatrice *_server)
+	: QObject(), socketDescriptor(_socketDescriptor), server(_server), messageInProgress(false)
 {
+	sharedCtor(cert, privateKey);
+}
+
+NetworkServerInterface::NetworkServerInterface(const QString &_peerHostName, const QString &_peerAddress, int _peerPort, const QSslCertificate &_peerCert, const QSslCertificate &cert, const QSslKey &privateKey, Servatrice *_server)
+		: QObject(), peerHostName(_peerHostName), peerAddress(_peerAddress), peerPort(_peerPort), peerCert(_peerCert), server(_server), messageInProgress(false)
+{
+	sharedCtor(cert, privateKey);
+}
+
+NetworkServerInterface::~NetworkServerInterface()
+{
+	logger->logMessage("[SN] session ended", this);
+	
+	flushOutputBuffer();
+}
+
+void NetworkServerInterface::initServer()
+{
+	socket->setSocketDescriptor(socketDescriptor);
+	
+	logger->logMessage(QString("[SN] incoming connection: %1").arg(socket->peerAddress().toString()));
+	
+	QList<ServerProperties> serverList = server->getServerList();
+	int listIndex = -1;
+	for (int i = 0; i < serverList.size(); ++i)
+		if (serverList[i].address == socket->peerAddress()) {
+			listIndex = i;
+			break;
+		}
+	if (listIndex == -1) {
+		logger->logMessage(QString("[SN] address %1 unknown, terminating connection").arg(socket->peerAddress().toString()));
+		deleteLater();
+		return;
+	}
+	
+	socket->startServerEncryption();
+	if (!socket->waitForEncrypted(5000)) {
+		QList<QSslError> sslErrors(socket->sslErrors());
+		if (sslErrors.isEmpty())
+			qDebug() << "[SN] SSL handshake timeout, terminating connection";
+		else
+			qDebug() << "[SN] SSL errors:" << sslErrors;
+		deleteLater();
+		return;
+	}
+	
+	if (serverList[listIndex].cert == socket->peerCertificate())
+		logger->logMessage(QString("[SN] Peer authenticated as " + serverList[listIndex].hostname));
+	else {
+		logger->logMessage(QString("[SN] Authentication failed, terminating connection"));
+		deleteLater();
+		return;
+	}
+	
 	Event_ServerCompleteList event;
 	event.set_server_id(server->getServerId());
 	
@@ -49,11 +107,14 @@ NetworkServerInterface::NetworkServerInterface(Servatrice *_server, QSslSocket *
 	server->serverMutex.unlock();
 }
 
-NetworkServerInterface::NetworkServerInterface(const QString &peerHostName, const QString &peerAddress, int peerPort, Servatrice *_server, QSslSocket *_socket)
-	: QObject(), server(_server), socket(_socket), messageInProgress(false)
+void NetworkServerInterface::initClient()
 {
-	sharedCtor();
+        QList<QSslError> expectedErrors;
+        expectedErrors.append(QSslError(QSslError::SelfSignedCertificate, peerCert));
+        socket->ignoreSslErrors(expectedErrors);
 	
+        qDebug() << "[SN] Connecting to " << peerAddress << ":" << peerPort;
+
 	socket->connectToHostEncrypted(peerAddress, peerPort, peerHostName);
 	if (!socket->waitForConnected(5000)) {
 		qDebug() << "[SN] Socket error:" << socket->errorString();
@@ -72,17 +133,9 @@ NetworkServerInterface::NetworkServerInterface(const QString &peerHostName, cons
 	server->addNetworkServerInterface(this);
 }
 
-NetworkServerInterface::~NetworkServerInterface()
-{
-	logger->logMessage("[SN] session ended", this);
-	
-	flushOutputBuffer();
-}
-
 void NetworkServerInterface::flushOutputBuffer()
 {
 	QMutexLocker locker(&outputBufferMutex);
-	qDebug("FLUSH");
 	if (outputBuffer.isEmpty())
 		return;
 	server->incTxBytes(outputBuffer.size());
@@ -142,7 +195,6 @@ void NetworkServerInterface::transmitMessage(const ServerNetworkMessage &item)
 	outputBufferMutex.lock();
 	outputBuffer.append(buf);
 	outputBufferMutex.unlock();
-	qDebug("TRANSMIT");
 	emit outputBufferChanged();
 }
 

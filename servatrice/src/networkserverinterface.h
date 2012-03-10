@@ -2,6 +2,9 @@
 #define NETWORKSERVERINTERFACE_H
 
 #include "servatrice.h"
+#include <QSslCertificate>
+#include <QSslKey>
+#include <QWaitCondition>
 
 class Servatrice;
 class QSslSocket;
@@ -16,6 +19,11 @@ private slots:
 signals:
 	void outputBufferChanged();
 private:
+	int socketDescriptor;
+	QString peerHostName, peerAddress;
+	int peerPort;
+	QSslCertificate peerCert;
+	
 	QMutex outputBufferMutex;
 	Servatrice *server;
 	QSslSocket *socket;
@@ -25,10 +33,13 @@ private:
 	int messageLength;
 	
 	void processMessage(const ServerNetworkMessage &item);
-	void sharedCtor();
+	void sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey);
+public slots:
+	void initServer();
+	void initClient();
 public:
-	NetworkServerInterface(Servatrice *_server, QSslSocket *_socket);
-	NetworkServerInterface(const QString &peerHostName, const QString &peerAddress, int peerPort, Servatrice *_server, QSslSocket *_socket);
+	NetworkServerInterface(int socketDescriptor, const QSslCertificate &cert, const QSslKey &privateKey, Servatrice *_server);
+	NetworkServerInterface(const QString &peerHostName, const QString &peerAddress, int peerPort, const QSslCertificate &peerCert, const QSslCertificate &cert, const QSslKey &privateKey, Servatrice *_server);
 	~NetworkServerInterface();
 	
 	void transmitMessage(const ServerNetworkMessage &item);
