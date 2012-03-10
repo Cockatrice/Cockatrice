@@ -68,6 +68,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	if (authState == PasswordRight) {
 		if (users.contains(name) || userSessionExists(name)) {
 			qDebug("Login denied: would overwrite old session");
+			unlockSessionTables();
 			return WouldOverwriteOldSession;
 		}
 	} else if (authState == UnknownUser) {
