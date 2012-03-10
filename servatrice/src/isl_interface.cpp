@@ -1,50 +1,49 @@
-#include "networkserverinterface.h"
+#include "isl_interface.h"
 #include <QSslSocket>
 #include "server_logger.h"
 #include "main.h"
 #include "server_protocolhandler.h"
 #include "server_room.h"
 
-#include "pb/servernetwork_message.pb.h"
+#include "pb/isl_message.pb.h"
 #include "pb/event_server_complete_list.pb.h"
 #include <google/protobuf/descriptor.h>
 
-void NetworkServerInterface::sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey)
+void IslInterface::sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey)
 {
 	socket = new QSslSocket(this);
 	socket->setLocalCertificate(cert);
 	socket->setPrivateKey(privateKey);
 	
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
-	connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(catchSocketError(QAbstractSocket::SocketError)));
 	connect(this, SIGNAL(outputBufferChanged()), this, SLOT(flushOutputBuffer()), Qt::QueuedConnection);
 }
 
-NetworkServerInterface::NetworkServerInterface(int _socketDescriptor, const QSslCertificate &cert, const QSslKey &privateKey, Servatrice *_server)
+IslInterface::IslInterface(int _socketDescriptor, const QSslCertificate &cert, const QSslKey &privateKey, Servatrice *_server)
 	: QObject(), socketDescriptor(_socketDescriptor), server(_server), messageInProgress(false)
 {
 	sharedCtor(cert, privateKey);
 }
 
-NetworkServerInterface::NetworkServerInterface(const QString &_peerHostName, const QString &_peerAddress, int _peerPort, const QSslCertificate &_peerCert, const QSslCertificate &cert, const QSslKey &privateKey, Servatrice *_server)
-		: QObject(), peerHostName(_peerHostName), peerAddress(_peerAddress), peerPort(_peerPort), peerCert(_peerCert), server(_server), messageInProgress(false)
+IslInterface::IslInterface(int _serverId, const QString &_peerHostName, const QString &_peerAddress, int _peerPort, const QSslCertificate &_peerCert, const QSslCertificate &cert, const QSslKey &privateKey, Servatrice *_server)
+		: QObject(), serverId(_serverId), peerHostName(_peerHostName), peerAddress(_peerAddress), peerPort(_peerPort), peerCert(_peerCert), server(_server), messageInProgress(false)
 {
 	sharedCtor(cert, privateKey);
 }
 
-NetworkServerInterface::~NetworkServerInterface()
+IslInterface::~IslInterface()
 {
-	logger->logMessage("[SN] session ended", this);
+	logger->logMessage("[ISL] session ended", this);
 	
 	flushOutputBuffer();
 }
 
-void NetworkServerInterface::initServer()
+void IslInterface::initServer()
 {
 	socket->setSocketDescriptor(socketDescriptor);
 	
-	logger->logMessage(QString("[SN] incoming connection: %1").arg(socket->peerAddress().toString()));
+	logger->logMessage(QString("[ISL] incoming connection: %1").arg(socket->peerAddress().toString()));
 	
 	QList<ServerProperties> serverList = server->getServerList();
 	int listIndex = -1;
@@ -54,7 +53,7 @@ void NetworkServerInterface::initServer()
 			break;
 		}
 	if (listIndex == -1) {
-		logger->logMessage(QString("[SN] address %1 unknown, terminating connection").arg(socket->peerAddress().toString()));
+		logger->logMessage(QString("[ISL] address %1 unknown, terminating connection").arg(socket->peerAddress().toString()));
 		deleteLater();
 		return;
 	}
@@ -63,20 +62,21 @@ void NetworkServerInterface::initServer()
 	if (!socket->waitForEncrypted(5000)) {
 		QList<QSslError> sslErrors(socket->sslErrors());
 		if (sslErrors.isEmpty())
-			qDebug() << "[SN] SSL handshake timeout, terminating connection";
+			qDebug() << "[ISL] SSL handshake timeout, terminating connection";
 		else
-			qDebug() << "[SN] SSL errors:" << sslErrors;
+			qDebug() << "[ISL] SSL errors:" << sslErrors;
 		deleteLater();
 		return;
 	}
 	
 	if (serverList[listIndex].cert == socket->peerCertificate())
-		logger->logMessage(QString("[SN] Peer authenticated as " + serverList[listIndex].hostname));
+		logger->logMessage(QString("[ISL] Peer authenticated as " + serverList[listIndex].hostname));
 	else {
-		logger->logMessage(QString("[SN] Authentication failed, terminating connection"));
+		logger->logMessage(QString("[ISL] Authentication failed, terminating connection"));
 		deleteLater();
 		return;
 	}
+	serverId = serverList[listIndex].id;
 	
 	Event_ServerCompleteList event;
 	event.set_server_id(server->getServerId());
@@ -93,13 +93,20 @@ void NetworkServerInterface::initServer()
 		event.add_room_list()->CopyFrom(room->getInfo(true, true, false));
 	}
 	
-	ServerNetworkMessage message;
-	message.set_message_type(ServerNetworkMessage::SESSION_EVENT);
+	IslMessage message;
+	message.set_message_type(IslMessage::SESSION_EVENT);
 	SessionEvent *sessionEvent = message.mutable_session_event();
 	sessionEvent->GetReflection()->MutableMessage(sessionEvent, event.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(event);
-	transmitMessage(message);
 	
-	server->addNetworkServerInterface(this);
+	server->islLock.lockForWrite();
+	if (server->islConnectionExists(serverId)) {
+		qDebug() << "[ISL] Duplicate connection to #" << serverId << "terminating connection";
+		deleteLater();
+	} else {
+		transmitMessage(message);
+		server->addIslInterface(serverId, this);
+	}
+	server->islLock.unlock();
 	
 	roomIterator.toFront();
 	while (roomIterator.hasNext())
@@ -107,33 +114,42 @@ void NetworkServerInterface::initServer()
 	server->serverMutex.unlock();
 }
 
-void NetworkServerInterface::initClient()
+void IslInterface::initClient()
 {
-        QList<QSslError> expectedErrors;
-        expectedErrors.append(QSslError(QSslError::SelfSignedCertificate, peerCert));
-        socket->ignoreSslErrors(expectedErrors);
+	QList<QSslError> expectedErrors;
+	expectedErrors.append(QSslError(QSslError::SelfSignedCertificate, peerCert));
+	socket->ignoreSslErrors(expectedErrors);
 	
-        qDebug() << "[SN] Connecting to " << peerAddress << ":" << peerPort;
+	qDebug() << "[ISL] Connecting to #" << serverId << ":" << peerAddress << ":" << peerPort;
 
 	socket->connectToHostEncrypted(peerAddress, peerPort, peerHostName);
 	if (!socket->waitForConnected(5000)) {
-		qDebug() << "[SN] Socket error:" << socket->errorString();
+		qDebug() << "[ISL] Socket error:" << socket->errorString();
 		deleteLater();
 		return;
 	}
 	if (!socket->waitForEncrypted(5000)) {
 		QList<QSslError> sslErrors(socket->sslErrors());
 		if (sslErrors.isEmpty())
-			qDebug() << "[SN] SSL handshake timeout, terminating connection";
+			qDebug() << "[ISL] SSL handshake timeout, terminating connection";
 		else
-			qDebug() << "[SN] SSL errors:" << sslErrors;
+			qDebug() << "[ISL] SSL errors:" << sslErrors;
 		deleteLater();
 		return;
 	}
-	server->addNetworkServerInterface(this);
+	
+	server->islLock.lockForWrite();
+	if (server->islConnectionExists(serverId)) {
+		qDebug() << "[ISL] Duplicate connection to #" << serverId << "terminating connection";
+		deleteLater();
+		return;
+	}
+		
+	server->addIslInterface(serverId, this);
+	server->islLock.unlock();
 }
 
-void NetworkServerInterface::flushOutputBuffer()
+void IslInterface::flushOutputBuffer()
 {
 	QMutexLocker locker(&outputBufferMutex);
 	if (outputBuffer.isEmpty())
@@ -144,7 +160,7 @@ void NetworkServerInterface::flushOutputBuffer()
 	outputBuffer.clear();
 }
 
-void NetworkServerInterface::readClient()
+void IslInterface::readClient()
 {
 	QByteArray data = socket->readAll();
 	server->incRxBytes(data.size());
@@ -165,7 +181,7 @@ void NetworkServerInterface::readClient()
 		if (inputBuffer.size() < messageLength)
 			return;
 		
-		ServerNetworkMessage newMessage;
+		IslMessage newMessage;
 		newMessage.ParseFromArray(inputBuffer.data(), messageLength);
 		inputBuffer.remove(0, messageLength);
 		messageInProgress = false;
@@ -174,14 +190,18 @@ void NetworkServerInterface::readClient()
 	} while (!inputBuffer.isEmpty());
 }
 
-void NetworkServerInterface::catchSocketError(QAbstractSocket::SocketError socketError)
+void IslInterface::catchSocketError(QAbstractSocket::SocketError socketError)
 {
-	qDebug() << "[SN] Socket error:" << socketError;
+	qDebug() << "[ISL] Socket error:" << socketError;
+	
+	server->islLock.lockForWrite();
+	server->removeIslInterface(serverId);
+	server->islLock.unlock();
 	
 	deleteLater();
 }
 
-void NetworkServerInterface::transmitMessage(const ServerNetworkMessage &item)
+void IslInterface::transmitMessage(const IslMessage &item)
 {
 	QByteArray buf;
 	unsigned int size = item.ByteSize();
@@ -198,7 +218,7 @@ void NetworkServerInterface::transmitMessage(const ServerNetworkMessage &item)
 	emit outputBufferChanged();
 }
 
-void NetworkServerInterface::processMessage(const ServerNetworkMessage &item)
+void IslInterface::processMessage(const IslMessage &item)
 {
 	qDebug() << QString::fromStdString(item.DebugString());
 }

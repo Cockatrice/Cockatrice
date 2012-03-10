@@ -4,7 +4,7 @@ import "commands.proto";
 import "game_event_container.proto";
 import "room_event.proto";
 
-message ServerNetworkMessage {
+message IslMessage {
 	enum MessageType {
 		RESPONSE = 0;
 		SESSION_EVENT = 1;

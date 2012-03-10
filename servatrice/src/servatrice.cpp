@@ -25,7 +25,7 @@
 #include "server_room.h"
 #include "serversocketinterface.h"
 #include "serversocketthread.h"
-#include "networkserverinterface.h"
+#include "isl_interface.h"
 #include "server_logger.h"
 #include "main.h"
 #include "passwordhasher.h"
@@ -48,12 +48,12 @@ void Servatrice_GameServer::incomingConnection(int socketDescriptor)
 	}
 }
 
-void Servatrice_NetworkServer::incomingConnection(int socketDescriptor)
+void Servatrice_IslServer::incomingConnection(int socketDescriptor)
 {
 	QThread *thread = new QThread;
 	connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 	
-	NetworkServerInterface *interface = new NetworkServerInterface(socketDescriptor, cert, privateKey, server);
+	IslInterface *interface = new IslInterface(socketDescriptor, cert, privateKey, server);
 	interface->moveToThread(thread);
 	connect(interface, SIGNAL(destroyed()), thread, SLOT(quit()));
 	
@@ -122,7 +122,7 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	maxGamesPerUser = settings->value("security/max_games_per_user").toInt();
 
 	try { if (settings->value("servernetwork/active", 0).toInt()) {
-		qDebug() << "Connecting to server network.";
+		qDebug() << "Connecting to ISL network.";
 		const QString certFileName = settings->value("servernetwork/ssl_cert").toString();
 		const QString keyFileName = settings->value("servernetwork/ssl_key").toString();
 		qDebug() << "Loading certificate...";
@@ -140,15 +140,6 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 		if (key.isNull())
 			throw QString("Invalid private key.");
 		
-		const int networkPort = settings->value("servernetwork/port", 14747).toInt();
-		qDebug() << "Starting network server on port" << networkPort;
-		
-		networkServer = new Servatrice_NetworkServer(this, cert, key, this);
-		if (networkServer->listen(QHostAddress::Any, networkPort))
-			qDebug() << "Network server listening.";
-		else
-			throw QString("networkServer->listen(): Error.");
-		
 		QMutableListIterator<ServerProperties> serverIterator(serverList);
 		while (serverIterator.hasNext()) {
 			const ServerProperties &prop = serverIterator.next();
@@ -160,7 +151,7 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 			QThread *thread = new QThread;
 			connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 			
-			NetworkServerInterface *interface = new NetworkServerInterface(prop.hostname, prop.address.toString(), prop.controlPort, prop.cert, cert, key, this);
+			IslInterface *interface = new IslInterface(prop.id, prop.hostname, prop.address.toString(), prop.controlPort, prop.cert, cert, key, this);
 			interface->moveToThread(thread);
 			connect(interface, SIGNAL(destroyed()), thread, SLOT(quit()));
 			
@@ -168,6 +159,15 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 			QMetaObject::invokeMethod(interface, "initClient", Qt::BlockingQueuedConnection);
 		}
 			
+		const int networkPort = settings->value("servernetwork/port", 14747).toInt();
+		qDebug() << "Starting ISL server on port" << networkPort;
+		
+		islServer = new Servatrice_IslServer(this, cert, key, this);
+		if (islServer->listen(QHostAddress::Any, networkPort))
+			qDebug() << "ISL server listening.";
+		else
+			throw QString("islServer->listen(): Error.");
+		
 	} } catch (QString error) {
 		qDebug() << "ERROR --" << error;
 	}
@@ -556,8 +556,9 @@ int Servatrice::startSession(const QString &userName, const QString &address)
 		return -1;
 	
 	QSqlQuery query;
-	query.prepare("insert into " + dbPrefix + "_sessions (user_name, ip_address, start_time) values(:user_name, :ip_address, NOW())");
+	query.prepare("insert into " + dbPrefix + "_sessions (user_name, id_server, ip_address, start_time) values(:user_name, :id_server, :ip_address, NOW())");
 	query.bindValue(":user_name", userName);
+	query.bindValue(":id_server", serverId);
 	query.bindValue(":ip_address", address);
 	if (execSqlQuery(query))
 		return query.lastInsertId().toInt();
@@ -574,7 +575,7 @@ void Servatrice::endSession(int sessionId)
 		return;
 	
 	QSqlQuery query;
-	query.exec("lock tables " + dbPrefix + "_sessions read");
+	query.exec("lock tables " + dbPrefix + "_sessions write");
 	query.prepare("update " + dbPrefix + "_sessions set end_time=NOW() where id = :id_session");
 	query.bindValue(":id_session", sessionId);
 	execSqlQuery(query);
@@ -839,13 +840,42 @@ void Servatrice::shutdownTimeout()
 		deleteLater();
 }
 
-void Servatrice::addNetworkServerInterface(NetworkServerInterface *interface)
+bool Servatrice::islConnectionExists(int serverId) const
 {
-	networkServerInterfaces.append(interface);
+	// Only call with islLock locked at least for reading
+	
+	return islInterfaces.contains(serverId);
 }
 
-void Servatrice::removeNetworkServerInterface(NetworkServerInterface *interface)
+void Servatrice::addIslInterface(int serverId, IslInterface *interface)
 {
+	// Only call with islLock locked for writing
+	
+	islInterfaces.insert(serverId, interface);
+}
+
+void Servatrice::removeIslInterface(int serverId)
+{
+	// Only call with islLock locked for writing
+	
 	// XXX we probably need to delete everything that belonged to it...
-	networkServerInterfaces.removeAt(networkServerInterfaces.indexOf(interface));
+	islInterfaces.remove(serverId);
+}
+
+void Servatrice::doSendIslMessage(const IslMessage &msg, int serverId)
+{
+	QReadLocker locker(&islLock);
+	
+	qDebug() << "hallo";
+	if (serverId == -1) {
+		QMapIterator<int, IslInterface *> islIterator(islInterfaces);
+		while (islIterator.hasNext()) {
+			qDebug() << "welt";
+			islIterator.next().value()->transmitMessage(msg);
+		}
+	} else {
+		IslInterface *interface = islInterfaces.value(serverId);
+		if (interface)
+			interface->transmitMessage(msg);
+	}
 }

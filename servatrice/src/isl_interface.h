@@ -1,16 +1,16 @@
-#ifndef NETWORKSERVERINTERFACE_H
-#define NETWORKSERVERINTERFACE_H
+#ifndef ISL_INTERFACE_H
+#define ISL_INTERFACE_H
 
 #include "servatrice.h"
 #include <QSslCertificate>
-#include <QSslKey>
 #include <QWaitCondition>
 
 class Servatrice;
 class QSslSocket;
-class ServerNetworkMessage;
+class QSslKey;
+class IslMessage;
 
-class NetworkServerInterface : public QObject {
+class IslInterface : public QObject {
 	Q_OBJECT
 private slots:
 	void readClient();
@@ -19,6 +19,7 @@ private slots:
 signals:
 	void outputBufferChanged();
 private:
+	int serverId;
 	int socketDescriptor;
 	QString peerHostName, peerAddress;
 	int peerPort;
@@ -32,17 +33,17 @@ private:
 	bool messageInProgress;
 	int messageLength;
 	
-	void processMessage(const ServerNetworkMessage &item);
+	void processMessage(const IslMessage &item);
 	void sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey);
 public slots:
 	void initServer();
 	void initClient();
 public:
-	NetworkServerInterface(int socketDescriptor, const QSslCertificate &cert, const QSslKey &privateKey, Servatrice *_server);
-	NetworkServerInterface(const QString &peerHostName, const QString &peerAddress, int peerPort, const QSslCertificate &peerCert, const QSslCertificate &cert, const QSslKey &privateKey, Servatrice *_server);
-	~NetworkServerInterface();
+	IslInterface(int socketDescriptor, const QSslCertificate &cert, const QSslKey &privateKey, Servatrice *_server);
+	IslInterface(int _serverId, const QString &peerHostName, const QString &peerAddress, int peerPort, const QSslCertificate &peerCert, const QSslCertificate &cert, const QSslKey &privateKey, Servatrice *_server);
+	~IslInterface();
 	
-	void transmitMessage(const ServerNetworkMessage &item);
+	void transmitMessage(const IslMessage &item);
 };
 
 #endif

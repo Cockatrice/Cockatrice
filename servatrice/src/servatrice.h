@@ -25,6 +25,7 @@
 #include <QSslCertificate>
 #include <QSslKey>
 #include <QHostAddress>
+#include <QReadWriteLock>
 #include "server.h"
 
 class QSqlDatabase;
@@ -35,7 +36,7 @@ class QTimer;
 class GameReplay;
 class Servatrice;
 class ServerSocketInterface;
-class NetworkServerInterface;
+class IslInterface;
 
 class Servatrice_GameServer : public QTcpServer {
 	Q_OBJECT
@@ -49,14 +50,14 @@ protected:
 	void incomingConnection(int socketDescriptor);
 };
 
-class Servatrice_NetworkServer : public QTcpServer {
+class Servatrice_IslServer : public QTcpServer {
 	Q_OBJECT
 private:
 	Servatrice *server;
 	QSslCertificate cert;
 	QSslKey privateKey;
 public:
-	Servatrice_NetworkServer(Servatrice *_server, const QSslCertificate &_cert, const QSslKey &_privateKey, QObject *parent = 0)
+	Servatrice_IslServer(Servatrice *_server, const QSslCertificate &_cert, const QSslKey &_privateKey, QObject *parent = 0)
 		: QTcpServer(parent), server(_server), cert(_cert), privateKey(_privateKey) { }
 protected:
 	void incomingConnection(int socketDescriptor);
@@ -115,8 +116,10 @@ public:
 	int getUserIdInDB(const QString &name);
 	void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays);
 	
-	void addNetworkServerInterface(NetworkServerInterface *interface);
-	void removeNetworkServerInterface(NetworkServerInterface *interface);
+	bool islConnectionExists(int serverId) const;
+	void addIslInterface(int serverId, IslInterface *interface);
+	void removeIslInterface(int serverId);
+	QReadWriteLock islLock;
 
 	QList<ServerProperties> getServerList() const;
 protected:
@@ -129,6 +132,8 @@ protected:
 	void lockSessionTables();
 	void unlockSessionTables();
 	bool userSessionExists(const QString &userName);
+	
+	void doSendIslMessage(const IslMessage &msg, int serverId);
 private:
 	enum AuthenticationMethod { AuthenticationNone, AuthenticationSql };
 	enum DatabaseType { DatabaseNone, DatabaseMySql };
@@ -136,7 +141,7 @@ private:
 	DatabaseType databaseType;
 	QTimer *pingClock, *statusUpdateClock;
 	Servatrice_GameServer *gameServer;
-	Servatrice_NetworkServer *networkServer;
+	Servatrice_IslServer *islServer;
 	QString serverName;
 	QString loginMessage;
 	QString dbPrefix;
@@ -158,7 +163,7 @@ private:
 	QList<ServerProperties> serverList;
 	void updateServerList();
 	
-	QList<NetworkServerInterface *> networkServerInterfaces;
+	QMap<int, IslInterface *> islInterfaces;
 };
 
 #endif

@@ -102,6 +102,7 @@ SET(PROTO_FILES
 	game_event_context.proto
 	game_event.proto
 	game_replay.proto
+	isl_message.proto
 	moderator_commands.proto
 	move_card_to_zone.proto
 	response_deck_download.proto
@@ -133,7 +134,6 @@ SET(PROTO_FILES
 	serverinfo_room.proto
 	serverinfo_user.proto
 	serverinfo_zone.proto
-	servernetwork_message.proto
 	server_message.proto
 	session_commands.proto
 	session_event.proto

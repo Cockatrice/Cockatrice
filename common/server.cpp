@@ -25,6 +25,8 @@
 #include "pb/event_user_joined.pb.h"
 #include "pb/event_user_left.pb.h"
 #include "pb/event_list_rooms.pb.h"
+#include "pb/session_event.pb.h"
+#include "pb/isl_message.pb.h"
 #include <QCoreApplication>
 #include <QDebug>
 
@@ -98,6 +100,9 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	for (int i = 0; i < clients.size(); ++i)
 		if (clients[i]->getAcceptsUserListChanges())
 			clients[i]->sendProtocolItem(*se);
+	serverMutex.unlock();
+	
+	sendIslMessage(*se);
 	delete se;
 	
 	return authState;
@@ -121,6 +126,7 @@ void Server::removeClient(Server_ProtocolHandler *client)
 		for (int i = 0; i < clients.size(); ++i)
 			if (clients[i]->getAcceptsUserListChanges())
 				clients[i]->sendProtocolItem(*se);
+		sendIslMessage(*se);
 		delete se;
 		
 		users.remove(QString::fromStdString(data->name()));
@@ -176,4 +182,13 @@ int Server::getGamesCount() const
 		result += room->getGames().size();
 	}
 	return result;
+}
+
+void Server::sendIslMessage(const SessionEvent &item, int serverId)
+{
+	IslMessage msg;
+	msg.set_message_type(IslMessage::SESSION_EVENT);
+	msg.mutable_session_event()->CopyFrom(item);
+	
+	doSendIslMessage(msg, serverId);
 }

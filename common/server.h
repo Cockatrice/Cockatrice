@@ -11,6 +11,8 @@ class Server_Game;
 class Server_Room;
 class Server_ProtocolHandler;
 class GameReplay;
+class IslMessage;
+class SessionEvent;
 
 enum AuthenticationResult { NotLoggedIn = 0, PasswordRight = 1, UnknownUser = 2, WouldOverwriteOldSession = 3, UserIsBanned = 4 };
 
@@ -50,6 +52,8 @@ public:
 	virtual bool isInIgnoreList(const QString &whoseList, const QString &who) { return false; }
 	
 	virtual void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays) { }
+	
+	void sendIslMessage(const SessionEvent &item, int serverId = -1);
 protected:
 	void prepareDestroy();
 	QList<Server_ProtocolHandler *> clients;
@@ -70,6 +74,8 @@ protected:
 	virtual void lockSessionTables() { }
 	virtual void unlockSessionTables() { }
 	virtual bool userSessionExists(const QString &userName) { return false; }
+	
+	virtual void doSendIslMessage(const IslMessage &msg, int serverId) { }
 };
 
 #endif
