@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QMutex>
 #include "pb/serverinfo_user.pb.h"
+#include "pb/serverinfo_room.pb.h"
 
 class Server_Game;
 class Server_Room;
@@ -26,7 +27,7 @@ class Server : public QObject
 signals:
 	void pingClockTimeout();
 private slots:
-	void broadcastRoomUpdate();
+	void broadcastRoomUpdate(const ServerInfo_Room &roomInfo, bool sendToIsl = false);
 public:
 	mutable QMutex serverMutex;
 	Server(QObject *parent = 0);
@@ -68,6 +69,7 @@ public:
 protected slots:	
 	void externalUserJoined(ServerInfo_User userInfo);
 	void externalUserLeft(QString userName);
+	void externalRoomUpdated(ServerInfo_Room roomInfo);
 protected:
 	void prepareDestroy();
 	QList<Server_ProtocolHandler *> clients;

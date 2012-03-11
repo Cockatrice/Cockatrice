@@ -34,6 +34,8 @@
 Server::Server(QObject *parent)
 	: QObject(parent), serverMutex(QMutex::Recursive), nextGameId(0), nextReplayId(0)
 {
+	qRegisterMetaType<ServerInfo_Game>("ServerInfo_Game");
+	qRegisterMetaType<ServerInfo_Room>("ServerInfo_Room");
 }
 
 Server::~Server()
@@ -170,22 +172,22 @@ void Server::externalUserLeft(QString userName)
 			clients[i]->sendProtocolItem(*se);
 }
 
-void Server::broadcastRoomUpdate()
+void Server::broadcastRoomUpdate(const ServerInfo_Room &roomInfo, bool sendToIsl)
 {
-	QMutexLocker locker(&serverMutex);
-	Server_Room *room = static_cast<Server_Room *>(sender());
 	Event_ListRooms event;
-	
-	ServerInfo_Room *roomInfo = event.add_room_list();
-	room->roomMutex.lock();
-	roomInfo->CopyFrom(room->getInfo(false, false, true));
-	room->roomMutex.unlock();
+	event.add_room_list()->CopyFrom(roomInfo);
 	
 	SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
 
+	serverMutex.lock();
 	for (int i = 0; i < clients.size(); ++i)
 	  	if (clients[i]->getAcceptsRoomListChanges())
 			clients[i]->sendProtocolItem(*se);
+	serverMutex.unlock();
+	
+	if (sendToIsl)
+		sendIslMessage(*se);
+	
 	delete se;
 }
 
@@ -193,7 +195,7 @@ void Server::addRoom(Server_Room *newRoom)
 {
 	QMutexLocker locker(&serverMutex);
 	rooms.insert(newRoom->getId(), newRoom);
-	connect(newRoom, SIGNAL(roomInfoChanged()), this, SLOT(broadcastRoomUpdate()));
+	connect(newRoom, SIGNAL(roomInfoChanged(ServerInfo_Room)), this, SLOT(broadcastRoomUpdate(const ServerInfo_Room &)), Qt::QueuedConnection);
 }
 
 int Server::getUsersCount() const

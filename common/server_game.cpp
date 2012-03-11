@@ -271,7 +271,7 @@ void Server_Game::doStartGameIfReady()
 	nextTurn();
 	
 	locker.unlock();
-	room->broadcastGameListUpdate(this);
+	emit gameInfoChanged(getInfo());
 }
 
 void Server_Game::startGameIfReady()
@@ -364,7 +364,7 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 	}
 
 	if (broadcastUpdate)
-		room->broadcastGameListUpdate(this);
+		emit gameInfoChanged(getInfo());
 	
 	return newPlayer;
 }
@@ -409,7 +409,7 @@ void Server_Game::removePlayer(Server_Player *player)
 		if (gameStarted && playerActive)
 			nextTurn();
 	}
-	room->broadcastGameListUpdate(this);
+	emit gameInfoChanged(getInfo());
 }
 
 void Server_Game::removeArrowsToPlayer(GameEventStorage &ges, Server_Player *player)

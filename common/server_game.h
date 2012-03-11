@@ -67,6 +67,7 @@ private:
 	GameReplay *currentReplay;
 signals:
 	void sigStartGameIfReady();
+	void gameInfoChanged(ServerInfo_Game gameInfo);
 private slots:
 	void pingClockTimeout();
 	void doStartGameIfReady();

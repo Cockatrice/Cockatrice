@@ -856,6 +856,7 @@ void Servatrice::addIslInterface(int serverId, IslInterface *interface)
 	islInterfaces.insert(serverId, interface);
 	connect(interface, SIGNAL(externalUserJoined(ServerInfo_User)), this, SLOT(externalUserJoined(ServerInfo_User)));
 	connect(interface, SIGNAL(externalUserLeft(QString)), this, SLOT(externalUserLeft(QString)));
+	connect(interface, SIGNAL(externalRoomUpdated(ServerInfo_Room)), this, SLOT(externalRoomUpdated(const ServerInfo_Room &)));
 }
 
 void Servatrice::removeIslInterface(int serverId)

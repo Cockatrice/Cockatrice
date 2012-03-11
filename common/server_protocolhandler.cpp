@@ -695,11 +695,16 @@ Response::ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_Creat
 	QString description = QString::fromStdString(cmd.description());
 	if (description.size() > 60)
 		description = description.left(60);
-	Server_Game *game = room->createGame(description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes, cmd.only_buddies(), cmd.only_registered(), cmd.spectators_allowed(), cmd.spectators_need_password(), cmd.spectators_can_talk(), cmd.spectators_see_everything(), this);
+	
+	Server_Game *game = new Server_Game(this, server->getNextGameId(), description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes, cmd.only_buddies(), cmd.only_registered(), cmd.spectators_allowed(), cmd.spectators_need_password(), cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
+	game->moveToThread(room->thread());
+
+	QMutexLocker gameListLocker(&gameListMutex);
+	game->gameMutex.lock();
+	room->addGame(game);
 	
 	Server_Player *creator = game->getPlayers().values().first();
 	
-	QMutexLocker gameListLocker(&gameListMutex);
 	games.insert(game->getGameId(), QPair<Server_Game *, Server_Player *>(game, creator));
 	
 	Event_GameJoined event1;

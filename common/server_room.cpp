@@ -12,6 +12,7 @@
 Server_Room::Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent)
 	: QObject(parent), id(_id), name(_name), description(_description), autoJoin(_autoJoin), joinMessage(_joinMessage), gameTypes(_gameTypes), roomMutex(QMutex::Recursive)
 {
+	connect(this, SIGNAL(gameListChanged(ServerInfo_Game)), this, SLOT(broadcastGameListUpdate(ServerInfo_Game)), Qt::QueuedConnection);
 }
 
 Server_Room::~Server_Room()
@@ -32,14 +33,14 @@ Server *Server_Room::getServer() const
 	return static_cast<Server *>(parent());
 }
 
-ServerInfo_Room Server_Room::getInfo(bool complete, bool showGameTypes, bool updating) const
+ServerInfo_Room Server_Room::getInfo(bool complete, bool showGameTypes, bool updating, bool includeExternalData) const
 {
 	QMutexLocker locker(&roomMutex);
 	
 	ServerInfo_Room result;
 	result.set_room_id(id);
-	result.set_game_count(games.size());
-	result.set_player_count(userList.size());
+	result.set_game_count(games.size() + externalGames.size());
+	result.set_player_count(userList.size() + externalUsers.size());
 	
 	if (!updating) {
 		result.set_name(name.toStdString());
@@ -51,9 +52,19 @@ ServerInfo_Room Server_Room::getInfo(bool complete, bool showGameTypes, bool upd
 		QMapIterator<int, Server_Game *> gameIterator(games);
 		while (gameIterator.hasNext())
 			result.add_game_list()->CopyFrom(gameIterator.next().value()->getInfo());
+		if (includeExternalData) {
+			QMapIterator<int, ServerInfo_Game> externalGameIterator(externalGames);
+			while (externalGameIterator.hasNext())
+				result.add_game_list()->CopyFrom(externalGameIterator.next().value());
+		}
 		
 		for (int i = 0; i < userList.size(); ++i)
 			result.add_user_list()->CopyFrom(userList[i]->copyUserInfo(false));
+		if (includeExternalData) {
+			QMapIterator<QString, ServerInfo_User_Container> externalUserIterator(externalUsers);
+			while (externalUserIterator.hasNext())
+				result.add_user_list()->CopyFrom(externalUserIterator.next().value().copyUserInfo(false));
+		}
 	}
 	if (complete || showGameTypes)
 		for (int i = 0; i < gameTypes.size(); ++i) {
@@ -83,7 +94,7 @@ void Server_Room::addClient(Server_ProtocolHandler *client)
 	userList.append(client);
 	roomMutex.unlock();
 	
-	emit roomInfoChanged();
+	emit roomInfoChanged(getInfo(false, false, true));
 }
 
 void Server_Room::removeClient(Server_ProtocolHandler *client)
@@ -96,7 +107,34 @@ void Server_Room::removeClient(Server_ProtocolHandler *client)
 	event.set_name(client->getUserInfo()->name());
 	sendRoomEvent(prepareRoomEvent(event));
 	
-	emit roomInfoChanged();
+	emit roomInfoChanged(getInfo(false, false, true));
+}
+
+void Server_Room::addExternalUser(const ServerInfo_User &userInfo)
+{
+	ServerInfo_User_Container userInfoContainer(userInfo);
+	Event_JoinRoom event;
+	event.mutable_user_info()->CopyFrom(userInfoContainer.copyUserInfo(false));
+	sendRoomEvent(prepareRoomEvent(event), false);
+	
+	roomMutex.lock();
+	externalUsers.insert(QString::fromStdString(userInfo.name()), userInfoContainer);
+	roomMutex.unlock();
+	
+	emit roomInfoChanged(getInfo(false, false, true));
+}
+
+void Server_Room::removeExternalUser(const QString &name)
+{
+	roomMutex.lock();
+	externalUsers.remove(name);
+	roomMutex.unlock();
+	
+	Event_LeaveRoom event;
+	event.set_name(name.toStdString());
+	sendRoomEvent(prepareRoomEvent(event), false);
+	
+	emit roomInfoChanged(getInfo(false, false, true));
 }
 
 void Server_Room::say(Server_ProtocolHandler *client, const QString &s)
@@ -107,39 +145,34 @@ void Server_Room::say(Server_ProtocolHandler *client, const QString &s)
 	sendRoomEvent(prepareRoomEvent(event));
 }
 
-void Server_Room::sendRoomEvent(RoomEvent *event)
+void Server_Room::sendRoomEvent(RoomEvent *event, bool sendToIsl)
 {
-	QMutexLocker locker(&roomMutex);
-	
+	roomMutex.lock();
 	for (int i = 0; i < userList.size(); ++i)
 		userList[i]->sendProtocolItem(*event);
+	roomMutex.unlock();
+	
+	if (sendToIsl)
+		static_cast<Server *>(parent())->sendIslMessage(*event);
+	
 	delete event;
 }
 
-void Server_Room::broadcastGameListUpdate(Server_Game *game)
+void Server_Room::broadcastGameListUpdate(ServerInfo_Game gameInfo)
 {
-	QMutexLocker locker(&roomMutex);
-	
 	Event_ListGames event;
-	event.add_game_list()->CopyFrom(game->getInfo());
+	event.add_game_list()->CopyFrom(gameInfo);
 	sendRoomEvent(prepareRoomEvent(event));
 }
 
-Server_Game *Server_Room::createGame(const QString &description, const QString &password, int maxPlayers, const QList<int> &gameTypes, bool onlyBuddies, bool onlyRegistered, bool spectatorsAllowed, bool spectatorsNeedPassword, bool spectatorsCanTalk, bool spectatorsSeeEverything, Server_ProtocolHandler *creator)
+void Server_Room::addGame(Server_Game *game)
 {
-	QMutexLocker locker(&roomMutex);
+	// Lock roomMutex and gameMutex before calling this
 	
-	Server_Game *newGame = new Server_Game(creator, static_cast<Server *>(parent())->getNextGameId(), description, password, maxPlayers, gameTypes, onlyBuddies, onlyRegistered, spectatorsAllowed, spectatorsNeedPassword, spectatorsCanTalk, spectatorsSeeEverything, this);
-	newGame->moveToThread(thread());
-	// This mutex needs to be unlocked by the caller.
-	newGame->gameMutex.lock();
-	games.insert(newGame->getGameId(), newGame);
-	
-	broadcastGameListUpdate(newGame);
-	
-	emit roomInfoChanged();
-	
-	return newGame;
+	connect(game, SIGNAL(gameInfoChanged(ServerInfo_Game)), this, SLOT(broadcastGameListUpdate(ServerInfo_Game)));
+	games.insert(game->getGameId(), game);
+	emit gameListChanged(game->getInfo());
+	emit roomInfoChanged(getInfo(false, false, true));
 }
 
 void Server_Room::removeGame(Server_Game *game)
@@ -147,10 +180,11 @@ void Server_Room::removeGame(Server_Game *game)
 	// No need to lock roomMutex or gameMutex. This method is only
 	// called from ~Server_Game, which locks both mutexes anyway beforehand.
 	
-	broadcastGameListUpdate(game);
+	disconnect(game, 0, this, 0);
+	emit gameListChanged(game->getInfo());
 	games.remove(game->getGameId());
 	
-	emit roomInfoChanged();
+	emit roomInfoChanged(getInfo(false, false, true));
 }
 
 int Server_Room::getGamesCreatedByUser(const QString &userName) const

@@ -107,7 +107,7 @@ void IslInterface::initServer()
 	while (roomIterator.hasNext()) {
 		Server_Room *room = roomIterator.next().value();
 		room->roomMutex.lock();
-		event.add_room_list()->CopyFrom(room->getInfo(true, true, false));
+		event.add_room_list()->CopyFrom(room->getInfo(true, true, false, false));
 	}
 	
 	IslMessage message;
