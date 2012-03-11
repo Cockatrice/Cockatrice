@@ -22,6 +22,7 @@
 #include "server_counter.h"
 #include "server_room.h"
 #include "server_protocolhandler.h"
+#include "server_remoteuserinterface.h"
 #include "pb/event_user_joined.pb.h"
 #include "pb/event_user_left.pb.h"
 #include "pb/event_list_rooms.pb.h"
@@ -100,7 +101,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	for (int i = 0; i < clients.size(); ++i)
 		if (clients[i]->getAcceptsUserListChanges())
 			clients[i]->sendProtocolItem(*se);
-	serverMutex.unlock();
+	locker.unlock();
 	
 	sendIslMessage(*se);
 	delete se;
@@ -137,6 +138,36 @@ void Server::removeClient(Server_ProtocolHandler *client)
 		qDebug() << "closed session id:" << client->getSessionId();
 	}
 	qDebug() << "Server::removeClient:" << clients.size() << "clients; " << users.size() << "users left";
+}
+
+void Server::externalUserJoined(ServerInfo_User userInfo)
+{
+	// This function is always called from the main thread via signal/slot.
+	QMutexLocker locker(&serverMutex);
+	
+	externalUsers.insert(QString::fromStdString(userInfo.name()), new Server_RemoteUserInterface(this, ServerInfo_User_Container(userInfo)));
+	
+	Event_UserJoined event;
+	event.mutable_user_info()->CopyFrom(userInfo);
+	SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
+	for (int i = 0; i < clients.size(); ++i)
+		if (clients[i]->getAcceptsUserListChanges())
+			clients[i]->sendProtocolItem(*se);
+}
+
+void Server::externalUserLeft(QString userName)
+{
+	// This function is always called from the main thread via signal/slot.
+	QMutexLocker locker(&serverMutex);
+	
+	delete externalUsers.take(userName);
+	
+	Event_UserLeft event;
+	event.set_name(userName.toStdString());
+	SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
+	for (int i = 0; i < clients.size(); ++i)
+		if (clients[i]->getAcceptsUserListChanges())
+			clients[i]->sendProtocolItem(*se);
 }
 
 void Server::broadcastRoomUpdate()
@@ -184,11 +215,38 @@ int Server::getGamesCount() const
 	return result;
 }
 
+void Server::sendIslMessage(const Response &item, int serverId)
+{
+	IslMessage msg;
+	msg.set_message_type(IslMessage::RESPONSE);
+	msg.mutable_response()->CopyFrom(item);
+	
+	doSendIslMessage(msg, serverId);
+}
+
 void Server::sendIslMessage(const SessionEvent &item, int serverId)
 {
 	IslMessage msg;
 	msg.set_message_type(IslMessage::SESSION_EVENT);
 	msg.mutable_session_event()->CopyFrom(item);
+	
+	doSendIslMessage(msg, serverId);
+}
+
+void Server::sendIslMessage(const GameEventContainer &item, int serverId)
+{
+	IslMessage msg;
+	msg.set_message_type(IslMessage::GAME_EVENT_CONTAINER);
+	msg.mutable_game_event_container()->CopyFrom(item);
+	
+	doSendIslMessage(msg, serverId);
+}
+
+void Server::sendIslMessage(const RoomEvent &item, int serverId)
+{
+	IslMessage msg;
+	msg.set_message_type(IslMessage::ROOM_EVENT);
+	msg.mutable_room_event()->CopyFrom(item);
 	
 	doSendIslMessage(msg, serverId);
 }

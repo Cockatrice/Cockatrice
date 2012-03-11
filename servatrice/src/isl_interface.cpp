@@ -5,8 +5,12 @@
 #include "server_protocolhandler.h"
 #include "server_room.h"
 
+#include "get_pb_extension.h"
 #include "pb/isl_message.pb.h"
 #include "pb/event_server_complete_list.pb.h"
+#include "pb/event_user_message.pb.h"
+#include "pb/event_user_joined.pb.h"
+#include "pb/event_user_left.pb.h"
 #include <google/protobuf/descriptor.h>
 
 void IslInterface::sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey)
@@ -37,6 +41,19 @@ IslInterface::~IslInterface()
 	logger->logMessage("[ISL] session ended", this);
 	
 	flushOutputBuffer();
+	
+	QStringList usersToDelete;
+	server->serverMutex.lock();
+	QMapIterator<QString, Server_AbstractUserInterface *> extUsers = server->getExternalUsers();
+	while (extUsers.hasNext()) {
+		extUsers.next();
+		if (extUsers.value()->getUserInfo()->server_id() == serverId)
+			usersToDelete.append(extUsers.key());
+	}
+	server->serverMutex.unlock();
+	
+	for (int i = 0; i < usersToDelete.size(); ++i)
+		emit externalUserLeft(usersToDelete[i]);
 }
 
 void IslInterface::initServer()
@@ -218,7 +235,63 @@ void IslInterface::transmitMessage(const IslMessage &item)
 	emit outputBufferChanged();
 }
 
+void IslInterface::sessionEvent_ServerCompleteList(const Event_ServerCompleteList &event)
+{
+	for (int i = 0; i < event.user_list_size(); ++i) {
+		ServerInfo_User temp(event.user_list(i));
+		temp.set_server_id(serverId);
+		emit externalUserJoined(temp);
+	}
+}
+
+void IslInterface::sessionEvent_UserMessage(const SessionEvent &sessionEvent, const Event_UserMessage &event)
+{
+	QMutexLocker locker(&server->serverMutex);
+	
+	Server_ProtocolHandler *userInterface = server->getUsers().value(QString::fromStdString(event.receiver_name()));
+	if (userInterface)
+		userInterface->sendProtocolItem(sessionEvent);
+}
+
+void IslInterface::sessionEvent_UserJoined(const Event_UserJoined &event)
+{
+	emit externalUserJoined(event.user_info());
+}
+
+void IslInterface::sessionEvent_UserLeft(const Event_UserLeft &event)
+{
+	emit externalUserLeft(QString::fromStdString(event.name()));
+}
+
+void IslInterface::processSessionEvent(const SessionEvent &event)
+{
+	switch (getPbExtension(event)) {
+		case SessionEvent::SERVER_COMPLETE_LIST: sessionEvent_ServerCompleteList(event.GetExtension(Event_ServerCompleteList::ext)); break;
+		case SessionEvent::USER_MESSAGE: sessionEvent_UserMessage(event, event.GetExtension(Event_UserMessage::ext)); break;
+		case SessionEvent::USER_JOINED: sessionEvent_UserJoined(event.GetExtension(Event_UserJoined::ext)); break;
+		case SessionEvent::USER_LEFT: sessionEvent_UserLeft(event.GetExtension(Event_UserLeft::ext)); break;
+		default: ;
+	}
+}
+
 void IslInterface::processMessage(const IslMessage &item)
 {
 	qDebug() << QString::fromStdString(item.DebugString());
+	
+	switch (item.message_type()) {
+		case IslMessage::SESSION_EVENT: processSessionEvent(item.session_event()); break;
+		case IslMessage::RESPONSE: {
+			break;
+		}
+		case IslMessage::GAME_COMMAND_CONTAINER: {
+			break;
+		}
+		case IslMessage::GAME_EVENT_CONTAINER: {
+			break;
+		}
+		case IslMessage::ROOM_EVENT: {
+			break;
+		}
+		default: ;
+	}
 }

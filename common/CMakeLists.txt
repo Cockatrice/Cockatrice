@@ -8,13 +8,16 @@ SET(common_SOURCES
 	rng_qt.cpp
 	rng_sfmt.cpp
 	server.cpp
+	server_abstractuserinterface.cpp
 	server_card.cpp
 	server_cardzone.cpp
 	server_game.cpp
 	server_player.cpp
 	server_protocolhandler.cpp
+	server_remoteuserinterface.cpp
 	server_response_containers.cpp
 	server_room.cpp
+	serverinfo_user_container.cpp
 	sfmt/SFMT.c
 )
 SET(common_HEADERS

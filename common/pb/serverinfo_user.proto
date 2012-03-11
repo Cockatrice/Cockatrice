@@ -19,4 +19,5 @@ message ServerInfo_User {
 	optional string country = 6;
 	optional bytes avatar_bmp = 7;
 	optional sint32 id = 8 [default = -1];
+	optional sint32 server_id = 9 [default = -1];
 }

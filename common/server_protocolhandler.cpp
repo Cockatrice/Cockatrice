@@ -9,6 +9,7 @@
 #include "server_game.h"
 #include "server_player.h"
 #include "decklist.h"
+#include "get_pb_extension.h"
 #include <QDateTime>
 #include "pb/serverinfo_zone.pb.h"
 #include "pb/commands.pb.h"
@@ -88,7 +89,7 @@
 #include <google/protobuf/descriptor.h>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
-	: QObject(parent), server(_server), authState(NotLoggedIn), acceptsUserListChanges(false), acceptsRoomListChanges(false), userInfo(0), sessionId(-1), timeRunning(0), lastDataReceived(0), gameListMutex(QMutex::Recursive)
+	: QObject(parent), Server_AbstractUserInterface(_server), authState(NotLoggedIn), acceptsUserListChanges(false), acceptsRoomListChanges(false), sessionId(-1), timeRunning(0), lastDataReceived(0), gameListMutex(QMutex::Recursive)
 {
 	connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
@@ -126,29 +127,6 @@ void Server_ProtocolHandler::prepareDestroy()
 		g->gameMutex.unlock();
 	}
 	gameListMutex.unlock();
-
-	delete userInfo;
-}
-
-void Server_ProtocolHandler::setUserInfo(const ServerInfo_User &_userInfo)
-{
-	userInfo = new ServerInfo_User;
-	userInfo->CopyFrom(_userInfo);
-}
-
-ServerInfo_User Server_ProtocolHandler::copyUserInfo(bool complete, bool moderatorInfo) const
-{
-	ServerInfo_User result;
-	if (userInfo) {
-		result.CopyFrom(*userInfo);
-		if (!moderatorInfo) {
-			result.clear_address();
-			result.clear_id();
-		}
-		if (!complete)
-			result.clear_avatar_bmp();
-	}
-	return result;
 }
 
 void Server_ProtocolHandler::playerRemovedFromGame(Server_Game *game)
@@ -195,37 +173,13 @@ void Server_ProtocolHandler::sendProtocolItem(const RoomEvent &item)
 	transmitProtocolItem(msg);
 }
 
-void Server_ProtocolHandler::sendProtocolItem(ServerMessage::MessageType type, const ::google::protobuf::Message &item)
-{
-	switch (type) {
-		case ServerMessage::RESPONSE: sendProtocolItem(static_cast<const Response &>(item)); break;
-		case ServerMessage::SESSION_EVENT: sendProtocolItem(static_cast<const SessionEvent &>(item)); break;
-		case ServerMessage::GAME_EVENT_CONTAINER: sendProtocolItem(static_cast<const GameEventContainer &>(item)); break;
-		case ServerMessage::ROOM_EVENT: sendProtocolItem(static_cast<const RoomEvent &>(item)); break;
-	}
-}
-
-SessionEvent *Server_ProtocolHandler::prepareSessionEvent(const ::google::protobuf::Message &sessionEvent)
-{
-	SessionEvent *event = new SessionEvent;
-	event->GetReflection()->MutableMessage(event, sessionEvent.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(sessionEvent);
-	return event;
-}
-
 Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(const CommandContainer &cont, ResponseContainer &rc)
 {
 	Response::ResponseCode finalResponseCode = Response::RespOk;
 	for (int i = cont.session_command_size() - 1; i >= 0; --i) {
 		Response::ResponseCode resp = Response::RespInvalidCommand;
 		const SessionCommand &sc = cont.session_command(i);
-		std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
-		sc.GetReflection()->ListFields(sc, &fieldList);
-		int num = 0;
-		for (unsigned int j = 0; j < fieldList.size(); ++j)
-			if (fieldList[j]->is_extension()) {
-				num = fieldList[j]->number();
-				break;
-			}
+		const int num = getPbExtension(sc);
 		if (num != SessionCommand::PING)
 			emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
 		switch ((SessionCommand::SessionCommandType) num) {
@@ -270,14 +224,7 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
 	for (int i = cont.room_command_size() - 1; i >= 0; --i) {
 		Response::ResponseCode resp = Response::RespInvalidCommand;
 		const RoomCommand &sc = cont.room_command(i);
-		std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
-		sc.GetReflection()->ListFields(sc, &fieldList);
-		int num = 0;
-		for (unsigned int j = 0; j < fieldList.size(); ++j)
-			if (fieldList[j]->is_extension()) {
-				num = fieldList[j]->number();
-				break;
-			}
+		const int num = getPbExtension(sc);
 		emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
 		switch ((RoomCommand::RoomCommandType) num) {
 			case RoomCommand::LEAVE_ROOM: resp = cmdLeaveRoom(sc.GetExtension(Command_LeaveRoom::ext), room, rc); break;
@@ -313,14 +260,7 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 	for (int i = cont.game_command_size() - 1; i >= 0; --i) {
 		Response::ResponseCode resp = Response::RespInvalidCommand;
 		const GameCommand &sc = cont.game_command(i);
-		std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
-		sc.GetReflection()->ListFields(sc, &fieldList);
-		int num = 0;
-		for (unsigned int j = 0; j < fieldList.size(); ++j)
-			if (fieldList[j]->is_extension()) {
-				num = fieldList[j]->number();
-				break;
-			}
+		const int num = getPbExtension(sc);
 		emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
 		switch ((GameCommand::GameCommandType) num) {
 			case GameCommand::KICK_FROM_GAME: resp = cmdKickFromGame(sc.GetExtension(Command_KickFromGame::ext), game, player, rc, ges); break;
@@ -372,14 +312,7 @@ Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(
 	for (int i = cont.moderator_command_size() - 1; i >= 0; --i) {
 		Response::ResponseCode resp = Response::RespInvalidCommand;
 		const ModeratorCommand &sc = cont.moderator_command(i);
-		std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
-		sc.GetReflection()->ListFields(sc, &fieldList);
-		int num = 0;
-		for (unsigned int j = 0; j < fieldList.size(); ++j)
-			if (fieldList[j]->is_extension()) {
-				num = fieldList[j]->number();
-				break;
-			}
+		const int num = getPbExtension(sc);
 		emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
 		switch ((ModeratorCommand::ModeratorCommandType) num) {
 			case ModeratorCommand::BAN_FROM_SERVER: resp = cmdBanFromServer(sc.GetExtension(Command_BanFromServer::ext), rc); break;
@@ -401,14 +334,7 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
 	for (int i = cont.admin_command_size() - 1; i >= 0; --i) {
 		Response::ResponseCode resp = Response::RespInvalidCommand;
 		const AdminCommand &sc = cont.admin_command(i);
-		std::vector< const ::google::protobuf::FieldDescriptor * > fieldList;
-		sc.GetReflection()->ListFields(sc, &fieldList);
-		int num = 0;
-		for (unsigned int j = 0; j < fieldList.size(); ++j)
-			if (fieldList[j]->is_extension()) {
-				num = fieldList[j]->number();
-				break;
-			}
+		const int num = getPbExtension(sc);
 		emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
 		switch ((AdminCommand::AdminCommandType) num) {
 			case AdminCommand::SHUTDOWN_SERVER: resp = cmdShutdownServer(sc.GetExtension(Command_ShutdownServer::ext), rc); break;
@@ -442,7 +368,7 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
 	
 	const QList<QPair<ServerMessage::MessageType, ::google::protobuf::Message *> > &preResponseQueue = responseContainer.getPreResponseQueue();
 	for (int i = 0; i < preResponseQueue.size(); ++i)
-		sendProtocolItem(preResponseQueue[i].first, *preResponseQueue[i].second);
+		sendProtocolItemByType(preResponseQueue[i].first, *preResponseQueue[i].second);
 	
 	Response response;
 	response.set_cmd_id(cont.cmd_id());
@@ -454,7 +380,7 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
 	
 	const QList<QPair<ServerMessage::MessageType, ::google::protobuf::Message *> > &postResponseQueue = responseContainer.getPostResponseQueue();
 	for (int i = 0; i < postResponseQueue.size(); ++i)
-		sendProtocolItem(postResponseQueue[i].first, *postResponseQueue[i].second);
+		sendProtocolItemByType(postResponseQueue[i].first, *postResponseQueue[i].second);
 }
 
 void Server_ProtocolHandler::pingClockTimeout()
@@ -577,11 +503,15 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
 	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
-	server->serverMutex.lock();
+	QMutexLocker locker(&server->serverMutex);
+	
 	QString receiver = QString::fromStdString(cmd.user_name());
-	Server_ProtocolHandler *userHandler = server->getUsers().value(receiver);
-	if (!userHandler)
-		return Response::RespNameNotFound;
+	Server_AbstractUserInterface *userInterface = server->getUsers().value(receiver);
+	if (!userInterface) {
+		userInterface = server->getExternalUsers().value(receiver);
+		if (!userInterface)
+			return Response::RespNameNotFound;
+	}
 	if (server->isInIgnoreList(receiver, QString::fromStdString(userInfo->name())))
 		return Response::RespInIgnoreList;
 	
@@ -591,9 +521,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
 	event.set_message(cmd.message());
 	
 	SessionEvent *se = prepareSessionEvent(event);
-	userHandler->sendProtocolItem(*se);
+	userInterface->sendProtocolItem(*se);
 	rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, se);
-	server->serverMutex.unlock();
 	
 	return Response::RespOk;
 }
@@ -634,12 +563,18 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetU
 	if (userName.isEmpty())
 		re->mutable_user_info()->CopyFrom(*userInfo);
 	else {
-		server->serverMutex.lock();
-		Server_ProtocolHandler *handler = server->getUsers().value(userName);
-		if (!handler)
+		
+		QMutexLocker locker(&server->serverMutex);
+		
+		ServerInfo_User_Container *infoSource;
+		if (server->getUsers().contains(userName))
+			infoSource = server->getUsers().value(userName);
+		else if (server->getExternalUsers().contains(userName))
+			infoSource = server->getExternalUsers().value(userName);
+		else
 			return Response::RespNameNotFound;
-		re->mutable_user_info()->CopyFrom(handler->copyUserInfo(true, userInfo->user_level() & ServerInfo_User::IsModerator));
-		server->serverMutex.unlock();
+		
+		re->mutable_user_info()->CopyFrom(infoSource->copyUserInfo(true, userInfo->user_level() & ServerInfo_User::IsModerator));
 	}
 	
 	rc.setResponseExtension(re);
@@ -699,6 +634,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdListUsers(const Command_ListUs
 	QMapIterator<QString, Server_ProtocolHandler *> userIterator = server->getUsers();
 	while (userIterator.hasNext())
 		re->add_user_list()->CopyFrom(userIterator.next().value()->copyUserInfo(false));
+	QMapIterator<QString, Server_AbstractUserInterface *> extIterator = server->getExternalUsers();
+	while (extIterator.hasNext())
+		re->add_user_list()->CopyFrom(extIterator.next().value()->copyUserInfo(false));
 	server->serverMutex.unlock();
 	
 	acceptsUserListChanges = true;
@@ -747,7 +685,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_Creat
 		return Response::RespLoginNeeded;
 
 	if (server->getMaxGamesPerUser() > 0)
-		if (room->getGamesCreatedByUser(getUserName()) >= server->getMaxGamesPerUser())
+		if (room->getGamesCreatedByUser(QString::fromStdString(userInfo->name())) >= server->getMaxGamesPerUser())
 			return Response::RespContextError;
 	
 	QList<int> gameTypes;

@@ -64,6 +64,8 @@ void Servatrice_IslServer::incomingConnection(int socketDescriptor)
 Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	: Server(parent), dbMutex(QMutex::Recursive), settings(_settings), uptime(0), shutdownTimer(0)
 {
+	qRegisterMetaType<ServerInfo_User>("ServerInfo_User");
+	
 	serverName = settings->value("server/name").toString();
 	serverId = settings->value("server/id", 0).toInt();
 	
@@ -852,6 +854,8 @@ void Servatrice::addIslInterface(int serverId, IslInterface *interface)
 	// Only call with islLock locked for writing
 	
 	islInterfaces.insert(serverId, interface);
+	connect(interface, SIGNAL(externalUserJoined(ServerInfo_User)), this, SLOT(externalUserJoined(ServerInfo_User)));
+	connect(interface, SIGNAL(externalUserLeft(QString)), this, SLOT(externalUserLeft(QString)));
 }
 
 void Servatrice::removeIslInterface(int serverId)
@@ -866,13 +870,10 @@ void Servatrice::doSendIslMessage(const IslMessage &msg, int serverId)
 {
 	QReadLocker locker(&islLock);
 	
-	qDebug() << "hallo";
 	if (serverId == -1) {
 		QMapIterator<int, IslInterface *> islIterator(islInterfaces);
-		while (islIterator.hasNext()) {
-			qDebug() << "welt";
+		while (islIterator.hasNext())
 			islIterator.next().value()->transmitMessage(msg);
-		}
 	} else {
 		IslInterface *interface = islInterfaces.value(serverId);
 		if (interface)

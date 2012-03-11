@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QPair>
 #include "server.h"
+#include "server_abstractuserinterface.h"
 #include "pb/response.pb.h"
 #include "pb/server_message.pb.h"
 
@@ -84,25 +85,21 @@ class Command_BanFromServer;
 class Command_UpdateServerMessage;
 class Command_ShutdownServer;
 
-class Server_ProtocolHandler : public QObject {
+class Server_ProtocolHandler : public QObject, public Server_AbstractUserInterface {
 	Q_OBJECT
 protected:
-	Server *server;
 	QMap<int, QPair<Server_Game *, Server_Player *> > games;
 	QMap<int, Server_Room *> rooms;
 
-	Server *getServer() const { return server; }
 	QPair<Server_Game *, Server_Player *> getGame(int gameId) const;
 
 	AuthenticationResult authState;
 	bool acceptsUserListChanges;
 	bool acceptsRoomListChanges;
-	ServerInfo_User *userInfo;
 	
 	void prepareDestroy();
 	int sessionId;
 private:
-	QString thisUserName;
 	QList<int> messageSizeOverTime, messageCountOverTime;
 	int timeRunning, lastDataReceived;
 	QTimer *pingClock;
@@ -186,11 +183,7 @@ public:
 	
 	bool getAcceptsUserListChanges() const { return acceptsUserListChanges; }
 	bool getAcceptsRoomListChanges() const { return acceptsRoomListChanges; }
-	ServerInfo_User *getUserInfo() const { return userInfo; }
-	ServerInfo_User copyUserInfo(bool complete, bool moderatorInfo = false) const;
-	const QString &getUserName() const { return thisUserName; }
 	virtual QString getAddress() const = 0;
-	void setUserInfo(const ServerInfo_User &_userInfo);
 	int getSessionId() const { return sessionId; }
 	void setSessionId(int _sessionId) { sessionId = _sessionId; }
 
@@ -201,9 +194,6 @@ public:
 	void sendProtocolItem(const SessionEvent &item);
 	void sendProtocolItem(const GameEventContainer &item);
 	void sendProtocolItem(const RoomEvent &item);
-	void sendProtocolItem(ServerMessage::MessageType type, const ::google::protobuf::Message &item);
-	
-	static SessionEvent *prepareSessionEvent(const ::google::protobuf::Message &sessionEvent);
 };
 
 #endif

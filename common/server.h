@@ -10,9 +10,13 @@
 class Server_Game;
 class Server_Room;
 class Server_ProtocolHandler;
+class Server_AbstractUserInterface;
 class GameReplay;
 class IslMessage;
+class Response;
 class SessionEvent;
+class GameEventContainer;
+class RoomEvent;
 
 enum AuthenticationResult { NotLoggedIn = 0, PasswordRight = 1, UnknownUser = 2, WouldOverwriteOldSession = 3, UserIsBanned = 4 };
 
@@ -53,11 +57,22 @@ public:
 	
 	virtual void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays) { }
 	
+	void sendIslMessage(const Response &item, int serverId = -1);
 	void sendIslMessage(const SessionEvent &item, int serverId = -1);
+	void sendIslMessage(const GameEventContainer &item, int serverId = -1);
+	void sendIslMessage(const RoomEvent &item, int serverId = -1);
+	
+	void addExternalUser(const ServerInfo_User &userInfo);
+	void removeExternalUser(const QString &userName);
+	const QMap<QString, Server_AbstractUserInterface *> &getExternalUsers() const { return externalUsers; }
+protected slots:	
+	void externalUserJoined(ServerInfo_User userInfo);
+	void externalUserLeft(QString userName);
 protected:
 	void prepareDestroy();
 	QList<Server_ProtocolHandler *> clients;
 	QMap<QString, Server_ProtocolHandler *> users;
+	QMap<QString, Server_AbstractUserInterface *> externalUsers;
 	QMap<int, Server_Room *> rooms;
 	
 	virtual int startSession(const QString &userName, const QString &address) { return -1; }
