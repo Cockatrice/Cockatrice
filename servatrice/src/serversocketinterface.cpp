@@ -451,27 +451,6 @@ Response::ResponseCode ServerSocketInterface::cmdDeckUpload(const Command_DeckUp
 	return Response::RespOk;
 }
 
-DeckList *ServerSocketInterface::getDeckFromDatabase(int deckId)
-{
-	servatrice->checkSql();
-	
-	QMutexLocker locker(&servatrice->dbMutex);
-	QSqlQuery query;
-	
-	query.prepare("select content from " + servatrice->getDbPrefix() + "_decklist_files where id = :id and user = :user");
-	query.bindValue(":id", deckId);
-	query.bindValue(":user", QString::fromStdString(userInfo->name()));
-	servatrice->execSqlQuery(query);
-	if (!query.next())
-		throw Response::RespNameNotFound;
-	
-	QXmlStreamReader deckReader(query.value(0).toString());
-	DeckList *deck = new DeckList;
-	deck->loadFromXml(&deckReader);
-	
-	return deck;
-}
-
 Response::ResponseCode ServerSocketInterface::cmdDeckDownload(const Command_DeckDownload &cmd, ResponseContainer &rc)
 {
 	if (authState != PasswordRight)
@@ -479,7 +458,7 @@ Response::ResponseCode ServerSocketInterface::cmdDeckDownload(const Command_Deck
 	
 	DeckList *deck;
 	try {
-		deck = getDeckFromDatabase(cmd.deck_id());
+		deck = servatrice->getDeckFromDatabase(cmd.deck_id(), QString::fromStdString(userInfo->name()));
 	} catch(Response::ResponseCode r) {
 		return r;
 	}

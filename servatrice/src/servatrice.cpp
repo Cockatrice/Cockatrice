@@ -29,6 +29,7 @@
 #include "server_logger.h"
 #include "main.h"
 #include "passwordhasher.h"
+#include "decklist.h"
 #include "pb/game_replay.pb.h"
 #include "pb/event_replay_added.pb.h"
 #include "pb/event_server_message.pb.h"
@@ -813,6 +814,27 @@ void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &a
 	query3.bindValue(":id_player", userIds);
 	query3.bindValue(":replay_name", replayNames);
 	query3.execBatch();
+}
+
+DeckList *Servatrice::getDeckFromDatabase(int deckId, const QString &userName)
+{
+	checkSql();
+	
+	QMutexLocker locker(&dbMutex);
+	QSqlQuery query;
+	
+	query.prepare("select content from " + dbPrefix + "_decklist_files where id = :id and user = :user");
+	query.bindValue(":id", deckId);
+	query.bindValue(":user", userName);
+	execSqlQuery(query);
+	if (!query.next())
+		throw Response::RespNameNotFound;
+	
+	QXmlStreamReader deckReader(query.value(0).toString());
+	DeckList *deck = new DeckList;
+	deck->loadFromXml(&deckReader);
+	
+	return deck;
 }
 
 void Servatrice::scheduleShutdown(const QString &reason, int minutes)

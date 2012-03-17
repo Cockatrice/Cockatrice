@@ -17,6 +17,9 @@ RNG_SFMT::RNG_SFMT(QObject *parent)
 
 unsigned int RNG_SFMT::getNumber(unsigned int min, unsigned int max)
 {
+	mutex.lock();
 	uint64_t r = gen_rand64();
+	mutex.unlock();
+	
 	return min + (unsigned int) (((double) (max + 1 - min)) * r / (18446744073709551616.0 + 1.0));
 }

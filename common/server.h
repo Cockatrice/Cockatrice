@@ -21,6 +21,7 @@ class Response;
 class SessionEvent;
 class GameEventContainer;
 class RoomEvent;
+class DeckList;
 
 enum AuthenticationResult { NotLoggedIn = 0, PasswordRight = 1, UnknownUser = 2, WouldOverwriteOldSession = 3, UserIsBanned = 4 };
 
@@ -60,7 +61,8 @@ public:
 	virtual bool isInIgnoreList(const QString &whoseList, const QString &who) { return false; }
 	
 	virtual void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays) { }
-	
+	virtual DeckList *getDeckFromDatabase(int deckId, const QString &userName) = 0;
+
 	void sendIslMessage(const Response &item, int serverId = -1);
 	void sendIslMessage(const SessionEvent &item, int serverId = -1);
 	void sendIslMessage(const GameEventContainer &item, int serverId = -1);

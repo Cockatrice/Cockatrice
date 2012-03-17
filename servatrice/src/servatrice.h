@@ -116,6 +116,7 @@ public:
 	void incRxBytes(quint64 num);
 	int getUserIdInDB(const QString &name);
 	void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays);
+	DeckList *getDeckFromDatabase(int deckId, const QString &userName);
 	
 	bool islConnectionExists(int serverId) const;
 	void addIslInterface(int serverId, IslInterface *interface);
