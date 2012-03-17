@@ -32,7 +32,7 @@
 #include <QDebug>
 
 Server::Server(QObject *parent)
-	: QObject(parent), nextGameId(0), nextReplayId(0)
+	: QObject(parent), nextGameId(0), nextReplayId(0), clientsLock(QReadWriteLock::Recursive)
 {
 	qRegisterMetaType<ServerInfo_Game>("ServerInfo_Game");
 	qRegisterMetaType<ServerInfo_Room>("ServerInfo_Room");
@@ -45,17 +45,17 @@ Server::~Server()
 
 void Server::prepareDestroy()
 {
+	clientsLock.lockForWrite();
+	while (!clients.isEmpty())
+		clients.first()->prepareDestroy();
+	clientsLock.unlock();
+	
 	roomsLock.lockForWrite();
 	QMapIterator<int, Server_Room *> roomIterator(rooms);
 	while (roomIterator.hasNext())
 		delete roomIterator.next().value();
 	rooms.clear();
 	roomsLock.unlock();
-	
-	clientsLock.lockForWrite();
-	while (!clients.isEmpty())
-		delete clients.takeFirst();
-	clientsLock.unlock();
 }
 
 AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr)

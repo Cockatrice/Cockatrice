@@ -60,8 +60,9 @@ static const int protocolVersion = 13;
 ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent)
 	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), messageInProgress(false)
 {
+	bool success = true;
+	
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
-	connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(catchSocketError(QAbstractSocket::SocketError)));
 	connect(this, SIGNAL(outputBufferChanged()), this, SLOT(flushOutputBuffer()), Qt::QueuedConnection);
 	
@@ -81,17 +82,18 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_s
 		sendProtocolItem(*se);
 		delete se;
 		
-		deleteLater();
+		success = false;
 	}
 	
 	server->addClient(this);
+	
+	if (!success)
+		prepareDestroy();
 }
 
 ServerSocketInterface::~ServerSocketInterface()
 {
 	logger->logMessage("ServerSocketInterface destructor", this);
-	
-	prepareDestroy();
 	
 	flushOutputBuffer();
 	delete socket;
@@ -143,7 +145,7 @@ void ServerSocketInterface::catchSocketError(QAbstractSocket::SocketError socket
 {
 	qDebug() << "Socket error:" << socketError;
 	
-	deleteLater();
+	prepareDestroy();
 }
 
 void ServerSocketInterface::transmitProtocolItem(const ServerMessage &item)
@@ -623,7 +625,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 		for (int i = 0; i < userList.size(); ++i) {
 			SessionEvent *se = userList[i]->prepareSessionEvent(event);
 			userList[i]->sendProtocolItem(*se);
-			userList[i]->deleteLater();
+			userList[i]->prepareDestroy();
 			delete se;
 		}
 	}

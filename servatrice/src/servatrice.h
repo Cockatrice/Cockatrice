@@ -82,6 +82,8 @@ class Servatrice : public Server
 private slots:
 	void statusUpdate();
 	void shutdownTimeout();
+public slots:
+	void scheduleShutdown(const QString &reason, int minutes);
 public:
 	mutable QMutex dbMutex;
 	Servatrice(QSettings *_settings, QObject *parent = 0);
@@ -110,7 +112,6 @@ public:
 	QMap<QString, ServerInfo_User> getIgnoreList(const QString &name);
 	bool isInBuddyList(const QString &whoseList, const QString &who);
 	bool isInIgnoreList(const QString &whoseList, const QString &who);
-	void scheduleShutdown(const QString &reason, int minutes);
 	void incTxBytes(quint64 num);
 	void incRxBytes(quint64 num);
 	int getUserIdInDB(const QString &name);

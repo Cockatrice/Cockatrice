@@ -98,9 +98,6 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 {
 }
 
-// This is essentially the destructor, but it needs to be called from the
-// child's destructor so that the server mutex does not get unlocked during
-// finalization.
 void Server_ProtocolHandler::prepareDestroy()
 {
 	qDebug("Server_ProtocolHandler::prepareDestroy");
@@ -146,6 +143,8 @@ void Server_ProtocolHandler::prepareDestroy()
 		r->gamesMutex.unlock();
 	}
 	server->roomsLock.unlock();
+	
+	deleteLater();
 }
 
 void Server_ProtocolHandler::playerRemovedFromGame(Server_Game *game)
@@ -437,7 +436,7 @@ void Server_ProtocolHandler::pingClockTimeout()
 	}
 	
 	if (timeRunning - lastDataReceived > server->getMaxPlayerInactivityTime())
-		deleteLater();
+		prepareDestroy();
 	++timeRunning;
 }
 
@@ -486,7 +485,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 	server->roomsLock.lockForRead();
 	
 	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
-	gameListMutex.lock();
 	while (roomIterator.hasNext()) {
 		Server_Room *room = roomIterator.next().value();
 		room->gamesMutex.lock();
@@ -498,7 +496,10 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 			for (int j = 0; j < gamePlayers.size(); ++j)
 				if (gamePlayers[j]->getUserInfo()->name() == userInfo->name()) {
 					gamePlayers[j]->setProtocolHandler(this);
+					
+					gameListMutex.lock();
 					games.insert(game->getGameId(), QPair<int, int>(room->getId(), gamePlayers[j]->getPlayerId()));
+					gameListMutex.unlock();
 					
 					Event_GameJoined event1;
 					event1.set_game_id(game->getGameId());
@@ -526,7 +527,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 		}
 		room->gamesMutex.unlock();
 	}
-	gameListMutex.unlock();
 	server->roomsLock.unlock();
 	
 	rc.setResponseExtension(re);
@@ -777,11 +777,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinGame(const Command_JoinGam
 	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
-	QMutexLocker locker(&gameListMutex);
-	
-	if (games.contains(cmd.game_id()))
-		return Response::RespContextError;
-	
 	room->gamesMutex.lock();
 	Server_Game *g = room->getGames().value(cmd.game_id());
 	if (!g) {
@@ -795,7 +790,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinGame(const Command_JoinGam
 	if (result == Response::RespOk) {
 		Server_Player *player = g->addPlayer(this, cmd.spectator());
 		
+		gameListMutex.lock();
 		games.insert(cmd.game_id(), QPair<int, int>(room->getId(), player->getPlayerId()));
+		gameListMutex.unlock();
 		
 		Event_GameJoined event1;
 		event1.set_game_id(g->getGameId());

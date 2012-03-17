@@ -307,6 +307,12 @@ void Server_Game::stopGameIfFinished()
 
 Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions)
 {
+	{
+		QMapIterator<int, Server_Player *> playerIterator(players);
+		while (playerIterator.hasNext())
+			if (playerIterator.next().value()->getUserInfo()->name() == user->name())
+				return Response::RespContextError;
+	}
 	if (!(overrideRestrictions && (user->user_level() & ServerInfo_User::IsModerator))) {
 		if ((_password != password) && !(spectator && !spectatorsNeedPassword))
 			return Response::RespWrongPassword;

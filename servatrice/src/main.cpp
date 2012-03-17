@@ -128,7 +128,6 @@ int main(int argc, char *argv[])
 	loggerThread = new QThread;
 	logger = new ServerLogger;
 	logger->moveToThread(loggerThread);
-	QObject::connect(logger, SIGNAL(destroyed()), loggerThread, SLOT(quit()));
 	
 	loggerThread->start();
 	QMetaObject::invokeMethod(logger, "startLog", Qt::BlockingQueuedConnection, Q_ARG(QString, settings->value("server/logfile").toString()));

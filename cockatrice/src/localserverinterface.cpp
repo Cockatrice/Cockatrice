@@ -9,7 +9,6 @@ LocalServerInterface::LocalServerInterface(LocalServer *_server)
 
 LocalServerInterface::~LocalServerInterface()
 {
-	prepareDestroy();
 }
 
 void LocalServerInterface::transmitProtocolItem(const ServerMessage &item)

@@ -95,7 +95,6 @@ protected:
 	bool acceptsUserListChanges;
 	bool acceptsRoomListChanges;
 	
-	void prepareDestroy();
 	int sessionId;
 private:
 	QMutex gameListMutex;
@@ -174,6 +173,8 @@ private slots:
 	void pingClockTimeout();
 signals:
 	void logDebugMessage(const QString &message, Server_ProtocolHandler *session);
+public slots:
+	void prepareDestroy();
 public:
 	Server_ProtocolHandler(Server *_server, QObject *parent = 0);
 	~Server_ProtocolHandler();

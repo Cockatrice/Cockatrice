@@ -16,6 +16,8 @@ ServerLogger::ServerLogger(QObject *parent)
 ServerLogger::~ServerLogger()
 {
 	flushBuffer();
+	// This does not work with the destroyed() signal as this destructor is called after the main event loop is done.
+	thread()->quit();
 }
 
 void ServerLogger::startLog(const QString &logFileName)
