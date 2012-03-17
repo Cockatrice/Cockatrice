@@ -71,7 +71,8 @@ private:
 	bool picDownload, downloadRunning, loadQueueRunning;
 	void startNextPicDownload();
 public:
-	PictureLoader(QObject *parent = 0);
+	PictureLoader(const QString &__picsPath, bool _picDownload, QObject *parent = 0);
+	~PictureLoader();
 	void setPicsPath(const QString &path);
 	void setPicDownload(bool _picDownload);
 	void loadImage(CardInfo *card, bool stripped);
@@ -81,24 +82,6 @@ public slots:
 	void processLoadQueue();
 signals:
 	void startLoadQueue();
-	void imageLoaded(CardInfo *card, const QImage &image);
-};
-
-class PictureLoadingThread : public QThread {
-	Q_OBJECT
-private:
-	QString picsPath;
-	bool picDownload;
-	PictureLoader *pictureLoader;
-	QWaitCondition initWaitCondition;
-protected:
-	void run();
-public:
-	PictureLoadingThread(const QString &_picsPath, bool _picDownload, QObject *parent);
-	~PictureLoadingThread();
-	PictureLoader *getPictureLoader() const { return pictureLoader; }
-	void waitForInit();
-signals:
 	void imageLoaded(CardInfo *card, const QImage &image);
 };
 
@@ -178,7 +161,9 @@ protected:
 	QHash<QString, CardSet *> setHash;
 	bool loadSuccess;
 	CardInfo *noCard;
-	PictureLoadingThread *loadingThread;
+	
+	QThread *pictureLoaderThread;
+	PictureLoader *pictureLoader;
 private:
 	void loadCardsFromXml(QXmlStreamReader &xml);
 	void loadSetsFromXml(QXmlStreamReader &xml);
