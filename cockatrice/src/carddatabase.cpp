@@ -78,13 +78,19 @@ bool PictureToLoad::nextSet()
 	return true;
 }
 
-PictureLoader::PictureLoader(QObject *parent)
-	: QObject(parent), downloadRunning(false), loadQueueRunning(false)
+PictureLoader::PictureLoader(const QString &__picsPath, bool _picDownload, QObject *parent)
+	: QObject(parent), _picsPath(__picsPath), picDownload(_picDownload), downloadRunning(false), loadQueueRunning(false)
 {
 	connect(this, SIGNAL(startLoadQueue()), this, SLOT(processLoadQueue()), Qt::QueuedConnection);
 	
 	networkManager = new QNetworkAccessManager(this);
 	connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
+}
+
+PictureLoader::~PictureLoader()
+{
+	// This does not work with the destroyed() signal as this destructor is called after the main event loop is done.
+	thread()->quit();
 }
 
 void PictureLoader::processLoadQueue()
@@ -222,40 +228,6 @@ void PictureLoader::setPicDownload(bool _picDownload)
 {
 	QMutexLocker locker(&mutex);
 	picDownload = _picDownload;
-}
-
-PictureLoadingThread::PictureLoadingThread(const QString &_picsPath, bool _picDownload, QObject *parent)
-	: QThread(parent), picsPath(_picsPath), picDownload(_picDownload)
-{
-}
-
-PictureLoadingThread::~PictureLoadingThread()
-{
-	quit();
-	wait();
-}
-
-void PictureLoadingThread::run()
-{
-	pictureLoader = new PictureLoader;
-	connect(pictureLoader, SIGNAL(imageLoaded(CardInfo *, const QImage &)), this, SIGNAL(imageLoaded(CardInfo *, const QImage &)));
-	pictureLoader->setPicsPath(picsPath);
-	pictureLoader->setPicDownload(picDownload);
-	
-	usleep(100000);
-	initWaitCondition.wakeAll();
-	
-	exec();
-	
-	delete pictureLoader;
-}
-
-void PictureLoadingThread::waitForInit()
-{
-	QMutex mutex;
-	mutex.lock();
-	initWaitCondition.wait(&mutex);
-	mutex.unlock();
 }
 
 CardInfo::CardInfo(CardDatabase *_db,
@@ -466,10 +438,11 @@ CardDatabase::CardDatabase(QObject *parent)
 	
 	loadCardDatabase();
 	
-	loadingThread = new PictureLoadingThread(settingsCache->getPicsPath(), settingsCache->getPicDownload(), this);
-	connect(loadingThread, SIGNAL(imageLoaded(CardInfo *, QImage)), this, SLOT(imageLoaded(CardInfo *, QImage)));
-	loadingThread->start(QThread::LowPriority);
-	loadingThread->waitForInit();
+	pictureLoaderThread = new QThread;
+	pictureLoader = new PictureLoader(settingsCache->getPicsPath(), settingsCache->getPicDownload());
+	pictureLoader->moveToThread(pictureLoaderThread);
+	connect(pictureLoader, SIGNAL(imageLoaded(CardInfo *, const QImage &)), this, SLOT(imageLoaded(CardInfo *, const QImage &)));
+	pictureLoaderThread->start(QThread::LowPriority);
 
 	noCard = new CardInfo(this);
 	noCard->loadPixmap(); // cache pixmap for card back
@@ -480,6 +453,10 @@ CardDatabase::~CardDatabase()
 {
 	clear();
 	delete noCard;
+	
+	pictureLoader->deleteLater();
+	pictureLoaderThread->wait();
+	delete pictureLoaderThread;
 }
 
 void CardDatabase::clear()
@@ -673,7 +650,7 @@ bool CardDatabase::saveToFile(const QString &fileName)
 
 void CardDatabase::picDownloadChanged()
 {
-	loadingThread->getPictureLoader()->setPicDownload(settingsCache->getPicDownload());
+	pictureLoader->setPicDownload(settingsCache->getPicDownload());
 	if (settingsCache->getPicDownload()) {
 		QHashIterator<QString, CardInfo *> cardIterator(cardHash);
 		while (cardIterator.hasNext())
@@ -739,7 +716,7 @@ void CardDatabase::cacheCardPixmaps(const QStringList &cardNames)
 
 void CardDatabase::loadImage(CardInfo *card)
 {
-	loadingThread->getPictureLoader()->loadImage(card, false);
+	pictureLoader->loadImage(card, false);
 }
 
 void CardDatabase::imageLoaded(CardInfo *card, QImage image)
@@ -749,6 +726,6 @@ void CardDatabase::imageLoaded(CardInfo *card, QImage image)
 
 void CardDatabase::picsPathChanged()
 {
-	loadingThread->getPictureLoader()->setPicsPath(settingsCache->getPicsPath());
+	pictureLoader->setPicsPath(settingsCache->getPicsPath());
 	clearPixmapCache();
 }

@@ -4,6 +4,7 @@
 #include <QPushButton>
 #include <QStyle>
 #include <QMouseEvent>
+#include <QDesktopWidget>
 #include "cardinfowidget.h"
 #include "carditem.h"
 #include "carddatabase.h"
@@ -74,8 +75,9 @@ CardInfoWidget::CardInfoWidget(ResizeMode _mode, const QString &cardName, QWidge
 		textLabel->setMinimumHeight(100);
 		setFixedWidth(sizeHint().width());
 	} else if (mode == ModePopUp) {
-		setFixedWidth(350);
-		pixmapWidth = 250;
+		QDesktopWidget desktopWidget;
+		pixmapWidth = desktopWidget.screenGeometry().height() / 3 / aspectRatio;
+		setFixedWidth(pixmapWidth + 150);
 	} else
 		setFixedWidth(250);
 	
