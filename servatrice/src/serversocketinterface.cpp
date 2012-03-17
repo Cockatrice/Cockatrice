@@ -642,6 +642,6 @@ Response::ResponseCode ServerSocketInterface::cmdUpdateServerMessage(const Comma
 
 Response::ResponseCode ServerSocketInterface::cmdShutdownServer(const Command_ShutdownServer &cmd, ResponseContainer & /*rc*/)
 {
-	servatrice->scheduleShutdown(QString::fromStdString(cmd.reason()), cmd.minutes());
+	QMetaObject::invokeMethod(server, "scheduleShutdown", Q_ARG(QString, QString::fromStdString(cmd.reason())), Q_ARG(int, cmd.minutes()));
 	return Response::RespOk;
 }

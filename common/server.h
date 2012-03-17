@@ -5,8 +5,11 @@
 #include <QStringList>
 #include <QMap>
 #include <QMutex>
+#include <QReadWriteLock>
+#include <QMetaType>
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_room.pb.h"
+#include "pb/serverinfo_game.pb.h"
 
 class Server_Game;
 class Server_Room;
@@ -29,7 +32,7 @@ signals:
 private slots:
 	void broadcastRoomUpdate(const ServerInfo_Room &roomInfo, bool sendToIsl = false);
 public:
-	mutable QMutex serverMutex;
+	mutable QReadWriteLock clientsLock, roomsLock;
 	Server(QObject *parent = 0);
 	~Server();
 	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason);
@@ -67,9 +70,12 @@ public:
 	void removeExternalUser(const QString &userName);
 	const QMap<QString, Server_AbstractUserInterface *> &getExternalUsers() const { return externalUsers; }
 protected slots:	
-	void externalUserJoined(ServerInfo_User userInfo);
-	void externalUserLeft(QString userName);
-	void externalRoomUpdated(ServerInfo_Room roomInfo);
+	void externalUserJoined(const ServerInfo_User &userInfo);
+	void externalUserLeft(const QString &userName);
+	void externalRoomUserJoined(int roomId, const ServerInfo_User &userInfo);
+	void externalRoomUserLeft(int roomId, const QString &userName);
+	void externalRoomSay(int roomId, const QString &userName, const QString &message);
+	void externalRoomGameListChanged(int roomId, const ServerInfo_Game &gameInfo);
 protected:
 	void prepareDestroy();
 	QList<Server_ProtocolHandler *> clients;
@@ -94,5 +100,9 @@ protected:
 	
 	virtual void doSendIslMessage(const IslMessage &msg, int serverId) { }
 };
+
+Q_DECLARE_METATYPE(ServerInfo_User)
+Q_DECLARE_METATYPE(ServerInfo_Room)
+Q_DECLARE_METATYPE(ServerInfo_Game)
 
 #endif

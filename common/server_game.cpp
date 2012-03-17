@@ -65,7 +65,7 @@ Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QS
 
 Server_Game::~Server_Game()
 {
-	room->roomMutex.lock();
+	room->gamesMutex.lock();
 	gameMutex.lock();
 	
 	sendGameEventContainer(prepareGameEvent(Event_GameClosed(), -1));
@@ -80,7 +80,7 @@ Server_Game::~Server_Game()
 	creatorInfo = 0;
 	
 	gameMutex.unlock();
-	room->roomMutex.unlock();
+	room->gamesMutex.unlock();
 	
 	currentReplay->set_duration_seconds(secondsElapsed - startTimeOfThisGame);
 	replayList.append(currentReplay);
@@ -371,7 +371,6 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 
 void Server_Game::removePlayer(Server_Player *player)
 {
-	QMutexLocker roomLocker(&room->roomMutex);
 	QMutexLocker locker(&gameMutex);
 	
 	players.remove(player->getPlayerId());
@@ -461,7 +460,6 @@ void Server_Game::unattachCards(GameEventStorage &ges, Server_Player *player)
 
 bool Server_Game::kickPlayer(int playerId)
 {
-	QMutexLocker roomLocker(&room->roomMutex);
 	QMutexLocker locker(&gameMutex);
 	
 	Server_Player *playerToKick = players.value(playerId);

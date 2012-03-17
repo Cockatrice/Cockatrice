@@ -16,4 +16,5 @@ message ServerInfo_Game {
 	optional bool spectators_need_password = 13;
 	optional uint32 spectators_count = 14;
 	optional uint32 start_time = 15;
+	optional sint32 server_id = 16 [default = -1];
 }

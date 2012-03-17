@@ -32,10 +32,11 @@
 #include <QDebug>
 
 Server::Server(QObject *parent)
-	: QObject(parent), serverMutex(QMutex::Recursive), nextGameId(0), nextReplayId(0)
+	: QObject(parent), nextGameId(0), nextReplayId(0)
 {
 	qRegisterMetaType<ServerInfo_Game>("ServerInfo_Game");
 	qRegisterMetaType<ServerInfo_Room>("ServerInfo_Room");
+	qRegisterMetaType<ServerInfo_User>("ServerInfo_User");
 }
 
 Server::~Server()
@@ -44,21 +45,25 @@ Server::~Server()
 
 void Server::prepareDestroy()
 {
-	QMutexLocker locker(&serverMutex);
-	
-	while (!clients.isEmpty())
-		delete clients.takeFirst();
-	
+	roomsLock.lockForWrite();
 	QMapIterator<int, Server_Room *> roomIterator(rooms);
 	while (roomIterator.hasNext())
 		delete roomIterator.next().value();
+	rooms.clear();
+	roomsLock.unlock();
+	
+	clientsLock.lockForWrite();
+	while (!clients.isEmpty())
+		delete clients.takeFirst();
+	clientsLock.unlock();
 }
 
 AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr)
 {
-	QMutexLocker locker(&serverMutex);
 	if (name.size() > 35)
 		name = name.left(35);
+	
+	QWriteLocker locker(&clientsLock);
 	
 	AuthenticationResult authState = checkUserPassword(session, name, password, reasonStr);
 	if ((authState == NotLoggedIn) || (authState == UserIsBanned))
@@ -113,13 +118,13 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 
 void Server::addClient(Server_ProtocolHandler *client)
 {
-	QMutexLocker locker(&serverMutex);
+	QWriteLocker locker(&clientsLock);
 	clients << client;
 }
 
 void Server::removeClient(Server_ProtocolHandler *client)
 {
-	QMutexLocker locker(&serverMutex);
+	QWriteLocker locker(&clientsLock);
 	clients.removeAt(clients.indexOf(client));
 	ServerInfo_User *data = client->getUserInfo();
 	if (data) {
@@ -142,34 +147,90 @@ void Server::removeClient(Server_ProtocolHandler *client)
 	qDebug() << "Server::removeClient:" << clients.size() << "clients; " << users.size() << "users left";
 }
 
-void Server::externalUserJoined(ServerInfo_User userInfo)
+void Server::externalUserJoined(const ServerInfo_User &userInfo)
 {
 	// This function is always called from the main thread via signal/slot.
-	QMutexLocker locker(&serverMutex);
+	QWriteLocker locker(&clientsLock);
 	
 	externalUsers.insert(QString::fromStdString(userInfo.name()), new Server_RemoteUserInterface(this, ServerInfo_User_Container(userInfo)));
 	
 	Event_UserJoined event;
 	event.mutable_user_info()->CopyFrom(userInfo);
+	
 	SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
 	for (int i = 0; i < clients.size(); ++i)
 		if (clients[i]->getAcceptsUserListChanges())
 			clients[i]->sendProtocolItem(*se);
+	delete se;
 }
 
-void Server::externalUserLeft(QString userName)
+void Server::externalUserLeft(const QString &userName)
 {
 	// This function is always called from the main thread via signal/slot.
-	QMutexLocker locker(&serverMutex);
+	QWriteLocker locker(&clientsLock);
 	
 	delete externalUsers.take(userName);
 	
 	Event_UserLeft event;
 	event.set_name(userName.toStdString());
+	
 	SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
 	for (int i = 0; i < clients.size(); ++i)
 		if (clients[i]->getAcceptsUserListChanges())
 			clients[i]->sendProtocolItem(*se);
+	delete se;
+}
+
+void Server::externalRoomUserJoined(int roomId, const ServerInfo_User &userInfo)
+{
+	// This function is always called from the main thread via signal/slot.
+	QReadLocker locker(&roomsLock);
+	
+	Server_Room *room = rooms.value(roomId);
+	if (!room) {
+		qDebug() << "externalRoomUserJoined: room id=" << roomId << "not found";
+		return;
+	}
+	room->addExternalUser(userInfo);
+}
+
+void Server::externalRoomUserLeft(int roomId, const QString &userName)
+{
+	// This function is always called from the main thread via signal/slot.
+	QReadLocker locker(&roomsLock);
+	
+	Server_Room *room = rooms.value(roomId);
+	if (!room) {
+		qDebug() << "externalRoomUserLeft: room id=" << roomId << "not found";
+		return;
+	}
+	room->removeExternalUser(userName);
+}
+
+void Server::externalRoomSay(int roomId, const QString &userName, const QString &message)
+{
+	// This function is always called from the main thread via signal/slot.
+	QReadLocker locker(&roomsLock);
+	
+	Server_Room *room = rooms.value(roomId);
+	if (!room) {
+		qDebug() << "externalRoomSay: room id=" << roomId << "not found";
+		return;
+	}
+	room->say(userName, message, false);
+}
+
+void Server::externalRoomGameListChanged(int roomId, const ServerInfo_Game &gameInfo)
+{
+	// This function is always called from the main thread via signal/slot.
+	QReadLocker locker(&roomsLock);
+	
+	Server_Room *room = rooms.value(roomId);
+	if (!room) {
+		qDebug() << "externalRoomGameListChanged: room id=" << roomId << "not found";
+		return;
+	}
+	room->updateExternalGameList(gameInfo);
 }
 
 void Server::broadcastRoomUpdate(const ServerInfo_Room &roomInfo, bool sendToIsl)
@@ -179,11 +240,11 @@ void Server::broadcastRoomUpdate(const ServerInfo_Room &roomInfo, bool sendToIsl
 	
 	SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
 
-	serverMutex.lock();
+	clientsLock.lockForRead();
 	for (int i = 0; i < clients.size(); ++i)
 	  	if (clients[i]->getAcceptsRoomListChanges())
 			clients[i]->sendProtocolItem(*se);
-	serverMutex.unlock();
+	clientsLock.unlock();
 	
 	if (sendToIsl)
 		sendIslMessage(*se);
@@ -193,25 +254,26 @@ void Server::broadcastRoomUpdate(const ServerInfo_Room &roomInfo, bool sendToIsl
 
 void Server::addRoom(Server_Room *newRoom)
 {
-	QMutexLocker locker(&serverMutex);
+	QWriteLocker locker(&roomsLock);
+	qDebug() << "Adding room: ID=" << newRoom->getId() << "name=" << newRoom->getName();
 	rooms.insert(newRoom->getId(), newRoom);
 	connect(newRoom, SIGNAL(roomInfoChanged(ServerInfo_Room)), this, SLOT(broadcastRoomUpdate(const ServerInfo_Room &)), Qt::QueuedConnection);
 }
 
 int Server::getUsersCount() const
 {
-	QMutexLocker locker(&serverMutex);
+	QReadLocker locker(&clientsLock);
 	return users.size();
 }
 
 int Server::getGamesCount() const
 {
 	int result = 0;
-	QMutexLocker locker(&serverMutex);
+	QReadLocker locker(&roomsLock);
 	QMapIterator<int, Server_Room *> roomIterator(rooms);
 	while (roomIterator.hasNext()) {
 		Server_Room *room = roomIterator.next().value();
-		QMutexLocker roomLocker(&room->roomMutex);
+		QMutexLocker roomLocker(&room->gamesMutex);
 		result += room->getGames().size();
 	}
 	return result;

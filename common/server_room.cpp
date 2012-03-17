@@ -10,22 +10,25 @@
 #include <google/protobuf/descriptor.h>
 
 Server_Room::Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent)
-	: QObject(parent), id(_id), name(_name), description(_description), autoJoin(_autoJoin), joinMessage(_joinMessage), gameTypes(_gameTypes), roomMutex(QMutex::Recursive)
+	: QObject(parent), id(_id), name(_name), description(_description), autoJoin(_autoJoin), joinMessage(_joinMessage), gameTypes(_gameTypes), gamesMutex(QMutex::Recursive)
 {
 	connect(this, SIGNAL(gameListChanged(ServerInfo_Game)), this, SLOT(broadcastGameListUpdate(ServerInfo_Game)), Qt::QueuedConnection);
 }
 
 Server_Room::~Server_Room()
 {
-	QMutexLocker locker(&roomMutex);
 	qDebug("Server_Room destructor");
 	
+	gamesMutex.lock();
 	const QList<Server_Game *> gameList = games.values();
 	for (int i = 0; i < gameList.size(); ++i)
 		delete gameList[i];
 	games.clear();
+	gamesMutex.unlock();
 	
+	usersLock.lockForWrite();
 	userList.clear();
+	usersLock.unlock();
 }
 
 Server *Server_Room::getServer() const
@@ -35,12 +38,8 @@ Server *Server_Room::getServer() const
 
 ServerInfo_Room Server_Room::getInfo(bool complete, bool showGameTypes, bool updating, bool includeExternalData) const
 {
-	QMutexLocker locker(&roomMutex);
-	
 	ServerInfo_Room result;
 	result.set_room_id(id);
-	result.set_game_count(games.size() + externalGames.size());
-	result.set_player_count(userList.size() + externalUsers.size());
 	
 	if (!updating) {
 		result.set_name(name.toStdString());
@@ -48,6 +47,8 @@ ServerInfo_Room Server_Room::getInfo(bool complete, bool showGameTypes, bool upd
 		result.set_auto_join(autoJoin);
 	}
 	
+	gamesMutex.lock();
+	result.set_game_count(games.size() + externalGames.size());
 	if (complete) {
 		QMapIterator<int, Server_Game *> gameIterator(games);
 		while (gameIterator.hasNext())
@@ -57,7 +58,12 @@ ServerInfo_Room Server_Room::getInfo(bool complete, bool showGameTypes, bool upd
 			while (externalGameIterator.hasNext())
 				result.add_game_list()->CopyFrom(externalGameIterator.next().value());
 		}
-		
+	}
+	gamesMutex.unlock();
+	
+	usersLock.lockForRead();
+	result.set_player_count(userList.size() + externalUsers.size());
+	if (complete) {
 		for (int i = 0; i < userList.size(); ++i)
 			result.add_user_list()->CopyFrom(userList[i]->copyUserInfo(false));
 		if (includeExternalData) {
@@ -66,6 +72,8 @@ ServerInfo_Room Server_Room::getInfo(bool complete, bool showGameTypes, bool upd
 				result.add_user_list()->CopyFrom(externalUserIterator.next().value().copyUserInfo(false));
 		}
 	}
+	usersLock.unlock();
+	
 	if (complete || showGameTypes)
 		for (int i = 0; i < gameTypes.size(); ++i) {
 			ServerInfo_GameType *gameTypeInfo = result.add_gametype_list();
@@ -90,18 +98,18 @@ void Server_Room::addClient(Server_ProtocolHandler *client)
 	event.mutable_user_info()->CopyFrom(client->copyUserInfo(false));
 	sendRoomEvent(prepareRoomEvent(event));
 	
-	roomMutex.lock();
+	usersLock.lockForWrite();
 	userList.append(client);
-	roomMutex.unlock();
+	usersLock.unlock();
 	
 	emit roomInfoChanged(getInfo(false, false, true));
 }
 
 void Server_Room::removeClient(Server_ProtocolHandler *client)
 {
-	roomMutex.lock();
+	usersLock.lockForWrite();
 	userList.removeAt(userList.indexOf(client));
-	roomMutex.unlock();
+	usersLock.unlock();
 	
 	Event_LeaveRoom event;
 	event.set_name(client->getUserInfo()->name());
@@ -112,23 +120,25 @@ void Server_Room::removeClient(Server_ProtocolHandler *client)
 
 void Server_Room::addExternalUser(const ServerInfo_User &userInfo)
 {
+	// This function is always called from the Server thread with server->roomsMutex locked.
 	ServerInfo_User_Container userInfoContainer(userInfo);
 	Event_JoinRoom event;
 	event.mutable_user_info()->CopyFrom(userInfoContainer.copyUserInfo(false));
 	sendRoomEvent(prepareRoomEvent(event), false);
 	
-	roomMutex.lock();
+	usersLock.lockForWrite();
 	externalUsers.insert(QString::fromStdString(userInfo.name()), userInfoContainer);
-	roomMutex.unlock();
+	usersLock.unlock();
 	
 	emit roomInfoChanged(getInfo(false, false, true));
 }
 
 void Server_Room::removeExternalUser(const QString &name)
 {
-	roomMutex.lock();
+	// This function is always called from the Server thread with server->roomsMutex locked.
+	usersLock.lockForWrite();
 	externalUsers.remove(name);
-	roomMutex.unlock();
+	usersLock.unlock();
 	
 	Event_LeaveRoom event;
 	event.set_name(name.toStdString());
@@ -137,20 +147,34 @@ void Server_Room::removeExternalUser(const QString &name)
 	emit roomInfoChanged(getInfo(false, false, true));
 }
 
-void Server_Room::say(Server_ProtocolHandler *client, const QString &s)
+void Server_Room::updateExternalGameList(const ServerInfo_Game &gameInfo)
+{
+	// This function is always called from the Server thread with server->roomsMutex locked.
+	gamesMutex.lock();
+	if (!gameInfo.has_player_count() && externalGames.contains(gameInfo.game_id()))
+		externalGames.remove(gameInfo.game_id());
+	else
+		externalGames.insert(gameInfo.game_id(), gameInfo);
+	gamesMutex.unlock();
+	
+	broadcastGameListUpdate(gameInfo, false);
+	emit roomInfoChanged(getInfo(false, false, true));
+}
+
+void Server_Room::say(const QString &userName, const QString &s, bool sendToIsl)
 {
 	Event_RoomSay event;
-	event.set_name(client->getUserInfo()->name());
+	event.set_name(userName.toStdString());
 	event.set_message(s.toStdString());
-	sendRoomEvent(prepareRoomEvent(event));
+	sendRoomEvent(prepareRoomEvent(event), sendToIsl);
 }
 
 void Server_Room::sendRoomEvent(RoomEvent *event, bool sendToIsl)
 {
-	roomMutex.lock();
+	usersLock.lockForRead();
 	for (int i = 0; i < userList.size(); ++i)
 		userList[i]->sendProtocolItem(*event);
-	roomMutex.unlock();
+	usersLock.unlock();
 	
 	if (sendToIsl)
 		static_cast<Server *>(parent())->sendIslMessage(*event);
@@ -158,16 +182,16 @@ void Server_Room::sendRoomEvent(RoomEvent *event, bool sendToIsl)
 	delete event;
 }
 
-void Server_Room::broadcastGameListUpdate(ServerInfo_Game gameInfo)
+void Server_Room::broadcastGameListUpdate(ServerInfo_Game gameInfo, bool sendToIsl)
 {
 	Event_ListGames event;
 	event.add_game_list()->CopyFrom(gameInfo);
-	sendRoomEvent(prepareRoomEvent(event));
+	sendRoomEvent(prepareRoomEvent(event), sendToIsl);
 }
 
 void Server_Room::addGame(Server_Game *game)
 {
-	// Lock roomMutex and gameMutex before calling this
+	// Lock gamesMutex and gameMutex before calling this
 	
 	connect(game, SIGNAL(gameInfoChanged(ServerInfo_Game)), this, SLOT(broadcastGameListUpdate(ServerInfo_Game)));
 	games.insert(game->getGameId(), game);
@@ -177,7 +201,7 @@ void Server_Room::addGame(Server_Game *game)
 
 void Server_Room::removeGame(Server_Game *game)
 {
-	// No need to lock roomMutex or gameMutex. This method is only
+	// No need to lock gamesMutex or gameMutex. This method is only
 	// called from ~Server_Game, which locks both mutexes anyway beforehand.
 	
 	disconnect(game, 0, this, 0);
@@ -189,7 +213,7 @@ void Server_Room::removeGame(Server_Game *game)
 
 int Server_Room::getGamesCreatedByUser(const QString &userName) const
 {
-	QMutexLocker locker(&roomMutex);
+	QMutexLocker locker(&gamesMutex);
 	
 	QMapIterator<int, Server_Game *> gamesIterator(games);
 	int result = 0;
@@ -201,6 +225,8 @@ int Server_Room::getGamesCreatedByUser(const QString &userName) const
 
 QList<ServerInfo_Game> Server_Room::getGamesOfUser(const QString &userName) const
 {
+	QMutexLocker locker(&gamesMutex);
+	
 	QList<ServerInfo_Game> result;
 	QMapIterator<int, Server_Game *> gamesIterator(games);
 	while (gamesIterator.hasNext()) {

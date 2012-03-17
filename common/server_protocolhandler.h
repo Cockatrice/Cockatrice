@@ -88,10 +88,8 @@ class Command_ShutdownServer;
 class Server_ProtocolHandler : public QObject, public Server_AbstractUserInterface {
 	Q_OBJECT
 protected:
-	QMap<int, QPair<Server_Game *, Server_Player *> > games;
+	QMap<int, QPair<int, int> > games; // gameId -> (roomId, playerId)
 	QMap<int, Server_Room *> rooms;
-
-	QPair<Server_Game *, Server_Player *> getGame(int gameId) const;
 
 	AuthenticationResult authState;
 	bool acceptsUserListChanges;
@@ -100,6 +98,8 @@ protected:
 	void prepareDestroy();
 	int sessionId;
 private:
+	QMutex gameListMutex;
+	
 	QList<int> messageSizeOverTime, messageCountOverTime;
 	int timeRunning, lastDataReceived;
 	QTimer *pingClock;
@@ -175,8 +175,6 @@ private slots:
 signals:
 	void logDebugMessage(const QString &message, Server_ProtocolHandler *session);
 public:
-	QMutex gameListMutex;
-	
 	Server_ProtocolHandler(Server *_server, QObject *parent = 0);
 	~Server_ProtocolHandler();
 	void playerRemovedFromGame(Server_Game *game);

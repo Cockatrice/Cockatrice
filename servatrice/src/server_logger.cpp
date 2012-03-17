@@ -8,8 +8,17 @@
 # include <sys/socket.h>
 #endif
 
-ServerLogger::ServerLogger(const QString &logFileName, QObject *parent)
+ServerLogger::ServerLogger(QObject *parent)
 	: QObject(parent), flushRunning(false)
+{
+}
+
+ServerLogger::~ServerLogger()
+{
+	flushBuffer();
+}
+
+void ServerLogger::startLog(const QString &logFileName)
 {
 	if (!logFileName.isEmpty()) {
 		logFile = new QFile("server.log", this);
@@ -24,11 +33,6 @@ ServerLogger::ServerLogger(const QString &logFileName, QObject *parent)
 		logFile = 0;
 	
 	connect(this, SIGNAL(sigFlushBuffer()), this, SLOT(flushBuffer()), Qt::QueuedConnection);
-}
-
-ServerLogger::~ServerLogger()
-{
-	flushBuffer();
 }
 
 void ServerLogger::logMessage(QString message, void *caller)
@@ -98,34 +102,3 @@ void ServerLogger::handleSigHup()
 
 QFile *ServerLogger::logFile;
 int ServerLogger::sigHupFD[2];
-
-ServerLoggerThread::ServerLoggerThread(const QString &_fileName, QObject *parent)
-	: QThread(parent), fileName(_fileName)
-{
-}
-
-ServerLoggerThread::~ServerLoggerThread()
-{
-	quit();
-	wait();
-}
-
-void ServerLoggerThread::run()
-{
-	logger = new ServerLogger(fileName);
-	
-	usleep(100);
-	initWaitCondition.wakeAll();
-	
-	exec();
-	
-	delete logger;
-}
-
-void ServerLoggerThread::waitForInit()
-{
-	QMutex mutex;
-	mutex.lock();
-	initWaitCondition.wait(&mutex);
-	mutex.unlock();
-}

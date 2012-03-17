@@ -87,30 +87,55 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	updateServerList();
 	clearSessionTables();
 	
-	int size = settings->beginReadArray("rooms");
-	for (int i = 0; i < size; ++i) {
-	  	settings->setArrayIndex(i);
-		
-		QStringList gameTypes;
-		int size2 = settings->beginReadArray("game_types");
-		for (int j = 0; j < size2; ++j) {
-			settings->setArrayIndex(j);
-			gameTypes.append(settings->value("name").toString());
+	const QString roomMethod = settings->value("rooms/method").toString();
+	if (roomMethod == "sql") {
+		QSqlQuery query;
+		query.prepare("select id, name, descr, auto_join, join_message from " + dbPrefix + "_rooms order by id asc");
+		execSqlQuery(query);
+		while (query.next()) {
+			QSqlQuery query2;
+			query2.prepare("select name from " + dbPrefix + "_rooms_gametypes where id_room = :id_room");
+			query2.bindValue(":id_room", query.value(0).toInt());
+			execSqlQuery(query2);
+			QStringList gameTypes;
+			while (query2.next())
+				gameTypes.append(query2.value(0).toString());
+			
+			addRoom(new Server_Room(query.value(0).toInt(),
+			                        query.value(1).toString(),
+			                        query.value(2).toString(),
+			                        query.value(3).toInt(),
+			                        query.value(4).toString(),
+			                        gameTypes,
+			                        this
+			));
+		}
+	} else {
+		int size = settings->beginReadArray("rooms/roomlist");
+		for (int i = 0; i < size; ++i) {
+		  	settings->setArrayIndex(i);
+			
+			QStringList gameTypes;
+			int size2 = settings->beginReadArray("game_types");
+				for (int j = 0; j < size2; ++j) {
+				settings->setArrayIndex(j);
+				gameTypes.append(settings->value("name").toString());
+			}
+			settings->endArray();
+				
+			Server_Room *newRoom = new Server_Room(
+				i,
+				settings->value("name").toString(),
+				settings->value("description").toString(),
+				settings->value("autojoin").toBool(),
+				settings->value("joinmessage").toString(),
+				gameTypes,
+				this
+			);
+			addRoom(newRoom);
 		}
 		settings->endArray();
-			
-		Server_Room *newRoom = new Server_Room(
-			i,
-			settings->value("name").toString(),
-			settings->value("description").toString(),
-			settings->value("autojoin").toBool(),
-			settings->value("joinmessage").toString(),
-			gameTypes,
-			this
-		);
-		addRoom(newRoom);
 	}
-	settings->endArray();
 	
 	updateLoginMessage();
 	
@@ -499,8 +524,8 @@ ServerInfo_User Servatrice::getUserData(const QString &name, bool withId)
 
 int Servatrice::getUsersWithAddress(const QHostAddress &address) const
 {
-	QMutexLocker locker(&serverMutex);
 	int result = 0;
+	QReadLocker locker(&clientsLock);
 	for (int i = 0; i < clients.size(); ++i)
 		if (static_cast<ServerSocketInterface *>(clients[i])->getPeerAddress() == address)
 			++result;
@@ -509,8 +534,8 @@ int Servatrice::getUsersWithAddress(const QHostAddress &address) const
 
 QList<ServerSocketInterface *> Servatrice::getUsersWithAddressAsList(const QHostAddress &address) const
 {
-	QMutexLocker locker(&serverMutex);
 	QList<ServerSocketInterface *> result;
+	QReadLocker locker(&clientsLock);
 	for (int i = 0; i < clients.size(); ++i)
 		if (static_cast<ServerSocketInterface *>(clients[i])->getPeerAddress() == address)
 			result.append(static_cast<ServerSocketInterface *>(clients[i]));
@@ -519,6 +544,8 @@ QList<ServerSocketInterface *> Servatrice::getUsersWithAddressAsList(const QHost
 
 void Servatrice::clearSessionTables()
 {
+	qDebug() << "Clearing previous sessions...";
+	
 	lockSessionTables();
 	QSqlQuery query;
 	query.prepare("update " + dbPrefix + "_sessions set end_time=now() where end_time is null and id_server = :id_server");
@@ -740,13 +767,13 @@ void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &a
 	
 	SessionEvent *sessionEvent = Server_ProtocolHandler::prepareSessionEvent(replayEvent);
 	allUsersIterator.toFront();
-	serverMutex.lock();
+	clientsLock.lockForRead();
 	while (allUsersIterator.hasNext()) {
 		Server_ProtocolHandler *userHandler = users.value(allUsersIterator.next());
 		if (userHandler)
 			userHandler->sendProtocolItem(*sessionEvent);
 	}
-	serverMutex.unlock();
+	clientsLock.unlock();
 	delete sessionEvent;
 	
 	QMutexLocker locker(&dbMutex);
@@ -790,8 +817,6 @@ void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &a
 
 void Servatrice::scheduleShutdown(const QString &reason, int minutes)
 {
-	QMutexLocker locker(&serverMutex);
-
 	shutdownReason = reason;
 	shutdownMinutes = minutes + 1;
 	if (minutes > 0) {
@@ -818,8 +843,6 @@ void Servatrice::incRxBytes(quint64 num)
 
 void Servatrice::shutdownTimeout()
 {
-	QMutexLocker locker(&serverMutex);
-	
 	--shutdownMinutes;
 	
 	SessionEvent *se;
@@ -833,9 +856,11 @@ void Servatrice::shutdownTimeout()
 		event.set_reason(Event_ConnectionClosed::SERVER_SHUTDOWN);
 		se = Server_ProtocolHandler::prepareSessionEvent(event);
 	}
-
+	
+	clientsLock.lockForRead();
 	for (int i = 0; i < clients.size(); ++i)
 		clients[i]->sendProtocolItem(*se);
+	clientsLock.unlock();
 	delete se;
 	
 	if (!shutdownMinutes)
@@ -856,7 +881,10 @@ void Servatrice::addIslInterface(int serverId, IslInterface *interface)
 	islInterfaces.insert(serverId, interface);
 	connect(interface, SIGNAL(externalUserJoined(ServerInfo_User)), this, SLOT(externalUserJoined(ServerInfo_User)));
 	connect(interface, SIGNAL(externalUserLeft(QString)), this, SLOT(externalUserLeft(QString)));
-	connect(interface, SIGNAL(externalRoomUpdated(ServerInfo_Room)), this, SLOT(externalRoomUpdated(const ServerInfo_Room &)));
+	connect(interface, SIGNAL(externalRoomUserJoined(int, ServerInfo_User)), this, SLOT(externalRoomUserJoined(int, ServerInfo_User)));
+	connect(interface, SIGNAL(externalRoomUserLeft(int, QString)), this, SLOT(externalRoomUserLeft(int, QString)));
+	connect(interface, SIGNAL(externalRoomSay(int, QString, QString)), this, SLOT(externalRoomSay(int, QString, QString)));
+	connect(interface, SIGNAL(externalRoomGameListChanged(int, ServerInfo_Game)), this, SLOT(externalRoomGameListChanged(int, ServerInfo_Game)));
 }
 
 void Servatrice::removeIslInterface(int serverId)

@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QStringList>
 #include <QMutex>
-#include <QMetaType>
+#include <QReadWriteLock>
 #include "pb/serverinfo_room.pb.h"
 #include "serverinfo_user_container.h"
 
@@ -35,9 +35,10 @@ private:
 	QList<Server_ProtocolHandler *> userList;
 	QMap<QString, ServerInfo_User_Container> externalUsers;
 private slots:
-	void broadcastGameListUpdate(ServerInfo_Game gameInfo);
+	void broadcastGameListUpdate(ServerInfo_Game gameInfo, bool sendToIsl = true);
 public:
-	mutable QMutex roomMutex;
+	mutable QReadWriteLock usersLock;
+	mutable QMutex gamesMutex;
 	Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent);
 	~Server_Room();
 	int getId() const { return id; }
@@ -57,8 +58,10 @@ public:
 	
 	void addExternalUser(const ServerInfo_User &userInfo);
 	void removeExternalUser(const QString &name);
+	const QMap<QString, ServerInfo_User_Container> &getExternalUsers() const { return externalUsers; }
+	void updateExternalGameList(const ServerInfo_Game &gameInfo);
 	
-	void say(Server_ProtocolHandler *client, const QString &s);
+	void say(const QString &userName, const QString &s, bool sendToIsl = true);
 	
 	void addGame(Server_Game *game);
 	void removeGame(Server_Game *game);
@@ -66,8 +69,5 @@ public:
 	void sendRoomEvent(RoomEvent *event, bool sendToIsl = true);
 	RoomEvent *prepareRoomEvent(const ::google::protobuf::Message &roomEvent);
 };
-
-Q_DECLARE_METATYPE(ServerInfo_Game)
-Q_DECLARE_METATYPE(ServerInfo_Room)
 
 #endif

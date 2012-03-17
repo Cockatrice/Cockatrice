@@ -11,6 +11,10 @@
 #include "pb/event_user_message.pb.h"
 #include "pb/event_user_joined.pb.h"
 #include "pb/event_user_left.pb.h"
+#include "pb/event_join_room.pb.h"
+#include "pb/event_leave_room.pb.h"
+#include "pb/event_room_say.pb.h"
+#include "pb/event_list_games.pb.h"
 #include <google/protobuf/descriptor.h>
 
 void IslInterface::sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey)
@@ -19,7 +23,7 @@ void IslInterface::sharedCtor(const QSslCertificate &cert, const QSslKey &privat
 	socket->setLocalCertificate(cert);
 	socket->setPrivateKey(privateKey);
 	
-	connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
+	connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()), Qt::QueuedConnection);
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(catchSocketError(QAbstractSocket::SocketError)));
 	connect(this, SIGNAL(outputBufferChanged()), this, SLOT(flushOutputBuffer()), Qt::QueuedConnection);
 }
@@ -42,18 +46,31 @@ IslInterface::~IslInterface()
 	
 	flushOutputBuffer();
 	
-	QStringList usersToDelete;
-	server->serverMutex.lock();
-	QMapIterator<QString, Server_AbstractUserInterface *> extUsers = server->getExternalUsers();
+	// As these signals are connected with Qt::QueuedConnection implicitly,
+	// we don't need to worry about them modifying the lists while we're iterating.
+	server->clientsLock.lockForRead();
+	QMapIterator<QString, Server_AbstractUserInterface *> extUsers(server->getExternalUsers());
 	while (extUsers.hasNext()) {
 		extUsers.next();
 		if (extUsers.value()->getUserInfo()->server_id() == serverId)
-			usersToDelete.append(extUsers.key());
+			emit externalUserLeft(extUsers.key());
 	}
-	server->serverMutex.unlock();
+	server->clientsLock.unlock();
 	
-	for (int i = 0; i < usersToDelete.size(); ++i)
-		emit externalUserLeft(usersToDelete[i]);
+	server->roomsLock.lockForRead();
+	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
+	while (roomIterator.hasNext()) {
+		Server_Room *room = roomIterator.next().value();
+		room->usersLock.lockForRead();
+		QMapIterator<QString, ServerInfo_User_Container> roomUsers(room->getExternalUsers());
+		while (roomUsers.hasNext()) {
+			roomUsers.next();
+			if (roomUsers.value().getUserInfo()->server_id() == serverId)
+				emit externalRoomUserLeft(room->getId(), roomUsers.key());
+		}
+		room->usersLock.unlock();
+	}
+	server->roomsLock.unlock();
 }
 
 void IslInterface::initServer()
@@ -98,15 +115,18 @@ void IslInterface::initServer()
 	Event_ServerCompleteList event;
 	event.set_server_id(server->getServerId());
 	
-	server->serverMutex.lock();
+	server->clientsLock.lockForRead();
 	QMapIterator<QString, Server_ProtocolHandler *> userIterator(server->getUsers());
 	while (userIterator.hasNext())
 		event.add_user_list()->CopyFrom(userIterator.next().value()->copyUserInfo(true, true));
-		
+	server->clientsLock.unlock();
+	
+	server->roomsLock.lockForRead();
 	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
 	while (roomIterator.hasNext()) {
 		Server_Room *room = roomIterator.next().value();
-		room->roomMutex.lock();
+		room->usersLock.lockForRead();
+		room->gamesMutex.lock();
 		event.add_room_list()->CopyFrom(room->getInfo(true, true, false, false));
 	}
 	
@@ -126,9 +146,12 @@ void IslInterface::initServer()
 	server->islLock.unlock();
 	
 	roomIterator.toFront();
-	while (roomIterator.hasNext())
-		roomIterator.next().value()->roomMutex.unlock();
-	server->serverMutex.unlock();
+	while (roomIterator.hasNext()) {
+		roomIterator.next();
+		roomIterator.value()->gamesMutex.unlock();
+		roomIterator.value()->usersLock.unlock();
+	}
+	server->roomsLock.unlock();
 }
 
 void IslInterface::initClient()
@@ -161,7 +184,7 @@ void IslInterface::initClient()
 		deleteLater();
 		return;
 	}
-		
+	
 	server->addIslInterface(serverId, this);
 	server->islLock.unlock();
 }
@@ -242,11 +265,24 @@ void IslInterface::sessionEvent_ServerCompleteList(const Event_ServerCompleteLis
 		temp.set_server_id(serverId);
 		emit externalUserJoined(temp);
 	}
+	for (int i = 0; i < event.room_list_size(); ++i) {
+		const ServerInfo_Room &room = event.room_list(i);
+		for (int j = 0; j < room.user_list_size(); ++j) {
+			ServerInfo_User userInfo(room.user_list(j));
+			userInfo.set_server_id(serverId);
+			emit externalRoomUserJoined(room.room_id(), userInfo);
+		}
+		for (int j = 0; j < room.game_list_size(); ++j) {
+			ServerInfo_Game gameInfo(room.game_list(j));
+			gameInfo.set_server_id(serverId);
+			emit externalRoomGameListChanged(room.room_id(), gameInfo);
+		}
+	}
 }
 
 void IslInterface::sessionEvent_UserMessage(const SessionEvent &sessionEvent, const Event_UserMessage &event)
 {
-	QMutexLocker locker(&server->serverMutex);
+	QReadLocker locker(&server->clientsLock);
 	
 	Server_ProtocolHandler *userInterface = server->getUsers().value(QString::fromStdString(event.receiver_name()));
 	if (userInterface)
@@ -255,12 +291,40 @@ void IslInterface::sessionEvent_UserMessage(const SessionEvent &sessionEvent, co
 
 void IslInterface::sessionEvent_UserJoined(const Event_UserJoined &event)
 {
-	emit externalUserJoined(event.user_info());
+	ServerInfo_User userInfo(event.user_info());
+	userInfo.set_server_id(serverId);
+	emit externalUserJoined(userInfo);
 }
 
 void IslInterface::sessionEvent_UserLeft(const Event_UserLeft &event)
 {
 	emit externalUserLeft(QString::fromStdString(event.name()));
+}
+
+void IslInterface::roomEvent_UserJoined(int roomId, const Event_JoinRoom &event)
+{
+	ServerInfo_User userInfo(event.user_info());
+	userInfo.set_server_id(serverId);
+	emit externalRoomUserJoined(roomId, userInfo);
+}
+
+void IslInterface::roomEvent_UserLeft(int roomId, const Event_LeaveRoom &event)
+{
+	emit externalRoomUserLeft(roomId, QString::fromStdString(event.name()));
+}
+
+void IslInterface::roomEvent_Say(int roomId, const Event_RoomSay &event)
+{
+	emit externalRoomSay(roomId, QString::fromStdString(event.name()), QString::fromStdString(event.message()));
+}
+
+void IslInterface::roomEvent_ListGames(int roomId, const Event_ListGames &event)
+{
+	for (int i = 0; i < event.game_list_size(); ++i) {
+		ServerInfo_Game gameInfo(event.game_list(i));
+		gameInfo.set_server_id(serverId);
+		emit externalRoomGameListChanged(roomId, gameInfo);
+	}
 }
 
 void IslInterface::processSessionEvent(const SessionEvent &event)
@@ -270,6 +334,17 @@ void IslInterface::processSessionEvent(const SessionEvent &event)
 		case SessionEvent::USER_MESSAGE: sessionEvent_UserMessage(event, event.GetExtension(Event_UserMessage::ext)); break;
 		case SessionEvent::USER_JOINED: sessionEvent_UserJoined(event.GetExtension(Event_UserJoined::ext)); break;
 		case SessionEvent::USER_LEFT: sessionEvent_UserLeft(event.GetExtension(Event_UserLeft::ext)); break;
+		default: ;
+	}
+}
+
+void IslInterface::processRoomEvent(const RoomEvent &event)
+{
+	switch (getPbExtension(event)) {
+		case RoomEvent::JOIN_ROOM: roomEvent_UserJoined(event.room_id(), event.GetExtension(Event_JoinRoom::ext)); break;
+		case RoomEvent::LEAVE_ROOM: roomEvent_UserLeft(event.room_id(), event.GetExtension(Event_LeaveRoom::ext)); break;
+		case RoomEvent::ROOM_SAY: roomEvent_Say(event.room_id(), event.GetExtension(Event_RoomSay::ext)); break;
+		case RoomEvent::LIST_GAMES: roomEvent_ListGames(event.room_id(), event.GetExtension(Event_ListGames::ext)); break;
 		default: ;
 	}
 }
@@ -290,6 +365,7 @@ void IslInterface::processMessage(const IslMessage &item)
 			break;
 		}
 		case IslMessage::ROOM_EVENT: {
+			processRoomEvent(item.room_event()); break;
 			break;
 		}
 		default: ;

@@ -35,7 +35,7 @@
 
 RNG_Abstract *rng;
 ServerLogger *logger;
-ServerLoggerThread *loggerThread;
+QThread *loggerThread;
 
 void testRNG()
 {
@@ -100,7 +100,11 @@ void sigSegvHandler(int sig)
 		logger->logMessage("CRASH: SIGSEGV");
 	else if (sig == SIGABRT)
 		logger->logMessage("CRASH: SIGABRT");
+	
+	logger->deleteLater();
+	loggerThread->wait();
 	delete loggerThread;
+	
 	raise(sig);
 }
 #endif
@@ -121,10 +125,13 @@ int main(int argc, char *argv[])
 	
 	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
 	
-	loggerThread = new ServerLoggerThread(settings->value("server/logfile").toString());
+	loggerThread = new QThread;
+	logger = new ServerLogger;
+	logger->moveToThread(loggerThread);
+	QObject::connect(logger, SIGNAL(destroyed()), loggerThread, SLOT(quit()));
+	
 	loggerThread->start();
-	loggerThread->waitForInit();
-	logger = loggerThread->getLogger();
+	QMetaObject::invokeMethod(logger, "startLog", Qt::BlockingQueuedConnection, Q_ARG(QString, settings->value("server/logfile").toString()));
 	
 	qInstallMsgHandler(myMessageOutput2);
 #ifdef Q_OS_UNIX	
@@ -166,6 +173,9 @@ int main(int argc, char *argv[])
 	
 	delete rng;
 	delete settings;
+	
+	logger->deleteLater();
+	loggerThread->wait();
 	delete loggerThread;
 
 	return retval;

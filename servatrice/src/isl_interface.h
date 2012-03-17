@@ -5,6 +5,8 @@
 #include <QSslCertificate>
 #include <QWaitCondition>
 #include "pb/serverinfo_user.pb.h"
+#include "pb/serverinfo_room.pb.h"
+#include "pb/serverinfo_game.pb.h"
 
 class Servatrice;
 class QSslSocket;
@@ -15,6 +17,10 @@ class Event_ServerCompleteList;
 class Event_UserMessage;
 class Event_UserJoined;
 class Event_UserLeft;
+class Event_JoinRoom;
+class Event_LeaveRoom;
+class Event_RoomSay;
+class Event_ListGames;
 
 class IslInterface : public QObject {
 	Q_OBJECT
@@ -26,7 +32,11 @@ signals:
 	void outputBufferChanged();
 	
 	void externalUserJoined(ServerInfo_User userInfo);
-	void externalUserLeft(QString name);
+	void externalUserLeft(QString userName);
+	void externalRoomUserJoined(int roomId, ServerInfo_User userInfo);
+	void externalRoomUserLeft(int roomId, QString userName);
+	void externalRoomSay(int roomId, QString userName, QString message);
+	void externalRoomGameListChanged(int roomId, ServerInfo_Game gameInfo);
 private:
 	int serverId;
 	int socketDescriptor;
@@ -47,7 +57,13 @@ private:
 	void sessionEvent_UserJoined(const Event_UserJoined &event);
 	void sessionEvent_UserLeft(const Event_UserLeft &event);
 	
+	void roomEvent_UserJoined(int roomId, const Event_JoinRoom &event);
+	void roomEvent_UserLeft(int roomId, const Event_LeaveRoom &event);
+	void roomEvent_Say(int roomId, const Event_RoomSay &event);
+	void roomEvent_ListGames(int roomId, const Event_ListGames &event);
+	
 	void processSessionEvent(const SessionEvent &event);
+	void processRoomEvent(const RoomEvent &event);
 	
 	void processMessage(const IslMessage &item);
 	void sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey);

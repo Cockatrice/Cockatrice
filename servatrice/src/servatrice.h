@@ -26,7 +26,6 @@
 #include <QSslKey>
 #include <QHostAddress>
 #include <QReadWriteLock>
-#include <QMetaType>
 #include "server.h"
 
 class QSqlDatabase;
@@ -166,7 +165,5 @@ private:
 	
 	QMap<int, IslInterface *> islInterfaces;
 };
-
-Q_DECLARE_METATYPE(ServerInfo_User)
 
 #endif
