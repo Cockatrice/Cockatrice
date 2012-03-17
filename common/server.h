@@ -38,8 +38,8 @@ public:
 	~Server();
 	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason);
 	const QMap<int, Server_Room *> &getRooms() { return rooms; }
-	int getNextGameId() { return nextGameId++; }
-	int getNextReplayId() { return nextReplayId++; }
+	virtual int getNextGameId() { return nextGameId++; }
+	virtual int getNextReplayId() { return nextReplayId++; }
 	
 	const QMap<QString, Server_ProtocolHandler *> &getUsers() const { return users; }
 	void addClient(Server_ProtocolHandler *player);
@@ -61,7 +61,7 @@ public:
 	virtual bool isInIgnoreList(const QString &whoseList, const QString &who) { return false; }
 	
 	virtual void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays) { }
-	virtual DeckList *getDeckFromDatabase(int deckId, const QString &userName) = 0;
+	virtual DeckList *getDeckFromDatabase(int deckId, const QString &userName) { return 0; }
 
 	void sendIslMessage(const Response &item, int serverId = -1);
 	void sendIslMessage(const SessionEvent &item, int serverId = -1);

@@ -249,24 +249,6 @@ bool Servatrice::openDatabase()
 	}
 	std::cerr << "OK" << std::endl;
 	
-	if (!nextGameId) {
-		QSqlQuery query;
-		if (!query.exec("select max(id) from " + dbPrefix + "_games"))
-			return false;
-		if (!query.next())
-			return false;
-		nextGameId = query.value(0).toInt() + 1;
-		qDebug() << "set nextGameId to " << nextGameId;
-	}
-	if (!nextReplayId) {
-		QSqlQuery query;
-		if (!query.exec("select max(id) from " + dbPrefix + "_replays"))
-			return false;
-		if (!query.next())
-			return false;
-		nextReplayId = query.value(0).toInt() + 1;
-		qDebug() << "set nextReplayId to " << nextReplayId;
-	}
 	return true;
 }
 
@@ -710,6 +692,34 @@ void Servatrice::statusUpdate()
 	execSqlQuery(query);
 }
 
+int Servatrice::getNextGameId()
+{
+	if (databaseType == DatabaseNone)
+		return Server::getNextGameId();
+	
+	checkSql();
+	
+	QSqlQuery query;
+	query.prepare("insert into " + dbPrefix + "_games (time_started) values (now())");
+	execSqlQuery(query);
+	
+	return query.lastInsertId().toInt();
+}
+
+int Servatrice::getNextReplayId()
+{
+	if (databaseType == DatabaseNone)
+		return Server::getNextGameId();
+	
+	checkSql();
+	
+	QSqlQuery query;
+	query.prepare("insert into " + dbPrefix + "_replays () values ()");
+	execSqlQuery(query);
+	
+	return query.lastInsertId().toInt();
+}
+
 void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replayList)
 {
 	const ServerInfo_Game &gameInfo = replayList.first()->game_info();
@@ -782,7 +792,7 @@ void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &a
 		return;
 	
 	QSqlQuery query1;
-	query1.prepare("insert into " + dbPrefix + "_games (room_name, id, descr, creator_name, password, game_types, player_count, time_started, time_finished) values (:id_room, :id_game, :descr, :creator_name, :password, :game_types, :player_count, date_sub(now(), interval :seconds second), now())");
+	query1.prepare("update " + dbPrefix + "_games set room_name=:room_name, descr=:descr, creator_name=:creator_name, password=:password, game_types=:game_types, player_count=:player_count, time_finished=now() where id=:id_game");
 	query1.bindValue(":room_name", room->getName());
 	query1.bindValue(":id_game", gameInfo.game_id());
 	query1.bindValue(":descr", QString::fromStdString(gameInfo.description()));
@@ -790,7 +800,6 @@ void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &a
 	query1.bindValue(":password", gameInfo.with_password() ? 1 : 0);
 	query1.bindValue(":game_types", gameTypes.isEmpty() ? QString("") : gameTypes.join(", "));
 	query1.bindValue(":player_count", gameInfo.max_players());
-	query1.bindValue(":seconds", secondsElapsed);
 	if (!execSqlQuery(query1))
 		return;
 	
@@ -801,7 +810,7 @@ void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &a
 	query2.execBatch();
 	
 	QSqlQuery replayQuery1;
-	replayQuery1.prepare("insert into " + dbPrefix + "_replays (id, id_game, duration, replay) values (:id_replay, :id_game, :duration, :replay)");
+	replayQuery1.prepare("update " + dbPrefix + "_replays set id_game=:id_game, duration=:duration, replay=:replay where id=:id_replay");
 	replayQuery1.bindValue(":id_replay", replayIds);
 	replayQuery1.bindValue(":id_game", replayGameIds);
 	replayQuery1.bindValue(":duration", replayDurations);

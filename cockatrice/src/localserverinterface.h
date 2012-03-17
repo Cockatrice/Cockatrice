@@ -9,7 +9,6 @@ class LocalServerInterface : public Server_ProtocolHandler
 {
 	Q_OBJECT
 private:
-	DeckList *getDeckFromDatabase(int /*deckId*/) { return 0; }
 	Response::ResponseCode cmdAddToList(const Command_AddToList & /*cmd*/, ResponseContainer & /*rc*/) { return Response::RespFunctionNotAllowed; }
 	Response::ResponseCode cmdRemoveFromList(const Command_RemoveFromList & /*cmd*/, ResponseContainer & /*rc*/) { return Response::RespFunctionNotAllowed; }
 	Response::ResponseCode cmdDeckList(const Command_DeckList & /*cmd*/, ResponseContainer & /*rc*/) { return Response::RespFunctionNotAllowed; }

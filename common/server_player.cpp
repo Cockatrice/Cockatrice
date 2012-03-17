@@ -649,6 +649,9 @@ Response::ResponseCode Server_Player::cmdDeckSelect(const Command_DeckSelect &cm
 	} else
 		newDeck = new DeckList(QString::fromStdString(cmd.deck()));
 	
+	if (!newDeck)
+		return Response::RespInternalError;
+	
 	delete deck;
 	deck = newDeck;
 	
