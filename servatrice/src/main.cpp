@@ -118,6 +118,7 @@ int main(int argc, char *argv[])
 	QStringList args = app.arguments();
 	bool testRandom = args.contains("--test-random");
 	bool testHashFunction = args.contains("--test-hash");
+	bool logToConsole = args.contains("--log-to-console");
 	
 	qRegisterMetaType<QList<int> >("QList<int>");
 	
@@ -126,13 +127,16 @@ int main(int argc, char *argv[])
 	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
 	
 	loggerThread = new QThread;
-	logger = new ServerLogger;
+	logger = new ServerLogger(logToConsole);
 	logger->moveToThread(loggerThread);
 	
 	loggerThread->start();
 	QMetaObject::invokeMethod(logger, "startLog", Qt::BlockingQueuedConnection, Q_ARG(QString, settings->value("server/logfile").toString()));
 	
-	qInstallMsgHandler(myMessageOutput2);
+	if (logToConsole)
+		qInstallMsgHandler(myMessageOutput);
+	else
+		qInstallMsgHandler(myMessageOutput2);
 #ifdef Q_OS_UNIX	
 	struct sigaction hup;
 	hup.sa_handler = ServerLogger::hupSignalHandler;
@@ -159,6 +163,7 @@ int main(int argc, char *argv[])
 		testHash();
 	
 	Servatrice *server = new Servatrice(settings);
+	QObject::connect(server, SIGNAL(logDebugMessage(QString, void *)), logger, SLOT(logMessage(QString, void *)));
 	QObject::connect(server, SIGNAL(destroyed()), &app, SLOT(quit()), Qt::QueuedConnection);
 	
 	std::cerr << "-------------------------" << std::endl;

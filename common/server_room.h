@@ -7,8 +7,9 @@
 #include <QStringList>
 #include <QMutex>
 #include <QReadWriteLock>
-#include "pb/serverinfo_room.pb.h"
 #include "serverinfo_user_container.h"
+#include "pb/serverinfo_room.pb.h"
+#include "pb/response.pb.h"
 
 class Server_ProtocolHandler;
 class RoomEvent;
@@ -17,6 +18,10 @@ class ServerInfo_Room;
 class ServerInfo_Game;
 class Server_Game;
 class Server;
+
+class Command_JoinGame;
+class ResponseContainer;
+class Server_AbstractUserInterface;
 
 class Server_Room : public QObject {
 	Q_OBJECT
@@ -48,6 +53,7 @@ public:
 	QString getJoinMessage() const { return joinMessage; }
 	const QStringList &getGameTypes() const { return gameTypes; }
 	const QMap<int, Server_Game *> &getGames() const { return games; }
+	const QMap<int, ServerInfo_Game> &getExternalGames() const { return externalGames; }
 	Server *getServer() const;
 	ServerInfo_Room getInfo(bool complete, bool showGameTypes = false, bool updating = false, bool includeExternalData = true) const;
 	int getGamesCreatedByUser(const QString &name) const;
@@ -60,6 +66,8 @@ public:
 	void removeExternalUser(const QString &name);
 	const QMap<QString, ServerInfo_User_Container> &getExternalUsers() const { return externalUsers; }
 	void updateExternalGameList(const ServerInfo_Game &gameInfo);
+	
+	Response::ResponseCode processJoinGameCommand(const Command_JoinGame &cmd, ResponseContainer &rc, Server_AbstractUserInterface *userInterface);
 	
 	void say(const QString &userName, const QString &s, bool sendToIsl = true);
 	

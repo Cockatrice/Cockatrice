@@ -65,8 +65,6 @@ void Servatrice_IslServer::incomingConnection(int socketDescriptor)
 Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	: Server(parent), dbMutex(QMutex::Recursive), settings(_settings), uptime(0), shutdownTimer(0)
 {
-	qRegisterMetaType<ServerInfo_User>("ServerInfo_User");
-	
 	serverName = settings->value("server/name").toString();
 	serverId = settings->value("server/id", 0).toInt();
 	
@@ -558,7 +556,7 @@ bool Servatrice::userSessionExists(const QString &userName)
 	return query.next();
 }
 
-int Servatrice::startSession(const QString &userName, const QString &address)
+qint64 Servatrice::startSession(const QString &userName, const QString &address)
 {
 	if (authenticationMethod == AuthenticationNone)
 		return -1;
@@ -577,7 +575,7 @@ int Servatrice::startSession(const QString &userName, const QString &address)
 	return -1;
 }
 
-void Servatrice::endSession(int sessionId)
+void Servatrice::endSession(qint64 sessionId)
 {
 	if (authenticationMethod == AuthenticationNone)
 		return;
@@ -780,7 +778,10 @@ void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &a
 	allUsersIterator.toFront();
 	clientsLock.lockForRead();
 	while (allUsersIterator.hasNext()) {
-		Server_ProtocolHandler *userHandler = users.value(allUsersIterator.next());
+		const QString userName = allUsersIterator.next();
+		Server_AbstractUserInterface *userHandler = users.value(userName);
+		if (!userHandler)
+			userHandler = externalUsers.value(userName);
 		if (userHandler)
 			userHandler->sendProtocolItem(*sessionEvent);
 	}
@@ -916,6 +917,10 @@ void Servatrice::addIslInterface(int serverId, IslInterface *interface)
 	connect(interface, SIGNAL(externalRoomUserLeft(int, QString)), this, SLOT(externalRoomUserLeft(int, QString)));
 	connect(interface, SIGNAL(externalRoomSay(int, QString, QString)), this, SLOT(externalRoomSay(int, QString, QString)));
 	connect(interface, SIGNAL(externalRoomGameListChanged(int, ServerInfo_Game)), this, SLOT(externalRoomGameListChanged(int, ServerInfo_Game)));
+	connect(interface, SIGNAL(joinGameCommandReceived(Command_JoinGame, int, int, int, qint64)), this, SLOT(externalJoinGameCommandReceived(Command_JoinGame, int, int, int, qint64)));
+	connect(interface, SIGNAL(gameCommandContainerReceived(CommandContainer, int, int, qint64)), this, SLOT(externalGameCommandContainerReceived(CommandContainer, int, int, qint64)));
+	connect(interface, SIGNAL(responseReceived(Response, qint64)), this, SLOT(externalResponseReceived(Response, qint64)));
+	connect(interface, SIGNAL(gameEventContainerReceived(GameEventContainer, qint64)), this, SLOT(externalGameEventContainerReceived(GameEventContainer, qint64)));
 }
 
 void Servatrice::removeIslInterface(int serverId)

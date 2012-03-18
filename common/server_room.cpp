@@ -3,6 +3,8 @@
 #include "server_game.h"
 #include <QDebug>
 
+#include "pb/commands.pb.h"
+#include "pb/room_commands.pb.h"
 #include "pb/event_join_room.pb.h"
 #include "pb/event_leave_room.pb.h"
 #include "pb/event_list_games.pb.h"
@@ -137,7 +139,8 @@ void Server_Room::removeExternalUser(const QString &name)
 {
 	// This function is always called from the Server thread with server->roomsMutex locked.
 	usersLock.lockForWrite();
-	externalUsers.remove(name);
+	if (externalUsers.contains(name))
+		externalUsers.remove(name);
 	usersLock.unlock();
 	
 	Event_LeaveRoom event;
@@ -161,6 +164,36 @@ void Server_Room::updateExternalGameList(const ServerInfo_Game &gameInfo)
 	emit roomInfoChanged(getInfo(false, false, true));
 }
 
+Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGame &cmd, ResponseContainer &rc, Server_AbstractUserInterface *userInterface)
+{
+	// This function is called from the Server thread and from the S_PH thread.
+	// server->roomsMutex is always locked.
+	
+	QMutexLocker roomGamesLocker(&gamesMutex);
+	Server_Game *g = games.value(cmd.game_id());
+	if (!g) {
+		if (externalGames.contains(cmd.game_id())) {
+			CommandContainer cont;
+			cont.set_cmd_id(rc.getCmdId());
+			RoomCommand *roomCommand = cont.add_room_command();
+			roomCommand->GetReflection()->MutableMessage(roomCommand, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
+			getServer()->sendIsl_RoomCommand(cont, externalGames.value(cmd.game_id()).server_id(), userInterface->getUserInfo()->session_id(), id);
+			
+			return Response::RespNothing;
+		} else
+			return Response::RespNameNotFound;
+	}
+	
+	QMutexLocker gameLocker(&g->gameMutex);
+	
+	Response::ResponseCode result = g->checkJoin(userInterface->getUserInfo(), QString::fromStdString(cmd.password()), cmd.spectator(), cmd.override_restrictions());
+	if (result == Response::RespOk)
+		g->addPlayer(userInterface, rc, cmd.spectator());
+	
+	return result;
+}
+
+
 void Server_Room::say(const QString &userName, const QString &s, bool sendToIsl)
 {
 	Event_RoomSay event;
@@ -177,7 +210,7 @@ void Server_Room::sendRoomEvent(RoomEvent *event, bool sendToIsl)
 	usersLock.unlock();
 	
 	if (sendToIsl)
-		static_cast<Server *>(parent())->sendIslMessage(*event);
+		static_cast<Server *>(parent())->sendIsl_RoomEvent(*event);
 	
 	delete event;
 }
@@ -191,11 +224,16 @@ void Server_Room::broadcastGameListUpdate(ServerInfo_Game gameInfo, bool sendToI
 
 void Server_Room::addGame(Server_Game *game)
 {
-	// Lock gamesMutex and gameMutex before calling this
+	// Lock gamesMutex before calling this
 	
+	game->moveToThread(thread());
 	connect(game, SIGNAL(gameInfoChanged(ServerInfo_Game)), this, SLOT(broadcastGameListUpdate(ServerInfo_Game)));
+	
+	game->gameMutex.lock();
 	games.insert(game->getGameId(), game);
 	emit gameListChanged(game->getInfo());
+	game->gameMutex.unlock();
+	
 	emit roomInfoChanged(getInfo(false, false, true));
 }
 

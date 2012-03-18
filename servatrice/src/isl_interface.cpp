@@ -7,6 +7,7 @@
 
 #include "get_pb_extension.h"
 #include "pb/isl_message.pb.h"
+#include "pb/event_game_joined.pb.h"
 #include "pb/event_server_complete_list.pb.h"
 #include "pb/event_user_message.pb.h"
 #include "pb/event_user_joined.pb.h"
@@ -280,15 +281,6 @@ void IslInterface::sessionEvent_ServerCompleteList(const Event_ServerCompleteLis
 	}
 }
 
-void IslInterface::sessionEvent_UserMessage(const SessionEvent &sessionEvent, const Event_UserMessage &event)
-{
-	QReadLocker locker(&server->clientsLock);
-	
-	Server_ProtocolHandler *userInterface = server->getUsers().value(QString::fromStdString(event.receiver_name()));
-	if (userInterface)
-		userInterface->sendProtocolItem(sessionEvent);
-}
-
 void IslInterface::sessionEvent_UserJoined(const Event_UserJoined &event)
 {
 	ServerInfo_User userInfo(event.user_info());
@@ -327,13 +319,41 @@ void IslInterface::roomEvent_ListGames(int roomId, const Event_ListGames &event)
 	}
 }
 
-void IslInterface::processSessionEvent(const SessionEvent &event)
+void IslInterface::roomCommand_JoinGame(const Command_JoinGame &cmd, int cmdId, int roomId, qint64 sessionId)
+{
+	emit joinGameCommandReceived(cmd, cmdId, roomId, serverId, sessionId);
+}
+
+void IslInterface::processSessionEvent(const SessionEvent &event, qint64 sessionId)
 {
 	switch (getPbExtension(event)) {
 		case SessionEvent::SERVER_COMPLETE_LIST: sessionEvent_ServerCompleteList(event.GetExtension(Event_ServerCompleteList::ext)); break;
-		case SessionEvent::USER_MESSAGE: sessionEvent_UserMessage(event, event.GetExtension(Event_UserMessage::ext)); break;
 		case SessionEvent::USER_JOINED: sessionEvent_UserJoined(event.GetExtension(Event_UserJoined::ext)); break;
 		case SessionEvent::USER_LEFT: sessionEvent_UserLeft(event.GetExtension(Event_UserLeft::ext)); break;
+		case SessionEvent::GAME_JOINED: {
+			QReadLocker clientsLocker(&server->clientsLock);
+			Server_AbstractUserInterface *client = server->getUsersBySessionId().value(sessionId);
+			if (!client) {
+				qDebug() << "IslInterface::processSessionEvent: session id" << sessionId << "not found";
+				break;
+			}
+			const Event_GameJoined &gameJoined = event.GetExtension(Event_GameJoined::ext);
+			client->playerAddedToGame(gameJoined.game_id(), gameJoined.room_id(), gameJoined.player_id());
+			client->sendProtocolItem(event);
+			break;
+		}
+		case SessionEvent::USER_MESSAGE:
+		case SessionEvent::REPLAY_ADDED: {
+			QReadLocker clientsLocker(&server->clientsLock);
+			Server_AbstractUserInterface *client = server->getUsersBySessionId().value(sessionId);
+			if (!client) {
+				qDebug() << "IslInterface::processSessionEvent: session id" << sessionId << "not found";
+				break;
+			}
+			
+			client->sendProtocolItem(event);
+			break;
+		}
 		default: ;
 	}
 }
@@ -349,19 +369,40 @@ void IslInterface::processRoomEvent(const RoomEvent &event)
 	}
 }
 
+void IslInterface::processRoomCommand(const CommandContainer &cont, qint64 sessionId)
+{
+	for (int i = 0; i < cont.room_command_size(); ++i) {
+		const RoomCommand &roomCommand = cont.room_command(i);
+		switch (static_cast<RoomCommand::RoomCommandType>(getPbExtension(roomCommand))) {
+			case RoomCommand::JOIN_GAME: roomCommand_JoinGame(roomCommand.GetExtension(Command_JoinGame::ext), cont.cmd_id(), cont.room_id(), sessionId);
+			default: ;
+		}
+	}
+}
+
 void IslInterface::processMessage(const IslMessage &item)
 {
 	qDebug() << QString::fromStdString(item.DebugString());
 	
 	switch (item.message_type()) {
-		case IslMessage::SESSION_EVENT: processSessionEvent(item.session_event()); break;
-		case IslMessage::RESPONSE: {
+		case IslMessage::ROOM_COMMAND_CONTAINER: {
+			processRoomCommand(item.room_command(), item.session_id());
 			break;
 		}
 		case IslMessage::GAME_COMMAND_CONTAINER: {
+			emit gameCommandContainerReceived(item.game_command(), item.player_id(), serverId, item.session_id());
+			break;
+		}
+		case IslMessage::SESSION_EVENT: {
+			processSessionEvent(item.session_event(), item.session_id());
+			break;
+		}
+		case IslMessage::RESPONSE: {
+			emit responseReceived(item.response(), item.session_id());
 			break;
 		}
 		case IslMessage::GAME_EVENT_CONTAINER: {
+			emit gameEventContainerReceived(item.game_event_container(), item.session_id());
 			break;
 		}
 		case IslMessage::ROOM_EVENT: {

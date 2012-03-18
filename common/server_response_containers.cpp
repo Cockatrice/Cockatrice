@@ -63,8 +63,8 @@ void GameEventStorage::sendToGame(Server_Game *game)
 	game->sendGameEventContainer(contOthers, GameEventStorageItem::SendToOthers, privatePlayerId);
 }
 
-ResponseContainer::ResponseContainer()
-        : responseExtension(0)
+ResponseContainer::ResponseContainer(int _cmdId)
+        : responseExtension(0), cmdId(_cmdId)
 {
 }
 

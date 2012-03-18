@@ -43,12 +43,14 @@ public:
 
 class ResponseContainer {
 private:
+	int cmdId;
 	::google::protobuf::Message *responseExtension;
 	QList<QPair<ServerMessage::MessageType, ::google::protobuf::Message *> > preResponseQueue, postResponseQueue;
 public:
-	ResponseContainer();
+	ResponseContainer(int _cmdId);
 	~ResponseContainer();
 	
+	int getCmdId() const { return cmdId; }
 	void setResponseExtension(::google::protobuf::Message *_responseExtension) { responseExtension = _responseExtension; }
 	::google::protobuf::Message *getResponseExtension() const { return responseExtension; }
 	void enqueuePreResponseItem(ServerMessage::MessageType type, ::google::protobuf::Message *item) { preResponseQueue.append(qMakePair(type, item)); }

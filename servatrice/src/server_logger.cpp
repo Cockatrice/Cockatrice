@@ -3,13 +3,14 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
+#include <iostream>
 #ifdef Q_OS_UNIX
 # include <sys/types.h>
 # include <sys/socket.h>
 #endif
 
-ServerLogger::ServerLogger(QObject *parent)
-	: QObject(parent), flushRunning(false)
+ServerLogger::ServerLogger(bool _logToConsole, QObject *parent)
+	: QObject(parent), logToConsole(_logToConsole), flushRunning(false)
 {
 }
 
@@ -71,6 +72,9 @@ void ServerLogger::flushBuffer()
 		
 		stream << message << "\n";
 		stream.flush();
+		
+		if (logToConsole)
+			std::cout << message.toStdString() << std::endl;
 	}
 }
 

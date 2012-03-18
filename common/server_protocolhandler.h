@@ -63,8 +63,6 @@ protected:
 	AuthenticationResult authState;
 	bool acceptsUserListChanges;
 	bool acceptsRoomListChanges;
-	
-	int sessionId;
 private:
 	QMutex gameListMutex;
 	
@@ -109,19 +107,18 @@ private:
 private slots:
 	void pingClockTimeout();
 signals:
-	void logDebugMessage(const QString &message, Server_ProtocolHandler *session);
+	void logDebugMessage(const QString &message, void *session);
 public slots:
 	void prepareDestroy();
 public:
 	Server_ProtocolHandler(Server *_server, QObject *parent = 0);
 	~Server_ProtocolHandler();
 	void playerRemovedFromGame(Server_Game *game);
+	void playerAddedToGame(int gameId, int roomId, int playerId);
 	
 	bool getAcceptsUserListChanges() const { return acceptsUserListChanges; }
 	bool getAcceptsRoomListChanges() const { return acceptsRoomListChanges; }
 	virtual QString getAddress() const = 0;
-	int getSessionId() const { return sessionId; }
-	void setSessionId(int _sessionId) { sessionId = _sessionId; }
 
 	int getLastCommandTime() const { return timeRunning - lastDataReceived; }
 	void processCommandContainer(const CommandContainer &cont);

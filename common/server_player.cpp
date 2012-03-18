@@ -1,3 +1,4 @@
+#include "server.h"
 #include "server_player.h"
 #include "server_card.h"
 #include "server_counter.h"
@@ -5,7 +6,7 @@
 #include "server_cardzone.h"
 #include "server_game.h"
 #include "server_room.h"
-#include "server_protocolhandler.h"
+#include "server_abstractuserinterface.h"
 #include "decklist.h"
 #include "color.h"
 #include "rng_abstract.h"
@@ -76,8 +77,8 @@
 
 #include <QDebug>
 
-Server_Player::Server_Player(Server_Game *_game, int _playerId, const ServerInfo_User &_userInfo, bool _spectator, Server_ProtocolHandler *_handler)
-	: game(_game), handler(_handler), userInfo(new ServerInfo_User(_userInfo)), deck(0), pingTime(0), playerId(_playerId), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false)
+Server_Player::Server_Player(Server_Game *_game, int _playerId, const ServerInfo_User &_userInfo, bool _spectator, Server_AbstractUserInterface *_userInterface)
+	: game(_game), userInterface(_userInterface), userInfo(new ServerInfo_User(_userInfo)), deck(0), pingTime(0), playerId(_playerId), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false)
 {
 }
 
@@ -92,8 +93,8 @@ void Server_Player::prepareDestroy()
 	delete deck;
 	
 	playerMutex.lock();
-	if (handler)
-		handler->playerRemovedFromGame(game);
+	if (userInterface)
+		userInterface->playerRemovedFromGame(game);
 	playerMutex.unlock();
 	
 	delete userInfo;
@@ -1557,17 +1558,17 @@ void Server_Player::sendGameEvent(const GameEventContainer &cont)
 {
 	QMutexLocker locker(&playerMutex);
 	
-	if (handler)
-		handler->sendProtocolItem(cont);
+	if (userInterface)
+		userInterface->sendProtocolItem(cont);
 }
 
-void Server_Player::setProtocolHandler(Server_ProtocolHandler *_handler)
+void Server_Player::setUserInterface(Server_AbstractUserInterface *_userInterface)
 {
 	playerMutex.lock();
-	handler = _handler;
+	userInterface = _userInterface;
 	playerMutex.unlock();
 	
-	pingTime = _handler ? 0 : -1;
+	pingTime = _userInterface ? 0 : -1;
 	
 	Event_PlayerPropertiesChanged event;
 	event.mutable_player_properties()->set_ping_seconds(pingTime);

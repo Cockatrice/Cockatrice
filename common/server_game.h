@@ -73,7 +73,7 @@ private slots:
 	void doStartGameIfReady();
 public:
 	mutable QMutex gameMutex;
-	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent);
+	Server_Game(const ServerInfo_User &_creatorInfo, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent);
 	~Server_Game();
 	Server_Room *getRoom() const { return room; }
 	ServerInfo_Game getInfo() const;
@@ -94,7 +94,7 @@ public:
 	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
 	Response::ResponseCode checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions);
 	bool containsUser(const QString &userName) const;
-	Server_Player *addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate = true);
+	void addPlayer(Server_AbstractUserInterface *userInterface, ResponseContainer &rc, bool spectator, bool broadcastUpdate = true);
 	void removePlayer(Server_Player *player);
 	void removeArrowsToPlayer(GameEventStorage &ges, Server_Player *player);
 	void unattachCards(GameEventStorage &ges, Server_Player *player);

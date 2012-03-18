@@ -16,7 +16,7 @@ class Server_CardZone;
 class Server_Counter;
 class Server_Arrow;
 class Server_Card;
-class Server_ProtocolHandler;
+class Server_AbstractUserInterface;
 class ServerInfo_User;
 class ServerInfo_PlayerProperties;
 class CommandContainer;
@@ -62,7 +62,7 @@ class Server_Player : public Server_ArrowTarget {
 private:
 	class MoveCardCompareFunctor;
 	Server_Game *game;
-	Server_ProtocolHandler *handler;
+	Server_AbstractUserInterface *userInterface;
 	ServerInfo_User *userInfo;
 	DeckList *deck;
 	QMap<QString, Server_CardZone *> zones;
@@ -78,11 +78,11 @@ private:
 	bool conceded;
 public:
 	mutable QMutex playerMutex;
-	Server_Player(Server_Game *_game, int _playerId, const ServerInfo_User &_userInfo, bool _spectator, Server_ProtocolHandler *_handler);
+	Server_Player(Server_Game *_game, int _playerId, const ServerInfo_User &_userInfo, bool _spectator, Server_AbstractUserInterface *_handler);
 	~Server_Player();
 	void prepareDestroy();
-	Server_ProtocolHandler *getProtocolHandler() const { return handler; }
-	void setProtocolHandler(Server_ProtocolHandler *_handler);
+	Server_AbstractUserInterface *getUserInterface() const { return userInterface; }
+	void setUserInterface(Server_AbstractUserInterface *_userInterface);
 	
 	void setPlayerId(int _id) { playerId = _id; }
 	bool getReadyStart() const { return readyStart; }

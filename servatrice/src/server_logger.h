@@ -14,7 +14,7 @@ class Server_ProtocolHandler;
 class ServerLogger : public QObject {
 	Q_OBJECT
 public:
-	ServerLogger(QObject *parent = 0);
+	ServerLogger(bool _logToConsole, QObject *parent = 0);
 	~ServerLogger();
 	static void hupSignalHandler(int unused);
 public slots:
@@ -26,6 +26,7 @@ private slots:
 signals:
 	void sigFlushBuffer();
 private:
+	bool logToConsole;
 	static int sigHupFD[2];
 	QSocketNotifier *snHup;
 	static QFile *logFile;

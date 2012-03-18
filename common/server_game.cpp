@@ -30,6 +30,7 @@
 #include "pb/context_ping_changed.pb.h"
 #include "pb/event_player_properties_changed.pb.h"
 #include "pb/event_game_closed.pb.h"
+#include "pb/event_game_joined.pb.h"
 #include "pb/event_game_host_changed.pb.h"
 #include "pb/event_game_state_changed.pb.h"
 #include "pb/event_kicked.pb.h"
@@ -44,16 +45,37 @@
 #include <QTimer>
 #include <QDebug>
 
-Server_Game::Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *_room)
-	: QObject(), room(_room), hostId(0), creatorInfo(new ServerInfo_User(_creator->copyUserInfo(false))), gameStarted(false), gameId(_gameId), description(_description), password(_password), maxPlayers(_maxPlayers), gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies), onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed), spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk), spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0), firstGameStarted(false), startTime(QDateTime::currentDateTime()), gameMutex(QMutex::Recursive)
+Server_Game::Server_Game(const ServerInfo_User &_creatorInfo, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *_room)
+	: QObject(),
+          room(_room),
+          hostId(0),
+          creatorInfo(new ServerInfo_User(_creatorInfo)),
+          gameStarted(false),
+          gameId(_gameId),
+          description(_description),
+          password(_password),
+          maxPlayers(_maxPlayers),
+          gameTypes(_gameTypes),
+          activePlayer(-1),
+          activePhase(-1),
+          onlyBuddies(_onlyBuddies),
+          onlyRegistered(_onlyRegistered),
+          spectatorsAllowed(_spectatorsAllowed),
+          spectatorsNeedPassword(_spectatorsNeedPassword),
+          spectatorsCanTalk(_spectatorsCanTalk),
+          spectatorsSeeEverything(_spectatorsSeeEverything),
+          inactivityCounter(0),
+          startTimeOfThisGame(0),
+          secondsElapsed(0),
+          firstGameStarted(false),
+          startTime(QDateTime::currentDateTime()),
+          gameMutex(QMutex::Recursive)
 {
 	currentReplay = new GameReplay;
 	currentReplay->set_replay_id(room->getServer()->getNextReplayId());
 	
 	connect(this, SIGNAL(sigStartGameIfReady()), this, SLOT(doStartGameIfReady()), Qt::QueuedConnection);
 	
-	addPlayer(_creator, false, false);
-
 	currentReplay->mutable_game_info()->CopyFrom(getInfo());
 
 	if (room->getServer()->getGameShouldPing()) {
@@ -112,8 +134,8 @@ void Server_Game::pingClockTimeout()
 		const int oldPingTime = player->getPingTime();
 		player->playerMutex.lock();
 		int newPingTime;
-		if (player->getProtocolHandler())
-			newPingTime = player->getProtocolHandler()->getLastCommandTime();
+		if (player->getUserInterface())
+			newPingTime = player->getUserInterface()->getLastCommandTime();
 		else
 			newPingTime = -1;
 		player->playerMutex.unlock();
@@ -345,14 +367,14 @@ bool Server_Game::containsUser(const QString &userName) const
 	return false;
 }
 
-Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate)
+void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface, ResponseContainer &rc, bool spectator, bool broadcastUpdate)
 {
 	QMutexLocker locker(&gameMutex);
 	
 	const QList<int> &keyList = players.keys();
 	int playerId = keyList.isEmpty() ? 0 : (keyList.last() + 1);
 	
-	Server_Player *newPlayer = new Server_Player(this, playerId, handler->copyUserInfo(true), spectator, handler);
+	Server_Player *newPlayer = new Server_Player(this, playerId, userInterface->copyUserInfo(true), spectator, userInterface);
 	newPlayer->moveToThread(thread());
 	
 	Event_Join joinEvent;
@@ -368,11 +390,33 @@ Server_Player *Server_Game::addPlayer(Server_ProtocolHandler *handler, bool spec
 		hostId = playerId;
 		sendGameEventContainer(prepareGameEvent(Event_GameHostChanged(), playerId));
 	}
-
+	
 	if (broadcastUpdate)
 		emit gameInfoChanged(getInfo());
 	
-	return newPlayer;
+	userInterface->playerAddedToGame(gameId, room->getId(), newPlayer->getPlayerId());
+	
+	Event_GameJoined event1;
+	event1.set_room_id(room->getId());
+	event1.set_game_id(gameId);
+	event1.set_game_description(description.toStdString());
+	event1.set_host_id(hostId);
+	event1.set_player_id(newPlayer->getPlayerId());
+	event1.set_spectator(newPlayer->getSpectator());
+	event1.set_spectators_can_talk(spectatorsCanTalk);
+	event1.set_spectators_see_everything(spectatorsSeeEverything);
+	event1.set_resuming(false);
+	rc.enqueuePostResponseItem(ServerMessage::SESSION_EVENT, Server_AbstractUserInterface::prepareSessionEvent(event1));
+	
+	Event_GameStateChanged event2;
+	QListIterator<ServerInfo_Player> gameStateIterator(getGameState(newPlayer, false, true));
+	while (gameStateIterator.hasNext())
+		event2.add_player_list()->CopyFrom(gameStateIterator.next());
+	event2.set_seconds_elapsed(secondsElapsed);
+	event2.set_game_started(gameStarted);
+	event2.set_active_player_id(activePlayer);
+	event2.set_active_phase(activePhase);
+	rc.enqueuePostResponseItem(ServerMessage::GAME_EVENT_CONTAINER, prepareGameEvent(event2, -1));
 }
 
 void Server_Game::removePlayer(Server_Player *player)

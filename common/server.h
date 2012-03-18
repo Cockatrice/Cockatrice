@@ -6,10 +6,7 @@
 #include <QMap>
 #include <QMutex>
 #include <QReadWriteLock>
-#include <QMetaType>
 #include "pb/serverinfo_user.pb.h"
-#include "pb/serverinfo_room.pb.h"
-#include "pb/serverinfo_game.pb.h"
 
 class Server_Game;
 class Server_Room;
@@ -17,11 +14,15 @@ class Server_ProtocolHandler;
 class Server_AbstractUserInterface;
 class GameReplay;
 class IslMessage;
-class Response;
 class SessionEvent;
-class GameEventContainer;
 class RoomEvent;
 class DeckList;
+class ServerInfo_Game;
+class ServerInfo_Room;
+class Response;
+class GameEventContainer;
+class CommandContainer;
+class Command_JoinGame;
 
 enum AuthenticationResult { NotLoggedIn = 0, PasswordRight = 1, UnknownUser = 2, WouldOverwriteOldSession = 3, UserIsBanned = 4 };
 
@@ -30,10 +31,12 @@ class Server : public QObject
 	Q_OBJECT
 signals:
 	void pingClockTimeout();
+	void sigSendIslMessage(const IslMessage &message, int serverId);
+	void logDebugMessage(QString message, void *caller);
 private slots:
 	void broadcastRoomUpdate(const ServerInfo_Room &roomInfo, bool sendToIsl = false);
 public:
-	mutable QReadWriteLock clientsLock, roomsLock;
+	mutable QReadWriteLock clientsLock, roomsLock; // locking order: roomsLock before clientsLock
 	Server(QObject *parent = 0);
 	~Server();
 	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason);
@@ -42,6 +45,7 @@ public:
 	virtual int getNextReplayId() { return nextReplayId++; }
 	
 	const QMap<QString, Server_ProtocolHandler *> &getUsers() const { return users; }
+	const QMap<qint64, Server_ProtocolHandler *> &getUsersBySessionId() const { return usersBySessionId; }
 	void addClient(Server_ProtocolHandler *player);
 	void removeClient(Server_ProtocolHandler *player);
 	virtual QString getLoginMessage() const { return QString(); }
@@ -63,10 +67,12 @@ public:
 	virtual void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays) { }
 	virtual DeckList *getDeckFromDatabase(int deckId, const QString &userName) { return 0; }
 
-	void sendIslMessage(const Response &item, int serverId = -1);
-	void sendIslMessage(const SessionEvent &item, int serverId = -1);
-	void sendIslMessage(const GameEventContainer &item, int serverId = -1);
-	void sendIslMessage(const RoomEvent &item, int serverId = -1);
+	void sendIsl_Response(const Response &item, int serverId = -1, qint64 sessionId = -1);
+	void sendIsl_SessionEvent(const SessionEvent &item, int serverId = -1, qint64 sessionId = -1);
+	void sendIsl_GameEventContainer(const GameEventContainer &item, int serverId = -1, qint64 sessionId = -1);
+	void sendIsl_RoomEvent(const RoomEvent &item, int serverId = -1, qint64 sessionId = -1);
+	void sendIsl_GameCommand(const CommandContainer &item, int serverId, qint64 sessionId, int roomId, int playerId);
+	void sendIsl_RoomCommand(const CommandContainer &item, int serverId, qint64 sessionId, int roomId);
 	
 	void addExternalUser(const ServerInfo_User &userInfo);
 	void removeExternalUser(const QString &userName);
@@ -78,15 +84,23 @@ protected slots:
 	void externalRoomUserLeft(int roomId, const QString &userName);
 	void externalRoomSay(int roomId, const QString &userName, const QString &message);
 	void externalRoomGameListChanged(int roomId, const ServerInfo_Game &gameInfo);
+	void externalJoinGameCommandReceived(const Command_JoinGame &cmd, int cmdId, int roomId, int serverId, qint64 sessionId);
+	void externalGameCommandContainerReceived(const CommandContainer &cont, int playerId, int serverId, qint64 sessionId);
+	void externalGameEventContainerReceived(const GameEventContainer &cont, qint64 sessionId);
+	void externalResponseReceived(const Response &resp, qint64 sessionId);
+	
+	virtual void doSendIslMessage(const IslMessage &msg, int serverId) { }
 protected:
 	void prepareDestroy();
 	QList<Server_ProtocolHandler *> clients;
+	QMap<qint64, Server_ProtocolHandler *> usersBySessionId;
 	QMap<QString, Server_ProtocolHandler *> users;
+	QMap<qint64, Server_AbstractUserInterface *> externalUsersBySessionId;
 	QMap<QString, Server_AbstractUserInterface *> externalUsers;
 	QMap<int, Server_Room *> rooms;
 	
-	virtual int startSession(const QString &userName, const QString &address) { return -1; }
-	virtual void endSession(int sessionId) { }
+	virtual qint64 startSession(const QString &userName, const QString &address) { return -1; }
+	virtual void endSession(qint64 sessionId) { }
 	virtual bool userExists(const QString &user) { return false; }
 	virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reason) { return UnknownUser; }
 	virtual ServerInfo_User getUserData(const QString &name, bool withId = false) = 0;
@@ -99,12 +113,6 @@ protected:
 	virtual void lockSessionTables() { }
 	virtual void unlockSessionTables() { }
 	virtual bool userSessionExists(const QString &userName) { return false; }
-	
-	virtual void doSendIslMessage(const IslMessage &msg, int serverId) { }
 };
-
-Q_DECLARE_METATYPE(ServerInfo_User)
-Q_DECLARE_METATYPE(ServerInfo_Room)
-Q_DECLARE_METATYPE(ServerInfo_Game)
 
 #endif

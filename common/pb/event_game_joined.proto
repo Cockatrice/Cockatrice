@@ -4,12 +4,13 @@ message Event_GameJoined {
 	extend SessionEvent {
 		optional Event_GameJoined ext = 1009;
 	}
-	optional sint32 game_id = 1;
-	optional string game_description = 2;
-	optional sint32 host_id = 3;
-	optional sint32 player_id = 4;
-	optional bool spectator = 5;
-	optional bool spectators_can_talk = 6;
-	optional bool spectators_see_everything = 7;
-	optional bool resuming = 8;
+	optional sint32 room_id = 1;
+	optional sint32 game_id = 2;
+	optional string game_description = 3;
+	optional sint32 host_id = 4;
+	optional sint32 player_id = 5;
+	optional bool spectator = 6;
+	optional bool spectators_can_talk = 7;
+	optional bool spectators_see_everything = 8;
+	optional bool resuming = 9;
 }

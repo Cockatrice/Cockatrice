@@ -36,7 +36,7 @@
 #include <google/protobuf/descriptor.h>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
-	: QObject(parent), Server_AbstractUserInterface(_server), authState(NotLoggedIn), acceptsUserListChanges(false), acceptsRoomListChanges(false), sessionId(-1), timeRunning(0), lastDataReceived(0)
+	: QObject(parent), Server_AbstractUserInterface(_server), authState(NotLoggedIn), acceptsUserListChanges(false), acceptsRoomListChanges(false), timeRunning(0), lastDataReceived(0)
 {
 	connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
@@ -84,7 +84,7 @@ void Server_ProtocolHandler::prepareDestroy()
 		if ((authState == UnknownUser) || p->getSpectator())
 			g->removePlayer(p);
 		else
-			p->setProtocolHandler(0);
+			p->setUserInterface(0);
 		
 		g->gameMutex.unlock();
 		r->gamesMutex.unlock();
@@ -100,6 +100,14 @@ void Server_ProtocolHandler::playerRemovedFromGame(Server_Game *game)
 	
 	QMutexLocker locker(&gameListMutex);
 	games.remove(game->getGameId());
+}
+
+void Server_ProtocolHandler::playerAddedToGame(int gameId, int roomId, int playerId)
+{
+	qDebug() << "Server_ProtocolHandler::playerAddedToGame(): gameId =" << gameId;
+	
+	QMutexLocker locker(&gameListMutex);
+	games.insert(gameId, QPair<int, int>(roomId, playerId));
 }
 
 void Server_ProtocolHandler::sendProtocolItem(const Response &item)
@@ -168,7 +176,7 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
 			case SessionCommand::JOIN_ROOM: resp = cmdJoinRoom(sc.GetExtension(Command_JoinRoom::ext), rc); break;
 			case SessionCommand::LIST_USERS: resp = cmdListUsers(sc.GetExtension(Command_ListUsers::ext), rc); break;
 		}
-		if ((resp != Response::RespOk) && (resp != Response::RespNothing))
+		if (resp != Response::RespOk)
 			finalResponseCode = resp;
 	}
 	return finalResponseCode;
@@ -196,7 +204,7 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
 			case RoomCommand::CREATE_GAME: resp = cmdCreateGame(sc.GetExtension(Command_CreateGame::ext), room, rc); break;
 			case RoomCommand::JOIN_GAME: resp = cmdJoinGame(sc.GetExtension(Command_JoinGame::ext), room, rc); break;
 		}
-		if ((resp != Response::RespOk) && (resp != Response::RespNothing))
+		if (resp != Response::RespOk)
 			finalResponseCode = resp;
 	}
 	return finalResponseCode;
@@ -207,6 +215,8 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
+	qDebug() << QString::fromStdString(cont.DebugString());
+	
 	gameListMutex.lock();
 	if (!games.contains(cont.game_id())) {
 		gameListMutex.unlock();
@@ -215,27 +225,30 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 	const QPair<int, int> roomIdAndPlayerId = games.value(cont.game_id());
 	gameListMutex.unlock();
 	
-	server->roomsLock.lockForRead();
+	QReadLocker roomsLocker(&server->roomsLock);
 	Server_Room *room = server->getRooms().value(roomIdAndPlayerId.first);
-	if (!room) {
-		server->roomsLock.unlock();
+	if (!room)
 		return Response::RespNotInRoom;
-	}
-	room->gamesMutex.lock();
+	
+	QMutexLocker roomGamesLocker(&room->gamesMutex);
 	Server_Game *game = room->getGames().value(cont.game_id());
 	if (!game) {
-		room->gamesMutex.unlock();
-		server->roomsLock.unlock();
+		if (room->getExternalGames().contains(cont.game_id())) {
+			server->sendIsl_GameCommand(cont,
+			                            room->getExternalGames().value(cont.game_id()).server_id(),
+			                            userInfo->session_id(),
+			                            roomIdAndPlayerId.first,
+			                            roomIdAndPlayerId.second
+			                            );
+			return Response::RespNothing;
+		}
 		return Response::RespNotInRoom;
 	}
-	game->gameMutex.lock();
+	
+	QMutexLocker gameLocker(&game->gameMutex);
 	Server_Player *player = game->getPlayer(roomIdAndPlayerId.second);
-	if (!player) {
-		game->gameMutex.unlock();
-		room->gamesMutex.unlock();
-		server->roomsLock.unlock();
+	if (!player)
 		return Response::RespNotInRoom;
-	}
 	
 	GameEventStorage ges;
 	Response::ResponseCode finalResponseCode = Response::RespOk;
@@ -245,14 +258,10 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 		
 		Response::ResponseCode resp = player->processGameCommand(sc, rc, ges);
 
-		if ((resp != Response::RespOk) && (resp != Response::RespNothing))
+		if (resp != Response::RespOk)
 			finalResponseCode = resp;
 	}
 	ges.sendToGame(game);
-	
-	game->gameMutex.unlock();
-	room->gamesMutex.unlock();
-	server->roomsLock.unlock();
 	
 	return finalResponseCode;
 }
@@ -273,7 +282,7 @@ Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(
 		switch ((ModeratorCommand::ModeratorCommandType) num) {
 			case ModeratorCommand::BAN_FROM_SERVER: resp = cmdBanFromServer(sc.GetExtension(Command_BanFromServer::ext), rc); break;
 		}
-		if ((resp != Response::RespOk) && (resp != Response::RespNothing))
+		if (resp != Response::RespOk)
 			finalResponseCode = resp;
 	}
 	return finalResponseCode;
@@ -296,7 +305,7 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
 			case AdminCommand::SHUTDOWN_SERVER: resp = cmdShutdownServer(sc.GetExtension(Command_ShutdownServer::ext), rc); break;
 			case AdminCommand::UPDATE_SERVER_MESSAGE: resp = cmdUpdateServerMessage(sc.GetExtension(Command_UpdateServerMessage::ext), rc); break;
 		}
-		if ((resp != Response::RespOk) && (resp != Response::RespNothing))
+		if (resp != Response::RespOk)
 			finalResponseCode = resp;
 	}
 	return finalResponseCode;
@@ -306,7 +315,7 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
 {
 	lastDataReceived = timeRunning;
 	
-	ResponseContainer responseContainer;
+	ResponseContainer responseContainer(cont.cmd_id());
 	Response::ResponseCode finalResponseCode;
 	
 	if (cont.game_command_size())
@@ -322,21 +331,8 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
 	else
 		finalResponseCode = Response::RespInvalidCommand;
 	
-	const QList<QPair<ServerMessage::MessageType, ::google::protobuf::Message *> > &preResponseQueue = responseContainer.getPreResponseQueue();
-	for (int i = 0; i < preResponseQueue.size(); ++i)
-		sendProtocolItemByType(preResponseQueue[i].first, *preResponseQueue[i].second);
-	
-	Response response;
-	response.set_cmd_id(cont.cmd_id());
-	response.set_response_code(finalResponseCode);
-	::google::protobuf::Message *responseExtension = responseContainer.getResponseExtension();
-	if (responseExtension)
-		response.GetReflection()->MutableMessage(&response, responseExtension->GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(*responseExtension);
-	sendProtocolItem(response);
-	
-	const QList<QPair<ServerMessage::MessageType, ::google::protobuf::Message *> > &postResponseQueue = responseContainer.getPostResponseQueue();
-	for (int i = 0; i < postResponseQueue.size(); ++i)
-		sendProtocolItemByType(postResponseQueue[i].first, *postResponseQueue[i].second);
+	if (finalResponseCode != Response::RespNothing)
+		sendResponseContainer(responseContainer, finalResponseCode);
 }
 
 void Server_ProtocolHandler::pingClockTimeout()
@@ -411,13 +407,14 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 			const QList<Server_Player *> &gamePlayers = game->getPlayers().values();
 			for (int j = 0; j < gamePlayers.size(); ++j)
 				if (gamePlayers[j]->getUserInfo()->name() == userInfo->name()) {
-					gamePlayers[j]->setProtocolHandler(this);
+					gamePlayers[j]->setUserInterface(this);
 					
 					gameListMutex.lock();
 					games.insert(game->getGameId(), QPair<int, int>(room->getId(), gamePlayers[j]->getPlayerId()));
 					gameListMutex.unlock();
 					
 					Event_GameJoined event1;
+					event1.set_room_id(room->getId());
 					event1.set_game_id(game->getGameId());
 					event1.set_game_description(game->getDescription().toStdString());
 					event1.set_host_id(game->getHostId());
@@ -650,40 +647,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_Creat
 	if (description.size() > 60)
 		description = description.left(60);
 	
-	Server_Game *game = new Server_Game(this, server->getNextGameId(), description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes, cmd.only_buddies(), cmd.only_registered(), cmd.spectators_allowed(), cmd.spectators_need_password(), cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
-	game->moveToThread(room->thread());
-
-	game->gameMutex.lock();
+	Server_Game *game = new Server_Game(copyUserInfo(false), server->getNextGameId(), description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes, cmd.only_buddies(), cmd.only_registered(), cmd.spectators_allowed(), cmd.spectators_need_password(), cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
+	game->addPlayer(this, rc, false, false);
 	room->addGame(game);
-	
-	Server_Player *creator = game->getPlayers().values().first();
-	
-	gameListMutex.lock();
-	games.insert(game->getGameId(), QPair<int, int>(room->getId(), creator->getPlayerId()));
-	gameListMutex.unlock();
-	
-	Event_GameJoined event1;
-	event1.set_game_id(game->getGameId());
-	event1.set_game_description(game->getDescription().toStdString());
-	event1.set_host_id(creator->getPlayerId());
-	event1.set_player_id(creator->getPlayerId());
-	event1.set_spectator(false);
-	event1.set_spectators_can_talk(game->getSpectatorsCanTalk());
-	event1.set_spectators_see_everything(game->getSpectatorsSeeEverything());
-	event1.set_resuming(false);
-	rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event1));
-	
-	Event_GameStateChanged event2;
-	QListIterator<ServerInfo_Player> gameStateIterator(game->getGameState(creator, false, true));
-	while (gameStateIterator.hasNext())
-		event2.add_player_list()->CopyFrom(gameStateIterator.next());
-	event2.set_seconds_elapsed(0);
-	event2.set_game_started(game->getGameStarted());
-	event2.set_active_player_id(game->getActivePlayer());
-	event2.set_active_phase(game->getActivePhase());
-	rc.enqueuePreResponseItem(ServerMessage::GAME_EVENT_CONTAINER, game->prepareGameEvent(event2, -1));
-
-	game->gameMutex.unlock();
 	
 	return Response::RespOk;
 }
@@ -693,47 +659,5 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinGame(const Command_JoinGam
 	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
-	room->gamesMutex.lock();
-	Server_Game *g = room->getGames().value(cmd.game_id());
-	if (!g) {
-		room->gamesMutex.unlock();
-		return Response::RespNameNotFound;
-	}
-	
-	g->gameMutex.lock();
-	
-	Response::ResponseCode result = g->checkJoin(userInfo, QString::fromStdString(cmd.password()), cmd.spectator(), cmd.override_restrictions());
-	if (result == Response::RespOk) {
-		Server_Player *player = g->addPlayer(this, cmd.spectator());
-		
-		gameListMutex.lock();
-		games.insert(cmd.game_id(), QPair<int, int>(room->getId(), player->getPlayerId()));
-		gameListMutex.unlock();
-		
-		Event_GameJoined event1;
-		event1.set_game_id(g->getGameId());
-		event1.set_game_description(g->getDescription().toStdString());
-		event1.set_host_id(g->getHostId());
-		event1.set_player_id(player->getPlayerId());
-		event1.set_spectator(cmd.spectator());
-		event1.set_spectators_can_talk(g->getSpectatorsCanTalk());
-		event1.set_spectators_see_everything(g->getSpectatorsSeeEverything());
-		event1.set_resuming(false);
-		rc.enqueuePostResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event1));
-		
-		Event_GameStateChanged event2;
-		QListIterator<ServerInfo_Player> gameStateIterator(g->getGameState(player, false, true));
-		while (gameStateIterator.hasNext())
-			event2.add_player_list()->CopyFrom(gameStateIterator.next());
-		event2.set_seconds_elapsed(g->getSecondsElapsed());
-		event2.set_game_started(g->getGameStarted());
-		event2.set_active_player_id(g->getActivePlayer());
-		event2.set_active_phase(g->getActivePhase());
-		rc.enqueuePostResponseItem(ServerMessage::GAME_EVENT_CONTAINER, g->prepareGameEvent(event2, -1));
-	}
-	
-	g->gameMutex.unlock();
-	room->gamesMutex.unlock();
-	
-	return result;
+	return room->processJoinGameCommand(cmd, rc, this);
 }

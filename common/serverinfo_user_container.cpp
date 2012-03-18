@@ -36,6 +36,7 @@ ServerInfo_User ServerInfo_User_Container::copyUserInfo(bool complete, bool mode
 	if (userInfo) {
 		result.CopyFrom(*userInfo);
 		if (!moderatorInfo) {
+			result.clear_session_id();
 			result.clear_address();
 			result.clear_id();
 		}

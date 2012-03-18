@@ -21,6 +21,7 @@ class Event_JoinRoom;
 class Event_LeaveRoom;
 class Event_RoomSay;
 class Event_ListGames;
+class Command_JoinGame;
 
 class IslInterface : public QObject {
 	Q_OBJECT
@@ -37,6 +38,10 @@ signals:
 	void externalRoomUserLeft(int roomId, QString userName);
 	void externalRoomSay(int roomId, QString userName, QString message);
 	void externalRoomGameListChanged(int roomId, ServerInfo_Game gameInfo);
+	void joinGameCommandReceived(const Command_JoinGame &cmd, int cmdId, int roomId, int serverId, qint64 sessionId);
+	void gameCommandContainerReceived(const CommandContainer &cont, int playerId, int serverId, qint64 sessionId);
+	void responseReceived(const Response &resp, qint64 sessionId);
+	void gameEventContainerReceived(const GameEventContainer &cont, qint64 sessionId);
 private:
 	int serverId;
 	int socketDescriptor;
@@ -53,7 +58,6 @@ private:
 	int messageLength;
 	
 	void sessionEvent_ServerCompleteList(const Event_ServerCompleteList &event);
-	void sessionEvent_UserMessage(const SessionEvent &sessionEvent, const Event_UserMessage &event);
 	void sessionEvent_UserJoined(const Event_UserJoined &event);
 	void sessionEvent_UserLeft(const Event_UserLeft &event);
 	
@@ -62,8 +66,11 @@ private:
 	void roomEvent_Say(int roomId, const Event_RoomSay &event);
 	void roomEvent_ListGames(int roomId, const Event_ListGames &event);
 	
-	void processSessionEvent(const SessionEvent &event);
+	void roomCommand_JoinGame(const Command_JoinGame &cmd, int cmdId, int roomId, qint64 sessionId);
+	
+	void processSessionEvent(const SessionEvent &event, qint64 sessionId);
 	void processRoomEvent(const RoomEvent &event);
+	void processRoomCommand(const CommandContainer &cont, qint64 sessionId);
 	
 	void processMessage(const IslMessage &item);
 	void sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey);

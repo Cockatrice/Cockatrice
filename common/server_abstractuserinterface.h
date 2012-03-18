@@ -3,13 +3,15 @@
 
 #include "serverinfo_user_container.h"
 #include "pb/server_message.pb.h"
+#include "pb/response.pb.h"
 
-class Response;
 class SessionEvent;
 class GameEventContainer;
 class RoomEvent;
+class ResponseContainer;
 
 class Server;
+class Server_Game;
 
 class Server_AbstractUserInterface : public ServerInfo_User_Container {
 protected:
@@ -19,6 +21,11 @@ public:
 	Server_AbstractUserInterface(Server *_server, const ServerInfo_User_Container &other) : ServerInfo_User_Container(other), server(_server) { }
 	virtual ~Server_AbstractUserInterface() { }
 	
+	virtual int getLastCommandTime() const = 0;
+	
+	virtual void playerRemovedFromGame(Server_Game *game) = 0;
+	virtual void playerAddedToGame(int gameId, int roomId, int playerId) = 0;
+	
 	virtual void sendProtocolItem(const Response &item) = 0;
 	virtual void sendProtocolItem(const SessionEvent &item) = 0;
 	virtual void sendProtocolItem(const GameEventContainer &item) = 0;
@@ -26,6 +33,7 @@ public:
 	void sendProtocolItemByType(ServerMessage::MessageType type, const ::google::protobuf::Message &item);
 	
 	static SessionEvent *prepareSessionEvent(const ::google::protobuf::Message &sessionEvent);
+	void sendResponseContainer(const ResponseContainer &responseContainer, Response::ResponseCode responseCode);
 };
 
 #endif
