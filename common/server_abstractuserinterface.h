@@ -1,6 +1,9 @@
 #ifndef SERVER_ABSTRACTUSERINTERFACE
 #define SERVER_ABSTRACTUSERINTERFACE
 
+#include <QMutex>
+#include <QMap>
+#include <QPair>
 #include "serverinfo_user_container.h"
 #include "pb/server_message.pb.h"
 #include "pb/response.pb.h"
@@ -14,6 +17,9 @@ class Server;
 class Server_Game;
 
 class Server_AbstractUserInterface : public ServerInfo_User_Container {
+private:
+	mutable QMutex gameListMutex;
+	QMap<int, QPair<int, int> > games; // gameId -> (roomId, playerId)
 protected:
 	Server *server;
 public:
@@ -23,8 +29,11 @@ public:
 	
 	virtual int getLastCommandTime() const = 0;
 	
-	virtual void playerRemovedFromGame(Server_Game *game) = 0;
-	virtual void playerAddedToGame(int gameId, int roomId, int playerId) = 0;
+	void playerRemovedFromGame(Server_Game *game);
+	void playerAddedToGame(int gameId, int roomId, int playerId);
+	void joinPersistentGames(ResponseContainer &rc);
+	
+	QMap<int, QPair<int, int> > getGames() const { QMutexLocker locker(&gameListMutex); return games; }
 	
 	virtual void sendProtocolItem(const Response &item) = 0;
 	virtual void sendProtocolItem(const SessionEvent &item) = 0;

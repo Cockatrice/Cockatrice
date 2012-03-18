@@ -49,14 +49,6 @@ IslInterface::~IslInterface()
 	
 	// As these signals are connected with Qt::QueuedConnection implicitly,
 	// we don't need to worry about them modifying the lists while we're iterating.
-	server->clientsLock.lockForRead();
-	QMapIterator<QString, Server_AbstractUserInterface *> extUsers(server->getExternalUsers());
-	while (extUsers.hasNext()) {
-		extUsers.next();
-		if (extUsers.value()->getUserInfo()->server_id() == serverId)
-			emit externalUserLeft(extUsers.key());
-	}
-	server->clientsLock.unlock();
 	
 	server->roomsLock.lockForRead();
 	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
@@ -72,6 +64,15 @@ IslInterface::~IslInterface()
 		room->usersLock.unlock();
 	}
 	server->roomsLock.unlock();
+	
+	server->clientsLock.lockForRead();
+	QMapIterator<QString, Server_AbstractUserInterface *> extUsers(server->getExternalUsers());
+	while (extUsers.hasNext()) {
+		extUsers.next();
+		if (extUsers.value()->getUserInfo()->server_id() == serverId)
+			emit externalUserLeft(extUsers.key());
+	}
+	server->clientsLock.unlock();
 }
 
 void IslInterface::initServer()

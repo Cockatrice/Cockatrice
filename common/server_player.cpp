@@ -1578,3 +1578,11 @@ void Server_Player::setUserInterface(Server_AbstractUserInterface *_userInterfac
 	ges.enqueueGameEvent(event, playerId);
 	ges.sendToGame(game);
 }
+
+void Server_Player::disconnectClient()
+{
+	if (!(userInfo->user_level() & ServerInfo_User::IsRegistered) || spectator)
+		game->removePlayer(this);
+	else
+		setUserInterface(0);
+}

@@ -129,6 +129,24 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	return authState;
 }
 
+void Server::addPersistentPlayer(const QString &userName, int roomId, int gameId, int playerId)
+{
+	QWriteLocker locker(&persistentPlayersLock);
+	persistentPlayers.insert(userName, PlayerReference(roomId, gameId, playerId));
+}
+
+void Server::removePersistentPlayer(const QString &userName, int roomId, int gameId, int playerId)
+{
+	QWriteLocker locker(&persistentPlayersLock);
+	persistentPlayers.remove(userName, PlayerReference(roomId, gameId, playerId));
+}
+
+QList<PlayerReference> Server::getPersistentPlayerReferences(const QString &userName) const
+{
+	QReadLocker locker(&persistentPlayersLock);
+	return persistentPlayers.values(userName);
+}
+
 void Server::addClient(Server_ProtocolHandler *client)
 {
 	QWriteLocker locker(&clientsLock);
@@ -181,24 +199,56 @@ void Server::externalUserJoined(const ServerInfo_User &userInfo)
 		if (clients[i]->getAcceptsUserListChanges())
 			clients[i]->sendProtocolItem(*se);
 	delete se;
+	clientsLock.unlock();
+	
+	ResponseContainer rc(-1);
+	newUser->joinPersistentGames(rc);
+	newUser->sendResponseContainer(rc, Response::RespNothing);
 }
 
 void Server::externalUserLeft(const QString &userName)
 {
 	// This function is always called from the main thread via signal/slot.
-	QWriteLocker locker(&clientsLock);
 	
+	clientsLock.lockForWrite();
 	Server_AbstractUserInterface *user = externalUsers.take(userName);
 	externalUsersBySessionId.remove(user->getUserInfo()->session_id());
+	clientsLock.unlock();
+	
+	QMap<int, QPair<int, int> > userGames(user->getGames());
+	QMapIterator<int, QPair<int, int> > userGamesIterator(userGames);
+	roomsLock.lockForRead();
+	while (userGamesIterator.hasNext()) {
+		userGamesIterator.next();
+		Server_Room *room = rooms.value(userGamesIterator.value().first);
+		if (!room)
+			continue;
+		
+		QMutexLocker roomGamesLocker(&room->gamesMutex);
+		Server_Game *game = room->getGames().value(userGamesIterator.key());
+		if (!game)
+			continue;
+		
+		QMutexLocker gameLocker(&game->gameMutex);
+		Server_Player *player = game->getPlayers().value(userGamesIterator.value().second);
+		if (!player)
+			continue;
+		
+		player->disconnectClient();
+	}
+	roomsLock.unlock();
+	
 	delete user;
 	
 	Event_UserLeft event;
 	event.set_name(userName.toStdString());
 	
 	SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
+	clientsLock.lockForRead();
 	for (int i = 0; i < clients.size(); ++i)
 		if (clients[i]->getAcceptsUserListChanges())
 			clients[i]->sendProtocolItem(*se);
+	clientsLock.unlock();
 	delete se;
 }
 

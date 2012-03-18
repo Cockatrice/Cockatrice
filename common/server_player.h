@@ -83,6 +83,7 @@ public:
 	void prepareDestroy();
 	Server_AbstractUserInterface *getUserInterface() const { return userInterface; }
 	void setUserInterface(Server_AbstractUserInterface *_userInterface);
+	void disconnectClient();
 	
 	void setPlayerId(int _id) { playerId = _id; }
 	bool getReadyStart() const { return readyStart; }

@@ -9,9 +9,6 @@ public:
 	
 	int getLastCommandTime() const { return 0; }
 	
-	void playerRemovedFromGame(Server_Game * /*game*/) { }
-	void playerAddedToGame(int /*gameId*/, int /*roomId*/, int /*playerId*/) { }
-	
 	void sendProtocolItem(const Response &item);
 	void sendProtocolItem(const SessionEvent &item);
 	void sendProtocolItem(const GameEventContainer &item);

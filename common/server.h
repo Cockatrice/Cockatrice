@@ -4,9 +4,11 @@
 #include <QObject>
 #include <QStringList>
 #include <QMap>
+#include <QMultiMap>
 #include <QMutex>
 #include <QReadWriteLock>
 #include "pb/serverinfo_user.pb.h"
+#include "server_player_reference.h"
 
 class Server_Game;
 class Server_Room;
@@ -77,6 +79,13 @@ public:
 	void addExternalUser(const ServerInfo_User &userInfo);
 	void removeExternalUser(const QString &userName);
 	const QMap<QString, Server_AbstractUserInterface *> &getExternalUsers() const { return externalUsers; }
+	
+	void addPersistentPlayer(const QString &userName, int roomId, int gameId, int playerId);
+	void removePersistentPlayer(const QString &userName, int roomId, int gameId, int playerId);
+	QList<PlayerReference> getPersistentPlayerReferences(const QString &userName) const;
+private:
+	QMultiMap<QString, PlayerReference> persistentPlayers;
+	mutable QReadWriteLock persistentPlayersLock;
 protected slots:	
 	void externalUserJoined(const ServerInfo_User &userInfo);
 	void externalUserLeft(const QString &userName);

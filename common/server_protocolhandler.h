@@ -57,14 +57,12 @@ class Command_ShutdownServer;
 class Server_ProtocolHandler : public QObject, public Server_AbstractUserInterface {
 	Q_OBJECT
 protected:
-	QMap<int, QPair<int, int> > games; // gameId -> (roomId, playerId)
 	QMap<int, Server_Room *> rooms;
 
 	AuthenticationResult authState;
 	bool acceptsUserListChanges;
 	bool acceptsRoomListChanges;
 private:
-	QMutex gameListMutex;
 	
 	QList<int> messageSizeOverTime, messageCountOverTime;
 	int timeRunning, lastDataReceived;
@@ -113,8 +111,6 @@ public slots:
 public:
 	Server_ProtocolHandler(Server *_server, QObject *parent = 0);
 	~Server_ProtocolHandler();
-	void playerRemovedFromGame(Server_Game *game);
-	void playerAddedToGame(int gameId, int roomId, int playerId);
 	
 	bool getAcceptsUserListChanges() const { return acceptsUserListChanges; }
 	bool getAcceptsRoomListChanges() const { return acceptsRoomListChanges; }

@@ -42,6 +42,7 @@ class Server_Game : public QObject {
 	Q_OBJECT
 private:
 	Server_Room *room;
+	int nextPlayerId;
 	int hostId;
 	ServerInfo_User *creatorInfo;
 	QMap<int, Server_Player *> players;
@@ -108,6 +109,7 @@ public:
 	void nextTurn();
 	int getSecondsElapsed() const { return secondsElapsed; }
 
+	void createGameJoinedEvent(Server_Player *player, ResponseContainer &rc, bool resuming);
 	void sendGameStateToPlayers();
 	QList<ServerInfo_Player> getGameState(Server_Player *playerWhosAsking, bool omniscient = false, bool withUserInfo = false) const;
 	

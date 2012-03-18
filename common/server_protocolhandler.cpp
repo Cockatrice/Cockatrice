@@ -49,15 +49,11 @@ void Server_ProtocolHandler::prepareDestroy()
 {
 	qDebug("Server_ProtocolHandler::prepareDestroy");
 	
-	server->removeClient(this);
-	
 	QMapIterator<int, Server_Room *> roomIterator(rooms);
 	while (roomIterator.hasNext())
 		roomIterator.next().value()->removeClient(this);
 	
-	gameListMutex.lock();
-	QMap<int, QPair<int, int> > tempGames(games);
-	gameListMutex.unlock();
+	QMap<int, QPair<int, int> > tempGames(getGames());
 	
 	server->roomsLock.lockForRead();
 	QMapIterator<int, QPair<int, int> > gameIterator(tempGames);
@@ -81,33 +77,16 @@ void Server_ProtocolHandler::prepareDestroy()
 			continue;
 		}
 		
-		if ((authState == UnknownUser) || p->getSpectator())
-			g->removePlayer(p);
-		else
-			p->setUserInterface(0);
+		p->disconnectClient();
 		
 		g->gameMutex.unlock();
 		r->gamesMutex.unlock();
 	}
 	server->roomsLock.unlock();
 	
+	server->removeClient(this);
+	
 	deleteLater();
-}
-
-void Server_ProtocolHandler::playerRemovedFromGame(Server_Game *game)
-{
-	qDebug() << "Server_ProtocolHandler::playerRemovedFromGame(): gameId =" << game->getGameId();
-	
-	QMutexLocker locker(&gameListMutex);
-	games.remove(game->getGameId());
-}
-
-void Server_ProtocolHandler::playerAddedToGame(int gameId, int roomId, int playerId)
-{
-	qDebug() << "Server_ProtocolHandler::playerAddedToGame(): gameId =" << gameId;
-	
-	QMutexLocker locker(&gameListMutex);
-	games.insert(gameId, QPair<int, int>(roomId, playerId));
 }
 
 void Server_ProtocolHandler::sendProtocolItem(const Response &item)
@@ -217,13 +196,10 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 	
 	qDebug() << QString::fromStdString(cont.DebugString());
 	
-	gameListMutex.lock();
-	if (!games.contains(cont.game_id())) {
-		gameListMutex.unlock();
+	QMap<int, QPair<int, int> > gameMap = getGames();
+	if (!gameMap.contains(cont.game_id()))
 		return Response::RespNotInRoom;
-	}
-	const QPair<int, int> roomIdAndPlayerId = games.value(cont.game_id());
-	gameListMutex.unlock();
+	const QPair<int, int> roomIdAndPlayerId = gameMap.value(cont.game_id());
 	
 	QReadLocker roomsLocker(&server->roomsLock);
 	Server_Room *room = server->getRooms().value(roomIdAndPlayerId.first);
@@ -394,53 +370,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 			re->add_ignore_list()->CopyFrom(ignoreIterator.next().value());
 	}
 	
-	server->roomsLock.lockForRead();
-	
-	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
-	while (roomIterator.hasNext()) {
-		Server_Room *room = roomIterator.next().value();
-		room->gamesMutex.lock();
-		QMapIterator<int, Server_Game *> gameIterator(room->getGames());
-		while (gameIterator.hasNext()) {
-			Server_Game *game = gameIterator.next().value();
-			QMutexLocker gameLocker(&game->gameMutex);
-			const QList<Server_Player *> &gamePlayers = game->getPlayers().values();
-			for (int j = 0; j < gamePlayers.size(); ++j)
-				if (gamePlayers[j]->getUserInfo()->name() == userInfo->name()) {
-					gamePlayers[j]->setUserInterface(this);
-					
-					gameListMutex.lock();
-					games.insert(game->getGameId(), QPair<int, int>(room->getId(), gamePlayers[j]->getPlayerId()));
-					gameListMutex.unlock();
-					
-					Event_GameJoined event1;
-					event1.set_room_id(room->getId());
-					event1.set_game_id(game->getGameId());
-					event1.set_game_description(game->getDescription().toStdString());
-					event1.set_host_id(game->getHostId());
-					event1.set_player_id(gamePlayers[j]->getPlayerId());
-					event1.set_spectator(gamePlayers[j]->getSpectator());
-					event1.set_spectators_can_talk(game->getSpectatorsCanTalk());
-					event1.set_spectators_see_everything(game->getSpectatorsSeeEverything());
-					event1.set_resuming(true);
-					rc.enqueuePostResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event1));
-					
-					Event_GameStateChanged event2;
-					QListIterator<ServerInfo_Player> gameStateIterator(game->getGameState(gamePlayers[j], gamePlayers[j]->getSpectator() && game->getSpectatorsSeeEverything(), true));
-					while (gameStateIterator.hasNext())
-						event2.add_player_list()->CopyFrom(gameStateIterator.next());
-					event2.set_seconds_elapsed(game->getSecondsElapsed());
-					event2.set_game_started(game->getGameStarted());
-					event2.set_active_player_id(game->getActivePlayer());
-					event2.set_active_phase(game->getActivePhase());
-					rc.enqueuePostResponseItem(ServerMessage::GAME_EVENT_CONTAINER, game->prepareGameEvent(event2, -1));
-					
-					break;
-				}
-		}
-		room->gamesMutex.unlock();
-	}
-	server->roomsLock.unlock();
+	joinPersistentGames(rc);
 	
 	rc.setResponseExtension(re);
 	return Response::RespOk;
