@@ -410,6 +410,8 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 	for (int cardIndex = 0; cardIndex < cardsToMove.size(); ++cardIndex) {
 		Server_Card *card = cardsToMove[cardIndex].first;
 		const CardToMove *thisCardProperties = cardProperties.value(card);
+		bool faceDown = thisCardProperties->has_face_down() ? thisCardProperties->face_down() : card->getFaceDown();
+		
 		int originalPosition = cardsToMove[cardIndex].second;
 		int position = startzone->removeCard(card);
 		if (startzone->getName() == "hand") {
@@ -478,8 +480,8 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 			bool targetBeingLookedAt = (targetzone->getType() != ServerInfo_Zone::HiddenZone) || (targetzone->getCardsBeingLookedAt() > newX) || (targetzone->getCardsBeingLookedAt() == -1);
 			bool sourceBeingLookedAt = (startzone->getType() != ServerInfo_Zone::HiddenZone) || (startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1);
 		
-			bool targetHiddenToPlayer = thisCardProperties->face_down() || !targetBeingLookedAt;
-			bool targetHiddenToOthers = thisCardProperties->face_down() || (targetzone->getType() != ServerInfo_Zone::PublicZone);
+			bool targetHiddenToPlayer = faceDown || !targetBeingLookedAt;
+			bool targetHiddenToOthers = faceDown || (targetzone->getType() != ServerInfo_Zone::PublicZone);
 			bool sourceHiddenToPlayer = card->getFaceDown() || !sourceBeingLookedAt;
 			bool sourceHiddenToOthers = card->getFaceDown() || (startzone->getType() != ServerInfo_Zone::PublicZone);
 		
@@ -490,9 +492,9 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 				publicCardName = card->getName();
 		
 			int oldCardId = card->getId();
-			if (thisCardProperties->face_down() || (targetzone->getPlayer() != startzone->getPlayer()))
+			if (faceDown || (targetzone->getPlayer() != startzone->getPlayer()))
 				card->setId(targetzone->getPlayer()->newCardId());
-			card->setFaceDown(thisCardProperties->face_down());
+			card->setFaceDown(faceDown);
 		
 			// The player does not get to see which card he moved if it moves between two parts of hidden zones which
 			// are not being looked at.
@@ -514,7 +516,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 				eventOthers.set_target_zone(targetzone->getName().toStdString());
 			eventOthers.set_x(newX);
 			eventOthers.set_y(y);
-			eventOthers.set_face_down(thisCardProperties->face_down());
+			eventOthers.set_face_down(faceDown);
 			
 			Event_MoveCard eventPrivate(eventOthers);
 			eventPrivate.set_card_id(privateOldCardId);
@@ -546,7 +548,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 			if (thisCardProperties->tapped())
 				setCardAttrHelper(ges, targetzone->getName(), card->getId(), AttrTapped, "1");
 			QString ptString = QString::fromStdString(thisCardProperties->pt());
-			if (!ptString.isEmpty() && !thisCardProperties->face_down())
+			if (!ptString.isEmpty() && !faceDown)
 				setCardAttrHelper(ges, targetzone->getName(), card->getId(), AttrPT, ptString);
 		}
 	}
