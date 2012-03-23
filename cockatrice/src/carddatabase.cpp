@@ -14,6 +14,8 @@
 #include <QNetworkRequest>
 #include <QDebug>
 
+const int CardDatabase::versionNeeded = 2;
+
 CardSet::CardSet(const QString &_shortName, const QString &_longName)
 	: shortName(_shortName), longName(_longName)
 {
@@ -625,6 +627,8 @@ bool CardDatabase::loadFromFile(const QString &fileName)
 		if (xml.readNext() == QXmlStreamReader::StartElement) {
 			if (xml.name() != "cockatrice_carddatabase")
 				return false;
+			if (xml.attributes().value("version").toString().toInt() < versionNeeded)
+				return false;
 			while (!xml.atEnd()) {
 				if (xml.readNext() == QXmlStreamReader::EndElement)
 					break;
@@ -649,7 +653,7 @@ bool CardDatabase::saveToFile(const QString &fileName)
 	xml.setAutoFormatting(true);
 	xml.writeStartDocument();
 	xml.writeStartElement("cockatrice_carddatabase");
-	xml.writeAttribute("version", "1");
+	xml.writeAttribute("version", QString::number(versionNeeded));
 
 	xml.writeStartElement("sets");
 	QHashIterator<QString, CardSet *> setIterator(setHash);

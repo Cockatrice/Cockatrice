@@ -180,6 +180,7 @@ protected:
 	CardInfo *noCard;
 	PictureLoadingThread *loadingThread;
 private:
+	static const int versionNeeded;
 	void loadCardsFromXml(QXmlStreamReader &xml);
 	void loadSetsFromXml(QXmlStreamReader &xml);
 public:
