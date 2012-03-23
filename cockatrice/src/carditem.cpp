@@ -33,6 +33,9 @@ CardItem::~CardItem()
 {
 	prepareDelete();
 	
+	if (scene())
+		static_cast<GameScene *>(scene())->unregisterAnimationItem(this);
+	
 	delete cardMenu;
 	delete ptMenu;
 	delete moveMenu;

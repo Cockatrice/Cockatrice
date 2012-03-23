@@ -165,6 +165,7 @@ protected:
 	QThread *pictureLoaderThread;
 	PictureLoader *pictureLoader;
 private:
+	static const int versionNeeded;
 	void loadCardsFromXml(QXmlStreamReader &xml);
 	void loadSetsFromXml(QXmlStreamReader &xml);
 public:
