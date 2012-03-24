@@ -11,8 +11,8 @@
 #include "gamescene.h"
 #include <QDebug>
 
-AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, QGraphicsItem *parent)
-	: ArrowTarget(_owner, parent), infoWidget(0), name(_name), tapped(false), tapAngle(0), isHovered(false), realZValue(0)
+AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, int _id, QGraphicsItem *parent)
+	: ArrowTarget(_owner, parent), infoWidget(0), id(_id), name(_name), tapped(false), facedown(false), tapAngle(0), isHovered(false), realZValue(0)
 {
 	setCursor(Qt::OpenHandCursor);
 	setFlag(ItemIsSelectable);
@@ -85,8 +85,9 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
 void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedSize, int angle)
 {
 	qreal scaleFactor = translatedSize.width() / boundingRect().width();
-
-	QPixmap *translatedPixmap = info->getPixmap(translatedSize.toSize());
+	
+	CardInfo *imageSource = facedown ? db->getCard() : info;
+	QPixmap *translatedPixmap = imageSource->getPixmap(translatedSize.toSize());
 	painter->save();
 	QColor bgColor = Qt::transparent;
 	if (translatedPixmap) {
@@ -124,13 +125,18 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
 	painter->setPen(pen);
 	painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 2));
 	
-	if (!translatedPixmap || settingsCache->getDisplayCardNames()) {
+	if (!translatedPixmap || settingsCache->getDisplayCardNames() || facedown) {
 		painter->save();
 		transformPainter(painter, translatedSize, angle);
 		painter->setPen(Qt::white);
 		painter->setBackground(Qt::black);
 		painter->setBackgroundMode(Qt::OpaqueMode);
-		painter->drawText(QRectF(3 * scaleFactor, 3 * scaleFactor, translatedSize.width() - 6 * scaleFactor, translatedSize.height() - 6 * scaleFactor), Qt::AlignTop | Qt::AlignLeft | Qt::TextWrapAnywhere, name);
+		QString nameStr;
+		if (facedown)
+			nameStr = "# " + QString::number(id);
+		else
+			nameStr = name;
+		painter->drawText(QRectF(3 * scaleFactor, 3 * scaleFactor, translatedSize.width() - 6 * scaleFactor, translatedSize.height() - 6 * scaleFactor), Qt::AlignTop | Qt::AlignLeft | Qt::TextWrapAnywhere, nameStr);
 		painter->restore();
 	}
 	
@@ -203,6 +209,13 @@ void AbstractCardItem::setTapped(bool _tapped, bool canAnimate)
 		setTransform(QTransform().translate((float) CARD_WIDTH / 2, (float) CARD_HEIGHT / 2).rotate(tapAngle).translate((float) -CARD_WIDTH / 2, (float) -CARD_HEIGHT / 2));
 		update();
 	}
+}
+
+void AbstractCardItem::setFaceDown(bool _facedown)
+{
+	facedown = _facedown;
+	update();
+	emit updateCardMenu(this);
 }
 
 void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)

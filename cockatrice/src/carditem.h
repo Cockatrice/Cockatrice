@@ -17,10 +17,8 @@ class CardItem : public AbstractCardItem {
 	Q_OBJECT
 private:
 	CardZone *zone;
-	int id;
 	bool revealedCard;
 	bool attacking;
-	bool facedown;
 	QMap<int, int> counters;
 	QString annotation;
 	QString pt;
@@ -50,13 +48,9 @@ public:
 	QPoint getGridPos() const { return gridPoint; }
 	Player *getOwner() const { return owner; }
 	void setOwner(Player *_owner) { owner = _owner; }
-	int getId() const { return id; }
-	void setId(int _id) { id = _id; }
 	bool getRevealedCard() const { return revealedCard; }
 	bool getAttacking() const { return attacking; }
 	void setAttacking(bool _attacking);
-	bool getFaceDown() const { return facedown; }
-	void setFaceDown(bool _facedown);
 	const QMap<int, int> &getCounters() const { return counters; }
 	void setCounter(int _id, int _value);
 	QString getAnnotation() const { return annotation; }
@@ -75,6 +69,10 @@ public:
 	void resetState();
 	void processCardInfo(const ServerInfo_Card &info);
 
+	QMenu *getCardMenu() const { return cardMenu; }
+	QMenu *getPTMenu() const { return ptMenu; }
+	QMenu *getMoveMenu() const { return moveMenu; }
+	
 	bool animationEvent();
 	CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);
 	void deleteDragItem();

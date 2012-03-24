@@ -97,7 +97,7 @@ signals:
 	void logSetAnnotation(Player *player, CardItem *card, QString newAnnotation);
 	void logDumpZone(Player *player, CardZone *zone, int numberCards);
 	void logStopDumpZone(Player *player, CardZone *zone);
-	void logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer);
+	void logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer, bool faceDown);
 	
 	void sizeChanged();
 	void gameConceded();
@@ -165,7 +165,7 @@ private:
 	QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
 	QAction *aPlay,
 		*aHide,
-		*aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aSetAnnotation, *aFlip, *aClone,
+		*aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aSetAnnotation, *aFlip, *aPeek, *aClone,
 		*aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile;
 
 	bool shortcutsActive;
@@ -223,6 +223,7 @@ private:
 	void eventRevealCards(const Event_RevealCards &event);
 public:
 	static const int counterAreaWidth = 55;
+	enum CardMenuActionType { cmTap, cmUntap, cmDoesntUntap, cmFlip, cmPeek, cmClone, cmMoveToTopLibrary, cmMoveToBottomLibrary, cmMoveToGraveyard, cmMoveToExile };
 	
 	enum { Type = typeOther };
 	int type() const { return Type; }
@@ -261,7 +262,7 @@ public:
 	const QMap<int, ArrowItem *> &getArrows() const { return arrows; }
 	void setCardMenu(QMenu *menu);
 	QMenu *getCardMenu() const;
-	void updateCardMenu(CardItem *card, QMenu *cardMenu, QMenu *ptMenu, QMenu *moveMenu);
+	void updateCardMenu(CardItem *card);
 	bool getActive() const { return active; }
 	void setActive(bool _active);
 	void setShortcutsActive();

@@ -1065,7 +1065,7 @@ void TabGame::newCardAdded(AbstractCardItem *card)
 	connect(card, SIGNAL(hovered(AbstractCardItem *)), cardInfo, SLOT(setCard(AbstractCardItem *)));
 	connect(card, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
 	connect(card, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
-	connect(card, SIGNAL(updateCardMenu(AbstractCardItem*,QMenu*,QMenu*,QMenu*)), this, SLOT(updateCardMenu(AbstractCardItem*,QMenu*,QMenu*,QMenu*)));
+	connect(card, SIGNAL(updateCardMenu(AbstractCardItem *)), this, SLOT(updateCardMenu(AbstractCardItem *)));
 }
 
 CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) const
@@ -1105,16 +1105,13 @@ Player *TabGame::getActiveLocalPlayer() const
 	
 	return 0;
 }
-#include <QDebug>
-void TabGame::updateCardMenu(AbstractCardItem *card, QMenu *cardMenu, QMenu *ptMenu, QMenu *moveMenu)
+
+void TabGame::updateCardMenu(AbstractCardItem *card)
 {
 	Player *p;
-	if ((clients.size() > 1) || !players.contains(localPlayerId)) {
-		qDebug("BUG");
+	if ((clients.size() > 1) || !players.contains(localPlayerId))
 		p = card->getOwner();
-	} else {
+	else
 		p = players.value(localPlayerId);
-		qDebug() << "GEFUNDEN" << localPlayerId << p->getName();
-	}
-	p->updateCardMenu(static_cast<CardItem *>(card), cardMenu, ptMenu, moveMenu);
+	p->updateCardMenu(static_cast<CardItem *>(card));
 }

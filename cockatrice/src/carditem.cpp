@@ -18,7 +18,7 @@
 #include "pb/serverinfo_card.pb.h"
 
 CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _revealedCard, QGraphicsItem *parent)
-	: AbstractCardItem(_name, _owner, parent), zone(0), id(_cardid), revealedCard(_revealedCard), attacking(false), facedown(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(0), attachedTo(0)
+	: AbstractCardItem(_name, _owner, _cardid, parent), zone(0), revealedCard(_revealedCard), attacking(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(0), attachedTo(0)
 {
 	owner->addCard(this);
 	
@@ -27,7 +27,7 @@ CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _reve
 	moveMenu = new QMenu;
 	
 	retranslateUi();
-	emit updateCardMenu(this, cardMenu, ptMenu, moveMenu);
+	emit updateCardMenu(this);
 }
 
 CardItem::~CardItem()
@@ -74,7 +74,7 @@ void CardItem::deleteLater()
 void CardItem::setZone(CardZone *_zone)
 {
 	zone = _zone;
-	emit updateCardMenu(this, cardMenu, ptMenu, moveMenu);
+	emit updateCardMenu(this);
 }
 
 void CardItem::retranslateUi()
@@ -135,14 +135,6 @@ void CardItem::setAttacking(bool _attacking)
 	update();
 }
 
-void CardItem::setFaceDown(bool _facedown)
-{
-	facedown = _facedown;
-	if (facedown)
-		setName(QString());
-	update();
-}
-
 void CardItem::setCounter(int _id, int _value)
 {
 	if (_value)
@@ -187,7 +179,7 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
 	if (zone)
 		zone->reorganizeCards();
 	
-	emit updateCardMenu(this, cardMenu, ptMenu, moveMenu);
+	emit updateCardMenu(this);
 }
 
 void CardItem::resetState()

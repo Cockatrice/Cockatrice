@@ -644,7 +644,7 @@ void MessageLogWidget::logStopDumpZone(Player *player, CardZone *zone)
 		appendHtml(tr("%1 stops looking at %2.", "male").arg(sanitizeHtml(player->getName())).arg(zoneName));
 }
 
-void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer)
+void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer, bool faceDown)
 {
 	QPair<QString, QString> temp = getFromStr(zone, cardName, cardId, false);
 	bool cardNameContainsStartZone = false;
@@ -704,7 +704,21 @@ void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId
 				appendHtml(tr("%1 randomly reveals %2%3.", "male").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
 		}
 	} else {
-		if (otherPlayer) {
+		if (faceDown && (player == otherPlayer)) {
+			if (cardName.isEmpty()) {
+				if (isFemale(player))
+					str = tr("%1 peeks at face down card #%2.", "female");
+				else
+					str = tr("%1 peeks at face down card #%2.", "male");
+				appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardId));
+			} else {
+				if (isFemale(player))
+					str = tr("%1 peeks at face down card #%2: %3.", "female");
+				else
+					str = tr("%1 peeks at face down card #%2: %3.", "male");
+				appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardId).arg(cardStr));
+			}
+		} else if (otherPlayer) {
 			if (isFemale(player)) {
 				if (isFemale(otherPlayer))
 					str = tr("%1 reveals %2%3 to %4.", "p1 female, p2 female");
@@ -809,7 +823,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
 	connect(player, SIGNAL(logStopDumpZone(Player *, CardZone *)), this, SLOT(logStopDumpZone(Player *, CardZone *)));
 	connect(player, SIGNAL(logDrawCards(Player *, int)), this, SLOT(logDrawCards(Player *, int)));
 	connect(player, SIGNAL(logUndoDraw(Player *, QString)), this, SLOT(logUndoDraw(Player *, QString)));
-	connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *)), this, SLOT(logRevealCards(Player *, CardZone *, int, QString, Player *)));
+	connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *, bool)), this, SLOT(logRevealCards(Player *, CardZone *, int, QString, Player *, bool)));
 }
 
 MessageLogWidget::MessageLogWidget(const QString &_ownName, bool _female, QWidget *parent)

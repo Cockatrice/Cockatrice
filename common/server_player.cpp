@@ -477,7 +477,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 				publicCardName = card->getName();
 		
 			int oldCardId = card->getId();
-			if (faceDown || (targetzone->getPlayer() != startzone->getPlayer()))
+			if ((faceDown && (startzone != targetzone)) || (targetzone->getPlayer() != startzone->getPlayer()))
 				card->setId(targetzone->getPlayer()->newCardId());
 			card->setFaceDown(faceDown);
 		
@@ -506,7 +506,8 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 			
 			Event_MoveCard eventPrivate(eventOthers);
 			eventPrivate.set_card_id(privateOldCardId);
-			eventPrivate.set_card_name(privateCardName.toStdString());
+			if (!privateCardName.isEmpty())
+				eventPrivate.set_card_name(privateCardName.toStdString());
 			eventPrivate.set_position(privatePosition);
 			eventPrivate.set_new_card_id(privateNewCardId);
 			
@@ -524,7 +525,8 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 			eventOthers.set_position(position);
 			if ((startzone->getType() == ServerInfo_Zone::PublicZone) || (targetzone->getType() == ServerInfo_Zone::PublicZone)) {
 				eventOthers.set_card_id(oldCardId);
-				eventOthers.set_card_name(publicCardName.toStdString());
+				if (!publicCardName.isEmpty())
+					eventOthers.set_card_name(publicCardName.toStdString());
 				eventOthers.set_new_card_id(card->getId());
 			}
 			
@@ -900,7 +902,8 @@ Response::ResponseCode Server_Player::cmdFlipCard(const Command_FlipCard &cmd, R
 	Event_FlipCard event;
 	event.set_zone_name(zone->getName().toStdString());
 	event.set_card_id(card->getId());
-	event.set_card_name(card->getName().toStdString());
+	if (!faceDown)
+		event.set_card_name(card->getName().toStdString());
 	event.set_face_down(faceDown);
 	ges.enqueueGameEvent(event, playerId);
 	

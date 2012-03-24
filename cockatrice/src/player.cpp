@@ -323,13 +323,13 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 	}
 	
 	aTap = new QAction(this);
-	aTap->setData(0);
+	aTap->setData(cmTap);
 	connect(aTap, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
 	aUntap = new QAction(this);
-	aUntap->setData(1);
+	aUntap->setData(cmUntap);
 	connect(aUntap, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
 	aDoesntUntap = new QAction(this);
-	aDoesntUntap->setData(2);
+	aDoesntUntap->setData(cmDoesntUntap);
 	connect(aDoesntUntap, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
 	aAttach = new QAction(this);
 	connect(aAttach, SIGNAL(triggered()), this, SLOT(actAttach()));
@@ -354,19 +354,22 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 	aSetAnnotation = new QAction(this);
 	connect(aSetAnnotation, SIGNAL(triggered()), this, SLOT(actSetAnnotation()));
 	aFlip = new QAction(this);
-	aFlip->setData(3);
+	aFlip->setData(cmFlip);
 	connect(aFlip, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+	aPeek = new QAction(this);
+	aPeek->setData(cmPeek);
+	connect(aPeek, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
 	aClone = new QAction(this);
-	aClone->setData(4);
+	aClone->setData(cmClone);
 	connect(aClone, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
 	aMoveToTopLibrary = new QAction(this);
-	aMoveToTopLibrary->setData(5);
+	aMoveToTopLibrary->setData(cmMoveToTopLibrary);
 	aMoveToBottomLibrary = new QAction(this);
-	aMoveToBottomLibrary->setData(6);
+	aMoveToBottomLibrary->setData(cmMoveToBottomLibrary);
 	aMoveToGraveyard = new QAction(this);
-	aMoveToGraveyard->setData(7);
+	aMoveToGraveyard->setData(cmMoveToGraveyard);
 	aMoveToExile = new QAction(this);
-	aMoveToExile->setData(8);
+	aMoveToExile->setData(cmMoveToExile);
 	connect(aMoveToTopLibrary, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
 	connect(aMoveToBottomLibrary, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
 	connect(aMoveToGraveyard, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
@@ -608,6 +611,7 @@ void Player::retranslateUi()
 	aUntap->setText(tr("&Untap"));
 	aDoesntUntap->setText(tr("Toggle &normal untapping"));
 	aFlip->setText(tr("&Flip"));
+	aPeek->setText(tr("&Peek at card face"));
 	aClone->setText(tr("&Clone"));
 	aClone->setShortcut(tr("Ctrl+H"));
 	aAttach->setText(tr("&Attach to card..."));
@@ -1094,7 +1098,8 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
 		return;
 	if (startZone != targetZone)
 		card->deleteCardInfoPopup();
-	card->setName(QString::fromStdString(event.card_name()));
+	if (event.has_card_name())
+		card->setName(QString::fromStdString(event.card_name()));
 	
 	if (card->getAttachedTo() && (startZone != targetZone)) {
 		CardItem *parentCard = card->getAttachedTo();
@@ -1256,19 +1261,34 @@ void Player::eventRevealCards(const Event_RevealCards &event)
 			return;
 	}
 	
+	bool peeking = false;
 	QList<const ServerInfo_Card *> cardList;
 	const int cardListSize = event.cards_size();
 	for (int i = 0; i < cardListSize; ++i) {
 		const ServerInfo_Card *temp = &event.cards(i);
+		if (temp->face_down())
+			peeking = true;
 		cardList.append(temp);
 	}
-	if (!cardList.isEmpty())
-		static_cast<GameScene *>(scene())->addRevealedZoneView(this, zone, cardList, event.grant_write_access());
 	
-	QString cardName;
-	if (cardList.size() == 1)
-		cardName = QString::fromStdString(cardList.first()->name());
-	emit logRevealCards(this, zone, event.card_id(), cardName, otherPlayer);
+	if (peeking) {
+		for (int i = 0; i < cardList.size(); ++i) {
+			QString cardName = QString::fromStdString(cardList.at(i)->name());
+			CardItem *card = zone->getCard(cardList.at(i)->id(), QString());
+			if (!card)
+				continue;
+			card->setName(cardName);
+			emit logRevealCards(this, zone, cardList.at(i)->id(), cardName, this, true);
+		}
+	} else {
+		if (!cardList.isEmpty())
+			static_cast<GameScene *>(scene())->addRevealedZoneView(this, zone, cardList, event.grant_write_access());
+		
+		QString cardName;
+		if (cardList.size() == 1)
+			cardName = QString::fromStdString(cardList.first()->name());
+		emit logRevealCards(this, zone, event.card_id(), cardName, otherPlayer, false);
+	}
 }
 
 void Player::processGameEvent(GameEvent::GameEventType type, const GameEvent &event, const GameEventContext &context)
@@ -1602,8 +1622,8 @@ void Player::cardMenuAction()
 	if (a->data().toInt() <= 4)
 		for (int i = 0; i < cardList.size(); ++i) {
 			CardItem *card = cardList[i];
-			switch (a->data().toInt()) {
-				case 0:
+			switch (static_cast<CardMenuActionType>(a->data().toInt())) {
+				case cmTap:
 					if (!card->getTapped()) {
 						Command_SetCardAttr *cmd = new Command_SetCardAttr;
 						cmd->set_zone(card->getZone()->getName().toStdString());
@@ -1613,7 +1633,7 @@ void Player::cardMenuAction()
 						commandList.append(cmd);
 					}
 					break;
-				case 1:
+				case cmUntap:
 					if (card->getTapped()) {
 						Command_SetCardAttr *cmd = new Command_SetCardAttr;
 						cmd->set_zone(card->getZone()->getName().toStdString());
@@ -1623,7 +1643,7 @@ void Player::cardMenuAction()
 						commandList.append(cmd);
 					}
 					break;
-				case 2: {
+				case cmDoesntUntap: {
 					Command_SetCardAttr *cmd = new Command_SetCardAttr;
 					cmd->set_zone(card->getZone()->getName().toStdString());
 					cmd->set_card_id(card->getId());
@@ -1632,7 +1652,7 @@ void Player::cardMenuAction()
 					commandList.append(cmd);
 					break;
 				}
-				case 3: {
+				case cmFlip: {
 					Command_FlipCard *cmd = new Command_FlipCard;
 					cmd->set_zone(card->getZone()->getName().toStdString());
 					cmd->set_card_id(card->getId());
@@ -1640,7 +1660,15 @@ void Player::cardMenuAction()
 					commandList.append(cmd);
 					break;
 				}
-				case 4: {
+				case cmPeek: {
+					Command_RevealCards *cmd = new Command_RevealCards;
+					cmd->set_zone_name(card->getZone()->getName().toStdString());
+					cmd->set_card_id(card->getId());
+					cmd->set_player_id(id);
+					commandList.append(cmd);
+					break;
+				}
+				case cmClone: {
 					Command_CreateToken *cmd = new Command_CreateToken;
 					cmd->set_zone(card->getZone()->getName().toStdString());
 					cmd->set_card_name(card->getName().toStdString());
@@ -1662,8 +1690,8 @@ void Player::cardMenuAction()
 		int startPlayerId = cardList[0]->getZone()->getPlayer()->getId();
 		QString startZone = cardList[0]->getZone()->getName();
 		
-		switch (a->data().toInt()) {
-			case 5: {
+		switch (static_cast<CardMenuActionType>(a->data().toInt())) {
+			case cmMoveToTopLibrary: {
 				Command_MoveCard *cmd = new Command_MoveCard;
 				cmd->set_start_player_id(startPlayerId);
 				cmd->set_start_zone(startZone.toStdString());
@@ -1675,7 +1703,7 @@ void Player::cardMenuAction()
 				commandList.append(cmd);
 				break;
 			}
-			case 6: {
+			case cmMoveToBottomLibrary: {
 				Command_MoveCard *cmd = new Command_MoveCard;
 				cmd->set_start_player_id(startPlayerId);
 				cmd->set_start_zone(startZone.toStdString());
@@ -1687,7 +1715,7 @@ void Player::cardMenuAction()
 				commandList.append(cmd);
 				break;
 			}
-			case 7: {
+			case cmMoveToGraveyard: {
 				Command_MoveCard *cmd = new Command_MoveCard;
 				cmd->set_start_player_id(startPlayerId);
 				cmd->set_start_zone(startZone.toStdString());
@@ -1699,7 +1727,7 @@ void Player::cardMenuAction()
 				commandList.append(cmd);
 				break;
 			}
-			case 8: {
+			case cmMoveToExile: {
 				Command_MoveCard *cmd = new Command_MoveCard;
 				cmd->set_start_player_id(startPlayerId);
 				cmd->set_start_zone(startZone.toStdString());
@@ -1924,8 +1952,12 @@ void Player::actHide()
 	game->getActiveCard()->getZone()->removeCard(game->getActiveCard());
 }
 
-void Player::updateCardMenu(CardItem *card, QMenu *cardMenu, QMenu *ptMenu, QMenu *moveMenu)
+void Player::updateCardMenu(CardItem *card)
 {
+	QMenu *cardMenu = card->getCardMenu();
+	QMenu *ptMenu = card->getPTMenu();
+	QMenu *moveMenu = card->getMoveMenu();
+	
 	cardMenu->clear();
 	
 	bool revealedCard = false;
@@ -1970,6 +2002,8 @@ void Player::updateCardMenu(CardItem *card, QMenu *cardMenu, QMenu *ptMenu, QMen
 				cardMenu->addAction(aUntap);
 				cardMenu->addAction(aDoesntUntap);
 				cardMenu->addAction(aFlip);
+				if (card->getFaceDown())
+					cardMenu->addAction(aPeek);
 				cardMenu->addSeparator();
 				cardMenu->addAction(aAttach);
 				if (card->getAttachedTo())
