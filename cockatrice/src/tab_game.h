@@ -110,6 +110,7 @@ private:
 	QStringList phasesList;
 	int currentPhase;
 	int activePlayer;
+	CardItem *activeCard;
 	
 	// Replay related members
 	GameReplay *replay;
@@ -177,6 +178,7 @@ private slots:
 	void incrementGameTime();
 	void adminLockChanged(bool lock);
 	void newCardAdded(AbstractCardItem *card);
+	void updateCardMenu(AbstractCardItem *card, QMenu *cardMenu, QMenu *ptMenu, QMenu *moveMenu);
 	
 	void actConcede();
 	void actLeaveGame();
@@ -201,6 +203,9 @@ public:
 	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
 	Player *getActiveLocalPlayer() const;
 	AbstractClient *getClientForPlayer(int playerId) const;
+	
+	void setActiveCard(CardItem *_card) { activeCard = _card; }
+	CardItem *getActiveCard() const { return activeCard; }
 
 	void processGameEventContainer(const GameEventContainer &cont, AbstractClient *client);
 	PendingCommand *prepareGameCommand(const ::google::protobuf::Message &cmd);

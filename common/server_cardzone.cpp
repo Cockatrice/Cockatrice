@@ -43,6 +43,8 @@ void Server_CardZone::shuffle()
 	for (int i = cards.size(); i; i--)
 		temp.append(cards.takeAt(rng->getNumber(0, i - 1)));
 	cards = temp;
+	
+	playersWithWritePermission.clear();
 }
 
 int Server_CardZone::removeCard(Server_Card *card)
@@ -206,4 +208,10 @@ void Server_CardZone::clear()
 	for (int i = 0; i < cards.size(); i++)
 		delete cards.at(i);
 	cards.clear();
+	playersWithWritePermission.clear();
+}
+
+void Server_CardZone::addWritePermission(int playerId)
+{
+	playersWithWritePermission.insert(playerId);
 }

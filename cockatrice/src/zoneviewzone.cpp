@@ -10,10 +10,11 @@
 #include "pb/response_dump_zone.pb.h"
 #include "pending_command.h"
 
-ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, bool _revealZone, QGraphicsItem *parent)
-	: SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0), numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone), sortByName(false), sortByType(false)
+ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, bool _revealZone, bool _writeableRevealZone, QGraphicsItem *parent)
+	: SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0), numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone), writeableRevealZone(_writeableRevealZone), sortByName(false), sortByType(false)
 {
-	if (!revealZone)
+	qDebug() << "revealZone=" << revealZone << "writeable=" << writeableRevealZone;
+	if (!(revealZone && !writeableRevealZone))
 		origZone->setView(this);
 }
 
@@ -21,7 +22,7 @@ ZoneViewZone::~ZoneViewZone()
 {
 	emit beingDeleted();
 	qDebug("ZoneViewZone destructor");
-	if (!revealZone)
+	if (!(revealZone && !writeableRevealZone))
 		origZone->setView(NULL);
 }
 
@@ -135,6 +136,7 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &/*dropPoint*/)
 {
 	Command_MoveCard cmd;
+	cmd.set_start_player_id(startZone->getPlayer()->getId());
 	cmd.set_start_zone(startZone->getName().toStdString());
 	cmd.set_target_player_id(player->getId());
 	cmd.set_target_zone(getName().toStdString());
@@ -167,4 +169,15 @@ void ZoneViewZone::setGeometry(const QRectF &rect)
 QSizeF ZoneViewZone::sizeHint(Qt::SizeHint /*which*/, const QSizeF & /*constraint*/) const
 {
 	return optimumRect.size();
+}
+
+void ZoneViewZone::setWriteableRevealZone(bool _writeableRevealZone)
+{
+	if (writeableRevealZone && !_writeableRevealZone)
+		origZone->setView(this);
+	else if (!writeableRevealZone && _writeableRevealZone)
+		origZone->setView(NULL);
+	
+	writeableRevealZone = _writeableRevealZone;
+	
 }

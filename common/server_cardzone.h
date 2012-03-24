@@ -23,6 +23,7 @@
 #include <QList>
 #include <QString>
 #include <QMap>
+#include <QSet>
 #include "pb/serverinfo_zone.pb.h"
 
 class Server_Card;
@@ -37,6 +38,7 @@ private:
 	bool has_coords;
 	ServerInfo_Zone::ZoneType type;
 	int cardsBeingLookedAt;
+	QSet<int> playersWithWritePermission;
 public:
 	Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ServerInfo_Zone::ZoneType _type);
 	~Server_CardZone();
@@ -60,6 +62,8 @@ public:
 	void insertCard(Server_Card *card, int x, int y);
 	void shuffle();
 	void clear();
+	void addWritePermission(int playerId);
+	const QSet<int> &getPlayersWithWritePermission() const { return playersWithWritePermission; }
 };
 
 #endif

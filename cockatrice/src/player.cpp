@@ -93,7 +93,7 @@ void PlayerArea::setSize(qreal width, qreal height)
 }
 
 Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_parent)
-	: QObject(_parent), activeCard(0), shortcutsActive(false), defaultNumberTopCards(3), lastTokenDestroy(true), id(_id), active(false), local(_local), mirrored(false), handVisible(false), conceded(false), dialogSemaphore(false)
+	: QObject(_parent), game(_parent), shortcutsActive(false), defaultNumberTopCards(3), lastTokenDestroy(true), id(_id), active(false), local(_local), mirrored(false), handVisible(false), conceded(false), dialogSemaphore(false)
 {
 	userInfo = new ServerInfo_User;
 	userInfo->CopyFrom(info);
@@ -392,7 +392,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 		connect(tempSetCounter, SIGNAL(triggered()), this, SLOT(actCardCounterTrigger()));
 	}
 
-	const QList<Player *> &players = _parent->getPlayers().values();
+	const QList<Player *> &players = game->getPlayers().values();
 	for (int i = 0; i < players.size(); ++i)
 		addPlayer(players[i]);
 	
@@ -460,9 +460,10 @@ void Player::playerListActionTriggered()
 	if (otherPlayerId != -1)
 		cmd.set_player_id(otherPlayerId);
 	
-	if (menu == mRevealLibrary)
+	if (menu == mRevealLibrary) {
 		cmd.set_zone_name("deck");
-	else if (menu == mRevealTopCard) {
+		cmd.set_grant_write_access(true);
+	} else if (menu == mRevealTopCard) {
 		cmd.set_zone_name("deck");
 		cmd.set_card_id(0);
 	} else if (menu == mRevealHand)
@@ -937,6 +938,9 @@ void Player::eventShuffle(const Event_Shuffle &event)
 	CardZone *zone = zones.value(QString::fromStdString(event.zone_name()));
 	if (!zone)
 		return;
+	if (zone->getView())
+		if (zone->getView()->getRevealZone())
+			zone->getView()->setWriteableRevealZone(false);
 	emit logShuffle(this, zone);
 }
 
@@ -1040,7 +1044,7 @@ void Player::eventDelCounter(const Event_DelCounter &event)
 
 void Player::eventDumpZone(const Event_DumpZone &event)
 {
-	Player *zoneOwner = static_cast<TabGame *>(parent())->getPlayers().value(event.zone_owner_id(), 0);
+	Player *zoneOwner = game->getPlayers().value(event.zone_owner_id(), 0);
 	if (!zoneOwner)
 		return;
 	CardZone *zone = zoneOwner->getZones().value(QString::fromStdString(event.zone_name()), 0);
@@ -1051,7 +1055,7 @@ void Player::eventDumpZone(const Event_DumpZone &event)
 
 void Player::eventStopDumpZone(const Event_StopDumpZone &event)
 {
-	Player *zoneOwner = static_cast<TabGame *>(parent())->getPlayers().value(event.zone_owner_id(), 0);
+	Player *zoneOwner = game->getPlayers().value(event.zone_owner_id(), 0);
 	if (!zoneOwner)
 		return;
 	CardZone *zone = zoneOwner->getZones().value(QString::fromStdString(event.zone_name()), 0);
@@ -1062,8 +1066,11 @@ void Player::eventStopDumpZone(const Event_StopDumpZone &event)
 
 void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &context)
 {
-	CardZone *startZone = zones.value(QString::fromStdString(event.start_zone()), 0);
-	Player *targetPlayer = static_cast<TabGame *>(parent())->getPlayers().value(event.target_player_id());
+	Player *startPlayer = game->getPlayers().value(event.start_player_id());
+	if (!startPlayer)
+		return;
+	CardZone *startZone = startPlayer->getZones().value(QString::fromStdString(event.start_zone()), 0);
+	Player *targetPlayer = game->getPlayers().value(event.target_player_id());
 	if (!targetPlayer)
 		return;
 	CardZone *targetZone;
@@ -1122,7 +1129,7 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
 
 	// Look at all arrows from and to the card.
 	// If the card was moved to another zone, delete the arrows, otherwise update them.
-	QMapIterator<int, Player *> playerIterator(static_cast<TabGame *>(parent())->getPlayers());
+	QMapIterator<int, Player *> playerIterator(game->getPlayers());
 	while (playerIterator.hasNext()) {
 		Player *p = playerIterator.next().value();
 
@@ -1176,7 +1183,7 @@ void Player::eventDestroyCard(const Event_DestroyCard &event)
 
 void Player::eventAttachCard(const Event_AttachCard &event)
 {
-	const QMap<int, Player *> &playerList = static_cast<TabGame *>(parent())->getPlayers();
+	const QMap<int, Player *> &playerList = game->getPlayers();
 	Player *targetPlayer = 0;
 	CardZone *targetZone = 0;
 	CardItem *targetCard = 0;
@@ -1244,7 +1251,7 @@ void Player::eventRevealCards(const Event_RevealCards &event)
 		return;
 	Player *otherPlayer = 0;
 	if (event.has_other_player_id()) {
-		otherPlayer = static_cast<TabGame *>(parent())->getPlayers().value(event.other_player_id());
+		otherPlayer = game->getPlayers().value(event.other_player_id());
 		if (!otherPlayer)
 			return;
 	}
@@ -1256,7 +1263,7 @@ void Player::eventRevealCards(const Event_RevealCards &event)
 		cardList.append(temp);
 	}
 	if (!cardList.isEmpty())
-		static_cast<GameScene *>(scene())->addRevealedZoneView(this, zone, cardList);
+		static_cast<GameScene *>(scene())->addRevealedZoneView(this, zone, cardList, event.grant_write_access());
 	
 	QString cardName;
 	if (cardList.size() == 1)
@@ -1364,7 +1371,7 @@ void Player::processCardAttachment(const ServerInfo_Player &info)
 			const ServerInfo_Card &cardInfo = zoneInfo.card_list(j);
 			if (cardInfo.has_attach_player_id()) {
 				CardItem *startCard = zone->getCard(cardInfo.id(), QString());
-				CardItem *targetCard = static_cast<TabGame *>(parent())->getCard(cardInfo.attach_player_id(), QString::fromStdString(cardInfo.attach_zone()), cardInfo.attach_card_id());
+				CardItem *targetCard = game->getCard(cardInfo.attach_player_id(), QString::fromStdString(cardInfo.attach_zone()), cardInfo.attach_card_id());
 				if (!targetCard)
 					continue;
 				
@@ -1377,6 +1384,7 @@ void Player::processCardAttachment(const ServerInfo_Player &info)
 void Player::playCard(CardItem *c, bool faceDown, bool tapped)
 {
 	Command_MoveCard cmd;
+	cmd.set_start_player_id(c->getZone()->getPlayer()->getId());
 	cmd.set_start_zone(c->getZone()->getName().toStdString());
 	cmd.set_target_player_id(getId());
 	CardToMove *cardToMove = cmd.mutable_cards_to_move()->add_card();
@@ -1465,7 +1473,7 @@ void Player::clearCounters()
 
 ArrowItem *Player::addArrow(const ServerInfo_Arrow &arrow)
 {
-	const QMap<int, Player *> &playerList = static_cast<TabGame *>(parent())->getPlayers();
+	const QMap<int, Player *> &playerList = game->getPlayers();
 	Player *startPlayer = playerList.value(arrow.start_player_id(), 0);
 	Player *targetPlayer = playerList.value(arrow.target_player_id(), 0);
 	if (!startPlayer || !targetPlayer)
@@ -1552,22 +1560,22 @@ void Player::rearrangeCounters()
 
 PendingCommand * Player::prepareGameCommand(const google::protobuf::Message &cmd)
 {
-	return static_cast<TabGame *>(parent())->prepareGameCommand(cmd);
+	return game->prepareGameCommand(cmd);
 }
 
 PendingCommand * Player::prepareGameCommand(const QList<const::google::protobuf::Message *> &cmdList)
 {
-	return static_cast<TabGame *>(parent())->prepareGameCommand(cmdList);
+	return game->prepareGameCommand(cmdList);
 }
 
 void Player::sendGameCommand(const google::protobuf::Message &command)
 {
-	static_cast<TabGame *>(parent())->sendGameCommand(command, id);
+	game->sendGameCommand(command, id);
 }
 
 void Player::sendGameCommand(PendingCommand *pend)
 {
-	static_cast<TabGame *>(parent())->sendGameCommand(pend, id);
+	game->sendGameCommand(pend, id);
 }
 
 bool Player::clearCardsToDelete()
@@ -1651,11 +1659,13 @@ void Player::cardMenuAction()
 		ListOfCardsToMove idList;
 		for (int i = 0; i < cardList.size(); ++i)
 			idList.add_card()->set_card_id(cardList[i]->getId());
+		int startPlayerId = cardList[0]->getZone()->getPlayer()->getId();
 		QString startZone = cardList[0]->getZone()->getName();
 		
 		switch (a->data().toInt()) {
 			case 5: {
 				Command_MoveCard *cmd = new Command_MoveCard;
+				cmd->set_start_player_id(startPlayerId);
 				cmd->set_start_zone(startZone.toStdString());
 				cmd->mutable_cards_to_move()->CopyFrom(idList);
 				cmd->set_target_player_id(getId());
@@ -1667,6 +1677,7 @@ void Player::cardMenuAction()
 			}
 			case 6: {
 				Command_MoveCard *cmd = new Command_MoveCard;
+				cmd->set_start_player_id(startPlayerId);
 				cmd->set_start_zone(startZone.toStdString());
 				cmd->mutable_cards_to_move()->CopyFrom(idList);
 				cmd->set_target_player_id(getId());
@@ -1678,6 +1689,7 @@ void Player::cardMenuAction()
 			}
 			case 7: {
 				Command_MoveCard *cmd = new Command_MoveCard;
+				cmd->set_start_player_id(startPlayerId);
 				cmd->set_start_zone(startZone.toStdString());
 				cmd->mutable_cards_to_move()->CopyFrom(idList);
 				cmd->set_target_player_id(getId());
@@ -1689,6 +1701,7 @@ void Player::cardMenuAction()
 			}
 			case 8: {
 				Command_MoveCard *cmd = new Command_MoveCard;
+				cmd->set_start_player_id(startPlayerId);
 				cmd->set_start_zone(startZone.toStdString());
 				cmd->mutable_cards_to_move()->CopyFrom(idList);
 				cmd->set_target_player_id(getId());
@@ -1701,7 +1714,7 @@ void Player::cardMenuAction()
 			default: ;
 		}
 	}
-	static_cast<TabGame *>(parent())->sendGameCommand(prepareGameCommand(commandList));
+	game->sendGameCommand(prepareGameCommand(commandList));
 }
 
 void Player::actIncPT(int deltaP, int deltaT)
@@ -1756,7 +1769,7 @@ void Player::actSetPT()
 
 void Player::actDrawArrow()
 {
-	activeCard->drawArrow(Qt::red);
+	game->getActiveCard()->drawArrow(Qt::red);
 }
 
 void Player::actIncP()
@@ -1824,7 +1837,7 @@ void Player::actSetAnnotation()
 
 void Player::actAttach()
 {
-	ArrowAttachItem *arrow = new ArrowAttachItem(activeCard);
+	ArrowAttachItem *arrow = new ArrowAttachItem(game->getActiveCard());
 	scene()->addItem(arrow);
 	arrow->grabMouse();
 }
@@ -1832,8 +1845,8 @@ void Player::actAttach()
 void Player::actUnattach()
 {
 	Command_AttachCard cmd;
-	cmd.set_start_zone(activeCard->getZone()->getName().toStdString());
-	cmd.set_card_id(activeCard->getId());
+	cmd.set_start_zone(game->getActiveCard()->getZone()->getName().toStdString());
+	cmd.set_card_id(game->getActiveCard()->getId());
 	sendGameCommand(cmd);
 }
 
@@ -1903,21 +1916,34 @@ void Player::actCardCounterTrigger()
 
 void Player::actPlay()
 {
-	activeCard->playCard(false);
+	playCard(game->getActiveCard(), false, game->getActiveCard()->getInfo()->getCipt());
 }
 
 void Player::actHide()
 {
-	activeCard->getZone()->removeCard(activeCard);
+	game->getActiveCard()->getZone()->removeCard(game->getActiveCard());
 }
 
 void Player::updateCardMenu(CardItem *card, QMenu *cardMenu, QMenu *ptMenu, QMenu *moveMenu)
 {
 	cardMenu->clear();
 	
-	if (card->getRevealedCard())
+	bool revealedCard = false;
+	bool writeableCard = getLocal();
+	if (card->getZone())
+		if (card->getZone()->getIsView()) {
+			ZoneViewZone *view = static_cast<ZoneViewZone *>(card->getZone());
+			if (view->getRevealZone()) {
+				if (view->getWriteableRevealZone())
+					writeableCard = true;
+				else
+					revealedCard = true;
+			}
+		}
+	
+	if (revealedCard)
 		cardMenu->addAction(aHide);
-	else if (getLocal()) {
+	else if (writeableCard) {
 		if (moveMenu->isEmpty()) {
 			moveMenu->addAction(aMoveToTopLibrary);
 			moveMenu->addAction(aMoveToBottomLibrary);

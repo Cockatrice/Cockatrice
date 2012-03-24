@@ -42,6 +42,7 @@ void HandZone::addCardImpl(CardItem *card, int x, int /*y*/)
 void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &/*dropPoint*/)
 {
 	Command_MoveCard cmd;
+	cmd.set_start_player_id(startZone->getPlayer()->getId());
 	cmd.set_start_zone(startZone->getName().toStdString());
 	cmd.set_target_player_id(player->getId());
 	cmd.set_target_zone(getName().toStdString());

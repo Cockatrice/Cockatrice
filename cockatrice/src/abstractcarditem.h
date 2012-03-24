@@ -31,6 +31,7 @@ signals:
 	void hovered(AbstractCardItem *card);
 	void showCardInfoPopup(QPoint pos, QString cardName);
 	void deleteCardInfoPopup(QString cardName);
+	void updateCardMenu(AbstractCardItem *card, QMenu *cardMenu, QMenu *ptMenu, QMenu *moveMenu);
 public:
 	enum { Type = typeCard };
 	int type() const { return Type; }

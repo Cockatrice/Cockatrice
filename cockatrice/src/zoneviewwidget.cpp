@@ -55,7 +55,7 @@ void TitleLabel::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	emit mouseMoved(event->scenePos() - buttonDownPos);
 }
 
-ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, bool _revealZone, const QList<const ServerInfo_Card *> &cardList)
+ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, bool _revealZone, bool _writeableRevealZone, const QList<const ServerInfo_Card *> &cardList)
 	: QGraphicsWidget(0, Qt::Tool | Qt::FramelessWindowHint), player(_player)
 {
 	setAcceptHoverEvents(true);
@@ -105,7 +105,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 	extraHeight = vbox->sizeHint(Qt::PreferredSize).height();
 	resize(150, 150);
 
-	zone = new ZoneViewZone(player, _origZone, numberCards, _revealZone, this);
+	zone = new ZoneViewZone(player, _origZone, numberCards, _revealZone, _writeableRevealZone, this);
 	vbox->addItem(zone);
 	
 	if (sortByNameCheckBox) {

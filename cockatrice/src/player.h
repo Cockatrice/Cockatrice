@@ -148,6 +148,7 @@ private slots:
 	void actHide();
 
 private:
+	TabGame *game;
 	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *countersMenu, *sayMenu,
 		*mRevealLibrary, *mRevealTopCard, *mRevealHand, *mRevealRandomHandCard;
 	QList<QMenu *> playerLists;
@@ -160,7 +161,6 @@ private:
                 *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle,
 		*aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,
 		*aCardMenu;
-	CardItem *activeCard;
 	
 	QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
 	QAction *aPlay,
@@ -250,6 +250,7 @@ public:
 	~Player();
 	void retranslateUi();
 	void clear();
+	TabGame *getGame() const { return game; }
 	QMenu *getPlayerMenu() const { return playerMenu; }
 	int getId() const { return id; }
 	QString getName() const;
@@ -260,7 +261,6 @@ public:
 	const QMap<int, ArrowItem *> &getArrows() const { return arrows; }
 	void setCardMenu(QMenu *menu);
 	QMenu *getCardMenu() const;
-	void setActiveCard(CardItem *card) { activeCard = card; }
 	void updateCardMenu(CardItem *card, QMenu *cardMenu, QMenu *ptMenu, QMenu *moveMenu);
 	bool getActive() const { return active; }
 	void setActive(bool _active);

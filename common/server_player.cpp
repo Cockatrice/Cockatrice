@@ -342,21 +342,6 @@ Response::ResponseCode Server_Player::undoDraw(GameEventStorage &ges)
 	return retVal;
 }
 
-Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, const QString &_startZone, const QList<const CardToMove *> &_cards, int targetPlayerId, const QString &_targetZone, int x, int y)
-{
-	QMutexLocker locker(&game->gameMutex);
-	
-	Server_CardZone *startzone = getZones().value(_startZone);
-	Server_Player *targetPlayer = game->getPlayers().value(targetPlayerId);
-	if (!targetPlayer)
-		return Response::RespNameNotFound;
-	Server_CardZone *targetzone = targetPlayer->getZones().value(_targetZone);
-	if ((!startzone) || (!targetzone))
-		return Response::RespNameNotFound;
-	
-	return moveCard(ges, startzone, _cards, targetzone, x, y);
-}
-
 class Server_Player::MoveCardCompareFunctor {
 private:
 	int x;
@@ -510,6 +495,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 				privatePosition = position;
 			
 			Event_MoveCard eventOthers;
+			eventOthers.set_start_player_id(startzone->getPlayer()->getPlayerId());
 			eventOthers.set_start_zone(startzone->getName().toStdString());
 			eventOthers.set_target_player_id(targetzone->getPlayer()->getPlayerId());
 			if (startzone != targetzone)
@@ -858,11 +844,31 @@ Response::ResponseCode Server_Player::cmdMoveCard(const Command_MoveCard &cmd, R
 	if (conceded)
 		return Response::RespContextError;
 	
+	Server_Player *startPlayer = game->getPlayers().value(cmd.has_start_player_id() ? cmd.start_player_id() : playerId);
+	if (!startPlayer)
+		return Response::RespNameNotFound;
+	Server_CardZone *startZone = startPlayer->getZones().value(QString::fromStdString(cmd.start_zone()));
+	if (!startZone)
+		return Response::RespNameNotFound;
+		
+	if ((startPlayer != this) && (!startZone->getPlayersWithWritePermission().contains(playerId)))
+		return Response::RespContextError;
+	
+	Server_Player *targetPlayer = game->getPlayers().value(cmd.target_player_id());
+	if (!targetPlayer)
+		return Response::RespNameNotFound;
+	Server_CardZone *targetZone = targetPlayer->getZones().value(QString::fromStdString(cmd.target_zone()));
+	if (!targetZone)
+		return Response::RespNameNotFound;
+	
+	if ((startPlayer != this) && (targetPlayer != this))
+		return Response::RespContextError;
+	
 	QList<const CardToMove *> cardsToMove;
 	for (int i = 0; i < cmd.cards_to_move().card_size(); ++i)
 		cardsToMove.append(&cmd.cards_to_move().card(i));
 	
-	return moveCard(ges, QString::fromStdString(cmd.start_zone()), cardsToMove, cmd.target_player_id(), QString::fromStdString(cmd.target_zone()), cmd.x(), cmd.y());
+	return moveCard(ges, startZone, cardsToMove, targetZone, cmd.x(), cmd.y());
 }
 
 Response::ResponseCode Server_Player::cmdFlipCard(const Command_FlipCard &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
@@ -1470,6 +1476,7 @@ Response::ResponseCode Server_Player::cmdRevealCards(const Command_RevealCards &
 	}
 	
 	Event_RevealCards eventOthers;
+	eventOthers.set_grant_write_access(cmd.grant_write_access());
 	eventOthers.set_zone_name(zone->getName().toStdString());
 	if (cmd.has_card_id())
 		eventOthers.set_card_id(cmd.card_id());
@@ -1511,10 +1518,20 @@ Response::ResponseCode Server_Player::cmdRevealCards(const Command_RevealCards &
 	}
 	
 	if (cmd.has_player_id()) {
+		if (cmd.grant_write_access())
+			zone->addWritePermission(cmd.player_id());
+		
 		ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, cmd.player_id());
 		ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
-	} else
+	} else {
+		if (cmd.grant_write_access()) {
+			const QList<int> &playerIds = game->getPlayers().keys();
+			for (int i = 0; i < playerIds.size(); ++i)
+				zone->addWritePermission(playerIds[i]);
+		}
+		
 		ges.enqueueGameEvent(eventPrivate, playerId);
+	}
 	
 	return Response::RespOk;
 }

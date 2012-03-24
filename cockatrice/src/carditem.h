@@ -74,7 +74,6 @@ public:
 	const QList<CardItem *> &getAttachedCards() const { return attachedCards; }
 	void resetState();
 	void processCardInfo(const ServerInfo_Card &info);
-	void updateCardMenu();
 
 	bool animationEvent();
 	CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);

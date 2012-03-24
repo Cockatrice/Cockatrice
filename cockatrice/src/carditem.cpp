@@ -8,6 +8,7 @@
 #include "carddragitem.h"
 #include "carddatabase.h"
 #include "cardzone.h"
+#include "zoneviewzone.h"
 #include "tablezone.h"
 #include "player.h"
 #include "arrowitem.h"
@@ -26,7 +27,7 @@ CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _reve
 	moveMenu = new QMenu;
 	
 	retranslateUi();
-	owner->updateCardMenu(this, cardMenu, ptMenu, moveMenu);
+	emit updateCardMenu(this, cardMenu, ptMenu, moveMenu);
 }
 
 CardItem::~CardItem()
@@ -45,7 +46,7 @@ void CardItem::prepareDelete()
 	if (owner) {
 		if (owner->getCardMenu() == cardMenu) {
 			owner->setCardMenu(0);
-			owner->setActiveCard(0);
+			owner->getGame()->setActiveCard(0);
 		}
 		owner = 0;
 	}
@@ -70,7 +71,7 @@ void CardItem::deleteLater()
 void CardItem::setZone(CardZone *_zone)
 {
 	zone = _zone;
-	owner->updateCardMenu(this, cardMenu, ptMenu, moveMenu);
+	emit updateCardMenu(this, cardMenu, ptMenu, moveMenu);
 }
 
 void CardItem::retranslateUi()
@@ -183,7 +184,7 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
 	if (zone)
 		zone->reorganizeCards();
 	
-	owner->updateCardMenu(this, cardMenu, ptMenu, moveMenu);
+	emit updateCardMenu(this, cardMenu, ptMenu, moveMenu);
 }
 
 void CardItem::resetState()
@@ -283,7 +284,11 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	} else if (event->buttons().testFlag(Qt::LeftButton)) {
 		if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < 2 * QApplication::startDragDistance())
 			return;
-		if (!owner->getLocal())
+		if (zone->getIsView()) {
+			const ZoneViewZone *const view = static_cast<const ZoneViewZone *const>(zone);
+			if (view->getRevealZone() && !view->getWriteableRevealZone())
+				return;
+		} else if (!owner->getLocal())
 			return;
 		
 		bool forceFaceDown = event->modifiers().testFlag(Qt::ShiftModifier);
@@ -332,7 +337,14 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 				cardMenu->exec(event->screenPos());
 	} else if ((event->button() == Qt::LeftButton) && !settingsCache->getDoubleClickToPlay()) {
 		setCursor(Qt::OpenHandCursor);
-		if (revealedCard)
+		
+		bool hideCard = false;
+		if (zone->getIsView()) {
+			ZoneViewZone *view = static_cast<ZoneViewZone *>(zone);
+			if (view->getRevealZone() && !view->getWriteableRevealZone())
+				hideCard = true;
+		}
+		if (hideCard)
 			zone->removeCard(this);
 		else
 			playCard(event->modifiers().testFlag(Qt::ShiftModifier));
@@ -374,10 +386,10 @@ QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
 	if ((change == ItemSelectedHasChanged) && owner) {
 		if (value == true) {
 			owner->setCardMenu(cardMenu);
-			owner->setActiveCard(this);
+			owner->getGame()->setActiveCard(this);
 		} else if (owner->getCardMenu() == cardMenu) {
 			owner->setCardMenu(0);
-			owner->setActiveCard(0);
+			owner->getGame()->setActiveCard(0);
 		}
 	}
 	return QGraphicsItem::itemChange(change, value);

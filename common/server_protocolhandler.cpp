@@ -194,8 +194,6 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
-	qDebug() << QString::fromStdString(cont.DebugString());
-	
 	QMap<int, QPair<int, int> > gameMap = getGames();
 	if (!gameMap.contains(cont.game_id()))
 		return Response::RespNotInRoom;

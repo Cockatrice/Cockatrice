@@ -51,7 +51,7 @@ private slots:
 	void zoneDeleted();
 	void moveWidget(QPointF scenePos);
 public:
-	ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards = 0, bool _revealZone = false, const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>());
+	ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards = 0, bool _revealZone = false, bool _writeableRevealZone = false, const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>());
 	ZoneViewZone *getZone() const { return zone; }
 	void retranslateUi();
 protected:

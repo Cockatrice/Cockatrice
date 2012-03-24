@@ -45,7 +45,7 @@ public:
 	void unregisterAnimationItem(AbstractCardItem *card);
 public slots:
 	void toggleZoneView(Player *player, const QString &zoneName, int numberCards);
-	void addRevealedZoneView(Player *player, CardZone *zone, const QList<const ServerInfo_Card *> &cardList);
+	void addRevealedZoneView(Player *player, CardZone *zone, const QList<const ServerInfo_Card *> &cardList, bool withWritePermission);
 	void removeZoneView(ZoneViewWidget *item);
 	void addPlayer(Player *player);
 	void removePlayer(Player *player);

@@ -210,6 +210,7 @@ TabGame::TabGame(GameReplay *_replay)
 	started(false),
 	resuming(false),
 	currentPhase(-1),
+	activeCard(0),
 	replay(_replay),
 	currentReplayStep(0)
 {
@@ -355,6 +356,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	started(false),
 	resuming(event.resuming()),
 	currentPhase(-1),
+	activeCard(0),
 	replay(0)
 {
 	gameTimer = new QTimer(this);
@@ -1063,6 +1065,7 @@ void TabGame::newCardAdded(AbstractCardItem *card)
 	connect(card, SIGNAL(hovered(AbstractCardItem *)), cardInfo, SLOT(setCard(AbstractCardItem *)));
 	connect(card, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
 	connect(card, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
+	connect(card, SIGNAL(updateCardMenu(AbstractCardItem*,QMenu*,QMenu*,QMenu*)), this, SLOT(updateCardMenu(AbstractCardItem*,QMenu*,QMenu*,QMenu*)));
 }
 
 CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) const
@@ -1101,4 +1104,17 @@ Player *TabGame::getActiveLocalPlayer() const
 	}
 	
 	return 0;
+}
+#include <QDebug>
+void TabGame::updateCardMenu(AbstractCardItem *card, QMenu *cardMenu, QMenu *ptMenu, QMenu *moveMenu)
+{
+	Player *p;
+	if ((clients.size() > 1) || !players.contains(localPlayerId)) {
+		qDebug("BUG");
+		p = card->getOwner();
+	} else {
+		p = players.value(localPlayerId);
+		qDebug() << "GEFUNDEN" << localPlayerId << p->getName();
+	}
+	p->updateCardMenu(static_cast<CardItem *>(card), cardMenu, ptMenu, moveMenu);
 }

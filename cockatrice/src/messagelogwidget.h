@@ -28,7 +28,7 @@ private:
 	
 	QString sanitizeHtml(QString dirty) const;
 	bool isFemale(Player *player) const;
-	QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position) const;
+	QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange) const;
 	MessageContext currentContext;
 	bool female;
 	

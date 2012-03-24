@@ -24,6 +24,7 @@ protected:
 	QAction *doubleClickAction;
 	bool hasCardAttr;
 	bool isShufflable;
+	bool isView;
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 	virtual void addCardImpl(CardItem *card, int x, int y) = 0;
@@ -36,7 +37,7 @@ public:
 	enum { Type = typeZone };
 	int type() const { return Type; }
 	virtual void handleDropEvent(const QList<CardDragItem *> &dragItem, CardZone *startZone, const QPoint &dropPoint) = 0;
-	CardZone(Player *_player, const QString &_name, bool _hasCardAttr, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent = 0, bool isView = false);
+	CardZone(Player *_player, const QString &_name, bool _hasCardAttr, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent = 0, bool _isView = false);
 	~CardZone();
 	void retranslateUi();
 	void clearContents();
@@ -59,6 +60,7 @@ public:
 	void setView(ZoneViewZone *_view) { view = _view; }
 	virtual void reorganizeCards() = 0;
 	virtual QPointF closestGridPoint(const QPointF &point);
+	bool getIsView() const { return isView; }
 };
 
 #endif

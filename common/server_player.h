@@ -117,7 +117,6 @@ public:
 
 	Response::ResponseCode drawCards(GameEventStorage &ges, int number);
 	Response::ResponseCode undoDraw(GameEventStorage &ges);
-	Response::ResponseCode moveCard(GameEventStorage &ges, const QString &_startZone, const QList<const CardToMove *> &_cards, int _targetPlayer, const QString &_targetZone, int _x, int _y);
 	Response::ResponseCode moveCard(GameEventStorage &ges, Server_CardZone *startzone, const QList<const CardToMove *> &_cards, Server_CardZone *targetzone, int x, int y, bool fixFreeSpaces = true, bool undoingDraw = false);
 	void unattachCard(GameEventStorage &ges, Server_Card *card);
 	Response::ResponseCode setCardAttrHelper(GameEventStorage &ges, const QString &zone, int cardId, CardAttribute attribute, const QString &attrValue);

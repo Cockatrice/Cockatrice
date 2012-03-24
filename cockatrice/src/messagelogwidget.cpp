@@ -171,7 +171,7 @@ void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
 		appendHtml((isFemale(player) ? tr("%1 undoes her last draw (%2).") : tr("%1 undoes his last draw (%2).")).arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
 }
 
-QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position) const
+QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange) const
 {
 	bool cardNameContainsStartZone = false;
 	QString fromStr;
@@ -188,18 +188,36 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
 	else if (startName == "deck") {
 		if (position >= zone->getCards().size() - 1) {
 			if (cardName.isEmpty()) {
-				cardName = isFemale(zone->getPlayer()) ? tr("the bottom card of her library") : tr("the bottom card of his library");
+				if (ownerChange)
+					cardName = tr("the bottom card of %1's library").arg(zone->getPlayer()->getName());
+				else
+					cardName = isFemale(zone->getPlayer()) ? tr("the bottom card of her library") : tr("the bottom card of his library");
 				cardNameContainsStartZone = true;
-			} else
-				fromStr = isFemale(zone->getPlayer()) ? tr(" from the bottom of her library") : tr(" from the bottom of his library");
+			} else {
+				if (ownerChange)
+					fromStr = tr(" from the bottom of %1's library").arg(zone->getPlayer()->getName());
+				else
+					fromStr = isFemale(zone->getPlayer()) ? tr(" from the bottom of her library") : tr(" from the bottom of his library");
+			}
 		} else if (position == 0) {
 			if (cardName.isEmpty()) {
-				cardName = isFemale(zone->getPlayer()) ? tr("the top card of her library") : tr("the top card of his library");
+				if (ownerChange)
+					cardName = tr("the top card of %1's library").arg(zone->getPlayer()->getName());
+				else
+					cardName = isFemale(zone->getPlayer()) ? tr("the top card of her library") : tr("the top card of his library");
 				cardNameContainsStartZone = true;
-			} else
-				fromStr = isFemale(zone->getPlayer()) ? tr(" from the top of her library") : tr(" from the top of his library");
-		} else
-			fromStr = tr(" from library");
+			} else {
+				if (ownerChange)
+					fromStr = tr(" from the top of %1's library").arg(zone->getPlayer()->getName());
+				else
+					fromStr = isFemale(zone->getPlayer()) ? tr(" from the top of her library") : tr(" from the top of his library");
+			}
+		} else {
+			if (ownerChange)
+				fromStr = tr(" from %1's library").arg(zone->getPlayer()->getName());
+			else
+				fromStr = tr(" from library");
+		}
 	} else if (startName == "sb")
 		fromStr = tr(" from sideboard");
 	else if (startName == "stack")
@@ -212,12 +230,13 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
 
 void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
 {
+	bool ownerChange = attributes.startZone->getPlayer() != attributes.targetZone->getPlayer();
 	QString startName = attributes.startZone->getName();
 	QString targetName = attributes.targetZone->getName();
 	if (((startName == "table") && (targetName == "table") && (attributes.startZone == attributes.targetZone)) || ((startName == "hand") && (targetName == "hand")))
 		return;
 	QString cardName = attributes.cardName;
-	QPair<QString, QString> temp = getFromStr(attributes.startZone, cardName, attributes.oldX);
+	QPair<QString, QString> temp = getFromStr(attributes.startZone, cardName, attributes.oldX, ownerChange);
 	bool cardNameContainsStartZone = false;
 	if (!temp.first.isEmpty()) {
 		cardNameContainsStartZone = true;
@@ -231,8 +250,8 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
 		cardStr = tr("a card");
 	else
 		cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName));
-
-	if (attributes.startZone->getPlayer() != attributes.targetZone->getPlayer()) {
+	
+	if (ownerChange && (attributes.startZone->getPlayer() == attributes.player)) {
 		appendHtml(tr("%1 gives %2 control over %3.").arg(sanitizeHtml(attributes.player->getName())).arg(sanitizeHtml(attributes.targetZone->getPlayer()->getName())).arg(cardStr));
 		return;
 	}
@@ -627,7 +646,7 @@ void MessageLogWidget::logStopDumpZone(Player *player, CardZone *zone)
 
 void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer)
 {
-	QPair<QString, QString> temp = getFromStr(zone, cardName, cardId);
+	QPair<QString, QString> temp = getFromStr(zone, cardName, cardId, false);
 	bool cardNameContainsStartZone = false;
 	if (!temp.first.isEmpty()) {
 		cardNameContainsStartZone = true;

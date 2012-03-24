@@ -15,10 +15,10 @@ private:
 	int minRows, numberCards;
 	void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint);
 	CardZone *origZone;
-	bool revealZone;
+	bool revealZone, writeableRevealZone;
 	bool sortByName, sortByType;
 public:
-	ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards = -1, bool _revealZone = false, QGraphicsItem *parent = 0);
+	ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards = -1, bool _revealZone = false, bool _writeableRevealZone = false, QGraphicsItem *parent = 0);
 	~ZoneViewZone();
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -28,6 +28,9 @@ public:
 	int getNumberCards() const { return numberCards; }
 	void setGeometry(const QRectF &rect);
 	QRectF getOptimumRect() const { return optimumRect; }
+	bool getRevealZone() const { return revealZone; }
+	bool getWriteableRevealZone() const { return writeableRevealZone; }
+	void setWriteableRevealZone(bool _writeableRevealZone);
 public slots:
 	void setSortByName(int _sortByName);
 	void setSortByType(int _sortByType);
