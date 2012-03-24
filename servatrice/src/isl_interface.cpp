@@ -339,7 +339,7 @@ void IslInterface::processSessionEvent(const SessionEvent &event, qint64 session
 				break;
 			}
 			const Event_GameJoined &gameJoined = event.GetExtension(Event_GameJoined::ext);
-			client->playerAddedToGame(gameJoined.game_id(), gameJoined.room_id(), gameJoined.player_id());
+			client->playerAddedToGame(gameJoined.game_info().game_id(), gameJoined.game_info().room_id(), gameJoined.player_id());
 			client->sendProtocolItem(event);
 			break;
 		}

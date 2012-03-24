@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <QToolButton>
 
+#include "dlg_creategame.h"
 #include "tab_game.h"
 #include "tab_supervisor.h"
 #include "cardinfowidget.h"
@@ -204,10 +205,7 @@ TabGame::TabGame(GameReplay *_replay)
 	hostId(-1),
 	localPlayerId(-1),
 	spectator(true),
-	spectatorsCanTalk(false),
-	spectatorsSeeEverything(true),
 	gameStateKnown(false),
-	started(false),
 	resuming(false),
 	currentPhase(-1),
 	activeCard(0),
@@ -216,8 +214,8 @@ TabGame::TabGame(GameReplay *_replay)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	
-	gameId = replay->game_info().game_id();
-	gameDescription = QString::fromStdString(replay->game_info().description());
+	gameInfo.CopyFrom(replay->game_info());
+	gameInfo.set_spectators_omniscient(true);
 	
 	// Create list: event number -> time [ms]
 	// Distribute simultaneous events evenly across 1 second.
@@ -325,6 +323,7 @@ TabGame::TabGame(GameReplay *_replay)
 	aNextPhase = 0;
 	aNextTurn = 0;
 	aRemoveLocalArrows = 0;
+	aGameInfo = 0;
 	aConcede = 0;
 	aLeaveGame = 0;
 	aCloseReplay = new QAction(this);
@@ -339,26 +338,25 @@ TabGame::TabGame(GameReplay *_replay)
 
 	splitter->restoreState(settingsCache->getTabGameSplitterSizes());
 	
-	messageLog->logReplayStarted(gameId);
+	messageLog->logReplayStarted(gameInfo.game_id());
 }
 
-TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event)
+TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event, const QMap<int, QString> &_roomGameTypes)
 	: Tab(_tabSupervisor),
 	clients(_clients),
-	gameId(event.game_id()),
-	gameDescription(QString::fromStdString(event.game_description())),
+	gameInfo(event.game_info()),
+	roomGameTypes(_roomGameTypes),
 	hostId(event.host_id()),
 	localPlayerId(event.player_id()),
 	spectator(event.spectator()),
-	spectatorsCanTalk(event.spectators_can_talk()),
-	spectatorsSeeEverything(event.spectators_see_everything()),
 	gameStateKnown(true),
-	started(false),
 	resuming(event.resuming()),
 	currentPhase(-1),
 	activeCard(0),
 	replay(0)
 {
+	gameInfo.set_started(false);
+	
 	gameTimer = new QTimer(this);
 	gameTimer->setInterval(1000);
 	connect(gameTimer, SIGNAL(timeout()), this, SLOT(incrementGameTime()));
@@ -411,7 +409,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	mainLayout->addLayout(deckViewContainerLayout, 10);
 	mainLayout->addWidget(splitter);
 	
-	if (spectator && !spectatorsCanTalk && tabSupervisor->getAdminLocked()) {
+	if (spectator && !gameInfo.spectators_can_chat() && tabSupervisor->getAdminLocked()) {
 		sayLabel->hide();
 		sayEdit->hide();
 	}
@@ -425,6 +423,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	connect(aNextTurn, SIGNAL(triggered()), this, SLOT(actNextTurn()));
 	aRemoveLocalArrows = new QAction(this);
 	connect(aRemoveLocalArrows, SIGNAL(triggered()), this, SLOT(actRemoveLocalArrows()));
+	aGameInfo = new QAction(this);
+	connect(aGameInfo, SIGNAL(triggered()), this, SLOT(actGameInfo()));
 	aConcede = new QAction(this);
 	connect(aConcede, SIGNAL(triggered()), this, SLOT(actConcede()));
 	aLeaveGame = new QAction(this);
@@ -457,6 +457,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	tabMenu->addSeparator();
 	tabMenu->addAction(aRemoveLocalArrows);
 	tabMenu->addSeparator();
+	tabMenu->addAction(aGameInfo);
 	tabMenu->addAction(aConcede);
 	tabMenu->addAction(aLeaveGame);
 	
@@ -465,7 +466,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 
 	splitter->restoreState(settingsCache->getTabGameSplitterSizes());
 	
-	messageLog->logGameJoined(gameId);
+	messageLog->logGameJoined(gameInfo.game_id());
 }
 
 TabGame::~TabGame()
@@ -504,6 +505,8 @@ void TabGame::retranslateUi()
 		aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
 		aRemoveLocalArrows->setShortcut(tr("Ctrl+R"));
 	}
+	if (aGameInfo)
+		aGameInfo->setText(tr("Game &information"));
 	if (aConcede) {
 		aConcede->setText(tr("&Concede"));
 		aConcede->setShortcut(tr("F2"));
@@ -607,9 +610,15 @@ void TabGame::incrementGameTime()
 
 void TabGame::adminLockChanged(bool lock)
 {
-	bool v = !(spectator && !spectatorsCanTalk && lock);
+	bool v = !(spectator && !gameInfo.spectators_can_chat() && lock);
 	sayLabel->setVisible(v);
 	sayEdit->setVisible(v);
+}
+
+void TabGame::actGameInfo()
+{
+	DlgCreateGame dlg(gameInfo, roomGameTypes);
+	dlg.exec();
 }
 
 void TabGame::actConcede()
@@ -782,7 +791,7 @@ void TabGame::sendGameCommand(const google::protobuf::Message &command, int play
 PendingCommand *TabGame::prepareGameCommand(const ::google::protobuf::Message &cmd)
 {
 	CommandContainer cont;
-	cont.set_game_id(gameId);
+	cont.set_game_id(gameInfo.game_id());
 	GameCommand *c = cont.add_game_command();
 	c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
 	return new PendingCommand(cont);
@@ -791,7 +800,7 @@ PendingCommand *TabGame::prepareGameCommand(const ::google::protobuf::Message &c
 PendingCommand *TabGame::prepareGameCommand(const QList< const ::google::protobuf::Message * > &cmdList)
 {
 	CommandContainer cont;
-	cont.set_game_id(gameId);
+	cont.set_game_id(gameInfo.game_id());
 	for (int i = 0; i < cmdList.size(); ++i) {
 		GameCommand *c = cont.add_game_command();
 		c->GetReflection()->MutableMessage(c, cmdList[i]->GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(*cmdList[i]);
@@ -819,7 +828,7 @@ void TabGame::startGame(bool resuming)
 	}
 
 	playerListWidget->setGameStarted(true, resuming);
-	started = true;
+	gameInfo.set_started(true);
 	static_cast<GameScene *>(gameView->scene())->rearrange();
 	gameView->show();
 	phasesToolbar->show();
@@ -839,7 +848,7 @@ void TabGame::stopGame()
 
 	playerListWidget->setActivePlayer(-1);
 	playerListWidget->setGameStarted(false, false);
-	started = false;
+	gameInfo.set_started(false);
 	gameView->hide();
 	phasesToolbar->hide();
 }
@@ -897,13 +906,13 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*e
 	
 	secondsElapsed = event.seconds_elapsed();
 	
-	if (event.game_started() && !started) {
+	if (event.game_started() && !gameInfo.started()) {
 		startGame(!gameStateKnown);
 		if (gameStateKnown)
 			messageLog->logGameStart();
 		setActivePlayer(event.active_player_id());
 		setActivePhase(event.active_phase());
-	} else if (!event.game_started() && started) {
+	} else if (!event.game_started() && gameInfo.started()) {
 		stopGame();
 		scene->clearViews();
 	}
@@ -1004,7 +1013,7 @@ void TabGame::eventGameHostChanged(const Event_GameHostChanged & /*event*/, int 
 
 void TabGame::eventGameClosed(const Event_GameClosed & /*event*/, int /*eventPlayerId*/, const GameEventContext & /*context*/)
 {
-	started = false;
+	gameInfo.set_started(false);
 	messageLog->logGameClosed();
 	emit userEvent();
 }
@@ -1084,9 +1093,9 @@ CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) co
 QString TabGame::getTabText() const
 {
 	if (replay)
-		return tr("Replay %1: %2").arg(gameId).arg(gameDescription);
+		return tr("Replay %1: %2").arg(gameInfo.game_id()).arg(QString::fromStdString(gameInfo.description()));
 	else
-		return tr("Game %1: %2").arg(gameId).arg(gameDescription);
+		return tr("Game %1: %2").arg(gameInfo.game_id()).arg(QString::fromStdString(gameInfo.description()));
 }
 
 Player *TabGame::getActiveLocalPlayer() const

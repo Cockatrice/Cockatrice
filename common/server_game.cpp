@@ -77,7 +77,7 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo, int _gameId, const
 	
 	connect(this, SIGNAL(sigStartGameIfReady()), this, SLOT(doStartGameIfReady()), Qt::QueuedConnection);
 	
-	currentReplay->mutable_game_info()->CopyFrom(getInfo());
+	getInfo(*currentReplay->mutable_game_info());
 
 	if (room->getServer()->getGameShouldPing()) {
 		pingClock = new QTimer(this);
@@ -271,7 +271,7 @@ void Server_Game::doStartGameIfReady()
 		replayList.append(currentReplay);
 		currentReplay = new GameReplay;
 		currentReplay->set_replay_id(room->getServer()->getNextReplayId());
-		currentReplay->mutable_game_info()->CopyFrom(getInfo());
+		getInfo(*currentReplay->mutable_game_info());
 		
 		Event_GameStateChanged omniscientEvent;
 		QListIterator<ServerInfo_Player> omniscientGameStateIterator(getGameState(0, true, true));
@@ -294,7 +294,10 @@ void Server_Game::doStartGameIfReady()
 	nextTurn();
 	
 	locker.unlock();
-	emit gameInfoChanged(getInfo());
+	
+	ServerInfo_Game gameInfo;
+	getInfo(gameInfo);
+	emit gameInfoChanged(gameInfo);
 }
 
 void Server_Game::startGameIfReady()
@@ -390,8 +393,11 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface, Respons
 		sendGameEventContainer(prepareGameEvent(Event_GameHostChanged(), hostId));
 	}
 	
-	if (broadcastUpdate)
-		emit gameInfoChanged(getInfo());
+	if (broadcastUpdate) {
+		ServerInfo_Game gameInfo;
+		getInfo(gameInfo);
+		emit gameInfoChanged(gameInfo);
+	}
 	
 	if ((newPlayer->getUserInfo()->user_level() & ServerInfo_User::IsRegistered) && !spectator)
 		room->getServer()->addPersistentPlayer(playerName, room->getId(), gameId, newPlayer->getPlayerId());
@@ -439,7 +445,10 @@ void Server_Game::removePlayer(Server_Player *player)
 		if (gameStarted && playerActive)
 			nextTurn();
 	}
-	emit gameInfoChanged(getInfo());
+	
+	ServerInfo_Game gameInfo;
+	getInfo(gameInfo);
+	emit gameInfoChanged(gameInfo);
 }
 
 void Server_Game::removeArrowsToPlayer(GameEventStorage &ges, Server_Player *player)
@@ -672,15 +681,19 @@ QList<ServerInfo_Player> Server_Game::getGameState(Server_Player *playerWhosAski
 void Server_Game::createGameJoinedEvent(Server_Player *player, ResponseContainer &rc, bool resuming)
 {
 	Event_GameJoined event1;
-	event1.set_room_id(room->getId());
-	event1.set_game_id(gameId);
-	event1.set_game_description(description.toStdString());
+	getInfo(*event1.mutable_game_info());
 	event1.set_host_id(hostId);
 	event1.set_player_id(player->getPlayerId());
 	event1.set_spectator(player->getSpectator());
-	event1.set_spectators_can_talk(spectatorsCanTalk);
-	event1.set_spectators_see_everything(spectatorsSeeEverything);
 	event1.set_resuming(resuming);
+	if (resuming) {
+		const QStringList &allGameTypes = room->getGameTypes();
+		for (int i = 0; i < allGameTypes.size(); ++i) {
+			ServerInfo_GameType *newGameType = event1.add_game_types();
+			newGameType->set_game_type_id(i);
+			newGameType->set_description(allGameTypes[i].toStdString());
+		}
+	}
 	rc.enqueuePostResponseItem(ServerMessage::SESSION_EVENT, Server_AbstractUserInterface::prepareSessionEvent(event1));
 	
 	Event_GameStateChanged event2;
@@ -728,11 +741,10 @@ GameEventContainer *Server_Game::prepareGameEvent(const ::google::protobuf::Mess
 	return cont;
 }
 
-ServerInfo_Game Server_Game::getInfo() const
+void Server_Game::getInfo(ServerInfo_Game &result) const
 {
 	QMutexLocker locker(&gameMutex);
 	
-	ServerInfo_Game result;
 	result.set_room_id(room->getId());
 	result.set_game_id(getGameId());
 	if (!players.isEmpty()) {
@@ -749,8 +761,9 @@ ServerInfo_Game Server_Game::getInfo() const
 		result.set_only_registered(onlyRegistered);
 		result.set_spectators_allowed(getSpectatorsAllowed());
 		result.set_spectators_need_password(getSpectatorsNeedPassword());
+		result.set_spectators_can_chat(spectatorsCanTalk);
+		result.set_spectators_omniscient(spectatorsSeeEverything);
 		result.set_spectators_count(getSpectatorCount());
 		result.set_start_time(startTime.toTime_t());
 	}
-	return result;
 }

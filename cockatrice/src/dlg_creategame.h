@@ -13,10 +13,13 @@ class QGroupBox;
 class QSpinBox;
 class TabRoom;
 
+class ServerInfo_Game;
+
 class DlgCreateGame : public QDialog {
 	Q_OBJECT
 public:
 	DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent = 0);
+	DlgCreateGame(const ServerInfo_Game &game, const QMap<int, QString> &_gameTypes, QWidget *parent = 0);
 private slots:
 	void actOK();
 	void checkResponse(Response::ResponseCode response);
@@ -33,6 +36,8 @@ private:
 	QCheckBox *onlyBuddiesCheckBox, *onlyRegisteredCheckBox;
 	QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox, *spectatorsSeeEverythingCheckBox;
 	QPushButton *okButton, *cancelButton;
+	
+	void sharedCtor();
 };
 
 #endif

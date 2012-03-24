@@ -54,7 +54,7 @@ ServerInfo_Room Server_Room::getInfo(bool complete, bool showGameTypes, bool upd
 	if (complete) {
 		QMapIterator<int, Server_Game *> gameIterator(games);
 		while (gameIterator.hasNext())
-			result.add_game_list()->CopyFrom(gameIterator.next().value()->getInfo());
+			gameIterator.next().value()->getInfo(*result.add_game_list());
 		if (includeExternalData) {
 			QMapIterator<int, ServerInfo_Game> externalGameIterator(externalGames);
 			while (externalGameIterator.hasNext())
@@ -231,9 +231,11 @@ void Server_Room::addGame(Server_Game *game)
 	
 	game->gameMutex.lock();
 	games.insert(game->getGameId(), game);
-	emit gameListChanged(game->getInfo());
+	ServerInfo_Game gameInfo;
+	game->getInfo(gameInfo);
 	game->gameMutex.unlock();
 	
+	emit gameListChanged(gameInfo);
 	emit roomInfoChanged(getInfo(false, false, true));
 }
 
@@ -243,7 +245,11 @@ void Server_Room::removeGame(Server_Game *game)
 	// called from ~Server_Game, which locks both mutexes anyway beforehand.
 	
 	disconnect(game, 0, this, 0);
-	emit gameListChanged(game->getInfo());
+	
+	ServerInfo_Game gameInfo;
+	game->getInfo(gameInfo);
+	emit gameListChanged(gameInfo);
+	
 	games.remove(game->getGameId());
 	
 	emit roomInfoChanged(getInfo(false, false, true));
@@ -269,8 +275,11 @@ QList<ServerInfo_Game> Server_Room::getGamesOfUser(const QString &userName) cons
 	QMapIterator<int, Server_Game *> gamesIterator(games);
 	while (gamesIterator.hasNext()) {
 		Server_Game *game = gamesIterator.next().value();
-		if (game->containsUser(userName))
-			result.append(game->getInfo());
+		if (game->containsUser(userName)) {
+			ServerInfo_Game gameInfo;
+			game->getInfo(gameInfo);
+			result.append(gameInfo);
+		}
 	}
 	return result;
 }

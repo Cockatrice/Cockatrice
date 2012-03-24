@@ -8,14 +8,15 @@
 #include <QSpinBox>
 #include <QGroupBox>
 #include <QMessageBox>
+#include <QSet>
 #include "dlg_creategame.h"
 #include "tab_room.h"
 
 #include "pending_command.h"
 #include "pb/room_commands.pb.h"
+#include "pb/serverinfo_game.pb.h"
 
-DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent)
-	: QDialog(parent), room(_room), gameTypes(_gameTypes)
+void DlgCreateGame::sharedCtor()
 {
 	descriptionLabel = new QLabel(tr("&Description:"));
 	descriptionEdit = new QLineEdit;
@@ -98,11 +99,61 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
 
 	setLayout(mainLayout);
 
-	setWindowTitle(tr("Create game"));
 	setFixedHeight(sizeHint().height());
+}
 
+DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent)
+	: QDialog(parent), room(_room), gameTypes(_gameTypes)
+{
+	sharedCtor();
+	
+	setWindowTitle(tr("Create game"));
+	
 	connect(okButton, SIGNAL(clicked()), this, SLOT(actOK()));
 	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+}
+
+DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QString> &_gameTypes, QWidget *parent)
+	: QDialog(parent), room(0), gameTypes(_gameTypes)
+{
+	sharedCtor();
+	
+	descriptionEdit->setEnabled(false);
+	maxPlayersEdit->setEnabled(false);
+	passwordEdit->setEnabled(false);
+	onlyBuddiesCheckBox->setEnabled(false);
+	onlyRegisteredCheckBox->setEnabled(false);
+	spectatorsAllowedCheckBox->setEnabled(false);
+	spectatorsNeedPasswordCheckBox->setEnabled(false);
+	spectatorsCanTalkCheckBox->setEnabled(false);
+	spectatorsSeeEverythingCheckBox->setEnabled(false);
+	
+	descriptionEdit->setText(QString::fromStdString(gameInfo.description()));
+	maxPlayersEdit->setValue(gameInfo.max_players());
+	onlyBuddiesCheckBox->setChecked(gameInfo.only_buddies());
+	onlyRegisteredCheckBox->setChecked(gameInfo.only_registered());
+	spectatorsAllowedCheckBox->setChecked(gameInfo.spectators_allowed());
+	spectatorsNeedPasswordCheckBox->setChecked(gameInfo.spectators_need_password());
+	spectatorsCanTalkCheckBox->setChecked(gameInfo.spectators_can_chat());
+	spectatorsSeeEverythingCheckBox->setChecked(gameInfo.spectators_omniscient());
+	
+	QSet<int> types;
+	for (int i = 0; i < gameInfo.game_types_size(); ++i)
+		types.insert(gameInfo.game_types(i));
+	
+	QMapIterator<int, QString> gameTypeIterator(gameTypes);
+	while (gameTypeIterator.hasNext()) {
+		gameTypeIterator.next();
+		
+		QCheckBox *gameTypeCheckBox = gameTypeCheckBoxes.value(gameTypeIterator.key());
+		gameTypeCheckBox->setEnabled(false);
+		gameTypeCheckBox->setChecked(types.contains(gameTypeIterator.key()));
+	}
+	
+	setWindowTitle(tr("Game information"));
+	okButton->setAutoDefault(true);
+	cancelButton->hide();
+	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
 void DlgCreateGame::actOK()

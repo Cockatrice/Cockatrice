@@ -108,7 +108,7 @@ protected:
 	QMap<QString, Server_AbstractUserInterface *> externalUsers;
 	QMap<int, Server_Room *> rooms;
 	
-	virtual qint64 startSession(const QString &userName, const QString &address) { return -1; }
+	virtual qint64 startSession(const QString &userName, const QString &address) { return 0; }
 	virtual void endSession(qint64 sessionId) { }
 	virtual bool userExists(const QString &user) { return false; }
 	virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reason) { return UnknownUser; }

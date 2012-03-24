@@ -250,27 +250,35 @@ void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex)
 
 void TabSupervisor::gameJoined(const Event_GameJoined &event)
 {
-	TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event);
+	QMap<int, QString> roomGameTypes;
+	TabRoom *room = roomTabs.value(event.game_info().room_id());
+	if (room)
+		roomGameTypes = room->getGameTypes();
+	else
+		for (int i = 0; i < event.game_types_size(); ++i)
+			roomGameTypes.insert(event.game_types(i).game_type_id(), QString::fromStdString(event.game_types(i).description()));
+	
+	TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event, roomGameTypes);
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
 	int tabIndex = myAddTab(tab);
 	addCloseButtonToTab(tab, tabIndex);
-	gameTabs.insert(event.game_id(), tab);
+	gameTabs.insert(event.game_info().game_id(), tab);
 	setCurrentWidget(tab);
 }
 
 void TabSupervisor::localGameJoined(const Event_GameJoined &event)
 {
-	TabGame *tab = new TabGame(this, localClients, event);
+	TabGame *tab = new TabGame(this, localClients, event, QMap<int, QString>());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	int tabIndex = myAddTab(tab);
 	addCloseButtonToTab(tab, tabIndex);
-	gameTabs.insert(event.game_id(), tab);
+	gameTabs.insert(event.game_info().game_id(), tab);
 	setCurrentWidget(tab);
 	
 	for (int i = 1; i < localClients.size(); ++i) {
 		Command_JoinGame cmd;
-		cmd.set_game_id(event.game_id());
+		cmd.set_game_id(event.game_info().game_id());
 		localClients[i]->sendCommand(localClients[i]->prepareRoomCommand(cmd, 0));
 	}
 }

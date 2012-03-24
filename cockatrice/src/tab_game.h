@@ -4,8 +4,8 @@
 #include <QMap>
 #include <QPushButton>
 #include "tab.h"
+#include "pb/serverinfo_game.pb.h"
 
-namespace google { namespace protobuf { class Message; } }
 class AbstractClient;
 class CardDatabase;
 class GameView;
@@ -96,16 +96,14 @@ private:
 	QTimer *gameTimer;
 	int secondsElapsed;
 	QList<AbstractClient *> clients;
-	int gameId;
-	QString gameDescription;
+	ServerInfo_Game gameInfo;
+	QMap<int, QString> roomGameTypes;
 	int hostId;
 	int localPlayerId;
 	bool spectator;
-	bool spectatorsCanTalk, spectatorsSeeEverything;
 	QMap<int, Player *> players;
 	QMap<int, QString> spectators;
 	bool gameStateKnown;
-	bool started;
 	bool resuming;
 	QStringList phasesList;
 	int currentPhase;
@@ -135,7 +133,7 @@ private:
 	ZoneViewLayout *zoneLayout;
 	QAction *playersSeparator;
 	QMenu *phasesMenu;
-	QAction *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextTurn, *aRemoveLocalArrows;
+	QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextTurn, *aRemoveLocalArrows;
 	QList<QAction *> phaseActions;
 
 	Player *addPlayer(int playerId, const ServerInfo_User &info);
@@ -180,6 +178,7 @@ private slots:
 	void newCardAdded(AbstractCardItem *card);
 	void updateCardMenu(AbstractCardItem *card);
 	
+	void actGameInfo();
 	void actConcede();
 	void actLeaveGame();
 	void actRemoveLocalArrows();
@@ -188,7 +187,7 @@ private slots:
 	void actNextPhase();
 	void actNextTurn();
 public:
-	TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event);
+	TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event, const QMap<int, QString> &_roomGameTypes);
 	TabGame(GameReplay *replay);
 	~TabGame();
 	void retranslateUi();
@@ -196,11 +195,10 @@ public:
 	const QMap<int, Player *> &getPlayers() const { return players; }
 	CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;
 	bool isHost() const { return hostId == localPlayerId; }
-	int getGameId() const { return gameId; }
+	int getGameId() const { return gameInfo.game_id(); }
 	QString getTabText() const;
 	bool getSpectator() const { return spectator; }
-	bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
-	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
+	bool getSpectatorsSeeEverything() const { return gameInfo.spectators_omniscient(); }
 	Player *getActiveLocalPlayer() const;
 	AbstractClient *getClientForPlayer(int playerId) const;
 	
