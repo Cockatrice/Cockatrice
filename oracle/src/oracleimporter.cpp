@@ -92,7 +92,8 @@ CardInfo *OracleImporter::addCard(const QString &setName,
 	if (cardName.contains("XX"))
 		cardName.remove("XX");
 	cardName = cardName.replace("Æ", "AE");
-	
+        cardName = cardName.replace("’", "'");
+
 	CardInfo *card;
 	if (cardHash.contains(cardName)) {
 		card = cardHash.value(cardName);
