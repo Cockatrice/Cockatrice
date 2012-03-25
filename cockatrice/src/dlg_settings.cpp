@@ -26,6 +26,8 @@ GeneralSettingsPage::GeneralSettingsPage()
 {
 	languageLabel = new QLabel;
 	languageBox = new QComboBox;
+	customTranslationButton = new QPushButton("...");
+	customTranslationButton->setMaximumWidth(50);
 	
 	QString setLanguage = settingsCache->getLang();
 	QStringList qmFiles = findQmFiles();
@@ -40,12 +42,14 @@ GeneralSettingsPage::GeneralSettingsPage()
 	picDownloadCheckBox->setChecked(settingsCache->getPicDownload());
 	
 	connect(languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
+	connect(customTranslationButton, SIGNAL(clicked()), this, SLOT(customTranslationButtonClicked()));
 	connect(picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
 	
 	QGridLayout *personalGrid = new QGridLayout;
 	personalGrid->addWidget(languageLabel, 0, 0);
 	personalGrid->addWidget(languageBox, 0, 1);
-	personalGrid->addWidget(picDownloadCheckBox, 1, 0, 1, 2);
+	personalGrid->addWidget(customTranslationButton, 0, 2);
+	personalGrid->addWidget(picDownloadCheckBox, 1, 0, 1, 3);
 	
 	personalGroupBox = new QGroupBox;
 	personalGroupBox->setLayout(personalGrid);
@@ -136,7 +140,17 @@ void GeneralSettingsPage::cardDatabasePathButtonClicked()
 
 void GeneralSettingsPage::languageBoxChanged(int index)
 {
+	settingsCache->setCustomTranslationFile(QString());
 	settingsCache->setLang(languageBox->itemData(index).toString());
+}
+
+void GeneralSettingsPage::customTranslationButtonClicked()
+{
+	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
+	if (path.isEmpty())
+		return;
+	
+	settingsCache->setCustomTranslationFile(path);
 }
 
 void GeneralSettingsPage::retranslateUi()
@@ -555,6 +569,7 @@ DlgSettings::DlgSettings(QWidget *parent)
 	: QDialog(parent)
 {
 	connect(settingsCache, SIGNAL(langChanged()), this, SLOT(updateLanguage()));
+	connect(settingsCache, SIGNAL(customTranslationFileChanged()), this, SLOT(updateLanguage()));
 	
 	contentsWidget = new QListWidget;
 	contentsWidget->setViewMode(QListView::IconMode);

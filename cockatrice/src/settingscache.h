@@ -8,6 +8,7 @@ class QSettings;
 class SettingsCache : public QObject {
 	Q_OBJECT
 signals:
+	void customTranslationFileChanged();
 	void langChanged();
 	void picsPathChanged();
 	void cardDatabasePathChanged();
@@ -25,7 +26,7 @@ signals:
 private:
 	QSettings *settings;
 	
-	QString lang;
+	QString customTranslationFile, lang;
 	QString deckPath, picsPath, cardDatabasePath;
 	QString handBgPath, stackBgPath, tableBgPath, playerBgPath, cardBackPicturePath;
 	bool picDownload;
@@ -43,6 +44,7 @@ private:
 	bool priceTagFeature;
 public:
 	SettingsCache();
+	QString getCustomTranslationFile() const { return customTranslationFile; }
 	QString getLang() const { return lang; }
 	QString getDeckPath() const { return deckPath; }
 	QString getPicsPath() const { return picsPath; }
@@ -67,6 +69,7 @@ public:
 	QString getSoundPath() const { return soundPath; }
 	bool getPriceTagFeature() const { return priceTagFeature; }
 public slots:
+	void setCustomTranslationFile(const QString &_customTranslationFile);
 	void setLang(const QString &_lang);
 	void setDeckPath(const QString &_deckPath);
 	void setPicsPath(const QString &_picsPath);

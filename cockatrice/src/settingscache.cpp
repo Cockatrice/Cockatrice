@@ -5,6 +5,7 @@ SettingsCache::SettingsCache()
 {
 	settings = new QSettings(this);
 	
+	customTranslationFile = settings->value("personal/custom_translation").toString();
 	lang = settings->value("personal/lang").toString();
 	
 	deckPath = settings->value("paths/decks").toString();
@@ -34,6 +35,13 @@ SettingsCache::SettingsCache()
 	soundPath = settings->value("sound/path").toString();
 	
 	priceTagFeature = settings->value("deckeditor/pricetags", false).toBool();
+}
+
+void SettingsCache::setCustomTranslationFile(const QString &_customTranslationFile)
+{
+	customTranslationFile = _customTranslationFile;
+	settings->setValue("personal/custom_translation", customTranslationFile);
+	emit customTranslationFileChanged();
 }
 
 void SettingsCache::setLang(const QString &_lang)

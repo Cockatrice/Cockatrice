@@ -27,6 +27,7 @@ public:
 	GeneralSettingsPage();
 	void retranslateUi();
 private slots:
+	void customTranslationButtonClicked();
 	void deckPathButtonClicked();
 	void picsPathButtonClicked();
 	void cardDatabasePathButtonClicked();
@@ -39,6 +40,7 @@ signals:
 private:
 	QStringList findQmFiles();
 	QString languageName(const QString &qmFile);
+	QPushButton *customTranslationButton;
 	QLineEdit *deckPathEdit, *picsPathEdit, *cardDatabasePathEdit;
 	QGroupBox *personalGroupBox, *pathsGroupBox;
 	QComboBox *languageBox;
