@@ -62,8 +62,9 @@ void AbstractClient::processProtocolItem(const ServerMessage &item)
 			PendingCommand *pend = pendingCommands.value(cmdId, 0);
 			if (!pend)
 				return;
-			
 			pendingCommands.remove(cmdId);
+			locker.unlock();
+			
 			pend->processResponse(response);
 			pend->deleteLater();
 			break;

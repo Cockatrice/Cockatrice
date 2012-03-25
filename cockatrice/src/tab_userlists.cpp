@@ -107,6 +107,7 @@ void TabUserLists::processUserLeftEvent(const Event_UserLeft &event)
 
 void TabUserLists::buddyListReceived(const QList<ServerInfo_User> &_buddyList)
 {
+	qDebug() << "BUDDY LIST" << _buddyList.size();
 	for (int i = 0; i < _buddyList.size(); ++i)
 		buddyList->processUserInfo(_buddyList[i], false);
 	buddyList->sortItems();

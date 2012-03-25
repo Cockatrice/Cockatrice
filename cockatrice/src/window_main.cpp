@@ -348,7 +348,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
 	connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
 	connect(client, SIGNAL(protocolVersionMismatch(int, int)), this, SLOT(protocolVersionMismatch(int, int)));
-	connect(client, SIGNAL(userInfoChanged(const ServerInfo_User &)), this, SLOT(userInfoReceived(const ServerInfo_User &)));
+	connect(client, SIGNAL(userInfoChanged(const ServerInfo_User &)), this, SLOT(userInfoReceived(const ServerInfo_User &)), Qt::BlockingQueuedConnection);
 	
 	clientThread = new QThread(this);
 	client->moveToThread(clientThread);

@@ -197,10 +197,10 @@ Response::ResponseCode ServerSocketInterface::cmdAddToList(const Command_AddToLi
 	if (!servatrice->execSqlQuery(query))
 		return Response::RespInternalError;
 	
-	Event_AddToList *event = new Event_AddToList;
-	event->set_list_name(cmd.list());
-	event->mutable_user_info()->CopyFrom(servatrice->getUserData(user));
-	rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, event);
+	Event_AddToList event;
+	event.set_list_name(cmd.list());
+	event.mutable_user_info()->CopyFrom(servatrice->getUserData(user));
+	rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event));
 	
 	return Response::RespOk;
 }
@@ -236,10 +236,10 @@ Response::ResponseCode ServerSocketInterface::cmdRemoveFromList(const Command_Re
 	if (!servatrice->execSqlQuery(query))
 		return Response::RespInternalError;
 	
-	Event_RemoveFromList *event = new Event_RemoveFromList;
-	event->set_list_name(cmd.list());
-	event->set_user_name(cmd.user_name());
-	rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, event);
+	Event_RemoveFromList event;
+	event.set_list_name(cmd.list());
+	event.set_user_name(cmd.user_name());
+	rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event));
 	
 	return Response::RespOk;
 }
