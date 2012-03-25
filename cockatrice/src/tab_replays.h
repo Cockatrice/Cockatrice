@@ -13,6 +13,7 @@ class QGroupBox;
 class RemoteReplayList_TreeWidget;
 class GameReplay;
 class Event_ReplayAdded;
+class CommandContainer;
 
 class TabReplays : public Tab {
 	Q_OBJECT
@@ -33,10 +34,10 @@ private slots:
 	void openRemoteReplayFinished(const Response &r);
 	
 	void actDownload();
-	void downloadFinished(const Response &r);
+	void downloadFinished(const Response &r, const CommandContainer &commandContainer, const QVariant &extraData);
 	
 	void actKeepRemoteReplay();
-	void keepRemoteReplayFinished(const Response &r);
+	void keepRemoteReplayFinished(const Response &r, const CommandContainer &commandContainer);
 	
 	void replayAddedEventReceived(const Event_ReplayAdded &event);
 signals:

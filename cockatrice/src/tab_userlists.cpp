@@ -35,7 +35,7 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
 	connect(client, SIGNAL(removeFromListEventReceived(const Event_RemoveFromList &)), this, SLOT(processRemoveFromListEvent(const Event_RemoveFromList &)));
 	
 	PendingCommand *pend = client->prepareSessionCommand(Command_ListUsers());
-	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(processListUsersResponse(const Response &)));
+	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(processListUsersResponse(const Response &)));
 	client->sendCommand(pend);
 	
 	QVBoxLayout *vbox = new QVBoxLayout;

@@ -15,6 +15,7 @@
 #include "pending_command.h"
 #include "pb/room_commands.pb.h"
 #include "pb/serverinfo_game.pb.h"
+#include "pb/response.pb.h"
 
 void DlgCreateGame::sharedCtor()
 {
@@ -177,19 +178,19 @@ void DlgCreateGame::actOK()
 	}
 	
 	PendingCommand *pend = room->prepareRoomCommand(cmd);
-	connect(pend, SIGNAL(finished(Response::ResponseCode)), this, SLOT(checkResponse(Response::ResponseCode)));
+	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(checkResponse(Response)));
 	room->sendRoomCommand(pend);
 	
 	okButton->setEnabled(false);
 	cancelButton->setEnabled(false);
 }
 
-void DlgCreateGame::checkResponse(Response::ResponseCode response)
+void DlgCreateGame::checkResponse(const Response &response)
 {
 	okButton->setEnabled(true);
 	cancelButton->setEnabled(true);
 
-	if (response == Response::RespOk)
+	if (response.response_code() == Response::RespOk)
 		accept();
 	else {
 		QMessageBox::critical(this, tr("Error"), tr("Server error."));

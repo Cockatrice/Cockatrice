@@ -17,10 +17,32 @@
 #include "pb/event_replay_added.pb.h"
 #include "get_pb_extension.h"
 #include <google/protobuf/descriptor.h>
+#include "client_metatypes.h"
 
 AbstractClient::AbstractClient(QObject *parent)
 	: QObject(parent), nextCmdId(0), status(StatusDisconnected)
 {
+	qRegisterMetaType<CommandContainer>("CommandContainer");
+	qRegisterMetaType<Response>("Response");
+	qRegisterMetaType<ClientStatus>("ClientStatus");
+	qRegisterMetaType<RoomEvent>("RoomEvent");
+	qRegisterMetaType<GameEventContainer>("GameEventContainer");
+	qRegisterMetaType<Event_ServerIdentification>("Event_ServerIdentification");
+	qRegisterMetaType<Event_ConnectionClosed>("Event_ConnectionClosed");
+	qRegisterMetaType<Event_ServerShutdown>("Event_ServerShutdown");
+	qRegisterMetaType<Event_AddToList>("Event_AddToList");
+	qRegisterMetaType<Event_RemoveFromList>("Event_RemoveFromList");
+	qRegisterMetaType<Event_UserJoined>("Event_UserJoined");
+	qRegisterMetaType<Event_UserLeft>("Event_UserLeft");
+	qRegisterMetaType<Event_ServerMessage>("Event_ServerMessage");
+	qRegisterMetaType<Event_ListRooms>("Event_ListRooms");
+	qRegisterMetaType<Event_GameJoined>("Event_GameJoined");
+	qRegisterMetaType<Event_UserMessage>("Event_UserMessage");
+	qRegisterMetaType<ServerInfo_User>("ServerInfo_User");
+	qRegisterMetaType<QList<ServerInfo_User> >("QList<ServerInfo_User>");
+	qRegisterMetaType<Event_ReplayAdded>("Event_ReplayAdded");
+	
+	connect(this, SIGNAL(sigSendCommandContainer(CommandContainer)), this, SLOT(sendCommandContainer(CommandContainer)));
 }
 
 AbstractClient::~AbstractClient()
@@ -33,6 +55,8 @@ void AbstractClient::processProtocolItem(const ServerMessage &item)
 		case ServerMessage::RESPONSE: {
 			const Response &response = item.response();
 			const int cmdId = response.cmd_id();
+			
+			QMutexLocker locker(&clientMutex);
 			PendingCommand *pend = pendingCommands.value(cmdId, 0);
 			if (!pend)
 				return;
@@ -87,9 +111,14 @@ void AbstractClient::sendCommand(const CommandContainer &cont)
 void AbstractClient::sendCommand(PendingCommand *pend)
 {
 	const int cmdId = nextCmdId++;
-	pendingCommands.insert(cmdId, pend);
 	pend->getCommandContainer().set_cmd_id(cmdId);
-	sendCommandContainer(pend->getCommandContainer());
+	pend->moveToThread(thread());
+	
+	clientMutex.lock();
+	pendingCommands.insert(cmdId, pend);
+	clientMutex.unlock();
+	
+	emit sigSendCommandContainer(pend->getCommandContainer());
 }
 
 PendingCommand *AbstractClient::prepareSessionCommand(const ::google::protobuf::Message &cmd)

@@ -60,7 +60,7 @@ void TabMessage::sendMessage()
 	cmd.set_message(sayEdit->text().toStdString());
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
-	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(messageSent(const Response &)));
+	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(messageSent(const Response &)));
 	client->sendCommand(pend);
 	
 	sayEdit->clear();

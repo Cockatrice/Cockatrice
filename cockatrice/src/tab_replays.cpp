@@ -140,7 +140,7 @@ void TabReplays::actOpenRemoteReplay()
 	cmd.set_replay_id(curRight->replay_id());
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
-	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(openRemoteReplayFinished(const Response &)));
+	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(openRemoteReplayFinished(const Response &)));
 	client->sendCommand(pend);
 }
 
@@ -175,16 +175,14 @@ void TabReplays::actDownload()
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
 	pend->setExtraData(filePath);
-	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(downloadFinished(const Response &)));
+	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(downloadFinished(Response, CommandContainer, QVariant)));
 	client->sendCommand(pend);
 }
 
-void TabReplays::downloadFinished(const Response &r)
+void TabReplays::downloadFinished(const Response &r, const CommandContainer &commandContainer, const QVariant &extraData)
 {
 	const Response_ReplayDownload &resp = r.GetExtension(Response_ReplayDownload::ext);
-	
-	PendingCommand *pend = static_cast<PendingCommand *>(sender());
-	QString filePath = pend->getExtraData().toString();
+	QString filePath = extraData.toString();
 	
 	const std::string &data = resp.replay_data();
 	QFile f(filePath);
@@ -204,17 +202,16 @@ void TabReplays::actKeepRemoteReplay()
 	cmd.set_do_not_hide(!curRight->do_not_hide());
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
-	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(keepRemoteReplayFinished(const Response &)));
+	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(keepRemoteReplayFinished(Response, CommandContainer)));
 	client->sendCommand(pend);
 }
 
-void TabReplays::keepRemoteReplayFinished(const Response &r)
+void TabReplays::keepRemoteReplayFinished(const Response &r, const CommandContainer &commandContainer)
 {
 	if (r.response_code() != Response::RespOk)
 		return;
 	
-	PendingCommand *pend = static_cast<PendingCommand *>(sender());
-	const Command_ReplayModifyMatch &cmd = pend->getCommandContainer().session_command(0).GetExtension(Command_ReplayModifyMatch::ext);
+	const Command_ReplayModifyMatch &cmd = commandContainer.session_command(0).GetExtension(Command_ReplayModifyMatch::ext);
 	
 	ServerInfo_ReplayMatch temp;
 	temp.set_do_not_hide(cmd.do_not_hide());

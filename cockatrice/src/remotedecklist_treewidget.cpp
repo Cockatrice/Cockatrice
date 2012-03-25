@@ -249,7 +249,7 @@ void RemoteDeckList_TreeModel::removeNode(RemoteDeckList_TreeModel::Node *node)
 void RemoteDeckList_TreeModel::refreshTree()
 {
 	PendingCommand *pend = client->prepareSessionCommand(Command_DeckList());
-	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(deckListFinished(const Response &)));
+	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(deckListFinished(const Response &)));
 	
 	client->sendCommand(pend);
 }

@@ -1,4 +1,5 @@
 #include <QTimer>
+#include <QThread>
 #include "remoteclient.h"
 
 #include "pending_command.h"
@@ -28,6 +29,7 @@ RemoteClient::RemoteClient(QObject *parent)
 RemoteClient::~RemoteClient()
 {
 	disconnectFromServer();
+	thread()->quit();
 }
 
 void RemoteClient::slotSocketError(QAbstractSocket::SocketError /*error*/)
@@ -58,7 +60,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
 	cmdLogin.set_password(password.toStdString());
 	
 	PendingCommand *pend = prepareSessionCommand(cmdLogin);
-	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(loginResponse(const Response &)));
+	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(loginResponse(Response)));
 	sendCommand(pend);
 }
 

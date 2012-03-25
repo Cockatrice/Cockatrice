@@ -29,6 +29,7 @@ class RemoteClient;
 class LocalClient;
 class LocalServer;
 class ServerInfo_User;
+class QThread;
 
 class MainWindow : public QMainWindow {
 	Q_OBJECT
@@ -66,9 +67,12 @@ private:
 	TabSupervisor *tabSupervisor;
 
 	RemoteClient *client;
+	QThread *clientThread;
+	
 	LocalServer *localServer;
 public:
 	MainWindow(QWidget *parent = 0);
+	~MainWindow();
 protected:
 	void closeEvent(QCloseEvent *event);
 	void changeEvent(QEvent *event);

@@ -16,6 +16,7 @@ class Event_ListRooms;
 class Event_ServerMessage;
 class Response;
 class ServerInfo_Room;
+class CommandContainer;
 
 class RoomSelector : public QGroupBox {
 	Q_OBJECT
@@ -28,7 +29,7 @@ private:
 private slots:
 	void processListRoomsEvent(const Event_ListRooms &event);
 	void joinClicked();
-	void joinFinished(const Response &resp);
+	void joinFinished(const Response &resp, const CommandContainer &commandContainer, const QVariant &extraData);
 signals:
 	void roomJoined(const ServerInfo_Room &info, bool setCurrent);
 public:

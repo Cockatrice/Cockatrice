@@ -120,7 +120,7 @@ void TabRoom::sendMessage()
 	cmd.set_message(sayEdit->text().toStdString());
 	
 	PendingCommand *pend = prepareRoomCommand(cmd);
-	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(sayFinished(const Response &)));
+	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(sayFinished(const Response &)));
 	sendRoomCommand(pend);
 	sayEdit->clear();
 }

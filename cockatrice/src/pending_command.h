@@ -8,8 +8,8 @@
 class PendingCommand : public QObject {
 	Q_OBJECT
 signals:
-	void finished(const Response &response);
-	void finished(Response::ResponseCode response);
+	void finished(const Response &response, const CommandContainer &commandContainer, const QVariant &extraData);
+	void finished(Response::ResponseCode respCode);
 private:
 	CommandContainer commandContainer;
 	QVariant extraData;
@@ -22,7 +22,7 @@ public:
 	QVariant getExtraData() const { return extraData; }
 	void processResponse(const Response &response)
 	{
-		emit finished(response);
+		emit finished(response, commandContainer, extraData);
 		emit finished(response.response_code());
 	}
 	int tick() { return ++ticks; }

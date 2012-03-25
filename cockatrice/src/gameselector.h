@@ -4,7 +4,6 @@
 #include <QGroupBox>
 //#include "tab_room.h"
 #include "gametypemap.h"
-#include "pb/response.pb.h"
 
 class QTreeView;
 class GamesModel;
@@ -15,6 +14,7 @@ class AbstractClient;
 class TabSupervisor;
 class TabRoom;
 class ServerInfo_Game;
+class Response;
 
 class GameSelector : public QGroupBox {
 	Q_OBJECT
@@ -22,7 +22,7 @@ private slots:
 	void showUnavailableGamesChanged(int state);
 	void actCreate();
 	void actJoin();
-	void checkResponse(Response::ResponseCode response);
+	void checkResponse(const Response &response);
 signals:
 	void gameJoined(int gameId);
 private:

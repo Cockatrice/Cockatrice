@@ -14,6 +14,7 @@
 #include "pending_command.h"
 #include "pb/room_commands.pb.h"
 #include "pb/serverinfo_game.pb.h"
+#include "pb/response.pb.h"
 
 GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSupervisor, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QWidget *parent)
 	: QGroupBox(parent), client(_client), tabSupervisor(_tabSupervisor), room(_room)
@@ -82,14 +83,14 @@ void GameSelector::actCreate()
 	dlg.exec();
 }
 
-void GameSelector::checkResponse(Response::ResponseCode response)
+void GameSelector::checkResponse(const Response &response)
 {
 	if (createButton)
 		createButton->setEnabled(true);
 	joinButton->setEnabled(true);
 	spectateButton->setEnabled(true);
 
-	switch (response) {
+	switch (response.response_code()) {
 		case Response::RespNotInRoom: QMessageBox::critical(this, tr("Error"), tr("Please join the appropriate room first.")); break;
 		case Response::RespWrongPassword: QMessageBox::critical(this, tr("Error"), tr("Wrong password.")); break;
 		case Response::RespSpectatorsNotAllowed: QMessageBox::critical(this, tr("Error"), tr("Spectators are not allowed in this game.")); break;
@@ -132,7 +133,7 @@ void GameSelector::actJoin()
 	}
 	
 	PendingCommand *pend = r->prepareRoomCommand(cmd);
-	connect(pend, SIGNAL(finished(Response::ResponseCode)), this, SLOT(checkResponse(Response::ResponseCode)));
+	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(checkResponse(Response)));
 	r->sendRoomCommand(pend);
 
 	if (createButton)

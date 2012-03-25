@@ -48,7 +48,7 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
 		cmd.set_number_cards(numberCards);
 		
 		PendingCommand *pend = player->prepareGameCommand(cmd);
-		connect(pend, SIGNAL(finished(const Response &)), this, SLOT(zoneDumpReceived(const Response &)));
+		connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(zoneDumpReceived(const Response &)));
 		player->sendGameCommand(pend);
 	} else {
 		const CardList &c = origZone->getCards();

@@ -26,6 +26,7 @@
 #include <QInputDialog>
 #include <QFile>
 #include <QFileDialog>
+#include <QThread>
 
 #include "main.h"
 #include "window_main.h"
@@ -337,7 +338,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
 	QPixmapCache::setCacheLimit(200000);
 
-	client = new RemoteClient(this);
+	client = new RemoteClient;
 	connect(client, SIGNAL(connectionClosedEventReceived(const Event_ConnectionClosed &)), this, SLOT(processConnectionClosedEvent(const Event_ConnectionClosed &)));
 	connect(client, SIGNAL(serverShutdownEventReceived(const Event_ServerShutdown &)), this, SLOT(processServerShutdownEvent(const Event_ServerShutdown &)));
 	connect(client, SIGNAL(serverError(Response::ResponseCode, QString)), this, SLOT(serverError(Response::ResponseCode, QString)));
@@ -346,6 +347,10 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
 	connect(client, SIGNAL(protocolVersionMismatch(int, int)), this, SLOT(protocolVersionMismatch(int, int)));
 	connect(client, SIGNAL(userInfoChanged(const ServerInfo_User &)), this, SLOT(userInfoReceived(const ServerInfo_User &)));
+	
+	clientThread = new QThread(this);
+	client->moveToThread(clientThread);
+	clientThread->start();
 
 	tabSupervisor = new TabSupervisor;
 	connect(tabSupervisor, SIGNAL(setMenu(QMenu *)), this, SLOT(updateTabMenu(QMenu *)));
@@ -359,6 +364,12 @@ MainWindow::MainWindow(QWidget *parent)
 	retranslateUi();
 	
 	resize(900, 700);
+}
+
+MainWindow::~MainWindow()
+{
+	client->deleteLater();
+	clientThread->wait();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

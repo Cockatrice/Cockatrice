@@ -105,7 +105,7 @@ void RoomSelector::joinRoom(int id, bool setCurrent)
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
 	pend->setExtraData(setCurrent);
-	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(joinFinished(const Response &)));
+	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(joinFinished(Response, CommandContainer, QVariant)));
 	
 	client->sendCommand(pend);
 }
@@ -119,13 +119,13 @@ void RoomSelector::joinClicked()
 	joinRoom(twi->data(0, Qt::UserRole).toInt(), true);
 }
 
-void RoomSelector::joinFinished(const Response &r)
+void RoomSelector::joinFinished(const Response &r, const CommandContainer & /*commandContainer*/, const QVariant &extraData)
 {
 	if (r.response_code() != Response::RespOk)
 		return;
 	const Response_JoinRoom &resp = r.GetExtension(Response_JoinRoom::ext);
 	
-	emit roomJoined(resp.room_info(), static_cast<PendingCommand *>(sender())->getExtraData().toBool());
+	emit roomJoined(resp.room_info(), extraData.toBool());
 }
 
 TabServer::TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent)

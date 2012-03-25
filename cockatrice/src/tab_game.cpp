@@ -147,7 +147,7 @@ void DeckViewContainer::loadLocalDeck()
 	Command_DeckSelect cmd;
 	cmd.set_deck(deck->writeToString_Native().toStdString());
 	PendingCommand *pend = static_cast<TabGame *>(parent())->prepareGameCommand(cmd);
-	connect(pend, SIGNAL(finished(const Response &)), this, SLOT(deckSelectFinished(const Response &)));
+	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(deckSelectFinished(const Response &)));
 	static_cast<TabGame *>(parent())->sendGameCommand(pend, playerId);
 }
 
@@ -158,7 +158,7 @@ void DeckViewContainer::loadRemoteDeck()
 		Command_DeckSelect cmd;
 		cmd.set_deck_id(dlg.getDeckId());
 		PendingCommand *pend = static_cast<TabGame *>(parent())->prepareGameCommand(cmd);
-		connect(pend, SIGNAL(finished(const Response &)), this, SLOT(deckSelectFinished(const Response &)));
+		connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(deckSelectFinished(const Response &)));
 		static_cast<TabGame *>(parent())->sendGameCommand(pend, playerId);
 	}
 }

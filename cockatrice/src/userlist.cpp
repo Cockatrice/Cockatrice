@@ -305,10 +305,10 @@ void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
 	emit openMessageDialog(item->data(2, Qt::UserRole).toString(), true);
 }
 
-void UserList::gamesOfUserReceived(const Response &resp)
+void UserList::gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer)
 {
 	const Response_GetGamesOfUser &response = resp.GetExtension(Response_GetGamesOfUser::ext);
-	const Command_GetGamesOfUser &cmd = static_cast<const Command_GetGamesOfUser &>(static_cast<PendingCommand *>(sender())->getCommandContainer().session_command(0).GetExtension(Command_GetGamesOfUser::ext));
+	const Command_GetGamesOfUser &cmd = commandContainer.session_command(0).GetExtension(Command_GetGamesOfUser::ext);
 	
 	QMap<int, GameTypeMap> gameTypeMap;
 	QMap<int, QString> roomMap;
@@ -429,7 +429,7 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 		cmd.set_user_name(userName.toStdString());
 		
 		PendingCommand *pend = client->prepareSessionCommand(cmd);
-		connect(pend, SIGNAL(finished(const Response &)), this, SLOT(gamesOfUserReceived(const Response &)));
+		connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(gamesOfUserReceived(Response, CommandContainer)));
 		
 		client->sendCommand(pend);
 	} else if (actionClicked == aAddToIgnoreList) {
@@ -449,7 +449,7 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 		cmd.set_user_name(userName.toStdString());
 		
 		PendingCommand *pend = client->prepareSessionCommand(cmd);
-		connect(pend, SIGNAL(finished(const Response &)), this, SLOT(banUser_processUserInfoResponse(const Response &)));
+		connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(banUser_processUserInfoResponse(Response)));
 		
 		client->sendCommand(pend);
 	}

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVariant>
+#include <QMutex>
 #include "pb/response.pb.h"
 #include "pb/serverinfo_user.pb.h"
 
@@ -59,16 +60,19 @@ signals:
 	void buddyListReceived(const QList<ServerInfo_User> &buddyList);
 	void ignoreListReceived(const QList<ServerInfo_User> &ignoreList);
 	void replayAddedEventReceived(const Event_ReplayAdded &event);
+	
+	void sigSendCommandContainer(const CommandContainer &commandContainer);
 private:
 	int nextCmdId;
+	QMutex clientMutex;
 protected slots:
 	void processProtocolItem(const ServerMessage &item);
+	virtual void sendCommandContainer(const CommandContainer &cont) = 0;
 protected:
 	QMap<int, PendingCommand *> pendingCommands;
 	ClientStatus status;
 	QString userName, password;
 	void setStatus(ClientStatus _status);
-	virtual void sendCommandContainer(const CommandContainer &cont) = 0;
 public:
 	AbstractClient(QObject *parent = 0);
 	~AbstractClient();
@@ -77,10 +81,10 @@ public:
 	void sendCommand(const CommandContainer &cont);
 	void sendCommand(PendingCommand *pend);
 	
-	PendingCommand *prepareSessionCommand(const ::google::protobuf::Message &cmd);
-	PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd, int roomId);
-	PendingCommand *prepareModeratorCommand(const ::google::protobuf::Message &cmd);
-	PendingCommand *prepareAdminCommand(const ::google::protobuf::Message &cmd);
+	static PendingCommand *prepareSessionCommand(const ::google::protobuf::Message &cmd);
+	static PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd, int roomId);
+	static PendingCommand *prepareModeratorCommand(const ::google::protobuf::Message &cmd);
+	static PendingCommand *prepareAdminCommand(const ::google::protobuf::Message &cmd);
 };
 
 #endif

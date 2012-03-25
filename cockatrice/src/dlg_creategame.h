@@ -3,7 +3,6 @@
 
 #include <QDialog>
 #include <QMap>
-#include "pb/response.pb.h"
 
 class QLabel;
 class QLineEdit;
@@ -13,6 +12,7 @@ class QGroupBox;
 class QSpinBox;
 class TabRoom;
 
+class Response;
 class ServerInfo_Game;
 
 class DlgCreateGame : public QDialog {
@@ -22,7 +22,7 @@ public:
 	DlgCreateGame(const ServerInfo_Game &game, const QMap<int, QString> &_gameTypes, QWidget *parent = 0);
 private slots:
 	void actOK();
-	void checkResponse(Response::ResponseCode response);
+	void checkResponse(const Response &response);
 	void spectatorsAllowedChanged(int state);
 private:
 	TabRoom *room;

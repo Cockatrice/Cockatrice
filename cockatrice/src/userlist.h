@@ -16,6 +16,7 @@ class QSpinBox;
 class QRadioButton;
 class QPlainTextEdit;
 class Response;
+class CommandContainer;
 
 class BanDialog : public QDialog {
 	Q_OBJECT
@@ -68,7 +69,7 @@ private slots:
 	void userClicked(QTreeWidgetItem *item, int column);
 	void banUser_processUserInfoResponse(const Response &resp);
 	void banUser_dialogFinished();
-	void gamesOfUserReceived(const Response &resp);
+	void gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer);
 signals:
 	void openMessageDialog(const QString &userName, bool focus);
 	void addBuddy(const QString &userName);
