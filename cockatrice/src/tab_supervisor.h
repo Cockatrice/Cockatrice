@@ -55,10 +55,10 @@ private:
 	int myAddTab(Tab *tab);
 	void addCloseButtonToTab(Tab *tab, int tabIndex);
 public:
-	TabSupervisor(QWidget *parent = 0);
+	TabSupervisor(AbstractClient *_client, QWidget *parent = 0);
 	~TabSupervisor();
 	void retranslateUi();
-	void start(AbstractClient *_client, const ServerInfo_User &userInfo);
+	void start(const ServerInfo_User &userInfo);
 	void startLocal(const QList<AbstractClient *> &_clients);
 	void stop();
 	int getGameCount() const { return gameTabs.size(); }

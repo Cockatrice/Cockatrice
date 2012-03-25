@@ -22,8 +22,10 @@
 AbstractClient::AbstractClient(QObject *parent)
 	: QObject(parent), nextCmdId(0), status(StatusDisconnected)
 {
+	qRegisterMetaType<QVariant>("QVariant");
 	qRegisterMetaType<CommandContainer>("CommandContainer");
 	qRegisterMetaType<Response>("Response");
+	qRegisterMetaType<Response::ResponseCode>("Response::ResponseCode");
 	qRegisterMetaType<ClientStatus>("ClientStatus");
 	qRegisterMetaType<RoomEvent>("RoomEvent");
 	qRegisterMetaType<GameEventContainer>("GameEventContainer");

@@ -14,6 +14,8 @@ signals:
 	void socketError(const QString &errorString);
 	void protocolVersionMismatch(int clientVersion, int serverVersion);
 	void protocolError();
+	void sigConnectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
+	void sigDisconnectFromServer();
 private slots:
 	void slotConnected();
 	void readData();
@@ -21,6 +23,8 @@ private slots:
 	void ping();
 	void processServerIdentificationEvent(const Event_ServerIdentification &event);
 	void loginResponse(const Response &response);
+	void doConnectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
+	void doDisconnectFromServer();
 private:
 	static const int maxTimeout = 10;
 	int timeRunning, lastDataReceived;
@@ -31,13 +35,12 @@ private:
 	
 	QTimer *timer;
 	QTcpSocket *socket;
-	
+protected slots:	
 	void sendCommandContainer(const CommandContainer &cont);
 public:
 	RemoteClient(QObject *parent = 0);
 	~RemoteClient();
 	QString peerName() const { return socket->peerName(); }
-
 	void connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
 	void disconnectFromServer();
 };

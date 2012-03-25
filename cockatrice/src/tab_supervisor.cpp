@@ -72,13 +72,19 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 	style()->drawPrimitive(QStyle::PE_IndicatorTabClose, &opt, &p, this);
 }
 
-TabSupervisor::TabSupervisor(QWidget *parent)
-	: QTabWidget(parent), client(0), tabServer(0), tabDeckStorage(0), tabAdmin(0)
+TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
+	: QTabWidget(parent), client(_client), tabServer(0), tabDeckStorage(0), tabAdmin(0)
 {
 	tabChangedIcon = new QIcon(":/resources/icon_tab_changed.svg");
 	setElideMode(Qt::ElideRight);
 	setIconSize(QSize(15, 15));
 	connect(this, SIGNAL(currentChanged(int)), this, SLOT(updateCurrent(int)));
+
+	connect(client, SIGNAL(roomEventReceived(const RoomEvent &)), this, SLOT(processRoomEvent(const RoomEvent &)));
+	connect(client, SIGNAL(gameEventContainerReceived(const GameEventContainer &)), this, SLOT(processGameEventContainer(const GameEventContainer &)));
+	connect(client, SIGNAL(gameJoinedEventReceived(const Event_GameJoined &)), this, SLOT(gameJoined(const Event_GameJoined &)));
+	connect(client, SIGNAL(userMessageEventReceived(const Event_UserMessage &)), this, SLOT(processUserMessageEvent(const Event_UserMessage &)));
+	connect(client, SIGNAL(maxPingTime(int, int)), this, SLOT(updatePingTime(int, int)));
 }
 
 TabSupervisor::~TabSupervisor()
@@ -113,17 +119,10 @@ int TabSupervisor::myAddTab(Tab *tab)
 	return addTab(tab, tab->getTabText());
 }
 
-void TabSupervisor::start(AbstractClient *_client, const ServerInfo_User &_userInfo)
+void TabSupervisor::start(const ServerInfo_User &_userInfo)
 {
-	client = _client;
 	userInfo = new ServerInfo_User(_userInfo);
 	
-	connect(client, SIGNAL(roomEventReceived(const RoomEvent &)), this, SLOT(processRoomEvent(const RoomEvent &)));
-	connect(client, SIGNAL(gameEventContainerReceived(const GameEventContainer &)), this, SLOT(processGameEventContainer(const GameEventContainer &)));
-	connect(client, SIGNAL(gameJoinedEventReceived(const Event_GameJoined &)), this, SLOT(gameJoined(const Event_GameJoined &)));
-	connect(client, SIGNAL(userMessageEventReceived(const Event_UserMessage &)), this, SLOT(processUserMessageEvent(const Event_UserMessage &)));
-	connect(client, SIGNAL(maxPingTime(int, int)), this, SLOT(updatePingTime(int, int)));
-
 	tabServer = new TabServer(this, client);
 	connect(tabServer, SIGNAL(roomJoined(const ServerInfo_Room &, bool)), this, SLOT(addRoomTab(const ServerInfo_Room &, bool)));
 	myAddTab(tabServer);
@@ -175,11 +174,6 @@ void TabSupervisor::stop()
 {
 	if ((!client) && localClients.isEmpty())
 		return;
-	
-	if (client) {
-		disconnect(client, 0, this, 0);
-		client = 0;
-	}
 	
 	if (!localClients.isEmpty()) {
 		for (int i = 0; i < localClients.size(); ++i)

@@ -108,7 +108,7 @@ void MainWindow::statusChanged(ClientStatus _status)
 
 void MainWindow::userInfoReceived(const ServerInfo_User &info)
 {
-	tabSupervisor->start(client, info);
+	tabSupervisor->start(info);
 }
 
 // Actions
@@ -352,7 +352,7 @@ MainWindow::MainWindow(QWidget *parent)
 	client->moveToThread(clientThread);
 	clientThread->start();
 
-	tabSupervisor = new TabSupervisor;
+	tabSupervisor = new TabSupervisor(client);
 	connect(tabSupervisor, SIGNAL(setMenu(QMenu *)), this, SLOT(updateTabMenu(QMenu *)));
 	connect(tabSupervisor, SIGNAL(localGameEnded()), this, SLOT(localGameEnded()));
 	

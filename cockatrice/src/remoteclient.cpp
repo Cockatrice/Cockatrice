@@ -24,18 +24,20 @@ RemoteClient::RemoteClient(QObject *parent)
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slotSocketError(QAbstractSocket::SocketError)));
 	
 	connect(this, SIGNAL(serverIdentificationEventReceived(const Event_ServerIdentification &)), this, SLOT(processServerIdentificationEvent(const Event_ServerIdentification &)));
+	connect(this, SIGNAL(sigConnectToServer(QString, unsigned int, QString, QString)), this, SLOT(doConnectToServer(QString, unsigned int, QString, QString)));
+	connect(this, SIGNAL(sigDisconnectFromServer()), this, SLOT(doDisconnectFromServer()));
 }
 
 RemoteClient::~RemoteClient()
 {
-	disconnectFromServer();
+	doDisconnectFromServer();
 	thread()->quit();
 }
 
 void RemoteClient::slotSocketError(QAbstractSocket::SocketError /*error*/)
 {
 	QString errorString = socket->errorString();
-	disconnectFromServer();
+	doDisconnectFromServer();
 	emit socketError(errorString);
 }
 
@@ -118,7 +120,7 @@ void RemoteClient::readData()
 	} while (!inputBuffer.isEmpty());
 	
 	if (status == StatusDisconnecting)
-		disconnectFromServer();
+		doDisconnectFromServer();
 }
 
 void RemoteClient::sendCommandContainer(const CommandContainer &cont)
@@ -135,9 +137,9 @@ void RemoteClient::sendCommandContainer(const CommandContainer &cont)
 	socket->write(buf);
 }
 
-void RemoteClient::connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password)
+void RemoteClient::doConnectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password)
 {
-	disconnectFromServer();
+	doDisconnectFromServer();
 	
 	userName = _userName;
 	password = _password;
@@ -145,7 +147,7 @@ void RemoteClient::connectToServer(const QString &hostname, unsigned int port, c
 	setStatus(StatusConnecting);
 }
 
-void RemoteClient::disconnectFromServer()
+void RemoteClient::doDisconnectFromServer()
 {
 	timer->stop();
 	
@@ -163,14 +165,15 @@ void RemoteClient::disconnectFromServer()
 
 void RemoteClient::ping()
 {
-/*	QMutableMapIterator<int, PendingCommand *> i(pendingCommands);
-	while (i.hasNext())
-		if (i.next().value()->tick() > maxTimeout) {
-			CommandContainer *cont = i.value();
+	QMutableMapIterator<int, PendingCommand *> i(pendingCommands);
+	while (i.hasNext()) {
+		PendingCommand *pend = i.next().value();
+		if (pend->tick() > maxTimeout) {
 			i.remove();
-			cont->deleteLater();
+			pend->deleteLater();
 		}
-*/	
+	}
+	
 	int maxTime = timeRunning - lastDataReceived;
 	emit maxPingTime(maxTime, maxTimeout);
 	if (maxTime >= maxTimeout) {
@@ -180,4 +183,14 @@ void RemoteClient::ping()
 		sendCommand(prepareSessionCommand(Command_Ping()));
 		++timeRunning;
 	}
+}
+
+void RemoteClient::connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password)
+{
+	emit sigConnectToServer(hostname, port, _userName, _password);
+}
+
+void RemoteClient::disconnectFromServer()
+{
+	emit sigDisconnectFromServer();
 }
