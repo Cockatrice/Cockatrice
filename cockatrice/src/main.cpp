@@ -72,8 +72,10 @@ void installNewTranslator()
 
 int main(int argc, char *argv[])
 {
-//	qInstallMsgHandler(myMessageOutput);
 	QApplication app(argc, argv);
+	
+	if (app.arguments().contains("--debug-output"))
+		qInstallMsgHandler(myMessageOutput);
 #ifdef Q_OS_MAC
 	QDir baseDir(app.applicationDirPath());
 	baseDir.cdUp();

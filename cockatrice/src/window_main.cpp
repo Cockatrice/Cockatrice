@@ -240,7 +240,7 @@ void MainWindow::serverError(Response::ResponseCode r, QString reasonStr)
 		case Response::RespWrongPassword: QMessageBox::critical(this, tr("Error"), tr("Invalid login data.")); break;
 		case Response::RespWouldOverwriteOldSession: QMessageBox::critical(this, tr("Error"), tr("There is already an active session using this user name.\nPlease close that session first and re-login.")); break;
 		case Response::RespUserIsBanned: QMessageBox::critical(this, tr("Error"), tr("You are banned.\n%1").arg(reasonStr)); break;
-		default: ;
+		default: QMessageBox::critical(this, tr("Error"), tr("Unknown server error: %1").arg(static_cast<int>(r)));
 	}
 }
 
@@ -262,6 +262,7 @@ void MainWindow::setClientStatusTitle()
 	switch (client->getStatus()) {
 		case StatusConnecting: setWindowTitle(appName + " - " + tr("Connecting to %1...").arg(client->peerName())); break;
 		case StatusDisconnected: setWindowTitle(appName + " - " + tr("Disconnected")); break;
+		case StatusLoggingIn: setWindowTitle(appName + " - " + tr("Connected, logging in at %1").arg(client->peerName())); break;
 		case StatusLoggedIn: setWindowTitle(appName + " - " + tr("Logged in at %1").arg(client->peerName())); break;
 		default: setWindowTitle(appName);
 	}
