@@ -225,6 +225,7 @@ void MainWindow::actAbout()
 		+ tr("Czech:") + " Ondřej Trhoň<br>"
 //		+ tr("Slovak:") + " Ganjalf Rendy<br>"
 		+ tr("Italian:") + " Luigi Sciolla<br>"
+		+ tr("Swedish:") + " Jessica Dahl<br>"
 	));
 }
 

@@ -63,7 +63,10 @@ void installNewTranslator()
 	qtTranslator->load("qt_" + lang, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	qApp->installTranslator(qtTranslator);
 	
-	translator->load(translationPrefix + "_" + lang, ":/translations");
+	if (!settingsCache->getCustomTranslationFile().isEmpty())
+		translator->load(settingsCache->getCustomTranslationFile());
+	else
+		translator->load(translationPrefix + "_" + lang, ":/translations");
 	qApp->installTranslator(translator);
 }
 

@@ -27,20 +27,16 @@ public:
 	GeneralSettingsPage();
 	void retranslateUi();
 private slots:
+	void customTranslationButtonClicked();
 	void deckPathButtonClicked();
 	void replaysPathButtonClicked();
 	void picsPathButtonClicked();
 	void cardDatabasePathButtonClicked();
 	void languageBoxChanged(int index);
-signals:
-/*	void picsPathChanged(const QString &path);
-	void replaysPathChanged(const QString &path);
-	void cardDatabasePathChanged(const QString &path);
-	void changeLanguage(const QString &qmFile);
-	void picDownloadChanged(int state);
-*/private:
+private:
 	QStringList findQmFiles();
 	QString languageName(const QString &qmFile);
+	QPushButton *customTranslationButton;
 	QLineEdit *deckPathEdit, *replaysPathEdit, *picsPathEdit, *cardDatabasePathEdit;
 	QGroupBox *personalGroupBox, *pathsGroupBox;
 	QComboBox *languageBox;
