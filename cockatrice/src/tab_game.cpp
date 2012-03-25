@@ -327,6 +327,7 @@ void TabGame::actConcede()
 	if (QMessageBox::question(this, tr("Concede"), tr("Are you sure you want to concede this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
 		return;
 
+sleep(5);
 	sendGameCommand(new Command_Concede);
 }
 
