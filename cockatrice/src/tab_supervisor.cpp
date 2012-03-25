@@ -73,7 +73,7 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 }
 
 TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
-	: QTabWidget(parent), client(_client), tabServer(0), tabDeckStorage(0), tabAdmin(0)
+	: QTabWidget(parent), userInfo(0), client(_client), tabUserLists(0), tabServer(0), tabDeckStorage(0), tabAdmin(0), tabReplays(0)
 {
 	tabChangedIcon = new QIcon(":/resources/icon_tab_changed.svg");
 	setElideMode(Qt::ElideRight);
@@ -182,10 +182,14 @@ void TabSupervisor::stop()
 		
 		emit localGameEnded();
 	} else {
-		tabUserLists->deleteLater();
-		tabServer->deleteLater();
-		tabDeckStorage->deleteLater();
-		tabReplays->deleteLater();
+		if (tabUserLists)
+			tabUserLists->deleteLater();
+		if (tabServer)
+			tabServer->deleteLater();
+		if (tabDeckStorage)
+			tabDeckStorage->deleteLater();
+		if (tabReplays)
+			tabReplays->deleteLater();
 	}
 	tabUserLists = 0;
 	tabServer = 0;
