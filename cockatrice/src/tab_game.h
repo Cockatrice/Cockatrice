@@ -109,6 +109,7 @@ private:
 	int currentPhase;
 	int activePlayer;
 	CardItem *activeCard;
+	bool gameClosed;
 	
 	// Replay related members
 	GameReplay *replay;
@@ -140,6 +141,7 @@ private:
 
 	void startGame(bool resuming);
 	void stopGame();
+	void closeGame();
 
 	void eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, const GameEventContext &context);
 	void eventSpectatorLeave(const Event_Leave &event, int eventPlayerId, const GameEventContext &context);

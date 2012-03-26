@@ -44,6 +44,7 @@ public slots:
 	void logJoin(Player *player);
 	void logLeave(Player *player);
 	void logGameClosed();
+	void logKicked();
 	void logJoinSpectator(QString name);
 	void logLeaveSpectator(QString name);
 	void logDeckSelect(Player *player, QString deckHash);

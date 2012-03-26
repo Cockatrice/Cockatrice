@@ -59,6 +59,11 @@ void MessageLogWidget::logGameClosed()
 	appendHtml(tr("The game has been closed."));
 }
 
+void MessageLogWidget::logKicked()
+{
+	appendHtml(tr("You have been kicked out of the game."));
+}
+
 void MessageLogWidget::logJoinSpectator(QString name)
 {
 	appendHtml(tr("%1 is now watching the game.").arg(sanitizeHtml(name)));

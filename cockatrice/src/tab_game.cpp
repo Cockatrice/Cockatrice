@@ -209,6 +209,7 @@ TabGame::TabGame(GameReplay *_replay)
 	resuming(false),
 	currentPhase(-1),
 	activeCard(0),
+	gameClosed(false),
 	replay(_replay),
 	currentReplayStep(0)
 {
@@ -353,6 +354,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	resuming(event.resuming()),
 	currentPhase(-1),
 	activeCard(0),
+	gameClosed(false),
 	replay(0)
 {
 	gameInfo.set_started(false);
@@ -631,12 +633,14 @@ void TabGame::actConcede()
 
 void TabGame::actLeaveGame()
 {
-	if (!spectator)
-		if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
-			return;
-	
-	if (!replay)
-		sendGameCommand(Command_LeaveGame());
+	if (!gameClosed) {
+		if (!spectator)
+			if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+				return;
+		
+		if (!replay)
+			sendGameCommand(Command_LeaveGame());
+	}
 	deleteLater();
 }
 
@@ -853,6 +857,15 @@ void TabGame::stopGame()
 	phasesToolbar->hide();
 }
 
+void TabGame::closeGame()
+{
+	gameInfo.set_started(false);
+	gameClosed = true;
+	
+	tabMenu->clear();
+	tabMenu->addAction(aLeaveGame);
+}
+
 void TabGame::eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, const GameEventContext & /*context*/)
 {
 	messageLog->logSpectatorSay(spectators.value(eventPlayerId), QString::fromStdString(event.message()));
@@ -1001,9 +1014,9 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
 
 void TabGame::eventKicked(const Event_Kicked & /*event*/, int /*eventPlayerId*/, const GameEventContext & /*context*/)
 {
+	closeGame();
+	messageLog->logKicked();
 	emit userEvent();
-	QMessageBox::critical(this, tr("Kicked"), tr("You have been kicked out of the game."));
-	deleteLater();
 }
 
 void TabGame::eventGameHostChanged(const Event_GameHostChanged & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
@@ -1013,7 +1026,7 @@ void TabGame::eventGameHostChanged(const Event_GameHostChanged & /*event*/, int 
 
 void TabGame::eventGameClosed(const Event_GameClosed & /*event*/, int /*eventPlayerId*/, const GameEventContext & /*context*/)
 {
-	gameInfo.set_started(false);
+	closeGame();
 	messageLog->logGameClosed();
 	emit userEvent();
 }
