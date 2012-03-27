@@ -98,6 +98,21 @@ void MessageLogWidget::logNotReadyStart(Player *player)
 		appendHtml(tr("%1 is not ready to start the game any more.", "male").arg(sanitizeHtml(player->getName())));
 }
 
+void MessageLogWidget::logSetSideboardLock(Player *player, bool locked)
+{
+	if (locked) {
+		if (isFemale(player))
+			appendHtml(tr("%1 has locked her sideboard.", "female").arg(sanitizeHtml(player->getName())));
+		else
+			appendHtml(tr("%1 has locked his sideboard.", "male").arg(sanitizeHtml(player->getName())));
+	} else {
+		if (isFemale(player))
+			appendHtml(tr("%1 has unlocked her sideboard.", "female").arg(sanitizeHtml(player->getName())));
+		else
+			appendHtml(tr("%1 has unlocked his sideboard.", "male").arg(sanitizeHtml(player->getName())));
+	}
+}
+
 void MessageLogWidget::logConcede(Player *player)
 {
 	if (isFemale(player))

@@ -31,7 +31,7 @@ private:
 	TabSupervisor *tabSupervisor;
 	AbstractClient *client;
 	TabGame *game;
-	QIcon readyIcon, notReadyIcon, concededIcon, playerIcon, spectatorIcon;
+	QIcon readyIcon, notReadyIcon, concededIcon, playerIcon, spectatorIcon, lockIcon;
 	bool gameStarted;
 signals:
 	void openMessageDialog(const QString &userName, bool focus);

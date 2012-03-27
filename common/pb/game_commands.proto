@@ -30,6 +30,7 @@ message GameCommand {
 		MOVE_CARD = 1027;
 		SET_SIDEBOARD_PLAN = 1028;
 		DECK_SELECT = 1029;
+		SET_SIDEBOARD_LOCK = 1030;
 	}
 	extensions 100 to max;
 }

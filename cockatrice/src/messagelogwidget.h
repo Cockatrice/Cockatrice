@@ -50,6 +50,7 @@ public slots:
 	void logDeckSelect(Player *player, QString deckHash);
 	void logReadyStart(Player *player);
 	void logNotReadyStart(Player *player);
+	void logSetSideboardLock(Player *player, bool locked);
 	void logConcede(Player *player);
 	void logGameStart();
 	void logConnectionStateChanged(Player *player, bool connectionState);

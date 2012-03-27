@@ -21,6 +21,7 @@
 #include "pb/command_create_counter.pb.h"
 #include "pb/command_create_token.pb.h"
 #include "pb/command_deck_select.pb.h"
+#include "pb/command_set_sideboard_lock.pb.h"
 #include "pb/command_del_counter.pb.h"
 #include "pb/command_delete_arrow.pb.h"
 #include "pb/command_draw_cards.pb.h"
@@ -70,6 +71,7 @@
 #include "pb/context_connection_state_changed.pb.h"
 #include "pb/context_concede.pb.h"
 #include "pb/context_deck_select.pb.h"
+#include "pb/context_set_sideboard_lock.pb.h"
 #include "pb/context_move_card.pb.h"
 #include "pb/context_mulligan.pb.h"
 #include "pb/context_undo_draw.pb.h"
@@ -78,7 +80,7 @@
 #include <QDebug>
 
 Server_Player::Server_Player(Server_Game *_game, int _playerId, const ServerInfo_User &_userInfo, bool _spectator, Server_AbstractUserInterface *_userInterface)
-	: game(_game), userInterface(_userInterface), userInfo(new ServerInfo_User(_userInfo)), deck(0), pingTime(0), playerId(_playerId), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false)
+	: game(_game), userInterface(_userInterface), userInfo(new ServerInfo_User(_userInfo)), deck(0), pingTime(0), playerId(_playerId), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false), sideboardLocked(true)
 {
 }
 
@@ -257,6 +259,7 @@ ServerInfo_PlayerProperties Server_Player::getProperties(bool withUserInfo)
 		result.mutable_user_info()->CopyFrom(*userInfo);
 	result.set_spectator(spectator);
 	result.set_conceded(conceded);
+	result.set_sideboard_locked(sideboardLocked);
 	result.set_ready_start(readyStart);
 	if (deck)
 		result.set_deck_hash(deck->getDeckHash().toStdString());
@@ -645,8 +648,10 @@ Response::ResponseCode Server_Player::cmdDeckSelect(const Command_DeckSelect &cm
 	
 	delete deck;
 	deck = newDeck;
+	sideboardLocked = true;
 	
 	Event_PlayerPropertiesChanged event;
+	event.mutable_player_properties()->set_sideboard_locked(true);
 	event.mutable_player_properties()->set_deck_hash(deck->getDeckHash().toStdString());
 	ges.enqueueGameEvent(event, playerId);
 	
@@ -669,11 +674,36 @@ Response::ResponseCode Server_Player::cmdSetSideboardPlan(const Command_SetSideb
 		return Response::RespContextError;
 	if (!deck)
 		return Response::RespContextError;
+	if (sideboardLocked)
+		return Response::RespContextError;
 	
 	QList<MoveCard_ToZone> sideboardPlan;
 	for (int i = 0; i < cmd.move_list_size(); ++i)
 		sideboardPlan.append(cmd.move_list(i));
 	deck->setCurrentSideboardPlan(sideboardPlan);
+	
+	return Response::RespOk;
+}
+
+Response::ResponseCode Server_Player::cmdSetSideboardLock(const Command_SetSideboardLock &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
+	if (spectator)
+		return Response::RespFunctionNotAllowed;
+	if (readyStart)
+		return Response::RespContextError;
+	if (!deck)
+		return Response::RespContextError;
+	if (sideboardLocked == cmd.locked())
+		return Response::RespContextError;
+	
+	sideboardLocked = cmd.locked();
+	if (sideboardLocked)
+		deck->setCurrentSideboardPlan(QList<MoveCard_ToZone>());
+	
+	Event_PlayerPropertiesChanged event;
+	event.mutable_player_properties()->set_sideboard_locked(sideboardLocked);
+	ges.enqueueGameEvent(event, playerId);
+	ges.setGameEventContext(Context_SetSideboardLock());
 	
 	return Response::RespOk;
 }
@@ -1572,6 +1602,7 @@ Response::ResponseCode Server_Player::processGameCommand(const GameCommand &comm
 		case GameCommand::MOVE_CARD: return cmdMoveCard(command.GetExtension(Command_MoveCard::ext), rc, ges); break;
 		case GameCommand::SET_SIDEBOARD_PLAN: return cmdSetSideboardPlan(command.GetExtension(Command_SetSideboardPlan::ext), rc, ges); break;
 		case GameCommand::DECK_SELECT: return cmdDeckSelect(command.GetExtension(Command_DeckSelect::ext), rc, ges); break;
+		case GameCommand::SET_SIDEBOARD_LOCK: return cmdSetSideboardLock(command.GetExtension(Command_SetSideboardLock::ext), rc, ges); break;
 		default: return Response::RespInvalidCommand;
 	}
 }

@@ -56,6 +56,7 @@ class Command_RevealCards;
 class Command_MoveCard;
 class Command_SetSideboardPlan;
 class Command_DeckSelect;
+class Command_SetSideboardLock;
 
 class Server_Player : public Server_ArrowTarget {
 	Q_OBJECT
@@ -76,6 +77,7 @@ private:
 	int nextCardId;
 	bool readyStart;
 	bool conceded;
+	bool sideboardLocked;
 public:
 	mutable QMutex playerMutex;
 	Server_Player(Server_Game *_game, int _playerId, const ServerInfo_User &_userInfo, bool _spectator, Server_AbstractUserInterface *_handler);
@@ -127,6 +129,7 @@ public:
 	Response::ResponseCode cmdReadyStart(const Command_ReadyStart &cmd, ResponseContainer &rc, GameEventStorage &ges);
 	Response::ResponseCode cmdDeckSelect(const Command_DeckSelect &cmd, ResponseContainer &rc, GameEventStorage &ges);
 	Response::ResponseCode cmdSetSideboardPlan(const Command_SetSideboardPlan &cmd, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdSetSideboardLock(const Command_SetSideboardLock &cmd, ResponseContainer &rc, GameEventStorage &ges);
 	Response::ResponseCode cmdGameSay(const Command_GameSay &cmd, ResponseContainer &rc, GameEventStorage &ges);
 	Response::ResponseCode cmdShuffle(const Command_Shuffle &cmd, ResponseContainer &rc, GameEventStorage &ges);
 	Response::ResponseCode cmdMulligan(const Command_Mulligan &cmd, ResponseContainer &rc, GameEventStorage &ges);

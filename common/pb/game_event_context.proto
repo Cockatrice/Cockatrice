@@ -8,6 +8,7 @@ message GameEventContext {
 		MULLIGAN = 1005;
 		PING_CHANGED = 1006;
 		CONNECTION_STATE_CHANGED = 1007;
+		SET_SIDEBOARD_LOCK = 1008;
 	}
 	extensions 100 to max;
 }

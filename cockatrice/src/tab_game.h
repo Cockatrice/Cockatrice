@@ -55,14 +55,14 @@ class GameReplay;
 class ServerInfo_User;
 class PendingCommand;
 
-class ReadyStartButton : public QPushButton {
+class ToggleButton : public QPushButton {
 	Q_OBJECT
 private:
-	bool readyStart;
+	bool state;
 public:
-	ReadyStartButton(QWidget *parent = 0);
-	bool getReadyStart() const { return readyStart; }
-	void setReadyStart(bool _readyStart);
+	ToggleButton(QWidget *parent = 0);
+	bool getState() const { return state; }
+	void setState(bool _state);
 protected:
 	void paintEvent(QPaintEvent *event);
 };
@@ -71,7 +71,7 @@ class DeckViewContainer : public QWidget {
 	Q_OBJECT
 private:
 	QPushButton *loadLocalButton, *loadRemoteButton;
-	ReadyStartButton *readyStartButton;
+	ToggleButton *readyStartButton, *sideboardLockButton;
 	DeckView *deckView;
 	int playerId;
 private slots:
@@ -80,6 +80,9 @@ private slots:
 	void readyStart();
 	void deckSelectFinished(const Response &r);
 	void sideboardPlanChanged();
+	void sideboardLockButtonClicked();
+private:
+	void updateSideboardLockButtonText();
 signals:
 	void newCardAdded(AbstractCardItem *card);
 public:
@@ -87,6 +90,7 @@ public:
 	void retranslateUi();
 	void setButtonsVisible(bool _visible);
 	void setReadyStart(bool ready);
+	void setSideboardLocked(bool locked);
 	void setDeck(DeckList *deck);
 };
 

@@ -38,6 +38,7 @@
 #include "pb/command_deck_select.pb.h"
 #include "pb/command_ready_start.pb.h"
 #include "pb/command_set_sideboard_plan.pb.h"
+#include "pb/command_set_sideboard_lock.pb.h"
 #include "pb/command_leave_game.pb.h"
 #include "pb/command_game_say.pb.h"
 #include "pb/command_set_active_phase.pb.h"
@@ -61,26 +62,26 @@
 #include "pb/context_ping_changed.pb.h"
 #include "get_pb_extension.h"
 
-ReadyStartButton::ReadyStartButton(QWidget *parent)
-	: QPushButton(parent), readyStart(false)
+ToggleButton::ToggleButton(QWidget *parent)
+	: QPushButton(parent), state(false)
 {
 }
 
-void ReadyStartButton::paintEvent(QPaintEvent *event)
+void ToggleButton::paintEvent(QPaintEvent *event)
 {
 	QPushButton::paintEvent(event);
 	
 	QPainter painter(this);
-	if (readyStart)
+	if (state)
 		painter.setPen(QPen(Qt::green, 3));
 	else
 		painter.setPen(QPen(Qt::red, 3));
 	painter.drawRect(1.5, 1.5, width() - 3, height() - 3);
 }
 
-void ReadyStartButton::setReadyStart(bool _readyStart)
+void ToggleButton::setState(bool _state)
 {
-	readyStart = _readyStart;
+	state = _state;
 	update();
 }
 
@@ -89,17 +90,21 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 {
 	loadLocalButton = new QPushButton;
 	loadRemoteButton = new QPushButton;
-	readyStartButton = new ReadyStartButton;
+	readyStartButton = new ToggleButton;
 	readyStartButton->setEnabled(false);
+	sideboardLockButton = new ToggleButton;
+	sideboardLockButton->setEnabled(false);
 	
 	connect(loadLocalButton, SIGNAL(clicked()), this, SLOT(loadLocalDeck()));
 	connect(loadRemoteButton, SIGNAL(clicked()), this, SLOT(loadRemoteDeck()));
 	connect(readyStartButton, SIGNAL(clicked()), this, SLOT(readyStart()));
+	connect(sideboardLockButton, SIGNAL(clicked()), this, SLOT(sideboardLockButtonClicked()));
 	
 	QHBoxLayout *buttonHBox = new QHBoxLayout;
 	buttonHBox->addWidget(loadLocalButton);
 	buttonHBox->addWidget(loadRemoteButton);
 	buttonHBox->addWidget(readyStartButton);
+	buttonHBox->addWidget(sideboardLockButton);
 	buttonHBox->addStretch();
 	deckView = new DeckView;
 	connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SIGNAL(newCardAdded(AbstractCardItem *)));
@@ -118,6 +123,7 @@ void DeckViewContainer::retranslateUi()
 	loadLocalButton->setText(tr("Load &local deck"));
 	loadRemoteButton->setText(tr("Load d&eck from server"));
 	readyStartButton->setText(tr("Ready to s&tart"));
+	updateSideboardLockButtonText();
 }
 
 void DeckViewContainer::setButtonsVisible(bool _visible)
@@ -125,6 +131,15 @@ void DeckViewContainer::setButtonsVisible(bool _visible)
 	loadLocalButton->setVisible(_visible);
 	loadRemoteButton->setVisible(_visible);
 	readyStartButton->setVisible(_visible);
+	sideboardLockButton->setVisible(_visible);
+}
+
+void DeckViewContainer::updateSideboardLockButtonText()
+{
+	if (sideboardLockButton->getState())
+		sideboardLockButton->setText(tr("S&ideboard unlocked"));
+	else
+		sideboardLockButton->setText(tr("S&ideboard locked"));
 }
 
 void DeckViewContainer::loadLocalDeck()
@@ -168,14 +183,21 @@ void DeckViewContainer::deckSelectFinished(const Response &r)
 	const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
 	DeckList *newDeck = new DeckList(QString::fromStdString(resp.deck()));
 	db->cacheCardPixmaps(newDeck->getCardList());
-	deckView->setDeck(newDeck);
-	readyStartButton->setEnabled(true);
+	setDeck(newDeck);
 }
 
 void DeckViewContainer::readyStart()
 {
 	Command_ReadyStart cmd;
-	cmd.set_ready(!readyStartButton->getReadyStart());
+	cmd.set_ready(!readyStartButton->getState());
+	static_cast<TabGame *>(parent())->sendGameCommand(cmd, playerId);
+}
+
+void DeckViewContainer::sideboardLockButtonClicked()
+{
+	Command_SetSideboardLock cmd;
+	cmd.set_locked(sideboardLockButton->getState());
+	
 	static_cast<TabGame *>(parent())->sendGameCommand(cmd, playerId);
 }
 
@@ -190,14 +212,25 @@ void DeckViewContainer::sideboardPlanChanged()
 
 void DeckViewContainer::setReadyStart(bool ready)
 {
-	readyStartButton->setReadyStart(ready);
-	deckView->setLocked(ready);
+	readyStartButton->setState(ready);
+	deckView->setLocked(ready || !sideboardLockButton->getState());
+}
+
+void DeckViewContainer::setSideboardLocked(bool locked)
+{
+	sideboardLockButton->setState(!locked);
+	updateSideboardLockButtonText();
+	deckView->setLocked(readyStartButton->getState() || !sideboardLockButton->getState());
+	if (locked)
+		deckView->resetSideboardPlan();
 }
 
 void DeckViewContainer::setDeck(DeckList *deck)
 {
 	deckView->setDeck(deck);
 	readyStartButton->setEnabled(true);
+	sideboardLockButton->setState(false);
+	sideboardLockButton->setEnabled(true);
 }
 
 TabGame::TabGame(GameReplay *_replay)
@@ -899,10 +932,15 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*e
 				playerListWidget->addPlayer(prop);
 			}
 			player->processPlayerInfo(playerInfo);
-			if (player->getLocal() && playerInfo.has_deck_list()) {
-				DeckList *newDeck = new DeckList(QString::fromStdString(playerInfo.deck_list()));
-				db->cacheCardPixmaps(newDeck->getCardList());
-				deckViewContainers.value(playerId)->setDeck(newDeck);
+			if (player->getLocal()) {
+				DeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
+				if (playerInfo.has_deck_list()) {
+					DeckList *newDeck = new DeckList(QString::fromStdString(playerInfo.deck_list()));
+					db->cacheCardPixmaps(newDeck->getCardList());
+					deckViewContainer->setDeck(newDeck);
+				}
+				deckViewContainer->setReadyStart(prop.ready_start());
+				deckViewContainer->setSideboardLocked(prop.sideboard_locked());
 			}
 		}
 	}
@@ -938,12 +976,13 @@ void TabGame::eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &
 	Player *player = players.value(eventPlayerId, 0);
 	if (!player)
 		return;
-	playerListWidget->updatePlayerProperties(event.player_properties(), eventPlayerId);
+	const ServerInfo_PlayerProperties &prop = event.player_properties();
+	playerListWidget->updatePlayerProperties(prop, eventPlayerId);
 	
 	const GameEventContext::ContextType contextType = static_cast<const GameEventContext::ContextType>(getPbExtension(context));
 	switch (contextType) {
 		case GameEventContext::READY_START: {
-			bool ready = event.player_properties().ready_start();
+			bool ready = prop.ready_start();
 			if (player->getLocal())
 				deckViewContainers.value(player->getId())->setReadyStart(ready);
 			if (ready)
@@ -966,8 +1005,14 @@ void TabGame::eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &
 			messageLog->logDeckSelect(player, QString::fromStdString(context.GetExtension(Context_DeckSelect::ext).deck_hash()));
 			break;
 		}
+		case GameEventContext::SET_SIDEBOARD_LOCK: {
+			if (player->getLocal())
+				deckViewContainers.value(player->getId())->setSideboardLocked(prop.sideboard_locked());
+			messageLog->logSetSideboardLock(player, prop.sideboard_locked());
+			break;
+		}
 		case GameEventContext::CONNECTION_STATE_CHANGED: {
-			messageLog->logConnectionStateChanged(player, event.player_properties().ping_seconds() != -1);
+			messageLog->logConnectionStateChanged(player, prop.ping_seconds() != -1);
 			break;
 		}
 		default: ;

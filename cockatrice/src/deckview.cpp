@@ -166,7 +166,6 @@ void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsI
 			painter->setPen(QColor(255, 255, 255, 100));
 			painter->drawLine(QPointF(0, yUntilNow - paddingY / 2), QPointF(width, yUntilNow - paddingY / 2));
 		}
-		
 		qreal thisRowHeight = CARD_HEIGHT * currentRowsAndCols[i].first;
 		QRectF textRect(0, yUntilNow, totalTextWidth, thisRowHeight);
 		yUntilNow += thisRowHeight + paddingY;
@@ -268,22 +267,27 @@ void DeckViewCardContainer::setWidth(qreal _width)
 }
 
 DeckViewScene::DeckViewScene(QObject *parent)
-	: QGraphicsScene(parent), locked(false), deck(0), optimalAspectRatio(1.0)
+	: QGraphicsScene(parent), locked(true), deck(0), optimalAspectRatio(1.0)
 {
 }
 
 DeckViewScene::~DeckViewScene()
 {
+	clearContents();
+}
+
+void DeckViewScene::clearContents()
+{
+	QMapIterator<QString, DeckViewCardContainer *> i(cardContainers);
+	while (i.hasNext())
+		delete i.next().value();
+	cardContainers.clear();
 }
 
 void DeckViewScene::setDeck(DeckList *_deck)
 {
 	if (deck)
 		delete deck;
-	QMapIterator<QString, DeckViewCardContainer *> i(cardContainers);
-	while (i.hasNext())
-		delete i.next().value();
-	cardContainers.clear();
 	
 	deck = _deck;
 	rebuildTree();
@@ -293,6 +297,11 @@ void DeckViewScene::setDeck(DeckList *_deck)
 
 void DeckViewScene::rebuildTree()
 {
+	clearContents();
+	
+	if (!deck)
+		return;
+	
 	InnerDecklistNode *listRoot = deck->getRoot();
 	for (int i = 0; i < listRoot->size(); i++) {
 		InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
@@ -432,6 +441,12 @@ QList<MoveCard_ToZone> DeckViewScene::getSideboardPlan() const
 	return result;
 }
 
+void DeckViewScene::resetSideboardPlan()
+{
+	rebuildTree();
+	rearrangeItems();
+}
+
 DeckView::DeckView(QWidget *parent)
 	: QGraphicsView(parent)
 {
@@ -462,4 +477,9 @@ void DeckView::updateSceneRect(const QRectF &rect)
 void DeckView::setDeck(DeckList *_deck)
 {
 	deckViewScene->setDeck(_deck);
+}
+
+void DeckView::resetSideboardPlan()
+{
+	deckViewScene->resetSideboardPlan();
 }
