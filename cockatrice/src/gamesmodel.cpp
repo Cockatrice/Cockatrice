@@ -39,7 +39,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
 				result.append(gameTypeMap.value(g.game_types(i)));
 			return result.join(", ");
 		}
-		case 4: return g.with_password() ? (g.spectators_need_password() ? tr("yes") : tr("yes, free for spectators")) : tr("no");
+		case 4: return g.with_password() ? ((g.spectators_need_password() || !g.spectators_allowed()) ? tr("yes") : tr("yes, free for spectators")) : tr("no");
 		case 5: {
 			QStringList result;
 			if (g.only_buddies())
