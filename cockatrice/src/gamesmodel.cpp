@@ -99,7 +99,11 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
 }
 
 GamesProxyModel::GamesProxyModel(QObject *parent, ServerInfo_User *_ownUser)
-	: QSortFilterProxyModel(parent), ownUser(_ownUser), unavailableGamesVisible(false)
+	: QSortFilterProxyModel(parent),
+          ownUser(_ownUser),
+          unavailableGamesVisible(false),
+          maxPlayersFilterMin(-1),
+          maxPlayersFilterMax(-1)
 {
 	setDynamicSortFilter(true);
 }
@@ -108,6 +112,41 @@ void GamesProxyModel::setUnavailableGamesVisible(bool _unavailableGamesVisible)
 {
 	unavailableGamesVisible = _unavailableGamesVisible;
 	invalidateFilter();
+}
+
+void GamesProxyModel::setGameNameFilter(const QString &_gameNameFilter)
+{
+	gameNameFilter = _gameNameFilter;
+	invalidateFilter();
+}
+
+void GamesProxyModel::setCreatorNameFilter(const QString &_creatorNameFilter)
+{
+	creatorNameFilter = _creatorNameFilter;
+	invalidateFilter();
+}
+
+void GamesProxyModel::setGameTypeFilter(const QSet<int> &_gameTypeFilter)
+{
+	gameTypeFilter = _gameTypeFilter;
+	invalidateFilter();
+}
+
+void GamesProxyModel::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax)
+{
+	maxPlayersFilterMin = _maxPlayersFilterMin;
+	maxPlayersFilterMax = _maxPlayersFilterMax;
+	invalidateFilter();
+}
+
+void GamesProxyModel::resetFilterParameters()
+{
+	unavailableGamesVisible = false;
+	gameNameFilter = QString();
+	creatorNameFilter = QString();
+	gameTypeFilter.clear();
+	maxPlayersFilterMin = -1;
+	maxPlayersFilterMax = -1;
 }
 
 bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourceParent*/) const
@@ -126,6 +165,23 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourc
 			if (game.only_registered())
 				return false;
 	}
+	if (!gameNameFilter.isEmpty())
+		if (!QString::fromStdString(game.description()).contains(gameNameFilter, Qt::CaseInsensitive))
+			return false;
+	if (!creatorNameFilter.isEmpty())
+		if (!QString::fromStdString(game.creator_info().name()).contains(creatorNameFilter, Qt::CaseInsensitive))
+			return false;
+	
+	QSet<int> gameTypes;
+	for (int i = 0; i < game.game_types_size(); ++i)
+		gameTypes.insert(game.game_types(i));
+	if (!gameTypeFilter.isEmpty() && gameTypes.intersect(gameTypeFilter).isEmpty())
+		return false;
+	                
+	if ((maxPlayersFilterMin != -1) && (game.max_players() < maxPlayersFilterMin))
+		return false;
+	if ((maxPlayersFilterMax != -1) && (game.max_players() > maxPlayersFilterMax))
+		return false;
 	
 	return true;
 }

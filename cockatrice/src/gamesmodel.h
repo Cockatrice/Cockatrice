@@ -4,6 +4,7 @@
 #include <QAbstractTableModel>
 #include <QSortFilterProxyModel>
 #include <QList>
+#include <QSet>
 #include "gametypemap.h"
 
 class ServerInfo_Game;
@@ -32,9 +33,18 @@ class GamesProxyModel : public QSortFilterProxyModel {
 private:
 	ServerInfo_User *ownUser;
 	bool unavailableGamesVisible;
+	QString gameNameFilter, creatorNameFilter;
+	QSet<int> gameTypeFilter;
+	int maxPlayersFilterMin, maxPlayersFilterMax;
 public:
 	GamesProxyModel(QObject *parent = 0, ServerInfo_User *_ownUser = 0);
+	
 	void setUnavailableGamesVisible(bool _unavailableGamesVisible);
+	void setGameNameFilter(const QString &_gameNameFilter);
+	void setCreatorNameFilter(const QString &_creatorNameFilter);
+	void setGameTypeFilter(const QSet<int> &_gameTypeFilter);
+	void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
+	void resetFilterParameters();
 protected:
 	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 };
