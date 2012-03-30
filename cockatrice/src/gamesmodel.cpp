@@ -147,6 +147,8 @@ void GamesProxyModel::resetFilterParameters()
 	gameTypeFilter.clear();
 	maxPlayersFilterMin = -1;
 	maxPlayersFilterMax = -1;
+	
+	invalidateFilter();
 }
 
 bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourceParent*/) const

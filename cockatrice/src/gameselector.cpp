@@ -8,6 +8,7 @@
 #include <QInputDialog>
 #include "tab_supervisor.h"
 #include "dlg_creategame.h"
+#include "dlg_filter_games.h"
 #include "gameselector.h"
 #include "gamesmodel.h"
 #include "tab_room.h"
@@ -32,11 +33,14 @@ GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSuperviso
 		gameListView->header()->hideSection(1);
 	gameListView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
 
-	showUnavailableGamesCheckBox = new QCheckBox;
-	
-	QVBoxLayout *filterLayout = new QVBoxLayout;
-	filterLayout->addWidget(showUnavailableGamesCheckBox);
-	
+	filterButton = new QPushButton;
+	filterButton->setIcon(QIcon(":/resources/icon_search.svg"));
+	connect(filterButton, SIGNAL(clicked()), this, SLOT(actSetFilter()));
+	clearFilterButton = new QPushButton;
+	clearFilterButton->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
+	clearFilterButton->setEnabled(false);
+	connect(clearFilterButton, SIGNAL(clicked()), this, SLOT(actClearFilter()));
+
 	if (room) {
 		createButton = new QPushButton;
 		connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
@@ -46,20 +50,18 @@ GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSuperviso
 	spectateButton = new QPushButton;
 	
 	QHBoxLayout *buttonLayout = new QHBoxLayout;
+	buttonLayout->addWidget(filterButton);
+	buttonLayout->addWidget(clearFilterButton);
+	buttonLayout->addStretch();
 	if (room)
 		buttonLayout->addWidget(createButton);
 	buttonLayout->addWidget(joinButton);
 	buttonLayout->addWidget(spectateButton);
 	buttonLayout->setAlignment(Qt::AlignTop);
 	
-	QHBoxLayout *hbox = new QHBoxLayout;
-	hbox->addLayout(filterLayout);
-	hbox->addStretch();
-	hbox->addLayout(buttonLayout);
-
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(gameListView);
-	mainLayout->addLayout(hbox);
+	mainLayout->addLayout(buttonLayout);
 
 	retranslateUi();
 	setLayout(mainLayout);
@@ -67,14 +69,39 @@ GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSuperviso
 	setMinimumWidth((qreal) (gameListView->columnWidth(0) * gameListModel->columnCount()) / 1.5);
 	setMinimumHeight(200);
 
-	connect(showUnavailableGamesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showUnavailableGamesChanged(int)));
 	connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
 	connect(spectateButton, SIGNAL(clicked()), this, SLOT(actJoin()));
 }
 
-void GameSelector::showUnavailableGamesChanged(int state)
+void GameSelector::actSetFilter()
 {
-	gameListProxyModel->setUnavailableGamesVisible(state);
+	GameTypeMap gameTypeMap;
+	if (room)
+		gameTypeMap = gameListModel->getGameTypes().value(room->getRoomId());
+	DlgFilterGames dlg(gameTypeMap, this);
+	dlg.setUnavailableGamesVisible(gameListProxyModel->getUnavailableGamesVisible());
+	dlg.setGameNameFilter(gameListProxyModel->getGameNameFilter());
+	dlg.setCreatorNameFilter(gameListProxyModel->getCreatorNameFilter());
+	dlg.setGameTypeFilter(gameListProxyModel->getGameTypeFilter());
+	dlg.setMaxPlayersFilter(gameListProxyModel->getMaxPlayersFilterMin(), gameListProxyModel->getMaxPlayersFilterMax());
+	
+	if (!dlg.exec())
+		return;
+	
+	clearFilterButton->setEnabled(true);
+	
+	gameListProxyModel->setUnavailableGamesVisible(dlg.getUnavailableGamesVisible());
+	gameListProxyModel->setGameNameFilter(dlg.getGameNameFilter());
+	gameListProxyModel->setCreatorNameFilter(dlg.getCreatorNameFilter());
+	gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());
+	gameListProxyModel->setMaxPlayersFilter(dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax());
+}
+
+void GameSelector::actClearFilter()
+{
+	clearFilterButton->setEnabled(false);
+	
+	gameListProxyModel->resetFilterParameters();
 }
 
 void GameSelector::actCreate()
@@ -145,7 +172,8 @@ void GameSelector::actJoin()
 void GameSelector::retranslateUi()
 {
 	setTitle(tr("Games"));
-	showUnavailableGamesCheckBox->setText(tr("Show u&navailable games"));
+	filterButton->setText(tr("&Filter games"));
+	clearFilterButton->setText(tr("C&lear filter"));
 	if (createButton)
 		createButton->setText(tr("C&reate"));
 	joinButton->setText(tr("&Join"));

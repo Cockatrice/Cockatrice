@@ -25,7 +25,6 @@ private:
 	QComboBox *colorEdit;
 	QLineEdit *nameEdit, *ptEdit, *annotationEdit;
 	QCheckBox *destroyCheckBox;
-	QPushButton *okButton, *cancelButton;
 };
 
 #endif

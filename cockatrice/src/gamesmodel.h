@@ -26,6 +26,7 @@ public:
 	
 	const ServerInfo_Game &getGame(int row);
 	void updateGameList(const ServerInfo_Game &game);
+	const QMap<int, GameTypeMap> &getGameTypes() { return gameTypes; }
 };
 
 class GamesProxyModel : public QSortFilterProxyModel {
@@ -39,10 +40,16 @@ private:
 public:
 	GamesProxyModel(QObject *parent = 0, ServerInfo_User *_ownUser = 0);
 	
+	bool getUnavailableGamesVisible() const { return unavailableGamesVisible; }
 	void setUnavailableGamesVisible(bool _unavailableGamesVisible);
+	QString getGameNameFilter() const { return gameNameFilter; }
 	void setGameNameFilter(const QString &_gameNameFilter);
+	QString getCreatorNameFilter() const { return creatorNameFilter; }
 	void setCreatorNameFilter(const QString &_creatorNameFilter);
+	QSet<int> getGameTypeFilter() const { return gameTypeFilter; }
 	void setGameTypeFilter(const QSet<int> &_gameTypeFilter);
+	int getMaxPlayersFilterMin() const { return maxPlayersFilterMin; }
+	int getMaxPlayersFilterMax() const { return maxPlayersFilterMax; }
 	void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
 	void resetFilterParameters();
 protected:

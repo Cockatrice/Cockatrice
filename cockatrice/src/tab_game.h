@@ -59,6 +59,8 @@ class ToggleButton : public QPushButton {
 	Q_OBJECT
 private:
 	bool state;
+signals:
+	void stateChanged();
 public:
 	ToggleButton(QWidget *parent = 0);
 	bool getState() const { return state; }
@@ -81,7 +83,6 @@ private slots:
 	void deckSelectFinished(const Response &r);
 	void sideboardPlanChanged();
 	void sideboardLockButtonClicked();
-private:
 	void updateSideboardLockButtonText();
 signals:
 	void newCardAdded(AbstractCardItem *card);

@@ -6,6 +6,7 @@
 #include <QKeySequence>
 #include <QApplication>
 #include <QTextStream>
+#include <QDialogButtonBox>
 #include <QMessageBox>
 #include "dlg_load_deck_from_clipboard.h"
 #include "decklist.h"
@@ -17,28 +18,21 @@ DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent)
 	
 	refreshButton = new QPushButton(tr("&Refresh"));
 	refreshButton->setShortcut(QKeySequence("F5"));
-	okButton = new QPushButton(tr("&OK"));
-	okButton->setDefault(true);
-	cancelButton = new QPushButton(tr("&Cancel"));
-
-	QHBoxLayout *buttonLayout = new QHBoxLayout;
-	buttonLayout->addWidget(refreshButton);
-	buttonLayout->addStretch();
-	buttonLayout->addWidget(okButton);
-	buttonLayout->addWidget(cancelButton);
-
+	connect(refreshButton, SIGNAL(clicked()), this, SLOT(actRefresh()));
+	
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+	buttonBox->addButton(refreshButton, QDialogButtonBox::ActionRole);
+	connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOK()));
+	connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+	
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(contentsEdit);
-	mainLayout->addLayout(buttonLayout);
+	mainLayout->addWidget(buttonBox);
 
 	setLayout(mainLayout);
 
 	setWindowTitle(tr("Load deck from clipboard"));
 	resize(500, 500);
-
-	connect(refreshButton, SIGNAL(clicked()), this, SLOT(actRefresh()));
-	connect(okButton, SIGNAL(clicked()), this, SLOT(actOK()));
-	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 	
 	actRefresh();
 }

@@ -17,6 +17,7 @@
 #include <QApplication>
 #include <QInputDialog>
 #include <QSpinBox>
+#include <QDialogButtonBox>
 #include "carddatabase.h"
 #include "dlg_settings.h"
 #include "main.h"
@@ -606,9 +607,6 @@ DlgSettings::DlgSettings(QWidget *parent)
 	pagesWidget->addWidget(new DeckEditorSettingsPage);
 	pagesWidget->addWidget(new MessagesSettingsPage);
 	
-	closeButton = new QPushButton;
-	connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
-	
 	createIcons();
 	contentsWidget->setCurrentRow(0);
 	
@@ -616,14 +614,13 @@ DlgSettings::DlgSettings(QWidget *parent)
 	hboxLayout->addWidget(contentsWidget);
 	hboxLayout->addWidget(pagesWidget);
 	
-	QHBoxLayout *buttonsLayout = new QHBoxLayout;
-	buttonsLayout->addStretch(1);
-	buttonsLayout->addWidget(closeButton);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+	connect(buttonBox, SIGNAL(accepted()), this, SLOT(close()));
 	
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addLayout(hboxLayout);
 	mainLayout->addSpacing(12);
-	mainLayout->addLayout(buttonsLayout);
+	mainLayout->addWidget(buttonBox);
 	setLayout(mainLayout);
 	
 	retranslateUi();
@@ -711,8 +708,6 @@ void DlgSettings::retranslateUi()
 	userInterfaceButton->setText(tr("User interface"));
 	deckEditorButton->setText(tr("Deck editor"));
 	messagesButton->setText(tr("Messages"));
-	
-	closeButton->setText(tr("&Close"));
 	
 	for (int i = 0; i < pagesWidget->count(); i++)
 		dynamic_cast<AbstractSettingsPage *>(pagesWidget->widget(i))->retranslateUi();

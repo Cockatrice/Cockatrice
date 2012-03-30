@@ -19,7 +19,8 @@ class Response;
 class GameSelector : public QGroupBox {
 	Q_OBJECT
 private slots:
-	void showUnavailableGamesChanged(int state);
+	void actSetFilter();
+	void actClearFilter();
 	void actCreate();
 	void actJoin();
 	void checkResponse(const Response &response);
@@ -33,8 +34,7 @@ private:
 	QTreeView *gameListView;
 	GamesModel *gameListModel;
 	GamesProxyModel *gameListProxyModel;
-	QPushButton *createButton, *joinButton, *spectateButton;
-	QCheckBox *showUnavailableGamesCheckBox;
+	QPushButton *filterButton, *clearFilterButton, *createButton, *joinButton, *spectateButton;
 public:
 	GameSelector(AbstractClient *_client, TabSupervisor *_tabSupervisor, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QWidget *parent = 0);
 	void retranslateUi();

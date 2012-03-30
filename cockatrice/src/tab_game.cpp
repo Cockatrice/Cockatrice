@@ -82,6 +82,7 @@ void ToggleButton::paintEvent(QPaintEvent *event)
 void ToggleButton::setState(bool _state)
 {
 	state = _state;
+	emit stateChanged();
 	update();
 }
 
@@ -99,6 +100,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 	connect(loadRemoteButton, SIGNAL(clicked()), this, SLOT(loadRemoteDeck()));
 	connect(readyStartButton, SIGNAL(clicked()), this, SLOT(readyStart()));
 	connect(sideboardLockButton, SIGNAL(clicked()), this, SLOT(sideboardLockButtonClicked()));
+	connect(sideboardLockButton, SIGNAL(stateChanged()), this, SLOT(updateSideboardLockButtonText()));
 	
 	QHBoxLayout *buttonHBox = new QHBoxLayout;
 	buttonHBox->addWidget(loadLocalButton);
@@ -219,7 +221,6 @@ void DeckViewContainer::setReadyStart(bool ready)
 void DeckViewContainer::setSideboardLocked(bool locked)
 {
 	sideboardLockButton->setState(!locked);
-	updateSideboardLockButtonText();
 	deckView->setLocked(readyStartButton->getState() || !sideboardLockButton->getState());
 	if (locked)
 		deckView->resetSideboardPlan();

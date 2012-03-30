@@ -19,7 +19,7 @@ public:
 	DeckList *getDeckList() const { return deckList; }
 private:
 	QPlainTextEdit *contentsEdit;
-	QPushButton *refreshButton, *okButton, *cancelButton;
+	QPushButton *refreshButton;
 };
 
 #endif

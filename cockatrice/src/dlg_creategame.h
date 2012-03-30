@@ -10,6 +10,7 @@ class QPushButton;
 class QCheckBox;
 class QGroupBox;
 class QSpinBox;
+class QDialogButtonBox;
 class TabRoom;
 
 class Response;
@@ -35,7 +36,7 @@ private:
 	QSpinBox *maxPlayersEdit;
 	QCheckBox *onlyBuddiesCheckBox, *onlyRegisteredCheckBox;
 	QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox, *spectatorsSeeEverythingCheckBox;
-	QPushButton *okButton, *cancelButton;
+	QDialogButtonBox *buttonBox;
 	
 	void sharedCtor();
 };

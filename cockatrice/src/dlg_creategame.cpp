@@ -7,6 +7,7 @@
 #include <QHBoxLayout>
 #include <QSpinBox>
 #include <QGroupBox>
+#include <QDialogButtonBox>
 #include <QMessageBox>
 #include <QSet>
 #include "dlg_creategame.h"
@@ -85,18 +86,12 @@ void DlgCreateGame::sharedCtor()
 	grid->addWidget(joinRestrictionsGroupBox, 0, 1);
 	grid->addWidget(gameTypeGroupBox, 1, 1);
 
-	okButton = new QPushButton(tr("&OK"));
-	okButton->setDefault(true);
-	cancelButton = new QPushButton(tr("&Cancel"));
-
-	QHBoxLayout *buttonLayout = new QHBoxLayout;
-	buttonLayout->addStretch();
-	buttonLayout->addWidget(okButton);
-	buttonLayout->addWidget(cancelButton);
-
+	buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+	connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+	
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addLayout(grid);
-	mainLayout->addLayout(buttonLayout);
+	mainLayout->addWidget(buttonBox);
 
 	setLayout(mainLayout);
 
@@ -108,10 +103,10 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
 {
 	sharedCtor();
 	
-	setWindowTitle(tr("Create game"));
+	buttonBox->addButton(QDialogButtonBox::Cancel);
+	connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOK()));
 	
-	connect(okButton, SIGNAL(clicked()), this, SLOT(actOK()));
-	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+	setWindowTitle(tr("Create game"));
 }
 
 DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QString> &_gameTypes, QWidget *parent)
@@ -151,10 +146,9 @@ DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QS
 		gameTypeCheckBox->setChecked(types.contains(gameTypeIterator.key()));
 	}
 	
+	connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+	
 	setWindowTitle(tr("Game information"));
-	okButton->setAutoDefault(true);
-	cancelButton->hide();
-	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
 void DlgCreateGame::actOK()
@@ -181,14 +175,12 @@ void DlgCreateGame::actOK()
 	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(checkResponse(Response)));
 	room->sendRoomCommand(pend);
 	
-	okButton->setEnabled(false);
-	cancelButton->setEnabled(false);
+	buttonBox->setEnabled(false);
 }
 
 void DlgCreateGame::checkResponse(const Response &response)
 {
-	okButton->setEnabled(true);
-	cancelButton->setEnabled(true);
+	buttonBox->setEnabled(true);
 
 	if (response.response_code() == Response::RespOk)
 		accept();

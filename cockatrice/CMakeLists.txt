@@ -6,6 +6,7 @@ SET(cockatrice_SOURCES
  src/abstractcounter.cpp 
  src/counter_general.cpp 
  src/dlg_creategame.cpp 
+ src/dlg_filter_games.cpp
  src/dlg_connect.cpp 
  src/dlg_create_token.cpp 
  src/abstractclient.cpp 
@@ -79,6 +80,7 @@ SET(cockatrice_HEADERS
  src/abstractcounter.h 
  src/counter_general.h 
  src/dlg_creategame.h 
+ src/dlg_filter_games.h 
  src/dlg_connect.h 
  src/dlg_create_token.h 
  src/gamesmodel.h 

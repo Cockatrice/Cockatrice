@@ -1,11 +1,11 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QComboBox>
-#include <QPushButton>
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QDialogButtonBox>
 #include "dlg_create_token.h"
 
 DlgCreateToken::DlgCreateToken(QWidget *parent)
@@ -38,10 +38,6 @@ DlgCreateToken::DlgCreateToken(QWidget *parent)
 	destroyCheckBox = new QCheckBox(tr("&Destroy token when it leaves the table"));
 	destroyCheckBox->setChecked(true);
 
-	okButton = new QPushButton(tr("&OK"));
-	okButton->setDefault(true);
-	cancelButton = new QPushButton(tr("&Cancel"));
-
 	QGridLayout *grid = new QGridLayout;
 	grid->addWidget(nameLabel, 0, 0);
 	grid->addWidget(nameEdit, 0, 1);
@@ -52,23 +48,19 @@ DlgCreateToken::DlgCreateToken(QWidget *parent)
 	grid->addWidget(annotationLabel, 3, 0);
 	grid->addWidget(annotationEdit, 3, 1);
 	grid->addWidget(destroyCheckBox, 4, 0, 1, 2);
-
-	QHBoxLayout *buttonLayout = new QHBoxLayout;
-	buttonLayout->addStretch();
-	buttonLayout->addWidget(okButton);
-	buttonLayout->addWidget(cancelButton);
-
+	
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+	connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
+	connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+	
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addLayout(grid);
-	mainLayout->addLayout(buttonLayout);
+	mainLayout->addWidget(buttonBox);
 	setLayout(mainLayout);
 
 	setWindowTitle(tr("Create token"));
 	setFixedHeight(sizeHint().height());
 	setMinimumWidth(300);
-
-	connect(okButton, SIGNAL(clicked()), this, SLOT(actOk()));
-	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
 void DlgCreateToken::actOk()

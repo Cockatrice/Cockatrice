@@ -22,7 +22,6 @@ private:
 	QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel;
 	QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit;
 	QCheckBox *savePasswordCheckBox;
-	QPushButton *okButton, *cancelButton;
 };
 
 #endif

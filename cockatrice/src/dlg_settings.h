@@ -129,7 +129,6 @@ private:
 	QListWidget *contentsWidget;
 	QStackedWidget *pagesWidget;
 	QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *messagesButton;
-	QPushButton *closeButton;
 	void createIcons();
 	void retranslateUi();
 protected:
