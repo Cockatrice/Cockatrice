@@ -85,8 +85,14 @@ QVariant RemoteReplayList_TreeModel::data(const QModelIndex &index, int role) co
 		MatchNode *matchNode = dynamic_cast<MatchNode *>(static_cast<Node *>(index.internalPointer()));
 		const ServerInfo_ReplayMatch &matchInfo = matchNode->getMatchInfo();
 		switch (role) {
-			case Qt::TextAlignmentRole:
-				return index.column() == 0 ? Qt::AlignRight : Qt::AlignLeft;
+		case Qt::TextAlignmentRole:
+			switch (index.column()) {
+				case 0:
+				case 5:
+					return Qt::AlignRight;
+				default:
+					return Qt::AlignLeft;
+			}
 			case Qt::DisplayRole: {
 				switch (index.column()) {
 					case 0: return matchInfo.game_id();
@@ -119,7 +125,13 @@ QVariant RemoteReplayList_TreeModel::headerData(int section, Qt::Orientation ori
 		return QVariant();
 	switch (role) {
 		case Qt::TextAlignmentRole:
-			return section == 0 ? Qt::AlignRight : Qt::AlignLeft;
+			switch (section) {
+				case 0:
+				case 5:
+					return Qt::AlignRight;
+				default:
+					return Qt::AlignLeft;
+			}
 		case Qt::DisplayRole: {
 			switch (section) {
 				case 0: return tr("ID");
@@ -254,9 +266,9 @@ RemoteReplayList_TreeWidget::RemoteReplayList_TreeWidget(AbstractClient *_client
 	proxyModel->setDynamicSortFilter(true);
 	proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 	setModel(proxyModel);
-	connect(treeModel, SIGNAL(treeRefreshed()), this, SLOT(expandAll()));
 
 	header()->setResizeMode(QHeaderView::ResizeToContents);
+	header()->setStretchLastSection(false);
 	setUniformRowHeights(true);
 	setSortingEnabled(true);
 	proxyModel->sort(0, Qt::AscendingOrder);

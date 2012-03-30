@@ -75,13 +75,6 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &allGameTypes, QWidget *
 	hbox->addLayout(leftColumn);
 	hbox->addLayout(rightColumn);
 	
-	QPushButton *okButton = new QPushButton(tr("O&K"));
-	okButton->setDefault(true);
-	okButton->setAutoDefault(true);
-	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
-	QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
-	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-	
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
 	connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
