@@ -31,6 +31,8 @@ GameSelector::GameSelector(AbstractClient *_client, TabSupervisor *_tabSuperviso
 	gameListView->setRootIsDecorated(true);
 	if (_room)
 		gameListView->header()->hideSection(1);
+	else
+		gameListProxyModel->setUnavailableGamesVisible(true);
 	gameListView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
 
 	filterButton = new QPushButton;

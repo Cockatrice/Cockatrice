@@ -17,9 +17,11 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &allGameTypes, QWidget *
 	
 	QLabel *gameNameFilterLabel = new QLabel(tr("Game &description:"));
 	gameNameFilterEdit = new QLineEdit;
+	gameNameFilterLabel->setBuddy(gameNameFilterEdit);
 	
 	QLabel *creatorNameFilterLabel = new QLabel(tr("&Creator name:"));
 	creatorNameFilterEdit = new QLineEdit;
+	creatorNameFilterLabel->setBuddy(creatorNameFilterEdit);
 	
 	QVBoxLayout *gameTypeFilterLayout = new QVBoxLayout;
 	QMapIterator<int, QString> gameTypesIterator(allGameTypes);
