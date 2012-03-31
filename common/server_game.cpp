@@ -266,7 +266,7 @@ void Server_Game::removePlayer(Server_Player *player)
 	QMutexLocker locker(&gameMutex);
 	
 	players.remove(player->getPlayerId());
-	removeArrowsToPlayer(player);
+	removeArrowsRelatedToPlayer(player);
 	
 	sendGameEvent(new Event_Leave(player->getPlayerId()));
 	bool playerActive = activePlayer == player->getPlayerId();
@@ -299,11 +299,13 @@ void Server_Game::removePlayer(Server_Player *player)
 	room->broadcastGameListUpdate(this);
 }
 
-void Server_Game::removeArrowsToPlayer(Server_Player *player)
+void Server_Game::removeArrowsRelatedToPlayer(Server_Player *player)
 {
 	QMutexLocker locker(&gameMutex);
 	
 	// Remove all arrows of other players pointing to the player being removed or to one of his cards.
+	// Also remove all arrows starting at one of his cards. This is necessary since players can create
+	// arrows that start at another person's cards.
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	while (playerIterator.hasNext()) {
 		Server_Player *p = playerIterator.next().value();
@@ -315,7 +317,11 @@ void Server_Game::removeArrowsToPlayer(Server_Player *player)
 			if (targetCard) {
 				if (targetCard->getZone()->getPlayer() == player)
 					toDelete.append(a);
-			} else if ((static_cast<Server_Player *>(a->getTargetItem()) == player) || (a->getStartCard()->getZone()->getPlayer() == player))
+			} else if (static_cast<Server_Player *>(a->getTargetItem()) == player)
+				toDelete.append(a);
+			
+			// Don't use else here! It has to happen regardless of whether targetCard == 0.
+			if (a->getStartCard()->getZone()->getPlayer() == player)
 				toDelete.append(a);
 		}
 		for (int i = 0; i < toDelete.size(); ++i) {

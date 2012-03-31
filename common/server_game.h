@@ -82,7 +82,7 @@ public:
 	bool containsUser(const QString &userName) const;
 	Server_Player *addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate = true);
 	void removePlayer(Server_Player *player);
-	void removeArrowsToPlayer(Server_Player *player);
+	void removeArrowsRelatedToPlayer(Server_Player *player);
 	bool kickPlayer(int playerId);
 	void startGameIfReady();
 	void stopGameIfFinished();
