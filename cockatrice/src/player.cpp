@@ -23,6 +23,7 @@
 #include <QMenu>
 #include <QDebug>
 
+#include "pb/command_change_zone_properties.pb.h"
 #include "pb/command_reveal_cards.pb.h"
 #include "pb/command_shuffle.pb.h"
 #include "pb/command_attach_card.pb.h"
@@ -60,6 +61,7 @@
 #include "pb/event_attach_card.pb.h"
 #include "pb/event_draw_cards.pb.h"
 #include "pb/event_reveal_cards.pb.h"
+#include "pb/event_change_zone_properties.pb.h"
 
 PlayerArea::PlayerArea(QGraphicsItem *parentItem)
 	: QObject(), QGraphicsItem(parentItem)
@@ -186,6 +188,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 		connect(aViewLibrary, SIGNAL(triggered()), this, SLOT(actViewLibrary()));
 		aViewTopCards = new QAction(this);
 		connect(aViewTopCards, SIGNAL(triggered()), this, SLOT(actViewTopCards()));
+		aAlwaysRevealTopCard = new QAction(this);
+		aAlwaysRevealTopCard->setCheckable(true);
+		connect(aAlwaysRevealTopCard, SIGNAL(triggered()), this, SLOT(actAlwaysRevealTopCard()));
 	}
 
 	aViewGraveyard = new QAction(this);
@@ -242,6 +247,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 		libraryMenu->addSeparator();
 		playerLists.append(mRevealLibrary = libraryMenu->addMenu(QString()));
 		playerLists.append(mRevealTopCard = libraryMenu->addMenu(QString()));
+		libraryMenu->addAction(aAlwaysRevealTopCard);
 		libraryMenu->addSeparator();
 		libraryMenu->addAction(aMoveTopCardsToGrave);
 		libraryMenu->addAction(aMoveTopCardsToExile);
@@ -571,6 +577,7 @@ void Player::retranslateUi()
 		aViewTopCards->setText(tr("View &top cards of library..."));
 		mRevealLibrary->setTitle(tr("Reveal &library to"));
 		mRevealTopCard->setTitle(tr("Reveal t&op card to"));
+		aAlwaysRevealTopCard->setText(tr("&Always reveal top card"));
 		aViewSideboard->setText(tr("&View sideboard"));
 		aDrawCard->setText(tr("&Draw card"));
 		aDrawCards->setText(tr("D&raw cards..."));
@@ -729,6 +736,15 @@ void Player::actViewTopCards()
 		defaultNumberTopCards = number;
 		static_cast<GameScene *>(scene())->toggleZoneView(this, "deck", number);
 	}
+}
+
+void Player::actAlwaysRevealTopCard()
+{
+	Command_ChangeZoneProperties cmd;
+	cmd.set_zone_name("deck");
+	cmd.set_always_reveal_top_card(aAlwaysRevealTopCard->isChecked());
+	
+	sendGameCommand(cmd);
 }
 
 void Player::actViewGraveyard()
@@ -1291,6 +1307,18 @@ void Player::eventRevealCards(const Event_RevealCards &event)
 	}
 }
 
+void Player::eventChangeZoneProperties(const Event_ChangeZoneProperties &event)
+{
+	CardZone *zone = zones.value(QString::fromStdString(event.zone_name()));
+	if (!zone)
+		return;
+	
+	if (event.has_always_reveal_top_card()) {
+		zone->setAlwaysRevealTopCard(event.always_reveal_top_card());
+		emit logAlwaysRevealTopCard(this, zone, event.always_reveal_top_card());
+	}
+}
+
 void Player::processGameEvent(GameEvent::GameEventType type, const GameEvent &event, const GameEventContext &context)
 {
 	switch (type) {
@@ -1313,6 +1341,7 @@ void Player::processGameEvent(GameEvent::GameEventType type, const GameEvent &ev
 		case GameEvent::ATTACH_CARD: eventAttachCard(event.GetExtension(Event_AttachCard::ext)); break;
 		case GameEvent::DRAW_CARDS: eventDrawCards(event.GetExtension(Event_DrawCards::ext)); break;
 		case GameEvent::REVEAL_CARDS: eventRevealCards(event.GetExtension(Event_RevealCards::ext)); break;
+		case GameEvent::CHANGE_ZONE_PROPERTIES: eventChangeZoneProperties(event.GetExtension(Event_ChangeZoneProperties::ext)); break;
 		default: {
 			qDebug() << "unhandled game event";
 		}
@@ -1363,16 +1392,15 @@ void Player::processPlayerInfo(const ServerInfo_Player &info)
 				zone->addCard(card, false, cardInfo.x(), cardInfo.y());
 			}
 		}
+		if (zoneInfo.has_always_reveal_top_card())
+			zone->setAlwaysRevealTopCard(zoneInfo.always_reveal_top_card());
+		
 		zone->reorganizeCards();
 	}
 	
 	const int counterListSize = info.counter_list_size();
 	for (int i = 0; i < counterListSize; ++i)
 		addCounter(info.counter_list(i));
-	
-	const int arrowListSize = info.arrow_list_size();
-	for (int i = 0; i < arrowListSize; ++i)
-		addArrow(info.arrow_list(i));
 	
 	setConceded(info.properties().conceded());
 }
@@ -1399,6 +1427,10 @@ void Player::processCardAttachment(const ServerInfo_Player &info)
 			}
 		}
 	}
+	
+	const int arrowListSize = info.arrow_list_size();
+	for (int i = 0; i < arrowListSize; ++i)
+		addArrow(info.arrow_list(i));
 }
 
 void Player::playCard(CardItem *c, bool faceDown, bool tapped)

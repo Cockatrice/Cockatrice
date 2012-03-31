@@ -5,6 +5,7 @@ SET(PROTO_FILES
 	card_attributes.proto
 	color.proto
 	command_attach_card.proto
+	command_change_zone_properties.proto
 	command_concede.proto
 	command_create_arrow.proto
 	command_create_counter.proto
@@ -56,6 +57,7 @@ SET(PROTO_FILES
 	context_undo_draw.proto
 	event_add_to_list.proto
 	event_attach_card.proto
+	event_change_zone_properties.proto
 	event_connection_closed.proto
 	event_create_arrow.proto
 	event_create_counter.proto

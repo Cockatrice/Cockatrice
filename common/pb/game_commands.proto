@@ -31,6 +31,7 @@ message GameCommand {
 		SET_SIDEBOARD_PLAN = 1028;
 		DECK_SELECT = 1029;
 		SET_SIDEBOARD_LOCK = 1030;
+		CHANGE_ZONE_PROPERTIES = 1031;
 	}
 	extensions 100 to max;
 }

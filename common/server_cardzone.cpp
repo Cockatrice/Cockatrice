@@ -23,11 +23,15 @@
 #include "rng_abstract.h"
 #include <QSet>
 #include <QDebug>
-#include "server_game.h"
 #include "pb/command_move_card.pb.h"
 
 Server_CardZone::Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ServerInfo_Zone::ZoneType _type)
-	: player(_player), name(_name), has_coords(_has_coords), type(_type), cardsBeingLookedAt(0)
+	: player(_player),
+          name(_name),
+          has_coords(_has_coords),
+          type(_type),
+          cardsBeingLookedAt(0),
+          alwaysRevealTopCard(false)
 {
 }
 
@@ -214,4 +218,21 @@ void Server_CardZone::clear()
 void Server_CardZone::addWritePermission(int playerId)
 {
 	playersWithWritePermission.insert(playerId);
+}
+
+void Server_CardZone::getInfo(ServerInfo_Zone *info, Server_Player *playerWhosAsking, bool omniscient)
+{
+	info->set_name(name.toStdString());
+	info->set_type(type);
+	info->set_with_coords(has_coords);
+	info->set_card_count(cards.size());
+	info->set_always_reveal_top_card(alwaysRevealTopCard);
+	if (
+		(((playerWhosAsking == player) || omniscient) && (type != ServerInfo_Zone::HiddenZone))
+		|| ((playerWhosAsking != player) && (type == ServerInfo_Zone::PublicZone))
+	) {
+		QListIterator<Server_Card *> cardIterator(cards);
+		while (cardIterator.hasNext())
+			cardIterator.next()->getInfo(info->add_card_list());
+	}
 }

@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "server.h"
 #include "server_game.h"
+#include "server_player.h"
 #include "server_counter.h"
 #include "server_room.h"
 #include "server_protocolhandler.h"
@@ -358,7 +359,7 @@ void Server::externalGameCommandContainerReceived(const CommandContainer &cont, 
 		}
 		
 		QMutexLocker gameLocker(&game->gameMutex);
-		Server_Player *player = game->getPlayer(playerId);
+		Server_Player *player = game->getPlayers().value(playerId);
 		if (!player) {
 			qDebug() << "externalGameCommandContainerReceived: player id=" << playerId << "not found";
 			throw Response::RespNotInRoom;

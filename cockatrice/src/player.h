@@ -52,6 +52,7 @@ class Event_DestroyCard;
 class Event_AttachCard;
 class Event_DrawCards;
 class Event_RevealCards;
+class Event_ChangeZoneProperties;
 class PendingCommand;
 
 class PlayerArea : public QObject, public QGraphicsItem {
@@ -98,6 +99,7 @@ signals:
 	void logDumpZone(Player *player, CardZone *zone, int numberCards);
 	void logStopDumpZone(Player *player, CardZone *zone);
 	void logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer, bool faceDown);
+	void logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal);
 	
 	void sizeChanged();
 	void gameConceded();
@@ -117,6 +119,7 @@ public slots:
 
 	void actViewLibrary();
 	void actViewTopCards();
+	void actAlwaysRevealTopCard();
 	void actViewGraveyard();
 	void actViewRfg();
 	void actViewSideboard();
@@ -156,7 +159,7 @@ private:
 	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
 		*aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg,
 		*aMoveRfgToTopLibrary, *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave,
-		*aViewLibrary, *aViewTopCards, *aMoveTopCardsToGrave, *aMoveTopCardsToExile, *aMoveTopCardToBottom,
+		*aViewLibrary, *aViewTopCards, *aAlwaysRevealTopCard, *aMoveTopCardsToGrave, *aMoveTopCardsToExile, *aMoveTopCardToBottom,
 		*aViewGraveyard, *aViewRfg, *aViewSideboard,
                 *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle,
 		*aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,
@@ -221,6 +224,7 @@ private:
 	void eventAttachCard(const Event_AttachCard &event);
 	void eventDrawCards(const Event_DrawCards &event);
 	void eventRevealCards(const Event_RevealCards &event);
+	void eventChangeZoneProperties(const Event_ChangeZoneProperties &event);
 public:
 	static const int counterAreaWidth = 55;
 	enum CardMenuActionType { cmTap, cmUntap, cmDoesntUntap, cmFlip, cmPeek, cmClone, cmMoveToTopLibrary, cmMoveToBottomLibrary, cmMoveToGraveyard, cmMoveToExile };

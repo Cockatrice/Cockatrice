@@ -39,6 +39,7 @@ private:
 	ServerInfo_Zone::ZoneType type;
 	int cardsBeingLookedAt;
 	QSet<int> playersWithWritePermission;
+	bool alwaysRevealTopCard;
 public:
 	Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ServerInfo_Zone::ZoneType _type);
 	~Server_CardZone();
@@ -52,6 +53,7 @@ public:
 	ServerInfo_Zone::ZoneType getType() const { return type; }
 	QString getName() const { return name; }
 	Server_Player *getPlayer() const { return player; }
+	void getInfo(ServerInfo_Zone *info, Server_Player *playerWhosAsking, bool omniscient);
 	
 	int getFreeGridColumn(int x, int y, const QString &cardName) const;
 	bool isColumnEmpty(int x, int y) const;
@@ -64,6 +66,8 @@ public:
 	void clear();
 	void addWritePermission(int playerId);
 	const QSet<int> &getPlayersWithWritePermission() const { return playersWithWritePermission; }
+	bool getAlwaysRevealTopCard() const { return alwaysRevealTopCard; }
+	void setAlwaysRevealTopCard(bool _alwaysRevealTopCard) { alwaysRevealTopCard = _alwaysRevealTopCard; }
 };
 
 #endif

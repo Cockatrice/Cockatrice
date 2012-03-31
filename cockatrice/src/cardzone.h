@@ -25,6 +25,7 @@ protected:
 	bool hasCardAttr;
 	bool isShufflable;
 	bool isView;
+	bool alwaysRevealTopCard;
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 	virtual void addCardImpl(CardItem *card, int x, int y) = 0;
@@ -61,6 +62,8 @@ public:
 	virtual void reorganizeCards() = 0;
 	virtual QPointF closestGridPoint(const QPointF &point);
 	bool getIsView() const { return isView; }
+	bool getAlwaysRevealTopCard() const { return alwaysRevealTopCard; }
+	void setAlwaysRevealTopCard(bool _alwaysRevealTopCard) { alwaysRevealTopCard = _alwaysRevealTopCard; }
 };
 
 #endif

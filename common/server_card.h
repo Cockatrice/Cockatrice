@@ -26,6 +26,7 @@
 #include <QMap>
 
 class Server_CardZone;
+class ServerInfo_Card;
 
 class Server_Card : public Server_ArrowTarget {
 	Q_OBJECT
@@ -88,6 +89,8 @@ public:
 	
 	void resetState();
 	QString setAttribute(CardAttribute attribute, const QString &avalue, bool allCards);
+	
+	void getInfo(ServerInfo_Card *info);
 };
 
 #endif

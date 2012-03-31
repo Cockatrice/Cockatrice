@@ -18,6 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "server_card.h"
+#include "server_cardzone.h"
+#include "server_player.h"
+#include "pb/serverinfo_card.pb.h"
 
 Server_Card::Server_Card(QString _name, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone)
 	: zone(_zone), id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), tapped(false), attacking(false), facedown(false), color(QString()), power(-1), toughness(-1), annotation(QString()), destroyOnZoneChange(false), doesntUntap(false), parentCard(0)
@@ -114,4 +117,44 @@ void Server_Card::setParentCard(Server_Card *_parentCard)
 	parentCard = _parentCard;
 	if (parentCard)
 		parentCard->addAttachedCard(this);
+}
+
+void Server_Card::getInfo(ServerInfo_Card *info)
+{
+	QString displayedName = facedown ? QString() : name;
+	
+	info->set_id(id);
+	info->set_name(displayedName.toStdString());
+	info->set_x(coord_x);
+	info->set_y(coord_y);
+	if (facedown)
+		info->set_face_down(true);
+	info->set_tapped(tapped);
+	if (attacking)
+		info->set_attacking(true);
+	if (!color.isEmpty())
+		info->set_color(color.toStdString());
+	const QString ptStr = getPT();
+	if (!ptStr.isEmpty())
+		info->set_pt(ptStr.toStdString());
+	if (!annotation.isEmpty())
+		info->set_annotation(annotation.toStdString());
+	if (destroyOnZoneChange)
+		info->set_destroy_on_zone_change(true);
+	if (doesntUntap)
+		info->set_doesnt_untap(true);
+	
+	QMapIterator<int, int> cardCounterIterator(counters);
+	while (cardCounterIterator.hasNext()) {
+		cardCounterIterator.next();
+		ServerInfo_CardCounter *counterInfo = info->add_counter_list();
+		counterInfo->set_id(cardCounterIterator.key());
+		counterInfo->set_value(cardCounterIterator.value());
+	}
+
+	if (parentCard) {
+		info->set_attach_player_id(parentCard->getZone()->getPlayer()->getPlayerId());
+		info->set_attach_zone(parentCard->getZone()->getName().toStdString());
+		info->set_attach_card_id(parentCard->getId());
+	}
 }

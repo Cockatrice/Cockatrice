@@ -70,7 +70,7 @@ void Server_ProtocolHandler::prepareDestroy()
 			continue;
 		}
 		g->gameMutex.lock();
-		Server_Player *p = g->getPlayer(gameIterator.value().second);
+		Server_Player *p = g->getPlayers().value(gameIterator.value().second);
 		if (!p) {
 			g->gameMutex.unlock();
 			r->gamesMutex.unlock();
@@ -220,7 +220,7 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 	}
 	
 	QMutexLocker gameLocker(&game->gameMutex);
-	Server_Player *player = game->getPlayer(roomIdAndPlayerId.second);
+	Server_Player *player = game->getPlayers().value(roomIdAndPlayerId.second);
 	if (!player)
 		return Response::RespNotInRoom;
 	

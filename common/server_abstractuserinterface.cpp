@@ -8,6 +8,7 @@
 #include "server.h"
 #include "server_room.h"
 #include "server_game.h"
+#include "server_player.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_game_state_changed.pb.h"
 #include <google/protobuf/descriptor.h>

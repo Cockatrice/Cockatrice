@@ -760,6 +760,17 @@ void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId
 	}
 }
 
+void MessageLogWidget::logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal)
+{
+	QString str;
+	if (reveal)
+		str = tr("%1 is now keeping the top card %2 revealed.");
+	else
+		str = tr("%1 is not revealing the top card %2 any longer.");
+	
+	appendHtml(str.arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseGenitive)));
+}
+
 void MessageLogWidget::logSetActivePlayer(Player *player)
 {
 	soundEngine->notification();
@@ -844,6 +855,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
 	connect(player, SIGNAL(logDrawCards(Player *, int)), this, SLOT(logDrawCards(Player *, int)));
 	connect(player, SIGNAL(logUndoDraw(Player *, QString)), this, SLOT(logUndoDraw(Player *, QString)));
 	connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *, bool)), this, SLOT(logRevealCards(Player *, CardZone *, int, QString, Player *, bool)));
+	connect(player, SIGNAL(logAlwaysRevealTopCard(Player *, CardZone *, bool)), this, SLOT(logAlwaysRevealTopCard(Player *, CardZone *, bool)));
 }
 
 MessageLogWidget::MessageLogWidget(const QString &_ownName, bool _female, QWidget *parent)

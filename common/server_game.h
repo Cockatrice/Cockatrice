@@ -21,22 +21,26 @@
 #define SERVERGAME_H
 
 #include <QStringList>
-#include <QPointer>
 #include <QObject>
 #include <QMutex>
 #include <QSet>
 #include <QDateTime>
-#include "server_player.h"
+#include <QMap>
 #include "server_response_containers.h"
 #include "pb/response.pb.h"
-#include "pb/serverinfo_player.pb.h"
+//#include "pb/serverinfo_player.pb.h"
 #include "pb/serverinfo_game.pb.h"
 
 class QTimer;
 class GameEventContainer;
 class GameReplay;
 class Server_Room;
+class Server_Player;
 class ServerInfo_User;
+class ServerInfo_Player;
+class ServerInfo_Game;
+class Server_AbstractUserInterface;
+class Event_GameStateChanged;
 
 class Server_Game : public QObject {
 	Q_OBJECT
@@ -66,6 +70,9 @@ private:
 	QTimer *pingClock;
 	QList<GameReplay *> replayList;
 	GameReplay *currentReplay;
+	
+	void createGameStateChangedEvent(Event_GameStateChanged *event, Server_Player *playerWhosAsking, bool omniscient, bool withUserInfo);
+	void sendGameStateToPlayers();
 signals:
 	void sigStartGameIfReady();
 	void gameInfoChanged(ServerInfo_Game gameInfo);
@@ -84,7 +91,6 @@ public:
 	int getPlayerCount() const;
 	int getSpectatorCount() const;
 	const QMap<int, Server_Player *> &getPlayers() const { return players; }
-	Server_Player *getPlayer(int playerId) const { return players.value(playerId, 0); }
 	int getGameId() const { return gameId; }
 	QString getDescription() const { return description; }
 	QString getPassword() const { return password; }
@@ -110,8 +116,6 @@ public:
 	int getSecondsElapsed() const { return secondsElapsed; }
 
 	void createGameJoinedEvent(Server_Player *player, ResponseContainer &rc, bool resuming);
-	void sendGameStateToPlayers();
-	QList<ServerInfo_Player> getGameState(Server_Player *playerWhosAsking, bool omniscient = false, bool withUserInfo = false) const;
 	
 	GameEventContainer *prepareGameEvent(const ::google::protobuf::Message &gameEvent, int playerId, GameEventContext *context = 0);
 	GameEventContext prepareGameEventContext(const ::google::protobuf::Message &gameEventContext);

@@ -23,6 +23,8 @@
 #include <QString>
 #include "pb/color.pb.h"
 
+class ServerInfo_Counter;
+
 class Server_Counter {
 protected:
 	int id;
@@ -31,7 +33,7 @@ protected:
 	int radius;
 	int count;
 public:
-	Server_Counter(int _id, const QString &_name, const color &_counterColor, int _radius, int _count = 0) : id(_id), name(_name), counterColor(_counterColor), radius(_radius), count(_count) { }
+	Server_Counter(int _id, const QString &_name, const color &_counterColor, int _radius, int _count = 0);
 	~Server_Counter() { }
 	int getId() const { return id; }
 	QString getName() const { return name; }
@@ -39,6 +41,8 @@ public:
 	int getRadius() const { return radius; }
 	int getCount() const { return count; }
 	void setCount(int _count) { count = _count; }
+	
+	void getInfo(ServerInfo_Counter *info);
 };
 
 #endif

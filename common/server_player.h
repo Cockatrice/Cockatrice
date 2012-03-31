@@ -18,6 +18,7 @@ class Server_Arrow;
 class Server_Card;
 class Server_AbstractUserInterface;
 class ServerInfo_User;
+class ServerInfo_Player;
 class ServerInfo_PlayerProperties;
 class CommandContainer;
 class CardToMove;
@@ -57,6 +58,7 @@ class Command_MoveCard;
 class Command_SetSideboardPlan;
 class Command_DeckSelect;
 class Command_SetSideboardLock;
+class Command_ChangeZoneProperties;
 
 class Server_Player : public Server_ArrowTarget {
 	Q_OBJECT
@@ -118,7 +120,6 @@ public:
 	void setupZones();
 
 	Response::ResponseCode drawCards(GameEventStorage &ges, int number);
-	Response::ResponseCode undoDraw(GameEventStorage &ges);
 	Response::ResponseCode moveCard(GameEventStorage &ges, Server_CardZone *startzone, const QList<const CardToMove *> &_cards, Server_CardZone *targetzone, int x, int y, bool fixFreeSpaces = true, bool undoingDraw = false);
 	void unattachCard(GameEventStorage &ges, Server_Card *card);
 	Response::ResponseCode setCardAttrHelper(GameEventStorage &ges, const QString &zone, int cardId, CardAttribute attribute, const QString &attrValue);
@@ -154,9 +155,12 @@ public:
 	Response::ResponseCode cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, GameEventStorage &ges);
 	Response::ResponseCode cmdStopDumpZone(const Command_StopDumpZone &cmd, ResponseContainer &rc, GameEventStorage &ges);
 	Response::ResponseCode cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer &rc, GameEventStorage &ges);
+	Response::ResponseCode cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd, ResponseContainer &rc, GameEventStorage &ges);
 	
 	Response::ResponseCode processGameCommand(const GameCommand &command, ResponseContainer &rc, GameEventStorage &ges);
 	void sendGameEvent(const GameEventContainer &event);
+	
+	void getInfo(ServerInfo_Player *info, Server_Player *playerWhosAsking, bool omniscient, bool withUserInfo);
 };
 
 #endif

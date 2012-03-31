@@ -20,11 +20,11 @@
 #include "server.h"
 #include "server_room.h"
 #include "server_game.h"
+#include "server_player.h"
 #include "server_protocolhandler.h"
 #include "server_arrow.h"
 #include "server_card.h"
 #include "server_cardzone.h"
-#include "server_counter.h"
 #include "decklist.h"
 #include "pb/context_connection_state_changed.pb.h"
 #include "pb/context_ping_changed.pb.h"
@@ -186,23 +186,26 @@ int Server_Game::getSpectatorCount() const
 	return result;
 }
 
+void Server_Game::createGameStateChangedEvent(Event_GameStateChanged *event, Server_Player *playerWhosAsking, bool omniscient, bool withUserInfo)
+{
+	event->set_seconds_elapsed(secondsElapsed);
+	if (gameStarted) {
+		event->set_game_started(true);
+		event->set_active_player_id(0);
+		event->set_active_phase(0);
+	} else
+		event->set_game_started(false);
+	
+	QMapIterator<int, Server_Player *> playerIterator(players);
+	while (playerIterator.hasNext())
+		playerIterator.next().value()->getInfo(event->add_player_list(), playerWhosAsking, omniscient, withUserInfo);
+}
+
 void Server_Game::sendGameStateToPlayers()
 {
-	// Prepare game state information that everyone can see
-	Event_GameStateChanged gameStateChangedEvent;
-	gameStateChangedEvent.set_seconds_elapsed(secondsElapsed);
-	if (gameStarted) {
-		gameStateChangedEvent.set_game_started(true);
-		gameStateChangedEvent.set_active_player_id(0);
-		gameStateChangedEvent.set_active_phase(0);
-	} else
-		gameStateChangedEvent.set_game_started(false);
-	
 	// game state information for replay and omniscient spectators
-	Event_GameStateChanged omniscientEvent(gameStateChangedEvent);
-	QListIterator<ServerInfo_Player> omniscientGameStateIterator(getGameState(0, true));
-	while (omniscientGameStateIterator.hasNext())
-		omniscientEvent.add_player_list()->CopyFrom(omniscientGameStateIterator.next());
+	Event_GameStateChanged omniscientEvent;
+	createGameStateChangedEvent(&omniscientEvent, 0, true, false);
 	
 	GameEventContainer *replayCont = prepareGameEvent(omniscientEvent, -1);
 	replayCont->set_seconds_elapsed(secondsElapsed - startTimeOfThisGame);
@@ -210,14 +213,13 @@ void Server_Game::sendGameStateToPlayers()
 	currentReplay->add_event_list()->CopyFrom(*replayCont);
 	delete replayCont;
 	
-	// If spectators are not omniscient, we need an additional getGameState call, otherwise we can use the data we used for the replay.
-	// All spectators are equal, so we don't need to make a getGameState call for each one.
-	Event_GameStateChanged spectatorEvent(spectatorsSeeEverything ? omniscientEvent : gameStateChangedEvent);
-	if (!spectatorsSeeEverything) {
-		QListIterator<ServerInfo_Player> spectatorGameStateIterator(getGameState(0, false));
-		while (spectatorGameStateIterator.hasNext())
-			spectatorEvent.add_player_list()->CopyFrom(spectatorGameStateIterator.next());
-	}
+	// If spectators are not omniscient, we need an additional createGameStateChangedEvent call, otherwise we can use the data we used for the replay.
+	// All spectators are equal, so we don't need to make a createGameStateChangedEvent call for each one.
+	Event_GameStateChanged spectatorEvent;
+	if (spectatorsSeeEverything)
+		spectatorEvent = omniscientEvent;
+	else
+		createGameStateChangedEvent(&spectatorEvent, 0, false, false);
 	
 	// send game state info to clients according to their role in the game
 	QMapIterator<int, Server_Player *> playerIterator(players);
@@ -227,10 +229,8 @@ void Server_Game::sendGameStateToPlayers()
 		if (player->getSpectator())
 			gec = prepareGameEvent(spectatorEvent, -1);
 		else {
-			Event_GameStateChanged event(gameStateChangedEvent);
-			QListIterator<ServerInfo_Player> gameStateIterator(getGameState(player));
-			while (gameStateIterator.hasNext())
-				event.add_player_list()->CopyFrom(gameStateIterator.next());
+			Event_GameStateChanged event;
+			createGameStateChangedEvent(&event, player, false, false);
 			
 			gec = prepareGameEvent(event, -1);
 		}
@@ -274,9 +274,7 @@ void Server_Game::doStartGameIfReady()
 		getInfo(*currentReplay->mutable_game_info());
 		
 		Event_GameStateChanged omniscientEvent;
-		QListIterator<ServerInfo_Player> omniscientGameStateIterator(getGameState(0, true, true));
-		while (omniscientGameStateIterator.hasNext())
-			omniscientEvent.add_player_list()->CopyFrom(omniscientGameStateIterator.next());
+		createGameStateChangedEvent(&omniscientEvent, 0, true, true);
 		
 		GameEventContainer *replayCont = prepareGameEvent(omniscientEvent, -1);
 		replayCont->set_seconds_elapsed(0);
@@ -577,113 +575,6 @@ void Server_Game::nextTurn()
 	setActivePlayer(keys[listPos]);
 }
 
-QList<ServerInfo_Player> Server_Game::getGameState(Server_Player *playerWhosAsking, bool omniscient, bool withUserInfo) const
-{
-	QMutexLocker locker(&gameMutex);
-	
-	QList<ServerInfo_Player> result;
-	QMapIterator<int, Server_Player *> playerIterator(players);
-	while (playerIterator.hasNext()) {
-		Server_Player *player = playerIterator.next().value();
-		
-		ServerInfo_Player playerInfo;
-		playerInfo.mutable_properties()->CopyFrom(player->getProperties(withUserInfo));
-		if (player == playerWhosAsking)
-			if (player->getDeck())
-				playerInfo.set_deck_list(player->getDeck()->writeToString_Native().toStdString());
-		
-		QList<ServerInfo_Arrow *> arrowList;
-		QMapIterator<int, Server_Arrow *> arrowIterator(player->getArrows());
-		while (arrowIterator.hasNext()) {
-			Server_Arrow *arrow = arrowIterator.next().value();
-			Server_Card *targetCard = qobject_cast<Server_Card *>(arrow->getTargetItem());
-			ServerInfo_Arrow *arrowInfo = playerInfo.add_arrow_list();
-			arrowInfo->set_id(arrow->getId());
-			arrowInfo->set_start_player_id(arrow->getStartCard()->getZone()->getPlayer()->getPlayerId());
-			arrowInfo->set_start_zone(arrow->getStartCard()->getZone()->getName().toStdString());
-			arrowInfo->set_start_card_id(arrow->getStartCard()->getId());
-			arrowInfo->mutable_arrow_color()->CopyFrom(arrow->getColor());
-			if (targetCard) {
-				arrowInfo->set_target_player_id(targetCard->getZone()->getPlayer()->getPlayerId());
-				arrowInfo->set_target_zone(targetCard->getZone()->getName().toStdString());
-				arrowInfo->set_target_card_id(targetCard->getId());
-			} else
-				arrowInfo->set_target_player_id(qobject_cast<Server_Player *>(arrow->getTargetItem())->getPlayerId());
-		}
-		
-		QMapIterator<int, Server_Counter *> counterIterator(player->getCounters());
-		while (counterIterator.hasNext()) {
-			Server_Counter *counter = counterIterator.next().value();
-			ServerInfo_Counter *counterInfo = playerInfo.add_counter_list();
-			counterInfo->set_id(counter->getId());
-			counterInfo->set_name(counter->getName().toStdString());
-			counterInfo->mutable_counter_color()->CopyFrom(counter->getColor());
-			counterInfo->set_radius(counter->getRadius());
-			counterInfo->set_count(counter->getCount());
-		}
-
-		QList<ServerInfo_Zone *> zoneList;
-		QMapIterator<QString, Server_CardZone *> zoneIterator(player->getZones());
-		while (zoneIterator.hasNext()) {
-			Server_CardZone *zone = zoneIterator.next().value();
-			ServerInfo_Zone *zoneInfo = playerInfo.add_zone_list();
-			zoneInfo->set_name(zone->getName().toStdString());
-			zoneInfo->set_type(zone->getType());
-			zoneInfo->set_with_coords(zone->hasCoords());
-			zoneInfo->set_card_count(zone->cards.size());
-			if (
-				(((playerWhosAsking == player) || omniscient) && (zone->getType() != ServerInfo_Zone::HiddenZone))
-				|| ((playerWhosAsking != player) && (zone->getType() == ServerInfo_Zone::PublicZone))
-			) {
-				QListIterator<Server_Card *> cardIterator(zone->cards);
-				while (cardIterator.hasNext()) {
-					Server_Card *card = cardIterator.next();
-					ServerInfo_Card *cardInfo = zoneInfo->add_card_list();
-					QString displayedName = card->getFaceDown() ? QString() : card->getName();
-					
-					cardInfo->set_id(card->getId());
-					cardInfo->set_name(displayedName.toStdString());
-					cardInfo->set_x(card->getX());
-					cardInfo->set_y(card->getY());
-					if (card->getFaceDown())
-						cardInfo->set_face_down(true);
-					cardInfo->set_tapped(card->getTapped());
-					if (card->getAttacking())
-						cardInfo->set_attacking(true);
-					if (!card->getColor().isEmpty())
-						cardInfo->set_color(card->getColor().toStdString());
-					if (!card->getPT().isEmpty())
-						cardInfo->set_pt(card->getPT().toStdString());
-					if (!card->getAnnotation().isEmpty())
-						cardInfo->set_annotation(card->getAnnotation().toStdString());
-					if (card->getDestroyOnZoneChange())
-						cardInfo->set_destroy_on_zone_change(true);
-					if (card->getDoesntUntap())
-						cardInfo->set_doesnt_untap(true);
-					
-					QList<ServerInfo_CardCounter *> cardCounterList;
-					QMapIterator<int, int> cardCounterIterator(card->getCounters());
-					while (cardCounterIterator.hasNext()) {
-						cardCounterIterator.next();
-						ServerInfo_CardCounter *counterInfo = cardInfo->add_counter_list();
-						counterInfo->set_id(cardCounterIterator.key());
-						counterInfo->set_value(cardCounterIterator.value());
-					}
-		
-					if (card->getParentCard()) {
-						cardInfo->set_attach_player_id(card->getParentCard()->getZone()->getPlayer()->getPlayerId());
-						cardInfo->set_attach_zone(card->getParentCard()->getZone()->getName().toStdString());
-						cardInfo->set_attach_card_id(card->getParentCard()->getId());
-					}
-				}
-			}
-		}
-		
-		result.append(playerInfo);
-	}
-	return result;
-}
-
 void Server_Game::createGameJoinedEvent(Server_Player *player, ResponseContainer &rc, bool resuming)
 {
 	Event_GameJoined event1;
@@ -703,13 +594,15 @@ void Server_Game::createGameJoinedEvent(Server_Player *player, ResponseContainer
 	rc.enqueuePostResponseItem(ServerMessage::SESSION_EVENT, Server_AbstractUserInterface::prepareSessionEvent(event1));
 	
 	Event_GameStateChanged event2;
-	QListIterator<ServerInfo_Player> gameStateIterator(getGameState(player, player->getSpectator() && spectatorsSeeEverything, true));
-	while (gameStateIterator.hasNext())
-		event2.add_player_list()->CopyFrom(gameStateIterator.next());
 	event2.set_seconds_elapsed(secondsElapsed);
 	event2.set_game_started(gameStarted);
 	event2.set_active_player_id(activePlayer);
 	event2.set_active_phase(activePhase);
+	
+	QMapIterator<int, Server_Player *> playerIterator(players);
+	while (playerIterator.hasNext())
+		playerIterator.next().value()->getInfo(event2.add_player_list(), player, player->getSpectator() && spectatorsSeeEverything, true);
+
 	rc.enqueuePostResponseItem(ServerMessage::GAME_EVENT_CONTAINER, prepareGameEvent(event2, -1));
 }
 

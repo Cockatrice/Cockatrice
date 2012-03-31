@@ -9,8 +9,10 @@ SET(common_SOURCES
 	rng_sfmt.cpp
 	server.cpp
 	server_abstractuserinterface.cpp
+	server_arrow.cpp
 	server_card.cpp
 	server_cardzone.cpp
+	server_counter.cpp
 	server_game.cpp
 	server_player.cpp
 	server_protocolhandler.cpp
