@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QCheckBox>
 #include <QLabel>
+#include <QToolButton>
 #include <QSplitter>
 #include "tab_supervisor.h"
 #include "tab_room.h"
@@ -15,6 +16,7 @@
 #include "abstractclient.h"
 #include "chatview.h"
 #include "gameselector.h"
+#include "settingscache.h"
 
 #include "get_pb_extension.h"
 #include "pb/room_commands.pb.h"
@@ -46,9 +48,20 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
 	sayLabel->setBuddy(sayEdit);
 	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
 	
+	QMenu *chatSettingsMenu = new QMenu(this);
+	aIgnoreUnregisteredUsers = chatSettingsMenu->addAction(QString());
+	aIgnoreUnregisteredUsers->setCheckable(true);
+	connect(aIgnoreUnregisteredUsers, SIGNAL(triggered()), this, SLOT(actIgnoreUnregisteredUsers()));
+	connect(settingsCache, SIGNAL(ignoreUnregisteredUsersChanged()), this, SLOT(ignoreUnregisteredUsersChanged()));	
+	QToolButton *chatSettingsButton = new QToolButton;
+	chatSettingsButton->setIcon(QIcon(":/resources/icon_settings.svg"));
+	chatSettingsButton->setMenu(chatSettingsMenu);
+	chatSettingsButton->setPopupMode(QToolButton::InstantPopup);
+	
 	QHBoxLayout *sayHbox = new QHBoxLayout;
 	sayHbox->addWidget(sayLabel);
 	sayHbox->addWidget(sayEdit);
+	sayHbox->addWidget(chatSettingsButton);
 	
 	QVBoxLayout *chatVbox = new QVBoxLayout;
 	chatVbox->addWidget(chatView);
@@ -96,6 +109,7 @@ void TabRoom::retranslateUi()
 	chatGroupBox->setTitle(tr("Chat"));
 	tabMenu->setTitle(tr("&Room"));
 	aLeaveRoom->setText(tr("&Leave room"));
+	aIgnoreUnregisteredUsers->setText(tr("&Ignore unregistered users in chat"));
 }
 
 void TabRoom::closeRequest()
@@ -137,6 +151,16 @@ void TabRoom::actLeaveRoom()
 	deleteLater();
 }
 
+void TabRoom::actIgnoreUnregisteredUsers()
+{
+	settingsCache->setIgnoreUnregisteredUsers(!settingsCache->getIgnoreUnregisteredUsers());
+}
+
+void TabRoom::ignoreUnregisteredUsersChanged()
+{
+	aIgnoreUnregisteredUsers->setChecked(settingsCache->getIgnoreUnregisteredUsers());
+}
+
 void TabRoom::processRoomEvent(const RoomEvent &event)
 {
 	switch (static_cast<RoomEvent::RoomEventType>(getPbExtension(event))) {
@@ -168,8 +192,24 @@ void TabRoom::processLeaveRoomEvent(const Event_LeaveRoom &event)
 
 void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
 {
-	if (!tabSupervisor->getUserListsTab()->getIgnoreList()->userInList(QString::fromStdString(event.name())))
-		chatView->appendMessage(QString::fromStdString(event.name()), QString::fromStdString(event.message()));
+	QString senderName = QString::fromStdString(event.name());
+	if (tabSupervisor->getUserListsTab()->getIgnoreList()->getUsers().contains(senderName))
+		return;
+	UserListTWI *twi = userList->getUsers().value(senderName);
+	QColor senderColor;
+	if (twi && (senderName != QString::fromStdString(ownUser->name()))) {
+		ServerInfo_User::UserLevelFlags userLevel = static_cast<ServerInfo_User::UserLevelFlags>(twi->getUserLevel());
+		if (userLevel & ServerInfo_User::IsModerator)
+			senderColor = Qt::darkMagenta;
+		else if (userLevel & ServerInfo_User::IsRegistered)
+			senderColor = Qt::darkGreen;
+		else {
+			if (settingsCache->getIgnoreUnregisteredUsers())
+				return;
+			senderColor = QColor(0, 0, 254);
+		}
+	}
+	chatView->appendMessage(QString::fromStdString(event.name()), QString::fromStdString(event.message()), senderColor);
 	emit userEvent(false);
 }
 

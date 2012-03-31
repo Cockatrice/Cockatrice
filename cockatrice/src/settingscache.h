@@ -23,6 +23,7 @@ signals:
 	void invertVerticalCoordinateChanged();
 	void minPlayersForMultiColumnLayoutChanged();
 	void soundPathChanged();
+	void ignoreUnregisteredUsersChanged();
 private:
 	QSettings *settings;
 	
@@ -42,6 +43,7 @@ private:
 	bool soundEnabled;
 	QString soundPath;
 	bool priceTagFeature;
+	bool ignoreUnregisteredUsers;
 public:
 	SettingsCache();
 	QString getCustomTranslationFile() const { return customTranslationFile; }
@@ -69,6 +71,7 @@ public:
 	bool getSoundEnabled() const { return soundEnabled; }
 	QString getSoundPath() const { return soundPath; }
 	bool getPriceTagFeature() const { return priceTagFeature; }
+	bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
 public slots:
 	void setCustomTranslationFile(const QString &_customTranslationFile);
 	void setLang(const QString &_lang);
@@ -95,6 +98,7 @@ public slots:
 	void setSoundEnabled(int _soundEnabled);
 	void setSoundPath(const QString &_soundPath);
 	void setPriceTagFeature(int _priceTagFeature);
+	void setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers);
 };
 
 extern SettingsCache *settingsCache;

@@ -123,7 +123,7 @@ void TabUserLists::ignoreListReceived(const QList<ServerInfo_User> &_ignoreList)
 void TabUserLists::processAddToListEvent(const Event_AddToList &event)
 {
 	const ServerInfo_User &info = event.user_info();
-	bool online = allUsersList->userInList(QString::fromStdString(info.name()));
+	bool online = allUsersList->getUsers().contains(QString::fromStdString(info.name()));
 	QString list = QString::fromStdString(event.list_name());
 	UserList *userList = 0;
 	if (list == "buddy")

@@ -174,6 +174,16 @@ UserListTWI::UserListTWI()
 {
 }
 
+QString UserListTWI::getUserName() const
+{
+	return data(2, Qt::UserRole).toString();
+}
+
+int UserListTWI::getUserLevel() const
+{
+	return data(0, Qt::UserRole).toInt();
+}
+
 bool UserListTWI::operator<(const QTreeWidgetItem &other) const
 {
 	// Sort by online/offline
@@ -224,16 +234,11 @@ void UserList::retranslateUi()
 
 void UserList::processUserInfo(const ServerInfo_User &user, bool online)
 {
-	QTreeWidgetItem *item = 0;
-	for (int i = 0; i < userTree->topLevelItemCount(); ++i) {
-		QTreeWidgetItem *temp = userTree->topLevelItem(i);
-		if (temp->data(2, Qt::UserRole) == QString::fromStdString(user.name())) {
-			item = temp;
-			break;
-		}
-	}
+	const QString userName = QString::fromStdString(user.name());
+	UserListTWI *item = users.value(userName);
 	if (!item) {
 		item = new UserListTWI;
+		users.insert(userName, item);
 		userTree->addTopLevelItem(item);
 		if (online)
 			++onlineCount;
@@ -254,15 +259,16 @@ void UserList::processUserInfo(const ServerInfo_User &user, bool online)
 
 bool UserList::deleteUser(const QString &userName)
 {
-	for (int i = 0; i < userTree->topLevelItemCount(); ++i)
-		if (userTree->topLevelItem(i)->data(2, Qt::UserRole) == userName) {
-			QTreeWidgetItem *item = userTree->takeTopLevelItem(i);
-			if (item->data(0, Qt::UserRole + 1).toBool())
-				--onlineCount;
-			delete item;
-			updateCount();
-			return true;
-		}
+	UserListTWI *twi = users.value(userName);
+	if (twi) {
+		users.remove(userName);
+		userTree->takeTopLevelItem(userTree->indexOfTopLevelItem(twi));
+		if (twi->data(0, Qt::UserRole + 1).toBool())
+			--onlineCount;
+		delete twi;
+		updateCount();
+		return true;
+	}
 	
 	return false;
 }
@@ -283,13 +289,9 @@ void UserList::setUserOnline(QTreeWidgetItem *item, bool online)
 
 void UserList::setUserOnline(const QString &userName, bool online)
 {
-	for (int i = 0; i < userTree->topLevelItemCount(); ++i) {
-		QTreeWidgetItem *item = userTree->topLevelItem(i);
-		if (item->data(2, Qt::UserRole) == userName) {
-			setUserOnline(item, online);
-			break;
-		}
-	}
+	UserListTWI *twi = users.value(userName);
+	if (twi)
+		setUserOnline(twi, online);
 }
 
 void UserList::updateCount()
@@ -361,8 +363,9 @@ void UserList::banUser_dialogFinished()
 
 void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 {
-	const QString &userName = index.sibling(index.row(), 2).data(Qt::UserRole).toString();
-	ServerInfo_User::UserLevelFlags userLevel = static_cast<ServerInfo_User::UserLevelFlags>(index.sibling(index.row(), 0).data(Qt::UserRole).toInt());
+	UserListTWI *twi = static_cast<UserListTWI *>(userTree->topLevelItem(index.row()));
+	const QString &userName = twi->getUserName();
+	ServerInfo_User::UserLevelFlags userLevel = static_cast<ServerInfo_User::UserLevelFlags>(twi->getUserLevel());
 	
 	QAction *aUserName = new QAction(userName, this);
 	aUserName->setEnabled(false);
@@ -383,11 +386,11 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	menu->addAction(aChat);
 	if ((userLevel & ServerInfo_User::IsRegistered) && (tabSupervisor->getUserLevel() & ServerInfo_User::IsRegistered)) {
 		menu->addSeparator();
-		if (tabSupervisor->getUserListsTab()->getBuddyList()->userInList(userName))
+		if (tabSupervisor->getUserListsTab()->getBuddyList()->getUsers().contains(userName))
 			menu->addAction(aRemoveFromBuddyList);
 		else
 			menu->addAction(aAddToBuddyList);
-		if (tabSupervisor->getUserListsTab()->getIgnoreList()->userInList(userName))
+		if (tabSupervisor->getUserListsTab()->getIgnoreList()->getUsers().contains(userName))
 			menu->addAction(aRemoveFromIgnoreList);
 		else
 			menu->addAction(aAddToIgnoreList);
@@ -463,14 +466,6 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 	delete aAddToIgnoreList;
 	delete aRemoveFromIgnoreList;
 	delete aBan;
-}
-
-bool UserList::userInList(const QString &userName) const
-{
-	for (int i = 0; i < userTree->topLevelItemCount(); ++i)
-		if (userTree->topLevelItem(i)->data(2, Qt::UserRole) == userName)
-			return true;
-	return false;
 }
 
 void UserList::sortItems()

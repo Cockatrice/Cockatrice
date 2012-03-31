@@ -42,14 +42,17 @@ private:
 	QGroupBox *chatGroupBox;
 
 	QAction *aLeaveRoom;
+	QAction *aIgnoreUnregisteredUsers;
 	QString sanitizeHtml(QString dirty) const;
 signals:
 	void roomClosing(TabRoom *tab);
 	void openMessageDialog(const QString &userName, bool focus);
 private slots:
 	void sendMessage();
-	void actLeaveRoom();
 	void sayFinished(const Response &response);
+	void actLeaveRoom();
+	void actIgnoreUnregisteredUsers();
+	void ignoreUnregisteredUsersChanged();
 	
 	void processListGamesEvent(const Event_ListGames &event);
 	void processJoinRoomEvent(const Event_JoinRoom &event);

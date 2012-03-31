@@ -36,6 +36,8 @@ SettingsCache::SettingsCache()
 	soundPath = settings->value("sound/path").toString();
 	
 	priceTagFeature = settings->value("deckeditor/pricetags", false).toBool();
+	
+	ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
 }
 
 void SettingsCache::setCustomTranslationFile(const QString &_customTranslationFile)
@@ -201,4 +203,11 @@ void SettingsCache::setPriceTagFeature(int _priceTagFeature)
 {
 	priceTagFeature = _priceTagFeature;
 	settings->setValue("deckeditor/pricetags", priceTagFeature);
+}
+
+void SettingsCache::setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers)
+{
+	ignoreUnregisteredUsers = _ignoreUnregisteredUsers;
+	settings->setValue("chat/ignore_unregistered", ignoreUnregisteredUsers);
+	emit ignoreUnregisteredUsersChanged();
 }

@@ -48,6 +48,8 @@ public:
 class UserListTWI : public QTreeWidgetItem {
 public:
 	UserListTWI();
+	QString getUserName() const;
+	int getUserLevel() const;
 	bool operator<(const QTreeWidgetItem &other) const;
 };
 
@@ -56,6 +58,7 @@ class UserList : public QGroupBox {
 public:
 	enum UserListType { AllUsersList, RoomList, BuddyList, IgnoreList };
 private:
+	QMap<QString, UserListTWI *> users;
 	TabSupervisor *tabSupervisor;
 	AbstractClient *client;
 	UserListType type;
@@ -82,7 +85,7 @@ public:
 	void processUserInfo(const ServerInfo_User &user, bool online);
 	bool deleteUser(const QString &userName);
 	void setUserOnline(const QString &userName, bool online);
-	bool userInList(const QString &userName) const;
+	const QMap<QString, UserListTWI *> &getUsers() const { return users; }
 	void showContextMenu(const QPoint &pos, const QModelIndex &index);
 	void sortItems();
 };

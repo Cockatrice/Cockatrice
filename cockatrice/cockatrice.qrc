@@ -21,6 +21,7 @@
         <file>resources/phases/icon_phase_main2.svg</file>
         <file>resources/phases/icon_phase_cleanup.svg</file>
         <file>resources/phases/icon_phase_nextturn.svg</file>
+	<file>resources/icon_settings.svg</file>
 	<file>resources/hand.svg</file>
 	<file>resources/pencil.svg</file>
 	<file>resources/icon_search.svg</file>

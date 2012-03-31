@@ -183,11 +183,11 @@ void PlayerListWidget::showContextMenu(const QPoint &pos, const QModelIndex &ind
 	menu->addAction(aChat);
 	if ((userLevel & ServerInfo_User::IsRegistered) && (tabSupervisor->getUserLevel() & ServerInfo_User::IsRegistered)) {
 		menu->addSeparator();
-		if (tabSupervisor->getUserListsTab()->getBuddyList()->userInList(userName))
+		if (tabSupervisor->getUserListsTab()->getBuddyList()->getUsers().contains(userName))
 			menu->addAction(aRemoveFromBuddyList);
 		else
 			menu->addAction(aAddToBuddyList);
-		if (tabSupervisor->getUserListsTab()->getIgnoreList()->userInList(userName))
+		if (tabSupervisor->getUserListsTab()->getIgnoreList()->getUsers().contains(userName))
 			menu->addAction(aRemoveFromIgnoreList);
 		else
 			menu->addAction(aAddToIgnoreList);
