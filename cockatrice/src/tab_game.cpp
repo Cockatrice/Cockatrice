@@ -384,7 +384,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	hostId(event.host_id()),
 	localPlayerId(event.player_id()),
 	spectator(event.spectator()),
-	gameStateKnown(true),
+	gameStateKnown(false),
 	resuming(event.resuming()),
 	currentPhase(-1),
 	activeCard(0),

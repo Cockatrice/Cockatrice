@@ -101,7 +101,7 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
 		player->setData(2, Qt::UserRole, prop.conceded());
 	if (prop.has_ready_start())
 		player->setData(2, Qt::UserRole + 1, prop.ready_start());
-	if (prop.has_conceded() && prop.has_ready_start())
+	if (prop.has_conceded() || prop.has_ready_start())
 		player->setIcon(2, gameStarted ? (prop.conceded() ? concededIcon : QIcon()) : (prop.ready_start() ? readyIcon : notReadyIcon));
 	if (prop.has_user_info()) {
 		player->setData(3, Qt::UserRole, prop.user_info().user_level());
