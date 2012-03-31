@@ -306,6 +306,15 @@ Response::ResponseCode Server_Player::drawCards(GameEventStorage &ges, int numbe
 	ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
 	ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
 	
+	if (deckZone->getAlwaysRevealTopCard() && !deckZone->cards.isEmpty()) {
+		Event_RevealCards revealEvent;
+		revealEvent.set_zone_name(deckZone->getName().toStdString());
+		revealEvent.set_card_id(0);
+		deckZone->cards.first()->getInfo(revealEvent.add_cards());
+		
+		ges.enqueueGameEvent(revealEvent, playerId);
+	}
+	
 	return Response::RespOk;
 }
 
@@ -411,6 +420,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 			}
 		}
 		
+		int publicNewX;
 		if (card->getDestroyOnZoneChange() && (startzone->getName() != targetzone->getName())) {
 			Event_DestroyCard event;
 			event.set_zone_name(startzone->getName().toStdString());
@@ -459,13 +469,14 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 			if (startzone->getType() == ServerInfo_Zone::HiddenZone)
 				privatePosition = position;
 			
+			publicNewX = newX;
+			
 			Event_MoveCard eventOthers;
 			eventOthers.set_start_player_id(startzone->getPlayer()->getPlayerId());
 			eventOthers.set_start_zone(startzone->getName().toStdString());
 			eventOthers.set_target_player_id(targetzone->getPlayer()->getPlayerId());
 			if (startzone != targetzone)
 				eventOthers.set_target_zone(targetzone->getName().toStdString());
-			eventOthers.set_x(newX);
 			eventOthers.set_y(y);
 			eventOthers.set_face_down(faceDown);
 			
@@ -475,6 +486,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 				eventPrivate.set_card_name(privateCardName.toStdString());
 			eventPrivate.set_position(privatePosition);
 			eventPrivate.set_new_card_id(privateNewCardId);
+			eventPrivate.set_x(newX);
 			
 			// Other players do not get to see the start and/or target position of the card if the respective
 			// part of the zone is being looked at. The information is not needed anyway because in hidden zones,
@@ -485,8 +497,9 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 			)
 				position = -1;
 			if ((targetzone->getType() == ServerInfo_Zone::HiddenZone) && ((targetzone->getCardsBeingLookedAt() > newX) || (targetzone->getCardsBeingLookedAt() == -1)))
-				newX = -1;
+				publicNewX = -1;
 			
+			eventOthers.set_x(publicNewX);
 			eventOthers.set_position(position);
 			if ((startzone->getType() == ServerInfo_Zone::PublicZone) || (targetzone->getType() == ServerInfo_Zone::PublicZone)) {
 				eventOthers.set_card_id(oldCardId);
@@ -503,6 +516,22 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 			QString ptString = QString::fromStdString(thisCardProperties->pt());
 			if (!ptString.isEmpty() && !faceDown)
 				setCardAttrHelper(ges, targetzone->getName(), card->getId(), AttrPT, ptString);
+		}
+		if (startzone->getAlwaysRevealTopCard() && !startzone->cards.isEmpty() && (originalPosition == 0)) {
+			Event_RevealCards revealEvent;
+			revealEvent.set_zone_name(startzone->getName().toStdString());
+			revealEvent.set_card_id(0);
+			startzone->cards.first()->getInfo(revealEvent.add_cards());
+			
+			ges.enqueueGameEvent(revealEvent, playerId);
+		}
+		if (targetzone->getAlwaysRevealTopCard() && !targetzone->cards.isEmpty() && (newX == 0)) {
+			Event_RevealCards revealEvent;
+			revealEvent.set_zone_name(targetzone->getName().toStdString());
+			revealEvent.set_card_id(0);
+			targetzone->cards.first()->getInfo(revealEvent.add_cards());
+			
+			ges.enqueueGameEvent(revealEvent, playerId);
 		}
 	}
 	if (undoingDraw)
@@ -1552,6 +1581,15 @@ Response::ResponseCode Server_Player::cmdChangeZoneProperties(const Command_Chan
 		event.set_always_reveal_top_card(cmd.always_reveal_top_card());
 		
 		ges.enqueueGameEvent(event, playerId);
+		
+		if (!zone->cards.isEmpty()) {
+			Event_RevealCards revealEvent;
+			revealEvent.set_zone_name(zone->getName().toStdString());
+			revealEvent.set_card_id(0);
+			zone->cards.first()->getInfo(revealEvent.add_cards());
+			
+			ges.enqueueGameEvent(revealEvent, playerId);
+		}
 	} else
 		return Response::RespContextError;
 }

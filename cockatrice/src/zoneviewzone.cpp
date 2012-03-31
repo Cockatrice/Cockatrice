@@ -13,7 +13,6 @@
 ZoneViewZone::ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards, bool _revealZone, bool _writeableRevealZone, QGraphicsItem *parent)
 	: SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0), numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone), writeableRevealZone(_writeableRevealZone), sortByName(false), sortByType(false)
 {
-	qDebug() << "revealZone=" << revealZone << "writeable=" << writeableRevealZone;
 	if (!(revealZone && !writeableRevealZone))
 		origZone->setView(this);
 }
