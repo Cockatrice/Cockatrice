@@ -1,6 +1,5 @@
 #include <QTreeView>
 #include <QFileSystemModel>
-#include <QSortFilterProxyModel>
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -28,18 +27,14 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client)
 {
 	localDirModel = new QFileSystemModel(this);
 	localDirModel->setRootPath(settingsCache->getReplaysPath());
-	
-	sortFilter = new QSortFilterProxyModel(this);
-	sortFilter->setSourceModel(localDirModel);
-	sortFilter->setDynamicSortFilter(true);
+	localDirModel->sort(0, Qt::AscendingOrder);
 	
 	localDirView = new QTreeView;
-	localDirView->setModel(sortFilter);
+	localDirView->setModel(localDirModel);
 	localDirView->setColumnHidden(1, true);
-	localDirView->setRootIndex(sortFilter->mapFromSource(localDirModel->index(localDirModel->rootPath(), 0)));
+	localDirView->setRootIndex(localDirModel->index(localDirModel->rootPath(), 0));
 	localDirView->setSortingEnabled(true);
 	localDirView->header()->setResizeMode(QHeaderView::ResizeToContents);
-	sortFilter->sort(0, Qt::AscendingOrder);
 	localDirView->header()->setSortIndicator(0, Qt::AscendingOrder);
 	
 	leftToolBar = new QToolBar;
@@ -113,7 +108,7 @@ void TabReplays::retranslateUi()
 
 void TabReplays::actOpenLocalReplay()
 {
-	QModelIndex curLeft = sortFilter->mapToSource(localDirView->selectionModel()->currentIndex());
+	QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
 	if (localDirModel->isDir(curLeft))
 		return;
 	QString filePath = localDirModel->filePath(curLeft);
@@ -156,7 +151,7 @@ void TabReplays::openRemoteReplayFinished(const Response &r)
 void TabReplays::actDownload()
 {
 	QString filePath;
-	QModelIndex curLeft = sortFilter->mapToSource(localDirView->selectionModel()->currentIndex());
+	QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
 	if (!curLeft.isValid())
 		filePath = localDirModel->rootPath();
 	else {

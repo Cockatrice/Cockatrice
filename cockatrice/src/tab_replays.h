@@ -7,7 +7,6 @@ class Response;
 class AbstractClient;
 class QTreeView;
 class QFileSystemModel;
-class QSortFilterProxyModel;
 class QToolBar;
 class QGroupBox;
 class RemoteReplayList_TreeWidget;
@@ -21,7 +20,6 @@ private:
 	AbstractClient *client;
 	QTreeView *localDirView;
 	QFileSystemModel *localDirModel;
-	QSortFilterProxyModel *sortFilter;
 	QToolBar *leftToolBar, *rightToolBar;
 	RemoteReplayList_TreeWidget *serverDirView;
 	QGroupBox *leftGroupBox, *rightGroupBox;
