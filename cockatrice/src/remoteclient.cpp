@@ -24,6 +24,7 @@ RemoteClient::RemoteClient(QObject *parent)
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slotSocketError(QAbstractSocket::SocketError)));
 	
 	connect(this, SIGNAL(serverIdentificationEventReceived(const Event_ServerIdentification &)), this, SLOT(processServerIdentificationEvent(const Event_ServerIdentification &)));
+	connect(this, SIGNAL(connectionClosedEventReceived(Event_ConnectionClosed)), this, SLOT(processConnectionClosedEvent(Event_ConnectionClosed)));
 	connect(this, SIGNAL(sigConnectToServer(QString, unsigned int, QString, QString)), this, SLOT(doConnectToServer(QString, unsigned int, QString, QString)));
 	connect(this, SIGNAL(sigDisconnectFromServer()), this, SLOT(doDisconnectFromServer()));
 }
@@ -66,6 +67,11 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
 	sendCommand(pend);
 }
 
+void RemoteClient::processConnectionClosedEvent(const Event_ConnectionClosed & /*event*/)
+{
+	doDisconnectFromServer();
+}
+
 void RemoteClient::loginResponse(const Response &response)
 {
 	const Response_Login &resp = response.GetExtension(Response_Login::ext);
@@ -83,7 +89,7 @@ void RemoteClient::loginResponse(const Response &response)
 			ignoreList.append(resp.ignore_list(i));
 		emit ignoreListReceived(ignoreList);
 	} else {
-		emit serverError(response.response_code(), QString::fromStdString(resp.denied_reason_str()));
+		emit loginError(response.response_code(), QString::fromStdString(resp.denied_reason_str()), resp.denied_end_time());
 		setStatus(StatusDisconnecting);
 	}
 }

@@ -41,7 +41,7 @@ public:
 	mutable QReadWriteLock clientsLock, roomsLock; // locking order: roomsLock before clientsLock
 	Server(QObject *parent = 0);
 	~Server();
-	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason);
+	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason, int &secondsLeft);
 	const QMap<int, Server_Room *> &getRooms() { return rooms; }
 	virtual int getNextGameId() { return nextGameId++; }
 	virtual int getNextReplayId() { return nextReplayId++; }
@@ -111,7 +111,7 @@ protected:
 	virtual qint64 startSession(const QString &userName, const QString &address) { return 0; }
 	virtual void endSession(qint64 sessionId) { }
 	virtual bool userExists(const QString &user) { return false; }
-	virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reason) { return UnknownUser; }
+	virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reason, int &secondsLeft) { return UnknownUser; }
 	virtual ServerInfo_User getUserData(const QString &name, bool withId = false) = 0;
 	int getUsersCount() const;
 	int getGamesCount() const;

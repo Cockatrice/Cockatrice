@@ -66,14 +66,14 @@ void Server::prepareDestroy()
 	roomsLock.unlock();
 }
 
-AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr)
+AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr, int &secondsLeft)
 {
 	if (name.size() > 35)
 		name = name.left(35);
 	
 	QWriteLocker locker(&clientsLock);
 	
-	AuthenticationResult authState = checkUserPassword(session, name, password, reasonStr);
+	AuthenticationResult authState = checkUserPassword(session, name, password, reasonStr, secondsLeft);
 	if ((authState == NotLoggedIn) || (authState == UserIsBanned))
 		return authState;
 	

@@ -39,7 +39,7 @@ private slots:
 	void processConnectionClosedEvent(const Event_ConnectionClosed &event);
 	void processServerShutdownEvent(const Event_ServerShutdown &event);
 	void serverTimeout();
-	void serverError(Response::ResponseCode r, QString reasonStr);
+	void loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime);
 	void socketError(const QString &errorStr);
 	void protocolVersionMismatch(int localVersion, int remoteVersion);
 	void userInfoReceived(const ServerInfo_User &userInfo);

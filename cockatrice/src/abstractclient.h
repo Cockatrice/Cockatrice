@@ -38,7 +38,6 @@ class AbstractClient : public QObject {
 	Q_OBJECT
 signals:
 	void statusChanged(ClientStatus _status);
-	void serverError(Response::ResponseCode resp, QString reasonStr);
 	
 	// Room events
 	void roomEventReceived(const RoomEvent &event);

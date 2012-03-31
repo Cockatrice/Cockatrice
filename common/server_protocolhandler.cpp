@@ -337,11 +337,14 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 	if (userName.isEmpty() || (userInfo != 0))
 		return Response::RespContextError;
 	QString reasonStr;
-	AuthenticationResult res = server->loginUser(this, userName, QString::fromStdString(cmd.password()), reasonStr);
+	int banSecondsLeft = 0;
+	AuthenticationResult res = server->loginUser(this, userName, QString::fromStdString(cmd.password()), reasonStr, banSecondsLeft);
 	switch (res) {
 		case UserIsBanned: {
 			Response_Login *re = new Response_Login;
 			re->set_denied_reason_str(reasonStr.toStdString());
+			if (banSecondsLeft != 0)
+				re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsLeft).toTime_t());
 			rc.setResponseExtension(re);
 			return Response::RespUserIsBanned;
 		}

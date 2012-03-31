@@ -11,6 +11,7 @@ class RemoteClient : public AbstractClient {
 signals:
 	void maxPingTime(int seconds, int maxSeconds);
 	void serverTimeout();
+	void loginError(Response::ResponseCode resp, QString reasonStr, quint32 endTime);
 	void socketError(const QString &errorString);
 	void protocolVersionMismatch(int clientVersion, int serverVersion);
 	void protocolError();
@@ -22,6 +23,7 @@ private slots:
 	void slotSocketError(QAbstractSocket::SocketError error);
 	void ping();
 	void processServerIdentificationEvent(const Event_ServerIdentification &event);
+	void processConnectionClosedEvent(const Event_ConnectionClosed &event);
 	void loginResponse(const Response &response);
 	void doConnectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
 	void doDisconnectFromServer();

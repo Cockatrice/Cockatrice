@@ -9,4 +9,5 @@ message Response_Login {
 	repeated ServerInfo_User buddy_list = 2;
 	repeated ServerInfo_User ignore_list = 3;
 	optional string denied_reason_str = 4;
+	optional uint64 denied_end_time = 5;
 }

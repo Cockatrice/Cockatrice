@@ -1,2 +1,4 @@
 tags
+build
 *.qm
+.directory

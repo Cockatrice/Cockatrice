@@ -27,6 +27,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QThread>
+#include <QDateTime>
 
 #include "main.h"
 #include "window_main.h"
@@ -67,6 +68,10 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
 		case Event_ConnectionClosed::TOO_MANY_CONNECTIONS: reasonStr = tr("There are too many concurrent connections from your address."); break;
 		case Event_ConnectionClosed::BANNED: {
 			reasonStr = tr("Banned by moderator");
+			if (event.has_end_time())
+				reasonStr.append("\n" + tr("Expected end time: %1").arg(QDateTime::fromTime_t(event.end_time()).toString()));
+			else
+				reasonStr.append("\n" + tr("This ban lasts indefinitely."));
 			if (event.has_reason_str())
 				reasonStr.append("\n\n" + QString::fromStdString(event.reason_str()));
 			break;
@@ -234,13 +239,29 @@ void MainWindow::serverTimeout()
 	QMessageBox::critical(this, tr("Error"), tr("Server timeout"));
 }
 
-void MainWindow::serverError(Response::ResponseCode r, QString reasonStr)
+void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime)
 {
 	switch (r) {
-		case Response::RespWrongPassword: QMessageBox::critical(this, tr("Error"), tr("Invalid login data.")); break;
-		case Response::RespWouldOverwriteOldSession: QMessageBox::critical(this, tr("Error"), tr("There is already an active session using this user name.\nPlease close that session first and re-login.")); break;
-		case Response::RespUserIsBanned: QMessageBox::critical(this, tr("Error"), tr("You are banned.\n%1").arg(reasonStr)); break;
-		default: QMessageBox::critical(this, tr("Error"), tr("Unknown server error: %1").arg(static_cast<int>(r)));
+		case Response::RespWrongPassword:
+			QMessageBox::critical(this, tr("Error"), tr("Invalid login data."));
+			break;
+		case Response::RespWouldOverwriteOldSession:
+			QMessageBox::critical(this, tr("Error"), tr("There is already an active session using this user name.\nPlease close that session first and re-login."));
+			break;
+		case Response::RespUserIsBanned: {
+			QString bannedStr;
+			if (endTime)
+				bannedStr = tr("You are banned until %1.").arg(QDateTime::fromTime_t(endTime).toString());
+			else
+				bannedStr = tr("You are banned indefinitely.");
+			if (!reasonStr.isEmpty())
+				bannedStr.append("\n\n" + reasonStr);
+		
+			QMessageBox::critical(this, tr("Error"), bannedStr);
+			break;
+		}
+		default:
+			QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)));
 	}
 }
 
@@ -343,7 +364,7 @@ MainWindow::MainWindow(QWidget *parent)
 	client = new RemoteClient;
 	connect(client, SIGNAL(connectionClosedEventReceived(const Event_ConnectionClosed &)), this, SLOT(processConnectionClosedEvent(const Event_ConnectionClosed &)));
 	connect(client, SIGNAL(serverShutdownEventReceived(const Event_ServerShutdown &)), this, SLOT(processServerShutdownEvent(const Event_ServerShutdown &)));
-	connect(client, SIGNAL(serverError(Response::ResponseCode, QString)), this, SLOT(serverError(Response::ResponseCode, QString)));
+	connect(client, SIGNAL(loginError(Response::ResponseCode, QString, quint32)), this, SLOT(loginError(Response::ResponseCode, QString, quint32)));
 	connect(client, SIGNAL(socketError(const QString &)), this, SLOT(socketError(const QString &)));
 	connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
 	connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));

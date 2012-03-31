@@ -587,8 +587,8 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 	query.bindValue(":ip_address", address);
 	query.bindValue(":id_admin", userInfo->id());
 	query.bindValue(":minutes", minutes);
-	query.bindValue(":reason", QString::fromStdString(cmd.reason()) + "\n");
-	query.bindValue(":visible_reason", QString::fromStdString(cmd.visible_reason()) + "\n");
+	query.bindValue(":reason", QString::fromStdString(cmd.reason()));
+	query.bindValue(":visible_reason", QString::fromStdString(cmd.visible_reason()));
 	servatrice->execSqlQuery(query);
 	servatrice->dbMutex.unlock();
 	
@@ -601,6 +601,8 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 		event.set_reason(Event_ConnectionClosed::BANNED);
 		if (cmd.has_visible_reason())
 			event.set_reason_str(cmd.visible_reason());
+		if (minutes)
+			event.set_end_time(QDateTime::currentDateTime().addSecs(60 * minutes).toTime_t());
 		for (int i = 0; i < userList.size(); ++i) {
 			SessionEvent *se = userList[i]->prepareSessionEvent(event);
 			userList[i]->sendProtocolItem(*se);

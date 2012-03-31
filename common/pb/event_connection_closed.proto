@@ -12,4 +12,5 @@ message Event_ConnectionClosed {
 	}
 	optional CloseReason reason = 1;
 	optional string reason_str = 2;
+	optional uint32 end_time = 3;
 }
