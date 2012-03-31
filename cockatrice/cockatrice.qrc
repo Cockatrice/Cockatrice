@@ -65,8 +65,8 @@
 <!--	<file>translations/cockatrice_cs.qm</file>
 	<file>translations/cockatrice_pl.qm</file>
 	<file>translations/cockatrice_sk.qm</file>
--->
-	<file>translations/cockatrice_sv.qm</file>
+-->	<file>translations/cockatrice_sv.qm</file>
+
 	<file>resources/countries/ar.svg</file>
 	<file>resources/countries/at.svg</file>
 	<file>resources/countries/au.svg</file>

@@ -97,7 +97,7 @@ public:
 	bool containsUser(const QString &userName) const;
 	void addPlayer(Server_AbstractUserInterface *userInterface, ResponseContainer &rc, bool spectator, bool broadcastUpdate = true);
 	void removePlayer(Server_Player *player);
-	void removeArrowsToPlayer(GameEventStorage &ges, Server_Player *player);
+	void removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Player *player);
 	void unattachCards(GameEventStorage &ges, Server_Player *player);
 	bool kickPlayer(int playerId);
 	void startGameIfReady();

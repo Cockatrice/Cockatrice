@@ -718,7 +718,7 @@ Response::ResponseCode Server_Player::cmdConcede(const Command_Concede & /*cmd*/
 		return Response::RespContextError;
 	
 	setConceded(true);
-	game->removeArrowsToPlayer(ges, this);
+	game->removeArrowsRelatedToPlayer(ges, this);
 	game->unattachCards(ges, this);
 	clearZones();
 	

@@ -413,7 +413,7 @@ void Server_Game::removePlayer(Server_Player *player)
 	players.remove(player->getPlayerId());
 	
 	GameEventStorage ges;
-	removeArrowsToPlayer(ges, player);
+	removeArrowsRelatedToPlayer(ges, player);
 	unattachCards(ges, player);
 	ges.enqueueGameEvent(Event_Leave(), player->getPlayerId());
 	ges.sendToGame(this);
@@ -451,11 +451,13 @@ void Server_Game::removePlayer(Server_Player *player)
 	emit gameInfoChanged(gameInfo);
 }
 
-void Server_Game::removeArrowsToPlayer(GameEventStorage &ges, Server_Player *player)
+void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Player *player)
 {
 	QMutexLocker locker(&gameMutex);
 	
 	// Remove all arrows of other players pointing to the player being removed or to one of his cards.
+	// Also remove all arrows starting at one of his cards. This is necessary since players can create
+	// arrows that start at another person's cards.
 	QMapIterator<int, Server_Player *> playerIterator(players);
 	while (playerIterator.hasNext()) {
 		Server_Player *p = playerIterator.next().value();
@@ -467,7 +469,11 @@ void Server_Game::removeArrowsToPlayer(GameEventStorage &ges, Server_Player *pla
 			if (targetCard) {
 				if (targetCard->getZone()->getPlayer() == player)
 					toDelete.append(a);
-			} else if ((static_cast<Server_Player *>(a->getTargetItem()) == player) || (a->getStartCard()->getZone()->getPlayer() == player))
+			} else if (static_cast<Server_Player *>(a->getTargetItem()) == player)
+				toDelete.append(a);
+			
+			// Don't use else here! It has to happen regardless of whether targetCard == 0.
+			if (a->getStartCard()->getZone()->getPlayer() == player)
 				toDelete.append(a);
 		}
 		for (int i = 0; i < toDelete.size(); ++i) {
