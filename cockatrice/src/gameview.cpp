@@ -8,7 +8,7 @@ GameView::GameView(QGraphicsScene *scene, QWidget *parent)
 	: QGraphicsView(scene, parent), rubberBand(0)
 {
 	setBackgroundBrush(QBrush(QColor(0, 0, 0)));
-	setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing/* | QPainter::SmoothPixmapTransform*/);
+	setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing);
 	setFocusPolicy(Qt::NoFocus);
 	setViewportUpdateMode(BoundingRectViewportUpdate);
 
@@ -31,9 +31,9 @@ void GameView::resizeEvent(QResizeEvent *event)
 	QGraphicsView::resizeEvent(event);
 
 	GameScene *s = dynamic_cast<GameScene *>(scene());
-	if (s) {
+	if (s)
 		s->processViewSizeChange(event->size());
-	}
+	
 	updateSceneRect(scene()->sceneRect());
 }
 

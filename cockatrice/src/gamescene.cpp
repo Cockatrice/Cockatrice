@@ -13,11 +13,13 @@
 #include <QGraphicsView>
 
 GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
-	: QGraphicsScene(parent), phasesToolbar(_phasesToolbar)
+	: QGraphicsScene(parent), phasesToolbar(_phasesToolbar), viewSize(QSize())
 {
 	animationTimer = new QBasicTimer;
 	addItem(phasesToolbar);
 	connect(settingsCache, SIGNAL(minPlayersForMultiColumnLayoutChanged()), this, SLOT(rearrange()));
+	
+	rearrange();
 }
 
 GameScene::~GameScene()

@@ -44,7 +44,7 @@ AbstractClient::AbstractClient(QObject *parent)
 	qRegisterMetaType<QList<ServerInfo_User> >("QList<ServerInfo_User>");
 	qRegisterMetaType<Event_ReplayAdded>("Event_ReplayAdded");
 	
-	connect(this, SIGNAL(sigSendCommandContainer(CommandContainer)), this, SLOT(sendCommandContainer(CommandContainer)));
+	connect(this, SIGNAL(sigQueuePendingCommand(PendingCommand *)), this, SLOT(queuePendingCommand(PendingCommand *)));
 }
 
 AbstractClient::~AbstractClient()
@@ -58,12 +58,10 @@ void AbstractClient::processProtocolItem(const ServerMessage &item)
 			const Response &response = item.response();
 			const int cmdId = response.cmd_id();
 			
-			QMutexLocker locker(&clientMutex);
 			PendingCommand *pend = pendingCommands.value(cmdId, 0);
 			if (!pend)
 				return;
 			pendingCommands.remove(cmdId);
-			locker.unlock();
 			
 			pend->processResponse(response);
 			pend->deleteLater();
@@ -100,6 +98,7 @@ void AbstractClient::processProtocolItem(const ServerMessage &item)
 
 void AbstractClient::setStatus(const ClientStatus _status)
 {
+	QMutexLocker locker(&clientMutex);
 	if (_status != status) {
 		status = _status;
 		emit statusChanged(_status);
@@ -113,15 +112,19 @@ void AbstractClient::sendCommand(const CommandContainer &cont)
 
 void AbstractClient::sendCommand(PendingCommand *pend)
 {
+	pend->moveToThread(thread());
+	emit sigQueuePendingCommand(pend);
+}
+
+void AbstractClient::queuePendingCommand(PendingCommand *pend)
+{
+	// This function is always called from the client thread via signal/slot.
 	const int cmdId = nextCmdId++;
 	pend->getCommandContainer().set_cmd_id(cmdId);
-	pend->moveToThread(thread());
 	
-	clientMutex.lock();
 	pendingCommands.insert(cmdId, pend);
-	clientMutex.unlock();
 	
-	emit sigSendCommandContainer(pend->getCommandContainer());
+	sendCommandContainer(pend->getCommandContainer());
 }
 
 PendingCommand *AbstractClient::prepareSessionCommand(const ::google::protobuf::Message &cmd)

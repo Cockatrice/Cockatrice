@@ -125,7 +125,7 @@ void RemoteClient::readData()
 		processProtocolItem(newServerMessage);
 	} while (!inputBuffer.isEmpty());
 	
-	if (status == StatusDisconnecting)
+	if (getStatus() == StatusDisconnecting) // use thread-safe getter
 		doDisconnectFromServer();
 }
 

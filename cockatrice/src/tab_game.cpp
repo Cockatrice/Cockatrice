@@ -271,7 +271,6 @@ TabGame::TabGame(GameReplay *_replay)
 	}
 	
 	phasesToolbar = new PhasesToolbar;
-	phasesToolbar->hide();
 	
 	scene = new GameScene(phasesToolbar, this);
 	gameView = new GameView(scene);
@@ -399,7 +398,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	gameTimer->start();
 	
 	phasesToolbar = new PhasesToolbar;
-	phasesToolbar->hide();
 	connect(phasesToolbar, SIGNAL(sendGameCommand(const ::google::protobuf::Message &, int)), this, SLOT(sendGameCommand(const ::google::protobuf::Message &, int)));
 	
 	scene = new GameScene(phasesToolbar, this);
@@ -869,7 +867,6 @@ void TabGame::startGame(bool resuming)
 	gameInfo.set_started(true);
 	static_cast<GameScene *>(gameView->scene())->rearrange();
 	gameView->show();
-	phasesToolbar->show();
 }
 
 void TabGame::stopGame()
@@ -888,7 +885,6 @@ void TabGame::stopGame()
 	playerListWidget->setGameStarted(false, false);
 	gameInfo.set_started(false);
 	gameView->hide();
-	phasesToolbar->hide();
 }
 
 void TabGame::closeGame()

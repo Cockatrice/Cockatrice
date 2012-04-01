@@ -60,23 +60,25 @@ signals:
 	void ignoreListReceived(const QList<ServerInfo_User> &ignoreList);
 	void replayAddedEventReceived(const Event_ReplayAdded &event);
 	
-	void sigSendCommandContainer(const CommandContainer &commandContainer);
+	void sigQueuePendingCommand(PendingCommand *pend);
 private:
 	int nextCmdId;
-	QMutex clientMutex;
+	mutable QMutex clientMutex;
+	ClientStatus status;
+private slots:
+	void queuePendingCommand(PendingCommand *pend);
 protected slots:
 	void processProtocolItem(const ServerMessage &item);
-	virtual void sendCommandContainer(const CommandContainer &cont) = 0;
 protected:
 	QMap<int, PendingCommand *> pendingCommands;
-	ClientStatus status;
 	QString userName, password;
 	void setStatus(ClientStatus _status);
+	virtual void sendCommandContainer(const CommandContainer &cont) = 0;
 public:
 	AbstractClient(QObject *parent = 0);
 	~AbstractClient();
 	
-	ClientStatus getStatus() const { return status; }
+	ClientStatus getStatus() const { QMutexLocker locker(&clientMutex); return status; }
 	void sendCommand(const CommandContainer &cont);
 	void sendCommand(PendingCommand *pend);
 	
