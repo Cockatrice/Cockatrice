@@ -14,6 +14,7 @@ class QCheckBox;
 class GameScene;
 class ServerInfo_Card;
 class QGraphicsSceneMouseEvent;
+class QGraphicsSceneWheelEvent;
 
 class TitleLabel : public QGraphicsWidget {
 	Q_OBJECT
@@ -36,6 +37,7 @@ class ZoneViewWidget : public QGraphicsWidget {
 	Q_OBJECT
 private:
 	ZoneViewZone *zone;
+	QGraphicsWidget *zoneContainer;
 	
 	TitleLabel *titleLabel;
 	QPushButton *closeButton;
@@ -48,6 +50,8 @@ signals:
 	void closePressed(ZoneViewWidget *zv);
 private slots:
 	void resizeToZoneContents();
+	void handleWheelEvent(QGraphicsSceneWheelEvent *event);
+	void handleScrollBarChange(int value);
 	void zoneDeleted();
 	void moveWidget(QPointF scenePos);
 public:

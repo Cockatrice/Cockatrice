@@ -7,6 +7,7 @@
 class ZoneViewWidget;
 class Response;
 class ServerInfo_Card;
+class QGraphicsSceneWheelEvent;
 
 class ZoneViewZone : public SelectZone, public QGraphicsLayoutItem {
 	Q_OBJECT
@@ -39,9 +40,11 @@ private slots:
 signals:
 	void beingDeleted();
 	void optimumRectChanged();
+	void wheelEventReceived(QGraphicsSceneWheelEvent *event);
 protected:
 	void addCardImpl(CardItem *card, int x, int y);
 	QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
+	void wheelEvent(QGraphicsSceneWheelEvent *event);
 };
 
 #endif

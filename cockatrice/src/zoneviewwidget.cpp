@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QPainter>
 #include <QPalette>
+#include <QScrollBar>
 #include "zoneviewwidget.h"
 #include "carditem.h"
 #include "zoneviewzone.h"
@@ -104,9 +105,26 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 	
 	extraHeight = vbox->sizeHint(Qt::PreferredSize).height();
 	resize(150, 150);
-
-	zone = new ZoneViewZone(player, _origZone, numberCards, _revealZone, _writeableRevealZone, this);
-	vbox->addItem(zone);
+	
+	QGraphicsLinearLayout *zoneHBox = new QGraphicsLinearLayout(Qt::Horizontal);
+	
+	zoneContainer = new QGraphicsWidget(this);
+	zoneContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	zoneContainer->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
+	zoneHBox->addItem(zoneContainer);
+	
+	scrollBar = new QScrollBar(Qt::Vertical);
+	scrollBar->setMinimum(0);
+	scrollBar->setSingleStep(50);
+	connect(scrollBar, SIGNAL(valueChanged(int)), this, SLOT(handleScrollBarChange(int)));
+	QGraphicsProxyWidget *scrollBarProxy = new QGraphicsProxyWidget;
+	scrollBarProxy->setWidget(scrollBar);
+	zoneHBox->addItem(scrollBarProxy);
+	
+	vbox->addItem(zoneHBox);
+	
+	zone = new ZoneViewZone(player, _origZone, numberCards, _revealZone, _writeableRevealZone, zoneContainer);
+	connect(zone, SIGNAL(wheelEventReceived(QGraphicsSceneWheelEvent *)), this, SLOT(handleWheelEvent(QGraphicsSceneWheelEvent *)));
 	
 	if (sortByNameCheckBox) {
 		connect(sortByNameCheckBox, SIGNAL(stateChanged(int)), zone, SLOT(setSortByName(int)));
@@ -148,11 +166,29 @@ void ZoneViewWidget::moveWidget(QPointF scenePos)
 void ZoneViewWidget::resizeToZoneContents()
 {
 	QRectF zoneRect = zone->getOptimumRect();
-	QSizeF newSize(qMax(QGraphicsWidget::layout()->effectiveSizeHint(Qt::MinimumSize, QSizeF()).width(), zoneRect.width() + 10), zoneRect.height() + extraHeight + 10);
+	qreal totalZoneHeight = zoneRect.height();
+	if (zoneRect.height() > 500)
+		zoneRect.setHeight(500);
+	QSizeF newSize(qMax(QGraphicsWidget::layout()->effectiveSizeHint(Qt::MinimumSize, QSizeF()).width(), zoneRect.width() + scrollBar->width() + 10), zoneRect.height() + extraHeight + 10);
 	setMaximumSize(newSize);
 	resize(newSize);
+	
+	zone->setGeometry(QRectF(0, -scrollBar->value(), zoneContainer->size().width(), totalZoneHeight));
+	scrollBar->setMaximum(totalZoneHeight - zoneRect.height());
+	
 	if (layout())
 		layout()->invalidate();
+}
+
+void ZoneViewWidget::handleWheelEvent(QGraphicsSceneWheelEvent *event)
+{
+	QWheelEvent wheelEvent(QPoint(), event->delta(), event->buttons(), event->modifiers(), event->orientation());
+	scrollBar->event(&wheelEvent);
+}
+
+void ZoneViewWidget::handleScrollBarChange(int value)
+{
+	zone->setY(-value);
 }
 
 void ZoneViewWidget::closeEvent(QCloseEvent *event)

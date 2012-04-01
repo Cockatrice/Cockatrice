@@ -1,5 +1,6 @@
 #include <math.h>
 #include <QDebug>
+#include <QGraphicsSceneWheelEvent>
 #include "zoneviewzone.h"
 #include "player.h"
 #include "carddragitem.h"
@@ -82,6 +83,8 @@ void ZoneViewZone::reorganizeCards()
 			cards[i]->setId(i);
 
 	int cols = floor(sqrt((double) cardCount / 2));
+	if (cols > 7)
+		cols = 7;
 	int rows = ceil((double) cardCount / cols);
 	if (rows < 1)
 		rows = 1;
@@ -179,4 +182,9 @@ void ZoneViewZone::setWriteableRevealZone(bool _writeableRevealZone)
 	
 	writeableRevealZone = _writeableRevealZone;
 	
+}
+
+void ZoneViewZone::wheelEvent(QGraphicsSceneWheelEvent *event)
+{
+	emit wheelEventReceived(event);
 }
