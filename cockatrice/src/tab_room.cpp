@@ -153,6 +153,7 @@ void TabRoom::actLeaveRoom()
 
 void TabRoom::actIgnoreUnregisteredUsers()
 {
+	aIgnoreUnregisteredUsers->setChecked(!aIgnoreUnregisteredUsers->isChecked());
 	settingsCache->setIgnoreUnregisteredUsers(!settingsCache->getIgnoreUnregisteredUsers());
 }
 
