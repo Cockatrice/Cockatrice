@@ -34,6 +34,7 @@ signals:
 	void showCardInfoPopup(QPoint pos, QString cardName);
 	void deleteCardInfoPopup(QString cardName);
 	void updateCardMenu(AbstractCardItem *card);
+	void sigPixmapUpdated();
 public:
 	enum { Type = typeCard };
 	int type() const { return Type; }

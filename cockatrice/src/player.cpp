@@ -1297,12 +1297,19 @@ void Player::eventRevealCards(const Event_RevealCards &event)
 			emit logRevealCards(this, zone, cardList.at(i)->id(), cardName, this, true);
 		}
 	} else {
-		if (!cardList.isEmpty())
+		bool showZoneView = true;
+		QString cardName;
+		if (cardList.size() == 1) {
+			cardName = QString::fromStdString(cardList.first()->name());
+			if ((event.card_id() == 0) && dynamic_cast<PileZone *>(zone)) {
+				zone->getCards().first()->setName(cardName);
+				zone->update();
+				showZoneView = false;
+			}
+		}
+		if (showZoneView && !cardList.isEmpty())
 			static_cast<GameScene *>(scene())->addRevealedZoneView(this, zone, cardList, event.grant_write_access());
 		
-		QString cardName;
-		if (cardList.size() == 1)
-			cardName = QString::fromStdString(cardList.first()->name());
 		emit logRevealCards(this, zone, event.card_id(), cardName, otherPlayer, false);
 	}
 }

@@ -1582,7 +1582,7 @@ Response::ResponseCode Server_Player::cmdChangeZoneProperties(const Command_Chan
 		
 		ges.enqueueGameEvent(event, playerId);
 		
-		if (!zone->cards.isEmpty()) {
+		if (!zone->cards.isEmpty() && cmd.always_reveal_top_card()) {
 			Event_RevealCards revealEvent;
 			revealEvent.set_zone_name(zone->getName().toStdString());
 			revealEvent.set_card_id(0);

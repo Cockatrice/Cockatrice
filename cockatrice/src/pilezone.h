@@ -5,6 +5,8 @@
 
 class PileZone : public CardZone {
 	Q_OBJECT
+private slots:
+	void callUpdate() { update(); }
 public:
 	PileZone(Player *_p, const QString &_name, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent = 0);
 	QRectF boundingRect() const;

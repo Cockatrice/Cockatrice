@@ -37,6 +37,7 @@ QRectF AbstractCardItem::boundingRect() const
 void AbstractCardItem::pixmapUpdated()
 {
 	update();
+	emit sigPixmapUpdated();
 }
 
 void AbstractCardItem::cardInfoUpdated()

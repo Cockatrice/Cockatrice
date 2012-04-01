@@ -39,11 +39,15 @@ void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
 
 void PileZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
+	connect(card, SIGNAL(sigPixmapUpdated()), this, SLOT(callUpdate()));
 	cards.insert(x, card);
 	card->setPos(0, 0);
 	if (!contentsKnown()) {
 		card->setName(QString());
 		card->setId(-1);
+		// If we obscure a previously revealed card, its name has to be forgotten
+		if (cards.size() > x + 1)
+			cards.at(x + 1)->setName(QString());
 	}
 	card->setVisible(false);
 	card->resetState();
