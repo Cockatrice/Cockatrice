@@ -26,11 +26,15 @@ private slots:
 
 class CardDatabaseDisplayModel : public QSortFilterProxyModel {
 	Q_OBJECT
+public:
+	enum FilterBool { ShowTrue, ShowFalse, ShowAll };
 private:
+	FilterBool isToken;
 	QString cardNameBeginning, cardName, cardText;
 	QSet<QString> cardTypes, cardColors;
 public:
 	CardDatabaseDisplayModel(QObject *parent = 0);
+	void setIsToken(FilterBool _isToken) { isToken = _isToken; invalidate(); }
 	void setCardNameBeginning(const QString &_beginning) { cardNameBeginning = _beginning; invalidate(); }
 	void setCardName(const QString &_cardName) { cardName = _cardName; invalidate(); }
 	void setCardText(const QString &_cardText) { cardText = _cardText; invalidate(); }

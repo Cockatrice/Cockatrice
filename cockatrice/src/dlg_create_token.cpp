@@ -6,9 +6,15 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QDialogButtonBox>
+#include <QGroupBox>
+#include <QTreeView>
+#include <QRadioButton>
+#include "decklist.h"
 #include "dlg_create_token.h"
+#include "carddatabasemodel.h"
+#include "main.h"
 
-DlgCreateToken::DlgCreateToken(QWidget *parent)
+DlgCreateToken::DlgCreateToken(DeckList *_deck, QWidget *parent)
 	: QDialog(parent)
 {
 	nameLabel = new QLabel(tr("&Name:"));
@@ -49,12 +55,37 @@ DlgCreateToken::DlgCreateToken(QWidget *parent)
 	grid->addWidget(annotationEdit, 3, 1);
 	grid->addWidget(destroyCheckBox, 4, 0, 1, 2);
 	
+	QGroupBox *tokenDataGroupBox = new QGroupBox(tr("Token data"));
+	tokenDataGroupBox->setLayout(grid);
+	
+	cardDatabaseModel = new CardDatabaseModel(db, this);
+	cardDatabaseDisplayModel = new CardDatabaseDisplayModel(this);
+	cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
+	cardDatabaseDisplayModel->setIsToken(CardDatabaseDisplayModel::ShowTrue);
+	
+	QRadioButton *chooseTokenFromAllRadioButton = new QRadioButton(tr("Show &all tokens"));
+	QRadioButton *chooseTokenFromDeckRadioButton = new QRadioButton(tr("Show tokens from this &deck"));
+	QTreeView *chooseTokenView = new QTreeView;
+	chooseTokenView->setModel(cardDatabaseDisplayModel);
+	
+	QVBoxLayout *tokenChooseLayout = new QVBoxLayout;
+	tokenChooseLayout->addWidget(chooseTokenFromAllRadioButton);
+	tokenChooseLayout->addWidget(chooseTokenFromDeckRadioButton);
+	tokenChooseLayout->addWidget(chooseTokenView);
+	
+	QGroupBox *tokenChooseGroupBox = new QGroupBox(tr("Choose token from list"));
+	tokenChooseGroupBox->setLayout(tokenChooseLayout);
+	
+	QHBoxLayout *hbox = new QHBoxLayout;
+	hbox->addWidget(tokenDataGroupBox);
+	hbox->addWidget(tokenChooseGroupBox);
+	
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
 	connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 	
 	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addLayout(grid);
+	mainLayout->addLayout(hbox);
 	mainLayout->addWidget(buttonBox);
 	setLayout(mainLayout);
 

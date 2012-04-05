@@ -71,7 +71,8 @@ void CardDatabaseModel::updateCardList()
 }
 
 CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
-	: QSortFilterProxyModel(parent)
+	: QSortFilterProxyModel(parent),
+	  isToken(ShowAll)
 {
 	setFilterCaseSensitivity(Qt::CaseInsensitive);
 	setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -81,10 +82,13 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 {
 	CardInfo *info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
 	
+	if (((isToken == ShowTrue) && !info->getIsToken()) || (isToken == ShowFalse) && info->getIsToken())
+		return false;
+	
 	if (!cardNameBeginning.isEmpty())
 		if (!info->getName().startsWith(cardNameBeginning, Qt::CaseInsensitive))
 			return false;
-	
+		
 	if (!cardName.isEmpty())
 		if (!info->getName().contains(cardName, Qt::CaseInsensitive))
 			return false;
@@ -96,7 +100,7 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 	if (!cardColors.isEmpty())
 		if (QSet<QString>::fromList(info->getColors()).intersect(cardColors).isEmpty() && !(info->getColors().isEmpty() && cardColors.contains("X")))
 			return false;
-		
+	
 	if (!cardTypes.isEmpty())
 		if (!cardTypes.contains(info->getMainCardType()))
 			return false;

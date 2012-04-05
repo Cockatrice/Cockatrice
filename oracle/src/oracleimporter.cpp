@@ -75,6 +75,7 @@ bool OracleImporter::readSetsFromXml(QXmlStreamReader &xml)
 
 CardInfo *OracleImporter::addCard(const QString &setName,
 								  QString cardName,
+								  bool isToken,
 								  int cardId,
 								  const QString &cardCost,
 								  const QString &cardType,
@@ -125,7 +126,7 @@ CardInfo *OracleImporter::addCard(const QString &setName,
 		
 		bool cipt = (cardText.contains(cardName + " enters the battlefield tapped."));
 		
-		card = new CardInfo(this, cardName, cardCost, cardType, cardPT, fullCardText, colors, cardLoyalty, cipt);
+		card = new CardInfo(this, cardName, isToken, cardCost, cardType, cardPT, fullCardText, colors, cardLoyalty, cipt);
 		int tableRow = 1;
 		QString mainCardType = card->getMainCardType();
 		if ((mainCardType == "Land") || mArtifact)
@@ -183,7 +184,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 					for (int i = 0; i < cardTextSplit.size(); ++i)
 						cardTextSplit[i] = cardTextSplit[i].trimmed();
 					
-					CardInfo *card = addCard(set->getShortName(), cardName, cardId, cardCost, cardType, cardPT, cardLoyalty, cardTextSplit);
+					CardInfo *card = addCard(set->getShortName(), cardName, false, cardId, cardCost, cardType, cardPT, cardLoyalty, cardTextSplit);
 					if (!set->contains(card)) {
 						card->addToSet(set);
 						cards++;

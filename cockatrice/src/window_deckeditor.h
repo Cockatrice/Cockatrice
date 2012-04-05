@@ -58,7 +58,7 @@ private slots:
 
         void finishedUpdatingPrices();
 private:
-	void addCardHelper(const QString &zoneName);
+	void addCardHelper(QString zoneName);
 	void recursiveExpand(const QModelIndex &index);
 	bool confirmClose();
 

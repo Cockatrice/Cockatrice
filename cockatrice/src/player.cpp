@@ -95,7 +95,19 @@ void PlayerArea::setSize(qreal width, qreal height)
 }
 
 Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_parent)
-	: QObject(_parent), game(_parent), shortcutsActive(false), defaultNumberTopCards(3), lastTokenDestroy(true), id(_id), active(false), local(_local), mirrored(false), handVisible(false), conceded(false), dialogSemaphore(false)
+	: QObject(_parent),
+	  game(_parent),
+	  shortcutsActive(false),
+	  defaultNumberTopCards(3),
+	  lastTokenDestroy(true),
+	  id(_id),
+	  active(false),
+	  local(_local),
+	  mirrored(false),
+	  handVisible(false),
+	  conceded(false),
+	  dialogSemaphore(false),
+	  deck(0)
 {
 	userInfo = new ServerInfo_User;
 	userInfo->CopyFrom(info);
@@ -876,7 +888,7 @@ void Player::actRollDie()
 
 void Player::actCreateToken()
 {
-	DlgCreateToken dlg;
+	DlgCreateToken dlg(deck);
 	if (!dlg.exec())
 		return;
 	

@@ -91,6 +91,7 @@ private:
 	CardDatabase *db;
 
 	QString name;
+	bool isToken;
 	SetList sets;
 	QString manacost;
 	QString cardtype;
@@ -106,6 +107,7 @@ private:
 public:
 	CardInfo(CardDatabase *_db,
 		const QString &_name = QString(),
+		bool _isToken = false,
 		const QString &_manacost = QString(),
 		const QString &_cardtype = QString(),
 		const QString &_powtough = QString(),
@@ -120,6 +122,7 @@ public:
 		const QStringMap &_picURLsSt = QStringMap());
 	~CardInfo();
 	const QString &getName() const { return name; }
+	bool getIsToken() const { return isToken; }
 	const SetList &getSets() const { return sets; }
 	const QString &getManaCost() const { return manacost; }
 	const QString &getCardType() const { return cardtype; }

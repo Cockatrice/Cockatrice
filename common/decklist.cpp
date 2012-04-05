@@ -98,6 +98,8 @@ QString InnerDecklistNode::visibleNameFromName(const QString &_name)
 		return QObject::tr("Maindeck");
 	else if (_name == "side")
 		return QObject::tr("Sideboard");
+	else if (_name == "tokens")
+		return QObject::tr("Tokens");
 	else
 		return _name;
 }
