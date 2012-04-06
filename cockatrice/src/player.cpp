@@ -947,7 +947,7 @@ void Player::actCreatePredefinedToken()
 	CardInfo *cardInfo = db->getCard(action->text());
 	
 	lastTokenName = cardInfo->getName();
-	lastTokenColor = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().first();
+	lastTokenColor = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().first().toLower();
 	lastTokenPT = cardInfo->getPowTough();
 	lastTokenAnnotation = cardInfo->getText();
 	lastTokenDestroy = true;
