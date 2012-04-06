@@ -6,8 +6,8 @@
 #include <QList>
 #include <QSet>
 #include "gametypemap.h"
+#include "pb/serverinfo_game.pb.h"
 
-class ServerInfo_Game;
 class ServerInfo_User;
 
 class GamesModel : public QAbstractTableModel {
@@ -18,7 +18,6 @@ private:
 	QMap<int, GameTypeMap> gameTypes;
 public:
 	GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent = 0);
-	~GamesModel();
 	int rowCount(const QModelIndex &parent = QModelIndex()) const { return parent.isValid() ? 0 : gameList.size(); }
 	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return 8; }
 	QVariant data(const QModelIndex &index, int role) const;

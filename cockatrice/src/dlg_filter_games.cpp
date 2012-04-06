@@ -61,12 +61,17 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &allGameTypes, QWidget *
 	QGroupBox *maxPlayersGroupBox = new QGroupBox(tr("Maximum player count"));
 	maxPlayersGroupBox->setLayout(maxPlayersFilterLayout);
 	
-	QGridLayout *leftColumn = new QGridLayout;
-	leftColumn->addWidget(gameNameFilterLabel, 0, 0);
-	leftColumn->addWidget(gameNameFilterEdit, 0, 1);
-	leftColumn->addWidget(creatorNameFilterLabel, 1, 0);
-	leftColumn->addWidget(creatorNameFilterEdit, 1, 1);
-	leftColumn->addWidget(maxPlayersGroupBox, 2, 0, 1, 2);
+	QGridLayout *leftGrid = new QGridLayout;
+	leftGrid->addWidget(gameNameFilterLabel, 0, 0);
+	leftGrid->addWidget(gameNameFilterEdit, 0, 1);
+	leftGrid->addWidget(creatorNameFilterLabel, 1, 0);
+	leftGrid->addWidget(creatorNameFilterEdit, 1, 1);
+	leftGrid->addWidget(maxPlayersGroupBox, 2, 0, 1, 2);
+	leftGrid->addWidget(unavailableGamesVisibleCheckBox, 3, 0, 1, 2);
+	
+	QVBoxLayout *leftColumn = new QVBoxLayout;
+	leftColumn->addLayout(leftGrid);
+	leftColumn->addStretch();
 	
 	QVBoxLayout *rightColumn = new QVBoxLayout;
 	rightColumn->addWidget(gameTypeFilterGroupBox);

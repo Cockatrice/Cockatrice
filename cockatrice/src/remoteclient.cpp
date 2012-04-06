@@ -118,7 +118,9 @@ void RemoteClient::readData()
 		
 		ServerMessage newServerMessage;
 		newServerMessage.ParseFromArray(inputBuffer.data(), messageLength);
-		qDebug(("IN " + QString::number(messageLength) + ": " + QString::fromStdString(newServerMessage.DebugString())).toUtf8());
+#ifdef QT_DEBUG
+		qDebug(("IN " + QString::number(messageLength) + ": " + QString::fromStdString(newServerMessage.ShortDebugString())).toUtf8());
+#endif
 		inputBuffer.remove(0, messageLength);
 		messageInProgress = false;
 		
@@ -133,7 +135,9 @@ void RemoteClient::sendCommandContainer(const CommandContainer &cont)
 {
 	QByteArray buf;
 	unsigned int size = cont.ByteSize();
-	qDebug(("OUT " + QString::number(size) + ": " + QString::fromStdString(cont.DebugString())).toUtf8());
+#ifdef QT_DEBUG
+	qDebug(("OUT " + QString::number(size) + ": " + QString::fromStdString(cont.ShortDebugString())).toUtf8());
+#endif
 	buf.resize(size + 4);
 	cont.SerializeToArray(buf.data() + 4, size);
 	buf.data()[3] = (unsigned char) size;

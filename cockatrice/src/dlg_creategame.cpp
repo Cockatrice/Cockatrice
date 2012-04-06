@@ -55,7 +55,8 @@ void DlgCreateGame::sharedCtor()
 
 	onlyBuddiesCheckBox = new QCheckBox(tr("Only &buddies can join"));
 	onlyRegisteredCheckBox = new QCheckBox(tr("Only &registered users can join"));
-	onlyRegisteredCheckBox->setChecked(true);
+	if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsRegistered)
+		onlyRegisteredCheckBox->setChecked(true);
 	
 	QGridLayout *joinRestrictionsLayout = new QGridLayout;
 	joinRestrictionsLayout->addWidget(passwordLabel, 0, 0);

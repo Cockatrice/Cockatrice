@@ -68,6 +68,7 @@ public:
 	const QMap<int, QString> &getGameTypes() const { return gameTypes; }
 	QString getChannelName() const { return roomName; }
 	QString getTabText() const { return roomName; }
+	const ServerInfo_User *getUserInfo() const { return ownUser; }
 
 	PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd);
 	void sendRoomCommand(PendingCommand *pend);

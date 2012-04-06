@@ -294,7 +294,9 @@ void Server_Game::doStartGameIfReady()
 	locker.unlock();
 	
 	ServerInfo_Game gameInfo;
-	getInfo(gameInfo);
+	gameInfo.set_room_id(room->getId());
+	gameInfo.set_game_id(gameId);
+	gameInfo.set_started(true);
 	emit gameInfoChanged(gameInfo);
 }
 
@@ -327,6 +329,14 @@ void Server_Game::stopGameIfFinished()
 	}
 
 	sendGameStateToPlayers();
+	
+	locker.unlock();
+	
+	ServerInfo_Game gameInfo;
+	gameInfo.set_room_id(room->getId());
+	gameInfo.set_game_id(gameId);
+	gameInfo.set_started(false);
+	emit gameInfoChanged(gameInfo);
 }
 
 Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions)
@@ -393,7 +403,9 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface, Respons
 	
 	if (broadcastUpdate) {
 		ServerInfo_Game gameInfo;
-		getInfo(gameInfo);
+		gameInfo.set_room_id(room->getId());
+		gameInfo.set_game_id(gameId);
+		gameInfo.set_player_count(getPlayerCount());
 		emit gameInfoChanged(gameInfo);
 	}
 	
@@ -421,9 +433,10 @@ void Server_Game::removePlayer(Server_Player *player)
 	bool spectator = player->getSpectator();
 	player->prepareDestroy();
 	
-	if (!getPlayerCount())
+	if (!getPlayerCount()) {
 		deleteLater();
-	else if (!spectator) {
+		return;
+	} else if (!spectator) {
 		if (playerHost) {
 			int newHostId = -1;
 			QMapIterator<int, Server_Player *> playerIterator(players);
@@ -445,7 +458,9 @@ void Server_Game::removePlayer(Server_Player *player)
 	}
 	
 	ServerInfo_Game gameInfo;
-	getInfo(gameInfo);
+	gameInfo.set_room_id(room->getId());
+	gameInfo.set_game_id(gameId);
+	gameInfo.set_player_count(getPlayerCount());
 	emit gameInfoChanged(gameInfo);
 }
 
@@ -645,8 +660,10 @@ void Server_Game::getInfo(ServerInfo_Game &result) const
 	QMutexLocker locker(&gameMutex);
 	
 	result.set_room_id(room->getId());
-	result.set_game_id(getGameId());
-	if (!players.isEmpty()) {
+	result.set_game_id(gameId);
+	if (players.isEmpty())
+		result.set_closed(true);
+	else {
 		for (int i = 0; i < gameTypes.size(); ++i)
 			result.add_game_types(gameTypes[i]);
 		

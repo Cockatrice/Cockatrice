@@ -422,7 +422,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_G
 	while (roomIterator.hasNext()) {
 		Server_Room *room = roomIterator.next().value();
 		room->gamesMutex.lock();
-		re->add_room_list()->CopyFrom(room->getInfo(false, true));
+		room->getInfo(*re->add_room_list(), false, true);
 		QListIterator<ServerInfo_Game> gameIterator(room->getGamesOfUser(QString::fromStdString(cmd.user_name())));
 		while (gameIterator.hasNext())
 			re->add_game_list()->CopyFrom(gameIterator.next());
@@ -470,7 +470,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdListRooms(const Command_ListRo
 	Event_ListRooms event;
 	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
 	while (roomIterator.hasNext())
-		event.add_room_list()->CopyFrom(roomIterator.next().value()->getInfo(false));
+		roomIterator.next().value()->getInfo(*event.add_room_list(), false);
 	rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event));
 	
 	acceptsRoomListChanges = true;
@@ -498,7 +498,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
 	rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, r->prepareRoomEvent(joinMessageEvent));
 	
 	Response_JoinRoom *re = new Response_JoinRoom;
-	re->mutable_room_info()->CopyFrom(r->getInfo(true));
+	r->getInfo(*re->mutable_room_info(), true);
 	
 	rc.setResponseExtension(re);
 	return Response::RespOk;

@@ -9,6 +9,7 @@
 #include "pb/event_leave_room.pb.h"
 #include "pb/event_list_games.pb.h"
 #include "pb/event_room_say.pb.h"
+#include "pb/serverinfo_room.pb.h"
 #include <google/protobuf/descriptor.h>
 
 Server_Room::Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent)
@@ -38,9 +39,8 @@ Server *Server_Room::getServer() const
 	return static_cast<Server *>(parent());
 }
 
-ServerInfo_Room Server_Room::getInfo(bool complete, bool showGameTypes, bool updating, bool includeExternalData) const
+const ServerInfo_Room &Server_Room::getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes, bool updating, bool includeExternalData) const
 {
-	ServerInfo_Room result;
 	result.set_room_id(id);
 	
 	if (!updating) {
@@ -104,7 +104,8 @@ void Server_Room::addClient(Server_ProtocolHandler *client)
 	userList.append(client);
 	usersLock.unlock();
 	
-	emit roomInfoChanged(getInfo(false, false, true));
+	ServerInfo_Room roomInfo;
+	emit roomInfoChanged(getInfo(roomInfo, false, false, true));
 }
 
 void Server_Room::removeClient(Server_ProtocolHandler *client)
@@ -117,7 +118,8 @@ void Server_Room::removeClient(Server_ProtocolHandler *client)
 	event.set_name(client->getUserInfo()->name());
 	sendRoomEvent(prepareRoomEvent(event));
 	
-	emit roomInfoChanged(getInfo(false, false, true));
+	ServerInfo_Room roomInfo;
+	emit roomInfoChanged(getInfo(roomInfo, false, false, true));
 }
 
 void Server_Room::addExternalUser(const ServerInfo_User &userInfo)
@@ -132,7 +134,8 @@ void Server_Room::addExternalUser(const ServerInfo_User &userInfo)
 	externalUsers.insert(QString::fromStdString(userInfo.name()), userInfoContainer);
 	usersLock.unlock();
 	
-	emit roomInfoChanged(getInfo(false, false, true));
+	ServerInfo_Room roomInfo;
+	emit roomInfoChanged(getInfo(roomInfo, false, false, true));
 }
 
 void Server_Room::removeExternalUser(const QString &name)
@@ -147,7 +150,8 @@ void Server_Room::removeExternalUser(const QString &name)
 	event.set_name(name.toStdString());
 	sendRoomEvent(prepareRoomEvent(event), false);
 	
-	emit roomInfoChanged(getInfo(false, false, true));
+	ServerInfo_Room roomInfo;
+	emit roomInfoChanged(getInfo(roomInfo, false, false, true));
 }
 
 void Server_Room::updateExternalGameList(const ServerInfo_Game &gameInfo)
@@ -161,7 +165,8 @@ void Server_Room::updateExternalGameList(const ServerInfo_Game &gameInfo)
 	gamesMutex.unlock();
 	
 	broadcastGameListUpdate(gameInfo, false);
-	emit roomInfoChanged(getInfo(false, false, true));
+	ServerInfo_Room roomInfo;
+	emit roomInfoChanged(getInfo(roomInfo, false, false, true));
 }
 
 Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGame &cmd, ResponseContainer &rc, Server_AbstractUserInterface *userInterface)
@@ -215,7 +220,7 @@ void Server_Room::sendRoomEvent(RoomEvent *event, bool sendToIsl)
 	delete event;
 }
 
-void Server_Room::broadcastGameListUpdate(ServerInfo_Game gameInfo, bool sendToIsl)
+void Server_Room::broadcastGameListUpdate(const ServerInfo_Game &gameInfo, bool sendToIsl)
 {
 	Event_ListGames event;
 	event.add_game_list()->CopyFrom(gameInfo);
@@ -236,7 +241,8 @@ void Server_Room::addGame(Server_Game *game)
 	game->gameMutex.unlock();
 	
 	emit gameListChanged(gameInfo);
-	emit roomInfoChanged(getInfo(false, false, true));
+	ServerInfo_Room roomInfo;
+	emit roomInfoChanged(getInfo(roomInfo, false, false, true));
 }
 
 void Server_Room::removeGame(Server_Game *game)
@@ -252,7 +258,8 @@ void Server_Room::removeGame(Server_Game *game)
 	
 	games.remove(game->getGameId());
 	
-	emit roomInfoChanged(getInfo(false, false, true));
+	ServerInfo_Room roomInfo;
+	emit roomInfoChanged(getInfo(roomInfo, false, false, true));
 }
 
 int Server_Room::getGamesCreatedByUser(const QString &userName) const

@@ -25,7 +25,6 @@ AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, int _id
 
 AbstractCardItem::~AbstractCardItem()
 {
-	qDebug() << "AbstractCardItem destructor:" << name;
 	emit deleteCardInfoPopup(name);
 }
 
