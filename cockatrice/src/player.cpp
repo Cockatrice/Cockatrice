@@ -18,6 +18,8 @@
 #include "dlg_create_token.h"
 #include "carddatabase.h"
 #include "color.h"
+#include "decklist.h"
+#include "main.h"
 #include <QSettings>
 #include <QPainter>
 #include <QMenu>
@@ -307,6 +309,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 		aCreateAnotherToken = new QAction(this);
 		connect(aCreateAnotherToken, SIGNAL(triggered()), this, SLOT(actCreateAnotherToken()));
 		aCreateAnotherToken->setEnabled(false);
+		
+		createPredefinedTokenMenu = new QMenu(QString());
 
 		playerMenu->addSeparator();
 		countersMenu = playerMenu->addMenu(QString());
@@ -317,6 +321,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 		playerMenu->addSeparator();
 		playerMenu->addAction(aCreateToken);
 		playerMenu->addAction(aCreateAnotherToken);
+		playerMenu->addMenu(createPredefinedTokenMenu);
 		playerMenu->addSeparator();
 		sayMenu = playerMenu->addMenu(QString());
 		initSayMenu();
@@ -332,11 +337,11 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 			allPlayersActions.append(newAction);
 			playerLists[i]->addSeparator();
 		}
-	
 	} else {
 		countersMenu = 0;
 		sbMenu = 0;
 		aCreateAnotherToken = 0;
+		createPredefinedTokenMenu = 0;
 		aCardMenu = 0;
 	}
 	
@@ -611,6 +616,7 @@ void Player::retranslateUi()
 		aRollDie->setText(tr("R&oll die..."));
 		aCreateToken->setText(tr("&Create token..."));
 		aCreateAnotherToken->setText(tr("C&reate another token"));
+		createPredefinedTokenMenu->setTitle(tr("Cr&eate predefined token"));
 		sayMenu->setTitle(tr("S&ay"));
 		
 		QMapIterator<int, AbstractCounter *> counterIterator(counters);
@@ -733,6 +739,24 @@ void Player::initSayMenu()
 		connect(newAction, SIGNAL(triggered()), this, SLOT(actSayMessage()));
 		sayMenu->addAction(newAction);
 	}
+}
+
+void Player::setDeck(DeckList *_deck)
+{
+	deck = _deck;
+	
+	createPredefinedTokenMenu->clear();
+	predefinedTokens.clear();
+	InnerDecklistNode *tokenZone = dynamic_cast<InnerDecklistNode *>(deck->getRoot()->findChild("tokens"));
+	if (tokenZone)
+		for (int i = 0; i < tokenZone->size(); ++i) {
+			const QString tokenName = tokenZone->at(i)->getName();
+			predefinedTokens.append(tokenName);
+			QAction *a = createPredefinedTokenMenu->addAction(tokenName);
+			if (i < 10)
+				a->setShortcut("Alt+" + QString::number((i + 1) % 10));
+			connect(a, SIGNAL(triggered()), this, SLOT(actCreatePredefinedToken()));
+		}
 }
 
 void Player::actViewLibrary()
@@ -888,7 +912,7 @@ void Player::actRollDie()
 
 void Player::actCreateToken()
 {
-	DlgCreateToken dlg(deck);
+	DlgCreateToken dlg(predefinedTokens);
 	if (!dlg.exec())
 		return;
 	
@@ -915,6 +939,21 @@ void Player::actCreateAnotherToken()
 	cmd.set_y(0);
 	
 	sendGameCommand(cmd);
+}
+
+void Player::actCreatePredefinedToken()
+{
+	QAction *action = static_cast<QAction *>(sender());
+	CardInfo *cardInfo = db->getCard(action->text());
+	
+	lastTokenName = cardInfo->getName();
+	lastTokenColor = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().first();
+	lastTokenPT = cardInfo->getPowTough();
+	lastTokenAnnotation = cardInfo->getText();
+	lastTokenDestroy = true;
+	aCreateAnotherToken->setEnabled(true);
+	
+	actCreateAnotherToken();
 }
 
 void Player::actSayMessage()

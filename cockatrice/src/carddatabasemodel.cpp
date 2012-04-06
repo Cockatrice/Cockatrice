@@ -80,7 +80,7 @@ CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
 
 bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
 {
-	CardInfo *info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
+	CardInfo const *info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
 	
 	if (((isToken == ShowTrue) && !info->getIsToken()) || (isToken == ShowFalse) && info->getIsToken())
 		return false;
@@ -88,9 +88,13 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 	if (!cardNameBeginning.isEmpty())
 		if (!info->getName().startsWith(cardNameBeginning, Qt::CaseInsensitive))
 			return false;
-		
+	
 	if (!cardName.isEmpty())
 		if (!info->getName().contains(cardName, Qt::CaseInsensitive))
+			return false;
+	
+	if (!cardNameSet.isEmpty())
+		if (!cardNameSet.contains(info->getName()))
 			return false;
 	
 	if (!cardText.isEmpty())

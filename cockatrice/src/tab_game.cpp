@@ -935,6 +935,7 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*e
 					DeckList *newDeck = new DeckList(QString::fromStdString(playerInfo.deck_list()));
 					db->cacheCardPixmaps(newDeck->getCardList());
 					deckViewContainer->setDeck(newDeck);
+					player->setDeck(newDeck);
 				}
 				deckViewContainer->setReadyStart(prop.ready_start());
 				deckViewContainer->setSideboardLocked(prop.sideboard_locked());

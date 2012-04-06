@@ -9,13 +9,14 @@
 #include <QGroupBox>
 #include <QTreeView>
 #include <QRadioButton>
+#include <QHeaderView>
 #include "decklist.h"
 #include "dlg_create_token.h"
 #include "carddatabasemodel.h"
 #include "main.h"
 
-DlgCreateToken::DlgCreateToken(DeckList *_deck, QWidget *parent)
-	: QDialog(parent)
+DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent)
+	: QDialog(parent), predefinedTokens(_predefinedTokens)
 {
 	nameLabel = new QLabel(tr("&Name:"));
 	nameEdit = new QLineEdit(tr("Token"));
@@ -30,7 +31,7 @@ DlgCreateToken::DlgCreateToken(DeckList *_deck, QWidget *parent)
 	colorEdit->addItem(tr("red"), "r");
 	colorEdit->addItem(tr("green"), "g");
 	colorEdit->addItem(tr("multicolor"), "m");
-	colorEdit->addItem(tr("colorless"), "");
+	colorEdit->addItem(tr("colorless"), QString());
 	colorLabel->setBuddy(colorEdit);
 
 	ptLabel = new QLabel(tr("&P/T:"));
@@ -63,10 +64,31 @@ DlgCreateToken::DlgCreateToken(DeckList *_deck, QWidget *parent)
 	cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
 	cardDatabaseDisplayModel->setIsToken(CardDatabaseDisplayModel::ShowTrue);
 	
-	QRadioButton *chooseTokenFromAllRadioButton = new QRadioButton(tr("Show &all tokens"));
-	QRadioButton *chooseTokenFromDeckRadioButton = new QRadioButton(tr("Show tokens from this &deck"));
+	chooseTokenFromAllRadioButton = new QRadioButton(tr("Show &all tokens"));
+	connect(chooseTokenFromAllRadioButton, SIGNAL(toggled(bool)), this, SLOT(actChooseTokenFromAll(bool)));
+	chooseTokenFromDeckRadioButton = new QRadioButton(tr("Show tokens from this &deck"));
+	connect(chooseTokenFromDeckRadioButton, SIGNAL(toggled(bool)), this, SLOT(actChooseTokenFromDeck(bool)));
 	QTreeView *chooseTokenView = new QTreeView;
 	chooseTokenView->setModel(cardDatabaseDisplayModel);
+	chooseTokenView->setUniformRowHeights(true);
+	chooseTokenView->setRootIsDecorated(false);
+	chooseTokenView->setAlternatingRowColors(true);
+	chooseTokenView->setSortingEnabled(true);
+	chooseTokenView->sortByColumn(0, Qt::AscendingOrder);
+	chooseTokenView->resizeColumnToContents(0);
+	chooseTokenView->header()->setStretchLastSection(false);
+	chooseTokenView->header()->hideSection(1);
+	chooseTokenView->header()->hideSection(2);
+	chooseTokenView->header()->setResizeMode(3, QHeaderView::ResizeToContents);
+	chooseTokenView->header()->setResizeMode(4, QHeaderView::ResizeToContents);
+	connect(chooseTokenView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this, SLOT(tokenSelectionChanged(QModelIndex, QModelIndex)));
+	
+	if (predefinedTokens.isEmpty())
+		chooseTokenFromAllRadioButton->setChecked(true);
+	else {
+		chooseTokenFromDeckRadioButton->setChecked(true);
+		cardDatabaseDisplayModel->setCardNameSet(QSet<QString>::fromList(predefinedTokens));
+	}
 	
 	QVBoxLayout *tokenChooseLayout = new QVBoxLayout;
 	tokenChooseLayout->addWidget(chooseTokenFromAllRadioButton);
@@ -76,8 +98,12 @@ DlgCreateToken::DlgCreateToken(DeckList *_deck, QWidget *parent)
 	QGroupBox *tokenChooseGroupBox = new QGroupBox(tr("Choose token from list"));
 	tokenChooseGroupBox->setLayout(tokenChooseLayout);
 	
+	QVBoxLayout *leftVBox = new QVBoxLayout;
+	leftVBox->addWidget(tokenDataGroupBox);
+	leftVBox->addStretch();
+	
 	QHBoxLayout *hbox = new QHBoxLayout;
-	hbox->addWidget(tokenDataGroupBox);
+	hbox->addLayout(leftVBox);
 	hbox->addWidget(tokenChooseGroupBox);
 	
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -92,6 +118,30 @@ DlgCreateToken::DlgCreateToken(DeckList *_deck, QWidget *parent)
 	setWindowTitle(tr("Create token"));
 	setFixedHeight(sizeHint().height());
 	setMinimumWidth(300);
+}
+
+void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
+{
+	const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
+	const CardInfo *cardInfo = cardDatabaseModel->getCard(realIndex.row());
+	
+	nameEdit->setText(cardInfo->getName());
+	const QString cardColor = cardInfo->getColors().isEmpty() ? QString() : (cardInfo->getColors().size() > 1 ? QString("m") : cardInfo->getColors().first());
+	colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
+	ptEdit->setText(cardInfo->getPowTough());
+	annotationEdit->setText(cardInfo->getText());
+}
+
+void DlgCreateToken::actChooseTokenFromAll(bool checked)
+{
+	if (checked)
+		cardDatabaseDisplayModel->setCardNameSet(QSet<QString>());
+}
+
+void DlgCreateToken::actChooseTokenFromDeck(bool checked)
+{
+	if (checked)
+		cardDatabaseDisplayModel->setCardNameSet(QSet<QString>::fromList(predefinedTokens));
 }
 
 void DlgCreateToken::actOk()
