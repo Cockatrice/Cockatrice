@@ -10,6 +10,7 @@ class ServerInfo_PlayerProperties;
 class TabSupervisor;
 class AbstractClient;
 class TabGame;
+class UserContextMenu;
 
 class PlayerListItemDelegate : public QStyledItemDelegate {
 public:
@@ -31,6 +32,7 @@ private:
 	TabSupervisor *tabSupervisor;
 	AbstractClient *client;
 	TabGame *game;
+	UserContextMenu *userContextMenu;
 	QIcon readyIcon, notReadyIcon, concededIcon, playerIcon, spectatorIcon, lockIcon;
 	bool gameStarted;
 signals:

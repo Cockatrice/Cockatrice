@@ -7,6 +7,7 @@
 #include "tab_userlists.h"
 #include "userlist.h"
 #include "userinfobox.h"
+#include "user_context_menu.h"
 #include <QMouseEvent>
 #include <QAction>
 #include <QMenu>
@@ -60,7 +61,11 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient
 	if (tabSupervisor) {
 		itemDelegate = new PlayerListItemDelegate(this);
 		setItemDelegate(itemDelegate);
-	}
+		
+		userContextMenu = new UserContextMenu(tabSupervisor, this, game);
+		connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
+	} else
+		userContextMenu = 0;
 	
 	setMinimumHeight(60);
 	setIconSize(QSize(20, 15));
@@ -162,93 +167,12 @@ void PlayerListWidget::setGameStarted(bool _gameStarted, bool resuming)
 
 void PlayerListWidget::showContextMenu(const QPoint &pos, const QModelIndex &index)
 {
+	if (!userContextMenu)
+		return;
+	
 	const QString &userName = index.sibling(index.row(), 4).data(Qt::UserRole).toString();
 	int playerId = index.sibling(index.row(), 4).data(Qt::UserRole + 1).toInt();
 	ServerInfo_User::UserLevelFlags userLevel = static_cast<ServerInfo_User::UserLevelFlags>(index.sibling(index.row(), 3).data(Qt::UserRole).toInt());
 	
-	QAction *aUserName = new QAction(userName, this);
-	aUserName->setEnabled(false);
-	QAction *aDetails = new QAction(tr("User &details"), this);
-	QAction *aChat = new QAction(tr("Direct &chat"), this);
-	QAction *aAddToBuddyList = new QAction(tr("Add to &buddy list"), this);
-	QAction *aRemoveFromBuddyList = new QAction(tr("Remove from &buddy list"), this);
-	QAction *aAddToIgnoreList = new QAction(tr("Add to &ignore list"), this);
-	QAction *aRemoveFromIgnoreList = new QAction(tr("Remove from &ignore list"), this);
-	QAction *aKick = new QAction(tr("Kick from &game"), this);
-	
-	QMenu *menu = new QMenu(this);
-	menu->addAction(aUserName);
-	menu->addSeparator();
-	menu->addAction(aDetails);
-	menu->addAction(aChat);
-	if ((userLevel & ServerInfo_User::IsRegistered) && (tabSupervisor->getUserLevel() & ServerInfo_User::IsRegistered)) {
-		menu->addSeparator();
-		if (tabSupervisor->getUserListsTab()->getBuddyList()->getUsers().contains(userName))
-			menu->addAction(aRemoveFromBuddyList);
-		else
-			menu->addAction(aAddToBuddyList);
-		if (tabSupervisor->getUserListsTab()->getIgnoreList()->getUsers().contains(userName))
-			menu->addAction(aRemoveFromIgnoreList);
-		else
-			menu->addAction(aAddToIgnoreList);
-	}
-	if (game->isHost() || !game->getTabSupervisor()->getAdminLocked()) {
-		menu->addSeparator();
-		menu->addAction(aKick);
-	}
-	if (userName == QString::fromStdString(game->getTabSupervisor()->getUserInfo()->name())) {
-		aChat->setEnabled(false);
-		aAddToBuddyList->setEnabled(false);
-		aRemoveFromBuddyList->setEnabled(false);
-		aAddToIgnoreList->setEnabled(false);
-		aRemoveFromIgnoreList->setEnabled(false);
-		aKick->setEnabled(false);
-	}
-	
-	QAction *actionClicked = menu->exec(pos);
-	if (actionClicked == aDetails) {
-		UserInfoBox *infoWidget = new UserInfoBox(client, true, this, Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
-		infoWidget->setAttribute(Qt::WA_DeleteOnClose);
-		infoWidget->updateInfo(userName);
-	} else if (actionClicked == aChat)
-		emit openMessageDialog(userName, true);
-	else if (actionClicked == aAddToBuddyList) {
-		Command_AddToList cmd;
-		cmd.set_list("buddy");
-		cmd.set_user_name(userName.toStdString());
-		
-		client->sendCommand(client->prepareSessionCommand(cmd));
-	} else if (actionClicked == aRemoveFromBuddyList) {
-		Command_RemoveFromList cmd;
-		cmd.set_list("buddy");
-		cmd.set_user_name(userName.toStdString());
-		
-		client->sendCommand(client->prepareSessionCommand(cmd));
-	} else if (actionClicked == aAddToIgnoreList) {
-		Command_AddToList cmd;
-		cmd.set_list("ignore");
-		cmd.set_user_name(userName.toStdString());
-		
-		client->sendCommand(client->prepareSessionCommand(cmd));
-	} else if (actionClicked == aRemoveFromIgnoreList) {
-		Command_RemoveFromList cmd;
-		cmd.set_list("ignore");
-		cmd.set_user_name(userName.toStdString());
-		
-		client->sendCommand(client->prepareSessionCommand(cmd));
-	} else if (actionClicked == aKick) {
-		Command_KickFromGame cmd;
-		cmd.set_player_id(playerId);
-		game->sendGameCommand(cmd);
-	}
-	
-	delete menu;
-	delete aUserName;
-	delete aDetails;
-	delete aChat;
-	delete aAddToBuddyList;
-	delete aRemoveFromBuddyList;
-	delete aAddToIgnoreList;
-	delete aRemoveFromIgnoreList;
-	delete aKick;
+	userContextMenu->showContextMenu(pos, userName, userLevel, playerId);
 }

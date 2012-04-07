@@ -98,10 +98,9 @@ GamesProxyModel::GamesProxyModel(QObject *parent, ServerInfo_User *_ownUser)
 {
 	setDynamicSortFilter(true);
 }
-#include <QDebug>
+
 void GamesProxyModel::setUnavailableGamesVisible(bool _unavailableGamesVisible)
 {
-	qDebug() << "setting to" << _unavailableGamesVisible;
 	unavailableGamesVisible = _unavailableGamesVisible;
 	invalidateFilter();
 }

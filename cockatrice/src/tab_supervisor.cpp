@@ -113,6 +113,11 @@ void TabSupervisor::retranslateUi()
 	}
 }
 
+AbstractClient *TabSupervisor::getClient() const
+{
+	return localClients.isEmpty() ? client : localClients.first();
+}
+
 int TabSupervisor::myAddTab(Tab *tab)
 {
 	connect(tab, SIGNAL(userEvent(bool)), this, SLOT(tabUserEvent(bool)));
@@ -427,9 +432,4 @@ bool TabSupervisor::getAdminLocked() const
 	if (!tabAdmin)
 		return true;
 	return tabAdmin->getLocked();
-}
-
-int TabSupervisor::getUserLevel() const
-{
-	return userInfo->user_level();
 }
