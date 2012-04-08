@@ -84,7 +84,7 @@ private slots:
 	void openReplay(GameReplay *replay);
 	void replayLeft(TabGame *tab);
 	void processUserLeft(const QString &userName);
-	void processUserJoined(const QString &userName);
+	void processUserJoined(const ServerInfo_User &userInfo);
 	void talkLeft(TabMessage *tab);
 	void tabUserEvent(bool globalEvent);
 	void processRoomEvent(const RoomEvent &event);

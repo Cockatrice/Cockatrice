@@ -17,7 +17,7 @@
 #include "pb/response_get_games_of_user.pb.h"
 #include "pb/response_get_user_info.pb.h"
 
-UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
+UserContextMenu::UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
 	: QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor), game(_game)
 {
 	aUserName = new QAction(QString(), this);
@@ -87,7 +87,7 @@ void UserContextMenu::banUser_dialogFinished()
 	client->sendCommand(client->prepareModeratorCommand(cmd));
 }
 
-void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName, ServerInfo_User::UserLevelFlags userLevel, int playerId)
+void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName, UserLevelFlags userLevel, int playerId)
 {
 	aUserName->setText(userName);
 	
@@ -97,7 +97,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
 	menu->addAction(aDetails);
 	menu->addAction(aShowGames);
 	menu->addAction(aChat);
-	if ((userLevel & ServerInfo_User::IsRegistered) && (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsRegistered)) {
+	if (userLevel.testFlag(ServerInfo_User::IsRegistered) && (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsRegistered)) {
 		menu->addSeparator();
 		if (tabSupervisor->getUserListsTab()->getBuddyList()->getUsers().contains(userName))
 			menu->addAction(aRemoveFromBuddyList);
@@ -167,7 +167,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
 		client->sendCommand(client->prepareSessionCommand(cmd));
 	} else if (actionClicked == aKick) {
 		Command_KickFromGame cmd;
-		cmd.set_player_id(playerId);
+		cmd.set_player_id(game->getPlayerIdByName(userName));
 		game->sendGameCommand(cmd);
 	} else if (actionClicked == aBan) {
 		Command_GetUserInfo cmd;

@@ -3,6 +3,7 @@
 #include "cardzone.h"
 #include "carditem.h"
 #include "soundengine.h"
+#include "tab_supervisor.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/context_move_card.pb.h"
 #include "pb/context_mulligan.pb.h"
@@ -21,9 +22,14 @@ bool MessageLogWidget::isFemale(Player *player) const
 	return player->getUserInfo()->gender() == ServerInfo_User::Female;
 }
 
+bool MessageLogWidget::userIsFemale() const
+{
+	return (tabSupervisor && tabSupervisor->getUserInfo()->gender() & ServerInfo_User::Female);
+}
+
 void MessageLogWidget::logGameJoined(int gameId)
 {
-	if (female)
+	if (userIsFemale())
 		appendHtml(tr("You have joined game #%1.", "female").arg(gameId));
 	else
 		appendHtml(tr("You have joined game #%1.", "male").arg(gameId));
@@ -31,7 +37,7 @@ void MessageLogWidget::logGameJoined(int gameId)
 
 void MessageLogWidget::logReplayStarted(int gameId)
 {
-	if (female)
+	if (userIsFemale())
 		appendHtml(tr("You are watching a replay of game #%1.", "female").arg(gameId));
 	else
 		appendHtml(tr("You are watching a replay of game #%1.", "male").arg(gameId));
@@ -143,12 +149,12 @@ void MessageLogWidget::logConnectionStateChanged(Player *player, bool connection
 
 void MessageLogWidget::logSay(Player *player, QString message)
 {
-	appendMessage(player->getName(), message, QColor(), true);
+	appendMessage(message, player->getName(), UserLevelFlags(player->getUserInfo()->user_level()), true);
 }
 
-void MessageLogWidget::logSpectatorSay(QString spectatorName, QString message)
+void MessageLogWidget::logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString message)
 {
-	appendMessage(spectatorName, message, QColor(), false);
+	appendMessage(message, spectatorName, spectatorUserLevel, false);
 }
 
 void MessageLogWidget::logShuffle(Player *player, CardZone *zone)
@@ -858,7 +864,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
 	connect(player, SIGNAL(logAlwaysRevealTopCard(Player *, CardZone *, bool)), this, SLOT(logAlwaysRevealTopCard(Player *, CardZone *, bool)));
 }
 
-MessageLogWidget::MessageLogWidget(const QString &_ownName, bool _female, QWidget *parent)
-	: ChatView(_ownName, false, parent), female(_female)
+MessageLogWidget::MessageLogWidget(const TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent)
+	: ChatView(_tabSupervisor, _game, false, parent)
 {
 }

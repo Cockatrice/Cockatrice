@@ -176,7 +176,7 @@ void MainWindow::actWatchReplay()
 	GameReplay *replay = new GameReplay;
 	replay->ParseFromArray(buf.data(), buf.size());
 	
-	TabGame *replayWatcher = new TabGame(replay);
+	TabGame *replayWatcher = new TabGame(0, replay);
 	replayWatcher->show();
 }
 

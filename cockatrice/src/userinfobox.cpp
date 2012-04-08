@@ -56,7 +56,7 @@ void UserInfoBox::retranslateUi()
 
 void UserInfoBox::updateInfo(const ServerInfo_User &user)
 {
-	const int userLevel = user.user_level();
+	const UserLevelFlags userLevel(user.user_level());
 	
 	QPixmap avatarPixmap;
 	const std::string bmp = user.avatar_bmp();
@@ -70,11 +70,11 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
 	countryLabel2->setPixmap(CountryPixmapGenerator::generatePixmap(15, QString::fromStdString(user.country())));
 	userLevelLabel2->setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel));
 	QString userLevelText;
-	if (userLevel & ServerInfo_User::IsAdmin)
+	if (userLevel.testFlag(ServerInfo_User::IsAdmin))
 		userLevelText = tr("Administrator");
-	else if (userLevel & ServerInfo_User::IsModerator)
+	else if (userLevel.testFlag(ServerInfo_User::IsModerator))
 		userLevelText = tr("Moderator");
-	else if (userLevel & ServerInfo_User::IsRegistered)
+	else if (userLevel.testFlag(ServerInfo_User::IsRegistered))
 		userLevelText = tr("Registered user");
 	else
 		userLevelText = tr("Unregistered user");

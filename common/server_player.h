@@ -105,7 +105,7 @@ public:
 	
 	int getPingTime() const { return pingTime; }
 	void setPingTime(int _pingTime) { pingTime = _pingTime; }
-	ServerInfo_PlayerProperties getProperties(bool withUserInfo);
+	void getProperties(ServerInfo_PlayerProperties &result, bool withUserInfo);
 	
 	int newCardId();
 	int newCounterId() const;

@@ -2,8 +2,8 @@
 #define MESSAGELOGWIDGET_H
 
 #include "chatview.h"
-#include <QAbstractSocket>
 #include "translation.h"
+#include "user_level.h"
 
 class Player;
 class CardZone;
@@ -28,9 +28,9 @@ private:
 	
 	QString sanitizeHtml(QString dirty) const;
 	bool isFemale(Player *player) const;
+	bool userIsFemale() const;
 	QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange) const;
 	MessageContext currentContext;
-	bool female;
 	
 	QList<LogMoveCard> moveCardQueue;
 	QMap<CardItem *, QString> moveCardPT;
@@ -55,7 +55,7 @@ public slots:
 	void logGameStart();
 	void logConnectionStateChanged(Player *player, bool connectionState);
 	void logSay(Player *player, QString message);
-	void logSpectatorSay(QString spectatorName, QString message);
+	void logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString message);
 	void logShuffle(Player *player, CardZone *zone);
 	void logRollDie(Player *player, int sides, int roll);
 	void logDrawCards(Player *player, int number);
@@ -85,7 +85,7 @@ public slots:
 	void containerProcessingDone();
 public:
 	void connectToPlayer(Player *player);
-	MessageLogWidget(const QString &_ownName, bool _female, QWidget *parent = 0);
+	MessageLogWidget(const TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent = 0);
 };
 
 #endif

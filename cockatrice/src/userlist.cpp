@@ -170,19 +170,27 @@ bool UserListItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model,
 	return QStyledItemDelegate::editorEvent(event, model, option, index);
 }
 
-UserListTWI::UserListTWI()
+UserListTWI::UserListTWI(const ServerInfo_User &_userInfo)
 	: QTreeWidgetItem(Type)
 {
+	setUserInfo(_userInfo);
 }
 
-QString UserListTWI::getUserName() const
+void UserListTWI::setUserInfo(const ServerInfo_User &_userInfo)
 {
-	return data(2, Qt::UserRole).toString();
+	userInfo = _userInfo;
+
+	setData(0, Qt::UserRole, userInfo.user_level());
+	setIcon(0, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(userInfo.user_level()))));
+	setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(12, QString::fromStdString(userInfo.country()))));
+	setData(2, Qt::UserRole, QString::fromStdString(userInfo.name()));
+	setData(2, Qt::DisplayRole, QString::fromStdString(userInfo.name()));
 }
 
-int UserListTWI::getUserLevel() const
+void UserListTWI::setOnline(bool online)
 {
-	return data(0, Qt::UserRole).toInt();
+	setData(0, Qt::UserRole + 1, online);
+	setData(2, Qt::ForegroundRole, online ? QBrush() : QBrush(Qt::gray));
 }
 
 bool UserListTWI::operator<(const QTreeWidgetItem &other) const
@@ -239,25 +247,17 @@ void UserList::processUserInfo(const ServerInfo_User &user, bool online)
 {
 	const QString userName = QString::fromStdString(user.name());
 	UserListTWI *item = users.value(userName);
-	if (!item) {
-		item = new UserListTWI;
+	if (item)
+		item->setUserInfo(user);
+	else {
+		item = new UserListTWI(user);
 		users.insert(userName, item);
 		userTree->addTopLevelItem(item);
 		if (online)
 			++onlineCount;
 		updateCount();
 	}
-	item->setData(0, Qt::UserRole, user.user_level());
-	item->setIcon(0, QIcon(UserLevelPixmapGenerator::generatePixmap(12, user.user_level())));
-	item->setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(12, QString::fromStdString(user.country()))));
-	item->setData(2, Qt::UserRole, QString::fromStdString(user.name()));
-	item->setData(2, Qt::DisplayRole, QString::fromStdString(user.name()));
-	
-	item->setData(0, Qt::UserRole + 1, online);
-	if (online)
-		item->setData(2, Qt::ForegroundRole, QBrush());
-	else
-		item->setData(2, Qt::ForegroundRole, QBrush(Qt::gray));
+	item->setOnline(online);
 }
 
 bool UserList::deleteUser(const QString &userName)
@@ -276,25 +276,18 @@ bool UserList::deleteUser(const QString &userName)
 	return false;
 }
 
-void UserList::setUserOnline(QTreeWidgetItem *item, bool online)
-{
-	item->setData(0, Qt::UserRole + 1, online);
-	
-	if (online) {
-		item->setData(2, Qt::ForegroundRole, QBrush());
-		++onlineCount;
-	} else {
-		item->setData(2, Qt::ForegroundRole, QBrush(Qt::gray));
-		--onlineCount;
-	}
-	updateCount();
-}
-
 void UserList::setUserOnline(const QString &userName, bool online)
 {
 	UserListTWI *twi = users.value(userName);
-	if (twi)
-		setUserOnline(twi, online);
+	if (!twi)
+		return;
+	
+	twi->setOnline(online);
+	if (online)
+		++onlineCount;
+	else
+		--onlineCount;
+	updateCount();
 }
 
 void UserList::updateCount()
@@ -312,11 +305,9 @@ void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
 
 void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 {
-	UserListTWI *twi = static_cast<UserListTWI *>(userTree->topLevelItem(index.row()));
-	const QString &userName = twi->getUserName();
-	ServerInfo_User::UserLevelFlags userLevel = static_cast<ServerInfo_User::UserLevelFlags>(twi->getUserLevel());
+	const ServerInfo_User &userInfo = static_cast<UserListTWI *>(userTree->topLevelItem(index.row()))->getUserInfo();
 	
-	userContextMenu->showContextMenu(pos, userName, userLevel);
+	userContextMenu->showContextMenu(pos, QString::fromStdString(userInfo.name()), UserLevelFlags(userInfo.user_level()));
 }
 
 void UserList::sortItems()

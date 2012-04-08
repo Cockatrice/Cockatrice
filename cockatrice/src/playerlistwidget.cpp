@@ -110,7 +110,7 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
 		player->setIcon(2, gameStarted ? (prop.conceded() ? concededIcon : QIcon()) : (prop.ready_start() ? readyIcon : notReadyIcon));
 	if (prop.has_user_info()) {
 		player->setData(3, Qt::UserRole, prop.user_info().user_level());
-		player->setIcon(3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, prop.user_info().user_level())));
+		player->setIcon(3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(prop.user_info().user_level()))));
 		player->setText(4, QString::fromStdString(prop.user_info().name()));
 		const QString country = QString::fromStdString(prop.user_info().country());
 		if (!country.isEmpty())
@@ -172,7 +172,7 @@ void PlayerListWidget::showContextMenu(const QPoint &pos, const QModelIndex &ind
 	
 	const QString &userName = index.sibling(index.row(), 4).data(Qt::UserRole).toString();
 	int playerId = index.sibling(index.row(), 4).data(Qt::UserRole + 1).toInt();
-	ServerInfo_User::UserLevelFlags userLevel = static_cast<ServerInfo_User::UserLevelFlags>(index.sibling(index.row(), 3).data(Qt::UserRole).toInt());
+	UserLevelFlags userLevel(index.sibling(index.row(), 3).data(Qt::UserRole).toInt());
 	
 	userContextMenu->showContextMenu(pos, userName, userLevel, playerId);
 }

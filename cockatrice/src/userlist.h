@@ -5,6 +5,7 @@
 #include <QGroupBox>
 #include <QTreeWidgetItem>
 #include <QStyledItemDelegate>
+#include "user_level.h"
 
 class QTreeWidget;
 class ServerInfo_User;
@@ -47,10 +48,13 @@ public:
 };
 
 class UserListTWI : public QTreeWidgetItem {
+private:
+	ServerInfo_User userInfo;
 public:
-	UserListTWI();
-	QString getUserName() const;
-	int getUserLevel() const;
+	UserListTWI(const ServerInfo_User &_userInfo);
+	const ServerInfo_User &getUserInfo() const { return userInfo; }
+	void setUserInfo(const ServerInfo_User &_userInfo);
+	void setOnline(bool online);
 	bool operator<(const QTreeWidgetItem &other) const;
 };
 
@@ -69,7 +73,6 @@ private:
 	int onlineCount;
 	QString titleStr;
 	void updateCount();
-	void setUserOnline(QTreeWidgetItem *user, bool online);
 private slots:
 	void userClicked(QTreeWidgetItem *item, int column);
 signals:

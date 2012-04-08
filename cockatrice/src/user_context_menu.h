@@ -2,7 +2,7 @@
 #define USER_CONTEXT_MENU_H
 
 #include <QObject>
-#include "pb/serverinfo_user.pb.h"
+#include "user_level.h"
 
 class QAction;
 class TabSupervisor;
@@ -16,7 +16,7 @@ class UserContextMenu : public QObject {
 	Q_OBJECT
 private:
 	AbstractClient *client;
-	TabSupervisor *tabSupervisor;
+	const TabSupervisor *tabSupervisor;
 	TabGame *game;
 	
 	QAction *aUserName;
@@ -34,8 +34,8 @@ private slots:
 	void banUser_dialogFinished();
 	void gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer);
 public:
-	UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *_parent, TabGame *_game = 0);
-	void showContextMenu(const QPoint &pos, const QString &userName, ServerInfo_User::UserLevelFlags userLevel, int playerId = -1);
+	UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *_parent, TabGame *_game = 0);
+	void showContextMenu(const QPoint &pos, const QString &userName, UserLevelFlags userLevel, int playerId = -1);
 };
 
 #endif

@@ -387,7 +387,7 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface, Respons
 	newPlayer->moveToThread(thread());
 	
 	Event_Join joinEvent;
-	joinEvent.mutable_player_properties()->CopyFrom(newPlayer->getProperties(true));
+	newPlayer->getProperties(*joinEvent.mutable_player_properties(), true);
 	sendGameEventContainer(prepareGameEvent(joinEvent, -1));
 	
 	const QString playerName = QString::fromStdString(newPlayer->getUserInfo()->name());

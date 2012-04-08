@@ -131,18 +131,18 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
 
 QMap<QString, QPixmap> CountryPixmapGenerator::pmCache;
 
-QPixmap UserLevelPixmapGenerator::generatePixmap(int height, int userLevel)
+QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags userLevel)
 {
-	int key = height * 10000 + userLevel;
+	int key = height * 10000 + (int) userLevel;
 	if (pmCache.contains(key))
 		return pmCache.value(key);
 	
 	QString levelString;
-	if (userLevel & ServerInfo_User::IsAdmin)
+	if (userLevel.testFlag(ServerInfo_User::IsAdmin))
 		levelString = "admin";
-	else if (userLevel & ServerInfo_User::IsModerator)
+	else if (userLevel.testFlag(ServerInfo_User::IsModerator))
 		levelString = "moderator";
-	else if (userLevel &ServerInfo_User::IsRegistered)
+	else if (userLevel.testFlag(ServerInfo_User::IsRegistered))
 		levelString = "registered";
 	else
 		levelString = "normal";
