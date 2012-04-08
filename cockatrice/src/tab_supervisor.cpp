@@ -97,21 +97,26 @@ TabSupervisor::~TabSupervisor()
 void TabSupervisor::retranslateUi()
 {
 	QList<Tab *> tabs;
-	if (tabServer)
-		tabs.append(tabServer);
-	if (tabDeckStorage)
-		tabs.append(tabDeckStorage);
+	tabs.append(tabServer);
+	tabs.append(tabReplays);
+	tabs.append(tabDeckStorage);
+	tabs.append(tabAdmin);
+	tabs.append(tabUserLists);
 	QMapIterator<int, TabRoom *> roomIterator(roomTabs);
 	while (roomIterator.hasNext())
 		tabs.append(roomIterator.next().value());
 	QMapIterator<int, TabGame *> gameIterator(gameTabs);
 	while (gameIterator.hasNext())
 		tabs.append(gameIterator.next().value());
+	QListIterator<TabGame *> replayIterator(replayTabs);
+	while (replayIterator.hasNext())
+		tabs.append(replayIterator.next());
 	
-	for (int i = 0; i < tabs.size(); ++i) {
-		setTabText(indexOf(tabs[i]), tabs[i]->getTabText());
-		tabs[i]->retranslateUi();
-	}
+	for (int i = 0; i < tabs.size(); ++i)
+		if (tabs[i]) {
+			setTabText(indexOf(tabs[i]), tabs[i]->getTabText());
+			tabs[i]->retranslateUi();
+		}
 }
 
 AbstractClient *TabSupervisor::getClient() const

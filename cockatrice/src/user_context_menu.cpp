@@ -22,15 +22,30 @@ UserContextMenu::UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *p
 {
 	aUserName = new QAction(QString(), this);
 	aUserName->setEnabled(false);
-	aDetails = new QAction(tr("User &details"), this);
-	aChat = new QAction(tr("Direct &chat"), this);
-	aShowGames = new QAction(tr("Show this user's &games"), this);
-	aAddToBuddyList = new QAction(tr("Add to &buddy list"), this);
-	aRemoveFromBuddyList = new QAction(tr("Remove from &buddy list"), this);
-	aAddToIgnoreList = new QAction(tr("Add to &ignore list"), this);
-	aRemoveFromIgnoreList = new QAction(tr("Remove from &ignore list"), this);
-	aKick = new QAction(tr("Kick from &game"), this);
-	aBan = new QAction(tr("Ban from &server"), this);
+	aDetails = new QAction(QString(), this);
+	aChat = new QAction(QString(), this);
+	aShowGames = new QAction(QString(), this);
+	aAddToBuddyList = new QAction(QString(), this);
+	aRemoveFromBuddyList = new QAction(QString(), this);
+	aAddToIgnoreList = new QAction(QString(), this);
+	aRemoveFromIgnoreList = new QAction(QString(), this);
+	aKick = new QAction(QString(), this);
+	aBan = new QAction(QString(), this);
+	
+	retranslateUi();
+}
+
+void UserContextMenu::retranslateUi()
+{
+	aDetails->setText(tr("User &details"));
+	aChat->setText(tr("Direct &chat"));
+	aShowGames->setText(tr("Show this user's &games"));
+	aAddToBuddyList->setText(tr("Add to &buddy list"));
+	aRemoveFromBuddyList->setText(tr("Remove from &buddy list"));
+	aAddToIgnoreList->setText(tr("Add to &ignore list"));
+	aRemoveFromIgnoreList->setText(tr("Remove from &ignore list"));
+	aKick->setText(tr("Kick from &game"));
+	aBan->setText(tr("Ban from &server"));
 }
 
 void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer)

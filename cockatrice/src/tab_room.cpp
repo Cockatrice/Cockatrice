@@ -106,6 +106,7 @@ TabRoom::~TabRoom()
 void TabRoom::retranslateUi()
 {
         gameSelector->retranslateUi();
+	chatView->retranslateUi();
 	sayLabel->setText(tr("&Say:"));
 	chatGroupBox->setTitle(tr("Chat"));
 	tabMenu->setTitle(tr("&Room"));

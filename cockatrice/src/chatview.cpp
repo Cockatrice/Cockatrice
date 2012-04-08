@@ -22,6 +22,11 @@ ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _sh
 	connect(this, SIGNAL(anchorClicked(const QUrl &)), this, SLOT(openLink(const QUrl &)));
 }
 
+void ChatView::retranslateUi()
+{
+	userContextMenu->retranslateUi();
+}
+
 QTextCursor ChatView::prepareBlock(bool same)
 {
 	lastSender.clear();
