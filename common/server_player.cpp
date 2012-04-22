@@ -331,7 +331,13 @@ ResponseCode Server_Player::moveCard(CommandContainer *cont, Server_CardZone *st
 	
 	QList<QPair<Server_Card *, int> > cardsToMove;
 	QMap<Server_Card *, CardToMove *> cardProperties;
+	QSet<int> cardIdsToMove;
 	for (int i = 0; i < _cards.size(); ++i) {
+		// The same card being moved twice would lead to undefined behaviour.
+		if (cardIdsToMove.contains(_cards[i]->getCardId()))
+			continue;
+		cardIdsToMove.insert(_cards[i]->getCardId());
+		
 		int position;
 		Server_Card *card = startzone->getCard(_cards[i]->getCardId(), &position);
 		if (!card)
