@@ -76,6 +76,7 @@ signals:
 	void adminLockChanged(bool lock);
 public slots:
 	TabDeckEditor *addDeckEditorTab(DeckList *deckToOpen);
+	void openReplay(GameReplay *replay);
 private slots:
 	void closeButtonPressed();
 	void updateCurrent(int index);
@@ -86,7 +87,6 @@ private slots:
 	void addRoomTab(const ServerInfo_Room &info, bool setCurrent);
 	void roomLeft(TabRoom *tab);
 	TabMessage *addMessageTab(const QString &userName, bool focus);
-	void openReplay(GameReplay *replay);
 	void replayLeft(TabGame *tab);
 	void processUserLeft(const QString &userName);
 	void processUserJoined(const ServerInfo_User &userInfo);

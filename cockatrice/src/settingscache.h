@@ -27,6 +27,7 @@ signals:
 private:
 	QSettings *settings;
 	
+	QByteArray mainWindowGeometry;
 	QString customTranslationFile, lang;
 	QString deckPath, replaysPath, picsPath, cardDatabasePath;
 	QString handBgPath, stackBgPath, tableBgPath, playerBgPath, cardBackPicturePath;
@@ -46,6 +47,7 @@ private:
 	bool ignoreUnregisteredUsers;
 public:
 	SettingsCache();
+	const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
 	QString getCustomTranslationFile() const { return customTranslationFile; }
 	QString getLang() const { return lang; }
 	QString getDeckPath() const { return deckPath; }
@@ -73,6 +75,7 @@ public:
 	bool getPriceTagFeature() const { return priceTagFeature; }
 	bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
 public slots:
+	void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
 	void setCustomTranslationFile(const QString &_customTranslationFile);
 	void setLang(const QString &_lang);
 	void setDeckPath(const QString &_deckPath);

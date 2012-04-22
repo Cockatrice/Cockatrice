@@ -56,7 +56,7 @@ void MainWindow::updateTabMenu(const QList<QMenu *> &newMenuList)
 		menuBar()->removeAction(tabMenus[i]->menuAction());
 	tabMenus = newMenuList;
 	for (int i = 0; i < tabMenus.size(); ++i)
-		menuBar()->insertMenu(tabMenus[i]->menuAction(), tabMenus[i]);
+		menuBar()->insertMenu(helpMenu->menuAction(), tabMenus[i]);
 }
 
 void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &event)
@@ -175,8 +175,7 @@ void MainWindow::actWatchReplay()
 	GameReplay *replay = new GameReplay;
 	replay->ParseFromArray(buf.data(), buf.size());
 	
-	TabGame *replayWatcher = new TabGame(0, replay);
-	replayWatcher->show();
+	tabSupervisor->openReplay(replay);
 }
 
 void MainWindow::localGameEnded()
@@ -386,6 +385,8 @@ MainWindow::MainWindow(QWidget *parent)
 	retranslateUi();
 	
 	resize(900, 700);
+	restoreGeometry(settingsCache->getMainWindowGeometry());
+	aFullScreen->setChecked(windowState() & Qt::WindowFullScreen);
 }
 
 MainWindow::~MainWindow()
@@ -403,6 +404,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 		}
 	}
 	event->accept();
+	settingsCache->setMainWindowGeometry(saveGeometry());
 	delete tabSupervisor;
 }
 

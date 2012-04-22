@@ -181,7 +181,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	connect(aPrintDeck, SIGNAL(triggered()), this, SLOT(actPrintDeck()));
 	aClose = new QAction(tr("&Close"), this);
 	aClose->setShortcut(tr("Ctrl+Q"));
-	connect(aClose, SIGNAL(triggered()), this, SLOT(close()));
+	connect(aClose, SIGNAL(triggered()), this, SLOT(closeRequest()));
 
 	aEditSets = new QAction(tr("&Edit sets..."), this);
 	connect(aEditSets, SIGNAL(triggered()), this, SLOT(actEditSets()));
@@ -289,7 +289,6 @@ void TabDeckEditor::updateName(const QString &name)
 {
 	deckModel->getDeckList()->setName(name);
 	setWindowModified(true);
-	emit tabTextChanged(this, getTabText());
 }
 
 void TabDeckEditor::updateComments()
@@ -567,4 +566,10 @@ void TabDeckEditor::setDeck(DeckList *_deck, const QString &_lastFileName, DeckL
 	db->cacheCardPixmaps(_deck->getCardList());
 	deckView->expandAll();
 	setWindowModified(false);
+}
+
+void TabDeckEditor::setWindowModified(bool _windowModified)
+{
+	Tab::setWindowModified(_windowModified);
+	emit tabTextChanged(this, getTabText());
 }

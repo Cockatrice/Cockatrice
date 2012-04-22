@@ -19,6 +19,7 @@ SettingsCache::SettingsCache()
 	playerBgPath = settings->value("zonebg/playerarea").toString();
 	cardBackPicturePath = settings->value("paths/cardbackpicture").toString();
 	
+	mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
 	picDownload = settings->value("personal/picturedownload", true).toBool();
 	doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
 	cardInfoMinimized = settings->value("interface/cardinfominimized", 0).toInt();
@@ -210,4 +211,10 @@ void SettingsCache::setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers)
 	ignoreUnregisteredUsers = _ignoreUnregisteredUsers;
 	settings->setValue("chat/ignore_unregistered", ignoreUnregisteredUsers);
 	emit ignoreUnregisteredUsersChanged();
+}
+
+void SettingsCache::setMainWindowGeometry(const QByteArray &_mainWindowGeometry)
+{
+	mainWindowGeometry = _mainWindowGeometry;
+	settings->setValue("interface/main_window_geometry", mainWindowGeometry);
 }

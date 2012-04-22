@@ -208,12 +208,14 @@ void TabSupervisor::stop()
 			tabDeckStorage->deleteLater();
 		if (tabReplays)
 			tabReplays->deleteLater();
+		if (tabAdmin)
+			tabAdmin->deleteLater();
 	}
 	tabUserLists = 0;
 	tabServer = 0;
 	tabDeckStorage = 0;
 	tabReplays = 0;
-	clear();
+	tabAdmin = 0;
 	
 	QMapIterator<int, TabRoom *> roomIterator(roomTabs);
 	while (roomIterator.hasNext())
@@ -235,10 +237,6 @@ void TabSupervisor::stop()
 		messageIterator.next().value()->deleteLater();
 	messageTabs.clear();
 	
-	QListIterator<TabDeckEditor *> deckEditorIterator(deckEditorTabs);
-	while (deckEditorIterator.hasNext())
-		deckEditorIterator.next()->deleteLater();
-	
 	delete userInfo;
 	userInfo = 0;
 }
@@ -250,7 +248,7 @@ void TabSupervisor::updatePingTime(int value, int max)
 	if (tabServer->getContentsChanged())
 		return;
 	
-	setTabIcon(0, QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));
+	setTabIcon(indexOf(tabServer), QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));
 }
 
 void TabSupervisor::closeButtonPressed()
@@ -281,6 +279,7 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
 	TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event, roomGameTypes);
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
+	connect(tab, SIGNAL(openDeckEditor(DeckList *)), this, SLOT(addDeckEditorTab(DeckList *)));
 	int tabIndex = myAddTab(tab);
 	addCloseButtonToTab(tab, tabIndex);
 	gameTabs.insert(event.game_info().game_id(), tab);
@@ -291,6 +290,7 @@ void TabSupervisor::localGameJoined(const Event_GameJoined &event)
 {
 	TabGame *tab = new TabGame(this, localClients, event, QMap<int, QString>());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
+	connect(tab, SIGNAL(openDeckEditor(DeckList *)), this, SLOT(addDeckEditorTab(DeckList *)));
 	int tabIndex = myAddTab(tab);
 	addCloseButtonToTab(tab, tabIndex);
 	gameTabs.insert(event.game_info().game_id(), tab);
@@ -387,6 +387,8 @@ void TabSupervisor::talkLeft(TabMessage *tab)
 TabDeckEditor *TabSupervisor::addDeckEditorTab(DeckList *deckToOpen)
 {
 	TabDeckEditor *tab = new TabDeckEditor(this);
+	if (deckToOpen)
+		tab->setDeck(deckToOpen);
 	connect(tab, SIGNAL(deckEditorClosing(TabDeckEditor *)), this, SLOT(deckEditorClosed(TabDeckEditor *)));
 	int tabIndex = myAddTab(tab);
 	addCloseButtonToTab(tab, tabIndex);

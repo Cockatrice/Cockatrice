@@ -24,7 +24,7 @@ bool MessageLogWidget::isFemale(Player *player) const
 
 bool MessageLogWidget::userIsFemale() const
 {
-	return (tabSupervisor && tabSupervisor->getUserInfo()->gender() & ServerInfo_User::Female);
+	return (tabSupervisor && tabSupervisor->getUserInfo() && (tabSupervisor->getUserInfo()->gender() & ServerInfo_User::Female));
 }
 
 void MessageLogWidget::logGameJoined(int gameId)

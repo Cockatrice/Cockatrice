@@ -77,6 +77,7 @@ public:
 class Player : public QObject, public QGraphicsItem {
 	Q_OBJECT
 signals:
+	void openDeckEditor(DeckList *deck);
 	void newCardAdded(AbstractCardItem *card);
 	// Log events
 	void logSay(Player *player, QString message);
@@ -134,6 +135,7 @@ private slots:
 	void updateBoundingRect();
 	void rearrangeZones();
 	
+	void actOpenDeckInDeckEditor();
 	void actCreatePredefinedToken();
 	void cardMenuAction();
 	void actCardCounterTrigger();
@@ -161,7 +163,7 @@ private:
 	QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
 		*aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg,
 		*aMoveRfgToTopLibrary, *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave,
-		*aViewLibrary, *aViewTopCards, *aAlwaysRevealTopCard, *aMoveTopCardsToGrave, *aMoveTopCardsToExile, *aMoveTopCardToBottom,
+		*aViewLibrary, *aViewTopCards, *aAlwaysRevealTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardsToGrave, *aMoveTopCardsToExile, *aMoveTopCardToBottom,
 		*aViewGraveyard, *aViewRfg, *aViewSideboard,
                 *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle,
 		*aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,

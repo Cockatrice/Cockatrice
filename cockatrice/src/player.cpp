@@ -205,6 +205,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 		aAlwaysRevealTopCard = new QAction(this);
 		aAlwaysRevealTopCard->setCheckable(true);
 		connect(aAlwaysRevealTopCard, SIGNAL(triggered()), this, SLOT(actAlwaysRevealTopCard()));
+		aOpenDeckInDeckEditor = new QAction(this);
+		aOpenDeckInDeckEditor->setEnabled(false);
+		connect(aOpenDeckInDeckEditor, SIGNAL(triggered()), this, SLOT(actOpenDeckInDeckEditor()));
 	}
 
 	aViewGraveyard = new QAction(this);
@@ -262,6 +265,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 		playerLists.append(mRevealLibrary = libraryMenu->addMenu(QString()));
 		playerLists.append(mRevealTopCard = libraryMenu->addMenu(QString()));
 		libraryMenu->addAction(aAlwaysRevealTopCard);
+		libraryMenu->addAction(aOpenDeckInDeckEditor);
 		libraryMenu->addSeparator();
 		libraryMenu->addAction(aMoveTopCardsToGrave);
 		libraryMenu->addAction(aMoveTopCardsToExile);
@@ -595,6 +599,7 @@ void Player::retranslateUi()
 		mRevealLibrary->setTitle(tr("Reveal &library to"));
 		mRevealTopCard->setTitle(tr("Reveal t&op card to"));
 		aAlwaysRevealTopCard->setText(tr("&Always reveal top card"));
+		aOpenDeckInDeckEditor->setText(tr("O&pen deck in deck editor"));
 		aViewSideboard->setText(tr("&View sideboard"));
 		aDrawCard->setText(tr("&Draw card"));
 		aDrawCards->setText(tr("D&raw cards..."));
@@ -744,6 +749,7 @@ void Player::initSayMenu()
 void Player::setDeck(DeckList *_deck)
 {
 	deck = _deck;
+	aOpenDeckInDeckEditor->setEnabled(deck);
 	
 	createPredefinedTokenMenu->clear();
 	predefinedTokens.clear();
@@ -781,6 +787,11 @@ void Player::actAlwaysRevealTopCard()
 	cmd.set_always_reveal_top_card(aAlwaysRevealTopCard->isChecked());
 	
 	sendGameCommand(cmd);
+}
+
+void Player::actOpenDeckInDeckEditor()
+{
+	emit openDeckEditor(new DeckList(deck));
 }
 
 void Player::actViewGraveyard()

@@ -90,8 +90,10 @@ public:
 	~TabDeckEditor();
 	void retranslateUi();
 	QString getTabText() const;
-	void closeRequest();
 	void setDeck(DeckList *_deck, const QString &_lastFileName = QString(), DeckList::FileFormat _lastFileFormat = DeckList::CockatriceFormat);
+	void setWindowModified(bool _windowModified);
+public slots:
+	void closeRequest();
 signals:
 	void deckEditorClosing(TabDeckEditor *tab);
 };
