@@ -33,7 +33,6 @@
 #include "window_main.h"
 #include "dlg_connect.h"
 #include "dlg_settings.h"
-#include "window_deckeditor.h"
 #include "tab_supervisor.h"
 #include "remoteclient.h"
 #include "localserver.h"
@@ -51,13 +50,13 @@
 
 const QString MainWindow::appName = "Cockatrice";
 
-void MainWindow::updateTabMenu(QMenu *menu)
+void MainWindow::updateTabMenu(const QList<QMenu *> &newMenuList)
 {
-	if (tabMenu)
-		menuBar()->removeAction(tabMenu->menuAction());
-	tabMenu = menu;
-	if (menu)
-		menuBar()->insertMenu(helpMenu->menuAction(), menu);
+	for (int i = 0; i < tabMenus.size(); ++i)
+		menuBar()->removeAction(tabMenus[i]->menuAction());
+	tabMenus = newMenuList;
+	for (int i = 0; i < tabMenus.size(); ++i)
+		menuBar()->insertMenu(tabMenus[i]->menuAction(), tabMenus[i]);
 }
 
 void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &event)
@@ -191,8 +190,7 @@ void MainWindow::localGameEnded()
 
 void MainWindow::actDeckEditor()
 {
-	WndDeckEditor *deckEditor = new WndDeckEditor(this);
-	deckEditor->show();
+	tabSupervisor->addDeckEditorTab(0);
 }
 
 void MainWindow::actFullScreen(bool checked)
@@ -357,7 +355,7 @@ void MainWindow::createMenus()
 }
 
 MainWindow::MainWindow(QWidget *parent)
-	: QMainWindow(parent), tabMenu(0), localServer(0)
+	: QMainWindow(parent), localServer(0)
 {
 	QPixmapCache::setCacheLimit(200000);
 
@@ -375,15 +373,16 @@ MainWindow::MainWindow(QWidget *parent)
 	client->moveToThread(clientThread);
 	clientThread->start();
 
-	tabSupervisor = new TabSupervisor(client);
-	connect(tabSupervisor, SIGNAL(setMenu(QMenu *)), this, SLOT(updateTabMenu(QMenu *)));
-	connect(tabSupervisor, SIGNAL(localGameEnded()), this, SLOT(localGameEnded()));
-	
-	setCentralWidget(tabSupervisor);
-
 	createActions();
 	createMenus();
 	
+	tabSupervisor = new TabSupervisor(client);
+	connect(tabSupervisor, SIGNAL(setMenu(QList<QMenu *>)), this, SLOT(updateTabMenu(QList<QMenu *>)));
+	connect(tabSupervisor, SIGNAL(localGameEnded()), this, SLOT(localGameEnded()));
+	tabSupervisor->addDeckEditorTab(0);	
+	
+	setCentralWidget(tabSupervisor);
+
 	retranslateUi();
 	
 	resize(900, 700);

@@ -82,8 +82,9 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
 	aLeaveRoom = new QAction(this);
 	connect(aLeaveRoom, SIGNAL(triggered()), this, SLOT(actLeaveRoom()));
 
-	tabMenu = new QMenu(this);
-	tabMenu->addAction(aLeaveRoom);
+	roomMenu = new QMenu(this);
+	roomMenu->addAction(aLeaveRoom);
+	addTabMenu(roomMenu);
 
 	retranslateUi();
 	setLayout(hbox);
@@ -109,7 +110,7 @@ void TabRoom::retranslateUi()
 	chatView->retranslateUi();
 	sayLabel->setText(tr("&Say:"));
 	chatGroupBox->setTitle(tr("Chat"));
-	tabMenu->setTitle(tr("&Room"));
+	roomMenu->setTitle(tr("&Room"));
 	aLeaveRoom->setText(tr("&Leave room"));
 	aIgnoreUnregisteredUsers->setText(tr("&Ignore unregistered users in chat"));
 }

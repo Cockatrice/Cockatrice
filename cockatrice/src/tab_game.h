@@ -138,6 +138,7 @@ private:
 	QHBoxLayout *mainLayout;
 	ZoneViewLayout *zoneLayout;
 	QAction *playersSeparator;
+	QMenu *gameMenu;
 	QMenu *phasesMenu;
 	QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextTurn, *aRemoveLocalArrows;
 	QList<QAction *> phaseActions;

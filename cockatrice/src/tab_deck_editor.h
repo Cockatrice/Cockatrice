@@ -1,7 +1,7 @@
 #ifndef WINDOW_DECKEDITOR_H
 #define WINDOW_DECKEDITOR_H
 
-#include <QMainWindow>
+#include "tab.h"
 #include <QAbstractItemModel>
 #include <QLineEdit>
 #include "decklist.h"
@@ -26,7 +26,7 @@ class SearchLineEdit : public QLineEdit {
 		void setTreeView(QTreeView *_treeView) { treeView = _treeView; }
 };
 
-class WndDeckEditor : public QMainWindow {
+class TabDeckEditor : public Tab {
 	Q_OBJECT
 private slots:
 	void updateName(const QString &name);
@@ -71,9 +71,13 @@ private:
 	QTreeView *databaseView;
 	QTreeView *deckView;
 	CardInfoWidget *cardInfo;
+	QLabel *searchLabel;
 	SearchLineEdit *searchEdit;
+	QLabel *nameLabel;
 	QLineEdit *nameEdit;
+	QLabel *commentsLabel;
 	QTextEdit *commentsEdit;
+	QLabel *hashLabel1;
 	QLabel *hashLabel;
 	DlgCardSearch *dlgCardSearch;
 
@@ -82,11 +86,14 @@ private:
 	QAction *aEditSets, *aSearch, *aClearSearch;
         QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement, *aUpdatePrices;
 public:
-	WndDeckEditor(QWidget *parent = 0);
-	~WndDeckEditor();
+	TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent = 0);
+	~TabDeckEditor();
+	void retranslateUi();
+	QString getTabText() const;
+	void closeRequest();
 	void setDeck(DeckList *_deck, const QString &_lastFileName = QString(), DeckList::FileFormat _lastFileFormat = DeckList::CockatriceFormat);
-protected:
-	void closeEvent(QCloseEvent *event);
+signals:
+	void deckEditorClosing(TabDeckEditor *tab);
 };
 
 #endif

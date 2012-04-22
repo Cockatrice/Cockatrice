@@ -28,8 +28,9 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
 	aLeave = new QAction(this);
 	connect(aLeave, SIGNAL(triggered()), this, SLOT(actLeave()));
 
-	tabMenu = new QMenu(this);
-	tabMenu->addAction(aLeave);
+	messageMenu = new QMenu(this);
+	messageMenu->addAction(aLeave);
+	addTabMenu(messageMenu);
 
 	retranslateUi();
 	setLayout(vbox);
@@ -44,7 +45,7 @@ TabMessage::~TabMessage()
 
 void TabMessage::retranslateUi()
 {
-	tabMenu->setTitle(tr("Personal &talk"));
+	messageMenu->setTitle(tr("Personal &talk"));
 	aLeave->setText(tr("&Leave"));
 }
 

@@ -40,7 +40,8 @@ private:
 	QLabel *sayLabel;
 	QLineEdit *sayEdit;
 	QGroupBox *chatGroupBox;
-
+	
+	QMenu *roomMenu;
 	QAction *aLeaveRoom;
 	QAction *aIgnoreUnregisteredUsers;
 	QString sanitizeHtml(QString dirty) const;

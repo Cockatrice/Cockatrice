@@ -14,6 +14,7 @@ class TabMessage : public Tab {
 	Q_OBJECT
 private:
 	AbstractClient *client;
+	QMenu *messageMenu;
 	ServerInfo_User *ownUserInfo;
 	ServerInfo_User *otherUserInfo;
 	bool userOnline;

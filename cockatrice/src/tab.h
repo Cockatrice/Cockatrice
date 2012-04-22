@@ -11,18 +11,20 @@ class Tab : public QWidget {
 	Q_OBJECT
 signals:
 	void userEvent(bool globalEvent = true);
+	void tabTextChanged(Tab *tab, const QString &newTabText);
 protected:
-	QMenu *tabMenu;
 	TabSupervisor *tabSupervisor;
+	void addTabMenu(QMenu *menu) { tabMenus.append(menu); }
 protected slots:
 	void showCardInfoPopup(const QPoint &pos, const QString &cardName);
 	void deleteCardInfoPopup(const QString &cardName);
 private:
 	bool contentsChanged;
 	CardInfoWidget *infoPopup;
+	QList<QMenu *> tabMenus;
 public:
 	Tab(TabSupervisor *_tabSupervisor, QWidget *parent = 0);
-	QMenu *getTabMenu() const { return tabMenu; }
+	const QList<QMenu *> &getTabMenus() const { return tabMenus; }
 	TabSupervisor *getTabSupervisor() const { return tabSupervisor; }
 	bool getContentsChanged() const { return contentsChanged; }
 	void setContentsChanged(bool _contentsChanged) { contentsChanged = _contentsChanged; }

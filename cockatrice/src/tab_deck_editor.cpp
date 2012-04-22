@@ -16,7 +16,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QTextStream>
-#include "window_deckeditor.h"
+#include "tab_deck_editor.h"
 #include "window_sets.h"
 #include "carddatabase.h"
 #include "carddatabasemodel.h"
@@ -35,19 +35,17 @@ void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 	QLineEdit::keyPressEvent(event);
 }
 
-WndDeckEditor::WndDeckEditor(QWidget *parent)
-	: QMainWindow(parent)
+TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
+	: Tab(_tabSupervisor, parent)
 {
-	setAttribute(Qt::WA_DeleteOnClose);
-	
-	aSearch = new QAction(tr("&Search..."), this);
+	aSearch = new QAction(QString(), this);
 	aSearch->setIcon(QIcon(":/resources/icon_search.svg"));
 	connect(aSearch, SIGNAL(triggered()), this, SLOT(actSearch()));
-	aClearSearch = new QAction(tr("&Clear search"), this);
+	aClearSearch = new QAction(QString(), this);
 	aClearSearch->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
 	connect(aClearSearch, SIGNAL(triggered()), this, SLOT(actClearSearch()));
 
-	QLabel *searchLabel = new QLabel(tr("&Search for:"));
+	searchLabel = new QLabel();
 	searchEdit = new SearchLineEdit;
 	searchLabel->setBuddy(searchEdit);
 	connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
@@ -108,16 +106,16 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	deckView->header()->setResizeMode(QHeaderView::ResizeToContents);
 	connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
 
-	QLabel *nameLabel = new QLabel(tr("Deck &name:"));
+	nameLabel = new QLabel();
 	nameEdit = new QLineEdit;
 	nameLabel->setBuddy(nameEdit);
 	connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateName(const QString &)));
-	QLabel *commentsLabel = new QLabel(tr("&Comments:"));
+	commentsLabel = new QLabel();
 	commentsEdit = new QTextEdit;
 	commentsEdit->setMaximumHeight(70);
 	commentsLabel->setBuddy(commentsEdit);
 	connect(commentsEdit, SIGNAL(textChanged()), this, SLOT(updateComments()));
-	QLabel *hashLabel1 = new QLabel(tr("Hash:"));
+	hashLabel1 = new QLabel();
 	hashLabel = new QLabel;
 
 	QGridLayout *grid = new QGridLayout;
@@ -131,8 +129,7 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	grid->addWidget(hashLabel, 2, 1);
 
         // Update price
-        aUpdatePrices = new QAction(tr("&Update prices"), this);
-        aUpdatePrices->setShortcut(tr("Ctrl+U"));
+        aUpdatePrices = new QAction(QString(), this);
         aUpdatePrices->setIcon(QIcon(":/resources/icon_update.png"));
         connect(aUpdatePrices, SIGNAL(triggered()), this, SLOT(actUpdatePrices()));
 	if (!settingsCache->getPriceTagFeature())
@@ -157,29 +154,26 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	mainLayout->addLayout(leftFrame, 10);
 	mainLayout->addLayout(middleFrame);
 	mainLayout->addLayout(rightFrame, 10);
-
-	QWidget *centralWidget = new QWidget;
-	centralWidget->setLayout(mainLayout);
-	setCentralWidget(centralWidget);
-
+	setLayout(mainLayout);
+	
 	setWindowTitle(tr("Deck editor [*]"));
 
-	aNewDeck = new QAction(tr("&New deck"), this);
+	aNewDeck = new QAction(QString(), this);
 	aNewDeck->setShortcuts(QKeySequence::New);
 	connect(aNewDeck, SIGNAL(triggered()), this, SLOT(actNewDeck()));
-	aLoadDeck = new QAction(tr("&Load deck..."), this);
+	aLoadDeck = new QAction(QString(), this);
 	aLoadDeck->setShortcuts(QKeySequence::Open);
 	connect(aLoadDeck, SIGNAL(triggered()), this, SLOT(actLoadDeck()));
-	aSaveDeck = new QAction(tr("&Save deck"), this);
+	aSaveDeck = new QAction(QString(), this);
 	aSaveDeck->setShortcuts(QKeySequence::Save);
 	connect(aSaveDeck, SIGNAL(triggered()), this, SLOT(actSaveDeck()));
-	aSaveDeckAs = new QAction(tr("Save deck &as..."), this);
+	aSaveDeckAs = new QAction(QString(), this);
 //	aSaveDeckAs->setShortcuts(QKeySequence::SaveAs);
 	connect(aSaveDeckAs, SIGNAL(triggered()), this, SLOT(actSaveDeckAs()));
-	aLoadDeckFromClipboard = new QAction(tr("Load deck from cl&ipboard..."), this);
+	aLoadDeckFromClipboard = new QAction(QString(), this);
 	connect(aLoadDeckFromClipboard, SIGNAL(triggered()), this, SLOT(actLoadDeckFromClipboard()));
 	aLoadDeckFromClipboard->setShortcuts(QKeySequence::Paste);
-	aSaveDeckToClipboard = new QAction(tr("Save deck to clip&board"), this);
+	aSaveDeckToClipboard = new QAction(QString(), this);
 	connect(aSaveDeckToClipboard, SIGNAL(triggered()), this, SLOT(actSaveDeckToClipboard()));
 	aSaveDeckToClipboard->setShortcuts(QKeySequence::Copy);
 	aPrintDeck = new QAction(tr("&Print deck..."), this);
@@ -192,7 +186,7 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	aEditSets = new QAction(tr("&Edit sets..."), this);
 	connect(aEditSets, SIGNAL(triggered()), this, SLOT(actEditSets()));
 
-	deckMenu = menuBar()->addMenu(tr("&Deck"));
+	deckMenu = new QMenu(this);
 	deckMenu->addAction(aNewDeck);
 	deckMenu->addAction(aLoadDeck);
 	deckMenu->addAction(aSaveDeck);
@@ -204,32 +198,29 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	deckMenu->addAction(aPrintDeck);
 	deckMenu->addSeparator();
 	deckMenu->addAction(aClose);
+	addTabMenu(deckMenu);
 
-	dbMenu = menuBar()->addMenu(tr("&Card database"));
+	dbMenu = new QMenu(this);
 	dbMenu->addAction(aEditSets);
 	dbMenu->addSeparator();
 	dbMenu->addAction(aSearch);
 	dbMenu->addAction(aClearSearch);
+	addTabMenu(dbMenu);
 
-	aAddCard = new QAction(tr("Add card to &maindeck"), this);
-	aAddCard->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Return")) << QKeySequence(tr("Enter")));
+	aAddCard = new QAction(QString(), this);
 	aAddCard->setIcon(QIcon(":/resources/arrow_right_green.svg"));
 	connect(aAddCard, SIGNAL(triggered()), this, SLOT(actAddCard()));
-	aAddCardToSideboard = new QAction(tr("Add card to &sideboard"), this);
+	aAddCardToSideboard = new QAction(QString(), this);
         aAddCardToSideboard->setIcon(QIcon(":/resources/add_to_sideboard.svg"));
-	aAddCardToSideboard->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
 	connect(aAddCardToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
-	aRemoveCard = new QAction(tr("&Remove row"), this);
-	aRemoveCard->setShortcut(tr("Del"));
+	aRemoveCard = new QAction(QString(), this);
         aRemoveCard->setIcon(QIcon(":/resources/remove_row.svg"));
 	connect(aRemoveCard, SIGNAL(triggered()), this, SLOT(actRemoveCard()));
-	aIncrement = new QAction(tr("&Increment number"), this);
-	aIncrement->setShortcut(tr("+"));
+	aIncrement = new QAction(QString(), this);
         aIncrement->setIcon(QIcon(":/resources/increment.svg"));
 	connect(aIncrement, SIGNAL(triggered()), this, SLOT(actIncrement()));
-	aDecrement = new QAction(tr("&Decrement number"), this);
+	aDecrement = new QAction(QString(), this);
         aDecrement->setIcon(QIcon(":/resources/decrement.svg"));
-	aDecrement->setShortcut(tr("-"));
 	connect(aDecrement, SIGNAL(triggered()), this, SLOT(actDecrement()));
 
 	verticalToolBar->addAction(aAddCard);
@@ -241,31 +232,78 @@ WndDeckEditor::WndDeckEditor(QWidget *parent)
 	
 	dlgCardSearch = new DlgCardSearch(this);
 	
+	retranslateUi();
+	
 	resize(950, 700);
 }
 
-WndDeckEditor::~WndDeckEditor()
+TabDeckEditor::~TabDeckEditor()
 {
+	emit deckEditorClosing(this);
 }
 
-void WndDeckEditor::updateName(const QString &name)
+void TabDeckEditor::retranslateUi()
+{
+	aSearch->setText(tr("&Search..."));
+	aClearSearch->setText(tr("&Clear search"));
+	searchLabel->setText(tr("&Search for:"));
+	
+	nameLabel->setText(tr("Deck &name:"));
+	commentsLabel->setText(tr("&Comments:"));
+	hashLabel1->setText(tr("Hash:"));
+	
+	aUpdatePrices->setText(tr("&Update prices"));
+        aUpdatePrices->setShortcut(tr("Ctrl+U"));
+        
+        aNewDeck->setText(tr("&New deck"));
+        aLoadDeck->setText(tr("&Load deck..."));
+        aSaveDeck->setText(tr("&Save deck"));
+	aSaveDeckAs->setText(tr("Save deck &as..."));
+	aLoadDeckFromClipboard->setText(tr("Load deck from cl&ipboard..."));
+	aSaveDeckToClipboard->setText(tr("Save deck to clip&board"));
+	
+	aAddCard->setText(tr("Add card to &maindeck"));
+	aAddCard->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Return")) << QKeySequence(tr("Enter")));
+	aAddCardToSideboard->setText(tr("Add card to &sideboard"));
+	aAddCardToSideboard->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
+	aRemoveCard->setText(tr("&Remove row"));
+	aRemoveCard->setShortcut(tr("Del"));
+	aIncrement->setText(tr("&Increment number"));
+	aIncrement->setShortcut(tr("+"));
+	aDecrement->setText(tr("&Decrement number"));
+	aDecrement->setShortcut(tr("-"));
+	
+	deckMenu->setTitle(tr("&Deck editor"));
+	dbMenu->setTitle(tr("C&ard database"));
+}
+
+QString TabDeckEditor::getTabText() const
+{
+	QString result = tr("Deck: %1").arg(nameEdit->text());
+	if (isWindowModified())
+		result.prepend("* ");
+	return result;
+}
+
+void TabDeckEditor::updateName(const QString &name)
 {
 	deckModel->getDeckList()->setName(name);
 	setWindowModified(true);
+	emit tabTextChanged(this, getTabText());
 }
 
-void WndDeckEditor::updateComments()
+void TabDeckEditor::updateComments()
 {
 	deckModel->getDeckList()->setComments(commentsEdit->toPlainText());
 	setWindowModified(true);
 }
 
-void WndDeckEditor::updateCardInfoLeft(const QModelIndex &current, const QModelIndex &/*previous*/)
+void TabDeckEditor::updateCardInfoLeft(const QModelIndex &current, const QModelIndex &/*previous*/)
 {
 	cardInfo->setCard(current.sibling(current.row(), 0).data().toString());
 }
 
-void WndDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModelIndex &/*previous*/)
+void TabDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModelIndex &/*previous*/)
 {
 	if (!current.isValid())
 		return;
@@ -273,7 +311,7 @@ void WndDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
 		cardInfo->setCard(current.sibling(current.row(), 1).data().toString());
 }
 
-void WndDeckEditor::updateSearch(const QString &search)
+void TabDeckEditor::updateSearch(const QString &search)
 {
 	databaseDisplayModel->setCardNameBeginning(search);
 	QModelIndexList sel = databaseView->selectionModel()->selectedRows();
@@ -281,12 +319,12 @@ void WndDeckEditor::updateSearch(const QString &search)
 		databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
 }
 
-void WndDeckEditor::updateHash()
+void TabDeckEditor::updateHash()
 {
 	hashLabel->setText(deckModel->getDeckList()->getDeckHash());
 }
 
-bool WndDeckEditor::confirmClose()
+bool TabDeckEditor::confirmClose()
 {
 	if (isWindowModified()) {
 		QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("Are you sure?"),
@@ -300,16 +338,13 @@ bool WndDeckEditor::confirmClose()
 	return true;
 }
 
-void WndDeckEditor::closeEvent(QCloseEvent *event)
+void TabDeckEditor::closeRequest()
 {
-	if (confirmClose()) {
-		event->accept();
+	if (confirmClose())
 		deleteLater();
-	} else
-		event->ignore();
 }
 
-void WndDeckEditor::actNewDeck()
+void TabDeckEditor::actNewDeck()
 {
 	if (!confirmClose())
 		return;
@@ -321,7 +356,7 @@ void WndDeckEditor::actNewDeck()
 	setWindowModified(false);
 }
 
-void WndDeckEditor::actLoadDeck()
+void TabDeckEditor::actLoadDeck()
 {
 	if (!confirmClose())
 		return;
@@ -341,7 +376,7 @@ void WndDeckEditor::actLoadDeck()
 		delete l;
 }
 
-bool WndDeckEditor::actSaveDeck()
+bool TabDeckEditor::actSaveDeck()
 {
 	if (lastFileName.isEmpty())
 		return actSaveDeckAs();
@@ -353,7 +388,7 @@ bool WndDeckEditor::actSaveDeck()
 	return false;
 }
 
-bool WndDeckEditor::actSaveDeckAs()
+bool TabDeckEditor::actSaveDeckAs()
 {
 	QFileDialog dialog(this, tr("Save deck"));
 	dialog.setDirectory(settingsCache->getDeckPath());
@@ -378,7 +413,7 @@ bool WndDeckEditor::actSaveDeckAs()
 	return false;
 }
 
-void WndDeckEditor::actLoadDeckFromClipboard()
+void TabDeckEditor::actLoadDeckFromClipboard()
 {
 	if (!confirmClose())
 		return;
@@ -391,7 +426,7 @@ void WndDeckEditor::actLoadDeckFromClipboard()
 	setWindowModified(true);
 }
 
-void WndDeckEditor::actSaveDeckToClipboard()
+void TabDeckEditor::actSaveDeckToClipboard()
 {
 	QString buffer;
 	QTextStream stream(&buffer);
@@ -400,21 +435,21 @@ void WndDeckEditor::actSaveDeckToClipboard()
 	QApplication::clipboard()->setText(buffer, QClipboard::Selection);
 }
 
-void WndDeckEditor::actPrintDeck()
+void TabDeckEditor::actPrintDeck()
 {
 	QPrintPreviewDialog *dlg = new QPrintPreviewDialog(this);
 	connect(dlg, SIGNAL(paintRequested(QPrinter *)), deckModel, SLOT(printDeckList(QPrinter *)));
 	dlg->exec();
 }
 
-void WndDeckEditor::actEditSets()
+void TabDeckEditor::actEditSets()
 {
 	WndSets *w = new WndSets;
 	w->setWindowModality(Qt::WindowModal);
 	w->show();
 }
 
-void WndDeckEditor::actSearch()
+void TabDeckEditor::actSearch()
 {
 	if (dlgCardSearch->exec()) {
 		searchEdit->clear();
@@ -425,19 +460,19 @@ void WndDeckEditor::actSearch()
 	}
 }
 
-void WndDeckEditor::actClearSearch()
+void TabDeckEditor::actClearSearch()
 {
 	databaseDisplayModel->clearSearch();
 }
 
-void WndDeckEditor::recursiveExpand(const QModelIndex &index)
+void TabDeckEditor::recursiveExpand(const QModelIndex &index)
 {
 	if (index.parent().isValid())
 		recursiveExpand(index.parent());
 	deckView->expand(index);
 }
 
-void WndDeckEditor::addCardHelper(QString zoneName)
+void TabDeckEditor::addCardHelper(QString zoneName)
 {
 	const QModelIndex currentIndex = databaseView->selectionModel()->currentIndex();
 	if (!currentIndex.isValid())
@@ -455,17 +490,17 @@ void WndDeckEditor::addCardHelper(QString zoneName)
 	setWindowModified(true);
 }
 
-void WndDeckEditor::actAddCard()
+void TabDeckEditor::actAddCard()
 {
 	addCardHelper("main");
 }
 
-void WndDeckEditor::actAddCardToSideboard()
+void TabDeckEditor::actAddCardToSideboard()
 {
 	addCardHelper("side");
 }
 
-void WndDeckEditor::actRemoveCard()
+void TabDeckEditor::actRemoveCard()
 {
 	const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
 	if (!currentIndex.isValid() || deckModel->hasChildren(currentIndex))
@@ -474,7 +509,7 @@ void WndDeckEditor::actRemoveCard()
 	setWindowModified(true);
 }
 
-void WndDeckEditor::actIncrement()
+void TabDeckEditor::actIncrement()
 {
 	const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
 	if (!currentIndex.isValid())
@@ -486,7 +521,7 @@ void WndDeckEditor::actIncrement()
 	setWindowModified(true);
 }
 
-void WndDeckEditor::actDecrement()
+void TabDeckEditor::actDecrement()
 {
 	const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
 	if (!currentIndex.isValid())
@@ -501,7 +536,7 @@ void WndDeckEditor::actDecrement()
 	setWindowModified(true);
 }
 
-void WndDeckEditor::actUpdatePrices()
+void TabDeckEditor::actUpdatePrices()
 {
 	aUpdatePrices->setDisabled(true);
 	PriceUpdater *up = new PriceUpdater(deckModel->getDeckList());
@@ -509,14 +544,14 @@ void WndDeckEditor::actUpdatePrices()
 	up->updatePrices();
 }
 
-void WndDeckEditor::finishedUpdatingPrices()
+void TabDeckEditor::finishedUpdatingPrices()
 {
 	deckModel->pricesUpdated();
 	setWindowModified(true);
 	aUpdatePrices->setDisabled(false);
 }
 
-void WndDeckEditor::setDeck(DeckList *_deck, const QString &_lastFileName, DeckList::FileFormat _lastFileFormat)
+void TabDeckEditor::setDeck(DeckList *_deck, const QString &_lastFileName, DeckList::FileFormat _lastFileFormat)
 {
 	deckModel->setDeckList(_deck);
 

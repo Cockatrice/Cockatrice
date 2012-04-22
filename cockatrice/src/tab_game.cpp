@@ -365,8 +365,9 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
 	connect(aCloseReplay, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
 	
 	phasesMenu = 0;
-	tabMenu = new QMenu(this);
-	tabMenu->addAction(aCloseReplay);
+	gameMenu = new QMenu(this);
+	gameMenu->addAction(aCloseReplay);
+	addTabMenu(gameMenu);
 	
 	retranslateUi();
 	setLayout(superMainLayout);
@@ -486,16 +487,17 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	phasesMenu->addSeparator();
 	phasesMenu->addAction(aNextPhase);
 	
-	tabMenu = new QMenu(this);
-	playersSeparator = tabMenu->addSeparator();
-	tabMenu->addMenu(phasesMenu);
-	tabMenu->addAction(aNextTurn);
-	tabMenu->addSeparator();
-	tabMenu->addAction(aRemoveLocalArrows);
-	tabMenu->addSeparator();
-	tabMenu->addAction(aGameInfo);
-	tabMenu->addAction(aConcede);
-	tabMenu->addAction(aLeaveGame);
+	gameMenu = new QMenu(this);
+	playersSeparator = gameMenu->addSeparator();
+	gameMenu->addMenu(phasesMenu);
+	gameMenu->addAction(aNextTurn);
+	gameMenu->addSeparator();
+	gameMenu->addAction(aRemoveLocalArrows);
+	gameMenu->addSeparator();
+	gameMenu->addAction(aGameInfo);
+	gameMenu->addAction(aConcede);
+	gameMenu->addAction(aLeaveGame);
+	addTabMenu(gameMenu);
 	
 	retranslateUi();
 	setLayout(mainLayout);
@@ -528,7 +530,7 @@ void TabGame::retranslateUi()
 		phasesMenu->setTitle(tr("&Phases"));
 	}
 	
-	tabMenu->setTitle(tr("&Game"));
+	gameMenu->setTitle(tr("&Game"));
 	if (aNextPhase) {
 		aNextPhase->setText(tr("Next &phase"));
 		aNextPhase->setShortcut(tr("Ctrl+Space"));
@@ -747,7 +749,7 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
 		deckViewContainerLayout->addWidget(deckView);
 	}
 
-	tabMenu->insertMenu(playersSeparator, newPlayer->getPlayerMenu());
+	gameMenu->insertMenu(playersSeparator, newPlayer->getPlayerMenu());
 	
 	players.insert(playerId, newPlayer);
 	emit playerAdded(newPlayer);
@@ -905,8 +907,8 @@ void TabGame::closeGame()
 	gameInfo.set_started(false);
 	gameClosed = true;
 	
-	tabMenu->clear();
-	tabMenu->addAction(aLeaveGame);
+	gameMenu->clear();
+	gameMenu->addAction(aLeaveGame);
 }
 
 void TabGame::eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, const GameEventContext & /*context*/)
