@@ -16,6 +16,7 @@ private:
 	QAudioOutput *audio;
 private slots:
 	void cacheData();
+	void soundEnabledChanged();
 public:
 	SoundEngine(QObject *parent = 0);
 public slots:

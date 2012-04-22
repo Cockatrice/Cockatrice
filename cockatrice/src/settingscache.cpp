@@ -191,6 +191,7 @@ void SettingsCache::setSoundEnabled(int _soundEnabled)
 {
 	soundEnabled = _soundEnabled;
 	settings->setValue("sound/enabled", soundEnabled);
+	emit soundEnabledChanged();
 }
 
 void SettingsCache::setSoundPath(const QString &_soundPath)

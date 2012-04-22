@@ -22,6 +22,7 @@ signals:
 	void horizontalHandChanged();
 	void invertVerticalCoordinateChanged();
 	void minPlayersForMultiColumnLayoutChanged();
+	void soundEnabledChanged();
 	void soundPathChanged();
 	void ignoreUnregisteredUsersChanged();
 private:

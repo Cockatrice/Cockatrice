@@ -6,20 +6,14 @@
 #include <QBuffer>
 
 SoundEngine::SoundEngine(QObject *parent)
-	: QObject(parent)
+	: QObject(parent), audio(0)
 {
-	inputBuffer = new QBuffer;
-	QAudioFormat format;
-	format.setFrequency(44100);
-	format.setChannels(1);
-	format.setSampleSize(16);
-	format.setCodec("audio/pcm");
-	format.setByteOrder(QAudioFormat::LittleEndian);
-	format.setSampleType(QAudioFormat::SignedInt);
-	audio = new QAudioOutput(format, this);
+	inputBuffer = new QBuffer(this);
 	
 	connect(settingsCache, SIGNAL(soundPathChanged()), this, SLOT(cacheData()));
+	connect(settingsCache, SIGNAL(soundEnabledChanged()), this, SLOT(soundEnabledChanged()));
 	cacheData();
+	soundEnabledChanged();
 }
 
 void SoundEngine::cacheData()
@@ -34,9 +28,29 @@ void SoundEngine::cacheData()
 	}
 }
 
+void SoundEngine::soundEnabledChanged()
+{
+	if (settingsCache->getSoundEnabled()) {
+		qDebug("SoundEngine: enabling sound");
+		QAudioFormat format;
+		format.setFrequency(44100);
+		format.setChannels(1);
+		format.setSampleSize(16);
+		format.setCodec("audio/pcm");
+		format.setByteOrder(QAudioFormat::LittleEndian);
+		format.setSampleType(QAudioFormat::SignedInt);
+		audio = new QAudioOutput(format, this);
+	} else if (audio) {
+		qDebug("SoundEngine: disabling sound");
+		audio->stop();
+		audio->deleteLater();
+		audio = 0;
+	}
+}
+
 void SoundEngine::playSound(const QString &fileName)
 {
-	if (!settingsCache->getSoundEnabled())
+	if (!audio)
 		return;
 	
 	audio->stop();
