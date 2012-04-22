@@ -94,12 +94,12 @@ void CardInfoWidget::minimizeClicked(int newMinimized)
 
 bool CardInfoWidget::shouldShowPowTough()
 {
-	return (!info->getPowTough().isEmpty());
+	return (!info->getPowTough().isEmpty() && (minimized != 0));
 }
 
 bool CardInfoWidget::shouldShowLoyalty()
 {
-	return (info->getLoyalty() > 0);
+	return ((info->getLoyalty() > 0) && (minimized != 0));
 }
 
 void CardInfoWidget::setMinimized(int _minimized)
