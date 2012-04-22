@@ -47,6 +47,13 @@ SettingsCache *settingsCache;
 RNG_Abstract *rng;
 SoundEngine *soundEngine;
 
+const QString translationPrefix = "cockatrice";
+#ifdef TRANSLATION_PATH
+const QString translationPath = TRANSLATION_PATH;
+#else
+const QString translationPath = QString();
+#endif
+
 void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
 	static FILE *f = NULL;
@@ -66,7 +73,7 @@ void installNewTranslator()
 	if (!settingsCache->getCustomTranslationFile().isEmpty())
 		translator->load(settingsCache->getCustomTranslationFile());
 	else
-		translator->load(translationPrefix + "_" + lang, ":/translations");
+		translator->load(translationPrefix + "_" + lang, translationPath);
 	qApp->installTranslator(translator);
 }
 

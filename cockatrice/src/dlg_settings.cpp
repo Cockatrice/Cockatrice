@@ -104,7 +104,7 @@ GeneralSettingsPage::GeneralSettingsPage()
 
 QStringList GeneralSettingsPage::findQmFiles()
 {
-	QDir dir(":/translations");
+	QDir dir(translationPath);
 	QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
 	fileNames.replaceInStrings(QRegExp(translationPrefix + "_(.*)\\.qm"), "\\1");
 	return fileNames;
@@ -113,7 +113,7 @@ QStringList GeneralSettingsPage::findQmFiles()
 QString GeneralSettingsPage::languageName(const QString &qmFile)
 {
 	QTranslator translator;
-	translator.load(":/translations/" + translationPrefix + "_" + qmFile + ".qm");
+	translator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
 	
 	return translator.translate("GeneralSettingsPage", "English");
 }

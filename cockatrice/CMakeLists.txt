@@ -150,6 +150,13 @@ SET(cockatrice_HEADERS
  src/pending_command.h 
 )
 
+if (UNIX)
+	set_source_files_properties(src/main.cpp PROPERTIES COMPILE_FLAGS -DTRANSLATION_PATH=\\"${CMAKE_INSTALL_PREFIX}/share/cockatrice/translations\\")
+endif (UNIX)
+if (WIN32)
+	set_source_files_properties(src/main.cpp PROPERTIES COMPILE_FLAGS -DTRANSLATION_PATH=\\"translations\\")
+endif (WIN32)
+
 set(cockatrice_RESOURCES cockatrice.qrc)
 set(cockatrice_TS
         translations/cockatrice_cs.ts
@@ -187,12 +194,11 @@ if (NOT QT_QTMULTIMEDIA_FOUND)
 endif (NOT QT_QTMULTIMEDIA_FOUND)
 FIND_PACKAGE(Protobuf REQUIRED)
 
-#set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-s -O2")
 
 QT4_WRAP_CPP(cockatrice_HEADERS_MOC ${cockatrice_HEADERS})
-QT4_ADD_TRANSLATION(${cockatrice_QM} ${cockatrice_TS})
+QT4_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
 QT4_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
 
 INCLUDE(${QT_USE_FILE})
@@ -211,6 +217,7 @@ if (NOT WIN32 AND NOT APPLE)
 	INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.png DESTINATION share/icons/hicolor/48x48/apps)
 	INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.svg DESTINATION share/icons/hicolor/scalable/apps)
 	INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice.desktop DESTINATION share/applications)
+	INSTALL(FILES ${cockatrice_QM} DESTINATION share/cockatrice/translations)
 ENDIF(NOT WIN32 AND NOT APPLE)
 
 add_custom_command(

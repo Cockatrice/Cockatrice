@@ -8,7 +8,8 @@ class SoundEngine;
 extern CardDatabase *db;
 
 extern QTranslator *translator;
-const QString translationPrefix = "cockatrice";
+extern const QString translationPrefix;
+extern const QString translationPath;
 
 void installNewTranslator();
 

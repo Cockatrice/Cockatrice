@@ -53,20 +53,6 @@
 	<file>resources/genders/female.svg</file>
 	<file>resources/genders/unknown.svg</file>
 
-        <file>translations/cockatrice_de.qm</file>
-        <file>translations/cockatrice_en.qm</file>
-	<file>translations/cockatrice_es.qm</file>
-	<file>translations/cockatrice_it.qm</file>
-	<file>translations/cockatrice_pt.qm</file>
-<!--	<file>translations/cockatrice_pt-br.qm</file>
--->	<file>translations/cockatrice_fr.qm</file>
-	<file>translations/cockatrice_ja.qm</file>
-	<file>translations/cockatrice_ru.qm</file>
-<!--	<file>translations/cockatrice_cs.qm</file>
-	<file>translations/cockatrice_pl.qm</file>
-	<file>translations/cockatrice_sk.qm</file>
--->	<file>translations/cockatrice_sv.qm</file>
-
 	<file>resources/countries/ar.svg</file>
 	<file>resources/countries/at.svg</file>
 	<file>resources/countries/au.svg</file>
