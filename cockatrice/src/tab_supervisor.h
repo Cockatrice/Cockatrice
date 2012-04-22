@@ -16,6 +16,7 @@ class TabReplays;
 class TabAdmin;
 class TabMessage;
 class TabUserLists;
+class TabDeckEditor;
 class RoomEvent;
 class GameEventContainer;
 class Event_GameJoined;
@@ -23,6 +24,7 @@ class Event_UserMessage;
 class ServerInfo_Room;
 class ServerInfo_User;
 class GameReplay;
+class DeckList;
 
 class CloseButton : public QAbstractButton {
 	Q_OBJECT
@@ -52,6 +54,7 @@ private:
 	QMap<int, TabGame *> gameTabs;
 	QList<TabGame *> replayTabs;
 	QMap<QString, TabMessage *> messageTabs;
+	QList<TabDeckEditor *> deckEditorTabs;
 	int myAddTab(Tab *tab);
 	void addCloseButtonToTab(Tab *tab, int tabIndex);
 public:
@@ -68,9 +71,11 @@ public:
 	const QMap<int, TabRoom *> &getRoomTabs() const { return roomTabs; }
 	bool getAdminLocked() const;
 signals:
-	void setMenu(QMenu *menu);
+	void setMenu(const QList<QMenu *> &newMenuList = QList<QMenu *>());
 	void localGameEnded();
 	void adminLockChanged(bool lock);
+public slots:
+	TabDeckEditor *addDeckEditorTab(DeckList *deckToOpen);
 private slots:
 	void closeButtonPressed();
 	void updateCurrent(int index);
@@ -86,7 +91,9 @@ private slots:
 	void processUserLeft(const QString &userName);
 	void processUserJoined(const ServerInfo_User &userInfo);
 	void talkLeft(TabMessage *tab);
+	void deckEditorClosed(TabDeckEditor *tab);
 	void tabUserEvent(bool globalEvent);
+	void updateTabText(Tab *tab, const QString &newTabText);
 	void processRoomEvent(const RoomEvent &event);
 	void processGameEventContainer(const GameEventContainer &cont);
 	void processUserMessageEvent(const Event_UserMessage &event);

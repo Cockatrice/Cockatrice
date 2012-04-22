@@ -38,7 +38,6 @@ SET(cockatrice_SOURCES
  src/stackzone.cpp 
  src/carddragitem.cpp 
  src/carddatabasemodel.cpp 
- src/window_deckeditor.cpp 
  src/setsmodel.cpp 
  src/window_sets.cpp 
  src/abstractgraphicsitem.cpp 
@@ -59,6 +58,7 @@ SET(cockatrice_SOURCES
  src/tab_supervisor.cpp 
  src/tab_admin.cpp 
  src/tab_userlists.cpp 
+ src/tab_deck_editor.cpp
  src/replay_timeline_widget.cpp
  src/chatview.cpp 
  src/userlist.cpp 
@@ -111,7 +111,6 @@ SET(cockatrice_HEADERS
  src/stackzone.h 
  src/carddragitem.h 
  src/carddatabasemodel.h 
- src/window_deckeditor.h 
  src/setsmodel.h 
  src/window_sets.h 
  src/abstractgraphicsitem.h 
@@ -132,6 +131,7 @@ SET(cockatrice_HEADERS
  src/tab_supervisor.h 
  src/tab_admin.h 
  src/tab_userlists.h 
+ src/tab_deck_editor.h
  src/replay_timeline_widget.h
  src/chatview.h 
  src/userlist.h 

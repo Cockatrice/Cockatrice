@@ -4,7 +4,7 @@
 #include <QApplication>
 #include <QDebug>
 Tab::Tab(TabSupervisor *_tabSupervisor, QWidget *parent)
-	: QWidget(parent), tabMenu(0), tabSupervisor(_tabSupervisor), contentsChanged(false), infoPopup(0)
+	: QWidget(parent), tabSupervisor(_tabSupervisor), contentsChanged(false), infoPopup(0)
 {
 }
 

@@ -9,6 +9,7 @@
 #include "tab_admin.h"
 #include "tab_message.h"
 #include "tab_userlists.h"
+#include "tab_deck_editor.h"
 #include "pixmapgenerator.h"
 #include "userlist.h"
 #include <QDebug>
@@ -86,6 +87,8 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
 	connect(client, SIGNAL(gameJoinedEventReceived(const Event_GameJoined &)), this, SLOT(gameJoined(const Event_GameJoined &)));
 	connect(client, SIGNAL(userMessageEventReceived(const Event_UserMessage &)), this, SLOT(processUserMessageEvent(const Event_UserMessage &)));
 	connect(client, SIGNAL(maxPingTime(int, int)), this, SLOT(updatePingTime(int, int)));
+	
+	retranslateUi();
 }
 
 TabSupervisor::~TabSupervisor()
@@ -111,6 +114,9 @@ void TabSupervisor::retranslateUi()
 	QListIterator<TabGame *> replayIterator(replayTabs);
 	while (replayIterator.hasNext())
 		tabs.append(replayIterator.next());
+	QListIterator<TabDeckEditor *> deckEditorIterator(deckEditorTabs);
+	while (deckEditorIterator.hasNext())
+		tabs.append(deckEditorIterator.next());
 	
 	for (int i = 0; i < tabs.size(); ++i)
 		if (tabs[i]) {
@@ -127,6 +133,7 @@ AbstractClient *TabSupervisor::getClient() const
 int TabSupervisor::myAddTab(Tab *tab)
 {
 	connect(tab, SIGNAL(userEvent(bool)), this, SLOT(tabUserEvent(bool)));
+	connect(tab, SIGNAL(tabTextChanged(Tab *, QString)), this, SLOT(updateTabText(Tab *, QString)));
 	return addTab(tab, tab->getTabText());
 }
 
@@ -228,6 +235,10 @@ void TabSupervisor::stop()
 		messageIterator.next().value()->deleteLater();
 	messageTabs.clear();
 	
+	QListIterator<TabDeckEditor *> deckEditorIterator(deckEditorTabs);
+	while (deckEditorIterator.hasNext())
+		deckEditorIterator.next()->deleteLater();
+	
 	delete userInfo;
 	userInfo = 0;
 }
@@ -295,7 +306,7 @@ void TabSupervisor::localGameJoined(const Event_GameJoined &event)
 void TabSupervisor::gameLeft(TabGame *tab)
 {
 	if (tab == currentWidget())
-		emit setMenu(0);
+		emit setMenu();
 
 	gameTabs.remove(tab->getGameId());
 	removeTab(indexOf(tab));
@@ -319,7 +330,7 @@ void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
 void TabSupervisor::roomLeft(TabRoom *tab)
 {
 	if (tab == currentWidget())
-		emit setMenu(0);
+		emit setMenu();
 	
 	roomTabs.remove(tab->getRoomId());
 	removeTab(indexOf(tab));
@@ -338,7 +349,7 @@ void TabSupervisor::openReplay(GameReplay *replay)
 void TabSupervisor::replayLeft(TabGame *tab)
 {
 	if (tab == currentWidget())
-		emit setMenu(0);
+		emit setMenu();
 	
 	replayTabs.removeAt(replayTabs.indexOf(tab));
 }
@@ -367,9 +378,29 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
 void TabSupervisor::talkLeft(TabMessage *tab)
 {
 	if (tab == currentWidget())
-		emit setMenu(0);
+		emit setMenu();
 
 	messageTabs.remove(tab->getUserName());
+	removeTab(indexOf(tab));
+}
+
+TabDeckEditor *TabSupervisor::addDeckEditorTab(DeckList *deckToOpen)
+{
+	TabDeckEditor *tab = new TabDeckEditor(this);
+	connect(tab, SIGNAL(deckEditorClosing(TabDeckEditor *)), this, SLOT(deckEditorClosed(TabDeckEditor *)));
+	int tabIndex = myAddTab(tab);
+	addCloseButtonToTab(tab, tabIndex);
+	deckEditorTabs.append(tab);
+	setCurrentWidget(tab);
+	return tab;
+}
+
+void TabSupervisor::deckEditorClosed(TabDeckEditor *tab)
+{
+	if (tab == currentWidget())
+		emit setMenu();
+	
+	deckEditorTabs.removeAt(deckEditorTabs.indexOf(tab));
 	removeTab(indexOf(tab));
 }
 
@@ -382,6 +413,11 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
 	}
 	if (globalEvent)
 		QApplication::alert(this);
+}
+
+void TabSupervisor::updateTabText(Tab *tab, const QString &newTabText)
+{
+	setTabText(indexOf(tab), newTabText);
 }
 
 void TabSupervisor::processRoomEvent(const RoomEvent &event)
@@ -434,9 +470,9 @@ void TabSupervisor::updateCurrent(int index)
 			setTabIcon(index, QIcon());
 			tab->setContentsChanged(false);
 		}
-		emit setMenu(static_cast<Tab *>(widget(index))->getTabMenu());
+		emit setMenu(static_cast<Tab *>(widget(index))->getTabMenus());
 	} else
-		emit setMenu(0);
+		emit setMenu();
 }
 
 bool TabSupervisor::getAdminLocked() const

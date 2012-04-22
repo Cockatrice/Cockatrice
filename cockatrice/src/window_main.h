@@ -34,7 +34,7 @@ class QThread;
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 private slots:
-	void updateTabMenu(QMenu *menu);
+	void updateTabMenu(const QList<QMenu *> &newMenuList);
 	void statusChanged(ClientStatus _status);
 	void processConnectionClosedEvent(const Event_ConnectionClosed &event);
 	void processServerShutdownEvent(const Event_ServerShutdown &event);
@@ -61,7 +61,8 @@ private:
 	void retranslateUi();
 	void createActions();
 	void createMenus();
-	QMenu *cockatriceMenu, *tabMenu, *helpMenu;
+	QList<QMenu *> tabMenus;
+	QMenu *cockatriceMenu, *helpMenu;
 	QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
 		*aAbout;
 	TabSupervisor *tabSupervisor;

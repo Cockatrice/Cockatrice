@@ -12,7 +12,7 @@
 #include "remotedecklist_treewidget.h"
 #include "abstractclient.h"
 #include "decklist.h"
-#include "window_deckeditor.h"
+//#include "window_deckeditor.h"
 #include "settingscache.h"
 
 #include "pending_command.h"
@@ -127,9 +127,9 @@ void TabDeckStorage::actOpenLocalDeck()
 	if (!deck->loadFromFile(filePath, DeckList::CockatriceFormat))
 		return;
 	
-	WndDeckEditor *deckEditor = new WndDeckEditor;
-	deckEditor->setDeck(deck, filePath, DeckList::CockatriceFormat);
-	deckEditor->show();
+//	WndDeckEditor *deckEditor = new WndDeckEditor;
+//	deckEditor->setDeck(deck, filePath, DeckList::CockatriceFormat);
+//	deckEditor->show();
 }
 
 void TabDeckStorage::actUpload()
@@ -196,9 +196,9 @@ void TabDeckStorage::openRemoteDeckFinished(const Response &r)
 {
 	const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
 	
-	WndDeckEditor *deckEditor = new WndDeckEditor;
-	deckEditor->setDeck(new DeckList(QString::fromStdString(resp.deck())));
-	deckEditor->show();
+//	WndDeckEditor *deckEditor = new WndDeckEditor;
+//	deckEditor->setDeck(new DeckList(QString::fromStdString(resp.deck())));
+//	deckEditor->show();
 }
 
 void TabDeckStorage::actDownload()
