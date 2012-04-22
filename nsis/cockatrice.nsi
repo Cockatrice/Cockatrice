@@ -37,31 +37,34 @@ Section "Application" SecApplication
 	File C:\MinGW\bin\libgcc_s_dw2-1.dll
 	File C:\MinGW\bin\mingwm10.dll
 	File C:\MinGW\bin\libprotobuf-7.dll
-	File C:\MinGW\bin\QtCore4.dll
-	File C:\MinGW\bin\QtGui4.dll
-	File C:\MinGW\bin\QtNetwork4.dll
-	File C:\MinGW\bin\QtSvg4.dll
-	File C:\MinGW\bin\QtXml4.dll
-	File C:\MinGW\bin\QtMultimedia4.dll
-	File C:\MinGW\bin\QtScript4.dll
+	File C:\MinGW\qt\bin\QtCore4.dll
+	File C:\MinGW\qt\bin\QtGui4.dll
+	File C:\MinGW\qt\bin\QtNetwork4.dll
+	File C:\MinGW\qt\bin\QtSvg4.dll
+	File C:\MinGW\qt\bin\QtXml4.dll
+	File C:\MinGW\qt\bin\QtMultimedia4.dll
+	File C:\MinGW\qt\bin\QtScript4.dll
 
 	SetOutPath "$INSTDIR\zonebg"
 	File /r ..\zonebg\*.*
 	
 	SetOutPath "$INSTDIR\plugins"
 	SetOutPath "$INSTDIR\plugins\codecs"
-	File C:\MinGW\plugins\codecs\qcncodecs4.dll
-	File C:\MinGW\plugins\codecs\qjpcodecs4.dll
-	File C:\MinGW\plugins\codecs\qkrcodecs4.dll
-	File C:\MinGW\plugins\codecs\qtwcodecs4.dll
+	File C:\MinGW\qt\plugins\codecs\qcncodecs4.dll
+	File C:\MinGW\qt\plugins\codecs\qjpcodecs4.dll
+	File C:\MinGW\qt\plugins\codecs\qkrcodecs4.dll
+	File C:\MinGW\qt\plugins\codecs\qtwcodecs4.dll
 	SetOutPath "$INSTDIR\plugins\iconengines"
-	File C:\MinGW\plugins\iconengines\qsvgicon4.dll
+	File C:\MinGW\qt\plugins\iconengines\qsvgicon4.dll
 	SetOutPath "$INSTDIR\plugins\imageformats"
-	File C:\MinGW\plugins\imageformats\qjpeg4.dll
-	File c:\MinGW\plugins\imageformats\qsvg4.dll
+	File C:\MinGW\qt\plugins\imageformats\qjpeg4.dll
+	File c:\MinGW\qt\plugins\imageformats\qsvg4.dll
 
 	SetOutPath "$INSTDIR\sounds"
 	File /r ..\sounds\*.*
+	
+	SetOutPath "$INSTDIR\translations"
+	File /r ..\build\cockatrice\*.qm
 
         WriteUninstaller "$INSTDIR\uninstall.exe"
         ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
@@ -91,6 +94,7 @@ Section Uninstall
         RMDir /r "$INSTDIR\zonebg"
         RMDir /r "$INSTDIR\plugins"
         RMDir /r "$INSTDIR\sounds"
+	RMDir /r "$INSTDIR\translations"
         Delete "$INSTDIR\uninstall.exe"
         Delete "$INSTDIR\cockatrice.exe"
         Delete "$INSTDIR\oracle.exe"
@@ -103,6 +107,8 @@ Section Uninstall
         Delete "$INSTDIR\QtNetwork4.dll"
         Delete "$INSTDIR\QtSvg4.dll"
         Delete "$INSTDIR\QtXml4.dll"
+	Delete "$INSTDIR\QtMultimedia4.dll"
+	Delete "$INSTDIR\QtScript4.dll"
         RMDir "$INSTDIR"
 
 	RMDir /r "$SMPROGRAMS\Cockatrice"
