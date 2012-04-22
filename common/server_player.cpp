@@ -350,7 +350,13 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 	
 	QList<QPair<Server_Card *, int> > cardsToMove;
 	QMap<Server_Card *, const CardToMove *> cardProperties;
+	QSet<int> cardIdsToMove;
 	for (int i = 0; i < _cards.size(); ++i) {
+		// The same card being moved twice would lead to undefined behaviour.
+		if (cardIdsToMove.contains(_cards[i]->card_id()))
+			continue;
+		cardIdsToMove.insert(_cards[i]->card_id());
+		
 		int position;
 		Server_Card *card = startzone->getCard(_cards[i]->card_id(), &position);
 		if (!card)
