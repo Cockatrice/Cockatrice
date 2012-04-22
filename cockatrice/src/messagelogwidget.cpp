@@ -161,10 +161,11 @@ void MessageLogWidget::logShuffle(Player *player, CardZone *zone)
 {
 	soundEngine->shuffle();
 	if (currentContext != MessageContext_Mulligan) {
-		if (isFemale(player))
-			appendHtml(tr("%1 shuffles %2.", "female").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)));
-		else
-			appendHtml(tr("%1 shuffles %2.", "male").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)));
+		appendHtml((isFemale(player)
+			? tr("%1 shuffles %2.", "female")
+			: tr("%1 shuffles %2.", "male")
+		).arg(sanitizeHtml(player->getName()))
+		 .arg(zone->getTranslatedName(true, CaseShuffleZone)));
 	}
 }
 
@@ -648,26 +649,27 @@ void MessageLogWidget::logSetAnnotation(Player *player, CardItem *card, QString 
 
 void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCards)
 {
-	if (numberCards != -1) {
-		if (isFemale(player))
-			appendHtml(tr("%1 is looking at the top %2 cards %3.", "female").arg(sanitizeHtml(player->getName())).arg(numberCards).arg(zone->getTranslatedName(zone->getPlayer() == player, CaseGenitive)));
-		else
-			appendHtml(tr("%1 is looking at the top %2 cards %3.", "male").arg(sanitizeHtml(player->getName())).arg(numberCards).arg(zone->getTranslatedName(zone->getPlayer() == player, CaseGenitive)));
-	} else {
-		if (isFemale(player))
-			appendHtml(tr("%1 is looking at %2.", "female").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(zone->getPlayer() == player, CaseAccusative)));
-		else
-			appendHtml(tr("%1 is looking at %2.", "male").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(zone->getPlayer() == player, CaseAccusative)));
-	}
+	if (numberCards == -1)
+		appendHtml((isFemale(player)
+			? tr("%1 is looking at %2.", "female")
+			: tr("%1 is looking at %2.", "male")
+		).arg(sanitizeHtml(player->getName()))
+		 .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
+	else
+		appendHtml((isFemale(player)
+			? tr("%1 is looking at the top %n card(s) %2.", "female", numberCards)
+			: tr("%1 is looking at the top %n card(s) %2.", "male", numberCards)
+		).arg(sanitizeHtml(player->getName()))
+		 .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone)));
 }
 
 void MessageLogWidget::logStopDumpZone(Player *player, CardZone *zone)
 {
-	QString zoneName = zone->getTranslatedName(zone->getPlayer() == player, CaseAccusative);
-	if (isFemale(player))
-		appendHtml(tr("%1 stops looking at %2.", "female").arg(sanitizeHtml(player->getName())).arg(zoneName));
-	else
-		appendHtml(tr("%1 stops looking at %2.", "male").arg(sanitizeHtml(player->getName())).arg(zoneName));
+	appendHtml((isFemale(player)
+		? tr("%1 stops looking at %2.", "female")
+		: tr("%1 stops looking at %2.", "male")
+	).arg(sanitizeHtml(player->getName()))
+	 .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
 }
 
 void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer, bool faceDown)
@@ -702,12 +704,13 @@ void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId
 				else
 					str = tr("%1 reveals %2 to %3.", "p1 male, p2 male");
 			}
-			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)).arg(sanitizeHtml(otherPlayer->getName())));
+			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseRevealZone)).arg(sanitizeHtml(otherPlayer->getName())));
 		} else {
-			if (isFemale(player))
-				appendHtml(tr("%1 reveals %2.", "female").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)));
-			else
-				appendHtml(tr("%1 reveals %2.", "male").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)));
+			appendHtml((isFemale(player)
+				? tr("%1 reveals %2.", "female")
+				: tr("%1 reveals %2.", "male")
+			).arg(sanitizeHtml(player->getName()))
+			 .arg(zone->getTranslatedName(true, CaseRevealZone)));
 		}
 	} else if (cardId == -2) {
 		if (otherPlayer) {
@@ -725,7 +728,7 @@ void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId
 			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr).arg(sanitizeHtml(otherPlayer->getName())));
 		} else {
 			if (isFemale(player))
-				appendHtml(tr("%1 randomly reveals %2%3.", "female").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)));
+				appendHtml(tr("%1 randomly reveals %2%3.", "female").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
 			else
 				appendHtml(tr("%1 randomly reveals %2%3.", "male").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
 		}
@@ -759,7 +762,7 @@ void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId
 			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr).arg(sanitizeHtml(otherPlayer->getName())));
 		} else {
 			if (isFemale(player))
-				appendHtml(tr("%1 reveals %2%3.", "female").arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseAccusative)));
+				appendHtml(tr("%1 reveals %2%3.", "female").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
 			else
 				appendHtml(tr("%1 reveals %2%3.", "male").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
 		}
@@ -768,13 +771,12 @@ void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId
 
 void MessageLogWidget::logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal)
 {
-	QString str;
-	if (reveal)
-		str = tr("%1 is now keeping the top card %2 revealed.");
-	else
-		str = tr("%1 is not revealing the top card %2 any longer.");
-	
-	appendHtml(str.arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseGenitive)));
+	appendHtml((reveal
+		? tr("%1 is now keeping the top card %2 revealed.")
+		: tr("%1 is not revealing the top card %2 any longer.")
+		).arg(sanitizeHtml(player->getName()))
+		 .arg(zone->getTranslatedName(true, CaseTopCardsOfZone))
+	);
 }
 
 void MessageLogWidget::logSetActivePlayer(Player *player)
