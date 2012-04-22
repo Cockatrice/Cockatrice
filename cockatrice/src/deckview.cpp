@@ -274,6 +274,7 @@ DeckViewScene::DeckViewScene(QObject *parent)
 DeckViewScene::~DeckViewScene()
 {
 	clearContents();
+	delete deck;
 }
 
 void DeckViewScene::clearContents()

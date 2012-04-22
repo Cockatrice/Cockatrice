@@ -437,13 +437,17 @@ void WndDeckEditor::recursiveExpand(const QModelIndex &index)
 	deckView->expand(index);
 }
 
-void WndDeckEditor::addCardHelper(const QString &zoneName)
+void WndDeckEditor::addCardHelper(QString zoneName)
 {
 	const QModelIndex currentIndex = databaseView->selectionModel()->currentIndex();
 	if (!currentIndex.isValid())
 		return;
 	const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
-
+	
+	CardInfo *info = db->getCard(cardName);
+	if (info->getIsToken())
+		zoneName = "tokens";
+	
 	QModelIndex newCardIndex = deckModel->addCard(cardName, zoneName);
 	recursiveExpand(newCardIndex);
 	deckView->setCurrentIndex(newCardIndex);

@@ -234,6 +234,7 @@ void PictureLoader::setPicDownload(bool _picDownload)
 
 CardInfo::CardInfo(CardDatabase *_db,
 				   const QString &_name,
+				   bool _isToken,
 				   const QString &_manacost,
 				   const QString &_cardtype,
 				   const QString &_powtough,
@@ -248,6 +249,7 @@ CardInfo::CardInfo(CardDatabase *_db,
 				   const QMap<QString, QString> &_picURLsSt)
 	: db(_db),
 	  name(_name),
+	  isToken(_isToken),
 	  sets(_sets),
 	  manacost(_manacost),
 	  cardtype(_cardtype),
@@ -426,6 +428,8 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 		xml.writeTextElement("loyalty", QString::number(info->getLoyalty()));
 	if (info->getCipt())
 		xml.writeTextElement("cipt", "1");
+	if (info->getIsToken())
+		xml.writeTextElement("token", "1");
 	xml.writeEndElement(); // card
 
 	return xml;
@@ -469,7 +473,7 @@ void CardDatabase::clear()
 		delete setIt.value();
 	}
 	setHash.clear();
-
+	
 	QHashIterator<QString, CardInfo *> i(cardHash);
 	while (i.hasNext()) {
 		i.next();
@@ -485,7 +489,7 @@ CardInfo *CardDatabase::getCard(const QString &cardName)
 	else if (cardHash.contains(cardName))
 		return cardHash.value(cardName);
 	else {
-		CardInfo *newCard = new CardInfo(this, cardName);
+		CardInfo *newCard = new CardInfo(this, cardName, true);
 		newCard->addToSet(getSet("TK"));
 		cardHash.insert(cardName, newCard);
 		return newCard;
@@ -558,6 +562,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 			int tableRow = 0;
 			int loyalty = 0;
 			bool cipt = false;
+			bool isToken = false;
 			while (!xml.atEnd()) {
 				if (xml.readNext() == QXmlStreamReader::EndElement)
 					break;
@@ -588,8 +593,10 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 					cipt = (xml.readElementText() == "1");
 				else if (xml.name() == "loyalty")
 					loyalty = xml.readElementText().toInt();
+				else if (xml.name() == "token")
+					isToken = xml.readElementText().toInt();
 			}
-			cardHash.insert(name, new CardInfo(this, name, manacost, type, pt, text, colors, loyalty, cipt, tableRow, sets, picURLs, picURLsHq, picURLsSt));
+			cardHash.insert(name, new CardInfo(this, name, isToken, manacost, type, pt, text, colors, loyalty, cipt, tableRow, sets, picURLs, picURLsHq, picURLsSt));
 		}
 	}
 }

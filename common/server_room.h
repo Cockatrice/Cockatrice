@@ -8,7 +8,6 @@
 #include <QMutex>
 #include <QReadWriteLock>
 #include "serverinfo_user_container.h"
-#include "pb/serverinfo_room.pb.h"
 #include "pb/response.pb.h"
 
 class Server_ProtocolHandler;
@@ -26,8 +25,8 @@ class Server_AbstractUserInterface;
 class Server_Room : public QObject {
 	Q_OBJECT
 signals:
-	void roomInfoChanged(ServerInfo_Room roomInfo);
-	void gameListChanged(ServerInfo_Game gameInfo);
+	void roomInfoChanged(const ServerInfo_Room &roomInfo);
+	void gameListChanged(const ServerInfo_Game &gameInfo);
 private:
 	int id;
 	QString name;
@@ -40,7 +39,7 @@ private:
 	QList<Server_ProtocolHandler *> userList;
 	QMap<QString, ServerInfo_User_Container> externalUsers;
 private slots:
-	void broadcastGameListUpdate(ServerInfo_Game gameInfo, bool sendToIsl = true);
+	void broadcastGameListUpdate(const ServerInfo_Game &gameInfo, bool sendToIsl = true);
 public:
 	mutable QReadWriteLock usersLock;
 	mutable QMutex gamesMutex;
@@ -55,7 +54,7 @@ public:
 	const QMap<int, Server_Game *> &getGames() const { return games; }
 	const QMap<int, ServerInfo_Game> &getExternalGames() const { return externalGames; }
 	Server *getServer() const;
-	ServerInfo_Room getInfo(bool complete, bool showGameTypes = false, bool updating = false, bool includeExternalData = true) const;
+	const ServerInfo_Room &getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes = false, bool updating = false, bool includeExternalData = true) const;
 	int getGamesCreatedByUser(const QString &name) const;
 	QList<ServerInfo_Game> getGamesOfUser(const QString &name) const;
 	

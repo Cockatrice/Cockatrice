@@ -10,6 +10,7 @@
 
 namespace google { namespace protobuf { class Message; } }
 class CardDatabase;
+class DeckList;
 class QMenu;
 class QAction;
 class ZoneViewZone;
@@ -133,6 +134,7 @@ private slots:
 	void updateBoundingRect();
 	void rearrangeZones();
 	
+	void actCreatePredefinedToken();
 	void cardMenuAction();
 	void actCardCounterTrigger();
 	void actAttach();
@@ -152,7 +154,7 @@ private slots:
 
 private:
 	TabGame *game;
-	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *countersMenu, *sayMenu,
+	QMenu *playerMenu, *handMenu, *graveMenu, *rfgMenu, *libraryMenu, *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu,
 		*mRevealLibrary, *mRevealTopCard, *mRevealHand, *mRevealRandomHandCard;
 	QList<QMenu *> playerLists;
 	QList<QAction *> allPlayersActions;
@@ -186,6 +188,9 @@ private:
 	bool dialogSemaphore;
 	bool clearCardsToDelete();
 	QList<CardItem *> cardsToDelete;
+	
+	DeckList *deck;
+	QStringList predefinedTokens;
 	
 	PlayerArea *playerArea;
 	QMap<QString, CardZone *> zones;
@@ -256,6 +261,7 @@ public:
 	void retranslateUi();
 	void clear();
 	TabGame *getGame() const { return game; }
+	void setDeck(DeckList *_deck);
 	QMenu *getPlayerMenu() const { return playerMenu; }
 	int getId() const { return id; }
 	QString getName() const;

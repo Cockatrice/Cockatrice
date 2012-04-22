@@ -8,12 +8,14 @@ class ChatView;
 class QLineEdit;
 class Event_UserMessage;
 class Response;
+class ServerInfo_User;
 
 class TabMessage : public Tab {
 	Q_OBJECT
 private:
 	AbstractClient *client;
-	QString userName;
+	ServerInfo_User *ownUserInfo;
+	ServerInfo_User *otherUserInfo;
 	bool userOnline;
 	
 	ChatView *chatView;
@@ -27,16 +29,16 @@ private slots:
 	void actLeave();
 	void messageSent(const Response &response);
 public:
-	TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, const QString &_userName);
+	TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &_ownUserInfo, const ServerInfo_User &_otherUserInfo);
 	~TabMessage();
 	void retranslateUi();
 	void closeRequest();
-	QString getUserName() const { return userName; }
-	QString getTabText() const { return tr("Talking to %1").arg(userName); }
+	QString getUserName() const;
+	QString getTabText() const;
 
 	void processUserMessageEvent(const Event_UserMessage &event);
 	void processUserLeft();
-	void processUserJoined();
+	void processUserJoined(const ServerInfo_User &_userInfo);
 };
 
 #endif

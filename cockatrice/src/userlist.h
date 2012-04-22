@@ -5,6 +5,7 @@
 #include <QGroupBox>
 #include <QTreeWidgetItem>
 #include <QStyledItemDelegate>
+#include "user_level.h"
 
 class QTreeWidget;
 class ServerInfo_User;
@@ -17,6 +18,7 @@ class QRadioButton;
 class QPlainTextEdit;
 class Response;
 class CommandContainer;
+class UserContextMenu;
 
 class BanDialog : public QDialog {
 	Q_OBJECT
@@ -46,10 +48,13 @@ public:
 };
 
 class UserListTWI : public QTreeWidgetItem {
+private:
+	ServerInfo_User userInfo;
 public:
-	UserListTWI();
-	QString getUserName() const;
-	int getUserLevel() const;
+	UserListTWI(const ServerInfo_User &_userInfo);
+	const ServerInfo_User &getUserInfo() const { return userInfo; }
+	void setUserInfo(const ServerInfo_User &_userInfo);
+	void setOnline(bool online);
 	bool operator<(const QTreeWidgetItem &other) const;
 };
 
@@ -64,15 +69,12 @@ private:
 	UserListType type;
 	QTreeWidget *userTree;
 	UserListItemDelegate *itemDelegate;
+	UserContextMenu *userContextMenu;
 	int onlineCount;
 	QString titleStr;
 	void updateCount();
-	void setUserOnline(QTreeWidgetItem *user, bool online);
 private slots:
 	void userClicked(QTreeWidgetItem *item, int column);
-	void banUser_processUserInfoResponse(const Response &resp);
-	void banUser_dialogFinished();
-	void gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer);
 signals:
 	void openMessageDialog(const QString &userName, bool focus);
 	void addBuddy(const QString &userName);

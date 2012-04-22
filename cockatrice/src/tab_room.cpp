@@ -40,7 +40,8 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
 	userList = new UserList(tabSupervisor, client, UserList::RoomList);
 	connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
 	
-	chatView = new ChatView(QString::fromStdString(ownUser->name()), true);
+	chatView = new ChatView(tabSupervisor, 0, true);
+	connect(chatView, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
 	connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
 	connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
 	sayLabel = new QLabel;
@@ -105,6 +106,7 @@ TabRoom::~TabRoom()
 void TabRoom::retranslateUi()
 {
         gameSelector->retranslateUi();
+	chatView->retranslateUi();
 	sayLabel->setText(tr("&Say:"));
 	chatGroupBox->setTitle(tr("Chat"));
 	tabMenu->setTitle(tr("&Room"));
@@ -142,7 +144,7 @@ void TabRoom::sendMessage()
 void TabRoom::sayFinished(const Response &response)
 {
 	if (response.response_code() == Response::RespChatFlood)
-		chatView->appendMessage(QString(), tr("You are flooding the chat. Please wait a couple of seconds."));
+		chatView->appendMessage(tr("You are flooding the chat. Please wait a couple of seconds."));
 }
 
 void TabRoom::actLeaveRoom()
@@ -197,20 +199,13 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
 	if (tabSupervisor->getUserListsTab()->getIgnoreList()->getUsers().contains(senderName))
 		return;
 	UserListTWI *twi = userList->getUsers().value(senderName);
-	QColor senderColor;
-	if (twi && (senderName != QString::fromStdString(ownUser->name()))) {
-		ServerInfo_User::UserLevelFlags userLevel = static_cast<ServerInfo_User::UserLevelFlags>(twi->getUserLevel());
-		if (userLevel & ServerInfo_User::IsModerator)
-			senderColor = Qt::darkMagenta;
-		else if (userLevel & ServerInfo_User::IsRegistered)
-			senderColor = Qt::darkGreen;
-		else {
-			if (settingsCache->getIgnoreUnregisteredUsers())
-				return;
-			senderColor = QColor(0, 0, 254);
-		}
+	UserLevelFlags userLevel;
+	if (twi) {
+		userLevel = UserLevelFlags(twi->getUserInfo().user_level());
+		if (settingsCache->getIgnoreUnregisteredUsers() && !userLevel.testFlag(ServerInfo_User::IsRegistered))
+			return;
 	}
-	chatView->appendMessage(QString::fromStdString(event.name()), QString::fromStdString(event.message()), senderColor);
+	chatView->appendMessage(QString::fromStdString(event.message()), senderName, userLevel);
 	emit userEvent(false);
 }
 

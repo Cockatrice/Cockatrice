@@ -1,7 +1,7 @@
 message ServerInfo_User {
-	enum UserLevelFlags {
-		IsNothing = 0;
-		IsUser = 1;
+	enum UserLevelFlag {
+        	IsNothing = 0;
+	        IsUser = 1;
 		IsRegistered = 2;
 		IsModerator = 4;
 		IsAdmin = 8;

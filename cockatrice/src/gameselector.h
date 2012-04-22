@@ -2,7 +2,6 @@
 #define GAMESELECTOR_H
 
 #include <QGroupBox>
-//#include "tab_room.h"
 #include "gametypemap.h"
 
 class QTreeView;
@@ -28,7 +27,7 @@ signals:
 	void gameJoined(int gameId);
 private:
 	AbstractClient *client;
-	TabSupervisor *tabSupervisor;
+	const TabSupervisor *tabSupervisor;
 	TabRoom *room;
 
 	QTreeView *gameListView;
@@ -36,7 +35,7 @@ private:
 	GamesProxyModel *gameListProxyModel;
 	QPushButton *filterButton, *clearFilterButton, *createButton, *joinButton, *spectateButton;
 public:
-	GameSelector(AbstractClient *_client, TabSupervisor *_tabSupervisor, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QWidget *parent = 0);
+	GameSelector(AbstractClient *_client, const TabSupervisor *_tabSupervisor, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QWidget *parent = 0);
 	void retranslateUi();
 	void processGameInfo(const ServerInfo_Game &info);
 };

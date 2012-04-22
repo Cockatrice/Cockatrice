@@ -21,7 +21,7 @@ class TabUserLists : public Tab {
 signals:
 	void openMessageDialog(const QString &userName, bool focus);
 	void userLeft(const QString &userName);
-	void userJoined(const QString &userName);
+	void userJoined(const ServerInfo_User &userInfo);
 private slots:
 	void processListUsersResponse(const Response &response);
 	void processUserJoinedEvent(const Event_UserJoined &event);
@@ -40,8 +40,9 @@ public:
 	TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo, QWidget *parent = 0);
 	void retranslateUi();
 	QString getTabText() const { return tr("User lists"); }
-	UserList *getBuddyList() const { return buddyList; }
-	UserList *getIgnoreList() const { return ignoreList; }
+	const UserList *getAllUsersList() const { return allUsersList; }
+	const UserList *getBuddyList() const { return buddyList; }
+	const UserList *getIgnoreList() const { return ignoreList; }
 };
 
 #endif

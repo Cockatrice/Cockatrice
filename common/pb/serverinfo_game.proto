@@ -19,4 +19,5 @@ message ServerInfo_Game {
 	optional uint32 spectators_count = 31;
 	optional bool started = 50;
 	optional uint32 start_time = 51;
+	optional bool closed = 52;
 }

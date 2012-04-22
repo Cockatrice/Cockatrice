@@ -7,15 +7,6 @@ GamesModel::GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTyp
 {
 }
 
-GamesModel::~GamesModel()
-{
-	if (!gameList.isEmpty()) {
-		beginRemoveRows(QModelIndex(), 0, gameList.size() - 1);
-		gameList.clear();
-		endRemoveRows();
-	}
-}
-
 QVariant GamesModel::data(const QModelIndex &index, int role) const
 {
 	if (!index.isValid())
@@ -81,12 +72,12 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
 {
 	for (int i = 0; i < gameList.size(); i++)
 		if (gameList[i].game_id() == game.game_id()) {
-			if (!game.has_player_count()) {
+			if (game.closed()) {
 				beginRemoveRows(QModelIndex(), i, i);
 				gameList.removeAt(i);
 				endRemoveRows();
 			} else {
-				gameList[i] = game;
+				gameList[i].MergeFrom(game);
 				emit dataChanged(index(i, 0), index(i, 7));
 			}
 			return;

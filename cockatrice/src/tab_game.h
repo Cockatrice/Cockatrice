@@ -107,7 +107,7 @@ private:
 	int localPlayerId;
 	bool spectator;
 	QMap<int, Player *> players;
-	QMap<int, QString> spectators;
+	QMap<int, ServerInfo_User> spectators;
 	bool gameStateKnown;
 	bool resuming;
 	QStringList phasesList;
@@ -195,7 +195,7 @@ private slots:
 	void actNextTurn();
 public:
 	TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event, const QMap<int, QString> &_roomGameTypes);
-	TabGame(GameReplay *replay);
+	TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
 	~TabGame();
 	void retranslateUi();
 	void closeRequest();
@@ -208,6 +208,7 @@ public:
 	bool getSpectatorsSeeEverything() const { return gameInfo.spectators_omniscient(); }
 	Player *getActiveLocalPlayer() const;
 	AbstractClient *getClientForPlayer(int playerId) const;
+	int getPlayerIdByName(const QString &playerName) const;
 	
 	void setActiveCard(CardItem *_card) { activeCard = _card; }
 	CardItem *getActiveCard() const { return activeCard; }

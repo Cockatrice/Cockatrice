@@ -4,6 +4,7 @@
 #include "abstractclient.h"
 #include "pixmapgenerator.h"
 #include "userinfobox.h"
+#include "user_context_menu.h"
 #include "gameselector.h"
 #include <QHeaderView>
 #include <QVBoxLayout>
@@ -169,19 +170,27 @@ bool UserListItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model,
 	return QStyledItemDelegate::editorEvent(event, model, option, index);
 }
 
-UserListTWI::UserListTWI()
+UserListTWI::UserListTWI(const ServerInfo_User &_userInfo)
 	: QTreeWidgetItem(Type)
 {
+	setUserInfo(_userInfo);
 }
 
-QString UserListTWI::getUserName() const
+void UserListTWI::setUserInfo(const ServerInfo_User &_userInfo)
 {
-	return data(2, Qt::UserRole).toString();
+	userInfo = _userInfo;
+
+	setData(0, Qt::UserRole, userInfo.user_level());
+	setIcon(0, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(userInfo.user_level()))));
+	setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(12, QString::fromStdString(userInfo.country()))));
+	setData(2, Qt::UserRole, QString::fromStdString(userInfo.name()));
+	setData(2, Qt::DisplayRole, QString::fromStdString(userInfo.name()));
 }
 
-int UserListTWI::getUserLevel() const
+void UserListTWI::setOnline(bool online)
 {
-	return data(0, Qt::UserRole).toInt();
+	setData(0, Qt::UserRole + 1, online);
+	setData(2, Qt::ForegroundRole, online ? QBrush() : QBrush(Qt::gray));
 }
 
 bool UserListTWI::operator<(const QTreeWidgetItem &other) const
@@ -202,6 +211,8 @@ UserList::UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserL
 	: QGroupBox(parent), tabSupervisor(_tabSupervisor), client(_client), type(_type), onlineCount(0)
 {
 	itemDelegate = new UserListItemDelegate(this);
+	userContextMenu = new UserContextMenu(tabSupervisor, this);
+	connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
 	
 	userTree = new QTreeWidget;
 	userTree->setColumnCount(3);
@@ -236,25 +247,17 @@ void UserList::processUserInfo(const ServerInfo_User &user, bool online)
 {
 	const QString userName = QString::fromStdString(user.name());
 	UserListTWI *item = users.value(userName);
-	if (!item) {
-		item = new UserListTWI;
+	if (item)
+		item->setUserInfo(user);
+	else {
+		item = new UserListTWI(user);
 		users.insert(userName, item);
 		userTree->addTopLevelItem(item);
 		if (online)
 			++onlineCount;
 		updateCount();
 	}
-	item->setData(0, Qt::UserRole, user.user_level());
-	item->setIcon(0, QIcon(UserLevelPixmapGenerator::generatePixmap(12, user.user_level())));
-	item->setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(12, QString::fromStdString(user.country()))));
-	item->setData(2, Qt::UserRole, QString::fromStdString(user.name()));
-	item->setData(2, Qt::DisplayRole, QString::fromStdString(user.name()));
-	
-	item->setData(0, Qt::UserRole + 1, online);
-	if (online)
-		item->setData(2, Qt::ForegroundRole, QBrush());
-	else
-		item->setData(2, Qt::ForegroundRole, QBrush(Qt::gray));
+	item->setOnline(online);
 }
 
 bool UserList::deleteUser(const QString &userName)
@@ -273,25 +276,18 @@ bool UserList::deleteUser(const QString &userName)
 	return false;
 }
 
-void UserList::setUserOnline(QTreeWidgetItem *item, bool online)
-{
-	item->setData(0, Qt::UserRole + 1, online);
-	
-	if (online) {
-		item->setData(2, Qt::ForegroundRole, QBrush());
-		++onlineCount;
-	} else {
-		item->setData(2, Qt::ForegroundRole, QBrush(Qt::gray));
-		--onlineCount;
-	}
-	updateCount();
-}
-
 void UserList::setUserOnline(const QString &userName, bool online)
 {
 	UserListTWI *twi = users.value(userName);
-	if (twi)
-		setUserOnline(twi, online);
+	if (!twi)
+		return;
+	
+	twi->setOnline(online);
+	if (online)
+		++onlineCount;
+	else
+		--onlineCount;
+	updateCount();
 }
 
 void UserList::updateCount()
@@ -307,165 +303,11 @@ void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
 	emit openMessageDialog(item->data(2, Qt::UserRole).toString(), true);
 }
 
-void UserList::gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer)
-{
-	const Response_GetGamesOfUser &response = resp.GetExtension(Response_GetGamesOfUser::ext);
-	const Command_GetGamesOfUser &cmd = commandContainer.session_command(0).GetExtension(Command_GetGamesOfUser::ext);
-	
-	QMap<int, GameTypeMap> gameTypeMap;
-	QMap<int, QString> roomMap;
-	const int roomListSize = response.room_list_size();
-	for (int i = 0; i < roomListSize; ++i) {
-		const ServerInfo_Room &roomInfo = response.room_list(i);
-		roomMap.insert(roomInfo.room_id(), QString::fromStdString(roomInfo.name()));
-		GameTypeMap tempMap;
-		const int gameTypeListSize = roomInfo.gametype_list_size();
-		for (int j = 0; j < gameTypeListSize; ++j) {
-			const ServerInfo_GameType &gameTypeInfo = roomInfo.gametype_list(j);
-			tempMap.insert(gameTypeInfo.game_type_id(), QString::fromStdString(gameTypeInfo.description()));
-		}
-		gameTypeMap.insert(roomInfo.room_id(), tempMap);
-	}
-	
-	GameSelector *selector = new GameSelector(client, tabSupervisor, 0, roomMap, gameTypeMap);
-	const int gameListSize = response.game_list_size();
-	for (int i = 0; i < gameListSize; ++i)
-		selector->processGameInfo(response.game_list(i));
-	
-	selector->setWindowTitle(tr("%1's games").arg(QString::fromStdString(cmd.user_name())));
-	selector->setAttribute(Qt::WA_DeleteOnClose);
-	selector->show();
-}
-
-void UserList::banUser_processUserInfoResponse(const Response &r)
-{
-	const Response_GetUserInfo &response = r.GetExtension(Response_GetUserInfo::ext);
-	
-	// The dialog needs to be non-modal in order to not block the event queue of the client.
-	BanDialog *dlg = new BanDialog(response.user_info(), this);
-	connect(dlg, SIGNAL(accepted()), this, SLOT(banUser_dialogFinished()));
-	dlg->show();
-}
-
-void UserList::banUser_dialogFinished()
-{
-	BanDialog *dlg = static_cast<BanDialog *>(sender());
-	
-	Command_BanFromServer cmd;
-	cmd.set_user_name(dlg->getBanName().toStdString());
-	cmd.set_address(dlg->getBanIP().toStdString());
-	cmd.set_minutes(dlg->getMinutes());
-	cmd.set_reason(dlg->getReason().toStdString());
-	cmd.set_visible_reason(dlg->getVisibleReason().toStdString());
-	
-	client->sendCommand(client->prepareModeratorCommand(cmd));
-}
-
 void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 {
-	UserListTWI *twi = static_cast<UserListTWI *>(userTree->topLevelItem(index.row()));
-	const QString &userName = twi->getUserName();
-	ServerInfo_User::UserLevelFlags userLevel = static_cast<ServerInfo_User::UserLevelFlags>(twi->getUserLevel());
+	const ServerInfo_User &userInfo = static_cast<UserListTWI *>(userTree->topLevelItem(index.row()))->getUserInfo();
 	
-	QAction *aUserName = new QAction(userName, this);
-	aUserName->setEnabled(false);
-	QAction *aDetails = new QAction(tr("User &details"), this);
-	QAction *aChat = new QAction(tr("Direct &chat"), this);
-	QAction *aShowGames = new QAction(tr("Show this user's &games"), this);
-	QAction *aAddToBuddyList = new QAction(tr("Add to &buddy list"), this);
-	QAction *aRemoveFromBuddyList = new QAction(tr("Remove from &buddy list"), this);
-	QAction *aAddToIgnoreList = new QAction(tr("Add to &ignore list"), this);
-	QAction *aRemoveFromIgnoreList = new QAction(tr("Remove from &ignore list"), this);
-	QAction *aBan = new QAction(tr("Ban from &server"), this);
-	
-	QMenu *menu = new QMenu(this);
-	menu->addAction(aUserName);
-	menu->addSeparator();
-	menu->addAction(aDetails);
-	menu->addAction(aShowGames);
-	menu->addAction(aChat);
-	if ((userLevel & ServerInfo_User::IsRegistered) && (tabSupervisor->getUserLevel() & ServerInfo_User::IsRegistered)) {
-		menu->addSeparator();
-		if (tabSupervisor->getUserListsTab()->getBuddyList()->getUsers().contains(userName))
-			menu->addAction(aRemoveFromBuddyList);
-		else
-			menu->addAction(aAddToBuddyList);
-		if (tabSupervisor->getUserListsTab()->getIgnoreList()->getUsers().contains(userName))
-			menu->addAction(aRemoveFromIgnoreList);
-		else
-			menu->addAction(aAddToIgnoreList);
-	}
-	if (!tabSupervisor->getAdminLocked()) {
-		menu->addSeparator();
-		menu->addAction(aBan);
-	}
-	if (userName == QString::fromStdString(tabSupervisor->getUserInfo()->name())) {
-		aChat->setEnabled(false);
-		aAddToBuddyList->setEnabled(false);
-		aRemoveFromBuddyList->setEnabled(false);
-		aAddToIgnoreList->setEnabled(false);
-		aRemoveFromIgnoreList->setEnabled(false);
-		aBan->setEnabled(false);
-	}
-	
-	QAction *actionClicked = menu->exec(pos);
-	if (actionClicked == aDetails) {
-		UserInfoBox *infoWidget = new UserInfoBox(client, true, this, Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
-		infoWidget->setAttribute(Qt::WA_DeleteOnClose);
-		infoWidget->updateInfo(userName);
-	} else if (actionClicked == aChat)
-		emit openMessageDialog(userName, true);
-	else if (actionClicked == aAddToBuddyList) {
-		Command_AddToList cmd;
-		cmd.set_list("buddy");
-		cmd.set_user_name(userName.toStdString());
-		
-		client->sendCommand(client->prepareSessionCommand(cmd));
-	} else if (actionClicked == aRemoveFromBuddyList) {
-		Command_RemoveFromList cmd;
-		cmd.set_list("buddy");
-		cmd.set_user_name(userName.toStdString());
-		
-		client->sendCommand(client->prepareSessionCommand(cmd));
-	} else if (actionClicked == aShowGames) {
-		Command_GetGamesOfUser cmd;
-		cmd.set_user_name(userName.toStdString());
-		
-		PendingCommand *pend = client->prepareSessionCommand(cmd);
-		connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(gamesOfUserReceived(Response, CommandContainer)));
-		
-		client->sendCommand(pend);
-	} else if (actionClicked == aAddToIgnoreList) {
-		Command_AddToList cmd;
-		cmd.set_list("ignore");
-		cmd.set_user_name(userName.toStdString());
-		
-		client->sendCommand(client->prepareSessionCommand(cmd));
-	} else if (actionClicked == aRemoveFromIgnoreList) {
-		Command_RemoveFromList cmd;
-		cmd.set_list("ignore");
-		cmd.set_user_name(userName.toStdString());
-		
-		client->sendCommand(client->prepareSessionCommand(cmd));
-	} else if (actionClicked == aBan) {
-		Command_GetUserInfo cmd;
-		cmd.set_user_name(userName.toStdString());
-		
-		PendingCommand *pend = client->prepareSessionCommand(cmd);
-		connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(banUser_processUserInfoResponse(Response)));
-		
-		client->sendCommand(pend);
-	}
-	
-	delete menu;
-	delete aUserName;
-	delete aDetails;
-	delete aChat;
-	delete aAddToBuddyList;
-	delete aRemoveFromBuddyList;
-	delete aAddToIgnoreList;
-	delete aRemoveFromIgnoreList;
-	delete aBan;
+	userContextMenu->showContextMenu(pos, QString::fromStdString(userInfo.name()), UserLevelFlags(userInfo.user_level()));
 }
 
 void UserList::sortItems()

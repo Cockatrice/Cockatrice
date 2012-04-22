@@ -10,11 +10,12 @@
 #include "pending_command.h"
 #include "pb/session_commands.pb.h"
 #include "pb/event_user_message.pb.h"
+#include "pb/serverinfo_user.pb.h"
 
-TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, const QString &_userName)
-	: Tab(_tabSupervisor), client(_client), userName(_userName), userOnline(true)
+TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &_ownUserInfo, const ServerInfo_User &_otherUserInfo)
+	: Tab(_tabSupervisor), client(_client), ownUserInfo(new ServerInfo_User(_ownUserInfo)), otherUserInfo(new ServerInfo_User(_otherUserInfo)), userOnline(true)
 {
-	chatView = new ChatView(_ownName, true);
+	chatView = new ChatView(tabSupervisor, 0, true);
 	connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
 	connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
 	sayEdit = new QLineEdit;
@@ -37,12 +38,24 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
 TabMessage::~TabMessage()
 {
 	emit talkClosing(this);
+	delete ownUserInfo;
+	delete otherUserInfo;
 }
 
 void TabMessage::retranslateUi()
 {
 	tabMenu->setTitle(tr("Personal &talk"));
 	aLeave->setText(tr("&Leave"));
+}
+
+QString TabMessage::getUserName() const
+{
+	return QString::fromStdString(otherUserInfo->name());
+}
+
+QString TabMessage::getTabText() const
+{
+	return tr("Talking to %1").arg(QString::fromStdString(otherUserInfo->name()));
 }
 
 void TabMessage::closeRequest()
@@ -56,7 +69,7 @@ void TabMessage::sendMessage()
 	  	return;
 	
 	Command_Message cmd;
-	cmd.set_user_name(userName.toStdString());
+	cmd.set_user_name(otherUserInfo->name());
 	cmd.set_message(sayEdit->text().toStdString());
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
@@ -69,7 +82,7 @@ void TabMessage::sendMessage()
 void TabMessage::messageSent(const Response &response)
 {
 	if (response.response_code() == Response::RespInIgnoreList)
-		chatView->appendMessage(QString(), tr("This user is ignoring you."));
+		chatView->appendMessage(tr("This user is ignoring you."));
 }
 
 void TabMessage::actLeave()
@@ -79,18 +92,20 @@ void TabMessage::actLeave()
 
 void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
 {
-	chatView->appendMessage(QString::fromStdString(event.sender_name()), QString::fromStdString(event.message()));
+	const UserLevelFlags userLevel(event.sender_name() == otherUserInfo->name() ? otherUserInfo->user_level() : ownUserInfo->user_level());
+	chatView->appendMessage(QString::fromStdString(event.message()), QString::fromStdString(event.sender_name()), userLevel);
 	emit userEvent();
 }
 
 void TabMessage::processUserLeft()
 {
-	chatView->appendMessage(QString(), tr("%1 has left the server.").arg(userName));
+	chatView->appendMessage(tr("%1 has left the server.").arg(QString::fromStdString(otherUserInfo->name())));
 	userOnline = false;
 }
 
-void TabMessage::processUserJoined()
+void TabMessage::processUserJoined(const ServerInfo_User &_userInfo)
 {
-	chatView->appendMessage(QString(), tr("%1 has joined the server.").arg(userName));
+	chatView->appendMessage(tr("%1 has joined the server.").arg(QString::fromStdString(otherUserInfo->name())));
 	userOnline = true;
+	*otherUserInfo = _userInfo;
 }

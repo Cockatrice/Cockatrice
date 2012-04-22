@@ -88,7 +88,7 @@ void TabUserLists::processUserJoinedEvent(const Event_UserJoined &event)
 	ignoreList->sortItems();
 	buddyList->sortItems();
 	
-	emit userJoined(userName);
+	emit userJoined(info);
 }
 
 void TabUserLists::processUserLeftEvent(const Event_UserLeft &event)

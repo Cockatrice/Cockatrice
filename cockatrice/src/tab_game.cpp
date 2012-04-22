@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QTimer>
 #include <QToolButton>
+#include <QDebug>
 
 #include "dlg_creategame.h"
 #include "tab_game.h"
@@ -234,8 +235,8 @@ void DeckViewContainer::setDeck(DeckList *deck)
 	sideboardLockButton->setEnabled(true);
 }
 
-TabGame::TabGame(GameReplay *_replay)
-	: Tab(0),
+TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
+	: Tab(_tabSupervisor),
 	hostId(-1),
 	localPlayerId(-1),
 	spectator(true),
@@ -282,7 +283,7 @@ TabGame::TabGame(GameReplay *_replay)
 	
 	timeElapsedLabel = new QLabel;
 	timeElapsedLabel->setAlignment(Qt::AlignCenter);
-	messageLog = new MessageLogWidget(QString(), false);
+	messageLog = new MessageLogWidget(tabSupervisor, this);
 	connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfo, SLOT(setCard(QString)));
 	connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
 	connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
@@ -411,7 +412,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 	
 	timeElapsedLabel = new QLabel;
 	timeElapsedLabel->setAlignment(Qt::AlignCenter);
-	messageLog = new MessageLogWidget(QString::fromStdString(tabSupervisor->getUserInfo()->name()), tabSupervisor->getUserInfo()->gender() == ServerInfo_User::Female);
+	messageLog = new MessageLogWidget(tabSupervisor, this);
+	connect(messageLog, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
 	connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfo, SLOT(setCard(QString)));
 	connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
 	connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
@@ -813,6 +815,17 @@ AbstractClient *TabGame::getClientForPlayer(int playerId) const
 		return clients.first();
 }
 
+int TabGame::getPlayerIdByName(const QString &playerName) const
+{
+	QMapIterator<int, Player *> playerIterator(players);
+	while (playerIterator.hasNext()) {
+		const Player *const p = playerIterator.next().value();
+		if (p->getName() == playerName)
+			return p->getId();
+	}
+	return -1;
+}
+
 void TabGame::sendGameCommand(PendingCommand *pend, int playerId)
 {
 	getClientForPlayer(playerId)->sendCommand(pend);
@@ -898,12 +911,13 @@ void TabGame::closeGame()
 
 void TabGame::eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, const GameEventContext & /*context*/)
 {
-	messageLog->logSpectatorSay(spectators.value(eventPlayerId), QString::fromStdString(event.message()));
+	const ServerInfo_User &userInfo = spectators.value(eventPlayerId);
+	messageLog->logSpectatorSay(QString::fromStdString(userInfo.name()), UserLevelFlags(userInfo.user_level()), QString::fromStdString(event.message()));
 }
 
 void TabGame::eventSpectatorLeave(const Event_Leave & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
 {
-	messageLog->logLeaveSpectator(spectators.value(eventPlayerId));
+	messageLog->logLeaveSpectator(QString::fromStdString(spectators.value(eventPlayerId).name()));
 	playerListWidget->removePlayer(eventPlayerId);
 	spectators.remove(eventPlayerId);
 	
@@ -919,7 +933,7 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*e
 		const int playerId = prop.player_id();
 		if (prop.spectator()) {
 			if (!spectators.contains(playerId)) {
-				spectators.insert(playerId, QString::fromStdString(prop.user_info().name()));
+				spectators.insert(playerId, prop.user_info());
 				playerListWidget->addPlayer(prop);
 			}
 		} else {
@@ -935,6 +949,7 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*e
 					DeckList *newDeck = new DeckList(QString::fromStdString(playerInfo.deck_list()));
 					db->cacheCardPixmaps(newDeck->getCardList());
 					deckViewContainer->setDeck(newDeck);
+					player->setDeck(newDeck);
 				}
 				deckViewContainer->setReadyStart(prop.ready_start());
 				deckViewContainer->setSideboardLocked(prop.sideboard_locked());
@@ -1023,7 +1038,7 @@ void TabGame::eventJoin(const Event_Join &event, int /*eventPlayerId*/, const Ga
 	if (players.contains(playerId))
 		return;
 	if (playerInfo.spectator()) {
-		spectators.insert(playerId, QString::fromStdString(playerInfo.user_info().name()));
+		spectators.insert(playerId, playerInfo.user_info());
 		messageLog->logJoinSpectator(QString::fromStdString(playerInfo.user_info().name()));
 	} else {
 		Player *newPlayer = addPlayer(playerId, playerInfo.user_info());

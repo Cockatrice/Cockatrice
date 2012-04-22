@@ -80,11 +80,11 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	else
 		databaseType = DatabaseNone;
 	dbPrefix = settings->value("database/prefix").toString();
-	if (databaseType != DatabaseNone)
+	if (databaseType != DatabaseNone) {
 		openDatabase();
-	
-	updateServerList();
-	clearSessionTables();
+		updateServerList();
+		clearSessionTables();
+	}
 	
 	const QString roomMethod = settings->value("rooms/method").toString();
 	if (roomMethod == "sql") {

@@ -63,6 +63,7 @@ SET(cockatrice_SOURCES
  src/chatview.cpp 
  src/userlist.cpp 
  src/userinfobox.cpp 
+ src/user_context_menu.cpp
  src/remotedecklist_treewidget.cpp 
  src/remotereplaylist_treewidget.cpp 
  src/deckview.cpp 
@@ -135,6 +136,7 @@ SET(cockatrice_HEADERS
  src/chatview.h 
  src/userlist.h 
  src/userinfobox.h 
+ src/user_context_menu.h
  src/remotedecklist_treewidget.h 
  src/remotereplaylist_treewidget.h 
  src/deckview.h 

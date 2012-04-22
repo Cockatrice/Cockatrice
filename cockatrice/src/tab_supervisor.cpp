@@ -10,6 +10,7 @@
 #include "tab_message.h"
 #include "tab_userlists.h"
 #include "pixmapgenerator.h"
+#include "userlist.h"
 #include <QDebug>
 #include <QPainter>
 
@@ -96,21 +97,31 @@ TabSupervisor::~TabSupervisor()
 void TabSupervisor::retranslateUi()
 {
 	QList<Tab *> tabs;
-	if (tabServer)
-		tabs.append(tabServer);
-	if (tabDeckStorage)
-		tabs.append(tabDeckStorage);
+	tabs.append(tabServer);
+	tabs.append(tabReplays);
+	tabs.append(tabDeckStorage);
+	tabs.append(tabAdmin);
+	tabs.append(tabUserLists);
 	QMapIterator<int, TabRoom *> roomIterator(roomTabs);
 	while (roomIterator.hasNext())
 		tabs.append(roomIterator.next().value());
 	QMapIterator<int, TabGame *> gameIterator(gameTabs);
 	while (gameIterator.hasNext())
 		tabs.append(gameIterator.next().value());
+	QListIterator<TabGame *> replayIterator(replayTabs);
+	while (replayIterator.hasNext())
+		tabs.append(replayIterator.next());
 	
-	for (int i = 0; i < tabs.size(); ++i) {
-		setTabText(indexOf(tabs[i]), tabs[i]->getTabText());
-		tabs[i]->retranslateUi();
-	}
+	for (int i = 0; i < tabs.size(); ++i)
+		if (tabs[i]) {
+			setTabText(indexOf(tabs[i]), tabs[i]->getTabText());
+			tabs[i]->retranslateUi();
+		}
+}
+
+AbstractClient *TabSupervisor::getClient() const
+{
+	return localClients.isEmpty() ? client : localClients.first();
 }
 
 int TabSupervisor::myAddTab(Tab *tab)
@@ -129,7 +140,7 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
 	
 	tabUserLists = new TabUserLists(this, client, *userInfo);
 	connect(tabUserLists, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
-	connect(tabUserLists, SIGNAL(userJoined(const QString &)), this, SLOT(processUserJoined(const QString &)));
+	connect(tabUserLists, SIGNAL(userJoined(ServerInfo_User)), this, SLOT(processUserJoined(ServerInfo_User)));
 	connect(tabUserLists, SIGNAL(userLeft(const QString &)), this, SLOT(processUserLeft(const QString &)));
 	myAddTab(tabUserLists);
 	
@@ -316,7 +327,7 @@ void TabSupervisor::roomLeft(TabRoom *tab)
 
 void TabSupervisor::openReplay(GameReplay *replay)
 {
-	TabGame *replayTab = new TabGame(replay);
+	TabGame *replayTab = new TabGame(this, replay);
 	connect(replayTab, SIGNAL(gameClosing(TabGame *)), this, SLOT(replayLeft(TabGame *)));
 	int tabIndex = myAddTab(replayTab);
 	addCloseButtonToTab(replayTab, tabIndex);
@@ -337,7 +348,13 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
 	if (receiverName == QString::fromStdString(userInfo->name()))
 		return 0;
 	
-	TabMessage *tab = new TabMessage(this, client, QString::fromStdString(userInfo->name()), receiverName);
+	ServerInfo_User otherUser;
+	UserListTWI *twi = tabUserLists->getAllUsersList()->getUsers().value(receiverName);
+	if (twi)
+		otherUser = twi->getUserInfo();
+	else
+		otherUser.set_name(receiverName.toStdString());
+	TabMessage *tab = new TabMessage(this, client, *userInfo, otherUser);
 	connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
 	int tabIndex = myAddTab(tab);
 	addCloseButtonToTab(tab, tabIndex);
@@ -402,11 +419,11 @@ void TabSupervisor::processUserLeft(const QString &userName)
 		tab->processUserLeft();
 }
 
-void TabSupervisor::processUserJoined(const QString &userName)
+void TabSupervisor::processUserJoined(const ServerInfo_User &userInfo)
 {
-	TabMessage *tab = messageTabs.value(userName);
+	TabMessage *tab = messageTabs.value(QString::fromStdString(userInfo.name()));
 	if (tab)
-		tab->processUserJoined();
+		tab->processUserJoined(userInfo);
 }
 
 void TabSupervisor::updateCurrent(int index)
@@ -427,9 +444,4 @@ bool TabSupervisor::getAdminLocked() const
 	if (!tabAdmin)
 		return true;
 	return tabAdmin->getLocked();
-}
-
-int TabSupervisor::getUserLevel() const
-{
-	return userInfo->user_level();
 }

@@ -240,9 +240,8 @@ void Server_Player::clearZones()
 	lastDrawList.clear();
 }
 
-ServerInfo_PlayerProperties Server_Player::getProperties(bool withUserInfo)
+void Server_Player::getProperties(ServerInfo_PlayerProperties &result, bool withUserInfo)
 {
-	ServerInfo_PlayerProperties result;
 	result.set_player_id(playerId);
 	if (withUserInfo)
 		result.mutable_user_info()->CopyFrom(*userInfo);
@@ -253,8 +252,6 @@ ServerInfo_PlayerProperties Server_Player::getProperties(bool withUserInfo)
 	if (deck)
 		result.set_deck_hash(deck->getDeckHash().toStdString());
 	result.set_ping_seconds(pingTime);
-	
-	return result;
 }
 
 void Server_Player::addZone(Server_CardZone *zone)
@@ -1674,7 +1671,7 @@ void Server_Player::disconnectClient()
 
 void Server_Player::getInfo(ServerInfo_Player *info, Server_Player *playerWhosAsking, bool omniscient, bool withUserInfo)
 {
-	info->mutable_properties()->CopyFrom(getProperties(withUserInfo));
+	getProperties(*info->mutable_properties(), withUserInfo);
 	if (playerWhosAsking == this)
 		if (deck)
 			info->set_deck_list(deck->writeToString_Native().toStdString());

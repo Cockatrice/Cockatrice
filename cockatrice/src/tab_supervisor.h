@@ -64,9 +64,9 @@ public:
 	int getGameCount() const { return gameTabs.size(); }
 	TabUserLists *getUserListsTab() const { return tabUserLists; }
 	ServerInfo_User *getUserInfo() const { return userInfo; }
+	AbstractClient *getClient() const;
 	const QMap<int, TabRoom *> &getRoomTabs() const { return roomTabs; }
 	bool getAdminLocked() const;
-	int getUserLevel() const;
 signals:
 	void setMenu(QMenu *menu);
 	void localGameEnded();
@@ -84,7 +84,7 @@ private slots:
 	void openReplay(GameReplay *replay);
 	void replayLeft(TabGame *tab);
 	void processUserLeft(const QString &userName);
-	void processUserJoined(const QString &userName);
+	void processUserJoined(const ServerInfo_User &userInfo);
 	void talkLeft(TabMessage *tab);
 	void tabUserEvent(bool globalEvent);
 	void processRoomEvent(const RoomEvent &event);
