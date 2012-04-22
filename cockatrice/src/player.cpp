@@ -239,6 +239,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 	}
 
 	playerMenu = new QMenu(QString());
+	table->setMenu(playerMenu);
 
 	if (local) {
 		handMenu = playerMenu->addMenu(QString());
