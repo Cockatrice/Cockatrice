@@ -49,9 +49,9 @@ SoundEngine *soundEngine;
 
 const QString translationPrefix = "cockatrice";
 #ifdef TRANSLATION_PATH
-const QString translationPath = TRANSLATION_PATH;
+QString translationPath = TRANSLATION_PATH;
 #else
-const QString translationPath = QString();
+QString translationPath = QString();
 #endif
 
 void myMessageOutput(QtMsgType /*type*/, const char *msg)
@@ -69,7 +69,8 @@ void installNewTranslator()
 
 	qtTranslator->load("qt_" + lang, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	qApp->installTranslator(qtTranslator);
-	
+	if (!translationPath.startsWith("/"))
+		translationPath.prepend(qApp->applicationDirPath() + "/");
 	if (!settingsCache->getCustomTranslationFile().isEmpty())
 		translator->load(settingsCache->getCustomTranslationFile());
 	else

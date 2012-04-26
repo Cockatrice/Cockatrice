@@ -3,8 +3,8 @@
 FRAMEWORKS="Core Gui Multimedia Network Svg Xml Script"
 DATE=`date '+%Y%m%d'`
 #QTDIR="/Users/brukie/QtSDK/Desktop/Qt/474/gcc"
-QTLIB="/Users/brukie/qt/lib"
-QTPLUGINS="/Users/brukie/qt/plugins"
+QTLIB="/Users/brukie/qt_leopard/lib"
+QTPLUGINS="/Users/brukie/qt_leopard/plugins"
 PROTOBUF="/Users/brukie/protobuf"
 DIR=cockatrice_mac_$DATE
 if [ -d $DIR ]; then echo "delete old dir first"; exit 1; fi
@@ -15,6 +15,8 @@ cp -R build/cockatrice/cockatrice.app $DIR
 cp -R build/oracle/oracle.app $DIR
 mkdir $DIR/Frameworks
 cp -R sounds zonebg $DIR
+mkdir $DIR/translations
+cp build/cockatrice/*.qm $DIR/translations
 cp -R $QTPLUGINS $DIR/PlugIns
 for f in $FRAMEWORKS; do
 	cp -R $QTLIB/Qt"$f".framework $DIR/Frameworks

@@ -9,7 +9,7 @@ extern CardDatabase *db;
 
 extern QTranslator *translator;
 extern const QString translationPrefix;
-extern const QString translationPath;
+extern QString translationPath;
 
 void installNewTranslator();
 
