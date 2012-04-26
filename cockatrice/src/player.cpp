@@ -1721,7 +1721,7 @@ void Player::cardMenuAction()
 		cardList.append(qgraphicsitem_cast<CardItem *>(sel.takeFirst()));
 	
 	QList< const ::google::protobuf::Message * > commandList;
-	if (a->data().toInt() <= 4)
+	if (a->data().toInt() <= (int) cmClone)
 		for (int i = 0; i < cardList.size(); ++i) {
 			CardItem *card = cardList[i];
 			switch (static_cast<CardMenuActionType>(a->data().toInt())) {
