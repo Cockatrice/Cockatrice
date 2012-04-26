@@ -1577,10 +1577,9 @@ void Player::delCounter(int counterId)
 	AbstractCounter *c = counters.value(counterId, 0);
 	if (!c)
 		return;
-	if (c->getName() == "life")
-		playerTarget->delCounter();
-	counters.remove(counterId);
+	
 	c->delCounter();
+	counters.remove(counterId);
 	rearrangeCounters();
 }
 
@@ -1590,7 +1589,6 @@ void Player::clearCounters()
 	while (counterIterator.hasNext())
 		counterIterator.next().value()->delCounter();
 	counters.clear();
-	playerTarget->delCounter();
 }
 
 ArrowItem *Player::addArrow(const ServerInfo_Arrow &arrow)

@@ -22,12 +22,13 @@ private:
 	QPixmap fullPixmap;
 	PlayerCounter *playerCounter;
 public slots:
-	void delCounter();
+	void counterDeleted();
 public:
 	enum { Type = typePlayerTarget };
 	int type() const { return Type; }
 	
 	PlayerTarget(Player *_player = 0, QGraphicsItem *parentItem = 0);
+	~PlayerTarget();
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	
