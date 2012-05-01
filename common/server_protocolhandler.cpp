@@ -1,27 +1,11 @@
 #include <QDebug>
+#include <QDateTime>
 #include "server_protocolhandler.h"
 #include "server_room.h"
-#include "server_card.h"
-#include "server_arrow.h"
-#include "server_cardzone.h"
-#include "server_counter.h"
 #include "server_game.h"
 #include "server_player.h"
-#include "decklist.h"
 #include "get_pb_extension.h"
-#include <QDateTime>
-#include "pb/serverinfo_zone.pb.h"
 #include "pb/commands.pb.h"
-#include "pb/command_deck_list.pb.h"
-#include "pb/command_deck_upload.pb.h"
-#include "pb/command_deck_download.pb.h"
-#include "pb/command_deck_new_dir.pb.h"
-#include "pb/command_deck_del_dir.pb.h"
-#include "pb/command_deck_del.pb.h"
-#include "pb/command_replay_list.pb.h"
-#include "pb/command_replay_download.pb.h"
-#include "pb/command_replay_modify_match.pb.h"
-#include "pb/command_replay_delete_match.pb.h"
 #include "pb/response.pb.h"
 #include "pb/response_login.pb.h"
 #include "pb/response_list_users.pb.h"
@@ -32,7 +16,6 @@
 #include "pb/event_server_message.pb.h"
 #include "pb/event_user_message.pb.h"
 #include "pb/event_game_joined.pb.h"
-#include "pb/event_game_state_changed.pb.h"
 #include "pb/event_room_say.pb.h"
 #include <google/protobuf/descriptor.h>
 
@@ -139,23 +122,12 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
 			case SessionCommand::PING: resp = cmdPing(sc.GetExtension(Command_Ping::ext), rc); break;
 			case SessionCommand::LOGIN: resp = cmdLogin(sc.GetExtension(Command_Login::ext), rc); break;
 			case SessionCommand::MESSAGE: resp = cmdMessage(sc.GetExtension(Command_Message::ext), rc); break;
-			case SessionCommand::ADD_TO_LIST: resp = cmdAddToList(sc.GetExtension(Command_AddToList::ext), rc); break;
-			case SessionCommand::REMOVE_FROM_LIST: resp = cmdRemoveFromList(sc.GetExtension(Command_RemoveFromList::ext), rc); break;
-			case SessionCommand::DECK_LIST: resp = cmdDeckList(sc.GetExtension(Command_DeckList::ext), rc); break;
-			case SessionCommand::DECK_NEW_DIR: resp = cmdDeckNewDir(sc.GetExtension(Command_DeckNewDir::ext), rc); break;
-			case SessionCommand::DECK_DEL_DIR: resp = cmdDeckDelDir(sc.GetExtension(Command_DeckDelDir::ext), rc); break;
-			case SessionCommand::DECK_DEL: resp = cmdDeckDel(sc.GetExtension(Command_DeckDel::ext), rc); break;
-			case SessionCommand::DECK_UPLOAD: resp = cmdDeckUpload(sc.GetExtension(Command_DeckUpload::ext), rc); break;
-			case SessionCommand::DECK_DOWNLOAD: resp = cmdDeckDownload(sc.GetExtension(Command_DeckDownload::ext), rc); break;
-			case SessionCommand::REPLAY_LIST: resp = cmdReplayList(sc.GetExtension(Command_ReplayList::ext), rc); break;
-			case SessionCommand::REPLAY_DOWNLOAD: resp = cmdReplayDownload(sc.GetExtension(Command_ReplayDownload::ext), rc); break;
-			case SessionCommand::REPLAY_MODIFY_MATCH: resp = cmdReplayModifyMatch(sc.GetExtension(Command_ReplayModifyMatch::ext), rc); break;
-			case SessionCommand::REPLAY_DELETE_MATCH: resp = cmdReplayDeleteMatch(sc.GetExtension(Command_ReplayDeleteMatch::ext), rc); break;
 			case SessionCommand::GET_GAMES_OF_USER: resp = cmdGetGamesOfUser(sc.GetExtension(Command_GetGamesOfUser::ext), rc); break;
 			case SessionCommand::GET_USER_INFO: resp = cmdGetUserInfo(sc.GetExtension(Command_GetUserInfo::ext), rc); break;
 			case SessionCommand::LIST_ROOMS: resp = cmdListRooms(sc.GetExtension(Command_ListRooms::ext), rc); break;
 			case SessionCommand::JOIN_ROOM: resp = cmdJoinRoom(sc.GetExtension(Command_JoinRoom::ext), rc); break;
 			case SessionCommand::LIST_USERS: resp = cmdListUsers(sc.GetExtension(Command_ListUsers::ext), rc); break;
+			default: resp = processExtendedSessionCommand(num, sc, rc);
 		}
 		if (resp != Response::RespOk)
 			finalResponseCode = resp;
@@ -255,9 +227,8 @@ Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(
 		const ModeratorCommand &sc = cont.moderator_command(i);
 		const int num = getPbExtension(sc);
 		emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
-		switch ((ModeratorCommand::ModeratorCommandType) num) {
-			case ModeratorCommand::BAN_FROM_SERVER: resp = cmdBanFromServer(sc.GetExtension(Command_BanFromServer::ext), rc); break;
-		}
+		
+		resp = processExtendedModeratorCommand(num, sc, rc);
 		if (resp != Response::RespOk)
 			finalResponseCode = resp;
 	}
@@ -277,10 +248,8 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
 		const AdminCommand &sc = cont.admin_command(i);
 		const int num = getPbExtension(sc);
 		emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
-		switch ((AdminCommand::AdminCommandType) num) {
-			case AdminCommand::SHUTDOWN_SERVER: resp = cmdShutdownServer(sc.GetExtension(Command_ShutdownServer::ext), rc); break;
-			case AdminCommand::UPDATE_SERVER_MESSAGE: resp = cmdUpdateServerMessage(sc.GetExtension(Command_UpdateServerMessage::ext), rc); break;
-		}
+		
+		resp = processExtendedAdminCommand(num, sc, rc);
 		if (resp != Response::RespOk)
 			finalResponseCode = resp;
 	}

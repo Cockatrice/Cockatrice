@@ -30,6 +30,23 @@ class Servatrice;
 class DeckList;
 class ServerInfo_DeckStorage_Folder;
 
+class Command_AddToList;
+class Command_RemoveFromList;
+class Command_DeckList;
+class Command_DeckNewDir;
+class Command_DeckDelDir;
+class Command_DeckDel;
+class Command_DeckDownload;
+class Command_DeckUpload;
+class Command_ReplayList;
+class Command_ReplayDownload;
+class Command_ReplayModifyMatch;
+class Command_ReplayDeleteMatch;
+
+class Command_BanFromServer;
+class Command_UpdateServerMessage;
+class Command_ShutdownServer;
+
 class ServerSocketInterface : public Server_ProtocolHandler
 {
 	Q_OBJECT
@@ -68,6 +85,10 @@ private:
 	Response::ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdShutdownServer(const Command_ShutdownServer &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, ResponseContainer &rc);
+	
+	Response::ResponseCode processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc);
+	Response::ResponseCode processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);
+	Response::ResponseCode processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc);
 public:
 	ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent = 0);
 	~ServerSocketInterface();

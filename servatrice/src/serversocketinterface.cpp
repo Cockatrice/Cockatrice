@@ -29,6 +29,7 @@
 #include "server_logger.h"
 #include "server_response_containers.h"
 #include "pb/commands.pb.h"
+#include "pb/command_deck_list.pb.h"
 #include "pb/command_deck_upload.pb.h"
 #include "pb/command_deck_download.pb.h"
 #include "pb/command_deck_new_dir.pb.h"
@@ -163,6 +164,42 @@ void ServerSocketInterface::transmitProtocolItem(const ServerMessage &item)
 	QMutexLocker locker(&outputBufferMutex);
 	outputBuffer.append(buf);
 	emit outputBufferChanged();
+}
+
+Response::ResponseCode ServerSocketInterface::processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc)
+{
+	switch ((SessionCommand::SessionCommandType) cmdType) {
+		case SessionCommand::ADD_TO_LIST: return cmdAddToList(cmd.GetExtension(Command_AddToList::ext), rc);
+		case SessionCommand::REMOVE_FROM_LIST: return cmdRemoveFromList(cmd.GetExtension(Command_RemoveFromList::ext), rc);
+		case SessionCommand::DECK_LIST: return cmdDeckList(cmd.GetExtension(Command_DeckList::ext), rc);
+		case SessionCommand::DECK_NEW_DIR: return cmdDeckNewDir(cmd.GetExtension(Command_DeckNewDir::ext), rc);
+		case SessionCommand::DECK_DEL_DIR: return cmdDeckDelDir(cmd.GetExtension(Command_DeckDelDir::ext), rc);
+		case SessionCommand::DECK_DEL: return cmdDeckDel(cmd.GetExtension(Command_DeckDel::ext), rc);
+		case SessionCommand::DECK_UPLOAD: return cmdDeckUpload(cmd.GetExtension(Command_DeckUpload::ext), rc);
+		case SessionCommand::DECK_DOWNLOAD: return cmdDeckDownload(cmd.GetExtension(Command_DeckDownload::ext), rc);
+		case SessionCommand::REPLAY_LIST: return cmdReplayList(cmd.GetExtension(Command_ReplayList::ext), rc);
+		case SessionCommand::REPLAY_DOWNLOAD: return cmdReplayDownload(cmd.GetExtension(Command_ReplayDownload::ext), rc);
+		case SessionCommand::REPLAY_MODIFY_MATCH: return cmdReplayModifyMatch(cmd.GetExtension(Command_ReplayModifyMatch::ext), rc);
+		case SessionCommand::REPLAY_DELETE_MATCH: return cmdReplayDeleteMatch(cmd.GetExtension(Command_ReplayDeleteMatch::ext), rc);
+		default: return Response::RespFunctionNotAllowed;
+	}
+}
+
+Response::ResponseCode ServerSocketInterface::processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc)
+{
+	switch ((ModeratorCommand::ModeratorCommandType) cmdType) {
+		case ModeratorCommand::BAN_FROM_SERVER: return cmdBanFromServer(cmd.GetExtension(Command_BanFromServer::ext), rc);
+		default: return Response::RespFunctionNotAllowed;
+	}
+}
+
+Response::ResponseCode ServerSocketInterface::processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc)
+{
+	switch ((AdminCommand::AdminCommandType) cmdType) {
+		case AdminCommand::SHUTDOWN_SERVER: return cmdShutdownServer(cmd.GetExtension(Command_ShutdownServer::ext), rc);
+		case AdminCommand::UPDATE_SERVER_MESSAGE: return cmdUpdateServerMessage(cmd.GetExtension(Command_UpdateServerMessage::ext), rc);
+		default: return Response::RespFunctionNotAllowed;
+	}
 }
 
 Response::ResponseCode ServerSocketInterface::cmdAddToList(const Command_AddToList &cmd, ResponseContainer &rc)
