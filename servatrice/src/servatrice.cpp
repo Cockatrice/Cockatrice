@@ -65,6 +65,16 @@ void Servatrice_IslServer::incomingConnection(int socketDescriptor)
 Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	: Server(parent), dbMutex(QMutex::Recursive), settings(_settings), uptime(0), shutdownTimer(0)
 {
+}
+
+Servatrice::~Servatrice()
+{
+	prepareDestroy();
+	QSqlDatabase::database().close();
+}
+
+bool Servatrice::initServer()
+{
 	serverName = settings->value("server/name").toString();
 	serverId = settings->value("server/id", 0).toInt();
 	
@@ -192,10 +202,10 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 		if (islServer->listen(QHostAddress::Any, networkPort))
 			qDebug() << "ISL server listening.";
 		else
-			throw QString("islServer->listen(): Error.");
-		
+			throw QString("islServer->listen()");
 	} } catch (QString error) {
 		qDebug() << "ERROR --" << error;
+		return false;
 	}
 	
 	pingClock = new QTimer(this);
@@ -216,15 +226,11 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	qDebug() << "Starting server on port" << gamePort;
 	if (gameServer->listen(QHostAddress::Any, gamePort))
 		qDebug() << "Server listening.";
-	else
+	else {
 		qDebug() << "gameServer->listen(): Error.";
-	
-}
-
-Servatrice::~Servatrice()
-{
-	prepareDestroy();
-	QSqlDatabase::database().close();
+		return false;
+	}
+	return true;
 }
 
 bool Servatrice::openDatabase()

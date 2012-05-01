@@ -88,6 +88,7 @@ public:
 	mutable QMutex dbMutex;
 	Servatrice(QSettings *_settings, QObject *parent = 0);
 	~Servatrice();
+	bool initServer();
 	bool openDatabase();
 	bool checkSql();
 	bool execSqlQuery(QSqlQuery &query);

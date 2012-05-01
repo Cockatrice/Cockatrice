@@ -165,15 +165,17 @@ int main(int argc, char *argv[])
 	Servatrice *server = new Servatrice(settings);
 	QObject::connect(server, SIGNAL(logDebugMessage(QString, void *)), logger, SLOT(logMessage(QString, void *)));
 	QObject::connect(server, SIGNAL(destroyed()), &app, SLOT(quit()), Qt::QueuedConnection);
-	
-	std::cerr << "-------------------------" << std::endl;
-	std::cerr << "Server initialized." << std::endl;
-	
-	qInstallMsgHandler(myMessageOutput);
-	int retval = app.exec();
-
-	std::cerr << "Server quit." << std::endl;
-	std::cerr << "-------------------------" << std::endl;
+	int retval = 0;
+	if (server->initServer()) {
+		std::cerr << "-------------------------" << std::endl;
+		std::cerr << "Server initialized." << std::endl;
+		
+		qInstallMsgHandler(myMessageOutput);
+		retval = app.exec();
+		
+		std::cerr << "Server quit." << std::endl;
+		std::cerr << "-------------------------" << std::endl;
+	}
 	
 	delete rng;
 	delete settings;
