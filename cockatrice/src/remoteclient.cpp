@@ -166,8 +166,14 @@ void RemoteClient::doDisconnectFromServer()
 	messageLength = 0;
 
 	QList<PendingCommand *> pc = pendingCommands.values();
-	for (int i = 0; i < pc.size(); i++)
+	for (int i = 0; i < pc.size(); i++) {
+		Response response;
+		response.set_response_code(Response::RespNotConnected);
+		response.set_cmd_id(pc[i]->getCommandContainer().cmd_id());
+		pc[i]->processResponse(response);
+		
 		delete pc[i];
+	}
 	pendingCommands.clear();
 
 	setStatus(StatusDisconnected);

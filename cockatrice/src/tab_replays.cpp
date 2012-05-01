@@ -162,6 +162,9 @@ void TabReplays::actOpenRemoteReplay()
 
 void TabReplays::openRemoteReplayFinished(const Response &r)
 {
+	if (r.response_code() != Response::RespOk)
+		return;
+	
 	const Response_ReplayDownload &resp = r.GetExtension(Response_ReplayDownload::ext);
 	GameReplay *replay = new GameReplay;
 	replay->ParseFromString(resp.replay_data());
@@ -197,6 +200,9 @@ void TabReplays::actDownload()
 
 void TabReplays::downloadFinished(const Response &r, const CommandContainer &commandContainer, const QVariant &extraData)
 {
+	if (r.response_code() != Response::RespOk)
+		return;
+	
 	const Response_ReplayDownload &resp = r.GetExtension(Response_ReplayDownload::ext);
 	QString filePath = extraData.toString();
 	

@@ -1,5 +1,6 @@
 message Response {
 	enum ResponseCode {
+		RespNotConnected = -1;
 		RespNothing = 0;
 		RespOk = 1;
 		RespNotInRoom = 2;

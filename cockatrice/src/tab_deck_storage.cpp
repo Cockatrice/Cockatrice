@@ -177,6 +177,9 @@ void TabDeckStorage::actUpload()
 
 void TabDeckStorage::uploadFinished(const Response &r, const CommandContainer &commandContainer)
 {
+	if (r.response_code() != Response::RespOk)
+		return;
+	
 	const Response_DeckUpload &resp = r.GetExtension(Response_DeckUpload::ext);
 	const Command_DeckUpload &cmd = commandContainer.session_command(0).GetExtension(Command_DeckUpload::ext);
 	
@@ -208,6 +211,9 @@ void TabDeckStorage::actOpenRemoteDeck()
 
 void TabDeckStorage::openRemoteDeckFinished(const Response &r)
 {
+	if (r.response_code() != Response::RespOk)
+		return;
+	
 	const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
 	
 //	WndDeckEditor *deckEditor = new WndDeckEditor;
@@ -243,6 +249,9 @@ void TabDeckStorage::actDownload()
 
 void TabDeckStorage::downloadFinished(const Response &r, const CommandContainer &/*commandContainer*/, const QVariant &extraData)
 {
+	if (r.response_code() != Response::RespOk)
+		return;
+	
 	const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
 	QString filePath = extraData.toString();
 	
