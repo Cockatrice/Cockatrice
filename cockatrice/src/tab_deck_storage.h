@@ -24,13 +24,15 @@ private:
 	RemoteDeckList_TreeWidget *serverDirView;
 	QGroupBox *leftGroupBox, *rightGroupBox;
 	
-	QAction *aOpenLocalDeck, *aUpload, *aOpenRemoteDeck, *aDownload, *aNewFolder, *aDelete;
+	QAction *aOpenLocalDeck, *aUpload, *aDeleteLocalDeck, *aOpenRemoteDeck, *aDownload, *aNewFolder, *aDeleteRemoteDeck;
 private slots:
 	void actOpenLocalDeck();
 	
 	void actUpload();
 	void uploadFinished(const Response &r, const CommandContainer &commandContainer);
-
+	
+	void actDeleteLocalDeck();
+	
 	void actOpenRemoteDeck();
 	void openRemoteDeckFinished(const Response &r);
 	
@@ -40,7 +42,7 @@ private slots:
 	void actNewFolder();
 	void newFolderFinished(const Response &response, const CommandContainer &commandContainer);
 
-	void actDelete();
+	void actDeleteRemoteDeck();
 	void deleteFolderFinished(const Response &response, const CommandContainer &commandContainer);
 	void deleteDeckFinished(const Response &response, const CommandContainer &commandContainer);
 public:

@@ -64,6 +64,7 @@ private:
 	Response::ResponseCode cmdReplayList(const Command_ReplayList &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdReplayDownload(const Command_ReplayDownload &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdReplayModifyMatch(const Command_ReplayModifyMatch &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdReplayDeleteMatch(const Command_ReplayDeleteMatch &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdShutdownServer(const Command_ShutdownServer &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, ResponseContainer &rc);

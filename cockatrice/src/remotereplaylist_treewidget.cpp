@@ -243,6 +243,17 @@ void RemoteReplayList_TreeModel::updateMatchInfo(int gameId, const ServerInfo_Re
 		}
 }
 
+void RemoteReplayList_TreeModel::removeMatchInfo(int gameId)
+{
+	for (int i = 0; i < replayMatches.size(); ++i)
+		if (replayMatches[i]->getMatchInfo().game_id() == gameId) {
+			beginRemoveRows(QModelIndex(), i, i);
+			replayMatches.removeAt(i);
+			endRemoveRows();
+			break;
+		}
+}
+
 void RemoteReplayList_TreeModel::replayListFinished(const Response &r)
 {
 	const Response_ReplayList &resp = r.GetExtension(Response_ReplayList::ext);

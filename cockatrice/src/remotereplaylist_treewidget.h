@@ -72,6 +72,7 @@ public:
 	ServerInfo_ReplayMatch const* getReplayMatch(const QModelIndex &index) const;
 	void addMatchInfo(const ServerInfo_ReplayMatch &matchInfo);
 	void updateMatchInfo(int gameId, const ServerInfo_ReplayMatch &matchInfo);
+	void removeMatchInfo(int gameId);
 };
 
 class RemoteReplayList_TreeWidget : public QTreeView {
@@ -86,6 +87,7 @@ public:
 	void refreshTree();
 	void addMatchInfo(const ServerInfo_ReplayMatch &matchInfo) { treeModel->addMatchInfo(matchInfo); }
 	void updateMatchInfo(int gameId, const ServerInfo_ReplayMatch &matchInfo) { treeModel->updateMatchInfo(gameId, matchInfo); }
+	void removeMatchInfo(int gameId) { treeModel->removeMatchInfo(gameId); }
 };
 
 #endif

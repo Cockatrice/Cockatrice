@@ -8,6 +8,7 @@
 #include <QHeaderView>
 #include <QApplication>
 #include <QInputDialog>
+#include <QMessageBox>
 #include "tab_replays.h"
 #include "remotereplaylist_treewidget.h"
 #include "abstractclient.h"
@@ -20,6 +21,7 @@
 #include "pb/response_replay_download.pb.h"
 #include "pb/command_replay_download.pb.h"
 #include "pb/command_replay_modify_match.pb.h"
+#include "pb/command_replay_delete_match.pb.h"
 #include "pb/event_replay_added.pb.h"
 
 TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client)
@@ -74,6 +76,9 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client)
 	aOpenLocalReplay = new QAction(this);
 	aOpenLocalReplay->setIcon(QIcon(":/resources/pencil.svg"));
 	connect(aOpenLocalReplay, SIGNAL(triggered()), this, SLOT(actOpenLocalReplay()));
+	aDeleteLocalReplay = new QAction(this);
+	aDeleteLocalReplay->setIcon(QIcon(":/resources/remove_row.svg"));
+	connect(aDeleteLocalReplay, SIGNAL(triggered()), this, SLOT(actDeleteLocalReplay()));
 	aOpenRemoteReplay = new QAction(this);
 	aOpenRemoteReplay->setIcon(QIcon(":/resources/pencil.svg"));
 	connect(aOpenRemoteReplay, SIGNAL(triggered()), this, SLOT(actOpenRemoteReplay()));
@@ -83,11 +88,16 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client)
 	aKeep = new QAction(this);
 	aKeep->setIcon(QIcon(":/resources/lock.svg"));
 	connect(aKeep, SIGNAL(triggered()), this, SLOT(actKeepRemoteReplay()));
+	aDeleteRemoteReplay = new QAction(this);
+	aDeleteRemoteReplay->setIcon(QIcon(":/resources/remove_row.svg"));
+	connect(aDeleteRemoteReplay, SIGNAL(triggered()), this, SLOT(actDeleteRemoteReplay()));
 	
 	leftToolBar->addAction(aOpenLocalReplay);
+	leftToolBar->addAction(aDeleteLocalReplay);
 	rightToolBar->addAction(aOpenRemoteReplay);
 	rightToolBar->addAction(aDownload);
 	rightToolBar->addAction(aKeep);
+	rightToolBar->addAction(aDeleteRemoteReplay);
 	
 	retranslateUi();
 	setLayout(hbox);
@@ -101,9 +111,11 @@ void TabReplays::retranslateUi()
 	rightGroupBox->setTitle(tr("Server replay storage"));
 	
 	aOpenLocalReplay->setText(tr("Watch replay"));
+	aDeleteLocalReplay->setText(tr("Delete"));
 	aOpenRemoteReplay->setText(tr("Watch replay"));
 	aDownload->setText(tr("Download replay"));
 	aKeep->setText(tr("Toggle expiration lock"));
+	aDeleteLocalReplay->setText(tr("Delete"));
 }
 
 void TabReplays::actOpenLocalReplay()
@@ -123,6 +135,15 @@ void TabReplays::actOpenLocalReplay()
 	replay->ParseFromArray(data.data(), data.size());
 	
 	emit openReplay(replay);
+}
+
+void TabReplays::actDeleteLocalReplay()
+{
+	QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
+	if (QMessageBox::warning(this, tr("Delete local file"), tr("Are you sure you want to delete \"%1\"?").arg(localDirModel->fileName(curLeft)), QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+		return;
+	
+	localDirModel->remove(curLeft);
 }
 
 void TabReplays::actOpenRemoteReplay()
@@ -212,6 +233,31 @@ void TabReplays::keepRemoteReplayFinished(const Response &r, const CommandContai
 	temp.set_do_not_hide(cmd.do_not_hide());
 	                
 	serverDirView->updateMatchInfo(cmd.game_id(), temp);
+}
+
+void TabReplays::actDeleteRemoteReplay()
+{
+	ServerInfo_ReplayMatch const *curRight = serverDirView->getCurrentReplayMatch();
+	if (!curRight)
+		return;
+	if (QMessageBox::warning(this, tr("Delete remote replay"), tr("Are you sure you want to delete the replay of game %1?").arg(curRight->game_id()), QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+		return;
+	
+	Command_ReplayDeleteMatch cmd;
+	cmd.set_game_id(curRight->game_id());
+	
+	PendingCommand *pend = client->prepareSessionCommand(cmd);
+	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(deleteRemoteReplayFinished(Response, CommandContainer)));
+	client->sendCommand(pend);
+}
+
+void TabReplays::deleteRemoteReplayFinished(const Response &r, const CommandContainer &commandContainer)
+{
+	if (r.response_code() != Response::RespOk)
+		return;
+	
+	const Command_ReplayDeleteMatch &cmd = commandContainer.session_command(0).GetExtension(Command_ReplayDeleteMatch::ext);
+	serverDirView->removeMatchInfo(cmd.game_id());
 }
 
 void TabReplays::replayAddedEventReceived(const Event_ReplayAdded &event)

@@ -5160,7 +5160,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <location filename="../src/player.cpp" line="832"/>
         <location filename="../src/player.cpp" line="847"/>
         <location filename="../src/player.cpp" line="870"/>
-        <location filename="../src/player.cpp" line="2023"/>
+        <location filename="../src/player.cpp" line="2021"/>
         <source>Number:</source>
         <translation>Anzahl:</translation>
     </message>
@@ -5175,27 +5175,27 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation>Oberste Karten ins Exil schicken</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1879"/>
+        <location filename="../src/player.cpp" line="1877"/>
         <source>Set power/toughness</source>
         <translation>Kampfwerte setzen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1879"/>
+        <location filename="../src/player.cpp" line="1877"/>
         <source>Please enter the new PT:</source>
         <translation>Bitte die neuen Kampfwerte eingeben:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1947"/>
+        <location filename="../src/player.cpp" line="1945"/>
         <source>Set annotation</source>
         <translation>Hinweis setzen</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1947"/>
+        <location filename="../src/player.cpp" line="1945"/>
         <source>Please enter the new annotation:</source>
         <translation>Bitte den Hinweis eingeben:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2023"/>
+        <location filename="../src/player.cpp" line="2021"/>
         <source>Set counters</source>
         <translation>Setze Zählmarken</translation>
     </message>
@@ -5743,66 +5743,83 @@ Bitte überprüfen Sie, dass Sie Schreibrechte in dem Verzeichnis haben, und ver
 <context>
     <name>TabDeckStorage</name>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="109"/>
+        <location filename="../src/tab_deck_storage.cpp" line="113"/>
         <source>Local file system</source>
         <translation>Lokales Dateisystem</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="110"/>
+        <location filename="../src/tab_deck_storage.cpp" line="114"/>
         <source>Server deck storage</source>
         <translation>Deckspeicherplatz auf dem Server</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="112"/>
-        <location filename="../src/tab_deck_storage.cpp" line="114"/>
+        <location filename="../src/tab_deck_storage.cpp" line="116"/>
+        <location filename="../src/tab_deck_storage.cpp" line="118"/>
         <source>Open in deck editor</source>
         <translation>Im Deckeditor öffnen</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="113"/>
+        <location filename="../src/tab_deck_storage.cpp" line="117"/>
         <source>Upload deck</source>
         <translation>Deck hochladen</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="115"/>
+        <location filename="../src/tab_deck_storage.cpp" line="119"/>
         <source>Download deck</source>
         <translation>Deck herunterladen</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="116"/>
-        <location filename="../src/tab_deck_storage.cpp" line="241"/>
+        <location filename="../src/tab_deck_storage.cpp" line="120"/>
+        <location filename="../src/tab_deck_storage.cpp" line="255"/>
         <source>New folder</source>
         <translation>Neuer Ordner</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="117"/>
+        <location filename="../src/tab_deck_storage.cpp" line="121"/>
+        <location filename="../src/tab_deck_storage.cpp" line="122"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="148"/>
+        <location filename="../src/tab_deck_storage.cpp" line="153"/>
         <source>Enter deck name</source>
         <translation>Decknamen eingeben</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="148"/>
+        <location filename="../src/tab_deck_storage.cpp" line="153"/>
         <source>This decklist does not have a name.
 Please enter a name:</source>
         <translation>Diese Deckliste hat keinen Namen.
 Bitte geben Sie einen Namen ein:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="152"/>
+        <location filename="../src/tab_deck_storage.cpp" line="157"/>
         <source>Unnamed deck</source>
         <translation>Unbenanntes Deck</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="241"/>
+        <location filename="../src/tab_deck_storage.cpp" line="189"/>
+        <source>Delete local file</source>
+        <translation>Lokale Datei löschen</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_storage.cpp" line="189"/>
+        <location filename="../src/tab_deck_storage.cpp" line="303"/>
+        <source>Are you sure you want to delete &quot;%1&quot;?</source>
+        <translation>Sind Sie sicher, dass Sie &quot;%1&quot; löschen möchten?</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_storage.cpp" line="255"/>
         <source>Name of new folder:</source>
         <translation>Name für den neuen Ordner:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.h" line="49"/>
+        <location filename="../src/tab_deck_storage.cpp" line="303"/>
+        <source>Delete remote deck</source>
+        <translation>Deck auf dem Server löschen</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_storage.h" line="51"/>
         <source>Deck storage</source>
         <translation>Deckspeicherplatz</translation>
     </message>
@@ -6023,33 +6040,59 @@ Bitte geben Sie einen Namen ein:</translation>
 <context>
     <name>TabReplays</name>
     <message>
-        <location filename="../src/tab_replays.cpp" line="100"/>
+        <location filename="../src/tab_replays.cpp" line="110"/>
         <source>Local file system</source>
         <translation>Lokales Dateisystem</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="101"/>
+        <location filename="../src/tab_replays.cpp" line="111"/>
         <source>Server replay storage</source>
         <translation>Replay-Speicherplatz auf dem Server</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="103"/>
-        <location filename="../src/tab_replays.cpp" line="104"/>
+        <location filename="../src/tab_replays.cpp" line="113"/>
+        <location filename="../src/tab_replays.cpp" line="115"/>
         <source>Watch replay</source>
         <translation>Replay abspielen</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="105"/>
+        <location filename="../src/tab_replays.cpp" line="114"/>
+        <location filename="../src/tab_replays.cpp" line="118"/>
+        <source>Delete</source>
+        <translation>Löschen</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_replays.cpp" line="116"/>
         <source>Download replay</source>
         <translation>Replay herunterladen</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="106"/>
+        <location filename="../src/tab_replays.cpp" line="117"/>
         <source>Toggle expiration lock</source>
         <translation>automatische Löschung umschalten</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.h" line="46"/>
+        <location filename="../src/tab_replays.cpp" line="143"/>
+        <source>Delete local file</source>
+        <translation>Lokale Datei löschen</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_replays.cpp" line="143"/>
+        <source>Are you sure you want to delete &quot;%1&quot;?</source>
+        <translation>Sind Sie sicher, dass Sie &quot;%1&quot; löschen möchten?</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_replays.cpp" line="243"/>
+        <source>Delete remote replay</source>
+        <translation>Replay auf dem Server löschen</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_replays.cpp" line="243"/>
+        <source>Are you sure you want to delete the replay of game %1?</source>
+        <translation>Sind Sie sicher, dass Sie das Replay des Spiels %1 löschen möchten?</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_replays.h" line="51"/>
         <source>Game replays</source>
         <translation>Replays</translation>
     </message>

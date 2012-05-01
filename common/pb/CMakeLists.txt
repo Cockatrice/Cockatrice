@@ -31,6 +31,7 @@ SET(PROTO_FILES
 	command_mulligan.proto
 	command_next_turn.proto
 	command_ready_start.proto
+	command_replay_delete_match.proto
 	command_replay_list.proto
 	command_replay_download.proto
 	command_replay_modify_match.proto

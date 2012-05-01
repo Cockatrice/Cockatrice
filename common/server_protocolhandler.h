@@ -43,6 +43,7 @@ class Command_DeckUpload;
 class Command_ReplayList;
 class Command_ReplayDownload;
 class Command_ReplayModifyMatch;
+class Command_ReplayDeleteMatch;
 class Command_ListRooms;
 class Command_JoinRoom;
 class Command_LeaveRoom;
@@ -84,6 +85,7 @@ private:
 	virtual Response::ResponseCode cmdReplayList(const Command_ReplayList &cmd, ResponseContainer &rc) = 0;
 	virtual Response::ResponseCode cmdReplayDownload(const Command_ReplayDownload &cmd, ResponseContainer &rc) = 0;
 	virtual Response::ResponseCode cmdReplayModifyMatch(const Command_ReplayModifyMatch &cmd, ResponseContainer &rc) = 0;
+	virtual Response::ResponseCode cmdReplayDeleteMatch(const Command_ReplayDeleteMatch &cmd, ResponseContainer &rc) = 0;
 	Response::ResponseCode cmdGetGamesOfUser(const Command_GetGamesOfUser &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdGetUserInfo(const Command_GetUserInfo &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdListRooms(const Command_ListRooms &cmd, ResponseContainer &rc);
