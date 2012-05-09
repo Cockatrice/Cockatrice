@@ -9,7 +9,7 @@
 #include "pb/server_message.pb.h"
 #include "pb/event_server_identification.pb.h"
 
-static const unsigned int protocolVersion = 13;
+static const unsigned int protocolVersion = 14;
 
 RemoteClient::RemoteClient(QObject *parent)
 	: AbstractClient(parent), timeRunning(0), lastDataReceived(0), messageInProgress(false), handshakeStarted(false), messageLength(0)
@@ -180,6 +180,7 @@ void RemoteClient::doDisconnectFromServer()
 	timer->stop();
 	
 	messageInProgress = false;
+	handshakeStarted = false;
 	messageLength = 0;
 
 	QList<PendingCommand *> pc = pendingCommands.values();
