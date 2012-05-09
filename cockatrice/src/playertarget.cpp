@@ -138,9 +138,11 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
 
 AbstractCounter *PlayerTarget::addCounter(int _counterId, const QString &_name, int _value)
 {
-	if (playerCounter)
-		return 0;
-	
+	if (playerCounter) {
+		disconnect(playerCounter, 0, this, 0);
+		playerCounter->delCounter();
+	}
+
 	playerCounter = new PlayerCounter(owner, _counterId, _name, _value, this);
 	playerCounter->setPos(boundingRect().width() - playerCounter->boundingRect().width(), boundingRect().height() - playerCounter->boundingRect().height());
 	connect(playerCounter, SIGNAL(destroyed()), this, SLOT(counterDeleted()));
