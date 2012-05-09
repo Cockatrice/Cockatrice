@@ -19,6 +19,7 @@ RemoteClient::RemoteClient(QObject *parent)
 	connect(timer, SIGNAL(timeout()), this, SLOT(ping()));
 
 	socket = new QTcpSocket(this);
+	socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
 	connect(socket, SIGNAL(connected()), this, SLOT(slotConnected()));
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readData()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slotSocketError(QAbstractSocket::SocketError)));

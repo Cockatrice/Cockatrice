@@ -44,6 +44,7 @@ void Servatrice_GameServer::incomingConnection(int socketDescriptor)
 	} else {
 		QTcpSocket *socket = new QTcpSocket;
 		socket->setSocketDescriptor(socketDescriptor);
+		socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
 		ServerSocketInterface *ssi = new ServerSocketInterface(server, socket);
 		logger->logMessage(QString("incoming connection: %1").arg(socket->peerAddress().toString()), ssi);
 	}
