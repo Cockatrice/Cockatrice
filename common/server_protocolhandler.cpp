@@ -260,7 +260,7 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
 {
 	lastDataReceived = timeRunning;
 	
-	ResponseContainer responseContainer(cont.cmd_id());
+	ResponseContainer responseContainer(cont.has_cmd_id() ? cont.cmd_id() : -1);
 	Response::ResponseCode finalResponseCode;
 	
 	if (cont.game_command_size())
@@ -276,7 +276,7 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
 	else
 		finalResponseCode = Response::RespInvalidCommand;
 	
-	if (finalResponseCode != Response::RespNothing)
+	if ((finalResponseCode != Response::RespNothing))
 		sendResponseContainer(responseContainer, finalResponseCode);
 }
 

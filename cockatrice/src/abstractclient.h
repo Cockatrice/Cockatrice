@@ -73,6 +73,7 @@ protected:
 	QMap<int, PendingCommand *> pendingCommands;
 	QString userName, password;
 	void setStatus(ClientStatus _status);
+	int getNewCmdId() { return nextCmdId++; }
 	virtual void sendCommandContainer(const CommandContainer &cont) = 0;
 public:
 	AbstractClient(QObject *parent = 0);

@@ -119,7 +119,7 @@ void AbstractClient::sendCommand(PendingCommand *pend)
 void AbstractClient::queuePendingCommand(PendingCommand *pend)
 {
 	// This function is always called from the client thread via signal/slot.
-	const int cmdId = nextCmdId++;
+	const int cmdId = getNewCmdId();
 	pend->getCommandContainer().set_cmd_id(cmdId);
 	
 	pendingCommands.insert(cmdId, pend);
