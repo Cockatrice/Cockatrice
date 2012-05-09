@@ -5,7 +5,7 @@ import "moderator_commands.proto";
 import "admin_commands.proto";
 
 message CommandContainer {
-	required uint64 cmd_id = 1;
+	optional uint64 cmd_id = 1;
 	
 	optional uint32 game_id = 10;
 	optional uint32 room_id = 20;

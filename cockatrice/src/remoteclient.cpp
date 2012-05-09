@@ -9,10 +9,10 @@
 #include "pb/server_message.pb.h"
 #include "pb/event_server_identification.pb.h"
 
-static const unsigned int protocolVersion = 13;
+static const unsigned int protocolVersion = 14;
 
 RemoteClient::RemoteClient(QObject *parent)
-	: AbstractClient(parent), timeRunning(0), lastDataReceived(0), messageInProgress(false), messageLength(0)
+	: AbstractClient(parent), timeRunning(0), lastDataReceived(0), messageInProgress(false), handshakeStarted(false), messageLength(0)
 {
 	timer = new QTimer(this);
 	timer->setInterval(1000);
@@ -47,6 +47,11 @@ void RemoteClient::slotConnected()
 {
 	timeRunning = lastDataReceived = 0;
 	timer->start();
+	
+	// dirty hack to be compatible with v14 server
+	sendCommandContainer(CommandContainer());
+	// end of hack
+	
 	setStatus(StatusAwaitingWelcome);
 }
 
@@ -54,7 +59,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
 {
 	if (event.protocol_version() != protocolVersion) {
 		emit protocolVersionMismatch(protocolVersion, event.protocol_version());
-		setStatus(StatusDisconnected);
+		setStatus(StatusDisconnecting);
 		return;
 	}
 	setStatus(StatusLoggingIn);
@@ -105,12 +110,22 @@ void RemoteClient::readData()
 	do {
 		if (!messageInProgress) {
 			if (inputBuffer.size() >= 4) {
-				messageLength =   (((quint32) (unsigned char) inputBuffer[0]) << 24)
-				                + (((quint32) (unsigned char) inputBuffer[1]) << 16)
-				                + (((quint32) (unsigned char) inputBuffer[2]) << 8)
-				                + ((quint32) (unsigned char) inputBuffer[3]);
-				inputBuffer.remove(0, 4);
-				messageInProgress = true;
+				// dirty hack to be compatible with v14 server that sends 60 bytes of garbage at the beginning
+				if (!handshakeStarted) {
+					handshakeStarted = true;
+					if (inputBuffer.startsWith("<?xm")) {
+						messageInProgress = true;
+						messageLength = 60;
+					}
+				} else {
+				// end of hack
+					messageLength =   (((quint32) (unsigned char) inputBuffer[0]) << 24)
+							+ (((quint32) (unsigned char) inputBuffer[1]) << 16)
+							+ (((quint32) (unsigned char) inputBuffer[2]) << 8)
+							+ ((quint32) (unsigned char) inputBuffer[3]);
+					inputBuffer.remove(0, 4);
+					messageInProgress = true;
+				}
 			} else
 				return;
 		}
@@ -126,10 +141,10 @@ void RemoteClient::readData()
 		messageInProgress = false;
 		
 		processProtocolItem(newServerMessage);
-	} while (!inputBuffer.isEmpty());
 	
-	if (getStatus() == StatusDisconnecting) // use thread-safe getter
-		doDisconnectFromServer();
+		if (getStatus() == StatusDisconnecting) // use thread-safe getter
+			doDisconnectFromServer();
+	} while (!inputBuffer.isEmpty());
 }
 
 void RemoteClient::sendCommandContainer(const CommandContainer &cont)

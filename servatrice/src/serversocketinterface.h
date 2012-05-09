@@ -63,6 +63,7 @@ private:
 	
 	QByteArray inputBuffer, outputBuffer;
 	bool messageInProgress;
+	bool handshakeStarted;
 	int messageLength;
 	
 	Response::ResponseCode cmdAddToList(const Command_AddToList &cmd, ResponseContainer &rc);
@@ -92,6 +93,8 @@ private:
 public:
 	ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent = 0);
 	~ServerSocketInterface();
+	void initSessionDeprecated();
+	bool initSession();
 	QHostAddress getPeerAddress() const { return socket->peerAddress(); }
 	QString getAddress() const { return socket->peerAddress().toString(); }
 

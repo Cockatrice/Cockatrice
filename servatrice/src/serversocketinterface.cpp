@@ -57,40 +57,14 @@
 #include <string>
 #include <iostream>
 
-static const int protocolVersion = 13;
+static const int protocolVersion = 14;
 
 ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent)
-	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), messageInProgress(false)
+	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), messageInProgress(false), handshakeStarted(false)
 {
-	bool success = true;
-	
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(catchSocketError(QAbstractSocket::SocketError)));
 	connect(this, SIGNAL(outputBufferChanged()), this, SLOT(flushOutputBuffer()), Qt::QueuedConnection);
-	
-	Event_ServerIdentification identEvent;
-	identEvent.set_server_name(servatrice->getServerName().toStdString());
-	identEvent.set_server_version(VERSION_STRING);
-	identEvent.set_protocol_version(protocolVersion);
-	SessionEvent *identSe = prepareSessionEvent(identEvent);
-	sendProtocolItem(*identSe);
-	delete identSe;
-	
-	int maxUsers = _server->getMaxUsersPerAddress();
-	if ((maxUsers > 0) && (_server->getUsersWithAddress(socket->peerAddress()) >= maxUsers)) {
-		Event_ConnectionClosed event;
-		event.set_reason(Event_ConnectionClosed::TOO_MANY_CONNECTIONS);
-		SessionEvent *se = prepareSessionEvent(event);
-		sendProtocolItem(*se);
-		delete se;
-		
-		success = false;
-	}
-	
-	server->addClient(this);
-	
-	if (!success)
-		prepareDestroy();
 }
 
 ServerSocketInterface::~ServerSocketInterface()
@@ -100,6 +74,42 @@ ServerSocketInterface::~ServerSocketInterface()
 	flushOutputBuffer();
 	delete socket;
 	socket = 0;
+}
+
+void ServerSocketInterface::initSessionDeprecated()
+{
+	// dirty hack to make v13 client display the correct error message
+	
+	outputBufferMutex.lock();
+	outputBuffer = "<?xml version=\"1.0\"?><cockatrice_server_stream version=\"14\">";
+	outputBufferMutex.unlock();
+	
+	emit outputBufferChanged();
+}
+
+bool ServerSocketInterface::initSession()
+{
+	Event_ServerIdentification identEvent;
+	identEvent.set_server_name(servatrice->getServerName().toStdString());
+	identEvent.set_server_version(VERSION_STRING);
+	identEvent.set_protocol_version(protocolVersion);
+	SessionEvent *identSe = prepareSessionEvent(identEvent);
+	sendProtocolItem(*identSe);
+	delete identSe;
+	
+	int maxUsers = servatrice->getMaxUsersPerAddress();
+	if ((maxUsers > 0) && (servatrice->getUsersWithAddress(socket->peerAddress()) >= maxUsers)) {
+		Event_ConnectionClosed event;
+		event.set_reason(Event_ConnectionClosed::TOO_MANY_CONNECTIONS);
+		SessionEvent *se = prepareSessionEvent(event);
+		sendProtocolItem(*se);
+		delete se;
+		
+		return false;
+	}
+	
+	server->addClient(this);
+	return true;
 }
 
 void ServerSocketInterface::flushOutputBuffer()
@@ -139,7 +149,15 @@ void ServerSocketInterface::readClient()
 		inputBuffer.remove(0, messageLength);
 		messageInProgress = false;
 		
-		processCommandContainer(newCommandContainer);
+		// dirty hack to make v13 client display the correct error message
+		if (handshakeStarted)
+			processCommandContainer(newCommandContainer);
+		else if (!newCommandContainer.has_cmd_id()) {
+			handshakeStarted = true;
+			if (!initSession())
+				prepareDestroy();
+		}
+		// end of hack
 	} while (!inputBuffer.isEmpty());
 }
 

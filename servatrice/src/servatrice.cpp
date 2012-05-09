@@ -43,10 +43,11 @@ void Servatrice_GameServer::incomingConnection(int socketDescriptor)
 		sst->start();
 	} else {
 		QTcpSocket *socket = new QTcpSocket;
+		ServerSocketInterface *ssi = new ServerSocketInterface(server, socket);
 		socket->setSocketDescriptor(socketDescriptor);
 		socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
-		ServerSocketInterface *ssi = new ServerSocketInterface(server, socket);
 		logger->logMessage(QString("incoming connection: %1").arg(socket->peerAddress().toString()), ssi);
+		ssi->initSessionDeprecated();
 	}
 }
 

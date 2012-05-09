@@ -33,6 +33,7 @@ private:
 
 	QByteArray inputBuffer;
 	bool messageInProgress;
+	bool handshakeStarted;
 	int messageLength;
 	
 	QTimer *timer;
