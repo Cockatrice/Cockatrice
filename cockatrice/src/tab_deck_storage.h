@@ -13,6 +13,7 @@ class QGroupBox;
 class RemoteDeckList_TreeWidget;
 class CommandContainer;
 class Response;
+class DeckLoader;
 
 class TabDeckStorage : public Tab {
 	Q_OBJECT
@@ -34,7 +35,7 @@ private slots:
 	void actDeleteLocalDeck();
 	
 	void actOpenRemoteDeck();
-	void openRemoteDeckFinished(const Response &r);
+	void openRemoteDeckFinished(const Response &r, const CommandContainer &commandContainer);
 	
 	void actDownload();
 	void downloadFinished(const Response &r, const CommandContainer &commandContainer, const QVariant &extraData);
@@ -49,6 +50,8 @@ public:
 	TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client);
 	void retranslateUi();
 	QString getTabText() const { return tr("Deck storage"); }
+signals:
+	void openDeckEditor(const DeckLoader *deckLoader);
 };
 
 #endif

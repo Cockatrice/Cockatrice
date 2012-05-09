@@ -18,7 +18,7 @@
 #include "dlg_create_token.h"
 #include "carddatabase.h"
 #include "color.h"
-#include "decklist.h"
+#include "deck_loader.h"
 #include "main.h"
 #include <QSettings>
 #include <QPainter>
@@ -747,9 +747,9 @@ void Player::initSayMenu()
 	}
 }
 
-void Player::setDeck(DeckList *_deck)
+void Player::setDeck(const DeckLoader &_deck)
 {
-	deck = _deck;
+	deck = new DeckLoader(_deck);
 	aOpenDeckInDeckEditor->setEnabled(deck);
 	
 	createPredefinedTokenMenu->clear();
@@ -792,7 +792,7 @@ void Player::actAlwaysRevealTopCard()
 
 void Player::actOpenDeckInDeckEditor()
 {
-	emit openDeckEditor(new DeckList(deck));
+	emit openDeckEditor(*deck);
 }
 
 void Player::actViewGraveyard()

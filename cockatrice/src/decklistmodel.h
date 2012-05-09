@@ -5,6 +5,7 @@
 #include <QList>
 #include "decklist.h"
 
+class DeckLoader;
 class CardDatabase;
 class QProgressDialog;
 class QPrinter;
@@ -47,11 +48,11 @@ public:
 	QModelIndex addCard(const QString &cardName, const QString &zoneName);
 	void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
 	void cleanList();
-	DeckList *getDeckList() const { return deckList; }
-	void setDeckList(DeckList *_deck);
+	DeckLoader *getDeckList() const { return deckList; }
+	void setDeckList(DeckLoader *_deck);
 	void pricesUpdated(InnerDecklistNode *node = 0);
 private:
-	DeckList *deckList;
+	DeckLoader *deckList;
 	InnerDecklistNode *root;
 	InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
 	QModelIndex nodeToIndex(AbstractDecklistNode *node) const;

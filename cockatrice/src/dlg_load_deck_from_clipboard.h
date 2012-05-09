@@ -3,7 +3,7 @@
 
 #include <QDialog>
 
-class DeckList;
+class DeckLoader;
 class QPlainTextEdit;
 class QPushButton;
 
@@ -13,10 +13,10 @@ private slots:
 	void actOK();
 	void actRefresh();
 private:
-	DeckList *deckList;
+	DeckLoader *deckList;
 public:
 	DlgLoadDeckFromClipboard(QWidget *parent = 0);
-	DeckList *getDeckList() const { return deckList; }
+	DeckLoader *getDeckList() const { return deckList; }
 private:
 	QPlainTextEdit *contentsEdit;
 	QPushButton *refreshButton;

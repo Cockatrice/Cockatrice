@@ -10,7 +10,7 @@
 
 namespace google { namespace protobuf { class Message; } }
 class CardDatabase;
-class DeckList;
+class DeckLoader;
 class QMenu;
 class QAction;
 class ZoneViewZone;
@@ -77,7 +77,7 @@ public:
 class Player : public QObject, public QGraphicsItem {
 	Q_OBJECT
 signals:
-	void openDeckEditor(DeckList *deck);
+	void openDeckEditor(const DeckLoader &deck);
 	void newCardAdded(AbstractCardItem *card);
 	// Log events
 	void logSay(Player *player, QString message);
@@ -191,7 +191,7 @@ private:
 	bool clearCardsToDelete();
 	QList<CardItem *> cardsToDelete;
 	
-	DeckList *deck;
+	DeckLoader *deck;
 	QStringList predefinedTokens;
 	
 	PlayerArea *playerArea;
@@ -263,7 +263,7 @@ public:
 	void retranslateUi();
 	void clear();
 	TabGame *getGame() const { return game; }
-	void setDeck(DeckList *_deck);
+	void setDeck(const DeckLoader &_deck);
 	QMenu *getPlayerMenu() const { return playerMenu; }
 	int getId() const { return id; }
 	QString getName() const;

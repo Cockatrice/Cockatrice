@@ -285,12 +285,12 @@ void DeckViewScene::clearContents()
 	cardContainers.clear();
 }
 
-void DeckViewScene::setDeck(DeckList *_deck)
+void DeckViewScene::setDeck(const DeckList &_deck)
 {
 	if (deck)
 		delete deck;
 	
-	deck = _deck;
+	deck = new DeckList(_deck);
 	rebuildTree();
 	applySideboardPlan(deck->getCurrentSideboardPlan());
 	rearrangeItems();
@@ -475,7 +475,7 @@ void DeckView::updateSceneRect(const QRectF &rect)
 	fitInView(rect, Qt::KeepAspectRatio);
 }
 
-void DeckView::setDeck(DeckList *_deck)
+void DeckView::setDeck(const DeckList &_deck)
 {
 	deckViewScene->setDeck(_deck);
 }

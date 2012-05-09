@@ -14,6 +14,7 @@
 #include "abstractclient.h"
 #include "decklist.h"
 #include "settingscache.h"
+#include "deck_loader.h"
 
 #include "pending_command.h"
 #include "pb/response.pb.h"
@@ -128,13 +129,12 @@ void TabDeckStorage::actOpenLocalDeck()
 	if (localDirModel->isDir(curLeft))
 		return;
 	QString filePath = localDirModel->filePath(curLeft);
-	DeckList *deck = new DeckList;
-	if (!deck->loadFromFile(filePath, DeckList::CockatriceFormat))
+	
+	DeckLoader deckLoader;
+	if (!deckLoader.loadFromFile(filePath, DeckLoader::CockatriceFormat))
 		return;
 	
-//	WndDeckEditor *deckEditor = new WndDeckEditor;
-//	deckEditor->setDeck(deck, filePath, DeckList::CockatriceFormat);
-//	deckEditor->show();
+	emit openDeckEditor(&deckLoader);
 }
 
 void TabDeckStorage::actUpload()
@@ -145,8 +145,8 @@ void TabDeckStorage::actUpload()
 	QString filePath = localDirModel->filePath(curLeft);
 	QFile deckFile(filePath);
 	QFileInfo deckFileInfo(deckFile);
-	DeckList deck;
-	if (!deck.loadFromFile(filePath, DeckList::CockatriceFormat))
+	DeckLoader deck;
+	if (!deck.loadFromFile(filePath, DeckLoader::CockatriceFormat))
 		return;
 	if (deck.getName().isEmpty()) {
 		bool ok;
@@ -157,7 +157,7 @@ void TabDeckStorage::actUpload()
 			deckName = tr("Unnamed deck");
 		deck.setName(deckName);
 	}
-
+	
 	QString targetPath;
 	RemoteDeckList_TreeModel::Node *curRight = serverDirView->getCurrentItem();
 	if (!curRight)
@@ -205,20 +205,23 @@ void TabDeckStorage::actOpenRemoteDeck()
 	cmd.set_deck_id(curRight->getId());
 	
 	PendingCommand *pend = client->prepareSessionCommand(cmd);
-	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(openRemoteDeckFinished(const Response &)));
+	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(openRemoteDeckFinished(Response, CommandContainer)));
 	client->sendCommand(pend);
 }
 
-void TabDeckStorage::openRemoteDeckFinished(const Response &r)
+void TabDeckStorage::openRemoteDeckFinished(const Response &r, const CommandContainer &commandContainer)
 {
 	if (r.response_code() != Response::RespOk)
 		return;
 	
 	const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
+	const Command_DeckDownload &cmd = commandContainer.session_command(0).GetExtension(Command_DeckDownload::ext);
 	
-//	WndDeckEditor *deckEditor = new WndDeckEditor;
-//	deckEditor->setDeck(new DeckList(QString::fromStdString(resp.deck())));
-//	deckEditor->show();
+	DeckLoader loader;
+	if (!loader.loadFromRemote(QString::fromStdString(resp.deck()), cmd.deck_id()))
+		return;
+	
+	emit openDeckEditor(&loader);
 }
 
 void TabDeckStorage::actDownload()
@@ -255,8 +258,8 @@ void TabDeckStorage::downloadFinished(const Response &r, const CommandContainer 
 	const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
 	QString filePath = extraData.toString();
 	
-	DeckList deck(QString::fromStdString(resp.deck()));
-	deck.saveToFile(filePath, DeckList::CockatriceFormat);
+	DeckLoader deck(QString::fromStdString(resp.deck()));
+	deck.saveToFile(filePath, DeckLoader::CockatriceFormat);
 }
 
 void TabDeckStorage::actNewFolder()

@@ -264,21 +264,19 @@ QVector<QPair<int, int> > InnerDecklistNode::sort(Qt::SortOrder order)
 	return result;
 }
 
-const QStringList DeckList::fileNameFilters = QStringList()
-	<< QObject::tr("Cockatrice decks (*.cod)")
-	<< QObject::tr("Plain text decks (*.dec *.mwDeck)")
-	<< QObject::tr("All files (*.*)");
-
 DeckList::DeckList()
 {
 	root = new InnerDecklistNode;
 }
 
-DeckList::DeckList(DeckList *other)
+DeckList::DeckList(const DeckList &other)
+	: name(other.name),
+	  comments(other.comments),
+	  deckHash(other.deckHash)
 {
-	root = new InnerDecklistNode(other->getRoot());
+	root = new InnerDecklistNode(other.getRoot());
 	
-	QMapIterator<QString, SideboardPlan *> spIterator(other->getSideboardPlans());
+	QMapIterator<QString, SideboardPlan *> spIterator(other.getSideboardPlans());
 	while (spIterator.hasNext()) {
 		spIterator.next();
 		sideboardPlans.insert(spIterator.key(), new SideboardPlan(spIterator.key(), spIterator.value()->getMoveList()));
@@ -289,9 +287,7 @@ DeckList::DeckList(DeckList *other)
 DeckList::DeckList(const QString &nativeString)
 {
 	root = new InnerDecklistNode;
-	
-	QXmlStreamReader xml(nativeString);
-	loadFromXml(&xml);
+	loadFromString_Native(nativeString);
 }
 
 DeckList::~DeckList()
@@ -362,13 +358,14 @@ void DeckList::write(QXmlStreamWriter *xml)
 	xml->writeEndElement();
 }
 
-void DeckList::loadFromXml(QXmlStreamReader *xml)
+bool DeckList::loadFromXml(QXmlStreamReader *xml)
 {
+	cleanList();
 	while (!xml->atEnd()) {
 		xml->readNext();
 		if (xml->isStartElement()) {
 			if (xml->name() != "cockatrice_deck")
-				return;
+				return false;
 			while (!xml->atEnd()) {
 				xml->readNext();
 				if (!readElement(xml))
@@ -377,6 +374,13 @@ void DeckList::loadFromXml(QXmlStreamReader *xml)
 		}
 	}
 	updateDeckHash();
+	return true;
+}
+
+bool DeckList::loadFromString_Native(const QString &nativeString)
+{
+	QXmlStreamReader xml(nativeString);
+	return loadFromXml(&xml);
 }
 
 QString DeckList::writeToString_Native()
@@ -410,6 +414,8 @@ bool DeckList::saveToFile_Native(QIODevice *device)
 
 bool DeckList::loadFromStream_Plain(QTextStream &in)
 {
+	cleanList();
+	
 	InnerDecklistNode *main = 0, *side = 0;
 
 	int okRows = 0;
@@ -474,52 +480,13 @@ bool DeckList::saveToFile_Plain(QIODevice *device)
 	return saveToStream_Plain(out);
 }
 
-bool DeckList::loadFromFile(const QString &fileName, FileFormat fmt)
-{
-	QFile file(fileName);
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-		return false;
-	cleanList();
-
-	bool result = false;
-	switch (fmt) {
-		case PlainTextFormat: result = loadFromFile_Plain(&file); break;
-		case CockatriceFormat: result = loadFromFile_Native(&file); break;
-	}
-	if (result)
-		emit deckLoaded();
-	return result;
-}
-
-bool DeckList::saveToFile(const QString &fileName, FileFormat fmt)
-{
-	QFile file(fileName);
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-		return false;
-
-	bool result = false;
-	switch (fmt) {
-		case PlainTextFormat: result = saveToFile_Plain(&file); break;
-		case CockatriceFormat: result = saveToFile_Native(&file); break;
-	}
-	return result;
-}
-
-DeckList::FileFormat DeckList::getFormatFromNameFilter(const QString &selectedNameFilter)
-{
-	switch (fileNameFilters.indexOf(selectedNameFilter)) {
-		case 0: return CockatriceFormat;
-		case 1: return PlainTextFormat;
-	}
-	return PlainTextFormat;
-}
-
 void DeckList::cleanList()
 {
 	root->clearTree();
 	setName();
 	setComments();
-	updateDeckHash();
+	deckHash = QString();
+	emit deckHashChanged();
 }
 
 void DeckList::getCardListHelper(InnerDecklistNode *item, QSet<QString> &result) const

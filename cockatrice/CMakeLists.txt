@@ -28,6 +28,7 @@ SET(cockatrice_SOURCES
  src/gameview.cpp 
  src/gameselector.cpp 
  src/decklistmodel.cpp 
+ src/deck_loader.cpp 
  src/dlg_load_deck_from_clipboard.cpp 
  src/dlg_load_remote_deck.cpp 
  src/cardinfowidget.cpp 
@@ -101,6 +102,7 @@ SET(cockatrice_HEADERS
  src/gameview.h 
  src/gameselector.h 
  src/decklistmodel.h 
+ src/deck_loader.h 
  src/dlg_load_deck_from_clipboard.h 
  src/dlg_load_remote_deck.h 
  src/cardinfowidget.h 

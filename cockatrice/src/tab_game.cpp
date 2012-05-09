@@ -22,7 +22,7 @@
 #include "zoneviewzone.h"
 #include "zoneviewwidget.h"
 #include "deckview.h"
-#include "decklist.h"
+#include "deck_loader.h"
 #include "dlg_load_remote_deck.h"
 #include "abstractclient.h"
 #include "carditem.h"
@@ -149,21 +149,20 @@ void DeckViewContainer::loadLocalDeck()
 {
 	QFileDialog dialog(this, tr("Load deck"));
 	dialog.setDirectory(settingsCache->getDeckPath());
-	dialog.setNameFilters(DeckList::fileNameFilters);
+	dialog.setNameFilters(DeckLoader::fileNameFilters);
 	if (!dialog.exec())
 		return;
 
 	QString fileName = dialog.selectedFiles().at(0);
-	DeckList::FileFormat fmt = DeckList::getFormatFromNameFilter(dialog.selectedNameFilter());
-	DeckList *deck = new DeckList;
-	if (!deck->loadFromFile(fileName, fmt)) {
-		delete deck;
-		// Error message
+	DeckLoader::FileFormat fmt = DeckLoader::getFormatFromNameFilter(dialog.selectedNameFilter());
+	DeckLoader deck;
+	if (!deck.loadFromFile(fileName, fmt)) {
+		QMessageBox::critical(this, tr("Error"), tr("The selected file could not be loaded."));
 		return;
 	}
 	
 	Command_DeckSelect cmd;
-	cmd.set_deck(deck->writeToString_Native().toStdString());
+	cmd.set_deck(deck.writeToString_Native().toStdString());
 	PendingCommand *pend = static_cast<TabGame *>(parent())->prepareGameCommand(cmd);
 	connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(deckSelectFinished(const Response &)));
 	static_cast<TabGame *>(parent())->sendGameCommand(pend, playerId);
@@ -184,8 +183,8 @@ void DeckViewContainer::loadRemoteDeck()
 void DeckViewContainer::deckSelectFinished(const Response &r)
 {
 	const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
-	DeckList *newDeck = new DeckList(QString::fromStdString(resp.deck()));
-	db->cacheCardPixmaps(newDeck->getCardList());
+	DeckLoader newDeck(QString::fromStdString(resp.deck()));
+	db->cacheCardPixmaps(newDeck.getCardList());
 	setDeck(newDeck);
 }
 
@@ -227,7 +226,7 @@ void DeckViewContainer::setSideboardLocked(bool locked)
 		deckView->resetSideboardPlan();
 }
 
-void DeckViewContainer::setDeck(DeckList *deck)
+void DeckViewContainer::setDeck(const DeckLoader &deck)
 {
 	deckView->setDeck(deck);
 	readyStartButton->setEnabled(true);
@@ -949,8 +948,8 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*e
 			if (player->getLocal()) {
 				DeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
 				if (playerInfo.has_deck_list()) {
-					DeckList *newDeck = new DeckList(QString::fromStdString(playerInfo.deck_list()));
-					db->cacheCardPixmaps(newDeck->getCardList());
+					DeckLoader newDeck(QString::fromStdString(playerInfo.deck_list()));
+					db->cacheCardPixmaps(newDeck.getCardList());
 					deckViewContainer->setDeck(newDeck);
 					player->setDeck(newDeck);
 				}

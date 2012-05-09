@@ -27,6 +27,11 @@
 #include "main.h"
 #include "settingscache.h"
 #include "priceupdater.h"
+#include "tab_supervisor.h"
+#include "abstractclient.h"
+#include "pending_command.h"
+#include "pb/response.pb.h"
+#include "pb/command_deck_upload.pb.h"
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
@@ -351,7 +356,7 @@ void TabDeckEditor::actNewDeck()
 	deckModel->cleanList();
 	nameEdit->setText(QString());
 	commentsEdit->setText(QString());
-	lastFileName = QString();
+	hashLabel->setText(QString());
 	setWindowModified(false);
 }
 
@@ -362,24 +367,44 @@ void TabDeckEditor::actLoadDeck()
 
 	QFileDialog dialog(this, tr("Load deck"));
 	dialog.setDirectory(settingsCache->getDeckPath());
-	dialog.setNameFilters(DeckList::fileNameFilters);
+	dialog.setNameFilters(DeckLoader::fileNameFilters);
 	if (!dialog.exec())
 		return;
 
 	QString fileName = dialog.selectedFiles().at(0);
-	DeckList::FileFormat fmt = DeckList::getFormatFromNameFilter(dialog.selectedNameFilter());
-	DeckList *l = new DeckList;
+	DeckLoader::FileFormat fmt = DeckLoader::getFormatFromNameFilter(dialog.selectedNameFilter());
+	
+	DeckLoader *l = new DeckLoader;
 	if (l->loadFromFile(fileName, fmt))
-		setDeck(l, fileName, fmt);
+		setDeck(l);
 	else
 		delete l;
 }
 
+void TabDeckEditor::saveDeckRemoteFinished(const Response &response)
+{
+	if (response.response_code() != Response::RespOk)
+		QMessageBox::critical(this, tr("Error"), tr("The deck could not be saved."));
+	else
+		setWindowModified(false);
+}
+
 bool TabDeckEditor::actSaveDeck()
 {
-	if (lastFileName.isEmpty())
+	DeckLoader *const deck = deckModel->getDeckList();
+	if (deck->getLastRemoteDeckId() != -1) {
+		Command_DeckUpload cmd;
+		cmd.set_deck_id(deck->getLastRemoteDeckId());
+		cmd.set_deck_list(deck->writeToString_Native().toStdString());
+		
+		PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
+		connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(saveDeckRemoteFinished(Response)));
+		tabSupervisor->getClient()->sendCommand(pend);
+		
+		return true;
+	} else if (deck->getLastFileName().isEmpty())
 		return actSaveDeckAs();
-	else if (deckModel->getDeckList()->saveToFile(lastFileName, lastFileFormat)) {
+	else if (deck->saveToFile(deck->getLastFileName(), deck->getLastFileFormat())) {
 		setWindowModified(false);
 		return true;
 	}
@@ -394,22 +419,20 @@ bool TabDeckEditor::actSaveDeckAs()
 	dialog.setAcceptMode(QFileDialog::AcceptSave);
 	dialog.setConfirmOverwrite(true);
 	dialog.setDefaultSuffix("cod");
-	dialog.setNameFilters(DeckList::fileNameFilters);
+	dialog.setNameFilters(DeckLoader::fileNameFilters);
 	dialog.selectFile(deckModel->getDeckList()->getName());
 	if (!dialog.exec())
 		return false;
 
 	QString fileName = dialog.selectedFiles().at(0);
-	DeckList::FileFormat fmt = DeckList::getFormatFromNameFilter(dialog.selectedNameFilter());
+	DeckLoader::FileFormat fmt = DeckLoader::getFormatFromNameFilter(dialog.selectedNameFilter());
 
-	if (deckModel->getDeckList()->saveToFile(fileName, fmt)) {
-		lastFileName = fileName;
-		lastFileFormat = fmt;
-		setWindowModified(false);
-		return true;
+	if (!deckModel->getDeckList()->saveToFile(fileName, fmt)) {
+		QMessageBox::critical(this, tr("Error"), tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));
+		return false;
 	}
-	QMessageBox::critical(this, tr("Error"), tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));
-	return false;
+	setWindowModified(false);
+	return true;
 }
 
 void TabDeckEditor::actLoadDeckFromClipboard()
@@ -550,20 +573,18 @@ void TabDeckEditor::finishedUpdatingPrices()
 	aUpdatePrices->setDisabled(false);
 }
 
-void TabDeckEditor::setDeck(DeckList *_deck, const QString &_lastFileName, DeckList::FileFormat _lastFileFormat)
+void TabDeckEditor::setDeck(DeckLoader *_deck)
 {
 	deckModel->setDeckList(_deck);
 
-	lastFileName = _lastFileName;
-	lastFileFormat = _lastFileFormat;
-	nameEdit->setText(_deck->getName());
-	commentsEdit->setText(_deck->getComments());
+	nameEdit->setText(deckModel->getDeckList()->getName());
+	commentsEdit->setText(deckModel->getDeckList()->getComments());
 	updateHash();
 	deckModel->sort(1);
 	deckView->expandAll();
 	setWindowModified(false);
 	
-	db->cacheCardPixmaps(_deck->getCardList());
+	db->cacheCardPixmaps(deckModel->getDeckList()->getCardList());
 	deckView->expandAll();
 	setWindowModified(false);
 }

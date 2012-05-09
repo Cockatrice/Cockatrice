@@ -48,7 +48,7 @@ class CardZone;
 class AbstractCardItem;
 class CardItem;
 class TabGame;
-class DeckList;
+class DeckLoader;
 class QVBoxLayout;
 class QHBoxLayout;
 class GameReplay;
@@ -92,7 +92,7 @@ public:
 	void setButtonsVisible(bool _visible);
 	void setReadyStart(bool ready);
 	void setSideboardLocked(bool locked);
-	void setDeck(DeckList *deck);
+	void setDeck(const DeckLoader &deck);
 };
 
 class TabGame : public Tab {
@@ -171,7 +171,7 @@ signals:
 	void containerProcessingStarted(const GameEventContext &context);
 	void containerProcessingDone();
 	void openMessageDialog(const QString &userName, bool focus);
-	void openDeckEditor(DeckList *deck);
+	void openDeckEditor(const DeckLoader &deck);
 private slots:
 	void replayNextEvent();
 	void replayFinished();

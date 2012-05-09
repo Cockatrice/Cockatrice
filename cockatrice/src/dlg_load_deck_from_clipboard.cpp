@@ -9,7 +9,7 @@
 #include <QDialogButtonBox>
 #include <QMessageBox>
 #include "dlg_load_deck_from_clipboard.h"
-#include "decklist.h"
+#include "deck_loader.h"
 
 DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent)
 	: QDialog(parent), deckList(0)
@@ -47,7 +47,7 @@ void DlgLoadDeckFromClipboard::actOK()
 	QString buffer = contentsEdit->toPlainText();
 	QTextStream stream(&buffer);
 	
-	DeckList *l = new DeckList;
+	DeckLoader *l = new DeckLoader;
 	if (l->loadFromStream_Plain(stream)) {
 		deckList = l;
 		accept();

@@ -89,7 +89,7 @@ public:
 	~DeckViewScene();
 	void setLocked(bool _locked) { locked = _locked; }
 	bool getLocked() const { return locked; }
-	void setDeck(DeckList *_deck);
+	void setDeck(const DeckList &_deck);
 	void setOptimalAspectRatio(qreal _optimalAspectRatio) { optimalAspectRatio = _optimalAspectRatio; }
 	void rearrangeItems();
 	void updateContents();
@@ -110,7 +110,7 @@ signals:
 	void sideboardPlanChanged();
 public:
 	DeckView(QWidget *parent = 0);
-	void setDeck(DeckList *_deck);
+	void setDeck(const DeckList &_deck);
 	void setLocked(bool _locked) { deckViewScene->setLocked(_locked); }
 	QList<MoveCard_ToZone> getSideboardPlan() const { return deckViewScene->getSideboardPlan(); }
 	void resetSideboardPlan();

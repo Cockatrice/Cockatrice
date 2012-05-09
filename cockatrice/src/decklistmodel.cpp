@@ -11,11 +11,12 @@
 #include "decklistmodel.h"
 #include "carddatabase.h"
 #include "settingscache.h"
+#include "deck_loader.h"
 
 DeckListModel::DeckListModel(QObject *parent)
 	: QAbstractItemModel(parent)
 {
-	deckList = new DeckList;
+	deckList = new DeckLoader;
 	connect(deckList, SIGNAL(deckLoaded()), this, SLOT(rebuildTree()));
 	connect(deckList, SIGNAL(deckHashChanged()), this, SIGNAL(deckHashChanged()));
 	root = new InnerDecklistNode;
@@ -304,12 +305,10 @@ void DeckListModel::sort(int /*column*/, Qt::SortOrder order)
 
 void DeckListModel::cleanList()
 {
-	root->clearTree();
-	deckList->cleanList();
-	reset();
+	setDeckList(new DeckLoader);
 }
 
-void DeckListModel::setDeckList(DeckList *_deck)
+void DeckListModel::setDeckList(DeckLoader *_deck)
 {
 	delete deckList;
 	deckList = _deck;

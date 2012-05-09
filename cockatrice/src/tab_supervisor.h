@@ -4,6 +4,7 @@
 #include <QTabWidget>
 #include <QMap>
 #include <QAbstractButton>
+#include "deck_loader.h"
 
 class QMenu;
 class AbstractClient;
@@ -75,7 +76,7 @@ signals:
 	void localGameEnded();
 	void adminLockChanged(bool lock);
 public slots:
-	TabDeckEditor *addDeckEditorTab(DeckList *deckToOpen);
+	TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
 	void openReplay(GameReplay *replay);
 private slots:
 	void closeButtonPressed();

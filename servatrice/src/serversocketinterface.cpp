@@ -455,13 +455,10 @@ Response::ResponseCode ServerSocketInterface::cmdDeckUpload(const Command_DeckUp
 	if (authState != PasswordRight)
 		return Response::RespFunctionNotAllowed;
 	
-	servatrice->checkSql();
-	
 	if (!cmd.has_deck_list())
 		return Response::RespInvalidData;
-	int folderId = getDeckPathId(QString::fromStdString(cmd.path()));
-	if (folderId == -1)
-		return Response::RespNameNotFound;
+	
+	servatrice->checkSql();
 	
 	QString deckStr = QString::fromStdString(cmd.deck_list());
 	DeckList deck(deckStr);
@@ -469,22 +466,48 @@ Response::ResponseCode ServerSocketInterface::cmdDeckUpload(const Command_DeckUp
 	QString deckName = deck.getName();
 	if (deckName.isEmpty())
 		deckName = "Unnamed deck";
-
-	QMutexLocker locker(&servatrice->dbMutex);
-	QSqlQuery query;
-	query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_files (id_folder, user, name, upload_time, content) values(:id_folder, :user, :name, NOW(), :content)");
-	query.bindValue(":id_folder", folderId);
-	query.bindValue(":user", QString::fromStdString(userInfo->name()));
-	query.bindValue(":name", deckName);
-	query.bindValue(":content", deckStr);
-	servatrice->execSqlQuery(query);
 	
-	Response_DeckUpload *re = new Response_DeckUpload;
-	ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
-	fileInfo->set_id(query.lastInsertId().toInt());
-	fileInfo->set_name(deckName.toStdString());
-	fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toTime_t());
-	rc.setResponseExtension(re);
+	if (cmd.has_path()) {
+		int folderId = getDeckPathId(QString::fromStdString(cmd.path()));
+		if (folderId == -1)
+			return Response::RespNameNotFound;
+		
+		QMutexLocker locker(&servatrice->dbMutex);
+		QSqlQuery query;
+		query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_files (id_folder, user, name, upload_time, content) values(:id_folder, :user, :name, NOW(), :content)");
+		query.bindValue(":id_folder", folderId);
+		query.bindValue(":user", QString::fromStdString(userInfo->name()));
+		query.bindValue(":name", deckName);
+		query.bindValue(":content", deckStr);
+		servatrice->execSqlQuery(query);
+		
+		Response_DeckUpload *re = new Response_DeckUpload;
+		ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
+		fileInfo->set_id(query.lastInsertId().toInt());
+		fileInfo->set_name(deckName.toStdString());
+		fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toTime_t());
+		rc.setResponseExtension(re);
+	} else if (cmd.has_deck_id()) {
+		QMutexLocker locker(&servatrice->dbMutex);
+		QSqlQuery query;
+		query.prepare("update " + servatrice->getDbPrefix() + "_decklist_files set name=:name, upload_time=NOW(), content=:content where id = :id_deck and user = :user");
+		query.bindValue(":id_deck", cmd.deck_id());
+		query.bindValue(":user", QString::fromStdString(userInfo->name()));
+		query.bindValue(":name", deckName);
+		query.bindValue(":content", deckStr);
+		servatrice->execSqlQuery(query);
+		
+		if (query.numRowsAffected() == 0)
+			return Response::RespNameNotFound;
+		
+		Response_DeckUpload *re = new Response_DeckUpload;
+		ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
+		fileInfo->set_id(cmd.deck_id());
+		fileInfo->set_name(deckName.toStdString());
+		fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toTime_t());
+		rc.setResponseExtension(re);
+	} else
+		return Response::RespInvalidData;
 	
 	return Response::RespOk;
 }

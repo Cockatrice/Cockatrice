@@ -4,7 +4,6 @@
 #include "tab.h"
 #include <QAbstractItemModel>
 #include <QLineEdit>
-#include "decklist.h"
 
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
@@ -15,6 +14,8 @@ class CardInfoWidget;
 class QTextEdit;
 class DlgCardSearch;
 class QLabel;
+class DeckLoader;
+class Response;
 
 class SearchLineEdit : public QLineEdit {
 	private:
@@ -57,13 +58,11 @@ private slots:
         void actUpdatePrices();
 
         void finishedUpdatingPrices();
+	void saveDeckRemoteFinished(const Response &r);
 private:
 	void addCardHelper(QString zoneName);
 	void recursiveExpand(const QModelIndex &index);
 	bool confirmClose();
-
-	QString lastFileName;
-	DeckList::FileFormat lastFileFormat;
 
 	CardDatabaseModel *databaseModel;
 	CardDatabaseDisplayModel *databaseDisplayModel;
@@ -90,7 +89,7 @@ public:
 	~TabDeckEditor();
 	void retranslateUi();
 	QString getTabText() const;
-	void setDeck(DeckList *_deck, const QString &_lastFileName = QString(), DeckList::FileFormat _lastFileFormat = DeckList::CockatriceFormat);
+	void setDeck(DeckLoader *_deckLoader);
 	void setWindowModified(bool _windowModified);
 public slots:
 	void closeRequest();

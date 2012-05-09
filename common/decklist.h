@@ -107,44 +107,36 @@ public:
 	void setName(const QString &_name) { name = _name; }
         float getPrice() const { return price; }
         void setPrice(const float _price) { price = _price; }
-    };
+};
 
 class DeckList : public QObject {
 	Q_OBJECT
-public:
-	enum FileFormat { PlainTextFormat, CockatriceFormat };
 private:
 	QString name, comments;
-	QString lastFileName;
 	QString deckHash;
-	FileFormat lastFileFormat;
 	QMap<QString, SideboardPlan *> sideboardPlans;
 	InnerDecklistNode *root;
-	QString currentElementText;
 	void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
 signals:
-	void deckLoaded();
 	void deckHashChanged();
 public slots:
 	void setName(const QString &_name = QString()) { name = _name; }
 	void setComments(const QString &_comments = QString()) { comments = _comments; }
 public:
-	static const QStringList fileNameFilters;
 	DeckList();
-	DeckList(DeckList *other);
+	DeckList(const DeckList &other);
 	DeckList(const QString &nativeString);
 	~DeckList();
 	QString getName() const { return name; }
 	QString getComments() const { return comments; }
-	QString getLastFileName() const { return lastFileName; }
-	FileFormat getLastFileFormat() const { return lastFileFormat; }
 	QList<MoveCard_ToZone> getCurrentSideboardPlan();
 	void setCurrentSideboardPlan(const QList<MoveCard_ToZone> &plan);
 	const QMap<QString, SideboardPlan *> &getSideboardPlans() const { return sideboardPlans; }
 
 	bool readElement(QXmlStreamReader *xml);
 	void write(QXmlStreamWriter *xml);
-	void loadFromXml(QXmlStreamReader *xml);
+	bool loadFromXml(QXmlStreamReader *xml);
+	bool loadFromString_Native(const QString &nativeString);
 	QString writeToString_Native();
 	bool loadFromFile_Native(QIODevice *device);
 	bool saveToFile_Native(QIODevice *device);
@@ -152,9 +144,6 @@ public:
 	bool loadFromFile_Plain(QIODevice *device);
 	bool saveToStream_Plain(QTextStream &stream);
 	bool saveToFile_Plain(QIODevice *device);
-	bool loadFromFile(const QString &fileName, FileFormat fmt);
-	bool saveToFile(const QString &fileName, FileFormat fmt);
-	static FileFormat getFormatFromNameFilter(const QString &selectedNameFilter);
 
 	void cleanList();
 	bool isEmpty() const { return root->isEmpty() && name.isEmpty() && comments.isEmpty() && sideboardPlans.isEmpty(); }
