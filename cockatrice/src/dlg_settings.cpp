@@ -27,8 +27,6 @@ GeneralSettingsPage::GeneralSettingsPage()
 {
 	languageLabel = new QLabel;
 	languageBox = new QComboBox;
-	customTranslationButton = new QPushButton("...");
-	customTranslationButton->setMaximumWidth(50);
 	
 	QString setLanguage = settingsCache->getLang();
 	QStringList qmFiles = findQmFiles();
@@ -43,14 +41,12 @@ GeneralSettingsPage::GeneralSettingsPage()
 	picDownloadCheckBox->setChecked(settingsCache->getPicDownload());
 	
 	connect(languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
-	connect(customTranslationButton, SIGNAL(clicked()), this, SLOT(customTranslationButtonClicked()));
 	connect(picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
 	
 	QGridLayout *personalGrid = new QGridLayout;
 	personalGrid->addWidget(languageLabel, 0, 0);
 	personalGrid->addWidget(languageBox, 0, 1);
-	personalGrid->addWidget(customTranslationButton, 0, 2);
-	personalGrid->addWidget(picDownloadCheckBox, 1, 0, 1, 3);
+	personalGrid->addWidget(picDownloadCheckBox, 1, 0, 1, 2);
 	
 	personalGroupBox = new QGroupBox;
 	personalGroupBox->setLayout(personalGrid);
@@ -79,6 +75,12 @@ GeneralSettingsPage::GeneralSettingsPage()
 	QPushButton *cardDatabasePathButton = new QPushButton("...");
 	connect(cardDatabasePathButton, SIGNAL(clicked()), this, SLOT(cardDatabasePathButtonClicked()));
 	
+	tokenDatabasePathLabel = new QLabel;
+	tokenDatabasePathEdit = new QLineEdit(settingsCache->getTokenDatabasePath());
+	tokenDatabasePathEdit->setReadOnly(true);
+	QPushButton *tokenDatabasePathButton = new QPushButton("...");
+	connect(tokenDatabasePathButton, SIGNAL(clicked()), this, SLOT(tokenDatabasePathButtonClicked()));
+	
 	QGridLayout *pathsGrid = new QGridLayout;
 	pathsGrid->addWidget(deckPathLabel, 0, 0);
 	pathsGrid->addWidget(deckPathEdit, 0, 1);
@@ -92,6 +94,9 @@ GeneralSettingsPage::GeneralSettingsPage()
 	pathsGrid->addWidget(cardDatabasePathLabel, 3, 0);
 	pathsGrid->addWidget(cardDatabasePathEdit, 3, 1);
 	pathsGrid->addWidget(cardDatabasePathButton, 3, 2);
+	pathsGrid->addWidget(tokenDatabasePathLabel, 4, 0);
+	pathsGrid->addWidget(tokenDatabasePathEdit, 4, 1);
+	pathsGrid->addWidget(tokenDatabasePathButton, 4, 2);
 	pathsGroupBox = new QGroupBox;
 	pathsGroupBox->setLayout(pathsGrid);
 
@@ -158,19 +163,19 @@ void GeneralSettingsPage::cardDatabasePathButtonClicked()
 	settingsCache->setCardDatabasePath(path);
 }
 
-void GeneralSettingsPage::languageBoxChanged(int index)
-{
-	settingsCache->setCustomTranslationFile(QString());
-	settingsCache->setLang(languageBox->itemData(index).toString());
-}
-
-void GeneralSettingsPage::customTranslationButtonClicked()
+void GeneralSettingsPage::tokenDatabasePathButtonClicked()
 {
 	QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
 	if (path.isEmpty())
 		return;
 	
-	settingsCache->setCustomTranslationFile(path);
+	tokenDatabasePathEdit->setText(path);
+	settingsCache->setTokenDatabasePath(path);
+}
+
+void GeneralSettingsPage::languageBoxChanged(int index)
+{
+	settingsCache->setLang(languageBox->itemData(index).toString());
 }
 
 void GeneralSettingsPage::retranslateUi()
@@ -183,6 +188,7 @@ void GeneralSettingsPage::retranslateUi()
 	replaysPathLabel->setText(tr("Replays directory:"));
 	picsPathLabel->setText(tr("Pictures directory:"));
 	cardDatabasePathLabel->setText(tr("Path to card database:"));
+	tokenDatabasePathLabel->setText(tr("Path to token database:"));
 }
 
 AppearanceSettingsPage::AppearanceSettingsPage()
@@ -590,7 +596,6 @@ DlgSettings::DlgSettings(QWidget *parent)
 	: QDialog(parent)
 {
 	connect(settingsCache, SIGNAL(langChanged()), this, SLOT(updateLanguage()));
-	connect(settingsCache, SIGNAL(customTranslationFileChanged()), this, SLOT(updateLanguage()));
 	
 	contentsWidget = new QListWidget;
 	contentsWidget->setViewMode(QListView::IconMode);

@@ -16,12 +16,15 @@ public:
 	int columnCount(const QModelIndex &parent = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-	CardInfo const *getCard(int index) const { return cardList[index]; }
+	CardInfo *getCard(int index) const { return cardList[index]; }
 private:
 	QList<CardInfo *> cardList;
 	CardDatabase *db;
 private slots:
 	void updateCardList();
+	void cardAdded(CardInfo *card);
+	void cardRemoved(CardInfo *card);
+	void cardInfoChanged(CardInfo *card);
 };
 
 class CardDatabaseDisplayModel : public QSortFilterProxyModel {

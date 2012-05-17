@@ -130,7 +130,11 @@ public:
 	const QString &getText() const { return text; }
 	const int &getLoyalty() const { return loyalty; }
 	bool getCipt() const { return cipt; }
-	void setText(const QString &_text) { text = _text; }
+	void setManaCost(const QString &_manaCost) { manacost = _manaCost; emit cardInfoChanged(this); }
+	void setCardType(const QString &_cardType) { cardtype = _cardType; emit cardInfoChanged(this); }
+	void setPowTough(const QString &_powTough) { powtough = _powTough; emit cardInfoChanged(this); }
+	void setText(const QString &_text) { text = _text; emit cardInfoChanged(this); }
+	void setColors(const QStringList &_colors) { colors = _colors; emit cardInfoChanged(this); }
 	const QStringList &getColors() const { return colors; }
 	QString getPicURL(const QString &set) const { return picURLs.value(set); }
 	QString getPicURLHq(const QString &set) const { return picURLsHq.value(set); }
@@ -141,7 +145,7 @@ public:
 	QString getCorrectedName() const;
 	int getTableRow() const { return tableRow; }
 	void setTableRow(int _tableRow) { tableRow = _tableRow; }
-	void setLoyalty(int _loyalty) { loyalty = _loyalty; }
+	void setLoyalty(int _loyalty) { loyalty = _loyalty; emit cardInfoChanged(this); }
 	void setPicURL(const QString &_set, const QString &_picURL) { picURLs.insert(_set, _picURL); }
 	void setPicURLHq(const QString &_set, const QString &_picURL) { picURLsHq.insert(_set, _picURL); }
 	void setPicURLSt(const QString &_set, const QString &_picURL) { picURLsSt.insert(_set, _picURL); }
@@ -155,6 +159,7 @@ public slots:
 	void updatePixmapCache();
 signals:
 	void pixmapUpdated();
+	void cardInfoChanged(CardInfo *card);
 };
 
 class CardDatabase : public QObject {
@@ -175,12 +180,14 @@ public:
 	CardDatabase(QObject *parent = 0);
 	~CardDatabase();
 	void clear();
-	CardInfo *getCard(const QString &cardName = QString());
+	void addCard(CardInfo *card);
+	void removeCard(CardInfo *card);
+	CardInfo *getCard(const QString &cardName = QString(), bool createIfNotFound = true);
 	CardSet *getSet(const QString &setName);
 	QList<CardInfo *> getCardList() const { return cardHash.values(); }
 	SetList getSetList() const;
-	bool loadFromFile(const QString &fileName);
-	bool saveToFile(const QString &fileName);
+	bool loadFromFile(const QString &fileName, bool tokens = false);
+	bool saveToFile(const QString &fileName, bool tokens = false);
 	QStringList getAllColors() const;
 	QStringList getAllMainCardTypes() const;
 	bool getLoadSuccess() const { return loadSuccess; }
@@ -188,14 +195,18 @@ public:
 	void loadImage(CardInfo *card);
 public slots:
 	void clearPixmapCache();
-	bool loadCardDatabase(const QString &path);
-	bool loadCardDatabase();
+	bool loadCardDatabase(const QString &path, bool tokens = false);
 private slots:
 	void imageLoaded(CardInfo *card, QImage image);
 	void picDownloadChanged();
 	void picsPathChanged();
+	
+	void loadCardDatabase();
+	void loadTokenDatabase();
 signals:
 	void cardListChanged();
+	void cardAdded(CardInfo *card);
+	void cardRemoved(CardInfo *card);
 };
 
 #endif

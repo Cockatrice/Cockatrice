@@ -27,21 +27,20 @@ public:
 	GeneralSettingsPage();
 	void retranslateUi();
 private slots:
-	void customTranslationButtonClicked();
 	void deckPathButtonClicked();
 	void replaysPathButtonClicked();
 	void picsPathButtonClicked();
 	void cardDatabasePathButtonClicked();
+	void tokenDatabasePathButtonClicked();
 	void languageBoxChanged(int index);
 private:
 	QStringList findQmFiles();
 	QString languageName(const QString &qmFile);
-	QPushButton *customTranslationButton;
-	QLineEdit *deckPathEdit, *replaysPathEdit, *picsPathEdit, *cardDatabasePathEdit;
+	QLineEdit *deckPathEdit, *replaysPathEdit, *picsPathEdit, *cardDatabasePathEdit, *tokenDatabasePathEdit;
 	QGroupBox *personalGroupBox, *pathsGroupBox;
 	QComboBox *languageBox;
 	QCheckBox *picDownloadCheckBox;
-	QLabel *languageLabel, *deckPathLabel, *replaysPathLabel, *picsPathLabel, *cardDatabasePathLabel;
+	QLabel *languageLabel, *deckPathLabel, *replaysPathLabel, *picsPathLabel, *cardDatabasePathLabel, *tokenDatabasePathLabel;
 };
 
 class AppearanceSettingsPage : public AbstractSettingsPage {

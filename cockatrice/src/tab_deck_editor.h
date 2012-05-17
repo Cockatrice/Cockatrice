@@ -46,6 +46,7 @@ private slots:
 	void actPrintDeck();
 
 	void actEditSets();
+	void actEditTokens();
 	
 	void actSearch();
 	void actClearSearch();
@@ -82,15 +83,17 @@ private:
 
 	QMenu *deckMenu, *dbMenu;
 	QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aClose;
-	QAction *aEditSets, *aSearch, *aClearSearch;
+	QAction *aEditSets, *aEditTokens, *aSearch, *aClearSearch;
         QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement, *aUpdatePrices;
+	
+	bool modified;
 public:
 	TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent = 0);
 	~TabDeckEditor();
 	void retranslateUi();
 	QString getTabText() const;
 	void setDeck(DeckLoader *_deckLoader);
-	void setWindowModified(bool _windowModified);
+	void setModified(bool _windowModified);
 public slots:
 	void closeRequest();
 signals:

@@ -440,9 +440,11 @@ CardDatabase::CardDatabase(QObject *parent)
 {
 	connect(settingsCache, SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
 	connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabase()));
+	connect(settingsCache, SIGNAL(tokenDatabasePathChanged()), this, SLOT(loadTokenDatabase()));
 	connect(settingsCache, SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
 	
 	loadCardDatabase();
+	loadTokenDatabase();
 	
 	pictureLoaderThread = new QThread;
 	pictureLoader = new PictureLoader(settingsCache->getPicsPath(), settingsCache->getPicDownload());
@@ -482,18 +484,31 @@ void CardDatabase::clear()
 	cardHash.clear();
 }
 
-CardInfo *CardDatabase::getCard(const QString &cardName)
+void CardDatabase::addCard(CardInfo *card)
+{
+	cardHash.insert(card->getName(), card);
+	emit cardAdded(card);
+}
+
+void CardDatabase::removeCard(CardInfo *card)
+{
+	cardHash.remove(card->getName());
+	emit cardRemoved(card);
+}
+
+CardInfo *CardDatabase::getCard(const QString &cardName, bool createIfNotFound)
 {
 	if (cardName.isEmpty())
 		return noCard;
 	else if (cardHash.contains(cardName))
 		return cardHash.value(cardName);
-	else {
+	else if (createIfNotFound) {
 		CardInfo *newCard = new CardInfo(this, cardName, true);
 		newCard->addToSet(getSet("TK"));
 		cardHash.insert(cardName, newCard);
 		return newCard;
-	}
+	} else
+		return 0;
 }
 
 CardSet *CardDatabase::getSet(const QString &setName)
@@ -601,14 +616,42 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 	}
 }
 
-bool CardDatabase::loadFromFile(const QString &fileName)
+bool CardDatabase::loadFromFile(const QString &fileName, bool tokens)
 {
 	QFile file(fileName);
 	file.open(QIODevice::ReadOnly);
 	if (!file.isOpen())
 		return false;
+	
+	if (tokens) {
+		QMutableHashIterator<QString, CardInfo *> i(cardHash);
+		while (i.hasNext()) {
+			i.next();
+			if (i.value()->getIsToken()) {
+				delete i.value();
+				i.remove();
+			}
+		}
+	} else {
+		QHashIterator<QString, CardSet *> setIt(setHash);
+		while (setIt.hasNext()) {
+			setIt.next();
+			delete setIt.value();
+		}
+		setHash.clear();
+		
+		QMutableHashIterator<QString, CardInfo *> i(cardHash);
+		while (i.hasNext()) {
+			i.next();
+			if (!i.value()->getIsToken()) {
+				delete i.value();
+				i.remove();
+			}
+		}
+		cardHash.clear();
+	}
+
 	QXmlStreamReader xml(&file);
-	clear();
 	while (!xml.atEnd()) {
 		if (xml.readNext() == QXmlStreamReader::StartElement) {
 			if (xml.name() != "cockatrice_carddatabase")
@@ -629,7 +672,7 @@ bool CardDatabase::loadFromFile(const QString &fileName)
 	return !cardHash.isEmpty();
 }
 
-bool CardDatabase::saveToFile(const QString &fileName)
+bool CardDatabase::saveToFile(const QString &fileName, bool tokens)
 {
 	QFile file(fileName);
 	if (!file.open(QIODevice::WriteOnly))
@@ -641,16 +684,21 @@ bool CardDatabase::saveToFile(const QString &fileName)
 	xml.writeStartElement("cockatrice_carddatabase");
 	xml.writeAttribute("version", QString::number(versionNeeded));
 
-	xml.writeStartElement("sets");
-	QHashIterator<QString, CardSet *> setIterator(setHash);
-	while (setIterator.hasNext())
-		xml << setIterator.next().value();
-	xml.writeEndElement(); // sets
+	if (!tokens) {
+		xml.writeStartElement("sets");
+		QHashIterator<QString, CardSet *> setIterator(setHash);
+		while (setIterator.hasNext())
+			xml << setIterator.next().value();
+		xml.writeEndElement(); // sets
+	}
 
 	xml.writeStartElement("cards");
 	QHashIterator<QString, CardInfo *> cardIterator(cardHash);
-	while (cardIterator.hasNext())
-		xml << cardIterator.next().value();
+	while (cardIterator.hasNext()) {
+		CardInfo *card = cardIterator.next().value();
+		if (card->getIsToken() == tokens)
+			xml << card;
+	}
 	xml.writeEndElement(); // cards
 
 	xml.writeEndElement(); // cockatrice_carddatabase
@@ -669,13 +717,13 @@ void CardDatabase::picDownloadChanged()
 	}
 }
 
-bool CardDatabase::loadCardDatabase(const QString &path)
+bool CardDatabase::loadCardDatabase(const QString &path, bool tokens)
 {
+	bool tempLoadSuccess = false;
 	if (!path.isEmpty())
-		loadSuccess = loadFromFile(path);
-	else loadSuccess = false;
+		tempLoadSuccess = loadFromFile(path, tokens);
 	
-	if (loadSuccess) {
+	if (tempLoadSuccess) {
 		SetList allSets;
 		QHashIterator<QString, CardSet *> setsIterator(setHash);
 		while (setsIterator.hasNext())
@@ -687,12 +735,20 @@ bool CardDatabase::loadCardDatabase(const QString &path)
 		emit cardListChanged();
 	}
 	
-	return loadSuccess;
+	if (!tokens)
+		loadSuccess = tempLoadSuccess;
+	
+	return tempLoadSuccess;
 }
 
-bool CardDatabase::loadCardDatabase()
+void CardDatabase::loadCardDatabase()
 {
-	return loadCardDatabase(settingsCache->getCardDatabasePath());
+	loadCardDatabase(settingsCache->getCardDatabasePath(), false);
+}
+
+void CardDatabase::loadTokenDatabase()
+{
+	loadCardDatabase(settingsCache->getTokenDatabasePath(), true);
 }
 
 QStringList CardDatabase::getAllColors() const

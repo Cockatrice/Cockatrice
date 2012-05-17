@@ -9,6 +9,7 @@ SET(cockatrice_SOURCES
  src/dlg_filter_games.cpp
  src/dlg_connect.cpp 
  src/dlg_create_token.cpp 
+ src/dlg_edit_tokens.cpp
  src/abstractclient.cpp 
  src/remoteclient.cpp 
  src/main.cpp 
@@ -85,6 +86,7 @@ SET(cockatrice_HEADERS
  src/dlg_filter_games.h 
  src/dlg_connect.h 
  src/dlg_create_token.h 
+ src/dlg_edit_tokens.h
  src/gamesmodel.h 
  src/abstractclient.h 
  src/remoteclient.h 

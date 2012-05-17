@@ -4,12 +4,13 @@ CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, QObject *parent)
 	: QAbstractListModel(parent), db(_db)
 {
 	connect(db, SIGNAL(cardListChanged()), this, SLOT(updateCardList()));
-	cardList = db->getCardList();
+	connect(db, SIGNAL(cardAdded(CardInfo *)), this, SLOT(cardAdded(CardInfo *)));
+	connect(db, SIGNAL(cardRemoved(CardInfo *)), this, SLOT(cardRemoved(CardInfo *)));
+	updateCardList();
 }
 
 CardDatabaseModel::~CardDatabaseModel()
 {
-
 }
 
 int CardDatabaseModel::rowCount(const QModelIndex &/*parent*/) const
@@ -66,8 +67,42 @@ QVariant CardDatabaseModel::headerData(int section, Qt::Orientation orientation,
 
 void CardDatabaseModel::updateCardList()
 {
+	for (int i = 0; i < cardList.size(); ++i)
+		disconnect(cardList[i], 0, this, 0);
+	
 	cardList = db->getCardList();
+	for (int i = 0; i < cardList.size(); ++i)
+		connect(cardList[i], SIGNAL(cardInfoChanged(CardInfo *)), this, SLOT(cardInfoChanged(CardInfo *)));
+	
 	reset();
+}
+
+void CardDatabaseModel::cardInfoChanged(CardInfo *card)
+{
+	const int row = cardList.indexOf(card);
+	if (row == -1)
+		return;
+	
+	emit dataChanged(index(row, 0), index(row, 4));
+}
+
+void CardDatabaseModel::cardAdded(CardInfo *card)
+{
+	beginInsertRows(QModelIndex(), cardList.size(), cardList.size());
+	cardList.append(card);
+	connect(card, SIGNAL(cardInfoChanged(CardInfo *)), this, SLOT(cardInfoChanged(CardInfo *)));
+	endInsertRows();
+}
+
+void CardDatabaseModel::cardRemoved(CardInfo *card)
+{
+	const int row = cardList.indexOf(card);
+	if (row == -1)
+		return;
+	
+	beginRemoveRows(QModelIndex(), row, row);
+	cardList.removeAt(row);
+	endRemoveRows();
 }
 
 CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)

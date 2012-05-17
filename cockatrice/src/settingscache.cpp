@@ -5,13 +5,13 @@ SettingsCache::SettingsCache()
 {
 	settings = new QSettings(this);
 	
-	customTranslationFile = settings->value("personal/custom_translation").toString();
 	lang = settings->value("personal/lang").toString();
 	
 	deckPath = settings->value("paths/decks").toString();
 	replaysPath = settings->value("paths/replays").toString();
 	picsPath = settings->value("paths/pics").toString();
 	cardDatabasePath = settings->value("paths/carddatabase").toString();
+	tokenDatabasePath = settings->value("paths/tokendatabase").toString();
 	
 	handBgPath = settings->value("zonebg/hand").toString();
 	stackBgPath = settings->value("zonebg/stack").toString();
@@ -39,13 +39,6 @@ SettingsCache::SettingsCache()
 	priceTagFeature = settings->value("deckeditor/pricetags", false).toBool();
 	
 	ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
-}
-
-void SettingsCache::setCustomTranslationFile(const QString &_customTranslationFile)
-{
-	customTranslationFile = _customTranslationFile;
-	settings->setValue("personal/custom_translation", customTranslationFile);
-	emit customTranslationFileChanged();
 }
 
 void SettingsCache::setLang(const QString &_lang)
@@ -79,6 +72,13 @@ void SettingsCache::setCardDatabasePath(const QString &_cardDatabasePath)
 	cardDatabasePath = _cardDatabasePath;
 	settings->setValue("paths/carddatabase", cardDatabasePath);
 	emit cardDatabasePathChanged();
+}
+
+void SettingsCache::setTokenDatabasePath(const QString &_tokenDatabasePath)
+{
+	tokenDatabasePath = _tokenDatabasePath;
+	settings->setValue("paths/tokendatabase", tokenDatabasePath);
+	emit tokenDatabasePathChanged();
 }
 
 void SettingsCache::setHandBgPath(const QString &_handBgPath)

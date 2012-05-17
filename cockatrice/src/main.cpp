@@ -71,10 +71,7 @@ void installNewTranslator()
 	qApp->installTranslator(qtTranslator);
 	if (!translationPath.startsWith("/"))
 		translationPath.prepend(qApp->applicationDirPath() + "/");
-	if (!settingsCache->getCustomTranslationFile().isEmpty())
-		translator->load(settingsCache->getCustomTranslationFile());
-	else
-		translator->load(translationPrefix + "_" + lang, translationPath);
+	translator->load(translationPrefix + "_" + lang, translationPath);
 	qApp->installTranslator(translator);
 }
 
@@ -117,6 +114,8 @@ int main(int argc, char *argv[])
 	if (!db->getLoadSuccess())
 		if (db->loadCardDatabase(dataDir + "/cards.xml"))
 			settingsCache->setCardDatabasePath(dataDir + "/cards.xml");
+	if (settingsCache->getTokenDatabasePath().isEmpty())
+		settingsCache->setTokenDatabasePath(dataDir + "/tokens.xml");
 	if (!QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty()) {
 		QDir().mkpath(dataDir + "/decks");
 		settingsCache->setDeckPath(dataDir + "/decks");

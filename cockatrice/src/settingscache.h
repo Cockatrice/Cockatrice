@@ -8,10 +8,10 @@ class QSettings;
 class SettingsCache : public QObject {
 	Q_OBJECT
 signals:
-	void customTranslationFileChanged();
 	void langChanged();
 	void picsPathChanged();
 	void cardDatabasePathChanged();
+	void tokenDatabasePathChanged();
 	void handBgPathChanged();
 	void stackBgPathChanged();
 	void tableBgPathChanged();
@@ -29,8 +29,8 @@ private:
 	QSettings *settings;
 	
 	QByteArray mainWindowGeometry;
-	QString customTranslationFile, lang;
-	QString deckPath, replaysPath, picsPath, cardDatabasePath;
+	QString lang;
+	QString deckPath, replaysPath, picsPath, cardDatabasePath, tokenDatabasePath;
 	QString handBgPath, stackBgPath, tableBgPath, playerBgPath, cardBackPicturePath;
 	bool picDownload;
 	bool doubleClickToPlay;
@@ -49,12 +49,12 @@ private:
 public:
 	SettingsCache();
 	const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
-	QString getCustomTranslationFile() const { return customTranslationFile; }
 	QString getLang() const { return lang; }
 	QString getDeckPath() const { return deckPath; }
 	QString getReplaysPath() const { return replaysPath; }
 	QString getPicsPath() const { return picsPath; }
 	QString getCardDatabasePath() const { return cardDatabasePath; }
+	QString getTokenDatabasePath() const { return tokenDatabasePath; }
 	QString getHandBgPath() const { return handBgPath; }
 	QString getStackBgPath() const { return stackBgPath; }
 	QString getTableBgPath() const { return tableBgPath; }
@@ -77,12 +77,12 @@ public:
 	bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
 public slots:
 	void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
-	void setCustomTranslationFile(const QString &_customTranslationFile);
 	void setLang(const QString &_lang);
 	void setDeckPath(const QString &_deckPath);
 	void setReplaysPath(const QString &_replaysPath);
 	void setPicsPath(const QString &_picsPath);
 	void setCardDatabasePath(const QString &_cardDatabasePath);
+	void setTokenDatabasePath(const QString &_tokenDatabasePath);
 	void setHandBgPath(const QString &_handBgPath);
 	void setStackBgPath(const QString &_stackBgPath);
 	void setTableBgPath(const QString &_tableBgPath);
