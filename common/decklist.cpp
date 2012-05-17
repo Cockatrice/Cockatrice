@@ -480,6 +480,14 @@ bool DeckList::saveToFile_Plain(QIODevice *device)
 	return saveToStream_Plain(out);
 }
 
+QString DeckList::writeToString_Plain()
+{
+	QString result;
+	QTextStream out(&result);
+	saveToStream_Plain(out);
+	return result;
+}
+
 void DeckList::cleanList()
 {
 	root->clearTree();

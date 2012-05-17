@@ -44,6 +44,7 @@ private slots:
 	void actLoadDeckFromClipboard();
 	void actSaveDeckToClipboard();
 	void actPrintDeck();
+	void actAnalyzeDeck();
 
 	void actEditSets();
 	void actEditTokens();
@@ -82,7 +83,7 @@ private:
 	DlgCardSearch *dlgCardSearch;
 
 	QMenu *deckMenu, *dbMenu;
-	QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aClose;
+	QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose;
 	QAction *aEditSets, *aEditTokens, *aSearch, *aClearSearch;
         QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement, *aUpdatePrices;
 	

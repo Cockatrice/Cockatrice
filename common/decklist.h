@@ -144,6 +144,7 @@ public:
 	bool loadFromFile_Plain(QIODevice *device);
 	bool saveToStream_Plain(QTextStream &stream);
 	bool saveToFile_Plain(QIODevice *device);
+	QString writeToString_Plain();
 
 	void cleanList();
 	bool isEmpty() const { return root->isEmpty() && name.isEmpty() && comments.isEmpty() && sideboardPlans.isEmpty(); }

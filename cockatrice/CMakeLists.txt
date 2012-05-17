@@ -62,6 +62,7 @@ SET(cockatrice_SOURCES
  src/tab_userlists.cpp 
  src/tab_deck_editor.cpp
  src/replay_timeline_widget.cpp
+ src/deckstats_interface.cpp
  src/chatview.cpp 
  src/userlist.cpp 
  src/userinfobox.cpp 
@@ -137,6 +138,7 @@ SET(cockatrice_HEADERS
  src/tab_userlists.h 
  src/tab_deck_editor.h
  src/replay_timeline_widget.h
+ src/deckstats_interface.h
  src/chatview.h 
  src/userlist.h 
  src/userinfobox.h 

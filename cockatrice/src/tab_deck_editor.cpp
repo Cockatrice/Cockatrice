@@ -29,6 +29,7 @@
 #include "settingscache.h"
 #include "priceupdater.h"
 #include "tab_supervisor.h"
+#include "deckstats_interface.h"
 #include "abstractclient.h"
 #include "pending_command.h"
 #include "pb/response.pb.h"
@@ -183,6 +184,8 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	aPrintDeck = new QAction(QString(), this);
 	aPrintDeck->setShortcuts(QKeySequence::Print);
 	connect(aPrintDeck, SIGNAL(triggered()), this, SLOT(actPrintDeck()));
+	aAnalyzeDeck = new QAction(QString(), this);
+	connect(aAnalyzeDeck, SIGNAL(triggered()), this, SLOT(actAnalyzeDeck()));
 	aClose = new QAction(QString(), this);
 	connect(aClose, SIGNAL(triggered()), this, SLOT(closeRequest()));
 
@@ -201,6 +204,8 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	deckMenu->addAction(aSaveDeckToClipboard);
 	deckMenu->addSeparator();
 	deckMenu->addAction(aPrintDeck);
+	deckMenu->addSeparator();
+	deckMenu->addAction(aAnalyzeDeck);
 	deckMenu->addSeparator();
 	deckMenu->addAction(aClose);
 	addTabMenu(deckMenu);
@@ -268,6 +273,7 @@ void TabDeckEditor::retranslateUi()
 	aLoadDeckFromClipboard->setText(tr("Load deck from cl&ipboard..."));
 	aSaveDeckToClipboard->setText(tr("Save deck to clip&board"));
 	aPrintDeck->setText(tr("&Print deck..."));
+	aAnalyzeDeck->setText(tr("&Analyze deck on deckstats.net"));
 	aClose->setText(tr("&Close"));
 	aClose->setShortcut(tr("Ctrl+Q"));
 	
@@ -469,6 +475,12 @@ void TabDeckEditor::actPrintDeck()
 	QPrintPreviewDialog *dlg = new QPrintPreviewDialog(this);
 	connect(dlg, SIGNAL(paintRequested(QPrinter *)), deckModel, SLOT(printDeckList(QPrinter *)));
 	dlg->exec();
+}
+
+void TabDeckEditor::actAnalyzeDeck()
+{
+	DeckStatsInterface *interface = new DeckStatsInterface(this); // it deletes itself when done
+	interface->analyzeDeck(deckModel->getDeckList());
 }
 
 void TabDeckEditor::actEditSets()
