@@ -60,62 +60,62 @@
 <context>
     <name>AppearanceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="322"/>
+        <location filename="../src/dlg_settings.cpp" line="328"/>
         <source>Zone background pictures</source>
         <translation>Hintergrundbilder für Kartenzonen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="323"/>
+        <location filename="../src/dlg_settings.cpp" line="329"/>
         <source>Path to hand background:</source>
         <translation>Hintergrundbild für die Hand:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="324"/>
+        <location filename="../src/dlg_settings.cpp" line="330"/>
         <source>Path to stack background:</source>
         <translation>Hintergrundbild für den Stapel:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="325"/>
+        <location filename="../src/dlg_settings.cpp" line="331"/>
         <source>Path to table background:</source>
         <translation>Hintergrundbild für das Spielfeld:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="326"/>
+        <location filename="../src/dlg_settings.cpp" line="332"/>
         <source>Path to player info background:</source>
         <translation>Hintergrundbild für den Spielerbereich:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="327"/>
+        <location filename="../src/dlg_settings.cpp" line="333"/>
         <source>Path to picture of card back:</source>
         <translation>Pfad zum Bild der Kartenrückseite:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="329"/>
+        <location filename="../src/dlg_settings.cpp" line="335"/>
         <source>Card rendering</source>
         <translation>Kartendarstellung</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="330"/>
+        <location filename="../src/dlg_settings.cpp" line="336"/>
         <source>Display card names on cards having a picture</source>
         <translation>Kartennamen darstellen auch bei Karten, die Bilder haben</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="332"/>
+        <location filename="../src/dlg_settings.cpp" line="338"/>
         <source>Hand layout</source>
         <translation>Kartenhand</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="333"/>
+        <location filename="../src/dlg_settings.cpp" line="339"/>
         <source>Display hand horizontally (wastes space)</source>
         <translation>Hand horizonal anzeigen (verschwendet Platz)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="335"/>
+        <location filename="../src/dlg_settings.cpp" line="341"/>
         <source>Table grid layout</source>
         <translation>Spielfeldraster</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="337"/>
+        <location filename="../src/dlg_settings.cpp" line="343"/>
         <source>Minimum player count for multi-column layout:</source>
         <translation>Mindestspielerzahl für mehrspaltige Anordnung:</translation>
     </message>
@@ -124,7 +124,7 @@
         <translation type="obsolete">Platzsparende Anordnung</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="336"/>
+        <location filename="../src/dlg_settings.cpp" line="342"/>
         <source>Invert vertical coordinate</source>
         <translation>Vertikale Koordinate umkehren</translation>
     </message>
@@ -133,17 +133,17 @@
         <translation type="obsolete">Platzsparende Anordnung</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="339"/>
+        <location filename="../src/dlg_settings.cpp" line="345"/>
         <source>Zone view layout</source>
         <translation>Aussehen des Zonenbetrachters</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="340"/>
+        <location filename="../src/dlg_settings.cpp" line="346"/>
         <source>Sort by name</source>
         <translation>nach Namen sortieren</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="341"/>
+        <location filename="../src/dlg_settings.cpp" line="347"/>
         <source>Sort by type</source>
         <translation>nach Kartentypen sortieren</translation>
     </message>
@@ -152,11 +152,11 @@
         <translation type="obsolete">standardmäßig alphabetisch sortieren</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="352"/>
-        <location filename="../src/dlg_settings.cpp" line="368"/>
-        <location filename="../src/dlg_settings.cpp" line="384"/>
-        <location filename="../src/dlg_settings.cpp" line="400"/>
-        <location filename="../src/dlg_settings.cpp" line="416"/>
+        <location filename="../src/dlg_settings.cpp" line="358"/>
+        <location filename="../src/dlg_settings.cpp" line="374"/>
+        <location filename="../src/dlg_settings.cpp" line="390"/>
+        <location filename="../src/dlg_settings.cpp" line="406"/>
+        <location filename="../src/dlg_settings.cpp" line="422"/>
         <source>Choose path</source>
         <translation>Pfad auswählen</translation>
     </message>
@@ -259,27 +259,27 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
 <context>
     <name>CardDatabaseModel</name>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="58"/>
+        <location filename="../src/carddatabasemodel.cpp" line="59"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="59"/>
+        <location filename="../src/carddatabasemodel.cpp" line="60"/>
         <source>Sets</source>
         <translation>Editionen</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="60"/>
+        <location filename="../src/carddatabasemodel.cpp" line="61"/>
         <source>Mana cost</source>
         <translation>Manakosten</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="61"/>
+        <location filename="../src/carddatabasemodel.cpp" line="62"/>
         <source>Card type</source>
         <translation>Kartentyp</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="62"/>
+        <location filename="../src/carddatabasemodel.cpp" line="63"/>
         <source>P/T</source>
         <translation>S/W</translation>
     </message>
@@ -1314,12 +1314,12 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
 <context>
     <name>DeckEditorSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="524"/>
+        <location filename="../src/dlg_settings.cpp" line="530"/>
         <source>Enable &amp;price tag feature (using data from blacklotusproject.com)</source>
         <translation>Karten&amp;preisfunktionen anschalten (benutzt Daten von blacklotusproject.com)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="525"/>
+        <location filename="../src/dlg_settings.cpp" line="531"/>
         <source>General</source>
         <translation>Allgemeines</translation>
     </message>
@@ -1355,6 +1355,20 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
         <location filename="../src/decklistmodel.cpp" line="140"/>
         <source>Price</source>
         <translation>Preis</translation>
+    </message>
+</context>
+<context>
+    <name>DeckStatsInterface</name>
+    <message>
+        <location filename="../src/deckstats_interface.cpp" line="20"/>
+        <location filename="../src/deckstats_interface.cpp" line="31"/>
+        <source>Error</source>
+        <translation>Fehler</translation>
+    </message>
+    <message>
+        <location filename="../src/deckstats_interface.cpp" line="31"/>
+        <source>The reply from the server could not be parsed.</source>
+        <translation>Der Server hat eine ungültige Antwort geliefert.</translation>
     </message>
 </context>
 <context>
@@ -1718,6 +1732,100 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     </message>
 </context>
 <context>
+    <name>DlgEditTokens</name>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="22"/>
+        <source>&amp;Name:</source>
+        <translation>&amp;Name:</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="27"/>
+        <source>C&amp;olor:</source>
+        <translation>&amp;Farbe:</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="29"/>
+        <source>white</source>
+        <translation>weiß</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="30"/>
+        <source>blue</source>
+        <translation>blau</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="31"/>
+        <source>black</source>
+        <translation>schwarz</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="32"/>
+        <source>red</source>
+        <translation>rot</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="33"/>
+        <source>green</source>
+        <translation>grün</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="34"/>
+        <source>multicolor</source>
+        <translation>mehrfarbig</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="35"/>
+        <source>colorless</source>
+        <translation>farblos</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="39"/>
+        <source>&amp;P/T:</source>
+        <translation>&amp;Kampfwerte:</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="44"/>
+        <source>&amp;Annotation:</source>
+        <translation>&amp;Hinweis:</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="59"/>
+        <source>Token data</source>
+        <translation>Spielstein-Daten</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="82"/>
+        <location filename="../src/dlg_edit_tokens.cpp" line="134"/>
+        <source>Add token</source>
+        <translation>Spielstein hinzufügen</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="85"/>
+        <source>Remove token</source>
+        <translation>Spielstein entfernen</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="110"/>
+        <source>Edit tokens</source>
+        <translation>Spielsteine bearbeiten</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="134"/>
+        <source>Please enter the name of the token:</source>
+        <translation>Bitte geben Sie den Namen des Spielsteins ein:</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="136"/>
+        <source>Error</source>
+        <translation>Fehler</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_edit_tokens.cpp" line="136"/>
+        <source>The chosen name conflicts with an existing card or token.</source>
+        <translation>Der gewählte Name existiert bereits als Karte oder Spielstein.</translation>
+    </message>
+</context>
+<context>
     <name>DlgFilterGames</name>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="16"/>
@@ -1814,9 +1922,9 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="685"/>
         <location filename="../src/dlg_settings.cpp" line="690"/>
         <location filename="../src/dlg_settings.cpp" line="695"/>
+        <location filename="../src/dlg_settings.cpp" line="700"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
@@ -1833,47 +1941,47 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
         <translation type="obsolete">Der Pfad zum Kartenbilderverzeichnis ist ungültig.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="685"/>
+        <location filename="../src/dlg_settings.cpp" line="690"/>
         <source>Your card database is invalid. Would you like to go back and set the correct path?</source>
         <translation>Ihre Kartendatenbank ist ungültig. Möchten Sie zurückgehen und den korrekten Pfad einstellen?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="690"/>
+        <location filename="../src/dlg_settings.cpp" line="695"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>Der Pfad zu Ihrem Deckordner ist ungültig. Möchten Sie zurückgehen und den korrekten Pfad einstellen?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="695"/>
+        <location filename="../src/dlg_settings.cpp" line="700"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>Der Pfad zu Ihrem Kartenbilderordner ist ungültig. Möchten Sie zurückgehen und den korrekten Pfad einstellen?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="704"/>
+        <location filename="../src/dlg_settings.cpp" line="709"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="706"/>
+        <location filename="../src/dlg_settings.cpp" line="711"/>
         <source>General</source>
         <translation>Allgemeines</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="707"/>
+        <location filename="../src/dlg_settings.cpp" line="712"/>
         <source>Appearance</source>
         <translation>Erscheinungsbild</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="708"/>
+        <location filename="../src/dlg_settings.cpp" line="713"/>
         <source>User interface</source>
         <translation>Bedienung</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="709"/>
+        <location filename="../src/dlg_settings.cpp" line="714"/>
         <source>Deck editor</source>
         <translation>Deckeditor</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="710"/>
+        <location filename="../src/dlg_settings.cpp" line="715"/>
         <source>Messages</source>
         <translation>Nachrichten</translation>
     </message>
@@ -2345,57 +2453,62 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
 <context>
     <name>GeneralSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="123"/>
-        <location filename="../src/dlg_settings.cpp" line="133"/>
-        <location filename="../src/dlg_settings.cpp" line="143"/>
-        <location filename="../src/dlg_settings.cpp" line="153"/>
-        <location filename="../src/dlg_settings.cpp" line="169"/>
+        <location filename="../src/dlg_settings.cpp" line="128"/>
+        <location filename="../src/dlg_settings.cpp" line="138"/>
+        <location filename="../src/dlg_settings.cpp" line="148"/>
+        <location filename="../src/dlg_settings.cpp" line="158"/>
+        <location filename="../src/dlg_settings.cpp" line="168"/>
         <source>Choose path</source>
         <translation>Pfad auswählen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="178"/>
+        <location filename="../src/dlg_settings.cpp" line="183"/>
         <source>Personal settings</source>
         <translation>Persönliche Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="179"/>
+        <location filename="../src/dlg_settings.cpp" line="184"/>
         <source>Language:</source>
         <translation>Sprache:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="180"/>
+        <location filename="../src/dlg_settings.cpp" line="185"/>
         <source>Download card pictures on the fly</source>
         <translation>Kartenbilder dynamisch herunterladen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="181"/>
+        <location filename="../src/dlg_settings.cpp" line="186"/>
         <source>Paths</source>
         <translation>Pfade</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="182"/>
+        <location filename="../src/dlg_settings.cpp" line="187"/>
         <source>Decks directory:</source>
         <translation>Verzeichnis mit Decklisten:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="183"/>
+        <location filename="../src/dlg_settings.cpp" line="188"/>
         <source>Replays directory:</source>
         <translation>Verzeichnis mit aufgezeichneten Spielen:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="184"/>
+        <location filename="../src/dlg_settings.cpp" line="189"/>
         <source>Pictures directory:</source>
         <translation>Verzeichnis mit Bilddateien:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="185"/>
+        <location filename="../src/dlg_settings.cpp" line="190"/>
         <source>Path to card database:</source>
         <translation>Pfad zur Kartendatenbank:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="38"/>
-        <location filename="../src/dlg_settings.cpp" line="118"/>
+        <location filename="../src/dlg_settings.cpp" line="191"/>
+        <source>Path to token database:</source>
+        <translation>Pfad zur Spielsteindatenbank:</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="36"/>
+        <location filename="../src/dlg_settings.cpp" line="123"/>
         <source>English</source>
         <translation>Deutsch</translation>
     </message>
@@ -4501,12 +4614,12 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="585"/>
+        <location filename="../src/dlg_settings.cpp" line="591"/>
         <source>&amp;Add</source>
         <translation>&amp;Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="586"/>
+        <location filename="../src/dlg_settings.cpp" line="592"/>
         <source>&amp;Remove</source>
         <translation>&amp;Entfernen</translation>
     </message>
@@ -4519,12 +4632,12 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <translation type="obsolete">Entfernen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="568"/>
+        <location filename="../src/dlg_settings.cpp" line="574"/>
         <source>Add message</source>
         <translation>Nachricht hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="568"/>
+        <location filename="../src/dlg_settings.cpp" line="574"/>
         <source>Message:</source>
         <translation>Nachricht:</translation>
     </message>
@@ -5547,214 +5660,223 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
 <context>
     <name>TabDeckEditor</name>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="164"/>
         <source>Deck editor [*]</source>
-        <translation>Deck-Editor [*]</translation>
+        <translation type="obsolete">Deck-Editor [*]</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="184"/>
+        <location filename="../src/tab_deck_editor.cpp" line="275"/>
         <source>&amp;Print deck...</source>
         <translation>Deck &amp;drucken...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="187"/>
+        <location filename="../src/tab_deck_editor.cpp" line="277"/>
         <source>&amp;Close</source>
         <translation>S&amp;chließen</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="188"/>
+        <location filename="../src/tab_deck_editor.cpp" line="278"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="191"/>
+        <location filename="../src/tab_deck_editor.cpp" line="294"/>
         <source>&amp;Edit sets...</source>
         <translation>&amp;Editionen bearbeiten...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="252"/>
+        <location filename="../src/tab_deck_editor.cpp" line="258"/>
         <source>&amp;Search...</source>
         <translation>&amp;Suchen...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="253"/>
+        <location filename="../src/tab_deck_editor.cpp" line="259"/>
         <source>&amp;Clear search</source>
         <translation>Suche a&amp;ufheben</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="254"/>
+        <location filename="../src/tab_deck_editor.cpp" line="260"/>
         <source>&amp;Search for:</source>
         <translation>&amp;Suchen nach:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="256"/>
+        <location filename="../src/tab_deck_editor.cpp" line="262"/>
         <source>Deck &amp;name:</source>
         <translation>Deck&amp;name:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="257"/>
+        <location filename="../src/tab_deck_editor.cpp" line="263"/>
         <source>&amp;Comments:</source>
         <translation>&amp;Kommentare:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="258"/>
+        <location filename="../src/tab_deck_editor.cpp" line="264"/>
         <source>Hash:</source>
         <translation>Hash:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="260"/>
+        <location filename="../src/tab_deck_editor.cpp" line="266"/>
         <source>&amp;Update prices</source>
         <translation>&amp;Preise aktualisieren</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="261"/>
+        <location filename="../src/tab_deck_editor.cpp" line="267"/>
         <source>Ctrl+U</source>
         <translation>Ctrl+U</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="263"/>
+        <location filename="../src/tab_deck_editor.cpp" line="269"/>
         <source>&amp;New deck</source>
         <translation>&amp;Neues Deck</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="264"/>
+        <location filename="../src/tab_deck_editor.cpp" line="270"/>
         <source>&amp;Load deck...</source>
         <translation>Deck &amp;laden...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="265"/>
+        <location filename="../src/tab_deck_editor.cpp" line="271"/>
         <source>&amp;Save deck</source>
         <translation>Deck &amp;speichern</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="266"/>
+        <location filename="../src/tab_deck_editor.cpp" line="272"/>
         <source>Save deck &amp;as...</source>
         <translation>Deck s&amp;peichern unter...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="267"/>
+        <location filename="../src/tab_deck_editor.cpp" line="273"/>
         <source>Load deck from cl&amp;ipboard...</source>
         <translation>Deck aus &amp;Zwischenablage laden...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="268"/>
+        <location filename="../src/tab_deck_editor.cpp" line="274"/>
         <source>Save deck to clip&amp;board</source>
         <translation>Deck in Z&amp;wischenablage speichern</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="270"/>
+        <location filename="../src/tab_deck_editor.cpp" line="276"/>
+        <source>&amp;Analyze deck on deckstats.net</source>
+        <translation>Deck auf deckstats.net &amp;analysieren</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="280"/>
         <source>Add card to &amp;maindeck</source>
         <translation>Karte zu&amp;m Hauptdeck hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="271"/>
+        <location filename="../src/tab_deck_editor.cpp" line="281"/>
         <source>Return</source>
         <translation>Return</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="271"/>
+        <location filename="../src/tab_deck_editor.cpp" line="281"/>
         <source>Enter</source>
         <translation>Enter</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="272"/>
+        <location filename="../src/tab_deck_editor.cpp" line="282"/>
         <source>Add card to &amp;sideboard</source>
         <translation>Karte zum &amp;Sideboard hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="273"/>
+        <location filename="../src/tab_deck_editor.cpp" line="283"/>
         <source>Ctrl+Return</source>
         <translation>Ctrl+Return</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="273"/>
+        <location filename="../src/tab_deck_editor.cpp" line="283"/>
         <source>Ctrl+Enter</source>
         <translation>Ctrl+Enter</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="274"/>
+        <location filename="../src/tab_deck_editor.cpp" line="284"/>
         <source>&amp;Remove row</source>
         <translation>Zeile entfe&amp;rnen</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="275"/>
+        <location filename="../src/tab_deck_editor.cpp" line="285"/>
         <source>Del</source>
         <translation>Del</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="276"/>
+        <location filename="../src/tab_deck_editor.cpp" line="286"/>
         <source>&amp;Increment number</source>
         <translation>Anzahl er&amp;höhen</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="277"/>
+        <location filename="../src/tab_deck_editor.cpp" line="287"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="278"/>
+        <location filename="../src/tab_deck_editor.cpp" line="288"/>
         <source>&amp;Decrement number</source>
         <translation>Anzahl v&amp;erringern</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="279"/>
+        <location filename="../src/tab_deck_editor.cpp" line="289"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="281"/>
+        <location filename="../src/tab_deck_editor.cpp" line="291"/>
         <source>&amp;Deck editor</source>
         <translation>&amp;Deck-Editor</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="282"/>
+        <location filename="../src/tab_deck_editor.cpp" line="292"/>
         <source>C&amp;ard database</source>
         <translation>&amp;Kartendatenbank</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="287"/>
+        <location filename="../src/tab_deck_editor.cpp" line="295"/>
+        <source>Edit &amp;tokens...</source>
+        <translation>Spielsteine &amp;bearbeiten...</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="300"/>
         <source>Deck: %1</source>
         <translation>Deck: %1</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="334"/>
+        <location filename="../src/tab_deck_editor.cpp" line="347"/>
         <source>Are you sure?</source>
         <translation>Sind Sie sicher?</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="335"/>
+        <location filename="../src/tab_deck_editor.cpp" line="348"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
         <translation>Die Deckliste wurde verändert.
 Möchten Sie die Änderungen speichern?</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="368"/>
+        <location filename="../src/tab_deck_editor.cpp" line="381"/>
         <source>Load deck</source>
         <translation>Deck laden</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="387"/>
-        <location filename="../src/tab_deck_editor.cpp" line="411"/>
-        <location filename="../src/tab_deck_editor.cpp" line="431"/>
+        <location filename="../src/tab_deck_editor.cpp" line="400"/>
+        <location filename="../src/tab_deck_editor.cpp" line="424"/>
+        <location filename="../src/tab_deck_editor.cpp" line="444"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="387"/>
+        <location filename="../src/tab_deck_editor.cpp" line="400"/>
         <source>The deck could not be saved.</source>
         <translation>Das Deck konnte nicht gespeichert werden.</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="411"/>
-        <location filename="../src/tab_deck_editor.cpp" line="431"/>
+        <location filename="../src/tab_deck_editor.cpp" line="424"/>
+        <location filename="../src/tab_deck_editor.cpp" line="444"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
         <translation>Das Deck konnte nicht gespeichert werden.
 Bitte überprüfen Sie, dass Sie Schreibrechte in dem Verzeichnis haben, und versuchen Sie es erneut.</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="417"/>
+        <location filename="../src/tab_deck_editor.cpp" line="430"/>
         <source>Save deck</source>
         <translation>Deck speichern</translation>
     </message>
@@ -6296,37 +6418,37 @@ Bitte geben Sie einen Namen ein:</translation>
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="480"/>
+        <location filename="../src/dlg_settings.cpp" line="486"/>
         <source>General interface settings</source>
         <translation>Allgemeine Bedienung</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="481"/>
+        <location filename="../src/dlg_settings.cpp" line="487"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation>Karten durch &amp;Doppelklick ausspielen (statt Einzelklick)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="482"/>
+        <location filename="../src/dlg_settings.cpp" line="488"/>
         <source>Animation settings</source>
         <translation>Animationseinstellungen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="483"/>
+        <location filename="../src/dlg_settings.cpp" line="489"/>
         <source>&amp;Tap/untap animation</source>
         <translation>Animiertes &amp;Tappen/Enttappen</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="484"/>
+        <location filename="../src/dlg_settings.cpp" line="490"/>
         <source>Enable &amp;sounds</source>
         <translation>&amp;Sound anschalten</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="485"/>
+        <location filename="../src/dlg_settings.cpp" line="491"/>
         <source>Path to sounds directory:</source>
         <translation>Pfad zum Verzeichnis mit den Sounddateien:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="496"/>
+        <location filename="../src/dlg_settings.cpp" line="502"/>
         <source>Choose path</source>
         <translation>Pfad auswählen</translation>
     </message>
