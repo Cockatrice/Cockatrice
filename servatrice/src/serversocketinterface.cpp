@@ -23,6 +23,7 @@
 #include <QDebug>
 #include "serversocketinterface.h"
 #include "servatrice.h"
+#include "servatrice_database_interface.h"
 #include "decklist.h"
 #include "server_player.h"
 #include "main.h"
@@ -59,8 +60,12 @@
 
 static const int protocolVersion = 14;
 
-ServerSocketInterface::ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent)
-	: Server_ProtocolHandler(_server, parent), servatrice(_server), socket(_socket), messageInProgress(false), handshakeStarted(false)
+ServerSocketInterface::ServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QTcpSocket *_socket, QObject *parent)
+	: Server_ProtocolHandler(_server, _databaseInterface, parent),
+	  servatrice(_server),
+	  socket(_socket),
+	  messageInProgress(false),
+	  handshakeStarted(false)
 {
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(catchSocketError(QAbstractSocket::SocketError)));
@@ -232,20 +237,20 @@ Response::ResponseCode ServerSocketInterface::cmdAddToList(const Command_AddToLi
 		return Response::RespContextError;
 	
 	if (list == "buddy")
-		if (servatrice->isInBuddyList(QString::fromStdString(userInfo->name()), user))
+		if (databaseInterface->isInBuddyList(QString::fromStdString(userInfo->name()), user))
 			return Response::RespContextError;
 	if (list == "ignore")
-		if (servatrice->isInIgnoreList(QString::fromStdString(userInfo->name()), user))
+		if (databaseInterface->isInIgnoreList(QString::fromStdString(userInfo->name()), user))
 			return Response::RespContextError;
 	
 	int id1 = userInfo->id();
-	int id2 = servatrice->getUserIdInDB(user);
+	int id2 = static_cast<Servatrice_DatabaseInterface *>(databaseInterface)->getUserIdInDB(user);
 	if (id2 < 0)
 		return Response::RespNameNotFound;
 	if (id1 == id2)
 		return Response::RespContextError;
 	
-	QMutexLocker locker(&servatrice->dbMutex);
+//	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("insert into " + servatrice->getDbPrefix() + "_" + list + "list (id_user1, id_user2) values(:id1, :id2)");
 	query.bindValue(":id1", id1);
@@ -255,7 +260,7 @@ Response::ResponseCode ServerSocketInterface::cmdAddToList(const Command_AddToLi
 	
 	Event_AddToList event;
 	event.set_list_name(cmd.list());
-	event.mutable_user_info()->CopyFrom(servatrice->getUserData(user));
+	event.mutable_user_info()->CopyFrom(databaseInterface->getUserData(user));
 	rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event));
 	
 	return Response::RespOk;
@@ -273,18 +278,18 @@ Response::ResponseCode ServerSocketInterface::cmdRemoveFromList(const Command_Re
 		return Response::RespContextError;
 	
 	if (list == "buddy")
-		if (!servatrice->isInBuddyList(QString::fromStdString(userInfo->name()), user))
+		if (!databaseInterface->isInBuddyList(QString::fromStdString(userInfo->name()), user))
 			return Response::RespContextError;
 	if (list == "ignore")
-		if (!servatrice->isInIgnoreList(QString::fromStdString(userInfo->name()), user))
+		if (!databaseInterface->isInIgnoreList(QString::fromStdString(userInfo->name()), user))
 			return Response::RespContextError;
 	
 	int id1 = userInfo->id();
-	int id2 = servatrice->getUserIdInDB(user);
+	int id2 = static_cast<Servatrice_DatabaseInterface *>(databaseInterface)->getUserIdInDB(user);
 	if (id2 < 0)
 		return Response::RespNameNotFound;
 	
-	QMutexLocker locker(&servatrice->dbMutex);
+//	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("delete from " + servatrice->getDbPrefix() + "_" + list + "list where id_user1 = :id1 and id_user2 = :id2");
 	query.bindValue(":id1", id1);
@@ -307,7 +312,7 @@ int ServerSocketInterface::getDeckPathId(int basePathId, QStringList path)
 	if (path[0].isEmpty())
 		return 0;
 	
-	QMutexLocker locker(&servatrice->dbMutex);
+//	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent and name = :name and user = :user");
 	query.bindValue(":id_parent", basePathId);
@@ -331,7 +336,7 @@ int ServerSocketInterface::getDeckPathId(const QString &path)
 
 bool ServerSocketInterface::deckListHelper(int folderId, ServerInfo_DeckStorage_Folder *folder)
 {
-	QMutexLocker locker(&servatrice->dbMutex);
+//	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("select id, name from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent and user = :user");
 	query.bindValue(":id_parent", folderId);
@@ -397,7 +402,7 @@ Response::ResponseCode ServerSocketInterface::cmdDeckNewDir(const Command_DeckNe
 	if (folderId == -1)
 		return Response::RespNameNotFound;
 	
-	QMutexLocker locker(&servatrice->dbMutex);
+//	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_folders (id_parent, user, name) values(:id_parent, :user, :name)");
 	query.bindValue(":id_parent", folderId);
@@ -412,7 +417,7 @@ void ServerSocketInterface::deckDelDirHelper(int basePathId)
 {
 	servatrice->checkSql();
 	
-	QMutexLocker locker(&servatrice->dbMutex);
+//	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	
 	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent");
@@ -451,7 +456,7 @@ Response::ResponseCode ServerSocketInterface::cmdDeckDel(const Command_DeckDel &
 	
 	servatrice->checkSql();
 	
-	QMutexLocker locker(&servatrice->dbMutex);
+//	QMutexLocker locker(&servatrice->dbMutex);
 	QSqlQuery query;
 	
 	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_files where id = :id and user = :user");
@@ -490,7 +495,7 @@ Response::ResponseCode ServerSocketInterface::cmdDeckUpload(const Command_DeckUp
 		if (folderId == -1)
 			return Response::RespNameNotFound;
 		
-		QMutexLocker locker(&servatrice->dbMutex);
+//		QMutexLocker locker(&servatrice->dbMutex);
 		QSqlQuery query;
 		query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_files (id_folder, user, name, upload_time, content) values(:id_folder, :user, :name, NOW(), :content)");
 		query.bindValue(":id_folder", folderId);
@@ -506,7 +511,7 @@ Response::ResponseCode ServerSocketInterface::cmdDeckUpload(const Command_DeckUp
 		fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toTime_t());
 		rc.setResponseExtension(re);
 	} else if (cmd.has_deck_id()) {
-		QMutexLocker locker(&servatrice->dbMutex);
+//		QMutexLocker locker(&servatrice->dbMutex);
 		QSqlQuery query;
 		query.prepare("update " + servatrice->getDbPrefix() + "_decklist_files set name=:name, upload_time=NOW(), content=:content where id = :id_deck and user = :user");
 		query.bindValue(":id_deck", cmd.deck_id());
@@ -557,7 +562,7 @@ Response::ResponseCode ServerSocketInterface::cmdReplayList(const Command_Replay
 	
 	Response_ReplayList *re = new Response_ReplayList;
 	
-	servatrice->dbMutex.lock();
+//	servatrice->dbMutex.lock();
 	QSqlQuery query1;
 	query1.prepare("select a.id_game, a.replay_name, b.room_name, b.time_started, b.time_finished, b.descr, a.do_not_hide from cockatrice_replays_access a left join cockatrice_games b on b.id = a.id_game where a.id_player = :id_player and (a.do_not_hide = 1 or date_add(b.time_started, interval 7 day) > now())");
 	query1.bindValue(":id_player", userInfo->id());
@@ -594,7 +599,7 @@ Response::ResponseCode ServerSocketInterface::cmdReplayList(const Command_Replay
 			replayInfo->set_duration(query3.value(1).toInt());
 		}
 	}
-	servatrice->dbMutex.unlock();
+//	servatrice->dbMutex.unlock();
 	
 	rc.setResponseExtension(re);
 	return Response::RespOk;
@@ -605,7 +610,7 @@ Response::ResponseCode ServerSocketInterface::cmdReplayDownload(const Command_Re
 	if (authState != PasswordRight)
 		return Response::RespFunctionNotAllowed;
 	
-	QMutexLocker dbLocker(&servatrice->dbMutex);
+//	QMutexLocker dbLocker(&servatrice->dbMutex);
 	
 	QSqlQuery query1;
 	query1.prepare("select 1 from " + servatrice->getDbPrefix() + "_replays_access a left join " + servatrice->getDbPrefix() + "_replays b on a.id_game = b.id_game where b.id = :id_replay and a.id_player = :id_player");
@@ -638,7 +643,7 @@ Response::ResponseCode ServerSocketInterface::cmdReplayModifyMatch(const Command
 	if (authState != PasswordRight)
 		return Response::RespFunctionNotAllowed;
 	
-	QMutexLocker dbLocker(&servatrice->dbMutex);
+//	QMutexLocker dbLocker(&servatrice->dbMutex);
 	
 	QSqlQuery query1;
 	query1.prepare("update " + servatrice->getDbPrefix() + "_replays_access set do_not_hide=:do_not_hide where id_player = :id_player and id_game = :id_game");
@@ -654,7 +659,7 @@ Response::ResponseCode ServerSocketInterface::cmdReplayDeleteMatch(const Command
 	if (authState != PasswordRight)
 		return Response::RespFunctionNotAllowed;
 	
-	QMutexLocker dbLocker(&servatrice->dbMutex);
+//	QMutexLocker dbLocker(&servatrice->dbMutex);
 	
 	QSqlQuery query1;
 	query1.prepare("delete from " + servatrice->getDbPrefix() + "_replays_access where id_player = :id_player and id_game = :id_game");
@@ -675,7 +680,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 	QString address = QString::fromStdString(cmd.address());
 	int minutes = cmd.minutes();
 	
-	servatrice->dbMutex.lock();
+//	servatrice->dbMutex.lock();
 	QSqlQuery query;
 	query.prepare("insert into " + servatrice->getDbPrefix() + "_bans (user_name, ip_address, id_admin, time_from, minutes, reason, visible_reason) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason, :visible_reason)");
 	query.bindValue(":user_name", userName);
@@ -685,7 +690,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 	query.bindValue(":reason", QString::fromStdString(cmd.reason()));
 	query.bindValue(":visible_reason", QString::fromStdString(cmd.visible_reason()));
 	servatrice->execSqlQuery(query);
-	servatrice->dbMutex.unlock();
+//	servatrice->dbMutex.unlock();
 	
 	QList<ServerSocketInterface *> userList = servatrice->getUsersWithAddressAsList(QHostAddress(address));
 	ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));

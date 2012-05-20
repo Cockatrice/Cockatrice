@@ -6,17 +6,18 @@ SET(servatrice_SOURCES
  src/main.cpp
  src/passwordhasher.cpp
  src/servatrice.cpp 
+ src/servatrice_database_interface.cpp
  src/server_logger.cpp 
  src/serversocketinterface.cpp 
- src/serversocketthread.cpp
  src/isl_interface.cpp
  ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
 )
 SET(servatrice_HEADERS
  src/servatrice.h 
+ src/servatrice_connection_pool.h
+ src/servatrice_database_interface.h
  src/server_logger.h 
  src/serversocketinterface.h 
- src/serversocketthread.h
  src/isl_interface.h
 )
 

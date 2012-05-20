@@ -10,6 +10,7 @@
 #include "serverinfo_user_container.h"
 #include "pb/response.pb.h"
 
+class Server_DatabaseInterface;
 class Server_ProtocolHandler;
 class RoomEvent;
 class ServerInfo_User;
@@ -66,7 +67,7 @@ public:
 	const QMap<QString, ServerInfo_User_Container> &getExternalUsers() const { return externalUsers; }
 	void updateExternalGameList(const ServerInfo_Game &gameInfo);
 	
-	Response::ResponseCode processJoinGameCommand(const Command_JoinGame &cmd, ResponseContainer &rc, Server_AbstractUserInterface *userInterface);
+	Response::ResponseCode processJoinGameCommand(const Command_JoinGame &cmd, ResponseContainer &rc, Server_AbstractUserInterface *userInterface, Server_DatabaseInterface *databaseInterface);
 	
 	void say(const QString &userName, const QString &s, bool sendToIsl = true);
 	

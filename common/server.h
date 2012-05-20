@@ -10,6 +10,7 @@
 #include "pb/serverinfo_user.pb.h"
 #include "server_player_reference.h"
 
+class Server_DatabaseInterface;
 class Server_Game;
 class Server_Room;
 class Server_ProtocolHandler;
@@ -35,16 +36,15 @@ signals:
 	void pingClockTimeout();
 	void sigSendIslMessage(const IslMessage &message, int serverId);
 	void logDebugMessage(QString message, void *caller);
+	void endSession(qint64 sessionId);
 private slots:
 	void broadcastRoomUpdate(const ServerInfo_Room &roomInfo, bool sendToIsl = false);
 public:
 	mutable QReadWriteLock clientsLock, roomsLock; // locking order: roomsLock before clientsLock
 	Server(QObject *parent = 0);
 	~Server();
-	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason, int &secondsLeft);
+	AuthenticationResult loginUser(Server_DatabaseInterface *sessionDatabaseInterface, Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason, int &secondsLeft);
 	const QMap<int, Server_Room *> &getRooms() { return rooms; }
-	virtual int getNextGameId() { return nextGameId++; }
-	virtual int getNextReplayId() { return nextReplayId++; }
 	
 	const QMap<QString, Server_ProtocolHandler *> &getUsers() const { return users; }
 	const QMap<qint64, Server_ProtocolHandler *> &getUsersBySessionId() const { return usersBySessionId; }
@@ -60,11 +60,6 @@ public:
 	virtual int getMaxMessageSizePerInterval() const { return 0; }
 	virtual int getMaxGamesPerUser() const { return 0; }
 	virtual bool getThreaded() const { return false; }
-	
-	virtual QMap<QString, ServerInfo_User> getBuddyList(const QString &name) { return QMap<QString, ServerInfo_User>(); }
-	virtual QMap<QString, ServerInfo_User> getIgnoreList(const QString &name) { return QMap<QString, ServerInfo_User>(); }
-	virtual bool isInBuddyList(const QString &whoseList, const QString &who) { return false; }
-	virtual bool isInIgnoreList(const QString &whoseList, const QString &who) { return false; }
 	
 	virtual void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays) { }
 	virtual DeckList *getDeckFromDatabase(int deckId, const QString &userName) { return 0; }
@@ -101,6 +96,8 @@ protected slots:
 	virtual void doSendIslMessage(const IslMessage &msg, int serverId) { }
 protected:
 	void prepareDestroy();
+	void setDatabaseInterface(Server_DatabaseInterface *_databaseInterface);
+	Server_DatabaseInterface *databaseInterface;
 	QList<Server_ProtocolHandler *> clients;
 	QMap<qint64, Server_ProtocolHandler *> usersBySessionId;
 	QMap<QString, Server_ProtocolHandler *> users;
@@ -108,20 +105,9 @@ protected:
 	QMap<QString, Server_AbstractUserInterface *> externalUsers;
 	QMap<int, Server_Room *> rooms;
 	
-	virtual qint64 startSession(const QString &userName, const QString &address) { return 0; }
-	virtual void endSession(qint64 sessionId) { }
-	virtual bool userExists(const QString &user) { return false; }
-	virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reason, int &secondsLeft) { return UnknownUser; }
-	virtual ServerInfo_User getUserData(const QString &name, bool withId = false) = 0;
 	int getUsersCount() const;
 	int getGamesCount() const;
-	int nextGameId, nextReplayId;
 	void addRoom(Server_Room *newRoom);
-
-	virtual void clearSessionTables() { }
-	virtual void lockSessionTables() { }
-	virtual void unlockSessionTables() { }
-	virtual bool userSessionExists(const QString &userName) { return false; }
 };
 
 #endif

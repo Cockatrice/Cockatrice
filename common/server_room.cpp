@@ -169,7 +169,7 @@ void Server_Room::updateExternalGameList(const ServerInfo_Game &gameInfo)
 	emit roomInfoChanged(getInfo(roomInfo, false, false, true));
 }
 
-Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGame &cmd, ResponseContainer &rc, Server_AbstractUserInterface *userInterface)
+Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGame &cmd, ResponseContainer &rc, Server_AbstractUserInterface *userInterface, Server_DatabaseInterface *databaseInterface)
 {
 	// This function is called from the Server thread and from the S_PH thread.
 	// server->roomsMutex is always locked.
@@ -191,7 +191,7 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
 	
 	QMutexLocker gameLocker(&g->gameMutex);
 	
-	Response::ResponseCode result = g->checkJoin(userInterface->getUserInfo(), QString::fromStdString(cmd.password()), cmd.spectator(), cmd.override_restrictions());
+	Response::ResponseCode result = g->checkJoin(databaseInterface, userInterface->getUserInfo(), QString::fromStdString(cmd.password()), cmd.spectator(), cmd.override_restrictions());
 	if (result == Response::RespOk)
 		g->addPlayer(userInterface, rc, cmd.spectator());
 	

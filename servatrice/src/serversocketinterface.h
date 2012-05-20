@@ -27,6 +27,7 @@
 
 class QTcpSocket;
 class Servatrice;
+class Servatrice_DatabaseInterface;
 class DeckList;
 class ServerInfo_DeckStorage_Folder;
 
@@ -91,7 +92,7 @@ private:
 	Response::ResponseCode processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);
 	Response::ResponseCode processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc);
 public:
-	ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent = 0);
+	ServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QTcpSocket *_socket, QObject *parent = 0);
 	~ServerSocketInterface();
 	void initSessionDeprecated();
 	bool initSession();

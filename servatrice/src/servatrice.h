@@ -26,6 +26,7 @@
 #include <QSslKey>
 #include <QHostAddress>
 #include <QReadWriteLock>
+#include <QSqlDatabase>
 #include "server.h"
 
 class QSqlDatabase;
@@ -35,6 +36,7 @@ class QTimer;
 
 class GameReplay;
 class Servatrice;
+class Servatrice_ConnectionPool;
 class ServerSocketInterface;
 class IslInterface;
 
@@ -43,9 +45,9 @@ class Servatrice_GameServer : public QTcpServer {
 private:
 	Servatrice *server;
 	bool threaded;
+	QList<Servatrice_ConnectionPool *> connectionPools;
 public:
-	Servatrice_GameServer(Servatrice *_server, bool _threaded, QObject *parent = 0)
-		: QTcpServer(parent), server(_server), threaded(_threaded) { }
+	Servatrice_GameServer(Servatrice *_server, bool _threaded, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent = 0);
 protected:
 	void incomingConnection(int socketDescriptor);
 };
@@ -79,13 +81,45 @@ public:
 class Servatrice : public Server
 {
 	Q_OBJECT
+public:
+	enum AuthenticationMethod { AuthenticationNone, AuthenticationSql };
 private slots:
 	void statusUpdate();
 	void shutdownTimeout();
+protected:
+	void doSendIslMessage(const IslMessage &msg, int serverId);
+private:
+	enum DatabaseType { DatabaseNone, DatabaseMySql };
+	AuthenticationMethod authenticationMethod;
+	DatabaseType databaseType;
+	QSqlDatabase sqlDatabase;
+	QTimer *pingClock, *statusUpdateClock;
+	Servatrice_GameServer *gameServer;
+	Servatrice_IslServer *islServer;
+	QString serverName;
+	QString loginMessage;
+	QString dbPrefix;
+	QSettings *settings;
+	int serverId;
+	bool threaded;
+	int uptime;
+	QMutex txBytesMutex, rxBytesMutex;
+	quint64 txBytes, rxBytes;
+	int maxGameInactivityTime, maxPlayerInactivityTime;
+	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser;
+	
+	QString shutdownReason;
+	int shutdownMinutes;
+	QTimer *shutdownTimer;
+	
+	mutable QMutex serverListMutex;
+	QList<ServerProperties> serverList;
+	void updateServerList();
+	
+	QMap<int, IslInterface *> islInterfaces;
 public slots:
 	void scheduleShutdown(const QString &reason, int minutes);
 public:
-	mutable QMutex dbMutex;
 	Servatrice(QSettings *_settings, QObject *parent = 0);
 	~Servatrice();
 	bool initServer();
@@ -102,22 +136,15 @@ public:
 	int getMaxMessageCountPerInterval() const { return maxMessageCountPerInterval; }
 	int getMaxMessageSizePerInterval() const { return maxMessageSizePerInterval; }
 	int getMaxGamesPerUser() const { return maxGamesPerUser; }
+	AuthenticationMethod getAuthenticationMethod() const { return authenticationMethod; }
 	bool getThreaded() const { return threaded; }
 	QString getDbPrefix() const { return dbPrefix; }
 	int getServerId() const { return serverId; }
 	void updateLoginMessage();
-	ServerInfo_User getUserData(const QString &name, bool withId = false);
 	int getUsersWithAddress(const QHostAddress &address) const;
 	QList<ServerSocketInterface *> getUsersWithAddressAsList(const QHostAddress &address) const;
-	QMap<QString, ServerInfo_User> getBuddyList(const QString &name);
-	QMap<QString, ServerInfo_User> getIgnoreList(const QString &name);
-	bool isInBuddyList(const QString &whoseList, const QString &who);
-	bool isInIgnoreList(const QString &whoseList, const QString &who);
 	void incTxBytes(quint64 num);
 	void incRxBytes(quint64 num);
-	int getUserIdInDB(const QString &name);
-	int getNextGameId();
-	int getNextReplayId();
 	void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays);
 	DeckList *getDeckFromDatabase(int deckId, const QString &userName);
 	
@@ -127,48 +154,6 @@ public:
 	QReadWriteLock islLock;
 
 	QList<ServerProperties> getServerList() const;
-protected:
-	qint64 startSession(const QString &userName, const QString &address);
-	void endSession(qint64 sessionId);
-	bool userExists(const QString &user);
-	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &secondsLeft);
-	
-	void clearSessionTables();
-	void lockSessionTables();
-	void unlockSessionTables();
-	bool userSessionExists(const QString &userName);
-	
-	void doSendIslMessage(const IslMessage &msg, int serverId);
-private:
-	enum AuthenticationMethod { AuthenticationNone, AuthenticationSql };
-	enum DatabaseType { DatabaseNone, DatabaseMySql };
-	AuthenticationMethod authenticationMethod;
-	DatabaseType databaseType;
-	QTimer *pingClock, *statusUpdateClock;
-	Servatrice_GameServer *gameServer;
-	Servatrice_IslServer *islServer;
-	QString serverName;
-	QString loginMessage;
-	QString dbPrefix;
-	QSettings *settings;
-	int serverId;
-	bool threaded;
-	int uptime;
-	QMutex txBytesMutex, rxBytesMutex;
-	quint64 txBytes, rxBytes;
-	int maxGameInactivityTime, maxPlayerInactivityTime;
-	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser;
-	ServerInfo_User evalUserQueryResult(const QSqlQuery &query, bool complete, bool withId = false);
-	
-	QString shutdownReason;
-	int shutdownMinutes;
-	QTimer *shutdownTimer;
-	
-	mutable QMutex serverListMutex;
-	QList<ServerProperties> serverList;
-	void updateServerList();
-	
-	QMap<int, IslInterface *> islInterfaces;
 };
 
 #endif

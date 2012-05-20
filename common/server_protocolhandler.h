@@ -8,6 +8,7 @@
 #include "pb/response.pb.h"
 #include "pb/server_message.pb.h"
 
+class Server_DatabaseInterface;
 class Server_Player;
 class ServerInfo_User;
 class Server_Room;
@@ -43,11 +44,11 @@ class Server_ProtocolHandler : public QObject, public Server_AbstractUserInterfa
 protected:
 	QMap<int, Server_Room *> rooms;
 
+	Server_DatabaseInterface *databaseInterface;
 	AuthenticationResult authState;
 	bool acceptsUserListChanges;
 	bool acceptsRoomListChanges;
 private:
-	
 	QList<int> messageSizeOverTime, messageCountOverTime;
 	int timeRunning, lastDataReceived;
 	QTimer *pingClock;
@@ -82,12 +83,13 @@ signals:
 public slots:
 	void prepareDestroy();
 public:
-	Server_ProtocolHandler(Server *_server, QObject *parent = 0);
+	Server_ProtocolHandler(Server *_server, Server_DatabaseInterface *_databaseInterface, QObject *parent = 0);
 	~Server_ProtocolHandler();
 	
 	bool getAcceptsUserListChanges() const { return acceptsUserListChanges; }
 	bool getAcceptsRoomListChanges() const { return acceptsRoomListChanges; }
 	virtual QString getAddress() const = 0;
+	Server_DatabaseInterface *getDatabaseInterface() const { return databaseInterface; }
 
 	int getLastCommandTime() const { return timeRunning - lastDataReceived; }
 	void processCommandContainer(const CommandContainer &cont);

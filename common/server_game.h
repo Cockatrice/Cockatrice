@@ -28,7 +28,6 @@
 #include <QMap>
 #include "server_response_containers.h"
 #include "pb/response.pb.h"
-//#include "pb/serverinfo_player.pb.h"
 #include "pb/serverinfo_game.pb.h"
 
 class QTimer;
@@ -40,6 +39,7 @@ class ServerInfo_User;
 class ServerInfo_Player;
 class ServerInfo_Game;
 class Server_AbstractUserInterface;
+class Server_DatabaseInterface;
 class Event_GameStateChanged;
 
 class Server_Game : public QObject {
@@ -99,7 +99,7 @@ public:
 	bool getSpectatorsNeedPassword() const { return spectatorsNeedPassword; }
 	bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
 	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
-	Response::ResponseCode checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions);
+	Response::ResponseCode checkJoin(Server_DatabaseInterface *databaseInterface, ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions);
 	bool containsUser(const QString &userName) const;
 	void addPlayer(Server_AbstractUserInterface *userInterface, ResponseContainer &rc, bool spectator, bool broadcastUpdate = true);
 	void removePlayer(Server_Player *player);

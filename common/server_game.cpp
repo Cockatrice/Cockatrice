@@ -25,6 +25,7 @@
 #include "server_arrow.h"
 #include "server_card.h"
 #include "server_cardzone.h"
+#include "server_database_interface.h"
 #include "decklist.h"
 #include "pb/context_connection_state_changed.pb.h"
 #include "pb/context_ping_changed.pb.h"
@@ -339,7 +340,7 @@ void Server_Game::stopGameIfFinished()
 	emit gameInfoChanged(gameInfo);
 }
 
-Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions)
+Response::ResponseCode Server_Game::checkJoin(Server_DatabaseInterface *databaseInterface, ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions)
 {
 	{
 		QMapIterator<int, Server_Player *> playerIterator(players);
@@ -353,9 +354,9 @@ Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user, const QStri
 		if (!(user->user_level() & ServerInfo_User::IsRegistered) && onlyRegistered)
 			return Response::RespUserLevelTooLow;
 		if (onlyBuddies)
-			if (!room->getServer()->isInBuddyList(QString::fromStdString(creatorInfo->name()), QString::fromStdString(user->name())))
+			if (!databaseInterface->isInBuddyList(QString::fromStdString(creatorInfo->name()), QString::fromStdString(user->name())))
 				return Response::RespOnlyBuddies;
-		if (room->getServer()->isInIgnoreList(QString::fromStdString(creatorInfo->name()), QString::fromStdString(user->name())))
+		if (databaseInterface->isInIgnoreList(QString::fromStdString(creatorInfo->name()), QString::fromStdString(user->name())))
 			return Response::RespInIgnoreList;
 		if (spectator) {
 			if (!spectatorsAllowed)

@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QDateTime>
 #include "server_protocolhandler.h"
+#include "server_database_interface.h"
 #include "server_room.h"
 #include "server_game.h"
 #include "server_player.h"
@@ -19,8 +20,15 @@
 #include "pb/event_room_say.pb.h"
 #include <google/protobuf/descriptor.h>
 
-Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, QObject *parent)
-	: QObject(parent), Server_AbstractUserInterface(_server), authState(NotLoggedIn), acceptsUserListChanges(false), acceptsRoomListChanges(false), timeRunning(0), lastDataReceived(0)
+Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, Server_DatabaseInterface *_databaseInterface, QObject *parent)
+	: QObject(parent),
+	  Server_AbstractUserInterface(_server),
+	  databaseInterface(_databaseInterface),
+	  authState(NotLoggedIn),
+	  acceptsUserListChanges(false),
+	  acceptsRoomListChanges(false),
+	  timeRunning(0),
+	  lastDataReceived(0)
 {
 	connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
@@ -309,7 +317,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 		return Response::RespContextError;
 	QString reasonStr;
 	int banSecondsLeft = 0;
-	AuthenticationResult res = server->loginUser(this, userName, QString::fromStdString(cmd.password()), reasonStr, banSecondsLeft);
+	AuthenticationResult res = server->loginUser(databaseInterface, this, userName, QString::fromStdString(cmd.password()), reasonStr, banSecondsLeft);
 	switch (res) {
 		case UserIsBanned: {
 			Response_Login *re = new Response_Login;
@@ -333,11 +341,11 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 	re->mutable_user_info()->CopyFrom(copyUserInfo(true));
 	
 	if (authState == PasswordRight) {
-		QMapIterator<QString, ServerInfo_User> buddyIterator(server->getBuddyList(userName));
+		QMapIterator<QString, ServerInfo_User> buddyIterator(databaseInterface->getBuddyList(userName));
 		while (buddyIterator.hasNext())
 			re->add_buddy_list()->CopyFrom(buddyIterator.next().value());
 	
-		QMapIterator<QString, ServerInfo_User> ignoreIterator(server->getIgnoreList(userName));
+		QMapIterator<QString, ServerInfo_User> ignoreIterator(databaseInterface->getIgnoreList(userName));
 		while (ignoreIterator.hasNext())
 			re->add_ignore_list()->CopyFrom(ignoreIterator.next().value());
 	}
@@ -362,7 +370,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
 		if (!userInterface)
 			return Response::RespNameNotFound;
 	}
-	if (server->isInIgnoreList(receiver, QString::fromStdString(userInfo->name())))
+	if (databaseInterface->isInIgnoreList(receiver, QString::fromStdString(userInfo->name())))
 		return Response::RespInIgnoreList;
 	
 	Event_UserMessage event;
@@ -488,9 +496,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdListUsers(const Command_ListUs
 	QMapIterator<QString, Server_AbstractUserInterface *> extIterator = server->getExternalUsers();
 	while (extIterator.hasNext())
 		re->add_user_list()->CopyFrom(extIterator.next().value()->copyUserInfo(false));
-	server->clientsLock.unlock();
 	
 	acceptsUserListChanges = true;
+	server->clientsLock.unlock();
 	
 	rc.setResponseExtension(re);
 	return Response::RespOk;
@@ -561,5 +569,5 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinGame(const Command_JoinGam
 	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
-	return room->processJoinGameCommand(cmd, rc, this);
+	return room->processJoinGameCommand(cmd, rc, this, databaseInterface);
 }

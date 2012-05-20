@@ -13,6 +13,7 @@ SET(common_SOURCES
 	server_card.cpp
 	server_cardzone.cpp
 	server_counter.cpp
+	server_database_interface.cpp
 	server_game.cpp
 	server_player.cpp
 	server_protocolhandler.cpp
@@ -30,6 +31,7 @@ SET(common_HEADERS
 	server.h
 	server_arrowtarget.h
 	server_card.h
+	server_database_interface.h
 	server_game.h
 	server_player.h
 	server_protocolhandler.h
