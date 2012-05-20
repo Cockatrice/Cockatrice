@@ -181,6 +181,7 @@ set(cockatrice_TS
         translations/cockatrice_ru.ts
         translations/cockatrice_sk.ts
 	translations/cockatrice_sv.ts
+	translations/cockatrice_zh_CN.ts
 )
 
 if(WIN32)
