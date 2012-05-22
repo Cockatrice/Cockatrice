@@ -361,7 +361,7 @@ ResponseCode ServerSocketInterface::cmdDeckDelDir(Command_DeckDelDir *cmd, Comma
 	servatrice->checkSql();
 	
 	int basePathId = getDeckPathId(cmd->getPath());
-	if (basePathId == -1)
+	if ((basePathId == -1) || (basePathId == 0))
 		return RespNameNotFound;
 	deckDelDirHelper(basePathId);
 	return RespOk;
