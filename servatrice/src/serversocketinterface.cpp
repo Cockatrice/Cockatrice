@@ -443,8 +443,8 @@ Response::ResponseCode ServerSocketInterface::cmdDeckDelDir(const Command_DeckDe
 	servatrice->checkSql();
 	
 	int basePathId = getDeckPathId(QString::fromStdString(cmd.path()));
-	if (basePathId == -1)
-		return Response::RespNameNotFound;
+	if ((basePathId == -1) || (basePathId == 0))
+		return RespNameNotFound;
 	deckDelDirHelper(basePathId);
 	return Response::RespOk;
 }
