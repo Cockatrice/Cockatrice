@@ -77,7 +77,7 @@ public:
 class Player : public QObject, public QGraphicsItem {
 	Q_OBJECT
 signals:
-	void openDeckEditor(const DeckLoader &deck);
+	void openDeckEditor(const DeckLoader *deck);
 	void newCardAdded(AbstractCardItem *card);
 	// Log events
 	void logSay(Player *player, QString message);

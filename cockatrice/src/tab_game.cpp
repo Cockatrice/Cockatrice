@@ -733,7 +733,7 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
 {
 	bool local = ((clients.size() > 1) || (playerId == localPlayerId));
 	Player *newPlayer = new Player(info, playerId, local, this);
-	connect(newPlayer, SIGNAL(openDeckEditor(DeckList *)), this, SIGNAL(openDeckEditor(DeckList *)));
+	connect(newPlayer, SIGNAL(openDeckEditor(const DeckLoader *)), this, SIGNAL(openDeckEditor(const DeckLoader *)));
 	scene->addPlayer(newPlayer);
 
 	connect(newPlayer, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));

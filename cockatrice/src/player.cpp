@@ -792,7 +792,7 @@ void Player::actAlwaysRevealTopCard()
 
 void Player::actOpenDeckInDeckEditor()
 {
-	emit openDeckEditor(*deck);
+	emit openDeckEditor(deck);
 }
 
 void Player::actViewGraveyard()

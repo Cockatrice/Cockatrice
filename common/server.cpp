@@ -35,8 +35,8 @@
 #include <QThread>
 #include <QDebug>
 
-Server::Server(QObject *parent)
-	: QObject(parent), clientsLock(QReadWriteLock::Recursive)
+Server::Server(bool _threaded, QObject *parent)
+	: QObject(parent), threaded(_threaded), clientsLock(QReadWriteLock::Recursive)
 {
 	qRegisterMetaType<ServerInfo_Game>("ServerInfo_Game");
 	qRegisterMetaType<ServerInfo_Room>("ServerInfo_Room");
@@ -56,20 +56,27 @@ Server::~Server()
 
 void Server::prepareDestroy()
 {
-	clientsLock.lockForRead();
-	for (int i = 0; i < clients.size(); ++i)
-		QMetaObject::invokeMethod(clients.at(i), "prepareDestroy", Qt::QueuedConnection);
-	clientsLock.unlock();
-	
 	// dirty :(
-	bool done = false;
-	do {
-		usleep(10000);
+	if (threaded) {
 		clientsLock.lockForRead();
-		if (clients.isEmpty())
-			done = true;
+		for (int i = 0; i < clients.size(); ++i)
+			QMetaObject::invokeMethod(clients.at(i), "prepareDestroy", Qt::QueuedConnection);
 		clientsLock.unlock();
-	} while (!done);
+		
+		bool done = false;
+		do {
+			usleep(10000);
+			clientsLock.lockForRead();
+			if (clients.isEmpty())
+				done = true;
+			clientsLock.unlock();
+		} while (!done);
+	} else {
+		clientsLock.lockForWrite();
+		while (!clients.isEmpty())
+			clients.first()->prepareDestroy();
+		clientsLock.unlock();
+	}
 	
 	roomsLock.lockForWrite();
 	QMapIterator<int, Server_Room *> roomIterator(rooms);

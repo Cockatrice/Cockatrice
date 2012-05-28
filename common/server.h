@@ -41,7 +41,7 @@ private slots:
 	void broadcastRoomUpdate(const ServerInfo_Room &roomInfo, bool sendToIsl = false);
 public:
 	mutable QReadWriteLock clientsLock, roomsLock; // locking order: roomsLock before clientsLock
-	Server(QObject *parent = 0);
+	Server(bool _threaded, QObject *parent = 0);
 	~Server();
 	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason, int &secondsLeft);
 	const QMap<int, Server_Room *> &getRooms() { return rooms; }
@@ -79,6 +79,7 @@ public:
 	void removePersistentPlayer(const QString &userName, int roomId, int gameId, int playerId);
 	QList<PlayerReference> getPersistentPlayerReferences(const QString &userName) const;
 private:
+	bool threaded;
 	QMultiMap<QString, PlayerReference> persistentPlayers;
 	mutable QReadWriteLock persistentPlayersLock;
 protected slots:	

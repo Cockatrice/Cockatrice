@@ -280,8 +280,7 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
 	TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event, roomGameTypes);
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
 	connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
-	connect(tab, SIGNAL(openDeckEditor(DeckList *, QString, DeckList::FileFormat)), this, SLOT(addDeckEditorTab(DeckList *, QString, DeckList::FileFormat)));
-	connect(tab, SIGNAL(openDeckEditor(DeckList *, int)), this, SLOT(addDeckEditorTab(DeckList *, int)));
+	connect(tab, SIGNAL(openDeckEditor(const DeckLoader *)), this, SLOT(addDeckEditorTab(const DeckLoader *)));
 	int tabIndex = myAddTab(tab);
 	addCloseButtonToTab(tab, tabIndex);
 	gameTabs.insert(event.game_info().game_id(), tab);
@@ -292,7 +291,7 @@ void TabSupervisor::localGameJoined(const Event_GameJoined &event)
 {
 	TabGame *tab = new TabGame(this, localClients, event, QMap<int, QString>());
 	connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
-	connect(tab, SIGNAL(openDeckEditor(DeckList *)), this, SLOT(addDeckEditorTab(DeckList *)));
+	connect(tab, SIGNAL(openDeckEditor(const DeckLoader *)), this, SLOT(addDeckEditorTab(const DeckLoader *)));
 	int tabIndex = myAddTab(tab);
 	addCloseButtonToTab(tab, tabIndex);
 	gameTabs.insert(event.game_info().game_id(), tab);

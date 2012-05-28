@@ -3,7 +3,7 @@
 #include "server_room.h"
 
 LocalServer::LocalServer(QObject *parent)
-	: Server(parent)
+	: Server(false, parent)
 {
 	setDatabaseInterface(new LocalServer_DatabaseInterface(this));
 	addRoom(new Server_Room(0, QString(), QString(), false, QString(), QStringList(), this));

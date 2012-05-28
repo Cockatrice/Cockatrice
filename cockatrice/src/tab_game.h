@@ -171,7 +171,7 @@ signals:
 	void containerProcessingStarted(const GameEventContext &context);
 	void containerProcessingDone();
 	void openMessageDialog(const QString &userName, bool focus);
-	void openDeckEditor(const DeckLoader &deck);
+	void openDeckEditor(const DeckLoader *deck);
 private slots:
 	void replayNextEvent();
 	void replayFinished();
