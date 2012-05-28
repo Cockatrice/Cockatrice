@@ -18,9 +18,11 @@ private:
 	ServerInfo_User evalUserQueryResult(const QSqlQuery &query, bool complete, bool withId = false);
 protected:
 	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &secondsLeft);
+public slots:
+	void initDatabase(const QSqlDatabase &_sqlDatabase);
 public:
 	Servatrice_DatabaseInterface(int _instanceId, Servatrice *_server);
-	void initDatabase(const QSqlDatabase &_sqlDatabase);
+	~Servatrice_DatabaseInterface();
 	void initDatabase(const QString &type, const QString &hostName, const QString &databaseName, const QString &userName, const QString &password);
 	bool openDatabase();
 	bool checkSql();

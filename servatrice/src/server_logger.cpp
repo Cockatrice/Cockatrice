@@ -47,7 +47,7 @@ void ServerLogger::logMessage(QString message, void *caller)
 	QString callerString;
 	if (caller)
 		callerString = QString::number((qulonglong) caller, 16) + " ";
-	buffer.append(QDateTime::currentDateTime().toString() + " " + QString::number((qulonglong) QThread::currentThread(), 16) + " " + callerString + message);
+	buffer.append(QDateTime::currentDateTime().toString() + " " + callerString + message);
 	bufferMutex.unlock();
 	
 	emit sigFlushBuffer();

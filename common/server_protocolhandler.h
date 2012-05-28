@@ -43,7 +43,8 @@ class Server_ProtocolHandler : public QObject, public Server_AbstractUserInterfa
 	Q_OBJECT
 protected:
 	QMap<int, Server_Room *> rooms;
-
+	
+	bool deleted;
 	Server_DatabaseInterface *databaseInterface;
 	AuthenticationResult authState;
 	bool acceptsUserListChanges;

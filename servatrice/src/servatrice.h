@@ -44,10 +44,10 @@ class Servatrice_GameServer : public QTcpServer {
 	Q_OBJECT
 private:
 	Servatrice *server;
-	bool threaded;
 	QList<Servatrice_ConnectionPool *> connectionPools;
 public:
-	Servatrice_GameServer(Servatrice *_server, bool _threaded, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent = 0);
+	Servatrice_GameServer(Servatrice *_server, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent = 0);
+	~Servatrice_GameServer();
 protected:
 	void incomingConnection(int socketDescriptor);
 };
@@ -102,7 +102,6 @@ private:
 	QSettings *settings;
 	Servatrice_DatabaseInterface *servatriceDatabaseInterface;
 	int serverId;
-	bool threaded;
 	int uptime;
 	QMutex txBytesMutex, rxBytesMutex;
 	quint64 txBytes, rxBytes;
@@ -135,7 +134,6 @@ public:
 	int getMaxMessageSizePerInterval() const { return maxMessageSizePerInterval; }
 	int getMaxGamesPerUser() const { return maxGamesPerUser; }
 	AuthenticationMethod getAuthenticationMethod() const { return authenticationMethod; }
-	bool getThreaded() const { return threaded; }
 	QString getDbPrefix() const { return dbPrefix; }
 	int getServerId() const { return serverId; }
 	void updateLoginMessage();
@@ -144,6 +142,7 @@ public:
 	void incTxBytes(quint64 num);
 	void incRxBytes(quint64 num);
 	void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays);
+	void addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface);
 	
 	bool islConnectionExists(int serverId) const;
 	void addIslInterface(int serverId, IslInterface *interface);

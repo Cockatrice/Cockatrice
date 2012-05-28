@@ -11,13 +11,13 @@ class Servatrice_ConnectionPool : public QObject {
 	Q_OBJECT
 private:
 	Servatrice_DatabaseInterface *databaseInterface;
+	bool threaded;
 	mutable QMutex clientCountMutex;
 	int clientCount;
 public:
-	Servatrice_ConnectionPool(Servatrice_DatabaseInterface *_databaseInterface)
-		: databaseInterface(_databaseInterface), clientCount(0)
-	{
-	}
+	Servatrice_ConnectionPool(Servatrice_DatabaseInterface *_databaseInterface);
+	~Servatrice_ConnectionPool();
+	
 	Servatrice_DatabaseInterface *getDatabaseInterface() const { return databaseInterface; }
 	
 	int getClientCount() const { QMutexLocker locker(&clientCountMutex); return clientCount; }

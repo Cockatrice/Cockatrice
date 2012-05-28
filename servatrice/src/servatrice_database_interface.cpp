@@ -15,6 +15,11 @@ Servatrice_DatabaseInterface::Servatrice_DatabaseInterface(int _instanceId, Serv
 {
 }
 
+Servatrice_DatabaseInterface::~Servatrice_DatabaseInterface()
+{
+	sqlDatabase.close();
+}
+
 void Servatrice_DatabaseInterface::initDatabase(const QSqlDatabase &_sqlDatabase)
 {
 	sqlDatabase = QSqlDatabase::cloneDatabase(_sqlDatabase, "pool_" + QString::number(instanceId));

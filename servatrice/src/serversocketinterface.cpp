@@ -61,14 +61,15 @@
 
 static const int protocolVersion = 14;
 
-ServerSocketInterface::ServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QTcpSocket *_socket, QObject *parent)
+ServerSocketInterface::ServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QObject *parent)
 	: Server_ProtocolHandler(_server, _databaseInterface, parent),
 	  servatrice(_server),
 	  sqlInterface(reinterpret_cast<Servatrice_DatabaseInterface *>(databaseInterface)),
-	  socket(_socket),
 	  messageInProgress(false),
 	  handshakeStarted(false)
 {
+	socket = new QTcpSocket(this);
+	socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(catchSocketError(QAbstractSocket::SocketError)));
 	connect(this, SIGNAL(outputBufferChanged()), this, SLOT(flushOutputBuffer()), Qt::QueuedConnection);
@@ -79,8 +80,13 @@ ServerSocketInterface::~ServerSocketInterface()
 	logger->logMessage("ServerSocketInterface destructor", this);
 	
 	flushOutputBuffer();
-	delete socket;
-	socket = 0;
+}
+
+void ServerSocketInterface::initConnection(int socketDescriptor)
+{
+	socket->setSocketDescriptor(socketDescriptor);
+	logger->logMessage(QString("Incoming connection: %1").arg(socket->peerAddress().toString()), this);
+	initSessionDeprecated();
 }
 
 void ServerSocketInterface::initSessionDeprecated()

@@ -23,6 +23,7 @@
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, Server_DatabaseInterface *_databaseInterface, QObject *parent)
 	: QObject(parent),
 	  Server_AbstractUserInterface(_server),
+	  deleted(false),
 	  databaseInterface(_databaseInterface),
 	  authState(NotLoggedIn),
 	  acceptsUserListChanges(false),
@@ -39,7 +40,9 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 
 void Server_ProtocolHandler::prepareDestroy()
 {
-	qDebug("Server_ProtocolHandler::prepareDestroy");
+	if (deleted)
+		return;
+	deleted = true;
 	
 	QMapIterator<int, Server_Room *> roomIterator(rooms);
 	while (roomIterator.hasNext())

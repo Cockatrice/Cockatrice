@@ -17,8 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include <QtSql>
+#include <QSqlQuery>
 #include <QSettings>
+#include <QFile>
+#include <QTimer>
+#include <QDateTime>
 #include <QDebug>
 #include <iostream>
 #include "servatrice.h"
@@ -36,20 +39,33 @@
 #include "pb/event_server_shutdown.pb.h"
 #include "pb/event_connection_closed.pb.h"
 
-Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server, bool _threaded, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent)
+Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent)
 	: QTcpServer(parent),
-	  server(_server),
-	  threaded(_threaded)
+	  server(_server)
 {
 	for (int i = 0; i < _numberPools; ++i) {
 		Servatrice_DatabaseInterface *newDatabaseInterface = new Servatrice_DatabaseInterface(i, server);
 		Servatrice_ConnectionPool *newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
 		
-		// ---
-		newDatabaseInterface->initDatabase(_sqlDatabase);
-		// ---
+		QThread *newThread = new QThread;
+		newPool->moveToThread(newThread);
+		newDatabaseInterface->moveToThread(newThread);
+		server->addDatabaseInterface(newThread, newDatabaseInterface);
+		
+		newThread->start();
+		QMetaObject::invokeMethod(newDatabaseInterface, "initDatabase", Qt::BlockingQueuedConnection, Q_ARG(QSqlDatabase, _sqlDatabase));
 		
 		connectionPools.append(newPool);
+	}
+}
+
+Servatrice_GameServer::~Servatrice_GameServer()
+{
+	for (int i = 0; i < connectionPools.size(); ++i) {
+		logger->logMessage(QString("Closing pool %1...").arg(i));
+		QThread *poolThread = connectionPools[i]->thread();
+		connectionPools[i]->deleteLater(); // pool destructor calls thread()->quit()
+		poolThread->wait();
 	}
 }
 
@@ -58,23 +74,24 @@ void Servatrice_GameServer::incomingConnection(int socketDescriptor)
 	// Determine connection pool with smallest client count
 	int minClientCount = -1;
 	int poolIndex = -1;
+	QStringList debugStr;
 	for (int i = 0; i < connectionPools.size(); ++i) {
 		const int clientCount = connectionPools[i]->getClientCount();
 		if ((poolIndex == -1) || (clientCount < minClientCount)) {
 			minClientCount = clientCount;
 			poolIndex = i;
 		}
+		debugStr.append(QString::number(clientCount));
 	}
+	qDebug() << "Pool utilisation:" << debugStr;
 	Servatrice_ConnectionPool *pool = connectionPools[poolIndex];
 	
-	QTcpSocket *socket = new QTcpSocket;
-	ServerSocketInterface *ssi = new ServerSocketInterface(server, pool->getDatabaseInterface(), socket);
+	ServerSocketInterface *ssi = new ServerSocketInterface(server, pool->getDatabaseInterface());
+	ssi->moveToThread(pool->thread());
 	pool->addClient();
 	connect(ssi, SIGNAL(destroyed()), pool, SLOT(removeClient()));
-	socket->setSocketDescriptor(socketDescriptor);
-	socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
-	logger->logMessage(QString("[pool %1] Incoming connection: %2").arg(poolIndex).arg(socket->peerAddress().toString()), ssi);
-	ssi->initSessionDeprecated();
+	
+	QMetaObject::invokeMethod(ssi, "initConnection", Qt::QueuedConnection, Q_ARG(int, socketDescriptor));
 }
 
 void Servatrice_IslServer::incomingConnection(int socketDescriptor)
@@ -97,8 +114,8 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 
 Servatrice::~Servatrice()
 {
+	gameServer->close();
 	prepareDestroy();
-	QSqlDatabase::database().close();
 }
 
 bool Servatrice::initServer()
@@ -261,9 +278,8 @@ bool Servatrice::initServer()
 		statusUpdateClock->start(statusUpdateTime);
 	}
 	
-	threaded = settings->value("server/threaded", false).toInt();
 	const int numberPools = settings->value("server/number_pools", 1).toInt();
-	gameServer = new Servatrice_GameServer(this, threaded, numberPools, servatriceDatabaseInterface->getDatabase(), this);
+	gameServer = new Servatrice_GameServer(this, numberPools, servatriceDatabaseInterface->getDatabase(), this);
 	const int gamePort = settings->value("server/port", 4747).toInt();
 	qDebug() << "Starting server on port" << gamePort;
 	if (gameServer->listen(QHostAddress::Any, gamePort))
@@ -273,6 +289,11 @@ bool Servatrice::initServer()
 		return false;
 	}
 	return true;
+}
+
+void Servatrice::addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface)
+{
+	databaseInterfaces.insert(thread, databaseInterface);
 }
 
 void Servatrice::updateServerList()

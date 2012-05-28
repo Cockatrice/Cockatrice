@@ -6,6 +6,7 @@ SET(servatrice_SOURCES
  src/main.cpp
  src/passwordhasher.cpp
  src/servatrice.cpp 
+ src/servatrice_connection_pool.cpp
  src/servatrice_database_interface.cpp
  src/server_logger.cpp 
  src/serversocketinterface.cpp 

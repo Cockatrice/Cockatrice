@@ -4,7 +4,13 @@ statusupdate=15000
 logfile=server.log
 name="My Cockatrice server"
 id=1
-threaded=0
+number_pools=1
+
+[servernetwork]
+active=0
+port=14747
+ssl_cert=ssl_cert.pem
+ssl_key=ssl_key.pem
 
 [authentication]
 method=none

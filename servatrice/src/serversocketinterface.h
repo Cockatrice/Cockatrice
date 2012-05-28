@@ -93,7 +93,7 @@ private:
 	Response::ResponseCode processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);
 	Response::ResponseCode processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc);
 public:
-	ServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QTcpSocket *_socket, QObject *parent = 0);
+	ServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QObject *parent = 0);
 	~ServerSocketInterface();
 	void initSessionDeprecated();
 	bool initSession();
@@ -101,6 +101,8 @@ public:
 	QString getAddress() const { return socket->peerAddress().toString(); }
 
 	void transmitProtocolItem(const ServerMessage &item);
+public slots:
+	void initConnection(int socketDescriptor);
 };
 
 #endif
