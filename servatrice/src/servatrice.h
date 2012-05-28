@@ -27,6 +27,7 @@
 #include <QHostAddress>
 #include <QReadWriteLock>
 #include <QSqlDatabase>
+#include <QMetaType>
 #include "server.h"
 
 Q_DECLARE_METATYPE(QSqlDatabase)
