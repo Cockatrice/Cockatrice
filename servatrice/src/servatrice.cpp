@@ -110,6 +110,7 @@ void Servatrice_IslServer::incomingConnection(int socketDescriptor)
 Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 	: Server(parent), settings(_settings), uptime(0), shutdownTimer(0)
 {
+	qRegisterMetaType<QSqlDatabase>("QSqlDatabase");
 }
 
 Servatrice::~Servatrice()

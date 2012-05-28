@@ -26,9 +26,11 @@
 #include <QSslKey>
 #include <QHostAddress>
 #include <QReadWriteLock>
+#include <QSqlDatabase>
 #include "server.h"
 
-class QSqlDatabase;
+Q_DECLARE_METATYPE(QSqlDatabase)
+
 class QSettings;
 class QSqlQuery;
 class QTimer;
