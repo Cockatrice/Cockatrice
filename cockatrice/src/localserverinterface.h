@@ -9,7 +9,7 @@ class LocalServerInterface : public Server_ProtocolHandler
 {
 	Q_OBJECT
 public:
-	LocalServerInterface(LocalServer *_server);
+	LocalServerInterface(LocalServer *_server, Server_DatabaseInterface *_databaseInterface);
 	~LocalServerInterface();
 	
 	QString getAddress() const { return QString(); }

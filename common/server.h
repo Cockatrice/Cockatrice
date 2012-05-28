@@ -43,7 +43,7 @@ public:
 	mutable QReadWriteLock clientsLock, roomsLock; // locking order: roomsLock before clientsLock
 	Server(QObject *parent = 0);
 	~Server();
-	AuthenticationResult loginUser(Server_DatabaseInterface *sessionDatabaseInterface, Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason, int &secondsLeft);
+	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason, int &secondsLeft);
 	const QMap<int, Server_Room *> &getRooms() { return rooms; }
 	
 	const QMap<QString, Server_ProtocolHandler *> &getUsers() const { return users; }
@@ -61,9 +61,9 @@ public:
 	virtual int getMaxGamesPerUser() const { return 0; }
 	virtual bool getThreaded() const { return false; }
 	
+	Server_DatabaseInterface *getDatabaseInterface() const;
 	virtual void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays) { }
-	virtual DeckList *getDeckFromDatabase(int deckId, const QString &userName) { return 0; }
-
+	
 	void sendIsl_Response(const Response &item, int serverId = -1, qint64 sessionId = -1);
 	void sendIsl_SessionEvent(const SessionEvent &item, int serverId = -1, qint64 sessionId = -1);
 	void sendIsl_GameEventContainer(const GameEventContainer &item, int serverId = -1, qint64 sessionId = -1);
@@ -97,13 +97,13 @@ protected slots:
 protected:
 	void prepareDestroy();
 	void setDatabaseInterface(Server_DatabaseInterface *_databaseInterface);
-	Server_DatabaseInterface *databaseInterface;
 	QList<Server_ProtocolHandler *> clients;
 	QMap<qint64, Server_ProtocolHandler *> usersBySessionId;
 	QMap<QString, Server_ProtocolHandler *> users;
 	QMap<qint64, Server_AbstractUserInterface *> externalUsersBySessionId;
 	QMap<QString, Server_AbstractUserInterface *> externalUsers;
 	QMap<int, Server_Room *> rooms;
+	QMap<QThread *, Server_DatabaseInterface *> databaseInterfaces;
 	
 	int getUsersCount() const;
 	int getGamesCount() const;

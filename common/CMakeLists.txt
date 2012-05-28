@@ -13,7 +13,6 @@ SET(common_SOURCES
 	server_card.cpp
 	server_cardzone.cpp
 	server_counter.cpp
-	server_database_interface.cpp
 	server_game.cpp
 	server_player.cpp
 	server_protocolhandler.cpp

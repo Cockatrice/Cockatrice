@@ -2,8 +2,8 @@
 #include "localserver.h"
 #include <QDebug>
 
-LocalServerInterface::LocalServerInterface(LocalServer *_server)
-	: Server_ProtocolHandler(_server, _server)
+LocalServerInterface::LocalServerInterface(LocalServer *_server, Server_DatabaseInterface *_databaseInterface)
+	: Server_ProtocolHandler(_server, _databaseInterface, _server)
 {
 }
 

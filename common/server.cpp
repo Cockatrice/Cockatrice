@@ -32,10 +32,11 @@
 #include "pb/session_event.pb.h"
 #include "pb/isl_message.pb.h"
 #include <QCoreApplication>
+#include <QThread>
 #include <QDebug>
 
 Server::Server(QObject *parent)
-	: QObject(parent), databaseInterface(0), clientsLock(QReadWriteLock::Recursive)
+	: QObject(parent), clientsLock(QReadWriteLock::Recursive)
 {
 	qRegisterMetaType<ServerInfo_Game>("ServerInfo_Game");
 	qRegisterMetaType<ServerInfo_Room>("ServerInfo_Room");
@@ -70,31 +71,38 @@ void Server::prepareDestroy()
 
 void Server::setDatabaseInterface(Server_DatabaseInterface *_databaseInterface)
 {
-	databaseInterface = _databaseInterface;
-	connect(this, SIGNAL(endSession(qint64)), databaseInterface, SLOT(endSession(qint64)));
+	connect(this, SIGNAL(endSession(qint64)), _databaseInterface, SLOT(endSession(qint64)));
+	databaseInterfaces.insert(QThread::currentThread(), _databaseInterface);
 }
 
-AuthenticationResult Server::loginUser(Server_DatabaseInterface *sessionDatabaseInterface, Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr, int &secondsLeft)
+Server_DatabaseInterface *Server::getDatabaseInterface() const
+{
+	return databaseInterfaces.value(QThread::currentThread());
+}
+
+AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr, int &secondsLeft)
 {
 	if (name.size() > 35)
 		name = name.left(35);
 	
+	Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
+	
 	QWriteLocker locker(&clientsLock);
 	
-	AuthenticationResult authState = sessionDatabaseInterface->checkUserPassword(session, name, password, reasonStr, secondsLeft);
+	AuthenticationResult authState = databaseInterface->checkUserPassword(session, name, password, reasonStr, secondsLeft);
 	if ((authState == NotLoggedIn) || (authState == UserIsBanned))
 		return authState;
 	
-	ServerInfo_User data = sessionDatabaseInterface->getUserData(name, true);
+	ServerInfo_User data = databaseInterface->getUserData(name, true);
 	data.set_address(session->getAddress().toStdString());
 	name = QString::fromStdString(data.name()); // Compensate for case indifference
 	
-	sessionDatabaseInterface->lockSessionTables();
+	databaseInterface->lockSessionTables();
 	
 	if (authState == PasswordRight) {
-		if (users.contains(name) || sessionDatabaseInterface->userSessionExists(name)) {
+		if (users.contains(name) || databaseInterface->userSessionExists(name)) {
 			qDebug("Login denied: would overwrite old session");
-			sessionDatabaseInterface->unlockSessionTables();
+			databaseInterface->unlockSessionTables();
 			return WouldOverwriteOldSession;
 		}
 	} else if (authState == UnknownUser) {
@@ -102,7 +110,7 @@ AuthenticationResult Server::loginUser(Server_DatabaseInterface *sessionDatabase
 		// don't interfere with registered user names though.
 		QString tempName = name;
 		int i = 0;
-		while (users.contains(tempName) || sessionDatabaseInterface->userExists(tempName) || sessionDatabaseInterface->userSessionExists(tempName))
+		while (users.contains(tempName) || databaseInterface->userExists(tempName) || databaseInterface->userSessionExists(tempName))
 			tempName = name + "_" + QString::number(++i);
 		name = tempName;
 		data.set_name(name.toStdString());
@@ -111,8 +119,8 @@ AuthenticationResult Server::loginUser(Server_DatabaseInterface *sessionDatabase
 	users.insert(name, session);
 	qDebug() << "Server::loginUser: name=" << name;
 	
-	data.set_session_id(sessionDatabaseInterface->startSession(name, session->getAddress()));	
-	sessionDatabaseInterface->unlockSessionTables();
+	data.set_session_id(databaseInterface->startSession(name, session->getAddress()));	
+	databaseInterface->unlockSessionTables();
 	
 	usersBySessionId.insert(data.session_id(), session);
 	
@@ -332,7 +340,7 @@ void Server::externalJoinGameCommandReceived(const Command_JoinGame &cmd, int cm
 		}
 		
 		ResponseContainer responseContainer(cmdId);
-		Response::ResponseCode responseCode = room->processJoinGameCommand(cmd, responseContainer, userInterface, databaseInterface);
+		Response::ResponseCode responseCode = room->processJoinGameCommand(cmd, responseContainer, userInterface);
 		userInterface->sendResponseContainer(responseContainer, responseCode);
 	} catch (Response::ResponseCode code) {
 		Response response;

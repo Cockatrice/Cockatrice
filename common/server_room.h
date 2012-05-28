@@ -67,7 +67,7 @@ public:
 	const QMap<QString, ServerInfo_User_Container> &getExternalUsers() const { return externalUsers; }
 	void updateExternalGameList(const ServerInfo_Game &gameInfo);
 	
-	Response::ResponseCode processJoinGameCommand(const Command_JoinGame &cmd, ResponseContainer &rc, Server_AbstractUserInterface *userInterface, Server_DatabaseInterface *databaseInterface);
+	Response::ResponseCode processJoinGameCommand(const Command_JoinGame &cmd, ResponseContainer &rc, Server_AbstractUserInterface *userInterface);
 	
 	void say(const QString &userName, const QString &s, bool sendToIsl = true);
 	

@@ -21,9 +21,11 @@ protected:
 public:
 	Servatrice_DatabaseInterface(int _instanceId, Servatrice *_server);
 	void initDatabase(const QSqlDatabase &_sqlDatabase);
+	void initDatabase(const QString &type, const QString &hostName, const QString &databaseName, const QString &userName, const QString &password);
 	bool openDatabase();
 	bool checkSql();
 	bool execSqlQuery(QSqlQuery &query);
+	const QSqlDatabase &getDatabase() { return sqlDatabase; }
 
 	bool userExists(const QString &user);
 	int getUserIdInDB(const QString &name);
@@ -32,6 +34,8 @@ public:
 	bool isInBuddyList(const QString &whoseList, const QString &who);
 	bool isInIgnoreList(const QString &whoseList, const QString &who);
 	ServerInfo_User getUserData(const QString &name, bool withId = false);
+	void storeGameInformation(const QString &roomName, const QStringList &roomGameTypes, const ServerInfo_Game &gameInfo, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replayList);
+	DeckList *getDeckFromDatabase(int deckId, const QString &userName);
 	
 	int getNextGameId();
 	int getNextReplayId();

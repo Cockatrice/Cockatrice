@@ -26,7 +26,6 @@
 #include <QSslKey>
 #include <QHostAddress>
 #include <QReadWriteLock>
-#include <QSqlDatabase>
 #include "server.h"
 
 class QSqlDatabase;
@@ -37,6 +36,7 @@ class QTimer;
 class GameReplay;
 class Servatrice;
 class Servatrice_ConnectionPool;
+class Servatrice_DatabaseInterface;
 class ServerSocketInterface;
 class IslInterface;
 
@@ -92,14 +92,15 @@ private:
 	enum DatabaseType { DatabaseNone, DatabaseMySql };
 	AuthenticationMethod authenticationMethod;
 	DatabaseType databaseType;
-	QSqlDatabase sqlDatabase;
 	QTimer *pingClock, *statusUpdateClock;
 	Servatrice_GameServer *gameServer;
 	Servatrice_IslServer *islServer;
 	QString serverName;
+	mutable QMutex loginMessageMutex;
 	QString loginMessage;
 	QString dbPrefix;
 	QSettings *settings;
+	Servatrice_DatabaseInterface *servatriceDatabaseInterface;
 	int serverId;
 	bool threaded;
 	int uptime;
@@ -123,11 +124,8 @@ public:
 	Servatrice(QSettings *_settings, QObject *parent = 0);
 	~Servatrice();
 	bool initServer();
-	bool openDatabase();
-	bool checkSql();
-	bool execSqlQuery(QSqlQuery &query);
 	QString getServerName() const { return serverName; }
-	QString getLoginMessage() const { return loginMessage; }
+	QString getLoginMessage() const { QMutexLocker locker(&loginMessageMutex); return loginMessage; }
 	bool getGameShouldPing() const { return true; }
 	int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
 	int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
@@ -146,7 +144,6 @@ public:
 	void incTxBytes(quint64 num);
 	void incRxBytes(quint64 num);
 	void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays);
-	DeckList *getDeckFromDatabase(int deckId, const QString &userName);
 	
 	bool islConnectionExists(int serverId) const;
 	void addIslInterface(int serverId, IslInterface *interface);

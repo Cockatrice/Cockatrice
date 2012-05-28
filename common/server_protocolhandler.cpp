@@ -317,7 +317,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 		return Response::RespContextError;
 	QString reasonStr;
 	int banSecondsLeft = 0;
-	AuthenticationResult res = server->loginUser(databaseInterface, this, userName, QString::fromStdString(cmd.password()), reasonStr, banSecondsLeft);
+	AuthenticationResult res = server->loginUser(this, userName, QString::fromStdString(cmd.password()), reasonStr, banSecondsLeft);
 	switch (res) {
 		case UserIsBanned: {
 			Response_Login *re = new Response_Login;
@@ -542,6 +542,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_Creat
 {
 	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
+	const int gameId = databaseInterface->getNextGameId();
+	if (gameId == -1)
+		return Response::RespInternalError;
 	
 	QMutexLocker roomLocker(&room->gamesMutex);
 	
@@ -557,7 +560,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_Creat
 	if (description.size() > 60)
 		description = description.left(60);
 	
-	Server_Game *game = new Server_Game(copyUserInfo(false), server->getNextGameId(), description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes, cmd.only_buddies(), cmd.only_registered(), cmd.spectators_allowed(), cmd.spectators_need_password(), cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
+	Server_Game *game = new Server_Game(copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes, cmd.only_buddies(), cmd.only_registered(), cmd.spectators_allowed(), cmd.spectators_need_password(), cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
 	game->addPlayer(this, rc, false, false);
 	room->addGame(game);
 	
@@ -569,5 +572,5 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinGame(const Command_JoinGam
 	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
-	return room->processJoinGameCommand(cmd, rc, this, databaseInterface);
+	return room->processJoinGameCommand(cmd, rc, this);
 }

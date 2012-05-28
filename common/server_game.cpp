@@ -74,7 +74,7 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo, int _gameId, const
           gameMutex(QMutex::Recursive)
 {
 	currentReplay = new GameReplay;
-	currentReplay->set_replay_id(room->getServer()->getNextReplayId());
+	currentReplay->set_replay_id(room->getServer()->getDatabaseInterface()->getNextReplayId());
 	
 	connect(this, SIGNAL(sigStartGameIfReady()), this, SLOT(doStartGameIfReady()), Qt::QueuedConnection);
 	
@@ -242,6 +242,7 @@ void Server_Game::sendGameStateToPlayers()
 
 void Server_Game::doStartGameIfReady()
 {
+	Server_DatabaseInterface *databaseInterface = room->getServer()->getDatabaseInterface();
 	QMutexLocker locker(&gameMutex);
 	
 	if (getPlayerCount() < maxPlayers)
@@ -271,7 +272,7 @@ void Server_Game::doStartGameIfReady()
 		currentReplay->set_duration_seconds(secondsElapsed - startTimeOfThisGame);
 		replayList.append(currentReplay);
 		currentReplay = new GameReplay;
-		currentReplay->set_replay_id(room->getServer()->getNextReplayId());
+		currentReplay->set_replay_id(databaseInterface->getNextReplayId());
 		getInfo(*currentReplay->mutable_game_info());
 		
 		Event_GameStateChanged omniscientEvent;
@@ -340,8 +341,9 @@ void Server_Game::stopGameIfFinished()
 	emit gameInfoChanged(gameInfo);
 }
 
-Response::ResponseCode Server_Game::checkJoin(Server_DatabaseInterface *databaseInterface, ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions)
+Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions)
 {
+	Server_DatabaseInterface *databaseInterface = room->getServer()->getDatabaseInterface();
 	{
 		QMapIterator<int, Server_Player *> playerIterator(players);
 		while (playerIterator.hasNext())

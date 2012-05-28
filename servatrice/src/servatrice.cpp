@@ -117,25 +117,36 @@ bool Servatrice::initServer()
 		databaseType = DatabaseMySql;
 	else
 		databaseType = DatabaseNone;
-	dbPrefix = settings->value("database/prefix").toString();
+	
+	servatriceDatabaseInterface = new Servatrice_DatabaseInterface(-1, this);
+	setDatabaseInterface(servatriceDatabaseInterface);
+	
 	if (databaseType != DatabaseNone) {
-		openDatabase();
+		settings->beginGroup("database");
+		dbPrefix = settings->value("prefix").toString();
+		servatriceDatabaseInterface->initDatabase("QMYSQL",
+							  settings->value("hostname").toString(),
+							  settings->value("database").toString(),
+							  settings->value("user").toString(),
+							  settings->value("password").toString());
+		settings->endGroup();
+		
 		updateServerList();
 		
 		qDebug() << "Clearing previous sessions...";
-		databaseInterface->clearSessionTables();
+		servatriceDatabaseInterface->clearSessionTables();
 	}
 	
 	const QString roomMethod = settings->value("rooms/method").toString();
 	if (roomMethod == "sql") {
-		QSqlQuery query(sqlDatabase);
+		QSqlQuery query(servatriceDatabaseInterface->getDatabase());
 		query.prepare("select id, name, descr, auto_join, join_message from " + dbPrefix + "_rooms order by id asc");
-		execSqlQuery(query);
+		servatriceDatabaseInterface->execSqlQuery(query);
 		while (query.next()) {
-			QSqlQuery query2(sqlDatabase);
+			QSqlQuery query2(servatriceDatabaseInterface->getDatabase());
 			query2.prepare("select name from " + dbPrefix + "_rooms_gametypes where id_room = :id_room");
 			query2.bindValue(":id_room", query.value(0).toInt());
-			execSqlQuery(query2);
+			servatriceDatabaseInterface->execSqlQuery(query2);
 			QStringList gameTypes;
 			while (query2.next())
 				gameTypes.append(query2.value(0).toString());
@@ -252,7 +263,7 @@ bool Servatrice::initServer()
 	
 	threaded = settings->value("server/threaded", false).toInt();
 	const int numberPools = settings->value("server/number_pools", 1).toInt();
-	gameServer = new Servatrice_GameServer(this, threaded, numberPools, sqlDatabase, this);
+	gameServer = new Servatrice_GameServer(this, threaded, numberPools, servatriceDatabaseInterface->getDatabase(), this);
 	const int gamePort = settings->value("server/port", 4747).toInt();
 	qDebug() << "Starting server on port" << gamePort;
 	if (gameServer->listen(QHostAddress::Any, gamePort))
@@ -264,46 +275,6 @@ bool Servatrice::initServer()
 	return true;
 }
 
-bool Servatrice::openDatabase()
-{
-	if (!sqlDatabase.isValid()) {
-		settings->beginGroup("database");
-		sqlDatabase = QSqlDatabase::addDatabase("QMYSQL");
-		sqlDatabase.setHostName(settings->value("hostname").toString());
-		sqlDatabase.setDatabaseName(settings->value("database").toString());
-		sqlDatabase.setUserName(settings->value("user").toString());
-		sqlDatabase.setPassword(settings->value("password").toString());
-		settings->endGroup();
-	} else if (sqlDatabase.isOpen())
-		sqlDatabase.close();
-	
-	qDebug() << QString("[main] Opening database...");
-	if (!sqlDatabase.open()) {
-		qDebug() << QString("[main] Error opening database: %1").arg(sqlDatabase.lastError().text());
-		return false;
-	}
-	
-	return true;
-}
-
-bool Servatrice::checkSql()
-{
-	if (databaseType == DatabaseNone)
-		return false;
-	
-	if (!sqlDatabase.exec("select 1").isActive())
-		return openDatabase();
-	return true;
-}
-
-bool Servatrice::execSqlQuery(QSqlQuery &query)
-{
-	if (query.exec())
-		return true;
-	qCritical() << QString("[main] Error executing query: %1").arg(query.lastError().text());
-	return false;
-}
-
 void Servatrice::updateServerList()
 {
 	qDebug() << "Updating server list...";
@@ -311,9 +282,9 @@ void Servatrice::updateServerList()
 	serverListMutex.lock();
 	serverList.clear();
 	
-	QSqlQuery query(sqlDatabase);
+	QSqlQuery query(servatriceDatabaseInterface->getDatabase());
 	query.prepare("select id, ssl_cert, hostname, address, game_port, control_port from " + dbPrefix + "_servers order by id asc");
-	execSqlQuery(query);
+	servatriceDatabaseInterface->execSqlQuery(query);
 	while (query.next()) {
 		ServerProperties prop(query.value(0).toInt(), QSslCertificate(query.value(1).toString().toAscii()), query.value(2).toString(), QHostAddress(query.value(3).toString()), query.value(4).toInt(), query.value(5).toInt());
 		serverList.append(prop);
@@ -352,20 +323,73 @@ QList<ServerSocketInterface *> Servatrice::getUsersWithAddressAsList(const QHost
 	return result;
 }
 
+void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replayList)
+{
+	const ServerInfo_Game &gameInfo = replayList.first()->game_info();
+	
+	Server_Room *room = rooms.value(gameInfo.room_id());
+	
+	Event_ReplayAdded replayEvent;
+	ServerInfo_ReplayMatch *replayMatchInfo = replayEvent.mutable_match_info();
+	replayMatchInfo->set_game_id(gameInfo.game_id());
+	replayMatchInfo->set_room_name(room->getName().toStdString());
+	replayMatchInfo->set_time_started(QDateTime::currentDateTime().addSecs(-secondsElapsed).toTime_t());
+	replayMatchInfo->set_length(secondsElapsed);
+	replayMatchInfo->set_game_name(gameInfo.description());
+	
+	const QStringList &allGameTypes = room->getGameTypes();
+	QStringList gameTypes;
+	for (int i = gameInfo.game_types_size() - 1; i >= 0; --i)
+		gameTypes.append(allGameTypes[gameInfo.game_types(i)]);
+	
+	QSetIterator<QString> playerIterator(allPlayersEver);
+	while (playerIterator.hasNext())
+		replayMatchInfo->add_player_names(playerIterator.next().toStdString());
+	
+	for (int i = 0; i < replayList.size(); ++i) {
+		ServerInfo_Replay *replayInfo = replayMatchInfo->add_replay_list();
+		replayInfo->set_replay_id(replayList[i]->replay_id());
+		replayInfo->set_replay_name(gameInfo.description());
+		replayInfo->set_duration(replayList[i]->duration_seconds());
+	}
+	
+	QSet<QString> allUsersInGame = allPlayersEver + allSpectatorsEver;
+	QSetIterator<QString> allUsersIterator(allUsersInGame);
+	
+	SessionEvent *sessionEvent = Server_ProtocolHandler::prepareSessionEvent(replayEvent);
+	clientsLock.lockForRead();
+	while (allUsersIterator.hasNext()) {
+		const QString userName = allUsersIterator.next();
+		Server_AbstractUserInterface *userHandler = users.value(userName);
+		if (!userHandler)
+			userHandler = externalUsers.value(userName);
+		if (userHandler)
+			userHandler->sendProtocolItem(*sessionEvent);
+	}
+	clientsLock.unlock();
+	delete sessionEvent;
+	
+	getDatabaseInterface()->storeGameInformation(room->getName(), gameTypes, gameInfo, allPlayersEver, allSpectatorsEver, replayList);
+}
+
 void Servatrice::updateLoginMessage()
 {
-	if (!checkSql())
+	if (!servatriceDatabaseInterface->checkSql())
 		return;
 	
-	QSqlQuery query;
+	QSqlQuery query(servatriceDatabaseInterface->getDatabase());
 	query.prepare("select message from " + dbPrefix + "_servermessages where id_server = :id_server order by timest desc limit 1");
 	query.bindValue(":id_server", serverId);
-	if (execSqlQuery(query))
+	if (servatriceDatabaseInterface->execSqlQuery(query))
 		if (query.next()) {
-			loginMessage = query.value(0).toString();
+			const QString newLoginMessage = query.value(0).toString();
+			
+			loginMessageMutex.lock();
+			loginMessage = newLoginMessage;
+			loginMessageMutex.unlock();
 			
 			Event_ServerMessage event;
-			event.set_message(loginMessage.toStdString());
+			event.set_message(newLoginMessage.toStdString());
 			SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
 			QMapIterator<QString, Server_ProtocolHandler *> usersIterator(users);
 			while (usersIterator.hasNext())
@@ -376,6 +400,9 @@ void Servatrice::updateLoginMessage()
 
 void Servatrice::statusUpdate()
 {
+	if (!servatriceDatabaseInterface->checkSql())
+		return;
+	
 	const int uc = getUsersCount(); // for correct mutex locking order
 	const int gc = getGamesCount();
 	
@@ -390,10 +417,7 @@ void Servatrice::statusUpdate()
 	rxBytes = 0;
 	rxBytesMutex.unlock();
 	
-	if (!checkSql())
-		return;
-	
-	QSqlQuery query;
+	QSqlQuery query(servatriceDatabaseInterface->getDatabase());
 	query.prepare("insert into " + dbPrefix + "_uptime (id_server, timest, uptime, users_count, games_count, tx_bytes, rx_bytes) values(:id, NOW(), :uptime, :users_count, :games_count, :tx, :rx)");
 	query.bindValue(":id", serverId);
 	query.bindValue(":uptime", uptime);
@@ -401,7 +425,7 @@ void Servatrice::statusUpdate()
 	query.bindValue(":games_count", gc);
 	query.bindValue(":tx", tx);
 	query.bindValue(":rx", rx);
-	execSqlQuery(query);
+	servatriceDatabaseInterface->execSqlQuery(query);
 }
 
 void Servatrice::scheduleShutdown(const QString &reason, int minutes)

@@ -7,6 +7,7 @@
 #include "server_game.h"
 #include "server_room.h"
 #include "server_abstractuserinterface.h"
+#include "server_database_interface.h"
 #include "decklist.h"
 #include "color.h"
 #include "rng_abstract.h"
@@ -626,7 +627,7 @@ Response::ResponseCode Server_Player::cmdDeckSelect(const Command_DeckSelect &cm
 	DeckList *newDeck;
 	if (cmd.has_deck_id()) {
 		try {
-			newDeck = game->getRoom()->getServer()->getDeckFromDatabase(cmd.deck_id(), QString::fromStdString(userInfo->name()));
+			newDeck = game->getRoom()->getServer()->getDatabaseInterface()->getDeckFromDatabase(cmd.deck_id(), QString::fromStdString(userInfo->name()));
 		} catch(Response::ResponseCode r) {
 			return r;
 		}

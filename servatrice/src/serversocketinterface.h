@@ -60,6 +60,7 @@ signals:
 private:
 	QMutex outputBufferMutex;
 	Servatrice *servatrice;
+	Servatrice_DatabaseInterface *sqlInterface;
 	QTcpSocket *socket;
 	
 	QByteArray inputBuffer, outputBuffer;
