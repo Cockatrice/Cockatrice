@@ -228,7 +228,7 @@ void ChatView::mousePressEvent(QMouseEvent *event)
 
 void ChatView::mouseReleaseEvent(QMouseEvent *event)
 {
-	if (hoveredItemType == HoveredCard && ((event->button() == Qt::MidButton) || (event->button() == Qt::LeftButton)))
+	if ((event->button() == Qt::MidButton) || (event->button() == Qt::LeftButton))
 		emit deleteCardInfoPopup(QString("_"));
 	
 	QTextBrowser::mouseReleaseEvent(event);
