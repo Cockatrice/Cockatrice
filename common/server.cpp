@@ -64,8 +64,15 @@ void Server::prepareDestroy()
 		clientsLock.unlock();
 		
 		bool done = false;
+		
+		class SleeperThread : public QThread
+		{
+		public:
+			static void msleep(unsigned long msecs) { QThread::usleep(msecs); }
+		};
+
 		do {
-			usleep(10000);
+			SleeperThread::msleep(10);
 			clientsLock.lockForRead();
 			if (clients.isEmpty())
 				done = true;
