@@ -1594,6 +1594,7 @@ Response::ResponseCode Server_Player::cmdChangeZoneProperties(const Command_Chan
 			
 			ges.enqueueGameEvent(revealEvent, playerId);
 		}
+		return Response::RespOk;
 	} else
 		return Response::RespContextError;
 }
