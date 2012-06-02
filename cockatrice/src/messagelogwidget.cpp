@@ -14,7 +14,13 @@ QString MessageLogWidget::sanitizeHtml(QString dirty) const
 	return dirty
 		.replace("&", "&amp;")
 		.replace("<", "&lt;")
-		.replace(">", "&gt;");
+		.replace(">", "&gt;")
+		.replace("\"", "&quot;");
+}
+
+QString MessageLogWidget::cardLink(const QString &cardName) const
+{
+	return QString("<a href=\"card://%1\">%2</a>").arg(cardName).arg(cardName);
 }
 
 bool MessageLogWidget::isFemale(Player *player) const
@@ -195,7 +201,7 @@ void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
 	if (cardName.isEmpty())
 		appendHtml((isFemale(player) ? tr("%1 undoes her last draw.") : tr("%1 undoes his last draw.")).arg(sanitizeHtml(player->getName())));
 	else
-		appendHtml((isFemale(player) ? tr("%1 undoes her last draw (%2).") : tr("%1 undoes his last draw (%2).")).arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+		appendHtml((isFemale(player) ? tr("%1 undoes her last draw (%2).") : tr("%1 undoes his last draw (%2).")).arg(sanitizeHtml(player->getName())).arg(QString("<a href=\"card://%1\">%2</a>").arg(sanitizeHtml(cardName)).arg(sanitizeHtml(cardName))));
 }
 
 QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange) const
@@ -276,7 +282,7 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
 	else if (cardName.isEmpty())
 		cardStr = tr("a card");
 	else
-		cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName));
+		cardStr = cardLink(cardName);
 	
 	if (ownerChange && (attributes.startZone->getPlayer() == attributes.player)) {
 		appendHtml(tr("%1 gives %2 control over %3.").arg(sanitizeHtml(attributes.player->getName())).arg(sanitizeHtml(attributes.targetZone->getPlayer()->getName())).arg(cardStr));
@@ -358,9 +364,9 @@ void MessageLogWidget::logFlipCard(Player *player, QString cardName, bool faceDo
 void MessageLogWidget::logDestroyCard(Player *player, QString cardName)
 {
 	if (isFemale(player))
-		appendHtml(tr("%1 destroys %2.", "female").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+		appendHtml(tr("%1 destroys %2.", "female").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)));
 	else
-		appendHtml(tr("%1 destroys %2.", "male").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+		appendHtml(tr("%1 destroys %2.", "male").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)));
 }
 
 void MessageLogWidget::logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName)
@@ -378,29 +384,29 @@ void MessageLogWidget::logAttachCard(Player *player, QString cardName, Player *t
 			str = tr("%1 attaches %2 to %3's %4.", "p1 male, p2 male");
 	}
 	
-	appendHtml(str.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(sanitizeHtml(targetPlayer->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(targetCardName))));
+	appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)).arg(sanitizeHtml(targetPlayer->getName())).arg(cardLink(targetCardName)));
 }
 
 void MessageLogWidget::logUnattachCard(Player *player, QString cardName)
 {
 	if (isFemale(player))
-		appendHtml(tr("%1 unattaches %2.", "female").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+		appendHtml(tr("%1 unattaches %2.", "female").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)));
 	else
-		appendHtml(tr("%1 unattaches %2.", "male").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))));
+		appendHtml(tr("%1 unattaches %2.", "male").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)));
 }
 
 void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt)
 {
 	if (isFemale(player))
-		appendHtml(tr("%1 creates token: %2%3.", "female").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+		appendHtml(tr("%1 creates token: %2%3.", "female").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)).arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
 	else
-		appendHtml(tr("%1 creates token: %2%3.", "male").arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+		appendHtml(tr("%1 creates token: %2%3.", "male").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)).arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
 }
 
 void MessageLogWidget::logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard, bool playerTarget)
 {
-	startCard = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(startCard));
-	targetCard = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(targetCard));
+	startCard = cardLink(startCard);
+	targetCard = cardLink(targetCard);
 	QString str;
 	if (playerTarget) {
 		if ((player == startPlayer) && (player == targetPlayer)) {
@@ -551,7 +557,7 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
 		default: ;
 	}
 	
-	appendHtml(finalStr.arg(sanitizeHtml(player->getName())).arg(colorStr).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName))).arg(value));
+	appendHtml(finalStr.arg(sanitizeHtml(player->getName())).arg(colorStr).arg(cardLink(cardName)).arg(value));
 }
 
 void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
@@ -590,8 +596,7 @@ void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
 				else
 					str = tr("%1 untaps %2.", "male");
 			}
-			QString cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()));
-			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardStr));
+			appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardLink(card->getName())));
 		}
 	}
 }
@@ -620,7 +625,7 @@ void MessageLogWidget::logSetDoesntUntap(Player *player, CardItem *card, bool do
 		else
 			str = tr("%1 sets %2 to untap normally.", "male");
 	}
-	appendHtml(str.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()))));
+	appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardLink(card->getName())));
 }
 
 void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
@@ -633,7 +638,7 @@ void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
 			str = tr("%1 sets PT of %2 to %3.", "female");
 		else
 			str = tr("%1 sets PT of %2 to %3.", "male");
-		appendHtml(str.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()))).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newPT))));
+		appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardLink(card->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newPT))));
 	}
 }
 
@@ -644,7 +649,7 @@ void MessageLogWidget::logSetAnnotation(Player *player, CardItem *card, QString 
 		str = tr("%1 sets annotation of %2 to %3.", "female");
 	else
 		str = tr("%1 sets annotation of %2 to %3.", "male");
-	appendHtml(str.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(card->getName()))).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newAnnotation))));
+	appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardLink(card->getName())).arg(QString("&quot;<font color=\"blue\">%1</font>&quot;").arg(sanitizeHtml(newAnnotation))));
 }
 
 void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCards)
@@ -688,7 +693,7 @@ void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId
 	else if (cardName.isEmpty())
 		cardStr = tr("a card");
 	else
-		cardStr = QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(cardName));
+		cardStr = cardLink(cardName);
 
 	QString str;
 	if (cardId == -1) {

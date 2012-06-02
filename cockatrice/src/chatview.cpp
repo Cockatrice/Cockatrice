@@ -12,6 +12,7 @@
 ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent)
 	: QTextBrowser(parent), tabSupervisor(_tabSupervisor), game(_game), evenNumber(true), showTimestamps(_showTimestamps), hoveredItemType(HoveredNothing)
 {
+	document()->setDefaultStyleSheet("a { text-decoration: none; color: blue; }");
 	userContextMenu = new UserContextMenu(tabSupervisor, this, game);
 	connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
 	
