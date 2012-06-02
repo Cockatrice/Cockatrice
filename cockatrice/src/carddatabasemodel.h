@@ -16,6 +16,7 @@ public:
 	int columnCount(const QModelIndex &parent = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+	CardDatabase *getDatabase() const { return db; }
 	CardInfo *getCard(int index) const { return cardList[index]; }
 private:
 	QList<CardInfo *> cardList;

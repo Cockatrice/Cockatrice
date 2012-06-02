@@ -492,7 +492,7 @@ void TabDeckEditor::actEditSets()
 
 void TabDeckEditor::actEditTokens()
 {
-	DlgEditTokens dlg;
+	DlgEditTokens dlg(databaseModel);
 	dlg.exec();
 	db->saveToFile(settingsCache->getTokenDatabasePath(), true);
 }

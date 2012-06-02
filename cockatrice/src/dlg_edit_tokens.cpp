@@ -1,6 +1,5 @@
 #include "dlg_edit_tokens.h"
 #include "carddatabasemodel.h"
-#include "main.h"
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -16,8 +15,8 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-DlgEditTokens::DlgEditTokens(QWidget *parent)
-	: QDialog(parent), currentCard(0)
+DlgEditTokens::DlgEditTokens(CardDatabaseModel *_cardDatabaseModel, QWidget *parent)
+	: QDialog(parent), currentCard(0), cardDatabaseModel(_cardDatabaseModel)
 {
 	nameLabel = new QLabel(tr("&Name:"));
 	nameEdit = new QLineEdit;
@@ -59,7 +58,6 @@ DlgEditTokens::DlgEditTokens(QWidget *parent)
 	QGroupBox *tokenDataGroupBox = new QGroupBox(tr("Token data"));
 	tokenDataGroupBox->setLayout(grid);
 	
-	cardDatabaseModel = new CardDatabaseModel(db, this);
 	cardDatabaseDisplayModel = new CardDatabaseDisplayModel(this);
 	cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
 	cardDatabaseDisplayModel->setIsToken(CardDatabaseDisplayModel::ShowTrue);
@@ -113,7 +111,7 @@ DlgEditTokens::DlgEditTokens(QWidget *parent)
 void DlgEditTokens::tokenSelectionChanged(const QModelIndex &current, const QModelIndex &previous)
 {
 	const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
-	CardInfo *cardInfo = current.row() >= 0 ? cardDatabaseModel->getCard(realIndex.row()) : db->getCard();
+	CardInfo *cardInfo = current.row() >= 0 ? cardDatabaseModel->getCard(realIndex.row()) : cardDatabaseModel->getDatabase()->getCard();
 	if (!cardInfo->getName().isEmpty())
 		currentCard = cardInfo;
 	else
@@ -132,7 +130,7 @@ void DlgEditTokens::actAddToken()
 	bool askAgain;
 	do {
 		name = QInputDialog::getText(this, tr("Add token"), tr("Please enter the name of the token:"));
-		if (!name.isEmpty() && db->getCard(name, false)) {
+		if (!name.isEmpty() && cardDatabaseModel->getDatabase()->getCard(name, false)) {
 			QMessageBox::critical(this, tr("Error"), tr("The chosen name conflicts with an existing card or token."));
 			askAgain = true;
 		} else
@@ -142,18 +140,19 @@ void DlgEditTokens::actAddToken()
 	if (name.isEmpty())
 		return;
 	
-	CardInfo *card = new CardInfo(db, name, true);
-	card->addToSet(db->getSet("TK"));
+	CardInfo *card = new CardInfo(cardDatabaseModel->getDatabase(), name, true);
+	card->addToSet(cardDatabaseModel->getDatabase()->getSet("TK"));
 	card->setCardType("Token");
-	db->addCard(card);
+	cardDatabaseModel->getDatabase()->addCard(card);
 }
 
 void DlgEditTokens::actRemoveToken()
 {
 	if (currentCard) {
-		db->removeCard(currentCard);
-		delete currentCard;
+		CardInfo *cardToRemove = currentCard; // the currentCard property gets modified during db->removeCard()
 		currentCard = 0;
+		cardDatabaseModel->getDatabase()->removeCard(cardToRemove);
+		delete cardToRemove;
 	}
 }
 

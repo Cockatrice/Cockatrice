@@ -32,7 +32,7 @@ private:
 	QLineEdit *nameEdit, *ptEdit, *annotationEdit;
 	QTreeView *chooseTokenView;
 public:
-	DlgEditTokens(QWidget *parent = 0);
+	DlgEditTokens(CardDatabaseModel *_cardDatabaseModel, QWidget *parent = 0);
 };
 
 #endif
