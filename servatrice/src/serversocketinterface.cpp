@@ -197,6 +197,11 @@ void ServerSocketInterface::transmitProtocolItem(const ServerMessage &item)
 	emit outputBufferChanged();
 }
 
+void ServerSocketInterface::logDebugMessage(const QString &message)
+{
+	logger->logMessage(message, this);
+}
+
 Response::ResponseCode ServerSocketInterface::processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc)
 {
 	switch ((SessionCommand::SessionCommandType) cmdType) {

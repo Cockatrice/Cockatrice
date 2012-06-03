@@ -57,6 +57,8 @@ private slots:
 	void flushOutputBuffer();
 signals:
 	void outputBufferChanged();
+protected:
+	void logDebugMessage(const QString &message);
 private:
 	QMutex outputBufferMutex;
 	Servatrice *servatrice;

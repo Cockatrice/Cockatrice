@@ -127,8 +127,14 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
 		Response::ResponseCode resp = Response::RespInvalidCommand;
 		const SessionCommand &sc = cont.session_command(i);
 		const int num = getPbExtension(sc);
-		if (num != SessionCommand::PING)
-			emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
+		if (num != SessionCommand::PING) { // don't log ping commands
+			if (num == SessionCommand::LOGIN) { // log login commands, but hide passwords
+				SessionCommand debugSc(sc);
+				debugSc.MutableExtension(Command_Login::ext)->clear_password();
+				logDebugMessage(QString::fromStdString(debugSc.ShortDebugString()));
+			} else
+				logDebugMessage(QString::fromStdString(sc.ShortDebugString()));
+		}
 		switch ((SessionCommand::SessionCommandType) num) {
 			case SessionCommand::PING: resp = cmdPing(sc.GetExtension(Command_Ping::ext), rc); break;
 			case SessionCommand::LOGIN: resp = cmdLogin(sc.GetExtension(Command_Login::ext), rc); break;
@@ -161,7 +167,7 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
 		Response::ResponseCode resp = Response::RespInvalidCommand;
 		const RoomCommand &sc = cont.room_command(i);
 		const int num = getPbExtension(sc);
-		emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
+		logDebugMessage(QString::fromStdString(sc.ShortDebugString()));
 		switch ((RoomCommand::RoomCommandType) num) {
 			case RoomCommand::LEAVE_ROOM: resp = cmdLeaveRoom(sc.GetExtension(Command_LeaveRoom::ext), room, rc); break;
 			case RoomCommand::ROOM_SAY: resp = cmdRoomSay(sc.GetExtension(Command_RoomSay::ext), room, rc); break;
@@ -213,7 +219,7 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 	Response::ResponseCode finalResponseCode = Response::RespOk;
 	for (int i = cont.game_command_size() - 1; i >= 0; --i) {
 		const GameCommand &sc = cont.game_command(i);
-		emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
+		logDebugMessage(QString("game %1 player %2: ").arg(cont.game_id()).arg(roomIdAndPlayerId.second) + QString::fromStdString(sc.ShortDebugString()));
 		
 		Response::ResponseCode resp = player->processGameCommand(sc, rc, ges);
 
@@ -237,7 +243,7 @@ Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(
 		Response::ResponseCode resp = Response::RespInvalidCommand;
 		const ModeratorCommand &sc = cont.moderator_command(i);
 		const int num = getPbExtension(sc);
-		emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
+		logDebugMessage(QString::fromStdString(sc.ShortDebugString()));
 		
 		resp = processExtendedModeratorCommand(num, sc, rc);
 		if (resp != Response::RespOk)
@@ -258,7 +264,7 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
 		Response::ResponseCode resp = Response::RespInvalidCommand;
 		const AdminCommand &sc = cont.admin_command(i);
 		const int num = getPbExtension(sc);
-		emit logDebugMessage(QString::fromStdString(sc.ShortDebugString()), this);
+		logDebugMessage(QString::fromStdString(sc.ShortDebugString()));
 		
 		resp = processExtendedAdminCommand(num, sc, rc);
 		if (resp != Response::RespOk)

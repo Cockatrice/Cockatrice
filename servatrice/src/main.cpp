@@ -163,7 +163,6 @@ int main(int argc, char *argv[])
 		testHash();
 	
 	Servatrice *server = new Servatrice(settings);
-	QObject::connect(server, SIGNAL(logDebugMessage(QString, void *)), logger, SLOT(logMessage(QString, void *)));
 	QObject::connect(server, SIGNAL(destroyed()), &app, SLOT(quit()), Qt::QueuedConnection);
 	int retval = 0;
 	if (server->initServer()) {
