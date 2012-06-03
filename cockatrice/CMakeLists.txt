@@ -77,6 +77,7 @@ SET(cockatrice_SOURCES
  src/localserverinterface.cpp 
  src/localclient.cpp 
  src/priceupdater.cpp 
+ src/qt-json/json.cpp
  src/soundengine.cpp
  ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
 )
@@ -194,7 +195,6 @@ if(APPLE)
   set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 ENDIF(APPLE)
 SET(QT_USE_QTNETWORK TRUE)
-SET(QT_USE_QTSCRIPT TRUE)
 SET(QT_USE_QTMULTIMEDIA TRUE)
 SET(QT_USE_QTXML TRUE)
 SET(QT_USE_QTSVG TRUE)

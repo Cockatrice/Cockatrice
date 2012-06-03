@@ -1,12 +1,11 @@
 /**
- * @author Marcio Ribeiro <mmr@b1n.org>
- * @version 1.0
+ * @author Marcio Ribeiro <mmr@b1n.org>, Max-Wilhelm Bruker <brukie@gmx.net>
+ * @version 1.1
  */
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
-#include <QScriptEngine>
-#include <QScriptValueIterator>
+#include "qt-json/json.h"
 #include "priceupdater.h"
 
 /**
@@ -41,27 +40,25 @@ void PriceUpdater::updatePrices()
  */
 void PriceUpdater::downloadFinished()
 {
-
-
-
     QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
-    QByteArray result = reply->readAll();
-    QScriptValue sc;
-    QScriptEngine engine;
-    sc = engine.evaluate("value = " + result);
-
+    bool ok;
+    QVariantMap resultMap = QtJson::Json::parse(QString(reply->readAll()), ok).toMap();
+    if (!ok) {
+        reply->deleteLater();
+        deleteLater();
+        return;
+    }
+    
     QMap<QString, float> cardsPrice;
-
-    if (sc.property("cards").isArray()) {
-        QScriptValueIterator it(sc.property("cards"));
-        while (it.hasNext()) {
-            it.next();
-            QString name = it.value().property("name").toString().toLower();
-            float price = it.value().property("average").toString().toFloat();
-            cardsPrice.insert(name, price);
-        }
-     }
-
+    
+    QListIterator<QVariant> it(resultMap.value("cards").toList());
+    while (it.hasNext()) {
+        QVariantMap map = it.next().toMap();
+        QString name = map.value("name").toString().toLower();
+        float price = map.value("average").toString().toFloat();
+        cardsPrice.insert(name, price);
+    }
+    
     InnerDecklistNode *listRoot = deck->getRoot();
     for (int i = 0; i < listRoot->size(); i++) {
         InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
@@ -72,7 +69,7 @@ void PriceUpdater::downloadFinished()
             currentCard->setPrice(cardsPrice[currentCard->getName().toLower()]);
         }
     }
-
+    
     reply->deleteLater();
     deleteLater();
     emit finishedUpdate();
