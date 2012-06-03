@@ -191,7 +191,6 @@ void Server::addClient(Server_ProtocolHandler *client)
 {
 	QWriteLocker locker(&clientsLock);
 	clients << client;
-	connect(client, SIGNAL(logDebugMessage(QString, void *)), this, SIGNAL(logDebugMessage(QString, void *)));
 }
 
 void Server::removeClient(Server_ProtocolHandler *client)

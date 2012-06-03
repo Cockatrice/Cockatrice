@@ -35,7 +35,6 @@ class Server : public QObject
 signals:
 	void pingClockTimeout();
 	void sigSendIslMessage(const IslMessage &message, int serverId);
-	void logDebugMessage(QString message, void *caller);
 	void endSession(qint64 sessionId);
 private slots:
 	void broadcastRoomUpdate(const ServerInfo_Room &roomInfo, bool sendToIsl = false);

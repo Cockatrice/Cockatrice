@@ -49,6 +49,7 @@ protected:
 	AuthenticationResult authState;
 	bool acceptsUserListChanges;
 	bool acceptsRoomListChanges;
+	virtual void logDebugMessage(const QString &message) { }
 private:
 	QList<int> messageSizeOverTime, messageCountOverTime;
 	int timeRunning, lastDataReceived;
@@ -79,8 +80,6 @@ private:
 	virtual Response::ResponseCode processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc) { return Response::RespFunctionNotAllowed; }
 private slots:
 	void pingClockTimeout();
-signals:
-	void logDebugMessage(const QString &message, void *session);
 public slots:
 	void prepareDestroy();
 public:

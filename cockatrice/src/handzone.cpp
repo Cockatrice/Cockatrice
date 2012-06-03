@@ -39,19 +39,31 @@ void HandZone::addCardImpl(CardItem *card, int x, int /*y*/)
 	card->update();
 }
 
-void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &/*dropPoint*/)
+void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint & dropPoint)
 {
+	QPoint point = dropPoint + scenePos().toPoint();
+	int x = -1;
+	if (settingsCache->getHorizontalHand()) {
+		for (x = 0; x < cards.size(); x++)
+			if (point.x() < ((CardItem *) cards.at(x))->scenePos().x())
+				break;
+	} else {
+		for (x = 0; x < cards.size(); x++)
+			if (point.y() < ((CardItem *) cards.at(x))->scenePos().y())
+				break;
+	}
+	
 	Command_MoveCard cmd;
 	cmd.set_start_player_id(startZone->getPlayer()->getId());
 	cmd.set_start_zone(startZone->getName().toStdString());
 	cmd.set_target_player_id(player->getId());
 	cmd.set_target_zone(getName().toStdString());
-	cmd.set_x(cards.size());
+	cmd.set_x(x);
 	cmd.set_y(-1);
 	
 	for (int i = 0; i < dragItems.size(); ++i)
 		cmd.mutable_cards_to_move()->add_card()->set_card_id(dragItems[i]->getId());
-
+	
 	player->sendGameCommand(cmd);
 }
 

@@ -60,6 +60,7 @@
 	<file>resources/countries/br.svg</file>
 	<file>resources/countries/by.svg</file>
 	<file>resources/countries/ca.svg</file>
+	<file>resources/countries/cl.svg</file>
 	<file>resources/countries/cz.svg</file>
 	<file>resources/countries/ch.svg</file>
 	<file>resources/countries/cn.svg</file>
@@ -96,6 +97,7 @@
 	<file>resources/countries/ua.svg</file>
 	<file>resources/countries/uk.svg</file>
 	<file>resources/countries/us.svg</file>
+	<file>resources/countries/ve.svg</file>
 	<file>resources/countries/za.svg</file>
 
 	<file>resources/counters/w.svg</file>
