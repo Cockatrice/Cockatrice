@@ -141,47 +141,47 @@ Introduza 0 para um banimento indefinido.</translation>
     <message>
         <location filename="../src/userlist.cpp" line="28"/>
         <source>ban &amp;user name</source>
-        <translation type="unfinished"></translation>
+        <translation>banir &amp;nome de utilizador</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="31"/>
         <source>ban &amp;IP address</source>
-        <translation type="unfinished"></translation>
+        <translation>banir &amp;endereço de IP</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="39"/>
         <source>Ban type</source>
-        <translation type="unfinished"></translation>
+        <translation>Banir tipo</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="42"/>
         <source>&amp;permanent ban</source>
-        <translation type="unfinished"></translation>
+        <translation>banimento &amp;permanente</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="43"/>
         <source>&amp;temporary ban</source>
-        <translation type="unfinished"></translation>
+        <translation>banimento &amp;temporário</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="46"/>
         <source>&amp;Days:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Dias:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="52"/>
         <source>&amp;Hours:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Horas:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="58"/>
         <source>&amp;Minutes:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Minutos:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="73"/>
         <source>Duration of the ban</source>
-        <translation type="unfinished"></translation>
+        <translation>Duração do banimento</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="76"/>
@@ -193,7 +193,7 @@ Isto apenas é guardado para os moderadores e não é visível para a pessoa ban
     <message>
         <location filename="../src/userlist.cpp" line="79"/>
         <source>&amp;OK</source>
-        <translation></translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="82"/>
@@ -208,12 +208,12 @@ Isto apenas é guardado para os moderadores e não é visível para a pessoa ban
     <message>
         <location filename="../src/userlist.cpp" line="104"/>
         <source>Error</source>
-        <translation type="unfinished">Erro</translation>
+        <translation>Erro</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="104"/>
         <source>You have to select a name-based or IP-based ban, or both.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tem de seleccionar um banimento baseado no nome, no Ip ou ambos.</translation>
     </message>
 </context>
 <context>
@@ -1793,7 +1793,7 @@ Isto apenas é guardado para os moderadores e não é visível para a pessoa ban
     <message>
         <location filename="../src/window_main.cpp" line="190"/>
         <source>Italian:</source>
-        <translation type="unfinished"></translation>
+        <translation>Italiano:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="196"/>
@@ -4442,7 +4442,7 @@ Introduza 0 para um banimento indefinido.</translation>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="118"/>
         <source>Hash:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hash:</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="132"/>
