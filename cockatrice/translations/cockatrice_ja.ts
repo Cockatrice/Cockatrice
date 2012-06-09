@@ -141,47 +141,47 @@ Enter 0 for an indefinite ban.</source>
     <message>
         <location filename="../src/userlist.cpp" line="28"/>
         <source>ban &amp;user name</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー名でBAN</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="31"/>
         <source>ban &amp;IP address</source>
-        <translation type="unfinished"></translation>
+        <translation>IPアドレスでBAN</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="39"/>
         <source>Ban type</source>
-        <translation type="unfinished"></translation>
+        <translation>BANタイプ</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="42"/>
         <source>&amp;permanent ban</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="43"/>
         <source>&amp;temporary ban</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="46"/>
         <source>&amp;Days:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="52"/>
         <source>&amp;Hours:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="58"/>
         <source>&amp;Minutes:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="73"/>
         <source>Duration of the ban</source>
-        <translation type="unfinished"></translation>
+        <translation>BAN期間</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="76"/>
@@ -207,12 +207,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/userlist.cpp" line="104"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="104"/>
         <source>You have to select a name-based or IP-based ban, or both.</source>
-        <translation type="unfinished"></translation>
+        <translation>名前によるBANかIPによるBAN、もしくは両方を選択してください</translation>
     </message>
 </context>
 <context>
@@ -287,7 +287,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardinfowidget.cpp" line="193"/>
         <source>Loyalty:</source>
-        <translation type="unfinished"></translation>
+        <translation>忠誠値:</translation>
     </message>
 </context>
 <context>
@@ -1394,7 +1394,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/gameselector.cpp" line="133"/>
         <source>Show u&amp;navailable games</source>
-        <translation type="unfinished"></translation>
+        <translation>プレイ不可のゲームを見る</translation>
     </message>
     <message>
         <source>Show &amp;full games</source>
@@ -1675,7 +1675,7 @@ Reason for shutdown: %1</source>
     <message>
         <location filename="../src/window_main.cpp" line="190"/>
         <source>Italian:</source>
-        <translation type="unfinished"></translation>
+        <translation>イタリア語:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="196"/>
@@ -4044,7 +4044,7 @@ Enter 0 for an indefinite ban.</source>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="118"/>
         <source>Hash:</source>
-        <translation type="unfinished"></translation>
+        <translation>ハッシュ:</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="132"/>
