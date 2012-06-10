@@ -7,6 +7,7 @@
 #ifdef Q_OS_UNIX
 # include <sys/types.h>
 # include <sys/socket.h>
+# include <unistd.h>
 #endif
 
 ServerLogger::ServerLogger(bool _logToConsole, QObject *parent)
