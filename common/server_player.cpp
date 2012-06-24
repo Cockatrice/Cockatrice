@@ -374,6 +374,8 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 		Server_Card *card = cardsToMove[cardIndex].first;
 		const CardToMove *thisCardProperties = cardProperties.value(card);
 		bool faceDown = thisCardProperties->has_face_down() ? thisCardProperties->face_down() : card->getFaceDown();
+		if (!targetzone->hasCoords())
+			faceDown = false;
 		
 		int originalPosition = cardsToMove[cardIndex].second;
 		int position = startzone->removeCard(card);
