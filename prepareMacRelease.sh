@@ -1,6 +1,6 @@
 #!/bin/sh
 
-FRAMEWORKS="Core Gui Multimedia Network Svg Xml Script"
+FRAMEWORKS="Core Gui Multimedia Network Svg Xml"
 DATE=`date '+%Y%m%d'`
 #QTDIR="/Users/brukie/QtSDK/Desktop/Qt/474/gcc"
 QTLIB="/Users/brukie/qt_leopard/lib"

@@ -169,20 +169,20 @@ endif (APPLE)
 
 set(cockatrice_RESOURCES cockatrice.qrc)
 set(cockatrice_TS
-        translations/cockatrice_cs.ts
+#        translations/cockatrice_cs.ts
         translations/cockatrice_de.ts
         translations/cockatrice_en.ts
         translations/cockatrice_es.ts
-        translations/cockatrice_fr.ts
+#        translations/cockatrice_fr.ts
         translations/cockatrice_it.ts
         translations/cockatrice_ja.ts
-        translations/cockatrice_pl.ts
-        translations/cockatrice_pt-br.ts
+#        translations/cockatrice_pl.ts
+#        translations/cockatrice_pt-br.ts
         translations/cockatrice_pt.ts
-        translations/cockatrice_ru.ts
-        translations/cockatrice_sk.ts
+#        translations/cockatrice_ru.ts
+#        translations/cockatrice_sk.ts
 	translations/cockatrice_sv.ts
-	translations/cockatrice_zh_CN.ts
+#	translations/cockatrice_zh_CN.ts
 )
 
 if(WIN32)

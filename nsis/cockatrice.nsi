@@ -43,7 +43,6 @@ Section "Application" SecApplication
 	File C:\MinGW\qt\bin\QtSvg4.dll
 	File C:\MinGW\qt\bin\QtXml4.dll
 	File C:\MinGW\qt\bin\QtMultimedia4.dll
-	File C:\MinGW\qt\bin\QtScript4.dll
 
 	SetOutPath "$INSTDIR\zonebg"
 	File /r ..\zonebg\*.*
@@ -108,7 +107,6 @@ Section Uninstall
         Delete "$INSTDIR\QtSvg4.dll"
         Delete "$INSTDIR\QtXml4.dll"
 	Delete "$INSTDIR\QtMultimedia4.dll"
-	Delete "$INSTDIR\QtScript4.dll"
         RMDir "$INSTDIR"
 
 	RMDir /r "$SMPROGRAMS\Cockatrice"

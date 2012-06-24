@@ -644,7 +644,7 @@ void Player::retranslateUi()
 	aFlip->setText(tr("&Flip"));
 	aPeek->setText(tr("&Peek at card face"));
 	aClone->setText(tr("&Clone"));
-	aClone->setShortcut(tr("Ctrl+H"));
+	aClone->setShortcut(tr("Ctrl+J"));
 	aAttach->setText(tr("Attac&h to card..."));
 	aAttach->setShortcut(tr("Ctrl+A"));
 	aUnattach->setText(tr("Unattac&h"));

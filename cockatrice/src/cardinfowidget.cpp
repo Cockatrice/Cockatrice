@@ -94,12 +94,14 @@ void CardInfoWidget::minimizeClicked(int newMinimized)
 
 bool CardInfoWidget::shouldShowPowTough()
 {
-	return (!info->getPowTough().isEmpty() && (minimized != 0));
+//	return (!info->getPowTough().isEmpty() && (minimized != 0));
+	return (minimized != 0);
 }
 
 bool CardInfoWidget::shouldShowLoyalty()
 {
-	return ((info->getLoyalty() > 0) && (minimized != 0));
+//	return ((info->getLoyalty() > 0) && (minimized != 0));
+	return (minimized != 0);
 }
 
 void CardInfoWidget::setMinimized(int _minimized)
@@ -153,7 +155,7 @@ void CardInfoWidget::setCard(CardInfo *card)
 	manacostLabel2->setText(card->getManaCost());
 	cardtypeLabel2->setText(card->getCardType());
 	powtoughLabel2->setText(card->getPowTough());
-	loyaltyLabel2->setText(QString::number(card->getLoyalty()));
+	loyaltyLabel2->setText(card->getLoyalty() > 0 ? QString::number(card->getLoyalty()) : QString());
 	textLabel->setText(card->getText());
 
 	powtoughLabel1->setVisible(shouldShowPowTough());
