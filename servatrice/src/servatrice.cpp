@@ -43,6 +43,15 @@ Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server, int _numberPoo
 	: QTcpServer(parent),
 	  server(_server)
 {
+	if (_numberPools == 0) {
+		Servatrice_DatabaseInterface *newDatabaseInterface = new Servatrice_DatabaseInterface(0, server);
+		Servatrice_ConnectionPool *newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
+		
+		server->addDatabaseInterface(thread(), newDatabaseInterface);
+		newDatabaseInterface->initDatabase(_sqlDatabase);
+		
+		connectionPools.append(newPool);
+	} else
 	for (int i = 0; i < _numberPools; ++i) {
 		Servatrice_DatabaseInterface *newDatabaseInterface = new Servatrice_DatabaseInterface(i, server);
 		Servatrice_ConnectionPool *newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
