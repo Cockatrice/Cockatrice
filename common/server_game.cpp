@@ -409,6 +409,7 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface, Respons
 		gameInfo.set_room_id(room->getId());
 		gameInfo.set_game_id(gameId);
 		gameInfo.set_player_count(getPlayerCount());
+		gameInfo.set_spectators_count(getSpectatorCount());
 		emit gameInfoChanged(gameInfo);
 	}
 	
@@ -464,6 +465,7 @@ void Server_Game::removePlayer(Server_Player *player)
 	gameInfo.set_room_id(room->getId());
 	gameInfo.set_game_id(gameId);
 	gameInfo.set_player_count(getPlayerCount());
+	gameInfo.set_spectators_count(getSpectatorCount());
 	emit gameInfoChanged(gameInfo);
 }
 
