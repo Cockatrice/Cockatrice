@@ -69,7 +69,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
 	}
 	
 	QTextCharFormat senderFormat;
-	if (tabSupervisor && (sender == QString::fromStdString(tabSupervisor->getUserInfo()->name()))) {
+	if (tabSupervisor && tabSupervisor->getUserInfo() && (sender == QString::fromStdString(tabSupervisor->getUserInfo()->name()))) {
 		senderFormat.setFontWeight(QFont::Bold);
 		senderFormat.setForeground(Qt::red);
 	} else {
