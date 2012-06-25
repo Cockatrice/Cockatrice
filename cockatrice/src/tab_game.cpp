@@ -813,7 +813,9 @@ AbstractClient *TabGame::getClientForPlayer(int playerId) const
 			playerId = getActiveLocalPlayer()->getId();
 
 		return clients.at(playerId);
-	} else
+	} else if (clients.isEmpty())
+		return 0;
+	else
 		return clients.first();
 }
 
@@ -830,12 +832,17 @@ int TabGame::getPlayerIdByName(const QString &playerName) const
 
 void TabGame::sendGameCommand(PendingCommand *pend, int playerId)
 {
-	getClientForPlayer(playerId)->sendCommand(pend);
+	AbstractClient *client = getClientForPlayer(playerId);
+	if (!client)
+		return;
+	client->sendCommand(pend);
 }
 
 void TabGame::sendGameCommand(const google::protobuf::Message &command, int playerId)
 {
 	AbstractClient *client = getClientForPlayer(playerId);
+	if (!client)
+		return;
 	client->sendCommand(prepareGameCommand(command));
 }
 
