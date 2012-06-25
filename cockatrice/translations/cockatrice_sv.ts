@@ -437,7 +437,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="65"/>
         <source>her library</source>
         <comment>look at zone, female owner</comment>
-        <translation>hennes lek</translation>
+        <translation>sin lek</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="66"/>
@@ -449,7 +449,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="68"/>
         <source>his library</source>
         <comment>look at zone, male owner</comment>
-        <translation>hans lek</translation>
+        <translation>sin lek</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="69"/>
@@ -485,7 +485,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="83"/>
         <source>her library</source>
         <comment>reveal zone, female owner</comment>
-        <translation>hennes lek</translation>
+        <translation>sinn lek</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="84"/>
@@ -497,7 +497,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="86"/>
         <source>his library</source>
         <comment>reveal zone, male owner</comment>
-        <translation>hans lek</translation>
+        <translation>sin lek</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="87"/>
@@ -509,7 +509,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="92"/>
         <source>her library</source>
         <comment>shuffle, female owner</comment>
-        <translation>hennes lek</translation>
+        <translation>sin lek</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="93"/>
@@ -521,7 +521,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="95"/>
         <source>his library</source>
         <comment>shuffle, male owner</comment>
-        <translation>hans lek</translation>
+        <translation>sin lek</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="96"/>
@@ -533,7 +533,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="131"/>
         <source>her sideboard</source>
         <comment>look at zone, female owner</comment>
-        <translation>hennes sidbräda</translation>
+        <translation>sin sidbräda</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="132"/>
@@ -545,7 +545,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="134"/>
         <source>his sideboard</source>
         <comment>look at zone, male owner</comment>
-        <translation>hans sidbräda</translation>
+        <translation>sin sidbräda</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="135"/>
@@ -597,7 +597,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="101"/>
         <source>her library</source>
         <comment>nominative, female owner</comment>
-        <translation>hennes lek</translation>
+        <translation>sin lek</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="102"/>
@@ -609,7 +609,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="104"/>
         <source>his library</source>
         <comment>nominative, male owner</comment>
-        <translation>hans lek</translation>
+        <translation>sin lek</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="105"/>
@@ -661,7 +661,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="111"/>
         <source>her graveyard</source>
         <comment>nominative, female owner</comment>
-        <translation>hennes kyrkogård</translation>
+        <translation>sin kyrkogård</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="112"/>
@@ -673,7 +673,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="114"/>
         <source>his graveyard</source>
         <comment>nominative, male owner</comment>
-        <translation>hans kyrkogård</translation>
+        <translation>sin kyrkogård</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="115"/>
@@ -725,7 +725,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="120"/>
         <source>her exile</source>
         <comment>nominative, female owner</comment>
-        <translation>hennes exil</translation>
+        <translation>sin exil</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="121"/>
@@ -737,7 +737,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="123"/>
         <source>his exile</source>
         <comment>nominative, male owner</comment>
-        <translation>hans exil</translation>
+        <translation>sen exil</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="124"/>
@@ -789,7 +789,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="140"/>
         <source>her sideboard</source>
         <comment>nominative, female owner</comment>
-        <translation>hennes sidbräda</translation>
+        <translation>sin sidbräda</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="141"/>
@@ -801,7 +801,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="143"/>
         <source>his sideboard</source>
         <comment>nominative, male owner</comment>
-        <translation>hans sidbräda</translation>
+        <translation>sin sidbräda</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="144"/>
@@ -2223,22 +2223,22 @@ Lokal version är %1, avlägsen version är %2.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="196"/>
         <source>%1 undoes her last draw.</source>
-        <translation>%1 ångrar hennes senaste drag.</translation>
+        <translation>%1 ångrar sitt senaste drag.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="196"/>
         <source>%1 undoes his last draw.</source>
-        <translation>%1 ångrar hans senaste drag.</translation>
+        <translation>%1 ångrar sitt senaste drag.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="198"/>
         <source>%1 undoes her last draw (%2).</source>
-        <translation>%1 ångrar hennes senaste drag (%2).</translation>
+        <translation>%1 ångrar sitt senaste drag (%2).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="198"/>
         <source>%1 undoes his last draw (%2).</source>
-        <translation>%1 ångrar hans senaste drag (%2).</translation>
+        <translation>%1 ångrar sitt senaste drag (%2).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="208"/>
@@ -2268,12 +2268,12 @@ Lokal version är %1, avlägsen version är %2.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="221"/>
         <source>the bottom card of her library</source>
-        <translation>det sista kortet i hennes lek</translation>
+        <translation>det sista kortet i sin lek</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="221"/>
         <source>the bottom card of his library</source>
-        <translation>det sista kortet i hans lek</translation>
+        <translation>det sista kortet i sin lek</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="225"/>
@@ -2283,12 +2283,12 @@ Lokal version är %1, avlägsen version är %2.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="227"/>
         <source> from the bottom of her library</source>
-        <translation> från botten av hennes lek</translation>
+        <translation> från botten av sin lek</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="227"/>
         <source> from the bottom of his library</source>
-        <translation> från botten av hans lek</translation>
+        <translation> från botten av sin lek</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="232"/>
@@ -2298,12 +2298,12 @@ Lokal version är %1, avlägsen version är %2.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="234"/>
         <source>the top card of her library</source>
-        <translation>det översta kortet av hennes lek</translation>
+        <translation>det översta kortet av sin lek</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="234"/>
         <source>the top card of his library</source>
-        <translation>det översta kortet av hans lek</translation>
+        <translation>det översta kortet avsin lek</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="238"/>
@@ -2313,12 +2313,12 @@ Lokal version är %1, avlägsen version är %2.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="240"/>
         <source> from the top of her library</source>
-        <translation> från toppen av hennes lek</translation>
+        <translation> från toppen av sin lek</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="240"/>
         <source> from the top of his library</source>
-        <translation> från botten av hans lek</translation>
+        <translation> från botten av sin lek</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="244"/>
@@ -2389,32 +2389,32 @@ Lokal version är %1, avlägsen version är %2.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="303"/>
         <source>%1 puts %2%3 on bottom of her library.</source>
-        <translation>%1 placerar %2%3 underst i hennes lek.</translation>
+        <translation>%1 placerar %2%3 underst i sin lek.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="303"/>
         <source>%1 puts %2%3 on bottom of his library.</source>
-        <translation>%1 placerar %2%3 underst i hans lek.</translation>
+        <translation>%1 placerar %2%3 underst i sin lek.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="305"/>
         <source>%1 puts %2%3 on top of her library.</source>
-        <translation>%1 placerar %2%3 överst i hennes lek.</translation>
+        <translation>%1 placerar %2%3 överst i sin lek.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="305"/>
         <source>%1 puts %2%3 on top of his library.</source>
-        <translation>%1 placerar %2%3 överst i hans lek.</translation>
+        <translation>%1 placerar %2%3 överst i sin lek.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="307"/>
         <source>%1 puts %2%3 into her library at position %4.</source>
-        <translation>%1 placerar %2%3 på plats %4 i hennes lek.</translation>
+        <translation>%1 placerar %2%3 på plats %4 i sin lek.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="307"/>
         <source>%1 puts %2%3 into his library at position %4.</source>
-        <translation>%1 placerar %2%3 på plats %4 i hans lek.</translation>
+        <translation>%1 placerar %2%3 på plats %4 i sin lek.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="309"/>
@@ -2542,37 +2542,37 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <location filename="../src/messagelogwidget.cpp" line="408"/>
         <source>%1 points from her %2 to herself.</source>
         <comment>female</comment>
-        <translation>%1 pekar från hennes %2 till sig själv.</translation>
+        <translation>%1 pekar från sin %2 till sig själv.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="410"/>
         <source>%1 points from his %2 to himself.</source>
         <comment>male</comment>
-        <translation>%1 pekar från hans %2 till sig själv.</translation>
+        <translation>%1 pekar från sin %2 till sig själv.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="415"/>
         <source>%1 points from her %2 to %3.</source>
         <comment>p1 female, p2 female</comment>
-        <translation>%1 pekar från hennes %2 till %3.</translation>
+        <translation>%1 pekar från sin %2 till %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="417"/>
         <source>%1 points from her %2 to %3.</source>
         <comment>p1 female, p2 male</comment>
-        <translation>%1 pekar från hennes %2 till %3.</translation>
+        <translation>%1 pekar från sin %2 till %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="420"/>
         <source>%1 points from his %2 to %3.</source>
         <comment>p1 male, p2 female</comment>
-        <translation>%1 pekar från hans %2 till %3.</translation>
+        <translation>%1 pekar från sin %2 till %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="422"/>
         <source>%1 points from his %2 to %3.</source>
         <comment>p1 male, p2 male</comment>
-        <translation>%1 pekar från hans %2 till %3.</translation>
+        <translation>%1 pekar från sin %2 till %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="428"/>
@@ -2650,37 +2650,37 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <location filename="../src/messagelogwidget.cpp" line="469"/>
         <source>%1 points from her %2 to her %3.</source>
         <comment>female</comment>
-        <translation>%1 pekar från hennes %2 till sin %3.</translation>
+        <translation>%1 pekar från sin %2 till sin %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="471"/>
         <source>%1 points from his %2 to his %3.</source>
         <comment>male</comment>
-        <translation>%1 pekar från hans %2 till sin %3.</translation>
+        <translation>%1 pekar från sin %2 till sin %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="476"/>
         <source>%1 points from her %2 to %3&apos;s %4.</source>
         <comment>p1 female, p2 female</comment>
-        <translation>%1 pekar från hennes %2 till %3&apos;s %4.</translation>
+        <translation>%1 pekar från sin %2 till %3&apos;s %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="478"/>
         <source>%1 points from her %2 to %3&apos;s %4.</source>
         <comment>p1 female, p2 male</comment>
-        <translation>%1 pekar från hennes %2 till %3&apos;s %4.</translation>
+        <translation>%1 pekar från sin %2 till %3&apos;s %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="481"/>
         <source>%1 points from his %2 to %3&apos;s %4.</source>
         <comment>p1 male, p2 female</comment>
-        <translation>%1 pekar från hans %2 till %3&apos;s %4.</translation>
+        <translation>%1 pekar från sin %2 till %3&apos;s %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="483"/>
         <source>%1 points from his %2 to %3&apos;s %4.</source>
         <comment>p1 male, p2 male</comment>
-        <translation>%1 pekar från hans %2 till %3&apos;s %4.</translation>
+        <translation>%1 pekar från sin %2 till %3&apos;s %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="489"/>

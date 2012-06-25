@@ -117,6 +117,9 @@ void TabSupervisor::retranslateUi()
 	QListIterator<TabDeckEditor *> deckEditorIterator(deckEditorTabs);
 	while (deckEditorIterator.hasNext())
 		tabs.append(deckEditorIterator.next());
+	QMapIterator<QString, TabMessage *> messageIterator(messageTabs);
+	while (messageIterator.hasNext())
+		tabs.append(messageIterator.next().value());
 	
 	for (int i = 0; i < tabs.size(); ++i)
 		if (tabs[i]) {
