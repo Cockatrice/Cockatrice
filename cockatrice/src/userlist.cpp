@@ -234,6 +234,7 @@ UserList::UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserL
 
 void UserList::retranslateUi()
 {
+	userContextMenu->retranslateUi();
 	switch (type) {
 		case AllUsersList: titleStr = tr("Users online: %1"); break;
 		case RoomList: titleStr = tr("Users in this room: %1"); break;
