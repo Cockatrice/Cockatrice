@@ -5,7 +5,7 @@ DATE=`date '+%Y%m%d'`
 #QTDIR="/Users/brukie/QtSDK/Desktop/Qt/474/gcc"
 QTLIB="/Users/brukie/qt_leopard/lib"
 QTPLUGINS="/Users/brukie/qt_leopard/plugins"
-PROTOBUF="/Users/brukie/protobuf"
+PROTOBUF="/Users/brukie/protobuf_leopard"
 DIR=cockatrice_mac_$DATE
 if [ -d $DIR ]; then echo "delete old dir first"; exit 1; fi
 
