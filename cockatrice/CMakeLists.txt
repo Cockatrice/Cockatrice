@@ -157,9 +157,9 @@ SET(cockatrice_HEADERS
  src/pending_command.h 
 )
 
-if (UNIX)
+if (UNIX AND NOT APPLE)
 	set_source_files_properties(src/main.cpp PROPERTIES COMPILE_FLAGS -DTRANSLATION_PATH=\\"${CMAKE_INSTALL_PREFIX}/share/cockatrice/translations\\")
-endif (UNIX)
+endif (UNIX AND NOT APPLE)
 
 set(cockatrice_RESOURCES cockatrice.qrc)
 set(cockatrice_TS
