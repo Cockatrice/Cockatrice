@@ -171,3 +171,14 @@ CREATE TABLE `cockatrice_sessions` (
   PRIMARY KEY (`id`),
   KEY `username` (`user_name`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `cockatrice_servers` (
+  `id` mediumint(8) unsigned NOT NULL,
+  `ssl_cert` text COLLATE utf8_unicode_ci NOT NULL,
+  `hostname` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `address` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `game_port` mediumint(8) unsigned NOT NULL,
+  `control_port` mediumint(9) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
