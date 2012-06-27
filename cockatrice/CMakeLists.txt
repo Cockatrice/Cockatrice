@@ -160,12 +160,6 @@ SET(cockatrice_HEADERS
 if (UNIX)
 	set_source_files_properties(src/main.cpp PROPERTIES COMPILE_FLAGS -DTRANSLATION_PATH=\\"${CMAKE_INSTALL_PREFIX}/share/cockatrice/translations\\")
 endif (UNIX)
-if (WIN32)
-	set_source_files_properties(src/main.cpp PROPERTIES COMPILE_FLAGS -DTRANSLATION_PATH=\\"translations\\")
-endif (WIN32)
-if (APPLE)
-	set_source_files_properties(src/main.cpp PROPERTIES COMPILE_FLAGS -DTRANSLATION_PATH=\\"../../../translations\\")
-endif (APPLE)
 
 set(cockatrice_RESOURCES cockatrice.qrc)
 set(cockatrice_TS

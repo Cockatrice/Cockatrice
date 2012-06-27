@@ -69,8 +69,6 @@ void installNewTranslator()
 
 	qtTranslator->load("qt_" + lang, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	qApp->installTranslator(qtTranslator);
-	if (!translationPath.startsWith("/"))
-		translationPath.prepend(qApp->applicationDirPath() + "/");
 	translator->load(translationPrefix + "_" + lang, translationPath);
 	qApp->installTranslator(translator);
 }
@@ -98,6 +96,17 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationName("Cockatrice");
 	QCoreApplication::setOrganizationDomain("cockatrice.de");
 	QCoreApplication::setApplicationName("Cockatrice");
+	
+	if (translationPath.isEmpty()) {
+#ifdef Q_OS_MAC
+		QDir translationsDir = baseDir;
+		translationsDir.cd("translations");
+		translationPath = translationsDir.absolutePath();
+#endif
+#ifdef Q_OS_WIN
+		translationPath = app.applicationDirPath() + "/translations";
+#endif
+	}
 	
 	rng = new RNG_SFMT;
 	settingsCache = new SettingsCache;
