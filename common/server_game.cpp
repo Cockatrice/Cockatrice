@@ -53,6 +53,7 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo, int _gameId, const
           hostId(0),
           creatorInfo(new ServerInfo_User(_creatorInfo)),
           gameStarted(false),
+          gameClosed(false),
           gameId(_gameId),
           description(_description),
           password(_password),
@@ -92,6 +93,7 @@ Server_Game::~Server_Game()
 	room->gamesMutex.lock();
 	gameMutex.lock();
 	
+	gameClosed = true;
 	sendGameEventContainer(prepareGameEvent(Event_GameClosed(), -1));
 	
 	QMapIterator<int, Server_Player *> playerIterator(players);
@@ -273,7 +275,9 @@ void Server_Game::doStartGameIfReady()
 		replayList.append(currentReplay);
 		currentReplay = new GameReplay;
 		currentReplay->set_replay_id(databaseInterface->getNextReplayId());
-		getInfo(*currentReplay->mutable_game_info());
+		ServerInfo_Game *gameInfo = currentReplay->mutable_game_info();
+		getInfo(*gameInfo);
+		gameInfo->set_started(false);
 		
 		Event_GameStateChanged omniscientEvent;
 		createGameStateChangedEvent(&omniscientEvent, 0, true, true);
@@ -438,6 +442,7 @@ void Server_Game::removePlayer(Server_Player *player)
 	player->prepareDestroy();
 	
 	if (!getPlayerCount()) {
+		gameClosed = true;
 		deleteLater();
 		return;
 	} else if (!spectator) {
@@ -666,7 +671,7 @@ void Server_Game::getInfo(ServerInfo_Game &result) const
 	
 	result.set_room_id(room->getId());
 	result.set_game_id(gameId);
-	if (players.isEmpty())
+	if (gameClosed)
 		result.set_closed(true);
 	else {
 		for (int i = 0; i < gameTypes.size(); ++i)
