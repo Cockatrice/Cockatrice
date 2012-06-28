@@ -165,6 +165,7 @@ CREATE TABLE `cockatrice_bans` (
 CREATE TABLE `cockatrice_sessions` (
   `id` int(9) NOT NULL AUTO_INCREMENT,
   `user_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `id_server` tinyint(3) NOT NULL,
   `ip_address` char(15) COLLATE utf8_unicode_ci NOT NULL,
   `start_time` datetime NOT NULL,
   `end_time` datetime DEFAULT NULL,
