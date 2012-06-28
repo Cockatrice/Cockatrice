@@ -51,6 +51,7 @@ private:
 	QMap<int, Server_Player *> players;
 	QSet<QString> allPlayersEver, allSpectatorsEver;
 	bool gameStarted;
+	bool gameClosed;
 	int gameId;
 	QString description;
 	QString password;
