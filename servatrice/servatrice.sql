@@ -183,3 +183,20 @@ CREATE TABLE `cockatrice_servers` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+CREATE TABLE `cockatrice_replays` (
+  `id` int(7) NOT NULL AUTO_INCREMENT,
+  `id_game` int(7) NOT NULL,
+  `duration` int(7) NOT NULL,
+  `replay` mediumblob NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_game` (`id_game`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE `cockatrice_replays_access` (
+  `id_game` int(7) NOT NULL,
+  `id_player` int(7) NOT NULL,
+  `replay_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `do_not_hide` tinyint(1) NOT NULL,
+  KEY `id_player` (`id_player`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
