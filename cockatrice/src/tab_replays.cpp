@@ -74,13 +74,13 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client)
 	hbox->addWidget(rightGroupBox);
 	
 	aOpenLocalReplay = new QAction(this);
-	aOpenLocalReplay->setIcon(QIcon(":/resources/pencil.svg"));
+	aOpenLocalReplay->setIcon(QIcon(":/resources/icon_view.svg"));
 	connect(aOpenLocalReplay, SIGNAL(triggered()), this, SLOT(actOpenLocalReplay()));
 	aDeleteLocalReplay = new QAction(this);
 	aDeleteLocalReplay->setIcon(QIcon(":/resources/remove_row.svg"));
 	connect(aDeleteLocalReplay, SIGNAL(triggered()), this, SLOT(actDeleteLocalReplay()));
 	aOpenRemoteReplay = new QAction(this);
-	aOpenRemoteReplay->setIcon(QIcon(":/resources/pencil.svg"));
+	aOpenRemoteReplay->setIcon(QIcon(":/resources/icon_view.svg"));
 	connect(aOpenRemoteReplay, SIGNAL(triggered()), this, SLOT(actOpenRemoteReplay()));
 	aDownload = new QAction(this);
 	aDownload->setIcon(QIcon(":/resources/arrow_left_green.svg"));
