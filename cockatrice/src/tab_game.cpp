@@ -819,17 +819,6 @@ AbstractClient *TabGame::getClientForPlayer(int playerId) const
 		return clients.first();
 }
 
-int TabGame::getPlayerIdByName(const QString &playerName) const
-{
-	QMapIterator<int, Player *> playerIterator(players);
-	while (playerIterator.hasNext()) {
-		const Player *const p = playerIterator.next().value();
-		if (p->getName() == playerName)
-			return p->getId();
-	}
-	return -1;
-}
-
 void TabGame::sendGameCommand(PendingCommand *pend, int playerId)
 {
 	AbstractClient *client = getClientForPlayer(playerId);

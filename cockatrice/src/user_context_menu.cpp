@@ -182,7 +182,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
 		client->sendCommand(client->prepareSessionCommand(cmd));
 	} else if (actionClicked == aKick) {
 		Command_KickFromGame cmd;
-		cmd.set_player_id(game->getPlayerIdByName(userName));
+		cmd.set_player_id(playerId);
 		game->sendGameCommand(cmd);
 	} else if (actionClicked == aBan) {
 		Command_GetUserInfo cmd;
