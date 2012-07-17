@@ -247,9 +247,11 @@ void Server_Player::getProperties(ServerInfo_PlayerProperties &result, bool with
 	if (withUserInfo)
 		result.mutable_user_info()->CopyFrom(*userInfo);
 	result.set_spectator(spectator);
-	result.set_conceded(conceded);
-	result.set_sideboard_locked(sideboardLocked);
-	result.set_ready_start(readyStart);
+	if (!spectator) {
+		result.set_conceded(conceded);
+		result.set_sideboard_locked(sideboardLocked);
+		result.set_ready_start(readyStart);
+	}
 	if (deck)
 		result.set_deck_hash(deck->getDeckHash().toStdString());
 	result.set_ping_seconds(pingTime);
