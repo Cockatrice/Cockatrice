@@ -774,12 +774,22 @@ Response::ResponseCode Server_Player::cmdShuffle(const Command_Shuffle & /*cmd*/
 		return Response::RespGameNotStarted;
 	if (conceded)
 		return Response::RespContextError;
-		
-	zones.value("deck")->shuffle();
+	
+	Server_CardZone *deckZone = zones.value("deck");
+	deckZone->shuffle();
 	
 	Event_Shuffle event;
 	event.set_zone_name("deck");
 	ges.enqueueGameEvent(event, playerId);
+	
+	if (deckZone->getAlwaysRevealTopCard() && !deckZone->cards.isEmpty()) {
+		Event_RevealCards revealEvent;
+		revealEvent.set_zone_name(deckZone->getName().toStdString());
+		revealEvent.set_card_id(0);
+		deckZone->cards.first()->getInfo(revealEvent.add_cards());
+		
+		ges.enqueueGameEvent(revealEvent, playerId);
+	}
 	
 	return Response::RespOk;
 }
