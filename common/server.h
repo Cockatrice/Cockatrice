@@ -61,6 +61,7 @@ public:
 	virtual bool getThreaded() const { return false; }
 	
 	Server_DatabaseInterface *getDatabaseInterface() const;
+	int getNextLocalGameId() { QMutexLocker locker(&nextLocalGameIdMutex); return ++nextLocalGameId; }
 	virtual void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays) { }
 	
 	void sendIsl_Response(const Response &item, int serverId = -1, qint64 sessionId = -1);
@@ -81,6 +82,8 @@ private:
 	bool threaded;
 	QMultiMap<QString, PlayerReference> persistentPlayers;
 	mutable QReadWriteLock persistentPlayersLock;
+	int nextLocalGameId;
+	QMutex nextLocalGameIdMutex;
 protected slots:	
 	void externalUserJoined(const ServerInfo_User &userInfo);
 	void externalUserLeft(const QString &userName);

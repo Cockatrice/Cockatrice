@@ -22,9 +22,7 @@ LocalServerInterface *LocalServer::newConnection()
 }
 
 LocalServer_DatabaseInterface::LocalServer_DatabaseInterface(LocalServer *_localServer)
-	: Server_DatabaseInterface(_localServer),
-	  nextGameId(0),
-	  nextReplayId(0)
+	: Server_DatabaseInterface(_localServer), localServer(_localServer)
 {
 }
 

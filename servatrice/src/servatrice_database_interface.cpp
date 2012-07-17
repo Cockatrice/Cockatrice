@@ -389,6 +389,9 @@ QMap<QString, ServerInfo_User> Servatrice_DatabaseInterface::getIgnoreList(const
 
 int Servatrice_DatabaseInterface::getNextGameId()
 {
+	if (!sqlDatabase.isValid())
+		return server->getNextLocalGameId();
+	
 	if (!checkSql())
 		return -1;
 	
