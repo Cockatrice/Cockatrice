@@ -36,7 +36,7 @@
 #include <QDebug>
 
 Server::Server(bool _threaded, QObject *parent)
-	: QObject(parent), threaded(_threaded), clientsLock(QReadWriteLock::Recursive)
+	: QObject(parent), threaded(_threaded), clientsLock(QReadWriteLock::Recursive), nextLocalGameId(0)
 {
 	qRegisterMetaType<ServerInfo_Game>("ServerInfo_Game");
 	qRegisterMetaType<ServerInfo_Room>("ServerInfo_Room");

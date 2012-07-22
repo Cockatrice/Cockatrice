@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (
   `content` text NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `FolderPlusUser` (`id_folder`,`user`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=550 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_decklist_folders` (
   `name` varchar(30) NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `ParentPlusUser` (`id_parent`,`user`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=80 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -58,13 +58,17 @@ CREATE TABLE IF NOT EXISTS `cockatrice_decklist_folders` (
 --
 
 CREATE TABLE IF NOT EXISTS `cockatrice_games` (
-  `id` int(7) unsigned zerofill NOT NULL,
+  `room_name` varchar(255) NOT NULL,
+  `id` int(7) unsigned NOT NULL auto_increment,
   `descr` varchar(50) default NULL,
-  `password` tinyint(1) default NULL,
+  `creator_name` varchar(255) NOT NULL,
+  `password` tinyint(1) NOT NULL,
+  `game_types` varchar(255) NOT NULL,
+  `player_count` tinyint(3) NOT NULL,
   `time_started` datetime default NULL,
   `time_finished` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -74,9 +78,9 @@ CREATE TABLE IF NOT EXISTS `cockatrice_games` (
 
 CREATE TABLE IF NOT EXISTS `cockatrice_games_players` (
   `id_game` int(7) unsigned zerofill NOT NULL,
-  `player` varchar(35) default NULL,
+  `player_name` varchar(255) NOT NULL,
   KEY `id_game` (`id_game`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -91,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_news` (
   `subject` varchar(255) NOT NULL,
   `content` text NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=17 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -114,7 +118,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `token` char(32) NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=915 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 CREATE TABLE `cockatrice_uptime` (
   `id_server` tinyint(3) NOT NULL,

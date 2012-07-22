@@ -22,8 +22,10 @@ Servatrice_DatabaseInterface::~Servatrice_DatabaseInterface()
 
 void Servatrice_DatabaseInterface::initDatabase(const QSqlDatabase &_sqlDatabase)
 {
-	sqlDatabase = QSqlDatabase::cloneDatabase(_sqlDatabase, "pool_" + QString::number(instanceId));
-	openDatabase();
+	if (_sqlDatabase.isValid()) {
+		sqlDatabase = QSqlDatabase::cloneDatabase(_sqlDatabase, "pool_" + QString::number(instanceId));
+		openDatabase();
+	}
 }
 
 void Servatrice_DatabaseInterface::initDatabase(const QString &type, const QString &hostName, const QString &databaseName, const QString &userName, const QString &password)
@@ -387,6 +389,9 @@ QMap<QString, ServerInfo_User> Servatrice_DatabaseInterface::getIgnoreList(const
 
 int Servatrice_DatabaseInterface::getNextGameId()
 {
+	if (!sqlDatabase.isValid())
+		return server->getNextLocalGameId();
+	
 	if (!checkSql())
 		return -1;
 	

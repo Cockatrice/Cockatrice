@@ -210,7 +210,6 @@ public:
 	bool getSpectatorsSeeEverything() const { return gameInfo.spectators_omniscient(); }
 	Player *getActiveLocalPlayer() const;
 	AbstractClient *getClientForPlayer(int playerId) const;
-	int getPlayerIdByName(const QString &playerName) const;
 	
 	void setActiveCard(CardItem *_card) { activeCard = _card; }
 	CardItem *getActiveCard() const { return activeCard; }
