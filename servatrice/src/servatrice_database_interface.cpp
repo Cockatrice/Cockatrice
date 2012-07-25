@@ -73,6 +73,21 @@ bool Servatrice_DatabaseInterface::execSqlQuery(QSqlQuery &query)
 	return false;
 }
 
+bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user)
+{
+	QString result;
+	result.reserve(user.size());
+	foreach (const QChar& c, user) {
+		switch (c.category()) {
+		// TODO: Figure out exactly which categories are OK and not
+		case QChar::Other_Control: break;
+		default: result += c;
+		}
+	}
+	result = result.trimmed();
+	return (result.size() > 0);
+}
+
 AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &banSecondsLeft)
 {
 	switch (server->getAuthenticationMethod()) {
@@ -80,6 +95,9 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
 	case Servatrice::AuthenticationSql: {
 		if (!checkSql())
 			return UnknownUser;
+
+		if (!usernameIsValid(user))
+			return UsernameInvalid;
 		
 		QSqlQuery ipBanQuery(sqlDatabase);
 		ipBanQuery.prepare("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))), b.minutes <=> 0, b.visible_reason from " + server->getDbPrefix() + "_bans b where b.time_from = (select max(c.time_from) from " + server->getDbPrefix() + "_bans c where c.ip_address = :address) and b.ip_address = :address2");

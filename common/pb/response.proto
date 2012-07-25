@@ -22,6 +22,7 @@ message Response {
 		RespChatFlood = 18;
 		RespUserIsBanned = 19;
 		RespAccessDenied = 20;
+		RespUsernameInvalid = 21;
 	}
 	enum ResponseType {
 		JOIN_ROOM = 1000;

@@ -9,6 +9,7 @@ message Event_ConnectionClosed {
 		SERVER_SHUTDOWN = 2;
 		TOO_MANY_CONNECTIONS = 3;
 		BANNED = 4;
+		USERNAMEINVALID = 5;
 	}
 	optional CloseReason reason = 1;
 	optional string reason_str = 2;

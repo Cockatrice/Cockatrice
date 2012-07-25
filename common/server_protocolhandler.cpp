@@ -200,11 +200,11 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 	if (!game) {
 		if (room->getExternalGames().contains(cont.game_id())) {
 			server->sendIsl_GameCommand(cont,
-			                            room->getExternalGames().value(cont.game_id()).server_id(),
-			                            userInfo->session_id(),
-			                            roomIdAndPlayerId.first,
-			                            roomIdAndPlayerId.second
-			                            );
+										room->getExternalGames().value(cont.game_id()).server_id(),
+										userInfo->session_id(),
+										roomIdAndPlayerId.first,
+										roomIdAndPlayerId.second
+										);
 			return Response::RespNothing;
 		}
 		return Response::RespNotInRoom;
@@ -338,6 +338,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 		}
 		case NotLoggedIn: return Response::RespWrongPassword;
 		case WouldOverwriteOldSession: return Response::RespWouldOverwriteOldSession;
+		case UsernameInvalid: return Response::RespUsernameInvalid;
 		default: authState = res;
 	}
 	

@@ -76,6 +76,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
 			break;
 		}
 		case Event_ConnectionClosed::SERVER_SHUTDOWN: reasonStr = tr("Scheduled server shutdown."); break;
+		case Event_ConnectionClosed::USERNAMEINVALID: reasonStr = tr("Invalid username."); break;
 		default: reasonStr = QString::fromStdString(event.reason_str());
 	}
 	QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.\nReason: %1").arg(reasonStr));
@@ -257,6 +258,9 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
 			QMessageBox::critical(this, tr("Error"), bannedStr);
 			break;
 		}
+		case Response::RespUserIsBanned:
+			QMessageBox::critical(this, tr("Error"), tr("Invalid username."));
+			break;
 		default:
 			QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)));
 	}
