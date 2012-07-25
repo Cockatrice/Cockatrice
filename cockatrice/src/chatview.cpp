@@ -103,7 +103,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
 		message = message.mid(index);
 		if (message.isEmpty())
 			break;
-		
+
 		if (message.startsWith("[card]")) {
 			message = message.mid(6);
 			int closeTagIndex = message.indexOf("[/card]");
@@ -112,12 +112,30 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
 				message.clear();
 			else
 				message = message.mid(closeTagIndex + 7);
-			
+
 			QTextCharFormat tempFormat = messageFormat;
 			tempFormat.setForeground(Qt::blue);
 			tempFormat.setAnchor(true);
 			tempFormat.setAnchorHref("card://" + cardName);
-			
+
+			cursor.setCharFormat(tempFormat);
+			cursor.insertText(cardName);
+			cursor.setCharFormat(messageFormat);
+		} else if (message.startsWith("[[")) {
+			message = message.mid(2);
+			int closeTagIndex = message.indexOf("]]");
+			QString cardName = message.left(closeTagIndex);
+			if (closeTagIndex == -1)
+				message.clear();
+			else
+				message = message.mid(closeTagIndex + 2);
+
+			// TODO: Factor out this duplicated code (vs [card] parsing)
+			QTextCharFormat tempFormat = messageFormat;
+			tempFormat.setForeground(Qt::blue);
+			tempFormat.setAnchor(true);
+			tempFormat.setAnchorHref("card://" + cardName);
+
 			cursor.setCharFormat(tempFormat);
 			cursor.insertText(cardName);
 			cursor.setCharFormat(messageFormat);
@@ -129,7 +147,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
 				message.clear();
 			else
 				message = message.mid(closeTagIndex + 6);
-			
+
 			if (!url.contains("://"))
 				url.prepend("http://");
 			
