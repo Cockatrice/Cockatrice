@@ -72,14 +72,14 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, Servatrice_Dat
 	socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(catchSocketError(QAbstractSocket::SocketError)));
-	connect(this, SIGNAL(outputBufferChanged()), this, SLOT(flushOutputBuffer()), Qt::QueuedConnection);
+	connect(this, SIGNAL(outputQueueChanged()), this, SLOT(flushOutputQueue()));
 }
 
 ServerSocketInterface::~ServerSocketInterface()
 {
 	logger->logMessage("ServerSocketInterface destructor", this);
 	
-	flushOutputBuffer();
+	flushOutputQueue();
 }
 
 void ServerSocketInterface::initConnection(int socketDescriptor)
@@ -93,11 +93,10 @@ void ServerSocketInterface::initSessionDeprecated()
 {
 	// dirty hack to make v13 client display the correct error message
 	
-	outputBufferMutex.lock();
-	outputBuffer = "<?xml version=\"1.0\"?><cockatrice_server_stream version=\"14\">";
-	outputBufferMutex.unlock();
-	
-	emit outputBufferChanged();
+	QByteArray buf;
+	buf.append("<?xml version=\"1.0\"?><cockatrice_server_stream version=\"14\">");
+	socket->write(buf);
+	socket->flush();
 }
 
 bool ServerSocketInterface::initSession()
@@ -123,17 +122,6 @@ bool ServerSocketInterface::initSession()
 	
 	server->addClient(this);
 	return true;
-}
-
-void ServerSocketInterface::flushOutputBuffer()
-{
-	QMutexLocker locker(&outputBufferMutex);
-	if (outputBuffer.isEmpty())
-		return;
-	servatrice->incTxBytes(outputBuffer.size());
-	socket->write(outputBuffer);
-	socket->flush();
-	outputBuffer.clear();
 }
 
 void ServerSocketInterface::readClient()
@@ -183,18 +171,38 @@ void ServerSocketInterface::catchSocketError(QAbstractSocket::SocketError socket
 
 void ServerSocketInterface::transmitProtocolItem(const ServerMessage &item)
 {
-	QByteArray buf;
-	unsigned int size = item.ByteSize();
-	buf.resize(size + 4);
-	item.SerializeToArray(buf.data() + 4, size);
-	buf.data()[3] = (unsigned char) size;
-	buf.data()[2] = (unsigned char) (size >> 8);
-	buf.data()[1] = (unsigned char) (size >> 16);
-	buf.data()[0] = (unsigned char) (size >> 24);
+	outputQueueMutex.lock();
+	outputQueue.append(item);
+	outputQueueMutex.unlock();
 	
-	QMutexLocker locker(&outputBufferMutex);
-	outputBuffer.append(buf);
-	emit outputBufferChanged();
+	emit outputQueueChanged();
+}
+
+void ServerSocketInterface::flushOutputQueue()
+{
+	QMutexLocker locker(&outputQueueMutex);
+	if (outputQueue.isEmpty())
+		return;
+	
+	int totalBytes = 0;
+	while (!outputQueue.isEmpty()) {
+		const ServerMessage &item = outputQueue.first();
+		
+		QByteArray buf;
+		unsigned int size = item.ByteSize();
+		buf.resize(size + 4);
+		item.SerializeToArray(buf.data() + 4, size);
+		buf.data()[3] = (unsigned char) size;
+		buf.data()[2] = (unsigned char) (size >> 8);
+		buf.data()[1] = (unsigned char) (size >> 16);
+		buf.data()[0] = (unsigned char) (size >> 24);
+		socket->write(buf);
+		
+		totalBytes += size + 4;
+		outputQueue.removeFirst();
+	}
+	servatrice->incTxBytes(totalBytes);
+	socket->flush();
 }
 
 void ServerSocketInterface::logDebugMessage(const QString &message)
@@ -715,8 +723,8 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 		for (int i = 0; i < userList.size(); ++i) {
 			SessionEvent *se = userList[i]->prepareSessionEvent(event);
 			userList[i]->sendProtocolItem(*se);
-			userList[i]->prepareDestroy();
 			delete se;
+			QMetaObject::invokeMethod(userList[i], "prepareDestroy", Qt::QueuedConnection);
 		}
 	}
 	

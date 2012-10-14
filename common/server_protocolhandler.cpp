@@ -38,6 +38,8 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 {
 }
 
+// This function must only be called from the thread this object lives in.
+// The thread must not hold any server locks when calling this (e.g. clientsLock, roomsLock).
 void Server_ProtocolHandler::prepareDestroy()
 {
 	if (deleted)
@@ -399,6 +401,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_G
 	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
+	// XXX This does not take external users into account.
+	// XXX Maybe remove this check and test if the result list is empty at the end.
 	server->clientsLock.lockForRead();
 	if (!server->getUsers().contains(QString::fromStdString(cmd.user_name())))
 		return Response::RespNameNotFound;

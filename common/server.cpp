@@ -36,7 +36,7 @@
 #include <QDebug>
 
 Server::Server(bool _threaded, QObject *parent)
-	: QObject(parent), threaded(_threaded), clientsLock(QReadWriteLock::Recursive), nextLocalGameId(0)
+	: QObject(parent), threaded(_threaded), nextLocalGameId(0)
 {
 	qRegisterMetaType<ServerInfo_Game>("ServerInfo_Game");
 	qRegisterMetaType<ServerInfo_Room>("ServerInfo_Room");
@@ -79,10 +79,9 @@ void Server::prepareDestroy()
 			clientsLock.unlock();
 		} while (!done);
 	} else {
-		clientsLock.lockForWrite();
+		// no locking is needed in unthreaded mode
 		while (!clients.isEmpty())
 			clients.first()->prepareDestroy();
-		clientsLock.unlock();
 	}
 	
 	roomsLock.lockForWrite();
@@ -224,7 +223,7 @@ void Server::removeClient(Server_ProtocolHandler *client)
 void Server::externalUserJoined(const ServerInfo_User &userInfo)
 {
 	// This function is always called from the main thread via signal/slot.
-	QWriteLocker locker(&clientsLock);
+	clientsLock.lockForWrite();
 	
 	Server_RemoteUserInterface *newUser = new Server_RemoteUserInterface(this, ServerInfo_User_Container(userInfo));
 	externalUsers.insert(QString::fromStdString(userInfo.name()), newUser);

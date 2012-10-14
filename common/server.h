@@ -42,6 +42,7 @@ public:
 	mutable QReadWriteLock clientsLock, roomsLock; // locking order: roomsLock before clientsLock
 	Server(bool _threaded, QObject *parent = 0);
 	~Server();
+	void setThreaded(bool _threaded) { threaded = _threaded; }
 	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason, int &secondsLeft);
 	const QMap<int, Server_Room *> &getRooms() { return rooms; }
 	

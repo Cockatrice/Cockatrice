@@ -44,6 +44,7 @@ Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server, int _numberPoo
 	  server(_server)
 {
 	if (_numberPools == 0) {
+		server->setThreaded(false);
 		Servatrice_DatabaseInterface *newDatabaseInterface = new Servatrice_DatabaseInterface(0, server);
 		Servatrice_ConnectionPool *newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
 		
