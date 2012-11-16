@@ -403,10 +403,11 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_G
 	
 	// XXX This does not take external users into account.
 	// XXX Maybe remove this check and test if the result list is empty at the end.
-	server->clientsLock.lockForRead();
-	if (!server->getUsers().contains(QString::fromStdString(cmd.user_name())))
-		return Response::RespNameNotFound;
-	server->clientsLock.unlock();
+	{
+		QReadLocker clientsLocker(&server->clientsLock);
+		if (!server->getUsers().contains(QString::fromStdString(cmd.user_name())))
+			return Response::RespNameNotFound;
+	}
 	
 	Response_GetGamesOfUser *re = new Response_GetGamesOfUser;
 	server->roomsLock.lockForRead();
