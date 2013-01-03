@@ -41,6 +41,7 @@ private:
 	QSet<int> playersWithWritePermission;
 	bool alwaysRevealTopCard;
 	QList<Server_Card *> cards;
+	QMap<int, QMap<int, Server_Card *> > coordinateMap; // y -> (x -> card)
 public:
 	Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ServerInfo_Zone::ZoneType _type);
 	~Server_CardZone();
@@ -61,8 +62,9 @@ public:
 	bool isColumnEmpty(int x, int y) const;
 	bool isColumnStacked(int x, int y) const;
 	void fixFreeSpaces(GameEventStorage &ges);
-	void moveCard(GameEventStorage &ges, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y);
+	void moveCardInRow(GameEventStorage &ges, Server_Card *card, int x, int y);
 	void insertCard(Server_Card *card, int x, int y);
+	void updateCardCoordinates(Server_Card *card, int oldX, int oldY);
 	void shuffle();
 	void clear();
 	void addWritePermission(int playerId);

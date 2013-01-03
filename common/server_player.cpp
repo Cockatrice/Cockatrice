@@ -1024,15 +1024,17 @@ Response::ResponseCode Server_Player::cmdAttachCard(const Command_AttachCard &cm
 		for (int i = 0; i < attachedList.size(); ++i)
 			attachedList[i]->getZone()->getPlayer()->unattachCard(ges, attachedList[i]);
 		
+		card->setParentCard(targetCard);
+		const int oldX = card->getX();
+		card->setCoords(-1, card->getY());
+		startzone->updateCardCoordinates(card, oldX, card->getY());
+		
 		if (targetzone->isColumnStacked(targetCard->getX(), targetCard->getY())) {
 			CardToMove *cardToMove = new CardToMove;
 			cardToMove->set_card_id(targetCard->getId());
 			targetPlayer->moveCard(ges, targetzone, QList<const CardToMove *>() << cardToMove, targetzone, targetzone->getFreeGridColumn(-2, targetCard->getY(), targetCard->getName()), targetCard->getY(), targetCard->getFaceDown());
 			delete cardToMove;
 		}
-		
-		card->setParentCard(targetCard);
-		card->setCoords(-1, card->getY());
 		
 		Event_AttachCard event;
 		event.set_start_zone(startzone->getName().toStdString());
