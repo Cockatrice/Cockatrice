@@ -516,8 +516,8 @@ void Server_Game::unattachCards(GameEventStorage &ges, Server_Player *player)
 	QMapIterator<QString, Server_CardZone *> zoneIterator(player->getZones());
 	while (zoneIterator.hasNext()) {
 		Server_CardZone *zone = zoneIterator.next().value();
-		for (int i = 0; i < zone->cards.size(); ++i) {
-			Server_Card *card = zone->cards.at(i);
+		for (int i = 0; i < zone->getCards().size(); ++i) {
+			Server_Card *card = zone->getCards().at(i);
 			
 			// Make a copy of the list because the original one gets modified during the loop
 			QList<Server_Card *> attachedCards = card->getAttachedCards();

@@ -60,19 +60,20 @@ int Server_CardZone::removeCard(Server_Card *card)
 	return index;
 }
 
-Server_Card *Server_CardZone::getCard(int id, int *position)
+Server_Card *Server_CardZone::getCard(int id, int *position, bool remove)
 {
 	if (type != ServerInfo_Zone::HiddenZone) {
-		QListIterator<Server_Card *> CardIterator(cards);
-		int i = 0;
-		while (CardIterator.hasNext()) {
-			Server_Card *tmp = CardIterator.next();
+		for (int i = 0; i < cards.size(); ++i) {
+			Server_Card *tmp = cards[i];
 			if (tmp->getId() == id) {
 				if (position)
 					*position = i;
+				if (remove) {
+					cards.removeAt(i);
+					tmp->setZone(0);
+				}
 				return tmp;
 			}
-			i++;
 		}
 		return NULL;
 	} else {
@@ -81,6 +82,10 @@ Server_Card *Server_CardZone::getCard(int id, int *position)
 		Server_Card *tmp = cards[id];
 		if (position)
 			*position = id;
+		if (remove) {
+			cards.removeAt(id);
+			tmp->setZone(0);
+		}
 		return tmp;
 	}
 }
@@ -202,7 +207,10 @@ void Server_CardZone::insertCard(Server_Card *card, int x, int y)
 		cards.append(card);
 	} else {
 		card->setCoords(0, 0);
-		cards.insert(x, card);
+		if (x == -1)
+			cards.append(card);
+		else
+			cards.insert(x, card);
 	}
 	card->setZone(this);
 }

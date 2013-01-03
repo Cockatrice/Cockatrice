@@ -40,12 +40,14 @@ private:
 	int cardsBeingLookedAt;
 	QSet<int> playersWithWritePermission;
 	bool alwaysRevealTopCard;
+	QList<Server_Card *> cards;
 public:
 	Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ServerInfo_Zone::ZoneType _type);
 	~Server_CardZone();
-
+	
+	const QList<Server_Card *> &getCards() const { return cards; }
 	int removeCard(Server_Card *card);
-	Server_Card *getCard(int id, int *position = NULL);
+	Server_Card *getCard(int id, int *position = NULL, bool remove = false);
 
 	int getCardsBeingLookedAt() const { return cardsBeingLookedAt; }
 	void setCardsBeingLookedAt(int _cardsBeingLookedAt) { cardsBeingLookedAt = _cardsBeingLookedAt; }
@@ -60,7 +62,6 @@ public:
 	bool isColumnStacked(int x, int y) const;
 	void fixFreeSpaces(GameEventStorage &ges);
 	void moveCard(GameEventStorage &ges, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y);
-	QList<Server_Card *> cards;
 	void insertCard(Server_Card *card, int x, int y);
 	void shuffle();
 	void clear();
