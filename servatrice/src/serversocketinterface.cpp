@@ -72,7 +72,10 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, Servatrice_Dat
 	socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(catchSocketError(QAbstractSocket::SocketError)));
-	connect(this, SIGNAL(outputQueueChanged()), this, SLOT(flushOutputQueue()));
+	
+	// Never call flushOutputQueue directly from outputQueueChanged. In case of a socket error,
+	// it could lead to this object being destroyed while another function is still on the call stack. -> mutex deadlocks etc.
+	connect(this, SIGNAL(outputQueueChanged()), this, SLOT(flushOutputQueue()), Qt::QueuedConnection);
 }
 
 ServerSocketInterface::~ServerSocketInterface()
