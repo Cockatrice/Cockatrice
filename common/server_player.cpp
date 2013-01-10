@@ -630,7 +630,7 @@ Response::ResponseCode Server_Player::cmdDeckSelect(const Command_DeckSelect &cm
 	DeckList *newDeck;
 	if (cmd.has_deck_id()) {
 		try {
-			newDeck = game->getRoom()->getServer()->getDatabaseInterface()->getDeckFromDatabase(cmd.deck_id(), QString::fromStdString(userInfo->name()));
+			newDeck = game->getRoom()->getServer()->getDatabaseInterface()->getDeckFromDatabase(cmd.deck_id(), userInfo->id());
 		} catch(Response::ResponseCode r) {
 			return r;
 		}
