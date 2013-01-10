@@ -201,6 +201,7 @@ CREATE TABLE `cockatrice_replays_access` (
   `id_player` int(7) NOT NULL,
   `replay_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `do_not_hide` tinyint(1) NOT NULL,
-  KEY `id_player` (`id_player`)
+  KEY `id_player` (`id_player`),
+  KEY `id_game` (`id_game`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
