@@ -157,6 +157,8 @@ int main(int argc, char *argv[])
 	std::cerr << "Servatrice " << VERSION_STRING << " starting." << std::endl;
 	std::cerr << "-------------------------" << std::endl;
 	
+	PasswordHasher::initialize();
+	
 	if (testRandom)
 		testRNG();
 	if (testHashFunction)

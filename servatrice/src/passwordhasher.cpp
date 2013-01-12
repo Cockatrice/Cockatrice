@@ -3,6 +3,14 @@
 #include <string.h>
 #include <gcrypt.h>
 
+void PasswordHasher::initialize()
+{
+	// These calls are required by libgcrypt before we use any of its functions.
+	gcry_check_version(0);
+	gcry_control(GCRYCTL_DISABLE_SECMEM, 0);
+	gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
+}
+
 QString PasswordHasher::computeHash(const QString &password, const QString &salt)
 {
 	const int algo = GCRY_MD_SHA512;
