@@ -448,7 +448,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetU
 		else
 			return Response::RespNameNotFound;
 		
-		re->mutable_user_info()->CopyFrom(infoSource->copyUserInfo(true, userInfo->user_level() & ServerInfo_User::IsModerator));
+		re->mutable_user_info()->CopyFrom(infoSource->copyUserInfo(true, false, userInfo->user_level() & ServerInfo_User::IsModerator));
 	}
 	
 	rc.setResponseExtension(re);

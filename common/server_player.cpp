@@ -84,7 +84,7 @@
 #include <QDebug>
 
 Server_Player::Server_Player(Server_Game *_game, int _playerId, const ServerInfo_User &_userInfo, bool _spectator, Server_AbstractUserInterface *_userInterface)
-	: game(_game), userInterface(_userInterface), userInfo(new ServerInfo_User(_userInfo)), deck(0), pingTime(0), playerId(_playerId), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false), sideboardLocked(true)
+	: ServerInfo_User_Container(_userInfo), game(_game), userInterface(_userInterface), deck(0), pingTime(0), playerId(_playerId), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false), sideboardLocked(true)
 {
 }
 
@@ -100,9 +100,6 @@ void Server_Player::prepareDestroy()
 	if (userInterface)
 		userInterface->playerRemovedFromGame(game);
 	playerMutex.unlock();
-	
-	delete userInfo;
-	userInfo = 0;
 	
 	clearZones();
 	
@@ -244,7 +241,7 @@ void Server_Player::getProperties(ServerInfo_PlayerProperties &result, bool with
 {
 	result.set_player_id(playerId);
 	if (withUserInfo)
-		result.mutable_user_info()->CopyFrom(*userInfo);
+		copyUserInfo(*(result.mutable_user_info()), true);
 	result.set_spectator(spectator);
 	if (!spectator) {
 		result.set_conceded(conceded);

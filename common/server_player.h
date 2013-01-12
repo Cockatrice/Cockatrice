@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include "server_arrowtarget.h"
+#include "serverinfo_user_container.h"
 #include <QString>
 #include <QList>
 #include <QMap>
@@ -60,13 +61,12 @@ class Command_DeckSelect;
 class Command_SetSideboardLock;
 class Command_ChangeZoneProperties;
 
-class Server_Player : public Server_ArrowTarget {
+class Server_Player : public Server_ArrowTarget, public ServerInfo_User_Container {
 	Q_OBJECT
 private:
 	class MoveCardCompareFunctor;
 	Server_Game *game;
 	Server_AbstractUserInterface *userInterface;
-	ServerInfo_User *userInfo;
 	DeckList *deck;
 	QMap<QString, Server_CardZone *> zones;
 	QMap<int, Server_Counter *> counters;
@@ -96,7 +96,6 @@ public:
 	bool getSpectator() const { return spectator; }
 	bool getConceded() const { return conceded; }
 	void setConceded(bool _conceded) { conceded = _conceded; }
-	ServerInfo_User *getUserInfo() const { return userInfo; }
 	DeckList *getDeck() const { return deck; }
 	Server_Game *getGame() const { return game; }
 	const QMap<QString, Server_CardZone *> &getZones() const { return zones; }

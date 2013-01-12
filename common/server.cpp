@@ -158,7 +158,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 			clients[i]->sendProtocolItem(*se);
 	delete se;
 	
-	event.mutable_user_info()->CopyFrom(session->copyUserInfo(true, true));
+	event.mutable_user_info()->CopyFrom(session->copyUserInfo(true, true, true));
 	locker.unlock();
 	
 	se = Server_ProtocolHandler::prepareSessionEvent(event);
