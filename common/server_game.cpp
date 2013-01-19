@@ -359,7 +359,7 @@ Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user, const QStri
 			return Response::RespWrongPassword;
 		if (!(user->user_level() & ServerInfo_User::IsRegistered) && onlyRegistered)
 			return Response::RespUserLevelTooLow;
-		if (onlyBuddies)
+		if (onlyBuddies && (user->name() != creatorInfo->name()))
 			if (!databaseInterface->isInBuddyList(QString::fromStdString(creatorInfo->name()), QString::fromStdString(user->name())))
 				return Response::RespOnlyBuddies;
 		if (databaseInterface->isInIgnoreList(QString::fromStdString(creatorInfo->name()), QString::fromStdString(user->name())))
