@@ -54,6 +54,35 @@ void ChatView::appendHtml(const QString &html)
 		verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }
 
+void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
+{
+	QTextCharFormat oldFormat = cursor.charFormat();
+	QTextCharFormat anchorFormat = oldFormat;
+	anchorFormat.setForeground(Qt::blue);
+	anchorFormat.setAnchor(true);
+	anchorFormat.setAnchorHref("card://" + cardName);
+	
+	cursor.setCharFormat(anchorFormat);
+	cursor.insertText(cardName);
+	cursor.setCharFormat(oldFormat);
+}
+
+void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
+{
+	if (!url.contains("://"))
+		url.prepend("http://");
+	
+	QTextCharFormat oldFormat = cursor.charFormat();
+	QTextCharFormat anchorFormat = oldFormat;
+	anchorFormat.setForeground(Qt::blue);
+	anchorFormat.setAnchor(true);
+	anchorFormat.setAnchorHref(url);
+	
+	cursor.setCharFormat(anchorFormat);
+	cursor.insertText(url);
+	cursor.setCharFormat(oldFormat);
+}
+
 void ChatView::appendMessage(QString message, QString sender, UserLevelFlags userLevel, bool playerBold)
 {
 	bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
@@ -112,15 +141,8 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
 				message.clear();
 			else
 				message = message.mid(closeTagIndex + 7);
-
-			QTextCharFormat tempFormat = messageFormat;
-			tempFormat.setForeground(Qt::blue);
-			tempFormat.setAnchor(true);
-			tempFormat.setAnchorHref("card://" + cardName);
-
-			cursor.setCharFormat(tempFormat);
-			cursor.insertText(cardName);
-			cursor.setCharFormat(messageFormat);
+			
+			appendCardTag(cursor, cardName);
 		} else if (message.startsWith("[[")) {
 			message = message.mid(2);
 			int closeTagIndex = message.indexOf("]]");
@@ -129,16 +151,8 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
 				message.clear();
 			else
 				message = message.mid(closeTagIndex + 2);
-
-			// TODO: Factor out this duplicated code (vs [card] parsing)
-			QTextCharFormat tempFormat = messageFormat;
-			tempFormat.setForeground(Qt::blue);
-			tempFormat.setAnchor(true);
-			tempFormat.setAnchorHref("card://" + cardName);
-
-			cursor.setCharFormat(tempFormat);
-			cursor.insertText(cardName);
-			cursor.setCharFormat(messageFormat);
+			
+			appendCardTag(cursor, cardName);
 		} else if (message.startsWith("[url]")) {
 			message = message.mid(5);
 			int closeTagIndex = message.indexOf("[/url]");
@@ -147,18 +161,8 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
 				message.clear();
 			else
 				message = message.mid(closeTagIndex + 6);
-
-			if (!url.contains("://"))
-				url.prepend("http://");
 			
-			QTextCharFormat tempFormat = messageFormat;
-			tempFormat.setForeground(Qt::blue);
-			tempFormat.setAnchor(true);
-			tempFormat.setAnchorHref(url);
-			
-			cursor.setCharFormat(tempFormat);
-			cursor.insertText(url);
-			cursor.setCharFormat(messageFormat);
+			appendUrlTag(cursor, url);
 		} else
 			from = 1;
 	}
