@@ -14,6 +14,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &allGameTypes, QWidget *
 	: QDialog(parent)
 {
 	unavailableGamesVisibleCheckBox = new QCheckBox(tr("Show &unavailable games"));
+	passwordProtectedGamesVisibleCheckBox = new QCheckBox(tr("Show &password protected games"));
 	
 	QLabel *gameNameFilterLabel = new QLabel(tr("Game &description:"));
 	gameNameFilterEdit = new QLineEdit;
@@ -68,6 +69,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &allGameTypes, QWidget *
 	leftGrid->addWidget(creatorNameFilterEdit, 1, 1);
 	leftGrid->addWidget(maxPlayersGroupBox, 2, 0, 1, 2);
 	leftGrid->addWidget(unavailableGamesVisibleCheckBox, 3, 0, 1, 2);
+	leftGrid->addWidget(passwordProtectedGamesVisibleCheckBox, 4, 0, 1, 2);
 	
 	QVBoxLayout *leftColumn = new QVBoxLayout;
 	leftColumn->addLayout(leftGrid);
@@ -100,6 +102,16 @@ bool DlgFilterGames::getUnavailableGamesVisible() const
 void DlgFilterGames::setUnavailableGamesVisible(bool _unavailableGamesVisible)
 {
 	unavailableGamesVisibleCheckBox->setChecked(_unavailableGamesVisible);
+}
+
+bool DlgFilterGames::getPasswordProtectedGamesVisible() const
+{
+	return passwordProtectedGamesVisibleCheckBox->isChecked();
+}
+
+void DlgFilterGames::setPasswordProtectedGamesVisible(bool _passwordProtectedGamesVisible)
+{
+	passwordProtectedGamesVisibleCheckBox->setChecked(_passwordProtectedGamesVisible);
 }
 
 QString DlgFilterGames::getGameNameFilter() const

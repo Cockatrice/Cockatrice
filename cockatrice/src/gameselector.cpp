@@ -82,6 +82,7 @@ void GameSelector::actSetFilter()
 		gameTypeMap = gameListModel->getGameTypes().value(room->getRoomId());
 	DlgFilterGames dlg(gameTypeMap, this);
 	dlg.setUnavailableGamesVisible(gameListProxyModel->getUnavailableGamesVisible());
+	dlg.setPasswordProtectedGamesVisible(gameListProxyModel->getPasswordProtectedGamesVisible());
 	dlg.setGameNameFilter(gameListProxyModel->getGameNameFilter());
 	dlg.setCreatorNameFilter(gameListProxyModel->getCreatorNameFilter());
 	dlg.setGameTypeFilter(gameListProxyModel->getGameTypeFilter());
@@ -93,6 +94,7 @@ void GameSelector::actSetFilter()
 	clearFilterButton->setEnabled(true);
 	
 	gameListProxyModel->setUnavailableGamesVisible(dlg.getUnavailableGamesVisible());
+	gameListProxyModel->setPasswordProtectedGamesVisible(dlg.getPasswordProtectedGamesVisible());
 	gameListProxyModel->setGameNameFilter(dlg.getGameNameFilter());
 	gameListProxyModel->setCreatorNameFilter(dlg.getCreatorNameFilter());
 	gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());

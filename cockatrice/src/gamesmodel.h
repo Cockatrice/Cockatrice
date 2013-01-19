@@ -33,6 +33,7 @@ class GamesProxyModel : public QSortFilterProxyModel {
 private:
 	ServerInfo_User *ownUser;
 	bool unavailableGamesVisible;
+	bool passwordProtectedGamesVisible;
 	QString gameNameFilter, creatorNameFilter;
 	QSet<int> gameTypeFilter;
 	int maxPlayersFilterMin, maxPlayersFilterMax;
@@ -41,6 +42,8 @@ public:
 	
 	bool getUnavailableGamesVisible() const { return unavailableGamesVisible; }
 	void setUnavailableGamesVisible(bool _unavailableGamesVisible);
+	bool getPasswordProtectedGamesVisible() const { return passwordProtectedGamesVisible; }
+	void setPasswordProtectedGamesVisible(bool _passwordProtectedGamesVisible);
 	QString getGameNameFilter() const { return gameNameFilter; }
 	void setGameNameFilter(const QString &_gameNameFilter);
 	QString getCreatorNameFilter() const { return creatorNameFilter; }
