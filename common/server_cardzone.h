@@ -42,6 +42,10 @@ private:
 	bool alwaysRevealTopCard;
 	QList<Server_Card *> cards;
 	QMap<int, QMap<int, Server_Card *> > coordinateMap; // y -> (x -> card)
+	QMap<int, QMultiMap<QString, int> > freePilesMap; // y -> (cardName -> x)
+	QMap<int, int> freeSpaceMap; // y -> x
+	void removeCardFromCoordMap(Server_Card *card, int oldX, int oldY);
+	void insertCardIntoCoordMap(Server_Card *card, int x, int y);
 public:
 	Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ServerInfo_Zone::ZoneType _type);
 	~Server_CardZone();

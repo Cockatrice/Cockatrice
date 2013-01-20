@@ -552,7 +552,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 void Server_Player::unattachCard(GameEventStorage &ges, Server_Card *card)
 {
 	Server_CardZone *zone = card->getZone();
-	
+	Server_Card *parentCard = card->getParentCard();
 	card->setParentCard(0);
 	
 	Event_AttachCard event;
@@ -564,6 +564,8 @@ void Server_Player::unattachCard(GameEventStorage &ges, Server_Card *card)
 	cardToMove->set_card_id(card->getId());
 	moveCard(ges, zone, QList<const CardToMove *>() << cardToMove, zone, -1, card->getY(), card->getFaceDown());
 	delete cardToMove;
+	
+	parentCard->getZone()->updateCardCoordinates(parentCard, parentCard->getX(), parentCard->getY());
 }
 
 Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, const QString &zoneName, int cardId, CardAttribute attribute, const QString &attrValue)
