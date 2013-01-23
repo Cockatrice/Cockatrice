@@ -186,6 +186,17 @@ QList<PlayerReference> Server::getPersistentPlayerReferences(const QString &user
 	return persistentPlayers.values(userName);
 }
 
+Server_AbstractUserInterface *Server::findUser(const QString &userName) const
+{
+	// Call this only with clientsLock set.
+	
+	Server_AbstractUserInterface *userHandler = users.value(userName);
+	if (userHandler)
+		return userHandler;
+	else
+		return externalUsers.value(userName);
+}
+
 void Server::addClient(Server_ProtocolHandler *client)
 {
 	QWriteLocker locker(&clientsLock);

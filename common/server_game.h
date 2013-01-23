@@ -73,6 +73,7 @@ private:
 	
 	void createGameStateChangedEvent(Event_GameStateChanged *event, Server_Player *playerWhosAsking, bool omniscient, bool withUserInfo);
 	void sendGameStateToPlayers();
+	void storeGameInformation();
 signals:
 	void sigStartGameIfReady();
 	void gameInfoChanged(ServerInfo_Game gameInfo);

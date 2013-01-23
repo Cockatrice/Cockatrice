@@ -33,8 +33,6 @@
 #include "server_logger.h"
 #include "main.h"
 #include "decklist.h"
-#include "pb/game_replay.pb.h"
-#include "pb/event_replay_added.pb.h"
 #include "pb/event_server_message.pb.h"
 #include "pb/event_server_shutdown.pb.h"
 #include "pb/event_connection_closed.pb.h"
@@ -353,55 +351,6 @@ QList<ServerSocketInterface *> Servatrice::getUsersWithAddressAsList(const QHost
 		if (static_cast<ServerSocketInterface *>(clients[i])->getPeerAddress() == address)
 			result.append(static_cast<ServerSocketInterface *>(clients[i]));
 	return result;
-}
-
-void Servatrice::storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replayList)
-{
-	const ServerInfo_Game &gameInfo = replayList.first()->game_info();
-	
-	Server_Room *room = rooms.value(gameInfo.room_id());
-	
-	Event_ReplayAdded replayEvent;
-	ServerInfo_ReplayMatch *replayMatchInfo = replayEvent.mutable_match_info();
-	replayMatchInfo->set_game_id(gameInfo.game_id());
-	replayMatchInfo->set_room_name(room->getName().toStdString());
-	replayMatchInfo->set_time_started(QDateTime::currentDateTime().addSecs(-secondsElapsed).toTime_t());
-	replayMatchInfo->set_length(secondsElapsed);
-	replayMatchInfo->set_game_name(gameInfo.description());
-	
-	const QStringList &allGameTypes = room->getGameTypes();
-	QStringList gameTypes;
-	for (int i = gameInfo.game_types_size() - 1; i >= 0; --i)
-		gameTypes.append(allGameTypes[gameInfo.game_types(i)]);
-	
-	QSetIterator<QString> playerIterator(allPlayersEver);
-	while (playerIterator.hasNext())
-		replayMatchInfo->add_player_names(playerIterator.next().toStdString());
-	
-	for (int i = 0; i < replayList.size(); ++i) {
-		ServerInfo_Replay *replayInfo = replayMatchInfo->add_replay_list();
-		replayInfo->set_replay_id(replayList[i]->replay_id());
-		replayInfo->set_replay_name(gameInfo.description());
-		replayInfo->set_duration(replayList[i]->duration_seconds());
-	}
-	
-	QSet<QString> allUsersInGame = allPlayersEver + allSpectatorsEver;
-	QSetIterator<QString> allUsersIterator(allUsersInGame);
-	
-	SessionEvent *sessionEvent = Server_ProtocolHandler::prepareSessionEvent(replayEvent);
-	clientsLock.lockForRead();
-	while (allUsersIterator.hasNext()) {
-		const QString userName = allUsersIterator.next();
-		Server_AbstractUserInterface *userHandler = users.value(userName);
-		if (!userHandler)
-			userHandler = externalUsers.value(userName);
-		if (userHandler)
-			userHandler->sendProtocolItem(*sessionEvent);
-	}
-	clientsLock.unlock();
-	delete sessionEvent;
-	
-	getDatabaseInterface()->storeGameInformation(room->getName(), gameTypes, gameInfo, allPlayersEver, allSpectatorsEver, replayList);
 }
 
 void Servatrice::updateLoginMessage()

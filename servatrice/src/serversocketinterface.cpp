@@ -739,7 +739,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 
 Response::ResponseCode ServerSocketInterface::cmdUpdateServerMessage(const Command_UpdateServerMessage & /*cmd*/, ResponseContainer & /*rc*/)
 {
-	servatrice->updateLoginMessage();
+	QMetaObject::invokeMethod(server, "updateLoginMessage");
 	return Response::RespOk;
 }
 

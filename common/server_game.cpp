@@ -42,6 +42,7 @@
 #include "pb/event_set_active_phase.pb.h"
 #include "pb/serverinfo_playerping.pb.h"
 #include "pb/game_replay.pb.h"
+#include "pb/event_replay_added.pb.h"
 #include <google/protobuf/descriptor.h>
 #include <QTimer>
 #include <QDebug>
@@ -110,12 +111,57 @@ Server_Game::~Server_Game()
 	
 	currentReplay->set_duration_seconds(secondsElapsed - startTimeOfThisGame);
 	replayList.append(currentReplay);
-	room->getServer()->storeGameInformation(secondsElapsed, allPlayersEver, allSpectatorsEver, replayList);
+	storeGameInformation();
 	
 	for (int i = 0; i < replayList.size(); ++i)
 		delete replayList[i];
 	
 	qDebug() << "Server_Game destructor: gameId=" << gameId;
+}
+
+void Server_Game::storeGameInformation()
+{
+	const ServerInfo_Game &gameInfo = replayList.first()->game_info();
+	
+	Event_ReplayAdded replayEvent;
+	ServerInfo_ReplayMatch *replayMatchInfo = replayEvent.mutable_match_info();
+	replayMatchInfo->set_game_id(gameInfo.game_id());
+	replayMatchInfo->set_room_name(room->getName().toStdString());
+	replayMatchInfo->set_time_started(QDateTime::currentDateTime().addSecs(-secondsElapsed).toTime_t());
+	replayMatchInfo->set_length(secondsElapsed);
+	replayMatchInfo->set_game_name(gameInfo.description());
+	
+	const QStringList &allGameTypes = room->getGameTypes();
+	QStringList gameTypes;
+	for (int i = gameInfo.game_types_size() - 1; i >= 0; --i)
+		gameTypes.append(allGameTypes[gameInfo.game_types(i)]);
+	
+	QSetIterator<QString> playerIterator(allPlayersEver);
+	while (playerIterator.hasNext())
+		replayMatchInfo->add_player_names(playerIterator.next().toStdString());
+	
+	for (int i = 0; i < replayList.size(); ++i) {
+		ServerInfo_Replay *replayInfo = replayMatchInfo->add_replay_list();
+		replayInfo->set_replay_id(replayList[i]->replay_id());
+		replayInfo->set_replay_name(gameInfo.description());
+		replayInfo->set_duration(replayList[i]->duration_seconds());
+	}
+	
+	QSet<QString> allUsersInGame = allPlayersEver + allSpectatorsEver;
+	QSetIterator<QString> allUsersIterator(allUsersInGame);
+	
+	SessionEvent *sessionEvent = Server_ProtocolHandler::prepareSessionEvent(replayEvent);
+	Server *server = room->getServer();
+	server->clientsLock.lockForRead();
+	while (allUsersIterator.hasNext()) {
+		Server_AbstractUserInterface *userHandler = server->findUser(allUsersIterator.next());
+		if (userHandler)
+			userHandler->sendProtocolItem(*sessionEvent);
+	}
+	server->clientsLock.unlock();
+	delete sessionEvent;
+	
+	server->getDatabaseInterface()->storeGameInformation(room->getName(), gameTypes, gameInfo, allPlayersEver, allSpectatorsEver, replayList);
 }
 
 void Server_Game::pingClockTimeout()

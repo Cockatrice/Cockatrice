@@ -375,12 +375,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
 	QReadLocker locker(&server->clientsLock);
 	
 	QString receiver = QString::fromStdString(cmd.user_name());
-	Server_AbstractUserInterface *userInterface = server->getUsers().value(receiver);
-	if (!userInterface) {
-		userInterface = server->getExternalUsers().value(receiver);
-		if (!userInterface)
-			return Response::RespNameNotFound;
-	}
+	Server_AbstractUserInterface *userInterface = server->findUser(receiver);
+	if (!userInterface)
+		return Response::RespNameNotFound;
 	if (databaseInterface->isInIgnoreList(receiver, QString::fromStdString(userInfo->name())))
 		return Response::RespInIgnoreList;
 	
@@ -401,13 +398,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_G
 	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
-	// XXX This does not take external users into account.
-	// XXX Maybe remove this check and test if the result list is empty at the end.
-	{
-		QReadLocker clientsLocker(&server->clientsLock);
-		if (!server->getUsers().contains(QString::fromStdString(cmd.user_name())))
-			return Response::RespNameNotFound;
-	}
+	// We don't need to check whether the user is logged in; persistent games should also work.
+	// The client needs to deal with an empty result list.
 	
 	Response_GetGamesOfUser *re = new Response_GetGamesOfUser;
 	server->roomsLock.lockForRead();
@@ -440,12 +432,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetU
 		
 		QReadLocker locker(&server->clientsLock);
 		
-		ServerInfo_User_Container *infoSource;
-		if (server->getUsers().contains(userName))
-			infoSource = server->getUsers().value(userName);
-		else if (server->getExternalUsers().contains(userName))
-			infoSource = server->getExternalUsers().value(userName);
-		else
+		ServerInfo_User_Container *infoSource = server->findUser(userName);
+		if (!infoSource)
 			return Response::RespNameNotFound;
 		
 		re->mutable_user_info()->CopyFrom(infoSource->copyUserInfo(true, false, userInfo->user_level() & ServerInfo_User::IsModerator));
