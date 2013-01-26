@@ -206,7 +206,9 @@ void ServerSocketInterface::flushOutputQueue()
 		totalBytes += size + 4;
 		locker.relock();
 	}
+	locker.unlock();
 	servatrice->incTxBytes(totalBytes);
+	// see above wrt mutex
 	socket->flush();
 }
 
