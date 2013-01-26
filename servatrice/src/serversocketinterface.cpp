@@ -189,7 +189,8 @@ void ServerSocketInterface::flushOutputQueue()
 	
 	int totalBytes = 0;
 	while (!outputQueue.isEmpty()) {
-		const ServerMessage &item = outputQueue.first();
+		ServerMessage item = outputQueue.takeFirst();
+		locker.unlock();
 		
 		QByteArray buf;
 		unsigned int size = item.ByteSize();
@@ -199,10 +200,11 @@ void ServerSocketInterface::flushOutputQueue()
 		buf.data()[2] = (unsigned char) (size >> 8);
 		buf.data()[1] = (unsigned char) (size >> 16);
 		buf.data()[0] = (unsigned char) (size >> 24);
+		// In case socket->write() calls catchSocketError(), the mutex must not be locked during this call.
 		socket->write(buf);
 		
 		totalBytes += size + 4;
-		outputQueue.removeFirst();
+		locker.relock();
 	}
 	servatrice->incTxBytes(totalBytes);
 	socket->flush();
