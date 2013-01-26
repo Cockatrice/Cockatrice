@@ -565,7 +565,8 @@ void Server_Player::unattachCard(GameEventStorage &ges, Server_Card *card)
 	moveCard(ges, zone, QList<const CardToMove *>() << cardToMove, zone, -1, card->getY(), card->getFaceDown());
 	delete cardToMove;
 	
-	parentCard->getZone()->updateCardCoordinates(parentCard, parentCard->getX(), parentCard->getY());
+	if (parentCard->getZone())
+		parentCard->getZone()->updateCardCoordinates(parentCard, parentCard->getX(), parentCard->getY());
 }
 
 Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, const QString &zoneName, int cardId, CardAttribute attribute, const QString &attrValue)
