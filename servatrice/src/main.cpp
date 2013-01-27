@@ -127,6 +127,7 @@ int main(int argc, char *argv[])
 	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
 	
 	loggerThread = new QThread;
+	loggerThread->setObjectName("logger");
 	logger = new ServerLogger(logToConsole);
 	logger->moveToThread(loggerThread);
 	
