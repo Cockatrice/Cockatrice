@@ -26,8 +26,7 @@ ServerInfo_User_Container::~ServerInfo_User_Container()
 
 void ServerInfo_User_Container::setUserInfo(const ServerInfo_User &_userInfo)
 {
-	userInfo = new ServerInfo_User;
-	userInfo->CopyFrom(_userInfo);
+	userInfo = new ServerInfo_User(_userInfo);
 }
 
 ServerInfo_User &ServerInfo_User_Container::copyUserInfo(ServerInfo_User &result, bool complete, bool internalInfo, bool sessionInfo) const

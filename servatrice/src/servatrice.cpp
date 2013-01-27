@@ -289,6 +289,7 @@ bool Servatrice::initServer()
 	
 	const int numberPools = settings->value("server/number_pools", 1).toInt();
 	gameServer = new Servatrice_GameServer(this, numberPools, servatriceDatabaseInterface->getDatabase(), this);
+	gameServer->setMaxPendingConnections(1000);
 	const int gamePort = settings->value("server/port", 4747).toInt();
 	qDebug() << "Starting server on port" << gamePort;
 	if (gameServer->listen(QHostAddress::Any, gamePort))

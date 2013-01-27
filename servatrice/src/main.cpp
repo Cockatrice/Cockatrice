@@ -151,6 +151,8 @@ int main(int argc, char *argv[])
 	sigemptyset(&segv.sa_mask);
 	sigaction(SIGSEGV, &segv, 0);
 	sigaction(SIGABRT, &segv, 0);
+	
+	signal(SIGPIPE, SIG_IGN);
 #endif
 	rng = new RNG_SFMT;
 	

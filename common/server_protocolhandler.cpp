@@ -277,6 +277,10 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
 
 void Server_ProtocolHandler::processCommandContainer(const CommandContainer &cont)
 {
+	// Command processing must be disabled after prepareDestroy() has been called.
+	if (deleted)
+		return;
+	
 	lastDataReceived = timeRunning;
 	
 	ResponseContainer responseContainer(cont.has_cmd_id() ? cont.cmd_id() : -1);

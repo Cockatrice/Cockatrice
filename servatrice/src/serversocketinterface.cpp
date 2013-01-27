@@ -87,6 +87,10 @@ ServerSocketInterface::~ServerSocketInterface()
 
 void ServerSocketInterface::initConnection(int socketDescriptor)
 {
+	// Add this object to the server's list of connections before it can receive socket events.
+	// Otherwise, in case a of a socket error, it could be removed from the list before it is added.
+	server->addClient(this);
+	
 	socket->setSocketDescriptor(socketDescriptor);
 	logger->logMessage(QString("Incoming connection: %1").arg(socket->peerAddress().toString()), this);
 	initSessionDeprecated();
@@ -123,7 +127,6 @@ bool ServerSocketInterface::initSession()
 		return false;
 	}
 	
-	server->addClient(this);
 	return true;
 }
 
@@ -716,6 +719,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 	query.bindValue(":visible_reason", QString::fromStdString(cmd.visible_reason()));
 	sqlInterface->execSqlQuery(query);
 	
+	servatrice->clientsLock.lockForRead();
 	QList<ServerSocketInterface *> userList = servatrice->getUsersWithAddressAsList(QHostAddress(address));
 	ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
 	if (user && !userList.contains(user))
@@ -734,6 +738,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 			QMetaObject::invokeMethod(userList[i], "prepareDestroy", Qt::QueuedConnection);
 		}
 	}
+	servatrice->clientsLock.unlock();
 	
 	return Response::RespOk;
 }

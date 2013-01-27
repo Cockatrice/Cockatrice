@@ -140,7 +140,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	}
 	
 	users.insert(name, session);
-	qDebug() << "Server::loginUser: name=" << name;
+	qDebug() << "Server::loginUser:" << session << "name=" << name;
 	
 	data.set_session_id(databaseInterface->startSession(name, session->getAddress()));	
 	databaseInterface->unlockSessionTables();
@@ -228,7 +228,7 @@ void Server::removeClient(Server_ProtocolHandler *client)
 			qDebug() << "closed session id:" << sessionId;
 		}
 	}
-	qDebug() << "Server::removeClient:" << clients.size() << "clients; " << users.size() << "users left";
+	qDebug() << "Server::removeClient: removed" << (void *) client << ";" << clients.size() << "clients; " << users.size() << "users left";
 }
 
 void Server::externalUserJoined(const ServerInfo_User &userInfo)
