@@ -56,6 +56,7 @@ Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server, int _numberPoo
 		Servatrice_ConnectionPool *newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
 		
 		QThread *newThread = new QThread;
+		newThread->setObjectName("pool_" + QString::number(i));
 		newPool->moveToThread(newThread);
 		newDatabaseInterface->moveToThread(newThread);
 		server->addDatabaseInterface(newThread, newDatabaseInterface);
@@ -252,6 +253,7 @@ bool Servatrice::initServer()
 			}
 			
 			QThread *thread = new QThread;
+			thread->setObjectName("isl_" + QString::number(prop.id));
 			connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 			
 			IslInterface *interface = new IslInterface(prop.id, prop.hostname, prop.address.toString(), prop.controlPort, prop.cert, cert, key, this);
