@@ -990,9 +990,11 @@ Response::ResponseCode Server_Player::cmdAttachCard(const Command_AttachCard &cm
 			return Response::RespContextError;
 		if (cmd.has_target_card_id())
 			targetCard = targetzone->getCard(cmd.target_card_id());
-		if (targetCard)
+		if (targetCard) {
 			if (targetCard->getParentCard())
 				return Response::RespContextError;
+		} else
+			return Response::RespNameNotFound;
 	}
 	if (!startzone->hasCoords())
 		return Response::RespContextError;
