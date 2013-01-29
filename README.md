@@ -36,3 +36,11 @@ The following flags can be passed to `cmake`:
 - `-DWITH_SERVER=1` build the server
 
 - `-DWITHOUT_CLIENT=1` do not build the client
+
+# Running
+
+`oracle` fetches card data
+
+`cockatrice` is the game client
+
+`servatrice` is the server
