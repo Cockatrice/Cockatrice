@@ -19,6 +19,10 @@ Dependencies:
 
 - [CMake](http://www.cmake.org/)
 
+The server requires an additional dependency:
+
+- [libgcrypt](http://www.gnu.org/software/libgcrypt/)
+
 ```
 mkdir build
 cd build
@@ -26,3 +30,9 @@ cmake ..
 make
 make install
 ```
+
+The following flags can be passed to `cmake`:
+
+- `-DWITH_SERVER=1` build the server
+
+- `-DWITHOUT_CLIENT=1` do not build the client
