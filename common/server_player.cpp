@@ -353,15 +353,21 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 			continue;
 		cardIdsToMove.insert(_cards[i]->card_id());
 		
+		// Consistency checks. In case the command contains illegal moves, try to resolve the legal ones still.
 		int position;
 		Server_Card *card = startzone->getCard(_cards[i]->card_id(), &position);
 		if (!card)
 			return Response::RespNameNotFound;
+		if (card->getParentCard())
+			continue;
 		if (!card->getAttachedCards().isEmpty() && !targetzone->isColumnEmpty(x, y))
-			return Response::RespContextError;
+			continue;
 		cardsToMove.append(QPair<Server_Card *, int>(card, position));
 		cardProperties.insert(card, _cards[i]);
 	}
+	// In case all moves were filtered out, abort.
+	if (cardsToMove.isEmpty())
+		return Response::RespContextError;
 	
 	MoveCardCompareFunctor cmp(startzone == targetzone ? -1 : x);
 	qSort(cardsToMove.begin(), cardsToMove.end(), cmp);
