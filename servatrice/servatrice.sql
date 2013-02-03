@@ -28,12 +28,12 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
   `id_folder` int(7) unsigned zerofill NOT NULL,
-  `user` varchar(35) NOT NULL,
+  `id_user` int(7) unsigned NULL,
   `name` varchar(50) NOT NULL,
   `upload_time` datetime NOT NULL,
   `content` text NOT NULL,
   PRIMARY KEY  (`id`),
-  KEY `FolderPlusUser` (`id_folder`,`user`)
+  KEY `FolderPlusUser` (`id_folder`,`id_user`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -45,10 +45,10 @@ CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (
 CREATE TABLE IF NOT EXISTS `cockatrice_decklist_folders` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
   `id_parent` int(7) unsigned zerofill NOT NULL,
-  `user` varchar(35) NOT NULL,
+  `id_user` int(7) unsigned NULL,
   `name` varchar(30) NOT NULL,
   PRIMARY KEY  (`id`),
-  KEY `ParentPlusUser` (`id_parent`,`user`)
+  KEY `ParentPlusUser` (`id_parent`,`id_user`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -163,7 +163,8 @@ CREATE TABLE `cockatrice_bans` (
  `reason` text NOT NULL,
  `visible_reason` text NOT NULL,
   PRIMARY KEY (`user_name`,`time_from`),
-  KEY `time_from` (`time_from`,`ip_address`)
+  KEY `time_from` (`time_from`,`ip_address`),
+  KEY `ip_address` (`ip_address`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE `cockatrice_sessions` (
