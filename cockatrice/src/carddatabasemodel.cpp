@@ -117,7 +117,7 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 {
 	CardInfo const *info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
 	
-	if (((isToken == ShowTrue) && !info->getIsToken()) || (isToken == ShowFalse) && info->getIsToken())
+	if (((isToken == ShowTrue) && !info->getIsToken()) || ((isToken == ShowFalse) && info->getIsToken()))
 		return false;
 	
 	if (!cardNameBeginning.isEmpty())
