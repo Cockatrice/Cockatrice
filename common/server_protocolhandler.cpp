@@ -552,8 +552,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_Creat
 	if (gameId == -1)
 		return Response::RespInternalError;
 	
-	QMutexLocker roomLocker(&room->gamesMutex);
-	
 	if (server->getMaxGamesPerUser() > 0)
 		if (room->getGamesCreatedByUser(QString::fromStdString(userInfo->name())) >= server->getMaxGamesPerUser())
 			return Response::RespContextError;

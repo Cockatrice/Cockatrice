@@ -37,7 +37,7 @@ private:
 	QStringList gameTypes;
 	QMap<int, Server_Game *> games;
 	QMap<int, ServerInfo_Game> externalGames;
-	QList<Server_ProtocolHandler *> userList;
+	QMap<QString, Server_ProtocolHandler *> users;
 	QMap<QString, ServerInfo_User_Container> externalUsers;
 private slots:
 	void broadcastGameListUpdate(const ServerInfo_Game &gameInfo, bool sendToIsl = true);

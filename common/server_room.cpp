@@ -30,7 +30,7 @@ Server_Room::~Server_Room()
 	gamesMutex.unlock();
 	
 	usersLock.lockForWrite();
-	userList.clear();
+	users.clear();
 	usersLock.unlock();
 }
 
@@ -64,10 +64,11 @@ const ServerInfo_Room &Server_Room::getInfo(ServerInfo_Room &result, bool comple
 	gamesMutex.unlock();
 	
 	usersLock.lockForRead();
-	result.set_player_count(userList.size() + externalUsers.size());
+	result.set_player_count(users.size() + externalUsers.size());
 	if (complete) {
-		for (int i = 0; i < userList.size(); ++i)
-			result.add_user_list()->CopyFrom(userList[i]->copyUserInfo(false));
+		QMapIterator<QString, Server_ProtocolHandler *> userIterator(users);
+		while (userIterator.hasNext())
+			result.add_user_list()->CopyFrom(userIterator.next().value()->copyUserInfo(false));
 		if (includeExternalData) {
 			QMapIterator<QString, ServerInfo_User_Container> externalUserIterator(externalUsers);
 			while (externalUserIterator.hasNext())
@@ -101,7 +102,7 @@ void Server_Room::addClient(Server_ProtocolHandler *client)
 	sendRoomEvent(prepareRoomEvent(event));
 	
 	usersLock.lockForWrite();
-	userList.append(client);
+	users.insert(QString::fromStdString(client->getUserInfo()->name()), client);
 	usersLock.unlock();
 	
 	ServerInfo_Room roomInfo;
@@ -111,7 +112,7 @@ void Server_Room::addClient(Server_ProtocolHandler *client)
 void Server_Room::removeClient(Server_ProtocolHandler *client)
 {
 	usersLock.lockForWrite();
-	userList.removeAt(userList.indexOf(client));
+	users.remove(QString::fromStdString(client->getUserInfo()->name()));
 	usersLock.unlock();
 	
 	Event_LeaveRoom event;
@@ -210,8 +211,11 @@ void Server_Room::say(const QString &userName, const QString &s, bool sendToIsl)
 void Server_Room::sendRoomEvent(RoomEvent *event, bool sendToIsl)
 {
 	usersLock.lockForRead();
-	for (int i = 0; i < userList.size(); ++i)
-		userList[i]->sendProtocolItem(*event);
+	{
+		QMapIterator<QString, Server_ProtocolHandler *> userIterator(users);
+		while (userIterator.hasNext())
+			userIterator.next().value()->sendProtocolItem(*event);
+	}
 	usersLock.unlock();
 	
 	if (sendToIsl)
@@ -229,8 +233,7 @@ void Server_Room::broadcastGameListUpdate(const ServerInfo_Game &gameInfo, bool 
 
 void Server_Room::addGame(Server_Game *game)
 {
-	// Lock gamesMutex before calling this
-	
+	gamesMutex.lock();
 	connect(game, SIGNAL(gameInfoChanged(ServerInfo_Game)), this, SLOT(broadcastGameListUpdate(ServerInfo_Game)));
 	
 	game->gameMutex.lock();
@@ -238,6 +241,7 @@ void Server_Room::addGame(Server_Game *game)
 	ServerInfo_Game gameInfo;
 	game->getInfo(gameInfo);
 	game->gameMutex.unlock();
+	gamesMutex.unlock();
 	
 	emit gameListChanged(gameInfo);
 	ServerInfo_Room roomInfo;
