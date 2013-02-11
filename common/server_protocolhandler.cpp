@@ -60,24 +60,24 @@ void Server_ProtocolHandler::prepareDestroy()
 		Server_Room *r = server->getRooms().value(gameIterator.value().first);
 		if (!r)
 			continue;
-		r->gamesMutex.lock();
+		r->gamesLock.lockForRead();
 		Server_Game *g = r->getGames().value(gameIterator.key());
 		if (!g) {
-			r->gamesMutex.unlock();
+			r->gamesLock.unlock();
 			continue;
 		}
 		g->gameMutex.lock();
 		Server_Player *p = g->getPlayers().value(gameIterator.value().second);
 		if (!p) {
 			g->gameMutex.unlock();
-			r->gamesMutex.unlock();
+			r->gamesLock.unlock();
 			continue;
 		}
 		
 		p->disconnectClient();
 		
 		g->gameMutex.unlock();
-		r->gamesMutex.unlock();
+		r->gamesLock.unlock();
 	}
 	server->roomsLock.unlock();
 	
@@ -197,7 +197,7 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 	if (!room)
 		return Response::RespNotInRoom;
 	
-	QMutexLocker roomGamesLocker(&room->gamesMutex);
+	QReadLocker roomGamesLocker(&room->gamesLock);
 	Server_Game *game = room->getGames().value(cont.game_id());
 	if (!game) {
 		if (room->getExternalGames().contains(cont.game_id())) {
@@ -410,12 +410,12 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_G
 	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
 	while (roomIterator.hasNext()) {
 		Server_Room *room = roomIterator.next().value();
-		room->gamesMutex.lock();
+		room->gamesLock.lockForRead();
 		room->getInfo(*re->add_room_list(), false, true);
 		QListIterator<ServerInfo_Game> gameIterator(room->getGamesOfUser(QString::fromStdString(cmd.user_name())));
 		while (gameIterator.hasNext())
 			re->add_game_list()->CopyFrom(gameIterator.next());
-		room->gamesMutex.unlock();
+		room->gamesLock.unlock();
 	}
 	server->roomsLock.unlock();
 	

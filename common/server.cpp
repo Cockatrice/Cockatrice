@@ -273,7 +273,7 @@ void Server::externalUserLeft(const QString &userName)
 		if (!room)
 			continue;
 		
-		QMutexLocker roomGamesLocker(&room->gamesMutex);
+		QReadLocker roomGamesLocker(&room->gamesLock);
 		Server_Game *game = room->getGames().value(userGamesIterator.key());
 		if (!game)
 			continue;
@@ -399,7 +399,7 @@ void Server::externalGameCommandContainerReceived(const CommandContainer &cont, 
 			throw Response::RespNotInRoom;
 		}
 		
-		QMutexLocker roomGamesLocker(&room->gamesMutex);
+		QReadLocker roomGamesLocker(&room->gamesLock);
 		Server_Game *game = room->getGames().value(cont.game_id());
 		if (!game) {
 			qDebug() << "externalGameCommandContainerReceived: game id=" << cont.game_id() << "not found";
@@ -509,7 +509,7 @@ int Server::getGamesCount() const
 	QMapIterator<int, Server_Room *> roomIterator(rooms);
 	while (roomIterator.hasNext()) {
 		Server_Room *room = roomIterator.next().value();
-		QMutexLocker roomLocker(&room->gamesMutex);
+		QReadLocker roomLocker(&room->gamesLock);
 		result += room->getGames().size();
 	}
 	return result;

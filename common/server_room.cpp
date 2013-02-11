@@ -13,7 +13,7 @@
 #include <google/protobuf/descriptor.h>
 
 Server_Room::Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent)
-	: QObject(parent), id(_id), name(_name), description(_description), autoJoin(_autoJoin), joinMessage(_joinMessage), gameTypes(_gameTypes), gamesMutex(QMutex::Recursive)
+	: QObject(parent), id(_id), name(_name), description(_description), autoJoin(_autoJoin), joinMessage(_joinMessage), gameTypes(_gameTypes), gamesLock(QReadWriteLock::Recursive)
 {
 	connect(this, SIGNAL(gameListChanged(ServerInfo_Game)), this, SLOT(broadcastGameListUpdate(ServerInfo_Game)), Qt::QueuedConnection);
 }
@@ -22,12 +22,12 @@ Server_Room::~Server_Room()
 {
 	qDebug("Server_Room destructor");
 	
-	gamesMutex.lock();
+	gamesLock.lockForWrite();
 	const QList<Server_Game *> gameList = games.values();
 	for (int i = 0; i < gameList.size(); ++i)
 		delete gameList[i];
 	games.clear();
-	gamesMutex.unlock();
+	gamesLock.unlock();
 	
 	usersLock.lockForWrite();
 	users.clear();
@@ -49,7 +49,7 @@ const ServerInfo_Room &Server_Room::getInfo(ServerInfo_Room &result, bool comple
 		result.set_auto_join(autoJoin);
 	}
 	
-	gamesMutex.lock();
+	gamesLock.lockForRead();
 	result.set_game_count(games.size() + externalGames.size());
 	if (complete) {
 		QMapIterator<int, Server_Game *> gameIterator(games);
@@ -61,7 +61,7 @@ const ServerInfo_Room &Server_Room::getInfo(ServerInfo_Room &result, bool comple
 				result.add_game_list()->CopyFrom(externalGameIterator.next().value());
 		}
 	}
-	gamesMutex.unlock();
+	gamesLock.unlock();
 	
 	usersLock.lockForRead();
 	result.set_player_count(users.size() + externalUsers.size());
@@ -158,12 +158,12 @@ void Server_Room::removeExternalUser(const QString &name)
 void Server_Room::updateExternalGameList(const ServerInfo_Game &gameInfo)
 {
 	// This function is always called from the Server thread with server->roomsMutex locked.
-	gamesMutex.lock();
+	gamesLock.lockForWrite();
 	if (!gameInfo.has_player_count() && externalGames.contains(gameInfo.game_id()))
 		externalGames.remove(gameInfo.game_id());
 	else
 		externalGames.insert(gameInfo.game_id(), gameInfo);
-	gamesMutex.unlock();
+	gamesLock.unlock();
 	
 	broadcastGameListUpdate(gameInfo, false);
 	ServerInfo_Room roomInfo;
@@ -175,7 +175,7 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
 	// This function is called from the Server thread and from the S_PH thread.
 	// server->roomsMutex is always locked.
 	
-	QMutexLocker roomGamesLocker(&gamesMutex);
+	QReadLocker roomGamesLocker(&gamesLock);
 	Server_Game *g = games.value(cmd.game_id());
 	if (!g) {
 		if (externalGames.contains(cmd.game_id())) {
@@ -233,7 +233,7 @@ void Server_Room::broadcastGameListUpdate(const ServerInfo_Game &gameInfo, bool 
 
 void Server_Room::addGame(Server_Game *game)
 {
-	gamesMutex.lock();
+	gamesLock.lockForWrite();
 	connect(game, SIGNAL(gameInfoChanged(ServerInfo_Game)), this, SLOT(broadcastGameListUpdate(ServerInfo_Game)));
 	
 	game->gameMutex.lock();
@@ -241,7 +241,7 @@ void Server_Room::addGame(Server_Game *game)
 	ServerInfo_Game gameInfo;
 	game->getInfo(gameInfo);
 	game->gameMutex.unlock();
-	gamesMutex.unlock();
+	gamesLock.unlock();
 	
 	emit gameListChanged(gameInfo);
 	ServerInfo_Room roomInfo;
@@ -250,7 +250,7 @@ void Server_Room::addGame(Server_Game *game)
 
 void Server_Room::removeGame(Server_Game *game)
 {
-	// No need to lock gamesMutex or gameMutex. This method is only
+	// No need to lock gamesLock or gameMutex. This method is only
 	// called from ~Server_Game, which locks both mutexes anyway beforehand.
 	
 	disconnect(game, 0, this, 0);
@@ -267,7 +267,7 @@ void Server_Room::removeGame(Server_Game *game)
 
 int Server_Room::getGamesCreatedByUser(const QString &userName) const
 {
-	QMutexLocker locker(&gamesMutex);
+	QReadLocker locker(&gamesLock);
 	
 	QMapIterator<int, Server_Game *> gamesIterator(games);
 	int result = 0;
@@ -279,7 +279,7 @@ int Server_Room::getGamesCreatedByUser(const QString &userName) const
 
 QList<ServerInfo_Game> Server_Room::getGamesOfUser(const QString &userName) const
 {
-	QMutexLocker locker(&gamesMutex);
+	QReadLocker locker(&gamesLock);
 	
 	QList<ServerInfo_Game> result;
 	QMapIterator<int, Server_Game *> gamesIterator(games);

@@ -91,7 +91,7 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo, int _gameId, const
 
 Server_Game::~Server_Game()
 {
-	room->gamesMutex.lock();
+	room->gamesLock.lockForWrite();
 	gameMutex.lock();
 	
 	gameClosed = true;
@@ -107,7 +107,7 @@ Server_Game::~Server_Game()
 	creatorInfo = 0;
 	
 	gameMutex.unlock();
-	room->gamesMutex.unlock();
+	room->gamesLock.unlock();
 	
 	currentReplay->set_duration_seconds(secondsElapsed - startTimeOfThisGame);
 	replayList.append(currentReplay);

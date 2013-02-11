@@ -43,7 +43,7 @@ private slots:
 	void broadcastGameListUpdate(const ServerInfo_Game &gameInfo, bool sendToIsl = true);
 public:
 	mutable QReadWriteLock usersLock;
-	mutable QMutex gamesMutex;
+	mutable QReadWriteLock gamesLock;
 	Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent);
 	~Server_Room();
 	int getId() const { return id; }
