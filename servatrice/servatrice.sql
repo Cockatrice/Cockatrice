@@ -115,9 +115,11 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `avatar_bmp` blob NOT NULL,
   `registrationDate` datetime NOT NULL,
   `active` tinyint(1) NOT NULL,
-  `token` char(32) NOT NULL,
+  `token` binary(16) NOT NULL,
   PRIMARY KEY  (`id`),
-  UNIQUE KEY `name` (`name`)
+  UNIQUE KEY `name` (`name`),
+  KEY `token` (`token`),
+  KEY `email` (`email`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 CREATE TABLE `cockatrice_uptime` (
