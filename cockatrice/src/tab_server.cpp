@@ -76,8 +76,10 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
 					twi->setData(0, Qt::DisplayRole, QString::fromStdString(room.name()));
 				if (room.has_description())
 					twi->setData(1, Qt::DisplayRole, QString::fromStdString(room.description()));
-				twi->setData(2, Qt::DisplayRole, room.player_count());
-				twi->setData(3, Qt::DisplayRole, room.game_count());
+				if (room.has_player_count())
+					twi->setData(2, Qt::DisplayRole, room.player_count());
+				if (room.has_game_count())
+					twi->setData(3, Qt::DisplayRole, room.game_count());
 				return;
 			}
 		}
@@ -91,6 +93,7 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
 		twi->setData(3, Qt::DisplayRole, room.game_count());
 		twi->setTextAlignment(2, Qt::AlignRight);
 		twi->setTextAlignment(3, Qt::AlignRight);
+		
 		roomList->addTopLevelItem(twi);
 		if (room.has_auto_join())
 			if (room.auto_join())

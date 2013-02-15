@@ -55,7 +55,7 @@ public:
 	const QMap<int, Server_Game *> &getGames() const { return games; }
 	const QMap<int, ServerInfo_Game> &getExternalGames() const { return externalGames; }
 	Server *getServer() const;
-	const ServerInfo_Room &getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes = false, bool updating = false, bool includeExternalData = true) const;
+	const ServerInfo_Room &getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes = false, bool includeExternalData = true) const;
 	int getGamesCreatedByUser(const QString &name) const;
 	QList<ServerInfo_Game> getGamesOfUser(const QString &name) const;
 	

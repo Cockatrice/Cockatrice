@@ -39,15 +39,13 @@ Server *Server_Room::getServer() const
 	return static_cast<Server *>(parent());
 }
 
-const ServerInfo_Room &Server_Room::getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes, bool updating, bool includeExternalData) const
+const ServerInfo_Room &Server_Room::getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes, bool includeExternalData) const
 {
 	result.set_room_id(id);
 	
-	if (!updating) {
-		result.set_name(name.toStdString());
-		result.set_description(description.toStdString());
-		result.set_auto_join(autoJoin);
-	}
+	result.set_name(name.toStdString());
+	result.set_description(description.toStdString());
+	result.set_auto_join(autoJoin);
 	
 	gamesLock.lockForRead();
 	result.set_game_count(games.size() + externalGames.size());
@@ -101,26 +99,44 @@ void Server_Room::addClient(Server_ProtocolHandler *client)
 	event.mutable_user_info()->CopyFrom(client->copyUserInfo(false));
 	sendRoomEvent(prepareRoomEvent(event));
 	
+	ServerInfo_Room roomInfo;
+	roomInfo.set_room_id(id);
+	
 	usersLock.lockForWrite();
 	users.insert(QString::fromStdString(client->getUserInfo()->name()), client);
+	roomInfo.set_player_count(users.size() + externalUsers.size());
 	usersLock.unlock();
 	
-	ServerInfo_Room roomInfo;
-	emit roomInfoChanged(getInfo(roomInfo, false, false, true));
+	// XXX This can be removed during the next client update.
+	gamesLock.lockForRead();
+	roomInfo.set_game_count(games.size() + externalGames.size());
+	gamesLock.unlock();
+	// -----------
+	
+	emit roomInfoChanged(roomInfo);
 }
 
 void Server_Room::removeClient(Server_ProtocolHandler *client)
 {
 	usersLock.lockForWrite();
 	users.remove(QString::fromStdString(client->getUserInfo()->name()));
+	
+	ServerInfo_Room roomInfo;
+	roomInfo.set_room_id(id);
+	roomInfo.set_player_count(users.size() + externalUsers.size());
 	usersLock.unlock();
 	
 	Event_LeaveRoom event;
 	event.set_name(client->getUserInfo()->name());
 	sendRoomEvent(prepareRoomEvent(event));
 	
-	ServerInfo_Room roomInfo;
-	emit roomInfoChanged(getInfo(roomInfo, false, false, true));
+	// XXX This can be removed during the next client update.
+	gamesLock.lockForRead();
+	roomInfo.set_game_count(games.size() + externalGames.size());
+	gamesLock.unlock();
+	// -----------
+	
+	emit roomInfoChanged(roomInfo);
 }
 
 void Server_Room::addExternalUser(const ServerInfo_User &userInfo)
@@ -131,43 +147,52 @@ void Server_Room::addExternalUser(const ServerInfo_User &userInfo)
 	event.mutable_user_info()->CopyFrom(userInfoContainer.copyUserInfo(false));
 	sendRoomEvent(prepareRoomEvent(event), false);
 	
+	ServerInfo_Room roomInfo;
+	roomInfo.set_room_id(id);
+
 	usersLock.lockForWrite();
 	externalUsers.insert(QString::fromStdString(userInfo.name()), userInfoContainer);
+	roomInfo.set_player_count(users.size() + externalUsers.size());
 	usersLock.unlock();
 	
-	ServerInfo_Room roomInfo;
-	emit roomInfoChanged(getInfo(roomInfo, false, false, true));
+	emit roomInfoChanged(roomInfo);
 }
 
 void Server_Room::removeExternalUser(const QString &name)
 {
 	// This function is always called from the Server thread with server->roomsMutex locked.
+	ServerInfo_Room roomInfo;
+	roomInfo.set_room_id(id);
+	
 	usersLock.lockForWrite();
 	if (externalUsers.contains(name))
 		externalUsers.remove(name);
+	roomInfo.set_player_count(users.size() + externalUsers.size());
 	usersLock.unlock();
 	
 	Event_LeaveRoom event;
 	event.set_name(name.toStdString());
 	sendRoomEvent(prepareRoomEvent(event), false);
 	
-	ServerInfo_Room roomInfo;
-	emit roomInfoChanged(getInfo(roomInfo, false, false, true));
+	emit roomInfoChanged(roomInfo);
 }
 
 void Server_Room::updateExternalGameList(const ServerInfo_Game &gameInfo)
 {
 	// This function is always called from the Server thread with server->roomsMutex locked.
+	ServerInfo_Room roomInfo;
+	roomInfo.set_room_id(id);
+	
 	gamesLock.lockForWrite();
 	if (!gameInfo.has_player_count() && externalGames.contains(gameInfo.game_id()))
 		externalGames.remove(gameInfo.game_id());
 	else
 		externalGames.insert(gameInfo.game_id(), gameInfo);
+	roomInfo.set_game_count(games.size() + externalGames.size());
 	gamesLock.unlock();
 	
 	broadcastGameListUpdate(gameInfo, false);
-	ServerInfo_Room roomInfo;
-	emit roomInfoChanged(getInfo(roomInfo, false, false, true));
+	emit roomInfoChanged(roomInfo);
 }
 
 Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGame &cmd, ResponseContainer &rc, Server_AbstractUserInterface *userInterface)
@@ -233,6 +258,9 @@ void Server_Room::broadcastGameListUpdate(const ServerInfo_Game &gameInfo, bool 
 
 void Server_Room::addGame(Server_Game *game)
 {
+	ServerInfo_Room roomInfo;
+	roomInfo.set_room_id(id);
+	
 	gamesLock.lockForWrite();
 	connect(game, SIGNAL(gameInfoChanged(ServerInfo_Game)), this, SLOT(broadcastGameListUpdate(ServerInfo_Game)));
 	
@@ -240,12 +268,18 @@ void Server_Room::addGame(Server_Game *game)
 	games.insert(game->getGameId(), game);
 	ServerInfo_Game gameInfo;
 	game->getInfo(gameInfo);
+	roomInfo.set_game_count(games.size() + externalGames.size());
 	game->gameMutex.unlock();
 	gamesLock.unlock();
 	
+	// XXX This can be removed during the next client update.
+	usersLock.lockForRead();
+	roomInfo.set_player_count(users.size() + externalUsers.size());
+	usersLock.unlock();
+	// -----------
+
 	emit gameListChanged(gameInfo);
-	ServerInfo_Room roomInfo;
-	emit roomInfoChanged(getInfo(roomInfo, false, false, true));
+	emit roomInfoChanged(roomInfo);
 }
 
 void Server_Room::removeGame(Server_Game *game)
@@ -262,7 +296,16 @@ void Server_Room::removeGame(Server_Game *game)
 	games.remove(game->getGameId());
 	
 	ServerInfo_Room roomInfo;
-	emit roomInfoChanged(getInfo(roomInfo, false, false, true));
+	roomInfo.set_room_id(id);
+	roomInfo.set_game_count(games.size() + externalGames.size());
+	
+	// XXX This can be removed during the next client update.
+	usersLock.lockForRead();
+	roomInfo.set_player_count(users.size() + externalUsers.size());
+	usersLock.unlock();
+	// -----------
+	
+	emit roomInfoChanged(roomInfo);
 }
 
 int Server_Room::getGamesCreatedByUser(const QString &userName) const

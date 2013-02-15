@@ -129,7 +129,7 @@ void IslInterface::initServer()
 		Server_Room *room = roomIterator.next().value();
 		room->usersLock.lockForRead();
 		room->gamesLock.lockForRead();
-		room->getInfo(*event.add_room_list(), true, true, false, false);
+		room->getInfo(*event.add_room_list(), true, true, false);
 	}
 	
 	IslMessage message;
