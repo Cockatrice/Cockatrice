@@ -37,13 +37,13 @@ private:
 	QStringList gameTypes;
 	QMap<int, Server_Game *> games;
 	QMap<int, ServerInfo_Game> externalGames;
-	QList<Server_ProtocolHandler *> userList;
+	QMap<QString, Server_ProtocolHandler *> users;
 	QMap<QString, ServerInfo_User_Container> externalUsers;
 private slots:
 	void broadcastGameListUpdate(const ServerInfo_Game &gameInfo, bool sendToIsl = true);
 public:
 	mutable QReadWriteLock usersLock;
-	mutable QMutex gamesMutex;
+	mutable QReadWriteLock gamesLock;
 	Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent);
 	~Server_Room();
 	int getId() const { return id; }
@@ -55,7 +55,7 @@ public:
 	const QMap<int, Server_Game *> &getGames() const { return games; }
 	const QMap<int, ServerInfo_Game> &getExternalGames() const { return externalGames; }
 	Server *getServer() const;
-	const ServerInfo_Room &getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes = false, bool updating = false, bool includeExternalData = true) const;
+	const ServerInfo_Room &getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes = false, bool includeExternalData = true) const;
 	int getGamesCreatedByUser(const QString &name) const;
 	QList<ServerInfo_Game> getGamesOfUser(const QString &name) const;
 	

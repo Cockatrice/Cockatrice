@@ -54,18 +54,19 @@ class ServerSocketInterface : public Server_ProtocolHandler
 private slots:
 	void readClient();
 	void catchSocketError(QAbstractSocket::SocketError socketError);
-	void flushOutputBuffer();
+	void flushOutputQueue();
 signals:
-	void outputBufferChanged();
+	void outputQueueChanged();
 protected:
 	void logDebugMessage(const QString &message);
 private:
-	QMutex outputBufferMutex;
+	QMutex outputQueueMutex;
 	Servatrice *servatrice;
 	Servatrice_DatabaseInterface *sqlInterface;
 	QTcpSocket *socket;
 	
-	QByteArray inputBuffer, outputBuffer;
+	QByteArray inputBuffer;
+	QList<ServerMessage> outputQueue;
 	bool messageInProgress;
 	bool handshakeStarted;
 	int messageLength;

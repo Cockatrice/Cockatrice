@@ -13,7 +13,8 @@ public:
 	virtual ~ServerInfo_User_Container();
 	ServerInfo_User *getUserInfo() const { return userInfo; }
 	void setUserInfo(const ServerInfo_User &_userInfo);
-	ServerInfo_User copyUserInfo(bool complete, bool moderatorInfo = false) const;
+	ServerInfo_User &copyUserInfo(ServerInfo_User &result, bool complete, bool internalInfo = false, bool sessionInfo = false) const;
+	ServerInfo_User copyUserInfo(bool complete, bool internalInfo = false, bool sessionInfo = false) const;
 };
 
 #endif

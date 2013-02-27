@@ -84,7 +84,7 @@
 #include <QDebug>
 
 Server_Player::Server_Player(Server_Game *_game, int _playerId, const ServerInfo_User &_userInfo, bool _spectator, Server_AbstractUserInterface *_userInterface)
-	: game(_game), userInterface(_userInterface), userInfo(new ServerInfo_User(_userInfo)), deck(0), pingTime(0), playerId(_playerId), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false), sideboardLocked(true)
+	: ServerInfo_User_Container(_userInfo), game(_game), userInterface(_userInterface), deck(0), pingTime(0), playerId(_playerId), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false), sideboardLocked(true)
 {
 }
 
@@ -100,9 +100,6 @@ void Server_Player::prepareDestroy()
 	if (userInterface)
 		userInterface->playerRemovedFromGame(game);
 	playerMutex.unlock();
-	
-	delete userInfo;
-	userInfo = 0;
 	
 	clearZones();
 	
@@ -185,7 +182,7 @@ void Server_Player::setupZones()
 			if (!currentCard)
 				continue;
 			for (int k = 0; k < currentCard->getNumber(); ++k)
-				z->cards.append(new Server_Card(currentCard->getName(), nextCardId++, 0, 0, z));
+				z->insertCard(new Server_Card(currentCard->getName(), nextCardId++, 0, 0, z), -1, 0);
 		}
 	}
 	
@@ -209,11 +206,10 @@ void Server_Player::setupZones()
 		else
 			continue;
 		
-		for (int j = 0; j < start->cards.size(); ++j)
-			if (start->cards[j]->getName() == QString::fromStdString(m.card_name())) {
-				Server_Card *card = start->cards[j];
-				start->cards.removeAt(j);
-				target->cards.append(card);
+		for (int j = 0; j < start->getCards().size(); ++j)
+			if (start->getCards()[j]->getName() == QString::fromStdString(m.card_name())) {
+				Server_Card *card = start->getCard(j, NULL, true);
+				target->insertCard(card, -1, 0);
 				break;
 			}
 	}
@@ -245,7 +241,7 @@ void Server_Player::getProperties(ServerInfo_PlayerProperties &result, bool with
 {
 	result.set_player_id(playerId);
 	if (withUserInfo)
-		result.mutable_user_info()->CopyFrom(*userInfo);
+		copyUserInfo(*(result.mutable_user_info()), true);
 	result.set_spectator(spectator);
 	if (!spectator) {
 		result.set_conceded(conceded);
@@ -286,16 +282,16 @@ Response::ResponseCode Server_Player::drawCards(GameEventStorage &ges, int numbe
 {
 	Server_CardZone *deckZone = zones.value("deck");
 	Server_CardZone *handZone = zones.value("hand");
-	if (deckZone->cards.size() < number)
-		number = deckZone->cards.size();
+	if (deckZone->getCards().size() < number)
+		number = deckZone->getCards().size();
 	
 	Event_DrawCards eventOthers;
 	eventOthers.set_number(number);
 	Event_DrawCards eventPrivate(eventOthers);
 	
 	for (int i = 0; i < number; ++i) {
-		Server_Card *card = deckZone->cards.takeFirst();
-		handZone->cards.append(card);
+		Server_Card *card = deckZone->getCard(0, NULL, true);
+		handZone->insertCard(card, -1, 0);
 		lastDrawList.append(card->getId());
 		
 		ServerInfo_Card *cardInfo = eventPrivate.add_cards();
@@ -306,11 +302,11 @@ Response::ResponseCode Server_Player::drawCards(GameEventStorage &ges, int numbe
 	ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
 	ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
 	
-	if (deckZone->getAlwaysRevealTopCard() && !deckZone->cards.isEmpty()) {
+	if (deckZone->getAlwaysRevealTopCard() && !deckZone->getCards().isEmpty()) {
 		Event_RevealCards revealEvent;
 		revealEvent.set_zone_name(deckZone->getName().toStdString());
 		revealEvent.set_card_id(0);
-		deckZone->cards.first()->getInfo(revealEvent.add_cards());
+		deckZone->getCards().first()->getInfo(revealEvent.add_cards());
 		
 		ges.enqueueGameEvent(revealEvent, playerId);
 	}
@@ -346,7 +342,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 		return Response::RespContextError;
 	
 	if (!targetzone->hasCoords() && (x == -1))
-		x = targetzone->cards.size();
+		x = targetzone->getCards().size();
 	
 	QList<QPair<Server_Card *, int> > cardsToMove;
 	QMap<Server_Card *, const CardToMove *> cardProperties;
@@ -357,15 +353,21 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 			continue;
 		cardIdsToMove.insert(_cards[i]->card_id());
 		
+		// Consistency checks. In case the command contains illegal moves, try to resolve the legal ones still.
 		int position;
 		Server_Card *card = startzone->getCard(_cards[i]->card_id(), &position);
 		if (!card)
 			return Response::RespNameNotFound;
+		if (card->getParentCard())
+			continue;
 		if (!card->getAttachedCards().isEmpty() && !targetzone->isColumnEmpty(x, y))
-			return Response::RespContextError;
+			continue;
 		cardsToMove.append(QPair<Server_Card *, int>(card, position));
 		cardProperties.insert(card, _cards[i]);
 	}
+	// In case all moves were filtered out, abort.
+	if (cardsToMove.isEmpty())
+		return Response::RespContextError;
 	
 	MoveCardCompareFunctor cmp(startzone == targetzone ? -1 : x);
 	qSort(cardsToMove.begin(), cardsToMove.end(), cmp);
@@ -525,19 +527,19 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 			if (!ptString.isEmpty() && !faceDown)
 				setCardAttrHelper(ges, targetzone->getName(), card->getId(), AttrPT, ptString);
 		}
-		if (startzone->getAlwaysRevealTopCard() && !startzone->cards.isEmpty() && (originalPosition == 0)) {
+		if (startzone->getAlwaysRevealTopCard() && !startzone->getCards().isEmpty() && (originalPosition == 0)) {
 			Event_RevealCards revealEvent;
 			revealEvent.set_zone_name(startzone->getName().toStdString());
 			revealEvent.set_card_id(0);
-			startzone->cards.first()->getInfo(revealEvent.add_cards());
+			startzone->getCards().first()->getInfo(revealEvent.add_cards());
 			
 			ges.enqueueGameEvent(revealEvent, playerId);
 		}
-		if (targetzone->getAlwaysRevealTopCard() && !targetzone->cards.isEmpty() && (newX == 0)) {
+		if (targetzone->getAlwaysRevealTopCard() && !targetzone->getCards().isEmpty() && (newX == 0)) {
 			Event_RevealCards revealEvent;
 			revealEvent.set_zone_name(targetzone->getName().toStdString());
 			revealEvent.set_card_id(0);
-			targetzone->cards.first()->getInfo(revealEvent.add_cards());
+			targetzone->getCards().first()->getInfo(revealEvent.add_cards());
 			
 			ges.enqueueGameEvent(revealEvent, playerId);
 		}
@@ -556,7 +558,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
 void Server_Player::unattachCard(GameEventStorage &ges, Server_Card *card)
 {
 	Server_CardZone *zone = card->getZone();
-	
+	Server_Card *parentCard = card->getParentCard();
 	card->setParentCard(0);
 	
 	Event_AttachCard event;
@@ -568,6 +570,9 @@ void Server_Player::unattachCard(GameEventStorage &ges, Server_Card *card)
 	cardToMove->set_card_id(card->getId());
 	moveCard(ges, zone, QList<const CardToMove *>() << cardToMove, zone, -1, card->getY(), card->getFaceDown());
 	delete cardToMove;
+	
+	if (parentCard->getZone())
+		parentCard->getZone()->updateCardCoordinates(parentCard, parentCard->getX(), parentCard->getY());
 }
 
 Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, const QString &zoneName, int cardId, CardAttribute attribute, const QString &attrValue)
@@ -580,7 +585,7 @@ Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, c
 
 	QString result;
 	if (cardId == -1) {
-		QListIterator<Server_Card *> CardIterator(zone->cards);
+		QListIterator<Server_Card *> CardIterator(zone->getCards());
 		while (CardIterator.hasNext()) {
 			result = CardIterator.next()->setAttribute(attribute, attrValue, true);
 			if (result.isNull())
@@ -631,7 +636,7 @@ Response::ResponseCode Server_Player::cmdDeckSelect(const Command_DeckSelect &cm
 	DeckList *newDeck;
 	if (cmd.has_deck_id()) {
 		try {
-			newDeck = game->getRoom()->getServer()->getDatabaseInterface()->getDeckFromDatabase(cmd.deck_id(), QString::fromStdString(userInfo->name()));
+			newDeck = game->getRoom()->getServer()->getDatabaseInterface()->getDeckFromDatabase(cmd.deck_id(), userInfo->id());
 		} catch(Response::ResponseCode r) {
 			return r;
 		}
@@ -782,11 +787,11 @@ Response::ResponseCode Server_Player::cmdShuffle(const Command_Shuffle & /*cmd*/
 	event.set_zone_name("deck");
 	ges.enqueueGameEvent(event, playerId);
 	
-	if (deckZone->getAlwaysRevealTopCard() && !deckZone->cards.isEmpty()) {
+	if (deckZone->getAlwaysRevealTopCard() && !deckZone->getCards().isEmpty()) {
 		Event_RevealCards revealEvent;
 		revealEvent.set_zone_name(deckZone->getName().toStdString());
 		revealEvent.set_card_id(0);
-		deckZone->cards.first()->getInfo(revealEvent.add_cards());
+		deckZone->getCards().first()->getInfo(revealEvent.add_cards());
 		
 		ges.enqueueGameEvent(revealEvent, playerId);
 	}
@@ -805,12 +810,12 @@ Response::ResponseCode Server_Player::cmdMulligan(const Command_Mulligan & /*cmd
 		return Response::RespContextError;
 	
 	Server_CardZone *hand = zones.value("hand");
-	int number = (hand->cards.size() <= 1) ? initialCards : hand->cards.size() - 1;
+	int number = (hand->getCards().size() <= 1) ? initialCards : hand->getCards().size() - 1;
 		
 	Server_CardZone *deck = zones.value("deck");
-	while (!hand->cards.isEmpty()) {
+	while (!hand->getCards().isEmpty()) {
 		CardToMove *cardToMove = new CardToMove;
-		cardToMove->set_card_id(hand->cards.first()->getId());
+		cardToMove->set_card_id(hand->getCards().first()->getId());
 		moveCard(ges, hand, QList<const CardToMove *>() << cardToMove, deck, 0, 0, false);
 		delete cardToMove;
 	}
@@ -991,9 +996,11 @@ Response::ResponseCode Server_Player::cmdAttachCard(const Command_AttachCard &cm
 			return Response::RespContextError;
 		if (cmd.has_target_card_id())
 			targetCard = targetzone->getCard(cmd.target_card_id());
-		if (targetCard)
+		if (targetCard) {
 			if (targetCard->getParentCard())
 				return Response::RespContextError;
+		} else
+			return Response::RespNameNotFound;
 	}
 	if (!startzone->hasCoords())
 		return Response::RespContextError;
@@ -1025,15 +1032,17 @@ Response::ResponseCode Server_Player::cmdAttachCard(const Command_AttachCard &cm
 		for (int i = 0; i < attachedList.size(); ++i)
 			attachedList[i]->getZone()->getPlayer()->unattachCard(ges, attachedList[i]);
 		
+		card->setParentCard(targetCard);
+		const int oldX = card->getX();
+		card->setCoords(-1, card->getY());
+		startzone->updateCardCoordinates(card, oldX, card->getY());
+		
 		if (targetzone->isColumnStacked(targetCard->getX(), targetCard->getY())) {
 			CardToMove *cardToMove = new CardToMove;
 			cardToMove->set_card_id(targetCard->getId());
 			targetPlayer->moveCard(ges, targetzone, QList<const CardToMove *>() << cardToMove, targetzone, targetzone->getFreeGridColumn(-2, targetCard->getY(), targetCard->getName()), targetCard->getY(), targetCard->getFaceDown());
 			delete cardToMove;
 		}
-		
-		card->setParentCard(targetCard);
-		card->setCoords(-1, card->getY());
 		
 		Event_AttachCard event;
 		event.set_start_zone(startzone->getName().toStdString());
@@ -1407,16 +1416,17 @@ Response::ResponseCode Server_Player::cmdDumpZone(const Command_DumpZone &cmd, R
 		return Response::RespContextError;
 	
 	int numberCards = cmd.number_cards();
+	const QList<Server_Card *> &cards = zone->getCards();
 	
 	Response_DumpZone *re = new Response_DumpZone;
 	ServerInfo_Zone *zoneInfo = re->mutable_zone_info();
 	zoneInfo->set_name(zone->getName().toStdString());
 	zoneInfo->set_type(zone->getType());
 	zoneInfo->set_with_coords(zone->hasCoords());
-	zoneInfo->set_card_count(numberCards < zone->cards.size() ? zone->cards.size() : numberCards);
+	zoneInfo->set_card_count(numberCards < cards.size() ? cards.size() : numberCards);
 	
-	for (int i = 0; (i < zone->cards.size()) && (i < numberCards || numberCards == -1); ++i) {
-		Server_Card *card = zone->cards[i];
+	for (int i = 0; (i < cards.size()) && (i < numberCards || numberCards == -1); ++i) {
+		Server_Card *card = cards[i];
 		QString displayedName = card->getFaceDown() ? QString() : card->getName();
 		ServerInfo_Card *cardInfo = zoneInfo->add_card_list();
 		cardInfo->set_name(displayedName.toStdString());
@@ -1510,11 +1520,11 @@ Response::ResponseCode Server_Player::cmdRevealCards(const Command_RevealCards &
 	
 	QList<Server_Card *> cardsToReveal;
 	if (!cmd.has_card_id())
-		cardsToReveal = zone->cards;
+		cardsToReveal = zone->getCards();
 	else if (cmd.card_id() == -2) {
-		if (zone->cards.isEmpty())
+		if (zone->getCards().isEmpty())
 			return Response::RespContextError;
-		cardsToReveal.append(zone->cards.at(rng->getNumber(0, zone->cards.size() - 1)));
+		cardsToReveal.append(zone->getCards().at(rng->getNumber(0, zone->getCards().size() - 1)));
 	} else {
 		Server_Card *card = zone->getCard(cmd.card_id());
 		if (!card)
@@ -1600,11 +1610,11 @@ Response::ResponseCode Server_Player::cmdChangeZoneProperties(const Command_Chan
 		
 		ges.enqueueGameEvent(event, playerId);
 		
-		if (!zone->cards.isEmpty() && cmd.always_reveal_top_card()) {
+		if (!zone->getCards().isEmpty() && cmd.always_reveal_top_card()) {
 			Event_RevealCards revealEvent;
 			revealEvent.set_zone_name(zone->getName().toStdString());
 			revealEvent.set_card_id(0);
-			zone->cards.first()->getInfo(revealEvent.add_cards());
+			zone->getCards().first()->getInfo(revealEvent.add_cards());
 			
 			ges.enqueueGameEvent(revealEvent, playerId);
 		}

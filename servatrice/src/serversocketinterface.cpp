@@ -72,18 +72,25 @@ ServerSocketInterface::ServerSocketInterface(Servatrice *_server, Servatrice_Dat
 	socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(catchSocketError(QAbstractSocket::SocketError)));
-	connect(this, SIGNAL(outputBufferChanged()), this, SLOT(flushOutputBuffer()), Qt::QueuedConnection);
+	
+	// Never call flushOutputQueue directly from outputQueueChanged. In case of a socket error,
+	// it could lead to this object being destroyed while another function is still on the call stack. -> mutex deadlocks etc.
+	connect(this, SIGNAL(outputQueueChanged()), this, SLOT(flushOutputQueue()), Qt::QueuedConnection);
 }
 
 ServerSocketInterface::~ServerSocketInterface()
 {
 	logger->logMessage("ServerSocketInterface destructor", this);
 	
-	flushOutputBuffer();
+	flushOutputQueue();
 }
 
 void ServerSocketInterface::initConnection(int socketDescriptor)
 {
+	// Add this object to the server's list of connections before it can receive socket events.
+	// Otherwise, in case a of a socket error, it could be removed from the list before it is added.
+	server->addClient(this);
+	
 	socket->setSocketDescriptor(socketDescriptor);
 	logger->logMessage(QString("Incoming connection: %1").arg(socket->peerAddress().toString()), this);
 	initSessionDeprecated();
@@ -93,11 +100,10 @@ void ServerSocketInterface::initSessionDeprecated()
 {
 	// dirty hack to make v13 client display the correct error message
 	
-	outputBufferMutex.lock();
-	outputBuffer = "<?xml version=\"1.0\"?><cockatrice_server_stream version=\"14\">";
-	outputBufferMutex.unlock();
-	
-	emit outputBufferChanged();
+	QByteArray buf;
+	buf.append("<?xml version=\"1.0\"?><cockatrice_server_stream version=\"14\">");
+	socket->write(buf);
+	socket->flush();
 }
 
 bool ServerSocketInterface::initSession()
@@ -121,19 +127,7 @@ bool ServerSocketInterface::initSession()
 		return false;
 	}
 	
-	server->addClient(this);
 	return true;
-}
-
-void ServerSocketInterface::flushOutputBuffer()
-{
-	QMutexLocker locker(&outputBufferMutex);
-	if (outputBuffer.isEmpty())
-		return;
-	servatrice->incTxBytes(outputBuffer.size());
-	socket->write(outputBuffer);
-	socket->flush();
-	outputBuffer.clear();
 }
 
 void ServerSocketInterface::readClient()
@@ -183,18 +177,42 @@ void ServerSocketInterface::catchSocketError(QAbstractSocket::SocketError socket
 
 void ServerSocketInterface::transmitProtocolItem(const ServerMessage &item)
 {
-	QByteArray buf;
-	unsigned int size = item.ByteSize();
-	buf.resize(size + 4);
-	item.SerializeToArray(buf.data() + 4, size);
-	buf.data()[3] = (unsigned char) size;
-	buf.data()[2] = (unsigned char) (size >> 8);
-	buf.data()[1] = (unsigned char) (size >> 16);
-	buf.data()[0] = (unsigned char) (size >> 24);
+	outputQueueMutex.lock();
+	outputQueue.append(item);
+	outputQueueMutex.unlock();
 	
-	QMutexLocker locker(&outputBufferMutex);
-	outputBuffer.append(buf);
-	emit outputBufferChanged();
+	emit outputQueueChanged();
+}
+
+void ServerSocketInterface::flushOutputQueue()
+{
+	QMutexLocker locker(&outputQueueMutex);
+	if (outputQueue.isEmpty())
+		return;
+	
+	int totalBytes = 0;
+	while (!outputQueue.isEmpty()) {
+		ServerMessage item = outputQueue.takeFirst();
+		locker.unlock();
+		
+		QByteArray buf;
+		unsigned int size = item.ByteSize();
+		buf.resize(size + 4);
+		item.SerializeToArray(buf.data() + 4, size);
+		buf.data()[3] = (unsigned char) size;
+		buf.data()[2] = (unsigned char) (size >> 8);
+		buf.data()[1] = (unsigned char) (size >> 16);
+		buf.data()[0] = (unsigned char) (size >> 24);
+		// In case socket->write() calls catchSocketError(), the mutex must not be locked during this call.
+		socket->write(buf);
+		
+		totalBytes += size + 4;
+		locker.relock();
+	}
+	locker.unlock();
+	servatrice->incTxBytes(totalBytes);
+	// see above wrt mutex
+	socket->flush();
 }
 
 void ServerSocketInterface::logDebugMessage(const QString &message)
@@ -324,10 +342,10 @@ int ServerSocketInterface::getDeckPathId(int basePathId, QStringList path)
 		return 0;
 	
 	QSqlQuery query(sqlInterface->getDatabase());
-	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent and name = :name and user = :user");
+	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent and name = :name and id_user = :id_user");
 	query.bindValue(":id_parent", basePathId);
 	query.bindValue(":name", path.takeFirst());
-	query.bindValue(":user", QString::fromStdString(userInfo->name()));
+	query.bindValue(":id_user", userInfo->id());
 	if (!sqlInterface->execSqlQuery(query))
 		return -1;
 	if (!query.next())
@@ -347,9 +365,9 @@ int ServerSocketInterface::getDeckPathId(const QString &path)
 bool ServerSocketInterface::deckListHelper(int folderId, ServerInfo_DeckStorage_Folder *folder)
 {
 	QSqlQuery query(sqlInterface->getDatabase());
-	query.prepare("select id, name from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent and user = :user");
+	query.prepare("select id, name from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent and id_user = :id_user");
 	query.bindValue(":id_parent", folderId);
-	query.bindValue(":user", QString::fromStdString(userInfo->name()));
+	query.bindValue(":id_user", userInfo->id());
 	if (!sqlInterface->execSqlQuery(query))
 		return false;
 	
@@ -362,9 +380,9 @@ bool ServerSocketInterface::deckListHelper(int folderId, ServerInfo_DeckStorage_
 			return false;
 	}
 	
-	query.prepare("select id, name, upload_time from " + servatrice->getDbPrefix() + "_decklist_files where id_folder = :id_folder and user = :user");
+	query.prepare("select id, name, upload_time from " + servatrice->getDbPrefix() + "_decklist_files where id_folder = :id_folder and id_user = :id_user");
 	query.bindValue(":id_folder", folderId);
-	query.bindValue(":user", QString::fromStdString(userInfo->name()));
+	query.bindValue(":id_user", userInfo->id());
 	if (!sqlInterface->execSqlQuery(query))
 		return false;
 	
@@ -412,9 +430,9 @@ Response::ResponseCode ServerSocketInterface::cmdDeckNewDir(const Command_DeckNe
 		return Response::RespNameNotFound;
 	
 	QSqlQuery query(sqlInterface->getDatabase());
-	query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_folders (id_parent, user, name) values(:id_parent, :user, :name)");
+	query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_folders (id_parent, id_user, name) values(:id_parent, :id_user, :name)");
 	query.bindValue(":id_parent", folderId);
-	query.bindValue(":user", QString::fromStdString(userInfo->name()));
+	query.bindValue(":id_user", userInfo->id());
 	query.bindValue(":name", QString::fromStdString(cmd.dir_name()));
 	if (!sqlInterface->execSqlQuery(query))
 		return Response::RespContextError;
@@ -463,9 +481,9 @@ Response::ResponseCode ServerSocketInterface::cmdDeckDel(const Command_DeckDel &
 	sqlInterface->checkSql();
 	QSqlQuery query(sqlInterface->getDatabase());
 	
-	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_files where id = :id and user = :user");
+	query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_files where id = :id and id_user = :id_user");
 	query.bindValue(":id", cmd.deck_id());
-	query.bindValue(":user", QString::fromStdString(userInfo->name()));
+	query.bindValue(":id_user", userInfo->id());
 	sqlInterface->execSqlQuery(query);
 	if (!query.next())
 		return Response::RespNameNotFound;
@@ -500,9 +518,9 @@ Response::ResponseCode ServerSocketInterface::cmdDeckUpload(const Command_DeckUp
 			return Response::RespNameNotFound;
 		
 		QSqlQuery query(sqlInterface->getDatabase());
-		query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_files (id_folder, user, name, upload_time, content) values(:id_folder, :user, :name, NOW(), :content)");
+		query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_files (id_folder, id_user, name, upload_time, content) values(:id_folder, :id_user, :name, NOW(), :content)");
 		query.bindValue(":id_folder", folderId);
-		query.bindValue(":user", QString::fromStdString(userInfo->name()));
+		query.bindValue(":id_user", userInfo->id());
 		query.bindValue(":name", deckName);
 		query.bindValue(":content", deckStr);
 		sqlInterface->execSqlQuery(query);
@@ -515,9 +533,9 @@ Response::ResponseCode ServerSocketInterface::cmdDeckUpload(const Command_DeckUp
 		rc.setResponseExtension(re);
 	} else if (cmd.has_deck_id()) {
 		QSqlQuery query(sqlInterface->getDatabase());
-		query.prepare("update " + servatrice->getDbPrefix() + "_decklist_files set name=:name, upload_time=NOW(), content=:content where id = :id_deck and user = :user");
+		query.prepare("update " + servatrice->getDbPrefix() + "_decklist_files set name=:name, upload_time=NOW(), content=:content where id = :id_deck and id_user = :id_user");
 		query.bindValue(":id_deck", cmd.deck_id());
-		query.bindValue(":user", QString::fromStdString(userInfo->name()));
+		query.bindValue(":id_user", userInfo->id());
 		query.bindValue(":name", deckName);
 		query.bindValue(":content", deckStr);
 		sqlInterface->execSqlQuery(query);
@@ -544,7 +562,7 @@ Response::ResponseCode ServerSocketInterface::cmdDeckDownload(const Command_Deck
 	
 	DeckList *deck;
 	try {
-		deck = sqlInterface->getDeckFromDatabase(cmd.deck_id(), QString::fromStdString(userInfo->name()));
+		deck = sqlInterface->getDeckFromDatabase(cmd.deck_id(), userInfo->id());
 	} catch(Response::ResponseCode r) {
 		return r;
 	}
@@ -701,6 +719,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 	query.bindValue(":visible_reason", QString::fromStdString(cmd.visible_reason()));
 	sqlInterface->execSqlQuery(query);
 	
+	servatrice->clientsLock.lockForRead();
 	QList<ServerSocketInterface *> userList = servatrice->getUsersWithAddressAsList(QHostAddress(address));
 	ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
 	if (user && !userList.contains(user))
@@ -715,10 +734,11 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 		for (int i = 0; i < userList.size(); ++i) {
 			SessionEvent *se = userList[i]->prepareSessionEvent(event);
 			userList[i]->sendProtocolItem(*se);
-			userList[i]->prepareDestroy();
 			delete se;
+			QMetaObject::invokeMethod(userList[i], "prepareDestroy", Qt::QueuedConnection);
 		}
 	}
+	servatrice->clientsLock.unlock();
 	
 	return Response::RespOk;
 }
@@ -728,7 +748,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 
 Response::ResponseCode ServerSocketInterface::cmdUpdateServerMessage(const Command_UpdateServerMessage & /*cmd*/, ResponseContainer & /*rc*/)
 {
-	servatrice->updateLoginMessage();
+	QMetaObject::invokeMethod(server, "updateLoginMessage");
 	return Response::RespOk;
 }
 

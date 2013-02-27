@@ -122,6 +122,7 @@ private:
 	QMap<int, IslInterface *> islInterfaces;
 public slots:
 	void scheduleShutdown(const QString &reason, int minutes);
+	void updateLoginMessage();
 public:
 	Servatrice(QSettings *_settings, QObject *parent = 0);
 	~Servatrice();
@@ -139,12 +140,10 @@ public:
 	AuthenticationMethod getAuthenticationMethod() const { return authenticationMethod; }
 	QString getDbPrefix() const { return dbPrefix; }
 	int getServerId() const { return serverId; }
-	void updateLoginMessage();
 	int getUsersWithAddress(const QHostAddress &address) const;
 	QList<ServerSocketInterface *> getUsersWithAddressAsList(const QHostAddress &address) const;
 	void incTxBytes(quint64 num);
 	void incRxBytes(quint64 num);
-	void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays);
 	void addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface);
 	
 	bool islConnectionExists(int serverId) const;

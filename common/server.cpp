@@ -36,7 +36,7 @@
 #include <QDebug>
 
 Server::Server(bool _threaded, QObject *parent)
-	: QObject(parent), threaded(_threaded), clientsLock(QReadWriteLock::Recursive), nextLocalGameId(0)
+	: QObject(parent), threaded(_threaded), nextLocalGameId(0)
 {
 	qRegisterMetaType<ServerInfo_Game>("ServerInfo_Game");
 	qRegisterMetaType<ServerInfo_Room>("ServerInfo_Room");
@@ -79,10 +79,9 @@ void Server::prepareDestroy()
 			clientsLock.unlock();
 		} while (!done);
 	} else {
-		clientsLock.lockForWrite();
+		// no locking is needed in unthreaded mode
 		while (!clients.isEmpty())
 			clients.first()->prepareDestroy();
-		clientsLock.unlock();
 	}
 	
 	roomsLock.lockForWrite();
@@ -141,7 +140,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	}
 	
 	users.insert(name, session);
-	qDebug() << "Server::loginUser: name=" << name;
+	qDebug() << "Server::loginUser:" << session << "name=" << name;
 	
 	data.set_session_id(databaseInterface->startSession(name, session->getAddress()));	
 	databaseInterface->unlockSessionTables();
@@ -159,7 +158,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 			clients[i]->sendProtocolItem(*se);
 	delete se;
 	
-	event.mutable_user_info()->CopyFrom(session->copyUserInfo(true, true));
+	event.mutable_user_info()->CopyFrom(session->copyUserInfo(true, true, true));
 	locker.unlock();
 	
 	se = Server_ProtocolHandler::prepareSessionEvent(event);
@@ -185,6 +184,17 @@ QList<PlayerReference> Server::getPersistentPlayerReferences(const QString &user
 {
 	QReadLocker locker(&persistentPlayersLock);
 	return persistentPlayers.values(userName);
+}
+
+Server_AbstractUserInterface *Server::findUser(const QString &userName) const
+{
+	// Call this only with clientsLock set.
+	
+	Server_AbstractUserInterface *userHandler = users.value(userName);
+	if (userHandler)
+		return userHandler;
+	else
+		return externalUsers.value(userName);
 }
 
 void Server::addClient(Server_ProtocolHandler *client)
@@ -218,13 +228,13 @@ void Server::removeClient(Server_ProtocolHandler *client)
 			qDebug() << "closed session id:" << sessionId;
 		}
 	}
-	qDebug() << "Server::removeClient:" << clients.size() << "clients; " << users.size() << "users left";
+	qDebug() << "Server::removeClient: removed" << (void *) client << ";" << clients.size() << "clients; " << users.size() << "users left";
 }
 
 void Server::externalUserJoined(const ServerInfo_User &userInfo)
 {
 	// This function is always called from the main thread via signal/slot.
-	QWriteLocker locker(&clientsLock);
+	clientsLock.lockForWrite();
 	
 	Server_RemoteUserInterface *newUser = new Server_RemoteUserInterface(this, ServerInfo_User_Container(userInfo));
 	externalUsers.insert(QString::fromStdString(userInfo.name()), newUser);
@@ -263,7 +273,7 @@ void Server::externalUserLeft(const QString &userName)
 		if (!room)
 			continue;
 		
-		QMutexLocker roomGamesLocker(&room->gamesMutex);
+		QReadLocker roomGamesLocker(&room->gamesLock);
 		Server_Game *game = room->getGames().value(userGamesIterator.key());
 		if (!game)
 			continue;
@@ -389,7 +399,7 @@ void Server::externalGameCommandContainerReceived(const CommandContainer &cont, 
 			throw Response::RespNotInRoom;
 		}
 		
-		QMutexLocker roomGamesLocker(&room->gamesMutex);
+		QReadLocker roomGamesLocker(&room->gamesLock);
 		Server_Game *game = room->getGames().value(cont.game_id());
 		if (!game) {
 			qDebug() << "externalGameCommandContainerReceived: game id=" << cont.game_id() << "not found";
@@ -499,7 +509,7 @@ int Server::getGamesCount() const
 	QMapIterator<int, Server_Room *> roomIterator(rooms);
 	while (roomIterator.hasNext()) {
 		Server_Room *room = roomIterator.next().value();
-		QMutexLocker roomLocker(&room->gamesMutex);
+		QReadLocker roomLocker(&room->gamesLock);
 		result += room->getGames().size();
 	}
 	return result;

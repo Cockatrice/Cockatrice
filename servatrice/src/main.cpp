@@ -127,6 +127,7 @@ int main(int argc, char *argv[])
 	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
 	
 	loggerThread = new QThread;
+	loggerThread->setObjectName("logger");
 	logger = new ServerLogger(logToConsole);
 	logger->moveToThread(loggerThread);
 	
@@ -151,11 +152,15 @@ int main(int argc, char *argv[])
 	sigemptyset(&segv.sa_mask);
 	sigaction(SIGSEGV, &segv, 0);
 	sigaction(SIGABRT, &segv, 0);
+	
+	signal(SIGPIPE, SIG_IGN);
 #endif
 	rng = new RNG_SFMT;
 	
 	std::cerr << "Servatrice " << VERSION_STRING << " starting." << std::endl;
 	std::cerr << "-------------------------" << std::endl;
+	
+	PasswordHasher::initialize();
 	
 	if (testRandom)
 		testRNG();

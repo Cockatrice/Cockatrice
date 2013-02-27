@@ -306,6 +306,8 @@ void TabDeckStorage::actDeleteRemoteDeck()
 		QString path = dir->getPath();
 		if (path.isEmpty())
 			return;
+		if (QMessageBox::warning(this, tr("Delete remote folder"), tr("Are you sure you want to delete \"%1\"?").arg(path), QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+			return;
 		Command_DeckDelDir cmd;
 		cmd.set_path(path.toStdString());
 		pend = client->prepareSessionCommand(cmd);

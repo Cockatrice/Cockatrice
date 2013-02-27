@@ -2,6 +2,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 PROJECT(servatrice)
 
+# cmake modules
+include(GNUInstallDirs)
+
 SET(servatrice_SOURCES
  src/main.cpp
  src/passwordhasher.cpp
@@ -28,6 +31,7 @@ SET(QT_USE_QTSQL TRUE)
 FIND_PACKAGE(Qt4 REQUIRED)
 FIND_PACKAGE(Protobuf REQUIRED)
 FIND_PACKAGE(Libgcrypt REQUIRED)
+FIND_PACKAGE(Threads)
 
 #set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O2")
@@ -43,7 +47,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/../common)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 ADD_EXECUTABLE(servatrice ${servatrice_SOURCES} ${servatrice_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${QT_LIBRARIES} ${LIBGCRYPT_LIBRARY})
+TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${QT_LIBRARIES} ${LIBGCRYPT_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
 
 #add_custom_target(versionheader ALL DEPENDS version_header)
 add_custom_command(
@@ -51,3 +55,5 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/../common/getversion.cmake
 )
 
+# install rules
+INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/servatrice DESTINATION ${CMAKE_INSTALL_BINDIR})

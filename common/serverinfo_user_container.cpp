@@ -26,22 +26,27 @@ ServerInfo_User_Container::~ServerInfo_User_Container()
 
 void ServerInfo_User_Container::setUserInfo(const ServerInfo_User &_userInfo)
 {
-	userInfo = new ServerInfo_User;
-	userInfo->CopyFrom(_userInfo);
+	userInfo = new ServerInfo_User(_userInfo);
 }
 
-ServerInfo_User ServerInfo_User_Container::copyUserInfo(bool complete, bool moderatorInfo) const
+ServerInfo_User &ServerInfo_User_Container::copyUserInfo(ServerInfo_User &result, bool complete, bool internalInfo, bool sessionInfo) const
 {
-	ServerInfo_User result;
 	if (userInfo) {
 		result.CopyFrom(*userInfo);
-		if (!moderatorInfo) {
+		if (!sessionInfo) {
 			result.clear_session_id();
 			result.clear_address();
-			result.clear_id();
 		}
+		if (!internalInfo)
+			result.clear_id();
 		if (!complete)
 			result.clear_avatar_bmp();
 	}
-	return result;
+	return result;	
+}
+
+ServerInfo_User ServerInfo_User_Container::copyUserInfo(bool complete, bool internalInfo, bool sessionInfo) const
+{
+	ServerInfo_User result;
+	return copyUserInfo(result, complete, internalInfo, sessionInfo);
 }

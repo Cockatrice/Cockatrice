@@ -19,7 +19,7 @@ public:
 	virtual bool isInIgnoreList(const QString &whoseList, const QString &who) { return false; }
 	virtual ServerInfo_User getUserData(const QString &name, bool withId = false) = 0;
 	virtual void storeGameInformation(const QString &roomName, const QStringList &roomGameTypes, const ServerInfo_Game &gameInfo, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replayList) { }
-	virtual DeckList *getDeckFromDatabase(int deckId, const QString &userName) { return 0; }
+	virtual DeckList *getDeckFromDatabase(int deckId, int userId) { return 0; }
 	
 	virtual qint64 startSession(const QString &userName, const QString &address) { return 0; }
 public slots:

@@ -105,6 +105,12 @@ void GamesProxyModel::setUnavailableGamesVisible(bool _unavailableGamesVisible)
 	invalidateFilter();
 }
 
+void GamesProxyModel::setPasswordProtectedGamesVisible(bool _passwordProtectedGamesVisible)
+{
+	passwordProtectedGamesVisible = _passwordProtectedGamesVisible;
+	invalidateFilter();
+}
+
 void GamesProxyModel::setGameNameFilter(const QString &_gameNameFilter)
 {
 	gameNameFilter = _gameNameFilter;
@@ -133,6 +139,7 @@ void GamesProxyModel::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlay
 void GamesProxyModel::resetFilterParameters()
 {
 	unavailableGamesVisible = false;
+	passwordProtectedGamesVisible = false;
 	gameNameFilter = QString();
 	creatorNameFilter = QString();
 	gameTypeFilter.clear();
@@ -158,6 +165,8 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourc
 			if (game.only_registered())
 				return false;
 	}
+	if (!passwordProtectedGamesVisible && game.with_password())
+		return false;
 	if (!gameNameFilter.isEmpty())
 		if (!QString::fromStdString(game.description()).contains(gameNameFilter, Qt::CaseInsensitive))
 			return false;

@@ -40,12 +40,19 @@ private:
 	int cardsBeingLookedAt;
 	QSet<int> playersWithWritePermission;
 	bool alwaysRevealTopCard;
+	QList<Server_Card *> cards;
+	QMap<int, QMap<int, Server_Card *> > coordinateMap; // y -> (x -> card)
+	QMap<int, QMultiMap<QString, int> > freePilesMap; // y -> (cardName -> x)
+	QMap<int, int> freeSpaceMap; // y -> x
+	void removeCardFromCoordMap(Server_Card *card, int oldX, int oldY);
+	void insertCardIntoCoordMap(Server_Card *card, int x, int y);
 public:
 	Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ServerInfo_Zone::ZoneType _type);
 	~Server_CardZone();
-
+	
+	const QList<Server_Card *> &getCards() const { return cards; }
 	int removeCard(Server_Card *card);
-	Server_Card *getCard(int id, int *position = NULL);
+	Server_Card *getCard(int id, int *position = NULL, bool remove = false);
 
 	int getCardsBeingLookedAt() const { return cardsBeingLookedAt; }
 	void setCardsBeingLookedAt(int _cardsBeingLookedAt) { cardsBeingLookedAt = _cardsBeingLookedAt; }
@@ -59,9 +66,9 @@ public:
 	bool isColumnEmpty(int x, int y) const;
 	bool isColumnStacked(int x, int y) const;
 	void fixFreeSpaces(GameEventStorage &ges);
-	void moveCard(GameEventStorage &ges, QMap<int, Server_Card *> &coordMap, Server_Card *card, int x, int y);
-	QList<Server_Card *> cards;
+	void moveCardInRow(GameEventStorage &ges, Server_Card *card, int x, int y);
 	void insertCard(Server_Card *card, int x, int y);
+	void updateCardCoordinates(Server_Card *card, int oldX, int oldY);
 	void shuffle();
 	void clear();
 	void addWritePermission(int playerId);

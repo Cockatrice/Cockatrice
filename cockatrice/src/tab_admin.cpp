@@ -4,6 +4,7 @@
 #include <QPushButton>
 #include <QGroupBox>
 #include <QMessageBox>
+#include <QDialogButtonBox>
 #include <QSpinBox>
 #include <QLabel>
 #include <QLineEdit>
@@ -24,24 +25,16 @@ ShutdownDialog::ShutdownDialog(QWidget *parent)
 	minutesEdit->setMinimum(0);
 	minutesEdit->setValue(5);
 	
-	QPushButton *okButton = new QPushButton(tr("&OK"));
-	okButton->setAutoDefault(true);
-	okButton->setDefault(true);
-	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
-	QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
-	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-	
-	QHBoxLayout *buttonLayout = new QHBoxLayout;
-	buttonLayout->addStretch();
-	buttonLayout->addWidget(okButton);
-	buttonLayout->addWidget(cancelButton);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+	connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+	connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 	
 	QGridLayout *mainLayout = new QGridLayout;
 	mainLayout->addWidget(reasonLabel, 0, 0);
 	mainLayout->addWidget(reasonEdit, 0, 1);
 	mainLayout->addWidget(minutesLabel, 1, 0);
 	mainLayout->addWidget(minutesEdit, 1, 1);
-	mainLayout->addLayout(buttonLayout, 2, 0, 1, 2);
+	mainLayout->addWidget(buttonBox, 2, 0, 1, 2);
 	
 	setLayout(mainLayout);
 	setWindowTitle(tr("Shut down server"));

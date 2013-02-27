@@ -1,6 +1,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(oracle)
 
+# paths
+set(DESKTOPDIR share/applications CACHE STRING "path to .desktop files")
+
 SET(oracle_SOURCES src/main.cpp src/oracleimporter.cpp src/window_main.cpp ../cockatrice/src/carddatabase.cpp ../cockatrice/src/settingscache.cpp)
 SET(oracle_HEADERS src/oracleimporter.h src/window_main.h ../cockatrice/src/carddatabase.h ../cockatrice/src/settingscache.h)
 
@@ -19,7 +22,11 @@ INCLUDE_DIRECTORIES(../cockatrice/src)
 ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_HEADERS_MOC})
 TARGET_LINK_LIBRARIES(oracle ${QT_LIBRARIES})
 
-INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/oracle DESTINATION bin)
+IF (NOT APPLE)
+  INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/oracle DESTINATION bin)
+ELSE (APPLE)
+  INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/oracle.app DESTINATION bin)
+ENDIF (NOT APPLE)
 IF (NOT WIN32 AND NOT APPLE)
-	INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/oracle.desktop DESTINATION share/applications)
+	INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/oracle.desktop DESTINATION ${DESKTOPDIR})
 ENDIF (NOT WIN32 AND NOT APPLE)

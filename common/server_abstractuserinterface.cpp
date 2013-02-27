@@ -78,7 +78,7 @@ void Server_AbstractUserInterface::joinPersistentGames(ResponseContainer &rc)
 		Server_Room *room = server->getRooms().value(pr.getRoomId());
 		if (!room)
 			continue;
-		QMutexLocker roomGamesLocker(&room->gamesMutex);
+		QReadLocker roomGamesLocker(&room->gamesLock);
 		
 		Server_Game *game = room->getGames().value(pr.getGameId());
 		if (!game)

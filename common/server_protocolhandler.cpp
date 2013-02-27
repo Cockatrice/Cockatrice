@@ -38,6 +38,8 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 {
 }
 
+// This function must only be called from the thread this object lives in.
+// The thread must not hold any server locks when calling this (e.g. clientsLock, roomsLock).
 void Server_ProtocolHandler::prepareDestroy()
 {
 	if (deleted)
@@ -58,24 +60,24 @@ void Server_ProtocolHandler::prepareDestroy()
 		Server_Room *r = server->getRooms().value(gameIterator.value().first);
 		if (!r)
 			continue;
-		r->gamesMutex.lock();
+		r->gamesLock.lockForRead();
 		Server_Game *g = r->getGames().value(gameIterator.key());
 		if (!g) {
-			r->gamesMutex.unlock();
+			r->gamesLock.unlock();
 			continue;
 		}
 		g->gameMutex.lock();
 		Server_Player *p = g->getPlayers().value(gameIterator.value().second);
 		if (!p) {
 			g->gameMutex.unlock();
-			r->gamesMutex.unlock();
+			r->gamesLock.unlock();
 			continue;
 		}
 		
 		p->disconnectClient();
 		
 		g->gameMutex.unlock();
-		r->gamesMutex.unlock();
+		r->gamesLock.unlock();
 	}
 	server->roomsLock.unlock();
 	
@@ -195,7 +197,7 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 	if (!room)
 		return Response::RespNotInRoom;
 	
-	QMutexLocker roomGamesLocker(&room->gamesMutex);
+	QReadLocker roomGamesLocker(&room->gamesLock);
 	Server_Game *game = room->getGames().value(cont.game_id());
 	if (!game) {
 		if (room->getExternalGames().contains(cont.game_id())) {
@@ -275,6 +277,10 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
 
 void Server_ProtocolHandler::processCommandContainer(const CommandContainer &cont)
 {
+	// Command processing must be disabled after prepareDestroy() has been called.
+	if (deleted)
+		return;
+	
 	lastDataReceived = timeRunning;
 	
 	ResponseContainer responseContainer(cont.has_cmd_id() ? cont.cmd_id() : -1);
@@ -374,12 +380,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
 	QReadLocker locker(&server->clientsLock);
 	
 	QString receiver = QString::fromStdString(cmd.user_name());
-	Server_AbstractUserInterface *userInterface = server->getUsers().value(receiver);
-	if (!userInterface) {
-		userInterface = server->getExternalUsers().value(receiver);
-		if (!userInterface)
-			return Response::RespNameNotFound;
-	}
+	Server_AbstractUserInterface *userInterface = server->findUser(receiver);
+	if (!userInterface)
+		return Response::RespNameNotFound;
 	if (databaseInterface->isInIgnoreList(receiver, QString::fromStdString(userInfo->name())))
 		return Response::RespInIgnoreList;
 	
@@ -400,22 +403,20 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_G
 	if (authState == NotLoggedIn)
 		return Response::RespLoginNeeded;
 	
-	server->clientsLock.lockForRead();
-	if (!server->getUsers().contains(QString::fromStdString(cmd.user_name())))
-		return Response::RespNameNotFound;
-	server->clientsLock.unlock();
+	// We don't need to check whether the user is logged in; persistent games should also work.
+	// The client needs to deal with an empty result list.
 	
 	Response_GetGamesOfUser *re = new Response_GetGamesOfUser;
 	server->roomsLock.lockForRead();
 	QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
 	while (roomIterator.hasNext()) {
 		Server_Room *room = roomIterator.next().value();
-		room->gamesMutex.lock();
+		room->gamesLock.lockForRead();
 		room->getInfo(*re->add_room_list(), false, true);
 		QListIterator<ServerInfo_Game> gameIterator(room->getGamesOfUser(QString::fromStdString(cmd.user_name())));
 		while (gameIterator.hasNext())
 			re->add_game_list()->CopyFrom(gameIterator.next());
-		room->gamesMutex.unlock();
+		room->gamesLock.unlock();
 	}
 	server->roomsLock.unlock();
 	
@@ -436,15 +437,11 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetU
 		
 		QReadLocker locker(&server->clientsLock);
 		
-		ServerInfo_User_Container *infoSource;
-		if (server->getUsers().contains(userName))
-			infoSource = server->getUsers().value(userName);
-		else if (server->getExternalUsers().contains(userName))
-			infoSource = server->getExternalUsers().value(userName);
-		else
+		ServerInfo_User_Container *infoSource = server->findUser(userName);
+		if (!infoSource)
 			return Response::RespNameNotFound;
 		
-		re->mutable_user_info()->CopyFrom(infoSource->copyUserInfo(true, userInfo->user_level() & ServerInfo_User::IsModerator));
+		re->mutable_user_info()->CopyFrom(infoSource->copyUserInfo(true, false, userInfo->user_level() & ServerInfo_User::IsModerator));
 	}
 	
 	rc.setResponseExtension(re);
@@ -555,8 +552,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_Creat
 	const int gameId = databaseInterface->getNextGameId();
 	if (gameId == -1)
 		return Response::RespInternalError;
-	
-	QMutexLocker roomLocker(&room->gamesMutex);
 	
 	if (server->getMaxGamesPerUser() > 0)
 		if (room->getGamesCreatedByUser(QString::fromStdString(userInfo->name())) >= server->getMaxGamesPerUser())

@@ -128,8 +128,8 @@ void IslInterface::initServer()
 	while (roomIterator.hasNext()) {
 		Server_Room *room = roomIterator.next().value();
 		room->usersLock.lockForRead();
-		room->gamesMutex.lock();
-		room->getInfo(*event.add_room_list(), true, true, false, false);
+		room->gamesLock.lockForRead();
+		room->getInfo(*event.add_room_list(), true, true, false);
 	}
 	
 	IslMessage message;
@@ -150,7 +150,7 @@ void IslInterface::initServer()
 	roomIterator.toFront();
 	while (roomIterator.hasNext()) {
 		roomIterator.next();
-		roomIterator.value()->gamesMutex.unlock();
+		roomIterator.value()->gamesLock.unlock();
 		roomIterator.value()->usersLock.unlock();
 	}
 	server->roomsLock.unlock();

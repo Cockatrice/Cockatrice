@@ -507,15 +507,15 @@ void Servatrice_DatabaseInterface::storeGameInformation(const QString &roomName,
 	}
 }
 
-DeckList *Servatrice_DatabaseInterface::getDeckFromDatabase(int deckId, const QString &userName)
+DeckList *Servatrice_DatabaseInterface::getDeckFromDatabase(int deckId, int userId)
 {
 	checkSql();
 	
 	QSqlQuery query(sqlDatabase);
 	
-	query.prepare("select content from " + server->getDbPrefix() + "_decklist_files where id = :id and user = :user");
+	query.prepare("select content from " + server->getDbPrefix() + "_decklist_files where id = :id and id_user = :id_user");
 	query.bindValue(":id", deckId);
-	query.bindValue(":user", userName);
+	query.bindValue(":id_user", userId);
 	execSqlQuery(query);
 	if (!query.next())
 		throw Response::RespNameNotFound;

@@ -42,9 +42,11 @@ public:
 	mutable QReadWriteLock clientsLock, roomsLock; // locking order: roomsLock before clientsLock
 	Server(bool _threaded, QObject *parent = 0);
 	~Server();
+	void setThreaded(bool _threaded) { threaded = _threaded; }
 	AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason, int &secondsLeft);
 	const QMap<int, Server_Room *> &getRooms() { return rooms; }
 	
+	Server_AbstractUserInterface *findUser(const QString &userName) const;
 	const QMap<QString, Server_ProtocolHandler *> &getUsers() const { return users; }
 	const QMap<qint64, Server_ProtocolHandler *> &getUsersBySessionId() const { return usersBySessionId; }
 	void addClient(Server_ProtocolHandler *player);
@@ -62,7 +64,6 @@ public:
 	
 	Server_DatabaseInterface *getDatabaseInterface() const;
 	int getNextLocalGameId() { QMutexLocker locker(&nextLocalGameIdMutex); return ++nextLocalGameId; }
-	virtual void storeGameInformation(int secondsElapsed, const QSet<QString> &allPlayersEver, const QSet<QString> &allSpectatorsEver, const QList<GameReplay *> &replays) { }
 	
 	void sendIsl_Response(const Response &item, int serverId = -1, qint64 sessionId = -1);
 	void sendIsl_SessionEvent(const SessionEvent &item, int serverId = -1, qint64 sessionId = -1);
