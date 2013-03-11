@@ -258,9 +258,6 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
 			QMessageBox::critical(this, tr("Error"), bannedStr);
 			break;
 		}
-		case Response::RespUserIsBanned:
-			QMessageBox::critical(this, tr("Error"), tr("Invalid username."));
-			break;
 		default:
 			QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)));
 	}
