@@ -1,0 +1,45 @@
+Keyboard Shortcuts
+==================
+
+Keyboard Shortcuts can be used while playing a game on Cockatrice. Players use
+them to do simple and recurring tasks without the use of looking though menus
+to find the proper action.
+
+Shortcut 	Action
+----------------------
+F3 	View library
+F4 	View graveyard
+Ctrl+F3	View sideboard
+Ctrl+W 	View top car(s) of library (Choose a number)
+Ctrl+S 	Shuffle deck
+Ctrl+I 	Roll dice
+Ctrl+M 	Draw 7, then mulligan successively
+Ctrl+D 	Draw a card
+Ctrl+E 	Draw Cards (Choose a number)
+Ctrl+Shift+D	Undo last draw
+Ctrl+L 	Set Life (useful when adding or subtracting a large number of life)
+F11 	Minus 1 life
+F12 	Add 1 life
+Ctrl+U 	Untap all permanents you control
+Ctrl+R 	Remove all local arrows
+Ctrl+T 	Brings up menu to Create a token
+Ctrl+G 	Creates last token you made
+(Select card) Ctrl+Del 	Move to graveyard
+(Select card) Ctrl+A 	Attach Card (For equipment and auras)
+(Select card) Ctrl+H 	Clone (Make copy of) selected card
+(Select card) Ctrl++	Increase power
+(Select card) Ctrl+-	Decrease power
+(Select card) Alt++	Increase toughness
+(Select card) Alt+-	Decrease toughness
+(Select card) Ctrl+Alt++	Increase power and toughness
+(Select card) Ctrl+Alt+-	Decrease power and toughness
+(Select card) Ctrl+P	Set power and toughness
+Ctrl+Enter (Return) 	Next turn
+Ctrl+Space 	Move to next phase
+F5	Untap step
+F6	Draw step
+F7	First main phase
+F8	Beginning of combat step
+F9	Second main phase
+F10	End of turn step
+F2	Concede game
