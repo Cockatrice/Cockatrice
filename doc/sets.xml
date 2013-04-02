@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cockatrice_setdatabase version="20100416">
+	<picture_url>http://www.wizards.com/global/images/magic/general/%1.jpg</picture_url>
+	<set_url>http://gatherer.wizards.com/Pages/Search/Default.aspx?output=spoiler&amp;method=text&amp;set=[&quot;!longname!&quot;]</set_url>
+        <set import="1">
+            <name>ARB</name>
+            <longname>Alara Reborn</longname>
+        </set>
+        <set import="1">
+            <name>AL</name>
+            <longname>Alliances</longname>
+        </set>
+        <set import="1">
+            <name>AQ</name>
+            <longname>Antiquities</longname>
+        </set>
+        <set import="1">
+            <name>AP</name>
+            <longname>Apocalypse</longname>
+        </set>
+        <set import="1">
+            <name>AN</name>
+            <longname>Arabian Nights</longname>
+        </set>
+        <set import="1">
+            <name>BOK</name>
+            <longname>Betrayers of Kamigawa</longname>
+        </set>
+        <set import="1">
+            <name>CHK</name>
+            <longname>Champions of Kamigawa</longname>
+        </set>
+        <set import="1">
+            <name>CH</name>
+            <longname>Chronicles</longname>
+        </set>
+        <set import="1">
+            <name>6E</name>
+            <longname>Classic Sixth Edition</longname>
+        </set>
+        <set import="1">
+            <name>CS</name>
+            <longname>Coldsnap</longname>
+        </set>
+        <set import="1">
+            <name>CFX</name>
+            <longname>Conflux</longname>
+        </set>
+        <set import="1">
+            <name>DS</name>
+            <longname>Darksteel</longname>
+        </set>
+        <set import="1">
+            <name>DIS</name>
+            <longname>Dissension</longname>
+        </set>
+        <set import="1">
+            <name>8E</name>
+            <longname>Eighth Edition</longname>
+        </set>
+        <set import="1">
+            <name>EVE</name>
+            <longname>Eventide</longname>
+        </set>
+        <set import="1">
+            <name>EX</name>
+            <longname>Exodus</longname>
+        </set>
+        <set import="1">
+            <name>FE</name>
+            <longname>Fallen Empires</longname>
+        </set>
+        <set import="1">
+            <name>FD</name>
+            <longname>Fifth Dawn</longname>
+        </set>
+        <set import="1">
+            <name>5E</name>
+            <longname>Fifth Edition</longname>
+        </set>
+        <set import="1">
+            <name>4E</name>
+            <longname>Fourth Edition</longname>
+        </set>
+        <set import="1">
+            <name>FUT</name>
+            <longname>Future Sight</longname>
+        </set>
+        <set import="1">
+            <name>GP</name>
+            <longname>Guildpact</longname>
+        </set>
+        <set import="1">
+            <name>HL</name>
+            <longname>Homelands</longname>
+        </set>
+        <set import="1">
+            <name>IA</name>
+            <longname>Ice Age</longname>
+        </set>
+        <set import="1">
+            <name>IN</name>
+            <longname>Invasion</longname>
+        </set>
+        <set import="1">
+            <name>JU</name>
+            <longname>Judgment</longname>
+        </set>
+        <set import="1">
+            <name>LG</name>
+            <longname>Legends</longname>
+        </set>
+        <set import="1">
+            <name>LE</name>
+            <longname>Legions</longname>
+        </set>
+        <set import="1">
+            <name>A</name>
+            <longname>Limited Edition Alpha</longname>
+        </set>
+        <set import="1">
+            <name>B</name>
+            <longname>Limited Edition Beta</longname>
+        </set>
+        <set import="1">
+            <name>LRW</name>
+            <longname>Lorwyn</longname>
+        </set>
+        <set import="1">
+            <name>M10</name>
+            <longname>Magic 2010</longname>
+        </set>
+	<set import="1">
+	    <name>M11</name>
+	    <longname>Magic 2011</longname>
+	</set>
+        <set import="1">
+            <name>MM</name>
+            <longname>Mercadian Masques</longname>
+        </set>
+        <set import="1">
+            <name>MI</name>
+            <longname>Mirage</longname>
+        </set>
+        <set import="1">
+            <name>MR</name>
+            <longname>Mirrodin</longname>
+        </set>
+        <set import="1">
+            <name>MOR</name>
+            <longname>Morningtide</longname>
+        </set>
+        <set import="1">
+            <name>NE</name>
+            <longname>Nemesis</longname>
+        </set>
+        <set import="1">
+            <name>9E</name>
+            <longname>Ninth Edition</longname>
+        </set>
+        <set import="1">
+            <name>OD</name>
+            <longname>Odyssey</longname>
+        </set>
+        <set import="1">
+            <name>ON</name>
+            <longname>Onslaught</longname>
+        </set>
+        <set import="1">
+            <name>PLC</name>
+            <longname>Planar Chaos</longname>
+        </set>
+        <set import="1">
+            <name>PS</name>
+            <longname>Planeshift</longname>
+        </set>
+        <set import="1">
+            <name>PT</name>
+            <longname>Portal</longname>
+        </set>
+        <set import="1">
+            <name>P2</name>
+            <longname>Portal Second Age</longname>
+        </set>
+        <set import="1">
+            <name>P3</name>
+            <longname>Portal Three Kingdoms</longname>
+        </set>
+	<set import="1">
+	    <name>PR</name>
+	    <longname>Promo set for Gatherer</longname>
+	</set>
+        <set import="1">
+            <name>PY</name>
+            <longname>Prophecy</longname>
+        </set>
+        <set import="1">
+            <name>RAV</name>
+            <longname>Ravnica: City of Guilds</longname>
+        </set>
+        <set import="1">
+            <name>R</name>
+            <longname>Revised Edition</longname>
+        </set>
+        <set import="1">
+            <name>ROE</name>
+            <longname>Rise of the Eldrazi</longname>
+        </set>
+        <set import="1">
+            <name>SOK</name>
+            <longname>Saviors of Kamigawa</longname>
+        </set>
+	<set import="1">
+	    <name>SOM</name>
+	    <longname>Scars of Mirrodin</longname>
+	</set>
+        <set import="1">
+            <name>SC</name>
+            <longname>Scourge</longname>
+        </set>
+        <set import="1">
+            <name>7E</name>
+            <longname>Seventh Edition</longname>
+        </set>
+        <set import="1">
+            <name>SHM</name>
+            <longname>Shadowmoor</longname>
+        </set>
+        <set import="1">
+            <name>ALA</name>
+            <longname>Shards of Alara</longname>
+        </set>
+	<set import="1">
+	    <name>ST</name>
+	    <longname>Starter 1999</longname>
+	</set>
+        <set import="1">
+            <name>ST2K</name>
+            <longname>Starter 2000</longname>
+        </set>
+        <set import="1">
+            <name>SH</name>
+            <longname>Stronghold</longname>
+        </set>
+        <set import="1">
+            <name>TE</name>
+            <longname>Tempest</longname>
+        </set>
+        <set import="1">
+            <name>10E</name>
+            <longname>Tenth Edition</longname>
+        </set>
+        <set import="1">
+            <name>DK</name>
+            <longname>The Dark</longname>
+        </set>
+        <set import="1">
+            <name>TSP</name>
+            <longname>Time Spiral</longname>
+        </set>
+	<set import="1">
+	    <name>TSB</name>
+	    <longname>Time Spiral "Timeshifted"</longname>
+	</set>
+        <set import="1">
+            <name>TO</name>
+            <longname>Torment</longname>
+        </set>
+        <set import="0">
+            <name>UG</name>
+            <longname>Unglued</longname>
+        </set>
+        <set import="0">
+            <name>UNH</name>
+            <longname>Unhinged</longname>
+        </set>
+        <set import="1">
+            <name>U</name>
+            <longname>Unlimited Edition</longname>
+        </set>
+        <set import="1">
+            <name>UD</name>
+            <longname>Urza's Destiny</longname>
+        </set>
+        <set import="1">
+            <name>UL</name>
+            <longname>Urza's Legacy</longname>
+        </set>
+        <set import="1">
+            <name>US</name>
+            <longname>Urza's Saga</longname>
+        </set>
+        <set import="1">
+            <name>VI</name>
+            <longname>Visions</longname>
+        </set>
+        <set import="1">
+            <name>WL</name>
+            <longname>Weatherlight</longname>
+        </set>
+	<set import="1">
+	    <name>WWK</name>
+	    <longname>Worldwake</longname>
+	</set>
+        <set import="1">
+            <name>ZEN</name>
+            <longname>Zendikar</longname>
+        </set>
+</cockatrice_setdatabase>
