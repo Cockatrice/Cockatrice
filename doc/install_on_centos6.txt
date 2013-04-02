@@ -1,0 +1,60 @@
+With the main server inaccessibility recently I was asked by a number of people on how I compiled and hosted the cockatrice server at woogerworks.com. 
+In response to these questions, I have written a quick and dirty guide with exact commands to get a basic cockatrice server, the oracle tool, and cockatrice client compiled on CentOS.  
+These instructions can also be accessed at WoogerWorks incase this site goes offline for any reason.  
+I hope to improve upon the formatting of these steps when I have time, but for now this should help.
+Installation script can be downloaded at: http://www.woogerworks.com/cockatrice/installatrice
+
+BEFORE CONTINUING, PLEASE UNDERSTAND THESE ARE THE VERY MOST BASIC STEPS.
+THIS WILL NOT CONFIGURE SECURITY SETTINGS (YOU ARE RESPONSIBLE FOR YOUR OWN SECURITY)!
+THIS WILL NOT CONNECT THE SERVER TO A DB!
+USE AT YOUR OWN RISK.
+
+I RECOMMEND RUNNING THE COMMANDS AS ROOT (NOT REQUIRED)
+YOU MUST HAVE INTERNET ACCESS
+
+-- open a command shell
+yum -y groupinstall "development tools"
+(64bit OS) rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+(32bit OS) rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+iptables -F
+yum -y install qt-mysql qt-devel qt-mobility-devel protobuf-devel protobuf-compiler cmake28 libgcrypt-devel
+cd ~
+(github source) git clone git://github.com/mbruker/Cockatrice.git
+(woogerworks stable) wget http://www.woogerworks.com/files/Cockatrice_20130214.zip
+(woogerworks stable) unzip Cockatrice_20130214.zip
+(woogerworks unstable) wget http://www.woogerworks.com/files/Cockatrice_20130227.zip
+(woogerworks unstable) unzip Cockatrice_20130227.zip
+cd Cockatrice
+mkdir build
+cd build
+cmake28 -DWITH_SERVER=1 ..
+make
+sudo make install
+sed -e "s/number_pools=1/number_pools=0/" ../servatrice/servatrice.ini.example > ~/servatrice.ini
+
+-- install the database server (optional)
+sudo yum -y install mysql-server mysql php-mysql
+sudo service mysqld start
+sudo chkconfig mysqld on
+mysqladmin -u root password 'password'
+mysql -u root -ppassword -e "create database servatrice;"
+mysql -u root -ppassword -e "create user 'servatrice'@'localhost' identified by 'password';"
+mysql -u root -ppassword -e "grant all privileges on servatrice.* to 'servatrice'@'localhost';"
+mysql -u servatrice -ppassword servatrice < ../servatrice/servatrice.sql
+mysql -u servatrice -ppassword -e "insert into servatrice.cockatrice_users (admin,name,password_sha512,active) values (1,'servatrice','jbB4kSWDmjaVzMNdU13n73SpdBCJTCJ/JYm5ZBZvfxlzbISbXir+e/aSvMz86KzOoaBfidxO0s6GVd8t00qC0TNPl+udHfECaF7MsA==',1);"
+sed -i.bak -e "s/password=foobar/password=password/" -e "s/type=none/type=mysql/" -e "s/method=none/method=sql/" ~/servatrice.ini
+
+-- start the servatrice server
+cd ~
+/usr/local/bin/servatrice &
+
+
+You should be able to log in as a regular user using any account name.
+You can login using the username "servatrice" and the password "password" as the first moderator
+
+
+Things to consider doing:
+learn linux!
+update the servatrice.ini line that says "max_users_per_address=4" to something alittle higher (maybe max_users_per_address=8)
+set your root password to something stong (sounds like a good idea)
+if you expect to be running a server only, change your default runlevel to 3
