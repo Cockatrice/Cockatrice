@@ -21,13 +21,13 @@ The server requires an additional dependency:
 
 - [libgcrypt](http://www.gnu.org/software/libgcrypt/)
 
-```
-mkdir build
-cd build
-cmake ..
-make
-make install
-```
+To compile:
+
+    mkdir build
+    cd build
+    cmake ..
+    make
+    make install
 
 The following flags can be passed to `cmake`:
 
