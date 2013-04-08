@@ -36,8 +36,6 @@ The following flags can be passed to `cmake`:
 
 # Running
 
-`oracle` fetches card data
-
-`cockatrice` is the game client
-
+`oracle` fetches card data  
+`cockatrice` is the game client  
 `servatrice` is the server
