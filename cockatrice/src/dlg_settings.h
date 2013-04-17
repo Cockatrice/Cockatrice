@@ -82,6 +82,7 @@ signals:
 	void soundPathChanged();
 private:
 	QCheckBox *doubleClickToPlayCheckBox;
+	QCheckBox *playToStackCheckBox;
 	QCheckBox *tapAnimationCheckBox;
 	QCheckBox *soundEnabledCheckBox;
 	QLabel *soundPathLabel;

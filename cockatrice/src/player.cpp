@@ -1513,7 +1513,7 @@ void Player::playCard(CardItem *c, bool faceDown, bool tapped)
 	cardToMove->set_card_id(c->getId());
 	
 	CardInfo *ci = c->getInfo();
-	if (ci->getTableRow() == 3) {
+	if ((!settingsCache->getPlayToStack() && ci->getTableRow() == 3) || (settingsCache->getPlayToStack() && ci->getTableRow() != 0)) {
 		cmd.set_target_zone("stack");
 		cmd.set_x(0);
 		cmd.set_y(0);
