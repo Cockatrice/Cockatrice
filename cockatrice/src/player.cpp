@@ -1513,7 +1513,9 @@ void Player::playCard(CardItem *c, bool faceDown, bool tapped)
 	cardToMove->set_card_id(c->getId());
 	
 	CardInfo *ci = c->getInfo();
-	if ((!settingsCache->getPlayToStack() && ci->getTableRow() == 3) || (settingsCache->getPlayToStack() && ci->getTableRow() != 0)) {
+	if ((!settingsCache->getPlayToStack() && ci->getTableRow() == 3) ||
+	    (settingsCache->getPlayToStack() && ci->getTableRow() != 0) &&
+	    c->getZone()->getName().toStdString() != "stack") {
 		cmd.set_target_zone("stack");
 		cmd.set_x(0);
 		cmd.set_y(0);
@@ -1522,7 +1524,8 @@ void Player::playCard(CardItem *c, bool faceDown, bool tapped)
 		cardToMove->set_face_down(faceDown);
 		cardToMove->set_pt(ci->getPowTough().toStdString());
 		cardToMove->set_tapped(tapped);
-		cmd.set_target_zone("table");
+		if(ci->getTableRow() != 3)
+			cmd.set_target_zone("table");
 		cmd.set_x(gridPoint.x());
 		cmd.set_y(gridPoint.y());
 	}
