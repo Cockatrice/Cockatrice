@@ -331,7 +331,6 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 			if (!cardMenu->isEmpty())
 				cardMenu->exec(event->screenPos());
 	} else if ((event->button() == Qt::LeftButton) && !settingsCache->getDoubleClickToPlay()) {
-		setCursor(Qt::OpenHandCursor);
 		
 		bool hideCard = false;
 		if (zone->getIsView()) {
@@ -345,6 +344,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 			playCard(event->modifiers().testFlag(Qt::ShiftModifier));
 	}
 
+	setCursor(Qt::OpenHandCursor);
 	AbstractCardItem::mouseReleaseEvent(event);
 }
 
