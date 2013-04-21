@@ -19,7 +19,7 @@ yum -y groupinstall "development tools"
 iptables -F
 yum -y install qt-mysql qt-devel qt-mobility-devel protobuf-devel protobuf-compiler cmake28 libgcrypt-devel
 cd ~
-(github source) git clone git://github.com/mbruker/Cockatrice.git
+(github source) git clone https://github.com/Daenyth/Cockatrice
 (woogerworks stable) wget http://www.woogerworks.com/files/Cockatrice_20130214.zip
 (woogerworks stable) unzip Cockatrice_20130214.zip
 (woogerworks unstable) wget http://www.woogerworks.com/files/Cockatrice_20130227.zip
