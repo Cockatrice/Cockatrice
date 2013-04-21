@@ -44,7 +44,6 @@ bool OracleImporter::readSetsFromXml(QXmlStreamReader &xml)
 		if (xml.readNext() == QXmlStreamReader::EndElement)
 			break;
 		if (xml.name() == "set") {
-			QString shortName, longName;
 			bool import = xml.attributes().value("import").toString().toInt();
 			while (!xml.atEnd()) {
 				if (xml.readNext() == QXmlStreamReader::EndElement)
