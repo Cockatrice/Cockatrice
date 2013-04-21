@@ -193,7 +193,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 					QString v1 = tds.at(0).toElement().text().simplified();
 					QString v2 = tds.at(1).toElement().text().replace(trUtf8("—"), "-");
 					
-					if (v1 == "Name:") {
+					if (v1 == "Name") {
 						QDomElement a = tds.at(1).toElement().elementsByTagName("a").at(0).toElement();
 						QString href = a.attributes().namedItem("href").nodeValue();
 						cardId = href.mid(href.indexOf("multiverseid=") + 13).toInt();
@@ -258,6 +258,7 @@ void OracleImporter::downloadNextFile()
 	if (urlString.isEmpty())
 		urlString = setUrl;
 	urlString = urlString.replace("!longname!", setsToDownload[setIndex].getLongName());
+
 	if (urlString.startsWith("http://")) {
 		QUrl url(urlString);
 		http->setHost(url.host(), QHttp::ConnectionModeHttp, url.port() == -1 ? 0 : url.port());
