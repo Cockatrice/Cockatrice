@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<cockatrice_setdatabase version="20130403">
+<cockatrice_setdatabase version="20130507">
 <picture_url>http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&amp;type=card</picture_url>
 <set_url>http://gatherer.wizards.com/Pages/Search/Default.aspx?output=spoiler&amp;method=text&amp;set=[&quot;!longname!&quot;]&amp;special=true</set_url>
 	<set import="1">
@@ -177,6 +177,10 @@
 	<set import="1">
 		<name>DDK</name>
 		<longname>Duel Decks: Sorin vs. Tibalt</longname>
+	</set>
+	<set import="1">
+		<name>DGM</name>
+		<longname>Dragon's Maze</longname>
 	</set>
 	<set import="1">
 		<name>DI</name>
