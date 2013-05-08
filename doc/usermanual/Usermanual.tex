@@ -288,6 +288,7 @@ The compilation works like already written above, but instead of invoking \shell
  \item If you want to build the server, use:\\ \shellcmd{cmake -DWITH\_SERVER=1 ..}
  \item If you want to build the server, but not the client, use:\\ \shellcmd{cmake -DWITH\_SERVER=1 -DWITHOUT\_CLIENT=1 ..}
 \end{itemize}
+There is more information on compiling and running Servatrice on CentOS 6 in chapter \ref{servatrice} on page \pageref{servatrice}.
 
 \section{Downloading Card Database Using the Oracle}
 If you are installing Cockatrice for the first time, changing what sets are in your database or even adding the newest set to your database, this tutorial will show you how to do it properly.
@@ -711,6 +712,121 @@ For example:
 [url]http://www.cockatrice.de[/url]
 [url]cockatrice.de[/url]
 \end{verbatim}
+
+
+\chapter{Servatrice on CentOS 6}
+\label{servatrice}
+This Howto from woogerworks.com will help you to run your own Cockatrice server (called Servatrice).
+An installation script can be downloaded at: \url{http://www.woogerworks.com/cockatrice/installatrice}
+
+BEFORE CONTINUING, PLEASE UNDERSTAND THESE ARE THE VERY MOST BASIC STEPS.
+THIS WILL NOT CONFIGURE SECURITY SETTINGS (YOU ARE RESPONSIBLE FOR YOUR OWN SECURITY)!
+THIS WILL NOT CONNECT THE SERVER TO A DATABASE!
+USE AT YOUR OWN RISK.
+
+\begin{enumerate}
+ \item Open a command shell and install the prerequisites
+\begin{enumerate}
+ \item \shellcmd{yum -y groupinstall "development tools"}
+ \item \shellcmd{rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86\_64/epel-release-6-8.noarch.rpm}
+ \item \shellcmd{yum -y install qt-mysql qt-devel qt-mobility-devel protobuf-devel protobuf-compiler cmake28 libgcrypt-devel}
+ \item \shellcmd{cd}
+\end{enumerate}
+
+ \item Download the source code:
+\begin{enumerate}
+ \item \shellcmd{git clone https://github.com/Daenyth/Cockatrice}
+ \item \shellcmd{cd Cockatrice}
+ \item \shellcmd{mkdir build}
+ \item \shellcmd{cd build}
+ \item \shellcmd{cmake28 -DWITH\_SERVER=1 ..}
+ \item \shellcmd{make}
+ \item \shellcmd{sudo make install}
+\end{enumerate}
+
+ \item Create a servatrice.ini file. There is an example file you can convert:
+\shellcmd{sed -e "s/number\_pools=1/number\_pools=0/" ../servatrice/servatrice.ini.example > \textasciitilde/servatrice.ini}
+Here is one example file:
+\begin{framed}
+\begin{verbatim}
+[server]
+port=4747
+statusupdate=15000
+logfile=server.log
+name="My own Cockatrice server"
+id=1
+number_pools=0
+
+[servernetwork]
+active=0
+port=14747
+ssl_cert=ssl_cert.pem
+ssl_key=ssl_key.pem
+
+[authentication]
+method=none
+
+[database]
+type=none
+prefix=cockatrice
+hostname=localhost
+database=servatrice
+user=MYUSERNAMEHERE
+password=MYSECUREPASSWORDHERE
+
+[rooms]
+method=config
+roomlist\size=1
+roomlist\1\name="FIRST ROOM NAME"
+roomlist\1\description="FIRST ROOM DESCRIPTION"
+roomlist\1\autojoin=true
+roomlist\1\joinmessage="THIS IS A JOIN MESSAGE"
+roomlist\1\game_types\size=11
+roomlist\1\game_types\1\name="Vintage (T1)"
+roomlist\1\game_types\2\name="Legacy (T1.5)"
+roomlist\1\game_types\3\name="Extended (T1.X)"
+roomlist\1\game_types\4\name="Modern"
+roomlist\1\game_types\5\name="Standard (T2)"
+roomlist\1\game_types\6\name="Block Constructed"
+roomlist\1\game_types\7\name="EDH/Commander"
+roomlist\1\game_types\8\name="Highlander"
+roomlist\1\game_types\9\name="2HG"
+roomlist\1\game_types\10\name="Draft/Sealed"
+roomlist\1\game_types\11\name="Other"
+
+[game]
+max_game_inactivity_time=120
+max_player_inactivity_time=15
+
+[security]
+max_users_per_address=8
+message_counting_interval=10
+max_message_size_per_interval=1000
+max_message_count_per_interval=10
+max_games_per_user=5
+\end{verbatim}
+\end{framed}
+
+ \item Install the database server (optional)
+\begin{enumerate}
+ \item \shellcmd{sudo yum -y install mysql-server mysql php-mysql}
+ \item \shellcmd{sudo service mysqld start}
+ \item \shellcmd{sudo chkconfig mysqld on}
+ \item \shellcmd{mysqladmin -u root password 'password'}
+ \item \shellcmd{mysql -u root -ppassword -e "create database servatrice;"}
+ \item \shellcmd{mysql -u root -ppassword -e "create user 'servatrice'@'localhost' identified by 'password';"}
+ \item \shellcmd{mysql -u root -ppassword -e "grant all privileges on servatrice.* to 'servatrice'@'localhost';"}
+ \item \shellcmd{mysql -u servatrice -ppassword servatrice < ../servatrice/servatrice.sql}
+ \item \shellcmd{mysql -u servatrice -ppassword -e "insert into servatrice.cockatrice\_users \textbackslash\\ (admin,name,password\_sha512,active) values (1,'servatrice','MYSHA512PASSWORD',1);"}
+ \item \shellcmd{sed -i.bak -e "s/password=foobar/password=password/" -e "s/type=none/type=mysql/" \textbackslash\\ -e "s/method=none/method=sql/" ~/servatrice.ini}
+\end{enumerate}
+
+ \item Start Servatrice for testing: \shellcmd{/usr/local/bin/servatrice}. I recommend to run it later within a \shellcmd{screen} session or write an init-script.
+\end{enumerate}
+You should be able to log in as a regular user using any account name.
+You can login using the username \textit{servatrice} and the password \textit{password} as the first moderator.
+
+If everything succeeded, you should tweak the servatrice.ini and set your root password to something strong if not already done (at least 8 characters, upper case, lower case, numbers, special characters).
 
 %\listoffigures
 %\listoftables
