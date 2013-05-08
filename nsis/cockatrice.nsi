@@ -2,10 +2,11 @@
 !include "FileFunc.nsh"
 
 !define /date TIMESTAMP "%Y%m%d" 
+!searchparse /file ../build/cockatrice/version_string.cpp '= "' VERSION '";'
 
 Name "Cockatrice"
-OutFile "cockatrice_win32_${TIMESTAMP}.exe"
-SetCompressor lzma
+OutFile "cockatrice_win32_${TIMESTAMP}_git-${VERSION}.exe"
+SetCompressor /SOLID lzma
 InstallDir "$PROGRAMFILES\Cockatrice"
 
 !define MUI_ABORTWARNING
@@ -20,6 +21,7 @@ InstallDir "$PROGRAMFILES\Cockatrice"
 !define MUI_FINISHPAGE_RUN_PARAMETERS "-dlsets"
 
 !insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_LICENSE "..\COPYING"
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
