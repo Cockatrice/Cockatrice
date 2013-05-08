@@ -85,7 +85,175 @@ Due to a legal dispute there are currently no official builds left, so currently
 
 \subsection{Client compilation}
 \subsubsection{Windows}
-TODO, please contribute this section!
+There should be two ways to compile Cockatrice: With Visual Studio 2010 and with MinGW.
+As the Visual Studio method is more complicated and might not work, you should do it with MinGW.
+The following howto has been tested with Windows 7 64Bit.
+
+\paragraph{Prerequisites}
+We need the Cockatrice sourcecode, it's dependencies and build tools. Everything is freely available:
+\begin{enumerate}
+ \item MinGW is needed to compile everything, it ships the compiler and other tools for this task.
+ \item git is needed to download the latest Cockatrice source code.
+ \item cmake is needed to create Cockatrice's project files for MinGW.
+ \item Qt 4.8 is a dependency for Cockatrice (download the MinGW version!)
+ \item protobuf 2.5 is another dependency for Cockatrice (download the zip file with the sourcecode).
+ \item Optional: Nullsoft Scriptable Install System (NSIS) which can be used to create an installer for your own Cockatrice version.
+\end{enumerate}
+
+All downloadlinks together:
+\footnotesize{\begin{enumerate}
+ \item \url{http://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/mingw-get-inst-20120426/}
+ \item \url{http://git-scm.com/download/win}
+ \item \url{http://www.cmake.org/files/v2.8/cmake-2.8.10.2-win32-x86.exe}
+ \item \url{http://download.qt-project.org/official_releases/qt/4.8/4.8.4/qt-win-opensource-4.8.4-mingw.exe}
+ \item \url{http://protobuf.googlecode.com/files/protobuf-2.5.0.zip}
+ \item Optional: \url{http://nsis.sourceforge.net/Download}
+\end{enumerate}}
+
+\paragraph{Installation of the Prerequisites}
+\begin{enumerate}
+ \item Download MinGW (mingw-get-inst), git, cmake, protobuf 2.5 sources zip and Qt 4.8.4 MinGW (see links above).
+ \item Make a standard installation for git and cmake.
+ \item Install MinGW:
+    \begin{enumerate}
+      \item Select default values everywhere, except: Also check the C++ Compiler, check the MSYS Basis System and MinGW Developer Toolkit.
+      \item Append \shellcmd{C:\textbackslash MinGW\textbackslash bin} to your PATH variable (google how to do it for your Windows version, if you don't know it).
+      This is very important and overseen many times! You can keep the PATH configuration dialog open for the next step.
+    \end{enumerate}
+ \item Install Qt, select default values everywhere, ignore the message regarding win32.h and append \shellcmd{C:\textbackslash Qt\textbackslash 4.8.4\textbackslash bin} to your PATH variable like you did for MinGW.
+ \item Unpack protobuf-2.5.0.zip in \shellcmd{C:\textbackslash MinGW\textbackslash msys\textbackslash 1.0\textbackslash home\textbackslash YOURLOGIN}
+    \begin{enumerate}
+     \item Open MinGW Shell, type the following commands exactly:
+     \item \shellcmd{cd protobuf-2.5.0/protobuf-2.5.0}
+     \item \shellcmd{./configure --prefix=`cd /mingw; pwd -W`} (these apostrophs are backticks and do not forget the dot at the beginning!)
+     \item \shellcmd{make; make install} (this builds and installs protobuf, which needs some time)
+     \item Close MinGW Shell
+    \end{enumerate}
+\end{enumerate}
+Your system is now able to compile Cockatrice. You do not have to repeat the process so far ever again.
+
+\paragraph{Cockatrice Compilation}
+\begin{enumerate}
+ \item Checkout Cockatrice:
+    \begin{enumerate}
+     \item Start Git Bash and type the following command exactly:
+     \item \shellcmd{git clone https://github.com/Daenyth/Cockatrice}
+     \item Close Git Bash
+    \end{enumerate}
+ \item Start CMake (cmake-gui) and do the following:
+    \begin{enumerate}
+     \item Where is the source code: Point to the Cockatrice directory
+     \item Where to build the binaries: Point to the Cockatrice/build directory (it doesn't matter if it exists; if it doesn't, cmake will ask later if it shall create this directory)
+     \item Check Advanced
+     \item Click Configure, choose MinGW, leave the rest default
+     \item An error will occur, set the following:
+     	\begin{itemize}
+	 \item Set CMAKE\_INSTALL\_PREFIX to a directory you like
+	 \item Set PROTOBUF\_INCLUDE\_DIR to C:/MinGW/include/google/protobuf
+	 \item Set PROTOBUF\_LIBRARY to C:/MinGW/lib/libprotobuf.dll.a
+	 \item Set PROTOBUF\_LITE\_LIBRARY to C:/MinGW/lib/libprotobuf-lite.dll.a
+	 \item Set PROTOBUF\_PROTOC\_EXECUTABLE to C:/MinGW/bin/protoc.exe
+	 \item Set PROTOBUF\_PROTOC\_LIBRARY to C:/MinGW/lib/libprotoc.dll.a
+	\end{itemize}
+     \item Click Configure again, then Generate
+     \item Close CMake
+    \end{enumerate}
+ \item Start cmd.exe (the Windows Command Prompt) and type the following commands:
+    \begin{enumerate}
+     \item \shellcmd{cd Cockatrice/build} (this changes to the build directory)
+     \item \shellcmd{make} (this builds everything and might need some time)
+    \end{enumerate}
+\end{enumerate}
+Cockatrice has now been downloaded and built for the first time. You do not have to repeat the process so far ever again.
+
+\paragraph{Updating your Cockatrice build}
+If you just compiled Cockatrice for the first time, you skip this step obviously.
+But if you want to update Cockatrice after the source code changed on github, do it like this:
+\begin{enumerate}
+ \item Start Git Bash and update Cockatrice:
+    \begin{enumerate}
+     \item \shellcmd{git pull origin master}
+     \item \shellcmd{Close Git Bash}
+    \end{enumerate}
+ \item Start cmd.exe, change to Cockatrice/build, type make like you did previously.
+\end{enumerate}
+Cockatrice has now been updated and built. You may repeat this process every time when the source code changed.
+
+\paragraph{Cockatrice installation}
+You should now install Cockatrice. The command make install does not work completely, but do it anyway (still in the Windows Command Prompt).
+Now create the following directory structure somewhere else\footnote{This step could be done from an installer program. Until we have one, you have to do it manually.}:
+\begin{verbatim}
+Cockatrice
++---plugins
+|   +---codecs
+|   +---iconengines
+|   +---imageformats
++---sounds
++---translations
++---zonebg
+\end{verbatim}
+
+\begin{description}
+ \item[Cockatrice] contains
+    \begin{itemize}
+     \item from the \shellcmd{Cockatrice/build} (check the subdirectories!) and the install directory:
+	\begin{itemize}
+	 \item cockatrice.exe
+	 \item oracle.exe
+	 \item sounds directory
+	 \item zonebg directory 
+	\end{itemize}
+     \item from the \shellcmd{C:\textbackslash MinGW\textbackslash bin} directory, the following files (or higher versions):
+	\begin{itemize}
+	 \item libgcc\_s\_dw2-1.dll
+	 \item libprotobuf-8.dll
+	 \item libstdc++-6.dll
+	 \item mingwm10.dll
+	\end{itemize}
+     \item from the \shellcmd{C:\textbackslash Qt\textbackslash 4.8.4\textbackslash bin} directory:
+	\begin{itemize}
+	 \item QtCore4.dll
+	 \item QtGui4.dll
+	 \item QtMultimedia4.dll
+	 \item QtNetwork4.dll
+	 \item QtSvg4.dll
+	 \item QtXml4.dll
+	\end{itemize}
+    \end{itemize}
+ \item[translations] contains the cockatrice\_XX.qm files from the \shellcmd{Cockatrice\textbackslash build} directory
+ \item[plugins] contains folders from the \shellcmd{C:\textbackslash Qt\textbackslash 4.8.4\textbackslash plugins} directory:
+    \begin{itemize}
+     \item codecs
+     \item iconengines
+     \item imageformats
+    \end{itemize}
+    \dots but just the dll files, delete the rest.
+\end{description}
+You are now able to use or deploy Cockatrice.
+
+\paragraph{Create a card database}
+Before you play or deploy Cockatrice, you should create a card database first:
+Start the oracle.exe and let it generate a current cards.xml file:
+\begin{enumerate}
+ \item File $\to$ Download Sets Information $\to$ OK
+ \item Check All, Start Download
+\end{enumerate}
+
+\paragraph{Optional: Distribute your version of Cockatrice}
+If you are going to deploy your Cockatrice version, include the cards.xml in the \shellcmd{Cockatrice} directory and also include the \shellcmd{doc} directory from the Cockatrice source code.
+
+You can redistribute your build the following way:
+\begin{enumerate}
+ \item Create a zip file from your Cockatrice directory, e.g. Cockatrice.zip.
+ \item Download, install and start the Nullsoft Scriptable Install System (NSIS).
+    \begin{itemize}
+     \item Choose \textit{Installer based on ZIP file}, point it to the Cockatrice.zip
+     \item Default folder can be C:\textbackslash Program Files (x86)
+     \item Generate, Test
+    \end{itemize}
+\end{enumerate}
+You should rename the exe file generated by NSIS to something like Cockatrice\_win32\_DATE\_git-HASH.exe, where DATE is something like 20130507 and HASH is the git version 
+(start cockatrice.exe and click the Help $\to$ About Cockatrice menu to find that out, it is a seven character alphanumerical string e.g. bd861bb).
 
 \subsubsection{Install latest experimental on Linux}
 \begin{enumerate}
@@ -120,6 +288,7 @@ The compilation works like already written above, but instead of invoking \shell
  \item If you want to build the server, use:\\ \shellcmd{cmake -DWITH\_SERVER=1 ..}
  \item If you want to build the server, but not the client, use:\\ \shellcmd{cmake -DWITH\_SERVER=1 -DWITHOUT\_CLIENT=1 ..}
 \end{itemize}
+There is more information on compiling and running Servatrice on CentOS 6 in chapter \ref{servatrice} on page \pageref{servatrice}.
 
 \section{Downloading Card Database Using the Oracle}
 If you are installing Cockatrice for the first time, changing what sets are in your database or even adding the newest set to your database, this tutorial will show you how to do it properly.
@@ -432,7 +601,14 @@ Here are all of the options for creating a game:
 \end{description}
 
 \subsection{Joining a Game}
-Most of the time, to join a game you click on the “MTG Room” tab, click on a game in the Games list, then click Join. If the Game's creator specified a password then you will have to type that password in a small window that appears after you click Join (the password is case-sensitive). If your User Profile meets the criteria of the Game's creator then a new tab will open with that game. There is also an easy way to join a game in which a User in your Buddy List is playing. Go to the “User Lists” tab, right click any Username from the Buddies Online list (at the left of the window) to make a menu appear, and select “Show this user's games”. A window will open with a list of games that the User is either playing or watching. In the same manner as described with the “MTG Room” tab, simply click on a game and click Join. To watch a game, the instructions are the same except that you click the “Join as Spectator” button instead of the Join button. NOTE: If you are a player in a game and you wish to become a spectator in that game, you must first leave the game then rejoin as a Spectator. Same thing if you are a Spectator and wish to play.
+Most of the time, to join a game you click on the “MTG Room” tab, click on a game in the Games list, then click Join.
+If the Game's creator specified a password then you will have to type that password in a small window that appears after you click Join (the password is case-sensitive).
+If your User Profile meets the criteria of the Game's creator then a new tab will open with that game.
+There is also an easy way to join a game in which a User in your Buddy List is playing.
+Go to the “User Lists” tab, right click any Username from the Buddies Online list (at the left of the window) to make a menu appear, and select “Show this user's games”.
+A window will open with a list of games that the User is either playing or watching. In the same manner as described with the “MTG Room” tab, simply click on a game and click Join.
+To watch a game, the instructions are the same except that you click the “Join as Spectator” button instead of the Join button.
+NOTE: If you are a player in a game and you wish to become a spectator in that game, you must first leave the game then rejoin as a Spectator. Same thing if you are a Spectator and wish to play.
 
 \subsection{Searching for Games}
 The Games list in the “MTG Room” tab displays by default all games that have not reached the specified number of players. The “Filter Games” button makes looking through this list easier if you are looking to join a particular kind of game. When this button is selected, a window appears (see below).
@@ -536,6 +712,121 @@ For example:
 [url]http://www.cockatrice.de[/url]
 [url]cockatrice.de[/url]
 \end{verbatim}
+
+
+\chapter{Servatrice on CentOS 6}
+\label{servatrice}
+This Howto from woogerworks.com will help you to run your own Cockatrice server (called Servatrice).
+An installation script can be downloaded at: \url{http://www.woogerworks.com/cockatrice/installatrice}
+
+BEFORE CONTINUING, PLEASE UNDERSTAND THESE ARE THE VERY MOST BASIC STEPS.
+THIS WILL NOT CONFIGURE SECURITY SETTINGS (YOU ARE RESPONSIBLE FOR YOUR OWN SECURITY)!
+THIS WILL NOT CONNECT THE SERVER TO A DATABASE!
+USE AT YOUR OWN RISK.
+
+\begin{enumerate}
+ \item Open a command shell and install the prerequisites
+\begin{enumerate}
+ \item \shellcmd{yum -y groupinstall "development tools"}
+ \item \shellcmd{rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86\_64/epel-release-6-8.noarch.rpm}
+ \item \shellcmd{yum -y install qt-mysql qt-devel qt-mobility-devel protobuf-devel protobuf-compiler cmake28 libgcrypt-devel}
+ \item \shellcmd{cd}
+\end{enumerate}
+
+ \item Download the source code:
+\begin{enumerate}
+ \item \shellcmd{git clone https://github.com/Daenyth/Cockatrice}
+ \item \shellcmd{cd Cockatrice}
+ \item \shellcmd{mkdir build}
+ \item \shellcmd{cd build}
+ \item \shellcmd{cmake28 -DWITH\_SERVER=1 ..}
+ \item \shellcmd{make}
+ \item \shellcmd{sudo make install}
+\end{enumerate}
+
+ \item Create a servatrice.ini file. There is an example file you can convert:
+\shellcmd{sed -e "s/number\_pools=1/number\_pools=0/" ../servatrice/servatrice.ini.example > \textasciitilde/servatrice.ini}
+Here is one example file:
+\begin{framed}
+\begin{verbatim}
+[server]
+port=4747
+statusupdate=15000
+logfile=server.log
+name="My own Cockatrice server"
+id=1
+number_pools=0
+
+[servernetwork]
+active=0
+port=14747
+ssl_cert=ssl_cert.pem
+ssl_key=ssl_key.pem
+
+[authentication]
+method=none
+
+[database]
+type=none
+prefix=cockatrice
+hostname=localhost
+database=servatrice
+user=MYUSERNAMEHERE
+password=MYSECUREPASSWORDHERE
+
+[rooms]
+method=config
+roomlist\size=1
+roomlist\1\name="FIRST ROOM NAME"
+roomlist\1\description="FIRST ROOM DESCRIPTION"
+roomlist\1\autojoin=true
+roomlist\1\joinmessage="THIS IS A JOIN MESSAGE"
+roomlist\1\game_types\size=11
+roomlist\1\game_types\1\name="Vintage (T1)"
+roomlist\1\game_types\2\name="Legacy (T1.5)"
+roomlist\1\game_types\3\name="Extended (T1.X)"
+roomlist\1\game_types\4\name="Modern"
+roomlist\1\game_types\5\name="Standard (T2)"
+roomlist\1\game_types\6\name="Block Constructed"
+roomlist\1\game_types\7\name="EDH/Commander"
+roomlist\1\game_types\8\name="Highlander"
+roomlist\1\game_types\9\name="2HG"
+roomlist\1\game_types\10\name="Draft/Sealed"
+roomlist\1\game_types\11\name="Other"
+
+[game]
+max_game_inactivity_time=120
+max_player_inactivity_time=15
+
+[security]
+max_users_per_address=8
+message_counting_interval=10
+max_message_size_per_interval=1000
+max_message_count_per_interval=10
+max_games_per_user=5
+\end{verbatim}
+\end{framed}
+
+ \item Install the database server (optional)
+\begin{enumerate}
+ \item \shellcmd{sudo yum -y install mysql-server mysql php-mysql}
+ \item \shellcmd{sudo service mysqld start}
+ \item \shellcmd{sudo chkconfig mysqld on}
+ \item \shellcmd{mysqladmin -u root password 'password'}
+ \item \shellcmd{mysql -u root -ppassword -e "create database servatrice;"}
+ \item \shellcmd{mysql -u root -ppassword -e "create user 'servatrice'@'localhost' identified by 'password';"}
+ \item \shellcmd{mysql -u root -ppassword -e "grant all privileges on servatrice.* to 'servatrice'@'localhost';"}
+ \item \shellcmd{mysql -u servatrice -ppassword servatrice < ../servatrice/servatrice.sql}
+ \item \shellcmd{mysql -u servatrice -ppassword -e "insert into servatrice.cockatrice\_users \textbackslash\\ (admin,name,password\_sha512,active) values (1,'servatrice','MYSHA512PASSWORD',1);"}
+ \item \shellcmd{sed -i.bak -e "s/password=foobar/password=password/" -e "s/type=none/type=mysql/" \textbackslash\\ -e "s/method=none/method=sql/" ~/servatrice.ini}
+\end{enumerate}
+
+ \item Start Servatrice for testing: \shellcmd{/usr/local/bin/servatrice}. I recommend to run it later within a \shellcmd{screen} session or write an init-script.
+\end{enumerate}
+You should be able to log in as a regular user using any account name.
+You can login using the username \textit{servatrice} and the password \textit{password} as the first moderator.
+
+If everything succeeded, you should tweak the servatrice.ini and set your root password to something strong if not already done (at least 8 characters, upper case, lower case, numbers, special characters).
 
 %\listoffigures
 %\listoftables
