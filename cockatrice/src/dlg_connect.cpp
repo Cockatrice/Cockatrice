@@ -13,7 +13,7 @@ DlgConnect::DlgConnect(QWidget *parent)
 	settings.beginGroup("server");
 
 	hostLabel = new QLabel(tr("&Host:"));
-	hostEdit = new QLineEdit(settings.value("hostname", "play.cockatrice.de").toString());
+	hostEdit = new QLineEdit(settings.value("hostname", "cockatrice.woogerworks.com").toString());
 	hostLabel->setBuddy(hostEdit);
 
 	portLabel = new QLabel(tr("&Port:"));
