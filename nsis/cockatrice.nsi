@@ -92,6 +92,7 @@ Section "Start menu item" SecStartMenu
 	createDirectory "$SMPROGRAMS\Cockatrice"
 	createShortCut "$SMPROGRAMS\Cockatrice\Cockatrice.lnk" "$INSTDIR\cockatrice.exe"
 	createShortCut "$SMPROGRAMS\Cockatrice\Oracle.lnk" "$INSTDIR\oracle.exe"
+	createShortCut "$SMPROGRAMS\Cockatrice\Usermanual.lnk" "$INSTDIR\Usermanual.pdf"
 SectionEnd
 
 Section Uninstall
