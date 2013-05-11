@@ -123,7 +123,7 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
 	QPainter painter(&pixmap);
 	svg.render(&painter, QRectF(0, 0, width, height));
 	painter.setPen(Qt::black);
-	painter.drawRect(0.5, 0.5, width - 1, height - 1);
+	painter.drawRect(0, 0, width - 1, height - 1);
 	
 	pmCache.insert(key, pixmap);
 	return pixmap;

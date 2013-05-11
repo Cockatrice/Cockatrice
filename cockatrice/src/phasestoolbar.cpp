@@ -39,7 +39,7 @@ void PhaseButton::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
 	
 	painter->setBrush(QColor(220 * (activeAnimationCounter / 10.0), 220 * (activeAnimationCounter / 10.0), 220 * (activeAnimationCounter / 10.0)));
 	painter->setPen(Qt::gray);
-	painter->drawRect(0.5, 0.5, width - 1, width - 1);
+	painter->drawRect(0, 0, width - 1, width - 1);
 	painter->save();
 	painter->resetTransform();
 	painter->drawPixmap(iconPixmap.rect().translated(round(3 * scaleFactor), round(3 * scaleFactor)), iconPixmap, iconPixmap.rect());
@@ -47,7 +47,7 @@ void PhaseButton::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
 	
 	painter->setBrush(QColor(0, 0, 0, 255 * ((10 - activeAnimationCounter) / 15.0)));
 	painter->setPen(Qt::gray);
-	painter->drawRect(0.5, 0.5, width - 1, width - 1);
+	painter->drawRect(0, 0, width - 1, width - 1);
 }
 
 void PhaseButton::setWidth(double _width)
