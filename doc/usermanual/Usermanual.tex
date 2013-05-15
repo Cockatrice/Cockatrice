@@ -194,13 +194,20 @@ Start the oracle.exe (the installer does this automatically) and let it generate
 \end{enumerate}
 Congratulations, you may now use Cockatrice!
 
-\subsubsection{Install latest experimental on Linux}
+\subsubsection{Linux and BSD}
+The following procedures have been tested with Debian Wheezy, Fedora 18 and FreeBSD 9.1.
+If you use Gentoo with KDE you have the needed prerequisites and may continue with downloading the source.
+If you use Bodhi or Arch Linux or another distribution that includes Cockatrice, you might install Cockatrice from the default packages -- though the package might be old, 
+so you probably should continue with this howto.
+
+Before you install new software, you should update your system. The following instructions failed on a fresh installation of Fedora 18 and FreeBSD 9.1 until the systems were updated.
 \begin{enumerate}
  \item You need to install the build tools and dependencies. This varies between the Linux distributions.
  \begin{description}
-  \item[Ubuntu] \shellcmd{sudo apt-get install build-essential git libqt4-dev qtmobility-dev libprotobuf-dev protobuf-compiler cmake}
+  \item[Debian, Ubuntu and spin-offs] \shellcmd{sudo apt-get install build-essential git libqt4-dev qtmobility-dev libprotobuf-dev protobuf-compiler cmake}
   \item[Fedora] \shellcmd{sudo yum groupinstall "Development Tools"\\
   yum install qt-devel qt-mobility-devel protobuf-devel protobuf-compiler cmake}
+  \item[FreeBSD] \shellcmd{pkg\_add -r qt4 qt4-linguist qt4-moc qt4-qmake qt4-rcc qt4-uic git cmake protobuf}
  \end{description}
  \item Download the sources from github via \\ \shellcmd{cd\\ git clone https://github.com/Daenyth/Cockatrice.git}
  \item To compile the sources, change into the newly created directory, create a build directory and invoke cmake:\\
@@ -208,12 +215,11 @@ Congratulations, you may now use Cockatrice!
 mkdir build \\
 cd build \\
 cmake ..\\
-make\\
-sudo make install
-}\\
+make}\\
 If you have some issues with pthread\_* add 'pthread' to the ``target\_link\_libraries'' entry in the \shellcmd{CMakeFiles.txt} in \shellcmd{Cockatrice/common}.
-
- \item Finish up the installation: Run \shellcmd{oracle} and download available cards, denn run \shellcmd{cockatrice}.
+ \item You may install the program into the directory \shellcmd{/usr/local} by typing \shellcmd{sudo make install} but you should also be able to start 
+ cockatrice and the oracle from the build directory.
+ \item Before you start Cockatrice for the first time, run \shellcmd{oracle -dlsets} and download available cards, denn run \shellcmd{cockatrice}.
 The default paths for decks, pics, cards and tokens are located in \\ \shellcmd{/home/<user>/.local/share/data/Cockatrice/Cockatrice}.
 \end{enumerate}
 
