@@ -1,6 +1,10 @@
+Add Sets
+===
+
 The oracle program creates the cockatrice card database and needs a set database to achieve this.
 The set database is written in XML and has the following skeleton:
 
+```
 <?xml version="1.0" encoding="UTF-8"?>
 <cockatrice_setdatabase version="20100416">
 	<picture_url>http://www.wizards.com/global/images/magic/general/%1.jpg</picture_url>
@@ -19,6 +23,7 @@ The set database is written in XML and has the following skeleton:
 	...
 
 </cockatrice_setdatabase>
+```
 
 The full set database file called "set.xml" should be included in the cockatrice git-sources.
 
