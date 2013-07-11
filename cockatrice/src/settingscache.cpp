@@ -22,6 +22,7 @@ SettingsCache::SettingsCache()
 	mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
 	picDownload = settings->value("personal/picturedownload", true).toBool();
 	doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
+	playToStack = settings->value("interface/playtostack", false).toBool();
 	cardInfoMinimized = settings->value("interface/cardinfominimized", 0).toInt();
 	tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
 	displayCardNames = settings->value("cards/displaycardnames", true).toBool();
@@ -127,6 +128,12 @@ void SettingsCache::setDoubleClickToPlay(int _doubleClickToPlay)
 {
 	doubleClickToPlay = _doubleClickToPlay;
 	settings->setValue("interface/doubleclicktoplay", doubleClickToPlay);
+}
+
+void SettingsCache::setPlayToStack(int _playToStack)
+{
+	playToStack = _playToStack;
+	settings->setValue("interface/playtostack", playToStack);
 }
 
 void SettingsCache::setCardInfoMinimized(int _cardInfoMinimized)
