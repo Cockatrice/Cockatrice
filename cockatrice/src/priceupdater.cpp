@@ -55,8 +55,16 @@ void PriceUpdater::downloadFinished()
     while (it.hasNext()) {
         QVariantMap map = it.next().toMap();
         QString name = map.value("name").toString().toLower();
-        float price = map.value("average").toString().toFloat();
-        cardsPrice.insert(name, price);
+        float price = map.value("price").toString().toFloat();
+        QString set = map.value("set_code").toString();
+
+        /**
+        * Make sure Masters Edition (MED) isn't the set, as it doesn't
+        * physically exist. Also check the price to see that the cheapest set
+        * ends up as the final price.
+        */
+        if (set != "MED" && (!cardsPrice.contains(name) || cardsPrice.value(name) > price))
+            cardsPrice.insert(name, price);
     }
     
     InnerDecklistNode *listRoot = deck->getRoot();
