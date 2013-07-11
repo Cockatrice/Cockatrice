@@ -435,8 +435,13 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 	doubleClickToPlayCheckBox->setChecked(settingsCache->getDoubleClickToPlay());
 	connect(doubleClickToPlayCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDoubleClickToPlay(int)));
 	
+	playToStackCheckBox = new QCheckBox;
+	playToStackCheckBox->setChecked(settingsCache->getPlayToStack());
+	connect(playToStackCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPlayToStack(int)));
+	
 	QGridLayout *generalGrid = new QGridLayout;
 	generalGrid->addWidget(doubleClickToPlayCheckBox, 0, 0);
+	generalGrid->addWidget(playToStackCheckBox, 1, 0);
 	
 	generalGroupBox = new QGroupBox;
 	generalGroupBox->setLayout(generalGrid);
@@ -485,6 +490,7 @@ void UserInterfaceSettingsPage::retranslateUi()
 {
 	generalGroupBox->setTitle(tr("General interface settings"));
 	doubleClickToPlayCheckBox->setText(tr("&Double-click cards to play them (instead of single-click)"));
+	playToStackCheckBox->setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
 	animationGroupBox->setTitle(tr("Animation settings"));
 	tapAnimationCheckBox->setText(tr("&Tap/untap animation"));
 	soundEnabledCheckBox->setText(tr("Enable &sounds"));
