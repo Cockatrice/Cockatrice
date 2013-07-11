@@ -1,9 +1,12 @@
 !include "MUI2.nsh"
 !include "FileFunc.nsh"
 
+!define /date TIMESTAMP "%Y%m%d" 
+!searchparse /file ../build/cockatrice/version_string.cpp '= "' VERSION '";'
+
 Name "Cockatrice"
-OutFile "cockatrice_win32.exe"
-SetCompressor lzma
+OutFile "cockatrice_win32_${TIMESTAMP}_git-${VERSION}.exe"
+SetCompressor /SOLID lzma
 InstallDir "$PROGRAMFILES\Cockatrice"
 
 !define MUI_ABORTWARNING
@@ -18,6 +21,7 @@ InstallDir "$PROGRAMFILES\Cockatrice"
 !define MUI_FINISHPAGE_RUN_PARAMETERS "-dlsets"
 
 !insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_LICENSE "..\COPYING"
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
@@ -33,31 +37,32 @@ Section "Application" SecApplication
 	SetOutPath "$INSTDIR"
 	File ..\build\cockatrice\cockatrice.exe
 	File ..\build\oracle\oracle.exe
+	File ..\doc\usermanual\Usermanual.pdf
 	File C:\MinGW\bin\libstdc++-6.dll
 	File C:\MinGW\bin\libgcc_s_dw2-1.dll
 	File C:\MinGW\bin\mingwm10.dll
-	File C:\MinGW\bin\libprotobuf-7.dll
-	File C:\MinGW\qt\bin\QtCore4.dll
-	File C:\MinGW\qt\bin\QtGui4.dll
-	File C:\MinGW\qt\bin\QtNetwork4.dll
-	File C:\MinGW\qt\bin\QtSvg4.dll
-	File C:\MinGW\qt\bin\QtXml4.dll
-	File C:\MinGW\qt\bin\QtMultimedia4.dll
+	File C:\MinGW\bin\libprotobuf-8.dll
+	File C:\Qt\4.8.4\bin\QtCore4.dll
+	File C:\Qt\4.8.4\bin\QtGui4.dll
+	File C:\Qt\4.8.4\bin\QtNetwork4.dll
+	File C:\Qt\4.8.4\bin\QtSvg4.dll
+	File C:\Qt\4.8.4\bin\QtXml4.dll
+	File C:\Qt\4.8.4\bin\QtMultimedia4.dll
 
 	SetOutPath "$INSTDIR\zonebg"
 	File /r ..\zonebg\*.*
 	
 	SetOutPath "$INSTDIR\plugins"
 	SetOutPath "$INSTDIR\plugins\codecs"
-	File C:\MinGW\qt\plugins\codecs\qcncodecs4.dll
-	File C:\MinGW\qt\plugins\codecs\qjpcodecs4.dll
-	File C:\MinGW\qt\plugins\codecs\qkrcodecs4.dll
-	File C:\MinGW\qt\plugins\codecs\qtwcodecs4.dll
+	File C:\Qt\4.8.4\plugins\codecs\qcncodecs4.dll
+	File C:\Qt\4.8.4\plugins\codecs\qjpcodecs4.dll
+	File C:\Qt\4.8.4\plugins\codecs\qkrcodecs4.dll
+	File C:\Qt\4.8.4\plugins\codecs\qtwcodecs4.dll
 	SetOutPath "$INSTDIR\plugins\iconengines"
-	File C:\MinGW\qt\plugins\iconengines\qsvgicon4.dll
+	File C:\Qt\4.8.4\plugins\iconengines\qsvgicon4.dll
 	SetOutPath "$INSTDIR\plugins\imageformats"
-	File C:\MinGW\qt\plugins\imageformats\qjpeg4.dll
-	File c:\MinGW\qt\plugins\imageformats\qsvg4.dll
+	File C:\Qt\4.8.4\plugins\imageformats\qjpeg4.dll
+	File C:\Qt\4.8.4\plugins\imageformats\qsvg4.dll
 
 	SetOutPath "$INSTDIR\sounds"
 	File /r ..\sounds\*.*
@@ -87,6 +92,7 @@ Section "Start menu item" SecStartMenu
 	createDirectory "$SMPROGRAMS\Cockatrice"
 	createShortCut "$SMPROGRAMS\Cockatrice\Cockatrice.lnk" "$INSTDIR\cockatrice.exe"
 	createShortCut "$SMPROGRAMS\Cockatrice\Oracle.lnk" "$INSTDIR\oracle.exe"
+	createShortCut "$SMPROGRAMS\Cockatrice\Usermanual.lnk" "$INSTDIR\Usermanual.pdf"
 SectionEnd
 
 Section Uninstall
@@ -97,8 +103,9 @@ Section Uninstall
         Delete "$INSTDIR\uninstall.exe"
         Delete "$INSTDIR\cockatrice.exe"
         Delete "$INSTDIR\oracle.exe"
+		Delete "$INSTDIR\Usermanual.pdf"
 	Delete "$INSTDIR\libstdc++-6.dll"
-	Delete "$INSTDIR\libprotobuf-7.dll"
+	Delete "$INSTDIR\libprotobuf-8.dll"
         Delete "$INSTDIR\libgcc_s_dw2-1.dll"
         Delete "$INSTDIR\mingwm10.dll"
         Delete "$INSTDIR\QtCore4.dll"

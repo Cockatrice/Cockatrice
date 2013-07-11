@@ -19,7 +19,7 @@
 #include "window_main.h"
 #include "oracleimporter.h"
 
-const QString WindowMain::defaultSetsUrl = QString("http://www.cockatrice.de/files/sets.xml");
+const QString WindowMain::defaultSetsUrl = QString("http://www.woogerworks.com/files/sets.xml");
 
 WindowMain::WindowMain(QWidget *parent)
 	: QMainWindow(parent)
