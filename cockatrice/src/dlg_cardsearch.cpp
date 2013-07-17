@@ -24,6 +24,7 @@ DlgCardSearch::DlgCardSearch(QWidget *parent)
     cboSetList = new QComboBox();
     cboSetList->addItem("");
     SetList setList = db->getSetList();
+    setList.sortByName();
     for (int intLoop = 0; intLoop < setList.size(); ++intLoop) {
         //Adding Translated Set Name, Just In Case
         cboSetList->addItem(tr("%1").arg(setList.at(intLoop)->getLongName()), setList.at(intLoop)->getShortName());

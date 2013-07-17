@@ -58,9 +58,20 @@ public:
 	}
 };
 
+class SetList::CompareName {
+public:
+    inline bool operator()(CardSet *a, CardSet *b) const {
+        return a->getLongName() < b->getLongName();
+    }
+};
+
 void SetList::sortByKey()
 {
 	qSort(begin(), end(), CompareFunctor());
+}
+
+void SetList::sortByName() {
+    qSort(begin(), end(), CompareName());
 }
 
 PictureToLoad::PictureToLoad(CardInfo *_card, bool _stripped, bool _hq)
