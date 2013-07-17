@@ -504,7 +504,8 @@ void TabDeckEditor::actSearch()
 		databaseDisplayModel->setCardName(dlgCardSearch->getCardName());
 		databaseDisplayModel->setCardText(dlgCardSearch->getCardText());
 		databaseDisplayModel->setCardTypes(dlgCardSearch->getCardTypes());
-		databaseDisplayModel->setCardColors(dlgCardSearch->getCardColors());
+        databaseDisplayModel->setCardColors(dlgCardSearch->getCardColors());
+        databaseDisplayModel->setCardSet(dlgCardSearch->getCardSet());
 	}
 }
 

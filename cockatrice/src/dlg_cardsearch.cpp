@@ -89,6 +89,10 @@ QString DlgCardSearch::getCardText() const
 	return cardTextEdit->text();
 }
 
+QString DlgCardSearch::getCardSet() const {
+    return cboSetList->itemData(cboSetList->currentIndex()).toString();
+}
+
 QSet<QString> DlgCardSearch::getCardTypes() const
 {
 	QStringList result;
