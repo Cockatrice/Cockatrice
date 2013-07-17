@@ -499,11 +499,11 @@ void TabDeckEditor::actEditTokens()
 
 void TabDeckEditor::actSearch()
 {
-    if (dlgCardSearch->exec()) {
-        searchEdit->clear();
-        databaseDisplayModel->setCardName(dlgCardSearch->getCardName());
-        databaseDisplayModel->setCardText(dlgCardSearch->getCardText());
-        databaseDisplayModel->setCardTypes(dlgCardSearch->getCardTypes());
+	if (dlgCardSearch->exec()) {
+		searchEdit->clear();
+		databaseDisplayModel->setCardName(dlgCardSearch->getCardName());
+		databaseDisplayModel->setCardText(dlgCardSearch->getCardText());
+		databaseDisplayModel->setCardTypes(dlgCardSearch->getCardTypes());
         databaseDisplayModel->setCardColors(dlgCardSearch->getCardColors());
         databaseDisplayModel->setCardSet(dlgCardSearch->getCardSet());
     }

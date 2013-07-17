@@ -35,7 +35,7 @@ public:
 private:
     FilterBool isToken;
     QString cardNameBeginning, cardName, cardText, cardSet;
-	QSet<QString> cardNameSet, cardTypes, cardColors;
+    QSet<QString> cardNameSet, cardTypes, cardColors;
 public:
 	CardDatabaseDisplayModel(QObject *parent = 0);
 	void setIsToken(FilterBool _isToken) { isToken = _isToken; invalidate(); }
