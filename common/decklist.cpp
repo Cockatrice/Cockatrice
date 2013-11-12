@@ -417,6 +417,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 	cleanList();
 	
 	InnerDecklistNode *main = 0, *side = 0;
+	bool inSideboard = false;
 
 	int okRows = 0;
 	while (!in.atEnd()) {
@@ -425,8 +426,15 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 			continue;
 
 		InnerDecklistNode *zone;
-		if (line.startsWith("SB:", Qt::CaseInsensitive)) {
+		if (line.startsWith("Sideboard", Qt::CaseInsensitive)) {
+			inSideboard = true;
+			continue;
+		} else if (line.startsWith("SB:", Qt::CaseInsensitive)) {
 			line = line.mid(3).trimmed();
+			if (!side)
+				side = new InnerDecklistNode("side", root);
+			zone = side;
+		} else if (inSideboard) {
 			if (!side)
 				side = new InnerDecklistNode("side", root);
 			zone = side;
@@ -448,8 +456,21 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 		int number = line.left(i).toInt(&ok);
 		if (!ok)
 			continue;
+
+		QString cardName = line.mid(i + 1);
+    // Common differences between cockatrice's card names
+    // and what's commonly used in decklists
+		rx.setPattern("’");
+    cardName.replace(rx, "'");
+		rx.setPattern("Æ");
+		cardName.replace(rx, "AE");
+		rx.setPattern("^Aether");
+		cardName.replace(rx, "AEther");
+		rx.setPattern("\\s*[&|/]{1,2}\\s*");
+		cardName.replace(rx, " // ");
+
 		++okRows;
-		new DecklistCardNode(line.mid(i + 1), number, zone);
+		new DecklistCardNode(cardName, number, zone);
 	}
 	updateDeckHash();
 	return (okRows > 0);
