@@ -12,6 +12,7 @@
 #include "tab_deck_editor.h"
 #include "pixmapgenerator.h"
 #include "userlist.h"
+#include "settingscache.h"
 #include <QDebug>
 #include <QPainter>
 
@@ -417,7 +418,7 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
 		tab->setContentsChanged(true);
 		setTabIcon(indexOf(tab), *tabChangedIcon);
 	}
-	if (globalEvent)
+	if (globalEvent && settingsCache->getNotificationsEnabled())
 		QApplication::alert(this);
 }
 

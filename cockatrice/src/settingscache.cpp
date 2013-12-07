@@ -21,6 +21,7 @@ SettingsCache::SettingsCache()
 	
 	mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
 	picDownload = settings->value("personal/picturedownload", true).toBool();
+	notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
 	doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
 	playToStack = settings->value("interface/playtostack", false).toBool();
 	cardInfoMinimized = settings->value("interface/cardinfominimized", 0).toInt();
@@ -122,6 +123,12 @@ void SettingsCache::setPicDownload(int _picDownload)
 	picDownload = _picDownload;
 	settings->setValue("personal/picturedownload", picDownload);
 	emit picDownloadChanged();
+}
+
+void SettingsCache::setNotificationsEnabled(int _notificationsEnabled)
+{
+	notificationsEnabled = _notificationsEnabled;
+	settings->setValue("interface/notificationsenabled", notificationsEnabled);
 }
 
 void SettingsCache::setDoubleClickToPlay(int _doubleClickToPlay)

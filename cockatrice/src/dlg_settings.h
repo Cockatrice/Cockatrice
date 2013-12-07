@@ -81,6 +81,7 @@ private slots:
 signals:
 	void soundPathChanged();
 private:
+	QCheckBox *notificationsEnabledCheckBox;
 	QCheckBox *doubleClickToPlayCheckBox;
 	QCheckBox *playToStackCheckBox;
 	QCheckBox *tapAnimationCheckBox;
