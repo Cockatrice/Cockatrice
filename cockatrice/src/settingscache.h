@@ -33,6 +33,7 @@ private:
 	QString deckPath, replaysPath, picsPath, cardDatabasePath, tokenDatabasePath;
 	QString handBgPath, stackBgPath, tableBgPath, playerBgPath, cardBackPicturePath;
 	bool picDownload;
+	bool notificationsEnabled;
 	bool doubleClickToPlay;
 	bool playToStack;
 	int cardInfoMinimized;
@@ -62,6 +63,7 @@ public:
 	QString getPlayerBgPath() const { return playerBgPath; }
 	QString getCardBackPicturePath() const { return cardBackPicturePath; }
 	bool getPicDownload() const { return picDownload; }
+	bool getNotificationsEnabled() const { return notificationsEnabled; }
 	bool getDoubleClickToPlay() const { return doubleClickToPlay; }
 	bool getPlayToStack() const { return playToStack; }
 	int  getCardInfoMinimized() const { return cardInfoMinimized; }
@@ -91,6 +93,7 @@ public slots:
 	void setPlayerBgPath(const QString &_playerBgPath);
 	void setCardBackPicturePath(const QString &_cardBackPicturePath);
 	void setPicDownload(int _picDownload);
+	void setNotificationsEnabled(int _notificationsEnabled);
 	void setDoubleClickToPlay(int _doubleClickToPlay);
 	void setPlayToStack(int _playToStack);
 	void setCardInfoMinimized(int _cardInfoMinimized);
