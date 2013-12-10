@@ -431,6 +431,10 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
 	QIcon deleteIcon(":/resources/icon_delete.svg");
 
+	notificationsEnabledCheckBox = new QCheckBox;
+	notificationsEnabledCheckBox->setChecked(settingsCache->getNotificationsEnabled());
+	connect(notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotificationsEnabled(int)));
+
 	doubleClickToPlayCheckBox = new QCheckBox;
 	doubleClickToPlayCheckBox->setChecked(settingsCache->getDoubleClickToPlay());
 	connect(doubleClickToPlayCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDoubleClickToPlay(int)));
@@ -440,8 +444,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 	connect(playToStackCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPlayToStack(int)));
 	
 	QGridLayout *generalGrid = new QGridLayout;
-	generalGrid->addWidget(doubleClickToPlayCheckBox, 0, 0);
-	generalGrid->addWidget(playToStackCheckBox, 1, 0);
+	generalGrid->addWidget(notificationsEnabledCheckBox, 0, 0);
+	generalGrid->addWidget(doubleClickToPlayCheckBox, 1, 0);
+	generalGrid->addWidget(playToStackCheckBox, 2, 0);
 	
 	generalGroupBox = new QGroupBox;
 	generalGroupBox->setLayout(generalGrid);
@@ -489,6 +494,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 void UserInterfaceSettingsPage::retranslateUi()
 {
 	generalGroupBox->setTitle(tr("General interface settings"));
+	notificationsEnabledCheckBox->setText(tr("Enable notifications in taskbar"));
 	doubleClickToPlayCheckBox->setText(tr("&Double-click cards to play them (instead of single-click)"));
 	playToStackCheckBox->setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
 	animationGroupBox->setTitle(tr("Animation settings"));
