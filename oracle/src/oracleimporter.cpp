@@ -296,7 +296,8 @@ void OracleImporter::httpRequestFinished(int requestId, bool error)
 	buffer->seek(0);
 	buffer->close();
 	int cards = importTextSpoiler(set, buffer->data());
-	++setIndex;
+        if (cards > 0)
+            ++setIndex;
 	
 	if (setIndex == setsToDownload.size()) {
 		emit setIndexChanged(cards, setIndex, QString());
