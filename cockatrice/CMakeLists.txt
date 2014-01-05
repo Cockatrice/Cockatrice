@@ -33,6 +33,7 @@ SET(cockatrice_SOURCES
  src/dlg_load_deck_from_clipboard.cpp 
  src/dlg_load_remote_deck.cpp 
  src/cardinfowidget.cpp 
+ src/cardframe.cpp
  src/messagelogwidget.cpp 
  src/zoneviewzone.cpp 
  src/zoneviewwidget.cpp 
@@ -110,6 +111,7 @@ SET(cockatrice_HEADERS
  src/dlg_load_deck_from_clipboard.h 
  src/dlg_load_remote_deck.h 
  src/cardinfowidget.h 
+ src/cardframe.h
  src/messagelogwidget.h 
  src/zoneviewzone.h 
  src/zoneviewwidget.h 

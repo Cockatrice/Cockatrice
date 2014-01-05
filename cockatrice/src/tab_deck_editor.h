@@ -10,7 +10,7 @@ class CardDatabaseDisplayModel;
 class DeckListModel;
 class QTreeView;
 class QTableView;
-class CardInfoWidget;
+class CardFrame;
 class QTextEdit;
 class DlgCardSearch;
 class QLabel;
@@ -71,7 +71,7 @@ private:
 	DeckListModel *deckModel;
 	QTreeView *databaseView;
 	QTreeView *deckView;
-	CardInfoWidget *cardInfo;
+	CardFrame *cardInfo;
 	QLabel *searchLabel;
 	SearchLineEdit *searchEdit;
 	QLabel *nameLabel;

@@ -21,7 +21,6 @@
 #include "carddatabase.h"
 #include "carddatabasemodel.h"
 #include "decklistmodel.h"
-#include "cardinfowidget.h"
 #include "dlg_cardsearch.h"
 #include "dlg_load_deck_from_clipboard.h"
 #include "dlg_edit_tokens.h"
@@ -34,6 +33,18 @@
 #include "pending_command.h"
 #include "pb/response.pb.h"
 #include "pb/command_deck_upload.pb.h"
+#include <QGridLayout>
+#include <QLabel>
+#include <QTextEdit>
+#include <QPushButton>
+#include <QStyle>
+#include <QMouseEvent>
+#include <QDesktopWidget>
+#include "cardframe.h"
+#include "carditem.h"
+#include "carddatabase.h"
+#include "main.h"
+#include "settingscache.h"
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
@@ -85,25 +96,16 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
 	searchEdit->setTreeView(databaseView);
 
-	QVBoxLayout *leftFrame = new QVBoxLayout;
-	leftFrame->addLayout(searchLayout);
-	leftFrame->addWidget(databaseView);
-
-	cardInfo = new CardInfoWidget(CardInfoWidget::ModeDeckEditor);
+	cardInfo = new CardFrame();
 	cardInfo->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
 	QToolBar *verticalToolBar = new QToolBar;
-	verticalToolBar->setOrientation(Qt::Vertical);
-	verticalToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+	verticalToolBar->setOrientation(Qt::Horizontal);
 	verticalToolBar->setIconSize(QSize(24, 24));
 	QHBoxLayout *verticalToolBarLayout = new QHBoxLayout;
-	verticalToolBarLayout->addStretch();
+	//verticalToolBarLayout->addStretch();
 	verticalToolBarLayout->addWidget(verticalToolBar);
-	verticalToolBarLayout->addStretch();
-
-	QVBoxLayout *middleFrame = new QVBoxLayout;
-	middleFrame->addWidget(cardInfo, 10);
-	middleFrame->addLayout(verticalToolBarLayout);
+	//verticalToolBarLayout->addStretch();
 
 	deckModel = new DeckListModel(this);
 	connect(deckModel, SIGNAL(deckHashChanged()), this, SLOT(updateHash()));
@@ -129,8 +131,8 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	grid->addWidget(nameLabel, 0, 0);
 	grid->addWidget(nameEdit, 0, 1);
 
-	grid->addWidget(commentsLabel, 1, 0);
-	grid->addWidget(commentsEdit, 1, 1);
+	/*grid->addWidget(commentsLabel, 1, 0);
+	grid->addWidget(commentsEdit, 1, 1);*/
 	
 	grid->addWidget(hashLabel1, 2, 0);
 	grid->addWidget(hashLabel, 2, 1);
@@ -152,15 +154,25 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
         deckToolbarLayout->addWidget(deckToolBar);
         deckToolbarLayout->addStretch();
 	
-	QVBoxLayout *rightFrame = new QVBoxLayout;
-	rightFrame->addLayout(grid);
-	rightFrame->addWidget(deckView, 10);
-        rightFrame->addLayout(deckToolbarLayout);
+	QVBoxLayout *deckFrame = new QVBoxLayout;
+	deckFrame->addLayout(grid);
+	deckFrame->addWidget(deckView, 10);
+	deckFrame->addLayout(deckToolbarLayout);
 
-	QHBoxLayout *mainLayout = new QHBoxLayout;
-	mainLayout->addLayout(leftFrame, 10);
-	mainLayout->addLayout(middleFrame);
-	mainLayout->addLayout(rightFrame, 10);
+	QHBoxLayout *topFrame = new QHBoxLayout;
+	topFrame->addWidget(cardInfo, 10);
+	topFrame->addLayout(deckFrame);
+
+	QVBoxLayout *botFrame = new QVBoxLayout;
+	QGridLayout *searchAndButtons = new QGridLayout;
+	searchAndButtons->addLayout(verticalToolBarLayout, 0, 0);
+	searchAndButtons->addLayout(searchLayout, 0, 1);
+	botFrame->addLayout(searchAndButtons);
+	botFrame->addWidget(databaseView);
+
+	QVBoxLayout *mainLayout = new QVBoxLayout;
+	mainLayout->addLayout(topFrame, 10);
+	mainLayout->addLayout(botFrame, 10);
 	setLayout(mainLayout);
 	
 	aNewDeck = new QAction(QString(), this);
