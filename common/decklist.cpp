@@ -450,7 +450,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 		rx.setPattern("\\(.*\\)");
 		line.remove(rx);
 		//Filter out post card name editions		
-		rx.setPattern("\\|.*");
+		rx.setPattern("\\|.*$");
 		line.remove(rx);
 		line = line.simplified();
 
