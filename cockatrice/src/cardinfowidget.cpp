@@ -69,10 +69,6 @@ CardInfoWidget::CardInfoWidget(ResizeMode _mode, const QString &cardName, QWidge
 		grid->addWidget(textLabel, row, 0, -1, 2);
 		grid->setRowStretch(row, 1);
 		grid->setColumnStretch(1, 1);
-	} else {
-		/*grid->addWidget(cardPicture, 0, 0);
-		grid->setRowStretch(0, 1);
-		grid->setColumnStretch(0, 1);*/
 	}
 
 	retranslateUi();

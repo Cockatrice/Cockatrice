@@ -41,10 +41,13 @@
 #include <QMouseEvent>
 #include <QDesktopWidget>
 #include "cardframe.h"
+#include "filterbuilder.h"
 #include "carditem.h"
 #include "carddatabase.h"
 #include "main.h"
 #include "settingscache.h"
+#include "filterlistmodel.h"
+#include "filterlist.h"
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
@@ -131,28 +134,25 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	grid->addWidget(nameLabel, 0, 0);
 	grid->addWidget(nameEdit, 0, 1);
 
-	/*grid->addWidget(commentsLabel, 1, 0);
-	grid->addWidget(commentsEdit, 1, 1);*/
-	
 	grid->addWidget(hashLabel1, 2, 0);
 	grid->addWidget(hashLabel, 2, 1);
 
-        // Update price
-        aUpdatePrices = new QAction(QString(), this);
-        aUpdatePrices->setIcon(QIcon(":/resources/icon_update.png"));
-        connect(aUpdatePrices, SIGNAL(triggered()), this, SLOT(actUpdatePrices()));
+	// Update price
+	aUpdatePrices = new QAction(QString(), this);
+	aUpdatePrices->setIcon(QIcon(":/resources/icon_update.png"));
+	connect(aUpdatePrices, SIGNAL(triggered()), this, SLOT(actUpdatePrices()));
 	if (!settingsCache->getPriceTagFeature())
 		aUpdatePrices->setVisible(false);
-	
-        QToolBar *deckToolBar = new QToolBar;
-        deckToolBar->setOrientation(Qt::Vertical);
-        deckToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        deckToolBar->setIconSize(QSize(24, 24));
-        deckToolBar->addAction(aUpdatePrices);
-        QHBoxLayout *deckToolbarLayout = new QHBoxLayout;
-        deckToolbarLayout->addStretch();
-        deckToolbarLayout->addWidget(deckToolBar);
-        deckToolbarLayout->addStretch();
+
+	QToolBar *deckToolBar = new QToolBar;
+	deckToolBar->setOrientation(Qt::Vertical);
+	deckToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+	deckToolBar->setIconSize(QSize(24, 24));
+	deckToolBar->addAction(aUpdatePrices);
+	QHBoxLayout *deckToolbarLayout = new QHBoxLayout;
+	deckToolbarLayout->addStretch();
+	deckToolbarLayout->addWidget(deckToolBar);
+	deckToolbarLayout->addStretch();
 	
 	QVBoxLayout *deckFrame = new QVBoxLayout;
 	deckFrame->addLayout(grid);
@@ -168,7 +168,30 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	searchAndButtons->addLayout(verticalToolBarLayout, 0, 0);
 	searchAndButtons->addLayout(searchLayout, 0, 1);
 	botFrame->addLayout(searchAndButtons);
-	botFrame->addWidget(databaseView);
+
+	filterModel = new FilterListModel();
+	filterView = new QTreeView;
+	filterView->setModel(filterModel);
+	filterView->setMaximumWidth(250);
+	filterView->setUniformRowHeights(true);
+	filterView->setHeaderHidden(true);
+	filterView->setExpandsOnDoubleClick(false);
+	filterView->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(filterModel, SIGNAL(layoutChanged()), filterView, SLOT(expandAll()));
+	connect(filterView, SIGNAL(customContextMenuRequested(const QPoint &)),
+			this, SLOT(filterViewCustomContextMenu(const QPoint &)));
+	FilterBuilder *filterBuilder = new FilterBuilder;
+	filterBuilder->setMaximumWidth(250);
+	connect(filterBuilder, SIGNAL(add(const CardFilter *)), filterModel, SLOT(addFilter(const CardFilter *)));
+
+	QVBoxLayout *filter = new QVBoxLayout;
+	filter->addWidget(filterBuilder, 0, Qt::AlignTop);
+	filter->addWidget(filterView);
+
+	QHBoxLayout *dbFrame = new QHBoxLayout;
+	dbFrame->addLayout(filter);
+	dbFrame->addWidget(databaseView);
+	botFrame->addLayout(dbFrame);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addLayout(topFrame, 10);
@@ -234,16 +257,16 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	aAddCard->setIcon(QIcon(":/resources/arrow_right_green.svg"));
 	connect(aAddCard, SIGNAL(triggered()), this, SLOT(actAddCard()));
 	aAddCardToSideboard = new QAction(QString(), this);
-        aAddCardToSideboard->setIcon(QIcon(":/resources/add_to_sideboard.svg"));
+	aAddCardToSideboard->setIcon(QIcon(":/resources/add_to_sideboard.svg"));
 	connect(aAddCardToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
 	aRemoveCard = new QAction(QString(), this);
-        aRemoveCard->setIcon(QIcon(":/resources/remove_row.svg"));
+	aRemoveCard->setIcon(QIcon(":/resources/remove_row.svg"));
 	connect(aRemoveCard, SIGNAL(triggered()), this, SLOT(actRemoveCard()));
 	aIncrement = new QAction(QString(), this);
-        aIncrement->setIcon(QIcon(":/resources/increment.svg"));
+	aIncrement->setIcon(QIcon(":/resources/increment.svg"));
 	connect(aIncrement, SIGNAL(triggered()), this, SLOT(actIncrement()));
 	aDecrement = new QAction(QString(), this);
-        aDecrement->setIcon(QIcon(":/resources/decrement.svg"));
+	aDecrement->setIcon(QIcon(":/resources/decrement.svg"));
 	connect(aDecrement, SIGNAL(triggered()), this, SLOT(actDecrement()));
 
 	verticalToolBar->addAction(aAddCard);
@@ -631,4 +654,32 @@ void TabDeckEditor::setModified(bool _modified)
 {
 	modified = _modified;
 	emit tabTextChanged(this, getTabText());
+}
+
+void TabDeckEditor::filterViewCustomContextMenu(const QPoint &point) {
+	QMenu menu;
+	QAction *action;
+	QModelIndex idx;
+
+	idx = filterView->indexAt(point);
+	if(!idx.isValid())
+		return;
+
+	action = menu.addAction(QString("delete"));
+	action->setData(point);
+	connect(&menu, SIGNAL(triggered(QAction *)),
+			this, SLOT(filterRemove(QAction *)));
+	menu.exec(filterView->mapToGlobal(point));
+}
+
+void TabDeckEditor::filterRemove(QAction *action) {
+	QPoint point;
+	QModelIndex idx;
+
+	point = action->data().toPoint();
+	idx = filterView->indexAt(point);
+	if(!idx.isValid())
+		return;
+
+	filterModel->removeRow(idx.row(), idx.parent());
 }

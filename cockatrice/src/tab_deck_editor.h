@@ -16,6 +16,7 @@ class DlgCardSearch;
 class QLabel;
 class DeckLoader;
 class Response;
+class FilterListModel;
 
 class SearchLineEdit : public QLineEdit {
 	private:
@@ -61,6 +62,8 @@ private slots:
 
         void finishedUpdatingPrices();
 	void saveDeckRemoteFinished(const Response &r);
+	void filterViewCustomContextMenu(const QPoint &point);
+	void filterRemove(QAction *action);
 private:
 	void addCardHelper(QString zoneName);
 	void recursiveExpand(const QModelIndex &index);
@@ -81,6 +84,8 @@ private:
 	QLabel *hashLabel1;
 	QLabel *hashLabel;
 	DlgCardSearch *dlgCardSearch;
+	FilterListModel *filterModel;
+	QTreeView *filterView;
 
 	QMenu *deckMenu, *dbMenu;
 	QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose;
