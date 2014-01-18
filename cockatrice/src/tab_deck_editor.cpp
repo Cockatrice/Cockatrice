@@ -385,7 +385,7 @@ void TabDeckEditor::actLoadDeck()
 		return;
 
 	QString fileName = dialog.selectedFiles().at(0);
-	DeckLoader::FileFormat fmt = DeckLoader::getFormatFromNameFilter(dialog.selectedNameFilter());
+	DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 	
 	DeckLoader *l = new DeckLoader;
 	if (l->loadFromFile(fileName, fmt))
@@ -438,7 +438,7 @@ bool TabDeckEditor::actSaveDeckAs()
 		return false;
 
 	QString fileName = dialog.selectedFiles().at(0);
-	DeckLoader::FileFormat fmt = DeckLoader::getFormatFromNameFilter(dialog.selectedNameFilter());
+	DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
 	if (!deckModel->getDeckList()->saveToFile(fileName, fmt)) {
 		QMessageBox::critical(this, tr("Error"), tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));

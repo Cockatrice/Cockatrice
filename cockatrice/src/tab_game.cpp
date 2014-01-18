@@ -154,7 +154,7 @@ void DeckViewContainer::loadLocalDeck()
 		return;
 
 	QString fileName = dialog.selectedFiles().at(0);
-	DeckLoader::FileFormat fmt = DeckLoader::getFormatFromNameFilter(dialog.selectedNameFilter());
+	DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 	DeckLoader deck;
 	if (!deck.loadFromFile(fileName, fmt)) {
 		QMessageBox::critical(this, tr("Error"), tr("The selected file could not be loaded."));
