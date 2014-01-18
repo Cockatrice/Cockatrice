@@ -4,9 +4,8 @@
 #include "decklist.h"
 
 const QStringList DeckLoader::fileNameFilters = QStringList()
-	<< QObject::tr("All files (*.*)")
-	<< QObject::tr("Cockatrice decks (*.cod)")
-	<< QObject::tr("Plain text decks (*.dec *.mwDeck)");
+	<< QObject::tr("Common deck formats (*.cod *.dec *.mwDeck)")
+	<< QObject::tr("All files (*.*)");
 
 DeckLoader::DeckLoader()
 	: DeckList(),
@@ -91,11 +90,10 @@ bool DeckLoader::saveToFile(const QString &fileName, FileFormat fmt)
 	return result;
 }
 
-DeckLoader::FileFormat DeckLoader::getFormatFromNameFilter(const QString &selectedNameFilter)
+DeckLoader::FileFormat DeckLoader::getFormatFromName(const QString &fileName)
 {
-	switch (fileNameFilters.indexOf(selectedNameFilter)) {
-		case 1: return CockatriceFormat;
-		case 2: return PlainTextFormat;
+	if (fileName.endsWith(".cod", Qt::CaseInsensitive)) {
+		return CockatriceFormat;
 	}
 	return PlainTextFormat;
 }

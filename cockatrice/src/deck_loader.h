@@ -23,7 +23,7 @@ public:
 	FileFormat getLastFileFormat() const { return lastFileFormat; }
 	int getLastRemoteDeckId() const { return lastRemoteDeckId; }
 	
-	static FileFormat getFormatFromNameFilter(const QString &selectedNameFilter);
+	static FileFormat getFormatFromName(const QString &fileName);
 	
 	bool loadFromFile(const QString &fileName, FileFormat fmt);
 	bool loadFromRemote(const QString &nativeString, int remoteDeckId);
