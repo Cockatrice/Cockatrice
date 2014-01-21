@@ -85,7 +85,7 @@ Due to a legal dispute there are currently no official builds left, so currently
 
 \subsection{Client compilation}
 \subsubsection{Windows}
-There should be two ways to compile Cockatrice: With Visual Studio 2010 and with MinGW.
+There should be two ways to compile Cockatrice: With Visual Studio 2010 or later and with MinGW.
 As the Visual Studio method is more complicated and might not work, you should do it with MinGW.
 The following howto has been tested with Windows 7 64Bit.
 
@@ -102,42 +102,58 @@ We need the Cockatrice sourcecode, it's dependencies and build tools. Everything
 
 All downloadlinks together:
 \footnotesize{\begin{enumerate}
- \item \url{http://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/mingw-get-inst-20120426/}
+ \item \url{http://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download}
  \item \url{http://git-scm.com/download/win}
- \item \url{http://www.cmake.org/files/v2.8/cmake-2.8.10.2-win32-x86.exe}
- \item \url{http://download.qt-project.org/official_releases/qt/4.8/4.8.4/qt-win-opensource-4.8.4-mingw.exe}
+ \item \url{http://cmake.org/files/v2.8/cmake-2.8.12.2-win32-x86.exe}
+ \item \url{http://download.qt-project.org/official_releases/qt/4.8/4.8.5/qt-win-opensource-4.8.5-mingw.exe}
  \item \url{http://protobuf.googlecode.com/files/protobuf-2.5.0.zip}
  \item \url{http://nsis.sourceforge.net/Download}
 \end{enumerate}}
+As those projects update their releases now and then and websites change, the links or versions documented here might be out of date.
+There should be no problem to use later versions but you should stay within the Qt 4 branch and don't use Qt 5 releases.
+If you find any changes, please report them so this documentation can be updated.
 
 \paragraph{Installation of the Prerequisites}
 \begin{enumerate}
- \item Download MinGW (mingw-get-inst), git, cmake, protobuf 2.5 sources zip and Qt 4.8.4 MinGW (see links above).
+ \item Download MinGW (mingw-get-setup), git, cmake, protobuf 2.5 sources zip and Qt 4.8.5 MinGW (see links above).
  \item Make a standard installation for git, cmake and NSIS.
  \item Install MinGW:
     \begin{enumerate}
-      \item Select default values everywhere, except: Also check the C++ Compiler, check the MSYS Basis System and MinGW Developer Toolkit.
+      \item Select default values everywhere and when MinGW Installation Manager offers his package selection, choose
+      \begin{itemize}
+       \item mingw-developer-toolkit
+       \item mingw32-base
+       \item mingw-gcc-g++
+       \item msys-base
+      \end{itemize}
+\includegraphics[scale=0.5]{pics/MinGWInstallManager}
+
+      Then click Installation/Apply Changes, let the installation proceed and finally quit the installer.
+      \item Open the directory \shellcmd{C:\textbackslash MinGW\textbackslash msys\textbackslash 1.0\textbackslash msys\textbackslash etc} in the Windows Explorer and rename fstab.sample simply to fstab (no file ending!).
       \item Append \shellcmd{C:\textbackslash MinGW\textbackslash bin} to your PATH variable (google how to do it for your Windows version, if you don't know it).
       This is very important and overseen many times! You can keep the PATH configuration dialog open for the next step.
     \end{enumerate}
- \item Install Qt, select default values everywhere, ignore the message regarding win32.h and append \shellcmd{C:\textbackslash Qt\textbackslash 4.8.4\textbackslash bin} to your PATH variable like you did for MinGW.
- \item Unpack protobuf-2.5.0.zip in \shellcmd{C:\textbackslash MinGW\textbackslash msys\textbackslash 1.0\textbackslash home\textbackslash YOURLOGIN}
+ \item Install Qt, select default values everywhere, ignore the message regarding w32api.h and append \shellcmd{C:\textbackslash Qt\textbackslash 4.8.5\textbackslash bin} to your PATH variable like you did for MinGW.
+ \item To install protobuf, execute the following steps:
     \begin{enumerate}
-     \item Open MinGW Shell, type the following commands exactly:
-     \item \shellcmd{cd protobuf-2.5.0/protobuf-2.5.0}
-     \item \shellcmd{./configure --prefix=`cd /mingw; pwd -W`} (these apostrophs are backticks and do not forget the dot at the beginning!)
-     \item \shellcmd{make; make install} (this builds and installs protobuf, which needs some time)
+     \item Open MinGW Shell (execute \shellcmd{C:\textbackslash MinGW\textbackslash msys\textbackslash 1.0\textbackslash msys} if you don't find it in the startmenu)
+     \item From the Windows Explorer, unpack protobuf-2.5.0.zip in \shellcmd{C:\textbackslash MinGW\textbackslash msys\textbackslash 1.0\textbackslash home\textbackslash YOURLOGIN}
+     \item Change the directory in MinGW Shell with \shellcmd{cd protobuf-2.5.0/protobuf-2.5.0}
+     \item Now type exactly:
+     \begin{verbatim}./configure --prefix=`cd /mingw; pwd -W`\end{verbatim}
+     (these apostrophs are backticks and do not forget the dot at the beginning!)
+     \item Then type \shellcmd{make; make install} to build and install protobuf, which needs a couple of minutes.
      \item Close MinGW Shell
     \end{enumerate}
 \end{enumerate}
-Your system is now able to compile Cockatrice. You do not have to repeat the process so far ever again.
+Your system is now able to compile Cockatrice. You do not have to repeat the process so far ever again unless you choose to update some of the prerequisites.
 
 \paragraph{Cockatrice Compilation}
 \begin{enumerate}
  \item Checkout Cockatrice:
     \begin{enumerate}
      \item Start Git Bash and type the following command exactly:
-     \item \shellcmd{git clone https://github.com/Daenyth/Cockatrice}
+     \item \shellcmd{git clone https://github.com/Daenyth/Cockatrice} which will Download the latest Cockatrice sources into \shellcmd{C:\textbackslash Users\textbackslash YOURLOGIN\textbackslash Cockatrice}
      \item Close Git Bash
     \end{enumerate}
  \item Start CMake (cmake-gui) and do the following:
@@ -145,7 +161,7 @@ Your system is now able to compile Cockatrice. You do not have to repeat the pro
      \item Where is the source code: Point to the Cockatrice directory
      \item Where to build the binaries: Point to the Cockatrice/build directory (it doesn't matter if it exists; if it doesn't, cmake will ask later if it shall create this directory)
      \item Check Advanced
-     \item Click Configure, choose MinGW, leave the rest default
+     \item Click Configure, choose MinGW Makefiles, leave the rest default
      \item An error will occur, set the following:
      	\begin{itemize}
 	 \item Set PROTOBUF\_INCLUDE\_DIR to C:/MinGW/include/google/protobuf
@@ -163,24 +179,21 @@ Your system is now able to compile Cockatrice. You do not have to repeat the pro
      \item \shellcmd{make} (this builds everything and might need some time)
     \end{enumerate}
 \end{enumerate}
-Cockatrice has now been downloaded and built for the first time. You do not have to repeat the process so far ever again.
+Cockatrice has now been downloaded and built for the first time. You do not have to repeat these steps ever again unless you changed the prerequisites, then you should run cmake-gui again and compile Cockatrice after that.
 
 \paragraph{Updating your Cockatrice build}
 If you just compiled Cockatrice for the first time, you skip this step obviously.
 But if you want to update Cockatrice after the source code changed on github, do it like this:
 \begin{enumerate}
- \item Start Git Bash and update Cockatrice:
-    \begin{enumerate}
-     \item \shellcmd{git pull origin master}
-     \item \shellcmd{Close Git Bash}
-    \end{enumerate}
- \item Start cmd.exe, change to Cockatrice/build, type make like you did previously.
+ \item Start Git Bash and update Cockatrice with \shellcmd{git pull origin master}
+ \item Close Git Bash, start cmd.exe, change to Cockatrice/build, type \shellcmd{make} like you did previously.
 \end{enumerate}
 Cockatrice has now been updated and built. You may repeat this process every time when the source code changed.
 
 \paragraph{Cockatrice installation}
 To install Cockatrice, you have to create an installer with NSIS now.
-Change to the directory \shellcmd{nsis} in the Cockatrice root directory, right click the cockatrice.nsi file and select \shellcmd{Compile NSIS Script}.
+Change to the directory \shellcmd{nsis} in the Cockatrice root directory, right click the cockatrice.nsi file and select \shellcmd{Compile NSIS Script} if you followed this documentation to the letter.
+Otherwise if you used other library versions or different install paths than documented before, you need to edit the cockatrice.nsi file like a textfile, apply your changes everywhere and save the file first.
 The NSIS program then creates a file called cockatrice\_win32\_YYYYmmdd\_git-xxxxxxx.exe. This is the complete, redistributable installer for your Cockatrice build.
 
 Now install Cockatrice by executing the installer.
