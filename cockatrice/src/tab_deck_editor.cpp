@@ -170,6 +170,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	botFrame->addLayout(searchAndButtons);
 
 	filterModel = new FilterListModel();
+	databaseDisplayModel->setFilterList(filterModel->filterList());
 	filterView = new QTreeView;
 	filterView->setModel(filterModel);
 	filterView->setMaximumWidth(250);

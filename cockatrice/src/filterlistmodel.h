@@ -10,7 +10,7 @@ class FilterListNode;
 class FilterListModel : public QAbstractItemModel {
 	Q_OBJECT
 private:
-	FilterList *filterList;
+	FilterList *fList;
 
 public slots:
 	void addFilter(const CardFilter *f);
@@ -26,6 +26,7 @@ private:
 public:
 	FilterListModel(QObject *parent = 0);
 	~FilterListModel();
+	const FilterList *filterList() const { return fList; }
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role) const;

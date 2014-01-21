@@ -1,5 +1,6 @@
 #include "filterlist.h"
-#include "CardFilter.h"
+#include "cardfilter.h"
+#include "carddatabase.h"
 
 #include <QList>
 
@@ -7,6 +8,17 @@ LogicMap::~LogicMap()
 {
 	while(!isEmpty())
 		delete takeFirst();
+}
+
+const FilterItemList *LogicMap::findTypeList(CardFilter::Type type) const
+{
+	LogicMap::const_iterator i;
+
+	for(i = constBegin(); i != constEnd(); i++)
+		if ((*i)->type == type)
+			return *i;
+
+	return NULL;
 }
 
 FilterItemList *LogicMap::typeList(CardFilter::Type type)
@@ -157,4 +169,169 @@ int FilterList::count(CardFilter::Attr attr, CardFilter::Type type)
 int FilterList::count(const CardFilter *f)
 {
 	return count(f->attr(), f->type());
+}
+
+bool FilterList::acceptName(const CardInfo *info, const QString &term) const
+{
+	return info->getName().contains(term, Qt::CaseInsensitive);
+}
+
+bool FilterList::acceptType(const CardInfo *info, const QString &term) const
+{
+	return info->getCardType().contains(term, Qt::CaseInsensitive);
+}
+
+bool FilterList::acceptColor(const CardInfo *info, const QString &term) const
+{
+	QStringList::const_iterator i;
+	bool status;
+
+	status = false;
+	for(i = info->getColors().constBegin(); i != info->getColors().constEnd(); i++)
+		if ((*i).contains(term, Qt::CaseInsensitive)) {
+			status = true;
+			break;
+		}
+
+	return status;
+}
+
+bool FilterList::acceptText(const CardInfo *info, const QString &term) const
+{
+	return info->getText().contains(term, Qt::CaseInsensitive);
+}
+
+bool FilterList::acceptSet(const CardInfo *info, const QString &term) const
+{
+	SetList::const_iterator i;
+	bool status;
+
+	status = false;
+	for(i = info->getSets().constBegin(); i != info->getSets().constEnd(); i++)
+		if ((*i)->getShortName() == term
+				|| (*i)->getLongName().contains(term, Qt::CaseInsensitive)) {
+			status = true;
+			break;
+		}
+
+	return status;
+}
+
+bool FilterList::acceptManaCost(const CardInfo *info, const QString &term) const
+{
+	return (info->getManaCost() == term);
+}
+
+bool FilterList::acceptCardAttr(const CardInfo *info, const QString &term,
+								CardFilter::Attr attr) const
+{
+	bool status;
+
+	switch(attr) {
+		case CardFilter::AttrName:
+			status = acceptName(info, term);
+			break;
+		case CardFilter::AttrType:
+			status = acceptType(info, term);
+			break;
+		case CardFilter::AttrColor:
+			status = acceptColor(info, term);
+			break;
+		case CardFilter::AttrText:
+			status = acceptText(info, term);
+			break;
+		case CardFilter::AttrSet:
+			status = acceptSet(info, term);
+			break;
+		case CardFilter::AttrManaCost:
+			status = acceptManaCost(info, term);
+			break;
+		default:
+			status = true; /* ignore this attribute */
+	}
+
+	return status;
+}
+
+bool FilterList::testTypeAnd(const CardInfo *info, CardFilter::Attr attr,
+							const FilterItemList *fil) const
+{
+	FilterItemList::const_iterator i;
+
+	for(i = fil->constBegin(); i != fil->constEnd(); i++)
+		if(!acceptCardAttr(info, (*i)->term, attr))
+			return false;
+
+	return true;
+}
+
+bool FilterList::testTypeAndNot(const CardInfo *info, CardFilter::Attr attr,
+									const FilterItemList *fil) const
+{
+	FilterItemList::const_iterator i;
+
+	for(i = fil->constBegin(); i != fil->constEnd(); i++)
+		if(acceptCardAttr(info, (*i)->term, attr))
+			return false;
+
+	return true;
+}
+
+bool FilterList::testTypeOr(const CardInfo *info, CardFilter::Attr attr,
+								const FilterItemList *filOr,
+								const FilterItemList *filOrNot) const
+{
+	FilterItemList::const_iterator i;
+	bool status;
+
+	if(filOr == NULL && filOrNot == NULL)
+		return true;
+
+	status = false;
+	if (filOr != NULL)
+		for(i = filOr->constBegin(); i != filOr->constEnd(); i++)
+			if(acceptCardAttr(info, (*i)->term, attr)) {
+				status = true;
+				break;
+			}
+	if (status != true && filOrNot != NULL)
+		for(i = filOrNot->constBegin(); i != filOrNot->constEnd(); i++)
+			if(!acceptCardAttr(info, (*i)->term, attr)) {
+				status = true;
+				break;
+			}
+
+	return status;
+}
+
+bool FilterList::testAttr(const CardInfo *info, const LogicMap *lm) const
+{
+	bool status;
+	const FilterItemList *fil, *fil2;
+
+	fil = lm->findTypeList(CardFilter::TypeAnd);
+	if (fil != NULL && !testTypeAnd(info, lm->attr, fil))
+		return false;
+
+	fil = lm->findTypeList(CardFilter::TypeAndNot);
+	if (fil != NULL && !testTypeAndNot(info, lm->attr, fil))
+		return false;
+
+	fil = lm->findTypeList(CardFilter::TypeOr);
+	fil2 = lm->findTypeList(CardFilter::TypeOrNot);
+	if (!testTypeOr(info, lm->attr, fil, fil2))
+		return false;
+
+	return true;
+}
+
+bool FilterList::acceptsCard(const CardInfo *info) const
+{
+	QList<LogicMap *>::const_iterator i;
+
+	for(i = logicAttrs.constBegin(); i != logicAttrs.constEnd(); i++)
+		if(!testAttr(info, *i))
+			return false;
+
+	return true;
 }

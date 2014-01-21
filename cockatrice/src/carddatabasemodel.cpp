@@ -1,4 +1,5 @@
 #include "carddatabasemodel.h"
+#include "filterlist.h"
 
 CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, QObject *parent)
 	: QAbstractListModel(parent), db(_db)
@@ -109,6 +110,7 @@ CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
 	: QSortFilterProxyModel(parent),
 	  isToken(ShowAll)
 {
+	filterList = NULL;
 	setFilterCaseSensitivity(Qt::CaseInsensitive);
 	setSortCaseSensitivity(Qt::CaseInsensitive);
 }
@@ -116,7 +118,7 @@ CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
 bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
 {
 	CardInfo const *info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
-	
+
 	if (((isToken == ShowTrue) && !info->getIsToken()) || ((isToken == ShowFalse) && info->getIsToken()))
 		return false;
 	
@@ -144,6 +146,9 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 		if (!cardTypes.contains(info->getMainCardType()))
 			return false;
 
+	if (filterList != NULL)
+		return filterList->acceptsCard(info);
+
 	return true;
 }
 
@@ -154,4 +159,19 @@ void CardDatabaseDisplayModel::clearSearch()
 	cardTypes.clear();
 	cardColors.clear();
 	invalidateFilter();
+}
+
+void CardDatabaseDisplayModel::setFilterList(const FilterList *filterList)
+{
+	if(this->filterList != NULL)
+		disconnect(this->filterList, 0, this, 0);
+
+	this->filterList = filterList;
+	connect(this->filterList, SIGNAL(changed()), this, SLOT(filterListChanged()));
+	invalidate();
+}
+
+void CardDatabaseDisplayModel::filterListChanged()
+{
+	invalidate();
 }

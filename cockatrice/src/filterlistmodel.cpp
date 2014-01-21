@@ -6,18 +6,18 @@
 FilterListModel::FilterListModel(QObject *parent)
 	: QAbstractItemModel(parent)
 {
-	filterList = new FilterList;
-	connect(filterList,
+	fList = new FilterList;
+	connect(fList,
 			SIGNAL(preInsertRow(const FilterListNode *, int)),
 			this, SLOT(proxyBeginInsertRow(const FilterListNode *, int)));
-	connect(filterList,
+	connect(fList,
 			SIGNAL(postInsertRow(const FilterListNode *, int)),
 			this, SLOT(proxyEndInsertRow(const FilterListNode *, int)));
 }
 
 FilterListModel::~FilterListModel()
 {
-	delete filterList;
+	delete fList;
 }
 
 void FilterListModel::proxyBeginInsertRow(const FilterListNode *node, int i) 
@@ -44,11 +44,11 @@ FilterListNode *FilterListModel::indexToNode(const QModelIndex &idx) const
 	FilterListNode *node;
 
 	if(!idx.isValid())
-		return filterList;
+		return fList;
 
 	ip = idx.internalPointer();
 	if(ip == NULL)
-		return filterList;
+		return fList;
 
 	node = static_cast<FilterListNode *>(ip);
 	return node;
@@ -57,7 +57,7 @@ FilterListNode *FilterListModel::indexToNode(const QModelIndex &idx) const
 void FilterListModel::addFilter(const CardFilter *f)
 {
 	emit layoutAboutToBeChanged();
-	filterList->termNode(f);
+	fList->termNode(f);
 	emit layoutChanged();
 }
 
@@ -135,7 +135,7 @@ bool FilterListModel::setData(const QModelIndex &index,
 		return false;
 
 	node = indexToNode(index);
-	if(node == NULL || node == filterList)
+	if(node == NULL || node == fList)
 		return false;
 
 	Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
@@ -161,7 +161,7 @@ Qt::ItemFlags FilterListModel::flags(const QModelIndex &index) const
 		return 0;
 
 	result = Qt::ItemIsEnabled;
-	if(node == filterList)
+	if(node == fList)
 		return result;
 
 	result |= Qt::ItemIsSelectable;
@@ -207,7 +207,7 @@ QModelIndex FilterListModel::parent(const QModelIndex &ind) const
 		return QModelIndex();
 
 	node = indexToNode(ind);
-	if(node == NULL || node == filterList)
+	if(node == NULL || node == fList)
 		return QModelIndex();
 
 	parent = node->parent();
@@ -239,8 +239,9 @@ bool FilterListModel::removeRows(int row, int count, const QModelIndex & parent)
 	for(i = 0; i < count; i++)
 		node->deleteAt(row);
 	endRemoveRows();
+	fList->emitChanged();
 
-	if(node != filterList && node->childCount() < 1)
+	if(node != fList && node->childCount() < 1)
 		return removeRow(parent.row(), parent.parent());
 
 	return true;

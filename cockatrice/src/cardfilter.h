@@ -13,10 +13,15 @@ public:
 		TypeEnd
     };
 
+	/* if you add an atribute here you also need to
+	 * add its string representation in attrName */
 	enum Attr {
 		AttrName = 0,
 		AttrType,
 		AttrColor,
+		AttrText,
+		AttrSet,
+		AttrManaCost,
 		AttrEnd
 	};
 

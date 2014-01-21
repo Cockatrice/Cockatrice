@@ -7,6 +7,8 @@
 
 #include "cardfilter.h"
 
+class CardInfo;
+
 class FilterListNode {
 private:
 	bool enabled;
@@ -38,6 +40,7 @@ public:
 	LogicMap(CardFilter::Attr a, FilterList *parent)
 		: attr(a), p(parent) {}
 	~LogicMap();
+	const FilterItemList *findTypeList(CardFilter::Type type) const;
 	FilterItemList *typeList(CardFilter::Type type);
 	virtual FilterListNode *parent() const;
 	virtual FilterListNode *nodeAt(int i) const;
@@ -55,6 +58,7 @@ private:
 	LogicMap *const p;
 public:
 	const CardFilter::Type type;
+
 	FilterItemList(CardFilter::Type t, LogicMap *parent)
 		: type(t), p(parent) {}
 	~FilterItemList();
@@ -90,6 +94,7 @@ class FilterList : public QObject, public FilterListNode {
 signals:
 	void preInsertRow(const FilterListNode *parent, int i) const;
 	void postInsertRow(const FilterListNode *parent, int i) const;
+	void changed() const;
 
 private:
 	QList<LogicMap *> logicAttrs;
@@ -98,6 +103,24 @@ private:
 	FilterItemList *attrTypeList(CardFilter::Attr attr,
 									CardFilter::Type type);
 
+	bool acceptName(const CardInfo *info, const QString &term) const;
+	bool acceptType(const CardInfo *info, const QString &term) const;
+	bool acceptColor(const CardInfo *info, const QString &term) const;
+	bool acceptCardAttr(const CardInfo *info, const QString &term,
+						CardFilter::Attr attr) const;
+	bool acceptText(const CardInfo *info, const QString &term) const;
+	bool acceptSet(const CardInfo *info, const QString &term) const;
+	bool acceptManaCost(const CardInfo *info, const QString &term) const;
+
+	bool testTypeAnd(const CardInfo *info, CardFilter::Attr attr,
+					const FilterItemList *fil) const;
+	bool testTypeAndNot(const CardInfo *info, CardFilter::Attr attr,
+							const FilterItemList *fil) const;
+	bool testTypeOr(const CardInfo *info, CardFilter::Attr attr,
+						const FilterItemList *filOr,
+						const FilterItemList *filOrNot) const;
+
+	bool testAttr(const CardInfo *info, const LogicMap *lm) const;
 public:
 	~FilterList();
 	int indexOf(const LogicMap *val) const { return logicAttrs.indexOf((LogicMap *) val); }
@@ -117,7 +140,10 @@ public:
 	virtual QString text() const { return QString("root"); }
 	virtual int index() const { return 0; }
 	void preInsertChild(const FilterListNode *p, int i) const { emit preInsertRow(p, i); }
-	void postInsertChild(const FilterListNode *p, int i) const { emit postInsertRow(p, i); }
+	void postInsertChild(const FilterListNode *p, int i) const { emit postInsertRow(p, i); emit changed(); }
+	void emitChanged() const { emit changed(); }
+
+	bool acceptsCard(const CardInfo *info) const;
 };
 
 #endif

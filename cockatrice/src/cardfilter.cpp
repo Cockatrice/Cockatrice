@@ -25,6 +25,12 @@ const char *CardFilter::attrName(Attr a)
 			return "type";
 		case AttrColor:
 			return "color";
+		case AttrText:
+			return "text";
+		case AttrSet:
+			return "set";
+		case AttrManaCost:
+			return "mana cost";
 		default:
 			return "";
 	}
