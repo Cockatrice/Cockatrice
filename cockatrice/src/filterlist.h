@@ -15,45 +15,71 @@ private:
 public:
 	FilterListNode() : enabled(true) {}
 	virtual bool isEnabled() const { return enabled; }
-	virtual void enable() { enabled = true; }
-	virtual void disable() { enabled = false; }
+	virtual void enable() { enabled = true; nodeChanged(); }
+	virtual void disable() { enabled = false; nodeChanged(); }
 	virtual FilterListNode *parent() const { return NULL; }
 	virtual FilterListNode *nodeAt(int i) const { return NULL; }
 	virtual void deleteAt(int i) {}
 	virtual int childCount() const { return 0; }
-	virtual int index() const { return -1; }
+	virtual int childIndex(const FilterListNode *node) const { return -1; }
+	virtual int index() const { return (parent() != NULL)? parent()->childIndex(this) : -1; }
 	virtual QString text() const { return ""; }
 	virtual bool isLeaf() const { return false; }
 	virtual const char *textCStr() const { return text().toStdString().c_str(); }
+	virtual void nodeChanged() const { 
+		printf("%s -> ", textCStr());
+		if (parent() != NULL) parent()->nodeChanged();
+	}
+	virtual	void preInsertChild(const FilterListNode *p, int i) const {
+		//printf("%s -> ", textCStr());
+		if (parent() != NULL) parent()->preInsertChild(p, i);
+	}
+	virtual	void postInsertChild(const FilterListNode *p, int i) const {
+		//printf("%s -> ", textCStr());
+		if (parent() != NULL) parent()->postInsertChild(p, i);
+	}
+	virtual	void preRemoveChild(const FilterListNode *p, int i) const {
+		printf("%s -> ", textCStr());
+		if (parent() != NULL) parent()->preRemoveChild(p, i);
+	}
+	virtual	void postRemoveChild(const FilterListNode *p, int i) const {
+		printf("%s -> ", textCStr());
+		if (parent() != NULL) parent()->postRemoveChild(p, i);
+	}
+};
+
+template <class T>
+class FilterListInnerNode : public FilterListNode {
+protected:
+	QList<T> childNodes;
+public:
+	~FilterListInnerNode();
+	FilterListNode *nodeAt(int i) const;
+	void deleteAt(int i);
+	int childCount() const { return childNodes.size(); }
+	int childIndex(const FilterListNode *node) const;
 };
 
 class FilterItemList;
 class FilterList;
-class LogicMap 
-	: public QList<FilterItemList *>
-	, public FilterListNode {
+class LogicMap : public FilterListInnerNode<FilterItemList *> {
+
 private:
 	FilterList *const p;
+
 public:
 	const CardFilter::Attr attr;
 
 	LogicMap(CardFilter::Attr a, FilterList *parent)
 		: attr(a), p(parent) {}
-	~LogicMap();
 	const FilterItemList *findTypeList(CardFilter::Type type) const;
 	FilterItemList *typeList(CardFilter::Type type);
-	virtual FilterListNode *parent() const;
-	virtual FilterListNode *nodeAt(int i) const;
-	virtual void deleteAt(int i);
-	virtual int childCount() const { return size(); }
-	virtual int index() const;
-	virtual QString text() const { return QString(CardFilter::attrName(attr)); }
+	FilterListNode *parent() const;
+	QString text() const { return QString(CardFilter::attrName(attr)); }
 };
 
 class FilterItem;
-class FilterItemList 
-	: public QList<FilterItem *> 
-	, public FilterListNode {
+class FilterItemList : public FilterListInnerNode<FilterItem *> {
 private:
 	LogicMap *const p;
 public:
@@ -61,14 +87,16 @@ public:
 
 	FilterItemList(CardFilter::Type t, LogicMap *parent)
 		: type(t), p(parent) {}
-	~FilterItemList();
 	CardFilter::Attr attr() const { return p->attr; }
-	virtual FilterListNode *parent() const { return p; }
-	virtual FilterListNode *nodeAt(int i) const;
-	virtual void deleteAt(int i);
-	virtual int childCount() const { return size(); }
-	virtual int index() const { return p->indexOf((FilterItemList *) this); }
-	virtual QString text() const { return QString(CardFilter::typeName(type)); }
+	FilterListNode *parent() const { return p; }
+	int termIndex(const QString &term) const;
+	FilterListNode *termNode(const QString &term);
+	QString text() const { return QString(CardFilter::typeName(type)); }
+
+	bool testTypeAnd(const CardInfo *info, CardFilter::Attr attr) const;
+	bool testTypeAndNot(const CardInfo *info, CardFilter::Attr attr) const;
+	bool testTypeOr(const CardInfo *info, CardFilter::Attr attr) const;
+	bool testTypeOrNot(const CardInfo *info, CardFilter::Attr attr) const;
 };
 
 class FilterItem : public FilterListNode {
@@ -82,48 +110,38 @@ public:
 
 	CardFilter::Attr attr() const { return p->attr(); }
 	CardFilter::Type type() const { return p->type; }
-	virtual FilterListNode *parent() const { return p; }
-	virtual int index() const { return p->indexOf((FilterItem *)this); }
-	virtual QString text() const { return term; }
-	virtual bool isLeaf() const { return true; }
+	FilterListNode *parent() const { return p; }
+	QString text() const { return term; }
+	bool isLeaf() const { return true; }
+
+	bool acceptName(const CardInfo *info) const;
+	bool acceptType(const CardInfo *info) const;
+	bool acceptColor(const CardInfo *info) const;
+	bool acceptText(const CardInfo *info) const;
+	bool acceptSet(const CardInfo *info) const;
+	bool acceptManaCost(const CardInfo *info) const;
+	bool acceptCardAttr(const CardInfo *info, CardFilter::Attr attr) const;
 };
 
-class FilterList : public QObject, public FilterListNode {
+class FilterList : public QObject, public FilterListInnerNode<LogicMap *> {
 	Q_OBJECT
 
 signals:
 	void preInsertRow(const FilterListNode *parent, int i) const;
 	void postInsertRow(const FilterListNode *parent, int i) const;
+	void preRemoveRow(const FilterListNode *parent, int i) const;
+	void postRemoveRow(const FilterListNode *parent, int i) const;
 	void changed() const;
 
 private:
-	QList<LogicMap *> logicAttrs;
-
 	LogicMap *attrLogicMap(CardFilter::Attr attr);
 	FilterItemList *attrTypeList(CardFilter::Attr attr,
 									CardFilter::Type type);
 
-	bool acceptName(const CardInfo *info, const QString &term) const;
-	bool acceptType(const CardInfo *info, const QString &term) const;
-	bool acceptColor(const CardInfo *info, const QString &term) const;
-	bool acceptCardAttr(const CardInfo *info, const QString &term,
-						CardFilter::Attr attr) const;
-	bool acceptText(const CardInfo *info, const QString &term) const;
-	bool acceptSet(const CardInfo *info, const QString &term) const;
-	bool acceptManaCost(const CardInfo *info, const QString &term) const;
-
-	bool testTypeAnd(const CardInfo *info, CardFilter::Attr attr,
-					const FilterItemList *fil) const;
-	bool testTypeAndNot(const CardInfo *info, CardFilter::Attr attr,
-							const FilterItemList *fil) const;
-	bool testTypeOr(const CardInfo *info, CardFilter::Attr attr,
-						const FilterItemList *filOr,
-						const FilterItemList *filOrNot) const;
-
 	bool testAttr(const CardInfo *info, const LogicMap *lm) const;
 public:
+	FilterList();
 	~FilterList();
-	int indexOf(const LogicMap *val) const { return logicAttrs.indexOf((LogicMap *) val); }
 	int findTermIndex(CardFilter::Attr attr, CardFilter::Type type,
 						const QString &term);
 	int findTermIndex(const CardFilter *f);
@@ -132,16 +150,14 @@ public:
 	FilterListNode *termNode(const CardFilter *f);
 	FilterListNode *attrTypeNode(CardFilter::Attr attr,
 								CardFilter::Type type);
-	int count(CardFilter::Attr attr, CardFilter::Type type);
-	int count(const CardFilter *f);
-	virtual FilterListNode *nodeAt(int i) const { return ((logicAttrs.size() > i)? logicAttrs.at(i) : NULL); }
-	virtual void deleteAt(int i) { delete logicAttrs.takeAt(i); }
-	virtual int childCount() const { return logicAttrs.size(); }
-	virtual QString text() const { return QString("root"); }
-	virtual int index() const { return 0; }
+	QString text() const { return QString("root"); }
+	int index() const { return 0; }
+
+	void nodeChanged() const { printf("root\n"); emit changed(); }
 	void preInsertChild(const FilterListNode *p, int i) const { emit preInsertRow(p, i); }
-	void postInsertChild(const FilterListNode *p, int i) const { emit postInsertRow(p, i); emit changed(); }
-	void emitChanged() const { emit changed(); }
+	void postInsertChild(const FilterListNode *p, int i) const { emit postInsertRow(p, i); }
+	void preRemoveChild(const FilterListNode *p, int i) const { printf("root\n"); emit preRemoveRow(p, i); }
+	void postRemoveChild(const FilterListNode *p, int i) const { printf("root\n"); emit postRemoveRow(p, i); }
 
 	bool acceptsCard(const CardInfo *info) const;
 };

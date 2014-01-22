@@ -13,6 +13,12 @@ FilterListModel::FilterListModel(QObject *parent)
 	connect(fList,
 			SIGNAL(postInsertRow(const FilterListNode *, int)),
 			this, SLOT(proxyEndInsertRow(const FilterListNode *, int)));
+	connect(fList,
+			SIGNAL(preRemoveRow(const FilterListNode *, int)),
+			this, SLOT(proxyBeginRemoveRow(const FilterListNode *, int)));
+	connect(fList,
+			SIGNAL(postRemoveRow(const FilterListNode *, int)),
+			this, SLOT(proxyEndRemoveRow(const FilterListNode *, int)));
 }
 
 FilterListModel::~FilterListModel()
@@ -36,6 +42,24 @@ void FilterListModel::proxyEndInsertRow(const FilterListNode *node, int)
 	idx = node->index();
 	if(idx >= 0)
 		endInsertRows();
+}
+
+void FilterListModel::proxyBeginRemoveRow(const FilterListNode *node, int i) 
+{
+	int idx;
+
+	idx = node->index();
+	if(idx >= 0)
+		beginRemoveRows(createIndex(idx, 0, (void *) node), i, i);
+}
+
+void FilterListModel::proxyEndRemoveRow(const FilterListNode *node, int)
+{
+	int idx;
+
+	idx = node->index();
+	if(idx >= 0)
+		endRemoveRows();
 }
 
 FilterListNode *FilterListModel::indexToNode(const QModelIndex &idx) const
@@ -235,11 +259,13 @@ bool FilterListModel::removeRows(int row, int count, const QModelIndex & parent)
 	if(node == NULL || last >= node->childCount())
 		return false;
 
-	beginRemoveRows(parent, row, last);
-	for(i = 0; i < count; i++)
+	printf("delete children in %s\n", node->textCStr());
+	fflush(stdout);
+	for(i = 0; i < count; i++) {
+		printf("  delete %d\n", i);
+		fflush(stdout);
 		node->deleteAt(row);
-	endRemoveRows();
-	fList->emitChanged();
+	}
 
 	if(node != fList && node->childCount() < 1)
 		return removeRow(parent.row(), parent.parent());

@@ -17,7 +17,9 @@ public slots:
 
 private slots:
 	void proxyBeginInsertRow(const FilterListNode *, int);
-	void proxyEndInsertRow(const FilterListNode *node, int i);
+	void proxyEndInsertRow(const FilterListNode *, int);
+	void proxyBeginRemoveRow(const FilterListNode *, int);
+	void proxyEndRemoveRow(const FilterListNode *, int);
 
 private:
 	FilterListNode *indexToNode(const QModelIndex &idx) const;
