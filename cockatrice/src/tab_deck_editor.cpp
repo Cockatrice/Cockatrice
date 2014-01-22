@@ -42,12 +42,11 @@
 #include <QDesktopWidget>
 #include "cardframe.h"
 #include "filterbuilder.h"
-#include "carditem.h"
-#include "carddatabase.h"
+//#include "carditem.h"
+//#include "carddatabase.h"
 #include "main.h"
 #include "settingscache.h"
-#include "filterlistmodel.h"
-#include "filterlist.h"
+#include "filtertreemodel.h"
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
@@ -169,8 +168,8 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	searchAndButtons->addLayout(searchLayout, 0, 1);
 	botFrame->addLayout(searchAndButtons);
 
-	filterModel = new FilterListModel();
-	databaseDisplayModel->setFilterList(filterModel->filterList());
+	filterModel = new FilterTreeModel();
+	databaseDisplayModel->setFilterTree(filterModel->filterTree());
 	filterView = new QTreeView;
 	filterView->setModel(filterModel);
 	filterView->setMaximumWidth(250);
@@ -663,7 +662,7 @@ void TabDeckEditor::filterViewCustomContextMenu(const QPoint &point) {
 	QModelIndex idx;
 
 	idx = filterView->indexAt(point);
-	if(!idx.isValid())
+	if (!idx.isValid())
 		return;
 
 	action = menu.addAction(QString("delete"));
@@ -679,7 +678,7 @@ void TabDeckEditor::filterRemove(QAction *action) {
 
 	point = action->data().toPoint();
 	idx = filterView->indexAt(point);
-	if(!idx.isValid())
+	if (!idx.isValid())
 		return;
 
 	filterModel->removeRow(idx.row(), idx.parent());

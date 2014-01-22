@@ -16,12 +16,12 @@ FilterBuilder::FilterBuilder(QWidget *parent)
 	QHBoxLayout *addFilter = new QHBoxLayout;
 
 	filterCombo = new QComboBox;
-	for(i = 0; i < CardFilter::AttrEnd; i++)
+	for (i = 0; i < CardFilter::AttrEnd; i++)
 		filterCombo->addItem(
 			CardFilter::attrName(static_cast<CardFilter::Attr>(i)), QVariant(i));
 
 	typeCombo = new QComboBox;
-	for(i = 0; i < CardFilter::TypeEnd; i++)
+	for (i = 0; i < CardFilter::TypeEnd; i++)
 		typeCombo->addItem(
 			CardFilter::typeName(static_cast<CardFilter::Type>(i)), QVariant(i));
 
@@ -52,7 +52,7 @@ FilterBuilder::~FilterBuilder()
 
 void FilterBuilder::destroyFilter()
 {
-	if(fltr)
+	if (fltr)
 		delete fltr;
 }
 
@@ -66,7 +66,7 @@ void FilterBuilder::add_released()
 	QString txt;
 
 	txt = edit->text();
-	if(txt.length() < 1)
+	if (txt.length() < 1)
 		return;
 
 	destroyFilter();
@@ -74,10 +74,4 @@ void FilterBuilder::add_released()
 					static_cast<CardFilter::Type>(comboCurrentIntData(typeCombo)),
 					static_cast<CardFilter::Attr>(comboCurrentIntData(filterCombo)));
 	emit add(fltr);
-}
-
-bool FilterBuilder::filter(const CardFilter *f) const
-{
-	f = fltr;
-	return false;
 }

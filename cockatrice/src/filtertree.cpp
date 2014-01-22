@@ -1,17 +1,17 @@
-#include "filterlist.h"
+#include "filtertree.h"
 #include "cardfilter.h"
 #include "carddatabase.h"
 
 #include <QList>
 
 template <class T>
-FilterListNode *FilterListInnerNode<T>::nodeAt(int i) const
+FilterTreeNode *FilterTreeBranch<T>::nodeAt(int i) const
 {
 	return ((childNodes.size() > i)? childNodes.at(i) : NULL);
 }
 
 template <class T>
-void FilterListInnerNode<T>::deleteAt(int i)
+void FilterTreeBranch<T>::deleteAt(int i)
 {
 	preRemoveChild(this, i);
 	delete childNodes.takeAt(i);
@@ -20,24 +20,24 @@ void FilterListInnerNode<T>::deleteAt(int i)
 }
 
 template <class T>
-int FilterListInnerNode<T>::childIndex(const FilterListNode *node) const
+int FilterTreeBranch<T>::childIndex(const FilterTreeNode *node) const
 {
-	FilterListNode *unconst;
+	FilterTreeNode *unconst;
 	T downcasted;
 
 	/* to do the dynamic cast to T we will lose const'ness, but we can
 	 * trust QList::indexOf */
-	unconst = (FilterListNode *) node;
+	unconst = (FilterTreeNode *) node;
 	downcasted = dynamic_cast<T>(unconst);
-	if(downcasted == NULL)
+	if (downcasted == NULL)
 		return -1;
 	return childNodes.indexOf(downcasted);
 }
 
 template <class T>
-FilterListInnerNode<T>::~FilterListInnerNode()
+FilterTreeBranch<T>::~FilterTreeBranch()
 {
-	while(!childNodes.isEmpty())
+	while (!childNodes.isEmpty())
 		delete childNodes.takeFirst();
 }
 
@@ -45,7 +45,7 @@ const FilterItemList *LogicMap::findTypeList(CardFilter::Type type) const
 {
 	QList<FilterItemList *>::const_iterator i;
 
-	for(i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
+	for (i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
 		if ((*i)->type == type)
 			return *i;
 
@@ -58,7 +58,7 @@ FilterItemList *LogicMap::typeList(CardFilter::Type type)
 	int count;
 
 	count = 0;
-	for(i = childNodes.begin(); i != childNodes.end(); i++) {
+	for (i = childNodes.begin(); i != childNodes.end(); i++) {
 		if ((*i)->type == type)
 			break;
 		count++;
@@ -73,7 +73,7 @@ FilterItemList *LogicMap::typeList(CardFilter::Type type)
 	return *i;
 }
 
-FilterListNode *LogicMap::parent() const
+FilterTreeNode *LogicMap::parent() const
 {
 	return p;
 }
@@ -82,20 +82,20 @@ int FilterItemList::termIndex(const QString &term) const
 {
 	int i;
 
-	for(i = 0; i < childNodes.count(); i++)
-		if((childNodes.at(i))->term == term)
+	for (i = 0; i < childNodes.count(); i++)
+		if ((childNodes.at(i))->term == term)
 			return i;
 
 	return -1;
 }
 
-FilterListNode *FilterItemList::termNode(const QString &term)
+FilterTreeNode *FilterItemList::termNode(const QString &term)
 {
 	int i, count;
 	FilterItem *fi;
 
 	i = termIndex(term);
-	if(i < 0) {
+	if (i < 0) {
 		fi = new FilterItem(term, this);
 		count = childNodes.count();
 		preInsertChild(this, count);
@@ -112,7 +112,7 @@ bool FilterItemList::testTypeAnd(const CardInfo *info, CardFilter::Attr attr) co
 {
 	QList<FilterItem *>::const_iterator i;
 
-	for(i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
+	for (i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
 		if (!(*i)->acceptCardAttr(info, attr))
 			return false;
 
@@ -129,7 +129,7 @@ bool FilterItemList::testTypeOr(const CardInfo *info, CardFilter::Attr attr) con
 {
 	QList<FilterItem *>::const_iterator i;
 
-	for(i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
+	for (i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
 		if ((*i)->acceptCardAttr(info, attr))
 			return true;
 
@@ -158,7 +158,7 @@ bool FilterItem::acceptColor(const CardInfo *info) const
 	bool status;
 
 	status = false;
-	for(i = info->getColors().constBegin(); i != info->getColors().constEnd(); i++)
+	for (i = info->getColors().constBegin(); i != info->getColors().constEnd(); i++)
 		if ((*i).contains(term, Qt::CaseInsensitive)) {
 			status = true;
 			break;
@@ -178,7 +178,7 @@ bool FilterItem::acceptSet(const CardInfo *info) const
 	bool status;
 
 	status = false;
-	for(i = info->getSets().constBegin(); i != info->getSets().constEnd(); i++)
+	for (i = info->getSets().constBegin(); i != info->getSets().constEnd(); i++)
 		if ((*i)->getShortName() == term
 				|| (*i)->getLongName().contains(term, Qt::CaseInsensitive)) {
 			status = true;
@@ -197,10 +197,10 @@ bool FilterItem::acceptCardAttr(const CardInfo *info, CardFilter::Attr attr) con
 {
 	bool status;
 
-	if(!isEnabled())
+	if (!isEnabled())
 		return true;
 
-	switch(attr) {
+	switch (attr) {
 		case CardFilter::AttrName:
 			status = acceptName(info);
 			break;
@@ -227,24 +227,24 @@ bool FilterItem::acceptCardAttr(const CardInfo *info, CardFilter::Attr attr) con
 }
 
 /* need to define these here to make QT happy, otherwise
- * moc doesnt find some of the FilterListInnerNode symbols.
+ * moc doesnt find some of the FilterTreeBranch symbols.
  */
-FilterList::FilterList() {}
-FilterList::~FilterList() {}
+FilterTree::FilterTree() {}
+FilterTree::~FilterTree() {}
 
-LogicMap *FilterList::attrLogicMap(CardFilter::Attr attr)
+LogicMap *FilterTree::attrLogicMap(CardFilter::Attr attr)
 {
 	QList<LogicMap *>::iterator i;
 	int count;
 
 	count = 0;
-	for(i = childNodes.begin(); i != childNodes.end(); i++) {
-		if((*i)->attr == attr)
+	for (i = childNodes.begin(); i != childNodes.end(); i++) {
+		if ((*i)->attr == attr)
 			break;
 		count++;
 	}
 
-	if(i == childNodes.end()) {
+	if (i == childNodes.end()) {
 		preInsertChild(this, count);
 		i = childNodes.insert(i, new LogicMap(attr, this));
 		postInsertChild(this, count);
@@ -254,41 +254,41 @@ LogicMap *FilterList::attrLogicMap(CardFilter::Attr attr)
 	return *i;
 }
 
-FilterItemList *FilterList::attrTypeList(CardFilter::Attr attr,
+FilterItemList *FilterTree::attrTypeList(CardFilter::Attr attr,
 											CardFilter::Type type)
 {
 	return attrLogicMap(attr)->typeList(type);
 }
 
-int FilterList::findTermIndex(CardFilter::Attr attr, CardFilter::Type type,
+int FilterTree::findTermIndex(CardFilter::Attr attr, CardFilter::Type type,
 								const QString &term)
 {
 	attrTypeList(attr, type)->termIndex(term);
 }
 
-int FilterList::findTermIndex(const CardFilter *f)
+int FilterTree::findTermIndex(const CardFilter *f)
 {
 	return findTermIndex(f->attr(), f->type(), f->term());
 }
 
-FilterListNode *FilterList::termNode(CardFilter::Attr attr, CardFilter::Type type,
+FilterTreeNode *FilterTree::termNode(CardFilter::Attr attr, CardFilter::Type type,
 					const QString &term)
 {
 	return attrTypeList(attr, type)->termNode(term);
 }
 
-FilterListNode *FilterList::termNode(const CardFilter *f)
+FilterTreeNode *FilterTree::termNode(const CardFilter *f)
 {
 	return termNode(f->attr(), f->type(), f->term());
 }
 
-FilterListNode *FilterList::attrTypeNode(CardFilter::Attr attr,
+FilterTreeNode *FilterTree::attrTypeNode(CardFilter::Attr attr,
 								CardFilter::Type type)
 {
 	return attrTypeList(attr, type);
 }
 
-bool FilterList::testAttr(const CardInfo *info, const LogicMap *lm) const
+bool FilterTree::testAttr(const CardInfo *info, const LogicMap *lm) const
 {
 	const FilterItemList *fil;
 	bool status;
@@ -318,11 +318,11 @@ bool FilterList::testAttr(const CardInfo *info, const LogicMap *lm) const
 	return status;
 }
 
-bool FilterList::acceptsCard(const CardInfo *info) const
+bool FilterTree::acceptsCard(const CardInfo *info) const
 {
 	QList<LogicMap *>::const_iterator i;
 
-	for(i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
+	for (i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
 		if ((*i)->isEnabled() && !testAttr(info, *i))
 			return false;
 

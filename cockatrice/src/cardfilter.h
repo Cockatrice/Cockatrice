@@ -11,7 +11,7 @@ public:
 		TypeAndNot,
 		TypeOrNot,
 		TypeEnd
-    };
+	};
 
 	/* if you add an atribute here you also need to
 	 * add its string representation in attrName */

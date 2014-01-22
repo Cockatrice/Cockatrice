@@ -16,7 +16,7 @@ class DlgCardSearch;
 class QLabel;
 class DeckLoader;
 class Response;
-class FilterListModel;
+class FilterTreeModel;
 
 class SearchLineEdit : public QLineEdit {
 	private:
@@ -84,7 +84,7 @@ private:
 	QLabel *hashLabel1;
 	QLabel *hashLabel;
 	DlgCardSearch *dlgCardSearch;
-	FilterListModel *filterModel;
+	FilterTreeModel *filterModel;
 	QTreeView *filterView;
 
 	QMenu *deckMenu, *dbMenu;

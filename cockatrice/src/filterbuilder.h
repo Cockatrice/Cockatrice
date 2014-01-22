@@ -23,8 +23,6 @@ public:
 	FilterBuilder(QWidget *parent = 0);
 	~FilterBuilder();
 
-	bool filter(const CardFilter *f) const;
-
 signals:
     void add(const CardFilter *f);
 

@@ -1,34 +1,34 @@
-#ifndef FILTERLISTMODEL_H
-#define FILTERLISTMODEL_H
+#ifndef FILTERTREEMODEL_H
+#define FILTERTREEMODEL_H
 
 #include <QAbstractItemModel>
 
-class FilterList;
+class FilterTree;
 class CardFilter;
-class FilterListNode;
+class FilterTreeNode;
 
-class FilterListModel : public QAbstractItemModel {
+class FilterTreeModel : public QAbstractItemModel {
 	Q_OBJECT
 private:
-	FilterList *fList;
+	FilterTree *fTree;
 
 public slots:
 	void addFilter(const CardFilter *f);
 
 private slots:
-	void proxyBeginInsertRow(const FilterListNode *, int);
-	void proxyEndInsertRow(const FilterListNode *, int);
-	void proxyBeginRemoveRow(const FilterListNode *, int);
-	void proxyEndRemoveRow(const FilterListNode *, int);
+	void proxyBeginInsertRow(const FilterTreeNode *, int);
+	void proxyEndInsertRow(const FilterTreeNode *, int);
+	void proxyBeginRemoveRow(const FilterTreeNode *, int);
+	void proxyEndRemoveRow(const FilterTreeNode *, int);
 
 private:
-	FilterListNode *indexToNode(const QModelIndex &idx) const;
-	QModelIndex nodeIndex(const FilterListNode *node, int row, int column) const;
+	FilterTreeNode *indexToNode(const QModelIndex &idx) const;
+	QModelIndex nodeIndex(const FilterTreeNode *node, int row, int column) const;
 
 public:
-	FilterListModel(QObject *parent = 0);
-	~FilterListModel();
-	const FilterList *filterList() const { return fList; }
+	FilterTreeModel(QObject *parent = 0);
+	~FilterTreeModel();
+	const FilterTree *filterTree() const { return fTree; }
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role) const;

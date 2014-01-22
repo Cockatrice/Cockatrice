@@ -36,8 +36,8 @@ SET(cockatrice_SOURCES
  src/cardframe.cpp
  src/filterbuilder.cpp
  src/cardfilter.cpp
- src/filterlistmodel.cpp
- src/filterlist.cpp
+ src/filtertreemodel.cpp
+ src/filtertree.cpp
  src/messagelogwidget.cpp 
  src/zoneviewzone.cpp 
  src/zoneviewwidget.cpp 
@@ -118,8 +118,8 @@ SET(cockatrice_HEADERS
  src/cardframe.h
  src/filterbuilder.h
  src/cardfilter.h
- src/filterlistmodel.h
- src/filterlist.h
+ src/filtertreemodel.h
+ src/filtertree.h
  src/messagelogwidget.h 
  src/zoneviewzone.h 
  src/zoneviewwidget.h 

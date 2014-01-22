@@ -1,100 +1,100 @@
 #include <QFont>
-#include "filterlistmodel.h"
-#include "filterlist.h"
+#include "filtertreemodel.h"
+#include "filtertree.h"
 #include "cardfilter.h"
 
-FilterListModel::FilterListModel(QObject *parent)
+FilterTreeModel::FilterTreeModel(QObject *parent)
 	: QAbstractItemModel(parent)
 {
-	fList = new FilterList;
-	connect(fList,
-			SIGNAL(preInsertRow(const FilterListNode *, int)),
-			this, SLOT(proxyBeginInsertRow(const FilterListNode *, int)));
-	connect(fList,
-			SIGNAL(postInsertRow(const FilterListNode *, int)),
-			this, SLOT(proxyEndInsertRow(const FilterListNode *, int)));
-	connect(fList,
-			SIGNAL(preRemoveRow(const FilterListNode *, int)),
-			this, SLOT(proxyBeginRemoveRow(const FilterListNode *, int)));
-	connect(fList,
-			SIGNAL(postRemoveRow(const FilterListNode *, int)),
-			this, SLOT(proxyEndRemoveRow(const FilterListNode *, int)));
+	fTree = new FilterTree;
+	connect(fTree,
+			SIGNAL(preInsertRow(const FilterTreeNode *, int)),
+			this, SLOT(proxyBeginInsertRow(const FilterTreeNode *, int)));
+	connect(fTree,
+			SIGNAL(postInsertRow(const FilterTreeNode *, int)),
+			this, SLOT(proxyEndInsertRow(const FilterTreeNode *, int)));
+	connect(fTree,
+			SIGNAL(preRemoveRow(const FilterTreeNode *, int)),
+			this, SLOT(proxyBeginRemoveRow(const FilterTreeNode *, int)));
+	connect(fTree,
+			SIGNAL(postRemoveRow(const FilterTreeNode *, int)),
+			this, SLOT(proxyEndRemoveRow(const FilterTreeNode *, int)));
 }
 
-FilterListModel::~FilterListModel()
+FilterTreeModel::~FilterTreeModel()
 {
-	delete fList;
+	delete fTree;
 }
 
-void FilterListModel::proxyBeginInsertRow(const FilterListNode *node, int i) 
+void FilterTreeModel::proxyBeginInsertRow(const FilterTreeNode *node, int i) 
 {
 	int idx;
 
 	idx = node->index();
-	if(idx >= 0)
+	if (idx >= 0)
 		beginInsertRows(createIndex(idx, 0, (void *) node), i, i);
 }
 
-void FilterListModel::proxyEndInsertRow(const FilterListNode *node, int)
+void FilterTreeModel::proxyEndInsertRow(const FilterTreeNode *node, int)
 {
 	int idx;
 
 	idx = node->index();
-	if(idx >= 0)
+	if (idx >= 0)
 		endInsertRows();
 }
 
-void FilterListModel::proxyBeginRemoveRow(const FilterListNode *node, int i) 
+void FilterTreeModel::proxyBeginRemoveRow(const FilterTreeNode *node, int i) 
 {
 	int idx;
 
 	idx = node->index();
-	if(idx >= 0)
+	if (idx >= 0)
 		beginRemoveRows(createIndex(idx, 0, (void *) node), i, i);
 }
 
-void FilterListModel::proxyEndRemoveRow(const FilterListNode *node, int)
+void FilterTreeModel::proxyEndRemoveRow(const FilterTreeNode *node, int)
 {
 	int idx;
 
 	idx = node->index();
-	if(idx >= 0)
+	if (idx >= 0)
 		endRemoveRows();
 }
 
-FilterListNode *FilterListModel::indexToNode(const QModelIndex &idx) const
+FilterTreeNode *FilterTreeModel::indexToNode(const QModelIndex &idx) const
 {
 	void *ip;
-	FilterListNode *node;
+	FilterTreeNode *node;
 
-	if(!idx.isValid())
-		return fList;
+	if (!idx.isValid())
+		return fTree;
 
 	ip = idx.internalPointer();
-	if(ip == NULL)
-		return fList;
+	if (ip == NULL)
+		return fTree;
 
-	node = static_cast<FilterListNode *>(ip);
+	node = static_cast<FilterTreeNode *>(ip);
 	return node;
 }
 
-void FilterListModel::addFilter(const CardFilter *f)
+void FilterTreeModel::addFilter(const CardFilter *f)
 {
 	emit layoutAboutToBeChanged();
-	fList->termNode(f);
+	fTree->termNode(f);
 	emit layoutChanged();
 }
 
-int FilterListModel::rowCount(const QModelIndex &parent) const
+int FilterTreeModel::rowCount(const QModelIndex &parent) const
 {
-	const FilterListNode *node;
+	const FilterTreeNode *node;
 	int result;
 
-	if(parent.column() > 0)
+	if (parent.column() > 0)
 		return 0;
 
 	node = indexToNode(parent);
-	if(node)
+	if (node)
 		result = node->childCount();
 	else
 		result = 0;
@@ -102,14 +102,14 @@ int FilterListModel::rowCount(const QModelIndex &parent) const
 	return result;
 }
 
-int FilterListModel::columnCount(const QModelIndex &/*parent*/) const
+int FilterTreeModel::columnCount(const QModelIndex &/*parent*/) const
 {
 	return 1;
 }
 
-QVariant FilterListModel::data(const QModelIndex &index, int role) const
+QVariant FilterTreeModel::data(const QModelIndex &index, int role) const
 {
-	const FilterListNode *node;
+	const FilterTreeNode *node;
 
 	if (!index.isValid())
 		return QVariant();
@@ -117,12 +117,12 @@ QVariant FilterListModel::data(const QModelIndex &index, int role) const
 		return QVariant();
 
 	node = indexToNode(index);
-	if(node == NULL)
+	if (node == NULL)
 		return QVariant();
 
 	switch (role) {
 		case Qt::FontRole:
-			if(!node->isLeaf()) {
+			if (!node->isLeaf()) {
 				QFont f;
 				f.setBold(true);
 				return f;
@@ -135,7 +135,7 @@ QVariant FilterListModel::data(const QModelIndex &index, int role) const
 		case Qt::WhatsThisRole:
 			return node->text();
 		case Qt::CheckStateRole:
-			if(node->isEnabled())
+			if (node->isEnabled())
 				return Qt::Checked;
 			else
 				return Qt::Unchecked;
@@ -146,10 +146,10 @@ QVariant FilterListModel::data(const QModelIndex &index, int role) const
 	return QVariant();
 }
 
-bool FilterListModel::setData(const QModelIndex &index,
+bool FilterTreeModel::setData(const QModelIndex &index,
 								const QVariant &value, int role)
 {
-	FilterListNode *node;
+	FilterTreeNode *node;
 
 	if (!index.isValid())
 		return false;
@@ -159,33 +159,33 @@ bool FilterListModel::setData(const QModelIndex &index,
 		return false;
 
 	node = indexToNode(index);
-	if(node == NULL || node == fList)
+	if (node == NULL || node == fTree)
 		return false;
 
 	Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
-	if(state == Qt::Checked)
+	if (state == Qt::Checked)
 		node->enable();
-    else
+	else
 		node->disable();
 
 	emit dataChanged(index, index);
-    return true;
+	return true;
 }	
 
-Qt::ItemFlags FilterListModel::flags(const QModelIndex &index) const
+Qt::ItemFlags FilterTreeModel::flags(const QModelIndex &index) const
 {
-	const FilterListNode *node;
+	const FilterTreeNode *node;
 	Qt::ItemFlags result;
 
 	if (!index.isValid())
 		return 0;
 
 	node = indexToNode(index);
-	if(node == NULL)
+	if (node == NULL)
 		return 0;
 
 	result = Qt::ItemIsEnabled;
-	if(node == fList)
+	if (node == fTree)
 		return result;
 
 	result |= Qt::ItemIsSelectable;
@@ -194,9 +194,9 @@ Qt::ItemFlags FilterListModel::flags(const QModelIndex &index) const
 	return result;
 }
 
-QModelIndex FilterListModel::nodeIndex(const FilterListNode *node, int row, int column) const
+QModelIndex FilterTreeModel::nodeIndex(const FilterTreeNode *node, int row, int column) const
 {
-	FilterListNode *child;
+	FilterTreeNode *child;
 
 	if (column > 0 || row >= node->childCount())
 		return QModelIndex();
@@ -205,25 +205,25 @@ QModelIndex FilterListModel::nodeIndex(const FilterListNode *node, int row, int 
 	return createIndex(row, column, child);
 }
 
-QModelIndex FilterListModel::index(int row, int column, 
+QModelIndex FilterTreeModel::index(int row, int column, 
 					const QModelIndex &parent) const
 {
-	const FilterListNode *node;
+	const FilterTreeNode *node;
 
 	if (!hasIndex(row, column, parent))
 		return QModelIndex();
 
 	node = indexToNode(parent);
-	if(node == NULL)
+	if (node == NULL)
 		return QModelIndex();
 
 	return nodeIndex(node, row, column);
 }
 
-QModelIndex FilterListModel::parent(const QModelIndex &ind) const
+QModelIndex FilterTreeModel::parent(const QModelIndex &ind) const
 {
-	const FilterListNode *node;
-	FilterListNode *parent;
+	const FilterTreeNode *node;
+	FilterTreeNode *parent;
 	int row;
 	QModelIndex idx;
 
@@ -231,13 +231,13 @@ QModelIndex FilterListModel::parent(const QModelIndex &ind) const
 		return QModelIndex();
 
 	node = indexToNode(ind);
-	if(node == NULL || node == fList)
+	if (node == NULL || node == fTree)
 		return QModelIndex();
 
 	parent = node->parent();
-	if(parent) {
+	if (parent) {
 		row = parent->index();
-		if(row < 0)
+		if (row < 0)
 			return QModelIndex();
 		idx = createIndex(row, 0, parent);
 		return idx;
@@ -246,9 +246,9 @@ QModelIndex FilterListModel::parent(const QModelIndex &ind) const
 	return QModelIndex();
 }
 
-bool FilterListModel::removeRows(int row, int count, const QModelIndex & parent)
+bool FilterTreeModel::removeRows(int row, int count, const QModelIndex & parent)
 {
-	FilterListNode *node;
+	FilterTreeNode *node;
 	int i, last;
 
 	last = row+count-1;
@@ -256,18 +256,18 @@ bool FilterListModel::removeRows(int row, int count, const QModelIndex & parent)
 		return false;
 
 	node = indexToNode(parent);
-	if(node == NULL || last >= node->childCount())
+	if (node == NULL || last >= node->childCount())
 		return false;
 
 	printf("delete children in %s\n", node->textCStr());
 	fflush(stdout);
-	for(i = 0; i < count; i++) {
+	for (i = 0; i < count; i++) {
 		printf("  delete %d\n", i);
 		fflush(stdout);
 		node->deleteAt(row);
 	}
 
-	if(node != fList && node->childCount() < 1)
+	if (node != fTree && node->childCount() < 1)
 		return removeRow(parent.row(), parent.parent());
 
 	return true;
