@@ -5,15 +5,12 @@
 #include "carddatabase.h"
 #include "main.h"
 
-CardFrame::CardFrame(const QString &cardName, QWidget *parent, Qt::WindowFlags flags)
-	: QLabel(parent, flags)
+CardFrame::CardFrame(const QString &cardName, QWidget *parent)
+	: QLabel(parent)
 	, info(0)
 {
-	this->setAlignment(Qt::AlignCenter);
-
 	setFrameStyle(QFrame::Panel | QFrame::Raised);
-	setFixedWidth(250);
-
+	setMaximumWidth(250);
 	setCard(db->getCard(cardName));
 }
 

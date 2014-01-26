@@ -21,7 +21,7 @@
 #include "carddatabase.h"
 #include "carddatabasemodel.h"
 #include "decklistmodel.h"
-#include "dlg_cardsearch.h"
+#include "cardinfowidget.h"
 #include "dlg_load_deck_from_clipboard.h"
 #include "dlg_edit_tokens.h"
 #include "main.h"
@@ -33,20 +33,9 @@
 #include "pending_command.h"
 #include "pb/response.pb.h"
 #include "pb/command_deck_upload.pb.h"
-#include <QGridLayout>
-#include <QLabel>
-#include <QTextEdit>
-#include <QPushButton>
-#include <QStyle>
-#include <QMouseEvent>
-#include <QDesktopWidget>
+#include "filtertreemodel.h"
 #include "cardframe.h"
 #include "filterbuilder.h"
-//#include "carditem.h"
-//#include "carddatabase.h"
-#include "main.h"
-#include "settingscache.h"
-#include "filtertreemodel.h"
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
@@ -58,9 +47,6 @@ void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	: Tab(_tabSupervisor, parent), modified(false)
 {
-	aSearch = new QAction(QString(), this);
-	aSearch->setIcon(QIcon(":/resources/icon_search.svg"));
-	connect(aSearch, SIGNAL(triggered()), this, SLOT(actSearch()));
 	aClearSearch = new QAction(QString(), this);
 	aClearSearch->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
 	connect(aClearSearch, SIGNAL(triggered()), this, SLOT(actClearSearch()));
@@ -70,16 +56,15 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	searchLabel->setBuddy(searchEdit);
 	connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(actAddCard()));
-	QToolButton *searchButton = new QToolButton;
-	searchButton->setDefaultAction(aSearch);
-	QToolButton *clearSearchButton = new QToolButton;
-	clearSearchButton->setDefaultAction(aClearSearch);
+
+	QToolBar *deckEditToolBar = new QToolBar;
+	deckEditToolBar->setOrientation(Qt::Horizontal);
+	deckEditToolBar->setIconSize(QSize(24, 24));
 
 	QHBoxLayout *searchLayout = new QHBoxLayout;
+	searchLayout->addWidget(deckEditToolBar);
 	searchLayout->addWidget(searchLabel);
 	searchLayout->addWidget(searchEdit);
-	searchLayout->addWidget(searchButton);
-	searchLayout->addWidget(clearSearchButton);
 
 	databaseModel = new CardDatabaseModel(db, this);
 	databaseDisplayModel = new CardDatabaseDisplayModel(this);
@@ -98,16 +83,33 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
 	searchEdit->setTreeView(databaseView);
 
-	cardInfo = new CardFrame();
-	cardInfo->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+	QVBoxLayout *leftFrame = new QVBoxLayout;
+	leftFrame->addLayout(searchLayout);
+	leftFrame->addWidget(databaseView);
 
-	QToolBar *verticalToolBar = new QToolBar;
-	verticalToolBar->setOrientation(Qt::Horizontal);
-	verticalToolBar->setIconSize(QSize(24, 24));
-	QHBoxLayout *verticalToolBarLayout = new QHBoxLayout;
-	//verticalToolBarLayout->addStretch();
-	verticalToolBarLayout->addWidget(verticalToolBar);
-	//verticalToolBarLayout->addStretch();
+	cardInfo = new CardFrame();
+	filterModel = new FilterTreeModel();
+	databaseDisplayModel->setFilterTree(filterModel->filterTree());
+	filterView = new QTreeView;
+	filterView->setModel(filterModel);
+	filterView->setMaximumWidth(250);
+	filterView->setUniformRowHeights(true);
+	filterView->setHeaderHidden(true);
+	filterView->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(filterModel, SIGNAL(layoutChanged()), filterView, SLOT(expandAll()));
+	connect(filterView, SIGNAL(customContextMenuRequested(const QPoint &)),
+			this, SLOT(filterViewCustomContextMenu(const QPoint &)));
+	FilterBuilder *filterBuilder = new FilterBuilder;
+	filterBuilder->setMaximumWidth(250);
+	connect(filterBuilder, SIGNAL(add(const CardFilter *)), filterModel, SLOT(addFilter(const CardFilter *)));
+
+	QVBoxLayout *filter = new QVBoxLayout;
+	filter->addWidget(filterBuilder, 0, Qt::AlignTop);
+	filter->addWidget(filterView, 10);
+
+	QVBoxLayout *middleFrame = new QVBoxLayout;
+	middleFrame->addWidget(cardInfo, 0, Qt::AlignTop);
+	middleFrame->addLayout(filter, 10);
 
 	deckModel = new DeckListModel(this);
 	connect(deckModel, SIGNAL(deckHashChanged()), this, SLOT(updateHash()));
@@ -133,6 +135,9 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	grid->addWidget(nameLabel, 0, 0);
 	grid->addWidget(nameEdit, 0, 1);
 
+	grid->addWidget(commentsLabel, 1, 0);
+	grid->addWidget(commentsEdit, 1, 1);
+
 	grid->addWidget(hashLabel1, 2, 0);
 	grid->addWidget(hashLabel, 2, 1);
 
@@ -153,49 +158,15 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	deckToolbarLayout->addWidget(deckToolBar);
 	deckToolbarLayout->addStretch();
 	
-	QVBoxLayout *deckFrame = new QVBoxLayout;
-	deckFrame->addLayout(grid);
-	deckFrame->addWidget(deckView, 10);
-	deckFrame->addLayout(deckToolbarLayout);
+	QVBoxLayout *rightFrame = new QVBoxLayout;
+	rightFrame->addLayout(grid);
+	rightFrame->addWidget(deckView, 10);
+	rightFrame->addLayout(deckToolbarLayout);
 
-	QHBoxLayout *topFrame = new QHBoxLayout;
-	topFrame->addWidget(cardInfo, 10);
-	topFrame->addLayout(deckFrame);
-
-	QVBoxLayout *botFrame = new QVBoxLayout;
-	QGridLayout *searchAndButtons = new QGridLayout;
-	searchAndButtons->addLayout(verticalToolBarLayout, 0, 0);
-	searchAndButtons->addLayout(searchLayout, 0, 1);
-	botFrame->addLayout(searchAndButtons);
-
-	filterModel = new FilterTreeModel();
-	databaseDisplayModel->setFilterTree(filterModel->filterTree());
-	filterView = new QTreeView;
-	filterView->setModel(filterModel);
-	filterView->setMaximumWidth(250);
-	filterView->setUniformRowHeights(true);
-	filterView->setHeaderHidden(true);
-	filterView->setExpandsOnDoubleClick(false);
-	filterView->setContextMenuPolicy(Qt::CustomContextMenu);
-	connect(filterModel, SIGNAL(layoutChanged()), filterView, SLOT(expandAll()));
-	connect(filterView, SIGNAL(customContextMenuRequested(const QPoint &)),
-			this, SLOT(filterViewCustomContextMenu(const QPoint &)));
-	FilterBuilder *filterBuilder = new FilterBuilder;
-	filterBuilder->setMaximumWidth(250);
-	connect(filterBuilder, SIGNAL(add(const CardFilter *)), filterModel, SLOT(addFilter(const CardFilter *)));
-
-	QVBoxLayout *filter = new QVBoxLayout;
-	filter->addWidget(filterBuilder, 0, Qt::AlignTop);
-	filter->addWidget(filterView);
-
-	QHBoxLayout *dbFrame = new QHBoxLayout;
-	dbFrame->addLayout(filter);
-	dbFrame->addWidget(databaseView);
-	botFrame->addLayout(dbFrame);
-
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addLayout(topFrame, 10);
-	mainLayout->addLayout(botFrame, 10);
+	QHBoxLayout *mainLayout = new QHBoxLayout;
+	mainLayout->addLayout(leftFrame, 10);
+	mainLayout->addLayout(middleFrame);
+	mainLayout->addLayout(rightFrame);
 	setLayout(mainLayout);
 	
 	aNewDeck = new QAction(QString(), this);
@@ -249,7 +220,6 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	dbMenu->addAction(aEditSets);
 	dbMenu->addAction(aEditTokens);
 	dbMenu->addSeparator();
-	dbMenu->addAction(aSearch);
 	dbMenu->addAction(aClearSearch);
 	addTabMenu(dbMenu);
 
@@ -269,14 +239,12 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	aDecrement->setIcon(QIcon(":/resources/decrement.svg"));
 	connect(aDecrement, SIGNAL(triggered()), this, SLOT(actDecrement()));
 
-	verticalToolBar->addAction(aAddCard);
-	verticalToolBar->addAction(aAddCardToSideboard);
-	verticalToolBar->addAction(aRemoveCard);
-	verticalToolBar->addAction(aIncrement);
-	verticalToolBar->addAction(aDecrement);
-	verticalToolBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-	
-	dlgCardSearch = new DlgCardSearch(this);
+	deckEditToolBar->addAction(aAddCard);
+	deckEditToolBar->addAction(aAddCardToSideboard);
+	deckEditToolBar->addAction(aRemoveCard);
+	deckEditToolBar->addAction(aIncrement);
+	deckEditToolBar->addAction(aDecrement);
+	deckEditToolBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	
 	retranslateUi();
 	
@@ -290,7 +258,6 @@ TabDeckEditor::~TabDeckEditor()
 
 void TabDeckEditor::retranslateUi()
 {
-	aSearch->setText(tr("&Search..."));
 	aClearSearch->setText(tr("&Clear search"));
 	searchLabel->setText(tr("&Search for:"));
 	
@@ -299,11 +266,11 @@ void TabDeckEditor::retranslateUi()
 	hashLabel1->setText(tr("Hash:"));
 	
 	aUpdatePrices->setText(tr("&Update prices"));
-        aUpdatePrices->setShortcut(tr("Ctrl+U"));
-        
-        aNewDeck->setText(tr("&New deck"));
-        aLoadDeck->setText(tr("&Load deck..."));
-        aSaveDeck->setText(tr("&Save deck"));
+	aUpdatePrices->setShortcut(tr("Ctrl+U"));
+
+	aNewDeck->setText(tr("&New deck"));
+	aLoadDeck->setText(tr("&Load deck..."));
+	aSaveDeck->setText(tr("&Save deck"));
 	aSaveDeckAs->setText(tr("Save deck &as..."));
 	aLoadDeckFromClipboard->setText(tr("Load deck from cl&ipboard..."));
 	aSaveDeckToClipboard->setText(tr("Save deck to clip&board"));
@@ -530,17 +497,6 @@ void TabDeckEditor::actEditTokens()
 	DlgEditTokens dlg(databaseModel);
 	dlg.exec();
 	db->saveToFile(settingsCache->getTokenDatabasePath(), true);
-}
-
-void TabDeckEditor::actSearch()
-{
-	if (dlgCardSearch->exec()) {
-		searchEdit->clear();
-		databaseDisplayModel->setCardName(dlgCardSearch->getCardName());
-		databaseDisplayModel->setCardText(dlgCardSearch->getCardText());
-		databaseDisplayModel->setCardTypes(dlgCardSearch->getCardTypes());
-		databaseDisplayModel->setCardColors(dlgCardSearch->getCardColors());
-	}
 }
 
 void TabDeckEditor::actClearSearch()

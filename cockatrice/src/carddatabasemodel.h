@@ -38,10 +38,10 @@ private:
 	FilterBool isToken;
 	QString cardNameBeginning, cardName, cardText;
 	QSet<QString> cardNameSet, cardTypes, cardColors;
-	const FilterTree *filterTree;
+	FilterTree *filterTree;
 public:
 	CardDatabaseDisplayModel(QObject *parent = 0);
-	void setFilterTree(const FilterTree *filterTree);
+	void setFilterTree(FilterTree *filterTree);
 	void setIsToken(FilterBool _isToken) { isToken = _isToken; invalidate(); }
 	void setCardNameBeginning(const QString &_beginning) { cardNameBeginning = _beginning; invalidate(); }
 	void setCardName(const QString &_cardName) { cardName = _cardName; invalidate(); }

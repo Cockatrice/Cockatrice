@@ -15,7 +15,7 @@ private:
 	CardInfo *info;
 
 public:
-	CardFrame(const QString &cardName = QString(), QWidget *parent = 0, Qt::WindowFlags f = 0);
+	CardFrame(const QString &cardName = QString(), QWidget *parent = 0);
 	QString getCardName() const;
 
 public slots:

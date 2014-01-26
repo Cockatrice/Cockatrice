@@ -28,7 +28,7 @@ private:
 public:
 	FilterTreeModel(QObject *parent = 0);
 	~FilterTreeModel();
-	const FilterTree *filterTree() const { return fTree; }
+	FilterTree *filterTree() const { return fTree; }
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const;
 	QVariant data(const QModelIndex &index, int role) const;

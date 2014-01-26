@@ -158,10 +158,12 @@ void CardDatabaseDisplayModel::clearSearch()
 	cardText.clear();
 	cardTypes.clear();
 	cardColors.clear();
+	if (filterTree != NULL)
+		filterTree->clear();
 	invalidateFilter();
 }
 
-void CardDatabaseDisplayModel::setFilterTree(const FilterTree *filterTree)
+void CardDatabaseDisplayModel::setFilterTree(FilterTree *filterTree)
 {
 	if (this->filterTree != NULL)
 		disconnect(this->filterTree, 0, this, 0);

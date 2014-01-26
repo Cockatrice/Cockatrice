@@ -27,23 +27,18 @@ public:
 	virtual bool isLeaf() const { return false; }
 	virtual const char *textCStr() const { return text().toStdString().c_str(); }
 	virtual void nodeChanged() const { 
-		printf("%s -> ", textCStr());
 		if (parent() != NULL) parent()->nodeChanged();
 	}
 	virtual	void preInsertChild(const FilterTreeNode *p, int i) const {
-		//printf("%s -> ", textCStr());
 		if (parent() != NULL) parent()->preInsertChild(p, i);
 	}
 	virtual	void postInsertChild(const FilterTreeNode *p, int i) const {
-		//printf("%s -> ", textCStr());
 		if (parent() != NULL) parent()->postInsertChild(p, i);
 	}
 	virtual	void preRemoveChild(const FilterTreeNode *p, int i) const {
-		printf("%s -> ", textCStr());
 		if (parent() != NULL) parent()->preRemoveChild(p, i);
 	}
 	virtual	void postRemoveChild(const FilterTreeNode *p, int i) const {
-		printf("%s -> ", textCStr());
 		if (parent() != NULL) parent()->postRemoveChild(p, i);
 	}
 };
@@ -139,6 +134,13 @@ private:
 									CardFilter::Type type);
 
 	bool testAttr(const CardInfo *info, const LogicMap *lm) const;
+
+	void nodeChanged() const { emit changed(); }
+	void preInsertChild(const FilterTreeNode *p, int i) const { emit preInsertRow(p, i); }
+	void postInsertChild(const FilterTreeNode *p, int i) const { emit postInsertRow(p, i); }
+	void preRemoveChild(const FilterTreeNode *p, int i) const { emit preRemoveRow(p, i); }
+	void postRemoveChild(const FilterTreeNode *p, int i) const { emit postRemoveRow(p, i); }
+
 public:
 	FilterTree();
 	~FilterTree();
@@ -153,13 +155,8 @@ public:
 	QString text() const { return QString("root"); }
 	int index() const { return 0; }
 
-	void nodeChanged() const { printf("root\n"); emit changed(); }
-	void preInsertChild(const FilterTreeNode *p, int i) const { emit preInsertRow(p, i); }
-	void postInsertChild(const FilterTreeNode *p, int i) const { emit postInsertRow(p, i); }
-	void preRemoveChild(const FilterTreeNode *p, int i) const { printf("root\n"); emit preRemoveRow(p, i); }
-	void postRemoveChild(const FilterTreeNode *p, int i) const { printf("root\n"); emit postRemoveRow(p, i); }
-
 	bool acceptsCard(const CardInfo *info) const;
+	void clear();
 };
 
 #endif

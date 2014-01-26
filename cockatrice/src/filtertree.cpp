@@ -328,3 +328,9 @@ bool FilterTree::acceptsCard(const CardInfo *info) const
 
 	return true;
 }
+
+void FilterTree::clear()
+{
+	while(childCount() > 0)
+		deleteAt(0);
+}
