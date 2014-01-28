@@ -37,11 +37,12 @@ FilterBuilder::FilterBuilder(QWidget *parent)
 	layout->addLayout(addFilter);
 	layout->addWidget(edit);
 
-	setFrameStyle(QFrame::Plain | QFrame::Box);
+	setFrameStyle(QFrame::Panel | QFrame::Raised);
 	layout->setAlignment(Qt::AlignTop);
 	setLayout(layout);
 
 	connect(ok, SIGNAL(released()), this, SLOT(add_released()));
+	connect(filterCombo, SIGNAL(currentIndexChanged(int)), edit, SLOT(clear()));
 	fltr = NULL;
 }
 
@@ -74,4 +75,5 @@ void FilterBuilder::add_released()
 					static_cast<CardFilter::Type>(comboCurrentIntData(typeCombo)),
 					static_cast<CardFilter::Attr>(comboCurrentIntData(filterCombo)));
 	emit add(fltr);
+	edit->clear();
 }
