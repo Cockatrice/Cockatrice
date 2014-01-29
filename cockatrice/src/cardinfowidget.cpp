@@ -51,25 +51,23 @@ CardInfoWidget::CardInfoWidget(ResizeMode _mode, const QString &cardName, QWidge
 	textLabel->setReadOnly(true);
 
 	QGridLayout *grid = new QGridLayout(this);
-	if (mode == ModeGameTab) {
-		int row = 0;
-
+	int row = 0;
+	if (mode == ModeGameTab)
 		grid->addWidget(dropList, row++, 1, 1, 1, Qt::AlignRight);
-		grid->addWidget(cardPicture, row++, 0, 1, 2);
-		grid->addWidget(nameLabel1, row, 0);
-		grid->addWidget(nameLabel2, row++, 1);
-		grid->addWidget(manacostLabel1, row, 0);
-		grid->addWidget(manacostLabel2, row++, 1);
-		grid->addWidget(cardtypeLabel1, row, 0);
-		grid->addWidget(cardtypeLabel2, row++, 1);
-		grid->addWidget(powtoughLabel1, row, 0);
-		grid->addWidget(powtoughLabel2, row++, 1);
-		grid->addWidget(loyaltyLabel1, row, 0);
-		grid->addWidget(loyaltyLabel2, row++, 1);
-		grid->addWidget(textLabel, row, 0, -1, 2);
-		grid->setRowStretch(row, 1);
-		grid->setColumnStretch(1, 1);
-	}
+	grid->addWidget(cardPicture, row++, 0, 1, 2);
+	grid->addWidget(nameLabel1, row, 0);
+	grid->addWidget(nameLabel2, row++, 1);
+	grid->addWidget(manacostLabel1, row, 0);
+	grid->addWidget(manacostLabel2, row++, 1);
+	grid->addWidget(cardtypeLabel1, row, 0);
+	grid->addWidget(cardtypeLabel2, row++, 1);
+	grid->addWidget(powtoughLabel1, row, 0);
+	grid->addWidget(powtoughLabel2, row++, 1);
+	grid->addWidget(loyaltyLabel1, row, 0);
+	grid->addWidget(loyaltyLabel2, row++, 1);
+	grid->addWidget(textLabel, row, 0, -1, 2);
+	grid->setRowStretch(row, 1);
+	grid->setColumnStretch(1, 1);
 
 	retranslateUi();
 	setFrameStyle(QFrame::Panel | QFrame::Raised);
