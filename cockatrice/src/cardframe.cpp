@@ -1,16 +1,27 @@
 #include "cardframe.h"
 
-#include <QLabel>
 #include "carditem.h"
 #include "carddatabase.h"
 #include "main.h"
+#include "cardinfopicture.h"
+#include "cardinfotext.h"
 
-CardFrame::CardFrame(const QString &cardName, QWidget *parent)
-	: QLabel(parent)
+CardFrame::CardFrame(int width, int height,
+						const QString &cardName, QWidget *parent)
+	: QStackedWidget(parent)
 	, info(0)
+	, cardTextOnly(false)
 {
 	setFrameStyle(QFrame::Panel | QFrame::Raised);
-	setMaximumWidth(250);
+	setMaximumWidth(width);
+	setMinimumWidth(width);
+	setMaximumHeight(height);
+	setMinimumHeight(height);
+	pic = new CardInfoPicture(width);
+	addWidget(pic);
+	text = new CardInfoText();
+	addWidget(text);
+	connect(pic, SIGNAL(hasPictureChanged()), this, SLOT(hasPictureChanged()));
 	setCard(db->getCard(cardName));
 }
 
@@ -19,10 +30,9 @@ void CardFrame::setCard(CardInfo *card)
 	if (info)
 		disconnect(info, 0, this, 0);
 	info = card;
-	connect(info, SIGNAL(pixmapUpdated()), this, SLOT(updatePixmap()));
 	connect(info, SIGNAL(destroyed()), this, SLOT(clear()));
-
-	updatePixmap();
+	text->setCard(info);
+	pic->setCard(info);
 }
 
 void CardFrame::setCard(const QString &cardName)
@@ -40,22 +50,10 @@ void CardFrame::clear()
 	setCard(db->getCard());
 }
 
-void CardFrame::updatePixmap()
+void CardFrame::hasPictureChanged()
 {
-	qreal aspectRatio = (qreal) CARD_HEIGHT / (qreal) CARD_WIDTH;
-	qreal pixmapWidth = this->width();
-
-	if (pixmapWidth == 0)
-		return;
-
-	QPixmap *resizedPixmap = info->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio));
-	if (resizedPixmap)
-		this->setPixmap(*resizedPixmap);
+	if (pic->hasPicture() && !cardTextOnly)
+		setCurrentWidget(pic);
 	else
-		this->setPixmap(*(db->getCard()->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio))));
-}
-
-QString CardFrame::getCardName() const
-{
-	return info->getName();
+		setCurrentWidget(text);
 }

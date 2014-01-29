@@ -34,6 +34,8 @@ SET(cockatrice_SOURCES
  src/dlg_load_remote_deck.cpp 
  src/cardinfowidget.cpp 
  src/cardframe.cpp
+ src/cardinfopicture.cpp
+ src/cardinfotext.cpp
  src/filterbuilder.cpp
  src/cardfilter.cpp
  src/filtertreemodel.cpp
@@ -116,6 +118,8 @@ SET(cockatrice_HEADERS
  src/dlg_load_remote_deck.h 
  src/cardinfowidget.h 
  src/cardframe.h
+ src/cardinfopicture.h
+ src/cardinfotext.h
  src/filterbuilder.h
  src/cardfilter.h
  src/filtertreemodel.h

@@ -87,7 +87,11 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	leftFrame->addLayout(searchLayout);
 	leftFrame->addWidget(databaseView);
 
-	cardInfo = new CardFrame();
+	cardInfo = new CardFrame(250, 356);
+	aCardTextOnly = new QAction(QString(), this);
+	aCardTextOnly->setCheckable(true);
+	connect(aCardTextOnly, SIGNAL(triggered()), cardInfo, SLOT(toggleCardTextOnly()));
+
 	filterModel = new FilterTreeModel();
 	databaseDisplayModel->setFilterTree(filterModel->filterTree());
 	filterView = new QTreeView;
@@ -221,6 +225,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	dbMenu->addAction(aEditTokens);
 	dbMenu->addSeparator();
 	dbMenu->addAction(aClearSearch);
+	dbMenu->addAction(aCardTextOnly);
 	addTabMenu(dbMenu);
 
 	aAddCard = new QAction(QString(), this);
@@ -258,6 +263,7 @@ TabDeckEditor::~TabDeckEditor()
 
 void TabDeckEditor::retranslateUi()
 {
+	aCardTextOnly->setText(tr("&Show card text only"));
 	aClearSearch->setText(tr("&Clear search"));
 	searchLabel->setText(tr("&Search for:"));
 	
