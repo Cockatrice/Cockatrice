@@ -36,8 +36,10 @@ public:
 class SetList : public QList<CardSet *> {
 private:
 	class CompareFunctor;
+    class CompareName;
 public:
 	void sortByKey();
+    void sortByName();
 };
 
 class PictureToLoad {

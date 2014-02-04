@@ -34,7 +34,7 @@ public:
 	enum FilterBool { ShowTrue, ShowFalse, ShowAll };
 private:
 	FilterBool isToken;
-	QString cardNameBeginning, cardName, cardText;
+    QString cardNameBeginning, cardName, cardText, cardSet;
 	QSet<QString> cardNameSet, cardTypes, cardColors;
 public:
 	CardDatabaseDisplayModel(QObject *parent = 0);
@@ -43,6 +43,7 @@ public:
 	void setCardName(const QString &_cardName) { cardName = _cardName; invalidate(); }
 	void setCardNameSet(const QSet<QString> &_cardNameSet) { cardNameSet = _cardNameSet; invalidate(); }
 	void setCardText(const QString &_cardText) { cardText = _cardText; invalidate(); }
+    void setCardSet(const QString &_cardSet) { cardSet = _cardSet; invalidate(); }
 	void setCardTypes(const QSet<QString> &_cardTypes) { cardTypes = _cardTypes; invalidate(); }
 	void setCardColors(const QSet<QString> &_cardColors) { cardColors = _cardColors; invalidate(); }
 	void clearSearch();

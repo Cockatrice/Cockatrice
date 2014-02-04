@@ -1,6 +1,7 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -17,6 +18,17 @@ DlgCardSearch::DlgCardSearch(QWidget *parent)
 	
 	QLabel *cardTextLabel = new QLabel(tr("Card text:"));
 	cardTextEdit = new QLineEdit;
+
+    //Adding Set Selector
+    QLabel *cardSetsLabel = new QLabel(tr("Card Set (AND):"));
+    cboSetList = new QComboBox();
+    cboSetList->addItem("");
+    SetList setList = db->getSetList();
+    setList.sortByName();
+    for (int intLoop = 0; intLoop < setList.size(); ++intLoop) {
+        //Adding Translated Set Name, Just In Case
+        cboSetList->addItem(tr("%1").arg(setList.at(intLoop)->getLongName()), setList.at(intLoop)->getShortName());
+    }
 	
 	QLabel *cardTypesLabel = new QLabel(tr("Card type (OR):"));
 	const QStringList &cardTypes = db->getAllMainCardTypes();
@@ -54,10 +66,12 @@ DlgCardSearch::DlgCardSearch(QWidget *parent)
 	optionsLayout->addWidget(cardNameEdit, 0, 1);
 	optionsLayout->addWidget(cardTextLabel, 1, 0);
 	optionsLayout->addWidget(cardTextEdit, 1, 1);
-	optionsLayout->addWidget(cardTypesLabel, 2, 0);
-	optionsLayout->addLayout(cardTypesLayout, 2, 1);
-	optionsLayout->addWidget(cardColorsLabel, 3, 0);
-	optionsLayout->addLayout(cardColorsLayout, 3, 1);
+    optionsLayout->addWidget(cardSetsLabel, 2, 0);
+    optionsLayout->addWidget(cboSetList, 2, 1);
+    optionsLayout->addWidget(cardTypesLabel, 3, 0);
+    optionsLayout->addLayout(cardTypesLayout, 3, 1);
+    optionsLayout->addWidget(cardColorsLabel, 4, 0);
+    optionsLayout->addLayout(cardColorsLayout, 4, 1);
 	
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addLayout(optionsLayout);
@@ -74,6 +88,10 @@ QString DlgCardSearch::getCardName() const
 QString DlgCardSearch::getCardText() const
 {
 	return cardTextEdit->text();
+}
+
+QString DlgCardSearch::getCardSet() const {
+    return cboSetList->itemData(cboSetList->currentIndex()).toString();
 }
 
 QSet<QString> DlgCardSearch::getCardTypes() const

@@ -144,6 +144,19 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 		if (!cardTypes.contains(info->getMainCardType()))
 			return false;
 
+    if (!cardSet.isEmpty()) {
+        bool blnGood = false;
+        for(int intLoop = 0; intLoop < info->getSets().count(); intLoop++) {
+            if (info->getSets().at(intLoop)->getShortName() == cardSet) {
+                blnGood = true;
+                break;
+            }
+        }
+        if (!blnGood) {
+            return false;
+        }
+    }
+
 	return true;
 }
 
