@@ -8,22 +8,22 @@ class QPainter;
 class QPixmap;
 
 class HandCounter : public AbstractGraphicsItem {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	int number;
+    int number;
 protected:
-	void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
 public slots:
-	void updateNumber();
+    void updateNumber();
 signals:
-	void showContextMenu(const QPoint &screenPos);
+    void showContextMenu(const QPoint &screenPos);
 public:
-	enum { Type = typeOther };
-	int type() const { return Type; }
-	HandCounter(QGraphicsItem *parent = 0);
-	~HandCounter();
-	QRectF boundingRect() const;
-	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    enum { Type = typeOther };
+    int type() const { return Type; }
+    HandCounter(QGraphicsItem *parent = 0);
+    ~HandCounter();
+    QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 };
 
 #endif

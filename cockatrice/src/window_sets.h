@@ -8,13 +8,13 @@ class QTreeView;
 class CardDatabase;
 
 class WndSets : public QMainWindow {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	SetsModel *model;
-	QTreeView *view;
+    SetsModel *model;
+    QTreeView *view;
 public:
-	WndSets(QWidget *parent = 0);
-	~WndSets();
+    WndSets(QWidget *parent = 0);
+    ~WndSets();
 };
 
 #endif
