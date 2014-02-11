@@ -143,6 +143,7 @@ QString CardZone::getTranslatedName(bool hisOwn, GrammaticalCase gc) const
 					? tr("his sideboard", "nominative, male owner")
 					: tr("%1's sideboard", "nominative, male owner").arg(ownerName)
 				);
+        default: break;
 		}
 	return QString();
 }

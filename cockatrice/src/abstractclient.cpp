@@ -82,6 +82,7 @@ void AbstractClient::processProtocolItem(const ServerMessage &item)
 				case SessionEvent::USER_LEFT: emit userLeftEventReceived(event.GetExtension(Event_UserLeft::ext)); break;
 				case SessionEvent::GAME_JOINED: emit gameJoinedEventReceived(event.GetExtension(Event_GameJoined::ext)); break;
 				case SessionEvent::REPLAY_ADDED: emit replayAddedEventReceived(event.GetExtension(Event_ReplayAdded::ext)); break;
+                default: break;
 			}
 			break;
 		}
