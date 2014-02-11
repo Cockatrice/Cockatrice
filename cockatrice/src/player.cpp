@@ -1514,8 +1514,8 @@ void Player::playCard(CardItem *c, bool faceDown, bool tapped)
 	
 	CardInfo *ci = c->getInfo();
 	if ((!settingsCache->getPlayToStack() && ci->getTableRow() == 3) ||
-	    (settingsCache->getPlayToStack() && ci->getTableRow() != 0) &&
-	    c->getZone()->getName().toStdString() != "stack") {
+	    ((settingsCache->getPlayToStack() && ci->getTableRow() != 0) &&
+	    c->getZone()->getName().toStdString() != "stack")) {
 		cmd.set_target_zone("stack");
 		cmd.set_x(0);
 		cmd.set_y(0);
@@ -1784,6 +1784,7 @@ void Player::cardMenuAction()
 					commandList.append(cmd);
 					break;
 				}
+                default: break;
 			}
 		}
 	else {
