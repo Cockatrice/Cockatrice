@@ -4,21 +4,21 @@
 #include "cardzone.h"
 
 class PileZone : public CardZone {
-	Q_OBJECT
+    Q_OBJECT
 private slots:
-	void callUpdate() { update(); }
+    void callUpdate() { update(); }
 public:
-	PileZone(Player *_p, const QString &_name, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent = 0);
-	QRectF boundingRect() const;
-	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-	void reorganizeCards();
-	void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint);
+    PileZone(Player *_p, const QString &_name, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent = 0);
+    QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void reorganizeCards();
+    void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint);
 protected:
-	void mousePressEvent(QGraphicsSceneMouseEvent *event);
-	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-	void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-	void addCardImpl(CardItem *card, int x, int y);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+    void addCardImpl(CardItem *card, int x, int y);
 };
 
 #endif

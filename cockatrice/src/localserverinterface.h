@@ -7,17 +7,17 @@ class LocalServer;
 
 class LocalServerInterface : public Server_ProtocolHandler
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	LocalServerInterface(LocalServer *_server, Server_DatabaseInterface *_databaseInterface);
-	~LocalServerInterface();
-	
-	QString getAddress() const { return QString(); }
-	void transmitProtocolItem(const ServerMessage &item);
+    LocalServerInterface(LocalServer *_server, Server_DatabaseInterface *_databaseInterface);
+    ~LocalServerInterface();
+    
+    QString getAddress() const { return QString(); }
+    void transmitProtocolItem(const ServerMessage &item);
 signals:
-	void itemToClient(const ServerMessage &item);
+    void itemToClient(const ServerMessage &item);
 public slots:
-	void itemFromClient(const CommandContainer &item);
+    void itemFromClient(const CommandContainer &item);
 };
 
 #endif

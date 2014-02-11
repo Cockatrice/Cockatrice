@@ -8,32 +8,32 @@
 #include "carddatabase.h"
 
 class CardDatabaseModel : public QAbstractListModel {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	CardDatabaseModel(CardDatabase *_db, QObject *parent = 0);
-	~CardDatabaseModel();
-	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	int columnCount(const QModelIndex &parent = QModelIndex()) const;
-	QVariant data(const QModelIndex &index, int role) const;
-	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-	CardDatabase *getDatabase() const { return db; }
-	CardInfo *getCard(int index) const { return cardList[index]; }
+    CardDatabaseModel(CardDatabase *_db, QObject *parent = 0);
+    ~CardDatabaseModel();
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    CardDatabase *getDatabase() const { return db; }
+    CardInfo *getCard(int index) const { return cardList[index]; }
 private:
-	QList<CardInfo *> cardList;
-	CardDatabase *db;
+    QList<CardInfo *> cardList;
+    CardDatabase *db;
 private slots:
-	void updateCardList();
-	void cardAdded(CardInfo *card);
-	void cardRemoved(CardInfo *card);
-	void cardInfoChanged(CardInfo *card);
+    void updateCardList();
+    void cardAdded(CardInfo *card);
+    void cardRemoved(CardInfo *card);
+    void cardInfoChanged(CardInfo *card);
 };
 
 class CardDatabaseDisplayModel : public QSortFilterProxyModel {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	enum FilterBool { ShowTrue, ShowFalse, ShowAll };
+    enum FilterBool { ShowTrue, ShowFalse, ShowAll };
 private:
-	FilterBool isToken;
+    FilterBool isToken;
     QString cardNameBeginning, cardName, cardText, cardSet;
 	QSet<QString> cardNameSet, cardTypes, cardColors;
 public:
@@ -48,7 +48,7 @@ public:
 	void setCardColors(const QSet<QString> &_cardColors) { cardColors = _cardColors; invalidate(); }
 	void clearSearch();
 protected:
-	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 };
 
 #endif

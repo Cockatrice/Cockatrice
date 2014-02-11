@@ -8,18 +8,18 @@ class QPlainTextEdit;
 class QPushButton;
 
 class DlgLoadDeckFromClipboard : public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 private slots:
-	void actOK();
-	void actRefresh();
+    void actOK();
+    void actRefresh();
 private:
-	DeckLoader *deckList;
+    DeckLoader *deckList;
 public:
-	DlgLoadDeckFromClipboard(QWidget *parent = 0);
-	DeckLoader *getDeckList() const { return deckList; }
+    DlgLoadDeckFromClipboard(QWidget *parent = 0);
+    DeckLoader *getDeckList() const { return deckList; }
 private:
-	QPlainTextEdit *contentsEdit;
-	QPushButton *refreshButton;
+    QPlainTextEdit *contentsEdit;
+    QPushButton *refreshButton;
 };
 
 #endif

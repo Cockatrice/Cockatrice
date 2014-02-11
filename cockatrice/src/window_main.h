@@ -32,51 +32,51 @@ class ServerInfo_User;
 class QThread;
 
 class MainWindow : public QMainWindow {
-	Q_OBJECT
+    Q_OBJECT
 private slots:
-	void updateTabMenu(const QList<QMenu *> &newMenuList);
-	void statusChanged(ClientStatus _status);
-	void processConnectionClosedEvent(const Event_ConnectionClosed &event);
-	void processServerShutdownEvent(const Event_ServerShutdown &event);
-	void serverTimeout();
-	void loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime);
-	void socketError(const QString &errorStr);
-	void protocolVersionMismatch(int localVersion, int remoteVersion);
-	void userInfoReceived(const ServerInfo_User &userInfo);
-	void localGameEnded();
+    void updateTabMenu(const QList<QMenu *> &newMenuList);
+    void statusChanged(ClientStatus _status);
+    void processConnectionClosedEvent(const Event_ConnectionClosed &event);
+    void processServerShutdownEvent(const Event_ServerShutdown &event);
+    void serverTimeout();
+    void loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime);
+    void socketError(const QString &errorStr);
+    void protocolVersionMismatch(int localVersion, int remoteVersion);
+    void userInfoReceived(const ServerInfo_User &userInfo);
+    void localGameEnded();
 
-	void actConnect();
-	void actDisconnect();
-	void actSinglePlayer();
-	void actWatchReplay();
-	void actDeckEditor();
-	void actFullScreen(bool checked);
-	void actSettings();
-	void actExit();
-	
-	void actAbout();
+    void actConnect();
+    void actDisconnect();
+    void actSinglePlayer();
+    void actWatchReplay();
+    void actDeckEditor();
+    void actFullScreen(bool checked);
+    void actSettings();
+    void actExit();
+    
+    void actAbout();
 private:
-	static const QString appName;
-	void setClientStatusTitle();
-	void retranslateUi();
-	void createActions();
-	void createMenus();
-	QList<QMenu *> tabMenus;
-	QMenu *cockatriceMenu, *helpMenu;
-	QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-		*aAbout;
-	TabSupervisor *tabSupervisor;
+    static const QString appName;
+    void setClientStatusTitle();
+    void retranslateUi();
+    void createActions();
+    void createMenus();
+    QList<QMenu *> tabMenus;
+    QMenu *cockatriceMenu, *helpMenu;
+    QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
+        *aAbout;
+    TabSupervisor *tabSupervisor;
 
-	RemoteClient *client;
-	QThread *clientThread;
-	
-	LocalServer *localServer;
+    RemoteClient *client;
+    QThread *clientThread;
+    
+    LocalServer *localServer;
 public:
-	MainWindow(QWidget *parent = 0);
-	~MainWindow();
+    MainWindow(QWidget *parent = 0);
+    ~MainWindow();
 protected:
-	void closeEvent(QCloseEvent *event);
-	void changeEvent(QEvent *event);
+    void closeEvent(QCloseEvent *event);
+    void changeEvent(QEvent *event);
 };
 
 #endif

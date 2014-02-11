@@ -10,18 +10,18 @@ class QCheckBox;
 class QComboBox;
 
 class DlgCardSearch : public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	QLineEdit *cardNameEdit, *cardTextEdit;
-	QList<QCheckBox *> cardTypeCheckBoxes, cardColorCheckBoxes;
+    QLineEdit *cardNameEdit, *cardTextEdit;
+    QList<QCheckBox *> cardTypeCheckBoxes, cardColorCheckBoxes;
     QComboBox *cboSetList;
 public:
-	DlgCardSearch(QWidget *parent = 0);
-	QString getCardName() const;
-	QString getCardText() const;
+    DlgCardSearch(QWidget *parent = 0);
+    QString getCardName() const;
+    QString getCardText() const;
     QString getCardSet() const;
-	QSet<QString> getCardTypes() const;
-	QSet<QString> getCardColors() const;
+    QSet<QString> getCardTypes() const;
+    QSet<QString> getCardColors() const;
 };
 
 #endif

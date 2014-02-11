@@ -14,38 +14,38 @@ class UserContextMenu;
 
 class PlayerListItemDelegate : public QStyledItemDelegate {
 public:
-	PlayerListItemDelegate(QObject *const parent);
-	bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
+    PlayerListItemDelegate(QObject *const parent);
+    bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
 };
 
 class PlayerListTWI : public QTreeWidgetItem {
 public:
-	PlayerListTWI();
-	bool operator<(const QTreeWidgetItem &other) const;
+    PlayerListTWI();
+    bool operator<(const QTreeWidgetItem &other) const;
 };
 
 class PlayerListWidget : public QTreeWidget {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	PlayerListItemDelegate *itemDelegate;
-	QMap<int, QTreeWidgetItem *> players;
-	TabSupervisor *tabSupervisor;
-	AbstractClient *client;
-	TabGame *game;
-	UserContextMenu *userContextMenu;
-	QIcon readyIcon, notReadyIcon, concededIcon, playerIcon, spectatorIcon, lockIcon;
-	bool gameStarted;
+    PlayerListItemDelegate *itemDelegate;
+    QMap<int, QTreeWidgetItem *> players;
+    TabSupervisor *tabSupervisor;
+    AbstractClient *client;
+    TabGame *game;
+    UserContextMenu *userContextMenu;
+    QIcon readyIcon, notReadyIcon, concededIcon, playerIcon, spectatorIcon, lockIcon;
+    bool gameStarted;
 signals:
-	void openMessageDialog(const QString &userName, bool focus);
+    void openMessageDialog(const QString &userName, bool focus);
 public:
-	PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, QWidget *parent = 0);
-	void retranslateUi();
-	void addPlayer(const ServerInfo_PlayerProperties &player);
-	void removePlayer(int playerId);
-	void setActivePlayer(int playerId);
-	void updatePlayerProperties(const ServerInfo_PlayerProperties &prop, int playerId = -1);
-	void setGameStarted(bool _gameStarted, bool resuming);
-	void showContextMenu(const QPoint &pos, const QModelIndex &index);
+    PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, QWidget *parent = 0);
+    void retranslateUi();
+    void addPlayer(const ServerInfo_PlayerProperties &player);
+    void removePlayer(int playerId);
+    void setActivePlayer(int playerId);
+    void updatePlayerProperties(const ServerInfo_PlayerProperties &prop, int playerId = -1);
+    void setGameStarted(bool _gameStarted, bool resuming);
+    void showContextMenu(const QPoint &pos, const QModelIndex &index);
 };
 
 #endif
