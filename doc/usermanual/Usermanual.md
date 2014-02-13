@@ -213,12 +213,22 @@ FreeBSD 9.1 until the systems were updated.
     FreeBSD
     :   `pkg_add -r qt4 qt4-linguist qt4-moc qt4-qmake qt4-rcc qt4-uic git cmake protobuf`
 
-2.  Download the sources from github via\
+2.  Download the sources from github via
     `cd git clone https://github.com/Daenyth/Cockatrice.git`
 
 3.  To compile the sources, change into the newly created directory,
-    create a build directory and invoke cmake:\
-    `cd Cockatrice mkdir build cd build cmake .. make`\
+    create a build directory and invoke cmake:
+
+    i. `cd Cockatrice`
+    
+    ii. `mkdir build`
+    
+    iii. `cd build` 
+    
+    iv. `cmake ..`
+    
+    v. `make`
+    
     If you have some issues with pthread\_ add ’pthread’ to the
     “target\_link\_libraries” entry in the `CMakeFiles.txt` in
     `Cockatrice/common`.
