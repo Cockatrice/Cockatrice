@@ -214,7 +214,7 @@ FreeBSD 9.1 until the systems were updated.
     :   `pkg_add -r qt4 qt4-linguist qt4-moc qt4-qmake qt4-rcc qt4-uic git cmake protobuf`
 
 2.  Download the sources from github via
-    `cd git clone https://github.com/Daenyth/Cockatrice.git`
+    `git clone https://github.com/Daenyth/Cockatrice.git`
 
 3.  To compile the sources, change into the newly created directory,
     create a build directory and invoke cmake:
@@ -239,7 +239,7 @@ FreeBSD 9.1 until the systems were updated.
 
 5.  Before you start Cockatrice for the first time, run `oracle -dlsets`
     and download available cards, denn run `cockatrice`. The default
-    paths for decks, pics, cards and tokens are located in\
+    paths for decks, pics, cards and tokens are located in
     `/home/<user>/.local/share/data/Cockatrice/Cockatrice`.
 
 #### MacOS X
@@ -254,10 +254,10 @@ Cockatrice is open source you are free to run your own. The compilation
 works like already written above, but instead of invoking `cmake ..`,
 you have to do it like this:
 
--   If you want to build the server, use:\
+-   If you want to build the server, use:
     `cmake -DWITH_SERVER=1 ..`
 
--   If you want to build the server, but not the client, use:\
+-   If you want to build the server, but not the client, use:
     `cmake -DWITH_SERVER=1 -DWITHOUT_CLIENT=1 ..`
 
 There is more information on compiling and running Servatrice on CentOS
@@ -378,13 +378,14 @@ has come out, you must re-run the Oracle and download set information.
     except for “Instant” along with “Artifact” and “U”, the Deck editor
     will only show you all Blue Instant and Artifact cards.
 
-    ll Letter & Card Type\
-    U & Blue\
-    W & White\
-    X & Colorless\
-    G & Green\
-    R & Red\
-    B & Black\
+    |Letter | Card Type |
+    |-------|-----------|
+    | U     | Blue      |
+    | W     | White     |
+    | X     | Colorless |
+    | G     | Green     |
+    | R     | Red       |
+    | B     | Black     |
 
 3. Card Data
 :   This section shows the Oracle text for the card that you currently
