@@ -736,7 +736,7 @@ players can not add or remove counters to or from your cards.
 
 #### Pointing at Cards / Arrows
 
-Pointing at cars is needed for resolving spells, or declaring attackers
+Pointing at cards is needed for resolving spells, or declaring attackers
 and blockers. All you need to do is right-click over a card and drag an
 arrow over to what you are pointing at. Permanents, spells in the stack,
 and even a players life total can be pointed at. You can point at your
