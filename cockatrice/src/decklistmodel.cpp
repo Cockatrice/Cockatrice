@@ -256,11 +256,11 @@ QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneN
         return nodeToIndex(cardNode);
     } else {
         cardNode->setNumber(cardNode->getNumber() + 1);
-        QModelIndex ind = nodeToIndex(cardNode);
+        QModelIndex parentIndex = nodeToIndex(cardTypeNode);
         sort(lastKnownColumn, lastKnownOrder);
-        emitRecursiveUpdates(ind);
+        emitRecursiveUpdates(parentIndex);
         deckList->updateDeckHash();
-        return ind;
+        return nodeToIndex(cardNode);
     }
 }
 
