@@ -244,24 +244,20 @@ QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneN
     QString cardType = info->getMainCardType();
     InnerDecklistNode *cardTypeNode = createNodeIfNeeded(cardType, zoneNode);
 
+    QModelIndex parentIndex = nodeToIndex(cardTypeNode);
     DecklistModelCardNode *cardNode = dynamic_cast<DecklistModelCardNode *>(cardTypeNode->findChild(cardName));
     if (!cardNode) {
         DecklistCardNode *decklistCard = deckList->addCard(cardName, zoneName);
-        QModelIndex parentIndex = nodeToIndex(cardTypeNode);
         beginInsertRows(parentIndex, cardTypeNode->size(), cardTypeNode->size());
         cardNode = new DecklistModelCardNode(decklistCard, cardTypeNode);
         endInsertRows();
-        sort(lastKnownColumn, lastKnownOrder);
-        emitRecursiveUpdates(parentIndex);
-        return nodeToIndex(cardNode);
     } else {
         cardNode->setNumber(cardNode->getNumber() + 1);
-        QModelIndex parentIndex = nodeToIndex(cardTypeNode);
-        sort(lastKnownColumn, lastKnownOrder);
-        emitRecursiveUpdates(parentIndex);
         deckList->updateDeckHash();
-        return nodeToIndex(cardNode);
     }
+    sort(lastKnownColumn, lastKnownOrder);
+    emitRecursiveUpdates(parentIndex);
+    return nodeToIndex(cardNode);
 }
 
 QModelIndex DeckListModel::nodeToIndex(AbstractDecklistNode *node) const
