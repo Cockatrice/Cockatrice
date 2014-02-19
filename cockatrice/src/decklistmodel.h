@@ -54,6 +54,8 @@ public:
 private:
     DeckLoader *deckList;
     InnerDecklistNode *root;
+    int lastKnownColumn;
+    Qt::SortOrder lastKnownOrder;
     InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
     QModelIndex nodeToIndex(AbstractDecklistNode *node) const;
     void emitRecursiveUpdates(const QModelIndex &index);

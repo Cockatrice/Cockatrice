@@ -14,7 +14,7 @@
 #include "deck_loader.h"
 
 DeckListModel::DeckListModel(QObject *parent)
-    : QAbstractItemModel(parent)
+    : QAbstractItemModel(parent), lastKnownColumn(1), lastKnownOrder(Qt::AscendingOrder)
 {
     deckList = new DeckLoader;
     connect(deckList, SIGNAL(deckLoaded()), this, SLOT(rebuildTree()));
@@ -251,12 +251,13 @@ QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneN
         beginInsertRows(parentIndex, cardTypeNode->size(), cardTypeNode->size());
         cardNode = new DecklistModelCardNode(decklistCard, cardTypeNode);
         endInsertRows();
-        sort(1);
+        sort(lastKnownColumn, lastKnownOrder);
         emitRecursiveUpdates(parentIndex);
         return nodeToIndex(cardNode);
     } else {
         cardNode->setNumber(cardNode->getNumber() + 1);
         QModelIndex ind = nodeToIndex(cardNode);
+        sort(lastKnownColumn, lastKnownOrder);
         emitRecursiveUpdates(ind);
         deckList->updateDeckHash();
         return ind;
@@ -298,6 +299,9 @@ void DeckListModel::sortHelper(InnerDecklistNode *node, Qt::SortOrder order)
 
 void DeckListModel::sort(int column, Qt::SortOrder order)
 {
+    lastKnownColumn = column;
+    lastKnownOrder = order;
+
     emit layoutAboutToBeChanged();
     root->setSortMethod(column);
     sortHelper(root, order);
