@@ -296,9 +296,10 @@ void DeckListModel::sortHelper(InnerDecklistNode *node, Qt::SortOrder order)
     }
 }
 
-void DeckListModel::sort(int /*column*/, Qt::SortOrder order)
+void DeckListModel::sort(int column, Qt::SortOrder order)
 {
     emit layoutAboutToBeChanged();
+    root->setSortMethod(column);
     sortHelper(root, order);
     emit layoutChanged();
 }

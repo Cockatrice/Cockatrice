@@ -110,6 +110,8 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     deckView = new QTreeView();
     deckView->setModel(deckModel);
     deckView->setUniformRowHeights(true);
+    deckView->setSortingEnabled(true);
+    deckView->sortByColumn(1, Qt::AscendingOrder);
     deckView->header()->setResizeMode(QHeaderView::ResizeToContents);
     connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
 
@@ -606,10 +608,10 @@ void TabDeckEditor::setDeck(DeckLoader *_deck)
     nameEdit->setText(deckModel->getDeckList()->getName());
     commentsEdit->setText(deckModel->getDeckList()->getComments());
     updateHash();
-    deckModel->sort(1);
+    deckModel->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
     deckView->expandAll();
     setModified(false);
-    
+
     db->cacheCardPixmaps(deckModel->getDeckList()->getCardList());
     deckView->expandAll();
     setModified(false);
