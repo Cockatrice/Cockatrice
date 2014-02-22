@@ -10,16 +10,16 @@ class QPushButton;
 class QDialogButtonBox;
 
 class DlgLoadRemoteDeck: public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	AbstractClient *client;
-	RemoteDeckList_TreeWidget *dirView;
-	QDialogButtonBox *buttonBox;
+    AbstractClient *client;
+    RemoteDeckList_TreeWidget *dirView;
+    QDialogButtonBox *buttonBox;
 private slots:
-	void currentItemChanged(const QModelIndex &current, const QModelIndex &previous);
+    void currentItemChanged(const QModelIndex &current, const QModelIndex &previous);
 public:
-	DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent = 0);
-	int getDeckId() const;
+    DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent = 0);
+    int getDeckId() const;
 };
 
 #endif

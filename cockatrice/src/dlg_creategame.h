@@ -17,28 +17,28 @@ class Response;
 class ServerInfo_Game;
 
 class DlgCreateGame : public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent = 0);
-	DlgCreateGame(const ServerInfo_Game &game, const QMap<int, QString> &_gameTypes, QWidget *parent = 0);
+    DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent = 0);
+    DlgCreateGame(const ServerInfo_Game &game, const QMap<int, QString> &_gameTypes, QWidget *parent = 0);
 private slots:
-	void actOK();
-	void checkResponse(const Response &response);
-	void spectatorsAllowedChanged(int state);
+    void actOK();
+    void checkResponse(const Response &response);
+    void spectatorsAllowedChanged(int state);
 private:
-	TabRoom *room;
-	QMap<int, QString> gameTypes;
-	QMap<int, QCheckBox *> gameTypeCheckBoxes;
+    TabRoom *room;
+    QMap<int, QString> gameTypes;
+    QMap<int, QCheckBox *> gameTypeCheckBoxes;
 
-	QGroupBox *spectatorsGroupBox;
-	QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel;
-	QLineEdit *descriptionEdit, *passwordEdit;
-	QSpinBox *maxPlayersEdit;
-	QCheckBox *onlyBuddiesCheckBox, *onlyRegisteredCheckBox;
-	QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox, *spectatorsSeeEverythingCheckBox;
-	QDialogButtonBox *buttonBox;
-	
-	void sharedCtor();
+    QGroupBox *spectatorsGroupBox;
+    QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel;
+    QLineEdit *descriptionEdit, *passwordEdit;
+    QSpinBox *maxPlayersEdit;
+    QCheckBox *onlyBuddiesCheckBox, *onlyRegisteredCheckBox;
+    QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox, *spectatorsSeeEverythingCheckBox;
+    QDialogButtonBox *buttonBox;
+    
+    void sharedCtor();
 };
 
 #endif

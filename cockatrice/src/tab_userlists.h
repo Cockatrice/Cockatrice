@@ -17,32 +17,32 @@ class Event_AddToList;
 class Event_RemoveFromList;
 
 class TabUserLists : public Tab {
-	Q_OBJECT
+    Q_OBJECT
 signals:
-	void openMessageDialog(const QString &userName, bool focus);
-	void userLeft(const QString &userName);
-	void userJoined(const ServerInfo_User &userInfo);
+    void openMessageDialog(const QString &userName, bool focus);
+    void userLeft(const QString &userName);
+    void userJoined(const ServerInfo_User &userInfo);
 private slots:
-	void processListUsersResponse(const Response &response);
-	void processUserJoinedEvent(const Event_UserJoined &event);
-	void processUserLeftEvent(const Event_UserLeft &event);
-	void buddyListReceived(const QList<ServerInfo_User> &_buddyList);
-	void ignoreListReceived(const QList<ServerInfo_User> &_ignoreList);
-	void processAddToListEvent(const Event_AddToList &event);
-	void processRemoveFromListEvent(const Event_RemoveFromList &event);
+    void processListUsersResponse(const Response &response);
+    void processUserJoinedEvent(const Event_UserJoined &event);
+    void processUserLeftEvent(const Event_UserLeft &event);
+    void buddyListReceived(const QList<ServerInfo_User> &_buddyList);
+    void ignoreListReceived(const QList<ServerInfo_User> &_ignoreList);
+    void processAddToListEvent(const Event_AddToList &event);
+    void processRemoveFromListEvent(const Event_RemoveFromList &event);
 private:
-	AbstractClient *client;
-	UserList *allUsersList;
-	UserList *buddyList;
-	UserList *ignoreList;
-	UserInfoBox *userInfoBox;
+    AbstractClient *client;
+    UserList *allUsersList;
+    UserList *buddyList;
+    UserList *ignoreList;
+    UserInfoBox *userInfoBox;
 public:
-	TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo, QWidget *parent = 0);
-	void retranslateUi();
-	QString getTabText() const { return tr("User lists"); }
-	const UserList *getAllUsersList() const { return allUsersList; }
-	const UserList *getBuddyList() const { return buddyList; }
-	const UserList *getIgnoreList() const { return ignoreList; }
+    TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo, QWidget *parent = 0);
+    void retranslateUi();
+    QString getTabText() const { return tr("User lists"); }
+    const UserList *getAllUsersList() const { return allUsersList; }
+    const UserList *getBuddyList() const { return buddyList; }
+    const UserList *getIgnoreList() const { return ignoreList; }
 };
 
 #endif

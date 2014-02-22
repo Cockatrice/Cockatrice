@@ -9,19 +9,19 @@ class QPushButton;
 class QCheckBox;
 
 class DlgConnect : public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	DlgConnect(QWidget *parent = 0);
-	QString getHost() const { return hostEdit->text(); }
-	int getPort() const { return portEdit->text().toInt(); }
-	QString getPlayerName() const { return playernameEdit->text(); }
-	QString getPassword() const { return passwordEdit->text(); }
+    DlgConnect(QWidget *parent = 0);
+    QString getHost() const { return hostEdit->text(); }
+    int getPort() const { return portEdit->text().toInt(); }
+    QString getPlayerName() const { return playernameEdit->text(); }
+    QString getPassword() const { return passwordEdit->text(); }
 private slots:
-	void actOk();
+    void actOk();
 private:
-	QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel;
-	QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit;
-	QCheckBox *savePasswordCheckBox;
+    QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel;
+    QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit;
+    QCheckBox *savePasswordCheckBox;
 };
 
 #endif
