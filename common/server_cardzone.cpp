@@ -43,13 +43,13 @@ Server_CardZone::~Server_CardZone()
 
 void Server_CardZone::shuffle()
 {
-	QList<Server_Card *> temp;
-	for (int i = cards.size(); i; i--)
-		temp.append(cards.takeAt(rng->getNumber(0, i - 1)));
-	cards = temp;
-	
+	for (int i = cards.size() - 1; i > 0; i--){
+		int j = rng->getNumber(0, i);//Assuming i is inclusive, i + 1 if exclusive (end result should be a number between 0 and i [0 and i included])
+		cards.swap(j,i)
+	}	
 	playersWithWritePermission.clear();
 }
+
 
 void Server_CardZone::removeCardFromCoordMap(Server_Card *card, int oldX, int oldY)
 {
