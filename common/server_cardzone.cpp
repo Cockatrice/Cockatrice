@@ -45,7 +45,7 @@ void Server_CardZone::shuffle()
 {
 	for (int i = cards.size() - 1; i > 0; i--){
 		int j = rng->getNumber(0, i);//Assuming i is inclusive, i + 1 if exclusive (end result should be a number between 0 and i [0 and i included])
-		cards.swap(j,i)
+		cards.swap(j,i);
 	}	
 	playersWithWritePermission.clear();
 }
