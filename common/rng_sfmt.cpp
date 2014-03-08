@@ -18,5 +18,5 @@ unsigned int RNG_SFMT::getNumber(unsigned int min, unsigned int max)
 	mutex.unlock();
 	
 	// return a random number from the interval [min, max]
-	return (unsigned int) (r % (max - min + 1));
+	return (unsigned int) (r % (max - min + 1) + min);
 }
