@@ -5,7 +5,6 @@ SET(common_SOURCES
 	decklist.cpp
 	get_pb_extension.cpp
 	rng_abstract.cpp
-	rng_qt.cpp
 	rng_sfmt.cpp
 	server.cpp
 	server_abstractuserinterface.cpp
@@ -25,7 +24,6 @@ SET(common_SOURCES
 SET(common_HEADERS
 	decklist.h
 	rng_abstract.h
-	rng_qt.h
 	rng_sfmt.h
 	server.h
 	server_arrowtarget.h
