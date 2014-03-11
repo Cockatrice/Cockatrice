@@ -2,7 +2,10 @@
 #include <QGraphicsScene>
 #include <QCursor>
 #include <QGraphicsSceneMouseEvent>
-#include <math.h>
+#include <cmath>
+#ifdef _WIN32
+#include "round.h"
+#endif /* _WIN32 */
 #include "carddatabase.h"
 #include "cardinfowidget.h"
 #include "abstractcarditem.h"

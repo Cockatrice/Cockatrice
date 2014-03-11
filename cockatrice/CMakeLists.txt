@@ -82,6 +82,7 @@ SET(cockatrice_SOURCES
  ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
 )
 SET(cockatrice_HEADERS
+ src/round.h
  src/abstractcounter.h 
  src/counter_general.h 
  src/dlg_creategame.h 
