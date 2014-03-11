@@ -19,6 +19,8 @@
  ***************************************************************************/
 
 #include <QApplication>
+#include <QFile>
+#include <QTextStream>
 #include <QTextCodec>
 #include <QtPlugin>
 #include <QTranslator>
@@ -28,7 +30,6 @@
 #include <QIcon>
 #include <QDir>
 #include <QDesktopServices>
-#include <stdio.h>
 
 #include "main.h"
 #include "window_main.h"
@@ -56,11 +57,11 @@ QString translationPath = QString();
 
 void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
-    static FILE *f = NULL;
-    if (!f)
-        f = fopen("qdebug.txt", "w");
-    fprintf(f, "%s\n", msg);
-    fflush(f);
+    QFile file("qdebug.txt");
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+    out << msg << "\n";
+    file.close();
 }
 
 void installNewTranslator()
