@@ -66,7 +66,7 @@ void ArrowItem::updatePath(const QPointF &endPoint)
 {
     const double arrowWidth = 15.0;
     const double headWidth = 40.0;
-    const double headLength = headWidth / sqrt(2);
+    const double headLength = headWidth / pow(2, 0.5); // aka headWidth / sqrt (2) but this produces a compile error with MSVC++
     const double phi = 15;
     
     if (!startItem)
