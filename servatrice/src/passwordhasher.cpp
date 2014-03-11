@@ -3,6 +3,8 @@
 #include <string.h>
 #include <gcrypt.h>
 
+#define HASH_ALGO GCRY_MD_SHA512
+
 void PasswordHasher::initialize()
 {
 	// These calls are required by libgcrypt before we use any of its functions.
@@ -13,17 +15,16 @@ void PasswordHasher::initialize()
 
 QString PasswordHasher::computeHash(const QString &password, const QString &salt)
 {
-	const int algo = GCRY_MD_SHA512;
-	const int rounds = 1000;
+	// concatenate salt and password
+	const QByteArray passwordBuffer = (salt + password).toAscii();
 
-	QByteArray passwordBuffer = (salt + password).toAscii();
-	int hashLen = gcry_md_get_algo_dlen(algo);
-	char hash[hashLen], tmp[hashLen];
-	gcry_md_hash_buffer(algo, hash, passwordBuffer.data(), passwordBuffer.size());
-	for (int i = 1; i < rounds; ++i) {
-		memcpy(tmp, hash, hashLen);
-		gcry_md_hash_buffer(algo, hash, tmp, hashLen);
-	}
-	return salt + QString(QByteArray(hash, hashLen).toBase64());
+	// create an array for the digest in the proper size for the chosen algorithm
+	char digest[gcry_md_get_algo_dlen(HASH_ALGO)];
+
+	// calculate the message digest of passwordBuffer
+	gcry_md_hash_buffer(HASH_ALGO, digest, passwordBuffer.data(), passwordBuffer.size());
+
+	// concatenate and return salt and digest
+	return salt + QString(QByteArray(digest).toBase64());
 }
 
