@@ -7,7 +7,14 @@
 
 /**
  * This class represents the random number generator.
- * It uses the SIMD-oriented Fast Mersenne Twister code v1.4.1 from
+ * Usage instructions:
+ * Create an instance of RNG_SFMT, then call getNumber(min, max).
+ * You should never call this function with min > max, this throws a
+ * std::invalid_argument exception. It is best practice to use getNumber() in a try block
+ * and catch the exception if min, max are entered by the user or computed somehow.
+ *
+ * Technical details:
+ * The RNG uses the SIMD-oriented Fast Mersenne Twister code v1.4.1 from
  * http://www.math.sci.hiroshima-u.ac.jp/~%20m-mat/MT/SFMT/index.html
  * To use this RNG, the class needs a sfmt_t structure for the RNG's internal state.
  * It has to be initialized by sfmt_init_gen_rand() which is done in the constructor.

@@ -1,6 +1,7 @@
 #include "rng_sfmt.h"
 #include <QDateTime>
 #include <algorithm>
+#include <stdexcept>
 
 // This is from gcc sources, namely from fixincludes/inclhack.def
 // On C++11 systems, <cstdint> could be included instead.
@@ -57,12 +58,17 @@ RNG_SFMT::RNG_SFMT(QObject *parent)
  */
 unsigned int RNG_SFMT::getNumber(unsigned int min, unsigned int max)
 {
-	// This all makes no sense if min > max.
-	// So in debug mode Q_ASSERT will print a warning...
-	Q_ASSERT(min <= max);
-	// ... and at runtime min and max will be swapped; this should never happen.
-	if(min > max)
-	  std::swap(min, max);
+	// This all makes no sense if min > max, which should never happen.
+	if(min > max) {
+		throw std::invalid_argument(
+		  QString("Invalid bounds for RNG: min > max! Values were: min = " +
+		  QString::number(min) + ", max = " +
+		  QString::number(max) +
+		  ". This is either a bug or something even more serious happened."
+		  ).toStdString());
+		// at this point, the method exits. No return value is needed, because
+		// basically the exception itself is returned.
+	}
 
 	// First compute the diameter (aka size, length) of the [min, max] interval
 	const unsigned int diameter = max - min + 1;
