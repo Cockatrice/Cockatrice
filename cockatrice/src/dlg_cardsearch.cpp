@@ -30,18 +30,6 @@ DlgCardSearch::DlgCardSearch(QWidget *parent)
         cboSetList->addItem(tr("%1").arg(setList.at(intLoop)->getLongName()), setList.at(intLoop)->getShortName());
     }
     
-    //Adding Set Selector
-    QLabel *cardSetsLabel = new QLabel(tr("Card Set (AND):"));
-    cboSetList = new QComboBox();
-    cboSetList->addItem("");
-    SetList setList = db->getSetList();
-    setList.sortByName();
-    int iCount = setList.size();
-    for (int iLoop = 0; iLoop < iCount; ++iLoop) {
-        //Adding Translated Set Name, Just In Case
-        cboSetList->addItem(setList.at(iLoop)->getLongName(), setList.at(iLoop)->getShortName());
-    }
-    
     QLabel *cardTypesLabel = new QLabel(tr("Card type (OR):"));
     const QStringList &cardTypes = db->getAllMainCardTypes();
     QVBoxLayout *cardTypesLayout = new QVBoxLayout;
