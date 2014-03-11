@@ -85,7 +85,7 @@ void PhaseButton::mousePressEvent(QGraphicsSceneMouseEvent * /*event*/)
     emit clicked();
 }
 
-void PhaseButton::mouseDoubleClickEvent(QGraphicsSceneMouseEvent */*event*/)
+void PhaseButton::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * /*event*/)
 {
     triggerDoubleClickAction();
 }

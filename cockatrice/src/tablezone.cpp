@@ -46,7 +46,7 @@ bool TableZone::isInverted() const
     return ((player->getMirrored() && !settingsCache->getInvertVerticalCoordinate()) || (!player->getMirrored() && settingsCache->getInvertVerticalCoordinate()));
 }
 
-void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     if (bgPixmap.isNull())
         painter->fillRect(boundingRect(), QColor(0, 0, 100));

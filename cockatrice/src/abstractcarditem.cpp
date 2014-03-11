@@ -143,7 +143,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     painter->restore();
 }
 
-void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     painter->save();
 
