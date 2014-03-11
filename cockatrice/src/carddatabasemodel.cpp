@@ -145,14 +145,15 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
             return false;
 
     if (!cardSet.isEmpty()) {
-        bool blnGood = false;
-        for(int intLoop = 0; intLoop < info->getSets().count(); intLoop++) {
-            if (info->getSets().at(intLoop)->getShortName() == cardSet) {
-                blnGood = true;
+    	int iCount = info->getSets().count();
+        bool isValidSet = false;
+        for(int iLoop = 0; iLoop < iCount; iLoop++) {
+            if (info->getSets().at(iLoop)->getShortName() == cardSet) {
+            	isValidSet = true;
                 break;
             }
         }
-        if (!blnGood) {
+        if (!isValidSet) {
             return false;
         }
     }

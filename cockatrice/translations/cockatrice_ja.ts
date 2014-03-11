@@ -798,37 +798,42 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DlgCardSearch</name>
     <message>
-        <location filename="../src/dlg_cardsearch.cpp" line="15"/>
+        <location filename="../src/dlg_cardsearch.cpp" line="16"/>
         <source>Card name:</source>
         <translation>カード名:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_cardsearch.cpp" line="18"/>
+        <location filename="../src/dlg_cardsearch.cpp" line="19"/>
         <source>Card text:</source>
         <translation>カードテキスト:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_cardsearch.cpp" line="21"/>
+        <location filename="../src/dlg_cardsearch.cpp" line="23"/>
+        <source>Card Set (AND):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_cardsearch.cpp" line="33"/>
         <source>Card type (OR):</source>
         <translation>カードタイプ（含む）:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_cardsearch.cpp" line="31"/>
+        <location filename="../src/dlg_cardsearch.cpp" line="43"/>
         <source>Color (OR):</source>
         <translation>色（含む）:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_cardsearch.cpp" line="41"/>
+        <location filename="../src/dlg_cardsearch.cpp" line="53"/>
         <source>O&amp;K</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/dlg_cardsearch.cpp" line="44"/>
+        <location filename="../src/dlg_cardsearch.cpp" line="56"/>
         <source>&amp;Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/dlg_cardsearch.cpp" line="66"/>
+        <location filename="../src/dlg_cardsearch.cpp" line="80"/>
         <source>Card search</source>
         <translation>カード検索</translation>
     </message>

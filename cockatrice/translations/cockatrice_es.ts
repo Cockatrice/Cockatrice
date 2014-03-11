@@ -1340,37 +1340,42 @@ Se almacenará unicamente para moderadores y no podrá ser visto por la persona 
 <context>
     <name>DlgCardSearch</name>
     <message>
-        <location filename="../src/dlg_cardsearch.cpp" line="15"/>
+        <location filename="../src/dlg_cardsearch.cpp" line="16"/>
         <source>Card name:</source>
         <translation>Nombre de la carta:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_cardsearch.cpp" line="18"/>
+        <location filename="../src/dlg_cardsearch.cpp" line="19"/>
         <source>Card text:</source>
         <translation>Texto de la carta:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_cardsearch.cpp" line="21"/>
+        <location filename="../src/dlg_cardsearch.cpp" line="23"/>
+        <source>Card Set (AND):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_cardsearch.cpp" line="33"/>
         <source>Card type (OR):</source>
         <translation>Tipo de la carta (OR):</translation>
     </message>
     <message>
-        <location filename="../src/dlg_cardsearch.cpp" line="31"/>
+        <location filename="../src/dlg_cardsearch.cpp" line="43"/>
         <source>Color (OR):</source>
         <translation>Color (OR):</translation>
     </message>
     <message>
-        <location filename="../src/dlg_cardsearch.cpp" line="41"/>
+        <location filename="../src/dlg_cardsearch.cpp" line="53"/>
         <source>O&amp;K</source>
         <translation>&amp;Aceptar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_cardsearch.cpp" line="44"/>
+        <location filename="../src/dlg_cardsearch.cpp" line="56"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Cancelar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_cardsearch.cpp" line="66"/>
+        <location filename="../src/dlg_cardsearch.cpp" line="80"/>
         <source>Card search</source>
         <translation>Buscar carta</translation>
     </message>
