@@ -20,7 +20,14 @@ INCLUDE(${QT_USE_FILE})
 INCLUDE_DIRECTORIES(../cockatrice/src)
 
 ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(oracle ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(oracle ${QT_QTMAIN_LIBRARY} ${QT_LIBRARIES})
+
+# This check is needed to link oracle with MSVC++
+if(WIN32)
+  if(MSVC)
+    set_target_properties(oracle PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
+  endif()
+endif()
 
 IF (NOT APPLE)
   INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/oracle DESTINATION bin)
