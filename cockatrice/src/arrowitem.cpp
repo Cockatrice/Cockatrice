@@ -1,9 +1,11 @@
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "arrowitem.h"
 #include "playertarget.h"
 #include "carditem.h"
 #include "cardzone.h"
 #include "player.h"
-#include "math.h"
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsScene>
