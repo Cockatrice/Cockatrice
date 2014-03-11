@@ -47,6 +47,13 @@ RNG_SFMT::RNG_SFMT(QObject *parent)
  * This can be compared to an ideal six sided die that is rolled until only sides
  * 1-5 show up, while 6 represents something that you don't want. So you basically roll
  * a five sided die.
+ * 
+ * Note: If you replace the SFMT RNG with some other rand() function in the future,
+ * then you _need_ to change the UINT64_MAX constant to the largest possible random 
+ * number which can be created by the new rand() function. This value is often defined
+ * in a RAND_MAX constant.
+ * Otherwise you will probably skew the outcome of the getNumber() method or worsen the
+ * performance of the application.
  */
 unsigned int RNG_SFMT::getNumber(unsigned int min, unsigned int max)
 {
