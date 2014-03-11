@@ -35,34 +35,31 @@ InstallDir "$PROGRAMFILES\Cockatrice"
 
 Section "Application" SecApplication
 	SetOutPath "$INSTDIR"
-	File ..\build\cockatrice\cockatrice.exe
-	File ..\build\oracle\oracle.exe
+	File ..\build\cockatrice\Release\cockatrice.exe
+	File ..\build\oracle\Release\oracle.exe
 	File ..\doc\usermanual\Usermanual.pdf
-	File C:\MinGW\bin\libstdc++-6.dll
-	File C:\MinGW\bin\libgcc_s_dw2-1.dll
-	File C:\MinGW\bin\mingwm10.dll
-	File C:\MinGW\bin\libprotobuf-8.dll
-	File C:\Qt\4.8.4\bin\QtCore4.dll
-	File C:\Qt\4.8.4\bin\QtGui4.dll
-	File C:\Qt\4.8.4\bin\QtNetwork4.dll
-	File C:\Qt\4.8.4\bin\QtSvg4.dll
-	File C:\Qt\4.8.4\bin\QtXml4.dll
-	File C:\Qt\4.8.4\bin\QtMultimedia4.dll
+	File ..\build\protobuf-2.5.0\protobuf-2.5.0\vsprojects\Release\libprotobuf.lib
+	File C:\Qt\4.8.5\bin\QtCore4.dll
+	File C:\Qt\4.8.5\bin\QtGui4.dll
+	File C:\Qt\4.8.5\bin\QtNetwork4.dll
+	File C:\Qt\4.8.5\bin\QtSvg4.dll
+	File C:\Qt\4.8.5\bin\QtXml4.dll
+	File C:\Qt\4.8.5\bin\QtMultimedia4.dll
 
 	SetOutPath "$INSTDIR\zonebg"
 	File /r ..\zonebg\*.*
 	
 	SetOutPath "$INSTDIR\plugins"
 	SetOutPath "$INSTDIR\plugins\codecs"
-	File C:\Qt\4.8.4\plugins\codecs\qcncodecs4.dll
-	File C:\Qt\4.8.4\plugins\codecs\qjpcodecs4.dll
-	File C:\Qt\4.8.4\plugins\codecs\qkrcodecs4.dll
-	File C:\Qt\4.8.4\plugins\codecs\qtwcodecs4.dll
+	File C:\Qt\4.8.5\plugins\codecs\qcncodecs4.dll
+	File C:\Qt\4.8.5\plugins\codecs\qjpcodecs4.dll
+	File C:\Qt\4.8.5\plugins\codecs\qkrcodecs4.dll
+	File C:\Qt\4.8.5\plugins\codecs\qtwcodecs4.dll
 	SetOutPath "$INSTDIR\plugins\iconengines"
-	File C:\Qt\4.8.4\plugins\iconengines\qsvgicon4.dll
+	File C:\Qt\4.8.5\plugins\iconengines\qsvgicon4.dll
 	SetOutPath "$INSTDIR\plugins\imageformats"
-	File C:\Qt\4.8.4\plugins\imageformats\qjpeg4.dll
-	File C:\Qt\4.8.4\plugins\imageformats\qsvg4.dll
+	File C:\Qt\4.8.5\plugins\imageformats\qjpeg4.dll
+	File C:\Qt\4.8.5\plugins\imageformats\qsvg4.dll
 
 	SetOutPath "$INSTDIR\sounds"
 	File /r ..\sounds\*.*
