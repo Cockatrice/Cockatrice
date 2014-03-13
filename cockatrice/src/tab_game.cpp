@@ -532,7 +532,7 @@ void TabGame::retranslateUi()
     gameMenu->setTitle(tr("&Game"));
     if (aNextPhase) {
         aNextPhase->setText(tr("Next &phase"));
-        aNextPhase->setShortcut(tr("Ctrl+Space"));
+        aNextPhase->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Space")) << QKeySequence(tr("Tab")));
     }
     if (aNextTurn) {
         aNextTurn->setText(tr("Next &turn"));
