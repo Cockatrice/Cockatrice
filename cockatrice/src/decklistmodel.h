@@ -45,6 +45,8 @@ public:
 	Qt::ItemFlags flags(const QModelIndex &index) const;
 	bool setData(const QModelIndex &index, const QVariant &value, int role);
 	bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+
+	QModelIndex findCard(const QString &cardName, const QString &zoneName) const;
 	QModelIndex addCard(const QString &cardName, const QString &zoneName);
 	void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
 	void cleanList();
@@ -56,6 +58,7 @@ private:
 	InnerDecklistNode *root;
 	InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
 	QModelIndex nodeToIndex(AbstractDecklistNode *node) const;
+	DecklistModelCardNode *findCardNode(const QString &cardName, const QString &zoneName) const;
 	void emitRecursiveUpdates(const QModelIndex &index);
 	void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);
 

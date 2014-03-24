@@ -4,6 +4,7 @@
 #include "tab.h"
 #include <QAbstractItemModel>
 #include <QLineEdit>
+#include "keysignals.h"
 
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
@@ -16,6 +17,7 @@ class QLabel;
 class DeckLoader;
 class Response;
 class FilterTreeModel;
+class CardInfo;
 
 class SearchLineEdit : public QLineEdit {
 	private:
@@ -56,6 +58,9 @@ private slots:
 	void actRemoveCard();
 	void actIncrement();
 	void actDecrement();
+	void actDecrementCard();
+	void actDecrementCardFromSideboard();
+
         void actUpdatePrices();
 
         void finishedUpdatingPrices();
@@ -63,7 +68,10 @@ private slots:
 	void filterViewCustomContextMenu(const QPoint &point);
 	void filterRemove(QAction *action);
 private:
+	CardInfo *currentCardInfo() const;
 	void addCardHelper(QString zoneName);
+	void offsetCountAtIndex(const QModelIndex &idx, int offset);
+	void decrementCardHelper(QString zoneName);
 	void recursiveExpand(const QModelIndex &index);
 	bool confirmClose();
 
@@ -71,10 +79,13 @@ private:
 	CardDatabaseDisplayModel *databaseDisplayModel;
 	DeckListModel *deckModel;
 	QTreeView *databaseView;
+	KeySignals dbViewKeySignals;
 	QTreeView *deckView;
+	KeySignals deckViewKeySignals;
 	CardFrame *cardInfo;
 	QLabel *searchLabel;
 	SearchLineEdit *searchEdit;
+	KeySignals searchKeySignals;
 	QLabel *nameLabel;
 	QLineEdit *nameEdit;
 	QLabel *commentsLabel;

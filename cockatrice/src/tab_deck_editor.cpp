@@ -54,8 +54,15 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	searchLabel = new QLabel();
 	searchEdit = new SearchLineEdit;
 	searchLabel->setBuddy(searchEdit);
+	searchKeySignals.filterDelete(false);
+	searchEdit->installEventFilter(&searchKeySignals);
 	connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
-	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(actAddCard()));
+	connect(&searchKeySignals, SIGNAL(onEnter()), this, SLOT(actAddCard()));
+	connect(&searchKeySignals, SIGNAL(onRight()), this, SLOT(actAddCard()));
+	connect(&searchKeySignals, SIGNAL(onCtrlRight()), this, SLOT(actAddCardToSideboard()));
+	connect(&searchKeySignals, SIGNAL(onLeft()), this, SLOT(actDecrementCard()));
+	connect(&searchKeySignals, SIGNAL(onCtrlLeft()), this, SLOT(actDecrementCardFromSideboard()));
+	connect(&searchKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));
 
 	QToolBar *deckEditToolBar = new QToolBar;
 	deckEditToolBar->setOrientation(Qt::Horizontal);
@@ -71,6 +78,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	databaseDisplayModel->setSourceModel(databaseModel);
 	databaseDisplayModel->setFilterKeyColumn(0);
 	databaseDisplayModel->sort(0, Qt::AscendingOrder);
+
 	databaseView = new QTreeView();
 	databaseView->setModel(databaseDisplayModel);
 	databaseView->setUniformRowHeights(true);
@@ -81,6 +89,14 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	databaseView->resizeColumnToContents(0);
 	connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
 	connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
+	databaseView->installEventFilter(&dbViewKeySignals);
+	connect(&dbViewKeySignals, SIGNAL(onEnter()), this, SLOT(actAddCard()));
+	connect(&dbViewKeySignals, SIGNAL(onRight()), this, SLOT(actAddCard()));
+	connect(&dbViewKeySignals, SIGNAL(onCtrlRight()), this, SLOT(actAddCardToSideboard()));
+	connect(&dbViewKeySignals, SIGNAL(onLeft()), this, SLOT(actDecrementCard()));
+	connect(&dbViewKeySignals, SIGNAL(onCtrlLeft()), this, SLOT(actDecrementCardFromSideboard()));
+	connect(&dbViewKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));
+
 	searchEdit->setTreeView(databaseView);
 
 	QVBoxLayout *leftFrame = new QVBoxLayout;
@@ -121,7 +137,13 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 	deckView->setModel(deckModel);
 	deckView->setUniformRowHeights(true);
 	deckView->header()->setResizeMode(QHeaderView::ResizeToContents);
+	deckViewKeySignals.filterLeftRight(false);
+	deckView->installEventFilter(&deckViewKeySignals);
 	connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
+	connect(&deckViewKeySignals, SIGNAL(onEnter()), this, SLOT(actIncrement()));
+	connect(&deckViewKeySignals, SIGNAL(onRight()), this, SLOT(actIncrement()));
+	connect(&deckViewKeySignals, SIGNAL(onLeft()), this, SLOT(actDecrement()));
+	connect(&deckViewKeySignals, SIGNAL(onDelete()), this, SLOT(actRemoveCard()));
 
 	nameLabel = new QLabel();
 	nameEdit = new QLineEdit;
@@ -286,9 +308,8 @@ void TabDeckEditor::retranslateUi()
 	aClose->setShortcut(tr("Ctrl+Q"));
 	
 	aAddCard->setText(tr("Add card to &maindeck"));
-	aAddCard->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Return")) << QKeySequence(tr("Enter")));
 	aAddCardToSideboard->setText(tr("Add card to &sideboard"));
-	aAddCardToSideboard->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
+
 	aRemoveCard->setText(tr("&Remove row"));
 	aRemoveCard->setShortcut(tr("Del"));
 	aIncrement->setText(tr("&Increment number"));
@@ -517,18 +538,27 @@ void TabDeckEditor::recursiveExpand(const QModelIndex &index)
 	deckView->expand(index);
 }
 
-void TabDeckEditor::addCardHelper(QString zoneName)
+CardInfo *TabDeckEditor::currentCardInfo() const
 {
 	const QModelIndex currentIndex = databaseView->selectionModel()->currentIndex();
 	if (!currentIndex.isValid())
-		return;
+		return NULL;
 	const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
 	
-	CardInfo *info = db->getCard(cardName);
+	return db->getCard(cardName);
+}
+
+void TabDeckEditor::addCardHelper(QString zoneName)
+{
+	const CardInfo *info;
+
+	info = currentCardInfo();
+	if(!info)
+		return;
 	if (info->getIsToken())
 		zoneName = "tokens";
-	
-	QModelIndex newCardIndex = deckModel->addCard(cardName, zoneName);
+
+	QModelIndex newCardIndex = deckModel->addCard(info->getName(), zoneName);
 	recursiveExpand(newCardIndex);
 	deckView->setCurrentIndex(newCardIndex);
 
@@ -554,31 +584,56 @@ void TabDeckEditor::actRemoveCard()
 	setModified(true);
 }
 
+void TabDeckEditor::offsetCountAtIndex(const QModelIndex &idx, int offset)
+{
+	if (!idx.isValid() || offset == 0)
+		return;
+
+	const QModelIndex numberIndex = idx.sibling(idx.row(), 0);
+	const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
+	deckView->setCurrentIndex(numberIndex);
+	if ((count + offset) <= 0)
+		deckModel->removeRow(idx.row(), idx.parent());
+	else
+		deckModel->setData(numberIndex, count + offset, Qt::EditRole);
+	setModified(true);
+}
+
+void TabDeckEditor::decrementCardHelper(QString zoneName)
+{
+	const CardInfo *info;
+	QModelIndex idx;
+
+	info = currentCardInfo();
+	if(!info)
+		return;
+	if (info->getIsToken())
+		zoneName = "tokens";
+
+	idx = deckModel->findCard(info->getName(), zoneName);
+	offsetCountAtIndex(idx, -1);
+}
+
+void TabDeckEditor::actDecrementCard()
+{
+	decrementCardHelper("main");
+}
+
+void TabDeckEditor::actDecrementCardFromSideboard()
+{
+	decrementCardHelper("side");
+}
+
 void TabDeckEditor::actIncrement()
 {
 	const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
-	if (!currentIndex.isValid())
-		return;
-	const QModelIndex numberIndex = currentIndex.sibling(currentIndex.row(), 0);
-	const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
-	deckView->setCurrentIndex(numberIndex);
-	deckModel->setData(numberIndex, count + 1, Qt::EditRole);
-	setModified(true);
+	offsetCountAtIndex(currentIndex, 1);
 }
 
 void TabDeckEditor::actDecrement()
 {
 	const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
-	if (!currentIndex.isValid())
-		return;
-	const QModelIndex numberIndex = currentIndex.sibling(currentIndex.row(), 0);
-	const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
-	deckView->setCurrentIndex(numberIndex);
-	if (count == 1)
-		deckModel->removeRow(currentIndex.row(), currentIndex.parent());
-	else
-		deckModel->setData(numberIndex, count - 1, Qt::EditRole);
-	setModified(true);
+	offsetCountAtIndex(currentIndex, -1);
 }
 
 void TabDeckEditor::actUpdatePrices()

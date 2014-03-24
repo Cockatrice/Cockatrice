@@ -41,7 +41,8 @@ FilterBuilder::FilterBuilder(QWidget *parent)
 	layout->setAlignment(Qt::AlignTop);
 	setLayout(layout);
 
-	connect(ok, SIGNAL(released()), this, SLOT(add_released()));
+	connect(edit, SIGNAL(returnPressed()), this, SLOT(emit_add()));
+	connect(ok, SIGNAL(released()), this, SLOT(emit_add()));
 	connect(filterCombo, SIGNAL(currentIndexChanged(int)), edit, SLOT(clear()));
 	fltr = NULL;
 }
@@ -62,7 +63,7 @@ static int comboCurrentIntData(const QComboBox *combo)
 	return combo->itemData(combo->currentIndex()).toInt();
 }
 
-void FilterBuilder::add_released()
+void FilterBuilder::emit_add()
 {
 	QString txt;
 

@@ -169,8 +169,7 @@ Qt::ItemFlags DeckListModel::flags(const QModelIndex &index) const
 		return 0;
 
 	Qt::ItemFlags result = Qt::ItemIsEnabled;
-	if (getNode<DecklistModelCardNode *>(index))
-		result |= Qt::ItemIsSelectable;
+	result |= Qt::ItemIsSelectable;
 
 	return result;
 }
@@ -234,6 +233,38 @@ InnerDecklistNode *DeckListModel::createNodeIfNeeded(const QString &name, InnerD
 		endInsertRows();
 	}
 	return newNode;
+}
+
+DecklistModelCardNode *DeckListModel::findCardNode(const QString &cardName, const QString &zoneName) const
+{
+	InnerDecklistNode *zoneNode, *typeNode;
+	CardInfo *info;
+	QString cardType;
+
+	zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
+	if(!zoneNode)
+		return NULL;
+
+	info = db->getCard(cardName);
+	if(!info)
+		return NULL;
+
+	cardType = info->getMainCardType();
+	typeNode = dynamic_cast<InnerDecklistNode *>(zoneNode->findChild(cardType));
+	if(!typeNode)
+		return NULL;
+
+	return dynamic_cast<DecklistModelCardNode *>(typeNode->findChild(cardName));
+}
+
+QModelIndex DeckListModel::findCard(const QString &cardName, const QString &zoneName) const
+{
+	DecklistModelCardNode *cardNode;
+
+	cardNode = findCardNode(cardName, zoneName);
+	if(!cardNode)
+		return QModelIndex();
+	return nodeToIndex(cardNode);
 }
 
 QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneName)

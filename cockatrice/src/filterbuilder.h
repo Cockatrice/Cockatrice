@@ -28,7 +28,7 @@ signals:
 
 public slots:
 private slots:
-	void add_released();
+	void emit_add();
 protected:
 };
 

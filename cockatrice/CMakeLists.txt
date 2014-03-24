@@ -26,6 +26,7 @@ SET(cockatrice_SOURCES
  src/handzone.cpp 
  src/handcounter.cpp 
  src/carddatabase.cpp 
+ src/keysignals.cpp
  src/gameview.cpp 
  src/gameselector.cpp 
  src/decklistmodel.cpp 
@@ -110,6 +111,7 @@ SET(cockatrice_HEADERS
  src/handzone.h 
  src/handcounter.h 
  src/carddatabase.h 
+ src/keysignals.h
  src/gameview.h 
  src/gameselector.h 
  src/decklistmodel.h 
