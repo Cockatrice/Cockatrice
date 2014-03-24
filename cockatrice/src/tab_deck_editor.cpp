@@ -285,7 +285,7 @@ TabDeckEditor::~TabDeckEditor()
 
 void TabDeckEditor::retranslateUi()
 {
-	aCardTextOnly->setText(tr("&Show card text only"));
+	aCardTextOnly->setText(tr("Show card text only"));
 	aClearSearch->setText(tr("&Clear search"));
 	searchLabel->setText(tr("&Search for:"));
 	
@@ -591,11 +591,12 @@ void TabDeckEditor::offsetCountAtIndex(const QModelIndex &idx, int offset)
 
 	const QModelIndex numberIndex = idx.sibling(idx.row(), 0);
 	const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
+	const int new_count = count + offset;
 	deckView->setCurrentIndex(numberIndex);
-	if ((count + offset) <= 0)
+	if (new_count <= 0)
 		deckModel->removeRow(idx.row(), idx.parent());
 	else
-		deckModel->setData(numberIndex, count + offset, Qt::EditRole);
+		deckModel->setData(numberIndex, new_count, Qt::EditRole);
 	setModified(true);
 }
 

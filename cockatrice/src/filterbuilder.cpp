@@ -18,12 +18,16 @@ FilterBuilder::FilterBuilder(QWidget *parent)
 	filterCombo = new QComboBox;
 	for (i = 0; i < CardFilter::AttrEnd; i++)
 		filterCombo->addItem(
-			CardFilter::attrName(static_cast<CardFilter::Attr>(i)), QVariant(i));
+			tr(CardFilter::attrName(static_cast<CardFilter::Attr>(i))),
+			QVariant(i)
+		);
 
 	typeCombo = new QComboBox;
 	for (i = 0; i < CardFilter::TypeEnd; i++)
 		typeCombo->addItem(
-			CardFilter::typeName(static_cast<CardFilter::Type>(i)), QVariant(i));
+			tr(CardFilter::typeName(static_cast<CardFilter::Type>(i))),
+			QVariant(i)
+		);
 
 	QPushButton *ok = new QPushButton("+");
 	ok->setMaximumSize(20, 20);

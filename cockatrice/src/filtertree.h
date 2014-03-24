@@ -23,9 +23,9 @@ public:
 	virtual int childCount() const { return 0; }
 	virtual int childIndex(const FilterTreeNode *node) const { return -1; }
 	virtual int index() const { return (parent() != NULL)? parent()->childIndex(this) : -1; }
-	virtual QString text() const { return ""; }
+	virtual QString text() const { return QString(textCStr()); }
 	virtual bool isLeaf() const { return false; }
-	virtual const char *textCStr() const { return text().toStdString().c_str(); }
+	virtual const char *textCStr() const { return ""; }
 	virtual void nodeChanged() const { 
 		if (parent() != NULL) parent()->nodeChanged();
 	}
@@ -70,7 +70,7 @@ public:
 	const FilterItemList *findTypeList(CardFilter::Type type) const;
 	FilterItemList *typeList(CardFilter::Type type);
 	FilterTreeNode *parent() const;
-	QString text() const { return QString(CardFilter::attrName(attr)); }
+	const char* textCStr() const { return CardFilter::attrName(attr); }
 };
 
 class FilterItem;
@@ -86,7 +86,7 @@ public:
 	FilterTreeNode *parent() const { return p; }
 	int termIndex(const QString &term) const;
 	FilterTreeNode *termNode(const QString &term);
-	QString text() const { return QString(CardFilter::typeName(type)); }
+	const char *textCStr() const { return CardFilter::typeName(type); }
 
 	bool testTypeAnd(const CardInfo *info, CardFilter::Attr attr) const;
 	bool testTypeAndNot(const CardInfo *info, CardFilter::Attr attr) const;
@@ -107,6 +107,7 @@ public:
 	CardFilter::Type type() const { return p->type; }
 	FilterTreeNode *parent() const { return p; }
 	QString text() const { return term; }
+	const char *textCStr() const { return term.toStdString().c_str(); }
 	bool isLeaf() const { return true; }
 
 	bool acceptName(const CardInfo *info) const;
@@ -152,7 +153,7 @@ public:
 	FilterTreeNode *termNode(const CardFilter *f);
 	FilterTreeNode *attrTypeNode(CardFilter::Attr attr,
 								CardFilter::Type type);
-	QString text() const { return QString("root"); }
+	const char *textCStr() { return "root"; }
 	int index() const { return 0; }
 
 	bool acceptsCard(const CardInfo *info) const;
