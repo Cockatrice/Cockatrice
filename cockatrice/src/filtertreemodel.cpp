@@ -262,13 +262,8 @@ bool FilterTreeModel::removeRows(int row, int count, const QModelIndex & parent)
 	if (node == NULL || last >= node->childCount())
 		return false;
 
-	printf("delete children in %s\n", node->textCStr());
-	fflush(stdout);
-	for (i = 0; i < count; i++) {
-		printf("  delete %d\n", i);
-		fflush(stdout);
+	for (i = 0; i < count; i++)
 		node->deleteAt(row);
-	}
 
 	if (node != fTree && node->childCount() < 1)
 		return removeRow(parent.row(), parent.parent());
