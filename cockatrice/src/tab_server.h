@@ -19,38 +19,38 @@ class ServerInfo_Room;
 class CommandContainer;
 
 class RoomSelector : public QGroupBox {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	QTreeWidget *roomList;
-	QPushButton *joinButton;
-	AbstractClient *client;
-	
-	void joinRoom(int id, bool setCurrent);
+    QTreeWidget *roomList;
+    QPushButton *joinButton;
+    AbstractClient *client;
+    
+    void joinRoom(int id, bool setCurrent);
 private slots:
-	void processListRoomsEvent(const Event_ListRooms &event);
-	void joinClicked();
-	void joinFinished(const Response &resp, const CommandContainer &commandContainer, const QVariant &extraData);
+    void processListRoomsEvent(const Event_ListRooms &event);
+    void joinClicked();
+    void joinFinished(const Response &resp, const CommandContainer &commandContainer, const QVariant &extraData);
 signals:
-	void roomJoined(const ServerInfo_Room &info, bool setCurrent);
+    void roomJoined(const ServerInfo_Room &info, bool setCurrent);
 public:
-	RoomSelector(AbstractClient *_client, QWidget *parent = 0);
-	void retranslateUi();
+    RoomSelector(AbstractClient *_client, QWidget *parent = 0);
+    void retranslateUi();
 };
 
 class TabServer : public Tab {
-	Q_OBJECT
+    Q_OBJECT
 signals:
-	void roomJoined(const ServerInfo_Room &info, bool setCurrent);
+    void roomJoined(const ServerInfo_Room &info, bool setCurrent);
 private slots:
-	void processServerMessageEvent(const Event_ServerMessage &event);
+    void processServerMessageEvent(const Event_ServerMessage &event);
 private:
-	AbstractClient *client;
-	RoomSelector *roomSelector;
-	QTextBrowser *serverInfoBox;
+    AbstractClient *client;
+    RoomSelector *roomSelector;
+    QTextBrowser *serverInfoBox;
 public:
-	TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = 0);
-	void retranslateUi();
-	QString getTabText() const { return tr("Server"); }
+    TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = 0);
+    void retranslateUi();
+    QString getTabText() const { return tr("Server"); }
 };
 
 #endif

@@ -28,7 +28,6 @@ Note that "improve" and "write" always also means: "document and comment"
 * Rename the picture filenames to something more meaningful.
 * Create an index, lists of tables/figures/...
 
-
 ## Storage
 * Find a better place for sets.xml than doc.
 
@@ -40,24 +39,6 @@ Note that "improve" and "write" always also means: "document and comment"
 * Comment and document servatrice.sql
 * Document everything!1!!
 * Coding guidelines
-
-##Fix compile warnings
-* (CMAKE_VERBOSE_MAKEFILE, compile with clang++), this could indicate missing program functionality:
-
-```
-cockatrice/src/abstractclient.cpp:72:12: warning: enumeration value 'SessionEvent_SessionEventType_SERVER_COMPLETE_LIST' not handled in switch [-Wswitch]
-                switch ((SessionEvent::SessionEventType) getPbExtension(event)) {
-```
-                                
-```
-cockatrice/Cockatrice.VanNostrand/cockatrice/src/player.cpp:1725:12: warning: 4 enumeration values not handled in switch: 'cmMoveToTopLibrary', 'cmMoveToBottomLibrary', 'cmMoveToGraveyard'... [-Wswitch]
-                switch (static_cast<CardMenuActionType>(a->data().toInt())) {
-```
-
-```
-cockatrice/src/cardzone.cpp:127:11: warning: enumeration values 'CaseTopCardsOfZone', 'CaseRevealZone', and 'CaseShuffleZone' not handled in switch [-Wswitch]
-                switch (gc) {
-```
 
 ##Else
 

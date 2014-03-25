@@ -48,5 +48,9 @@ INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(cockatrice_common ${common_SOURCES} ${common_HEADERS_MOC})
-target_link_libraries(cockatrice_common cockatrice_protocol)
-
+# Without this check, Linux will put -pthread out of order in link.txt and build will fail
+if (UNIX)
+    target_link_libraries(cockatrice_common cockatrice_protocol pthread)
+else (UNIX)
+    target_link_libraries(cockatrice_common cockatrice_protocol)
+endif (UNIX)

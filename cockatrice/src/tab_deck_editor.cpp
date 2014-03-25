@@ -54,6 +54,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     searchLabel = new QLabel();
     searchEdit = new SearchLineEdit;
     searchLabel->setBuddy(searchEdit);
+
     searchKeySignals.filterDelete(false);
     searchEdit->installEventFilter(&searchKeySignals);
     connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
@@ -96,7 +97,6 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     connect(&dbViewKeySignals, SIGNAL(onLeft()), this, SLOT(actDecrementCard()));
     connect(&dbViewKeySignals, SIGNAL(onCtrlLeft()), this, SLOT(actDecrementCardFromSideboard()));
     connect(&dbViewKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));
-
     searchEdit->setTreeView(databaseView);
 
     QVBoxLayout *leftFrame = new QVBoxLayout;
@@ -414,7 +414,7 @@ void TabDeckEditor::actLoadDeck()
         return;
 
     QString fileName = dialog.selectedFiles().at(0);
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromNameFilter(dialog.selectedNameFilter());
+    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
     
     DeckLoader *l = new DeckLoader;
     if (l->loadFromFile(fileName, fmt))
@@ -467,7 +467,7 @@ bool TabDeckEditor::actSaveDeckAs()
         return false;
 
     QString fileName = dialog.selectedFiles().at(0);
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromNameFilter(dialog.selectedNameFilter());
+    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
     if (!deckModel->getDeckList()->saveToFile(fileName, fmt)) {
         QMessageBox::critical(this, tr("Error"), tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));
@@ -561,7 +561,6 @@ void TabDeckEditor::addCardHelper(QString zoneName)
     QModelIndex newCardIndex = deckModel->addCard(info->getName(), zoneName);
     recursiveExpand(newCardIndex);
     deckView->setCurrentIndex(newCardIndex);
-
     setModified(true);
 }
 

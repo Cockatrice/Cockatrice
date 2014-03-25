@@ -11,92 +11,92 @@ class QSortFilterProxyModel;
 class ServerInfo_DeckStorage_TreeItem;
 
 class RemoteDeckList_TreeModel : public QAbstractItemModel {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	class DirectoryNode;
-	class FileNode;
-	class Node {
-	protected:
-		DirectoryNode *parent;
-		QString name;
-	public:
-		Node(const QString &_name, DirectoryNode *_parent = 0)
-			: parent(_parent), name(_name) { }
-		virtual ~Node() { };
-		DirectoryNode *getParent() const { return parent; }
-		QString getName() const { return name; }
-	};
-	class DirectoryNode : public Node, public QList<Node *> {
-	public:
-		DirectoryNode(const QString &_name = QString(), DirectoryNode *_parent = 0);
-		~DirectoryNode();
-		void clearTree();
-		QString getPath() const;
-		DirectoryNode *getNodeByPath(QStringList path);
-		FileNode *getNodeById(int id) const;
-	};
-	class FileNode : public Node {
-	private:
-		int id;
-		QDateTime uploadTime;
-	public:
-		FileNode(const QString &_name, int _id, const QDateTime &_uploadTime, DirectoryNode *_parent = 0)
-			: Node(_name, _parent), id(_id), uploadTime(_uploadTime) { }
-		int getId() const { return id; }
-		QDateTime getUploadTime() const { return uploadTime; }
-	};
-	
-	template<typename T> T getNode(const QModelIndex &index) const
-	{
-		if (!index.isValid())
-			return dynamic_cast<T>(root);
-		return dynamic_cast<T>(static_cast<Node *>(index.internalPointer()));
-	}
+    class DirectoryNode;
+    class FileNode;
+    class Node {
+    protected:
+        DirectoryNode *parent;
+        QString name;
+    public:
+        Node(const QString &_name, DirectoryNode *_parent = 0)
+            : parent(_parent), name(_name) { }
+        virtual ~Node() { };
+        DirectoryNode *getParent() const { return parent; }
+        QString getName() const { return name; }
+    };
+    class DirectoryNode : public Node, public QList<Node *> {
+    public:
+        DirectoryNode(const QString &_name = QString(), DirectoryNode *_parent = 0);
+        ~DirectoryNode();
+        void clearTree();
+        QString getPath() const;
+        DirectoryNode *getNodeByPath(QStringList path);
+        FileNode *getNodeById(int id) const;
+    };
+    class FileNode : public Node {
+    private:
+        int id;
+        QDateTime uploadTime;
+    public:
+        FileNode(const QString &_name, int _id, const QDateTime &_uploadTime, DirectoryNode *_parent = 0)
+            : Node(_name, _parent), id(_id), uploadTime(_uploadTime) { }
+        int getId() const { return id; }
+        QDateTime getUploadTime() const { return uploadTime; }
+    };
+    
+    template<typename T> T getNode(const QModelIndex &index) const
+    {
+        if (!index.isValid())
+            return dynamic_cast<T>(root);
+        return dynamic_cast<T>(static_cast<Node *>(index.internalPointer()));
+    }
 private:
-	AbstractClient *client;
-	DirectoryNode *root;
-	
-	QIcon fileIcon, dirIcon;
-	
-	QModelIndex nodeToIndex(Node *node) const;
+    AbstractClient *client;
+    DirectoryNode *root;
+    
+    QIcon fileIcon, dirIcon;
+    
+    QModelIndex nodeToIndex(Node *node) const;
 signals:
-	void treeRefreshed();
+    void treeRefreshed();
 private slots:
-	void deckListFinished(const Response &r);
+    void deckListFinished(const Response &r);
 public:
-	RemoteDeckList_TreeModel(AbstractClient *_client, QObject *parent = 0);
-	~RemoteDeckList_TreeModel();
-	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const;
-	QVariant data(const QModelIndex &index, int role) const;
-	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-	QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
-	QModelIndex parent(const QModelIndex &index) const;
-	Qt::ItemFlags flags(const QModelIndex &index) const;
+    RemoteDeckList_TreeModel(AbstractClient *_client, QObject *parent = 0);
+    ~RemoteDeckList_TreeModel();
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
+    QModelIndex parent(const QModelIndex &index) const;
+    Qt::ItemFlags flags(const QModelIndex &index) const;
 
-	DirectoryNode *getRoot() const { return root; }
-	void addFileToTree(const ServerInfo_DeckStorage_TreeItem &file, DirectoryNode *parent);
-	void addFolderToTree(const ServerInfo_DeckStorage_TreeItem &folder, DirectoryNode *parent);
-	DirectoryNode *addNamedFolderToTree(const QString &name, DirectoryNode *parent);
-	void removeNode(Node *node);
-	void refreshTree();
+    DirectoryNode *getRoot() const { return root; }
+    void addFileToTree(const ServerInfo_DeckStorage_TreeItem &file, DirectoryNode *parent);
+    void addFolderToTree(const ServerInfo_DeckStorage_TreeItem &folder, DirectoryNode *parent);
+    DirectoryNode *addNamedFolderToTree(const QString &name, DirectoryNode *parent);
+    void removeNode(Node *node);
+    void refreshTree();
 };
 
 class RemoteDeckList_TreeWidget : public QTreeView {
 private:
-	RemoteDeckList_TreeModel *treeModel;
-	QSortFilterProxyModel *proxyModel;
+    RemoteDeckList_TreeModel *treeModel;
+    QSortFilterProxyModel *proxyModel;
 public:
-	RemoteDeckList_TreeWidget(AbstractClient *_client, QWidget *parent = 0);
-	RemoteDeckList_TreeModel::Node *getNode(const QModelIndex &ind) const;
-	RemoteDeckList_TreeModel::Node *getCurrentItem() const;
-	RemoteDeckList_TreeModel::DirectoryNode *getNodeByPath(const QString &path) const;
-	RemoteDeckList_TreeModel::FileNode *getNodeById(int id) const;
-	void addFileToTree(const ServerInfo_DeckStorage_TreeItem &file, RemoteDeckList_TreeModel::DirectoryNode *parent);
-	void addFolderToTree(const ServerInfo_DeckStorage_TreeItem &folder, RemoteDeckList_TreeModel::DirectoryNode *parent);
-	void addFolderToTree(const QString &name, RemoteDeckList_TreeModel::DirectoryNode *parent);
-	void removeNode(RemoteDeckList_TreeModel::Node *node);
-	void refreshTree();
+    RemoteDeckList_TreeWidget(AbstractClient *_client, QWidget *parent = 0);
+    RemoteDeckList_TreeModel::Node *getNode(const QModelIndex &ind) const;
+    RemoteDeckList_TreeModel::Node *getCurrentItem() const;
+    RemoteDeckList_TreeModel::DirectoryNode *getNodeByPath(const QString &path) const;
+    RemoteDeckList_TreeModel::FileNode *getNodeById(int id) const;
+    void addFileToTree(const ServerInfo_DeckStorage_TreeItem &file, RemoteDeckList_TreeModel::DirectoryNode *parent);
+    void addFolderToTree(const ServerInfo_DeckStorage_TreeItem &folder, RemoteDeckList_TreeModel::DirectoryNode *parent);
+    void addFolderToTree(const QString &name, RemoteDeckList_TreeModel::DirectoryNode *parent);
+    void removeNode(RemoteDeckList_TreeModel::Node *node);
+    void refreshTree();
 };
 
 #endif

@@ -11,35 +11,35 @@ class Response;
 class ServerInfo_User;
 
 class TabMessage : public Tab {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	AbstractClient *client;
-	QMenu *messageMenu;
-	ServerInfo_User *ownUserInfo;
-	ServerInfo_User *otherUserInfo;
-	bool userOnline;
-	
-	ChatView *chatView;
-	QLineEdit *sayEdit;
+    AbstractClient *client;
+    QMenu *messageMenu;
+    ServerInfo_User *ownUserInfo;
+    ServerInfo_User *otherUserInfo;
+    bool userOnline;
+    
+    ChatView *chatView;
+    QLineEdit *sayEdit;
 
-	QAction *aLeave;
+    QAction *aLeave;
 signals:
-	void talkClosing(TabMessage *tab);
+    void talkClosing(TabMessage *tab);
 private slots:
-	void sendMessage();
-	void actLeave();
-	void messageSent(const Response &response);
+    void sendMessage();
+    void actLeave();
+    void messageSent(const Response &response);
 public:
-	TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &_ownUserInfo, const ServerInfo_User &_otherUserInfo);
-	~TabMessage();
-	void retranslateUi();
-	void closeRequest();
-	QString getUserName() const;
-	QString getTabText() const;
+    TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &_ownUserInfo, const ServerInfo_User &_otherUserInfo);
+    ~TabMessage();
+    void retranslateUi();
+    void closeRequest();
+    QString getUserName() const;
+    QString getTabText() const;
 
-	void processUserMessageEvent(const Event_UserMessage &event);
-	void processUserLeft();
-	void processUserJoined(const ServerInfo_User &_userInfo);
+    void processUserMessageEvent(const Event_UserMessage &event);
+    void processUserLeft();
+    void processUserJoined(const ServerInfo_User &_userInfo);
 };
 
 #endif

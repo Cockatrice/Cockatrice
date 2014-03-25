@@ -8,14 +8,14 @@ class QNetworkReply;
 class DeckList;
 
 class DeckStatsInterface : public QObject {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	QNetworkAccessManager *manager;
+    QNetworkAccessManager *manager;
 private slots:
-	void queryFinished(QNetworkReply *reply);
+    void queryFinished(QNetworkReply *reply);
 public:
-	DeckStatsInterface(QObject *parent = 0);
-	void analyzeDeck(DeckList *deck);
+    DeckStatsInterface(QObject *parent = 0);
+    void analyzeDeck(DeckList *deck);
 };
 
 #endif

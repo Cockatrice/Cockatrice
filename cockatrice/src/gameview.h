@@ -6,21 +6,21 @@
 class QRubberBand;
 
 class GameView : public QGraphicsView {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	QAction *aCloseMostRecentZoneView;
-	QRubberBand *rubberBand;
-	QPointF selectionOrigin;
+    QAction *aCloseMostRecentZoneView;
+    QRubberBand *rubberBand;
+    QPointF selectionOrigin;
 protected:
-	void resizeEvent(QResizeEvent *event);
+    void resizeEvent(QResizeEvent *event);
 private slots:
-	void startRubberBand(const QPointF &selectionOrigin);
-	void resizeRubberBand(const QPointF &cursorPoint);
-	void stopRubberBand();
+    void startRubberBand(const QPointF &selectionOrigin);
+    void resizeRubberBand(const QPointF &cursorPoint);
+    void stopRubberBand();
 public slots:
-	void updateSceneRect(const QRectF &rect);
+    void updateSceneRect(const QRectF &rect);
 public:
-	GameView(QGraphicsScene *scene, QWidget *parent = 0);
+    GameView(QGraphicsScene *scene, QWidget *parent = 0);
 };
 
 #endif

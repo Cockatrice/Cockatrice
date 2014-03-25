@@ -9,16 +9,16 @@ class QLineEdit;
 class QCheckBox;
 
 class DlgCardSearch : public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	QLineEdit *cardNameEdit, *cardTextEdit;
-	QList<QCheckBox *> cardTypeCheckBoxes, cardColorCheckBoxes;
+    QLineEdit *cardNameEdit, *cardTextEdit;
+    QList<QCheckBox *> cardTypeCheckBoxes, cardColorCheckBoxes;
 public:
-	DlgCardSearch(QWidget *parent = 0);
-	QString getCardName() const;
-	QString getCardText() const;
-	QSet<QString> getCardTypes() const;
-	QSet<QString> getCardColors() const;
+    DlgCardSearch(QWidget *parent = 0);
+    QString getCardName() const;
+    QString getCardText() const;
+    QSet<QString> getCardTypes() const;
+    QSet<QString> getCardColors() const;
 };
 
 #endif

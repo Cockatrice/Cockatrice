@@ -13,26 +13,26 @@ class QTreeView;
 class CardInfo;
 
 class DlgEditTokens : public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 private slots:
-	void tokenSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
-	void colorChanged(int _colorIndex);
-	void ptChanged(const QString &_pt);
-	void annotationChanged(const QString &_annotation);
-	
-	void actAddToken();
-	void actRemoveToken();
+    void tokenSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
+    void colorChanged(int _colorIndex);
+    void ptChanged(const QString &_pt);
+    void annotationChanged(const QString &_annotation);
+    
+    void actAddToken();
+    void actRemoveToken();
 private:
-	CardInfo *currentCard;
-	CardDatabaseModel *cardDatabaseModel;
-	CardDatabaseDisplayModel *cardDatabaseDisplayModel;
-	QStringList predefinedTokens;
-	QLabel *nameLabel, *colorLabel, *ptLabel, *annotationLabel;
-	QComboBox *colorEdit;
-	QLineEdit *nameEdit, *ptEdit, *annotationEdit;
-	QTreeView *chooseTokenView;
+    CardInfo *currentCard;
+    CardDatabaseModel *cardDatabaseModel;
+    CardDatabaseDisplayModel *cardDatabaseDisplayModel;
+    QStringList predefinedTokens;
+    QLabel *nameLabel, *colorLabel, *ptLabel, *annotationLabel;
+    QComboBox *colorEdit;
+    QLineEdit *nameEdit, *ptEdit, *annotationEdit;
+    QTreeView *chooseTokenView;
 public:
-	DlgEditTokens(CardDatabaseModel *_cardDatabaseModel, QWidget *parent = 0);
+    DlgEditTokens(CardDatabaseModel *_cardDatabaseModel, QWidget *parent = 0);
 };
 
 #endif

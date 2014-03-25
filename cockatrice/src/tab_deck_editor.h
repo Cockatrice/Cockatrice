@@ -61,9 +61,9 @@ private slots:
     void actDecrementCard();
     void actDecrementCardFromSideboard();
 
-        void actUpdatePrices();
+    void actUpdatePrices();
 
-        void finishedUpdatingPrices();
+    void finishedUpdatingPrices();
     void saveDeckRemoteFinished(const Response &r);
     void filterViewCustomContextMenu(const QPoint &point);
     void filterRemove(QAction *action);
@@ -79,6 +79,7 @@ private:
     CardDatabaseDisplayModel *databaseDisplayModel;
     DeckListModel *deckModel;
     QTreeView *databaseView;
+
     KeySignals dbViewKeySignals;
     QTreeView *deckView;
     KeySignals deckViewKeySignals;
@@ -86,6 +87,7 @@ private:
     QLabel *searchLabel;
     SearchLineEdit *searchEdit;
     KeySignals searchKeySignals;
+
     QLabel *nameLabel;
     QLineEdit *nameEdit;
     QLabel *commentsLabel;
@@ -98,7 +100,7 @@ private:
     QMenu *deckMenu, *dbMenu;
     QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose;
     QAction *aEditSets, *aEditTokens, *aClearSearch, *aCardTextOnly;
-        QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement, *aUpdatePrices;
+    QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement, *aUpdatePrices;
     
     bool modified;
 public:

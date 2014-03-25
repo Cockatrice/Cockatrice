@@ -45,7 +45,6 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-
     QModelIndex findCard(const QString &cardName, const QString &zoneName) const;
     QModelIndex addCard(const QString &cardName, const QString &zoneName);
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);

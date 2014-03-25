@@ -15,28 +15,28 @@ class CardDatabaseModel;
 class CardDatabaseDisplayModel;
 
 class DlgCreateToken : public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent = 0);
-	QString getName() const;
-	QString getColor() const;
-	QString getPT() const;
-	QString getAnnotation() const;
-	bool getDestroy() const;
+    DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent = 0);
+    QString getName() const;
+    QString getColor() const;
+    QString getPT() const;
+    QString getAnnotation() const;
+    bool getDestroy() const;
 private slots:
-	void tokenSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
-	void actChooseTokenFromAll(bool checked);
-	void actChooseTokenFromDeck(bool checked);
-	void actOk();
+    void tokenSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
+    void actChooseTokenFromAll(bool checked);
+    void actChooseTokenFromDeck(bool checked);
+    void actOk();
 private:
-	CardDatabaseModel *cardDatabaseModel;
-	CardDatabaseDisplayModel *cardDatabaseDisplayModel;
-	QStringList predefinedTokens;
-	QLabel *nameLabel, *colorLabel, *ptLabel, *annotationLabel;
-	QComboBox *colorEdit;
-	QLineEdit *nameEdit, *ptEdit, *annotationEdit;
-	QCheckBox *destroyCheckBox;
-	QRadioButton *chooseTokenFromAllRadioButton, *chooseTokenFromDeckRadioButton;
+    CardDatabaseModel *cardDatabaseModel;
+    CardDatabaseDisplayModel *cardDatabaseDisplayModel;
+    QStringList predefinedTokens;
+    QLabel *nameLabel, *colorLabel, *ptLabel, *annotationLabel;
+    QComboBox *colorEdit;
+    QLineEdit *nameEdit, *ptEdit, *annotationEdit;
+    QCheckBox *destroyCheckBox;
+    QRadioButton *chooseTokenFromAllRadioButton, *chooseTokenFromDeckRadioButton;
 };
 
 #endif
