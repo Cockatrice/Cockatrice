@@ -112,9 +112,12 @@ bool FilterItemList::testTypeAnd(const CardInfo *info, CardFilter::Attr attr) co
 {
     QList<FilterItem *>::const_iterator i;
 
-    for (i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
+    for (i = childNodes.constBegin(); i != childNodes.constEnd(); i++) {
+        if (!(*i)->isEnabled())
+            continue;
         if (!(*i)->acceptCardAttr(info, attr))
             return false;
+    }
 
     return true;
 }
@@ -129,9 +132,12 @@ bool FilterItemList::testTypeOr(const CardInfo *info, CardFilter::Attr attr) con
 {
     QList<FilterItem *>::const_iterator i;
 
-    for (i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
+    for (i = childNodes.constBegin(); i != childNodes.constEnd(); i++) {
+        if (!(*i)->isEnabled())
+            continue;
         if ((*i)->acceptCardAttr(info, attr))
             return true;
+    }
 
     return false;
 }
@@ -196,9 +202,6 @@ bool FilterItem::acceptManaCost(const CardInfo *info) const
 bool FilterItem::acceptCardAttr(const CardInfo *info, CardFilter::Attr attr) const
 {
     bool status;
-
-    if (!isEnabled())
-        return true;
 
     switch (attr) {
         case CardFilter::AttrName:
