@@ -11,39 +11,55 @@ bool KeySignals::eventFilter(QObject * /*object*/, QEvent *event) {
     switch(kevent->key()) {
     case Qt::Key_Return:
     case Qt::Key_Enter:
-        if(kevent->modifiers() & Qt::ControlModifier)
+        if (kevent->modifiers().testFlag(Qt::AltModifier)
+                && kevent->modifiers().testFlag(Qt::ControlModifier) )
+            emit onCtrlAltEnter();
+        else if (kevent->modifiers() & Qt::ControlModifier)
             emit onCtrlEnter();
         else
             emit onEnter();
+
         break;
     case Qt::Key_Right:
-        if(kevent->modifiers() & Qt::ControlModifier)
-            emit onCtrlRight();
-        else
-            emit onRight();
+        emit onRight();
 
-        if(!filterLROn)
-            return false;
         break;
     case Qt::Key_Left:
-        if(kevent->modifiers() & Qt::ControlModifier)
-            emit onCtrlLeft();
-        else
-            emit onLeft();
+        emit onLeft();
 
-        if(!filterLROn)
-            return false;
         break;
     case Qt::Key_Delete:
     case Qt::Key_Backspace:
         emit onDelete();
 
-        if(!filterDeleteOn)
-            return false;
+        break;
+    case Qt::Key_Minus:
+        if (kevent->modifiers().testFlag(Qt::AltModifier)
+                && kevent->modifiers().testFlag(Qt::ControlModifier) )
+            emit onCtrlAltMinus();
+
+        break;
+    case Qt::Key_Equal:
+        if (kevent->modifiers().testFlag(Qt::AltModifier)
+                && kevent->modifiers().testFlag(Qt::ControlModifier) )
+            emit onCtrlAltEqual();
+
+        break;
+    case Qt::Key_BracketLeft:
+        if (kevent->modifiers().testFlag(Qt::AltModifier)
+                && kevent->modifiers().testFlag(Qt::ControlModifier) )
+            emit onCtrlAltLBracket();
+
+        break;
+    case Qt::Key_BracketRight:
+        if (kevent->modifiers().testFlag(Qt::AltModifier)
+                && kevent->modifiers().testFlag(Qt::ControlModifier) )
+            emit onCtrlAltRBracket();
+
         break;
     default:
         return false;
     }
 
-    return true;
+    return false;
 }

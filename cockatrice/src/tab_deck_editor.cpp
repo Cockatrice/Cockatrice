@@ -54,15 +54,17 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     searchLabel = new QLabel();
     searchEdit = new SearchLineEdit;
     searchLabel->setBuddy(searchEdit);
+    setFocusProxy(searchEdit);
+    setFocusPolicy(Qt::ClickFocus);
 
-    searchKeySignals.filterDelete(false);
     searchEdit->installEventFilter(&searchKeySignals);
     connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
     connect(&searchKeySignals, SIGNAL(onEnter()), this, SLOT(actAddCard()));
-    connect(&searchKeySignals, SIGNAL(onRight()), this, SLOT(actAddCard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlRight()), this, SLOT(actAddCardToSideboard()));
-    connect(&searchKeySignals, SIGNAL(onLeft()), this, SLOT(actDecrementCard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlLeft()), this, SLOT(actDecrementCardFromSideboard()));
+    connect(&searchKeySignals, SIGNAL(onCtrlAltEqual()), this, SLOT(actAddCard()));
+    connect(&searchKeySignals, SIGNAL(onCtrlAltRBracket()), this, SLOT(actAddCardToSideboard()));
+    connect(&searchKeySignals, SIGNAL(onCtrlAltMinus()), this, SLOT(actDecrementCard()));
+    connect(&searchKeySignals, SIGNAL(onCtrlAltLBracket()), this, SLOT(actDecrementCardFromSideboard()));
+    connect(&searchKeySignals, SIGNAL(onCtrlAltEnter()), this, SLOT(actAddCardToSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));
 
     QToolBar *deckEditToolBar = new QToolBar;
@@ -81,6 +83,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     databaseDisplayModel->sort(0, Qt::AscendingOrder);
 
     databaseView = new QTreeView();
+    databaseView->setFocusProxy(searchEdit);
     databaseView->setModel(databaseDisplayModel);
     databaseView->setUniformRowHeights(true);
     databaseView->setRootIsDecorated(false);
@@ -90,13 +93,6 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     databaseView->resizeColumnToContents(0);
     connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
     connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
-    databaseView->installEventFilter(&dbViewKeySignals);
-    connect(&dbViewKeySignals, SIGNAL(onEnter()), this, SLOT(actAddCard()));
-    connect(&dbViewKeySignals, SIGNAL(onRight()), this, SLOT(actAddCard()));
-    connect(&dbViewKeySignals, SIGNAL(onCtrlRight()), this, SLOT(actAddCardToSideboard()));
-    connect(&dbViewKeySignals, SIGNAL(onLeft()), this, SLOT(actDecrementCard()));
-    connect(&dbViewKeySignals, SIGNAL(onCtrlLeft()), this, SLOT(actDecrementCardFromSideboard()));
-    connect(&dbViewKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));
     searchEdit->setTreeView(databaseView);
 
     QVBoxLayout *leftFrame = new QVBoxLayout;
@@ -137,10 +133,11 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     deckView->setModel(deckModel);
     deckView->setUniformRowHeights(true);
     deckView->header()->setResizeMode(QHeaderView::ResizeToContents);
-    deckViewKeySignals.filterLeftRight(false);
     deckView->installEventFilter(&deckViewKeySignals);
     connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
     connect(&deckViewKeySignals, SIGNAL(onEnter()), this, SLOT(actIncrement()));
+    connect(&deckViewKeySignals, SIGNAL(onCtrlAltEqual()), this, SLOT(actIncrement()));
+    connect(&deckViewKeySignals, SIGNAL(onCtrlAltMinus()), this, SLOT(actDecrement()));
     connect(&deckViewKeySignals, SIGNAL(onRight()), this, SLOT(actIncrement()));
     connect(&deckViewKeySignals, SIGNAL(onLeft()), this, SLOT(actDecrement()));
     connect(&deckViewKeySignals, SIGNAL(onDelete()), this, SLOT(actRemoveCard()));

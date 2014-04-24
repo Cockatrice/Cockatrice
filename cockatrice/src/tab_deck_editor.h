@@ -80,7 +80,6 @@ private:
     DeckListModel *deckModel;
     QTreeView *databaseView;
 
-    KeySignals dbViewKeySignals;
     QTreeView *deckView;
     KeySignals deckViewKeySignals;
     CardFrame *cardInfo;
