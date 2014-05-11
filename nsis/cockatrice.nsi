@@ -9,6 +9,9 @@ OutFile "cockatrice_win32_${TIMESTAMP}_git-${VERSION}.exe"
 SetCompressor /SOLID lzma
 InstallDir "$PROGRAMFILES\Cockatrice"
 
+; set the Qt install dir here (and make sure you use the latest 4.8 version for packaging)
+!define QTDIR "C:\Qt\4.8.6"
+
 !define MUI_ABORTWARNING
 !define MUI_WELCOMEFINISHPAGE_BITMAP "leftimage.bmp"
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "leftimage.bmp"
@@ -40,27 +43,27 @@ Section "Application" SecApplication
 	File ..\build\oracle\Release\oracle.exe
 	File ..\doc\usermanual\Usermanual.pdf
 	File ..\build\protobuf-2.5.0\protobuf-2.5.0\vsprojects\Release\libprotobuf.lib
-	File C:\Qt\4.8.5\bin\QtCore4.dll
-	File C:\Qt\4.8.5\bin\QtGui4.dll
-	File C:\Qt\4.8.5\bin\QtNetwork4.dll
-	File C:\Qt\4.8.5\bin\QtSvg4.dll
-	File C:\Qt\4.8.5\bin\QtXml4.dll
-	File C:\Qt\4.8.5\bin\QtMultimedia4.dll
+	File "${QTDIR}\bin\QtCore4.dll"
+	File "${QTDIR}\bin\QtGui4.dll"
+	File "${QTDIR}\bin\QtNetwork4.dll"
+	File "${QTDIR}\bin\QtSvg4.dll"
+	File "${QTDIR}\bin\QtXml4.dll"
+	File "${QTDIR}\bin\QtMultimedia4.dll"
 
 	SetOutPath "$INSTDIR\zonebg"
 	File /r ..\zonebg\*.*
 	
 	SetOutPath "$INSTDIR\plugins"
 	SetOutPath "$INSTDIR\plugins\codecs"
-	File C:\Qt\4.8.5\plugins\codecs\qcncodecs4.dll
-	File C:\Qt\4.8.5\plugins\codecs\qjpcodecs4.dll
-	File C:\Qt\4.8.5\plugins\codecs\qkrcodecs4.dll
-	File C:\Qt\4.8.5\plugins\codecs\qtwcodecs4.dll
+	File "${QTDIR}\plugins\codecs\qcncodecs4.dll"
+	File "${QTDIR}\plugins\codecs\qjpcodecs4.dll"
+	File "${QTDIR}\plugins\codecs\qkrcodecs4.dll"
+	File "${QTDIR}\plugins\codecs\qtwcodecs4.dll"
 	SetOutPath "$INSTDIR\plugins\iconengines"
-	File C:\Qt\4.8.5\plugins\iconengines\qsvgicon4.dll
+	File "${QTDIR}\plugins\iconengines\qsvgicon4.dll"
 	SetOutPath "$INSTDIR\plugins\imageformats"
-	File C:\Qt\4.8.5\plugins\imageformats\qjpeg4.dll
-	File C:\Qt\4.8.5\plugins\imageformats\qsvg4.dll
+	File "${QTDIR}\plugins\imageformats\qjpeg4.dll"
+	File "${QTDIR}\plugins\imageformats\qsvg4.dll"
 
 	SetOutPath "$INSTDIR\sounds"
 	File /r ..\sounds\*.*
