@@ -1,4 +1,10 @@
 cmake_minimum_required(VERSION 2.6)
+
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+# GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
+  ADD_DEFINITIONS("-DSFMT_MEXP=19937")
+ENDIF()
+
 add_subdirectory(common)
 if(WITH_SERVER)
 	add_subdirectory(servatrice)
