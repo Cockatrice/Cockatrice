@@ -1,6 +1,7 @@
 #include "rng_sfmt.h"
 #include <QDateTime>
 #include <algorithm>
+#include <climits>
 #include <stdexcept>
 
 // This is from gcc sources, namely from fixincludes/inclhack.def
