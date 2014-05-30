@@ -62,7 +62,7 @@ RNG_SFMT::RNG_SFMT(QObject *parent)
 unsigned int RNG_SFMT::getNumber(unsigned int min, unsigned int max)
 {
 	// This all makes no sense if min > max, which should never happen.
-	if(min > max || max >= UINT_MAX || min >= UINT_MAX) {
+	if(min > max) {
 		throw std::invalid_argument(
 		  QString("Invalid bounds for RNG: min > max! Values were: min = " +
 		  QString::number(min) + ", max = " +
