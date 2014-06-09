@@ -1,27 +1,28 @@
 #ifndef RNG_SFMT_H
 #define RNG_SFMT_H
 
+#include <climits>
+#include <QMutex>
 #include "sfmt/SFMT.h"
 #include "rng_abstract.h"
-#include <QMutex>
 
 /**
- * This class represents the random number generator.
- * Usage instructions:
- * Create an instance of RNG_SFMT, then call getNumber(min, max).
- * You should never call this function with min > max, this throws a
- * std::invalid_argument exception. It is best practice to use getNumber() in a try block
- * and catch the exception if min, max are entered by the user or computed somehow.
+ * This class encapsulates a state of the art PRNG and can be used
+ * to return uniformly distributed integer random numbers from a range [min, max].
+ * Though technically possible, min must be >= 0 and max should always be > 0.
+ * If max < 0 and min == 0 it is assumed that rand() % -max is wanted and the result will
+ * be -rand(0, -max).
+ * This is the only exception to the rule that !(min > max) and is actually unused in
+ * Cockatrice.
  *
  * Technical details:
  * The RNG uses the SIMD-oriented Fast Mersenne Twister code v1.4.1 from
  * http://www.math.sci.hiroshima-u.ac.jp/~%20m-mat/MT/SFMT/index.html
- * To use this RNG, the class needs a sfmt_t structure for the RNG's internal state.
- * It has to be initialized by sfmt_init_gen_rand() which is done in the constructor.
- * The function sfmt_genrand_uint64() can then be used to create a 64 bit unsigned int 
- * pseudorandom number. This is done in getNumber().
- * For more information see the author's website and look at the documentation and 
- * examples that are part of the official downloads.
+ * The SFMT RNG creates unsigned int 64bit pseudo random numbers.
+ *
+ * These are mapped to values from the interval [min, max] without bias by using Knuth's
+ * "Algorithm S (Selection sampling technique)" from "The Art of Computer Programming 3rd
+ * Edition Volume 2 / Seminumerical Algorithms".
  */
 
 class RNG_SFMT : public RNG_Abstract {
@@ -29,9 +30,11 @@ class RNG_SFMT : public RNG_Abstract {
 private:
 	QMutex mutex;
 	sfmt_t sfmt;
+	// The discrete cumulative distribution function for the RNG
+	unsigned int cdf(unsigned int min, unsigned int max);
 public:
 	RNG_SFMT(QObject *parent = 0);
-	unsigned int getNumber(unsigned int min, unsigned int max);
+	unsigned int rand(int min, int max);
 };
 
 #endif
