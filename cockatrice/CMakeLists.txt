@@ -1,5 +1,7 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+# CMakeLists for cockatrice directory
+#
+# provides the cockatrice binary
+
 PROJECT(cockatrice)
 
 SET(cockatrice_SOURCES
@@ -87,90 +89,8 @@ SET(cockatrice_SOURCES
  src/priceupdater.cpp 
  src/qt-json/json.cpp
  src/soundengine.cpp
+ src/pending_command.cpp
  ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
-)
-SET(cockatrice_HEADERS
- src/abstractcounter.h 
- src/counter_general.h 
- src/dlg_creategame.h 
- src/dlg_filter_games.h 
- src/dlg_connect.h 
- src/dlg_create_token.h 
- src/dlg_edit_tokens.h
- src/gamesmodel.h 
- src/abstractclient.h 
- src/remoteclient.h 
- src/window_main.h 
- src/cardzone.h 
- src/selectzone.h 
- src/player.h 
- src/playertarget.h 
- src/abstractcarditem.h 
- src/carditem.h 
- src/tablezone.h 
- src/handzone.h 
- src/handcounter.h 
- src/carddatabase.h 
- src/keysignals.h
- src/gameview.h 
- src/gameselector.h 
- src/decklistmodel.h 
- src/deck_loader.h 
- src/dlg_load_deck_from_clipboard.h 
- src/dlg_load_remote_deck.h 
- src/cardinfowidget.h 
- src/cardframe.h
- src/cardinfopicture.h
- src/cardinfotext.h
- src/filterbuilder.h
- src/cardfilter.h
- src/filtertreemodel.h
- src/filtertree.h
- src/messagelogwidget.h 
- src/zoneviewzone.h 
- src/zoneviewwidget.h 
- src/pilezone.h 
- src/stackzone.h 
- src/carddragitem.h 
- src/carddatabasemodel.h 
- src/setsmodel.h 
- src/window_sets.h 
- src/abstractgraphicsitem.h 
- src/abstractcarddragitem.h 
- src/dlg_settings.h 
- src/dlg_cardsearch.h 
- src/phasestoolbar.h 
- src/gamescene.h 
- src/arrowitem.h 
- src/arrowtarget.h 
- src/tab.h 
- src/tab_server.h 
- src/tab_room.h 
- src/tab_message.h 
- src/tab_game.h 
- src/tab_deck_storage.h 
- src/tab_replays.h 
- src/tab_supervisor.h 
- src/tab_admin.h 
- src/tab_userlists.h 
- src/tab_deck_editor.h
- src/replay_timeline_widget.h
- src/deckstats_interface.h
- src/chatview.h 
- src/userlist.h 
- src/userinfobox.h 
- src/user_context_menu.h
- src/remotedecklist_treewidget.h 
- src/remotereplaylist_treewidget.h 
- src/deckview.h 
- src/playerlistwidget.h 
- src/settingscache.h 
- src/localserver.h 
- src/localserverinterface.h 
- src/localclient.h 
- src/priceupdater.h 
- src/soundengine.h 
- src/pending_command.h 
 )
 
 if (UNIX AND NOT APPLE)
@@ -204,34 +124,26 @@ if(APPLE)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
   set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 ENDIF(APPLE)
+
+if (NOT QT_QTMULTIMEDIA_FOUND)
+  FIND_PACKAGE(QtMobility REQUIRED)
+endif (NOT QT_QTMULTIMEDIA_FOUND)
+
 SET(QT_USE_QTNETWORK TRUE)
 SET(QT_USE_QTMULTIMEDIA TRUE)
 SET(QT_USE_QTXML TRUE)
 SET(QT_USE_QTSVG TRUE)
-FIND_PACKAGE(Qt4 REQUIRED)
-if (NOT QT_QTMULTIMEDIA_FOUND)
-	FIND_PACKAGE(QtMobility REQUIRED)
-endif (NOT QT_QTMULTIMEDIA_FOUND)
-FIND_PACKAGE(Protobuf REQUIRED)
-FIND_PACKAGE(Threads)
 
-IF (CMAKE_COMPILER_IS_GNUCC)
-  set(CMAKE_CXX_FLAGS_RELEASE "-s -O2")
-  set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0")
-ELSE (CMAKE_COMPILER_IS_GNUCC)
-  set(CMAKE_CXX_FLAGS_RELEASE "-O2")
-  set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
-ENDIF (CMAKE_COMPILER_IS_GNUCC)
-
-# paths
+# Declare path variables
 set(ICONDIR share/icons CACHE STRING "icon dir")
 set(DESKTOPDIR share/applications CACHE STRING "desktop file destination")
 
-
-QT4_WRAP_CPP(cockatrice_HEADERS_MOC ${cockatrice_HEADERS})
+# Let cmake chew Qt4's translations and resource files
+# Note: header files are MOC-ed automatically by cmake
 QT4_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
 QT4_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
 
+# Include directories
 INCLUDE(${QT_USE_FILE})
 INCLUDE_DIRECTORIES(../common)
 INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
@@ -240,14 +152,22 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(${QT_MOBILITY_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${QT_MOBILITY_MULTIMEDIAKIT_INCLUDE_DIR})
 
-ADD_EXECUTABLE(cockatrice WIN32 MACOSX_BUNDLE ${cockatrice_SOURCES} ${cockatrice_QM} ${cockatrice_RESOURCES_RCC} ${cockatrice_HEADERS_MOC})
+# Build cockatrice binary and link it
+ADD_EXECUTABLE(cockatrice WIN32 MACOSX_BUNDLE ${cockatrice_SOURCES} ${cockatrice_QM} ${cockatrice_RESOURCES_RCC} ${cockatrice_MOC_SRCS})
 TARGET_LINK_LIBRARIES(cockatrice cockatrice_common ${QT_LIBRARIES} ${QT_MOBILITY_MULTIMEDIAKIT_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
 
-IF (NOT APPLE)
-  INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/cockatrice DESTINATION bin)
-ELSE (APPLE)
-  INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/cockatrice.app DESTINATION bin)
-ENDIF (NOT APPLE)
+
+if(UNIX)
+  if(APPLE)
+    INSTALL(TARGETS cockatrice BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX})
+  else()
+    # Assume linux
+    INSTALL(TARGETS cockatrice RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+  endif()
+elseif(WIN32)
+  INSTALL(TARGETS cockatrice RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
+endif()
+
 if (NOT WIN32 AND NOT APPLE)
 	INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
 	INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
@@ -260,3 +180,31 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/../common/getversion.cmake
 )
 
+if(APPLE)
+  set(plugin_dest_dir ${CMAKE_INSTALL_PREFIX}/cockatrice.app/Contents/Plugins)
+  set(qtconf_dest_dir ${CMAKE_INSTALL_PREFIX}/cockatrice.app/Contents/Resources)
+
+  # note: no codecs in qt5
+  # note: phonon_backend => mediaservice
+  # note: needs platform on osx
+
+  if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+      FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*_debug\\.dylib")
+  else()
+    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+      FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/[^_]*\\.dylib")
+  endif()
+
+  install(CODE "
+      file(WRITE \"${qtconf_dest_dir}/qt.conf\" \"[Paths]
+Plugins = Plugins\")
+      " COMPONENT Runtime)
+
+  install(CODE "
+      file(GLOB_RECURSE QTPLUGINS
+        \"${plugin_dest_dir}/*.dylib\")
+      include(BundleUtilities)
+      fixup_bundle(\"${CMAKE_INSTALL_PREFIX}/cockatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+      " COMPONENT Runtime)
+endif()
