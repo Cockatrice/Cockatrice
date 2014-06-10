@@ -45,7 +45,7 @@ void Server_CardZone::shuffle()
 {
 	QList<Server_Card *> temp;
 	for (int i = cards.size(); i; i--)
-		temp.append(cards.takeAt(rng->getNumber(0, i - 1)));
+		temp.append(cards.takeAt(rng->rand(0, i - 1)));
 	cards = temp;
 	
 	playersWithWritePermission.clear();
