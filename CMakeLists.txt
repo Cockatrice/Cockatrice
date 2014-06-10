@@ -58,7 +58,6 @@ set(CMAKE_AUTOMOC TRUE)
 
 # Find other needed libraries
 FIND_PACKAGE(Protobuf REQUIRED)
-FIND_PACKAGE(Threads)
 
 # Compile servatrice (default off)
 add_subdirectory(common)
