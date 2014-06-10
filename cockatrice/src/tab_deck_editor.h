@@ -4,18 +4,20 @@
 #include "tab.h"
 #include <QAbstractItemModel>
 #include <QLineEdit>
+#include "keysignals.h"
 
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
 class DeckListModel;
 class QTreeView;
 class QTableView;
-class CardInfoWidget;
+class CardFrame;
 class QTextEdit;
-class DlgCardSearch;
 class QLabel;
 class DeckLoader;
 class Response;
+class FilterTreeModel;
+class CardInfo;
 
 class SearchLineEdit : public QLineEdit {
     private:
@@ -49,7 +51,6 @@ private slots:
     void actEditSets();
     void actEditTokens();
     
-    void actSearch();
     void actClearSearch();
 
     void actAddCard();
@@ -57,12 +58,20 @@ private slots:
     void actRemoveCard();
     void actIncrement();
     void actDecrement();
-        void actUpdatePrices();
+    void actDecrementCard();
+    void actDecrementCardFromSideboard();
 
-        void finishedUpdatingPrices();
+    void actUpdatePrices();
+
+    void finishedUpdatingPrices();
     void saveDeckRemoteFinished(const Response &r);
+    void filterViewCustomContextMenu(const QPoint &point);
+    void filterRemove(QAction *action);
 private:
+    CardInfo *currentCardInfo() const;
     void addCardHelper(QString zoneName);
+    void offsetCountAtIndex(const QModelIndex &idx, int offset);
+    void decrementCardHelper(QString zoneName);
     void recursiveExpand(const QModelIndex &index);
     bool confirmClose();
 
@@ -70,22 +79,27 @@ private:
     CardDatabaseDisplayModel *databaseDisplayModel;
     DeckListModel *deckModel;
     QTreeView *databaseView;
+
     QTreeView *deckView;
-    CardInfoWidget *cardInfo;
+    KeySignals deckViewKeySignals;
+    CardFrame *cardInfo;
     QLabel *searchLabel;
     SearchLineEdit *searchEdit;
+    KeySignals searchKeySignals;
+
     QLabel *nameLabel;
     QLineEdit *nameEdit;
     QLabel *commentsLabel;
     QTextEdit *commentsEdit;
     QLabel *hashLabel1;
     QLabel *hashLabel;
-    DlgCardSearch *dlgCardSearch;
+    FilterTreeModel *filterModel;
+    QTreeView *filterView;
 
     QMenu *deckMenu, *dbMenu;
     QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose;
-    QAction *aEditSets, *aEditTokens, *aSearch, *aClearSearch;
-        QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement, *aUpdatePrices;
+    QAction *aEditSets, *aEditTokens, *aClearSearch, *aCardTextOnly;
+    QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement, *aUpdatePrices;
     
     bool modified;
 public:

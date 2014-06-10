@@ -26,6 +26,7 @@ SET(cockatrice_SOURCES
  src/handzone.cpp 
  src/handcounter.cpp 
  src/carddatabase.cpp 
+ src/keysignals.cpp
  src/gameview.cpp 
  src/gameselector.cpp 
  src/decklistmodel.cpp 
@@ -33,6 +34,13 @@ SET(cockatrice_SOURCES
  src/dlg_load_deck_from_clipboard.cpp 
  src/dlg_load_remote_deck.cpp 
  src/cardinfowidget.cpp 
+ src/cardframe.cpp
+ src/cardinfopicture.cpp
+ src/cardinfotext.cpp
+ src/filterbuilder.cpp
+ src/cardfilter.cpp
+ src/filtertreemodel.cpp
+ src/filtertree.cpp
  src/messagelogwidget.cpp 
  src/zoneviewzone.cpp 
  src/zoneviewwidget.cpp 
@@ -103,6 +111,7 @@ SET(cockatrice_HEADERS
  src/handzone.h 
  src/handcounter.h 
  src/carddatabase.h 
+ src/keysignals.h
  src/gameview.h 
  src/gameselector.h 
  src/decklistmodel.h 
@@ -110,6 +119,13 @@ SET(cockatrice_HEADERS
  src/dlg_load_deck_from_clipboard.h 
  src/dlg_load_remote_deck.h 
  src/cardinfowidget.h 
+ src/cardframe.h
+ src/cardinfopicture.h
+ src/cardinfotext.h
+ src/filterbuilder.h
+ src/cardfilter.h
+ src/filtertreemodel.h
+ src/filtertree.h
  src/messagelogwidget.h 
  src/zoneviewzone.h 
  src/zoneviewwidget.h 
