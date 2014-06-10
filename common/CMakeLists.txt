@@ -1,3 +1,7 @@
+# CMakeLists for common directory
+#
+# provides the common library
+
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 add_subdirectory(pb)
 

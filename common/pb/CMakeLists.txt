@@ -1,3 +1,7 @@
+# CMakeLists for common directory
+#
+# provides the protobuf interfaces
+
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET(PROTO_FILES
