@@ -1,3 +1,6 @@
+#ifndef KEYSIGNALS_H
+#define KEYSIGNALS_H
+
 #include <QObject>
 #include <QEvent>
 
@@ -19,3 +22,5 @@ signals:
 protected:
     virtual bool eventFilter(QObject *, QEvent *event);
 };
+
+#endif
