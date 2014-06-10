@@ -144,14 +144,13 @@ SET(PROTO_FILES
 	session_event.proto
 )
 
-find_package(Protobuf REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 
 add_library(cockatrice_protocol ${PROTO_SRCS} ${PROTO_HDRS})
 set(cockatrice_protocol_LIBS ${PROTOBUF_LIBRARIES})
-if (WIN32)
+if (MSVC)
         set(cockatrice_protocol_LIBS ${cockatrice_protocol_LIBS} -lprotobuf)
-endif (WIN32)
+endif (MSVC)
 target_link_libraries(cockatrice_protocol ${cockatrice_protocol_LIBS})
