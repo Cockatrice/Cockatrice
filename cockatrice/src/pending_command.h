@@ -15,17 +15,12 @@ private:
     QVariant extraData;
     int ticks;
 public:
-    PendingCommand(const CommandContainer &_commandContainer, QVariant _extraData = QVariant())
-        : commandContainer(_commandContainer), extraData(_extraData), ticks(0) { }
-    CommandContainer &getCommandContainer() { return commandContainer; }
-    void setExtraData(const QVariant &_extraData) { extraData = _extraData; }
-    QVariant getExtraData() const { return extraData; }
-    void processResponse(const Response &response)
-    {
-        emit finished(response, commandContainer, extraData);
-        emit finished(response.response_code());
-    }
-    int tick() { return ++ticks; }
+    PendingCommand(const CommandContainer &_commandContainer, QVariant _extraData = QVariant());
+    CommandContainer &getCommandContainer();
+    void setExtraData(const QVariant &_extraData);
+    QVariant getExtraData() const;
+    void processResponse(const Response &response);
+    int tick();
 };
 
 #endif 
