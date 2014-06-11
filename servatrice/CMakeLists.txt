@@ -9,15 +9,15 @@ SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 FIND_PACKAGE(Libgcrypt REQUIRED)
 
 SET(servatrice_SOURCES
- src/main.cpp
- src/passwordhasher.cpp
- src/servatrice.cpp
- src/servatrice_connection_pool.cpp
- src/servatrice_database_interface.cpp
- src/server_logger.cpp
- src/serversocketinterface.cpp
- src/isl_interface.cpp
- ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
+    src/main.cpp
+    src/passwordhasher.cpp
+    src/servatrice.cpp
+    src/servatrice_connection_pool.cpp
+    src/servatrice_database_interface.cpp
+    src/server_logger.cpp
+    src/serversocketinterface.cpp
+    src/isl_interface.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
 )
 
 SET(QT_DONTUSE_QTGUI)
@@ -38,47 +38,76 @@ TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${QT_LIBRARIES} ${LIBGCRYPT_L
 
 #add_custom_target(versionheader ALL DEPENDS version_header)
 add_custom_command(
-	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version_string.h ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
-	COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/../common/getversion.cmake
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version_string.h ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
+    COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/../common/getversion.cmake
 )
 
 # install rules
 if(UNIX)
-  if(APPLE)
-    INSTALL(TARGETS servatrice BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX})
-  else()
-    # Assume linux
-    INSTALL(TARGETS servatrice RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-  endif()
+    if(APPLE)
+        INSTALL(TARGETS servatrice BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX})
+    else()
+        # Assume linux
+        INSTALL(TARGETS servatrice RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    endif()
 elseif(WIN32)
-  INSTALL(TARGETS servatrice RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
+    INSTALL(TARGETS servatrice RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
 endif()
 
 if(APPLE)
-  set(plugin_dest_dir ${CMAKE_INSTALL_PREFIX}/servatrice.app/Contents/Plugins)
-  set(qtconf_dest_dir ${CMAKE_INSTALL_PREFIX}/servatrice.app/Contents/Resources)
+    set(plugin_dest_dir ${CMAKE_INSTALL_PREFIX}/servatrice.app/Contents/Plugins)
+    set(qtconf_dest_dir ${CMAKE_INSTALL_PREFIX}/servatrice.app/Contents/Resources)
 
-  # note: no codecs in qt5
-  # note: phonon_backend => mediaservice
-  # note: needs platform on osx
+    # note: no codecs in qt5
+    # note: phonon_backend => mediaservice
+    # note: needs platform on osx
 
-  if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-      FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*_debug\\.dylib")
-  else()
-    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-      FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/[^_]*\\.dylib")
-  endif()
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*_debug\\.dylib")
+    else()
+        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/[^_]*\\.dylib")
+    endif()
 
-  install(CODE "
-      file(WRITE \"${qtconf_dest_dir}/qt.conf\" \"[Paths]
+    install(CODE "
+        file(WRITE \"${qtconf_dest_dir}/qt.conf\" \"[Paths]
 Plugins = Plugins\")
-      " COMPONENT Runtime)
+    " COMPONENT Runtime)
 
-  install(CODE "
-      file(GLOB_RECURSE QTPLUGINS
+    install(CODE "
+        file(GLOB_RECURSE QTPLUGINS
         \"${plugin_dest_dir}/*.dylib\")
-      include(BundleUtilities)
-      fixup_bundle(\"${CMAKE_INSTALL_PREFIX}/servatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
-      " COMPONENT Runtime)
+    include(BundleUtilities)
+    fixup_bundle(\"${CMAKE_INSTALL_PREFIX}/servatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+    " COMPONENT Runtime)
+endif()
+
+if(APPLE)
+    set(plugin_dest_dir ${CMAKE_INSTALL_PREFIX}/oracle.app/Contents/Plugins)
+    set(qtconf_dest_dir ${CMAKE_INSTALL_PREFIX}/oracle.app/Contents/Resources)
+
+    # note: no codecs in qt5
+    # note: phonon_backend => mediaservice
+    # note: needs platform on osx
+
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*_debug\\.dylib")
+    else()
+        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/[^_]*\\.dylib")
+    endif()
+
+    install(CODE "
+        file(WRITE \"${qtconf_dest_dir}/qt.conf\" \"[Paths]
+Plugins = Plugins\")
+        " COMPONENT Runtime)
+
+    install(CODE "
+        file(GLOB_RECURSE QTPLUGINS
+            \"${plugin_dest_dir}/*.dylib\")
+        include(BundleUtilities)
+        fixup_bundle(\"${CMAKE_INSTALL_PREFIX}/oracle.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        " COMPONENT Runtime)
 endif()

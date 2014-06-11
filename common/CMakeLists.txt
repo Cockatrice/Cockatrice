@@ -6,26 +6,26 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 add_subdirectory(pb)
 
 SET(common_SOURCES
-	decklist.cpp
-	get_pb_extension.cpp
-	rng_abstract.cpp
-	rng_sfmt.cpp
-	server.cpp
-	server_abstractuserinterface.cpp
-	server_arrow.cpp
-	server_arrowtarget.h
-	server_card.cpp
-	server_cardzone.cpp
-	server_counter.cpp
-	server_game.cpp
-	server_database_interface.cpp
-	server_player.cpp
-	server_protocolhandler.cpp
-	server_remoteuserinterface.cpp
-	server_response_containers.cpp
-	server_room.cpp
-	serverinfo_user_container.cpp
-	sfmt/SFMT.c
+    decklist.cpp
+    get_pb_extension.cpp
+    rng_abstract.cpp
+    rng_sfmt.cpp
+    server.cpp
+    server_abstractuserinterface.cpp
+    server_arrow.cpp
+    server_arrowtarget.h
+    server_card.cpp
+    server_cardzone.cpp
+    server_counter.cpp
+    server_game.cpp
+    server_database_interface.cpp
+    server_player.cpp
+    server_protocolhandler.cpp
+    server_remoteuserinterface.cpp
+    server_response_containers.cpp
+    server_room.cpp
+    serverinfo_user_container.cpp
+    sfmt/SFMT.c
 )
 
 INCLUDE(${QT_USE_FILE})
