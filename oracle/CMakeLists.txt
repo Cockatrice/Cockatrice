@@ -42,31 +42,31 @@ IF (NOT WIN32 AND NOT APPLE)
     INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/oracle.desktop DESTINATION ${DESKTOPDIR})
 ENDIF (NOT WIN32 AND NOT APPLE)
 
-#if(APPLE)
-#    set(plugin_dest_dir ${CMAKE_INSTALL_PREFIX}/oracle.app/Contents/Plugins)
-#    set(qtconf_dest_dir ${CMAKE_INSTALL_PREFIX}/oracle.app/Contents/Resources)
+if(APPLE)
+    set(plugin_dest_dir ${CMAKE_INSTALL_PREFIX}/oracle.app/Contents/Plugins)
+    set(qtconf_dest_dir ${CMAKE_INSTALL_PREFIX}/oracle.app/Contents/Resources)
 
     # note: no codecs in qt5
     # note: phonon_backend => mediaservice
     # note: needs platform on osx
 
-#    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-#        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-#            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*_debug\\.dylib")
-#    else()
-#        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-#            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/[^_]*\\.dylib")
-#    endif()
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*_debug\\.dylib")
+    else()
+        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/[^_]*\\.dylib")
+    endif()
 
-#    install(CODE "
-#        file(WRITE \"${qtconf_dest_dir}/qt.conf\" \"[Paths]
-#Plugins = Plugins\")
-#        " COMPONENT Runtime)
+    install(CODE "
+        file(WRITE \"${qtconf_dest_dir}/qt.conf\" \"[Paths]
+Plugins = Plugins\")
+        " COMPONENT Runtime)
 
-#    install(CODE "
-#        file(GLOB_RECURSE QTPLUGINS
-#            \"${plugin_dest_dir}/*.dylib\")
-#        include(BundleUtilities)
-#        fixup_bundle(\"${CMAKE_INSTALL_PREFIX}/oracle.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
-#        " COMPONENT Runtime)
-#endif()
+    install(CODE "
+        file(GLOB_RECURSE QTPLUGINS
+            \"${plugin_dest_dir}/*.dylib\")
+        include(BundleUtilities)
+        fixup_bundle(\"${CMAKE_INSTALL_PREFIX}/oracle.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        " COMPONENT Runtime)
+endif()
