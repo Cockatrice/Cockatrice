@@ -7,6 +7,15 @@
 
 cmake_minimum_required(VERSION 2.6)
 
+set(PROJECT_NAME "Cockatrice")
+set(PROJECT_VERSION_MAJOR 0)
+set(PROJECT_VERSION_MINOR 0)
+set(PROJECT_VERSION_PATCH 1)
+set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH} )
+
+# A project name is needed for CPack
+PROJECT("${PROJECT_NAME}")
+
 # Set conventional loops
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
