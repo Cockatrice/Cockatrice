@@ -160,20 +160,19 @@ TARGET_LINK_LIBRARIES(cockatrice cockatrice_common ${QT_LIBRARIES} ${QT_MOBILITY
 if(UNIX)
     if(APPLE)
         INSTALL(TARGETS cockatrice BUNDLE DESTINATION ./)
+        INSTALL(FILES ${cockatrice_QM} DESTINATION ./cockatrice.app/Contents/Resources/translations)
     else()
         # Assume linux
         INSTALL(TARGETS cockatrice RUNTIME DESTINATION bin/)
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice.desktop DESTINATION ${DESKTOPDIR})
+        INSTALL(FILES ${cockatrice_QM} DESTINATION share/cockatrice/translations)
     endif()
 elseif(WIN32)
         INSTALL(TARGETS cockatrice RUNTIME DESTINATION ./)
+        INSTALL(FILES ${cockatrice_QM} DESTINATION ./translations)
 endif()
-
-if (NOT WIN32 AND NOT APPLE)
-    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
-    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
-    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice.desktop DESTINATION ${DESKTOPDIR})
-    INSTALL(FILES ${cockatrice_QM} DESTINATION share/cockatrice/translations)
-ENDIF(NOT WIN32 AND NOT APPLE)
 
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp ${CMAKE_CURRENT_BINARY_DIR}/version_string.h
