@@ -29,13 +29,13 @@ TARGET_LINK_LIBRARIES(oracle ${QT_LIBRARIES})
 
 if(UNIX)
     if(APPLE)
-        INSTALL(TARGETS oracle BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX})
+        INSTALL(TARGETS oracle BUNDLE DESTINATION ./)
     else()
         # Assume linux
-        INSTALL(TARGETS oracle RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+        INSTALL(TARGETS oracle RUNTIME DESTINATION bin/)
     endif()
 elseif(WIN32)
-    INSTALL(TARGETS oracle RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
+    INSTALL(TARGETS oracle RUNTIME DESTINATION ./)
 endif()
 
 IF (NOT WIN32 AND NOT APPLE)
@@ -43,8 +43,8 @@ IF (NOT WIN32 AND NOT APPLE)
 ENDIF (NOT WIN32 AND NOT APPLE)
 
 if(APPLE)
-    set(plugin_dest_dir ${CMAKE_INSTALL_PREFIX}/oracle.app/Contents/Plugins)
-    set(qtconf_dest_dir ${CMAKE_INSTALL_PREFIX}/oracle.app/Contents/Resources)
+    set(plugin_dest_dir ./oracle.app/Contents/Plugins)
+    set(qtconf_dest_dir ./oracle.app/Contents/Resources)
 
     # note: no codecs in qt5
     # note: phonon_backend => mediaservice
@@ -67,6 +67,6 @@ Plugins = Plugins\")
         file(GLOB_RECURSE QTPLUGINS
             \"${plugin_dest_dir}/*.dylib\")
         include(BundleUtilities)
-        fixup_bundle(\"${CMAKE_INSTALL_PREFIX}/oracle.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/oracle.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         " COMPONENT Runtime)
 endif()

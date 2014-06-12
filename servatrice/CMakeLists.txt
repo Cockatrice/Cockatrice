@@ -45,18 +45,18 @@ add_custom_command(
 # install rules
 if(UNIX)
     if(APPLE)
-        INSTALL(TARGETS servatrice BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX})
+        INSTALL(TARGETS servatrice BUNDLE DESTINATION ./)
     else()
         # Assume linux
-        INSTALL(TARGETS servatrice RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+        INSTALL(TARGETS servatrice RUNTIME DESTINATION bin/)
     endif()
 elseif(WIN32)
-    INSTALL(TARGETS servatrice RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
+    INSTALL(TARGETS servatrice RUNTIME DESTINATION ./)
 endif()
 
 if(APPLE)
-    set(plugin_dest_dir ${CMAKE_INSTALL_PREFIX}/servatrice.app/Contents/Plugins)
-    set(qtconf_dest_dir ${CMAKE_INSTALL_PREFIX}/servatrice.app/Contents/Resources)
+    set(plugin_dest_dir ./servatrice.app/Contents/Plugins)
+    set(qtconf_dest_dir ./servatrice.app/Contents/Resources)
 
     # note: no codecs in qt5
     # note: phonon_backend => mediaservice
@@ -79,35 +79,6 @@ Plugins = Plugins\")
         file(GLOB_RECURSE QTPLUGINS
         \"${plugin_dest_dir}/*.dylib\")
     include(BundleUtilities)
-    fixup_bundle(\"${CMAKE_INSTALL_PREFIX}/servatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/servatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
     " COMPONENT Runtime)
-endif()
-
-if(APPLE)
-    set(plugin_dest_dir ${CMAKE_INSTALL_PREFIX}/oracle.app/Contents/Plugins)
-    set(qtconf_dest_dir ${CMAKE_INSTALL_PREFIX}/oracle.app/Contents/Resources)
-
-    # note: no codecs in qt5
-    # note: phonon_backend => mediaservice
-    # note: needs platform on osx
-
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*_debug\\.dylib")
-    else()
-        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/[^_]*\\.dylib")
-    endif()
-
-    install(CODE "
-        file(WRITE \"${qtconf_dest_dir}/qt.conf\" \"[Paths]
-Plugins = Plugins\")
-        " COMPONENT Runtime)
-
-    install(CODE "
-        file(GLOB_RECURSE QTPLUGINS
-            \"${plugin_dest_dir}/*.dylib\")
-        include(BundleUtilities)
-        fixup_bundle(\"${CMAKE_INSTALL_PREFIX}/oracle.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
-        " COMPONENT Runtime)
 endif()

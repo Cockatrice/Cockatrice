@@ -159,13 +159,13 @@ TARGET_LINK_LIBRARIES(cockatrice cockatrice_common ${QT_LIBRARIES} ${QT_MOBILITY
 
 if(UNIX)
     if(APPLE)
-        INSTALL(TARGETS cockatrice BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX})
+        INSTALL(TARGETS cockatrice BUNDLE DESTINATION ./)
     else()
         # Assume linux
-        INSTALL(TARGETS cockatrice RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+        INSTALL(TARGETS cockatrice RUNTIME DESTINATION bin/)
     endif()
 elseif(WIN32)
-        INSTALL(TARGETS cockatrice RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
+        INSTALL(TARGETS cockatrice RUNTIME DESTINATION ./)
 endif()
 
 if (NOT WIN32 AND NOT APPLE)
@@ -181,8 +181,8 @@ add_custom_command(
 )
 
 if(APPLE)
-    set(plugin_dest_dir ${CMAKE_INSTALL_PREFIX}/cockatrice.app/Contents/Plugins)
-    set(qtconf_dest_dir ${CMAKE_INSTALL_PREFIX}/cockatrice.app/Contents/Resources)
+    set(plugin_dest_dir ./cockatrice.app/Contents/Plugins)
+    set(qtconf_dest_dir ./cockatrice.app/Contents/Resources)
 
     # note: no codecs in qt5
     # note: phonon_backend => mediaservice
@@ -205,6 +205,6 @@ Plugins = Plugins\")
         file(GLOB_RECURSE QTPLUGINS
             \"${plugin_dest_dir}/*.dylib\")
         include(BundleUtilities)
-        fixup_bundle(\"${CMAKE_INSTALL_PREFIX}/cockatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/cockatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         " COMPONENT Runtime)
 endif()
