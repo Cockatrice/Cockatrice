@@ -13,6 +13,7 @@ SET(oracle_SOURCES
     src/window_main.cpp
     ../cockatrice/src/carddatabase.cpp
     ../cockatrice/src/settingscache.cpp
+    ../cockatrice/src/qt-json/json.cpp
  )
 
 SET(QT_USE_QTNETWORK TRUE)
