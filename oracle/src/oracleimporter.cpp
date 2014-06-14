@@ -148,44 +148,94 @@ CardInfo *OracleImporter::addCard(const QString &setName,
 
 int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 {
-	int cards = 0;
+    int cards = 0;
     bool ok;
     QVariantMap resultMap = QtJson::Json::parse(QString(data), ok).toMap();
     if (!ok) {
-    	qDebug() << "error: QtJson::Json::parse()";
+        qDebug() << "error: QtJson::Json::parse()";
         return 0;
     }
     
     QListIterator<QVariant> it(resultMap.value("cards").toList());
     QVariantMap map;
-	QString cardName;
-	QString cardCost;
-	QString cardType;
-	QString cardPT;
-	QString cardText;
-	int cardId;
-	int cardLoyalty;
+    QString cardName;
+    QString cardCost;
+    QString cardType;
+    QString cardPT;
+    QString cardText;
+    int cardId;
+    int cardLoyalty;
+    QMap<int, QVariantMap> splitCards;
 
     while (it.hasNext()) {
         map = it.next().toMap();
-		cardName = map.contains("name") ? map.value("name").toString() : QString("");
-		cardCost = map.contains("manaCost") ? map.value("manaCost").toString() : QString("");
-		cardType = map.contains("type") ? map.value("type").toString() : QString("");
-		cardPT = map.contains("power") || map.contains("toughness") ? map.value("power").toString() + QString('/') + map.value("toughness").toString() : QString("");
-		cardText = map.contains("text") ? map.value("text").toString() : QString("");
-		cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
-		cardLoyalty = map.contains("loyalty") ? map.value("loyalty").toInt() : 0;
-		QStringList cardTextSplit = cardText.split("\n");
+        if(0 == QString::compare(map.value("layout").toString(), QString("split"), Qt::CaseInsensitive))
+        {
+            // Split card handling
+            cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
+            if(splitCards.contains(cardId))
+            {
+                // merge two split cards
+                QVariantMap tmpMap = splitCards.take(cardId);
+                QVariantMap * card1 = 0, * card2 = 0;
+                // same cardid
+                cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
+                // this is currently an integer; can't accept 2 values
+                cardLoyalty = 0;
 
-		CardInfo *card = addCard(set->getShortName(), cardName, false, cardId, cardCost, cardType, cardPT, cardLoyalty, cardTextSplit);
+                // determine which subcard is the first one in the split
+                QStringList names=map.contains("names") ? map.value("names").toStringList() : QStringList("");
+                if(names.count()>0 &&
+                    map.contains("name") &&
+                    0 == QString::compare(map.value("name").toString(), names.at(0)))
+                {
+                    // map is the left part of the split card, tmpMap is right part
+                    card1 = &map;
+                    card2 = &tmpMap;
+                } else {
+                    //tmpMap is the left part of the split card, map is right part
+                    card1 = &tmpMap;
+                    card2 = &map;
+                }
 
-		if (!set->contains(card)) {
-			card->addToSet(set);
-			cards++;
-		}
+                // add first card's data
+                cardName = card1->contains("name") ? card1->value("name").toString() : QString("");
+                cardCost = card1->contains("manaCost") ? card1->value("manaCost").toString() : QString("");
+                cardType = card1->contains("type") ? card1->value("type").toString() : QString("");
+                cardPT = card1->contains("power") || card1->contains("toughness") ? card1->value("power").toString() + QString('/') + card1->value("toughness").toString() : QString("");
+                cardText = card1->contains("text") ? card1->value("text").toString() : QString("");
+
+                // add second card's data
+                cardName += card2->contains("name") ? QString(" // ") + card2->value("name").toString() : QString("");
+                cardCost += card2->contains("manaCost") ? QString(" // ") + card2->value("manaCost").toString() : QString("");
+                cardType += card2->contains("type") ? QString(" // ") + card2->value("type").toString() : QString("");
+                cardPT += card2->contains("power") || card2->contains("toughness") ? QString(" // ") + card2->value("power").toString() + QString('/') + card2->value("toughness").toString() : QString("");
+                cardText += card2->contains("text") ? QString("\n\n---\n\n") + card2->value("text").toString() : QString("");
+            } else {
+                // first card od a pair; enqueue for later merging
+                splitCards.insert(cardId, map);
+                continue;
+            }
+        } else {
+            // normal cards handling
+            cardName = map.contains("name") ? map.value("name").toString() : QString("");
+            cardCost = map.contains("manaCost") ? map.value("manaCost").toString() : QString("");
+            cardType = map.contains("type") ? map.value("type").toString() : QString("");
+            cardPT = map.contains("power") || map.contains("toughness") ? map.value("power").toString() + QString('/') + map.value("toughness").toString() : QString("");
+            cardText = map.contains("text") ? map.value("text").toString() : QString("");
+            cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
+            cardLoyalty = map.contains("loyalty") ? map.value("loyalty").toInt() : 0;
+        }
+
+        CardInfo *card = addCard(set->getShortName(), cardName, false, cardId, cardCost, cardType, cardPT, cardLoyalty, cardText.split("\n"));
+
+        if (!set->contains(card)) {
+            card->addToSet(set);
+            cards++;
+        }
     }
-	
-	return cards;
+    
+    return cards;
 }
 
 QString OracleImporter::getPictureUrl(QString url, int cardId, QString name, const QString &setName) const
