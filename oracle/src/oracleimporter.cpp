@@ -157,15 +157,24 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
     }
     
     QListIterator<QVariant> it(resultMap.value("cards").toList());
+    QVariantMap map;
+	QString cardName;
+	QString cardCost;
+	QString cardType;
+	QString cardPT;
+	QString cardText;
+	int cardId;
+	int cardLoyalty;
+
     while (it.hasNext()) {
-        QVariantMap map = it.next().toMap();
-		QString cardName = map.value("name").toString();
-		QString cardCost = map.value("manaCost").toString();
-		QString cardType = map.value("type").toString();
-		QString cardPT = map.value("power").toString() + QString('/') + map.value("toughness").toString();
-		QString cardText = map.value("text").toString();
-		int cardId = map.value("multiverseid").toInt();
-		int cardLoyalty = map.value("loyalty").toInt();
+        map = it.next().toMap();
+		cardName = map.contains("name") ? map.value("name").toString() : QString("");
+		cardCost = map.contains("manaCost") ? map.value("manaCost").toString() : QString("");
+		cardType = map.contains("type") ? map.value("type").toString() : QString("");
+		cardPT = map.contains("power") || map.contains("toughness") ? map.value("power").toString() + QString('/') + map.value("toughness").toString() : QString("");
+		cardText = map.contains("text") ? map.value("text").toString() : QString("");
+		cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
+		cardLoyalty = map.contains("loyalty") ? map.value("loyalty").toInt() : 0;
 		QStringList cardTextSplit = cardText.split("\n");
 
 		CardInfo *card = addCard(set->getShortName(), cardName, false, cardId, cardCost, cardType, cardPT, cardLoyalty, cardTextSplit);
@@ -174,7 +183,6 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 			card->addToSet(set);
 			cards++;
 		}
-		cardName = cardCost = cardType = cardPT = cardText = QString();
     }
 	
 	return cards;
