@@ -1,4 +1,5 @@
 #include "carddatabasemodel.h"
+#include "filtertree.h"
 
 CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, QObject *parent)
     : QAbstractListModel(parent), db(_db)
@@ -109,6 +110,7 @@ CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
     : QSortFilterProxyModel(parent),
       isToken(ShowAll)
 {
+    filterTree = NULL;
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setSortCaseSensitivity(Qt::CaseInsensitive);
 }
@@ -116,7 +118,6 @@ CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
 bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
 {
     CardInfo const *info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
-    
     if (((isToken == ShowTrue) && !info->getIsToken()) || ((isToken == ShowFalse) && info->getIsToken()))
         return false;
     
@@ -144,6 +145,9 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
         if (!cardTypes.contains(info->getMainCardType()))
             return false;
 
+    if (filterTree != NULL)
+        return filterTree->acceptsCard(info);
+
     return true;
 }
 
@@ -153,5 +157,22 @@ void CardDatabaseDisplayModel::clearSearch()
     cardText.clear();
     cardTypes.clear();
     cardColors.clear();
+    if (filterTree != NULL)
+        filterTree->clear();
     invalidateFilter();
+}
+
+void CardDatabaseDisplayModel::setFilterTree(FilterTree *filterTree)
+{
+    if (this->filterTree != NULL)
+        disconnect(this->filterTree, 0, this, 0);
+
+    this->filterTree = filterTree;
+    connect(this->filterTree, SIGNAL(changed()), this, SLOT(filterTreeChanged()));
+    invalidate();
+}
+
+void CardDatabaseDisplayModel::filterTreeChanged()
+{
+    invalidate();
 }

@@ -43,10 +43,12 @@ Server_CardZone::~Server_CardZone()
 
 void Server_CardZone::shuffle()
 {
+    // Size 0 or 1 decks are sorted
+    if (cards.size() < 2) return;
     for (int i = cards.size() - 1; i > 0; i--){
-        int j = rng->getNumber(0, i);//Assuming i is inclusive, i + 1 if exclusive (end result should be a number between 0 and i [0 and i included])
+        int j = rng->rand(0, i);
         cards.swap(j,i);
-    }    
+    }
     playersWithWritePermission.clear();
 }
 
