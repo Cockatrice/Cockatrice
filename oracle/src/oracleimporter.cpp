@@ -5,6 +5,8 @@
 #include <QDomDocument>
 #include <QDebug>
 
+#include "qt-json/json.h"
+
 OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent)
 	: CardDatabase(parent), dataDir(_dataDir), setIndex(-1)
 {
@@ -147,72 +149,34 @@ CardInfo *OracleImporter::addCard(const QString &setName,
 int OracleImporter::importTextSpoiler(CardSet *set, const QByteArray &data)
 {
 	int cards = 0;
-	QString bufferContents(data);
-	
-	// Workaround for ampersand bug in text spoilers
-	int index = -1;
-	while ((index = bufferContents.indexOf('&', index + 1)) != -1) {
-		int semicolonIndex = bufferContents.indexOf(';', index);
-		if (semicolonIndex > 5) {
-			bufferContents.insert(index + 1, "amp;");
-			index += 4;
-		}
-	}
-	
-	QDomDocument doc;
-	QString errorMsg;
-	int errorLine, errorColumn;
-	if (!doc.setContent(bufferContents, &errorMsg, &errorLine, &errorColumn))
-		qDebug() << "error:" << errorMsg << "line:" << errorLine << "column:" << errorColumn;
+    bool ok;
+    QVariantMap resultMap = QtJson::Json::parse(QString(data), ok).toMap();
+    if (!ok) {
+    	qDebug() << "error: QtJson::Json::parse()";
+        return 0;
+    }
+    
+    QListIterator<QVariant> it(resultMap.value("cards").toList());
+    while (it.hasNext()) {
+        QVariantMap map = it.next().toMap();
+		QString cardName = map.value("name").toString();
+		QString cardCost = map.value("manaCost").toString();
+		QString cardType = map.value("type").toString();
+		QString cardPT = map.value("power").toString() + QString('/') + map.value("toughness").toString();
+		QString cardText = map.value("text").toString();
+		int cardId = map.value("multiverseid").toInt();
+		int cardLoyalty = map.value("loyalty").toInt();
+		QStringList cardTextSplit = cardText.split("\n");
 
-	QDomNodeList divs = doc.elementsByTagName("div");
-	for (int i = 0; i < divs.size(); ++i) {
-		QDomElement div = divs.at(i).toElement();
-		QDomNode divClass = div.attributes().namedItem("class");
-		if (divClass.nodeValue() == "textspoiler") {
-			QString cardName, cardCost, cardType, cardPT, cardText;
-			int cardId = 0;
-			int cardLoyalty = 0;
-			
-			QDomNodeList trs = div.elementsByTagName("tr");
-			for (int j = 0; j < trs.size(); ++j) {
-				QDomElement tr = trs.at(j).toElement();
-				QDomNodeList tds = tr.elementsByTagName("td");
-				if (tds.size() != 2) {
-					QStringList cardTextSplit = cardText.split("\n");
-					for (int i = 0; i < cardTextSplit.size(); ++i)
-						cardTextSplit[i] = cardTextSplit[i].trimmed();
-					
-					CardInfo *card = addCard(set->getShortName(), cardName, false, cardId, cardCost, cardType, cardPT, cardLoyalty, cardTextSplit);
-					if (!set->contains(card)) {
-						card->addToSet(set);
-						cards++;
-					}
-					cardName = cardCost = cardType = cardPT = cardText = QString();
-				} else {
-					QString v1 = tds.at(0).toElement().text().simplified();
-					QString v2 = tds.at(1).toElement().text().replace(trUtf8("—"), "-");
-					
-					if (v1 == "Name") {
-						QDomElement a = tds.at(1).toElement().elementsByTagName("a").at(0).toElement();
-						QString href = a.attributes().namedItem("href").nodeValue();
-						cardId = href.mid(href.indexOf("multiverseid=") + 13).toInt();
-						cardName = v2.simplified();
-					} else if (v1 == "Cost:")
-						cardCost = v2.simplified();
-					else if (v1 == "Type:")
-						cardType = v2.simplified();
-					else if (v1 == "Pow/Tgh:")
-						cardPT = v2.simplified().remove('(').remove(')');
-					else if (v1 == "Rules Text:")
-						cardText = v2.trimmed();
-					else if (v1 == "Loyalty:")
-						cardLoyalty = v2.trimmed().remove('(').remove(')').toInt();
-				}
-			}
-			break;
+		CardInfo *card = addCard(set->getShortName(), cardName, false, cardId, cardCost, cardType, cardPT, cardLoyalty, cardTextSplit);
+
+		if (!set->contains(card)) {
+			card->addToSet(set);
+			cards++;
 		}
-	}
+		cardName = cardCost = cardType = cardPT = cardText = QString();
+    }
+	
 	return cards;
 }
 
@@ -257,7 +221,7 @@ void OracleImporter::downloadNextFile()
 	QString urlString = setsToDownload[setIndex].getUrl();
 	if (urlString.isEmpty())
 		urlString = setUrl;
-	urlString = urlString.replace("!longname!", setsToDownload[setIndex].getLongName());
+	urlString = urlString.replace("!name!", setsToDownload[setIndex].getShortName());
 
 	if (urlString.startsWith("http://")) {
 		QUrl url(urlString);
