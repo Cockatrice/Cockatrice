@@ -13,6 +13,14 @@ set(PROJECT_VERSION_MINOR 0)
 set(PROJECT_VERSION_PATCH 1)
 set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH} )
 
+# Defualt to "Release" build type
+# User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
+IF(DEFINED CMAKE_BUILD_TYPE)
+   SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Type of build")
+ELSE()
+   SET(CMAKE_BUILD_TYPE Release CACHE STRING "Type of build")
+ENDIF()
+
 # A project name is needed for CPack
 PROJECT("${PROJECT_NAME}")
 
@@ -40,9 +48,6 @@ if(UNIX)
 elseif(WIN32)
     set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/release)
 endif()
-
-# Force "Release" build type by default
-set(CMAKE_BUILD_TYPE Release)
 
 # Define proper compilation flags
 IF (CMAKE_COMPILER_IS_GNUCC)
