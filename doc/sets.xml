@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cockatrice_setdatabase version="20110126">
-<picture_url>http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&amp;type=card</picture_url>
+<picture_url>http://mtgimage.com/multiverseid/!cardid!.jpg</picture_url>
 <set_url>http://mtgjson.com/json/!name!.json</set_url>
 	<set import="1">
 		<name>ARB</name>
