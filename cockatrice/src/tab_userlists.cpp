@@ -4,6 +4,8 @@
 #include "abstractclient.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QPushButton>
+#include <QLineEdit>
 
 #include "pending_command.h"
 #include "pb/session_commands.pb.h"
@@ -21,33 +23,89 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
     ignoreList = new UserList(_tabSupervisor, client, UserList::IgnoreList);
     userInfoBox = new UserInfoBox(client, false);
     userInfoBox->updateInfo(userInfo);
-    
+
     connect(allUsersList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
     connect(buddyList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
     connect(ignoreList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
-    
+
     connect(client, SIGNAL(userJoinedEventReceived(const Event_UserJoined &)), this, SLOT(processUserJoinedEvent(const Event_UserJoined &)));
     connect(client, SIGNAL(userLeftEventReceived(const Event_UserLeft &)), this, SLOT(processUserLeftEvent(const Event_UserLeft &)));
     connect(client, SIGNAL(buddyListReceived(const QList<ServerInfo_User> &)), this, SLOT(buddyListReceived(const QList<ServerInfo_User> &)));
     connect(client, SIGNAL(ignoreListReceived(const QList<ServerInfo_User> &)), this, SLOT(ignoreListReceived(const QList<ServerInfo_User> &)));
     connect(client, SIGNAL(addToListEventReceived(const Event_AddToList &)), this, SLOT(processAddToListEvent(const Event_AddToList &)));
     connect(client, SIGNAL(removeFromListEventReceived(const Event_RemoveFromList &)), this, SLOT(processRemoveFromListEvent(const Event_RemoveFromList &)));
-    
+
     PendingCommand *pend = client->prepareSessionCommand(Command_ListUsers());
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(processListUsersResponse(const Response &)));
     client->sendCommand(pend);
-    
+
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(userInfoBox);
     vbox->addWidget(allUsersList);
-    
+
+    QHBoxLayout *addToBuddyList = new QHBoxLayout;
+    addBuddyEdit = new QLineEdit;
+    addBuddyEdit->setPlaceholderText(tr("Add to Buddy List"));
+    connect(addBuddyEdit, SIGNAL(returnPressed()), this, SLOT(addToBuddyList()));
+    QPushButton *addBuddyButton = new QPushButton("Add");
+    connect(addBuddyButton, SIGNAL(clicked()), this, SLOT(addToBuddyList()));
+    addToBuddyList->addWidget(addBuddyEdit);
+    addToBuddyList->addWidget(addBuddyButton);
+
+    QHBoxLayout *addToIgnoreList = new QHBoxLayout;
+    addIgnoreEdit = new QLineEdit;
+    addIgnoreEdit->setPlaceholderText(tr("Add to Ignore List"));
+    connect(addIgnoreEdit, SIGNAL(returnPressed()), this, SLOT(addToIgnoreList()));
+    QPushButton *addIgnoreButton = new QPushButton("Add");
+    connect(addIgnoreButton, SIGNAL(clicked()), this, SLOT(addToIgnoreList()));
+    addToIgnoreList->addWidget(addIgnoreEdit);
+    addToIgnoreList->addWidget(addIgnoreButton);
+
+    QVBoxLayout *buddyPanel = new QVBoxLayout;
+    buddyPanel->addWidget(buddyList);
+    buddyPanel->addLayout(addToBuddyList);
+
+    QVBoxLayout *ignorePanel = new QVBoxLayout;
+    ignorePanel->addWidget(ignoreList);
+    ignorePanel->addLayout(addToIgnoreList);
+
     QHBoxLayout *mainLayout = new QHBoxLayout;
-    mainLayout->addWidget(buddyList);
-    mainLayout->addWidget(ignoreList);
+    mainLayout->addLayout(buddyPanel);
+    mainLayout->addLayout(ignorePanel);
     mainLayout->addLayout(vbox);
-    
+
     setLayout(mainLayout);
 }
+
+void TabUserLists::addToBuddyList()
+{
+    QString userName = addBuddyEdit->text();
+    if (userName.length() < 1) return;
+
+    std::string listName = "buddy";
+    addToList(listName, userName);
+    addBuddyEdit->clear();
+}
+
+void TabUserLists::addToIgnoreList()
+{
+    QString userName = addIgnoreEdit->text();
+    if (userName.length() < 1) return;
+
+    std::string listName = "ignore";
+    addToList(listName, userName);
+    addIgnoreEdit->clear();
+}
+
+void TabUserLists::addToList(const std::string &listName, const QString &userName)
+{
+    Command_AddToList cmd;
+    cmd.set_list(listName);
+    cmd.set_user_name(userName.toStdString());
+
+    client->sendCommand(client->prepareSessionCommand(cmd));
+}
+
 
 void TabUserLists::retranslateUi()
 {
