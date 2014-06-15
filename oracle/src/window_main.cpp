@@ -19,7 +19,7 @@
 #include "window_main.h"
 #include "oracleimporter.h"
 
-const QString WindowMain::defaultSetsUrl = QString("http://www.woogerworks.com/files/sets.xml");
+const QString WindowMain::defaultSetsUrl = QString("http://mtgjson.com/json/AllSets.json");
 
 WindowMain::WindowMain(QWidget *parent)
 	: QMainWindow(parent)
@@ -45,7 +45,7 @@ WindowMain::WindowMain(QWidget *parent)
 	checkAllButtonLayout->addWidget(checkAllButton);
 	checkAllButtonLayout->addWidget(uncheckAllButton);
 	
-	startButton = new QPushButton(tr("&Start download"));
+	startButton = new QPushButton(tr("&Start import"));
 	connect(startButton, SIGNAL(clicked()), this, SLOT(actStart()));
 	
 	QVBoxLayout *settingsLayout = new QVBoxLayout;
@@ -130,7 +130,7 @@ void WindowMain::actLoadSetsFile()
 {
 	QFileDialog dialog(this, tr("Load sets file"));
 	dialog.setFileMode(QFileDialog::ExistingFile);
-	dialog.setNameFilter("Sets XML file (*.xml)");
+	dialog.setNameFilter("Sets JSON file (*.json)");
 	if (!dialog.exec())
 		return;
 
@@ -224,7 +224,7 @@ void WindowMain::actUncheckAll()
 
 void WindowMain::actStart()
 {
-	int setsCount = importer->startDownload();
+	int setsCount = importer->startImport();
 	if (!setsCount) {
 		QMessageBox::critical(this, tr("Error"), tr("No sets to download selected."));
 		return;

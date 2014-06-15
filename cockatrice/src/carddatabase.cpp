@@ -406,12 +406,27 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
     xml.writeTextElement("name", info->getName());
 
     const SetList &sets = info->getSets();
+    QString tmpString;
+    QString tmpSet;
     for (int i = 0; i < sets.size(); i++) {
         xml.writeStartElement("set");
-        xml.writeAttribute("picURL", info->getPicURL(sets[i]->getShortName()));
-        xml.writeAttribute("picURLHq", info->getPicURLHq(sets[i]->getShortName()));
-        xml.writeAttribute("picURLSt", info->getPicURLSt(sets[i]->getShortName()));
-        xml.writeCharacters(sets[i]->getShortName());
+
+        tmpSet=sets[i]->getShortName();
+        xml.writeAttribute("muId", QString::number(info->getMuId(tmpSet)));
+
+        tmpString = info->getPicURL(tmpSet);
+        if(!tmpString.isEmpty())
+            xml.writeAttribute("picURL", tmpString);
+
+        tmpString = info->getPicURLHq(tmpSet);
+        if(!tmpString.isEmpty())
+            xml.writeAttribute("picURLHq", tmpString);
+
+        tmpString = info->getPicURLSt(tmpSet);
+        if(!tmpString.isEmpty())
+            xml.writeAttribute("picURLSt", tmpString);
+
+        xml.writeCharacters(tmpSet);
         xml.writeEndElement();
     }
     const QStringList &colors = info->getColors();

@@ -100,6 +100,7 @@ private:
     QStringList colors;
     int loyalty;
     QMap<QString, QString> picURLs, picURLsHq, picURLsSt;
+    QMap<QString, int> muIds;
     bool cipt;
     int tableRow;
     QPixmap *pixmap;
@@ -139,6 +140,7 @@ public:
     QString getPicURL(const QString &set) const { return picURLs.value(set); }
     QString getPicURLHq(const QString &set) const { return picURLsHq.value(set); }
     QString getPicURLSt(const QString &set) const { return picURLsSt.value(set); }
+    int getMuId(const QString &set) const { return muIds.value(set); }
     QString getPicURL() const;
     const QMap<QString, QString> &getPicURLs() const { return picURLs; }
     QString getMainCardType() const;
@@ -149,6 +151,7 @@ public:
     void setPicURL(const QString &_set, const QString &_picURL) { picURLs.insert(_set, _picURL); }
     void setPicURLHq(const QString &_set, const QString &_picURL) { picURLsHq.insert(_set, _picURL); }
     void setPicURLSt(const QString &_set, const QString &_picURL) { picURLsSt.insert(_set, _picURL); }
+    void setMuId(const QString &_set, const int &_muId) { muIds.insert(_set, _muId); }
     void addToSet(CardSet *set);
     QPixmap *loadPixmap();
     QPixmap *getPixmap(QSize size);
