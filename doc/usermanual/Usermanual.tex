@@ -204,7 +204,7 @@ Before you install new software, you should update your system. The following in
 \begin{enumerate}
  \item You need to install the build tools and dependencies. This varies between the Linux distributions.
  \begin{description}
-  \item[Debian, Ubuntu and spin-offs] \shellcmd{sudo apt-get install build-essential git libqt4-dev qtmobility-dev libprotobuf-dev protobuf-compiler cmake} (see note below regarding pthread)
+  \item[Debian, Ubuntu and spin-offs] \shellcmd{sudo apt-get install build-essential git libqt4-dev qtmobility-dev libprotobuf-dev protobuf-compiler cmake}
   \item[Fedora] \shellcmd{sudo yum groupinstall "Development Tools"\\
   yum install qt-devel qt-mobility-devel protobuf-devel protobuf-compiler cmake}
   \item[FreeBSD 9] \shellcmd{pkg\_add -r qt4 qt4-linguist qt4-moc qt4-qmake qt4-rcc qt4-uic git cmake protobuf}
@@ -217,9 +217,6 @@ mkdir build \\
 cd build \\
 cmake ..\\
 make}\\
-\begin{framed}
-If you have linking errors with pthread\_* add 'pthread' to the ``target\_link\_libraries'' entry in the \shellcmd{CMakeFiles.txt} in \shellcmd{Cockatrice/common}, e.g. for Xubuntu, then continue the make process.
-\end{framed}
  \item You may install the program into the directory \shellcmd{/usr/local} by typing \shellcmd{sudo make install} but you should also be able to start 
  cockatrice and the oracle from the build directory.
  \item Before you start Cockatrice for the first time, run \shellcmd{oracle -dlsets} and download available cards, then run \shellcmd{cockatrice}.
