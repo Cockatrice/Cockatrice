@@ -266,7 +266,7 @@ FilterItemList *FilterTree::attrTypeList(CardFilter::Attr attr,
 int FilterTree::findTermIndex(CardFilter::Attr attr, CardFilter::Type type,
                                 const QString &term)
 {
-    attrTypeList(attr, type)->termIndex(term);
+    return attrTypeList(attr, type)->termIndex(term);
 }
 
 int FilterTree::findTermIndex(const CardFilter *f)
