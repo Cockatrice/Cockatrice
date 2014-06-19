@@ -18,6 +18,7 @@ public:
 	void setImport(bool _import) { import = _import; }
 	SetToDownload(const QString &_shortName, const QString &_longName, const QVariant &_cards, bool _import)
 		: shortName(_shortName), longName(_longName), cards(_cards), import(_import) { }
+	bool operator<(const SetToDownload &set) const { return longName < set.longName; }
 };
 
 class OracleImporter : public CardDatabase {
@@ -27,15 +28,13 @@ private:
 	QVariantMap setsMap;
 	QString dataDir;
 	
-	void downloadNextFile();
 	CardInfo *addCard(const QString &setName, QString cardName, bool isToken, int cardId, const QString &cardCost, const QString &cardType, const QString &cardPT, int cardLoyalty, const QStringList &cardText);
 signals:
-	void setIndexChanged(int cardsImported, int setIndex, const QString &nextSetName);
+	void setIndexChanged(int cardsImported, int setIndex, const QString &setName);
 	void dataReadProgress(int bytesRead, int totalBytes);
 public:
 	OracleImporter(const QString &_dataDir, QObject *parent = 0);
 	bool readSetsFromByteArray(const QByteArray &data);
-	bool readSetsFromFile(const QString &fileName);
 	int startImport();
 	int importTextSpoiler(CardSet *set, const QVariant &data);
 	QList<SetToDownload> &getSets() { return allSets; }

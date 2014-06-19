@@ -9,8 +9,8 @@ set(DESKTOPDIR share/applications CACHE STRING "path to .desktop files")
 
 SET(oracle_SOURCES
     src/main.cpp
+    src/oraclewizard.cpp
     src/oracleimporter.cpp
-    src/window_main.cpp
     ../cockatrice/src/carddatabase.cpp
     ../cockatrice/src/settingscache.cpp
     ../cockatrice/src/qt-json/json.cpp

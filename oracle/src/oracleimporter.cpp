@@ -9,17 +9,6 @@ OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent)
 {
 }
 
-bool OracleImporter::readSetsFromFile(const QString &fileName)
-{
-    QFile setsFile(fileName);
-    if (!setsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::critical(0, tr("Error"), tr("Cannot open file '%1'.").arg(fileName));
-        return false;
-    }
-
-    return readSetsFromByteArray(setsFile.readAll());
-}
-
 bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
 {
     QList<SetToDownload> newSetList;
@@ -51,6 +40,9 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
 
         newSetList.append(SetToDownload(edition, editionLong, editionCards, import));
     }
+
+    qSort(newSetList);
+
     if (newSetList.isEmpty())
         return false;
     allSets = newSetList;
@@ -243,8 +235,8 @@ int OracleImporter::startImport()
     while (it.hasNext())
     {
         curSet = & it.next();
-
-        emit setIndexChanged(0, 0, curSet->getLongName());
+        if(!curSet->getImport())
+            continue;
             
         CardSet *set = new CardSet(curSet->getShortName(), curSet->getLongName());
         if (!setHash.contains(set->getShortName()))
