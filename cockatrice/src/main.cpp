@@ -120,7 +120,11 @@ int main(int argc, char *argv[])
     qsrand(QDateTime::currentDateTime().toTime_t());
     
     bool startMainProgram = true;
+#if QT_VERSION < 0x050000
     const QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#else
+    const QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation)).toString();
+#endif
     if (!db->getLoadSuccess())
         if (db->loadCardDatabase(dataDir + "/cards.xml"))
             settingsCache->setCardDatabasePath(dataDir + "/cards.xml");

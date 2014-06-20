@@ -24,7 +24,11 @@ const QString WindowMain::defaultSetsUrl = QString("http://www.woogerworks.com/f
 WindowMain::WindowMain(QWidget *parent)
 	: QMainWindow(parent)
 {
+#if QT_VERSION < 0x050000
 	importer = new OracleImporter(QDesktopServices::storageLocation(QDesktopServices::DataLocation), this);
+#else
+	importer = new OracleImporter(QStandardPaths::standardLocations(QStandardPaths::DataLocation)).toString(), this);
+#endif
 	nam = new QNetworkAccessManager(this);
 	
 	checkBoxLayout = new QVBoxLayout;
@@ -176,7 +180,11 @@ void WindowMain::updateTotalProgress(int cardsImported, int setIndex, const QStr
 	if (nextSetName.isEmpty()) {
 		QMessageBox::information(this, tr("Oracle importer"), tr("Import finished: %1 cards.").arg(importer->getCardList().size()));
 		bool ok = false;
+#if QT_VERSION < 0x050000
 		const QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#else
+		const QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation)).toString();
+#endif
 		QDir dir(dataDir);
 		if (!dir.exists())
 			dir.mkpath(dataDir);
