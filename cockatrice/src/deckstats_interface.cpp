@@ -7,6 +7,10 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 
+#if QT_VERSION >= 0x050000
+#include <QUrlQuery>
+#endif
+
 DeckStatsInterface::DeckStatsInterface(QObject *parent)
     : QObject(parent)
 {
@@ -42,7 +46,13 @@ void DeckStatsInterface::queryFinished(QNetworkReply *reply)
 void DeckStatsInterface::analyzeDeck(DeckList *deck)
 {
     QUrl params;
+#if QT_VERSION < 0x050000
     params.addQueryItem("deck", deck->writeToString_Plain());
+#else
+    QUrlQuery urlQuery;
+    urlQuery.addQueryItem("deck", deck->writeToString_Plain());
+    params.setUrlQuery(urlQuery);
+#endif
     QByteArray data;
     data.append(params.encodedQuery());
     
