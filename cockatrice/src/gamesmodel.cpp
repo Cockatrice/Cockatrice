@@ -180,9 +180,9 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourc
     if (!gameTypeFilter.isEmpty() && gameTypes.intersect(gameTypeFilter).isEmpty())
         return false;
                     
-    if ((maxPlayersFilterMin != -1) && (game.max_players() < maxPlayersFilterMin))
+    if ((maxPlayersFilterMin != -1) && ((int)game.max_players() < maxPlayersFilterMin))
         return false;
-    if ((maxPlayersFilterMax != -1) && (game.max_players() > maxPlayersFilterMax))
+    if ((maxPlayersFilterMax != -1) && ((int)game.max_players() > maxPlayersFilterMax))
         return false;
     
     return true;

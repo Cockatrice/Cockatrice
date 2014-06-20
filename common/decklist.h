@@ -83,7 +83,7 @@ public:
 	virtual QString getName() const = 0;
 	virtual void setName(const QString &_name) = 0;
         virtual float getPrice() const = 0;
-        virtual void setPrice(float _price) = 0;
+        virtual void setPrice(const float _price) = 0;
         float getTotalPrice() const { return getNumber() * getPrice(); }
 	int height() const { return 0; }
 	bool compare(AbstractDecklistNode *other) const;
