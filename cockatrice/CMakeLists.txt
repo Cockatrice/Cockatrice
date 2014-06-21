@@ -125,36 +125,101 @@ if(APPLE)
     set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 ENDIF(APPLE)
 
-if (NOT QT_QTMULTIMEDIA_FOUND)
-    FIND_PACKAGE(QtMobility REQUIRED)
-endif (NOT QT_QTMULTIMEDIA_FOUND)
+set(COCKATRICE_LIBS)
 
-SET(QT_USE_QTNETWORK TRUE)
-SET(QT_USE_QTMULTIMEDIA TRUE)
-SET(QT_USE_QTXML TRUE)
-SET(QT_USE_QTSVG TRUE)
+# Qt4 stuff
+if(Qt4_FOUND)
+    if (NOT QT_QTMULTIMEDIA_FOUND)
+        FIND_PACKAGE(QtMobility REQUIRED)
+    endif (NOT QT_QTMULTIMEDIA_FOUND)
+
+    SET(QT_USE_QTNETWORK TRUE)
+    SET(QT_USE_QTMULTIMEDIA TRUE)
+    SET(QT_USE_QTXML TRUE)
+    SET(QT_USE_QTSVG TRUE)
+
+    # Include directories
+    INCLUDE(${QT_USE_FILE})
+    INCLUDE_DIRECTORIES(${QT_INCLUDES})
+    INCLUDE_DIRECTORIES(${QT_MOBILITY_INCLUDE_DIR})
+    INCLUDE_DIRECTORIES(${QT_MOBILITY_MULTIMEDIAKIT_INCLUDE_DIR})
+    LIST(APPEND COCKATRICE_LIBS ${QT_LIBRARIES})
+    LIST(APPEND COCKATRICE_LIBS ${QT_QTMAIN_LIBRARY})
+    LIST(APPEND COCKATRICE_LIBS ${QT_MOBILITY_MULTIMEDIAKIT_LIBRARY})
+
+    # Let cmake chew Qt4's translations and resource files
+    # Note: header files are MOC-ed automatically by cmake
+    QT4_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
+    QT4_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+endif()
+
+# qt5 stuff
+if(Qt5Widgets_FOUND)
+    include_directories(${Qt5Widgets_INCLUDE_DIRS})
+    list(APPEND COCKATRICE_LIBS Widgets)
+
+    # QtNetwork
+    find_package(Qt5Network)
+    if(Qt5Network_FOUND)
+        include_directories(${Qt5Network_INCLUDE_DIRS})
+        list(APPEND COCKATRICE_LIBS Network)
+    endif()
+
+    # QtMultimedia
+    find_package(Qt5Multimedia)
+    if(Qt5Multimedia_FOUND)
+        include_directories(${Qt5Multimedia_INCLUDE_DIRS})
+        list(APPEND COCKATRICE_LIBS Multimedia)
+    endif()
+
+    # QtXml
+    find_package(Qt5Xml)
+    if(Qt5Xml_FOUND)
+        include_directories(${Qt5Xml_INCLUDE_DIRS})
+        list(APPEND COCKATRICE_LIBS Xml)
+    endif()
+
+    # QtSvg
+    find_package(Qt5Svg)
+    if(Qt5Svg_FOUND)
+        include_directories(${Qt5Svg_INCLUDE_DIRS})
+        list(APPEND COCKATRICE_LIBS Svg)
+    endif()
+
+    # Qt5LinguistTools
+    find_package(Qt5LinguistTools)
+    if(Qt5LinguistTools_FOUND)
+        include_directories(${Qt5LinguistTools_INCLUDE_DIRS})
+        list(APPEND COCKATRICE_LIBS LinguistTools)
+    endif()
+
+    # Let cmake chew Qt4's translations and resource files
+    # Note: header files are MOC-ed automatically by cmake
+    QT5_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
+    QT5_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+endif()
 
 # Declare path variables
 set(ICONDIR share/icons CACHE STRING "icon dir")
 set(DESKTOPDIR share/applications CACHE STRING "desktop file destination")
 
-# Let cmake chew Qt4's translations and resource files
-# Note: header files are MOC-ed automatically by cmake
-QT4_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
-QT4_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
-
 # Include directories
-INCLUDE(${QT_USE_FILE})
 INCLUDE_DIRECTORIES(../common)
 INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/common)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-INCLUDE_DIRECTORIES(${QT_MOBILITY_INCLUDE_DIR})
-INCLUDE_DIRECTORIES(${QT_MOBILITY_MULTIMEDIAKIT_INCLUDE_DIR})
 
 # Build cockatrice binary and link it
 ADD_EXECUTABLE(cockatrice WIN32 MACOSX_BUNDLE ${cockatrice_SOURCES} ${cockatrice_QM} ${cockatrice_RESOURCES_RCC} ${cockatrice_MOC_SRCS})
-TARGET_LINK_LIBRARIES(cockatrice cockatrice_common ${QT_QTMAIN_LIBRARY} ${QT_LIBRARIES} ${QT_MOBILITY_MULTIMEDIAKIT_LIBRARY})
+
+if(Qt4_FOUND)
+    TARGET_LINK_LIBRARIES(cockatrice cockatrice_common ${COCKATRICE_LIBS})
+endif()
+if(Qt5Widgets_FOUND)
+    TARGET_LINK_LIBRARIES(cockatrice cockatrice_common)
+    qt5_use_modules(cockatrice ${COCKATRICE_LIBS})
+endif()
+
 
 if(MSVC)
 	set_target_properties(cockatrice PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")

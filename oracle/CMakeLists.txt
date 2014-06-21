@@ -15,17 +15,59 @@ SET(oracle_SOURCES
     ../cockatrice/src/settingscache.cpp
  )
 
-SET(QT_USE_QTNETWORK TRUE)
-SET(QT_USE_QTXML TRUE)
-SET(QT_USE_QTSVG TRUE)
+set(ORACLE_LIBS)
 
-# Include directories
-INCLUDE(${QT_USE_FILE})
+# Qt4 stuff
+if(Qt4_FOUND)
+    SET(QT_USE_QTNETWORK TRUE)
+    SET(QT_USE_QTXML TRUE)
+    SET(QT_USE_QTSVG TRUE)
+
+    # Include directories
+    INCLUDE(${QT_USE_FILE})
+    include_directories(${QT_INCLUDES})
+    LIST(APPEND ORACLE_LIBS ${QT_QTMAIN_LIBRARY})
+    LIST(APPEND ORACLE_LIBS ${QT_LIBRARIES})
+endif()
+
+# qt5 stuff
+if(Qt5Widgets_FOUND)
+    include_directories(${Qt5Widgets_INCLUDE_DIRS})
+    list(APPEND ORACLE_LIBS Widgets)
+
+    # QtNetwork
+    find_package(Qt5Network)
+    if(Qt5Network_FOUND)
+        include_directories(${Qt5Network_INCLUDE_DIRS})
+        list(APPEND ORACLE_LIBS Network)
+    endif()
+
+    # QtXml
+    find_package(Qt5Xml)
+    if(Qt5Xml_FOUND)
+        include_directories(${Qt5Xml_INCLUDE_DIRS})
+        list(APPEND ORACLE_LIBS Xml)
+    endif()
+
+    # QtSvg
+    find_package(Qt5Svg)
+    if(Qt5Svg_FOUND)
+        include_directories(${Qt5Svg_INCLUDE_DIRS})
+        list(APPEND ORACLE_LIBS Svg)
+    endif()
+endif()
+
 INCLUDE_DIRECTORIES(../cockatrice/src)
 
 # Build oracle binary and link it
 ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_MOC_SRCS})
-TARGET_LINK_LIBRARIES(oracle ${QT_QTMAIN_LIBRARY} ${QT_LIBRARIES})
+
+if(Qt4_FOUND)
+    TARGET_LINK_LIBRARIES(oracle ${ORACLE_LIBS})
+endif()
+if(Qt5Widgets_FOUND)
+    qt5_use_modules(oracle ${ORACLE_LIBS})
+endif()
 
 if(MSVC)
 	set_target_properties(oracle PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")

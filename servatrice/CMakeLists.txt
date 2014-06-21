@@ -20,12 +20,42 @@ SET(servatrice_SOURCES
     ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
 )
 
-SET(QT_DONTUSE_QTGUI)
-SET(QT_USE_QTNETWORK TRUE)
-SET(QT_USE_QTSQL TRUE)
+set(SERVATRICE_LIBS)
+
+# Qt4 stuff
+if(Qt4_FOUND)
+    SET(QT_USE_QTNETWORK TRUE)
+    SET(QT_USE_QTSQL TRUE)
+
+    # Include directories
+    INCLUDE(${QT_USE_FILE})
+    include_directories(${QT_INCLUDES})
+    LIST(APPEND SERVATRICE_LIBS ${QT_LIBRARIES})
+endif()
+
+# qt5 stuff
+if(Qt5Widgets_FOUND)
+    include_directories(${Qt5Widgets_INCLUDE_DIRS})
+    list(APPEND SERVATRICE_LIBS Widgets)
+
+    # QtNetwork
+    find_package(Qt5Network)
+    if(Qt5Network_FOUND)
+        include_directories(${Qt5Network_INCLUDE_DIRS})
+        list(APPEND SERVATRICE_LIBS Network)
+    endif()
+
+    # QtSql
+    find_package(Qt5Sql)
+    if(Qt5Sql_FOUND)
+        include_directories(${Qt5Sql_INCLUDE_DIRS})
+        list(APPEND SERVATRICE_LIBS Sql)
+    endif()
+endif()
+
+SET(QT_DONT_USE_QTGUI TRUE)
 
 # Include directories
-INCLUDE(${QT_USE_FILE})
 INCLUDE_DIRECTORIES(../common)
 INCLUDE_DIRECTORIES(${LIBGCRYPT_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
@@ -34,7 +64,16 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 # Build servatrice binary and link it
 ADD_EXECUTABLE(servatrice MACOSX_BUNDLE ${servatrice_SOURCES} ${servatrice_MOC_SRCS})
-TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${QT_LIBRARIES} ${LIBGCRYPT_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+
+if(Qt4_FOUND)
+    TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${SERVATRICE_LIBS} ${LIBGCRYPT_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+endif()
+if(Qt5Widgets_FOUND)
+    TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${LIBGCRYPT_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+    qt5_use_modules(servatrice ${SERVATRICE_LIBS})
+endif()
+
+
 
 #add_custom_target(versionheader ALL DEPENDS version_header)
 add_custom_command(
