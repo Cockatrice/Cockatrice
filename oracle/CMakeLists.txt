@@ -71,6 +71,7 @@ Plugins = Plugins\")
     install(CODE "
         file(GLOB_RECURSE QTPLUGINS
             \"${plugin_dest_dir}/*.dylib\")
+        set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
         fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/oracle.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         " COMPONENT Runtime)
