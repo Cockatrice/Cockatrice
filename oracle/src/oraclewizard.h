@@ -15,6 +15,7 @@ class QNetworkAccessManager;
 class QTextEdit;
 class QVBoxLayout;
 class OracleImporter;
+class QSettings;
 
 class OracleWizard : public QWizard
 {
@@ -26,6 +27,7 @@ public:
      void disableButtons();
 public: 
      OracleImporter *importer;
+     QSettings * settings;
 };
 
 

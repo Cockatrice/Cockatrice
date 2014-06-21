@@ -12,6 +12,7 @@
 OracleWizard::OracleWizard(QWidget *parent)
     : QWizard(parent)
 {
+    settings = new QSettings(this);
     importer = new OracleImporter(QDesktopServices::storageLocation(QDesktopServices::DataLocation), this);
 
     addPage(new IntroPage);
@@ -76,7 +77,6 @@ LoadSetsPage::LoadSetsPage(QWidget *parent)
     progressBar = new QProgressBar(this);
 
     urlRadioButton->setChecked(true);
-    urlLineEdit->setText(ALLSETS_URL);
 
     fileButton = new QPushButton(tr("Choose file..."), this);
     connect(fileButton, SIGNAL(clicked()), this, SLOT(actLoadSetsFile()));
@@ -97,6 +97,8 @@ LoadSetsPage::LoadSetsPage(QWidget *parent)
 
 void LoadSetsPage::initializePage()
 {
+    urlLineEdit->setText(wizard()->settings->value("allsetsurl", ALLSETS_URL).toString());
+
     progressLabel->hide();
     progressBar->hide();
 }
@@ -200,7 +202,13 @@ void LoadSetsPage::actDownloadFinishedSetsFile()
         return;
     }
 
-    this->readSetsFromByteArray(reply->readAll());
+    // save allsets.json url, but only if the user customized it and download was successfull
+    if(urlLineEdit->text() != QString(ALLSETS_URL))
+        wizard()->settings->setValue("allsetsurl", urlLineEdit->text());
+    else
+        wizard()->settings->remove("allsetsurl");
+
+    readSetsFromByteArray(reply->readAll());
     reply->deleteLater();
 }
 
