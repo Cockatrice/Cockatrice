@@ -13,6 +13,14 @@ set(PROJECT_VERSION_MINOR 0)
 set(PROJECT_VERSION_PATCH 1)
 set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH} )
 
+# Defualt to "Release" build type
+# User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
+IF(DEFINED CMAKE_BUILD_TYPE)
+   SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Type of build")
+ELSE()
+   SET(CMAKE_BUILD_TYPE Release CACHE STRING "Type of build")
+ENDIF()
+
 # A project name is needed for CPack
 PROJECT("${PROJECT_NAME}")
 
@@ -41,19 +49,22 @@ elseif(WIN32)
     set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/release)
 endif()
 
-# Force "Release" build type by default
-set(CMAKE_BUILD_TYPE Release)
-
 # Define proper compilation flags
-IF (CMAKE_COMPILER_IS_GNUCC)
+IF(MSVC)
+	# Visual Studio:
+	# Maximum optimization
+    set(CMAKE_CXX_FLAGS_RELEASE "/Ox")
+	# Generate complete debugging information
+    #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
+ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
     # linux/gcc, bsd/gcc, windows/mingw
     set(CMAKE_CXX_FLAGS_RELEASE "-s -O2")
     set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0")
-else()
+ELSE()
     # other: osx/llvm, bsd/llvm
     set(CMAKE_CXX_FLAGS_RELEASE "-O2")
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
-ENDIF (CMAKE_COMPILER_IS_GNUCC)
+ENDIF()
 
 # GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")

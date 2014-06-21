@@ -13,7 +13,7 @@ QRectF GeneralCounter::boundingRect() const
     return QRectF(0, 0, radius * 2, radius * 2);
 }
 
-void GeneralCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+void GeneralCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     QRectF mapRect = painter->combinedTransform().mapRect(boundingRect());
     int translatedHeight = mapRect.size().height();

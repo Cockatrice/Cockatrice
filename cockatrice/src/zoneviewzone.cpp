@@ -31,7 +31,7 @@ QRectF ZoneViewZone::boundingRect() const
     return bRect;
 }
 
-void ZoneViewZone::paint(QPainter */*painter*/, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+void ZoneViewZone::paint(QPainter * /*painter*/, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
 }
 

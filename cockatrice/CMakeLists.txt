@@ -154,8 +154,11 @@ INCLUDE_DIRECTORIES(${QT_MOBILITY_MULTIMEDIAKIT_INCLUDE_DIR})
 
 # Build cockatrice binary and link it
 ADD_EXECUTABLE(cockatrice WIN32 MACOSX_BUNDLE ${cockatrice_SOURCES} ${cockatrice_QM} ${cockatrice_RESOURCES_RCC} ${cockatrice_MOC_SRCS})
-TARGET_LINK_LIBRARIES(cockatrice cockatrice_common ${QT_LIBRARIES} ${QT_MOBILITY_MULTIMEDIAKIT_LIBRARY})
+TARGET_LINK_LIBRARIES(cockatrice cockatrice_common ${QT_QTMAIN_LIBRARY} ${QT_LIBRARIES} ${QT_MOBILITY_MULTIMEDIAKIT_LIBRARY})
 
+if(MSVC)
+	set_target_properties(cockatrice PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
+endif(MSVC)
 
 if(UNIX)
     if(APPLE)

@@ -3,7 +3,10 @@
 #include <QPen>
 #include <QTimer>
 #include <QDebug>
-#include <math.h>
+#include <cmath>
+#ifdef _WIN32
+#include "round.h"
+#endif /* _WIN32 */
 #include "phasestoolbar.h"
 #include "pixmapgenerator.h"
 
@@ -85,7 +88,7 @@ void PhaseButton::mousePressEvent(QGraphicsSceneMouseEvent * /*event*/)
     emit clicked();
 }
 
-void PhaseButton::mouseDoubleClickEvent(QGraphicsSceneMouseEvent */*event*/)
+void PhaseButton::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * /*event*/)
 {
     triggerDoubleClickAction();
 }

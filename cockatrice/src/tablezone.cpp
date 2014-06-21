@@ -1,7 +1,10 @@
 #include <QPainter>
 #include <QSet>
 #include <QGraphicsScene>
-#include <math.h>
+#include <cmath>
+#ifdef _WIN32
+#include "round.h"
+#endif /* _WIN32 */
 #include "tablezone.h"
 #include "player.h"
 #include "settingscache.h"
@@ -46,7 +49,7 @@ bool TableZone::isInverted() const
     return ((player->getMirrored() && !settingsCache->getInvertVerticalCoordinate()) || (!player->getMirrored() && settingsCache->getInvertVerticalCoordinate()));
 }
 
-void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     if (bgPixmap.isNull())
         painter->fillRect(boundingRect(), QColor(0, 0, 100));

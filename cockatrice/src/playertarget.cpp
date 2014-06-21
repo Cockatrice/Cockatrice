@@ -5,7 +5,10 @@
 #include <QPainter>
 #include <QPixmapCache>
 #include <QDebug>
-#include <math.h>
+#include <cmath>
+#ifdef _WIN32
+#include "round.h"
+#endif /* _WIN32 */
 
 PlayerCounter::PlayerCounter(Player *_player, int _id, const QString &_name, int _value, QGraphicsItem *parent)
     : AbstractCounter(_player, _id, _name, false, _value, parent)
@@ -87,7 +90,8 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
         cachedPixmap = QPixmap(translatedSize.width(), translatedSize.height());
         
         QPainter tempPainter(&cachedPixmap);
-        QRadialGradient grad(translatedRect.center(), sqrt(translatedSize.width() * translatedSize.width() + translatedSize.height() * translatedSize.height()) / 2);
+	// pow(foo, 0.5) equals to sqrt(foo), but using sqrt(foo) in this context will produce a compile error with MSVC++
+        QRadialGradient grad(translatedRect.center(), pow(translatedSize.width() * translatedSize.width() + translatedSize.height() * translatedSize.height(), 0.5) / 2);
         grad.setColorAt(1, Qt::black);
         grad.setColorAt(0, QColor(180, 180, 180));
         tempPainter.fillRect(QRectF(0, 0, translatedSize.width(), translatedSize.height()), grad);

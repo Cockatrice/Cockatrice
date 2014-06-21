@@ -9,6 +9,9 @@ OutFile "cockatrice_win32_${TIMESTAMP}_git-${VERSION}.exe"
 SetCompressor /SOLID lzma
 InstallDir "$PROGRAMFILES\Cockatrice"
 
+; set the Qt install dir here (and make sure you use the latest 4.8 version for packaging)
+!define QTDIR "C:\Qt\4.8.6"
+
 !define MUI_ABORTWARNING
 !define MUI_WELCOMEFINISHPAGE_BITMAP "leftimage.bmp"
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "leftimage.bmp"
@@ -34,35 +37,33 @@ InstallDir "$PROGRAMFILES\Cockatrice"
 !insertmacro MUI_LANGUAGE "English"
 
 Section "Application" SecApplication
+	SetShellVarContext all
 	SetOutPath "$INSTDIR"
-	File ..\build\cockatrice\cockatrice.exe
-	File ..\build\oracle\oracle.exe
+	File ..\build\cockatrice\Release\cockatrice.exe
+	File ..\build\oracle\Release\oracle.exe
 	File ..\doc\usermanual\Usermanual.pdf
-	File C:\MinGW\bin\libstdc++-6.dll
-	File C:\MinGW\bin\libgcc_s_dw2-1.dll
-	File C:\MinGW\bin\mingwm10.dll
-	File C:\MinGW\bin\libprotobuf-8.dll
-	File C:\Qt\4.8.4\bin\QtCore4.dll
-	File C:\Qt\4.8.4\bin\QtGui4.dll
-	File C:\Qt\4.8.4\bin\QtNetwork4.dll
-	File C:\Qt\4.8.4\bin\QtSvg4.dll
-	File C:\Qt\4.8.4\bin\QtXml4.dll
-	File C:\Qt\4.8.4\bin\QtMultimedia4.dll
+	File ..\build\protobuf-2.5.0\protobuf-2.5.0\vsprojects\Release\libprotobuf.lib
+	File "${QTDIR}\bin\QtCore4.dll"
+	File "${QTDIR}\bin\QtGui4.dll"
+	File "${QTDIR}\bin\QtNetwork4.dll"
+	File "${QTDIR}\bin\QtSvg4.dll"
+	File "${QTDIR}\bin\QtXml4.dll"
+	File "${QTDIR}\bin\QtMultimedia4.dll"
 
 	SetOutPath "$INSTDIR\zonebg"
 	File /r ..\zonebg\*.*
 	
 	SetOutPath "$INSTDIR\plugins"
 	SetOutPath "$INSTDIR\plugins\codecs"
-	File C:\Qt\4.8.4\plugins\codecs\qcncodecs4.dll
-	File C:\Qt\4.8.4\plugins\codecs\qjpcodecs4.dll
-	File C:\Qt\4.8.4\plugins\codecs\qkrcodecs4.dll
-	File C:\Qt\4.8.4\plugins\codecs\qtwcodecs4.dll
+	File "${QTDIR}\plugins\codecs\qcncodecs4.dll"
+	File "${QTDIR}\plugins\codecs\qjpcodecs4.dll"
+	File "${QTDIR}\plugins\codecs\qkrcodecs4.dll"
+	File "${QTDIR}\plugins\codecs\qtwcodecs4.dll"
 	SetOutPath "$INSTDIR\plugins\iconengines"
-	File C:\Qt\4.8.4\plugins\iconengines\qsvgicon4.dll
+	File "${QTDIR}\plugins\iconengines\qsvgicon4.dll"
 	SetOutPath "$INSTDIR\plugins\imageformats"
-	File C:\Qt\4.8.4\plugins\imageformats\qjpeg4.dll
-	File C:\Qt\4.8.4\plugins\imageformats\qsvg4.dll
+	File "${QTDIR}\plugins\imageformats\qjpeg4.dll"
+	File "${QTDIR}\plugins\imageformats\qsvg4.dll"
 
 	SetOutPath "$INSTDIR\sounds"
 	File /r ..\sounds\*.*
@@ -70,9 +71,9 @@ Section "Application" SecApplication
 	SetOutPath "$INSTDIR\translations"
 	File /r ..\build\cockatrice\*.qm
 
-        WriteUninstaller "$INSTDIR\uninstall.exe"
-        ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
-        IntFmt $0 "0x%08X" $0
+	WriteUninstaller "$INSTDIR\uninstall.exe"
+	${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+	IntFmt $0 "0x%08X" $0
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayName" "Cockatrice"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
@@ -96,38 +97,36 @@ Section "Start menu item" SecStartMenu
 SectionEnd
 
 Section Uninstall
-        RMDir /r "$INSTDIR\zonebg"
-        RMDir /r "$INSTDIR\plugins"
-        RMDir /r "$INSTDIR\sounds"
+SetShellVarContext all
+	RMDir /r "$INSTDIR\zonebg"
+	RMDir /r "$INSTDIR\plugins"
+	RMDir /r "$INSTDIR\sounds"
 	RMDir /r "$INSTDIR\translations"
-        Delete "$INSTDIR\uninstall.exe"
-        Delete "$INSTDIR\cockatrice.exe"
-        Delete "$INSTDIR\oracle.exe"
-		Delete "$INSTDIR\Usermanual.pdf"
-	Delete "$INSTDIR\libstdc++-6.dll"
-	Delete "$INSTDIR\libprotobuf-8.dll"
-        Delete "$INSTDIR\libgcc_s_dw2-1.dll"
-        Delete "$INSTDIR\mingwm10.dll"
-        Delete "$INSTDIR\QtCore4.dll"
-        Delete "$INSTDIR\QtGui4.dll"
-        Delete "$INSTDIR\QtNetwork4.dll"
-        Delete "$INSTDIR\QtSvg4.dll"
-        Delete "$INSTDIR\QtXml4.dll"
+	Delete "$INSTDIR\uninstall.exe"
+	Delete "$INSTDIR\cockatrice.exe"
+	Delete "$INSTDIR\oracle.exe"
+	Delete "$INSTDIR\Usermanual.pdf"
+	Delete "$INSTDIR\libprotobuf.lib"
+	Delete "$INSTDIR\QtCore4.dll"
+	Delete "$INSTDIR\QtGui4.dll"
+	Delete "$INSTDIR\QtNetwork4.dll"
+	Delete "$INSTDIR\QtSvg4.dll"
+	Delete "$INSTDIR\QtXml4.dll"
 	Delete "$INSTDIR\QtMultimedia4.dll"
-        RMDir "$INSTDIR"
+	RMDir "$INSTDIR"
 
 	RMDir /r "$SMPROGRAMS\Cockatrice"
-        
-        DeleteRegKey HKCU "Software\Cockatrice"
-        DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
+
+	DeleteRegKey HKCU "Software\Cockatrice"
+	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
 SectionEnd
 
 LangString DESC_SecApplication ${LANG_ENGLISH} "Cockatrice program files"
 LangString DESC_SecUpdateConfig ${LANG_ENGLISH} "Update the paths in the application settings according to the installation paths."
 LangString DESC_SecStartMenu ${LANG_ENGLISH} "Create start menu items for Cockatrice and Oracle."
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-        !insertmacro MUI_DESCRIPTION_TEXT ${SecApplication} $(DESC_SecApplication)
-        !insertmacro MUI_DESCRIPTION_TEXT ${SecUpdateConfig} $(DESC_SecUpdateConfig)
-        !insertmacro MUI_DESCRIPTION_TEXT ${SecStartMenu} $(DESC_SecStartMenu)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SecApplication} $(DESC_SecApplication)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SecUpdateConfig} $(DESC_SecUpdateConfig)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SecStartMenu} $(DESC_SecStartMenu)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 

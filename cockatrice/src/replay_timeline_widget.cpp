@@ -2,7 +2,10 @@
 #include <QPainter>
 #include <QPalette>
 #include <QTimer>
-#include <math.h>
+#include <cmath>
+#ifdef _WIN32
+#include "round.h"
+#endif /* _WIN32 */
 
 ReplayTimelineWidget::ReplayTimelineWidget(QWidget *parent)
     : QWidget(parent), maxBinValue(1), maxTime(1), timeScaleFactor(1.0), currentTime(0), currentEvent(0)
