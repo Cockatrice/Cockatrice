@@ -71,8 +71,18 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     ADD_DEFINITIONS("-DSFMT_MEXP=19937")
 ENDIF()
 
-#Find Qt4 and enable the needed features
-FIND_PACKAGE(Qt4 REQUIRED)
+#Find Qt and enable the needed features
+FIND_PACKAGE(Qt5Widgets)
+IF(Qt5Widgets_FOUND)
+    MESSAGE(STATUS "Found Qt ${Qt5Widgets_VERSION_STRING}")
+ELSE()
+    FIND_PACKAGE(Qt4 REQUIRED)
+    IF(Qt4_FOUND)
+        MESSAGE(STATUS "Found Qt ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}")
+    ELSE()
+        MESSAGE(FATAL_ERROR "No Qt4 or Qt5 found!")
+    ENDIF()
+ENDIF()
 
 set(CMAKE_AUTOMOC TRUE)
 
