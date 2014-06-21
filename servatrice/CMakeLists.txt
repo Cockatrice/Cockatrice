@@ -55,8 +55,10 @@ elseif(WIN32)
 endif()
 
 if(APPLE)
+    # this needs to be relative
     set(plugin_dest_dir ./servatrice.app/Contents/Plugins)
-    set(qtconf_dest_dir ./servatrice.app/Contents/Resources)
+    # instead, this needs an absolute path (for make)
+    set(qtconf_dest_dir ${CMAKE_INSTALL_PREFIX}/servatrice.app/Contents/Resources)
 
     # note: no codecs in qt5
     # note: phonon_backend => mediaservice

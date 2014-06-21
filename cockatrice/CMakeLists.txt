@@ -183,8 +183,10 @@ add_custom_command(
 )
 
 if(APPLE)
+    # this needs to be relative
     set(plugin_dest_dir ./cockatrice.app/Contents/Plugins)
-    set(qtconf_dest_dir ./cockatrice.app/Contents/Resources)
+    # instead, this needs an absolute path (for make package to work)
+    set(qtconf_dest_dir ${CMAKE_INSTALL_PREFIX}/cockatrice.app/Contents/Resources)
 
     # note: no codecs in qt5
     # note: phonon_backend => mediaservice
