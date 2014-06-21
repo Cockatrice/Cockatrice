@@ -116,9 +116,9 @@ int main(int argc, char *argv[])
     qtTranslator = new QTranslator;
     translator = new QTranslator;
     installNewTranslator();
-    
+
     qsrand(QDateTime::currentDateTime().toTime_t());
-    
+
     bool startMainProgram = true;
     const QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     if (!db->getLoadSuccess())
