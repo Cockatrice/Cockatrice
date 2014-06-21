@@ -322,11 +322,16 @@ SaveSetsPage::SaveSetsPage(QWidget *parent)
     setSubTitle(tr("The following sets has been imported. "
                    "Press \"Save\" to save the imported cards to the Cockatrice database."));
 
+    defaultPathCheckBox = new QCheckBox(this);
+    defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
+    defaultPathCheckBox->setChecked(true);
+
     messageLog = new QTextEdit(this);
     messageLog->setReadOnly(true);
 
     QGridLayout *layout = new QGridLayout(this);
-    layout->addWidget(messageLog, 0, 0);
+    layout->addWidget(defaultPathCheckBox, 0, 0);
+    layout->addWidget(messageLog, 1, 0);
 
     setLayout(layout);
 }
@@ -366,7 +371,7 @@ bool SaveSetsPage::validatePage()
     QString savePath = dataDir + "/cards.xml";
     do {
         QString fileName;
-        if (savePath.isEmpty())
+        if (savePath.isEmpty() || !defaultPathCheckBox->isChecked())
             fileName = QFileDialog::getSaveFileName(this, tr("Save card database"), dataDir + "/cards.xml", tr("XML card database (*.xml)"));
         else {
             fileName = savePath;

@@ -100,6 +100,7 @@ public:
      SaveSetsPage(QWidget *parent = 0);
 private:
      QTextEdit *messageLog;
+     QCheckBox * defaultPathCheckBox;
 protected:
      void initializePage();
      void cleanupPage();
