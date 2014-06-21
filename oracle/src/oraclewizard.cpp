@@ -20,6 +20,7 @@ OracleWizard::OracleWizard(QWidget *parent)
     addPage(new SaveSetsPage);
 
     setWindowTitle(tr("Oracle Importer"));
+    QWizard::setButtonText(QWizard::FinishButton, tr("Save"));
 }
 
 void OracleWizard::accept()
@@ -319,7 +320,7 @@ SaveSetsPage::SaveSetsPage(QWidget *parent)
 {
     setTitle(tr("Sets imported"));
     setSubTitle(tr("The following sets has been imported. "
-                   "Press \"Done\" to save the imported cards to the Cockatrice database."));
+                   "Press \"Save\" to save the imported cards to the Cockatrice database."));
 
     messageLog = new QTextEdit(this);
     messageLog->setReadOnly(true);
