@@ -2,7 +2,10 @@
 #include <QGraphicsScene>
 #include <QCursor>
 #include <QGraphicsSceneMouseEvent>
-#include <math.h>
+#include <cmath>
+#ifdef _WIN32
+#include "round.h"
+#endif /* _WIN32 */
 #include "carddatabase.h"
 #include "cardinfowidget.h"
 #include "abstractcarditem.h"
@@ -143,7 +146,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     painter->restore();
 }
 
-void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     painter->save();
 

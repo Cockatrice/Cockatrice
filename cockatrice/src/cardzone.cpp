@@ -148,7 +148,7 @@ QString CardZone::getTranslatedName(bool hisOwn, GrammaticalCase gc) const
     return QString();
 }
 
-void CardZone::mouseDoubleClickEvent(QGraphicsSceneMouseEvent */*event*/)
+void CardZone::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * /*event*/)
 {
     if (doubleClickAction)
         doubleClickAction->trigger();

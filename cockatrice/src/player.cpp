@@ -85,7 +85,7 @@ void PlayerArea::updateBgPixmap()
     update();
 }
 
-void PlayerArea::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+void PlayerArea::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     painter->fillRect(bRect, bgPixmapBrush);
 }
@@ -1430,7 +1430,7 @@ QRectF Player::boundingRect() const
     return bRect;
 }
 
-void Player::paint(QPainter * /*painter*/, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+void Player::paint(QPainter * /*painter*/, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
 }
 

@@ -83,87 +83,115 @@ If someone runs his own server where you can register a user profile, read his d
 \section{Downloading and Installing the Cockatrice Program}
 Due to a legal dispute there are currently no official builds left, so currently you have to build your own binaries.
 
-\subsection{Client compilation}
+\subsection{Building the Client}
 \subsubsection{Windows}
-There should be two ways to compile Cockatrice: With Visual Studio 2010 and with MinGW.
-As the Visual Studio method is more complicated and might not work, you should do it with MinGW.
-The following howto has been tested with Windows 7 64Bit.
+To build Cockatrice, we need the Cockatrice sourcecode, its dependencies and build tools of course.
+Everything is freely available.
+
+There should be two ways to compile Cockatrice:
+With Microsoft Visual Studio 2010 (Visual C++ 2010) and with MinGW, a minimalist GNU environment for Windows.
+
+We suggest to use Visual Studio because there is a severe problem with MinGW:
+It doesn't offer a compatible version of its tools.
+The Qt library needs a certain, old MinGW version\footnote{The officially needed version is MinGW 4.8.2, the last known working version was MinGW 20120426} which is unavailable on the internet because they use an online installer and don't offer old, stable releases.
+Trying to build with the current version of MinGW will result in application crashes!
+So MinGW and Qt force us to focus on Visual Studio and don't support MinGW.
+
+Gladly, Microsoft offers Visual Studio Express free of charge, which is a limited but sufficient version of Visual Studio.
+It only requires a free of charge registration after 30 days.
+
+The following howto which uses Visual C++ 2010 Express has been tested with an up to date Windows 7 64Bit.
+The resulting build is a 32bit binary, which runs on both 32bit and 64bit systems.
 
 \paragraph{Prerequisites}
-We need the Cockatrice sourcecode, it's dependencies and build tools. Everything is freely available:
+Here is an introduction of all dependencies and tools needed for Cockatrice, followed by a list of downloadlinks in the same order.
 \begin{enumerate}
- \item MinGW is needed to compile everything, it ships the compiler and other tools for this task.
+ \item The Microsoft Windows SDK for Windows 7 and .NET Framework 4 provides tools and libraries to create Windows applications.
+ \item The Visual C++ 2010 SP 1 Compiler Update for Windows SDK 7.1 (KB2519277) is a necessary update for the SDK.
+ \item Microsoft Visual C++ 2010 Express is the actual development environment.
+ \item Microsoft Visual Studio 2010 Service Pack 1 (VS10sp1-KB983509) is an update for Visual Studio.
+ \item The Qt libraries 4.8.x for Windows (VS 2010) are the main dependency for Cockatrice.
+ \item protobuf 2.5.0 is another dependency for Cockatrice (it has no installer, you need to download the zip file with the sourcecode).
+ \item cmake version 2.8.12.x is needed to create Cockatrice's project files for Visual Studio. Version 3 has not been tested yet with Cockatrice.
  \item git is needed to download the latest Cockatrice source code.
- \item cmake is needed to create Cockatrice's project files for MinGW.
- \item Qt 4.8 is a dependency for Cockatrice (download the MinGW version!)
- \item protobuf 2.5 is another dependency for Cockatrice (download the zip file with the sourcecode).
- \item Nullsoft Scriptable Install System (NSIS) which can be used to create an installer for your own Cockatrice version.
+ \item Nullsoft Scriptable Install System (NSIS 3.0b0) is a program to create the Windows installer for Cockatrice.
 \end{enumerate}
 
 All downloadlinks together:
 \footnotesize{\begin{enumerate}
- \item \url{http://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/mingw-get-inst-20120426/}
+ \item \url{http://www.microsoft.com/en-us/download/details.aspx?id=8279} % Win SDK
+ \item \url{http://www.microsoft.com/en-us/download/details.aspx?displaylang=en&id=4422} % SDK Update
+ \item \url{http://go.microsoft.com/?linkid=9709949} % MSVC
+ \item \url{http://www.microsoft.com/en-us/download/details.aspx?id=23691} % MSVC SP1
+ \item \url{http://download.qt-project.org/official_releases/qt/4.8/4.8.6/qt-opensource-windows-x86-vs2010-4.8.6.exe}
+ \item \url{http://www.cmake.org/files/v2.8/cmake-2.8.12.2-win32-x86.exe}
  \item \url{http://git-scm.com/download/win}
- \item \url{http://www.cmake.org/files/v2.8/cmake-2.8.10.2-win32-x86.exe}
- \item \url{http://download.qt-project.org/official_releases/qt/4.8/4.8.4/qt-win-opensource-4.8.4-mingw.exe}
  \item \url{http://protobuf.googlecode.com/files/protobuf-2.5.0.zip}
  \item \url{http://nsis.sourceforge.net/Download}
 \end{enumerate}}
 
 \paragraph{Installation of the Prerequisites}
+Problems will occur if you don't install the first four steps (all the Microsoft SDK and Visual Studio packages) in the exact same order as printed here!
 \begin{enumerate}
- \item Download MinGW (mingw-get-inst), git, cmake, protobuf 2.5 sources zip and Qt 4.8.4 MinGW (see links above).
- \item Make a standard installation for git, cmake and NSIS.
- \item Install MinGW:
-    \begin{enumerate}
-      \item Select default values everywhere, except: Also check the C++ Compiler, check the MSYS Basis System and MinGW Developer Toolkit.
-      \item Append \shellcmd{C:\textbackslash MinGW\textbackslash bin} to your PATH variable (google how to do it for your Windows version, if you don't know it).
-      This is very important and overseen many times! You can keep the PATH configuration dialog open for the next step.
-    \end{enumerate}
- \item Install Qt, select default values everywhere, ignore the message regarding win32.h and append \shellcmd{C:\textbackslash Qt\textbackslash 4.8.4\textbackslash bin} to your PATH variable like you did for MinGW.
- \item Unpack protobuf-2.5.0.zip in \shellcmd{C:\textbackslash MinGW\textbackslash msys\textbackslash 1.0\textbackslash home\textbackslash YOURLOGIN}
-    \begin{enumerate}
-     \item Open MinGW Shell, type the following commands exactly:
-     \item \shellcmd{cd protobuf-2.5.0/protobuf-2.5.0}
-     \item \shellcmd{./configure --prefix=`cd /mingw; pwd -W`} (these apostrophs are backticks and do not forget the dot at the beginning!)
-     \item \shellcmd{make; make install} (this builds and installs protobuf, which needs some time)
-     \item Close MinGW Shell
-    \end{enumerate}
+ \item Install Microsoft Windows SDK for Windows 7 and .NET Framework 4.
+ \item Apply the Visual C++ 2010 SP 1 Compiler Update for Windows SDK 7.1
+ \item Install Visual C++ 2010 Express (Start the web installer, you may disable Silverlight)
+ \item Apply Visual C++ 2010 Express Service Pack 1
+ \item Install Qt4 VS 2010 edition.
+ \item Install NSIS.
+ \item Install cmake. Choose to add CMake to the System path.
+ \item Install git. Choose Run Git from Windows Command Prompt.
 \end{enumerate}
-Your system is now able to compile Cockatrice. You do not have to repeat the process so far ever again.
+
+As protobuf does neither provide an installer nor the libraries needed for Cockatrice, you have to build those with Visual Studio from the protobuf sources.
+The Cockatrice installer will search for the protobuf libraries within the Cockatrice sources, so before unpacking and building protobuf, you need to download the Cockatrice sources first:
+\begin{enumerate}
+ \item Right click into a folder, select Git Gui, then Clone Existing Directory,
+ \item enter Source Location \url{https://github.com/Daenyth/Cockatrice}
+ \item enter target directory (from now on called Cockatrice), click clone and wait until the sources have been downloaded,
+ \item close Git Gui.
+\end{enumerate}
+
+Now we prepare protobuf:
+\begin{enumerate}
+ \item Create a \shellcmd{build} directory inside the Cockatrice directory.
+ \item Copy the protobuf-2.5.0.zip into the build directory.
+ \item Rightclick the zip, choose Extract all. This uses the Windows included zip unpacker to extract the archive.
+\end{enumerate}
+To be clear: you will (and must) have a Cockatrice/build/protobuf-2.5.0/protobuf-2.5.0 directory hierarchy after that!
+
+Now the protobuf dependencies for Cockatrice will be built:
+\begin{enumerate}
+ \item Start Visual C++ 2010 Express and from the File menu Open Project/Solution, move to the Cockatrice/build/protobuf-2.5.0/protobuf-2.5.0/vsprojects directory and choose protobuf.sln.
+ \item Let you guide through the Conversion Wizard, you don't need to create a backup.
+ \item After the conversion is finished, open the projects (uncheck ``Ask me for every project in this solution'' and click OK).
+ \item You don't need to look at the conversion report.
+ \item Select Release or Debug in the toolbar. Release optimizes the code for size and speed, while Debug creates larger, slower binaries, used for development. You need to use the same setting for Cockatrice later! We suggest to use Release.
+ \item Rightclick on libprotobuf, choose Build. Note that the output should say: Build started: Project libprotobuf, Configuration: Release Win32
+ \item Then rightclick on protoc, choose Build. This will build libprotoc and the protoc executable, also as Release Win32.
+ \item After the build succeeded, close Visual C++.
+\end{enumerate}
+The Cockatrice/build/protobuf-2.5.0/protobuf-2.5.0/vsprojects/Release directory now contains libprotobuf.dll, libprotobuf.lib and protoc.exe which are needed for Cockatrice.
 
 \paragraph{Cockatrice Compilation}
+Now everything is ready to compile Cockatrice.
 \begin{enumerate}
- \item Checkout Cockatrice:
-    \begin{enumerate}
-     \item Start Git Bash and type the following command exactly:
-     \item \shellcmd{git clone https://github.com/Daenyth/Cockatrice}
-     \item Close Git Bash
-    \end{enumerate}
- \item Start CMake (cmake-gui) and do the following:
-    \begin{enumerate}
-     \item Where is the source code: Point to the Cockatrice directory
-     \item Where to build the binaries: Point to the Cockatrice/build directory (it doesn't matter if it exists; if it doesn't, cmake will ask later if it shall create this directory)
-     \item Check Advanced
-     \item Click Configure, choose MinGW, leave the rest default
-     \item An error will occur, set the following:
-     	\begin{itemize}
-	 \item Set PROTOBUF\_INCLUDE\_DIR to C:/MinGW/include/google/protobuf
-	 \item Set PROTOBUF\_LIBRARY to C:/MinGW/lib/libprotobuf.dll.a
-	 \item Set PROTOBUF\_LITE\_LIBRARY to C:/MinGW/lib/libprotobuf-lite.dll.a
-	 \item Set PROTOBUF\_PROTOC\_EXECUTABLE to C:/MinGW/bin/protoc.exe
-	 \item Set PROTOBUF\_PROTOC\_LIBRARY to C:/MinGW/lib/libprotoc.dll.a
-	\end{itemize}
-     \item Click Configure again, then Generate
-     \item Close CMake
-    \end{enumerate}
- \item Start cmd.exe (the Windows Command Prompt) and type the following commands:
-    \begin{enumerate}
-     \item \shellcmd{cd Cockatrice/build} (this changes to the build directory)
-     \item \shellcmd{make} (this builds everything and might need some time)
-    \end{enumerate}
+ \item Start CMake GUI, locate the Cockatrice directory and locate the Cockatrice/build directory.
+ Then click Configure and choose Visual Studio 10.
+ An error will occur during the Configure process because CMake does not know the location of the protobuf library.
+ \item To satisfy CMake, check Advanced, enter ``protobuf'' in the Search field,
+ \begin{enumerate}
+  \item Set PROTOBUF\_INCLUDE\_DIR to Cockatrice/build/protobuf-2.5.0/protobuf-2.5.0/src/
+  \item Set PROTOBUF\_LIBRARY to Cockatrice/build/protobuf-2.5.0/protobuf-2.5.0/vsprojects/Release/libprotobuf.lib
+  \item Set PROTOBUF\_PROTOC\_EXECUTABLE to Cockatrice/build/protobuf-2.5.0/protobuf-2.5.0/vsprojects/Release/protoc.exe
+  \item Set PROTOBUF\_PROTOC\_LIBRARY to Cockatrice/build/protobuf-2.5.0/protobuf-2.5.0/vsprojects/Release/libprotoc.lib % TODO: Is this needed? I don't think so; but it doesn't hurt either.
+  \item Click Configure again.
+ \end{enumerate}
+ \item Click Generate, then close CMake GUI. The project files have been generated.
+ \item Start Visual C++ 2010 Express and from the File menu select Open Project/Solution, point to the Cockatrice/build directory and choose Cockatrice.sln.
+ \item Select Release or Debug in the toolbar exactly as you did for protobuf. We suggest Release.
+ \item Rightclick on ALL\_BUILD, choose Build.
 \end{enumerate}
-Cockatrice has now been downloaded and built for the first time. You do not have to repeat the process so far ever again.
 
 \paragraph{Updating your Cockatrice build}
 If you just compiled Cockatrice for the first time, you skip this step obviously.
@@ -174,17 +202,19 @@ But if you want to update Cockatrice after the source code changed on github, do
      \item \shellcmd{git pull origin master}
      \item \shellcmd{Close Git Bash}
     \end{enumerate}
- \item Start cmd.exe, change to Cockatrice/build, type make like you did previously.
+ \item Start Visual C++ 2010 Express and build the Cockatrice sources again.
 \end{enumerate}
 Cockatrice has now been updated and built. You may repeat this process every time when the source code changed.
 
 \paragraph{Cockatrice installation}
 To install Cockatrice, you have to create an installer with NSIS now.
-Change to the directory \shellcmd{nsis} in the Cockatrice root directory, right click the cockatrice.nsi file and select \shellcmd{Compile NSIS Script}.
+Change to the directory \shellcmd{nsis} in the Cockatrice directory, right click the cockatrice.nsi file and select \shellcmd{Compile NSIS Script}.
 The NSIS program then creates a file called cockatrice\_win32\_YYYYmmdd\_git-xxxxxxx.exe. This is the complete, redistributable installer for your Cockatrice build.
 
 Now install Cockatrice by executing the installer.
-Note: if you installed MinGW or Qt in other than the default paths, you have to fix the paths in the cockatrice.nsi file (also if some libraries change); you can edit this file with a text editor.
+Note: if you installed Qt in other than the default path, you have to fix the paths in the cockatrice.nsi file; you can edit this file with a text editor.
+
+We will remove this static NSIS file in the future and let CMake create the NSIS file on the fly.
 
 \paragraph{Create a card database}
 Start the oracle.exe (the installer does this automatically) and let it generate a current cards.xml file:
@@ -204,7 +234,7 @@ Before you install new software, you should update your system. The following in
 \begin{enumerate}
  \item You need to install the build tools and dependencies. This varies between the Linux distributions.
  \begin{description}
-  \item[Debian, Ubuntu and spin-offs] \shellcmd{sudo apt-get install build-essential git libqt4-dev qtmobility-dev libprotobuf-dev protobuf-compiler cmake} (see note below regarding pthread)
+  \item[Debian, Ubuntu and spin-offs] \shellcmd{sudo apt-get install build-essential git libqt4-dev qtmobility-dev libprotobuf-dev protobuf-compiler cmake}
   \item[Fedora] \shellcmd{sudo yum groupinstall "Development Tools"\\
   yum install qt-devel qt-mobility-devel protobuf-devel protobuf-compiler cmake}
   \item[FreeBSD 9] \shellcmd{pkg\_add -r qt4 qt4-linguist qt4-moc qt4-qmake qt4-rcc qt4-uic git cmake protobuf}
@@ -217,9 +247,6 @@ mkdir build \\
 cd build \\
 cmake ..\\
 make}\\
-\begin{framed}
-If you have linking errors with pthread\_* add 'pthread' to the ``target\_link\_libraries'' entry in the \shellcmd{CMakeFiles.txt} in \shellcmd{Cockatrice/common}, e.g. for Xubuntu, then continue the make process.
-\end{framed}
  \item You may install the program into the directory \shellcmd{/usr/local} by typing \shellcmd{sudo make install} but you should also be able to start 
  cockatrice and the oracle from the build directory.
  \item Before you start Cockatrice for the first time, run \shellcmd{oracle -dlsets} and download available cards, then run \shellcmd{cockatrice}.
@@ -229,7 +256,7 @@ The default paths for decks, pics, cards and tokens are located in \\ \shellcmd{
 \subsubsection{MacOS X}
 TODO, please contribute this section! See Linux section, then use the \shellcmd{prepareMacRelease.sh} script from Cockatrice.
 
-\subsection{Server compilation}
+\subsection{Building the Server}
 You don't need your own server if you plan to play only. But as Cockatrice is open source you are free to run your own.
 The compilation works like already written above, but instead of invoking \shellcmd{cmake ..}, you have to do it like this:
 \begin{itemize}
