@@ -48,9 +48,7 @@ IF (NOT WIN32 AND NOT APPLE)
 ENDIF (NOT WIN32 AND NOT APPLE)
 
 if(APPLE)
-    # this needs to be relative
-    set(plugin_dest_dir ./oracle.app/Contents/Plugins)
-    # instead, this needs an absolute path (for make)
+    set(plugin_dest_dir ${CMAKE_INSTALL_PREFIX}/oracle.app/Contents/Plugins)
     set(qtconf_dest_dir ${CMAKE_INSTALL_PREFIX}/oracle.app/Contents/Resources)
 
     # note: no codecs in qt5
