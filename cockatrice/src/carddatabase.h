@@ -68,13 +68,15 @@ private:
     QNetworkAccessManager *networkManager;
     QList<PictureToLoad> cardsToDownload;
     PictureToLoad cardBeingDownloaded;
-    bool picDownload, downloadRunning, loadQueueRunning;
+    bool picDownload, picDownloadHq, downloadRunning, loadQueueRunning;
     void startNextPicDownload();
+    QString getPicUrl(CardInfo* card);
 public:
-    PictureLoader(const QString &__picsPath, bool _picDownload, QObject *parent = 0);
+    PictureLoader(const QString &__picsPath, bool _picDownload, bool _picDownloadHq, QObject *parent = 0);
     ~PictureLoader();
     void setPicsPath(const QString &path);
     void setPicDownload(bool _picDownload);
+    void setPicDownloadHq(bool _picDownloadHq);
     void loadImage(CardInfo *card, bool stripped);
 private slots:
     void picDownloadFinished(QNetworkReply *reply);
@@ -99,7 +101,6 @@ private:
     QString text;
     QStringList colors;
     int loyalty;
-    QMap<QString, QString> picURLs, picURLsHq, picURLsSt;
     QMap<QString, int> muIds;
     bool cipt;
     int tableRow;
@@ -118,9 +119,7 @@ public:
         bool _cipt = false,
         int _tableRow = 0,
         const SetList &_sets = SetList(),
-        const QStringMap &_picURLs = QStringMap(),
-        const QStringMap &_picURLsHq = QStringMap(),
-        const QStringMap &_picURLsSt = QStringMap());
+        QMap<QString, int> muids = QMap<QString, int>());
     ~CardInfo();
     const QString &getName() const { return name; }
     bool getIsToken() const { return isToken; }
@@ -137,20 +136,12 @@ public:
     void setText(const QString &_text) { text = _text; emit cardInfoChanged(this); }
     void setColors(const QStringList &_colors) { colors = _colors; emit cardInfoChanged(this); }
     const QStringList &getColors() const { return colors; }
-    QString getPicURL(const QString &set) const { return picURLs.value(set); }
-    QString getPicURLHq(const QString &set) const { return picURLsHq.value(set); }
-    QString getPicURLSt(const QString &set) const { return picURLsSt.value(set); }
     int getMuId(const QString &set) const { return muIds.value(set); }
-    QString getPicURL() const;
-    const QMap<QString, QString> &getPicURLs() const { return picURLs; }
     QString getMainCardType() const;
     QString getCorrectedName() const;
     int getTableRow() const { return tableRow; }
     void setTableRow(int _tableRow) { tableRow = _tableRow; }
     void setLoyalty(int _loyalty) { loyalty = _loyalty; emit cardInfoChanged(this); }
-    void setPicURL(const QString &_set, const QString &_picURL) { picURLs.insert(_set, _picURL); }
-    void setPicURLHq(const QString &_set, const QString &_picURL) { picURLsHq.insert(_set, _picURL); }
-    void setPicURLSt(const QString &_set, const QString &_picURL) { picURLsSt.insert(_set, _picURL); }
     void setMuId(const QString &_set, const int &_muId) { muIds.insert(_set, _muId); }
     void addToSet(CardSet *set);
     QPixmap *loadPixmap();
@@ -158,6 +149,8 @@ public:
     void clearPixmapCache();
     void clearPixmapCacheMiss();
     void imageLoaded(const QImage &image);
+    CardSet *getPreferredSet();
+    int getPreferredMuId();
 public slots:
     void updatePixmapCache();
 signals:
@@ -172,7 +165,7 @@ protected:
     QHash<QString, CardSet *> setHash;
     bool loadSuccess;
     CardInfo *noCard;
-    
+
     QThread *pictureLoaderThread;
     PictureLoader *pictureLoader;
 private:
@@ -202,6 +195,7 @@ public slots:
 private slots:
     void imageLoaded(CardInfo *card, QImage image);
     void picDownloadChanged();
+    void picDownloadHqChanged();
     void picsPathChanged();
     
     void loadCardDatabase();

@@ -3,6 +3,9 @@
 
 #include <QObject>
 
+#define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
+#define PIC_URL_HQ_DEFAULT "http://mtgimage.com/multiverseid/!cardid!.jpg"
+
 class QSettings;
 
 class SettingsCache : public QObject {
@@ -18,6 +21,7 @@ signals:
     void playerBgPathChanged();
     void cardBackPicturePathChanged();
     void picDownloadChanged();
+    void picDownloadHqChanged();
     void displayCardNamesChanged();
     void horizontalHandChanged();
     void invertVerticalCoordinateChanged();
@@ -33,6 +37,7 @@ private:
     QString deckPath, replaysPath, picsPath, cardDatabasePath, tokenDatabasePath;
     QString handBgPath, stackBgPath, tableBgPath, playerBgPath, cardBackPicturePath;
     bool picDownload;
+    bool picDownloadHq;
     bool notificationsEnabled;
     bool doubleClickToPlay;
     bool playToStack;
@@ -48,6 +53,8 @@ private:
     QString soundPath;
     bool priceTagFeature;
     bool ignoreUnregisteredUsers;
+    QString picUrl;
+    QString picUrlHq;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -63,6 +70,7 @@ public:
     QString getPlayerBgPath() const { return playerBgPath; }
     QString getCardBackPicturePath() const { return cardBackPicturePath; }
     bool getPicDownload() const { return picDownload; }
+    bool getPicDownloadHq() const { return picDownloadHq; }
     bool getNotificationsEnabled() const { return notificationsEnabled; }
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
@@ -79,6 +87,8 @@ public:
     QString getSoundPath() const { return soundPath; }
     bool getPriceTagFeature() const { return priceTagFeature; }
     bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
+    QString getPicUrl() const { return picUrl; }
+    QString getPicUrlHq() const { return picUrlHq; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -93,6 +103,7 @@ public slots:
     void setPlayerBgPath(const QString &_playerBgPath);
     void setCardBackPicturePath(const QString &_cardBackPicturePath);
     void setPicDownload(int _picDownload);
+    void setPicDownloadHq(int _picDownloadHq);
     void setNotificationsEnabled(int _notificationsEnabled);
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);
@@ -109,6 +120,8 @@ public slots:
     void setSoundPath(const QString &_soundPath);
     void setPriceTagFeature(int _priceTagFeature);
     void setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers);
+    void setPicUrl(const QString &_picUrl);
+    void setPicUrlHq(const QString &_picUrlHq);
 };
 
 extern SettingsCache *settingsCache;
