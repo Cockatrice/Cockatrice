@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&amp;type=card"
+#define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
 #define PIC_URL_HQ_DEFAULT "http://mtgimage.com/multiverseid/!cardid!.jpg"
 
 class QSettings;
@@ -21,6 +21,7 @@ signals:
     void playerBgPathChanged();
     void cardBackPicturePathChanged();
     void picDownloadChanged();
+    void picDownloadHqChanged();
     void displayCardNamesChanged();
     void horizontalHandChanged();
     void invertVerticalCoordinateChanged();
@@ -36,6 +37,7 @@ private:
     QString deckPath, replaysPath, picsPath, cardDatabasePath, tokenDatabasePath;
     QString handBgPath, stackBgPath, tableBgPath, playerBgPath, cardBackPicturePath;
     bool picDownload;
+    bool picDownloadHq;
     bool notificationsEnabled;
     bool doubleClickToPlay;
     bool playToStack;
@@ -68,6 +70,7 @@ public:
     QString getPlayerBgPath() const { return playerBgPath; }
     QString getCardBackPicturePath() const { return cardBackPicturePath; }
     bool getPicDownload() const { return picDownload; }
+    bool getPicDownloadHq() const { return picDownloadHq; }
     bool getNotificationsEnabled() const { return notificationsEnabled; }
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
@@ -100,6 +103,7 @@ public slots:
     void setPlayerBgPath(const QString &_playerBgPath);
     void setCardBackPicturePath(const QString &_cardBackPicturePath);
     void setPicDownload(int _picDownload);
+    void setPicDownloadHq(int _picDownloadHq);
     void setNotificationsEnabled(int _notificationsEnabled);
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);

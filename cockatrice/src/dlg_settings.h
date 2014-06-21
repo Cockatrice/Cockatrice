@@ -40,6 +40,7 @@ private:
     QGroupBox *personalGroupBox, *pathsGroupBox;
     QComboBox *languageBox;
     QCheckBox *picDownloadCheckBox;
+    QCheckBox *picDownloadHqCheckBox;
     QLabel *languageLabel, *deckPathLabel, *replaysPathLabel, *picsPathLabel, *cardDatabasePathLabel, *tokenDatabasePathLabel;
 };
 

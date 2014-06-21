@@ -20,6 +20,7 @@ SettingsCache::SettingsCache()
     cardBackPicturePath = settings->value("paths/cardbackpicture").toString();
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
+    picDownloadHq = settings->value("personal/picturedownloadhq", false).toBool();
     picUrl = settings->value("personal/picUrl", PIC_URL_DEFAULT).toString();
     picUrlHq = settings->value("personal/picUrlHq", PIC_URL_HQ_DEFAULT).toString();
 
@@ -126,6 +127,13 @@ void SettingsCache::setPicDownload(int _picDownload)
     picDownload = _picDownload;
     settings->setValue("personal/picturedownload", picDownload);
     emit picDownloadChanged();
+}
+
+void SettingsCache::setPicDownloadHq(int _picDownloadHq)
+{
+    picDownloadHq = _picDownloadHq;
+    settings->setValue("personal/picturedownloadhq", picDownloadHq);
+    emit picDownloadHqChanged();
 }
 
 void SettingsCache::setPicUrl(const QString &_picUrl)
