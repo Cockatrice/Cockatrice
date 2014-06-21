@@ -26,7 +26,11 @@ INCLUDE_DIRECTORIES(../cockatrice/src)
 
 # Build oracle binary and link it
 ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_MOC_SRCS})
-TARGET_LINK_LIBRARIES(oracle ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(oracle ${QT_QTMAIN_LIBRARY} ${QT_LIBRARIES})
+
+if(MSVC)
+	set_target_properties(oracle PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
+endif(MSVC)
 
 if(UNIX)
     if(APPLE)
