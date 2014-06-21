@@ -3,6 +3,9 @@
 
 #include <QObject>
 
+#define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&amp;type=card"
+#define PIC_URL_HQ_DEFAULT "http://mtgimage.com/multiverseid/!cardid!.jpg"
+
 class QSettings;
 
 class SettingsCache : public QObject {
@@ -48,6 +51,8 @@ private:
     QString soundPath;
     bool priceTagFeature;
     bool ignoreUnregisteredUsers;
+    QString picUrl;
+    QString picUrlHq;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -79,6 +84,8 @@ public:
     QString getSoundPath() const { return soundPath; }
     bool getPriceTagFeature() const { return priceTagFeature; }
     bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
+    QString getPicUrl() const { return picUrl; }
+    QString getPicUrlHq() const { return picUrlHq; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -109,6 +116,8 @@ public slots:
     void setSoundPath(const QString &_soundPath);
     void setPriceTagFeature(int _priceTagFeature);
     void setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers);
+    void setPicUrl(const QString &_picUrl);
+    void setPicUrlHq(const QString &_picUrlHq);
 };
 
 extern SettingsCache *settingsCache;
