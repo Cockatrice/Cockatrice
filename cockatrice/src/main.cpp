@@ -74,10 +74,18 @@ void installNewTranslator()
     qApp->installTranslator(translator);
 }
 
+bool settingsValid()
+{
+    return QDir(settingsCache->getDeckPath()).exists() &&
+        !settingsCache->getDeckPath().isEmpty() &&
+        QDir(settingsCache->getPicsPath()).exists() &&
+        !settingsCache->getPicsPath().isEmpty();
+}
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    
+
     if (app.arguments().contains("--debug-output"))
         qInstallMsgHandler(myMessageOutput);
 #ifdef Q_OS_MAC
@@ -97,7 +105,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Cockatrice");
     QCoreApplication::setOrganizationDomain("cockatrice.de");
     QCoreApplication::setApplicationName("Cockatrice");
-    
+
     if (translationPath.isEmpty()) {
 #ifdef Q_OS_MAC
         QDir translationsDir = baseDir;
@@ -108,7 +116,7 @@ int main(int argc, char *argv[])
         translationPath = app.applicationDirPath() + "/translations";
 #endif
     }
-    
+
     rng = new RNG_SFMT;
     settingsCache = new SettingsCache;
     db = new CardDatabase;
@@ -119,7 +127,6 @@ int main(int argc, char *argv[])
 
     qsrand(QDateTime::currentDateTime().toTime_t());
 
-    bool startMainProgram = true;
     const QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     if (!db->getLoadSuccess())
         if (db->loadCardDatabase(dataDir + "/cards.xml"))
@@ -138,30 +145,30 @@ int main(int argc, char *argv[])
         QDir().mkpath(dataDir + "/pics");
         settingsCache->setPicsPath(dataDir + "/pics");
     }
-    if (!db->getLoadSuccess() || !QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty() || settingsCache->getPicsPath().isEmpty() || !QDir(settingsCache->getPicsPath()).exists()) {
+    if (!settingsValid() || db->getLoadStatus() != Ok) {
+        qDebug("main(): invalid settings or load status");
         DlgSettings dlgSettings;
         dlgSettings.show();
         app.exec();
-        startMainProgram = (db->getLoadSuccess() && QDir(settingsCache->getDeckPath()).exists() && !settingsCache->getDeckPath().isEmpty() && QDir(settingsCache->getPicsPath()).exists() && !settingsCache->getPicsPath().isEmpty());
     }
-    
-    if (startMainProgram) {
+
+    if (settingsValid()) {
         qDebug("main(): starting main program");
         soundEngine = new SoundEngine;
         qDebug("main(): SoundEngine constructor finished");
 
         MainWindow ui;
         qDebug("main(): MainWindow constructor finished");
-        
+
         QIcon icon(":/resources/appicon.svg");
         ui.setWindowIcon(icon);
-        
+
         ui.show();
         qDebug("main(): ui.show() finished");
-        
+
         app.exec();
     }
-    
+
     qDebug("Event loop finished, terminating...");
     delete db;
     delete settingsCache;
@@ -169,6 +176,6 @@ int main(int argc, char *argv[])
     PingPixmapGenerator::clear();
     CountryPixmapGenerator::clear();
     UserLevelPixmapGenerator::clear();
-    
+
     return 0;
 }
