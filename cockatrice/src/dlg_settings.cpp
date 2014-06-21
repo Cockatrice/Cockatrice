@@ -27,7 +27,7 @@ GeneralSettingsPage::GeneralSettingsPage()
 {
     languageLabel = new QLabel;
     languageBox = new QComboBox;
-    
+
     QString setLanguage = settingsCache->getLang();
     QStringList qmFiles = findQmFiles();
     for (int i = 0; i < qmFiles.size(); i++) {
@@ -36,27 +36,32 @@ GeneralSettingsPage::GeneralSettingsPage()
         if ((qmFiles[i] == setLanguage) || (setLanguage.isEmpty() && langName == tr("English")))
             languageBox->setCurrentIndex(i);
     }
-    
+
     picDownloadCheckBox = new QCheckBox;
     picDownloadCheckBox->setChecked(settingsCache->getPicDownload());
-    
+
+    picDownloadHqCheckBox = new QCheckBox;
+    picDownloadHqCheckBox->setChecked(settingsCache->getPicDownloadHq());
+
     connect(languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
     connect(picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
-    
+    connect(picDownloadHqCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownloadHq(int)));
+
     QGridLayout *personalGrid = new QGridLayout;
     personalGrid->addWidget(languageLabel, 0, 0);
     personalGrid->addWidget(languageBox, 0, 1);
     personalGrid->addWidget(picDownloadCheckBox, 1, 0, 1, 2);
-    
+    personalGrid->addWidget(picDownloadHqCheckBox, 2, 0, 1, 2);
+
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
-    
+
     deckPathLabel = new QLabel;
     deckPathEdit = new QLineEdit(settingsCache->getDeckPath());
     deckPathEdit->setReadOnly(true);
     QPushButton *deckPathButton = new QPushButton("...");
     connect(deckPathButton, SIGNAL(clicked()), this, SLOT(deckPathButtonClicked()));
-    
+
     replaysPathLabel = new QLabel;
     replaysPathEdit = new QLineEdit(settingsCache->getReplaysPath());
     replaysPathEdit->setReadOnly(true);
@@ -183,6 +188,7 @@ void GeneralSettingsPage::retranslateUi()
     personalGroupBox->setTitle(tr("Personal settings"));
     languageLabel->setText(tr("Language:"));
     picDownloadCheckBox->setText(tr("Download card pictures on the fly"));
+    picDownloadHqCheckBox->setText(tr("Download high-quality card pictures"));
     pathsGroupBox->setTitle(tr("Paths"));
     deckPathLabel->setText(tr("Decks directory:"));
     replaysPathLabel->setText(tr("Replays directory:"));
