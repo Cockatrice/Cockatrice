@@ -80,15 +80,6 @@ int main(int argc, char *argv[])
     
     if (app.arguments().contains("--debug-output"))
         qInstallMsgHandler(myMessageOutput);
-#ifdef Q_OS_MAC
-    QDir baseDir(app.applicationDirPath());
-    baseDir.cdUp();
-    baseDir.cdUp();
-    baseDir.cdUp();
-    QDir pluginsDir = baseDir;
-    pluginsDir.cd("PlugIns");
-    app.addLibraryPath(pluginsDir.absolutePath());
-#endif
 #ifdef Q_OS_WIN
     app.addLibraryPath(app.applicationDirPath() + "/plugins");
 #endif
@@ -100,11 +91,12 @@ int main(int argc, char *argv[])
     
     if (translationPath.isEmpty()) {
 #ifdef Q_OS_MAC
-        QDir translationsDir = baseDir;
+        QDir translationsDir = app.applicationDirPath();
+        translationsDir.cd("..");
+        translationsDir.cd("Resources");
         translationsDir.cd("translations");
         translationPath = translationsDir.absolutePath();
-#endif
-#ifdef Q_OS_WIN
+#elif Q_OS_WIN
         translationPath = app.applicationDirPath() + "/translations";
 #endif
     }
