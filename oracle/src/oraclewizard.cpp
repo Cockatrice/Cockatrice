@@ -19,10 +19,6 @@ OracleWizard::OracleWizard(QWidget *parent)
     addPage(new ChooseSetsPage);
     addPage(new SaveSetsPage);
 
-/*
-    setPixmap(QWizard::BannerPixmap, QPixmap(":/images/banner.png"));
-    setPixmap(QWizard::BackgroundPixmap, QPixmap(":/images/background.png"));
-*/
     setWindowTitle(tr("Oracle Importer"));
 }
 
@@ -47,7 +43,6 @@ IntroPage::IntroPage(QWidget *parent)
     : OracleWizardPage(parent)
 {
     setTitle(tr("Introduction"));
-    //setPixmap(QWizard::WatermarkPixmap, QPixmap(":/images/watermark1.png"));
 
     label = new QLabel(tr("This wizard will import the list of sets and cards "
                           "that will be used by Cockatrice. You will need to "
@@ -69,7 +64,6 @@ LoadSetsPage::LoadSetsPage(QWidget *parent)
     setSubTitle(tr("Please specify a source for the list of sets and cards. "
                    "You can specify an url address that will be download or "
                    "use an existing file from your computer."));
-    //setPixmap(QWizard::LogoPixmap, QPixmap(":/images/logo1.png"));
 
     urlRadioButton = new QRadioButton(tr("Download url:"), this);
     fileRadioButton = new QRadioButton(tr("Local file:"), this);
@@ -326,8 +320,6 @@ SaveSetsPage::SaveSetsPage(QWidget *parent)
     setTitle(tr("Sets imported"));
     setSubTitle(tr("The following sets has been imported. "
                    "Press \"Done\" to save the imported cards to the Cockatrice database."));
-
-//    setPixmap(QWizard::LogoPixmap, QPixmap(":/images/logo3.png"));
 
     messageLog = new QTextEdit(this);
     messageLog->setReadOnly(true);

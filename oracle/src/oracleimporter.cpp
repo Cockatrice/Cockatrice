@@ -205,25 +205,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
     
     return cards;
 }
-/*
-QString OracleImporter::getPictureUrl(QString url, int cardId, QString name, const QString &setName) const
-{
-    if ((name == "Island") || (name == "Swamp") || (name == "Mountain") || (name == "Plains") || (name == "Forest"))
-        name.append("1");
-    return url.replace("!cardid!", QString::number(cardId)).replace("!set!", setName).replace("!name!", name
-        .replace("ö", "o")
-//      .remove('\'')
-        .remove(" // ")
-//      .remove(',')
-//      .remove(':')
-//      .remove('.')
-        .remove(QRegExp("\\(.*\\)"))
-        .simplified()
-//      .replace(' ', '_')
-//      .replace('-', '_')
-    );
-}
-*/
+
 int OracleImporter::startImport()
 {
     clear();
