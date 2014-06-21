@@ -221,13 +221,13 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
 
 void LoadSetsPage::importFinished()
 {
+    wizard()->enableButtons();
+    setEnabled(true);
+    progressLabel->hide();
+    progressBar->hide();
+
     if(watcher.future().result())
     {
-        wizard()->enableButtons();
-        setEnabled(true);
-        progressLabel->hide();
-        progressBar->hide();
-
         wizard()->next();
     } else {
         QMessageBox::critical(this, tr("Error"), tr("The file was retrieved successfully, but it does not contain any sets data."));
