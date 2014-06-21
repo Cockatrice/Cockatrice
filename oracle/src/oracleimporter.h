@@ -28,7 +28,7 @@ private:
 	QVariantMap setsMap;
 	QString dataDir;
 	
-	CardInfo *addCard(const QString &setName, QString cardName, bool isToken, int cardId, const QString &cardCost, const QString &cardType, const QString &cardPT, int cardLoyalty, const QStringList &cardText);
+	CardInfo *addCard(const QString &setName, QString cardName, bool isToken, int cardId, QString &cardCost, const QString &cardType, const QString &cardPT, int cardLoyalty, const QStringList &cardText);
 signals:
 	void setIndexChanged(int cardsImported, int setIndex, const QString &setName);
 	void dataReadProgress(int bytesRead, int totalBytes);

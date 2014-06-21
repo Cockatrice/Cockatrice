@@ -53,7 +53,7 @@ CardInfo *OracleImporter::addCard(const QString &setName,
                                   QString cardName,
                                   bool isToken,
                                   int cardId,
-                                  const QString &cardCost,
+                                  QString &cardCost,
                                   const QString &cardType,
                                   const QString &cardPT,
                                   int cardLoyalty,
@@ -69,7 +69,11 @@ CardInfo *OracleImporter::addCard(const QString &setName,
     if (cardName.contains("XX"))
         cardName.remove("XX");
     cardName = cardName.replace("Æ", "AE");
-        cardName = cardName.replace("’", "'");
+    cardName = cardName.replace("’", "'");
+
+    // Remove {} around mana costs
+    cardCost.remove(QChar('{'));
+    cardCost.remove(QChar('}'));
 
     CardInfo *card;
     if (cardHash.contains(cardName)) {
