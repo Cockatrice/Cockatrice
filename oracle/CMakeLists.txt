@@ -48,7 +48,9 @@ IF (NOT WIN32 AND NOT APPLE)
 ENDIF (NOT WIN32 AND NOT APPLE)
 
 if(APPLE)
-    set(plugin_dest_dir ${CMAKE_INSTALL_PREFIX}/oracle.app/Contents/Plugins)
+    # this needs to be relative
+    set(plugin_dest_dir oracle.app/Contents/Plugins)
+    # instead, this needs an absolute path (for make)
     set(qtconf_dest_dir ${CMAKE_INSTALL_PREFIX}/oracle.app/Contents/Resources)
 
     # note: no codecs in qt5
@@ -65,12 +67,13 @@ if(APPLE)
 
     install(CODE "
         file(WRITE \"${qtconf_dest_dir}/qt.conf\" \"[Paths]
-Plugins = Plugins\")
+Plugins = Plugins
+Translations = Resources/translations\")
         " COMPONENT Runtime)
 
     install(CODE "
         file(GLOB_RECURSE QTPLUGINS
-            \"${plugin_dest_dir}/*.dylib\")
+            \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
         fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/oracle.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
