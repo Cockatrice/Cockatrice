@@ -183,9 +183,8 @@ add_custom_command(
 )
 
 if(APPLE)
-    # this needs to be relative
+    # these needs to be relative to CMAKE_INSTALL_PREFIX
     set(plugin_dest_dir cockatrice.app/Contents/Plugins)
-    # instead, this needs an absolute path (for make package to work)
     set(qtconf_dest_dir cockatrice.app/Contents/Resources)
 
     # note: no codecs in qt5
