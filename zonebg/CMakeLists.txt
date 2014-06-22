@@ -2,7 +2,7 @@
 #
 # Installs default "zone background" files
 
-FILE(GLOB zonebg "${CMAKE_CURRENT_SOURCE_DIR}/*.*")
+FILE(GLOB zonebg "${CMAKE_CURRENT_SOURCE_DIR}/*.png" "${CMAKE_CURRENT_SOURCE_DIR}/*.jpg")
 
 if(UNIX)
     if(APPLE)
