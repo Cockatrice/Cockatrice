@@ -158,16 +158,18 @@ signals:
     void cardInfoChanged(CardInfo *card);
 };
 
+enum LoadStatus { Ok, VersionTooOld, Invalid, NotLoaded, FileError, NoCards };
+
 class CardDatabase : public QObject {
     Q_OBJECT
 protected:
     QHash<QString, CardInfo *> cardHash;
     QHash<QString, CardSet *> setHash;
-    bool loadSuccess;
     CardInfo *noCard;
 
     QThread *pictureLoaderThread;
     PictureLoader *pictureLoader;
+    LoadStatus loadStatus;
 private:
     static const int versionNeeded;
     void loadCardsFromXml(QXmlStreamReader &xml);
@@ -182,22 +184,23 @@ public:
     CardSet *getSet(const QString &setName);
     QList<CardInfo *> getCardList() const { return cardHash.values(); }
     SetList getSetList() const;
-    bool loadFromFile(const QString &fileName, bool tokens = false);
+    LoadStatus loadFromFile(const QString &fileName, bool tokens = false);
     bool saveToFile(const QString &fileName, bool tokens = false);
     QStringList getAllColors() const;
     QStringList getAllMainCardTypes() const;
-    bool getLoadSuccess() const { return loadSuccess; }
+    LoadStatus getLoadStatus() const { return loadStatus; }
+    bool getLoadSuccess() const { return loadStatus == Ok; }
     void cacheCardPixmaps(const QStringList &cardNames);
     void loadImage(CardInfo *card);
 public slots:
     void clearPixmapCache();
-    bool loadCardDatabase(const QString &path, bool tokens = false);
+    LoadStatus loadCardDatabase(const QString &path, bool tokens = false);
 private slots:
     void imageLoaded(CardInfo *card, QImage image);
     void picDownloadChanged();
     void picDownloadHqChanged();
     void picsPathChanged();
-    
+
     void loadCardDatabase();
     void loadTokenDatabase();
 signals:

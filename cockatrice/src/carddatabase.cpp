@@ -14,7 +14,7 @@
 #include <QNetworkRequest>
 #include <QDebug>
 
-const int CardDatabase::versionNeeded = 2;
+const int CardDatabase::versionNeeded = 3;
 
 CardSet::CardSet(const QString &_shortName, const QString &_longName)
     : shortName(_shortName), longName(_longName)
@@ -457,7 +457,7 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 }
 
 CardDatabase::CardDatabase(QObject *parent)
-    : QObject(parent), loadSuccess(false), noCard(0)
+    : QObject(parent), loadStatus(NotLoaded), noCard(0)
 {
     connect(settingsCache, SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
     connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabase()));
@@ -636,13 +636,13 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
     }
 }
 
-bool CardDatabase::loadFromFile(const QString &fileName, bool tokens)
+LoadStatus CardDatabase::loadFromFile(const QString &fileName, bool tokens)
 {
     QFile file(fileName);
     file.open(QIODevice::ReadOnly);
     if (!file.isOpen())
-        return false;
-    
+        return FileError;
+
     if (tokens) {
         QMutableHashIterator<QString, CardInfo *> i(cardHash);
         while (i.hasNext()) {
@@ -659,7 +659,7 @@ bool CardDatabase::loadFromFile(const QString &fileName, bool tokens)
             delete setIt.value();
         }
         setHash.clear();
-        
+
         QMutableHashIterator<QString, CardInfo *> i(cardHash);
         while (i.hasNext()) {
             i.next();
@@ -675,9 +675,12 @@ bool CardDatabase::loadFromFile(const QString &fileName, bool tokens)
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::StartElement) {
             if (xml.name() != "cockatrice_carddatabase")
-                return false;
-            if (xml.attributes().value("version").toString().toInt() < versionNeeded)
-                return false;
+                return Invalid;
+            int version = xml.attributes().value("version").toString().toInt();
+            if (version < versionNeeded) {
+                qDebug() << "loadFromFile(): Version too old: " << version;
+                return VersionTooOld;
+            }
             while (!xml.atEnd()) {
                 if (xml.readNext() == QXmlStreamReader::EndElement)
                     break;
@@ -689,7 +692,10 @@ bool CardDatabase::loadFromFile(const QString &fileName, bool tokens)
         }
     }
     qDebug() << cardHash.size() << "cards in" << setHash.size() << "sets loaded";
-    return !cardHash.isEmpty();
+
+    if (cardHash.isEmpty()) return NoCards;
+
+    return Ok;
 }
 
 bool CardDatabase::saveToFile(const QString &fileName, bool tokens)
@@ -747,13 +753,13 @@ void CardDatabase::picDownloadHqChanged()
     }
 }
 
-bool CardDatabase::loadCardDatabase(const QString &path, bool tokens)
+LoadStatus CardDatabase::loadCardDatabase(const QString &path, bool tokens)
 {
-    bool tempLoadSuccess = false;
+    LoadStatus tempLoadStatus = NotLoaded;
     if (!path.isEmpty())
-        tempLoadSuccess = loadFromFile(path, tokens);
-    
-    if (tempLoadSuccess) {
+        tempLoadStatus = loadFromFile(path, tokens);
+
+    if (tempLoadStatus == Ok) {
         SetList allSets;
         QHashIterator<QString, CardSet *> setsIterator(setHash);
         while (setsIterator.hasNext())
@@ -761,14 +767,17 @@ bool CardDatabase::loadCardDatabase(const QString &path, bool tokens)
         allSets.sortByKey();
         for (int i = 0; i < allSets.size(); ++i)
             allSets[i]->setSortKey(i);
-        
+
         emit cardListChanged();
     }
-    
-    if (!tokens)
-        loadSuccess = tempLoadSuccess;
-    
-    return tempLoadSuccess;
+
+    if (!tokens) {
+        loadStatus = tempLoadStatus;
+        qDebug() << "loadCardDatabase(): Status = " << loadStatus;
+    }
+
+
+    return tempLoadStatus;
 }
 
 void CardDatabase::loadCardDatabase()
