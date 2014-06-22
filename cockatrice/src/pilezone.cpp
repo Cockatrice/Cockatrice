@@ -105,7 +105,7 @@ void PileZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     setCursor(Qt::OpenHandCursor);
 }
 
-void PileZone::mouseReleaseEvent(QGraphicsSceneMouseEvent */*event*/)
+void PileZone::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
 {
     setCursor(Qt::OpenHandCursor);
 }

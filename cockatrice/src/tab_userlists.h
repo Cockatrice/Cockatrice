@@ -3,6 +3,7 @@
 
 #include "tab.h"
 #include "pb/serverinfo_user.pb.h"
+#include <QLineEdit>
 
 class AbstractClient;
 class UserList;
@@ -30,12 +31,17 @@ private slots:
     void ignoreListReceived(const QList<ServerInfo_User> &_ignoreList);
     void processAddToListEvent(const Event_AddToList &event);
     void processRemoveFromListEvent(const Event_RemoveFromList &event);
+    void addToIgnoreList();
+    void addToBuddyList();
 private:
     AbstractClient *client;
     UserList *allUsersList;
     UserList *buddyList;
     UserList *ignoreList;
     UserInfoBox *userInfoBox;
+    QLineEdit *addBuddyEdit;
+    QLineEdit *addIgnoreEdit;
+    void addToList(const std::string &listName, const QString &userName);
 public:
     TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo, QWidget *parent = 0);
     void retranslateUi();

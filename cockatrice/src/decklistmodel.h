@@ -19,7 +19,7 @@ public:
     int getNumber() const { return dataNode->getNumber(); }
     void setNumber(int _number) { dataNode->setNumber(_number); }
         float getPrice() const { return dataNode->getPrice(); }
-        void setPrice(float _price) { dataNode->setPrice(_price); }
+    void setPrice(const float _price) { dataNode->setPrice(_price); }
     QString getName() const { return dataNode->getName(); }
     void setName(const QString &_name) { dataNode->setName(_name); }
     DecklistCardNode *getDataNode() const { return dataNode; }
@@ -45,6 +45,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    QModelIndex findCard(const QString &cardName, const QString &zoneName) const;
     QModelIndex addCard(const QString &cardName, const QString &zoneName);
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
     void cleanList();
@@ -58,6 +59,7 @@ private:
     Qt::SortOrder lastKnownOrder;
     InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
     QModelIndex nodeToIndex(AbstractDecklistNode *node) const;
+    DecklistModelCardNode *findCardNode(const QString &cardName, const QString &zoneName) const;
     void emitRecursiveUpdates(const QModelIndex &index);
     void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);
 

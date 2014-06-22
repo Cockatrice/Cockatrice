@@ -844,7 +844,7 @@ Response::ResponseCode Server_Player::cmdRollDie(const Command_RollDie &cmd, Res
 	
 	Event_RollDie event;
 	event.set_sides(cmd.sides());
-	event.set_value(rng->getNumber(1, cmd.sides()));
+	event.set_value(rng->rand(1, cmd.sides()));
 	ges.enqueueGameEvent(event, playerId);
 	
 	return Response::RespOk;
@@ -1524,7 +1524,7 @@ Response::ResponseCode Server_Player::cmdRevealCards(const Command_RevealCards &
 	else if (cmd.card_id() == -2) {
 		if (zone->getCards().isEmpty())
 			return Response::RespContextError;
-		cardsToReveal.append(zone->getCards().at(rng->getNumber(0, zone->getCards().size() - 1)));
+		cardsToReveal.append(zone->getCards().at(rng->rand(0, zone->getCards().size() - 1)));
 	} else {
 		Server_Card *card = zone->getCard(cmd.card_id());
 		if (!card)
