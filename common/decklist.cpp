@@ -104,7 +104,7 @@ QString InnerDecklistNode::visibleNameFromName(const QString &_name)
 		return _name;
 }
 
-void InnerDecklistNode::setSortMethod(int method)
+void InnerDecklistNode::setSortMethod(DeckSortMethod method)
 {
 	sortMethod = method;
 	for (int i = 0; i < size(); i++)
@@ -218,11 +218,11 @@ bool InnerDecklistNode::comparePrice(AbstractDecklistNode *other) const
 bool AbstractDecklistCardNode::compare(AbstractDecklistNode *other) const
 {
 	switch (sortMethod) {
-		case 0:
+		case ByNumber:
 			return compareNumber(other);
-		case 1:
+		case ByName:
 			return compareName(other);
-		case 2:
+		case ByPrice:
 			return compareTotalPrice(other);
 	}
 }

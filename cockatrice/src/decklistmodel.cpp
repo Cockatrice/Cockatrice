@@ -315,7 +315,7 @@ void DeckListModel::sortHelper(InnerDecklistNode *node, Qt::SortOrder order)
         }
     }
     changePersistentIndexList(from, to);
-    
+
     // Recursion
     for (int i = node->size() - 1; i >= 0; --i) {
         InnerDecklistNode *subNode = dynamic_cast<InnerDecklistNode *>(node->at(i));
@@ -330,7 +330,18 @@ void DeckListModel::sort(int column, Qt::SortOrder order)
     lastKnownOrder = order;
 
     emit layoutAboutToBeChanged();
-    root->setSortMethod(column);
+    DeckSortMethod sortMethod;
+    switch(column) {
+    case 0:
+        sortMethod = ByNumber;
+        break;
+    case 1:
+        sortMethod = ByName;
+        break;
+    case 2:
+        sortMethod = ByPrice;
+    }
+    root->setSortMethod(sortMethod);
     sortHelper(root, order);
     emit layoutChanged();
 }

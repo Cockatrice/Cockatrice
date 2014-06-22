@@ -29,26 +29,28 @@ public:
 	SideboardPlan(const QString &_name = QString(), const QList<MoveCard_ToZone> &_moveList = QList<MoveCard_ToZone>());
 	bool readElement(QXmlStreamReader *xml);
 	void write(QXmlStreamWriter *xml);
-	
+
 	QString getName() const { return name; }
 	const QList<MoveCard_ToZone> &getMoveList() const { return moveList; }
 	void setMoveList(const QList<MoveCard_ToZone> &_moveList);
 };
 
+enum DeckSortMethod { ByNumber, ByName, ByPrice };
+
 class AbstractDecklistNode {
 protected:
 	InnerDecklistNode *parent;
-	int sortMethod;
+	DeckSortMethod sortMethod;
 public:
 	AbstractDecklistNode(InnerDecklistNode *_parent = 0);
 	virtual ~AbstractDecklistNode() { }
-	virtual void setSortMethod(int method) { sortMethod = method; }
+	virtual void setSortMethod(DeckSortMethod method) { sortMethod = method; }
 	virtual QString getName() const = 0;
 	InnerDecklistNode *getParent() const { return parent; }
 	int depth() const;
 	virtual int height() const = 0;
 	virtual bool compare(AbstractDecklistNode *other) const = 0;
-	
+
 	virtual bool readElement(QXmlStreamReader *xml) = 0;
 	virtual void writeElement(QXmlStreamWriter *xml) = 0;
 };
@@ -61,7 +63,7 @@ public:
 	InnerDecklistNode(const QString &_name = QString(), InnerDecklistNode *_parent = 0) : AbstractDecklistNode(_parent), name(_name) { }
 	InnerDecklistNode(InnerDecklistNode *other, InnerDecklistNode *_parent = 0);
 	virtual ~InnerDecklistNode();
-	void setSortMethod(int method);
+	void setSortMethod(DeckSortMethod method);
 	QString getName() const { return name; }
 	void setName(const QString &_name) { name = _name; }
 	static QString visibleNameFromName(const QString &_name);
@@ -76,7 +78,7 @@ public:
 	bool compareName(AbstractDecklistNode *other) const;
 	bool comparePrice(AbstractDecklistNode *other) const;
 	QVector<QPair<int, int> > sort(Qt::SortOrder order = Qt::AscendingOrder);
-	
+
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 };
@@ -96,7 +98,7 @@ public:
 	bool compareNumber(AbstractDecklistNode *other) const;
 	bool compareName(AbstractDecklistNode *other) const;
 	bool compareTotalPrice(AbstractDecklistNode *other) const;
-	
+
 	bool readElement(QXmlStreamReader *xml);
 	void writeElement(QXmlStreamWriter *xml);
 };
