@@ -224,7 +224,7 @@ Start the oracle.exe (the installer does this automatically) and let it generate
 \end{enumerate}
 Congratulations, you may now use Cockatrice!
 
-\subsubsection{Linux and BSD}
+\subsubsection{Linux, BSD, OS X}
 The following procedures have been tested with Debian Wheezy, Fedora 18, XUbuntu 13.10, FreeBSD 9.1 and 10.0.
 If you use Gentoo with KDE you have the needed prerequisites and may continue with downloading the source.
 If you use Bodhi or Arch Linux (AUR) or another distribution that includes Cockatrice, you might install Cockatrice from the default packages -- though the package might be old, 
@@ -239,6 +239,7 @@ Before you install new software, you should update your system. The following in
   yum install qt-devel qt-mobility-devel protobuf-devel protobuf-compiler cmake}
   \item[FreeBSD 9] \shellcmd{pkg\_add -r qt4 qt4-linguist qt4-moc qt4-qmake qt4-rcc qt4-uic git cmake protobuf}
   \item[FreeBSD 10] \shellcmd{pkg install qt4 qt4-linguist qt4-moc qt4-qmake qt4-rcc qt4-uic git cmake protobuf}
+  \item[OS X] \shellcmd{brew install qt cmake protobuf}
  \end{description}
  \item Download the sources from github via \\ \shellcmd{cd\\ git clone https://github.com/Daenyth/Cockatrice.git}
  \item To compile the sources, change into the newly created directory, create a build directory and invoke cmake:\\
@@ -252,9 +253,6 @@ make}\\
  \item Before you start Cockatrice for the first time, run \shellcmd{oracle -dlsets} and download available cards, then run \shellcmd{cockatrice}.
 The default paths for decks, pics, cards and tokens are located in \\ \shellcmd{/home/<user>/.local/share/data/Cockatrice/Cockatrice}.
 \end{enumerate}
-
-\subsubsection{MacOS X}
-TODO, please contribute this section! See Linux section, then use the \shellcmd{prepareMacRelease.sh} script from Cockatrice.
 
 \subsection{Building the Server}
 You don't need your own server if you plan to play only. But as Cockatrice is open source you are free to run your own.

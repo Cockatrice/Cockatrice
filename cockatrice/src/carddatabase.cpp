@@ -295,6 +295,8 @@ QString CardInfo::getMainCardType() const
     int pos;
     if ((pos = result.indexOf('-')) != -1)
         result.remove(pos, result.length());
+    if ((pos = result.indexOf("—")) != -1)
+        result.remove(pos, result.length());
     if ((pos = result.indexOf("//")) != -1)
         result.remove(pos, result.length());
     result = result.simplified();

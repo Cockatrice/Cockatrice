@@ -14,7 +14,7 @@
 #include "deck_loader.h"
 
 DeckListModel::DeckListModel(QObject *parent)
-    : QAbstractItemModel(parent)
+    : QAbstractItemModel(parent), lastKnownColumn(1), lastKnownOrder(Qt::AscendingOrder)
 {
     deckList = new DeckLoader;
     connect(deckList, SIGNAL(deckLoaded()), this, SLOT(rebuildTree()));
@@ -275,23 +275,20 @@ QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneN
     QString cardType = info->getMainCardType();
     InnerDecklistNode *cardTypeNode = createNodeIfNeeded(cardType, zoneNode);
 
+    QModelIndex parentIndex = nodeToIndex(cardTypeNode);
     DecklistModelCardNode *cardNode = dynamic_cast<DecklistModelCardNode *>(cardTypeNode->findChild(cardName));
     if (!cardNode) {
         DecklistCardNode *decklistCard = deckList->addCard(cardName, zoneName);
-        QModelIndex parentIndex = nodeToIndex(cardTypeNode);
         beginInsertRows(parentIndex, cardTypeNode->size(), cardTypeNode->size());
         cardNode = new DecklistModelCardNode(decklistCard, cardTypeNode);
         endInsertRows();
-        sort(1);
-        emitRecursiveUpdates(parentIndex);
-        return nodeToIndex(cardNode);
     } else {
         cardNode->setNumber(cardNode->getNumber() + 1);
-        QModelIndex ind = nodeToIndex(cardNode);
-        emitRecursiveUpdates(ind);
         deckList->updateDeckHash();
-        return ind;
     }
+    sort(lastKnownColumn, lastKnownOrder);
+    emitRecursiveUpdates(parentIndex);
+    return nodeToIndex(cardNode);
 }
 
 QModelIndex DeckListModel::nodeToIndex(AbstractDecklistNode *node) const
@@ -318,7 +315,7 @@ void DeckListModel::sortHelper(InnerDecklistNode *node, Qt::SortOrder order)
         }
     }
     changePersistentIndexList(from, to);
-    
+
     // Recursion
     for (int i = node->size() - 1; i >= 0; --i) {
         InnerDecklistNode *subNode = dynamic_cast<InnerDecklistNode *>(node->at(i));
@@ -327,9 +324,24 @@ void DeckListModel::sortHelper(InnerDecklistNode *node, Qt::SortOrder order)
     }
 }
 
-void DeckListModel::sort(int /*column*/, Qt::SortOrder order)
+void DeckListModel::sort(int column, Qt::SortOrder order)
 {
+    lastKnownColumn = column;
+    lastKnownOrder = order;
+
     emit layoutAboutToBeChanged();
+    DeckSortMethod sortMethod;
+    switch(column) {
+    case 0:
+        sortMethod = ByNumber;
+        break;
+    case 1:
+        sortMethod = ByName;
+        break;
+    case 2:
+        sortMethod = ByPrice;
+    }
+    root->setSortMethod(sortMethod);
     sortHelper(root, order);
     emit layoutChanged();
 }
