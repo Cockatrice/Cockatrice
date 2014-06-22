@@ -202,7 +202,8 @@ if(APPLE)
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
 Plugins = Plugins
-Translations = Resources/translations\")
+Translations = Resources/translations
+Data = Resources\")
     " COMPONENT Runtime)
 
     install(CODE "
