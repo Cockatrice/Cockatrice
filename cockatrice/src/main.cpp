@@ -146,6 +146,20 @@ int main(int argc, char *argv[])
             settingsCache->setPlayerBgPath(destDir + "/fabric_gray.png");
         }
     }
+
+    if(settingsCache->getSoundPath().isEmpty())
+    {
+        QString srcDir = QLibraryInfo::location(QLibraryInfo::DataPath);
+        QString destDir = dataDir + "/sounds";
+        QDir tmpDir(destDir);
+        if(!tmpDir.exists())
+        {
+            // try to install the default sounds for the current user and set the settigs value
+            settingsCache->copyPath(srcDir + "/sounds", destDir);
+
+            settingsCache->setSoundPath(destDir);
+        }
+    }
 #endif
 
     if (!db->getLoadSuccess() || !QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty() || settingsCache->getPicsPath().isEmpty() || !QDir(settingsCache->getPicsPath()).exists()) {
