@@ -48,10 +48,9 @@ IF (NOT WIN32 AND NOT APPLE)
 ENDIF (NOT WIN32 AND NOT APPLE)
 
 if(APPLE)
-    # this needs to be relative
+    # these needs to be relative to CMAKE_INSTALL_PREFIX
     set(plugin_dest_dir oracle.app/Contents/Plugins)
-    # instead, this needs an absolute path (for make)
-    set(qtconf_dest_dir ${CMAKE_INSTALL_PREFIX}/oracle.app/Contents/Resources)
+    set(qtconf_dest_dir oracle.app/Contents/Resources)
 
     # note: no codecs in qt5
     # note: phonon_backend => mediaservice
@@ -66,10 +65,10 @@ if(APPLE)
     endif()
 
     install(CODE "
-        file(WRITE \"${qtconf_dest_dir}/qt.conf\" \"[Paths]
+        file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
 Plugins = Plugins
 Translations = Resources/translations\")
-        " COMPONENT Runtime)
+    " COMPONENT Runtime)
 
     install(CODE "
         file(GLOB_RECURSE QTPLUGINS
