@@ -126,6 +126,28 @@ int main(int argc, char *argv[])
         QDir().mkpath(dataDir + "/pics");
         settingsCache->setPicsPath(dataDir + "/pics");
     }
+#ifdef Q_OS_MAC
+    if(settingsCache->getHandBgPath().isEmpty() &&
+        settingsCache->getStackBgPath().isEmpty() &&
+        settingsCache->getTableBgPath().isEmpty() &&
+        settingsCache->getPlayerBgPath().isEmpty())
+    {
+        QString srcDir = QLibraryInfo::location(QLibraryInfo::DataPath);
+        QString destDir = dataDir + "/zonebg";
+        QDir tmpDir(destDir);
+        if(!tmpDir.exists())
+        {
+            // try to install the default images for the current user and set the settigs value
+            settingsCache->copyPath(srcDir + "/zonebg", destDir);
+
+            settingsCache->setHandBgPath(destDir + "/fabric_green.png");
+            settingsCache->setStackBgPath(destDir + "/fabric_red.png");
+            settingsCache->setTableBgPath(destDir + "/fabric_blue.png");
+            settingsCache->setPlayerBgPath(destDir + "/fabric_gray.png");
+        }
+    }
+#endif
+
     if (!db->getLoadSuccess() || !QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty() || settingsCache->getPicsPath().isEmpty() || !QDir(settingsCache->getPicsPath()).exists()) {
         DlgSettings dlgSettings;
         dlgSettings.show();
