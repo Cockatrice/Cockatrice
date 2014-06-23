@@ -58,7 +58,8 @@ class PendingCommand;
 
 class PlayerArea : public QObject, public QGraphicsItem {
     Q_OBJECT
-private:    
+    Q_INTERFACES(QGraphicsItem)
+private:
     QBrush bgPixmapBrush;
     QRectF bRect;
 private slots:
@@ -76,6 +77,7 @@ public:
 
 class Player : public QObject, public QGraphicsItem {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 signals:
     void openDeckEditor(const DeckLoader *deck);
     void newCardAdded(AbstractCardItem *card);

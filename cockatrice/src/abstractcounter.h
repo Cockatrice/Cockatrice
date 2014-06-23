@@ -9,6 +9,7 @@ class QAction;
 
 class AbstractCounter : public QObject, public QGraphicsItem {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 protected:
     Player *player;
     int id;

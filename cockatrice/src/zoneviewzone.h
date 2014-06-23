@@ -11,6 +11,7 @@ class QGraphicsSceneWheelEvent;
 
 class ZoneViewZone : public SelectZone, public QGraphicsLayoutItem {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsLayoutItem)
 private:
     QRectF bRect, optimumRect;
     int minRows, numberCards;

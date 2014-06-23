@@ -11,6 +11,7 @@ class ArrowTarget;
 
 class ArrowItem : public QObject, public QGraphicsItem {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 private:
     QPainterPath path;
     QMenu *menu;
