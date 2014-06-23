@@ -704,6 +704,8 @@ USE AT YOUR OWN RISK.
 \begin{enumerate}
  \item Open a command shell and install the prerequisites
 \begin{enumerate}
+ \item \shellcmd{cd /etc/yum.repos.d/}
+ \item \shellcmd{sudo wget http://kdeforge.unl.edu/apt/kde-redhat/epel/kde.repo}
  \item \shellcmd{yum -y groupinstall "development tools"}
  \item \shellcmd{rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86\_64/epel-release-6-8.noarch.rpm}
  \item \shellcmd{yum -y install qt-mysql qt-devel qt-mobility-devel protobuf-devel protobuf-compiler cmake28 libgcrypt-devel}
