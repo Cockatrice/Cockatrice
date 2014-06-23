@@ -53,6 +53,8 @@ void ServerLogger::logMessage(QString message, void *caller)
 	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
 	int found = 0; int capture = 0; int loglevel = 0;
 	loglevel = settings->value("server/loglevel").toInt();
+
+	
 	switch (loglevel)
 	{
 		case 1:
@@ -60,18 +62,26 @@ void ServerLogger::logMessage(QString message, void *caller)
 			break;
 
 		case 2:
-
 			// filter message log data
-			found = message.indexOf("Adding room: ID=", Qt::CaseInsensitive); if (found != -1){ capture = 1; }
-			found = message.indexOf("Starting status update clock", Qt::CaseInsensitive); if (found != -1){ capture = 1; }
-			found = message.indexOf("Starting server on port", Qt::CaseInsensitive); if (found != -1){ capture = 1; }
-			found = message.indexOf("Server listening.", Qt::CaseInsensitive); if (found != -1){ capture = 1; }
-			found = message.indexOf("Server::loginUser:", Qt::CaseInsensitive); if (found != -1){ capture = 1; }
-			found = message.indexOf("Server::removeClient:", Qt::CaseInsensitive); if (found != -1){ capture = 1; }
-			found = message.indexOf("Command_Login.ext", Qt::CaseInsensitive); if (found != -1){ capture = 1; }
-			found = message.indexOf("Command_RoomSay.ext", Qt::CaseInsensitive); if (found != -1){ capture = 1; }
-			found = message.indexOf("Command_Message.ext", Qt::CaseInsensitive); if (found != -1){ capture = 1; }
-			found = message.indexOf("Command_GameSay.ext", Qt::CaseInsensitive); if (found != -1){ capture = 1; }
+			list = [
+				"Adding room: ID=",
+				"Starting status update clock",
+				"Starting server on port",
+				"Server listening.",
+				"Server::loginUser:",
+				"Server::removeClient:",
+				"Command_Login.ext",
+				"Command_RoomSay.ext",
+				"Command_Message.ext",
+				"Command_GameSay.ext"
+			];
+
+			for x in list {
+				if(message.indexOf(x, Qt::CaseInsensitive) != -1) {
+					capture = 1;
+					break;
+				}
+			}
 			break;
 
 		default:
