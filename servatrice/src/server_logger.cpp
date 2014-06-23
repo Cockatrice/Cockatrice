@@ -5,11 +5,13 @@
 #include <QDateTime>
 #include <QSettings>
 #include <iostream>
+#include <list>
 #ifdef Q_OS_UNIX
 # include <sys/types.h>
 # include <sys/socket.h>
 # include <unistd.h>
 #endif
+using namespace std;
 
 ServerLogger::ServerLogger(bool _logToConsole, QObject *parent)
 	: QObject(parent), logToConsole(_logToConsole), flushRunning(false)
@@ -51,7 +53,7 @@ void ServerLogger::logMessage(QString message, void *caller)
 		
 	//filter out all log entries based on loglevel value in configuration file
 	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
-	int found = 0; int capture = 0; int loglevel = 0;
+	int found = 0; int capture = 0; int loglevel = 0; list<string> lst_str;
 	loglevel = settings->value("server/loglevel").toInt();
 
 	
@@ -63,24 +65,22 @@ void ServerLogger::logMessage(QString message, void *caller)
 
 		case 2:
 			// filter message log data
-			list = [
-				"Adding room: ID=",
-				"Starting status update clock",
-				"Starting server on port",
-				"Server listening.",
-				"Server::loginUser:",
-				"Server::removeClient:",
-				"Command_Login.ext",
-				"Command_RoomSay.ext",
-				"Command_Message.ext",
-				"Command_GameSay.ext"
-			];
-
-			for x in list {
-				if(message.indexOf(x, Qt::CaseInsensitive) != -1) {
-					capture = 1;
-					break;
-				}
+			lst_str.push_back("Adding room: ID=");
+  			lst_str.push_back("Starting status update clock");
+  			lst_str.push_back("Starting server on port");
+  			lst_str.push_back("Server listening.");
+  			lst_str.push_back("Server::loginUser:");
+  			lst_str.push_back("Server::removeClient:");
+  			lst_str.push_back("Command_Login.ext");
+  			lst_str.push_back("Command_RoomSay.ext");
+  			lst_str.push_back("Command_Message.ext");
+  			lst_str.push_back("Command_GameSay.ext");
+			for (list<string>::iterator i = lst_str.begin(); i != lst_str.end(); i++)
+			{	
+				if(message.indexOf((*i).c_str(), Qt::CaseInsensitive) != -1) {
+			 		capture = 1;
+			 		break;
+			 	}
 			}
 			break;
 
