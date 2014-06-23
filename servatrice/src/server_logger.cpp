@@ -56,6 +56,7 @@ void ServerLogger::logMessage(QString message, void *caller)
 	switch (loglevel)
 	{
 		case 1:
+			capture = 0;
 			break;
 
 		case 2:
@@ -71,17 +72,16 @@ void ServerLogger::logMessage(QString message, void *caller)
 			found = message.indexOf("Command_RoomSay.ext", Qt::CaseInsensitive); if (found != -1){ capture = 1; }
 			found = message.indexOf("Command_Message.ext", Qt::CaseInsensitive); if (found != -1){ capture = 1; }
 			found = message.indexOf("Command_GameSay.ext", Qt::CaseInsensitive); if (found != -1){ capture = 1; }
-			if (capture != 0){
-				bufferMutex.lock();
-				buffer.append(QDateTime::currentDateTime().toString() + " " + callerString + message);
-				bufferMutex.unlock();
-			}
 			break;
 
 		default:
-			bufferMutex.lock();
-			buffer.append(QDateTime::currentDateTime().toString() + " " + callerString + message);
-			bufferMutex.unlock();
+			capture = 1;
+	}
+
+	if (capture != 0){
+		bufferMutex.lock();
+		buffer.append(QDateTime::currentDateTime().toString() + " " + callerString + message);
+		bufferMutex.unlock();
 	}
 	emit sigFlushBuffer();
 }
