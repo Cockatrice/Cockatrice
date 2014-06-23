@@ -269,7 +269,10 @@ void SettingsCache::copyPath(const QString &src, const QString &dst)
     if (!tmpDir.exists())
     {
         tmpDir.setPath(QDir::rootPath());
-        tmpDir.mkdir(dst);
+        if (!tmpDir.mkdir(dst) && !tmpDir.exists()) {
+            // TODO: this is probably not good.
+            qDebug() << "copyPath(): Failed to create dir: " << dst;
+        }
     }
 
     foreach (QString d, dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
