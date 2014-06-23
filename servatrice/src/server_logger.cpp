@@ -53,9 +53,10 @@ void ServerLogger::logMessage(QString message, void *caller)
 		
 	//filter out all log entries based on loglevel value in configuration file
 	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
-	int found = 0; int capture = 0; int loglevel = 0; list<string> lst_str;
-	loglevel = settings->value("server/loglevel").toInt();
-
+	int capture = 0; list<string> lst_str;
+        int loglevel = settings->value("server/loglevel").toInt();
+        if (!loglevel)
+                loglevel = 999;
 	
 	switch (loglevel)
 	{
