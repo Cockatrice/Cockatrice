@@ -27,7 +27,7 @@ void PriceUpdater::updatePrices()
     QString q = "http://blacklotusproject.com/json/?cards=";
     QStringList cards = deck->getCardList();
     for (int i = 0; i < cards.size(); ++i) {
-        q += cards[i] + "|";
+        q += cards[i].toLower() + "|";
     }
     QUrl url(q.replace(' ', '+'));
 

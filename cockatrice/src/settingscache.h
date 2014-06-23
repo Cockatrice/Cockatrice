@@ -28,10 +28,11 @@ signals:
     void minPlayersForMultiColumnLayoutChanged();
     void soundEnabledChanged();
     void soundPathChanged();
+    void priceTagFeatureChanged(int enabled);
     void ignoreUnregisteredUsersChanged();
 private:
     QSettings *settings;
-    
+
     QByteArray mainWindowGeometry;
     QString lang;
     QString deckPath, replaysPath, picsPath, cardDatabasePath, tokenDatabasePath;

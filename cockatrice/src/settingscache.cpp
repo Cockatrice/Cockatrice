@@ -242,6 +242,7 @@ void SettingsCache::setPriceTagFeature(int _priceTagFeature)
 {
     priceTagFeature = _priceTagFeature;
     settings->setValue("deckeditor/pricetags", priceTagFeature);
+    emit priceTagFeatureChanged(priceTagFeature);
 }
 
 void SettingsCache::setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers)

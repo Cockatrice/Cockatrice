@@ -172,6 +172,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     connect(aUpdatePrices, SIGNAL(triggered()), this, SLOT(actUpdatePrices()));
     if (!settingsCache->getPriceTagFeature())
         aUpdatePrices->setVisible(false);
+    connect(settingsCache, SIGNAL(priceTagFeatureChanged(int)), this, SLOT(setPriceTagFeatureEnabled(int)));
 
     QToolBar *deckToolBar = new QToolBar;
     deckToolBar->setOrientation(Qt::Vertical);
@@ -182,7 +183,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     deckToolbarLayout->addStretch();
     deckToolbarLayout->addWidget(deckToolBar);
     deckToolbarLayout->addStretch();
-    
+
     QVBoxLayout *rightFrame = new QVBoxLayout;
     rightFrame->addLayout(grid);
     rightFrame->addWidget(deckView, 10);
@@ -193,7 +194,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     mainLayout->addLayout(middleFrame);
     mainLayout->addLayout(rightFrame);
     setLayout(mainLayout);
-    
+
     aNewDeck = new QAction(QString(), this);
     aNewDeck->setShortcuts(QKeySequence::New);
     connect(aNewDeck, SIGNAL(triggered()), this, SLOT(actNewDeck()));
@@ -633,6 +634,11 @@ void TabDeckEditor::actDecrement()
 {
     const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
     offsetCountAtIndex(currentIndex, -1);
+}
+
+void TabDeckEditor::setPriceTagFeatureEnabled(int enabled)
+{
+    aUpdatePrices->setVisible(enabled);
 }
 
 void TabDeckEditor::actUpdatePrices()
