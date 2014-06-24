@@ -234,8 +234,16 @@ bool Servatrice::initServer()
 		if (!certFile.open(QIODevice::ReadOnly))
 			throw QString("Error opening certificate file: %1").arg(certFileName);
 		QSslCertificate cert(&certFile);
+#if QT_VERSION < 0x050000
 		if (!cert.isValid())
 			throw(QString("Invalid certificate."));
+#else
+		const QDateTime currentTime = QDateTime::currentDateTime();
+		if(currentTime < cert.effectiveDate() ||
+			currentTime > cert.expiryDate() ||
+			cert.isBlacklisted())
+			throw(QString("Invalid certificate."));
+#endif
 		qDebug() << "Loading private key...";
 		QFile keyFile(keyFileName);
 		if (!keyFile.open(QIODevice::ReadOnly))
