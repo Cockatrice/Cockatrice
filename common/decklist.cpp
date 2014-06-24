@@ -2,6 +2,7 @@
 #include <QTextStream>
 #include <QVariant>
 #include <QCryptographicHash>
+#include <QDebug>
 #include "decklist.h"
 
 SideboardPlan::SideboardPlan(const QString &_name, const QList<MoveCard_ToZone> &_moveList)
@@ -441,6 +442,11 @@ void DeckList::write(QXmlStreamWriter *xml)
 
 bool DeckList::loadFromXml(QXmlStreamReader *xml)
 {
+    if (xml->error()) {
+        qDebug() << "Error loading deck from xml: " << xml->errorString();
+        return false;
+    }
+
 	cleanList();
 	while (!xml->atEnd()) {
 		xml->readNext();
@@ -455,6 +461,10 @@ bool DeckList::loadFromXml(QXmlStreamReader *xml)
 		}
 	}
 	updateDeckHash();
+    if (xml->error()) {
+        qDebug() << "Error loading deck from xml: " << xml->errorString();
+        return false;
+    }
 	return true;
 }
 
@@ -477,8 +487,7 @@ QString DeckList::writeToString_Native()
 bool DeckList::loadFromFile_Native(QIODevice *device)
 {
 	QXmlStreamReader xml(device);
-	loadFromXml(&xml);
-	return true;
+	return loadFromXml(&xml);
 }
 
 bool DeckList::saveToFile_Native(QIODevice *device)
@@ -496,7 +505,7 @@ bool DeckList::saveToFile_Native(QIODevice *device)
 bool DeckList::loadFromStream_Plain(QTextStream &in)
 {
 	cleanList();
-	
+
 	InnerDecklistNode *main = 0, *side = 0;
 	bool inSideboard = false;
 
@@ -530,7 +539,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 		line.remove(rx);
 		rx.setPattern("\\(.*\\)");
 		line.remove(rx);
-		//Filter out post card name editions		
+		//Filter out post card name editions
 		rx.setPattern("\\|.*$");
 		line.remove(rx);
 		line = line.simplified();
@@ -543,10 +552,10 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 			continue;
 
 		QString cardName = line.mid(i + 1);
-    // Common differences between cockatrice's card names
-    // and what's commonly used in decklists
+        // Common differences between cockatrice's card names
+        // and what's commonly used in decklists
 		rx.setPattern("’");
-    cardName.replace(rx, "'");
+        cardName.replace(rx, "'");
 		rx.setPattern("Æ");
 		cardName.replace(rx, "AE");
 		rx.setPattern("^Aether");
