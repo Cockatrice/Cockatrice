@@ -48,13 +48,15 @@ void DeckStatsInterface::analyzeDeck(DeckList *deck)
     QUrl params;
 #if QT_VERSION < 0x050000
     params.addQueryItem("deck", deck->writeToString_Plain());
+    QByteArray data;
+    data.append(params.encodedQuery());
 #else
     QUrlQuery urlQuery;
     urlQuery.addQueryItem("deck", deck->writeToString_Plain());
-    params.setUrlQuery(urlQuery);
-#endif
+    params.setQuery(urlQuery);
     QByteArray data;
-    data.append(params.encodedQuery());
+    data.append(params.query(QUrl::EncodeReserved));
+#endif
     
     QNetworkRequest request(QUrl("http://deckstats.net/index.php"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");

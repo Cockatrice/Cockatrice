@@ -172,6 +172,13 @@ if(Qt5Widgets_FOUND)
         list(APPEND COCKATRICE_LIBS Multimedia)
     endif()
 
+    # QtPrinter
+    find_package(Qt5PrintSupport)
+    if(Qt5PrintSupport_FOUND)
+        include_directories(${Qt5PrintSupport_INCLUDE_DIRS})
+        list(APPEND COCKATRICE_LIBS PrintSupport)
+    endif()
+
     # QtXml
     find_package(Qt5Xml)
     if(Qt5Xml_FOUND)

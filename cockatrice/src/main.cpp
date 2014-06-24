@@ -55,6 +55,7 @@ QString translationPath = TRANSLATION_PATH;
 QString translationPath = QString();
 #endif
 
+#if QT_VERSION < 0x050000
 void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
     QFile file("qdebug.txt");
@@ -63,6 +64,16 @@ void myMessageOutput(QtMsgType /*type*/, const char *msg)
     out << msg << endl;
     file.close();
 }
+#else
+void myMessageOutput(QtMsgType /*type*/, const QMessageLogContext &, const QString &msg)
+{
+    QFile file("qdebug.txt");
+    file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
+    QTextStream out(&file);
+    out << msg << endl;
+    file.close();
+}
+#endif
 
 void installNewTranslator()
 {
@@ -87,7 +98,13 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     if (app.arguments().contains("--debug-output"))
+    {
+#if QT_VERSION < 0x050000
         qInstallMsgHandler(myMessageOutput);
+#else
+        qInstallMessageHandler(myMessageOutput);
+#endif
+    }
 #ifdef Q_OS_MAC
     QDir baseDir(app.applicationDirPath());
     baseDir.cdUp();
@@ -100,7 +117,11 @@ int main(int argc, char *argv[])
 #ifdef Q_OS_WIN
     app.addLibraryPath(app.applicationDirPath() + "/plugins");
 #endif
+
+#if QT_VERSION < 0x050000
+    // gone in Qt5, all source files _MUST_ be utf8-encoded
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+#endif
 
     QCoreApplication::setOrganizationName("Cockatrice");
     QCoreApplication::setOrganizationDomain("cockatrice.de");
@@ -131,7 +152,7 @@ int main(int argc, char *argv[])
 #if QT_VERSION < 0x050000
     const QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 #else
-    const QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation)).toString();
+    const QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
     if (!db->getLoadSuccess())
         if (db->loadCardDatabase(dataDir + "/cards.xml"))

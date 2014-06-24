@@ -258,8 +258,17 @@ void RemoteDeckList_TreeModel::deckListFinished(const Response &r)
 {
     const Response_DeckList &resp = r.GetExtension(Response_DeckList::ext);
 
+#if QT_VERSION >= 0x050000
+    beginResetModel();
+#endif
+
     root->clearTree();
+
+#if QT_VERSION < 0x050000
     reset();
+#else
+    endResetModel();
+#endif
     
     ServerInfo_DeckStorage_TreeItem tempRoot;
     tempRoot.set_id(0);
@@ -280,7 +289,11 @@ RemoteDeckList_TreeWidget::RemoteDeckList_TreeWidget(AbstractClient *_client, QW
     setModel(proxyModel);
     connect(treeModel, SIGNAL(treeRefreshed()), this, SLOT(expandAll()));
 
+#if QT_VERSION < 0x050000
     header()->setResizeMode(QHeaderView::ResizeToContents);
+#else
+    header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+#endif
     setUniformRowHeights(true);
     setSortingEnabled(true);
     proxyModel->sort(0, Qt::AscendingOrder);
