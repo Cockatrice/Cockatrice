@@ -36,6 +36,13 @@ if(Qt5Widgets_FOUND)
     include_directories(${Qt5Widgets_INCLUDE_DIRS})
     list(APPEND ORACLE_LIBS Widgets)
 
+    # QtConcurrent
+    find_package(Qt5Concurrent)
+    if(Qt5Concurrent_FOUND)
+        include_directories(${Qt5Concurrent_INCLUDE_DIRS})
+        list(APPEND ORACLE_LIBS Concurrent)
+    endif()
+
     # QtNetwork
     find_package(Qt5Network)
     if(Qt5Network_FOUND)
