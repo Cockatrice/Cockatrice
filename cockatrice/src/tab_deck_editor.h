@@ -50,7 +50,7 @@ private slots:
 
     void actEditSets();
     void actEditTokens();
-    
+
     void actClearSearch();
 
     void actAddCard();
@@ -67,6 +67,7 @@ private slots:
     void saveDeckRemoteFinished(const Response &r);
     void filterViewCustomContextMenu(const QPoint &point);
     void filterRemove(QAction *action);
+    void setPriceTagFeatureEnabled(int enabled);
 private:
     CardInfo *currentCardInfo() const;
     void addCardHelper(QString zoneName);

@@ -1,333 +1,254 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<cockatrice_setdatabase version="20130507">
+<cockatrice_setdatabase version="20110126">
 <picture_url>http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&amp;type=card</picture_url>
-<set_url>http://gatherer.wizards.com/Pages/Search/Default.aspx?output=spoiler&amp;method=text&amp;set=[&quot;!longname!&quot;]&amp;special=true</set_url>
-	<set import="1">
-		<name>10E</name>
-		<longname>Tenth Edition</longname>
-	</set>
-	<set import="1">
-		<name>15ANN</name>
-		<longname>15th Anniversary</longname>
-	</set>
-	<set import="1">
-		<name>4E</name>
-		<longname>Fourth Edition</longname>
-	</set>
-	<set import="1">
-		<name>5DN</name>
-		<longname>Fifth Dawn</longname>
-	</set>
-	<set import="1">
-		<name>5E</name>
-		<longname>Fifth Edition</longname>
-	</set>
-	<set import="1">
-		<name>6E</name>
-		<longname>Classic Sixth Edition</longname>
-	</set>
-	<set import="1">
-		<name>7E</name>
-		<longname>Seventh Edition</longname>
-	</set>
-	<set import="1">
-		<name>8EB</name>
-		<longname>Eighth Edition Box Set</longname>
-	</set>
-	<set import="1">
-		<name>8E</name>
-		<longname>Eighth Edition</longname>
-	</set>
-	<set import="1">
-		<name>9EB</name>
-		<longname>Ninth Edition Box Set</longname>
-	</set>
-	<set import="1">
-		<name>9E</name>
-		<longname>Ninth Edition</longname>
-	</set>
-	<set import="1">
-		<name>AI</name>
-		<longname>Alliances</longname>
-	</set>
-	<set import="1">
-		<name>ALA</name>
-		<longname>Shards of Alara</longname>
-	</set>
-	<set import="1">
-		<name>AL</name>
-		<longname>Limited Edition Alpha</longname>
-	</set>
-	<set import="1">
-		<name>AN</name>
-		<longname>Arabian Nights</longname>
-	</set>
-	<set import="1">
-		<name>APAC</name>
-		<longname>Asia Pacific Land Program</longname>
-	</set>
-	<set import="1">
-		<name>AP</name>
-		<longname>Apocalypse</longname>
-	</set>
-	<set import="1">
-		<name>AQ</name>
-		<longname>Antiquities</longname>
-	</set>
+<!-- <picture_url_hq>http://mtgimage.com/multiverseid/!cardid!.jpg</picture_url_hq> -->
+<set_url>http://mtgjson.com/json/!name!.json</set_url>
 	<set import="1">
 		<name>ARB</name>
 		<longname>Alara Reborn</longname>
 	</set>
 	<set import="1">
+		<name>ALL</name>
+		<longname>Alliances</longname>
+	</set>
+	<set import="1">
+		<name>ATQ</name>
+		<longname>Antiquities</longname>
+	</set>
+	<set import="1">
+		<name>APC</name>
+		<longname>Apocalypse</longname>
+	</set>
+	<set import="1">
+		<name>ARN</name>
+		<longname>Arabian Nights</longname>
+	</set>
+	<set import="0">
 		<name>ARC</name>
 		<longname>Archenemy</longname>
-	</set>
-	<set import="1">
-		<name>ARENA</name>
-		<longname>Arena League</longname>
-	</set>
-	<set import="1">
-		<name>AT</name>
-		<longname>Anthologies</longname>
 	</set>
 	<set import="1">
 		<name>AVR</name>
 		<longname>Avacyn Restored</longname>
 	</set>
-	<set import="1">
-		<name>BD</name>
-		<longname>Beatdown Box Set</longname>
+	<set import="0">
+		<name>BRB</name>
+		<longname>Battle Royale Box Set</longname>
 	</set>
-	<set import="1">
-		<name>BE</name>
-		<longname>Limited Edition Beta</longname>
+	<set import="0">
+		<name>BTD</name>
+		<longname>Beatdown Box Set</longname>
 	</set>
 	<set import="1">
 		<name>BOK</name>
 		<longname>Betrayers of Kamigawa</longname>
 	</set>
 	<set import="1">
-		<name>BR</name>
-		<longname>Battle Royale Box Set</longname>
-	</set>
-	<set import="1">
-		<name>CED</name>
-		<longname>Collector's Edition</longname>
-	</set>
-	<set import="1">
-		<name>CEDI</name>
-		<longname>International Collectors' Edition</longname>
-	</set>
-	<set import="1">
-		<name>CFX</name>
-		<longname>Conflux</longname>
-	</set>
-	<set import="1">
-		<name>CH</name>
-		<longname>Chronicles</longname>
+		<name>BNG</name>
+		<longname>Born of the Gods</longname>
 	</set>
 	<set import="1">
 		<name>CHK</name>
 		<longname>Champions of Kamigawa</longname>
 	</set>
 	<set import="1">
-		<name>CMA</name>
-		<longname>Commander's Arsenal</longname>
+		<name>CHR</name>
+		<longname>Chronicles</longname>
 	</set>
 	<set import="1">
-		<name>CMD</name>
-		<longname>Commander</longname>
+		<name>6ED</name>
+		<longname>Classic Sixth Edition</longname>
 	</set>
 	<set import="1">
-		<name>CP</name>
-		<longname>Champs</longname>
-	</set>
-	<set import="1">
-		<name>CS</name>
+		<name>CSP</name>
 		<longname>Coldsnap</longname>
 	</set>
 	<set import="1">
-		<name>CSTD</name>
-		<longname>Coldsnap Theme Decks</longname>
+		<name>CON</name>
+		<longname>Conflux</longname>
+	</set>
+	<set import="0">
+		<name>CMA</name>
+		<longname>Commander's Arsenal</longname>
+	</set>
+	<set import="0">^M
+		<name>C13</name>^M
+		<longname>Commander 2013 Edition</longname>^M
 	</set>
 	<set import="1">
-		<name>DCILM</name>
-		<longname>Legend Membership</longname>
-	</set>
-	<set import="1">
-		<name>DDF</name>
-		<longname>Duel Decks: Elspeth vs. Tezzeret</longname>
-	</set>
-	<set import="1">
-		<name>DDG</name>
-		<longname>Duel Decks: Knights vs. Dragons</longname>
-	</set>
-	<set import="1">
-		<name>DDH</name>
-		<longname>Duel Decks: Ajani vs. Nicol Bolas</longname>
-	</set>
-	<set import="1">
-		<name>DDI</name>
-		<longname>Duel Decks: Venser vs. Koth</longname>
-	</set>
-	<set import="1">
-		<name>DDJ</name>
-		<longname>Duel Decks: Izzet vs. Golgari</longname>
-	</set>
-	<set import="1">
-		<name>DDK</name>
-		<longname>Duel Decks: Sorin vs. Tibalt</longname>
-	</set>
-	<set import="1">
-		<name>DGM</name>
-		<longname>Dragon's Maze</longname>
-	</set>
-	<set import="1">
-		<name>DI</name>
-		<longname>Dissension</longname>
+		<name>DST</name>
+		<longname>Darksteel</longname>
 	</set>
 	<set import="1">
 		<name>DKA</name>
 		<longname>Dark Ascension</longname>
 	</set>
 	<set import="1">
-		<name>DK</name>
-		<longname>The Dark</longname>
+		<name>DIS</name>
+		<longname>Dissension</longname>
 	</set>
 	<set import="1">
-		<name>DM</name>
-		<longname>Deckmasters</longname>
+		<name>DGM</name>
+		<longname>Dragon's Maze</longname>
 	</set>
-	<set import="1">
-		<name>DPA</name>
-		<longname>Duels of the Planeswalkers</longname>
+	<set import="0">
+		<name>DDH</name>
+		<longname>Duel Decks: Ajani vs. Nicol Bolas</longname>
 	</set>
-	<set import="1">
-		<name>DRC</name>
-		<longname>Dragon Con</longname>
-	</set>
-	<set import="1">
-		<name>DS</name>
-		<longname>Darksteel</longname>
-	</set>
-	<set import="1">
-		<name>DVD</name>
+	<set import="0">
+		<name>DDC</name>
 		<longname>Duel Decks: Divine vs. Demonic</longname>
 	</set>
+	<set import="0">
+		<name>DDF</name>
+		<longname>Duel Decks: Elspeth vs. Tezzeret</longname>
+	</set>
+	<set import="0">
+		<name>EVG</name>
+		<longname>Duel Decks: Elves vs. Goblins</longname>
+	</set>
+	<set import="0">
+		<name>DDD</name>
+		<longname>Duel Decks: Garruk vs. Liliana</longname>
+	</set>
+	<set import="0">
+		<name>DDL</name>
+		<longname>Duel Decks: Heroes vs. Monsters</longname>
+	</set>
+	<set import="0">
+		<name>DDJ</name>
+		<longname>Duel Decks: Izzet vs. Golgari</longname>
+	</set>
+	<set import="0">
+		<name>DD2</name>
+		<longname>Duel Decks: Jace vs. Chandra</longname>
+	</set>
+	<set import="0">
+		<name>DDM</name>
+		<longname>Duel Decks: Jace vs. Vraska</longname>
+	</set>
+	<set import="0">
+		<name>DDG</name>
+		<longname>Duel Decks: Knights vs. Dragons</longname>
+	</set>
+	<set import="0">
+		<name>DDE</name>
+		<longname>Duel Decks: Phyrexia vs. the Coalition</longname>
+	</set>
+	<set import="0">
+		<name>DDK</name>
+		<longname>Duel Decks: Sorin vs. Tibalt</longname>
+	</set>
+	<set import="0">
+		<name>DDI</name>
+		<longname>Duel Decks: Venser vs. Koth</longname>
+	</set>
 	<set import="1">
-		<name>EURO</name>
-		<longname>European Land Program</longname>
+		<name>8ED</name>
+		<longname>Eighth Edition</longname>
 	</set>
 	<set import="1">
 		<name>EVE</name>
 		<longname>Eventide</longname>
 	</set>
 	<set import="1">
-		<name>EVG</name>
-		<longname>Duel Decks: Elves vs. Goblins</longname>
-	</set>
-	<set import="1">
-		<name>EX</name>
+		<name>EXO</name>
 		<longname>Exodus</longname>
 	</set>
 	<set import="1">
-		<name>FE</name>
+		<name>FEM</name>
 		<longname>Fallen Empires</longname>
 	</set>
 	<set import="1">
-		<name>FNMP</name>
-		<longname>Friday Night Magic</longname>
+		<name>5DN</name>
+		<longname>Fifth Dawn</longname>
+	</set>
+	<set import="1">
+		<name>5ED</name>
+		<longname>Fifth Edition</longname>
+	</set>
+	<set import="1">
+		<name>4ED</name>
+		<longname>Fourth Edition</longname>
+	</set>
+	<set import="0">
+		<name>DRB</name>
+		<longname>From the Vault: Dragons</longname>
+	</set>
+	<set import="0">
+		<name>V09</name>
+		<longname>From the Vault: Exiled</longname>
+	</set>
+	<set import="0">
+		<name>V11</name>
+		<longname>From the Vault: Legends</longname>
+	</set>
+	<set import="0">
+		<name>V12</name>
+		<longname>From the Vault: Realms</longname>
+	</set>
+	<set import="0">
+		<name>V10</name>
+		<longname>From the Vault: Relics</longname>
+	</set>
+	<set import="0">
+		<name>V13</name>
+		<longname>From the Vault: Twenty</longname>
 	</set>
 	<set import="1">
 		<name>FUT</name>
 		<longname>Future Sight</longname>
 	</set>
 	<set import="1">
-		<name>FVD</name>
-		<longname>From the Vault: Dragons</longname>
-	</set>
-	<set import="1">
-		<name>FVE</name>
-		<longname>From the Vault: Exiled</longname>
-	</set>
-	<set import="1">
-		<name>FVL</name>
-		<longname>From the Vault: Legends</longname>
-	</set>
-	<set import="1">
-		<name>FVR</name>
-		<longname>From the Vault: Relics</longname>
-	</set>
-	<set import="1">
-		<name>GP</name>
+		<name>GPT</name>
 		<longname>Guildpact</longname>
-	</set>
-	<set import="1">
-		<name>GPX</name>
-		<longname>Grand Prix</longname>
-	</set>
-	<set import="1">
-		<name>GRC</name>
-		<longname>WPN/Gateway</longname>
 	</set>
 	<set import="1">
 		<name>GTC</name>
 		<longname>Gatecrash</longname>
 	</set>
 	<set import="1">
-		<name>GURU</name>
-		<longname>Guru</longname>
-	</set>
-	<set import="1">
-		<name>GVL</name>
-		<longname>Duel Decks: Garruk vs. Liliana</longname>
-	</set>
-	<set import="1">
-		<name>HHO</name>
-		<longname>Happy Holidays</longname>
-	</set>
-	<set import="1">
-		<name>HL</name>
+		<name>HML</name>
 		<longname>Homelands</longname>
 	</set>
 	<set import="1">
-		<name>IA</name>
+		<name>ICE</name>
 		<longname>Ice Age</longname>
-	</set>
-	<set import="1">
-		<name>IN</name>
-		<longname>Invasion</longname>
 	</set>
 	<set import="1">
 		<name>ISD</name>
 		<longname>Innistrad</longname>
 	</set>
 	<set import="1">
-		<name>ITP</name>
-		<longname>Introductory Two-Player Set</longname>
+		<name>INV</name>
+		<longname>Invasion</longname>
 	</set>
 	<set import="1">
-		<name>JR</name>
-		<longname>Judge Gift Program</longname>
+		<name>JOU</name>
+		<longname>Journey into Nyx</longname>
 	</set>
 	<set import="1">
-		<name>JU</name>
+		<name>JUD</name>
 		<longname>Judgment</longname>
 	</set>
 	<set import="1">
-		<name>JVC</name>
-		<longname>Duel Decks: Jace vs. Chandra</longname>
-	</set>
-	<set import="1">
-		<name>LE</name>
-		<longname>Legions</longname>
-	</set>
-	<set import="1">
-		<name>LG</name>
+		<name>LEG</name>
 		<longname>Legends</longname>
 	</set>
 	<set import="1">
-		<name>LW</name>
+		<name>LGN</name>
+		<longname>Legions</longname>
+	</set>
+	<set import="1">
+		<name>LEA</name>
+		<longname>Limited Edition Alpha</longname>
+	</set>
+	<set import="1">
+		<name>LEB</name>
+		<longname>Limited Edition Beta</longname>
+	</set>
+	<set import="1">
+		<name>LRW</name>
 		<longname>Lorwyn</longname>
 	</set>
 	<set import="1">
@@ -347,63 +268,59 @@
 		<longname>Magic 2013</longname>
 	</set>
 	<set import="1">
-		<name>MBP</name>
-		<longname>Media Inserts</longname>
+		<name>M14</name>
+		<longname>Magic 2014 Core Set</longname>
+	</set>
+	<set import="0">
+		<name>CMD</name>
+		<longname>Magic: The Gathering-Commander</longname>
+	</set>
+	<set import="0">
+		<name>CNS</name>
+		<longname>Magic: The Gathering—Conspiracy</longname>
+	</set>
+	<set import="0">
+		<name>MED</name>
+		<longname>Masters Edition</longname>
+	</set>
+	<set import="0">
+		<name>ME2</name>
+		<longname>Masters Edition II</longname>
+	</set>
+	<set import="0">
+		<name>ME3</name>
+		<longname>Masters Edition III</longname>
+	</set>
+	<set import="0">
+		<name>ME4</name>
+		<longname>Masters Edition IV</longname>
+	</set>
+	<set import="1">
+		<name>MMQ</name>
+		<longname>Mercadian Masques</longname>
+	</set>
+	<set import="1">
+		<name>MIR</name>
+		<longname>Mirage</longname>
+	</set>
+	<set import="1">
+		<name>MRD</name>
+		<longname>Mirrodin</longname>
 	</set>
 	<set import="1">
 		<name>MBS</name>
 		<longname>Mirrodin Besieged</longname>
 	</set>
+	<set import="0">^M
+		<name>MMA</name>^M
+		<longname>Modern Masters</longname>^M
+	</set>^
 	<set import="1">
-		<name>ME2</name>
-		<longname>MTGO Masters Edition II</longname>
-	</set>
-	<set import="1">
-		<name>ME3</name>
-		<longname>MTGO Masters Edition III</longname>
-	</set>
-	<set import="1">
-		<name>ME4</name>
-		<longname>MTGO Masters Edition IV</longname>
-	</set>
-	<set import="1">
-		<name>MED</name>
-		<longname>MTGO Masters Edition</longname>
-	</set>
-	<set import="1">
-		<name>MGBC</name>
-		<longname>Multiverse Gift Box Cards</longname>
-	</set>
-	<set import="1">
-		<name>MGDC</name>
-		<longname>Magic Game Day Cards</longname>
-	</set>
-	<set import="1">
-		<name>MI</name>
-		<longname>Mirrodin</longname>
-	</set>
-	<set import="1">
-		<name>MLP</name>
-		<longname>Magic: The Gathering Launch Parties</longname>
-	</set>
-	<set import="1">
-		<name>MM</name>
-		<longname>Mercadian Masques</longname>
-	</set>
-	<set import="1">
-		<name>MPRP</name>
-		<longname>Magic Player Rewards</longname>
-	</set>
-	<set import="1">
-		<name>MR</name>
-		<longname>Mirage</longname>
-	</set>
-	<set import="1">
-		<name>MT</name>
+		<name>MOR</name>
 		<longname>Morningtide</longname>
 	</set>
 	<set import="1">
-		<name>NE</name>
+		<name>NMS</name>
 		<longname>Nemesis</longname>
 	</set>
 	<set import="1">
@@ -411,104 +328,80 @@
 		<longname>New Phyrexia</longname>
 	</set>
 	<set import="1">
-		<name>OD</name>
+		<name>9ED</name>
+		<longname>Ninth Edition</longname>
+	</set>
+	<set import="1">
+		<name>ODY</name>
 		<longname>Odyssey</longname>
 	</set>
 	<set import="1">
-		<name>ON</name>
+		<name>ONS</name>
 		<longname>Onslaught</longname>
 	</set>
 	<set import="1">
-		<name>P3K</name>
-		<longname>Portal Three Kingdoms</longname>
+		<name>PLC</name>
+		<longname>Planar Chaos</longname>
 	</set>
-	<set import="1">
+	<set import="0">
+		<name>HOP</name>
+		<longname>Planechase</longname>
+	</set>
+	<set import="0">
 		<name>PC2</name>
 		<longname>Planechase 2012 Edition</longname>
 	</set>
 	<set import="1">
-		<name>PC</name>
-		<longname>Planar Chaos</longname>
+		<name>PLS</name>
+		<longname>Planeshift</longname>
 	</set>
 	<set import="1">
-		<name>PCH</name>
-		<longname>Planechase</longname>
-	</set>
-	<set import="1">
-		<name>PD2</name>
-		<longname>Premium Deck Series: Fire and Lightning</longname>
-	</set>
-	<set import="1">
-		<name>PD3</name>
-		<longname>Premium Deck Series: Graveborn</longname>
-	</set>
-	<set import="1">
-		<name>PDS</name>
-		<longname>Premium Deck Series: Slivers</longname>
+		<name>POR</name>
+		<longname>Portal</longname>
 	</set>
 	<set import="1">
 		<name>PO2</name>
 		<longname>Portal Second Age</longname>
 	</set>
 	<set import="1">
-		<name>PO</name>
-		<longname>Portal</longname>
+		<name>PTK</name>
+		<longname>Portal Three Kingdoms</longname>
+	</set>
+	<set import="0">
+		<name>PD2</name>
+		<longname>Premium Deck Series: Fire and Lightning</longname>
+	</set>
+	<set import="0">
+		<name>PD3</name>
+		<longname>Premium Deck Series: Graveborn</longname>
+	</set>
+	<set import="0">
+		<name>H09</name>
+		<longname>Premium Deck Series: Slivers</longname>
+	</set>
+	<set import="0">
+		<name>PPR</name>
+		<longname>Promo set for Gatherer</longname>
 	</set>
 	<set import="1">
-		<name>POT</name>
-		<longname>Portal Demogame</longname>
-	</set>
-	<set import="1">
-		<name>PR</name>
+		<name>PCY</name>
 		<longname>Prophecy</longname>
-	</set>
-	<set import="1">
-		<name>PRO</name>
-		<longname>Pro Tour</longname>
-	</set>
-	<set import="1">
-		<name>PS</name>
-		<longname>Planeshift</longname>
-	</set>
-	<set import="1">
-		<name>PTC</name>
-		<longname>Prerelease Events</longname>
-	</set>
-	<set import="1">
-		<name>PVC</name>
-		<longname>Duel Decks: Phyrexia vs. The Coalition</longname>
 	</set>
 	<set import="1">
 		<name>RAV</name>
 		<longname>Ravnica: City of Guilds</longname>
 	</set>
 	<set import="1">
-		<name>REP</name>
-		<longname>Release Events</longname>
-	</set>
-	<set import="1">
-		<name>ROE</name>
-		<longname>Rise of the Eldrazi</longname>
-	</set>
-	<set import="1">
 		<name>RTR</name>
 		<longname>Return to Ravnica</longname>
 	</set>
 	<set import="1">
-		<name>RV</name>
+		<name>3ED</name>
 		<longname>Revised Edition</longname>
 	</set>
 	<set import="1">
-		<name>SC</name>
-		<longname>Scourge</longname>
-	</set>
-	<set import="1">
-		<name>SH</name>
-		<longname>Stronghold</longname>
-	</set>
-	<set import="1">
-		<name>SHM</name>
-		<longname>Shadowmoor</longname>
+		<name>ROE</name>
+		<longname>Rise of the Eldrazi</longname>
 	</set>
 	<set import="1">
 		<name>SOK</name>
@@ -519,96 +412,96 @@
 		<longname>Scars of Mirrodin</longname>
 	</set>
 	<set import="1">
-		<name>ST2K</name>
-		<longname>Starter 2000</longname>
+		<name>SCG</name>
+		<longname>Scourge</longname>
 	</set>
 	<set import="1">
-		<name>ST</name>
+		<name>7ED</name>
+		<longname>Seventh Edition</longname>
+	</set>
+	<set import="1">
+		<name>SHM</name>
+		<longname>Shadowmoor</longname>
+	</set>
+	<set import="1">
+		<name>ALA</name>
+		<longname>Shards of Alara</longname>
+	</set>
+	<set import="1">
+		<name>S99</name>
 		<longname>Starter 1999</longname>
 	</set>
 	<set import="1">
-		<name>SUM</name>
-		<longname>Summer of Magic</longname>
+		<name>S00</name>
+		<longname>Starter 2000</longname>
 	</set>
 	<set import="1">
-		<name>SUS</name>
-		<longname>Super Series</longname>
+		<name>STH</name>
+		<longname>Stronghold</longname>
 	</set>
 	<set import="1">
-		<name>THGT</name>
-		<longname>Two-Headed Giant Tournament</longname>
-	</set>
-	<set import="1">
-		<name>TP</name>
+		<name>TMP</name>
 		<longname>Tempest</longname>
 	</set>
 	<set import="1">
-		<name>TR</name>
-		<longname>Torment</longname>
+		<name>10E</name>
+		<longname>Tenth Edition</longname>
 	</set>
 	<set import="1">
-		<name>TS</name>
+		<name>DRK</name>
+		<longname>The Dark</longname>
+	</set>
+	<set import="1">
+		<name>THS</name>
+		<longname>Theros</longname>
+	</set>
+	<set import="1">
+		<name>TSP</name>
 		<longname>Time Spiral</longname>
 	</set>
 	<set import="1">
-		<name>TSTS</name>
+		<name>TSB</name>
 		<longname>Time Spiral "Timeshifted"</longname>
 	</set>
 	<set import="1">
-		<name>UD</name>
-		<longname>Urza's Destiny</longname>
+		<name>TOR</name>
+		<longname>Torment</longname>
 	</set>
-	<set import="1">
-		<name>UG</name>
+	<set import="0">
+		<name>UGL</name>
 		<longname>Unglued</longname>
 	</set>
-	<set import="1">
-		<name>UHAA</name>
-		<longname>Unhinged Alternate Foils</longname>
-	</set>
-	<set import="1">
-		<name>UH</name>
+	<set import="0">
+		<name>UNH</name>
 		<longname>Unhinged</longname>
 	</set>
 	<set import="1">
-		<name>UL</name>
-		<longname>Urza's Legacy</longname>
-	</set>
-	<set import="1">
-		<name>UN</name>
+		<name>2ED</name>
 		<longname>Unlimited Edition</longname>
 	</set>
 	<set import="1">
-		<name>UQC</name>
-		<longname>Celebration Cards</longname>
+		<name>UDS</name>
+		<longname>Urza's Destiny</longname>
 	</set>
 	<set import="1">
-		<name>US</name>
+		<name>ULG</name>
+		<longname>Urza's Legacy</longname>
+	</set>
+	<set import="1">
+		<name>USG</name>
 		<longname>Urza's Saga</longname>
 	</set>
-	<set import="1">
-		<name>V12</name>
-		<longname>From the Vault: Realms</longname>
+	<set import="0">
+		<name>VAN</name>
+		<longname>Vanguard</longname>
 	</set>
 	<set import="1">
-		<name>VI</name>
+		<name>VIS</name>
 		<longname>Visions</longname>
 	</set>
 	<set import="1">
-		<name>WL</name>
+		<name>WTH</name>
 		<longname>Weatherlight</longname>
-	</set>
-	<set import="1">
-		<name>WMCQ</name>
-		<longname>World Magic Cup Qualifiers</longname>
-	</set>
-	<set import="1">
-		<name>WOTC</name>
-		<longname>WotC Online Store</longname>
-	</set>
-	<set import="1">
-		<name>WRL</name>
-		<longname>Worlds</longname>
 	</set>
 	<set import="1">
 		<name>WWK</name>

@@ -2,6 +2,7 @@
 #include <QTextStream>
 #include <QVariant>
 #include <QCryptographicHash>
+#include <QDebug>
 #include "decklist.h"
 
 SideboardPlan::SideboardPlan(const QString &_name, const QList<MoveCard_ToZone> &_moveList)
@@ -104,6 +105,13 @@ QString InnerDecklistNode::visibleNameFromName(const QString &_name)
 		return _name;
 }
 
+void InnerDecklistNode::setSortMethod(DeckSortMethod method)
+{
+	sortMethod = method;
+	for (int i = 0; i < size(); i++)
+		at(i)->setSortMethod(method);
+}
+
 QString InnerDecklistNode::getVisibleName() const
 {
 	return visibleNameFromName(name);
@@ -164,20 +172,94 @@ float InnerDecklistNode::recursivePrice(bool countTotalCards) const
 
 bool InnerDecklistNode::compare(AbstractDecklistNode *other) const
 {
+	switch (sortMethod) {
+		case 0:
+			return compareNumber(other);
+		case 1:
+			return compareName(other);
+		case 2:
+			return comparePrice(other);
+	}
+}
+
+bool InnerDecklistNode::compareNumber(AbstractDecklistNode *other) const
+{
 	InnerDecklistNode *other2 = dynamic_cast<InnerDecklistNode *>(other);
-	if (other2)
-		return (getName() > other->getName());
-	else
+	if (other2) {
+		int n1 = recursiveCount(true);
+		int n2 = other2->recursiveCount(true);
+		return (n1 != n2) ? (n1 > n2) : compareName(other);
+	} else {
 		return false;
+	}
+}
+
+bool InnerDecklistNode::compareName(AbstractDecklistNode *other) const
+{
+	InnerDecklistNode *other2 = dynamic_cast<InnerDecklistNode *>(other);
+	if (other2) {
+		return (getName() > other2->getName());
+	} else {
+		return false;
+	}
+}
+
+bool InnerDecklistNode::comparePrice(AbstractDecklistNode *other) const
+{
+	InnerDecklistNode *other2 = dynamic_cast<InnerDecklistNode *>(other);
+	if (other2) {
+		int p1 = 100*recursivePrice(true);
+		int p2 = 100*other2->recursivePrice(true);
+		return (p1 != p2) ? (p1 > p2) : compareName(other);
+	} else {
+		return false;
+	}
 }
 
 bool AbstractDecklistCardNode::compare(AbstractDecklistNode *other) const
 {
+	switch (sortMethod) {
+		case ByNumber:
+			return compareNumber(other);
+		case ByName:
+			return compareName(other);
+		case ByPrice:
+			return compareTotalPrice(other);
+	}
+}
+
+bool AbstractDecklistCardNode::compareNumber(AbstractDecklistNode *other) const
+{
 	AbstractDecklistCardNode *other2 = dynamic_cast<AbstractDecklistCardNode *>(other);
-	if (other2)
-		return (getName() > other->getName());
-	else
+	if (other2) {
+		int n1 = getNumber();
+		int n2 = other2->getNumber();
+		return (n1 != n2) ? (n1 > n2) : compareName(other);
+	} else {
 		return true;
+	}
+}
+
+bool AbstractDecklistCardNode::compareName(AbstractDecklistNode *other) const
+{
+	AbstractDecklistCardNode *other2 = dynamic_cast<AbstractDecklistCardNode *>(other);
+	if (other2) {
+		return (getName() > other2->getName());
+	} else {
+		return true;
+	}
+}
+
+bool AbstractDecklistCardNode::compareTotalPrice(AbstractDecklistNode *other) const
+{
+	AbstractDecklistCardNode *other2 = dynamic_cast<AbstractDecklistCardNode *>(other);
+	if (other2) {
+		int p1 = 100*getTotalPrice();
+		int p2 = 100*other2->getTotalPrice();
+		return (p1 != p2) ? (p1 > p2) : compareName(other);
+	} else {
+		return true;
+	}
 }
 
 class InnerDecklistNode::compareFunctor {
@@ -360,6 +442,11 @@ void DeckList::write(QXmlStreamWriter *xml)
 
 bool DeckList::loadFromXml(QXmlStreamReader *xml)
 {
+    if (xml->error()) {
+        qDebug() << "Error loading deck from xml: " << xml->errorString();
+        return false;
+    }
+
 	cleanList();
 	while (!xml->atEnd()) {
 		xml->readNext();
@@ -374,6 +461,10 @@ bool DeckList::loadFromXml(QXmlStreamReader *xml)
 		}
 	}
 	updateDeckHash();
+    if (xml->error()) {
+        qDebug() << "Error loading deck from xml: " << xml->errorString();
+        return false;
+    }
 	return true;
 }
 
@@ -396,8 +487,7 @@ QString DeckList::writeToString_Native()
 bool DeckList::loadFromFile_Native(QIODevice *device)
 {
 	QXmlStreamReader xml(device);
-	loadFromXml(&xml);
-	return true;
+	return loadFromXml(&xml);
 }
 
 bool DeckList::saveToFile_Native(QIODevice *device)
@@ -415,7 +505,7 @@ bool DeckList::saveToFile_Native(QIODevice *device)
 bool DeckList::loadFromStream_Plain(QTextStream &in)
 {
 	cleanList();
-	
+
 	InnerDecklistNode *main = 0, *side = 0;
 	bool inSideboard = false;
 
@@ -449,7 +539,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 		line.remove(rx);
 		rx.setPattern("\\(.*\\)");
 		line.remove(rx);
-		//Filter out post card name editions		
+		//Filter out post card name editions
 		rx.setPattern("\\|.*$");
 		line.remove(rx);
 		line = line.simplified();
@@ -462,10 +552,10 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 			continue;
 
 		QString cardName = line.mid(i + 1);
-    // Common differences between cockatrice's card names
-    // and what's commonly used in decklists
+        // Common differences between cockatrice's card names
+        // and what's commonly used in decklists
 		rx.setPattern("’");
-    cardName.replace(rx, "'");
+        cardName.replace(rx, "'");
 		rx.setPattern("Æ");
 		cardName.replace(rx, "AE");
 		rx.setPattern("^Aether");

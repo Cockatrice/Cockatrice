@@ -18,6 +18,7 @@
 #include <QInputDialog>
 #include <QSpinBox>
 #include <QDialogButtonBox>
+#include <QDebug>
 #include "carddatabase.h"
 #include "dlg_settings.h"
 #include "main.h"
@@ -27,7 +28,7 @@ GeneralSettingsPage::GeneralSettingsPage()
 {
     languageLabel = new QLabel;
     languageBox = new QComboBox;
-    
+
     QString setLanguage = settingsCache->getLang();
     QStringList qmFiles = findQmFiles();
     for (int i = 0; i < qmFiles.size(); i++) {
@@ -36,27 +37,32 @@ GeneralSettingsPage::GeneralSettingsPage()
         if ((qmFiles[i] == setLanguage) || (setLanguage.isEmpty() && langName == tr("English")))
             languageBox->setCurrentIndex(i);
     }
-    
+
     picDownloadCheckBox = new QCheckBox;
     picDownloadCheckBox->setChecked(settingsCache->getPicDownload());
-    
+
+    picDownloadHqCheckBox = new QCheckBox;
+    picDownloadHqCheckBox->setChecked(settingsCache->getPicDownloadHq());
+
     connect(languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
     connect(picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
-    
+    connect(picDownloadHqCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownloadHq(int)));
+
     QGridLayout *personalGrid = new QGridLayout;
     personalGrid->addWidget(languageLabel, 0, 0);
     personalGrid->addWidget(languageBox, 0, 1);
     personalGrid->addWidget(picDownloadCheckBox, 1, 0, 1, 2);
-    
+    personalGrid->addWidget(picDownloadHqCheckBox, 2, 0, 1, 2);
+
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
-    
+
     deckPathLabel = new QLabel;
     deckPathEdit = new QLineEdit(settingsCache->getDeckPath());
     deckPathEdit->setReadOnly(true);
     QPushButton *deckPathButton = new QPushButton("...");
     connect(deckPathButton, SIGNAL(clicked()), this, SLOT(deckPathButtonClicked()));
-    
+
     replaysPathLabel = new QLabel;
     replaysPathEdit = new QLineEdit(settingsCache->getReplaysPath());
     replaysPathEdit->setReadOnly(true);
@@ -183,6 +189,7 @@ void GeneralSettingsPage::retranslateUi()
     personalGroupBox->setTitle(tr("Personal settings"));
     languageLabel->setText(tr("Language:"));
     picDownloadCheckBox->setText(tr("Download card pictures on the fly"));
+    picDownloadHqCheckBox->setText(tr("Download high-quality card pictures"));
     pathsGroupBox->setTitle(tr("Paths"));
     deckPathLabel->setText(tr("Decks directory:"));
     replaysPathLabel->setText(tr("Replays directory:"));
@@ -698,17 +705,65 @@ void DlgSettings::changeEvent(QEvent *event)
 
 void DlgSettings::closeEvent(QCloseEvent *event)
 {
-    if (!db->getLoadSuccess())
-        if (QMessageBox::critical(this, tr("Error"), tr("Your card database is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+    bool showLoadError = true;
+    QString loadErrorMessage = tr("Unknown Error loading card database");
+    LoadStatus loadStatus = db->getLoadStatus();
+    qDebug() << "Card Database load status: " << loadStatus;
+    switch(loadStatus) {
+    case Ok:
+        showLoadError = false;
+        break;
+    case Invalid:
+        loadErrorMessage =
+            tr("Your card database is invalid.\n\n"
+               "Cockatrice may not function correctly with an invalid database\n\n"
+               "You may need to rerun oracle to update your card database.\n\n"
+               "Would you like to change your database location setting?");
+        break;
+    case VersionTooOld:
+        loadErrorMessage =
+            tr("Your card database version is too old.\n\n"
+               "This can cause problems loading card information or images\n\n"
+               "Usually this can be fixed by rerunning oracle to to update your card database.\n\n"
+               "Would you like to change your database location setting?");
+        break;
+    case NotLoaded:
+        loadErrorMessage =
+            tr("Your card database did not finish loading\n\n"
+               "Please file a ticket at http://github.com/Daenyth/Cockatrice/issues with your cards.xml attached\n\n"
+               "Would you like to change your database location setting?");
+        break;
+    case FileError:
+        loadErrorMessage =
+            tr("File Error loading your card database.\n\n"
+               "Would you like to change your database location setting?");
+        break;
+    case NoCards:
+        loadErrorMessage =
+            tr("Your card database was loaded but contains no cards.\n\n"
+               "Would you like to change your database location setting?");
+        break;
+    default:
+        loadErrorMessage =
+            tr("Unknown card database load status\n\n"
+               "Please file a ticket at http://github.com/Daenyth/Cockatrice/issues\n\n"
+               "Would you like to change your database location setting?");
+
+        break;
+    }
+    if (showLoadError)
+        if (QMessageBox::critical(this, tr("Error"), loadErrorMessage, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
             event->ignore();
             return;
         }
     if (!QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty())
+        // TODO: Prompt to create it
         if (QMessageBox::critical(this, tr("Error"), tr("The path to your deck directory is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
             event->ignore();
             return;
         }
     if (!QDir(settingsCache->getPicsPath()).exists() || settingsCache->getPicsPath().isEmpty())
+        // TODO: Prompt to create it
         if (QMessageBox::critical(this, tr("Error"), tr("The path to your card pictures directory is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
             event->ignore();
             return;

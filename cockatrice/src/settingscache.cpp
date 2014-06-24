@@ -4,23 +4,27 @@
 SettingsCache::SettingsCache()
 {
     settings = new QSettings(this);
-    
+
     lang = settings->value("personal/lang").toString();
-    
+
     deckPath = settings->value("paths/decks").toString();
     replaysPath = settings->value("paths/replays").toString();
     picsPath = settings->value("paths/pics").toString();
     cardDatabasePath = settings->value("paths/carddatabase").toString();
     tokenDatabasePath = settings->value("paths/tokendatabase").toString();
-    
+
     handBgPath = settings->value("zonebg/hand").toString();
     stackBgPath = settings->value("zonebg/stack").toString();
     tableBgPath = settings->value("zonebg/table").toString();
     playerBgPath = settings->value("zonebg/playerarea").toString();
     cardBackPicturePath = settings->value("paths/cardbackpicture").toString();
-    
-    mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
+
     picDownload = settings->value("personal/picturedownload", true).toBool();
+    picDownloadHq = settings->value("personal/picturedownloadhq", false).toBool();
+    picUrl = settings->value("personal/picUrl", PIC_URL_DEFAULT).toString();
+    picUrlHq = settings->value("personal/picUrlHq", PIC_URL_HQ_DEFAULT).toString();
+
+    mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
     playToStack = settings->value("interface/playtostack", false).toBool();
@@ -31,15 +35,15 @@ SettingsCache::SettingsCache()
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 5).toInt();
     tapAnimation = settings->value("cards/tapanimation", true).toBool();
-    
+
     zoneViewSortByName = settings->value("zoneview/sortbyname", true).toBool();
     zoneViewSortByType = settings->value("zoneview/sortbytype", true).toBool();
-    
+
     soundEnabled = settings->value("sound/enabled", false).toBool();
     soundPath = settings->value("sound/path").toString();
-    
+
     priceTagFeature = settings->value("deckeditor/pricetags", false).toBool();
-    
+
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
 }
 
@@ -123,6 +127,25 @@ void SettingsCache::setPicDownload(int _picDownload)
     picDownload = _picDownload;
     settings->setValue("personal/picturedownload", picDownload);
     emit picDownloadChanged();
+}
+
+void SettingsCache::setPicDownloadHq(int _picDownloadHq)
+{
+    picDownloadHq = _picDownloadHq;
+    settings->setValue("personal/picturedownloadhq", picDownloadHq);
+    emit picDownloadHqChanged();
+}
+
+void SettingsCache::setPicUrl(const QString &_picUrl)
+{
+    picUrl = _picUrl;
+    settings->setValue("personal/picUrl", picUrl);
+}
+
+void SettingsCache::setPicUrlHq(const QString &_picUrlHq)
+{
+    picUrlHq = _picUrlHq;
+    settings->setValue("personal/picUrlHq", picUrlHq);
 }
 
 void SettingsCache::setNotificationsEnabled(int _notificationsEnabled)
@@ -219,6 +242,7 @@ void SettingsCache::setPriceTagFeature(int _priceTagFeature)
 {
     priceTagFeature = _priceTagFeature;
     settings->setValue("deckeditor/pricetags", priceTagFeature);
+    emit priceTagFeatureChanged(priceTagFeature);
 }
 
 void SettingsCache::setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers)

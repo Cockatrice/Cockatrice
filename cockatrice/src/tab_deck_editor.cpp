@@ -132,6 +132,8 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     deckView = new QTreeView();
     deckView->setModel(deckModel);
     deckView->setUniformRowHeights(true);
+    deckView->setSortingEnabled(true);
+    deckView->sortByColumn(1, Qt::AscendingOrder);
     deckView->header()->setResizeMode(QHeaderView::ResizeToContents);
     deckView->installEventFilter(&deckViewKeySignals);
     connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
@@ -170,6 +172,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     connect(aUpdatePrices, SIGNAL(triggered()), this, SLOT(actUpdatePrices()));
     if (!settingsCache->getPriceTagFeature())
         aUpdatePrices->setVisible(false);
+    connect(settingsCache, SIGNAL(priceTagFeatureChanged(int)), this, SLOT(setPriceTagFeatureEnabled(int)));
 
     QToolBar *deckToolBar = new QToolBar;
     deckToolBar->setOrientation(Qt::Vertical);
@@ -180,7 +183,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     deckToolbarLayout->addStretch();
     deckToolbarLayout->addWidget(deckToolBar);
     deckToolbarLayout->addStretch();
-    
+
     QVBoxLayout *rightFrame = new QVBoxLayout;
     rightFrame->addLayout(grid);
     rightFrame->addWidget(deckView, 10);
@@ -191,7 +194,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     mainLayout->addLayout(middleFrame);
     mainLayout->addLayout(rightFrame);
     setLayout(mainLayout);
-    
+
     aNewDeck = new QAction(QString(), this);
     aNewDeck->setShortcuts(QKeySequence::New);
     connect(aNewDeck, SIGNAL(triggered()), this, SLOT(actNewDeck()));
@@ -633,6 +636,11 @@ void TabDeckEditor::actDecrement()
     offsetCountAtIndex(currentIndex, -1);
 }
 
+void TabDeckEditor::setPriceTagFeatureEnabled(int enabled)
+{
+    aUpdatePrices->setVisible(enabled);
+}
+
 void TabDeckEditor::actUpdatePrices()
 {
     aUpdatePrices->setDisabled(true);
@@ -655,10 +663,10 @@ void TabDeckEditor::setDeck(DeckLoader *_deck)
     nameEdit->setText(deckModel->getDeckList()->getName());
     commentsEdit->setText(deckModel->getDeckList()->getComments());
     updateHash();
-    deckModel->sort(1);
+    deckModel->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
     deckView->expandAll();
     setModified(false);
-    
+
     db->cacheCardPixmaps(deckModel->getDeckList()->getCardList());
     deckView->expandAll();
     setModified(false);
