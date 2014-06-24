@@ -82,6 +82,7 @@ void testHash()
 	std::cerr << startTime.secsTo(endTime) << "secs" << std::endl;
 }
 
+#if QT_VERSION < 0x050000
 void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
 	logger->logMessage(msg);
@@ -92,17 +93,18 @@ void myMessageOutput2(QtMsgType /*type*/, const char *msg)
 	logger->logMessage(msg);
 	std::cerr << msg << std::endl;
 }
-
-void myMessageOutputQt5(QtMsgType /*type*/, const QMessageLogContext &, const QString &msg)
+#else
+void myMessageOutput(QtMsgType /*type*/, const QMessageLogContext &, const QString &msg)
 {
 	logger->logMessage(msg);
 }
 
-void myMessageOutput2Qt5(QtMsgType /*type*/, const QMessageLogContext &, const QString &msg)
+void myMessageOutput2(QtMsgType /*type*/, const QMessageLogContext &, const QString &msg)
 {
 	logger->logMessage(msg);
 	std::cerr << msg.toStdString() << std::endl;
 }
+#endif
 
 #ifdef Q_OS_UNIX
 void sigSegvHandler(int sig)
@@ -155,9 +157,9 @@ int main(int argc, char *argv[])
 		qInstallMsgHandler(myMessageOutput2);
 #else
 	if (logToConsole)
-		qInstallMessageHandler(myMessageOutputQt5);
+		qInstallMessageHandler(myMessageOutput);
 	else
-		qInstallMessageHandler(myMessageOutput2Qt5);
+		qInstallMessageHandler(myMessageOutput2);
 #endif
 
 #ifdef Q_OS_UNIX	
@@ -199,7 +201,7 @@ int main(int argc, char *argv[])
 #if QT_VERSION < 0x050000		
 		qInstallMsgHandler(myMessageOutput);
 #else
-		qInstallMessageHandler(myMessageOutputQt5);
+		qInstallMessageHandler(myMessageOutput);
 #endif
 		retval = app.exec();
 		
