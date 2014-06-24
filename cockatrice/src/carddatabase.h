@@ -53,10 +53,8 @@ public:
     bool getStripped() const { return stripped; }
     QString getSetName() const { return sortedSets[setIndex]->getShortName(); }
     bool nextSet();
-        
     bool getHq() const { return hq; }
     void setHq(bool _hq) { hq = _hq; }
-    
 };
 
 class PictureLoader : public QObject {

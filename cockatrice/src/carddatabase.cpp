@@ -132,7 +132,7 @@ void PictureLoader::processLoadQueue()
                     }
                     continue;
                 }
-        
+
         emit imageLoaded(ptl.getCard(), image);
     }
 }
@@ -176,6 +176,10 @@ void PictureLoader::startNextPicDownload()
 void PictureLoader::picDownloadFinished(QNetworkReply *reply)
 {
     QString picsPath = _picsPath;
+    if (reply->error()) {
+        qDebug() << "Download failed:" << reply->errorString();
+    }
+
     const QByteArray &picData = reply->readAll();
     QImage testImage;
     if (testImage.loadFromData(picData)) {
@@ -189,17 +193,17 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
             QDir dir(QString(picsPath + "/downloadedPics"));
             dir.mkdir(cardBeingDownloaded.getSetName());
         }
-        
+
         QString suffix;
         if (!cardBeingDownloaded.getStripped())
             suffix = ".full";
-        
+
         QFile newPic(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + ".jpg");
         if (!newPic.open(QIODevice::WriteOnly))
             return;
         newPic.write(picData);
         newPic.close();
-        
+
         emit imageLoaded(cardBeingDownloaded.getCard(), testImage);
     } else if (cardBeingDownloaded.getHq()) {
         qDebug() << "HQ: received invalid picture. URL:" << reply->request().url();
@@ -216,7 +220,7 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
         } else
             emit imageLoaded(cardBeingDownloaded.getCard(), QImage());
     }
-    
+
     reply->deleteLater();
     startNextPicDownload();
 }
@@ -224,7 +228,7 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
 void PictureLoader::loadImage(CardInfo *card, bool stripped)
 {
     QMutexLocker locker(&mutex);
-    
+
     loadQueue.append(PictureToLoad(card, stripped));
     emit startLoadQueue();
 }
