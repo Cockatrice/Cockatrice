@@ -169,7 +169,7 @@ void PictureLoader::startNextPicDownload()
     QUrl url(picUrl);
 
     QNetworkRequest req(url);
-    qDebug() << "starting picture download:" << req.url();
+    qDebug() << "starting picture download:" << cardBeingDownloaded.getCard()->getName() << "Url:" << req.url();
     networkManager->get(req);
 }
 
