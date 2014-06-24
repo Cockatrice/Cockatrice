@@ -115,7 +115,7 @@ SetShellVarContext all
 	Delete "$INSTDIR\QtMultimedia4.dll"
 	RMDir "$INSTDIR"
 
-	RMDir /r "$SMPROGRAMS\Cockatrice"
+	RMDir "$SMPROGRAMS\Cockatrice"
 
 	DeleteRegKey HKCU "Software\Cockatrice"
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
