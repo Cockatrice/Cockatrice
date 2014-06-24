@@ -83,10 +83,10 @@ Section "Application" SecApplication
 SectionEnd
 
 Section "Update configuration" SecUpdateConfig
-	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "carddatabase" "$APPDATA\cards.xml"
-	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "decks" "$APPDATA\decks"
-	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "pics" "$APPDATA\pics"
-	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\sound" "path" "$APPDATA\sounds"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "carddatabase" "$APPDATA\Cockatrice\cards.xml"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "decks" "$APPDATA\Cockatrice\decks"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "pics" "$APPDATA\Cockatrice\pics"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\sound" "path" "$APPDATA\Cockatrice\sounds"
 SectionEnd
 
 Section "Start menu item" SecStartMenu
