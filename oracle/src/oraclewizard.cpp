@@ -3,9 +3,9 @@
     #include <QDesktopServices>
 #else 
     #include <QStandardPaths>
+    #include <QtConcurrent>
 #endif
 #include <QAbstractButton>
-#include <QtConcurrent>
 #include <QCheckBox>
 #include <QFileDialog>
 #include <QGridLayout>
