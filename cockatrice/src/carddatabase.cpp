@@ -16,12 +16,6 @@
 
 const int CardDatabase::versionNeeded = 3;
 
-CardSet::CardSet(const QString &_shortName, const QString &_longName)
-    : shortName(_shortName), longName(_longName)
-{
-    updateSortKey();
-}
-
 QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
 {
     xml.writeStartElement("set");
@@ -30,6 +24,24 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
     xml.writeEndElement();
 
     return xml;
+}
+
+CardSet::CardSet(const QString &_shortName, const QString &_longName)
+    : shortName(_shortName), longName(_longName)
+{
+    updateSortKey();
+}
+
+QString CardSet::getCorrectedShortName() const
+{
+    // Because windows is horrible.
+    QSet<QString> invalidFileNames;
+    invalidFileNames << "CON" << "PRN" << "AUX" << "NUL" << "COM1" << "COM2" <<
+        "COM3" << "COM4" << "COM5" << "COM6" << "COM7" << "COM8" << "COM9" <<
+        "LPT1" << "LPT2" << "LPT3" << "LPT4" << "LPT5" << "LPT6" << "LPT7" <<
+        "LPT8" << "LPT9";
+
+    return invalidFileNames.contains(shortName) ? shortName + "_" : shortName;
 }
 
 void CardSet::setSortKey(unsigned int _sortKey)
