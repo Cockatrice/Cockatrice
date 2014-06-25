@@ -201,10 +201,13 @@ if(Qt5Widgets_FOUND)
         list(APPEND COCKATRICE_LIBS LinguistTools)
     endif()
 
-    # Let cmake chew Qt4's translations and resource files
+    # Let cmake chew Qt5's translations and resource files
     # Note: header files are MOC-ed automatically by cmake
     QT5_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
     QT5_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+
+    # guess plugins directory
+    set(QT_PLUGINS_DIR "${Qt5Widgets_DIR}/../../../plugins")
 endif()
 
 # Declare path variables

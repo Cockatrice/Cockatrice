@@ -51,6 +51,9 @@ if(Qt5Widgets_FOUND)
         include_directories(${Qt5Sql_INCLUDE_DIRS})
         list(APPEND SERVATRICE_LIBS Sql)
     endif()
+
+    # guess plugins directory
+    set(QT_PLUGINS_DIR "${Qt5Widgets_DIR}/../../../plugins")
 endif()
 
 SET(QT_DONT_USE_QTGUI TRUE)

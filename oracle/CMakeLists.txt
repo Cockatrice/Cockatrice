@@ -63,6 +63,9 @@ if(Qt5Widgets_FOUND)
         include_directories(${Qt5Svg_INCLUDE_DIRS})
         list(APPEND ORACLE_LIBS Svg)
     endif()
+
+    # guess plugins directory
+    set(QT_PLUGINS_DIR "${Qt5Widgets_DIR}/../../../plugins")
 endif()
 
 INCLUDE_DIRECTORIES(../cockatrice/src)
