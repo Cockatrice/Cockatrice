@@ -1,5 +1,6 @@
 #include "settingscache.h"
 #include <QSettings>
+#include <QDebug>
 #include <QDir>
 
 SettingsCache::SettingsCache()
