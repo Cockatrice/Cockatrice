@@ -43,20 +43,29 @@ void DeckStatsInterface::queryFinished(QNetworkReply *reply)
     deleteLater();
 }
 
-void DeckStatsInterface::analyzeDeck(DeckList *deck)
+#if QT_VERSION < 0x050000
+void DeckStatsInterface::getAnalyzeRequestData(DeckList *deck, QByteArray *data)
 {
     QUrl params;
-#if QT_VERSION < 0x050000
     params.addQueryItem("deck", deck->writeToString_Plain());
-    QByteArray data;
-    data.append(params.encodedQuery());
+    data->append(params.encodedQuery());
+}
 #else
+void DeckStatsInterface::getAnalyzeRequestData(DeckList *deck, QByteArray *data)
+{
+    QUrl params;
     QUrlQuery urlQuery;
     urlQuery.addQueryItem("deck", deck->writeToString_Plain());
     params.setQuery(urlQuery);
-    QByteArray data;
-    data.append(params.query(QUrl::EncodeReserved));
+    data->append(params.query(QUrl::EncodeReserved));
+}
 #endif
+
+
+void DeckStatsInterface::analyzeDeck(DeckList *deck)
+{
+    QByteArray data;
+    getAnalyzeRequestData(deck, &data);
     
     QNetworkRequest request(QUrl("http://deckstats.net/index.php"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
