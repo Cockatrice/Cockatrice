@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
     if (translationPath.isEmpty()) {
 #ifdef Q_OS_MAC
         translationPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
-#elif Q_OS_WIN
+#elif defined(Q_OS_WIN)
         translationPath = app.applicationDirPath() + "/translations";
 #endif
     }
