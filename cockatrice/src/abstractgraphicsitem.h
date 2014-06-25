@@ -14,6 +14,7 @@ enum GraphicsItemType {
 
 class AbstractGraphicsItem : public QObject, public QGraphicsItem {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 protected:
     void paintNumberEllipse(int number, int radius, const QColor &color, int position, int count, QPainter *painter);
 public:

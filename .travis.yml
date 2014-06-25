@@ -1,0 +1,9 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+script: mkdir build && cd build && cmake .. && make
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y qtmobility-dev libprotobuf-dev protobuf-compiler libqt4-dev build-essential
+cache: apt

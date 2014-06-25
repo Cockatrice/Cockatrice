@@ -6,7 +6,7 @@ FILE(GLOB sounds "${CMAKE_CURRENT_SOURCE_DIR}/*.raw")
 
 if(UNIX)
     if(APPLE)
-      	INSTALL(FILES ${sounds} DESTINATION sounds/)
+      	INSTALL(FILES ${sounds} DESTINATION cockatrice.app/Contents/Resources/sounds/)
     else()
         # Assume linux
         INSTALL(FILES ${sounds} DESTINATION share/cockatrice/sounds/)

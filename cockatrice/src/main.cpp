@@ -105,15 +105,6 @@ int main(int argc, char *argv[])
         qInstallMessageHandler(myMessageOutput);
 #endif
     }
-#ifdef Q_OS_MAC
-    QDir baseDir(app.applicationDirPath());
-    baseDir.cdUp();
-    baseDir.cdUp();
-    baseDir.cdUp();
-    QDir pluginsDir = baseDir;
-    pluginsDir.cd("PlugIns");
-    app.addLibraryPath(pluginsDir.absolutePath());
-#endif
 #ifdef Q_OS_WIN
     app.addLibraryPath(app.applicationDirPath() + "/plugins");
 #endif
@@ -129,11 +120,8 @@ int main(int argc, char *argv[])
 
     if (translationPath.isEmpty()) {
 #ifdef Q_OS_MAC
-        QDir translationsDir = baseDir;
-        translationsDir.cd("translations");
-        translationPath = translationsDir.absolutePath();
-#endif
-#ifdef Q_OS_WIN
+        translationPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+#elif Q_OS_WIN
         translationPath = app.applicationDirPath() + "/translations";
 #endif
     }
@@ -171,6 +159,43 @@ int main(int argc, char *argv[])
         QDir().mkpath(dataDir + "/pics");
         settingsCache->setPicsPath(dataDir + "/pics");
     }
+
+#ifdef Q_OS_MAC
+    if(settingsCache->getHandBgPath().isEmpty() &&
+        settingsCache->getStackBgPath().isEmpty() &&
+        settingsCache->getTableBgPath().isEmpty() &&
+        settingsCache->getPlayerBgPath().isEmpty())
+    {
+        QString srcDir = QLibraryInfo::location(QLibraryInfo::DataPath);
+        QString destDir = dataDir + "/zonebg";
+        QDir tmpDir(destDir);
+        if(!tmpDir.exists())
+        {
+            // try to install the default images for the current user and set the settigs value
+            settingsCache->copyPath(srcDir + "/zonebg", destDir);
+
+            settingsCache->setHandBgPath(destDir + "/fabric_green.png");
+            settingsCache->setStackBgPath(destDir + "/fabric_red.png");
+            settingsCache->setTableBgPath(destDir + "/fabric_blue.png");
+            settingsCache->setPlayerBgPath(destDir + "/fabric_gray.png");
+        }
+    }
+
+    if(settingsCache->getSoundPath().isEmpty())
+    {
+        QString srcDir = QLibraryInfo::location(QLibraryInfo::DataPath);
+        QString destDir = dataDir + "/sounds";
+        QDir tmpDir(destDir);
+        if(!tmpDir.exists())
+        {
+            // try to install the default sounds for the current user and set the settigs value
+            settingsCache->copyPath(srcDir + "/sounds", destDir);
+
+            settingsCache->setSoundPath(destDir);
+        }
+    }
+#endif
+
     if (!settingsValid() || db->getLoadStatus() != Ok) {
         qDebug("main(): invalid settings or load status");
         DlgSettings dlgSettings;

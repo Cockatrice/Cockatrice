@@ -94,8 +94,9 @@ elseif(WIN32)
 endif()
 
 if(APPLE)
-    set(plugin_dest_dir ./servatrice.app/Contents/Plugins)
-    set(qtconf_dest_dir ./servatrice.app/Contents/Resources)
+    # these needs to be relative to CMAKE_INSTALL_PREFIX
+    set(plugin_dest_dir servatrice.app/Contents/Plugins)
+    set(qtconf_dest_dir servatrice.app/Contents/Resources)
 
     # note: no codecs in qt5
     # note: phonon_backend => mediaservice
@@ -110,13 +111,15 @@ if(APPLE)
     endif()
 
     install(CODE "
-        file(WRITE \"${qtconf_dest_dir}/qt.conf\" \"[Paths]
-Plugins = Plugins\")
+        file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
+Plugins = Plugins
+Translations = Resources/translations\")
     " COMPONENT Runtime)
 
     install(CODE "
         file(GLOB_RECURSE QTPLUGINS
-        \"${plugin_dest_dir}/*.dylib\")
+        \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
+    set(BU_CHMOD_BUNDLE_ITEMS ON)
     include(BundleUtilities)
     fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/servatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
     " COMPONENT Runtime)

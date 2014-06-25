@@ -90,6 +90,7 @@ public:
     bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
     QString getPicUrl() const { return picUrl; }
     QString getPicUrlHq() const { return picUrlHq; }
+    void copyPath(const QString &src, const QString &dst);
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
