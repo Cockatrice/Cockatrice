@@ -68,9 +68,7 @@ QVariant CardDatabaseModel::headerData(int section, Qt::Orientation orientation,
 
 void CardDatabaseModel::updateCardList()
 {
-#if QT_VERSION >= 0x050000
     beginResetModel();
-#endif
 
     for (int i = 0; i < cardList.size(); ++i)
         disconnect(cardList[i], 0, this, 0);
@@ -79,11 +77,7 @@ void CardDatabaseModel::updateCardList()
     for (int i = 0; i < cardList.size(); ++i)
         connect(cardList[i], SIGNAL(cardInfoChanged(CardInfo *)), this, SLOT(cardInfoChanged(CardInfo *)));
     
-#if QT_VERSION < 0x050000
-    reset();
-#else
     endResetModel();
-#endif
 }
 
 void CardDatabaseModel::cardInfoChanged(CardInfo *card)

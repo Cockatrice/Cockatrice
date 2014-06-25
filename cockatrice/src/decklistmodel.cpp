@@ -30,9 +30,7 @@ DeckListModel::~DeckListModel()
 
 void DeckListModel::rebuildTree()
 {
-#if QT_VERSION >= 0x050000
     beginResetModel();
-#endif
 
     root->clearTree();
     InnerDecklistNode *listRoot = deckList->getRoot();
@@ -59,11 +57,7 @@ void DeckListModel::rebuildTree()
         }
     }
 
-#if QT_VERSION < 0x050000
-    reset();
-#else
     endResetModel();
-#endif
 }
 
 int DeckListModel::rowCount(const QModelIndex &parent) const

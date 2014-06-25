@@ -258,17 +258,11 @@ void RemoteDeckList_TreeModel::deckListFinished(const Response &r)
 {
     const Response_DeckList &resp = r.GetExtension(Response_DeckList::ext);
 
-#if QT_VERSION >= 0x050000
     beginResetModel();
-#endif
 
     root->clearTree();
 
-#if QT_VERSION < 0x050000
-    reset();
-#else
     endResetModel();
-#endif
     
     ServerInfo_DeckStorage_TreeItem tempRoot;
     tempRoot.set_id(0);
