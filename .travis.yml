@@ -5,4 +5,4 @@ compiler:
 script: mkdir build && cd build && cmake .. && make
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y qtmobility-dev libprotobuf-dev protobuf-compiler
+  - sudo apt-get install -y qtmobility-dev libprotobuf-dev protobuf-compiler libqt4-dev
