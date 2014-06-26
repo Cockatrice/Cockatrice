@@ -49,19 +49,25 @@ void ServerLogger::logMessage(QString message, void *caller)
 	if (caller)
 		callerString = QString::number((qulonglong) caller, 16) + " ";
 		
-	//filter out all log entries based on loglevel value in configuration file
+	//filter out all log entries based on values in configuration file
 	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
 	bool shouldWeWriteLog = settings->value("server/writelog").toBool();
-	//allowedLogStatements << "Adding room: ID=" << "Starting status update clock" << "Starting server on port" << 
-	//	"Server listening." << "Server::loginUser:" << "Server::removeClient:" << "Command_Login.ext" << 
-	//	"Command_RoomSay.ext" << "Command_Message.ext" << "Command_GameSay.ext";
 	
 	if (shouldWeWriteLog){
 		QString logFilters = settings->value("server/logfilters").toString();
+		QStringList listlogFilters = logFilters.split(",", QString::SkipEmptyParts);
 		bool shouldWeSkipLine = false;
-		if (!logFilters.trimmed().isEmpty()) 
-			shouldWeSkipLine = !message.contains(logFilters);
-		
+		if (!logFilters.trimmed().isEmpty()){
+			shouldWeSkipLine = true;
+			foreach(QString logFilter, listlogFilters){ 
+				if (message.contains(logFilter, Qt::CaseInsensitive)){
+					shouldWeSkipLine = false;
+					break;
+				}
+			}
+		}
+
+
 		if (shouldWeSkipLine)
 			return;
 
