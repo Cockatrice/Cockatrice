@@ -275,7 +275,7 @@ CardInfo::CardInfo(CardDatabase *_db,
                    bool _cipt,
                    int _tableRow,
                    const SetList &_sets,
-                   QMap<QString, int> _muIds)
+                   MuidMap _muIds)
     : db(_db),
       name(_name),
       isToken(_isToken),
@@ -610,7 +610,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
         if (xml.name() == "card") {
             QString name, manacost, type, pt, text;
             QStringList colors;
-            QMap<QString, int> muids;
+            MuidMap muids;
             SetList sets;
             int tableRow = 0;
             int loyalty = 0;
