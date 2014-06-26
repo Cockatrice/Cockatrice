@@ -5,13 +5,11 @@
 #include <QDateTime>
 #include <QSettings>
 #include <iostream>
-#include <list>
 #ifdef Q_OS_UNIX
 # include <sys/types.h>
 # include <sys/socket.h>
 # include <unistd.h>
 #endif
-using namespace std;
 
 ServerLogger::ServerLogger(bool _logToConsole, QObject *parent)
 	: QObject(parent), logToConsole(_logToConsole), flushRunning(false)
@@ -53,48 +51,25 @@ void ServerLogger::logMessage(QString message, void *caller)
 		
 	//filter out all log entries based on loglevel value in configuration file
 	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
-	int capture = 0; list<string> lst_str;
-        int loglevel = settings->value("server/loglevel").toInt();
-        if (!loglevel)
-                loglevel = 999;
+	bool shouldWeWriteLog = settings->value("server/writelog").toBool();
+	//allowedLogStatements << "Adding room: ID=" << "Starting status update clock" << "Starting server on port" << 
+	//	"Server listening." << "Server::loginUser:" << "Server::removeClient:" << "Command_Login.ext" << 
+	//	"Command_RoomSay.ext" << "Command_Message.ext" << "Command_GameSay.ext";
 	
-	switch (loglevel)
-	{
-		case 1:
-			capture = 0;
-			break;
+	if (shouldWeWriteLog){
+		QString logFilters = settings->value("server/logfilters").toString();
+		bool shouldWeSkipLine = false;
+		if (!logFilters.trimmed().isEmpty()) 
+			shouldWeSkipLine = !message.contains(logFilters);
+		
+		if (shouldWeSkipLine)
+			return;
 
-		case 2:
-			// filter message log data
-			lst_str.push_back("Adding room: ID=");
-  			lst_str.push_back("Starting status update clock");
-  			lst_str.push_back("Starting server on port");
-  			lst_str.push_back("Server listening.");
-  			lst_str.push_back("Server::loginUser:");
-  			lst_str.push_back("Server::removeClient:");
-  			lst_str.push_back("Command_Login.ext");
-  			lst_str.push_back("Command_RoomSay.ext");
-  			lst_str.push_back("Command_Message.ext");
-  			lst_str.push_back("Command_GameSay.ext");
-			for (list<string>::iterator i = lst_str.begin(); i != lst_str.end(); i++)
-			{	
-				if(message.indexOf((*i).c_str(), Qt::CaseInsensitive) != -1) {
-			 		capture = 1;
-			 		break;
-			 	}
-			}
-			break;
-
-		default:
-			capture = 1;
-	}
-
-	if (capture != 0){
 		bufferMutex.lock();
-		buffer.append(QDateTime::currentDateTime().toString() + " " + callerString + message);
-		bufferMutex.unlock();
+               	buffer.append(QDateTime::currentDateTime().toString() + " " + callerString + message);
+               	bufferMutex.unlock();
+               	emit sigFlushBuffer();
 	}
-	emit sigFlushBuffer();
 }
 
 void ServerLogger::flushBuffer()
