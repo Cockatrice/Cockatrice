@@ -67,7 +67,6 @@ void ServerLogger::logMessage(QString message, void *caller)
 			}
 		}
 
-
 		if (shouldWeSkipLine)
 			return;
 
