@@ -69,14 +69,19 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 ADD_EXECUTABLE(servatrice MACOSX_BUNDLE ${servatrice_SOURCES} ${servatrice_MOC_SRCS})
 
 if(Qt4_FOUND)
+    if(MSVC) 
+        set(QT_USE_QTMAIN true) 
+    endif() 
     TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${SERVATRICE_LIBS} ${LIBGCRYPT_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
 endif()
 if(Qt5Widgets_FOUND)
-    TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${LIBGCRYPT_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+    if(MSVC)
+        TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${LIBGCRYPT_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} Qt5::WinMain)
+    else()
+        TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${LIBGCRYPT_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+    endif()
     qt5_use_modules(servatrice ${SERVATRICE_LIBS})
 endif()
-
-
 
 #add_custom_target(versionheader ALL DEPENDS version_header)
 add_custom_command(
