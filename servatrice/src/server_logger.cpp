@@ -12,121 +12,122 @@
 #endif
 
 ServerLogger::ServerLogger(bool _logToConsole, QObject *parent)
-	: QObject(parent), logToConsole(_logToConsole), flushRunning(false)
+    : QObject(parent), logToConsole(_logToConsole), flushRunning(false)
 {
 }
 
 ServerLogger::~ServerLogger()
 {
-	flushBuffer();
-	// This does not work with the destroyed() signal as this destructor is called after the main event loop is done.
-	thread()->quit();
+    flushBuffer();
+    // This does not work with the destroyed() signal as this destructor is called after the main event loop is done.
+    thread()->quit();
 }
 
 void ServerLogger::startLog(const QString &logFileName)
 {
-	if (!logFileName.isEmpty()) {
-		logFile = new QFile("server.log", this);
-		logFile->open(QIODevice::Append);
+    if (!logFileName.isEmpty()) {
+        logFile = new QFile("server.log", this);
+        logFile->open(QIODevice::Append);
 #ifdef Q_OS_UNIX
-		::socketpair(AF_UNIX, SOCK_STREAM, 0, sigHupFD);
+        ::socketpair(AF_UNIX, SOCK_STREAM, 0, sigHupFD);
 
-		snHup = new QSocketNotifier(sigHupFD[1], QSocketNotifier::Read, this);
-		connect(snHup, SIGNAL(activated(int)), this, SLOT(handleSigHup()));
+        snHup = new QSocketNotifier(sigHupFD[1], QSocketNotifier::Read, this);
+        connect(snHup, SIGNAL(activated(int)), this, SLOT(handleSigHup()));
 #endif
-	} else
-		logFile = 0;
-	
-	connect(this, SIGNAL(sigFlushBuffer()), this, SLOT(flushBuffer()), Qt::QueuedConnection);
+    } else
+        logFile = 0;
+    
+    connect(this, SIGNAL(sigFlushBuffer()), this, SLOT(flushBuffer()), Qt::QueuedConnection);
 }
 
 void ServerLogger::logMessage(QString message, void *caller)
 {
-	if (!logFile)
-		return;
-	
-	QString callerString;
-	if (caller)
-		callerString = QString::number((qulonglong) caller, 16) + " ";
-		
-	//filter out all log entries based on values in configuration file
-	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
-	bool shouldWeWriteLog = settings->value("server/writelog").toBool();
-	
-	if (shouldWeWriteLog){
-		QString logFilters = settings->value("server/logfilters").toString();
-		QStringList listlogFilters = logFilters.split(",", QString::SkipEmptyParts);
-		bool shouldWeSkipLine = false;
-		if (!logFilters.trimmed().isEmpty()){
-			shouldWeSkipLine = true;
-			foreach(QString logFilter, listlogFilters){ 
-				if (message.contains(logFilter, Qt::CaseInsensitive)){
-					shouldWeSkipLine = false;
-					break;
-				}
-			}
-		}
+    if (!logFile)
+        return;
+    
+    QString callerString;
+    if (caller)
+        callerString = QString::number((qulonglong) caller, 16) + " ";
+        
+    //filter out all log entries based on values in configuration file
+    QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
+    bool shouldWeWriteLog = settings->value("server/writelog").toBool();
+    QString logFilters = settings->value("server/logfilters").toString();
+    QStringList listlogFilters = logFilters.split(",", QString::SkipEmptyParts); 
+    bool shouldWeSkipLine = false; 
+    
+    if (!shouldWeWriteLog)
+        return;
 
-		if (shouldWeSkipLine)
-			return;
+    if (!logFilters.trimmed().isEmpty()){
+        shouldWeSkipLine = true;
+        foreach(QString logFilter, listlogFilters){ 
+            if (message.contains(logFilter, Qt::CaseInsensitive)){
+                shouldWeSkipLine = false;
+                break;
+            }
+        }
+    }
 
-		bufferMutex.lock();
-               	buffer.append(QDateTime::currentDateTime().toString() + " " + callerString + message);
-               	bufferMutex.unlock();
-               	emit sigFlushBuffer();
-	}
+    if (shouldWeSkipLine)
+        return;
+
+    bufferMutex.lock();
+    buffer.append(QDateTime::currentDateTime().toString() + " " + callerString + message);
+    bufferMutex.unlock();
+    emit sigFlushBuffer();
 }
 
 void ServerLogger::flushBuffer()
 {
-	if (flushRunning)
-		return;
-	
-	flushRunning = true;
-	QTextStream stream(logFile);
-	forever {
-		bufferMutex.lock();
-		if (buffer.isEmpty()) {
-			bufferMutex.unlock();
-			flushRunning = false;
-			return;
-		}
-		QString message = buffer.takeFirst();
-		bufferMutex.unlock();
-		
-		stream << message << "\n";
-		stream.flush();
-		
-		if (logToConsole)
-			std::cout << message.toStdString() << std::endl;
-	}
+    if (flushRunning)
+        return;
+    
+    flushRunning = true;
+    QTextStream stream(logFile);
+    forever {
+        bufferMutex.lock();
+        if (buffer.isEmpty()) {
+            bufferMutex.unlock();
+            flushRunning = false;
+            return;
+        }
+        QString message = buffer.takeFirst();
+        bufferMutex.unlock();
+        
+        stream << message << "\n";
+        stream.flush();
+        
+        if (logToConsole)
+            std::cout << message.toStdString() << std::endl;
+    }
 }
 
 void ServerLogger::hupSignalHandler(int /*unused*/)
 {
 #ifdef Q_OS_UNIX
-	if (!logFile)
-		return;
-	
-	char a = 1;
-	::write(sigHupFD[0], &a, sizeof(a));
+    if (!logFile)
+        return;
+    
+    char a = 1;
+    ::write(sigHupFD[0], &a, sizeof(a));
 #endif
 }
 
 void ServerLogger::handleSigHup()
 {
 #ifdef Q_OS_UNIX
-	if (!logFile)
-		return;
-	
-	snHup->setEnabled(false);
-	char tmp;
-	::read(sigHupFD[1], &tmp, sizeof(tmp));
-	
-	logFile->close();
-	logFile->open(QIODevice::Append);
-	
-	snHup->setEnabled(true);
+    if (!logFile)
+        return;
+    
+    snHup->setEnabled(false);
+    char tmp;
+    ::read(sigHupFD[1], &tmp, sizeof(tmp));
+    
+    logFile->close();
+    logFile->open(QIODevice::Append);
+    
+    snHup->setEnabled(true);
 #endif
 }
 
