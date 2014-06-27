@@ -5,6 +5,8 @@ logfile=server.log
 name="My Cockatrice server"
 id=1
 number_pools=1
+writelog=1
+logfilters=""
 
 [servernetwork]
 active=0
