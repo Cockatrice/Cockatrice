@@ -139,7 +139,7 @@ elseif(WIN32)
     set(CPACK_NSIS_HELP_LINK "https://github.com/Daenyth/Cockatrice")
     set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/Daenyth/Cockatrice")
     set(CPACK_NSIS_CONTACT "Daenyth+github@gmail.com")
-    set(CPACK_NSIS_MODIFY_PATH ON)
+    set(CPACK_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/nsis")
 endif()
 
 include(CPack)
