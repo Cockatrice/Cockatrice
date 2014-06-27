@@ -52,8 +52,10 @@ if(Qt5Widgets_FOUND)
         list(APPEND SERVATRICE_LIBS Sql)
     endif()
 
-    # guess plugins directory
+    # guess plugins and libraries directory
     set(QT_PLUGINS_DIR "${Qt5Widgets_DIR}/../../../plugins")
+    get_target_property(QT_LIBRARY_DIR Qt5::Core LOCATION)
+    get_filename_component(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} PATH)
 endif()
 
 SET(QT_DONT_USE_QTGUI TRUE)
@@ -130,5 +132,37 @@ Translations = Resources/translations\")
     set(BU_CHMOD_BUNDLE_ITEMS ON)
     include(BundleUtilities)
     fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/servatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+    " COMPONENT Runtime)
+endif()
+
+if(WIN32)
+    # these needs to be relative to CMAKE_INSTALL_PREFIX
+    set(plugin_dest_dir Plugins)
+    set(qtconf_dest_dir .)
+
+    # note: no codecs in qt5
+    # note: phonon_backend => mediaservice
+    # note: needs platform on osx
+
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*d\\.dll")
+    else()
+        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*[^d]\\.dll")
+    endif()
+
+    install(CODE "
+        file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
+Plugins = Plugins
+Translations = Resources/translations\")
+    " COMPONENT Runtime)
+
+    install(CODE "
+        file(GLOB_RECURSE QTPLUGINS
+        \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
+    set(BU_CHMOD_BUNDLE_ITEMS ON)
+    include(BundleUtilities)
+    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/servatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
     " COMPONENT Runtime)
 endif()
