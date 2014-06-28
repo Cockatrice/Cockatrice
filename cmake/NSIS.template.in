@@ -11,11 +11,11 @@ SetCompressor /SOLID lzma
 InstallDir "$PROGRAMFILES\Cockatrice"
 
 !define MUI_ABORTWARNING
-!define MUI_WELCOMEFINISHPAGE_BITMAP "${NSIS_SOURCE_PATH}\nsis\leftimage.bmp"
-!define MUI_UNWELCOMEFINISHPAGE_BITMAP "${NSIS_SOURCE_PATH}\nsis\leftimage.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "${NSIS_SOURCE_PATH}\cmake\leftimage.bmp"
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "${NSIS_SOURCE_PATH}\cmake\leftimage.bmp"
 !define MUI_HEADERIMAGE
-!define MUI_HEADERIMAGE_BITMAP "${NSIS_SOURCE_PATH}\nsis\headerimage.bmp"
-!define MUI_HEADERIMAGE_UNBITMAP "${NSIS_SOURCE_PATH}\nsis\headerimage.bmp"
+!define MUI_HEADERIMAGE_BITMAP "${NSIS_SOURCE_PATH}\cmake\headerimage.bmp"
+!define MUI_HEADERIMAGE_UNBITMAP "${NSIS_SOURCE_PATH}\cmake\headerimage.bmp"
 !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of Cockatrice.$\r$\n$\r$\nClick Next to continue."
 !define MUI_FINISHPAGE_RUN "$INSTDIR/oracle.exe"
 !define MUI_FINISHPAGE_RUN_TEXT "Run card database downloader now"

@@ -90,7 +90,7 @@ SET(cockatrice_SOURCES
     src/qt-json/json.cpp
     src/soundengine.cpp
     src/pending_command.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
+    ${VERSION_STRING_CPP}
 )
 
 if (UNIX AND NOT APPLE)
@@ -130,9 +130,8 @@ set(COCKATRICE_LIBS)
 # Qt4 stuff
 if(Qt4_FOUND)
     if (NOT QT_QTMULTIMEDIA_FOUND)
-        SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
         FIND_PACKAGE(QtMobility REQUIRED)
-    endif (NOT QT_QTMULTIMEDIA_FOUND)
+    endif()
 
     SET(QT_USE_QTNETWORK TRUE)
     SET(QT_USE_QTMULTIMEDIA TRUE)
@@ -256,11 +255,6 @@ elseif(WIN32)
         INSTALL(TARGETS cockatrice RUNTIME DESTINATION ./)
         INSTALL(FILES ${cockatrice_QM} DESTINATION ./translations)
 endif()
-
-add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp ${CMAKE_CURRENT_BINARY_DIR}/version_string.h
-    COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/../common/getversion.cmake
-)
 
 if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX

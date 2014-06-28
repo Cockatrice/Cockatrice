@@ -4,8 +4,6 @@
 
 PROJECT(servatrice)
 
-# cmake module for libgcrypt is included in current directory
-SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 FIND_PACKAGE(Libgcrypt REQUIRED)
 
 SET(servatrice_SOURCES
@@ -17,7 +15,7 @@ SET(servatrice_SOURCES
     src/server_logger.cpp
     src/serversocketinterface.cpp
     src/isl_interface.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
+    ${VERSION_STRING_CPP}
 )
 
 set(SERVATRICE_LIBS)
@@ -84,12 +82,6 @@ if(Qt5Widgets_FOUND)
     endif()
     qt5_use_modules(servatrice ${SERVATRICE_LIBS})
 endif()
-
-#add_custom_target(versionheader ALL DEPENDS version_header)
-add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version_string.h ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
-    COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/../common/getversion.cmake
-)
 
 # install rules
 if(UNIX)

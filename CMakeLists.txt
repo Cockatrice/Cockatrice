@@ -20,12 +20,8 @@ if(POLICY CMP0048)
 endif()
 
 set(PROJECT_NAME "Cockatrice")
-set(PROJECT_VERSION_MAJOR 0)
-set(PROJECT_VERSION_MINOR 0)
-set(PROJECT_VERSION_PATCH 1)
-set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH} )
 
-# Defualt to "Release" build type
+# Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
 IF(DEFINED CMAKE_BUILD_TYPE)
    SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Type of build")
@@ -36,8 +32,18 @@ ENDIF()
 # A project name is needed for CPack
 PROJECT("${PROJECT_NAME}")
 
+
 # Set conventional loops
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+
+# Search path for cmake modules
+SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+# Retrieve git version hash
+include(getversion)
+
+# Create a header and a cpp file containing the version hash
+include(createversionfile)
 
 # Define a proper install path
 if(UNIX)
@@ -109,8 +115,8 @@ FIND_PACKAGE(Protobuf REQUIRED)
 set(CPACK_PACKAGE_CONTACT "Daenyth+github@gmail.com") 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PROJECT_NAME})
 set(CPACK_PACKAGE_VENDOR "Cockatrice Development Team")
-set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
+set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
@@ -133,17 +139,10 @@ if(UNIX)
     endif()
 elseif(WIN32)
     set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY "${PROJECT_NAME}\\\\${PROJECT_VERSION}")
-    set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\${PROJECT_NAME}.exe")
-    set(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} ${PROJECT_NAME}")
-    set(CPACK_NSIS_HELP_LINK "https://github.com/Daenyth/Cockatrice")
-    set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/Daenyth/Cockatrice")
-    set(CPACK_NSIS_CONTACT "Daenyth+github@gmail.com")
-    set(CPACK_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/nsis")
 
     # Configure file with custom definitions for NSIS.
     configure_file(
-        ${PROJECT_SOURCE_DIR}/nsis/NSIS.definitions.nsh.in
+        ${CMAKE_MODULE_PATH}/NSIS.definitions.nsh.in
         ${PROJECT_BINARY_DIR}/NSIS.definitions.nsh
     )
 endif()
