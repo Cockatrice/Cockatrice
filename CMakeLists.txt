@@ -140,6 +140,12 @@ elseif(WIN32)
     set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/Daenyth/Cockatrice")
     set(CPACK_NSIS_CONTACT "Daenyth+github@gmail.com")
     set(CPACK_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/nsis")
+
+    # Configure file with custom definitions for NSIS.
+    configure_file(
+        ${PROJECT_SOURCE_DIR}/nsis/NSIS.definitions.nsh.in
+        ${PROJECT_BINARY_DIR}/NSIS.definitions.nsh
+    )
 endif()
 
 include(CPack)
