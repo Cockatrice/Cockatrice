@@ -128,7 +128,7 @@ if(UNIX)
         set(CPACK_DMG_FORMAT "UDBZ")
         set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
         set(CPACK_SYSTEM_NAME "OSX")
-        set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
+        set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-osx_git-${PROJECT_VERSION}")
         set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/cockatrice/resources/appicon.icns")
     else()
         # linux
@@ -139,6 +139,7 @@ if(UNIX)
     endif()
 elseif(WIN32)
     set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
+    set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_win32_git-${PROJECT_VERSION}")
 
     # Configure file with custom definitions for NSIS.
     configure_file(
