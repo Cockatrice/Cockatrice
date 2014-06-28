@@ -2,9 +2,6 @@
 !include "MUI2.nsh"
 !include "FileFunc.nsh"
 
-!define /date TIMESTAMP "%Y%m%d"
-!searchparse /file ../../../cockatrice/version_string.cpp '= "' VERSION '";'
-
 Name "${NSIS_PROJECT_NAME}"
 OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
 SetCompressor /SOLID lzma
