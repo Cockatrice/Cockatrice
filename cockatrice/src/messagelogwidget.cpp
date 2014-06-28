@@ -86,12 +86,16 @@ void MessageLogWidget::logLeaveSpectator(QString name)
     appendHtml(tr("%1 is not watching the game any more.").arg(sanitizeHtml(name)));
 }
 
-void MessageLogWidget::logDeckSelect(Player *player, QString deckHash)
+void MessageLogWidget::logDeckSelect(Player *player, QString deckHash, int sideboardSize)
 {
-    if (isFemale(player))
-        appendHtml(tr("%1 has loaded a deck (%2).", "female").arg(sanitizeHtml(player->getName())).arg(deckHash));
+    const char* gender = isFemale(player) ? "female" : "male";
+    if (sideboardSize < 0)
+        appendHtml(tr("%1 has loaded a deck (%2).", gender).arg(sanitizeHtml(player->getName())).arg(deckHash));
     else
-        appendHtml(tr("%1 has loaded a deck (%2).", "male").arg(sanitizeHtml(player->getName())).arg(deckHash));
+        appendHtml(tr("%1 has loaded a deck with (%2) sideboard cards (%3).", gender).
+                arg(sanitizeHtml(player->getName())).
+                arg(sideboardSize).
+                arg(deckHash));
 }
 
 void MessageLogWidget::logReadyStart(Player *player)

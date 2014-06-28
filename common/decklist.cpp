@@ -633,12 +633,27 @@ QStringList DeckList::getCardList() const
 	return result.toList();
 }
 
+int DeckList::getSideboardSize() const
+{
+    int size = 0;
+    for (int i = 0; i < root->size(); ++i) {
+        InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
+        if (node->getName() != "side")
+            continue;
+		for (int j = 0; j < node->size(); j++) {
+            DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
+            size += card->getNumber();
+        }
+    }
+    return size;
+}
+
 DecklistCardNode *DeckList::addCard(const QString &cardName, const QString &zoneName)
 {
 	InnerDecklistNode *zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
 	if (!zoneNode)
 		zoneNode = new InnerDecklistNode(zoneName, root);
-	
+
 	DecklistCardNode *node = new DecklistCardNode(cardName, 1, zoneNode);
 	updateDeckHash();
 	return node;

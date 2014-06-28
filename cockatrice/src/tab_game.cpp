@@ -1012,7 +1012,10 @@ void TabGame::eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &
             break;
         }
         case GameEventContext::DECK_SELECT: {
-            messageLog->logDeckSelect(player, QString::fromStdString(context.GetExtension(Context_DeckSelect::ext).deck_hash()));
+            Context_DeckSelect deckSelect = context.GetExtension(Context_DeckSelect::ext);
+            messageLog->logDeckSelect(player,
+                    QString::fromStdString(deckSelect.deck_hash()),
+                    deckSelect.sideboard_size());
             break;
         }
         case GameEventContext::SET_SIDEBOARD_LOCK: {
