@@ -13,4 +13,6 @@ extern QString translationPath;
 
 void installNewTranslator();
 
+bool settingsValid();
+
 #endif

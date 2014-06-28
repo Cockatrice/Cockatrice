@@ -64,7 +64,7 @@ void GameEventStorage::sendToGame(Server_Game *game)
 }
 
 ResponseContainer::ResponseContainer(int _cmdId)
-        : responseExtension(0), cmdId(_cmdId)
+        : cmdId(_cmdId), responseExtension(0)
 {
 }
 

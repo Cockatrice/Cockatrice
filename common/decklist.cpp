@@ -180,6 +180,7 @@ bool InnerDecklistNode::compare(AbstractDecklistNode *other) const
 		case 2:
 			return comparePrice(other);
 	}
+    return 0;
 }
 
 bool InnerDecklistNode::compareNumber(AbstractDecklistNode *other) const
@@ -226,6 +227,7 @@ bool AbstractDecklistCardNode::compare(AbstractDecklistNode *other) const
 		case ByPrice:
 			return compareTotalPrice(other);
 	}
+    return 0;
 }
 
 bool AbstractDecklistCardNode::compareNumber(AbstractDecklistNode *other) const
@@ -351,6 +353,7 @@ DeckList::DeckList()
 	root = new InnerDecklistNode;
 }
 
+// TODO: http://qt-project.org/doc/qt-4.8/qobject.html#no-copy-constructor-or-assignment-operator
 DeckList::DeckList(const DeckList &other)
 	: name(other.name),
 	  comments(other.comments),

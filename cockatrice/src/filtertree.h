@@ -66,7 +66,7 @@ public:
     const CardFilter::Attr attr;
 
     LogicMap(CardFilter::Attr a, FilterTree *parent)
-        : attr(a), p(parent) {}
+        : p(parent), attr(a) {}
     const FilterItemList *findTypeList(CardFilter::Type type) const;
     FilterItemList *typeList(CardFilter::Type type);
     FilterTreeNode *parent() const;
@@ -81,7 +81,7 @@ public:
     const CardFilter::Type type;
 
     FilterItemList(CardFilter::Type t, LogicMap *parent)
-        : type(t), p(parent) {}
+        : p(parent), type(t) {}
     CardFilter::Attr attr() const { return p->attr; }
     FilterTreeNode *parent() const { return p; }
     int termIndex(const QString &term) const;

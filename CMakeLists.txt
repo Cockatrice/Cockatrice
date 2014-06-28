@@ -58,8 +58,8 @@ IF(MSVC)
     #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
 ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
     # linux/gcc, bsd/gcc, windows/mingw
-    set(CMAKE_CXX_FLAGS_RELEASE "-s -O2")
-    set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0")
+    set(CMAKE_CXX_FLAGS_RELEASE "-s -O2 -Wall -Wextra -pedantic -Werror -Wcast-align -Wmissing-declarations -Winline -Wno-long-long -Wno-error=extra -Wno-unused-parameter -Wno-inline -Wno-delete-non-virtual-dtor -Wno-error=sign-compare -Wno-reorder -Wno-missing-declarations")
+    set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra -pedantic -Werror -Wcast-align -Wmissing-declarations -Winline -Wno-long-long -Wno-error=extra -Wno-error=unused-parameter -Wno-inline -Wno-error=delete-non-virtual-dtor -W-noerror=sign-compare -Wno-error=reorder -Wno-error=missing-declarations")
 ELSE()
     # other: osx/llvm, bsd/llvm
     set(CMAKE_CXX_FLAGS_RELEASE "-O2")

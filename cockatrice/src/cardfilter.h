@@ -26,9 +26,9 @@ public:
     };
 
 private:
+    QString trm;
     enum Type t;
     enum Attr a;
-    QString trm;
 
 public:
     CardFilter(QString term, Type type, Attr attr) : trm(term), t(type), a(attr) {};

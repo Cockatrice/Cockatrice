@@ -55,7 +55,7 @@ QString translationPath = TRANSLATION_PATH;
 QString translationPath = QString();
 #endif
 
-void myMessageOutput(QtMsgType /*type*/, const char *msg)
+static void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
     QFile file("qdebug.txt");
     file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
