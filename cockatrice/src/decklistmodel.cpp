@@ -342,6 +342,9 @@ void DeckListModel::sort(int column, Qt::SortOrder order)
         break;
     case 2:
         sortMethod = ByPrice;
+        break;
+    default:
+        sortMethod = ByName;
     }
     root->setSortMethod(sortMethod);
     sortHelper(root, order);

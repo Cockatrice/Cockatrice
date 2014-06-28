@@ -160,7 +160,9 @@ public:
 	void cleanList();
 	bool isEmpty() const { return root->isEmpty() && name.isEmpty() && comments.isEmpty() && sideboardPlans.isEmpty(); }
 	QStringList getCardList() const;
-	
+
+    int getSideboardSize() const;
+
 	QString getDeckHash() const { return deckHash; }
 	void updateDeckHash();
 

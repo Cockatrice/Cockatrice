@@ -16,7 +16,7 @@
 
 const int CardDatabase::versionNeeded = 3;
 
-QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
+static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
 {
     xml.writeStartElement("set");
     xml.writeTextElement("name", set->getShortName());
@@ -275,18 +275,18 @@ CardInfo::CardInfo(CardDatabase *_db,
                    bool _cipt,
                    int _tableRow,
                    const SetList &_sets,
-                   QMap<QString, int> _muIds)
+                   MuidMap _muIds)
     : db(_db),
       name(_name),
       isToken(_isToken),
       sets(_sets),
-      muIds(_muIds),
       manacost(_manacost),
       cardtype(_cardtype),
       powtough(_powtough),
       text(_text),
       colors(_colors),
       loyalty(_loyalty),
+      muIds(_muIds),
       cipt(_cipt),
       tableRow(_tableRow),
       pixmap(NULL)
@@ -434,7 +434,7 @@ int CardInfo::getPreferredMuId()
     return muIds[getPreferredSet()->getShortName()];
 }
 
-QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
+static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 {
     xml.writeStartElement("card");
     xml.writeTextElement("name", info->getName());
@@ -473,7 +473,7 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 }
 
 CardDatabase::CardDatabase(QObject *parent)
-    : QObject(parent), loadStatus(NotLoaded), noCard(0)
+    : QObject(parent), noCard(0), loadStatus(NotLoaded)
 {
     connect(settingsCache, SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
     connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabase()));
@@ -610,7 +610,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
         if (xml.name() == "card") {
             QString name, manacost, type, pt, text;
             QStringList colors;
-            QMap<QString, int> muids;
+            MuidMap muids;
             SetList sets;
             int tableRow = 0;
             int loyalty = 0;

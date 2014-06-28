@@ -56,7 +56,7 @@ QString translationPath = QString();
 #endif
 
 #if QT_VERSION < 0x050000
-void myMessageOutput(QtMsgType /*type*/, const char *msg)
+static void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
     QFile file("qdebug.txt");
     file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
@@ -65,7 +65,7 @@ void myMessageOutput(QtMsgType /*type*/, const char *msg)
     file.close();
 }
 #else
-void myMessageOutput(QtMsgType /*type*/, const QMessageLogContext &, const QString &msg)
+static void myMessageOutput(QtMsgType /*type*/, const QMessageLogContext &, const QString &msg)
 {
     QFile file("qdebug.txt");
     file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);

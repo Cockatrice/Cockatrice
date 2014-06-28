@@ -657,6 +657,7 @@ Response::ResponseCode Server_Player::cmdDeckSelect(const Command_DeckSelect &cm
 	
 	Context_DeckSelect context;
 	context.set_deck_hash(deck->getDeckHash().toStdString());
+    context.set_sideboard_size(deck->getSideboardSize());
 	ges.setGameEventContext(context);
 	
 	Response_DeckDownload *re = new Response_DeckDownload;
