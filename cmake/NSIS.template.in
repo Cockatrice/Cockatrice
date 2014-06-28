@@ -77,6 +77,9 @@ SetShellVarContext all
 	Delete "$INSTDIR\Usermanual.pdf"
 	Delete "$INSTDIR\libprotobuf.lib"
 	Delete "$INSTDIR\Qt*.dll"
+	Delete "$INSTDIR\icu*.dll"
+	Delete "$INSTDIR\qt.conf"
+	Delete "$INSTDIR\qdebug.txt"
 	RMDir "$INSTDIR"
 
 	RMDir "$SMPROGRAMS\Cockatrice"
