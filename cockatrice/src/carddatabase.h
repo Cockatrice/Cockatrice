@@ -20,6 +20,9 @@ class QNetworkRequest;
 
 typedef QMap<QString, QString> QStringMap;
 
+// If we don't typedef this, CardInfo::CardInfo will refuse to compile on OS X < 10.9
+typedef QMap<QString, int> MuidMap;
+
 class CardSet : public QList<CardInfo *> {
 private:
     QString shortName, longName;
@@ -100,7 +103,7 @@ private:
     QString text;
     QStringList colors;
     int loyalty;
-    QMap<QString, int> muIds;
+    MuidMap muIds;
     bool cipt;
     int tableRow;
     QPixmap *pixmap;
@@ -118,7 +121,7 @@ public:
         bool _cipt = false,
         int _tableRow = 0,
         const SetList &_sets = SetList(),
-        QMap<QString, int> muids = QMap<QString, int>());
+        MuidMap muids = MuidMap());
     ~CardInfo();
     const QString &getName() const { return name; }
     bool getIsToken() const { return isToken; }
