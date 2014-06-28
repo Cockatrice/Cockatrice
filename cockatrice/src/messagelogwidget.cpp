@@ -92,7 +92,7 @@ void MessageLogWidget::logDeckSelect(Player *player, QString deckHash, int sideb
     if (sideboardSize < 0)
         appendHtml(tr("%1 has loaded a deck (%2).", gender).arg(sanitizeHtml(player->getName())).arg(deckHash));
     else
-        appendHtml(tr("%1 has loaded a deck with (%2) sideboard cards (%3).", gender).
+        appendHtml(tr("%1 has loaded a deck with %2 sideboard cards (%3).", gender).
                 arg(sanitizeHtml(player->getName())).
                 arg(sideboardSize).
                 arg(deckHash));
