@@ -17,7 +17,7 @@ public:
 	bool getImport() const { return import; }
 	void setImport(bool _import) { import = _import; }
 	SetToDownload(const QString &_shortName, const QString &_longName, const QVariant &_cards, bool _import)
-		: shortName(_shortName), longName(_longName), cards(_cards), import(_import) { }
+		: shortName(_shortName), longName(_longName), import(_import), cards(_cards)  { }
 	bool operator<(const SetToDownload &set) const { return longName.compare(set.longName, Qt::CaseInsensitive) < 0; }
 };
 

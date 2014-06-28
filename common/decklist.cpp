@@ -180,6 +180,7 @@ bool InnerDecklistNode::compare(AbstractDecklistNode *other) const
 		case 2:
 			return comparePrice(other);
 	}
+    return 0;
 }
 
 bool InnerDecklistNode::compareNumber(AbstractDecklistNode *other) const
@@ -226,6 +227,7 @@ bool AbstractDecklistCardNode::compare(AbstractDecklistNode *other) const
 		case ByPrice:
 			return compareTotalPrice(other);
 	}
+    return 0;
 }
 
 bool AbstractDecklistCardNode::compareNumber(AbstractDecklistNode *other) const
@@ -351,6 +353,7 @@ DeckList::DeckList()
 	root = new InnerDecklistNode;
 }
 
+// TODO: http://qt-project.org/doc/qt-4.8/qobject.html#no-copy-constructor-or-assignment-operator
 DeckList::DeckList(const DeckList &other)
 	: name(other.name),
 	  comments(other.comments),
@@ -630,12 +633,27 @@ QStringList DeckList::getCardList() const
 	return result.toList();
 }
 
+int DeckList::getSideboardSize() const
+{
+    int size = 0;
+    for (int i = 0; i < root->size(); ++i) {
+        InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
+        if (node->getName() != "side")
+            continue;
+		for (int j = 0; j < node->size(); j++) {
+            DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
+            size += card->getNumber();
+        }
+    }
+    return size;
+}
+
 DecklistCardNode *DeckList::addCard(const QString &cardName, const QString &zoneName)
 {
 	InnerDecklistNode *zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
 	if (!zoneNode)
 		zoneNode = new InnerDecklistNode(zoneName, root);
-	
+
 	DecklistCardNode *node = new DecklistCardNode(cardName, 1, zoneNode);
 	updateDeckHash();
 	return node;

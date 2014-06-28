@@ -48,7 +48,7 @@ public slots:
     void logKicked();
     void logJoinSpectator(QString name);
     void logLeaveSpectator(QString name);
-    void logDeckSelect(Player *player, QString deckHash);
+    void logDeckSelect(Player *player, QString deckHash, int sideboardSize);
     void logReadyStart(Player *player);
     void logNotReadyStart(Player *player);
     void logSetSideboardLock(Player *player, bool locked);
