@@ -20,7 +20,7 @@ class QNetworkRequest;
 
 typedef QMap<QString, QString> QStringMap;
 
-// If we don't typedef this, CardInfo::CardInfo will refuse to compile on OS X.
+// If we don't typedef this, CardInfo::CardInfo will refuse to compile on OS X < 10.9
 typedef QMap<QString, int> MuidMap;
 
 class CardSet : public QList<CardInfo *> {
