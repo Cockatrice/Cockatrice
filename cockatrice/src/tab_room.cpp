@@ -97,6 +97,10 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     const int gameListSize = info.game_list_size();
     for (int i = 0; i < gameListSize; ++i)
         gameSelector->processGameInfo(info.game_list(i));
+
+    setFocusProxy(sayEdit);
+    chatView->setFocusProxy(sayEdit);
+    sayEdit->setFocus();
 }
 
 TabRoom::~TabRoom()
