@@ -53,6 +53,7 @@ private:
     bool soundEnabled;
     QString soundPath;
     bool priceTagFeature;
+    int priceTagSource;
     bool ignoreUnregisteredUsers;
     QString picUrl;
     QString picUrlHq;
@@ -87,6 +88,7 @@ public:
     bool getSoundEnabled() const { return soundEnabled; }
     QString getSoundPath() const { return soundPath; }
     bool getPriceTagFeature() const { return priceTagFeature; }
+    int getPriceTagSource() const { return priceTagSource; }
     bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
     QString getPicUrl() const { return picUrl; }
     QString getPicUrlHq() const { return picUrlHq; }
@@ -121,6 +123,7 @@ public slots:
     void setSoundEnabled(int _soundEnabled);
     void setSoundPath(const QString &_soundPath);
     void setPriceTagFeature(int _priceTagFeature);
+    void setPriceTagSource(int _priceTagSource);
     void setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers);
     void setPicUrl(const QString &_picUrl);
     void setPicUrlHq(const QString &_picUrlHq);

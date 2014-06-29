@@ -45,6 +45,7 @@ SettingsCache::SettingsCache()
     soundPath = settings->value("sound/path").toString();
 
     priceTagFeature = settings->value("deckeditor/pricetags", false).toBool();
+    priceTagSource = settings->value("deckeditor/pricetagsource", 0).toInt();
 
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
 }
@@ -245,6 +246,12 @@ void SettingsCache::setPriceTagFeature(int _priceTagFeature)
     priceTagFeature = _priceTagFeature;
     settings->setValue("deckeditor/pricetags", priceTagFeature);
     emit priceTagFeatureChanged(priceTagFeature);
+}
+
+void SettingsCache::setPriceTagSource(int _priceTagSource)
+{
+    priceTagSource = _priceTagSource;
+    settings->setValue("deckeditor/pricetagsource", priceTagSource);
 }
 
 void SettingsCache::setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers)

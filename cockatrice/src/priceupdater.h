@@ -11,18 +11,38 @@ class QNetworkAccessManager;
  *
  * @author Marcio Ribeiro <mmr@b1n.org>
  */
-class PriceUpdater : public QObject
+class AbstractPriceUpdater : public QWidget
 {
     Q_OBJECT
-private:
+protected:
     const DeckList *deck;
     QNetworkAccessManager *nam;
 signals:
     void finishedUpdate();
-private slots:
-    void downloadFinished();
+protected slots:
+    virtual void downloadFinished() = 0;
 public:
-    PriceUpdater(const DeckList *deck);
-    void updatePrices();
+    AbstractPriceUpdater(const DeckList *deck);
+    virtual void updatePrices() = 0;
+};
+
+class BLPPriceUpdater : public AbstractPriceUpdater
+{
+    Q_OBJECT
+protected:
+    virtual void downloadFinished();
+public:
+    BLPPriceUpdater(const DeckList *deck);
+    virtual void updatePrices();
+};
+
+class DBPriceUpdater : public AbstractPriceUpdater
+{
+    Q_OBJECT
+protected:
+    virtual void downloadFinished();
+public:
+    DBPriceUpdater(const DeckList *deck);
+    virtual void updatePrices();
 };
 #endif

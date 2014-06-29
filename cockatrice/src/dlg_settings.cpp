@@ -18,6 +18,7 @@
 #include <QInputDialog>
 #include <QSpinBox>
 #include <QDialogButtonBox>
+#include <QRadioButton>
 #include <QDebug>
 #include "carddatabase.h"
 #include "dlg_settings.h"
@@ -531,9 +532,27 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     priceTagsCheckBox = new QCheckBox;
     priceTagsCheckBox->setChecked(settingsCache->getPriceTagFeature());
     connect(priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
-    
+
+    priceTagSource0 = new QRadioButton;
+    priceTagSource1 = new QRadioButton;
+
+    switch(settingsCache->getPriceTagSource())
+    {
+        case 0:
+            priceTagSource0->setChecked(true);
+            break;
+        case 1:
+            priceTagSource1->setChecked(true);
+            break;
+    }
+
+    connect(priceTagSource0, SIGNAL(toggled(bool)), this, SLOT(radioPriceTagSourceClicked(bool)));
+    connect(priceTagSource1, SIGNAL(toggled(bool)), this, SLOT(radioPriceTagSourceClicked(bool)));
+
     QGridLayout *generalGrid = new QGridLayout;
     generalGrid->addWidget(priceTagsCheckBox, 0, 0);
+    generalGrid->addWidget(priceTagSource0, 1, 0);
+    generalGrid->addWidget(priceTagSource1, 2, 0);
     
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -546,8 +565,24 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
 void DeckEditorSettingsPage::retranslateUi()
 {
-    priceTagsCheckBox->setText(tr("Enable &price tag feature (using data from blacklotusproject.com)"));
+    priceTagsCheckBox->setText(tr("Enable &price tag feature"));
+    priceTagSource0->setText(tr("using data from blacklotusproject.com"));
+    priceTagSource1->setText(tr("using data from deckbrew.com"));
     generalGroupBox->setTitle(tr("General"));
+}
+
+void DeckEditorSettingsPage::radioPriceTagSourceClicked(bool checked)
+{
+    if(!checked)
+        return;
+
+    int source=0;
+    if(priceTagSource0->isChecked())
+        source=0;
+    if(priceTagSource1->isChecked())
+        source=1;
+
+    QMetaObject::invokeMethod( settingsCache, "setPriceTagSource", Qt::QueuedConnection, Q_ARG(int, source));
 }
 
 MessagesSettingsPage::MessagesSettingsPage()
