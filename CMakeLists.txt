@@ -89,8 +89,14 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     ADD_DEFINITIONS("-DSFMT_MEXP=19937")
 ENDIF()
 
-#Find Qt and enable the needed features
-FIND_PACKAGE(Qt5Widgets)
+# Find Qt and enable the needed features
+# Default is Qt5 unless WITH_QT4 option is enabled
+option(WITH_QT4 "Force thr use of Qt4 libraries" OFF)
+
+IF(NOT WITH_QT4)
+    FIND_PACKAGE(Qt5Widgets)
+ENDIF()
+
 IF(Qt5Widgets_FOUND)
     MESSAGE(STATUS "Found Qt ${Qt5Widgets_VERSION_STRING}")
 ELSE()
