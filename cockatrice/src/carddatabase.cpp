@@ -151,14 +151,28 @@ void PictureLoader::processLoadQueue()
 
 QString PictureLoader::getPicUrl(CardInfo *card)
 {
-    if (!picDownload) return 0;
+    if (!picDownload) return QString("");
 
     QString picUrl = picDownloadHq ? settingsCache->getPicUrlHq() : settingsCache->getPicUrl();
+
     picUrl.replace("!name!", QUrl::toPercentEncoding(card->getCorrectedName()));
+
     CardSet *set = card->getPreferredSet();
-    picUrl.replace("!setcode!", QUrl::toPercentEncoding(set->getShortName()));
-    picUrl.replace("!setname!", QUrl::toPercentEncoding(set->getLongName()));
-    picUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(card->getPreferredMuId())));
+    if (set) {
+        picUrl.replace("!setcode!", QUrl::toPercentEncoding(set->getShortName()));
+        picUrl.replace("!setname!", QUrl::toPercentEncoding(set->getLongName()));
+    }
+    int muid = card->getPreferredMuId();
+    if (muid)
+        picUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(card->getPreferredMuId())));
+
+    if (picUrl.contains("!name!") ||
+            picUrl.contains("!setcode!") ||
+            picUrl.contains("!setname!") ||
+            picUrl.contains("!cardid!")) {
+        qDebug() << "Insufficient card data to download" << card->getName() << "Url:" << picUrl;
+        return QString("");
+    }
 
     return picUrl;
 }
@@ -175,8 +189,11 @@ void PictureLoader::startNextPicDownload()
 
     cardBeingDownloaded = cardsToDownload.takeFirst();
 
-    // TODO: Do something useful when picUrl is 0 or empty, etc
     QString picUrl = getPicUrl(cardBeingDownloaded.getCard());
+    if (picUrl.isEmpty()) {
+        qDebug() << "No url for" << cardBeingDownloaded.getCard()->getName();
+        return;
+    }
 
     QUrl url(picUrl);
 
