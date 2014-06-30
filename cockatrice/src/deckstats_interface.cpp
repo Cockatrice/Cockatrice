@@ -7,8 +7,10 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 
-DeckStatsInterface::DeckStatsInterface(QObject *parent)
-    : QObject(parent)
+DeckStatsInterface::DeckStatsInterface(
+    CardDatabase &_cardDatabase,
+    QObject *parent
+) : QObject(parent), cardDatabase(_cardDatabase)
 {
     manager = new QNetworkAccessManager(this);
     connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(queryFinished(QNetworkReply *)));
@@ -42,7 +44,11 @@ void DeckStatsInterface::queryFinished(QNetworkReply *reply)
 void DeckStatsInterface::analyzeDeck(DeckList *deck)
 {
     QUrl params;
-    params.addQueryItem("deck", deck->writeToString_Plain());
+
+    DeckList deckWithoutTokens;
+    copyDeckWithoutTokens(*deck, deckWithoutTokens);
+
+    params.addQueryItem("deck", deckWithoutTokens.writeToString_Plain());
     QByteArray data;
     data.append(params.encodedQuery());
     
@@ -50,4 +56,31 @@ void DeckStatsInterface::analyzeDeck(DeckList *deck)
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     
     manager->post(request, data);
+}
+
+struct CopyIfNotAToken {
+    CardDatabase &cardDatabase;
+    DeckList &destination;
+
+    CopyIfNotAToken(
+        CardDatabase &_cardDatabase,
+        DeckList &_destination
+    ) : cardDatabase(_cardDatabase), destination(_destination) {};
+
+    void operator()(
+        const InnerDecklistNode *node,
+        const DecklistCardNode *card
+    ) const {
+        if (!cardDatabase.getCard(card->getName())->getIsToken()) {
+            destination.addCard(card->getName(), node->getName());
+        }
+    }
+};
+
+void DeckStatsInterface::copyDeckWithoutTokens(
+    const DeckList &source,
+    DeckList &destination
+) {
+    CopyIfNotAToken copyIfNotAToken(cardDatabase, destination);
+    source.forEachCard(copyIfNotAToken);
 }

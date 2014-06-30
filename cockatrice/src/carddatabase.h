@@ -186,7 +186,7 @@ public:
     CardSet *getSet(const QString &setName);
     QList<CardInfo *> getCardList() const { return cardHash.values(); }
     SetList getSetList() const;
-    LoadStatus loadFromFile(const QString &fileName, bool tokens = false);
+    LoadStatus loadFromFile(const QString &fileName);
     bool saveToFile(const QString &fileName, bool tokens = false);
     QStringList getAllColors() const;
     QStringList getAllMainCardTypes() const;
