@@ -7,6 +7,7 @@ id=1
 number_pools=1
 writelog=1
 logfilters=""
+regonly=0
 
 [servernetwork]
 active=0
