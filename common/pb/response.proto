@@ -23,7 +23,7 @@ message Response {
 		RespUserIsBanned = 19;
 		RespAccessDenied = 20;
 		RespUsernameInvalid = 21;
-		RespRegRequired = 22;
+		RespRegistrationRequired = 22;
 	}
 	enum ResponseType {
 		JOIN_ROOM = 1000;
