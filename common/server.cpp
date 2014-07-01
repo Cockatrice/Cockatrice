@@ -134,10 +134,11 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 		// don't interfere with registered user names though.
 		QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
     	bool requireReg = settings->value("server/regonly").toBool();
-    	if (requireReg)
+    	if (requireReg) {
     		qDebug("Login denied: registration required");
 			databaseInterface->unlockSessionTables();
     		return RegistrationRequired;
+    	}
     		
 		QString tempName = name;
 		int i = 0;
