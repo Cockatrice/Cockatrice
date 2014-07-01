@@ -132,7 +132,7 @@ bool Servatrice::initServer()
 {
 	serverName = settings->value("server/name").toString();
 	serverId = settings->value("server/id", 0).toInt();
-	regServerOnly = settings->value("server/regonly", 0).toBool();
+	bool regServerOnly = settings->value("server/regonly", 0).toBool();
 		
 	const QString authenticationMethodStr = settings->value("authentication/method").toString();
 	if (authenticationMethodStr == "sql") {
