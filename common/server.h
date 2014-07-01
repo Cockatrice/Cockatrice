@@ -27,7 +27,7 @@ class GameEventContainer;
 class CommandContainer;
 class Command_JoinGame;
 
-enum AuthenticationResult { NotLoggedIn = 0, PasswordRight = 1, UnknownUser = 2, WouldOverwriteOldSession = 3, UserIsBanned = 4, UsernameInvalid = 5 };
+enum AuthenticationResult { NotLoggedIn = 0, PasswordRight = 1, UnknownUser = 2, WouldOverwriteOldSession = 3, UserIsBanned = 4, UsernameInvalid = 5, RegistrationRequired = 6 };
 
 class Server : public QObject
 {
