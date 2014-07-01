@@ -1,7 +1,7 @@
 !include "MUI2.nsh"
 !include "FileFunc.nsh"
 
-!define /date TIMESTAMP "%Y%m%d" 
+!define /date TIMESTAMP "%Y%m%d"
 !searchparse /file ../build/cockatrice/version_string.cpp '= "' VERSION '";'
 
 Name "Cockatrice"
@@ -52,7 +52,7 @@ Section "Application" SecApplication
 
 	SetOutPath "$INSTDIR\zonebg"
 	File /r ..\zonebg\*.*
-	
+
 	SetOutPath "$INSTDIR\plugins"
 	SetOutPath "$INSTDIR\plugins\codecs"
 	File "${QTDIR}\plugins\codecs\qcncodecs4.dll"
@@ -67,7 +67,7 @@ Section "Application" SecApplication
 
 	SetOutPath "$INSTDIR\sounds"
 	File /r ..\sounds\*.*
-	
+
 	SetOutPath "$INSTDIR\translations"
 	File /r ..\build\cockatrice\*.qm
 
@@ -83,15 +83,15 @@ Section "Application" SecApplication
 SectionEnd
 
 Section "Update configuration" SecUpdateConfig
-	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "carddatabase" "$INSTDIR\cards.xml"
-	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "decks" "$INSTDIR\decks"
-	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "pics" "$INSTDIR\pics"
-	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\sound" "path" "$INSTDIR\sounds"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "carddatabase" "$APPDATA\Cockatrice\cards.xml"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "decks" "$APPDATA\Cockatrice\decks"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "pics" "$APPDATA\Cockatrice\pics"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\sound" "path" "$APPDATA\Cockatrice\sounds"
 SectionEnd
 
 Section "Start menu item" SecStartMenu
 	createDirectory "$SMPROGRAMS\Cockatrice"
-	createShortCut "$SMPROGRAMS\Cockatrice\Cockatrice.lnk" "$INSTDIR\cockatrice.exe"
+	createShortCut "$SMPROGRAMS\Cockatrice\Cockatrice.lnk" "$INSTDIR\cockatrice.exe" '--debug-output'
 	createShortCut "$SMPROGRAMS\Cockatrice\Oracle.lnk" "$INSTDIR\oracle.exe"
 	createShortCut "$SMPROGRAMS\Cockatrice\Usermanual.lnk" "$INSTDIR\Usermanual.pdf"
 SectionEnd
@@ -115,7 +115,7 @@ SetShellVarContext all
 	Delete "$INSTDIR\QtMultimedia4.dll"
 	RMDir "$INSTDIR"
 
-	RMDir /r "$SMPROGRAMS\Cockatrice"
+	RMDir "$SMPROGRAMS\Cockatrice"
 
 	DeleteRegKey HKCU "Software\Cockatrice"
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"

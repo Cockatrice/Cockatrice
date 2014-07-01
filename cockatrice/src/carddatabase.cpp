@@ -16,13 +16,7 @@
 
 const int CardDatabase::versionNeeded = 3;
 
-CardSet::CardSet(const QString &_shortName, const QString &_longName)
-    : shortName(_shortName), longName(_longName)
-{
-    updateSortKey();
-}
-
-QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
+static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
 {
     xml.writeStartElement("set");
     xml.writeTextElement("name", set->getShortName());
@@ -30,6 +24,24 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
     xml.writeEndElement();
 
     return xml;
+}
+
+CardSet::CardSet(const QString &_shortName, const QString &_longName)
+    : shortName(_shortName), longName(_longName)
+{
+    updateSortKey();
+}
+
+QString CardSet::getCorrectedShortName() const
+{
+    // Because windows is horrible.
+    QSet<QString> invalidFileNames;
+    invalidFileNames << "CON" << "PRN" << "AUX" << "NUL" << "COM1" << "COM2" <<
+        "COM3" << "COM4" << "COM5" << "COM6" << "COM7" << "COM8" << "COM9" <<
+        "LPT1" << "LPT2" << "LPT3" << "LPT4" << "LPT5" << "LPT6" << "LPT7" <<
+        "LPT8" << "LPT9";
+
+    return invalidFileNames.contains(shortName) ? shortName + "_" : shortName;
 }
 
 void CardSet::setSortKey(unsigned int _sortKey)
@@ -132,7 +144,7 @@ void PictureLoader::processLoadQueue()
                     }
                     continue;
                 }
-        
+
         emit imageLoaded(ptl.getCard(), image);
     }
 }
@@ -169,13 +181,17 @@ void PictureLoader::startNextPicDownload()
     QUrl url(picUrl);
 
     QNetworkRequest req(url);
-    qDebug() << "starting picture download:" << req.url();
+    qDebug() << "starting picture download:" << cardBeingDownloaded.getCard()->getName() << "Url:" << req.url();
     networkManager->get(req);
 }
 
 void PictureLoader::picDownloadFinished(QNetworkReply *reply)
 {
     QString picsPath = _picsPath;
+    if (reply->error()) {
+        qDebug() << "Download failed:" << reply->errorString();
+    }
+
     const QByteArray &picData = reply->readAll();
     QImage testImage;
     if (testImage.loadFromData(picData)) {
@@ -189,17 +205,17 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
             QDir dir(QString(picsPath + "/downloadedPics"));
             dir.mkdir(cardBeingDownloaded.getSetName());
         }
-        
+
         QString suffix;
         if (!cardBeingDownloaded.getStripped())
             suffix = ".full";
-        
+
         QFile newPic(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + ".jpg");
         if (!newPic.open(QIODevice::WriteOnly))
             return;
         newPic.write(picData);
         newPic.close();
-        
+
         emit imageLoaded(cardBeingDownloaded.getCard(), testImage);
     } else if (cardBeingDownloaded.getHq()) {
         qDebug() << "HQ: received invalid picture. URL:" << reply->request().url();
@@ -216,7 +232,7 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
         } else
             emit imageLoaded(cardBeingDownloaded.getCard(), QImage());
     }
-    
+
     reply->deleteLater();
     startNextPicDownload();
 }
@@ -224,7 +240,7 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
 void PictureLoader::loadImage(CardInfo *card, bool stripped)
 {
     QMutexLocker locker(&mutex);
-    
+
     loadQueue.append(PictureToLoad(card, stripped));
     emit startLoadQueue();
 }
@@ -259,18 +275,18 @@ CardInfo::CardInfo(CardDatabase *_db,
                    bool _cipt,
                    int _tableRow,
                    const SetList &_sets,
-                   QMap<QString, int> _muIds)
+                   MuidMap _muIds)
     : db(_db),
       name(_name),
       isToken(_isToken),
       sets(_sets),
-      muIds(_muIds),
       manacost(_manacost),
       cardtype(_cardtype),
       powtough(_powtough),
       text(_text),
       colors(_colors),
       loyalty(_loyalty),
+      muIds(_muIds),
       cipt(_cipt),
       tableRow(_tableRow),
       pixmap(NULL)
@@ -418,7 +434,7 @@ int CardInfo::getPreferredMuId()
     return muIds[getPreferredSet()->getShortName()];
 }
 
-QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
+static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 {
     xml.writeStartElement("card");
     xml.writeTextElement("name", info->getName());
@@ -457,7 +473,7 @@ QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 }
 
 CardDatabase::CardDatabase(QObject *parent)
-    : QObject(parent), loadStatus(NotLoaded), noCard(0)
+    : QObject(parent), noCard(0), loadStatus(NotLoaded)
 {
     connect(settingsCache, SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
     connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabase()));
@@ -594,7 +610,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
         if (xml.name() == "card") {
             QString name, manacost, type, pt, text;
             QStringList colors;
-            QMap<QString, int> muids;
+            MuidMap muids;
             SetList sets;
             int tableRow = 0;
             int loyalty = 0;

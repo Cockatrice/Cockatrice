@@ -20,12 +20,16 @@ class QNetworkRequest;
 
 typedef QMap<QString, QString> QStringMap;
 
+// If we don't typedef this, CardInfo::CardInfo will refuse to compile on OS X < 10.9
+typedef QMap<QString, int> MuidMap;
+
 class CardSet : public QList<CardInfo *> {
 private:
     QString shortName, longName;
     unsigned int sortKey;
 public:
     CardSet(const QString &_shortName = QString(), const QString &_longName = QString());
+    QString getCorrectedShortName() const;
     QString getShortName() const { return shortName; }
     QString getLongName() const { return longName; }
     int getSortKey() const { return sortKey; }
@@ -51,12 +55,10 @@ public:
     PictureToLoad(CardInfo *_card = 0, bool _stripped = false, bool _hq = true);
     CardInfo *getCard() const { return card; }
     bool getStripped() const { return stripped; }
-    QString getSetName() const { return sortedSets[setIndex]->getShortName(); }
+    QString getSetName() const { return sortedSets[setIndex]->getCorrectedShortName(); }
     bool nextSet();
-        
     bool getHq() const { return hq; }
     void setHq(bool _hq) { hq = _hq; }
-    
 };
 
 class PictureLoader : public QObject {
@@ -101,7 +103,7 @@ private:
     QString text;
     QStringList colors;
     int loyalty;
-    QMap<QString, int> muIds;
+    MuidMap muIds;
     bool cipt;
     int tableRow;
     QPixmap *pixmap;
@@ -119,7 +121,7 @@ public:
         bool _cipt = false,
         int _tableRow = 0,
         const SetList &_sets = SetList(),
-        QMap<QString, int> muids = QMap<QString, int>());
+        MuidMap muids = MuidMap());
     ~CardInfo();
     const QString &getName() const { return name; }
     bool getIsToken() const { return isToken; }

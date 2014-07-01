@@ -1,0 +1,10 @@
+language: cpp
+os:
+  - linux
+  - osx
+compiler:
+  - gcc
+  - clang
+script: mkdir build && cd build && cmake .. -DWITH_SERVER=1 && make
+install: ./travis-dependencies.sh
+cache: apt
