@@ -241,7 +241,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
 {
     switch (r) {
         case Response::RespWrongPassword:
-            QMessageBox::critical(this, tr("Error"), tr("Incorrect password, please try again."));
+            QMessageBox::critical(this, tr("Error"), tr("Invalid login data."));
             break;
         case Response::RespWouldOverwriteOldSession:
             QMessageBox::critical(this, tr("Error"), tr("There is already an active session using this user name.\nPlease close that session first and re-login."));
