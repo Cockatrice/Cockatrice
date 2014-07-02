@@ -14,6 +14,8 @@ class QNetworkAccessManager;
 class AbstractPriceUpdater : public QWidget
 {
     Q_OBJECT
+public:
+    enum PriceSource { BLPPriceSource, DBPriceSource };
 protected:
     const DeckList *deck;
     QNetworkAccessManager *nam;

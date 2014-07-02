@@ -648,10 +648,10 @@ void TabDeckEditor::actUpdatePrices()
 
     switch(settingsCache->getPriceTagSource())
     {
-        case 0:
+        case AbstractPriceUpdater::BLPPriceSource:
             up = new BLPPriceUpdater(deckModel->getDeckList());
             break;
-        case 1:
+        case AbstractPriceUpdater::DBPriceSource:
             up = new DBPriceUpdater(deckModel->getDeckList());
             break;
     }

@@ -24,6 +24,7 @@
 #include "dlg_settings.h"
 #include "main.h"
 #include "settingscache.h"
+#include "priceupdater.h"
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
@@ -538,10 +539,10 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
     switch(settingsCache->getPriceTagSource())
     {
-        case 0:
+        case AbstractPriceUpdater::BLPPriceSource:
             priceTagSource0->setChecked(true);
             break;
-        case 1:
+        case AbstractPriceUpdater::DBPriceSource:
             priceTagSource1->setChecked(true);
             break;
     }
@@ -578,11 +579,11 @@ void DeckEditorSettingsPage::radioPriceTagSourceClicked(bool checked)
     if(!checked)
         return;
 
-    int source=0;
+    int source=AbstractPriceUpdater::BLPPriceSource;
     if(priceTagSource0->isChecked())
-        source=0;
+        source=AbstractPriceUpdater::BLPPriceSource;
     if(priceTagSource1->isChecked())
-        source=1;
+        source=AbstractPriceUpdater::DBPriceSource;
 
     emit priceTagSourceChanged(source);
 }
