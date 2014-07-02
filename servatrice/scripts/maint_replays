@@ -1,6 +1,3 @@
 #!/bin/bash
-#RUN THIS SCRIPT TO REMOVE ALL COCKATRICE REPLAYS FROM THE DATABASE
-#--CAN BE SCHEDULED WITH CRONTAB
-
-mysql --defaults-file=./mysql.cnf -h localhost -e 'truncate table servatrice.cockatrice_replays'
-mysql --defaults-file=./mysql.cnf -h localhost -e 'truncate table servatrice.cockatrice_replays_access'
+# SCHEDULE WITH CRONTAB BASED ON TIME PERIOD REPLAYS SHOULD BE SAVED UNTIL (EX: SCHEDULE ONCE A WEEK TO KEEP A WEEKS WORTH OF REPLAYS IN THE DB)
+mysql --defaults-file=./mysql.cnf -h localhost -e 'truncate table servatrice.cockatrice_replays;truncate table servatrice.cockatrice_replays_access'

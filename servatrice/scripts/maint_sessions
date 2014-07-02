@@ -1,7 +1,3 @@
 #!/bin/bash
-#REPLACE THE --date="1 month ago" WITH THE TIME FRAME TO CLEAR UP
-#EX: --date="1 day ago" (FOR SINGLE DAY)
-#--CAN BE SCHEDULED WITH CRONTAB
-
-DATE=$(date +%Y-%m --date="1 month ago")
-mysql --defaults-file=./mysql.cnf -h localhost -e "delete from servatrice.cockatrice_sessions where start_time like \"${DATE}%\""
+# SCHEDULE WITH CRONTAB TO RUN ONCE A MONTH
+mysql --defaults-file=./mysql.cnf -h localhost -e "delete from servatrice.cockatrice_sessions where start_time < DATE_SUB(now(), INTERVAL 1 MONTH)"
