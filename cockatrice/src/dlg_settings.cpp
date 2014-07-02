@@ -539,11 +539,12 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
     switch(settingsCache->getPriceTagSource())
     {
-        case AbstractPriceUpdater::BLPPriceSource:
-            priceTagSource0->setChecked(true);
-            break;
         case AbstractPriceUpdater::DBPriceSource:
             priceTagSource1->setChecked(true);
+            break;
+        case AbstractPriceUpdater::BLPPriceSource:
+        default:
+            priceTagSource0->setChecked(true);
             break;
     }
 
