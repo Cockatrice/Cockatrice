@@ -1,0 +1,3 @@
+[client]
+user={db_username}
+password={db_password}
