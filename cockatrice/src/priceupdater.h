@@ -6,6 +6,9 @@
 
 class QNetworkAccessManager;
 
+// If we don't typedef this, won't compile on OS X < 10.9
+typedef QMap<int, QString> MuidStringMap;
+
 /**
  * Price Updater.
  *
@@ -41,6 +44,8 @@ public:
 class DBPriceUpdater : public AbstractPriceUpdater
 {
     Q_OBJECT
+protected:
+    MuidStringMap muidMap;
 protected:
     virtual void downloadFinished();
 public:

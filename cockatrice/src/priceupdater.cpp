@@ -9,6 +9,9 @@
 #include "qt-json/json.h"
 #include "priceupdater.h"
 
+#include "main.h"
+#include "carddatabase.h"
+
 #if QT_VERSION < 0x050000
     // for Qt::escape() 
     #include <QtGui/qtextdocument.h>
@@ -120,10 +123,16 @@ void DBPriceUpdater::updatePrices()
 {
     QString q = "https://api.deckbrew.com/mtg/cards";
     QStringList cards = deck->getCardList();
+    muidMap.clear();
+    CardInfo * card;
+    int muid;
     for (int i = 0; i < cards.size(); ++i) {
-        q += (i ? "&" : "?")  + QString("name=") + cards[i].toLower();
+        card = db->getCard(cards[i], false);
+        muid=card->getPreferredMuId();
+        q += (i ? "&" : "?")  + QString("multiverseid=%1").arg(muid);
+        muidMap.insert(muid, cards[i]);
     }
-    QUrl url(q.replace(' ', '+'));
+    QUrl url(q);
 
     QNetworkReply *reply = nam->get(QNetworkRequest(url));
     connect(reply, SIGNAL(finished()), this, SLOT(downloadFinished()));
@@ -172,17 +181,24 @@ void DBPriceUpdater::downloadFinished()
     }
 
     QMap<QString, float> cardsPrice;
-
     QListIterator<QVariant> it(resultList);
     while (it.hasNext()) {
-        QVariantMap map = it.next().toMap();
-        QString name = map.value("name").toString().toLower();
+        QVariantMap cardMap = it.next().toMap();
 
-        QList<QVariant> editions = map.value("editions").toList();
+
+        // get sets list
+        QList<QVariant> editions = cardMap.value("editions").toList();
         foreach (QVariant ed, editions)
         {
+            // retrieve card name "as we know it" from the muid
             QVariantMap edition = ed.toMap();
             QString set = edition.value("set_id").toString();
+
+            int muid = edition.value("multiverse_id").toString().toInt();
+            if(!muidMap.contains(muid))
+                continue;
+
+            QString name=muidMap.value(muid);
             // Prices are in USD cents
             float price = edition.value("price").toMap().value("median").toString().toFloat() / 100;
             //qDebug() << "card " << name << " set " << set << " price " << price << endl;
@@ -196,7 +212,7 @@ void DBPriceUpdater::downloadFinished()
                 cardsPrice.insert(name, price);
         }
     }
-    
+
     InnerDecklistNode *listRoot = deck->getRoot();
     for (int i = 0; i < listRoot->size(); i++) {
         InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
@@ -204,7 +220,7 @@ void DBPriceUpdater::downloadFinished()
             DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
             if (!currentCard)
                 continue;
-            currentCard->setPrice(cardsPrice[currentCard->getName().toLower()]);
+            currentCard->setPrice(cardsPrice[currentCard->getName()]);
         }
     }
     
