@@ -192,6 +192,8 @@ void PictureLoader::startNextPicDownload()
     QString picUrl = getPicUrl(cardBeingDownloaded.getCard());
     if (picUrl.isEmpty()) {
         qDebug() << "No url for" << cardBeingDownloaded.getCard()->getName();
+        cardBeingDownloaded = 0;
+        downloadRunning = false;
         return;
     }
 
