@@ -2,3 +2,4 @@ tags
 build*
 *.qm
 .directory
+mysql.cnf
