@@ -549,6 +549,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(priceTagSource0, SIGNAL(toggled(bool)), this, SLOT(radioPriceTagSourceClicked(bool)));
     connect(priceTagSource1, SIGNAL(toggled(bool)), this, SLOT(radioPriceTagSourceClicked(bool)));
 
+    connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
+
     QGridLayout *generalGrid = new QGridLayout;
     generalGrid->addWidget(priceTagsCheckBox, 0, 0);
     generalGrid->addWidget(priceTagSource0, 1, 0);
@@ -582,7 +584,7 @@ void DeckEditorSettingsPage::radioPriceTagSourceClicked(bool checked)
     if(priceTagSource1->isChecked())
         source=1;
 
-    QMetaObject::invokeMethod( settingsCache, "setPriceTagSource", Qt::QueuedConnection, Q_ARG(int, source));
+    emit priceTagSourceChanged(source);
 }
 
 MessagesSettingsPage::MessagesSettingsPage()
