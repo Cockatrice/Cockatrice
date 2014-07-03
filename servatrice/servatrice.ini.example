@@ -7,7 +7,6 @@ id=1
 number_pools=1
 writelog=1
 logfilters=""
-regonly=0
 
 [servernetwork]
 active=0
@@ -17,6 +16,7 @@ ssl_key=ssl_key.pem
 
 [authentication]
 method=none
+regonly=0
 
 [database]
 type=none

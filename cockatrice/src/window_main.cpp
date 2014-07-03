@@ -262,8 +262,8 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             QMessageBox::critical(this, tr("Error"), tr("Invalid username."));
             break;
         case Response::RespRegistrationRequired:
-        	QMessageBox::critical(this, tr("Error"), tr("This server requires user registration."));
-        	break;
+            QMessageBox::critical(this, tr("Error"), tr("This server requires user registration."));
+            break;
         default:
             QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)));
     }
