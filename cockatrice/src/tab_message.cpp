@@ -34,6 +34,10 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
 
     retranslateUi();
     setLayout(vbox);
+    
+    setFocusProxy(sayEdit);
+    chatView->setFocusProxy(sayEdit);
+    sayEdit->setFocus();
 }
 
 TabMessage::~TabMessage()
