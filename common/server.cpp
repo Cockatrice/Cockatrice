@@ -34,6 +34,7 @@
 #include <QCoreApplication>
 #include <QThread>
 #include <QDebug>
+#include <QSettings>
 
 Server::Server(bool _threaded, QObject *parent)
 	: QObject(parent), threaded(_threaded), nextLocalGameId(0)
@@ -131,6 +132,14 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	} else if (authState == UnknownUser) {
 		// Change user name so that no two users have the same names,
 		// don't interfere with registered user names though.
+		QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
+    	bool requireReg = settings->value("server/regonly").toBool();
+    	if (requireReg) {
+    		qDebug("Login denied: registration required");
+			databaseInterface->unlockSessionTables();
+    		return RegistrationRequired;
+    	}
+    		
 		QString tempName = name;
 		int i = 0;
 		while (users.contains(tempName) || databaseInterface->userExists(tempName) || databaseInterface->userSessionExists(tempName))

@@ -345,6 +345,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 		case NotLoggedIn: return Response::RespWrongPassword;
 		case WouldOverwriteOldSession: return Response::RespWouldOverwriteOldSession;
 		case UsernameInvalid: return Response::RespUsernameInvalid;
+		case RegistrationRequired: return Response::RespRegistrationRequired;
 		default: authState = res;
 	}
 	
