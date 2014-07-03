@@ -225,8 +225,6 @@ void MainWindow::actAbout()
         + tr("French:") + " Yannick Hammer, Arnaud Faes<br>"
         + tr("Japanese:") + " Nagase Task<br>"
         + tr("Russian:") + " Alexander Davidov<br>"
-//        + tr("Czech:") + " Ondrej Trhon<br>"
-//        + tr("Slovak:") + " Ganjalf Rendy<br>"
         + tr("Italian:") + " Luigi Sciolla<br>"
         + tr("Swedish:") + " Jessica Dahl<br>"
     ));
