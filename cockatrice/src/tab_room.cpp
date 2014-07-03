@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QToolButton>
 #include <QSplitter>
+#include <QTimer>
 #include "tab_supervisor.h"
 #include "tab_room.h"
 #include "tab_userlists.h"
@@ -100,7 +101,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
 
     setFocusProxy(sayEdit);
     chatView->setFocusProxy(sayEdit);
-    sayEdit->setFocus();
+    QTimer::singleShot(0, sayEdit, SLOT(setFocus()));
 }
 
 TabRoom::~TabRoom()
