@@ -90,6 +90,7 @@ SET(cockatrice_SOURCES
     src/qt-json/json.cpp
     src/soundengine.cpp
     src/pending_command.cpp
+    src/lineinput.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
 )
 

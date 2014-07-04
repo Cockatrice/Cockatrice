@@ -1,4 +1,3 @@
-#include <QLineEdit>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QMenu>
@@ -6,6 +5,7 @@
 #include "tab_message.h"
 #include "abstractclient.h"
 #include "chatview.h"
+#include "lineinput.h"
 
 #include "pending_command.h"
 #include "pb/session_commands.pb.h"
@@ -18,7 +18,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
     chatView = new ChatView(tabSupervisor, 0, true);
     connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
-    sayEdit = new QLineEdit;
+    sayEdit = new LineInput;
     connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
     
     QVBoxLayout *vbox = new QVBoxLayout;
@@ -36,7 +36,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
     setLayout(vbox);
     
     setFocusProxy(sayEdit);
-    chatView->setFocusProxy(sayEdit);
+    chatView->installEventFilter(sayEdit);
     sayEdit->setFocus();
 }
 
