@@ -1,4 +1,3 @@
-#include <QLineEdit>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QMenu>
@@ -16,6 +15,7 @@
 #include "userlist.h"
 #include "abstractclient.h"
 #include "chatview.h"
+#include "lineinput.h"
 #include "gameselector.h"
 #include "settingscache.h"
 
@@ -46,7 +46,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     sayLabel = new QLabel;
-    sayEdit = new QLineEdit;
+    sayEdit = new LineInput;
     sayLabel->setBuddy(sayEdit);
     connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
     
@@ -100,7 +100,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
         gameSelector->processGameInfo(info.game_list(i));
 
     setFocusProxy(sayEdit);
-    chatView->setFocusProxy(sayEdit);
+    chatView->installEventFilter(sayEdit);
     QTimer::singleShot(0, sayEdit, SLOT(setFocus()));
 }
 

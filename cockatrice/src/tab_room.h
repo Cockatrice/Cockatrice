@@ -10,7 +10,7 @@ class AbstractClient;
 class UserList;
 class QLabel;
 class ChatView;
-class QLineEdit;
+class LineInput;
 class QPushButton;
 class QTextTable;
 class RoomEvent;
@@ -38,7 +38,7 @@ private:
     UserList *userList;
     ChatView *chatView;
     QLabel *sayLabel;
-    QLineEdit *sayEdit;
+    LineInput *sayEdit;
     QGroupBox *chatGroupBox;
     
     QMenu *roomMenu;
