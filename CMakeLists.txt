@@ -99,6 +99,11 @@ ENDIF()
 
 IF(Qt5Widgets_FOUND)
     MESSAGE(STATUS "Found Qt ${Qt5Widgets_VERSION_STRING}")
+
+    if(UNIX AND NOT APPLE AND "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+        # FIX: Qt was built with -reduce-relocations
+        add_definitions(-fPIC)
+    endif()  
 ELSE()
     FIND_PACKAGE(Qt4 4.8.0 REQUIRED)
     IF(QT4_FOUND)
