@@ -9,26 +9,52 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QDialogButtonBox>
+#include <QSettings>
 
-DlgFilterGames::DlgFilterGames(const QMap<int, QString> &allGameTypes, QWidget *parent)
-    : QDialog(parent)
+DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, QWidget *parent)
+    : QDialog(parent),
+      allGameTypes(_allGameTypes)
 {
+    QSettings settings;
+    settings.beginGroup("filter_games");
+
     unavailableGamesVisibleCheckBox = new QCheckBox(tr("Show &unavailable games"));
+    unavailableGamesVisibleCheckBox->setChecked(
+        settings.value("unavailable_games_visible", false).toBool()
+    );
+
     passwordProtectedGamesVisibleCheckBox = new QCheckBox(tr("Show &password protected games"));
+    passwordProtectedGamesVisibleCheckBox->setChecked(
+        settings.value("password_protected_games_visible", false).toBool()
+    );
     
-    QLabel *gameNameFilterLabel = new QLabel(tr("Game &description:"));
     gameNameFilterEdit = new QLineEdit;
+    gameNameFilterEdit->setText(
+        settings.value("game_name_filter", "").toString()
+    );
+    QLabel *gameNameFilterLabel = new QLabel(tr("Game &description:"));
     gameNameFilterLabel->setBuddy(gameNameFilterEdit);
     
-    QLabel *creatorNameFilterLabel = new QLabel(tr("&Creator name:"));
     creatorNameFilterEdit = new QLineEdit;
+    creatorNameFilterEdit->setText(
+        settings.value("creator_name_filter", "").toString()
+    );
+    QLabel *creatorNameFilterLabel = new QLabel(tr("&Creator name:"));
     creatorNameFilterLabel->setBuddy(creatorNameFilterEdit);
     
     QVBoxLayout *gameTypeFilterLayout = new QVBoxLayout;
     QMapIterator<int, QString> gameTypesIterator(allGameTypes);
     while (gameTypesIterator.hasNext()) {
         gameTypesIterator.next();
+
         QCheckBox *temp = new QCheckBox(gameTypesIterator.value());
+        temp->setChecked(
+            settings.value(
+                "game_type/" + gameTypesIterator.value(),
+                false
+            ).toBool()
+        );
+
         gameTypeFilterCheckBoxes.insert(gameTypesIterator.key(), temp);
         gameTypeFilterLayout->addWidget(temp);
     }
@@ -43,14 +69,18 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &allGameTypes, QWidget *
     maxPlayersFilterMinSpinBox = new QSpinBox;
     maxPlayersFilterMinSpinBox->setMinimum(1);
     maxPlayersFilterMinSpinBox->setMaximum(99);
-    maxPlayersFilterMinSpinBox->setValue(1);
+    maxPlayersFilterMinSpinBox->setValue(
+        settings.value("min_players", 1).toInt()
+    );
     maxPlayersFilterMinLabel->setBuddy(maxPlayersFilterMinSpinBox);
     
     QLabel *maxPlayersFilterMaxLabel = new QLabel(tr("at &most:"));
     maxPlayersFilterMaxSpinBox = new QSpinBox;
     maxPlayersFilterMaxSpinBox->setMinimum(1);
     maxPlayersFilterMaxSpinBox->setMaximum(99);
-    maxPlayersFilterMaxSpinBox->setValue(99);
+    maxPlayersFilterMaxSpinBox->setValue(
+        settings.value("max_players", 99).toInt()
+    );
     maxPlayersFilterMaxLabel->setBuddy(maxPlayersFilterMaxSpinBox);
     
     QGridLayout *maxPlayersFilterLayout = new QGridLayout;
@@ -83,7 +113,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &allGameTypes, QWidget *
     hbox->addLayout(rightColumn);
     
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
     
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -92,6 +122,38 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &allGameTypes, QWidget *
     
     setLayout(mainLayout);
     setWindowTitle(tr("Filter games"));
+}
+
+void DlgFilterGames::actOk() {
+    QSettings settings;
+    settings.beginGroup("filter_games");
+    settings.setValue(
+        "unavailable_games_visible",
+	unavailableGamesVisibleCheckBox->isChecked()
+    );
+    settings.setValue(
+        "password_protected_games_visible",
+        passwordProtectedGamesVisibleCheckBox->isChecked()
+    );
+    settings.setValue("game_name_filter", gameNameFilterEdit->text());
+    settings.setValue("creator_name_filter", creatorNameFilterEdit->text());
+
+    QMapIterator<int, QString> gameTypeIterator(allGameTypes);
+    QMapIterator<int, QCheckBox *> checkboxIterator(gameTypeFilterCheckBoxes);
+    while (gameTypeIterator.hasNext()) {
+        gameTypeIterator.next();
+        checkboxIterator.next();
+
+        settings.setValue(
+            "game_type/" + gameTypeIterator.value(),
+            checkboxIterator.value()->isChecked()
+        );
+    }
+
+    settings.setValue("min_players", maxPlayersFilterMinSpinBox->value());
+    settings.setValue("max_players", maxPlayersFilterMaxSpinBox->value());
+
+    accept();
 }
 
 bool DlgFilterGames::getUnavailableGamesVisible() const

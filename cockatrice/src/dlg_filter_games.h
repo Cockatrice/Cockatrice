@@ -19,6 +19,10 @@ private:
     QMap<int, QCheckBox *> gameTypeFilterCheckBoxes;
     QSpinBox *maxPlayersFilterMinSpinBox;
     QSpinBox *maxPlayersFilterMaxSpinBox;
+
+    const QMap<int, QString> &allGameTypes;
+private slots:
+    void actOk();
 public:
     DlgFilterGames(const QMap<int, QString> &allGameTypes, QWidget *parent = 0);
     
