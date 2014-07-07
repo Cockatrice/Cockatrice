@@ -10,6 +10,7 @@
 #include <QGridLayout>
 #include <QDialogButtonBox>
 #include <QSettings>
+#include <QCryptographicHash>
 
 DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, QWidget *parent)
     : QDialog(parent),
@@ -50,7 +51,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, QWidget 
         QCheckBox *temp = new QCheckBox(gameTypesIterator.value());
         temp->setChecked(
             settings.value(
-                "game_type/" + gameTypesIterator.value(),
+                "game_type/" + hashGameType(gameTypesIterator.value()),
                 false
             ).toBool()
         );
@@ -145,7 +146,7 @@ void DlgFilterGames::actOk() {
         checkboxIterator.next();
 
         settings.setValue(
-            "game_type/" + gameTypeIterator.value(),
+            "game_type/" + hashGameType(gameTypeIterator.value()),
             checkboxIterator.value()->isChecked()
         );
     }
@@ -154,6 +155,10 @@ void DlgFilterGames::actOk() {
     settings.setValue("max_players", maxPlayersFilterMaxSpinBox->value());
 
     accept();
+}
+
+QString DlgFilterGames::hashGameType(const QString &gameType) const {
+    return QCryptographicHash::hash(gameType.toUtf8(), QCryptographicHash::Md5).toHex();
 }
 
 bool DlgFilterGames::getUnavailableGamesVisible() const
