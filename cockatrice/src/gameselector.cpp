@@ -84,12 +84,6 @@ void GameSelector::actSetFilter()
     if (room)
         gameTypeMap = gameListModel->getGameTypes().value(room->getRoomId());
     DlgFilterGames dlg(gameTypeMap, this);
-    dlg.setUnavailableGamesVisible(gameListProxyModel->getUnavailableGamesVisible());
-    dlg.setPasswordProtectedGamesVisible(gameListProxyModel->getPasswordProtectedGamesVisible());
-    dlg.setGameNameFilter(gameListProxyModel->getGameNameFilter());
-    dlg.setCreatorNameFilter(gameListProxyModel->getCreatorNameFilter());
-    dlg.setGameTypeFilter(gameListProxyModel->getGameTypeFilter());
-    dlg.setMaxPlayersFilter(gameListProxyModel->getMaxPlayersFilterMin(), gameListProxyModel->getMaxPlayersFilterMax());
     
     if (!dlg.exec())
         return;

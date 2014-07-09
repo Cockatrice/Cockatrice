@@ -19,6 +19,16 @@ private:
     QMap<int, QCheckBox *> gameTypeFilterCheckBoxes;
     QSpinBox *maxPlayersFilterMinSpinBox;
     QSpinBox *maxPlayersFilterMaxSpinBox;
+
+    const QMap<int, QString> &allGameTypes;
+
+    /*
+     * The game type might contain special characters, so to use it in
+     * QSettings we just hash it.
+     */
+    QString hashGameType(const QString &gameType) const;
+private slots:
+    void actOk();
 public:
     DlgFilterGames(const QMap<int, QString> &allGameTypes, QWidget *parent = 0);
     
