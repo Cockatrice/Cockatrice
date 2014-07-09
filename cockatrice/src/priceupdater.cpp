@@ -126,14 +126,20 @@ void DBPriceUpdater::updatePrices()
     muidMap.clear();
     CardInfo * card;
     int muid;
+    SetList sets;
     for (int i = 0; i < cards.size(); ++i) {
         card = db->getCard(cards[i], false);
-        muid=card->getPreferredMuId();
-        q += (i ? "&" : "?")  + QString("multiverseid=%1").arg(muid);
-        muidMap.insert(muid, cards[i]);
+        sets = card->getSets();
+        for(int j = 0; j < sets.size(); ++j)
+        {
+            muid=card->getMuId(sets[j]->getShortName());
+            //qDebug() << "muid " << muid << " card: " << cards[i] << endl;
+            q += (i ? "&" : "?") + QString("m=%1").arg(muid);
+            muidMap.insert(muid, cards[i]);
+        }
     }
     QUrl url(q);
-
+    //qDebug() << "request prices from: " << url.toString() << endl;
     QNetworkReply *reply = nam->get(QNetworkRequest(url));
     connect(reply, SIGNAL(finished()), this, SLOT(downloadFinished()));
 }
@@ -208,7 +214,7 @@ void DBPriceUpdater::downloadFinished()
             * physically exist. Also check the price to see that the cheapest set
             * ends up as the final price.
             */
-            if (set != "MED" && (!cardsPrice.contains(name) || cardsPrice.value(name) > price))
+            if (set != "MED" && price > 0 && (!cardsPrice.contains(name) || cardsPrice.value(name) > price))
                 cardsPrice.insert(name, price);
         }
     }
