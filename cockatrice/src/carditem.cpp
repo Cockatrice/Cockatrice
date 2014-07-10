@@ -233,7 +233,8 @@ CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPoin
 
 void CardItem::deleteDragItem()
 {
-    dragItem->deleteLater();
+    if(dragItem)
+        dragItem->deleteLater();
     dragItem = NULL;
 }
 

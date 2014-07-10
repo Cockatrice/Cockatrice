@@ -23,7 +23,7 @@ RemoteClient::RemoteClient(QObject *parent)
     connect(socket, SIGNAL(connected()), this, SLOT(slotConnected()));
     connect(socket, SIGNAL(readyRead()), this, SLOT(readData()));
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slotSocketError(QAbstractSocket::SocketError)));
-    
+
     connect(this, SIGNAL(serverIdentificationEventReceived(const Event_ServerIdentification &)), this, SLOT(processServerIdentificationEvent(const Event_ServerIdentification &)));
     connect(this, SIGNAL(connectionClosedEventReceived(Event_ConnectionClosed)), this, SLOT(processConnectionClosedEvent(Event_ConnectionClosed)));
     connect(this, SIGNAL(sigConnectToServer(QString, unsigned int, QString, QString)), this, SLOT(doConnectToServer(QString, unsigned int, QString, QString)));
@@ -47,12 +47,12 @@ void RemoteClient::slotConnected()
 {
     timeRunning = lastDataReceived = 0;
     timer->start();
-    
+
     // dirty hack to be compatible with v14 server
     sendCommandContainer(CommandContainer());
     getNewCmdId();
     // end of hack
-    
+
     setStatus(StatusAwaitingWelcome);
 }
 
@@ -208,7 +208,7 @@ void RemoteClient::ping()
             pend->deleteLater();
         }
     }
-    
+
     int maxTime = timeRunning - lastDataReceived;
     emit maxPingTime(maxTime, maxTimeout);
     if (maxTime >= maxTimeout) {

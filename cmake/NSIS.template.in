@@ -1,30 +1,25 @@
+!include ..\..\..\NSIS.definitions.nsh
 !include "MUI2.nsh"
 !include "FileFunc.nsh"
 
-!define /date TIMESTAMP "%Y%m%d"
-!searchparse /file ../build/cockatrice/version_string.cpp '= "' VERSION '";'
-
-Name "Cockatrice"
-OutFile "cockatrice_win32_${TIMESTAMP}_git-${VERSION}.exe"
+Name "${NSIS_PROJECT_NAME}"
+OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
 SetCompressor /SOLID lzma
 InstallDir "$PROGRAMFILES\Cockatrice"
 
-; set the Qt install dir here (and make sure you use the latest 4.8 version for packaging)
-!define QTDIR "C:\Qt\4.8.6"
-
 !define MUI_ABORTWARNING
-!define MUI_WELCOMEFINISHPAGE_BITMAP "leftimage.bmp"
-!define MUI_UNWELCOMEFINISHPAGE_BITMAP "leftimage.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "${NSIS_SOURCE_PATH}\cmake\leftimage.bmp"
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "${NSIS_SOURCE_PATH}\cmake\leftimage.bmp"
 !define MUI_HEADERIMAGE
-!define MUI_HEADERIMAGE_BITMAP "headerimage.bmp"
-!define MUI_HEADERIMAGE_UNBITMAP "headerimage.bmp"
+!define MUI_HEADERIMAGE_BITMAP "${NSIS_SOURCE_PATH}\cmake\headerimage.bmp"
+!define MUI_HEADERIMAGE_UNBITMAP "${NSIS_SOURCE_PATH}\cmake\headerimage.bmp"
 !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of Cockatrice.$\r$\n$\r$\nClick Next to continue."
 !define MUI_FINISHPAGE_RUN "$INSTDIR/oracle.exe"
 !define MUI_FINISHPAGE_RUN_TEXT "Run card database downloader now"
 !define MUI_FINISHPAGE_RUN_PARAMETERS "-dlsets"
 
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "..\COPYING"
+!insertmacro MUI_PAGE_LICENSE "${NSIS_SOURCE_PATH}\COPYING"
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
@@ -39,37 +34,8 @@ InstallDir "$PROGRAMFILES\Cockatrice"
 Section "Application" SecApplication
 	SetShellVarContext all
 	SetOutPath "$INSTDIR"
-	File ..\build\cockatrice\Release\cockatrice.exe
-	File ..\build\oracle\Release\oracle.exe
-	File ..\doc\usermanual\Usermanual.pdf
-	File ..\build\protobuf-2.5.0\protobuf-2.5.0\vsprojects\Release\libprotobuf.lib
-	File "${QTDIR}\bin\QtCore4.dll"
-	File "${QTDIR}\bin\QtGui4.dll"
-	File "${QTDIR}\bin\QtNetwork4.dll"
-	File "${QTDIR}\bin\QtSvg4.dll"
-	File "${QTDIR}\bin\QtXml4.dll"
-	File "${QTDIR}\bin\QtMultimedia4.dll"
 
-	SetOutPath "$INSTDIR\zonebg"
-	File /r ..\zonebg\*.*
-
-	SetOutPath "$INSTDIR\plugins"
-	SetOutPath "$INSTDIR\plugins\codecs"
-	File "${QTDIR}\plugins\codecs\qcncodecs4.dll"
-	File "${QTDIR}\plugins\codecs\qjpcodecs4.dll"
-	File "${QTDIR}\plugins\codecs\qkrcodecs4.dll"
-	File "${QTDIR}\plugins\codecs\qtwcodecs4.dll"
-	SetOutPath "$INSTDIR\plugins\iconengines"
-	File "${QTDIR}\plugins\iconengines\qsvgicon4.dll"
-	SetOutPath "$INSTDIR\plugins\imageformats"
-	File "${QTDIR}\plugins\imageformats\qjpeg4.dll"
-	File "${QTDIR}\plugins\imageformats\qsvg4.dll"
-
-	SetOutPath "$INSTDIR\sounds"
-	File /r ..\sounds\*.*
-
-	SetOutPath "$INSTDIR\translations"
-	File /r ..\build\cockatrice\*.qm
+	File /r "${NSIS_BINARY_PATH}\Release\*.*"
 
 	WriteUninstaller "$INSTDIR\uninstall.exe"
 	${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
@@ -107,12 +73,10 @@ SetShellVarContext all
 	Delete "$INSTDIR\oracle.exe"
 	Delete "$INSTDIR\Usermanual.pdf"
 	Delete "$INSTDIR\libprotobuf.lib"
-	Delete "$INSTDIR\QtCore4.dll"
-	Delete "$INSTDIR\QtGui4.dll"
-	Delete "$INSTDIR\QtNetwork4.dll"
-	Delete "$INSTDIR\QtSvg4.dll"
-	Delete "$INSTDIR\QtXml4.dll"
-	Delete "$INSTDIR\QtMultimedia4.dll"
+	Delete "$INSTDIR\Qt*.dll"
+	Delete "$INSTDIR\icu*.dll"
+	Delete "$INSTDIR\qt.conf"
+	Delete "$INSTDIR\qdebug.txt"
 	RMDir "$INSTDIR"
 
 	RMDir "$SMPROGRAMS\Cockatrice"
