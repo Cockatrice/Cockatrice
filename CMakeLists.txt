@@ -7,13 +7,21 @@
 
 cmake_minimum_required(VERSION 2.6)
 
-set(PROJECT_NAME "Cockatrice")
-set(PROJECT_VERSION_MAJOR 0)
-set(PROJECT_VERSION_MINOR 0)
-set(PROJECT_VERSION_PATCH 1)
-set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH} )
+if(POLICY CMP0020)
+    cmake_policy(SET CMP0020 OLD)
+endif()
 
-# Defualt to "Release" build type
+if(POLICY CMP0043)
+    cmake_policy(SET CMP0043 OLD)
+endif()
+
+if(POLICY CMP0048)
+    cmake_policy(SET CMP0048 OLD)
+endif()
+
+set(PROJECT_NAME "Cockatrice")
+
+# Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
 IF(DEFINED CMAKE_BUILD_TYPE)
    SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Type of build")
@@ -24,8 +32,18 @@ ENDIF()
 # A project name is needed for CPack
 PROJECT("${PROJECT_NAME}")
 
+
 # Set conventional loops
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+
+# Search path for cmake modules
+SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+# Retrieve git version hash
+include(getversion)
+
+# Create a header and a cpp file containing the version hash
+include(createversionfile)
 
 # Define a proper install path
 if(UNIX)
@@ -71,8 +89,33 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     ADD_DEFINITIONS("-DSFMT_MEXP=19937")
 ENDIF()
 
-#Find Qt4 and enable the needed features
-FIND_PACKAGE(Qt4 REQUIRED)
+# Find Qt and enable the needed features
+# Default is Qt5 unless WITH_QT4 option is enabled
+option(WITH_QT4 "Force thr use of Qt4 libraries" OFF)
+
+IF(NOT WITH_QT4)
+    FIND_PACKAGE(Qt5Widgets)
+ENDIF()
+
+IF(Qt5Widgets_FOUND)
+    MESSAGE(STATUS "Found Qt ${Qt5Widgets_VERSION_STRING}")
+
+    if(UNIX AND NOT APPLE AND "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+        # FIX: Qt was built with -reduce-relocations
+        add_definitions(-fPIC)
+    endif()  
+ELSE()
+    FIND_PACKAGE(Qt4 4.8.0 REQUIRED)
+    IF(QT4_FOUND)
+        # Old FindQt4.cmake modules used the same flag with different case
+        SET(Qt4_FOUND TRUE)
+    ENDIF()
+    IF(Qt4_FOUND)
+        MESSAGE(STATUS "Found Qt ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}")
+    ELSE()
+        MESSAGE(FATAL_ERROR "No Qt4 or Qt5 found!")
+    ENDIF()
+ENDIF()
 
 set(CMAKE_AUTOMOC TRUE)
 
@@ -83,8 +126,8 @@ FIND_PACKAGE(Protobuf REQUIRED)
 set(CPACK_PACKAGE_CONTACT "Daenyth+github@gmail.com") 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PROJECT_NAME})
 set(CPACK_PACKAGE_VENDOR "Cockatrice Development Team")
-set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
+set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
@@ -96,7 +139,7 @@ if(UNIX)
         set(CPACK_DMG_FORMAT "UDBZ")
         set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
         set(CPACK_SYSTEM_NAME "OSX")
-        set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
+        set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-osx_git-${PROJECT_VERSION}")
         set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/cockatrice/resources/appicon.icns")
     else()
         # linux
@@ -107,13 +150,13 @@ if(UNIX)
     endif()
 elseif(WIN32)
     set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY "${PROJECT_NAME}\\\\${PROJECT_VERSION}")
-    set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\${PROJECT_NAME}.exe")
-    set(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} ${PROJECT_NAME}")
-    set(CPACK_NSIS_HELP_LINK "https://github.com/Daenyth/Cockatrice")
-    set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/Daenyth/Cockatrice")
-    set(CPACK_NSIS_CONTACT "Daenyth+github@gmail.com")
-    set(CPACK_NSIS_MODIFY_PATH ON)
+    set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_win32_git-${PROJECT_VERSION}")
+
+    # Configure file with custom definitions for NSIS.
+    configure_file(
+        ${CMAKE_MODULE_PATH}/NSIS.definitions.nsh.in
+        ${PROJECT_BINARY_DIR}/NSIS.definitions.nsh
+    )
 endif()
 
 include(CPack)

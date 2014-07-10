@@ -15,15 +15,5 @@ else()
 	message( WARNING "Git not found. Build will not contain git revision info." )
 endif()
 
-set( hstring "extern const char *VERSION_STRING\;\n" )
-set( cppstring "const char * VERSION_STRING = \"${GIT_COMMIT_ID}\"\;\n")
-
-file(WRITE version_string.cpp.txt ${cppstring} )
-file(WRITE version_string.h.txt ${hstring} )
-
-execute_process(
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different version_string.h.txt ${CMAKE_CURRENT_BINARY_DIR}/version_string.h
-)
-execute_process(
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different version_string.cpp.txt ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
-)
+set(PROJECT_VERSION_MAJOR ${GIT_COMMIT_ID})
+set(PROJECT_VERSION ${GIT_COMMIT_ID} )

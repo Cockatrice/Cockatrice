@@ -2,6 +2,7 @@
 #define SERVER_RESPONSE_CONTAINERS_H
 
 #include <QPair>
+#include <QList>
 #include "pb/server_message.pb.h"
 
 namespace google { namespace protobuf { class Message; } }

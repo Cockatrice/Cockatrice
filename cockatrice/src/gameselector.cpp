@@ -33,8 +33,11 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
         gameListView->header()->hideSection(1);
     else
         gameListProxyModel->setUnavailableGamesVisible(true);
+#if QT_VERSION < 0x050000
     gameListView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
-
+#else
+    gameListView->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+#endif
     filterButton = new QPushButton;
     filterButton->setIcon(QIcon(":/resources/icon_search.svg"));
     connect(filterButton, SIGNAL(clicked()), this, SLOT(actSetFilter()));
