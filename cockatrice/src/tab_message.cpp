@@ -34,10 +34,6 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
 
     retranslateUi();
     setLayout(vbox);
-    
-    setFocusProxy(sayEdit);
-    chatView->setFocusProxy(sayEdit);
-    sayEdit->setFocus();
 }
 
 TabMessage::~TabMessage()
@@ -51,6 +47,12 @@ void TabMessage::retranslateUi()
 {
     messageMenu->setTitle(tr("Personal &talk"));
     aLeave->setText(tr("&Leave"));
+}
+
+void TabMessage::tabActivated()
+{
+    if(!sayEdit->hasFocus())
+        sayEdit->setFocus();
 }
 
 QString TabMessage::getUserName() const

@@ -9,7 +9,6 @@
 #include <QLabel>
 #include <QToolButton>
 #include <QSplitter>
-#include <QTimer>
 #include "tab_supervisor.h"
 #include "tab_room.h"
 #include "tab_userlists.h"
@@ -98,10 +97,6 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     const int gameListSize = info.game_list_size();
     for (int i = 0; i < gameListSize; ++i)
         gameSelector->processGameInfo(info.game_list(i));
-
-    setFocusProxy(sayEdit);
-    chatView->setFocusProxy(sayEdit);
-    QTimer::singleShot(0, sayEdit, SLOT(setFocus()));
 }
 
 TabRoom::~TabRoom()
@@ -124,6 +119,12 @@ void TabRoom::retranslateUi()
 void TabRoom::closeRequest()
 {
     actLeaveRoom();
+}
+
+void TabRoom::tabActivated()
+{
+    if(!sayEdit->hasFocus())
+        sayEdit->setFocus();
 }
 
 QString TabRoom::sanitizeHtml(QString dirty) const
