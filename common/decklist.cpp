@@ -563,8 +563,19 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         cardName.replace(rx, "AE");
         rx.setPattern("^Aether");
         cardName.replace(rx, "AEther");
-        rx.setPattern("\\s*[&|/]{1,2}\\s*");
+        rx.setPattern("\\s*[|/]{1,2}\\s*");
         cardName.replace(rx, " // ");
+
+        // Replace only if the ampersand is preceded by a non-capital letter,
+        // as would happen with acronyms. So 'Fire & Ice' is replaced but not
+        // 'R&D' or 'R & D'.
+        //
+        // Qt regexes don't support lookbehind so we capture and replace
+        // instead.
+        rx.setPattern("([^A-Z])\\s*&\\s*");
+        if (rx.indexIn(cardName) != -1) {
+            cardName.replace(rx, QString("%1 // ").arg(rx.cap(1)));
+        }
 
         ++okRows;
         new DecklistCardNode(cardName, number, zone);
