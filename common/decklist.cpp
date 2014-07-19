@@ -547,14 +547,21 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         line.remove(rx);
         line = line.simplified();
 
-
         int i = line.indexOf(' ');
+        int cardNameStart = i + 1;
+
+        // If the count ends with an 'x', ignore it. For example,
+        // "4x Storm Crow" will count 4 correctly.
+        if (i > 0 && line[i - 1] == 'x') {
+            i--;
+        }
+
         bool ok;
         int number = line.left(i).toInt(&ok);
         if (!ok)
             continue;
 
-        QString cardName = line.mid(i + 1);
+        QString cardName = line.mid(cardNameStart);
         // Common differences between cockatrice's card names
         // and what's commonly used in decklists
         rx.setPattern("’");

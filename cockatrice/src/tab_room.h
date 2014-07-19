@@ -64,6 +64,7 @@ public:
     ~TabRoom();
     void retranslateUi();
     void closeRequest();
+    void tabActivated();
     void processRoomEvent(const RoomEvent &event);
     int getRoomId() const { return roomId; }
     const QMap<int, QString> &getGameTypes() const { return gameTypes; }

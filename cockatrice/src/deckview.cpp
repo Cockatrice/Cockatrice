@@ -64,7 +64,11 @@ void DeckViewCardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 DeckViewCard::DeckViewCard(const QString &_name, const QString &_originZone, QGraphicsItem *parent)
     : AbstractCardItem(_name, 0, -1, parent), originZone(_originZone), dragItem(0)
 {
+#if QT_VERSION < 0x050000
     setAcceptsHoverEvents(true);
+#else
+    setAcceptHoverEvents(true);
+#endif
 }
 
 DeckViewCard::~DeckViewCard()

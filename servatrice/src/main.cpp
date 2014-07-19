@@ -82,6 +82,7 @@ void testHash()
 	std::cerr << startTime.secsTo(endTime) << "secs" << std::endl;
 }
 
+#if QT_VERSION < 0x050000
 void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
 	logger->logMessage(msg);
@@ -92,6 +93,18 @@ void myMessageOutput2(QtMsgType /*type*/, const char *msg)
 	logger->logMessage(msg);
 	std::cerr << msg << std::endl;
 }
+#else
+void myMessageOutput(QtMsgType /*type*/, const QMessageLogContext &, const QString &msg)
+{
+	logger->logMessage(msg);
+}
+
+void myMessageOutput2(QtMsgType /*type*/, const QMessageLogContext &, const QString &msg)
+{
+	logger->logMessage(msg);
+	std::cerr << msg.toStdString() << std::endl;
+}
+#endif
 
 #ifdef Q_OS_UNIX
 void sigSegvHandler(int sig)
@@ -121,9 +134,12 @@ int main(int argc, char *argv[])
 	bool logToConsole = args.contains("--log-to-console");
 	
 	qRegisterMetaType<QList<int> >("QList<int>");
-	
+
+#if QT_VERSION < 0x050000
+	// gone in Qt5, all source files _MUST_ be utf8-encoded
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-	
+#endif
+
 	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
 	
 	loggerThread = new QThread;
@@ -133,11 +149,19 @@ int main(int argc, char *argv[])
 	
 	loggerThread->start();
 	QMetaObject::invokeMethod(logger, "startLog", Qt::BlockingQueuedConnection, Q_ARG(QString, settings->value("server/logfile").toString()));
-	
+
+#if QT_VERSION < 0x050000
 	if (logToConsole)
 		qInstallMsgHandler(myMessageOutput);
 	else
 		qInstallMsgHandler(myMessageOutput2);
+#else
+	if (logToConsole)
+		qInstallMessageHandler(myMessageOutput);
+	else
+		qInstallMessageHandler(myMessageOutput2);
+#endif
+
 #ifdef Q_OS_UNIX	
 	struct sigaction hup;
 	hup.sa_handler = ServerLogger::hupSignalHandler;
@@ -173,8 +197,12 @@ int main(int argc, char *argv[])
 	if (server->initServer()) {
 		std::cerr << "-------------------------" << std::endl;
 		std::cerr << "Server initialized." << std::endl;
-		
+
+#if QT_VERSION < 0x050000		
 		qInstallMsgHandler(myMessageOutput);
+#else
+		qInstallMessageHandler(myMessageOutput);
+#endif
 		retval = app.exec();
 		
 		std::cerr << "Server quit." << std::endl;

@@ -52,7 +52,11 @@ public:
 	Servatrice_GameServer(Servatrice *_server, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent = 0);
 	~Servatrice_GameServer();
 protected:
+#if QT_VERSION < 0x050000
 	void incomingConnection(int socketDescriptor);
+#else
+	void incomingConnection(qintptr socketDescriptor);
+#endif
 };
 
 class Servatrice_IslServer : public QTcpServer {
