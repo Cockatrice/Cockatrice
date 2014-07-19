@@ -139,7 +139,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
             databaseInterface->unlockSessionTables();
             return RegistrationRequired;
         }
-            
+
         QString tempName = name;
         int i = 0;
         while (users.contains(tempName) || databaseInterface->userExists(tempName) || databaseInterface->userSessionExists(tempName))

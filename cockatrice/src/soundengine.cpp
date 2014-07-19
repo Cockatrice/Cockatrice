@@ -33,8 +33,13 @@ void SoundEngine::soundEnabledChanged()
     if (settingsCache->getSoundEnabled()) {
         qDebug("SoundEngine: enabling sound");
         QAudioFormat format;
+#if QT_VERSION < 0x050000
         format.setFrequency(44100);
         format.setChannels(1);
+#else
+        format.setSampleRate(44100);
+        format.setChannelCount(1);
+#endif
         format.setSampleSize(16);
         format.setCodec("audio/pcm");
         format.setByteOrder(QAudioFormat::LittleEndian);

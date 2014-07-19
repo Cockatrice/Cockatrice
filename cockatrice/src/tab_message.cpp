@@ -49,6 +49,12 @@ void TabMessage::retranslateUi()
     aLeave->setText(tr("&Leave"));
 }
 
+void TabMessage::tabActivated()
+{
+    if(!sayEdit->hasFocus())
+        sayEdit->setFocus();
+}
+
 QString TabMessage::getUserName() const
 {
     return QString::fromStdString(otherUserInfo->name());

@@ -72,7 +72,11 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient
     setColumnCount(6);
     setHeaderHidden(true);
     setRootIsDecorated(false);
+#if QT_VERSION < 0x050000
     header()->setResizeMode(QHeaderView::ResizeToContents);
+#else
+    header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+#endif
     retranslateUi();
 }
 

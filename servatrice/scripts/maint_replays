@@ -1,0 +1,3 @@
+#!/bin/bash
+# SCHEDULE WITH CRONTAB BASED ON TIME PERIOD REPLAYS SHOULD BE SAVED UNTIL (EX: SCHEDULE ONCE A WEEK TO KEEP A WEEKS WORTH OF REPLAYS IN THE DB)
+mysql --defaults-file=./mysql.cnf -h localhost -e 'truncate table servatrice.cockatrice_replays;truncate table servatrice.cockatrice_replays_access'

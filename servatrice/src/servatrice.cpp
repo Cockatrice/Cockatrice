@@ -78,7 +78,11 @@ Servatrice_GameServer::~Servatrice_GameServer()
     }
 }
 
+#if QT_VERSION < 0x050000
 void Servatrice_GameServer::incomingConnection(int socketDescriptor)
+#else
+void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
+#endif
 {
     // Determine connection pool with smallest client count
     int minClientCount = -1;
@@ -231,82 +235,90 @@ bool Servatrice::initServer()
     maxMessageSizePerInterval = settings->value("security/max_message_size_per_interval").toInt();
     maxGamesPerUser = settings->value("security/max_games_per_user").toInt();
 
-    try { if (settings->value("servernetwork/active", 0).toInt()) {
-        qDebug() << "Connecting to ISL network.";
-        const QString certFileName = settings->value("servernetwork/ssl_cert").toString();
-        const QString keyFileName = settings->value("servernetwork/ssl_key").toString();
-        qDebug() << "Loading certificate...";
-        QFile certFile(certFileName);
-        if (!certFile.open(QIODevice::ReadOnly))
-            throw QString("Error opening certificate file: %1").arg(certFileName);
-        QSslCertificate cert(&certFile);
-        if (!cert.isValid())
-            throw(QString("Invalid certificate."));
-        qDebug() << "Loading private key...";
-        QFile keyFile(keyFileName);
-        if (!keyFile.open(QIODevice::ReadOnly))
-            throw QString("Error opening private key file: %1").arg(keyFileName);
-        QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
-        if (key.isNull())
-            throw QString("Invalid private key.");
-        
-        QMutableListIterator<ServerProperties> serverIterator(serverList);
-        while (serverIterator.hasNext()) {
-            const ServerProperties &prop = serverIterator.next();
-            if (prop.cert == cert) {
-                serverIterator.remove();
-                continue;
-            }
-            
-            QThread *thread = new QThread;
-            thread->setObjectName("isl_" + QString::number(prop.id));
-            connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-            
-            IslInterface *interface = new IslInterface(prop.id, prop.hostname, prop.address.toString(), prop.controlPort, prop.cert, cert, key, this);
-            interface->moveToThread(thread);
-            connect(interface, SIGNAL(destroyed()), thread, SLOT(quit()));
-            
-            thread->start();
-            QMetaObject::invokeMethod(interface, "initClient", Qt::BlockingQueuedConnection);
-        }
-            
-        const int networkPort = settings->value("servernetwork/port", 14747).toInt();
-        qDebug() << "Starting ISL server on port" << networkPort;
-        
-        islServer = new Servatrice_IslServer(this, cert, key, this);
-        if (islServer->listen(QHostAddress::Any, networkPort))
-            qDebug() << "ISL server listening.";
-        else
-            throw QString("islServer->listen()");
-    } } catch (QString error) {
-        qDebug() << "ERROR --" << error;
-        return false;
-    }
-    
-    pingClock = new QTimer(this);
-    connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
-    pingClock->start(1000);
-    
-    int statusUpdateTime = settings->value("server/statusupdate").toInt();
-    statusUpdateClock = new QTimer(this);
-    connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
-    if (statusUpdateTime != 0) {
-        qDebug() << "Starting status update clock, interval " << statusUpdateTime << " ms";
-        statusUpdateClock->start(statusUpdateTime);
-    }
-    
-    const int numberPools = settings->value("server/number_pools", 1).toInt();
-    gameServer = new Servatrice_GameServer(this, numberPools, servatriceDatabaseInterface->getDatabase(), this);
-    gameServer->setMaxPendingConnections(1000);
-    const int gamePort = settings->value("server/port", 4747).toInt();
-    qDebug() << "Starting server on port" << gamePort;
-    if (gameServer->listen(QHostAddress::Any, gamePort))
-        qDebug() << "Server listening.";
-    else {
-        qDebug() << "gameServer->listen(): Error.";
-        return false;
-    }
-    return true;
+	try { if (settings->value("servernetwork/active", 0).toInt()) {
+		qDebug() << "Connecting to ISL network.";
+		const QString certFileName = settings->value("servernetwork/ssl_cert").toString();
+		const QString keyFileName = settings->value("servernetwork/ssl_key").toString();
+		qDebug() << "Loading certificate...";
+		QFile certFile(certFileName);
+		if (!certFile.open(QIODevice::ReadOnly))
+			throw QString("Error opening certificate file: %1").arg(certFileName);
+		QSslCertificate cert(&certFile);
+#if QT_VERSION < 0x050000
+		if (!cert.isValid())
+			throw(QString("Invalid certificate."));
+#else
+		const QDateTime currentTime = QDateTime::currentDateTime();
+		if(currentTime < cert.effectiveDate() ||
+			currentTime > cert.expiryDate() ||
+			cert.isBlacklisted())
+			throw(QString("Invalid certificate."));
+#endif
+		qDebug() << "Loading private key...";
+		QFile keyFile(keyFileName);
+		if (!keyFile.open(QIODevice::ReadOnly))
+			throw QString("Error opening private key file: %1").arg(keyFileName);
+		QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
+		if (key.isNull())
+			throw QString("Invalid private key.");
+		
+		QMutableListIterator<ServerProperties> serverIterator(serverList);
+		while (serverIterator.hasNext()) {
+			const ServerProperties &prop = serverIterator.next();
+			if (prop.cert == cert) {
+				serverIterator.remove();
+				continue;
+			}
+			
+			QThread *thread = new QThread;
+			thread->setObjectName("isl_" + QString::number(prop.id));
+			connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+			
+			IslInterface *interface = new IslInterface(prop.id, prop.hostname, prop.address.toString(), prop.controlPort, prop.cert, cert, key, this);
+			interface->moveToThread(thread);
+			connect(interface, SIGNAL(destroyed()), thread, SLOT(quit()));
+			
+			thread->start();
+			QMetaObject::invokeMethod(interface, "initClient", Qt::BlockingQueuedConnection);
+		}
+			
+		const int networkPort = settings->value("servernetwork/port", 14747).toInt();
+		qDebug() << "Starting ISL server on port" << networkPort;
+		
+		islServer = new Servatrice_IslServer(this, cert, key, this);
+		if (islServer->listen(QHostAddress::Any, networkPort))
+			qDebug() << "ISL server listening.";
+		else
+			throw QString("islServer->listen()");
+	} } catch (QString error) {
+		qDebug() << "ERROR --" << error;
+		return false;
+	}
+	
+	pingClock = new QTimer(this);
+	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
+	pingClock->start(1000);
+	
+	int statusUpdateTime = settings->value("server/statusupdate").toInt();
+	statusUpdateClock = new QTimer(this);
+	connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
+	if (statusUpdateTime != 0) {
+		qDebug() << "Starting status update clock, interval " << statusUpdateTime << " ms";
+		statusUpdateClock->start(statusUpdateTime);
+	}
+	
+	const int numberPools = settings->value("server/number_pools", 1).toInt();
+	gameServer = new Servatrice_GameServer(this, numberPools, servatriceDatabaseInterface->getDatabase(), this);
+	gameServer->setMaxPendingConnections(1000);
+	const int gamePort = settings->value("server/port", 4747).toInt();
+	qDebug() << "Starting server on port" << gamePort;
+	if (gameServer->listen(QHostAddress::Any, gamePort))
+		qDebug() << "Server listening.";
+	else {
+		qDebug() << "gameServer->listen(): Error.";
+		return false;
+	}
+	return true;
 }
 
 void Servatrice::addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface)
@@ -316,21 +328,21 @@ void Servatrice::addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterf
 
 void Servatrice::updateServerList()
 {
-    qDebug() << "Updating server list...";
-    
-    serverListMutex.lock();
-    serverList.clear();
-    
-    QSqlQuery query(servatriceDatabaseInterface->getDatabase());
-    query.prepare("select id, ssl_cert, hostname, address, game_port, control_port from " + dbPrefix + "_servers order by id asc");
-    servatriceDatabaseInterface->execSqlQuery(query);
-    while (query.next()) {
-        ServerProperties prop(query.value(0).toInt(), QSslCertificate(query.value(1).toString().toAscii()), query.value(2).toString(), QHostAddress(query.value(3).toString()), query.value(4).toInt(), query.value(5).toInt());
-        serverList.append(prop);
-        qDebug() << QString("#%1 CERT=%2 NAME=%3 IP=%4:%5 CPORT=%6").arg(prop.id).arg(QString(prop.cert.digest().toHex())).arg(prop.hostname).arg(prop.address.toString()).arg(prop.gamePort).arg(prop.controlPort);
-    }
-    
-    serverListMutex.unlock();
+	qDebug() << "Updating server list...";
+	
+	serverListMutex.lock();
+	serverList.clear();
+	
+	QSqlQuery query(servatriceDatabaseInterface->getDatabase());
+	query.prepare("select id, ssl_cert, hostname, address, game_port, control_port from " + dbPrefix + "_servers order by id asc");
+	servatriceDatabaseInterface->execSqlQuery(query);
+	while (query.next()) {
+		ServerProperties prop(query.value(0).toInt(), QSslCertificate(query.value(1).toString().toUtf8()), query.value(2).toString(), QHostAddress(query.value(3).toString()), query.value(4).toInt(), query.value(5).toInt());
+		serverList.append(prop);
+		qDebug() << QString("#%1 CERT=%2 NAME=%3 IP=%4:%5 CPORT=%6").arg(prop.id).arg(QString(prop.cert.digest().toHex())).arg(prop.hostname).arg(prop.address.toString()).arg(prop.gamePort).arg(prop.controlPort);
+	}
+	
+	serverListMutex.unlock();
 }
 
 QList<ServerProperties> Servatrice::getServerList() const

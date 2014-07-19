@@ -1,5 +1,9 @@
 #include "oracleimporter.h"
-#include <QtGui>
+#if QT_VERSION < 0x050000
+    #include <QtGui>
+#else
+    #include <QtWidgets>
+#endif
 #include <QDebug>
 
 #include "qt-json/json.h"
