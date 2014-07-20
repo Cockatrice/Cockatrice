@@ -78,7 +78,11 @@ Servatrice_GameServer::~Servatrice_GameServer()
 	}
 }
 
+#if QT_VERSION < 0x050000
 void Servatrice_GameServer::incomingConnection(int socketDescriptor)
+#else
+void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
+#endif
 {
 	// Determine connection pool with smallest client count
 	int minClientCount = -1;
@@ -234,8 +238,16 @@ bool Servatrice::initServer()
 		if (!certFile.open(QIODevice::ReadOnly))
 			throw QString("Error opening certificate file: %1").arg(certFileName);
 		QSslCertificate cert(&certFile);
+#if QT_VERSION < 0x050000
 		if (!cert.isValid())
 			throw(QString("Invalid certificate."));
+#else
+		const QDateTime currentTime = QDateTime::currentDateTime();
+		if(currentTime < cert.effectiveDate() ||
+			currentTime > cert.expiryDate() ||
+			cert.isBlacklisted())
+			throw(QString("Invalid certificate."));
+#endif
 		qDebug() << "Loading private key...";
 		QFile keyFile(keyFileName);
 		if (!keyFile.open(QIODevice::ReadOnly))
@@ -319,7 +331,7 @@ void Servatrice::updateServerList()
 	query.prepare("select id, ssl_cert, hostname, address, game_port, control_port from " + dbPrefix + "_servers order by id asc");
 	servatriceDatabaseInterface->execSqlQuery(query);
 	while (query.next()) {
-		ServerProperties prop(query.value(0).toInt(), QSslCertificate(query.value(1).toString().toAscii()), query.value(2).toString(), QHostAddress(query.value(3).toString()), query.value(4).toInt(), query.value(5).toInt());
+		ServerProperties prop(query.value(0).toInt(), QSslCertificate(query.value(1).toString().toUtf8()), query.value(2).toString(), QHostAddress(query.value(3).toString()), query.value(4).toInt(), query.value(5).toInt());
 		serverList.append(prop);
 		qDebug() << QString("#%1 CERT=%2 NAME=%3 IP=%4:%5 CPORT=%6").arg(prop.id).arg(QString(prop.cert.digest().toHex())).arg(prop.hostname).arg(prop.address.toString()).arg(prop.gamePort).arg(prop.controlPort);
 	}

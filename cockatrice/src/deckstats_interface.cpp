@@ -7,6 +7,10 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 
+#if QT_VERSION >= 0x050000
+#include <QUrlQuery>
+#endif
+
 DeckStatsInterface::DeckStatsInterface(
     CardDatabase &_cardDatabase,
     QObject *parent
@@ -41,16 +45,28 @@ void DeckStatsInterface::queryFinished(QNetworkReply *reply)
     deleteLater();
 }
 
-void DeckStatsInterface::analyzeDeck(DeckList *deck)
+void DeckStatsInterface::getAnalyzeRequestData(DeckList *deck, QByteArray *data)
 {
-    QUrl params;
-
     DeckList deckWithoutTokens;
     copyDeckWithoutTokens(*deck, deckWithoutTokens);
 
+#if QT_VERSION < 0x050000
+    QUrl params;
     params.addQueryItem("deck", deckWithoutTokens.writeToString_Plain());
+    data->append(params.encodedQuery());
+#else
+    QUrl params;
+    QUrlQuery urlQuery;
+    urlQuery.addQueryItem("deck", deckWithoutTokens.writeToString_Plain());
+    params.setQuery(urlQuery);
+    data->append(params.query(QUrl::EncodeReserved));
+#endif
+}
+
+void DeckStatsInterface::analyzeDeck(DeckList *deck)
+{
     QByteArray data;
-    data.append(params.encodedQuery());
+    getAnalyzeRequestData(deck, &data);
     
     QNetworkRequest request(QUrl("http://deckstats.net/index.php"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");

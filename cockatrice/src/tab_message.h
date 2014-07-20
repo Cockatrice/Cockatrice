@@ -34,6 +34,7 @@ public:
     ~TabMessage();
     void retranslateUi();
     void closeRequest();
+    void tabActivated();
     QString getUserName() const;
     QString getTabText() const;
 

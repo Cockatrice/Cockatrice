@@ -33,8 +33,9 @@ To compile:
 
 The following flags can be passed to `cmake`:
 
-- `-DWITH_SERVER=1` build the server
-- `-DWITHOUT_CLIENT=1` do not build the client
+- `-DWITH_SERVER=1` Build the server
+- `-DWITHOUT_CLIENT=1` Do not build the client
+- `-DWITH_QT4=1` Force compilation to use Qt4 instead of Qt5.
 
 # Running
 
