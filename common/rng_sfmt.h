@@ -26,15 +26,15 @@
  */
 
 class RNG_SFMT : public RNG_Abstract {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	QMutex mutex;
-	sfmt_t sfmt;
-	// The discrete cumulative distribution function for the RNG
-	unsigned int cdf(unsigned int min, unsigned int max);
+    QMutex mutex;
+    sfmt_t sfmt;
+    // The discrete cumulative distribution function for the RNG
+    unsigned int cdf(unsigned int min, unsigned int max);
 public:
-	RNG_SFMT(QObject *parent = 0);
-	unsigned int rand(int min, int max);
+    RNG_SFMT(QObject *parent = 0);
+    unsigned int rand(int min, int max);
 };
 
 #endif

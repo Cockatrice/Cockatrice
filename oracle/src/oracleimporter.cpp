@@ -1,5 +1,9 @@
 #include "oracleimporter.h"
-#include <QtGui>
+#if QT_VERSION < 0x050000
+    #include <QtGui>
+#else
+    #include <QtWidgets>
+#endif
 #include <QDebug>
 
 #include "qt-json/json.h"
@@ -197,6 +201,11 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
             cardText = map.contains("text") ? map.value("text").toString() : QString("");
             cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
             cardLoyalty = map.contains("loyalty") ? map.value("loyalty").toInt() : 0;
+
+            // Distinguish Vanguard cards from regular cards of the same name.
+            if (map.value("layout") == "vanguard") {
+                cardName += " Avatar";
+            }
         }
 
         CardInfo *card = addCard(set->getShortName(), cardName, false, cardId, cardCost, cardType, cardPT, cardLoyalty, cardText.split("\n"));

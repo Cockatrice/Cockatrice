@@ -16,7 +16,7 @@ QString PasswordHasher::computeHash(const QString &password, const QString &salt
 	const int algo = GCRY_MD_SHA512;
 	const int rounds = 1000;
 
-	QByteArray passwordBuffer = (salt + password).toAscii();
+	QByteArray passwordBuffer = (salt + password).toUtf8();
 	int hashLen = gcry_md_get_algo_dlen(algo);
 	char hash[hashLen], tmp[hashLen];
 	gcry_md_hash_buffer(algo, hash, passwordBuffer.data(), passwordBuffer.size());

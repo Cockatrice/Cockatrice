@@ -11,10 +11,10 @@
 #endif
 
 RNG_SFMT::RNG_SFMT(QObject *parent)
-	: RNG_Abstract(parent)
+    : RNG_Abstract(parent)
 {
-	// initialize the random number generator with a 32bit integer seed (timestamp)
-	sfmt_init_gen_rand(&sfmt, QDateTime::currentDateTime().toTime_t());
+    // initialize the random number generator with a 32bit integer seed (timestamp)
+    sfmt_init_gen_rand(&sfmt, QDateTime::currentDateTime().toTime_t());
 }
 
 /**
@@ -32,11 +32,11 @@ unsigned int RNG_SFMT::rand(int min, int max) {
    * There has been no use for negative random numbers with rand() though, so it's treated as error.
    */
   if(min < 0) {
-	throw std::invalid_argument(
-	  QString("Invalid bounds for RNG: Got min " +
-	  QString::number(min) + " < 0!\n").toStdString());
-	// at this point, the method exits. No return value is needed, because
-	// basically the exception itself is returned.
+    throw std::invalid_argument(
+      QString("Invalid bounds for RNG: Got min " +
+      QString::number(min) + " < 0!\n").toStdString());
+    // at this point, the method exits. No return value is needed, because
+    // basically the exception itself is returned.
   }
 
   // For complete fairness and equal timing, this should be a roll, but let's skip it anyway
@@ -99,38 +99,38 @@ unsigned int RNG_SFMT::rand(int min, int max) {
  */
 unsigned int RNG_SFMT::cdf(unsigned int min, unsigned int max)
 {
-	// This all makes no sense if min > max, which should never happen.
-	if(min > max) {
-		throw std::invalid_argument(
-		  QString("Invalid bounds for RNG: min > max! Values were: min = " +
-		  QString::number(min) + ", max = " +
-		  QString::number(max)).toStdString());
-		// at this point, the method exits. No return value is needed, because
-		// basically the exception itself is returned.
-	}
+    // This all makes no sense if min > max, which should never happen.
+    if(min > max) {
+        throw std::invalid_argument(
+          QString("Invalid bounds for RNG: min > max! Values were: min = " +
+          QString::number(min) + ", max = " +
+          QString::number(max)).toStdString());
+        // at this point, the method exits. No return value is needed, because
+        // basically the exception itself is returned.
+    }
 
-	// First compute the diameter (aka size, length) of the [min, max] interval
-	const unsigned int diameter = max - min + 1;
+    // First compute the diameter (aka size, length) of the [min, max] interval
+    const unsigned int diameter = max - min + 1;
 
-	// Compute how many buckets (each in size of the diameter) will fit into the
-	// universe.
-	// If the division has a remainder, the result is floored automatically.
-	const uint64_t buckets = UINT64_MAX / diameter;
+    // Compute how many buckets (each in size of the diameter) will fit into the
+    // universe.
+    // If the division has a remainder, the result is floored automatically.
+    const uint64_t buckets = UINT64_MAX / diameter;
 
-	// Compute the last valid random number. All numbers beyond have to be ignored.
-	// If there was no remainder in the previous step, limit is equal to UINT64_MAX.
-	const uint64_t limit = diameter * buckets;
+    // Compute the last valid random number. All numbers beyond have to be ignored.
+    // If there was no remainder in the previous step, limit is equal to UINT64_MAX.
+    const uint64_t limit = diameter * buckets;
 
-	uint64_t rand;
-	// To make the random number generation thread-safe, a mutex is created around
-	// the generation. Outside of the loop of course, to avoid lock/unlock overhead.
-	mutex.lock();
-	do {
-		rand = sfmt_genrand_uint64(&sfmt);
-	} while (rand >= limit);
-	mutex.unlock();
+    uint64_t rand;
+    // To make the random number generation thread-safe, a mutex is created around
+    // the generation. Outside of the loop of course, to avoid lock/unlock overhead.
+    mutex.lock();
+    do {
+        rand = sfmt_genrand_uint64(&sfmt);
+    } while (rand >= limit);
+    mutex.unlock();
 
-	// Now determine the bucket containing the SFMT() random number and after adding
-	// the lower bound, a random number from [min, max] can be returned.
-	return (unsigned int) (rand / buckets + min);
+    // Now determine the bucket containing the SFMT() random number and after adding
+    // the lower bound, a random number from [min, max] can be returned.
+    return (unsigned int) (rand / buckets + min);
 }

@@ -15,7 +15,7 @@ RemoteClient::RemoteClient(QObject *parent)
     : AbstractClient(parent), timeRunning(0), lastDataReceived(0), messageInProgress(false), handshakeStarted(false), messageLength(0)
 {
     timer = new QTimer(this);
-    timer->setInterval(9000);
+    timer->setInterval(1000);
     connect(timer, SIGNAL(timeout()), this, SLOT(ping()));
 
     socket = new QTcpSocket(this);

@@ -90,7 +90,7 @@ SET(cockatrice_SOURCES
     src/qt-json/json.cpp
     src/soundengine.cpp
     src/pending_command.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp
+    ${VERSION_STRING_CPP}
 )
 
 if (UNIX AND NOT APPLE)
@@ -125,41 +125,119 @@ if(APPLE)
     set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 ENDIF(APPLE)
 
-if (NOT QT_QTMULTIMEDIA_FOUND)
-    SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
-    FIND_PACKAGE(QtMobility REQUIRED)
-endif (NOT QT_QTMULTIMEDIA_FOUND)
+set(COCKATRICE_LIBS)
 
-SET(QT_USE_QTNETWORK TRUE)
-SET(QT_USE_QTMULTIMEDIA TRUE)
-SET(QT_USE_QTXML TRUE)
-SET(QT_USE_QTSVG TRUE)
+# Qt4 stuff
+if(Qt4_FOUND)
+    if (NOT QT_QTMULTIMEDIA_FOUND)
+        FIND_PACKAGE(QtMobility REQUIRED)
+    endif()
+
+    SET(QT_USE_QTNETWORK TRUE)
+    SET(QT_USE_QTMULTIMEDIA TRUE)
+    SET(QT_USE_QTXML TRUE)
+    SET(QT_USE_QTSVG TRUE)
+
+    # Include directories
+    INCLUDE(${QT_USE_FILE})
+    INCLUDE_DIRECTORIES(${QT_INCLUDES})
+    INCLUDE_DIRECTORIES(${QT_MOBILITY_INCLUDE_DIR})
+    INCLUDE_DIRECTORIES(${QT_MOBILITY_MULTIMEDIAKIT_INCLUDE_DIR})
+    LIST(APPEND COCKATRICE_LIBS ${QT_LIBRARIES})
+    LIST(APPEND COCKATRICE_LIBS ${QT_QTMAIN_LIBRARY})
+    LIST(APPEND COCKATRICE_LIBS ${QT_MOBILITY_MULTIMEDIAKIT_LIBRARY})
+
+    # Let cmake chew Qt4's translations and resource files
+    # Note: header files are MOC-ed automatically by cmake
+    QT4_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
+    QT4_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+endif()
+
+# qt5 stuff
+if(Qt5Widgets_FOUND)
+    include_directories(${Qt5Widgets_INCLUDE_DIRS})
+    list(APPEND COCKATRICE_LIBS Widgets)
+
+    # QtNetwork
+    find_package(Qt5Network)
+    if(Qt5Network_FOUND)
+        include_directories(${Qt5Network_INCLUDE_DIRS})
+        list(APPEND COCKATRICE_LIBS Network)
+    endif()
+
+    # QtMultimedia
+    find_package(Qt5Multimedia)
+    if(Qt5Multimedia_FOUND)
+        include_directories(${Qt5Multimedia_INCLUDE_DIRS})
+        list(APPEND COCKATRICE_LIBS Multimedia)
+    endif()
+
+    # QtPrinter
+    find_package(Qt5PrintSupport)
+    if(Qt5PrintSupport_FOUND)
+        include_directories(${Qt5PrintSupport_INCLUDE_DIRS})
+        list(APPEND COCKATRICE_LIBS PrintSupport)
+    endif()
+
+    # QtXml
+    find_package(Qt5Xml)
+    if(Qt5Xml_FOUND)
+        include_directories(${Qt5Xml_INCLUDE_DIRS})
+        list(APPEND COCKATRICE_LIBS Xml)
+    endif()
+
+    # QtSvg
+    find_package(Qt5Svg)
+    if(Qt5Svg_FOUND)
+        include_directories(${Qt5Svg_INCLUDE_DIRS})
+        list(APPEND COCKATRICE_LIBS Svg)
+    endif()
+
+    # Qt5LinguistTools
+    find_package(Qt5LinguistTools)
+    if(Qt5LinguistTools_FOUND)
+        include_directories(${Qt5LinguistTools_INCLUDE_DIRS})
+        list(APPEND COCKATRICE_LIBS LinguistTools)
+    endif()
+
+    # Let cmake chew Qt5's translations and resource files
+    # Note: header files are MOC-ed automatically by cmake
+    QT5_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
+    QT5_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+
+    # guess plugins and libraries directory
+    set(QT_PLUGINS_DIR "${Qt5Widgets_DIR}/../../../plugins")
+    get_target_property(QT_LIBRARY_DIR Qt5::Core LOCATION)
+    get_filename_component(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} PATH)
+endif()
 
 # Declare path variables
 set(ICONDIR share/icons CACHE STRING "icon dir")
 set(DESKTOPDIR share/applications CACHE STRING "desktop file destination")
 
-# Let cmake chew Qt4's translations and resource files
-# Note: header files are MOC-ed automatically by cmake
-QT4_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
-QT4_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
-
 # Include directories
-INCLUDE(${QT_USE_FILE})
 INCLUDE_DIRECTORIES(../common)
 INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/common)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-INCLUDE_DIRECTORIES(${QT_MOBILITY_INCLUDE_DIR})
-INCLUDE_DIRECTORIES(${QT_MOBILITY_MULTIMEDIAKIT_INCLUDE_DIR})
 
 # Build cockatrice binary and link it
 ADD_EXECUTABLE(cockatrice WIN32 MACOSX_BUNDLE ${cockatrice_SOURCES} ${cockatrice_QM} ${cockatrice_RESOURCES_RCC} ${cockatrice_MOC_SRCS})
-TARGET_LINK_LIBRARIES(cockatrice cockatrice_common ${QT_QTMAIN_LIBRARY} ${QT_LIBRARIES} ${QT_MOBILITY_MULTIMEDIAKIT_LIBRARY})
 
-if(MSVC)
-	set_target_properties(cockatrice PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
-endif(MSVC)
+if(Qt4_FOUND)
+    if(MSVC) 
+        set(QT_USE_QTMAIN true) 
+    endif() 
+    TARGET_LINK_LIBRARIES(cockatrice cockatrice_common ${COCKATRICE_LIBS})
+endif()
+if(Qt5Widgets_FOUND)
+    if(MSVC)
+        TARGET_LINK_LIBRARIES(cockatrice cockatrice_common Qt5::WinMain)
+    else()
+        TARGET_LINK_LIBRARIES(cockatrice cockatrice_common)
+    endif()
+    qt5_use_modules(cockatrice ${COCKATRICE_LIBS})
+endif()
 
 if(UNIX)
     if(APPLE)
@@ -177,11 +255,6 @@ elseif(WIN32)
         INSTALL(TARGETS cockatrice RUNTIME DESTINATION ./)
         INSTALL(FILES ${cockatrice_QM} DESTINATION ./translations)
 endif()
-
-add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version_string.cpp ${CMAKE_CURRENT_BINARY_DIR}/version_string.h
-    COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/../common/getversion.cmake
-)
 
 if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
@@ -213,5 +286,38 @@ Data = Resources\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
         fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/cockatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        " COMPONENT Runtime)
+endif()
+
+if(WIN32)
+    # these needs to be relative to CMAKE_INSTALL_PREFIX
+    set(plugin_dest_dir Plugins)
+    set(qtconf_dest_dir .)
+
+    # note: no codecs in qt5
+    # note: phonon_backend => mediaservice
+    # note: needs platform on osx
+
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*d\\.dll")
+    else()
+        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*[^d]\\.dll")
+    endif()
+
+    install(CODE "
+        file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
+Plugins = Plugins
+Translations = Resources/translations
+Data = Resources\")
+    " COMPONENT Runtime)
+
+    install(CODE "
+        file(GLOB_RECURSE QTPLUGINS
+            \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
+        set(BU_CHMOD_BUNDLE_ITEMS ON)
+        include(BundleUtilities)
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/cockatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         " COMPONENT Runtime)
 endif()
