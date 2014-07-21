@@ -95,6 +95,13 @@ private:
     CardDatabase *db;
 
     QString name;
+
+    /*
+     * The name without punctuation or capitalization, for better card tag name
+     * recognition.
+     */
+    QString simpleName;
+
     bool isToken;
     SetList sets;
     QString manacost;
@@ -153,6 +160,12 @@ public:
     void imageLoaded(const QImage &image);
     CardSet *getPreferredSet();
     int getPreferredMuId();
+
+    /**
+     * Simplify a name to have no punctuation and lowercase all letters, for
+     * less strict name-matching.
+     */
+    static QString simplifyName(const QString &name);
 public slots:
     void updatePixmapCache();
 signals:
@@ -162,11 +175,27 @@ signals:
 
 enum LoadStatus { Ok, VersionTooOld, Invalid, NotLoaded, FileError, NoCards };
 
+typedef QHash<QString, CardInfo *> CardNameMap;
+typedef QHash<QString, CardSet *> SetNameMap;
+
 class CardDatabase : public QObject {
     Q_OBJECT
 protected:
-    QHash<QString, CardInfo *> cardHash;
-    QHash<QString, CardSet *> setHash;
+    /*
+     * The cards, indexed by name.
+     */
+    CardNameMap cards;
+
+    /**
+     * The cards, indexed by their simple name.
+     */
+    CardNameMap simpleNameCards;
+
+    /*
+     * The sets, indexed by short name.
+     */
+    SetNameMap sets;
+
     CardInfo *noCard;
 
     QThread *pictureLoaderThread;
@@ -176,6 +205,8 @@ private:
     static const int versionNeeded;
     void loadCardsFromXml(QXmlStreamReader &xml);
     void loadSetsFromXml(QXmlStreamReader &xml);
+
+    CardInfo *getCardFromMap(CardNameMap &cardMap, const QString &cardName, bool createIfNotFound);
 public:
     CardDatabase(QObject *parent = 0);
     ~CardDatabase();
@@ -183,8 +214,15 @@ public:
     void addCard(CardInfo *card);
     void removeCard(CardInfo *card);
     CardInfo *getCard(const QString &cardName = QString(), bool createIfNotFound = true);
+
+    /*
+     * Get a card by its simple name. The name will be simplified in this
+     * function, so you don't need to simplify it beforehand.
+     */
+    CardInfo *getCardBySimpleName(const QString &cardName = QString(), bool createIfNotFound = true);
+
     CardSet *getSet(const QString &setName);
-    QList<CardInfo *> getCardList() const { return cardHash.values(); }
+    QList<CardInfo *> getCardList() const { return cards.values(); }
     SetList getSetList() const;
     LoadStatus loadFromFile(const QString &fileName, bool tokens = false);
     bool saveToFile(const QString &fileName, bool tokens = false);

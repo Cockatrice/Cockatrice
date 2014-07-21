@@ -81,7 +81,7 @@ CardInfoWidget::CardInfoWidget(ResizeMode _mode, const QString &cardName, QWidge
     } else
         setFixedWidth(250);
     
-    setCard(db->getCard(cardName));
+    setCard(getCard(cardName));
     setMinimized(settingsCache->getCardInfoMinimized());
 }
 
@@ -166,7 +166,7 @@ void CardInfoWidget::setCard(CardInfo *card)
 
 void CardInfoWidget::setCard(const QString &cardName)
 {
-    setCard(db->getCard(cardName));
+    setCard(getCard(cardName));
 }
 
 void CardInfoWidget::setCard(AbstractCardItem *card)
@@ -176,7 +176,11 @@ void CardInfoWidget::setCard(AbstractCardItem *card)
 
 void CardInfoWidget::clear()
 {
-    setCard(db->getCard());
+    setCard(getCard());
+}
+
+CardInfo *CardInfoWidget::getCard(const QString &cardName) {
+    return db->getCardBySimpleName(cardName);
 }
 
 void CardInfoWidget::updatePixmap()
@@ -188,7 +192,7 @@ void CardInfoWidget::updatePixmap()
     if (resizedPixmap)
         cardPicture->setPixmap(*resizedPixmap);
     else
-        cardPicture->setPixmap(*(db->getCard()->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio))));
+        cardPicture->setPixmap(*(getCard()->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio))));
 }
 
 void CardInfoWidget::retranslateUi()
