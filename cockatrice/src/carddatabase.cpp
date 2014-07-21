@@ -436,6 +436,10 @@ int CardInfo::getPreferredMuId()
 
 QString CardInfo::simplifyName(const QString &name) {
     QString simpleName(name);
+
+    // Replace Jötun Grunt with Jotun Grunt.
+    simpleName = simpleName.normalized(QString::NormalizationForm_KD);
+
     simpleName.remove(QRegExp("[^a-zA-Z0-9 ]"));
     simpleName = simpleName.toLower();
     return simpleName;
@@ -553,8 +557,6 @@ CardInfo *CardDatabase::getCard(const QString &cardName, bool createIfNotFound) 
 
 CardInfo *CardDatabase::getCardBySimpleName(const QString &cardName, bool createIfNotFound) {
     QString simpleName = CardInfo::simplifyName(cardName);
-    qDebug() << "Getting card by name " << simpleName << "\n";
-    qDebug() << "Cards available: " << simpleNameCards.size() << "\n";
     return getCardFromMap(simpleNameCards, simpleName, createIfNotFound);
 }
 
