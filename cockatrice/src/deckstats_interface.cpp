@@ -88,7 +88,11 @@ struct CopyIfNotAToken {
         const DecklistCardNode *card
     ) const {
         if (!cardDatabase.getCard(card->getName())->getIsToken()) {
-            destination.addCard(card->getName(), node->getName());
+            DecklistCardNode *addedCard = destination.addCard(
+                card->getName(),
+                node->getName()
+            );
+            addedCard->setNumber(card->getNumber());
         }
     }
 };
