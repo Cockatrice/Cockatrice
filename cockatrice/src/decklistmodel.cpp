@@ -472,13 +472,7 @@ void DeckListModel::printDeckList(QPrinter *printer)
     doc.print(printer);
 }
 
-void DeckListModel::pricesUpdated(InnerDecklistNode *node)
+void DeckListModel::pricesUpdated()
 {
-    if (!node)
-        node = root;
-    
-    if (node->isEmpty())
-        return;
-    
-    emit dataChanged(createIndex(0, 2, node->at(0)), createIndex(node->size() - 1, 2, node->last()));
+    emit layoutChanged();
 }
