@@ -31,6 +31,7 @@ public:
     virtual QString getTabText() const = 0;
     virtual void retranslateUi() = 0;
     virtual void closeRequest() { }
+    virtual void tabActivated() { }
 };
 
 #endif

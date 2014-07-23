@@ -80,8 +80,8 @@ CardInfo *OracleImporter::addCard(const QString &setName,
     cardCost.remove(QChar('}'));
 
     CardInfo *card;
-    if (cardHash.contains(cardName)) {
-        card = cardHash.value(cardName);
+    if (cards.contains(cardName)) {
+        card = cards.value(cardName);
         if (splitCard && !card->getText().contains(fullCardText))
             card->setText(card->getText() + "\n---\n" + fullCardText);
     } else {
@@ -121,7 +121,7 @@ CardInfo *OracleImporter::addCard(const QString &setName,
             tableRow = 2;
         card->setTableRow(tableRow);
         
-        cardHash.insert(cardName, card);
+        cards.insert(cardName, card);
     }
     card->setMuId(setName, cardId);
 
@@ -141,6 +141,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
     QString cardText;
     int cardId;
     int cardLoyalty;
+    bool cardIsToken = false;
     QMap<int, QVariantMap> splitCards;
 
     while (it.hasNext()) {
@@ -201,6 +202,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
             cardText = map.contains("text") ? map.value("text").toString() : QString("");
             cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
             cardLoyalty = map.contains("loyalty") ? map.value("loyalty").toInt() : 0;
+            cardIsToken = map.value("layout") == "token";
 
             // Distinguish Vanguard cards from regular cards of the same name.
             if (map.value("layout") == "vanguard") {
@@ -208,7 +210,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
             }
         }
 
-        CardInfo *card = addCard(set->getShortName(), cardName, false, cardId, cardCost, cardType, cardPT, cardLoyalty, cardText.split("\n"));
+        CardInfo *card = addCard(set->getShortName(), cardName, cardIsToken, cardId, cardCost, cardType, cardPT, cardLoyalty, cardText.split("\n"));
 
         if (!set->contains(card)) {
             card->addToSet(set);
@@ -234,8 +236,8 @@ int OracleImporter::startImport()
             continue;
             
         CardSet *set = new CardSet(curSet->getShortName(), curSet->getLongName());
-        if (!setHash.contains(set->getShortName()))
-            setHash.insert(set->getShortName(), set);
+        if (!sets.contains(set->getShortName()))
+            sets.insert(set->getShortName(), set);
 
         int setCards = importTextSpoiler(set, curSet->getCards());
 

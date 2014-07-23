@@ -512,7 +512,10 @@ void TabDeckEditor::actPrintDeck()
 
 void TabDeckEditor::actAnalyzeDeck()
 {
-    DeckStatsInterface *interface = new DeckStatsInterface(this); // it deletes itself when done
+    DeckStatsInterface *interface = new DeckStatsInterface(
+        *databaseModel->getDatabase(),
+        this
+    ); // it deletes itself when done
     interface->analyzeDeck(deckModel->getDeckList());
 }
 

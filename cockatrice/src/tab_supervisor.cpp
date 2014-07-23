@@ -479,6 +479,7 @@ void TabSupervisor::updateCurrent(int index)
             tab->setContentsChanged(false);
         }
         emit setMenu(static_cast<Tab *>(widget(index))->getTabMenus());
+        tab->tabActivated();
     } else
         emit setMenu();
 }

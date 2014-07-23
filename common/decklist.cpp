@@ -570,8 +570,19 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         cardName.replace(rx, "AE");
         rx.setPattern("^Aether");
         cardName.replace(rx, "AEther");
-        rx.setPattern("\\s*[&|/]{1,2}\\s*");
+        rx.setPattern("\\s*[|/]{1,2}\\s*");
         cardName.replace(rx, " // ");
+
+        // Replace only if the ampersand is preceded by a non-capital letter,
+        // as would happen with acronyms. So 'Fire & Ice' is replaced but not
+        // 'R&D' or 'R & D'.
+        //
+        // Qt regexes don't support lookbehind so we capture and replace
+        // instead.
+        rx.setPattern("([^A-Z])\\s*&\\s*");
+        if (rx.indexIn(cardName) != -1) {
+            cardName.replace(rx, QString("%1 // ").arg(rx.cap(1)));
+        }
 
         ++okRows;
         new DecklistCardNode(cardName, number, zone);
@@ -586,16 +597,30 @@ bool DeckList::loadFromFile_Plain(QIODevice *device)
     return loadFromStream_Plain(in);
 }
 
+struct WriteToStream {
+    QTextStream &stream;
+
+    WriteToStream(QTextStream &_stream) : stream(_stream) {}
+
+    void operator()(
+        const InnerDecklistNode *node,
+        const DecklistCardNode *card
+    ) {
+       if (node->getName() == "side") {
+           stream << "SB: ";
+       }
+       stream << QString("%1 %2\n").arg(
+           card->getNumber()
+       ).arg(
+           card->getName()
+       );
+    }
+};
+
 bool DeckList::saveToStream_Plain(QTextStream &out)
 {
-    // Support for this is only possible if the internal structure doesn't get more complicated.
-    for (int i = 0; i < root->size(); i++) {
-        InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
-        for (int j = 0; j < node->size(); j++) {
-            DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
-            out << QString("%1%2 %3\n").arg(node->getName() == "side" ? "SB: " : "").arg(card->getNumber()).arg(card->getName());
-        }
-    }
+    WriteToStream writeToStream(out);
+    forEachCard(writeToStream);
     return true;
 }
 
