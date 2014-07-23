@@ -80,8 +80,8 @@ CardInfo *OracleImporter::addCard(const QString &setName,
     cardCost.remove(QChar('}'));
 
     CardInfo *card;
-    if (cardHash.contains(cardName)) {
-        card = cardHash.value(cardName);
+    if (cards.contains(cardName)) {
+        card = cards.value(cardName);
         if (splitCard && !card->getText().contains(fullCardText))
             card->setText(card->getText() + "\n---\n" + fullCardText);
     } else {
@@ -121,7 +121,7 @@ CardInfo *OracleImporter::addCard(const QString &setName,
             tableRow = 2;
         card->setTableRow(tableRow);
         
-        cardHash.insert(cardName, card);
+        cards.insert(cardName, card);
     }
     card->setMuId(setName, cardId);
 
@@ -236,8 +236,8 @@ int OracleImporter::startImport()
             continue;
             
         CardSet *set = new CardSet(curSet->getShortName(), curSet->getLongName());
-        if (!setHash.contains(set->getShortName()))
-            setHash.insert(set->getShortName(), set);
+        if (!sets.contains(set->getShortName()))
+            sets.insert(set->getShortName(), set);
 
         int setCards = importTextSpoiler(set, curSet->getCards());
 
