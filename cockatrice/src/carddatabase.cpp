@@ -684,41 +684,12 @@ CardInfo *CardDatabase::getCardFromMap(CardNameMap &cardMap, const QString &card
         return 0;
 }
 
-LoadStatus CardDatabase::loadFromFile(const QString &fileName, bool tokens)
+LoadStatus CardDatabase::loadFromFile(const QString &fileName)
 {
     QFile file(fileName);
     file.open(QIODevice::ReadOnly);
     if (!file.isOpen())
         return FileError;
-
-    if (tokens) {
-        QMutableHashIterator<QString, CardInfo *> i(cards);
-        while (i.hasNext()) {
-            i.next();
-            if (i.value()->getIsToken()) {
-                removeCard(i.value());
-                delete i.value();
-            }
-        }
-    } else {
-        QHashIterator<QString, CardSet *> setIt(sets);
-        while (setIt.hasNext()) {
-            setIt.next();
-            delete setIt.value();
-        }
-        sets.clear();
-
-        QMutableHashIterator<QString, CardInfo *> i(cards);
-        while (i.hasNext()) {
-            i.next();
-            if (!i.value()->getIsToken()) {
-                removeCard(i.value());
-                delete i.value();
-            }
-        }
-        cards.clear();
-        simpleNameCards.clear();
-    }
 
     QXmlStreamReader xml(&file);
     while (!xml.atEnd()) {
@@ -771,8 +742,7 @@ bool CardDatabase::saveToFile(const QString &fileName, bool tokens)
     QHashIterator<QString, CardInfo *> cardIterator(cards);
     while (cardIterator.hasNext()) {
         CardInfo *card = cardIterator.next().value();
-        if (card->getIsToken() == tokens)
-            xml << card;
+        xml << card;
     }
     xml.writeEndElement(); // cards
 
@@ -806,7 +776,7 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path, bool tokens)
 {
     LoadStatus tempLoadStatus = NotLoaded;
     if (!path.isEmpty())
-        tempLoadStatus = loadFromFile(path, tokens);
+        tempLoadStatus = loadFromFile(path);
 
     if (tempLoadStatus == Ok) {
         SetList allSets;
