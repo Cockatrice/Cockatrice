@@ -1,7 +1,7 @@
 #ifndef PRICEUPDATER_H
 #define PRICEUPDATER_H
 
-#include <QNetworkReply>
+#include <QNetworkAccessManager>
 #include "decklist.h"
 
 class QNetworkAccessManager;
@@ -46,8 +46,10 @@ class DBPriceUpdater : public AbstractPriceUpdater
     Q_OBJECT
 protected:
     MuidStringMap muidMap;
+    QList<QString> urls;
 protected:
     virtual void downloadFinished();
+    void requestNext();
 public:
     DBPriceUpdater(const DeckList *deck);
     virtual void updatePrices();

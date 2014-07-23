@@ -121,12 +121,15 @@ DBPriceUpdater::DBPriceUpdater(const DeckList *_deck)
  */
 void DBPriceUpdater::updatePrices()
 {
-    QString q = "https://api.deckbrew.com/mtg/cards";
+    QString base = "https://api.deckbrew.com/mtg/cards", q = "";
     QStringList cards = deck->getCardList();
     muidMap.clear();
+    urls.clear();
     CardInfo * card;
     int muid;
     SetList sets;
+    bool bNotFirst=false;
+
     for (int i = 0; i < cards.size(); ++i) {
         card = db->getCard(cards[i], false);
         sets = card->getSets();
@@ -134,11 +137,35 @@ void DBPriceUpdater::updatePrices()
         {
             muid=card->getMuId(sets[j]->getShortName());
             //qDebug() << "muid " << muid << " card: " << cards[i] << endl;
-            q += (i ? "&" : "?") + QString("m=%1").arg(muid);
+            if(bNotFirst)
+            {
+                q += QString("&m=%1").arg(muid);
+            } else {
+                q += QString("?m=%1").arg(muid);
+                bNotFirst = true;
+            }
             muidMap.insert(muid, cards[i]);
         }
+
+        if(q.length() > 240)
+        {
+            urls.append(base + q);
+            bNotFirst=false;
+            q = "";
+        }
     }
-    QUrl url(q);
+    if(q.length() > 0)
+        urls.append(base + q);
+
+    requestNext();
+}
+
+void DBPriceUpdater::requestNext()
+{
+    if(urls.empty())
+        return;
+
+    QUrl url(urls.takeFirst(), QUrl::TolerantMode);
     //qDebug() << "request prices from: " << url.toString() << endl;
     QNetworkReply *reply = nam->get(QNetworkRequest(url));
     connect(reply, SIGNAL(finished()), this, SLOT(downloadFinished()));
@@ -158,8 +185,13 @@ void DBPriceUpdater::downloadFinished()
     if (!ok) {
         QMessageBox::critical(this, tr("Error"), tr("A problem has occured while fetching card prices."));
         reply->deleteLater();
-        deleteLater();
-        return;
+        if(urls.isEmpty())
+        {
+            deleteLater();
+            emit finishedUpdate();
+        } else {
+            requestNext();
+        }
     }
 
     if(resultMap.contains("errors"))
@@ -173,8 +205,13 @@ void DBPriceUpdater::downloadFinished()
 #endif
         );
         reply->deleteLater();
-        deleteLater();
-        return;
+        if(urls.isEmpty())
+        {
+            deleteLater();
+            emit finishedUpdate();
+        } else {
+            requestNext();
+        }
     }
 
     // Good results are a list
@@ -182,8 +219,13 @@ void DBPriceUpdater::downloadFinished()
     if (!ok) {
         QMessageBox::critical(this, tr("Error"), tr("A problem has occured while fetching card prices."));
         reply->deleteLater();
-        deleteLater();
-        return;
+        if(urls.isEmpty())
+        {
+            deleteLater();
+            emit finishedUpdate();
+        } else {
+            requestNext();
+        }
     }
 
     QMap<QString, float> cardsPrice;
@@ -226,11 +268,18 @@ void DBPriceUpdater::downloadFinished()
             DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
             if (!currentCard)
                 continue;
-            currentCard->setPrice(cardsPrice[currentCard->getName()]);
+            float price = cardsPrice[currentCard->getName()];
+            if(price > 0)
+                currentCard->setPrice(price);
         }
     }
     
     reply->deleteLater();
-    deleteLater();
-    emit finishedUpdate();
+    if(urls.isEmpty())
+    {
+        deleteLater();
+        emit finishedUpdate();
+    } else {
+        requestNext();
+    }
 }
