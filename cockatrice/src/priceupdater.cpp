@@ -145,13 +145,13 @@ void DBPriceUpdater::updatePrices()
                 bNotFirst = true;
             }
             muidMap.insert(muid, cards[i]);
-        }
 
-        if(q.length() > 240)
-        {
-            urls.append(base + q);
-            bNotFirst=false;
-            q = "";
+            if(q.length() > 240)
+            {
+                urls.append(base + q);
+                bNotFirst=false;
+                q = "";
+            }
         }
     }
     if(q.length() > 0)
