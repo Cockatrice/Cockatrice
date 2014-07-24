@@ -18,10 +18,10 @@ public:
     virtual void enable() { enabled = true; nodeChanged(); }
     virtual void disable() { enabled = false; nodeChanged(); }
     virtual FilterTreeNode *parent() const { return NULL; }
-    virtual FilterTreeNode *nodeAt(int i) const { return NULL; }
-    virtual void deleteAt(int i) {}
+    virtual FilterTreeNode *nodeAt(int /* i */) const { return NULL; }
+    virtual void deleteAt(int /* i */) {}
     virtual int childCount() const { return 0; }
-    virtual int childIndex(const FilterTreeNode *node) const { return -1; }
+    virtual int childIndex(const FilterTreeNode * /* node */) const { return -1; }
     virtual int index() const { return (parent() != NULL)? parent()->childIndex(this) : -1; }
     virtual QString text() const { return QString(textCStr()); }
     virtual bool isLeaf() const { return false; }
