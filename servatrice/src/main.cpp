@@ -37,6 +37,23 @@ RNG_Abstract *rng;
 ServerLogger *logger;
 QThread *loggerThread;
 
+/* Prototypes */
+
+void testRNG();
+void testHash();
+#if QT_VERSION < 0x050000
+void myMessageOutput(QtMsgType type, const char *msg);
+void myMessageOutput2(QtMsgType type, const char *msg);
+#else
+void myMessageOutput(QtMsgType type, const QMessageLogContext &, const QString &msg);
+void myMessageOutput2(QtMsgType type, const QMessageLogContext &, const QString &msg);
+#endif
+#ifdef Q_OS_UNIX
+void sigSegvHandler(int sig);
+#endif
+
+/* Implementations */
+
 void testRNG()
 {
 	const int n = 500000;
