@@ -48,7 +48,7 @@ class FilterTreeBranch : public FilterTreeNode {
 protected:
     QList<T> childNodes;
 public:
-    ~FilterTreeBranch();
+    virtual ~FilterTreeBranch();
     FilterTreeNode *nodeAt(int i) const;
     void deleteAt(int i);
     int childCount() const { return childNodes.size(); }
@@ -102,6 +102,7 @@ public:
 
     FilterItem(QString trm, FilterItemList *parent)
         : p(parent), term(trm) {}
+    virtual ~FilterItem() {};
 
     CardFilter::Attr attr() const { return p->attr(); }
     CardFilter::Type type() const { return p->type; }
