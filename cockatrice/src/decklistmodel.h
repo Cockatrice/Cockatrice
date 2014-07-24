@@ -51,7 +51,7 @@ public:
     void cleanList();
     DeckLoader *getDeckList() const { return deckList; }
     void setDeckList(DeckLoader *_deck);
-    void pricesUpdated(InnerDecklistNode *node = 0);
+    void pricesUpdated();
 private:
     DeckLoader *deckList;
     InnerDecklistNode *root;
