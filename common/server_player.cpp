@@ -1594,7 +1594,7 @@ Response::ResponseCode Server_Player::cmdRevealCards(const Command_RevealCards &
     return Response::RespOk;
 }
 
-Response::ResponseCode Server_Player::cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd, ResponseContainer &rc, GameEventStorage &ges)
+Response::ResponseCode Server_Player::cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd, ResponseContainer & /* rc */, GameEventStorage &ges)
 {
     Server_CardZone *zone = zones.value(QString::fromStdString(cmd.zone_name()));
     if (!zone)
