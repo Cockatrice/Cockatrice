@@ -136,6 +136,11 @@ void DBPriceUpdater::updatePrices()
         for(int j = 0; j < sets.size(); ++j)
         {
             muid=card->getMuId(sets[j]->getShortName());
+
+            if (!muid) {
+                continue;
+            }
+
             //qDebug() << "muid " << muid << " card: " << cards[i] << endl;
             if(bNotFirst)
             {
