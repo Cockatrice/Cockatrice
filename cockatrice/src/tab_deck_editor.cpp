@@ -646,6 +646,7 @@ void TabDeckEditor::actDecrement()
 void TabDeckEditor::setPriceTagFeatureEnabled(int enabled)
 {
     aUpdatePrices->setVisible(enabled);
+    deckModel->pricesUpdated();
 }
 
 void TabDeckEditor::actUpdatePrices()
