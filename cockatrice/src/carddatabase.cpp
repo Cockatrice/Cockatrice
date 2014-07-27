@@ -153,12 +153,18 @@ QString PictureLoader::getPicUrl(CardInfo *card)
 {
     if (!picDownload) return 0;
 
-    // first check if a custom card url exists in cards.xml
     CardSet *set = card->getPreferredSet();
-    QString picUrl = picDownloadHq ? 
-        card->getCustomPicURLHq(set->getShortName()) : 
-        card->getCustomPicURL(set->getShortName());
+    QString picUrl = QString("");
+    // first check if Hq is enabled and a custom Hq card url exists in cards.xml
+    if(picDownloadHq)
+    {
+        picUrl = card->getCustomPicURLHq(set->getShortName());
+        if (!picUrl.isEmpty())
+            return picUrl;
+    }
 
+    // then, test for a custom, non-Hq card url in cards.xml
+    picUrl = card->getCustomPicURL(set->getShortName());
     if (!picUrl.isEmpty())
         return picUrl;
 
