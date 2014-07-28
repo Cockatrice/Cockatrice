@@ -742,7 +742,9 @@ bool CardDatabase::saveToFile(const QString &fileName, bool tokens)
     QHashIterator<QString, CardInfo *> cardIterator(cards);
     while (cardIterator.hasNext()) {
         CardInfo *card = cardIterator.next().value();
-        xml << card;
+        if (tokens == card->getIsToken()) {
+            xml << card;
+        }
     }
     xml.writeEndElement(); // cards
 
