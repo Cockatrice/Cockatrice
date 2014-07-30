@@ -311,8 +311,9 @@ void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
 void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 {
     const ServerInfo_User &userInfo = static_cast<UserListTWI *>(userTree->topLevelItem(index.row()))->getUserInfo();
-    
-    userContextMenu->showContextMenu(pos, QString::fromStdString(userInfo.name()), UserLevelFlags(userInfo.user_level()));
+    bool online = index.sibling(index.row(), 0).data(Qt::UserRole + 1).toBool();
+
+    userContextMenu->showContextMenu(pos, QString::fromStdString(userInfo.name()), UserLevelFlags(userInfo.user_level()), online);
 }
 
 void UserList::sortItems()

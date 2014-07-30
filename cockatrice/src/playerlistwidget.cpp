@@ -178,5 +178,5 @@ void PlayerListWidget::showContextMenu(const QPoint &pos, const QModelIndex &ind
     int playerId = index.sibling(index.row(), 4).data(Qt::UserRole + 1).toInt();
     UserLevelFlags userLevel(index.sibling(index.row(), 3).data(Qt::UserRole).toInt());
     
-    userContextMenu->showContextMenu(pos, userName, userLevel, playerId);
+    userContextMenu->showContextMenu(pos, userName, userLevel, true, playerId);
 }
