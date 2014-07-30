@@ -49,7 +49,7 @@ protected:
     AuthenticationResult authState;
     bool acceptsUserListChanges;
     bool acceptsRoomListChanges;
-    virtual void logDebugMessage(const QString &message) { }
+    virtual void logDebugMessage(const QString & /* message */) { }
 private:
     QList<int> messageSizeOverTime, messageCountOverTime;
     int timeRunning, lastDataReceived;
@@ -71,13 +71,13 @@ private:
     Response::ResponseCode cmdJoinGame(const Command_JoinGame &cmd, Server_Room *room, ResponseContainer &rc);
     
     Response::ResponseCode processSessionCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
-    virtual Response::ResponseCode processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc) { return Response::RespFunctionNotAllowed; }
+    virtual Response::ResponseCode processExtendedSessionCommand(int /* cmdType */, const SessionCommand & /* cmd */, ResponseContainer & /* rc */) { return Response::RespFunctionNotAllowed; }
     Response::ResponseCode processRoomCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
     Response::ResponseCode processGameCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
     Response::ResponseCode processModeratorCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
-    virtual Response::ResponseCode processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc) { return Response::RespFunctionNotAllowed; }
+    virtual Response::ResponseCode processExtendedModeratorCommand(int /* cmdType */, const ModeratorCommand & /* cmd */, ResponseContainer & /* rc */) { return Response::RespFunctionNotAllowed; }
     Response::ResponseCode processAdminCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
-    virtual Response::ResponseCode processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc) { return Response::RespFunctionNotAllowed; }
+    virtual Response::ResponseCode processExtendedAdminCommand(int /* cmdType */, const AdminCommand & /* cmd */, ResponseContainer & /* rc */) { return Response::RespFunctionNotAllowed; }
 private slots:
     void pingClockTimeout();
 public slots:

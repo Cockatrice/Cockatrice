@@ -97,7 +97,7 @@ protected slots:
     void externalGameEventContainerReceived(const GameEventContainer &cont, qint64 sessionId);
     void externalResponseReceived(const Response &resp, qint64 sessionId);
     
-    virtual void doSendIslMessage(const IslMessage &msg, int serverId) { }
+    virtual void doSendIslMessage(const IslMessage & /* msg */, int /* serverId */) { }
 protected:
     void prepareDestroy();
     void setDatabaseInterface(Server_DatabaseInterface *_databaseInterface);

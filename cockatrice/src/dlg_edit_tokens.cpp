@@ -113,7 +113,7 @@ DlgEditTokens::DlgEditTokens(CardDatabaseModel *_cardDatabaseModel, QWidget *par
     setWindowTitle(tr("Edit tokens"));
 }
 
-void DlgEditTokens::tokenSelectionChanged(const QModelIndex &current, const QModelIndex &previous)
+void DlgEditTokens::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /* previous */)
 {
     const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
     CardInfo *cardInfo = current.row() >= 0 ? cardDatabaseModel->getCard(realIndex.row()) : cardDatabaseModel->getDatabase()->getCard();
