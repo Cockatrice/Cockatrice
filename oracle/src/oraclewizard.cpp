@@ -379,21 +379,25 @@ bool SaveSetsPage::validatePage()
         QDir dir(dataDir);
         if (!dir.exists())
             dir.mkpath(dataDir);
-        savePath = dataDir + "/cards.xml";
-        settings->setValue("paths/carddatabase", savePath);
     }
-    qDebug(savePath.toLatin1());
     do {
         QString fileName;
-        if (savePath.isEmpty() || !defaultPathCheckBox->isChecked())
-            fileName = QFileDialog::getSaveFileName(this, tr("Save card database"), dataDir + "/cards.xml", tr("XML card database (*.xml)"));
+        if (savePath.isEmpty()) {
+            if (!defaultPathCheckBox->isChecked())
+                fileName = QFileDialog::getSaveFileName(this, tr("Save card database"), dataDir + "/cards.xml", tr("XML card database (*.xml)"));
+            else
+                fileName = dataDir + "/cards.xml";;
+            settings->setValue("paths/carddatabase", fileName);
+        }
         else {
-            fileName = savePath;
+            if (!defaultPathCheckBox->isChecked())
+                fileName = QFileDialog::getSaveFileName(this, tr("Save card database"), savePath, tr("XML card database (*.xml)"));
+            else
+                fileName = savePath;
             savePath.clear();
         }
-        if (fileName.isEmpty()) {
+        if (fileName.isEmpty())
             return false;
-        }
         if (wizard()->importer->saveToFile(fileName))
             ok = true;
         else
