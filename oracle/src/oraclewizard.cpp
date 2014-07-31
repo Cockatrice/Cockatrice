@@ -374,12 +374,15 @@ bool SaveSetsPage::validatePage()
     bool ok = false;
     QSettings* settings = new QSettings(this);
     QString savePath = settings->value("paths/carddatabase").toString();
-    //Not really sure if dataDir is necessary anymore, but leaving it in for safety
     const QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    /*QDir dir(dataDir);
-    if (!dir.exists())
-        dir.mkpath(dataDir);
-    QString savePath = dataDir + "/cards.xml";*/
+    if (savePath.isEmpty()) {
+        QDir dir(dataDir);
+        if (!dir.exists())
+            dir.mkpath(dataDir);
+        savePath = dataDir + "/cards.xml";
+        settings->setValue("paths/carddatabase", savePath);
+    }
+    qDebug(savePath.toLatin1());
     do {
         QString fileName;
         if (savePath.isEmpty() || !defaultPathCheckBox->isChecked())
