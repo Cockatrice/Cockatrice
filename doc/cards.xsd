@@ -34,7 +34,7 @@
                         </xs:simpleContent>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element type="xs:string" name="color" minOccurs="0"/>
+                    <xs:element type="xs:string" name="color" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element type="xs:string" name="manacost"/>
                     <xs:element type="xs:string" name="type"/>
                     <xs:element type="xs:string" name="pt" minOccurs="0"/>
