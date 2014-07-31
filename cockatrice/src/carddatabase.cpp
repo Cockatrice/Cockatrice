@@ -129,21 +129,22 @@ void PictureLoader::processLoadQueue()
         QString setName = ptl.getSetName();
 
         QImage image;
-        if (!image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(setName).arg(correctedName)))
-            if (!image.load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(setName).arg(correctedName).arg(1)))
-                if (!image.load(QString("%1/%2/%3/%4.full.jpg").arg(picsPath).arg("downloadedPics").arg(setName).arg(correctedName))) {
-                    if (picDownload) {
-                        cardsToDownload.append(ptl);
-                        if (!downloadRunning)
-                            startNextPicDownload();
-                    } else {
-                        if (ptl.nextSet())
-                            loadQueue.prepend(ptl);
-                        else
-                            emit imageLoaded(ptl.getCard(), QImage());
+        if (!image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg("CUSTOM").arg(correctedName))) {
+            if (!image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(setName).arg(correctedName)))
+                //if (!image.load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(setName).arg(correctedName).arg(1)))
+                    if (!image.load(QString("%1/%2/%3/%4.full.jpg").arg(picsPath).arg("downloadedPics").arg(setName).arg(correctedName))) {
+                        if (picDownload) {
+                            cardsToDownload.append(ptl);
+                            if (!downloadRunning)
+                                startNextPicDownload();
+                        } else {
+                            if (ptl.nextSet())
+                                loadQueue.prepend(ptl);
+                            else
+                                emit imageLoaded(ptl.getCard(), QImage());
+                        }
                     }
-                    continue;
-                }
+        }
 
         emit imageLoaded(ptl.getCard(), image);
     }
