@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
         settingsCache->setPicsPath(dataDir + "/pics");
     }
     if (!QDir().mkpath(settingsCache->getPicsPath() + "/CUSTOM"))
-        qDebug("Could not create " + settingsCache->getPicsPath().toLatin1() + "/CUSTOM. Will fall back on default card images.");
+        qDebug("Could not create " + settingsCache->getPicsPath().toUtf8() + "/CUSTOM. Will fall back on default card images.");
         
 #ifdef Q_OS_MAC
     if(settingsCache->getHandBgPath().isEmpty() &&
