@@ -129,22 +129,24 @@ void PictureLoader::processLoadQueue()
         QString setName = ptl.getSetName();
 
         QImage image;
-        if (!image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg("CUSTOM").arg(correctedName))) {
-            if (!image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(setName).arg(correctedName)))
-                //if (!image.load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(setName).arg(correctedName).arg(1)))
-                    if (!image.load(QString("%1/%2/%3/%4.full.jpg").arg(picsPath).arg("downloadedPics").arg(setName).arg(correctedName))) {
-                        if (picDownload) {
-                            cardsToDownload.append(ptl);
-                            if (!downloadRunning)
-                                startNextPicDownload();
-                        } else {
-                            if (ptl.nextSet())
-                                loadQueue.prepend(ptl);
-                            else
-                                emit imageLoaded(ptl.getCard(), QImage());
-                        }
-                    }
-        }
+        //Supports loading JPG and PNG images; default is JPG
+        if (!image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg("CUSTOM").arg(correctedName)))
+            if (!image.load(QString("%1/%2/%3.full.png").arg(picsPath).arg("CUSTOM").arg(correctedName)))
+                if (!image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(setName).arg(correctedName)))
+                    if (!image.load(QString("%1/%2/%3.full.png").arg(picsPath).arg(setName).arg(correctedName)))
+                        if (!image.load(QString("%1/%2/%3/%4.full.jpg").arg(picsPath).arg("downloadedPics").arg(setName).arg(correctedName)))
+                            if (!image.load(QString("%1/%2/%3/%4.full.png").arg(picsPath).arg("downloadedPics").arg(setName).arg(correctedName))) {
+                                if (picDownload) {
+                                    cardsToDownload.append(ptl);
+                                    if (!downloadRunning)
+                                    startNextPicDownload();
+                                } else {
+                                    if (ptl.nextSet())
+                                        loadQueue.prepend(ptl);
+                                    else
+                                        emit imageLoaded(ptl.getCard(), QImage());
+                                }
+                            }
 
         emit imageLoaded(ptl.getCard(), image);
     }
@@ -226,11 +228,13 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
         if (!cardBeingDownloaded.getStripped())
             suffix = ".full";
 
-        QFile newPic(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + ".jpg");
-        if (!newPic.open(QIODevice::WriteOnly))
-            return;
-        newPic.write(picData);
-        newPic.close();
+        //Supports JPG and PNG images; default is JPG
+        QString extension = ".jpg";
+        if (picData.left(8) == QByteArray::fromHex("89504E470D0A1A0A"))
+            extension = ".png";
+
+        if (!testImage.save(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + extension))
+            qDebug() << picsPath.toUtf8() + "/downloadedPics/" + cardBeingDownloaded.getSetName().toUtf8() + "/" + cardBeingDownloaded.getCard()->getCorrectedName().toUtf8() + suffix.toUtf8() + extension.toUtf8() + "was not successfully saved.";
 
         emit imageLoaded(cardBeingDownloaded.getCard(), testImage);
     } else if (cardBeingDownloaded.getHq()) {
