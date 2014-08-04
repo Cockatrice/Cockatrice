@@ -233,8 +233,11 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
         if (picData.left(8) == QByteArray::fromHex("89504E470D0A1A0A"))
             extension = ".png";
 
-        if (!testImage.save(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + extension))
-            qDebug() << picsPath.toUtf8() + "/downloadedPics/" + cardBeingDownloaded.getSetName().toUtf8() + "/" + cardBeingDownloaded.getCard()->getCorrectedName().toUtf8() + suffix.toUtf8() + extension.toUtf8() + "was not successfully saved.";
+        QFile newPic(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + extension);
+        if (!newPic.open(QIODevice::WriteOnly))
+            return;
+        newPic.write(picData);
+        newPic.close();
 
         emit imageLoaded(cardBeingDownloaded.getCard(), testImage);
     } else if (cardBeingDownloaded.getHq()) {
