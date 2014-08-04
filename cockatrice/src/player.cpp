@@ -959,6 +959,10 @@ void Player::actCreateToken()
         return;
     
     lastTokenName = dlg.getName();
+    if (CardInfo *correctedCard = db->getCardBySimpleName(lastTokenName, false)) {
+        lastTokenName = correctedCard->getName();
+    }
+
     lastTokenColor = dlg.getColor();
     lastTokenPT = dlg.getPT();
     lastTokenAnnotation = dlg.getAnnotation();
