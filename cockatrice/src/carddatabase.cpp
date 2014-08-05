@@ -13,12 +13,9 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QDebug>
+#include <QImageReader>
 
 const int CardDatabase::versionNeeded = 3;
-
-//Specifies image formats and their associated signature bytes (expected first x bytes, in hex)
-const QList<QString> PictureLoader::imgFormats = QList<QString>() << ".png";
-const QList<QByteArray> PictureLoader::imgSignatures = QList<QByteArray>() << "89504E470D0A1A0A";
 
 static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
 {
@@ -135,22 +132,17 @@ void PictureLoader::processLoadQueue()
                                                     << _picsPath + "/downloadedPics/" + ptl.getSetName() + "/" + ptl.getCard()->getCorrectedName() + ".full";
 
         QImage image;
-        QString extension;
-        bool found;
-        int i, j;
+        bool found = false;
         
-        //Iterates through the list of paths, iterating through imgFormats in each to find the image  in any supported format; default is JPG
-        for (found = false, i = 0; i < picsPaths.length() && !found; i ++)
-            for (extension = ".jpg", j = 0; !found; j ++) {
-                //qDebug() << picsPaths.at(i) + extension;
-                if (image.load(picsPaths.at(i) + extension)) {
-                    emit imageLoaded(ptl.getCard(), image);
-                    found = true;
-                }
-                if (j >= imgFormats.length())
-                    break;
-                extension = imgFormats.at(j);
+        //Iterates through the list of paths, searching for images with the desired name with any QImageReader-supported extension
+        for (int i = 0; i < picsPaths.length() && !found; i ++) {
+            QImageReader imgReader;
+            imgReader.setFileName(picsPaths.at(i));
+            if (imgReader.read(&image)) {
+                emit imageLoaded(ptl.getCard(), image);
+                found = true;
             }
+        }
 
         if (!found) {
             if (picDownload) {
@@ -225,31 +217,25 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
         qDebug() << "Download failed:" << reply->errorString();
     }
 
-    const QByteArray &picData = reply->readAll();
+    const QByteArray &picData = reply->peek(reply->size()); //peek is used to keep the data in the buffer for use by QImageReader
     QImage testImage;
-    if (testImage.loadFromData(picData)) {
-        if (!QDir(QString(picsPath + "/downloadedPics/")).exists()) {
-            QDir dir(picsPath);
-            if (!dir.exists())
-                return;
-            dir.mkdir("downloadedPics");
-        }
-        if (!QDir(QString(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName())).exists()) {
-            QDir dir(QString(picsPath + "/downloadedPics"));
-            dir.mkdir(cardBeingDownloaded.getSetName());
+    
+    QImageReader imgReader;
+    imgReader.setDecideFormatFromContent(true);
+    imgReader.setDevice(reply);
+    QString extension = "." + imgReader.format(); //the format is determined prior to reading the QImageReader data into a QImage object, as that wipes the QImageReader buffer
+    if (extension == ".jpeg")
+        extension = ".jpg";
+    
+    if (imgReader.read(&testImage)) {
+        if (!QDir().mkpath(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName())) {
+            qDebug() << picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + " could not be created.";
+            return;
         }
 
         QString suffix;
         if (!cardBeingDownloaded.getStripped())
             suffix = ".full";
-
-        //Supports JPG and formats specified in imgFormats; default is JPG
-        QString extension = ".jpg";
-        for (int i = 0; i < imgFormats.length(); i ++)
-            if (picData.left(QByteArray::fromHex(imgSignatures.at(i)).length()) == QByteArray::fromHex(imgSignatures.at(i))) {
-                extension = imgFormats.at(i);
-                break;
-            }
 
         QFile newPic(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + extension);
         if (!newPic.open(QIODevice::WriteOnly))

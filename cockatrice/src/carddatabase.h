@@ -73,8 +73,6 @@ private:
     bool picDownload, picDownloadHq, downloadRunning, loadQueueRunning;
     void startNextPicDownload();
     QString getPicUrl(CardInfo* card);
-    static const QList<QString> imgFormats;
-    static const QList<QByteArray> imgSignatures;
 public:
     PictureLoader(const QString &__picsPath, bool _picDownload, bool _picDownloadHq, QObject *parent = 0);
     ~PictureLoader();
