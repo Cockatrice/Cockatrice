@@ -16,6 +16,10 @@
 
 const int CardDatabase::versionNeeded = 3;
 
+//Specifies image formats and their associated signature bytes (expected first x bytes, in hex)
+const QList<QString> PictureLoader::imgFormats = QList<QString>() << ".png";
+const QList<QByteArray> PictureLoader::imgSignatures = QList<QByteArray>() << "89504E470D0A1A0A";
+
 static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
 {
     xml.writeStartElement("set");
@@ -124,31 +128,42 @@ void PictureLoader::processLoadQueue()
         }
         PictureToLoad ptl = loadQueue.takeFirst();
         mutex.unlock();
-        QString correctedName = ptl.getCard()->getCorrectedName();
-        QString picsPath = _picsPath;
-        QString setName = ptl.getSetName();
+
+        //The list of paths to the folders in which to search for images
+        QList<QString> picsPaths = QList<QString>() << _picsPath + "/CUSTOM/" + ptl.getCard()->getCorrectedName() + ".full"
+                                                    << _picsPath + "/" + ptl.getSetName() + "/" + ptl.getCard()->getCorrectedName() + ".full"
+                                                    << _picsPath + "/downloadedPics/" + ptl.getSetName() + "/" + ptl.getCard()->getCorrectedName() + ".full";
 
         QImage image;
-        //Supports loading JPG and PNG images; default is JPG
-        if (!image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg("CUSTOM").arg(correctedName)))
-            if (!image.load(QString("%1/%2/%3.full.png").arg(picsPath).arg("CUSTOM").arg(correctedName)))
-                if (!image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(setName).arg(correctedName)))
-                    if (!image.load(QString("%1/%2/%3.full.png").arg(picsPath).arg(setName).arg(correctedName)))
-                        if (!image.load(QString("%1/%2/%3/%4.full.jpg").arg(picsPath).arg("downloadedPics").arg(setName).arg(correctedName)))
-                            if (!image.load(QString("%1/%2/%3/%4.full.png").arg(picsPath).arg("downloadedPics").arg(setName).arg(correctedName))) {
-                                if (picDownload) {
-                                    cardsToDownload.append(ptl);
-                                    if (!downloadRunning)
-                                    startNextPicDownload();
-                                } else {
-                                    if (ptl.nextSet())
-                                        loadQueue.prepend(ptl);
-                                    else
-                                        emit imageLoaded(ptl.getCard(), QImage());
-                                }
-                            }
+        QString extension;
+        bool found;
+        int i, j;
+        
+        //Iterates through the list of paths, iterating through imgFormats in each to find the image  in any supported format; default is JPG
+        for (found = false, i = 0; i < picsPaths.length() && !found; i ++)
+            for (extension = ".jpg", j = 0; !found; j ++) {
+                //qDebug() << picsPaths.at(i) + extension;
+                if (image.load(picsPaths.at(i) + extension)) {
+                    emit imageLoaded(ptl.getCard(), image);
+                    found = true;
+                }
+                if (j >= imgFormats.length())
+                    break;
+                extension = imgFormats.at(j);
+            }
 
-        emit imageLoaded(ptl.getCard(), image);
+        if (!found) {
+            if (picDownload) {
+                cardsToDownload.append(ptl);
+                if (!downloadRunning)
+                    startNextPicDownload();
+            } else {
+                if (ptl.nextSet())
+                    loadQueue.prepend(ptl);
+                else
+                    emit imageLoaded(ptl.getCard(), QImage());
+            }
+        }
     }
 }
 
@@ -228,10 +243,13 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
         if (!cardBeingDownloaded.getStripped())
             suffix = ".full";
 
-        //Supports JPG and PNG images; default is JPG
+        //Supports JPG and formats specified in imgFormats; default is JPG
         QString extension = ".jpg";
-        if (picData.left(8) == QByteArray::fromHex("89504E470D0A1A0A"))
-            extension = ".png";
+        for (int i = 0; i < imgFormats.length(); i ++)
+            if (picData.left(QByteArray::fromHex(imgSignatures.at(i)).length()) == QByteArray::fromHex(imgSignatures.at(i))) {
+                extension = imgFormats.at(i);
+                break;
+            }
 
         QFile newPic(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + extension);
         if (!newPic.open(QIODevice::WriteOnly))
