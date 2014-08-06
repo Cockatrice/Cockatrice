@@ -719,8 +719,8 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 
 CardInfo *CardNameMap::findByPrefix(const std::string &prefix) {
     for (CardNameMap::iterator it = this->begin(); it != this->end(); ++it) {
-        auto std::mismatch(prefix.begin(), prefix.end(), it.key().toStdString().begin())
-        if (auto.first == prefix.end())
+        auto check = std::mismatch(prefix.begin(), prefix.end(), it.key().toStdString().begin())
+        if (check.first == prefix.end())
             return it.value();
     }
     return NULL;
