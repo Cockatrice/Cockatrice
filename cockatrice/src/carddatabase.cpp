@@ -132,11 +132,12 @@ void PictureLoader::processLoadQueue()
                                                     << _picsPath + "/downloadedPics/" + ptl.getSetName() + "/" + ptl.getCard()->getCorrectedName() + ".full";
 
         QImage image;
+        QImageReader imgReader;
+        imgReader.setDecideFormatFromContent(true);
         bool found = false;
-        
+
         //Iterates through the list of paths, searching for images with the desired name with any QImageReader-supported extension
         for (int i = 0; i < picsPaths.length() && !found; i ++) {
-            QImageReader imgReader;
             imgReader.setFileName(picsPaths.at(i));
             if (imgReader.read(&image)) {
                 emit imageLoaded(ptl.getCard(), image);
