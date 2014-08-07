@@ -216,7 +216,11 @@ UserList::UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserL
     
     userTree = new QTreeWidget;
     userTree->setColumnCount(3);
+#if QT_VERSION < 0x050000
     userTree->header()->setResizeMode(QHeaderView::ResizeToContents);
+#else
+    userTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+#endif
     userTree->setHeaderHidden(true);
     userTree->setRootIsDecorated(false);
     userTree->setIconSize(QSize(20, 12));
@@ -307,8 +311,9 @@ void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
 void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
 {
     const ServerInfo_User &userInfo = static_cast<UserListTWI *>(userTree->topLevelItem(index.row()))->getUserInfo();
-    
-    userContextMenu->showContextMenu(pos, QString::fromStdString(userInfo.name()), UserLevelFlags(userInfo.user_level()));
+    bool online = index.sibling(index.row(), 0).data(Qt::UserRole + 1).toBool();
+
+    userContextMenu->showContextMenu(pos, QString::fromStdString(userInfo.name()), UserLevelFlags(userInfo.user_level()), online);
 }
 
 void UserList::sortItems()

@@ -4,5 +4,5 @@ Version=1.0
 Type=Application
 Name=Cockatrice Oracle downloader
 Exec=oracle
-Icon=cockatrice
+Icon=oracle
 Categories=Game;CardGame;

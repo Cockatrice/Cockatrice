@@ -42,6 +42,11 @@ private:
     CardInfo *info;
     void setMinimized(int _minimized);
 
+    /*
+     * Wrapper around db->getCardBySimpleName.
+     */
+    CardInfo *getCard(const QString &cardName = QString());
+
 public:
     CardInfoWidget(ResizeMode _mode, const QString &cardName = QString(), QWidget *parent = 0, Qt::WindowFlags f = 0);
     void retranslateUi();

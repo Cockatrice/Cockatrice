@@ -30,6 +30,7 @@
 #include <QIcon>
 #include <QDir>
 #include <QDesktopServices>
+#include <QDebug>
 
 #include "main.h"
 #include "window_main.h"
@@ -55,6 +56,7 @@ QString translationPath = TRANSLATION_PATH;
 QString translationPath = QString();
 #endif
 
+#if QT_VERSION < 0x050000
 static void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
     QFile file("qdebug.txt");
@@ -63,6 +65,16 @@ static void myMessageOutput(QtMsgType /*type*/, const char *msg)
     out << msg << endl;
     file.close();
 }
+#else
+static void myMessageOutput(QtMsgType /*type*/, const QMessageLogContext &, const QString &msg)
+{
+    QFile file("qdebug.txt");
+    file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
+    QTextStream out(&file);
+    out << msg << endl;
+    file.close();
+}
+#endif
 
 void installNewTranslator()
 {
@@ -87,11 +99,21 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     if (app.arguments().contains("--debug-output"))
+    {
+#if QT_VERSION < 0x050000
         qInstallMsgHandler(myMessageOutput);
+#else
+        qInstallMessageHandler(myMessageOutput);
+#endif
+    }
 #ifdef Q_OS_WIN
     app.addLibraryPath(app.applicationDirPath() + "/plugins");
 #endif
+
+#if QT_VERSION < 0x050000
+    // gone in Qt5, all source files _MUST_ be utf8-encoded
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+#endif
 
     QCoreApplication::setOrganizationName("Cockatrice");
     QCoreApplication::setOrganizationDomain("cockatrice.de");
@@ -114,8 +136,12 @@ int main(int argc, char *argv[])
     installNewTranslator();
 
     qsrand(QDateTime::currentDateTime().toTime_t());
-
+    
+#if QT_VERSION < 0x050000
     const QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#else
+    const QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
+#endif
     if (!db->getLoadSuccess())
         if (db->loadCardDatabase(dataDir + "/cards.xml"))
             settingsCache->setCardDatabasePath(dataDir + "/cards.xml");
@@ -133,7 +159,9 @@ int main(int argc, char *argv[])
         QDir().mkpath(dataDir + "/pics");
         settingsCache->setPicsPath(dataDir + "/pics");
     }
-
+    if (!QDir().mkpath(settingsCache->getPicsPath() + "/CUSTOM"))
+        qDebug() << "Could not create " + settingsCache->getPicsPath().toUtf8() + "/CUSTOM. Will fall back on default card images.";
+        
 #ifdef Q_OS_MAC
     if(settingsCache->getHandBgPath().isEmpty() &&
         settingsCache->getStackBgPath().isEmpty() &&

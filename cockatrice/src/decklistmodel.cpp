@@ -30,6 +30,8 @@ DeckListModel::~DeckListModel()
 
 void DeckListModel::rebuildTree()
 {
+    beginResetModel();
+
     root->clearTree();
     InnerDecklistNode *listRoot = deckList->getRoot();
     for (int i = 0; i < listRoot->size(); i++) {
@@ -55,7 +57,7 @@ void DeckListModel::rebuildTree()
         }
     }
 
-    reset();
+    endResetModel();
 }
 
 int DeckListModel::rowCount(const QModelIndex &parent) const
@@ -470,13 +472,7 @@ void DeckListModel::printDeckList(QPrinter *printer)
     doc.print(printer);
 }
 
-void DeckListModel::pricesUpdated(InnerDecklistNode *node)
+void DeckListModel::pricesUpdated()
 {
-    if (!node)
-        node = root;
-    
-    if (node->isEmpty())
-        return;
-    
-    emit dataChanged(createIndex(0, 2, node->at(0)), createIndex(node->size() - 1, 2, node->last()));
+    emit layoutChanged();
 }

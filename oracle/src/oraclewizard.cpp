@@ -1,8 +1,25 @@
 #include <QtGui>
+#if QT_VERSION < 0x050000
+    #include <QDesktopServices>
+#else 
+    #include <QStandardPaths>
+    #include <QtConcurrent>
+#endif
+#include <QAbstractButton>
+#include <QCheckBox>
+#include <QFileDialog>
 #include <QGridLayout>
-#include <QDesktopServices>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QProgressBar>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QTextEdit>
 
 #include "oraclewizard.h"
 #include "oracleimporter.h"
@@ -13,7 +30,14 @@ OracleWizard::OracleWizard(QWidget *parent)
     : QWizard(parent)
 {
     settings = new QSettings(this);
-    importer = new OracleImporter(QDesktopServices::storageLocation(QDesktopServices::DataLocation), this);
+
+    importer = new OracleImporter(
+#if QT_VERSION < 0x050000
+        QDesktopServices::storageLocation(QDesktopServices::DataLocation)
+#else
+        QStandardPaths::standardLocations(QStandardPaths::DataLocation).first()
+#endif
+    , this);
 
     addPage(new IntroPage);
     addPage(new LoadSetsPage);
@@ -359,7 +383,7 @@ void SaveSetsPage::initializePage()
         QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
 }
 
-void SaveSetsPage::updateTotalProgress(int cardsImported, int setIndex, const QString &setName)
+void SaveSetsPage::updateTotalProgress(int cardsImported, int /* setIndex */, const QString &setName)
 {
     if (setName.isEmpty()) {
         messageLog->append("<b>" + tr("Import finished: %1 cards.").arg(wizard()->importer->getCardList().size()) + "</b>");
@@ -372,7 +396,12 @@ void SaveSetsPage::updateTotalProgress(int cardsImported, int setIndex, const QS
 bool SaveSetsPage::validatePage()
 {
     bool ok = false;
-    const QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    const QString dataDir = 
+#if QT_VERSION < 0x050000
+        QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#else
+        QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
+#endif
     QDir dir(dataDir);
     if (!dir.exists())
         dir.mkpath(dataDir);
@@ -389,9 +418,12 @@ bool SaveSetsPage::validatePage()
             return false;
         }
         if (wizard()->importer->saveToFile(fileName))
+        {
             ok = true;
-        else
+            QMessageBox::information(this, tr("Success"), tr("The card database has been saved successfully."));
+        } else {
             QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to the desired location."));
+        }
     } while (!ok);
 
     return true;

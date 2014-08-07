@@ -33,7 +33,7 @@ ServerInfo_User LocalServer_DatabaseInterface::getUserData(const QString &name, 
     return result;
 }
 
-AuthenticationResult LocalServer_DatabaseInterface::checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &secondsLeft)
+AuthenticationResult LocalServer_DatabaseInterface::checkUserPassword(Server_ProtocolHandler * /* handler */, const QString & /* user */, const QString & /* password */, QString & /* reasonStr */, int & /* secondsLeft */)
 {
     return UnknownUser;
 }

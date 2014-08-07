@@ -121,6 +121,12 @@ void TabRoom::closeRequest()
     actLeaveRoom();
 }
 
+void TabRoom::tabActivated()
+{
+    if(!sayEdit->hasFocus())
+        sayEdit->setFocus();
+}
+
 QString TabRoom::sanitizeHtml(QString dirty) const
 {
     return dirty
