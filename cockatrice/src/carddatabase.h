@@ -55,7 +55,7 @@ public:
     PictureToLoad(CardInfo *_card = 0, bool _stripped = false, bool _hq = true);
     CardInfo *getCard() const { return card; }
     bool getStripped() const { return stripped; }
-    QString getSetName() const { return sortedSets[setIndex]->getCorrectedShortName(); }
+    QString getSetName() const;
     bool nextSet();
     bool getHq() const { return hq; }
     void setHq(bool _hq) { hq = _hq; }
