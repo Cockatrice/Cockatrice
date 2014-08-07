@@ -719,7 +719,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 
 CardInfo *CardNameMap::findByPrefix(const std::string &prefix) {
     for (CardNameMap::iterator it = this->begin(); it != this->end(); ++it) {
-        if (std::mismatch(prefix.begin(), prefix.end(), 
+        if (std::mismatch(prefix.begin(), prefix.end(),
                           it.key().toStdString().begin()).first == prefix.end())
             return it.value();
     }
@@ -731,6 +731,8 @@ CardInfo *CardDatabase::getCardFromMap(CardNameMap &cardMap, const QString &card
 
     if (cardName.isEmpty())
         return noCard;
+    else if (cardMap.contains(cardName))
+        return cardMap.value(cardName);
     else if ((foundCard = cardMap.findByPrefix(cardName.toStdString())))
         return foundCard;
     else if (createIfNotFound) {
