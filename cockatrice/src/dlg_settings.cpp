@@ -168,18 +168,24 @@ void GeneralSettingsPage::clearDownloadedPicsButtonClicked()
 {
     QString picsPath = settingsCache->getPicsPath() + "/downloadedPics/";
     QStringList dirs = QDir(picsPath).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+    bool outerSuccessRemove = true;
     for (int i = 0; i < dirs.length(); i ++) {
         QString currentPath = picsPath + dirs.at(i) + "/";
         QStringList files = QDir(currentPath).entryList(QDir::Files);
-        bool failRemove = false;
+        bool innerSuccessRemove = true;
         for (int j = 0; j < files.length(); j ++)
             if (!QDir(currentPath).remove(files.at(j))) {
                 qDebug() << "Failed to remove " + currentPath.toUtf8() + files.at(j).toUtf8();
-                failRemove = true;
+                outerSuccessRemove = false;
+                innerSuccessRemove = false;
             }
-        if (!failRemove)
+        if (innerSuccessRemove)
             QDir(picsPath).rmdir(dirs.at(i));
     }
+    if (outerSuccessRemove)
+        QMessageBox::information(this, tr("Success"), tr("Downloaded card images have been cleared."));
+    else
+        QMessageBox::critical(this, tr("Error"), tr("One or more downloaded card images could not be cleared."));
 }
 
 void GeneralSettingsPage::cardDatabasePathButtonClicked()
