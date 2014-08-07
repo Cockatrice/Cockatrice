@@ -202,7 +202,7 @@ void TabReplays::actDownload()
     client->sendCommand(pend);
 }
 
-void TabReplays::downloadFinished(const Response &r, const CommandContainer &commandContainer, const QVariant &extraData)
+void TabReplays::downloadFinished(const Response &r, const CommandContainer & /* commandContainer */, const QVariant &extraData)
 {
     if (r.response_code() != Response::RespOk)
         return;

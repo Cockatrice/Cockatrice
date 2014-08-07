@@ -129,21 +129,22 @@ void PictureLoader::processLoadQueue()
         QString setName = ptl.getSetName();
 
         QImage image;
-        if (!image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(setName).arg(correctedName)))
-            if (!image.load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(setName).arg(correctedName).arg(1)))
-                if (!image.load(QString("%1/%2/%3/%4.full.jpg").arg(picsPath).arg("downloadedPics").arg(setName).arg(correctedName))) {
-                    if (picDownload) {
-                        cardsToDownload.append(ptl);
-                        if (!downloadRunning)
-                            startNextPicDownload();
-                    } else {
-                        if (ptl.nextSet())
-                            loadQueue.prepend(ptl);
-                        else
-                            emit imageLoaded(ptl.getCard(), QImage());
+        if (!image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg("CUSTOM").arg(correctedName))) {
+            if (!image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(setName).arg(correctedName)))
+                //if (!image.load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(setName).arg(correctedName).arg(1)))
+                    if (!image.load(QString("%1/%2/%3/%4.full.jpg").arg(picsPath).arg("downloadedPics").arg(setName).arg(correctedName))) {
+                        if (picDownload) {
+                            cardsToDownload.append(ptl);
+                            if (!downloadRunning)
+                                startNextPicDownload();
+                        } else {
+                            if (ptl.nextSet())
+                                loadQueue.prepend(ptl);
+                            else
+                                emit imageLoaded(ptl.getCard(), QImage());
+                        }
                     }
-                    continue;
-                }
+        }
 
         emit imageLoaded(ptl.getCard(), image);
     }
@@ -153,9 +154,24 @@ QString PictureLoader::getPicUrl(CardInfo *card)
 {
     if (!picDownload) return 0;
 
-    QString picUrl = picDownloadHq ? settingsCache->getPicUrlHq() : settingsCache->getPicUrl();
-    picUrl.replace("!name!", QUrl::toPercentEncoding(card->getCorrectedName()));
     CardSet *set = card->getPreferredSet();
+    QString picUrl = QString("");
+    // first check if Hq is enabled and a custom Hq card url exists in cards.xml
+    if(picDownloadHq)
+    {
+        picUrl = card->getCustomPicURLHq(set->getShortName());
+        if (!picUrl.isEmpty())
+            return picUrl;
+    }
+
+    // then, test for a custom, non-Hq card url in cards.xml
+    picUrl = card->getCustomPicURL(set->getShortName());
+    if (!picUrl.isEmpty())
+        return picUrl;
+
+    // otherwise, fallback to the default url
+    picUrl = picDownloadHq ? settingsCache->getPicUrlHq() : settingsCache->getPicUrl();
+    picUrl.replace("!name!", QUrl::toPercentEncoding(card->getCorrectedName()));
     picUrl.replace("!setcode!", QUrl::toPercentEncoding(set->getShortName()));
     picUrl.replace("!setname!", QUrl::toPercentEncoding(set->getLongName()));
     picUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(card->getPreferredMuId())));
@@ -275,6 +291,8 @@ CardInfo::CardInfo(CardDatabase *_db,
                    bool _cipt,
                    int _tableRow,
                    const SetList &_sets,
+                   const QStringMap &_customPicURLs,
+                   const QStringMap &_customPicURLsHq,
                    MuidMap _muIds)
     : db(_db),
       name(_name),
@@ -286,6 +304,8 @@ CardInfo::CardInfo(CardDatabase *_db,
       text(_text),
       colors(_colors),
       loyalty(_loyalty),
+      customPicURLs(_customPicURLs),
+      customPicURLsHq(_customPicURLsHq),
       muIds(_muIds),
       cipt(_cipt),
       tableRow(_tableRow),
@@ -464,6 +484,14 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
         tmpSet=sets[i]->getShortName();
         xml.writeAttribute("muId", QString::number(info->getMuId(tmpSet)));
 
+        tmpString = info->getCustomPicURL(tmpSet);
+        if(!tmpString.isEmpty())
+            xml.writeAttribute("picURL", tmpString);
+
+        tmpString = info->getCustomPicURLHq(tmpSet);
+        if(!tmpString.isEmpty())
+            xml.writeAttribute("picURLHq", tmpString);
+
         xml.writeCharacters(tmpSet);
         xml.writeEndElement();
     }
@@ -628,6 +656,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
         if (xml.name() == "card") {
             QString name, manacost, type, pt, text;
             QStringList colors;
+            QStringMap customPicURLs, customPicURLsHq;
             MuidMap muids;
             SetList sets;
             int tableRow = 0;
@@ -654,6 +683,12 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
                     if (attrs.hasAttribute("muId")) {
                         muids[setName] = attrs.value("muId").toString().toInt();
                     }
+                    if (attrs.hasAttribute("picURL")) {
+                        customPicURLs[setName] = attrs.value("picURL").toString();
+                    }
+                    if (attrs.hasAttribute("picURLHq")) {
+                        customPicURLsHq[setName] = attrs.value("picURLHq").toString();
+                    }
                 } else if (xml.name() == "color")
                     colors << xml.readElementText();
                 else if (xml.name() == "tablerow")
@@ -667,7 +702,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
             }
 
             if (isToken == tokens) {
-                addCard(new CardInfo(this, name, isToken, manacost, type, pt, text, colors, loyalty, cipt, tableRow, sets, muids));
+                addCard(new CardInfo(this, name, isToken, manacost, type, pt, text, colors, loyalty, cipt, tableRow, sets, customPicURLs, customPicURLsHq, muids));
             }
         }
     }

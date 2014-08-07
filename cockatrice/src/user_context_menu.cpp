@@ -102,7 +102,7 @@ void UserContextMenu::banUser_dialogFinished()
     client->sendCommand(client->prepareModeratorCommand(cmd));
 }
 
-void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName, UserLevelFlags userLevel, int playerId)
+void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName, UserLevelFlags userLevel, bool online, int playerId)
 {
     aUserName->setText(userName);
     
@@ -132,7 +132,8 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
         menu->addAction(aBan);
     }
     bool anotherUser = userName != QString::fromStdString(tabSupervisor->getUserInfo()->name());
-    aChat->setEnabled(anotherUser);
+    aDetails->setEnabled(online);
+    aChat->setEnabled(anotherUser && online);
     aShowGames->setEnabled(anotherUser);
     aAddToBuddyList->setEnabled(anotherUser);
     aRemoveFromBuddyList->setEnabled(anotherUser);

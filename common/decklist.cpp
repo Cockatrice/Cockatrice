@@ -355,7 +355,8 @@ DeckList::DeckList()
 
 // TODO: http://qt-project.org/doc/qt-4.8/qobject.html#no-copy-constructor-or-assignment-operator
 DeckList::DeckList(const DeckList &other)
-    : name(other.name),
+    : QObject(),
+      name(other.name),
       comments(other.comments),
       deckHash(other.deckHash)
 {

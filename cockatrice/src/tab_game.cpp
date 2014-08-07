@@ -254,7 +254,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     
     // Create list: event number -> time [ms]
     // Distribute simultaneous events evenly across 1 second.
-    int lastEventTimestamp = -1;
+    unsigned int lastEventTimestamp = 0;
     const int eventCount = replay->event_list_size();
     for (int i = 0; i < eventCount; ++i) {
         int j = i + 1;

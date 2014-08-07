@@ -43,7 +43,7 @@ void ReplayTimelineWidget::setTimeline(const QList<int> &_replayTimeline)
     update();
 }
 
-void ReplayTimelineWidget::paintEvent(QPaintEvent *event)
+void ReplayTimelineWidget::paintEvent(QPaintEvent * /* event */)
 {
     QPainter painter(this);
     painter.drawRect(0, 0, width() - 1, height() - 1);
