@@ -248,20 +248,24 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
         extension = ".jpg";
     
     if (imgReader.read(&testImage)) {
-        if (!QDir().mkpath(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName())) {
-            qDebug() << picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + " could not be created.";
-            return;
+        QString setName = cardBeingDownloaded.getSetName();
+        if(!setName.isEmpty())
+        {
+            if (!QDir().mkpath(picsPath + "/downloadedPics/" + setName)) {
+                qDebug() << picsPath + "/downloadedPics/" + setName + " could not be created.";
+                return;
+            }
+
+            QString suffix;
+            if (!cardBeingDownloaded.getStripped())
+                suffix = ".full";
+
+            QFile newPic(picsPath + "/downloadedPics/" + setName + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + extension);
+            if (!newPic.open(QIODevice::WriteOnly))
+                return;
+            newPic.write(picData);
+            newPic.close();
         }
-
-        QString suffix;
-        if (!cardBeingDownloaded.getStripped())
-            suffix = ".full";
-
-        QFile newPic(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + extension);
-        if (!newPic.open(QIODevice::WriteOnly))
-            return;
-        newPic.write(picData);
-        newPic.close();
 
         emit imageLoaded(cardBeingDownloaded.getCard(), testImage);
     } else if (cardBeingDownloaded.getHq()) {
