@@ -418,9 +418,12 @@ bool SaveSetsPage::validatePage()
             return false;
         }
         if (wizard()->importer->saveToFile(fileName))
+        {
             ok = true;
-        else
+            QMessageBox::information(this, tr("Success"), tr("The card database has been saved successfully."));
+        } else {
             QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to the desired location."));
+        }
     } while (!ok);
 
     return true;
