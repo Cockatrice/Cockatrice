@@ -16,6 +16,19 @@ SET(oracle_SOURCES
     ../cockatrice/src/qt-json/json.cpp
  )
 
+set(oracle_RESOURCES oracle.qrc)
+
+if(WIN32)
+    set(oracle_SOURCES ${oracle_SOURCES} oracle.rc)
+endif(WIN32)
+
+
+if(APPLE)
+    set(MACOSX_BUNDLE_ICON_FILE appicon.icns)
+    set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    set(oracle_SOURCES ${oracle_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
+ENDIF(APPLE)
+
 set(ORACLE_LIBS)
 
 # Qt4 stuff
@@ -29,6 +42,10 @@ if(Qt4_FOUND)
     include_directories(${QT_INCLUDES})
     LIST(APPEND ORACLE_LIBS ${QT_QTMAIN_LIBRARY})
     LIST(APPEND ORACLE_LIBS ${QT_LIBRARIES})
+
+    # Let cmake chew Qt4's translations and resource files
+    # Note: header files are MOC-ed automatically by cmake
+    QT4_ADD_RESOURCES(oracle_RESOURCES_RCC ${oracle_RESOURCES})
 endif()
 
 # qt5 stuff
@@ -64,6 +81,10 @@ if(Qt5Widgets_FOUND)
         list(APPEND ORACLE_LIBS Svg)
     endif()
 
+    # Let cmake chew Qt5's translations and resource files
+    # Note: header files are MOC-ed automatically by cmake
+    QT5_ADD_RESOURCES(oracle_RESOURCES_RCC ${oracle_RESOURCES})
+
     # guess plugins and libraries directory
     set(QT_PLUGINS_DIR "${Qt5Widgets_DIR}/../../../plugins")
     get_target_property(QT_LIBRARY_DIR Qt5::Core LOCATION)
@@ -73,7 +94,7 @@ endif()
 INCLUDE_DIRECTORIES(../cockatrice/src)
 
 # Build oracle binary and link it
-ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_MOC_SRCS})
+ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_RESOURCES_RCC} ${oracle_MOC_SRCS})
 
 if(Qt4_FOUND)
     if(MSVC) 
@@ -94,6 +115,8 @@ if(UNIX)
     else()
         # Assume linux
         INSTALL(TARGETS oracle RUNTIME DESTINATION bin/)
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/oracle.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/oracle.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
     endif()
 elseif(WIN32)
     INSTALL(TARGETS oracle RUNTIME DESTINATION ./)
