@@ -76,6 +76,8 @@ GeneralSettingsPage::GeneralSettingsPage()
     picsPathEdit->setReadOnly(true);
     QPushButton *picsPathButton = new QPushButton("...");
     connect(picsPathButton, SIGNAL(clicked()), this, SLOT(picsPathButtonClicked()));
+    QPushButton *clearDownloadedPicsButton = new QPushButton(tr("Clear Downloaded Pics"));
+    connect(clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
     
     cardDatabasePathLabel = new QLabel;
     cardDatabasePathEdit = new QLineEdit(settingsCache->getCardDatabasePath());
@@ -99,12 +101,13 @@ GeneralSettingsPage::GeneralSettingsPage()
     pathsGrid->addWidget(picsPathLabel, 2, 0);
     pathsGrid->addWidget(picsPathEdit, 2, 1);
     pathsGrid->addWidget(picsPathButton, 2, 2);
-    pathsGrid->addWidget(cardDatabasePathLabel, 3, 0);
-    pathsGrid->addWidget(cardDatabasePathEdit, 3, 1);
-    pathsGrid->addWidget(cardDatabasePathButton, 3, 2);
-    pathsGrid->addWidget(tokenDatabasePathLabel, 4, 0);
-    pathsGrid->addWidget(tokenDatabasePathEdit, 4, 1);
-    pathsGrid->addWidget(tokenDatabasePathButton, 4, 2);
+    pathsGrid->addWidget(clearDownloadedPicsButton, 3, 1);
+    pathsGrid->addWidget(cardDatabasePathLabel, 4, 0);
+    pathsGrid->addWidget(cardDatabasePathEdit, 4, 1);
+    pathsGrid->addWidget(cardDatabasePathButton, 4, 2);
+    pathsGrid->addWidget(tokenDatabasePathLabel, 5, 0);
+    pathsGrid->addWidget(tokenDatabasePathEdit, 5, 1);
+    pathsGrid->addWidget(tokenDatabasePathButton, 5, 2);
     pathsGroupBox = new QGroupBox;
     pathsGroupBox->setLayout(pathsGrid);
 
@@ -159,6 +162,24 @@ void GeneralSettingsPage::picsPathButtonClicked()
     
     picsPathEdit->setText(path);
     settingsCache->setPicsPath(path);
+}
+
+void GeneralSettingsPage::clearDownloadedPicsButtonClicked()
+{
+    QString picsPath = settingsCache->getPicsPath() + "/downloadedPics/";
+    QStringList dirs = QDir(picsPath).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+    for (int i = 0; i < dirs.length(); i ++) {
+        QString currentPath = picsPath + dirs.at(i) + "/";
+        QStringList files = QDir(currentPath).entryList(QDir::Files);
+        bool failRemove = false;
+        for (int j = 0; j < files.length(); j ++)
+            if (!QDir(currentPath).remove(files.at(j))) {
+                qDebug() << "Failed to remove " + currentPath.toUtf8() + files.at(j).toUtf8();
+                failRemove = true;
+            }
+        if (!failRemove)
+            QDir(picsPath).rmdir(dirs.at(i));
+    }
 }
 
 void GeneralSettingsPage::cardDatabasePathButtonClicked()

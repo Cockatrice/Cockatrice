@@ -31,6 +31,7 @@ private slots:
     void deckPathButtonClicked();
     void replaysPathButtonClicked();
     void picsPathButtonClicked();
+    void clearDownloadedPicsButtonClicked();
     void cardDatabasePathButtonClicked();
     void tokenDatabasePathButtonClicked();
     void languageBoxChanged(int index);
