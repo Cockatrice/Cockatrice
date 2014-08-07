@@ -93,6 +93,14 @@ bool PictureToLoad::nextSet()
     return true;
 }
 
+QString PictureToLoad::getSetName() const
+{
+    if (setIndex < sortedSets.size() - 1)
+        return sortedSets[setIndex]->getCorrectedShortName();
+    else
+        return QString("");
+}
+
 PictureLoader::PictureLoader(const QString &__picsPath, bool _picDownload, bool _picDownloadHq, QObject *parent)
     : QObject(parent),
       _picsPath(__picsPath), picDownload(_picDownload), picDownloadHq(_picDownloadHq),
@@ -127,9 +135,15 @@ void PictureLoader::processLoadQueue()
         mutex.unlock();
 
         //The list of paths to the folders in which to search for images
-        QList<QString> picsPaths = QList<QString>() << _picsPath + "/CUSTOM/" + ptl.getCard()->getCorrectedName() + ".full"
-                                                    << _picsPath + "/" + ptl.getSetName() + "/" + ptl.getCard()->getCorrectedName() + ".full"
-                                                    << _picsPath + "/downloadedPics/" + ptl.getSetName() + "/" + ptl.getCard()->getCorrectedName() + ".full";
+        QList<QString> picsPaths = QList<QString>() << _picsPath + "/CUSTOM/" + ptl.getCard()->getCorrectedName() + ".full";
+
+
+        QString setName=ptl.getSetName();
+        if(!setName.isEmpty())
+        {
+            picsPaths   << _picsPath + "/" + setName + "/" + ptl.getCard()->getCorrectedName() + ".full"
+                        << _picsPath + "/downloadedPics/" + setName + "/" + ptl.getCard()->getCorrectedName() + ".full";
+        }
 
         QImage image;
         QImageReader imgReader;
@@ -166,18 +180,23 @@ QString PictureLoader::getPicUrl(CardInfo *card)
 
     CardSet *set = card->getPreferredSet();
     QString picUrl = QString("");
-    // first check if Hq is enabled and a custom Hq card url exists in cards.xml
-    if(picDownloadHq)
+
+    // if sets have been defined for the card, they can contain custom picUrls
+    if(set)
     {
-        picUrl = card->getCustomPicURLHq(set->getShortName());
+        // first check if Hq is enabled and a custom Hq card url exists in cards.xml
+        if(picDownloadHq)
+        {
+            picUrl = card->getCustomPicURLHq(set->getShortName());
+            if (!picUrl.isEmpty())
+                return picUrl;
+        }
+
+        // then, test for a custom, non-Hq card url in cards.xml
+        picUrl = card->getCustomPicURL(set->getShortName());
         if (!picUrl.isEmpty())
             return picUrl;
     }
-
-    // then, test for a custom, non-Hq card url in cards.xml
-    picUrl = card->getCustomPicURL(set->getShortName());
-    if (!picUrl.isEmpty())
-        return picUrl;
 
     // otherwise, fallback to the default url
     picUrl = picDownloadHq ? settingsCache->getPicUrlHq() : settingsCache->getPicUrl();
@@ -456,6 +475,8 @@ void CardInfo::updatePixmapCache()
 
 CardSet* CardInfo::getPreferredSet()
 {
+    if(sets.isEmpty())
+        return 0;
     SetList sortedSets = sets;
     sortedSets.sortByKey();
     return sortedSets.first();
@@ -463,7 +484,8 @@ CardSet* CardInfo::getPreferredSet()
 
 int CardInfo::getPreferredMuId()
 {
-    return muIds[getPreferredSet()->getShortName()];
+    CardSet *set = getPreferredSet();
+    return set ? muIds[set->getShortName()] : 0;
 }
 
 QString CardInfo::simplifyName(const QString &name) {
