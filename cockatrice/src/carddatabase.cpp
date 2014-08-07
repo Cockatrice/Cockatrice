@@ -477,6 +477,10 @@ QString CardInfo::simplifyName(const QString &name) {
     // Replace Jötun Grunt with Jotun Grunt.
     simpleName = simpleName.normalized(QString::NormalizationForm_KD);
 
+    // Replace dashes with spaces so that we can say "garruk the veil cursed"
+    // instead of the unintuitive "garruk the veilcursed".
+    simpleName = simpleName.replace("-", " ");
+
     simpleName.remove(QRegExp("[^a-zA-Z0-9 ]"));
     simpleName = simpleName.toLower();
     return simpleName;
