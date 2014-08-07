@@ -95,7 +95,7 @@ bool PictureToLoad::nextSet()
 
 QString PictureToLoad::getSetName() const
 {
-    if (setIndex < sortedSets.size() - 1)
+    if (setIndex < sortedSets.size())
         return sortedSets[setIndex]->getCorrectedShortName();
     else
         return QString("");
