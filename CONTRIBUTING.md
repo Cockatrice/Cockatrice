@@ -103,3 +103,32 @@ Use only spaces. Four spaces per tab.
 Do not have trailing whitespace in your lines.
 
 Lines should be 80 characters or less, as a soft limit.
+
+### Memory Management ###
+
+New code should be written using references over pointers and stack allocation
+over heap allocation wherever possible.
+
+    // Good: uses stack allocation and references
+    void showCard(const Card &card);
+    int main()
+    {
+        Card card;
+        showCard(card);
+    }
+
+    // Bad: relies on manual memory management and doesn't give us much
+    // null-safety.
+    void showCard(const Card *card);
+    int main()
+    {
+        Card *card = new Card;
+        showCard(card);
+        delete card;
+    }
+
+(Remember to pass by `const` reference wherever possible, to avoid accidentally
+mutating objects.)
+
+When pointers can't be avoided, try to use a smart pointer of some sort, such
+as `QScopedPointer`, or, less preferably, `QSharedPointer`.
