@@ -412,17 +412,17 @@ bool SaveSetsPage::validatePage()
     do {
         QString fileName;
         if (savePath.isEmpty()) {
-            if (!defaultPathCheckBox->isChecked())
-                fileName = QFileDialog::getSaveFileName(this, windowName, dataDir + "/cards.xml", fileType);
+            if (defaultPathCheckBox->isChecked())
+                fileName = dataDir + "/cards.xml";
             else
-                fileName = dataDir + "/cards.xml";;
+                fileName = QFileDialog::getSaveFileName(this, windowName, dataDir + "/cards.xml", fileType);
             settings->setValue("paths/carddatabase", fileName);
         }
         else {
-            if (!defaultPathCheckBox->isChecked())
-                fileName = QFileDialog::getSaveFileName(this, windowName, savePath, fileType);
-            else
+            if (defaultPathCheckBox->isChecked())
                 fileName = savePath;
+            else
+                fileName = QFileDialog::getSaveFileName(this, windowName, savePath, fileType);
         }
         if (fileName.isEmpty()) {
             return false;
