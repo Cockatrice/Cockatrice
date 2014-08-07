@@ -15,6 +15,7 @@ class QCheckBox;
 class QLabel;
 class QCloseEvent;
 class QSpinBox;
+class QRadioButton;
 
 class AbstractSettingsPage : public QWidget {
 public:
@@ -100,8 +101,13 @@ class DeckEditorSettingsPage : public AbstractSettingsPage {
 public:
     DeckEditorSettingsPage();
     void retranslateUi();
+private slots:
+    void radioPriceTagSourceClicked(bool checked);
+signals:
+    void priceTagSourceChanged(int _priceTagSource);
 private:
     QCheckBox *priceTagsCheckBox;
+    QRadioButton *priceTagSource0, *priceTagSource1;
     QGroupBox *generalGroupBox;
 };
 

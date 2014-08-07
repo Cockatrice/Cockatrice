@@ -68,14 +68,16 @@ QVariant CardDatabaseModel::headerData(int section, Qt::Orientation orientation,
 
 void CardDatabaseModel::updateCardList()
 {
+    beginResetModel();
+
     for (int i = 0; i < cardList.size(); ++i)
         disconnect(cardList[i], 0, this, 0);
 
     cardList = db->getCardList();
     for (int i = 0; i < cardList.size(); ++i)
         connect(cardList[i], SIGNAL(cardInfoChanged(CardInfo *)), this, SLOT(cardInfoChanged(CardInfo *)));
-
-    reset();
+    
+    endResetModel();
 }
 
 void CardDatabaseModel::cardInfoChanged(CardInfo *card)

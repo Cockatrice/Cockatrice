@@ -72,7 +72,11 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient
     setColumnCount(6);
     setHeaderHidden(true);
     setRootIsDecorated(false);
+#if QT_VERSION < 0x050000
     header()->setResizeMode(QHeaderView::ResizeToContents);
+#else
+    header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+#endif
     retranslateUi();
 }
 
@@ -174,5 +178,5 @@ void PlayerListWidget::showContextMenu(const QPoint &pos, const QModelIndex &ind
     int playerId = index.sibling(index.row(), 4).data(Qt::UserRole + 1).toInt();
     UserLevelFlags userLevel(index.sibling(index.row(), 3).data(Qt::UserRole).toInt());
     
-    userContextMenu->showContextMenu(pos, userName, userLevel, playerId);
+    userContextMenu->showContextMenu(pos, userName, userLevel, true, playerId);
 }

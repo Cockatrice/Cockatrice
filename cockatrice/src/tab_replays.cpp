@@ -36,7 +36,11 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client)
     localDirView->setColumnHidden(1, true);
     localDirView->setRootIndex(localDirModel->index(localDirModel->rootPath(), 0));
     localDirView->setSortingEnabled(true);
+#if QT_VERSION < 0x050000
     localDirView->header()->setResizeMode(QHeaderView::ResizeToContents);
+#else
+    localDirView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+#endif
     localDirView->header()->setSortIndicator(0, Qt::AscendingOrder);
     
     leftToolBar = new QToolBar;
@@ -198,7 +202,7 @@ void TabReplays::actDownload()
     client->sendCommand(pend);
 }
 
-void TabReplays::downloadFinished(const Response &r, const CommandContainer &commandContainer, const QVariant &extraData)
+void TabReplays::downloadFinished(const Response &r, const CommandContainer & /* commandContainer */, const QVariant &extraData)
 {
     if (r.response_code() != Response::RespOk)
         return;

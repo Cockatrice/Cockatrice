@@ -7,8 +7,14 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 
-DeckStatsInterface::DeckStatsInterface(QObject *parent)
-    : QObject(parent)
+#if QT_VERSION >= 0x050000
+#include <QUrlQuery>
+#endif
+
+DeckStatsInterface::DeckStatsInterface(
+    CardDatabase &_cardDatabase,
+    QObject *parent
+) : QObject(parent), cardDatabase(_cardDatabase)
 {
     manager = new QNetworkAccessManager(this);
     connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(queryFinished(QNetworkReply *)));
@@ -39,15 +45,62 @@ void DeckStatsInterface::queryFinished(QNetworkReply *reply)
     deleteLater();
 }
 
+void DeckStatsInterface::getAnalyzeRequestData(DeckList *deck, QByteArray *data)
+{
+    DeckList deckWithoutTokens;
+    copyDeckWithoutTokens(*deck, deckWithoutTokens);
+
+#if QT_VERSION < 0x050000
+    QUrl params;
+    params.addQueryItem("deck", deckWithoutTokens.writeToString_Plain());
+    data->append(params.encodedQuery());
+#else
+    QUrl params;
+    QUrlQuery urlQuery;
+    urlQuery.addQueryItem("deck", deckWithoutTokens.writeToString_Plain());
+    params.setQuery(urlQuery);
+    data->append(params.query(QUrl::EncodeReserved));
+#endif
+}
+
 void DeckStatsInterface::analyzeDeck(DeckList *deck)
 {
-    QUrl params;
-    params.addQueryItem("deck", deck->writeToString_Plain());
     QByteArray data;
-    data.append(params.encodedQuery());
+    getAnalyzeRequestData(deck, &data);
     
     QNetworkRequest request(QUrl("http://deckstats.net/index.php"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     
     manager->post(request, data);
+}
+
+struct CopyIfNotAToken {
+    CardDatabase &cardDatabase;
+    DeckList &destination;
+
+    CopyIfNotAToken(
+        CardDatabase &_cardDatabase,
+        DeckList &_destination
+    ) : cardDatabase(_cardDatabase), destination(_destination) {};
+
+    void operator()(
+        const InnerDecklistNode *node,
+        const DecklistCardNode *card
+    ) const {
+        if (!cardDatabase.getCard(card->getName())->getIsToken()) {
+            DecklistCardNode *addedCard = destination.addCard(
+                card->getName(),
+                node->getName()
+            );
+            addedCard->setNumber(card->getNumber());
+        }
+    }
+};
+
+void DeckStatsInterface::copyDeckWithoutTokens(
+    const DeckList &source,
+    DeckList &destination
+) {
+    CopyIfNotAToken copyIfNotAToken(cardDatabase, destination);
+    source.forEachCard(copyIfNotAToken);
 }

@@ -13,6 +13,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QDebug>
+#include <QImageReader>
 
 const int CardDatabase::versionNeeded = 3;
 
@@ -124,28 +125,38 @@ void PictureLoader::processLoadQueue()
         }
         PictureToLoad ptl = loadQueue.takeFirst();
         mutex.unlock();
-        QString correctedName = ptl.getCard()->getCorrectedName();
-        QString picsPath = _picsPath;
-        QString setName = ptl.getSetName();
+
+        //The list of paths to the folders in which to search for images
+        QList<QString> picsPaths = QList<QString>() << _picsPath + "/CUSTOM/" + ptl.getCard()->getCorrectedName() + ".full"
+                                                    << _picsPath + "/" + ptl.getSetName() + "/" + ptl.getCard()->getCorrectedName() + ".full"
+                                                    << _picsPath + "/downloadedPics/" + ptl.getSetName() + "/" + ptl.getCard()->getCorrectedName() + ".full";
 
         QImage image;
-        if (!image.load(QString("%1/%2/%3.full.jpg").arg(picsPath).arg(setName).arg(correctedName)))
-            if (!image.load(QString("%1/%2/%3%4.full.jpg").arg(picsPath).arg(setName).arg(correctedName).arg(1)))
-                if (!image.load(QString("%1/%2/%3/%4.full.jpg").arg(picsPath).arg("downloadedPics").arg(setName).arg(correctedName))) {
-                    if (picDownload) {
-                        cardsToDownload.append(ptl);
-                        if (!downloadRunning)
-                            startNextPicDownload();
-                    } else {
-                        if (ptl.nextSet())
-                            loadQueue.prepend(ptl);
-                        else
-                            emit imageLoaded(ptl.getCard(), QImage());
-                    }
-                    continue;
-                }
+        QImageReader imgReader;
+        imgReader.setDecideFormatFromContent(true);
+        bool found = false;
 
-        emit imageLoaded(ptl.getCard(), image);
+        //Iterates through the list of paths, searching for images with the desired name with any QImageReader-supported extension
+        for (int i = 0; i < picsPaths.length() && !found; i ++) {
+            imgReader.setFileName(picsPaths.at(i));
+            if (imgReader.read(&image)) {
+                emit imageLoaded(ptl.getCard(), image);
+                found = true;
+            }
+        }
+
+        if (!found) {
+            if (picDownload) {
+                cardsToDownload.append(ptl);
+                if (!downloadRunning)
+                    startNextPicDownload();
+            } else {
+                if (ptl.nextSet())
+                    loadQueue.prepend(ptl);
+                else
+                    emit imageLoaded(ptl.getCard(), QImage());
+            }
+        }
     }
 }
 
@@ -153,11 +164,25 @@ QString PictureLoader::getPicUrl(CardInfo *card)
 {
     if (!picDownload) return QString("");
 
-    QString picUrl = picDownloadHq ? settingsCache->getPicUrlHq() : settingsCache->getPicUrl();
+    CardSet *set = card->getPreferredSet();
+    QString picUrl = QString("");
+    // first check if Hq is enabled and a custom Hq card url exists in cards.xml
+    if(picDownloadHq)
+    {
+        picUrl = card->getCustomPicURLHq(set->getShortName());
+        if (!picUrl.isEmpty())
+            return picUrl;
+    }
+
+    // then, test for a custom, non-Hq card url in cards.xml
+    picUrl = card->getCustomPicURL(set->getShortName());
+    if (!picUrl.isEmpty())
+        return picUrl;
+
+    // otherwise, fallback to the default url
+    picUrl = picDownloadHq ? settingsCache->getPicUrlHq() : settingsCache->getPicUrl();
 
     picUrl.replace("!name!", QUrl::toPercentEncoding(card->getCorrectedName()));
-
-    CardSet *set = card->getPreferredSet();
     if (set) {
         picUrl.replace("!setcode!", QUrl::toPercentEncoding(set->getShortName()));
         picUrl.replace("!setname!", QUrl::toPercentEncoding(set->getLongName()));
@@ -211,25 +236,27 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
         qDebug() << "Download failed:" << reply->errorString();
     }
 
-    const QByteArray &picData = reply->readAll();
+    const QByteArray &picData = reply->peek(reply->size()); //peek is used to keep the data in the buffer for use by QImageReader
     QImage testImage;
-    if (testImage.loadFromData(picData)) {
-        if (!QDir(QString(picsPath + "/downloadedPics/")).exists()) {
-            QDir dir(picsPath);
-            if (!dir.exists())
-                return;
-            dir.mkdir("downloadedPics");
-        }
-        if (!QDir(QString(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName())).exists()) {
-            QDir dir(QString(picsPath + "/downloadedPics"));
-            dir.mkdir(cardBeingDownloaded.getSetName());
+    
+    QImageReader imgReader;
+    imgReader.setDecideFormatFromContent(true);
+    imgReader.setDevice(reply);
+    QString extension = "." + imgReader.format(); //the format is determined prior to reading the QImageReader data into a QImage object, as that wipes the QImageReader buffer
+    if (extension == ".jpeg")
+        extension = ".jpg";
+    
+    if (imgReader.read(&testImage)) {
+        if (!QDir().mkpath(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName())) {
+            qDebug() << picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + " could not be created.";
+            return;
         }
 
         QString suffix;
         if (!cardBeingDownloaded.getStripped())
             suffix = ".full";
 
-        QFile newPic(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + ".jpg");
+        QFile newPic(picsPath + "/downloadedPics/" + cardBeingDownloaded.getSetName() + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + extension);
         if (!newPic.open(QIODevice::WriteOnly))
             return;
         newPic.write(picData);
@@ -294,6 +321,8 @@ CardInfo::CardInfo(CardDatabase *_db,
                    bool _cipt,
                    int _tableRow,
                    const SetList &_sets,
+                   const QStringMap &_customPicURLs,
+                   const QStringMap &_customPicURLsHq,
                    MuidMap _muIds)
     : db(_db),
       name(_name),
@@ -305,6 +334,8 @@ CardInfo::CardInfo(CardDatabase *_db,
       text(_text),
       colors(_colors),
       loyalty(_loyalty),
+      customPicURLs(_customPicURLs),
+      customPicURLsHq(_customPicURLsHq),
       muIds(_muIds),
       cipt(_cipt),
       tableRow(_tableRow),
@@ -453,6 +484,26 @@ int CardInfo::getPreferredMuId()
     return muIds[getPreferredSet()->getShortName()];
 }
 
+QString CardInfo::simplifyName(const QString &name) {
+    QString simpleName(name);
+
+    // So Aetherling would work, but not Ætherling since 'Æ' would get replaced
+    // with nothing.
+    simpleName.replace("æ", "ae");
+    simpleName.replace("Æ", "AE");
+
+    // Replace Jötun Grunt with Jotun Grunt.
+    simpleName = simpleName.normalized(QString::NormalizationForm_KD);
+
+    // Replace dashes with spaces so that we can say "garruk the veil cursed"
+    // instead of the unintuitive "garruk the veilcursed".
+    simpleName = simpleName.replace("-", " ");
+
+    simpleName.remove(QRegExp("[^a-zA-Z0-9 ]"));
+    simpleName = simpleName.toLower();
+    return simpleName;
+}
+
 static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 {
     xml.writeStartElement("card");
@@ -466,6 +517,14 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 
         tmpSet=sets[i]->getShortName();
         xml.writeAttribute("muId", QString::number(info->getMuId(tmpSet)));
+
+        tmpString = info->getCustomPicURL(tmpSet);
+        if(!tmpString.isEmpty())
+            xml.writeAttribute("picURL", tmpString);
+
+        tmpString = info->getCustomPicURLHq(tmpSet);
+        if(!tmpString.isEmpty())
+            xml.writeAttribute("picURLHq", tmpString);
 
         xml.writeCharacters(tmpSet);
         xml.writeEndElement();
@@ -526,55 +585,55 @@ CardDatabase::~CardDatabase()
 
 void CardDatabase::clear()
 {
-    QHashIterator<QString, CardSet *> setIt(setHash);
+    QHashIterator<QString, CardSet *> setIt(sets);
     while (setIt.hasNext()) {
         setIt.next();
         delete setIt.value();
     }
-    setHash.clear();
+    sets.clear();
     
-    QHashIterator<QString, CardInfo *> i(cardHash);
+    QHashIterator<QString, CardInfo *> i(cards);
     while (i.hasNext()) {
         i.next();
         delete i.value();
     }
-    cardHash.clear();
+    cards.clear();
+
+    // The pointers themselves were already deleted, so we don't delete them
+    // again.
+    simpleNameCards.clear();
 }
 
 void CardDatabase::addCard(CardInfo *card)
 {
-    cardHash.insert(card->getName(), card);
+    cards.insert(card->getName(), card);
+    simpleNameCards.insert(CardInfo::simplifyName(card->getName()), card);
     emit cardAdded(card);
 }
 
 void CardDatabase::removeCard(CardInfo *card)
 {
-    cardHash.remove(card->getName());
+    cards.remove(card->getName());
+    simpleNameCards.remove(CardInfo::simplifyName(card->getName()));
     emit cardRemoved(card);
 }
 
-CardInfo *CardDatabase::getCard(const QString &cardName, bool createIfNotFound)
-{
-    if (cardName.isEmpty())
-        return noCard;
-    else if (cardHash.contains(cardName))
-        return cardHash.value(cardName);
-    else if (createIfNotFound) {
-        CardInfo *newCard = new CardInfo(this, cardName, true);
-        newCard->addToSet(getSet("TK"));
-        cardHash.insert(cardName, newCard);
-        return newCard;
-    } else
-        return 0;
+CardInfo *CardDatabase::getCard(const QString &cardName, bool createIfNotFound) {
+    return getCardFromMap(cards, cardName, createIfNotFound);
+}
+
+CardInfo *CardDatabase::getCardBySimpleName(const QString &cardName, bool createIfNotFound) {
+    QString simpleName = CardInfo::simplifyName(cardName);
+    return getCardFromMap(simpleNameCards, simpleName, createIfNotFound);
 }
 
 CardSet *CardDatabase::getSet(const QString &setName)
 {
-    if (setHash.contains(setName))
-        return setHash.value(setName);
+    if (sets.contains(setName))
+        return sets.value(setName);
     else {
         CardSet *newSet = new CardSet(setName);
-        setHash.insert(setName, newSet);
+        sets.insert(setName, newSet);
         return newSet;
     }
 }
@@ -582,7 +641,7 @@ CardSet *CardDatabase::getSet(const QString &setName)
 SetList CardDatabase::getSetList() const
 {
     SetList result;
-    QHashIterator<QString, CardSet *> i(setHash);
+    QHashIterator<QString, CardSet *> i(sets);
     while (i.hasNext()) {
         i.next();
         result << i.value();
@@ -592,7 +651,9 @@ SetList CardDatabase::getSetList() const
 
 void CardDatabase::clearPixmapCache()
 {
-    QHashIterator<QString, CardInfo *> i(cardHash);
+    // This also clears the cards in simpleNameCards since they point to the
+    // same object.
+    QHashIterator<QString, CardInfo *> i(cards);
     while (i.hasNext()) {
         i.next();
         i.value()->clearPixmapCache();
@@ -616,7 +677,7 @@ void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
                 else if (xml.name() == "longname")
                     longName = xml.readElementText();
             }
-            setHash.insert(shortName, new CardSet(shortName, longName));
+            sets.insert(shortName, new CardSet(shortName, longName));
         }
     }
 }
@@ -629,6 +690,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
         if (xml.name() == "card") {
             QString name, manacost, type, pt, text;
             QStringList colors;
+            QStringMap customPicURLs, customPicURLsHq;
             MuidMap muids;
             SetList sets;
             int tableRow = 0;
@@ -655,6 +717,12 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
                     if (attrs.hasAttribute("muId")) {
                         muids[setName] = attrs.value("muId").toString().toInt();
                     }
+                    if (attrs.hasAttribute("picURL")) {
+                        customPicURLs[setName] = attrs.value("picURL").toString();
+                    }
+                    if (attrs.hasAttribute("picURLHq")) {
+                        customPicURLsHq[setName] = attrs.value("picURLHq").toString();
+                    }
                 } else if (xml.name() == "color")
                     colors << xml.readElementText();
                 else if (xml.name() == "tablerow")
@@ -666,45 +734,31 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
                 else if (xml.name() == "token")
                     isToken = xml.readElementText().toInt();
             }
-            cardHash.insert(name, new CardInfo(this, name, isToken, manacost, type, pt, text, colors, loyalty, cipt, tableRow, sets, muids));
+            addCard(new CardInfo(this, name, isToken, manacost, type, pt, text, colors, loyalty, cipt, tableRow, sets, customPicURLs, customPicURLsHq, muids));
         }
     }
 }
 
-LoadStatus CardDatabase::loadFromFile(const QString &fileName, bool tokens)
+CardInfo *CardDatabase::getCardFromMap(CardNameMap &cardMap, const QString &cardName, bool createIfNotFound) {
+    if (cardName.isEmpty())
+        return noCard;
+    else if (cardMap.contains(cardName))
+        return cardMap.value(cardName);
+    else if (createIfNotFound) {
+        CardInfo *newCard = new CardInfo(this, cardName, true);
+        newCard->addToSet(getSet("TK"));
+        cardMap.insert(cardName, newCard);
+        return newCard;
+    } else
+        return 0;
+}
+
+LoadStatus CardDatabase::loadFromFile(const QString &fileName)
 {
     QFile file(fileName);
     file.open(QIODevice::ReadOnly);
     if (!file.isOpen())
         return FileError;
-
-    if (tokens) {
-        QMutableHashIterator<QString, CardInfo *> i(cardHash);
-        while (i.hasNext()) {
-            i.next();
-            if (i.value()->getIsToken()) {
-                delete i.value();
-                i.remove();
-            }
-        }
-    } else {
-        QHashIterator<QString, CardSet *> setIt(setHash);
-        while (setIt.hasNext()) {
-            setIt.next();
-            delete setIt.value();
-        }
-        setHash.clear();
-
-        QMutableHashIterator<QString, CardInfo *> i(cardHash);
-        while (i.hasNext()) {
-            i.next();
-            if (!i.value()->getIsToken()) {
-                delete i.value();
-                i.remove();
-            }
-        }
-        cardHash.clear();
-    }
 
     QXmlStreamReader xml(&file);
     while (!xml.atEnd()) {
@@ -726,9 +780,9 @@ LoadStatus CardDatabase::loadFromFile(const QString &fileName, bool tokens)
             }
         }
     }
-    qDebug() << cardHash.size() << "cards in" << setHash.size() << "sets loaded";
+    qDebug() << cards.size() << "cards in" << sets.size() << "sets loaded";
 
-    if (cardHash.isEmpty()) return NoCards;
+    if (cards.isEmpty()) return NoCards;
 
     return Ok;
 }
@@ -747,18 +801,17 @@ bool CardDatabase::saveToFile(const QString &fileName, bool tokens)
 
     if (!tokens) {
         xml.writeStartElement("sets");
-        QHashIterator<QString, CardSet *> setIterator(setHash);
+        QHashIterator<QString, CardSet *> setIterator(sets);
         while (setIterator.hasNext())
             xml << setIterator.next().value();
         xml.writeEndElement(); // sets
     }
 
     xml.writeStartElement("cards");
-    QHashIterator<QString, CardInfo *> cardIterator(cardHash);
+    QHashIterator<QString, CardInfo *> cardIterator(cards);
     while (cardIterator.hasNext()) {
         CardInfo *card = cardIterator.next().value();
-        if (card->getIsToken() == tokens)
-            xml << card;
+        xml << card;
     }
     xml.writeEndElement(); // cards
 
@@ -772,7 +825,7 @@ void CardDatabase::picDownloadChanged()
 {
     pictureLoader->setPicDownload(settingsCache->getPicDownload());
     if (settingsCache->getPicDownload()) {
-        QHashIterator<QString, CardInfo *> cardIterator(cardHash);
+        QHashIterator<QString, CardInfo *> cardIterator(cards);
         while (cardIterator.hasNext())
             cardIterator.next().value()->clearPixmapCacheMiss();
     }
@@ -782,7 +835,7 @@ void CardDatabase::picDownloadHqChanged()
 {
     pictureLoader->setPicDownloadHq(settingsCache->getPicDownloadHq());
     if (settingsCache->getPicDownloadHq()) {
-        QHashIterator<QString, CardInfo *> cardIterator(cardHash);
+        QHashIterator<QString, CardInfo *> cardIterator(cards);
         while (cardIterator.hasNext())
             cardIterator.next().value()->clearPixmapCacheMiss();
     }
@@ -792,11 +845,11 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path, bool tokens)
 {
     LoadStatus tempLoadStatus = NotLoaded;
     if (!path.isEmpty())
-        tempLoadStatus = loadFromFile(path, tokens);
+        tempLoadStatus = loadFromFile(path);
 
     if (tempLoadStatus == Ok) {
         SetList allSets;
-        QHashIterator<QString, CardSet *> setsIterator(setHash);
+        QHashIterator<QString, CardSet *> setsIterator(sets);
         while (setsIterator.hasNext())
             allSets.append(setsIterator.next().value());
         allSets.sortByKey();
@@ -828,7 +881,7 @@ void CardDatabase::loadTokenDatabase()
 QStringList CardDatabase::getAllColors() const
 {
     QSet<QString> colors;
-    QHashIterator<QString, CardInfo *> cardIterator(cardHash);
+    QHashIterator<QString, CardInfo *> cardIterator(cards);
     while (cardIterator.hasNext()) {
         const QStringList &cardColors = cardIterator.next().value()->getColors();
         if (cardColors.isEmpty())
@@ -843,7 +896,7 @@ QStringList CardDatabase::getAllColors() const
 QStringList CardDatabase::getAllMainCardTypes() const
 {
     QSet<QString> types;
-    QHashIterator<QString, CardInfo *> cardIterator(cardHash);
+    QHashIterator<QString, CardInfo *> cardIterator(cards);
     while (cardIterator.hasNext())
         types.insert(cardIterator.next().value()->getMainCardType());
     return types.toList();

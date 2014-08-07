@@ -4,7 +4,7 @@
 #include <QObject>
 
 class Server_ArrowTarget : public QObject {
-	Q_OBJECT
+    Q_OBJECT
 };
 
 #endif

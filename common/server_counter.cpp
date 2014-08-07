@@ -12,9 +12,9 @@ Server_Counter::Server_Counter(int _id, const QString &_name, const color &_coun
 
 void Server_Counter::getInfo(ServerInfo_Counter *info)
 {
-	info->set_id(id);
-	info->set_name(name.toStdString());
-	info->mutable_counter_color()->CopyFrom(counterColor);
-	info->set_radius(radius);
-	info->set_count(count);
+    info->set_id(id);
+    info->set_name(name.toStdString());
+    info->mutable_counter_color()->CopyFrom(counterColor);
+    info->set_radius(radius);
+    info->set_count(count);
 }

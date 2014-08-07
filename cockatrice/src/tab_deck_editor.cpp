@@ -134,7 +134,11 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     deckView->setUniformRowHeights(true);
     deckView->setSortingEnabled(true);
     deckView->sortByColumn(1, Qt::AscendingOrder);
+#if QT_VERSION < 0x050000
     deckView->header()->setResizeMode(QHeaderView::ResizeToContents);
+#else
+    deckView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+#endif
     deckView->installEventFilter(&deckViewKeySignals);
     connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
     connect(&deckViewKeySignals, SIGNAL(onEnter()), this, SLOT(actIncrement()));
@@ -508,7 +512,10 @@ void TabDeckEditor::actPrintDeck()
 
 void TabDeckEditor::actAnalyzeDeck()
 {
-    DeckStatsInterface *interface = new DeckStatsInterface(this); // it deletes itself when done
+    DeckStatsInterface *interface = new DeckStatsInterface(
+        *databaseModel->getDatabase(),
+        this
+    ); // it deletes itself when done
     interface->analyzeDeck(deckModel->getDeckList());
 }
 
@@ -639,12 +646,25 @@ void TabDeckEditor::actDecrement()
 void TabDeckEditor::setPriceTagFeatureEnabled(int enabled)
 {
     aUpdatePrices->setVisible(enabled);
+    deckModel->pricesUpdated();
 }
 
 void TabDeckEditor::actUpdatePrices()
 {
     aUpdatePrices->setDisabled(true);
-    PriceUpdater *up = new PriceUpdater(deckModel->getDeckList());
+    AbstractPriceUpdater *up;
+
+    switch(settingsCache->getPriceTagSource())
+    {
+        case AbstractPriceUpdater::DBPriceSource:
+            up = new DBPriceUpdater(deckModel->getDeckList());
+            break;
+        case AbstractPriceUpdater::BLPPriceSource:
+        default:
+            up = new BLPPriceUpdater(deckModel->getDeckList());
+            break;
+    }
+     
     connect(up, SIGNAL(finishedUpdate()), this, SLOT(finishedUpdatingPrices()));
     up->updatePrices();
 }

@@ -774,7 +774,13 @@ void Player::actViewLibrary()
 void Player::actViewTopCards()
 {
     bool ok;
-    int number = QInputDialog::getInteger(0, tr("View top cards of library"), tr("Number of cards:"), defaultNumberTopCards, 1, 2000000000, 1, &ok);
+    int number = 
+#if QT_VERSION < 0x050000
+    QInputDialog::getInteger(
+#else
+    QInputDialog::getInt(
+#endif
+        0, tr("View top cards of library"), tr("Number of cards:"), defaultNumberTopCards, 1, 2000000000, 1, &ok);
     if (ok) {
         defaultNumberTopCards = number;
         static_cast<GameScene *>(scene())->toggleZoneView(this, "deck", number);
@@ -829,7 +835,13 @@ void Player::actMulligan()
 
 void Player::actDrawCards()
 {
-    int number = QInputDialog::getInteger(0, tr("Draw cards"), tr("Number:"));
+    int number = 
+#if QT_VERSION < 0x050000
+    QInputDialog::getInteger(
+#else
+    QInputDialog::getInt(
+#endif
+    0, tr("Draw cards"), tr("Number:"));
         if (number) {
         Command_DrawCards cmd;
         cmd.set_number(number);
@@ -844,8 +856,14 @@ void Player::actUndoDraw()
 
 void Player::actMoveTopCardsToGrave()
 {
-    int number = QInputDialog::getInteger(0, tr("Move top cards to grave"), tr("Number:"));
-        if (!number)
+    int number = 
+#if QT_VERSION < 0x050000
+    QInputDialog::getInteger(
+#else
+    QInputDialog::getInt(
+#endif
+    0, tr("Move top cards to grave"), tr("Number:"));
+    if (!number)
         return;
 
     const int maxCards = zones.value("deck")->getCards().size();
@@ -867,8 +885,14 @@ void Player::actMoveTopCardsToGrave()
 
 void Player::actMoveTopCardsToExile()
 {
-    int number = QInputDialog::getInteger(0, tr("Move top cards to exile"), tr("Number:"));
-        if (!number)
+    int number =
+#if QT_VERSION < 0x050000
+    QInputDialog::getInteger(
+#else
+    QInputDialog::getInt(
+#endif
+    0, tr("Move top cards to exile"), tr("Number:"));
+    if (!number)
         return;
 
     const int maxCards = zones.value("deck")->getCards().size();
@@ -914,7 +938,13 @@ void Player::actUntapAll()
 void Player::actRollDie()
 {
     bool ok;
-    int sides = QInputDialog::getInteger(0, tr("Roll die"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
+    int sides =
+#if QT_VERSION < 0x050000
+    QInputDialog::getInteger(
+#else
+    QInputDialog::getInt(
+#endif
+    0, tr("Roll die"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
     if (ok) {
         Command_RollDie cmd;
         cmd.set_sides(sides);
@@ -929,6 +959,10 @@ void Player::actCreateToken()
         return;
     
     lastTokenName = dlg.getName();
+    if (CardInfo *correctedCard = db->getCardBySimpleName(lastTokenName, false)) {
+        lastTokenName = correctedCard->getName();
+    }
+
     lastTokenColor = dlg.getColor();
     lastTokenPT = dlg.getPT();
     lastTokenAnnotation = dlg.getAnnotation();
@@ -2022,7 +2056,13 @@ void Player::actCardCounterTrigger()
         case 11: {
             bool ok;
             dialogSemaphore = true;
-            int number = QInputDialog::getInteger(0, tr("Set counters"), tr("Number:"), 0, 0, MAX_COUNTERS_ON_CARD, 1, &ok);
+            int number = 
+#if QT_VERSION < 0x050000
+                QInputDialog::getInteger(
+#else
+                QInputDialog::getInt(
+#endif
+                    0, tr("Set counters"), tr("Number:"), 0, 0, MAX_COUNTERS_ON_CARD, 1, &ok);
             dialogSemaphore = false;
             if (clearCardsToDelete())
                 return;
