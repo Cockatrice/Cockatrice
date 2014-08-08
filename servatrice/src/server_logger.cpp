@@ -50,9 +50,9 @@ void ServerLogger::logMessage(QString message, void *caller)
         callerString = QString::number((qulonglong) caller, 16) + " ";
         
     //filter out all log entries based on values in configuration file
-    QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
-    bool shouldWeWriteLog = settings->value("server/writelog").toBool();
-    QString logFilters = settings->value("server/logfilters").toString();
+    QSettings settings("servatrice.ini", QSettings::IniFormat);
+    bool shouldWeWriteLog = settings.value("server/writelog").toBool();
+    QString logFilters = settings.value("server/logfilters").toString();
     QStringList listlogFilters = logFilters.split(",", QString::SkipEmptyParts); 
     bool shouldWeSkipLine = false; 
     

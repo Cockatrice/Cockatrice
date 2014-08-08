@@ -29,6 +29,7 @@
 #include "server_logger.h"
 #include "rng_sfmt.h"
 #include "version_string.h"
+#include <google/protobuf/stubs/common.h>
 #ifdef Q_OS_UNIX
 #include <signal.h>
 #endif
@@ -232,6 +233,9 @@ int main(int argc, char *argv[])
 	logger->deleteLater();
 	loggerThread->wait();
 	delete loggerThread;
+
+	// Delete all global objects allocated by libprotobuf.
+	google::protobuf::ShutdownProtobufLibrary();
 
 	return retval;
 }
