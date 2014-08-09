@@ -236,6 +236,7 @@ void DeckViewContainer::setDeck(const DeckLoader &deck)
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     : Tab(_tabSupervisor),
+    secondsElapsed(0),
     hostId(-1),
     localPlayerId(-1),
     spectator(true),
@@ -245,8 +246,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     activeCard(0),
     gameClosed(false),
     replay(_replay),
-    currentReplayStep(0),
-    secondsElapsed(0)
+    currentReplayStep(0)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     
