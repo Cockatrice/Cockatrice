@@ -15,7 +15,7 @@ GameEventStorageItem::~GameEventStorageItem()
 }
 
 GameEventStorage::GameEventStorage()
-    : gameEventContext(0)
+    : gameEventContext(0), privatePlayerId(0)
 {
 }
 
