@@ -29,6 +29,7 @@
 #include "server_logger.h"
 #include "rng_sfmt.h"
 #include "version_string.h"
+#include <google/protobuf/stubs/common.h>
 #ifdef Q_OS_UNIX
 #include <signal.h>
 #endif
@@ -36,6 +37,23 @@
 RNG_Abstract *rng;
 ServerLogger *logger;
 QThread *loggerThread;
+
+/* Prototypes */
+
+void testRNG();
+void testHash();
+#if QT_VERSION < 0x050000
+void myMessageOutput(QtMsgType type, const char *msg);
+void myMessageOutput2(QtMsgType type, const char *msg);
+#else
+void myMessageOutput(QtMsgType type, const QMessageLogContext &, const QString &msg);
+void myMessageOutput2(QtMsgType type, const QMessageLogContext &, const QString &msg);
+#endif
+#ifdef Q_OS_UNIX
+void sigSegvHandler(int sig);
+#endif
+
+/* Implementations */
 
 void testRNG()
 {
@@ -215,6 +233,9 @@ int main(int argc, char *argv[])
 	logger->deleteLater();
 	loggerThread->wait();
 	delete loggerThread;
+
+	// Delete all global objects allocated by libprotobuf.
+	google::protobuf::ShutdownProtobufLibrary();
 
 	return retval;
 }

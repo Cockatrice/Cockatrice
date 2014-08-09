@@ -2,10 +2,11 @@
 !include "MUI2.nsh"
 !include "FileFunc.nsh"
 
-Name "${NSIS_PROJECT_NAME}"
+Name "@CPACK_PACKAGE_NAME@"
 OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
 SetCompressor /SOLID lzma
 InstallDir "$PROGRAMFILES\Cockatrice"
+!define INST_DIR "@CPACK_TEMPORARY_DIRECTORY@"
 
 !define MUI_ABORTWARNING
 !define MUI_WELCOMEFINISHPAGE_BITMAP "${NSIS_SOURCE_PATH}\cmake\leftimage.bmp"
@@ -35,7 +36,8 @@ Section "Application" SecApplication
 	SetShellVarContext all
 	SetOutPath "$INSTDIR"
 
-	File /r "${NSIS_BINARY_PATH}\Release\*.*"
+    @CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS@
+    @CPACK_NSIS_FULL_INSTALL@
 
 	WriteUninstaller "$INSTDIR\uninstall.exe"
 	${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2

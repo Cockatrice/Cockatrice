@@ -33,8 +33,11 @@ To compile:
 
 The following flags can be passed to `cmake`:
 
-- `-DWITH_SERVER=1` build the server
-- `-DWITHOUT_CLIENT=1` do not build the client
+- `-DWITH_SERVER=1` Build the server
+- `-DWITH_CLIENT=0` Do not build the client
+- `-DWITH_ORACLE=0` Do not build Oracle
+- `-DWITH_QT4=1` Force compilation to use Qt4 instead of Qt5.
+- `-DCMAKE_BUILD_TYPE=Debug` Compile in debug mode. Enables extra logging output, debug symbols, and much more verbose compiler warnings.
 
 # Running
 

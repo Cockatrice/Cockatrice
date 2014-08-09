@@ -76,8 +76,19 @@ IF(MSVC)
     #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
 ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
     # linux/gcc, bsd/gcc, windows/mingw
+    include(CheckCXXCompilerFlag)
+
     set(CMAKE_CXX_FLAGS_RELEASE "-s -O2")
-    set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra -pedantic -Werror -Wcast-align -Wmissing-declarations -Winline -Wno-long-long -Wno-error=extra -Wno-error=unused-parameter -Wno-inline -Wno-error=delete-non-virtual-dtor -Wno-error=sign-compare -Wno-error=reorder -Wno-error=missing-declarations")
+    set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra -pedantic -Werror")
+
+    set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Winline -Wno-long-long -Wno-error=extra -Wno-error=unused-parameter -Wno-inline -Wno-error=delete-non-virtual-dtor -Wno-error=sign-compare -Wno-error=reorder -Wno-error=missing-declarations)
+
+    FOREACH(FLAG ${ADDITIONAL_DEBUG_FLAGS})
+        CHECK_CXX_COMPILER_FLAG("${FLAG}" CXX_HAS_WARNING_${FLAG})
+        IF(CXX_HAS_WARNING_${FLAG})
+            SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FLAG}")
+        ENDIF()
+    ENDFOREACH()
 ELSE()
     # other: osx/llvm, bsd/llvm
     set(CMAKE_CXX_FLAGS_RELEASE "-O2")
@@ -99,6 +110,11 @@ ENDIF()
 
 IF(Qt5Widgets_FOUND)
     MESSAGE(STATUS "Found Qt ${Qt5Widgets_VERSION_STRING}")
+
+    if(UNIX AND NOT APPLE AND "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+        # FIX: Qt was built with -reduce-relocations
+        add_definitions(-fPIC)
+    endif()  
 ELSE()
     FIND_PACKAGE(Qt4 4.8.0 REQUIRED)
     IF(QT4_FOUND)

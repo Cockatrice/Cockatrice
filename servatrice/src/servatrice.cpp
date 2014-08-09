@@ -78,7 +78,11 @@ Servatrice_GameServer::~Servatrice_GameServer()
 	}
 }
 
+#if QT_VERSION < 0x050000
 void Servatrice_GameServer::incomingConnection(int socketDescriptor)
+#else
+void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
+#endif
 {
 	// Determine connection pool with smallest client count
 	int minClientCount = -1;

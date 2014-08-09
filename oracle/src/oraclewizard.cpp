@@ -383,7 +383,7 @@ void SaveSetsPage::initializePage()
         QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
 }
 
-void SaveSetsPage::updateTotalProgress(int cardsImported, int setIndex, const QString &setName)
+void SaveSetsPage::updateTotalProgress(int cardsImported, int /* setIndex */, const QString &setName)
 {
     if (setName.isEmpty()) {
         messageLog->append("<b>" + tr("Import finished: %1 cards.").arg(wizard()->importer->getCardList().size()) + "</b>");
@@ -418,9 +418,12 @@ bool SaveSetsPage::validatePage()
             return false;
         }
         if (wizard()->importer->saveToFile(fileName))
+        {
             ok = true;
-        else
+            QMessageBox::information(this, tr("Success"), tr("The card database has been saved successfully."));
+        } else {
             QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to the desired location."));
+        }
     } while (!ok);
 
     return true;
