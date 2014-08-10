@@ -132,8 +132,8 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     } else if (authState == UnknownUser) {
         // Change user name so that no two users have the same names,
         // don't interfere with registered user names though.
-        QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
-        bool requireReg = settings->value("authentication/regonly", 0).toBool();
+        QSettings settings("servatrice.ini", QSettings::IniFormat);
+        bool requireReg = settings.value("authentication/regonly", 0).toBool();
         if (requireReg) {
             qDebug("Login denied: registration required");
             databaseInterface->unlockSessionTables();
