@@ -76,8 +76,8 @@ void SetList::sortByKey()
     qSort(begin(), end(), CompareFunctor());
 }
 
-PictureToLoad::PictureToLoad(CardInfo *_card, bool _stripped, bool _hq)
-    : card(_card), stripped(_stripped), setIndex(0), hq(_hq)
+PictureToLoad::PictureToLoad(CardInfo *_card, bool _hq)
+    : card(_card), setIndex(0), hq(_hq)
 {
     if (card) {
         sortedSets = card->getSets();
@@ -308,11 +308,11 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
     startNextPicDownload();
 }
 
-void PictureLoader::loadImage(CardInfo *card, bool stripped)
+void PictureLoader::loadImage(CardInfo *card)
 {
     QMutexLocker locker(&mutex);
 
-    loadQueue.append(PictureToLoad(card, stripped));
+    loadQueue.append(PictureToLoad(card));
     emit startLoadQueue();
 }
 
@@ -938,7 +938,7 @@ void CardDatabase::cacheCardPixmaps(const QStringList &cardNames)
 
 void CardDatabase::loadImage(CardInfo *card)
 {
-    pictureLoader->loadImage(card, false);
+    pictureLoader->loadImage(card);
 }
 
 void CardDatabase::imageLoaded(CardInfo *card, QImage image)
