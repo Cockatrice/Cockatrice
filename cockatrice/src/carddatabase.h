@@ -47,14 +47,12 @@ public:
 class PictureToLoad {
 private:
     CardInfo *card;
-    bool stripped;
     SetList sortedSets;
     int setIndex;
     bool hq;
 public:
-    PictureToLoad(CardInfo *_card = 0, bool _stripped = false, bool _hq = true);
+    PictureToLoad(CardInfo *_card = 0, bool _hq = true);
     CardInfo *getCard() const { return card; }
-    bool getStripped() const { return stripped; }
     QString getSetName() const;
     bool nextSet();
     bool getHq() const { return hq; }
@@ -79,7 +77,7 @@ public:
     void setPicsPath(const QString &path);
     void setPicDownload(bool _picDownload);
     void setPicDownloadHq(bool _picDownloadHq);
-    void loadImage(CardInfo *card, bool stripped);
+    void loadImage(CardInfo *card);
 private slots:
     void picDownloadFinished(QNetworkReply *reply);
 public slots:
