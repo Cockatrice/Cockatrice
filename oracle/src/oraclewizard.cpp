@@ -402,17 +402,27 @@ bool SaveSetsPage::validatePage()
 #else
         QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
-    QDir dir(dataDir);
-    if (!dir.exists())
-        dir.mkpath(dataDir);
-    QString savePath = dataDir + "/cards.xml";
+    QSettings* settings = new QSettings(this);
+    QString savePath = settings->value("paths/carddatabase").toString();
+    if (savePath.isEmpty()) {
+        QDir().mkpath(dataDir);
+    }
+    QString windowName = tr("Save card database");
+    QString fileType = tr("XML; card database (*.xml)");
     do {
         QString fileName;
-        if (savePath.isEmpty() || !defaultPathCheckBox->isChecked())
-            fileName = QFileDialog::getSaveFileName(this, tr("Save card database"), dataDir + "/cards.xml", tr("XML card database (*.xml)"));
+        if (savePath.isEmpty()) {
+            if (defaultPathCheckBox->isChecked())
+                fileName = dataDir + "/cards.xml";
+            else
+                fileName = QFileDialog::getSaveFileName(this, windowName, dataDir + "/cards.xml", fileType);
+            settings->setValue("paths/carddatabase", fileName);
+        }
         else {
-            fileName = savePath;
-            savePath.clear();
+            if (defaultPathCheckBox->isChecked())
+                fileName = savePath;
+            else
+                fileName = QFileDialog::getSaveFileName(this, windowName, savePath, fileType);
         }
         if (fileName.isEmpty()) {
             return false;
