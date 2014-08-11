@@ -84,7 +84,9 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             sc->removeItem(c);
         }
     }
-    currentZone->handleDropEvent(dragItemList, startZone, (sp - currentZone->scenePos()).toPoint());
+
+    if(currentZone)
+        currentZone->handleDropEvent(dragItemList, startZone, (sp - currentZone->scenePos()).toPoint());
 
     event->accept();
 }
