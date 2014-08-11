@@ -100,7 +100,7 @@ void PhaseButton::triggerDoubleClickAction()
 }
 
 PhasesToolbar::PhasesToolbar(QGraphicsItem *parent)
-    : QGraphicsItem(parent), width(100), height(100)
+    : QGraphicsItem(parent), width(100), height(100), ySpacing(1), symbolSize(8)
 {
     QAction *aUntapAll = new QAction(this);
     connect(aUntapAll, SIGNAL(triggered()), this, SLOT(actUntapAll()));
