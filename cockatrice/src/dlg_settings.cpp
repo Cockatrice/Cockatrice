@@ -42,6 +42,9 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     picDownloadCheckBox = new QCheckBox;
     picDownloadCheckBox->setChecked(settingsCache->getPicDownload());
+    
+    QPushButton *clearDownloadedPicsButton = new QPushButton(tr("Reset/Clear Downloaded Pictures"));
+    connect(clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
 
     picDownloadHqCheckBox = new QCheckBox;
     picDownloadHqCheckBox->setChecked(settingsCache->getPicDownloadHq());
@@ -55,6 +58,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(languageBox, 0, 1);
     personalGrid->addWidget(picDownloadCheckBox, 1, 0, 1, 2);
     personalGrid->addWidget(picDownloadHqCheckBox, 2, 0, 1, 2);
+    personalGrid->addWidget(clearDownloadedPicsButton, 3, 0, 1, 1);
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
@@ -161,6 +165,30 @@ void GeneralSettingsPage::picsPathButtonClicked()
     settingsCache->setPicsPath(path);
 }
 
+void GeneralSettingsPage::clearDownloadedPicsButtonClicked()
+{
+    QString picsPath = settingsCache->getPicsPath() + "/downloadedPics/";
+    QStringList dirs = QDir(picsPath).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+    bool outerSuccessRemove = true;
+    for (int i = 0; i < dirs.length(); i ++) {
+        QString currentPath = picsPath + dirs.at(i) + "/";
+        QStringList files = QDir(currentPath).entryList(QDir::Files);
+        bool innerSuccessRemove = true;
+        for (int j = 0; j < files.length(); j ++)
+            if (!QDir(currentPath).remove(files.at(j))) {
+                qDebug() << "Failed to remove " + currentPath.toUtf8() + files.at(j).toUtf8();
+                outerSuccessRemove = false;
+                innerSuccessRemove = false;
+            }
+        if (innerSuccessRemove)
+            QDir(picsPath).rmdir(dirs.at(i));
+    }
+    if (outerSuccessRemove)
+        QMessageBox::information(this, tr("Success"), tr("Downloaded card pictures have been reset."));
+    else
+        QMessageBox::critical(this, tr("Error"), tr("One or more downloaded card pictures could not be cleared."));
+}
+
 void GeneralSettingsPage::cardDatabasePathButtonClicked()
 {
     QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
@@ -196,8 +224,8 @@ void GeneralSettingsPage::retranslateUi()
     deckPathLabel->setText(tr("Decks directory:"));
     replaysPathLabel->setText(tr("Replays directory:"));
     picsPathLabel->setText(tr("Pictures directory:"));
-    cardDatabasePathLabel->setText(tr("Path to card database:"));
-    tokenDatabasePathLabel->setText(tr("Path to token database:"));
+    cardDatabasePathLabel->setText(tr("Card database:"));
+    tokenDatabasePathLabel->setText(tr("Token database:"));
 }
 
 AppearanceSettingsPage::AppearanceSettingsPage()
@@ -335,11 +363,11 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 void AppearanceSettingsPage::retranslateUi()
 {
     zoneBgGroupBox->setTitle(tr("Zone background pictures"));
-    handBgLabel->setText(tr("Path to hand background:"));
-    stackBgLabel->setText(tr("Path to stack background:"));
-    tableBgLabel->setText(tr("Path to table background:"));
-    playerAreaBgLabel->setText(tr("Path to player info background:"));
-    cardBackPicturePathLabel->setText(tr("Path to picture of card back:"));
+    handBgLabel->setText(tr("Hand background:"));
+    stackBgLabel->setText(tr("Stack background:"));
+    tableBgLabel->setText(tr("Table background:"));
+    playerAreaBgLabel->setText(tr("Player info background:"));
+    cardBackPicturePathLabel->setText(tr("Card back:"));
     
     cardsGroupBox->setTitle(tr("Card rendering"));
     displayCardNamesCheckBox->setText(tr("Display card names on cards having a picture"));
