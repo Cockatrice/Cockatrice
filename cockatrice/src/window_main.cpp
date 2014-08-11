@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
  *   Copyright (C) 2008 by Max-Wilhelm Bruker   *
  *   brukie@gmx.net   *
  *                                                                         *
@@ -225,8 +225,6 @@ void MainWindow::actAbout()
         + tr("French:") + " Yannick Hammer, Arnaud Faes<br>"
         + tr("Japanese:") + " Nagase Task<br>"
         + tr("Russian:") + " Alexander Davidov<br>"
-//        + tr("Czech:") + " Ondřej Trhoň<br>"
-//        + tr("Slovak:") + " Ganjalf Rendy<br>"
         + tr("Italian:") + " Luigi Sciolla<br>"
         + tr("Swedish:") + " Jessica Dahl<br>"
     ));
@@ -260,6 +258,9 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
         }
         case Response::RespUsernameInvalid:
             QMessageBox::critical(this, tr("Error"), tr("Invalid username."));
+            break;
+        case Response::RespRegistrationRequired:
+            QMessageBox::critical(this, tr("Error"), tr("This server requires user registration."));
             break;
         default:
             QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)));
