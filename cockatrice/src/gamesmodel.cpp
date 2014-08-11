@@ -93,6 +93,7 @@ GamesProxyModel::GamesProxyModel(QObject *parent, ServerInfo_User *_ownUser)
     : QSortFilterProxyModel(parent),
           ownUser(_ownUser),
           unavailableGamesVisible(false),
+          passwordProtectedGamesVisible(false),
           maxPlayersFilterMin(-1),
           maxPlayersFilterMax(-1)
 {

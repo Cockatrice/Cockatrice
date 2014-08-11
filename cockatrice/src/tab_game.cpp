@@ -236,6 +236,7 @@ void DeckViewContainer::setDeck(const DeckLoader &deck)
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     : Tab(_tabSupervisor),
+    secondsElapsed(0),
     hostId(-1),
     localPlayerId(-1),
     spectator(true),
