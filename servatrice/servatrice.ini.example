@@ -16,6 +16,7 @@ ssl_key=ssl_key.pem
 
 [authentication]
 method=none
+regonly=0
 
 [database]
 type=none

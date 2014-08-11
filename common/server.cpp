@@ -34,6 +34,7 @@
 #include <QCoreApplication>
 #include <QThread>
 #include <QDebug>
+#include <QSettings>
 
 Server::Server(bool _threaded, QObject *parent)
     : QObject(parent), threaded(_threaded), nextLocalGameId(0)
@@ -131,6 +132,14 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     } else if (authState == UnknownUser) {
         // Change user name so that no two users have the same names,
         // don't interfere with registered user names though.
+        QSettings settings("servatrice.ini", QSettings::IniFormat);
+        bool requireReg = settings.value("authentication/regonly", 0).toBool();
+        if (requireReg) {
+            qDebug("Login denied: registration required");
+            databaseInterface->unlockSessionTables();
+            return RegistrationRequired;
+        }
+
         QString tempName = name;
         int i = 0;
         while (users.contains(tempName) || databaseInterface->userExists(tempName) || databaseInterface->userSessionExists(tempName))
@@ -142,7 +151,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     users.insert(name, session);
     qDebug() << "Server::loginUser:" << session << "name=" << name;
     
-    data.set_session_id(databaseInterface->startSession(name, session->getAddress()));    
+    data.set_session_id(databaseInterface->startSession(name, session->getAddress()));  
     databaseInterface->unlockSessionTables();
     
     usersBySessionId.insert(data.session_id(), session);
@@ -478,7 +487,7 @@ void Server::broadcastRoomUpdate(const ServerInfo_Room &roomInfo, bool sendToIsl
 
     clientsLock.lockForRead();
     for (int i = 0; i < clients.size(); ++i)
-          if (clients[i]->getAcceptsRoomListChanges())
+        if (clients[i]->getAcceptsRoomListChanges())
             clients[i]->sendProtocolItem(*se);
     clientsLock.unlock();
     
