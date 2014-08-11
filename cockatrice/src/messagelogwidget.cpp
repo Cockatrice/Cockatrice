@@ -876,6 +876,6 @@ void MessageLogWidget::connectToPlayer(Player *player)
 }
 
 MessageLogWidget::MessageLogWidget(const TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent)
-    : ChatView(_tabSupervisor, _game, false, parent)
+    : ChatView(_tabSupervisor, _game, false, parent), currentContext(MessageContext_None)
 {
 }
