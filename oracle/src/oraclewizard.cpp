@@ -433,6 +433,8 @@ bool SaveSetsPage::validatePage()
             QMessageBox::information(this, tr("Success"), tr("The card database has been saved successfully."));
         } else {
             QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to the desired location."));
+            if (defaultPathCheckBox->isChecked())
+                defaultPathCheckBox->setChecked(false);
         }
     } while (!ok);
 
