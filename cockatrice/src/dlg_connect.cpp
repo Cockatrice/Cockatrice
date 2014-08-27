@@ -4,6 +4,8 @@
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QDialogButtonBox>
+#include <QDebug>
+#include <iostream>
 #include "dlg_connect.h"
 
 DlgConnect::DlgConnect(QWidget *parent)
@@ -32,6 +34,20 @@ DlgConnect::DlgConnect(QWidget *parent)
     savePasswordCheckBox = new QCheckBox(tr("&Save password"));
     savePasswordCheckBox->setChecked(settings.value("save_password", 1).toInt());
 
+    //autoConnectCheckBox = new QCheckBox(tr("A&uto connect at start"));
+    autoConnectCheckBox = new QCheckBox("A&uto connect at start"); // TODO needs tr()
+    if(savePasswordCheckBox->isChecked())
+    {
+        autoConnectCheckBox->setChecked(settings.value("auto_connect", 0).toInt());
+        autoConnectCheckBox->setEnabled(true);
+    } else {
+        settings.setValue("auto_connect", 0);
+        autoConnectCheckBox->setChecked(0);
+        autoConnectCheckBox->setEnabled(false);
+    }
+
+    connect(savePasswordCheckBox, SIGNAL(stateChanged(int)), this, SLOT(passwordSaved(int)));
+
     QGridLayout *grid = new QGridLayout;
     grid->addWidget(hostLabel, 0, 0);
     grid->addWidget(hostEdit, 0, 1);
@@ -42,10 +58,11 @@ DlgConnect::DlgConnect(QWidget *parent)
     grid->addWidget(passwordLabel, 3, 0);
     grid->addWidget(passwordEdit, 3, 1);
     grid->addWidget(savePasswordCheckBox, 4, 0, 1, 2);
+    grid->addWidget(autoConnectCheckBox, 5, 0, 1, 2);
     
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
          
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
@@ -57,6 +74,17 @@ DlgConnect::DlgConnect(QWidget *parent)
     setMinimumWidth(300);
 }
 
+void DlgConnect::passwordSaved(int state)
+{
+    if(!savePasswordCheckBox->isChecked())
+    {
+        autoConnectCheckBox->setChecked(0);
+        autoConnectCheckBox->setEnabled(false);
+    } else {
+        autoConnectCheckBox->setEnabled(true);
+    }
+}
+
 void DlgConnect::actOk()
 {
     QSettings settings;
@@ -66,7 +94,17 @@ void DlgConnect::actOk()
     settings.setValue("playername", playernameEdit->text());
     settings.setValue("password", savePasswordCheckBox->isChecked() ? passwordEdit->text() : QString());
     settings.setValue("save_password", savePasswordCheckBox->isChecked() ? 1 : 0);
+    settings.setValue("auto_connect", autoConnectCheckBox->isChecked() ? 1 : 0);
     settings.endGroup();
 
     accept();
+}
+
+void DlgConnect::actCancel()
+{
+    QSettings settings;
+    settings.beginGroup("server");
+    settings.setValue("auto_connect", autoConnectCheckBox->isChecked() ? 1 : 0);
+    settings.endGroup();
+    reject();
 }

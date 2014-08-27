@@ -71,6 +71,7 @@ private:
     QThread *clientThread;
     
     LocalServer *localServer;
+    bool bHasActivated;
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
