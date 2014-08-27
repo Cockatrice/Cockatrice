@@ -57,6 +57,7 @@ private:
     bool ignoreUnregisteredUsers;
     QString picUrl;
     QString picUrlHq;
+    bool attemptAutoConnect;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -93,6 +94,7 @@ public:
     QString getPicUrl() const { return picUrl; }
     QString getPicUrlHq() const { return picUrlHq; }
     void copyPath(const QString &src, const QString &dst);
+    bool getAutoConnect() const { return attemptAutoConnect; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -127,6 +129,7 @@ public slots:
     void setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers);
     void setPicUrl(const QString &_picUrl);
     void setPicUrlHq(const QString &_picUrlHq);
+    void setAutoConnect(const bool &_autoConnect);
 };
 
 extern SettingsCache *settingsCache;
