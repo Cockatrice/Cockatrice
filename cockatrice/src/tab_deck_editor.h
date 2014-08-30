@@ -53,6 +53,7 @@ private slots:
 
     void actClearSearch();
 
+    void actSwapCard();
     void actAddCard();
     void actAddCardToSideboard();
     void actRemoveCard();
