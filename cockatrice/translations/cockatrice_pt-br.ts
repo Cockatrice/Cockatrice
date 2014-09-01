@@ -103,7 +103,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="343"/>
         <source>Minimum player count for multi-column layout:</source>
-        <translation type="unfinished"></translation>
+        <translation>Número mínimo de jogadores para layout com múltiplas colunas:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="345"/>
@@ -141,83 +141,84 @@ Digite 0 para banir indefinidamente.</translation>
     <message>
         <location filename="../src/userlist.cpp" line="34"/>
         <source>ban &amp;user name</source>
-        <translation type="unfinished"></translation>
+        <translation>Banir nome de &amp;utilizador</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="37"/>
         <source>ban &amp;IP address</source>
-        <translation type="unfinished"></translation>
+        <translation>Banir endereço de &amp;IP</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="45"/>
         <source>Ban type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo de banimento</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="48"/>
         <source>&amp;permanent ban</source>
-        <translation type="unfinished"></translation>
+        <translation>Banimento &amp;permanente</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="49"/>
         <source>&amp;temporary ban</source>
-        <translation type="unfinished"></translation>
+        <translation>Banimento &amp;temporário</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="52"/>
         <source>&amp;Days:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Dias:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="58"/>
         <source>&amp;Hours:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Horas:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="64"/>
         <source>&amp;Minutes:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Minutos:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="79"/>
         <source>Duration of the ban</source>
-        <translation type="unfinished"></translation>
+        <translation>Duração do banimento</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="82"/>
         <source>Please enter the reason for the ban.
 This is only saved for moderators and cannot be seen by the banned person.</source>
-        <translation type="unfinished"></translation>
+        <translation>Por favor introduza o motivo do banimento.
+Isto apenas é guardado para os moderadores e não é visível para a pessoa banida.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="85"/>
         <source>Please enter the reason for the ban that will be visible to the banned person.</source>
-        <translation type="unfinished"></translation>
+        <translation>Por favor introduza o motivo do banimento que será visível à pessoa banida.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="88"/>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="91"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Cancelar</translation>
+        <translation>&amp;Cancelar</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="109"/>
         <source>Ban user from server</source>
-        <translation type="unfinished"></translation>
+        <translation>Banir utilizador do servidor</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="115"/>
         <source>Error</source>
-        <translation type="unfinished">Erro</translation>
+        <translation>Erro</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="115"/>
         <source>You have to select a name-based or IP-based ban, or both.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tem de seleccionar um banimento baseado no nome, no IP ou ambos.</translation>
     </message>
 </context>
 <context>
