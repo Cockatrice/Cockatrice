@@ -1,7 +1,5 @@
 # Cockatrice
 
-[![Build Status](https://travis-ci.org/Daenyth/Cockatrice.svg?branch=master)](https://travis-ci.org/Daenyth/Cockatrice)
-
 Cockatrice is an open-source multiplatform software for playing card games,
 such as Magic: The Gathering, over a network. It is fully client-server based
 to prevent any kind of cheating, though it supports single-player games without
@@ -14,6 +12,8 @@ Chat with the Cockatrice developers on Gitter.
 [![Gitter chat](https://badges.gitter.im/Daenyth/Cockatrice.png)](https://gitter.im/Daenyth/Cockatrice)
 
 # Building
+
+[![Build Status](https://travis-ci.org/Daenyth/Cockatrice.svg?branch=master)](https://travis-ci.org/Daenyth/Cockatrice)
 
 Dependencies:
 
