@@ -7,9 +7,11 @@ such as Magic: The Gathering, over a network. It is fully client-server based
 to prevent any kind of cheating, though it supports single-player games without
 a network interface as well. Both client and server are written in Qt 4.
 
-# License
+# Get Involved
 
-Cockatrice is free software, licensed under the GPLv2; see COPYING for details.
+Chat with the Cockatrice developers on Gitter.
+
+[![Gitter chat](https://badges.gitter.im/Daenyth/Cockatrice.png)](https://gitter.im/Daenyth/Cockatrice)
 
 # Building
 
@@ -44,3 +46,7 @@ The following flags can be passed to `cmake`:
 `oracle` fetches card data  
 `cockatrice` is the game client  
 `servatrice` is the server
+
+# License
+
+Cockatrice is free software, licensed under the GPLv2; see COPYING for details.
