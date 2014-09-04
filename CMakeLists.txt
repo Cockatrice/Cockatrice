@@ -102,7 +102,9 @@ ENDIF()
 
 # Find Qt and enable the needed features
 # Default is Qt5 unless WITH_QT4 option is enabled
-option(WITH_QT4 "Force thr use of Qt4 libraries" OFF)
+option(WITH_QT4 "Force the use of Qt4 libraries" OFF)
+OPTION(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
+MESSAGE("UPDATE TRANSLATIONS: ${UPDATE_TRANSLATIONS}")
 
 IF(NOT WITH_QT4)
     FIND_PACKAGE(Qt5Widgets)
@@ -114,7 +116,19 @@ IF(Qt5Widgets_FOUND)
     if(UNIX AND NOT APPLE AND "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
         # FIX: Qt was built with -reduce-relocations
         add_definitions(-fPIC)
-    endif()  
+    endif() 
+
+    FIND_PACKAGE(Qt5LinguistTools)
+    IF(UPDATE_TRANSLATIONS)
+        IF(NOT Qt5_LUPDATE_EXECUTABLE)
+            MESSAGE(WARNING "Qt's lupdate not found.")
+        ENDIF()
+    ENDIF()
+
+    IF(NOT Qt5_LRELEASE_EXECUTABLE)
+        MESSAGE(WARNING "Qt's lrelease not found.")
+    ENDIF()
+
 ELSE()
     FIND_PACKAGE(Qt4 4.8.0 REQUIRED)
     IF(QT4_FOUND)
@@ -123,6 +137,17 @@ ELSE()
     ENDIF()
     IF(Qt4_FOUND)
         MESSAGE(STATUS "Found Qt ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}")
+
+        IF(UPDATE_TRANSLATIONS)
+            IF(NOT QT_LUPDATE_EXECUTABLE)
+                MESSAGE(WARNING "Qt's lupdate not found.")
+            ENDIF()
+        ENDIF()
+
+        IF(NOT QT_LRELEASE_EXECUTABLE)
+            MESSAGE(WARNING "Qt's lrelease not found.")
+        ENDIF()
+
     ELSE()
         MESSAGE(FATAL_ERROR "No Qt4 or Qt5 found!")
     ENDIF()
