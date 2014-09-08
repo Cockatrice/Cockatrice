@@ -40,6 +40,7 @@ The following flags can be passed to `cmake`:
 - `-DWITH_ORACLE=0` Do not build Oracle
 - `-DWITH_QT4=1` Force compilation to use Qt4 instead of Qt5.
 - `-DCMAKE_BUILD_TYPE=Debug` Compile in debug mode. Enables extra logging output, debug symbols, and much more verbose compiler warnings.
+- `-DUPDATE_TRANSLATIONS=1` Configure `make` to update the translation .ts files for new strings in the source code. Note: Running `make clean` will remove the .ts files. You should run this when contributing code that changes user messages. Translation file updates should be added in the same commit as the string that was changed.
 
 # Running
 
