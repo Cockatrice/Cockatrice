@@ -98,22 +98,13 @@ if (UNIX AND NOT APPLE)
 endif (UNIX AND NOT APPLE)
 
 set(cockatrice_RESOURCES cockatrice.qrc)
-set(cockatrice_TS
-#    translations/cockatrice_cs.ts
-    translations/cockatrice_de.ts
-    translations/cockatrice_en.ts
-    translations/cockatrice_es.ts
-#    translations/cockatrice_fr.ts
-    translations/cockatrice_it.ts
-    translations/cockatrice_ja.ts
-#    translations/cockatrice_pl.ts
-#    translations/cockatrice_pt-br.ts
-    translations/cockatrice_pt.ts
-#    translations/cockatrice_ru.ts
-#    translations/cockatrice_sk.ts
-    translations/cockatrice_sv.ts
-#    translations/cockatrice_zh_CN.ts
-)
+FILE(GLOB cockatrice_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
+
+IF(UPDATE_TRANSLATIONS)
+    FILE(GLOB_RECURSE translate_cockatrice_SRCS ${CMAKE_SOURCE_DIR}/cockatrice/src/*.cpp)
+    FILE(GLOB_RECURSE translate_common_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/common/*.cpp)
+    SET(translate_SRCS ${translate_cockatrice_SRCS} ${translate_common_SRCS})
+ENDIF(UPDATE_TRANSLATIONS)
 
 if(WIN32)
     set(cockatrice_SOURCES ${cockatrice_SOURCES} cockatrice.rc)
@@ -149,7 +140,12 @@ if(Qt4_FOUND)
 
     # Let cmake chew Qt4's translations and resource files
     # Note: header files are MOC-ed automatically by cmake
-    QT4_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
+    IF(UPDATE_TRANSLATIONS)
+        QT4_CREATE_TRANSLATION(cockatrice_QM ${translate_SRCS} ${cockatrice_TS})
+    ELSE(UPDATE_TRANSLATIONS)
+        QT4_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
+    ENDIF(UPDATE_TRANSLATIONS)
+
     QT4_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
 endif()
 
@@ -202,7 +198,12 @@ if(Qt5Widgets_FOUND)
 
     # Let cmake chew Qt5's translations and resource files
     # Note: header files are MOC-ed automatically by cmake
-    QT5_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
+    IF(UPDATE_TRANSLATIONS)
+        QT5_CREATE_TRANSLATION(cockatrice_QM ${translate_SRCS} ${cockatrice_TS})
+    ELSE()
+        QT5_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
+    ENDIF()
+
     QT5_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
 
     # guess plugins and libraries directory
