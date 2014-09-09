@@ -1,17 +1,19 @@
 # Cockatrice
 
-[![Build Status](https://travis-ci.org/Daenyth/Cockatrice.svg?branch=master)](https://travis-ci.org/Daenyth/Cockatrice)
-
 Cockatrice is an open-source multiplatform software for playing card games,
 such as Magic: The Gathering, over a network. It is fully client-server based
 to prevent any kind of cheating, though it supports single-player games without
-a network interface as well. Both client and server are written in Qt 4.
+a network interface as well. Both client and server are written in Qt, supporting both Qt4 and Qt5.
 
-# License
+# Get Involved
 
-Cockatrice is free software, licensed under the GPLv2; see COPYING for details.
+Chat with the Cockatrice developers on Gitter. Come here to talk about the application, features, or just to hang out. For support regarding specific servers, please contact that server's admin or forum for support rather than asking here.
+
+[![Gitter chat](https://badges.gitter.im/Daenyth/Cockatrice.png)](https://gitter.im/Daenyth/Cockatrice)
 
 # Building
+
+[![Build Status](https://travis-ci.org/Daenyth/Cockatrice.svg?branch=master)](https://travis-ci.org/Daenyth/Cockatrice)
 
 Dependencies:
 
@@ -38,9 +40,14 @@ The following flags can be passed to `cmake`:
 - `-DWITH_ORACLE=0` Do not build Oracle
 - `-DWITH_QT4=1` Force compilation to use Qt4 instead of Qt5.
 - `-DCMAKE_BUILD_TYPE=Debug` Compile in debug mode. Enables extra logging output, debug symbols, and much more verbose compiler warnings.
+- `-DUPDATE_TRANSLATIONS=1` Configure `make` to update the translation .ts files for new strings in the source code. Note: Running `make clean` will remove the .ts files. You should run this when contributing code that changes user messages. Translation file updates should be added in the same commit as the string that was changed.
 
 # Running
 
 `oracle` fetches card data  
 `cockatrice` is the game client  
 `servatrice` is the server
+
+# License
+
+Cockatrice is free software, licensed under the GPLv2; see COPYING for details.
