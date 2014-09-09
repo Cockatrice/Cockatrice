@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pl_PL">
+<TS version="2.0" language="pl_PL">
 <context>
     <name>AbstractCounter</name>
     <message>
@@ -670,7 +670,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <name>DeckEditorSettingsPage</name>
     <message>
         <source>Enable &amp;price tag feature (using data from blacklotusproject.com)</source>
-        <translation type="vanished">Włącz oznaczenia &amp;ceny (korzystając z danych z blacklotusproject.com)</translation>
+        <translation type="obsolete">Włącz oznaczenia &amp;ceny (korzystając z danych z blacklotusproject.com)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="600"/>
@@ -809,32 +809,37 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DlgConnect</name>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="15"/>
+        <location filename="../src/dlg_connect.cpp" line="17"/>
         <source>&amp;Host:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="19"/>
+        <location filename="../src/dlg_connect.cpp" line="21"/>
         <source>&amp;Port:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="23"/>
+        <location filename="../src/dlg_connect.cpp" line="25"/>
         <source>Player &amp;name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="27"/>
+        <location filename="../src/dlg_connect.cpp" line="29"/>
         <source>P&amp;assword:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="32"/>
+        <location filename="../src/dlg_connect.cpp" line="34"/>
         <source>&amp;Save password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="55"/>
+        <location filename="../src/dlg_connect.cpp" line="37"/>
+        <source>A&amp;uto connect at start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_connect.cpp" line="71"/>
         <source>Connect to server</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1605,7 +1610,7 @@ Would you like to change your database location setting?</source>
     </message>
     <message>
         <source>Path to card database:</source>
-        <translation type="vanished">Ścieżka do bazy kart:</translation>
+        <translation type="obsolete">Ścieżka do bazy kart:</translation>
     </message>
 </context>
 <context>
@@ -4454,14 +4459,14 @@ Please enter a name:</source>
     <name>TabServer</name>
     <message>
         <source>Server</source>
-        <translation type="vanished">Serwer</translation>
+        <translation type="obsolete">Serwer</translation>
     </message>
 </context>
 <context>
     <name>TabUserLists</name>
     <message>
         <source>User lists</source>
-        <translation type="vanished">Lista użytkowników</translation>
+        <translation type="obsolete">Lista użytkowników</translation>
     </message>
     <message>
         <location filename="../src/tab_userlists.cpp" line="48"/>

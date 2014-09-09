@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en" sourcelanguage="en">
+<TS version="2.0" language="en" sourcelanguage="en">
 <context>
     <name>AbstractCounter</name>
     <message>
@@ -755,28 +755,33 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DlgConnect</name>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="15"/>
+        <location filename="../src/dlg_connect.cpp" line="17"/>
         <source>&amp;Host:</source>
         <translation>Ò&amp;stair:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="19"/>
+        <location filename="../src/dlg_connect.cpp" line="21"/>
         <source>&amp;Port:</source>
         <translation>&amp;Port:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="23"/>
+        <location filename="../src/dlg_connect.cpp" line="25"/>
         <source>Player &amp;name:</source>
         <translation>&amp;Ainm a&apos; chluicheadair:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="27"/>
+        <location filename="../src/dlg_connect.cpp" line="29"/>
         <source>P&amp;assword:</source>
         <translation>&amp;Facal-faire:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="32"/>
+        <location filename="../src/dlg_connect.cpp" line="34"/>
         <source>&amp;Save password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_connect.cpp" line="37"/>
+        <source>A&amp;uto connect at start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -788,7 +793,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation type="obsolete">&amp;Sguir dheth</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="55"/>
+        <location filename="../src/dlg_connect.cpp" line="71"/>
         <source>Connect to server</source>
         <translation>Dèan ceangal ris an fhrithealaiche</translation>
     </message>
@@ -3786,11 +3791,11 @@ Local version is %1, remote version is %2.</source>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="vanished">&amp;Ceart ma-thà</translation>
+        <translation type="obsolete">&amp;Ceart ma-thà</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="vanished">&amp;Sguir dheth</translation>
+        <translation type="obsolete">&amp;Sguir dheth</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="40"/>
@@ -4404,7 +4409,7 @@ Please enter a name:</source>
     <name>TabServer</name>
     <message>
         <source>Server</source>
-        <translation type="vanished">Fhrithealaiche</translation>
+        <translation type="obsolete">Fhrithealaiche</translation>
     </message>
 </context>
 <context>
