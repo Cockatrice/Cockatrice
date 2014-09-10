@@ -44,27 +44,27 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="288"/>
         <source>Path to hand background:</source>
-        <translation>Chemin pour les images de fond de main:</translation>
+        <translation>Chemin vers l&apos;image de fond de la zone de main:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="289"/>
         <source>Path to stack background:</source>
-        <translation>Chemin pour les images de fond de pile:</translation>
+        <translation>Chemin pour l&apos;image de fond de la pile:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="290"/>
         <source>Path to table background:</source>
-        <translation>Chemin pour les images d&apos;arrière-plan:</translation>
+        <translation>Chemin vers l&apos;image de fond de la zone de jeu:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="291"/>
         <source>Path to player info background:</source>
-        <translation>Chemin pour les images de fond d&apos;affichage d&apos;informations:</translation>
+        <translation>Chemin vers l&apos;image de fond d&apos;affichage d&apos;informations:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="292"/>
         <source>Path to picture of card back:</source>
-        <translation>Chemin pour les images de dos des cartes:</translation>
+        <translation>Chemin vers l&apos;image de dos des cartes:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="294"/>
@@ -84,7 +84,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="298"/>
         <source>Display hand horizontally (wastes space)</source>
-        <translation>Montrer la main horizontalement</translation>
+        <translation>Afficher la main horizontalement (perte d'espace)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="300"/>
@@ -104,7 +104,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="304"/>
         <source>Zone view layout</source>
-        <translation>Voir disposition de la zone</translation>
+        <translation>Disposition de la zone d'aperçu</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="305"/>
@@ -131,60 +131,60 @@
     <message>
         <source>Please enter the duration of the ban (in minutes).
 Enter 0 for an indefinite ban.</source>
-        <translation type="obsolete">Entrez la durée de temps du ban (en minutes).
-Entrez 0 pour une durée illimitée du ban.</translation>
+        <translation type="obsolete">Entrez la durée de temps de blocage (en minutes).
+Entrez 0 pour un blocage permanent.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="28"/>
         <source>ban &amp;user name</source>
-        <translation type="unfinished"></translation>
+        <translation>bloquer &amp;nom d&apos;utilisateur</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="31"/>
         <source>ban &amp;IP address</source>
-        <translation type="unfinished"></translation>
+        <translation>bloquer &amp;adresse IP</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="39"/>
         <source>Ban type</source>
-        <translation type="unfinished"></translation>
+        <translation>Type du blocage</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="42"/>
         <source>&amp;permanent ban</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;blocage permanent</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="43"/>
         <source>&amp;temporary ban</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;blocage temporaire</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="46"/>
         <source>&amp;Days:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Jours:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="52"/>
         <source>&amp;Hours:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Heures:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="58"/>
         <source>&amp;Minutes:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Minutes:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="73"/>
         <source>Duration of the ban</source>
-        <translation type="unfinished"></translation>
+        <translation>Durée du blocage</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="76"/>
         <source>Please enter the reason for the ban.
 This is only saved for moderators and cannot be seen by the banned person.</source>
-        <translation>Veuillez expliquer la raison du ban.
-Cette information ne sera consultable que par les modérateurs.</translation>
+        <translation>Veuillez expliquer la raison du blocage.
+Cette information sera consultable uniquement par les modérateurs.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="79"/>
@@ -204,12 +204,12 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     <message>
         <location filename="../src/userlist.cpp" line="104"/>
         <source>Error</source>
-        <translation type="unfinished">Erreur</translation>
+        <translation>Érreur</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="104"/>
         <source>You have to select a name-based or IP-based ban, or both.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous devez choisir un blocage à partir du nom ou de l&apos;IP, ou des deux.</translation>
     </message>
 </context>
 <context>
@@ -323,7 +323,7 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     <message>
         <location filename="../src/carditem.cpp" line="214"/>
         <source>Ctrl+H</source>
-        <translation></translation>
+        <translation>Ctrl+H</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="215"/>
@@ -342,7 +342,7 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     </message>
     <message>
         <source>Set &amp;P/T...</source>
-        <translation type="obsolete">Fixer &amp;F/E...</translation>
+        <translation type="obsolete">Définir &amp;F/E...</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="218"/>
@@ -351,8 +351,8 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="219"/>
-        <source>&amp;Power / toughness</source>
-        <translation>F&amp;orce / Endurance</translation>
+        <source>&amp;Power / Toughness</source>
+        <translation>&amp;Force / Endurance</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="220"/>
@@ -417,7 +417,7 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     <message>
         <location filename="../src/carditem.cpp" line="232"/>
         <source>Set &amp;power and toughness...</source>
-        <translation>Fi&amp;xer la force et l&apos;endurance...</translation>
+        <translation>Dé&amp;finir la force et l&apos;endurance...</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="233"/>
@@ -457,7 +457,7 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     <message>
         <location filename="../src/carditem.cpp" line="244"/>
         <source>&amp;Set counters (%1)...</source>
-        <translation>&amp;Fixer marqueurs (%1)...</translation>
+        <translation>&amp;Définir marqueurs (%1)...</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="245"/>
@@ -482,7 +482,7 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     <message>
         <location filename="../src/carditem.cpp" line="249"/>
         <source>&amp;exile</source>
-        <translation>&amp;exiler</translation>
+        <translation>&amp;exile</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="251"/>
@@ -1774,7 +1774,7 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="190"/>
         <source>Italian:</source>
-        <translation type="unfinished"></translation>
+        <translation>Italien:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="196"/>
