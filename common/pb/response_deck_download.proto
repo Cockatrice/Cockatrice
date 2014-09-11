@@ -1,0 +1,8 @@
+import "response.proto";
+
+message Response_DeckDownload {
+	extend Response {
+		optional Response_DeckDownload ext = 1007;
+	}
+	optional string deck = 1;
+}

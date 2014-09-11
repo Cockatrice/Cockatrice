@@ -28,13 +28,32 @@
 #include "servatrice.h"
 #include "server_logger.h"
 #include "rng_sfmt.h"
+#include "version_string.h"
+#include <google/protobuf/stubs/common.h>
 #ifdef Q_OS_UNIX
 #include <signal.h>
 #endif
 
 RNG_Abstract *rng;
 ServerLogger *logger;
-ServerLoggerThread *loggerThread;
+QThread *loggerThread;
+
+/* Prototypes */
+
+void testRNG();
+void testHash();
+#if QT_VERSION < 0x050000
+void myMessageOutput(QtMsgType type, const char *msg);
+void myMessageOutput2(QtMsgType type, const char *msg);
+#else
+void myMessageOutput(QtMsgType type, const QMessageLogContext &, const QString &msg);
+void myMessageOutput2(QtMsgType type, const QMessageLogContext &, const QString &msg);
+#endif
+#ifdef Q_OS_UNIX
+void sigSegvHandler(int sig);
+#endif
+
+/* Implementations */
 
 void testRNG()
 {
@@ -81,10 +100,29 @@ void testHash()
 	std::cerr << startTime.secsTo(endTime) << "secs" << std::endl;
 }
 
+#if QT_VERSION < 0x050000
 void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
 	logger->logMessage(msg);
 }
+
+void myMessageOutput2(QtMsgType /*type*/, const char *msg)
+{
+	logger->logMessage(msg);
+	std::cerr << msg << std::endl;
+}
+#else
+void myMessageOutput(QtMsgType /*type*/, const QMessageLogContext &, const QString &msg)
+{
+	logger->logMessage(msg);
+}
+
+void myMessageOutput2(QtMsgType /*type*/, const QMessageLogContext &, const QString &msg)
+{
+	logger->logMessage(msg);
+	std::cerr << msg.toStdString() << std::endl;
+}
+#endif
 
 #ifdef Q_OS_UNIX
 void sigSegvHandler(int sig)
@@ -93,7 +131,11 @@ void sigSegvHandler(int sig)
 		logger->logMessage("CRASH: SIGSEGV");
 	else if (sig == SIGABRT)
 		logger->logMessage("CRASH: SIGABRT");
+	
+	logger->deleteLater();
+	loggerThread->wait();
 	delete loggerThread;
+	
 	raise(sig);
 }
 #endif
@@ -107,19 +149,37 @@ int main(int argc, char *argv[])
 	QStringList args = app.arguments();
 	bool testRandom = args.contains("--test-random");
 	bool testHashFunction = args.contains("--test-hash");
+	bool logToConsole = args.contains("--log-to-console");
 	
 	qRegisterMetaType<QList<int> >("QList<int>");
-	
+
+#if QT_VERSION < 0x050000
+	// gone in Qt5, all source files _MUST_ be utf8-encoded
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-	
+#endif
+
 	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
 	
-	loggerThread = new ServerLoggerThread(settings->value("server/logfile").toString());
-	loggerThread->start();
-	loggerThread->waitForInit();
-	logger = loggerThread->getLogger();
+	loggerThread = new QThread;
+	loggerThread->setObjectName("logger");
+	logger = new ServerLogger(logToConsole);
+	logger->moveToThread(loggerThread);
 	
-	qInstallMsgHandler(myMessageOutput);
+	loggerThread->start();
+	QMetaObject::invokeMethod(logger, "startLog", Qt::BlockingQueuedConnection, Q_ARG(QString, settings->value("server/logfile").toString()));
+
+#if QT_VERSION < 0x050000
+	if (logToConsole)
+		qInstallMsgHandler(myMessageOutput);
+	else
+		qInstallMsgHandler(myMessageOutput2);
+#else
+	if (logToConsole)
+		qInstallMessageHandler(myMessageOutput);
+	else
+		qInstallMessageHandler(myMessageOutput2);
+#endif
+
 #ifdef Q_OS_UNIX	
 	struct sigaction hup;
 	hup.sa_handler = ServerLogger::hupSignalHandler;
@@ -134,11 +194,15 @@ int main(int argc, char *argv[])
 	sigemptyset(&segv.sa_mask);
 	sigaction(SIGSEGV, &segv, 0);
 	sigaction(SIGABRT, &segv, 0);
+	
+	signal(SIGPIPE, SIG_IGN);
 #endif
 	rng = new RNG_SFMT;
 	
-	std::cerr << "Servatrice " << Servatrice::versionString.toStdString() << " starting." << std::endl;
+	std::cerr << "Servatrice " << VERSION_STRING << " starting." << std::endl;
 	std::cerr << "-------------------------" << std::endl;
+	
+	PasswordHasher::initialize();
 	
 	if (testRandom)
 		testRNG();
@@ -147,18 +211,31 @@ int main(int argc, char *argv[])
 	
 	Servatrice *server = new Servatrice(settings);
 	QObject::connect(server, SIGNAL(destroyed()), &app, SLOT(quit()), Qt::QueuedConnection);
-	
-	std::cerr << "-------------------------" << std::endl;
-	std::cerr << "Server initialized." << std::endl;
-	
-	int retval = app.exec();
+	int retval = 0;
+	if (server->initServer()) {
+		std::cerr << "-------------------------" << std::endl;
+		std::cerr << "Server initialized." << std::endl;
 
-	std::cerr << "Server quit." << std::endl;
-	std::cerr << "-------------------------" << std::endl;
+#if QT_VERSION < 0x050000		
+		qInstallMsgHandler(myMessageOutput);
+#else
+		qInstallMessageHandler(myMessageOutput);
+#endif
+		retval = app.exec();
+		
+		std::cerr << "Server quit." << std::endl;
+		std::cerr << "-------------------------" << std::endl;
+	}
 	
 	delete rng;
 	delete settings;
+	
+	logger->deleteLater();
+	loggerThread->wait();
 	delete loggerThread;
+
+	// Delete all global objects allocated by libprotobuf.
+	google::protobuf::ShutdownProtobufLibrary();
 
 	return retval;
 }

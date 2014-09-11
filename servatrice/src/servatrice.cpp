@@ -17,42 +17,288 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include <QtSql>
+#include <QSqlQuery>
 #include <QSettings>
+#include <QFile>
+#include <QTimer>
+#include <QDateTime>
 #include <QDebug>
 #include <iostream>
 #include "servatrice.h"
+#include "servatrice_database_interface.h"
+#include "servatrice_connection_pool.h"
 #include "server_room.h"
 #include "serversocketinterface.h"
-#include "serversocketthread.h"
-#include "protocol.h"
+#include "isl_interface.h"
 #include "server_logger.h"
 #include "main.h"
-#include "passwordhasher.h"
+#include "decklist.h"
+#include "pb/event_server_message.pb.h"
+#include "pb/event_server_shutdown.pb.h"
+#include "pb/event_connection_closed.pb.h"
 
-void Servatrice_TcpServer::incomingConnection(int socketDescriptor)
+Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent)
+    : QTcpServer(parent),
+      server(_server)
 {
-	if (threaded) {
-		ServerSocketThread *sst = new ServerSocketThread(socketDescriptor, server, this);
-		sst->start();
-	} else {
-		QTcpSocket *socket = new QTcpSocket;
-		socket->setSocketDescriptor(socketDescriptor);
-		ServerSocketInterface *ssi = new ServerSocketInterface(server, socket);
-		logger->logMessage(QString("incoming connection: %1").arg(socket->peerAddress().toString()), ssi);
-	}
+    if (_numberPools == 0) {
+        server->setThreaded(false);
+        Servatrice_DatabaseInterface *newDatabaseInterface = new Servatrice_DatabaseInterface(0, server);
+        Servatrice_ConnectionPool *newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
+        
+        server->addDatabaseInterface(thread(), newDatabaseInterface);
+        newDatabaseInterface->initDatabase(_sqlDatabase);
+        
+        connectionPools.append(newPool);
+    } else
+    for (int i = 0; i < _numberPools; ++i) {
+        Servatrice_DatabaseInterface *newDatabaseInterface = new Servatrice_DatabaseInterface(i, server);
+        Servatrice_ConnectionPool *newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
+        
+        QThread *newThread = new QThread;
+        newThread->setObjectName("pool_" + QString::number(i));
+        newPool->moveToThread(newThread);
+        newDatabaseInterface->moveToThread(newThread);
+        server->addDatabaseInterface(newThread, newDatabaseInterface);
+        
+        newThread->start();
+        QMetaObject::invokeMethod(newDatabaseInterface, "initDatabase", Qt::BlockingQueuedConnection, Q_ARG(QSqlDatabase, _sqlDatabase));
+        
+        connectionPools.append(newPool);
+    }
+}
+
+Servatrice_GameServer::~Servatrice_GameServer()
+{
+    for (int i = 0; i < connectionPools.size(); ++i) {
+        logger->logMessage(QString("Closing pool %1...").arg(i));
+        QThread *poolThread = connectionPools[i]->thread();
+        connectionPools[i]->deleteLater(); // pool destructor calls thread()->quit()
+        poolThread->wait();
+    }
+}
+
+#if QT_VERSION < 0x050000
+void Servatrice_GameServer::incomingConnection(int socketDescriptor)
+#else
+void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
+#endif
+{
+    // Determine connection pool with smallest client count
+    int minClientCount = -1;
+    int poolIndex = -1;
+    QStringList debugStr;
+    for (int i = 0; i < connectionPools.size(); ++i) {
+        const int clientCount = connectionPools[i]->getClientCount();
+        if ((poolIndex == -1) || (clientCount < minClientCount)) {
+            minClientCount = clientCount;
+            poolIndex = i;
+        }
+        debugStr.append(QString::number(clientCount));
+    }
+    qDebug() << "Pool utilisation:" << debugStr;
+    Servatrice_ConnectionPool *pool = connectionPools[poolIndex];
+    
+    ServerSocketInterface *ssi = new ServerSocketInterface(server, pool->getDatabaseInterface());
+    ssi->moveToThread(pool->thread());
+    pool->addClient();
+    connect(ssi, SIGNAL(destroyed()), pool, SLOT(removeClient()));
+    
+    QMetaObject::invokeMethod(ssi, "initConnection", Qt::QueuedConnection, Q_ARG(int, socketDescriptor));
+}
+
+void Servatrice_IslServer::incomingConnection(int socketDescriptor)
+{
+    QThread *thread = new QThread;
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    
+    IslInterface *interface = new IslInterface(socketDescriptor, cert, privateKey, server);
+    interface->moveToThread(thread);
+    connect(interface, SIGNAL(destroyed()), thread, SLOT(quit()));
+    
+    thread->start();
+    QMetaObject::invokeMethod(interface, "initServer", Qt::QueuedConnection);
 }
 
 Servatrice::Servatrice(QSettings *_settings, QObject *parent)
-	: Server(parent), dbMutex(QMutex::Recursive), settings(_settings), uptime(0), shutdownTimer(0)
+    : Server(true, parent), settings(_settings), uptime(0), shutdownTimer(0)
 {
+    qRegisterMetaType<QSqlDatabase>("QSqlDatabase");
+}
+
+Servatrice::~Servatrice()
+{
+    gameServer->close();
+    prepareDestroy();
+}
+
+bool Servatrice::initServer()
+{
+    serverName = settings->value("server/name").toString();
+    serverId = settings->value("server/id", 0).toInt();
+    bool regServerOnly = settings->value("server/regonly", 0).toBool();
+        
+    const QString authenticationMethodStr = settings->value("authentication/method").toString();
+    if (authenticationMethodStr == "sql") {
+        authenticationMethod = AuthenticationSql;
+    } else {
+        if (regServerOnly) {
+            qDebug() << "Registration only server enabled but no DB Connection : Error.";
+            return false;   
+        }
+        authenticationMethod = AuthenticationNone;
+    }
+    
+    QString dbTypeStr = settings->value("database/type").toString();
+    if (dbTypeStr == "mysql")
+        databaseType = DatabaseMySql;
+    else
+        databaseType = DatabaseNone;
+    
+    servatriceDatabaseInterface = new Servatrice_DatabaseInterface(-1, this);
+    setDatabaseInterface(servatriceDatabaseInterface);
+    
+    if (databaseType != DatabaseNone) {
+        settings->beginGroup("database");
+        dbPrefix = settings->value("prefix").toString();
+        servatriceDatabaseInterface->initDatabase("QMYSQL",
+                              settings->value("hostname").toString(),
+                              settings->value("database").toString(),
+                              settings->value("user").toString(),
+                              settings->value("password").toString());
+        settings->endGroup();
+        
+        updateServerList();
+        
+        qDebug() << "Clearing previous sessions...";
+        servatriceDatabaseInterface->clearSessionTables();
+    }
+    
+    const QString roomMethod = settings->value("rooms/method").toString();
+    if (roomMethod == "sql") {
+        QSqlQuery query(servatriceDatabaseInterface->getDatabase());
+        query.prepare("select id, name, descr, auto_join, join_message from " + dbPrefix + "_rooms order by id asc");
+        servatriceDatabaseInterface->execSqlQuery(query);
+        while (query.next()) {
+            QSqlQuery query2(servatriceDatabaseInterface->getDatabase());
+            query2.prepare("select name from " + dbPrefix + "_rooms_gametypes where id_room = :id_room");
+            query2.bindValue(":id_room", query.value(0).toInt());
+            servatriceDatabaseInterface->execSqlQuery(query2);
+            QStringList gameTypes;
+            while (query2.next())
+                gameTypes.append(query2.value(0).toString());
+            
+            addRoom(new Server_Room(query.value(0).toInt(),
+                                    query.value(1).toString(),
+                                    query.value(2).toString(),
+                                    query.value(3).toInt(),
+                                    query.value(4).toString(),
+                                    gameTypes,
+                                    this
+            ));
+        }
+    } else {
+        int size = settings->beginReadArray("rooms/roomlist");
+        for (int i = 0; i < size; ++i) {
+            settings->setArrayIndex(i);
+            
+            QStringList gameTypes;
+            int size2 = settings->beginReadArray("game_types");
+                for (int j = 0; j < size2; ++j) {
+                settings->setArrayIndex(j);
+                gameTypes.append(settings->value("name").toString());
+            }
+            settings->endArray();
+                
+            Server_Room *newRoom = new Server_Room(
+                i,
+                settings->value("name").toString(),
+                settings->value("description").toString(),
+                settings->value("autojoin").toBool(),
+                settings->value("joinmessage").toString(),
+                gameTypes,
+                this
+            );
+            addRoom(newRoom);
+        }
+        settings->endArray();
+    }
+    
+    updateLoginMessage();
+    
+    maxGameInactivityTime = settings->value("game/max_game_inactivity_time").toInt();
+    maxPlayerInactivityTime = settings->value("game/max_player_inactivity_time").toInt();
+    
+    maxUsersPerAddress = settings->value("security/max_users_per_address").toInt();
+    messageCountingInterval = settings->value("security/message_counting_interval").toInt();
+    maxMessageCountPerInterval = settings->value("security/max_message_count_per_interval").toInt();
+    maxMessageSizePerInterval = settings->value("security/max_message_size_per_interval").toInt();
+    maxGamesPerUser = settings->value("security/max_games_per_user").toInt();
+
+	try { if (settings->value("servernetwork/active", 0).toInt()) {
+		qDebug() << "Connecting to ISL network.";
+		const QString certFileName = settings->value("servernetwork/ssl_cert").toString();
+		const QString keyFileName = settings->value("servernetwork/ssl_key").toString();
+		qDebug() << "Loading certificate...";
+		QFile certFile(certFileName);
+		if (!certFile.open(QIODevice::ReadOnly))
+			throw QString("Error opening certificate file: %1").arg(certFileName);
+		QSslCertificate cert(&certFile);
+#if QT_VERSION < 0x050000
+		if (!cert.isValid())
+			throw(QString("Invalid certificate."));
+#else
+		const QDateTime currentTime = QDateTime::currentDateTime();
+		if(currentTime < cert.effectiveDate() ||
+			currentTime > cert.expiryDate() ||
+			cert.isBlacklisted())
+			throw(QString("Invalid certificate."));
+#endif
+		qDebug() << "Loading private key...";
+		QFile keyFile(keyFileName);
+		if (!keyFile.open(QIODevice::ReadOnly))
+			throw QString("Error opening private key file: %1").arg(keyFileName);
+		QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
+		if (key.isNull())
+			throw QString("Invalid private key.");
+		
+		QMutableListIterator<ServerProperties> serverIterator(serverList);
+		while (serverIterator.hasNext()) {
+			const ServerProperties &prop = serverIterator.next();
+			if (prop.cert == cert) {
+				serverIterator.remove();
+				continue;
+			}
+			
+			QThread *thread = new QThread;
+			thread->setObjectName("isl_" + QString::number(prop.id));
+			connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+			
+			IslInterface *interface = new IslInterface(prop.id, prop.hostname, prop.address.toString(), prop.controlPort, prop.cert, cert, key, this);
+			interface->moveToThread(thread);
+			connect(interface, SIGNAL(destroyed()), thread, SLOT(quit()));
+			
+			thread->start();
+			QMetaObject::invokeMethod(interface, "initClient", Qt::BlockingQueuedConnection);
+		}
+			
+		const int networkPort = settings->value("servernetwork/port", 14747).toInt();
+		qDebug() << "Starting ISL server on port" << networkPort;
+		
+		islServer = new Servatrice_IslServer(this, cert, key, this);
+		if (islServer->listen(QHostAddress::Any, networkPort))
+			qDebug() << "ISL server listening.";
+		else
+			throw QString("islServer->listen()");
+	} } catch (QString error) {
+		qDebug() << "ERROR --" << error;
+		return false;
+	}
+	
 	pingClock = new QTimer(this);
 	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
 	pingClock->start(1000);
 	
-	ProtocolItem::initializeHash();
-	
-	serverId = settings->value("server/id", 0).toInt();
 	int statusUpdateTime = settings->value("server/statusupdate").toInt();
 	statusUpdateClock = new QTimer(this);
 	connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
@@ -61,424 +307,224 @@ Servatrice::Servatrice(QSettings *_settings, QObject *parent)
 		statusUpdateClock->start(statusUpdateTime);
 	}
 	
-	threaded = settings->value("server/threaded", false).toInt();
-	tcpServer = new Servatrice_TcpServer(this, threaded, this);
-	int port = settings->value("server/port", 4747).toInt();
-	qDebug() << "Starting server on port" << port;
-	if (tcpServer->listen(QHostAddress::Any, port))
+	const int numberPools = settings->value("server/number_pools", 1).toInt();
+	gameServer = new Servatrice_GameServer(this, numberPools, servatriceDatabaseInterface->getDatabase(), this);
+	gameServer->setMaxPendingConnections(1000);
+	const int gamePort = settings->value("server/port", 4747).toInt();
+	qDebug() << "Starting server on port" << gamePort;
+	if (gameServer->listen(QHostAddress::Any, gamePort))
 		qDebug() << "Server listening.";
-	else
-		qDebug() << "tcpServer->listen(): Error.";
-	
-	QString dbType = settings->value("database/type").toString();
-	dbPrefix = settings->value("database/prefix").toString();
-	if (dbType == "mysql")
-		openDatabase();
-	
-	int size = settings->beginReadArray("rooms");
-	for (int i = 0; i < size; ++i) {
-	  	settings->setArrayIndex(i);
-		
-		QStringList gameTypes;
-		int size2 = settings->beginReadArray("game_types");
-		for (int j = 0; j < size2; ++j) {
-			settings->setArrayIndex(j);
-			gameTypes.append(settings->value("name").toString());
-		}
-		settings->endArray();
-			
-		Server_Room *newRoom = new Server_Room(
-			i,
-			settings->value("name").toString(),
-			settings->value("description").toString(),
-			settings->value("autojoin").toBool(),
-			settings->value("joinmessage").toString(),
-			gameTypes,
-			this
-		);
-		addRoom(newRoom);
-	}
-	settings->endArray();
-	
-	updateLoginMessage();
-	
-	maxGameInactivityTime = settings->value("game/max_game_inactivity_time").toInt();
-	maxPlayerInactivityTime = settings->value("game/max_player_inactivity_time").toInt();
-	
-	maxUsersPerAddress = settings->value("security/max_users_per_address").toInt();
-	messageCountingInterval = settings->value("security/message_counting_interval").toInt();
-	maxMessageCountPerInterval = settings->value("security/max_message_count_per_interval").toInt();
-	maxMessageSizePerInterval = settings->value("security/max_message_size_per_interval").toInt();
-	maxGamesPerUser = settings->value("security/max_games_per_user").toInt();
-}
-
-Servatrice::~Servatrice()
-{
-	prepareDestroy();
-	QSqlDatabase::database().close();
-}
-
-bool Servatrice::openDatabase()
-{
-	if (!QSqlDatabase::connectionNames().isEmpty())
-		QSqlDatabase::removeDatabase(QSqlDatabase::database().connectionNames().at(0));
-	
-	settings->beginGroup("database");
-	QSqlDatabase sqldb = QSqlDatabase::addDatabase("QMYSQL");
-	sqldb.setHostName(settings->value("hostname").toString());
-	sqldb.setDatabaseName(settings->value("database").toString());
-	sqldb.setUserName(settings->value("user").toString());
-	sqldb.setPassword(settings->value("password").toString());
-	settings->endGroup();
-	
-	std::cerr << "Opening database...";
-	if (!sqldb.open()) {
-		std::cerr << "error" << std::endl;
+	else {
+		qDebug() << "gameServer->listen(): Error.";
 		return false;
-	}
-	std::cerr << "OK" << std::endl;
-	
-	if (!nextGameId) {
-		QSqlQuery query;
-		if (!query.exec("select max(id) from " + dbPrefix + "_games"))
-			return false;
-		if (!query.next())
-			return false;
-		nextGameId = query.value(0).toInt() + 1;
-		qDebug() << "set nextGameId to " << nextGameId;
 	}
 	return true;
 }
 
-void Servatrice::checkSql()
+void Servatrice::addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface)
 {
-	QMutexLocker locker(&dbMutex);
-	if (!QSqlDatabase::database().exec("select 1").isActive())
-		openDatabase();
+    databaseInterfaces.insert(thread, databaseInterface);
 }
 
-bool Servatrice::execSqlQuery(QSqlQuery &query)
+void Servatrice::updateServerList()
 {
-	if (query.exec())
-		return true;
-	qCritical() << "Database error:" << query.lastError().text();
-	return false;
-}
-
-AuthenticationResult Servatrice::checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password)
-{
-	QMutexLocker locker(&dbMutex);
-	const QString method = settings->value("authentication/method").toString();
-	if (method == "none")
-		return UnknownUser;
-	else if (method == "sql") {
-		checkSql();
-		
-		QSqlQuery ipBanQuery;
-		ipBanQuery.prepare("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_bans b where b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.ip_address = :address) and b.ip_address = :address2");
-		ipBanQuery.bindValue(":address", static_cast<ServerSocketInterface *>(handler)->getPeerAddress().toString());
-		ipBanQuery.bindValue(":address2", static_cast<ServerSocketInterface *>(handler)->getPeerAddress().toString());
-		if (!execSqlQuery(ipBanQuery)) {
-			qDebug("Login denied: SQL error");
-			return PasswordWrong;
-		}
-		
-		if (ipBanQuery.next())
-			if (ipBanQuery.value(0).toInt() || ipBanQuery.value(1).toInt()) {
-				qDebug("Login denied: banned by address");
-				return PasswordWrong;
-			}
-		
-		QSqlQuery nameBanQuery;
-		nameBanQuery.prepare("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))) < 0, b.minutes <=> 0 from " + dbPrefix + "_bans b where b.time_from = (select max(c.time_from) from " + dbPrefix + "_bans c where c.user_name = :name2) and b.user_name = :name1");
-		nameBanQuery.bindValue(":name1", user);
-		nameBanQuery.bindValue(":name2", user);
-		if (!execSqlQuery(nameBanQuery)) {
-			qDebug("Login denied: SQL error");
-			return PasswordWrong;
-		}
-		
-		if (nameBanQuery.next())
-			if (nameBanQuery.value(0).toInt() || nameBanQuery.value(1).toInt()) {
-				qDebug("Login denied: banned by name");
-				return PasswordWrong;
-			}
-		
-		QSqlQuery passwordQuery;
-		passwordQuery.prepare("select password_sha512 from " + dbPrefix + "_users where name = :name and active = 1");
-		passwordQuery.bindValue(":name", user);
-		if (!execSqlQuery(passwordQuery)) {
-			qDebug("Login denied: SQL error");
-			return PasswordWrong;
-		}
-		
-		if (passwordQuery.next()) {
-			const QString correctPassword = passwordQuery.value(0).toString();
-			if (correctPassword == PasswordHasher::computeHash(password, correctPassword.left(16))) {
-				qDebug("Login accepted: password right");
-				return PasswordRight;
-			} else {
-				qDebug("Login denied: password wrong");
-				return PasswordWrong;
-			}
-		} else {
-			qDebug("Login accepted: unknown user");
-			return UnknownUser;
-		}
-	} else
-		return UnknownUser;
-}
-
-bool Servatrice::userExists(const QString &user)
-{
-	QMutexLocker locker(&dbMutex);
-	const QString method = settings->value("authentication/method").toString();
-	if (method == "sql") {
-		checkSql();
+	qDebug() << "Updating server list...";
 	
-		QSqlQuery query;
-		query.prepare("select 1 from " + dbPrefix + "_users where name = :name and active = 1");
-		query.bindValue(":name", user);
-		if (!execSqlQuery(query))
-			return false;
-		return query.next();
-	} else return false;
+	serverListMutex.lock();
+	serverList.clear();
+	
+	QSqlQuery query(servatriceDatabaseInterface->getDatabase());
+	query.prepare("select id, ssl_cert, hostname, address, game_port, control_port from " + dbPrefix + "_servers order by id asc");
+	servatriceDatabaseInterface->execSqlQuery(query);
+	while (query.next()) {
+		ServerProperties prop(query.value(0).toInt(), QSslCertificate(query.value(1).toString().toUtf8()), query.value(2).toString(), QHostAddress(query.value(3).toString()), query.value(4).toInt(), query.value(5).toInt());
+		serverList.append(prop);
+		qDebug() << QString("#%1 CERT=%2 NAME=%3 IP=%4:%5 CPORT=%6").arg(prop.id).arg(QString(prop.cert.digest().toHex())).arg(prop.hostname).arg(prop.address.toString()).arg(prop.gamePort).arg(prop.controlPort);
+	}
+	
+	serverListMutex.unlock();
 }
 
-ServerInfo_User *Servatrice::evalUserQueryResult(const QSqlQuery &query, bool complete)
+QList<ServerProperties> Servatrice::getServerList() const
 {
-	QString name = query.value(0).toString();
-	int is_admin = query.value(1).toInt();
-	QString realName = query.value(2).toString();
-	QString genderStr = query.value(3).toString();
-	QString country = query.value(4).toString();
-	QByteArray avatarBmp;
-	if (complete)
-		avatarBmp = query.value(5).toByteArray();
-	
-	ServerInfo_User::Gender gender;
-	if (genderStr == "m")
-		gender = ServerInfo_User::Male;
-	else if (genderStr == "f")
-		gender = ServerInfo_User::Female;
-	else
-		gender = ServerInfo_User::GenderUnknown;
-	
-	int userLevel = ServerInfo_User::IsUser | ServerInfo_User::IsRegistered;
-	if (is_admin == 1)
-		userLevel |= ServerInfo_User::IsAdmin | ServerInfo_User::IsModerator;
-	else if (is_admin == 2)
-		userLevel |= ServerInfo_User::IsModerator;
-	
-	return new ServerInfo_User(
-		name,
-		userLevel,
-		QString(),
-		realName,
-		gender,
-		country,
-		avatarBmp
-	);
-}
-
-ServerInfo_User *Servatrice::getUserData(const QString &name)
-{
-	QMutexLocker locker(&dbMutex);
-	const QString method = settings->value("authentication/method").toString();
-	if (method == "sql") {
-		checkSql();
-
-		QSqlQuery query;
-		query.prepare("select name, admin, realname, gender, country, avatar_bmp from " + dbPrefix + "_users where name = :name and active = 1");
-		query.bindValue(":name", name);
-		if (!execSqlQuery(query))
-			return new ServerInfo_User(name, ServerInfo_User::IsUser);
-		
-		if (query.next())
-			return evalUserQueryResult(query, true);
-		else
-			return new ServerInfo_User(name, ServerInfo_User::IsUser);
-	} else
-		return new ServerInfo_User(name, ServerInfo_User::IsUser);
+    serverListMutex.lock();
+    QList<ServerProperties> result = serverList;
+    serverListMutex.unlock();
+    
+    return result;
 }
 
 int Servatrice::getUsersWithAddress(const QHostAddress &address) const
 {
-	QMutexLocker locker(&serverMutex);
-	int result = 0;
-	for (int i = 0; i < clients.size(); ++i)
-		if (static_cast<ServerSocketInterface *>(clients[i])->getPeerAddress() == address)
-			++result;
-	return result;
+    int result = 0;
+    QReadLocker locker(&clientsLock);
+    for (int i = 0; i < clients.size(); ++i)
+        if (static_cast<ServerSocketInterface *>(clients[i])->getPeerAddress() == address)
+            ++result;
+    return result;
 }
 
-int Servatrice::startSession(const QString &userName, const QString &address)
+QList<ServerSocketInterface *> Servatrice::getUsersWithAddressAsList(const QHostAddress &address) const
 {
-	QMutexLocker locker(&dbMutex);
-	checkSql();
-	
-	QSqlQuery query;
-	query.prepare("insert into " + dbPrefix + "_sessions (user_name, ip_address, start_time) values(:user_name, :ip_address, NOW())");
-	query.bindValue(":user_name", userName);
-	query.bindValue(":ip_address", address);
-	if (execSqlQuery(query))
-		return query.lastInsertId().toInt();
-	return -1;
-}
-
-void Servatrice::endSession(int sessionId)
-{
-	QMutexLocker locker(&dbMutex);
-	checkSql();
-	
-	QSqlQuery query;
-	query.prepare("update " + dbPrefix + "_sessions set end_time=NOW() where id = :id_session");
-	query.bindValue(":id_session", sessionId);
-	execSqlQuery(query);
-}
-
-QMap<QString, ServerInfo_User *> Servatrice::getBuddyList(const QString &name)
-{
-	QMutexLocker locker(&dbMutex);
-	QMap<QString, ServerInfo_User *> result;
-	
-	const QString method = settings->value("authentication/method").toString();
-	if (method == "sql") {
-		checkSql();
-
-		QSqlQuery query;
-		query.prepare("select a.name, a.admin, a.realname, a.gender, a.country from " + dbPrefix + "_users a left join " + dbPrefix + "_buddylist b on a.id = b.id_user2 left join " + dbPrefix + "_users c on b.id_user1 = c.id where c.name = :name");
-		query.bindValue(":name", name);
-		if (!execSqlQuery(query))
-			return result;
-		
-		while (query.next()) {
-			ServerInfo_User *temp = evalUserQueryResult(query, false);
-			result.insert(temp->getName(), temp);
-		}
-	}
-	return result;
-}
-
-QMap<QString, ServerInfo_User *> Servatrice::getIgnoreList(const QString &name)
-{
-	QMutexLocker locker(&dbMutex);
-	QMap<QString, ServerInfo_User *> result;
-	
-	const QString method = settings->value("authentication/method").toString();
-	if (method == "sql") {
-		checkSql();
-
-		QSqlQuery query;
-		query.prepare("select a.name, a.admin, a.realname, a.gender, a.country from " + dbPrefix + "_users a left join " + dbPrefix + "_ignorelist b on a.id = b.id_user2 left join " + dbPrefix + "_users c on b.id_user1 = c.id where c.name = :name");
-		query.bindValue(":name", name);
-		if (!execSqlQuery(query))
-			return result;
-		
-		while (query.next()) {
-			ServerInfo_User *temp = evalUserQueryResult(query, false);
-			result.insert(temp->getName(), temp);
-		}
-	}
-	return result;
+    QList<ServerSocketInterface *> result;
+    QReadLocker locker(&clientsLock);
+    for (int i = 0; i < clients.size(); ++i)
+        if (static_cast<ServerSocketInterface *>(clients[i])->getPeerAddress() == address)
+            result.append(static_cast<ServerSocketInterface *>(clients[i]));
+    return result;
 }
 
 void Servatrice::updateLoginMessage()
 {
-	QMutexLocker locker(&dbMutex);
-	checkSql();
-	QSqlQuery query;
-	query.prepare("select message from " + dbPrefix + "_servermessages where id_server = :id_server order by timest desc limit 1");
-	query.bindValue(":id_server", serverId);
-	if (execSqlQuery(query))
-		if (query.next()) {
-			loginMessage = query.value(0).toString();
-			
-			Event_ServerMessage *event = new Event_ServerMessage(loginMessage);
-			QMapIterator<QString, Server_ProtocolHandler *> usersIterator(users);
-			while (usersIterator.hasNext()) {
-				usersIterator.next().value()->sendProtocolItem(event, false);
-			}
-			delete event;
-		}
+    if (!servatriceDatabaseInterface->checkSql())
+        return;
+    
+    QSqlQuery query(servatriceDatabaseInterface->getDatabase());
+    query.prepare("select message from " + dbPrefix + "_servermessages where id_server = :id_server order by timest desc limit 1");
+    query.bindValue(":id_server", serverId);
+    if (servatriceDatabaseInterface->execSqlQuery(query))
+        if (query.next()) {
+            const QString newLoginMessage = query.value(0).toString();
+            
+            loginMessageMutex.lock();
+            loginMessage = newLoginMessage;
+            loginMessageMutex.unlock();
+            
+            Event_ServerMessage event;
+            event.set_message(newLoginMessage.toStdString());
+            SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
+            QMapIterator<QString, Server_ProtocolHandler *> usersIterator(users);
+            while (usersIterator.hasNext())
+                usersIterator.next().value()->sendProtocolItem(*se);
+            delete se;
+        }
 }
 
 void Servatrice::statusUpdate()
 {
-	const int uc = getUsersCount(); // for correct mutex locking order
-	const int gc = getGamesCount();
-	
-	uptime += statusUpdateClock->interval() / 1000;
-	
-	txBytesMutex.lock();
-	quint64 tx = txBytes;
-	txBytes = 0;
-	txBytesMutex.unlock();
-	rxBytesMutex.lock();
-	quint64 rx = rxBytes;
-	rxBytes = 0;
-	rxBytesMutex.unlock();
-	
-	QMutexLocker locker(&dbMutex);
-	checkSql();
-	
-	QSqlQuery query;
-	query.prepare("insert into " + dbPrefix + "_uptime (id_server, timest, uptime, users_count, games_count, tx_bytes, rx_bytes) values(:id, NOW(), :uptime, :users_count, :games_count, :tx, :rx)");
-	query.bindValue(":id", serverId);
-	query.bindValue(":uptime", uptime);
-	query.bindValue(":users_count", uc);
-	query.bindValue(":games_count", gc);
-	query.bindValue(":tx", tx);
-	query.bindValue(":rx", rx);
-	execSqlQuery(query);
+    if (!servatriceDatabaseInterface->checkSql())
+        return;
+    
+    const int uc = getUsersCount(); // for correct mutex locking order
+    const int gc = getGamesCount();
+    
+    uptime += statusUpdateClock->interval() / 1000;
+    
+    txBytesMutex.lock();
+    quint64 tx = txBytes;
+    txBytes = 0;
+    txBytesMutex.unlock();
+    rxBytesMutex.lock();
+    quint64 rx = rxBytes;
+    rxBytes = 0;
+    rxBytesMutex.unlock();
+    
+    QSqlQuery query(servatriceDatabaseInterface->getDatabase());
+    query.prepare("insert into " + dbPrefix + "_uptime (id_server, timest, uptime, users_count, games_count, tx_bytes, rx_bytes) values(:id, NOW(), :uptime, :users_count, :games_count, :tx, :rx)");
+    query.bindValue(":id", serverId);
+    query.bindValue(":uptime", uptime);
+    query.bindValue(":users_count", uc);
+    query.bindValue(":games_count", gc);
+    query.bindValue(":tx", tx);
+    query.bindValue(":rx", rx);
+    servatriceDatabaseInterface->execSqlQuery(query);
 }
 
 void Servatrice::scheduleShutdown(const QString &reason, int minutes)
 {
-	QMutexLocker locker(&serverMutex);
-
-	shutdownReason = reason;
-	shutdownMinutes = minutes + 1;
-	if (minutes > 0) {
-		shutdownTimer = new QTimer;
-		connect(shutdownTimer, SIGNAL(timeout()), this, SLOT(shutdownTimeout()));
-		shutdownTimer->start(60000);
-	}
-	shutdownTimeout();
+    shutdownReason = reason;
+    shutdownMinutes = minutes + 1;
+    if (minutes > 0) {
+        shutdownTimer = new QTimer;
+        connect(shutdownTimer, SIGNAL(timeout()), this, SLOT(shutdownTimeout()));
+        shutdownTimer->start(60000);
+    }
+    shutdownTimeout();
 }
 
 void Servatrice::incTxBytes(quint64 num)
 {
-	txBytesMutex.lock();
-	txBytes += num;
-	txBytesMutex.unlock();
+    txBytesMutex.lock();
+    txBytes += num;
+    txBytesMutex.unlock();
 }
 
 void Servatrice::incRxBytes(quint64 num)
 {
-	rxBytesMutex.lock();
-	rxBytes += num;
-	rxBytesMutex.unlock();
+    rxBytesMutex.lock();
+    rxBytes += num;
+    rxBytesMutex.unlock();
 }
 
 void Servatrice::shutdownTimeout()
 {
-	QMutexLocker locker(&serverMutex);
-	
-	--shutdownMinutes;
-	
-	GenericEvent *event;
-	if (shutdownMinutes)
-		event = new Event_ServerShutdown(shutdownReason, shutdownMinutes);
-	else
-		event = new Event_ConnectionClosed("server_shutdown");
-
-	for (int i = 0; i < clients.size(); ++i)
-		clients[i]->sendProtocolItem(event, false);
-	delete event;
-	
-	if (!shutdownMinutes)
-		deleteLater();
+    --shutdownMinutes;
+    
+    SessionEvent *se;
+    if (shutdownMinutes) {
+        Event_ServerShutdown event;
+        event.set_reason(shutdownReason.toStdString());
+        event.set_minutes(shutdownMinutes);
+        se = Server_ProtocolHandler::prepareSessionEvent(event);
+    } else {
+        Event_ConnectionClosed event;
+        event.set_reason(Event_ConnectionClosed::SERVER_SHUTDOWN);
+        se = Server_ProtocolHandler::prepareSessionEvent(event);
+    }
+    
+    clientsLock.lockForRead();
+    for (int i = 0; i < clients.size(); ++i)
+        clients[i]->sendProtocolItem(*se);
+    clientsLock.unlock();
+    delete se;
+    
+    if (!shutdownMinutes)
+        deleteLater();
 }
 
-const QString Servatrice::versionString = "Servatrice 0.20111113";
+bool Servatrice::islConnectionExists(int serverId) const
+{
+    // Only call with islLock locked at least for reading
+    
+    return islInterfaces.contains(serverId);
+}
+
+void Servatrice::addIslInterface(int serverId, IslInterface *interface)
+{
+    // Only call with islLock locked for writing
+    
+    islInterfaces.insert(serverId, interface);
+    connect(interface, SIGNAL(externalUserJoined(ServerInfo_User)), this, SLOT(externalUserJoined(ServerInfo_User)));
+    connect(interface, SIGNAL(externalUserLeft(QString)), this, SLOT(externalUserLeft(QString)));
+    connect(interface, SIGNAL(externalRoomUserJoined(int, ServerInfo_User)), this, SLOT(externalRoomUserJoined(int, ServerInfo_User)));
+    connect(interface, SIGNAL(externalRoomUserLeft(int, QString)), this, SLOT(externalRoomUserLeft(int, QString)));
+    connect(interface, SIGNAL(externalRoomSay(int, QString, QString)), this, SLOT(externalRoomSay(int, QString, QString)));
+    connect(interface, SIGNAL(externalRoomGameListChanged(int, ServerInfo_Game)), this, SLOT(externalRoomGameListChanged(int, ServerInfo_Game)));
+    connect(interface, SIGNAL(joinGameCommandReceived(Command_JoinGame, int, int, int, qint64)), this, SLOT(externalJoinGameCommandReceived(Command_JoinGame, int, int, int, qint64)));
+    connect(interface, SIGNAL(gameCommandContainerReceived(CommandContainer, int, int, qint64)), this, SLOT(externalGameCommandContainerReceived(CommandContainer, int, int, qint64)));
+    connect(interface, SIGNAL(responseReceived(Response, qint64)), this, SLOT(externalResponseReceived(Response, qint64)));
+    connect(interface, SIGNAL(gameEventContainerReceived(GameEventContainer, qint64)), this, SLOT(externalGameEventContainerReceived(GameEventContainer, qint64)));
+}
+
+void Servatrice::removeIslInterface(int serverId)
+{
+    // Only call with islLock locked for writing
+    
+    // XXX we probably need to delete everything that belonged to it...
+    islInterfaces.remove(serverId);
+}
+
+void Servatrice::doSendIslMessage(const IslMessage &msg, int serverId)
+{
+    QReadLocker locker(&islLock);
+    
+    if (serverId == -1) {
+        QMapIterator<int, IslInterface *> islIterator(islInterfaces);
+        while (islIterator.hasNext())
+            islIterator.next().value()->transmitMessage(msg);
+    } else {
+        IslInterface *interface = islInterfaces.value(serverId);
+        if (interface)
+            interface->transmitMessage(msg);
+    }
+}

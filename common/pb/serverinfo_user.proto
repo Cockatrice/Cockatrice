@@ -1,0 +1,24 @@
+message ServerInfo_User {
+	enum UserLevelFlag {
+        	IsNothing = 0;
+	        IsUser = 1;
+		IsRegistered = 2;
+		IsModerator = 4;
+		IsAdmin = 8;
+	};
+	enum Gender {
+		GenderUnknown = -1;
+		Male = 0;
+		Female = 1;
+	};
+	optional string name = 1;
+	optional uint32 user_level = 2;
+	optional string address = 3;
+	optional string real_name = 4;
+	optional Gender gender = 5 [default = GenderUnknown];
+	optional string country = 6;
+	optional bytes avatar_bmp = 7;
+	optional sint32 id = 8 [default = -1];
+	optional sint32 server_id = 9 [default = -1];
+	optional uint64 session_id = 10;
+}

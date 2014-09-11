@@ -1,0 +1,7 @@
+import "game_event_context.proto";
+
+message Context_MoveCard {
+	extend GameEventContext {
+		optional Context_MoveCard ext = 1004;
+	}
+}

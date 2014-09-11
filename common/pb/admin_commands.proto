@@ -1,0 +1,21 @@
+message AdminCommand {
+	enum AdminCommandType {
+		UPDATE_SERVER_MESSAGE = 1000;
+		SHUTDOWN_SERVER = 1001;
+	}
+	extensions 100 to max;
+}
+
+message Command_UpdateServerMessage {
+	extend AdminCommand {
+		optional Command_UpdateServerMessage ext = 1000;
+	}
+}
+
+message Command_ShutdownServer {
+	extend AdminCommand {
+		optional Command_ShutdownServer ext = 1001;
+	}
+	optional string reason = 1;
+	optional uint32 minutes = 2;
+}

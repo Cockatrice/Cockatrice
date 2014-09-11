@@ -5,84 +5,114 @@
 #include <QAction>
 #include "tab_message.h"
 #include "abstractclient.h"
-#include "protocol_items.h"
 #include "chatview.h"
 
-TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, const QString &_userName)
-	: Tab(_tabSupervisor), client(_client), userName(_userName), userOnline(true)
+#include "pending_command.h"
+#include "pb/session_commands.pb.h"
+#include "pb/event_user_message.pb.h"
+#include "pb/serverinfo_user.pb.h"
+
+TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &_ownUserInfo, const ServerInfo_User &_otherUserInfo)
+    : Tab(_tabSupervisor), client(_client), ownUserInfo(new ServerInfo_User(_ownUserInfo)), otherUserInfo(new ServerInfo_User(_otherUserInfo)), userOnline(true)
 {
-	chatView = new ChatView(_ownName, true);
-	connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
-	connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
-	sayEdit = new QLineEdit;
-	connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
-	
-	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(chatView);
-	vbox->addWidget(sayEdit);
-	
-	aLeave = new QAction(this);
-	connect(aLeave, SIGNAL(triggered()), this, SLOT(actLeave()));
+    chatView = new ChatView(tabSupervisor, 0, true);
+    connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
+    connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
+    sayEdit = new QLineEdit;
+    connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
+    
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addWidget(chatView);
+    vbox->addWidget(sayEdit);
+    
+    aLeave = new QAction(this);
+    connect(aLeave, SIGNAL(triggered()), this, SLOT(actLeave()));
 
-	tabMenu = new QMenu(this);
-	tabMenu->addAction(aLeave);
+    messageMenu = new QMenu(this);
+    messageMenu->addAction(aLeave);
+    addTabMenu(messageMenu);
 
-	retranslateUi();
-	setLayout(vbox);
+    retranslateUi();
+    setLayout(vbox);
 }
 
 TabMessage::~TabMessage()
 {
-	emit talkClosing(this);
+    emit talkClosing(this);
+    delete ownUserInfo;
+    delete otherUserInfo;
 }
 
 void TabMessage::retranslateUi()
 {
-	tabMenu->setTitle(tr("Personal &talk"));
-	aLeave->setText(tr("&Leave"));
+    messageMenu->setTitle(tr("Personal &talk"));
+    aLeave->setText(tr("&Leave"));
+}
+
+void TabMessage::tabActivated()
+{
+    if(!sayEdit->hasFocus())
+        sayEdit->setFocus();
+}
+
+QString TabMessage::getUserName() const
+{
+    return QString::fromStdString(otherUserInfo->name());
+}
+
+QString TabMessage::getTabText() const
+{
+    return tr("Talking to %1").arg(QString::fromStdString(otherUserInfo->name()));
 }
 
 void TabMessage::closeRequest()
 {
-	actLeave();
+    actLeave();
 }
 
 void TabMessage::sendMessage()
 {
-	if (sayEdit->text().isEmpty() || !userOnline)
-	  	return;
-	
-	Command_Message *cmd = new Command_Message(userName, sayEdit->text());
-	connect(cmd, SIGNAL(finished(ProtocolResponse *)), this, SLOT(messageSent(ProtocolResponse *)));
-	client->sendCommand(cmd);
-	sayEdit->clear();
+    if (sayEdit->text().isEmpty() || !userOnline)
+          return;
+    
+    Command_Message cmd;
+    cmd.set_user_name(otherUserInfo->name());
+    cmd.set_message(sayEdit->text().toStdString());
+    
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(messageSent(const Response &)));
+    client->sendCommand(pend);
+    
+    sayEdit->clear();
 }
 
-void TabMessage::messageSent(ProtocolResponse *response)
+void TabMessage::messageSent(const Response &response)
 {
-	if (response->getResponseCode() == RespInIgnoreList)
-		chatView->appendMessage(QString(), tr("This user is ignoring you."));
+    if (response.response_code() == Response::RespInIgnoreList)
+        chatView->appendMessage(tr("This user is ignoring you."));
 }
 
 void TabMessage::actLeave()
 {
-	deleteLater();
+    deleteLater();
 }
 
-void TabMessage::processMessageEvent(Event_Message *event)
+void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
 {
-	chatView->appendMessage(event->getSenderName(), event->getText());
-	emit userEvent();
+    const UserLevelFlags userLevel(event.sender_name() == otherUserInfo->name() ? otherUserInfo->user_level() : ownUserInfo->user_level());
+    chatView->appendMessage(QString::fromStdString(event.message()), QString::fromStdString(event.sender_name()), userLevel);
+    emit userEvent();
 }
 
 void TabMessage::processUserLeft()
 {
-	chatView->appendMessage(QString(), tr("%1 has left the server.").arg(userName));
-	userOnline = false;
+    chatView->appendMessage(tr("%1 has left the server.").arg(QString::fromStdString(otherUserInfo->name())));
+    userOnline = false;
 }
 
-void TabMessage::processUserJoined()
+void TabMessage::processUserJoined(const ServerInfo_User &_userInfo)
 {
-	chatView->appendMessage(QString(), tr("%1 has joined the server.").arg(userName));
-	userOnline = true;
+    chatView->appendMessage(tr("%1 has joined the server.").arg(QString::fromStdString(otherUserInfo->name())));
+    userOnline = true;
+    *otherUserInfo = _userInfo;
 }

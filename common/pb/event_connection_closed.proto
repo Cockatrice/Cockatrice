@@ -1,0 +1,17 @@
+import "session_event.proto";
+
+message Event_ConnectionClosed {
+	extend SessionEvent {
+		optional Event_ConnectionClosed ext = 1002;
+	}
+	enum CloseReason {
+		OTHER = 1;
+		SERVER_SHUTDOWN = 2;
+		TOO_MANY_CONNECTIONS = 3;
+		BANNED = 4;
+		USERNAMEINVALID = 5;
+	}
+	optional CloseReason reason = 1;
+	optional string reason_str = 2;
+	optional uint32 end_time = 3;
+}

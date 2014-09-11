@@ -1,0 +1,7 @@
+import "game_event_context.proto";
+
+message Context_PingChanged {
+	extend GameEventContext {
+		optional Context_PingChanged ext = 1006;
+	}
+}

@@ -1,0 +1,7 @@
+import "game_commands.proto";
+message Command_SetActivePhase {
+	extend GameCommand {
+		optional Command_SetActivePhase ext = 1023;
+	}
+	optional uint32 phase = 1;
+}

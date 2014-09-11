@@ -1,0 +1,9 @@
+enum CardAttribute {
+	AttrTapped = 1;
+	AttrAttacking = 2;
+	AttrFaceDown = 3;
+	AttrColor = 4;
+	AttrPT = 5;
+	AttrAnnotation = 6;
+	AttrDoesntUntap = 7;
+}

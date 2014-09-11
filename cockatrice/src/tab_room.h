@@ -5,6 +5,7 @@
 #include <QGroupBox>
 #include <QMap>
 
+namespace google { namespace protobuf { class Message; } }
 class AbstractClient;
 class UserList;
 class QLabel;
@@ -19,49 +20,60 @@ class Event_ListGames;
 class Event_JoinRoom;
 class Event_LeaveRoom;
 class Event_RoomSay;
-class ProtocolResponse;
 class GameSelector;
+class Response;
+class PendingCommand;
+class ServerInfo_User;
 
 class TabRoom : public Tab {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	AbstractClient *client;
-	int roomId;
-	QString roomName;
-	QString ownName;
-	QMap<int, QString> gameTypes;
-	
-	GameSelector *gameSelector;
-	UserList *userList;
-	ChatView *chatView;
-	QLabel *sayLabel;
-	QLineEdit *sayEdit;
-	QGroupBox *chatGroupBox;
-
-	QAction *aLeaveRoom;
-	QString sanitizeHtml(QString dirty) const;
+    AbstractClient *client;
+    int roomId;
+    QString roomName;
+    ServerInfo_User *ownUser;
+    QMap<int, QString> gameTypes;
+    
+    GameSelector *gameSelector;
+    UserList *userList;
+    ChatView *chatView;
+    QLabel *sayLabel;
+    QLineEdit *sayEdit;
+    QGroupBox *chatGroupBox;
+    
+    QMenu *roomMenu;
+    QAction *aLeaveRoom;
+    QAction *aIgnoreUnregisteredUsers;
+    QString sanitizeHtml(QString dirty) const;
 signals:
-	void roomClosing(TabRoom *tab);
-	void openMessageDialog(const QString &userName, bool focus);
+    void roomClosing(TabRoom *tab);
+    void openMessageDialog(const QString &userName, bool focus);
 private slots:
-	void sendMessage();
-	void actLeaveRoom();
-	void sayFinished(ProtocolResponse *response);
-	
-	void processListGamesEvent(Event_ListGames *event);
-	void processJoinRoomEvent(Event_JoinRoom *event);
-	void processLeaveRoomEvent(Event_LeaveRoom *event);
-	void processSayEvent(Event_RoomSay *event);
+    void sendMessage();
+    void sayFinished(const Response &response);
+    void actLeaveRoom();
+    void actIgnoreUnregisteredUsers();
+    void ignoreUnregisteredUsersChanged();
+    
+    void processListGamesEvent(const Event_ListGames &event);
+    void processJoinRoomEvent(const Event_JoinRoom &event);
+    void processLeaveRoomEvent(const Event_LeaveRoom &event);
+    void processRoomSayEvent(const Event_RoomSay &event);
 public:
-	TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_ownName, ServerInfo_Room *info);
-	~TabRoom();
-	void retranslateUi();
-	void closeRequest();
-	void processRoomEvent(RoomEvent *event);
-	int getRoomId() const { return roomId; }
-	const QMap<int, QString> &getGameTypes() const { return gameTypes; }
-	QString getChannelName() const { return roomName; }
-	QString getTabText() const { return roomName; }
+    TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerInfo_User *_ownUser, const ServerInfo_Room &info);
+    ~TabRoom();
+    void retranslateUi();
+    void closeRequest();
+    void tabActivated();
+    void processRoomEvent(const RoomEvent &event);
+    int getRoomId() const { return roomId; }
+    const QMap<int, QString> &getGameTypes() const { return gameTypes; }
+    QString getChannelName() const { return roomName; }
+    QString getTabText() const { return roomName; }
+    const ServerInfo_User *getUserInfo() const { return ownUser; }
+
+    PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd);
+    void sendRoomCommand(PendingCommand *pend);
 };
 
 #endif

@@ -1,0 +1,10 @@
+import "session_commands.proto";
+
+message Command_DeckNewDir {
+	extend SessionCommand {
+		optional Command_DeckNewDir ext = 1009;
+	}
+	optional string path = 1;
+	optional string dir_name = 2;
+}
+ 

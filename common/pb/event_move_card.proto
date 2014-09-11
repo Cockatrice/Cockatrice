@@ -1,0 +1,18 @@
+import "game_event.proto";
+
+message Event_MoveCard {
+	extend GameEvent {
+		optional Event_MoveCard ext = 2009;
+	}
+	optional sint32 card_id = 1 [default = -1];
+	optional string card_name = 2;
+	optional sint32 start_player_id = 3 [default = -1];
+	optional string start_zone = 4;
+	optional sint32 position = 5 [default = -1];
+	optional sint32 target_player_id = 6 [default = -1];
+	optional string target_zone = 7;
+	optional sint32 x = 8 [default = -1];
+	optional sint32 y = 9 [default = -1];
+	optional sint32 new_card_id = 10 [default = -1];
+	optional bool face_down = 11;
+}

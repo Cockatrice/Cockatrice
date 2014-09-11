@@ -1,0 +1,8 @@
+import "game_event.proto";
+
+message Event_DeleteArrow {
+	extend GameEvent {
+		optional Event_DeleteArrow ext = 2001;
+	}
+	optional sint32 arrow_id = 1;
+}

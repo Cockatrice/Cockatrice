@@ -1,0 +1,8 @@
+import "game_event.proto";
+
+message Event_SetActivePlayer {
+	extend GameEvent {
+		optional Event_SetActivePlayer ext = 2016;
+	}
+	optional sint32 active_player_id = 1;
+}

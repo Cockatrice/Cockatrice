@@ -1,0 +1,14 @@
+message GameEventContext {
+	enum ContextType {
+		READY_START = 1000;
+		CONCEDE = 1001;
+		DECK_SELECT = 1002;
+		UNDO_DRAW = 1003;
+		MOVE_CARD = 1004;
+		MULLIGAN = 1005;
+		PING_CHANGED = 1006;
+		CONNECTION_STATE_CHANGED = 1007;
+		SET_SIDEBOARD_LOCK = 1008;
+	}
+	extensions 100 to max;
+}

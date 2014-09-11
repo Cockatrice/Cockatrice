@@ -19,6 +19,8 @@
  ***************************************************************************/
 
 #include <QApplication>
+#include <QFile>
+#include <QTextStream>
 #include <QTextCodec>
 #include <QtPlugin>
 #include <QTranslator>
@@ -27,7 +29,8 @@
 #include <QSettings>
 #include <QIcon>
 #include <QDir>
-#include <stdio.h>
+#include <QDesktopServices>
+#include <QDebug>
 
 #include "main.h"
 #include "window_main.h"
@@ -46,99 +49,186 @@ SettingsCache *settingsCache;
 RNG_Abstract *rng;
 SoundEngine *soundEngine;
 
-void myMessageOutput(QtMsgType /*type*/, const char *msg)
+const QString translationPrefix = "cockatrice";
+#ifdef TRANSLATION_PATH
+QString translationPath = TRANSLATION_PATH;
+#else
+QString translationPath = QString();
+#endif
+
+#if QT_VERSION < 0x050000
+static void myMessageOutput(QtMsgType /*type*/, const char *msg)
 {
-	static FILE *f = NULL;
-	if (!f)
-		f = fopen("qdebug.txt", "w");
-	fprintf(f, "%s\n", msg);
-	fflush(f);
+    QFile file("qdebug.txt");
+    file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
+    QTextStream out(&file);
+    out << msg << endl;
+    file.close();
 }
+#else
+static void myMessageOutput(QtMsgType /*type*/, const QMessageLogContext &, const QString &msg)
+{
+    QFile file("qdebug.txt");
+    file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
+    QTextStream out(&file);
+    out << msg << endl;
+    file.close();
+}
+#endif
 
 void installNewTranslator()
 {
-	QString lang = settingsCache->getLang();
+    QString lang = settingsCache->getLang();
 
-	qtTranslator->load("qt_" + lang, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-	qApp->installTranslator(qtTranslator);
-	
-	translator->load(translationPrefix + "_" + lang, ":/translations");
-	qApp->installTranslator(translator);
+    qtTranslator->load("qt_" + lang, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    qApp->installTranslator(qtTranslator);
+    translator->load(translationPrefix + "_" + lang, translationPath);
+    qApp->installTranslator(translator);
+}
+
+bool settingsValid()
+{
+    return QDir(settingsCache->getDeckPath()).exists() &&
+        !settingsCache->getDeckPath().isEmpty() &&
+        QDir(settingsCache->getPicsPath()).exists() &&
+        !settingsCache->getPicsPath().isEmpty();
 }
 
 int main(int argc, char *argv[])
 {
-//	qInstallMsgHandler(myMessageOutput);
-	QApplication app(argc, argv);
-#ifdef Q_OS_MAC
-	QDir baseDir(app.applicationDirPath());
-	baseDir.cdUp();
-	baseDir.cdUp();
-	baseDir.cdUp();
-	QDir pluginsDir = baseDir;
-	pluginsDir.cd("PlugIns");
-	app.addLibraryPath(pluginsDir.absolutePath());
+    QApplication app(argc, argv);
+
+    if (app.arguments().contains("--debug-output"))
+    {
+#if QT_VERSION < 0x050000
+        qInstallMsgHandler(myMessageOutput);
+#else
+        qInstallMessageHandler(myMessageOutput);
 #endif
+    }
 #ifdef Q_OS_WIN
-	app.addLibraryPath(app.applicationDirPath() + "/plugins");
+    app.addLibraryPath(app.applicationDirPath() + "/plugins");
 #endif
-	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
-	QCoreApplication::setOrganizationName("Cockatrice");
-	QCoreApplication::setOrganizationDomain("cockatrice.de");
-	QCoreApplication::setApplicationName("Cockatrice");
-	
-	rng = new RNG_SFMT;
-	settingsCache = new SettingsCache;
-	db = new CardDatabase;
+#if QT_VERSION < 0x050000
+    // gone in Qt5, all source files _MUST_ be utf8-encoded
+    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+#endif
 
-	qtTranslator = new QTranslator;
-	translator = new QTranslator;
-	installNewTranslator();
-	
-	qsrand(QDateTime::currentDateTime().toTime_t());
-	
-	bool startMainProgram = true;
+    QCoreApplication::setOrganizationName("Cockatrice");
+    QCoreApplication::setOrganizationDomain("cockatrice.de");
+    QCoreApplication::setApplicationName("Cockatrice");
+
+    if (translationPath.isEmpty()) {
 #ifdef Q_OS_MAC
-	if (!db->getLoadSuccess())
-		if (db->loadCardDatabase(baseDir.absolutePath() + "/cards.xml"))
-			settingsCache->setCardDatabasePath(baseDir.absolutePath() + "/cards.xml");
-	if (!QDir(settingsCache->getDeckPath()).exists())
-		settingsCache->setDeckPath(baseDir.absolutePath() + "/decks");
-	if (!QDir(settingsCache->getPicsPath()).exists())
-		settingsCache->setPicsPath(baseDir.absolutePath() + "/pics");
+        translationPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+#elif defined(Q_OS_WIN)
+        translationPath = app.applicationDirPath() + "/translations";
 #endif
-	if (!db->getLoadSuccess() || !QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty() || settingsCache->getPicsPath().isEmpty() || !QDir(settingsCache->getPicsPath()).exists()) {
-		DlgSettings dlgSettings;
-		dlgSettings.show();
-		app.exec();
-		startMainProgram = (db->getLoadSuccess() && QDir(settingsCache->getDeckPath()).exists() && !settingsCache->getDeckPath().isEmpty() && QDir(settingsCache->getPicsPath()).exists() && !settingsCache->getPicsPath().isEmpty());
-	}
-	
-	if (startMainProgram) {
-		qDebug("main(): starting main program");
-		soundEngine = new SoundEngine;
-		qDebug("main(): SoundEngine constructor finished");
+    }
 
-		MainWindow ui;
-		qDebug("main(): MainWindow constructor finished");
-		
-		QIcon icon(":/resources/appicon.svg");
-		ui.setWindowIcon(icon);
-		
-		ui.show();
-		qDebug("main(): ui.show() finished");
-		
-		app.exec();
-	}
-	
-	qDebug("Event loop finished, terminating...");
-	delete db;
-	delete settingsCache;
-	delete rng;
-	PingPixmapGenerator::clear();
-	CountryPixmapGenerator::clear();
-	UserLevelPixmapGenerator::clear();
-	
-	return 0;
+    rng = new RNG_SFMT;
+    settingsCache = new SettingsCache;
+    db = new CardDatabase;
+
+    qtTranslator = new QTranslator;
+    translator = new QTranslator;
+    installNewTranslator();
+
+    qsrand(QDateTime::currentDateTime().toTime_t());
+    
+#if QT_VERSION < 0x050000
+    const QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#else
+    const QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
+#endif
+    if (!db->getLoadSuccess())
+        if (db->loadCardDatabase(dataDir + "/cards.xml"))
+            settingsCache->setCardDatabasePath(dataDir + "/cards.xml");
+    if (settingsCache->getTokenDatabasePath().isEmpty())
+        settingsCache->setTokenDatabasePath(dataDir + "/tokens.xml");
+    if (!QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty()) {
+        QDir().mkpath(dataDir + "/decks");
+        settingsCache->setDeckPath(dataDir + "/decks");
+    }
+    if (!QDir(settingsCache->getReplaysPath()).exists() || settingsCache->getReplaysPath().isEmpty()) {
+        QDir().mkpath(dataDir + "/replays");
+        settingsCache->setReplaysPath(dataDir + "/replays");
+    }
+    if (!QDir(settingsCache->getPicsPath()).exists() || settingsCache->getPicsPath().isEmpty()) {
+        QDir().mkpath(dataDir + "/pics");
+        settingsCache->setPicsPath(dataDir + "/pics");
+    }
+    if (!QDir().mkpath(settingsCache->getPicsPath() + "/CUSTOM"))
+        qDebug() << "Could not create " + settingsCache->getPicsPath().toUtf8() + "/CUSTOM. Will fall back on default card images.";
+        
+#ifdef Q_OS_MAC
+    if(settingsCache->getHandBgPath().isEmpty() &&
+        settingsCache->getStackBgPath().isEmpty() &&
+        settingsCache->getTableBgPath().isEmpty() &&
+        settingsCache->getPlayerBgPath().isEmpty())
+    {
+        QString srcDir = QLibraryInfo::location(QLibraryInfo::DataPath);
+        QString destDir = dataDir + "/zonebg";
+        QDir tmpDir(destDir);
+        if(!tmpDir.exists())
+        {
+            // try to install the default images for the current user and set the settigs value
+            settingsCache->copyPath(srcDir + "/zonebg", destDir);
+
+            settingsCache->setHandBgPath(destDir + "/fabric_green.png");
+            settingsCache->setStackBgPath(destDir + "/fabric_red.png");
+            settingsCache->setTableBgPath(destDir + "/fabric_blue.png");
+            settingsCache->setPlayerBgPath(destDir + "/fabric_gray.png");
+        }
+    }
+
+    if(settingsCache->getSoundPath().isEmpty())
+    {
+        QString srcDir = QLibraryInfo::location(QLibraryInfo::DataPath);
+        QString destDir = dataDir + "/sounds";
+        QDir tmpDir(destDir);
+        if(!tmpDir.exists())
+        {
+            // try to install the default sounds for the current user and set the settigs value
+            settingsCache->copyPath(srcDir + "/sounds", destDir);
+
+            settingsCache->setSoundPath(destDir);
+        }
+    }
+#endif
+
+    if (!settingsValid() || db->getLoadStatus() != Ok) {
+        qDebug("main(): invalid settings or load status");
+        DlgSettings dlgSettings;
+        dlgSettings.show();
+        app.exec();
+    }
+
+    if (settingsValid()) {
+        qDebug("main(): starting main program");
+        soundEngine = new SoundEngine;
+        qDebug("main(): SoundEngine constructor finished");
+
+        MainWindow ui;
+        qDebug("main(): MainWindow constructor finished");
+
+        QIcon icon(":/resources/appicon.svg");
+        ui.setWindowIcon(icon);
+
+        ui.show();
+        qDebug("main(): ui.show() finished");
+
+        app.exec();
+    }
+
+    qDebug("Event loop finished, terminating...");
+    delete db;
+    delete settingsCache;
+    delete rng;
+    PingPixmapGenerator::clear();
+    CountryPixmapGenerator::clear();
+    UserLevelPixmapGenerator::clear();
+
+    return 0;
 }

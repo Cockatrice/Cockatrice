@@ -1,0 +1,8 @@
+import "game_event.proto";
+
+message Event_SetActivePhase {
+	extend GameEvent {
+		optional Event_SetActivePhase ext = 2017;
+	}
+	optional sint32 phase = 1;
+}

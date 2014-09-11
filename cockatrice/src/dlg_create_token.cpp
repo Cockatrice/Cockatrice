@@ -1,102 +1,180 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QComboBox>
-#include <QPushButton>
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QDialogButtonBox>
+#include <QGroupBox>
+#include <QTreeView>
+#include <QRadioButton>
+#include <QHeaderView>
+#include "decklist.h"
 #include "dlg_create_token.h"
+#include "carddatabasemodel.h"
+#include "main.h"
 
-DlgCreateToken::DlgCreateToken(QWidget *parent)
-	: QDialog(parent)
+DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent)
+    : QDialog(parent), predefinedTokens(_predefinedTokens)
 {
-	nameLabel = new QLabel(tr("&Name:"));
-	nameEdit = new QLineEdit(tr("Token"));
-	nameEdit->selectAll();
-	nameLabel->setBuddy(nameEdit);
+    nameLabel = new QLabel(tr("&Name:"));
+    nameEdit = new QLineEdit(tr("Token"));
+    nameEdit->selectAll();
+    nameLabel->setBuddy(nameEdit);
 
-	colorLabel = new QLabel(tr("C&olor:"));
-	colorEdit = new QComboBox;
-	colorEdit->addItem(tr("white"), "w");
-	colorEdit->addItem(tr("blue"), "u");
-	colorEdit->addItem(tr("black"), "b");
-	colorEdit->addItem(tr("red"), "r");
-	colorEdit->addItem(tr("green"), "g");
-	colorEdit->addItem(tr("multicolor"), "m");
-	colorEdit->addItem(tr("colorless"), "");
-	colorLabel->setBuddy(colorEdit);
+    colorLabel = new QLabel(tr("C&olor:"));
+    colorEdit = new QComboBox;
+    colorEdit->addItem(tr("white"), "w");
+    colorEdit->addItem(tr("blue"), "u");
+    colorEdit->addItem(tr("black"), "b");
+    colorEdit->addItem(tr("red"), "r");
+    colorEdit->addItem(tr("green"), "g");
+    colorEdit->addItem(tr("multicolor"), "m");
+    colorEdit->addItem(tr("colorless"), QString());
+    colorLabel->setBuddy(colorEdit);
 
-	ptLabel = new QLabel(tr("&P/T:"));
-	ptEdit = new QLineEdit;
-	ptLabel->setBuddy(ptEdit);
+    ptLabel = new QLabel(tr("&P/T:"));
+    ptEdit = new QLineEdit;
+    ptLabel->setBuddy(ptEdit);
 
-	annotationLabel = new QLabel(tr("&Annotation:"));
-	annotationEdit = new QLineEdit;
-	annotationLabel->setBuddy(annotationEdit);
-	
-	destroyCheckBox = new QCheckBox(tr("&Destroy token when it leaves the table"));
-	destroyCheckBox->setChecked(true);
+    annotationLabel = new QLabel(tr("&Annotation:"));
+    annotationEdit = new QLineEdit;
+    annotationLabel->setBuddy(annotationEdit);
+    
+    destroyCheckBox = new QCheckBox(tr("&Destroy token when it leaves the table"));
+    destroyCheckBox->setChecked(true);
 
-	okButton = new QPushButton(tr("&OK"));
-	okButton->setDefault(true);
-	cancelButton = new QPushButton(tr("&Cancel"));
+    QGridLayout *grid = new QGridLayout;
+    grid->addWidget(nameLabel, 0, 0);
+    grid->addWidget(nameEdit, 0, 1);
+    grid->addWidget(colorLabel, 1, 0);
+    grid->addWidget(colorEdit, 1, 1);
+    grid->addWidget(ptLabel, 2, 0);
+    grid->addWidget(ptEdit, 2, 1);
+    grid->addWidget(annotationLabel, 3, 0);
+    grid->addWidget(annotationEdit, 3, 1);
+    grid->addWidget(destroyCheckBox, 4, 0, 1, 2);
+    
+    QGroupBox *tokenDataGroupBox = new QGroupBox(tr("Token data"));
+    tokenDataGroupBox->setLayout(grid);
+    
+    cardDatabaseModel = new CardDatabaseModel(db, this);
+    cardDatabaseDisplayModel = new CardDatabaseDisplayModel(this);
+    cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
+    cardDatabaseDisplayModel->setIsToken(CardDatabaseDisplayModel::ShowTrue);
+    
+    chooseTokenFromAllRadioButton = new QRadioButton(tr("Show &all tokens"));
+    connect(chooseTokenFromAllRadioButton, SIGNAL(toggled(bool)), this, SLOT(actChooseTokenFromAll(bool)));
+    chooseTokenFromDeckRadioButton = new QRadioButton(tr("Show tokens from this &deck"));
+    connect(chooseTokenFromDeckRadioButton, SIGNAL(toggled(bool)), this, SLOT(actChooseTokenFromDeck(bool)));
+    QTreeView *chooseTokenView = new QTreeView;
+    chooseTokenView->setModel(cardDatabaseDisplayModel);
+    chooseTokenView->setUniformRowHeights(true);
+    chooseTokenView->setRootIsDecorated(false);
+    chooseTokenView->setAlternatingRowColors(true);
+    chooseTokenView->setSortingEnabled(true);
+    chooseTokenView->sortByColumn(0, Qt::AscendingOrder);
+    chooseTokenView->resizeColumnToContents(0);
+    chooseTokenView->header()->setStretchLastSection(false);
+    chooseTokenView->header()->hideSection(1);
+    chooseTokenView->header()->hideSection(2);
+#if QT_VERSION < 0x050000
+    chooseTokenView->header()->setResizeMode(3, QHeaderView::ResizeToContents);
+    chooseTokenView->header()->setResizeMode(4, QHeaderView::ResizeToContents);
+#else
+    chooseTokenView->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    chooseTokenView->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
+#endif
+    connect(chooseTokenView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this, SLOT(tokenSelectionChanged(QModelIndex, QModelIndex)));
+    
+    if (predefinedTokens.isEmpty())
+        chooseTokenFromAllRadioButton->setChecked(true);
+    else {
+        chooseTokenFromDeckRadioButton->setChecked(true);
+        cardDatabaseDisplayModel->setCardNameSet(QSet<QString>::fromList(predefinedTokens));
+    }
+    
+    QVBoxLayout *tokenChooseLayout = new QVBoxLayout;
+    tokenChooseLayout->addWidget(chooseTokenFromAllRadioButton);
+    tokenChooseLayout->addWidget(chooseTokenFromDeckRadioButton);
+    tokenChooseLayout->addWidget(chooseTokenView);
+    
+    QGroupBox *tokenChooseGroupBox = new QGroupBox(tr("Choose token from list"));
+    tokenChooseGroupBox->setLayout(tokenChooseLayout);
+    
+    QVBoxLayout *leftVBox = new QVBoxLayout;
+    leftVBox->addWidget(tokenDataGroupBox);
+    leftVBox->addStretch();
+    
+    QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->addLayout(leftVBox);
+    hbox->addWidget(tokenChooseGroupBox);
+    
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(hbox);
+    mainLayout->addWidget(buttonBox);
+    setLayout(mainLayout);
 
-	QGridLayout *grid = new QGridLayout;
-	grid->addWidget(nameLabel, 0, 0);
-	grid->addWidget(nameEdit, 0, 1);
-	grid->addWidget(colorLabel, 1, 0);
-	grid->addWidget(colorEdit, 1, 1);
-	grid->addWidget(ptLabel, 2, 0);
-	grid->addWidget(ptEdit, 2, 1);
-	grid->addWidget(annotationLabel, 3, 0);
-	grid->addWidget(annotationEdit, 3, 1);
-	grid->addWidget(destroyCheckBox, 4, 0, 1, 2);
+    setWindowTitle(tr("Create token"));
+    setFixedHeight(sizeHint().height());
+    setMinimumWidth(300);
+}
 
-	QHBoxLayout *buttonLayout = new QHBoxLayout;
-	buttonLayout->addStretch();
-	buttonLayout->addWidget(okButton);
-	buttonLayout->addWidget(cancelButton);
+void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
+{
+    const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
+    const CardInfo *cardInfo = current.row() >= 0 ? cardDatabaseModel->getCard(realIndex.row()) : db->getCard();
+    
+    nameEdit->setText(cardInfo->getName());
+    const QString cardColor = cardInfo->getColors().isEmpty() ? QString() : (cardInfo->getColors().size() > 1 ? QString("m") : cardInfo->getColors().first());
+    colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
+    ptEdit->setText(cardInfo->getPowTough());
+    annotationEdit->setText(cardInfo->getText());
+}
 
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addLayout(grid);
-	mainLayout->addLayout(buttonLayout);
-	setLayout(mainLayout);
+void DlgCreateToken::actChooseTokenFromAll(bool checked)
+{
+    if (checked)
+        cardDatabaseDisplayModel->setCardNameSet(QSet<QString>());
+}
 
-	setWindowTitle(tr("Create token"));
-	setFixedHeight(sizeHint().height());
-	setMinimumWidth(300);
-
-	connect(okButton, SIGNAL(clicked()), this, SLOT(actOk()));
-	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+void DlgCreateToken::actChooseTokenFromDeck(bool checked)
+{
+    if (checked)
+        cardDatabaseDisplayModel->setCardNameSet(QSet<QString>::fromList(predefinedTokens));
 }
 
 void DlgCreateToken::actOk()
 {
-	accept();
+    accept();
 }
 
 QString DlgCreateToken::getName() const
 {
-	return nameEdit->text();
+    return nameEdit->text();
 }
 
 QString DlgCreateToken::getColor() const
 {
-	return colorEdit->itemData(colorEdit->currentIndex()).toString();
+    return colorEdit->itemData(colorEdit->currentIndex()).toString();
 }
 
 QString DlgCreateToken::getPT() const
 {
-	return ptEdit->text();
+    return ptEdit->text();
 }
 
 QString DlgCreateToken::getAnnotation() const
 {
-	return annotationEdit->text();
+    return annotationEdit->text();
 }
 
 bool DlgCreateToken::getDestroy() const
 {
-	return destroyCheckBox->isChecked();
+    return destroyCheckBox->isChecked();
 }

@@ -1,0 +1,8 @@
+import "game_commands.proto";
+message Command_IncCounter {
+	extend GameCommand {
+		optional Command_IncCounter ext = 1018;
+	}
+	optional sint32 counter_id = 1 [default = -1];
+	optional sint32 delta = 2;
+}

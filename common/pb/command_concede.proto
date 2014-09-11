@@ -1,0 +1,6 @@
+import "game_commands.proto";
+message Command_Concede {
+	extend GameCommand {
+		optional Command_Concede ext = 1017;
+	}
+}

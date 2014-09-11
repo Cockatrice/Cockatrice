@@ -1,0 +1,8 @@
+import "session_commands.proto";
+
+message Command_DeckDel {
+	extend SessionCommand {
+		optional Command_DeckDel ext = 1011;
+	}
+	optional sint32 deck_id = 1 [default = -1];
+}

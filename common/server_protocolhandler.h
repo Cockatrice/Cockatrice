@@ -4,120 +4,100 @@
 #include <QObject>
 #include <QPair>
 #include "server.h"
-#include "protocol.h"
-#include "protocol_items.h"
+#include "server_abstractuserinterface.h"
+#include "pb/response.pb.h"
+#include "pb/server_message.pb.h"
 
+class Server_DatabaseInterface;
 class Server_Player;
-class Server_Card;
 class ServerInfo_User;
 class Server_Room;
 class QTimer;
 
-class Server_ProtocolHandler : public QObject {
-	Q_OBJECT
+class ServerMessage;
+class Response;
+class SessionEvent;
+class GameEventContainer;
+class RoomEvent;
+class ResponseContainer;
+
+class CommandContainer;
+class SessionCommand;
+class ModeratorCommand;
+class AdminCommand;
+
+class Command_Ping;
+class Command_Login;
+class Command_Message;
+class Command_ListUsers;
+class Command_GetGamesOfUser;
+class Command_GetUserInfo;
+class Command_ListRooms;
+class Command_JoinRoom;
+class Command_LeaveRoom;
+class Command_RoomSay;
+class Command_CreateGame;
+class Command_JoinGame;
+
+class Server_ProtocolHandler : public QObject, public Server_AbstractUserInterface {
+    Q_OBJECT
 protected:
-	Server *server;
-	QMap<int, QPair<Server_Game *, Server_Player *> > games;
-	QMap<int, Server_Room *> rooms;
-
-	Server *getServer() const { return server; }
-	QPair<Server_Game *, Server_Player *> getGame(int gameId) const;
-
-	AuthenticationResult authState;
-	bool acceptsUserListChanges;
-	bool acceptsRoomListChanges;
-	ServerInfo_User *userInfo;
-	QMap<QString, ServerInfo_User *> buddyList, ignoreList;
-	
-	void prepareDestroy();
-	virtual bool getCompressionSupport() const = 0;
-	int sessionId;
+    QMap<int, Server_Room *> rooms;
+    
+    bool deleted;
+    Server_DatabaseInterface *databaseInterface;
+    AuthenticationResult authState;
+    bool acceptsUserListChanges;
+    bool acceptsRoomListChanges;
+    virtual void logDebugMessage(const QString & /* message */) { }
 private:
-	QList<ProtocolItem *> itemQueue;
-	QList<int> messageSizeOverTime, messageCountOverTime;
-	int timeRunning, lastDataReceived;
-	QTimer *pingClock;
+    QList<int> messageSizeOverTime, messageCountOverTime;
+    int timeRunning, lastDataReceived;
+    QTimer *pingClock;
 
-	virtual DeckList *getDeckFromDatabase(int deckId) = 0;
-
-	ResponseCode cmdPing(Command_Ping *cmd, CommandContainer *cont);
-	ResponseCode cmdLogin(Command_Login *cmd, CommandContainer *cont);
-	ResponseCode cmdMessage(Command_Message *cmd, CommandContainer *cont);
-	virtual ResponseCode cmdAddToList(Command_AddToList *cmd, CommandContainer *cont) = 0;
-	virtual ResponseCode cmdRemoveFromList(Command_RemoveFromList *cmd, CommandContainer *cont) = 0;
-	virtual ResponseCode cmdDeckList(Command_DeckList *cmd, CommandContainer *cont) = 0;
-	virtual ResponseCode cmdDeckNewDir(Command_DeckNewDir *cmd, CommandContainer *cont) = 0;
-	virtual ResponseCode cmdDeckDelDir(Command_DeckDelDir *cmd, CommandContainer *cont) = 0;
-	virtual ResponseCode cmdDeckDel(Command_DeckDel *cmd, CommandContainer *cont) = 0;
-	virtual ResponseCode cmdDeckUpload(Command_DeckUpload *cmd, CommandContainer *cont) = 0;
-	virtual ResponseCode cmdDeckDownload(Command_DeckDownload *cmd, CommandContainer *cont) = 0;
-	ResponseCode cmdGetGamesOfUser(Command_GetGamesOfUser *cmd, CommandContainer *cont);
-	ResponseCode cmdGetUserInfo(Command_GetUserInfo *cmd, CommandContainer *cont);
-	ResponseCode cmdListRooms(Command_ListRooms *cmd, CommandContainer *cont);
-	ResponseCode cmdJoinRoom(Command_JoinRoom *cmd, CommandContainer *cont);
-	ResponseCode cmdLeaveRoom(Command_LeaveRoom *cmd, CommandContainer *cont, Server_Room *room);
-	ResponseCode cmdRoomSay(Command_RoomSay *cmd, CommandContainer *cont, Server_Room *room);
-	ResponseCode cmdListUsers(Command_ListUsers *cmd, CommandContainer *cont);
-	ResponseCode cmdCreateGame(Command_CreateGame *cmd, CommandContainer *cont, Server_Room *room);
-	ResponseCode cmdJoinGame(Command_JoinGame *cmd, CommandContainer *cont, Server_Room *room);
-	ResponseCode cmdLeaveGame(Command_LeaveGame *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdKickFromGame(Command_KickFromGame *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdConcede(Command_Concede *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdReadyStart(Command_ReadyStart *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdDeckSelect(Command_DeckSelect *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdSetSideboardPlan(Command_SetSideboardPlan *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdSay(Command_Say *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdShuffle(Command_Shuffle *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdMulligan(Command_Mulligan *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdRollDie(Command_RollDie *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdDrawCards(Command_DrawCards *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdUndoDraw(Command_UndoDraw *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdMoveCard(Command_MoveCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdFlipCard(Command_FlipCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdAttachCard(Command_AttachCard *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdCreateToken(Command_CreateToken *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdCreateArrow(Command_CreateArrow *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdDeleteArrow(Command_DeleteArrow *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdSetCardAttr(Command_SetCardAttr *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdSetCardCounter(Command_SetCardCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdIncCardCounter(Command_IncCardCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdIncCounter(Command_IncCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdCreateCounter(Command_CreateCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdSetCounter(Command_SetCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdDelCounter(Command_DelCounter *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdNextTurn(Command_NextTurn *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdSetActivePhase(Command_SetActivePhase *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdDumpZone(Command_DumpZone *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdStopDumpZone(Command_StopDumpZone *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	ResponseCode cmdRevealCards(Command_RevealCards *cmd, CommandContainer *cont, Server_Game *game, Server_Player *player);
-	virtual ResponseCode cmdBanFromServer(Command_BanFromServer *cmd, CommandContainer *cont) = 0;
-	virtual ResponseCode cmdShutdownServer(Command_ShutdownServer *cmd, CommandContainer *cont) = 0;
-	virtual ResponseCode cmdUpdateServerMessage(Command_UpdateServerMessage *cmd, CommandContainer *cont) = 0;
-	
-	ResponseCode processCommandHelper(Command *command, CommandContainer *cont);
+    virtual void transmitProtocolItem(const ServerMessage &item) = 0;
+    
+    Response::ResponseCode cmdPing(const Command_Ping &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdLogin(const Command_Login &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdMessage(const Command_Message &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdGetGamesOfUser(const Command_GetGamesOfUser &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdGetUserInfo(const Command_GetUserInfo &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdListRooms(const Command_ListRooms &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdJoinRoom(const Command_JoinRoom &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdListUsers(const Command_ListUsers &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdLeaveRoom(const Command_LeaveRoom &cmd, Server_Room *room, ResponseContainer &rc);
+    Response::ResponseCode cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room, ResponseContainer &rc);
+    Response::ResponseCode cmdCreateGame(const Command_CreateGame &cmd, Server_Room *room, ResponseContainer &rc);
+    Response::ResponseCode cmdJoinGame(const Command_JoinGame &cmd, Server_Room *room, ResponseContainer &rc);
+    
+    Response::ResponseCode processSessionCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
+    virtual Response::ResponseCode processExtendedSessionCommand(int /* cmdType */, const SessionCommand & /* cmd */, ResponseContainer & /* rc */) { return Response::RespFunctionNotAllowed; }
+    Response::ResponseCode processRoomCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
+    Response::ResponseCode processGameCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
+    Response::ResponseCode processModeratorCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
+    virtual Response::ResponseCode processExtendedModeratorCommand(int /* cmdType */, const ModeratorCommand & /* cmd */, ResponseContainer & /* rc */) { return Response::RespFunctionNotAllowed; }
+    Response::ResponseCode processAdminCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
+    virtual Response::ResponseCode processExtendedAdminCommand(int /* cmdType */, const AdminCommand & /* cmd */, ResponseContainer & /* rc */) { return Response::RespFunctionNotAllowed; }
 private slots:
-	void pingClockTimeout();
+    void pingClockTimeout();
+public slots:
+    void prepareDestroy();
 public:
-	QMutex gameListMutex;
-	
-	Server_ProtocolHandler(Server *_server, QObject *parent = 0);
-	~Server_ProtocolHandler();
-	void playerRemovedFromGame(Server_Game *game);
-	
-	bool getAcceptsUserListChanges() const { return acceptsUserListChanges; }
-	bool getAcceptsRoomListChanges() const { return acceptsRoomListChanges; }
-	ServerInfo_User *getUserInfo() const { return userInfo; }
-	virtual QString getAddress() const = 0;
-	void setUserInfo(ServerInfo_User *_userInfo) { userInfo = _userInfo; }
-	const QMap<QString, ServerInfo_User *> &getBuddyList() const { return buddyList; }
-	const QMap<QString, ServerInfo_User *> &getIgnoreList() const { return ignoreList; }
-	int getSessionId() const { return sessionId; }
-	void setSessionId(int _sessionId) { sessionId = _sessionId; }
+    Server_ProtocolHandler(Server *_server, Server_DatabaseInterface *_databaseInterface, QObject *parent = 0);
+    ~Server_ProtocolHandler();
+    
+    bool getAcceptsUserListChanges() const { return acceptsUserListChanges; }
+    bool getAcceptsRoomListChanges() const { return acceptsRoomListChanges; }
+    virtual QString getAddress() const = 0;
+    Server_DatabaseInterface *getDatabaseInterface() const { return databaseInterface; }
 
-	int getLastCommandTime() const { return timeRunning - lastDataReceived; }
-	void processCommandContainer(CommandContainer *cont);
-	virtual void sendProtocolItem(ProtocolItem *item, bool deleteItem = true) = 0;
-	void enqueueProtocolItem(ProtocolItem *item);
+    int getLastCommandTime() const { return timeRunning - lastDataReceived; }
+    void processCommandContainer(const CommandContainer &cont);
+    
+    void sendProtocolItem(const Response &item);
+    void sendProtocolItem(const SessionEvent &item);
+    void sendProtocolItem(const GameEventContainer &item);
+    void sendProtocolItem(const RoomEvent &item);
 };
 
 #endif

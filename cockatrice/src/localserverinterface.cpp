@@ -2,25 +2,21 @@
 #include "localserver.h"
 #include <QDebug>
 
-LocalServerInterface::LocalServerInterface(LocalServer *_server)
-	: Server_ProtocolHandler(_server, _server)
+LocalServerInterface::LocalServerInterface(LocalServer *_server, Server_DatabaseInterface *_databaseInterface)
+    : Server_ProtocolHandler(_server, _databaseInterface, _server)
 {
 }
 
 LocalServerInterface::~LocalServerInterface()
 {
-	prepareDestroy();
 }
 
-void LocalServerInterface::sendProtocolItem(ProtocolItem *item, bool deleteItem)
+void LocalServerInterface::transmitProtocolItem(const ServerMessage &item)
 {
-	item->setReceiverMayDelete(false);
-	emit itemToClient(item);
-	if (deleteItem)
-		delete item;
+    emit itemToClient(item);
 }
 
-void LocalServerInterface::itemFromClient(ProtocolItem *item)
+void LocalServerInterface::itemFromClient(const CommandContainer &item)
 {
-	processCommandContainer(static_cast<CommandContainer *>(item));
+    processCommandContainer(item);
 }

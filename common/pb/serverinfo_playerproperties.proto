@@ -1,0 +1,12 @@
+import "serverinfo_user.proto";
+
+message ServerInfo_PlayerProperties {
+	optional sint32 player_id = 1;
+	optional ServerInfo_User user_info = 2;
+	optional bool spectator = 3;
+	optional bool conceded = 4;
+	optional bool ready_start = 5;
+	optional string deck_hash = 6;
+	optional sint32 ping_seconds = 7;
+	optional bool sideboard_locked = 8;
+}

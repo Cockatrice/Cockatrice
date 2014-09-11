@@ -1,0 +1,14 @@
+message ServerInfo_DeckStorage_File {
+	optional uint32 creation_time = 1;
+}
+
+message ServerInfo_DeckStorage_Folder {
+	repeated ServerInfo_DeckStorage_TreeItem items = 1;
+}
+
+message ServerInfo_DeckStorage_TreeItem {
+	optional uint32 id = 1;
+	optional string name = 2;
+	optional ServerInfo_DeckStorage_File file = 10;
+	optional ServerInfo_DeckStorage_Folder folder = 11;
+}

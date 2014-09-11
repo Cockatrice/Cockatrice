@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="900" height="600">
+	<rect width="900" height="210" fill="#f7d117"/>
+	<rect y="200" width="900" height="210" fill="#0033ab"/>
+	<rect y="400" width="900" height="200" fill="#cf142b"/>
+	<g id="s" transform="rotate(-70 450,420) translate(450,240)" fill="#fff">
+		<g id="c">
+			<path id="t" d="M 0,-30 V 0 H 15" transform="rotate(18 0,-30)"/>
+			<use xlink:href="#t" transform="scale(-1,1)"/>
+		</g>
+		<use xlink:href="#c" transform="rotate(72)"/>
+		<use xlink:href="#c" transform="rotate(144)"/>
+		<use xlink:href="#c" transform="rotate(216)"/>
+		<use xlink:href="#c" transform="rotate(288)"/>
+	</g>
+	<use xlink:href="#s" transform="rotate(20 450,420)"/>
+	<use xlink:href="#s" transform="rotate(40 450,420)"/>
+	<use xlink:href="#s" transform="rotate(60 450,420)"/>
+	<use xlink:href="#s" transform="rotate(80 450,420)"/>
+	<use xlink:href="#s" transform="rotate(100 450,420)"/>
+	<use xlink:href="#s" transform="rotate(120 450,420)"/>
+	<use xlink:href="#s" transform="rotate(140 450,420)"/>
+</svg>

@@ -1,0 +1,10 @@
+import "game_commands.proto";
+
+message Command_ChangeZoneProperties {
+	extend GameCommand {
+		optional Command_ChangeZoneProperties ext = 1031;
+	}
+	optional string zone_name = 1;
+	
+	optional bool always_reveal_top_card = 10;
+}

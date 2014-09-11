@@ -1,0 +1,12 @@
+import "session_event.proto";
+import "serverinfo_user.proto";
+import "serverinfo_room.proto";
+
+message Event_ServerCompleteList {
+	extend SessionEvent {
+		optional Event_ServerCompleteList ext = 600;
+	}
+	optional uint32 server_id = 1;
+	repeated ServerInfo_User user_list = 2;
+	repeated ServerInfo_Room room_list = 3;
+}

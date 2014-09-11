@@ -1,0 +1,15 @@
+import "game_commands.proto";
+import "color.proto";
+
+message Command_CreateArrow {
+	extend GameCommand {
+		optional Command_CreateArrow ext = 1011;
+	}
+	optional sint32 start_player_id = 1 [default = -1];
+	optional string start_zone = 2;
+	optional sint32 start_card_id = 3 [default = -1];
+	optional sint32 target_player_id = 4 [default = -1];
+	optional string target_zone = 5;
+	optional sint32 target_card_id = 6 [default = -1];
+	optional color arrow_color = 7;
+}

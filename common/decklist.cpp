@@ -1,131 +1,160 @@
 #include <QFile>
 #include <QTextStream>
-#include <QXmlStreamReader>
-#include <QXmlStreamWriter>
 #include <QVariant>
 #include <QCryptographicHash>
+#include <QDebug>
 #include "decklist.h"
 
-MoveCardToZone::MoveCardToZone(const QString &_cardName, const QString &_startZone, const QString &_targetZone)
-	: SerializableItem_Map("move_card_to_zone")
+SideboardPlan::SideboardPlan(const QString &_name, const QList<MoveCard_ToZone> &_moveList)
+    : name(_name), moveList(_moveList)
 {
-	insertItem(new SerializableItem_String("card_name", _cardName));
-	insertItem(new SerializableItem_String("start_zone", _startZone));
-	insertItem(new SerializableItem_String("target_zone", _targetZone));
 }
 
-MoveCardToZone::MoveCardToZone(MoveCardToZone *other)
-	: SerializableItem_Map("move_card_to_zone")
+void SideboardPlan::setMoveList(const QList<MoveCard_ToZone> &_moveList)
 {
-	insertItem(new SerializableItem_String("card_name", other->getCardName()));
-	insertItem(new SerializableItem_String("start_zone", other->getStartZone()));
-	insertItem(new SerializableItem_String("target_zone", other->getTargetZone()));
+    moveList = _moveList;
 }
 
-SideboardPlan::SideboardPlan(const QString &_name, const QList<MoveCardToZone *> &_moveList)
-	: SerializableItem_Map("sideboard_plan")
+bool SideboardPlan::readElement(QXmlStreamReader *xml)
 {
-	insertItem(new SerializableItem_String("name", _name));
-	
-	for (int i = 0; i < _moveList.size(); ++i)
-		itemList.append(_moveList[i]);
+    while (!xml->atEnd()) {
+        xml->readNext();
+        const QString childName = xml->name().toString();
+        if (xml->isStartElement()) {
+            if (childName == "name")
+                name = xml->readElementText();
+            else if (childName == "move_card_to_zone") {
+                MoveCard_ToZone m;
+                while (!xml->atEnd()) {
+                    xml->readNext();
+                    const QString childName2 = xml->name().toString();
+                    if (xml->isStartElement()) {
+                        if (childName2 == "card_name")
+                            m.set_card_name(xml->readElementText().toStdString());
+                        else if (childName2 == "start_zone")
+                            m.set_start_zone(xml->readElementText().toStdString());
+                        else if (childName2 == "target_zone")
+                            m.set_target_zone(xml->readElementText().toStdString());
+                    } else if (xml->isEndElement() && (childName2 == "move_card_to_zone")) {
+                        moveList.append(m);
+                        break;
+                    }
+                }
+            }
+        } else if (xml->isEndElement() && (childName == "sideboard_plan"))
+            return true;
+    }
+    return false;
 }
 
-void SideboardPlan::setMoveList(const QList<MoveCardToZone *> &_moveList)
+void SideboardPlan::write(QXmlStreamWriter *xml)
 {
-	for (int i = 0; i < itemList.size(); ++i)
-		delete itemList[i];
-	itemList.clear();
-	
-	for (int i = 0; i < _moveList.size(); ++i)
-		itemList.append(_moveList[i]);
+    xml->writeStartElement("sideboard_plan");
+    xml->writeTextElement("name", name);
+    for (int i = 0; i < moveList.size(); ++i) {
+        xml->writeStartElement("move_card_to_zone");
+        xml->writeTextElement("card_name", QString::fromStdString(moveList[i].card_name()));
+        xml->writeTextElement("start_zone", QString::fromStdString(moveList[i].start_zone()));
+        xml->writeTextElement("target_zone", QString::fromStdString(moveList[i].target_zone()));
+        xml->writeEndElement();
+    }
+    xml->writeEndElement();
 }
 
 AbstractDecklistNode::AbstractDecklistNode(InnerDecklistNode *_parent)
-	: parent(_parent), currentItem(0)
+    : parent(_parent)
 {
-	if (parent)
-		parent->append(this);
+    if (parent)
+        parent->append(this);
 }
 
 int AbstractDecklistNode::depth() const
 {
-	if (parent)
-		return parent->depth() + 1;
-	else
-		return 0;
+    if (parent)
+        return parent->depth() + 1;
+    else
+        return 0;
 }
 
 InnerDecklistNode::InnerDecklistNode(InnerDecklistNode *other, InnerDecklistNode *_parent)
-	: AbstractDecklistNode(_parent), name(other->getName())
+    : AbstractDecklistNode(_parent), name(other->getName())
 {
-	for (int i = 0; i < other->size(); ++i) {
-		InnerDecklistNode *inner = dynamic_cast<InnerDecklistNode *>(other->at(i));
-		if (inner)
-			new InnerDecklistNode(inner, this);
-		else
-			new DecklistCardNode(dynamic_cast<DecklistCardNode *>(other->at(i)), this);
-	}
+    for (int i = 0; i < other->size(); ++i) {
+        InnerDecklistNode *inner = dynamic_cast<InnerDecklistNode *>(other->at(i));
+        if (inner)
+            new InnerDecklistNode(inner, this);
+        else
+            new DecklistCardNode(dynamic_cast<DecklistCardNode *>(other->at(i)), this);
+    }
 }
 
 InnerDecklistNode::~InnerDecklistNode()
 {
-	clearTree();
+    clearTree();
 }
 
 QString InnerDecklistNode::visibleNameFromName(const QString &_name)
 {
-	if (_name == "main")
-		return QObject::tr("Maindeck");
-	else if (_name == "side")
-		return QObject::tr("Sideboard");
-	else
-		return _name;
+    if (_name == "main")
+        return QObject::tr("Maindeck");
+    else if (_name == "side")
+        return QObject::tr("Sideboard");
+    else if (_name == "tokens")
+        return QObject::tr("Tokens");
+    else
+        return _name;
+}
+
+void InnerDecklistNode::setSortMethod(DeckSortMethod method)
+{
+    sortMethod = method;
+    for (int i = 0; i < size(); i++)
+        at(i)->setSortMethod(method);
 }
 
 QString InnerDecklistNode::getVisibleName() const
 {
-	return visibleNameFromName(name);
+    return visibleNameFromName(name);
 }
 
 void InnerDecklistNode::clearTree()
 {
-	for (int i = 0; i < size(); i++)
-		delete at(i);
-	clear();
+    for (int i = 0; i < size(); i++)
+        delete at(i);
+    clear();
 }
 
 DecklistCardNode::DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent)
-	: AbstractDecklistCardNode(_parent), name(other->getName()), number(other->getNumber()), price(other->getPrice())
+    : AbstractDecklistCardNode(_parent), name(other->getName()), number(other->getNumber()), price(other->getPrice())
 {
 }
 
 AbstractDecklistNode *InnerDecklistNode::findChild(const QString &name)
 {
-	for (int i = 0; i < size(); i++)
-		if (at(i)->getName() == name)
-			return at(i);
-	return 0;
+    for (int i = 0; i < size(); i++)
+        if (at(i)->getName() == name)
+            return at(i);
+    return 0;
 }
 
 int InnerDecklistNode::height() const
 {
-	return at(0)->height() + 1;
+    return at(0)->height() + 1;
 }
 
 int InnerDecklistNode::recursiveCount(bool countTotalCards) const
 {
-	int result = 0;
-	for (int i = 0; i < size(); i++) {
-		InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(at(i));
-		if (node)
-			result += node->recursiveCount(countTotalCards);
-		else if (countTotalCards)
-			result += dynamic_cast<AbstractDecklistCardNode *>(at(i))->getNumber();
-		else
-			result += 1;
-	}
-	return result;
+    int result = 0;
+    for (int i = 0; i < size(); i++) {
+        InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(at(i));
+        if (node)
+            result += node->recursiveCount(countTotalCards);
+        else if (countTotalCards)
+            result += dynamic_cast<AbstractDecklistCardNode *>(at(i))->getNumber();
+        else
+            result += 1;
+    }
+    return result;
 }
 
 float InnerDecklistNode::recursivePrice(bool countTotalCards) const
@@ -143,435 +172,576 @@ float InnerDecklistNode::recursivePrice(bool countTotalCards) const
 
 bool InnerDecklistNode::compare(AbstractDecklistNode *other) const
 {
-	InnerDecklistNode *other2 = dynamic_cast<InnerDecklistNode *>(other);
-	if (other2)
-		return (getName() > other->getName());
-	else
-		return false;
+    switch (sortMethod) {
+        case 0:
+            return compareNumber(other);
+        case 1:
+            return compareName(other);
+        case 2:
+            return comparePrice(other);
+    }
+    return 0;
+}
+
+bool InnerDecklistNode::compareNumber(AbstractDecklistNode *other) const
+{
+    InnerDecklistNode *other2 = dynamic_cast<InnerDecklistNode *>(other);
+    if (other2) {
+        int n1 = recursiveCount(true);
+        int n2 = other2->recursiveCount(true);
+        return (n1 != n2) ? (n1 > n2) : compareName(other);
+    } else {
+        return false;
+    }
+}
+
+bool InnerDecklistNode::compareName(AbstractDecklistNode *other) const
+{
+    InnerDecklistNode *other2 = dynamic_cast<InnerDecklistNode *>(other);
+    if (other2) {
+        return (getName() > other2->getName());
+    } else {
+        return false;
+    }
+}
+
+bool InnerDecklistNode::comparePrice(AbstractDecklistNode *other) const
+{
+    InnerDecklistNode *other2 = dynamic_cast<InnerDecklistNode *>(other);
+    if (other2) {
+        int p1 = 100*recursivePrice(true);
+        int p2 = 100*other2->recursivePrice(true);
+        return (p1 != p2) ? (p1 > p2) : compareName(other);
+    } else {
+        return false;
+    }
 }
 
 bool AbstractDecklistCardNode::compare(AbstractDecklistNode *other) const
 {
-	AbstractDecklistCardNode *other2 = dynamic_cast<AbstractDecklistCardNode *>(other);
-	if (other2)
-		return (getName() > other->getName());
-	else
-		return true;
+    switch (sortMethod) {
+        case ByNumber:
+            return compareNumber(other);
+        case ByName:
+            return compareName(other);
+        case ByPrice:
+            return compareTotalPrice(other);
+    }
+    return 0;
+}
+
+bool AbstractDecklistCardNode::compareNumber(AbstractDecklistNode *other) const
+{
+    AbstractDecklistCardNode *other2 = dynamic_cast<AbstractDecklistCardNode *>(other);
+    if (other2) {
+        int n1 = getNumber();
+        int n2 = other2->getNumber();
+        return (n1 != n2) ? (n1 > n2) : compareName(other);
+    } else {
+        return true;
+    }
+}
+
+bool AbstractDecklistCardNode::compareName(AbstractDecklistNode *other) const
+{
+    AbstractDecklistCardNode *other2 = dynamic_cast<AbstractDecklistCardNode *>(other);
+    if (other2) {
+        return (getName() > other2->getName());
+    } else {
+        return true;
+    }
+}
+
+bool AbstractDecklistCardNode::compareTotalPrice(AbstractDecklistNode *other) const
+{
+    AbstractDecklistCardNode *other2 = dynamic_cast<AbstractDecklistCardNode *>(other);
+    if (other2) {
+        int p1 = 100*getTotalPrice();
+        int p2 = 100*other2->getTotalPrice();
+        return (p1 != p2) ? (p1 > p2) : compareName(other);
+    } else {
+        return true;
+    }
 }
 
 class InnerDecklistNode::compareFunctor {
 private:
-	Qt::SortOrder order;
+    Qt::SortOrder order;
 public:
-	compareFunctor(Qt::SortOrder _order) : order(_order) { }
-	inline bool operator()(QPair<int, AbstractDecklistNode *> a, QPair<int, AbstractDecklistNode *> b) const
-	{
-		return (order == Qt::AscendingOrder) ^ (a.second->compare(b.second));
-	}
+    compareFunctor(Qt::SortOrder _order) : order(_order) { }
+    inline bool operator()(QPair<int, AbstractDecklistNode *> a, QPair<int, AbstractDecklistNode *> b) const
+    {
+        return (order == Qt::AscendingOrder) ^ (a.second->compare(b.second));
+    }
 };
 
 bool InnerDecklistNode::readElement(QXmlStreamReader *xml)
 {
-	if (currentItem) {
-		if (currentItem->readElement(xml))
-			currentItem = 0;
-		return false;
-	}
-	if (xml->isStartElement() && (xml->name() == "zone"))
-		currentItem = new InnerDecklistNode(xml->attributes().value("name").toString(), this);
-        else if (xml->isStartElement() && (xml->name() == "card")) {
+    while (!xml->atEnd()) {
+        xml->readNext();
+        const QString childName = xml->name().toString();
+        if (xml->isStartElement()) {
+            if (childName == "zone") {
+                InnerDecklistNode *newZone = new InnerDecklistNode(xml->attributes().value("name").toString(), this);
+                newZone->readElement(xml);
+            } else if (childName == "card") {
                 float price = (xml->attributes().value("price") != NULL) ? xml->attributes().value("price").toString().toFloat() : 0;
-                currentItem = new DecklistCardNode(xml->attributes().value("name").toString(), xml->attributes().value("number").toString().toInt(), price, this);
-        } else if (xml->isEndElement() && (xml->name() == "zone"))
-		return true;
-
-	return false;
+                DecklistCardNode *newCard = new DecklistCardNode(xml->attributes().value("name").toString(), xml->attributes().value("number").toString().toInt(), price, this);
+                newCard->readElement(xml);
+            }
+        } else if (xml->isEndElement() && (childName == "zone"))
+            return false;
+    }
+    return true;
 }
 
 void InnerDecklistNode::writeElement(QXmlStreamWriter *xml)
 {
-	xml->writeStartElement("zone");
-	xml->writeAttribute("name", name);
-	for (int i = 0; i < size(); i++)
-		at(i)->writeElement(xml);
-	xml->writeEndElement(); // zone
+    xml->writeStartElement("zone");
+    xml->writeAttribute("name", name);
+    for (int i = 0; i < size(); i++)
+        at(i)->writeElement(xml);
+    xml->writeEndElement(); // zone
 }
 
 bool AbstractDecklistCardNode::readElement(QXmlStreamReader *xml)
 {
-	if (xml->isEndElement())
-		return true;
-	else
-		return false;
+    while (!xml->atEnd()) {
+        xml->readNext();
+        if (xml->isEndElement() && xml->name() == "card")
+            return false;
+    }
+    return true;
 }
 
 void AbstractDecklistCardNode::writeElement(QXmlStreamWriter *xml)
 {
-	xml->writeEmptyElement("card");
-	xml->writeAttribute("number", QString::number(getNumber()));
+    xml->writeEmptyElement("card");
+    xml->writeAttribute("number", QString::number(getNumber()));
         xml->writeAttribute("price", QString::number(getPrice()));
-	xml->writeAttribute("name", getName());
+    xml->writeAttribute("name", getName());
 }
 
 QVector<QPair<int, int> > InnerDecklistNode::sort(Qt::SortOrder order)
 {
-	QVector<QPair<int, int> > result(size());
-	
-	// Initialize temporary list with contents of current list
-	QVector<QPair<int, AbstractDecklistNode *> > tempList(size());
-	for (int i = size() - 1; i >= 0; --i) {
-		tempList[i].first = i;
-		tempList[i].second = at(i);
-	}
-	
-	// Sort temporary list
-	compareFunctor cmp(order);
-	qSort(tempList.begin(), tempList.end(), cmp);
-	
-	// Map old indexes to new indexes and
-	// copy temporary list to the current one
-	for (int i = size() - 1; i >= 0; --i) {
-		result[i].first = tempList[i].first;
-		result[i].second = i;
-		replace(i, tempList[i].second);
-	}
+    QVector<QPair<int, int> > result(size());
+    
+    // Initialize temporary list with contents of current list
+    QVector<QPair<int, AbstractDecklistNode *> > tempList(size());
+    for (int i = size() - 1; i >= 0; --i) {
+        tempList[i].first = i;
+        tempList[i].second = at(i);
+    }
+    
+    // Sort temporary list
+    compareFunctor cmp(order);
+    qSort(tempList.begin(), tempList.end(), cmp);
+    
+    // Map old indexes to new indexes and
+    // copy temporary list to the current one
+    for (int i = size() - 1; i >= 0; --i) {
+        result[i].first = tempList[i].first;
+        result[i].second = i;
+        replace(i, tempList[i].second);
+    }
 
-	return result;
+    return result;
 }
-
-const QStringList DeckList::fileNameFilters = QStringList()
-	<< QObject::tr("Cockatrice decks (*.cod)")
-	<< QObject::tr("Plain text decks (*.dec *.mwDeck)")
-	<< QObject::tr("All files (*.*)");
 
 DeckList::DeckList()
-	: SerializableItem("cockatrice_deck"), currentZone(0), currentSideboardPlan(0)
 {
-	root = new InnerDecklistNode;
+    root = new InnerDecklistNode;
 }
 
-DeckList::DeckList(DeckList *other)
-	: SerializableItem("cockatrice_deck"), currentZone(0), currentSideboardPlan(0)
+// TODO: http://qt-project.org/doc/qt-4.8/qobject.html#no-copy-constructor-or-assignment-operator
+DeckList::DeckList(const DeckList &other)
+    : QObject(),
+      name(other.name),
+      comments(other.comments),
+      deckHash(other.deckHash)
 {
-	root = new InnerDecklistNode(other->getRoot());
-	
-	QMapIterator<QString, SideboardPlan *> spIterator(other->getSideboardPlans());
-	while (spIterator.hasNext()) {
-		spIterator.next();
-		QList<MoveCardToZone *> newMoveList;
-		QList<MoveCardToZone *> oldMoveList = spIterator.value()->getMoveList();
-		for (int i = 0; i < oldMoveList.size(); ++i)
-			newMoveList.append(new MoveCardToZone(oldMoveList[i]));
-		sideboardPlans.insert(spIterator.key(), new SideboardPlan(spIterator.key(), newMoveList));
-	}
-	updateDeckHash();
+    root = new InnerDecklistNode(other.getRoot());
+    
+    QMapIterator<QString, SideboardPlan *> spIterator(other.getSideboardPlans());
+    while (spIterator.hasNext()) {
+        spIterator.next();
+        sideboardPlans.insert(spIterator.key(), new SideboardPlan(spIterator.key(), spIterator.value()->getMoveList()));
+    }
+    updateDeckHash();
+}
+
+DeckList::DeckList(const QString &nativeString)
+{
+    root = new InnerDecklistNode;
+    loadFromString_Native(nativeString);
 }
 
 DeckList::~DeckList()
 {
-	delete root;
-	
-	QMapIterator<QString, SideboardPlan *> i(sideboardPlans);
-	while (i.hasNext())
-		delete i.next().value();
+    delete root;
+    
+    QMapIterator<QString, SideboardPlan *> i(sideboardPlans);
+    while (i.hasNext())
+        delete i.next().value();
 }
 
-QList<MoveCardToZone *> DeckList::getCurrentSideboardPlan()
+QList<MoveCard_ToZone> DeckList::getCurrentSideboardPlan()
 {
-	SideboardPlan *current = sideboardPlans.value(QString(), 0);
-	if (!current)
-		return QList<MoveCardToZone *>();
-	else
-		return current->getMoveList();
+    SideboardPlan *current = sideboardPlans.value(QString(), 0);
+    if (!current)
+        return QList<MoveCard_ToZone>();
+    else
+        return current->getMoveList();
 }
 
-void DeckList::setCurrentSideboardPlan(const QList<MoveCardToZone *> &plan)
+void DeckList::setCurrentSideboardPlan(const QList<MoveCard_ToZone> &plan)
 {
-	SideboardPlan *current = sideboardPlans.value(QString(), 0);
-	if (!current) {
-		current = new SideboardPlan;
-		sideboardPlans.insert(QString(), current);
-	}
-	
-	QList<MoveCardToZone *> newList;
-	for (int i = 0; i < plan.size(); ++i)
-		newList.append(new MoveCardToZone(plan[i]));
-	current->setMoveList(newList);
+    SideboardPlan *current = sideboardPlans.value(QString(), 0);
+    if (!current) {
+        current = new SideboardPlan;
+        sideboardPlans.insert(QString(), current);
+    }
+    
+    current->setMoveList(plan);
 }
 
 bool DeckList::readElement(QXmlStreamReader *xml)
 {
-	if (currentZone) {
-		if (currentZone->readElement(xml))
-			currentZone = 0;
-	} else if (currentSideboardPlan) {
-		if (currentSideboardPlan->readElement(xml)) {
-			sideboardPlans.insert(currentSideboardPlan->getName(), currentSideboardPlan);
-			currentSideboardPlan = 0;
-		}
-		return false;
-	} else if (xml->isEndElement()) {
-		if (xml->name() == "deckname")
-			name = currentElementText;
-		else if (xml->name() == "comments")
-			comments = currentElementText;
-		
-		currentElementText.clear();
-	} else if (xml->isStartElement() && (xml->name() == "zone"))
-		currentZone = new InnerDecklistNode(xml->attributes().value("name").toString(), root);
-	else if (xml->isStartElement() && (xml->name() == "sideboard_plan")) {
-		currentSideboardPlan = new SideboardPlan;
-		if (currentSideboardPlan->readElement(xml)) {
-			sideboardPlans.insert(currentSideboardPlan->getName(), currentSideboardPlan);
-			currentSideboardPlan = 0;
-		}
-	} else if (xml->isCharacters() && !xml->isWhitespace())
-		currentElementText = xml->text().toString();
-	return SerializableItem::readElement(xml);
+    const QString childName = xml->name().toString();
+    if (xml->isStartElement()) {
+        if (childName == "deckname")
+            name = xml->readElementText();
+        else if (childName == "comments")
+            comments = xml->readElementText();
+        else if (childName == "zone") {
+            InnerDecklistNode *newZone = new InnerDecklistNode(xml->attributes().value("name").toString(), root);
+            newZone->readElement(xml);
+        } else if (childName == "sideboard_plan") {
+            SideboardPlan *newSideboardPlan = new SideboardPlan;
+            if (newSideboardPlan->readElement(xml))
+                sideboardPlans.insert(newSideboardPlan->getName(), newSideboardPlan);
+            else
+                delete newSideboardPlan;
+        }
+    } else if (xml->isEndElement() && (childName == "cockatrice_deck"))
+        return false;
+    return true;
 }
 
-void DeckList::writeElement(QXmlStreamWriter *xml)
+void DeckList::write(QXmlStreamWriter *xml)
 {
-	xml->writeAttribute("version", "1");
-	xml->writeTextElement("deckname", name);
-	xml->writeTextElement("comments", comments);
+    xml->writeStartElement("cockatrice_deck");
+    xml->writeAttribute("version", "1");
+    xml->writeTextElement("deckname", name);
+    xml->writeTextElement("comments", comments);
 
-	for (int i = 0; i < root->size(); i++)
-		root->at(i)->writeElement(xml);
-	
-	QMapIterator<QString, SideboardPlan *> i(sideboardPlans);
-	while (i.hasNext())
-		i.next().value()->write(xml);
+    for (int i = 0; i < root->size(); i++)
+        root->at(i)->writeElement(xml);
+    
+    QMapIterator<QString, SideboardPlan *> i(sideboardPlans);
+    while (i.hasNext())
+        i.next().value()->write(xml);
+    xml->writeEndElement();
 }
 
-void DeckList::loadFromXml(QXmlStreamReader *xml)
+bool DeckList::loadFromXml(QXmlStreamReader *xml)
 {
-	while (!xml->atEnd()) {
-		xml->readNext();
-		if (xml->isStartElement()) {
-			if (xml->name() != "cockatrice_deck")
-				return;
-			while (!xml->atEnd()) {
-				xml->readNext();
-				readElement(xml);
-			}
-		}
-	}
-	updateDeckHash();
+    if (xml->error()) {
+        qDebug() << "Error loading deck from xml: " << xml->errorString();
+        return false;
+    }
+
+    cleanList();
+    while (!xml->atEnd()) {
+        xml->readNext();
+        if (xml->isStartElement()) {
+            if (xml->name() != "cockatrice_deck")
+                return false;
+            while (!xml->atEnd()) {
+                xml->readNext();
+                if (!readElement(xml))
+                    break;
+            }
+        }
+    }
+    updateDeckHash();
+    if (xml->error()) {
+        qDebug() << "Error loading deck from xml: " << xml->errorString();
+        return false;
+    }
+    return true;
+}
+
+bool DeckList::loadFromString_Native(const QString &nativeString)
+{
+    QXmlStreamReader xml(nativeString);
+    return loadFromXml(&xml);
+}
+
+QString DeckList::writeToString_Native()
+{
+    QString result;
+    QXmlStreamWriter xml(&result);
+    xml.writeStartDocument();
+    write(&xml);
+    xml.writeEndDocument();
+    return result;
 }
 
 bool DeckList::loadFromFile_Native(QIODevice *device)
 {
-	QXmlStreamReader xml(device);
-	loadFromXml(&xml);
-	return true;
+    QXmlStreamReader xml(device);
+    return loadFromXml(&xml);
 }
 
 bool DeckList::saveToFile_Native(QIODevice *device)
 {
-	QXmlStreamWriter xml(device);
-	xml.setAutoFormatting(true);
-	xml.writeStartDocument();
+    QXmlStreamWriter xml(device);
+    xml.setAutoFormatting(true);
+    xml.writeStartDocument();
 
-	write(&xml);
+    write(&xml);
 
-	xml.writeEndDocument();
-	return true;
+    xml.writeEndDocument();
+    return true;
 }
 
 bool DeckList::loadFromStream_Plain(QTextStream &in)
 {
-	InnerDecklistNode *main = 0, *side = 0;
+    cleanList();
 
-	int okRows = 0;
-	while (!in.atEnd()) {
-		QString line = in.readLine().simplified();
-		if (line.startsWith("//"))
-			continue;
+    InnerDecklistNode *main = 0, *side = 0;
+    bool inSideboard = false;
 
-		InnerDecklistNode *zone;
-		if (line.startsWith("SB:", Qt::CaseInsensitive)) {
-			line = line.mid(3).trimmed();
-			if (!side)
-				side = new InnerDecklistNode("side", root);
-			zone = side;
-		} else {
-			if (!main)
-				main = new InnerDecklistNode("main", root);
-			zone = main;
-		}
+    int okRows = 0;
+    while (!in.atEnd()) {
+        QString line = in.readLine().simplified();
+        if (line.startsWith("//"))
+            continue;
 
-		// Filter out MWS edition symbols and basic land extras
-		QRegExp rx("\\[.*\\]");
-		line.remove(rx);
-		rx.setPattern("\\(.*\\)");
-		line.remove(rx);
-		line = line.simplified();
+        InnerDecklistNode *zone;
+        if (line.startsWith("Sideboard", Qt::CaseInsensitive)) {
+            inSideboard = true;
+            continue;
+        } else if (line.startsWith("SB:", Qt::CaseInsensitive)) {
+            line = line.mid(3).trimmed();
+            if (!side)
+                side = new InnerDecklistNode("side", root);
+            zone = side;
+        } else if (inSideboard) {
+            if (!side)
+                side = new InnerDecklistNode("side", root);
+            zone = side;
+        } else {
+            if (!main)
+                main = new InnerDecklistNode("main", root);
+            zone = main;
+        }
 
-		int i = line.indexOf(' ');
-		bool ok;
-		int number = line.left(i).toInt(&ok);
-		if (!ok)
-			continue;
-		++okRows;
-		new DecklistCardNode(line.mid(i + 1), number, zone);
-	}
-	updateDeckHash();
-	return (okRows > 0);
+        // Filter out MWS edition symbols and basic land extras
+        QRegExp rx("\\[.*\\]");
+        line.remove(rx);
+        rx.setPattern("\\(.*\\)");
+        line.remove(rx);
+        //Filter out post card name editions
+        rx.setPattern("\\|.*$");
+        line.remove(rx);
+        line = line.simplified();
+
+        int i = line.indexOf(' ');
+        int cardNameStart = i + 1;
+
+        // If the count ends with an 'x', ignore it. For example,
+        // "4x Storm Crow" will count 4 correctly.
+        if (i > 0 && line[i - 1] == 'x') {
+            i--;
+        }
+
+        bool ok;
+        int number = line.left(i).toInt(&ok);
+        if (!ok)
+            continue;
+
+        QString cardName = line.mid(cardNameStart);
+        // Common differences between cockatrice's card names
+        // and what's commonly used in decklists
+        rx.setPattern("’");
+        cardName.replace(rx, "'");
+        rx.setPattern("Æ");
+        cardName.replace(rx, "AE");
+        rx.setPattern("^Aether");
+        cardName.replace(rx, "AEther");
+        rx.setPattern("\\s*[|/]{1,2}\\s*");
+        cardName.replace(rx, " // ");
+
+        // Replace only if the ampersand is preceded by a non-capital letter,
+        // as would happen with acronyms. So 'Fire & Ice' is replaced but not
+        // 'R&D' or 'R & D'.
+        //
+        // Qt regexes don't support lookbehind so we capture and replace
+        // instead.
+        rx.setPattern("([^A-Z])\\s*&\\s*");
+        if (rx.indexIn(cardName) != -1) {
+            cardName.replace(rx, QString("%1 // ").arg(rx.cap(1)));
+        }
+
+        ++okRows;
+        new DecklistCardNode(cardName, number, zone);
+    }
+    updateDeckHash();
+    return (okRows > 0);
 }
 
 bool DeckList::loadFromFile_Plain(QIODevice *device)
 {
-	QTextStream in(device);
-	return loadFromStream_Plain(in);
+    QTextStream in(device);
+    return loadFromStream_Plain(in);
 }
+
+struct WriteToStream {
+    QTextStream &stream;
+
+    WriteToStream(QTextStream &_stream) : stream(_stream) {}
+
+    void operator()(
+        const InnerDecklistNode *node,
+        const DecklistCardNode *card
+    ) {
+       if (node->getName() == "side") {
+           stream << "SB: ";
+       }
+       stream << QString("%1 %2\n").arg(
+           card->getNumber()
+       ).arg(
+           card->getName()
+       );
+    }
+};
 
 bool DeckList::saveToStream_Plain(QTextStream &out)
 {
-	// Support for this is only possible if the internal structure doesn't get more complicated.
-	for (int i = 0; i < root->size(); i++) {
-		InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
-		for (int j = 0; j < node->size(); j++) {
-			DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
-			out << QString("%1%2 %3\n").arg(node->getName() == "side" ? "SB: " : "").arg(card->getNumber()).arg(card->getName());
-		}
-	}
-	return true;
+    WriteToStream writeToStream(out);
+    forEachCard(writeToStream);
+    return true;
 }
 
 bool DeckList::saveToFile_Plain(QIODevice *device)
 {
-	QTextStream out(device);
-	return saveToStream_Plain(out);
+    QTextStream out(device);
+    return saveToStream_Plain(out);
 }
 
-bool DeckList::loadFromFile(const QString &fileName, FileFormat fmt)
+QString DeckList::writeToString_Plain()
 {
-	QFile file(fileName);
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-		return false;
-	cleanList();
-
-	bool result = false;
-	switch (fmt) {
-		case PlainTextFormat: result = loadFromFile_Plain(&file); break;
-		case CockatriceFormat: result = loadFromFile_Native(&file); break;
-	}
-	if (result)
-		emit deckLoaded();
-	return result;
-}
-
-bool DeckList::saveToFile(const QString &fileName, FileFormat fmt)
-{
-	QFile file(fileName);
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-		return false;
-
-	bool result = false;
-	switch (fmt) {
-		case PlainTextFormat: result = saveToFile_Plain(&file); break;
-		case CockatriceFormat: result = saveToFile_Native(&file); break;
-	}
-	return result;
-}
-
-DeckList::FileFormat DeckList::getFormatFromNameFilter(const QString &selectedNameFilter)
-{
-	switch (fileNameFilters.indexOf(selectedNameFilter)) {
-		case 0: return CockatriceFormat;
-		case 1: return PlainTextFormat;
-	}
-	return PlainTextFormat;
+    QString result;
+    QTextStream out(&result);
+    saveToStream_Plain(out);
+    return result;
 }
 
 void DeckList::cleanList()
 {
-	root->clearTree();
-	setName();
-	setComments();
-	updateDeckHash();
+    root->clearTree();
+    setName();
+    setComments();
+    deckHash = QString();
+    emit deckHashChanged();
 }
 
 void DeckList::getCardListHelper(InnerDecklistNode *item, QSet<QString> &result) const
 {
-	for (int i = 0; i < item->size(); ++i) {
-		DecklistCardNode *node = dynamic_cast<DecklistCardNode *>(item->at(i));
-		if (node)
-			result.insert(node->getName());
-		else
-			getCardListHelper(dynamic_cast<InnerDecklistNode *>(item->at(i)), result);
-	}
+    for (int i = 0; i < item->size(); ++i) {
+        DecklistCardNode *node = dynamic_cast<DecklistCardNode *>(item->at(i));
+        if (node)
+            result.insert(node->getName());
+        else
+            getCardListHelper(dynamic_cast<InnerDecklistNode *>(item->at(i)), result);
+    }
 }
 
 QStringList DeckList::getCardList() const
 {
-	QSet<QString> result;
-	getCardListHelper(root, result);
-	return result.toList();
+    QSet<QString> result;
+    getCardListHelper(root, result);
+    return result.toList();
+}
+
+int DeckList::getSideboardSize() const
+{
+    int size = 0;
+    for (int i = 0; i < root->size(); ++i) {
+        InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
+        if (node->getName() != "side")
+            continue;
+        for (int j = 0; j < node->size(); j++) {
+            DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
+            size += card->getNumber();
+        }
+    }
+    return size;
 }
 
 DecklistCardNode *DeckList::addCard(const QString &cardName, const QString &zoneName)
 {
-	InnerDecklistNode *zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
-	if (!zoneNode)
-		zoneNode = new InnerDecklistNode(zoneName, root);
-	
-	DecklistCardNode *node = new DecklistCardNode(cardName, 1, zoneNode);
-	updateDeckHash();
-	return node;
+    InnerDecklistNode *zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
+    if (!zoneNode)
+        zoneNode = new InnerDecklistNode(zoneName, root);
+
+    DecklistCardNode *node = new DecklistCardNode(cardName, 1, zoneNode);
+    updateDeckHash();
+    return node;
 }
 
 bool DeckList::deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNode)
 {
-	if (node == root)
-		return true;
-	bool updateHash = false;
-	if (!rootNode) {
-		rootNode = root;
-		updateHash = true;
-	}
-	
-	int index = rootNode->indexOf(node);
-	if (index != -1) {
-		delete rootNode->takeAt(index);
-		if (!rootNode->size())
-			deleteNode(rootNode, rootNode->getParent());
-		if (updateHash)
-			updateDeckHash();
-		return true;
-	}
-	for (int i = 0; i < rootNode->size(); i++) {
-		InnerDecklistNode *inner = dynamic_cast<InnerDecklistNode *>(rootNode->at(i));
-		if (inner)
-			if (deleteNode(node, inner)) {
-				if (updateHash)
-					updateDeckHash();
-				return true;
-			}
-	}
-	return false;
+    if (node == root)
+        return true;
+    bool updateHash = false;
+    if (!rootNode) {
+        rootNode = root;
+        updateHash = true;
+    }
+    
+    int index = rootNode->indexOf(node);
+    if (index != -1) {
+        delete rootNode->takeAt(index);
+        if (!rootNode->size())
+            deleteNode(rootNode, rootNode->getParent());
+        if (updateHash)
+            updateDeckHash();
+        return true;
+    }
+    for (int i = 0; i < rootNode->size(); i++) {
+        InnerDecklistNode *inner = dynamic_cast<InnerDecklistNode *>(rootNode->at(i));
+        if (inner)
+            if (deleteNode(node, inner)) {
+                if (updateHash)
+                    updateDeckHash();
+                return true;
+            }
+    }
+    return false;
 }
 
 void DeckList::updateDeckHash()
 {
-	QStringList cardList;
-	for (int i = 0; i < root->size(); i++) {
-		InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
-		for (int j = 0; j < node->size(); j++) {
-			DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
-			for (int k = 0; k < card->getNumber(); ++k)
-				cardList.append((node->getName() == "side" ? "SB:" : "") + card->getName().toLower());
-		}
-	}
-	cardList.sort();
-	QByteArray deckHashArray = QCryptographicHash::hash(cardList.join(";").toUtf8(), QCryptographicHash::Sha1);
-	quint64 number = (((quint64) (unsigned char) deckHashArray[0]) << 32)
-	                + (((quint64) (unsigned char) deckHashArray[1]) << 24)
-	                + (((quint64) (unsigned char) deckHashArray[2] << 16))
-	                + (((quint64) (unsigned char) deckHashArray[3]) << 8)
-	                + (quint64) (unsigned char) deckHashArray[4];
-	deckHash = QString::number(number, 32).rightJustified(8, '0');
-	
-	emit deckHashChanged();
+    QStringList cardList;
+    for (int i = 0; i < root->size(); i++) {
+        InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
+        for (int j = 0; j < node->size(); j++) {
+            DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
+            for (int k = 0; k < card->getNumber(); ++k)
+                cardList.append((node->getName() == "side" ? "SB:" : "") + card->getName().toLower());
+        }
+    }
+    cardList.sort();
+    QByteArray deckHashArray = QCryptographicHash::hash(cardList.join(";").toUtf8(), QCryptographicHash::Sha1);
+    quint64 number = (((quint64) (unsigned char) deckHashArray[0]) << 32)
+                    + (((quint64) (unsigned char) deckHashArray[1]) << 24)
+                    + (((quint64) (unsigned char) deckHashArray[2] << 16))
+                    + (((quint64) (unsigned char) deckHashArray[3]) << 8)
+                    + (quint64) (unsigned char) deckHashArray[4];
+    deckHash = QString::number(number, 32).rightJustified(8, '0');
+    
+    emit deckHashChanged();
 }

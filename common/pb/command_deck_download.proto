@@ -1,0 +1,9 @@
+import "session_commands.proto";
+
+message Command_DeckDownload {
+	extend SessionCommand {
+		optional Command_DeckDownload ext = 1012;
+	}
+	optional sint32 deck_id = 1 [default = -1];
+}
+ 

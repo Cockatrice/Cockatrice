@@ -2,11 +2,21 @@
 port=4747
 statusupdate=15000
 logfile=server.log
+name="My Cockatrice server"
 id=1
-threaded=0
+number_pools=1
+writelog=1
+logfilters=""
+
+[servernetwork]
+active=0
+port=14747
+ssl_cert=ssl_cert.pem
+ssl_key=ssl_key.pem
 
 [authentication]
 method=none
+regonly=0
 
 [database]
 type=none
@@ -17,15 +27,16 @@ user=servatrice
 password=foobar
 
 [rooms]
-size=1
-1\name="General room"
-1\description="Play anything here."
-1\autojoin=true
-1\joinmessage="This message is only here to show that rooms can have a join message."
-1\game_types\size=3
-1\game_types\1\name="GameType1"
-1\game_types\2\name="GameType2"
-1\game_types\3\name="GameType3"
+method=config
+roomlist\size=1
+roomlist\1\name="General room"
+roomlist\1\description="Play anything here."
+roomlist\1\autojoin=true
+roomlist\1\joinmessage="This message is only here to show that rooms can have a join message."
+roomlist\1\game_types\size=3
+roomlist\1\game_types\1\name="GameType1"
+roomlist\1\game_types\2\name="GameType2"
+roomlist\1\game_types\3\name="GameType3"
 
 [game]
 max_game_inactivity_time=120

@@ -1,0 +1,9 @@
+import "game_event_context.proto";
+
+message Context_DeckSelect {
+    extend GameEventContext {
+        optional Context_DeckSelect ext = 1002;
+    }
+    optional string deck_hash = 1;
+    optional int32 sideboard_size = 2 [default = -1];
+}

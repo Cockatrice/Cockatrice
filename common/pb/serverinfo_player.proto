@@ -1,0 +1,12 @@
+import "serverinfo_zone.proto";
+import "serverinfo_counter.proto";
+import "serverinfo_arrow.proto";
+import "serverinfo_playerproperties.proto";
+
+message ServerInfo_Player {
+	optional ServerInfo_PlayerProperties properties = 1;
+	optional string deck_list = 2;
+	repeated ServerInfo_Zone zone_list = 3;
+	repeated ServerInfo_Counter counter_list = 4;
+	repeated ServerInfo_Arrow arrow_list = 5;
+}

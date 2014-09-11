@@ -21,83 +21,107 @@
 #define SERVERGAME_H
 
 #include <QStringList>
-#include <QPointer>
 #include <QObject>
 #include <QMutex>
-#include "server_player.h"
-#include "protocol.h"
+#include <QSet>
+#include <QDateTime>
+#include <QMap>
+#include "server_response_containers.h"
+#include "pb/response.pb.h"
+#include "pb/serverinfo_game.pb.h"
 
 class QTimer;
+class GameEventContainer;
+class GameReplay;
 class Server_Room;
+class Server_Player;
 class ServerInfo_User;
+class ServerInfo_Player;
+class ServerInfo_Game;
+class Server_AbstractUserInterface;
+class Event_GameStateChanged;
 
 class Server_Game : public QObject {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	Server_Room *room;
-	int hostId;
-	ServerInfo_User *creatorInfo;
-	QMap<int, Server_Player *> players;
-	bool gameStarted;
-	int gameId;
-	QString description;
-	QString password;
-	int maxPlayers;
-	QList<int> gameTypes;
-	int activePlayer, activePhase;
-	bool onlyBuddies, onlyRegistered;
-	bool spectatorsAllowed;
-	bool spectatorsNeedPassword;
-	bool spectatorsCanTalk;
-	bool spectatorsSeeEverything;
-	int inactivityCounter;
-	int secondsElapsed;
-	QTimer *pingClock;
+    Server_Room *room;
+    int nextPlayerId;
+    int hostId;
+    ServerInfo_User *creatorInfo;
+    QMap<int, Server_Player *> players;
+    QSet<QString> allPlayersEver, allSpectatorsEver;
+    bool gameStarted;
+    bool gameClosed;
+    int gameId;
+    QString description;
+    QString password;
+    int maxPlayers;
+    QList<int> gameTypes;
+    int activePlayer, activePhase;
+    bool onlyBuddies, onlyRegistered;
+    bool spectatorsAllowed;
+    bool spectatorsNeedPassword;
+    bool spectatorsCanTalk;
+    bool spectatorsSeeEverything;
+    int inactivityCounter;
+    int startTimeOfThisGame, secondsElapsed;
+    bool firstGameStarted;
+    QDateTime startTime;
+    QTimer *pingClock;
+    QList<GameReplay *> replayList;
+    GameReplay *currentReplay;
+    
+    void createGameStateChangedEvent(Event_GameStateChanged *event, Server_Player *playerWhosAsking, bool omniscient, bool withUserInfo);
+    void sendGameStateToPlayers();
+    void storeGameInformation();
 signals:
-	void sigStartGameIfReady();
+    void sigStartGameIfReady();
+    void gameInfoChanged(ServerInfo_Game gameInfo);
 private slots:
-	void pingClockTimeout();
-	void doStartGameIfReady();
+    void pingClockTimeout();
+    void doStartGameIfReady();
 public:
-	mutable QMutex gameMutex;
-	Server_Game(Server_ProtocolHandler *_creator, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent);
-	~Server_Game();
-	ServerInfo_Game *getInfo() const;
-	int getHostId() const { return hostId; }
-	ServerInfo_User *getCreatorInfo() const { return creatorInfo; }
-	bool getGameStarted() const { return gameStarted; }
-	int getPlayerCount() const;
-	int getSpectatorCount() const;
-	const QMap<int, Server_Player *> &getPlayers() const { return players; }
-	Server_Player *getPlayer(int playerId) const { return players.value(playerId, 0); }
-	int getGameId() const { return gameId; }
-	QString getDescription() const { return description; }
-	QString getPassword() const { return password; }
-	int getMaxPlayers() const { return maxPlayers; }
-	bool getSpectatorsAllowed() const { return spectatorsAllowed; }
-	bool getSpectatorsNeedPassword() const { return spectatorsNeedPassword; }
-	bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
-	bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
-	ResponseCode checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions);
-	bool containsUser(const QString &userName) const;
-	Server_Player *addPlayer(Server_ProtocolHandler *handler, bool spectator, bool broadcastUpdate = true);
-	void removePlayer(Server_Player *player);
-	void removeArrowsToPlayer(Server_Player *player);
-	bool kickPlayer(int playerId);
-	void startGameIfReady();
-	void stopGameIfFinished();
-	int getActivePlayer() const { return activePlayer; }
-	int getActivePhase() const { return activePhase; }
-	void setActivePlayer(int _activePlayer);
-	void setActivePhase(int _activePhase);
-	void nextTurn();
-	void postConnectionStatusUpdate(Server_Player *player, bool connectionStatus);
+    mutable QMutex gameMutex;
+    Server_Game(const ServerInfo_User &_creatorInfo, int _gameId, const QString &_description, const QString &_password, int _maxPlayers, const QList<int> &_gameTypes, bool _onlyBuddies, bool _onlyRegistered, bool _spectatorsAllowed, bool _spectatorsNeedPassword, bool _spectatorsCanTalk, bool _spectatorsSeeEverything, Server_Room *parent);
+    ~Server_Game();
+    Server_Room *getRoom() const { return room; }
+    void getInfo(ServerInfo_Game &result) const;
+    int getHostId() const { return hostId; }
+    ServerInfo_User *getCreatorInfo() const { return creatorInfo; }
+    bool getGameStarted() const { return gameStarted; }
+    int getPlayerCount() const;
+    int getSpectatorCount() const;
+    const QMap<int, Server_Player *> &getPlayers() const { return players; }
+    int getGameId() const { return gameId; }
+    QString getDescription() const { return description; }
+    QString getPassword() const { return password; }
+    int getMaxPlayers() const { return maxPlayers; }
+    bool getSpectatorsAllowed() const { return spectatorsAllowed; }
+    bool getSpectatorsNeedPassword() const { return spectatorsNeedPassword; }
+    bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
+    bool getSpectatorsSeeEverything() const { return spectatorsSeeEverything; }
+    Response::ResponseCode checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions);
+    bool containsUser(const QString &userName) const;
+    void addPlayer(Server_AbstractUserInterface *userInterface, ResponseContainer &rc, bool spectator, bool broadcastUpdate = true);
+    void removePlayer(Server_Player *player);
+    void removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Player *player);
+    void unattachCards(GameEventStorage &ges, Server_Player *player);
+    bool kickPlayer(int playerId);
+    void startGameIfReady();
+    void stopGameIfFinished();
+    int getActivePlayer() const { return activePlayer; }
+    int getActivePhase() const { return activePhase; }
+    void setActivePlayer(int _activePlayer);
+    void setActivePhase(int _activePhase);
+    void nextTurn();
+    int getSecondsElapsed() const { return secondsElapsed; }
 
-	QList<ServerInfo_Player *> getGameState(Server_Player *playerWhosAsking) const;
-	void sendGameEvent(GameEvent *event, GameEventContext *context = 0, Server_Player *exclude = 0);
-	void sendGameEventContainer(GameEventContainer *cont, Server_Player *exclude = 0, bool excludeOmniscient = false);
-	void sendGameEventContainerOmniscient(GameEventContainer *cont, Server_Player *exclude = 0);
-	void sendGameEventToPlayer(Server_Player *player, GameEvent *event);
+    void createGameJoinedEvent(Server_Player *player, ResponseContainer &rc, bool resuming);
+    
+    GameEventContainer *prepareGameEvent(const ::google::protobuf::Message &gameEvent, int playerId, GameEventContext *context = 0);
+    GameEventContext prepareGameEventContext(const ::google::protobuf::Message &gameEventContext);
+    
+    void sendGameEventContainer(GameEventContainer *cont, GameEventStorageItem::EventRecipients recipients = GameEventStorageItem::SendToPrivate | GameEventStorageItem::SendToOthers, int privatePlayerId = -1);
 };
 
 #endif

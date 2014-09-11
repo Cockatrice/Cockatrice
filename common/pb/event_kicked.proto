@@ -1,0 +1,7 @@
+import "game_event.proto";
+
+message Event_Kicked {
+	extend GameEvent {
+		optional Event_Kicked ext = 1004;
+	}
+}

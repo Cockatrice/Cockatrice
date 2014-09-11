@@ -1,0 +1,8 @@
+import "session_event.proto";
+
+message Event_ServerMessage {
+	extend SessionEvent {
+		optional Event_ServerMessage ext = 1000;
+	}
+	optional string message = 1;
+}

@@ -5,6 +5,7 @@
 #include <QGroupBox>
 #include <QTreeWidgetItem>
 #include <QStyledItemDelegate>
+#include "user_level.h"
 
 class QTreeWidget;
 class ServerInfo_User;
@@ -15,74 +16,80 @@ class QCheckBox;
 class QSpinBox;
 class QRadioButton;
 class QPlainTextEdit;
-class ProtocolResponse;
+class Response;
+class CommandContainer;
+class UserContextMenu;
 
 class BanDialog : public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	QLabel *daysLabel, *hoursLabel, *minutesLabel;
-	QCheckBox *nameBanCheckBox, *ipBanCheckBox;
-	QLineEdit *nameBanEdit, *ipBanEdit;
-	QSpinBox *daysEdit, *hoursEdit, *minutesEdit;
-	QRadioButton *permanentRadio, *temporaryRadio;
-	QPlainTextEdit *reasonEdit;
+    QLabel *daysLabel, *hoursLabel, *minutesLabel;
+    QCheckBox *nameBanCheckBox, *ipBanCheckBox;
+    QLineEdit *nameBanEdit, *ipBanEdit;
+    QSpinBox *daysEdit, *hoursEdit, *minutesEdit;
+    QRadioButton *permanentRadio, *temporaryRadio;
+    QPlainTextEdit *reasonEdit, *visibleReasonEdit;
 private slots:
-	void okClicked();
-	void enableTemporaryEdits(bool enabled);
+    void okClicked();
+    void enableTemporaryEdits(bool enabled);
 public:
-	BanDialog(ServerInfo_User *info, QWidget *parent = 0);
-	QString getBanName() const;
-	QString getBanIP() const;
-	int getMinutes() const;
-	QString getReason() const;
+    BanDialog(const ServerInfo_User &info, QWidget *parent = 0);
+    QString getBanName() const;
+    QString getBanIP() const;
+    int getMinutes() const;
+    QString getReason() const;
+    QString getVisibleReason() const;
 };
 
 class UserListItemDelegate : public QStyledItemDelegate {
 public:
-	UserListItemDelegate(QObject *const parent);
-	bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
+    UserListItemDelegate(QObject *const parent);
+    bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
 };
 
 class UserListTWI : public QTreeWidgetItem {
+private:
+    ServerInfo_User userInfo;
 public:
-	UserListTWI();
-	bool operator<(const QTreeWidgetItem &other) const;
+    UserListTWI(const ServerInfo_User &_userInfo);
+    const ServerInfo_User &getUserInfo() const { return userInfo; }
+    void setUserInfo(const ServerInfo_User &_userInfo);
+    void setOnline(bool online);
+    bool operator<(const QTreeWidgetItem &other) const;
 };
 
 class UserList : public QGroupBox {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	enum UserListType { AllUsersList, RoomList, BuddyList, IgnoreList };
+    enum UserListType { AllUsersList, RoomList, BuddyList, IgnoreList };
 private:
-	TabSupervisor *tabSupervisor;
-	AbstractClient *client;
-	UserListType type;
-	QTreeWidget *userTree;
-	UserListItemDelegate *itemDelegate;
-	int onlineCount;
-	QString titleStr;
-	void updateCount();
-	void setUserOnline(QTreeWidgetItem *user, bool online);
+    QMap<QString, UserListTWI *> users;
+    TabSupervisor *tabSupervisor;
+    AbstractClient *client;
+    UserListType type;
+    QTreeWidget *userTree;
+    UserListItemDelegate *itemDelegate;
+    UserContextMenu *userContextMenu;
+    int onlineCount;
+    QString titleStr;
+    void updateCount();
 private slots:
-	void userClicked(QTreeWidgetItem *item, int column);
-	void banUser_processUserInfoResponse(ProtocolResponse *resp);
-	void banUser_dialogFinished();
-	void gamesOfUserReceived(ProtocolResponse *resp);
+    void userClicked(QTreeWidgetItem *item, int column);
 signals:
-	void openMessageDialog(const QString &userName, bool focus);
-	void addBuddy(const QString &userName);
-	void removeBuddy(const QString &userName);
-	void addIgnore(const QString &userName);
-	void removeIgnore(const QString &userName);
+    void openMessageDialog(const QString &userName, bool focus);
+    void addBuddy(const QString &userName);
+    void removeBuddy(const QString &userName);
+    void addIgnore(const QString &userName);
+    void removeIgnore(const QString &userName);
 public:
-	UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserListType _type, QWidget *parent = 0);
-	void retranslateUi();
-	void processUserInfo(ServerInfo_User *user, bool online);
-	bool deleteUser(const QString &userName);
-	void setUserOnline(const QString &userName, bool online);
-	bool userInList(const QString &userName) const;
-	void showContextMenu(const QPoint &pos, const QModelIndex &index);
-	void sortItems();
+    UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserListType _type, QWidget *parent = 0);
+    void retranslateUi();
+    void processUserInfo(const ServerInfo_User &user, bool online);
+    bool deleteUser(const QString &userName);
+    void setUserOnline(const QString &userName, bool online);
+    const QMap<QString, UserListTWI *> &getUsers() const { return users; }
+    void showContextMenu(const QPoint &pos, const QModelIndex &index);
+    void sortItems();
 };
 
 #endif

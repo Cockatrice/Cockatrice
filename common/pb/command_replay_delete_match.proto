@@ -1,0 +1,8 @@
+import "session_commands.proto";
+
+message Command_ReplayDeleteMatch {
+	extend SessionCommand {
+		optional Command_ReplayDeleteMatch ext = 1103;
+	}
+	optional sint32 game_id = 1 [default = -1];
+}

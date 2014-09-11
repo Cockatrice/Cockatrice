@@ -1,0 +1,8 @@
+import "game_event.proto";
+
+message Event_GameSay {
+	extend GameEvent {
+		optional Event_GameSay ext = 1009;
+	}
+	optional string message = 1;
+}

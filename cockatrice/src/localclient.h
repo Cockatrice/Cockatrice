@@ -6,19 +6,16 @@
 class LocalServerInterface;
 
 class LocalClient : public AbstractClient {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	LocalServerInterface *lsi;
+    LocalServerInterface *lsi;
 public:
-	LocalClient(LocalServerInterface *_lsi, const QString &_playerName, QObject *parent = 0);
-	~LocalClient();
-	
-	void sendCommandContainer(CommandContainer *cont);
-	
+    LocalClient(LocalServerInterface *_lsi, const QString &_playerName, QObject *parent = 0);
+    ~LocalClient();
+    
+    void sendCommandContainer(const CommandContainer &cont);
 private slots:
-	void itemFromServer(ProtocolItem *item);
-signals:
-	void itemToServer(ProtocolItem *item);
+    void itemFromServer(const ServerMessage &item);
 };
 
 #endif

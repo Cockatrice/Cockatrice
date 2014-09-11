@@ -27,11 +27,26 @@
 
 class QTcpSocket;
 class Servatrice;
-class QXmlStreamReader;
-class QXmlStreamWriter;
+class Servatrice_DatabaseInterface;
 class DeckList;
-class TopLevelProtocolItem;
-class QByteArray;
+class ServerInfo_DeckStorage_Folder;
+
+class Command_AddToList;
+class Command_RemoveFromList;
+class Command_DeckList;
+class Command_DeckNewDir;
+class Command_DeckDelDir;
+class Command_DeckDel;
+class Command_DeckDownload;
+class Command_DeckUpload;
+class Command_ReplayList;
+class Command_ReplayDownload;
+class Command_ReplayModifyMatch;
+class Command_ReplayDeleteMatch;
+
+class Command_BanFromServer;
+class Command_UpdateServerMessage;
+class Command_ShutdownServer;
 
 class ServerSocketInterface : public Server_ProtocolHandler
 {
@@ -39,46 +54,58 @@ class ServerSocketInterface : public Server_ProtocolHandler
 private slots:
 	void readClient();
 	void catchSocketError(QAbstractSocket::SocketError socketError);
-	void processProtocolItem(ProtocolItem *item);
-	void flushXmlBuffer();
+	void flushOutputQueue();
 signals:
-	void xmlBufferChanged();
+	void outputQueueChanged();
+protected:
+	void logDebugMessage(const QString &message);
 private:
-	QMutex xmlBufferMutex;
+	QMutex outputQueueMutex;
 	Servatrice *servatrice;
+	Servatrice_DatabaseInterface *sqlInterface;
 	QTcpSocket *socket;
-	QXmlStreamWriter *xmlWriter;
-	QXmlStreamReader *xmlReader;
-	QString xmlBuffer;
-	TopLevelProtocolItem *topLevelItem;
-	bool compressionSupport;
-	int getUserIdInDB(const QString &name) const;
-
-	ResponseCode cmdAddToList(Command_AddToList *cmd, CommandContainer *cont);
-	ResponseCode cmdRemoveFromList(Command_RemoveFromList *cmd, CommandContainer *cont);
+	
+	QByteArray inputBuffer;
+	QList<ServerMessage> outputQueue;
+	bool messageInProgress;
+	bool handshakeStarted;
+	int messageLength;
+	
+	Response::ResponseCode cmdAddToList(const Command_AddToList &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, ResponseContainer &rc);
 	int getDeckPathId(int basePathId, QStringList path);
 	int getDeckPathId(const QString &path);
-	bool deckListHelper(DeckList_Directory *folder);
-	ResponseCode cmdDeckList(Command_DeckList *cmd, CommandContainer *cont);
-	ResponseCode cmdDeckNewDir(Command_DeckNewDir *cmd, CommandContainer *cont);
+	bool deckListHelper(int folderId, ServerInfo_DeckStorage_Folder *folder);
+	Response::ResponseCode cmdDeckList(const Command_DeckList &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, ResponseContainer &rc);
 	void deckDelDirHelper(int basePathId);
-	ResponseCode cmdDeckDelDir(Command_DeckDelDir *cmd, CommandContainer *cont);
-	ResponseCode cmdDeckDel(Command_DeckDel *cmd, CommandContainer *cont);
-	ResponseCode cmdDeckUpload(Command_DeckUpload *cmd, CommandContainer *cont);
+	Response::ResponseCode cmdDeckDelDir(const Command_DeckDelDir &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdDeckDel(const Command_DeckDel &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdDeckUpload(const Command_DeckUpload &cmd, ResponseContainer &rc);
 	DeckList *getDeckFromDatabase(int deckId);
-	ResponseCode cmdDeckDownload(Command_DeckDownload *cmd, CommandContainer *cont);
-	ResponseCode cmdBanFromServer(Command_BanFromServer *cmd, CommandContainer *cont);
-	ResponseCode cmdShutdownServer(Command_ShutdownServer *cmd, CommandContainer *cont);
-	ResponseCode cmdUpdateServerMessage(Command_UpdateServerMessage *cmd, CommandContainer *cont);
-protected:
-	bool getCompressionSupport() const { return compressionSupport; }
+	Response::ResponseCode cmdDeckDownload(const Command_DeckDownload &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdReplayList(const Command_ReplayList &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdReplayDownload(const Command_ReplayDownload &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdReplayModifyMatch(const Command_ReplayModifyMatch &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdReplayDeleteMatch(const Command_ReplayDeleteMatch &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdShutdownServer(const Command_ShutdownServer &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, ResponseContainer &rc);
+	
+	Response::ResponseCode processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc);
+	Response::ResponseCode processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);
+	Response::ResponseCode processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc);
 public:
-	ServerSocketInterface(Servatrice *_server, QTcpSocket *_socket, QObject *parent = 0);
+	ServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QObject *parent = 0);
 	~ServerSocketInterface();
+	void initSessionDeprecated();
+	bool initSession();
 	QHostAddress getPeerAddress() const { return socket->peerAddress(); }
 	QString getAddress() const { return socket->peerAddress().toString(); }
 
-	void sendProtocolItem(ProtocolItem *item, bool deleteItem = true);
+	void transmitProtocolItem(const ServerMessage &item);
+public slots:
+	void initConnection(int socketDescriptor);
 };
 
 #endif

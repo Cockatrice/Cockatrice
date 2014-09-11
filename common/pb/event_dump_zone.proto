@@ -1,0 +1,10 @@
+import "game_event.proto";
+
+message Event_DumpZone {
+	extend GameEvent {
+		optional Event_DumpZone ext = 2018;
+	}
+	optional sint32 zone_owner_id = 1;
+	optional string zone_name = 2;
+	optional sint32 number_cards = 3;
+}

@@ -1,0 +1,10 @@
+message RoomEvent {
+	enum RoomEventType {
+		LEAVE_ROOM = 1000;
+		JOIN_ROOM = 1001;
+		ROOM_SAY = 1002;
+		LIST_GAMES = 1003;
+	}
+	optional sint32 room_id = 1;
+	extensions 100 to max;
+}

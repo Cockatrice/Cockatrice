@@ -1,0 +1,7 @@
+import "game_event_context.proto";
+
+message Context_Concede {
+	extend GameEventContext {
+		optional Context_Concede ext = 1001;
+	}
+}

@@ -1,0 +1,10 @@
+import "game_commands.proto";
+message Command_IncCardCounter {
+	extend GameCommand {
+		optional Command_IncCardCounter ext = 1015;
+	}
+	optional string zone = 1;
+	optional sint32 card_id = 2 [default = -1];
+	optional sint32 counter_id = 3 [default = -1];
+	optional sint32 counter_delta = 4;
+}

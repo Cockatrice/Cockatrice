@@ -14,46 +14,56 @@ class QResizeEvent;
 class QMouseEvent;
 
 class CardInfoWidget : public QFrame {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	enum ResizeMode { ModeDeckEditor, ModeGameTab, ModePopUp };
+    enum ResizeMode { ModeDeckEditor, ModeGameTab, ModePopUp };
 
 private:
-	int pixmapWidth;
-	qreal cardHeightOffset;
-	qreal aspectRatio;
-	int minimized; // 0 - card, 1 - oracle only, 2 - full
-	ResizeMode mode;
+    int pixmapWidth;
+    qreal cardHeightOffset;
+    qreal aspectRatio;
+    // XXX: Why isn't this an eunm?
+    int minimized; // 0 - card, 1 - oracle only, 2 - full
+    ResizeMode mode;
 
-	QComboBox *dropList;
-	QLabel *cardPicture;
-	QLabel *nameLabel1, *nameLabel2;
-	QLabel *manacostLabel1, *manacostLabel2;
-	QLabel *cardtypeLabel1, *cardtypeLabel2;
-	QLabel *powtoughLabel1, *powtoughLabel2;
-	QTextEdit *textLabel;
+    QComboBox *dropList;
+    QLabel *cardPicture;
+    QLabel *nameLabel1, *nameLabel2;
+    QLabel *manacostLabel1, *manacostLabel2;
+    QLabel *cardtypeLabel1, *cardtypeLabel2;
+    QLabel *powtoughLabel1, *powtoughLabel2;
+    QLabel *loyaltyLabel1, *loyaltyLabel2;
+    QTextEdit *textLabel;
 
-	CardInfo *info;
-	void setMinimized(int _minimized);
+    bool shouldShowPowTough();
+    bool shouldShowLoyalty();
+
+    CardInfo *info;
+    void setMinimized(int _minimized);
+
+    /*
+     * Wrapper around db->getCardBySimpleName.
+     */
+    CardInfo *getCard(const QString &cardName = QString());
 
 public:
-	CardInfoWidget(ResizeMode _mode, QWidget *parent = 0, Qt::WindowFlags f = 0);
-	void retranslateUi();
-	QString getCardName() const;
+    CardInfoWidget(ResizeMode _mode, const QString &cardName = QString(), QWidget *parent = 0, Qt::WindowFlags f = 0);
+    void retranslateUi();
+    QString getCardName() const;
 
 public slots:
-	void setCard(CardInfo *card);
-	void setCard(const QString &cardName);
-	void setCard(AbstractCardItem *card);
+    void setCard(CardInfo *card);
+    void setCard(const QString &cardName);
+    void setCard(AbstractCardItem *card);
 
 private slots:
-	void clear();
-	void updatePixmap();
-	void minimizeClicked(int newMinimized);
+    void clear();
+    void updatePixmap();
+    void minimizeClicked(int newMinimized);
 
 protected:
-	void resizeEvent(QResizeEvent *event);
+    void resizeEvent(QResizeEvent *event);
 };
 
 #endif

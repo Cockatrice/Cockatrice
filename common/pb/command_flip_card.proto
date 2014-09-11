@@ -1,0 +1,11 @@
+import "game_commands.proto";
+message Command_FlipCard {
+	extend GameCommand {
+		optional Command_FlipCard ext = 1008;
+	}
+	optional string zone = 1;
+	optional sint32 card_id = 2 [default = -1];
+	optional bool face_down = 3;
+}
+
+

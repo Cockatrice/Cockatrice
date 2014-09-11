@@ -1,47 +1,40 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QDialogButtonBox>
 #include "remotedecklist_treewidget.h"
 #include "dlg_load_remote_deck.h"
 #include "main.h"
 
 DlgLoadRemoteDeck::DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent)
-	: QDialog(parent), client(_client)
+    : QDialog(parent), client(_client)
 {
-	dirView = new RemoteDeckList_TreeWidget(client);
+    dirView = new RemoteDeckList_TreeWidget(client);
+    
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-	okButton = new QPushButton(tr("O&K"));
-	okButton->setDefault(true);
-	okButton->setAutoDefault(true);
-	okButton->setEnabled(false);
-	cancelButton = new QPushButton(tr("&Cancel"));
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(dirView);
+    mainLayout->addWidget(buttonBox);
 
-	QHBoxLayout *buttonLayout = new QHBoxLayout;
-	buttonLayout->addStretch();
-	buttonLayout->addWidget(okButton);
-	buttonLayout->addWidget(cancelButton);
+    setLayout(mainLayout);
 
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addWidget(dirView);
-	mainLayout->addLayout(buttonLayout);
+    setWindowTitle(tr("Load deck"));
+    setMinimumWidth(sizeHint().width());
+    resize(400, 600);
 
-	setLayout(mainLayout);
-
-	setWindowTitle(tr("Load deck"));
-	setMinimumWidth(sizeHint().width());
-	resize(300, 500);
-
-	connect(dirView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(currentItemChanged(const QModelIndex &, const QModelIndex &)));
-	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
-	connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(dirView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(currentItemChanged(const QModelIndex &, const QModelIndex &)));
 }
 
 void DlgLoadRemoteDeck::currentItemChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
-	okButton->setEnabled(dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(dirView->getNode(current)));
+    buttonBox->button(QDialogButtonBox::Ok)->setEnabled(dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(dirView->getNode(current)));
 }
 
 int DlgLoadRemoteDeck::getDeckId() const
 {
-	return dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(dirView->getNode(dirView->selectionModel()->currentIndex()))->getId();
+    return dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(dirView->getNode(dirView->selectionModel()->currentIndex()))->getId();
 }

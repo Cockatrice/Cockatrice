@@ -1,0 +1,12 @@
+import "game_commands.proto";
+import "color.proto";
+
+message Command_CreateCounter {
+	extend GameCommand {
+		optional Command_CreateCounter ext = 1019;
+	}
+	optional string counter_name = 1;
+	optional color counter_color = 2;
+	optional uint32 radius = 3;
+	optional sint32 value = 4;
+}

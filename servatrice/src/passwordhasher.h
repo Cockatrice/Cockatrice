@@ -5,6 +5,7 @@
 
 class PasswordHasher {
 public:
+	static void initialize();
 	static QString computeHash(const QString &password, const QString &salt);
 };
 
