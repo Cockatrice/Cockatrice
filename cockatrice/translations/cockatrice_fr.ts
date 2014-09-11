@@ -5690,6 +5690,12 @@ Entrez 0 pour une durée illimitée du ban.</translation>
         <translation type="obsolete">&amp;Commentaires:</translation>
     </message>
     <message>
+        <location filename="../src/window_deckeditor.cpp" line="118"/>
+        <source>Hash:</source>
+        <translation>Empreinte:</translation>
+    </message>
+    <message>
+        <location filename="../src/window_deckeditor.cpp" line="132"/>
         <source>&amp;Update prices</source>
         <translation type="obsolete">Mettre à &amp;jour les prix</translation>
     </message>
