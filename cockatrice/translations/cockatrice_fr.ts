@@ -47,7 +47,7 @@
     </message>
     <message>
         <source>Path to stack background:</source>
-        <translation>Chemin pour l&apos;image de fond de la pile:</translation>
+        <translation>Chemin vers l&apos;image de fond de la pile:</translation>
     </message>
     <message>
         <source>Path to table background:</source>
