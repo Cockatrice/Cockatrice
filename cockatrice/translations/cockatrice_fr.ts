@@ -4453,7 +4453,7 @@ Entrez 0 pour une durée illimitée du ban.</translation>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="118"/>
         <source>Hash:</source>
-        <translation type="unfinished"></translation>
+        <translation>Empreinte:</translation>
     </message>
     <message>
         <location filename="../src/window_deckeditor.cpp" line="132"/>
