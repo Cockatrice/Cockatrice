@@ -7,6 +7,7 @@
 #endif
 #include <QAbstractButton>
 #include <QCheckBox>
+#include <QDir>
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QLabel>
@@ -403,15 +404,13 @@ bool SaveSetsPage::validatePage()
         QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
     QSettings* settings = new QSettings(this);
-    QString savePath = settings->value("paths/carddatabase").toString();
-    if (savePath.isEmpty()) {
-        QDir().mkpath(dataDir);
-    }
+    QString defaultPath = settings->value("paths/carddatabase").toString();
     QString windowName = tr("Save card database");
     QString fileType = tr("XML; card database (*.xml)");
+
     do {
         QString fileName;
-        if (savePath.isEmpty()) {
+        if (defaultPath.isEmpty()) {
             if (defaultPathCheckBox->isChecked())
                 fileName = dataDir + "/cards.xml";
             else
@@ -420,11 +419,17 @@ bool SaveSetsPage::validatePage()
         }
         else {
             if (defaultPathCheckBox->isChecked())
-                fileName = savePath;
+                fileName = defaultPath;
             else
-                fileName = QFileDialog::getSaveFileName(this, windowName, savePath, fileType);
+                fileName = QFileDialog::getSaveFileName(this, windowName, defaultPath, fileType);
         }
         if (fileName.isEmpty()) {
+            return false;
+        }
+
+        QFileInfo fi(fileName);
+        QDir fileDir(fi.path());
+        if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
             return false;
         }
         if (wizard()->importer->saveToFile(fileName))

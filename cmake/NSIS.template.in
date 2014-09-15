@@ -51,13 +51,15 @@ Section "Application" SecApplication
 SectionEnd
 
 Section "Update configuration" SecUpdateConfig
-	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "carddatabase" "$APPDATA\Cockatrice\cards.xml"
-	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "decks" "$APPDATA\Cockatrice\decks"
-	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "pics" "$APPDATA\Cockatrice\pics"
-	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\sound" "path" "$APPDATA\Cockatrice\sounds"
+	SetShellVarContext current
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "carddatabase" "$LOCALAPPDATA\Cockatrice\cards.xml"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "decks" "$LOCALAPPDATA\Cockatrice\decks"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "pics" "$LOCALAPPDATA\Cockatrice\pics"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\sound" "path" "$LOCALAPPDATA\Cockatrice\sounds"
 SectionEnd
 
 Section "Start menu item" SecStartMenu
+	SetShellVarContext all
 	createDirectory "$SMPROGRAMS\Cockatrice"
 	createShortCut "$SMPROGRAMS\Cockatrice\Cockatrice.lnk" "$INSTDIR\cockatrice.exe" '--debug-output'
 	createShortCut "$SMPROGRAMS\Cockatrice\Oracle.lnk" "$INSTDIR\oracle.exe"
@@ -65,7 +67,7 @@ Section "Start menu item" SecStartMenu
 SectionEnd
 
 Section Uninstall
-SetShellVarContext all
+	SetShellVarContext all
 	RMDir /r "$INSTDIR\zonebg"
 	RMDir /r "$INSTDIR\plugins"
 	RMDir /r "$INSTDIR\sounds"
@@ -83,8 +85,10 @@ SetShellVarContext all
 
 	RMDir "$SMPROGRAMS\Cockatrice"
 
-	DeleteRegKey HKCU "Software\Cockatrice"
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
+
+	SetShellVarContext current
+	DeleteRegKey HKCU "Software\Cockatrice"
 SectionEnd
 
 LangString DESC_SecApplication ${LANG_ENGLISH} "Cockatrice program files"
