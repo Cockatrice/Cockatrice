@@ -100,7 +100,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     : QObject(_parent),
       game(_parent),
       shortcutsActive(false),
-      defaultNumberTopCards(3),
+      defaultNumberTopCards(1),
       lastTokenDestroy(true),
       id(_id),
       active(false),
