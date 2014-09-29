@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="fr_FR">
+<TS version="2.0" language="fr_FR">
 <context>
     <name>AbstractCounter</name>
     <message>
@@ -43,23 +43,23 @@
     </message>
     <message>
         <source>Path to hand background:</source>
-        <translation type="vanished">Chemin pour les images de fond de main:</translation>
+        <translation type="obsolete">Chemin pour les images de fond de main:</translation>
     </message>
     <message>
         <source>Path to stack background:</source>
-        <translation type="vanished">Chemin pour les images de fond de pile:</translation>
+        <translation type="obsolete">Chemin pour les images de fond de pile:</translation>
     </message>
     <message>
         <source>Path to table background:</source>
-        <translation type="vanished">Chemin pour les images d&apos;arrière-plan:</translation>
+        <translation type="obsolete">Chemin pour les images d&apos;arrière-plan:</translation>
     </message>
     <message>
         <source>Path to player info background:</source>
-        <translation type="vanished">Chemin pour les images de fond d&apos;affichage d&apos;informations:</translation>
+        <translation type="obsolete">Chemin pour les images de fond d&apos;affichage d&apos;informations:</translation>
     </message>
     <message>
         <source>Path to picture of card back:</source>
-        <translation type="vanished">Chemin pour les images de dos des cartes:</translation>
+        <translation type="obsolete">Chemin pour les images de dos des cartes:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="366"/>
@@ -1173,7 +1173,7 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     <name>DeckEditorSettingsPage</name>
     <message>
         <source>Enable &amp;price tag feature (using data from blacklotusproject.com)</source>
-        <translation type="vanished">Activer le guide de &amp;prix des cartes (source : blacklotusproject.com)</translation>
+        <translation type="obsolete">Activer le guide de &amp;prix des cartes (source : blacklotusproject.com)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="600"/>
@@ -1319,28 +1319,33 @@ Cette information ne sera consultable que par les modérateurs.</translation>
 <context>
     <name>DlgConnect</name>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="15"/>
+        <location filename="../src/dlg_connect.cpp" line="17"/>
         <source>&amp;Host:</source>
         <translation>&amp;Hôte:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="19"/>
+        <location filename="../src/dlg_connect.cpp" line="21"/>
         <source>&amp;Port:</source>
         <translation>&amp;Port:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="23"/>
+        <location filename="../src/dlg_connect.cpp" line="25"/>
         <source>Player &amp;name:</source>
         <translation>&amp;Nom du joueur:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="27"/>
+        <location filename="../src/dlg_connect.cpp" line="29"/>
         <source>P&amp;assword:</source>
         <translation>Mot de p&amp;asse:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="32"/>
+        <location filename="../src/dlg_connect.cpp" line="34"/>
         <source>&amp;Save password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_connect.cpp" line="37"/>
+        <source>A&amp;uto connect at start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1352,7 +1357,7 @@ Cette information ne sera consultable que par les modérateurs.</translation>
         <translation type="obsolete">&amp;Annuler</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="55"/>
+        <location filename="../src/dlg_connect.cpp" line="71"/>
         <source>Connect to server</source>
         <translation>Connexion au serveur</translation>
     </message>
@@ -1757,7 +1762,7 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     </message>
     <message>
         <source>Your card database is invalid. Would you like to go back and set the correct path?</source>
-        <translation type="vanished">Votre base de carte est invalide. Souhaitez-vous redéfinir le chemin d&apos;accès?</translation>
+        <translation type="obsolete">Votre base de carte est invalide. Souhaitez-vous redéfinir le chemin d&apos;accès?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="776"/>
@@ -2152,7 +2157,7 @@ Would you like to change your database location setting?</source>
     </message>
     <message>
         <source>Path to card database:</source>
-        <translation type="vanished">Chemin vers la base de cartes:</translation>
+        <translation type="obsolete">Chemin vers la base de cartes:</translation>
     </message>
 </context>
 <context>
@@ -2248,7 +2253,7 @@ Would you like to change your database location setting?</source>
     </message>
     <message>
         <source>Invalid login data.</source>
-        <translation type="vanished">Information de connexion érronée.</translation>
+        <translation type="obsolete">Information de connexion érronée.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="250"/>
@@ -2331,7 +2336,7 @@ Raison de la fermeture : %1</numerusform>
     </message>
     <message>
         <source>Czech:</source>
-        <translation type="vanished">Tchèque :</translation>
+        <translation type="obsolete">Tchèque :</translation>
     </message>
     <message>
         <source>Slovak:</source>
@@ -2980,12 +2985,12 @@ La version la plus récente est %1, l&apos;ancienne version est %2.</translation
     <message>
         <source>%1 has loaded a deck (%2).</source>
         <comment>female</comment>
-        <translation type="vanished">%1 a chargé le deck %2.</translation>
+        <translation type="obsolete">%1 a chargé le deck %2.</translation>
     </message>
     <message>
         <source>%1 has loaded a deck (%2).</source>
         <comment>male</comment>
-        <translation type="vanished">%1 a chargé le deck %2.</translation>
+        <translation type="obsolete">%1 a chargé le deck %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="93"/>
@@ -4769,11 +4774,11 @@ La version la plus récente est %1, l&apos;ancienne version est %2.</translation
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="vanished">&amp;OK</translation>
+        <translation type="obsolete">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="vanished">&amp;Annuler</translation>
+        <translation type="obsolete">&amp;Annuler</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="40"/>
@@ -4820,7 +4825,7 @@ La version la plus récente est %1, l&apos;ancienne version est %2.</translation
     </message>
     <message>
         <source>Administration</source>
-        <translation type="vanished">Administration</translation>
+        <translation type="obsolete">Administration</translation>
     </message>
 </context>
 <context>
@@ -5148,7 +5153,7 @@ Entrez un nom s&apos;il vous plaît:</translation>
     </message>
     <message>
         <source>Deck storage</source>
-        <translation type="vanished">Stockage de deck</translation>
+        <translation type="obsolete">Stockage de deck</translation>
     </message>
 </context>
 <context>
@@ -5442,14 +5447,14 @@ Entrez un nom s&apos;il vous plaît:</translation>
     <name>TabServer</name>
     <message>
         <source>Server</source>
-        <translation type="vanished">Serveur</translation>
+        <translation type="obsolete">Serveur</translation>
     </message>
 </context>
 <context>
     <name>TabUserLists</name>
     <message>
         <source>User lists</source>
-        <translation type="vanished">Listes de l&apos;utilisateur</translation>
+        <translation type="obsolete">Listes de l&apos;utilisateur</translation>
     </message>
     <message>
         <location filename="../src/tab_userlists.cpp" line="48"/>

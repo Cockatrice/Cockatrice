@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="cs_CZ">
+<TS version="2.0" language="cs_CZ">
 <context>
     <name>AbstractCounter</name>
     <message>
@@ -43,23 +43,23 @@
     </message>
     <message>
         <source>Path to hand background:</source>
-        <translation type="vanished">Cesta k pozadí ruky:</translation>
+        <translation type="obsolete">Cesta k pozadí ruky:</translation>
     </message>
     <message>
         <source>Path to stack background:</source>
-        <translation type="vanished">Cesta k pozadí stacku:</translation>
+        <translation type="obsolete">Cesta k pozadí stacku:</translation>
     </message>
     <message>
         <source>Path to table background:</source>
-        <translation type="vanished">Cesta k pozadí stolu:</translation>
+        <translation type="obsolete">Cesta k pozadí stolu:</translation>
     </message>
     <message>
         <source>Path to player info background:</source>
-        <translation type="vanished">Cesta k pozadí informací o uživateli:</translation>
+        <translation type="obsolete">Cesta k pozadí informací o uživateli:</translation>
     </message>
     <message>
         <source>Path to picture of card back:</source>
-        <translation type="vanished">Cesta k rubu karet:</translation>
+        <translation type="obsolete">Cesta k rubu karet:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="366"/>
@@ -1063,7 +1063,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <name>DeckEditorSettingsPage</name>
     <message>
         <source>Enable &amp;price tag feature (using data from blacklotusproject.com)</source>
-        <translation type="vanished">&amp;Povolit zobrazovaní cen (použijí se data z blacklotusproject.com)</translation>
+        <translation type="obsolete">&amp;Povolit zobrazovaní cen (použijí se data z blacklotusproject.com)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="600"/>
@@ -1202,28 +1202,33 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DlgConnect</name>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="15"/>
+        <location filename="../src/dlg_connect.cpp" line="17"/>
         <source>&amp;Host:</source>
         <translation>&amp;Hostitel:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="19"/>
+        <location filename="../src/dlg_connect.cpp" line="21"/>
         <source>&amp;Port:</source>
         <translation>&amp;Port:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="23"/>
+        <location filename="../src/dlg_connect.cpp" line="25"/>
         <source>Player &amp;name:</source>
         <translation>Jméno &amp;hráče:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="27"/>
+        <location filename="../src/dlg_connect.cpp" line="29"/>
         <source>P&amp;assword:</source>
         <translation>H&amp;eslo:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="32"/>
+        <location filename="../src/dlg_connect.cpp" line="34"/>
         <source>&amp;Save password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_connect.cpp" line="37"/>
+        <source>A&amp;uto connect at start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1235,7 +1240,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation type="obsolete">&amp;Zrušit</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="55"/>
+        <location filename="../src/dlg_connect.cpp" line="71"/>
         <source>Connect to server</source>
         <translation>Připojit k serveru</translation>
     </message>
@@ -1636,7 +1641,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     </message>
     <message>
         <source>Your card database is invalid. Would you like to go back and set the correct path?</source>
-        <translation type="vanished">Cesta k databázi je neplatná. Chcete se vrátit a nastavit správnou?</translation>
+        <translation type="obsolete">Cesta k databázi je neplatná. Chcete se vrátit a nastavit správnou?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="776"/>
@@ -2022,7 +2027,7 @@ Would you like to change your database location setting?</source>
     </message>
     <message>
         <source>Path to card database:</source>
-        <translation type="vanished">Karetní databáze:</translation>
+        <translation type="obsolete">Karetní databáze:</translation>
     </message>
 </context>
 <context>
@@ -2141,7 +2146,7 @@ Reason for shutdown: %1</source>
     </message>
     <message>
         <source>Czech:</source>
-        <translation type="vanished">Čeština:</translation>
+        <translation type="obsolete">Čeština:</translation>
     </message>
     <message>
         <source>Slovak:</source>
@@ -2204,7 +2209,7 @@ Reason for shutdown: %1</source>
     </message>
     <message>
         <source>Invalid login data.</source>
-        <translation type="vanished">Nesprávné údaje uživatele.</translation>
+        <translation type="obsolete">Nesprávné údaje uživatele.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="242"/>
@@ -2518,12 +2523,12 @@ Lokální verze je %1, verze serveru je %2.</translation>
     <message>
         <source>%1 has loaded a deck (%2).</source>
         <comment>female</comment>
-        <translation type="vanished">%1 nahrál balíček %2.</translation>
+        <translation type="obsolete">%1 nahrál balíček %2.</translation>
     </message>
     <message>
         <source>%1 has loaded a deck (%2).</source>
         <comment>male</comment>
-        <translation type="vanished">%1 nahrál balíček %2.</translation>
+        <translation type="obsolete">%1 nahrál balíček %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="93"/>
@@ -4624,7 +4629,7 @@ Lokální verze je %1, verze serveru je %2.</translation>
     </message>
     <message>
         <source>Administration</source>
-        <translation type="vanished">Administrace</translation>
+        <translation type="obsolete">Administrace</translation>
     </message>
 </context>
 <context>
@@ -4933,7 +4938,7 @@ Prosím vložte jméno:</translation>
     </message>
     <message>
         <source>Deck storage</source>
-        <translation type="vanished">Uložiště balíčků</translation>
+        <translation type="obsolete">Uložiště balíčků</translation>
     </message>
 </context>
 <context>
@@ -5218,14 +5223,14 @@ Prosím vložte jméno:</translation>
     <name>TabServer</name>
     <message>
         <source>Server</source>
-        <translation type="vanished">Server</translation>
+        <translation type="obsolete">Server</translation>
     </message>
 </context>
 <context>
     <name>TabUserLists</name>
     <message>
         <source>User lists</source>
-        <translation type="vanished">Seznam uživatelů</translation>
+        <translation type="obsolete">Seznam uživatelů</translation>
     </message>
     <message>
         <location filename="../src/tab_userlists.cpp" line="48"/>
