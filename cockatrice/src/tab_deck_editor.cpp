@@ -141,6 +141,8 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 #endif
     deckView->installEventFilter(&deckViewKeySignals);
     connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
+    connect(deckView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actSwapCard()));
+    connect(&deckViewKeySignals, SIGNAL(onS()), this, SLOT(actSwapCard()));
     connect(&deckViewKeySignals, SIGNAL(onEnter()), this, SLOT(actIncrement()));
     connect(&deckViewKeySignals, SIGNAL(onCtrlAltEqual()), this, SLOT(actIncrement()));
     connect(&deckViewKeySignals, SIGNAL(onCtrlAltMinus()), this, SLOT(actDecrement()));
@@ -566,6 +568,27 @@ void TabDeckEditor::addCardHelper(QString zoneName)
         zoneName = "tokens";
 
     QModelIndex newCardIndex = deckModel->addCard(info->getName(), zoneName);
+    recursiveExpand(newCardIndex);
+    deckView->setCurrentIndex(newCardIndex);
+    setModified(true);
+}
+
+void TabDeckEditor::actSwapCard()
+{
+    const QModelIndex currentIndex = deckView->selectionModel()->currentIndex();
+    if (!currentIndex.isValid())
+        return;
+    const QString cardName = currentIndex.sibling(currentIndex.row(), 1).data().toString();
+    const QModelIndex gparent = currentIndex.parent().parent();
+    if (!gparent.isValid())
+            return;
+
+    const QString zoneName = gparent.sibling(gparent.row(), 1).data().toString();
+    actDecrement();
+
+    const QString otherZoneName = zoneName == "Maindeck" ? "side" : "main";
+
+    QModelIndex newCardIndex = deckModel->addCard(cardName, otherZoneName);
     recursiveExpand(newCardIndex);
     deckView->setCurrentIndex(newCardIndex);
     setModified(true);
