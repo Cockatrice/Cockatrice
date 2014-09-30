@@ -57,6 +57,10 @@ bool KeySignals::eventFilter(QObject * /*object*/, QEvent *event) {
             emit onCtrlAltRBracket();
 
         break;
+    case Qt::Key_S:
+        emit onS();
+
+        break;
     default:
         return false;
     }
