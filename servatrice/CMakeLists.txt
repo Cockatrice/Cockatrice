@@ -4,8 +4,6 @@
 
 PROJECT(servatrice)
 
-FIND_PACKAGE(Libgcrypt REQUIRED)
-
 SET(servatrice_SOURCES
     src/main.cpp
     src/passwordhasher.cpp
@@ -29,6 +27,10 @@ if(Qt4_FOUND)
     INCLUDE(${QT_USE_FILE})
     include_directories(${QT_INCLUDES})
     LIST(APPEND SERVATRICE_LIBS ${QT_LIBRARIES})
+
+    # Libgcrypt is required only with Qt4 to support SHA512 hashing
+    FIND_PACKAGE(Libgcrypt REQUIRED)
+    INCLUDE_DIRECTORIES(${LIBGCRYPT_INCLUDE_DIR})
 endif()
 
 # qt5 stuff
@@ -60,7 +62,6 @@ SET(QT_DONT_USE_QTGUI TRUE)
 
 # Include directories
 INCLUDE_DIRECTORIES(../common)
-INCLUDE_DIRECTORIES(${LIBGCRYPT_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/../common)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
