@@ -21,7 +21,7 @@ Dependencies:
 - [protobuf](http://code.google.com/p/protobuf/)
 - [CMake](http://www.cmake.org/)
 
-The server requires an additional dependency:
+The server requires an additional dependency when compiled under Qt4:
 
 - [libgcrypt](http://www.gnu.org/software/libgcrypt/)
 
