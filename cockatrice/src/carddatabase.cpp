@@ -76,8 +76,8 @@ void SetList::sortByKey()
     qSort(begin(), end(), CompareFunctor());
 }
 
-PictureToLoad::PictureToLoad(CardInfo *_card, bool _stripped, bool _hq)
-    : card(_card), stripped(_stripped), setIndex(0), hq(_hq)
+PictureToLoad::PictureToLoad(CardInfo *_card, bool _hq)
+    : card(_card), setIndex(0), hq(_hq)
 {
     if (card) {
         sortedSets = card->getSets();
@@ -135,14 +135,14 @@ void PictureLoader::processLoadQueue()
         mutex.unlock();
 
         //The list of paths to the folders in which to search for images
-        QList<QString> picsPaths = QList<QString>() << _picsPath + "/CUSTOM/" + ptl.getCard()->getCorrectedName() + ".full";
+        QList<QString> picsPaths = QList<QString>() << _picsPath + "/CUSTOM/" + ptl.getCard()->getCorrectedName();
 
 
         QString setName=ptl.getSetName();
         if(!setName.isEmpty())
         {
-            picsPaths   << _picsPath + "/" + setName + "/" + ptl.getCard()->getCorrectedName() + ".full"
-                        << _picsPath + "/downloadedPics/" + setName + "/" + ptl.getCard()->getCorrectedName() + ".full";
+            picsPaths   << _picsPath + "/" + setName + "/" + ptl.getCard()->getCorrectedName()
+                        << _picsPath + "/downloadedPics/" + setName + "/" + ptl.getCard()->getCorrectedName();
         }
 
         QImage image;
@@ -153,6 +153,12 @@ void PictureLoader::processLoadQueue()
         //Iterates through the list of paths, searching for images with the desired name with any QImageReader-supported extension
         for (int i = 0; i < picsPaths.length() && !found; i ++) {
             imgReader.setFileName(picsPaths.at(i));
+            if (imgReader.read(&image)) {
+                emit imageLoaded(ptl.getCard(), image);
+                found = true;
+                break;
+            }
+            imgReader.setFileName(picsPaths.at(i) + ".full");
             if (imgReader.read(&image)) {
                 emit imageLoaded(ptl.getCard(), image);
                 found = true;
@@ -274,11 +280,7 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
                 return;
             }
 
-            QString suffix;
-            if (!cardBeingDownloaded.getStripped())
-                suffix = ".full";
-
-            QFile newPic(picsPath + "/downloadedPics/" + setName + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + extension);
+            QFile newPic(picsPath + "/downloadedPics/" + setName + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + extension);
             if (!newPic.open(QIODevice::WriteOnly))
                 return;
             newPic.write(picData);
@@ -306,11 +308,11 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
     startNextPicDownload();
 }
 
-void PictureLoader::loadImage(CardInfo *card, bool stripped)
+void PictureLoader::loadImage(CardInfo *card)
 {
     QMutexLocker locker(&mutex);
 
-    loadQueue.append(PictureToLoad(card, stripped));
+    loadQueue.append(PictureToLoad(card));
     emit startLoadQueue();
 }
 
@@ -936,7 +938,7 @@ void CardDatabase::cacheCardPixmaps(const QStringList &cardNames)
 
 void CardDatabase::loadImage(CardInfo *card)
 {
-    pictureLoader->loadImage(card, false);
+    pictureLoader->loadImage(card);
 }
 
 void CardDatabase::imageLoaded(CardInfo *card, QImage image)
