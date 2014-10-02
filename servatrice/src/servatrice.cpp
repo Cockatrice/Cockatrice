@@ -134,7 +134,7 @@ Servatrice::~Servatrice()
 
 bool Servatrice::initServer()
 {
-    serverName = settingsCache->value("server/name").toString();
+    serverName = settingsCache->value("server/name", "My Cockatrice server").toString();
     serverId = settingsCache->value("server/id", 0).toInt();
     bool regServerOnly = settingsCache->value("server/regonly", 0).toBool();
         
@@ -221,19 +221,35 @@ bool Servatrice::initServer()
             );
             addRoom(newRoom);
         }
+
+        if(size==0)
+        {
+            // no room defined in config, add a dummy one
+            Server_Room *newRoom = new Server_Room(
+                0,
+                "General room",
+                "Play anything here.",
+                true,
+                "",
+                QStringList("Standard"),
+                this
+            );
+            addRoom(newRoom);            
+        }
+
         settingsCache->endArray();
     }
     
     updateLoginMessage();
     
-    maxGameInactivityTime = settingsCache->value("game/max_game_inactivity_time").toInt();
-    maxPlayerInactivityTime = settingsCache->value("game/max_player_inactivity_time").toInt();
+    maxGameInactivityTime = settingsCache->value("game/max_game_inactivity_time", 120).toInt();
+    maxPlayerInactivityTime = settingsCache->value("game/max_player_inactivity_time", 15).toInt();
     
-    maxUsersPerAddress = settingsCache->value("security/max_users_per_address").toInt();
-    messageCountingInterval = settingsCache->value("security/message_counting_interval").toInt();
-    maxMessageCountPerInterval = settingsCache->value("security/max_message_count_per_interval").toInt();
-    maxMessageSizePerInterval = settingsCache->value("security/max_message_size_per_interval").toInt();
-    maxGamesPerUser = settingsCache->value("security/max_games_per_user").toInt();
+    maxUsersPerAddress = settingsCache->value("security/max_users_per_address", 4).toInt();
+    messageCountingInterval = settingsCache->value("security/message_counting_interval", 10).toInt();
+    maxMessageCountPerInterval = settingsCache->value("security/max_message_count_per_interval", 10).toInt();
+    maxMessageSizePerInterval = settingsCache->value("security/max_message_size_per_interval", 1000).toInt();
+    maxGamesPerUser = settingsCache->value("security/max_games_per_user", 5).toInt();
 
 	try { if (settingsCache->value("servernetwork/active", 0).toInt()) {
 		qDebug() << "Connecting to ISL network.";
@@ -299,7 +315,7 @@ bool Servatrice::initServer()
 	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
 	pingClock->start(1000);
 	
-	int statusUpdateTime = settingsCache->value("server/statusupdate").toInt();
+	int statusUpdateTime = settingsCache->value("server/statusupdate", 15000).toInt();
 	statusUpdateClock = new QTimer(this);
 	connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
 	if (statusUpdateTime != 0) {
