@@ -26,7 +26,7 @@ ServerLogger::~ServerLogger()
 void ServerLogger::startLog(const QString &logFileName)
 {
     if (!logFileName.isEmpty()) {
-        logFile = new QFile("server.log", this);
+        logFile = new QFile(logFileName, this);
         logFile->open(QIODevice::Append);
 #ifdef Q_OS_UNIX
         ::socketpair(AF_UNIX, SOCK_STREAM, 0, sigHupFD);
