@@ -82,7 +82,6 @@ Section Uninstall
 	Delete "$INSTDIR\icu*.dll"
 	Delete "$INSTDIR\qt.conf"
 	Delete "$INSTDIR\qdebug.txt"
-	Delete "$INSTDIR\server.log"
 	Delete "$INSTDIR\servatrice.sql"
 	Delete "$INSTDIR\servatrice.ini.example"
 	RMDir "$INSTDIR"
