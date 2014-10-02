@@ -9,23 +9,23 @@
 
 QString SettingsCache::guessConfigurationPath(QString & specificPath)
 {
-	const QString fileName="servatrice.ini";
-	QString guessFileName;
+    const QString fileName="servatrice.ini";
+    QString guessFileName;
 
-	// specific path
-	if(!specificPath.isEmpty() && QFile::exists(specificPath))
-		return specificPath;
+    // specific path
+    if(!specificPath.isEmpty() && QFile::exists(specificPath))
+        return specificPath;
 
-	// application directory path
-	guessFileName = QCoreApplication::applicationDirPath() + "/" + fileName;
-	if(QFile::exists(guessFileName))
-		return guessFileName;
+    // application directory path
+    guessFileName = QCoreApplication::applicationDirPath() + "/" + fileName;
+    if(QFile::exists(guessFileName))
+        return guessFileName;
 
 #ifdef Q_OS_UNIX
-	// /etc
-	guessFileName = "/etc/servatrice/" + fileName;
-	if(QFile::exists(guessFileName))
-		return guessFileName;
+    // /etc
+    guessFileName = "/etc/servatrice/" + fileName;
+    if(QFile::exists(guessFileName))
+        return guessFileName;
 #endif
 
 #if QT_VERSION >= 0x050000
