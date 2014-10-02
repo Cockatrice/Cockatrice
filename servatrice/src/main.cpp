@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
 	logger->moveToThread(loggerThread);
 	
 	loggerThread->start();
-	QMetaObject::invokeMethod(logger, "startLog", Qt::BlockingQueuedConnection, Q_ARG(QString, settingsCache->value("server/logfile").toString()));
+	QMetaObject::invokeMethod(logger, "startLog", Qt::BlockingQueuedConnection, Q_ARG(QString, settingsCache->value("server/logfile", QString("server.log")).toString()));
 
 #if QT_VERSION < 0x050000
 	if (logToConsole)
