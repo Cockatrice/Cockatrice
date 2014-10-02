@@ -1092,8 +1092,12 @@ void Player::eventCreateToken(const Event_CreateToken &event)
         return;
 
     CardItem *card = new CardItem(this, QString::fromStdString(event.card_name()), event.card_id());
+    // use db PT if not provided in event
+    if (!QString::fromStdString(event.pt()).isEmpty())
+        card->setPT(QString::fromStdString(event.pt()));
+    else
+        card->setPT(db->getCard(QString::fromStdString(event.card_name()))->getPowTough());
     card->setColor(QString::fromStdString(event.color()));
-    card->setPT(QString::fromStdString(event.pt()));
     card->setAnnotation(QString::fromStdString(event.annotation()));
     card->setDestroyOnZoneChange(event.destroy_on_zone_change());
 
