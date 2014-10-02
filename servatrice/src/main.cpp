@@ -20,6 +20,7 @@
 
 #include <QCoreApplication>
 #include <QTextCodec>
+#include <QtGlobal>
 #include <iostream>
 #include <QMetaType>
 #include <QDateTime>
@@ -164,7 +165,7 @@ int main(int argc, char *argv[])
 #endif
 
 	configPath = SettingsCache::guessConfigurationPath(configPath);
-	std::cerr << "Using configuration file:" << configPath.toUtf8().data() << std::endl;
+	qWarning() << "Using configuration file: " << configPath;
 	settingsCache = new SettingsCache();
 	
 	loggerThread = new QThread;
