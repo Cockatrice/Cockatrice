@@ -272,7 +272,7 @@ void SettingsCache::setMainWindowGeometry(const QByteArray &_mainWindowGeometry)
 void SettingsCache::setAutoConnect(const bool &_autoConnect)
 {
     attemptAutoConnect = _autoConnect;
-    settings->value("server/auto_connect", attemptAutoConnect ? 1 : 0);
+    settings->setValue("server/auto_connect", attemptAutoConnect ? 1 : 0);
 }
 
 void SettingsCache::copyPath(const QString &src, const QString &dst)
