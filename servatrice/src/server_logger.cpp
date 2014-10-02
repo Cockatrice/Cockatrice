@@ -1,9 +1,9 @@
 #include "server_logger.h"
+#include "settingscache.h"
 #include <QSocketNotifier>
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
-#include <QSettings>
 #include <iostream>
 #ifdef Q_OS_UNIX
 # include <sys/types.h>
@@ -50,9 +50,8 @@ void ServerLogger::logMessage(QString message, void *caller)
         callerString = QString::number((qulonglong) caller, 16) + " ";
         
     //filter out all log entries based on values in configuration file
-    QSettings settings("servatrice.ini", QSettings::IniFormat);
-    bool shouldWeWriteLog = settings.value("server/writelog").toBool();
-    QString logFilters = settings.value("server/logfilters").toString();
+    bool shouldWeWriteLog = settingsCache->value("server/writelog").toBool();
+    QString logFilters = settingsCache->value("server/logfilters").toString();
     QStringList listlogFilters = logFilters.split(",", QString::SkipEmptyParts); 
     bool shouldWeSkipLine = false; 
     

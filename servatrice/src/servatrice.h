@@ -32,7 +32,6 @@
 
 Q_DECLARE_METATYPE(QSqlDatabase)
 
-class QSettings;
 class QSqlQuery;
 class QTimer;
 
@@ -106,7 +105,6 @@ private:
 	mutable QMutex loginMessageMutex;
 	QString loginMessage;
 	QString dbPrefix;
-	QSettings *settings;
 	Servatrice_DatabaseInterface *servatriceDatabaseInterface;
 	int serverId;
 	int uptime;
@@ -128,7 +126,7 @@ public slots:
 	void scheduleShutdown(const QString &reason, int minutes);
 	void updateLoginMessage();
 public:
-	Servatrice(QSettings *_settings, QObject *parent = 0);
+	Servatrice(QObject *parent = 0);
 	~Servatrice();
 	bool initServer();
 	QString getServerName() const { return serverName; }
