@@ -23,7 +23,7 @@ QString SettingsCache::guessConfigurationPath(QString & specificPath)
 
 #ifdef Q_OS_UNIX
 	// /etc
-	guessFileName = "/etc/" + fileName;
+	guessFileName = "/etc/servatrice/" + fileName;
 	if(QFile::exists(guessFileName))
 		return guessFileName;
 #endif
