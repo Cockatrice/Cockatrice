@@ -1,0 +1,30 @@
+﻿
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Your branch is up-to-date with 'origin/master'.
+#
+# Changes to be committed:
+#	new file:   cockatrice/resources/layout_wip/Untitled.png
+#	new file:   cockatrice/resources/layout_wip/Untitled2.png
+#	new file:   cockatrice/resources/layout_wip/Untitled3.png
+#	new file:   cockatrice/resources/layout_wip/Untitled4.png
+#	new file:   cockatrice/resources/layout_wip/Untitled5.png
+#	new file:   cockatrice/resources/layout_wip/logos/cockatrice_new.png
+#	new file:   cockatrice/resources/layout_wip/logos/cockatrice_new.svg
+#	new file:   cockatrice/resources/layout_wip/logos/cockatrice_new_c.png
+#	new file:   cockatrice/resources/layout_wip/logos/cockatrice_new_c.svg
+#	new file:   cockatrice/resources/layout_wip/logos/cockatrice_new_square.png
+#	new file:   cockatrice/resources/layout_wip/logos/cockatrice_new_square.svg
+#	new file:   cockatrice/resources/layout_wip/logos/cockatrice_new_square_c.png
+#	new file:   cockatrice/resources/layout_wip/logos/cockatrice_new_square_c.svg
+#	new file:   cockatrice/resources/layout_wip/logos/cockatrice_new_square_white_c.png
+#	new file:   cockatrice/resources/layout_wip/logos/cockatrice_new_square_white_c.svg
+#	new file:   cockatrice/resources/layout_wip/logos/cockatrice_new_square_white_large_bw.png
+#	new file:   cockatrice/resources/layout_wip/new.png
+#	new file:   cockatrice/resources/layout_wip/new2.png
+#
+# Untracked files:
+#	cockatrice/cockatrice.aps
+#
+
