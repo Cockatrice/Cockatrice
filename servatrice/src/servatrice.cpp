@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include <QSqlQuery>
-#include <QSettings>
 #include <QFile>
 #include <QTimer>
 #include <QDateTime>
@@ -28,6 +27,7 @@
 #include "servatrice_database_interface.h"
 #include "servatrice_connection_pool.h"
 #include "server_room.h"
+#include "settingscache.h"
 #include "serversocketinterface.h"
 #include "isl_interface.h"
 #include "server_logger.h"
@@ -120,8 +120,8 @@ void Servatrice_IslServer::incomingConnection(int socketDescriptor)
     QMetaObject::invokeMethod(interface, "initServer", Qt::QueuedConnection);
 }
 
-Servatrice::Servatrice(QSettings *_settings, QObject *parent)
-    : Server(true, parent), settings(_settings), uptime(0), shutdownTimer(0)
+Servatrice::Servatrice(QObject *parent)
+    : Server(true, parent), uptime(0), shutdownTimer(0)
 {
     qRegisterMetaType<QSqlDatabase>("QSqlDatabase");
 }
@@ -134,11 +134,11 @@ Servatrice::~Servatrice()
 
 bool Servatrice::initServer()
 {
-    serverName = settings->value("server/name").toString();
-    serverId = settings->value("server/id", 0).toInt();
-    bool regServerOnly = settings->value("server/regonly", 0).toBool();
+    serverName = settingsCache->value("server/name", "My Cockatrice server").toString();
+    serverId = settingsCache->value("server/id", 0).toInt();
+    bool regServerOnly = settingsCache->value("server/regonly", 0).toBool();
         
-    const QString authenticationMethodStr = settings->value("authentication/method").toString();
+    const QString authenticationMethodStr = settingsCache->value("authentication/method").toString();
     if (authenticationMethodStr == "sql") {
         authenticationMethod = AuthenticationSql;
     } else {
@@ -149,7 +149,7 @@ bool Servatrice::initServer()
         authenticationMethod = AuthenticationNone;
     }
     
-    QString dbTypeStr = settings->value("database/type").toString();
+    QString dbTypeStr = settingsCache->value("database/type").toString();
     if (dbTypeStr == "mysql")
         databaseType = DatabaseMySql;
     else
@@ -159,14 +159,14 @@ bool Servatrice::initServer()
     setDatabaseInterface(servatriceDatabaseInterface);
     
     if (databaseType != DatabaseNone) {
-        settings->beginGroup("database");
-        dbPrefix = settings->value("prefix").toString();
+        settingsCache->beginGroup("database");
+        dbPrefix = settingsCache->value("prefix").toString();
         servatriceDatabaseInterface->initDatabase("QMYSQL",
-                              settings->value("hostname").toString(),
-                              settings->value("database").toString(),
-                              settings->value("user").toString(),
-                              settings->value("password").toString());
-        settings->endGroup();
+                              settingsCache->value("hostname").toString(),
+                              settingsCache->value("database").toString(),
+                              settingsCache->value("user").toString(),
+                              settingsCache->value("password").toString());
+        settingsCache->endGroup();
         
         updateServerList();
         
@@ -174,7 +174,7 @@ bool Servatrice::initServer()
         servatriceDatabaseInterface->clearSessionTables();
     }
     
-    const QString roomMethod = settings->value("rooms/method").toString();
+    const QString roomMethod = settingsCache->value("rooms/method").toString();
     if (roomMethod == "sql") {
         QSqlQuery query(servatriceDatabaseInterface->getDatabase());
         query.prepare("select id, name, descr, auto_join, join_message from " + dbPrefix + "_rooms order by id asc");
@@ -198,47 +198,63 @@ bool Servatrice::initServer()
             ));
         }
     } else {
-        int size = settings->beginReadArray("rooms/roomlist");
+        int size = settingsCache->beginReadArray("rooms/roomlist");
         for (int i = 0; i < size; ++i) {
-            settings->setArrayIndex(i);
+            settingsCache->setArrayIndex(i);
             
             QStringList gameTypes;
-            int size2 = settings->beginReadArray("game_types");
+            int size2 = settingsCache->beginReadArray("game_types");
                 for (int j = 0; j < size2; ++j) {
-                settings->setArrayIndex(j);
-                gameTypes.append(settings->value("name").toString());
+                settingsCache->setArrayIndex(j);
+                gameTypes.append(settingsCache->value("name").toString());
             }
-            settings->endArray();
+            settingsCache->endArray();
                 
             Server_Room *newRoom = new Server_Room(
                 i,
-                settings->value("name").toString(),
-                settings->value("description").toString(),
-                settings->value("autojoin").toBool(),
-                settings->value("joinmessage").toString(),
+                settingsCache->value("name").toString(),
+                settingsCache->value("description").toString(),
+                settingsCache->value("autojoin").toBool(),
+                settingsCache->value("joinmessage").toString(),
                 gameTypes,
                 this
             );
             addRoom(newRoom);
         }
-        settings->endArray();
+
+        if(size==0)
+        {
+            // no room defined in config, add a dummy one
+            Server_Room *newRoom = new Server_Room(
+                0,
+                "General room",
+                "Play anything here.",
+                true,
+                "",
+                QStringList("Standard"),
+                this
+            );
+            addRoom(newRoom);            
+        }
+
+        settingsCache->endArray();
     }
     
     updateLoginMessage();
     
-    maxGameInactivityTime = settings->value("game/max_game_inactivity_time").toInt();
-    maxPlayerInactivityTime = settings->value("game/max_player_inactivity_time").toInt();
+    maxGameInactivityTime = settingsCache->value("game/max_game_inactivity_time", 120).toInt();
+    maxPlayerInactivityTime = settingsCache->value("game/max_player_inactivity_time", 15).toInt();
     
-    maxUsersPerAddress = settings->value("security/max_users_per_address").toInt();
-    messageCountingInterval = settings->value("security/message_counting_interval").toInt();
-    maxMessageCountPerInterval = settings->value("security/max_message_count_per_interval").toInt();
-    maxMessageSizePerInterval = settings->value("security/max_message_size_per_interval").toInt();
-    maxGamesPerUser = settings->value("security/max_games_per_user").toInt();
+    maxUsersPerAddress = settingsCache->value("security/max_users_per_address", 4).toInt();
+    messageCountingInterval = settingsCache->value("security/message_counting_interval", 10).toInt();
+    maxMessageCountPerInterval = settingsCache->value("security/max_message_count_per_interval", 10).toInt();
+    maxMessageSizePerInterval = settingsCache->value("security/max_message_size_per_interval", 1000).toInt();
+    maxGamesPerUser = settingsCache->value("security/max_games_per_user", 5).toInt();
 
-	try { if (settings->value("servernetwork/active", 0).toInt()) {
+	try { if (settingsCache->value("servernetwork/active", 0).toInt()) {
 		qDebug() << "Connecting to ISL network.";
-		const QString certFileName = settings->value("servernetwork/ssl_cert").toString();
-		const QString keyFileName = settings->value("servernetwork/ssl_key").toString();
+		const QString certFileName = settingsCache->value("servernetwork/ssl_cert").toString();
+		const QString keyFileName = settingsCache->value("servernetwork/ssl_key").toString();
 		qDebug() << "Loading certificate...";
 		QFile certFile(certFileName);
 		if (!certFile.open(QIODevice::ReadOnly))
@@ -282,7 +298,7 @@ bool Servatrice::initServer()
 			QMetaObject::invokeMethod(interface, "initClient", Qt::BlockingQueuedConnection);
 		}
 			
-		const int networkPort = settings->value("servernetwork/port", 14747).toInt();
+		const int networkPort = settingsCache->value("servernetwork/port", 14747).toInt();
 		qDebug() << "Starting ISL server on port" << networkPort;
 		
 		islServer = new Servatrice_IslServer(this, cert, key, this);
@@ -299,7 +315,7 @@ bool Servatrice::initServer()
 	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
 	pingClock->start(1000);
 	
-	int statusUpdateTime = settings->value("server/statusupdate").toInt();
+	int statusUpdateTime = settingsCache->value("server/statusupdate", 15000).toInt();
 	statusUpdateClock = new QTimer(this);
 	connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
 	if (statusUpdateTime != 0) {
@@ -307,10 +323,10 @@ bool Servatrice::initServer()
 		statusUpdateClock->start(statusUpdateTime);
 	}
 	
-	const int numberPools = settings->value("server/number_pools", 1).toInt();
+	const int numberPools = settingsCache->value("server/number_pools", 1).toInt();
 	gameServer = new Servatrice_GameServer(this, numberPools, servatriceDatabaseInterface->getDatabase(), this);
 	gameServer->setMaxPendingConnections(1000);
-	const int gamePort = settings->value("server/port", 4747).toInt();
+	const int gamePort = settingsCache->value("server/port", 4747).toInt();
 	qDebug() << "Starting server on port" << gamePort;
 	if (gameServer->listen(QHostAddress::Any, gamePort))
 		qDebug() << "Server listening.";

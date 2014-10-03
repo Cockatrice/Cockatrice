@@ -12,6 +12,7 @@ SET(servatrice_SOURCES
     src/servatrice_database_interface.cpp
     src/server_logger.cpp
     src/serversocketinterface.cpp
+    src/settingscache.cpp
     src/isl_interface.cpp
     ${VERSION_STRING_CPP}
 )

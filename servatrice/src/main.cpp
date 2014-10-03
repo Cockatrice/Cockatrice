@@ -20,13 +20,14 @@
 
 #include <QCoreApplication>
 #include <QTextCodec>
+#include <QtGlobal>
 #include <iostream>
 #include <QMetaType>
-#include <QSettings>
 #include <QDateTime>
 #include "passwordhasher.h"
 #include "servatrice.h"
 #include "server_logger.h"
+#include "settingscache.h"
 #include "rng_sfmt.h"
 #include "version_string.h"
 #include <google/protobuf/stubs/common.h>
@@ -37,6 +38,7 @@
 RNG_Abstract *rng;
 ServerLogger *logger;
 QThread *loggerThread;
+SettingsCache *settingsCache;
 
 /* Prototypes */
 
@@ -150,6 +152,10 @@ int main(int argc, char *argv[])
 	bool testRandom = args.contains("--test-random");
 	bool testHashFunction = args.contains("--test-hash");
 	bool logToConsole = args.contains("--log-to-console");
+	QString configPath;
+	int hasConfigPath=args.indexOf("--config");
+	if(hasConfigPath > -1 && args.count() > hasConfigPath + 1)
+		configPath = args.at(hasConfigPath + 1);
 	
 	qRegisterMetaType<QList<int> >("QList<int>");
 
@@ -158,7 +164,9 @@ int main(int argc, char *argv[])
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 #endif
 
-	QSettings *settings = new QSettings("servatrice.ini", QSettings::IniFormat);
+	configPath = SettingsCache::guessConfigurationPath(configPath);
+	qWarning() << "Using configuration file: " << configPath;
+	settingsCache = new SettingsCache();
 	
 	loggerThread = new QThread;
 	loggerThread->setObjectName("logger");
@@ -166,7 +174,7 @@ int main(int argc, char *argv[])
 	logger->moveToThread(loggerThread);
 	
 	loggerThread->start();
-	QMetaObject::invokeMethod(logger, "startLog", Qt::BlockingQueuedConnection, Q_ARG(QString, settings->value("server/logfile").toString()));
+	QMetaObject::invokeMethod(logger, "startLog", Qt::BlockingQueuedConnection, Q_ARG(QString, settingsCache->value("server/logfile", QString("server.log")).toString()));
 
 #if QT_VERSION < 0x050000
 	if (logToConsole)
@@ -209,7 +217,7 @@ int main(int argc, char *argv[])
 	if (testHashFunction)
 		testHash();
 	
-	Servatrice *server = new Servatrice(settings);
+	Servatrice *server = new Servatrice();
 	QObject::connect(server, SIGNAL(destroyed()), &app, SLOT(quit()), Qt::QueuedConnection);
 	int retval = 0;
 	if (server->initServer()) {
@@ -228,7 +236,7 @@ int main(int argc, char *argv[])
 	}
 	
 	delete rng;
-	delete settings;
+	delete settingsCache;
 	
 	logger->deleteLater();
 	loggerThread->wait();
