@@ -38,23 +38,6 @@ logfile=server.log
 logfilters=""
 
 
-[servernetwork]
-
-; Servatrice servers can connect themselves and build a network. This settins enable the ability of servatrice
-; of waiting for other server's connections and connect to other servers. Other servers can be defined in the
-; "servers" table of the database. Default is 0 (disabled)
-active=0
-
-; The TCP port number servatrice will listen on for other servers; default is 14747
-port=14747
-
-; Server-to-server communication needs a valid certificate in PEM format. Enter its filename in this setting
-ssl_cert=ssl_cert.pem
-
-; Filename of the private key for the server-to-server certificate
-ssl_key=ssl_key.pem
-
-
 [authentication]
 
 ; Servatrice can authenticate users connecting. It currently supports 3 different authentication methods:
@@ -154,3 +137,24 @@ max_message_count_per_interval=10
 
 ; Maximum number of games a single user can create; default is 5
 max_games_per_user=5
+
+
+; EXPERIMENTAL - NOT WORKING YET
+; The following settings are relative to the server network functionality, that is not yet complete.
+; Avoid enabling it unless you are willing to test it and help its development.
+
+[servernetwork]
+
+; Servatrice servers can connect themselves and build a network. This settins enable the ability of servatrice
+; of waiting for other server's connections and connect to other servers. Other servers can be defined in the
+; "servers" table of the database. Default is 0 (disabled)
+active=0
+
+; The TCP port number servatrice will listen on for other servers; default is 14747
+port=14747
+
+; Server-to-server communication needs a valid certificate in PEM format. Enter its filename in this setting
+ssl_cert=ssl_cert.pem
+
+; Filename of the private key for the server-to-server certificate
+ssl_key=ssl_key.pem
