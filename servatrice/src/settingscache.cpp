@@ -7,6 +7,12 @@
     #include <QDesktopServices>
 #endif
 
+SettingsCache::SettingsCache(const QString & fileName, QSettings::Format format, QObject * parent)
+:QSettings(fileName, format, parent)
+{
+
+}
+
 QString SettingsCache::guessConfigurationPath(QString & specificPath)
 {
     const QString fileName="servatrice.ini";
