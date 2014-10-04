@@ -9,7 +9,7 @@ class SettingsCache : public QSettings {
 private:
     QSettings *settings;
 public:
-    SettingsCache(const QString & fileName="servatrice.ini", QSettings::Format format=QSettings::IniFormat, QObject * parent = 0) { };
+    SettingsCache(const QString & fileName="servatrice.ini", QSettings::Format format=QSettings::IniFormat, QObject * parent = 0);
     static QString guessConfigurationPath(QString & specificPath);
 };
 

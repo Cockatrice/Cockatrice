@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
 
 	configPath = SettingsCache::guessConfigurationPath(configPath);
 	qWarning() << "Using configuration file: " << configPath;
-	settingsCache = new SettingsCache();
+	settingsCache = new SettingsCache(configPath);
 	
 	loggerThread = new QThread;
 	loggerThread->setObjectName("logger");
