@@ -136,7 +136,7 @@ bool Servatrice::initServer()
 {
     serverName = settingsCache->value("server/name", "My Cockatrice server").toString();
     serverId = settingsCache->value("server/id", 0).toInt();
-    bool regServerOnly = settingsCache->value("server/regonly", 0).toBool();
+    bool regServerOnly = settingsCache->value("authentication/regonly", 0).toBool();
         
     const QString authenticationMethodStr = settingsCache->value("authentication/method").toString();
     if (authenticationMethodStr == "sql") {

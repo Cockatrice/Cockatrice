@@ -50,7 +50,8 @@ public:
 	void lockSessionTables();
 	void unlockSessionTables();
 	bool userSessionExists(const QString &userName);
-	
+
+	bool getRequireRegistration();
 };
 
 #endif
