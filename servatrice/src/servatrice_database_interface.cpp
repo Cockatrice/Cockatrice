@@ -95,7 +95,7 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
 	case Servatrice::AuthenticationNone: return UnknownUser;
 	case Servatrice::AuthenticationPassword: {
 		QString configPassword = settingsCache->value("authentication/password").toString();
-		if(configPassword == password)
+		if (configPassword == password)
 			return PasswordRight;
 
 		return NotLoggedIn;

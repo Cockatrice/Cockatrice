@@ -1,7 +1,7 @@
 ; Servatrice configuration file
 ;
 ; This is the main configuration file for Servatrice; while using a configuration is not mandatory,
-; you may want to customize some aspects of your servatrice instance, lie its name, port or the way
+; you may want to customize some aspects of your servatrice instance, like its name, port or the way
 ; users can authenticate to the server.
 
 
@@ -22,18 +22,19 @@ port=4747
 ; long delays (lag), you may want to try increasing this value; default is 1.
 number_pools=1
 
-; When database is eneabled, servatrice writes the server status in the "update" database table; this 
+; When database is enabled, servatrice writes the server status in the "update" database table; this 
 ; setting defines every how many milliseconds servatrice will update its status; default is 15000 (15 secs)
 statusupdate=15000
 
 ; Do you want servatrice to write important events and errors to a logfile? Default is 1 (yes).
 writelog=1
 
-; Choose a name for the log file, if enabled; the default file name is server.log
+; Choose a name for the log file, if enabled; you can specify an absolute path or a path relative to
+; the servatrice executable; the default file name is server.log (in the same path as servatrice)
 logfile=server.log
 
-; You may want to silence some useless, commonly recurring messages in the logfile. This setting can contain
-; a comma-separed list of words; if any message that is about to be logged contains at least one of these words,
+; You may want to silence some commonly recurring messages in the logfile. This setting can contain a
+; comma-separed list of words; if any message that is about to be logged contains at least one of these words,
 ; it won't be logged. Default is empty; example: "kittens,ponies,faires"
 logfilters=""
 
@@ -47,11 +48,10 @@ logfilters=""
 ; Please note that only the "sql" method permits to have registered users and store their data on the server.
 method=none
 
-; if the chosen authentication methos is password, here you can define the password your users will use to log in
+; if the chosen authentication method is password, here you can define the password your users will use to log in
 password=123456
 
 ; Accept only registered users? default is 0 (accept unregistered users)
-; FIXME: unused / not working
 regonly=0
 
 
