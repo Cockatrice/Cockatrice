@@ -2,6 +2,7 @@
 #include "servatrice_database_interface.h"
 #include "passwordhasher.h"
 #include "serversocketinterface.h"
+#include "settingscache.h"
 #include "decklist.h"
 #include "pb/game_replay.pb.h"
 #include <QDebug>
@@ -92,6 +93,13 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
 {
 	switch (server->getAuthenticationMethod()) {
 	case Servatrice::AuthenticationNone: return UnknownUser;
+	case Servatrice::AuthenticationPassword: {
+		QString configPassword = settingsCache->value("authentication/password").toString();
+		if (configPassword == password)
+			return PasswordRight;
+
+		return NotLoggedIn;
+	}
 	case Servatrice::AuthenticationSql: {
 		if (!checkSql())
 			return UnknownUser;

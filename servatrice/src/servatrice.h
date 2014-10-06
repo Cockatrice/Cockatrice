@@ -88,7 +88,7 @@ class Servatrice : public Server
 {
 	Q_OBJECT
 public:
-	enum AuthenticationMethod { AuthenticationNone, AuthenticationSql };
+	enum AuthenticationMethod { AuthenticationNone, AuthenticationSql, AuthenticationPassword };
 private slots:
 	void statusUpdate();
 	void shutdownTimeout();

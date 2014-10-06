@@ -1,50 +1,160 @@
+; Servatrice configuration file
+;
+; This is the main configuration file for Servatrice; while using a configuration is not mandatory,
+; you may want to customize some aspects of your servatrice instance, like its name, port or the way
+; users can authenticate to the server.
+
+
 [server]
-port=4747
-statusupdate=15000
-logfile=server.log
+
+; This is the name that servatrice exposes to the users; the default value is pretty boring
 name="My Cockatrice server"
+
+; Multiple servatrice servers can run on the same host using the same database; each server instance
+; must have a different id; the default id is 1
 id=1
+
+; The TCP port number servatrice will listen on for clients; default is 4747
+port=4747
+
+; Servatrice can scale up to serve big number of users using more than one parallel thread of execution;
+; If your server is hosting a lot of players and they frequently report of being unable to login or
+; long delays (lag), you may want to try increasing this value; default is 1.
 number_pools=1
+
+; When database is enabled, servatrice writes the server status in the "update" database table; this 
+; setting defines every how many milliseconds servatrice will update its status; default is 15000 (15 secs)
+statusupdate=15000
+
+; Do you want servatrice to write important events and errors to a logfile? Default is 1 (yes).
 writelog=1
+
+; Choose a name for the log file, if enabled; you can specify an absolute path or a path relative to
+; the servatrice executable; the default file name is server.log (in the same path as servatrice)
+logfile=server.log
+
+; You may want to silence some commonly recurring messages in the logfile. This setting can contain a
+; comma-separed list of words; if any message that is about to be logged contains at least one of these words,
+; it won't be logged. Default is empty; example: "kittens,ponies,faires"
 logfilters=""
 
-[servernetwork]
-active=0
-port=14747
-ssl_cert=ssl_cert.pem
-ssl_key=ssl_key.pem
 
 [authentication]
+
+; Servatrice can authenticate users connecting. It currently supports 3 different authentication methods:
+; * none: no authentication, accept every user;
+; * password: require users to specify a common password to log in;
+; * sql: authenticate users against the "users" table of the database;
+; Please note that only the "sql" method permits to have registered users and store their data on the server.
 method=none
+
+; if the chosen authentication method is password, here you can define the password your users will use to log in
+password=123456
+
+; Accept only registered users? default is 0 (accept unregistered users)
 regonly=0
 
+
 [database]
+
+; Database type. Valid values are:
+; * none: no database;
+; * mysql: mysql or compatible database;
 type=none
+
+; Prefix used in he database for table names; default is cockatrice
 prefix=cockatrice
+
+; Database connection parameter: server hostname or IP
 hostname=localhost
+
+; Database connection parameter: database name
 database=servatrice
+
+; Database connection parameter: database user
 user=servatrice
+
+; Database connection parameter: database user's password
 password=foobar
 
 [rooms]
+
+; A servtrice server can expose to the users different "rooms" to chat and create games. Rooms can be defined
+; with two different methods:
+; config: rooms are defined in this configuration (see the following example)
+; sql: rooms are defined in the "rooms" table of the database
 method=config
+
+; Example configuration for a server with rooms configured in the configuration file. Number of rooms defined
 roomlist\size=1
+
+; Room name for the room number 1
 roomlist\1\name="General room"
+
+; Room description for the room number 1
 roomlist\1\description="Play anything here."
+
+; Wether to make users autojoin this room when connected to the server
 roomlist\1\autojoin=true
+
+; Message displayed to each user when he joins room  number 1
 roomlist\1\joinmessage="This message is only here to show that rooms can have a join message."
+
+; Number of game types allowed (defined) in the room number 1
 roomlist\1\game_types\size=3
+
+; Name of the three game types for the room number 1
 roomlist\1\game_types\1\name="GameType1"
 roomlist\1\game_types\2\name="GameType2"
 roomlist\1\game_types\3\name="GameType3"
 
+
 [game]
-max_game_inactivity_time=120
+
+; Maximum time in seconds a player can stay inactive, with his client hot even responding to pings, before is
+; considered disconnected; default is 15
 max_player_inactivity_time=15
 
+; Maximum time in seconds all players in a game can stay inactive before the game is automatically closed;
+; default is 120
+max_game_inactivity_time=120
+
+
 [security]
+
+; Maximum number of users that can connect from the same IP address; useful to avoid bots, default is 4
 max_users_per_address=4
+
+; Servatrice can avoid users from flooding rooms with large number messages in an interval of time.
+; This setting defines the length in seconds of the considered interval; default is 10
 message_counting_interval=10
+
+; Maximum size in characters of all messages in an interval before new messages gets dropped; default is 1000
 max_message_size_per_interval=1000
+
+; Maximum number of messages in an interval before new messages gets dropped; default is 10
 max_message_count_per_interval=10
+
+; Maximum number of games a single user can create; default is 5
 max_games_per_user=5
+
+
+; EXPERIMENTAL - NOT WORKING YET
+; The following settings are relative to the server network functionality, that is not yet complete.
+; Avoid enabling it unless you are willing to test it and help its development.
+
+[servernetwork]
+
+; Servatrice servers can connect themselves and build a network. This settins enable the ability of servatrice
+; of waiting for other server's connections and connect to other servers. Other servers can be defined in the
+; "servers" table of the database. Default is 0 (disabled)
+active=0
+
+; The TCP port number servatrice will listen on for other servers; default is 14747
+port=14747
+
+; Server-to-server communication needs a valid certificate in PEM format. Enter its filename in this setting
+ssl_cert=ssl_cert.pem
+
+; Filename of the private key for the server-to-server certificate
+ssl_key=ssl_key.pem
