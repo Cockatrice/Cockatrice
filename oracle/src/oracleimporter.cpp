@@ -210,11 +210,13 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
             }
         }
 
-        CardInfo *card = addCard(set->getShortName(), cardName, cardIsToken, cardId, cardCost, cardType, cardPT, cardLoyalty, cardText.split("\n"));
+        if (!cardIsToken) {
+            CardInfo *card = addCard(set->getShortName(), cardName, cardIsToken, cardId, cardCost, cardType, cardPT, cardLoyalty, cardText.split("\n"));
 
-        if (!set->contains(card)) {
-            card->addToSet(set);
-            cards++;
+            if (!set->contains(card)) {
+                card->addToSet(set);
+                cards++;
+            }
         }
     }
     

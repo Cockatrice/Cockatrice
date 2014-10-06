@@ -208,7 +208,7 @@ protected:
     LoadStatus loadStatus;
 private:
     static const int versionNeeded;
-    void loadCardsFromXml(QXmlStreamReader &xml);
+    void loadCardsFromXml(QXmlStreamReader &xml, bool tokens);
     void loadSetsFromXml(QXmlStreamReader &xml);
 
     CardInfo *getCardFromMap(CardNameMap &cardMap, const QString &cardName, bool createIfNotFound);
@@ -229,7 +229,7 @@ public:
     CardSet *getSet(const QString &setName);
     QList<CardInfo *> getCardList() const { return cards.values(); }
     SetList getSetList() const;
-    LoadStatus loadFromFile(const QString &fileName);
+    LoadStatus loadFromFile(const QString &fileName, bool tokens = false);
     bool saveToFile(const QString &fileName, bool tokens = false);
     QStringList getAllColors() const;
     QStringList getAllMainCardTypes() const;

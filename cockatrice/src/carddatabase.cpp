@@ -710,7 +710,7 @@ void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
     }
 }
 
-void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
+void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
 {
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement)
@@ -762,7 +762,10 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
                 else if (xml.name() == "token")
                     isToken = xml.readElementText().toInt();
             }
-            addCard(new CardInfo(this, name, isToken, manacost, type, pt, text, colors, loyalty, cipt, tableRow, sets, customPicURLs, customPicURLsHq, muids));
+
+            if (isToken == tokens) {
+                addCard(new CardInfo(this, name, isToken, manacost, type, pt, text, colors, loyalty, cipt, tableRow, sets, customPicURLs, customPicURLsHq, muids));
+            }
         }
     }
 }
@@ -781,7 +784,7 @@ CardInfo *CardDatabase::getCardFromMap(CardNameMap &cardMap, const QString &card
         return 0;
 }
 
-LoadStatus CardDatabase::loadFromFile(const QString &fileName)
+LoadStatus CardDatabase::loadFromFile(const QString &fileName, bool tokens)
 {
     QFile file(fileName);
     file.open(QIODevice::ReadOnly);
@@ -804,7 +807,7 @@ LoadStatus CardDatabase::loadFromFile(const QString &fileName)
                 if (xml.name() == "sets")
                     loadSetsFromXml(xml);
                 else if (xml.name() == "cards")
-                    loadCardsFromXml(xml);
+                    loadCardsFromXml(xml, tokens);
             }
         }
     }
@@ -839,7 +842,9 @@ bool CardDatabase::saveToFile(const QString &fileName, bool tokens)
     QHashIterator<QString, CardInfo *> cardIterator(cards);
     while (cardIterator.hasNext()) {
         CardInfo *card = cardIterator.next().value();
-        xml << card;
+        if (tokens == card->getIsToken()) {
+            xml << card;
+        }
     }
     xml.writeEndElement(); // cards
 
@@ -873,7 +878,7 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path, bool tokens)
 {
     LoadStatus tempLoadStatus = NotLoaded;
     if (!path.isEmpty())
-        tempLoadStatus = loadFromFile(path);
+        tempLoadStatus = loadFromFile(path, tokens);
 
     if (tempLoadStatus == Ok) {
         SetList allSets;
