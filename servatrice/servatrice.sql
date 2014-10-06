@@ -208,3 +208,12 @@ CREATE TABLE `cockatrice_replays_access` (
   KEY `id_game` (`id_game`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `cockatrice_rooms` (
+`id` int(7) unsigned NOT NULL auto_increment,
+`name` varchar(50) NOT NULL,
+`descr` varchar(255) NOT NULL,
+`autojoin` tinyint(1) default 0,
+`join_message` varchar(255) NOT NULL,
+PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
