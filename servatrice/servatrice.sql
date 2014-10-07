@@ -1,4 +1,4 @@
--- phpMyAdmin SQL Dump
+﻿-- phpMyAdmin SQL Dump
 -- version 2.11.8.1deb1ubuntu0.2
 -- http://www.phpmyadmin.net
 --
@@ -212,8 +212,14 @@ CREATE TABLE IF NOT EXISTS `cockatrice_rooms` (
 `id` int(7) unsigned NOT NULL auto_increment,
 `name` varchar(50) NOT NULL,
 `descr` varchar(255) NOT NULL,
-`autojoin` tinyint(1) default 0,
+`auto_join` tinyint(1) default 0,
 `join_message` varchar(255) NOT NULL,
 PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `cockatrice_rooms_gametypes` (
+`id_room` int(7) unsigned NOT NULL,
+`name` varchar(50) NOT NULL,
+PRIMARY KEY (`id_room`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
