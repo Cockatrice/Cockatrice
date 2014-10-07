@@ -140,14 +140,18 @@ bool Servatrice::initServer()
         
     const QString authenticationMethodStr = settingsCache->value("authentication/method").toString();
     if (authenticationMethodStr == "sql") {
+        qDebug() << "Authenticating method: sql";
         authenticationMethod = AuthenticationSql;
     } else if(authenticationMethodStr == "password") {
+        qDebug() << "Authenticating method: password";
         authenticationMethod = AuthenticationPassword;
     } else {
         if (regServerOnly) {
             qDebug() << "Registration only server enabled but no authentication method defined: Error.";
             return false;   
         }
+
+        qDebug() << "Authenticating method: none";
         authenticationMethod = AuthenticationNone;
     }
     
