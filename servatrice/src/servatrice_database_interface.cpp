@@ -89,6 +89,11 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user)
 	return (result.size() > 0);
 }
 
+bool Servatrice_DatabaseInterface::getRequireRegistration()
+{
+	return settingsCache->value("authentication/regonly", 0).toBool();
+}
+
 AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &banSecondsLeft)
 {
 	switch (server->getAuthenticationMethod()) {
