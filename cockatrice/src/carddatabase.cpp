@@ -263,14 +263,14 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
 
     const QByteArray &picData = reply->peek(reply->size()); //peek is used to keep the data in the buffer for use by QImageReader
     QImage testImage;
-    
+
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
     imgReader.setDevice(reply);
     QString extension = "." + imgReader.format(); //the format is determined prior to reading the QImageReader data into a QImage object, as that wipes the QImageReader buffer
     if (extension == ".jpeg")
         extension = ".jpg";
-    
+
     if (imgReader.read(&testImage)) {
         QString setName = cardBeingDownloaded.getSetName();
         if(!setName.isEmpty())
@@ -493,7 +493,7 @@ void CardInfo::updatePixmapCache()
     qDebug() << "Updating pixmap cache for" << name;
     clearPixmapCache();
     loadPixmap();
-    
+
     emit pixmapUpdated();
 }
 
@@ -605,7 +605,7 @@ CardDatabase::~CardDatabase()
 {
     clear();
     delete noCard;
-    
+
     pictureLoader->deleteLater();
     pictureLoaderThread->wait();
     delete pictureLoaderThread;
@@ -619,7 +619,7 @@ void CardDatabase::clear()
         delete setIt.value();
     }
     sets.clear();
-    
+
     QHashIterator<QString, CardInfo *> i(cards);
     while (i.hasNext()) {
         i.next();
@@ -770,11 +770,30 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
     }
 }
 
+CardInfo *CardNameMap::findByPrefix(const std::string &prefix) {
+    int count = 0;
+    CardInfo *found;
+
+    for (CardNameMap::iterator it = this->begin(); it != this->end(); ++it) {
+        if (std::mismatch(prefix.begin(), prefix.end(),
+                          it.key().toStdString().begin()).first == prefix.end()) {
+            count++;
+            found = it.value();
+        }
+    }
+
+    return (count == 1 ? found : NULL);
+}
+
 CardInfo *CardDatabase::getCardFromMap(CardNameMap &cardMap, const QString &cardName, bool createIfNotFound) {
+    CardInfo *foundCard;
+
     if (cardName.isEmpty())
         return noCard;
     else if (cardMap.contains(cardName))
         return cardMap.value(cardName);
+    else if ((foundCard = cardMap.findByPrefix(cardName.toStdString())))
+        return foundCard;
     else if (createIfNotFound) {
         CardInfo *newCard = new CardInfo(this, cardName, true);
         newCard->addToSet(getSet("TK"));
