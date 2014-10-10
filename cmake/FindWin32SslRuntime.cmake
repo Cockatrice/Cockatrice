@@ -1,8 +1,8 @@
-# Find the openssl runtime libraries (.dll) for windows that
+# Find the OpenSSL runtime libraries (.dll) for Windows that
 # will be needed by Qt in order to access https urls.
 
 if (WIN32)
-  # Get standatds instalaltion paths for openssl under windos 
+  # Get standard installation paths for OpenSSL under Windows 
 
   # http://www.slproweb.com/products/Win32OpenSSL.html
   set(_OPENSSL_ROOT_HINTS
