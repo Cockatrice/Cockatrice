@@ -2,6 +2,7 @@
 #define SERVER_DATABASE_INTERFACE_H
 
 #include <QObject>
+#include <QSettings>
 
 #include "server.h"
 
@@ -32,6 +33,8 @@ public:
     virtual void lockSessionTables() { }
     virtual void unlockSessionTables() { }
     virtual bool userSessionExists(const QString & /* userName */) { return false; }
+
+    virtual bool getRequireRegistration() { return false; }
 };
 
 #endif

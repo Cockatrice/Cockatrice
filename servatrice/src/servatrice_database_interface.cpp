@@ -2,6 +2,7 @@
 #include "servatrice_database_interface.h"
 #include "passwordhasher.h"
 #include "serversocketinterface.h"
+#include "settingscache.h"
 #include "decklist.h"
 #include "pb/game_replay.pb.h"
 #include <QDebug>
@@ -88,10 +89,22 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user)
 	return (result.size() > 0);
 }
 
+bool Servatrice_DatabaseInterface::getRequireRegistration()
+{
+	return settingsCache->value("authentication/regonly", 0).toBool();
+}
+
 AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &banSecondsLeft)
 {
 	switch (server->getAuthenticationMethod()) {
 	case Servatrice::AuthenticationNone: return UnknownUser;
+	case Servatrice::AuthenticationPassword: {
+		QString configPassword = settingsCache->value("authentication/password").toString();
+		if (configPassword == password)
+			return PasswordRight;
+
+		return NotLoggedIn;
+	}
 	case Servatrice::AuthenticationSql: {
 		if (!checkSql())
 			return UnknownUser;

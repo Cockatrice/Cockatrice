@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru_RU">
+<TS version="2.0" language="ru_RU">
 <context>
     <name>AbstractCounter</name>
     <message>
@@ -43,23 +43,23 @@
     </message>
     <message>
         <source>Path to hand background:</source>
-        <translation type="vanished">Рука:</translation>
+        <translation type="obsolete">Рука:</translation>
     </message>
     <message>
         <source>Path to stack background:</source>
-        <translation type="vanished">Стек:</translation>
+        <translation type="obsolete">Стек:</translation>
     </message>
     <message>
         <source>Path to table background:</source>
-        <translation type="vanished">Поле битвы:</translation>
+        <translation type="obsolete">Поле битвы:</translation>
     </message>
     <message>
         <source>Path to player info background:</source>
-        <translation type="vanished">Панель игрока:</translation>
+        <translation type="obsolete">Панель игрока:</translation>
     </message>
     <message>
         <source>Path to picture of card back:</source>
-        <translation type="vanished">Рубашки карт:</translation>
+        <translation type="obsolete">Рубашки карт:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="366"/>
@@ -1091,7 +1091,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <name>DeckEditorSettingsPage</name>
     <message>
         <source>Enable &amp;price tag feature (using data from blacklotusproject.com)</source>
-        <translation type="vanished">Подписывать &amp;цены (по данным blacklotusproject.com)</translation>
+        <translation type="obsolete">Подписывать &amp;цены (по данным blacklotusproject.com)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="600"/>
@@ -1230,28 +1230,33 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DlgConnect</name>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="15"/>
+        <location filename="../src/dlg_connect.cpp" line="17"/>
         <source>&amp;Host:</source>
         <translation>&amp;Хост:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="19"/>
+        <location filename="../src/dlg_connect.cpp" line="21"/>
         <source>&amp;Port:</source>
         <translation>&amp;Порт:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="23"/>
+        <location filename="../src/dlg_connect.cpp" line="25"/>
         <source>Player &amp;name:</source>
         <translation>&amp;Ник:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="27"/>
+        <location filename="../src/dlg_connect.cpp" line="29"/>
         <source>P&amp;assword:</source>
         <translation>П&amp;ароль:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="32"/>
+        <location filename="../src/dlg_connect.cpp" line="34"/>
         <source>&amp;Save password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_connect.cpp" line="37"/>
+        <source>A&amp;uto connect at start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1263,7 +1268,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation type="obsolete">&amp;Отмена</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="55"/>
+        <location filename="../src/dlg_connect.cpp" line="71"/>
         <source>Connect to server</source>
         <translation>Соединение</translation>
     </message>
@@ -1668,7 +1673,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     </message>
     <message>
         <source>Your card database is invalid. Would you like to go back and set the correct path?</source>
-        <translation type="vanished">База карт не найдена. Вернуться и задать правильный путь?</translation>
+        <translation type="obsolete">База карт не найдена. Вернуться и задать правильный путь?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="776"/>
@@ -2058,7 +2063,7 @@ Would you like to change your database location setting?</source>
     </message>
     <message>
         <source>Path to card database:</source>
-        <translation type="vanished">Путь к базе карт:</translation>
+        <translation type="obsolete">Путь к базе карт:</translation>
     </message>
 </context>
 <context>
@@ -2179,7 +2184,7 @@ Reason for shutdown: %1</source>
     </message>
     <message>
         <source>Czech:</source>
-        <translation type="vanished">Чешский:</translation>
+        <translation type="obsolete">Чешский:</translation>
     </message>
     <message>
         <source>Slovak:</source>
@@ -2242,7 +2247,7 @@ Reason for shutdown: %1</source>
     </message>
     <message>
         <source>Invalid login data.</source>
-        <translation type="vanished">Неверный логин/пароль.</translation>
+        <translation type="obsolete">Неверный логин/пароль.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="242"/>
@@ -2852,12 +2857,12 @@ Local version is %1, remote version is %2.</source>
     <message>
         <source>%1 has loaded a deck (%2).</source>
         <comment>female</comment>
-        <translation type="vanished">%1 загрузила колоду %2.</translation>
+        <translation type="obsolete">%1 загрузила колоду %2.</translation>
     </message>
     <message>
         <source>%1 has loaded a deck (%2).</source>
         <comment>male</comment>
-        <translation type="vanished">%1 загрузил колоду %2.</translation>
+        <translation type="obsolete">%1 загрузил колоду %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="93"/>
@@ -4653,11 +4658,11 @@ Local version is %1, remote version is %2.</source>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="vanished">&amp;Ок</translation>
+        <translation type="obsolete">&amp;Ок</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="vanished">&amp;Отмена</translation>
+        <translation type="obsolete">&amp;Отмена</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="40"/>
@@ -4704,7 +4709,7 @@ Local version is %1, remote version is %2.</source>
     </message>
     <message>
         <source>Administration</source>
-        <translation type="vanished">Администрирование</translation>
+        <translation type="obsolete">Администрирование</translation>
     </message>
 </context>
 <context>
@@ -4997,7 +5002,7 @@ Please enter a name:</source>
     </message>
     <message>
         <source>Deck storage</source>
-        <translation type="vanished">Хранилище колод</translation>
+        <translation type="obsolete">Хранилище колод</translation>
     </message>
 </context>
 <context>
@@ -5282,14 +5287,14 @@ Please enter a name:</source>
     <name>TabServer</name>
     <message>
         <source>Server</source>
-        <translation type="vanished">Сервер</translation>
+        <translation type="obsolete">Сервер</translation>
     </message>
 </context>
 <context>
     <name>TabUserLists</name>
     <message>
         <source>User lists</source>
-        <translation type="vanished">Панели пользователей</translation>
+        <translation type="obsolete">Панели пользователей</translation>
     </message>
     <message>
         <location filename="../src/tab_userlists.cpp" line="48"/>

@@ -18,6 +18,7 @@ signals:
     void onCtrlAltEqual();
     void onCtrlAltLBracket();
     void onCtrlAltRBracket();
+    void onS();
 
 protected:
     virtual bool eventFilter(QObject *, QEvent *event);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="it_IT">
+<TS version="2.0" language="it_IT">
 <context>
     <name>AbstractCounter</name>
     <message>
@@ -43,23 +43,23 @@
     </message>
     <message>
         <source>Path to hand background:</source>
-        <translation type="vanished">Percorso sfondo della mano:</translation>
+        <translation type="obsolete">Percorso sfondo della mano:</translation>
     </message>
     <message>
         <source>Path to stack background:</source>
-        <translation type="vanished">Percorso sfondo della pila:</translation>
+        <translation type="obsolete">Percorso sfondo della pila:</translation>
     </message>
     <message>
         <source>Path to table background:</source>
-        <translation type="vanished">Percorso sfondo del tavolo:</translation>
+        <translation type="obsolete">Percorso sfondo del tavolo:</translation>
     </message>
     <message>
         <source>Path to player info background:</source>
-        <translation type="vanished">Percorso sfondo info giocatore:</translation>
+        <translation type="obsolete">Percorso sfondo info giocatore:</translation>
     </message>
     <message>
         <source>Path to picture of card back:</source>
-        <translation type="vanished">Percorso sfondo retro delle carte:</translation>
+        <translation type="obsolete">Percorso sfondo retro delle carte:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="366"/>
@@ -959,7 +959,7 @@ Questo è solo visibile ai moderatori e non alla persona bannata.</translation>
     <name>DeckEditorSettingsPage</name>
     <message>
         <source>Enable &amp;price tag feature (using data from blacklotusproject.com)</source>
-        <translation type="vanished">Abilita la &amp;ricerca del costo (utilizzando i dati di blacklotusproject.com)</translation>
+        <translation type="obsolete">Abilita la &amp;ricerca del costo (utilizzando i dati di blacklotusproject.com)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="600"/>
@@ -1098,29 +1098,34 @@ Questo è solo visibile ai moderatori e non alla persona bannata.</translation>
 <context>
     <name>DlgConnect</name>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="15"/>
+        <location filename="../src/dlg_connect.cpp" line="17"/>
         <source>&amp;Host:</source>
         <translation>&amp;Host:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="19"/>
+        <location filename="../src/dlg_connect.cpp" line="21"/>
         <source>&amp;Port:</source>
         <translation>&amp;Porta:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="23"/>
+        <location filename="../src/dlg_connect.cpp" line="25"/>
         <source>Player &amp;name:</source>
         <translation>Nome &amp;Giocatore:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="27"/>
+        <location filename="../src/dlg_connect.cpp" line="29"/>
         <source>P&amp;assword:</source>
         <translation>P&amp;assword:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="32"/>
+        <location filename="../src/dlg_connect.cpp" line="34"/>
         <source>&amp;Save password</source>
         <translation>&amp;Salva password</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_connect.cpp" line="37"/>
+        <source>A&amp;uto connect at start</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>&amp;OK</source>
@@ -1131,7 +1136,7 @@ Questo è solo visibile ai moderatori e non alla persona bannata.</translation>
         <translation type="obsolete">&amp;Annulla</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="55"/>
+        <location filename="../src/dlg_connect.cpp" line="71"/>
         <source>Connect to server</source>
         <translation>Connetti al server</translation>
     </message>
@@ -1532,7 +1537,7 @@ Questo è solo visibile ai moderatori e non alla persona bannata.</translation>
     </message>
     <message>
         <source>Your card database is invalid. Would you like to go back and set the correct path?</source>
-        <translation type="vanished">Il tuo database è invalido. Vuoi tornare indietro e impostare il percorso corretto?</translation>
+        <translation type="obsolete">Il tuo database è invalido. Vuoi tornare indietro e impostare il percorso corretto?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="776"/>
@@ -1922,11 +1927,11 @@ Would you like to change your database location setting?</source>
     </message>
     <message>
         <source>Path to card database:</source>
-        <translation type="vanished">Percorso database delle carte:</translation>
+        <translation type="obsolete">Percorso database delle carte:</translation>
     </message>
     <message>
         <source>Path to token database:</source>
-        <translation type="vanished">Percorso database pedine:</translation>
+        <translation type="obsolete">Percorso database pedine:</translation>
     </message>
 </context>
 <context>
@@ -2048,7 +2053,7 @@ Ragione dello spegnimento: %1</numerusform>
     </message>
     <message>
         <source>Czech:</source>
-        <translation type="vanished">Ceco:</translation>
+        <translation type="obsolete">Ceco:</translation>
     </message>
     <message>
         <source>Slovak:</source>
@@ -2111,7 +2116,7 @@ Ragione dello spegnimento: %1</numerusform>
     </message>
     <message>
         <source>Invalid login data.</source>
-        <translation type="vanished">Dati login non validi.</translation>
+        <translation type="obsolete">Dati login non validi.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="242"/>
@@ -2348,12 +2353,12 @@ La tua versione è la %1, la versione online è la %2.</translation>
     <message>
         <source>%1 has loaded a deck (%2).</source>
         <comment>female</comment>
-        <translation type="vanished">%1 ha aperto un mazzo %2.</translation>
+        <translation type="obsolete">%1 ha aperto un mazzo %2.</translation>
     </message>
     <message>
         <source>%1 has loaded a deck (%2).</source>
         <comment>male</comment>
-        <translation type="vanished">%1 ha aperto un mazzo %2.</translation>
+        <translation type="obsolete">%1 ha aperto un mazzo %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="93"/>
@@ -3792,7 +3797,7 @@ La tua versione è la %1, la versione online è la %2.</translation>
     </message>
     <message>
         <source>Ctrl+H</source>
-        <translation type="vanished">Ctrl+H</translation>
+        <translation type="obsolete">Ctrl+H</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="647"/>
@@ -4134,11 +4139,11 @@ La tua versione è la %1, la versione online è la %2.</translation>
     </message>
     <message>
         <source>Cockatrice decks (*.cod)</source>
-        <translation type="vanished">Mazzi Cockatrice (*.cod)</translation>
+        <translation type="obsolete">Mazzi Cockatrice (*.cod)</translation>
     </message>
     <message>
         <source>Plain text decks (*.dec *.mwDeck)</source>
-        <translation type="vanished">Mazzi in formato testo (*.dec *.mwDeck)</translation>
+        <translation type="obsolete">Mazzi in formato testo (*.dec *.mwDeck)</translation>
     </message>
     <message>
         <location filename="../src/deck_loader.cpp" line="8"/>
@@ -4267,11 +4272,11 @@ La tua versione è la %1, la versione online è la %2.</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="vanished">&amp;OK</translation>
+        <translation type="obsolete">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="vanished">&amp;Annulla</translation>
+        <translation type="obsolete">&amp;Annulla</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="40"/>
@@ -4318,14 +4323,14 @@ La tua versione è la %1, la versione online è la %2.</translation>
     </message>
     <message>
         <source>Administration</source>
-        <translation type="vanished">Amministrazione</translation>
+        <translation type="obsolete">Amministrazione</translation>
     </message>
 </context>
 <context>
     <name>TabDeckEditor</name>
     <message>
         <source>&amp;Search...</source>
-        <translation type="vanished">&amp;Cerca...</translation>
+        <translation type="obsolete">&amp;Cerca...</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="292"/>
@@ -4424,11 +4429,11 @@ La tua versione è la %1, la versione online è la %2.</translation>
     </message>
     <message>
         <source>Return</source>
-        <translation type="vanished">Return</translation>
+        <translation type="obsolete">Return</translation>
     </message>
     <message>
         <source>Enter</source>
-        <translation type="vanished">Invio</translation>
+        <translation type="obsolete">Invio</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="315"/>
@@ -4437,11 +4442,11 @@ La tua versione è la %1, la versione online è la %2.</translation>
     </message>
     <message>
         <source>Ctrl+Return</source>
-        <translation type="vanished">Ctrl+Return</translation>
+        <translation type="obsolete">Ctrl+Return</translation>
     </message>
     <message>
         <source>Ctrl+Enter</source>
-        <translation type="vanished">Ctrl+Invio</translation>
+        <translation type="obsolete">Ctrl+Invio</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="317"/>
@@ -4626,7 +4631,7 @@ Please enter a name:</source>
     </message>
     <message>
         <source>Deck storage</source>
-        <translation type="vanished">Cartella mazzi</translation>
+        <translation type="obsolete">Cartella mazzi</translation>
     </message>
 </context>
 <context>
@@ -4875,7 +4880,7 @@ Please enter a name:</source>
     </message>
     <message>
         <source>Game replays</source>
-        <translation type="vanished">Replay partite</translation>
+        <translation type="obsolete">Replay partite</translation>
     </message>
 </context>
 <context>
@@ -4915,14 +4920,14 @@ Please enter a name:</source>
     <name>TabServer</name>
     <message>
         <source>Server</source>
-        <translation type="vanished">Server</translation>
+        <translation type="obsolete">Server</translation>
     </message>
 </context>
 <context>
     <name>TabUserLists</name>
     <message>
         <source>User lists</source>
-        <translation type="vanished">Lista utenti</translation>
+        <translation type="obsolete">Lista utenti</translation>
     </message>
     <message>
         <location filename="../src/tab_userlists.cpp" line="48"/>

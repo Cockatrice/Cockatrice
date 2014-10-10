@@ -359,7 +359,7 @@ void MainWindow::createMenus()
 }
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), localServer(0)
+    : QMainWindow(parent), localServer(0), bHasActivated(false)
 {
     QPixmapCache::setCacheLimit(200000);
 
@@ -417,5 +417,16 @@ void MainWindow::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::LanguageChange)
         retranslateUi();
+    else if(event->type() == QEvent::ActivationChange) {
+        if(isActiveWindow() && !bHasActivated){
+            bHasActivated = true;
+            if(settingsCache->getAutoConnect()) {
+                qDebug() << "Attempting auto-connect...";
+                 DlgConnect dlg(this);
+                 client->connectToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName(), dlg.getPassword());
+            }
+        }
+    }
+
     QMainWindow::changeEvent(event);
 }

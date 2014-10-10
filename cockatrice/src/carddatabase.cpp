@@ -76,8 +76,8 @@ void SetList::sortByKey()
     qSort(begin(), end(), CompareFunctor());
 }
 
-PictureToLoad::PictureToLoad(CardInfo *_card, bool _stripped, bool _hq)
-    : card(_card), stripped(_stripped), setIndex(0), hq(_hq)
+PictureToLoad::PictureToLoad(CardInfo *_card, bool _hq)
+    : card(_card), setIndex(0), hq(_hq)
 {
     if (card) {
         sortedSets = card->getSets();
@@ -135,14 +135,14 @@ void PictureLoader::processLoadQueue()
         mutex.unlock();
 
         //The list of paths to the folders in which to search for images
-        QList<QString> picsPaths = QList<QString>() << _picsPath + "/CUSTOM/" + ptl.getCard()->getCorrectedName() + ".full";
+        QList<QString> picsPaths = QList<QString>() << _picsPath + "/CUSTOM/" + ptl.getCard()->getCorrectedName();
 
 
         QString setName=ptl.getSetName();
         if(!setName.isEmpty())
         {
-            picsPaths   << _picsPath + "/" + setName + "/" + ptl.getCard()->getCorrectedName() + ".full"
-                        << _picsPath + "/downloadedPics/" + setName + "/" + ptl.getCard()->getCorrectedName() + ".full";
+            picsPaths   << _picsPath + "/" + setName + "/" + ptl.getCard()->getCorrectedName()
+                        << _picsPath + "/downloadedPics/" + setName + "/" + ptl.getCard()->getCorrectedName();
         }
 
         QImage image;
@@ -153,6 +153,12 @@ void PictureLoader::processLoadQueue()
         //Iterates through the list of paths, searching for images with the desired name with any QImageReader-supported extension
         for (int i = 0; i < picsPaths.length() && !found; i ++) {
             imgReader.setFileName(picsPaths.at(i));
+            if (imgReader.read(&image)) {
+                emit imageLoaded(ptl.getCard(), image);
+                found = true;
+                break;
+            }
+            imgReader.setFileName(picsPaths.at(i) + ".full");
             if (imgReader.read(&image)) {
                 emit imageLoaded(ptl.getCard(), image);
                 found = true;
@@ -257,14 +263,14 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
 
     const QByteArray &picData = reply->peek(reply->size()); //peek is used to keep the data in the buffer for use by QImageReader
     QImage testImage;
-    
+
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
     imgReader.setDevice(reply);
     QString extension = "." + imgReader.format(); //the format is determined prior to reading the QImageReader data into a QImage object, as that wipes the QImageReader buffer
     if (extension == ".jpeg")
         extension = ".jpg";
-    
+
     if (imgReader.read(&testImage)) {
         QString setName = cardBeingDownloaded.getSetName();
         if(!setName.isEmpty())
@@ -274,11 +280,7 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
                 return;
             }
 
-            QString suffix;
-            if (!cardBeingDownloaded.getStripped())
-                suffix = ".full";
-
-            QFile newPic(picsPath + "/downloadedPics/" + setName + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + suffix + extension);
+            QFile newPic(picsPath + "/downloadedPics/" + setName + "/" + cardBeingDownloaded.getCard()->getCorrectedName() + extension);
             if (!newPic.open(QIODevice::WriteOnly))
                 return;
             newPic.write(picData);
@@ -306,11 +308,11 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
     startNextPicDownload();
 }
 
-void PictureLoader::loadImage(CardInfo *card, bool stripped)
+void PictureLoader::loadImage(CardInfo *card)
 {
     QMutexLocker locker(&mutex);
 
-    loadQueue.append(PictureToLoad(card, stripped));
+    loadQueue.append(PictureToLoad(card));
     emit startLoadQueue();
 }
 
@@ -491,7 +493,7 @@ void CardInfo::updatePixmapCache()
     qDebug() << "Updating pixmap cache for" << name;
     clearPixmapCache();
     loadPixmap();
-    
+
     emit pixmapUpdated();
 }
 
@@ -603,7 +605,7 @@ CardDatabase::~CardDatabase()
 {
     clear();
     delete noCard;
-    
+
     pictureLoader->deleteLater();
     pictureLoaderThread->wait();
     delete pictureLoaderThread;
@@ -617,7 +619,7 @@ void CardDatabase::clear()
         delete setIt.value();
     }
     sets.clear();
-    
+
     QHashIterator<QString, CardInfo *> i(cards);
     while (i.hasNext()) {
         i.next();
@@ -708,7 +710,7 @@ void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
     }
 }
 
-void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
+void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
 {
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement)
@@ -760,16 +762,38 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
                 else if (xml.name() == "token")
                     isToken = xml.readElementText().toInt();
             }
-            addCard(new CardInfo(this, name, isToken, manacost, type, pt, text, colors, loyalty, cipt, tableRow, sets, customPicURLs, customPicURLsHq, muids));
+
+            if (isToken == tokens) {
+                addCard(new CardInfo(this, name, isToken, manacost, type, pt, text, colors, loyalty, cipt, tableRow, sets, customPicURLs, customPicURLsHq, muids));
+            }
         }
     }
 }
 
+CardInfo *CardNameMap::findByPrefix(const std::string &prefix) {
+    int count = 0;
+    CardInfo *found;
+
+    for (CardNameMap::iterator it = this->begin(); it != this->end(); ++it) {
+        if (std::mismatch(prefix.begin(), prefix.end(),
+                          it.key().toStdString().begin()).first == prefix.end()) {
+            count++;
+            found = it.value();
+        }
+    }
+
+    return (count == 1 ? found : NULL);
+}
+
 CardInfo *CardDatabase::getCardFromMap(CardNameMap &cardMap, const QString &cardName, bool createIfNotFound) {
+    CardInfo *foundCard;
+
     if (cardName.isEmpty())
         return noCard;
     else if (cardMap.contains(cardName))
         return cardMap.value(cardName);
+    else if ((foundCard = cardMap.findByPrefix(cardName.toStdString())))
+        return foundCard;
     else if (createIfNotFound) {
         CardInfo *newCard = new CardInfo(this, cardName, true);
         newCard->addToSet(getSet("TK"));
@@ -779,7 +803,7 @@ CardInfo *CardDatabase::getCardFromMap(CardNameMap &cardMap, const QString &card
         return 0;
 }
 
-LoadStatus CardDatabase::loadFromFile(const QString &fileName)
+LoadStatus CardDatabase::loadFromFile(const QString &fileName, bool tokens)
 {
     QFile file(fileName);
     file.open(QIODevice::ReadOnly);
@@ -802,7 +826,7 @@ LoadStatus CardDatabase::loadFromFile(const QString &fileName)
                 if (xml.name() == "sets")
                     loadSetsFromXml(xml);
                 else if (xml.name() == "cards")
-                    loadCardsFromXml(xml);
+                    loadCardsFromXml(xml, tokens);
             }
         }
     }
@@ -837,7 +861,9 @@ bool CardDatabase::saveToFile(const QString &fileName, bool tokens)
     QHashIterator<QString, CardInfo *> cardIterator(cards);
     while (cardIterator.hasNext()) {
         CardInfo *card = cardIterator.next().value();
-        xml << card;
+        if (tokens == card->getIsToken()) {
+            xml << card;
+        }
     }
     xml.writeEndElement(); // cards
 
@@ -871,7 +897,7 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path, bool tokens)
 {
     LoadStatus tempLoadStatus = NotLoaded;
     if (!path.isEmpty())
-        tempLoadStatus = loadFromFile(path);
+        tempLoadStatus = loadFromFile(path, tokens);
 
     if (tempLoadStatus == Ok) {
         SetList allSets;
@@ -936,7 +962,7 @@ void CardDatabase::cacheCardPixmaps(const QStringList &cardNames)
 
 void CardDatabase::loadImage(CardInfo *card)
 {
-    pictureLoader->loadImage(card, false);
+    pictureLoader->loadImage(card);
 }
 
 void CardDatabase::imageLoaded(CardInfo *card, QImage image)

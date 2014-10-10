@@ -18,10 +18,12 @@ public:
     QString getPassword() const { return passwordEdit->text(); }
 private slots:
     void actOk();
+    void actCancel();
+    void passwordSaved(int state);
 private:
     QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel;
     QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit;
-    QCheckBox *savePasswordCheckBox;
+    QCheckBox *savePasswordCheckBox, *autoConnectCheckBox;
 };
 
 #endif

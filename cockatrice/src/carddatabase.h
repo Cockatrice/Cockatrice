@@ -47,14 +47,12 @@ public:
 class PictureToLoad {
 private:
     CardInfo *card;
-    bool stripped;
     SetList sortedSets;
     int setIndex;
     bool hq;
 public:
-    PictureToLoad(CardInfo *_card = 0, bool _stripped = false, bool _hq = true);
+    PictureToLoad(CardInfo *_card = 0, bool _hq = true);
     CardInfo *getCard() const { return card; }
-    bool getStripped() const { return stripped; }
     QString getSetName() const;
     bool nextSet();
     bool getHq() const { return hq; }
@@ -79,7 +77,7 @@ public:
     void setPicsPath(const QString &path);
     void setPicDownload(bool _picDownload);
     void setPicDownloadHq(bool _picDownloadHq);
-    void loadImage(CardInfo *card, bool stripped);
+    void loadImage(CardInfo *card);
 private slots:
     void picDownloadFinished(QNetworkReply *reply);
 public slots:
@@ -182,7 +180,13 @@ signals:
 
 enum LoadStatus { Ok, VersionTooOld, Invalid, NotLoaded, FileError, NoCards };
 
-typedef QHash<QString, CardInfo *> CardNameMap;
+
+class CardNameMap: public QHash<QString, CardInfo *>
+{
+ public:
+  CardInfo *findByPrefix(const std::string &prefix);
+};
+
 typedef QHash<QString, CardSet *> SetNameMap;
 
 class CardDatabase : public QObject {
@@ -210,7 +214,7 @@ protected:
     LoadStatus loadStatus;
 private:
     static const int versionNeeded;
-    void loadCardsFromXml(QXmlStreamReader &xml);
+    void loadCardsFromXml(QXmlStreamReader &xml, bool tokens);
     void loadSetsFromXml(QXmlStreamReader &xml);
 
     CardInfo *getCardFromMap(CardNameMap &cardMap, const QString &cardName, bool createIfNotFound);
@@ -231,7 +235,7 @@ public:
     CardSet *getSet(const QString &setName);
     QList<CardInfo *> getCardList() const { return cards.values(); }
     SetList getSetList() const;
-    LoadStatus loadFromFile(const QString &fileName);
+    LoadStatus loadFromFile(const QString &fileName, bool tokens = false);
     bool saveToFile(const QString &fileName, bool tokens = false);
     QStringList getAllColors() const;
     QStringList getAllMainCardTypes() const;

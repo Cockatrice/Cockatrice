@@ -48,6 +48,8 @@ SettingsCache::SettingsCache()
     priceTagSource = settings->value("deckeditor/pricetagsource", 0).toInt();
 
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
+
+    attemptAutoConnect = settings->value("server/auto_connect", 0).toBool(); 
 }
 
 void SettingsCache::setLang(const QString &_lang)
@@ -265,6 +267,12 @@ void SettingsCache::setMainWindowGeometry(const QByteArray &_mainWindowGeometry)
 {
     mainWindowGeometry = _mainWindowGeometry;
     settings->setValue("interface/main_window_geometry", mainWindowGeometry);
+}
+
+void SettingsCache::setAutoConnect(const bool &_autoConnect)
+{
+    attemptAutoConnect = _autoConnect;
+    settings->setValue("server/auto_connect", attemptAutoConnect ? 1 : 0);
 }
 
 void SettingsCache::copyPath(const QString &src, const QString &dst)

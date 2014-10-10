@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="sv_SE">
+<TS version="2.0" language="sv_SE">
 <context>
     <name>AbstractCounter</name>
     <message>
@@ -43,23 +43,23 @@
     </message>
     <message>
         <source>Path to hand background:</source>
-        <translation type="vanished">Sökväg till handbakgrund:</translation>
+        <translation type="obsolete">Sökväg till handbakgrund:</translation>
     </message>
     <message>
         <source>Path to stack background:</source>
-        <translation type="vanished">Sökväg till stapelbakgrund:</translation>
+        <translation type="obsolete">Sökväg till stapelbakgrund:</translation>
     </message>
     <message>
         <source>Path to table background:</source>
-        <translation type="vanished">Sökväg till bordbakgrund:</translation>
+        <translation type="obsolete">Sökväg till bordbakgrund:</translation>
     </message>
     <message>
         <source>Path to player info background:</source>
-        <translation type="vanished">Sökväg till spelarinfobakgrund:</translation>
+        <translation type="obsolete">Sökväg till spelarinfobakgrund:</translation>
     </message>
     <message>
         <source>Path to picture of card back:</source>
-        <translation type="vanished">Sökväg till kortbaksidans bild:</translation>
+        <translation type="obsolete">Sökväg till kortbaksidans bild:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="366"/>
@@ -923,7 +923,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <name>DeckEditorSettingsPage</name>
     <message>
         <source>Enable &amp;price tag feature (using data from blacklotusproject.com)</source>
-        <translation type="vanished">Aktivera &amp;prislappsfunktionen (använder data från blacklotusproject.com)</translation>
+        <translation type="obsolete">Aktivera &amp;prislappsfunktionen (använder data från blacklotusproject.com)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="600"/>
@@ -1062,29 +1062,34 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
 <context>
     <name>DlgConnect</name>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="15"/>
+        <location filename="../src/dlg_connect.cpp" line="17"/>
         <source>&amp;Host:</source>
         <translation>&amp;Värd:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="19"/>
+        <location filename="../src/dlg_connect.cpp" line="21"/>
         <source>&amp;Port:</source>
         <translation>&amp;Port:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="23"/>
+        <location filename="../src/dlg_connect.cpp" line="25"/>
         <source>Player &amp;name:</source>
         <translation>Spelar&amp;namn:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="27"/>
+        <location filename="../src/dlg_connect.cpp" line="29"/>
         <source>P&amp;assword:</source>
         <translation>&amp;Lösenord:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="32"/>
+        <location filename="../src/dlg_connect.cpp" line="34"/>
         <source>&amp;Save password</source>
         <translation>&amp;Spara lösenord</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_connect.cpp" line="37"/>
+        <source>A&amp;uto connect at start</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>&amp;OK</source>
@@ -1095,7 +1100,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <translation type="obsolete">&amp;Avbryt</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="55"/>
+        <location filename="../src/dlg_connect.cpp" line="71"/>
         <source>Connect to server</source>
         <translation>Anslut till server</translation>
     </message>
@@ -1492,7 +1497,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     </message>
     <message>
         <source>Your card database is invalid. Would you like to go back and set the correct path?</source>
-        <translation type="vanished">Din kortdatabas är ogiltig. Vill du gå tillbaka och ange den korrekta sökvägen?</translation>
+        <translation type="obsolete">Din kortdatabas är ogiltig. Vill du gå tillbaka och ange den korrekta sökvägen?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="776"/>
@@ -1878,11 +1883,11 @@ Would you like to change your database location setting?</source>
     </message>
     <message>
         <source>Path to card database:</source>
-        <translation type="vanished">Sökväg till kortdatabas:</translation>
+        <translation type="obsolete">Sökväg till kortdatabas:</translation>
     </message>
     <message>
         <source>Path to token database:</source>
-        <translation type="vanished">Sökväg till jetongdatabas:</translation>
+        <translation type="obsolete">Sökväg till jetongdatabas:</translation>
     </message>
 </context>
 <context>
@@ -2030,7 +2035,7 @@ Anledning till nedstängning: %1</numerusform>
     </message>
     <message>
         <source>Czech:</source>
-        <translation type="vanished">Tjeckiska:</translation>
+        <translation type="obsolete">Tjeckiska:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="228"/>
@@ -2063,7 +2068,7 @@ Anledning till nedstängning: %1</numerusform>
     </message>
     <message>
         <source>Invalid login data.</source>
-        <translation type="vanished">Ogiltig inloggningsdata.</translation>
+        <translation type="obsolete">Ogiltig inloggningsdata.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="242"/>
@@ -2280,12 +2285,12 @@ Lokal version är %1, avlägsen version är %2.</translation>
     <message>
         <source>%1 has loaded a deck (%2).</source>
         <comment>female</comment>
-        <translation type="vanished">%1 har laddat en lek (%2).</translation>
+        <translation type="obsolete">%1 har laddat en lek (%2).</translation>
     </message>
     <message>
         <source>%1 has loaded a deck (%2).</source>
         <comment>male</comment>
-        <translation type="vanished">%1 har laddat en lek (%2).</translation>
+        <translation type="obsolete">%1 har laddat en lek (%2).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="93"/>
@@ -4054,11 +4059,11 @@ Lokal version är %1, avlägsen version är %2.</translation>
     </message>
     <message>
         <source>Cockatrice decks (*.cod)</source>
-        <translation type="vanished">Cockatricelekar (*.cod)</translation>
+        <translation type="obsolete">Cockatricelekar (*.cod)</translation>
     </message>
     <message>
         <source>Plain text decks (*.dec *.mwDeck)</source>
-        <translation type="vanished">Klartextlekar (*.dec *.mwDeck)</translation>
+        <translation type="obsolete">Klartextlekar (*.dec *.mwDeck)</translation>
     </message>
     <message>
         <location filename="../src/deck_loader.cpp" line="8"/>
@@ -4187,11 +4192,11 @@ Lokal version är %1, avlägsen version är %2.</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="vanished">&amp;OK</translation>
+        <translation type="obsolete">&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="vanished">&amp;Avbryt</translation>
+        <translation type="obsolete">&amp;Avbryt</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="40"/>
@@ -4238,14 +4243,14 @@ Lokal version är %1, avlägsen version är %2.</translation>
     </message>
     <message>
         <source>Administration</source>
-        <translation type="vanished">Administration</translation>
+        <translation type="obsolete">Administration</translation>
     </message>
 </context>
 <context>
     <name>TabDeckEditor</name>
     <message>
         <source>&amp;Search...</source>
-        <translation type="vanished">&amp;Sök...</translation>
+        <translation type="obsolete">&amp;Sök...</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="292"/>
@@ -4529,7 +4534,7 @@ Please enter a name:</source>
     </message>
     <message>
         <source>Deck storage</source>
-        <translation type="vanished">Leklagring</translation>
+        <translation type="obsolete">Leklagring</translation>
     </message>
 </context>
 <context>
@@ -4778,7 +4783,7 @@ Please enter a name:</source>
     </message>
     <message>
         <source>Game replays</source>
-        <translation type="vanished">Spelrepriser</translation>
+        <translation type="obsolete">Spelrepriser</translation>
     </message>
 </context>
 <context>
@@ -4818,14 +4823,14 @@ Please enter a name:</source>
     <name>TabServer</name>
     <message>
         <source>Server</source>
-        <translation type="vanished">Server</translation>
+        <translation type="obsolete">Server</translation>
     </message>
 </context>
 <context>
     <name>TabUserLists</name>
     <message>
         <source>User lists</source>
-        <translation type="vanished">Användarlistor</translation>
+        <translation type="obsolete">Användarlistor</translation>
     </message>
     <message>
         <location filename="../src/tab_userlists.cpp" line="48"/>
