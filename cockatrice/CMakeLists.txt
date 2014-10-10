@@ -323,6 +323,6 @@ Data = Resources\")
         " COMPONENT Runtime)
 
     if(WIN32SSLRUNTIME_FOUND)
-        install(FILES ${WIN32SSLRUNTIME_LIBRARIES} DESTINATION "${CMAKE_INSTALL_PREFIX}")
+        install(FILES ${WIN32SSLRUNTIME_LIBRARIES} DESTINATION ./)
     endif()
 endif()
