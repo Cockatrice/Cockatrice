@@ -80,6 +80,8 @@ Section Uninstall
 	Delete "$INSTDIR\libprotobuf.lib"
 	Delete "$INSTDIR\Qt*.dll"
 	Delete "$INSTDIR\icu*.dll"
+	Delete "$INSTDIR\libeay32.dll"
+	Delete "$INSTDIR\ssleay32.dll"
 	Delete "$INSTDIR\qt.conf"
 	Delete "$INSTDIR\qdebug.txt"
 	Delete "$INSTDIR\servatrice.sql"
