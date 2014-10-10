@@ -203,7 +203,7 @@ endif()
 include(CPack)
 
 # Compile servatrice (default off)
-option(WITH_SERVER "build servatrice" ON)
+option(WITH_SERVER "build servatrice" OFF)
 add_subdirectory(common)
 if(WITH_SERVER)
     add_subdirectory(servatrice)
