@@ -60,6 +60,7 @@
     <message>
         <source>Path to picture of card back:</source>
         <translation>Chemin vers l&apos;image de dos des cartes:</translation>
+	</message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="366"/>
         <source>Hand background:</source>
