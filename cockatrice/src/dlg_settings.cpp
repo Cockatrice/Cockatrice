@@ -25,6 +25,7 @@
 #include "main.h"
 #include "settingscache.h"
 #include "priceupdater.h"
+#include "soundengine.h"
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
@@ -503,6 +504,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(soundPathClearButton, SIGNAL(clicked()), this, SLOT(soundPathClearButtonClicked()));
     QPushButton *soundPathButton = new QPushButton("...");
     connect(soundPathButton, SIGNAL(clicked()), this, SLOT(soundPathButtonClicked()));
+    QPushButton *soundTestButton = new QPushButton(QString("Play test sound"));
+    connect(soundTestButton, SIGNAL(clicked()), soundEngine, SLOT(cuckoo()));
     
     QGridLayout *soundGrid = new QGridLayout;
     soundGrid->addWidget(soundEnabledCheckBox, 0, 0, 1, 4);
@@ -510,6 +513,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     soundGrid->addWidget(soundPathEdit, 1, 1);
     soundGrid->addWidget(soundPathClearButton, 1, 2);
     soundGrid->addWidget(soundPathButton, 1, 3);
+    soundGrid->addWidget(soundTestButton, 1, 4);
     
     soundGroupBox = new QGroupBox;
     soundGroupBox->setLayout(soundGrid);
