@@ -158,6 +158,11 @@ set(CMAKE_AUTOMOC TRUE)
 # Find other needed libraries
 FIND_PACKAGE(Protobuf REQUIRED)
 
+#Find OpenSSL
+IF(WIN32)
+    FIND_PACKAGE(Win32SslRuntime)
+ENDIF()
+
 # Package builder
 set(CPACK_PACKAGE_CONTACT "Daenyth+github@gmail.com") 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PROJECT_NAME})

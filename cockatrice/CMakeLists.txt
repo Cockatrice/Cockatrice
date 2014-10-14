@@ -321,4 +321,8 @@ Data = Resources\")
         include(BundleUtilities)
         fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/cockatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         " COMPONENT Runtime)
+
+    if(WIN32SSLRUNTIME_FOUND)
+        install(FILES ${WIN32SSLRUNTIME_LIBRARIES} DESTINATION ./)
+    endif()
 endif()
