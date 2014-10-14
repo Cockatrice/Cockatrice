@@ -6,3 +6,5 @@ Name=Servatrice
 Exec=servatrice
 Icon=servatrice
 Categories=Game;CardGame;
+Terminal=true
+Comment=Game server for Cockatrice
