@@ -504,7 +504,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(soundPathClearButton, SIGNAL(clicked()), this, SLOT(soundPathClearButtonClicked()));
     QPushButton *soundPathButton = new QPushButton("...");
     connect(soundPathButton, SIGNAL(clicked()), this, SLOT(soundPathButtonClicked()));
-    QPushButton *soundTestButton = new QPushButton(QString("Play test sound"));
+    soundTestButton = new QPushButton();
     connect(soundTestButton, SIGNAL(clicked()), soundEngine, SLOT(cuckoo()));
     
     QGridLayout *soundGrid = new QGridLayout;
@@ -513,7 +513,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     soundGrid->addWidget(soundPathEdit, 1, 1);
     soundGrid->addWidget(soundPathClearButton, 1, 2);
     soundGrid->addWidget(soundPathButton, 1, 3);
-    soundGrid->addWidget(soundTestButton, 1, 4);
+    soundGrid->addWidget(soundTestButton, 2, 1);
     
     soundGroupBox = new QGroupBox;
     soundGroupBox->setLayout(soundGrid);
@@ -542,6 +542,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     tapAnimationCheckBox->setText(tr("&Tap/untap animation"));
     soundEnabledCheckBox->setText(tr("Enable &sounds"));
     soundPathLabel->setText(tr("Path to sounds directory:"));
+    soundTestButton->setText(tr("Test system sound engine"));
 }
 
 void UserInterfaceSettingsPage::soundPathClearButtonClicked()
