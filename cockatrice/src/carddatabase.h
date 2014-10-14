@@ -180,13 +180,7 @@ signals:
 
 enum LoadStatus { Ok, VersionTooOld, Invalid, NotLoaded, FileError, NoCards };
 
-
-class CardNameMap: public QHash<QString, CardInfo *>
-{
- public:
-  CardInfo *findByPrefix(const std::string &prefix);
-};
-
+typedef QHash<QString, CardInfo *> CardNameMap;
 typedef QHash<QString, CardSet *> SetNameMap;
 
 class CardDatabase : public QObject {
