@@ -146,8 +146,17 @@ void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsI
 {
     qreal totalTextWidth = getCardTypeTextWidth();
     
-    if (bgPixmap.isNull())
-        painter->fillRect(boundingRect(), QColor(0, 0, 100));
+    if (bgPixmap.isNull()) {
+        //painter->fillRect(boundingRect(), QColor(70, 50, 100));
+
+        QLinearGradient grad1(0, 0, 1, 0);
+        grad1.setCoordinateMode(QGradient::ObjectBoundingMode);
+        grad1.setColorAt(0, QColor(70, 50, 100));
+        grad1.setColorAt(1, QColor(170, 150, 200));
+        painter->fillRect(QRectF(0, 0, width, height), QBrush(grad1));
+
+        painter->fillRect(boundingRect(), QColor(0, 0, 0, 80));
+    }
     else
         painter->fillRect(boundingRect(), QBrush(bgPixmap));
     painter->setPen(QColor(255, 255, 255, 100));
