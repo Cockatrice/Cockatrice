@@ -17,6 +17,7 @@
 #include "tab_game.h"
 #include "pb/serverinfo_card.pb.h"
 
+
 CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _revealedCard, QGraphicsItem *parent)
     : AbstractCardItem(_name, _owner, _cardid, parent), zone(0), revealedCard(_revealedCard), attacking(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(0), attachedTo(0)
 {
@@ -360,15 +361,16 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     event->accept();
 }
 
+
 bool CardItem::animationEvent()
 {
-    int delta = 18;
+    int delta = DELTA;
     if (!tapped)
         delta *= -1;
-    
+
     tapAngle += delta;
-    
-    setTransform(QTransform().translate((float) CARD_WIDTH / 2, (float) CARD_HEIGHT / 2).rotate(tapAngle).translate((float) -CARD_WIDTH / 2, (float) -CARD_HEIGHT / 2));
+
+    setTransform(QTransform().translate(CARD_WIDTH_HALF, CARD_HEIGHT_HALF).rotate(tapAngle).translate(-CARD_WIDTH_HALF, -CARD_HEIGHT_HALF));
     setHovered(false);
     update();
 
