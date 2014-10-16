@@ -25,6 +25,7 @@
 #include "main.h"
 #include "settingscache.h"
 #include "priceupdater.h"
+#include "soundengine.h"
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
@@ -503,6 +504,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(soundPathClearButton, SIGNAL(clicked()), this, SLOT(soundPathClearButtonClicked()));
     QPushButton *soundPathButton = new QPushButton("...");
     connect(soundPathButton, SIGNAL(clicked()), this, SLOT(soundPathButtonClicked()));
+    soundTestButton = new QPushButton();
+    connect(soundTestButton, SIGNAL(clicked()), soundEngine, SLOT(cuckoo()));
     
     QGridLayout *soundGrid = new QGridLayout;
     soundGrid->addWidget(soundEnabledCheckBox, 0, 0, 1, 4);
@@ -510,6 +513,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     soundGrid->addWidget(soundPathEdit, 1, 1);
     soundGrid->addWidget(soundPathClearButton, 1, 2);
     soundGrid->addWidget(soundPathButton, 1, 3);
+    soundGrid->addWidget(soundTestButton, 2, 1);
     
     soundGroupBox = new QGroupBox;
     soundGroupBox->setLayout(soundGrid);
@@ -538,6 +542,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     tapAnimationCheckBox->setText(tr("&Tap/untap animation"));
     soundEnabledCheckBox->setText(tr("Enable &sounds"));
     soundPathLabel->setText(tr("Path to sounds directory:"));
+    soundTestButton->setText(tr("Test system sound engine"));
 }
 
 void UserInterfaceSettingsPage::soundPathClearButtonClicked()
