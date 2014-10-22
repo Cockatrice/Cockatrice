@@ -263,15 +263,16 @@ if(APPLE)
     set(qtconf_dest_dir cockatrice.app/Contents/Resources)
 
     # note: no codecs in qt5
-    # note: phonon_backend => mediaservice
+    # note: phonon_backend => audio | mediaservice
     # note: needs platform on osx
 
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*_debug\\.dylib")
+            FILES_MATCHING REGEX "(audio|codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*_debug\\.dylib")
     else()
         install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/[^_]*\\.dylib")
+            FILES_MATCHING REGEX "(audio|codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*\\.dylib"
+            REGEX ".*_debug\\.dylib" EXCLUDE)
     endif()
 
     install(CODE "
@@ -296,15 +297,15 @@ if(WIN32)
     set(qtconf_dest_dir .)
 
     # note: no codecs in qt5
-    # note: phonon_backend => mediaservice
+    # note: phonon_backend => audio | mediaservice
     # note: needs platform on osx
 
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*d\\.dll")
+            FILES_MATCHING REGEX "(audio|codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*d\\.dll")
     else()
         install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*[^d]\\.dll")
+            FILES_MATCHING REGEX "(audio|codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*[^d]\\.dll")
     endif()
 
     install(CODE "
@@ -321,4 +322,8 @@ Data = Resources\")
         include(BundleUtilities)
         fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/cockatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         " COMPONENT Runtime)
+
+    if(WIN32SSLRUNTIME_FOUND)
+        install(FILES ${WIN32SSLRUNTIME_LIBRARIES} DESTINATION ./)
+    endif()
 endif()

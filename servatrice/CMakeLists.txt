@@ -77,6 +77,10 @@ endif()
 
 SET(QT_DONT_USE_QTGUI TRUE)
 
+# Declare path variables
+set(ICONDIR share/icons CACHE STRING "icon dir")
+set(DESKTOPDIR share/applications CACHE STRING "desktop file destination")
+
 # Include directories
 INCLUDE_DIRECTORIES(../common)
 INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
@@ -112,6 +116,10 @@ if(UNIX)
         INSTALL(TARGETS servatrice RUNTIME DESTINATION bin/)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION share/servatice/)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION share/servatice/)
+
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/servatrice.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/servatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.desktop DESTINATION ${DESKTOPDIR})
     endif()
 elseif(WIN32)
     INSTALL(TARGETS servatrice RUNTIME DESTINATION ./)
