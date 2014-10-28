@@ -113,10 +113,10 @@ ENDIF()
 IF(Qt5Widgets_FOUND)
     MESSAGE(STATUS "Found Qt ${Qt5Widgets_VERSION_STRING}")
 
-    if(UNIX AND NOT APPLE AND "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
-        # FIX: Qt was built with -reduce-relocations
-        add_definitions(-fPIC)
-    endif() 
+    # FIX: Qt was built with -reduce-relocations
+    if (Qt5_POSITION_INDEPENDENT_CODE)
+        SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    endif()
 
     FIND_PACKAGE(Qt5LinguistTools)
     IF(UPDATE_TRANSLATIONS)
