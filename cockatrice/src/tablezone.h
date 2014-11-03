@@ -133,9 +133,6 @@ public:
      */
     void resizeToContents();
 
-    //**************************************************************************
-    // GETTERS AND SETTERS
-    //**************************************************************************
     int getMinimumWidth() const { return currentMinimumWidth; }
     void setWidth(qreal _width){ prepareGeometryChange(); width = _width;};
     qreal getWidth() const { return width; }
