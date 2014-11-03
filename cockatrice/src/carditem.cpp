@@ -364,11 +364,11 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 bool CardItem::animationEvent()
 {
-    int delta = DELTA;
+    int rotation = ROTATION_DEGREES_PER_FRAME;
     if (!tapped)
-        delta *= -1;
+        rotation *= -1;
 
-    tapAngle += delta;
+    tapAngle += rotation;
 
     setTransform(QTransform().translate(CARD_WIDTH_HALF, CARD_HEIGHT_HALF).rotate(tapAngle).translate(-CARD_WIDTH_HALF, -CARD_HEIGHT_HALF));
     setHovered(false);
