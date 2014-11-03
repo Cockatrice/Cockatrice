@@ -220,6 +220,6 @@ PRIMARY KEY (`id`)
 CREATE TABLE IF NOT EXISTS `cockatrice_rooms_gametypes` (
 `id_room` int(7) unsigned NOT NULL,
 `name` varchar(50) NOT NULL,
-PRIMARY KEY (`id_room`)
+PRIMARY KEY (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
