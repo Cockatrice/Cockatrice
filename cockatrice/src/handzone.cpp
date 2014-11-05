@@ -78,7 +78,7 @@ QRectF HandZone::boundingRect() const
 void HandZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     if (bgPixmap.isNull())
-        painter->fillRect(boundingRect(), Qt::darkGreen);
+        painter->fillRect(boundingRect(), QColor(80, 100, 50));
     else
         painter->fillRect(boundingRect(), QBrush(bgPixmap));
 }
