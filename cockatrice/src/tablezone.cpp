@@ -26,16 +26,11 @@ const QColor TableZone::GRADIENT_COLORLESS  = QColor(255, 255, 255, 0);
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
     : SelectZone(_p, "table", true, false, true, parent), active(false)
 {
-    // repaint the table if the background image changes
     connect(settingsCache, SIGNAL(tableBgPathChanged()), this, SLOT(updateBgPixmap()));
-
-    // reorganize the cards if the vertical coordinates are changed
     connect(settingsCache, SIGNAL(invertVerticalCoordinateChanged()), this, SLOT(reorganizeCards()));
-    
-    // load in any current background pixel map
+
     updateBgPixmap();
 
-    // calculate the width and height of the TableZone bounding rect
     height = 2 * BOX_LINE_WIDTH + 3 * (CARD_HEIGHT + 20) + 2 * PADDING_Y;
     width = MIN_WIDTH + 2 * MARGIN_X + 2 * BOX_LINE_WIDTH;
     currentMinimumWidth = MIN_WIDTH;
