@@ -12,6 +12,9 @@ class QAction;
 class QColor;
 
 const int MAX_COUNTERS_ON_CARD = 999;
+const float CARD_WIDTH_HALF = CARD_WIDTH / 2;
+const float CARD_HEIGHT_HALF = CARD_HEIGHT / 2;
+const int ROTATION_DEGREES_PER_FRAME = 10;
 
 class CardItem : public AbstractCardItem {
     Q_OBJECT

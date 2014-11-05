@@ -262,7 +262,7 @@ void GameScene::registerAnimationItem(AbstractCardItem *card)
 {
     cardsToAnimate.insert(static_cast<CardItem *>(card));
     if (!animationTimer->isActive())
-        animationTimer->start(50, this);
+        animationTimer->start(15, this);
 }
 
 void GameScene::unregisterAnimationItem(AbstractCardItem *card)

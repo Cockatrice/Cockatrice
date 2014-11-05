@@ -65,7 +65,7 @@ void PhaseButton::setActive(bool _active)
         return;
     
     active = _active;
-    activeAnimationTimer->start(50);
+    activeAnimationTimer->start(25);
 }
 
 void PhaseButton::updateAnimation()
