@@ -142,8 +142,8 @@ void PictureLoader::processLoadQueue()
         PictureToLoad ptl = loadQueue.takeFirst();
         mutex.unlock();
 
-        QString setName=ptl.getSetName();
-        QString correctedCardname=ptl.getCard()->getCorrectedName();
+        QString setName = ptl.getSetName();
+        QString correctedCardname = ptl.getCard()->getCorrectedName();
         qDebug() << "Trying to load picture (set: " << setName << " card: " << correctedCardname << ")";
 
         //The list of paths to the folders in which to search for images
