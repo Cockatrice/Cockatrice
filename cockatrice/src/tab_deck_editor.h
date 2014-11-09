@@ -85,7 +85,6 @@ private:
     QTreeView *deckView;
     KeySignals deckViewKeySignals;
     CardFrame *cardInfo;
-    QLabel *searchLabel;
     SearchLineEdit *searchEdit;
     KeySignals searchKeySignals;
 
