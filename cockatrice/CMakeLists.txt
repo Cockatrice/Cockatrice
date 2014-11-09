@@ -242,6 +242,13 @@ endif()
 
 if(UNIX)
     if(APPLE)
+        set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}")
+        set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.cockatrice.${PROJECT_NAME}")
+        set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME}-${PROJECT_VERSION}")
+        set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
+        set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
+        set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+
         INSTALL(TARGETS cockatrice BUNDLE DESTINATION ./)
         INSTALL(FILES ${cockatrice_QM} DESTINATION ./cockatrice.app/Contents/Resources/translations)
     else()
