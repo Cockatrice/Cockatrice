@@ -108,6 +108,13 @@ endif()
 # install rules
 if(UNIX)
     if(APPLE)
+        set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}")
+        set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.daenyth.${PROJECT_NAME}")
+        set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME}-${PROJECT_VERSION}")
+        set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
+        set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
+        set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+
         INSTALL(TARGETS servatrice BUNDLE DESTINATION ./)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION ./servatrice.app/Contents/Resources/)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION ./servatrice.app/Contents/Resources/)
