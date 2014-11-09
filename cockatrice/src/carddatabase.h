@@ -53,6 +53,7 @@ private:
 public:
     PictureToLoad(CardInfo *_card = 0, bool _hq = true);
     CardInfo *getCard() const { return card; }
+    CardSet *getCurrentSet() const;
     QString getSetName() const;
     bool nextSet();
     bool getHq() const { return hq; }
@@ -70,7 +71,7 @@ private:
     PictureToLoad cardBeingDownloaded;
     bool picDownload, picDownloadHq, downloadRunning, loadQueueRunning;
     void startNextPicDownload();
-    QString getPicUrl(CardInfo* card);
+    QString getPicUrl();
 public:
     PictureLoader(const QString &__picsPath, bool _picDownload, bool _picDownloadHq, QObject *parent = 0);
     ~PictureLoader();
@@ -80,6 +81,7 @@ public:
     void loadImage(CardInfo *card);
 private slots:
     void picDownloadFinished(QNetworkReply *reply);
+    void picDownloadFailed();
 public slots:
     void processLoadQueue();
 signals:
@@ -163,8 +165,6 @@ public:
     void clearPixmapCache();
     void clearPixmapCacheMiss();
     void imageLoaded(const QImage &image);
-    CardSet *getPreferredSet();
-    int getPreferredMuId();
 
     /**
      * Simplify a name to have no punctuation and lowercase all letters, for

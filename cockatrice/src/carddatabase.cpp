@@ -101,6 +101,14 @@ QString PictureToLoad::getSetName() const
         return QString("");
 }
 
+CardSet *PictureToLoad::getCurrentSet() const
+{
+    if (setIndex < sortedSets.size())
+        return sortedSets[setIndex];
+    else
+        return 0;
+}
+
 PictureLoader::PictureLoader(const QString &__picsPath, bool _picDownload, bool _picDownloadHq, QObject *parent)
     : QObject(parent),
       _picsPath(__picsPath), picDownload(_picDownload), picDownloadHq(_picDownloadHq),
@@ -134,15 +142,17 @@ void PictureLoader::processLoadQueue()
         PictureToLoad ptl = loadQueue.takeFirst();
         mutex.unlock();
 
+        QString setName = ptl.getSetName();
+        QString correctedCardname = ptl.getCard()->getCorrectedName();
+        qDebug() << "Trying to load picture (set: " << setName << " card: " << correctedCardname << ")";
+
         //The list of paths to the folders in which to search for images
-        QList<QString> picsPaths = QList<QString>() << _picsPath + "/CUSTOM/" + ptl.getCard()->getCorrectedName();
+        QList<QString> picsPaths = QList<QString>() << _picsPath + "/CUSTOM/" + correctedCardname;
 
-
-        QString setName=ptl.getSetName();
         if(!setName.isEmpty())
         {
-            picsPaths   << _picsPath + "/" + setName + "/" + ptl.getCard()->getCorrectedName()
-                        << _picsPath + "/downloadedPics/" + setName + "/" + ptl.getCard()->getCorrectedName();
+            picsPaths   << _picsPath + "/" + setName + "/" + correctedCardname
+                        << _picsPath + "/downloadedPics/" + setName + "/" + correctedCardname;
         }
 
         QImage image;
@@ -154,12 +164,14 @@ void PictureLoader::processLoadQueue()
         for (int i = 0; i < picsPaths.length() && !found; i ++) {
             imgReader.setFileName(picsPaths.at(i));
             if (imgReader.read(&image)) {
+                qDebug() << "Picture found on disk (set: " << setName << " card: " << correctedCardname << ")";
                 emit imageLoaded(ptl.getCard(), image);
                 found = true;
                 break;
             }
             imgReader.setFileName(picsPaths.at(i) + ".full");
             if (imgReader.read(&image)) {
+                qDebug() << "Picture.full found on disk (set: " << setName << " card: " << correctedCardname << ")";
                 emit imageLoaded(ptl.getCard(), image);
                 found = true;
             }
@@ -167,24 +179,32 @@ void PictureLoader::processLoadQueue()
 
         if (!found) {
             if (picDownload) {
+                qDebug() << "Picture NOT found, trying to download (set: " << setName << " card: " << correctedCardname << ")";
                 cardsToDownload.append(ptl);
                 if (!downloadRunning)
                     startNextPicDownload();
             } else {
                 if (ptl.nextSet())
+                {
+                    qDebug() << "Picture NOT found and download disabled, moving to next set (newset: " << setName << " card: " << correctedCardname << ")";
+                    mutex.lock();
                     loadQueue.prepend(ptl);
-                else
+                    mutex.unlock();
+                } else {
+                    qDebug() << "Picture NOT found, download disabled, no more sets to try: BAILING OUT (oldset: " << setName << " card: " << correctedCardname << ")";
                     emit imageLoaded(ptl.getCard(), QImage());
+                }
             }
         }
     }
 }
 
-QString PictureLoader::getPicUrl(CardInfo *card)
+QString PictureLoader::getPicUrl()
 {
     if (!picDownload) return QString("");
 
-    CardSet *set = card->getPreferredSet();
+    CardInfo *card = cardBeingDownloaded.getCard();
+    CardSet *set=cardBeingDownloaded.getCurrentSet();
     QString picUrl = QString("");
 
     // if sets have been defined for the card, they can contain custom picUrls
@@ -211,10 +231,10 @@ QString PictureLoader::getPicUrl(CardInfo *card)
     if (set) {
         picUrl.replace("!setcode!", QUrl::toPercentEncoding(set->getShortName()));
         picUrl.replace("!setname!", QUrl::toPercentEncoding(set->getLongName()));
+        int muid = card->getMuId(set->getShortName());
+        if (muid)
+            picUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(muid)));
     }
-    int muid = card->getPreferredMuId();
-    if (muid)
-        picUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(muid)));
 
     if (picUrl.contains("!name!") ||
             picUrl.contains("!setcode!") ||
@@ -239,19 +259,33 @@ void PictureLoader::startNextPicDownload()
 
     cardBeingDownloaded = cardsToDownload.takeFirst();
 
-    QString picUrl = getPicUrl(cardBeingDownloaded.getCard());
+    QString picUrl = getPicUrl();
     if (picUrl.isEmpty()) {
-        qDebug() << "No url for" << cardBeingDownloaded.getCard()->getName();
-        cardBeingDownloaded = 0;
         downloadRunning = false;
-        return;
+        picDownloadFailed();
+    } else {
+        QUrl url(picUrl);
+
+        QNetworkRequest req(url);
+        qDebug() << "starting picture download:" << cardBeingDownloaded.getCard()->getName() << "Url:" << req.url();
+        networkManager->get(req);
     }
+}
 
-    QUrl url(picUrl);
-
-    QNetworkRequest req(url);
-    qDebug() << "starting picture download:" << cardBeingDownloaded.getCard()->getName() << "Url:" << req.url();
-    networkManager->get(req);
+void PictureLoader::picDownloadFailed()
+{
+    if (cardBeingDownloaded.nextSet())
+    {
+        qDebug() << "Picture NOT found, download failed, moving to next set (newset: " << cardBeingDownloaded.getSetName() << " card: " << cardBeingDownloaded.getCard()->getCorrectedName() << ")";
+        mutex.lock();
+        loadQueue.prepend(cardBeingDownloaded);
+        mutex.unlock();
+        emit startLoadQueue();
+    } else {
+        qDebug() << "Picture NOT found, download failed, no more sets to try: BAILING OUT (oldset: " << cardBeingDownloaded.getSetName() << " card: " << cardBeingDownloaded.getCard()->getCorrectedName() << ")";
+        cardBeingDownloaded = 0;
+        emit imageLoaded(cardBeingDownloaded.getCard(), QImage());
+    }
 }
 
 void PictureLoader::picDownloadFinished(QNetworkReply *reply)
@@ -288,21 +322,9 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
         }
 
         emit imageLoaded(cardBeingDownloaded.getCard(), testImage);
-    } else if (cardBeingDownloaded.getHq()) {
-        qDebug() << "HQ: received invalid picture. URL:" << reply->request().url();
-        cardBeingDownloaded.setHq(false);
-        cardsToDownload.prepend(cardBeingDownloaded);
     } else {
-        qDebug() << "LQ: received invalid picture. URL:" << reply->request().url();
-        if (cardBeingDownloaded.nextSet()) {
-            cardBeingDownloaded.setHq(true);
-            mutex.lock();
-            loadQueue.prepend(cardBeingDownloaded);
-            mutex.unlock();
-            emit startLoadQueue();
-        } else
-            emit imageLoaded(cardBeingDownloaded.getCard(), QImage());
-    }
+        picDownloadFailed();
+    } 
 
     reply->deleteLater();
     startNextPicDownload();
@@ -495,21 +517,6 @@ void CardInfo::updatePixmapCache()
     loadPixmap();
     
     emit pixmapUpdated();
-}
-
-CardSet* CardInfo::getPreferredSet()
-{
-    if(sets.isEmpty())
-        return 0;
-    SetList sortedSets = sets;
-    sortedSets.sortByKey();
-    return sortedSets.first();
-}
-
-int CardInfo::getPreferredMuId()
-{
-    CardSet *set = getPreferredSet();
-    return set ? muIds[set->getShortName()] : 0;
 }
 
 QString CardInfo::simplifyName(const QString &name) {
