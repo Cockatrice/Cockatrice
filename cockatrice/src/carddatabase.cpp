@@ -22,13 +22,15 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
     xml.writeStartElement("set");
     xml.writeTextElement("name", set->getShortName());
     xml.writeTextElement("longname", set->getLongName());
+    xml.writeTextElement("settype", set->getSetType());
+    xml.writeTextElement("releasedate", set->getReleaseDate().toString(Qt::ISODate));
     xml.writeEndElement();
 
     return xml;
 }
 
-CardSet::CardSet(const QString &_shortName, const QString &_longName)
-    : shortName(_shortName), longName(_longName)
+CardSet::CardSet(const QString &_shortName, const QString &_longName, const QString &_setType, const QDate &_releaseDate)
+    : shortName(_shortName), longName(_longName), setType(_setType), releaseDate(_releaseDate)
 {
     updateSortKey();
 }
@@ -703,7 +705,8 @@ void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
         if (xml.readNext() == QXmlStreamReader::EndElement)
             break;
         if (xml.name() == "set") {
-            QString shortName, longName;
+            QString shortName, longName, setType;
+            QDate releaseDate;
             while (!xml.atEnd()) {
                 if (xml.readNext() == QXmlStreamReader::EndElement)
                     break;
@@ -711,8 +714,12 @@ void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
                     shortName = xml.readElementText();
                 else if (xml.name() == "longname")
                     longName = xml.readElementText();
+                else if (xml.name() == "settype")
+                    setType = xml.readElementText();
+                else if (xml.name() == "releasedate")
+                    releaseDate = QDate::fromString(xml.readElementText(), Qt::ISODate);
             }
-            sets.insert(shortName, new CardSet(shortName, longName));
+            sets.insert(shortName, new CardSet(shortName, longName, setType, releaseDate));
         }
     }
 }

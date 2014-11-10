@@ -4,6 +4,7 @@
 #include <QHash>
 #include <QPixmap>
 #include <QMap>
+#include <QDate>
 #include <QDataStream>
 #include <QList>
 #include <QXmlStreamReader>
@@ -27,11 +28,15 @@ class CardSet : public QList<CardInfo *> {
 private:
     QString shortName, longName;
     unsigned int sortKey;
+    QDate releaseDate;
+    QString setType;
 public:
-    CardSet(const QString &_shortName = QString(), const QString &_longName = QString());
+    CardSet(const QString &_shortName = QString(), const QString &_longName = QString(), const QString &_setType = QString(), const QDate &_releaseDate = QDate());
     QString getCorrectedShortName() const;
     QString getShortName() const { return shortName; }
     QString getLongName() const { return longName; }
+    QString getSetType() const { return setType; }
+    QDate getReleaseDate() const { return releaseDate; }
     int getSortKey() const { return sortKey; }
     void setSortKey(unsigned int _sortKey);
     void updateSortKey();
