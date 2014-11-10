@@ -25,6 +25,8 @@ SettingsCache::SettingsCache()
     picDownloadHq = settings->value("personal/picturedownloadhq", false).toBool();
     picUrl = settings->value("personal/picUrl", PIC_URL_DEFAULT).toString();
     picUrlHq = settings->value("personal/picUrlHq", PIC_URL_HQ_DEFAULT).toString();
+    picUrlFallback = settings->value("personal/picUrlFallback", PIC_URL_FALLBACK).toString();
+    picUrlHqFallback = settings->value("personal/picUrlHqFallback", PIC_URL_HQ_FALLBACK).toString();
 
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
@@ -151,6 +153,18 @@ void SettingsCache::setPicUrlHq(const QString &_picUrlHq)
 {
     picUrlHq = _picUrlHq;
     settings->setValue("personal/picUrlHq", picUrlHq);
+}
+
+void SettingsCache::setPicUrlFallback(const QString &_picUrlFallback)
+{
+    picUrlFallback = _picUrlFallback;
+    settings->setValue("personal/picUrlFallback", picUrlFallback);
+}
+
+void SettingsCache::setPicUrlHqFallback(const QString &_picUrlHqFallback)
+{
+    picUrlHqFallback = _picUrlHqFallback;
+    settings->setValue("personal/picUrlHqFallback", picUrlHqFallback);
 }
 
 void SettingsCache::setNotificationsEnabled(int _notificationsEnabled)
