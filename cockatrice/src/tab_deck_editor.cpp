@@ -50,11 +50,10 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     aClearSearch = new QAction(QString(), this);
     aClearSearch->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
     connect(aClearSearch, SIGNAL(triggered()), this, SLOT(actClearSearch()));
-
     searchEdit = new SearchLineEdit;
     searchEdit->addAction(QIcon(":/resources/icon_search_black.svg"), QLineEdit::LeadingPosition);
     searchEdit->setObjectName("searchEdit");
-    searchEdit->setStyleSheet("#searchEdit{background:#DFE0E5;border-radius:13px;padding:5px 0px;}#searchEdit:focus{background:#EBEBEB;}");
+    
     setFocusProxy(searchEdit);
     setFocusPolicy(Qt::ClickFocus);
 
