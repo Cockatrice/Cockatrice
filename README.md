@@ -13,7 +13,7 @@ Chat with the Cockatrice developers on Gitter. Come here to talk about the appli
 
 # Building
 
-[![Build Status](https://travis-ci.org/Daenyth/Cockatrice.svg?branch=master)](https://travis-ci.org/Daenyth/Cockatrice)
+[![Build Status](https://travis-ci.org/Cockatrice/Cockatrice.svg?branch=master)](https://travis-ci.org/Cockatrice/Cockatrice)
 
 Dependencies:
 
