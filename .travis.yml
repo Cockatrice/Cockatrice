@@ -8,6 +8,6 @@ os:
 compiler:
   - gcc
   - clang
-script: mkdir build && cd build && cmake .. -DWITH_QT4=$QT4 -DWITH_SERVER=1 && make
+script: ./travis-compile.sh
 install: ./travis-dependencies.sh
 cache: apt
