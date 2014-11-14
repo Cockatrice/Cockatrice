@@ -1,13 +1,13 @@
 language: cpp
 env:
-  - QT="-DWITH_QT4=0"
-  - QT="-DWITH_QT4=1"
+  - QT4=1
+  - QT4=0
 os:
   - linux
   - osx
 compiler:
   - gcc
   - clang
-script: mkdir build && cd build && cmake .. $QT -DWITH_SERVER=1 && make
+script: mkdir build && cd build && cmake .. -DWITH_QT4=$QT4 -DWITH_SERVER=1 && make
 install: ./travis-dependencies.sh
 cache: apt
