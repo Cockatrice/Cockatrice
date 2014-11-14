@@ -9,7 +9,7 @@ a network interface as well. Both client and server are written in Qt, supportin
 
 Chat with the Cockatrice developers on Gitter. Come here to talk about the application, features, or just to hang out. For support regarding specific servers, please contact that server's admin or forum for support rather than asking here.
 
-[![Gitter chat](https://badges.gitter.im/Daenyth/Cockatrice.png)](https://gitter.im/Daenyth/Cockatrice)
+[![Gitter chat](https://badges.gitter.im/Cockatrice/Cockatrice.png)](https://gitter.im/Cockatrice/Cockatrice)
 
 # Building
 
