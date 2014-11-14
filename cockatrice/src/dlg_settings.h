@@ -92,6 +92,7 @@ private:
     QLabel *soundPathLabel;
     QLineEdit *soundPathEdit;
     QGroupBox *generalGroupBox, *animationGroupBox, *soundGroupBox;
+    QPushButton *soundTestButton;
 public:
     UserInterfaceSettingsPage();
     void retranslateUi();

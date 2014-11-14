@@ -113,10 +113,10 @@ ENDIF()
 IF(Qt5Widgets_FOUND)
     MESSAGE(STATUS "Found Qt ${Qt5Widgets_VERSION_STRING}")
 
-    if(UNIX AND NOT APPLE AND "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
-        # FIX: Qt was built with -reduce-relocations
-        add_definitions(-fPIC)
-    endif() 
+    # FIX: Qt was built with -reduce-relocations
+    if (Qt5_POSITION_INDEPENDENT_CODE)
+        SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    endif()
 
     FIND_PACKAGE(Qt5LinguistTools)
     IF(UPDATE_TRANSLATIONS)
@@ -157,6 +157,11 @@ set(CMAKE_AUTOMOC TRUE)
 
 # Find other needed libraries
 FIND_PACKAGE(Protobuf REQUIRED)
+
+#Find OpenSSL
+IF(WIN32)
+    FIND_PACKAGE(Win32SslRuntime)
+ENDIF()
 
 # Package builder
 set(CPACK_PACKAGE_CONTACT "Daenyth+github@gmail.com") 

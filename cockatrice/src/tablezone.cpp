@@ -16,16 +16,24 @@
 #include "pb/command_move_card.pb.h"
 #include "pb/command_set_card_attr.pb.h"
 
+
+const QColor TableZone::BACKGROUND_COLOR    = QColor(70, 50, 100);
+const QColor TableZone::FADE_MASK           = QColor(0, 0, 0, 80);
+const QColor TableZone::GRADIENT_COLOR      = QColor(255, 255, 255, 150);
+const QColor TableZone::GRADIENT_COLORLESS  = QColor(255, 255, 255, 0);
+
+
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
     : SelectZone(_p, "table", true, false, true, parent), active(false)
 {
     connect(settingsCache, SIGNAL(tableBgPathChanged()), this, SLOT(updateBgPixmap()));
     connect(settingsCache, SIGNAL(invertVerticalCoordinateChanged()), this, SLOT(reorganizeCards()));
+
     updateBgPixmap();
 
-    height = 2 * boxLineWidth + 3 * (CARD_HEIGHT + 20) + 2 * paddingY;
-    width = minWidth + 2 * marginX + 2 * boxLineWidth;
-    currentMinimumWidth = minWidth;
+    height = 2 * BOX_LINE_WIDTH + 3 * (CARD_HEIGHT + 20) + 2 * PADDING_Y;
+    width = MIN_WIDTH + 2 * MARGIN_X + 2 * BOX_LINE_WIDTH;
+    currentMinimumWidth = MIN_WIDTH;
 
     setCacheMode(DeviceCoordinateCache);
 #if QT_VERSION < 0x050000
@@ -35,56 +43,85 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 #endif
 }
 
+
 void TableZone::updateBgPixmap()
 {
     QString bgPath = settingsCache->getTableBgPath();
     if (!bgPath.isEmpty())
-        bgPixmap.load(bgPath);
+        backgroundPixelMap.load(bgPath);
     update();
 }
+
 
 QRectF TableZone::boundingRect() const
 {
     return QRectF(0, 0, width, height);
 }
 
+
 bool TableZone::isInverted() const
 {
     return ((player->getMirrored() && !settingsCache->getInvertVerticalCoordinate()) || (!player->getMirrored() && settingsCache->getInvertVerticalCoordinate()));
 }
 
+
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    if (bgPixmap.isNull())
-        painter->fillRect(boundingRect(), QColor(0, 0, 100));
+    // if no custom background is provided then use the default color
+    if (backgroundPixelMap.isNull())
+        painter->fillRect(boundingRect(), BACKGROUND_COLOR);
     else
-        painter->fillRect(boundingRect(), QBrush(bgPixmap));
+        painter->fillRect(boundingRect(), QBrush(backgroundPixelMap));
+
+    if (active) {
+        paintZoneOutline(painter);
+    } else {
+        // inactive player gets a darker table zone with a semi transparent black mask
+        // this means if the user provides a custom background it will fade
+        painter->fillRect(boundingRect(), FADE_MASK);
+    }
+
+    paintLandDivider(painter);
+}
+
+
+/**
+   Render a soft outline around the edge of the TableZone.
+
+   @param painter QPainter object
+ */
+void TableZone::paintZoneOutline(QPainter *painter) {
+    QLinearGradient grad1(0, 0, 0, 1);
+    grad1.setCoordinateMode(QGradient::ObjectBoundingMode);
+    grad1.setColorAt(0, GRADIENT_COLOR);
+    grad1.setColorAt(1, GRADIENT_COLORLESS);
+    painter->fillRect(QRectF(0, 0, width, BOX_LINE_WIDTH), QBrush(grad1));
+
+    grad1.setFinalStop(1, 0);
+    painter->fillRect(QRectF(0, 0, BOX_LINE_WIDTH, height), QBrush(grad1));
+
+    grad1.setStart(0, 1);
+    grad1.setFinalStop(0, 0);
+    painter->fillRect(QRectF(0, height - BOX_LINE_WIDTH, width, BOX_LINE_WIDTH), QBrush(grad1));
+
+    grad1.setStart(1, 0);
+    painter->fillRect(QRectF(width - BOX_LINE_WIDTH, 0, BOX_LINE_WIDTH, height), QBrush(grad1));
+}
+
+
+/**
+   Render a division line for land placement
+
+   @painter QPainter object
+ */
+void TableZone::paintLandDivider(QPainter *painter){
     painter->setPen(QColor(255, 255, 255, 40));
-    qreal separatorY = 2 * (CARD_HEIGHT + 20 + paddingY) + boxLineWidth - paddingY / 2;
+    qreal separatorY = 2 * (CARD_HEIGHT + 20 + PADDING_Y) + BOX_LINE_WIDTH - PADDING_Y / 2;
     if (isInverted())
         separatorY = height - separatorY;
     painter->drawLine(QPointF(0, separatorY), QPointF(width, separatorY));
-    
-    if (active) {
-        QColor color1(255, 255, 255, 150);
-        QColor color2(255, 255, 255, 0);
-        QLinearGradient grad1(0, 0, 0, 1);
-        grad1.setCoordinateMode(QGradient::ObjectBoundingMode);
-        grad1.setColorAt(0, color1);
-        grad1.setColorAt(1, color2);
-        painter->fillRect(QRectF(0, 0, width, boxLineWidth), QBrush(grad1));
-        
-        grad1.setFinalStop(1, 0);
-        painter->fillRect(QRectF(0, 0, boxLineWidth, height), QBrush(grad1));
-        
-        grad1.setStart(0, 1);
-        grad1.setFinalStop(0, 0);
-        painter->fillRect(QRectF(0, height - boxLineWidth, width, boxLineWidth), QBrush(grad1));
-        
-        grad1.setStart(1, 0);
-        painter->fillRect(QRectF(width - boxLineWidth, 0, boxLineWidth, height), QBrush(grad1));
-    }
 }
+
 
 void TableZone::addCardImpl(CardItem *card, int _x, int _y)
 {
@@ -96,10 +133,12 @@ void TableZone::addCardImpl(CardItem *card, int _x, int _y)
     card->update();
 }
 
+
 void TableZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint)
 {
     handleDropEventByGrid(dragItems, startZone, mapToGrid(dropPoint));
 }
+
 
 void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &gridPoint)
 {
@@ -120,6 +159,7 @@ void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems, Ca
     
     startZone->getPlayer()->sendGameCommand(cmd);
 }
+
 
 void TableZone::reorganizeCards()
 {
@@ -193,6 +233,7 @@ void TableZone::reorganizeCards()
     update();
 }
 
+
 void TableZone::toggleTapped()
 {
     QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
@@ -217,6 +258,7 @@ void TableZone::toggleTapped()
     player->sendGameCommand(player->prepareGameCommand(cmdList));
 }
 
+
 CardItem *TableZone::takeCard(int position, int cardId, bool canResize)
 {
     CardItem *result = CardZone::takeCard(position, cardId);
@@ -225,6 +267,7 @@ CardItem *TableZone::takeCard(int position, int cardId, bool canResize)
     return result;
 }
 
+
 void TableZone::resizeToContents()
 {
     int xMax = 0;
@@ -232,15 +275,16 @@ void TableZone::resizeToContents()
         if (cards[i]->pos().x() > xMax)
             xMax = (int) cards[i]->pos().x();
     xMax += 2 * CARD_WIDTH;
-    if (xMax < minWidth)
-        xMax = minWidth;
-    currentMinimumWidth = xMax + 2 * marginX + 2 * boxLineWidth;
+    if (xMax < MIN_WIDTH)
+        xMax = MIN_WIDTH;
+    currentMinimumWidth = xMax + 2 * MARGIN_X + 2 * BOX_LINE_WIDTH;
     if (currentMinimumWidth != width) {
         prepareGeometryChange();
         width = currentMinimumWidth;
         emit sizeChanged();
     }
 }
+
 
 CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
 {
@@ -256,17 +300,18 @@ CardItem *TableZone::getCardFromCoords(const QPointF &point) const
     return getCardFromGrid(gridPoint);
 }
 
+
 QPointF TableZone::mapFromGrid(QPoint gridPoint) const
 {
     qreal x, y;
-    x = marginX + (gridPoint.x() % 3) * CARD_WIDTH / 3.0;
+    x = MARGIN_X + (gridPoint.x() % 3) * CARD_WIDTH / 3.0;
     for (int i = 0; i < gridPoint.x() / 3; ++i)
-        x += gridPointWidth.value(gridPoint.y() * 1000 + i, CARD_WIDTH) + paddingX;
+        x += gridPointWidth.value(gridPoint.y() * 1000 + i, CARD_WIDTH) + PADDING_X;
     
     if (isInverted())
         gridPoint.setY(2 - gridPoint.y());
     
-    y = boxLineWidth + gridPoint.y() * (CARD_HEIGHT + paddingY + 20) + (gridPoint.x() % 3) * 10;
+    y = BOX_LINE_WIDTH + gridPoint.y() * (CARD_HEIGHT + PADDING_Y + 20) + (gridPoint.x() % 3) * 10;
 /*    
     if (isInverted())
         y = height - CARD_HEIGHT - y;
@@ -274,24 +319,25 @@ QPointF TableZone::mapFromGrid(QPoint gridPoint) const
     return QPointF(x, y);
 }
 
+
 QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 {
-    qreal x = mapPoint.x() - marginX;
+    qreal x = mapPoint.x() - MARGIN_X;
     qreal y = mapPoint.y();
 /*    if (isInverted())
         y = height - y;
-*/    y -= boxLineWidth;
+*/    y -= BOX_LINE_WIDTH;
     
     if (x < 0)
         x = 0;
-    else if (x > width - CARD_WIDTH - marginX)
-        x = width - CARD_WIDTH - marginX;
+    else if (x > width - CARD_WIDTH - MARGIN_X)
+        x = width - CARD_WIDTH - MARGIN_X;
     if (y < 0)
         y = 0;
     else if (y > height - CARD_HEIGHT)
         y = height - CARD_HEIGHT;
     
-    int resultY = round(y / (CARD_HEIGHT + paddingY + 20));
+    int resultY = round(y / (CARD_HEIGHT + PADDING_Y + 20));
     if (isInverted())
         resultY = 2 - resultY;
 
@@ -300,13 +346,14 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
     do {
         ++baseX;
         oldTempX = tempX;
-        tempX += gridPointWidth.value(resultY * 1000 + baseX, CARD_WIDTH) + paddingX;
+        tempX += gridPointWidth.value(resultY * 1000 + baseX, CARD_WIDTH) + PADDING_X;
     } while (tempX < x + 1);
     
     qreal xdiff = x - oldTempX;
     int resultX = baseX * 3 + qMin((int) floor(xdiff * 3 / CARD_WIDTH), 2);
     return QPoint(resultX, resultY);
 }
+
 
 QPointF TableZone::closestGridPoint(const QPointF &point)
 {
@@ -317,10 +364,4 @@ QPointF TableZone::closestGridPoint(const QPointF &point)
     if (getCardFromGrid(gridPoint))
         gridPoint.setX(gridPoint.x() + 1);
     return mapFromGrid(gridPoint);
-}
-
-void TableZone::setWidth(qreal _width)
-{
-    prepareGeometryChange();
-    width = _width;
 }

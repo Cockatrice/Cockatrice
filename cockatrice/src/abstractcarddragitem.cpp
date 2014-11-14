@@ -4,6 +4,9 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QDebug>
 
+static const float CARD_WIDTH_HALF = CARD_WIDTH / 2;
+static const float CARD_HEIGHT_HALF = CARD_HEIGHT / 2;
+
 AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag)
     : QGraphicsItem(), item(_item), hotSpot(_hotSpot)
 {
@@ -22,7 +25,7 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item, const QPoint
         setZValue(2000000007);
     }
     if (item->getTapped())
-        setTransform(QTransform().translate((float) CARD_WIDTH / 2, (float) CARD_HEIGHT / 2).rotate(90).translate((float) -CARD_WIDTH / 2, (float) -CARD_HEIGHT / 2));
+        setTransform(QTransform().translate(CARD_WIDTH_HALF, CARD_HEIGHT_HALF).rotate(90).translate(-CARD_WIDTH_HALF, -CARD_HEIGHT_HALF));
 
     setCacheMode(DeviceCoordinateCache);
 }

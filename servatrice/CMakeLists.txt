@@ -17,6 +17,19 @@ SET(servatrice_SOURCES
     ${VERSION_STRING_CPP}
 )
 
+set(servatrice_RESOURCES servatrice.qrc)
+
+if(WIN32)
+    set(servatrice_SOURCES ${servatrice_SOURCES} servatrice.rc)
+endif(WIN32)
+
+
+if(APPLE)
+    set(MACOSX_BUNDLE_ICON_FILE appicon.icns)
+    set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    set(servatrice_SOURCES ${servatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
+ENDIF(APPLE)
+
 set(SERVATRICE_LIBS)
 
 # Qt4 stuff
@@ -32,6 +45,7 @@ if(Qt4_FOUND)
     # Libgcrypt is required only with Qt4 to support SHA512 hashing
     FIND_PACKAGE(Libgcrypt REQUIRED)
     INCLUDE_DIRECTORIES(${LIBGCRYPT_INCLUDE_DIR})
+    QT4_ADD_RESOURCES(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
 endif()
 
 # qt5 stuff
@@ -53,6 +67,8 @@ if(Qt5Widgets_FOUND)
         list(APPEND SERVATRICE_LIBS Sql)
     endif()
 
+    QT5_ADD_RESOURCES(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
+
     # guess plugins and libraries directory
     set(QT_PLUGINS_DIR "${Qt5Widgets_DIR}/../../../plugins")
     get_target_property(QT_LIBRARY_DIR Qt5::Core LOCATION)
@@ -61,6 +77,10 @@ endif()
 
 SET(QT_DONT_USE_QTGUI TRUE)
 
+# Declare path variables
+set(ICONDIR share/icons CACHE STRING "icon dir")
+set(DESKTOPDIR share/applications CACHE STRING "desktop file destination")
+
 # Include directories
 INCLUDE_DIRECTORIES(../common)
 INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
@@ -68,7 +88,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/../common)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 # Build servatrice binary and link it
-ADD_EXECUTABLE(servatrice MACOSX_BUNDLE ${servatrice_SOURCES} ${servatrice_MOC_SRCS})
+ADD_EXECUTABLE(servatrice MACOSX_BUNDLE ${servatrice_SOURCES} ${servatrice_RESOURCES_RCC} ${servatrice_MOC_SRCS})
 
 if(Qt4_FOUND)
     if(MSVC) 
@@ -88,6 +108,13 @@ endif()
 # install rules
 if(UNIX)
     if(APPLE)
+        set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}")
+        set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.cockatrice.${PROJECT_NAME}")
+        set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME}-${PROJECT_VERSION}")
+        set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
+        set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
+        set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+
         INSTALL(TARGETS servatrice BUNDLE DESTINATION ./)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION ./servatrice.app/Contents/Resources/)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION ./servatrice.app/Contents/Resources/)
@@ -96,6 +123,10 @@ if(UNIX)
         INSTALL(TARGETS servatrice RUNTIME DESTINATION bin/)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION share/servatice/)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION share/servatice/)
+
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/servatrice.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/servatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.desktop DESTINATION ${DESKTOPDIR})
     endif()
 elseif(WIN32)
     INSTALL(TARGETS servatrice RUNTIME DESTINATION ./)

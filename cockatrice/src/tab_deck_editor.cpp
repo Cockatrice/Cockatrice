@@ -50,10 +50,12 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     aClearSearch = new QAction(QString(), this);
     aClearSearch->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
     connect(aClearSearch, SIGNAL(triggered()), this, SLOT(actClearSearch()));
-
-    searchLabel = new QLabel();
     searchEdit = new SearchLineEdit;
-    searchLabel->setBuddy(searchEdit);
+#if QT_VERSION >= 0x050000
+    searchEdit->addAction(QIcon(":/resources/icon_search_black.svg"), QLineEdit::LeadingPosition);
+#endif
+    searchEdit->setObjectName("searchEdit");
+    
     setFocusProxy(searchEdit);
     setFocusPolicy(Qt::ClickFocus);
 
@@ -73,7 +75,6 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 
     QHBoxLayout *searchLayout = new QHBoxLayout;
     searchLayout->addWidget(deckEditToolBar);
-    searchLayout->addWidget(searchLabel);
     searchLayout->addWidget(searchEdit);
 
     databaseModel = new CardDatabaseModel(db, this);
@@ -293,7 +294,6 @@ void TabDeckEditor::retranslateUi()
 {
     aCardTextOnly->setText(tr("Show card text only"));
     aClearSearch->setText(tr("&Clear search"));
-    searchLabel->setText(tr("&Search for:"));
     
     nameLabel->setText(tr("Deck &name:"));
     commentsLabel->setText(tr("&Comments:"));
@@ -365,7 +365,7 @@ void TabDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
 
 void TabDeckEditor::updateSearch(const QString &search)
 {
-    databaseDisplayModel->setCardNameBeginning(search);
+    databaseDisplayModel->setCardName(search);
     QModelIndexList sel = databaseView->selectionModel()->selectedRows();
     if (sel.isEmpty() && databaseDisplayModel->rowCount())
         databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);

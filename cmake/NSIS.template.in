@@ -63,6 +63,7 @@ Section "Start menu item" SecStartMenu
 	createDirectory "$SMPROGRAMS\Cockatrice"
 	createShortCut "$SMPROGRAMS\Cockatrice\Cockatrice.lnk" "$INSTDIR\cockatrice.exe" '--debug-output'
 	createShortCut "$SMPROGRAMS\Cockatrice\Oracle.lnk" "$INSTDIR\oracle.exe"
+	createShortCut "$SMPROGRAMS\Cockatrice\Servatrice.lnk" "$INSTDIR\servatrice.exe"
 	createShortCut "$SMPROGRAMS\Cockatrice\Usermanual.lnk" "$INSTDIR\Usermanual.pdf"
 SectionEnd
 
@@ -80,6 +81,8 @@ Section Uninstall
 	Delete "$INSTDIR\libprotobuf.lib"
 	Delete "$INSTDIR\Qt*.dll"
 	Delete "$INSTDIR\icu*.dll"
+	Delete "$INSTDIR\libeay32.dll"
+	Delete "$INSTDIR\ssleay32.dll"
 	Delete "$INSTDIR\qt.conf"
 	Delete "$INSTDIR\qdebug.txt"
 	Delete "$INSTDIR\servatrice.sql"

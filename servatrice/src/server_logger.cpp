@@ -50,7 +50,7 @@ void ServerLogger::logMessage(QString message, void *caller)
         callerString = QString::number((qulonglong) caller, 16) + " ";
         
     //filter out all log entries based on values in configuration file
-    bool shouldWeWriteLog = settingsCache->value("server/writelog").toBool();
+    bool shouldWeWriteLog = settingsCache->value("server/writelog",1).toBool();
     QString logFilters = settingsCache->value("server/logfilters").toString();
     QStringList listlogFilters = logFilters.split(",", QString::SkipEmptyParts); 
     bool shouldWeSkipLine = false; 
