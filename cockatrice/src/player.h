@@ -120,6 +120,7 @@ public slots:
     void actMoveTopCardsToGrave();
     void actMoveTopCardsToExile();
     void actMoveTopCardToBottom();
+    void actMoveBottomCardToGrave();
 
     void actViewLibrary();
     void actViewTopCards();
@@ -169,7 +170,7 @@ private:
         *aViewGraveyard, *aViewRfg, *aViewSideboard,
                 *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle,
         *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,
-        *aCardMenu;
+        *aCardMenu, *aMoveBottomCardToGrave;
     
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
     QAction *aPlay,
