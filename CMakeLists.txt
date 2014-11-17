@@ -79,9 +79,9 @@ ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
     include(CheckCXXCompilerFlag)
 
     set(CMAKE_CXX_FLAGS_RELEASE "-s -O2")
-    set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra -pedantic")
+    set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra -pedantic -Werror")
 
-    set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Winline -Wno-long-long -Wno-inline)
+    set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Winline -Wno-long-long -Wno-error=extra -Wno-error=unused-parameter -Wno-inline -Wno-error=delete-non-virtual-dtor -Wno-error=sign-compare -Wno-error=reorder -Wno-error=missing-declarations)
 
     FOREACH(FLAG ${ADDITIONAL_DEBUG_FLAGS})
         CHECK_CXX_COMPILER_FLAG("${FLAG}" CXX_HAS_WARNING_${FLAG})
