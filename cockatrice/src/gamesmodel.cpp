@@ -23,7 +23,7 @@ namespace {
      *   24+ hours will return "1+ days ago", because it seems unlikely that we care about
      *     an accurate timestamp of day old games.
      */
-    std::string prettyPrintSecsAgo(uint32_t secs) {
+    QString prettyPrintSecsAgo(uint32_t secs) {
         std::ostringstream str_stream;
 
         if (secs < SECS_PER_MIN) {
@@ -45,7 +45,7 @@ namespace {
             str_stream << "5+ hours ago";
         }
 
-        return tr(str_stream.str());
+        return QObject::tr(str_stream.str().c_str());
     }
 }
 
@@ -74,7 +74,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             int secs = now - then;
  
             switch (role) {
-                case Qt::DisplayRole: return QString::fromStdString(prettyPrintSecsAgo(secs));
+                case Qt::DisplayRole: return prettyPrintSecsAgo(secs);
                 case SORT_ROLE: return QVariant(secs);
                 default: {
                     qDebug() << "Returning data for col 1 of games model when role != display, role != sort";
