@@ -10,7 +10,6 @@ namespace {
     const unsigned SECS_PER_MIN       = 60;
     const unsigned SECS_PER_HALF_HOUR = 1600;  // 60 * 30
     const unsigned SECS_PER_HOUR      = 3600;  // 60 * 60
-    const unsigned SECS_PER_DAY       = 86400; // 60 * 60 * 24
 
     /**
      * Pretty print an integer number of seconds ago. Accurate to only one unit,
@@ -24,28 +23,22 @@ namespace {
      *     an accurate timestamp of day old games.
      */
     QString prettyPrintSecsAgo(uint32_t secs) {
-        std::ostringstream str_stream;
-
         if (secs < SECS_PER_MIN) {
-            str_stream << secs;
-            str_stream << "s ago";
-        } else if (secs < SECS_PER_HOUR) {
+            return QString::number(secs).append(QObject::tr("s ago"));
+        }
+        if (secs < SECS_PER_HOUR) {
             uint32_t mins = secs / SECS_PER_MIN;
             if (secs % SECS_PER_MIN >= SECS_PER_HALF_MIN)
               mins++;
-            str_stream << mins;
-            str_stream << "m ago";
-        } else if (secs < SECS_PER_HOUR * 5) {
+            return QString::number(mins).append(QObject::tr("m ago"));
+        } 
+        if (secs < SECS_PER_HOUR * 5) {
             uint32_t hours = secs / SECS_PER_HOUR;
             if (secs % SECS_PER_HOUR >= SECS_PER_HALF_HOUR)
               hours++;
-            str_stream << hours;
-            str_stream << "hr ago";
-        } else {
-            str_stream << "5+ hours ago";
+            return QString::number(hours).append(QObject::tr("hr ago"));
         }
-
-        return QObject::tr(str_stream.str().c_str());
+        return QObject::tr("5+ hours ago");
     }
 }
 
