@@ -1,5 +1,6 @@
 #include "gamesmodel.h"
 #include "pb/serverinfo_game.pb.h"
+#include <QDebug>
 #include <QStringList>
 #include <sstream>
 #include <time.h>
@@ -12,7 +13,7 @@ namespace {
     const unsigned SECS_PER_DAY       = 86400; // 60 * 60 * 24
 
     /**
-     * Pretty print an integer number of seconds ago. Accurate to only one unit, 
+     * Pretty print an integer number of seconds ago. Accurate to only one unit,
      * rounded.
      *
      * For example...
@@ -34,17 +35,17 @@ namespace {
               mins++;
             str_stream << mins;
             str_stream << "m ago";
-        } else if (secs < SECS_PER_DAY) {
+        } else if (secs < SECS_PER_HOUR * 5) {
             uint32_t hours = secs / SECS_PER_HOUR;
             if (secs % SECS_PER_HOUR >= SECS_PER_HALF_HOUR)
               hours++;
             str_stream << hours;
-            str_stream << "h ago";
+            str_stream << "hr ago";
         } else {
-            str_stream << "a long time ago";
+            str_stream << "5+ hours ago";
         }
 
-        return str_stream.str();
+        return tr(str_stream.str());
     }
 }
 
@@ -75,7 +76,10 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             switch (role) {
                 case Qt::DisplayRole: return QString::fromStdString(prettyPrintSecsAgo(secs));
                 case SORT_ROLE: return QVariant(secs);
-                default: return QVariant(); // Shouldn't ever be reached.
+                default: {
+                    qDebug() << "Returning data for col 1 of games model when role != display, role != sort";
+                    return QVariant(); // Shouldn't ever be reached.
+                }
             }
         }
         case 2: return QString::fromStdString(g.description());
@@ -108,7 +112,7 @@ QVariant GamesModel::headerData(int section, Qt::Orientation orientation, int ro
         return QVariant();
     switch (section) {
         case 0: return tr("Room");
-        case 1: return tr("Start time");
+        case 1: return tr("Game created");
         case 2: return tr("Description");
         case 3: return tr("Creator");
         case 4: return tr("Game type");
