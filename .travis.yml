@@ -11,3 +11,10 @@ compiler:
 script: ./travis-compile.sh
 install: ./travis-dependencies.sh
 cache: apt
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/d94969c3b01b22cbdcb7
+    on_success: change
+    on_failure: change
+    on_start: false
