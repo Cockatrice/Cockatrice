@@ -117,14 +117,16 @@ bool ServerSocketInterface::initSession()
     SessionEvent *identSe = prepareSessionEvent(identEvent);
     sendProtocolItem(*identSe);
     delete identSe;
+    
+    int maxUsers = servatrice->getMaxUsersPerAddress();
 
     //allow unlimited number of connections from the trusted sources
     QString trustedSources = settingsCache->value("server/trusted_sources","127.0.0.1,::1").toString();
     if (trustedSources.contains(socket->peerAddress().toString(),Qt::CaseInsensitive))
-        qDebug() << "Allowing user from trusted source: " << socket->peerAddress().toString();
+        if (servatrice->getUsersWithAddress(socket->peerAddress()) >= maxUsers)
+            qDebug() << "Allowing user from trusted source: " << socket->peerAddress().toString();
         return true;
     
-    int maxUsers = servatrice->getMaxUsersPerAddress();
     if ((maxUsers > 0) && (servatrice->getUsersWithAddress(socket->peerAddress()) >= maxUsers)) {
         Event_ConnectionClosed event;
         event.set_reason(Event_ConnectionClosed::TOO_MANY_CONNECTIONS);
