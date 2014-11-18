@@ -15,6 +15,6 @@ else
     sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
     sudo apt-get update -qq
     sudo apt-get install -y libprotobuf-dev protobuf-compiler qtbase5-dev\
-      qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev qt5-default qttools5-dev-tools
+      qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev qt5-default qttools5-dev-tools qttools5-dev
   fi
 fi
