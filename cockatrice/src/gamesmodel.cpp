@@ -6,39 +6,61 @@
 #include <time.h>
 
 namespace {
-    const unsigned SECS_PER_HALF_MIN  = 30;
     const unsigned SECS_PER_MIN       = 60;
-    const unsigned SECS_PER_HALF_HOUR = 1600;  // 60 * 30
-    const unsigned SECS_PER_HOUR      = 3600;  // 60 * 60
+    const unsigned SECS_PER_HALF_HOUR = 60 * 30;
+    const unsigned SECS_PER_HOUR      = 60 * 60;
+    const unsigned SECS_PER_90_MINS   = 60 * 90;
 
     /**
      * Pretty print an integer number of seconds ago. Accurate to only one unit,
-     * rounded.
+     * rounded. As a special case, time between 60 and 90 minutes will display
+     * both the hours and minutes.
      *
      * For example...
-     *   0-59 seconds will return "X seconds ago"
-     *   1-59 minutes will return "X minutes ago"; 90 seconds will return "2 minutes ago"
-     *   1-23 hours will return "X hours ago"; 90 minutes will return "2 hours ago"
-     *   24+ hours will return "1+ days ago", because it seems unlikely that we care about
-     *     an accurate timestamp of day old games.
+     *   0-59 seconds will return "Xs ago"
+     *   1-59 minutes will return "Xm ago"; 90 seconds will return "2m ago"
+     *   60-90 minutes will return "Xhr Ym ago"
+     *   91-300 minutes will return "Xhr ago"; 91 minutes will return "2hr ago"
+     *   300+ minutes will return "5+ hr ago", because it seems unlikely that we 
+     *     care about an accurate timestamp of old games.
      */
     QString prettyPrintSecsAgo(uint32_t secs) {
         if (secs < SECS_PER_MIN) {
+            //: This will have a number prepended, like "10s ago"
             return QString::number(secs).append(QObject::tr("s ago"));
         }
         if (secs < SECS_PER_HOUR) {
             uint32_t mins = secs / SECS_PER_MIN;
-            if (secs % SECS_PER_MIN >= SECS_PER_HALF_MIN)
+            if (secs % SECS_PER_MIN >= 30)
               mins++;
+            //: This will have a number prepended, like "10m ago"
             return QString::number(mins).append(QObject::tr("m ago"));
-        } 
+        }
+        // Here, we want to display both the hours and minutes.
+        //
+        // There are two small "corner" cases which could be rectified with
+        // some more knotty iffy-elsey code:
+        //   Between 1:00:00 and 1:00:29 will display "1hr 0m ago"
+        //   Between 1:29:30 and 1:29:59 will display "1hr 31m ago"
+        //
+        // Personally, I prefer to keep the code cleaner, and allow these.
+        if (secs < SECS_PER_90_MINS) {
+          uint32_t mins = secs / SECS_PER_MIN - 60;
+          if (secs % SECS_PER_MIN >= 30)
+            mins++;
+          return QObject::tr("1hr ")
+                   .append(QString::number(mins))
+                   //: This will have a number prepended, like "5m ago"
+                   .append(QObject::tr("m ago"));
+        }
         if (secs < SECS_PER_HOUR * 5) {
             uint32_t hours = secs / SECS_PER_HOUR;
             if (secs % SECS_PER_HOUR >= SECS_PER_HALF_HOUR)
               hours++;
+            //: This will have a number prepended, like "2h ago"
             return QString::number(hours).append(QObject::tr("hr ago"));
         }
-        return QObject::tr("5+ hours ago");
+        return QObject::tr("5+ hrs ago");
     }
 }
 
