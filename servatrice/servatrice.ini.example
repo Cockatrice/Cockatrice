@@ -128,7 +128,7 @@ max_users_per_address=4
 ; You may want to allow an unlimited number of users from a trusted source. This setting can contain a
 ; comma-separed list of IP addresses which will allow an unlimited number of connections from each of the
 ; IP addresses listed (ignoring the max_users_per_address). Default is "127.0.0.1,::1"; example: "192.73.233.244,81.4.100.74"
-trusted_sources=""
+trusted_sources="127.0.0.1,::1"
 
 ; Servatrice can avoid users from flooding rooms with large number messages in an interval of time.
 ; This setting defines the length in seconds of the considered interval; default is 10
