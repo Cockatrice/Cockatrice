@@ -35,10 +35,7 @@
 #include "main.h"
 #include "decklist.h"
 #include "pb/event_server_message.pb.h"
-#include "pb/event_server_shutdo; You may want to allow an unlimited number of users from a trusted source. This setting can contain a
-; comma-separed list of IP addresses which will allow an unlimited number of connections from each of the
-; IP addresses listed (ignoring the max_users_per_address). Default is "127.0.0.1,::1"; example: "192.73.233.244,81.4.100.74"
-trusted_sources=""wn.pb.h"
+#include "pb/event_server_shutdown.pb.h"
 #include "pb/event_connection_closed.pb.h"
 
 Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent)
