@@ -5,7 +5,7 @@ if [[ $TRAVIS_OS_NAME == "osx" ]] ; then
   if (( QT4 )); then
     brew install qt protobuf libgcrypt
   else
-    brew install qt qt5 protobuf libgcrypt
+    brew install qt5 protobuf libgcrypt
   fi
 else
   if (( QT4 )); then
