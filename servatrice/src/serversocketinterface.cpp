@@ -120,7 +120,8 @@ bool ServerSocketInterface::initSession()
 
     //allow unlimited number of connections from the trusted sources
     QString trustedSources = settingsCache->value("server/trusted_sources","127.0.0.1,::1").toString();
-    if (trustedSources.contains(address.toString(),Qt::CaseInsensitive))
+    if (trustedSources.contains(socket->peerAddress().toString(),Qt::CaseInsensitive))
+        qDebug() << "Allowing user from trusted source: " << socket->peerAddress().toString();
         return true;
     
     int maxUsers = servatrice->getMaxUsersPerAddress();
