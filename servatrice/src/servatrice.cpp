@@ -380,16 +380,11 @@ QList<ServerProperties> Servatrice::getServerList() const
 int Servatrice::getUsersWithAddress(const QHostAddress &address) const
 {
     int result = 0;
-    QString trustedSources = settingsCache->value("server/trusted_sources","127.0.0.1,::1").toString();
-
-    if (trustedSources.contains(address.toString(),Qt::CaseInsensitive)) {
-        //allow all clients from trusted sources regardsless of number of connections
-    } else {
-        QReadLocker locker(&clientsLock);
-        for (int i = 0; i < clients.size(); ++i)
-            if (static_cast<ServerSocketInterface *>(clients[i])->getPeerAddress() == address)
-                ++result;
-    }
+    QReadLocker locker(&clientsLock);
+    for (int i = 0; i < clients.size(); ++i)
+    if (static_cast<ServerSocketInterface *>(clients[i])->getPeerAddress() == address)
+        ++result;
+    
     return result;
 }
 

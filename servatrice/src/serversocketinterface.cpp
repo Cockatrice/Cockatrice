@@ -22,6 +22,7 @@
 #include <QHostAddress>
 #include <QDebug>
 #include <QDateTime>
+#include <QString>
 #include "settingscache.h"
 #include "serversocketinterface.h"
 #include "servatrice.h"
@@ -117,6 +118,11 @@ bool ServerSocketInterface::initSession()
 	sendProtocolItem(*identSe);
 	delete identSe;
 
+    //allow unlimited number of connections from the trusted sources
+    QString trustedSources = settingsCache->value("server/trusted_sources","127.0.0.1,::1").toString();
+    if (trustedSources.contains(address.toString(),Qt::CaseInsensitive))
+        return true;
+    
 	int maxUsers = servatrice->getMaxUsersPerAddress();
 	if ((maxUsers > 0) && (servatrice->getUsersWithAddress(socket->peerAddress()) >= maxUsers)) {
 		Event_ConnectionClosed event;
@@ -708,9 +714,9 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 
 	QString userName = QString::fromStdString(cmd.user_name());
 	QString address = QString::fromStdString(cmd.address());
-	QString trustedSources = settingsCache->value("server/trusted_sources","127.0.0.1,::1").toString();
+    QString trustedSources = settingsCache->value("server/trusted_sources","127.0.0.1,::1").toString();
 	int minutes = cmd.minutes();
-	if (trustedSources.contains(address,Qt::CaseInsensitive))
+    if (trustedSources.contains(address,Qt::CaseInsensitive))
         address = "";
 
 	QSqlQuery query(sqlInterface->getDatabase());
