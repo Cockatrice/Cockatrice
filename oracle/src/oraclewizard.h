@@ -63,6 +63,7 @@ private:
      QRadioButton *fileRadioButton;
      QLineEdit *urlLineEdit;
      QLineEdit *fileLineEdit;
+     QPushButton *urlButton;
      QPushButton *fileButton;
      QLabel *progressLabel;
      QProgressBar * progressBar;
@@ -72,6 +73,7 @@ private:
      QFuture<bool> future;
 private slots:
      void actLoadSetsFile();
+     void actRestoreDefaultUrl();
      void actDownloadProgressSetsFile(qint64 received, qint64 total);
      void actDownloadFinishedSetsFile();
      void importFinished();

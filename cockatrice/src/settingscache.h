@@ -4,7 +4,9 @@
 #include <QObject>
 
 #define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
+#define PIC_URL_FALLBACK "http://mtgimage.com/set/!setcode!/!name!.jpg"
 #define PIC_URL_HQ_DEFAULT "http://mtgimage.com/multiverseid/!cardid!.jpg"
+#define PIC_URL_HQ_FALLBACK "http://mtgimage.com/set/!setcode!/!name!.jpg"
 
 class QSettings;
 
@@ -57,6 +59,8 @@ private:
     bool ignoreUnregisteredUsers;
     QString picUrl;
     QString picUrlHq;
+    QString picUrlFallback;
+    QString picUrlHqFallback;
     bool attemptAutoConnect;
 public:
     SettingsCache();
@@ -93,6 +97,8 @@ public:
     bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
     QString getPicUrl() const { return picUrl; }
     QString getPicUrlHq() const { return picUrlHq; }
+    QString getPicUrlFallback() const { return picUrlFallback; }
+    QString getPicUrlHqFallback() const { return picUrlHqFallback; }
     void copyPath(const QString &src, const QString &dst);
     bool getAutoConnect() const { return attemptAutoConnect; }
 public slots:
@@ -129,6 +135,8 @@ public slots:
     void setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers);
     void setPicUrl(const QString &_picUrl);
     void setPicUrlHq(const QString &_picUrlHq);
+    void setPicUrlFallback(const QString &_picUrlFallback);
+    void setPicUrlHqFallback(const QString &_picUrlHqFallback);
     void setAutoConnect(const bool &_autoConnect);
 };
 

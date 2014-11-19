@@ -43,48 +43,48 @@
     </message>
     <message>
         <source>Path to hand background:</source>
-        <translation type="obsolete">Chemin pour les images de fond de main:</translation>
+        <translation>Chemin vers l&apos;image de fond de la zone de main:</translation>
     </message>
     <message>
         <source>Path to stack background:</source>
-        <translation type="obsolete">Chemin pour les images de fond de pile:</translation>
+        <translation>Chemin vers l&apos;image de fond de la pile:</translation>
     </message>
     <message>
         <source>Path to table background:</source>
-        <translation type="obsolete">Chemin pour les images d&apos;arrière-plan:</translation>
+        <translation>Chemin vers l&apos;image de fond de la zone de jeu:</translation>
     </message>
     <message>
         <source>Path to player info background:</source>
-        <translation type="obsolete">Chemin pour les images de fond d&apos;affichage d&apos;informations:</translation>
+        <translation>Chemin vers l&apos;image de fond d&apos;informations joueur:</translation>
     </message>
     <message>
         <source>Path to picture of card back:</source>
-        <translation type="obsolete">Chemin pour les images de dos des cartes:</translation>
-    </message>
+        <translation>Chemin vers l&apos;image de dos des cartes:</translation>
+	</message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="366"/>
         <source>Hand background:</source>
-        <translation type="unfinished"></translation>
+        <translation>Image de fond de la zone de main:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="367"/>
         <source>Stack background:</source>
-        <translation type="unfinished"></translation>
+        <translation>Image de fond de la pile:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="368"/>
         <source>Table background:</source>
-        <translation type="unfinished"></translation>
+        <translation>Image de fond de la zone de jeu:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="369"/>
         <source>Player info background:</source>
-        <translation type="unfinished"></translation>
+        <translation>Image de fond de la zone d&apos;informations joueur:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="370"/>
         <source>Card back:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dos de carte:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="372"/>
@@ -104,7 +104,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="376"/>
         <source>Display hand horizontally (wastes space)</source>
-        <translation>Montrer la main horizontalement</translation>
+        <translation>Afficher la main horizontalement (perte d'espace)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="378"/>
@@ -124,7 +124,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="382"/>
         <source>Zone view layout</source>
-        <translation>Voir disposition de la zone</translation>
+        <translation>Disposition de la zone d'aperçu</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="383"/>
@@ -151,60 +151,60 @@
     <message>
         <source>Please enter the duration of the ban (in minutes).
 Enter 0 for an indefinite ban.</source>
-        <translation type="obsolete">Entrez la durée de temps du ban (en minutes).
-Entrez 0 pour une durée illimitée du ban.</translation>
+        <translation type="obsolete">Entrez la durée de temps de blocage (en minutes).
+Entrez 0 pour un blocage permanent.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="34"/>
         <source>ban &amp;user name</source>
-        <translation type="unfinished"></translation>
+        <translation>bloquer &amp;nom d&apos;utilisateur</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="37"/>
         <source>ban &amp;IP address</source>
-        <translation type="unfinished"></translation>
+        <translation>bloquer &amp;adresse IP</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="45"/>
         <source>Ban type</source>
-        <translation type="unfinished"></translation>
+        <translation>Type du blocage</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="48"/>
         <source>&amp;permanent ban</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;blocage permanent</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="49"/>
         <source>&amp;temporary ban</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;blocage temporaire</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="52"/>
         <source>&amp;Days:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Jours:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="58"/>
         <source>&amp;Hours:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Heures:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="64"/>
         <source>&amp;Minutes:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Minutes:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="79"/>
         <source>Duration of the ban</source>
-        <translation type="unfinished"></translation>
+        <translation>Durée du blocage</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="82"/>
         <source>Please enter the reason for the ban.
 This is only saved for moderators and cannot be seen by the banned person.</source>
-        <translation>Veuillez expliquer la raison du ban.
-Cette information ne sera consultable que par les modérateurs.</translation>
+        <translation>Veuillez expliquer la raison du blocage.
+Cette information sera consultable uniquement par les modérateurs.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="85"/>
@@ -229,12 +229,12 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     <message>
         <location filename="../src/userlist.cpp" line="115"/>
         <source>Error</source>
-        <translation type="unfinished">Erreur</translation>
+        <translation>Érreur</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="115"/>
         <source>You have to select a name-based or IP-based ban, or both.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous devez choisir un blocage à partir du nom ou de l&apos;IP, ou des deux.</translation>
     </message>
 </context>
 <context>
@@ -369,6 +369,12 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     <message>
         <source>&amp;Clone</source>
         <translation type="obsolete">&amp;Copier une carte</translation>
+        <translation>&amp;Copier une carte</translation>
+    </message>
+    <message>
+        <location filename="../src/carditem.cpp" line="214"/>
+        <source>Ctrl+H</source>
+        <translation>Ctrl+H</translation>
     </message>
     <message>
         <source>&amp;Attach to card...</source>
@@ -384,16 +390,16 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     </message>
     <message>
         <source>Set &amp;P/T...</source>
-        <translation type="obsolete">Fixer &amp;F/E...</translation>
+        <translation type="obsolete">Définir &amp;F/E...</translation>
     </message>
     <message>
         <source>&amp;Draw arrow...</source>
         <translation type="obsolete">&amp;Tracer une flèche...</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="83"/>
-        <source>&amp;Power / toughness</source>
-        <translation>F&amp;orce / Endurance</translation>
+        <location filename="../src/carditem.cpp" line="219"/>
+        <source>&amp;Power / Toughness</source>
+        <translation>&amp;Force / Endurance</translation>
     </message>
     <message>
         <source>&amp;Increase power</source>
@@ -445,7 +451,7 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     </message>
     <message>
         <source>Set &amp;power and toughness...</source>
-        <translation type="obsolete">Fi&amp;xer la force et l&apos;endurance...</translation>
+        <translation>Dé&amp;finir la force et l&apos;endurance...</translation>
     </message>
     <message>
         <source>Ctrl+P</source>
@@ -477,7 +483,7 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     </message>
     <message>
         <source>&amp;Set counters (%1)...</source>
-        <translation type="obsolete">&amp;Fixer marqueurs (%1)...</translation>
+        <translation>&amp;Définir marqueurs (%1)...</translation>
     </message>
     <message>
         <source>&amp;top of library</source>
@@ -497,7 +503,7 @@ Cette information ne sera consultable que par les modérateurs.</translation>
     </message>
     <message>
         <source>&amp;exile</source>
-        <translation type="obsolete">&amp;exiler</translation>
+        <translation>&amp;exile</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="82"/>
@@ -2230,7 +2236,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/window_main.cpp" line="228"/>
         <source>Italian:</source>
-        <translation type="unfinished"></translation>
+        <translation>Italien:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="235"/>
@@ -5714,6 +5720,12 @@ Entrez 0 pour une durée illimitée du ban.</translation>
         <translation type="obsolete">&amp;Commentaires:</translation>
     </message>
     <message>
+        <location filename="../src/window_deckeditor.cpp" line="118"/>
+        <source>Hash:</source>
+        <translation>Empreinte:</translation>
+    </message>
+    <message>
+        <location filename="../src/window_deckeditor.cpp" line="132"/>
         <source>&amp;Update prices</source>
         <translation type="obsolete">Mettre à &amp;jour les prix</translation>
     </message>

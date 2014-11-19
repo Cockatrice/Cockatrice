@@ -103,17 +103,21 @@ LoadSetsPage::LoadSetsPage(QWidget *parent)
 
     urlRadioButton->setChecked(true);
 
+    urlButton = new QPushButton(tr("Restore default url"), this);
+    connect(urlButton, SIGNAL(clicked()), this, SLOT(actRestoreDefaultUrl()));
+
     fileButton = new QPushButton(tr("Choose file..."), this);
     connect(fileButton, SIGNAL(clicked()), this, SLOT(actLoadSetsFile()));
 
     QGridLayout *layout = new QGridLayout(this);
     layout->addWidget(urlRadioButton, 0, 0);
     layout->addWidget(urlLineEdit, 0, 1);
-    layout->addWidget(fileRadioButton, 1, 0);
-    layout->addWidget(fileLineEdit, 1, 1);
-    layout->addWidget(fileButton, 2, 1, Qt::AlignRight);
-    layout->addWidget(progressLabel, 3, 0);
-    layout->addWidget(progressBar, 3, 1);
+    layout->addWidget(urlButton, 1, 1, Qt::AlignRight);
+    layout->addWidget(fileRadioButton, 2, 0);
+    layout->addWidget(fileLineEdit, 2, 1);
+    layout->addWidget(fileButton, 3, 1, Qt::AlignRight);
+    layout->addWidget(progressLabel, 4, 0);
+    layout->addWidget(progressBar, 4, 1);
 
     connect(&watcher, SIGNAL(finished()), this, SLOT(importFinished()));
 
@@ -126,6 +130,11 @@ void LoadSetsPage::initializePage()
 
     progressLabel->hide();
     progressBar->hide();
+}
+
+void LoadSetsPage::actRestoreDefaultUrl()
+{
+    urlLineEdit->setText(ALLSETS_URL);
 }
 
 void LoadSetsPage::actLoadSetsFile()
