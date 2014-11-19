@@ -6,6 +6,7 @@
 class SetsModel;
 class SetsProxyModel;
 class QTreeView;
+class QPushButton;
 class CardDatabase;
 
 class WndSets : public QMainWindow {
@@ -14,9 +15,13 @@ private:
     SetsModel *model;
     SetsProxyModel *proxyModel;
     QTreeView *view;
+    QPushButton *saveButton, *restoreButton;
 public:
     WndSets(QWidget *parent = 0);
     ~WndSets();
+private slots:
+    void actSave();
+    void actRestore();
 };
 
 #endif

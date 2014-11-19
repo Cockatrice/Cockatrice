@@ -6,6 +6,8 @@
 #include <QMimeData>
 #include "carddatabase.h"
 
+class SetsProxyModel;
+
 class SetsMimeData : public QMimeData {
     Q_OBJECT
 private:
@@ -18,6 +20,7 @@ public:
 
 class SetsModel : public QAbstractTableModel {
     Q_OBJECT
+    friend class SetsProxyModel;
 private:
     static const int NUM_COLS = 5;
     SetList sets;
@@ -42,5 +45,6 @@ class SetsProxyModel : public QSortFilterProxyModel {
     Q_OBJECT
 public:
     SetsProxyModel(QObject *parent = 0);
+    void saveOrder();
 };
 #endif

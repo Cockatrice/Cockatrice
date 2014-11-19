@@ -2,8 +2,9 @@
 #include "setsmodel.h"
 #include "main.h"
 #include <QTreeView>
-#include <QHBoxLayout>
+#include <QGridLayout>
 #include <QHeaderView>
+#include <QPushButton>
 
 WndSets::WndSets(QWidget *parent)
     : QMainWindow(parent)
@@ -30,8 +31,15 @@ WndSets::WndSets(QWidget *parent)
     view->header()->setSectionResizeMode(SetsModel::LongNameCol, QHeaderView::ResizeToContents);
 #endif
 
-    QHBoxLayout *mainLayout = new QHBoxLayout;
-    mainLayout->addWidget(view);
+    saveButton = new QPushButton(tr("Save sets order"));
+    connect(saveButton, SIGNAL(clicked()), this, SLOT(actSave()));
+    restoreButton = new QPushButton(tr("Restore saved sets order"));
+    connect(restoreButton, SIGNAL(clicked()), this, SLOT(actRestore()));
+
+    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout->addWidget(view, 0, 0, 1, 2);
+    mainLayout->addWidget(saveButton, 1, 0, 1, 1);
+    mainLayout->addWidget(restoreButton, 1, 1, 1, 1);
 
     QWidget *centralWidget = new QWidget;
     centralWidget->setLayout(mainLayout);
@@ -43,4 +51,14 @@ WndSets::WndSets(QWidget *parent)
 
 WndSets::~WndSets()
 {
+}
+
+void WndSets::actSave()
+{
+    proxyModel->saveOrder();
+}
+
+void WndSets::actRestore()
+{
+    view->sortByColumn(SetsModel::SortKeyCol, Qt::AscendingOrder);
 }

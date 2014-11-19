@@ -90,6 +90,10 @@ bool SetsModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int r
     for (int i = 0; i < sets.size(); i++)
         sets[i]->setSortKey(i);
 
+    sets.sortByKey();
+
+    emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
+
     return true;
 }
 
@@ -104,3 +108,17 @@ SetsProxyModel::SetsProxyModel(QObject *parent)
     setDynamicSortFilter(true);
 }
 
+void SetsProxyModel::saveOrder()
+{
+    int numRows = rowCount();
+    SetsModel * model = (SetsModel*) sourceModel();
+    for(int row = 0; row < numRows; ++row) {
+        QModelIndex idx = index(row, 0);
+        int oldRow = data(idx, Qt::DisplayRole).toInt(); 
+        CardSet *temp = model->sets.at(oldRow);
+        temp->setSortKey(row);
+    }
+    model->sets.sortByKey();
+
+    emit model->dataChanged(model->index(0, 0), model->index(model->rowCount() - 1, model->columnCount() - 1));
+}
