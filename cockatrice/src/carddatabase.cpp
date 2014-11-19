@@ -16,6 +16,7 @@
 #include <QImageReader>
 
 const int CardDatabase::versionNeeded = 3;
+const char* CardDatabase::TOKENS_SETNAME = "TK";
 
 static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
 {
@@ -791,7 +792,7 @@ CardInfo *CardDatabase::getCardFromMap(CardNameMap &cardMap, const QString &card
         return cardMap.value(cardName);
     else if (createIfNotFound) {
         CardInfo *newCard = new CardInfo(this, cardName, true);
-        newCard->addToSet(getSet("TK"));
+        newCard->addToSet(getSet(CardDatabase::TOKENS_SETNAME));
         cardMap.insert(cardName, newCard);
         return newCard;
     } else

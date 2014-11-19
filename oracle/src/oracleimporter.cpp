@@ -235,6 +235,10 @@ int OracleImporter::startImport()
     QListIterator<SetToDownload> it(allSets);
     const SetToDownload * curSet;
 
+    // add an empty set for tokens
+    CardSet *tokenSet = new CardSet(TOKENS_SETNAME, tr("Dummy set containing tokens"), "tokens");
+    sets.insert(TOKENS_SETNAME, tokenSet);
+
     while (it.hasNext())
     {
         curSet = & it.next();

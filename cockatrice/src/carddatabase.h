@@ -218,6 +218,8 @@ private:
 
     CardInfo *getCardFromMap(CardNameMap &cardMap, const QString &cardName, bool createIfNotFound);
 public:
+    static const char* TOKENS_SETNAME;
+
     CardDatabase(QObject *parent = 0);
     ~CardDatabase();
     void clear();
