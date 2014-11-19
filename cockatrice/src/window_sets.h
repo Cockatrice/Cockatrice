@@ -4,6 +4,7 @@
 #include <QMainWindow>
 
 class SetsModel;
+class SetsProxyModel;
 class QTreeView;
 class CardDatabase;
 
@@ -11,6 +12,7 @@ class WndSets : public QMainWindow {
     Q_OBJECT
 private:
     SetsModel *model;
+    SetsProxyModel *proxyModel;
     QTreeView *view;
 public:
     WndSets(QWidget *parent = 0);
