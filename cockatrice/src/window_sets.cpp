@@ -31,9 +31,9 @@ WndSets::WndSets(QWidget *parent)
     view->header()->setSectionResizeMode(SetsModel::LongNameCol, QHeaderView::ResizeToContents);
 #endif
 
-    saveButton = new QPushButton(tr("Save sets order"));
+    saveButton = new QPushButton(tr("Save set ordering"));
     connect(saveButton, SIGNAL(clicked()), this, SLOT(actSave()));
-    restoreButton = new QPushButton(tr("Restore saved sets order"));
+    restoreButton = new QPushButton(tr("Restore saved set ordering"));
     connect(restoreButton, SIGNAL(clicked()), this, SLOT(actRestore()));
 
     QGridLayout *mainLayout = new QGridLayout;
