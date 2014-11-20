@@ -51,7 +51,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     aClearSearch->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
     connect(aClearSearch, SIGNAL(triggered()), this, SLOT(actClearSearch()));
     searchEdit = new SearchLineEdit;
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= 0x050300
     searchEdit->addAction(QIcon(":/resources/icon_search_black.svg"), QLineEdit::LeadingPosition);
 #endif
     searchEdit->setObjectName("searchEdit");
