@@ -18,3 +18,9 @@ notifications:
     on_success: change
     on_failure: change
     on_start: false
+matrix:
+  fast_finish: true
+  allow_failures:
+    - compiler: clang
+      os: linux
+      env: QT4=0
