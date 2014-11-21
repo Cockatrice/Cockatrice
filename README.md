@@ -48,6 +48,11 @@ The following flags can be passed to `cmake`:
 `cockatrice` is the game client  
 `servatrice` is the server
 
+# Community Resources
+- [reddit r/Cockatrice](http://reddit.com/r/cockatrice)
+- [Woogerworks Server & Forums](http://woogerworks.com)
+- [Cockatrice Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
+
 # License
 
 Cockatrice is free software, licensed under the GPLv2; see COPYING for details.
