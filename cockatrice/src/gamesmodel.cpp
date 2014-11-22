@@ -126,10 +126,10 @@ QVariant GamesModel::headerData(int section, Qt::Orientation orientation, int ro
         return QVariant();
     switch (section) {
         case 0: return tr("Room");
-        case 1: return tr("Game created");
+        case 1: return tr("Game Created");
         case 2: return tr("Description");
         case 3: return tr("Creator");
-        case 4: return tr("Game type");
+        case 4: return tr("Game Type");
         case 5: return tr("Password");
         case 6: return tr("Restrictions");
         case 7: return tr("Players");
