@@ -22,6 +22,9 @@ namespace {
      *   300+ minutes will return "5+ hr ago"
      */
     QString prettyPrintSecsAgo(uint32_t secs) {
+        if (secs < SECS_PER_MIN) {
+            return QObject::tr("<1m ago");
+        }
         if (secs < SECS_PER_MIN * 5) {
             return QObject::tr("<5m ago");
         }
