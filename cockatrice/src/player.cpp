@@ -236,6 +236,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
         connect(aMoveTopCardsToExile, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToExile()));
         aMoveTopCardToBottom = new QAction(this);
         connect(aMoveTopCardToBottom, SIGNAL(triggered()), this, SLOT(actMoveTopCardToBottom()));
+        aMoveBottomCardToGrave = new QAction(this);
+        connect(aMoveBottomCardToGrave, SIGNAL(triggered()), this, SLOT(actMoveBottomCardToGrave()));
     }
 
     playerMenu = new QMenu(QString());
@@ -271,6 +273,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
         libraryMenu->addAction(aMoveTopCardsToGrave);
         libraryMenu->addAction(aMoveTopCardsToExile);
         libraryMenu->addAction(aMoveTopCardToBottom);
+        libraryMenu->addAction(aMoveBottomCardToGrave);
         deck->setMenu(libraryMenu, aDrawCard);
     } else {
         handMenu = 0;
@@ -610,6 +613,7 @@ void Player::retranslateUi()
         aMoveTopCardsToGrave->setText(tr("Move top cards to &graveyard..."));
         aMoveTopCardsToExile->setText(tr("Move top cards to &exile..."));
         aMoveTopCardToBottom->setText(tr("Put top card on &bottom"));
+        aMoveBottomCardToGrave->setText(tr("Put bottom card &in graveyard"));
     
         handMenu->setTitle(tr("&Hand"));
         mRevealHand->setTitle(tr("&Reveal to"));
@@ -922,6 +926,19 @@ void Player::actMoveTopCardToBottom()
     cmd.set_x(-1);
     cmd.set_y(0);
     
+    sendGameCommand(cmd);
+}
+
+void Player::actMoveBottomCardToGrave() {
+    CardZone *zone = zones.value("deck");
+    Command_MoveCard cmd;
+    cmd.set_start_zone("deck");
+    cmd.mutable_cards_to_move()->add_card()->set_card_id(zone->getCards().size() - 1);
+    cmd.set_target_player_id(getId());
+    cmd.set_target_zone("grave");
+    cmd.set_x(0);
+    cmd.set_y(0);
+
     sendGameCommand(cmd);
 }
 
