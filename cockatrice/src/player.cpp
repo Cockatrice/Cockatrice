@@ -496,7 +496,6 @@ void Player::playerListActionTriggered()
     
     if (menu == mRevealLibrary) {
         cmd.set_zone_name("deck");
-        cmd.set_grant_write_access(true);
     } else if (menu == mRevealTopCard) {
         cmd.set_zone_name("deck");
         cmd.set_card_id(0);
