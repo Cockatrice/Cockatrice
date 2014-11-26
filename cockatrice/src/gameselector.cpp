@@ -27,16 +27,17 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     gameListView->setModel(gameListProxyModel);
     gameListView->setSortingEnabled(true);
+    gameListView->sortByColumn(gameListModel->startTimeColIndex(), Qt::AscendingOrder);
     gameListView->setAlternatingRowColors(true);
     gameListView->setRootIsDecorated(true);
     if (_room)
-        gameListView->header()->hideSection(1);
+        gameListView->header()->hideSection(gameListModel->roomColIndex());
     else
         gameListProxyModel->setUnavailableGamesVisible(true);
 #if QT_VERSION < 0x050000
-    gameListView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
+    gameListView->header()->setResizeMode(0, QHeaderView::ResizeToContents);
 #else
-    gameListView->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    gameListView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 #endif
     filterButton = new QPushButton;
     filterButton->setIcon(QIcon(":/resources/icon_search.svg"));
@@ -53,7 +54,7 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
         createButton = 0;
     joinButton = new QPushButton;
     spectateButton = new QPushButton;
-    
+
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(filterButton);
     buttonLayout->addWidget(clearFilterButton);
@@ -63,7 +64,7 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     buttonLayout->addWidget(joinButton);
     buttonLayout->addWidget(spectateButton);
     buttonLayout->setAlignment(Qt::AlignTop);
-    
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(gameListView);
     mainLayout->addLayout(buttonLayout);
@@ -76,6 +77,8 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
 
     connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
     connect(spectateButton, SIGNAL(clicked()), this, SLOT(actJoin()));
+    connect(gameListView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actJoin()));
+    connect(gameListView, SIGNAL(activated(const QModelIndex &)), this, SLOT(actJoin()));
 }
 
 void GameSelector::actSetFilter()

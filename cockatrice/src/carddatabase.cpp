@@ -227,16 +227,18 @@ QString PictureLoader::getPicUrl()
             return picUrl;
     }
 
-    // otherwise, fallback to the default url
-    picUrl = picDownloadHq ? settingsCache->getPicUrlHq() : settingsCache->getPicUrl();
-    picUrl.replace("!name!", QUrl::toPercentEncoding(card->getCorrectedName()));
+    // if a card has a muid, use the default url; if not, use the fallback
+    int muid = set ? card->getMuId(set->getShortName()) : 0;
+    if(muid)
+        picUrl = picDownloadHq ? settingsCache->getPicUrlHq() : settingsCache->getPicUrl();
+    else
+        picUrl = picDownloadHq ? settingsCache->getPicUrlHqFallback() : settingsCache->getPicUrlFallback();
 
+    picUrl.replace("!name!", QUrl::toPercentEncoding(card->getCorrectedName()));
+    picUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(muid)));
     if (set) {
         picUrl.replace("!setcode!", QUrl::toPercentEncoding(set->getShortName()));
         picUrl.replace("!setname!", QUrl::toPercentEncoding(set->getLongName()));
-        int muid = card->getMuId(set->getShortName());
-        if (muid)
-            picUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(muid)));
     }
 
     if (picUrl.contains("!name!") ||

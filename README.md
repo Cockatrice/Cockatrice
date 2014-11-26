@@ -9,11 +9,11 @@ a network interface as well. Both client and server are written in Qt, supportin
 
 Chat with the Cockatrice developers on Gitter. Come here to talk about the application, features, or just to hang out. For support regarding specific servers, please contact that server's admin or forum for support rather than asking here.
 
-[![Gitter chat](https://badges.gitter.im/Daenyth/Cockatrice.png)](https://gitter.im/Daenyth/Cockatrice)
+[![Gitter chat](https://badges.gitter.im/Cockatrice/Cockatrice.png)](https://gitter.im/Cockatrice/Cockatrice)
 
 # Building
 
-[![Build Status](https://travis-ci.org/Daenyth/Cockatrice.svg?branch=master)](https://travis-ci.org/Daenyth/Cockatrice)
+[![Build Status](https://travis-ci.org/Cockatrice/Cockatrice.svg?branch=master)](https://travis-ci.org/Cockatrice/Cockatrice)
 
 Dependencies:
 
@@ -47,6 +47,11 @@ The following flags can be passed to `cmake`:
 `oracle` fetches card data  
 `cockatrice` is the game client  
 `servatrice` is the server
+
+# Community Resources
+- [reddit r/Cockatrice](http://reddit.com/r/cockatrice)
+- [Woogerworks Server & Forums](http://woogerworks.com)
+- [Cockatrice Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
 
 # License
 

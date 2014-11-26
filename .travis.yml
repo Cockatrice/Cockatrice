@@ -1,10 +1,26 @@
 language: cpp
+env:
+  - QT4=1
+  - QT4=0
 os:
   - linux
   - osx
 compiler:
   - gcc
   - clang
-script: mkdir build && cd build && cmake .. -DWITH_SERVER=1 && make
+script: ./travis-compile.sh
 install: ./travis-dependencies.sh
 cache: apt
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/d94969c3b01b22cbdcb7
+    on_success: change
+    on_failure: change
+    on_start: false
+matrix:
+  fast_finish: true
+  allow_failures:
+    - compiler: clang
+      os: linux
+      env: QT4=0

@@ -50,10 +50,12 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     aClearSearch = new QAction(QString(), this);
     aClearSearch->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
     connect(aClearSearch, SIGNAL(triggered()), this, SLOT(actClearSearch()));
-
-    searchLabel = new QLabel();
     searchEdit = new SearchLineEdit;
-    searchLabel->setBuddy(searchEdit);
+#if QT_VERSION >= 0x050300
+    searchEdit->addAction(QIcon(":/resources/icon_search_black.svg"), QLineEdit::LeadingPosition);
+#endif
+    searchEdit->setObjectName("searchEdit");
+    
     setFocusProxy(searchEdit);
     setFocusPolicy(Qt::ClickFocus);
 
@@ -73,7 +75,6 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 
     QHBoxLayout *searchLayout = new QHBoxLayout;
     searchLayout->addWidget(deckEditToolBar);
-    searchLayout->addWidget(searchLabel);
     searchLayout->addWidget(searchEdit);
 
     databaseModel = new CardDatabaseModel(db, this);
@@ -293,7 +294,6 @@ void TabDeckEditor::retranslateUi()
 {
     aCardTextOnly->setText(tr("Show card text only"));
     aClearSearch->setText(tr("&Clear search"));
-    searchLabel->setText(tr("&Search for:"));
     
     nameLabel->setText(tr("Deck &name:"));
     commentsLabel->setText(tr("&Comments:"));
