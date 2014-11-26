@@ -2,8 +2,7 @@
 #include "pb/serverinfo_game.pb.h"
 #include <QDebug>
 #include <QStringList>
-#include <sstream>
-#include <time.h>
+#include <QDateTime>
 
 namespace {
     const unsigned SECS_PER_MIN  = 60;
@@ -21,7 +20,7 @@ namespace {
      *   91-300 minutes will return "Xhr ago"
      *   300+ minutes will return "5+ hr ago"
      */
-    QString prettyPrintSecsAgo(uint32_t secs) {
+    QString prettyPrintSecsAgo(unsigned int secs) {
         if (secs < SECS_PER_MIN) {
             return QObject::tr("<1m ago");
         }
@@ -29,7 +28,7 @@ namespace {
             return QObject::tr("<5m ago");
         }
         if (secs < SECS_PER_HOUR) {
-            uint32_t mins = secs / SECS_PER_MIN;
+            unsigned int mins = secs / SECS_PER_MIN;
             if (secs % SECS_PER_MIN >= 30)
               mins++;
             //: This will have a number prepended, like "10m ago"
@@ -44,7 +43,7 @@ namespace {
         //
         // Personally, I prefer to keep the code cleaner, and allow these.
         if (secs < SECS_PER_MIN * 90) {
-          uint32_t mins = secs / SECS_PER_MIN - 60;
+          unsigned int mins = secs / SECS_PER_MIN - 60;
           if (secs % SECS_PER_MIN >= 30)
             mins++;
           return QObject::tr("1hr ")
@@ -53,7 +52,7 @@ namespace {
                    .append(QObject::tr("m ago"));
         }
         if (secs < SECS_PER_HOUR * 5) {
-            uint32_t hours = secs / SECS_PER_HOUR;
+            unsigned int hours = secs / SECS_PER_HOUR;
             if (secs % SECS_PER_HOUR >= SECS_PER_MIN * 30)
               hours++;
             //: This will have a number prepended, like "2h ago"
@@ -83,9 +82,9 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
     switch (index.column()) {
         case 0: return rooms.value(g.room_id());
         case 1: {
-            uint32_t now = time(NULL);
-            uint32_t then = g.start_time();
-            int secs = now - then;
+            QDateTime then;
+            then.setTime_t(g.start_time());
+            unsigned int secs = then.secsTo(QDateTime::currentDateTime());
  
             switch (role) {
                 case Qt::DisplayRole: return prettyPrintSecsAgo(secs);
