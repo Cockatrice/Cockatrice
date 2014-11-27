@@ -52,7 +52,6 @@ RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent)
     setLayout(vbox);
     
     connect(client, SIGNAL(listRoomsEventReceived(const Event_ListRooms &)), this, SLOT(processListRoomsEvent(const Event_ListRooms &)));
-    connect(roomList, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(joinClicked()));
     connect(roomList, SIGNAL(activated(const QModelIndex &)), this, SLOT(joinClicked()));
     client->sendCommand(client->prepareSessionCommand(Command_ListRooms()));
 }

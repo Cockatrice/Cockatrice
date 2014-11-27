@@ -77,7 +77,6 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
 
     connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
     connect(spectateButton, SIGNAL(clicked()), this, SLOT(actJoin()));
-    connect(gameListView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actJoin()));
     connect(gameListView, SIGNAL(activated(const QModelIndex &)), this, SLOT(actJoin()));
 }
 
