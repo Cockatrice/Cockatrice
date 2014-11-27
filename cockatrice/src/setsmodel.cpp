@@ -20,13 +20,16 @@ int SetsModel::rowCount(const QModelIndex &parent) const
 
 QVariant SetsModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || (index.column() >= 2) || (index.row() >= rowCount()) || (role != Qt::DisplayRole))
+    if (!index.isValid() || (index.column() >= NUM_COLS) || (index.row() >= rowCount()) || (role != Qt::DisplayRole))
         return QVariant();
 
     CardSet *set = sets[index.row()];
     switch (index.column()) {
-        case 0: return set->getShortName();
-        case 1: return set->getLongName();
+        case SortKeyCol: return set->getSortKey();
+        case SetTypeCol: return set->getSetType();
+        case ShortNameCol: return set->getShortName();
+        case LongNameCol: return set->getLongName();
+        case ReleaseDateCol: return set->getReleaseDate();
         default: return QVariant();
     }
 }
@@ -36,8 +39,11 @@ QVariant SetsModel::headerData(int section, Qt::Orientation orientation, int rol
     if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal))
         return QVariant();
     switch (section) {
-        case 0: return tr("Short name");
-        case 1: return tr("Long name");
+        case SortKeyCol: return tr("Key");
+        case SetTypeCol: return tr("Set type");
+        case ShortNameCol: return tr("Short name");
+        case LongNameCol: return tr("Long name");
+        case ReleaseDateCol: return tr("Release date");
         default: return QVariant();
     }
 }
@@ -84,10 +90,35 @@ bool SetsModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int r
     for (int i = 0; i < sets.size(); i++)
         sets[i]->setSortKey(i);
 
+    sets.sortByKey();
+
+    emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
+
     return true;
 }
 
 QStringList SetsModel::mimeTypes() const
 {
     return QStringList() << "application/x-cockatricecardset";
+}
+
+SetsProxyModel::SetsProxyModel(QObject *parent)
+    : QSortFilterProxyModel(parent)
+{
+    setDynamicSortFilter(true);
+}
+
+void SetsProxyModel::saveOrder()
+{
+    int numRows = rowCount();
+    SetsModel * model = (SetsModel*) sourceModel();
+    for(int row = 0; row < numRows; ++row) {
+        QModelIndex idx = index(row, 0);
+        int oldRow = data(idx, Qt::DisplayRole).toInt(); 
+        CardSet *temp = model->sets.at(oldRow);
+        temp->setSortKey(row);
+    }
+    model->sets.sortByKey();
+
+    emit model->dataChanged(model->index(0, 0), model->index(model->rowCount() - 1, model->columnCount() - 1));
 }

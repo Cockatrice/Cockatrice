@@ -30,6 +30,8 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
     QString edition;
     QString editionLong;
     QVariant editionCards;
+    QString setType;
+    QDate releaseDate;
     bool import;
 
     while (it.hasNext()) {
@@ -37,12 +39,14 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
         edition = map.value("code").toString();
         editionLong = map.value("name").toString();
         editionCards = map.value("cards");
+        setType = map.value("type").toString();
+        releaseDate = map.value("releaseDate").toDate();
 
         // core and expansion sets are marked to be imported by default
-        import = (0 == QString::compare(map.value("type").toString(), QString("core"), Qt::CaseInsensitive) ||
-            0 == QString::compare(map.value("type").toString(), QString("expansion"), Qt::CaseInsensitive));
+        import = (0 == QString::compare(setType, QString("core"), Qt::CaseInsensitive) ||
+            0 == QString::compare(setType, QString("expansion"), Qt::CaseInsensitive));
 
-        newSetList.append(SetToDownload(edition, editionLong, editionCards, import));
+        newSetList.append(SetToDownload(edition, editionLong, editionCards, import, setType, releaseDate));
     }
 
     qSort(newSetList);
@@ -231,13 +235,17 @@ int OracleImporter::startImport()
     QListIterator<SetToDownload> it(allSets);
     const SetToDownload * curSet;
 
+    // add an empty set for tokens
+    CardSet *tokenSet = new CardSet(TOKENS_SETNAME, tr("Dummy set containing tokens"), "tokens");
+    sets.insert(TOKENS_SETNAME, tokenSet);
+
     while (it.hasNext())
     {
         curSet = & it.next();
         if(!curSet->getImport())
             continue;
             
-        CardSet *set = new CardSet(curSet->getShortName(), curSet->getLongName());
+        CardSet *set = new CardSet(curSet->getShortName(), curSet->getLongName(), curSet->getSetType(), curSet->getReleaseDate());
         if (!sets.contains(set->getShortName()))
             sets.insert(set->getShortName(), set);
 
