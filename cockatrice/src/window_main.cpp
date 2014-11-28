@@ -217,7 +217,7 @@ void MainWindow::actAbout()
     QMessageBox::about(this, tr("About Cockatrice"), QString(
         "<font size=\"8\"><b>Cockatrice</b></font><br>"
         + tr("Version %1").arg(VERSION_STRING)
-        + "<br><br><br><b>" + tr("Authors:") + "</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>"
+        + "<br><br><br><b>" + tr("Authors:") + "</b><br>Gavin Bisesi<br>Max-Wilhelm Bruker (Retired)<br>Marcus Schütz (Retired)<br><br>"
         + "<b>" + tr("Translators:") + "</b><br>"
         + tr("Spanish:") + " Víctor Martínez<br>"
         + tr("Portugese (Portugal):") + " Milton Gonçalves<br>"
