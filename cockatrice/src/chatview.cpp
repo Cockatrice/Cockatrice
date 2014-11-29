@@ -38,7 +38,7 @@ QTextCursor ChatView::prepareBlock(bool same)
         QTextBlockFormat blockFormat;
         if ((evenNumber = !evenNumber))
             blockFormat.setBackground(palette().alternateBase());
-        blockFormat.setBottomMargin(2);
+        blockFormat.setBottomMargin(4);
         cursor.insertBlock(blockFormat);
     } else
         cursor.insertHtml("<br>");
