@@ -5,23 +5,28 @@
 
 class SetsModel;
 class SetsProxyModel;
-class QTreeView;
 class QPushButton;
 class CardDatabase;
+class QItemSelection;
+class QTreeView;
 
 class WndSets : public QMainWindow {
     Q_OBJECT
 private:
     SetsModel *model;
-    SetsProxyModel *proxyModel;
     QTreeView *view;
-    QPushButton *saveButton, *restoreButton;
+    QPushButton *upButton, *downButton, *bottomButton, *topButton;
 public:
     WndSets(QWidget *parent = 0);
     ~WndSets();
+protected:
+    void selectRow(int row);
 private slots:
-    void actSave();
-    void actRestore();
+    void actUp();
+    void actDown();
+    void actTop();
+    void actBottom();
+    void actToggleButtons(const QItemSelection & selected, const QItemSelection & deselected);
 };
 
 #endif

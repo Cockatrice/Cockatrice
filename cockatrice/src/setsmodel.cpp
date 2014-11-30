@@ -1,4 +1,5 @@
 #include "setsmodel.h"
+#include <QDebug>
 
 SetsModel::SetsModel(CardDatabase *_db, QObject *parent)
     : QAbstractTableModel(parent), sets(_db->getSetList())
@@ -78,13 +79,22 @@ bool SetsModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int r
         row = parent.row();
     }
     int oldRow = qobject_cast<const SetsMimeData *>(data)->getOldRow();
+    if (oldRow < row)
+        row--;
+
+    swapRows(oldRow, row);
+
+    return true;
+}
+
+void SetsModel::swapRows(int oldRow, int newRow)
+{
     beginRemoveRows(QModelIndex(), oldRow, oldRow);
     CardSet *temp = sets.takeAt(oldRow);
     endRemoveRows();
-    if (oldRow < row)
-        row--;
-    beginInsertRows(QModelIndex(), row, row);
-    sets.insert(row, temp);
+
+    beginInsertRows(QModelIndex(), newRow, newRow);
+    sets.insert(newRow, temp);
     endInsertRows();
 
     for (int i = 0; i < sets.size(); i++)
@@ -93,32 +103,27 @@ bool SetsModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int r
     sets.sortByKey();
 
     emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
+}
 
-    return true;
+void SetsModel::sort(int column, Qt::SortOrder order)
+{
+    QMap<QString, CardSet *> setMap;
+    int numRows = rowCount();
+    int row;
+
+    for(row = 0; row < numRows; ++row)
+        setMap.insertMulti(index(row, column).data().toString(), sets.at(row));
+
+    row = (order == Qt::AscendingOrder) ? 0 : numRows - 1;
+
+    foreach(CardSet * set, setMap)
+        set->setSortKey((order == Qt::AscendingOrder) ? row++ : row--);
+
+    sets.sortByKey();
+    emit dataChanged(index(0, 0), index(numRows - 1, columnCount() - 1));
 }
 
 QStringList SetsModel::mimeTypes() const
 {
     return QStringList() << "application/x-cockatricecardset";
-}
-
-SetsProxyModel::SetsProxyModel(QObject *parent)
-    : QSortFilterProxyModel(parent)
-{
-    setDynamicSortFilter(true);
-}
-
-void SetsProxyModel::saveOrder()
-{
-    int numRows = rowCount();
-    SetsModel * model = (SetsModel*) sourceModel();
-    for(int row = 0; row < numRows; ++row) {
-        QModelIndex idx = index(row, 0);
-        int oldRow = data(idx, Qt::DisplayRole).toInt(); 
-        CardSet *temp = model->sets.at(oldRow);
-        temp->setSortKey(row);
-    }
-    model->sets.sortByKey();
-
-    emit model->dataChanged(model->index(0, 0), model->index(model->rowCount() - 1, model->columnCount() - 1));
 }

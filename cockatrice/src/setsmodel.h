@@ -2,7 +2,6 @@
 #define SETSMODEL_H
 
 #include <QAbstractTableModel>
-#include <QSortFilterProxyModel>
 #include <QMimeData>
 #include "carddatabase.h"
 
@@ -39,12 +38,8 @@ public:
     QMimeData *mimeData(const QModelIndexList &indexes) const;
     bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
     QStringList mimeTypes() const;
+    void swapRows(int oldRow, int newRow);
+    void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
 };
 
-class SetsProxyModel : public QSortFilterProxyModel {
-    Q_OBJECT
-public:
-    SetsProxyModel(QObject *parent = 0);
-    void saveOrder();
-};
 #endif
