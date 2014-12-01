@@ -567,7 +567,6 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     priceTagsCheckBox->setChecked(settingsCache->getPriceTagFeature());
     connect(priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
 
-    priceTagSource0 = new QRadioButton;
     priceTagSource1 = new QRadioButton;
 
     switch(settingsCache->getPriceTagSource())
@@ -578,15 +577,13 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
             break;
     }
 
-    connect(priceTagSource0, SIGNAL(toggled(bool)), this, SLOT(radioPriceTagSourceClicked(bool)));
     connect(priceTagSource1, SIGNAL(toggled(bool)), this, SLOT(radioPriceTagSourceClicked(bool)));
 
     connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
 
     QGridLayout *generalGrid = new QGridLayout;
     generalGrid->addWidget(priceTagsCheckBox, 0, 0);
-    generalGrid->addWidget(priceTagSource0, 1, 0);
-    generalGrid->addWidget(priceTagSource1, 2, 0);
+    generalGrid->addWidget(priceTagSource1, 1, 0);
     
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
