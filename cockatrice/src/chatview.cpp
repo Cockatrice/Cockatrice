@@ -77,6 +77,8 @@ void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
     anchorFormat.setForeground(Qt::blue);
     anchorFormat.setAnchor(true);
     anchorFormat.setAnchorHref(url);
+    anchorFormat.setUnderlineColor(Qt::blue);
+    anchorFormat.setFontUnderline(true);
     
     cursor.setCharFormat(anchorFormat);
     cursor.insertText(url);
