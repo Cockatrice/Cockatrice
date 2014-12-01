@@ -568,15 +568,18 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
 
     priceTagSource1 = new QRadioButton;
+	priceTagSource1->setChecked(true);
+	priceTagSource1->setEnabled(false);
 
+	/* Not necessary unless another price source comes into play
     switch(settingsCache->getPriceTagSource())
     {
         case AbstractPriceUpdater::DBPriceSource:
         default:
-		   if (!priceTagSource1->isChecked())
-               priceTagSource1->setChecked(true);
+		   priceTagSource1->setChecked(true);
         break;
     }
+	*/
 
     connect(priceTagSource1, SIGNAL(toggled(bool)), this, SLOT(radioPriceTagSourceClicked(bool)));
 
