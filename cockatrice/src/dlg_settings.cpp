@@ -573,8 +573,9 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     {
         case AbstractPriceUpdater::DBPriceSource:
         default:
-            priceTagSource1->setChecked(true);
-            break;
+		   if (!priceTagSource1->isChecked())
+               priceTagSource1->setChecked(true);
+        break;
     }
 
     connect(priceTagSource1, SIGNAL(toggled(bool)), this, SLOT(radioPriceTagSourceClicked(bool)));
