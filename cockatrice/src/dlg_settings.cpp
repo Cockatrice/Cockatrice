@@ -573,11 +573,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     switch(settingsCache->getPriceTagSource())
     {
         case AbstractPriceUpdater::DBPriceSource:
-            priceTagSource1->setChecked(true);
-            break;
-        case AbstractPriceUpdater::BLPPriceSource:
         default:
-            priceTagSource0->setChecked(true);
+            priceTagSource1->setChecked(true);
             break;
     }
 
@@ -603,8 +600,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 void DeckEditorSettingsPage::retranslateUi()
 {
     priceTagsCheckBox->setText(tr("Enable &price tag feature"));
-    priceTagSource0->setText(tr("using data from blacklotusproject.com"));
-    priceTagSource1->setText(tr("using data from deckbrew.com"));
+    priceTagSource1->setText(tr("Get prices from deckbrew.com"));
     generalGroupBox->setTitle(tr("General"));
 }
 
@@ -613,11 +609,7 @@ void DeckEditorSettingsPage::radioPriceTagSourceClicked(bool checked)
     if(!checked)
         return;
 
-    int source=AbstractPriceUpdater::BLPPriceSource;
-    if(priceTagSource0->isChecked())
-        source=AbstractPriceUpdater::BLPPriceSource;
-    if(priceTagSource1->isChecked())
-        source=AbstractPriceUpdater::DBPriceSource;
+    int source=AbstractPriceUpdater::DBPriceSource;
 
     emit priceTagSourceChanged(source);
 }
