@@ -31,16 +31,6 @@ public:
     virtual void updatePrices() = 0;
 };
 
-class BLPPriceUpdater : public AbstractPriceUpdater
-{
-    Q_OBJECT
-protected:
-    virtual void downloadFinished();
-public:
-    BLPPriceUpdater(const DeckList *deck);
-    virtual void updatePrices();
-};
-
 class DBPriceUpdater : public AbstractPriceUpdater
 {
     Q_OBJECT

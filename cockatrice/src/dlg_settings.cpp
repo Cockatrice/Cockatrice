@@ -567,29 +567,27 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     priceTagsCheckBox->setChecked(settingsCache->getPriceTagFeature());
     connect(priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
 
-    priceTagSource0 = new QRadioButton;
     priceTagSource1 = new QRadioButton;
+	priceTagSource1->setChecked(true);
+	priceTagSource1->setEnabled(false);
 
+	/* Not necessary unless another price source comes into play
     switch(settingsCache->getPriceTagSource())
     {
         case AbstractPriceUpdater::DBPriceSource:
-            priceTagSource1->setChecked(true);
-            break;
-        case AbstractPriceUpdater::BLPPriceSource:
         default:
-            priceTagSource0->setChecked(true);
-            break;
+		   priceTagSource1->setChecked(true);
+        break;
     }
+	*/
 
-    connect(priceTagSource0, SIGNAL(toggled(bool)), this, SLOT(radioPriceTagSourceClicked(bool)));
     connect(priceTagSource1, SIGNAL(toggled(bool)), this, SLOT(radioPriceTagSourceClicked(bool)));
 
     connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
 
     QGridLayout *generalGrid = new QGridLayout;
     generalGrid->addWidget(priceTagsCheckBox, 0, 0);
-    generalGrid->addWidget(priceTagSource0, 1, 0);
-    generalGrid->addWidget(priceTagSource1, 2, 0);
+    generalGrid->addWidget(priceTagSource1, 1, 0);
     
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -603,8 +601,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 void DeckEditorSettingsPage::retranslateUi()
 {
     priceTagsCheckBox->setText(tr("Enable &price tag feature"));
-    priceTagSource0->setText(tr("using data from blacklotusproject.com"));
-    priceTagSource1->setText(tr("using data from deckbrew.com"));
+    priceTagSource1->setText(tr("Get prices from deckbrew.com"));
     generalGroupBox->setTitle(tr("General"));
 }
 
@@ -613,11 +610,7 @@ void DeckEditorSettingsPage::radioPriceTagSourceClicked(bool checked)
     if(!checked)
         return;
 
-    int source=AbstractPriceUpdater::BLPPriceSource;
-    if(priceTagSource0->isChecked())
-        source=AbstractPriceUpdater::BLPPriceSource;
-    if(priceTagSource1->isChecked())
-        source=AbstractPriceUpdater::DBPriceSource;
+    int source=AbstractPriceUpdater::DBPriceSource;
 
     emit priceTagSourceChanged(source);
 }
