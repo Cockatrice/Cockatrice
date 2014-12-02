@@ -1,5 +1,4 @@
 #include "setsmodel.h"
-#include <QDebug>
 
 SetsModel::SetsModel(CardDatabase *_db, QObject *parent)
     : QAbstractTableModel(parent), sets(_db->getSetList())
