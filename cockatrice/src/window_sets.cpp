@@ -13,8 +13,6 @@ WndSets::WndSets(QWidget *parent)
     model = new SetsModel(db, this);
     view = new QTreeView;
     view->setModel(model);
-    view->sortByColumn(SetsModel::SortKeyCol, Qt::AscendingOrder);
-    view->setColumnHidden(SetsModel::SortKeyCol, true);
 
     view->setAlternatingRowColors(true);
     view->setUniformRowHeights(true);
@@ -36,6 +34,13 @@ WndSets::WndSets(QWidget *parent)
     view->header()->setSectionResizeMode(SetsModel::LongNameCol, QHeaderView::ResizeToContents);
 #endif
 
+    view->sortByColumn(SetsModel::SortKeyCol, Qt::AscendingOrder);
+    view->setColumnHidden(SetsModel::SortKeyCol, true);
+
+    saveButton = new QPushButton(tr("Save set ordering"));
+    connect(saveButton, SIGNAL(clicked()), this, SLOT(actSave()));
+    restoreButton = new QPushButton(tr("Restore saved set ordering"));
+    connect(restoreButton, SIGNAL(clicked()), this, SLOT(actRestore()));
     upButton = new QPushButton(tr("Move selected set up"));
     connect(upButton, SIGNAL(clicked()), this, SLOT(actUp()));
     downButton = new QPushButton(tr("Move selected set down"));
@@ -62,6 +67,9 @@ WndSets::WndSets(QWidget *parent)
     mainLayout->addWidget(topButton, 1, 1, 1, 1);
     mainLayout->addWidget(bottomButton, 2, 1, 1, 1);
 
+    mainLayout->addWidget(saveButton, 3, 0, 1, 1);
+    mainLayout->addWidget(restoreButton, 3, 1, 1, 1);
+
     QWidget *centralWidget = new QWidget;
     centralWidget->setLayout(mainLayout);
     setCentralWidget(centralWidget);
@@ -72,6 +80,16 @@ WndSets::WndSets(QWidget *parent)
 
 WndSets::~WndSets()
 {
+}
+
+void WndSets::actSave()
+{
+    model->save();
+}
+
+void WndSets::actRestore()
+{
+    model->restore(db);
 }
 
 void WndSets::actToggleButtons(const QItemSelection & selected, const QItemSelection &)

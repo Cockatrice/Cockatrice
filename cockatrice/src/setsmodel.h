@@ -40,6 +40,8 @@ public:
     QStringList mimeTypes() const;
     void swapRows(int oldRow, int newRow);
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
+    void save();
+    void restore(CardDatabase *db);
 };
 
 #endif

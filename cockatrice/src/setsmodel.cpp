@@ -97,30 +97,49 @@ void SetsModel::swapRows(int oldRow, int newRow)
     sets.insert(newRow, temp);
     endInsertRows();
 
-    for (int i = 0; i < sets.size(); i++)
-        sets[i]->setSortKey(i);
-
-    sets.sortByKey();
-
     emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
 }
 
 void SetsModel::sort(int column, Qt::SortOrder order)
 {
-    QMap<QString, CardSet *> setMap;
+    QMap<QVariant, CardSet *> setMap;
     int numRows = rowCount();
     int row;
 
     for(row = 0; row < numRows; ++row)
-        setMap.insertMulti(index(row, column).data().toString(), sets.at(row));
+        setMap.insertMulti(index(row, column).data(), sets.at(row));
 
-    row = (order == Qt::AscendingOrder) ? 0 : numRows - 1;
+    
+    QList<CardSet *> tmp = setMap.values();
+    sets.clear();
+    if(order == Qt::AscendingOrder)
+    {
+        for(row = 0; row < tmp.size(); row++) {
+            sets.append(tmp.at(row));
+        }
+    } else {
+        for(row = tmp.size() - 1; row >= 0; row--) {
+            sets.append(tmp.at(row));
+        }
+    }
 
-    foreach(CardSet * set, setMap)
-        set->setSortKey((order == Qt::AscendingOrder) ? row++ : row--);
+    emit dataChanged(index(0, 0), index(numRows - 1, columnCount() - 1));
+}
+
+void SetsModel::save()
+{
+    for (int i = 0; i < sets.size(); i++)
+        sets[i]->setSortKey(i);
 
     sets.sortByKey();
-    emit dataChanged(index(0, 0), index(numRows - 1, columnCount() - 1));
+}
+
+void SetsModel::restore(CardDatabase *db)
+{
+    sets = db->getSetList();
+    sets.sortByKey();
+
+    emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
 }
 
 QStringList SetsModel::mimeTypes() const
