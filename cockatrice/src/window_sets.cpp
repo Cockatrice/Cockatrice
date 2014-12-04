@@ -6,6 +6,7 @@
 #include <QHeaderView>
 #include <QPushButton>
 #include <QItemSelection>
+#include <QMessageBox>
 
 WndSets::WndSets(QWidget *parent)
     : QMainWindow(parent)
@@ -85,6 +86,7 @@ WndSets::~WndSets()
 void WndSets::actSave()
 {
     model->save();
+    QMessageBox::information(this, tr("Success"), tr("The sets database has been saved successfully."));
 }
 
 void WndSets::actRestore()
