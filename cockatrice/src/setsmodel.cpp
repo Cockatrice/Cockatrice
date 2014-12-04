@@ -101,13 +101,12 @@ void SetsModel::swapRows(int oldRow, int newRow)
 
 void SetsModel::sort(int column, Qt::SortOrder order)
 {
-    QMap<QVariant, CardSet *> setMap;
+    QMap<QString, CardSet *> setMap;
     int numRows = rowCount();
     int row;
 
     for(row = 0; row < numRows; ++row)
-        setMap.insertMulti(index(row, column).data(), sets.at(row));
-
+        setMap.insertMulti(index(row, column).data().toString(), sets.at(row));
     
     QList<CardSet *> tmp = setMap.values();
     sets.clear();
