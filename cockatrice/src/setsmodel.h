@@ -24,7 +24,7 @@ private:
     static const int NUM_COLS = 5;
     SetList sets;
 public:
-    enum SetsColumns { SortKeyCol, SetTypeCol, ShortNameCol, LongNameCol, ReleaseDateCol };
+    enum SetsColumns { SortKeyCol, LongNameCol, ShortNameCol, SetTypeCol, ReleaseDateCol };
 
     SetsModel(CardDatabase *_db, QObject *parent = 0);
     ~SetsModel();

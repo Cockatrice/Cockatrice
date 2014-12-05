@@ -25,11 +25,11 @@ QVariant SetsModel::data(const QModelIndex &index, int role) const
 
     CardSet *set = sets[index.row()];
     switch (index.column()) {
-        case SortKeyCol: return set->getSortKey();
+        case SortKeyCol: return QString("%1").arg(set->getSortKey(), 4, 10, QChar('0'));
         case SetTypeCol: return set->getSetType();
         case ShortNameCol: return set->getShortName();
         case LongNameCol: return set->getLongName();
-        case ReleaseDateCol: return set->getReleaseDate();
+        case ReleaseDateCol: return set->getReleaseDate().toString(Qt::ISODate);
         default: return QVariant();
     }
 }
@@ -41,7 +41,7 @@ QVariant SetsModel::headerData(int section, Qt::Orientation orientation, int rol
     switch (section) {
         case SortKeyCol: return tr("Key");
         case SetTypeCol: return tr("Set type");
-        case ShortNameCol: return tr("Short name");
+        case ShortNameCol: return tr("Set code");
         case LongNameCol: return tr("Long name");
         case ReleaseDateCol: return tr("Release date");
         default: return QVariant();
