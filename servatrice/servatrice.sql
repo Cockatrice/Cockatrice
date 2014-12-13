@@ -223,3 +223,18 @@ CREATE TABLE IF NOT EXISTS `cockatrice_rooms_gametypes` (
 PRIMARY KEY (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `cockatrice_log` (
+ `log_time` datetime NOT NULL,
+ `sender_id` int(7) unsigned NULL,
+ `sender_name` varchar(35) NOT NULL,
+ `sender_ip` varchar(255) NOT NULL,
+ `log_message` text NOT NULL,
+ `target_type` ENUM('room', 'game', 'chat'),
+ `target_id` int(7) NULL,
+ `target_name` varchar(50) NOT NULL,
+  KEY `sender_name` (`sender_name`),
+  KEY `sender_ip` (`sender_ip`),
+  KEY `target_type` (`target_type`),
+  KEY `target_id` (`target_id`),
+  KEY `target_name` (`target_name`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

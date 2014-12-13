@@ -145,10 +145,10 @@ if(APPLE)
 
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*_debug\\.dylib")
+            FILES_MATCHING REGEX "(sqldrivers|platforms)/.*_debug\\.dylib")
     else()
         install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/[^_]*\\.dylib")
+            FILES_MATCHING REGEX "(sqldrivers|platforms)/[^_]*\\.dylib")
     endif()
 
     install(CODE "
@@ -177,10 +177,10 @@ if(WIN32)
 
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*d\\.dll")
+            FILES_MATCHING REGEX "(sqldrivers|platforms)/.*d\\.dll")
     else()
         install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*[^d]\\.dll")
+            FILES_MATCHING REGEX "(sqldrivers|platforms)/.*[^d]\\.dll")
     endif()
 
     install(CODE "
