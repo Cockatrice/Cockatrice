@@ -395,7 +395,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
     SessionEvent *se = prepareSessionEvent(event);
     userInterface->sendProtocolItem(*se);
     rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, se);
-    
+
+    databaseInterface->logMessage(userInfo->id(), QString::fromStdString(userInfo->name()), QString::fromStdString(userInfo->address()), QString::fromStdString(cmd.message()), Server_DatabaseInterface::MessageTargetChat, userInterface->getUserInfo()->id(), receiver);
+
     return Response::RespOk;
 }
 
@@ -543,6 +545,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay 
     msg.replace(QChar('\n'), QChar(' '));
     
     room->say(QString::fromStdString(userInfo->name()), msg);
+
+    databaseInterface->logMessage(userInfo->id(), QString::fromStdString(userInfo->name()), QString::fromStdString(userInfo->address()), msg, Server_DatabaseInterface::MessageTargetRoom, room->getId(), room->getName());
+
     return Response::RespOk;
 }
 
