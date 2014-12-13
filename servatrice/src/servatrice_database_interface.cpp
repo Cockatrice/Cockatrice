@@ -538,3 +538,30 @@ DeckList *Servatrice_DatabaseInterface::getDeckFromDatabase(int deckId, int user
 	
 	return deck;
 }
+
+void Servatrice_DatabaseInterface::logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage, LogMessage_TargetType targetType, const int targetId, const QString &targetName)
+{
+		QSqlQuery query(sqlDatabase);
+		QString targetTypeString;
+		switch(targetType)
+		{
+			case MessageTargetRoom:
+				targetTypeString = "room";
+				break;
+			case MessageTargetGame:
+				targetTypeString = "game";
+				break;
+			case MessageTargetChat:
+				targetTypeString = "chat";
+				break;
+		}
+		query.prepare("insert into " + server->getDbPrefix() + "_log (log_time, sender_id, sender_name, sender_ip, log_message, target_type, target_id, target_name) values (now(), :sender_id, :sender_name, :sender_ip, :log_message, :target_type, :target_id, :target_name)");
+		query.bindValue(":sender_id", senderId);
+		query.bindValue(":sender_name", senderName);
+		query.bindValue(":sender_ip", senderIp);
+		query.bindValue(":log_message", logMessage);
+		query.bindValue(":target_type", targetTypeString);
+		query.bindValue(":target_id", targetId);
+		query.bindValue(":target_name", targetName);
+		execSqlQuery(query);
+}

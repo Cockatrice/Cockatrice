@@ -35,6 +35,9 @@ public:
     virtual bool userSessionExists(const QString & /* userName */) { return false; }
 
     virtual bool getRequireRegistration() { return false; }
+
+    enum LogMessage_TargetType { MessageTargetRoom, MessageTargetGame, MessageTargetChat };
+    virtual void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage, LogMessage_TargetType targetType, const int targetId, const QString &targetName) { };
 };
 
 #endif
