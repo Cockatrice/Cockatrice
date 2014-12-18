@@ -37,6 +37,7 @@ WndSets::WndSets(QWidget *parent)
 
     view->sortByColumn(SetsModel::SortKeyCol, Qt::AscendingOrder);
     view->setColumnHidden(SetsModel::SortKeyCol, true);
+    view->setRootIsDecorated(false);
 
     saveButton = new QPushButton(tr("Save set ordering"));
     connect(saveButton, SIGNAL(clicked()), this, SLOT(actSave()));
