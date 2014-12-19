@@ -1,5 +1,24 @@
 #!/usr/bin/make -f
+
+BUILDDIR = build_dir_debian
+
 %:
 	dh $@ --parallel
+
 override_dh_auto_configure:
-	cmake . -DCMAKE_BUILD_TYPE=Release -DWITH_QT4=1 -DWITH_CLIENT=1 -DWITH_SERVER=1 -DWITH_ORACLE=1
+	mkdir $(BUILDDIR)
+	cd $(BUILDDIR) && cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_QT4=1 -DWITH_CLIENT=1 -DWITH_SERVER=1 -DWITH_ORACLE=1 -DCMAKE_INSTALL_PREFIX:PATH=/usr
+
+override_dh_auto_install:
+	# fuck debian packaging. seriously. this shit is from the 90s
+	ln -s ../debian $(BUILDDIR)/debian
+	cd $(BUILDDIR) && dh_auto_install
+
+override_dh_auto_build:
+	make -j -C $(BUILDDIR)
+
+override_dh_usrlocal:
+
+override_dh_auto_clean:
+	dh_clean
+	rm -rf $(BUILDDIR)
