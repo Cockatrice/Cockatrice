@@ -1,0 +1,5 @@
+#!/usr/bin/make -f
+%:
+	dh $@ --parallel
+override_dh_auto_configure:
+	cmake . -DCMAKE_BUILD_TYPE=Release -DWITH_QT4=1 -DWITH_CLIENT=1 -DWITH_SERVER=1 -DWITH_ORACLE=1
