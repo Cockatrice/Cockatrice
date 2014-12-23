@@ -10,8 +10,8 @@ private:
     QString shortName, longName;
     bool import;
     QVariant cards;
-    QDate releaseDate;
-    QString setType;
+	QString setType;
+	QDate releaseDate;
 public:
     const QString &getShortName() const { return shortName; }
     const QString &getLongName() const { return longName; }
