@@ -188,11 +188,12 @@ void CardInfoWidget::updatePixmap()
     if (pixmapWidth == 0)
         return;
     
-    QPixmap *resizedPixmap = info->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio));
-    if (resizedPixmap)
-        cardPicture->setPixmap(*resizedPixmap);
-    else
-        cardPicture->setPixmap(*(getCard()->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio))));
+    QPixmap resizedPixmap;
+    info->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio), resizedPixmap);
+
+    if (resizedPixmap.isNull())
+        getCard()->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio), resizedPixmap);
+    cardPicture->setPixmap(resizedPixmap);
 }
 
 void CardInfoWidget::retranslateUi()

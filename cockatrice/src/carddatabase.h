@@ -12,6 +12,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QWaitCondition>
+#include <QPixmapCache>
 
 class CardDatabase;
 class CardInfo;
@@ -119,8 +120,7 @@ private:
     MuidMap muIds;
     bool cipt;
     int tableRow;
-    QPixmap *pixmap;
-    QMap<int, QPixmap *> scaledPixmapCache;
+    QString pixmapCacheKey;
 public:
     CardInfo(CardDatabase *_db,
         const QString &_name = QString(),
@@ -165,8 +165,8 @@ public:
     void setCustomPicURLHq(const QString &_set, const QString &_customPicURL) { customPicURLsHq.insert(_set, _customPicURL); }
     void setMuId(const QString &_set, const int &_muId) { muIds.insert(_set, _muId); }
     void addToSet(CardSet *set);
-    QPixmap *loadPixmap();
-    QPixmap *getPixmap(QSize size);
+    void loadPixmap(QPixmap &pixmap);
+    void getPixmap(QSize size, QPixmap &pixmap);
     void clearPixmapCache();
     void clearPixmapCacheMiss();
     void imageLoaded(const QImage &image);
