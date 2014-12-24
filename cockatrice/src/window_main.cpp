@@ -361,7 +361,8 @@ void MainWindow::createMenus()
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), localServer(0), bHasActivated(false)
 {
-    QPixmapCache::setCacheLimit(200000);
+    connect(settingsCache, SIGNAL(pixmapCacheSizeChanged(int)), this, SLOT(pixmapCacheSizeChanged(int)));
+    pixmapCacheSizeChanged(settingsCache->getPixmapCacheSize());
 
     client = new RemoteClient;
     connect(client, SIGNAL(connectionClosedEventReceived(const Event_ConnectionClosed &)), this, SLOT(processConnectionClosedEvent(const Event_ConnectionClosed &)));
@@ -429,4 +430,11 @@ void MainWindow::changeEvent(QEvent *event)
     }
 
     QMainWindow::changeEvent(event);
+}
+
+void MainWindow::pixmapCacheSizeChanged(int value)
+{
+    //qDebug() << "Setting pixmap cache size to " << value << " MBs";
+    // translate MBs to KBs
+    QPixmapCache::setCacheLimit(value * 1024);
 }

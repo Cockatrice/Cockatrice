@@ -16,6 +16,7 @@ class QLabel;
 class QCloseEvent;
 class QSpinBox;
 class QRadioButton;
+class QSpinBox;
 
 class AbstractSettingsPage : public QWidget {
 public:
@@ -39,11 +40,12 @@ private:
     QStringList findQmFiles();
     QString languageName(const QString &qmFile);
     QLineEdit *deckPathEdit, *replaysPathEdit, *picsPathEdit, *cardDatabasePathEdit, *tokenDatabasePathEdit;
+    QSpinBox *pixmapCacheEdit;
     QGroupBox *personalGroupBox, *pathsGroupBox;
     QComboBox *languageBox;
     QCheckBox *picDownloadCheckBox;
     QCheckBox *picDownloadHqCheckBox;
-    QLabel *languageLabel, *deckPathLabel, *replaysPathLabel, *picsPathLabel, *cardDatabasePathLabel, *tokenDatabasePathLabel;
+    QLabel *languageLabel, *deckPathLabel, *replaysPathLabel, *picsPathLabel, *cardDatabasePathLabel, *tokenDatabasePathLabel, *pixmapCacheLabel;
 };
 
 class AppearanceSettingsPage : public AbstractSettingsPage {

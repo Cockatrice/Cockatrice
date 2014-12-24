@@ -23,6 +23,7 @@ SettingsCache::SettingsCache()
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
     picDownloadHq = settings->value("personal/picturedownloadhq", false).toBool();
+    pixmapCacheSize = settings->value("personal/pixmapCacheSize", PIXMAPCACHE_SIZE_DEFAULT).toInt();
     picUrl = settings->value("personal/picUrl", PIC_URL_DEFAULT).toString();
     picUrlHq = settings->value("personal/picUrlHq", PIC_URL_HQ_DEFAULT).toString();
     picUrlFallback = settings->value("personal/picUrlFallback", PIC_URL_FALLBACK).toString();
@@ -287,6 +288,13 @@ void SettingsCache::setAutoConnect(const bool &_autoConnect)
 {
     attemptAutoConnect = _autoConnect;
     settings->setValue("server/auto_connect", attemptAutoConnect ? 1 : 0);
+}
+
+void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
+{
+    pixmapCacheSize = _pixmapCacheSize;
+    settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
+    emit pixmapCacheSizeChanged(pixmapCacheSize);
 }
 
 void SettingsCache::copyPath(const QString &src, const QString &dst)

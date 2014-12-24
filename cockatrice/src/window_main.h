@@ -44,6 +44,7 @@ private slots:
     void protocolVersionMismatch(int localVersion, int remoteVersion);
     void userInfoReceived(const ServerInfo_User &userInfo);
     void localGameEnded();
+    void pixmapCacheSizeChanged(int value);
 
     void actConnect();
     void actDisconnect();
