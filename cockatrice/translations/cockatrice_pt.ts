@@ -37,7 +37,7 @@
 <context>
     <name>AppearanceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="366"/>
+        <location filename="../src/dlg_settings.cpp" line="367"/>
         <source>Zone background pictures</source>
         <translation>Zona das imagens de fundo</translation>
     </message>
@@ -62,27 +62,27 @@
         <translation type="obsolete">Directório da imagem do verso da carta:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="373"/>
+        <location filename="../src/dlg_settings.cpp" line="374"/>
         <source>Card rendering</source>
         <translation>Rendering da carta</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="374"/>
+        <location filename="../src/dlg_settings.cpp" line="375"/>
         <source>Display card names on cards having a picture</source>
         <translation>Mostrar o nome em cartas com imagem</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="376"/>
+        <location filename="../src/dlg_settings.cpp" line="377"/>
         <source>Hand layout</source>
         <translation>Disposição da Mão</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="377"/>
+        <location filename="../src/dlg_settings.cpp" line="378"/>
         <source>Display hand horizontally (wastes space)</source>
         <translation>Mostrar mão horizontalmente (desperdiça espaço)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="379"/>
+        <location filename="../src/dlg_settings.cpp" line="380"/>
         <source>Table grid layout</source>
         <translation>Esquema da mesa</translation>
     </message>
@@ -91,61 +91,61 @@
         <translation type="obsolete">Esquema económico</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="367"/>
+        <location filename="../src/dlg_settings.cpp" line="368"/>
         <source>Hand background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="368"/>
+        <location filename="../src/dlg_settings.cpp" line="369"/>
         <source>Stack background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="369"/>
+        <location filename="../src/dlg_settings.cpp" line="370"/>
         <source>Table background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="370"/>
+        <location filename="../src/dlg_settings.cpp" line="371"/>
         <source>Player info background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="371"/>
+        <location filename="../src/dlg_settings.cpp" line="372"/>
         <source>Card back:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="380"/>
+        <location filename="../src/dlg_settings.cpp" line="381"/>
         <source>Invert vertical coordinate</source>
         <translation>Inverter coordenada vertical</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="381"/>
+        <location filename="../src/dlg_settings.cpp" line="382"/>
         <source>Minimum player count for multi-column layout:</source>
         <translation>Número mínimo de kogadores para layout com múltiplas colunas:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="383"/>
+        <location filename="../src/dlg_settings.cpp" line="384"/>
         <source>Zone view layout</source>
         <translation>Distribuição da zona de vizualização</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="384"/>
+        <location filename="../src/dlg_settings.cpp" line="385"/>
         <source>Sort by name</source>
         <translation>Ordenar por nome</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="385"/>
+        <location filename="../src/dlg_settings.cpp" line="386"/>
         <source>Sort by type</source>
         <translation>Ordenar por tipo</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="396"/>
-        <location filename="../src/dlg_settings.cpp" line="412"/>
-        <location filename="../src/dlg_settings.cpp" line="428"/>
-        <location filename="../src/dlg_settings.cpp" line="444"/>
-        <location filename="../src/dlg_settings.cpp" line="460"/>
+        <location filename="../src/dlg_settings.cpp" line="397"/>
+        <location filename="../src/dlg_settings.cpp" line="413"/>
+        <location filename="../src/dlg_settings.cpp" line="429"/>
+        <location filename="../src/dlg_settings.cpp" line="445"/>
+        <location filename="../src/dlg_settings.cpp" line="461"/>
         <source>Choose path</source>
         <translation>Escolher directório</translation>
     </message>
@@ -1184,12 +1184,12 @@ Isto apenas é guardado para os moderadores e não é visível para a pessoa ban
         <translation type="obsolete">&amp;Permitir função de tag de preços (utilizando informação de blacklotusproject.com)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="586"/>
+        <location filename="../src/dlg_settings.cpp" line="587"/>
         <source>Enable &amp;price tag feature from deckbrew.com</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="587"/>
+        <location filename="../src/dlg_settings.cpp" line="588"/>
         <source>General</source>
         <translation>Geral</translation>
     </message>
@@ -1748,9 +1748,9 @@ Isto apenas é guardado para os moderadores e não é visível para a pessoa ban
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="801"/>
-        <location filename="../src/dlg_settings.cpp" line="807"/>
-        <location filename="../src/dlg_settings.cpp" line="813"/>
+        <location filename="../src/dlg_settings.cpp" line="802"/>
+        <location filename="../src/dlg_settings.cpp" line="808"/>
+        <location filename="../src/dlg_settings.cpp" line="814"/>
         <source>Error</source>
         <translation>Erro</translation>
     </message>
@@ -1759,12 +1759,12 @@ Isto apenas é guardado para os moderadores e não é visível para a pessoa ban
         <translation type="obsolete">A sua base de dados é inválida. Gostaria de voltar atrás e corrigir o directório?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="755"/>
+        <location filename="../src/dlg_settings.cpp" line="756"/>
         <source>Unknown Error loading card database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="764"/>
+        <location filename="../src/dlg_settings.cpp" line="765"/>
         <source>Your card database is invalid.
 
 Cockatrice may not function correctly with an invalid database
@@ -1775,7 +1775,7 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="771"/>
+        <location filename="../src/dlg_settings.cpp" line="772"/>
         <source>Your card database version is too old.
 
 This can cause problems loading card information or images
@@ -1786,7 +1786,7 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="778"/>
+        <location filename="../src/dlg_settings.cpp" line="779"/>
         <source>Your card database did not finish loading
 
 Please file a ticket at http://github.com/Daenyth/Cockatrice/issues with your cards.xml attached
@@ -1795,21 +1795,21 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="784"/>
+        <location filename="../src/dlg_settings.cpp" line="785"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="789"/>
+        <location filename="../src/dlg_settings.cpp" line="790"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="794"/>
+        <location filename="../src/dlg_settings.cpp" line="795"/>
         <source>Unknown card database load status
 
 Please file a ticket at http://github.com/Daenyth/Cockatrice/issues
@@ -1818,42 +1818,42 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="807"/>
+        <location filename="../src/dlg_settings.cpp" line="808"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>O directório do seu deck é inválido. Gostaria de voltar atrás e corrigir o directório?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="813"/>
+        <location filename="../src/dlg_settings.cpp" line="814"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>O directório das imagens das cartas  é inválido. Gostaria de voltar atrás e corrigir o directório?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="822"/>
+        <location filename="../src/dlg_settings.cpp" line="823"/>
         <source>Settings</source>
         <translation>Definições</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="824"/>
+        <location filename="../src/dlg_settings.cpp" line="825"/>
         <source>General</source>
         <translation>Geral</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="825"/>
+        <location filename="../src/dlg_settings.cpp" line="826"/>
         <source>Appearance</source>
         <translation>Aparência</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="826"/>
+        <location filename="../src/dlg_settings.cpp" line="827"/>
         <source>User interface</source>
         <translation>Interface do utilizador</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="827"/>
+        <location filename="../src/dlg_settings.cpp" line="828"/>
         <source>Deck editor</source>
         <translation>Editor de Decks</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="828"/>
+        <location filename="../src/dlg_settings.cpp" line="829"/>
         <source>Messages</source>
         <translation>Mensagens</translation>
     </message>
@@ -2074,7 +2074,7 @@ Would you like to change your database location setting?</source>
         <translation>Português</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="47"/>
+        <location filename="../src/dlg_settings.cpp" line="230"/>
         <source>Reset/Clear Downloaded Pictures</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3940,22 +3940,22 @@ Versão local é %1, versão remota é %2.</translation>
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="639"/>
+        <location filename="../src/dlg_settings.cpp" line="640"/>
         <source>Add message</source>
         <translation>Adicionar mensagem</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="639"/>
+        <location filename="../src/dlg_settings.cpp" line="640"/>
         <source>Message:</source>
         <translation>Mensagem:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="656"/>
+        <location filename="../src/dlg_settings.cpp" line="657"/>
         <source>&amp;Add</source>
         <translation>&amp;Adicionar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="657"/>
+        <location filename="../src/dlg_settings.cpp" line="658"/>
         <source>&amp;Remove</source>
         <translation>&amp;Remover</translation>
     </message>
@@ -5631,52 +5631,52 @@ Por favor introduza um nome:</translation>
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="537"/>
+        <location filename="../src/dlg_settings.cpp" line="538"/>
         <source>General interface settings</source>
         <translation>Configurações gerais da interface</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="538"/>
+        <location filename="../src/dlg_settings.cpp" line="539"/>
         <source>Enable notifications in taskbar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="539"/>
+        <location filename="../src/dlg_settings.cpp" line="540"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation>Clicar &amp;duas vezes nas cartas para as jogar (ao invés de clicar apenas uma vez)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="540"/>
+        <location filename="../src/dlg_settings.cpp" line="541"/>
         <source>&amp;Play all nonlands onto the stack (not the battlefield) by default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="541"/>
+        <location filename="../src/dlg_settings.cpp" line="542"/>
         <source>Animation settings</source>
         <translation>Configurações de Animações</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="542"/>
+        <location filename="../src/dlg_settings.cpp" line="543"/>
         <source>&amp;Tap/untap animation</source>
         <translation>Animação de &amp;virar/desvirar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="543"/>
+        <location filename="../src/dlg_settings.cpp" line="544"/>
         <source>Enable &amp;sounds</source>
         <translation>Permitir &amp;sons</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="544"/>
+        <location filename="../src/dlg_settings.cpp" line="545"/>
         <source>Path to sounds directory:</source>
         <translation>Caminho para o directório dos sons:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="545"/>
+        <location filename="../src/dlg_settings.cpp" line="546"/>
         <source>Test system sound engine</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="556"/>
+        <location filename="../src/dlg_settings.cpp" line="557"/>
         <source>Choose path</source>
         <translation>Escolher directório</translation>
     </message>
