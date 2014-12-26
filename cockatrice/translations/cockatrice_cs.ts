@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="cs_CZ">
+<TS version="2.1" language="cs_CZ">
 <context>
     <name>AbstractCounter</name>
     <message>
@@ -37,7 +37,7 @@
 <context>
     <name>AppearanceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="365"/>
+        <location filename="../src/dlg_settings.cpp" line="366"/>
         <source>Zone background pictures</source>
         <translation>Pozadí zón</translation>
     </message>
@@ -62,86 +62,86 @@
         <translation type="obsolete">Cesta k rubu karet:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="366"/>
+        <location filename="../src/dlg_settings.cpp" line="367"/>
         <source>Hand background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="367"/>
+        <location filename="../src/dlg_settings.cpp" line="368"/>
         <source>Stack background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="368"/>
+        <location filename="../src/dlg_settings.cpp" line="369"/>
         <source>Table background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="369"/>
+        <location filename="../src/dlg_settings.cpp" line="370"/>
         <source>Player info background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="370"/>
+        <location filename="../src/dlg_settings.cpp" line="371"/>
         <source>Card back:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="372"/>
+        <location filename="../src/dlg_settings.cpp" line="373"/>
         <source>Card rendering</source>
         <translation>Vykreslování karet</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="373"/>
+        <location filename="../src/dlg_settings.cpp" line="374"/>
         <source>Display card names on cards having a picture</source>
         <translation>Zobrazit jména karet na kartách s obrázky</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="375"/>
+        <location filename="../src/dlg_settings.cpp" line="376"/>
         <source>Hand layout</source>
         <translation>Rozvržení ruky</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="376"/>
+        <location filename="../src/dlg_settings.cpp" line="377"/>
         <source>Display hand horizontally (wastes space)</source>
         <translation>Zobrazit ruku horizontálně (zabírá více místa)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="378"/>
+        <location filename="../src/dlg_settings.cpp" line="379"/>
         <source>Table grid layout</source>
         <translation>Rozložení herní mřížky</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="379"/>
+        <location filename="../src/dlg_settings.cpp" line="380"/>
         <source>Invert vertical coordinate</source>
         <translation>Převrátit vertikální souřadnice</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="380"/>
+        <location filename="../src/dlg_settings.cpp" line="381"/>
         <source>Minimum player count for multi-column layout:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="382"/>
+        <location filename="../src/dlg_settings.cpp" line="383"/>
         <source>Zone view layout</source>
         <translation>Rozvržení zón</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="383"/>
+        <location filename="../src/dlg_settings.cpp" line="384"/>
         <source>Sort by name</source>
         <translation>Seřadit dle jména</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="384"/>
+        <location filename="../src/dlg_settings.cpp" line="385"/>
         <source>Sort by type</source>
         <translation>Seřadit dle typu</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="395"/>
-        <location filename="../src/dlg_settings.cpp" line="411"/>
-        <location filename="../src/dlg_settings.cpp" line="427"/>
-        <location filename="../src/dlg_settings.cpp" line="443"/>
-        <location filename="../src/dlg_settings.cpp" line="459"/>
+        <location filename="../src/dlg_settings.cpp" line="396"/>
+        <location filename="../src/dlg_settings.cpp" line="412"/>
+        <location filename="../src/dlg_settings.cpp" line="428"/>
+        <location filename="../src/dlg_settings.cpp" line="444"/>
+        <location filename="../src/dlg_settings.cpp" line="460"/>
         <source>Choose path</source>
         <translation>Vyberte cestu</translation>
     </message>
@@ -386,7 +386,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation type="obsolete">Od&amp;pojit</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="83"/>
+        <location filename="../src/carditem.cpp" line="84"/>
         <source>&amp;Power / toughness</source>
         <translation>&amp;Síla / odolnost</translation>
     </message>
@@ -495,7 +495,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation type="obsolete">&amp;exilnout</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="82"/>
+        <location filename="../src/carditem.cpp" line="83"/>
         <source>&amp;Move to</source>
         <translation>&amp;Přesunout</translation>
     </message>
@@ -1041,20 +1041,20 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DBPriceUpdater</name>
     <message>
-        <location filename="../src/priceupdater.cpp" line="191"/>
-        <location filename="../src/priceupdater.cpp" line="204"/>
-        <location filename="../src/priceupdater.cpp" line="225"/>
+        <location filename="../src/priceupdater.cpp" line="115"/>
+        <location filename="../src/priceupdater.cpp" line="128"/>
+        <location filename="../src/priceupdater.cpp" line="149"/>
         <source>Error</source>
         <translation type="unfinished">Chyba</translation>
     </message>
     <message>
-        <location filename="../src/priceupdater.cpp" line="191"/>
-        <location filename="../src/priceupdater.cpp" line="225"/>
+        <location filename="../src/priceupdater.cpp" line="115"/>
+        <location filename="../src/priceupdater.cpp" line="149"/>
         <source>A problem has occured while fetching card prices.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/priceupdater.cpp" line="204"/>
+        <location filename="../src/priceupdater.cpp" line="128"/>
         <source>A problem has occured while fetching card prices:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1066,22 +1066,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation type="obsolete">&amp;Povolit zobrazovaní cen (použijí se data z blacklotusproject.com)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="600"/>
-        <source>Enable &amp;price tag feature</source>
+        <location filename="../src/dlg_settings.cpp" line="586"/>
+        <source>Enable &amp;price tag feature from deckbrew.com</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="601"/>
-        <source>using data from blacklotusproject.com</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="602"/>
-        <source>using data from deckbrew.com</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="603"/>
+        <location filename="../src/dlg_settings.cpp" line="587"/>
         <source>General</source>
         <translation>Obecné</translation>
     </message>
@@ -1278,32 +1268,32 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation>Jen pro &amp;registrované</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="67"/>
+        <location filename="../src/dlg_creategame.cpp" line="72"/>
         <source>Joining restrictions</source>
         <translation>Omezení připojení</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="70"/>
+        <location filename="../src/dlg_creategame.cpp" line="75"/>
         <source>&amp;Spectators allowed</source>
         <translation>&amp;Diváci povoleni</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="73"/>
+        <location filename="../src/dlg_creategame.cpp" line="78"/>
         <source>Spectators &amp;need a password to join</source>
         <translation>Diváci &amp;musí znát heslo</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="74"/>
+        <location filename="../src/dlg_creategame.cpp" line="79"/>
         <source>Spectators can &amp;chat</source>
         <translation>Diváci mohou &amp;chatovat</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="75"/>
+        <location filename="../src/dlg_creategame.cpp" line="80"/>
         <source>Spectators see &amp;everything</source>
         <translation>Diváci vidí &amp;všechno</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="81"/>
+        <location filename="../src/dlg_creategame.cpp" line="86"/>
         <source>Spectators</source>
         <translation>Diváci</translation>
     </message>
@@ -1316,22 +1306,22 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation type="obsolete">&amp;Zrušit</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="110"/>
+        <location filename="../src/dlg_creategame.cpp" line="115"/>
         <source>Create game</source>
         <translation>Vytvořit hru</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="152"/>
+        <location filename="../src/dlg_creategame.cpp" line="157"/>
         <source>Game information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="189"/>
+        <location filename="../src/dlg_creategame.cpp" line="194"/>
         <source>Error</source>
         <translation>Chyba</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="189"/>
+        <location filename="../src/dlg_creategame.cpp" line="194"/>
         <source>Server error.</source>
         <translation>Chyba serveru.</translation>
     </message>
@@ -1633,9 +1623,9 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="822"/>
-        <location filename="../src/dlg_settings.cpp" line="828"/>
-        <location filename="../src/dlg_settings.cpp" line="834"/>
+        <location filename="../src/dlg_settings.cpp" line="801"/>
+        <location filename="../src/dlg_settings.cpp" line="807"/>
+        <location filename="../src/dlg_settings.cpp" line="813"/>
         <source>Error</source>
         <translation>Chyba</translation>
     </message>
@@ -1644,12 +1634,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation type="obsolete">Cesta k databázi je neplatná. Chcete se vrátit a nastavit správnou?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="776"/>
+        <location filename="../src/dlg_settings.cpp" line="755"/>
         <source>Unknown Error loading card database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="785"/>
+        <location filename="../src/dlg_settings.cpp" line="764"/>
         <source>Your card database is invalid.
 
 Cockatrice may not function correctly with an invalid database
@@ -1660,7 +1650,7 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="792"/>
+        <location filename="../src/dlg_settings.cpp" line="771"/>
         <source>Your card database version is too old.
 
 This can cause problems loading card information or images
@@ -1671,7 +1661,7 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="799"/>
+        <location filename="../src/dlg_settings.cpp" line="778"/>
         <source>Your card database did not finish loading
 
 Please file a ticket at http://github.com/Daenyth/Cockatrice/issues with your cards.xml attached
@@ -1680,21 +1670,21 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="805"/>
+        <location filename="../src/dlg_settings.cpp" line="784"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="810"/>
+        <location filename="../src/dlg_settings.cpp" line="789"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="815"/>
+        <location filename="../src/dlg_settings.cpp" line="794"/>
         <source>Unknown card database load status
 
 Please file a ticket at http://github.com/Daenyth/Cockatrice/issues
@@ -1703,42 +1693,42 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="828"/>
+        <location filename="../src/dlg_settings.cpp" line="807"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>Cesta k adresáři s balíčky je neplatná. Chcete se vrátit a nastavit správnou?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="834"/>
+        <location filename="../src/dlg_settings.cpp" line="813"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>Cesta k adresáři s obrázky je neplatná. Chcete se vrátit a nastavit správnou?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="843"/>
+        <location filename="../src/dlg_settings.cpp" line="822"/>
         <source>Settings</source>
         <translation>Nastavení</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="845"/>
+        <location filename="../src/dlg_settings.cpp" line="824"/>
         <source>General</source>
         <translation>Obecné</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="846"/>
+        <location filename="../src/dlg_settings.cpp" line="825"/>
         <source>Appearance</source>
         <translation>Vzhled</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="847"/>
+        <location filename="../src/dlg_settings.cpp" line="826"/>
         <source>User interface</source>
         <translation>Uživatelské rozhraní</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="848"/>
+        <location filename="../src/dlg_settings.cpp" line="827"/>
         <source>Deck editor</source>
         <translation>Editor balíčků</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="849"/>
+        <location filename="../src/dlg_settings.cpp" line="828"/>
         <source>Messages</source>
         <translation>Zprávy</translation>
     </message>
@@ -1750,85 +1740,85 @@ Would you like to change your database location setting?</source>
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/gameselector.cpp" line="122"/>
-        <location filename="../src/gameselector.cpp" line="123"/>
         <location filename="../src/gameselector.cpp" line="124"/>
         <location filename="../src/gameselector.cpp" line="125"/>
         <location filename="../src/gameselector.cpp" line="126"/>
         <location filename="../src/gameselector.cpp" line="127"/>
         <location filename="../src/gameselector.cpp" line="128"/>
         <location filename="../src/gameselector.cpp" line="129"/>
-        <location filename="../src/gameselector.cpp" line="159"/>
+        <location filename="../src/gameselector.cpp" line="130"/>
+        <location filename="../src/gameselector.cpp" line="131"/>
+        <location filename="../src/gameselector.cpp" line="161"/>
         <source>Error</source>
         <translation>Chyba</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="122"/>
+        <location filename="../src/gameselector.cpp" line="124"/>
         <source>Please join the appropriate room first.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="123"/>
+        <location filename="../src/gameselector.cpp" line="125"/>
         <source>Wrong password.</source>
         <translation>Špatné heslo.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="124"/>
+        <location filename="../src/gameselector.cpp" line="126"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>Do této hry je divákům přístup zakázán.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="125"/>
+        <location filename="../src/gameselector.cpp" line="127"/>
         <source>The game is already full.</source>
         <translation>Hra je plná.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="126"/>
+        <location filename="../src/gameselector.cpp" line="128"/>
         <source>The game does not exist any more.</source>
         <translation>Hra již neexistuje.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="127"/>
+        <location filename="../src/gameselector.cpp" line="129"/>
         <source>This game is only open to registered users.</source>
         <translation>Hra je určena jen pro registrované.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="128"/>
+        <location filename="../src/gameselector.cpp" line="130"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
         <translation>Hra je dostupná jen pro přátele zakládajícícho.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="129"/>
+        <location filename="../src/gameselector.cpp" line="131"/>
         <source>You are being ignored by the creator of this game.</source>
         <translation>Zakladatel hry vás ignoruje.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="146"/>
+        <location filename="../src/gameselector.cpp" line="148"/>
         <source>Join game</source>
         <translation>Připojit ke hře</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="146"/>
+        <location filename="../src/gameselector.cpp" line="148"/>
         <source>Password:</source>
         <translation>Heslo:</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="159"/>
+        <location filename="../src/gameselector.cpp" line="161"/>
         <source>Please join the respective room first.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="175"/>
+        <location filename="../src/gameselector.cpp" line="177"/>
         <source>Games</source>
         <translation>Hry</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="176"/>
+        <location filename="../src/gameselector.cpp" line="178"/>
         <source>&amp;Filter games</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="177"/>
+        <location filename="../src/gameselector.cpp" line="179"/>
         <source>C&amp;lear filter</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1837,17 +1827,17 @@ Would you like to change your database location setting?</source>
         <translation type="obsolete">Ukázat &amp;plné hry</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="179"/>
+        <location filename="../src/gameselector.cpp" line="181"/>
         <source>C&amp;reate</source>
         <translation>V&amp;ytvořit</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="180"/>
+        <location filename="../src/gameselector.cpp" line="182"/>
         <source>&amp;Join</source>
         <translation>&amp;Připojit</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="181"/>
+        <location filename="../src/gameselector.cpp" line="183"/>
         <source>J&amp;oin as spectator</source>
         <translation>P&amp;řipojit se jako divák</translation>
     </message>
@@ -1863,72 +1853,81 @@ Would you like to change your database location setting?</source>
 <context>
     <name>GamesModel</name>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="33"/>
+        <location filename="../src/gamesmodel.cpp" line="107"/>
         <source>yes</source>
         <translation>ano</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="33"/>
+        <location filename="../src/gamesmodel.cpp" line="107"/>
         <source>yes, free for spectators</source>
         <translation>diváci povoleni</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="33"/>
+        <location filename="../src/gamesmodel.cpp" line="107"/>
         <source>no</source>
         <translation>ne</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="37"/>
+        <location filename="../src/gamesmodel.cpp" line="111"/>
         <source>buddies only</source>
         <translation>jen pro přátele</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="39"/>
+        <location filename="../src/gamesmodel.cpp" line="113"/>
         <source>reg. users only</source>
         <translation>jen pro registrované</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="43"/>
+        <location filename="../src/gamesmodel.cpp" line="117"/>
         <source>not allowed</source>
         <translation>nepovolené</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="54"/>
+        <location filename="../src/gamesmodel.cpp" line="127"/>
         <source>Room</source>
         <translation type="unfinished">Místnost</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="53"/>
+        <location filename="../src/gamesmodel.cpp" line="128"/>
+        <source>Game Created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="129"/>
         <source>Description</source>
         <translation>Popis</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="55"/>
+        <location filename="../src/gamesmodel.cpp" line="130"/>
         <source>Creator</source>
         <translation>Zakladatel</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="56"/>
-        <source>Game type</source>
-        <translation>Formát</translation>
+        <location filename="../src/gamesmodel.cpp" line="131"/>
+        <source>Game Type</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="57"/>
+        <source>Game type</source>
+        <translation type="vanished">Formát</translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="132"/>
         <source>Password</source>
         <translation>Heslo</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="58"/>
+        <location filename="../src/gamesmodel.cpp" line="133"/>
         <source>Restrictions</source>
         <translation>Omezení</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="59"/>
+        <location filename="../src/gamesmodel.cpp" line="134"/>
         <source>Players</source>
         <translation>Hráči</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="60"/>
+        <location filename="../src/gamesmodel.cpp" line="135"/>
         <source>Spectators</source>
         <translation>Diváci</translation>
     </message>
@@ -1936,92 +1935,92 @@ Would you like to change your database location setting?</source>
 <context>
     <name>GeneralSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="39"/>
-        <location filename="../src/dlg_settings.cpp" line="135"/>
+        <location filename="../src/dlg_settings.cpp" line="40"/>
+        <location filename="../src/dlg_settings.cpp" line="136"/>
         <source>English</source>
         <translation>Česky</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="46"/>
+        <location filename="../src/dlg_settings.cpp" line="47"/>
         <source>Reset/Clear Downloaded Pictures</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="140"/>
-        <location filename="../src/dlg_settings.cpp" line="150"/>
-        <location filename="../src/dlg_settings.cpp" line="160"/>
-        <location filename="../src/dlg_settings.cpp" line="194"/>
-        <location filename="../src/dlg_settings.cpp" line="204"/>
+        <location filename="../src/dlg_settings.cpp" line="141"/>
+        <location filename="../src/dlg_settings.cpp" line="151"/>
+        <location filename="../src/dlg_settings.cpp" line="161"/>
+        <location filename="../src/dlg_settings.cpp" line="195"/>
+        <location filename="../src/dlg_settings.cpp" line="205"/>
         <source>Choose path</source>
         <translation>Vyberte cestu</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="187"/>
+        <location filename="../src/dlg_settings.cpp" line="188"/>
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="187"/>
+        <location filename="../src/dlg_settings.cpp" line="188"/>
         <source>Downloaded card pictures have been reset.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="189"/>
+        <location filename="../src/dlg_settings.cpp" line="190"/>
         <source>Error</source>
         <translation type="unfinished">Chyba</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="189"/>
+        <location filename="../src/dlg_settings.cpp" line="190"/>
         <source>One or more downloaded card pictures could not be cleared.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="219"/>
+        <location filename="../src/dlg_settings.cpp" line="220"/>
         <source>Personal settings</source>
         <translation>Osobní nastavení</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="220"/>
+        <location filename="../src/dlg_settings.cpp" line="221"/>
         <source>Language:</source>
         <translation>Jazyk:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="221"/>
+        <location filename="../src/dlg_settings.cpp" line="222"/>
         <source>Download card pictures on the fly</source>
         <translation>Stahovat obrázky karet za běhu</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="222"/>
+        <location filename="../src/dlg_settings.cpp" line="223"/>
         <source>Download high-quality card pictures</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="223"/>
+        <location filename="../src/dlg_settings.cpp" line="224"/>
         <source>Paths</source>
         <translation>Cesty</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="224"/>
+        <location filename="../src/dlg_settings.cpp" line="225"/>
         <source>Decks directory:</source>
         <translation>Adresář s balíčky:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="225"/>
+        <location filename="../src/dlg_settings.cpp" line="226"/>
         <source>Replays directory:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="226"/>
+        <location filename="../src/dlg_settings.cpp" line="227"/>
         <source>Pictures directory:</source>
         <translation>Adresář s obrázky:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="227"/>
+        <location filename="../src/dlg_settings.cpp" line="228"/>
         <source>Card database:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="228"/>
+        <location filename="../src/dlg_settings.cpp" line="229"/>
         <source>Token database:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3783,22 +3782,22 @@ Lokální verze je %1, verze serveru je %2.</translation>
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="660"/>
+        <location filename="../src/dlg_settings.cpp" line="639"/>
         <source>Add message</source>
         <translation>Přidat zprávu</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="660"/>
+        <location filename="../src/dlg_settings.cpp" line="639"/>
         <source>Message:</source>
         <translation>Zpráva:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="677"/>
+        <location filename="../src/dlg_settings.cpp" line="656"/>
         <source>&amp;Add</source>
         <translation>&amp;Přidat</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="678"/>
+        <location filename="../src/dlg_settings.cpp" line="657"/>
         <source>&amp;Remove</source>
         <translation>&amp;Odstranit</translation>
     </message>
@@ -3864,244 +3863,249 @@ Lokální verze je %1, verze serveru je %2.</translation>
 <context>
     <name>Player</name>
     <message>
-        <location filename="../src/player.cpp" line="579"/>
+        <location filename="../src/player.cpp" line="581"/>
         <source>&amp;View graveyard</source>
         <translation>&amp;Zobrazit hřbitov</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="580"/>
+        <location filename="../src/player.cpp" line="582"/>
         <source>&amp;View exile</source>
         <translation>&amp;Zobrazit exilnuté karty</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="581"/>
+        <location filename="../src/player.cpp" line="583"/>
         <source>Player &quot;%1&quot;</source>
         <translation>Hráč &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="582"/>
+        <location filename="../src/player.cpp" line="584"/>
         <source>&amp;Graveyard</source>
         <translation>&amp;Hřbitov</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="583"/>
+        <location filename="../src/player.cpp" line="585"/>
         <source>&amp;Exile</source>
         <translation>&amp;Exilnuté karty</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="586"/>
-        <location filename="../src/player.cpp" line="590"/>
-        <location filename="../src/player.cpp" line="594"/>
+        <location filename="../src/player.cpp" line="588"/>
+        <location filename="../src/player.cpp" line="592"/>
+        <location filename="../src/player.cpp" line="596"/>
         <source>Move to &amp;top of library</source>
         <translation>Přesunout na &amp;vršek knihovny</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="587"/>
-        <location filename="../src/player.cpp" line="591"/>
-        <location filename="../src/player.cpp" line="595"/>
+        <location filename="../src/player.cpp" line="589"/>
+        <location filename="../src/player.cpp" line="593"/>
+        <location filename="../src/player.cpp" line="597"/>
         <source>Move to &amp;bottom of library</source>
         <translation>Přesunout na &amp;spodek knihovny</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="588"/>
-        <location filename="../src/player.cpp" line="597"/>
+        <location filename="../src/player.cpp" line="590"/>
+        <location filename="../src/player.cpp" line="599"/>
         <source>Move to &amp;graveyard</source>
         <translation>Přesunout do &amp;hřbitova</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="589"/>
-        <location filename="../src/player.cpp" line="593"/>
+        <location filename="../src/player.cpp" line="591"/>
+        <location filename="../src/player.cpp" line="595"/>
         <source>Move to &amp;exile</source>
         <translation>&amp;Exilnout</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="592"/>
-        <location filename="../src/player.cpp" line="596"/>
+        <location filename="../src/player.cpp" line="594"/>
+        <location filename="../src/player.cpp" line="598"/>
         <source>Move to &amp;hand</source>
         <translation>Přesunout do &amp;ruky</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="598"/>
+        <location filename="../src/player.cpp" line="600"/>
         <source>&amp;View library</source>
         <translation>&amp;Zobrazit knihovnu</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="599"/>
+        <location filename="../src/player.cpp" line="601"/>
         <source>View &amp;top cards of library...</source>
         <translation>Zobrazit &amp;vrchní karty knihovny...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="600"/>
+        <location filename="../src/player.cpp" line="602"/>
         <source>Reveal &amp;library to</source>
         <translation>Ukázat &amp;knihovnu</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="601"/>
+        <location filename="../src/player.cpp" line="603"/>
         <source>Reveal t&amp;op card to</source>
         <translation>Ukázat v&amp;rchní kartu</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="602"/>
+        <location filename="../src/player.cpp" line="604"/>
         <source>&amp;Always reveal top card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="603"/>
+        <location filename="../src/player.cpp" line="605"/>
         <source>O&amp;pen deck in deck editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="604"/>
+        <location filename="../src/player.cpp" line="606"/>
         <source>&amp;View sideboard</source>
         <translation>&amp;Zobrazit sideboard</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="605"/>
+        <location filename="../src/player.cpp" line="607"/>
         <source>&amp;Draw card</source>
         <translation>&amp;Líznout kartu</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="606"/>
+        <location filename="../src/player.cpp" line="608"/>
         <source>D&amp;raw cards...</source>
         <translation>L&amp;íznout karty...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="607"/>
+        <location filename="../src/player.cpp" line="609"/>
         <source>&amp;Undo last draw</source>
         <translation>&amp;Vrátit zpět poslední líznutí</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="608"/>
+        <location filename="../src/player.cpp" line="610"/>
         <source>Take &amp;mulligan</source>
         <translation>&amp;Mulliganovat</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="609"/>
+        <location filename="../src/player.cpp" line="611"/>
         <source>&amp;Shuffle</source>
         <translation>&amp;Zamíchat</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="610"/>
+        <location filename="../src/player.cpp" line="612"/>
         <source>Move top cards to &amp;graveyard...</source>
         <translation>Přesunout vrchní karty do &amp;hřbitova...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="611"/>
+        <location filename="../src/player.cpp" line="613"/>
         <source>Move top cards to &amp;exile...</source>
         <translation>&amp;Exilnout vrchní karty...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="612"/>
+        <location filename="../src/player.cpp" line="614"/>
         <source>Put top card on &amp;bottom</source>
         <translation>Dát kartu na &amp;spodek</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="614"/>
+        <location filename="../src/player.cpp" line="615"/>
+        <source>Put bottom card &amp;in graveyard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="617"/>
         <source>&amp;Hand</source>
         <translation>&amp;Ruka</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="615"/>
+        <location filename="../src/player.cpp" line="618"/>
         <source>&amp;Reveal to</source>
         <translation>&amp;Ukázat</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="616"/>
+        <location filename="../src/player.cpp" line="619"/>
         <source>Reveal r&amp;andom card to</source>
         <translation>Ukázat kartu n&amp;áhodně</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="617"/>
+        <location filename="../src/player.cpp" line="620"/>
         <source>&amp;Sideboard</source>
         <translation>&amp;Sideboard</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="618"/>
+        <location filename="../src/player.cpp" line="621"/>
         <source>&amp;Library</source>
         <translation>&amp;Knihovna</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="619"/>
+        <location filename="../src/player.cpp" line="622"/>
         <source>&amp;Counters</source>
         <translation>&amp;Žetony</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="621"/>
+        <location filename="../src/player.cpp" line="624"/>
         <source>&amp;Untap all permanents</source>
         <translation>&amp;Odtapnout všechny permanenty</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="622"/>
+        <location filename="../src/player.cpp" line="625"/>
         <source>R&amp;oll die...</source>
         <translation>H&amp;odit kostkou...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="623"/>
+        <location filename="../src/player.cpp" line="626"/>
         <source>&amp;Create token...</source>
         <translation>&amp;Vytvořit token...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="624"/>
+        <location filename="../src/player.cpp" line="627"/>
         <source>C&amp;reate another token</source>
         <translation>V&amp;ytvořit další token</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="625"/>
+        <location filename="../src/player.cpp" line="628"/>
         <source>Cr&amp;eate predefined token</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="626"/>
+        <location filename="../src/player.cpp" line="629"/>
         <source>S&amp;ay</source>
         <translation>&amp;Chat</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="632"/>
+        <location filename="../src/player.cpp" line="635"/>
         <source>C&amp;ard</source>
         <translation>K&amp;arta</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="635"/>
+        <location filename="../src/player.cpp" line="638"/>
         <source>&amp;All players</source>
         <translation>&amp;Všem hráčům</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="638"/>
+        <location filename="../src/player.cpp" line="641"/>
         <source>&amp;Play</source>
         <translation type="unfinished">&amp;Zahrát</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="639"/>
+        <location filename="../src/player.cpp" line="642"/>
         <source>&amp;Hide</source>
         <translation type="unfinished">&amp;Skrýt</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="641"/>
+        <location filename="../src/player.cpp" line="644"/>
         <source>&amp;Tap</source>
         <translation type="unfinished">&amp;Tapnout</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="642"/>
+        <location filename="../src/player.cpp" line="645"/>
         <source>&amp;Untap</source>
         <translation type="unfinished">&amp;Odtapnout</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="643"/>
+        <location filename="../src/player.cpp" line="646"/>
         <source>Toggle &amp;normal untapping</source>
         <translation type="unfinished">Přepnout &amp;normální odtapnutí</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="644"/>
+        <location filename="../src/player.cpp" line="647"/>
         <source>&amp;Flip</source>
         <translation type="unfinished">&amp;Otočit</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="645"/>
+        <location filename="../src/player.cpp" line="648"/>
         <source>&amp;Peek at card face</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="646"/>
+        <location filename="../src/player.cpp" line="649"/>
         <source>&amp;Clone</source>
         <translation type="unfinished">&amp;Zdvojit</translation>
     </message>
@@ -4110,290 +4114,290 @@ Lokální verze je %1, verze serveru je %2.</translation>
         <translation type="obsolete">Ctrl+H</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="647"/>
+        <location filename="../src/player.cpp" line="650"/>
         <source>Ctrl+J</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="648"/>
+        <location filename="../src/player.cpp" line="651"/>
         <source>Attac&amp;h to card...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="649"/>
+        <location filename="../src/player.cpp" line="652"/>
         <source>Ctrl+A</source>
         <translation type="unfinished">Ctrl+A</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="650"/>
+        <location filename="../src/player.cpp" line="653"/>
         <source>Unattac&amp;h</source>
         <translation type="unfinished">Od&amp;pojit</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="651"/>
+        <location filename="../src/player.cpp" line="654"/>
         <source>&amp;Draw arrow...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="652"/>
+        <location filename="../src/player.cpp" line="655"/>
         <source>&amp;Increase power</source>
         <translation type="unfinished">&amp;Zvýšit sílu</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="653"/>
+        <location filename="../src/player.cpp" line="656"/>
         <source>Ctrl++</source>
         <translation type="unfinished">Ctrl++</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="654"/>
+        <location filename="../src/player.cpp" line="657"/>
         <source>&amp;Decrease power</source>
         <translation type="unfinished">&amp;Snížit sílu</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="655"/>
+        <location filename="../src/player.cpp" line="658"/>
         <source>Ctrl+-</source>
         <translation type="unfinished">Ctrl+-</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="656"/>
+        <location filename="../src/player.cpp" line="659"/>
         <source>I&amp;ncrease toughness</source>
         <translation type="unfinished">&amp;Zvýšit odolnost</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="657"/>
+        <location filename="../src/player.cpp" line="660"/>
         <source>Alt++</source>
         <translation type="unfinished">Alt++</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="658"/>
+        <location filename="../src/player.cpp" line="661"/>
         <source>D&amp;ecrease toughness</source>
         <translation type="unfinished">&amp;Snížit sílu</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="659"/>
+        <location filename="../src/player.cpp" line="662"/>
         <source>Alt+-</source>
         <translation type="unfinished">Alt+-</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="660"/>
+        <location filename="../src/player.cpp" line="663"/>
         <source>In&amp;crease power and toughness</source>
         <translation type="unfinished">&amp;Zvýšit sílu a odolnost</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="661"/>
+        <location filename="../src/player.cpp" line="664"/>
         <source>Ctrl+Alt++</source>
         <translation type="unfinished">Ctrl+Alt++</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="662"/>
+        <location filename="../src/player.cpp" line="665"/>
         <source>Dec&amp;rease power and toughness</source>
         <translation type="unfinished">&amp;Snížit sílu a odolnost</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="663"/>
+        <location filename="../src/player.cpp" line="666"/>
         <source>Ctrl+Alt+-</source>
         <translation type="unfinished">Ctrl+Alt+-</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="664"/>
+        <location filename="../src/player.cpp" line="667"/>
         <source>Set &amp;power and toughness...</source>
         <translation type="unfinished">Nastavit &amp;sílu a odolnost...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="665"/>
+        <location filename="../src/player.cpp" line="668"/>
         <source>Ctrl+P</source>
         <translation type="unfinished">Ctrl+P</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="666"/>
+        <location filename="../src/player.cpp" line="669"/>
         <source>&amp;Set annotation...</source>
         <translation type="unfinished">Na&amp;stavit poznámku...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="668"/>
+        <location filename="../src/player.cpp" line="671"/>
         <source>red</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="669"/>
+        <location filename="../src/player.cpp" line="672"/>
         <source>yellow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="670"/>
+        <location filename="../src/player.cpp" line="673"/>
         <source>green</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="672"/>
+        <location filename="../src/player.cpp" line="675"/>
         <source>&amp;Add counter (%1)</source>
         <translation type="unfinished">Přid&amp;at žeton (%1)</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="674"/>
+        <location filename="../src/player.cpp" line="677"/>
         <source>&amp;Remove counter (%1)</source>
         <translation type="unfinished">Odst&amp;ranit žeton (%1)</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="676"/>
+        <location filename="../src/player.cpp" line="679"/>
         <source>&amp;Set counters (%1)...</source>
         <translation type="unfinished">Na&amp;stavit žetony (%1)...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="677"/>
+        <location filename="../src/player.cpp" line="680"/>
         <source>&amp;top of library</source>
         <translation type="unfinished">&amp;vršek knihovny</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="678"/>
+        <location filename="../src/player.cpp" line="681"/>
         <source>&amp;bottom of library</source>
         <translation type="unfinished">&amp;spodek knihovny</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="679"/>
+        <location filename="../src/player.cpp" line="682"/>
         <source>&amp;graveyard</source>
         <translation type="unfinished">&amp;hřbitov</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="680"/>
+        <location filename="../src/player.cpp" line="683"/>
         <source>Ctrl+Del</source>
         <translation type="unfinished">Ctrl+Del</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="681"/>
+        <location filename="../src/player.cpp" line="684"/>
         <source>&amp;exile</source>
         <translation type="unfinished">&amp;exilnout</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="692"/>
+        <location filename="../src/player.cpp" line="695"/>
         <source>Ctrl+F3</source>
         <translation>Ctrl+F3</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="693"/>
+        <location filename="../src/player.cpp" line="696"/>
         <source>F3</source>
         <translation>F3</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="694"/>
+        <location filename="../src/player.cpp" line="697"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="695"/>
+        <location filename="../src/player.cpp" line="698"/>
         <source>F4</source>
         <translation>F4</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="696"/>
+        <location filename="../src/player.cpp" line="699"/>
         <source>Ctrl+D</source>
         <translation>Ctrl+D</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="697"/>
+        <location filename="../src/player.cpp" line="700"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="698"/>
+        <location filename="../src/player.cpp" line="701"/>
         <source>Ctrl+Shift+D</source>
         <translation>Ctrl+Shift+D</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="699"/>
+        <location filename="../src/player.cpp" line="702"/>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="700"/>
+        <location filename="../src/player.cpp" line="703"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="701"/>
+        <location filename="../src/player.cpp" line="704"/>
         <source>Ctrl+U</source>
         <translation>Ctrl+U</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="702"/>
+        <location filename="../src/player.cpp" line="705"/>
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="703"/>
+        <location filename="../src/player.cpp" line="706"/>
         <source>Ctrl+T</source>
         <translation>Ctrl+T</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="704"/>
+        <location filename="../src/player.cpp" line="707"/>
         <source>Ctrl+G</source>
         <translation>Ctrl+G</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="783"/>
+        <location filename="../src/player.cpp" line="786"/>
         <source>View top cards of library</source>
         <translation>Zobrazit vrchní karty knihovny</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="783"/>
+        <location filename="../src/player.cpp" line="786"/>
         <source>Number of cards:</source>
         <translation>Počet karet:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="844"/>
+        <location filename="../src/player.cpp" line="847"/>
         <source>Draw cards</source>
         <translation>Líznout karty</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="844"/>
-        <location filename="../src/player.cpp" line="865"/>
-        <location filename="../src/player.cpp" line="894"/>
-        <location filename="../src/player.cpp" line="2065"/>
+        <location filename="../src/player.cpp" line="847"/>
+        <location filename="../src/player.cpp" line="868"/>
+        <location filename="../src/player.cpp" line="897"/>
+        <location filename="../src/player.cpp" line="2085"/>
         <source>Number:</source>
         <translation>Počet:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="865"/>
+        <location filename="../src/player.cpp" line="868"/>
         <source>Move top cards to grave</source>
         <translation>Přesunout vrchní karty do hřbitova</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="894"/>
+        <location filename="../src/player.cpp" line="897"/>
         <source>Move top cards to exile</source>
         <translation>Exilnout vrchní karty</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="947"/>
+        <location filename="../src/player.cpp" line="963"/>
         <source>Roll die</source>
         <translation>Hodit kostkou</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="947"/>
+        <location filename="../src/player.cpp" line="963"/>
         <source>Number of sides:</source>
         <translation>Počet stran:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1915"/>
+        <location filename="../src/player.cpp" line="1935"/>
         <source>Set power/toughness</source>
         <translation>Nastavit sílu/odolnost</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1915"/>
+        <location filename="../src/player.cpp" line="1935"/>
         <source>Please enter the new PT:</source>
         <translation>Vložte novou odolnost/sílu:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1983"/>
+        <location filename="../src/player.cpp" line="2003"/>
         <source>Set annotation</source>
         <translation>Nastavit poznámku</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1983"/>
+        <location filename="../src/player.cpp" line="2003"/>
         <source>Please enter the new annotation:</source>
         <translation>Vložte novou poznámku:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2065"/>
+        <location filename="../src/player.cpp" line="2085"/>
         <source>Set counters</source>
         <translation>Nastavit žetony</translation>
     </message>
@@ -4470,6 +4474,39 @@ Lokální verze je %1, verze serveru je %2.</translation>
         <source>Cockatrice replays (*.cor)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="25"/>
+        <source>&lt;1m ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="28"/>
+        <source>&lt;5m ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="35"/>
+        <location filename="../src/gamesmodel.cpp" line="52"/>
+        <source>m ago</source>
+        <extracomment>This will have a number prepended, like &quot;10m ago&quot;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="49"/>
+        <source>1hr </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="59"/>
+        <source>hr ago</source>
+        <extracomment>This will have a number prepended, like &quot;2h ago&quot;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="61"/>
+        <source>5+ hrs ago</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RemoteDeckList_TreeModel</name>
@@ -4525,32 +4562,32 @@ Lokální verze je %1, verze serveru je %2.</translation>
 <context>
     <name>RoomSelector</name>
     <message>
-        <location filename="../src/tab_server.cpp" line="60"/>
+        <location filename="../src/tab_server.cpp" line="61"/>
         <source>Rooms</source>
         <translation>Místnosti</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="61"/>
+        <location filename="../src/tab_server.cpp" line="62"/>
         <source>Joi&amp;n</source>
         <translation>&amp;Připojit</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="64"/>
+        <location filename="../src/tab_server.cpp" line="65"/>
         <source>Room</source>
         <translation>Místnost</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="65"/>
+        <location filename="../src/tab_server.cpp" line="66"/>
         <source>Description</source>
         <translation>Popis</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="66"/>
+        <location filename="../src/tab_server.cpp" line="67"/>
         <source>Players</source>
         <translation>Hráči</translation>
     </message>
     <message>
-        <location filename="../src/tab_server.cpp" line="67"/>
+        <location filename="../src/tab_server.cpp" line="68"/>
         <source>Games</source>
         <translation>Hry</translation>
     </message>
@@ -4558,14 +4595,33 @@ Lokální verze je %1, verze serveru je %2.</translation>
 <context>
     <name>SetsModel</name>
     <message>
-        <location filename="../src/setsmodel.cpp" line="39"/>
         <source>Short name</source>
-        <translation>Krátký název</translation>
+        <translation type="vanished">Krátký název</translation>
     </message>
     <message>
-        <location filename="../src/setsmodel.cpp" line="40"/>
+        <location filename="../src/setsmodel.cpp" line="42"/>
+        <source>Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/setsmodel.cpp" line="43"/>
+        <source>Set type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/setsmodel.cpp" line="44"/>
+        <source>Set code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/setsmodel.cpp" line="45"/>
         <source>Long name</source>
         <translation>Dlouhý název</translation>
+    </message>
+    <message>
+        <location filename="../src/setsmodel.cpp" line="46"/>
+        <source>Release date</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4628,8 +4684,9 @@ Lokální verze je %1, verze serveru je %2.</translation>
         <translation>Opravdu chcete odemknout administrační funkce?</translation>
     </message>
     <message>
+        <location filename="../src/tab_admin.h" line="45"/>
         <source>Administration</source>
-        <translation type="obsolete">Administrace</translation>
+        <translation type="unfinished">Administrace</translation>
     </message>
 </context>
 <context>
@@ -4639,97 +4696,96 @@ Lokální verze je %1, verze serveru je %2.</translation>
         <translation type="obsolete">&amp;Hledat...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="292"/>
+        <location filename="../src/tab_deck_editor.cpp" line="295"/>
         <source>Show card text only</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="293"/>
+        <location filename="../src/tab_deck_editor.cpp" line="296"/>
         <source>&amp;Clear search</source>
         <translation type="unfinished">&amp;Vyčistit hledání</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="294"/>
         <source>&amp;Search for:</source>
-        <translation type="unfinished">&amp;Vyhledat:</translation>
+        <translation type="obsolete">&amp;Vyhledat:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="296"/>
+        <location filename="../src/tab_deck_editor.cpp" line="298"/>
         <source>Deck &amp;name:</source>
         <translation type="unfinished">&amp;Název balíčku:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="297"/>
+        <location filename="../src/tab_deck_editor.cpp" line="299"/>
         <source>&amp;Comments:</source>
         <translation type="unfinished">&amp;Komentář:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="298"/>
+        <location filename="../src/tab_deck_editor.cpp" line="300"/>
         <source>Hash:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="300"/>
+        <location filename="../src/tab_deck_editor.cpp" line="302"/>
         <source>&amp;Update prices</source>
         <translation type="unfinished">Akt&amp;ualizovat ceny</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="301"/>
+        <location filename="../src/tab_deck_editor.cpp" line="303"/>
         <source>Ctrl+U</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="303"/>
+        <location filename="../src/tab_deck_editor.cpp" line="305"/>
         <source>&amp;New deck</source>
         <translation type="unfinished">&amp;Nový balíček</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="304"/>
+        <location filename="../src/tab_deck_editor.cpp" line="306"/>
         <source>&amp;Load deck...</source>
         <translation type="unfinished">&amp;Nahrát balíček...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="305"/>
+        <location filename="../src/tab_deck_editor.cpp" line="307"/>
         <source>&amp;Save deck</source>
         <translation type="unfinished">&amp;Uložit balíček</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="306"/>
+        <location filename="../src/tab_deck_editor.cpp" line="308"/>
         <source>Save deck &amp;as...</source>
         <translation type="unfinished">Uložit balíček &amp;jako...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="307"/>
+        <location filename="../src/tab_deck_editor.cpp" line="309"/>
         <source>Load deck from cl&amp;ipboard...</source>
         <translation type="unfinished">Nahrát balíček ze s&amp;chránky...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="308"/>
+        <location filename="../src/tab_deck_editor.cpp" line="310"/>
         <source>Save deck to clip&amp;board</source>
         <translation type="unfinished">Vložit balíček do &amp;schránky</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="309"/>
+        <location filename="../src/tab_deck_editor.cpp" line="311"/>
         <source>&amp;Print deck...</source>
         <translation type="unfinished">&amp;Vytisknout balíček...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="310"/>
+        <location filename="../src/tab_deck_editor.cpp" line="312"/>
         <source>&amp;Analyze deck on deckstats.net</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="311"/>
+        <location filename="../src/tab_deck_editor.cpp" line="313"/>
         <source>&amp;Close</source>
         <translation type="unfinished">&amp;Zavřít</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="312"/>
+        <location filename="../src/tab_deck_editor.cpp" line="314"/>
         <source>Ctrl+Q</source>
         <translation type="unfinished">CTRL+Q</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="314"/>
+        <location filename="../src/tab_deck_editor.cpp" line="316"/>
         <source>Add card to &amp;maindeck</source>
         <translation type="unfinished">Přidat kartu do &amp;balíčku</translation>
     </message>
@@ -4742,7 +4798,7 @@ Lokální verze je %1, verze serveru je %2.</translation>
         <translation type="obsolete">Enter</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="315"/>
+        <location filename="../src/tab_deck_editor.cpp" line="317"/>
         <source>Add card to &amp;sideboard</source>
         <translation type="unfinished">Přidat kartu do &amp;sideboardu</translation>
     </message>
@@ -4755,99 +4811,99 @@ Lokální verze je %1, verze serveru je %2.</translation>
         <translation type="obsolete">Ctrl+Enter</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="317"/>
+        <location filename="../src/tab_deck_editor.cpp" line="319"/>
         <source>&amp;Remove row</source>
         <translation type="unfinished">&amp;Smazat řádek</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="318"/>
+        <location filename="../src/tab_deck_editor.cpp" line="320"/>
         <source>Del</source>
         <translation type="unfinished">Del</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="319"/>
+        <location filename="../src/tab_deck_editor.cpp" line="321"/>
         <source>&amp;Increment number</source>
         <translation type="unfinished">&amp;Zvýšit počet</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="320"/>
+        <location filename="../src/tab_deck_editor.cpp" line="322"/>
         <source>+</source>
         <translation type="unfinished">+</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="321"/>
+        <location filename="../src/tab_deck_editor.cpp" line="323"/>
         <source>&amp;Decrement number</source>
         <translation type="unfinished">&amp;Snížit počet</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="322"/>
+        <location filename="../src/tab_deck_editor.cpp" line="324"/>
         <source>-</source>
         <translation type="unfinished">-</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="324"/>
+        <location filename="../src/tab_deck_editor.cpp" line="326"/>
         <source>&amp;Deck editor</source>
         <translation type="unfinished">&amp;Editor balíčků</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="325"/>
+        <location filename="../src/tab_deck_editor.cpp" line="327"/>
         <source>C&amp;ard database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="327"/>
+        <location filename="../src/tab_deck_editor.cpp" line="329"/>
         <source>&amp;Edit sets...</source>
         <translation type="unfinished">&amp;Upravit sasy...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="328"/>
+        <location filename="../src/tab_deck_editor.cpp" line="330"/>
         <source>Edit &amp;tokens...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="333"/>
+        <location filename="../src/tab_deck_editor.cpp" line="335"/>
         <source>Deck: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="380"/>
+        <location filename="../src/tab_deck_editor.cpp" line="382"/>
         <source>Are you sure?</source>
         <translation type="unfinished">Jste si jisti?</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="381"/>
+        <location filename="../src/tab_deck_editor.cpp" line="383"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
         <translation type="unfinished">Balíček byl upraven.
 Chcete uložit změny?</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="414"/>
+        <location filename="../src/tab_deck_editor.cpp" line="416"/>
         <source>Load deck</source>
         <translation type="unfinished">Nahrát balíček</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="433"/>
-        <location filename="../src/tab_deck_editor.cpp" line="457"/>
-        <location filename="../src/tab_deck_editor.cpp" line="477"/>
+        <location filename="../src/tab_deck_editor.cpp" line="435"/>
+        <location filename="../src/tab_deck_editor.cpp" line="459"/>
+        <location filename="../src/tab_deck_editor.cpp" line="479"/>
         <source>Error</source>
         <translation type="unfinished">Chyba</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="433"/>
+        <location filename="../src/tab_deck_editor.cpp" line="435"/>
         <source>The deck could not be saved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="457"/>
-        <location filename="../src/tab_deck_editor.cpp" line="477"/>
+        <location filename="../src/tab_deck_editor.cpp" line="459"/>
+        <location filename="../src/tab_deck_editor.cpp" line="479"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
         <translation type="unfinished">Balíček nebylo možné uložit.
 Zkontrolujte, jestli lze zapisovat do cílového adresáře a zkuste to znovu.</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="463"/>
+        <location filename="../src/tab_deck_editor.cpp" line="465"/>
         <source>Save deck</source>
         <translation type="unfinished">Uložit balíček</translation>
     </message>
@@ -4937,8 +4993,9 @@ Prosím vložte jméno:</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/tab_deck_storage.h" line="52"/>
         <source>Deck storage</source>
-        <translation type="obsolete">Uložiště balíčků</translation>
+        <translation type="unfinished">Uložiště balíčků</translation>
     </message>
 </context>
 <context>
@@ -5185,6 +5242,11 @@ Prosím vložte jméno:</translation>
         <source>Are you sure you want to delete the replay of game %1?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../src/tab_replays.h" line="51"/>
+        <source>Game replays</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TabRoom</name>
@@ -5222,15 +5284,17 @@ Prosím vložte jméno:</translation>
 <context>
     <name>TabServer</name>
     <message>
+        <location filename="../src/tab_server.h" line="53"/>
         <source>Server</source>
-        <translation type="obsolete">Server</translation>
+        <translation type="unfinished">Server</translation>
     </message>
 </context>
 <context>
     <name>TabUserLists</name>
     <message>
+        <location filename="../src/tab_userlists.h" line="48"/>
         <source>User lists</source>
-        <translation type="obsolete">Seznam uživatelů</translation>
+        <translation type="unfinished">Seznam uživatelů</translation>
     </message>
     <message>
         <location filename="../src/tab_userlists.cpp" line="48"/>
@@ -5351,47 +5415,52 @@ Prosím vložte jméno:</translation>
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="533"/>
+        <location filename="../src/dlg_settings.cpp" line="537"/>
         <source>General interface settings</source>
         <translation>Obecné</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="534"/>
+        <location filename="../src/dlg_settings.cpp" line="538"/>
         <source>Enable notifications in taskbar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="535"/>
+        <location filename="../src/dlg_settings.cpp" line="539"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation>&amp;Pro zahraní karty je třeba dvojklik</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="536"/>
+        <location filename="../src/dlg_settings.cpp" line="540"/>
         <source>&amp;Play all nonlands onto the stack (not the battlefield) by default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="537"/>
+        <location filename="../src/dlg_settings.cpp" line="541"/>
         <source>Animation settings</source>
         <translation>Animace</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="538"/>
+        <location filename="../src/dlg_settings.cpp" line="542"/>
         <source>&amp;Tap/untap animation</source>
         <translation>&amp;Animace tapnutí/odtapnutí</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="539"/>
+        <location filename="../src/dlg_settings.cpp" line="543"/>
         <source>Enable &amp;sounds</source>
         <translation>Povolit &amp;zvuky</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="540"/>
+        <location filename="../src/dlg_settings.cpp" line="544"/>
         <source>Path to sounds directory:</source>
         <translation>Adresář se zvuky:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="551"/>
+        <location filename="../src/dlg_settings.cpp" line="545"/>
+        <source>Test system sound engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="556"/>
         <source>Choose path</source>
         <translation>Vyberte cestu</translation>
     </message>
@@ -5619,9 +5688,49 @@ Zkontrolujte, jestli lze zapisovat do cílového adresáře a zkuste to znovu.</
 <context>
     <name>WndSets</name>
     <message>
-        <location filename="../src/window_sets.cpp" line="29"/>
+        <location filename="../src/window_sets.cpp" line="41"/>
+        <source>Save set ordering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="43"/>
+        <source>Restore saved set ordering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="45"/>
+        <source>Move selected set up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="47"/>
+        <source>Move selected set down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="49"/>
+        <source>Move selected set to top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="51"/>
+        <source>Move selected set to bottom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="78"/>
         <source>Edit sets</source>
         <translation>Upravit edice</translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="89"/>
+        <source>Success</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="89"/>
+        <source>The sets database has been saved successfully.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
