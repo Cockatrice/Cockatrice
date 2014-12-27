@@ -119,7 +119,7 @@ void TabReplays::retranslateUi()
     aOpenRemoteReplay->setText(tr("Watch replay"));
     aDownload->setText(tr("Download replay"));
     aKeep->setText(tr("Toggle expiration lock"));
-    aDeleteLocalReplay->setText(tr("Delete"));
+    aDeleteRemoteReplay->setText(tr("Delete"));
 }
 
 void TabReplays::actOpenLocalReplay()
