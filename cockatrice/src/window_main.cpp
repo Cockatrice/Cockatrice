@@ -410,7 +410,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
     event->accept();
     settingsCache->setMainWindowGeometry(saveGeometry());
-    delete tabSupervisor;
+    tabSupervisor->deleteLater();
 }
 
 void MainWindow::changeEvent(QEvent *event)
