@@ -432,9 +432,9 @@ void MainWindow::changeEvent(QEvent *event)
     QMainWindow::changeEvent(event);
 }
 
-void MainWindow::pixmapCacheSizeChanged(int value)
+void MainWindow::pixmapCacheSizeChanged(int newSizeInMBs)
 {
     //qDebug() << "Setting pixmap cache size to " << value << " MBs";
     // translate MBs to KBs
-    QPixmapCache::setCacheLimit(value * 1024);
+    QPixmapCache::setCacheLimit(newSizeInMBs * 1024);
 }

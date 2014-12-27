@@ -34,7 +34,7 @@ signals:
     void soundPathChanged();
     void priceTagFeatureChanged(int enabled);
     void ignoreUnregisteredUsersChanged();
-    void pixmapCacheSizeChanged(int value);
+    void pixmapCacheSizeChanged(int newSizeInMBs);
 private:
     QSettings *settings;
 
