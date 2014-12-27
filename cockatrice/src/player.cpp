@@ -1900,7 +1900,7 @@ void Player::cardMenuAction()
             default: ;
         }
     }
-    game->sendGameCommand(prepareGameCommand(commandList));
+    game->sendGameCommand(prepareGameCommand(commandList), getId());
 }
 
 void Player::actIncPT(int deltaP, int deltaT)
