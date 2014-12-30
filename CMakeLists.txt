@@ -78,10 +78,10 @@ ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
     # linux/gcc, bsd/gcc, windows/mingw
     include(CheckCXXCompilerFlag)
 
-    set(CMAKE_CXX_FLAGS_RELEASE "-s -O2")
-    set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra -pedantic -Werror")
+    set(CMAKE_CXX_FLAGS_RELEASE "-s -std=c++98 -pedantic -O3")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -std=c++98 -pedantic -Werror")
 
-    set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Winline -Wno-long-long -Wno-error=extra -Wno-error=unused-parameter -Wno-inline -Wno-error=delete-non-virtual-dtor -Wno-error=sign-compare -Wno-error=reorder -Wno-error=missing-declarations)
+    set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Wno-long-long -Wno-error=extra -Wno-error=sign-compare -Wno-error=missing-declarations)
 
     FOREACH(FLAG ${ADDITIONAL_DEBUG_FLAGS})
         CHECK_CXX_COMPILER_FLAG("${FLAG}" CXX_HAS_WARNING_${FLAG})
@@ -90,9 +90,21 @@ ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
         ENDIF()
     ENDFOREACH()
 ELSE()
-    # other: osx/llvm, bsd/llvm
-    set(CMAKE_CXX_FLAGS_RELEASE "-O2")
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+    # osx/llvm, bsd/llvm
+    # linux/gcc, bsd/gcc, windows/mingw
+    include(CheckCXXCompilerFlag)
+
+    set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -pedantic -O3")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -std=c++11 -pedantic -Werror")
+
+    set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Wno-long-long -Wno-error=extra -Wno-error=sign-compare -Wno-error=missing-declarations)
+
+    FOREACH(FLAG ${ADDITIONAL_DEBUG_FLAGS})
+        CHECK_CXX_COMPILER_FLAG("${FLAG}" CXX_HAS_WARNING_${FLAG})
+        IF(CXX_HAS_WARNING_${FLAG})
+            SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FLAG}")
+        ENDIF()
+    ENDFOREACH()
 ENDIF()
 
 # GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
