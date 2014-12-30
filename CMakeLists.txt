@@ -74,14 +74,14 @@ IF(MSVC)
     set(CMAKE_CXX_FLAGS_RELEASE "/Ox")
 	# Generate complete debugging information
     #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
-ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
+ELSEIF (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
     # linux/gcc, bsd/gcc, windows/mingw
     include(CheckCXXCompilerFlag)
 
-    set(CMAKE_CXX_FLAGS_RELEASE "-s -O2")
-    set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra -pedantic -Werror")
+    set(CMAKE_CXX_FLAGS_RELEASE "-s -pedantic -std=c++98 -O3")
+    set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -Wall -Wextra -std=c++98 -pedantic -Werror -fsanitize=address")
 
-    set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Winline -Wno-long-long -Wno-error=extra -Wno-inline -Wno-error=delete-non-virtual-dtor -Wno-error=sign-compare -Wno-error=missing-declarations)
+    set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Wno-long-long -Wno-error=extra -Wno-error=sign-compare -Wno-error=missing-declarations)
 
     FOREACH(FLAG ${ADDITIONAL_DEBUG_FLAGS})
         CHECK_CXX_COMPILER_FLAG("${FLAG}" CXX_HAS_WARNING_${FLAG})
@@ -91,8 +91,8 @@ ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
     ENDFOREACH()
 ELSE()
     # other: osx/llvm, bsd/llvm
-    set(CMAKE_CXX_FLAGS_RELEASE "-O2")
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+    set(CMAKE_CXX_FLAGS_RELEASE "-s -pedantic -std=c++98 -O3")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g")
 ENDIF()
 
 # GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
