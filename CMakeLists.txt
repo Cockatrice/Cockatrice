@@ -89,12 +89,12 @@ ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
             SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FLAG}")
         ENDIF()
     ENDFOREACH()
-ELSEIF (CMAKE_COMPILER_IS_CLANGXX)
+ELSE()
     # osx/llvm, bsd/llvm
     # linux/gcc, bsd/gcc, windows/mingw
     include(CheckCXXCompilerFlag)
 
-    set(CMAKE_CXX_FLAGS_RELEASE "-s -std=c++11 -pedantic -O3")
+    set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -pedantic -O3")
     set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -std=c++11 -pedantic -Werror")
 
     set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Wno-long-long -Wno-error=extra -Wno-error=sign-compare -Wno-error=missing-declarations)
@@ -105,10 +105,6 @@ ELSEIF (CMAKE_COMPILER_IS_CLANGXX)
             SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FLAG}")
         ENDIF()
     ENDFOREACH()
-ELSE()
-    # other:
-    set(CMAKE_CXX_FLAGS_RELEASE "-s -pedantic -std=c++98 -O3")
-    set(CMAKE_CXX_FLAGS_DEBUG "-g")
 ENDIF()
 
 # GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
