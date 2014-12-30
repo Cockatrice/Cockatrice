@@ -75,11 +75,11 @@ IF(MSVC)
 	# Generate complete debugging information
     #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
 ELSEIF (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
-    # linux/gcc, bsd/gcc, windows/mingw
+    # linux/gcc, bsd/gcc, windows/mingw, osx/llvm, bsd/llvm
     include(CheckCXXCompilerFlag)
 
-    set(CMAKE_CXX_FLAGS_RELEASE "-s -pedantic -std=c++98 -O3")
-    set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -Wall -Wextra -std=c++98 -pedantic -Werror -fsanitize=address")
+    set(CMAKE_CXX_FLAGS_RELEASE "-s -pedantic -std=c++11 -O3")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -std=c++11 -pedantic -Werror")
 
     set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Wno-long-long -Wno-error=extra -Wno-error=sign-compare -Wno-error=missing-declarations)
 
@@ -90,7 +90,7 @@ ELSEIF (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
         ENDIF()
     ENDFOREACH()
 ELSE()
-    # other: osx/llvm, bsd/llvm
+    # other:
     set(CMAKE_CXX_FLAGS_RELEASE "-s -pedantic -std=c++98 -O3")
     set(CMAKE_CXX_FLAGS_DEBUG "-g")
 ENDIF()
