@@ -16,6 +16,6 @@ else
     sudo apt-get update -qq
     sudo apt-get install -y libprotobuf-dev protobuf-compiler qtbase5-dev cmake\
       qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev qt5-default qttools5-dev-tools\
-      qttools5-dev qtmultimedia5-dev libqt5svg5-dev
+      qttools5-dev libqt5svg5-dev
   fi
 fi
