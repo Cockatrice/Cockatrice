@@ -74,14 +74,30 @@ IF(MSVC)
     set(CMAKE_CXX_FLAGS_RELEASE "/Ox")
 	# Generate complete debugging information
     #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
-ELSEIF (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
-    # linux/gcc, bsd/gcc, windows/mingw, osx/llvm, bsd/llvm
+ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
+    # linux/gcc, bsd/gcc, windows/mingw
     include(CheckCXXCompilerFlag)
 
     set(CMAKE_CXX_FLAGS_RELEASE "-s -std=c++98 -pedantic -O3")
     set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -std=c++98 -pedantic -Werror")
 
-    set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Wno-long-long -Wno-error=extra -Wno-error=sign-compare -Wno-error=missing-declarations -Wno-c++11-long-long)
+    set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Wno-long-long -Wno-error=extra -Wno-error=sign-compare -Wno-error=missing-declarations)
+
+    FOREACH(FLAG ${ADDITIONAL_DEBUG_FLAGS})
+        CHECK_CXX_COMPILER_FLAG("${FLAG}" CXX_HAS_WARNING_${FLAG})
+        IF(CXX_HAS_WARNING_${FLAG})
+            SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FLAG}")
+        ENDIF()
+    ENDFOREACH()
+ELSEIF (CMAKE_COMPILER_IS_CLANGXX)
+    # osx/llvm, bsd/llvm
+    # linux/gcc, bsd/gcc, windows/mingw
+    include(CheckCXXCompilerFlag)
+
+    set(CMAKE_CXX_FLAGS_RELEASE "-s -std=c++11 -pedantic -O3")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -std=c++11 -pedantic -Werror")
+
+    set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Wno-long-long -Wno-error=extra -Wno-error=sign-compare -Wno-error=missing-declarations)
 
     FOREACH(FLAG ${ADDITIONAL_DEBUG_FLAGS})
         CHECK_CXX_COMPILER_FLAG("${FLAG}" CXX_HAS_WARNING_${FLAG})
