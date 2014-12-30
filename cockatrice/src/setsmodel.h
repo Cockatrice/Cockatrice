@@ -29,7 +29,7 @@ public:
     SetsModel(CardDatabase *_db, QObject *parent = 0);
     ~SetsModel();
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const { return NUM_COLS; }
+    int columnCount(const QModelIndex &parent = QModelIndex()) const { Q_UNUSED(parent); return NUM_COLS; }
     QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
