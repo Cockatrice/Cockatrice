@@ -570,12 +570,12 @@ void Servatrice_DatabaseInterface::logMessage(const int senderId, const QString 
 		}
 
 		query.prepare("insert into " + server->getDbPrefix() + "_log (log_time, sender_id, sender_name, sender_ip, log_message, target_type, target_id, target_name) values (now(), :sender_id, :sender_name, :sender_ip, :log_message, :target_type, :target_id, :target_name)");
-		query.bindValue(":sender_id", senderId);
+		query.bindValue(":sender_id", senderId < 1 ? QVariant() : senderId);
 		query.bindValue(":sender_name", senderName);
 		query.bindValue(":sender_ip", senderIp);
 		query.bindValue(":log_message", logMessage);
 		query.bindValue(":target_type", targetTypeString);
-		query.bindValue(":target_id", targetId);
+		query.bindValue(":target_id", (targetType == MessageTargetChat && targetId < 1) ? QVariant() : targetId);
 		query.bindValue(":target_name", targetName);
 		execSqlQuery(query);
 }
