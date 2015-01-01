@@ -31,7 +31,7 @@
     <message>
         <location filename="../src/abstractcounter.cpp" line="142"/>
         <source>New value for counter &apos;%1&apos;:</source>
-        <translation>카운터 &apos;%1&apos;의 값을 지정해주세요:</translation>
+        <translation>카운터 &apos;%1&apos;의 값을 지정하여 주십시오:</translation>
     </message>
 </context>
 <context>
@@ -44,7 +44,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="368"/>
         <source>Hand background:</source>
-        <translation>손 배경 이미지:</translation>
+        <translation>손패 배경 이미지:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="369"/>
@@ -84,7 +84,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="378"/>
         <source>Display hand horizontally (wastes space)</source>
-        <translation>손패의 카드들을 가로로 표시（화면 공간을 더 필요로 함）</translation>
+        <translation>손패의 카드를 가로로 표시（화면 공간을 더 필요로 함）</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="380"/>
@@ -263,7 +263,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardinfotext.cpp" line="66"/>
         <source>Loyalty:</source>
-        <translation>충성심:</translation>
+        <translation>충성도:</translation>
     </message>
 </context>
 <context>
@@ -306,7 +306,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardinfowidget.cpp" line="204"/>
         <source>Loyalty:</source>
-        <translation>충성심:</translation>
+        <translation>충성도:</translation>
     </message>
 </context>
 <context>
@@ -328,25 +328,25 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <location filename="../src/cardzone.cpp" line="54"/>
         <source>her hand</source>
         <comment>nominative, female owner</comment>
-        <translation>그녀의 손</translation>
+        <translation>그녀의 손패</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="55"/>
         <source>%1&apos;s hand</source>
         <comment>nominative, female owner</comment>
-        <translation>%1의 손</translation>
+        <translation>%1의 손패</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="57"/>
         <source>his hand</source>
         <comment>nominative, male owner</comment>
-        <translation>그의 손</translation>
+        <translation>그의 손패</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="58"/>
         <source>%1&apos;s hand</source>
         <comment>nominative, male owner</comment>
-        <translation>%1의 손</translation>
+        <translation>%1의 손패</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="65"/>
@@ -651,12 +651,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/tab_game.cpp" line="143"/>
         <source>S&amp;ideboard unlocked</source>
-        <translation>사이드보드 잠금해제</translation>
+        <translation>사이드보드 교체 활성화</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="145"/>
         <source>S&amp;ideboard locked</source>
-        <translation>사이드보드 잠금</translation>
+        <translation>사이드보드 교체 비활성화</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="150"/>
@@ -755,7 +755,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_creategame.cpp" line="23"/>
         <source>&amp;Description:</source>
-        <translation>설명:</translation>
+        <translation>게임 이름:</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="52"/>
@@ -853,17 +853,17 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_create_token.cpp" line="28"/>
         <source>white</source>
-        <translation>백</translation>
+        <translation>백색</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="29"/>
         <source>blue</source>
-        <translation>청</translation>
+        <translation>청색</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="30"/>
         <source>black</source>
-        <translation>흑</translation>
+        <translation>흑색</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="31"/>
@@ -941,17 +941,17 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="28"/>
         <source>white</source>
-        <translation>백</translation>
+        <translation>백색</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="29"/>
         <source>blue</source>
-        <translation>청</translation>
+        <translation>청색</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="30"/>
         <source>black</source>
-        <translation>흑</translation>
+        <translation>흑색</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="31"/>
@@ -1035,7 +1035,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="36"/>
         <source>Game &amp;description:</source>
-        <translation>게임 설명:</translation>
+        <translation>게임 이름:</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="43"/>
@@ -1154,9 +1154,9 @@ Would you like to change your database location setting?</source>
 Please file a ticket at http://github.com/Daenyth/Cockatrice/issues with your cards.xml attached
 
 Would you like to change your database location setting?</source>
-        <translation>카드 데이터베이스를 완전히 불러올 수 없었습니다.
+        <translation>카드 데이터베이스를 완전히 불러올 수 없습니다.
 
-        	http://github.com/Daenyth/Cockatrice/issues 에 cards.xml를 첨부하여 버그 리포팅을 해주십시오.
+        	http://github.com/Daenyth/Cockatrice/issues 에 cards.xml를 첨부하여 버그 리포팅을 하여 주십시오.
 
         	데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
@@ -1214,7 +1214,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="826"/>
         <source>Appearance</source>
-        <translation>모양</translation>
+        <translation>외형</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="827"/>
@@ -1260,7 +1260,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/gameselector.cpp" line="124"/>
         <source>Please join the appropriate room first.</source>
-        <translation>해당되는 게임에 먼저 들어가시기 바랍니다.</translation>
+        <translation>게임에 먼저 들어가시기 바랍니다.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="125"/>
@@ -1270,12 +1270,12 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/gameselector.cpp" line="126"/>
         <source>Spectators are not allowed in this game.</source>
-        <translation>관전자가 허용되지 않은 게임입니다.</translation>
+        <translation>관전이 허용되지 않은 게임입니다.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="127"/>
         <source>The game is already full.</source>
-        <translation>게임이 이미 꽉 찼습니다.</translation>
+        <translation>게임 인원이 전부 찼습니다.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="128"/>
@@ -1295,7 +1295,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/gameselector.cpp" line="131"/>
         <source>You are being ignored by the creator of this game.</source>
-        <translation>방장이 당신을 차단 하였습니다.</translation>
+        <translation>방장이 당신을 차단하였습니다.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="148"/>
@@ -1366,7 +1366,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/gamesmodel.cpp" line="129"/>
         <source>Description</source>
-        <translation>설명</translation>
+        <translation>게임 이름</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="107"/>
@@ -1443,7 +1443,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="188"/>
         <source>Downloaded card pictures have been reset.</source>
-        <translation>저장된 이미지 파일들이 초기화 되었습니다.</translation>
+        <translation>저장된 카드 이미지 파일들이 초기화 되었습니다.</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="190"/>
@@ -1453,7 +1453,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="190"/>
         <source>One or more downloaded card pictures could not be cleared.</source>
-        <translation>저장된 이미지 파일들을 전부 초기화 시킬 수 없었습니다.</translation>
+        <translation>저장된 카드 이미지 파일을 초기화 시킬 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="220"/>
@@ -1517,7 +1517,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/window_main.cpp" line="67"/>
         <source>There are too many concurrent connections from your address.</source>
-        <translation>해당 IP주소에서 동시 연결 회선이 너무 많습니다.</translation>
+        <translation>해당 IP주소에서 동시에 연결된 회선이 너무 많습니다.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="78"/>
@@ -1569,7 +1569,7 @@ All running games will be lost.
 Reason for shutdown: %1</source>
         <translation>
             <numerusform>서버가 %n분 후 재시작 할 예정입니다.
-진행 중인 게임은 저장이 되지 않습니다.
+진행 중인 게임은 저장되지 않습니다.
 서버 재시작 사유: %1</numerusform>
         </translation>
     </message>
@@ -1904,7 +1904,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="95"/>
         <source>%1 has loaded a deck with %2 sideboard cards (%3).</source>
-        <translation>%1이(가) %2개의 사이드보드 카드가 있는 덱을 불러왔습니다. (해시값: %3)</translation>
+        <translation>%1이(가) %2장의 사이드보드가 있는 덱을 불러왔습니다. (해시값: %3)</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="104"/>
@@ -1934,25 +1934,25 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="121"/>
         <source>%1 has locked her sideboard.</source>
         <comment>female</comment>
-        <translation>%1이(가) 사이드보드를 잠궜습니다.</translation>
+        <translation>%1이(가) 사이드보드 교체를 비활성화 하였습니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="123"/>
         <source>%1 has locked his sideboard.</source>
         <comment>male</comment>
-        <translation>%1이(가) 사이드보드를 잠궜습니다.</translation>
+        <translation>%1이(가) 사이드보드 교체를 비활성화 하였습니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="126"/>
         <source>%1 has unlocked her sideboard.</source>
         <comment>female</comment>
-        <translation>%1이(가) 사이드보드의 잠금을 풀었습니다.</translation>
+        <translation>%1이(가) 사이드보드 교체를 활성화 하였습니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="128"/>
         <source>%1 has unlocked his sideboard.</source>
         <comment>male</comment>
-        <translation>%1이(가) 사이드보드의 잠금을 풀었습니다.</translation>
+        <translation>%1이(가) 사이드보드 교체를 활성화 하였습니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="135"/>
@@ -2068,7 +2068,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="224"/>
         <source> from hand</source>
-        <translation>손에</translation>
+        <translation>손패에</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="229"/>
@@ -2178,7 +2178,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="308"/>
         <source>%1 moves %2%3 to hand.</source>
-        <translation>%1이(가) %3 있던 %2을(를) 손으로 가져갑니다.</translation>
+        <translation>%1이(가) %3 있던 %2을(를) 손패로 가져갑니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="311"/>
@@ -2558,25 +2558,25 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="581"/>
         <source>%1 taps her permanents.</source>
         <comment>female</comment>
-        <translation>%1이(가) 그녀의 지속물들을 전부 탭합니다.</translation>
+        <translation>%1이(가) 그녀의 지속물을 전부 탭합니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="583"/>
         <source>%1 untaps her permanents.</source>
         <comment>female</comment>
-        <translation>%1이(가) 그녀의 지속물들을 전부 언탭합니다.</translation>
+        <translation>%1이(가) 그녀의 지속물을 전부 언탭합니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="586"/>
         <source>%1 taps his permanents.</source>
         <comment>male</comment>
-        <translation>%1이(가) 그의 지속물들을 전부 탭합니다.</translation>
+        <translation>%1이(가) 그의 지속물을 전부 탭합니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="588"/>
         <source>%1 untaps his permanents.</source>
         <comment>male</comment>
-        <translation>%1이(가) 그의 지속물들을 전부 언탭합니다.</translation>
+        <translation>%1이(가) 그의 지속물을 전부 언탭합니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="594"/>
@@ -2630,13 +2630,13 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="628"/>
         <source>%1 sets %2 to untap normally.</source>
         <comment>female</comment>
-        <translation>%1이(가) %2을(를) 언탭단에 언탭하도록 다시 지정합니다.</translation>
+        <translation>%1이(가) %2을(를) 언탭단에 언탭하도록 지정합니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="630"/>
         <source>%1 sets %2 to untap normally.</source>
         <comment>male</comment>
-        <translation>%1이(가) %2을(를) 언탭단에 언탭하도록 다시 지정합니다.</translation>
+        <translation>%1이(가) %2을(를) 언탭단에 언탭하도록 지정합니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="642"/>
@@ -2903,12 +2903,12 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="350"/>
         <source>%1 draws his initial hand.</source>
-        <translation>%1이(가) 시작 패를 뽑았습니다.</translation>
+        <translation>%1이(가) 시작 손패를 뽑았습니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="350"/>
         <source>%1 draws her initial hand.</source>
-        <translation>%1이(가) 시작 패를 뽑았습니다.</translation>
+        <translation>%1이(가) 시작 손패를 뽑았습니다.</translation>
     </message>
     <message numerus="yes">
         <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
@@ -3143,7 +3143,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/player.cpp" line="601"/>
         <source>View &amp;top cards of library...</source>
-        <translation>서고 맨 위의 카드 여러장 보기</translation>
+        <translation>서고 맨 위 X장 보기</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="581"/>
@@ -3193,7 +3193,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/player.cpp" line="786"/>
         <source>Number of cards:</source>
-        <translation>카드의 장수:</translation>
+        <translation>카드 장수:</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="607"/>
@@ -3350,7 +3350,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/player.cpp" line="619"/>
         <source>Reveal r&amp;andom card to</source>
-        <translation>무작위로 카드 공개:</translation>
+        <translation>무작위 카드 공개:</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="628"/>
@@ -3525,7 +3525,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/player.cpp" line="677"/>
         <source>&amp;Remove counter (%1)</source>
-        <translation>카운터 제거 (%1)</translation>
+        <translation>카운터 감소 (%1)</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="679"/>
@@ -3598,7 +3598,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/player.cpp" line="963"/>
         <source>Number of sides:</source>
-        <translation>주사위 면체:</translation>
+        <translation>주사위 면의 수:</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1935"/>
@@ -3705,7 +3705,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/remotereplaylist_treewidget.cpp" line="138"/>
         <source>Name</source>
-        <translation>설명</translation>
+        <translation>게임 이름</translation>
     </message>
     <message>
         <location filename="../src/remotereplaylist_treewidget.cpp" line="139"/>
@@ -4035,7 +4035,7 @@ Do you want to save the changes?</source>
         <location filename="../src/tab_deck_editor.cpp" line="479"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
-        <translation>덱을 저장할 수 없었습니다. 덱 파일 디렉토리에 쓰기가 가능한지 확인하시고 다시 시도하여 주십시오.</translation>
+        <translation>덱을 저장하는데 실패하였습니다. 덱 파일 디렉토리에 쓰기가 가능한지 확인하시고 다시 시도하여 주십시오.</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="465"/>
@@ -4263,7 +4263,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="674"/>
         <source>Leave game</source>
-        <translation>게임 퇴장</translation>
+        <translation>게임 나가기</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="674"/>
