@@ -436,7 +436,7 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface, Respons
 {
     QMutexLocker locker(&gameMutex);
     
-    Server_Player *newPlayer = new Server_Player(this, nextPlayerId++, userInterface->copyUserInfo(true, true), spectator, userInterface);
+    Server_Player *newPlayer = new Server_Player(this, nextPlayerId++, userInterface->copyUserInfo(true, true, true), spectator, userInterface);
     newPlayer->moveToThread(thread());
     
     Event_Join joinEvent;
