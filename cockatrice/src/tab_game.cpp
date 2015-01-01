@@ -872,7 +872,7 @@ void TabGame::startGame(bool resuming)
     if (!resuming) {
         QMapIterator<int, Player *> playerIterator(players);
         while (playerIterator.hasNext())
-            playerIterator.next().value()->setConceded(false);
+            playerIterator.next().value()->setGameStarted();
     }
 
     playerListWidget->setGameStarted(true, resuming);
