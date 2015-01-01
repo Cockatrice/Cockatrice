@@ -19,6 +19,7 @@ protected slots:
     void showCardInfoPopup(const QPoint &pos, const QString &cardName);
     void deleteCardInfoPopup(const QString &cardName);
 private:
+    QString currentCardName;
     bool contentsChanged;
     CardInfoWidget *infoPopup;
     QList<QMenu *> tabMenus;
