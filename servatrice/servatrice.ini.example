@@ -79,7 +79,7 @@ password=foobar
 
 [rooms]
 
-; A servtrice server can expose to the users different "rooms" to chat and create games. Rooms can be defined
+; A servatrice server can expose to the users different "rooms" to chat and create games. Rooms can be defined
 ; with two different methods:
 ; config: rooms are defined in this configuration (see the following example)
 ; sql: rooms are defined in the "rooms" table of the database
@@ -142,6 +142,24 @@ max_message_count_per_interval=10
 
 ; Maximum number of games a single user can create; default is 5
 max_games_per_user=5
+
+
+[logging]
+
+; Servatrice can log user messages to the database table cockatrice_log.
+; These messages can come from different sources; each source can be enabled separately.
+
+; Log user messages inside chat rooms
+log_user_msg_room=false
+
+; Log user messages inside games
+log_user_msg_game=false
+
+; Log user messages in private chats
+log_user_msg_chat=false
+
+; Log user messages coming from other servers in the network
+log_user_msg_isl=false
 
 
 ; EXPERIMENTAL - NOT WORKING YET
