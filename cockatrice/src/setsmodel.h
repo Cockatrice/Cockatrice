@@ -2,7 +2,6 @@
 #define SETSMODEL_H
 
 #include <QAbstractTableModel>
-#include <QSortFilterProxyModel>
 #include <QMimeData>
 #include "carddatabase.h"
 
@@ -25,12 +24,12 @@ private:
     static const int NUM_COLS = 5;
     SetList sets;
 public:
-    enum SetsColumns { SortKeyCol, SetTypeCol, ShortNameCol, LongNameCol, ReleaseDateCol };
+    enum SetsColumns { SortKeyCol, LongNameCol, ShortNameCol, SetTypeCol, ReleaseDateCol };
 
     SetsModel(CardDatabase *_db, QObject *parent = 0);
     ~SetsModel();
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const { return NUM_COLS; }
+    int columnCount(const QModelIndex &parent = QModelIndex()) const { Q_UNUSED(parent); return NUM_COLS; }
     QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
@@ -39,12 +38,10 @@ public:
     QMimeData *mimeData(const QModelIndexList &indexes) const;
     bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
     QStringList mimeTypes() const;
+    void swapRows(int oldRow, int newRow);
+    void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
+    void save();
+    void restore(CardDatabase *db);
 };
 
-class SetsProxyModel : public QSortFilterProxyModel {
-    Q_OBJECT
-public:
-    SetsProxyModel(QObject *parent = 0);
-    void saveOrder();
-};
 #endif

@@ -139,17 +139,12 @@ if(APPLE)
     set(plugin_dest_dir servatrice.app/Contents/Plugins)
     set(qtconf_dest_dir servatrice.app/Contents/Resources)
 
-    # note: no codecs in qt5
-    # note: phonon_backend => mediaservice
-    # note: needs platform on osx
+    # qt4: codecs, sqldrivers
+    # qt5: platforms, sqldrivers
 
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(sqldrivers|platforms)/.*_debug\\.dylib")
-    else()
-        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(sqldrivers|platforms)/[^_]*\\.dylib")
-    endif()
+    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+        FILES_MATCHING REGEX "(codecs|platforms|sqldrivers)/.*\\.dylib"
+        REGEX ".*_debug\\.dylib" EXCLUDE)
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
@@ -171,17 +166,11 @@ if(WIN32)
     set(plugin_dest_dir Plugins)
     set(qtconf_dest_dir .)
 
-    # note: no codecs in qt5
-    # note: phonon_backend => mediaservice
-    # note: needs platform on osx
+    # qt4: codecs, sqldrivers
+    # qt5: platforms, sqldrivers
 
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(sqldrivers|platforms)/.*d\\.dll")
-    else()
-        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(sqldrivers|platforms)/.*[^d]\\.dll")
-    endif()
+    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+        FILES_MATCHING REGEX "(codecs|platforms|sqldrivers)/.*[^d]\\.dll")
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]

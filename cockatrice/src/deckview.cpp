@@ -180,9 +180,11 @@ void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsI
         qreal thisRowHeight = CARD_HEIGHT * currentRowsAndCols[i].first;
         QRectF textRect(0, yUntilNow, totalTextWidth, thisRowHeight);
         yUntilNow += thisRowHeight + paddingY;
-        
+
+        QString displayString = QString("%1\n(%2)").arg(cardTypeList[i]).arg(cardsByType.count(cardTypeList[i]));
+
         painter->setPen(Qt::white);
-        painter->drawText(textRect, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, cardTypeList[i]);
+        painter->drawText(textRect, Qt::AlignHCenter | Qt::AlignVCenter, displayString);
     }
 }
 

@@ -40,6 +40,9 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
         editionLong = map.value("name").toString();
         editionCards = map.value("cards");
         setType = map.value("type").toString();
+        // capitalize set type
+        if(setType.length() > 0)
+            setType[0] = setType[0].toUpper();
         releaseDate = map.value("releaseDate").toDate();
 
         // core and expansion sets are marked to be imported by default
@@ -236,7 +239,7 @@ int OracleImporter::startImport()
     const SetToDownload * curSet;
 
     // add an empty set for tokens
-    CardSet *tokenSet = new CardSet(TOKENS_SETNAME, tr("Dummy set containing tokens"), "tokens");
+    CardSet *tokenSet = new CardSet(TOKENS_SETNAME, tr("Dummy set containing tokens"), "Tokens");
     sets.insert(TOKENS_SETNAME, tokenSet);
 
     while (it.hasNext())
