@@ -1601,7 +1601,7 @@ Would you like to change your database location setting?</source>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="79"/>
-        <location filename="../src/window_main.cpp" line="260"/>
+        <location filename="../src/window_main.cpp" line="261"/>
         <source>Invalid username.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1699,175 +1699,180 @@ Reason for shutdown: %1</source>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="227"/>
-        <source>Russian:</source>
+        <source>Korean:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="228"/>
-        <source>Italian:</source>
+        <source>Russian:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="229"/>
+        <source>Italian:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="230"/>
         <source>Swedish:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="235"/>
-        <location filename="../src/window_main.cpp" line="242"/>
-        <location filename="../src/window_main.cpp" line="245"/>
-        <location filename="../src/window_main.cpp" line="256"/>
-        <location filename="../src/window_main.cpp" line="260"/>
-        <location filename="../src/window_main.cpp" line="263"/>
-        <location filename="../src/window_main.cpp" line="266"/>
-        <location filename="../src/window_main.cpp" line="272"/>
-        <location filename="../src/window_main.cpp" line="278"/>
-        <location filename="../src/window_main.cpp" line="280"/>
+        <location filename="../src/window_main.cpp" line="236"/>
+        <location filename="../src/window_main.cpp" line="243"/>
+        <location filename="../src/window_main.cpp" line="246"/>
+        <location filename="../src/window_main.cpp" line="257"/>
+        <location filename="../src/window_main.cpp" line="261"/>
+        <location filename="../src/window_main.cpp" line="264"/>
+        <location filename="../src/window_main.cpp" line="267"/>
+        <location filename="../src/window_main.cpp" line="273"/>
+        <location filename="../src/window_main.cpp" line="279"/>
+        <location filename="../src/window_main.cpp" line="281"/>
         <source>Error</source>
         <translation>Mearachd</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="235"/>
+        <location filename="../src/window_main.cpp" line="236"/>
         <source>Server timeout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="242"/>
+        <location filename="../src/window_main.cpp" line="243"/>
         <source>Incorrect username or password. Please check your authentication information and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="245"/>
+        <location filename="../src/window_main.cpp" line="246"/>
         <source>There is already an active session using this user name.
 Please close that session first and re-login.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="250"/>
+        <location filename="../src/window_main.cpp" line="251"/>
         <source>You are banned until %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="252"/>
+        <location filename="../src/window_main.cpp" line="253"/>
         <source>You are banned indefinitely.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="263"/>
+        <location filename="../src/window_main.cpp" line="264"/>
         <source>This server requires user registration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="266"/>
+        <location filename="../src/window_main.cpp" line="267"/>
         <source>Unknown login error: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="272"/>
+        <location filename="../src/window_main.cpp" line="273"/>
         <source>Socket error: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="278"/>
+        <location filename="../src/window_main.cpp" line="279"/>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="280"/>
+        <location filename="../src/window_main.cpp" line="281"/>
         <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
 Local version is %1, remote version is %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="286"/>
+        <location filename="../src/window_main.cpp" line="287"/>
         <source>Connecting to %1...</source>
         <translatorcomment>The conjugation on &apos;ri&apos; will probably suck here.</translatorcomment>
         <translation>A&apos; dèanamh ceangal ri %1...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="287"/>
+        <location filename="../src/window_main.cpp" line="288"/>
         <source>Disconnected</source>
         <translation>Air dì-cheangal</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="288"/>
+        <location filename="../src/window_main.cpp" line="289"/>
         <source>Connected, logging in at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="289"/>
+        <location filename="../src/window_main.cpp" line="290"/>
         <source>Logged in at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="298"/>
+        <location filename="../src/window_main.cpp" line="299"/>
         <source>&amp;Connect...</source>
         <translation>A&apos; dèanamh &amp;ceangal...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="299"/>
+        <location filename="../src/window_main.cpp" line="300"/>
         <source>&amp;Disconnect</source>
         <translation>&amp;Dì-cheangail</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="300"/>
+        <location filename="../src/window_main.cpp" line="301"/>
         <source>Start &amp;local game...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="301"/>
+        <location filename="../src/window_main.cpp" line="302"/>
         <source>&amp;Watch replay...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="302"/>
+        <location filename="../src/window_main.cpp" line="303"/>
         <source>&amp;Deck editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="303"/>
+        <location filename="../src/window_main.cpp" line="304"/>
         <source>&amp;Full screen</source>
         <translation>&amp;Làn-sgrìn</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="304"/>
+        <location filename="../src/window_main.cpp" line="305"/>
         <source>Ctrl+F</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="305"/>
+        <location filename="../src/window_main.cpp" line="306"/>
         <source>&amp;Settings...</source>
         <translation>&amp;Roghainnean...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="306"/>
+        <location filename="../src/window_main.cpp" line="307"/>
         <source>&amp;Exit</source>
         <translation>&amp;Fàg an-seo</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="308"/>
+        <location filename="../src/window_main.cpp" line="309"/>
         <source>&amp;Cockatrice</source>
         <translatorcomment>Considering this a proper name, so leaving untranslated</translatorcomment>
         <translation>&amp;Cockatrice</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="310"/>
+        <location filename="../src/window_main.cpp" line="311"/>
         <source>&amp;About Cockatrice</source>
         <translation>&amp;Mu Cockatrice</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="311"/>
+        <location filename="../src/window_main.cpp" line="312"/>
         <source>&amp;Help</source>
         <translation>&amp;Cobhair</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="406"/>
+        <location filename="../src/window_main.cpp" line="407"/>
         <source>Are you sure?</source>
         <translation>A bheil thu cinnteach?</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="406"/>
+        <location filename="../src/window_main.cpp" line="407"/>
         <source>There are still open games. Are you sure you want to quit?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4697,47 +4702,47 @@ Please enter a name:</source>
 <context>
     <name>WndSets</name>
     <message>
-        <location filename="../src/window_sets.cpp" line="41"/>
+        <location filename="../src/window_sets.cpp" line="42"/>
         <source>Save set ordering</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="43"/>
+        <location filename="../src/window_sets.cpp" line="44"/>
         <source>Restore saved set ordering</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="45"/>
+        <location filename="../src/window_sets.cpp" line="46"/>
         <source>Move selected set up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="47"/>
+        <location filename="../src/window_sets.cpp" line="48"/>
         <source>Move selected set down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="49"/>
+        <location filename="../src/window_sets.cpp" line="50"/>
         <source>Move selected set to top</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="51"/>
+        <location filename="../src/window_sets.cpp" line="52"/>
         <source>Move selected set to bottom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="78"/>
+        <location filename="../src/window_sets.cpp" line="79"/>
         <source>Edit sets</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="89"/>
+        <location filename="../src/window_sets.cpp" line="90"/>
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="89"/>
+        <location filename="../src/window_sets.cpp" line="90"/>
         <source>The sets database has been saved successfully.</source>
         <translation type="unfinished"></translation>
     </message>
