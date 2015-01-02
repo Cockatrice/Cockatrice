@@ -177,12 +177,13 @@
         <location filename="../src/userlist.cpp" line="82"/>
         <source>Please enter the reason for the ban.
 This is only saved for moderators and cannot be seen by the banned person.</source>
-        <translation>추방의 사유를 적어주십시오. 해당 사유는 관리자들만 볼 수 있고 추방 당한 사용자는 볼 수 없습니다.</translation>
+        <translation>추방 사유를 적어주십시오.
+해당 사유는 관리자들만 볼 수 있고 추방 당한 사용자는 볼 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="85"/>
         <source>Please enter the reason for the ban that will be visible to the banned person.</source>
-        <translation>추방 당한 사용자가 보게 될 정지 사유를 적어주십시오.</translation>
+        <translation>추방된 사용자가 보게 될 추방 사유를 적어주십시오.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="88"/>
@@ -1124,11 +1125,11 @@ You may need to rerun oracle to update your card database.
 Would you like to change your database location setting?</source>
         <translation>카드 데이터베이스가 손상되었습니다.
 
-        	잘못된 데이터베이스를 사용 시 코카트리스에 오류가 발생 할 수 있습니다.
+잘못된 데이터베이스를 사용 시 코카트리스에 오류가 발생 할 수 있습니다.
 
-        	오라클을 다시 실행하여 카드 데이터베이스를 갱신할 수 있습니다.
+오라클을 다시 실행하여 카드 데이터베이스를 갱신할 수 있습니다.
 
-        	데이터베이스 경로를 다시 설정하시겠습니까?</translation>
+데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="772"/>
@@ -1141,11 +1142,11 @@ Usually this can be fixed by rerunning oracle to to update your card database.
 Would you like to change your database location setting?</source>
         <translation>카드 데이터베이스가 너무 오래되었습니다.
 
-        	카드 정보나 이미지를 불러올때 오류가 발생할 수 있습니다.
+카드 정보나 이미지를 불러올때 오류가 발생할 수 있습니다.
 
-        	오라클을 다시 실행하여 카드 데이터베이스를 갱신하는 것을 권장 합니다.
+오라클을 다시 실행하여 카드 데이터베이스를 갱신하는 것을 권장 합니다.
 
-        	데이터베이스 경로를 다시 설정하시겠습니까?</translation>
+데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="779"/>
@@ -1156,9 +1157,9 @@ Please file a ticket at http://github.com/Daenyth/Cockatrice/issues with your ca
 Would you like to change your database location setting?</source>
         <translation>카드 데이터베이스를 완전히 불러올 수 없습니다.
 
-        	http://github.com/Daenyth/Cockatrice/issues 에 cards.xml를 첨부하여 버그 리포팅을 하여 주십시오.
+http://github.com/Daenyth/Cockatrice/issues 에 cards.xml를 첨부하여 버그 리포팅을 하여 주십시오.
 
-        	데이터베이스 경로를 다시 설정하시겠습니까?</translation>
+데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="785"/>
@@ -1176,7 +1177,7 @@ Would you like to change your database location setting?</source>
 Would you like to change your database location setting?</source>
         <translation>카드 데이터베이스를 불러왔지만 카드 정보가 없었습니다.
 
-        데이터베이스 경로를 다시 설정하시겠습니까?</translation>
+데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="795"/>
@@ -1187,19 +1188,21 @@ Please file a ticket at http://github.com/Daenyth/Cockatrice/issues
 Would you like to change your database location setting?</source>
         <translation>카드 데이터베이스를 불러오는 중 알 수 없는 오류가 발생하였습니다.
 
-        	http://github.com/Daenyth/Cockatrice/issues 에 cards.xml를 첨부하여 버그 리포팅을 해주십시오.
+http://github.com/Daenyth/Cockatrice/issues 에 cards.xml를 첨부하여 버그 리포팅을 해주십시오.
 
-        	데이터베이스 경로를 다시 설정하시겠습니까?</translation>
+데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="808"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
-        <translation>덱 파일을 보관하는 디렉토리의 경로가 잘못되었습니다. 경로를 다시 설정하시겠습니까?</translation>
+        <translation>덱 파일을 보관하는 디렉토리의 경로가 잘못되었습니다.
+경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="814"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
-        <translation>카드 이미지 파일을 보관하는 디렉토리의 경로가 잘못되었습니다. 경로를 다시 설정하시겠습니까?</translation>
+        <translation>카드 이미지 파일을 보관하는 디렉토리의 경로가 잘못되었습니다.
+경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="823"/>
@@ -1681,7 +1684,8 @@ Reason for shutdown: %1</source>
     <message>
         <location filename="../src/window_main.cpp" line="243"/>
         <source>Incorrect username or password. Please check your authentication information and try again.</source>
-        <translation>잘못된 사용자명이나 비밀번호입니다. 확인 후 다시 시도하여 주십시오.</translation>
+        <translation>잘못된 사용자명이나 비밀번호입니다.
+확인 후 다시 시도하여 주십시오.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="246"/>
@@ -1817,7 +1821,8 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/window_main.cpp" line="407"/>
         <source>There are still open games. Are you sure you want to quit?</source>
-        <translation>참여 중인 게임이 있습니다. 정말로 코카트리스를 종료하시겠습니까?</translation>
+        <translation>참여 중인 게임이 있습니다. 
+정말로 코카트리스를 종료하시겠습니까?</translation>
     </message>
 </context>
 <context>
@@ -4011,7 +4016,8 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/tab_deck_editor.cpp" line="383"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
-        <translation>덱 리스트가 변경되었습니다. 변경사항을 저장하시겠습니까?</translation>
+        <translation>덱 리스트가 변경되었습니다.
+변경사항을 저장하시겠습니까?</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="416"/>
@@ -4035,7 +4041,8 @@ Do you want to save the changes?</source>
         <location filename="../src/tab_deck_editor.cpp" line="479"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
-        <translation>덱을 저장하는데 실패하였습니다. 덱 파일 디렉토리에 쓰기가 가능한지 확인하시고 다시 시도하여 주십시오.</translation>
+        <translation>덱을 저장하는데 실패하였습니다.
+덱 파일 디렉토리에 쓰기가 가능한지 확인하시고 다시 시도하여 주십시오.</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="465"/>
