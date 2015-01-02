@@ -1900,12 +1900,16 @@ void Player::cardMenuAction()
             default: ;
         }
     }
-    game->sendGameCommand(prepareGameCommand(commandList), getId());
+    if(local)
+        sendGameCommand(prepareGameCommand(commandList));
+    else
+        game->sendGameCommand(prepareGameCommand(commandList));
 }
 
 void Player::actIncPT(int deltaP, int deltaT)
 {
     QString ptString = "+" + QString::number(deltaP) + "/+" + QString::number(deltaT);
+    int playerid = id;
     
     QList< const ::google::protobuf::Message * > commandList;
     QListIterator<QGraphicsItem *> j(scene()->selectedItems());
@@ -1917,13 +1921,19 @@ void Player::actIncPT(int deltaP, int deltaT)
         cmd->set_attribute(AttrPT);
         cmd->set_attr_value(ptString.toStdString());
         commandList.append(cmd);
+
+        if(local)
+            playerid=card->getZone()->getPlayer()->getId();
     }
-    sendGameCommand(prepareGameCommand(commandList));
+
+    game->sendGameCommand(prepareGameCommand(commandList), playerid);
 }
 
 void Player::actSetPT()
 {
     QString oldPT;
+    int playerid = id;
+
     QListIterator<QGraphicsItem *> i(scene()->selectedItems());
     while (i.hasNext()) {
         CardItem *card = static_cast<CardItem *>(i.next());
@@ -1949,8 +1959,12 @@ void Player::actSetPT()
         cmd->set_attribute(AttrPT);
         cmd->set_attr_value(pt.toStdString());
         commandList.append(cmd);
+
+        if(local)
+            playerid=card->getZone()->getPlayer()->getId();
     }
-    sendGameCommand(prepareGameCommand(commandList));
+
+    game->sendGameCommand(prepareGameCommand(commandList), playerid);
 }
 
 void Player::actDrawArrow()
