@@ -73,7 +73,7 @@ public:
     void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
     void resetFilterParameters();
     void loadFilterParameters(const QMap<int, QString> &allGameTypes);
-    void saveFilterParameters();
+    void saveFilterParameters(const QMap<int, QString> &allGameTypes);
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 };

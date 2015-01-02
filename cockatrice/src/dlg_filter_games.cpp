@@ -112,34 +112,6 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, GamesPro
 }
 
 void DlgFilterGames::actOk() {
-    QSettings settings;
-    settings.beginGroup("filter_games");
-    settings.setValue(
-        "unavailable_games_visible",
-	unavailableGamesVisibleCheckBox->isChecked()
-    );
-    settings.setValue(
-        "password_protected_games_visible",
-        passwordProtectedGamesVisibleCheckBox->isChecked()
-    );
-    settings.setValue("game_name_filter", gameNameFilterEdit->text());
-    settings.setValue("creator_name_filter", creatorNameFilterEdit->text());
-
-    QMapIterator<int, QString> gameTypeIterator(allGameTypes);
-    QMapIterator<int, QCheckBox *> checkboxIterator(gameTypeFilterCheckBoxes);
-    while (gameTypeIterator.hasNext()) {
-        gameTypeIterator.next();
-        checkboxIterator.next();
-
-        settings.setValue(
-            "game_type/" + hashGameType(gameTypeIterator.value()),
-            checkboxIterator.value()->isChecked()
-        );
-    }
-
-    settings.setValue("min_players", maxPlayersFilterMinSpinBox->value());
-    settings.setValue("max_players", maxPlayersFilterMaxSpinBox->value());
-
     accept();
 }
 

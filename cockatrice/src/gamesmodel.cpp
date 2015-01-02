@@ -253,6 +253,33 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
     invalidateFilter();
 }
 
+void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameTypes)
+{
+    QSettings settings;
+    settings.beginGroup("filter_games");
+
+    settings.setValue("unavailable_games_visible", unavailableGamesVisible);
+    settings.setValue(
+        "password_protected_games_visible",
+        passwordProtectedGamesVisible
+    );
+    settings.setValue("game_name_filter", gameNameFilter);
+    settings.setValue("creator_name_filter", creatorNameFilter);
+
+    QMapIterator<int, QString> gameTypeIterator(allGameTypes);
+    while (gameTypeIterator.hasNext()) {
+        gameTypeIterator.next();
+
+        settings.setValue(
+            "game_type/" + hashGameType(gameTypeIterator.value()),
+            gameTypeFilter.contains(gameTypeIterator.key())
+        );
+    }
+
+    settings.setValue("min_players", maxPlayersFilterMin);
+    settings.setValue("max_players", maxPlayersFilterMax);
+}
+
 bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourceParent*/) const
 {
     GamesModel *model = qobject_cast<GamesModel *>(sourceModel());

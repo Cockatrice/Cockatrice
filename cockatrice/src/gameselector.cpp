@@ -109,6 +109,7 @@ void GameSelector::actSetFilter()
     gameListProxyModel->setCreatorNameFilter(dlg.getCreatorNameFilter());
     gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());
     gameListProxyModel->setMaxPlayersFilter(dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax());
+    gameListProxyModel->saveFilterParameters(gameTypeMap);
 }
 
 void GameSelector::actClearFilter()
