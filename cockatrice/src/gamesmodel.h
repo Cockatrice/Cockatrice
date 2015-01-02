@@ -49,6 +49,12 @@ private:
     QString gameNameFilter, creatorNameFilter;
     QSet<int> gameTypeFilter;
     int maxPlayersFilterMin, maxPlayersFilterMax;
+
+    /*
+     * The game type might contain special characters, so to use it in
+     * QSettings we just hash it.
+     */
+    QString hashGameType(const QString &gameType) const;
 public:
     GamesProxyModel(QObject *parent = 0, ServerInfo_User *_ownUser = 0);
 
@@ -66,6 +72,8 @@ public:
     int getMaxPlayersFilterMax() const { return maxPlayersFilterMax; }
     void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
     void resetFilterParameters();
+    void loadFilterParameters(const QMap<int, QString> &allGameTypes);
+    void saveFilterParameters();
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 };

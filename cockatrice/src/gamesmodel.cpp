@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <QStringList>
 #include <QDateTime>
+#include <QSettings>
+#include <QCryptographicHash>
 
 namespace {
     const unsigned SECS_PER_MIN  = 60;
@@ -10,7 +12,7 @@ namespace {
 
     /**
      * Pretty print an integer number of seconds ago. Accurate to only one unit,
-     * rounded; <5 minutes and >5 hours are displayed as such. As a special case, 
+     * rounded; <5 minutes and >5 hours are displayed as such. As a special case,
      * time between 60 and 90 minutes will display both the hours and minutes.
      *
      * For example...
@@ -85,7 +87,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             QDateTime then;
             then.setTime_t(g.start_time());
             unsigned int secs = then.secsTo(QDateTime::currentDateTime());
- 
+
             switch (role) {
                 case Qt::DisplayRole: return prettyPrintSecsAgo(secs);
                 case SORT_ROLE: return QVariant(secs);
@@ -221,8 +223,32 @@ void GamesProxyModel::resetFilterParameters()
     gameNameFilter = QString();
     creatorNameFilter = QString();
     gameTypeFilter.clear();
-    maxPlayersFilterMin = -1;
-    maxPlayersFilterMax = -1;
+    maxPlayersFilterMin = 1;
+    maxPlayersFilterMax = 99;
+
+    invalidateFilter();
+}
+
+void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameTypes)
+{
+    QSettings settings;
+    settings.beginGroup("filter_games");
+
+    unavailableGamesVisible = settings.value("unavailable_games_visible", false).toBool();
+    qDebug() << "Load unavailable = " << unavailableGamesVisible;
+    passwordProtectedGamesVisible = settings.value("password_protected_games_visible", false).toBool();
+    gameNameFilter = settings.value("game_name_filter", "").toString();
+    creatorNameFilter = settings.value("creator_name_filter", "").toString();
+    maxPlayersFilterMin = settings.value("min_players", 1).toInt();
+    maxPlayersFilterMax = settings.value("max_players", 99).toInt();
+
+    QMapIterator<int, QString> gameTypesIterator(allGameTypes);
+    while (gameTypesIterator.hasNext()) {
+        gameTypesIterator.next();
+        if (settings.value("game_type/" + hashGameType(gameTypesIterator.value()), false).toBool()) {
+            gameTypeFilter.insert(gameTypesIterator.key());
+        }
+    }
 
     invalidateFilter();
 }
@@ -264,4 +290,8 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourc
         return false;
 
     return true;
+}
+
+QString GamesProxyModel::hashGameType(const QString &gameType) const {
+    return QCryptographicHash::hash(gameType.toUtf8(), QCryptographicHash::Md5).toHex();
 }
