@@ -33,7 +33,6 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     if (_room)
         gameListView->header()->hideSection(gameListModel->roomColIndex());
 
-    GameTypeMap gameTypeMap;
     if (room)
         gameTypeMap = gameListModel->getGameTypes().value(room->getRoomId());
 
@@ -87,9 +86,6 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
 
 void GameSelector::actSetFilter()
 {
-	GameTypeMap gameTypeMap;
-	if (room)
-	    gameTypeMap = gameListModel->getGameTypes().value(room->getRoomId());
     DlgFilterGames dlg(gameTypeMap, gameListProxyModel, this);
 
     if (!dlg.exec())
@@ -111,6 +107,7 @@ void GameSelector::actClearFilter()
     clearFilterButton->setEnabled(false);
 
     gameListProxyModel->resetFilterParameters();
+    gameListProxyModel->saveFilterParameters(gameTypeMap);
 }
 
 void GameSelector::actCreate()
