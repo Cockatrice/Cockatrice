@@ -39,8 +39,6 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
 
     gameListProxyModel->loadFilterParameters(gameTypeMap);
 
-    // set the reset filter button enabled
-
 #if QT_VERSION < 0x050000
     gameListView->header()->setResizeMode(0, QHeaderView::ResizeToContents);
 #else
@@ -51,7 +49,7 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     connect(filterButton, SIGNAL(clicked()), this, SLOT(actSetFilter()));
     clearFilterButton = new QPushButton;
     clearFilterButton->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
-    clearFilterButton->setEnabled(false);
+    clearFilterButton->setEnabled(true);
     connect(clearFilterButton, SIGNAL(clicked()), this, SLOT(actClearFilter()));
 
     if (room) {
