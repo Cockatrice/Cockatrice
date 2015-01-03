@@ -13,7 +13,7 @@
 #include <QSettings>
 #include <QCryptographicHash>
 
-DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, GamesProxyModel *_gamesProxyModel, QWidget *parent)
+DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, const GamesProxyModel *_gamesProxyModel, QWidget *parent)
     : QDialog(parent),
       allGameTypes(_allGameTypes),
       gamesProxyModel(_gamesProxyModel)
