@@ -235,7 +235,6 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
     settings.beginGroup("filter_games");
 
     unavailableGamesVisible = settings.value("unavailable_games_visible", false).toBool();
-    qDebug() << "Load unavailable = " << unavailableGamesVisible;
     passwordProtectedGamesVisible = settings.value("password_protected_games_visible", false).toBool();
     gameNameFilter = settings.value("game_name_filter", "").toString();
     creatorNameFilter = settings.value("creator_name_filter", "").toString();

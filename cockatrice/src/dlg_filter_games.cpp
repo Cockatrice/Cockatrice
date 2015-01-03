@@ -1,5 +1,4 @@
 #include "dlg_filter_games.h"
-#include <QDebug>
 #include <QCheckBox>
 #include <QPushButton>
 #include <QLabel>
@@ -22,7 +21,6 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, const Ga
     settings.beginGroup("filter_games");
 
     unavailableGamesVisibleCheckBox = new QCheckBox(tr("Show &unavailable games"));
-    qDebug() << "getUnavailableGamesVisible() == " << gamesProxyModel->getUnavailableGamesVisible();
     unavailableGamesVisibleCheckBox->setChecked(gamesProxyModel->getUnavailableGamesVisible());
 
     passwordProtectedGamesVisibleCheckBox = new QCheckBox(tr("Show &password protected games"));

@@ -1,4 +1,3 @@
-#include <QDebug>
 #include <QTreeView>
 #include <QCheckBox>
 #include <QPushButton>
@@ -39,8 +38,6 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
         gameTypeMap = gameListModel->getGameTypes().value(room->getRoomId());
 
     gameListProxyModel->loadFilterParameters(gameTypeMap);
-
-    qDebug() << "Check unavailable" << gameListProxyModel->getUnavailableGamesVisible();
 
     // set the reset filter button enabled
 
@@ -95,7 +92,6 @@ void GameSelector::actSetFilter()
 	GameTypeMap gameTypeMap;
 	if (room)
 	    gameTypeMap = gameListModel->getGameTypes().value(room->getRoomId());
-	qDebug() << "Check unavailable" << gameListProxyModel->getUnavailableGamesVisible();
     DlgFilterGames dlg(gameTypeMap, gameListProxyModel, this);
 
     if (!dlg.exec())
