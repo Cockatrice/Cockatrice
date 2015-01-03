@@ -113,10 +113,6 @@ void DlgFilterGames::actOk() {
     accept();
 }
 
-QString DlgFilterGames::hashGameType(const QString &gameType) const {
-    return QCryptographicHash::hash(gameType.toUtf8(), QCryptographicHash::Md5).toHex();
-}
-
 bool DlgFilterGames::getUnavailableGamesVisible() const
 {
     return unavailableGamesVisibleCheckBox->isChecked();
