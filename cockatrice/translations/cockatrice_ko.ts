@@ -44,7 +44,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="368"/>
         <source>Hand background:</source>
-        <translation>손패 배경 이미지:</translation>
+        <translation>손 배경 이미지:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="369"/>
@@ -79,12 +79,12 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="377"/>
         <source>Hand layout</source>
-        <translation>손패 정렬 방식</translation>
+        <translation>손 정렬 방식</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="378"/>
         <source>Display hand horizontally (wastes space)</source>
-        <translation>손패의 카드를 가로로 표시（화면 공간을 더 필요로 함）</translation>
+        <translation>손의 카드를 가로로 정렬（화면 공간을 더 필요로 함）</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="380"/>
@@ -329,73 +329,73 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <location filename="../src/cardzone.cpp" line="54"/>
         <source>her hand</source>
         <comment>nominative, female owner</comment>
-        <translation>그녀의 손패</translation>
+        <translation>그녀의 손</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="55"/>
         <source>%1&apos;s hand</source>
         <comment>nominative, female owner</comment>
-        <translation>%1의 손패</translation>
+        <translation>%1의 손</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="57"/>
         <source>his hand</source>
         <comment>nominative, male owner</comment>
-        <translation>그의 손패</translation>
+        <translation>그의 손</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="58"/>
         <source>%1&apos;s hand</source>
         <comment>nominative, male owner</comment>
-        <translation>%1의 손패</translation>
+        <translation>%1의 손</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="65"/>
         <source>her library</source>
         <comment>look at zone, female owner</comment>
-        <translation>그녀의 서고</translation>
+        <translation>그녀의 서고를</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="66"/>
         <source>%1&apos;s library</source>
         <comment>look at zone, female owner</comment>
-        <translation>%1의 서고</translation>
+        <translation>%1의 서고를</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="68"/>
         <source>his library</source>
         <comment>look at zone, male owner</comment>
-        <translation>그의 서고</translation>
+        <translation>그의 서고를</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="69"/>
         <source>%1&apos;s library</source>
         <comment>look at zone, male owner</comment>
-        <translation>%1의 서고</translation>
+        <translation>%1의 서고를</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="74"/>
         <source>of her library</source>
         <comment>top cards of zone, female owner</comment>
-        <translation>그녀의 서고의</translation>
+        <translation>그녀의 서고</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="75"/>
         <source>of %1&apos;s library</source>
         <comment>top cards of zone, female owner</comment>
-        <translation>%1의 서고의</translation>
+        <translation>%1의 서고</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="77"/>
         <source>of his library</source>
         <comment>top cards of zone, male owner</comment>
-        <translation>그의 서고의</translation>
+        <translation>그의 서고</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="78"/>
         <source>of %1&apos;s library</source>
         <comment>top cards of zone, male owner</comment>
-        <translation>%1의 서고의</translation>
+        <translation>%1의 서고</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="83"/>
@@ -425,49 +425,49 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <location filename="../src/cardzone.cpp" line="92"/>
         <source>her library</source>
         <comment>shuffle, female owner</comment>
-        <translation>그녀의 서고</translation>
+        <translation>그녀의 서고를</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="93"/>
         <source>%1&apos;s library</source>
         <comment>shuffle, female owner</comment>
-        <translation>%1의 서고</translation>
+        <translation>%1의 서고를</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="95"/>
         <source>his library</source>
         <comment>shuffle, male owner</comment>
-        <translation>그의 서고</translation>
+        <translation>그의 서고를</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="96"/>
         <source>%1&apos;s library</source>
         <comment>shuffle, male owner</comment>
-        <translation>%1의 서고</translation>
+        <translation>%1의 서고를</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="131"/>
         <source>her sideboard</source>
         <comment>look at zone, female owner</comment>
-        <translation>그녀의 사이드보드</translation>
+        <translation>그녀의 사이드보드를</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="132"/>
         <source>%1&apos;s sideboard</source>
         <comment>look at zone, female owner</comment>
-        <translation>%1의 사이드보드</translation>
+        <translation>%1의 사이드보드를</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="134"/>
         <source>his sideboard</source>
         <comment>look at zone, male owner</comment>
-        <translation>그의 사이드보드</translation>
+        <translation>그의 사이드보드를</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="135"/>
         <source>%1&apos;s sideboard</source>
         <comment>look at zone, male owner</comment>
-        <translation>%1의 사이드보드</translation>
+        <translation>%1의 사이드보드를</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="101"/>
@@ -806,7 +806,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_creategame.cpp" line="80"/>
         <source>Spectators see &amp;everything</source>
-        <translation>관전자에게 손패 공개</translation>
+        <translation>관전자에게 손 공개</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="86"/>
@@ -1999,13 +1999,13 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="175"/>
         <source>%1 shuffles %2.</source>
         <comment>female</comment>
-        <translation>%1이(가) %2을(를) 섞습니다.</translation>
+        <translation>%1이(가) %2 섞습니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="176"/>
         <source>%1 shuffles %2.</source>
         <comment>male</comment>
-        <translation>%1이(가) %2을(를) 섞습니다.</translation>
+        <translation>%1이(가) %2 섞습니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="185"/>
@@ -2073,7 +2073,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="224"/>
         <source> from hand</source>
-        <translation>손패에</translation>
+        <translation>손에</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="229"/>
@@ -2183,7 +2183,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="308"/>
         <source>%1 moves %2%3 to hand.</source>
-        <translation>%1이(가) %3 있던 %2을(를) 손패로 가져갑니다.</translation>
+        <translation>%1이(가) %3 있던 %2을(를) 손으로 가져갑니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="311"/>
@@ -2671,20 +2671,20 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="663"/>
         <source>%1 is looking at %2.</source>
         <comment>female</comment>
-        <translation>%1이(가) %2을(를) 보고있습니다.</translation>
+        <translation>%1이(가) %2 보고 있습니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="664"/>
         <source>%1 is looking at %2.</source>
         <comment>male</comment>
-        <translation>%1이(가) %2을(를) 보고있습니다.</translation>
+        <translation>%1이(가) %2 보고 있습니다.</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="669"/>
         <source>%1 is looking at the top %n card(s) %2.</source>
         <comment>female</comment>
         <translation>
-            <numerusform>%1이(가) %2 맨 위 %n장의 카드를 봅니다.</numerusform>
+            <numerusform>%1이(가) %2 맨 위 %n장의 카드를 보고 있습니다.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2692,20 +2692,20 @@ Local version is %1, remote version is %2.</source>
         <source>%1 is looking at the top %n card(s) %2.</source>
         <comment>male</comment>
         <translation>
-            <numerusform>%1이(가) %2 맨 위 %n장의 카드를 봅니다.</numerusform>
+            <numerusform>%1이(가) %2 맨 위 %n장의 카드를 보고 있습니다.</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="678"/>
         <source>%1 stops looking at %2.</source>
         <comment>female</comment>
-        <translation>%1이(가) %2을(를) 그만 봅니다.</translation>
+        <translation>%1이(가) %2 더 이상 보고 있지 않습니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="679"/>
         <source>%1 stops looking at %2.</source>
         <comment>male</comment>
-        <translation>%1이(가) %2을(를) 그만 봅니다.</translation>
+        <translation>%1이(가) %2 더 이상 보고 있지 않습니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="707"/>
@@ -2908,12 +2908,12 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="350"/>
         <source>%1 draws his initial hand.</source>
-        <translation>%1이(가) 시작 손패를 뽑았습니다.</translation>
+        <translation>%1이(가) 시작 카드를 뽑았습니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="350"/>
         <source>%1 draws her initial hand.</source>
-        <translation>%1이(가) 시작 손패를 뽑았습니다.</translation>
+        <translation>%1이(가) 시작 카드를 뽑았습니다.</translation>
     </message>
     <message numerus="yes">
         <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
@@ -3173,7 +3173,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/player.cpp" line="617"/>
         <source>&amp;Hand</source>
-        <translation>손패</translation>
+        <translation>손</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="621"/>
@@ -3219,7 +3219,7 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/player.cpp" line="594"/>
         <location filename="../src/player.cpp" line="598"/>
         <source>Move to &amp;hand</source>
-        <translation>손패로 이동하기</translation>
+        <translation>손으로 가져오기</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="591"/>
