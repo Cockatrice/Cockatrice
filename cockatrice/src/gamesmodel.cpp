@@ -224,7 +224,7 @@ void GamesProxyModel::resetFilterParameters()
     creatorNameFilter = QString();
     gameTypeFilter.clear();
     maxPlayersFilterMin = 1;
-    maxPlayersFilterMax = 99;
+    maxPlayersFilterMax = DEFAULT_MAX_PLAYERS_MAX;
 
     invalidateFilter();
 }
@@ -239,7 +239,7 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
     gameNameFilter = settings.value("game_name_filter", "").toString();
     creatorNameFilter = settings.value("creator_name_filter", "").toString();
     maxPlayersFilterMin = settings.value("min_players", 1).toInt();
-    maxPlayersFilterMax = settings.value("max_players", 99).toInt();
+    maxPlayersFilterMax = settings.value("max_players", DEFAULT_MAX_PLAYERS_MAX).toInt();
 
     QMapIterator<int, QString> gameTypesIterator(allGameTypes);
     while (gameTypesIterator.hasNext()) {
