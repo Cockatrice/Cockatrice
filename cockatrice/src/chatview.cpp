@@ -96,7 +96,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
         QTextCharFormat timeFormat;
         timeFormat.setForeground(Qt::black);
         cursor.setCharFormat(timeFormat);
-        cursor.insertText(QDateTime::currentDateTime().toString("[hh:mm] "));
+        cursor.insertText(QDateTime::currentDateTime().toString("[hh:mm:ss] "));
     }
     
     QTextCharFormat senderFormat;
