@@ -22,7 +22,6 @@ private:
     QSpinBox *maxPlayersFilterMaxSpinBox;
 
     const QMap<int, QString> &allGameTypes;
-    // This needs a const someplace
     const GamesProxyModel *gamesProxyModel;
 
 private slots:
