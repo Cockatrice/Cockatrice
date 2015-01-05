@@ -101,8 +101,8 @@ set(cockatrice_RESOURCES cockatrice.qrc)
 FILE(GLOB cockatrice_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
 
 IF(UPDATE_TRANSLATIONS)
-    FILE(GLOB_RECURSE translate_cockatrice_SRCS ${CMAKE_SOURCE_DIR}/cockatrice/src/*.cpp)
-    FILE(GLOB_RECURSE translate_common_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/common/*.cpp)
+    FILE(GLOB_RECURSE translate_cockatrice_SRCS ${CMAKE_SOURCE_DIR}/cockatrice/src/*.cpp ${CMAKE_SOURCE_DIR}/cockatrice/src/*.h)
+    FILE(GLOB_RECURSE translate_common_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/common/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/common/*.h)
     SET(translate_SRCS ${translate_cockatrice_SRCS} ${translate_common_SRCS})
 ENDIF(UPDATE_TRANSLATIONS)
 
@@ -269,18 +269,12 @@ if(APPLE)
     set(plugin_dest_dir cockatrice.app/Contents/Plugins)
     set(qtconf_dest_dir cockatrice.app/Contents/Resources)
 
-    # note: no codecs in qt5
-    # note: phonon_backend => audio | mediaservice
-    # note: needs platform on osx
+    # qt4: codecs, iconengines, imageformats, phonon_backend
+    # qt5: audio, iconengines, imageformats, platforms, printsupport
 
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(audio|codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*_debug\\.dylib")
-    else()
-        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(audio|codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*\\.dylib"
-            REGEX ".*_debug\\.dylib" EXCLUDE)
-    endif()
+    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+        FILES_MATCHING REGEX "(audio|codecs|iconengines|imageformats|phonon_backend|platforms|printsupport)/.*\\.dylib"
+        REGEX ".*_debug\\.dylib" EXCLUDE)
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
@@ -303,17 +297,11 @@ if(WIN32)
     set(plugin_dest_dir Plugins)
     set(qtconf_dest_dir .)
 
-    # note: no codecs in qt5
-    # note: phonon_backend => audio | mediaservice
-    # note: needs platform on osx
+    # qt4: codecs, iconengines, imageformats, phonon_backend
+    # qt5: audio, iconengines, imageformats, platforms, printsupport
 
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(audio|codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*d\\.dll")
-    else()
-        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(audio|codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*[^d]\\.dll")
-    endif()
+    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+        FILES_MATCHING REGEX "(audio|codecs|iconengines|imageformats|phonon_backend|platforms|printsupport)/.*[^d]\\.dll")
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]

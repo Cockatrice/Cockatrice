@@ -68,7 +68,11 @@ public:
 	Servatrice_IslServer(Servatrice *_server, const QSslCertificate &_cert, const QSslKey &_privateKey, QObject *parent = 0)
 		: QTcpServer(parent), server(_server), cert(_cert), privateKey(_privateKey) { }
 protected:
+#if QT_VERSION < 0x050000
 	void incomingConnection(int socketDescriptor);
+#else
+	void incomingConnection(qintptr socketDescriptor);
+#endif
 };
 
 class ServerProperties {

@@ -138,17 +138,12 @@ if(APPLE)
     set(plugin_dest_dir oracle.app/Contents/Plugins)
     set(qtconf_dest_dir oracle.app/Contents/Resources)
 
-    # note: no codecs in qt5
-    # note: phonon_backend => mediaservice
-    # note: needs platform on osx
+    # qt4: codecs, iconengines, imageformats
+    # qt5: iconengines, platforms
 
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*_debug\\.dylib")
-    else()
-        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/[^_]*\\.dylib")
-    endif()
+    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+        FILES_MATCHING REGEX "(codecs|iconengines|platforms)/.*\\.dylib"
+        REGEX ".*_debug\\.dylib" EXCLUDE)
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
@@ -170,17 +165,11 @@ IF(WIN32)
     set(plugin_dest_dir Plugins)
     set(qtconf_dest_dir .)
 
-    # note: no codecs in qt5
-    # note: phonon_backend => mediaservice
-    # note: needs platform on osx
+    # qt4: codecs, iconengines, imageformats
+    # qt5: iconengines, imageformats, platforms
 
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*d\\.dll")
-    else()
-        install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-            FILES_MATCHING REGEX "(codecs|iconengines|imageformats|mediaservice|phonon_backend|platforms)/.*[^d]\\.dll")
-    endif()
+    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+        FILES_MATCHING REGEX "(codecs|iconengines|platforms)/.*[^d]\\.dll")
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]

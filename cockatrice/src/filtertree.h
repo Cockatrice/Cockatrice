@@ -154,7 +154,7 @@ public:
     FilterTreeNode *termNode(const CardFilter *f);
     FilterTreeNode *attrTypeNode(CardFilter::Attr attr,
                                 CardFilter::Type type);
-    const char *textCStr() { return "root"; }
+    const char *textCStr() const { return "root"; }
     int index() const { return 0; }
 
     bool acceptsCard(const CardInfo *info) const;
