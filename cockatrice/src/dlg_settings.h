@@ -46,6 +46,7 @@ private:
     QCheckBox *picDownloadCheckBox;
     QCheckBox *picDownloadHqCheckBox;
     QLabel *languageLabel, *deckPathLabel, *replaysPathLabel, *picsPathLabel, *cardDatabasePathLabel, *tokenDatabasePathLabel, *pixmapCacheLabel;
+    QPushButton *clearDownloadedPicsButton;
 };
 
 class AppearanceSettingsPage : public AbstractSettingsPage {

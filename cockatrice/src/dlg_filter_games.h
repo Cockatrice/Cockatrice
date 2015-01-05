@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QSet>
 #include <QMap>
+#include "gamesmodel.h"
 
 class QCheckBox;
 class QLineEdit;
@@ -21,17 +22,13 @@ private:
     QSpinBox *maxPlayersFilterMaxSpinBox;
 
     const QMap<int, QString> &allGameTypes;
+    const GamesProxyModel *gamesProxyModel;
 
-    /*
-     * The game type might contain special characters, so to use it in
-     * QSettings we just hash it.
-     */
-    QString hashGameType(const QString &gameType) const;
 private slots:
     void actOk();
 public:
-    DlgFilterGames(const QMap<int, QString> &allGameTypes, QWidget *parent = 0);
-    
+    DlgFilterGames(const QMap<int, QString> &_allGameTypes, const GamesProxyModel *_gamesProxyModel, QWidget *parent = 0);
+
     bool getUnavailableGamesVisible() const;
     void setUnavailableGamesVisible(bool _unavailableGamesVisible);
     bool getPasswordProtectedGamesVisible() const;

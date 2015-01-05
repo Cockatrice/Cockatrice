@@ -2225,6 +2225,13 @@ qreal Player::getMinimumWidth() const
     return result;
 }
 
+void Player::setGameStarted()
+{
+    if (local)
+        aAlwaysRevealTopCard->setChecked(false);
+    setConceded(false);
+}
+
 void Player::setConceded(bool _conceded)
 {
     conceded = _conceded;

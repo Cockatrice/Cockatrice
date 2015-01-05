@@ -286,6 +286,8 @@ public:
     
     void setConceded(bool _conceded);
     bool getConceded() const { return conceded; }
+
+    void setGameStarted();
     
     qreal getMinimumWidth() const;
     void setMirrored(bool _mirrored);

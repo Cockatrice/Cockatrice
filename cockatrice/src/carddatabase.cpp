@@ -31,7 +31,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
 }
 
 CardSet::CardSet(const QString &_shortName, const QString &_longName, const QString &_setType, const QDate &_releaseDate)
-    : shortName(_shortName), longName(_longName), setType(_setType), releaseDate(_releaseDate)
+    : shortName(_shortName), longName(_longName), releaseDate(_releaseDate), setType(_setType)
 {
     updateSortKey();
 }

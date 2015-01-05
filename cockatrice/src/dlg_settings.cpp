@@ -44,7 +44,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     picDownloadCheckBox = new QCheckBox;
     picDownloadCheckBox->setChecked(settingsCache->getPicDownload());
     
-    QPushButton *clearDownloadedPicsButton = new QPushButton(tr("Reset/Clear Downloaded Pictures"));
+    clearDownloadedPicsButton = new QPushButton();
     connect(clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
 
     picDownloadHqCheckBox = new QCheckBox;
@@ -239,6 +239,7 @@ void GeneralSettingsPage::retranslateUi()
     cardDatabasePathLabel->setText(tr("Card database:"));
     tokenDatabasePathLabel->setText(tr("Token database:"));
     pixmapCacheLabel->setText(tr("Picture cache size:"));
+    clearDownloadedPicsButton->setText(tr("Reset/Clear Downloaded Pictures"));
 }
 
 AppearanceSettingsPage::AppearanceSettingsPage()

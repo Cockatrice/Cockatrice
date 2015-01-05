@@ -8,6 +8,7 @@
 #include "pb/context_move_card.pb.h"
 #include "pb/context_mulligan.pb.h"
 #include <QScrollBar>
+#include <QDateTime>
 
 QString MessageLogWidget::sanitizeHtml(QString dirty) const
 {
@@ -797,7 +798,7 @@ void MessageLogWidget::logSetActivePlayer(Player *player)
         str = tr("It is now %1's turn.", "female");
     else
         str = tr("It is now %1's turn.", "male");
-    appendHtml("<br><font color=\"green\"><b>" + str.arg(player->getName()) + "</b></font><br>");
+    appendHtml("<br><font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + str.arg(player->getName()) + "</b></font><br>");
 }
 
 void MessageLogWidget::logSetActivePhase(int phase)
@@ -817,7 +818,7 @@ void MessageLogWidget::logSetActivePhase(int phase)
         case 9: phaseName = tr("second main phase"); break;
         case 10: phaseName = tr("ending phase"); break;
     }
-    appendHtml("<font color=\"green\"><b>" + tr("It is now the %1.").arg(phaseName) + "</b></font>");
+    appendHtml("<font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + tr("It is now the %1.").arg(phaseName) + "</b></font>");
 }
 
 void MessageLogWidget::containerProcessingStarted(const GameEventContext &_context)
@@ -876,6 +877,6 @@ void MessageLogWidget::connectToPlayer(Player *player)
 }
 
 MessageLogWidget::MessageLogWidget(const TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent)
-    : ChatView(_tabSupervisor, _game, false, parent), currentContext(MessageContext_None)
+    : ChatView(_tabSupervisor, _game, true, parent), currentContext(MessageContext_None)
 {
 }

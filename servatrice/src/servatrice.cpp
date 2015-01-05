@@ -108,7 +108,11 @@ void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
     QMetaObject::invokeMethod(ssi, "initConnection", Qt::QueuedConnection, Q_ARG(int, socketDescriptor));
 }
 
+#if QT_VERSION < 0x050000
 void Servatrice_IslServer::incomingConnection(int socketDescriptor)
+#else
+void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
+#endif
 {
     QThread *thread = new QThread;
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));

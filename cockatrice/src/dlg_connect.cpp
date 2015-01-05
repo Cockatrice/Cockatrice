@@ -75,6 +75,7 @@ DlgConnect::DlgConnect(QWidget *parent)
 
 void DlgConnect::passwordSaved(int state)
 {
+    Q_UNUSED(state);
     if(savePasswordCheckBox->isChecked()) {
        autoConnectCheckBox->setEnabled(true);
     } else {
