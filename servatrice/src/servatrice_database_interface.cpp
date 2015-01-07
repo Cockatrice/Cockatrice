@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QDateTime>
 
 Servatrice_DatabaseInterface::Servatrice_DatabaseInterface(int _instanceId, Servatrice *_server)
 	: instanceId(_instanceId),
@@ -283,6 +284,12 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
 	const QString realName = query.value(3).toString();
 	if (!realName.isEmpty())
 		result.set_real_name(realName.toStdString());
+
+    const QDateTime regDate = query.value(7).toDateTime();
+    if(!regDate.toString(Qt::ISODate).isEmpty()) {
+        qint64 accountAgeInSeconds = regDate.secsTo(QDateTime::currentDateTime());
+        result.set_accountage_secs(accountAgeInSeconds);
+    }
 	
 	return result;
 }
@@ -298,7 +305,7 @@ ServerInfo_User Servatrice_DatabaseInterface::getUserData(const QString &name, b
 			return result;
 		
 		QSqlQuery query(sqlDatabase);
-		query.prepare("select id, name, admin, realname, gender, country, avatar_bmp from " + server->getDbPrefix() + "_users where name = :name and active = 1");
+		query.prepare("select id, name, admin, realname, gender, country, avatar_bmp, registrationDate from " + server->getDbPrefix() + "_users where name = :name and active = 1");
 		query.bindValue(":name", name);
 		if (!execSqlQuery(query))
 			return result;
