@@ -90,15 +90,11 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     qreal scaleFactor = translatedSize.width() / boundingRect().width();
     
     CardInfo *imageSource = facedown ? db->getCard() : info;
-    QPixmap *translatedPixmap = imageSource->getPixmap(translatedSize.toSize());
+    QPixmap translatedPixmap;
+    imageSource->getPixmap(translatedSize.toSize(), translatedPixmap);
     painter->save();
     QColor bgColor = Qt::transparent;
-    if (translatedPixmap) {
-        painter->save();
-        transformPainter(painter, translatedSize, angle);
-        painter->drawPixmap(QPointF(0, 0), *translatedPixmap);
-        painter->restore();
-    } else {
+    if (translatedPixmap.isNull()) {
         QString colorStr;
         if (!color.isEmpty())
             colorStr = color;
@@ -121,6 +117,11 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
             bgColor = QColor(250, 190, 30);
         else
             bgColor = QColor(230, 230, 230);
+    } else {
+        painter->save();
+        transformPainter(painter, translatedSize, angle);
+        painter->drawPixmap(QPointF(0, 0), translatedPixmap);
+        painter->restore();
     }
     painter->setBrush(bgColor);
     QPen pen(Qt::black);
@@ -128,7 +129,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     painter->setPen(pen);
     painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 2));
     
-    if (!translatedPixmap || settingsCache->getDisplayCardNames() || facedown) {
+    if (translatedPixmap.isNull() || settingsCache->getDisplayCardNames() || facedown) {
         painter->save();
         transformPainter(painter, translatedSize, angle);
         painter->setPen(Qt::white);

@@ -390,9 +390,10 @@ CardInfo::CardInfo(CardDatabase *_db,
       customPicURLsHq(_customPicURLsHq),
       muIds(_muIds),
       cipt(_cipt),
-      tableRow(_tableRow),
-      pixmap(NULL)
+      tableRow(_tableRow)
 {
+    pixmapCacheKey = QLatin1String("card_") + name;
+
     for (int i = 0; i < sets.size(); i++)
         sets[i]->append(this);
 }
@@ -446,72 +447,67 @@ void CardInfo::addToSet(CardSet *set)
     sets << set;
 }
 
-QPixmap *CardInfo::loadPixmap()
+void CardInfo::loadPixmap(QPixmap &pixmap)
 {
-    if (pixmap)
-        return pixmap;
-    pixmap = new QPixmap();
+    if(QPixmapCache::find(pixmapCacheKey, &pixmap))
+        return;
+
+    pixmap = QPixmap();
 
     if (getName().isEmpty()) {
-        pixmap->load(settingsCache->getCardBackPicturePath());
-        return pixmap;
+        pixmap.load(settingsCache->getCardBackPicturePath());
+        return;
     }
+
     db->loadImage(this);
-    return pixmap;
 }
 
 void CardInfo::imageLoaded(const QImage &image)
 {
     if (!image.isNull()) {
-        *pixmap = QPixmap::fromImage(image);
+        QPixmapCache::insert(pixmapCacheKey, QPixmap::fromImage(image));
         emit pixmapUpdated();
     }
 }
 
-QPixmap *CardInfo::getPixmap(QSize size)
+void CardInfo::getPixmap(QSize size, QPixmap &pixmap)
 {
-    QPixmap *cachedPixmap = scaledPixmapCache.value(size.width());
-    if (cachedPixmap)
-        return cachedPixmap;
-    QPixmap *bigPixmap = loadPixmap();
-    QPixmap *result;
-    if (bigPixmap->isNull()) {
-        if (!getName().isEmpty())
-            return 0;
-        else {
-            result = new QPixmap(size);
-            result->fill(Qt::transparent);
+    QString key = QLatin1String("card_") + name + QLatin1Char('_') + QString::number(size.width());
+    if(QPixmapCache::find(key, &pixmap))
+        return;
+
+    QPixmap bigPixmap;
+    loadPixmap(bigPixmap);
+    if (bigPixmap.isNull()) {
+        if (!getName().isEmpty()) {
+            pixmap = QPixmap(); // null
+            return;
+        } else {
+            pixmap = QPixmap(size);
+            pixmap.fill(Qt::transparent);
             QSvgRenderer svg(QString(":/back.svg"));
-            QPainter painter(result);
+            QPainter painter(&pixmap);
             svg.render(&painter, QRectF(0, 0, size.width(), size.height()));
         }
-    } else
-        result = new QPixmap(bigPixmap->scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-    scaledPixmapCache.insert(size.width(), result);
-    return result;
+    } else {
+        pixmap = bigPixmap.scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    }
+    QPixmapCache::insert(key, pixmap);
 }
 
 void CardInfo::clearPixmapCache()
 {
-    if (pixmap) {
-        qDebug() << "Deleting pixmap for" << name;
-        delete pixmap;
-        pixmap = 0;
-        QMapIterator<int, QPixmap *> i(scaledPixmapCache);
-        while (i.hasNext()) {
-            i.next();
-            qDebug() << "  Deleting cached pixmap for width" << i.key();
-            delete i.value();
-        }
-        scaledPixmapCache.clear();
-    }
+    qDebug() << "Deleting pixmap for" << name;
+    QPixmapCache::remove(pixmapCacheKey);
 }
 
 void CardInfo::clearPixmapCacheMiss()
 {
-    if (!pixmap)
+    QPixmap pixmap;
+    if(!QPixmapCache::find(pixmapCacheKey, &pixmap))
         return;
-    if (pixmap->isNull())
+
+    if (pixmap.isNull())
         clearPixmapCache();
 }
 
@@ -519,8 +515,9 @@ void CardInfo::updatePixmapCache()
 {
     qDebug() << "Updating pixmap cache for" << name;
     clearPixmapCache();
-    loadPixmap();
-    
+    QPixmap tmp;
+    loadPixmap(tmp);
+
     emit pixmapUpdated();
 }
 
@@ -609,7 +606,8 @@ CardDatabase::CardDatabase(QObject *parent)
     pictureLoaderThread->start(QThread::LowPriority);
 
     noCard = new CardInfo(this);
-    noCard->loadPixmap(); // cache pixmap for card back
+    QPixmap tmp;
+    noCard->loadPixmap(tmp); // cache pixmap for card back
     connect(settingsCache, SIGNAL(cardBackPicturePathChanged()), noCard, SLOT(updatePixmapCache()));
 }
 
@@ -954,8 +952,9 @@ QStringList CardDatabase::getAllMainCardTypes() const
 
 void CardDatabase::cacheCardPixmaps(const QStringList &cardNames)
 {
+    QPixmap tmp;
     for (int i = 0; i < cardNames.size(); ++i)
-        getCard(cardNames[i])->loadPixmap();
+        getCard(cardNames[i])->loadPixmap(tmp);
 }
 
 void CardDatabase::loadImage(CardInfo *card)

@@ -7,6 +7,8 @@
 #define PIC_URL_FALLBACK "http://mtgimage.com/set/!setcode!/!name!.jpg"
 #define PIC_URL_HQ_DEFAULT "http://mtgimage.com/multiverseid/!cardid!.jpg"
 #define PIC_URL_HQ_FALLBACK "http://mtgimage.com/set/!setcode!/!name!.jpg"
+// size should be a multiple of 64
+#define PIXMAPCACHE_SIZE_DEFAULT 256
 
 class QSettings;
 
@@ -32,6 +34,7 @@ signals:
     void soundPathChanged();
     void priceTagFeatureChanged(int enabled);
     void ignoreUnregisteredUsersChanged();
+    void pixmapCacheSizeChanged(int newSizeInMBs);
 private:
     QSettings *settings;
 
@@ -62,6 +65,7 @@ private:
     QString picUrlFallback;
     QString picUrlHqFallback;
     bool attemptAutoConnect;
+    int pixmapCacheSize;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -101,6 +105,7 @@ public:
     QString getPicUrlHqFallback() const { return picUrlHqFallback; }
     void copyPath(const QString &src, const QString &dst);
     bool getAutoConnect() const { return attemptAutoConnect; }
+    int getPixmapCacheSize() const { return pixmapCacheSize; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -138,6 +143,7 @@ public slots:
     void setPicUrlFallback(const QString &_picUrlFallback);
     void setPicUrlHqFallback(const QString &_picUrlHqFallback);
     void setAutoConnect(const bool &_autoConnect);
+    void setPixmapCacheSize(const int _pixmapCacheSize);
 };
 
 extern SettingsCache *settingsCache;

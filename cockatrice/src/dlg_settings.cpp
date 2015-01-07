@@ -50,16 +50,27 @@ GeneralSettingsPage::GeneralSettingsPage()
     picDownloadHqCheckBox = new QCheckBox;
     picDownloadHqCheckBox->setChecked(settingsCache->getPicDownloadHq());
 
+    pixmapCacheLabel = new QLabel;
+    pixmapCacheEdit = new QSpinBox;
+    pixmapCacheEdit->setMinimum(64);
+    pixmapCacheEdit->setMaximum(8192);
+    pixmapCacheEdit->setSingleStep(64);
+    pixmapCacheEdit->setValue(settingsCache->getPixmapCacheSize());
+    pixmapCacheEdit->setSuffix(" MB");
+
     connect(languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
     connect(picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
     connect(picDownloadHqCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownloadHq(int)));
+    connect(pixmapCacheEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPixmapCacheSize(int)));
 
     QGridLayout *personalGrid = new QGridLayout;
     personalGrid->addWidget(languageLabel, 0, 0);
     personalGrid->addWidget(languageBox, 0, 1);
-    personalGrid->addWidget(picDownloadCheckBox, 1, 0, 1, 2);
-    personalGrid->addWidget(picDownloadHqCheckBox, 2, 0, 1, 2);
-    personalGrid->addWidget(clearDownloadedPicsButton, 3, 0, 1, 1);
+    personalGrid->addWidget(pixmapCacheLabel, 1, 0, 1, 1);
+    personalGrid->addWidget(pixmapCacheEdit, 1, 1, 1, 1);
+    personalGrid->addWidget(picDownloadCheckBox, 2, 0, 1, 2);
+    personalGrid->addWidget(picDownloadHqCheckBox, 3, 0, 1, 2);
+    personalGrid->addWidget(clearDownloadedPicsButton, 4, 0, 1, 1);
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
@@ -227,6 +238,7 @@ void GeneralSettingsPage::retranslateUi()
     picsPathLabel->setText(tr("Pictures directory:"));
     cardDatabasePathLabel->setText(tr("Card database:"));
     tokenDatabasePathLabel->setText(tr("Token database:"));
+    pixmapCacheLabel->setText(tr("Picture cache size:"));
     clearDownloadedPicsButton->setText(tr("Reset/Clear Downloaded Pictures"));
 }
 

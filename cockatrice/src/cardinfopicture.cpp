@@ -41,13 +41,14 @@ void CardInfoPicture::updatePixmap()
         return;
     }
 
-    QPixmap *resizedPixmap = info->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio));
-    if (resizedPixmap) {
-        setNoPicture(false);
-        this->setPixmap(*resizedPixmap);
-    }
-    else {
+    QPixmap resizedPixmap;
+    info->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio), resizedPixmap);
+
+    if (resizedPixmap.isNull()) {
         setNoPicture(true);
-        this->setPixmap(*(db->getCard()->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio))));
+        db->getCard()->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio), resizedPixmap);
+    } else {
+        setNoPicture(false);
     }
+    this->setPixmap(resizedPixmap);
 }
