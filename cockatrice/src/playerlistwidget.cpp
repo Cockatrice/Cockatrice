@@ -77,6 +77,8 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient
     setColumnWidth(5, 20);
     setHeaderHidden(true);
     setRootIsDecorated(false);
+    setUniformRowHeights(true);
+    setItemsExpandable(false);
     retranslateUi();
 }
 
@@ -91,6 +93,8 @@ void PlayerListWidget::addPlayer(const ServerInfo_PlayerProperties &player)
     updatePlayerProperties(player);
     addTopLevelItem(newPlayer);
     sortItems(1, Qt::AscendingOrder);
+    resizeColumnToContents(4);
+    resizeColumnToContents(5);
 }
 
 void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties &prop, int playerId)
@@ -116,7 +120,6 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
         player->setData(3, Qt::UserRole, prop.user_info().user_level());
         player->setIcon(3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(prop.user_info().user_level()))));
         player->setText(4, QString::fromStdString(prop.user_info().name()));
-	resizeColumnToContents(4);
         const QString country = QString::fromStdString(prop.user_info().country());
         if (!country.isEmpty())
             player->setIcon(4, QIcon(CountryPixmapGenerator::generatePixmap(12, country)));
@@ -126,7 +129,6 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
         player->setData(4, Qt::UserRole + 1, prop.player_id());
     if (prop.has_deck_hash()) {
         player->setText(5, QString::fromStdString(prop.deck_hash()));
-	resizeColumnToContents(5);
     }
     if (prop.has_sideboard_locked())
         player->setIcon(5, prop.sideboard_locked() ? lockIcon : QIcon());
