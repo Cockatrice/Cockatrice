@@ -52,6 +52,8 @@ public:
 	bool userSessionExists(const QString &userName);
 
 	bool getRequireRegistration();
+
+    void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage, LogMessage_TargetType targetType, const int targetId, const QString &targetName);
 };
 
 #endif

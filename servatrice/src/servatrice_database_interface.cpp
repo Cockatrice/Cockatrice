@@ -538,3 +538,44 @@ DeckList *Servatrice_DatabaseInterface::getDeckFromDatabase(int deckId, int user
 	
 	return deck;
 }
+
+void Servatrice_DatabaseInterface::logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage, LogMessage_TargetType targetType, const int targetId, const QString &targetName)
+{
+		QSqlQuery query(sqlDatabase);
+		QString targetTypeString;
+		switch(targetType)
+		{
+			case MessageTargetRoom:
+				if(!settingsCache->value("logging/log_user_msg_room", 0).toBool())
+					return;
+				targetTypeString = "room";
+				break;
+			case MessageTargetGame:
+				if(!settingsCache->value("logging/log_user_msg_game", 0).toBool())
+					return;
+				targetTypeString = "game";
+				break;
+			case MessageTargetChat:
+				if(!settingsCache->value("logging/log_user_msg_chat", 0).toBool())
+					return;
+				targetTypeString = "chat";
+				break;
+			case MessageTargetIslRoom:
+				if(!settingsCache->value("logging/log_user_msg_isl", 0).toBool())
+					return;
+				targetTypeString = "room";
+				break;
+			default:
+				return;
+		}
+
+		query.prepare("insert into " + server->getDbPrefix() + "_log (log_time, sender_id, sender_name, sender_ip, log_message, target_type, target_id, target_name) values (now(), :sender_id, :sender_name, :sender_ip, :log_message, :target_type, :target_id, :target_name)");
+		query.bindValue(":sender_id", senderId < 1 ? QVariant() : senderId);
+		query.bindValue(":sender_name", senderName);
+		query.bindValue(":sender_ip", senderIp);
+		query.bindValue(":log_message", logMessage);
+		query.bindValue(":target_type", targetTypeString);
+		query.bindValue(":target_id", (targetType == MessageTargetChat && targetId < 1) ? QVariant() : targetId);
+		query.bindValue(":target_name", targetName);
+		execSqlQuery(query);
+}

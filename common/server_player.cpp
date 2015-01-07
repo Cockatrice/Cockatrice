@@ -767,6 +767,8 @@ Response::ResponseCode Server_Player::cmdGameSay(const Command_GameSay &cmd, Res
     Event_GameSay event;
     event.set_message(cmd.message());
     ges.enqueueGameEvent(event, playerId);
+
+    game->getRoom()->getServer()->getDatabaseInterface()->logMessage(userInfo->id(), QString::fromStdString(userInfo->name()), QString::fromStdString(userInfo->address()), QString::fromStdString(cmd.message()), Server_DatabaseInterface::MessageTargetGame, game->getGameId(), game->getDescription());
     
     return Response::RespOk;
 }

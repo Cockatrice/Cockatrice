@@ -345,6 +345,8 @@ void Server::externalRoomSay(int roomId, const QString &userName, const QString 
         return;
     }
     room->say(userName, message, false);
+
+    getDatabaseInterface()->logMessage(0, userName, "ISL", message, Server_DatabaseInterface::MessageTargetIslRoom, room->getId(), room->getName());
 }
 
 void Server::externalRoomGameListChanged(int roomId, const ServerInfo_Game &gameInfo)
