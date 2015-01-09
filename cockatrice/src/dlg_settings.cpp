@@ -493,6 +493,10 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     tapAnimationCheckBox = new QCheckBox;
     tapAnimationCheckBox->setChecked(settingsCache->getTapAnimation());
     connect(tapAnimationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setTapAnimation(int)));
+
+    chatMentionCheckBox = new QCheckBox;
+    chatMentionCheckBox->setChecked(settingsCache->getChatMention());
+    connect(chatMentionCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMention(int)));
     
     soundEnabledCheckBox = new QCheckBox;
     soundEnabledCheckBox->setChecked(settingsCache->getSoundEnabled());
@@ -525,9 +529,16 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     animationGroupBox = new QGroupBox;
     animationGroupBox->setLayout(animationGrid);
 
+    QGridLayout *chatGrid = new QGridLayout;
+    chatGrid->addWidget(chatMentionCheckBox, 0, 0);
+
+    chatGroupBox = new QGroupBox;
+    chatGroupBox->setLayout(chatGrid);
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(generalGroupBox);
     mainLayout->addWidget(animationGroupBox);
+    mainLayout->addWidget(chatGroupBox);
     mainLayout->addWidget(soundGroupBox);
     
     setLayout(mainLayout);
@@ -540,7 +551,9 @@ void UserInterfaceSettingsPage::retranslateUi()
     doubleClickToPlayCheckBox->setText(tr("&Double-click cards to play them (instead of single-click)"));
     playToStackCheckBox->setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
     animationGroupBox->setTitle(tr("Animation settings"));
+    chatGroupBox->setTitle(tr("Chat settings"));
     tapAnimationCheckBox->setText(tr("&Tap/untap animation"));
+    chatMentionCheckBox->setText(tr("Enable chat mentions ('@yourusername' in chat log will be highlighted)"));
     soundEnabledCheckBox->setText(tr("Enable &sounds"));
     soundPathLabel->setText(tr("Path to sounds directory:"));
     soundTestButton->setText(tr("Test system sound engine"));

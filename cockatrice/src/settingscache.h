@@ -51,6 +51,7 @@ private:
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
     bool tapAnimation;
+    bool chatMention;
     bool zoneViewSortByName, zoneViewSortByType;
     bool soundEnabled;
     QString soundPath;
@@ -88,6 +89,7 @@ public:
     bool getInvertVerticalCoordinate() const { return invertVerticalCoordinate; }
     int getMinPlayersForMultiColumnLayout() const { return minPlayersForMultiColumnLayout; }
     bool getTapAnimation() const { return tapAnimation; }
+    bool getChatMention()  const { return chatMention; }
     bool getZoneViewSortByName() const { return zoneViewSortByName; }
     bool getZoneViewSortByType() const { return zoneViewSortByType; }
     bool getSoundEnabled() const { return soundEnabled; }
@@ -126,6 +128,7 @@ public slots:
     void setInvertVerticalCoordinate(int _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
     void setTapAnimation(int _tapAnimation);
+    void setChatMention(int _chatMention);
     void setZoneViewSortByName(int _zoneViewSortByName);
     void setZoneViewSortByType(int _zoneViewSortByType);
     void setSoundEnabled(int _soundEnabled);

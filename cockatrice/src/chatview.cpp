@@ -8,6 +8,8 @@
 #include "user_context_menu.h"
 #include "tab_supervisor.h"
 #include "pixmapgenerator.h"
+#include "settingscache.h"
+#include "main.h"
 
 ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent)
     : QTextBrowser(parent), tabSupervisor(_tabSupervisor), game(_game), evenNumber(true), showTimestamps(_showTimestamps), hoveredItemType(HoveredNothing)
@@ -102,7 +104,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     QTextCharFormat senderFormat;
     if (tabSupervisor && tabSupervisor->getUserInfo() && (sender == QString::fromStdString(tabSupervisor->getUserInfo()->name()))) {
         senderFormat.setFontWeight(QFont::Bold);
-        senderFormat.setForeground(Qt::red);
+        senderFormat.setForeground(QBrush(QColor(113, 43, 43)));
     } else {
         senderFormat.setForeground(Qt::blue);
         if (playerBold)
@@ -168,8 +170,17 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
         } else
             from = 1;
     }
+
+    QTextCharFormat charFormat;
+    if (settingsCache->getChatMention()) {
+        if (message.toLower().contains("@" + QString::fromStdString(tabSupervisor->getUserInfo()->name()).toLower())) {
+            charFormat.setFontWeight(QFont::Bold);
+            charFormat.setForeground(QBrush(QColor(113, 43, 43)));
+        } 
+    }
+
     if (!message.isEmpty())
-        cursor.insertText(message);
+        cursor.insertText(message, charFormat);
     
     if (atBottom)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());

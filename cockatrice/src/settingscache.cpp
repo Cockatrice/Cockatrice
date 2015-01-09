@@ -39,6 +39,7 @@ SettingsCache::SettingsCache()
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 5).toInt();
     tapAnimation = settings->value("cards/tapanimation", true).toBool();
+    chatMention = settings->value("chat/mention", true).toBool();
 
     zoneViewSortByName = settings->value("zoneview/sortbyname", true).toBool();
     zoneViewSortByType = settings->value("zoneview/sortbytype", true).toBool();
@@ -229,6 +230,11 @@ void SettingsCache::setTapAnimation(int _tapAnimation)
 {
     tapAnimation = _tapAnimation;
     settings->setValue("cards/tapanimation", tapAnimation);
+}
+
+void SettingsCache::setChatMention(int _chatMention) {
+    chatMention = _chatMention;
+    settings->setValue("chat/mention", chatMention);
 }
 
 void SettingsCache::setZoneViewSortByName(int _zoneViewSortByName)
