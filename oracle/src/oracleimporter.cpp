@@ -45,9 +45,8 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
             setType[0] = setType[0].toUpper();
         releaseDate = map.value("releaseDate").toDate();
 
-        // core and expansion sets are marked to be imported by default
-        import = (0 == QString::compare(setType, QString("core"), Qt::CaseInsensitive) ||
-            0 == QString::compare(setType, QString("expansion"), Qt::CaseInsensitive));
+        // all are marked to be imported by default
+        import = true;
 
         newSetList.append(SetToDownload(edition, editionLong, editionCards, import, setType, releaseDate));
     }
