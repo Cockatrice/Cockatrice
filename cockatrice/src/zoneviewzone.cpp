@@ -5,6 +5,7 @@
 #include "player.h"
 #include "carddragitem.h"
 #include "carditem.h"
+#include "carddatabase.h"
 #include "pb/command_dump_zone.pb.h"
 #include "pb/command_move_card.pb.h"
 #include "pb/serverinfo_card.pb.h"
@@ -102,18 +103,52 @@ void ZoneViewZone::reorganizeCards()
     CardList cardsToDisplay(cards);
     if (sortByName || sortByType)
         cardsToDisplay.sort((sortByName ? CardList::SortByName : 0) | (sortByType ? CardList::SortByType : 0));
+
+    int typeColumn = 0;
+    int longestRow = 0;
+    if (pileView && sortByType) // we need sort by type enabled for the feature to work
+        setPileViewPositions(cardCount, cardsToDisplay, typeColumn, longestRow);
+    else {
+        for (int i = 0; i < cardCount; i++) {
+            CardItem *c = cardsToDisplay.at(i);
+            qreal x = (i / rows) * CARD_WIDTH;
+            qreal y = (i % rows) * CARD_HEIGHT / 3;
+            c->setPos(x + 5, y + 5);
+            c->setRealZValue(i);
+        }
+    }
     
+    if (pileView && sortByType)
+        optimumRect = QRectF(0, 0, qMax(typeColumn + 1, 3) * CARD_WIDTH + 20, ((longestRow - 1) * CARD_HEIGHT) / 3 + CARD_HEIGHT + 60);
+    else 
+        optimumRect = QRectF(0, 0, qMax(cols, 1) * CARD_WIDTH + 20, ((rows - 1) * CARD_HEIGHT) / 3 + CARD_HEIGHT + 20);
+    updateGeometry();
+    emit optimumRectChanged();
+}
+
+void ZoneViewZone::setPileViewPositions(int cardCount, CardList &cardsToDisplay, int &typeColumn, int &longestRow){
+    int typeRow = 0;
+    bool cardTypeMatch = true;
     for (int i = 0; i < cardCount; i++) {
         CardItem *c = cardsToDisplay.at(i);
-        qreal x = (i / rows) * CARD_WIDTH;
-        qreal y = (i % rows) * CARD_HEIGHT / 3;
+        QString cardType = c->getInfo()->getMainCardType();
+
+        if (i){
+            // last card and this card have a matching main type?
+            cardTypeMatch = cardType.compare(cardsToDisplay.at(i-1)->getInfo()->getMainCardType()) == 0 ? true : false;
+            if (!cardTypeMatch) { // if no match then move card to next column
+                typeColumn++;
+                longestRow = qMax(typeRow, longestRow);
+                typeRow = 0;
+            } else // add below current card
+                typeRow++;
+        }
+
+        qreal x = typeColumn * CARD_WIDTH;
+        qreal y = typeRow * CARD_HEIGHT / 3;
         c->setPos(x + 5, y + 5);
         c->setRealZValue(i);
     }
-
-    optimumRect = QRectF(0, 0, qMax(cols, 3) * CARD_WIDTH + 10, ((rows - 1) * CARD_HEIGHT) / 3 + CARD_HEIGHT + 10);
-    updateGeometry();
-    emit optimumRectChanged();
 }
 
 void ZoneViewZone::setSortByName(int _sortByName)
@@ -125,6 +160,13 @@ void ZoneViewZone::setSortByName(int _sortByName)
 void ZoneViewZone::setSortByType(int _sortByType)
 {
     sortByType = _sortByType;
+    if (!sortByType)
+        pileView = false;
+    reorganizeCards();
+}
+
+void ZoneViewZone::setPileView(int _pileView) {
+    pileView = _pileView;
     reorganizeCards();
 }
 

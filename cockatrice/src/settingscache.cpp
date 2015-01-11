@@ -44,6 +44,8 @@ SettingsCache::SettingsCache()
 
     zoneViewSortByName = settings->value("zoneview/sortbyname", true).toBool();
     zoneViewSortByType = settings->value("zoneview/sortbytype", true).toBool();
+    zoneViewPileView = settings->value("zoneview/pileview", true).toBool();
+    zoneViewShuffle = settings->value("zoneview/shuffle", true).toBool();
 
     soundEnabled = settings->value("sound/enabled", false).toBool();
     soundPath = settings->value("sound/path").toString();
@@ -248,6 +250,16 @@ void SettingsCache::setZoneViewSortByType(int _zoneViewSortByType)
 {
     zoneViewSortByType = _zoneViewSortByType;
     settings->setValue("zoneview/sortbytype", zoneViewSortByType);
+}
+
+void SettingsCache::setZoneViewPileView(int _zoneViewPileView){
+    zoneViewPileView = _zoneViewPileView;
+    settings->setValue("zoneview/pileview", zoneViewPileView);
+}
+
+void SettingsCache::setZoneViewShuffle(int _zoneViewShuffle) {
+    zoneViewShuffle = _zoneViewShuffle;
+    settings->setValue("zoneview/shuffle", zoneViewShuffle);
 }
 
 void SettingsCache::setSoundEnabled(int _soundEnabled)

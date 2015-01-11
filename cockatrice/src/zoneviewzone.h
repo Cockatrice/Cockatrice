@@ -19,12 +19,17 @@ private:
     CardZone *origZone;
     bool revealZone, writeableRevealZone;
     bool sortByName, sortByType;
+    bool pileView;
 public:
     ZoneViewZone(Player *_p, CardZone *_origZone, int _numberCards = -1, bool _revealZone = false, bool _writeableRevealZone = false, QGraphicsItem *parent = 0);
     ~ZoneViewZone();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void reorganizeCards();
+
+    void setPileViewPositions(int cardCount, CardList &cardsToDisplay, int &typeColumn, int &longestRow);
+    
+
     void initializeCards(const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>());
     void removeCard(int position);
     int getNumberCards() const { return numberCards; }
@@ -36,6 +41,7 @@ public:
 public slots:
     void setSortByName(int _sortByName);
     void setSortByType(int _sortByType);
+    void setPileView(int _pileView);
 private slots:
     void zoneDumpReceived(const Response &r);
 signals:
