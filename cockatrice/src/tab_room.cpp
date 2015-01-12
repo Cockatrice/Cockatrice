@@ -53,6 +53,9 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     aIgnoreUnregisteredUsers = chatSettingsMenu->addAction(QString());
     aIgnoreUnregisteredUsers->setCheckable(true);
     connect(aIgnoreUnregisteredUsers, SIGNAL(triggered()), this, SLOT(actIgnoreUnregisteredUsers()));
+    chatSettingsMenu->addSeparator();
+    aClearChat = chatSettingsMenu->addAction(QString());
+    connect(aClearChat, SIGNAL(triggered()), this, SLOT(actClearChat()));
     connect(settingsCache, SIGNAL(ignoreUnregisteredUsersChanged()), this, SLOT(ignoreUnregisteredUsersChanged()));    
     QToolButton *chatSettingsButton = new QToolButton;
     chatSettingsButton->setIcon(QIcon(":/resources/icon_settings.svg"));
@@ -114,6 +117,7 @@ void TabRoom::retranslateUi()
     roomMenu->setTitle(tr("&Room"));
     aLeaveRoom->setText(tr("&Leave room"));
     aIgnoreUnregisteredUsers->setText(tr("&Ignore unregistered users in chat"));
+    aClearChat->setText(tr("&Clear chat"));
 }
 
 void TabRoom::closeRequest()
@@ -170,6 +174,10 @@ void TabRoom::actIgnoreUnregisteredUsers()
 void TabRoom::ignoreUnregisteredUsersChanged()
 {
     aIgnoreUnregisteredUsers->setChecked(settingsCache->getIgnoreUnregisteredUsers());
+}
+
+void TabRoom::actClearChat() {
+    chatView->clearChat();
 }
 
 void TabRoom::processRoomEvent(const RoomEvent &event)
