@@ -2,6 +2,7 @@
 #define USERINFOBOX_H
 
 #include <QWidget>
+#include <QLabel>
 
 class QLabel;
 class ServerInfo_User;
@@ -13,7 +14,8 @@ class UserInfoBox : public QWidget {
 private:
     AbstractClient *client;
     bool fullInfo;
-    QLabel *avatarLabel, *nameLabel, *realNameLabel1, *realNameLabel2, *genderLabel1, *genderLabel2, *countryLabel1, *countryLabel2, *userLevelLabel1, *userLevelLabel2, *userLevelLabel3;
+    QLabel avatarLabel, nameLabel, realNameLabel1, realNameLabel2, genderLabel1, genderLabel2, countryLabel1, 
+        countryLabel2, userLevelLabel1, userLevelLabel2, userLevelLabel3, accountAgeLebel1, accountAgeLabel2;
 public:
     UserInfoBox(AbstractClient *_client, bool fullInfo, QWidget *parent = 0, Qt::WindowFlags flags = 0);
     void retranslateUi();
