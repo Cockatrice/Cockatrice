@@ -91,10 +91,11 @@ private:
     QCheckBox *doubleClickToPlayCheckBox;
     QCheckBox *playToStackCheckBox;
     QCheckBox *tapAnimationCheckBox;
+    QCheckBox *chatMentionCheckBox;
     QCheckBox *soundEnabledCheckBox;
     QLabel *soundPathLabel;
     QLineEdit *soundPathEdit;
-    QGroupBox *generalGroupBox, *animationGroupBox, *soundGroupBox;
+    QGroupBox *generalGroupBox, *animationGroupBox, *soundGroupBox, *chatGroupBox;
     QPushButton *soundTestButton;
 public:
     UserInterfaceSettingsPage();
