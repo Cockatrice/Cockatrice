@@ -175,6 +175,10 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }
 
+void ChatView::clearChat() {
+    document()->clear();
+}
+
 void ChatView::enterEvent(QEvent * /*event*/)
 {
     setMouseTracking(true);
