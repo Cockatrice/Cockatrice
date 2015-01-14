@@ -569,6 +569,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     soundEnabledCheckBox->setText(tr("Enable &sounds"));
     soundPathLabel->setText(tr("Path to sounds directory:"));
     soundTestButton->setText(tr("Test system sound engine"));
+    soundGroupBox->setTitle(tr("Sound settings"));
 }
 
 void UserInterfaceSettingsPage::soundPathClearButtonClicked()
