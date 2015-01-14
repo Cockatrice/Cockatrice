@@ -505,10 +505,6 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     tapAnimationCheckBox = new QCheckBox;
     tapAnimationCheckBox->setChecked(settingsCache->getTapAnimation());
     connect(tapAnimationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setTapAnimation(int)));
-
-    chatMentionCheckBox = new QCheckBox;
-    chatMentionCheckBox->setChecked(settingsCache->getChatMention());
-    connect(chatMentionCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMention(int)));
     
     soundEnabledCheckBox = new QCheckBox;
     soundEnabledCheckBox->setChecked(settingsCache->getSoundEnabled());
@@ -541,16 +537,11 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     animationGroupBox = new QGroupBox;
     animationGroupBox->setLayout(animationGrid);
 
-    QGridLayout *chatGrid = new QGridLayout;
-    chatGrid->addWidget(chatMentionCheckBox, 0, 0);
-
-    chatGroupBox = new QGroupBox;
-    chatGroupBox->setLayout(chatGrid);
+   
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(generalGroupBox);
     mainLayout->addWidget(animationGroupBox);
-    mainLayout->addWidget(chatGroupBox);
     mainLayout->addWidget(soundGroupBox);
     
     setLayout(mainLayout);
@@ -563,9 +554,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     doubleClickToPlayCheckBox->setText(tr("&Double-click cards to play them (instead of single-click)"));
     playToStackCheckBox->setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
     animationGroupBox->setTitle(tr("Animation settings"));
-    chatGroupBox->setTitle(tr("Chat settings"));
     tapAnimationCheckBox->setText(tr("&Tap/untap animation"));
-    chatMentionCheckBox->setText(tr("Enable chat mentions ('@yourusername' in chat log will be highlighted)"));
     soundEnabledCheckBox->setText(tr("Enable &sounds"));
     soundPathLabel->setText(tr("Path to sounds directory:"));
     soundTestButton->setText(tr("Test system sound engine"));
@@ -624,26 +613,43 @@ void DeckEditorSettingsPage::radioPriceTagSourceClicked(bool checked)
 
 MessagesSettingsPage::MessagesSettingsPage()
 {
-    aAdd = new QAction(this);
-    connect(aAdd, SIGNAL(triggered()), this, SLOT(actAdd()));
-    aRemove = new QAction(this);
-    connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemove()));
-    
-    messageList = new QListWidget;
-    QToolBar *messageToolBar = new QToolBar;
-    messageToolBar->setOrientation(Qt::Vertical);
-    messageToolBar->addAction(aAdd);
-    messageToolBar->addAction(aRemove);
+
+    chatMentionCheckBox = new QCheckBox;
+    chatMentionCheckBox->setChecked(settingsCache->getChatMention());
+    connect(chatMentionCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMention(int)));
+    QGridLayout *chatGrid = new QGridLayout;
+    chatGrid->addWidget(chatMentionCheckBox, 0, 0);
+    chatGroupBox = new QGroupBox;
+    chatGroupBox->setLayout(chatGrid);
 
     QSettings settings;
+    messageList = new QListWidget;
     settings.beginGroup("messages");
     int count = settings.value("count", 0).toInt();
     for (int i = 0; i < count; i++)
         messageList->addItem(settings.value(QString("msg%1").arg(i)).toString());
     
-    QHBoxLayout *mainLayout = new QHBoxLayout;
-    mainLayout->addWidget(messageList);
-    mainLayout->addWidget(messageToolBar);
+    aAdd = new QAction(this);
+    connect(aAdd, SIGNAL(triggered()), this, SLOT(actAdd()));
+    aRemove = new QAction(this);
+    connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemove()));
+
+    QToolBar *messageToolBar = new QToolBar;
+    messageToolBar->setOrientation(Qt::Vertical);
+    messageToolBar->addAction(aAdd);
+    messageToolBar->addAction(aRemove);
+
+    QHBoxLayout *messageListLayout = new QHBoxLayout;
+    messageListLayout->addWidget(messageList);
+    messageListLayout->addWidget(messageToolBar);
+
+    messageShortcuts = new QGroupBox;
+    messageShortcuts->setLayout(messageListLayout);
+    
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+     
+    mainLayout->addWidget(messageShortcuts);
+    mainLayout->addWidget(chatGroupBox);
 
     setLayout(mainLayout);
     
@@ -681,6 +687,9 @@ void MessagesSettingsPage::retranslateUi()
 {
     aAdd->setText(tr("&Add"));
     aRemove->setText(tr("&Remove"));
+    chatGroupBox->setTitle(tr("Chat settings"));
+    chatMentionCheckBox->setText(tr("Enable chat mentions ('@yourusername' in chat log will be highlighted)"));
+    messageShortcuts->setTitle(tr("In-game message macros"));
 }
 
 DlgSettings::DlgSettings(QWidget *parent)
@@ -851,7 +860,7 @@ void DlgSettings::retranslateUi()
     appearanceButton->setText(tr("Appearance"));
     userInterfaceButton->setText(tr("User interface"));
     deckEditorButton->setText(tr("Deck editor"));
-    messagesButton->setText(tr("Messages"));
+    messagesButton->setText(tr("Chat Settings"));
     
     for (int i = 0; i < pagesWidget->count(); i++)
         dynamic_cast<AbstractSettingsPage *>(pagesWidget->widget(i))->retranslateUi();

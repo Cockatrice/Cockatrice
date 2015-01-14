@@ -91,11 +91,10 @@ private:
     QCheckBox *doubleClickToPlayCheckBox;
     QCheckBox *playToStackCheckBox;
     QCheckBox *tapAnimationCheckBox;
-    QCheckBox *chatMentionCheckBox;
     QCheckBox *soundEnabledCheckBox;
     QLabel *soundPathLabel;
     QLineEdit *soundPathEdit;
-    QGroupBox *generalGroupBox, *animationGroupBox, *soundGroupBox, *chatGroupBox;
+    QGroupBox *generalGroupBox, *animationGroupBox, *soundGroupBox;
     QPushButton *soundTestButton;
 public:
     UserInterfaceSettingsPage();
@@ -128,7 +127,10 @@ private slots:
 private:
     QListWidget *messageList;
     QAction *aAdd, *aRemove;
-    
+    QCheckBox *chatMentionCheckBox;
+    QGroupBox *chatGroupBox;
+    QGroupBox *messageShortcuts;
+
     void storeSettings();
 };
 
