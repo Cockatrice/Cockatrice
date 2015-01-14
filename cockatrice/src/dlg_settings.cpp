@@ -690,11 +690,11 @@ DlgSettings::DlgSettings(QWidget *parent)
     
     contentsWidget = new QListWidget;
     contentsWidget->setViewMode(QListView::IconMode);
-    contentsWidget->setIconSize(QSize(96, 84));
+    contentsWidget->setIconSize(QSize(58, 50));
     contentsWidget->setMovement(QListView::Static);
-    contentsWidget->setMinimumWidth(130);
-    contentsWidget->setMaximumWidth(150);
-    contentsWidget->setSpacing(12);
+    contentsWidget->setMinimumHeight(85);
+    contentsWidget->setMaximumHeight(85);
+    contentsWidget->setSpacing(5);
     
     pagesWidget = new QStackedWidget;
     pagesWidget->addWidget(new GeneralSettingsPage);
@@ -706,15 +706,15 @@ DlgSettings::DlgSettings(QWidget *parent)
     createIcons();
     contentsWidget->setCurrentRow(0);
     
-    QHBoxLayout *hboxLayout = new QHBoxLayout;
-    hboxLayout->addWidget(contentsWidget);
-    hboxLayout->addWidget(pagesWidget);
+    QVBoxLayout *vboxLayout = new QVBoxLayout;
+    vboxLayout->addWidget(contentsWidget);
+    vboxLayout->addWidget(pagesWidget);
     
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(close()));
     
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(hboxLayout);
+    mainLayout->addLayout(vboxLayout);
     mainLayout->addSpacing(12);
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
