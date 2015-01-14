@@ -15,6 +15,8 @@ Chat with the Cockatrice developers on Gitter. Come here to talk about the appli
 
 [![Build Status](https://travis-ci.org/Cockatrice/Cockatrice.svg?branch=master)](https://travis-ci.org/Cockatrice/Cockatrice)
 
+**Detailed installation instructions are on the Cockatrice wiki under [Installing Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Installing-Cockatrice)**
+
 Dependencies:
 
 - [Qt](http://qt-project.org/) 
