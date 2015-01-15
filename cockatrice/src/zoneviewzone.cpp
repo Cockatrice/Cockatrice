@@ -118,10 +118,12 @@ void ZoneViewZone::reorganizeCards()
         }
     }
     
-    if (pileView && sortByType)
-        optimumRect = QRectF(0, 0, qMax(typeColumn + 1, 3) * CARD_WIDTH + 20, ((longestRow - 1) * CARD_HEIGHT) / 3 + CARD_HEIGHT + 60);
-    else 
-        optimumRect = QRectF(0, 0, qMax(cols, 1) * CARD_WIDTH + 20, ((rows - 1) * CARD_HEIGHT) / 3 + CARD_HEIGHT + 20);
+    qreal aleft = 0;
+    qreal atop = 0;
+    qreal awidth = (pileView && sortByType) ? qMax(typeColumn + 1, 3) * CARD_WIDTH + 20 : qMax(cols, 1) * CARD_WIDTH + 20;
+    qreal aheight = (pileView && sortByType) ? ((longestRow - 1) * CARD_HEIGHT) / 3 + CARD_HEIGHT + 60 : ((rows - 1) * CARD_HEIGHT) / 3 + CARD_HEIGHT + 20;
+    optimumRect = QRectF(aleft, atop, awidth, aheight);
+
     updateGeometry();
     emit optimumRectChanged();
 }
@@ -134,7 +136,7 @@ void ZoneViewZone::setPileViewPositions(int cardCount, CardList &cardsToDisplay,
         QString cardType = c->getInfo()->getMainCardType();
 
         if (i){
-            // last card and this card have a matching main type?
+            // if not the first card. Last card and this card have a matching main type?
             cardTypeMatch = cardType.compare(cardsToDisplay.at(i-1)->getInfo()->getMainCardType()) == 0 ? true : false;
             if (!cardTypeMatch) { // if no match then move card to next column
                 typeColumn++;
