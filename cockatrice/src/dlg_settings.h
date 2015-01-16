@@ -1,7 +1,13 @@
 #ifndef DLG_SETTINGS_H
 #define DLG_SETTINGS_H
 
+#include <QComboBox>
+#include <QCheckBox>
 #include <QDialog>
+#include <QGroupBox>
+#include <QLabel>
+#include <QPushButton>
+#include <QSpinBox>
 
 class CardDatabase;
 class QListWidget;
@@ -39,14 +45,25 @@ private slots:
 private:
     QStringList findQmFiles();
     QString languageName(const QString &qmFile);
-    QLineEdit *deckPathEdit, *replaysPathEdit, *picsPathEdit, *cardDatabasePathEdit, *tokenDatabasePathEdit;
-    QSpinBox *pixmapCacheEdit;
-    QGroupBox *personalGroupBox, *pathsGroupBox;
-    QComboBox *languageBox;
-    QCheckBox *picDownloadCheckBox;
-    QCheckBox *picDownloadHqCheckBox;
-    QLabel *languageLabel, *deckPathLabel, *replaysPathLabel, *picsPathLabel, *cardDatabasePathLabel, *tokenDatabasePathLabel, *pixmapCacheLabel;
-    QPushButton *clearDownloadedPicsButton;
+    QLineEdit *deckPathEdit;
+    QLineEdit *replaysPathEdit;
+    QLineEdit *picsPathEdit;
+    QLineEdit *cardDatabasePathEdit;
+    QLineEdit *tokenDatabasePathEdit;
+    QSpinBox pixmapCacheEdit;
+    QGroupBox *personalGroupBox; 
+    QGroupBox *pathsGroupBox;
+    QComboBox languageBox;
+    QCheckBox picDownloadCheckBox;
+    QCheckBox picDownloadHqCheckBox;
+    QLabel languageLabel;
+    QLabel pixmapCacheLabel;
+    QLabel deckPathLabel;
+    QLabel replaysPathLabel;
+    QLabel picsPathLabel;
+    QLabel cardDatabasePathLabel;
+    QLabel tokenDatabasePathLabel;
+    QPushButton clearDownloadedPicsButton;
 };
 
 class AppearanceSettingsPage : public AbstractSettingsPage {
@@ -69,11 +86,25 @@ signals:
     void playerAreaBgChanged(const QString &path);
     void cardBackPicturePathChanged(const QString &path);
 private:
-    QLabel *handBgLabel, *stackBgLabel, *tableBgLabel, *playerAreaBgLabel, *cardBackPicturePathLabel, *minPlayersForMultiColumnLayoutLabel;
-    QLineEdit *handBgEdit, *stackBgEdit, *tableBgEdit, *playerAreaBgEdit, *cardBackPicturePathEdit;
-    QCheckBox *displayCardNamesCheckBox, *horizontalHandCheckBox, *invertVerticalCoordinateCheckBox, *zoneViewSortByNameCheckBox, *zoneViewSortByTypeCheckBox;
-    QGroupBox *zoneBgGroupBox, *cardsGroupBox, *handGroupBox, *tableGroupBox, *zoneViewGroupBox;
-    QSpinBox *minPlayersForMultiColumnLayoutEdit;
+    QLabel handBgLabel;
+    QLabel stackBgLabel;
+    QLabel tableBgLabel;
+    QLabel playerAreaBgLabel;
+    QLabel cardBackPicturePathLabel;
+    QLabel minPlayersForMultiColumnLayoutLabel;
+    QLineEdit *handBgEdit;
+    QLineEdit *stackBgEdit;
+    QLineEdit *tableBgEdit;
+    QLineEdit *playerAreaBgEdit;
+    QLineEdit *cardBackPicturePathEdit;
+    QCheckBox displayCardNamesCheckBox;
+    QCheckBox horizontalHandCheckBox;
+    QCheckBox invertVerticalCoordinateCheckBox;
+    QGroupBox *zoneBgGroupBox;
+    QGroupBox *cardsGroupBox;
+    QGroupBox *handGroupBox;
+    QGroupBox *tableGroupBox;
+    QSpinBox minPlayersForMultiColumnLayoutEdit;
 public:
     AppearanceSettingsPage();
     void retranslateUi();

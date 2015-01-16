@@ -29,18 +29,16 @@
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
-    languageLabel = new QLabel;
-    languageBox = new QComboBox;
-
     QString setLanguage = settingsCache->getLang();
     QStringList qmFiles = findQmFiles();
     for (int i = 0; i < qmFiles.size(); i++) {
         QString langName = languageName(qmFiles[i]);
-        languageBox->addItem(langName, qmFiles[i]);
+        languageBox.addItem(langName, qmFiles[i]);
         if ((qmFiles[i] == setLanguage) || (setLanguage.isEmpty() && langName == tr("English")))
-            languageBox->setCurrentIndex(i);
+            languageBox.setCurrentIndex(i);
     }
 
+<<<<<<< HEAD
     picDownloadCheckBox = new QCheckBox;
     picDownloadCheckBox->setChecked(settingsCache->getPicDownload());
     
@@ -58,68 +56,73 @@ GeneralSettingsPage::GeneralSettingsPage()
     pixmapCacheEdit->setSingleStep(64);
     pixmapCacheEdit->setValue(settingsCache->getPixmapCacheSize());
     pixmapCacheEdit->setSuffix(" MB");
+=======
+    pixmapCacheEdit.setMinimum(64);
+    pixmapCacheEdit.setMaximum(8192);
+    pixmapCacheEdit.setSingleStep(64);
+    pixmapCacheEdit.setValue(settingsCache->getPixmapCacheSize());
+    pixmapCacheEdit.setSuffix(" MB");
+    picDownloadHqCheckBox.setChecked(settingsCache->getPicDownloadHq());
+    picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
+>>>>>>> 0b02c2b... Refactored General Settings Tab
 
-    connect(languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
-    connect(picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
-    connect(picDownloadHqCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownloadHq(int)));
-    connect(pixmapCacheEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPixmapCacheSize(int)));
+    connect(&clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
+    connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
+    connect(&picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
+    connect(&picDownloadHqCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownloadHq(int)));
+    connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPixmapCacheSize(int)));
 
     QGridLayout *personalGrid = new QGridLayout;
-    personalGrid->addWidget(languageLabel, 0, 0);
-    personalGrid->addWidget(languageBox, 0, 1);
-    personalGrid->addWidget(pixmapCacheLabel, 1, 0, 1, 1);
-    personalGrid->addWidget(pixmapCacheEdit, 1, 1, 1, 1);
-    personalGrid->addWidget(picDownloadCheckBox, 2, 0, 1, 2);
-    personalGrid->addWidget(picDownloadHqCheckBox, 3, 0, 1, 2);
-    personalGrid->addWidget(clearDownloadedPicsButton, 4, 0, 1, 1);
+    personalGrid->addWidget(&languageLabel, 0, 0);
+    personalGrid->addWidget(&languageBox, 0, 1);
+    personalGrid->addWidget(&pixmapCacheLabel, 1, 0, 1, 1);
+    personalGrid->addWidget(&pixmapCacheEdit, 1, 1, 1, 1);
+    personalGrid->addWidget(&picDownloadCheckBox, 2, 0, 1, 2);
+    personalGrid->addWidget(&picDownloadHqCheckBox, 3, 0, 1, 2);
+    personalGrid->addWidget(&clearDownloadedPicsButton, 4, 0, 1, 1);
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
 
-    deckPathLabel = new QLabel;
     deckPathEdit = new QLineEdit(settingsCache->getDeckPath());
     deckPathEdit->setReadOnly(true);
     QPushButton *deckPathButton = new QPushButton("...");
     connect(deckPathButton, SIGNAL(clicked()), this, SLOT(deckPathButtonClicked()));
 
-    replaysPathLabel = new QLabel;
     replaysPathEdit = new QLineEdit(settingsCache->getReplaysPath());
     replaysPathEdit->setReadOnly(true);
     QPushButton *replaysPathButton = new QPushButton("...");
     connect(replaysPathButton, SIGNAL(clicked()), this, SLOT(replaysPathButtonClicked()));
     
-    picsPathLabel = new QLabel;
     picsPathEdit = new QLineEdit(settingsCache->getPicsPath());
     picsPathEdit->setReadOnly(true);
     QPushButton *picsPathButton = new QPushButton("...");
     connect(picsPathButton, SIGNAL(clicked()), this, SLOT(picsPathButtonClicked()));
     
-    cardDatabasePathLabel = new QLabel;
     cardDatabasePathEdit = new QLineEdit(settingsCache->getCardDatabasePath());
     cardDatabasePathEdit->setReadOnly(true);
     QPushButton *cardDatabasePathButton = new QPushButton("...");
     connect(cardDatabasePathButton, SIGNAL(clicked()), this, SLOT(cardDatabasePathButtonClicked()));
     
-    tokenDatabasePathLabel = new QLabel;
     tokenDatabasePathEdit = new QLineEdit(settingsCache->getTokenDatabasePath());
     tokenDatabasePathEdit->setReadOnly(true);
     QPushButton *tokenDatabasePathButton = new QPushButton("...");
     connect(tokenDatabasePathButton, SIGNAL(clicked()), this, SLOT(tokenDatabasePathButtonClicked()));
     
     QGridLayout *pathsGrid = new QGridLayout;
-    pathsGrid->addWidget(deckPathLabel, 0, 0);
+    pathsGrid->addWidget(&deckPathLabel, 0, 0);
     pathsGrid->addWidget(deckPathEdit, 0, 1);
     pathsGrid->addWidget(deckPathButton, 0, 2);
-    pathsGrid->addWidget(replaysPathLabel, 1, 0);
+    pathsGrid->addWidget(&replaysPathLabel, 1, 0);
     pathsGrid->addWidget(replaysPathEdit, 1, 1);
     pathsGrid->addWidget(replaysPathButton, 1, 2);
-    pathsGrid->addWidget(picsPathLabel, 2, 0);
+    pathsGrid->addWidget(&picsPathLabel, 2, 0);
     pathsGrid->addWidget(picsPathEdit, 2, 1);
     pathsGrid->addWidget(picsPathButton, 2, 2);
-    pathsGrid->addWidget(cardDatabasePathLabel, 3, 0);
+    pathsGrid->addWidget(&cardDatabasePathLabel, 3, 0);
     pathsGrid->addWidget(cardDatabasePathEdit, 3, 1);
     pathsGrid->addWidget(cardDatabasePathButton, 3, 2);
-    pathsGrid->addWidget(tokenDatabasePathLabel, 4, 0);
+    pathsGrid->addWidget(&tokenDatabasePathLabel, 4, 0);
     pathsGrid->addWidget(tokenDatabasePathEdit, 4, 1);
     pathsGrid->addWidget(tokenDatabasePathButton, 4, 2);
     pathsGroupBox = new QGroupBox;
@@ -224,30 +227,29 @@ void GeneralSettingsPage::tokenDatabasePathButtonClicked()
 
 void GeneralSettingsPage::languageBoxChanged(int index)
 {
-    settingsCache->setLang(languageBox->itemData(index).toString());
+    settingsCache->setLang(languageBox.itemData(index).toString());
 }
 
 void GeneralSettingsPage::retranslateUi()
 {
     personalGroupBox->setTitle(tr("Personal settings"));
-    languageLabel->setText(tr("Language:"));
-    picDownloadCheckBox->setText(tr("Download card pictures on the fly"));
-    picDownloadHqCheckBox->setText(tr("Download high-quality card pictures"));
+    languageLabel.setText(tr("Language:"));
+    picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
+    picDownloadHqCheckBox.setText(tr("Download high-quality card pictures"));
     pathsGroupBox->setTitle(tr("Paths"));
-    deckPathLabel->setText(tr("Decks directory:"));
-    replaysPathLabel->setText(tr("Replays directory:"));
-    picsPathLabel->setText(tr("Pictures directory:"));
-    cardDatabasePathLabel->setText(tr("Card database:"));
-    tokenDatabasePathLabel->setText(tr("Token database:"));
-    pixmapCacheLabel->setText(tr("Picture cache size:"));
-    clearDownloadedPicsButton->setText(tr("Reset/Clear Downloaded Pictures"));
+    deckPathLabel.setText(tr("Decks directory:"));
+    replaysPathLabel.setText(tr("Replays directory:"));
+    picsPathLabel.setText(tr("Pictures directory:"));
+    cardDatabasePathLabel.setText(tr("Card database:"));
+    tokenDatabasePathLabel.setText(tr("Token database:"));
+    pixmapCacheLabel.setText(tr("Picture cache size:"));
+    clearDownloadedPicsButton.setText(tr("Reset/Clear Downloaded Pictures"));
 }
 
 AppearanceSettingsPage::AppearanceSettingsPage()
 {
     QIcon deleteIcon(":/resources/icon_delete.svg");
     
-    handBgLabel = new QLabel;
     handBgEdit = new QLineEdit(settingsCache->getHandBgPath());
     handBgEdit->setReadOnly(true);
     QPushButton *handBgClearButton = new QPushButton(deleteIcon, QString());
@@ -255,7 +257,6 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     QPushButton *handBgButton = new QPushButton("...");
     connect(handBgButton, SIGNAL(clicked()), this, SLOT(handBgButtonClicked()));
     
-    stackBgLabel = new QLabel;
     stackBgEdit = new QLineEdit(settingsCache->getStackBgPath());
     stackBgEdit->setReadOnly(true);
     QPushButton *stackBgClearButton = new QPushButton(deleteIcon, QString());
@@ -263,7 +264,6 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     QPushButton *stackBgButton = new QPushButton("...");
     connect(stackBgButton, SIGNAL(clicked()), this, SLOT(stackBgButtonClicked()));
 
-    tableBgLabel = new QLabel;
     tableBgEdit = new QLineEdit(settingsCache->getTableBgPath());
     tableBgEdit->setReadOnly(true);
     QPushButton *tableBgClearButton = new QPushButton(deleteIcon, QString());
@@ -271,7 +271,6 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     QPushButton *tableBgButton = new QPushButton("...");
     connect(tableBgButton, SIGNAL(clicked()), this, SLOT(tableBgButtonClicked()));
     
-    playerAreaBgLabel = new QLabel;
     playerAreaBgEdit = new QLineEdit(settingsCache->getPlayerBgPath());
     playerAreaBgEdit->setReadOnly(true);
     QPushButton *playerAreaBgClearButton = new QPushButton(deleteIcon, QString());
@@ -279,7 +278,6 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     QPushButton *playerAreaBgButton = new QPushButton("...");
     connect(playerAreaBgButton, SIGNAL(clicked()), this, SLOT(playerAreaBgButtonClicked()));
     
-    cardBackPicturePathLabel = new QLabel;
     cardBackPicturePathEdit = new QLineEdit(settingsCache->getCardBackPicturePath());
     cardBackPicturePathEdit->setReadOnly(true);
     QPushButton *cardBackPicturePathClearButton = new QPushButton(deleteIcon, QString());
@@ -288,23 +286,23 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(cardBackPicturePathButton, SIGNAL(clicked()), this, SLOT(cardBackPicturePathButtonClicked()));
     
     QGridLayout *zoneBgGrid = new QGridLayout;
-    zoneBgGrid->addWidget(handBgLabel, 0, 0);
+    zoneBgGrid->addWidget(&handBgLabel, 0, 0);
     zoneBgGrid->addWidget(handBgEdit, 0, 1);
     zoneBgGrid->addWidget(handBgClearButton, 0, 2);
     zoneBgGrid->addWidget(handBgButton, 0, 3);
-    zoneBgGrid->addWidget(stackBgLabel, 1, 0);
+    zoneBgGrid->addWidget(&stackBgLabel, 1, 0);
     zoneBgGrid->addWidget(stackBgEdit, 1, 1);
     zoneBgGrid->addWidget(stackBgClearButton, 1, 2);
     zoneBgGrid->addWidget(stackBgButton, 1, 3);
-    zoneBgGrid->addWidget(tableBgLabel, 2, 0);
+    zoneBgGrid->addWidget(&tableBgLabel, 2, 0);
     zoneBgGrid->addWidget(tableBgEdit, 2, 1);
     zoneBgGrid->addWidget(tableBgClearButton, 2, 2);
     zoneBgGrid->addWidget(tableBgButton, 2, 3);
-    zoneBgGrid->addWidget(playerAreaBgLabel, 3, 0);
+    zoneBgGrid->addWidget(&playerAreaBgLabel, 3, 0);
     zoneBgGrid->addWidget(playerAreaBgEdit, 3, 1);
     zoneBgGrid->addWidget(playerAreaBgClearButton, 3, 2);
     zoneBgGrid->addWidget(playerAreaBgButton, 3, 3);
-    zoneBgGrid->addWidget(cardBackPicturePathLabel, 4, 0);
+    zoneBgGrid->addWidget(&cardBackPicturePathLabel, 4, 0);
     zoneBgGrid->addWidget(cardBackPicturePathEdit, 4, 1);
     zoneBgGrid->addWidget(cardBackPicturePathClearButton, 4, 2);
     zoneBgGrid->addWidget(cardBackPicturePathButton, 4, 3);
@@ -312,65 +310,45 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     zoneBgGroupBox = new QGroupBox;
     zoneBgGroupBox->setLayout(zoneBgGrid);
 
-    displayCardNamesCheckBox = new QCheckBox;
-    displayCardNamesCheckBox->setChecked(settingsCache->getDisplayCardNames());
-    connect(displayCardNamesCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDisplayCardNames(int)));
+    displayCardNamesCheckBox.setChecked(settingsCache->getDisplayCardNames());
+    connect(&displayCardNamesCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDisplayCardNames(int)));
     
     QGridLayout *cardsGrid = new QGridLayout;
-    cardsGrid->addWidget(displayCardNamesCheckBox, 0, 0, 1, 2);
+    cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
     
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
     
-    horizontalHandCheckBox = new QCheckBox;
-    horizontalHandCheckBox->setChecked(settingsCache->getHorizontalHand());
-    connect(horizontalHandCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setHorizontalHand(int)));
+    horizontalHandCheckBox.setChecked(settingsCache->getHorizontalHand());
+    connect(&horizontalHandCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setHorizontalHand(int)));
     
     QGridLayout *handGrid = new QGridLayout;
-    handGrid->addWidget(horizontalHandCheckBox, 0, 0, 1, 2);
+    handGrid->addWidget(&horizontalHandCheckBox, 0, 0, 1, 2);
     
     handGroupBox = new QGroupBox;
     handGroupBox->setLayout(handGrid);
     
-    invertVerticalCoordinateCheckBox = new QCheckBox;
-    invertVerticalCoordinateCheckBox->setChecked(settingsCache->getInvertVerticalCoordinate());
-    connect(invertVerticalCoordinateCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setInvertVerticalCoordinate(int)));
+    invertVerticalCoordinateCheckBox.setChecked(settingsCache->getInvertVerticalCoordinate());
+    connect(&invertVerticalCoordinateCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setInvertVerticalCoordinate(int)));
     
-    minPlayersForMultiColumnLayoutLabel = new QLabel;
-    minPlayersForMultiColumnLayoutEdit = new QSpinBox;
-    minPlayersForMultiColumnLayoutEdit->setMinimum(2);
-    minPlayersForMultiColumnLayoutEdit->setValue(settingsCache->getMinPlayersForMultiColumnLayout());
-    connect(minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMinPlayersForMultiColumnLayout(int)));
-    minPlayersForMultiColumnLayoutLabel->setBuddy(minPlayersForMultiColumnLayoutEdit);
+    minPlayersForMultiColumnLayoutEdit.setMinimum(2);
+    minPlayersForMultiColumnLayoutEdit.setValue(settingsCache->getMinPlayersForMultiColumnLayout());
+    connect(&minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMinPlayersForMultiColumnLayout(int)));
+    minPlayersForMultiColumnLayoutLabel.setBuddy(&minPlayersForMultiColumnLayoutEdit);
     
     QGridLayout *tableGrid = new QGridLayout;
-    tableGrid->addWidget(invertVerticalCoordinateCheckBox, 0, 0, 1, 2);
-    tableGrid->addWidget(minPlayersForMultiColumnLayoutLabel, 1, 0, 1, 1);
-    tableGrid->addWidget(minPlayersForMultiColumnLayoutEdit, 1, 1, 1, 1);
+    tableGrid->addWidget(&invertVerticalCoordinateCheckBox, 0, 0, 1, 2);
+    tableGrid->addWidget(&minPlayersForMultiColumnLayoutLabel, 1, 0, 1, 1);
+    tableGrid->addWidget(&minPlayersForMultiColumnLayoutEdit, 1, 1, 1, 1);
     
     tableGroupBox = new QGroupBox;
     tableGroupBox->setLayout(tableGrid);
-    
-    zoneViewSortByNameCheckBox = new QCheckBox;
-    zoneViewSortByNameCheckBox->setChecked(settingsCache->getZoneViewSortByName());
-    connect(zoneViewSortByNameCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setZoneViewSortByName(int)));
-    zoneViewSortByTypeCheckBox = new QCheckBox;
-    zoneViewSortByTypeCheckBox->setChecked(settingsCache->getZoneViewSortByType());
-    connect(zoneViewSortByTypeCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setZoneViewSortByType(int)));
-
-    QGridLayout *zoneViewGrid = new QGridLayout;
-    zoneViewGrid->addWidget(zoneViewSortByNameCheckBox, 0, 0, 1, 2);
-    zoneViewGrid->addWidget(zoneViewSortByTypeCheckBox, 1, 0, 1, 2);
-
-    zoneViewGroupBox = new QGroupBox;
-    zoneViewGroupBox->setLayout(zoneViewGrid);
     
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(zoneBgGroupBox);
     mainLayout->addWidget(cardsGroupBox);
     mainLayout->addWidget(handGroupBox);
     mainLayout->addWidget(tableGroupBox);
-    mainLayout->addWidget(zoneViewGroupBox);
     
     setLayout(mainLayout);
 }
@@ -378,25 +356,21 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 void AppearanceSettingsPage::retranslateUi()
 {
     zoneBgGroupBox->setTitle(tr("Zone background pictures"));
-    handBgLabel->setText(tr("Hand background:"));
-    stackBgLabel->setText(tr("Stack background:"));
-    tableBgLabel->setText(tr("Table background:"));
-    playerAreaBgLabel->setText(tr("Player info background:"));
-    cardBackPicturePathLabel->setText(tr("Card back:"));
+    handBgLabel.setText(tr("Hand background:"));
+    stackBgLabel.setText(tr("Stack background:"));
+    tableBgLabel.setText(tr("Table background:"));
+    playerAreaBgLabel.setText(tr("Player info background:"));
+    cardBackPicturePathLabel.setText(tr("Card back:"));
     
     cardsGroupBox->setTitle(tr("Card rendering"));
-    displayCardNamesCheckBox->setText(tr("Display card names on cards having a picture"));
+    displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));
     
     handGroupBox->setTitle(tr("Hand layout"));
-    horizontalHandCheckBox->setText(tr("Display hand horizontally (wastes space)"));
+    horizontalHandCheckBox.setText(tr("Display hand horizontally (wastes space)"));
     
     tableGroupBox->setTitle(tr("Table grid layout"));
-    invertVerticalCoordinateCheckBox->setText(tr("Invert vertical coordinate"));
-    minPlayersForMultiColumnLayoutLabel->setText(tr("Minimum player count for multi-column layout:"));
-    
-    zoneViewGroupBox->setTitle(tr("Zone view layout"));
-    zoneViewSortByNameCheckBox->setText(tr("Sort by name"));
-    zoneViewSortByTypeCheckBox->setText(tr("Sort by type"));
+    invertVerticalCoordinateCheckBox.setText(tr("Invert vertical coordinate"));
+    minPlayersForMultiColumnLayoutLabel.setText(tr("Minimum player count for multi-column layout:"));
 }
 
 void AppearanceSettingsPage::handBgClearButtonClicked()
