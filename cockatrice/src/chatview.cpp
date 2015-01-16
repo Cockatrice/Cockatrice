@@ -171,16 +171,15 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
             from = 1;
     }
 
-    QTextCharFormat charFormat;
     if (settingsCache->getChatMention()) {
         if (message.toLower().contains("@" + QString::fromStdString(tabSupervisor->getUserInfo()->name()).toLower())) {
-            charFormat.setFontWeight(QFont::Bold);
-            charFormat.setForeground(QBrush(QColor(255, 120, 0)));
+            messageFormat.setFontWeight(QFont::Bold);
+            messageFormat.setForeground(QBrush(QColor(255, 120, 0)));
         } 
     }
 
     if (!message.isEmpty())
-        cursor.insertText(message, charFormat);
+        cursor.insertText(message, messageFormat);
     
     if (atBottom)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
