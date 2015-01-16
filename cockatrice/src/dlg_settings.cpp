@@ -52,8 +52,9 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     pixmapCacheLabel = new QLabel;
     pixmapCacheEdit = new QSpinBox;
-    pixmapCacheEdit->setMinimum(64);
-    pixmapCacheEdit->setMaximum(8192);
+    pixmapCacheEdit->setMinimum(PIXMAPCACHE_SIZE_MIN);
+    // 2047 is the max value to avoid overflowing of QPixmapCache::setCacheLimit(int size)
+    pixmapCacheEdit->setMaximum(PIXMAPCACHE_SIZE_MAX);
     pixmapCacheEdit->setSingleStep(64);
     pixmapCacheEdit->setValue(settingsCache->getPixmapCacheSize());
     pixmapCacheEdit->setSuffix(" MB");

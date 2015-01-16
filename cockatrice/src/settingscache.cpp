@@ -24,6 +24,10 @@ SettingsCache::SettingsCache()
     picDownload = settings->value("personal/picturedownload", true).toBool();
     picDownloadHq = settings->value("personal/picturedownloadhq", false).toBool();
     pixmapCacheSize = settings->value("personal/pixmapCacheSize", PIXMAPCACHE_SIZE_DEFAULT).toInt();
+    //sanity check
+    if(pixmapCacheSize < PIXMAPCACHE_SIZE_MIN || pixmapCacheSize > PIXMAPCACHE_SIZE_MAX)
+        pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
+
     picUrl = settings->value("personal/picUrl", PIC_URL_DEFAULT).toString();
     picUrlHq = settings->value("personal/picUrlHq", PIC_URL_HQ_DEFAULT).toString();
     picUrlFallback = settings->value("personal/picUrlFallback", PIC_URL_FALLBACK).toString();
