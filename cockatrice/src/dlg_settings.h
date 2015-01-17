@@ -118,15 +118,17 @@ private slots:
 signals:
     void soundPathChanged();
 private:
-    QCheckBox *notificationsEnabledCheckBox;
-    QCheckBox *doubleClickToPlayCheckBox;
-    QCheckBox *playToStackCheckBox;
-    QCheckBox *tapAnimationCheckBox;
-    QCheckBox *soundEnabledCheckBox;
-    QLabel *soundPathLabel;
+    QCheckBox notificationsEnabledCheckBox;
+    QCheckBox doubleClickToPlayCheckBox;
+    QCheckBox playToStackCheckBox;
+    QCheckBox tapAnimationCheckBox;
+    QCheckBox soundEnabledCheckBox;
+    QLabel soundPathLabel;
     QLineEdit *soundPathEdit;
-    QGroupBox *generalGroupBox, *animationGroupBox, *soundGroupBox;
-    QPushButton *soundTestButton;
+    QGroupBox *generalGroupBox;
+    QGroupBox *animationGroupBox;
+    QGroupBox *soundGroupBox;
+    QPushButton soundTestButton;
 public:
     UserInterfaceSettingsPage();
     void retranslateUi();

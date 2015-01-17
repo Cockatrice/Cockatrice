@@ -449,62 +449,53 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
     QIcon deleteIcon(":/resources/icon_delete.svg");
 
-    notificationsEnabledCheckBox = new QCheckBox;
-    notificationsEnabledCheckBox->setChecked(settingsCache->getNotificationsEnabled());
-    connect(notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotificationsEnabled(int)));
+    notificationsEnabledCheckBox.setChecked(settingsCache->getNotificationsEnabled());
+    connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotificationsEnabled(int)));
 
-    doubleClickToPlayCheckBox = new QCheckBox;
-    doubleClickToPlayCheckBox->setChecked(settingsCache->getDoubleClickToPlay());
-    connect(doubleClickToPlayCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDoubleClickToPlay(int)));
+    doubleClickToPlayCheckBox.setChecked(settingsCache->getDoubleClickToPlay());
+    connect(&doubleClickToPlayCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDoubleClickToPlay(int)));
     
-    playToStackCheckBox = new QCheckBox;
-    playToStackCheckBox->setChecked(settingsCache->getPlayToStack());
-    connect(playToStackCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPlayToStack(int)));
+    playToStackCheckBox.setChecked(settingsCache->getPlayToStack());
+    connect(&playToStackCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPlayToStack(int)));
     
     QGridLayout *generalGrid = new QGridLayout;
-    generalGrid->addWidget(notificationsEnabledCheckBox, 0, 0);
-    generalGrid->addWidget(doubleClickToPlayCheckBox, 1, 0);
-    generalGrid->addWidget(playToStackCheckBox, 2, 0);
+    generalGrid->addWidget(&notificationsEnabledCheckBox, 0, 0);
+    generalGrid->addWidget(&doubleClickToPlayCheckBox, 1, 0);
+    generalGrid->addWidget(&playToStackCheckBox, 2, 0);
     
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
     
-    tapAnimationCheckBox = new QCheckBox;
-    tapAnimationCheckBox->setChecked(settingsCache->getTapAnimation());
-    connect(tapAnimationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setTapAnimation(int)));
+    tapAnimationCheckBox.setChecked(settingsCache->getTapAnimation());
+    connect(&tapAnimationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setTapAnimation(int)));
     
-    soundEnabledCheckBox = new QCheckBox;
-    soundEnabledCheckBox->setChecked(settingsCache->getSoundEnabled());
-    connect(soundEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setSoundEnabled(int)));
+    soundEnabledCheckBox.setChecked(settingsCache->getSoundEnabled());
+    connect(&soundEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setSoundEnabled(int)));
     
-    soundPathLabel = new QLabel;
     soundPathEdit = new QLineEdit(settingsCache->getSoundPath());
     soundPathEdit->setReadOnly(true);
     QPushButton *soundPathClearButton = new QPushButton(deleteIcon, QString());
     connect(soundPathClearButton, SIGNAL(clicked()), this, SLOT(soundPathClearButtonClicked()));
     QPushButton *soundPathButton = new QPushButton("...");
     connect(soundPathButton, SIGNAL(clicked()), this, SLOT(soundPathButtonClicked()));
-    soundTestButton = new QPushButton();
-    connect(soundTestButton, SIGNAL(clicked()), soundEngine, SLOT(cuckoo()));
+    connect(&soundTestButton, SIGNAL(clicked()), soundEngine, SLOT(cuckoo()));
     
     QGridLayout *soundGrid = new QGridLayout;
-    soundGrid->addWidget(soundEnabledCheckBox, 0, 0, 1, 4);
-    soundGrid->addWidget(soundPathLabel, 1, 0);
+    soundGrid->addWidget(&soundEnabledCheckBox, 0, 0, 1, 4);
+    soundGrid->addWidget(&soundPathLabel, 1, 0);
     soundGrid->addWidget(soundPathEdit, 1, 1);
     soundGrid->addWidget(soundPathClearButton, 1, 2);
     soundGrid->addWidget(soundPathButton, 1, 3);
-    soundGrid->addWidget(soundTestButton, 2, 1);
+    soundGrid->addWidget(&soundTestButton, 2, 1);
     
     soundGroupBox = new QGroupBox;
     soundGroupBox->setLayout(soundGrid);
     
     QGridLayout *animationGrid = new QGridLayout;
-    animationGrid->addWidget(tapAnimationCheckBox, 0, 0);
+    animationGrid->addWidget(&tapAnimationCheckBox, 0, 0);
     
     animationGroupBox = new QGroupBox;
     animationGroupBox->setLayout(animationGrid);
-
-   
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(generalGroupBox);
@@ -517,14 +508,14 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 void UserInterfaceSettingsPage::retranslateUi()
 {
     generalGroupBox->setTitle(tr("General interface settings"));
-    notificationsEnabledCheckBox->setText(tr("Enable notifications in taskbar"));
-    doubleClickToPlayCheckBox->setText(tr("&Double-click cards to play them (instead of single-click)"));
-    playToStackCheckBox->setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
+    notificationsEnabledCheckBox.setText(tr("Enable notifications in taskbar"));
+    doubleClickToPlayCheckBox.setText(tr("&Double-click cards to play them (instead of single-click)"));
+    playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
     animationGroupBox->setTitle(tr("Animation settings"));
-    tapAnimationCheckBox->setText(tr("&Tap/untap animation"));
-    soundEnabledCheckBox->setText(tr("Enable &sounds"));
-    soundPathLabel->setText(tr("Path to sounds directory:"));
-    soundTestButton->setText(tr("Test system sound engine"));
+    tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
+    soundEnabledCheckBox.setText(tr("Enable &sounds"));
+    soundPathLabel.setText(tr("Path to sounds directory:"));
+    soundTestButton.setText(tr("Test system sound engine"));
     soundGroupBox->setTitle(tr("Sound settings"));
 }
 
