@@ -183,7 +183,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
             int mentionIndex;
             while ((mentionIndex = message.toLower().indexOf(mention)) != -1) {
                 cursor.insertText(message.left(mentionIndex), defaultFormat);
-                cursor.insertText(userName, mentionFormat);
+                cursor.insertText("@" + userName, mentionFormat);
                 message = message.mid(mentionIndex + mention.size());
             }
         } 
