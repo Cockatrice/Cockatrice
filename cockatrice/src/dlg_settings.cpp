@@ -38,25 +38,18 @@ GeneralSettingsPage::GeneralSettingsPage()
             languageBox.setCurrentIndex(i);
     }
 
-<<<<<<< HEAD
-    picDownloadCheckBox = new QCheckBox;
-    picDownloadCheckBox->setChecked(settingsCache->getPicDownload());
+    picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
     
-    clearDownloadedPicsButton = new QPushButton();
-    connect(clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
+    connect(&clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
 
-    picDownloadHqCheckBox = new QCheckBox;
-    picDownloadHqCheckBox->setChecked(settingsCache->getPicDownloadHq());
+    picDownloadHqCheckBox.setChecked(settingsCache->getPicDownloadHq());
 
-    pixmapCacheLabel = new QLabel;
-    pixmapCacheEdit = new QSpinBox;
-    pixmapCacheEdit->setMinimum(PIXMAPCACHE_SIZE_MIN);
+    pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
     // 2047 is the max value to avoid overflowing of QPixmapCache::setCacheLimit(int size)
-    pixmapCacheEdit->setMaximum(PIXMAPCACHE_SIZE_MAX);
-    pixmapCacheEdit->setSingleStep(64);
-    pixmapCacheEdit->setValue(settingsCache->getPixmapCacheSize());
-    pixmapCacheEdit->setSuffix(" MB");
-=======
+    pixmapCacheEdit.setMaximum(PIXMAPCACHE_SIZE_MAX);
+    pixmapCacheEdit.setSingleStep(64);
+    pixmapCacheEdit.setValue(settingsCache->getPixmapCacheSize());
+    pixmapCacheEdit.setSuffix(" MB");
     pixmapCacheEdit.setMinimum(64);
     pixmapCacheEdit.setMaximum(8192);
     pixmapCacheEdit.setSingleStep(64);
@@ -64,7 +57,6 @@ GeneralSettingsPage::GeneralSettingsPage()
     pixmapCacheEdit.setSuffix(" MB");
     picDownloadHqCheckBox.setChecked(settingsCache->getPicDownloadHq());
     picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
->>>>>>> 0b02c2b... Refactored General Settings Tab
 
     connect(&clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
