@@ -228,6 +228,7 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
 
 void TabRoom::addMentionTag(QString mentionTag) {
     sayEdit->insert(mentionTag + " ");
+    sayEdit->setFocus();
 }
 
 PendingCommand *TabRoom::prepareRoomCommand(const ::google::protobuf::Message &cmd)
