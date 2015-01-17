@@ -572,11 +572,10 @@ void DeckEditorSettingsPage::radioPriceTagSourceClicked(bool checked)
 MessagesSettingsPage::MessagesSettingsPage()
 {
 
-    chatMentionCheckBox = new QCheckBox;
-    chatMentionCheckBox->setChecked(settingsCache->getChatMention());
-    connect(chatMentionCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMention(int)));
+    chatMentionCheckBox.setChecked(settingsCache->getChatMention());
+    connect(&chatMentionCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMention(int)));
     QGridLayout *chatGrid = new QGridLayout;
-    chatGrid->addWidget(chatMentionCheckBox, 0, 0);
+    chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
 
@@ -646,7 +645,7 @@ void MessagesSettingsPage::retranslateUi()
     aAdd->setText(tr("&Add"));
     aRemove->setText(tr("&Remove"));
     chatGroupBox->setTitle(tr("Chat settings"));
-    chatMentionCheckBox->setText(tr("Enable chat mentions ('@yourusername' in chat log will be highlighted)"));
+    chatMentionCheckBox.setText(tr("Enable chat mentions ('@yourusername' in chat log will be highlighted)"));
     messageShortcuts->setTitle(tr("In-game message macros"));
 }
 

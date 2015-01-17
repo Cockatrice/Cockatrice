@@ -158,8 +158,9 @@ private slots:
     void actRemove();
 private:
     QListWidget *messageList;
-    QAction *aAdd, *aRemove;
-    QCheckBox *chatMentionCheckBox;
+    QAction *aAdd;
+    QAction *aRemove;
+    QCheckBox chatMentionCheckBox;
     QGroupBox *chatGroupBox;
     QGroupBox *messageShortcuts;
 
