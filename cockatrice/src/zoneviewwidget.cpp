@@ -88,6 +88,13 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
         sortByTypeProxy->setWidget(&sortByTypeCheckBox);
         vbox->addItem(sortByTypeProxy);
 
+        QGraphicsProxyWidget *lineProxy = new QGraphicsProxyWidget;
+        QFrame *line = new QFrame;
+        line->setFrameShape(QFrame::HLine);
+        line->setFrameShadow(QFrame::Sunken);
+        lineProxy->setWidget(line);
+        vbox->addItem(lineProxy);
+
         QGraphicsProxyWidget *pileViewProxy = new QGraphicsProxyWidget;
         pileViewProxy->setWidget(&pileViewCheckBox);
         vbox->addItem(pileViewProxy);
