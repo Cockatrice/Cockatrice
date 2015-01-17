@@ -537,14 +537,13 @@ void UserInterfaceSettingsPage::soundPathButtonClicked()
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
-    priceTagsCheckBox = new QCheckBox;
-    priceTagsCheckBox->setChecked(settingsCache->getPriceTagFeature());
-    connect(priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
+    priceTagsCheckBox.setChecked(settingsCache->getPriceTagFeature());
+    connect(&priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
 
     connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
 
     QGridLayout *generalGrid = new QGridLayout;
-    generalGrid->addWidget(priceTagsCheckBox, 0, 0);
+    generalGrid->addWidget(&priceTagsCheckBox, 0, 0);
     
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -557,7 +556,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
 void DeckEditorSettingsPage::retranslateUi()
 {
-    priceTagsCheckBox->setText(tr("Enable &price tag feature from deckbrew.com"));
+    priceTagsCheckBox.setText(tr("Enable &price tag feature from deckbrew.com"));
     generalGroupBox->setTitle(tr("General"));
 }
 

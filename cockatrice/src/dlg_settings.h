@@ -144,8 +144,7 @@ private slots:
 signals:
     void priceTagSourceChanged(int _priceTagSource);
 private:
-    QCheckBox *priceTagsCheckBox;
-    QRadioButton *priceTagSource0, *priceTagSource1;
+    QCheckBox priceTagsCheckBox;
     QGroupBox *generalGroupBox;
 };
 
