@@ -698,7 +698,7 @@ DlgSettings::DlgSettings(QWidget *parent)
     
     retranslateUi();
     
-    resize(800, 450);
+    adjustSize();
 }
 
 void DlgSettings::createIcons()
