@@ -44,6 +44,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     connect(chatView, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
     connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
+    connect(chatView, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
     sayLabel = new QLabel;
     sayEdit = new QLineEdit;
     sayLabel->setBuddy(sayEdit);
@@ -223,6 +224,10 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
     }
     chatView->appendMessage(QString::fromStdString(event.message()), senderName, userLevel);
     emit userEvent(false);
+}
+
+void TabRoom::addMentionTag(QString mentionTag) {
+    sayEdit->insert(mentionTag + " ");
 }
 
 PendingCommand *TabRoom::prepareRoomCommand(const ::google::protobuf::Message &cmd)

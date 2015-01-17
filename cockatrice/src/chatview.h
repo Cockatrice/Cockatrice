@@ -49,6 +49,7 @@ signals:
     void cardNameHovered(QString cardName);
     void showCardInfoPopup(QPoint pos, QString cardName);
     void deleteCardInfoPopup(QString cardName);
+    void addMentionTag(QString mentionTag);
 };
 
 #endif
