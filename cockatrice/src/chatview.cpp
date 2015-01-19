@@ -252,12 +252,19 @@ void ChatView::mousePressEvent(QMouseEvent *event)
             if (event->button() != Qt::MidButton) {
                 const int delimiterIndex = hoveredContent.indexOf("_");
                 const QString userName = hoveredContent.mid(delimiterIndex + 1);
-                if (event->button() == Qt::RightButton) {
+                switch(event->button()) {
+                case Qt::RightButton :{
                     UserLevelFlags userLevel(hoveredContent.left(delimiterIndex).toInt());
                     userContextMenu->showContextMenu(event->globalPos(), userName, userLevel);
-                }
-                else if (event->button() == Qt::LeftButton) 
+                    break;
+                                      }
+                case Qt::LeftButton :{
                     emit addMentionTag("@" + userName);
+                    break;
+                                     }
+                default:
+                    break;
+                }
             }
             break;
         }
