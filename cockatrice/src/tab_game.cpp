@@ -418,6 +418,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfo, SLOT(setCard(QString)));
     connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
+    connect(messageLog, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
     sayLabel = new QLabel;
     sayEdit = new QLineEdit;
     sayLabel->setBuddy(sayEdit);
@@ -505,6 +506,11 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     splitter->restoreState(settingsCache->getTabGameSplitterSizes());
     
     messageLog->logGameJoined(gameInfo.game_id());
+}
+
+void TabGame::addMentionTag(QString value) {
+    sayEdit->insert(value + " ");
+    sayEdit->setFocus();
 }
 
 TabGame::~TabGame()
