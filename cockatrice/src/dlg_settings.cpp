@@ -773,6 +773,13 @@ void DlgSettings::changePage(QListWidgetItem *current, QListWidgetItem *previous
     pagesWidget->setCurrentIndex(contentsWidget->row(current));
 }
 
+void DlgSettings::setTab(int index) {
+    if (index <= contentsWidget->count()-1 && index >= 0) {
+        changePage(contentsWidget->item(index), contentsWidget->currentItem());
+        contentsWidget->setCurrentRow(index);
+    }
+}
+
 void DlgSettings::updateLanguage()
 {
     qApp->removeTranslator(translator);
