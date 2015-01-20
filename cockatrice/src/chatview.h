@@ -22,6 +22,10 @@ private:
     enum HoveredItemType { HoveredNothing, HoveredUrl, HoveredCard, HoveredUser };
     UserContextMenu *userContextMenu;
     QString lastSender;
+    QString userName;
+    QString mention;
+    QTextCharFormat mentionFormat;
+    QTextCharFormat defaultFormat;
     bool evenNumber;
     bool showTimestamps;
     HoveredItemType hoveredItemType;

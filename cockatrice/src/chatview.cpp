@@ -18,6 +18,13 @@ ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _sh
     userContextMenu = new UserContextMenu(tabSupervisor, this, game);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
     
+    userName = QString::fromStdString(tabSupervisor->getUserInfo()->name());
+    mention = "@" + userName.toLower();
+
+    mentionFormat.setFontWeight(QFont::Bold);
+    mentionFormat.setForeground(QBrush(Qt::white));
+    mentionFormat.setBackground(QBrush(QColor(190, 25, 85)));
+
     viewport()->setCursor(Qt::IBeamCursor);
     setReadOnly(true);
     setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse);
@@ -104,7 +111,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     QTextCharFormat senderFormat;
     if (tabSupervisor && tabSupervisor->getUserInfo() && (sender == QString::fromStdString(tabSupervisor->getUserInfo()->name()))) {
         senderFormat.setFontWeight(QFont::Bold);
-        senderFormat.setForeground(QBrush(QColor(255, 120, 0)));
+        senderFormat.setForeground(QBrush(QColor(190, 25, 85)));
     } else {
         senderFormat.setForeground(Qt::blue);
         if (playerBold)
@@ -172,15 +179,19 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     }
 
     if (settingsCache->getChatMention()) {
-        if (message.toLower().contains("@" + QString::fromStdString(tabSupervisor->getUserInfo()->name()).toLower())) {
-            messageFormat.setFontWeight(QFont::Bold);
-            messageFormat.setForeground(QBrush(QColor(255, 120, 0)));
+        if (message.toLower().contains(mention)) {
+            int mentionIndex;
+            while ((mentionIndex = message.toLower().indexOf(mention)) != -1) {
+                cursor.insertText(message.left(mentionIndex), defaultFormat);
+                cursor.insertText("@" + userName, mentionFormat);
+                message = message.mid(mentionIndex + mention.size());
+            }
         } 
     }
 
     if (!message.isEmpty())
-        cursor.insertText(message, messageFormat);
-    
+        cursor.insertText(message, defaultFormat);
+
     if (atBottom)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }
