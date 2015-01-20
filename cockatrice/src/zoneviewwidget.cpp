@@ -63,7 +63,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
     setAttribute(Qt::WA_DeleteOnClose);
     setZValue(2000000006);
     setFlag(ItemIgnoresTransformations);
-    
+
     QGraphicsLinearLayout *hbox = new QGraphicsLinearLayout(Qt::Horizontal);
     titleLabel = new TitleLabel;
     connect(titleLabel, SIGNAL(mouseMoved(QPointF)), this, SLOT(moveWidget(QPointF)));
@@ -72,47 +72,51 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
     closeButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     QGraphicsProxyWidget *closeButtonProxy = new QGraphicsProxyWidget;
     closeButtonProxy->setWidget(closeButton);
-    
+
     hbox->addItem(titleLabel);
     hbox->addItem(closeButtonProxy);
     QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
-    
+
     vbox->addItem(hbox);
-    
+
     if (numberCards < 0) {
-        sortByNameCheckBox = new QCheckBox;
         QGraphicsProxyWidget *sortByNameProxy = new QGraphicsProxyWidget;
-        sortByNameProxy->setWidget(sortByNameCheckBox);
+        sortByNameProxy->setWidget(&sortByNameCheckBox);
         vbox->addItem(sortByNameProxy);
 
-        sortByTypeCheckBox = new QCheckBox;
         QGraphicsProxyWidget *sortByTypeProxy = new QGraphicsProxyWidget;
-        sortByTypeProxy->setWidget(sortByTypeCheckBox);
+        sortByTypeProxy->setWidget(&sortByTypeCheckBox);
         vbox->addItem(sortByTypeProxy);
-    } else {
-        sortByNameCheckBox = 0;
-        sortByTypeCheckBox = 0;
+
+        QGraphicsProxyWidget *lineProxy = new QGraphicsProxyWidget;
+        QFrame *line = new QFrame;
+        line->setFrameShape(QFrame::HLine);
+        line->setFrameShadow(QFrame::Sunken);
+        lineProxy->setWidget(line);
+        vbox->addItem(lineProxy);
+
+        QGraphicsProxyWidget *pileViewProxy = new QGraphicsProxyWidget;
+        pileViewProxy->setWidget(&pileViewCheckBox);
+        vbox->addItem(pileViewProxy);
     }
-    
+
     if (_origZone->getIsShufflable() && (numberCards == -1)) {
-        shuffleCheckBox = new QCheckBox;
-        shuffleCheckBox->setChecked(true);
+        shuffleCheckBox.setChecked(settingsCache->getZoneViewShuffle());
         QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget;
-        shuffleProxy->setWidget(shuffleCheckBox);
+        shuffleProxy->setWidget(&shuffleCheckBox);
         vbox->addItem(shuffleProxy);
-    } else
-        shuffleCheckBox = 0;
-    
+    }
+
     extraHeight = vbox->sizeHint(Qt::PreferredSize).height();
     resize(150, 150);
-    
+
     QGraphicsLinearLayout *zoneHBox = new QGraphicsLinearLayout(Qt::Horizontal);
-    
+
     zoneContainer = new QGraphicsWidget(this);
     zoneContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     zoneContainer->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
     zoneHBox->addItem(zoneContainer);
-    
+
     scrollBar = new QScrollBar(Qt::Vertical);
     scrollBar->setMinimum(0);
     scrollBar->setSingleStep(50);
@@ -120,36 +124,57 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
     QGraphicsProxyWidget *scrollBarProxy = new QGraphicsProxyWidget;
     scrollBarProxy->setWidget(scrollBar);
     zoneHBox->addItem(scrollBarProxy);
-    
+
     vbox->addItem(zoneHBox);
-    
+
     zone = new ZoneViewZone(player, _origZone, numberCards, _revealZone, _writeableRevealZone, zoneContainer);
     connect(zone, SIGNAL(wheelEventReceived(QGraphicsSceneWheelEvent *)), this, SLOT(handleWheelEvent(QGraphicsSceneWheelEvent *)));
-    
-    if (sortByNameCheckBox) {
-        connect(sortByNameCheckBox, SIGNAL(stateChanged(int)), zone, SLOT(setSortByName(int)));
-        connect(sortByTypeCheckBox, SIGNAL(stateChanged(int)), zone, SLOT(setSortByType(int)));
-        sortByNameCheckBox->setChecked(settingsCache->getZoneViewSortByName());
-        sortByTypeCheckBox->setChecked(settingsCache->getZoneViewSortByType());
+
+    // numberCard is the num of cards we want to reveal from an area. Ex: scry the top 3 cards.
+    // If the number is < 0 then it means that we can make the area sorted and we dont care about the order.
+    if (numberCards < 0) {
+        connect(&sortByNameCheckBox, SIGNAL(stateChanged(int)), this, SLOT(processSortByName(int)));
+        connect(&sortByTypeCheckBox, SIGNAL(stateChanged(int)), this, SLOT(processSortByType(int)));
+        connect(&pileViewCheckBox, SIGNAL(stateChanged(int)), this, SLOT(processSetPileView(int)));
+        sortByNameCheckBox.setChecked(settingsCache->getZoneViewSortByName());
+        sortByTypeCheckBox.setChecked(settingsCache->getZoneViewSortByType());
+        pileViewCheckBox.setChecked(settingsCache->getZoneViewPileView());
+        if (!settingsCache->getZoneViewSortByType())
+            pileViewCheckBox.setEnabled(false);
     }
 
     retranslateUi();
     setLayout(vbox);
-    
+
     connect(zone, SIGNAL(optimumRectChanged()), this, SLOT(resizeToZoneContents()));
     connect(zone, SIGNAL(beingDeleted()), this, SLOT(zoneDeleted()));
     zone->initializeCards(cardList);
 }
 
+void ZoneViewWidget::processSortByType(int value) {
+    pileViewCheckBox.setEnabled(value);
+    settingsCache->setZoneViewSortByType(value);
+    zone->setPileView(pileViewCheckBox.isChecked());
+    zone->setSortByType(value);
+}
+
+void ZoneViewWidget::processSortByName(int value) {
+    settingsCache->setZoneViewSortByName(value);
+    zone->setSortByName(value);
+}
+
+void ZoneViewWidget::processSetPileView(int value) {
+    settingsCache->setZoneViewPileView(value);
+    zone->setPileView(value);
+}
+
 void ZoneViewWidget::retranslateUi()
 {
     titleLabel->setText(zone->getTranslatedName(false, CaseNominative));
-    if (sortByNameCheckBox)
-        sortByNameCheckBox->setText(tr("sort by name"));
-    if (sortByTypeCheckBox)
-        sortByTypeCheckBox->setText(tr("sort by type"));
-    if (shuffleCheckBox)
-        shuffleCheckBox->setText(tr("shuffle when closing"));
+    sortByNameCheckBox.setText(tr("sort by name"));
+    sortByTypeCheckBox.setText(tr("sort by type"));
+    shuffleCheckBox.setText(tr("shuffle when closing"));
+    pileViewCheckBox.setText(tr("pile view"));
 }
 
 void ZoneViewWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -172,10 +197,10 @@ void ZoneViewWidget::resizeToZoneContents()
     QSizeF newSize(qMax(QGraphicsWidget::layout()->effectiveSizeHint(Qt::MinimumSize, QSizeF()).width(), zoneRect.width() + scrollBar->width() + 10), zoneRect.height() + extraHeight + 10);
     setMaximumSize(newSize);
     resize(newSize);
-    
+
     zone->setGeometry(QRectF(0, -scrollBar->value(), zoneContainer->size().width(), totalZoneHeight));
     scrollBar->setMaximum(totalZoneHeight - zoneRect.height());
-    
+
     if (layout())
         layout()->invalidate();
 }
@@ -200,9 +225,9 @@ void ZoneViewWidget::closeEvent(QCloseEvent *event)
         cmd.set_zone_name(zone->getName().toStdString());
         player->sendGameCommand(cmd);
     }
-    if (shuffleCheckBox)
-        if (shuffleCheckBox->isChecked())
-            player->sendGameCommand(Command_Shuffle());
+    if (shuffleCheckBox.isChecked()) 
+        player->sendGameCommand(Command_Shuffle());
+    settingsCache->setZoneViewShuffle(shuffleCheckBox.isChecked());
     emit closePressed(this);
     deleteLater();
     event->accept();

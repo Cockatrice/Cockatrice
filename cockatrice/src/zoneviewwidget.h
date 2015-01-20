@@ -2,6 +2,7 @@
 #define ZONEVIEWWIDGET_H
 
 #include <QGraphicsWidget>
+#include <QCheckBox>
 
 class QLabel;
 class QPushButton;
@@ -42,13 +43,19 @@ private:
     TitleLabel *titleLabel;
     QPushButton *closeButton;
     QScrollBar *scrollBar;
-    QCheckBox *sortByNameCheckBox, *sortByTypeCheckBox, *shuffleCheckBox;
+    QCheckBox sortByNameCheckBox;
+    QCheckBox sortByTypeCheckBox;
+    QCheckBox shuffleCheckBox;
+    QCheckBox pileViewCheckBox;
     
     int extraHeight;
     Player *player;
 signals:
     void closePressed(ZoneViewWidget *zv);
 private slots:
+    void processSortByType(int value);
+    void processSortByName(int value);
+    void processSetPileView(int value);
     void resizeToZoneContents();
     void handleWheelEvent(QGraphicsSceneWheelEvent *event);
     void handleScrollBarChange(int value);

@@ -57,7 +57,7 @@ private:
     int minPlayersForMultiColumnLayout;
     bool tapAnimation;
     bool chatMention;
-    bool zoneViewSortByName, zoneViewSortByType;
+    bool zoneViewSortByName, zoneViewSortByType, zoneViewPileView, zoneViewShuffle;
     bool soundEnabled;
     QString soundPath;
     bool priceTagFeature;
@@ -98,6 +98,16 @@ public:
     bool getChatMention()  const { return chatMention; }
     bool getZoneViewSortByName() const { return zoneViewSortByName; }
     bool getZoneViewSortByType() const { return zoneViewSortByType; }
+    /**
+       Returns if the view should be sorted into pile view.
+       @return zoneViewPileView if the view should be sorted into pile view.
+     */
+    bool getZoneViewPileView() const { return zoneViewPileView; }
+    /**
+       Returns if the view should be shuffled on closing.
+       @return zoneViewShuffle if the view should be shuffled on closing.
+     */
+    bool getZoneViewShuffle() const { return zoneViewShuffle; }
     bool getSoundEnabled() const { return soundEnabled; }
     QString getSoundPath() const { return soundPath; }
     bool getPriceTagFeature() const { return priceTagFeature; }
@@ -138,6 +148,8 @@ public slots:
     void setChatMention(int _chatMention);
     void setZoneViewSortByName(int _zoneViewSortByName);
     void setZoneViewSortByType(int _zoneViewSortByType);
+    void setZoneViewPileView(int _zoneViewPileView);
+    void setZoneViewShuffle(int _zoneViewShuffle);
     void setSoundEnabled(int _soundEnabled);
     void setSoundPath(const QString &_soundPath);
     void setPriceTagFeature(int _priceTagFeature);
