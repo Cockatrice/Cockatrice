@@ -52,14 +52,11 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
     
     QMenu *chatSettingsMenu = new QMenu(this);
-    aIgnoreUnregisteredUsers = chatSettingsMenu->addAction(QString());
-    aIgnoreUnregisteredUsers->setCheckable(true);
-    connect(aIgnoreUnregisteredUsers, SIGNAL(triggered()), this, SLOT(actIgnoreUnregisteredUsers()));
 
-    chatSettingsMenu->addSeparator();
-    
     aClearChat = chatSettingsMenu->addAction(QString());
     connect(aClearChat, SIGNAL(triggered()), this, SLOT(actClearChat()));
+
+    chatSettingsMenu->addSeparator();
 
     aOpenChatSettings = chatSettingsMenu->addAction(QString());
     connect(aOpenChatSettings, SIGNAL(triggered()), this, SLOT(actOpenChatSettings()));
@@ -124,7 +121,6 @@ void TabRoom::retranslateUi()
     chatGroupBox->setTitle(tr("Chat"));
     roomMenu->setTitle(tr("&Room"));
     aLeaveRoom->setText(tr("&Leave room"));
-    aIgnoreUnregisteredUsers->setText(tr("&Ignore unregistered users in chat"));
     aClearChat->setText(tr("&Clear chat"));
     aOpenChatSettings->setText(tr("Chat Settings..."));
 }
@@ -172,17 +168,6 @@ void TabRoom::actLeaveRoom()
 {
     sendRoomCommand(prepareRoomCommand(Command_LeaveRoom()));
     deleteLater();
-}
-
-void TabRoom::actIgnoreUnregisteredUsers()
-{
-    aIgnoreUnregisteredUsers->setChecked(!aIgnoreUnregisteredUsers->isChecked());
-    settingsCache->setIgnoreUnregisteredUsers(!settingsCache->getIgnoreUnregisteredUsers());
-}
-
-void TabRoom::ignoreUnregisteredUsersChanged()
-{
-    aIgnoreUnregisteredUsers->setChecked(settingsCache->getIgnoreUnregisteredUsers());
 }
 
 void TabRoom::actClearChat() {

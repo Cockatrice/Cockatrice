@@ -293,11 +293,10 @@ void SettingsCache::setPriceTagSource(int _priceTagSource)
     settings->setValue("deckeditor/pricetagsource", priceTagSource);
 }
 
-void SettingsCache::setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers)
+void SettingsCache::setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers)
 {
     ignoreUnregisteredUsers = _ignoreUnregisteredUsers;
     settings->setValue("chat/ignore_unregistered", ignoreUnregisteredUsers);
-    emit ignoreUnregisteredUsersChanged();
 }
 
 void SettingsCache::setMainWindowGeometry(const QByteArray &_mainWindowGeometry)

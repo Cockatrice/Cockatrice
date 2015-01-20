@@ -43,7 +43,6 @@ private:
     
     QMenu *roomMenu;
     QAction *aLeaveRoom;
-    QAction *aIgnoreUnregisteredUsers;
     QAction *aOpenChatSettings;
     QAction * aClearChat;
     QString sanitizeHtml(QString dirty) const;
@@ -54,10 +53,8 @@ private slots:
     void sendMessage();
     void sayFinished(const Response &response);
     void actLeaveRoom();
-    void actIgnoreUnregisteredUsers();
     void actClearChat();
     void actOpenChatSettings();
-    void ignoreUnregisteredUsersChanged();
     void addMentionTag(QString mentionTag);
     
     void processListGamesEvent(const Event_ListGames &event);
