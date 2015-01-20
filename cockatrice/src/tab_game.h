@@ -195,6 +195,8 @@ private slots:
     void actPhaseAction();
     void actNextPhase();
     void actNextTurn();
+
+    void addMentionTag(QString value);
 public:
     TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event, const QMap<int, QString> &_roomGameTypes);
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);

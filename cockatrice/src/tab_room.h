@@ -58,6 +58,7 @@ private slots:
     void actClearChat();
     void actOpenChatSettings();
     void ignoreUnregisteredUsersChanged();
+    void addMentionTag(QString mentionTag);
     
     void processListGamesEvent(const Event_ListGames &event);
     void processJoinRoomEvent(const Event_JoinRoom &event);
