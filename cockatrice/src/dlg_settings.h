@@ -1,7 +1,13 @@
 #ifndef DLG_SETTINGS_H
 #define DLG_SETTINGS_H
 
+#include <QComboBox>
+#include <QCheckBox>
 #include <QDialog>
+#include <QGroupBox>
+#include <QLabel>
+#include <QPushButton>
+#include <QSpinBox>
 
 class CardDatabase;
 class QListWidget;
@@ -39,14 +45,25 @@ private slots:
 private:
     QStringList findQmFiles();
     QString languageName(const QString &qmFile);
-    QLineEdit *deckPathEdit, *replaysPathEdit, *picsPathEdit, *cardDatabasePathEdit, *tokenDatabasePathEdit;
-    QSpinBox *pixmapCacheEdit;
-    QGroupBox *personalGroupBox, *pathsGroupBox;
-    QComboBox *languageBox;
-    QCheckBox *picDownloadCheckBox;
-    QCheckBox *picDownloadHqCheckBox;
-    QLabel *languageLabel, *deckPathLabel, *replaysPathLabel, *picsPathLabel, *cardDatabasePathLabel, *tokenDatabasePathLabel, *pixmapCacheLabel;
-    QPushButton *clearDownloadedPicsButton;
+    QLineEdit *deckPathEdit;
+    QLineEdit *replaysPathEdit;
+    QLineEdit *picsPathEdit;
+    QLineEdit *cardDatabasePathEdit;
+    QLineEdit *tokenDatabasePathEdit;
+    QSpinBox pixmapCacheEdit;
+    QGroupBox *personalGroupBox; 
+    QGroupBox *pathsGroupBox;
+    QComboBox languageBox;
+    QCheckBox picDownloadCheckBox;
+    QCheckBox picDownloadHqCheckBox;
+    QLabel languageLabel;
+    QLabel pixmapCacheLabel;
+    QLabel deckPathLabel;
+    QLabel replaysPathLabel;
+    QLabel picsPathLabel;
+    QLabel cardDatabasePathLabel;
+    QLabel tokenDatabasePathLabel;
+    QPushButton clearDownloadedPicsButton;
 };
 
 class AppearanceSettingsPage : public AbstractSettingsPage {
@@ -69,11 +86,25 @@ signals:
     void playerAreaBgChanged(const QString &path);
     void cardBackPicturePathChanged(const QString &path);
 private:
-    QLabel *handBgLabel, *stackBgLabel, *tableBgLabel, *playerAreaBgLabel, *cardBackPicturePathLabel, *minPlayersForMultiColumnLayoutLabel;
-    QLineEdit *handBgEdit, *stackBgEdit, *tableBgEdit, *playerAreaBgEdit, *cardBackPicturePathEdit;
-    QCheckBox *displayCardNamesCheckBox, *horizontalHandCheckBox, *invertVerticalCoordinateCheckBox, *zoneViewSortByNameCheckBox, *zoneViewSortByTypeCheckBox;
-    QGroupBox *zoneBgGroupBox, *cardsGroupBox, *handGroupBox, *tableGroupBox, *zoneViewGroupBox;
-    QSpinBox *minPlayersForMultiColumnLayoutEdit;
+    QLabel handBgLabel;
+    QLabel stackBgLabel;
+    QLabel tableBgLabel;
+    QLabel playerAreaBgLabel;
+    QLabel cardBackPicturePathLabel;
+    QLabel minPlayersForMultiColumnLayoutLabel;
+    QLineEdit *handBgEdit;
+    QLineEdit *stackBgEdit;
+    QLineEdit *tableBgEdit;
+    QLineEdit *playerAreaBgEdit;
+    QLineEdit *cardBackPicturePathEdit;
+    QCheckBox displayCardNamesCheckBox;
+    QCheckBox horizontalHandCheckBox;
+    QCheckBox invertVerticalCoordinateCheckBox;
+    QGroupBox *zoneBgGroupBox;
+    QGroupBox *cardsGroupBox;
+    QGroupBox *handGroupBox;
+    QGroupBox *tableGroupBox;
+    QSpinBox minPlayersForMultiColumnLayoutEdit;
 public:
     AppearanceSettingsPage();
     void retranslateUi();
@@ -87,15 +118,17 @@ private slots:
 signals:
     void soundPathChanged();
 private:
-    QCheckBox *notificationsEnabledCheckBox;
-    QCheckBox *doubleClickToPlayCheckBox;
-    QCheckBox *playToStackCheckBox;
-    QCheckBox *tapAnimationCheckBox;
-    QCheckBox *soundEnabledCheckBox;
-    QLabel *soundPathLabel;
+    QCheckBox notificationsEnabledCheckBox;
+    QCheckBox doubleClickToPlayCheckBox;
+    QCheckBox playToStackCheckBox;
+    QCheckBox tapAnimationCheckBox;
+    QCheckBox soundEnabledCheckBox;
+    QLabel soundPathLabel;
     QLineEdit *soundPathEdit;
-    QGroupBox *generalGroupBox, *animationGroupBox, *soundGroupBox;
-    QPushButton *soundTestButton;
+    QGroupBox *generalGroupBox;
+    QGroupBox *animationGroupBox;
+    QGroupBox *soundGroupBox;
+    QPushButton soundTestButton;
 public:
     UserInterfaceSettingsPage();
     void retranslateUi();
@@ -111,8 +144,7 @@ private slots:
 signals:
     void priceTagSourceChanged(int _priceTagSource);
 private:
-    QCheckBox *priceTagsCheckBox;
-    QRadioButton *priceTagSource0, *priceTagSource1;
+    QCheckBox priceTagsCheckBox;
     QGroupBox *generalGroupBox;
 };
 
@@ -126,8 +158,9 @@ private slots:
     void actRemove();
 private:
     QListWidget *messageList;
-    QAction *aAdd, *aRemove;
-    QCheckBox *chatMentionCheckBox;
+    QAction *aAdd;
+    QAction *aRemove;
+    QCheckBox chatMentionCheckBox;
     QGroupBox *chatGroupBox;
     QGroupBox *messageShortcuts;
 
