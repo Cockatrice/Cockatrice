@@ -154,7 +154,7 @@ public slots:
     void setSoundPath(const QString &_soundPath);
     void setPriceTagFeature(int _priceTagFeature);
     void setPriceTagSource(int _priceTagSource);
-    void setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers);
+    void setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers);
     void setPicUrl(const QString &_picUrl);
     void setPicUrlHq(const QString &_picUrlHq);
     void setPicUrlFallback(const QString &_picUrlFallback);
