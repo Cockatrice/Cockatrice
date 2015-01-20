@@ -44,6 +44,7 @@ private:
     QMenu *roomMenu;
     QAction *aLeaveRoom;
     QAction *aIgnoreUnregisteredUsers;
+    QAction *aOpenChatSettings;
     QAction * aClearChat;
     QString sanitizeHtml(QString dirty) const;
 signals:
@@ -55,6 +56,7 @@ private slots:
     void actLeaveRoom();
     void actIgnoreUnregisteredUsers();
     void actClearChat();
+    void actOpenChatSettings();
     void ignoreUnregisteredUsersChanged();
     
     void processListGamesEvent(const Event_ListGames &event);

@@ -138,6 +138,7 @@ class DlgSettings : public QDialog {
     Q_OBJECT
 public:
     DlgSettings(QWidget *parent = 0);
+    void setTab(int index);
 private slots:
     void changePage(QListWidgetItem *current, QListWidgetItem *previous);
     void updateLanguage();
