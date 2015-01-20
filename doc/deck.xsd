@@ -1,0 +1,29 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="cockatrice_deck">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element type="xs:string" name="deckname"/>
+        <xs:element type="xs:string" name="comments"/>
+        <xs:element name="zone" maxOccurs="unbounded" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="card" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute type="xs:int" name="number" />
+                      <xs:attribute type="xs:float" name="price" use="optional"/>
+                      <xs:attribute type="xs:string" name="name" />
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute type="xs:string" name="name" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute type="xs:int" name="version"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
