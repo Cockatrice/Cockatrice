@@ -102,18 +102,6 @@
         <translation>다열 레이아웃를 위한 최소 플레이어 인원 (4명 이상 권장)</translation>
     </message>
     <message>
-        <source>Zone view layout</source>
-        <translation type="vanished">구역 표시 레이아웃</translation>
-    </message>
-    <message>
-        <source>Sort by name</source>
-        <translation type="vanished">카드 이름 순 정렬</translation>
-    </message>
-    <message>
-        <source>Sort by type</source>
-        <translation type="vanished">카드 유형 별 정렬</translation>
-    </message>
-    <message>
         <location filename="../src/dlg_settings.cpp" line="376"/>
         <location filename="../src/dlg_settings.cpp" line="392"/>
         <location filename="../src/dlg_settings.cpp" line="408"/>
@@ -1231,10 +1219,6 @@ http://github.com/Daenyth/Cockatrice/issues 에 cards.xml를 첨부하여 버그
         <source>Chat Settings</source>
         <translation>대화 설정</translation>
     </message>
-    <message>
-        <source>Messages</source>
-        <translation type="vanished">메세지</translation>
-    </message>
 </context>
 <context>
     <name>GameSelector</name>
@@ -1849,12 +1833,6 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="87"/>
         <source>%1 is not watching the game any more.</source>
         <translation>%1이(가) 관전을 종료하였습니다.</translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 draws %n card(s).</source>
-        <translation type="vanished">
-            <numerusform>%1이(가) %n장의 카드를 뽑습니다.</numerusform>
-        </translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="40"/>
@@ -2876,18 +2854,6 @@ Local version is %1, remote version is %2.</source>
         <translation>카드 한 장</translation>
     </message>
     <message numerus="yes">
-        <source>%1 places %n counter(s) (%2) on %3 (now %4).</source>
-        <translation type="vanished">
-            <numerusform>%1이(가) %n개의 %2 카운터를 %3에 올려놓습니다 (현재 %4개).</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 removes %n counter(s) (%2) from %3 (now %4).</source>
-        <translation type="vanished">
-            <numerusform>%1이(가) %n개의 %2 카운터를 %3에서 제거합니다 (현재 %4개).</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="559"/>
         <source>red</source>
         <translation>
@@ -2922,18 +2888,6 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="351"/>
         <source>%1 draws her initial hand.</source>
         <translation>%1이(가) 시작 카드를 뽑았습니다.</translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
-        <translation type="vanished">
-            <numerusform>%1이(가) %n개의 %2 카운터를 %3에 올려놓습니다 (현재 %4개).</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
-        <translation type="vanished">
-            <numerusform>%1이(가) %n개의 %2 카운터를 %3에서 제거합니다 (현재 %4개).</numerusform>
-        </translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="819"/>
@@ -3049,7 +3003,7 @@ Local version is %1, remote version is %2.</source>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="655"/>
-        <source>Ignore unregisterd users in main chat</source>
+        <source>Ignore unregistered users in main chat</source>
         <translation>채널 대화창에서 서버에 등록하지 않은 사용자의 대화 차단</translation>
     </message>
     <message>
@@ -4431,10 +4385,6 @@ Please enter a name:</source>
         <location filename="../src/tab_room.cpp" line="123"/>
         <source>&amp;Leave room</source>
         <translation>채널에서 나가기</translation>
-    </message>
-    <message>
-        <source>&amp;Ignore unregistered users in chat</source>
-        <translation type="vanished">서버에 등록하지 않은 사용자의 메세지 차단</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="124"/>
