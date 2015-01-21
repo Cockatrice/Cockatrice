@@ -652,7 +652,7 @@ void MessagesSettingsPage::retranslateUi()
     chatGroupBox->setTitle(tr("Chat settings"));
     chatMentionCheckBox.setText(tr("Enable chat mentions ('@yourusername' in chat log will be highlighted)"));
     messageShortcuts->setTitle(tr("In-game message macros"));
-    ignoreUnregUsersMainChat.setText(tr("Ignore unregisterd users in main chat"));
+    ignoreUnregUsersMainChat.setText(tr("Ignore unregistered users in main chat"));
 }
 
 DlgSettings::DlgSettings(QWidget *parent)
