@@ -37,91 +37,88 @@
 <context>
     <name>AppearanceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="379"/>
+        <location filename="../src/dlg_settings.cpp" line="350"/>
         <source>Zone background pictures</source>
         <translation>구역별 배경 이미지</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="380"/>
+        <location filename="../src/dlg_settings.cpp" line="351"/>
         <source>Hand background:</source>
         <translation>손 배경 이미지:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="381"/>
+        <location filename="../src/dlg_settings.cpp" line="352"/>
         <source>Stack background:</source>
         <translation>스택 배경 이미지:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="382"/>
+        <location filename="../src/dlg_settings.cpp" line="353"/>
         <source>Table background:</source>
         <translation>전장 배경 이미지:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="383"/>
+        <location filename="../src/dlg_settings.cpp" line="354"/>
         <source>Player info background:</source>
         <translation>플레이어 정보 배경 이미지:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="384"/>
+        <location filename="../src/dlg_settings.cpp" line="355"/>
         <source>Card back:</source>
         <translation>카드 뒷면 이미지:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="386"/>
+        <location filename="../src/dlg_settings.cpp" line="357"/>
         <source>Card rendering</source>
         <translation>카드 렌더링</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="387"/>
+        <location filename="../src/dlg_settings.cpp" line="358"/>
         <source>Display card names on cards having a picture</source>
         <translation>이미지가 존재하는 카드에도 카드 이름 표시</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="389"/>
+        <location filename="../src/dlg_settings.cpp" line="360"/>
         <source>Hand layout</source>
-        <translation>손 정렬 방식</translation>
+        <translation>손 레이아웃</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="390"/>
+        <location filename="../src/dlg_settings.cpp" line="361"/>
         <source>Display hand horizontally (wastes space)</source>
-        <translation>손의 카드를 가로로 정렬（화면 공간을 더 필요로 함）</translation>
+        <translation>손의 카드를 가로로 정렬</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="392"/>
+        <location filename="../src/dlg_settings.cpp" line="363"/>
         <source>Table grid layout</source>
         <translation>테이블 격자 레이아웃</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="393"/>
+        <location filename="../src/dlg_settings.cpp" line="364"/>
         <source>Invert vertical coordinate</source>
-        <translation>전장의 상하배치를 전환 (대지를 앞으로)</translation>
+        <translation>전장의 상하배치를 전환 (대지를 앞에 배치)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="394"/>
+        <location filename="../src/dlg_settings.cpp" line="365"/>
         <source>Minimum player count for multi-column layout:</source>
         <translation>다열 레이아웃를 위한 최소 플레이어 인원 (4명 이상 권장)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="396"/>
         <source>Zone view layout</source>
-        <translation>구역 표시 레이아웃</translation>
+        <translation type="vanished">구역 표시 레이아웃</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="397"/>
         <source>Sort by name</source>
-        <translation>이름 순 정렬</translation>
+        <translation type="vanished">카드 이름 순 정렬</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="398"/>
         <source>Sort by type</source>
-        <translation>종류 별 정렬</translation>
+        <translation type="vanished">카드 유형 별 정렬</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="409"/>
-        <location filename="../src/dlg_settings.cpp" line="425"/>
-        <location filename="../src/dlg_settings.cpp" line="441"/>
-        <location filename="../src/dlg_settings.cpp" line="457"/>
-        <location filename="../src/dlg_settings.cpp" line="473"/>
+        <location filename="../src/dlg_settings.cpp" line="376"/>
+        <location filename="../src/dlg_settings.cpp" line="392"/>
+        <location filename="../src/dlg_settings.cpp" line="408"/>
+        <location filename="../src/dlg_settings.cpp" line="424"/>
+        <location filename="../src/dlg_settings.cpp" line="440"/>
         <source>Choose path</source>
         <translation>경로 선택</translation>
     </message>
@@ -231,7 +228,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="63"/>
         <source>Card type</source>
-        <translation>카드 종류</translation>
+        <translation>카드 유형</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="64"/>
@@ -254,7 +251,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardinfotext.cpp" line="64"/>
         <source>Card type:</source>
-        <translation>카드 종류:</translation>
+        <translation>카드 유형:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="65"/>
@@ -297,7 +294,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardinfowidget.cpp" line="203"/>
         <source>Card type:</source>
-        <translation>카드 종류:</translation>
+        <translation>카드 유형:</translation>
     </message>
     <message>
         <location filename="../src/cardinfowidget.cpp" line="204"/>
@@ -590,12 +587,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DeckEditorSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="599"/>
+        <location filename="../src/dlg_settings.cpp" line="559"/>
         <source>Enable &amp;price tag feature from deckbrew.com</source>
         <translation>deckbrew.com을 이용한 카드 가격 정보 조회 기능</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="600"/>
+        <location filename="../src/dlg_settings.cpp" line="560"/>
         <source>General</source>
         <translation>일반</translation>
     </message>
@@ -690,12 +687,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_cardsearch.cpp" line="21"/>
         <source>Card type (OR):</source>
-        <translation>카드 종류（OR）:</translation>
+        <translation>카드 유형(OR):</translation>
     </message>
     <message>
         <location filename="../src/dlg_cardsearch.cpp" line="31"/>
         <source>Color (OR):</source>
-        <translation>카드 색깔（OR）:</translation>
+        <translation>카드 색깔(OR):</translation>
     </message>
     <message>
         <location filename="../src/dlg_cardsearch.cpp" line="41"/>
@@ -1103,19 +1100,19 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="814"/>
-        <location filename="../src/dlg_settings.cpp" line="820"/>
-        <location filename="../src/dlg_settings.cpp" line="826"/>
+        <location filename="../src/dlg_settings.cpp" line="806"/>
+        <location filename="../src/dlg_settings.cpp" line="812"/>
+        <location filename="../src/dlg_settings.cpp" line="818"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="768"/>
+        <location filename="../src/dlg_settings.cpp" line="760"/>
         <source>Unknown Error loading card database</source>
         <translation>데이터베이스를 불러올 때 미상의 오류가 발생하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="777"/>
+        <location filename="../src/dlg_settings.cpp" line="769"/>
         <source>Your card database is invalid.
 
 Cockatrice may not function correctly with an invalid database
@@ -1132,7 +1129,7 @@ Would you like to change your database location setting?</source>
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="784"/>
+        <location filename="../src/dlg_settings.cpp" line="776"/>
         <source>Your card database version is too old.
 
 This can cause problems loading card information or images
@@ -1149,7 +1146,7 @@ Would you like to change your database location setting?</source>
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="791"/>
+        <location filename="../src/dlg_settings.cpp" line="783"/>
         <source>Your card database did not finish loading
 
 Please file a ticket at http://github.com/Daenyth/Cockatrice/issues with your cards.xml attached
@@ -1162,7 +1159,7 @@ http://github.com/Daenyth/Cockatrice/issues 에 cards.xml를 첨부하여 버그
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="797"/>
+        <location filename="../src/dlg_settings.cpp" line="789"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
@@ -1171,7 +1168,7 @@ Would you like to change your database location setting?</source>
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="802"/>
+        <location filename="../src/dlg_settings.cpp" line="794"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
@@ -1180,7 +1177,7 @@ Would you like to change your database location setting?</source>
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="807"/>
+        <location filename="../src/dlg_settings.cpp" line="799"/>
         <source>Unknown card database load status
 
 Please file a ticket at http://github.com/Daenyth/Cockatrice/issues
@@ -1193,46 +1190,50 @@ http://github.com/Daenyth/Cockatrice/issues 에 cards.xml를 첨부하여 버그
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="820"/>
+        <location filename="../src/dlg_settings.cpp" line="812"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>덱 파일을 보관하는 디렉토리의 경로가 잘못되었습니다.
 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="826"/>
+        <location filename="../src/dlg_settings.cpp" line="818"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>카드 이미지 파일을 보관하는 디렉토리의 경로가 잘못되었습니다.
 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="835"/>
+        <location filename="../src/dlg_settings.cpp" line="827"/>
         <source>Settings</source>
         <translation>환경설정</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="837"/>
+        <location filename="../src/dlg_settings.cpp" line="829"/>
         <source>General</source>
         <translation>일반</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="838"/>
+        <location filename="../src/dlg_settings.cpp" line="830"/>
         <source>Appearance</source>
         <translation>외형</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="839"/>
+        <location filename="../src/dlg_settings.cpp" line="831"/>
         <source>User interface</source>
         <translation>인터페이스</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="840"/>
+        <location filename="../src/dlg_settings.cpp" line="832"/>
         <source>Deck editor</source>
         <translation>덱 편집기</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="841"/>
+        <location filename="../src/dlg_settings.cpp" line="833"/>
+        <source>Chat Settings</source>
+        <translation>대화 설정</translation>
+    </message>
+    <message>
         <source>Messages</source>
-        <translation>메세지</translation>
+        <translation type="vanished">메세지</translation>
     </message>
 </context>
 <context>
@@ -1425,97 +1426,97 @@ http://github.com/Daenyth/Cockatrice/issues 에 cards.xml를 첨부하여 버그
 <context>
     <name>GeneralSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="242"/>
+        <location filename="../src/dlg_settings.cpp" line="238"/>
         <source>Reset/Clear Downloaded Pictures</source>
         <translation>저장된 이미지 초기화</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="152"/>
-        <location filename="../src/dlg_settings.cpp" line="162"/>
-        <location filename="../src/dlg_settings.cpp" line="172"/>
-        <location filename="../src/dlg_settings.cpp" line="206"/>
-        <location filename="../src/dlg_settings.cpp" line="216"/>
+        <location filename="../src/dlg_settings.cpp" line="148"/>
+        <location filename="../src/dlg_settings.cpp" line="158"/>
+        <location filename="../src/dlg_settings.cpp" line="168"/>
+        <location filename="../src/dlg_settings.cpp" line="202"/>
+        <location filename="../src/dlg_settings.cpp" line="212"/>
         <source>Choose path</source>
         <translation>경로 선택</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="199"/>
+        <location filename="../src/dlg_settings.cpp" line="195"/>
         <source>Success</source>
         <translation>성공</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="199"/>
+        <location filename="../src/dlg_settings.cpp" line="195"/>
         <source>Downloaded card pictures have been reset.</source>
         <translation>저장된 카드 이미지 파일들이 초기화 되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="201"/>
+        <location filename="../src/dlg_settings.cpp" line="197"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="201"/>
+        <location filename="../src/dlg_settings.cpp" line="197"/>
         <source>One or more downloaded card pictures could not be cleared.</source>
         <translation>저장된 카드 이미지 파일을 초기화 시킬 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="231"/>
+        <location filename="../src/dlg_settings.cpp" line="227"/>
         <source>Personal settings</source>
         <translation>개인 설정</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="232"/>
+        <location filename="../src/dlg_settings.cpp" line="228"/>
         <source>Language:</source>
         <translation>언어:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="233"/>
+        <location filename="../src/dlg_settings.cpp" line="229"/>
         <source>Download card pictures on the fly</source>
         <translation>카드 이미지 파일 자동 다운로드</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="234"/>
+        <location filename="../src/dlg_settings.cpp" line="230"/>
         <source>Download high-quality card pictures</source>
         <translation>고화질 카드 이미지 사용</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="235"/>
+        <location filename="../src/dlg_settings.cpp" line="231"/>
         <source>Paths</source>
         <translation>디렉토리 경로</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="236"/>
+        <location filename="../src/dlg_settings.cpp" line="232"/>
         <source>Decks directory:</source>
         <translation>덱 파일 경로:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="237"/>
+        <location filename="../src/dlg_settings.cpp" line="233"/>
         <source>Replays directory:</source>
         <translation>리플레이 파일 경로:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="238"/>
+        <location filename="../src/dlg_settings.cpp" line="234"/>
         <source>Pictures directory:</source>
         <translation>카드 이미지 경로:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="239"/>
+        <location filename="../src/dlg_settings.cpp" line="235"/>
         <source>Card database:</source>
         <translation>카드 데이터베이스 경로:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="240"/>
+        <location filename="../src/dlg_settings.cpp" line="236"/>
         <source>Token database:</source>
         <translation>토큰 데이터베이스 경로:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="241"/>
+        <location filename="../src/dlg_settings.cpp" line="237"/>
         <source>Picture cache size:</source>
         <translation>카드 이미지 캐시 최대 용량:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="40"/>
-        <location filename="../src/dlg_settings.cpp" line="147"/>
+        <location filename="../src/dlg_settings.cpp" line="37"/>
+        <location filename="../src/dlg_settings.cpp" line="143"/>
         <source>English</source>
         <translation>한국어</translation>
     </message>
@@ -1630,12 +1631,12 @@ Reason for shutdown: %1</source>
     <message>
         <location filename="../src/window_main.cpp" line="223"/>
         <source>Portugese (Portugal):</source>
-        <translation>포르투갈어（포르투갈）:</translation>
+        <translation>포르투갈어(포르투갈):</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="224"/>
         <source>Portugese (Brazil):</source>
-        <translation>포르투갈어（브라질）:</translation>
+        <translation>포르투갈어(브라질):</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="225"/>
@@ -1728,14 +1729,16 @@ Please close that session first and re-login.</source>
         <location filename="../src/window_main.cpp" line="279"/>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
-        <translation>서버 버전이 클라이언트보다 오래되었습니다. 클라이언트를 다운그레이드하거나 다른 서버에 연결하여 주시기 바랍니다.
+        <translation>서버 버전이 클라이언트보다 오래되었습니다.
+클라이언트를 다운그레이드하거나 다른 서버에 연결하여 주시기 바랍니다.
 클라이언트 버전 %1, 서버 버전 %2.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="281"/>
         <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
 Local version is %1, remote version is %2.</source>
-        <translation>코카트리스 클라이언트 버전이 오래되었습니다. 클라이언트를 업데이트하여 주십시오.
+        <translation>코카트리스 클라이언트 버전이 오래되었습니다.
+클라이언트를 업데이트하여 주십시오.
 클라이언트 버전 %1, 서버 버전 %2.</translation>
     </message>
     <message>
@@ -3020,22 +3023,42 @@ Local version is %1, remote version is %2.</source>
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="669"/>
+        <location filename="../src/dlg_settings.cpp" line="650"/>
         <source>&amp;Add</source>
         <translation>추가</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="670"/>
+        <location filename="../src/dlg_settings.cpp" line="651"/>
         <source>&amp;Remove</source>
         <translation>제거</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="652"/>
+        <source>Chat settings</source>
+        <translation>대화 설정</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="653"/>
+        <source>Enable chat mentions (&apos;@yourusername&apos; in chat log will be highlighted)</source>
+        <translation>대화 중 호출 시 해당 문장을 강조 (&apos;@(당신의 사용자명)&apos;이 포함된 문장을 강조합니다)</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="654"/>
+        <source>In-game message macros</source>
+        <translation>게임 내 대화 매크로</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="655"/>
+        <source>Ignore unregisterd users in main chat</source>
+        <translation>채널 대화창에서 서버에 등록하지 않은 사용자의 대화 차단</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="633"/>
         <source>Add message</source>
         <translation>메세지 추가</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="652"/>
+        <location filename="../src/dlg_settings.cpp" line="633"/>
         <source>Message:</source>
         <translation>메세지:</translation>
     </message>
@@ -3809,7 +3832,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/tab_admin.cpp" line="22"/>
         <source>&amp;Time until shutdown (minutes):</source>
-        <translation>서버 종류까지 남은 시간(분):</translation>
+        <translation>서버 종료까지 남은 시간(분):</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="40"/>
@@ -4148,148 +4171,148 @@ Please enter a name:</source>
 <context>
     <name>TabGame</name>
     <message>
-        <location filename="../src/tab_game.cpp" line="476"/>
+        <location filename="../src/tab_game.cpp" line="477"/>
         <source>F5</source>
         <translation>F5</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="477"/>
+        <location filename="../src/tab_game.cpp" line="478"/>
         <source>F6</source>
         <translation>F6</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="478"/>
+        <location filename="../src/tab_game.cpp" line="479"/>
         <source>F7</source>
         <translation>F7</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="479"/>
+        <location filename="../src/tab_game.cpp" line="480"/>
         <source>F8</source>
         <translation>F8</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="480"/>
+        <location filename="../src/tab_game.cpp" line="481"/>
         <source>F9</source>
         <translation>F9</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="481"/>
+        <location filename="../src/tab_game.cpp" line="482"/>
         <source>F10</source>
         <translation>F10</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="530"/>
+        <location filename="../src/tab_game.cpp" line="536"/>
         <source>&amp;Phases</source>
         <translation>단계</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="533"/>
+        <location filename="../src/tab_game.cpp" line="539"/>
         <source>&amp;Game</source>
         <translation>게임</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="535"/>
+        <location filename="../src/tab_game.cpp" line="541"/>
         <source>Next &amp;phase</source>
         <translation>다음 단계로 진행</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="536"/>
+        <location filename="../src/tab_game.cpp" line="542"/>
         <source>Ctrl+Space</source>
         <translation>Ctrl+Space</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="536"/>
+        <location filename="../src/tab_game.cpp" line="542"/>
         <source>Tab</source>
         <translation>Tab</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="539"/>
+        <location filename="../src/tab_game.cpp" line="545"/>
         <source>Next &amp;turn</source>
         <translation>턴 넘기기</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="540"/>
+        <location filename="../src/tab_game.cpp" line="546"/>
         <source>Ctrl+Return</source>
         <translation>Ctrl+Return</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="540"/>
+        <location filename="../src/tab_game.cpp" line="546"/>
         <source>Ctrl+Enter</source>
         <translation>Ctrl+Enter</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="543"/>
+        <location filename="../src/tab_game.cpp" line="549"/>
         <source>&amp;Remove all local arrows</source>
         <translation>자기가 그린 화살표 제거</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="544"/>
+        <location filename="../src/tab_game.cpp" line="550"/>
         <source>Ctrl+R</source>
         <translation>Ctrl+R</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="547"/>
+        <location filename="../src/tab_game.cpp" line="553"/>
         <source>Game &amp;information</source>
         <translation>게임 정보</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="549"/>
+        <location filename="../src/tab_game.cpp" line="555"/>
         <source>&amp;Concede</source>
         <translation>항복</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="550"/>
+        <location filename="../src/tab_game.cpp" line="556"/>
         <source>F2</source>
         <translation>F2</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="553"/>
+        <location filename="../src/tab_game.cpp" line="559"/>
         <source>&amp;Leave game</source>
         <translation>게임 나가기</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="554"/>
-        <location filename="../src/tab_game.cpp" line="558"/>
+        <location filename="../src/tab_game.cpp" line="560"/>
+        <location filename="../src/tab_game.cpp" line="564"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="557"/>
+        <location filename="../src/tab_game.cpp" line="563"/>
         <source>C&amp;lose replay</source>
         <translation>리플레이 닫기</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="562"/>
+        <location filename="../src/tab_game.cpp" line="568"/>
         <source>&amp;Say:</source>
         <translation>말하기:</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="664"/>
+        <location filename="../src/tab_game.cpp" line="670"/>
         <source>Concede</source>
         <translation>항복</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="664"/>
+        <location filename="../src/tab_game.cpp" line="670"/>
         <source>Are you sure you want to concede this game?</source>
         <translation>정말 게임에서 항복하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="674"/>
+        <location filename="../src/tab_game.cpp" line="680"/>
         <source>Leave game</source>
         <translation>게임 나가기</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="674"/>
+        <location filename="../src/tab_game.cpp" line="680"/>
         <source>Are you sure you want to leave this game?</source>
         <translation>정말 게임에서 나가시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1168"/>
+        <location filename="../src/tab_game.cpp" line="1174"/>
         <source>Replay %1: %2</source>
         <translation>리플레이 %1: %2</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1170"/>
+        <location filename="../src/tab_game.cpp" line="1176"/>
         <source>Game %1: %2</source>
         <translation>게임 %1: %2</translation>
     </message>
@@ -4390,37 +4413,41 @@ Please enter a name:</source>
 <context>
     <name>TabRoom</name>
     <message>
-        <location filename="../src/tab_room.cpp" line="115"/>
+        <location filename="../src/tab_room.cpp" line="120"/>
         <source>&amp;Say:</source>
         <translation>말하기:</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="116"/>
+        <location filename="../src/tab_room.cpp" line="121"/>
         <source>Chat</source>
         <translation>대화</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="117"/>
+        <location filename="../src/tab_room.cpp" line="122"/>
         <source>&amp;Room</source>
         <translation>채널</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="118"/>
+        <location filename="../src/tab_room.cpp" line="123"/>
         <source>&amp;Leave room</source>
         <translation>채널에서 나가기</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="119"/>
         <source>&amp;Ignore unregistered users in chat</source>
-        <translation>서버에 등록하지 않은 사용자의 메세지 차단</translation>
+        <translation type="vanished">서버에 등록하지 않은 사용자의 메세지 차단</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="120"/>
+        <location filename="../src/tab_room.cpp" line="124"/>
         <source>&amp;Clear chat</source>
         <translation>대화 내용 삭제</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="159"/>
+        <location filename="../src/tab_room.cpp" line="125"/>
+        <source>Chat Settings...</source>
+        <translation>대화 설정...</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_room.cpp" line="164"/>
         <source>You are flooding the chat. Please wait a couple of seconds.</source>
         <translation>너무 빨리 말하고 있습니다. 조금만 기다려 주십시오.</translation>
     </message>
@@ -4586,52 +4613,57 @@ Please enter a name:</source>
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="550"/>
+        <location filename="../src/dlg_settings.cpp" line="510"/>
         <source>General interface settings</source>
         <translation>일반 인터페이스 설정</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="551"/>
+        <location filename="../src/dlg_settings.cpp" line="511"/>
         <source>Enable notifications in taskbar</source>
         <translation>상태 표시줄에 알림 설정</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="552"/>
+        <location filename="../src/dlg_settings.cpp" line="512"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
-        <translation>카드를 (한번 클릭이 아닌) 더블 클릭하여 발동</translation>
+        <translation>카드를 더블 클릭하여 발동 (해제시 한번만 클릭하면 발동 됨)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="553"/>
+        <location filename="../src/dlg_settings.cpp" line="513"/>
         <source>&amp;Play all nonlands onto the stack (not the battlefield) by default</source>
-        <translation>모든 대지가 아닌 카드를 발동 시에 (전장이 아닌) 스택으로 이동</translation>
+        <translation>모든 대지가 아닌 카드를 발동 시에 스택으로 이동 (해제시 전장으로 바로 이동)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="554"/>
+        <location filename="../src/dlg_settings.cpp" line="514"/>
         <source>Animation settings</source>
         <translation>애니메이션 설정</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="555"/>
+        <location filename="../src/dlg_settings.cpp" line="515"/>
         <source>&amp;Tap/untap animation</source>
         <translation>탭/언탭 애니메이션</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="556"/>
+        <location filename="../src/dlg_settings.cpp" line="516"/>
         <source>Enable &amp;sounds</source>
         <translation>음향 효과 켜기</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="557"/>
+        <location filename="../src/dlg_settings.cpp" line="517"/>
         <source>Path to sounds directory:</source>
         <translation>음향 효과 파일 디렉토리 경로:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="558"/>
+        <location filename="../src/dlg_settings.cpp" line="518"/>
         <source>Test system sound engine</source>
         <translation>시스템 사운드 엔진 테스트</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="569"/>
+        <location filename="../src/dlg_settings.cpp" line="519"/>
+        <source>Sound settings</source>
+        <translation>음향 설정</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="530"/>
         <source>Choose path</source>
         <translation>경로 선택</translation>
     </message>
@@ -4710,19 +4742,24 @@ Please enter a name:</source>
 <context>
     <name>ZoneViewWidget</name>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="148"/>
+        <location filename="../src/zoneviewwidget.cpp" line="174"/>
         <source>sort by name</source>
-        <translation>이름 순 정렬</translation>
+        <translation>카드 이름 순 정렬</translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="150"/>
+        <location filename="../src/zoneviewwidget.cpp" line="175"/>
         <source>sort by type</source>
-        <translation>종류 별 정렬</translation>
+        <translation>카드 유형 별 정렬</translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="152"/>
+        <location filename="../src/zoneviewwidget.cpp" line="176"/>
         <source>shuffle when closing</source>
         <translation>닫은 후 덱 섞기</translation>
+    </message>
+    <message>
+        <location filename="../src/zoneviewwidget.cpp" line="177"/>
+        <source>pile view</source>
+        <translation>카드 유형마다 행으로 끊어 정렬</translation>
     </message>
 </context>
 </TS>
