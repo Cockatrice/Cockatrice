@@ -12,6 +12,10 @@
 #include "userlist.h"
 #include "tab_userlists.h"
 
+const QColor OTHER_USER_MENTION_COLOR = QColor(145, 210, 255); // light blue
+const QColor MENTION_COLOR = QColor(190, 25, 85); // maroon
+const QColor OTHER_USER_COLOR = QColor(0, 65, 255); // dark blue
+
 ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent)
     : QTextBrowser(parent), tabSupervisor(_tabSupervisor), game(_game), evenNumber(true), showTimestamps(_showTimestamps), hoveredItemType(HoveredNothing)
 {
@@ -24,10 +28,11 @@ ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _sh
 
     mentionFormat.setFontWeight(QFont::Bold);
     mentionFormat.setForeground(QBrush(Qt::white));
-    mentionFormat.setBackground(QBrush(QColor(190, 25, 85)));
+    mentionFormat.setBackground(QBrush(MENTION_COLOR));
 
-    mentionFormatOtherUser.setForeground(Qt::white);
-    mentionFormatOtherUser.setBackground(QBrush(QColor(0, 65, 255, 155))); //toned down dark blue
+    mentionFormatOtherUser.setFontWeight(QFont::Bold);
+    mentionFormatOtherUser.setForeground(Qt::blue);
+    mentionFormatOtherUser.setBackground(QBrush(OTHER_USER_MENTION_COLOR));
     mentionFormatOtherUser.setAnchor(true);
 
     viewport()->setCursor(Qt::IBeamCursor);
@@ -116,9 +121,9 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     QTextCharFormat senderFormat;
     if (tabSupervisor && tabSupervisor->getUserInfo() && (sender == QString::fromStdString(tabSupervisor->getUserInfo()->name()))) {
         senderFormat.setFontWeight(QFont::Bold);
-        senderFormat.setForeground(QBrush(QColor(190, 25, 85))); // maroon
+        senderFormat.setForeground(QBrush(MENTION_COLOR));
     } else {
-        senderFormat.setForeground(QBrush(QColor(0, 65, 255))); // dark blue
+        senderFormat.setForeground(QBrush(OTHER_USER_COLOR));
         if (playerBold)
             senderFormat.setFontWeight(QFont::Bold);
     }
