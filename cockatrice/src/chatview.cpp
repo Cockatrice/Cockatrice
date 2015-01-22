@@ -6,10 +6,15 @@
 #include "chatview.h"
 #include "user_level.h"
 #include "user_context_menu.h"
-#include "tab_supervisor.h"
 #include "pixmapgenerator.h"
 #include "settingscache.h"
 #include "main.h"
+#include "userlist.h"
+#include "tab_userlists.h"
+
+const QColor OTHER_USER_MENTION_COLOR = QColor(145, 210, 255); // light blue
+const QColor MENTION_COLOR = QColor(190, 25, 85); // maroon
+const QColor OTHER_USER_COLOR = QColor(0, 65, 255); // dark blue
 
 ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent)
     : QTextBrowser(parent), tabSupervisor(_tabSupervisor), game(_game), evenNumber(true), showTimestamps(_showTimestamps), hoveredItemType(HoveredNothing)
@@ -23,7 +28,12 @@ ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _sh
 
     mentionFormat.setFontWeight(QFont::Bold);
     mentionFormat.setForeground(QBrush(Qt::white));
-    mentionFormat.setBackground(QBrush(QColor(190, 25, 85)));
+    mentionFormat.setBackground(QBrush(MENTION_COLOR));
+
+    mentionFormatOtherUser.setFontWeight(QFont::Bold);
+    mentionFormatOtherUser.setForeground(Qt::blue);
+    mentionFormatOtherUser.setBackground(QBrush(OTHER_USER_MENTION_COLOR));
+    mentionFormatOtherUser.setAnchor(true);
 
     viewport()->setCursor(Qt::IBeamCursor);
     setReadOnly(true);
@@ -111,9 +121,9 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     QTextCharFormat senderFormat;
     if (tabSupervisor && tabSupervisor->getUserInfo() && (sender == QString::fromStdString(tabSupervisor->getUserInfo()->name()))) {
         senderFormat.setFontWeight(QFont::Bold);
-        senderFormat.setForeground(QBrush(QColor(190, 25, 85)));
+        senderFormat.setForeground(QBrush(MENTION_COLOR));
     } else {
-        senderFormat.setForeground(Qt::blue);
+        senderFormat.setForeground(QBrush(OTHER_USER_COLOR));
         if (playerBold)
             senderFormat.setFontWeight(QFont::Bold);
     }
@@ -179,14 +189,35 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     }
 
     if (settingsCache->getChatMention()) {
-        if (message.toLower().contains(mention)) {
-            int mentionIndex;
-            while ((mentionIndex = message.toLower().indexOf(mention)) != -1) {
-                cursor.insertText(message.left(mentionIndex), defaultFormat);
+        index = 0;
+        from = 0;
+        while((index = message.indexOf('@', from)) != -1) {
+            cursor.insertText(message.left(index), defaultFormat);
+            message = message.mid(index);
+            if (message.isEmpty())
+                break;
+            // you have been mentioned
+            if (message.toLower().startsWith(mention)) {
                 cursor.insertText("@" + userName, mentionFormat);
-                message = message.mid(mentionIndex + mention.size());
+                message = message.mid(mention.size());
             }
-        } 
+            // another user has been mentioned
+            else {
+                int mentionEndIndex = message.indexOf(" ");
+                if (mentionEndIndex == -1)
+                    mentionEndIndex = message.size(); // there is no text after the mention
+                QString userMention = message.left(mentionEndIndex);
+                QString userName = userMention.right(userMention.size()-1).normalized(QString::NormalizationForm_D);
+                QMap<QString, UserListTWI *> userList = tabSupervisor->getUserListsTab()->getAllUsersList()->getUsers();
+                if (userList.contains(userName)) {
+                    UserListTWI *vlu = userList.value(userName);
+                    mentionFormatOtherUser.setAnchorHref("user://" + QString::number(vlu->getUserInfo().user_level()) + "_" + userName);
+                    cursor.insertText("@" + userName, mentionFormatOtherUser);
+                } else 
+                    cursor.insertText("@" + userName, defaultFormat);
+                message = message.mid(userName.size() + 1);
+            }
+        }
     }
 
     if (!message.isEmpty())
