@@ -8,7 +8,7 @@
 #include <QSettings>
 #include <QCryptographicHash>
 
-const enum GameListColumn {ROOM, CREATED, DESCRIPTION, CREATOR, GAME_TYPE, RESTRICTIONS, PLAYERS, SPECTATORS};
+enum GameListColumn {ROOM, CREATED, DESCRIPTION, CREATOR, GAME_TYPE, RESTRICTIONS, PLAYERS, SPECTATORS};
 
 namespace {
     const unsigned SECS_PER_MIN  = 60;
