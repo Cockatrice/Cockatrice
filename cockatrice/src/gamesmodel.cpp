@@ -9,6 +9,7 @@
 #include <QCryptographicHash>
 
 static const enum {ROOM, CREATED, DESCRIPTION, CREATOR, GAME_TYPE, RESTRICTIONS, PLAYERS, SPECTATORS};
+static const enum {UNREGISTERED, REGISTERED};
 
 namespace {
     const unsigned SECS_PER_MIN  = 60;
@@ -116,11 +117,8 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                 return QString::fromStdString(g.creator_info().name());
             case Qt::DecorationRole:
                 switch(g.creator_info().user_level()) {
-                case 1: {
-                    QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)g.creator_info().user_level());
-                    return QIcon(avatarPixmap);
-                        }
-                case 3:{
+                case UNREGISTERED:
+                case REGISTERED:{
                     QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)g.creator_info().user_level());
                     return QIcon(avatarPixmap);
                        }
@@ -151,12 +149,12 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             case SORT_ROLE:
             case Qt::DisplayRole: {
                 QStringList result;
+                if (g.with_password())
+                    result.append(tr("password"));
                 if (g.only_buddies())
                     result.append(tr("buddies only"));
                 if (g.only_registered())
                     result.append(tr("reg. users only"));
-                if (g.with_password())
-                    result.append(tr("password"));
                 return result.join(", ");
             }
             case Qt::DecorationRole:{
@@ -197,14 +195,14 @@ QVariant GamesModel::headerData(int section, Qt::Orientation orientation, int ro
     if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal))
         return QVariant();
     switch (section) {
-    case 0: return tr("Room");
-    case 1: return tr("Game Created");
-    case 2: return tr("Description");
-    case 3: return tr("Creator");
-    case 4: return tr("Game Type");
-    case 5: return tr("Restrictions");
-    case 6: return tr("Players");
-    case 7: return tr("Spectators");
+    case ROOM: return tr("Room");
+    case CREATED: return tr("Game Created");
+    case DESCRIPTION: return tr("Description");
+    case CREATOR: return tr("Creator");
+    case GAME_TYPE: return tr("Game Type");
+    case RESTRICTIONS: return tr("Restrictions");
+    case PLAYERS: return tr("Players");
+    case SPECTATORS: return tr("Spectators");
     default: return QVariant();
     }
 }
