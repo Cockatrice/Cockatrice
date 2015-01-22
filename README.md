@@ -52,7 +52,7 @@ The following flags can be passed to `cmake`:
 
 # Community Resources
 - [reddit r/Cockatrice](http://reddit.com/r/cockatrice)
-- [Woogerworks Server & Forums](http://woogerworks.com)
+- [Woogerworks Server & Forums](http://www.woogerworks.com)
 - [Cockatrice Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
 
 # License
