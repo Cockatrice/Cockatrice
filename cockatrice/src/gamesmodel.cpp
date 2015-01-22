@@ -8,8 +8,7 @@
 #include <QSettings>
 #include <QCryptographicHash>
 
-static const enum {ROOM, CREATED, DESCRIPTION, CREATOR, GAME_TYPE, RESTRICTIONS, PLAYERS, SPECTATORS};
-static const enum {UNREGISTERED, REGISTERED};
+const enum GameListColumn {ROOM, CREATED, DESCRIPTION, CREATOR, GAME_TYPE, RESTRICTIONS, PLAYERS, SPECTATORS};
 
 namespace {
     const unsigned SECS_PER_MIN  = 60;
@@ -115,15 +114,9 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             case SORT_ROLE:
             case Qt::DisplayRole:
                 return QString::fromStdString(g.creator_info().name());
-            case Qt::DecorationRole:
-                switch(g.creator_info().user_level()) {
-                case UNREGISTERED:
-                case REGISTERED:{
+            case Qt::DecorationRole: {
                     QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)g.creator_info().user_level());
                     return QIcon(avatarPixmap);
-                       }
-                default:
-                    break;
                 }
             default:
                 return QVariant();
