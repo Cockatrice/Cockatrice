@@ -6,11 +6,11 @@
 #include <QTextCursor>
 #include <QColor>
 #include "user_level.h"
+#include "tab_supervisor.h"
 
 class QTextTable;
 class QMouseEvent;
 class UserContextMenu;
-class TabSupervisor;
 class TabGame;
 
 class ChatView : public QTextBrowser {
@@ -25,6 +25,7 @@ private:
     QString userName;
     QString mention;
     QTextCharFormat mentionFormat;
+    QTextCharFormat mentionFormatOtherUser;
     QTextCharFormat defaultFormat;
     bool evenNumber;
     bool showTimestamps;
