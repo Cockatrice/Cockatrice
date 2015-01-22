@@ -17,7 +17,7 @@ private:
     QMap<int, QString> rooms;
     QMap<int, GameTypeMap> gameTypes;
 
-    static const int NUM_COLS = 9;
+    static const int NUM_COLS = 8;
 public:
     static const int SORT_ROLE = Qt::UserRole+1;
 

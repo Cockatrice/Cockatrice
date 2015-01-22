@@ -1,27 +1,31 @@
 #include "gamesmodel.h"
 #include "pb/serverinfo_game.pb.h"
+#include "pixmapgenerator.h"
 #include <QDebug>
+#include <QIcon>
 #include <QStringList>
 #include <QDateTime>
 #include <QSettings>
 #include <QCryptographicHash>
+
+static const enum {ROOM, CREATED, DESCRIPTION, CREATOR, GAME_TYPE, RESTRICTIONS, PLAYERS, SPECTATORS};
 
 namespace {
     const unsigned SECS_PER_MIN  = 60;
     const unsigned SECS_PER_HOUR = 60 * 60;
 
     /**
-     * Pretty print an integer number of seconds ago. Accurate to only one unit,
-     * rounded; <5 minutes and >5 hours are displayed as such. As a special case,
-     * time between 60 and 90 minutes will display both the hours and minutes.
-     *
-     * For example...
-     *   0-300 seconds will return "<5m ago"
-     *   5-59 minutes will return "Xm ago"
-     *   60-90 minutes will return "Xhr Ym ago"
-     *   91-300 minutes will return "Xhr ago"
-     *   300+ minutes will return "5+ hr ago"
-     */
+    * Pretty print an integer number of seconds ago. Accurate to only one unit,
+    * rounded; <5 minutes and >5 hours are displayed as such. As a special case,
+    * time between 60 and 90 minutes will display both the hours and minutes.
+    *
+    * For example...
+    *   0-300 seconds will return "<5m ago"
+    *   5-59 minutes will return "Xm ago"
+    *   60-90 minutes will return "Xhr Ym ago"
+    *   91-300 minutes will return "Xhr ago"
+    *   300+ minutes will return "5+ hr ago"
+    */
     QString prettyPrintSecsAgo(unsigned int secs) {
         if (secs < SECS_PER_MIN) {
             return QObject::tr("<1m ago");
@@ -32,7 +36,7 @@ namespace {
         if (secs < SECS_PER_HOUR) {
             unsigned int mins = secs / SECS_PER_MIN;
             if (secs % SECS_PER_MIN >= 30)
-              mins++;
+                mins++;
             //: This will have a number prepended, like "10m ago"
             return QString::number(mins).append(QObject::tr("m ago"));
         }
@@ -45,18 +49,18 @@ namespace {
         //
         // Personally, I prefer to keep the code cleaner, and allow these.
         if (secs < SECS_PER_MIN * 90) {
-          unsigned int mins = secs / SECS_PER_MIN - 60;
-          if (secs % SECS_PER_MIN >= 30)
-            mins++;
-          return QObject::tr("1hr ")
-                   .append(QString::number(mins))
-                   //: This will have a number prepended, like "5m ago"
-                   .append(QObject::tr("m ago"));
+            unsigned int mins = secs / SECS_PER_MIN - 60;
+            if (secs % SECS_PER_MIN >= 30)
+                mins++;
+            return QObject::tr("1hr ")
+                .append(QString::number(mins))
+                //: This will have a number prepended, like "5m ago"
+                .append(QObject::tr("m ago"));
         }
         if (secs < SECS_PER_HOUR * 5) {
             unsigned int hours = secs / SECS_PER_HOUR;
             if (secs % SECS_PER_HOUR >= SECS_PER_MIN * 30)
-              hours++;
+                hours++;
             //: This will have a number prepended, like "2h ago"
             return QString::number(hours).append(QObject::tr("hr ago"));
         }
@@ -75,15 +79,16 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
         return QVariant();
     if (role == Qt::UserRole)
         return index.row();
-    if (role != Qt::DisplayRole && role != SORT_ROLE)
+    if (role != Qt::DisplayRole && role != SORT_ROLE && role != Qt::DecorationRole && role != Qt::TextAlignmentRole)
         return QVariant();
     if ((index.row() >= gameList.size()) || (index.column() >= columnCount()))
         return QVariant();
 
     const ServerInfo_Game &g = gameList[index.row()];
     switch (index.column()) {
-        case 0: return rooms.value(g.room_id());
-        case 1: {
+        case ROOM: 
+            return rooms.value(g.room_id());
+        case CREATED: {
             QDateTime then;
             then.setTime_t(g.start_time());
             unsigned int secs = then.secsTo(QDateTime::currentDateTime());
@@ -91,32 +96,98 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             switch (role) {
                 case Qt::DisplayRole: return prettyPrintSecsAgo(secs);
                 case SORT_ROLE: return QVariant(secs);
-                default: {
-                    qDebug() << "Returning data for col 1 of games model when role != display, role != sort";
-                    return QVariant(); // Shouldn't ever be reached.
-                }
+                default: return QVariant();
             }
         }
-        case 2: return QString::fromStdString(g.description());
-        case 3: return QString::fromStdString(g.creator_info().name());
-        case 4: {
-            QStringList result;
-            GameTypeMap gameTypeMap = gameTypes.value(g.room_id());
-            for (int i = g.game_types_size() - 1; i >= 0; --i)
-                result.append(gameTypeMap.value(g.game_types(i)));
-            return result.join(", ");
+        case DESCRIPTION: 
+            switch(role) {
+            case SORT_ROLE:
+            case Qt::DisplayRole:
+                return QString::fromStdString(g.description());
+            case Qt::TextAlignmentRole:
+                Qt::AlignLeft;
+            default:
+                return QVariant();
         }
-        case 5: return g.with_password() ? ((g.spectators_need_password() || !g.spectators_allowed()) ? tr("yes") : tr("yes, free for spectators")) : tr("no");
-        case 6: {
-            QStringList result;
-            if (g.only_buddies())
-                result.append(tr("buddies only"));
-            if (g.only_registered())
-                result.append(tr("reg. users only"));
-            return result.join(", ");
+        case CREATOR: {
+            switch(role) {
+            case SORT_ROLE:
+            case Qt::DisplayRole:
+                return QString::fromStdString(g.creator_info().name());
+            case Qt::DecorationRole:
+                switch(g.creator_info().user_level()) {
+                case 1: {
+                    QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)g.creator_info().user_level());
+                    return QIcon(avatarPixmap);
+                        }
+                case 3:{
+                    QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)g.creator_info().user_level());
+                    return QIcon(avatarPixmap);
+                       }
+                default:
+                    break;
+                }
+            default:
+                return QVariant();
+            }
         }
-        case 7: return QString("%1/%2").arg(g.player_count()).arg(g.max_players());
-        case 8: return g.spectators_allowed() ? QVariant(g.spectators_count()) : QVariant(tr("not allowed"));
+        case GAME_TYPE:
+            switch (role) {
+            case SORT_ROLE:
+            case Qt::DisplayRole: {
+                QStringList result;
+                GameTypeMap gameTypeMap = gameTypes.value(g.room_id());
+                for (int i = g.game_types_size() - 1; i >= 0; --i)
+                    result.append(gameTypeMap.value(g.game_types(i)));
+                return result.join(", ");
+                }
+            case Qt::TextAlignmentRole:
+                return Qt::AlignLeft;
+            default:
+                return QVariant();
+        }
+        case RESTRICTIONS: 
+            switch(role) {
+            case SORT_ROLE:
+            case Qt::DisplayRole: {
+                QStringList result;
+                if (g.only_buddies())
+                    result.append(tr("buddies only"));
+                if (g.only_registered())
+                    result.append(tr("reg. users only"));
+                if (g.with_password())
+                    result.append(tr("password"));
+                return result.join(", ");
+            }
+            case Qt::DecorationRole:{
+                return g.with_password() ? QIcon(":/resources/lock.svg") : QVariant();
+            case Qt::TextAlignmentRole:
+                return Qt::AlignLeft;
+            default:
+                return QVariant();
+            }
+            }
+        case PLAYERS: 
+            switch(role) {
+            case SORT_ROLE:
+            case Qt::DisplayRole: 
+                return QString("%1/%2").arg(g.player_count()).arg(g.max_players());
+            case Qt::TextAlignmentRole:
+                return Qt::AlignLeft;
+            default:
+                return QVariant();
+            }
+            
+        case SPECTATORS: 
+            switch(role) {
+            case SORT_ROLE:
+            case Qt::DisplayRole: 
+                return g.spectators_allowed() ? QVariant(g.spectators_count()) : QVariant(tr("not allowed"));
+            case Qt::TextAlignmentRole:
+                return Qt::AlignLeft;
+            default:
+                return QVariant();
+            }
         default: return QVariant();
     }
 }
@@ -126,16 +197,15 @@ QVariant GamesModel::headerData(int section, Qt::Orientation orientation, int ro
     if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal))
         return QVariant();
     switch (section) {
-        case 0: return tr("Room");
-        case 1: return tr("Game Created");
-        case 2: return tr("Description");
-        case 3: return tr("Creator");
-        case 4: return tr("Game Type");
-        case 5: return tr("Password");
-        case 6: return tr("Restrictions");
-        case 7: return tr("Players");
-        case 8: return tr("Spectators");
-        default: return QVariant();
+    case 0: return tr("Room");
+    case 1: return tr("Game Created");
+    case 2: return tr("Description");
+    case 3: return tr("Creator");
+    case 4: return tr("Game Type");
+    case 5: return tr("Restrictions");
+    case 6: return tr("Players");
+    case 7: return tr("Spectators");
+    default: return QVariant();
     }
 }
 
@@ -169,11 +239,11 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
 
 GamesProxyModel::GamesProxyModel(QObject *parent, ServerInfo_User *_ownUser)
     : QSortFilterProxyModel(parent),
-          ownUser(_ownUser),
-          unavailableGamesVisible(false),
-          passwordProtectedGamesVisible(false),
-          maxPlayersFilterMin(-1),
-          maxPlayersFilterMax(-1)
+    ownUser(_ownUser),
+    unavailableGamesVisible(false),
+    passwordProtectedGamesVisible(false),
+    maxPlayersFilterMin(-1),
+    maxPlayersFilterMax(-1)
 {
     setSortRole(GamesModel::SORT_ROLE);
     setDynamicSortFilter(true);
@@ -261,7 +331,7 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
     settings.setValue(
         "password_protected_games_visible",
         passwordProtectedGamesVisible
-    );
+        );
     settings.setValue("game_name_filter", gameNameFilter);
     settings.setValue("creator_name_filter", creatorNameFilter);
 
@@ -272,7 +342,7 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
         settings.setValue(
             "game_type/" + hashGameType(gameTypeIterator.value()),
             gameTypeFilter.contains(gameTypeIterator.key())
-        );
+            );
     }
 
     settings.setValue("min_players", maxPlayersFilterMin);
