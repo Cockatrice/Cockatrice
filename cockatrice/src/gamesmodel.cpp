@@ -105,7 +105,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             case Qt::DisplayRole:
                 return QString::fromStdString(g.description());
             case Qt::TextAlignmentRole:
-                Qt::AlignLeft;
+                return Qt::AlignLeft;
             default:
                 return QVariant();
         }
