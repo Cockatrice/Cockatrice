@@ -160,4 +160,20 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags user
     return pixmap;
 }
 
+QMap<QString, QPixmap> PixmapGenerator::pmCache;
+QPixmap PixmapGenerator::generatePixmap(int height, QString resourceName) {
+    if (pmCache.contains(resourceName))
+        return pmCache.value(resourceName);
+
+    QSvgRenderer svg(resourceName);
+    int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
+    QPixmap pixmap(width, height);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    svg.render(&painter, QRectF(0, 0, width, height));
+
+    pmCache.insert(resourceName, pixmap);
+    return pixmap;
+}
+
 QMap<int, QPixmap> UserLevelPixmapGenerator::pmCache;

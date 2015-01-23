@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   viewBox="0 0 64 64"
+   enable-background="new 0 0 64 64"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.5 r10040"
+   width="100%"
+   height="100%"
+   sodipodi:docname="buddy_icon.svg">
+  <metadata
+     id="metadata12">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs10" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1028"
+     id="namedview8"
+     showgrid="false"
+     inkscape:zoom="7.375"
+     inkscape:cx="27.318536"
+     inkscape:cy="23.31428"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2" />
+  <path
+     d="M 60.456025,23.062583 38.036064,22.95865 31.209111,0.27044038 24.381168,22.95865 1.9602161,23.062586 20.162454,37.54598 10.959875,62.252482 31.209111,46.553559 51.468243,62.252482 42.254777,37.54598 z"
+     id="path4"
+     style="fill:#9600ec;fill-opacity:1"
+     inkscape:connector-curvature="0" />
+</svg>

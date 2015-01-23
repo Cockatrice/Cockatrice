@@ -54,4 +54,12 @@ public:
     static void clear() { pmCache.clear(); }
 };
 
+class PixmapGenerator {
+private:
+    static QMap<QString, QPixmap> pmCache;
+public:
+    static QPixmap generatePixmap(int height, QString resourceName);
+    static void clear() { pmCache.clear(); }
+};
+
 #endif
