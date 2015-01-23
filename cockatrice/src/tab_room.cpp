@@ -9,6 +9,8 @@
 #include <QLabel>
 #include <QToolButton>
 #include <QSplitter>
+#include <QCompleter>
+
 #include "tab_supervisor.h"
 #include "tab_room.h"
 #include "tab_userlists.h"
@@ -98,13 +100,29 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     setLayout(hbox);
     
     const int userListSize = info.user_list_size();
+
     for (int i = 0; i < userListSize; ++i)
         userList->processUserInfo(info.user_list(i), true);
+
     userList->sortItems();
-    
-    const int gameListSize = info.game_list_size();
+const int gameListSize = info.game_list_size();
     for (int i = 0; i < gameListSize; ++i)
         gameSelector->processGameInfo(info.game_list(i));
+
+    
+    QChar* alertPrefix = new QChar('@');
+
+    
+    QList<QString> userNames = tabSupervisor->getUserListsTab()->getAllUsersList()->getUsers().keys();
+    for (int i = 0; i < userNames.size(); ++i) {
+       userNames[i].insert(0,alertPrefix,1);
+    }
+
+    QCompleter *completer = new QCompleter(userNames, this);
+    completer->setCompletionMode(QCompleter::InlineCompletion);
+    completer->setCaseSensitivity(Qt::CaseSensitive);
+    connect(sayEdit,SIGNAL(cursorPositionChanged(int,int)),completer,SLOT(setCompletionColumn(int)));
+    sayEdit->setCompleter(completer);
 }
 
 TabRoom::~TabRoom()
