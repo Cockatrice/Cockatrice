@@ -57,6 +57,7 @@ private:
     int minPlayersForMultiColumnLayout;
     bool tapAnimation;
     bool chatMention;
+    bool showBuddyIcon;
     bool zoneViewSortByName, zoneViewSortByType, zoneViewPileView, zoneViewShuffle;
     bool soundEnabled;
     QString soundPath;
@@ -96,6 +97,11 @@ public:
     int getMinPlayersForMultiColumnLayout() const { return minPlayersForMultiColumnLayout; }
     bool getTapAnimation() const { return tapAnimation; }
     bool getChatMention()  const { return chatMention; }
+    /**
+       Returns if the buddy icon should be displayed in chat.
+       @return buddyIcon if the buddy icon should be displayed in chat.
+     */
+    bool getShowBuddyIcon() const { return showBuddyIcon; }
     bool getZoneViewSortByName() const { return zoneViewSortByName; }
     bool getZoneViewSortByType() const { return zoneViewSortByType; }
     /**
@@ -146,6 +152,7 @@ public slots:
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
     void setTapAnimation(int _tapAnimation);
     void setChatMention(int _chatMention);
+    void setShowBuddyIcon(int _showBuddyIcon);
     void setZoneViewSortByName(int _zoneViewSortByName);
     void setZoneViewSortByType(int _zoneViewSortByType);
     void setZoneViewPileView(int _zoneViewPileView);

@@ -133,9 +133,11 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
         if (!sender.isEmpty()) {
             const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
             cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel).toImage(), QString::number(pixelSize) + "_" + QString::number((int) userLevel));
-            QMap<QString, UserListTWI *> buddyList = tabSupervisor->getUserListsTab()->getBuddyList()->getUsers();
-            if (buddyList.contains(sender))
-                cursor.insertImage(PixmapGenerator::generatePixmap(pixelSize, ":/resources/buddy_icon.svg").toImage());
+            if (settingsCache->getShowBuddyIcon()) {
+                QMap<QString, UserListTWI *> buddyList = tabSupervisor->getUserListsTab()->getBuddyList()->getUsers();
+                if (buddyList.contains(sender))
+                    cursor.insertImage(PixmapGenerator::generatePixmap(pixelSize, ":/resources/buddy_icon.svg").toImage());
+            }
             cursor.insertText(" ");
         }
         cursor.setCharFormat(senderFormat);
