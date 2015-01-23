@@ -137,6 +137,8 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                 QMap<QString, UserListTWI *> buddyList = tabSupervisor->getUserListsTab()->getBuddyList()->getUsers();
                 if (buddyList.contains(sender))
                     cursor.insertImage(PixmapGenerator::generatePixmap(pixelSize, ":/resources/buddy_icon.svg").toImage());
+                else
+                    cursor.insertImage(PixmapGenerator::generatePixmap(pixelSize, ":/resources/empty_icon.svg").toImage());
             }
             cursor.insertText(" ");
         }

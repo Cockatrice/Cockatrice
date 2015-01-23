@@ -56,6 +56,7 @@
     <file>resources/genders/unknown.svg</file>
     
     <file>resources/buddy_icon.svg</file>
+    <file>resources/empty_icon.svg</file>
 
     <file>resources/countries/ar.svg</file>
     <file>resources/countries/at.svg</file>
