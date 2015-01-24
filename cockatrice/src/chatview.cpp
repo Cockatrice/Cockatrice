@@ -221,7 +221,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     }
 
     if (!message.isEmpty())
-        cursor.insertText(message, defaultFormat);
+        cursor.insertText(message);
 
     if (atBottom)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
