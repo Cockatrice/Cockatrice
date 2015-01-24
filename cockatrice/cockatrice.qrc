@@ -54,9 +54,6 @@
     <file>resources/genders/male.svg</file>
     <file>resources/genders/female.svg</file>
     <file>resources/genders/unknown.svg</file>
-    
-    <file>resources/buddy_icon.svg</file>
-    <file>resources/empty_icon.svg</file>
 
     <file>resources/countries/ar.svg</file>
     <file>resources/countries/at.svg</file>
@@ -127,6 +124,10 @@
     <file>resources/userlevels/registered.svg</file>
     <file>resources/userlevels/moderator.svg</file>
     <file>resources/userlevels/admin.svg</file>
+    
+    <file>resources/userlevels/registered_buddy.svg</file>
+    <file>resources/userlevels/admin_buddy.svg</file>
+    <file>resources/userlevels/moderator_buddy.svg</file>
 
     <file>resources/news/exclamation_mark.svg</file>
     <file>resources/news/question_mark.svg</file>
