@@ -162,6 +162,7 @@ private:
     QAction *aRemove;
     QCheckBox chatMentionCheckBox;
     QCheckBox ignoreUnregUsersMainChat;
+    QCheckBox showBuddyIcon;
     QGroupBox *chatGroupBox;
     QGroupBox *messageShortcuts;
 

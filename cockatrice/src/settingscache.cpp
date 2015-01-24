@@ -59,6 +59,8 @@ SettingsCache::SettingsCache()
 
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
 
+    showBuddyIcon = settings->value("chat/showbuddyicon", true).toBool();
+
     attemptAutoConnect = settings->value("server/auto_connect", 0).toBool(); 
 }
 
@@ -242,6 +244,11 @@ void SettingsCache::setTapAnimation(int _tapAnimation)
 void SettingsCache::setChatMention(int _chatMention) {
     chatMention = _chatMention;
     settings->setValue("chat/mention", chatMention);
+}
+
+void SettingsCache::setShowBuddyIcon(int _showBuddyIcon) {
+    showBuddyIcon = _showBuddyIcon;
+    settings->setValue("chat/showbuddyicon", showBuddyIcon);
 }
 
 void SettingsCache::setZoneViewSortByName(int _zoneViewSortByName)

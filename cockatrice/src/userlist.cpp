@@ -180,6 +180,7 @@ void UserListTWI::setUserInfo(const ServerInfo_User &_userInfo)
 {
     userInfo = _userInfo;
 
+     QMap<QString, UserListTWI *> buddyList = tabSupervisor->getUserListsTab()->getBuddyList()->getUsers();
     setData(0, Qt::UserRole, userInfo.user_level());
     setIcon(0, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(userInfo.user_level()))));
     setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(12, QString::fromStdString(userInfo.country()))));
