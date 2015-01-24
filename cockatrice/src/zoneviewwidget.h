@@ -48,6 +48,7 @@ private:
     QCheckBox shuffleCheckBox;
     QCheckBox pileViewCheckBox;
     
+    bool canBeShuffled;
     int extraHeight;
     Player *player;
 signals:
