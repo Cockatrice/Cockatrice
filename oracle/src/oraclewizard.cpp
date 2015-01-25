@@ -281,7 +281,8 @@ ChooseSetsPage::ChooseSetsPage(QWidget *parent)
 {
     setTitle(tr("Sets selection"));
     setSubTitle(tr("The following sets has been found in the source file. "
-                   "Please mark the sets that will be imported."));
+                   "Please mark the sets that will be imported.\n"
+                   "All core and expansion sets are selected by default."));
 
     checkBoxLayout = new QVBoxLayout;
     
