@@ -61,7 +61,6 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     aOpenChatSettings = chatSettingsMenu->addAction(QString());
     connect(aOpenChatSettings, SIGNAL(triggered()), this, SLOT(actOpenChatSettings()));
     
-    connect(settingsCache, SIGNAL(ignoreUnregisteredUsersChanged()), this, SLOT(ignoreUnregisteredUsersChanged()));    
     QToolButton *chatSettingsButton = new QToolButton;
     chatSettingsButton->setIcon(QIcon(":/resources/icon_settings.svg"));
     chatSettingsButton->setMenu(chatSettingsMenu);
