@@ -245,14 +245,15 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 
     if (local) {
         handMenu = playerMenu->addMenu(QString());
-                handMenu->addAction(aMulligan);
-        handMenu->addAction(aMoveHandToTopLibrary);
-        handMenu->addAction(aMoveHandToBottomLibrary);
-        handMenu->addAction(aMoveHandToGrave);
-        handMenu->addAction(aMoveHandToRfg);
-        handMenu->addSeparator();
         playerLists.append(mRevealHand = handMenu->addMenu(QString()));
         playerLists.append(mRevealRandomHandCard = handMenu->addMenu(QString()));
+        handMenu->addSeparator();
+        handMenu->addAction(aMulligan);
+        moveHandMenu = handMenu->addMenu(QString());
+        moveHandMenu->addAction(aMoveHandToTopLibrary);
+        moveHandMenu->addAction(aMoveHandToBottomLibrary);
+        moveHandMenu->addAction(aMoveHandToGrave);
+        moveHandMenu->addAction(aMoveHandToRfg);
         hand->setMenu(handMenu);
 
         libraryMenu = playerMenu->addMenu(QString());
@@ -290,16 +291,18 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 
     if (local) {
         graveMenu->addSeparator();
-        graveMenu->addAction(aMoveGraveToTopLibrary);
-        graveMenu->addAction(aMoveGraveToBottomLibrary);
-        graveMenu->addAction(aMoveGraveToHand);
-        graveMenu->addAction(aMoveGraveToRfg);
+        moveGraveMenu = graveMenu->addMenu(QString());
+        moveGraveMenu->addAction(aMoveGraveToTopLibrary);
+        moveGraveMenu->addAction(aMoveGraveToBottomLibrary);
+        moveGraveMenu->addAction(aMoveGraveToHand);
+        moveGraveMenu->addAction(aMoveGraveToRfg);
 
         rfgMenu->addSeparator();
-        rfgMenu->addAction(aMoveRfgToTopLibrary);
-        rfgMenu->addAction(aMoveRfgToBottomLibrary);
-        rfgMenu->addAction(aMoveRfgToHand);
-        rfgMenu->addAction(aMoveRfgToGrave);
+        moveRfgMenu = rfgMenu->addMenu(QString());
+        moveRfgMenu->addAction(aMoveRfgToTopLibrary);
+        moveRfgMenu->addAction(aMoveRfgToBottomLibrary);
+        moveRfgMenu->addAction(aMoveRfgToHand);
+        moveRfgMenu->addAction(aMoveRfgToGrave);
 
         sbMenu = playerMenu->addMenu(QString());
         sbMenu->addAction(aViewSideboard);
@@ -585,18 +588,24 @@ void Player::retranslateUi()
     rfgMenu->setTitle(tr("&Exile"));
     
     if (local) {
-        aMoveHandToTopLibrary->setText(tr("Move to &top of library"));
-        aMoveHandToBottomLibrary->setText(tr("Move to &bottom of library"));
-        aMoveHandToGrave->setText(tr("Move to &graveyard"));
-        aMoveHandToRfg->setText(tr("Move to &exile"));
-        aMoveGraveToTopLibrary->setText(tr("Move to &top of library"));
-        aMoveGraveToBottomLibrary->setText(tr("Move to &bottom of library"));
-        aMoveGraveToHand->setText(tr("Move to &hand"));
-        aMoveGraveToRfg->setText(tr("Move to &exile"));
-        aMoveRfgToTopLibrary->setText(tr("Move to &top of library"));
-        aMoveRfgToBottomLibrary->setText(tr("Move to &bottom of library"));
-        aMoveRfgToHand->setText(tr("Move to &hand"));
-        aMoveRfgToGrave->setText(tr("Move to &graveyard"));
+        moveHandMenu->setTitle(tr("&Move hand to"));
+        aMoveHandToTopLibrary->setText(tr("&top of library"));
+        aMoveHandToBottomLibrary->setText(tr("&bottom of library"));
+        aMoveHandToGrave->setText(tr("&graveyard"));
+        aMoveHandToRfg->setText(tr("&exile"));
+
+        moveGraveMenu->setTitle(tr("&Move graveyard to"));
+        aMoveGraveToTopLibrary->setText(tr("&top of library"));
+        aMoveGraveToBottomLibrary->setText(tr("&bottom of library"));
+        aMoveGraveToHand->setText(tr("&hand"));
+        aMoveGraveToRfg->setText(tr("&exile"));
+
+        moveRfgMenu->setTitle(tr("&Move exile to"));
+        aMoveRfgToTopLibrary->setText(tr("&top of library"));
+        aMoveRfgToBottomLibrary->setText(tr("&bottom of library"));
+        aMoveRfgToHand->setText(tr("&hand"));
+        aMoveRfgToGrave->setText(tr("&graveyard"));
+
         aViewLibrary->setText(tr("&View library"));
         aViewTopCards->setText(tr("View &top cards of library..."));
         mRevealLibrary->setTitle(tr("Reveal &library to"));
@@ -615,7 +624,7 @@ void Player::retranslateUi()
         aMoveBottomCardToGrave->setText(tr("Put bottom card &in graveyard"));
     
         handMenu->setTitle(tr("&Hand"));
-        mRevealHand->setTitle(tr("&Reveal to"));
+        mRevealHand->setTitle(tr("&Reveal hand to"));
         mRevealRandomHandCard->setTitle(tr("Reveal r&andom card to"));
         sbMenu->setTitle(tr("&Sideboard"));
         libraryMenu->setTitle(tr("&Library"));
