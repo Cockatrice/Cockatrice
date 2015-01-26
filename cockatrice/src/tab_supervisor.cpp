@@ -365,13 +365,13 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     if (receiverName == QString::fromStdString(userInfo->name()))
         return 0;
     
-    ServerInfo_User Self;
+    ServerInfo_User otherUser;
     UserListTWI *twi = tabUserLists->getAllUsersList()->getUsers().value(receiverName);
     if (twi)
-        Self = twi->getUserInfo();
+        otherUser = twi->getUserInfo();
     else
-        Self.set_name(receiverName.toStdString());
-    TabMessage *tab = new TabMessage(this, client, *userInfo, Self);
+        otherUser.set_name(receiverName.toStdString());
+    TabMessage *tab = new TabMessage(this, client, *userInfo, otherUser);
     connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
