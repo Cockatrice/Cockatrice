@@ -608,8 +608,8 @@ void Player::retranslateUi()
 
         aViewLibrary->setText(tr("&View library"));
         aViewTopCards->setText(tr("View &top cards of library..."));
-        mRevealLibrary->setTitle(tr("Reveal &library to"));
-        mRevealTopCard->setTitle(tr("Reveal t&op card to"));
+        mRevealLibrary->setTitle(tr("Reveal &library to..."));
+        mRevealTopCard->setTitle(tr("Reveal t&op card to..."));
         aAlwaysRevealTopCard->setText(tr("&Always reveal top card"));
         aOpenDeckInDeckEditor->setText(tr("O&pen deck in deck editor"));
         aViewSideboard->setText(tr("&View sideboard"));
@@ -624,8 +624,8 @@ void Player::retranslateUi()
         aMoveBottomCardToGrave->setText(tr("Put bottom card &in graveyard"));
     
         handMenu->setTitle(tr("&Hand"));
-        mRevealHand->setTitle(tr("&Reveal hand to"));
-        mRevealRandomHandCard->setTitle(tr("Reveal r&andom card to"));
+        mRevealHand->setTitle(tr("&Reveal hand to..."));
+        mRevealRandomHandCard->setTitle(tr("Reveal r&andom card to..."));
         sbMenu->setTitle(tr("&Sideboard"));
         libraryMenu->setTitle(tr("&Library"));
         countersMenu->setTitle(tr("&Counters"));
