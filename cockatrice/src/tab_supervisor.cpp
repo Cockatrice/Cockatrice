@@ -365,13 +365,13 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     if (receiverName == QString::fromStdString(userInfo->name()))
         return 0;
     
-    ServerInfo_User otherUser;
+    ServerInfo_User Self;
     UserListTWI *twi = tabUserLists->getAllUsersList()->getUsers().value(receiverName);
     if (twi)
-        otherUser = twi->getUserInfo();
+        Self = twi->getUserInfo();
     else
-        otherUser.set_name(receiverName.toStdString());
-    TabMessage *tab = new TabMessage(this, client, *userInfo, otherUser);
+        Self.set_name(receiverName.toStdString());
+    TabMessage *tab = new TabMessage(this, client, *userInfo, Self);
     connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
@@ -446,11 +446,36 @@ void TabSupervisor::processGameEventContainer(const GameEventContainer &cont)
 
 void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
 {
-    TabMessage *tab = messageTabs.value(QString::fromStdString(event.sender_name()));
+    QString senderName = QString::fromStdString(event.sender_name());
+    
+    UserListTWI *twi = tabUserLists->getAllUsersList()->getUsers().value(senderName);
+
+    ServerInfo_User Self;
+
+    if (twi)
+        Self = twi->getUserInfo();
+    else
+        Self.set_name(senderName.toStdString());
+
+    UserLevelFlags SelfLevel = UserLevelFlags(Self.user_level());
+
+    if (settingsCache->getIgnoreUnregisteredUsers() && !SelfLevel.testFlag(ServerInfo_User::IsUnegistered))
+        return;
+    
+    if (settingsCache->getIgnoreUnregisteredUsers() && !SelfLevel.testFlag(ServerInfo_User::IsRegistered))
+        return;
+        
+    if (settingsCache->getIgnoreUnregisteredUsers() && !SelfLevel.testFlag(ServerInfo_User::IsModerator))
+        return;
+        
+    if (settingsCache->getIgnoreUnregisteredUsers() && !SelfLevel.testFlag(ServerInfo_User::IsAdministrator))
+        return;
+
+TabMessage *tab = messageTabs.value(senderName);
     if (!tab)
         tab = messageTabs.value(QString::fromStdString(event.receiver_name()));
     if (!tab)
-        tab = addMessageTab(QString::fromStdString(event.sender_name()), false);
+        tab = addMessageTab(senderName, false);
     if (!tab)
         return;
     tab->processUserMessageEvent(event);
