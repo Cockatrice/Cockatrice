@@ -588,23 +588,23 @@ void Player::retranslateUi()
     rfgMenu->setTitle(tr("&Exile"));
     
     if (local) {
-        moveHandMenu->setTitle(tr("&Move hand to"));
-        aMoveHandToTopLibrary->setText(tr("&top of library"));
-        aMoveHandToBottomLibrary->setText(tr("&bottom of library"));
-        aMoveHandToGrave->setText(tr("&graveyard"));
-        aMoveHandToRfg->setText(tr("&exile"));
+        moveHandMenu->setTitle(tr("&Move hand to..."));
+        aMoveHandToTopLibrary->setText(tr("&Top of library"));
+        aMoveHandToBottomLibrary->setText(tr("&Bottom of library"));
+        aMoveHandToGrave->setText(tr("&Graveyard"));
+        aMoveHandToRfg->setText(tr("&Exile"));
 
-        moveGraveMenu->setTitle(tr("&Move graveyard to"));
-        aMoveGraveToTopLibrary->setText(tr("&top of library"));
-        aMoveGraveToBottomLibrary->setText(tr("&bottom of library"));
-        aMoveGraveToHand->setText(tr("&hand"));
-        aMoveGraveToRfg->setText(tr("&exile"));
+        moveGraveMenu->setTitle(tr("&Move graveyard to..."));
+        aMoveGraveToTopLibrary->setText(tr("&Top of library"));
+        aMoveGraveToBottomLibrary->setText(tr("&Bottom of library"));
+        aMoveGraveToHand->setText(tr("&Hand"));
+        aMoveGraveToRfg->setText(tr("&Exile"));
 
-        moveRfgMenu->setTitle(tr("&Move exile to"));
-        aMoveRfgToTopLibrary->setText(tr("&top of library"));
-        aMoveRfgToBottomLibrary->setText(tr("&bottom of library"));
-        aMoveRfgToHand->setText(tr("&hand"));
-        aMoveRfgToGrave->setText(tr("&graveyard"));
+        moveRfgMenu->setTitle(tr("&Move exile to..."));
+        aMoveRfgToTopLibrary->setText(tr("&Top of library"));
+        aMoveRfgToBottomLibrary->setText(tr("&Bottom of library"));
+        aMoveRfgToHand->setText(tr("&Hand"));
+        aMoveRfgToGrave->setText(tr("&Graveyard"));
 
         aViewLibrary->setText(tr("&View library"));
         aViewTopCards->setText(tr("View &top cards of library..."));
