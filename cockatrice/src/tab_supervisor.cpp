@@ -450,12 +450,12 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
     
     UserListTWI *twi = tabUserLists->getAllUsersList()->getUsers().value(senderName);
 
-    ServerInfo_User Self;
+    ServerInfo_User otherUser;
 
     if (twi)
-        Self = twi->getUserInfo();
+        otherUser = twi->getUserInfo();
     else
-        Self.set_name(senderName.toStdString());
+        otherUser.set_name(senderName.toStdString());
 
     UserLevelFlags SelfLevel = UserLevelFlags(Self.user_level());
 
