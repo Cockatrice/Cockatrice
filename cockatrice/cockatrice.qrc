@@ -59,10 +59,13 @@
     <file>resources/countries/at.svg</file>
     <file>resources/countries/au.svg</file>
     <file>resources/countries/be.svg</file>
+    <file>resources/countries/bo.svg</file>
     <file>resources/countries/br.svg</file>
+    <file>resources/countries/bs.svg</file>
     <file>resources/countries/by.svg</file>
     <file>resources/countries/ca.svg</file>
     <file>resources/countries/cl.svg</file>
+    <file>resources/countries/cr.svg</file>
     <file>resources/countries/cz.svg</file>
     <file>resources/countries/ch.svg</file>
     <file>resources/countries/cn.svg</file>
@@ -72,6 +75,7 @@
     <file>resources/countries/es.svg</file>
     <file>resources/countries/fi.svg</file>
     <file>resources/countries/fr.svg</file>
+    <file>resources/countries/gb.svg</file>
     <file>resources/countries/ge.svg</file>
     <file>resources/countries/gr.svg</file>
     <file>resources/countries/gt.svg</file>
@@ -82,6 +86,7 @@
     <file>resources/countries/it.svg</file>
     <file>resources/countries/jp.svg</file>
     <file>resources/countries/kr.svg</file>
+    <file>resources/countries/kw.svg</file>
     <file>resources/countries/lt.svg</file>
     <file>resources/countries/lu.svg</file>
     <file>resources/countries/lv.svg</file>
@@ -104,6 +109,7 @@
     <file>resources/countries/ua.svg</file>
     <file>resources/countries/uk.svg</file>
     <file>resources/countries/us.svg</file>
+    <file>resources/countries/vc.svg</file>
     <file>resources/countries/ve.svg</file>
     <file>resources/countries/za.svg</file>
 
