@@ -12,7 +12,6 @@
 #include "userlist.h"
 #include "tab_userlists.h"
 
-const QColor OTHER_USER_MENTION_COLOR = QColor(145, 210, 255); // light blue
 const QColor MENTION_COLOR = QColor(190, 25, 85); // maroon
 const QColor OTHER_USER_COLOR = QColor(0, 65, 255); // dark blue
 
@@ -32,7 +31,6 @@ ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _sh
 
     mentionFormatOtherUser.setFontWeight(QFont::Bold);
     mentionFormatOtherUser.setForeground(Qt::blue);
-    mentionFormatOtherUser.setBackground(QBrush(OTHER_USER_MENTION_COLOR));
     mentionFormatOtherUser.setAnchor(true);
 
     viewport()->setCursor(Qt::IBeamCursor);
@@ -190,8 +188,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
 
     if (settingsCache->getChatMention()) {
         index = 0;
-        from = 0;
-        while((index = message.indexOf('@', from)) != -1) {
+        while((index = message.indexOf('@')) != -1) {
             cursor.insertText(message.left(index), defaultFormat);
             message = message.mid(index);
             if (message.isEmpty())
