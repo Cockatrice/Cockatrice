@@ -459,18 +459,9 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
 
     UserLevelFlags SelfLevel = UserLevelFlags(Self.user_level());
 
-    if (settingsCache->getIgnoreUnregisteredUsers() && !SelfLevel.testFlag(ServerInfo_User::IsNormal))
-        return;
-    
-    if (settingsCache->getIgnoreUnregisteredUsers() && !SelfLevel.testFlag(ServerInfo_User::IsRegistered))
+    if (settingsCache->getIgnoreUnregisteredUsers() && !SelfLevel.testFlag(ServerInfo_User::IsUser)) || !SelfLevel.testFlag(ServerInfo_User::IsRegistered)) || !SelfLevel.testFlag(ServerInfo_User::IsModerator)) || !SelfLevel.testFlag(ServerInfo_User::IsAdmin))
         return;
         
-    if (settingsCache->getIgnoreUnregisteredUsers() && !SelfLevel.testFlag(ServerInfo_User::IsModerator))
-        return;
-        
-    if (settingsCache->getIgnoreUnregisteredUsers() && !SelfLevel.testFlag(ServerInfo_User::IsAdmin))
-        return;
-
 TabMessage *tab = messageTabs.value(senderName);
     if (!tab)
         tab = messageTabs.value(QString::fromStdString(event.receiver_name()));
