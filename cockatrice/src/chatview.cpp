@@ -205,7 +205,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                 QString userMention = message.left(mentionEndIndex);
                 QString userName = userMention.right(userMention.size()-1).normalized(QString::NormalizationForm_D);
                 QMap<QString, UserListTWI *> userList = tabSupervisor->getUserListsTab()->getAllUsersList()->getUsers();
-                QString correctUserName = getCorrectUserName(userList, userName);
+                QString correctUserName = getNameFromUserList(userList, userName);
                 if (!correctUserName.isEmpty()) {
                     UserListTWI *vlu = userList.value(correctUserName);
                     mentionFormatOtherUser.setAnchorHref("user://" + QString::number(vlu->getUserInfo().user_level()) + "_" + correctUserName);
@@ -225,8 +225,11 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }
 
-
-QString ChatView::getCorrectUserName(QMap<QString, UserListTWI *> &userList, QString &userName) {
+/**
+   Returns the correct case version of the provided username, if no correct casing version
+   was found then the provided name is not available and will return an empty QString.
+ */
+QString ChatView::getNameFromUserList(QMap<QString, UserListTWI *> &userList, QString &userName) {
     QMap<QString, UserListTWI *>::iterator i;
     QString lowerUserName = userName.toLower();
     for (i = userList.begin(); i != userList.end(); ++i) {
