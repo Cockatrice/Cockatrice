@@ -79,12 +79,14 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
         return QVariant();
     if (role == Qt::UserRole)
         return index.row();
-    if (role != Qt::DisplayRole && role != SORT_ROLE && role != Qt::DecorationRole && role != Qt::TextAlignmentRole)
+    if (role != Qt::DisplayRole && role != SORT_ROLE && role != Qt::DecorationRole && role != Qt::TextAlignmentRole && role != Qt::BackgroundRole)
         return QVariant();
     if ((index.row() >= gameList.size()) || (index.column() >= columnCount()))
         return QVariant();
 
     const ServerInfo_Game &g = gameList[index.row()];
+    if (role == Qt::BackgroundRole && (g.player_count() == g.max_players()))
+        return QColor(230, 190, 200);
     switch (index.column()) {
         case ROOM: 
             return rooms.value(g.room_id());
