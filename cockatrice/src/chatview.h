@@ -5,6 +5,7 @@
 #include <QTextFragment>
 #include <QTextCursor>
 #include <QColor>
+#include "userlist.h"
 #include "user_level.h"
 #include "tab_supervisor.h"
 
@@ -35,6 +36,7 @@ private:
     QTextCursor prepareBlock(bool same = false);
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
     void appendUrlTag(QTextCursor &cursor, QString url);
+    QString getNameFromUserList(QMap<QString, UserListTWI *> &userList, QString &userName);
 private slots:
     void openLink(const QUrl &link);
 public:

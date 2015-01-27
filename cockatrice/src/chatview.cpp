@@ -9,7 +9,6 @@
 #include "pixmapgenerator.h"
 #include "settingscache.h"
 #include "main.h"
-#include "userlist.h"
 #include "tab_userlists.h"
 
 const QColor MENTION_COLOR = QColor(190, 25, 85); // maroon
@@ -206,14 +205,16 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                 QString userMention = message.left(mentionEndIndex);
                 QString userName = userMention.right(userMention.size()-1).normalized(QString::NormalizationForm_D);
                 QMap<QString, UserListTWI *> userList = tabSupervisor->getUserListsTab()->getAllUsersList()->getUsers();
-                if (userList.contains(userName)) {
-                    UserListTWI *vlu = userList.value(userName);
-                    mentionFormatOtherUser.setAnchorHref("user://" + QString::number(vlu->getUserInfo().user_level()) + "_" + userName);
-                    cursor.insertText("@" + userName, mentionFormatOtherUser);
+                QString correctUserName = getNameFromUserList(userList, userName);
+                if (!correctUserName.isEmpty()) {
+                    UserListTWI *vlu = userList.value(correctUserName);
+                    mentionFormatOtherUser.setAnchorHref("user://" + QString::number(vlu->getUserInfo().user_level()) + "_" + correctUserName);
+                    cursor.insertText("@" + correctUserName, mentionFormatOtherUser);
                 } else 
                     cursor.insertText("@" + userName, defaultFormat);
                 message = message.mid(userName.size() + 1);
             }
+            cursor.setCharFormat(defaultFormat); // reset format after each itteration
         }
     }
 
@@ -222,6 +223,20 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
 
     if (atBottom)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+}
+
+/**
+   Returns the correct case version of the provided username, if no correct casing version
+   was found then the provided name is not available and will return an empty QString.
+ */
+QString ChatView::getNameFromUserList(QMap<QString, UserListTWI *> &userList, QString &userName) {
+    QMap<QString, UserListTWI *>::iterator i;
+    QString lowerUserName = userName.toLower();
+    for (i = userList.begin(); i != userList.end(); ++i) {
+        if (i.key().toLower() == lowerUserName)
+            return i.key();
+    }
+    return QString();
 }
 
 void ChatView::clearChat() {
