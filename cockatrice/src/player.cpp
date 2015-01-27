@@ -249,6 +249,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
         playerLists.append(mRevealRandomHandCard = handMenu->addMenu(QString()));
         handMenu->addSeparator();
         handMenu->addAction(aMulligan);
+        handMenu->addSeparator();
         moveHandMenu = handMenu->addMenu(QString());
         moveHandMenu->addAction(aMoveHandToTopLibrary);
         moveHandMenu->addAction(aMoveHandToBottomLibrary);
@@ -269,12 +270,13 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
         playerLists.append(mRevealLibrary = libraryMenu->addMenu(QString()));
         playerLists.append(mRevealTopCard = libraryMenu->addMenu(QString()));
         libraryMenu->addAction(aAlwaysRevealTopCard);
-        libraryMenu->addAction(aOpenDeckInDeckEditor);
         libraryMenu->addSeparator();
         libraryMenu->addAction(aMoveTopCardsToGrave);
         libraryMenu->addAction(aMoveTopCardsToExile);
         libraryMenu->addAction(aMoveTopCardToBottom);
         libraryMenu->addAction(aMoveBottomCardToGrave);
+        libraryMenu->addSeparator();
+        libraryMenu->addAction(aOpenDeckInDeckEditor);
         deck->setMenu(libraryMenu, aDrawCard);
     } else {
         handMenu = 0;
