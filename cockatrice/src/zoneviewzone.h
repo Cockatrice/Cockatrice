@@ -26,10 +26,6 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void reorganizeCards();
-
-    void setPileViewPositions(int cardCount, CardList &cardsToDisplay, int &typeColumn, int &longestRow);
-    
-
     void initializeCards(const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>());
     void removeCard(int position);
     int getNumberCards() const { return numberCards; }

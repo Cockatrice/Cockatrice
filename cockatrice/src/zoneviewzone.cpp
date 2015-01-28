@@ -106,9 +106,30 @@ void ZoneViewZone::reorganizeCards()
 
     int typeColumn = 0;
     int longestRow = 0;
-    if (pileView && sortByType) // we need sort by type enabled for the feature to work
-        setPileViewPositions(cardCount, cardsToDisplay, typeColumn, longestRow);
-    else {
+    if (pileView && sortByType) { // we need sort by type enabled for the feature to work
+        int typeRow = 0;
+        QString lastCardType;
+        for (int i = 0; i < cardCount; i++) {
+            CardItem *c = cardsToDisplay.at(i);
+            QString cardType = c->getInfo()->getMainCardType();
+
+            if (i){ // if not the first card
+                if (cardType == lastCardType)
+                    typeRow++; // add below current card
+                else { // if no match then move card to next column
+                    typeColumn++;
+                    longestRow = qMax(typeRow, longestRow);
+                    typeRow = 0;
+                }
+            }
+
+            lastCardType = cardType;
+            qreal x = typeColumn * CARD_WIDTH;
+            qreal y = typeRow * CARD_HEIGHT / 3;
+            c->setPos(x + 5, y + 5);
+            c->setRealZValue(i);
+        }
+    } else {
         for (int i = 0; i < cardCount; i++) {
             CardItem *c = cardsToDisplay.at(i);
             qreal x = (i / rows) * CARD_WIDTH;
@@ -126,31 +147,6 @@ void ZoneViewZone::reorganizeCards()
 
     updateGeometry();
     emit optimumRectChanged();
-}
-
-void ZoneViewZone::setPileViewPositions(int cardCount, CardList &cardsToDisplay, int &typeColumn, int &longestRow){
-    int typeRow = 0;
-    bool cardTypeMatch = true;
-    for (int i = 0; i < cardCount; i++) {
-        CardItem *c = cardsToDisplay.at(i);
-        QString cardType = c->getInfo()->getMainCardType();
-
-        if (i){
-            // if not the first card. Last card and this card have a matching main type?
-            cardTypeMatch = cardType.compare(cardsToDisplay.at(i-1)->getInfo()->getMainCardType()) == 0 ? true : false;
-            if (!cardTypeMatch) { // if no match then move card to next column
-                typeColumn++;
-                longestRow = qMax(typeRow, longestRow);
-                typeRow = 0;
-            } else // add below current card
-                typeRow++;
-        }
-
-        qreal x = typeColumn * CARD_WIDTH;
-        qreal y = typeRow * CARD_HEIGHT / 3;
-        c->setPos(x + 5, y + 5);
-        c->setRealZValue(i);
-    }
 }
 
 void ZoneViewZone::setSortByName(int _sortByName)
