@@ -93,9 +93,10 @@ QPixmap GenderPixmapGenerator::generatePixmap(int height, int _gender)
     
     QString genderStr;
     switch (gender) {
-        case ServerInfo_User::Male: genderStr = "male"; break;
-        case ServerInfo_User::Female: genderStr = "female"; break;
-        default: genderStr = "unknown";
+        case ServerInfo_User::Male: genderStr = "masculine"; break;
+        case ServerInfo_User::Female: genderStr = "feminine"; break;
+        case ServerInfo_User::Neutral: genderStr = "neutral"; break;
+        default: genderStr = "null";
     };
     
     QSvgRenderer svg(QString(":/resources/genders/" + genderStr + ".svg"));
