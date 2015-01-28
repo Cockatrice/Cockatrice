@@ -51,8 +51,9 @@
     <file>resources/replay_tostart.svg</file>
     <file>resources/replay_pause.svg</file>
 
-    <file>resources/genders/male.svg</file>
-    <file>resources/genders/female.svg</file>
+    <file>resources/genders/masculine.svg</file>
+    <file>resources/genders/feminine.svg</file>
+    <file>resources/genders/null.svg</file>
     <file>resources/genders/unknown.svg</file>
 
     <file>resources/countries/ad.svg</file>
