@@ -251,47 +251,51 @@ bool Servatrice_DatabaseInterface::isInIgnoreList(const QString &whoseList, cons
 
 ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuery &query, bool complete, bool withId)
 {
-	ServerInfo_User result;
-	
-	if (withId)
-		result.set_id(query.value(0).toInt());
-	result.set_name(query.value(1).toString().toStdString());
-	
-	const QString country = query.value(5).toString();
-	if (!country.isEmpty())
-		result.set_country(country.toStdString());
-	
-	if (complete) {
-		const QByteArray avatarBmp = query.value(6).toByteArray();
-		if (avatarBmp.size())
-			result.set_avatar_bmp(avatarBmp.data(), avatarBmp.size());
-	}
-	
-	const QString genderStr = query.value(4).toString();
-	if (genderStr == "m")
-		result.set_gender(ServerInfo_User::Male);
-	else if (genderStr == "f")
-		result.set_gender(ServerInfo_User::Female);
-	
-	const int is_admin = query.value(2).toInt();
-	int userLevel = ServerInfo_User::IsUser | ServerInfo_User::IsRegistered;
-	if (is_admin == 1)
-		userLevel |= ServerInfo_User::IsAdmin | ServerInfo_User::IsModerator;
-	else if (is_admin == 2)
-		userLevel |= ServerInfo_User::IsModerator;
-	result.set_user_level(userLevel);
-	
-	const QString realName = query.value(3).toString();
-	if (!realName.isEmpty())
-		result.set_real_name(realName.toStdString());
+    ServerInfo_User result;
+    
+    if (withId)
+        result.set_id(query.value(0).toInt());
+    result.set_name(query.value(1).toString().toStdString());
+    
+    const QString country = query.value(5).toString();
+    if (!country.isEmpty())
+        result.set_country(country.toStdString());
+    
+    if (complete) {
+        const QByteArray avatarBmp = query.value(6).toByteArray();
+        if (avatarBmp.size())
+            result.set_avatar_bmp(avatarBmp.data(), avatarBmp.size());
+    }
+    
+    const QString genderStr = query.value(4).toString();
+    if (genderStr == "m")
+        result.set_gender(ServerInfo_User::Male);
+    else if (genderStr == "f")
+        result.set_gender(ServerInfo_User::Female);
+    else if (genderStr == "n")
+        result.set_gender(ServerInfo_User::Neutral);
+    else
+        result.set_gender(ServerInfo_User::Unknown);
+
+    const int is_admin = query.value(2).toInt();
+    int userLevel = ServerInfo_User::IsUser | ServerInfo_User::IsRegistered;
+    if (is_admin == 1)
+        userLevel |= ServerInfo_User::IsAdmin | ServerInfo_User::IsModerator;
+    else if (is_admin == 2)
+        userLevel |= ServerInfo_User::IsModerator;
+    result.set_user_level(userLevel);
+    
+    const QString realName = query.value(3).toString();
+    if (!realName.isEmpty())
+        result.set_real_name(realName.toStdString());
 
     const QDateTime regDate = query.value(7).toDateTime();
     if(!regDate.toString(Qt::ISODate).isEmpty()) {
         qint64 accountAgeInSeconds = regDate.secsTo(QDateTime::currentDateTime());
         result.set_accountage_secs(accountAgeInSeconds);
     }
-	
-	return result;
+    
+    return result;
 }
 
 ServerInfo_User Servatrice_DatabaseInterface::getUserData(const QString &name, bool withId)
