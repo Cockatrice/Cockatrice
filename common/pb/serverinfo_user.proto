@@ -10,6 +10,7 @@ message ServerInfo_User {
 		GenderUnknown = -1;
 		Male = 0;
 		Female = 1;
+		Neutral = 2;
 	};
 	optional string name = 1;
 	optional uint32 user_level = 2;
