@@ -59,14 +59,14 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     QPixmap avatarPixmap;
     const std::string bmp = user.avatar_bmp();
     if (!avatarPixmap.loadFromData((const uchar *) bmp.data(), bmp.size()))
-        avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel);
+        avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel, false);
     avatarLabel.setPixmap(avatarPixmap);
     
     nameLabel.setText(QString::fromStdString(user.name()));
     realNameLabel2.setText(QString::fromStdString(user.real_name()));
     genderLabel2.setPixmap(GenderPixmapGenerator::generatePixmap(15, user.gender()));
     countryLabel2.setPixmap(CountryPixmapGenerator::generatePixmap(15, QString::fromStdString(user.country())));
-    userLevelLabel2.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel));
+    userLevelLabel2.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel, false));
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin))
         userLevelText = tr("Administrator");
