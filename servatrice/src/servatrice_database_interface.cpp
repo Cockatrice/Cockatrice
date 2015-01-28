@@ -275,7 +275,7 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
     else if (genderStr == "n")
         result.set_gender(ServerInfo_User::Neutral);
     else
-        result.set_gender(ServerInfo_User::Unknown);
+        result.set_gender(ServerInfo_User::GenderUnknown);
 
     const int is_admin = query.value(2).toInt();
     int userLevel = ServerInfo_User::IsUser | ServerInfo_User::IsRegistered;
