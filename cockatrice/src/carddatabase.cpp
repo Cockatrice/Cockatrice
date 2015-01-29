@@ -751,7 +751,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
                 else if (xml.name() == "manacost")
                     manacost = xml.readElementText();
                 else if (xml.name() == "cmc")
-                    cmc = xml.readElementText().toInt();
+                    cmc = xml.readElementText();
                 else if (xml.name() == "type")
                     type = xml.readElementText();
                 else if (xml.name() == "pt")

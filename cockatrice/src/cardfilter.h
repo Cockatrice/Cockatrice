@@ -22,6 +22,7 @@ public:
         AttrText,
         AttrSet,
         AttrManaCost,
+        AttrCmc,
         AttrEnd
     };
 
