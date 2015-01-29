@@ -187,23 +187,21 @@ bool Servatrice::initServer()
 
     const QString roomMethod = settingsCache->value("rooms/method").toString();
     if (roomMethod == "sql") {
-        QSqlQuery query(servatriceDatabaseInterface->getDatabase());
-        query.prepare("select id, name, descr, auto_join, join_message from " + dbPrefix + "_rooms order by id asc");
+        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, name, descr, auto_join, join_message from {prefix}_rooms order by id asc");
         servatriceDatabaseInterface->execSqlQuery(query);
-        while (query.next()) {
-            QSqlQuery query2(servatriceDatabaseInterface->getDatabase());
-            query2.prepare("select name from " + dbPrefix + "_rooms_gametypes where id_room = :id_room");
-            query2.bindValue(":id_room", query.value(0).toInt());
+        while (query->next()) {
+            QSqlQuery *query2 = servatriceDatabaseInterface->prepareQuery("select name from {prefix}_rooms_gametypes where id_room = :id_room");
+            query2->bindValue(":id_room", query->value(0).toInt());
             servatriceDatabaseInterface->execSqlQuery(query2);
             QStringList gameTypes;
-            while (query2.next())
-                gameTypes.append(query2.value(0).toString());
+            while (query2->next())
+                gameTypes.append(query2->value(0).toString());
 
-            addRoom(new Server_Room(query.value(0).toInt(),
-                                    query.value(1).toString(),
-                                    query.value(2).toString(),
-                                    query.value(3).toInt(),
-                                    query.value(4).toString(),
+            addRoom(new Server_Room(query->value(0).toInt(),
+                                    query->value(1).toString(),
+                                    query->value(2).toString(),
+                                    query->value(3).toInt(),
+                                    query->value(4).toString(),
                                     gameTypes,
                                     this
             ));
@@ -360,11 +358,10 @@ void Servatrice::updateServerList()
 	serverListMutex.lock();
 	serverList.clear();
 
-	QSqlQuery query(servatriceDatabaseInterface->getDatabase());
-	query.prepare("select id, ssl_cert, hostname, address, game_port, control_port from " + dbPrefix + "_servers order by id asc");
+	QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, ssl_cert, hostname, address, game_port, control_port from {prefix}_servers order by id asc");
 	servatriceDatabaseInterface->execSqlQuery(query);
-	while (query.next()) {
-		ServerProperties prop(query.value(0).toInt(), QSslCertificate(query.value(1).toString().toUtf8()), query.value(2).toString(), QHostAddress(query.value(3).toString()), query.value(4).toInt(), query.value(5).toInt());
+	while (query->next()) {
+		ServerProperties prop(query->value(0).toInt(), QSslCertificate(query->value(1).toString().toUtf8()), query->value(2).toString(), QHostAddress(query->value(3).toString()), query->value(4).toInt(), query->value(5).toInt());
 		serverList.append(prop);
 		qDebug() << QString("#%1 CERT=%2 NAME=%3 IP=%4:%5 CPORT=%6").arg(prop.id).arg(QString(prop.cert.digest().toHex())).arg(prop.hostname).arg(prop.address.toString()).arg(prop.gamePort).arg(prop.controlPort);
 	}
@@ -407,12 +404,11 @@ void Servatrice::updateLoginMessage()
     if (!servatriceDatabaseInterface->checkSql())
         return;
 
-    QSqlQuery query(servatriceDatabaseInterface->getDatabase());
-    query.prepare("select message from " + dbPrefix + "_servermessages where id_server = :id_server order by timest desc limit 1");
-    query.bindValue(":id_server", serverId);
+    QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select message from {prefix}_servermessages where id_server = :id_server order by timest desc limit 1");
+    query->bindValue(":id_server", serverId);
     if (servatriceDatabaseInterface->execSqlQuery(query))
-        if (query.next()) {
-            const QString newLoginMessage = query.value(0).toString();
+        if (query->next()) {
+            const QString newLoginMessage = query->value(0).toString();
 
             loginMessageMutex.lock();
             loginMessage = newLoginMessage;
@@ -447,14 +443,13 @@ void Servatrice::statusUpdate()
     rxBytes = 0;
     rxBytesMutex.unlock();
 
-    QSqlQuery query(servatriceDatabaseInterface->getDatabase());
-    query.prepare("insert into " + dbPrefix + "_uptime (id_server, timest, uptime, users_count, games_count, tx_bytes, rx_bytes) values(:id, NOW(), :uptime, :users_count, :games_count, :tx, :rx)");
-    query.bindValue(":id", serverId);
-    query.bindValue(":uptime", uptime);
-    query.bindValue(":users_count", uc);
-    query.bindValue(":games_count", gc);
-    query.bindValue(":tx", tx);
-    query.bindValue(":rx", rx);
+    QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("insert into {prefix}_uptime (id_server, timest, uptime, users_count, games_count, tx_bytes, rx_bytes) values(:id, NOW(), :uptime, :users_count, :games_count, :tx, :rx)");
+    query->bindValue(":id", serverId);
+    query->bindValue(":uptime", uptime);
+    query->bindValue(":users_count", uc);
+    query->bindValue(":games_count", gc);
+    query->bindValue(":tx", tx);
+    query->bindValue(":rx", rx);
     servatriceDatabaseInterface->execSqlQuery(query);
 }
 
