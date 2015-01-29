@@ -47,7 +47,7 @@ public:
     QMenu *getMenu() const { return menu; }
     void setMenu(QMenu *_menu, QAction *_doubleClickAction = 0) { menu = _menu; doubleClickAction = _doubleClickAction; }
     QString getName() const { return name; }
-    QString getTranslatedName(bool hisOwn, GrammaticalCase gc) const;
+    QString getTranslatedName(bool theirOwn, GrammaticalCase gc) const;
     Player *getPlayer() const { return player; }
     bool contentsKnown() const { return cards.getContentsKnown(); }
     const CardList &getCards() const { return cards; }

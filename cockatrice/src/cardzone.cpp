@@ -44,16 +44,16 @@ void CardZone::clearContents()
     emit cardCountChanged();
 }
 
-QString CardZone::getTranslatedName(bool hisOwn, GrammaticalCase gc) const
+QString CardZone::getTranslatedName(bool theirOwn, GrammaticalCase gc) const
 {
     QString ownerName = player->getName();
     bool female = player->getUserInfo()->gender() == ServerInfo_User::Female;
     if (name == "hand")
         return female
-            ? (hisOwn
+            ? (theirOwn
                 ? tr("her hand", "nominative, female owner")
                 : tr("%1's hand", "nominative, female owner").arg(ownerName)
-            ) : (hisOwn
+            ) : (theirOwn
                 ? tr("his hand", "nominative, male owner")
                 : tr("%1's hand", "nominative, male owner").arg(ownerName)
             );
@@ -61,65 +61,65 @@ QString CardZone::getTranslatedName(bool hisOwn, GrammaticalCase gc) const
         switch (gc) {
         case CaseLookAtZone:
             return female
-                ? (hisOwn
+                ? (theirOwn
                     ? tr("her library", "look at zone, female owner")
                     : tr("%1's library", "look at zone, female owner").arg(ownerName)
-                ) : (hisOwn
+                ) : (theirOwn
                     ? tr("his library", "look at zone, male owner")
                     : tr("%1's library", "look at zone, male owner").arg(ownerName)
                 );
         case CaseTopCardsOfZone:
             return female
-                ? (hisOwn
+                ? (theirOwn
                     ? tr("of her library", "top cards of zone, female owner")
                     : tr("of %1's library", "top cards of zone, female owner").arg(ownerName)
-                ) : (hisOwn
+                ) : (theirOwn
                     ? tr("of his library", "top cards of zone, male owner")
                     : tr("of %1's library", "top cards of zone, male owner").arg(ownerName)
                 );
         case CaseRevealZone:
             return female
-                ? (hisOwn
+                ? (theirOwn
                     ? tr("her library", "reveal zone, female owner")
                     : tr("%1's library", "reveal zone, female owner").arg(ownerName)
-                ) : (hisOwn
+                ) : (theirOwn
                     ? tr("his library", "reveal zone, male owner")
                     : tr("%1's library", "reveal zone, male owner").arg(ownerName)
                 );
         case CaseShuffleZone:
             return female
-                ? (hisOwn
+                ? (theirOwn
                     ? tr("her library", "shuffle, female owner")
                     : tr("%1's library", "shuffle, female owner").arg(ownerName)
-                ) : (hisOwn
+                ) : (theirOwn
                     ? tr("his library", "shuffle, male owner")
                     : tr("%1's library", "shuffle, male owner").arg(ownerName)
                 );
         default:
             return female
-                ? (hisOwn
+                ? (theirOwn
                     ? tr("her library", "nominative, female owner")
                     : tr("%1's library", "nominative, female owner").arg(ownerName)
-                ) : (hisOwn
+                ) : (theirOwn
                     ? tr("his library", "nominative, male owner")
                     : tr("%1's library", "nominative, male owner").arg(ownerName)
                 );
         }
     else if (name == "grave")
         return female
-            ? (hisOwn
+            ? (theirOwn
                 ? tr("her graveyard", "nominative, female owner")
                 : tr("%1's graveyard", "nominative, female owner").arg(ownerName)
-            ) : (hisOwn
+            ) : (theirOwn
                 ? tr("his graveyard", "nominative, male owner")
                 : tr("%1's graveyard", "nominative, male owner").arg(ownerName)
             );
     else if (name == "rfg")
         return female
-            ? (hisOwn
+            ? (theirOwn
                 ? tr("her exile", "nominative, female owner")
                 : tr("%1's exile", "nominative, female owner").arg(ownerName)
-            ) : (hisOwn
+            ) : (theirOwn
                 ? tr("his exile", "nominative, male owner")
                 : tr("%1's exile", "nominative, male owner").arg(ownerName)
             );
@@ -127,19 +127,19 @@ QString CardZone::getTranslatedName(bool hisOwn, GrammaticalCase gc) const
         switch (gc) {
         case CaseLookAtZone:
             return female
-                ? (hisOwn
+                ? (theirOwn
                     ? tr("her sideboard", "look at zone, female owner")
                     : tr("%1's sideboard", "look at zone, female owner").arg(ownerName)
-                ) : (hisOwn
+                ) : (theirOwn
                     ? tr("his sideboard", "look at zone, male owner")
                     : tr("%1's sideboard", "look at zone, male owner").arg(ownerName)
                 );
         case CaseNominative:
             return female
-                ? (hisOwn
+                ? (theirOwn
                     ? tr("her sideboard", "nominative, female owner")
                     : tr("%1's sideboard", "nominative, female owner").arg(ownerName)
-                ) : (hisOwn
+                ) : (theirOwn
                     ? tr("his sideboard", "nominative, male owner")
                     : tr("%1's sideboard", "nominative, male owner").arg(ownerName)
                 );
