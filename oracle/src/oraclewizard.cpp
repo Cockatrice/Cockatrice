@@ -281,7 +281,8 @@ ChooseSetsPage::ChooseSetsPage(QWidget *parent)
 {
     setTitle(tr("Sets selection"));
     setSubTitle(tr("The following sets has been found in the source file. "
-                   "Please mark the sets that will be imported."));
+                   "Please mark the sets that will be imported.\n"
+                   "All core and expansion sets are selected by default."));
 
     checkBoxLayout = new QVBoxLayout;
     
@@ -444,7 +445,9 @@ bool SaveSetsPage::validatePage()
         if (wizard()->importer->saveToFile(fileName))
         {
             ok = true;
-            QMessageBox::information(this, tr("Success"), tr("The card database has been saved successfully."));
+            QMessageBox::information(this,
+              tr("Success"),
+              tr("The card database has been saved successfully to\n%1").arg(fileName));
         } else {
             QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));;
             if (defaultPathCheckBox->isChecked())

@@ -3,3 +3,5 @@ build*
 *.qm
 .directory
 mysql.cnf
+.DS_Store
+.idea/

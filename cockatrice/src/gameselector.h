@@ -36,7 +36,7 @@ private:
     QPushButton *filterButton, *clearFilterButton, *createButton, *joinButton, *spectateButton;
     GameTypeMap gameTypeMap;
 public:
-    GameSelector(AbstractClient *_client, const TabSupervisor *_tabSupervisor, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QWidget *parent = 0);
+    GameSelector(AbstractClient *_client, const TabSupervisor *_tabSupervisor, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, const bool restoresettings, QWidget *parent = 0);
     void retranslateUi();
     void processGameInfo(const ServerInfo_Game &info);
 };

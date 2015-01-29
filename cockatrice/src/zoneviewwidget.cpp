@@ -57,7 +57,7 @@ void TitleLabel::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 }
 
 ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, bool _revealZone, bool _writeableRevealZone, const QList<const ServerInfo_Card *> &cardList)
-    : QGraphicsWidget(0, Qt::Tool | Qt::FramelessWindowHint), player(_player)
+    : QGraphicsWidget(0, Qt::Tool | Qt::FramelessWindowHint), player(_player), canBeShuffled(_origZone->getIsShufflable())
 {
     setAcceptHoverEvents(true);
     setAttribute(Qt::WA_DeleteOnClose);
@@ -227,7 +227,8 @@ void ZoneViewWidget::closeEvent(QCloseEvent *event)
     }
     if (shuffleCheckBox.isChecked()) 
         player->sendGameCommand(Command_Shuffle());
-    settingsCache->setZoneViewShuffle(shuffleCheckBox.isChecked());
+    if (canBeShuffled)
+        settingsCache->setZoneViewShuffle(shuffleCheckBox.isChecked());
     emit closePressed(this);
     deleteLater();
     event->accept();
