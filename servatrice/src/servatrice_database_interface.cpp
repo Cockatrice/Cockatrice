@@ -330,12 +330,12 @@ void Servatrice_DatabaseInterface::clearSessionTables()
 
 void Servatrice_DatabaseInterface::lockSessionTables()
 {
-	QSqlQuery("lock tables " + server->getDbPrefix() + "_sessions write, " + server->getDbPrefix() + "_users read", sqlDatabase).exec();
+	QSqlQuery("lock tables " + server->getDbPrefix() + "_sessions write, " + server->getDbPrefix() + "_users read", sqlDatabase);
 }
 
 void Servatrice_DatabaseInterface::unlockSessionTables()
 {
-	QSqlQuery("unlock tables", sqlDatabase).exec();
+	QSqlQuery("unlock tables", sqlDatabase);
 }
 
 bool Servatrice_DatabaseInterface::userSessionExists(const QString &userName)
