@@ -199,34 +199,31 @@ bool FilterItem::acceptManaCost(const CardInfo *info) const
     return (info->getManaCost() == term);
 }
 
+bool FilterItem::acceptCmc(const CardInfo *info) const
+{
+    return (info->getCmc() == term);
+}
+
 bool FilterItem::acceptCardAttr(const CardInfo *info, CardFilter::Attr attr) const
 {
-    bool status;
-
     switch (attr) {
         case CardFilter::AttrName:
-            status = acceptName(info);
-            break;
+            return acceptName(info);
         case CardFilter::AttrType:
-            status = acceptType(info);
-            break;
+            return acceptType(info);
         case CardFilter::AttrColor:
-            status = acceptColor(info);
-            break;
+            return acceptColor(info);
         case CardFilter::AttrText:
-            status = acceptText(info);
-            break;
+            return acceptText(info);
         case CardFilter::AttrSet:
-            status = acceptSet(info);
-            break;
+            return acceptSet(info);
         case CardFilter::AttrManaCost:
-            status = acceptManaCost(info);
-            break;
+            return acceptManaCost(info);
+        case CardFilter::AttrCmc:
+            return acceptCmc(info);
         default:
-            status = true; /* ignore this attribute */
+            return true; /* ignore this attribute */
     }
-
-    return status;
 }
 
 /* need to define these here to make QT happy, otherwise
