@@ -28,7 +28,7 @@ private:
     
     QString sanitizeHtml(QString dirty) const;
     QString cardLink(const QString &cardName) const;
-    bool isFemale(Player *player) const;
+    bool genderOf(Player *player) const;
     bool userIsFemale() const;
     QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange) const;
     MessageContext currentContext;

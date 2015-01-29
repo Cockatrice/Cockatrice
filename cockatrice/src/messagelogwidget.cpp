@@ -24,9 +24,9 @@ QString MessageLogWidget::cardLink(const QString &cardName) const
     return QString("<a href=\"card://%1\">%2</a>").arg(cardName).arg(cardName);
 }
 
-bool MessageLogWidget::isFemale(Player *player) const
+ServerInfo_User::Gender MessageLogWidget::genderOf(Player *player) const
 {
-    return player->getUserInfo()->gender() == ServerInfo_User::Female;
+    return player->getUserInfo()->gender();
 }
 
 bool MessageLogWidget::userIsFemale() const
