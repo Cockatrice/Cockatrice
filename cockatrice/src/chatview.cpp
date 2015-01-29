@@ -3,6 +3,7 @@
 #include <QScrollBar>
 #include <QMouseEvent>
 #include <QDesktopServices>
+#include <QApplication>
 #include "chatview.h"
 #include "user_level.h"
 #include "user_context_menu.h"
@@ -196,6 +197,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
             if (message.toLower().startsWith(mention)) {
                 cursor.insertText("@" + userName, mentionFormat);
                 message = message.mid(mention.size());
+                QApplication::alert(this);
             }
             // another user has been mentioned
             else {
