@@ -579,7 +579,7 @@ Response::ResponseCode ServerSocketInterface::cmdReplayList(const Command_Replay
 
     Response_ReplayList *re = new Response_ReplayList;
 
-    QSqlQuery *query1 = sqlInterface->prepareQuery("select a.id_game, a.replay_name, b.room_name, b.time_started, b.time_finished, b.descr, a.do_not_hide from cockatrice_replays_access a left join cockatrice_games b on b.id = a.id_game where a.id_player = :id_player and (a.do_not_hide = 1 or date_add(b.time_started, interval 7 day) > now())");
+    QSqlQuery *query1 = sqlInterface->prepareQuery("select a.id_game, a.replay_name, b.room_name, b.time_started, b.time_finished, b.descr, a.do_not_hide from {prefix}_replays_access a left join {prefix}_games b on b.id = a.id_game where a.id_player = :id_player and (a.do_not_hide = 1 or date_add(b.time_started, interval 7 day) > now())");
     query1->bindValue(":id_player", userInfo->id());
     sqlInterface->execSqlQuery(query1);
     while (query1->next()) {
@@ -597,7 +597,7 @@ Response::ResponseCode ServerSocketInterface::cmdReplayList(const Command_Replay
         matchInfo->set_do_not_hide(query1->value(6).toBool());
 
         {
-            QSqlQuery *query2 = sqlInterface->prepareQuery("select player_name from cockatrice_games_players where id_game = :id_game");
+            QSqlQuery *query2 = sqlInterface->prepareQuery("select player_name from {prefix}_games_players where id_game = :id_game");
             query2->bindValue(":id_game", gameId);
             sqlInterface->execSqlQuery(query2);
             while (query2->next())
