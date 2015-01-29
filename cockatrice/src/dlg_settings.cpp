@@ -573,9 +573,20 @@ MessagesSettingsPage::MessagesSettingsPage()
     ignoreUnregUsersMainChat.setChecked(settingsCache->getIgnoreUnregisteredUsers());
     connect(&ignoreUnregUsersMainChat, SIGNAL(stateChanged(int)), settingsCache, SLOT(setIgnoreUnregisteredUsers(int)));
     
+    invertMentionForeground.setChecked(settingsCache->getChatMentionForeground());
+    connect(&invertMentionForeground, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMentionForeground(int)));
+
+    mentionColor = new QLineEdit();
+    mentionColor->setText(settingsCache->getChatMentionColor());
+    connect(mentionColor, SIGNAL(textChanged(QString)), settingsCache, SLOT(setChatMentionColor(QString)));
+
     QGridLayout *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
-    chatGrid->addWidget(&ignoreUnregUsersMainChat, 1, 0);
+    chatGrid->addWidget(&mentionColorLabel, 1, 0);
+    chatGrid->addWidget(mentionColor, 1, 1);
+    chatGrid->addWidget(&invertMentionForeground, 2, 0);
+    chatGrid->addWidget(&ignoreUnregUsersMainChat, 3, 0);
+    
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
 
@@ -648,6 +659,8 @@ void MessagesSettingsPage::retranslateUi()
     chatMentionCheckBox.setText(tr("Enable chat mentions ('@yourusername' in chat log will be highlighted)"));
     messageShortcuts->setTitle(tr("In-game message macros"));
     ignoreUnregUsersMainChat.setText(tr("Ignore unregistered users in main chat"));
+    mentionColorLabel.setText(tr("Username/Mention color:"));
+    invertMentionForeground.setText(tr("Invert mention text color (white)"));
 }
 
 DlgSettings::DlgSettings(QWidget *parent)
