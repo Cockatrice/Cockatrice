@@ -31,6 +31,7 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _fullInfo, QWidget *paren
     mainLayout->addWidget(&genderLabel2, 3, 1, 1, 2);
     mainLayout->addWidget(&countryLabel1, 4, 0, 1, 1);
     mainLayout->addWidget(&countryLabel2, 4, 1, 1, 2);
+    mainLayout->addWidget(&countryLabel3, 4, 2, 1, 1);
     mainLayout->addWidget(&userLevelLabel1, 5, 0, 1, 1);
     mainLayout->addWidget(&userLevelLabel2, 5, 1, 1, 1);
     mainLayout->addWidget(&userLevelLabel3, 5, 2, 1, 1);
@@ -65,7 +66,9 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     nameLabel.setText(QString::fromStdString(user.name()));
     realNameLabel2.setText(QString::fromStdString(user.real_name()));
     genderLabel2.setPixmap(GenderPixmapGenerator::generatePixmap(15, user.gender()));
-    countryLabel2.setPixmap(CountryPixmapGenerator::generatePixmap(15, QString::fromStdString(user.country())));
+    QString country = QString::fromStdString(user.country());
+    countryLabel2.setPixmap(CountryPixmapGenerator::generatePixmap(15, country));
+    countryLabel3.setText(QString("(%1)").arg(country.toUpper()));
     userLevelLabel2.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel));
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin))
