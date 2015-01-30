@@ -454,13 +454,10 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
 
     if (twi)
         sendingUser = twi->getUserInfo();
+        if (settingsCache->getIgnoreUnregisteredUsers())
+            return;
     else
         sendingUser.set_name(senderName.toStdString());
-
-    UserLevelFlags sendingUserLevel = UserLevelFlags(sendingUser.user_level());
-
-    if (settingsCache->getIgnoreUnregisteredUsers() && (!sendingUserLevel.testFlag(ServerInfo_User::IsUser) || !sendingUserLevel.testFlag(ServerInfo_User::IsRegistered) || !sendingUserLevel.testFlag(ServerInfo_User::IsModerator) || !sendingUserLevel.testFlag(ServerInfo_User::IsAdmin)))
-        return;
 
 TabMessage *tab = messageTabs.value(senderName);
     if (!tab)
