@@ -446,11 +446,24 @@ void TabSupervisor::processGameEventContainer(const GameEventContainer &cont)
 
 void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
 {
-    TabMessage *tab = messageTabs.value(QString::fromStdString(event.sender_name()));
+    QString senderName = QString::fromStdString(event.sender_name());
+
+    UserListTWI *twi = tabUserLists->getAllUsersList()->getUsers().value(senderName);
+
+    ServerInfo_User sendingUser;
+
+    if (twi)
+        sendingUser = twi->getUserInfo();
+        if (settingsCache->getIgnoreUnregisteredUsers())
+            return;
+    else
+        sendingUser.set_name(senderName.toStdString());
+
+TabMessage *tab = messageTabs.value(senderName);
     if (!tab)
         tab = messageTabs.value(QString::fromStdString(event.receiver_name()));
     if (!tab)
-        tab = addMessageTab(QString::fromStdString(event.sender_name()), false);
+        tab = addMessageTab(senderName, false);
     if (!tab)
         return;
     tab->processUserMessageEvent(event);
