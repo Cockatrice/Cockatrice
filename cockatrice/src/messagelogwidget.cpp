@@ -36,51 +36,77 @@ ServerInfo_User::Gender MessageLogWidget::currentUserGender() const
     return ServerInfo_User::GenderUnknown;
 }
 
-const char* MessageLogWidget::trGenderHint(const ServerInfo_User::Gender gender) const
-{
-    switch (gender) {
-      case ServerInfo_User::GenderUnknown:
-          return "unspecified gender";
-      case ServerInfo_User::Male:
-          return "male";
-      case ServerInfo_User::Female:
-          return "female";
-      case ServerInfo_User::Neutral:
-          return "gender neutral";
-    }
-}
-
 void MessageLogWidget::logGameJoined(int gameId)
 {
-    if (userIsFemale())
-        appendHtml(tr("You have joined game #%1.", "female").arg(gameId));
-    else
-        appendHtml(tr("You have joined game #%1.", "male").arg(gameId));
+    switch (currentUserGender()) {
+      case ServerInfo_User::GenderUnknown:
+          appendHtml(tr("You have joined game #%1", "unspecified gender").arg(gameId));
+          break;
+      case ServerInfo_User::Male:
+          appendHtml(tr("You have joined game #%1", "male").arg(gameId));
+          break;
+      case ServerInfo_User::Female:
+          appendHtml(tr("You have joined game #%1", "female").arg(gameId));
+          break;
+      case ServerInfo_User::Neutral:
+          appendHtml(tr("You have joined game #%1", "gender neutral").arg(gameId));
+          break;
+    }
 }
 
 void MessageLogWidget::logReplayStarted(int gameId)
 {
-    if (userIsFemale())
-        appendHtml(tr("You are watching a replay of game #%1.", "female").arg(gameId));
-    else
-        appendHtml(tr("You are watching a replay of game #%1.", "male").arg(gameId));
+    switch (currentUserGender()) {
+      case ServerInfo_User::GenderUnknown:
+          appendHtml(tr("You are watching a replay of game #%1.", "unspecified gender").arg(gameId));
+          break;
+      case ServerInfo_User::Male:
+          appendHtml(tr("You are watching a replay of game #%1.", "male").arg(gameId));
+          break;
+      case ServerInfo_User::Female:
+          appendHtml(tr("You are watching a replay of game #%1.", "female").arg(gameId));
+          break;
+      case ServerInfo_User::Neutral:
+          appendHtml(tr("You are watching a replay of game #%1.", "gender neutral").arg(gameId));
+          break;
+    }
 }
 
 void MessageLogWidget::logJoin(Player *player)
 {
     soundEngine->cuckoo();
-    if (isFemale(player))
-        appendHtml(tr("%1 has joined the game.", "female").arg(sanitizeHtml(player->getName())));
-    else
-        appendHtml(tr("%1 has joined the game.", "male").arg(sanitizeHtml(player->getName())));
+    switch (genderOf(player)) {
+      case ServerInfo_User::GenderUnknown:
+          appendHtml(tr("%1 has joined the game.", "unspecified gender").arg(sanitizeHtml(player->getName())));
+          break;
+      case ServerInfo_User::Male:
+          appendHtml(tr("%1 has joined the game.", "male").arg(sanitizeHtml(player->getName())));
+          break;
+      case ServerInfo_User::Female:
+          appendHtml(tr("%1 has joined the game.", "female").arg(sanitizeHtml(player->getName())));
+          break;
+      case ServerInfo_User::Neutral:
+          appendHtml(tr("%1 has joined the game.", "gender neutral").arg(sanitizeHtml(player->getName())));
+          break;
+    }
 }
 
 void MessageLogWidget::logLeave(Player *player)
 {
-    if (isFemale(player))
-        appendHtml(tr("%1 has left the game.", "female").arg(sanitizeHtml(player->getName())));
-    else
-        appendHtml(tr("%1 has left the game.", "male").arg(sanitizeHtml(player->getName())));
+    switch (genderOf(player)) {
+      case ServerInfo_User::GenderUnknown:
+          appendHtml(tr("%1 has left the game.", "unspecified gender").arg(sanitizeHtml(player->getName())));
+          break;
+      case ServerInfo_User::Male:
+          appendHtml(tr("%1 has left the game.", "male").arg(sanitizeHtml(player->getName())));
+          break;
+      case ServerInfo_User::Female:
+          appendHtml(tr("%1 has left the game.", "female").arg(sanitizeHtml(player->getName())));
+          break;
+      case ServerInfo_User::Neutral:
+          appendHtml(tr("%1 has left the game.", "gender neutral").arg(sanitizeHtml(player->getName())));
+          break;
+    }
 }
 
 void MessageLogWidget::logGameClosed()
@@ -90,7 +116,20 @@ void MessageLogWidget::logGameClosed()
 
 void MessageLogWidget::logKicked()
 {
-    appendHtml(tr("You have been kicked out of the game."));
+    switch (currentUserGender()) {
+      case ServerInfo_User::GenderUnknown:
+          appendHtml(tr("You have been kicked out of the game.", "unspecified gender"));
+          break;
+      case ServerInfo_User::Male:
+          appendHtml(tr("You have been kicked out of the game.", "male"));
+          break;
+      case ServerInfo_User::Female:
+          appendHtml(tr("You have been kicked out of the game.", "female"));
+          break;
+      case ServerInfo_User::Neutral:
+          appendHtml(tr("You have been kicked out of the game.", "gender neutral"));
+          break;
+    }
 }
 
 void MessageLogWidget::logJoinSpectator(QString name)
@@ -105,53 +144,139 @@ void MessageLogWidget::logLeaveSpectator(QString name)
 
 void MessageLogWidget::logDeckSelect(Player *player, QString deckHash, int sideboardSize)
 {
-    const char* gender = isFemale(player) ? "female" : "male";
+    const char* gender = genderOf(player);
     if (sideboardSize < 0)
-        appendHtml(tr("%1 has loaded a deck (%2).", gender).arg(sanitizeHtml(player->getName())).arg(deckHash));
+        switch(gender) {
+            case ServerInfo_User::GenderUnknown:
+                appendHtml(tr("%1 has loaded a deck (%2).", "unspecified gender").arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Neutral:
+                appendHtml(tr("%1 has loaded a deck (%2).", "gender neutral").arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Female:
+                appendHtml(tr("%1 has loaded a deck (%2).", "female").arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Male:
+                appendHtml(tr("%1 has loaded a deck (%2).", "male").arg(sanitizeHtml(player->getName())));
+                break;
+        }
     else
-        appendHtml(tr("%1 has loaded a deck with %2 sideboard cards (%3).", gender).
-                arg(sanitizeHtml(player->getName())).
-                arg(sideboardSize).
-                arg(deckHash));
+        switch(gender) {
+            case ServerInfo_User::GenderUnknown:
+                appendHtml(tr("%1 has loaded a deck with %2 sideboard cards (%3).", "unspecified gender").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(sideboardSize).
+                    arg(deckHash));
+                break;
+            case ServerInfo_User::Neutral:
+                appendHtml(tr("%1 has loaded a deck with %2 sideboard cards (%3).", "gender neutral").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(sideboardSize).
+                    arg(deckHash));
+                break;
+            case ServerInfo_User::Female:
+                appendHtml(tr("%1 has loaded a deck with %2 sideboard cards (%3).", "female").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(sideboardSize).
+                    arg(deckHash));
+                break;
+            case ServerInfo_User::Male:
+                appendHtml(tr("%1 has loaded a deck with %2 sideboard cards (%3).", "male").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(sideboardSize).
+                    arg(deckHash));
+                break;
+        }
 }
 
 void MessageLogWidget::logReadyStart(Player *player)
 {
-    if (isFemale(player))
-        appendHtml(tr("%1 is ready to start the game.", "female").arg(sanitizeHtml(player->getName())));
-    else
-        appendHtml(tr("%1 is ready to start the game.", "male").arg(sanitizeHtml(player->getName())));
+    switch(genderOf(player)) {
+        case ServerInfo_User::GenderUnknown:
+            appendHtml(tr("%1 is ready to start the game.", "unspecified gender").arg(sanitizeHtml(player->getName())));
+            break;
+        case ServerInfo_User::Neutral:
+            appendHtml(tr("%1 is ready to start the game.", "gender neutral").arg(sanitizeHtml(player->getName())));
+            break;
+        case ServerInfo_User::Female:
+            appendHtml(tr("%1 is ready to start the game.", "female").arg(sanitizeHtml(player->getName())));
+            break;
+        case ServerInfo_User::Male:
+            appendHtml(tr("%1 is ready to start the game.", "male").arg(sanitizeHtml(player->getName())));
+            break;
+    }
 }
 
 void MessageLogWidget::logNotReadyStart(Player *player)
 {
-    if (isFemale(player))
-        appendHtml(tr("%1 is not ready to start the game any more.", "female").arg(sanitizeHtml(player->getName())));
-    else
-        appendHtml(tr("%1 is not ready to start the game any more.", "male").arg(sanitizeHtml(player->getName())));
+    switch(genderOf(player)) {
+        case ServerInfo_User::GenderUnknown:
+            appendHtml(tr("%1 is not ready to start the game any more.", "unspecified gender").arg(sanitizeHtml(player->getName())));
+            break;
+        case ServerInfo_User::Neutral:
+            appendHtml(tr("%1 is not ready to start the game any more.", "gender neutral").arg(sanitizeHtml(player->getName())));
+            break;
+        case ServerInfo_User::Female:
+            appendHtml(tr("%1 is not ready to start the game any more.", "female").arg(sanitizeHtml(player->getName())));
+            break;
+        case ServerInfo_User::Male:
+            appendHtml(tr("%1 is not ready to start the game any more.", "male").arg(sanitizeHtml(player->getName())));
+            break;
+    }
 }
 
 void MessageLogWidget::logSetSideboardLock(Player *player, bool locked)
 {
+    ServerInfo_User::Gender gender = genderOf(player);
     if (locked) {
-        if (isFemale(player))
-            appendHtml(tr("%1 has locked her sideboard.", "female").arg(sanitizeHtml(player->getName())));
-        else
-            appendHtml(tr("%1 has locked his sideboard.", "male").arg(sanitizeHtml(player->getName())));
+        switch(gender) {
+            case ServerInfo_User::GenderUnknown:
+                appendHtml(tr("%1 has locked their sideboard.", "unspecified gender").arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Neutral:
+                appendHtml(tr("%1 has locked their sideboard.", "gender neutral").arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Female:
+                appendHtml(tr("%1 has locked her sideboard.", "female").arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Male:
+                appendHtml(tr("%1 has locked his sideboard.", "male").arg(sanitizeHtml(player->getName())));
+                break;
+        }
     } else {
-        if (isFemale(player))
-            appendHtml(tr("%1 has unlocked her sideboard.", "female").arg(sanitizeHtml(player->getName())));
-        else
-            appendHtml(tr("%1 has unlocked his sideboard.", "male").arg(sanitizeHtml(player->getName())));
+        switch(gender) {
+            case ServerInfo_User::GenderUnknown:
+                appendHtml(tr("%1 has unlocked their sideboard.", "unspecified gender").arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Neutral:
+                appendHtml(tr("%1 has unlocked their sideboard.", "gender neutral").arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Female:
+                appendHtml(tr("%1 has unlocked her sideboard.", "female").arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Male:
+                appendHtml(tr("%1 has unlocked his sideboard.", "male").arg(sanitizeHtml(player->getName())));
+                break;
+        }
     }
 }
 
 void MessageLogWidget::logConcede(Player *player)
 {
-    if (isFemale(player))
-        appendHtml(tr("%1 has conceded the game.", "female").arg(sanitizeHtml(player->getName())));
-    else
-        appendHtml(tr("%1 has conceded the game.", "male").arg(sanitizeHtml(player->getName())));
+    switch(genderOf(player)) {
+        case ServerInfo_User::GenderUnknown:
+            appendHtml(tr("%1 has conceded the game.", "unspecified gender").arg(sanitizeHtml(player->getName())));
+            break;
+        case ServerInfo_User::Neutral:
+            appendHtml(tr("%1 has conceded the game.", "gender neutral").arg(sanitizeHtml(player->getName())));
+            break;
+        case ServerInfo_User::Female:
+            appendHtml(tr("%1 has conceded the game.", "female").arg(sanitizeHtml(player->getName())));
+            break;
+        case ServerInfo_User::Male:
+            appendHtml(tr("%1 has conceded the game.", "male").arg(sanitizeHtml(player->getName())));
+            break;
+    }
 }
 
 void MessageLogWidget::logGameStart()
@@ -162,15 +287,35 @@ void MessageLogWidget::logGameStart()
 void MessageLogWidget::logConnectionStateChanged(Player *player, bool connectionState)
 {
     if (connectionState) {
-        if (isFemale(player))
-            appendHtml(tr("%1 has restored connection to the game.", "female").arg(sanitizeHtml(player->getName())));
-        else
-            appendHtml(tr("%1 has restored connection to the game.", "male").arg(sanitizeHtml(player->getName())));
+        switch(genderOf(player)) {
+            case ServerInfo_User::GenderUnknown:
+                appendHtml(tr("%1 has restored connection to the game.", "unspecified gender").arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Neutral:
+                appendHtml(tr("%1 has restored connection to the game.", "gender neutral").arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Female:
+                appendHtml(tr("%1 has restored connection to the game.", "female").arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Male:
+                appendHtml(tr("%1 has restored connection to the game.", "male").arg(sanitizeHtml(player->getName())));
+                break;
+        }
     } else {
-        if (isFemale(player))
-            appendHtml(tr("%1 has lost connection to the game.", "female").arg(sanitizeHtml(player->getName())));
-        else
-            appendHtml(tr("%1 has lost connection to the game.", "male").arg(sanitizeHtml(player->getName())));
+        switch(genderOf(player)) {
+            case ServerInfo_User::GenderUnknown:
+                appendHtml(tr("%1 has lost connection to the game.", "unspecified gender").arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Neutral:
+                appendHtml(tr("%1 has lost connection to the game.", "gender neutral").arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Female:
+                appendHtml(tr("%1 has lost connection to the game.", "female").arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Male:
+                appendHtml(tr("%1 has lost connection to the game.", "male").arg(sanitizeHtml(player->getName())));
+                break;
+        }
     }
 }
 
@@ -188,11 +333,28 @@ void MessageLogWidget::logShuffle(Player *player, CardZone *zone)
 {
     soundEngine->shuffle();
     if (currentContext != MessageContext_Mulligan) {
-        appendHtml((isFemale(player)
-            ? tr("%1 shuffles %2.", "female")
-            : tr("%1 shuffles %2.", "male")
-        ).arg(sanitizeHtml(player->getName()))
-         .arg(zone->getTranslatedName(true, CaseShuffleZone)));
+        switch(genderOf(player)) {
+            case ServerInfo_User::GenderUnknown:
+                appendHtml(tr("%1 shuffles %2.", "unspecified gender").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(zone->getTranslatedName(true, CaseShuffleZone)));
+                break;
+            case ServerInfo_User::Neutral:
+                appendHtml(tr("%1 shuffles %2.", "gender neutral").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(zone->getTranslatedName(true, CaseShuffleZone)));
+                break;
+            case ServerInfo_User::Female:
+                appendHtml(tr("%1 shuffles %2.", "female").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(zone->getTranslatedName(true, CaseShuffleZone)));
+                break;
+            case ServerInfo_User::Male:
+                appendHtml(tr("%1 shuffles %2.", "male").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(zone->getTranslatedName(true, CaseShuffleZone)));
+                break;
+        }
     }
 }
 
