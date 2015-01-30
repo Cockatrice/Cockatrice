@@ -29,9 +29,25 @@ ServerInfo_User::Gender MessageLogWidget::genderOf(Player *player) const
     return player->getUserInfo()->gender();
 }
 
-bool MessageLogWidget::userIsFemale() const
+ServerInfo_User::Gender MessageLogWidget::currentUserGender() const
 {
-    return (tabSupervisor && tabSupervisor->getUserInfo() && (tabSupervisor->getUserInfo()->gender() & ServerInfo_User::Female));
+    if (tabSupervisor && tabSupervisor->getUserInfo())
+        return tabSupervisor->getUserInfo()->gender();
+    return ServerInfo_User::GenderUnknown;
+}
+
+const char* MessageLogWidget::trGenderHint(const ServerInfo_User::Gender gender) const
+{
+    switch (gender) {
+      case ServerInfo_User::GenderUnknown:
+          return "unspecified gender";
+      case ServerInfo_User::Male:
+          return "male";
+      case ServerInfo_User::Female:
+          return "female";
+      case ServerInfo_User::Neutral:
+          return "gender neutral";
+    }
 }
 
 void MessageLogWidget::logGameJoined(int gameId)

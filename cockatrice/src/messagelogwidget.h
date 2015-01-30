@@ -28,8 +28,9 @@ private:
     
     QString sanitizeHtml(QString dirty) const;
     QString cardLink(const QString &cardName) const;
-    bool genderOf(Player *player) const;
-    bool userIsFemale() const;
+    ServerInfo_User::Gender genderOf(Player *player) const;
+    const char* trGenderHint(const ServerInfo_User::Gender g) const;
+    ServerInfo_User::Gender currentUserGender() const;
     QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange) const;
     MessageContext currentContext;
     
