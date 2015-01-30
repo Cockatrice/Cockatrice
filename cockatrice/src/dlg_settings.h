@@ -168,6 +168,7 @@ private:
     QGroupBox *chatGroupBox;
     QGroupBox *messageShortcuts;
     QLineEdit *mentionColor;
+    QLabel hexLabel;
 
     void storeSettings();
     void updateMentionPreview();

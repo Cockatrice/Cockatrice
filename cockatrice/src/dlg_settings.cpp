@@ -585,6 +585,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(&invertMentionForeground, 0, 1);
     chatGrid->addWidget(mentionColor, 0, 2);
     chatGrid->addWidget(&ignoreUnregUsersMainChat, 1, 0);
+    chatGrid->addWidget(&hexLabel, 1, 2);
     
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
@@ -678,6 +679,7 @@ void MessagesSettingsPage::retranslateUi()
     messageShortcuts->setTitle(tr("In-game message macros"));
     ignoreUnregUsersMainChat.setText(tr("Ignore unregistered users in main chat"));
     invertMentionForeground.setText(tr("Invert text color"));
+    hexLabel.setText(tr("(Color is hexadecimal)"));
 }
 
 DlgSettings::DlgSettings(QWidget *parent)
