@@ -156,6 +156,8 @@ public:
 private slots:
     void actAdd();
     void actRemove();
+    void updateColor(const QString &value);
+    void updateTextColor(int value);
 private:
     QListWidget *messageList;
     QAction *aAdd;
@@ -166,9 +168,9 @@ private:
     QGroupBox *chatGroupBox;
     QGroupBox *messageShortcuts;
     QLineEdit *mentionColor;
-    QLabel mentionColorLabel;
 
     void storeSettings();
+    void updateMentionPreview();
 };
 
 class DlgSettings : public QDialog {

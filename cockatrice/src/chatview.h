@@ -37,6 +37,7 @@ private:
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
     void appendUrlTag(QTextCursor &cursor, QString url);
     QString getNameFromUserList(QMap<QString, UserListTWI *> &userList, QString &userName);
+    QColor getCustomMentionColor();
 private slots:
     void openLink(const QUrl &link);
 public:

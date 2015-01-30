@@ -566,7 +566,6 @@ void DeckEditorSettingsPage::radioPriceTagSourceClicked(bool checked)
 
 MessagesSettingsPage::MessagesSettingsPage()
 {
-
     chatMentionCheckBox.setChecked(settingsCache->getChatMention());
     connect(&chatMentionCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMention(int)));
     
@@ -574,18 +573,18 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&ignoreUnregUsersMainChat, SIGNAL(stateChanged(int)), settingsCache, SLOT(setIgnoreUnregisteredUsers(int)));
     
     invertMentionForeground.setChecked(settingsCache->getChatMentionForeground());
-    connect(&invertMentionForeground, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMentionForeground(int)));
+    connect(&invertMentionForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextColor(int)));
 
     mentionColor = new QLineEdit();
     mentionColor->setText(settingsCache->getChatMentionColor());
-    connect(mentionColor, SIGNAL(textChanged(QString)), settingsCache, SLOT(setChatMentionColor(QString)));
+    updateMentionPreview();
+    connect(mentionColor, SIGNAL(textChanged(QString)), this, SLOT(updateColor(QString)));
 
     QGridLayout *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
-    chatGrid->addWidget(&mentionColorLabel, 1, 0);
-    chatGrid->addWidget(mentionColor, 1, 1);
-    chatGrid->addWidget(&invertMentionForeground, 2, 0);
-    chatGrid->addWidget(&ignoreUnregUsersMainChat, 3, 0);
+    chatGrid->addWidget(&invertMentionForeground, 0, 1);
+    chatGrid->addWidget(mentionColor, 0, 2);
+    chatGrid->addWidget(&ignoreUnregUsersMainChat, 1, 0);
     
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
@@ -624,6 +623,25 @@ MessagesSettingsPage::MessagesSettingsPage()
     retranslateUi();
 }
 
+void MessagesSettingsPage::updateColor(const QString &value) {
+    QColor colorToSet;
+    colorToSet.setNamedColor("#" + value);
+    if (colorToSet.isValid()) {
+        settingsCache->setChatMentionColor(value);
+        updateMentionPreview();
+    }
+}
+
+void MessagesSettingsPage::updateTextColor(int value) {
+    settingsCache->setChatMentionForeground(value);
+    updateMentionPreview();
+}
+
+void MessagesSettingsPage::updateMentionPreview() {
+    mentionColor->setStyleSheet("QLineEdit{background:#" + settingsCache->getChatMentionColor() + 
+        ";color: " + (settingsCache->getChatMentionForeground() ? "white" : "black") + ";}");
+}
+
 void MessagesSettingsPage::storeSettings()
 {
     QSettings settings;
@@ -656,11 +674,10 @@ void MessagesSettingsPage::retranslateUi()
     aAdd->setText(tr("&Add"));
     aRemove->setText(tr("&Remove"));
     chatGroupBox->setTitle(tr("Chat settings"));
-    chatMentionCheckBox.setText(tr("Enable chat mentions ('@yourusername' in chat log will be highlighted)"));
+    chatMentionCheckBox.setText(tr("Enable chat mentions"));
     messageShortcuts->setTitle(tr("In-game message macros"));
     ignoreUnregUsersMainChat.setText(tr("Ignore unregistered users in main chat"));
-    mentionColorLabel.setText(tr("Username/Mention color:"));
-    invertMentionForeground.setText(tr("Invert mention text color (white)"));
+    invertMentionForeground.setText(tr("Invert text color"));
 }
 
 DlgSettings::DlgSettings(QWidget *parent)

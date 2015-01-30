@@ -116,9 +116,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     
     QTextCharFormat senderFormat;
     if (tabSupervisor && tabSupervisor->getUserInfo() && (sender == QString::fromStdString(tabSupervisor->getUserInfo()->name()))) {
-        QColor customColor;
-        customColor.setNamedColor("#" + settingsCache->getChatMentionColor());
-        senderFormat.setForeground(customColor.isValid() ? QBrush(customColor) : QBrush(DEFAULT_MENTION_COLOR));
+        senderFormat.setForeground(QBrush(getCustomMentionColor()));
         senderFormat.setFontWeight(QFont::Bold);
     } else {
         senderFormat.setForeground(QBrush(OTHER_USER_COLOR));
@@ -195,9 +193,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                 break;
             // you have been mentioned
             if (message.toLower().startsWith(mention)) {
-                QColor customColor;
-                customColor.setNamedColor("#" + settingsCache->getChatMentionColor());
-                mentionFormat.setBackground(customColor.isValid() ? QBrush(customColor) : QBrush(DEFAULT_MENTION_COLOR));
+                mentionFormat.setBackground(QBrush(getCustomMentionColor()));
                 mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white):QBrush(Qt::black));
                 cursor.insertText("@" + userName, mentionFormat);
                 message = message.mid(mention.size());
@@ -229,6 +225,12 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
 
     if (atBottom)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+}
+
+QColor ChatView::getCustomMentionColor() {
+    QColor customColor;
+    customColor.setNamedColor("#" + settingsCache->getChatMentionColor());
+    return customColor.isValid() ? customColor : DEFAULT_MENTION_COLOR;
 }
 
 /**
