@@ -365,6 +365,7 @@ CardInfo::CardInfo(CardDatabase *_db,
                    const QString &_name,
                    bool _isToken,
                    const QString &_manacost,
+                   const QString &_cmc,
                    const QString &_cardtype,
                    const QString &_powtough,
                    const QString &_text,
@@ -381,6 +382,7 @@ CardInfo::CardInfo(CardDatabase *_db,
       isToken(_isToken),
       sets(_sets),
       manacost(_manacost),
+      cmc(_cmc),
       cardtype(_cardtype),
       powtough(_powtough),
       text(_text),
@@ -571,6 +573,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
         xml.writeTextElement("color", colors[i]);
 
     xml.writeTextElement("manacost", info->getManaCost());
+    xml.writeTextElement("cmc", info->getCmc());
     xml.writeTextElement("type", info->getCardType());
     if (!info->getPowTough().isEmpty())
         xml.writeTextElement("pt", info->getPowTough());
@@ -731,7 +734,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
         if (xml.readNext() == QXmlStreamReader::EndElement)
             break;
         if (xml.name() == "card") {
-            QString name, manacost, type, pt, text;
+            QString name, manacost, cmc, type, pt, text;
             QStringList colors;
             QStringMap customPicURLs, customPicURLsHq;
             MuidMap muids;
@@ -747,6 +750,8 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
                     name = xml.readElementText();
                 else if (xml.name() == "manacost")
                     manacost = xml.readElementText();
+                else if (xml.name() == "cmc")
+                    cmc = xml.readElementText();
                 else if (xml.name() == "type")
                     type = xml.readElementText();
                 else if (xml.name() == "pt")
@@ -779,7 +784,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
             }
 
             if (isToken == tokens) {
-                addCard(new CardInfo(this, name, isToken, manacost, type, pt, text, colors, loyalty, cipt, tableRow, sets, customPicURLs, customPicURLsHq, muids));
+                addCard(new CardInfo(this, name, isToken, manacost, cmc, type, pt, text, colors, loyalty, cipt, tableRow, sets, customPicURLs, customPicURLsHq, muids));
             }
         }
     }

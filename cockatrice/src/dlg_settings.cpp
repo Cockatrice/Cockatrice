@@ -50,11 +50,6 @@ GeneralSettingsPage::GeneralSettingsPage()
     pixmapCacheEdit.setSingleStep(64);
     pixmapCacheEdit.setValue(settingsCache->getPixmapCacheSize());
     pixmapCacheEdit.setSuffix(" MB");
-    pixmapCacheEdit.setMinimum(64);
-    pixmapCacheEdit.setMaximum(8192);
-    pixmapCacheEdit.setSingleStep(64);
-    pixmapCacheEdit.setValue(settingsCache->getPixmapCacheSize());
-    pixmapCacheEdit.setSuffix(" MB");
     picDownloadHqCheckBox.setChecked(settingsCache->getPicDownloadHq());
     picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
 
