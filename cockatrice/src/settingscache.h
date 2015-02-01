@@ -58,6 +58,8 @@ private:
     int minPlayersForMultiColumnLayout;
     bool tapAnimation;
     bool chatMention;
+    QString chatMentionColor;
+    bool chatMentionForeground;
     bool zoneViewSortByName, zoneViewSortByType, zoneViewPileView;
     bool soundEnabled;
     QString soundPath;
@@ -85,6 +87,7 @@ public:
     QString getTableBgPath() const { return tableBgPath; }
     QString getPlayerBgPath() const { return playerBgPath; }
     QString getCardBackPicturePath() const { return cardBackPicturePath; }
+    QString getChatMentionColor() const { return chatMentionColor; }
     bool getPicDownload() const { return picDownload; }
     bool getPicDownloadHq() const { return picDownloadHq; }
     bool getNotificationsEnabled() const { return notificationsEnabled; }
@@ -98,6 +101,7 @@ public:
     int getMinPlayersForMultiColumnLayout() const { return minPlayersForMultiColumnLayout; }
     bool getTapAnimation() const { return tapAnimation; }
     bool getChatMention()  const { return chatMention; }
+    bool getChatMentionForeground() const { return chatMentionForeground; }
     bool getZoneViewSortByName() const { return zoneViewSortByName; }
     bool getZoneViewSortByType() const { return zoneViewSortByType; }
     /**
@@ -131,6 +135,7 @@ public slots:
     void setTableBgPath(const QString &_tableBgPath);
     void setPlayerBgPath(const QString &_playerBgPath);
     void setCardBackPicturePath(const QString &_cardBackPicturePath);
+    void setChatMentionColor(const QString &_chatMentionColor);
     void setPicDownload(int _picDownload);
     void setPicDownloadHq(int _picDownloadHq);
     void setNotificationsEnabled(int _notificationsEnabled);
@@ -144,6 +149,7 @@ public slots:
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
     void setTapAnimation(int _tapAnimation);
     void setChatMention(int _chatMention);
+    void setChatMentionForeground(int _chatMentionForeground);
     void setZoneViewSortByName(int _zoneViewSortByName);
     void setZoneViewSortByType(int _zoneViewSortByType);
     void setZoneViewPileView(int _zoneViewPileView);

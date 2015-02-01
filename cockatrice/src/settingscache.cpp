@@ -45,6 +45,8 @@ SettingsCache::SettingsCache()
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 5).toInt();
     tapAnimation = settings->value("cards/tapanimation", true).toBool();
     chatMention = settings->value("chat/mention", true).toBool();
+    chatMentionForeground = settings->value("chat/mentionforeground", true).toBool();
+    chatMentionColor = settings->value("chat/mentioncolor", "C21F2F").toString();
 
     zoneViewSortByName = settings->value("zoneview/sortbyname", true).toBool();
     zoneViewSortByType = settings->value("zoneview/sortbytype", true).toBool();
@@ -242,6 +244,16 @@ void SettingsCache::setTapAnimation(int _tapAnimation)
 void SettingsCache::setChatMention(int _chatMention) {
     chatMention = _chatMention;
     settings->setValue("chat/mention", chatMention);
+}
+
+void SettingsCache::setChatMentionForeground(int _chatMentionForeground) {
+    chatMentionForeground = _chatMentionForeground;
+    settings->setValue("chat/mentionforeground", chatMentionForeground);
+}
+
+void SettingsCache::setChatMentionColor(const QString &_chatMentionColor) {
+    chatMentionColor = _chatMentionColor;
+    settings->setValue("chat/mentioncolor", chatMentionColor);
 }
 
 void SettingsCache::setZoneViewSortByName(int _zoneViewSortByName)

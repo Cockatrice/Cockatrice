@@ -156,17 +156,23 @@ public:
 private slots:
     void actAdd();
     void actRemove();
+    void updateColor(const QString &value);
+    void updateTextColor(int value);
 private:
     QListWidget *messageList;
     QAction *aAdd;
     QAction *aRemove;
     QCheckBox chatMentionCheckBox;
+    QCheckBox invertMentionForeground;
     QCheckBox ignoreUnregUsersMainChat;
     QCheckBox ignoreUnregUserMessages;
     QGroupBox *chatGroupBox;
     QGroupBox *messageShortcuts;
+    QLineEdit *mentionColor;
+    QLabel hexLabel;
 
     void storeSettings();
+    void updateMentionPreview();
 };
 
 class DlgSettings : public QDialog {
