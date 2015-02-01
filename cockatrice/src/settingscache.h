@@ -36,6 +36,7 @@ signals:
     void soundPathChanged();
     void priceTagFeatureChanged(int enabled);
     void ignoreUnregisteredUsersChanged();
+    void ignoreUnregisteredUserMessagesChanged();
     void pixmapCacheSizeChanged(int newSizeInMBs);
 private:
     QSettings *settings;
@@ -63,6 +64,7 @@ private:
     bool priceTagFeature;
     int priceTagSource;
     bool ignoreUnregisteredUsers;
+    bool ignoreUnregisteredUserMessages;
     QString picUrl;
     QString picUrlHq;
     QString picUrlFallback;
@@ -108,6 +110,7 @@ public:
     bool getPriceTagFeature() const { return priceTagFeature; }
     int getPriceTagSource() const { return priceTagSource; }
     bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
+    bool getIgnoreUnregisteredUserMessages() const { return ignoreUnregisteredUserMessages; }
     QString getPicUrl() const { return picUrl; }
     QString getPicUrlHq() const { return picUrlHq; }
     QString getPicUrlFallback() const { return picUrlFallback; }
@@ -149,6 +152,7 @@ public slots:
     void setPriceTagFeature(int _priceTagFeature);
     void setPriceTagSource(int _priceTagSource);
     void setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers);
+    void setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages);
     void setPicUrl(const QString &_picUrl);
     void setPicUrlHq(const QString &_picUrlHq);
     void setPicUrlFallback(const QString &_picUrlFallback);
