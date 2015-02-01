@@ -571,11 +571,14 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&chatMentionCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMention(int)));
     
     ignoreUnregUsersMainChat.setChecked(settingsCache->getIgnoreUnregisteredUsers());
+    ignoreUnregUserMessages.setChecked(settingsCache->getIgnoreUnregisteredUserMessages());
     connect(&ignoreUnregUsersMainChat, SIGNAL(stateChanged(int)), settingsCache, SLOT(setIgnoreUnregisteredUsers(int)));
+    connect(&ignoreUnregUserMessages, SIGNAL(stateChanged(int)), settingsCache, SLOT(setIgnoreUnregisteredUserMessages(int)));
     
     QGridLayout *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
     chatGrid->addWidget(&ignoreUnregUsersMainChat, 1, 0);
+    chatGrid->addWidget(&ignoreUnregUserMessages, 2, 0);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
 
@@ -647,7 +650,8 @@ void MessagesSettingsPage::retranslateUi()
     chatGroupBox->setTitle(tr("Chat settings"));
     chatMentionCheckBox.setText(tr("Enable chat mentions ('@yourusername' in chat log will be highlighted)"));
     messageShortcuts->setTitle(tr("In-game message macros"));
-    ignoreUnregUsersMainChat.setText(tr("Ignore unregistered users in main chat"));
+    ignoreUnregUsersMainChat.setText(tr("Ignore chat room messages sent by unregistered users."));
+    ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users."));
 }
 
 DlgSettings::DlgSettings(QWidget *parent)
