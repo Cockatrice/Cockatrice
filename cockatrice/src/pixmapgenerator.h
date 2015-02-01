@@ -50,7 +50,15 @@ class UserLevelPixmapGenerator {
 private:
     static QMap<int, QPixmap> pmCache;
 public:
-    static QPixmap generatePixmap(int height, UserLevelFlags userLevel);
+    static QPixmap generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy);
+    static void clear() { pmCache.clear(); }
+};
+
+class PixmapGenerator {
+private:
+    static QMap<QString, QPixmap> pmCache;
+public:
+    static QPixmap generatePixmap(int height, QString resourceName);
     static void clear() { pmCache.clear(); }
 };
 
