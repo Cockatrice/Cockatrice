@@ -570,7 +570,9 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&chatMentionCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMention(int)));
     
     ignoreUnregUsersMainChat.setChecked(settingsCache->getIgnoreUnregisteredUsers());
+    ignoreUnregUserMessages.setChecked(settingsCache->getIgnoreUnregisteredUserMessages());
     connect(&ignoreUnregUsersMainChat, SIGNAL(stateChanged(int)), settingsCache, SLOT(setIgnoreUnregisteredUsers(int)));
+    connect(&ignoreUnregUserMessages, SIGNAL(stateChanged(int)), settingsCache, SLOT(setIgnoreUnregisteredUserMessages(int)));
     
     invertMentionForeground.setChecked(settingsCache->getChatMentionForeground());
     connect(&invertMentionForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextColor(int)));
@@ -586,7 +588,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(mentionColor, 0, 2);
     chatGrid->addWidget(&ignoreUnregUsersMainChat, 1, 0);
     chatGrid->addWidget(&hexLabel, 1, 2);
-    
+    chatGrid->addWidget(&ignoreUnregUserMessages, 2, 0);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
 
@@ -678,6 +680,8 @@ void MessagesSettingsPage::retranslateUi()
     chatMentionCheckBox.setText(tr("Enable chat mentions"));
     messageShortcuts->setTitle(tr("In-game message macros"));
     ignoreUnregUsersMainChat.setText(tr("Ignore unregistered users in main chat"));
+    ignoreUnregUsersMainChat.setText(tr("Ignore chat room messages sent by unregistered users."));
+    ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users."));
     invertMentionForeground.setText(tr("Invert text color"));
     hexLabel.setText(tr("(Color is hexadecimal)"));
 }

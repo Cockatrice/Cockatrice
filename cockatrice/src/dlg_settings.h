@@ -163,8 +163,9 @@ private:
     QAction *aAdd;
     QAction *aRemove;
     QCheckBox chatMentionCheckBox;
-    QCheckBox ignoreUnregUsersMainChat;
     QCheckBox invertMentionForeground;
+    QCheckBox ignoreUnregUsersMainChat;
+    QCheckBox ignoreUnregUserMessages;
     QGroupBox *chatGroupBox;
     QGroupBox *messageShortcuts;
     QLineEdit *mentionColor;

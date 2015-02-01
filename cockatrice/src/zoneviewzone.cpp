@@ -118,7 +118,6 @@ void ZoneViewZone::reorganizeCards()
                     typeRow++; // add below current card
                 else { // if no match then move card to next column
                     typeColumn++;
-                    longestRow = qMax(typeRow, longestRow);
                     typeRow = 0;
                 }
             }
@@ -128,6 +127,7 @@ void ZoneViewZone::reorganizeCards()
             qreal y = typeRow * CARD_HEIGHT / 3;
             c->setPos(x + 5, y + 5);
             c->setRealZValue(i);
+            longestRow = qMax(typeRow, longestRow);
         }
     } else {
         for (int i = 0; i < cardCount; i++) {

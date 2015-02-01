@@ -59,6 +59,7 @@ SettingsCache::SettingsCache()
     priceTagSource = settings->value("deckeditor/pricetagsource", 0).toInt();
 
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
+    ignoreUnregisteredUserMessages = settings->value("chat/ignore_unregistered_messages", false).toBool();
 
     attemptAutoConnect = settings->value("server/auto_connect", 0).toBool(); 
 }
@@ -303,6 +304,12 @@ void SettingsCache::setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers)
 {
     ignoreUnregisteredUsers = _ignoreUnregisteredUsers;
     settings->setValue("chat/ignore_unregistered", ignoreUnregisteredUsers);
+}
+
+void SettingsCache::setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages)
+{
+    ignoreUnregisteredUserMessages = _ignoreUnregisteredUserMessages;
+    settings->setValue("chat/ignore_unregistered_messages", ignoreUnregisteredUserMessages);
 }
 
 void SettingsCache::setMainWindowGeometry(const QByteArray &_mainWindowGeometry)
