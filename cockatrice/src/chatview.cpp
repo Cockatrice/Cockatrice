@@ -4,6 +4,7 @@
 #include <QMouseEvent>
 #include <QDesktopServices>
 #include <QApplication>
+#include <QDebug>
 #include "chatview.h"
 #include "user_level.h"
 #include "user_context_menu.h"
@@ -128,7 +129,8 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     if (!sameSender) {
         if (!sender.isEmpty()) {
             const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
-            cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel).toImage(), QString::number(pixelSize) + "_" + QString::number((int) userLevel));
+            QMap<QString, UserListTWI *> buddyList = tabSupervisor->getUserListsTab()->getBuddyList()->getUsers();
+            cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, buddyList.contains(sender)).toImage());
             cursor.insertText(" ");
         }
         cursor.setCharFormat(senderFormat);
