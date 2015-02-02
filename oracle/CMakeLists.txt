@@ -11,6 +11,8 @@ SET(oracle_SOURCES
     src/main.cpp
     src/oraclewizard.cpp
     src/oracleimporter.cpp
+    src/zip/unzip.cpp
+    src/zip/zipglobal.cpp
     ../cockatrice/src/carddatabase.cpp
     ../cockatrice/src/settingscache.cpp
     ../cockatrice/src/qt-json/json.cpp
@@ -93,6 +95,15 @@ endif()
 
 INCLUDE_DIRECTORIES(../cockatrice/src)
 
+# Libz is required to support zipped files
+FIND_PACKAGE(ZLIB REQUIRED)
+IF(ZLIB_FOUND)
+    INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
+    ADD_DEFINITIONS("-DHAS_ZLIB")
+ELSE()
+    MESSAGE(STATUS "Oracle: zlib not found; ZIP support disabled")
+ENDIF()
+
 # Build oracle binary and link it
 ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_RESOURCES_RCC} ${oracle_MOC_SRCS})
 
@@ -108,6 +119,10 @@ if(Qt5Widgets_FOUND)
     endif()
     qt5_use_modules(oracle ${ORACLE_LIBS})
 endif()
+
+IF(ZLIB_FOUND)
+    TARGET_LINK_LIBRARIES(oracle ${ZLIB_LIBRARIES})
+ENDIF()
 
 if(UNIX)
     if(APPLE)

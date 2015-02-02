@@ -24,6 +24,10 @@ Dependencies:
 - [protobuf](http://code.google.com/p/protobuf/)
 - [CMake](http://www.cmake.org/)
 
+Oracle can optionally use zlib to load zipped files:
+
+- [zlib](http://www.zlib.net/)
+
 The server requires an additional dependency when compiled under Qt4:
 
 - [libgcrypt](http://www.gnu.org/software/libgcrypt/)
