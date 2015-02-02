@@ -203,7 +203,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
             }
             // another user has been mentioned
             else {
-                int mentionEndIndex = message.indexOf(" ");
+                int mentionEndIndex = message.indexOf(QRegExp("\\W"), 1);// from 1 as @ is non-char
                 if (mentionEndIndex == -1)
                     mentionEndIndex = message.size(); // there is no text after the mention
                 QString userMention = message.left(mentionEndIndex);
