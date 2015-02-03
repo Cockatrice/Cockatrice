@@ -94,7 +94,7 @@ void GameSelector::actSetFilter()
     clearFilterButton->setEnabled(true);
 
     gameListProxyModel->setUnavailableGamesVisible(dlg.getUnavailableGamesVisible());
-    gameListProxyModel->setPasswordProtectedGamesVisible(dlg.getPasswordProtectedGamesVisible());
+    gameListProxyModel->setPasswordProtectedGamesHidden(dlg.getPasswordProtectedGamesHidden());
     gameListProxyModel->setGameNameFilter(dlg.getGameNameFilter());
     gameListProxyModel->setCreatorNameFilter(dlg.getCreatorNameFilter());
     gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());
