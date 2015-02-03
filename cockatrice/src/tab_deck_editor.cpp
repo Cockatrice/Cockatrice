@@ -276,8 +276,8 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     deckEditToolBar->addAction(aAddCard);
     deckEditToolBar->addAction(aAddCardToSideboard);
     deckEditToolBar->addAction(aRemoveCard);
-    deckEditToolBar->addAction(aIncrement);
     deckEditToolBar->addAction(aDecrement);
+    deckEditToolBar->addAction(aIncrement);
     deckEditToolBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     
     retranslateUi();
