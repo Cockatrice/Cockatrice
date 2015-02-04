@@ -2,6 +2,8 @@
 #include "settingscache.h"
 #include <QSocketNotifier>
 #include <QFile>
+#include <QFileInfo>
+#include <QDir>
 #include <QTextStream>
 #include <QDateTime>
 #include <iostream>
@@ -26,8 +28,23 @@ ServerLogger::~ServerLogger()
 void ServerLogger::startLog(const QString &logFileName)
 {
     if (!logFileName.isEmpty()) {
+        QFileInfo fi(logFileName);
+        QDir fileDir(fi.path());
+        if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
+            std::cerr << "ERROR: logfile folder doesn't exist and i can't create it." << std::endl;
+            logFile = 0;
+            return;
+        }
+
+
         logFile = new QFile(logFileName, this);
-        logFile->open(QIODevice::Append);
+        if(!logFile->open(QIODevice::Append)) {
+            std::cerr << "ERROR: can't open() logfile." << std::endl;
+            delete logFile;
+            logFile = 0;
+            return;
+        }
+
 #ifdef Q_OS_UNIX
         ::socketpair(AF_UNIX, SOCK_STREAM, 0, sigHupFD);
 
