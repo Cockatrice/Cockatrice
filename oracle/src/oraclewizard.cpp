@@ -30,6 +30,7 @@
     #include "zip/unzip.h"
     #define ZIP_SIGNATURE "PK"
     #define ALLSETS_URL "http://mtgjson.com/json/AllSets.json.zip"
+    #define ALLSETS_URL_FALLBACK "http://mtgjson.com/json/AllSets.json"
 #else
     #define ALLSETS_URL "http://mtgjson.com/json/AllSets.json"
 #endif
@@ -282,19 +283,13 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
 
         ec = uz.openArchive(inBuffer);
         if (ec != UnZip::Ok) {
-            QMessageBox::critical(this, tr("Error"), tr("Failed to open Zip archive: %1").arg(uz.formatError(ec)));
-
-            wizard()->enableButtons();
-            setEnabled(true);
+            zipDownloadFailed(tr("Failed to open Zip archive: %1.").arg(uz.formatError(ec)));
             return;
         }
 
         if(uz.fileList().size() != 1)
         {
-            QMessageBox::critical(this, tr("Error"), tr("The Zip archive doesn't contain exactly one file"));
-
-            wizard()->enableButtons();
-            setEnabled(true);
+            zipDownloadFailed(tr("The Zip archive doesn't contain exactly one file."));
             return;            
         }
         fileName = uz.fileList().at(0);
@@ -302,11 +297,8 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
         outBuffer->open(QBuffer::ReadWrite);
         ec = uz.extractFile(fileName, outBuffer);
         if (ec != UnZip::Ok) {
-            QMessageBox::critical(this, tr("Error"), tr("Zip extraction failed: %1").arg(uz.formatError(ec)));
+            zipDownloadFailed(tr("Zip extraction failed: %1.").arg(uz.formatError(ec)));
             uz.closeArchive();
-
-            wizard()->enableButtons();
-            setEnabled(true);
             return;
         }
 
@@ -314,16 +306,36 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
         watcher.setFuture(future);
         return;
 #else
-        QMessageBox::critical(this, tr("Error"), tr("Sorry, this version of Oracle does not support zipped files."));
+        zipDownloadFailed(tr("Sorry, this version of Oracle does not support zipped files."));
 
         wizard()->enableButtons();
         setEnabled(true);
+        progressLabel->hide();
+        progressBar->hide();
         return;
 #endif
     } 
     // Start the computation.
     future = QtConcurrent::run(wizard()->importer, &OracleImporter::readSetsFromByteArray, data);
     watcher.setFuture(future);
+}
+
+void LoadSetsPage::zipDownloadFailed(const QString &message)
+{
+    wizard()->enableButtons();
+    setEnabled(true);
+    progressLabel->hide();
+    progressBar->hide();
+
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, tr("Error"), message + "<br/>" + tr("Do you want to try to download a fresh copy of the uncompressed file instead?"), QMessageBox::Ok|QMessageBox::Cancel, QMessageBox::Ok);
+    if (reply == QMessageBox::Ok)
+    {
+        urlRadioButton->setChecked(true);
+        urlLineEdit->setText(ALLSETS_URL_FALLBACK);
+
+        wizard()->next();
+    }
 }
 
 void LoadSetsPage::importFinished()
