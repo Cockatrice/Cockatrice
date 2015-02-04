@@ -46,7 +46,7 @@ SettingsCache::SettingsCache()
     tapAnimation = settings->value("cards/tapanimation", true).toBool();
     chatMention = settings->value("chat/mention", true).toBool();
     chatMentionForeground = settings->value("chat/mentionforeground", true).toBool();
-    chatMentionColor = settings->value("chat/mentioncolor", "C21F2F").toString();
+    chatMentionColor = settings->value("chat/mentioncolor", "A6120D").toString();
 
     zoneViewSortByName = settings->value("zoneview/sortbyname", true).toBool();
     zoneViewSortByType = settings->value("zoneview/sortbytype", true).toBool();
