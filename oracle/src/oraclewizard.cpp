@@ -289,7 +289,7 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
 
         if(uz.fileList().size() != 1)
         {
-            zipDownloadFailed(tr("The Zip archive doesn't contain exactly one file."));
+            zipDownloadFailed(tr("Zip extraction failed: the Zip archive doesn't contain exactly one file."));
             return;            
         }
         fileName = uz.fileList().at(0);
