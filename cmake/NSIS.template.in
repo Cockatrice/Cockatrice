@@ -16,7 +16,7 @@ InstallDir "$PROGRAMFILES\Cockatrice"
 !define MUI_HEADERIMAGE_UNBITMAP "${NSIS_SOURCE_PATH}\cmake\headerimage.bmp"
 !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of Cockatrice.$\r$\n$\r$\nClick Next to continue."
 !define MUI_FINISHPAGE_RUN "$INSTDIR/oracle.exe"
-!define MUI_FINISHPAGE_RUN_TEXT "Run card database downloader now"
+!define MUI_FINISHPAGE_RUN_TEXT "Run 'Oracle' now to update your card database"
 !define MUI_FINISHPAGE_RUN_PARAMETERS "-dlsets"
 
 !insertmacro MUI_PAGE_WELCOME

@@ -3,6 +3,8 @@
 #include <QScrollBar>
 #include <QMouseEvent>
 #include <QDesktopServices>
+#include <QApplication>
+#include <QDebug>
 #include "chatview.h"
 #include "user_level.h"
 #include "user_context_menu.h"
@@ -11,7 +13,7 @@
 #include "main.h"
 #include "tab_userlists.h"
 
-const QColor MENTION_COLOR = QColor(190, 25, 85); // maroon
+const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
 const QColor OTHER_USER_COLOR = QColor(0, 65, 255); // dark blue
 
 ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent)
@@ -25,8 +27,6 @@ ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _sh
     mention = "@" + userName.toLower();
 
     mentionFormat.setFontWeight(QFont::Bold);
-    mentionFormat.setForeground(QBrush(Qt::white));
-    mentionFormat.setBackground(QBrush(MENTION_COLOR));
 
     mentionFormatOtherUser.setFontWeight(QFont::Bold);
     mentionFormatOtherUser.setForeground(Qt::blue);
@@ -117,8 +117,8 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     
     QTextCharFormat senderFormat;
     if (tabSupervisor && tabSupervisor->getUserInfo() && (sender == QString::fromStdString(tabSupervisor->getUserInfo()->name()))) {
+        senderFormat.setForeground(QBrush(getCustomMentionColor()));
         senderFormat.setFontWeight(QFont::Bold);
-        senderFormat.setForeground(QBrush(MENTION_COLOR));
     } else {
         senderFormat.setForeground(QBrush(OTHER_USER_COLOR));
         if (playerBold)
@@ -129,7 +129,8 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     if (!sameSender) {
         if (!sender.isEmpty()) {
             const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
-            cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel).toImage(), QString::number(pixelSize) + "_" + QString::number((int) userLevel));
+            QMap<QString, UserListTWI *> buddyList = tabSupervisor->getUserListsTab()->getBuddyList()->getUsers();
+            cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, buddyList.contains(sender)).toImage());
             cursor.insertText(" ");
         }
         cursor.setCharFormat(senderFormat);
@@ -194,12 +195,15 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                 break;
             // you have been mentioned
             if (message.toLower().startsWith(mention)) {
+                mentionFormat.setBackground(QBrush(getCustomMentionColor()));
+                mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white):QBrush(Qt::black));
                 cursor.insertText("@" + userName, mentionFormat);
                 message = message.mid(mention.size());
+                QApplication::alert(this);
             }
             // another user has been mentioned
             else {
-                int mentionEndIndex = message.indexOf(" ");
+                int mentionEndIndex = message.indexOf(QRegExp("\\W"), 1);// from 1 as @ is non-char
                 if (mentionEndIndex == -1)
                     mentionEndIndex = message.size(); // there is no text after the mention
                 QString userMention = message.left(mentionEndIndex);
@@ -223,6 +227,12 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
 
     if (atBottom)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+}
+
+QColor ChatView::getCustomMentionColor() {
+    QColor customColor;
+    customColor.setNamedColor("#" + settingsCache->getChatMentionColor());
+    return customColor.isValid() ? customColor : DEFAULT_MENTION_COLOR;
 }
 
 /**

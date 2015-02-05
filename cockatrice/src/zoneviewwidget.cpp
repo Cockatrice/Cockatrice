@@ -101,7 +101,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
     }
 
     if (_origZone->getIsShufflable() && (numberCards == -1)) {
-        shuffleCheckBox.setChecked(settingsCache->getZoneViewShuffle());
+        shuffleCheckBox.setChecked(true);
         QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget;
         shuffleProxy->setWidget(&shuffleCheckBox);
         vbox->addItem(shuffleProxy);
@@ -225,10 +225,8 @@ void ZoneViewWidget::closeEvent(QCloseEvent *event)
         cmd.set_zone_name(zone->getName().toStdString());
         player->sendGameCommand(cmd);
     }
-    if (shuffleCheckBox.isChecked()) 
+    if (shuffleCheckBox.isChecked())
         player->sendGameCommand(Command_Shuffle());
-    if (canBeShuffled)
-        settingsCache->setZoneViewShuffle(shuffleCheckBox.isChecked());
     emit closePressed(this);
     deleteLater();
     event->accept();

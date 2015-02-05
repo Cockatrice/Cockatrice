@@ -111,6 +111,7 @@ private:
     bool isToken;
     SetList sets;
     QString manacost;
+    QString cmc;
     QString cardtype;
     QString powtough;
     QString text;
@@ -126,6 +127,7 @@ public:
         const QString &_name = QString(),
         bool _isToken = false,
         const QString &_manacost = QString(),
+        const QString &_cmc = QString(),
         const QString &_cardtype = QString(),
         const QString &_powtough = QString(),
         const QString &_text = QString(),
@@ -142,12 +144,14 @@ public:
     bool getIsToken() const { return isToken; }
     const SetList &getSets() const { return sets; }
     const QString &getManaCost() const { return manacost; }
+    const QString &getCmc() const { return cmc; }
     const QString &getCardType() const { return cardtype; }
     const QString &getPowTough() const { return powtough; }
     const QString &getText() const { return text; }
     const int &getLoyalty() const { return loyalty; }
     bool getCipt() const { return cipt; }
     void setManaCost(const QString &_manaCost) { manacost = _manaCost; emit cardInfoChanged(this); }
+    void setCmc(const QString &_cmc) { cmc = _cmc; emit cardInfoChanged(this); }
     void setCardType(const QString &_cardType) { cardtype = _cardType; emit cardInfoChanged(this); }
     void setPowTough(const QString &_powTough) { powtough = _powTough; emit cardInfoChanged(this); }
     void setText(const QString &_text) { text = _text; emit cardInfoChanged(this); }

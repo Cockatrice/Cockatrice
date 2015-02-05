@@ -344,6 +344,7 @@ void MainWindow::createMenus()
     cockatriceMenu = menuBar()->addMenu(QString());
     cockatriceMenu->addAction(aConnect);
     cockatriceMenu->addAction(aDisconnect);
+    cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aSinglePlayer);
     cockatriceMenu->addAction(aWatchReplay);
     cockatriceMenu->addSeparator();
