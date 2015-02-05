@@ -371,7 +371,16 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
         otherUser = twi->getUserInfo();
     else
         otherUser.set_name(receiverName.toStdString());
-    TabMessage *tab = new TabMessage(this, client, *userInfo, otherUser);
+
+    TabMessage *tab;
+    tab = messageTabs.value(QString::fromStdString(otherUser.name()));
+    if (tab) {
+        if (focus)
+          setCurrentWidget(tab);
+        return tab;
+    }
+
+    tab = new TabMessage(this, client, *userInfo, otherUser);
     connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
