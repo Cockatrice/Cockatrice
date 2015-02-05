@@ -68,16 +68,16 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     genderLabel2.setPixmap(GenderPixmapGenerator::generatePixmap(15, user.gender()));
     QString country = QString::fromStdString(user.country());
 
-	if (country.length() != 0)
-	{
-		countryLabel2.setPixmap(CountryPixmapGenerator::generatePixmap(15, country));
-		countryLabel3.setText(QString("(%1)").arg(country.toUpper()));
-	}
-	else
-	{
-		countryLabel2.setText("");
-		countryLabel3.setText("");
-	}
+    if (country.length() != 0)
+    {
+        countryLabel2.setPixmap(CountryPixmapGenerator::generatePixmap(15, country));
+        countryLabel3.setText(QString("(%1)").arg(country.toUpper()));
+    }
+    else
+    {
+        countryLabel2.setText("");
+        countryLabel3.setText("");
+    }
 	
     userLevelLabel2.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel, false));
     QString userLevelText;
