@@ -1082,6 +1082,10 @@ void TabGame::eventKicked(const Event_Kicked & /*event*/, int /*eventPlayerId*/,
 {
     closeGame();
     messageLog->logKicked();
+    QMessageBox msgBox(this);
+    msgBox.setText(tr("You have been kicked out of the game."));
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.exec();
     emit userEvent();
 }
 
