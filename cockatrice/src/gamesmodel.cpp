@@ -232,7 +232,7 @@ GamesProxyModel::GamesProxyModel(QObject *parent, ServerInfo_User *_ownUser)
     : QSortFilterProxyModel(parent),
     ownUser(_ownUser),
     unavailableGamesVisible(false),
-    passwordProtectedGamesVisible(false),
+    passwordProtectedGamesHidden(false),
     maxPlayersFilterMin(-1),
     maxPlayersFilterMax(-1)
 {
@@ -246,9 +246,9 @@ void GamesProxyModel::setUnavailableGamesVisible(bool _unavailableGamesVisible)
     invalidateFilter();
 }
 
-void GamesProxyModel::setPasswordProtectedGamesVisible(bool _passwordProtectedGamesVisible)
+void GamesProxyModel::setPasswordProtectedGamesHidden(bool _passwordProtectedGamesHidden)
 {
-    passwordProtectedGamesVisible = _passwordProtectedGamesVisible;
+    passwordProtectedGamesHidden = _passwordProtectedGamesHidden;
     invalidateFilter();
 }
 
@@ -280,7 +280,7 @@ void GamesProxyModel::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlay
 void GamesProxyModel::resetFilterParameters()
 {
     unavailableGamesVisible = false;
-    passwordProtectedGamesVisible = false;
+    passwordProtectedGamesHidden = false;
     gameNameFilter = QString();
     creatorNameFilter = QString();
     gameTypeFilter.clear();
@@ -296,7 +296,7 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
     settings.beginGroup("filter_games");
 
     unavailableGamesVisible = settings.value("unavailable_games_visible", false).toBool();
-    passwordProtectedGamesVisible = settings.value("password_protected_games_visible", false).toBool();
+    passwordProtectedGamesHidden = settings.value("password_protected_games_hidden", false).toBool();
     gameNameFilter = settings.value("game_name_filter", "").toString();
     maxPlayersFilterMin = settings.value("min_players", 1).toInt();
     maxPlayersFilterMax = settings.value("max_players", DEFAULT_MAX_PLAYERS_MAX).toInt();
@@ -319,8 +319,8 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
 
     settings.setValue("unavailable_games_visible", unavailableGamesVisible);
     settings.setValue(
-        "password_protected_games_visible",
-        passwordProtectedGamesVisible
+        "password_protected_games_hidden",
+        passwordProtectedGamesHidden
         );
     settings.setValue("game_name_filter", gameNameFilter);
     
@@ -354,7 +354,7 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourc
             if (game.only_registered())
                 return false;
     }
-    if (!passwordProtectedGamesVisible && game.with_password())
+    if (passwordProtectedGamesHidden && game.with_password())
         return false;
     if (!gameNameFilter.isEmpty())
         if (!QString::fromStdString(game.description()).contains(gameNameFilter, Qt::CaseInsensitive))

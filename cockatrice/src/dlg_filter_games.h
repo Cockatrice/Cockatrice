@@ -14,7 +14,7 @@ class DlgFilterGames : public QDialog {
     Q_OBJECT
 private:
     QCheckBox *unavailableGamesVisibleCheckBox;
-    QCheckBox *passwordProtectedGamesVisibleCheckBox;
+    QCheckBox *passwordProtectedGamesHiddenCheckBox;
     QLineEdit *gameNameFilterEdit;
     QLineEdit *creatorNameFilterEdit;
     QMap<int, QCheckBox *> gameTypeFilterCheckBoxes;
@@ -31,8 +31,8 @@ public:
 
     bool getUnavailableGamesVisible() const;
     void setUnavailableGamesVisible(bool _unavailableGamesVisible);
-    bool getPasswordProtectedGamesVisible() const;
-    void setPasswordProtectedGamesVisible(bool _passwordProtectedGamesVisible);
+    bool getPasswordProtectedGamesHidden() const;
+    void setPasswordProtectedGamesHidden(bool _passwordProtectedGamesHidden);
     QString getGameNameFilter() const;
     void setGameNameFilter(const QString &_gameNameFilter);
     QString getCreatorNameFilter() const;
