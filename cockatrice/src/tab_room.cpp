@@ -34,13 +34,13 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     const int gameTypeListSize = info.gametype_list_size();
     for (int i = 0; i < gameTypeListSize; ++i)
         gameTypes.insert(info.gametype_list(i).game_type_id(), QString::fromStdString(info.gametype_list(i).description()));
-    
+
     QMap<int, GameTypeMap> tempMap;
     tempMap.insert(info.room_id(), gameTypes);
-    gameSelector = new GameSelector(client, tabSupervisor, this, QMap<int, QString>(), tempMap);
+    gameSelector = new GameSelector(client, tabSupervisor, this, QMap<int, QString>(), tempMap, true);
     userList = new UserList(tabSupervisor, client, UserList::RoomList);
     connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
-    
+
     chatView = new ChatView(tabSupervisor, 0, true);
     connect(chatView, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
     connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
@@ -50,7 +50,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     sayEdit = new QLineEdit;
     sayLabel->setBuddy(sayEdit);
     connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
-    
+
     QMenu *chatSettingsMenu = new QMenu(this);
 
     aClearChat = chatSettingsMenu->addAction(QString());
@@ -60,32 +60,32 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
 
     aOpenChatSettings = chatSettingsMenu->addAction(QString());
     connect(aOpenChatSettings, SIGNAL(triggered()), this, SLOT(actOpenChatSettings()));
-    
+
     QToolButton *chatSettingsButton = new QToolButton;
     chatSettingsButton->setIcon(QIcon(":/resources/icon_settings.svg"));
     chatSettingsButton->setMenu(chatSettingsMenu);
     chatSettingsButton->setPopupMode(QToolButton::InstantPopup);
-    
+
     QHBoxLayout *sayHbox = new QHBoxLayout;
     sayHbox->addWidget(sayLabel);
     sayHbox->addWidget(sayEdit);
     sayHbox->addWidget(chatSettingsButton);
-    
+
     QVBoxLayout *chatVbox = new QVBoxLayout;
     chatVbox->addWidget(chatView);
     chatVbox->addLayout(sayHbox);
-    
+
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatVbox);
-    
+
     QSplitter *splitter = new QSplitter(Qt::Vertical);
     splitter->addWidget(gameSelector);
     splitter->addWidget(chatGroupBox);
-    
+
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(splitter, 3);
     hbox->addWidget(userList, 1);
-    
+
     aLeaveRoom = new QAction(this);
     connect(aLeaveRoom, SIGNAL(triggered()), this, SLOT(actLeaveRoom()));
 
@@ -95,12 +95,12 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
 
     retranslateUi();
     setLayout(hbox);
-    
+
     const int userListSize = info.user_list_size();
     for (int i = 0; i < userListSize; ++i)
         userList->processUserInfo(info.user_list(i), true);
     userList->sortItems();
-    
+
     const int gameListSize = info.game_list_size();
     for (int i = 0; i < gameListSize; ++i)
         gameSelector->processGameInfo(info.game_list(i));
@@ -147,10 +147,10 @@ void TabRoom::sendMessage()
 {
     if (sayEdit->text().isEmpty())
           return;
-    
+
     Command_RoomSay cmd;
     cmd.set_message(sayEdit->text().toStdString());
-    
+
     PendingCommand *pend = prepareRoomCommand(cmd);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(sayFinished(const Response &)));
     sendRoomCommand(pend);

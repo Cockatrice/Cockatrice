@@ -17,7 +17,7 @@
 #include "pb/serverinfo_game.pb.h"
 #include "pb/response.pb.h"
 
-GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSupervisor, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QWidget *parent)
+GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSupervisor, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, const bool restoresettings, QWidget *parent)
     : QGroupBox(parent), client(_client), tabSupervisor(_tabSupervisor), room(_room)
 {
     gameListView = new QTreeView;
@@ -36,7 +36,8 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     if (room)
         gameTypeMap = gameListModel->getGameTypes().value(room->getRoomId());
 
-    gameListProxyModel->loadFilterParameters(gameTypeMap);
+    if (restoresettings)
+    	gameListProxyModel->loadFilterParameters(gameTypeMap);
 
 #if QT_VERSION < 0x050000
     gameListView->header()->setResizeMode(0, QHeaderView::ResizeToContents);
