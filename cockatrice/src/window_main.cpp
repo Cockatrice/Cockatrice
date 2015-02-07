@@ -306,8 +306,11 @@ void MainWindow::retranslateUi()
     aSettings->setText(tr("&Settings..."));
     aExit->setText(tr("&Exit"));
     
+#if defined(__APPLE__)  /* For OSX */
+    cockatriceMenu->setTitle(tr("A&ctions"));
+#else
     cockatriceMenu->setTitle(tr("&Cockatrice"));
-    
+#endif
     aAbout->setText(tr("&About Cockatrice"));
     helpMenu->setTitle(tr("&Help"));
     
@@ -339,12 +342,6 @@ void MainWindow::createActions()
     connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
 
 #if defined(__APPLE__)  /* For OSX */
-    aConnect->setMenuRole(QAction::ApplicationSpecificRole);
-    aDisconnect->setMenuRole(QAction::ApplicationSpecificRole);
-    aSinglePlayer->setMenuRole(QAction::ApplicationSpecificRole);
-    aWatchReplay->setMenuRole(QAction::ApplicationSpecificRole);
-    aDeckEditor->setMenuRole(QAction::ApplicationSpecificRole);
-    aFullScreen->setMenuRole(QAction::ApplicationSpecificRole);
     aSettings->setMenuRole(QAction::PreferencesRole);
     aExit->setMenuRole(QAction::QuitRole);
     aAbout->setMenuRole(QAction::AboutRole);
