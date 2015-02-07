@@ -4227,37 +4227,37 @@ La tua versione è la %1, la versione online è la %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="353"/>
         <source>Services</source>
-        <translation type="unfinished"></translation>
+        <translation>Servizi</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="354"/>
         <source>Hide %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nascondi %1</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="355"/>
         <source>Hide Others</source>
-        <translation type="unfinished"></translation>
+        <translation>Nascondi altre</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="356"/>
         <source>Show All</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostra tutte</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="357"/>
         <source>Preferences...</source>
-        <translation type="unfinished"></translation>
+        <translation>Preferenze...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="358"/>
         <source>Quit %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Esci da %1</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="359"/>
         <source>About %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Informazioni su %1</translation>
     </message>
 </context>
 <context>
