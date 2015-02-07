@@ -337,6 +337,27 @@ void MainWindow::createActions()
     
     aAbout = new QAction(this);
     connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
+
+#if defined(__APPLE__)  /* For OSX */
+    aConnect->setMenuRole(QAction::ApplicationSpecificRole);
+    aDisconnect->setMenuRole(QAction::ApplicationSpecificRole);
+    aSinglePlayer->setMenuRole(QAction::ApplicationSpecificRole);
+    aWatchReplay->setMenuRole(QAction::ApplicationSpecificRole);
+    aDeckEditor->setMenuRole(QAction::ApplicationSpecificRole);
+    aFullScreen->setMenuRole(QAction::ApplicationSpecificRole);
+    aSettings->setMenuRole(QAction::PreferencesRole);
+    aExit->setMenuRole(QAction::QuitRole);
+    aAbout->setMenuRole(QAction::AboutRole);
+
+    char const * foo; // avoid "warning: expression result unused" under clang
+    foo = QT_TRANSLATE_NOOP("QMenuBar","Services");
+    foo = QT_TRANSLATE_NOOP("QMenuBar","Hide %1");
+    foo = QT_TRANSLATE_NOOP("QMenuBar","Hide Others");
+    foo = QT_TRANSLATE_NOOP("QMenuBar","Show All");
+    foo = QT_TRANSLATE_NOOP("QMenuBar","Preferences...");
+    foo = QT_TRANSLATE_NOOP("QMenuBar","Quit %1");
+    foo = QT_TRANSLATE_NOOP("QMenuBar","About %1");
+#endif
 }
 
 void MainWindow::createMenus()
