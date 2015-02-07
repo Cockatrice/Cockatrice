@@ -6,6 +6,7 @@
     #include <QtConcurrent>
 #endif
 #include <QAbstractButton>
+#include <QBuffer>
 #include <QCheckBox>
 #include <QDir>
 #include <QFileDialog>
@@ -25,7 +26,15 @@
 #include "oraclewizard.h"
 #include "oracleimporter.h"
 
-#define ALLSETS_URL "http://mtgjson.com/json/AllSets.json"
+#ifdef HAS_ZLIB
+    #include "zip/unzip.h"
+    #define ZIP_SIGNATURE "PK"
+    #define ALLSETS_URL "http://mtgjson.com/json/AllSets.json.zip"
+    #define ALLSETS_URL_FALLBACK "http://mtgjson.com/json/AllSets.json"
+#else
+    #define ALLSETS_URL "http://mtgjson.com/json/AllSets.json"
+#endif
+
 
 OracleWizard::OracleWizard(QWidget *parent)
     : QWizard(parent)
@@ -141,7 +150,12 @@ void LoadSetsPage::actLoadSetsFile()
 {
     QFileDialog dialog(this, tr("Load sets file"));
     dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setNameFilter("Sets JSON file (*.json)");
+    
+#ifdef HAS_ZLIB
+    dialog.setNameFilter(tr("Sets JSON file (*.json *.zip)"));
+#else
+    dialog.setNameFilter(tr("Sets JSON file (*.json)"));
+#endif
 
     if(!fileLineEdit->text().isEmpty() && QFile::exists(fileLineEdit->text()))
         dialog.selectFile(fileLineEdit->text());
@@ -194,7 +208,7 @@ bool LoadSetsPage::validatePage()
             return false;
         }
 
-        if (!setsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        if (!setsFile.open(QIODevice::ReadOnly)) {
             QMessageBox::critical(0, tr("Error"), tr("Cannot open file '%1'.").arg(fileLineEdit->text()));
             return false;
         }
@@ -256,9 +270,72 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
     progressLabel->show();
     progressBar->show();
 
+    // unzip the file if needed
+    if(data.startsWith(ZIP_SIGNATURE))
+    {
+#ifdef HAS_ZLIB
+        // zipped file
+        QBuffer *inBuffer = new QBuffer(&data);
+        QBuffer *outBuffer = new QBuffer(this);
+        QString fileName;
+        UnZip::ErrorCode ec;
+        UnZip uz;
+
+        ec = uz.openArchive(inBuffer);
+        if (ec != UnZip::Ok) {
+            zipDownloadFailed(tr("Failed to open Zip archive: %1.").arg(uz.formatError(ec)));
+            return;
+        }
+
+        if(uz.fileList().size() != 1)
+        {
+            zipDownloadFailed(tr("Zip extraction failed: the Zip archive doesn't contain exactly one file."));
+            return;            
+        }
+        fileName = uz.fileList().at(0);
+
+        outBuffer->open(QBuffer::ReadWrite);
+        ec = uz.extractFile(fileName, outBuffer);
+        if (ec != UnZip::Ok) {
+            zipDownloadFailed(tr("Zip extraction failed: %1.").arg(uz.formatError(ec)));
+            uz.closeArchive();
+            return;
+        }
+
+        future = QtConcurrent::run(wizard()->importer, &OracleImporter::readSetsFromByteArray, outBuffer->data());
+        watcher.setFuture(future);
+        return;
+#else
+        zipDownloadFailed(tr("Sorry, this version of Oracle does not support zipped files."));
+
+        wizard()->enableButtons();
+        setEnabled(true);
+        progressLabel->hide();
+        progressBar->hide();
+        return;
+#endif
+    } 
     // Start the computation.
     future = QtConcurrent::run(wizard()->importer, &OracleImporter::readSetsFromByteArray, data);
     watcher.setFuture(future);
+}
+
+void LoadSetsPage::zipDownloadFailed(const QString &message)
+{
+    wizard()->enableButtons();
+    setEnabled(true);
+    progressLabel->hide();
+    progressBar->hide();
+
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, tr("Error"), message + "<br/>" + tr("Do you want to try to download a fresh copy of the uncompressed file instead?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+    if (reply == QMessageBox::Yes)
+    {
+        urlRadioButton->setChecked(true);
+        urlLineEdit->setText(ALLSETS_URL_FALLBACK);
+
+        wizard()->next();
+    }
 }
 
 void LoadSetsPage::importFinished()

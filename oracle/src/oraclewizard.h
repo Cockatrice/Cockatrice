@@ -77,6 +77,7 @@ private slots:
      void actDownloadProgressSetsFile(qint64 received, qint64 total);
      void actDownloadFinishedSetsFile();
      void importFinished();
+     void zipDownloadFailed(const QString &message);
 };
 
 class ChooseSetsPage : public OracleWizardPage
