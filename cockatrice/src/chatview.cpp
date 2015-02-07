@@ -23,8 +23,11 @@ ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _sh
     userContextMenu = new UserContextMenu(tabSupervisor, this, game);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
     
-    userName = QString::fromStdString(tabSupervisor->getUserInfo()->name());
-    mention = "@" + userName.toLower();
+    if(tabSupervisor->getUserInfo())
+    {
+        userName = QString::fromStdString(tabSupervisor->getUserInfo()->name());
+        mention = "@" + userName.toLower();
+    }
 
     mentionFormat.setFontWeight(QFont::Bold);
 
