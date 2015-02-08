@@ -96,7 +96,7 @@ endif()
 INCLUDE_DIRECTORIES(../cockatrice/src)
 
 # Libz is required to support zipped files
-FIND_PACKAGE(ZLIB REQUIRED)
+FIND_PACKAGE(ZLIB)
 IF(ZLIB_FOUND)
     INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
     ADD_DEFINITIONS("-DHAS_ZLIB")
