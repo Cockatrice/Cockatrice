@@ -246,7 +246,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     activeCard(0),
     gameClosed(false),
     replay(_replay),
-    currentReplayStep(0)
+    currentReplayStep(0),
+    sayEdit(0)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     
@@ -885,7 +886,8 @@ void TabGame::startGame(bool resuming)
     gameInfo.set_started(true);
     static_cast<GameScene *>(gameView->scene())->rearrange();
     gameView->show();
-    sayEdit->setFocus();
+    if(sayEdit)
+        sayEdit->setFocus();
 }
 
 void TabGame::stopGame()

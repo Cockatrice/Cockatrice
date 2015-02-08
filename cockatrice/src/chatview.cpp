@@ -23,8 +23,11 @@ ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _sh
     userContextMenu = new UserContextMenu(tabSupervisor, this, game);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
     
-    userName = QString::fromStdString(tabSupervisor->getUserInfo()->name());
-    mention = "@" + userName.toLower();
+    if(tabSupervisor->getUserInfo())
+    {
+        userName = QString::fromStdString(tabSupervisor->getUserInfo()->name());
+        mention = "@" + userName.toLower();
+    }
 
     mentionFormat.setFontWeight(QFont::Bold);
 
@@ -127,7 +130,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     senderFormat.setAnchor(true);
     senderFormat.setAnchorHref("user://" + QString::number(userLevel) + "_" + sender);
     if (!sameSender) {
-        if (!sender.isEmpty()) {
+        if (!sender.isEmpty() && tabSupervisor->getUserListsTab()) {
             const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
             QMap<QString, UserListTWI *> buddyList = tabSupervisor->getUserListsTab()->getBuddyList()->getUsers();
             cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, buddyList.contains(sender)).toImage());
