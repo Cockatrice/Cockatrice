@@ -886,7 +886,7 @@ void TabGame::startGame(bool resuming)
     gameInfo.set_started(true);
     static_cast<GameScene *>(gameView->scene())->rearrange();
     gameView->show();
-    if(sayEdit)
+    if(sayEdit && players.size() > 1)
         sayEdit->setFocus();
 }
 
