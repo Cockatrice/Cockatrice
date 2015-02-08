@@ -7,6 +7,7 @@
 
 class QCheckBox;
 class QGroupBox;
+class QComboBox;
 class QLabel;
 class QLineEdit;
 class QRadioButton;
@@ -25,9 +26,17 @@ public:
      void accept();
      void enableButtons();
      void disableButtons();
+     void retranslateUi();
 public: 
      OracleImporter *importer;
      QSettings * settings;
+private slots:
+    void updateLanguage();
+private:
+    QStringList findQmFiles();
+    QString languageName(const QString &qmFile);
+protected:
+    void changeEvent(QEvent *event);
 };
 
 
@@ -36,6 +45,7 @@ class OracleWizardPage : public QWizardPage
      Q_OBJECT
 public:
      OracleWizardPage(QWidget *parent = 0): QWizardPage(parent) {};
+     virtual void retranslateUi() = 0;
 protected:
      inline OracleWizard *wizard() { return (OracleWizard*) QWizardPage::wizard(); };
 };
@@ -44,9 +54,16 @@ class IntroPage : public OracleWizardPage
 {
      Q_OBJECT
 public:
-     IntroPage(QWidget *parent = 0);
+    IntroPage(QWidget *parent = 0);
+    void retranslateUi();
 private:
-     QLabel *label;
+    QStringList findQmFiles();
+    QString languageName(const QString &qmFile);
+private:
+     QLabel *label, *languageLabel;
+     QComboBox *languageBox;
+private slots:
+    void languageBoxChanged(int index);
 };
 
 class LoadSetsPage : public OracleWizardPage
@@ -54,6 +71,7 @@ class LoadSetsPage : public OracleWizardPage
      Q_OBJECT
 public:
      LoadSetsPage(QWidget *parent = 0);
+    void retranslateUi();
 protected:
      void initializePage();
      bool validatePage();
@@ -85,6 +103,7 @@ class ChooseSetsPage : public OracleWizardPage
      Q_OBJECT
 public:
      ChooseSetsPage(QWidget *parent = 0);
+    void retranslateUi();
 protected:
      void initializePage();
      bool validatePage();
@@ -103,6 +122,7 @@ class SaveSetsPage : public OracleWizardPage
      Q_OBJECT
 public:
      SaveSetsPage(QWidget *parent = 0);
+    void retranslateUi();
 private:
      QTextEdit *messageLog;
      QCheckBox * defaultPathCheckBox;

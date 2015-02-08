@@ -12,6 +12,7 @@
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QLabel>
+#include <QComboBox>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QNetworkAccessManager>
@@ -25,6 +26,8 @@
 
 #include "oraclewizard.h"
 #include "oracleimporter.h"
+#include "main.h"
+#include "settingscache.h"
 
 #ifdef HAS_ZLIB
     #include "zip/unzip.h"
@@ -40,6 +43,7 @@ OracleWizard::OracleWizard(QWidget *parent)
     : QWizard(parent)
 {
     settings = new QSettings(this);
+    connect(settingsCache, SIGNAL(langChanged()), this, SLOT(updateLanguage()));
 
     importer = new OracleImporter(
 #if QT_VERSION < 0x050000
@@ -54,8 +58,29 @@ OracleWizard::OracleWizard(QWidget *parent)
     addPage(new ChooseSetsPage);
     addPage(new SaveSetsPage);
 
+    retranslateUi();
+}
+
+void OracleWizard::updateLanguage()
+{
+    qApp->removeTranslator(translator);
+    installNewTranslator();
+}
+
+void OracleWizard::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::LanguageChange)
+        retranslateUi();
+    QDialog::changeEvent(event);
+}
+
+void OracleWizard::retranslateUi()
+{
     setWindowTitle(tr("Oracle Importer"));
     QWizard::setButtonText(QWizard::FinishButton, tr("Save"));
+    
+    for (int i = 0; i < pageIds().count(); i++)
+        dynamic_cast<OracleWizardPage *>(page(i))->retranslateUi();
 }
 
 void OracleWizard::accept()
@@ -78,31 +103,66 @@ void OracleWizard::disableButtons()
 IntroPage::IntroPage(QWidget *parent)
     : OracleWizardPage(parent)
 {
-    setTitle(tr("Introduction"));
-
-    label = new QLabel(tr("This wizard will import the list of sets and cards "
-                          "that will be used by Cockatrice. You will need to "
-                          "specify an url or a filename that will be used as a "
-                          "source, and then choose the wanted sets from the list "
-                          "of the available ones."),
-                        this);
+    label = new QLabel(this);
     label->setWordWrap(true);
 
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->addWidget(label);
+    languageLabel = new QLabel(this);
+    languageBox = new QComboBox(this);
+    QString setLanguage = settingsCache->getLang();
+    QStringList qmFiles = findQmFiles();
+    for (int i = 0; i < qmFiles.size(); i++) {
+        QString langName = languageName(qmFiles[i]);
+        languageBox->addItem(langName, qmFiles[i]);
+        if ((qmFiles[i] == setLanguage) || (setLanguage.isEmpty() && langName == tr("English")))
+            languageBox->setCurrentIndex(i);
+    }
+    connect(languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
+
+    QGridLayout *layout = new QGridLayout(this);
+    layout->addWidget(label, 0, 0, 1, 2);
+    layout->addWidget(languageLabel, 1, 0);
+    layout->addWidget(languageBox, 1, 1);
+
     setLayout(layout);
+}
+
+QStringList IntroPage::findQmFiles()
+{
+    QDir dir(translationPath);
+    QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
+    fileNames.replaceInStrings(QRegExp(translationPrefix + "_(.*)\\.qm"), "\\1");
+    return fileNames;
+}
+
+QString IntroPage::languageName(const QString &qmFile)
+{
+    QTranslator translator;
+    translator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
+    
+    return translator.translate("IntroPage", "English");
+}
+
+void IntroPage::languageBoxChanged(int index)
+{
+    settingsCache->setLang(languageBox->itemData(index).toString());
+}
+
+void IntroPage::retranslateUi()
+{
+    setTitle(tr("Introduction"));
+    label->setText(tr("This wizard will import the list of sets and cards "
+                          "that will be used by Cockatrice.<br/>You will need to "
+                          "specify an url or a filename that will be used as a "
+                          "source, and then choose the wanted sets from the list "
+                          "of the available ones."));
+    languageLabel->setText(tr("Language:"));
 }
 
 LoadSetsPage::LoadSetsPage(QWidget *parent)
     : OracleWizardPage(parent), nam(0)
 {
-    setTitle(tr("Source selection"));
-    setSubTitle(tr("Please specify a source for the list of sets and cards. "
-                   "You can specify an url address that will be download or "
-                   "use an existing file from your computer."));
-
-    urlRadioButton = new QRadioButton(tr("Download url:"), this);
-    fileRadioButton = new QRadioButton(tr("Local file:"), this);
+    urlRadioButton = new QRadioButton(this);
+    fileRadioButton = new QRadioButton(this);
 
     urlLineEdit = new QLineEdit(this);
     fileLineEdit = new QLineEdit(this);
@@ -112,10 +172,10 @@ LoadSetsPage::LoadSetsPage(QWidget *parent)
 
     urlRadioButton->setChecked(true);
 
-    urlButton = new QPushButton(tr("Restore default url"), this);
+    urlButton = new QPushButton(this);
     connect(urlButton, SIGNAL(clicked()), this, SLOT(actRestoreDefaultUrl()));
 
-    fileButton = new QPushButton(tr("Choose file..."), this);
+    fileButton = new QPushButton(this);
     connect(fileButton, SIGNAL(clicked()), this, SLOT(actLoadSetsFile()));
 
     QGridLayout *layout = new QGridLayout(this);
@@ -139,6 +199,19 @@ void LoadSetsPage::initializePage()
 
     progressLabel->hide();
     progressBar->hide();
+}
+
+void LoadSetsPage::retranslateUi()
+{
+    setTitle(tr("Source selection"));
+    setSubTitle(tr("Please specify a source for the list of sets and cards. "
+                   "You can specify an url address that will be download or "
+                   "use an existing file from your computer."));
+
+    urlRadioButton->setText(tr("Download url:"));
+    fileRadioButton->setText(tr("Local file:"));
+    urlButton->setText(tr("Restore default url"));
+    fileButton->setText(tr("Choose file..."));
 }
 
 void LoadSetsPage::actRestoreDefaultUrl()
@@ -356,11 +429,6 @@ void LoadSetsPage::importFinished()
 ChooseSetsPage::ChooseSetsPage(QWidget *parent)
     : OracleWizardPage(parent)
 {
-    setTitle(tr("Sets selection"));
-    setSubTitle(tr("The following sets has been found in the source file. "
-                   "Please mark the sets that will be imported.\n"
-                   "All core and expansion sets are selected by default."));
-
     checkBoxLayout = new QVBoxLayout;
     
     QWidget *checkboxFrame = new QWidget(this);
@@ -370,9 +438,9 @@ ChooseSetsPage::ChooseSetsPage(QWidget *parent)
     checkboxArea->setWidget(checkboxFrame);
     checkboxArea->setWidgetResizable(true);
     
-    checkAllButton = new QPushButton(tr("&Check all"));
+    checkAllButton = new QPushButton(this);
     connect(checkAllButton, SIGNAL(clicked()), this, SLOT(actCheckAll()));
-    uncheckAllButton = new QPushButton(tr("&Uncheck all"));
+    uncheckAllButton = new QPushButton(this);
     connect(uncheckAllButton, SIGNAL(clicked()), this, SLOT(actUncheckAll()));
 
     QGridLayout *layout = new QGridLayout(this);
@@ -398,6 +466,17 @@ void ChooseSetsPage::initializePage()
         checkBoxLayout->addWidget(checkBox);
         checkBoxList << checkBox;
     }
+}
+
+void ChooseSetsPage::retranslateUi()
+{
+    setTitle(tr("Sets selection"));
+    setSubTitle(tr("The following sets has been found in the source file. "
+                   "Please mark the sets that will be imported.\n"
+                   "All core and expansion sets are selected by default."));
+
+    checkAllButton->setText(tr("&Check all"));
+    uncheckAllButton->setText(tr("&Uncheck all"));
 }
 
 void ChooseSetsPage::checkBoxChanged(int state)
@@ -438,12 +517,7 @@ bool ChooseSetsPage::validatePage()
 SaveSetsPage::SaveSetsPage(QWidget *parent)
     : OracleWizardPage(parent)
 {
-    setTitle(tr("Sets imported"));
-    setSubTitle(tr("The following sets has been imported. "
-                   "Press \"Save\" to save the imported cards to the Cockatrice database."));
-
     defaultPathCheckBox = new QCheckBox(this);
-    defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
     defaultPathCheckBox->setChecked(true);
 
     messageLog = new QTextEdit(this);
@@ -469,6 +543,15 @@ void SaveSetsPage::initializePage()
 
     if (!wizard()->importer->startImport())
         QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
+}
+
+void SaveSetsPage::retranslateUi()
+{
+    setTitle(tr("Sets imported"));
+    setSubTitle(tr("The following sets has been imported. "
+                   "Press \"Save\" to save the imported cards to the Cockatrice database."));
+
+    defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
 }
 
 void SaveSetsPage::updateTotalProgress(int cardsImported, int /* setIndex */, const QString &setName)

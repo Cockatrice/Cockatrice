@@ -18,12 +18,21 @@ SET(oracle_SOURCES
     ../cockatrice/src/qt-json/json.cpp
  )
 
+if (UNIX AND NOT APPLE)
+    set_source_files_properties(src/main.cpp PROPERTIES COMPILE_FLAGS -DTRANSLATION_PATH=\\"${CMAKE_INSTALL_PREFIX}/share/oracle/translations\\")
+endif (UNIX AND NOT APPLE)
+
 set(oracle_RESOURCES oracle.qrc)
+FILE(GLOB oracle_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
+
+IF(UPDATE_TRANSLATIONS)
+    FILE(GLOB_RECURSE translate_oracle_SRCS ${CMAKE_SOURCE_DIR}/oracle/src/*.cpp ${CMAKE_SOURCE_DIR}/oracle/src/*.h)
+    SET(translate_SRCS ${translate_oracle_SRCS})
+ENDIF(UPDATE_TRANSLATIONS)
 
 if(WIN32)
     set(oracle_SOURCES ${oracle_SOURCES} oracle.rc)
 endif(WIN32)
-
 
 if(APPLE)
     set(MACOSX_BUNDLE_ICON_FILE appicon.icns)
@@ -47,6 +56,12 @@ if(Qt4_FOUND)
 
     # Let cmake chew Qt4's translations and resource files
     # Note: header files are MOC-ed automatically by cmake
+    IF(UPDATE_TRANSLATIONS)
+        QT4_CREATE_TRANSLATION(oracle_QM ${translate_SRCS} ${oracle_TS})
+    ELSE(UPDATE_TRANSLATIONS)
+        QT4_ADD_TRANSLATION(oracle_QM ${oracle_TS})
+    ENDIF(UPDATE_TRANSLATIONS)
+
     QT4_ADD_RESOURCES(oracle_RESOURCES_RCC ${oracle_RESOURCES})
 endif()
 
@@ -85,6 +100,12 @@ if(Qt5Widgets_FOUND)
 
     # Let cmake chew Qt5's translations and resource files
     # Note: header files are MOC-ed automatically by cmake
+    IF(UPDATE_TRANSLATIONS)
+        QT5_CREATE_TRANSLATION(oracle_QM ${translate_SRCS} ${oracle_TS})
+    ELSE()
+        QT5_ADD_TRANSLATION(oracle_QM ${oracle_TS})
+    ENDIF()
+
     QT5_ADD_RESOURCES(oracle_RESOURCES_RCC ${oracle_RESOURCES})
 
     # guess plugins and libraries directory
@@ -105,7 +126,7 @@ ELSE()
 ENDIF()
 
 # Build oracle binary and link it
-ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_RESOURCES_RCC} ${oracle_MOC_SRCS})
+ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_QM} ${oracle_RESOURCES_RCC} ${oracle_MOC_SRCS})
 
 if(Qt4_FOUND)
     if(MSVC) 
@@ -134,14 +155,17 @@ if(UNIX)
         set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
 
         INSTALL(TARGETS oracle BUNDLE DESTINATION ./)
+        INSTALL(FILES ${oracle_QM} DESTINATION ./oracle.app/Contents/Resources/translations)
     else()
         # Assume linux
         INSTALL(TARGETS oracle RUNTIME DESTINATION bin/)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/oracle.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/oracle.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
+        INSTALL(FILES ${oracle_QM} DESTINATION share/oracle/translations)
     endif()
 elseif(WIN32)
     INSTALL(TARGETS oracle RUNTIME DESTINATION ./)
+    INSTALL(FILES ${oracle_QM} DESTINATION ./translations)
 endif()
 
 IF (NOT WIN32 AND NOT APPLE)
