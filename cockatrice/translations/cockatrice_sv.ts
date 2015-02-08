@@ -2213,12 +2213,12 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <translation>&amp;Hjälp</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="409"/>
+        <location filename="../src/window_main.cpp" line="430"/>
         <source>Are you sure?</source>
         <translation>Är du säker?</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="409"/>
+        <location filename="../src/window_main.cpp" line="430"/>
         <source>There are still open games. Are you sure you want to quit?</source>
         <translation>Du har fortfarande öppna spel. Är du säker på att du vill avsluta?</translation>
     </message>
@@ -4143,6 +4143,44 @@ Lokal version är %1, avlägsen version är %2.</translation>
     </message>
 </context>
 <context>
+    <name>QMenuBar</name>
+    <message>
+        <location filename="../src/window_main.cpp" line="353"/>
+        <source>Services</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="354"/>
+        <source>Hide %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="355"/>
+        <source>Hide Others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="356"/>
+        <source>Show All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="357"/>
+        <source>Preferences...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="358"/>
+        <source>Quit %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="359"/>
+        <source>About %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Maindeck</source>
@@ -4688,143 +4726,143 @@ Please enter a name:</source>
 <context>
     <name>TabGame</name>
     <message>
-        <location filename="../src/tab_game.cpp" line="478"/>
+        <location filename="../src/tab_game.cpp" line="477"/>
         <source>F5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="479"/>
+        <location filename="../src/tab_game.cpp" line="478"/>
         <source>F6</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="480"/>
+        <location filename="../src/tab_game.cpp" line="479"/>
         <source>F7</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="481"/>
+        <location filename="../src/tab_game.cpp" line="480"/>
         <source>F8</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="482"/>
+        <location filename="../src/tab_game.cpp" line="481"/>
         <source>F9</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="483"/>
+        <location filename="../src/tab_game.cpp" line="482"/>
         <source>F10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="537"/>
+        <location filename="../src/tab_game.cpp" line="536"/>
         <source>&amp;Phases</source>
         <translation>&amp;Faser</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="540"/>
+        <location filename="../src/tab_game.cpp" line="539"/>
         <source>&amp;Game</source>
         <translation>&amp;Spel</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="542"/>
+        <location filename="../src/tab_game.cpp" line="541"/>
         <source>Next &amp;phase</source>
         <translation>Nästa &amp;fas</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="543"/>
+        <location filename="../src/tab_game.cpp" line="542"/>
         <source>Ctrl+Space</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="543"/>
+        <location filename="../src/tab_game.cpp" line="542"/>
         <source>Tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="546"/>
+        <location filename="../src/tab_game.cpp" line="545"/>
         <source>Next &amp;turn</source>
         <translation>Nästa &amp;tur</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="547"/>
+        <location filename="../src/tab_game.cpp" line="546"/>
         <source>Ctrl+Return</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="547"/>
+        <location filename="../src/tab_game.cpp" line="546"/>
         <source>Ctrl+Enter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="550"/>
+        <location filename="../src/tab_game.cpp" line="549"/>
         <source>&amp;Remove all local arrows</source>
         <translation>Ta &amp;bort alla lokala pilar</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="551"/>
+        <location filename="../src/tab_game.cpp" line="550"/>
         <source>Ctrl+R</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="554"/>
+        <location filename="../src/tab_game.cpp" line="553"/>
         <source>Game &amp;information</source>
         <translation>Spel&amp;information</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="556"/>
+        <location filename="../src/tab_game.cpp" line="555"/>
         <source>&amp;Concede</source>
         <translation>&amp;Ge upp</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="557"/>
+        <location filename="../src/tab_game.cpp" line="556"/>
         <source>F2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="560"/>
+        <location filename="../src/tab_game.cpp" line="559"/>
         <source>&amp;Leave game</source>
         <translation>&amp;Lämna spel</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="561"/>
-        <location filename="../src/tab_game.cpp" line="565"/>
+        <location filename="../src/tab_game.cpp" line="560"/>
+        <location filename="../src/tab_game.cpp" line="564"/>
         <source>Ctrl+Q</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="564"/>
+        <location filename="../src/tab_game.cpp" line="563"/>
         <source>C&amp;lose replay</source>
         <translation>S&amp;täng repris</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="569"/>
+        <location filename="../src/tab_game.cpp" line="568"/>
         <source>&amp;Say:</source>
         <translation>S&amp;äg:</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="671"/>
+        <location filename="../src/tab_game.cpp" line="670"/>
         <source>Concede</source>
         <translation>Ge upp</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="671"/>
+        <location filename="../src/tab_game.cpp" line="670"/>
         <source>Are you sure you want to concede this game?</source>
         <translation>Är du säker på att du vill ge upp detta spel?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="681"/>
+        <location filename="../src/tab_game.cpp" line="680"/>
         <source>Leave game</source>
         <translation>Lämna spel</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="681"/>
+        <location filename="../src/tab_game.cpp" line="680"/>
         <source>Are you sure you want to leave this game?</source>
         <translation>Är du säker på att du vill lämna detta spel?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1185"/>
+        <location filename="../src/tab_game.cpp" line="1175"/>
         <source>Replay %1: %2</source>
         <translation>Repris %1: %2</translation>
     </message>
@@ -4833,12 +4871,11 @@ Please enter a name:</source>
         <translation type="obsolete">Utsparkad</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1091"/>
         <source>You have been kicked out of the game.</source>
-        <translation type="unfinished">Du har blivit utsparkad från spelet.</translation>
+        <translation type="obsolete">Du har blivit utsparkad från spelet.</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1187"/>
+        <location filename="../src/tab_game.cpp" line="1177"/>
         <source>Game %1: %2</source>
         <translation>Spel %1: %2</translation>
     </message>
