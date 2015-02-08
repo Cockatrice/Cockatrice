@@ -37,7 +37,7 @@
 <context>
     <name>AppearanceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="367"/>
+        <location filename="../src/dlg_settings.cpp" line="345"/>
         <source>Zone background pictures</source>
         <translation>背景画像の設定</translation>
     </message>
@@ -62,28 +62,28 @@
         <translation type="obsolete">カード背面画像へのパス:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="374"/>
+        <location filename="../src/dlg_settings.cpp" line="352"/>
         <source>Card rendering</source>
         <translation>カードレンダリング</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="375"/>
+        <location filename="../src/dlg_settings.cpp" line="353"/>
         <source>Display card names on cards having a picture</source>
         <translatorcomment>やや不明</translatorcomment>
         <translation>画像持ちカードのカードネームを表示する</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="377"/>
+        <location filename="../src/dlg_settings.cpp" line="355"/>
         <source>Hand layout</source>
         <translation>手札のレイアウト</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="378"/>
+        <location filename="../src/dlg_settings.cpp" line="356"/>
         <source>Display hand horizontally (wastes space)</source>
         <translation>手札を横に並べる（スペースを消費します）</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="380"/>
+        <location filename="../src/dlg_settings.cpp" line="358"/>
         <source>Table grid layout</source>
         <translation>テーブルグリッドのレイアウト</translation>
     </message>
@@ -92,61 +92,58 @@
         <translation type="obsolete">省スペースレイアウト（カード間間隔を細かくできます）</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="368"/>
+        <location filename="../src/dlg_settings.cpp" line="346"/>
         <source>Hand background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="369"/>
+        <location filename="../src/dlg_settings.cpp" line="347"/>
         <source>Stack background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="370"/>
+        <location filename="../src/dlg_settings.cpp" line="348"/>
         <source>Table background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="371"/>
+        <location filename="../src/dlg_settings.cpp" line="349"/>
         <source>Player info background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="372"/>
+        <location filename="../src/dlg_settings.cpp" line="350"/>
         <source>Card back:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="381"/>
+        <location filename="../src/dlg_settings.cpp" line="359"/>
         <source>Invert vertical coordinate</source>
         <translation>垂直反転調整</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="382"/>
+        <location filename="../src/dlg_settings.cpp" line="360"/>
         <source>Minimum player count for multi-column layout:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="384"/>
         <source>Zone view layout</source>
-        <translation>ゾーンビューレイアウト</translation>
+        <translation type="vanished">ゾーンビューレイアウト</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="385"/>
         <source>Sort by name</source>
-        <translation>名前で整列</translation>
+        <translation type="vanished">名前で整列</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="386"/>
         <source>Sort by type</source>
-        <translation>タイプで整列</translation>
+        <translation type="vanished">タイプで整列</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="397"/>
-        <location filename="../src/dlg_settings.cpp" line="413"/>
-        <location filename="../src/dlg_settings.cpp" line="429"/>
-        <location filename="../src/dlg_settings.cpp" line="445"/>
-        <location filename="../src/dlg_settings.cpp" line="461"/>
+        <location filename="../src/dlg_settings.cpp" line="371"/>
+        <location filename="../src/dlg_settings.cpp" line="387"/>
+        <location filename="../src/dlg_settings.cpp" line="403"/>
+        <location filename="../src/dlg_settings.cpp" line="419"/>
+        <location filename="../src/dlg_settings.cpp" line="435"/>
         <source>Choose path</source>
         <translation>画像の指定</translation>
     </message>
@@ -318,27 +315,27 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation>全て表示</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="200"/>
+        <location filename="../src/cardinfowidget.cpp" line="201"/>
         <source>Name:</source>
         <translation>カード名:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="201"/>
+        <location filename="../src/cardinfowidget.cpp" line="202"/>
         <source>Mana cost:</source>
         <translation>マナコスト:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="202"/>
+        <location filename="../src/cardinfowidget.cpp" line="203"/>
         <source>Card type:</source>
         <translation>カードタイプ:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="203"/>
+        <location filename="../src/cardinfowidget.cpp" line="204"/>
         <source>P / T:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="204"/>
+        <location filename="../src/cardinfowidget.cpp" line="205"/>
         <source>Loyalty:</source>
         <translation>忠誠値:</translation>
     </message>
@@ -783,12 +780,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation type="obsolete">価格タグを表示可能に（blacklotusproject.comからのデータを使用）</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="587"/>
+        <location filename="../src/dlg_settings.cpp" line="554"/>
         <source>Enable &amp;price tag feature from deckbrew.com</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="588"/>
+        <location filename="../src/dlg_settings.cpp" line="555"/>
         <source>General</source>
         <translation>全般</translation>
     </message>
@@ -1217,47 +1214,47 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DlgFilterGames</name>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="22"/>
+        <location filename="../src/dlg_filter_games.cpp" line="23"/>
         <source>Show &amp;unavailable games</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="27"/>
-        <source>Show &amp;password protected games</source>
+        <location filename="../src/dlg_filter_games.cpp" line="26"/>
+        <source>Hide &amp;password protected games</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="36"/>
+        <location filename="../src/dlg_filter_games.cpp" line="31"/>
         <source>Game &amp;description:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="43"/>
+        <location filename="../src/dlg_filter_games.cpp" line="36"/>
         <source>&amp;Creator name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="64"/>
+        <location filename="../src/dlg_filter_games.cpp" line="52"/>
         <source>&amp;Game types</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="69"/>
+        <location filename="../src/dlg_filter_games.cpp" line="57"/>
         <source>at &amp;least:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="78"/>
+        <location filename="../src/dlg_filter_games.cpp" line="64"/>
         <source>at &amp;most:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="93"/>
+        <location filename="../src/dlg_filter_games.cpp" line="77"/>
         <source>Maximum player count</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="125"/>
+        <location filename="../src/dlg_filter_games.cpp" line="109"/>
         <source>Filter games</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1296,9 +1293,9 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="802"/>
-        <location filename="../src/dlg_settings.cpp" line="808"/>
-        <location filename="../src/dlg_settings.cpp" line="814"/>
+        <location filename="../src/dlg_settings.cpp" line="837"/>
+        <location filename="../src/dlg_settings.cpp" line="843"/>
+        <location filename="../src/dlg_settings.cpp" line="849"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
@@ -1307,12 +1304,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation type="obsolete">あなたのカードデータベースは無効です.前に戻って正しいパスを設定してください.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="756"/>
+        <location filename="../src/dlg_settings.cpp" line="791"/>
         <source>Unknown Error loading card database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="765"/>
+        <location filename="../src/dlg_settings.cpp" line="800"/>
         <source>Your card database is invalid.
 
 Cockatrice may not function correctly with an invalid database
@@ -1323,7 +1320,7 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="772"/>
+        <location filename="../src/dlg_settings.cpp" line="807"/>
         <source>Your card database version is too old.
 
 This can cause problems loading card information or images
@@ -1334,7 +1331,7 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="779"/>
+        <location filename="../src/dlg_settings.cpp" line="814"/>
         <source>Your card database did not finish loading
 
 Please file a ticket at http://github.com/Daenyth/Cockatrice/issues with your cards.xml attached
@@ -1343,21 +1340,21 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="785"/>
+        <location filename="../src/dlg_settings.cpp" line="820"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="790"/>
+        <location filename="../src/dlg_settings.cpp" line="825"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="795"/>
+        <location filename="../src/dlg_settings.cpp" line="830"/>
         <source>Unknown card database load status
 
 Please file a ticket at http://github.com/Daenyth/Cockatrice/issues
@@ -1366,138 +1363,142 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="808"/>
+        <location filename="../src/dlg_settings.cpp" line="843"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>あなたのデッキディレクトリへのパスは無効です.前に戻って正しいパスを設定してください.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="814"/>
+        <location filename="../src/dlg_settings.cpp" line="849"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>あなたのカード画像ディレクトリへのパスは無効です.前に戻って正しいパスを設定してください.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="823"/>
+        <location filename="../src/dlg_settings.cpp" line="858"/>
         <source>Settings</source>
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="825"/>
+        <location filename="../src/dlg_settings.cpp" line="860"/>
         <source>General</source>
         <translation>全般</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="826"/>
+        <location filename="../src/dlg_settings.cpp" line="861"/>
         <source>Appearance</source>
         <translation>外観</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="827"/>
+        <location filename="../src/dlg_settings.cpp" line="862"/>
         <source>User interface</source>
         <translation>ユーザーインターフェース</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="828"/>
+        <location filename="../src/dlg_settings.cpp" line="863"/>
         <source>Deck editor</source>
         <translation>デッキエディター</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="829"/>
+        <location filename="../src/dlg_settings.cpp" line="864"/>
+        <source>Chat Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Messages</source>
-        <translation>メッセージ</translation>
+        <translation type="vanished">メッセージ</translation>
     </message>
 </context>
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/gameselector.cpp" line="181"/>
+        <location filename="../src/gameselector.cpp" line="185"/>
         <source>C&amp;reate</source>
         <translation>部屋を作る</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="182"/>
+        <location filename="../src/gameselector.cpp" line="186"/>
         <source>&amp;Join</source>
         <translation>参加する</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="124"/>
-        <location filename="../src/gameselector.cpp" line="125"/>
-        <location filename="../src/gameselector.cpp" line="126"/>
-        <location filename="../src/gameselector.cpp" line="127"/>
         <location filename="../src/gameselector.cpp" line="128"/>
         <location filename="../src/gameselector.cpp" line="129"/>
         <location filename="../src/gameselector.cpp" line="130"/>
         <location filename="../src/gameselector.cpp" line="131"/>
-        <location filename="../src/gameselector.cpp" line="161"/>
+        <location filename="../src/gameselector.cpp" line="132"/>
+        <location filename="../src/gameselector.cpp" line="133"/>
+        <location filename="../src/gameselector.cpp" line="134"/>
+        <location filename="../src/gameselector.cpp" line="135"/>
+        <location filename="../src/gameselector.cpp" line="165"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="124"/>
+        <location filename="../src/gameselector.cpp" line="128"/>
         <source>Please join the appropriate room first.</source>
         <translation>適切な部屋に参加してください.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="125"/>
+        <location filename="../src/gameselector.cpp" line="129"/>
         <source>Wrong password.</source>
         <translation>パスワードが間違っています.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="126"/>
+        <location filename="../src/gameselector.cpp" line="130"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>この試合は観戦者は許可されていません.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="127"/>
+        <location filename="../src/gameselector.cpp" line="131"/>
         <source>The game is already full.</source>
         <translation>このゲームはすでに満員です.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="128"/>
+        <location filename="../src/gameselector.cpp" line="132"/>
         <source>The game does not exist any more.</source>
         <translation>このゲームはもう存在しません.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="129"/>
+        <location filename="../src/gameselector.cpp" line="133"/>
         <source>This game is only open to registered users.</source>
         <translation>このゲームは登録済みプレイヤーにのみ公開されています.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="130"/>
+        <location filename="../src/gameselector.cpp" line="134"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
         <translation>このゲームは作成者のフレンドのみに公開されています.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="131"/>
+        <location filename="../src/gameselector.cpp" line="135"/>
         <source>You are being ignored by the creator of this game.</source>
         <translation>あなたはこのゲームの作成者によって拒否されています.</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="148"/>
+        <location filename="../src/gameselector.cpp" line="152"/>
         <source>Join game</source>
         <translation>参加</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="148"/>
+        <location filename="../src/gameselector.cpp" line="152"/>
         <source>Password:</source>
         <translation>パスワード:</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="161"/>
+        <location filename="../src/gameselector.cpp" line="165"/>
         <source>Please join the respective room first.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="177"/>
+        <location filename="../src/gameselector.cpp" line="181"/>
         <source>Games</source>
         <translation>ゲーム</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="178"/>
+        <location filename="../src/gameselector.cpp" line="182"/>
         <source>&amp;Filter games</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="179"/>
+        <location filename="../src/gameselector.cpp" line="183"/>
         <source>C&amp;lear filter</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1518,7 +1519,7 @@ Would you like to change your database location setting?</source>
         <translation type="obsolete">全てのゲームを見る</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="183"/>
+        <location filename="../src/gameselector.cpp" line="187"/>
         <source>J&amp;oin as spectator</source>
         <translation>観戦者として参加</translation>
     </message>
@@ -1534,57 +1535,59 @@ Would you like to change your database location setting?</source>
 <context>
     <name>GamesModel</name>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="107"/>
         <source>yes</source>
-        <translation>あり</translation>
+        <translation type="vanished">あり</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="107"/>
         <source>no</source>
-        <translation>なし</translation>
+        <translation type="vanished">なし</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="128"/>
+        <location filename="../src/gamesmodel.cpp" line="192"/>
         <source>Game Created</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="130"/>
+        <location filename="../src/gamesmodel.cpp" line="194"/>
         <source>Creator</source>
         <translation>作成者</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="129"/>
+        <location filename="../src/gamesmodel.cpp" line="193"/>
         <source>Description</source>
         <translation>説明</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="107"/>
         <source>yes, free for spectators</source>
-        <translation>あり,観戦は自由</translation>
+        <translation type="vanished">あり,観戦は自由</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="111"/>
+        <location filename="../src/gamesmodel.cpp" line="146"/>
+        <source>password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="148"/>
         <source>buddies only</source>
         <translation>フレンドのみ</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="113"/>
+        <location filename="../src/gamesmodel.cpp" line="150"/>
         <source>reg. users only</source>
         <translation>登録済みユーザーのみ</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="117"/>
+        <location filename="../src/gamesmodel.cpp" line="176"/>
         <source>not allowed</source>
         <translation>不許可</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="127"/>
+        <location filename="../src/gamesmodel.cpp" line="191"/>
         <source>Room</source>
         <translation>部屋</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="131"/>
+        <location filename="../src/gamesmodel.cpp" line="195"/>
         <source>Game Type</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1593,22 +1596,21 @@ Would you like to change your database location setting?</source>
         <translation type="vanished">ゲームタイプ</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="132"/>
         <source>Password</source>
-        <translation>パスワード</translation>
+        <translation type="vanished">パスワード</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="133"/>
+        <location filename="../src/gamesmodel.cpp" line="196"/>
         <source>Restrictions</source>
         <translation>制限</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="134"/>
+        <location filename="../src/gamesmodel.cpp" line="197"/>
         <source>Players</source>
         <translation>プレイヤー</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="135"/>
+        <location filename="../src/gamesmodel.cpp" line="198"/>
         <source>Spectators</source>
         <translation>観戦者</translation>
     </message>
@@ -1616,87 +1618,92 @@ Would you like to change your database location setting?</source>
 <context>
     <name>GeneralSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="230"/>
+        <location filename="../src/dlg_settings.cpp" line="233"/>
         <source>Reset/Clear Downloaded Pictures</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="141"/>
-        <location filename="../src/dlg_settings.cpp" line="151"/>
-        <location filename="../src/dlg_settings.cpp" line="161"/>
-        <location filename="../src/dlg_settings.cpp" line="195"/>
-        <location filename="../src/dlg_settings.cpp" line="205"/>
+        <location filename="../src/dlg_settings.cpp" line="143"/>
+        <location filename="../src/dlg_settings.cpp" line="153"/>
+        <location filename="../src/dlg_settings.cpp" line="163"/>
+        <location filename="../src/dlg_settings.cpp" line="197"/>
+        <location filename="../src/dlg_settings.cpp" line="207"/>
         <source>Choose path</source>
         <translation>パスを選択</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="188"/>
+        <location filename="../src/dlg_settings.cpp" line="190"/>
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="188"/>
+        <location filename="../src/dlg_settings.cpp" line="190"/>
         <source>Downloaded card pictures have been reset.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="190"/>
+        <location filename="../src/dlg_settings.cpp" line="192"/>
         <source>Error</source>
         <translation type="unfinished">エラー</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="190"/>
+        <location filename="../src/dlg_settings.cpp" line="192"/>
         <source>One or more downloaded card pictures could not be cleared.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="220"/>
+        <location filename="../src/dlg_settings.cpp" line="222"/>
         <source>Personal settings</source>
         <translation>個人設定</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="221"/>
+        <location filename="../src/dlg_settings.cpp" line="223"/>
         <source>Language:</source>
         <translation>言語:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="222"/>
+        <location filename="../src/dlg_settings.cpp" line="224"/>
         <source>Download card pictures on the fly</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="223"/>
+        <location filename="../src/dlg_settings.cpp" line="225"/>
         <source>Download high-quality card pictures</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="224"/>
+        <location filename="../src/dlg_settings.cpp" line="226"/>
         <source>Paths</source>
         <translation>パス</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="225"/>
+        <location filename="../src/dlg_settings.cpp" line="227"/>
         <source>Decks directory:</source>
         <translation>デッキディレクトリ:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="226"/>
+        <location filename="../src/dlg_settings.cpp" line="228"/>
         <source>Replays directory:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="227"/>
+        <location filename="../src/dlg_settings.cpp" line="229"/>
         <source>Pictures directory:</source>
         <translation>カード画像のディレクトリ:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="228"/>
+        <location filename="../src/dlg_settings.cpp" line="230"/>
         <source>Card database:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="229"/>
+        <location filename="../src/dlg_settings.cpp" line="231"/>
         <source>Token database:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="232"/>
+        <source>Picture cache size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1704,8 +1711,8 @@ Would you like to change your database location setting?</source>
         <translation type="obsolete">カードデータベースのパス:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="40"/>
-        <location filename="../src/dlg_settings.cpp" line="136"/>
+        <location filename="../src/dlg_settings.cpp" line="37"/>
+        <location filename="../src/dlg_settings.cpp" line="138"/>
         <source>English</source>
         <translation>Japanese</translation>
     </message>
@@ -2029,12 +2036,12 @@ Local version is %1, remote version is %2.</source>
         <translation>ヘルプ</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="407"/>
+        <location filename="../src/window_main.cpp" line="409"/>
         <source>Are you sure?</source>
         <translation>よろしいですか?</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="407"/>
+        <location filename="../src/window_main.cpp" line="409"/>
         <source>There are still open games. Are you sure you want to quit?</source>
         <translation>ゲームがまだ開いています.本当に退出しますか?</translation>
     </message>
@@ -2042,52 +2049,52 @@ Local version is %1, remote version is %2.</source>
 <context>
     <name>MessageLogWidget</name>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="71"/>
+        <location filename="../src/messagelogwidget.cpp" line="72"/>
         <source>The game has been closed.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="81"/>
+        <location filename="../src/messagelogwidget.cpp" line="82"/>
         <source>%1 is now watching the game.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="86"/>
+        <location filename="../src/messagelogwidget.cpp" line="87"/>
         <source>%1 is not watching the game any more.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="39"/>
+        <location filename="../src/messagelogwidget.cpp" line="40"/>
         <source>You have joined game #%1.</source>
         <comment>female</comment>
         <translation>あなたはゲーム#%1に参加しました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="41"/>
+        <location filename="../src/messagelogwidget.cpp" line="42"/>
         <source>You have joined game #%1.</source>
         <comment>male</comment>
         <translation>あなたはゲーム#%1に参加しました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="56"/>
+        <location filename="../src/messagelogwidget.cpp" line="57"/>
         <source>%1 has joined the game.</source>
         <comment>female</comment>
         <translation>%1がゲームに参加しました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="58"/>
+        <location filename="../src/messagelogwidget.cpp" line="59"/>
         <source>%1 has joined the game.</source>
         <comment>male</comment>
         <translation>%1がゲームに参加しました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="64"/>
+        <location filename="../src/messagelogwidget.cpp" line="65"/>
         <source>%1 has left the game.</source>
         <comment>female</comment>
         <translation>%1はゲームから抜けました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="66"/>
+        <location filename="../src/messagelogwidget.cpp" line="67"/>
         <source>%1 has left the game.</source>
         <comment>male</comment>
         <translation>%1はゲームから抜けました.</translation>
@@ -2113,116 +2120,116 @@ Local version is %1, remote version is %2.</source>
         <translation type="obsolete">%1はデッキ#%2をロードしました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="104"/>
+        <location filename="../src/messagelogwidget.cpp" line="105"/>
         <source>%1 is ready to start the game.</source>
         <comment>female</comment>
         <translation>%1はゲーム開始の準備が出来ました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="106"/>
+        <location filename="../src/messagelogwidget.cpp" line="107"/>
         <source>%1 is ready to start the game.</source>
         <comment>male</comment>
         <translation>%1はゲーム開始の準備が出来ました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="112"/>
+        <location filename="../src/messagelogwidget.cpp" line="113"/>
         <source>%1 is not ready to start the game any more.</source>
         <comment>female</comment>
         <translation>%1はゲーム開始の準備がまだ出来ていません.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="114"/>
+        <location filename="../src/messagelogwidget.cpp" line="115"/>
         <source>%1 is not ready to start the game any more.</source>
         <comment>male</comment>
         <translation>%1はゲーム開始の準備がまだ出来ていません.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="121"/>
+        <location filename="../src/messagelogwidget.cpp" line="122"/>
         <source>%1 has locked her sideboard.</source>
         <comment>female</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="123"/>
+        <location filename="../src/messagelogwidget.cpp" line="124"/>
         <source>%1 has locked his sideboard.</source>
         <comment>male</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="126"/>
+        <location filename="../src/messagelogwidget.cpp" line="127"/>
         <source>%1 has unlocked her sideboard.</source>
         <comment>female</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="128"/>
+        <location filename="../src/messagelogwidget.cpp" line="129"/>
         <source>%1 has unlocked his sideboard.</source>
         <comment>male</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="135"/>
+        <location filename="../src/messagelogwidget.cpp" line="136"/>
         <source>%1 has conceded the game.</source>
         <comment>female</comment>
         <translation>%1が投了しました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="137"/>
+        <location filename="../src/messagelogwidget.cpp" line="138"/>
         <source>%1 has conceded the game.</source>
         <comment>male</comment>
         <translation>%1が投了しました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="149"/>
+        <location filename="../src/messagelogwidget.cpp" line="150"/>
         <source>%1 has restored connection to the game.</source>
         <comment>female</comment>
         <translation>%1がこのゲームに再接続しました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="151"/>
+        <location filename="../src/messagelogwidget.cpp" line="152"/>
         <source>%1 has restored connection to the game.</source>
         <comment>male</comment>
         <translation>%1がこのゲームに再接続しました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="154"/>
+        <location filename="../src/messagelogwidget.cpp" line="155"/>
         <source>%1 has lost connection to the game.</source>
         <comment>female</comment>
         <translation>%1はこのゲームから切断されました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="156"/>
+        <location filename="../src/messagelogwidget.cpp" line="157"/>
         <source>%1 has lost connection to the game.</source>
         <comment>male</comment>
         <translation>%1はこのゲームから切断されました.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="175"/>
-        <source>%1 shuffles %2.</source>
-        <comment>female</comment>
-        <translation>%1は%2をシャッフルします.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="176"/>
         <source>%1 shuffles %2.</source>
+        <comment>female</comment>
+        <translation>%1は%2をシャッフルします.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="177"/>
+        <source>%1 shuffles %2.</source>
         <comment>male</comment>
         <translation>%1は%2をシャッフルします.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="185"/>
+        <location filename="../src/messagelogwidget.cpp" line="186"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
         <comment>female</comment>
         <translatorcomment>ちょっと怪しいです　要チェック</translatorcomment>
         <translation>%1は%3面ダイスを使用して%2を割り振ります.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="187"/>
+        <location filename="../src/messagelogwidget.cpp" line="188"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
         <comment>male</comment>
         <translation>%1は%3面ダイスを使用して%2を割り振ります.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="197"/>
+        <location filename="../src/messagelogwidget.cpp" line="198"/>
         <source>%1 draws %n card(s).</source>
         <comment>female</comment>
         <translation>
@@ -2230,7 +2237,7 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="199"/>
+        <location filename="../src/messagelogwidget.cpp" line="200"/>
         <source>%1 draws %n card(s).</source>
         <comment>male</comment>
         <translation>
@@ -2238,207 +2245,207 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="206"/>
+        <location filename="../src/messagelogwidget.cpp" line="207"/>
         <source>%1 undoes his last draw.</source>
         <translation>%1は最後のドローを取り消しました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="206"/>
+        <location filename="../src/messagelogwidget.cpp" line="207"/>
         <source>%1 undoes her last draw.</source>
         <translation>%1は最後のドローを取り消しました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="208"/>
+        <location filename="../src/messagelogwidget.cpp" line="209"/>
         <source>%1 undoes his last draw (%2).</source>
         <translation>%1は最後のドローを取り消しました(%2).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="208"/>
+        <location filename="../src/messagelogwidget.cpp" line="209"/>
         <source>%1 undoes her last draw (%2).</source>
         <translation>%1は最後のドローを取り消しました(%2).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="218"/>
+        <location filename="../src/messagelogwidget.cpp" line="219"/>
         <source> from table</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="220"/>
+        <location filename="../src/messagelogwidget.cpp" line="221"/>
         <source> from graveyard</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="222"/>
+        <location filename="../src/messagelogwidget.cpp" line="223"/>
         <source> from exile</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="224"/>
+        <location filename="../src/messagelogwidget.cpp" line="225"/>
         <source> from hand</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="229"/>
+        <location filename="../src/messagelogwidget.cpp" line="230"/>
         <source>the bottom card of %1&apos;s library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="231"/>
+        <location filename="../src/messagelogwidget.cpp" line="232"/>
         <source>the bottom card of his library</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="231"/>
+        <location filename="../src/messagelogwidget.cpp" line="232"/>
         <source>the bottom card of her library</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="235"/>
+        <location filename="../src/messagelogwidget.cpp" line="236"/>
         <source> from the bottom of %1&apos;s library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="237"/>
+        <location filename="../src/messagelogwidget.cpp" line="238"/>
         <source> from the bottom of his library</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="237"/>
+        <location filename="../src/messagelogwidget.cpp" line="238"/>
         <source> from the bottom of her library</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="242"/>
+        <location filename="../src/messagelogwidget.cpp" line="243"/>
         <source>the top card of %1&apos;s library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="244"/>
+        <location filename="../src/messagelogwidget.cpp" line="245"/>
         <source>the top card of his library</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="244"/>
+        <location filename="../src/messagelogwidget.cpp" line="245"/>
         <source>the top card of her library</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="248"/>
+        <location filename="../src/messagelogwidget.cpp" line="249"/>
         <source> from the top of %1&apos;s library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="250"/>
+        <location filename="../src/messagelogwidget.cpp" line="251"/>
         <source> from the top of his library</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="250"/>
+        <location filename="../src/messagelogwidget.cpp" line="251"/>
         <source> from the top of her library</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="254"/>
+        <location filename="../src/messagelogwidget.cpp" line="255"/>
         <source> from %1&apos;s library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="256"/>
+        <location filename="../src/messagelogwidget.cpp" line="257"/>
         <source> from library</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="259"/>
+        <location filename="../src/messagelogwidget.cpp" line="260"/>
         <source> from sideboard</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="261"/>
+        <location filename="../src/messagelogwidget.cpp" line="262"/>
         <source> from the stack</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="292"/>
+        <location filename="../src/messagelogwidget.cpp" line="293"/>
         <source>%1 gives %2 control over %3.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="300"/>
+        <location filename="../src/messagelogwidget.cpp" line="301"/>
         <source>%1 puts %2 into play tapped%3.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="302"/>
+        <location filename="../src/messagelogwidget.cpp" line="303"/>
         <source>%1 puts %2 into play%3.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="304"/>
+        <location filename="../src/messagelogwidget.cpp" line="305"/>
         <source>%1 puts %2%3 into graveyard.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="306"/>
+        <location filename="../src/messagelogwidget.cpp" line="307"/>
         <source>%1 exiles %2%3.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="308"/>
+        <location filename="../src/messagelogwidget.cpp" line="309"/>
         <source>%1 moves %2%3 to hand.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="311"/>
+        <location filename="../src/messagelogwidget.cpp" line="312"/>
         <source>%1 puts %2%3 into his library.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="311"/>
+        <location filename="../src/messagelogwidget.cpp" line="312"/>
         <source>%1 puts %2%3 into her library.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="313"/>
+        <location filename="../src/messagelogwidget.cpp" line="314"/>
         <source>%1 puts %2%3 on bottom of his library.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="313"/>
+        <location filename="../src/messagelogwidget.cpp" line="314"/>
         <source>%1 puts %2%3 on bottom of her library.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="315"/>
+        <location filename="../src/messagelogwidget.cpp" line="316"/>
         <source>%1 puts %2%3 on top of his library.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="315"/>
+        <location filename="../src/messagelogwidget.cpp" line="316"/>
         <source>%1 puts %2%3 on top of her library.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="317"/>
+        <location filename="../src/messagelogwidget.cpp" line="318"/>
         <source>%1 puts %2%3 into his library at position %4.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="317"/>
+        <location filename="../src/messagelogwidget.cpp" line="318"/>
         <source>%1 puts %2%3 into her library at position %4.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="319"/>
+        <location filename="../src/messagelogwidget.cpp" line="320"/>
         <source>%1 moves %2%3 to sideboard.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="322"/>
+        <location filename="../src/messagelogwidget.cpp" line="323"/>
         <source>%1 plays %2%3.</source>
         <translation></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="346"/>
+        <location filename="../src/messagelogwidget.cpp" line="347"/>
         <source>%1 takes a mulligan to %n.</source>
         <comment>female</comment>
         <translation>
@@ -2446,7 +2453,7 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="348"/>
+        <location filename="../src/messagelogwidget.cpp" line="349"/>
         <source>%1 takes a mulligan to %n.</source>
         <comment>male</comment>
         <translation>
@@ -2454,283 +2461,283 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="357"/>
+        <location filename="../src/messagelogwidget.cpp" line="358"/>
         <source>%1 flips %2 face-down.</source>
         <comment>female</comment>
         <translation>%1は%2を裏返しにしました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="359"/>
+        <location filename="../src/messagelogwidget.cpp" line="360"/>
         <source>%1 flips %2 face-down.</source>
         <comment>male</comment>
         <translation>%1は%2を裏返しにしました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="362"/>
+        <location filename="../src/messagelogwidget.cpp" line="363"/>
         <source>%1 flips %2 face-up.</source>
         <comment>female</comment>
         <translation>%1は%2を表返しにしました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="364"/>
+        <location filename="../src/messagelogwidget.cpp" line="365"/>
         <source>%1 flips %2 face-up.</source>
         <comment>male</comment>
         <translation>%1は%2を表返しにしました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="371"/>
+        <location filename="../src/messagelogwidget.cpp" line="372"/>
         <source>%1 destroys %2.</source>
         <comment>female</comment>
         <translation>%1は%2を破壊しました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="373"/>
+        <location filename="../src/messagelogwidget.cpp" line="374"/>
         <source>%1 destroys %2.</source>
         <comment>male</comment>
         <translation>%1は%2を破壊しました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="397"/>
+        <location filename="../src/messagelogwidget.cpp" line="398"/>
         <source>%1 unattaches %2.</source>
         <comment>female</comment>
         <translation>%1は%2を外しました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="399"/>
+        <location filename="../src/messagelogwidget.cpp" line="400"/>
         <source>%1 unattaches %2.</source>
         <comment>male</comment>
         <translation>%1は%2を外しました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="405"/>
+        <location filename="../src/messagelogwidget.cpp" line="406"/>
         <source>%1 creates token: %2%3.</source>
         <comment>female</comment>
         <translation>%1はトークン:%2%3を作りました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="407"/>
+        <location filename="../src/messagelogwidget.cpp" line="408"/>
         <source>%1 creates token: %2%3.</source>
         <comment>male</comment>
         <translation>%1はトークン:%2%3を作りました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="418"/>
+        <location filename="../src/messagelogwidget.cpp" line="419"/>
         <source>%1 points from her %2 to herself.</source>
         <comment>female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="420"/>
+        <location filename="../src/messagelogwidget.cpp" line="421"/>
         <source>%1 points from his %2 to himself.</source>
         <comment>male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="425"/>
+        <location filename="../src/messagelogwidget.cpp" line="426"/>
         <source>%1 points from her %2 to %3.</source>
         <comment>p1 female, p2 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="427"/>
+        <location filename="../src/messagelogwidget.cpp" line="428"/>
         <source>%1 points from her %2 to %3.</source>
         <comment>p1 female, p2 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="430"/>
+        <location filename="../src/messagelogwidget.cpp" line="431"/>
         <source>%1 points from his %2 to %3.</source>
         <comment>p1 male, p2 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="432"/>
+        <location filename="../src/messagelogwidget.cpp" line="433"/>
         <source>%1 points from his %2 to %3.</source>
         <comment>p1 male, p2 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="438"/>
+        <location filename="../src/messagelogwidget.cpp" line="439"/>
         <source>%1 points from %2&apos;s %3 to herself.</source>
         <comment>card owner female, target female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="440"/>
+        <location filename="../src/messagelogwidget.cpp" line="441"/>
         <source>%1 points from %2&apos;s %3 to herself.</source>
         <comment>card owner male, target female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="443"/>
+        <location filename="../src/messagelogwidget.cpp" line="444"/>
         <source>%1 points from %2&apos;s %3 to himself.</source>
         <comment>card owner female, target male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="445"/>
+        <location filename="../src/messagelogwidget.cpp" line="446"/>
         <source>%1 points from %2&apos;s %3 to himself.</source>
         <comment>card owner male, target male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="452"/>
+        <location filename="../src/messagelogwidget.cpp" line="453"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 female, p2 female, p3 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="454"/>
+        <location filename="../src/messagelogwidget.cpp" line="455"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 female, p2 female, p3 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="457"/>
+        <location filename="../src/messagelogwidget.cpp" line="458"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 female, p2 male, p3 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="459"/>
+        <location filename="../src/messagelogwidget.cpp" line="460"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 female, p2 male, p3 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="464"/>
+        <location filename="../src/messagelogwidget.cpp" line="465"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 male, p2 female, p3 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="466"/>
+        <location filename="../src/messagelogwidget.cpp" line="467"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 male, p2 female, p3 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="469"/>
+        <location filename="../src/messagelogwidget.cpp" line="470"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 male, p2 male, p3 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="471"/>
+        <location filename="../src/messagelogwidget.cpp" line="472"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 male, p2 male, p3 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="479"/>
+        <location filename="../src/messagelogwidget.cpp" line="480"/>
         <source>%1 points from her %2 to her %3.</source>
         <comment>female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="481"/>
+        <location filename="../src/messagelogwidget.cpp" line="482"/>
         <source>%1 points from his %2 to his %3.</source>
         <comment>male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="486"/>
+        <location filename="../src/messagelogwidget.cpp" line="487"/>
         <source>%1 points from her %2 to %3&apos;s %4.</source>
         <comment>p1 female, p2 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="488"/>
+        <location filename="../src/messagelogwidget.cpp" line="489"/>
         <source>%1 points from her %2 to %3&apos;s %4.</source>
         <comment>p1 female, p2 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="491"/>
+        <location filename="../src/messagelogwidget.cpp" line="492"/>
         <source>%1 points from his %2 to %3&apos;s %4.</source>
         <comment>p1 male, p2 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="493"/>
+        <location filename="../src/messagelogwidget.cpp" line="494"/>
         <source>%1 points from his %2 to %3&apos;s %4.</source>
         <comment>p1 male, p2 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="499"/>
+        <location filename="../src/messagelogwidget.cpp" line="500"/>
         <source>%1 points from %2&apos;s %3 to her own %4.</source>
         <comment>card owner female, target female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="501"/>
+        <location filename="../src/messagelogwidget.cpp" line="502"/>
         <source>%1 points from %2&apos;s %3 to her own %4.</source>
         <comment>card owner male, target female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="504"/>
+        <location filename="../src/messagelogwidget.cpp" line="505"/>
         <source>%1 points from %2&apos;s %3 to his own %4.</source>
         <comment>card owner female, target male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="506"/>
+        <location filename="../src/messagelogwidget.cpp" line="507"/>
         <source>%1 points from %2&apos;s %3 to his own %4.</source>
         <comment>card owner male, target male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="513"/>
+        <location filename="../src/messagelogwidget.cpp" line="514"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 female, p2 female, p3 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="515"/>
+        <location filename="../src/messagelogwidget.cpp" line="516"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 female, p2 female, p3 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="518"/>
+        <location filename="../src/messagelogwidget.cpp" line="519"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 female, p2 male, p3 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="520"/>
+        <location filename="../src/messagelogwidget.cpp" line="521"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 female, p2 male, p3 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="525"/>
+        <location filename="../src/messagelogwidget.cpp" line="526"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 male, p2 female, p3 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="527"/>
+        <location filename="../src/messagelogwidget.cpp" line="528"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 male, p2 female, p3 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="530"/>
+        <location filename="../src/messagelogwidget.cpp" line="531"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 male, p2 male, p3 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="532"/>
+        <location filename="../src/messagelogwidget.cpp" line="533"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 male, p2 male, p3 male</comment>
         <translation></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="547"/>
+        <location filename="../src/messagelogwidget.cpp" line="548"/>
         <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
         <comment>female</comment>
         <translation>
@@ -2738,7 +2745,7 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="549"/>
+        <location filename="../src/messagelogwidget.cpp" line="550"/>
         <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
         <comment>male</comment>
         <translation>
@@ -2746,7 +2753,7 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="552"/>
+        <location filename="../src/messagelogwidget.cpp" line="553"/>
         <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
         <comment>female</comment>
         <translation>
@@ -2754,7 +2761,7 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="554"/>
+        <location filename="../src/messagelogwidget.cpp" line="555"/>
         <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
         <comment>male</comment>
         <translation>
@@ -2762,310 +2769,310 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="581"/>
+        <location filename="../src/messagelogwidget.cpp" line="582"/>
         <source>%1 taps her permanents.</source>
         <comment>female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="583"/>
+        <location filename="../src/messagelogwidget.cpp" line="584"/>
         <source>%1 untaps her permanents.</source>
         <comment>female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="586"/>
+        <location filename="../src/messagelogwidget.cpp" line="587"/>
         <source>%1 taps his permanents.</source>
         <comment>male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="588"/>
+        <location filename="../src/messagelogwidget.cpp" line="589"/>
         <source>%1 untaps his permanents.</source>
         <comment>male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="594"/>
+        <location filename="../src/messagelogwidget.cpp" line="595"/>
         <source>%1 taps %2.</source>
         <comment>female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="596"/>
+        <location filename="../src/messagelogwidget.cpp" line="597"/>
         <source>%1 untaps %2.</source>
         <comment>female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="599"/>
+        <location filename="../src/messagelogwidget.cpp" line="600"/>
         <source>%1 taps %2.</source>
         <comment>male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="601"/>
+        <location filename="../src/messagelogwidget.cpp" line="602"/>
         <source>%1 untaps %2.</source>
         <comment>male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="612"/>
+        <location filename="../src/messagelogwidget.cpp" line="613"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
         <comment>female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="614"/>
+        <location filename="../src/messagelogwidget.cpp" line="615"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
         <comment>male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="623"/>
+        <location filename="../src/messagelogwidget.cpp" line="624"/>
         <source>%1 sets %2 to not untap normally.</source>
         <comment>female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="625"/>
+        <location filename="../src/messagelogwidget.cpp" line="626"/>
         <source>%1 sets %2 to not untap normally.</source>
         <comment>male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="628"/>
+        <location filename="../src/messagelogwidget.cpp" line="629"/>
         <source>%1 sets %2 to untap normally.</source>
         <comment>female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="630"/>
+        <location filename="../src/messagelogwidget.cpp" line="631"/>
         <source>%1 sets %2 to untap normally.</source>
         <comment>male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="642"/>
+        <location filename="../src/messagelogwidget.cpp" line="643"/>
         <source>%1 sets PT of %2 to %3.</source>
         <comment>female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="644"/>
+        <location filename="../src/messagelogwidget.cpp" line="645"/>
         <source>%1 sets PT of %2 to %3.</source>
         <comment>male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="653"/>
+        <location filename="../src/messagelogwidget.cpp" line="654"/>
         <source>%1 sets annotation of %2 to %3.</source>
         <comment>female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="655"/>
+        <location filename="../src/messagelogwidget.cpp" line="656"/>
         <source>%1 sets annotation of %2 to %3.</source>
         <comment>male</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="663"/>
-        <source>%1 is looking at %2.</source>
-        <comment>female</comment>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="664"/>
         <source>%1 is looking at %2.</source>
-        <comment>male</comment>
+        <comment>female</comment>
         <translation></translation>
     </message>
-    <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="669"/>
-        <source>%1 is looking at the top %n card(s) %2.</source>
-        <comment>female</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="665"/>
+        <source>%1 is looking at %2.</source>
+        <comment>male</comment>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="670"/>
         <source>%1 is looking at the top %n card(s) %2.</source>
+        <comment>female</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="671"/>
+        <source>%1 is looking at the top %n card(s) %2.</source>
         <comment>male</comment>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="678"/>
+        <location filename="../src/messagelogwidget.cpp" line="679"/>
         <source>%1 stops looking at %2.</source>
         <comment>female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="679"/>
+        <location filename="../src/messagelogwidget.cpp" line="680"/>
         <source>%1 stops looking at %2.</source>
         <comment>male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="707"/>
+        <location filename="../src/messagelogwidget.cpp" line="708"/>
         <source>%1 reveals %2 to %3.</source>
         <comment>p1 female, p2 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="709"/>
+        <location filename="../src/messagelogwidget.cpp" line="710"/>
         <source>%1 reveals %2 to %3.</source>
         <comment>p1 female, p2 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="712"/>
+        <location filename="../src/messagelogwidget.cpp" line="713"/>
         <source>%1 reveals %2 to %3.</source>
         <comment>p1 male, p2 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="714"/>
+        <location filename="../src/messagelogwidget.cpp" line="715"/>
         <source>%1 reveals %2 to %3.</source>
         <comment>p1 male, p2 male</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="719"/>
-        <source>%1 reveals %2.</source>
-        <comment>female</comment>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="720"/>
         <source>%1 reveals %2.</source>
+        <comment>female</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="721"/>
+        <source>%1 reveals %2.</source>
         <comment>male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="728"/>
+        <location filename="../src/messagelogwidget.cpp" line="729"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <comment>p1 female, p2 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="730"/>
+        <location filename="../src/messagelogwidget.cpp" line="731"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <comment>p1 female, p2 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="733"/>
+        <location filename="../src/messagelogwidget.cpp" line="734"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <comment>p1 male, p2 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="735"/>
+        <location filename="../src/messagelogwidget.cpp" line="736"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <comment>p1 male, p2 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="740"/>
+        <location filename="../src/messagelogwidget.cpp" line="741"/>
         <source>%1 randomly reveals %2%3.</source>
         <comment>female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="742"/>
+        <location filename="../src/messagelogwidget.cpp" line="743"/>
         <source>%1 randomly reveals %2%3.</source>
         <comment>male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="748"/>
+        <location filename="../src/messagelogwidget.cpp" line="749"/>
         <source>%1 peeks at face down card #%2.</source>
         <comment>female</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="750"/>
+        <location filename="../src/messagelogwidget.cpp" line="751"/>
         <source>%1 peeks at face down card #%2.</source>
         <comment>male</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="754"/>
+        <location filename="../src/messagelogwidget.cpp" line="755"/>
         <source>%1 peeks at face down card #%2: %3.</source>
         <comment>female</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="756"/>
+        <location filename="../src/messagelogwidget.cpp" line="757"/>
         <source>%1 peeks at face down card #%2: %3.</source>
         <comment>male</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="762"/>
+        <location filename="../src/messagelogwidget.cpp" line="763"/>
         <source>%1 reveals %2%3 to %4.</source>
         <comment>p1 female, p2 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="764"/>
+        <location filename="../src/messagelogwidget.cpp" line="765"/>
         <source>%1 reveals %2%3 to %4.</source>
         <comment>p1 female, p2 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="767"/>
+        <location filename="../src/messagelogwidget.cpp" line="768"/>
         <source>%1 reveals %2%3 to %4.</source>
         <comment>p1 male, p2 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="769"/>
+        <location filename="../src/messagelogwidget.cpp" line="770"/>
         <source>%1 reveals %2%3 to %4.</source>
         <comment>p1 male, p2 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="774"/>
+        <location filename="../src/messagelogwidget.cpp" line="775"/>
         <source>%1 reveals %2%3.</source>
         <comment>female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="776"/>
+        <location filename="../src/messagelogwidget.cpp" line="777"/>
         <source>%1 reveals %2%3.</source>
         <comment>male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="784"/>
+        <location filename="../src/messagelogwidget.cpp" line="785"/>
         <source>%1 is now keeping the top card %2 revealed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="785"/>
+        <location filename="../src/messagelogwidget.cpp" line="786"/>
         <source>%1 is not revealing the top card %2 any longer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="797"/>
+        <location filename="../src/messagelogwidget.cpp" line="798"/>
         <source>It is now %1&apos;s turn.</source>
         <comment>female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="799"/>
+        <location filename="../src/messagelogwidget.cpp" line="800"/>
         <source>It is now %1&apos;s turn.</source>
         <comment>male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="287"/>
-        <location filename="../src/messagelogwidget.cpp" line="698"/>
+        <location filename="../src/messagelogwidget.cpp" line="288"/>
+        <location filename="../src/messagelogwidget.cpp" line="699"/>
         <source>a card</source>
         <translation></translation>
     </message>
@@ -3082,75 +3089,75 @@ Local version is %1, remote version is %2.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="558"/>
+        <location filename="../src/messagelogwidget.cpp" line="559"/>
         <source>red</source>
         <translation>
             <numerusform>赤</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="559"/>
+        <location filename="../src/messagelogwidget.cpp" line="560"/>
         <source>yellow</source>
         <translation>
             <numerusform>黄</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="560"/>
+        <location filename="../src/messagelogwidget.cpp" line="561"/>
         <source>green</source>
         <translation>
             <numerusform>緑</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="142"/>
+        <location filename="../src/messagelogwidget.cpp" line="143"/>
         <source>The game has started.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="93"/>
+        <location filename="../src/messagelogwidget.cpp" line="94"/>
         <source>%1 has loaded a deck (%2).</source>
         <translation type="unfinished">%1はデッキ%2をロードしました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="95"/>
+        <location filename="../src/messagelogwidget.cpp" line="96"/>
         <source>%1 has loaded a deck with %2 sideboard cards (%3).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="350"/>
+        <location filename="../src/messagelogwidget.cpp" line="351"/>
         <source>%1 draws his initial hand.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="350"/>
+        <location filename="../src/messagelogwidget.cpp" line="351"/>
         <source>%1 draws her initial hand.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="818"/>
+        <location filename="../src/messagelogwidget.cpp" line="819"/>
         <source>ending phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="808"/>
+        <location filename="../src/messagelogwidget.cpp" line="809"/>
         <source>untap step</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="47"/>
+        <location filename="../src/messagelogwidget.cpp" line="48"/>
         <source>You are watching a replay of game #%1.</source>
         <comment>female</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="49"/>
+        <location filename="../src/messagelogwidget.cpp" line="50"/>
         <source>You are watching a replay of game #%1.</source>
         <comment>male</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="76"/>
+        <location filename="../src/messagelogwidget.cpp" line="77"/>
         <source>You have been kicked out of the game.</source>
         <translation type="unfinished">あなたはこのゲームからキックされました.</translation>
     </message>
@@ -3165,76 +3172,76 @@ Local version is %1, remote version is %2.</source>
         <translation type="obsolete">%1はデッキ%2をロードしました.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="381"/>
+        <location filename="../src/messagelogwidget.cpp" line="382"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <comment>p1 female, p2 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="383"/>
+        <location filename="../src/messagelogwidget.cpp" line="384"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <comment>p1 female, p2 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="386"/>
+        <location filename="../src/messagelogwidget.cpp" line="387"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <comment>p1 male, p2 female</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="388"/>
+        <location filename="../src/messagelogwidget.cpp" line="389"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <comment>p1 male, p2 male</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="809"/>
+        <location filename="../src/messagelogwidget.cpp" line="810"/>
         <source>upkeep step</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="810"/>
+        <location filename="../src/messagelogwidget.cpp" line="811"/>
         <source>draw step</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="811"/>
+        <location filename="../src/messagelogwidget.cpp" line="812"/>
         <source>first main phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="812"/>
+        <location filename="../src/messagelogwidget.cpp" line="813"/>
         <source>beginning of combat step</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="813"/>
+        <location filename="../src/messagelogwidget.cpp" line="814"/>
         <source>declare attackers step</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="814"/>
+        <location filename="../src/messagelogwidget.cpp" line="815"/>
         <source>declare blockers step</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="815"/>
+        <location filename="../src/messagelogwidget.cpp" line="816"/>
         <source>combat damage step</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="816"/>
+        <location filename="../src/messagelogwidget.cpp" line="817"/>
         <source>end of combat step</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="817"/>
+        <location filename="../src/messagelogwidget.cpp" line="818"/>
         <source>second main phase</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="820"/>
+        <location filename="../src/messagelogwidget.cpp" line="821"/>
         <source>It is now the %1.</source>
         <translation></translation>
     </message>
@@ -3242,22 +3249,62 @@ Local version is %1, remote version is %2.</source>
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="657"/>
+        <location filename="../src/dlg_settings.cpp" line="677"/>
         <source>&amp;Add</source>
         <translation>追加</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="658"/>
+        <location filename="../src/dlg_settings.cpp" line="678"/>
         <source>&amp;Remove</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="640"/>
+        <location filename="../src/dlg_settings.cpp" line="679"/>
+        <source>Chat settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="680"/>
+        <source>Enable chat mentions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="681"/>
+        <source>In-game message macros</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="682"/>
+        <source>Ignore unregistered users in main chat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="683"/>
+        <source>Ignore chat room messages sent by unregistered users.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="684"/>
+        <source>Ignore private messages sent by unregistered users.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="685"/>
+        <source>Invert text color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="686"/>
+        <source>(Color is hexadecimal)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="660"/>
         <source>Add message</source>
         <translation>メッセージを追加する</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="640"/>
+        <location filename="../src/dlg_settings.cpp" line="660"/>
         <source>Message:</source>
         <translation>メッセージ:</translation>
     </message>
@@ -3323,537 +3370,576 @@ Local version is %1, remote version is %2.</source>
 <context>
     <name>Player</name>
     <message>
-        <location filename="../src/player.cpp" line="588"/>
-        <location filename="../src/player.cpp" line="592"/>
-        <location filename="../src/player.cpp" line="596"/>
         <source>Move to &amp;top of library</source>
-        <translation>ライブラリーの一番上へ移動</translation>
+        <translation type="vanished">ライブラリーの一番上へ移動</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="589"/>
-        <location filename="../src/player.cpp" line="593"/>
-        <location filename="../src/player.cpp" line="597"/>
         <source>Move to &amp;bottom of library</source>
-        <translation>ライブラリーの一番下へ移動</translation>
+        <translation type="vanished">ライブラリーの一番下へ移動</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="590"/>
-        <location filename="../src/player.cpp" line="599"/>
         <source>Move to &amp;graveyard</source>
-        <translation>墓地へ移動</translation>
+        <translation type="vanished">墓地へ移動</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="600"/>
+        <location filename="../src/player.cpp" line="611"/>
         <source>&amp;View library</source>
         <translation>ライブラリーを見る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="602"/>
         <source>Reveal &amp;library to</source>
-        <translation>ライブラリーを公開する</translation>
+        <translation type="vanished">ライブラリーを公開する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="603"/>
         <source>Reveal t&amp;op card to</source>
-        <translation>一番上のカードを公開する</translation>
+        <translation type="vanished">一番上のカードを公開する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="612"/>
+        <location filename="../src/player.cpp" line="623"/>
         <source>Move top cards to &amp;graveyard...</source>
         <translation>カードを上から墓地へ置く...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="650"/>
+        <location filename="../src/player.cpp" line="661"/>
         <source>Ctrl+J</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="696"/>
+        <location filename="../src/player.cpp" line="707"/>
         <source>F3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="601"/>
+        <location filename="../src/player.cpp" line="612"/>
         <source>View &amp;top cards of library...</source>
         <translation>ライブラリーのカードを上からX枚見る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="581"/>
+        <location filename="../src/player.cpp" line="586"/>
         <source>&amp;View graveyard</source>
         <translation>墓地を見る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="698"/>
+        <location filename="../src/player.cpp" line="709"/>
         <source>F4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="606"/>
+        <location filename="../src/player.cpp" line="617"/>
         <source>&amp;View sideboard</source>
         <translation>サイドボードを見る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="583"/>
+        <location filename="../src/player.cpp" line="588"/>
         <source>Player &quot;%1&quot;</source>
         <translation>プレイヤー &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="617"/>
+        <location filename="../src/player.cpp" line="602"/>
+        <location filename="../src/player.cpp" line="608"/>
+        <location filename="../src/player.cpp" line="628"/>
         <source>&amp;Hand</source>
         <translation>手札</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="621"/>
+        <location filename="../src/player.cpp" line="629"/>
+        <source>&amp;Reveal hand to...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="630"/>
+        <source>Reveal r&amp;andom card to...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="632"/>
         <source>&amp;Library</source>
         <translation>ライブラリー</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="584"/>
+        <location filename="../src/player.cpp" line="589"/>
+        <location filename="../src/player.cpp" line="596"/>
+        <location filename="../src/player.cpp" line="609"/>
         <source>&amp;Graveyard</source>
         <translation>墓地</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="620"/>
+        <location filename="../src/player.cpp" line="631"/>
         <source>&amp;Sideboard</source>
         <translation>サイドボード</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="786"/>
+        <location filename="../src/player.cpp" line="797"/>
         <source>View top cards of library</source>
         <translation>ライブラリーのカードを上からX枚見る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="786"/>
+        <location filename="../src/player.cpp" line="797"/>
         <source>Number of cards:</source>
         <translation>カードの枚数:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="607"/>
+        <location filename="../src/player.cpp" line="618"/>
         <source>&amp;Draw card</source>
         <translation>カードを引く</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="582"/>
+        <location filename="../src/player.cpp" line="587"/>
         <source>&amp;View exile</source>
         <translation>追放領域を見る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="585"/>
+        <location filename="../src/player.cpp" line="590"/>
+        <location filename="../src/player.cpp" line="597"/>
+        <location filename="../src/player.cpp" line="603"/>
         <source>&amp;Exile</source>
         <translation>追放領域</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="594"/>
-        <location filename="../src/player.cpp" line="598"/>
         <source>Move to &amp;hand</source>
-        <translation>手札に移動する</translation>
+        <translation type="vanished">手札に移動する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="591"/>
-        <location filename="../src/player.cpp" line="595"/>
         <source>Move to &amp;exile</source>
-        <translation>追放領域へ移動する</translation>
+        <translation type="vanished">追放領域へ移動する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="697"/>
+        <location filename="../src/player.cpp" line="708"/>
         <source>Ctrl+W</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="699"/>
+        <location filename="../src/player.cpp" line="710"/>
         <source>Ctrl+D</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="608"/>
+        <location filename="../src/player.cpp" line="619"/>
         <source>D&amp;raw cards...</source>
         <translation>カードをX枚引く</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="700"/>
+        <location filename="../src/player.cpp" line="711"/>
         <source>Ctrl+E</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="610"/>
+        <location filename="../src/player.cpp" line="621"/>
         <source>Take &amp;mulligan</source>
         <translation>マリガンする</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="702"/>
+        <location filename="../src/player.cpp" line="713"/>
         <source>Ctrl+M</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="611"/>
+        <location filename="../src/player.cpp" line="622"/>
         <source>&amp;Shuffle</source>
         <translation>シャッフル</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="703"/>
+        <location filename="../src/player.cpp" line="714"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="622"/>
+        <location filename="../src/player.cpp" line="633"/>
         <source>&amp;Counters</source>
         <translation>カウンター</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="624"/>
+        <location filename="../src/player.cpp" line="635"/>
         <source>&amp;Untap all permanents</source>
         <translation>全てのパーマネントをアンタップする</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="704"/>
+        <location filename="../src/player.cpp" line="715"/>
         <source>Ctrl+U</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="625"/>
+        <location filename="../src/player.cpp" line="636"/>
         <source>R&amp;oll die...</source>
         <translation>X面ダイスを振る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="705"/>
+        <location filename="../src/player.cpp" line="716"/>
         <source>Ctrl+I</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="626"/>
+        <location filename="../src/player.cpp" line="637"/>
         <source>&amp;Create token...</source>
         <translation>トークンを作成する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="706"/>
+        <location filename="../src/player.cpp" line="717"/>
         <source>Ctrl+T</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="627"/>
+        <location filename="../src/player.cpp" line="638"/>
         <source>C&amp;reate another token</source>
         <translation>同じトークンを作成する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="707"/>
+        <location filename="../src/player.cpp" line="718"/>
         <source>Ctrl+G</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="629"/>
+        <location filename="../src/player.cpp" line="640"/>
         <source>S&amp;ay</source>
         <translation>発言する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="604"/>
-        <source>&amp;Always reveal top card</source>
+        <location filename="../src/player.cpp" line="593"/>
+        <source>&amp;Move hand to...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="594"/>
+        <location filename="../src/player.cpp" line="600"/>
+        <location filename="../src/player.cpp" line="606"/>
+        <source>&amp;Top of library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="595"/>
+        <location filename="../src/player.cpp" line="601"/>
+        <location filename="../src/player.cpp" line="607"/>
+        <source>&amp;Bottom of library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="599"/>
+        <source>&amp;Move graveyard to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="605"/>
+        <source>&amp;Move exile to...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="613"/>
+        <source>Reveal &amp;library to...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="614"/>
+        <source>Reveal t&amp;op card to...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="615"/>
+        <source>&amp;Always reveal top card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="616"/>
         <source>O&amp;pen deck in deck editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="609"/>
+        <location filename="../src/player.cpp" line="620"/>
         <source>&amp;Undo last draw</source>
         <translation>最後のドローを取り消す</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="613"/>
+        <location filename="../src/player.cpp" line="624"/>
         <source>Move top cards to &amp;exile...</source>
         <translation>ライブラリーの一番上からX枚追放する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="614"/>
+        <location filename="../src/player.cpp" line="625"/>
         <source>Put top card on &amp;bottom</source>
         <translation>一番上のカードを一番下に置く</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="615"/>
+        <location filename="../src/player.cpp" line="626"/>
         <source>Put bottom card &amp;in graveyard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="618"/>
         <source>&amp;Reveal to</source>
-        <translation>公開する</translation>
+        <translation type="vanished">公開する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="619"/>
         <source>Reveal r&amp;andom card to</source>
-        <translation>ランダムに公開する</translation>
+        <translation type="vanished">ランダムに公開する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="628"/>
+        <location filename="../src/player.cpp" line="639"/>
         <source>Cr&amp;eate predefined token</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="635"/>
+        <location filename="../src/player.cpp" line="646"/>
         <source>C&amp;ard</source>
         <translation>カード</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="638"/>
+        <location filename="../src/player.cpp" line="649"/>
         <source>&amp;All players</source>
         <translation>全てのプレイヤー</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="641"/>
+        <location filename="../src/player.cpp" line="652"/>
         <source>&amp;Play</source>
         <translation type="unfinished">プレイ</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="642"/>
+        <location filename="../src/player.cpp" line="653"/>
         <source>&amp;Hide</source>
         <translation type="unfinished">裏にしてプレイ</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="644"/>
+        <location filename="../src/player.cpp" line="655"/>
         <source>&amp;Tap</source>
         <translation type="unfinished">タップ</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="645"/>
+        <location filename="../src/player.cpp" line="656"/>
         <source>&amp;Untap</source>
         <translation type="unfinished">アンタップ</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="646"/>
+        <location filename="../src/player.cpp" line="657"/>
         <source>Toggle &amp;normal untapping</source>
         <translation type="unfinished">通常のアンタップをしない</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="647"/>
+        <location filename="../src/player.cpp" line="658"/>
         <source>&amp;Flip</source>
         <translation type="unfinished">裏にする</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="648"/>
+        <location filename="../src/player.cpp" line="659"/>
         <source>&amp;Peek at card face</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="649"/>
+        <location filename="../src/player.cpp" line="660"/>
         <source>&amp;Clone</source>
         <translation type="unfinished">複製する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="651"/>
+        <location filename="../src/player.cpp" line="662"/>
         <source>Attac&amp;h to card...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="652"/>
+        <location filename="../src/player.cpp" line="663"/>
         <source>Ctrl+A</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="653"/>
+        <location filename="../src/player.cpp" line="664"/>
         <source>Unattac&amp;h</source>
         <translation type="unfinished">取り外す</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="654"/>
+        <location filename="../src/player.cpp" line="665"/>
         <source>&amp;Draw arrow...</source>
         <translation type="unfinished">矢印を指定</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="655"/>
+        <location filename="../src/player.cpp" line="666"/>
         <source>&amp;Increase power</source>
         <translation type="unfinished">パワーを上げる</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="656"/>
+        <location filename="../src/player.cpp" line="667"/>
         <source>Ctrl++</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="657"/>
+        <location filename="../src/player.cpp" line="668"/>
         <source>&amp;Decrease power</source>
         <translation type="unfinished">パワーを下げる</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="658"/>
+        <location filename="../src/player.cpp" line="669"/>
         <source>Ctrl+-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="659"/>
+        <location filename="../src/player.cpp" line="670"/>
         <source>I&amp;ncrease toughness</source>
         <translation type="unfinished">タフネスを上げる</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="660"/>
+        <location filename="../src/player.cpp" line="671"/>
         <source>Alt++</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="661"/>
+        <location filename="../src/player.cpp" line="672"/>
         <source>D&amp;ecrease toughness</source>
         <translation type="unfinished">タフネスを下げる</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="662"/>
+        <location filename="../src/player.cpp" line="673"/>
         <source>Alt+-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="663"/>
+        <location filename="../src/player.cpp" line="674"/>
         <source>In&amp;crease power and toughness</source>
         <translation type="unfinished">パワーとタフネスを上げる</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="664"/>
+        <location filename="../src/player.cpp" line="675"/>
         <source>Ctrl+Alt++</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="665"/>
+        <location filename="../src/player.cpp" line="676"/>
         <source>Dec&amp;rease power and toughness</source>
         <translation type="unfinished">パワーとタフネスを下げる</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="666"/>
+        <location filename="../src/player.cpp" line="677"/>
         <source>Ctrl+Alt+-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="667"/>
+        <location filename="../src/player.cpp" line="678"/>
         <source>Set &amp;power and toughness...</source>
         <translation type="unfinished">パワーとタフネスを設定する...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="668"/>
+        <location filename="../src/player.cpp" line="679"/>
         <source>Ctrl+P</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="669"/>
+        <location filename="../src/player.cpp" line="680"/>
         <source>&amp;Set annotation...</source>
         <translation type="unfinished">注釈を付ける...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="671"/>
+        <location filename="../src/player.cpp" line="682"/>
         <source>red</source>
         <translation type="unfinished">赤</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="672"/>
+        <location filename="../src/player.cpp" line="683"/>
         <source>yellow</source>
         <translation type="unfinished">黄</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="673"/>
+        <location filename="../src/player.cpp" line="684"/>
         <source>green</source>
         <translation type="unfinished">緑</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="675"/>
+        <location filename="../src/player.cpp" line="686"/>
         <source>&amp;Add counter (%1)</source>
         <translation type="unfinished">カウンターを乗せる (%1)</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="677"/>
+        <location filename="../src/player.cpp" line="688"/>
         <source>&amp;Remove counter (%1)</source>
         <translation type="unfinished">カウンターを取り除く (%1)</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="679"/>
+        <location filename="../src/player.cpp" line="690"/>
         <source>&amp;Set counters (%1)...</source>
         <translation type="unfinished">カウンターの数を決める (%1)...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="680"/>
+        <location filename="../src/player.cpp" line="691"/>
         <source>&amp;top of library</source>
         <translation type="unfinished">ライブラリーの一番上へ</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="681"/>
+        <location filename="../src/player.cpp" line="692"/>
         <source>&amp;bottom of library</source>
         <translation type="unfinished">ライブラリーの一番下へ</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="682"/>
+        <location filename="../src/player.cpp" line="693"/>
         <source>&amp;graveyard</source>
         <translation type="unfinished">墓地へ</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="683"/>
+        <location filename="../src/player.cpp" line="694"/>
         <source>Ctrl+Del</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="684"/>
+        <location filename="../src/player.cpp" line="695"/>
         <source>&amp;exile</source>
         <translation type="unfinished">追放領域へ</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="695"/>
+        <location filename="../src/player.cpp" line="706"/>
         <source>Ctrl+F3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="701"/>
+        <location filename="../src/player.cpp" line="712"/>
         <source>Ctrl+Shift+D</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="847"/>
+        <location filename="../src/player.cpp" line="858"/>
         <source>Draw cards</source>
         <translation>カードを引く</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="847"/>
-        <location filename="../src/player.cpp" line="868"/>
-        <location filename="../src/player.cpp" line="897"/>
-        <location filename="../src/player.cpp" line="2085"/>
+        <location filename="../src/player.cpp" line="858"/>
+        <location filename="../src/player.cpp" line="879"/>
+        <location filename="../src/player.cpp" line="908"/>
+        <location filename="../src/player.cpp" line="2110"/>
         <source>Number:</source>
         <translation>枚数</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="868"/>
+        <location filename="../src/player.cpp" line="879"/>
         <source>Move top cards to grave</source>
         <translation>ライブラリーのトップからX枚墓地へ置く</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="897"/>
+        <location filename="../src/player.cpp" line="908"/>
         <source>Move top cards to exile</source>
         <translation>ライブラリーのトップからX枚追放領域へ置く</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="963"/>
+        <location filename="../src/player.cpp" line="974"/>
         <source>Roll die</source>
         <translation>ダイスを振る</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="963"/>
+        <location filename="../src/player.cpp" line="974"/>
         <source>Number of sides:</source>
         <translation>面の数:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1935"/>
+        <location filename="../src/player.cpp" line="1956"/>
         <source>Set power/toughness</source>
         <translation>パワーとタフネスを設定する</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1935"/>
+        <location filename="../src/player.cpp" line="1956"/>
         <source>Please enter the new PT:</source>
         <translation>新しいP/Tを入力してください</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2003"/>
+        <location filename="../src/player.cpp" line="2028"/>
         <source>Set annotation</source>
         <translation>補足を付ける</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2003"/>
+        <location filename="../src/player.cpp" line="2028"/>
         <source>Please enter the new annotation:</source>
         <translation>新しい補足を付けてください</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2085"/>
+        <location filename="../src/player.cpp" line="2110"/>
         <source>Set counters</source>
         <translation>カウンターを設定する</translation>
     </message>
@@ -3935,35 +4021,35 @@ Local version is %1, remote version is %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="25"/>
+        <location filename="../src/gamesmodel.cpp" line="31"/>
         <source>&lt;1m ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="28"/>
+        <location filename="../src/gamesmodel.cpp" line="34"/>
         <source>&lt;5m ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="35"/>
-        <location filename="../src/gamesmodel.cpp" line="52"/>
+        <location filename="../src/gamesmodel.cpp" line="41"/>
+        <location filename="../src/gamesmodel.cpp" line="58"/>
         <source>m ago</source>
         <extracomment>This will have a number prepended, like &quot;10m ago&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="49"/>
+        <location filename="../src/gamesmodel.cpp" line="55"/>
         <source>1hr </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="59"/>
+        <location filename="../src/gamesmodel.cpp" line="65"/>
         <source>hr ago</source>
         <extracomment>This will have a number prepended, like &quot;2h ago&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="61"/>
+        <location filename="../src/gamesmodel.cpp" line="67"/>
         <source>5+ hrs ago</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4472,143 +4558,143 @@ Please enter a name:</source>
 <context>
     <name>TabGame</name>
     <message>
-        <location filename="../src/tab_game.cpp" line="476"/>
+        <location filename="../src/tab_game.cpp" line="478"/>
         <source>F5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="477"/>
+        <location filename="../src/tab_game.cpp" line="479"/>
         <source>F6</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="478"/>
+        <location filename="../src/tab_game.cpp" line="480"/>
         <source>F7</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="479"/>
+        <location filename="../src/tab_game.cpp" line="481"/>
         <source>F8</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="480"/>
+        <location filename="../src/tab_game.cpp" line="482"/>
         <source>F9</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="481"/>
+        <location filename="../src/tab_game.cpp" line="483"/>
         <source>F10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="530"/>
+        <location filename="../src/tab_game.cpp" line="537"/>
         <source>&amp;Phases</source>
         <translation>フェイズ</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="533"/>
+        <location filename="../src/tab_game.cpp" line="540"/>
         <source>&amp;Game</source>
         <translation>ゲーム</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="535"/>
+        <location filename="../src/tab_game.cpp" line="542"/>
         <source>Next &amp;phase</source>
         <translation>次のフェイズ</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="536"/>
+        <location filename="../src/tab_game.cpp" line="543"/>
         <source>Ctrl+Space</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="536"/>
+        <location filename="../src/tab_game.cpp" line="543"/>
         <source>Tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="539"/>
+        <location filename="../src/tab_game.cpp" line="546"/>
         <source>Next &amp;turn</source>
         <translation>次のターン</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="540"/>
+        <location filename="../src/tab_game.cpp" line="547"/>
         <source>Ctrl+Return</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="540"/>
+        <location filename="../src/tab_game.cpp" line="547"/>
         <source>Ctrl+Enter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="543"/>
+        <location filename="../src/tab_game.cpp" line="550"/>
         <source>&amp;Remove all local arrows</source>
         <translation>全ての矢印を消す</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="544"/>
+        <location filename="../src/tab_game.cpp" line="551"/>
         <source>Ctrl+R</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="547"/>
+        <location filename="../src/tab_game.cpp" line="554"/>
         <source>Game &amp;information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="549"/>
+        <location filename="../src/tab_game.cpp" line="556"/>
         <source>&amp;Concede</source>
         <translation>投了する</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="550"/>
+        <location filename="../src/tab_game.cpp" line="557"/>
         <source>F2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="553"/>
+        <location filename="../src/tab_game.cpp" line="560"/>
         <source>&amp;Leave game</source>
         <translation>ゲームを退出する</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="554"/>
-        <location filename="../src/tab_game.cpp" line="558"/>
+        <location filename="../src/tab_game.cpp" line="561"/>
+        <location filename="../src/tab_game.cpp" line="565"/>
         <source>Ctrl+Q</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="557"/>
+        <location filename="../src/tab_game.cpp" line="564"/>
         <source>C&amp;lose replay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="562"/>
+        <location filename="../src/tab_game.cpp" line="569"/>
         <source>&amp;Say:</source>
         <translation>発言する</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="664"/>
+        <location filename="../src/tab_game.cpp" line="671"/>
         <source>Concede</source>
         <translation>投了する</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="664"/>
+        <location filename="../src/tab_game.cpp" line="671"/>
         <source>Are you sure you want to concede this game?</source>
         <translation>本当にこのゲームに投了しますか?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="674"/>
+        <location filename="../src/tab_game.cpp" line="681"/>
         <source>Leave game</source>
         <translation>ゲームから退出する</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="674"/>
+        <location filename="../src/tab_game.cpp" line="681"/>
         <source>Are you sure you want to leave this game?</source>
         <translation>本当にこのゲームから退出しますか?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1168"/>
+        <location filename="../src/tab_game.cpp" line="1185"/>
         <source>Replay %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4617,11 +4703,12 @@ Please enter a name:</source>
         <translation type="obsolete">キック</translation>
     </message>
     <message>
+        <location filename="../src/tab_game.cpp" line="1091"/>
         <source>You have been kicked out of the game.</source>
-        <translation type="obsolete">あなたはこのゲームからキックされました.</translation>
+        <translation type="unfinished">あなたはこのゲームからキックされました.</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1170"/>
+        <location filename="../src/tab_game.cpp" line="1187"/>
         <source>Game %1: %2</source>
         <translation>ゲーム %1: %2</translation>
     </message>
@@ -4629,32 +4716,32 @@ Please enter a name:</source>
 <context>
     <name>TabMessage</name>
     <message>
-        <location filename="../src/tab_message.cpp" line="48"/>
+        <location filename="../src/tab_message.cpp" line="54"/>
         <source>Personal &amp;talk</source>
         <translation>個人会話</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="49"/>
+        <location filename="../src/tab_message.cpp" line="55"/>
         <source>&amp;Leave</source>
         <translation>退出する</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="92"/>
+        <location filename="../src/tab_message.cpp" line="98"/>
         <source>This user is ignoring you.</source>
         <translation>このユーザーはあなたを無視しています.</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="109"/>
+        <location filename="../src/tab_message.cpp" line="115"/>
         <source>%1 has left the server.</source>
         <translation>%1はサーバーから退出しました.</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="115"/>
+        <location filename="../src/tab_message.cpp" line="121"/>
         <source>%1 has joined the server.</source>
         <translation>%1がサーバーに参加しました.</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="65"/>
+        <location filename="../src/tab_message.cpp" line="71"/>
         <source>Talking to %1</source>
         <translation>%1と会話</translation>
     </message>
@@ -4722,32 +4809,37 @@ Please enter a name:</source>
 <context>
     <name>TabRoom</name>
     <message>
-        <location filename="../src/tab_room.cpp" line="112"/>
+        <location filename="../src/tab_room.cpp" line="119"/>
         <source>&amp;Say:</source>
         <translation>発言する</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="113"/>
+        <location filename="../src/tab_room.cpp" line="120"/>
         <source>Chat</source>
         <translation>チャット</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="114"/>
+        <location filename="../src/tab_room.cpp" line="121"/>
         <source>&amp;Room</source>
         <translation>部屋</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="115"/>
+        <location filename="../src/tab_room.cpp" line="122"/>
         <source>&amp;Leave room</source>
         <translation>部屋から出る</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="116"/>
-        <source>&amp;Ignore unregistered users in chat</source>
+        <location filename="../src/tab_room.cpp" line="123"/>
+        <source>&amp;Clear chat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="155"/>
+        <location filename="../src/tab_room.cpp" line="124"/>
+        <source>Chat Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/tab_room.cpp" line="163"/>
         <source>You are flooding the chat. Please wait a couple of seconds.</source>
         <translation>あなたはチャットルームから弾かれました.少々お待ちください.</translation>
     </message>
@@ -4842,51 +4934,82 @@ Please enter a name:</source>
 <context>
     <name>UserInfoBox</name>
     <message>
-        <location filename="../src/userinfobox.cpp" line="44"/>
+        <location filename="../src/userinfobox.cpp" line="42"/>
         <source>User information</source>
         <translation>ユーザー情報</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="51"/>
+        <location filename="../src/userinfobox.cpp" line="49"/>
         <source>Real name:</source>
         <translation>本名:</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="52"/>
+        <location filename="../src/userinfobox.cpp" line="50"/>
         <source>Gender:</source>
         <translation>性別:</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="53"/>
+        <location filename="../src/userinfobox.cpp" line="51"/>
         <source>Location:</source>
         <translation>現在地:</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="54"/>
+        <location filename="../src/userinfobox.cpp" line="52"/>
         <source>User level:</source>
         <translation>ユーザーレベル:</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="74"/>
+        <location filename="../src/userinfobox.cpp" line="53"/>
+        <source>Account Age:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/userinfobox.cpp" line="85"/>
         <source>Administrator</source>
         <translation>管理者</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="76"/>
+        <location filename="../src/userinfobox.cpp" line="87"/>
         <source>Moderator</source>
         <translation>モデレーター</translation>
+    </message>
+    <message>
+        <location filename="../src/userinfobox.cpp" line="97"/>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/userinfobox.cpp" line="110"/>
+        <source>Year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/userinfobox.cpp" line="110"/>
+        <source>Years</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/userinfobox.cpp" line="116"/>
+        <source>Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/userinfobox.cpp" line="116"/>
+        <source>Days</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Judge</source>
         <translation type="obsolete">ジャッジ</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="78"/>
+        <location filename="../src/userinfobox.cpp" line="89"/>
         <source>Registered user</source>
         <translation>登録ユーザー</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="80"/>
+        <location filename="../src/userinfobox.cpp" line="91"/>
+        <location filename="../src/userinfobox.cpp" line="94"/>
         <source>Unregistered user</source>
         <translation>未登録ユーザー</translation>
     </message>
@@ -4894,52 +5017,57 @@ Please enter a name:</source>
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="538"/>
+        <location filename="../src/dlg_settings.cpp" line="505"/>
         <source>General interface settings</source>
         <translation>インターフェース総合設定</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="539"/>
+        <location filename="../src/dlg_settings.cpp" line="506"/>
         <source>Enable notifications in taskbar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="540"/>
+        <location filename="../src/dlg_settings.cpp" line="507"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation>ダブルクリックでカードをプレイする（シングルクリックの代わり）</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="541"/>
+        <location filename="../src/dlg_settings.cpp" line="508"/>
         <source>&amp;Play all nonlands onto the stack (not the battlefield) by default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="542"/>
+        <location filename="../src/dlg_settings.cpp" line="509"/>
         <source>Animation settings</source>
         <translation>アニメーション設定</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="543"/>
+        <location filename="../src/dlg_settings.cpp" line="510"/>
         <source>&amp;Tap/untap animation</source>
         <translation>タップ/アンタップアニメーション</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="544"/>
+        <location filename="../src/dlg_settings.cpp" line="511"/>
         <source>Enable &amp;sounds</source>
         <translation>サウンドを許可</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="545"/>
+        <location filename="../src/dlg_settings.cpp" line="512"/>
         <source>Path to sounds directory:</source>
         <translation>サウンドディレクトリへのパス:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="546"/>
+        <location filename="../src/dlg_settings.cpp" line="513"/>
         <source>Test system sound engine</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="557"/>
+        <location filename="../src/dlg_settings.cpp" line="514"/>
+        <source>Sound settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="525"/>
         <source>Choose path</source>
         <translation>パスを選ぶ</translation>
     </message>
@@ -5189,19 +5317,24 @@ Do you want to save the changes?</source>
 <context>
     <name>ZoneViewWidget</name>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="148"/>
+        <location filename="../src/zoneviewwidget.cpp" line="174"/>
         <source>sort by name</source>
         <translation>名前でソート</translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="150"/>
+        <location filename="../src/zoneviewwidget.cpp" line="175"/>
         <source>sort by type</source>
         <translation>タイプでソート</translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="152"/>
+        <location filename="../src/zoneviewwidget.cpp" line="176"/>
         <source>shuffle when closing</source>
         <translation>閉じる時にシャッフル</translation>
+    </message>
+    <message>
+        <location filename="../src/zoneviewwidget.cpp" line="177"/>
+        <source>pile view</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
