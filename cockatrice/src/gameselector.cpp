@@ -17,15 +17,20 @@
 #include "pb/serverinfo_game.pb.h"
 #include "pb/response.pb.h"
 
-GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSupervisor, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, const bool restoresettings, QWidget *parent)
+GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSupervisor, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, const bool restoresettings, const bool showfilters, QWidget *parent)
     : QGroupBox(parent), client(_client), tabSupervisor(_tabSupervisor), room(_room)
 {
     gameListView = new QTreeView;
     gameListModel = new GamesModel(_rooms, _gameTypes, this);
-    gameListProxyModel = new GamesProxyModel(this, tabSupervisor->getUserInfo());
-    gameListProxyModel->setSourceModel(gameListModel);
-    gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-    gameListView->setModel(gameListProxyModel);
+    if(showfilters)
+    {
+        gameListProxyModel = new GamesProxyModel(this, tabSupervisor->getUserInfo());
+        gameListProxyModel->setSourceModel(gameListModel);
+        gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+        gameListView->setModel(gameListProxyModel);
+    } else {
+        gameListView->setModel(gameListModel);
+    }
     gameListView->setSortingEnabled(true);
     gameListView->sortByColumn(gameListModel->startTimeColIndex(), Qt::AscendingOrder);
     gameListView->setAlternatingRowColors(true);
@@ -36,7 +41,7 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     if (room)
         gameTypeMap = gameListModel->getGameTypes().value(room->getRoomId());
 
-    if (restoresettings)
+    if (showfilters && restoresettings)
     	gameListProxyModel->loadFilterParameters(gameTypeMap);
 
 #if QT_VERSION < 0x050000
@@ -61,8 +66,11 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     spectateButton = new QPushButton;
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
-    buttonLayout->addWidget(filterButton);
-    buttonLayout->addWidget(clearFilterButton);
+    if(showfilters)
+    {
+        buttonLayout->addWidget(filterButton);
+        buttonLayout->addWidget(clearFilterButton);
+    }
     buttonLayout->addStretch();
     if (room)
         buttonLayout->addWidget(createButton);
