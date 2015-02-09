@@ -179,7 +179,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
 
                     if (g.spectators_can_chat() && g.spectators_omniscient())
                     {
-                        result.append(" (").append(tr("can chat")).append(" & ").append((tr("see hands")).append(")"));
+                        result.append(" (").append(tr("can chat")).append(" & ").append(tr("see hands")).append(")");
                     }
                     else if (g.spectators_can_chat())
                     {
