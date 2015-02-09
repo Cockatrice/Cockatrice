@@ -77,7 +77,7 @@ void DlgCreateGame::sharedCtor()
     connect(spectatorsAllowedCheckBox, SIGNAL(stateChanged(int)), this, SLOT(spectatorsAllowedChanged(int)));
     spectatorsNeedPasswordCheckBox = new QCheckBox(tr("Spectators &need a password to watch"));
     spectatorsCanTalkCheckBox = new QCheckBox(tr("Spectators can &chat"));
-    spectatorsSeeEverythingCheckBox = new QCheckBox(tr("Spectators can see hands"));
+    spectatorsSeeEverythingCheckBox = new QCheckBox(tr("Spectators can see &hands"));
     QVBoxLayout *spectatorsLayout = new QVBoxLayout;
     spectatorsLayout->addWidget(spectatorsAllowedCheckBox);
     spectatorsLayout->addWidget(spectatorsNeedPasswordCheckBox);
