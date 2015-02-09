@@ -16,7 +16,7 @@
    inkscape:version="0.48.5 r10040"
    width="100%"
    height="100%"
-   sodipodi:docname="registered_buddy - Copy.svg">
+   sodipodi:docname="moderator_buddy.svg">
   <metadata
      id="metadata12">
     <rdf:RDF>
@@ -30,22 +30,6 @@
   </metadata>
   <defs
      id="defs10">
-    <pattern
-       inkscape:stockid="Stripes 1:1 white"
-       id="Strips1_1white"
-       patternTransform="translate(0,0) scale(10,10)"
-       height="1"
-       width="2"
-       patternUnits="userSpaceOnUse"
-       inkscape:collect="always">
-      <rect
-         id="rect4484"
-         height="2"
-         width="1"
-         y="-0.5"
-         x="0"
-         style="fill:white;stroke:none" />
-    </pattern>
     <linearGradient
        id="linearGradient5225">
       <stop
@@ -122,8 +106,8 @@
      id="namedview8"
      showgrid="false"
      inkscape:zoom="5.2149125"
-     inkscape:cx="51.90239"
-     inkscape:cy="51.245759"
+     inkscape:cx="-26.445493"
+     inkscape:cy="31.598459"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
@@ -134,12 +118,12 @@
      style="fill:#000000;fill-opacity:1"
      inkscape:connector-curvature="0" />
   <path
-     d="M 57.150089,25.064396 37.504323,24.973324 31.522122,5.092503 25.539054,24.973324 5.8924192,25.064399 21.842354,37.75565 13.778482,59.405024 31.522122,45.64865 49.274434,59.405024 41.201022,37.75565 z"
+     d="M 55.041981,25.814432 36.921945,25.730432 31.404334,7.3935963 25.885923,25.730432 7.7650846,25.814434 22.476316,37.520057 15.0387,57.488097 31.404334,44.800071 47.777965,57.488097 40.331551,37.520057 z"
      id="path4"
      style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero"
      inkscape:connector-curvature="0" />
   <path
-     d="M 57.165891,25.072777 37.520125,24.981707 31.537924,5.1008868 c 0.05101,40.5880862 0.05344,-0.1118618 0,40.5561512 L 49.290236,59.413412 41.216824,37.764038 z"
+     d="M 56.276895,25.211993 37.3433,24.856806 31.486705,5.7742084 c 0.04705,37.4359336 -0.01851,2.6744908 -0.0678,40.1841446 L 48.19932,58.580578 40.956295,37.527792 z"
      id="path4-1"
      style="fill:#000000;fill-opacity:1;fill-rule:nonzero"
      inkscape:connector-curvature="0"

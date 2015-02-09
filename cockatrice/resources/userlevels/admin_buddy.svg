@@ -31,6 +31,17 @@
   <defs
      id="defs10">
     <linearGradient
+       id="linearGradient3766">
+      <stop
+         style="stop-color:#ff2700;stop-opacity:1;"
+         offset="0"
+         id="stop3768" />
+      <stop
+         style="stop-color:#820000;stop-opacity:1;"
+         offset="1"
+         id="stop3770" />
+    </linearGradient>
+    <linearGradient
        id="linearGradient5225">
       <stop
          style="stop-color:#ffffff;stop-opacity:1;"
@@ -106,7 +117,7 @@
      id="namedview8"
      showgrid="false"
      inkscape:zoom="5.2149125"
-     inkscape:cx="21.988178"
+     inkscape:cx="-37.840247"
      inkscape:cy="51.245759"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
@@ -120,6 +131,6 @@
   <path
      d="M 57.150089,25.064396 37.504323,24.973324 31.522122,5.092503 25.539054,24.973324 5.8924192,25.064399 21.842354,37.75565 13.778482,59.405024 31.522122,45.64865 49.274434,59.405024 41.201022,37.75565 z"
      id="path4"
-     style="fill:#ff0000;fill-opacity:1;fill-rule:nonzero"
+     style="fill:#ff2700;fill-opacity:1;fill-rule:nonzero"
      inkscape:connector-curvature="0" />
 </svg>
