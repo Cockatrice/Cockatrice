@@ -31,7 +31,7 @@
     <message>
         <location filename="../src/abstractcounter.cpp" line="142"/>
         <source>New value for counter &apos;%1&apos;:</source>
-        <translation>카운터 &apos;%1&apos;의 값을 지정하여 주십시오:</translation>
+        <translation>카운터 &apos;%1&apos;의 값을 지정해 주세요:</translation>
     </message>
 </context>
 <context>
@@ -162,13 +162,13 @@
         <location filename="../src/userlist.cpp" line="82"/>
         <source>Please enter the reason for the ban.
 This is only saved for moderators and cannot be seen by the banned person.</source>
-        <translation>추방 사유를 적어주십시오.
+        <translation>추방 사유를 적어주세요.
 해당 사유는 관리자들만 볼 수 있고 추방 당한 사용자는 볼 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="85"/>
         <source>Please enter the reason for the ban that will be visible to the banned person.</source>
-        <translation>추방된 사용자가 보게 될 추방 사유를 적어주십시오.</translation>
+        <translation>추방된 사용자가 보게 될 추방 사유를 적어주세요.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="88"/>
@@ -193,7 +193,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/userlist.cpp" line="115"/>
         <source>You have to select a name-based or IP-based ban, or both.</source>
-        <translation>추방의 유형을 선택하여 주십시오.</translation>
+        <translation>추방의 유형을 선택해 주세요.</translation>
     </message>
 </context>
 <context>
@@ -993,7 +993,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="137"/>
         <source>Please enter the name of the token:</source>
-        <translation>토큰의 이름을 입력하여 주십시오.</translation>
+        <translation>토큰의 이름을 입력해 주세요.</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="139"/>
@@ -1112,7 +1112,7 @@ Would you like to change your database location setting?</source>
 
 잘못된 데이터베이스를 사용 시 코카트리스에 오류가 발생 할 수 있습니다.
 
-오라클을 다시 실행하여 카드 데이터베이스를 갱신할 수 있습니다.
+오라클을 다시 실행해서 카드 데이터베이스를 갱신할 수 있습니다.
 
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
@@ -1129,7 +1129,7 @@ Would you like to change your database location setting?</source>
 
 카드 정보나 이미지를 불러올때 오류가 발생할 수 있습니다.
 
-오라클을 다시 실행하여 카드 데이터베이스를 갱신하는 것을 권장 합니다.
+오라클을 다시 실행해서 카드 데이터베이스를 갱신하는 것을 권장합니다.
 
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
@@ -1142,7 +1142,7 @@ Please file a ticket at http://github.com/Daenyth/Cockatrice/issues with your ca
 Would you like to change your database location setting?</source>
         <translation>카드 데이터베이스를 완전히 불러올 수 없습니다.
 
-http://github.com/Daenyth/Cockatrice/issues 에 cards.xml를 첨부하여 버그 리포팅을 하여 주십시오.
+http://github.com/Daenyth/Cockatrice/issues에 cards.xml를 첨부해서 이슈로 올려주세요.
 
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
@@ -1173,7 +1173,7 @@ Please file a ticket at http://github.com/Daenyth/Cockatrice/issues
 Would you like to change your database location setting?</source>
         <translation>카드 데이터베이스를 불러오는 중 알 수 없는 오류가 발생하였습니다.
 
-http://github.com/Daenyth/Cockatrice/issues 에 cards.xml를 첨부하여 버그 리포팅을 해주십시오.
+http://github.com/Daenyth/Cockatrice/issues에 cards.xml를 첨부해서 이슈로 올려주세요.
 
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
@@ -1505,7 +1505,7 @@ http://github.com/Daenyth/Cockatrice/issues 에 cards.xml를 첨부하여 버그
     <message>
         <location filename="../src/window_main.cpp" line="69"/>
         <source>Banned by moderator</source>
-        <translation>관리자에 의하여 서버에서 추방 당하였습니다.</translation>
+        <translation>관리자에 의해 서버에서 추방 당하였습니다.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="71"/>
@@ -1559,7 +1559,7 @@ Reason for shutdown: %1</source>
     <message>
         <location filename="../src/window_main.cpp" line="136"/>
         <source>Please enter the number of players.</source>
-        <translation>최대 플레이어 인원을 입력하여 주십시오</translation>
+        <translation>최대 플레이어 인원을 입력해 주세요.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="145"/>
@@ -1660,14 +1660,14 @@ Reason for shutdown: %1</source>
         <location filename="../src/window_main.cpp" line="243"/>
         <source>Incorrect username or password. Please check your authentication information and try again.</source>
         <translation>잘못된 사용자명이나 비밀번호입니다.
-확인 후 다시 시도하여 주십시오.</translation>
+확인 후 다시 시도해 주세요.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="246"/>
         <source>There is already an active session using this user name.
 Please close that session first and re-login.</source>
         <translation>해당 사용자명으로 연결된 다른 세션이 있습니다.
-해당 세션을 종료 한 후에 다시 시도하여 주십시오.</translation>
+해당 세션을 종료 한 후에 다시 시도해 주세요.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="251"/>
@@ -1699,7 +1699,7 @@ Please close that session first and re-login.</source>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
         <translation>서버 버전이 클라이언트보다 오래되었습니다.
-클라이언트를 다운그레이드하거나 다른 서버에 연결하여 주시기 바랍니다.
+클라이언트를 다운그레이드하거나 다른 서버에 연결해 주시기 바랍니다.
 클라이언트 버전 %1, 서버 버전 %2.</translation>
     </message>
     <message>
@@ -1707,7 +1707,7 @@ Local version is %1, remote version is %2.</source>
         <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
 Local version is %1, remote version is %2.</source>
         <translation>코카트리스 클라이언트 버전이 오래되었습니다.
-클라이언트를 업데이트하여 주십시오.
+클라이언트 업데이트를 해 주세요.
 클라이언트 버전 %1, 서버 버전 %2.</translation>
     </message>
     <message>
@@ -3608,7 +3608,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/player.cpp" line="1956"/>
         <source>Please enter the new PT:</source>
-        <translation>새로운 공/방 값을 입력하여 주십시오:</translation>
+        <translation>새로운 공/방 값을 입력해 주세요:</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2028"/>
@@ -3618,7 +3618,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/player.cpp" line="2028"/>
         <source>Please enter the new annotation:</source>
-        <translation>새로운 주석을 입력하여 주십시오:</translation>
+        <translation>새로운 주석을 입력해 주세요:</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2110"/>
@@ -4075,7 +4075,7 @@ Do you want to save the changes?</source>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
         <translation>덱을 저장하는데 실패하였습니다.
-덱 파일 디렉토리에 쓰기가 가능한지 확인하시고 다시 시도하여 주십시오.</translation>
+덱 파일 디렉토리에 쓰기가 가능한지 확인하시고 다시 시도해 주세요.</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="465"/>
@@ -4133,7 +4133,7 @@ Please check that the directory is writable and try again.</source>
         <source>This decklist does not have a name.
 Please enter a name:</source>
         <translation>이 덱리스트는 이름이 없습니다.
-이름을 입력하여 주십시오:</translation>
+이름을 입력해 주세요:</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="161"/>
@@ -4455,7 +4455,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_room.cpp" line="163"/>
         <source>You are flooding the chat. Please wait a couple of seconds.</source>
-        <translation>너무 빨리 말하고 있습니다. 조금만 기다려 주십시오.</translation>
+        <translation>너무 빨리 말하고 있습니다. 조금만 기다려 주세요.</translation>
     </message>
 </context>
 <context>
@@ -4631,7 +4631,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="507"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
-        <translation>카드를 더블 클릭하여 발동 (해제시 한번만 클릭하면 발동 됨)</translation>
+        <translation>카드를 더블 클릭해서 발동 (해제시 한번만 클릭하면 발동 됨)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="508"/>

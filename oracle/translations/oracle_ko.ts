@@ -11,7 +11,7 @@
         <source>The following sets has been found in the source file. Please mark the sets that will be imported.
 All core and expansion sets are selected by default.</source>
         <translation>아래 목록은 불러올 수 있는 판본의 목록입니다.
-코카트리스에서 사용 할 판본들을 선택하여 주세요.
+코카트리스에서 사용 할 판본들을 선택해 주세요.
 모든 기본판과 확장판은 기본으로 선택되어 있습니다. </translation>
     </message>
     <message>
@@ -28,7 +28,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Please mark at least one set.</source>
-        <translation>최소 한개 이상의 판본을 선택해주세요.</translation>
+        <translation>최소 한개 이상의 판본을 선택해 주세요.</translation>
     </message>
 </context>
 <context>
@@ -47,7 +47,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
-        <translation>오라클은 코카트리스에서 사용할 판본의 목록과 카드들의 정보를 갱신하는 프로그램입니다.&lt;br/&gt;판본 목록 파일이 있는 웹 주소나 파일을 입력하신 후에 읽어온 목록에서 원하는 판본을 선택하여 불러올 수 있습니다.</translation>
+        <translation>오라클은 코카트리스에서 사용할 판본의 목록과 카드들의 정보를 갱신하는 프로그램입니다.&lt;br/&gt;판본 목록 파일이 있는 웹 주소나 파일을 입력하신 후에 읽어온 목록에서 원하는 판본을 선택해 불러올 수 있습니다.</translation>
     </message>
 </context>
 <context>
@@ -58,7 +58,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Please specify a source for the list of sets and cards. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation>판본 목록 및 카드 정보가 들어있는 파일의 위치를 입력하여 주십시오. 
+        <translation>판본 목록 및 카드 정보가 들어있는 파일의 위치를 입력해 주세요. 
 다운로드 할 수 있는 웹 주소나 컴퓨터에 저장되어 있는 파일을 선택 할 수 있습니다.</translation>
     </message>
     <message>
@@ -103,7 +103,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Please choose a file.</source>
-        <translation>판본 목록 파일을 선택하여 주세요.</translation>
+        <translation>판본 목록 파일을 선택해 주세요.</translation>
     </message>
     <message>
         <source>Cannot open file &apos;%1&apos;.</source>
