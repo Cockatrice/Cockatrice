@@ -79,12 +79,15 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
         return QVariant();
     if (role == Qt::UserRole)
         return index.row();
-    if (role != Qt::DisplayRole && role != SORT_ROLE && role != Qt::DecorationRole && role != Qt::TextAlignmentRole)
+    if (role != Qt::DisplayRole && role != SORT_ROLE && role != Qt::DecorationRole && role != Qt::TextAlignmentRole && role != Qt::ForegroundRole)
         return QVariant();
     if ((index.row() >= gameList.size()) || (index.column() >= columnCount()))
         return QVariant();
 
     const ServerInfo_Game &g = gameList[index.row()];
+    if (role == Qt::ForegroundRole && !isGameAvailable(g)) 
+        return QColor(130, 130, 130);
+
     switch (index.column()) {
         case ROOM: 
             return rooms.value(g.room_id());
@@ -151,7 +154,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                 return result.join(", ");
             }
             case Qt::DecorationRole:{
-                return g.with_password() ? QIcon(":/resources/lock.svg") : QVariant();
+                return g.with_password() ? QIcon(isGameAvailable(g) ? ":/resources/lock.svg" : ":/resources/faded_lock.svg") : QVariant();
             case Qt::TextAlignmentRole:
                 return Qt::AlignLeft;
             default:
@@ -168,7 +171,6 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             default:
                 return QVariant();
             }
-            
         case SPECTATORS: 
             switch(role) {
             case SORT_ROLE:
@@ -191,6 +193,10 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             }
         default: return QVariant();
     }
+}
+
+bool GamesModel::isGameAvailable(const ServerInfo_Game &g) const {
+    return g.player_count() != g.max_players() && !g.started();
 }
 
 QVariant GamesModel::headerData(int section, Qt::Orientation orientation, int role) const

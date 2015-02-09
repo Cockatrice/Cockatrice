@@ -38,6 +38,7 @@ public:
     int startTimeColIndex() { return 1; }
 
     const QMap<int, GameTypeMap> &getGameTypes() { return gameTypes; }
+    bool isGameAvailable(const ServerInfo_Game &g) const;
 };
 
 class GamesProxyModel : public QSortFilterProxyModel {
