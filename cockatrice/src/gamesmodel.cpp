@@ -172,8 +172,18 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
         case SPECTATORS: 
             switch(role) {
             case SORT_ROLE:
-            case Qt::DisplayRole: 
-                return g.spectators_allowed() ? QVariant(g.spectators_count()) : QVariant(tr("not allowed"));
+            case Qt::DisplayRole: {
+                if (g.spectators_allowed()) {
+                    QString result;
+                    result.append(QString::number(g.spectators_count()));
+                    if (g.spectators_can_chat()) 
+                        result.append(", ").append(tr("chat"));
+                    if (g.spectators_omniscient())
+                        result.append(", ").append(tr("see hands"));
+                    return result;
+                }
+                return QVariant(tr("not allowed"));
+            }
             case Qt::TextAlignmentRole:
                 return Qt::AlignLeft;
             default:
