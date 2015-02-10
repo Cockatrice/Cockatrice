@@ -14,17 +14,13 @@ Chat with the Cockatrice developers on Gitter. Come here to talk about the appli
 - [Woogerworks Server & Forums](http://www.woogerworks.com)
 - [Cockatrice Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
 
-# Translation Status
+# Translation Status [![Cockatrice on Transiflex](https://ds0k0en9abmn1.cloudfront.net/static/charts/images/tx-logo-micro.646b0065fce6.png)](https://www.transifex.com/projects/p/cockatrice/)
 
-Cockatrice uses Transifex for translations. You can help us bring Cockatrice to your language on our [project page](https://www.transifex.com/projects/p/cockatrice/)
+Cockatrice uses Transifex for translations. You can help us bring Cockatrice/Oracle to your language or edit single wordings by clicking on the associated charts below.<br>
+Our [project page](https://www.transifex.com/projects/p/cockatrice/) offers a detailed overview for contributors.
 
-For Cockatrice:
-
-[![Cockatrice translations](https://www.transifex.com/projects/p/cockatrice/resource/cockatrice_ents/chart/image_png)](https://www.transifex.com/projects/p/cockatrice/)
-
-For Oracle:
-
-[![Oracle translations](https://www.transifex.com/projects/p/cockatrice/resource/oracle_ents/chart/image_png)](https://www.transifex.com/projects/p/cockatrice/)
+Top languages for `Cockatrice` (on the left) and `Oracle` (on the right):<br>
+[![Cockatrice translations](https://www.transifex.com/projects/p/cockatrice/resource/cockatrice_ents/chart/image_png)](https://www.transifex.com/projects/p/cockatrice/resource/cockatrice/)  	   [![Oracle translations](https://www.transifex.com/projects/p/cockatrice/resource/oracle_ents/chart/image_png)](https://www.transifex.com/projects/p/cockatrice/resource/oracle/)
 
 # Building [![Build Status](https://travis-ci.org/Cockatrice/Cockatrice.svg?branch=master)](https://travis-ci.org/Cockatrice/Cockatrice)
 
