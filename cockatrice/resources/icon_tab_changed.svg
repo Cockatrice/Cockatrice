@@ -7,6 +7,7 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="100"
@@ -20,11 +21,11 @@
     <linearGradient
        id="linearGradient3753">
       <stop
-         style="stop-color:#ff500e;stop-opacity:1;"
+         style="stop-color:#20500e;stop-opacity:1;"
          offset="0"
          id="stop3755" />
       <stop
-         style="stop-color:#ffa20e;stop-opacity:1;"
+         style="stop-color:#02db0e;stop-opacity:1;"
          offset="1"
          id="stop3757" />
     </linearGradient>
@@ -42,6 +43,15 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3753"
+       id="linearGradient3766"
+       x1="103.53491"
+       y1="132.64713"
+       x2="-1.5473157"
+       y2="33.224445"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -51,14 +61,14 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5"
-     inkscape:cx="26.103122"
+     inkscape:cx="-5.096878"
      inkscape:cy="28.010059"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer2"
      showgrid="false"
-     inkscape:window-width="1600"
-     inkscape:window-height="1178"
-     inkscape:window-x="1912"
+     inkscape:window-width="1920"
+     inkscape:window-height="1028"
+     inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1" />
   <metadata
@@ -77,26 +87,22 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Triangle"
-     style="display:inline"
-     sodipodi:insensitive="true">
+     style="display:inline">
     <path
-       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#ff8500;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:4.7528863;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
-       d="m 49.592243,12.96121 c -3.497115,0.21207 -6.329734,1.990693 -8.07712,5.022959 -0.0061,0.01055 -0.01918,0.01464 -0.02524,0.02523 L 4.3351285,82.323482 c -0.00402,0.0068 0.004,0.01835 0,0.02523 l -0.025242,0.02524 c -1.8691261,3.232623 -1.8701422,6.806151 0,10.045919 1.8711716,3.241605 4.9711781,5.05201 8.7081455,5.048198 0.01729,-1e-5 0.03316,9.6e-5 0.05047,0 l 74.259027,0 c 0.01731,9.6e-5 0.03319,-1e-5 0.05047,0 3.73613,0.0036 6.836866,-1.806402 8.708147,-5.048198 1.870072,-3.239711 1.869037,-6.813341 0,-10.045919 l -0.0252,-0.05047 L 58.931443,18.00941 c -0.0061,-0.01073 -0.01907,-0.01454 -0.02524,-0.02523 -1.988809,-3.452227 -5.332793,-5.269352 -9.313933,-5.022963 z"
-       id="path3770"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccccsccccscccsc" />
+       sodipodi:type="arc"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:url(#linearGradient3766);stroke-width:51.23924637;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="path3758"
+       sodipodi:cx="53.900002"
+       sodipodi:cy="78.5"
+       sodipodi:rx="46.5"
+       sodipodi:ry="46.5"
+       d="M 100.4,78.5 A 46.5,46.5 0 1 1 7.4000015,78.5 46.5,46.5 0 1 1 100.4,78.5 z"
+       transform="matrix(0.68011953,0,0,0.68011953,13.241558,-2.889383)" />
   </g>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-952.36218)"
-     style="display:inline">
-    <path
-       style="font-size:253.8901062px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.39994991;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-       d="m 51.683911,1016.3059 c 0.284377,-7.7488 0.995292,-13.223 2.346027,-17.84398 2.274932,-7.82007 2.417123,-8.4599 2.417123,-11.23247 0,-4.47876 -2.488217,-7.10915 -6.611518,-7.10915 -4.194394,0 -6.682604,2.63039 -6.682604,7.10915 0,1.84838 0.355466,4.1944 0.995287,6.32714 2.843659,9.38411 3.341291,12.44111 3.767857,22.74931 l 3.767828,0 m -1.77804,10.9108 c -3.625668,0 -6.611511,2.9859 -6.611511,6.6116 0,3.6256 2.985843,6.6826 6.540416,6.6826 3.767858,0 6.753706,-2.9859 6.753706,-6.6826 0,-3.6257 -2.985848,-6.6116 -6.682611,-6.6116"
-       id="text3838"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccsssccccsssc" />
-  </g>
+     style="display:inline" />
 </svg>
