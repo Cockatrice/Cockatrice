@@ -14,6 +14,18 @@ Chat with the Cockatrice developers on Gitter. Come here to talk about the appli
 - [Woogerworks Server & Forums](http://www.woogerworks.com)
 - [Cockatrice Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
 
+# Translation Status
+
+Cockatrice uses Transifex for translations. You can help us bring Cockatrice to your language on our [project page](https://www.transifex.com/projects/p/cockatrice/)
+
+For Cockatrice:
+
+[![Cockatrice translations](https://www.transifex.com/projects/p/cockatrice/resource/cockatrice_ents/chart/image_png)](https://www.transifex.com/projects/p/cockatrice/)
+
+For Oracle:
+
+[![Oracle translations](https://www.transifex.com/projects/p/cockatrice/resource/oracle_ents/chart/image_png)](https://www.transifex.com/projects/p/cockatrice/)
+
 # Building [![Build Status](https://travis-ci.org/Cockatrice/Cockatrice.svg?branch=master)](https://travis-ci.org/Cockatrice/Cockatrice)
 
 **Detailed installation instructions are on the Cockatrice wiki under [Installing Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Installing-Cockatrice)**
