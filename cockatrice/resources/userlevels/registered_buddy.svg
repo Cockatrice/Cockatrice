@@ -15,7 +15,7 @@
    inkscape:version="0.48.5 r10040"
    width="100%"
    height="100%"
-   sodipodi:docname="buddy_icon.svg">
+   sodipodi:docname="registered_buddy.svg">
   <metadata
      id="metadata12">
     <rdf:RDF>
@@ -34,11 +34,11 @@
       <stop
          id="stop3760"
          offset="0"
-         style="stop-color:#0fbb00;stop-opacity:1;" />
+         style="stop-color:#80d600;stop-opacity:1;" />
       <stop
          id="stop3762"
          offset="1"
-         style="stop-color:#064400;stop-opacity:1;" />
+         style="stop-color:#80d600;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
        id="linearGradient3750">
@@ -96,10 +96,10 @@
      id="namedview8"
      showgrid="false"
      inkscape:zoom="7.375"
-     inkscape:cx="-14.986549"
-     inkscape:cy="23.31428"
+     inkscape:cx="-11.596718"
+     inkscape:cy="34.975297"
      inkscape:window-x="1912"
-     inkscape:window-y="227"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
   <path
