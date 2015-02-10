@@ -21,7 +21,7 @@
     <linearGradient
        id="linearGradient3753">
       <stop
-         style="stop-color:#20500e;stop-opacity:1;"
+         style="stop-color:#02db0e;stop-opacity:1;"
          offset="0"
          id="stop3755" />
       <stop
@@ -61,7 +61,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5"
-     inkscape:cx="-5.096878"
+     inkscape:cx="-36.296878"
      inkscape:cy="28.010059"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
@@ -90,7 +90,7 @@
      style="display:inline">
     <path
        sodipodi:type="arc"
-       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:url(#linearGradient3766);stroke-width:51.23924637;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:url(#linearGradient3766);stroke-width:51.23924636999999600;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="path3758"
        sodipodi:cx="53.900002"
        sodipodi:cy="78.5"
