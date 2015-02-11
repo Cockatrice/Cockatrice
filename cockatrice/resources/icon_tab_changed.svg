@@ -7,7 +7,6 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="100"
@@ -43,15 +42,6 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3753"
-       id="linearGradient3766"
-       x1="103.53491"
-       y1="132.64713"
-       x2="-1.5473157"
-       y2="33.224445"
-       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -61,8 +51,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5"
-     inkscape:cx="-36.296878"
-     inkscape:cy="28.010059"
+     inkscape:cx="-9.896878"
+     inkscape:cy="42.810059"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="false"
@@ -90,14 +80,26 @@
      style="display:inline">
     <path
        sodipodi:type="arc"
-       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:url(#linearGradient3766);stroke-width:51.23924636999999600;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="path3758"
+       style="fill:#007aff;fill-opacity:1;fill-rule:nonzero;stroke:none;display:inline"
+       id="path3758-1"
        sodipodi:cx="53.900002"
        sodipodi:cy="78.5"
        sodipodi:rx="46.5"
        sodipodi:ry="46.5"
        d="M 100.4,78.5 A 46.5,46.5 0 1 1 7.4000015,78.5 46.5,46.5 0 1 1 100.4,78.5 z"
-       transform="matrix(0.68011953,0,0,0.68011953,13.241558,-2.889383)" />
+       transform="matrix(1.05866,0,0,1.05866,-7.0617752,-32.704809)" />
+    <text
+       xml:space="preserve"
+       style="font-size:133.49534607px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1.06498075;stroke-opacity:1;font-family:'Magic:the Gathering';-inkscape-font-specification:'Magic:the Gathering'"
+       x="31.894444"
+       y="91.111641"
+       id="text3759"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3761"
+         x="31.894444"
+         y="91.111641"
+         style="stroke-width:1.06498075">i</tspan></text>
   </g>
   <g
      inkscape:label="Layer 1"
