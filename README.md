@@ -19,8 +19,11 @@ Chat with the Cockatrice developers on Gitter. Come here to talk about the appli
 Cockatrice uses Transifex for translations. You can help us bring Cockatrice/Oracle to your language or edit single wordings by clicking on the associated charts below.<br>
 Our [project page](https://www.transifex.com/projects/p/cockatrice/) offers a detailed overview for contributors.
 
-Top languages for `Cockatrice` (on the left) and `Oracle` (on the right):<br>
-[![Cockatrice translations](https://www.transifex.com/projects/p/cockatrice/resource/cockatrice_ents/chart/image_png)](https://www.transifex.com/projects/p/cockatrice/resource/cockatrice/)  	   [![Oracle translations](https://www.transifex.com/projects/p/cockatrice/resource/oracle_ents/chart/image_png)](https://www.transifex.com/projects/p/cockatrice/resource/oracle/)
+Language statistics for `Cockatrice` *(on the left)* and `Oracle` *(on the right)*:
+
+[![Cockatrice translations](https://www.transifex.com/projects/p/cockatrice/resource/cockatrice/chart/image_png)](https://www.transifex.com/projects/p/cockatrice/resource/cockatrice/)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Oracle translations](https://www.transifex.com/projects/p/cockatrice/resource/oracle/chart/image_png)](https://www.transifex.com/projects/p/cockatrice/resource/oracle/)
+
+Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information!
 
 # Building [![Build Status](https://travis-ci.org/Cockatrice/Cockatrice.svg?branch=master)](https://travis-ci.org/Cockatrice/Cockatrice)
 
