@@ -67,11 +67,11 @@ private slots:
 public:
     enum { Type = typeOther };
     int type() const { return Type; }
-
+    
     PlayerArea(QGraphicsItem *parent = 0);
     QRectF boundingRect() const { return bRect; }
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
+    
     void setSize(qreal width, qreal height);
 };
 
@@ -104,7 +104,7 @@ signals:
     void logStopDumpZone(Player *player, CardZone *zone);
     void logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer, bool faceDown);
     void logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal);
-
+    
     void sizeChanged();
     void gameConceded();
 public slots:
@@ -128,16 +128,16 @@ public slots:
     void actViewGraveyard();
     void actViewRfg();
     void actViewSideboard();
-
+    
     void actSayMessage();
 private slots:
     void addPlayer(Player *player);
     void removePlayer(Player *player);
     void playerListActionTriggered();
-
+    
     void updateBoundingRect();
     void rearrangeZones();
-
+    
     void actOpenDeckInDeckEditor();
     void actCreatePredefinedToken();
     void cardMenuAction();
@@ -172,7 +172,7 @@ private:
                 *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle,
         *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,
         *aCardMenu, *aMoveBottomCardToGrave;
-
+    
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
     QAction *aPlay, *aPlayFacedown,
         *aHide,
@@ -190,21 +190,21 @@ private:
     bool mirrored;
     bool handVisible;
     bool conceded;
-
+    
     bool dialogSemaphore;
     bool clearCardsToDelete();
     QList<CardItem *> cardsToDelete;
-
+    
     DeckLoader *deck;
     QStringList predefinedTokens;
-
+    
     PlayerArea *playerArea;
     QMap<QString, CardZone *> zones;
     StackZone *stack;
     TableZone *table;
     HandZone *hand;
     PlayerTarget *playerTarget;
-
+    
     void setCardAttrHelper(const GameEventContext &context, CardItem *card, CardAttribute attribute, const QString &avalue, bool allCards);
 
     QRectF bRect;
@@ -212,9 +212,9 @@ private:
     QMap<int, AbstractCounter *> counters;
     QMap<int, ArrowItem *> arrows;
     void rearrangeCounters();
-
+    
     void initSayMenu();
-
+    
     void eventConnectionStateChanged(const Event_ConnectionStateChanged &event);
     void eventGameSay(const Event_GameSay &event);
     void eventShuffle(const Event_Shuffle &event);
@@ -239,12 +239,12 @@ private:
 public:
     static const int counterAreaWidth = 55;
     enum CardMenuActionType { cmTap, cmUntap, cmDoesntUntap, cmFlip, cmPeek, cmClone, cmMoveToTopLibrary, cmMoveToBottomLibrary, cmMoveToGraveyard, cmMoveToExile };
-
+    
     enum { Type = typeOther };
     int type() const { return Type; }
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
+    
     void playCard(CardItem *c, bool faceDown, bool tapped);
     void addCard(CardItem *c);
     void deleteCard(CardItem *c);
@@ -254,7 +254,7 @@ public:
     AbstractCounter *addCounter(int counterId, const QString &name, QColor color, int radius, int value);
     void delCounter(int counterId);
     void clearCounters();
-
+    
     ArrowItem *addArrow(const ServerInfo_Arrow &arrow);
     ArrowItem *addArrow(int arrowId, CardItem *startCard, ArrowTarget *targetItem, const QColor &color);
     void delArrow(int arrowId);
@@ -284,19 +284,19 @@ public:
     void setShortcutsActive();
     void setShortcutsInactive();
     void updateZones();
-
+    
     void setConceded(bool _conceded);
     bool getConceded() const { return conceded; }
 
     void setGameStarted();
-
+    
     qreal getMinimumWidth() const;
     void setMirrored(bool _mirrored);
     void processSceneSizeChange(int newPlayerWidth);
-
+    
     void processPlayerInfo(const ServerInfo_Player &info);
     void processCardAttachment(const ServerInfo_Player &info);
-
+    
     void processGameEvent(GameEvent::GameEventType type, const GameEvent &event, const GameEventContext &context);
 
     PendingCommand *prepareGameCommand(const ::google::protobuf::Message &cmd);
