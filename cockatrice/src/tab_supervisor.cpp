@@ -81,7 +81,7 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
     tabChangedIcon = new QIcon(":/resources/icon_tab_changed.svg");
     setElideMode(Qt::ElideRight);
     setMovable(true);
-    setIconSize(QSize(15, 15));
+    setIconSize(QSize(16, 16));
     connect(this, SIGNAL(currentChanged(int)), this, SLOT(updateCurrent(int)));
 
     connect(client, SIGNAL(roomEventReceived(const RoomEvent &)), this, SLOT(processRoomEvent(const RoomEvent &)));
@@ -254,7 +254,7 @@ void TabSupervisor::updatePingTime(int value, int max)
     if (tabServer->getContentsChanged())
         return;
     
-    setTabIcon(indexOf(tabServer), QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));
+    setTabIcon(indexOf(tabServer), QIcon(PingPixmapGenerator::generatePixmap(16, value, max)));
 }
 
 void TabSupervisor::closeButtonPressed()
