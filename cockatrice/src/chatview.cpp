@@ -326,7 +326,10 @@ void ChatView::mousePressEvent(QMouseEvent *event)
                     break;
                                       }
                 case Qt::LeftButton :{
-                    emit addMentionTag("@" + userName);
+                    if (event->modifiers() == Qt::ControlModifier) {
+                        emit openMessageDialog(userName, true);
+                    } else
+                        emit addMentionTag("@" + userName);
                     break;
                                      }
                 default:
