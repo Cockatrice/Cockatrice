@@ -415,7 +415,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     connect(aPlay, SIGNAL(triggered()), this, SLOT(actPlay()));
     aHide = new QAction(this);
     connect(aHide, SIGNAL(triggered()), this, SLOT(actHide()));
-        
+    aPlayFacedown = new QAction(this);
+    connect(aPlayFacedown, SIGNAL(triggered()), this, SLOT(actPlayFacedown()));
+
     for (int i = 0; i < 3; ++i) {
         QAction *tempAddCounter = new QAction(this);
         tempAddCounter->setData(9 + i * 1000);
