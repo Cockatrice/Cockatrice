@@ -22,7 +22,7 @@ SettingsCache::SettingsCache()
     cardBackPicturePath = settings->value("paths/cardbackpicture").toString();
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
-    picDownloadHq = settings->value("personal/picturedownloadhq", false).toBool();
+    picDownloadHq = settings->value("personal/picturedownloadhq", true).toBool();
     pixmapCacheSize = settings->value("personal/pixmapCacheSize", PIXMAPCACHE_SIZE_DEFAULT).toInt();
     //sanity check
     if(pixmapCacheSize < PIXMAPCACHE_SIZE_MIN || pixmapCacheSize > PIXMAPCACHE_SIZE_MAX)
