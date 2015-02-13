@@ -132,3 +132,59 @@ mutating objects.)
 
 When pointers can't be avoided, try to use a smart pointer of some sort, such
 as `QScopedPointer`, or, less preferably, `QSharedPointer`.
+
+### Translations (for developers) ###
+
+All the user-interface strings inside cockatrice's source code must be written in
+english language. Translations to other languages are managed using Transifex:
+http://www.transifex.com
+
+If you're about to propose a change that adds or modifies any translatable string
+in the code, you'll need to update the basic translation files so that translators
+are notified that new strings needs to be translated.
+To update the basic translation files, re-run cmake with enabling the appropriate
+parameter and then run make:
+
+    cd cockatrice/build
+    cmake .. -DUPDATE_TRANSLATIONS=ON
+    make
+
+If the parameter has been enabled correctly, when running "make" you should see
+a line similar to this one (the numbers may vary):
+
+    [ 76%] Generating ../../cockatrice/translations/cockatrice_en.ts
+    Updating '../../cockatrice/translations/cockatrice_en.ts'...
+    Found 857 source text(s) (8 new and 849 already existing)
+
+You should then notice that the following files have uncommitted changes:
+
+    cockatrice/translations/cockatrice_en.ts
+    oracle/translations/oracle_en.ts
+
+It's now suggested to disable the parameter using:
+
+    cmake .. -DUPDATE_TRANSLATIONS=OFF
+
+Now you are ready to propose your change. Once your change gets merged, 
+Transifex will pick up the modified files automatically (checks every 24 hours)
+and update the interface where translators will be able to translate the new
+strings.
+
+### Translations (for mantainers) ###
+
+Before rushing out a new release, it would be nice to fetch the most up to date
+translations from Transifer and commit them in the cockatrice source code.
+This can be done manually from the Transifex we interface, but it's quite time
+expensive.
+
+As an alternative, you can install the Transifex CLI: 
+    
+    http://docs.transifex.com/developer/client/
+
+You'll then be able to use a git-like cli command to push and pull translations
+from Transifex to the source code and viceversa.
+
+### Translations (for translators) ###
+
+Please have a look at the specific FAQ:
+https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ
