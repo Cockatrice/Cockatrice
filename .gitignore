@@ -5,3 +5,4 @@ build*
 mysql.cnf
 .DS_Store
 .idea/
+.tx/

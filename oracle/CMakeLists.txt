@@ -23,11 +23,13 @@ if (UNIX AND NOT APPLE)
 endif (UNIX AND NOT APPLE)
 
 set(oracle_RESOURCES oracle.qrc)
-FILE(GLOB oracle_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
 
 IF(UPDATE_TRANSLATIONS)
     FILE(GLOB_RECURSE translate_oracle_SRCS ${CMAKE_SOURCE_DIR}/oracle/src/*.cpp ${CMAKE_SOURCE_DIR}/oracle/src/*.h)
     SET(translate_SRCS ${translate_oracle_SRCS})
+    SET(oracle_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/oracle_en.ts")
+ELSE()
+    FILE(GLOB oracle_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
 ENDIF(UPDATE_TRANSLATIONS)
 
 if(WIN32)
