@@ -115,7 +115,7 @@ bool OSDAB_ZIP_MANGLE(setFileTimestamp)(const QString& fileName, const QDateTime
         return true;
 
 #ifdef Q_OS_WIN
-    HANDLE hFile = CreateFile(fileName.toStdWString().c_str(),
+    HANDLE hFile = CreateFileW(fileName.toStdWString().c_str(),
         GENERIC_WRITE, FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
     if (hFile == INVALID_HANDLE_VALUE) {
         return false;

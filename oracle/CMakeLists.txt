@@ -11,8 +11,6 @@ SET(oracle_SOURCES
     src/main.cpp
     src/oraclewizard.cpp
     src/oracleimporter.cpp
-    src/zip/unzip.cpp
-    src/zip/zipglobal.cpp
     ../cockatrice/src/carddatabase.cpp
     ../cockatrice/src/settingscache.cpp
     ../cockatrice/src/qt-json/json.cpp
@@ -123,6 +121,12 @@ FIND_PACKAGE(ZLIB)
 IF(ZLIB_FOUND)
     INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
     ADD_DEFINITIONS("-DHAS_ZLIB")
+
+    set(oracle_SOURCES ${oracle_SOURCES}
+        src/zip/unzip.cpp
+        src/zip/zipglobal.cpp
+    )
+
 ELSE()
     MESSAGE(STATUS "Oracle: zlib not found; ZIP support disabled")
 ENDIF()
@@ -205,6 +209,12 @@ IF(WIN32)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
     set(plugin_dest_dir Plugins)
     set(qtconf_dest_dir .)
+    list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
+    IF(ZLIB_FOUND)
+        get_filename_component(ZLIB_DLL_DIR "${ZLIB_INCLUDE_DIRS}/../bin/" REALPATH)
+        list(APPEND libSearchDirs ${ZLIB_DLL_DIR})
+    ENDIF()
+    MESSAGE(STATUS "Oracle: ZLIB dll found at ${ZLIB_DLL_DIR}")
 
     # qt4: codecs, iconengines, imageformats
     # qt5: iconengines, imageformats, platforms
@@ -223,6 +233,6 @@ Translations = Resources/translations\")
             \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/oracle.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/oracle.exe\" \"\${QTPLUGINS}\" \"${libSearchDirs}\")
         " COMPONENT Runtime)
 endif() 
