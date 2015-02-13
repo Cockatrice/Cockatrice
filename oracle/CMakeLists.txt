@@ -11,8 +11,6 @@ SET(oracle_SOURCES
     src/main.cpp
     src/oraclewizard.cpp
     src/oracleimporter.cpp
-    src/zip/unzip.cpp
-    src/zip/zipglobal.cpp
     ../cockatrice/src/carddatabase.cpp
     ../cockatrice/src/settingscache.cpp
     ../cockatrice/src/qt-json/json.cpp
@@ -121,6 +119,12 @@ FIND_PACKAGE(ZLIB)
 IF(ZLIB_FOUND)
     INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
     ADD_DEFINITIONS("-DHAS_ZLIB")
+
+    set(oracle_SOURCES ${oracle_SOURCES}
+        src/zip/unzip.cpp
+        src/zip/zipglobal.cpp
+    )
+
 ELSE()
     MESSAGE(STATUS "Oracle: zlib not found; ZIP support disabled")
 ENDIF()

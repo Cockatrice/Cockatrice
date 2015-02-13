@@ -29,11 +29,12 @@
 #include "main.h"
 #include "settingscache.h"
 
+#define ZIP_SIGNATURE "PK"
+#define ALLSETS_URL_FALLBACK "http://mtgjson.com/json/AllSets.json"
+
 #ifdef HAS_ZLIB
     #include "zip/unzip.h"
-    #define ZIP_SIGNATURE "PK"
     #define ALLSETS_URL "http://mtgjson.com/json/AllSets.json.zip"
-    #define ALLSETS_URL_FALLBACK "http://mtgjson.com/json/AllSets.json"
 #else
     #define ALLSETS_URL "http://mtgjson.com/json/AllSets.json"
 #endif
