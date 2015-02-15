@@ -161,11 +161,30 @@ bool FilterItem::acceptType(const CardInfo *info) const
 bool FilterItem::acceptColor(const CardInfo *info) const
 {
     QStringList::const_iterator i;
+    QString converted_term;
     bool status;
 
     status = false;
+    if (term.contains("green", Qt::CaseInsensitive) || term.contains("grn", Qt::CaseInsensitive)) {
+        converted_term = 'g';
+    }
+    else if (term.contains("blue", Qt::CaseInsensitive) || term.contains("blu", Qt::CaseInsensitive)) {
+        converted_term = 'u';
+    }
+    else if (term.contains("black", Qt::CaseInsensitive) || term.contains("blk", Qt::CaseInsensitive)) {
+        converted_term = 'b';
+    }
+    else if (term.contains("red", Qt::CaseInsensitive)) {
+        converted_term = 'r';
+    }
+    else if (term.contains("white", Qt::CaseInsensitive) || term.contains("wht", Qt::CaseInsensitive)) {
+        converted_term = 'w';
+    }
+    else {
+        converted_term = term;
+    }
     for (i = info->getColors().constBegin(); i != info->getColors().constEnd(); i++)
-        if ((*i).contains(term, Qt::CaseInsensitive)) {
+        if ((*i).contains(converted_term, Qt::CaseInsensitive)) {
             status = true;
             break;
         }
