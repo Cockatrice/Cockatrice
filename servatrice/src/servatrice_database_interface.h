@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSqlDatabase>
+#include <QHash>
 
 #include "server.h"
 #include "server_database_interface.h"
@@ -14,8 +15,9 @@ class Servatrice_DatabaseInterface : public Server_DatabaseInterface {
 private:
 	int instanceId;
 	QSqlDatabase sqlDatabase;
+	QHash<QString, QSqlQuery *> preparedStatements;
 	Servatrice *server;
-	ServerInfo_User evalUserQueryResult(const QSqlQuery &query, bool complete, bool withId = false);
+	ServerInfo_User evalUserQueryResult(const QSqlQuery *query, bool complete, bool withId = false);
 	bool usernameIsValid(const QString &user);
 protected:
 	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &secondsLeft);
@@ -27,7 +29,8 @@ public:
 	void initDatabase(const QString &type, const QString &hostName, const QString &databaseName, const QString &userName, const QString &password);
 	bool openDatabase();
 	bool checkSql();
-	bool execSqlQuery(QSqlQuery &query);
+	QSqlQuery * prepareQuery(const QString &queryText);
+	bool execSqlQuery(QSqlQuery *query);
 	const QSqlDatabase &getDatabase() { return sqlDatabase; }
 
 	bool userExists(const QString &user);
