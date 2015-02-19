@@ -107,7 +107,8 @@ OPTION(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
 MESSAGE("UPDATE TRANSLATIONS: ${UPDATE_TRANSLATIONS}")
 
 IF(NOT WITH_QT4)
-    FIND_PACKAGE(Qt5Widgets)
+    # First known not-broken Qt5 version (5.0.2 available on old ubuntus is buggy).
+    FIND_PACKAGE(Qt5Widgets 5.0.3)
 ENDIF()
 
 IF(Qt5Widgets_FOUND)
