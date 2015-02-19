@@ -7,14 +7,15 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="500"
    height="500"
    id="svg2825"
    version="1.1"
-   inkscape:version="0.47pre4 r22446"
-   sodipodi:docname="eye.svg">
+   inkscape:version="0.48.5 r10040"
+   sodipodi:docname="icon_spectator.svg">
   <defs
      id="defs2827">
     <inkscape:perspective
@@ -24,6 +25,27 @@
        inkscape:vp_z="744.09448 : 526.18109 : 1"
        inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
        id="perspective2833" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3170"
+       id="linearGradient3176"
+       x1="348.1423"
+       y1="241.25623"
+       x2="362.82382"
+       y2="226.27509"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3170">
+      <stop
+         style="stop-color: rgb(255, 255, 255); stop-opacity: 1;"
+         offset="0"
+         id="stop3172" />
+      <stop
+         style="stop-color: rgb(255, 255, 255); stop-opacity: 0;"
+         offset="1"
+         id="stop3174" />
+    </linearGradient>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -32,17 +54,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.35"
-     inkscape:cx="-791.42857"
-     inkscape:cy="725.71429"
+     inkscape:zoom="0.7"
+     inkscape:cx="161.90734"
+     inkscape:cy="313.43022"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1280"
-     inkscape:window-height="725"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
-     inkscape:window-maximized="1" />
+     inkscape:window-width="784"
+     inkscape:window-height="1162"
+     inkscape:window-x="2720"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata2830">
     <rdf:RDF>
@@ -62,16 +84,6 @@
      transform="translate(0,-552.36218)">
     <path
        sodipodi:type="arc"
-       style="fill:none;stroke:#000000;stroke-width:10;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="path2835"
-       sodipodi:cx="374.28571"
-       sodipodi:cy="503.79074"
-       sodipodi:rx="297.14285"
-       sodipodi:ry="74.285713"
-       d="m 671.42856,503.79074 a 297.14285,74.285713 0 1 1 -594.285707,0 297.14285,74.285713 0 1 1 594.285707,0 z"
-       transform="matrix(0.80005756,0,0,1.7051801,-49.450108,-56.691766)" />
-    <path
-       sodipodi:type="arc"
        style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:10;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="path3609"
        sodipodi:cx="382.85715"
@@ -79,6 +91,16 @@
        sodipodi:rx="71.428574"
        sodipodi:ry="71.428574"
        d="m 454.28572,549.50507 a 71.428574,71.428574 0 1 1 -142.85715,0 71.428574,71.428574 0 1 1 142.85715,0 z"
-       transform="matrix(1.278781,0,0,1.278781,-239.59045,99.665542)" />
+       transform="matrix(1.278781,0,0,1.278781,-239.59045,89.665546)" />
+    <g
+       transform="matrix(4.0314732,0,0,4.0314732,-693.67321,-408.8113)"
+       id="g3178">
+      <path
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="csssc"
+         id="path3159"
+         d="m 234.78774,331.58001 c -31.87684,0.0325 -57.71719,-31.08607 -58.23077,-32.66642 -1.24408,-3.82817 25.38817,-32.75179 57.265,-32.78433 31.87683,-0.0325 58.68772,30.04142 58.23076,32.66642 -0.17904,1.02851 -24.29715,32.20961 -55.54932,32.76812"
+         style="fill:none;stroke:#000000;stroke-width:6.60500002;stroke-linecap:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
   </g>
 </svg>
