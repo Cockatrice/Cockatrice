@@ -16,6 +16,6 @@ else
     sudo add-apt-repository -y ppa:kalakris/cmake
     sudo apt-get update -qq
     sudo apt-get install -y libprotobuf-dev protobuf-compiler cmake libsqlite3-dev\
-      qt52base qt52webkit qt52tools qt52svg
+      qt52base qt52webkit qt52tools qt52svg qt52multimedia
   fi
 fi
