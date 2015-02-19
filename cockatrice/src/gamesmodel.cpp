@@ -11,8 +11,8 @@
 enum GameListColumn {ROOM, CREATED, DESCRIPTION, CREATOR, GAME_TYPE, RESTRICTIONS, PLAYERS, SPECTATORS};
 
 namespace {
-    const unsigned SECS_PER_MIN  = 60;
-    const unsigned SECS_PER_HOUR = 60 * 60;
+    const int SECS_PER_MIN  = 60;
+    const int SECS_PER_HOUR = 60 * 60;
 
     /**
     * Pretty print an integer number of seconds ago. Accurate to only one unit,
@@ -26,7 +26,7 @@ namespace {
     *   91-300 minutes will return "Xhr ago"
     *   300+ minutes will return "5+ hr ago"
     */
-    QString prettyPrintSecsAgo(unsigned int secs) {
+    QString prettyPrintSecsAgo(int secs) {
         if (secs < SECS_PER_MIN) {
             return QObject::tr("<1m ago");
         }
@@ -91,7 +91,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
         case CREATED: {
             QDateTime then;
             then.setTime_t(g.start_time());
-            unsigned int secs = then.secsTo(QDateTime::currentDateTime());
+            int secs = then.secsTo(QDateTime::currentDateTime());
 
             switch (role) {
                 case Qt::DisplayRole: return prettyPrintSecsAgo(secs);
