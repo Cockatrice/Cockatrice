@@ -23,7 +23,16 @@ SettingsCache::SettingsCache()
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
     picDownloadHq = settings->value("personal/picturedownloadhq", true).toBool();
-    pixmapCacheSize = settings->value("personal/pixmapCacheSize", PIXMAPCACHE_SIZE_DEFAULT).toInt();
+    
+    // we only want to reset the cache once, then its up to the user
+    bool updateCache = settings->value("update/pixmapCacheSize", false).toBool();
+    if (!updateCache) {
+        pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
+        settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
+        settings->setValue("update/pixmapCacheSize", true);
+    }
+    else
+        pixmapCacheSize = settings->value("personal/pixmapCacheSize", PIXMAPCACHE_SIZE_DEFAULT).toInt();
     //sanity check
     if(pixmapCacheSize < PIXMAPCACHE_SIZE_MIN || pixmapCacheSize > PIXMAPCACHE_SIZE_MAX)
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
