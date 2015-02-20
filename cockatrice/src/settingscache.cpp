@@ -21,14 +21,12 @@ SettingsCache::SettingsCache()
     playerBgPath = settings->value("zonebg/playerarea").toString();
     cardBackPicturePath = settings->value("paths/cardbackpicture").toString();
 
-    picDownload = settings->value("personal/picturedownload", true).toBool();
-    picDownloadHq = settings->value("personal/picturedownloadhq", true).toBool();
-    
     // we only want to reset the cache once, then its up to the user
     bool updateCache = settings->value("update/pixmapCacheSize", false).toBool();
     if (!updateCache) {
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
         settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
+        settings->setValue("personal/picturedownloadhq", true);
         settings->setValue("update/pixmapCacheSize", true);
     }
     else
@@ -36,6 +34,9 @@ SettingsCache::SettingsCache()
     //sanity check
     if(pixmapCacheSize < PIXMAPCACHE_SIZE_MIN || pixmapCacheSize > PIXMAPCACHE_SIZE_MAX)
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
+
+    picDownload = settings->value("personal/picturedownload", true).toBool();
+    picDownloadHq = settings->value("personal/picturedownloadhq", true).toBool();
 
     picUrl = settings->value("personal/picUrl", PIC_URL_DEFAULT).toString();
     picUrlHq = settings->value("personal/picUrlHq", PIC_URL_HQ_DEFAULT).toString();
