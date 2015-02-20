@@ -74,6 +74,7 @@ private:
     QMutex mutex;
     QNetworkAccessManager *networkManager;
     QList<PictureToLoad> cardsToDownload;
+    PictureToLoad cardBeingLoaded;
     PictureToLoad cardBeingDownloaded;
     bool picDownload, picDownloadHq, downloadRunning, loadQueueRunning;
     void startNextPicDownload();
