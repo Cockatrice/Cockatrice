@@ -514,6 +514,11 @@ void TabGame::addMentionTag(QString value) {
     sayEdit->setFocus();
 }
 
+void TabGame::emitUserEvent() {
+    bool globalEvent = !spectator || settingsCache->getSpectatorNotificationsEnabled();
+    emit userEvent(globalEvent);
+}
+
 TabGame::~TabGame()
 {
     delete replay;
@@ -806,7 +811,7 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont, Abstract
                         break;
                     }
                     player->processGameEvent(eventType, event, context);
-                    emit userEvent();
+                    emitUserEvent();
                 }
             }
         }
@@ -929,7 +934,7 @@ void TabGame::eventSpectatorLeave(const Event_Leave & /*event*/, int eventPlayer
     playerListWidget->removePlayer(eventPlayerId);
     spectators.remove(eventPlayerId);
     
-    emit userEvent();
+    emitUserEvent();
 }
 
 void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*eventPlayerId*/, const GameEventContext & /*context*/)
@@ -988,7 +993,7 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*e
         scene->clearViews();
     }
     gameStateKnown = true;
-    emit userEvent();
+    emitUserEvent();
 }
 
 void TabGame::eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &event, int eventPlayerId, const GameEventContext &context)
@@ -1056,7 +1061,7 @@ void TabGame::eventJoin(const Event_Join &event, int /*eventPlayerId*/, const Ga
         messageLog->logJoin(newPlayer);
     }
     playerListWidget->addPlayer(playerInfo);
-    emit userEvent();
+    emitUserEvent();
 }
 
 void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
@@ -1077,7 +1082,7 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
     while (playerIterator.hasNext())
         playerIterator.next().value()->updateZones();
     
-    emit userEvent();
+    emitUserEvent();
 }
 
 void TabGame::eventKicked(const Event_Kicked & /*event*/, int /*eventPlayerId*/, const GameEventContext & /*context*/)
@@ -1092,7 +1097,7 @@ void TabGame::eventKicked(const Event_Kicked & /*event*/, int /*eventPlayerId*/,
     msgBox.setIcon(QMessageBox::Information);
     msgBox.exec();
 
-    emit userEvent();
+    emitUserEvent();
 }
 
 void TabGame::eventGameHostChanged(const Event_GameHostChanged & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
@@ -1104,7 +1109,7 @@ void TabGame::eventGameClosed(const Event_GameClosed & /*event*/, int /*eventPla
 {
     closeGame();
     messageLog->logGameClosed();
-    emit userEvent();
+    emitUserEvent();
 }
 
 Player *TabGame::setActivePlayer(int id)
@@ -1128,7 +1133,7 @@ Player *TabGame::setActivePlayer(int id)
         }
     }
     currentPhase = -1;
-    emit userEvent();
+    emitUserEvent();
     return player;
 }
 
@@ -1138,7 +1143,7 @@ void TabGame::eventSetActivePlayer(const Event_SetActivePlayer &event, int /*eve
     if (!player)
         return;
     messageLog->logSetActivePlayer(player);
-    emit userEvent();
+    emitUserEvent();
 }
 
 void TabGame::setActivePhase(int phase)
@@ -1155,7 +1160,7 @@ void TabGame::eventSetActivePhase(const Event_SetActivePhase &event, int /*event
     if (currentPhase != phase)
         messageLog->logSetActivePhase(phase);
     setActivePhase(phase);
-    emit userEvent();
+    emitUserEvent();
 }
 
 void TabGame::newCardAdded(AbstractCardItem *card)

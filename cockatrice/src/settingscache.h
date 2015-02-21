@@ -48,6 +48,7 @@ private:
     bool picDownload;
     bool picDownloadHq;
     bool notificationsEnabled;
+    bool spectatorNotificationsEnabled;
     bool doubleClickToPlay;
     bool playToStack;
     int cardInfoMinimized;
@@ -91,6 +92,8 @@ public:
     bool getPicDownload() const { return picDownload; }
     bool getPicDownloadHq() const { return picDownloadHq; }
     bool getNotificationsEnabled() const { return notificationsEnabled; }
+    bool getSpectatorNotificationsEnabled() const { return spectatorNotificationsEnabled; }
+
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
     int  getCardInfoMinimized() const { return cardInfoMinimized; }
@@ -139,6 +142,7 @@ public slots:
     void setPicDownload(int _picDownload);
     void setPicDownloadHq(int _picDownloadHq);
     void setNotificationsEnabled(int _notificationsEnabled);
+    void setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled);
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);
     void setCardInfoMinimized(int _cardInfoMinimized);

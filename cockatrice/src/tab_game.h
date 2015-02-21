@@ -164,6 +164,7 @@ private:
     void setActivePhase(int phase);
     void eventSetActivePhase(const Event_SetActivePhase &event, int eventPlayerId, const GameEventContext &context);
     void eventPing(const Event_Ping &event, int eventPlayerId, const GameEventContext &context);
+    void emitUserEvent();
 signals:
     void gameClosing(TabGame *tab);
     void playerAdded(Player *player);
