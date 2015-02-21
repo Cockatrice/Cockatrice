@@ -35,6 +35,7 @@ SettingsCache::SettingsCache()
 
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
+    spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
     playToStack = settings->value("interface/playtostack", false).toBool();
     cardInfoMinimized = settings->value("interface/cardinfominimized", 0).toInt();
@@ -181,6 +182,11 @@ void SettingsCache::setNotificationsEnabled(int _notificationsEnabled)
 {
     notificationsEnabled = _notificationsEnabled;
     settings->setValue("interface/notificationsenabled", notificationsEnabled);
+}
+
+void SettingsCache::setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled) {
+    spectatorNotificationsEnabled = _spectatorNotificationsEnabled;
+    settings->setValue("interface/specnotificationsenabled", spectatorNotificationsEnabled);
 }
 
 void SettingsCache::setDoubleClickToPlay(int _doubleClickToPlay)

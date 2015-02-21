@@ -446,6 +446,11 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     notificationsEnabledCheckBox.setChecked(settingsCache->getNotificationsEnabled());
     connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotificationsEnabled(int)));
+    connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setSpecNotificationEnabled(int)));
+
+    specNotificationsEnabledCheckBox.setChecked(settingsCache->getSpectatorNotificationsEnabled());
+    specNotificationsEnabledCheckBox.setEnabled(settingsCache->getNotificationsEnabled());
+    connect(&specNotificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setSpectatorNotificationsEnabled(int)));
 
     doubleClickToPlayCheckBox.setChecked(settingsCache->getDoubleClickToPlay());
     connect(&doubleClickToPlayCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDoubleClickToPlay(int)));
@@ -455,8 +460,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     
     QGridLayout *generalGrid = new QGridLayout;
     generalGrid->addWidget(&notificationsEnabledCheckBox, 0, 0);
-    generalGrid->addWidget(&doubleClickToPlayCheckBox, 1, 0);
-    generalGrid->addWidget(&playToStackCheckBox, 2, 0);
+    generalGrid->addWidget(&specNotificationsEnabledCheckBox, 1, 0);
+    generalGrid->addWidget(&doubleClickToPlayCheckBox, 2, 0);
+    generalGrid->addWidget(&playToStackCheckBox, 3, 0);
     
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -500,10 +506,15 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     setLayout(mainLayout);
 }
 
+void UserInterfaceSettingsPage::setSpecNotificationEnabled(int i) {
+    specNotificationsEnabledCheckBox.setEnabled(i != 0);
+}
+
 void UserInterfaceSettingsPage::retranslateUi()
 {
     generalGroupBox->setTitle(tr("General interface settings"));
     notificationsEnabledCheckBox.setText(tr("Enable notifications in taskbar"));
+    specNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar for game events while you are spectating"));
     doubleClickToPlayCheckBox.setText(tr("&Double-click cards to play them (instead of single-click)"));
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
     animationGroupBox->setTitle(tr("Animation settings"));
