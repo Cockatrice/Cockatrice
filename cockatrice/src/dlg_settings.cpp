@@ -449,6 +449,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setSpecNotificationEnabled(int)));
 
     specNotificationsEnabledCheckBox.setChecked(settingsCache->getSpectatorNotificationsEnabled());
+    specNotificationsEnabledCheckBox.setEnabled(settingsCache->getNotificationsEnabled());
     connect(&specNotificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setSpectatorNotificationsEnabled(int)));
 
     doubleClickToPlayCheckBox.setChecked(settingsCache->getDoubleClickToPlay());
