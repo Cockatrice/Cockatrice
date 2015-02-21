@@ -15,6 +15,7 @@
 #include "settingscache.h"
 #include <QDebug>
 #include <QPainter>
+#include <QMessageBox>
 
 #include "pb/room_commands.pb.h"
 #include "pb/room_event.pb.h"
@@ -128,6 +129,23 @@ void TabSupervisor::retranslateUi()
             setTabText(indexOf(tabs[i]), tabs[i]->getTabText());
             tabs[i]->retranslateUi();
         }
+}
+
+bool TabSupervisor::closeRequest()
+{
+    if (getGameCount()) {
+        if (QMessageBox::question(this, tr("Are you sure?"), tr("There are still open games. Are you sure you want to quit?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
+            return false;
+        }
+    }
+
+    foreach(TabDeckEditor *tab,  deckEditorTabs)
+    {
+        if(!tab->confirmClose())
+            return false;
+    }
+
+    return true;
 }
 
 AbstractClient *TabSupervisor::getClient() const

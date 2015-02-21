@@ -71,6 +71,7 @@ public:
     AbstractClient *getClient() const;
     const QMap<int, TabRoom *> &getRoomTabs() const { return roomTabs; }
     bool getAdminLocked() const;
+    bool closeRequest();
 signals:
     void setMenu(const QList<QMenu *> &newMenuList = QList<QMenu *>());
     void localGameEnded();

@@ -379,6 +379,7 @@ void TabDeckEditor::updateHash()
 bool TabDeckEditor::confirmClose()
 {
     if (modified) {
+        tabSupervisor->setCurrentWidget(this);
         QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("Are you sure?"),
             tr("The decklist has been modified.\nDo you want to save the changes?"),
             QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
