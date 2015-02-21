@@ -423,12 +423,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (tabSupervisor->getGameCount()) {
-        if (QMessageBox::question(this, tr("Are you sure?"), tr("There are still open games. Are you sure you want to quit?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
-            event->ignore();
-            return;
-        }
+    if (!tabSupervisor->closeRequest())
+    {
+        event->ignore();
+        return;
     }
+
     event->accept();
     settingsCache->setMainWindowGeometry(saveGeometry());
     tabSupervisor->deleteLater();
