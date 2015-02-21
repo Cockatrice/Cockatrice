@@ -115,10 +115,12 @@ class UserInterfaceSettingsPage : public AbstractSettingsPage {
 private slots:
     void soundPathClearButtonClicked();
     void soundPathButtonClicked();
+    void setSpecNotificationEnabled(int);
 signals:
     void soundPathChanged();
 private:
     QCheckBox notificationsEnabledCheckBox;
+    QCheckBox specNotificationsEnabledCheckBox;
     QCheckBox doubleClickToPlayCheckBox;
     QCheckBox playToStackCheckBox;
     QCheckBox tapAnimationCheckBox;
