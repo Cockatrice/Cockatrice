@@ -1581,18 +1581,19 @@ void Player::playCard(CardItem *c, bool faceDown, bool tapped)
     cardToMove->set_card_id(c->getId());
     
     CardInfo *ci = c->getInfo();
-    if ((!settingsCache->getPlayToStack() && ci->getTableRow() == 3) ||
+    if (!faceDown && ((!settingsCache->getPlayToStack() && ci->getTableRow() == 3) ||
         ((settingsCache->getPlayToStack() && ci->getTableRow() != 0) &&
-        c->getZone()->getName().toStdString() != "stack")) {
+        c->getZone()->getName().toStdString() != "stack"))) {
         cmd.set_target_zone("stack");
         cmd.set_x(0);
         cmd.set_y(0);
     } else {
-        QPoint gridPoint = QPoint(-1, 2 - ci->getTableRow());
+        int tableRow = faceDown ? 2 : ci->getTableRow();
+        QPoint gridPoint = QPoint(-1, 2 - tableRow);
         cardToMove->set_face_down(faceDown);
         cardToMove->set_pt(ci->getPowTough().toStdString());
         cardToMove->set_tapped(tapped);
-        if(ci->getTableRow() != 3)
+        if (tableRow != 3)
             cmd.set_target_zone("table");
         cmd.set_x(gridPoint.x());
         cmd.set_y(gridPoint.y());
@@ -2146,7 +2147,7 @@ void Player::actHide()
 
 void Player::actPlayFacedown()
 {
-    playCard(game->getActiveCard(), true, game->getActiveCard()->getInfo()->getCipt());
+    playCard(game->getActiveCard(), true, false);
 }
 
 void Player::updateCardMenu(CardItem *card)
