@@ -298,7 +298,7 @@ bool LoadSetsPage::validatePage()
 
 void LoadSetsPage::actDownloadProgressSetsFile(qint64 received, qint64 total)
 {
-    if(total > 0 && progressBar->maximum()==0)
+    if(total > 0)
     {
         progressBar->setMaximum(total);
         progressBar->setValue(received);
