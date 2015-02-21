@@ -148,9 +148,25 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
         messageFormat.setForeground(Qt::darkGreen);
     cursor.setCharFormat(messageFormat);
     
-    int from = 0, index = 0;
-    while ((index = message.indexOf('[', from)) != -1) {
-        cursor.insertText(message.left(index));
+    int from = 0, index = 0, bracket = 0, at = 0;
+    bool mentionEnabled = settingsCache->getChatMention();
+    while (((message.indexOf('[', from)) != -1) || (mentionEnabled && (message.indexOf('@', from)) != -1)) {
+        bracket = message.indexOf('[', from);
+        if (!mentionEnabled) {
+            index = bracket;
+        } else {
+            at = message.indexOf('@', from);
+            if (bracket == -1)
+                index = at;
+            else if (at == -1)
+                index = bracket;
+            else
+                index = std::min(bracket, at);
+        }
+
+
+
+        cursor.insertText(message.left(index), defaultFormat);
         message = message.mid(index);
         if (message.isEmpty())
             break;
@@ -185,27 +201,15 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                 message = message.mid(closeTagIndex + 6);
             
             appendUrlTag(cursor, url);
-        } else
-            from = 1;
-    }
-
-    if (settingsCache->getChatMention()) {
-        index = 0;
-        while((index = message.indexOf('@')) != -1) {
-            cursor.insertText(message.left(index), defaultFormat);
-            message = message.mid(index);
-            if (message.isEmpty())
-                break;
-            // you have been mentioned
+        } else if (mentionEnabled) {
             if (message.toLower().startsWith(mention)) {
+                // you have been mentioned
                 mentionFormat.setBackground(QBrush(getCustomMentionColor()));
                 mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white):QBrush(Qt::black));
                 cursor.insertText("@" + userName, mentionFormat);
                 message = message.mid(mention.size());
                 QApplication::alert(this);
-            }
-            // another user has been mentioned
-            else {
+            } else {
                 int mentionEndIndex = message.indexOf(QRegExp("\\W"), 1);// from 1 as @ is non-char
                 if (mentionEndIndex == -1)
                     mentionEndIndex = message.size(); // there is no text after the mention
@@ -217,12 +221,13 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                     UserListTWI *vlu = userList.value(correctUserName);
                     mentionFormatOtherUser.setAnchorHref("user://" + QString::number(vlu->getUserInfo().user_level()) + "_" + correctUserName);
                     cursor.insertText("@" + correctUserName, mentionFormatOtherUser);
-                } else 
+                } else
                     cursor.insertText("@" + userName, defaultFormat);
                 message = message.mid(userName.size() + 1);
             }
-            cursor.setCharFormat(defaultFormat); // reset format after each itteration
-        }
+            cursor.setCharFormat(defaultFormat); // reset format after each iteration
+        } else
+            from = 1;
     }
 
     if (!message.isEmpty())
