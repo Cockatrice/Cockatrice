@@ -156,6 +156,7 @@ private slots:
     void actSetAnnotation();
     void actPlay();
     void actHide();
+    void actPlayFacedown();
 
 private:
     TabGame *game;
@@ -173,7 +174,7 @@ private:
         *aCardMenu, *aMoveBottomCardToGrave;
     
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
-    QAction *aPlay,
+    QAction *aPlay, *aPlayFacedown,
         *aHide,
         *aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aSetAnnotation, *aFlip, *aPeek, *aClone,
         *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile;

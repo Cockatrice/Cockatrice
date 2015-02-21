@@ -22,7 +22,7 @@ SettingsCache::SettingsCache()
     cardBackPicturePath = settings->value("paths/cardbackpicture").toString();
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
-    picDownloadHq = settings->value("personal/picturedownloadhq", false).toBool();
+    picDownloadHq = settings->value("personal/picturedownloadhq", true).toBool();
     pixmapCacheSize = settings->value("personal/pixmapCacheSize", PIXMAPCACHE_SIZE_DEFAULT).toInt();
     //sanity check
     if(pixmapCacheSize < PIXMAPCACHE_SIZE_MIN || pixmapCacheSize > PIXMAPCACHE_SIZE_MAX)
@@ -35,6 +35,7 @@ SettingsCache::SettingsCache()
 
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
+    spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
     playToStack = settings->value("interface/playtostack", false).toBool();
     cardInfoMinimized = settings->value("interface/cardinfominimized", 0).toInt();
@@ -45,6 +46,8 @@ SettingsCache::SettingsCache()
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 5).toInt();
     tapAnimation = settings->value("cards/tapanimation", true).toBool();
     chatMention = settings->value("chat/mention", true).toBool();
+    chatMentionForeground = settings->value("chat/mentionforeground", true).toBool();
+    chatMentionColor = settings->value("chat/mentioncolor", "A6120D").toString();
 
     zoneViewSortByName = settings->value("zoneview/sortbyname", true).toBool();
     zoneViewSortByType = settings->value("zoneview/sortbytype", true).toBool();
@@ -57,6 +60,7 @@ SettingsCache::SettingsCache()
     priceTagSource = settings->value("deckeditor/pricetagsource", 0).toInt();
 
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
+    ignoreUnregisteredUserMessages = settings->value("chat/ignore_unregistered_messages", false).toBool();
 
     attemptAutoConnect = settings->value("server/auto_connect", 0).toBool(); 
 }
@@ -180,6 +184,11 @@ void SettingsCache::setNotificationsEnabled(int _notificationsEnabled)
     settings->setValue("interface/notificationsenabled", notificationsEnabled);
 }
 
+void SettingsCache::setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled) {
+    spectatorNotificationsEnabled = _spectatorNotificationsEnabled;
+    settings->setValue("interface/specnotificationsenabled", spectatorNotificationsEnabled);
+}
+
 void SettingsCache::setDoubleClickToPlay(int _doubleClickToPlay)
 {
     doubleClickToPlay = _doubleClickToPlay;
@@ -243,6 +252,16 @@ void SettingsCache::setChatMention(int _chatMention) {
     settings->setValue("chat/mention", chatMention);
 }
 
+void SettingsCache::setChatMentionForeground(int _chatMentionForeground) {
+    chatMentionForeground = _chatMentionForeground;
+    settings->setValue("chat/mentionforeground", chatMentionForeground);
+}
+
+void SettingsCache::setChatMentionColor(const QString &_chatMentionColor) {
+    chatMentionColor = _chatMentionColor;
+    settings->setValue("chat/mentioncolor", chatMentionColor);
+}
+
 void SettingsCache::setZoneViewSortByName(int _zoneViewSortByName)
 {
     zoneViewSortByName = _zoneViewSortByName;
@@ -291,6 +310,12 @@ void SettingsCache::setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers)
 {
     ignoreUnregisteredUsers = _ignoreUnregisteredUsers;
     settings->setValue("chat/ignore_unregistered", ignoreUnregisteredUsers);
+}
+
+void SettingsCache::setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages)
+{
+    ignoreUnregisteredUserMessages = _ignoreUnregisteredUserMessages;
+    settings->setValue("chat/ignore_unregistered_messages", ignoreUnregisteredUserMessages);
 }
 
 void SettingsCache::setMainWindowGeometry(const QByteArray &_mainWindowGeometry)

@@ -161,16 +161,33 @@ bool FilterItem::acceptType(const CardInfo *info) const
 bool FilterItem::acceptColor(const CardInfo *info) const
 {
     QStringList::const_iterator i;
-    bool status;
+    QString converted_term;
+    QString::const_iterator it;
+    int match_count;
 
-    status = false;
-    for (i = info->getColors().constBegin(); i != info->getColors().constEnd(); i++)
-        if ((*i).contains(term, Qt::CaseInsensitive)) {
-            status = true;
-            break;
-        }
+    converted_term = term;
+    converted_term.replace(QString("green"), QString("g"), Qt::CaseInsensitive);
+    converted_term.replace(QString("grn"), QString("g"), Qt::CaseInsensitive);
+    converted_term.replace(QString("blue"), QString("u"), Qt::CaseInsensitive);
+    converted_term.replace(QString("blu"), QString("u"), Qt::CaseInsensitive);
+    converted_term.replace(QString("black"), QString("b"), Qt::CaseInsensitive);
+    converted_term.replace(QString("blk"), QString("b"), Qt::CaseInsensitive);
+    converted_term.replace(QString("red"), QString("r"), Qt::CaseInsensitive);
+    converted_term.replace(QString("white"), QString("w"), Qt::CaseInsensitive);
+    converted_term.replace(QString("wht"), QString("w"), Qt::CaseInsensitive);
+    converted_term.replace(QString(" "), QString(""), Qt::CaseInsensitive);
 
-    return status;
+    /* This is a tricky part, if the filter has multiple colors in it, like UGW,
+       then we should match all of them to the card's colors */
+    match_count = 0;
+    for (it = converted_term.begin(); it != converted_term.end(); it++) {
+        for (i = info->getColors().constBegin(); i != info->getColors().constEnd(); i++)
+            if ((*i).contains((*it), Qt::CaseInsensitive)) {
+                match_count++;
+            }
+    }
+
+    return match_count == converted_term.length();
 }
 
 bool FilterItem::acceptText(const CardInfo *info) const

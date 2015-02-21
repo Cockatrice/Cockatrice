@@ -8,7 +8,7 @@
 #define PIC_URL_HQ_DEFAULT "http://mtgimage.com/multiverseid/!cardid!.jpg"
 #define PIC_URL_HQ_FALLBACK "http://mtgimage.com/set/!setcode!/!name!.jpg"
 // size should be a multiple of 64
-#define PIXMAPCACHE_SIZE_DEFAULT 256
+#define PIXMAPCACHE_SIZE_DEFAULT 2047
 #define PIXMAPCACHE_SIZE_MIN 64
 #define PIXMAPCACHE_SIZE_MAX 2047
 
@@ -36,6 +36,7 @@ signals:
     void soundPathChanged();
     void priceTagFeatureChanged(int enabled);
     void ignoreUnregisteredUsersChanged();
+    void ignoreUnregisteredUserMessagesChanged();
     void pixmapCacheSizeChanged(int newSizeInMBs);
 private:
     QSettings *settings;
@@ -47,6 +48,7 @@ private:
     bool picDownload;
     bool picDownloadHq;
     bool notificationsEnabled;
+    bool spectatorNotificationsEnabled;
     bool doubleClickToPlay;
     bool playToStack;
     int cardInfoMinimized;
@@ -57,12 +59,15 @@ private:
     int minPlayersForMultiColumnLayout;
     bool tapAnimation;
     bool chatMention;
+    QString chatMentionColor;
+    bool chatMentionForeground;
     bool zoneViewSortByName, zoneViewSortByType, zoneViewPileView;
     bool soundEnabled;
     QString soundPath;
     bool priceTagFeature;
     int priceTagSource;
     bool ignoreUnregisteredUsers;
+    bool ignoreUnregisteredUserMessages;
     QString picUrl;
     QString picUrlHq;
     QString picUrlFallback;
@@ -83,9 +88,12 @@ public:
     QString getTableBgPath() const { return tableBgPath; }
     QString getPlayerBgPath() const { return playerBgPath; }
     QString getCardBackPicturePath() const { return cardBackPicturePath; }
+    QString getChatMentionColor() const { return chatMentionColor; }
     bool getPicDownload() const { return picDownload; }
     bool getPicDownloadHq() const { return picDownloadHq; }
     bool getNotificationsEnabled() const { return notificationsEnabled; }
+    bool getSpectatorNotificationsEnabled() const { return spectatorNotificationsEnabled; }
+
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
     int  getCardInfoMinimized() const { return cardInfoMinimized; }
@@ -96,6 +104,7 @@ public:
     int getMinPlayersForMultiColumnLayout() const { return minPlayersForMultiColumnLayout; }
     bool getTapAnimation() const { return tapAnimation; }
     bool getChatMention()  const { return chatMention; }
+    bool getChatMentionForeground() const { return chatMentionForeground; }
     bool getZoneViewSortByName() const { return zoneViewSortByName; }
     bool getZoneViewSortByType() const { return zoneViewSortByType; }
     /**
@@ -108,6 +117,7 @@ public:
     bool getPriceTagFeature() const { return priceTagFeature; }
     int getPriceTagSource() const { return priceTagSource; }
     bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
+    bool getIgnoreUnregisteredUserMessages() const { return ignoreUnregisteredUserMessages; }
     QString getPicUrl() const { return picUrl; }
     QString getPicUrlHq() const { return picUrlHq; }
     QString getPicUrlFallback() const { return picUrlFallback; }
@@ -128,9 +138,11 @@ public slots:
     void setTableBgPath(const QString &_tableBgPath);
     void setPlayerBgPath(const QString &_playerBgPath);
     void setCardBackPicturePath(const QString &_cardBackPicturePath);
+    void setChatMentionColor(const QString &_chatMentionColor);
     void setPicDownload(int _picDownload);
     void setPicDownloadHq(int _picDownloadHq);
     void setNotificationsEnabled(int _notificationsEnabled);
+    void setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled);
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);
     void setCardInfoMinimized(int _cardInfoMinimized);
@@ -141,6 +153,7 @@ public slots:
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
     void setTapAnimation(int _tapAnimation);
     void setChatMention(int _chatMention);
+    void setChatMentionForeground(int _chatMentionForeground);
     void setZoneViewSortByName(int _zoneViewSortByName);
     void setZoneViewSortByType(int _zoneViewSortByType);
     void setZoneViewPileView(int _zoneViewPileView);
@@ -149,6 +162,7 @@ public slots:
     void setPriceTagFeature(int _priceTagFeature);
     void setPriceTagSource(int _priceTagSource);
     void setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers);
+    void setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages);
     void setPicUrl(const QString &_picUrl);
     void setPicUrlHq(const QString &_picUrlHq);
     void setPicUrlFallback(const QString &_picUrlFallback);

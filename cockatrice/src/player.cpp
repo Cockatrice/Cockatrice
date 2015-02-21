@@ -415,7 +415,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     connect(aPlay, SIGNAL(triggered()), this, SLOT(actPlay()));
     aHide = new QAction(this);
     connect(aHide, SIGNAL(triggered()), this, SLOT(actHide()));
-        
+    aPlayFacedown = new QAction(this);
+    connect(aPlayFacedown, SIGNAL(triggered()), this, SLOT(actPlayFacedown()));
+
     for (int i = 0; i < 3; ++i) {
         QAction *tempAddCounter = new QAction(this);
         tempAddCounter->setData(9 + i * 1000);
@@ -651,7 +653,8 @@ void Player::retranslateUi()
     
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
-    
+    aPlayFacedown->setText(tr("Play &Face Down"));
+
     aTap->setText(tr("&Tap"));
     aUntap->setText(tr("&Untap"));
     aDoesntUntap->setText(tr("Toggle &normal untapping"));
@@ -2141,6 +2144,11 @@ void Player::actHide()
     game->getActiveCard()->getZone()->removeCard(game->getActiveCard());
 }
 
+void Player::actPlayFacedown()
+{
+    playCard(game->getActiveCard(), true, game->getActiveCard()->getInfo()->getCipt());
+}
+
 void Player::updateCardMenu(CardItem *card)
 {
     QMenu *cardMenu = card->getCardMenu();
@@ -2217,6 +2225,7 @@ void Player::updateCardMenu(CardItem *card)
                 cardMenu->addMenu(moveMenu);
             } else {
                 cardMenu->addAction(aPlay);
+                cardMenu->addAction(aPlayFacedown);
                 cardMenu->addMenu(moveMenu);
             }
         } else

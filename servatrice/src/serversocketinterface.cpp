@@ -289,10 +289,9 @@ Response::ResponseCode ServerSocketInterface::cmdAddToList(const Command_AddToLi
     if (id1 == id2)
         return Response::RespContextError;
 
-    QSqlQuery query(sqlInterface->getDatabase());
-    query.prepare("insert into " + servatrice->getDbPrefix() + "_" + list + "list (id_user1, id_user2) values(:id1, :id2)");
-    query.bindValue(":id1", id1);
-    query.bindValue(":id2", id2);
+    QSqlQuery *query = sqlInterface->prepareQuery("insert into {prefix}_" + list + "list (id_user1, id_user2) values(:id1, :id2)");
+    query->bindValue(":id1", id1);
+    query->bindValue(":id2", id2);
     if (!sqlInterface->execSqlQuery(query))
         return Response::RespInternalError;
 
@@ -327,10 +326,9 @@ Response::ResponseCode ServerSocketInterface::cmdRemoveFromList(const Command_Re
     if (id2 < 0)
         return Response::RespNameNotFound;
 
-    QSqlQuery query(sqlInterface->getDatabase());
-    query.prepare("delete from " + servatrice->getDbPrefix() + "_" + list + "list where id_user1 = :id1 and id_user2 = :id2");
-    query.bindValue(":id1", id1);
-    query.bindValue(":id2", id2);
+    QSqlQuery *query = sqlInterface->prepareQuery("delete from {prefix}_" + list + "list where id_user1 = :id1 and id_user2 = :id2");
+    query->bindValue(":id1", id1);
+    query->bindValue(":id2", id2);
     if (!sqlInterface->execSqlQuery(query))
         return Response::RespInternalError;
 
@@ -349,16 +347,15 @@ int ServerSocketInterface::getDeckPathId(int basePathId, QStringList path)
     if (path[0].isEmpty())
         return 0;
 
-    QSqlQuery query(sqlInterface->getDatabase());
-    query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent and name = :name and id_user = :id_user");
-    query.bindValue(":id_parent", basePathId);
-    query.bindValue(":name", path.takeFirst());
-    query.bindValue(":id_user", userInfo->id());
+    QSqlQuery *query = sqlInterface->prepareQuery("select id from {prefix}_decklist_folders where id_parent = :id_parent and name = :name and id_user = :id_user");
+    query->bindValue(":id_parent", basePathId);
+    query->bindValue(":name", path.takeFirst());
+    query->bindValue(":id_user", userInfo->id());
     if (!sqlInterface->execSqlQuery(query))
         return -1;
-    if (!query.next())
+    if (!query->next())
         return -1;
-    int id = query.value(0).toInt();
+    int id = query->value(0).toInt();
     if (path.isEmpty())
         return id;
     else
@@ -372,35 +369,34 @@ int ServerSocketInterface::getDeckPathId(const QString &path)
 
 bool ServerSocketInterface::deckListHelper(int folderId, ServerInfo_DeckStorage_Folder *folder)
 {
-    QSqlQuery query(sqlInterface->getDatabase());
-    query.prepare("select id, name from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent and id_user = :id_user");
-    query.bindValue(":id_parent", folderId);
-    query.bindValue(":id_user", userInfo->id());
+    QSqlQuery *query = sqlInterface->prepareQuery("select id, name from {prefix}_decklist_folders where id_parent = :id_parent and id_user = :id_user");
+    query->bindValue(":id_parent", folderId);
+    query->bindValue(":id_user", userInfo->id());
     if (!sqlInterface->execSqlQuery(query))
         return false;
 
-    while (query.next()) {
+    while (query->next()) {
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
-        newItem->set_id(query.value(0).toInt());
-        newItem->set_name(query.value(1).toString().toStdString());
+        newItem->set_id(query->value(0).toInt());
+        newItem->set_name(query->value(1).toString().toStdString());
 
         if (!deckListHelper(newItem->id(), newItem->mutable_folder()))
             return false;
     }
 
-    query.prepare("select id, name, upload_time from " + servatrice->getDbPrefix() + "_decklist_files where id_folder = :id_folder and id_user = :id_user");
-    query.bindValue(":id_folder", folderId);
-    query.bindValue(":id_user", userInfo->id());
+    query = sqlInterface->prepareQuery("select id, name, upload_time from {prefix}_decklist_files where id_folder = :id_folder and id_user = :id_user");
+    query->bindValue(":id_folder", folderId);
+    query->bindValue(":id_user", userInfo->id());
     if (!sqlInterface->execSqlQuery(query))
         return false;
 
-    while (query.next()) {
+    while (query->next()) {
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
-        newItem->set_id(query.value(0).toInt());
-        newItem->set_name(query.value(1).toString().toStdString());
+        newItem->set_id(query->value(0).toInt());
+        newItem->set_name(query->value(1).toString().toStdString());
 
         ServerInfo_DeckStorage_File *newFile = newItem->mutable_file();
-        newFile->set_creation_time(query.value(2).toDateTime().toTime_t());
+        newFile->set_creation_time(query->value(2).toDateTime().toTime_t());
     }
 
     return true;
@@ -437,11 +433,10 @@ Response::ResponseCode ServerSocketInterface::cmdDeckNewDir(const Command_DeckNe
     if (folderId == -1)
         return Response::RespNameNotFound;
 
-    QSqlQuery query(sqlInterface->getDatabase());
-    query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_folders (id_parent, id_user, name) values(:id_parent, :id_user, :name)");
-    query.bindValue(":id_parent", folderId);
-    query.bindValue(":id_user", userInfo->id());
-    query.bindValue(":name", QString::fromStdString(cmd.dir_name()));
+    QSqlQuery *query = sqlInterface->prepareQuery("insert into {prefix}_decklist_folders (id_parent, id_user, name) values(:id_parent, :id_user, :name)");
+    query->bindValue(":id_parent", folderId);
+    query->bindValue(":id_user", userInfo->id());
+    query->bindValue(":name", QString::fromStdString(cmd.dir_name()));
     if (!sqlInterface->execSqlQuery(query))
         return Response::RespContextError;
     return Response::RespOk;
@@ -450,20 +445,18 @@ Response::ResponseCode ServerSocketInterface::cmdDeckNewDir(const Command_DeckNe
 void ServerSocketInterface::deckDelDirHelper(int basePathId)
 {
     sqlInterface->checkSql();
-    QSqlQuery query(sqlInterface->getDatabase());
-
-    query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_folders where id_parent = :id_parent");
-    query.bindValue(":id_parent", basePathId);
+    QSqlQuery *query = sqlInterface->prepareQuery("select id from {prefix}_decklist_folders where id_parent = :id_parent");
+    query->bindValue(":id_parent", basePathId);
     sqlInterface->execSqlQuery(query);
-    while (query.next())
-        deckDelDirHelper(query.value(0).toInt());
+    while (query->next())
+        deckDelDirHelper(query->value(0).toInt());
 
-    query.prepare("delete from " + servatrice->getDbPrefix() + "_decklist_files where id_folder = :id_folder");
-    query.bindValue(":id_folder", basePathId);
+    query = sqlInterface->prepareQuery("delete from {prefix}_decklist_files where id_folder = :id_folder");
+    query->bindValue(":id_folder", basePathId);
     sqlInterface->execSqlQuery(query);
 
-    query.prepare("delete from " + servatrice->getDbPrefix() + "_decklist_folders where id = :id");
-    query.bindValue(":id", basePathId);
+    query = sqlInterface->prepareQuery("delete from {prefix}_decklist_folders where id = :id");
+    query->bindValue(":id", basePathId);
     sqlInterface->execSqlQuery(query);
 }
 
@@ -487,17 +480,15 @@ Response::ResponseCode ServerSocketInterface::cmdDeckDel(const Command_DeckDel &
         return Response::RespFunctionNotAllowed;
 
     sqlInterface->checkSql();
-    QSqlQuery query(sqlInterface->getDatabase());
-
-    query.prepare("select id from " + servatrice->getDbPrefix() + "_decklist_files where id = :id and id_user = :id_user");
-    query.bindValue(":id", cmd.deck_id());
-    query.bindValue(":id_user", userInfo->id());
+    QSqlQuery *query = sqlInterface->prepareQuery("select id from {prefix}_decklist_files where id = :id and id_user = :id_user");
+    query->bindValue(":id", cmd.deck_id());
+    query->bindValue(":id_user", userInfo->id());
     sqlInterface->execSqlQuery(query);
-    if (!query.next())
+    if (!query->next())
         return Response::RespNameNotFound;
 
-    query.prepare("delete from " + servatrice->getDbPrefix() + "_decklist_files where id = :id");
-    query.bindValue(":id", cmd.deck_id());
+    query = sqlInterface->prepareQuery("delete from {prefix}_decklist_files where id = :id");
+    query->bindValue(":id", cmd.deck_id());
     sqlInterface->execSqlQuery(query);
 
     return Response::RespOk;
@@ -525,30 +516,28 @@ Response::ResponseCode ServerSocketInterface::cmdDeckUpload(const Command_DeckUp
         if (folderId == -1)
             return Response::RespNameNotFound;
 
-        QSqlQuery query(sqlInterface->getDatabase());
-        query.prepare("insert into " + servatrice->getDbPrefix() + "_decklist_files (id_folder, id_user, name, upload_time, content) values(:id_folder, :id_user, :name, NOW(), :content)");
-        query.bindValue(":id_folder", folderId);
-        query.bindValue(":id_user", userInfo->id());
-        query.bindValue(":name", deckName);
-        query.bindValue(":content", deckStr);
+        QSqlQuery *query = sqlInterface->prepareQuery("insert into {prefix}_decklist_files (id_folder, id_user, name, upload_time, content) values(:id_folder, :id_user, :name, NOW(), :content)");
+        query->bindValue(":id_folder", folderId);
+        query->bindValue(":id_user", userInfo->id());
+        query->bindValue(":name", deckName);
+        query->bindValue(":content", deckStr);
         sqlInterface->execSqlQuery(query);
 
         Response_DeckUpload *re = new Response_DeckUpload;
         ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
-        fileInfo->set_id(query.lastInsertId().toInt());
+        fileInfo->set_id(query->lastInsertId().toInt());
         fileInfo->set_name(deckName.toStdString());
         fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toTime_t());
         rc.setResponseExtension(re);
     } else if (cmd.has_deck_id()) {
-        QSqlQuery query(sqlInterface->getDatabase());
-        query.prepare("update " + servatrice->getDbPrefix() + "_decklist_files set name=:name, upload_time=NOW(), content=:content where id = :id_deck and id_user = :id_user");
-        query.bindValue(":id_deck", cmd.deck_id());
-        query.bindValue(":id_user", userInfo->id());
-        query.bindValue(":name", deckName);
-        query.bindValue(":content", deckStr);
+        QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_decklist_files set name=:name, upload_time=NOW(), content=:content where id = :id_deck and id_user = :id_user");
+        query->bindValue(":id_deck", cmd.deck_id());
+        query->bindValue(":id_user", userInfo->id());
+        query->bindValue(":name", deckName);
+        query->bindValue(":content", deckStr);
         sqlInterface->execSqlQuery(query);
 
-        if (query.numRowsAffected() == 0)
+        if (query->numRowsAffected() == 0)
             return Response::RespNameNotFound;
 
         Response_DeckUpload *re = new Response_DeckUpload;
@@ -590,42 +579,39 @@ Response::ResponseCode ServerSocketInterface::cmdReplayList(const Command_Replay
 
     Response_ReplayList *re = new Response_ReplayList;
 
-    QSqlQuery query1(sqlInterface->getDatabase());
-    query1.prepare("select a.id_game, a.replay_name, b.room_name, b.time_started, b.time_finished, b.descr, a.do_not_hide from cockatrice_replays_access a left join cockatrice_games b on b.id = a.id_game where a.id_player = :id_player and (a.do_not_hide = 1 or date_add(b.time_started, interval 7 day) > now())");
-    query1.bindValue(":id_player", userInfo->id());
+    QSqlQuery *query1 = sqlInterface->prepareQuery("select a.id_game, a.replay_name, b.room_name, b.time_started, b.time_finished, b.descr, a.do_not_hide from {prefix}_replays_access a left join {prefix}_games b on b.id = a.id_game where a.id_player = :id_player and (a.do_not_hide = 1 or date_add(b.time_started, interval 7 day) > now())");
+    query1->bindValue(":id_player", userInfo->id());
     sqlInterface->execSqlQuery(query1);
-    while (query1.next()) {
+    while (query1->next()) {
         ServerInfo_ReplayMatch *matchInfo = re->add_match_list();
 
-        const int gameId = query1.value(0).toInt();
+        const int gameId = query1->value(0).toInt();
         matchInfo->set_game_id(gameId);
-        matchInfo->set_room_name(query1.value(2).toString().toStdString());
-        const int timeStarted = query1.value(3).toDateTime().toTime_t();
-        const int timeFinished = query1.value(4).toDateTime().toTime_t();
+        matchInfo->set_room_name(query1->value(2).toString().toStdString());
+        const int timeStarted = query1->value(3).toDateTime().toTime_t();
+        const int timeFinished = query1->value(4).toDateTime().toTime_t();
         matchInfo->set_time_started(timeStarted);
         matchInfo->set_length(timeFinished - timeStarted);
-        matchInfo->set_game_name(query1.value(5).toString().toStdString());
-        const QString replayName = query1.value(1).toString();
-        matchInfo->set_do_not_hide(query1.value(6).toBool());
+        matchInfo->set_game_name(query1->value(5).toString().toStdString());
+        const QString replayName = query1->value(1).toString();
+        matchInfo->set_do_not_hide(query1->value(6).toBool());
 
         {
-            QSqlQuery query2(sqlInterface->getDatabase());
-            query2.prepare("select player_name from cockatrice_games_players where id_game = :id_game");
-            query2.bindValue(":id_game", gameId);
+            QSqlQuery *query2 = sqlInterface->prepareQuery("select player_name from {prefix}_games_players where id_game = :id_game");
+            query2->bindValue(":id_game", gameId);
             sqlInterface->execSqlQuery(query2);
-            while (query2.next())
-                matchInfo->add_player_names(query2.value(0).toString().toStdString());
+            while (query2->next())
+                matchInfo->add_player_names(query2->value(0).toString().toStdString());
         }
         {
-            QSqlQuery query3(sqlInterface->getDatabase());
-            query3.prepare("select id, duration from " + servatrice->getDbPrefix() + "_replays where id_game = :id_game");
-            query3.bindValue(":id_game", gameId);
+            QSqlQuery *query3 = sqlInterface->prepareQuery("select id, duration from {prefix}_replays where id_game = :id_game");
+            query3->bindValue(":id_game", gameId);
             sqlInterface->execSqlQuery(query3);
-            while (query3.next()) {
+            while (query3->next()) {
                 ServerInfo_Replay *replayInfo = matchInfo->add_replay_list();
-                replayInfo->set_replay_id(query3.value(0).toInt());
+                replayInfo->set_replay_id(query3->value(0).toInt());
                 replayInfo->set_replay_name(replayName.toStdString());
-                replayInfo->set_duration(query3.value(1).toInt());
+                replayInfo->set_duration(query3->value(1).toInt());
             }
         }
     }
@@ -640,25 +626,23 @@ Response::ResponseCode ServerSocketInterface::cmdReplayDownload(const Command_Re
         return Response::RespFunctionNotAllowed;
 
     {
-        QSqlQuery query(sqlInterface->getDatabase());
-        query.prepare("select 1 from " + servatrice->getDbPrefix() + "_replays_access a left join " + servatrice->getDbPrefix() + "_replays b on a.id_game = b.id_game where b.id = :id_replay and a.id_player = :id_player");
-        query.bindValue(":id_replay", cmd.replay_id());
-        query.bindValue(":id_player", userInfo->id());
+        QSqlQuery *query = sqlInterface->prepareQuery("select 1 from {prefix}_replays_access a left join {prefix}_replays b on a.id_game = b.id_game where b.id = :id_replay and a.id_player = :id_player");
+        query->bindValue(":id_replay", cmd.replay_id());
+        query->bindValue(":id_player", userInfo->id());
         if (!sqlInterface->execSqlQuery(query))
             return Response::RespInternalError;
-        if (!query.next())
+        if (!query->next())
             return Response::RespAccessDenied;
     }
 
-    QSqlQuery query(sqlInterface->getDatabase());
-    query.prepare("select replay from " + servatrice->getDbPrefix() + "_replays where id = :id_replay");
-    query.bindValue(":id_replay", cmd.replay_id());
+    QSqlQuery *query = sqlInterface->prepareQuery("select replay from {prefix}_replays where id = :id_replay");
+    query->bindValue(":id_replay", cmd.replay_id());
     if (!sqlInterface->execSqlQuery(query))
         return Response::RespInternalError;
-    if (!query.next())
+    if (!query->next())
         return Response::RespNameNotFound;
 
-    QByteArray data = query.value(0).toByteArray();
+    QByteArray data = query->value(0).toByteArray();
 
     Response_ReplayDownload *re = new Response_ReplayDownload;
     re->set_replay_data(data.data(), data.size());
@@ -675,15 +659,14 @@ Response::ResponseCode ServerSocketInterface::cmdReplayModifyMatch(const Command
     if (!sqlInterface->checkSql())
         return Response::RespInternalError;
 
-    QSqlQuery query(sqlInterface->getDatabase());
-    query.prepare("update " + servatrice->getDbPrefix() + "_replays_access set do_not_hide=:do_not_hide where id_player = :id_player and id_game = :id_game");
-    query.bindValue(":id_player", userInfo->id());
-    query.bindValue(":id_game", cmd.game_id());
-    query.bindValue(":do_not_hide", cmd.do_not_hide());
+    QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_replays_access set do_not_hide=:do_not_hide where id_player = :id_player and id_game = :id_game");
+    query->bindValue(":id_player", userInfo->id());
+    query->bindValue(":id_game", cmd.game_id());
+    query->bindValue(":do_not_hide", cmd.do_not_hide());
 
     if (!sqlInterface->execSqlQuery(query))
         return Response::RespInternalError;
-    return query.numRowsAffected() > 0 ? Response::RespOk : Response::RespNameNotFound;
+    return query->numRowsAffected() > 0 ? Response::RespOk : Response::RespNameNotFound;
 }
 
 Response::ResponseCode ServerSocketInterface::cmdReplayDeleteMatch(const Command_ReplayDeleteMatch &cmd, ResponseContainer & /*rc*/)
@@ -694,14 +677,13 @@ Response::ResponseCode ServerSocketInterface::cmdReplayDeleteMatch(const Command
     if (!sqlInterface->checkSql())
         return Response::RespInternalError;
 
-    QSqlQuery query(sqlInterface->getDatabase());
-    query.prepare("delete from " + servatrice->getDbPrefix() + "_replays_access where id_player = :id_player and id_game = :id_game");
-    query.bindValue(":id_player", userInfo->id());
-    query.bindValue(":id_game", cmd.game_id());
+    QSqlQuery *query = sqlInterface->prepareQuery("delete from {prefix}_replays_access where id_player = :id_player and id_game = :id_game");
+    query->bindValue(":id_player", userInfo->id());
+    query->bindValue(":id_game", cmd.game_id());
 
     if (!sqlInterface->execSqlQuery(query))
         return Response::RespInternalError;
-    return query.numRowsAffected() > 0 ? Response::RespOk : Response::RespNameNotFound;
+    return query->numRowsAffected() > 0 ? Response::RespOk : Response::RespNameNotFound;
 }
 
 
@@ -720,14 +702,13 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
     if (trustedSources.contains(address,Qt::CaseInsensitive))
         address = "";
 
-    QSqlQuery query(sqlInterface->getDatabase());
-    query.prepare("insert into " + servatrice->getDbPrefix() + "_bans (user_name, ip_address, id_admin, time_from, minutes, reason, visible_reason) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason, :visible_reason)");
-    query.bindValue(":user_name", userName);
-    query.bindValue(":ip_address", address);
-    query.bindValue(":id_admin", userInfo->id());
-    query.bindValue(":minutes", minutes);
-    query.bindValue(":reason", QString::fromStdString(cmd.reason()));
-    query.bindValue(":visible_reason", QString::fromStdString(cmd.visible_reason()));
+    QSqlQuery *query = sqlInterface->prepareQuery("insert into {prefix}_bans (user_name, ip_address, id_admin, time_from, minutes, reason, visible_reason) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason, :visible_reason)");
+    query->bindValue(":user_name", userName);
+    query->bindValue(":ip_address", address);
+    query->bindValue(":id_admin", userInfo->id());
+    query->bindValue(":minutes", minutes);
+    query->bindValue(":reason", QString::fromStdString(cmd.reason()));
+    query->bindValue(":visible_reason", QString::fromStdString(cmd.visible_reason()));
     sqlInterface->execSqlQuery(query);
 
     servatrice->clientsLock.lockForRead();

@@ -31,12 +31,14 @@
     <file>resources/icon_view.svg</file>
     <file>resources/hr.jpg</file>
     <file alias="resources/appicon.svg">resources/cockatrice.svg</file>
+    
     <file>resources/add_to_sideboard.svg</file>
     <file>resources/decrement.svg</file>
     <file>resources/increment.svg</file>
     <file>resources/remove_row.svg</file>
     <file>resources/arrow_left_green.svg</file>
     <file>resources/arrow_right_green.svg</file>
+    
     <file>resources/icon_ready_start.svg</file>
     <file>resources/icon_not_ready_start.svg</file>
     <file>resources/icon_conceded.svg</file>
@@ -321,8 +323,11 @@
 
     <file>resources/userlevels/normal.svg</file>
     <file>resources/userlevels/registered.svg</file>
+    <file>resources/userlevels/registered_buddy.svg</file>
     <file>resources/userlevels/moderator.svg</file>
+    <file>resources/userlevels/moderator_buddy.svg</file>
     <file>resources/userlevels/admin.svg</file>
+    <file>resources/userlevels/admin_buddy.svg</file>
 
     <file>resources/news/exclamation_mark.svg</file>
     <file>resources/news/question_mark.svg</file>

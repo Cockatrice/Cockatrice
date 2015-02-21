@@ -144,7 +144,7 @@ void MessageLogWidget::logLeaveSpectator(QString name)
 
 void MessageLogWidget::logDeckSelect(Player *player, QString deckHash, int sideboardSize)
 {
-    const char* gender = genderOf(player);
+    ServerInfo_User::Gender gender = genderOf(player);
     if (sideboardSize < 0)
         switch(gender) {
             case ServerInfo_User::GenderUnknown:

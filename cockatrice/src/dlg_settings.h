@@ -115,10 +115,12 @@ class UserInterfaceSettingsPage : public AbstractSettingsPage {
 private slots:
     void soundPathClearButtonClicked();
     void soundPathButtonClicked();
+    void setSpecNotificationEnabled(int);
 signals:
     void soundPathChanged();
 private:
     QCheckBox notificationsEnabledCheckBox;
+    QCheckBox specNotificationsEnabledCheckBox;
     QCheckBox doubleClickToPlayCheckBox;
     QCheckBox playToStackCheckBox;
     QCheckBox tapAnimationCheckBox;
@@ -156,16 +158,23 @@ public:
 private slots:
     void actAdd();
     void actRemove();
+    void updateColor(const QString &value);
+    void updateTextColor(int value);
 private:
     QListWidget *messageList;
     QAction *aAdd;
     QAction *aRemove;
     QCheckBox chatMentionCheckBox;
+    QCheckBox invertMentionForeground;
     QCheckBox ignoreUnregUsersMainChat;
+    QCheckBox ignoreUnregUserMessages;
     QGroupBox *chatGroupBox;
     QGroupBox *messageShortcuts;
+    QLineEdit *mentionColor;
+    QLabel hexLabel;
 
     void storeSettings();
+    void updateMentionPreview();
 };
 
 class DlgSettings : public QDialog {

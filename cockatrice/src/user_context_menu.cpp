@@ -31,7 +31,7 @@ UserContextMenu::UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *p
     aRemoveFromIgnoreList = new QAction(QString(), this);
     aKick = new QAction(QString(), this);
     aBan = new QAction(QString(), this);
-    
+
     retranslateUi();
 }
 
@@ -52,7 +52,7 @@ void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandCon
 {
     const Response_GetGamesOfUser &response = resp.GetExtension(Response_GetGamesOfUser::ext);
     const Command_GetGamesOfUser &cmd = commandContainer.session_command(0).GetExtension(Command_GetGamesOfUser::ext);
-    
+
     QMap<int, GameTypeMap> gameTypeMap;
     QMap<int, QString> roomMap;
     const int roomListSize = response.room_list_size();
@@ -67,12 +67,12 @@ void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandCon
         }
         gameTypeMap.insert(roomInfo.room_id(), tempMap);
     }
-    
-    GameSelector *selector = new GameSelector(client, tabSupervisor, 0, roomMap, gameTypeMap);
+
+    GameSelector *selector = new GameSelector(client, tabSupervisor, 0, roomMap, gameTypeMap, false, false);
     const int gameListSize = response.game_list_size();
     for (int i = 0; i < gameListSize; ++i)
         selector->processGameInfo(response.game_list(i));
-    
+
     selector->setWindowTitle(tr("%1's games").arg(QString::fromStdString(cmd.user_name())));
     selector->setAttribute(Qt::WA_DeleteOnClose);
     selector->show();
@@ -81,7 +81,7 @@ void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandCon
 void UserContextMenu::banUser_processUserInfoResponse(const Response &r)
 {
     const Response_GetUserInfo &response = r.GetExtension(Response_GetUserInfo::ext);
-    
+
     // The dialog needs to be non-modal in order to not block the event queue of the client.
     BanDialog *dlg = new BanDialog(response.user_info(), static_cast<QWidget *>(parent()));
     connect(dlg, SIGNAL(accepted()), this, SLOT(banUser_dialogFinished()));
@@ -91,21 +91,21 @@ void UserContextMenu::banUser_processUserInfoResponse(const Response &r)
 void UserContextMenu::banUser_dialogFinished()
 {
     BanDialog *dlg = static_cast<BanDialog *>(sender());
-    
+
     Command_BanFromServer cmd;
     cmd.set_user_name(dlg->getBanName().toStdString());
     cmd.set_address(dlg->getBanIP().toStdString());
     cmd.set_minutes(dlg->getMinutes());
     cmd.set_reason(dlg->getReason().toStdString());
     cmd.set_visible_reason(dlg->getVisibleReason().toStdString());
-    
+
     client->sendCommand(client->prepareModeratorCommand(cmd));
 }
 
 void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName, UserLevelFlags userLevel, bool online, int playerId)
 {
     aUserName->setText(userName);
-    
+
     QMenu *menu = new QMenu(static_cast<QWidget *>(parent()));
     menu->addAction(aUserName);
     menu->addSeparator();
@@ -141,7 +141,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
     aRemoveFromIgnoreList->setEnabled(anotherUser);
     aKick->setEnabled(anotherUser);
     aBan->setEnabled(anotherUser);
-    
+
     QAction *actionClicked = menu->exec(pos);
     if (actionClicked == aDetails) {
         UserInfoBox *infoWidget = new UserInfoBox(client, true, static_cast<QWidget *>(parent()), Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
@@ -152,34 +152,34 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
     else if (actionClicked == aShowGames) {
         Command_GetGamesOfUser cmd;
         cmd.set_user_name(userName.toStdString());
-        
+
         PendingCommand *pend = client->prepareSessionCommand(cmd);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(gamesOfUserReceived(Response, CommandContainer)));
-        
+
         client->sendCommand(pend);
     } else if (actionClicked == aAddToBuddyList) {
         Command_AddToList cmd;
         cmd.set_list("buddy");
         cmd.set_user_name(userName.toStdString());
-        
+
         client->sendCommand(client->prepareSessionCommand(cmd));
     } else if (actionClicked == aRemoveFromBuddyList) {
         Command_RemoveFromList cmd;
         cmd.set_list("buddy");
         cmd.set_user_name(userName.toStdString());
-        
+
         client->sendCommand(client->prepareSessionCommand(cmd));
     } else if (actionClicked == aAddToIgnoreList) {
         Command_AddToList cmd;
         cmd.set_list("ignore");
         cmd.set_user_name(userName.toStdString());
-        
+
         client->sendCommand(client->prepareSessionCommand(cmd));
     } else if (actionClicked == aRemoveFromIgnoreList) {
         Command_RemoveFromList cmd;
         cmd.set_list("ignore");
         cmd.set_user_name(userName.toStdString());
-        
+
         client->sendCommand(client->prepareSessionCommand(cmd));
     } else if (actionClicked == aKick) {
         Command_KickFromGame cmd;
@@ -188,12 +188,12 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
     } else if (actionClicked == aBan) {
         Command_GetUserInfo cmd;
         cmd.set_user_name(userName.toStdString());
-        
+
         PendingCommand *pend = client->prepareSessionCommand(cmd);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(banUser_processUserInfoResponse(Response)));
-        
+
         client->sendCommand(pend);
     }
-    
+
     delete menu;
 }

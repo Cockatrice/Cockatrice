@@ -60,16 +60,26 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     QPixmap avatarPixmap;
     const std::string bmp = user.avatar_bmp();
     if (!avatarPixmap.loadFromData((const uchar *) bmp.data(), bmp.size()))
-        avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel);
+        avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel, false);
     avatarLabel.setPixmap(avatarPixmap);
     
     nameLabel.setText(QString::fromStdString(user.name()));
     realNameLabel2.setText(QString::fromStdString(user.real_name()));
     genderLabel2.setPixmap(GenderPixmapGenerator::generatePixmap(15, user.gender()));
     QString country = QString::fromStdString(user.country());
-    countryLabel2.setPixmap(CountryPixmapGenerator::generatePixmap(15, country));
-    countryLabel3.setText(QString("(%1)").arg(country.toUpper()));
-    userLevelLabel2.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel));
+
+    if (country.length() != 0)
+    {
+        countryLabel2.setPixmap(CountryPixmapGenerator::generatePixmap(15, country));
+        countryLabel3.setText(QString("(%1)").arg(country.toUpper()));
+    }
+    else
+    {
+        countryLabel2.setText("");
+        countryLabel3.setText("");
+    }
+	
+    userLevelLabel2.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel, false));
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin))
         userLevelText = tr("Administrator");

@@ -246,7 +246,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     activeCard(0),
     gameClosed(false),
     replay(_replay),
-    currentReplayStep(0)
+    currentReplayStep(0),
+    sayEdit(0)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     
@@ -511,6 +512,11 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 void TabGame::addMentionTag(QString value) {
     sayEdit->insert(value + " ");
     sayEdit->setFocus();
+}
+
+void TabGame::emitUserEvent() {
+    bool globalEvent = !spectator || settingsCache->getSpectatorNotificationsEnabled();
+    emit userEvent(globalEvent);
 }
 
 TabGame::~TabGame()
@@ -805,7 +811,7 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont, Abstract
                         break;
                     }
                     player->processGameEvent(eventType, event, context);
-                    emit userEvent();
+                    emitUserEvent();
                 }
             }
         }
@@ -885,6 +891,8 @@ void TabGame::startGame(bool resuming)
     gameInfo.set_started(true);
     static_cast<GameScene *>(gameView->scene())->rearrange();
     gameView->show();
+    if(sayEdit && players.size() > 1)
+        sayEdit->setFocus();
 }
 
 void TabGame::stopGame()
@@ -926,7 +934,7 @@ void TabGame::eventSpectatorLeave(const Event_Leave & /*event*/, int eventPlayer
     playerListWidget->removePlayer(eventPlayerId);
     spectators.remove(eventPlayerId);
     
-    emit userEvent();
+    emitUserEvent();
 }
 
 void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*eventPlayerId*/, const GameEventContext & /*context*/)
@@ -985,7 +993,7 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*e
         scene->clearViews();
     }
     gameStateKnown = true;
-    emit userEvent();
+    emitUserEvent();
 }
 
 void TabGame::eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &event, int eventPlayerId, const GameEventContext &context)
@@ -1053,7 +1061,7 @@ void TabGame::eventJoin(const Event_Join &event, int /*eventPlayerId*/, const Ga
         messageLog->logJoin(newPlayer);
     }
     playerListWidget->addPlayer(playerInfo);
-    emit userEvent();
+    emitUserEvent();
 }
 
 void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
@@ -1074,14 +1082,22 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
     while (playerIterator.hasNext())
         playerIterator.next().value()->updateZones();
     
-    emit userEvent();
+    emitUserEvent();
 }
 
 void TabGame::eventKicked(const Event_Kicked & /*event*/, int /*eventPlayerId*/, const GameEventContext & /*context*/)
 {
     closeGame();
+    tabSupervisor->setCurrentIndex(tabSupervisor->indexOf(this));
     messageLog->logKicked();
-    emit userEvent();
+
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(getTabText());
+    msgBox.setText(tr("You have been kicked out of the game."));
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.exec();
+
+    emitUserEvent();
 }
 
 void TabGame::eventGameHostChanged(const Event_GameHostChanged & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
@@ -1093,7 +1109,7 @@ void TabGame::eventGameClosed(const Event_GameClosed & /*event*/, int /*eventPla
 {
     closeGame();
     messageLog->logGameClosed();
-    emit userEvent();
+    emitUserEvent();
 }
 
 Player *TabGame::setActivePlayer(int id)
@@ -1117,7 +1133,7 @@ Player *TabGame::setActivePlayer(int id)
         }
     }
     currentPhase = -1;
-    emit userEvent();
+    emitUserEvent();
     return player;
 }
 
@@ -1127,7 +1143,7 @@ void TabGame::eventSetActivePlayer(const Event_SetActivePlayer &event, int /*eve
     if (!player)
         return;
     messageLog->logSetActivePlayer(player);
-    emit userEvent();
+    emitUserEvent();
 }
 
 void TabGame::setActivePhase(int phase)
@@ -1144,7 +1160,7 @@ void TabGame::eventSetActivePhase(const Event_SetActivePhase &event, int /*event
     if (currentPhase != phase)
         messageLog->logSetActivePhase(phase);
     setActivePhase(phase);
-    emit userEvent();
+    emitUserEvent();
 }
 
 void TabGame::newCardAdded(AbstractCardItem *card)

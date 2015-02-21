@@ -14,8 +14,8 @@
    height="100"
    id="svg5322"
    version="1.1"
-   inkscape:version="0.48.0 r9654"
-   sodipodi:docname="normal.svg">
+   inkscape:version="0.48.5 r10040"
+   sodipodi:docname="admin.svg">
   <defs
      id="defs3">
     <inkscape:perspective
@@ -194,17 +194,6 @@
          offset="1"
          id="stop3604-6" />
     </linearGradient>
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3600-7"
-       id="radialGradient5254"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.92332021,0.38403097,-0.41592401,1.0000002,78.192026,-120.05314)"
-       cx="324.32715"
-       cy="131.40274"
-       fx="324.32715"
-       fy="131.40274"
-       r="25.501276" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient5189-1"
@@ -234,7 +223,8 @@
        y1="1021.5341"
        x2="87.549789"
        y2="1021.5341"
-       gradientUnits="userSpaceOnUse" />
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(0,-952.36218)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient5173-1"
@@ -248,11 +238,11 @@
     <linearGradient
        id="linearGradient5173-1">
       <stop
-         style="stop-color:#f50000;stop-opacity:1;"
+         style="stop-color:#ff2700;stop-opacity:1;"
          offset="0"
          id="stop5175-5" />
       <stop
-         style="stop-color:#950000;stop-opacity:1;"
+         style="stop-color:#ff2700;stop-opacity:1;"
          offset="1"
          id="stop5177-3" />
     </linearGradient>
@@ -276,14 +266,14 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8"
-     inkscape:cx="32.597594"
-     inkscape:cy="59.570011"
+     inkscape:cx="-32.045264"
+     inkscape:cy="65.284297"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1280"
-     inkscape:window-height="951"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-width="1920"
+     inkscape:window-height="1028"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata4">
@@ -293,7 +283,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -303,25 +293,9 @@
      id="layer1"
      transform="translate(0,-952.36218)">
     <path
-       inkscape:connector-curvature="0"
-       style="fill:url(#linearGradient5436);fill-opacity:1.0;stroke:black;stroke-width:2.78220295999999978;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 85.364995,1028.0149 c 5.174327,19.3109 -15.904932,22.563 -35.524668,22.563 c -19.619737,0 -40.7990906,-2.8786 -35.524678,-22.563 c 5.077959,-18.9511 15.904941,-35.52461 35.524678,-35.52461 c 19.619736,0 30.325039,16.11931 35.524668,35.52461 z"
-       id="path3597-8"
-       sodipodi:nodetypes="csssc"
-       inkscape:export-filename="/home/marcus/path3595-7.png"
-       inkscape:export-xdpi="122.56824"
-       inkscape:export-ydpi="122.56824" />
-    <path
-       sodipodi:type="arc"
-       style="fill:url(#radialGradient5254);fill-opacity:1;stroke:black;stroke-width:2.92716622;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="path3595-7"
-       sodipodi:cx="333.60287"
-       sodipodi:cy="135.90129"
-       sodipodi:rx="25.001276"
-       sodipodi:ry="25.001276"
-       d="m 358.60415,135.90129 a 25.001276,25.001276 0 1 1 -50.00255,0 a 25.001276,25.001276 0 1 1 50.00255,0 z"
-       transform="matrix(0.95047652,0,0,0.95047652,-267.24137,848.67737)"
-       inkscape:export-xdpi="122.56824"
-       inkscape:export-ydpi="122.56824" />
+       style="fill:url(#linearGradient5436);fill-opacity:1;stroke:black;stroke-width:2.78220295999999980;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="M 49.84375 1.71875 C 36.719738 1.71875 26.0625 12.375988 26.0625 25.5 C 26.0625 32.977454 29.538325 39.612734 34.9375 43.96875 C 24.439951 49.943698 17.919149 62.196126 14.3125 75.65625 C 9.0380874 95.34065 30.224013 98.21875 49.84375 98.21875 C 69.463486 98.21875 90.549327 94.96715 85.375 75.65625 C 81.693381 61.916246 75.224585 49.827177 64.8125 43.9375 C 70.181573 39.580662 73.59375 32.953205 73.59375 25.5 C 73.59375 12.375988 62.967762 1.71875 49.84375 1.71875 z "
+       transform="translate(0,952.36218)"
+       id="path3597-8" />
   </g>
 </svg>

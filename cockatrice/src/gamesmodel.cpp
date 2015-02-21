@@ -11,8 +11,8 @@
 enum GameListColumn {ROOM, CREATED, DESCRIPTION, CREATOR, GAME_TYPE, RESTRICTIONS, PLAYERS, SPECTATORS};
 
 namespace {
-    const unsigned SECS_PER_MIN  = 60;
-    const unsigned SECS_PER_HOUR = 60 * 60;
+    const int SECS_PER_MIN  = 60;
+    const int SECS_PER_HOUR = 60 * 60;
 
     /**
     * Pretty print an integer number of seconds ago. Accurate to only one unit,
@@ -26,7 +26,7 @@ namespace {
     *   91-300 minutes will return "Xhr ago"
     *   300+ minutes will return "5+ hr ago"
     */
-    QString prettyPrintSecsAgo(unsigned int secs) {
+    QString prettyPrintSecsAgo(int secs) {
         if (secs < SECS_PER_MIN) {
             return QObject::tr("<1m ago");
         }
@@ -91,7 +91,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
         case CREATED: {
             QDateTime then;
             then.setTime_t(g.start_time());
-            unsigned int secs = then.secsTo(QDateTime::currentDateTime());
+            int secs = then.secsTo(QDateTime::currentDateTime());
 
             switch (role) {
                 case Qt::DisplayRole: return prettyPrintSecsAgo(secs);
@@ -115,7 +115,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             case Qt::DisplayRole:
                 return QString::fromStdString(g.creator_info().name());
             case Qt::DecorationRole: {
-                    QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)g.creator_info().user_level());
+                    QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)g.creator_info().user_level(), false);
                     return QIcon(avatarPixmap);
                 }
             default:
@@ -172,8 +172,28 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
         case SPECTATORS: 
             switch(role) {
             case SORT_ROLE:
-            case Qt::DisplayRole: 
-                return g.spectators_allowed() ? QVariant(g.spectators_count()) : QVariant(tr("not allowed"));
+            case Qt::DisplayRole: {
+                if (g.spectators_allowed()) {
+                    QString result;
+                    result.append(QString::number(g.spectators_count()));
+
+                    if (g.spectators_can_chat() && g.spectators_omniscient())
+                    {
+                        result.append(" (").append(tr("can chat")).append(" & ").append(tr("see hands")).append(")");
+                    }
+                    else if (g.spectators_can_chat())
+                    {
+                        result.append(" (").append(tr("can chat")).append(")");
+                    }
+                    else if (g.spectators_omniscient())
+                    {
+                        result.append(" (").append(tr("can see hands")).append(")");
+                    }
+					
+                    return result;
+                }
+                return QVariant(tr("not allowed"));
+            }
             case Qt::TextAlignmentRole:
                 return Qt::AlignLeft;
             default:
@@ -232,7 +252,7 @@ GamesProxyModel::GamesProxyModel(QObject *parent, ServerInfo_User *_ownUser)
     : QSortFilterProxyModel(parent),
     ownUser(_ownUser),
     unavailableGamesVisible(false),
-    passwordProtectedGamesVisible(false),
+    passwordProtectedGamesHidden(false),
     maxPlayersFilterMin(-1),
     maxPlayersFilterMax(-1)
 {
@@ -246,9 +266,9 @@ void GamesProxyModel::setUnavailableGamesVisible(bool _unavailableGamesVisible)
     invalidateFilter();
 }
 
-void GamesProxyModel::setPasswordProtectedGamesVisible(bool _passwordProtectedGamesVisible)
+void GamesProxyModel::setPasswordProtectedGamesHidden(bool _passwordProtectedGamesHidden)
 {
-    passwordProtectedGamesVisible = _passwordProtectedGamesVisible;
+    passwordProtectedGamesHidden = _passwordProtectedGamesHidden;
     invalidateFilter();
 }
 
@@ -280,7 +300,7 @@ void GamesProxyModel::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlay
 void GamesProxyModel::resetFilterParameters()
 {
     unavailableGamesVisible = false;
-    passwordProtectedGamesVisible = false;
+    passwordProtectedGamesHidden = false;
     gameNameFilter = QString();
     creatorNameFilter = QString();
     gameTypeFilter.clear();
@@ -296,9 +316,8 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
     settings.beginGroup("filter_games");
 
     unavailableGamesVisible = settings.value("unavailable_games_visible", false).toBool();
-    passwordProtectedGamesVisible = settings.value("password_protected_games_visible", false).toBool();
+    passwordProtectedGamesHidden = settings.value("password_protected_games_hidden", false).toBool();
     gameNameFilter = settings.value("game_name_filter", "").toString();
-    creatorNameFilter = settings.value("creator_name_filter", "").toString();
     maxPlayersFilterMin = settings.value("min_players", 1).toInt();
     maxPlayersFilterMax = settings.value("max_players", DEFAULT_MAX_PLAYERS_MAX).toInt();
 
@@ -320,12 +339,11 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
 
     settings.setValue("unavailable_games_visible", unavailableGamesVisible);
     settings.setValue(
-        "password_protected_games_visible",
-        passwordProtectedGamesVisible
+        "password_protected_games_hidden",
+        passwordProtectedGamesHidden
         );
     settings.setValue("game_name_filter", gameNameFilter);
-    settings.setValue("creator_name_filter", creatorNameFilter);
-
+    
     QMapIterator<int, QString> gameTypeIterator(allGameTypes);
     while (gameTypeIterator.hasNext()) {
         gameTypeIterator.next();
@@ -356,7 +374,7 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourc
             if (game.only_registered())
                 return false;
     }
-    if (!passwordProtectedGamesVisible && game.with_password())
+    if (passwordProtectedGamesHidden && game.with_password())
         return false;
     if (!gameNameFilter.isEmpty())
         if (!QString::fromStdString(game.description()).contains(gameNameFilter, Qt::CaseInsensitive))

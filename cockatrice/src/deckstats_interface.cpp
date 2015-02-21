@@ -32,7 +32,7 @@ void DeckStatsInterface::queryFinished(QNetworkReply *reply)
     QString data(reply->readAll());
     reply->deleteLater();
     
-    QRegExp rx("id=\"deckstats_deck_url\" value=\"([^\"]+)\"");
+    QRegExp rx("<meta property=\"og:url\" content=\"([^\"]+)\"/>");
     if (!rx.indexIn(data)) {
         QMessageBox::critical(0, tr("Error"), tr("The reply from the server could not be parsed."));
         deleteLater();
@@ -53,11 +53,13 @@ void DeckStatsInterface::getAnalyzeRequestData(DeckList *deck, QByteArray *data)
 #if QT_VERSION < 0x050000
     QUrl params;
     params.addQueryItem("deck", deckWithoutTokens.writeToString_Plain());
+    params.addQueryItem("decktitle", deck->getName());
     data->append(params.encodedQuery());
 #else
     QUrl params;
     QUrlQuery urlQuery;
     urlQuery.addQueryItem("deck", deckWithoutTokens.writeToString_Plain());
+    urlQuery.addQueryItem("decktitle", deck->getName());
     params.setQuery(urlQuery);
     data->append(params.query(QUrl::EncodeReserved));
 #endif
