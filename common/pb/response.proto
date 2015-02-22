@@ -24,6 +24,12 @@ message Response {
 		RespAccessDenied = 20;
 		RespUsernameInvalid = 21;
 		RespRegistrationRequired = 22;
+		RespRegistrationAccepted = 23; // Server agrees to process client's registration request
+		RespUserAlreadyExists = 24; // Client attempted to register a name which is already registered
+		RespEmailRequiredToRegister = 25; // Server requires email to register accounts but client did not provide one
+		RespServerDoesNotUseAuth = 26; // Client attempted to register but server does not use authentication
+		RespTooManyRequests = 27; // Server refused to complete command because client has sent too many too quickly
+		RespAccountNotActivated = 28; // Client attempted to log into a registered username but the account hasn't been activated
 	}
 	enum ResponseType {
 		JOIN_ROOM = 1000;
@@ -35,6 +41,7 @@ message Response {
 		DECK_LIST = 1006;
 		DECK_DOWNLOAD = 1007;
 		DECK_UPLOAD = 1008;
+		REGISTER = 1009;
 		REPLAY_LIST = 1100;
 		REPLAY_DOWNLOAD = 1101;
 	}
