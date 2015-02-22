@@ -134,12 +134,17 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
                 SessionCommand debugSc(sc);
                 debugSc.MutableExtension(Command_Login::ext)->clear_password();
                 logDebugMessage(QString::fromStdString(debugSc.ShortDebugString()));
+            } else if (num == SessionCommand::REGISTER) {
+                SessionCommand logSc(sc);
+                logSc.MutableExtension(Command_Register::ext)->clear_password();
+                logDebugMessage(QString::fromStdString(logSc.ShortDebugString()));
             } else
                 logDebugMessage(QString::fromStdString(sc.ShortDebugString()));
         }
         switch ((SessionCommand::SessionCommandType) num) {
             case SessionCommand::PING: resp = cmdPing(sc.GetExtension(Command_Ping::ext), rc); break;
             case SessionCommand::LOGIN: resp = cmdLogin(sc.GetExtension(Command_Login::ext), rc); break;
+            case SessionCommand::REGISTER: resp = cmdRegisterAccount(sc.GetExtension(Command_Register::ext), rc); break;
             case SessionCommand::MESSAGE: resp = cmdMessage(sc.GetExtension(Command_Message::ext), rc); break;
             case SessionCommand::GET_GAMES_OF_USER: resp = cmdGetGamesOfUser(sc.GetExtension(Command_GetGamesOfUser::ext), rc); break;
             case SessionCommand::GET_USER_INFO: resp = cmdGetUserInfo(sc.GetExtension(Command_GetUserInfo::ext), rc); break;
@@ -371,6 +376,13 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     
     rc.setResponseExtension(re);
     return Response::RespOk;
+}
+
+Response::ResponseCode Server_ProtocolHandler::cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc)
+{
+    // TODO implement
+    qDebug() << "Got register command: " << QString::fromStdString(cmd.user_name());
+    return Response::RespInvalidCommand;
 }
 
 Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message &cmd, ResponseContainer &rc)
