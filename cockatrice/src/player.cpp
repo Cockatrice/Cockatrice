@@ -1592,7 +1592,7 @@ void Player::playCard(CardItem *c, bool faceDown, bool tapped)
         QPoint gridPoint = QPoint(-1, 2 - tableRow);
         cardToMove->set_face_down(faceDown);
         cardToMove->set_pt(ci->getPowTough().toStdString());
-        cardToMove->set_tapped(tapped);
+        cardToMove->set_tapped(faceDown ? false : tapped);
         if (tableRow != 3)
             cmd.set_target_zone("table");
         cmd.set_x(gridPoint.x());
