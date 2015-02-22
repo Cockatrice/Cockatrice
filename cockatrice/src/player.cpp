@@ -2159,16 +2159,15 @@ void Player::updateCardMenu(CardItem *card)
     
     bool revealedCard = false;
     bool writeableCard = getLocal();
-    if (card->getZone())
-        if (card->getZone()->getIsView()) {
-            ZoneViewZone *view = static_cast<ZoneViewZone *>(card->getZone());
-            if (view->getRevealZone()) {
-                if (view->getWriteableRevealZone())
-                    writeableCard = true;
-                else
-                    revealedCard = true;
-            }
+    if (card->getZone() && card->getZone()->getIsView()) {
+        ZoneViewZone *view = static_cast<ZoneViewZone *>(card->getZone());
+        if (view->getRevealZone()) {
+            if (view->getWriteableRevealZone())
+                writeableCard = true;
+            else
+                revealedCard = true;
         }
+    }
     
     if (revealedCard)
         cardMenu->addAction(aHide);
