@@ -439,7 +439,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
             
             card->deleteLater();
         } else {
-			card->setFaceDown(faceDown);
+            card->setFaceDown(faceDown);
             if (!targetzone->hasCoords()) {
                 y = 0;
                 card->resetState();
