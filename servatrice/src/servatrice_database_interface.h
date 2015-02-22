@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSqlDatabase>
 #include <QHash>
+#include <qchar.h>
 
 #include "server.h"
 #include "server_database_interface.h"
@@ -18,15 +19,22 @@ private:
 	QHash<QString, QSqlQuery *> preparedStatements;
 	Servatrice *server;
 	ServerInfo_User evalUserQueryResult(const QSqlQuery *query, bool complete, bool withId = false);
-	bool usernameIsValid(const QString &user);
+	/** Must be called after checkSql and server is known to be in auth mode. */
+	bool checkUserIsIpBanned(const QString &ipAddress, QString &banReason, int &banSecondsRemaining);
+	/** Must be called after checkSql and server is known to be in auth mode. */
+	bool checkUserIsNameBanned(QString const &userName, QString &banReason, int &banSecondsRemaining);
+	QChar getGenderChar(ServerInfo_User_Gender const &gender);
 protected:
+	bool usernameIsValid(const QString &user);
 	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &secondsLeft);
+	bool checkUserIsBanned(const QString &ipAddress, const QString &userName, QString &banReason, int &banSecondsRemaining);
 public slots:
 	void initDatabase(const QSqlDatabase &_sqlDatabase);
 public:
 	Servatrice_DatabaseInterface(int _instanceId, Servatrice *_server);
 	~Servatrice_DatabaseInterface();
-	void initDatabase(const QString &type, const QString &hostName, const QString &databaseName, const QString &userName, const QString &password);
+	bool initDatabase(const QString &type, const QString &hostName, const QString &databaseName,
+					  const QString &userName, const QString &password);
 	bool openDatabase();
 	bool checkSql();
 	QSqlQuery * prepareQuery(const QString &queryText);
@@ -55,6 +63,7 @@ public:
 	bool userSessionExists(const QString &userName);
 
 	bool getRequireRegistration();
+	bool registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &passwordSha512, const QString &emailAddress, const QString &country, bool active = false);
 
     void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage, LogMessage_TargetType targetType, const int targetId, const QString &targetName);
 };

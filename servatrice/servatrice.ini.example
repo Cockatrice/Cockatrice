@@ -54,6 +54,13 @@ password=123456
 ; Accept only registered users? default is 0 (accept unregistered users)
 regonly=0
 
+[registration]
+
+; Servatrice can process registration requests to add new users on the fly.
+; Enable this feature? Default false.
+;enabled=false
+; Require users to provide an email address in order to register. Default true.
+;requireemail=true
 
 [database]
 
