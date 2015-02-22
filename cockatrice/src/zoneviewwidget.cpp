@@ -185,6 +185,24 @@ void ZoneViewWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
 void ZoneViewWidget::moveWidget(QPointF scenePos)
 {
+    if(scenePos.x() < 0)
+    {
+        scenePos.setX(0);
+    } else {
+        qreal maxw = scene()->sceneRect().width() - 100;
+        if(scenePos.x() > maxw)
+            scenePos.setX(maxw);
+    }
+
+    if(scenePos.y() < 0)
+    {
+        scenePos.setY(0);
+    } else {
+        qreal maxh = scene()->sceneRect().height() - 100;
+        if(scenePos.y() > maxh)
+            scenePos.setY(maxh);
+    }
+
     setPos(scenePos);
 }
 
