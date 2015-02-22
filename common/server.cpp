@@ -175,6 +175,18 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     return authState;
 }
 
+RegistrationResult Server::registerUserAccount(QString banReason, int &banSecondsRemaining)
+{
+    // TODO
+    // Check for bans
+    // Check for too many requests
+    // Check for email required/missing
+    // Validate username
+    // Insert, check unique key failure
+    // Reply with successful info or not
+    return TooManyRequests;
+}
+
 void Server::addPersistentPlayer(const QString &userName, int roomId, int gameId, int playerId)
 {
     QWriteLocker locker(&persistentPlayersLock);
