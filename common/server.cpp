@@ -34,7 +34,6 @@
 #include <QCoreApplication>
 #include <QThread>
 #include <QDebug>
-#include <AppKit/AppKit.h>
 
 Server::Server(bool _threaded, QObject *parent)
     : QObject(parent), threaded(_threaded), nextLocalGameId(0)

@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QSettings>
 
-#include "server.h"#include "server_protocolhandler.h"#include "../../../../usr/local/Cellar/qt/4.8.6/include/QtCore/qstring.h"
+#include "server.h"
 
 class Server_DatabaseInterface : public QObject {
     Q_OBJECT
