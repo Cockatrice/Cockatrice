@@ -52,7 +52,7 @@ public:
     * @param banSecondsRemaining If the client is banned, the time left will be included in this. 0 if the ban is permanent.
     * @return RegistrationResult member indicating whether it succeeded or failed.
     */
-    RegistrationResult registerUserAccount(QString banReason, int &banSecondsRemaining);
+    RegistrationResult registerUserAccount(Server_ProtocolHandler *session, QString &banReason, int &banSecondsRemaining);
     const QMap<int, Server_Room *> &getRooms() { return rooms; }
     
     Server_AbstractUserInterface *findUser(const QString &userName) const;

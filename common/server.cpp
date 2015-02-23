@@ -34,6 +34,7 @@
 #include <QCoreApplication>
 #include <QThread>
 #include <QDebug>
+#include <AppKit/AppKit.h>
 
 Server::Server(bool _threaded, QObject *parent)
     : QObject(parent), threaded(_threaded), nextLocalGameId(0)
@@ -175,13 +176,17 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     return authState;
 }
 
-RegistrationResult Server::registerUserAccount(QString banReason, int &banSecondsRemaining)
+RegistrationResult Server::registerUserAccount(Server_ProtocolHandler *session, QString &banReason, int &banSecondsRemaining)
 {
     // TODO
+
+    Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
+    bool isBanned = databaseInterface->checkUserIsBanned(session, banReason, banSecondsRemaining);
+
+    // Validate username
     // Check for bans
     // Check for too many requests
     // Check for email required/missing
-    // Validate username
     // Insert, check unique key failure
     // Reply with successful info or not
     return TooManyRequests;

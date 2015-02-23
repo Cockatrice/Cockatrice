@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QSettings>
 
-#include "server.h"
+#include "server.h"#include "server_protocolhandler.h"#include "../../../../usr/local/Cellar/qt/4.8.6/include/QtCore/qstring.h"
 
 class Server_DatabaseInterface : public QObject {
     Q_OBJECT
@@ -13,6 +13,7 @@ public:
         : QObject(parent) { }
     
     virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &secondsLeft) = 0;
+    virtual bool checkUserIsBanned(Server_ProtocolHandler *session, QString &banReason, int &banSecondsRemaining);
     virtual bool userExists(const QString & /* user */) { return false; }
     virtual QMap<QString, ServerInfo_User> getBuddyList(const QString & /* name */) { return QMap<QString, ServerInfo_User>(); }
     virtual QMap<QString, ServerInfo_User> getIgnoreList(const QString & /* name */) { return QMap<QString, ServerInfo_User>(); }
@@ -38,6 +39,6 @@ public:
 
     enum LogMessage_TargetType { MessageTargetRoom, MessageTargetGame, MessageTargetChat, MessageTargetIslRoom };
     virtual void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage, LogMessage_TargetType targetType, const int targetId, const QString &targetName) { };
-};
+bool checkUserIsBanned(Server_ProtocolHandler *session, QString &banReason, int &banSecondsRemaining);};
 
 #endif

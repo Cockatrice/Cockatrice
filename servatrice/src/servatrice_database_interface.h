@@ -21,6 +21,7 @@ private:
 	bool usernameIsValid(const QString &user);
 protected:
 	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &secondsLeft);
+	bool checkUserIsBanned(Server_ProtocolHandler *session, QString &banReason, int &banSecondsRemaining);
 public slots:
 	void initDatabase(const QSqlDatabase &_sqlDatabase);
 public:

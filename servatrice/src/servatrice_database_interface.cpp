@@ -197,6 +197,11 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
     return UnknownUser;
 }
 
+bool Servatrice_DatabaseInterface::checkUserIsBanned(Server_ProtocolHandler *session, QString &banReason, int &banSecondsRemaining)
+{
+    return false;
+}
+
 bool Servatrice_DatabaseInterface::userExists(const QString &user)
 {
     if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
