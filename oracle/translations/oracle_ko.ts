@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="ko_KR">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="ko" version="2.1">
 <context>
     <name>ChooseSetsPage</name>
     <message>
@@ -10,7 +8,7 @@
     <message>
         <source>The following sets has been found in the source file. Please mark the sets that will be imported.
 All core and expansion sets are selected by default.</source>
-        <translation>아래 목록은 불러올 수 있는 판본의 목록입니다.
+        <translation>아래는 불러올 수 있는 판본의 목록입니다.
 코카트리스에서 사용 할 판본들을 선택해 주세요.
 모든 기본판과 확장판은 기본으로 선택되어 있습니다. </translation>
     </message>
@@ -39,7 +37,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>English</source>
-        <translation>한국어</translation>
+        <translation>한국어 (Korean)</translation>
     </message>
     <message>
         <source>Language:</source>
@@ -143,7 +141,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
-        <translation>파일을 성공적으로 다운로드 하였으나 판본 목록 정보가 없습니다.</translation>
+        <translation>파일을 성공적으로 다운로드 하였으나 판본 정보가 들어있지 않습니다.</translation>
     </message>
 </context>
 <context>
@@ -282,7 +280,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Inconsistent headers. Archive might be corrupted.</source>
-        <translation>헤더가 손상되었습니다. 압축 파일 자체의 손상도 가능합니다.</translation>
+        <translation>헤더가 손상되었습니다. 압축 파일이 손상됐을 가능성이 있습니다.</translation>
     </message>
     <message>
         <source>Unknown error.</source>

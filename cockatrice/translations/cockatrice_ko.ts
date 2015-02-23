@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="ko_KR">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="ko" version="2.1">
 <context>
     <name>AbstractCounter</name>
     <message>
@@ -206,7 +204,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="61"/>
         <source>Sets</source>
-        <translation>세트</translation>
+        <translation>판본</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="62"/>
@@ -775,23 +773,23 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="75"/>
-        <source>&amp;Spectators allowed</source>
+        <source>&amp;Spectators can watch</source>
         <translation>관전자 허용</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="78"/>
-        <source>Spectators &amp;need a password to join</source>
+        <source>Spectators &amp;need a password to watch</source>
         <translation>관전자 입장 시 비밀번호 필요</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_creategame.cpp" line="80"/>
+        <source>Spectators can see &amp;hands</source>
+        <translation>관전자에게 플레이어의 손 공개</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="79"/>
         <source>Spectators can &amp;chat</source>
         <translation>관전자 대화 가능</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_creategame.cpp" line="80"/>
-        <source>Spectators see &amp;everything</source>
-        <translation>관전자에게 손 공개</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="86"/>
@@ -1332,17 +1330,17 @@ http://github.com/Daenyth/Cockatrice/issues에 cards.xml를 첨부해서 이슈�
 <context>
     <name>GamesModel</name>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="192"/>
+        <location filename="../src/gamesmodel.cpp" line="212"/>
         <source>Game Created</source>
         <translation>게임 개설 시간</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="194"/>
+        <location filename="../src/gamesmodel.cpp" line="214"/>
         <source>Creator</source>
         <translation>방장</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="193"/>
+        <location filename="../src/gamesmodel.cpp" line="213"/>
         <source>Description</source>
         <translation>게임 이름</translation>
     </message>
@@ -1362,32 +1360,48 @@ http://github.com/Daenyth/Cockatrice/issues에 cards.xml를 첨부해서 이슈�
         <translation>가입한 사용자만</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="176"/>
+        <location filename="../src/gamesmodel.cpp" line="182"/>
+        <location filename="../src/gamesmodel.cpp" line="186"/>
+        <source>can chat</source>
+        <translation>관전자 대화 가능</translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="182"/>
+        <source>see hands</source>
+        <translation>손 공개</translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="190"/>
+        <source>can see hands</source>
+        <translation>관전자에게 손 공개</translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="195"/>
         <source>not allowed</source>
         <translation>허용 안됨</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="191"/>
+        <location filename="../src/gamesmodel.cpp" line="211"/>
         <source>Room</source>
         <translation>게임</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="195"/>
+        <location filename="../src/gamesmodel.cpp" line="215"/>
         <source>Game Type</source>
         <translation>게임 종류</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="196"/>
+        <location filename="../src/gamesmodel.cpp" line="216"/>
         <source>Restrictions</source>
         <translation>입장 제한</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="197"/>
+        <location filename="../src/gamesmodel.cpp" line="217"/>
         <source>Players</source>
         <translation>플레이어</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="198"/>
+        <location filename="../src/gamesmodel.cpp" line="218"/>
         <source>Spectators</source>
         <translation>관전자</translation>
     </message>
@@ -1487,7 +1501,7 @@ http://github.com/Daenyth/Cockatrice/issues에 cards.xml를 첨부해서 이슈�
         <location filename="../src/dlg_settings.cpp" line="37"/>
         <location filename="../src/dlg_settings.cpp" line="138"/>
         <source>English</source>
-        <translation>한국어</translation>
+        <translation>한국어 (Korean)</translation>
     </message>
 </context>
 <context>
@@ -1545,11 +1559,9 @@ Reason: %1</source>
         <source>The server is going to be restarted in %n minute(s).
 All running games will be lost.
 Reason for shutdown: %1</source>
-        <translation>
-            <numerusform>서버가 %n분 후 재시작 할 예정입니다.
+        <translation><numerusform>서버가 %n분 후 재시작 할 예정입니다.
 진행 중인 게임은 저장되지 않습니다.
-서버 재시작 사유: %1</numerusform>
-        </translation>
+서버 재시작 사유: %1</numerusform></translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="136"/>
@@ -1824,6 +1836,13 @@ Local version is %1, remote version is %2.</source>
         <source>%1 is not watching the game any more.</source>
         <translation>%1이(가) 관전을 종료하였습니다.</translation>
     </message>
+    <message numerus="yes">
+        <source>%1 draws %n card(s).</source>
+        <translation type="obsolete">
+            <numerusform>%1 draws a card.</numerusform>
+            <numerusform>%1 draws %n cards.</numerusform>
+        </translation>
+    </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="40"/>
         <source>You have joined game #%1.</source>
@@ -1999,17 +2018,13 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="198"/>
         <source>%1 draws %n card(s).</source>
         <comment>female</comment>
-        <translation>
-            <numerusform>%1이(가) %n장의 카드를 뽑습니다.</numerusform>
-        </translation>
+        <translation><numerusform>%1이(가) %n장의 카드를 뽑습니다.</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="200"/>
         <source>%1 draws %n card(s).</source>
         <comment>male</comment>
-        <translation>
-            <numerusform>%1이(가) %n장의 카드를 뽑습니다.</numerusform>
-        </translation>
+        <translation><numerusform>%1이(가) %n장의 카드를 뽑습니다.</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="207"/>
@@ -2215,17 +2230,13 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="347"/>
         <source>%1 takes a mulligan to %n.</source>
         <comment>female</comment>
-        <translation>
-            <numerusform>%1이(가) %n장으로 멀리건을 하였습니다.</numerusform>
-        </translation>
+        <translation><numerusform>%1이(가) %n장으로 멀리건을 하였습니다.</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="349"/>
         <source>%1 takes a mulligan to %n.</source>
         <comment>male</comment>
-        <translation>
-            <numerusform>%1이(가) %n장으로 멀리건을 하였습니다.</numerusform>
-        </translation>
+        <translation><numerusform>%1이(가) %n장으로 멀리건을 하였습니다.</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="358"/>
@@ -2507,33 +2518,25 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="548"/>
         <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
         <comment>female</comment>
-        <translation>
-            <numerusform>%1이(가) %n개의 %2 카운터를 %3에 올려놓습니다 (현재 %4개).</numerusform>
-        </translation>
+        <translation><numerusform>%1이(가) %n개의 %2 카운터를 %3에 올려놓습니다 (현재 %4개).</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="550"/>
         <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
         <comment>male</comment>
-        <translation>
-            <numerusform>%1이(가) %n개의 %2 카운터를 %3에 올려놓습니다 (현재 %4개).</numerusform>
-        </translation>
+        <translation><numerusform>%1이(가) %n개의 %2 카운터를 %3에 올려놓습니다 (현재 %4개).</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="553"/>
         <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
         <comment>female</comment>
-        <translation>
-            <numerusform>%1이(가) %n개의 %2 카운터를 %3에서 제거합니다 (현재 %4개).</numerusform>
-        </translation>
+        <translation><numerusform>%1이(가) %n개의 %2 카운터를 %3에서 제거합니다 (현재 %4개).</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="555"/>
         <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
         <comment>male</comment>
-        <translation>
-            <numerusform>%1이(가) %n개의 %2 카운터를 %3에서 제거합니다 (현재 %4개).</numerusform>
-        </translation>
+        <translation><numerusform>%1이(가) %n개의 %2 카운터를 %3에서 제거합니다 (현재 %4개).</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="582"/>
@@ -2659,17 +2662,13 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="670"/>
         <source>%1 is looking at the top %n card(s) %2.</source>
         <comment>female</comment>
-        <translation>
-            <numerusform>%1이(가) %2 맨 위 %n장의 카드를 보고 있습니다.</numerusform>
-        </translation>
+        <translation><numerusform>%1이(가) %2 맨 위 %n장의 카드를 보고 있습니다.</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="671"/>
         <source>%1 is looking at the top %n card(s) %2.</source>
         <comment>male</comment>
-        <translation>
-            <numerusform>%1이(가) %2 맨 위 %n장의 카드를 보고 있습니다.</numerusform>
-        </translation>
+        <translation><numerusform>%1이(가) %2 맨 위 %n장의 카드를 보고 있습니다.</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="679"/>
@@ -2844,25 +2843,33 @@ Local version is %1, remote version is %2.</source>
         <translation>카드 한 장</translation>
     </message>
     <message numerus="yes">
+        <source>%1 places %n counter(s) (%2) on %3 (now %4).</source>
+        <translation type="obsolete">
+            <numerusform>%1 places a counter (%2) on %3 (now %4).</numerusform>
+            <numerusform>%1 places %n counters (%2) on %3 (now %4).</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 removes %n counter(s) (%2) from %3 (now %4).</source>
+        <translation type="obsolete">
+            <numerusform>%1 removes a counter (%2) from %3 (now %4).</numerusform>
+            <numerusform>%1 removes %n counters (%2) from %3 (now %4).</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="559"/>
         <source>red</source>
-        <translation>
-            <numerusform>적색</numerusform>
-        </translation>
+        <translation><numerusform>적색</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="560"/>
         <source>yellow</source>
-        <translation>
-            <numerusform>황색</numerusform>
-        </translation>
+        <translation><numerusform>황색</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="561"/>
         <source>green</source>
-        <translation>
-            <numerusform>녹색</numerusform>
-        </translation>
+        <translation><numerusform>녹색</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="143"/>
@@ -2878,6 +2885,20 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="351"/>
         <source>%1 draws her initial hand.</source>
         <translation>%1이(가) 시작 카드를 뽑았습니다.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
+        <translation type="obsolete">
+            <numerusform>%1 places a %2 counter on %3 (now %4).</numerusform>
+            <numerusform>%1 places %n %2 counters on %3 (now %4).</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
+        <translation type="obsolete">
+            <numerusform>%1 removes a %2 counter from %3 (now %4).</numerusform>
+            <numerusform>%1 removes %n %2 counters from %3 (now %4).</numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="819"/>
@@ -2987,6 +3008,16 @@ Local version is %1, remote version is %2.</source>
         <translation>대화 중 본인의 사용자명 언급 시 해당 문장을 강조</translation>
     </message>
     <message>
+        <location filename="../src/dlg_settings.cpp" line="681"/>
+        <source>In-game message macros</source>
+        <translation>게임 내 대화 매크로</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="682"/>
+        <source>Ignore unregistered users in main chat</source>
+        <translation>채널 대화창에서 서버에 가입하지 않은 사용자의 대화 차단</translation>
+    </message>
+    <message>
         <location filename="../src/dlg_settings.cpp" line="683"/>
         <source>Ignore chat room messages sent by unregistered users.</source>
         <translation>가입하지 않은 사용자의 채널 대화 차단</translation>
@@ -3005,16 +3036,6 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/dlg_settings.cpp" line="686"/>
         <source>(Color is hexadecimal)</source>
         <translation>(16진수 색상 코드)</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="681"/>
-        <source>In-game message macros</source>
-        <translation>게임 내 대화 매크로</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="682"/>
-        <source>Ignore unregistered users in main chat</source>
-        <translation>채널 대화창에서 서버에 가입하지 않은 사용자의 대화 차단</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="660"/>
@@ -3809,17 +3830,17 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/setsmodel.cpp" line="43"/>
         <source>Set type</source>
-        <translation>세트 종류</translation>
+        <translation>판본 종류</translation>
     </message>
     <message>
         <location filename="../src/setsmodel.cpp" line="44"/>
         <source>Set code</source>
-        <translation>세트 약자</translation>
+        <translation>판본 약자</translation>
     </message>
     <message>
         <location filename="../src/setsmodel.cpp" line="45"/>
         <source>Long name</source>
-        <translation>세트 이름</translation>
+        <translation>판본 이름</translation>
     </message>
     <message>
         <location filename="../src/setsmodel.cpp" line="46"/>
