@@ -423,9 +423,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    // workaround Qt bug where closeEvent gets called twice
+    static bool bClosingDown=false;
+    if(bClosingDown)
+        return;
+    bClosingDown=true;
+
     if (!tabSupervisor->closeRequest())
     {
         event->ignore();
+        bClosingDown=false;
         return;
     }
 
