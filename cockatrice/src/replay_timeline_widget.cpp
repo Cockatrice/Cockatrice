@@ -101,4 +101,10 @@ void ReplayTimelineWidget::startReplay()
 void ReplayTimelineWidget::stopReplay()
 {
     replayTimer->stop();
+    timeScaleFactor = 1.0;
+}
+
+void ReplayTimelineWidget::pauseReplay()
+{
+    replayTimer->stop();
 }

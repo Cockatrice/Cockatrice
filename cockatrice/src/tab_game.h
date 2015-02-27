@@ -180,7 +180,7 @@ private slots:
     void replayStartButtonClicked();
     void replayPauseButtonClicked();
     void replayStopButtonClicked();
-    void replayFastForwardButtonToggled(bool checked);
+    void replayFastForwardButtonToggled();
     void replayToEndButtonClicked();
     
     void incrementGameTime();
