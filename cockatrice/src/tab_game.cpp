@@ -326,8 +326,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     replayFastForwardButton->setIconSize(QSize(32, 32));
     replayFastForwardButton->setEnabled(false);
     replayFastForwardButton->setIcon(QIcon(":/resources/replay_fastforward.svg"));
-    replayFastForwardButton->setCheckable(true);
-    connect(replayFastForwardButton, SIGNAL(toggled(bool)), this, SLOT(replayFastForwardButtonToggled(bool)));
+    connect(replayFastForwardButton, SIGNAL(clicked()), this, SLOT(replayFastForwardButtonToggled()));
     replayToEndButton = new QToolButton;
     replayToEndButton->setIconSize(QSize(32, 32));
     replayToEndButton->setIcon(QIcon(":/resources/replay_toend.svg"));
@@ -623,7 +622,7 @@ void TabGame::replayPauseButtonClicked()
     replayPauseButton->setEnabled(false);
     replayFastForwardButton->setEnabled(false);
     
-    timelineWidget->stopReplay();
+    timelineWidget->pauseReplay();
 }
 
 void TabGame::replayStopButtonClicked()
@@ -637,9 +636,9 @@ void TabGame::replayStopButtonClicked()
     // XXX to start
 }
 
-void TabGame::replayFastForwardButtonToggled(bool checked)
+void TabGame::replayFastForwardButtonToggled()
 {
-    timelineWidget->setTimeScaleFactor(checked ? 10.0 : 1.0);
+    timelineWidget->setTimeScaleFactor(timelineWidget->getTimeScaleFactor()  * 2);
 }
 
 void TabGame::replayToEndButtonClicked()

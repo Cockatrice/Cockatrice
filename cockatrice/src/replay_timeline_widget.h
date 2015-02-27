@@ -30,9 +30,11 @@ public:
     QSize minimumSizeHint() const;
     void setTimeScaleFactor(qreal _timeScaleFactor);
     int getCurrentEvent() const { return currentEvent; }
+    qreal getTimeScaleFactor() const { return timeScaleFactor; }
 public slots:
     void startReplay();
     void stopReplay();
+    void pauseReplay();
 protected:
     void paintEvent(QPaintEvent *event);
 };
