@@ -7,9 +7,8 @@ class StackZone : public SelectZone {
     Q_OBJECT
 private:
     qreal zoneHeight;
-    QPixmap bgPixmap;
 private slots:
-    void updateBgPixmap();
+    void updateBg();
 public:
     StackZone(Player *_p, int _zoneHeight, QGraphicsItem *parent = 0);
     void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint);

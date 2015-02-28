@@ -1,5 +1,6 @@
 #include "carddatabase.h"
 #include "settingscache.h"
+#include "themeManager.h"
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
@@ -469,7 +470,7 @@ void CardInfo::loadPixmap(QPixmap &pixmap)
     pixmap = QPixmap();
 
     if (getName().isEmpty()) {
-        pixmap.load(settingsCache->getCardBackPicturePath());
+        pixmap = themeManager->getCardBackPixmap();
         return;
     }
 
@@ -623,7 +624,7 @@ CardDatabase::CardDatabase(QObject *parent)
     noCard = new CardInfo(this);
     QPixmap tmp;
     noCard->loadPixmap(tmp); // cache pixmap for card back
-    connect(settingsCache, SIGNAL(cardBackPicturePathChanged()), noCard, SLOT(updatePixmapCache()));
+    connect(themeManager, SIGNAL(themeChanged()), noCard, SLOT(updatePixmapCache()));
 }
 
 CardDatabase::~CardDatabase()

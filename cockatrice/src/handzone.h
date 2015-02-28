@@ -7,9 +7,8 @@ class HandZone : public SelectZone {
     Q_OBJECT
 private:
     qreal width, zoneHeight;
-    QPixmap bgPixmap;
 private slots:
-    void updateBgPixmap();
+    void updateBg();
 public slots:
     void updateOrientation();
 public:
