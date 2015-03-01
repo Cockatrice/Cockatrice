@@ -1,6 +1,6 @@
 #include "carddatabase.h"
 #include "settingscache.h"
-#include "themeManager.h"
+#include "thememanager.h"
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
