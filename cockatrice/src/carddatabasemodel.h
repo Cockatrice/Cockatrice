@@ -37,6 +37,7 @@ public:
 private:
     FilterBool isToken;
     QString cardNameBeginning, cardName, cardText;
+    QString searchTerm;
     QSet<QString> cardNameSet, cardTypes, cardColors;
     FilterTree *filterTree;
 public:
@@ -46,11 +47,13 @@ public:
     void setCardNameBeginning(const QString &_beginning) { cardNameBeginning = _beginning; invalidate(); }
     void setCardName(const QString &_cardName) { cardName = _cardName; invalidate(); }
     void setCardNameSet(const QSet<QString> &_cardNameSet) { cardNameSet = _cardNameSet; invalidate(); }
+    void setSearchTerm(const QString &_searchTerm) { searchTerm = _searchTerm; }
     void setCardText(const QString &_cardText) { cardText = _cardText; invalidate(); }
     void setCardTypes(const QSet<QString> &_cardTypes) { cardTypes = _cardTypes; invalidate(); }
     void setCardColors(const QSet<QString> &_cardColors) { cardColors = _cardColors; invalidate(); }
     void clearSearch();
 protected:
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 private slots:
     void filterTreeChanged();
