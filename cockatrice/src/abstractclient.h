@@ -82,6 +82,8 @@ public:
     ClientStatus getStatus() const { QMutexLocker locker(&clientMutex); return status; }
     void sendCommand(const CommandContainer &cont);
     void sendCommand(PendingCommand *pend);
+
+    const QString getUserName() {return userName;}
     
     static PendingCommand *prepareSessionCommand(const ::google::protobuf::Message &cmd);
     static PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd, int roomId);
