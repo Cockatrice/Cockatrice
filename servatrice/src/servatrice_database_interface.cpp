@@ -163,7 +163,7 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
     return UnknownUser;
 }
 
-bool Servatrice_DatabaseInterface::checkUserIsBanned(Server_ProtocolHandler *session, const QString &userName, QString &banReason, int &banSecondsRemaining)
+bool Servatrice_DatabaseInterface::checkUserIsBanned(const QString &ipAddress, const QString &userName, QString &banReason, int &banSecondsRemaining)
 {
     if (server->getAuthenticationMethod() != Servatrice::AuthenticationSql)
         return false;
@@ -173,7 +173,6 @@ bool Servatrice_DatabaseInterface::checkUserIsBanned(Server_ProtocolHandler *ses
         return false;
     }
 
-    QString ipAddress = static_cast<ServerSocketInterface *>(session)->getPeerAddress().toString()
     return
         checkUserIsIpBanned(ipAddress, banReason, banSecondsRemaining)
         || checkUserIsNameBanned(userName, banReason, banSecondsRemaining);

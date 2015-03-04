@@ -385,9 +385,18 @@ Response::ResponseCode Server_ProtocolHandler::cmdRegisterAccount(const Command_
 
     QString banReason;
     int banSecondsRemaining;
-    RegistrationResult result = server->registerUserAccount(this, QString::fromStdString(cmd.user_name()), banReason, banSecondsRemaining);
+    RegistrationResult result =
+            server->registerUserAccount(
+                    this->getAddress(),
+                    QString::fromStdString(cmd.user_name()),
+                    QString::fromStdString(cmd.email()),
+                    banReason,
+                    banSecondsRemaining);
     qDebug() << "Register command result:" << result;
+
     switch (result) {
+        case RegistrationDisabled:
+            return Response::RespRegistrationDisabled;
         case Accepted:
             return Response::RespRegistrationAccepted;
         case UserAlreadyExists:

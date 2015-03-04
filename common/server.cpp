@@ -175,23 +175,39 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     return authState;
 }
 
-RegistrationResult Server::registerUserAccount(Server_ProtocolHandler *session, const QString userName, QString &banReason, int &banSecondsRemaining)
+RegistrationResult Server::registerUserAccount(const QString &ipAddress, const QString userName, const QString emailAddress, QString &banReason, int &banSecondsRemaining)
 {
     // TODO
 
+    if (!registrationEnabled)
+        return RegistrationDisabled;
+
+    if (requireEmailForRegistration && emailAddress.isEmpty())
+        return EmailRequired;
+
     Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
 
+    // TODO: Move this method outside of the db interface
     if (!databaseInterface->usernameIsValid(userName))
-        return RegistrationResult::InvalidUsername;
+        return InvalidUsername;
 
-    if (databaseInterface->checkUserIsBanned(session, userName, banReason, banSecondsRemaining))
-        return RegistrationResult::ClientIsBanned;
+    if (databaseInterface->checkUserIsBanned(ipAddress, userName, banReason, banSecondsRemaining))
+        return ClientIsBanned;
 
-    // Check for too many requests
-    // Check for email required/missing
+    if (tooManyRegistrationAttempts(ipAddress))
+        return TooManyRequests;
+
     // Insert, check unique key failure
     // Reply with successful info or not
-    return TooManyRequests;
+    // Check for too many requests
+
+    return RegistrationDisabled;
+}
+
+bool Server::tooManyRegistrationAttempts(const QString &ipAddress)
+{
+    // TODO: implement
+    return false;
 }
 
 void Server::addPersistentPlayer(const QString &userName, int roomId, int gameId, int playerId)
