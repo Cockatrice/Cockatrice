@@ -19,9 +19,13 @@ private:
 	Servatrice *server;
 	ServerInfo_User evalUserQueryResult(const QSqlQuery *query, bool complete, bool withId = false);
 	bool usernameIsValid(const QString &user);
+	/** Must be called after checkSql and server is known to be in auth mode. */
+	bool checkUserIsIpBanned(const QString &ipAddress, QString &banReason, int &banSecondsRemaining);
+	/** Must be called after checkSql and server is known to be in auth mode. */
+	bool checkUserIsNameBanned(QString const &userName, QString &banReason, int &banSecondsRemaining);
 protected:
 	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &secondsLeft);
-	bool checkUserIsBanned(Server_ProtocolHandler *session, QString &banReason, int &banSecondsRemaining);
+	bool checkUserIsBanned(Server_ProtocolHandler *session, const QString &userName, QString &banReason, int &banSecondsRemaining);
 public slots:
 	void initDatabase(const QSqlDatabase &_sqlDatabase);
 public:

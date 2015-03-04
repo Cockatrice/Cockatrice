@@ -9,6 +9,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QDateTime>
+#include <AppKit/AppKit.h>
 
 Servatrice_DatabaseInterface::Servatrice_DatabaseInterface(int _instanceId, Servatrice *_server)
     : instanceId(_instanceId),
@@ -134,43 +135,8 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
         if (!usernameIsValid(user))
             return UsernameInvalid;
         
-        QSqlQuery *ipBanQuery = prepareQuery("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))), b.minutes <=> 0, b.visible_reason from {prefix}_bans b where b.time_from = (select max(c.time_from) from {prefix}_bans c where c.ip_address = :address) and b.ip_address = :address2");
-        ipBanQuery->bindValue(":address", static_cast<ServerSocketInterface *>(handler)->getPeerAddress().toString());
-        ipBanQuery->bindValue(":address2", static_cast<ServerSocketInterface *>(handler)->getPeerAddress().toString());
-        if (!execSqlQuery(ipBanQuery)) {
-            qDebug("Login denied: SQL error");
-            return NotLoggedIn;
-        }
-        
-        if (ipBanQuery->next()) {
-            const int secondsLeft = -ipBanQuery->value(0).toInt();
-            const bool permanentBan = ipBanQuery->value(1).toInt();
-            if ((secondsLeft > 0) || permanentBan) {
-                reasonStr = ipBanQuery->value(2).toString();
-                banSecondsLeft = permanentBan ? 0 : secondsLeft;
-                qDebug("Login denied: banned by address");
-                return UserIsBanned;
-            }
-        }
-        
-        QSqlQuery *nameBanQuery = prepareQuery("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))), b.minutes <=> 0, b.visible_reason from {prefix}_bans b where b.time_from = (select max(c.time_from) from {prefix}_bans c where c.user_name = :name2) and b.user_name = :name1");
-        nameBanQuery->bindValue(":name1", user);
-        nameBanQuery->bindValue(":name2", user);
-        if (!execSqlQuery(nameBanQuery)) {
-            qDebug("Login denied: SQL error");
-            return NotLoggedIn;
-        }
-        
-        if (nameBanQuery->next()) {
-            const int secondsLeft = -nameBanQuery->value(0).toInt();
-            const bool permanentBan = nameBanQuery->value(1).toInt();
-            if ((secondsLeft > 0) || permanentBan) {
-                reasonStr = nameBanQuery->value(2).toString();
-                banSecondsLeft = permanentBan ? 0 : secondsLeft;
-                qDebug("Login denied: banned by name");
-                return UserIsBanned;
-            }
-        }
+        if (checkUserIsBanned(handler, user, reasonStr, banSecondsLeft))
+            return UserIsBanned;
         
         QSqlQuery *passwordQuery = prepareQuery("select password_sha512 from {prefix}_users where name = :name and active = 1");
         passwordQuery->bindValue(":name", user);
@@ -197,9 +163,77 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
     return UnknownUser;
 }
 
-bool Servatrice_DatabaseInterface::checkUserIsBanned(Server_ProtocolHandler *session, QString &banReason, int &banSecondsRemaining)
+bool Servatrice_DatabaseInterface::checkUserIsBanned(Server_ProtocolHandler *session, const QString &userName, QString &banReason, int &banSecondsRemaining)
 {
+    if (server->getAuthenticationMethod() != Servatrice::AuthenticationSql)
+        return false;
+
+    if (!checkSql()) {
+        qDebug("Failed to check if user is banned. Database invalid.");
+        return false;
+    }
+
+    QString ipAddress = static_cast<ServerSocketInterface *>(session)->getPeerAddress().toString()
+    return
+        checkUserIsIpBanned(ipAddress, banReason, banSecondsRemaining)
+        || checkUserIsNameBanned(userName, banReason, banSecondsRemaining);
+
+}
+
+bool Servatrice_DatabaseInterface::checkUserIsNameBanned(const QString &userName, QString &banReason, int &banSecondsRemaining)
+{
+    QSqlQuery *nameBanQuery = prepareQuery("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))), b.minutes <=> 0, b.visible_reason from {prefix}_bans b where b.time_from = (select max(c.time_from) from {prefix}_bans c where c.user_name = :name2) and b.user_name = :name1");
+    nameBanQuery->bindValue(":name1", userName);
+    nameBanQuery->bindValue(":name2", userName);
+    if (!execSqlQuery(nameBanQuery)) {
+        qDebug() << "Name ban check failed: SQL error" << nameBanQuery->lastError();
+        return false;
+    }
+
+    if (nameBanQuery->next()) {
+        const int secondsLeft = -nameBanQuery->value(0).toInt();
+        const bool permanentBan = nameBanQuery->value(1).toInt();
+        if ((secondsLeft > 0) || permanentBan) {
+            banReason = nameBanQuery->value(2).toString();
+            banSecondsRemaining = permanentBan ? 0 : secondsLeft;
+            qDebug() << "Username" << userName << "is banned by name";
+            return true;
+        }
+    }
     return false;
+}
+
+bool Servatrice_DatabaseInterface::checkUserIsIpBanned(const QString &ipAddress, QString &banReason, int &banSecondsRemaining)
+{
+    QSqlQuery *ipBanQuery = prepareQuery(
+            "select"
+                    " time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))),"
+                    " b.minutes <=> 0,"
+                    " b.visible_reason"
+                    " from {prefix}_bans b"
+                    " where"
+                    " b.time_from = (select max(c.time_from)"
+                    " from {prefix}_bans c"
+                    " where c.ip_address = :address)"
+                    " and b.ip_address = :address2");
+
+    ipBanQuery->bindValue(":address", ipAddress);
+    ipBanQuery->bindValue(":address2", ipAddress);
+    if (!execSqlQuery(ipBanQuery)) {
+        qDebug() << "IP ban check failed: SQL error." << ipBanQuery->lastError();
+        return false;
+    }
+
+    if (ipBanQuery->next()) {
+        const int secondsLeft = -ipBanQuery->value(0).toInt();
+        const bool permanentBan = ipBanQuery->value(1).toInt();
+        if ((secondsLeft > 0) || permanentBan) {
+            banReason = ipBanQuery->value(2).toString();
+            banSecondsRemaining = permanentBan ? 0 : secondsLeft;
+            qDebug() << "User is banned by address" << ipAddress;
+            return true;
+        }
+    }
 }
 
 bool Servatrice_DatabaseInterface::userExists(const QString &user)

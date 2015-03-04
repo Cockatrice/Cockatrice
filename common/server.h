@@ -48,11 +48,13 @@ public:
 
     /**
     * Registers a user account.
+    * @param session The connection from the user
+    * @param userName The username to attempt to register
     * @param banReason If the client is banned, the reason for the ban will be included in this string.
     * @param banSecondsRemaining If the client is banned, the time left will be included in this. 0 if the ban is permanent.
     * @return RegistrationResult member indicating whether it succeeded or failed.
     */
-    RegistrationResult registerUserAccount(Server_ProtocolHandler *session, QString &banReason, int &banSecondsRemaining);
+    RegistrationResult registerUserAccount(Server_ProtocolHandler *session, const QString userName, QString &banReason, int &banSecondsRemaining);
     const QMap<int, Server_Room *> &getRooms() { return rooms; }
     
     Server_AbstractUserInterface *findUser(const QString &userName) const;

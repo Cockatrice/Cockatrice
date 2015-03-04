@@ -175,12 +175,12 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     return authState;
 }
 
-RegistrationResult Server::registerUserAccount(Server_ProtocolHandler *session, QString &banReason, int &banSecondsRemaining)
+RegistrationResult Server::registerUserAccount(Server_ProtocolHandler *session, const QString userName, QString &banReason, int &banSecondsRemaining)
 {
     // TODO
 
     Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
-    bool isBanned = databaseInterface->checkUserIsBanned(session, banReason, banSecondsRemaining);
+    bool isBanned = databaseInterface->checkUserIsBanned(session, userName, banReason, banSecondsRemaining);
 
     // Validate username
     // Check for bans
