@@ -180,10 +180,13 @@ RegistrationResult Server::registerUserAccount(Server_ProtocolHandler *session, 
     // TODO
 
     Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
-    bool isBanned = databaseInterface->checkUserIsBanned(session, userName, banReason, banSecondsRemaining);
 
-    // Validate username
-    // Check for bans
+    if (!databaseInterface->usernameIsValid(userName))
+        return RegistrationResult::InvalidUsername;
+
+    if (databaseInterface->checkUserIsBanned(session, userName, banReason, banSecondsRemaining))
+        return RegistrationResult::ClientIsBanned;
+
     // Check for too many requests
     // Check for email required/missing
     // Insert, check unique key failure
