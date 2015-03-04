@@ -1708,7 +1708,7 @@ Local version is %1, remote version is %2.</source>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="290"/>
-        <source>Logged in at %1</source>
+        <source>Logged in as %1 at %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

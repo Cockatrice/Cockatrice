@@ -1712,7 +1712,7 @@ La versión local es %1, la versión remota es %2.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="290"/>
-        <source>Logged in as %1 at %2</source>
+        <source>Logged in at %1</source>
         <translation>Conectado en %1</translation>
     </message>
     <message>
