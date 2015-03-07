@@ -45,7 +45,7 @@ Alle Haupt- und Erweiterungssets sind standardmäßig ausgewählt.</translation>
     <message>
         <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
         <translation>Dieser Assistent wird eine Liste aller Editionen und Karten, die von Cockatrice genutzt werden, importieren.
-Sie müssen dazu eine URL oder einen Dateinamen angeben der als Quelle genutzt wird, dann können aus einer Liste aller verfügbaren Editionen die gewünschten Sets ausgwählt werden.</translation>
+Sie müssen dazu eine URL oder einen Dateinamen die/der als Quelle genutzt werden soll angeben, dann können aus einer Liste aller verfügbaren Editionen die Gewünschten ausgwählt werden.</translation>
     </message>
 </context>
 <context>
