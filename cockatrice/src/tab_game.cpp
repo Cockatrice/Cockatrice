@@ -306,31 +306,31 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     
     replayToStartButton = new QToolButton;
     replayToStartButton->setIconSize(QSize(32, 32));
-    replayToStartButton->setIcon(QIcon(":/resources/replay_tostart.svg"));
+    replayToStartButton->setIcon(QIcon("theme:replay_tostart.svg"));
     connect(replayToStartButton, SIGNAL(clicked()), this, SLOT(replayToStartButtonClicked()));
     replayStartButton = new QToolButton;
     replayStartButton->setIconSize(QSize(32, 32));
-    replayStartButton->setIcon(QIcon(":/resources/replay_start.svg"));
+    replayStartButton->setIcon(QIcon("theme:replay_start.svg"));
     connect(replayStartButton, SIGNAL(clicked()), this, SLOT(replayStartButtonClicked()));
     replayPauseButton = new QToolButton;
     replayPauseButton->setIconSize(QSize(32, 32));
     replayPauseButton->setEnabled(false);
-    replayPauseButton->setIcon(QIcon(":/resources/replay_pause.svg"));
+    replayPauseButton->setIcon(QIcon("theme:replay_pause.svg"));
     connect(replayPauseButton, SIGNAL(clicked()), this, SLOT(replayPauseButtonClicked()));
     replayStopButton = new QToolButton;
     replayStopButton->setIconSize(QSize(32, 32));
     replayStopButton->setEnabled(false);
-    replayStopButton->setIcon(QIcon(":/resources/replay_stop.svg"));
+    replayStopButton->setIcon(QIcon("theme:replay_stop.svg"));
     connect(replayStopButton, SIGNAL(clicked()), this, SLOT(replayStopButtonClicked()));
     replayFastForwardButton = new QToolButton;
     replayFastForwardButton->setIconSize(QSize(32, 32));
     replayFastForwardButton->setEnabled(false);
-    replayFastForwardButton->setIcon(QIcon(":/resources/replay_fastforward.svg"));
+    replayFastForwardButton->setIcon(QIcon("theme:replay_fastforward.svg"));
     replayFastForwardButton->setCheckable(true);
     connect(replayFastForwardButton, SIGNAL(toggled(bool)), this, SLOT(replayFastForwardButtonToggled(bool)));
     replayToEndButton = new QToolButton;
     replayToEndButton->setIconSize(QSize(32, 32));
-    replayToEndButton->setIcon(QIcon(":/resources/replay_toend.svg"));
+    replayToEndButton->setIcon(QIcon("theme:replay_toend.svg"));
     connect(replayStopButton, SIGNAL(clicked()), this, SLOT(replayToEndButtonClicked()));
     
     splitter = new QSplitter(Qt::Vertical);

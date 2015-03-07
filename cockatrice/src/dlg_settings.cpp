@@ -322,7 +322,7 @@ void AppearanceSettingsPage::retranslateUi()
 
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
-    QIcon deleteIcon(":/resources/icon_delete.svg");
+    QIcon deleteIcon("theme:icon_delete.svg");
 
     notificationsEnabledCheckBox.setChecked(settingsCache->getNotificationsEnabled());
     connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotificationsEnabled(int)));
@@ -623,27 +623,27 @@ void DlgSettings::createIcons()
     generalButton = new QListWidgetItem(contentsWidget);
     generalButton->setTextAlignment(Qt::AlignHCenter);
     generalButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    generalButton->setIcon(QIcon(":/resources/icon_config_general.svg"));
+    generalButton->setIcon(QIcon("theme:icon_config_general.svg"));
     
     appearanceButton = new QListWidgetItem(contentsWidget);
     appearanceButton->setTextAlignment(Qt::AlignHCenter);
     appearanceButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    appearanceButton->setIcon(QIcon(":/resources/icon_config_appearance.svg"));
+    appearanceButton->setIcon(QIcon("theme:icon_config_appearance.svg"));
     
     userInterfaceButton = new QListWidgetItem(contentsWidget);
     userInterfaceButton->setTextAlignment(Qt::AlignHCenter);
     userInterfaceButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    userInterfaceButton->setIcon(QIcon(":/resources/icon_config_interface.svg"));
+    userInterfaceButton->setIcon(QIcon("theme:icon_config_interface.svg"));
     
     deckEditorButton = new QListWidgetItem(contentsWidget);
     deckEditorButton->setTextAlignment(Qt::AlignHCenter);
     deckEditorButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    deckEditorButton->setIcon(QIcon(":/resources/icon_config_deckeditor.svg"));
+    deckEditorButton->setIcon(QIcon("theme:icon_config_deckeditor.svg"));
     
     messagesButton = new QListWidgetItem(contentsWidget);
     messagesButton->setTextAlignment(Qt::AlignHCenter);
     messagesButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    messagesButton->setIcon(QIcon(":/resources/icon_config_messages.svg"));
+    messagesButton->setIcon(QIcon("theme:icon_config_messages.svg"));
     
     connect(contentsWidget, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(changePage(QListWidgetItem *, QListWidgetItem *)));
 }

@@ -151,7 +151,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                 return result.join(", ");
             }
             case Qt::DecorationRole:{
-                return g.with_password() ? QIcon(":/resources/lock.svg") : QVariant();
+                return g.with_password() ? QIcon("theme:lock.svg") : QVariant();
             case Qt::TextAlignmentRole:
                 return Qt::AlignLeft;
             default:

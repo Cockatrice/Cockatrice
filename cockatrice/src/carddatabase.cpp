@@ -494,15 +494,15 @@ void CardInfo::getPixmap(QSize size, QPixmap &pixmap)
     QPixmap bigPixmap;
     loadPixmap(bigPixmap);
     if (bigPixmap.isNull()) {
-        if (!getName().isEmpty()) {
-            pixmap = QPixmap(); // null
-            return;
-        } else {
+        if (getName().isEmpty()) {
             pixmap = QPixmap(size);
             pixmap.fill(Qt::transparent);
-            QSvgRenderer svg(QString(":/back.svg"));
+            QSvgRenderer svg(QString("theme:back.svg"));
             QPainter painter(&pixmap);
             svg.render(&painter, QRectF(0, 0, size.width(), size.height()));
+        } else {
+            pixmap = QPixmap(); // null
+            return;
         }
     } else {
         pixmap = bigPixmap.scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);

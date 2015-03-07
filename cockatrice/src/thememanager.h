@@ -5,6 +5,7 @@
 #include <QBrush>
 #include <QPixmap>
 #include <QStringList>
+#include <QDir>
 
 class QApplication;
 
@@ -18,6 +19,8 @@ private:
     QStringList availableThemes;
 protected:
     void ensureUserThemeDirectoryExists();
+    QBrush loadBrush(QDir dir, QString fileName, QColor fallbackColor);
+    QPixmap loadPixmap(QDir dir, QString fileName);
 public:
     QBrush &getHandBgBrush() { return handBgBrush; }
     QBrush &getStackBgBrush() { return stackBgBrush; }

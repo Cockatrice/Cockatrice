@@ -329,6 +329,8 @@ void SettingsCache::copyPath(const QString &src, const QString &dst)
     }
 
     foreach (QString f, dir.entryList(QDir::Files)) {
+        if(tmpDir.exists(f)) 
+            tmpDir.remove(f);
         QFile::copy(src + QDir::separator() + f, dst + QDir::separator() + f);
     }
 }

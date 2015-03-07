@@ -48,11 +48,11 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     : Tab(_tabSupervisor, parent), modified(false)
 {
     aClearSearch = new QAction(QString(), this);
-    aClearSearch->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
+    aClearSearch->setIcon(QIcon("theme:icon_clearsearch.svg"));
     connect(aClearSearch, SIGNAL(triggered()), this, SLOT(actClearSearch()));
     searchEdit = new SearchLineEdit;
 #if QT_VERSION >= 0x050300
-    searchEdit->addAction(QIcon(":/resources/icon_search_black.svg"), QLineEdit::LeadingPosition);
+    searchEdit->addAction(QIcon("theme:icon_search_black.svg"), QLineEdit::LeadingPosition);
 #endif
     searchEdit->setObjectName("searchEdit");
     
@@ -175,7 +175,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 
     // Update price
     aUpdatePrices = new QAction(QString(), this);
-    aUpdatePrices->setIcon(QIcon(":/resources/icon_update.png"));
+    aUpdatePrices->setIcon(QIcon("theme:icon_update.png"));
     connect(aUpdatePrices, SIGNAL(triggered()), this, SLOT(actUpdatePrices()));
     if (!settingsCache->getPriceTagFeature())
         aUpdatePrices->setVisible(false);
@@ -258,19 +258,19 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     addTabMenu(dbMenu);
 
     aAddCard = new QAction(QString(), this);
-    aAddCard->setIcon(QIcon(":/resources/arrow_right_green.svg"));
+    aAddCard->setIcon(QIcon("theme:arrow_right_green.svg"));
     connect(aAddCard, SIGNAL(triggered()), this, SLOT(actAddCard()));
     aAddCardToSideboard = new QAction(QString(), this);
-    aAddCardToSideboard->setIcon(QIcon(":/resources/add_to_sideboard.svg"));
+    aAddCardToSideboard->setIcon(QIcon("theme:add_to_sideboard.svg"));
     connect(aAddCardToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
     aRemoveCard = new QAction(QString(), this);
-    aRemoveCard->setIcon(QIcon(":/resources/remove_row.svg"));
+    aRemoveCard->setIcon(QIcon("theme:remove_row.svg"));
     connect(aRemoveCard, SIGNAL(triggered()), this, SLOT(actRemoveCard()));
     aIncrement = new QAction(QString(), this);
-    aIncrement->setIcon(QIcon(":/resources/increment.svg"));
+    aIncrement->setIcon(QIcon("theme:increment.svg"));
     connect(aIncrement, SIGNAL(triggered()), this, SLOT(actIncrement()));
     aDecrement = new QAction(QString(), this);
-    aDecrement->setIcon(QIcon(":/resources/decrement.svg"));
+    aDecrement->setIcon(QIcon("theme:decrement.svg"));
     connect(aDecrement, SIGNAL(triggered()), this, SLOT(actDecrement()));
 
     deckEditToolBar->addAction(aAddCard);
