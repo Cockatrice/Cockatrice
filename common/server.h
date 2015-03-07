@@ -54,8 +54,8 @@ public:
     virtual QString getLoginMessage() const { return QString(); }
     
     virtual bool getGameShouldPing() const { return false; }
-    virtual int getMaxGameInactivityTime() const { return 9999999; }
-    virtual int getMaxPlayerInactivityTime() const { return 9999999; }
+    virtual int getMaxGameInactivityTime() const { return 900; }
+    virtual int getMaxPlayerInactivityTime() const { return 900; }
     virtual int getMessageCountingInterval() const { return 0; }
     virtual int getMaxMessageCountPerInterval() const { return 0; }
     virtual int getMaxMessageSizePerInterval() const { return 0; }

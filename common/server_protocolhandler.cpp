@@ -310,13 +310,15 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
     if (deleted)
         return;
     
-    lastDataReceived = timeRunning;
-    
     ResponseContainer responseContainer(cont.has_cmd_id() ? cont.cmd_id() : -1);
     Response::ResponseCode finalResponseCode;
     
-    if (cont.game_command_size())
+    if (cont.game_command_size()) {
         finalResponseCode = processGameCommandContainer(cont, responseContainer);
+        // lastDataReceived is used to determine if a room is still active.
+        // we now determine that a room is active if game actions are occurring.
+        lastDataReceived = timeRunning;
+    }
     else if (cont.room_command_size())
         finalResponseCode = processRoomCommandContainer(cont, responseContainer);
     else if (cont.session_command_size())
