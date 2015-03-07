@@ -44,6 +44,7 @@ public:
     ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent = 0);
     void retranslateUi();
     void appendHtml(const QString &html);
+    void appendHtmlServerMessage(const QString &html);
     void appendMessage(QString message, QString sender = QString(), UserLevelFlags userLevel = UserLevelFlags(), bool playerBold = false);
     void clearChat();
 protected:
