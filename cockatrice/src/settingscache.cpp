@@ -22,12 +22,12 @@ SettingsCache::SettingsCache()
     cardBackPicturePath = settings->value("paths/cardbackpicture").toString();
 
     // we only want to reset the cache once, then its up to the user
-    bool updateCache = settings->value("update/pixmapCacheSize", false).toBool();
+    bool updateCache = settings->value("revert/pixmapCacheSize", false).toBool();
     if (!updateCache) {
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
         settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
-        settings->setValue("personal/picturedownloadhq", true);
-        settings->setValue("update/pixmapCacheSize", true);
+        settings->setValue("personal/picturedownloadhq", false);
+        settings->setValue("revert/pixmapCacheSize", true);
     }
     else
         pixmapCacheSize = settings->value("personal/pixmapCacheSize", PIXMAPCACHE_SIZE_DEFAULT).toInt();
