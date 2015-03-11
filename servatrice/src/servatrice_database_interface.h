@@ -60,6 +60,7 @@ public:
 	bool userSessionExists(const QString &userName);
 
 	bool getRequireRegistration();
+	void registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &passwordSha512, const QString &emailAddress, const QString &country, bool active = false);
 
     void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage, LogMessage_TargetType targetType, const int targetId, const QString &targetName);
 };

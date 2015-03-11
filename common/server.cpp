@@ -175,19 +175,21 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     return authState;
 }
 
-RegistrationResult Server::registerUserAccount(const QString &ipAddress, const QString userName, const QString emailAddress, QString &banReason, int &banSecondsRemaining)
+RegistrationResult Server::registerUserAccount(const QString &ipAddress, const Command_Register &cmd, QString &banReason, int &banSecondsRemaining)
 {
     // TODO
 
     if (!registrationEnabled)
         return RegistrationDisabled;
 
+    QString emailAddress = QString::fromStdString(cmd.email());
     if (requireEmailForRegistration && emailAddress.isEmpty())
         return EmailRequired;
 
     Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
 
     // TODO: Move this method outside of the db interface
+    QString userName = QString::fromStdString(cmd.user_name());
     if (!databaseInterface->usernameIsValid(userName))
         return InvalidUsername;
 
@@ -197,9 +199,12 @@ RegistrationResult Server::registerUserAccount(const QString &ipAddress, const Q
     if (tooManyRegistrationAttempts(ipAddress))
         return TooManyRequests;
 
-    // Insert, check unique key failure
+    QString realName = QString::fromStdString(cmd.real_name());
+    ServerInfo_User_Gender gender = cmd.gender();
+    QString country = QString::fromStdString(cmd.country());
+    QString passwordSha512 = QString::fromStdString(cmd.password());
+    databaseInterface->registerUser(userName, realName, gender, passwordSha512, emailAddress, country, false);
     // Reply with successful info or not
-    // Check for too many requests
 
     return RegistrationDisabled;
 }

@@ -112,9 +112,16 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user)
     return (result.size() > 0);
 }
 
+// TODO move this to Server
 bool Servatrice_DatabaseInterface::getRequireRegistration()
 {
     return settingsCache->value("authentication/regonly", 0).toBool();
+}
+
+void Servatrice_DatabaseInterface::registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &passwordSha512, const QString &emailAddress, const QString &country, bool active)
+{
+    // TODO insert
+    // TODO handle duplicate key
 }
 
 AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &banSecondsLeft)
@@ -135,7 +142,7 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
         if (!usernameIsValid(user))
             return UsernameInvalid;
         
-        if (checkUserIsBanned(handler, user, reasonStr, banSecondsLeft))
+        if (checkUserIsBanned(handler->getAddress(), user, reasonStr, banSecondsLeft))
             return UserIsBanned;
         
         QSqlQuery *passwordQuery = prepareQuery("select password_sha512 from {prefix}_users where name = :name and active = 1");

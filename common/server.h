@@ -7,6 +7,7 @@
 #include <QMultiMap>
 #include <QMutex>
 #include <QReadWriteLock>
+#include "pb/commands.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "server_player_reference.h"
 
@@ -55,7 +56,7 @@ public:
     * @param banSecondsRemaining If the client is banned, the time left will be included in this. 0 if the ban is permanent.
     * @return RegistrationResult member indicating whether it succeeded or failed.
     */
-    RegistrationResult registerUserAccount(const QString &ipAddress, const QString userName, const QString emailAddress, QString &banReason, int &banSecondsRemaining);
+    RegistrationResult registerUserAccount(const QString &ipAddress, const Command_Register &cmd, QString &banReason, int &banSecondsRemaining);
 
     bool tooManyRegistrationAttempts(const QString &ipAddress);
     const QMap<int, Server_Room *> &getRooms() { return rooms; }

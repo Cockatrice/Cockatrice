@@ -1,3 +1,5 @@
+import "serverinfo_user.proto";
+
 message SessionCommand {
 	enum SessionCommandType {
 		PING = 1000;
@@ -107,4 +109,9 @@ message Command_Register {
 	required string password = 2;
 	// Email address of the client for user validation
 	optional string email = 3;
+  // Gender of the user
+  optional ServerInfo_User.Gender gender = 4;
+  // Country code of the user. 2 letter ISO format
+  optional string country = 5;
+  optional string real_name = 6;
 }

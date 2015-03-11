@@ -388,8 +388,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdRegisterAccount(const Command_
     RegistrationResult result =
             server->registerUserAccount(
                     this->getAddress(),
-                    QString::fromStdString(cmd.user_name()),
-                    QString::fromStdString(cmd.email()),
+                    cmd,
                     banReason,
                     banSecondsRemaining);
     qDebug() << "Register command result:" << result;
