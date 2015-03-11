@@ -146,14 +146,17 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 {
     CardInfo const *info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
     
-    bool show = false;
-    if (!cardName.isEmpty()) {
-        if (info->getName().contains(cardName, Qt::CaseInsensitive))
-            show = true;
-    } else
-        return true;// search is empty, show all
+    if (((isToken == ShowTrue) && !info->getIsToken()) || ((isToken == ShowFalse) && info->getIsToken()))
+        return false;
 
-    return show;
+    if (!cardName.isEmpty())
+        if (!info->getName().contains(cardName, Qt::CaseInsensitive))
+            return false;
+
+    if (filterTree != NULL)
+        return filterTree->acceptsCard(info);
+
+    return true;
 }
 
 void CardDatabaseDisplayModel::clearSearch()
