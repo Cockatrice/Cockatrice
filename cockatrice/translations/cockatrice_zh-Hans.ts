@@ -1112,7 +1112,7 @@ Would you like to change your database location setting?</source>
 
 您应该重新启动Oracle以便更新卡牌数据库。
 
-您想要重新设置卡牌数据库路径么？</translation>
+您想要重新设置卡牌数据库路径么?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="818"/>
@@ -1129,7 +1129,7 @@ Would you like to change your database location setting?</source>
 
 您应该重新启动Oracle以便更新卡牌数据库。
 
-您想要重新设置卡牌数据库路径么？</translation>
+您想要重新设置卡牌数据库路径么?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="825"/>
@@ -1138,21 +1138,29 @@ Would you like to change your database location setting?</source>
 Please file a ticket at http://github.com/Daenyth/Cockatrice/issues with your cards.xml attached
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"/>
+        <translation>您的卡牌数据库没有完成载入 
+
+请转至http://github.com/Daenyth/Cockatrice/issues with your cards.xml 报错并且上传cards.xml文件
+
+您想要重新设置卡牌数据库路径么?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="831"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"/>
+        <translation>载入卡牌数据库时出现错误
+
+您想要重新设置卡牌数据库路径么?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="836"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"/>
+        <translation>您的卡牌数据库中并不包含任何卡牌信息
+
+您想要重新设置卡牌数据库路径么?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="841"/>
@@ -1161,17 +1169,17 @@ Would you like to change your database location setting?</source>
 Please file a ticket at http://github.com/Daenyth/Cockatrice/issues
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"/>
+        <translation>您想要重新设置卡牌数据库路径么?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="854"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
-        <translation type="unfinished"/>
+        <translation>您想要重新设置卡牌数据库路径么?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="860"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
-        <translation type="unfinished"/>
+        <translation>您想要重新设置卡牌数据库路径么?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="869"/>

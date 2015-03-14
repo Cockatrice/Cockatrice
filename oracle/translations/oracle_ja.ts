@@ -3,12 +3,12 @@
     <name>ChooseSetsPage</name>
     <message>
         <source>Sets selection</source>
-        <translation>セット選択</translation>
+        <translation>カードセット選択</translation>
     </message>
     <message>
         <source>The following sets has been found in the source file. Please mark the sets that will be imported.
 All core and expansion sets are selected by default.</source>
-        <translation>ソースファイルからこれらのセットが見つかりました。インポートするセットにチェックしてください。
+        <translation>ソースファイルからこれらのカードセットが見つかりました。インポートするセットにチェックしてください。
  すべての基本セットと拡張セットはデフォルトで選択されています。</translation>
     </message>
     <message>
@@ -36,7 +36,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>English</source>
-        <translation>(Japanese)</translation>
+        <translation>日本語 (Japanese)</translation>
     </message>
     <message>
         <source>Language:</source>
@@ -44,8 +44,8 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
-        <translation>このウィザードでは、Cockatriceが使用するセットやカードのリストをインポートします。
-URLまたはソースとして使用するファイルを指定した後、利用可能リストから入れたいセットを選択します。</translation>
+        <translation>このウィザードでは、Cockatriceが使用するカードセットやカードのリストをインポートします。
+ソースとして使用するURLまたはファイルを指定した後、利用可能リストから入れたいセットを選択します。</translation>
     </message>
 </context>
 <context>
@@ -56,7 +56,7 @@ URLまたはソースとして使用するファイルを指定した後、利�
     </message>
     <message>
         <source>Please specify a source for the list of sets and cards. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation>セットやカードのリストのソースを指定してください。ダウンロード可能なURLか、コンピューターにあるソースファイルを指定することができます。</translation>
+        <translation>カードセットやカードのリストのソースを指定してください。ダウンロード可能なURLか、コンピューターにあるソースファイルを指定することができます。</translation>
     </message>
     <message>
         <source>Download url:</source>
@@ -76,15 +76,15 @@ URLまたはソースとして使用するファイルを指定した後、利�
     </message>
     <message>
         <source>Load sets file</source>
-        <translation>セットファイルを開く</translation>
+        <translation>カードセットファイルを開く</translation>
     </message>
     <message>
         <source>Sets JSON file (*.json *.zip)</source>
-        <translation>Sets JSON file (*.json *.zip)</translation>
+        <translation>カードセット JSON ファイル (*.json *.zip)</translation>
     </message>
     <message>
         <source>Sets JSON file (*.json)</source>
-        <translation>Sets JSON file (*.json)</translation>
+        <translation>カードセット JSON ファイル (*.json)</translation>
     </message>
     <message>
         <source>Error</source>
@@ -124,7 +124,7 @@ URLまたはソースとして使用するファイルを指定した後、利�
     </message>
     <message>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
-        <translation>ZIP展開に失敗：Zipアーカイブは、正確に一つのファイルが含まれていません。</translation>
+        <translation>ZIP展開に失敗:Zipアーカイブは、正確に一つのファイルが含まれていません。</translation>
     </message>
     <message>
         <source>Zip extraction failed: %1.</source>
@@ -132,7 +132,7 @@ URLまたはソースとして使用するファイルを指定した後、利�
     </message>
     <message>
         <source>Sorry, this version of Oracle does not support zipped files.</source>
-        <translation>申し訳ありませんが、Oracleのこのバージョンのは、zip形式のファイルをサポートしていません。</translation>
+        <translation>申し訳ありませんが現バージョンのOracleはzip形式のファイルをサポートしていません。</translation>
     </message>
     <message>
         <source>Do you want to try to download a fresh copy of the uncompressed file instead?</source>
@@ -140,7 +140,7 @@ URLまたはソースとして使用するファイルを指定した後、利�
     </message>
     <message>
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
-        <translation>ファイルが正常に取得されたが、すべてのセットのデータが含まれていません。</translation>
+        <translation>ファイルは正常に取得されたが、カードセットのデータが含まれていませんでした。</translation>
     </message>
 </context>
 <context>
@@ -165,11 +165,11 @@ URLまたはソースとして使用するファイルを指定した後、利�
     <name>SaveSetsPage</name>
     <message>
         <source>Sets imported</source>
-        <translation>セットインポート</translation>
+        <translation>カードセットインポート</translation>
     </message>
     <message>
         <source>The following sets has been imported. Press &quot;Save&quot; to save the imported cards to the Cockatrice database.</source>
-        <translation>セットがインポートされます。”保存”をクリックするとインポートしたカードをCockatriceデータベースに保存します。</translation>
+        <translation>これらのカードセットがインポートされます。”保存”をクリックするとインポートしたカードをCockatriceデータベースに保存します。</translation>
     </message>
     <message>
         <source>Save to the default path (recommended)</source>
@@ -230,7 +230,7 @@ URLまたはソースとして使用するファイルを指定した後、利�
     </message>
     <message>
         <source>Unable to create or open file.</source>
-        <translation>Unable to create or open file.</translation>
+        <translation>ファイルが作成または開けませんでした。</translation>
     </message>
     <message>
         <source>Partially corrupted archive. Some files might be extracted.</source>

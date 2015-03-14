@@ -575,7 +575,7 @@ Cette information sera consultable uniquement par les modérateurs.</translation
     <message>
         <location filename="../src/dlg_settings.cpp" line="565"/>
         <source>Enable &amp;price tag feature from deckbrew.com</source>
-        <translation type="unfinished"/>
+        <translation>Activer la fonction affichage du &amp;prix depuis deckbrew.com</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="566"/>
@@ -655,7 +655,7 @@ Cette information sera consultable uniquement par les modérateurs.</translation
     <message>
         <location filename="../src/tab_game.cpp" line="160"/>
         <source>The selected file could not be loaded.</source>
-        <translation type="unfinished"/>
+        <translation>Le fichier sélectionné n&apos;a pas pu être chargé.</translation>
     </message>
 </context>
 <context>
@@ -774,17 +774,17 @@ Cette information sera consultable uniquement par les modérateurs.</translation
     <message>
         <location filename="../src/dlg_creategame.cpp" line="75"/>
         <source>&amp;Spectators can watch</source>
-        <translation type="unfinished"/>
+        <translation>Les &amp;spectateurs peuvent observer.</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="78"/>
         <source>Spectators &amp;need a password to watch</source>
-        <translation type="unfinished"/>
+        <translation>Les spectateurs ont besoin d&apos;un &amp;mot-de-passe pour observer.</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="80"/>
         <source>Spectators can see &amp;hands</source>
-        <translation type="unfinished"/>
+        <translation>Les spectateurs peuvent voir les &amp;mains des joueurs.</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="79"/>
@@ -804,7 +804,7 @@ Cette information sera consultable uniquement par les modérateurs.</translation
     <message>
         <location filename="../src/dlg_creategame.cpp" line="157"/>
         <source>Game information</source>
-        <translation type="unfinished"/>
+        <translation>Informations sur la partie</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="194"/>
@@ -887,17 +887,17 @@ Cette information sera consultable uniquement par les modérateurs.</translation
     <message>
         <location filename="../src/dlg_create_token.cpp" line="59"/>
         <source>Token data</source>
-        <translation type="unfinished"/>
+        <translation>Données du jeton</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="67"/>
         <source>Show &amp;all tokens</source>
-        <translation type="unfinished"/>
+        <translation>Afficher &amp;tous les tokens</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="69"/>
         <source>Show tokens from this &amp;deck</source>
-        <translation type="unfinished"/>
+        <translation>Afficher les tokens présents dans ce &amp;deck</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="103"/>
