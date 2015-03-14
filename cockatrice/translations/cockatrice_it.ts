@@ -4264,7 +4264,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="552"/>
         <source>Ctrl+Enter</source>
-        <translation>Ctrl+Invio</translation>
+        <translation>Ctrl+Enter</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="555"/>

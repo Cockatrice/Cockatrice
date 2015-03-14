@@ -92,7 +92,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="359"/>
         <source>Invert vertical coordinate</source>
-        <translation>垂直反転調整</translation>
+        <translation>戦場の配置の垂直反転</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="360"/>
@@ -160,8 +160,8 @@
         <location filename="../src/userlist.cpp" line="82"/>
         <source>Please enter the reason for the ban.
 This is only saved for moderators and cannot be seen by the banned person.</source>
-        <translation>Banの理由を入れてください。
-これはモデレーターによって保存されBanされた人間には見えません。</translation>
+        <translation>BANの理由を入れてください。
+これはモデレーターによって保存されBANされた人間には見えません。</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="85"/>
@@ -176,7 +176,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/userlist.cpp" line="91"/>
         <source>&amp;Cancel</source>
-        <translation>Cancel</translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="109"/>
@@ -204,7 +204,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="61"/>
         <source>Sets</source>
-        <translation>エキスパンション</translation>
+        <translation>カードセット</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="62"/>
@@ -214,12 +214,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="63"/>
         <source>Card type</source>
-        <translation>カードタイプ</translation>
+        <translation>カード・タイプ</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="64"/>
         <source>P/T</source>
-        <translation>サイズ（P/T）</translation>
+        <translation>P/T</translation>
     </message>
 </context>
 <context>
@@ -232,17 +232,17 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardinfotext.cpp" line="63"/>
         <source>Mana cost:</source>
-        <translation>マナコスト:</translation>
+        <translation>マナ・コスト:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="64"/>
         <source>Card type:</source>
-        <translation>カードタイプ:</translation>
+        <translation>カード・タイプ:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="65"/>
         <source>P / T:</source>
-        <translation>パワー / タフネス:</translation>
+        <translation>P / T:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="66"/>
@@ -260,7 +260,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardinfowidget.cpp" line="24"/>
         <source>Show text only</source>
-        <translation>テキストのみ表示</translation>
+        <translation>カードテキストのみ表示</translation>
     </message>
     <message>
         <location filename="../src/cardinfowidget.cpp" line="24"/>
@@ -275,17 +275,17 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardinfowidget.cpp" line="202"/>
         <source>Mana cost:</source>
-        <translation>マナコスト:</translation>
+        <translation>マナ・コスト:</translation>
     </message>
     <message>
         <location filename="../src/cardinfowidget.cpp" line="203"/>
         <source>Card type:</source>
-        <translation>カードタイプ:</translation>
+        <translation>カード・タイプ:</translation>
     </message>
     <message>
         <location filename="../src/cardinfowidget.cpp" line="204"/>
         <source>P / T:</source>
-        <translation>パワー / タフネス:</translation>
+        <translation>P / T:</translation>
     </message>
     <message>
         <location filename="../src/cardinfowidget.cpp" line="205"/>
@@ -635,12 +635,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/tab_game.cpp" line="143"/>
         <source>S&amp;ideboard unlocked</source>
-        <translation>サイドボードをロック</translation>
+        <translation>サイドボードをロックする</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="145"/>
         <source>S&amp;ideboard locked</source>
-        <translation>サイドボードを使用</translation>
+        <translation>サイドボードを使用する</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="150"/>
@@ -673,7 +673,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_cardsearch.cpp" line="21"/>
         <source>Card type (OR):</source>
-        <translation>カードタイプ（含む）:</translation>
+        <translation>カード・タイプ (含む) :</translation>
     </message>
     <message>
         <location filename="../src/dlg_cardsearch.cpp" line="31"/>
@@ -688,7 +688,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_cardsearch.cpp" line="44"/>
         <source>&amp;Cancel</source>
-        <translation>Cancel</translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location filename="../src/dlg_cardsearch.cpp" line="66"/>
@@ -1203,7 +1203,7 @@ http://github.com/Daenyth/Cockatrice/issues でチケットを提出してくだ
     <message>
         <location filename="../src/dlg_settings.cpp" line="873"/>
         <source>User interface</source>
-        <translation>ユーザーインターフェース</translation>
+        <translation>UI</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="874"/>
@@ -1330,7 +1330,7 @@ http://github.com/Daenyth/Cockatrice/issues でチケットを提出してくだ
     <message>
         <location filename="../src/gamesmodel.cpp" line="212"/>
         <source>Game Created</source>
-        <translation>ゲーム作成</translation>
+        <translation>作成時</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="214"/>
@@ -1366,17 +1366,17 @@ http://github.com/Daenyth/Cockatrice/issues でチケットを提出してくだ
     <message>
         <location filename="../src/gamesmodel.cpp" line="182"/>
         <source>see hands</source>
-        <translation>手札の閲覧</translation>
+        <translation>手札閲覧可</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="190"/>
         <source>can see hands</source>
-        <translation>閲覧可</translation>
+        <translation>手札閲覧可</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="195"/>
         <source>not allowed</source>
-        <translation>閲覧不可</translation>
+        <translation>観戦不可</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="211"/>
@@ -1499,7 +1499,7 @@ http://github.com/Daenyth/Cockatrice/issues でチケットを提出してくだ
         <location filename="../src/dlg_settings.cpp" line="37"/>
         <location filename="../src/dlg_settings.cpp" line="138"/>
         <source>English</source>
-        <translation>(Japanese)</translation>
+        <translation>日本語 (Japanese)</translation>
     </message>
 </context>
 <context>
@@ -1681,7 +1681,7 @@ Please close that session first and re-login.</source>
     <message>
         <location filename="../src/window_main.cpp" line="251"/>
         <source>You are banned until %1.</source>
-        <translation>あなたは%1まで禁止されています。</translation>
+        <translation>あなたは%1までBANされています。</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="253"/>
@@ -2033,12 +2033,12 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="209"/>
         <source>%1 undoes his last draw (%2).</source>
-        <translation>%1は最後のドローを取り消した(%2)。</translation>
+        <translation>%1は最後のドローを取り消した (%2)。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="209"/>
         <source>%1 undoes her last draw (%2).</source>
-        <translation>%1は最後のドローを取り消した(%2)。</translation>
+        <translation>%1は最後のドローを取り消した (%2)。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="219"/>
@@ -2203,12 +2203,12 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="318"/>
         <source>%1 puts %2%3 into his library at position %4.</source>
-        <translation>%1は%2を%3ライブラリーの一番上から%4 +1番目に置いた。</translation>
+        <translation>%1は%2を%3ライブラリーの一番上から%4枚目の下に置いた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="318"/>
         <source>%1 puts %2%3 into her library at position %4.</source>
-        <translation>%1は%2を%3ライブラリーの一番上から%4 +1番目に置いた。</translation>
+        <translation>%1は%2を%3ライブラリーの一番上から%4番目に置いた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="320"/>
@@ -2584,13 +2584,13 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="613"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
         <comment>female</comment>
-        <translation>%1は%2カウンターを%3に設定した(%4%5)。</translation>
+        <translation>%1は%2カウンターを%3に設定した (%4%5)。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="615"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
         <comment>male</comment>
-        <translation>%1は%2カウンターを%3に設定した(%4%5)。</translation>
+        <translation>%1は%2カウンターを%3に設定した (%4%5)。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="624"/>
@@ -2608,37 +2608,37 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/messagelogwidget.cpp" line="629"/>
         <source>%1 sets %2 to untap normally.</source>
         <comment>female</comment>
-        <translation>%1は%2を、通常のアンタップをするように設定した。</translation>
+        <translation>%1は%2を、通常にアンタップするように設定した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="631"/>
         <source>%1 sets %2 to untap normally.</source>
         <comment>male</comment>
-        <translation>%1は%2を、通常のアンタップをするように設定した。</translation>
+        <translation>%1は%2を、通常にアンタップするように設定した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="643"/>
         <source>%1 sets PT of %2 to %3.</source>
         <comment>female</comment>
-        <translation>%1は%2のサイズを%3にした。</translation>
+        <translation>%1は%2のP/Tを変更した（%3）。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="645"/>
         <source>%1 sets PT of %2 to %3.</source>
         <comment>male</comment>
-        <translation>%1は%2のサイズを%3にした。</translation>
+        <translation>%1は%2のP/Tを変更した（%3）。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="654"/>
         <source>%1 sets annotation of %2 to %3.</source>
         <comment>female</comment>
-        <translation>%1は%2に注釈をつけた(%3)。</translation>
+        <translation>%1は%2に注釈をつけた (%3)。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="656"/>
         <source>%1 sets annotation of %2 to %3.</source>
         <comment>male</comment>
-        <translation>%1は%2に注釈をつけた(%3)。</translation>
+        <translation>%1は%2に注釈をつけた (%3)。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="664"/>
@@ -2976,7 +2976,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="821"/>
         <source>It is now the %1.</source>
-        <translation>［%1］</translation>
+        <translation>-%1-</translation>
     </message>
 </context>
 <context>
@@ -2984,12 +2984,12 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="688"/>
         <source>&amp;Add</source>
-        <translation>追加する</translation>
+        <translation>追加</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="689"/>
         <source>&amp;Remove</source>
-        <translation>削除する</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="690"/>
@@ -3004,7 +3004,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="692"/>
         <source>In-game message macros</source>
-        <translation>メッセージマクロ</translation>
+        <translation>定型文</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="693"/>
@@ -3510,7 +3510,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/player.cpp" line="681"/>
         <source>Set &amp;power and toughness...</source>
-        <translation>サイズを設定する...</translation>
+        <translation>P/Tを設定する...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="682"/>
@@ -3623,7 +3623,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/player.cpp" line="1959"/>
         <source>Set power/toughness</source>
-        <translation>サイズを設定する</translation>
+        <translation>P/Tを設定する</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1959"/>
@@ -3811,7 +3811,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/tab_server.cpp" line="67"/>
         <source>Players</source>
-        <translation>プレイヤー</translation>
+        <translation>人数</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="68"/>
@@ -4170,7 +4170,7 @@ Please enter a name:</source>
         <location filename="../src/tab_deck_storage.cpp" line="313"/>
         <location filename="../src/tab_deck_storage.cpp" line="321"/>
         <source>Are you sure you want to delete &quot;%1&quot;?</source>
-        <translation>本当に &amp;quot;%1&amp;quot; をローカルから削除してもよろしいですか？</translation>
+        <translation>本当に &quot;%1&quot; を削除してもよろしいですか？</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="271"/>
@@ -4422,7 +4422,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_replays.cpp" line="147"/>
         <source>Are you sure you want to delete &quot;%1&quot;?</source>
-        <translation>本当に &amp;quot;%1&amp;quot; をローカルから削除してもよろしいですか？</translation>
+        <translation>本当に &quot;%1&quot; を削除してもよろしいですか？</translation>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="253"/>
@@ -4651,7 +4651,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="517"/>
         <source>Notify in the taskbar for game events while you are spectating</source>
-        <translation>観戦中タスクバーにベームイベントを通知する</translation>
+        <translation>タスクバーに観戦中のゲームイベントを通知する</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="518"/>
@@ -4780,7 +4780,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/zoneviewwidget.cpp" line="175"/>
         <source>sort by type</source>
-        <translation>カードタイプ順で並び替え</translation>
+        <translation>カード・タイプ順で並び替え</translation>
     </message>
     <message>
         <location filename="../src/zoneviewwidget.cpp" line="176"/>
@@ -4790,7 +4790,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/zoneviewwidget.cpp" line="177"/>
         <source>pile view</source>
-        <translation>pile view</translation>
+        <translation>タイプ別に重ねて表示</translation>
     </message>
 </context>
 </TS>
