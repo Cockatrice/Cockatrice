@@ -130,7 +130,7 @@ max_users_per_address=4
 ; IP addresses listed (ignoring the max_users_per_address). Default is "127.0.0.1,::1"; example: "192.73.233.244,81.4.100.74"
 trusted_sources="127.0.0.1,::1"
 
-; Servatrice can avoid users from flooding rooms with large number messages in an interval of time.
+; Servatrice can avoid users from flooding rooms with large number of messages in an interval of time.
 ; This setting defines the length in seconds of the considered interval; default is 10
 message_counting_interval=10
 
@@ -143,6 +143,12 @@ max_message_count_per_interval=10
 ; Maximum number of games a single user can create; default is 5
 max_games_per_user=5
 
+; Servatrice can avoid users from flooding games with large number of game commands in an interval of time.
+; This setting defines the length in seconds of the considered interval; default is 10
+command_counting_interval=10
+
+; Maximum number of game commands in an interval before new commands gets dropped; default is 10
+max_command_count_per_interval=10
 
 [logging]
 

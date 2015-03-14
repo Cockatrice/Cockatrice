@@ -259,6 +259,8 @@ bool Servatrice::initServer()
     maxMessageCountPerInterval = settingsCache->value("security/max_message_count_per_interval", 10).toInt();
     maxMessageSizePerInterval = settingsCache->value("security/max_message_size_per_interval", 1000).toInt();
     maxGamesPerUser = settingsCache->value("security/max_games_per_user", 5).toInt();
+    commandCountingInterval = settingsCache->value("game/command_counting_interval", 10).toInt();
+    maxCommandCountPerInterval = settingsCache->value("game/max_command_count_per_interval", 10).toInt();
 
 	try { if (settingsCache->value("servernetwork/active", 0).toInt()) {
 		qDebug() << "Connecting to ISL network.";

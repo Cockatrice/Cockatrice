@@ -217,12 +217,26 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
     if (!player)
         return Response::RespNotInRoom;
     
+    int commandCountingInterval = server->getCommandCountingInterval();
+    int maxMessageCountPerInterval = server->getMaxMessageCountPerInterval();
     GameEventStorage ges;
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.game_command_size() - 1; i >= 0; --i) {
         const GameCommand &sc = cont.game_command(i);
         logDebugMessage(QString("game %1 player %2: ").arg(cont.game_id()).arg(roomIdAndPlayerId.second) + QString::fromStdString(sc.ShortDebugString()));
-        
+
+        if (commandCountingInterval > 0) {
+            int totalCount = 0;
+            if (commandCountOverTime.isEmpty())
+                commandCountOverTime.prepend(0);
+            ++commandCountOverTime[0];
+            for (int i = 0; i < commandCountOverTime.size(); ++i)
+                totalCount += commandCountOverTime[i];
+            
+            if (totalCount > maxMessageCountPerInterval)
+                return Response::RespChatFlood;
+        }
+
         Response::ResponseCode resp = player->processGameCommand(sc, rc, ges);
 
         if (resp != Response::RespOk)
@@ -314,7 +328,14 @@ void Server_ProtocolHandler::pingClockTimeout()
         if (messageCountOverTime.size() > server->getMessageCountingInterval())
             messageCountOverTime.removeLast();
     }
-    
+
+    interval = server->getCommandCountingInterval();
+    if (interval > 0) {
+        commandCountOverTime.prepend(0);
+        if (commandCountOverTime.size() > server->getCommandCountingInterval())
+            commandCountOverTime.removeLast();
+    }
+
     if (timeRunning - lastDataReceived > server->getMaxPlayerInactivityTime())
         prepareDestroy();
     ++timeRunning;
