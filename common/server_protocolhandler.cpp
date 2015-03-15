@@ -415,6 +415,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdRegisterAccount(const Command_
                 re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsRemaining).toTime_t());
             rc.setResponseExtension(re);
             return Response::RespUserIsBanned;
+        case Failed:
+            return Response::RespRegistrationFailed;
     }
 
     return Response::RespInvalidCommand;

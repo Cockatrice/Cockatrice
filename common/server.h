@@ -29,7 +29,7 @@ class CommandContainer;
 class Command_JoinGame;
 
 enum AuthenticationResult { NotLoggedIn = 0, PasswordRight = 1, UnknownUser = 2, WouldOverwriteOldSession = 3, UserIsBanned = 4, UsernameInvalid = 5, RegistrationRequired = 6 };
-enum RegistrationResult { Accepted = 0, UserAlreadyExists = 1, EmailRequired = 2, UnauthenticatedServer = 3, TooManyRequests = 4, InvalidUsername = 5, ClientIsBanned = 6, RegistrationDisabled = 7};
+enum RegistrationResult { Accepted = 0, UserAlreadyExists = 1, EmailRequired = 2, UnauthenticatedServer = 3, TooManyRequests = 4, InvalidUsername = 5, ClientIsBanned = 6, RegistrationDisabled = 7, Failed = 8};
 
 class Server : public QObject
 {

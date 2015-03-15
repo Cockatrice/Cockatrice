@@ -9,7 +9,6 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QDateTime>
-#include <AppKit/AppKit.h>
 
 Servatrice_DatabaseInterface::Servatrice_DatabaseInterface(int _instanceId, Servatrice *_server)
     : instanceId(_instanceId),
@@ -118,10 +117,44 @@ bool Servatrice_DatabaseInterface::getRequireRegistration()
     return settingsCache->value("authentication/regonly", 0).toBool();
 }
 
-void Servatrice_DatabaseInterface::registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &passwordSha512, const QString &emailAddress, const QString &country, bool active)
+bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &passwordSha512, const QString &emailAddress, const QString &country, bool active)
 {
-    // TODO insert
-    // TODO handle duplicate key
+    if (!checkSql())
+        return false;
+
+    QSqlQuery *query = prepareQuery("insert into {prefix}_users "
+            "(name, realname, gender, password_sha512, email, country, registrationDate, active) "
+            "values "
+            "(:userName, :realName, :gender, :password_sha512, :email, :country, UTC_TIMESTAMP(), :active)");
+    query->bindValue(":userName", userName);
+    query->bindValue(":realName", realName);
+    query->bindValue(":gender", getGenderChar(gender));
+    query->bindValue(":password_sha512", passwordSha512);
+    query->bindValue(":email", emailAddress);
+    query->bindValue(":country", country);
+    query->bindValue(":active", active ? 1 : 0);
+
+    if (!execSqlQuery(query)) {
+        qDebug() << "Failed to insert user: " << query->lastError() << " sql: " << query->lastQuery();
+        // TODO handle duplicate insert error
+        return false;
+    }
+
+    return true;
+}
+
+char Servatrice_DatabaseInterface::getGenderChar(ServerInfo_User_Gender const &gender)
+{
+    switch (gender) {
+        case ServerInfo_User_Gender_GenderUnknown:
+            return 'u';
+        case ServerInfo_User_Gender_Male:
+            return 'm';
+        case ServerInfo_User_Gender_Female:
+            return 'f';
+        default:
+            return 'u';
+    }
 }
 
 AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &banSecondsLeft)
@@ -240,6 +273,7 @@ bool Servatrice_DatabaseInterface::checkUserIsIpBanned(const QString &ipAddress,
             return true;
         }
     }
+    return false;
 }
 
 bool Servatrice_DatabaseInterface::userExists(const QString &user)

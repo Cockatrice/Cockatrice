@@ -203,10 +203,9 @@ RegistrationResult Server::registerUserAccount(const QString &ipAddress, const C
     ServerInfo_User_Gender gender = cmd.gender();
     QString country = QString::fromStdString(cmd.country());
     QString passwordSha512 = QString::fromStdString(cmd.password());
-    databaseInterface->registerUser(userName, realName, gender, passwordSha512, emailAddress, country, false);
-    // Reply with successful info or not
+    bool regSucceeded = databaseInterface->registerUser(userName, realName, gender, passwordSha512, emailAddress, country, false);
 
-    return RegistrationDisabled;
+    return regSucceeded ? Accepted : Failed;
 }
 
 bool Server::tooManyRegistrationAttempts(const QString &ipAddress)

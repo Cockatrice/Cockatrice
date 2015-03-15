@@ -22,6 +22,7 @@ private:
 	bool checkUserIsIpBanned(const QString &ipAddress, QString &banReason, int &banSecondsRemaining);
 	/** Must be called after checkSql and server is known to be in auth mode. */
 	bool checkUserIsNameBanned(QString const &userName, QString &banReason, int &banSecondsRemaining);
+	char getGenderChar(ServerInfo_User_Gender const &gender);
 protected:
 	bool usernameIsValid(const QString &user);
 	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &secondsLeft);
@@ -60,7 +61,7 @@ public:
 	bool userSessionExists(const QString &userName);
 
 	bool getRequireRegistration();
-	void registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &passwordSha512, const QString &emailAddress, const QString &country, bool active = false);
+	bool registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &passwordSha512, const QString &emailAddress, const QString &country, bool active = false);
 
     void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage, LogMessage_TargetType targetType, const int targetId, const QString &targetName);
 };
