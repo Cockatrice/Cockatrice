@@ -439,11 +439,12 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
             
             card->deleteLater();
         } else {
+            card->setFaceDown(faceDown);
             if (!targetzone->hasCoords()) {
                 y = 0;
                 card->resetState();
             } else
-                newX = targetzone->getFreeGridColumn(newX, y, card->getName());
+                newX = targetzone->getFreeGridColumn(newX, y, card->getName(), faceDown);
         
             targetzone->insertCard(card, newX, y);
         
@@ -464,7 +465,6 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
             int oldCardId = card->getId();
             if ((faceDown && (startzone != targetzone)) || (targetzone->getPlayer() != startzone->getPlayer()))
                 card->setId(targetzone->getPlayer()->newCardId());
-            card->setFaceDown(faceDown);
         
             // The player does not get to see which card he moved if it moves between two parts of hidden zones which
             // are not being looked at.
@@ -1043,7 +1043,7 @@ Response::ResponseCode Server_Player::cmdAttachCard(const Command_AttachCard &cm
         if (targetzone->isColumnStacked(targetCard->getX(), targetCard->getY())) {
             CardToMove *cardToMove = new CardToMove;
             cardToMove->set_card_id(targetCard->getId());
-            targetPlayer->moveCard(ges, targetzone, QList<const CardToMove *>() << cardToMove, targetzone, targetzone->getFreeGridColumn(-2, targetCard->getY(), targetCard->getName()), targetCard->getY(), targetCard->getFaceDown());
+            targetPlayer->moveCard(ges, targetzone, QList<const CardToMove *>() << cardToMove, targetzone, targetzone->getFreeGridColumn(-2, targetCard->getY(), targetCard->getName(), false), targetCard->getY(), targetCard->getFaceDown());
             delete cardToMove;
         }
         
@@ -1080,7 +1080,7 @@ Response::ResponseCode Server_Player::cmdCreateToken(const Command_CreateToken &
     int x = cmd.x();
     int y = cmd.y();
     if (zone->hasCoords())
-        x = zone->getFreeGridColumn(x, y, cardName);
+        x = zone->getFreeGridColumn(x, y, cardName, false);
     if (x < 0)
         x = 0;
     if (y < 0)

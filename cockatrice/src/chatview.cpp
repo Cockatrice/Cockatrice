@@ -15,6 +15,7 @@
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
 const QColor OTHER_USER_COLOR = QColor(0, 65, 255); // dark blue
+const QString SERVER_MESSAGE_COLOR = "#851515";
 
 ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent)
     : QTextBrowser(parent), tabSupervisor(_tabSupervisor), game(_game), evenNumber(true), showTimestamps(_showTimestamps), hoveredItemType(HoveredNothing)
@@ -69,6 +70,14 @@ void ChatView::appendHtml(const QString &html)
 {
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
     prepareBlock().insertHtml(html);
+    if (atBottom)
+        verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+}
+
+void ChatView::appendHtmlServerMessage(const QString &html)
+{
+    bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
+    prepareBlock().insertHtml("<font color=" + SERVER_MESSAGE_COLOR + ">" + html + "</font>");
     if (atBottom)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }

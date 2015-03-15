@@ -62,7 +62,7 @@ public:
     Server_Player *getPlayer() const { return player; }
     void getInfo(ServerInfo_Zone *info, Server_Player *playerWhosAsking, bool omniscient);
     
-    int getFreeGridColumn(int x, int y, const QString &cardName) const;
+    int getFreeGridColumn(int x, int y, const QString &cardName, bool dontStackSameName) const;
     bool isColumnEmpty(int x, int y) const;
     bool isColumnStacked(int x, int y) const;
     void fixFreeSpaces(GameEventStorage &ges);

@@ -1,330 +1,330 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="it" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="fr" version="2.1">
 <context>
     <name>ChooseSetsPage</name>
     <message>
         <source>Sets selection</source>
-        <translation>Selezione dei set</translation>
+        <translation>Choix des éditions</translation>
     </message>
     <message>
         <source>The following sets has been found in the source file. Please mark the sets that will be imported.
 All core and expansion sets are selected by default.</source>
-        <translation>I seguenti set sono stati trovati nel file. Seleziona i set che verranno importati.
-Tutti i set base e le espansioni sono selezionate di default.</translation>
+        <translation>Les éditions suivantes ont été trouvées. Veuillez choisir les éditions que vous souhaitez importer.
+Les éditions de base et les différents blocs d&apos;éditions sont cochés par défaut.</translation>
     </message>
     <message>
         <source>&amp;Check all</source>
-        <translation>Seleziona tutti</translation>
+        <translation>&amp;Tout cocher</translation>
     </message>
     <message>
         <source>&amp;Uncheck all</source>
-        <translation>Deseleziona tutti</translation>
+        <translation>&amp;Tout décocher</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Errore</translation>
+        <translation>Erreur</translation>
     </message>
     <message>
         <source>Please mark at least one set.</source>
-        <translation>Seleziona perlomeno un set.</translation>
+        <translation>Merci de selectionner au moins une édition.</translation>
     </message>
 </context>
 <context>
     <name>IntroPage</name>
     <message>
         <source>Introduction</source>
-        <translation>Introduzione</translation>
+        <translation>Introduction</translation>
     </message>
     <message>
         <source>English</source>
-        <translation>Italiano (Italian)</translation>
+        <translation>Français (French)</translation>
     </message>
     <message>
         <source>Language:</source>
-        <translation>Lingua:</translation>
+        <translation>Langue:</translation>
     </message>
     <message>
         <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
-        <translation>Questo wizard importerà la lista dei set e delle carte che verranno usate da Cockatrice.&lt;br/&gt;Dovrai specificare un indirizzo url o il nome di un file che verrà utilizzato come sorgente, e poi selezionare i set dalla lista di quelli disponibili.</translation>
+        <translation>Cet assistant va importer la liste des éditions et des cartes qui seront utilisées par Cockatrice.&lt;br/&gt;Vous devrez spécifier une url ou un fichier local avec la liste d&apos;édition comme fichier source, Puis choisir quelles éditions seront importées parmis la liste proposée.</translation>
     </message>
 </context>
 <context>
     <name>LoadSetsPage</name>
     <message>
         <source>Source selection</source>
-        <translation>Selezione sorgente</translation>
+        <translation>Choix du fichier source</translation>
     </message>
     <message>
         <source>Please specify a source for the list of sets and cards. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation>Specifica una sorgente per la lista dei set e delle carte. Puoi specificare un indirizzo url da cui scaricare il file o alternativamente usare un file già presente nel tuo computer.</translation>
+        <translation>Choisissez un fichier d&apos;éditions source. Vous pouvez donner une addresse url qui sera téléchargée ou un fichier local.</translation>
     </message>
     <message>
         <source>Download url:</source>
-        <translation>Indirizzo download:</translation>
+        <translation>URL de téléchargement:</translation>
     </message>
     <message>
         <source>Local file:</source>
-        <translation>File nel pc:</translation>
+        <translation>Fichier local:</translation>
     </message>
     <message>
         <source>Restore default url</source>
-        <translation>Usa l&apos;indirizzo predefinito</translation>
+        <translation>Restaurer l&apos;URL par défaut</translation>
     </message>
     <message>
         <source>Choose file...</source>
-        <translation>Scegli file...</translation>
+        <translation>Choisir un fichier...</translation>
     </message>
     <message>
         <source>Load sets file</source>
-        <translation>Carica file dei set</translation>
+        <translation>Charger une liste d&apos;éditions</translation>
     </message>
     <message>
         <source>Sets JSON file (*.json *.zip)</source>
-        <translation>File dei set JSON (*.json *.zip)</translation>
+        <translation>Fichier d&apos;éditions JSON (*.json *.zip)</translation>
     </message>
     <message>
         <source>Sets JSON file (*.json)</source>
-        <translation>File set set JSON (*.json)</translation>
+        <translation>Fichier d&apos;éditions JSON (*.json)</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Errore</translation>
+        <translation>Erreur</translation>
     </message>
     <message>
         <source>The provided url is not valid.</source>
-        <translation>L&apos;indirizzo specificato non è valido.</translation>
+        <translation>L&apos;URL fournit est non valide.</translation>
     </message>
     <message>
         <source>Downloading (0MB)</source>
-        <translation>Scaricamento (0MB)</translation>
+        <translation>Téléchargement (0MB)</translation>
     </message>
     <message>
         <source>Please choose a file.</source>
-        <translation>Selezina un file.</translation>
+        <translation>Choisissez un fichier.</translation>
     </message>
     <message>
         <source>Cannot open file &apos;%1&apos;.</source>
-        <translation>Impossibile aprire il file &apos;%1&apos;.</translation>
+        <translation>Impossible d&apos;ouvrir le fichier &apos;%1&apos;.</translation>
     </message>
     <message>
         <source>Downloading (%1MB)</source>
-        <translation>Scaricamento (%1MB)</translation>
+        <translation>Téléchargement (%1MB)</translation>
     </message>
     <message>
         <source>Network error: %1.</source>
-        <translation>Errore di rete: %1</translation>
+        <translation>Erreur réseau : %1.</translation>
     </message>
     <message>
         <source>Parsing file</source>
-        <translation>Analisi dei file</translation>
+        <translation>Traitement du fichier.</translation>
     </message>
     <message>
         <source>Failed to open Zip archive: %1.</source>
-        <translation>Impossibile aprire il file Zip: %1</translation>
+        <translation>Impossible d&apos;ouvrir l&apos;archive zip: %1.</translation>
     </message>
     <message>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
-        <translation>Estrazione file Zip fallita: lo Zip non contiene un solo file.</translation>
+        <translation>Ce fichier ne peut être enregistré au répertoire</translation>
     </message>
     <message>
         <source>Zip extraction failed: %1.</source>
-        <translation>Estrazione file Zip fallita: %1</translation>
+        <translation>l&apos;extraction du zip à échoué : %1.</translation>
     </message>
     <message>
         <source>Sorry, this version of Oracle does not support zipped files.</source>
-        <translation>Spiacente, ma questa versione di Oracle non supporta in file zippati.</translation>
+        <translation>Désolé, cette version d&apos;Oracle ne supporte pas les fichiers zip.</translation>
     </message>
     <message>
         <source>Do you want to try to download a fresh copy of the uncompressed file instead?</source>
-        <translation>Vuoi provare a riscaricare un copia pulita del file non zippato?</translation>
+        <translation>Voulez vous essayer de télécharger une copie non compressée de fichier à la place ?</translation>
     </message>
     <message>
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
-        <translation>Il file è stato analizzato correttamente, ma non contiene i dati di nessun set.</translation>
+        <translation>Le fichier a été trouvé, mais ne contient aucune éditions.</translation>
     </message>
 </context>
 <context>
     <name>OracleImporter</name>
     <message>
         <source>Dummy set containing tokens</source>
-        <translation>Set finto contenente i token</translation>
+        <translation>Fausse édition contenant les jetons.</translation>
     </message>
 </context>
 <context>
     <name>OracleWizard</name>
     <message>
         <source>Oracle Importer</source>
-        <translation>Oracle Importer</translation>
+        <translation>Oracle Importeur</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Salva</translation>
+        <translation>Sauvegarder</translation>
     </message>
 </context>
 <context>
     <name>SaveSetsPage</name>
     <message>
         <source>Sets imported</source>
-        <translation>Set importati</translation>
+        <translation>Éditions importées</translation>
     </message>
     <message>
         <source>The following sets has been imported. Press &quot;Save&quot; to save the imported cards to the Cockatrice database.</source>
-        <translation>I seguenti set sono stati importati. Premi &quot;Salva&quot; per salvare le carte importate nell&apos;archivio di Cockatrice.</translation>
+        <translation>Les éditions suivantes ont été ajoutées. Appuyez sur &quot;Sauvegarder&quot; pour enregister les cartes importées dans la base de cockatrice. </translation>
     </message>
     <message>
         <source>Save to the default path (recommended)</source>
-        <translation>Salva nel percorso predefinito (raccomandato)</translation>
+        <translation>Sauvergarder au chemin par défaut (recommendé)</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Errore</translation>
+        <translation>Erreur</translation>
     </message>
     <message>
         <source>No set has been imported.</source>
-        <translation>Nessun set importato.</translation>
+        <translation>Aucune édition n&apos;a été importé.</translation>
     </message>
     <message>
         <source>Import finished: %1 cards.</source>
-        <translation>Importazione conclusa: %1 carte.</translation>
+        <translation>Import terminé: %1 cartes.</translation>
     </message>
     <message>
         <source>%1: %2 cards imported</source>
-        <translation>%1: %2 carte importate</translation>
+        <translation>%1: %2 cartes ajoutées.</translation>
     </message>
     <message>
         <source>Save card database</source>
-        <translation>Salva archivio carte</translation>
+        <translation>Sauvegarder la base de carte</translation>
     </message>
     <message>
         <source>XML; card database (*.xml)</source>
-        <translation>XML; archivio carte (*.xml)</translation>
+        <translation>XML; base de donnée de carte (*.xml)</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation>Successo</translation>
+        <translation>Importation réussi</translation>
     </message>
     <message>
         <source>The card database has been saved successfully to
 %1</source>
-        <translation>L&apos;archivio delle carte è stato salvato correttamente su
+        <translation>La base de donnée de carte à été correctement sauvegardée dans
 %1</translation>
     </message>
     <message>
         <source>The file could not be saved to %1</source>
-        <translation>Impossibile salvare il file su %1</translation>
+        <translation>Le fichier n&apos;a pu être sauvegarder au chemin &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
     <name>UnZip</name>
     <message>
         <source>ZIP operation completed successfully.</source>
-        <translation>Operazione ZIP completata con successo.</translation>
+        <translation>Extraction zip réussi.</translation>
     </message>
     <message>
         <source>Failed to initialize or load zlib library.</source>
-        <translation>Impossibile caricare le libreria zlib.</translation>
+        <translation>Impossible d&apos;initialiser ou de charger la bibliothèque zlib.</translation>
     </message>
     <message>
         <source>zlib library error.</source>
-        <translation>errore libreria zlib.</translation>
+        <translation>Erreur avec la bibliothèque zlib.</translation>
     </message>
     <message>
         <source>Unable to create or open file.</source>
-        <translation>Impossibile creare o aprire il file.</translation>
+        <translation>Impossible de créer ou d&apos;ouvrir le fichier</translation>
     </message>
     <message>
         <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation>Archivio parzialmente danneggiato. Alcuni file potrebbero essere stati estratti.</translation>
+        <translation>Archive partiellement corrompue. Certains fichiers ont pu être extraits.</translation>
     </message>
     <message>
         <source>Corrupted archive.</source>
-        <translation>Archivio danneggiato.</translation>
+        <translation>Archive corrompu.</translation>
     </message>
     <message>
         <source>Wrong password.</source>
-        <translation>Password sbagliata.</translation>
+        <translation>Mauvais mot de passe.</translation>
     </message>
     <message>
         <source>No archive has been created yet.</source>
-        <translation>L&apos;archivio non è ancora stato creato.</translation>
+        <translation>Aucune archive n&apos;a été créée pour l&apos;instant.</translation>
     </message>
     <message>
         <source>File or directory does not exist.</source>
-        <translation>Il file o la cartella non esiste.</translation>
+        <translation>Le fichier ou le dossier n&apos;existe pas.</translation>
     </message>
     <message>
         <source>File read error.</source>
-        <translation>Errore di lettura del file.</translation>
+        <translation>Erreur lors de la lecture du fichier.</translation>
     </message>
     <message>
         <source>File write error.</source>
-        <translation>Errore di scrittura del file.</translation>
+        <translation>Erreur lors de l&apos;écriture du fichier.</translation>
     </message>
     <message>
         <source>File seek error.</source>
-        <translation>Errore di ricerca nel file.</translation>
+        <translation>File seek error.</translation>
     </message>
     <message>
         <source>Unable to create a directory.</source>
-        <translation>Impossibile creare una cartella.</translation>
+        <translation>Impossible de créer le répertoire</translation>
     </message>
     <message>
         <source>Invalid device.</source>
-        <translation>Dispositivo non valido.</translation>
+        <translation>Périphérique non valide.</translation>
     </message>
     <message>
         <source>Invalid or incompatible zip archive.</source>
-        <translation>Archivio zip non valido o incompatibile.</translation>
+        <translation>Archive zip non valide ou incompatible.</translation>
     </message>
     <message>
         <source>Inconsistent headers. Archive might be corrupted.</source>
-        <translation>Intestazioni inconsistenti. L&apos;archivio potrebbe essere danneggiato.</translation>
+        <translation>En-têtes inconsistants. L&apos;archive peut être corrompu.</translation>
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation>Errore sconosciuto.</translation>
+        <translation>Erreur inconnue.</translation>
     </message>
 </context>
 <context>
     <name>Zip</name>
     <message>
         <source>ZIP operation completed successfully.</source>
-        <translation>Operazione ZIP completata con successo.</translation>
+        <translation>Extraction zip réussi.</translation>
     </message>
     <message>
         <source>Failed to initialize or load zlib library.</source>
-        <translation>Impossibile caricare le libreria zlib.</translation>
+        <translation>Impossible d&apos;initialiser ou charger la bibliothèque zlib.</translation>
     </message>
     <message>
         <source>zlib library error.</source>
-        <translation>errore libreria zlib.</translation>
+        <translation>Erreur avec la bibliothèque zlib.</translation>
     </message>
     <message>
         <source>Unable to create or open file.</source>
-        <translation>Impossibile creare o aprire il file.</translation>
+        <translation>Impossible de créer ou d&apos;ouvrir le fichier</translation>
     </message>
     <message>
         <source>No archive has been created yet.</source>
-        <translation>L&apos;archivio non è ancora stato creato.</translation>
+        <translation>Aucune archive n&apos;a été créée pour l&apos;instant.</translation>
     </message>
     <message>
         <source>File or directory does not exist.</source>
-        <translation>Il file o la cartella non esiste.</translation>
+        <translation>Le fichier ou le dossier n&apos;existe pas.</translation>
     </message>
     <message>
         <source>File read error.</source>
-        <translation>Errore di lettura del file.</translation>
+        <translation>Erreur lors de la lecture du fichier.</translation>
     </message>
     <message>
         <source>File write error.</source>
-        <translation>Errore di scrittura del file.</translation>
+        <translation>Erreur lors de l&apos;écriture du fichier.</translation>
     </message>
     <message>
         <source>File seek error.</source>
-        <translation>Errore di ricerca nel file.</translation>
+        <translation>File seek error.</translation>
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation>Errore sconosciuto.</translation>
+        <translation>Erreur inconnue.</translation>
     </message>
 </context>
 </TS>
