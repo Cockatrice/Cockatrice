@@ -408,6 +408,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdRegisterAccount(const Command_
             return Response::RespTooManyRequests;
         case InvalidUsername:
             return Response::RespUsernameInvalid;
+        case Failed:
+            return Response::RespRegistrationFailed;
         case ClientIsBanned:
             Response_Register *re = new Response_Register;
             re->set_denied_reason_str(banReason.toStdString());
@@ -415,8 +417,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdRegisterAccount(const Command_
                 re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsRemaining).toTime_t());
             rc.setResponseExtension(re);
             return Response::RespUserIsBanned;
-        case Failed:
-            return Response::RespRegistrationFailed;
     }
 
     return Response::RespInvalidCommand;
