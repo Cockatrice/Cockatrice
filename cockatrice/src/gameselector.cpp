@@ -35,6 +35,16 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     gameListView->sortByColumn(gameListModel->startTimeColIndex(), Qt::AscendingOrder);
     gameListView->setAlternatingRowColors(true);
     gameListView->setRootIsDecorated(true);
+    // game created width
+    gameListView->resizeColumnToContents(1);
+    // players width
+    gameListView->resizeColumnToContents(6);
+    // description width
+    gameListView->setColumnWidth(2, gameListView->columnWidth(2) * 1.7);
+    // creator width
+    gameListView->setColumnWidth(3, gameListView->columnWidth(3) * 1.2);
+    // game type width
+    gameListView->setColumnWidth(4, gameListView->columnWidth(4) * 1.4);
     if (_room)
         gameListView->header()->hideSection(gameListModel->roomColIndex());
 
