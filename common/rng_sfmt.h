@@ -3,6 +3,7 @@
 
 #include <climits>
 #include <QMutex>
+#include <random>
 #include "sfmt/SFMT.h"
 #include "rng_abstract.h"
 
@@ -30,6 +31,7 @@ class RNG_SFMT : public RNG_Abstract {
 private:
     QMutex mutex;
     sfmt_t sfmt;
+    std::random_device rd;
     // The discrete cumulative distribution function for the RNG
     unsigned int cdf(unsigned int min, unsigned int max);
 public:
