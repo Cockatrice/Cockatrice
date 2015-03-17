@@ -74,6 +74,7 @@ void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandCon
         selector->processGameInfo(response.game_list(i));
 
     selector->setWindowTitle(tr("%1's games").arg(QString::fromStdString(cmd.user_name())));
+    selector->setMinimumWidth(800);
     selector->setAttribute(Qt::WA_DeleteOnClose);
     selector->show();
 }
