@@ -30,6 +30,7 @@ private slots:
     void actLeave();
     void messageSent(const Response &response);
     void addMentionTag(QString mentionTag);
+    void messageClicked();
 public:
     TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &_ownUserInfo, const ServerInfo_User &_otherUserInfo);
     ~TabMessage();
@@ -40,8 +41,12 @@ public:
     QString getTabText() const;
 
     void processUserMessageEvent(const Event_UserMessage &event);
+
     void processUserLeft();
     void processUserJoined(const ServerInfo_User &_userInfo);
+private:
+    bool shouldShowSystemPopup(const Event_UserMessage &event);
+    void showSystemPopup(const Event_UserMessage &event);
 };
 
 #endif

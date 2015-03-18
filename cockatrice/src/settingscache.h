@@ -75,6 +75,8 @@ private:
     bool attemptAutoConnect;
     int pixmapCacheSize;
     bool scaleCards;
+    bool showMessagePopups;
+    bool showMentionPopups;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -127,6 +129,8 @@ public:
     bool getAutoConnect() const { return attemptAutoConnect; }
     int getPixmapCacheSize() const { return pixmapCacheSize; }
     bool getScaleCards() const {  return scaleCards; }
+    bool getShowMessagePopup() const { return showMessagePopups; }
+    bool getShowMentionPopup() const { return showMentionPopups; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -172,6 +176,8 @@ public slots:
     void setAutoConnect(const bool &_autoConnect);
     void setPixmapCacheSize(const int _pixmapCacheSize);
     void setCardScaling(const int _scaleCards);
+    void setShowMessagePopups(const int _showMessagePopups);
+    void setShowMentionPopups(const int _showMentionPopups);
 };
 
 extern SettingsCache *settingsCache;

@@ -3,10 +3,12 @@
 
 class CardDatabase;
 class QTranslator;
+class QSystemTrayIcon;
 class SoundEngine;
 
 extern CardDatabase *db;
 
+extern QSystemTrayIcon *trayIcon;
 extern QTranslator *translator;
 extern const QString translationPrefix;
 extern QString translationPath;

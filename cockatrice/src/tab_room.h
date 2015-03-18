@@ -56,6 +56,7 @@ private slots:
     void actClearChat();
     void actOpenChatSettings();
     void addMentionTag(QString mentionTag);
+    void focusTab();
     
     void processListGamesEvent(const Event_ListGames &event);
     void processJoinRoomEvent(const Event_JoinRoom &event);

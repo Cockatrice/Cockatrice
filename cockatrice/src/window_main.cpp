@@ -28,6 +28,8 @@
 #include <QFileDialog>
 #include <QThread>
 #include <QDateTime>
+#include <QSystemTrayIcon>
+#include <QApplication>
 
 #include "main.h"
 #include "window_main.h"
@@ -413,6 +415,11 @@ MainWindow::MainWindow(QWidget *parent)
     resize(900, 700);
     restoreGeometry(settingsCache->getMainWindowGeometry());
     aFullScreen->setChecked(windowState() & Qt::WindowFullScreen);
+
+    if (QSystemTrayIcon::isSystemTrayAvailable()) {
+        createTrayActions();
+        createTrayIcon();
+    }
 }
 
 MainWindow::~MainWindow()
@@ -420,6 +427,37 @@ MainWindow::~MainWindow()
     client->deleteLater();
     clientThread->wait();
 }
+
+void MainWindow::createTrayIcon() {
+    QMenu *trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(closeAction);
+    
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setContextMenu(trayIconMenu);
+    trayIcon->setIcon(QIcon(":/resources/appicon.svg"));
+    trayIcon->show();
+
+    connect(trayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,
+        SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
+}
+
+void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
+    if (reason == QSystemTrayIcon::DoubleClick) {
+        if (windowState() != Qt::WindowMinimized)
+            showMinimized();
+        else {
+            showNormal();
+            QApplication::setActiveWindow(this);
+        }
+    }
+}
+
+
+void MainWindow::createTrayActions() {
+    closeAction = new QAction(tr("&Exit"), this);
+    connect(closeAction, SIGNAL(triggered()), this, SLOT(close()));
+}
+
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
