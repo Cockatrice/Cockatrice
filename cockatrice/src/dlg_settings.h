@@ -98,6 +98,7 @@ private:
     QLineEdit *playerAreaBgEdit;
     QLineEdit *cardBackPicturePathEdit;
     QCheckBox displayCardNamesCheckBox;
+    QCheckBox cardScalingCheckBox;
     QCheckBox horizontalHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;
     QGroupBox *zoneBgGroupBox;
