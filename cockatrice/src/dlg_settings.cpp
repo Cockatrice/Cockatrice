@@ -299,9 +299,13 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     displayCardNamesCheckBox.setChecked(settingsCache->getDisplayCardNames());
     connect(&displayCardNamesCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDisplayCardNames(int)));
+
+    cardScalingCheckBox.setChecked(settingsCache->getScaleCards());
+    connect(&cardScalingCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setCardScaling(int)));
     
     QGridLayout *cardsGrid = new QGridLayout;
     cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
+    cardsGrid->addWidget(&cardScalingCheckBox, 1, 0, 1, 2);
     
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
@@ -351,6 +355,7 @@ void AppearanceSettingsPage::retranslateUi()
     
     cardsGroupBox->setTitle(tr("Card rendering"));
     displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));
+    cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
     
     handGroupBox->setTitle(tr("Hand layout"));
     horizontalHandCheckBox.setText(tr("Display hand horizontally (wastes space)"));

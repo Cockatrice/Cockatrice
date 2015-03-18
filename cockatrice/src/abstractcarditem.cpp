@@ -191,7 +191,7 @@ void AbstractCardItem::setHovered(bool _hovered)
         processHoverEvent();
     isHovered = _hovered;
     setZValue(_hovered ? 2000000004 : realZValue);
-    setScale(_hovered ? 1.1 : 1);
+    setScale(_hovered && settingsCache->getScaleCards() ? 1.1 : 1);
     setTransformOriginPoint(_hovered ? CARD_WIDTH / 2 : 0, _hovered ? CARD_HEIGHT / 2 : 0);
     update();
 }
