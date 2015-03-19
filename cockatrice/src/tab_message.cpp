@@ -106,7 +106,7 @@ void TabMessage::actLeave()
 void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
 {
     const UserLevelFlags userLevel(event.sender_name() == otherUserInfo->name() ? otherUserInfo->user_level() : ownUserInfo->user_level());
-    chatView->appendMessage(QString::fromStdString(event.message()), QString::fromStdString(event.sender_name()), userLevel);
+    chatView->appendMessage(QString::fromStdString(event.message()), QString::fromStdString(event.sender_name()), userLevel, true);
     emit userEvent();
 }
 

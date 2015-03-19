@@ -221,7 +221,7 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
         if (settingsCache->getIgnoreUnregisteredUsers() && !userLevel.testFlag(ServerInfo_User::IsRegistered))
             return;
     }
-    chatView->appendMessage(QString::fromStdString(event.message()), senderName, userLevel);
+    chatView->appendMessage(QString::fromStdString(event.message()), senderName, userLevel, true);
     emit userEvent(false);
 }
 
