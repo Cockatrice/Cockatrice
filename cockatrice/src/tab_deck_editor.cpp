@@ -676,19 +676,21 @@ void TabDeckEditor::setPriceTagFeatureEnabled(int enabled)
 
 void TabDeckEditor::actUpdatePrices()
 {
-    aUpdatePrices->setDisabled(true);
+    /*
+	aUpdatePrices->setDisabled(true);
     AbstractPriceUpdater *up;
 
     switch(settingsCache->getPriceTagSource())
     {
         case AbstractPriceUpdater::DBPriceSource:
         default:
-			up = false; //new DBPriceUpdater(deckModel->getDeckList());
+			up = new DBPriceUpdater(deckModel->getDeckList());
             break;
     }
      
     connect(up, SIGNAL(finishedUpdate()), this, SLOT(finishedUpdatingPrices()));
     up->updatePrices();
+	*/
 }
 
 void TabDeckEditor::finishedUpdatingPrices()

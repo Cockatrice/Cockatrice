@@ -530,16 +530,20 @@ void UserInterfaceSettingsPage::soundPathButtonClicked()
     settingsCache->setSoundPath(path);
 }
 
-/*
+
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
-    priceTagsCheckBox.setChecked(settingsCache->getPriceTagFeature());
-    connect(&priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
+    //priceTagsCheckBox.setChecked(settingsCache->getPriceTagFeature());
+    //connect(&priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
 
     connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
 
     QGridLayout *generalGrid = new QGridLayout;
-	// generalGrid->addWidget(&priceTagsCheckBox, 0, 0);
+	//generalGrid->addWidget(&priceTagsCheckBox, 0, 0);
+	
+//	QLabel *message = new QLabel(tr("Test"));
+	
+	generalGrid->addWidget(new QLabel(tr("Nothing is here... yet")),0,0);
     
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -552,19 +556,18 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
 void DeckEditorSettingsPage::retranslateUi()
 {
-    priceTagsCheckBox.setText(tr("Enable &price tag feature from deckbrew.com"));
+    //priceTagsCheckBox.setText(tr("Enable &price tag feature from deckbrew.com"));
     generalGroupBox->setTitle(tr("General"));
 }
 
-void DeckEditorSettingsPage::radioPriceTagSourceClicked(bool checked)
+/*void DeckEditorSettingsPage::radioPriceTagSourceClicked(bool checked)
 {
     if(!checked)
         return;
 
     int source=AbstractPriceUpdater::DBPriceSource;
     emit priceTagSourceChanged(source);
-}
-*/
+}*/
 
 MessagesSettingsPage::MessagesSettingsPage()
 {
@@ -705,7 +708,7 @@ DlgSettings::DlgSettings(QWidget *parent)
     pagesWidget->addWidget(new GeneralSettingsPage);
     pagesWidget->addWidget(new AppearanceSettingsPage);
     pagesWidget->addWidget(new UserInterfaceSettingsPage);
-    //pagesWidget->addWidget(new DeckEditorSettingsPage);
+    pagesWidget->addWidget(new DeckEditorSettingsPage);
     pagesWidget->addWidget(new MessagesSettingsPage);
     
     createIcons();
@@ -746,14 +749,10 @@ void DlgSettings::createIcons()
     userInterfaceButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     userInterfaceButton->setIcon(QIcon(":/resources/icon_config_interface.svg"));
     
-	/* 
-	Not needed at this time since the only thing was for prices
-	
     deckEditorButton = new QListWidgetItem(contentsWidget);
     deckEditorButton->setTextAlignment(Qt::AlignHCenter);
     deckEditorButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     deckEditorButton->setIcon(QIcon(":/resources/icon_config_deckeditor.svg"));
-	*/
     
     messagesButton = new QListWidgetItem(contentsWidget);
     messagesButton->setTextAlignment(Qt::AlignHCenter);
@@ -865,8 +864,8 @@ void DlgSettings::retranslateUi()
     
     generalButton->setText(tr("General"));
     appearanceButton->setText(tr("Appearance"));
-	userInterfaceButton->setText(tr("User interface"));
-    //deckEditorButton->setText(tr("Deck editor"));
+	userInterfaceButton->setText(tr("User Interface"));
+    deckEditorButton->setText(tr("Deck Editor"));
     messagesButton->setText(tr("Chat Settings"));
     
     for (int i = 0; i < pagesWidget->count(); i++)
