@@ -46,7 +46,7 @@ DBPriceUpdater::DBPriceUpdater(const DeckList *_deck)
 void DBPriceUpdater::updatePrices()
 {
     /*
-	QString base = "https://api.deckbrew.com/mtg/cards", q = "";
+    QString base = "https://api.deckbrew.com/mtg/cards", q = "";
     QStringList cards = deck->getCardList();
     muidMap.clear();
     urls.clear();
@@ -88,7 +88,7 @@ void DBPriceUpdater::updatePrices()
         urls.append(base + q);
 
     requestNext();
-	*/
+    */
 }
 
 void DBPriceUpdater::requestNext()
