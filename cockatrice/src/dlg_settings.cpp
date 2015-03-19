@@ -539,9 +539,9 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
 
     QGridLayout *generalGrid = new QGridLayout;
-	//generalGrid->addWidget(&priceTagsCheckBox, 0, 0);
-	
-	generalGrid->addWidget(new QLabel(tr("Nothing is here... yet")), 0, 0);
+    //generalGrid->addWidget(&priceTagsCheckBox, 0, 0);
+    
+    generalGrid->addWidget(new QLabel(tr("Nothing is here... yet")), 0, 0);
     
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -862,7 +862,7 @@ void DlgSettings::retranslateUi()
     
     generalButton->setText(tr("General"));
     appearanceButton->setText(tr("Appearance"));
-	userInterfaceButton->setText(tr("User Interface"));
+    userInterfaceButton->setText(tr("User Interface"));
     deckEditorButton->setText(tr("Deck Editor"));
     messagesButton->setText(tr("Chat Settings"));
     
