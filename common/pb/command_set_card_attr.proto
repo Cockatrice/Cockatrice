@@ -1,0 +1,12 @@
+import "game_commands.proto";
+import "card_attributes.proto";
+
+message Command_SetCardAttr {
+	extend GameCommand {
+		optional Command_SetCardAttr ext = 1013;
+	}
+	optional string zone = 1;
+	optional sint32 card_id = 2 [default = -1];
+	optional CardAttribute attribute = 3;
+	optional string attr_value = 4;
+}

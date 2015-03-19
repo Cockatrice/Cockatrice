@@ -1,0 +1,8 @@
+import "game_commands.proto";
+message Command_Mulligan {
+	extend GameCommand {
+		optional Command_Mulligan ext = 1004;
+	}
+}
+
+

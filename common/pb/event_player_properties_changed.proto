@@ -1,0 +1,9 @@
+import "game_event.proto";
+import "serverinfo_playerproperties.proto";
+
+message Event_PlayerPropertiesChanged {
+	extend GameEvent {
+		optional Event_PlayerPropertiesChanged ext = 1007;
+	}
+	optional ServerInfo_PlayerProperties player_properties = 1;
+}

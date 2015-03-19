@@ -1,0 +1,10 @@
+import "game_event.proto";
+
+message Event_ChangeZoneProperties {
+	extend GameEvent {
+		optional Event_ChangeZoneProperties ext = 2020;
+	}
+	optional string zone_name = 1;
+	
+	optional bool always_reveal_top_card = 10;
+}

@@ -1,0 +1,11 @@
+import "response.proto";
+import "serverinfo_user.proto";
+
+message Response_GetUserInfo {
+	extend Response {
+		optional Response_GetUserInfo ext = 1003;
+	}
+	optional ServerInfo_User user_info = 1;
+}
+ 
+ 

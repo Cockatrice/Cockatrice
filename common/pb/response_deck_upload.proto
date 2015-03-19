@@ -1,0 +1,9 @@
+import "response.proto";
+import "serverinfo_deckstorage.proto";
+
+message Response_DeckUpload {
+	extend Response {
+		optional Response_DeckUpload ext = 1008;
+	}
+	optional ServerInfo_DeckStorage_TreeItem new_file = 1;
+}

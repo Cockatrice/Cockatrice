@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/" >    
+        <file alias="resources/appicon.svg">resources/servatrice.svg</file>
+    </qresource>
+</RCC>

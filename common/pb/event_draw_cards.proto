@@ -1,0 +1,10 @@
+import "game_event.proto";
+import "serverinfo_card.proto";
+
+message Event_DrawCards {
+	extend GameEvent {
+		optional Event_DrawCards ext = 2005;
+	}
+	optional sint32 number = 1;
+	repeated ServerInfo_Card cards = 2;
+}

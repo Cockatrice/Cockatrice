@@ -1,0 +1,9 @@
+import "game_event.proto";
+
+message Event_SetCounter {
+	extend GameEvent {
+		optional Event_SetCounter ext = 2003;
+	}
+	optional sint32 counter_id = 1;
+	optional sint32 value = 2;
+}

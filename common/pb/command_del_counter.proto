@@ -1,0 +1,7 @@
+import "game_commands.proto";
+message Command_DelCounter {
+	extend GameCommand {
+		optional Command_DelCounter ext = 1021;
+	}
+	optional sint32 counter_id = 1 [default = -1];
+}

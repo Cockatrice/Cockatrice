@@ -1,0 +1,13 @@
+import "game_event.proto";
+import "serverinfo_player.proto";
+
+message Event_GameStateChanged {
+	extend GameEvent {
+		optional Event_GameStateChanged ext = 1005;
+	}
+	repeated ServerInfo_Player player_list = 1;
+	optional bool game_started = 2;
+	optional sint32 active_player_id = 3;
+	optional sint32 active_phase = 4;
+	optional uint32 seconds_elapsed = 5;
+}

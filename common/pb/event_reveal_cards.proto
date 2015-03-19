@@ -1,0 +1,13 @@
+import "game_event.proto";
+import "serverinfo_card.proto";
+
+message Event_RevealCards {
+	extend GameEvent {
+		optional Event_RevealCards ext = 2006;
+	}
+	optional string zone_name = 1;
+	optional sint32 card_id = 2 [default = -1];
+	optional sint32 other_player_id = 3 [default = -1];
+	repeated ServerInfo_Card cards = 4;
+	optional bool grant_write_access = 5;
+}

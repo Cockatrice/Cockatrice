@@ -1,0 +1,45 @@
+message Response {
+	enum ResponseCode {
+		RespNotConnected = -1;
+		RespNothing = 0;
+		RespOk = 1;
+		RespNotInRoom = 2;
+		RespInternalError = 3;
+		RespInvalidCommand = 4;
+		RespInvalidData = 5;
+		RespNameNotFound = 6;
+		RespLoginNeeded = 7;
+		RespFunctionNotAllowed = 8;
+		RespGameNotStarted = 9;
+		RespGameFull = 10;
+		RespContextError = 11;
+		RespWrongPassword = 12;
+		RespSpectatorsNotAllowed = 13;
+		RespOnlyBuddies = 14;
+		RespUserLevelTooLow = 15;
+		RespInIgnoreList = 16;
+		RespWouldOverwriteOldSession = 17;
+		RespChatFlood = 18;
+		RespUserIsBanned = 19;
+		RespAccessDenied = 20;
+		RespUsernameInvalid = 21;
+		RespRegistrationRequired = 22;
+	}
+	enum ResponseType {
+		JOIN_ROOM = 1000;
+		LIST_USERS = 1001;
+		GET_GAMES_OF_USER = 1002;
+		GET_USER_INFO = 1003;
+		DUMP_ZONE = 1004;
+		LOGIN = 1005;
+		DECK_LIST = 1006;
+		DECK_DOWNLOAD = 1007;
+		DECK_UPLOAD = 1008;
+		REPLAY_LIST = 1100;
+		REPLAY_DOWNLOAD = 1101;
+	}
+	required uint64 cmd_id = 1;
+	optional ResponseCode response_code = 2;
+	
+	extensions 100 to max;
+}

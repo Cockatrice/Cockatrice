@@ -1,0 +1,9 @@
+import "session_commands.proto";
+
+message Command_DeckDelDir {
+	extend SessionCommand {
+		optional Command_DeckDelDir ext = 1010;
+	}
+	optional string path = 1;
+}
+ 

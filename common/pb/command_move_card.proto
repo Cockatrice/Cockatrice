@@ -1,0 +1,25 @@
+import "game_commands.proto";
+message CardToMove {
+	optional sint32 card_id = 1 [default = -1];
+	optional bool face_down = 2;
+	optional string pt = 3;
+	optional bool tapped = 4;
+}
+
+message ListOfCardsToMove {
+	repeated CardToMove card = 1;
+}
+
+message Command_MoveCard {
+	extend GameCommand {
+		optional Command_MoveCard ext = 1027;
+	}
+	optional sint32 start_player_id = 1 [default = -1];
+	optional string start_zone = 2;
+	optional ListOfCardsToMove cards_to_move = 3;
+	optional sint32 target_player_id = 4 [default = -1];
+	optional string target_zone = 5;
+	optional sint32 x = 6 [default = -1];
+	optional sint32 y = 7 [default = -1];
+}
+

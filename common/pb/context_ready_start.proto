@@ -1,0 +1,7 @@
+import "game_event_context.proto";
+
+message Context_ReadyStart {
+	extend GameEventContext {
+		optional Context_ReadyStart ext = 1000;
+	}
+}

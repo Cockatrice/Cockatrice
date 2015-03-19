@@ -1,0 +1,9 @@
+import "game_event.proto";
+
+message Event_RollDie {
+	extend GameEvent {
+		optional Event_RollDie ext = 2008;
+	}
+	optional uint32 sides = 1;
+	optional uint32 value = 2;
+}

@@ -1,0 +1,7 @@
+import "game_event_context.proto";
+
+message Context_SetSideboardLock {
+	extend GameEventContext {
+		optional Context_SetSideboardLock ext = 1008;
+	}
+}

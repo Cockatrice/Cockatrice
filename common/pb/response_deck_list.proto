@@ -1,0 +1,9 @@
+import "response.proto";
+import "serverinfo_deckstorage.proto";
+
+message Response_DeckList {
+	extend Response {
+		optional Response_DeckList ext = 1006;
+	}
+	optional ServerInfo_DeckStorage_Folder root = 1;
+}

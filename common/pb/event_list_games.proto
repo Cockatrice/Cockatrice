@@ -1,0 +1,9 @@
+import "room_event.proto";
+import "serverinfo_game.proto";
+
+message Event_ListGames {
+	extend RoomEvent {
+		optional Event_ListGames ext = 1003;
+	}
+	repeated ServerInfo_Game game_list = 1;
+}

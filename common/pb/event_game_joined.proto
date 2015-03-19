@@ -1,0 +1,15 @@
+import "session_event.proto";
+import "serverinfo_game.proto";
+import "serverinfo_gametype.proto";
+
+message Event_GameJoined {
+	extend SessionEvent {
+		optional Event_GameJoined ext = 1009;
+	}
+	optional ServerInfo_Game game_info = 1;
+	repeated ServerInfo_GameType game_types = 2;
+	optional sint32 host_id = 3;
+	optional sint32 player_id = 4;
+	optional bool spectator = 5;
+	optional bool resuming = 6;
+}

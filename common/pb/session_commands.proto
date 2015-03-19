@@ -1,0 +1,96 @@
+message SessionCommand {
+	enum SessionCommandType {
+		PING = 1000;
+		LOGIN = 1001;
+		MESSAGE = 1002;
+		LIST_USERS = 1003;
+		GET_GAMES_OF_USER = 1004;
+		GET_USER_INFO = 1005;
+		ADD_TO_LIST = 1006;
+		REMOVE_FROM_LIST = 1007;
+		DECK_LIST = 1008;
+		DECK_NEW_DIR = 1009;
+		DECK_DEL_DIR = 1010;
+		DECK_DEL = 1011;
+		DECK_DOWNLOAD = 1012;
+		DECK_UPLOAD = 1013;
+		LIST_ROOMS = 1014;
+		JOIN_ROOM = 1015;
+		REPLAY_LIST = 1100;
+		REPLAY_DOWNLOAD = 1101;
+		REPLAY_MODIFY_MATCH = 1102;
+		REPLAY_DELETE_MATCH = 1103;
+	}
+	extensions 100 to max;
+}
+
+message Command_Ping {
+	extend SessionCommand {
+		optional Command_Ping ext = 1000;
+	}
+}
+
+message Command_Login {
+	extend SessionCommand {
+		optional Command_Login ext = 1001;
+	}
+	optional string user_name = 1;
+	optional string password = 2;
+}
+
+message Command_Message {
+	extend SessionCommand {
+		optional Command_Message ext = 1002;
+	}
+	optional string user_name = 1;
+	optional string message = 2;
+}
+
+message Command_ListUsers {
+	extend SessionCommand {
+		optional Command_ListUsers ext = 1003;
+	}
+}
+
+message Command_GetGamesOfUser {
+	extend SessionCommand {
+		optional Command_GetGamesOfUser ext = 1004;
+	}
+	optional string user_name = 1;
+}
+
+message Command_GetUserInfo {
+	extend SessionCommand {
+		optional Command_GetUserInfo ext = 1005;
+	}
+	optional string user_name = 1;
+}
+
+message Command_AddToList {
+	extend SessionCommand {
+		optional Command_AddToList ext = 1006;
+	}
+	optional string list = 1;
+	optional string user_name = 2;
+}
+
+message Command_RemoveFromList {
+	extend SessionCommand {
+		optional Command_RemoveFromList ext = 1007;
+	}
+	optional string list = 1;
+	optional string user_name = 2;
+}
+
+message Command_ListRooms {
+	extend SessionCommand {
+		optional Command_ListRooms ext = 1014;
+	}
+}
+
+message Command_JoinRoom {
+	extend SessionCommand {
+		optional Command_JoinRoom ext = 1015;
+	}
+	optional uint32 room_id = 1;
+}

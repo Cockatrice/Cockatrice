@@ -1,0 +1,23 @@
+import "serverinfo_user.proto";
+
+message ServerInfo_Game {
+	optional sint32 server_id = 1 [default = -1];
+	optional sint32 room_id = 2 [default = -1];
+	optional sint32 game_id = 3 [default = -1];
+	optional string description = 4;
+	optional bool with_password = 5;
+	optional uint32 max_players = 6;
+	repeated sint32 game_types = 7;
+	optional ServerInfo_User creator_info = 8;
+	optional bool only_buddies = 9;
+	optional bool only_registered = 10;
+	optional bool spectators_allowed = 11;
+	optional bool spectators_need_password = 12;
+	optional bool spectators_can_chat = 13;
+	optional bool spectators_omniscient = 14;
+	optional uint32 player_count = 30;
+	optional uint32 spectators_count = 31;
+	optional bool started = 50;
+	optional uint32 start_time = 51;
+	optional bool closed = 52;
+}

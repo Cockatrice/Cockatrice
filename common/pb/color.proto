@@ -1,0 +1,6 @@
+message color {
+	optional uint32 r = 1;
+	optional uint32 g = 2;
+	optional uint32 b = 3;
+	optional uint32 a = 4;
+}

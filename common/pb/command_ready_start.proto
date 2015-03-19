@@ -1,0 +1,7 @@
+import "game_commands.proto";
+message Command_ReadyStart {
+	extend GameCommand {
+		optional Command_ReadyStart ext = 1016;
+	}
+	optional bool ready = 1;
+}

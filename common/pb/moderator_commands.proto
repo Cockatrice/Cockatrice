@@ -1,0 +1,17 @@
+message ModeratorCommand {
+	enum ModeratorCommandType {
+		BAN_FROM_SERVER = 1000;
+	}
+	extensions 100 to max;
+}
+
+message Command_BanFromServer {
+	extend ModeratorCommand {
+		optional Command_BanFromServer ext = 1000;
+	}
+	optional string user_name = 1;
+	optional string address = 2;
+	optional uint32 minutes = 3;
+	optional string reason = 4;
+	optional string visible_reason = 5;
+}

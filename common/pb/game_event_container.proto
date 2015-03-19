@@ -1,0 +1,9 @@
+import "game_event.proto";
+import "game_event_context.proto";
+
+message GameEventContainer {
+	optional uint32 game_id = 1;
+	repeated GameEvent event_list = 2;
+	optional GameEventContext context = 3;
+	optional uint32 seconds_elapsed = 4;
+}

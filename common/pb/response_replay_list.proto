@@ -1,0 +1,9 @@
+import "response.proto";
+import "serverinfo_replay_match.proto";
+
+message Response_ReplayList {
+	extend Response {
+		optional Response_ReplayList ext = 1100;
+	}
+	repeated ServerInfo_ReplayMatch match_list = 1;
+}

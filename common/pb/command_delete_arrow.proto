@@ -1,0 +1,7 @@
+import "game_commands.proto";
+message Command_DeleteArrow {
+	extend GameCommand {
+		optional Command_DeleteArrow ext = 1012;
+	}
+	optional sint32 arrow_id = 1 [default = -1];
+}

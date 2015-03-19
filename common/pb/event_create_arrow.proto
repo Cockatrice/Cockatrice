@@ -1,0 +1,9 @@
+import "game_event.proto";
+import "serverinfo_arrow.proto";
+
+message Event_CreateArrow {
+	extend GameEvent {
+		optional Event_CreateArrow ext = 2000;
+	}
+	optional ServerInfo_Arrow arrow_info = 1;
+}

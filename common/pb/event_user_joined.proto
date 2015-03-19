@@ -1,0 +1,9 @@
+import "session_event.proto";
+import "serverinfo_user.proto";
+
+message Event_UserJoined {
+	extend SessionEvent {
+		optional Event_UserJoined ext = 1007;
+	}
+	optional ServerInfo_User user_info = 1;
+}

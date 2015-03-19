@@ -1,0 +1,20 @@
+import "serverinfo_cardcounter.proto";
+
+message ServerInfo_Card {
+	optional sint32 id = 1 [default = -1];
+	optional string name = 2;
+	optional sint32 x = 3 [default = -1];
+	optional sint32 y = 4 [default = -1];
+	optional bool face_down = 5;
+	optional bool tapped = 6;
+	optional bool attacking = 7;
+	optional string color = 8;
+	optional string pt = 9;
+	optional string annotation = 10;
+	optional bool destroy_on_zone_change = 11;
+	optional bool doesnt_untap = 12;
+	repeated ServerInfo_CardCounter counter_list = 13;
+	optional sint32 attach_player_id = 14 [default = -1];
+	optional string attach_zone = 15;
+	optional sint32 attach_card_id = 16 [default = -1];
+}
