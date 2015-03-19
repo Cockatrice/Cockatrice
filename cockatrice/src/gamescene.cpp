@@ -267,7 +267,8 @@ void GameScene::registerAnimationItem(AbstractCardItem *card)
 
 void GameScene::unregisterAnimationItem(AbstractCardItem *card)
 {
-    cardsToAnimate.remove(static_cast<CardItem *>(card));
+    if (cardsToAnimate)
+        cardsToAnimate.remove(static_cast<CardItem *>(card));
     if (cardsToAnimate.isEmpty())
         if (animationTimer)
             animationTimer->stop();
