@@ -379,7 +379,6 @@ void TabDeckEditor::updateHash()
 bool TabDeckEditor::confirmClose()
 {
     if (modified) {
-        tabSupervisor->setCurrentWidget(this);
         QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("Are you sure?"),
             tr("The decklist has been modified.\nDo you want to save the changes?"),
             QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
@@ -667,14 +666,17 @@ void TabDeckEditor::actDecrement()
     offsetCountAtIndex(currentIndex, -1);
 }
 
+
 void TabDeckEditor::setPriceTagFeatureEnabled(int enabled)
 {
     aUpdatePrices->setVisible(enabled);
     deckModel->pricesUpdated();
 }
 
+
 void TabDeckEditor::actUpdatePrices()
 {
+    /*
     aUpdatePrices->setDisabled(true);
     AbstractPriceUpdater *up;
 
@@ -688,6 +690,7 @@ void TabDeckEditor::actUpdatePrices()
      
     connect(up, SIGNAL(finishedUpdate()), this, SLOT(finishedUpdatingPrices()));
     up->updatePrices();
+    */
 }
 
 void TabDeckEditor::finishedUpdatingPrices()
@@ -696,6 +699,7 @@ void TabDeckEditor::finishedUpdatingPrices()
     setModified(true);
     aUpdatePrices->setDisabled(false);
 }
+
 
 void TabDeckEditor::setDeck(DeckLoader *_deck)
 {

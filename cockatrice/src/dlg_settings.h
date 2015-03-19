@@ -98,7 +98,6 @@ private:
     QLineEdit *playerAreaBgEdit;
     QLineEdit *cardBackPicturePathEdit;
     QCheckBox displayCardNamesCheckBox;
-    QCheckBox cardScalingCheckBox;
     QCheckBox horizontalHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;
     QGroupBox *zoneBgGroupBox;
@@ -116,12 +115,10 @@ class UserInterfaceSettingsPage : public AbstractSettingsPage {
 private slots:
     void soundPathClearButtonClicked();
     void soundPathButtonClicked();
-    void setSpecNotificationEnabled(int);
 signals:
     void soundPathChanged();
 private:
     QCheckBox notificationsEnabledCheckBox;
-    QCheckBox specNotificationsEnabledCheckBox;
     QCheckBox doubleClickToPlayCheckBox;
     QCheckBox playToStackCheckBox;
     QCheckBox tapAnimationCheckBox;
@@ -143,11 +140,11 @@ public:
     DeckEditorSettingsPage();
     void retranslateUi();
 private slots:
-    void radioPriceTagSourceClicked(bool checked);
+    //void radioPriceTagSourceClicked(bool checked);
 signals:
-    void priceTagSourceChanged(int _priceTagSource);
+    //void priceTagSourceChanged(int _priceTagSource);
 private:
-    QCheckBox priceTagsCheckBox;
+    //QCheckBox priceTagsCheckBox;
     QGroupBox *generalGroupBox;
 };
 
