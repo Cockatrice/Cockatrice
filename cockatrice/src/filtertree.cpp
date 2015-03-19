@@ -202,8 +202,8 @@ bool FilterItem::acceptSet(const CardInfo *info) const
 
     status = false;
     for (i = info->getSets().constBegin(); i != info->getSets().constEnd(); i++)
-        if ((*i)->getShortName() == term
-                || (*i)->getLongName().contains(term, Qt::CaseInsensitive)) {
+        if ((*i)->getShortName().compare(term, Qt::CaseInsensitive) == 0 
+            || (*i)->getLongName().compare(term, Qt::CaseInsensitive) == 0) {
             status = true;
             break;
         }
