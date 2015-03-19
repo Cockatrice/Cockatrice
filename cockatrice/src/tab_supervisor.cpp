@@ -126,7 +126,7 @@ void TabSupervisor::retranslateUi()
     
     for (int i = 0; i < tabs.size(); ++i)
         if (tabs[i]) {
-            setTabText(indexOf(tabs[i]), tabs[i]->getTabText());
+            setTabText(indexOf(tabs[i]), sanitizeTabName(tabs[i]->getTabText()));
             tabs[i]->retranslateUi();
         }
 }
@@ -153,11 +153,16 @@ AbstractClient *TabSupervisor::getClient() const
     return localClients.isEmpty() ? client : localClients.first();
 }
 
+QString TabSupervisor::sanitizeTabName(QString dirty) const
+{
+    return dirty.replace("&", "&&");
+}
+
 int TabSupervisor::myAddTab(Tab *tab)
 {
     connect(tab, SIGNAL(userEvent(bool)), this, SLOT(tabUserEvent(bool)));
     connect(tab, SIGNAL(tabTextChanged(Tab *, QString)), this, SLOT(updateTabText(Tab *, QString)));
-    return addTab(tab, tab->getTabText());
+    return addTab(tab, sanitizeTabName(tab->getTabText()));
 }
 
 void TabSupervisor::start(const ServerInfo_User &_userInfo)
