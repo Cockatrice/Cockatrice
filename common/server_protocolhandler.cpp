@@ -184,6 +184,18 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
 
 Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const CommandContainer &cont, ResponseContainer &rc)
 {
+    static QList<GameCommand::GameCommandType> antifloodCommandsWhiteList = QList<GameCommand::GameCommandType>()
+        // draw, undraw cards (eg: drawing 10 cards one by one from the deck)
+        << GameCommand::DRAW_CARDS
+        << GameCommand::UNDO_DRAW
+        // create, delete arrows (eg: targeting with 10 cards during an attack)
+        << GameCommand::CREATE_ARROW
+        << GameCommand::DELETE_ARROW
+        // set card attributes (eg: tapping 10 cards at once)
+        << GameCommand::SET_CARD_ATTR
+        // increment / decrement counter (eg: -10 lifepoints one by one)
+        << GameCommand::INC_COUNTER;
+
     if (authState == NotLoggedIn)
         return Response::RespLoginNeeded;
     
@@ -229,7 +241,10 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
             int totalCount = 0;
             if (commandCountOverTime.isEmpty())
                 commandCountOverTime.prepend(0);
-            ++commandCountOverTime[0];
+
+            if(!antifloodCommandsWhiteList.contains((GameCommand::GameCommandType) getPbExtension(sc)))
+                ++commandCountOverTime[0];
+
             for (int i = 0; i < commandCountOverTime.size(); ++i)
                 totalCount += commandCountOverTime[i];
             
