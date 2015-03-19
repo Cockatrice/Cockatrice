@@ -134,7 +134,7 @@ public:
     void retranslateUi();
 };
 
-class DeckEditorSettingsPage : public AbstractSettingsPage {
+/*class DeckEditorSettingsPage : public AbstractSettingsPage {
     Q_OBJECT
 public:
     DeckEditorSettingsPage();
@@ -146,7 +146,7 @@ signals:
 private:
     QCheckBox priceTagsCheckBox;
     QGroupBox *generalGroupBox;
-};
+};*/
 
 class MessagesSettingsPage : public AbstractSettingsPage {
     Q_OBJECT

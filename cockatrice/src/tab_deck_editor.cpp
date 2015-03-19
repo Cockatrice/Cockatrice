@@ -666,11 +666,13 @@ void TabDeckEditor::actDecrement()
     offsetCountAtIndex(currentIndex, -1);
 }
 
+
 void TabDeckEditor::setPriceTagFeatureEnabled(int enabled)
 {
     aUpdatePrices->setVisible(enabled);
     deckModel->pricesUpdated();
 }
+
 
 void TabDeckEditor::actUpdatePrices()
 {
@@ -681,7 +683,7 @@ void TabDeckEditor::actUpdatePrices()
     {
         case AbstractPriceUpdater::DBPriceSource:
         default:
-            up = new DBPriceUpdater(deckModel->getDeckList());
+			up = false; //new DBPriceUpdater(deckModel->getDeckList());
             break;
     }
      
@@ -695,6 +697,7 @@ void TabDeckEditor::finishedUpdatingPrices()
     setModified(true);
     aUpdatePrices->setDisabled(false);
 }
+
 
 void TabDeckEditor::setDeck(DeckLoader *_deck)
 {

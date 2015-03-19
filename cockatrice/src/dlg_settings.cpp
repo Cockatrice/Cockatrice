@@ -530,6 +530,7 @@ void UserInterfaceSettingsPage::soundPathButtonClicked()
     settingsCache->setSoundPath(path);
 }
 
+/*
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
     priceTagsCheckBox.setChecked(settingsCache->getPriceTagFeature());
@@ -538,7 +539,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
 
     QGridLayout *generalGrid = new QGridLayout;
-    generalGrid->addWidget(&priceTagsCheckBox, 0, 0);
+	// generalGrid->addWidget(&priceTagsCheckBox, 0, 0);
     
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -563,6 +564,7 @@ void DeckEditorSettingsPage::radioPriceTagSourceClicked(bool checked)
     int source=AbstractPriceUpdater::DBPriceSource;
     emit priceTagSourceChanged(source);
 }
+*/
 
 MessagesSettingsPage::MessagesSettingsPage()
 {
@@ -703,7 +705,7 @@ DlgSettings::DlgSettings(QWidget *parent)
     pagesWidget->addWidget(new GeneralSettingsPage);
     pagesWidget->addWidget(new AppearanceSettingsPage);
     pagesWidget->addWidget(new UserInterfaceSettingsPage);
-    pagesWidget->addWidget(new DeckEditorSettingsPage);
+    //pagesWidget->addWidget(new DeckEditorSettingsPage);
     pagesWidget->addWidget(new MessagesSettingsPage);
     
     createIcons();
@@ -744,10 +746,14 @@ void DlgSettings::createIcons()
     userInterfaceButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     userInterfaceButton->setIcon(QIcon(":/resources/icon_config_interface.svg"));
     
+	/* 
+	Not needed at this time since the only thing was for prices
+	
     deckEditorButton = new QListWidgetItem(contentsWidget);
     deckEditorButton->setTextAlignment(Qt::AlignHCenter);
     deckEditorButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     deckEditorButton->setIcon(QIcon(":/resources/icon_config_deckeditor.svg"));
+	*/
     
     messagesButton = new QListWidgetItem(contentsWidget);
     messagesButton->setTextAlignment(Qt::AlignHCenter);
@@ -812,7 +818,7 @@ void DlgSettings::closeEvent(QCloseEvent *event)
     case NotLoaded:
         loadErrorMessage =
             tr("Your card database did not finish loading\n\n"
-               "Please file a ticket at http://github.com/Daenyth/Cockatrice/issues with your cards.xml attached\n\n"
+               "Please file a ticket at http://github.com/Cockatrce/Cockatrice/issues with your cards.xml attached\n\n"
                "Would you like to change your database location setting?");
         break;
     case FileError:
@@ -828,7 +834,7 @@ void DlgSettings::closeEvent(QCloseEvent *event)
     default:
         loadErrorMessage =
             tr("Unknown card database load status\n\n"
-               "Please file a ticket at http://github.com/Daenyth/Cockatrice/issues\n\n"
+               "Please file a ticket at http://github.com/Cockatrce/Cockatrice/issues\n\n"
                "Would you like to change your database location setting?");
 
         break;
@@ -859,8 +865,8 @@ void DlgSettings::retranslateUi()
     
     generalButton->setText(tr("General"));
     appearanceButton->setText(tr("Appearance"));
-    userInterfaceButton->setText(tr("User interface"));
-    deckEditorButton->setText(tr("Deck editor"));
+	userInterfaceButton->setText(tr("User interface"));
+    //deckEditorButton->setText(tr("Deck editor"));
     messagesButton->setText(tr("Chat Settings"));
     
     for (int i = 0; i < pagesWidget->count(); i++)
