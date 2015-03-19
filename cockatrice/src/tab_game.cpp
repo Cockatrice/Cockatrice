@@ -837,6 +837,8 @@ void TabGame::sendGameCommand(PendingCommand *pend, int playerId)
     AbstractClient *client = getClientForPlayer(playerId);
     if (!client)
         return;
+
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(commandFinished(const Response &)));
     client->sendCommand(pend);
 }
 
@@ -845,7 +847,16 @@ void TabGame::sendGameCommand(const google::protobuf::Message &command, int play
     AbstractClient *client = getClientForPlayer(playerId);
     if (!client)
         return;
-    client->sendCommand(prepareGameCommand(command));
+
+    PendingCommand *pend = prepareGameCommand(command);
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(commandFinished(const Response &)));
+    client->sendCommand(pend);
+}
+
+void TabGame::commandFinished(const Response &response)
+{   
+    if (response.response_code() == Response::RespChatFlood)
+       messageLog->appendMessage(tr("You are flooding the game. Please wait a couple of seconds."));
 }
 
 PendingCommand *TabGame::prepareGameCommand(const ::google::protobuf::Message &cmd)
