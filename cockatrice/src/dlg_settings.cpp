@@ -555,8 +555,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
     QGridLayout *generalGrid = new QGridLayout;
     //generalGrid->addWidget(&priceTagsCheckBox, 0, 0);
-	
-	generalGrid->addWidget(new QLabel(tr("Nothing is here... yet")), 0, 0);
+    
+    generalGrid->addWidget(new QLabel(tr("Nothing is here... yet")), 0, 0);
     
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
