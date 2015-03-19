@@ -299,13 +299,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     displayCardNamesCheckBox.setChecked(settingsCache->getDisplayCardNames());
     connect(&displayCardNamesCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDisplayCardNames(int)));
-
-    cardScalingCheckBox.setChecked(settingsCache->getScaleCards());
-    connect(&cardScalingCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setCardScaling(int)));
     
     QGridLayout *cardsGrid = new QGridLayout;
     cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
-    cardsGrid->addWidget(&cardScalingCheckBox, 1, 0, 1, 2);
     
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
@@ -355,7 +351,6 @@ void AppearanceSettingsPage::retranslateUi()
     
     cardsGroupBox->setTitle(tr("Card rendering"));
     displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));
-    cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
     
     handGroupBox->setTitle(tr("Hand layout"));
     horizontalHandCheckBox.setText(tr("Display hand horizontally (wastes space)"));
@@ -451,11 +446,6 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     notificationsEnabledCheckBox.setChecked(settingsCache->getNotificationsEnabled());
     connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotificationsEnabled(int)));
-    connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setSpecNotificationEnabled(int)));
-
-    specNotificationsEnabledCheckBox.setChecked(settingsCache->getSpectatorNotificationsEnabled());
-    specNotificationsEnabledCheckBox.setEnabled(settingsCache->getNotificationsEnabled());
-    connect(&specNotificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setSpectatorNotificationsEnabled(int)));
 
     doubleClickToPlayCheckBox.setChecked(settingsCache->getDoubleClickToPlay());
     connect(&doubleClickToPlayCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDoubleClickToPlay(int)));
@@ -465,9 +455,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     
     QGridLayout *generalGrid = new QGridLayout;
     generalGrid->addWidget(&notificationsEnabledCheckBox, 0, 0);
-    generalGrid->addWidget(&specNotificationsEnabledCheckBox, 1, 0);
-    generalGrid->addWidget(&doubleClickToPlayCheckBox, 2, 0);
-    generalGrid->addWidget(&playToStackCheckBox, 3, 0);
+    generalGrid->addWidget(&doubleClickToPlayCheckBox, 1, 0);
+    generalGrid->addWidget(&playToStackCheckBox, 2, 0);
     
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -511,15 +500,10 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     setLayout(mainLayout);
 }
 
-void UserInterfaceSettingsPage::setSpecNotificationEnabled(int i) {
-    specNotificationsEnabledCheckBox.setEnabled(i != 0);
-}
-
 void UserInterfaceSettingsPage::retranslateUi()
 {
     generalGroupBox->setTitle(tr("General interface settings"));
     notificationsEnabledCheckBox.setText(tr("Enable notifications in taskbar"));
-    specNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar for game events while you are spectating"));
     doubleClickToPlayCheckBox.setText(tr("&Double-click cards to play them (instead of single-click)"));
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
     animationGroupBox->setTitle(tr("Animation settings"));
@@ -546,15 +530,18 @@ void UserInterfaceSettingsPage::soundPathButtonClicked()
     settingsCache->setSoundPath(path);
 }
 
+
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
-    priceTagsCheckBox.setChecked(settingsCache->getPriceTagFeature());
-    connect(&priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
+    //priceTagsCheckBox.setChecked(settingsCache->getPriceTagFeature());
+    //connect(&priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
 
     connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
 
     QGridLayout *generalGrid = new QGridLayout;
-    generalGrid->addWidget(&priceTagsCheckBox, 0, 0);
+    //generalGrid->addWidget(&priceTagsCheckBox, 0, 0);
+    
+    generalGrid->addWidget(new QLabel(tr("Nothing is here... yet")), 0, 0);
     
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -567,18 +554,18 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
 void DeckEditorSettingsPage::retranslateUi()
 {
-    priceTagsCheckBox.setText(tr("Enable &price tag feature from deckbrew.com"));
+    //priceTagsCheckBox.setText(tr("Enable &price tag feature from deckbrew.com"));
     generalGroupBox->setTitle(tr("General"));
 }
 
-void DeckEditorSettingsPage::radioPriceTagSourceClicked(bool checked)
+/*void DeckEditorSettingsPage::radioPriceTagSourceClicked(bool checked)
 {
     if(!checked)
         return;
 
     int source=AbstractPriceUpdater::DBPriceSource;
     emit priceTagSourceChanged(source);
-}
+}*/
 
 MessagesSettingsPage::MessagesSettingsPage()
 {
@@ -828,7 +815,7 @@ void DlgSettings::closeEvent(QCloseEvent *event)
     case NotLoaded:
         loadErrorMessage =
             tr("Your card database did not finish loading\n\n"
-               "Please file a ticket at http://github.com/Daenyth/Cockatrice/issues with your cards.xml attached\n\n"
+               "Please file a ticket at http://github.com/Cockatrce/Cockatrice/issues with your cards.xml attached\n\n"
                "Would you like to change your database location setting?");
         break;
     case FileError:
@@ -844,7 +831,7 @@ void DlgSettings::closeEvent(QCloseEvent *event)
     default:
         loadErrorMessage =
             tr("Unknown card database load status\n\n"
-               "Please file a ticket at http://github.com/Daenyth/Cockatrice/issues\n\n"
+               "Please file a ticket at http://github.com/Cockatrce/Cockatrice/issues\n\n"
                "Would you like to change your database location setting?");
 
         break;
@@ -875,8 +862,8 @@ void DlgSettings::retranslateUi()
     
     generalButton->setText(tr("General"));
     appearanceButton->setText(tr("Appearance"));
-    userInterfaceButton->setText(tr("User interface"));
-    deckEditorButton->setText(tr("Deck editor"));
+    userInterfaceButton->setText(tr("User Interface"));
+    deckEditorButton->setText(tr("Deck Editor"));
     messagesButton->setText(tr("Chat Settings"));
     
     for (int i = 0; i < pagesWidget->count(); i++)

@@ -35,6 +35,8 @@ AbstractPriceUpdater::AbstractPriceUpdater(const DeckList *_deck)
  *
  * @param _deck deck.
  */
+
+
 DBPriceUpdater::DBPriceUpdater(const DeckList *_deck)
 : AbstractPriceUpdater(_deck)
 {
@@ -43,6 +45,7 @@ DBPriceUpdater::DBPriceUpdater(const DeckList *_deck)
 /**
  * Update the prices of the cards in deckList.
  */
+
 void DBPriceUpdater::updatePrices()
 {
     QString base = "https://api.deckbrew.com/mtg/cards", q = "";
@@ -103,6 +106,7 @@ void DBPriceUpdater::requestNext()
 /**
  * Called when the download of the json file with the prices is finished.
  */
+
 void DBPriceUpdater::downloadFinished()
 {
     QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
@@ -180,11 +184,12 @@ void DBPriceUpdater::downloadFinished()
             float price = edition.value("price").toMap().value("median").toString().toFloat() / 100;
             //qDebug() << "card " << name << " set " << set << " price " << price << endl;
 
-            /**
+            /*
             * Make sure Masters Edition (MED) isn't the set, as it doesn't
             * physically exist. Also check the price to see that the cheapest set
             * ends up as the final price.
             */
+
             if (set != "MED" && price > 0 && (!cardsPrice.contains(name) || cardsPrice.value(name) > price))
                 cardsPrice.insert(name, price);
         }
