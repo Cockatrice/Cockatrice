@@ -51,7 +51,7 @@ void TabMessage::addMentionTag(QString mentionTag) {
 
 void TabMessage::retranslateUi()
 {
-    messageMenu->setTitle(tr("Personal &talk"));
+    messageMenu->setTitle(tr("Private &chat"));
     aLeave->setText(tr("&Leave"));
 }
 
@@ -68,7 +68,7 @@ QString TabMessage::getUserName() const
 
 QString TabMessage::getTabText() const
 {
-    return tr("Talking to %1").arg(QString::fromStdString(otherUserInfo->name()));
+    return tr("%1 - Private chat").arg(QString::fromStdString(otherUserInfo->name()));
 }
 
 void TabMessage::closeRequest()
