@@ -31,7 +31,6 @@ public:
     virtual void updatePrices() = 0;
 };
 
-/*
 class DBPriceUpdater : public AbstractPriceUpdater
 {
     Q_OBJECT
@@ -45,5 +44,4 @@ public:
     DBPriceUpdater(const DeckList *deck);
     virtual void updatePrices();
 };
-*/
 #endif
