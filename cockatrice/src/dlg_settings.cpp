@@ -881,7 +881,7 @@ void DlgSettings::retranslateUi()
     appearanceButton->setText(tr("Appearance"));
     userInterfaceButton->setText(tr("User Interface"));
     deckEditorButton->setText(tr("Deck Editor"));
-    messagesButton->setText(tr("Chat Settings"));
+    messagesButton->setText(tr("Chat"));
     
     for (int i = 0; i < pagesWidget->count(); i++)
         dynamic_cast<AbstractSettingsPage *>(pagesWidget->widget(i))->retranslateUi();
