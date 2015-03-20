@@ -187,7 +187,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     deckToolBar->setOrientation(Qt::Vertical);
     deckToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     deckToolBar->setIconSize(QSize(24, 24));
-    deckToolBar->addAction(aUpdatePrices);
+    //deckToolBar->addAction(aUpdatePrices);
     QHBoxLayout *deckToolbarLayout = new QHBoxLayout;
     deckToolbarLayout->addStretch();
     deckToolbarLayout->addWidget(deckToolBar);
@@ -672,7 +672,7 @@ void TabDeckEditor::actDecrement()
 void TabDeckEditor::setPriceTagFeatureEnabled(int enabled)
 {
     //aUpdatePrices->setVisible(enabled);
-	aUpdatePrices->setVisible(false);
+	//aUpdatePrices->setVisible(false);
     deckModel->pricesUpdated();
 }
 
@@ -701,7 +701,7 @@ void TabDeckEditor::finishedUpdatingPrices()
 {
     deckModel->pricesUpdated();
     setModified(true);
-    aUpdatePrices->setDisabled(false);
+    //aUpdatePrices->setDisabled(false);
 }
 
 void TabDeckEditor::setDeck(DeckLoader *_deck)
