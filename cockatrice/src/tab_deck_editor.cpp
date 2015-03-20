@@ -174,12 +174,14 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     grid->addWidget(hashLabel, 2, 1);
 
     // Update price
+	/*
     aUpdatePrices = new QAction(QString(), this);
     aUpdatePrices->setIcon(QIcon(":/resources/icon_update.png"));
     connect(aUpdatePrices, SIGNAL(triggered()), this, SLOT(actUpdatePrices()));
     if (!settingsCache->getPriceTagFeature())
         aUpdatePrices->setVisible(false);
     connect(settingsCache, SIGNAL(priceTagFeatureChanged(int)), this, SLOT(setPriceTagFeatureEnabled(int)));
+	*/
 
     QToolBar *deckToolBar = new QToolBar;
     deckToolBar->setOrientation(Qt::Vertical);
@@ -299,8 +301,8 @@ void TabDeckEditor::retranslateUi()
     commentsLabel->setText(tr("&Comments:"));
     hashLabel1->setText(tr("Hash:"));
     
-    aUpdatePrices->setText(tr("&Update prices"));
-    aUpdatePrices->setShortcut(tr("Ctrl+U"));
+    //aUpdatePrices->setText(tr("&Update prices"));
+    //aUpdatePrices->setShortcut(tr("Ctrl+U"));
 
     aNewDeck->setText(tr("&New deck"));
     aLoadDeck->setText(tr("&Load deck..."));
@@ -669,7 +671,8 @@ void TabDeckEditor::actDecrement()
 
 void TabDeckEditor::setPriceTagFeatureEnabled(int enabled)
 {
-    aUpdatePrices->setVisible(enabled);
+    //aUpdatePrices->setVisible(enabled);
+	aUpdatePrices->setVisible(false);
     deckModel->pricesUpdated();
 }
 
