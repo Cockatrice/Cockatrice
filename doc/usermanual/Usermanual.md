@@ -98,7 +98,7 @@ the process so far ever again.
 
     1.  Start Git Bash and type the following command exactly:
 
-    2.  `git clone https://github.com/Daenyth/Cockatrice`
+    2.  `git clone https://github.com/Cockatrice/Cockatrice/`
 
     3.  Close Git Bash
 
@@ -214,7 +214,7 @@ FreeBSD 9.1 until the systems were updated.
     :   `pkg_add -r qt4 qt4-linguist qt4-moc qt4-qmake qt4-rcc qt4-uic git cmake protobuf`
 
 2.  Download the sources from github via
-    `git clone https://github.com/Daenyth/Cockatrice.git`
+    `git clone https://github.com/Cockatrice/Cockatrice.git`
 
 3.  To compile the sources, change into the newly created directory,
     create a build directory and invoke cmake:
@@ -1143,7 +1143,7 @@ USE AT YOUR OWN RISK.
 
 2.  Download the source code:
 
-    1.  `git clone https://github.com/Daenyth/Cockatrice`
+    1.  `git clone https://github.com/Cockatrice/Cockatrice`
 
     2.  `cd Cockatrice`
 
