@@ -98,7 +98,7 @@ the process so far ever again.
 
     1.  Start Git Bash and type the following command exactly:
 
-    2.  `git clone https://github.com/Cockatrice/Cockatrice/`
+    2.  `git clone https://github.com/Cockatrice/Cockatrice`
 
     3.  Close Git Bash
 
