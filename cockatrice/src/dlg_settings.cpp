@@ -842,7 +842,7 @@ void DlgSettings::closeEvent(QCloseEvent *event)
     case NotLoaded:
         loadErrorMessage =
             tr("Your card database did not finish loading\n\n"
-               "Please file a ticket at http://github.com/Cockatrce/Cockatrice/issues with your cards.xml attached\n\n"
+               "Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues with your cards.xml attached\n\n"
                "Would you like to change your database location setting?");
         break;
     case FileError:
@@ -858,7 +858,7 @@ void DlgSettings::closeEvent(QCloseEvent *event)
     default:
         loadErrorMessage =
             tr("Unknown card database load status\n\n"
-               "Please file a ticket at http://github.com/Cockatrce/Cockatrice/issues\n\n"
+               "Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues\n\n"
                "Would you like to change your database location setting?");
 
         break;
