@@ -173,15 +173,14 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     grid->addWidget(hashLabel1, 2, 0);
     grid->addWidget(hashLabel, 2, 1);
 
-    // Update price
-	/*
+    /* Update price
     aUpdatePrices = new QAction(QString(), this);
     aUpdatePrices->setIcon(QIcon(":/resources/icon_update.png"));
     connect(aUpdatePrices, SIGNAL(triggered()), this, SLOT(actUpdatePrices()));
     if (!settingsCache->getPriceTagFeature())
         aUpdatePrices->setVisible(false);
     connect(settingsCache, SIGNAL(priceTagFeatureChanged(int)), this, SLOT(setPriceTagFeatureEnabled(int)));
-	*/
+    */
 
     QToolBar *deckToolBar = new QToolBar;
     deckToolBar->setOrientation(Qt::Vertical);
@@ -672,7 +671,6 @@ void TabDeckEditor::actDecrement()
 void TabDeckEditor::setPriceTagFeatureEnabled(int enabled)
 {
     //aUpdatePrices->setVisible(enabled);
-	//aUpdatePrices->setVisible(false);
     deckModel->pricesUpdated();
 }
 
