@@ -32,13 +32,18 @@ def send(msg):
     sock.sendall(packed)
     sock.sendall(msg)
 
-def print_resp(typ, resp):
+def print_resp(resp):
     print "<<<"
     print repr(resp)
-    m = typ()
+    m = ServerMessage()
     m.ParseFromString(bytes(resp))
-    print "Parsed? " + str(m.IsInitialized())
     print m
+
+def recv(sock):
+    header = sock.recv(4)
+    msg_size = struct.unpack('>I', header)
+    raw_msg = sock.recv(msg_size[0])
+    print_resp(raw_msg)
 
 if __name__ == "__main__":
     print "Building registration command"
@@ -53,24 +58,14 @@ if __name__ == "__main__":
     xmlClientHack = Cmd().SerializeToString()
     send(xmlClientHack)
     print sock.recv(4096)
-
-    # start handshake
-    print ">>> handshake"
-    cmd = Cmd()
-    #cmd.cmd_id = CMD_ID
-    #CMD_ID += 1
-    print cmd
-    msg = cmd.SerializeToString()
-    send(msg)
-    print_resp(ServerId, sock.recv(4096))
+    recv(sock)
 
     print ">>> register"
     r = build_reg()
     print r
     msg = r.SerializeToString()
     send(msg)
-    resp = sock.recv(4096)
-    print_resp(ServerMessage, resp)
+    recv(sock)
 
     print "Done"
 
