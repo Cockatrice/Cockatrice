@@ -2,8 +2,11 @@
 
 import socket, sys, struct
 
+from pypb.server_message_pb2 import ServerMessage
 from pypb.session_commands_pb2 import Command_Register as Reg
 from pypb.commands_pb2 import CommandContainer as Cmd
+from pypb.event_server_identification_pb2 import Event_ServerIdentification as ServerId
+from pypb.response_pb2 import Response
 
 HOST = "localhost"
 PORT = 4747
@@ -24,9 +27,20 @@ def build_reg():
     CMD_ID += 1
     return cmd
 
+def send(msg):
+    packed = struct.pack('I', len(msg))
+    sock.sendall(packed)
+    sock.sendall(msg)
+
+def print_resp(typ, resp):
+    print "<<<"
+    print repr(resp)
+    m = typ()
+    m.ParseFromString(bytes(resp))
+    print m
+
 if __name__ == "__main__":
     print "Building registration command"
-    r = build_reg()
     print "Attempting to register"
 
     address = (HOST, PORT)
@@ -34,23 +48,24 @@ if __name__ == "__main__":
     sock.connect(address)
 
     # hack for old xml clients - server expects this and discards first message
+    print ">>> xml hack"
     xmlClientHack = Cmd().SerializeToString()
-    sock.sendall(struct.pack('I', len(xmlClientHack)))
-    sock.sendall(xmlClientHack)
-
+    send(xmlClientHack)
     print sock.recv(4096)
 
+    # start handshake
+    print ">>> handshake"
+    msg = Cmd().SerializeToString()
+    send(msg)
+    print_resp(ServerId, sock.recv(4096))
+
+    print ">>> register"
+    r = build_reg()
+    print r
     msg = r.SerializeToString()
-    packed = struct.pack('I', len(msg))
-    sock.sendall(packed)
-    sock.sendall(msg)
+    send(msg)
+    resp = sock.recv(4096)
+    print_resp(Response, resp)
 
-    print sock.recv(4096)
-
-    msg = build_reg().SerializeToString()
-    packed = struct.pack('I', len(msg))
-    sock.sendall(packed)
-    sock.sendall(msg)
-
-    print sock.recv(4096)
+    print "Done"
 
