@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSqlDatabase>
 #include <QHash>
+#include <qchar.h>
 
 #include "server.h"
 #include "server_database_interface.h"
@@ -22,7 +23,7 @@ private:
 	bool checkUserIsIpBanned(const QString &ipAddress, QString &banReason, int &banSecondsRemaining);
 	/** Must be called after checkSql and server is known to be in auth mode. */
 	bool checkUserIsNameBanned(QString const &userName, QString &banReason, int &banSecondsRemaining);
-	char getGenderChar(ServerInfo_User_Gender const &gender);
+	QChar getGenderChar(ServerInfo_User_Gender const &gender);
 protected:
 	bool usernameIsValid(const QString &user);
 	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &secondsLeft);

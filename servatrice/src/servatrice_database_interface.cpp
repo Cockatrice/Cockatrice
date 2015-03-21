@@ -9,6 +9,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QDateTime>
+#include <QChar>
 
 Servatrice_DatabaseInterface::Servatrice_DatabaseInterface(int _instanceId, Servatrice *_server)
     : instanceId(_instanceId),
@@ -143,17 +144,17 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const Q
     return true;
 }
 
-char Servatrice_DatabaseInterface::getGenderChar(ServerInfo_User_Gender const &gender)
+QChar Servatrice_DatabaseInterface::getGenderChar(ServerInfo_User_Gender const &gender)
 {
     switch (gender) {
         case ServerInfo_User_Gender_GenderUnknown:
-            return 'u';
+            return QChar('u');
         case ServerInfo_User_Gender_Male:
-            return 'm';
+            return QChar('m');
         case ServerInfo_User_Gender_Female:
-            return 'f';
+            return QChar('f');
         default:
-            return 'u';
+            return QChar('u');
     }
 }
 
