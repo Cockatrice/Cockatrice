@@ -133,15 +133,37 @@ mutating objects.)
 When pointers can't be avoided, try to use a smart pointer of some sort, such
 as `QScopedPointer`, or, less preferably, `QSharedPointer`.
 
+### Translations: introduction ###
+
+Basic workflow for translations:
+ 1. developer adds a tr("foo") string in the code;
+ 2. every few days, a mantainer updates the *_en.ts files adding the new strings;
+ 3. Trasifex picks up the new files from github every 24 hours;
+ 4. translators translate the new untraslated strings on Transifex;
+ 5. before a release, a mantainer fetches the updated translations from Transifex.
+
 ### Translations (for developers) ###
 
 All the user-interface strings inside Cockatrice's source code must be written in
 english language. Translations to other languages are managed using [Transifex](https://www.transifex.com/projects/p/cockatrice/).
 
 If you're about to propose a change that adds or modifies any translatable string
-in the code, you'll need to update the basic translation files so that translators
-are notified that new strings needs to be translated.
-To update the basic translation files, re-run cmake with enabling the appropriate
+in the code, you don't need to take care of adding the new strings to the
+translation files. Every few days, or when a lot of new strings have been added, 
+someone from the development team will take care of extracing all the new strings,
+adding them to the english translation file and making them available to
+translators on Transifex.
+
+### Translations (for mantainers) ###
+
+#### step 2: updating *_en.ts files ####
+
+When new translatable strings have been added to the code, it would be nice to
+make them available to translators on Transifex. Every few days, or when a lot
+of new strings have been added, a mantainer should take care of extracing all
+the new strings and add them to the english translation.
+
+To update the english translation files, re-run cmake enabling the appropriate
 parameter and then run make:
 
     cd cockatrice/build
@@ -169,7 +191,7 @@ Transifex will pick up the modified files automatically (checks every 24 hours)
 and update the interface where translators will be able to translate the new
 strings.
 
-### Translations (for mantainers) ###
+#### step 5: fetch new translations ####
 
 Before rushing out a new release, it would be nice to fetch the most up to date
 translations from Transifex and commit them into the Cockatrice source code.
