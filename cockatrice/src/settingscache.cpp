@@ -72,7 +72,14 @@ SettingsCache::SettingsCache()
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
     ignoreUnregisteredUserMessages = settings->value("chat/ignore_unregistered_messages", false).toBool();
 
-    attemptAutoConnect = settings->value("server/auto_connect", 0).toBool(); 
+    attemptAutoConnect = settings->value("server/auto_connect", 0).toBool();
+
+    scaleCards = settings->value("cards/scaleCards", true).toBool();
+}
+
+void SettingsCache::setCardScaling(const int _scaleCards) {
+    scaleCards = _scaleCards;
+    settings->setValue("cards/scaleCards", scaleCards);
 }
 
 void SettingsCache::setLang(const QString &_lang)

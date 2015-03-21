@@ -74,6 +74,7 @@ private:
     QString picUrlHqFallback;
     bool attemptAutoConnect;
     int pixmapCacheSize;
+    bool scaleCards;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -125,6 +126,7 @@ public:
     void copyPath(const QString &src, const QString &dst);
     bool getAutoConnect() const { return attemptAutoConnect; }
     int getPixmapCacheSize() const { return pixmapCacheSize; }
+    bool getScaleCards() const {  return scaleCards; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -169,6 +171,7 @@ public slots:
     void setPicUrlHqFallback(const QString &_picUrlHqFallback);
     void setAutoConnect(const bool &_autoConnect);
     void setPixmapCacheSize(const int _pixmapCacheSize);
+    void setCardScaling(const int _scaleCards);
 };
 
 extern SettingsCache *settingsCache;
