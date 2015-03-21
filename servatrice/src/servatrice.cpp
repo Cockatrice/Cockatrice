@@ -163,6 +163,10 @@ bool Servatrice::initServer()
     registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
     requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
 
+    qDebug() << "Registration enabled: " << registrationEnabled;
+    if (registrationEnabled)
+        qDebug() << "Require email address to register: " << requireEmailForRegistration;
+
     QString dbTypeStr = settingsCache->value("database/type").toString();
     if (dbTypeStr == "mysql")
         databaseType = DatabaseMySql;
