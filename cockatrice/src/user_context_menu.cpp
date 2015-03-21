@@ -38,7 +38,7 @@ UserContextMenu::UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *p
 void UserContextMenu::retranslateUi()
 {
     aDetails->setText(tr("User &details"));
-    aChat->setText(tr("Direct &chat"));
+    aChat->setText(tr("Private &chat"));
     aShowGames->setText(tr("Show this user's &games"));
     aAddToBuddyList->setText(tr("Add to &buddy list"));
     aRemoveFromBuddyList->setText(tr("Remove from &buddy list"));

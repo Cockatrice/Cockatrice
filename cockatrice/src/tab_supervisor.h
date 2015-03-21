@@ -59,6 +59,7 @@ private:
     int myAddTab(Tab *tab);
     void addCloseButtonToTab(Tab *tab, int tabIndex);
     QString sanitizeTabName(QString dirty) const;
+    QString sanitizeHtml(QString dirty) const;
 public:
     TabSupervisor(AbstractClient *_client, QWidget *parent = 0);
     ~TabSupervisor();

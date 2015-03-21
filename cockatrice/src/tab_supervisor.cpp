@@ -126,7 +126,10 @@ void TabSupervisor::retranslateUi()
     
     for (int i = 0; i < tabs.size(); ++i)
         if (tabs[i]) {
-            setTabText(indexOf(tabs[i]), sanitizeTabName(tabs[i]->getTabText()));
+            int idx = indexOf(tabs[i]);
+            QString tabText = tabs[i]->getTabText();
+            setTabText(idx, sanitizeTabName(tabText));
+            setTabToolTip(idx, sanitizeHtml(tabText));
             tabs[i]->retranslateUi();
         }
 }
@@ -158,11 +161,25 @@ QString TabSupervisor::sanitizeTabName(QString dirty) const
     return dirty.replace("&", "&&");
 }
 
+QString TabSupervisor::sanitizeHtml(QString dirty) const
+{
+    return dirty
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;");
+}
+
 int TabSupervisor::myAddTab(Tab *tab)
 {
     connect(tab, SIGNAL(userEvent(bool)), this, SLOT(tabUserEvent(bool)));
     connect(tab, SIGNAL(tabTextChanged(Tab *, QString)), this, SLOT(updateTabText(Tab *, QString)));
-    return addTab(tab, sanitizeTabName(tab->getTabText()));
+
+    QString tabText = tab->getTabText();
+    int idx = addTab(tab, sanitizeTabName(tabText));
+    setTabToolTip(idx, sanitizeHtml(tabText));
+
+    return idx;
 }
 
 void TabSupervisor::start(const ServerInfo_User &_userInfo)
@@ -457,7 +474,9 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
 
 void TabSupervisor::updateTabText(Tab *tab, const QString &newTabText)
 {
-    setTabText(indexOf(tab), newTabText);
+    int idx = indexOf(tab);
+    setTabText(idx, sanitizeTabName(newTabText));
+    setTabToolTip(idx, sanitizeHtml(newTabText));
 }
 
 void TabSupervisor::processRoomEvent(const RoomEvent &event)
