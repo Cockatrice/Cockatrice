@@ -28,7 +28,7 @@ def build_reg():
     return cmd
 
 def send(msg):
-    packed = struct.pack('I', len(msg))
+    packed = struct.pack('>I', len(msg))
     sock.sendall(packed)
     sock.sendall(msg)
 
@@ -37,6 +37,7 @@ def print_resp(typ, resp):
     print repr(resp)
     m = typ()
     m.ParseFromString(bytes(resp))
+    print "Parsed? " + str(m.IsInitialized())
     print m
 
 if __name__ == "__main__":
@@ -55,7 +56,11 @@ if __name__ == "__main__":
 
     # start handshake
     print ">>> handshake"
-    msg = Cmd().SerializeToString()
+    cmd = Cmd()
+    #cmd.cmd_id = CMD_ID
+    #CMD_ID += 1
+    print cmd
+    msg = cmd.SerializeToString()
     send(msg)
     print_resp(ServerId, sock.recv(4096))
 
@@ -65,7 +70,7 @@ if __name__ == "__main__":
     msg = r.SerializeToString()
     send(msg)
     resp = sock.recv(4096)
-    print_resp(Response, resp)
+    print_resp(ServerMessage, resp)
 
     print "Done"
 
