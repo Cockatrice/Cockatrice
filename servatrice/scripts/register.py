@@ -8,7 +8,10 @@ from pypb.commands_pb2 import CommandContainer as Cmd
 HOST = "localhost"
 PORT = 4747
 
+CMD_ID = 1
+
 def build_reg():
+    global CMD_ID
     cmd = Cmd()
     sc = cmd.session_command.add()
 
@@ -17,7 +20,8 @@ def build_reg():
     reg.email = "test@example.com"
     reg.password = "password"
 
-    cmd.cmd_id = 1
+    cmd.cmd_id = CMD_ID
+    CMD_ID += 1
     return cmd
 
 if __name__ == "__main__":
@@ -31,16 +35,22 @@ if __name__ == "__main__":
 
     # hack for old xml clients - server expects this and discards first message
     xmlClientHack = Cmd().SerializeToString()
-    sock.sendall(struct.pack('H', len(xmlClientHack)))
+    sock.sendall(struct.pack('I', len(xmlClientHack)))
     sock.sendall(xmlClientHack)
 
     print sock.recv(4096)
 
     msg = r.SerializeToString()
-    packed = struct.pack('H', len(msg))
+    packed = struct.pack('I', len(msg))
     sock.sendall(packed)
     sock.sendall(msg)
 
-    resp = sock.recv(4096)
-    print resp
+    print sock.recv(4096)
+
+    msg = build_reg().SerializeToString()
+    packed = struct.pack('I', len(msg))
+    sock.sendall(packed)
+    sock.sendall(msg)
+
+    print sock.recv(4096)
 
