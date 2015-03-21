@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import socket, sys, struct
+import socket, sys, struct, time
 
 from pypb.server_message_pb2 import ServerMessage
 from pypb.session_commands_pb2 import Command_Register as Reg
@@ -40,24 +40,26 @@ def print_resp(resp):
     print m
 
 def recv(sock):
+    print "< header"
     header = sock.recv(4)
-    msg_size = struct.unpack('>I', header)
-    raw_msg = sock.recv(msg_size[0])
+    msg_size = struct.unpack('>I', header)[0]
+    print "< ", msg_size
+    raw_msg = sock.recv(msg_size)
     print_resp(raw_msg)
 
 if __name__ == "__main__":
-    print "Building registration command"
-    print "Attempting to register"
-
     address = (HOST, PORT)
     sock = socket.socket()
+
+    print "Connecting to server ", address
     sock.connect(address)
 
     # hack for old xml clients - server expects this and discards first message
     print ">>> xml hack"
     xmlClientHack = Cmd().SerializeToString()
     send(xmlClientHack)
-    print sock.recv(4096)
+    print sock.recv(60)
+
     recv(sock)
 
     print ">>> register"
