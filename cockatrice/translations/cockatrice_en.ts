@@ -1776,6 +1776,16 @@ Local version is %1, remote version is %2.</source>
         <source>&amp;Help</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="427"/>
+        <source>Are you sure?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="427"/>
+        <source>There are still open games. Are you sure you want to quit?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageLogWidget</name>
@@ -3599,7 +3609,7 @@ Local version is %1, remote version is %2.</source>
         <location filename="../src/player.cpp" line="861"/>
         <location filename="../src/player.cpp" line="882"/>
         <location filename="../src/player.cpp" line="911"/>
-        <location filename="../src/player.cpp" line="2114"/>
+        <location filename="../src/player.cpp" line="2113"/>
         <source>Number:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3624,27 +3634,27 @@ Local version is %1, remote version is %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1960"/>
+        <location filename="../src/player.cpp" line="1959"/>
         <source>Set power/toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1960"/>
+        <location filename="../src/player.cpp" line="1959"/>
         <source>Please enter the new PT:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2032"/>
+        <location filename="../src/player.cpp" line="2031"/>
         <source>Set annotation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2032"/>
+        <location filename="../src/player.cpp" line="2031"/>
         <source>Please enter the new annotation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2114"/>
+        <location filename="../src/player.cpp" line="2113"/>
         <source>Set counters</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4064,42 +4074,42 @@ Local version is %1, remote version is %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="383"/>
+        <location filename="../src/tab_deck_editor.cpp" line="382"/>
         <source>Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="384"/>
+        <location filename="../src/tab_deck_editor.cpp" line="383"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="417"/>
+        <location filename="../src/tab_deck_editor.cpp" line="416"/>
         <source>Load deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="436"/>
-        <location filename="../src/tab_deck_editor.cpp" line="460"/>
-        <location filename="../src/tab_deck_editor.cpp" line="480"/>
+        <location filename="../src/tab_deck_editor.cpp" line="435"/>
+        <location filename="../src/tab_deck_editor.cpp" line="459"/>
+        <location filename="../src/tab_deck_editor.cpp" line="479"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="436"/>
+        <location filename="../src/tab_deck_editor.cpp" line="435"/>
         <source>The deck could not be saved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="460"/>
-        <location filename="../src/tab_deck_editor.cpp" line="480"/>
+        <location filename="../src/tab_deck_editor.cpp" line="459"/>
+        <location filename="../src/tab_deck_editor.cpp" line="479"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="466"/>
+        <location filename="../src/tab_deck_editor.cpp" line="465"/>
         <source>Save deck</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4332,22 +4342,17 @@ Please enter a name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="859"/>
-        <source>You are flooding the game. Please wait a couple of seconds.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/tab_game.cpp" line="1107"/>
+        <location filename="../src/tab_game.cpp" line="1096"/>
         <source>You have been kicked out of the game.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1201"/>
+        <location filename="../src/tab_game.cpp" line="1190"/>
         <source>Replay %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1203"/>
+        <location filename="../src/tab_game.cpp" line="1192"/>
         <source>Game %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4488,19 +4493,6 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_server.h" line="53"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>TabSupervisor</name>
-    <message>
-        <location filename="../src/tab_supervisor.cpp" line="137"/>
-        <source>Are you sure?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/tab_supervisor.cpp" line="137"/>
-        <source>There are still open games. Are you sure you want to quit?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
