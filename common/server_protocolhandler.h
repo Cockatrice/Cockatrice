@@ -51,7 +51,7 @@ protected:
     bool acceptsRoomListChanges;
     virtual void logDebugMessage(const QString & /* message */) { }
 private:
-    QList<int> messageSizeOverTime, messageCountOverTime;
+    QList<int> messageSizeOverTime, messageCountOverTime, commandCountOverTime;
     int timeRunning, lastDataReceived;
     QTimer *pingClock;
 
