@@ -315,7 +315,7 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
     
     if (cont.game_command_size()) {
         finalResponseCode = processGameCommandContainer(cont, responseContainer);
-        // lastDataReceived is used to determine if a room is still active.
+        // lastDataReceived is used to determine if a room or player is still active.
         // we now determine that a room is active if game actions are occurring.
         lastDataReceived = timeRunning;
     }
@@ -353,7 +353,7 @@ void Server_ProtocolHandler::pingClockTimeout()
             commandCountOverTime.removeLast();
     }
 
-    if (timeRunning - lastDataReceived > server->getMaxPlayerInactivityTime())
+    if (timeRunning - lastDataReceived > server->getMaxLimitedPlayerInactivityTime())
         prepareDestroy();
     ++timeRunning;
 }

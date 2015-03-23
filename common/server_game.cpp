@@ -203,7 +203,8 @@ void Server_Game::pingClockTimeout()
     }
     ges.sendToGame(this);
 
-    const int maxTime = room->getServer()->getMaxGameInactivityTime();
+    QStringList gameTypes = room->getGameTypes();
+    const int maxTime = (gameTypes.contains("Limited Draft / Sealed")) ? room->getServer()->getMaxLimitedGameInactivityTime() : room->getServer()->getMaxGameInactivityTime();
     if (allPlayersInactive) {
         if (((++inactivityCounter >= maxTime) && (maxTime > 0)) || (playerCount < maxPlayers))
             deleteLater();

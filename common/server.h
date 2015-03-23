@@ -54,8 +54,10 @@ public:
     virtual QString getLoginMessage() const { return QString(); }
     
     virtual bool getGameShouldPing() const { return false; }
-    virtual int getMaxGameInactivityTime() const { return 900; }
-    virtual int getMaxPlayerInactivityTime() const { return 900; }
+    virtual int getMaxLimitedGameInactivityTime() const { return 18000;} // limited games usually have 8 players, with 4 games. 5 hours should work
+    virtual int getMaxLimitedPlayerInactivityTime() const { return 18000;}
+    virtual int getMaxGameInactivityTime() const { return 5400; }
+    virtual int getMaxPlayerInactivityTime() const { return 5400; }
     virtual int getMessageCountingInterval() const { return 0; }
     virtual int getMaxMessageCountPerInterval() const { return 0; }
     virtual int getMaxMessageSizePerInterval() const { return 0; }
