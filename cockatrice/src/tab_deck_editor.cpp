@@ -675,9 +675,9 @@ void TabDeckEditor::setPriceTagFeatureEnabled(int enabled)
 }
 
 
+/*
 void TabDeckEditor::actUpdatePrices()
 {
-    /*
     aUpdatePrices->setDisabled(true);
     AbstractPriceUpdater *up;
 
@@ -691,14 +691,14 @@ void TabDeckEditor::actUpdatePrices()
      
     connect(up, SIGNAL(finishedUpdate()), this, SLOT(finishedUpdatingPrices()));
     up->updatePrices();
-    */
 }
+*/
 
 
 void TabDeckEditor::finishedUpdatingPrices()
 {
-    deckModel->pricesUpdated();
-    setModified(true);
+    //deckModel->pricesUpdated();
+    //setModified(true);
     //aUpdatePrices->setDisabled(false);
 }
 
