@@ -21,11 +21,7 @@ signals:
     void picsPathChanged();
     void cardDatabasePathChanged();
     void tokenDatabasePathChanged();
-    void handBgPathChanged();
-    void stackBgPathChanged();
-    void tableBgPathChanged();
-    void playerBgPathChanged();
-    void cardBackPicturePathChanged();
+    void themeChanged();
     void picDownloadChanged();
     void picDownloadHqChanged();
     void displayCardNamesChanged();
@@ -43,8 +39,7 @@ private:
 
     QByteArray mainWindowGeometry;
     QString lang;
-    QString deckPath, replaysPath, picsPath, cardDatabasePath, tokenDatabasePath;
-    QString handBgPath, stackBgPath, tableBgPath, playerBgPath, cardBackPicturePath;
+    QString deckPath, replaysPath, picsPath, cardDatabasePath, tokenDatabasePath, themeName;
     bool picDownload;
     bool picDownloadHq;
     bool notificationsEnabled;
@@ -84,11 +79,7 @@ public:
     QString getPicsPath() const { return picsPath; }
     QString getCardDatabasePath() const { return cardDatabasePath; }
     QString getTokenDatabasePath() const { return tokenDatabasePath; }
-    QString getHandBgPath() const { return handBgPath; }
-    QString getStackBgPath() const { return stackBgPath; }
-    QString getTableBgPath() const { return tableBgPath; }
-    QString getPlayerBgPath() const { return playerBgPath; }
-    QString getCardBackPicturePath() const { return cardBackPicturePath; }
+    QString getThemeName() const { return themeName; }
     QString getChatMentionColor() const { return chatMentionColor; }
     bool getPicDownload() const { return picDownload; }
     bool getPicDownloadHq() const { return picDownloadHq; }
@@ -135,11 +126,7 @@ public slots:
     void setPicsPath(const QString &_picsPath);
     void setCardDatabasePath(const QString &_cardDatabasePath);
     void setTokenDatabasePath(const QString &_tokenDatabasePath);
-    void setHandBgPath(const QString &_handBgPath);
-    void setStackBgPath(const QString &_stackBgPath);
-    void setTableBgPath(const QString &_tableBgPath);
-    void setPlayerBgPath(const QString &_playerBgPath);
-    void setCardBackPicturePath(const QString &_cardBackPicturePath);
+    void setThemeName(const QString &_themeName);
     void setChatMentionColor(const QString &_chatMentionColor);
     void setPicDownload(int _picDownload);
     void setPicDownloadHq(int _picDownloadHq);

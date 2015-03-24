@@ -37,6 +37,7 @@
 #include "dlg_settings.h"
 #include "carddatabase.h"
 #include "settingscache.h"
+#include "thememanager.h"
 #include "pixmapgenerator.h"
 #include "rng_sfmt.h"
 #include "soundengine.h"
@@ -48,6 +49,7 @@ QTranslator *translator, *qtTranslator;
 SettingsCache *settingsCache;
 RNG_Abstract *rng;
 SoundEngine *soundEngine;
+ThemeManager *themeManager;
 
 const QString translationPrefix = "cockatrice";
 #ifdef TRANSLATION_PATH
@@ -129,6 +131,7 @@ int main(int argc, char *argv[])
 
     rng = new RNG_SFMT;
     settingsCache = new SettingsCache;
+    themeManager = new ThemeManager;
     db = new CardDatabase;
 
     qtTranslator = new QTranslator;
@@ -161,27 +164,6 @@ int main(int argc, char *argv[])
     }
     if (!QDir().mkpath(settingsCache->getPicsPath() + "/CUSTOM"))
         qDebug() << "Could not create " + settingsCache->getPicsPath().toUtf8() + "/CUSTOM. Will fall back on default card images.";
-        
-#ifdef Q_OS_MAC
-    if(settingsCache->getHandBgPath().isEmpty() &&
-        settingsCache->getStackBgPath().isEmpty() &&
-        settingsCache->getTableBgPath().isEmpty() &&
-        settingsCache->getPlayerBgPath().isEmpty())
-    {
-        QString srcDir = QLibraryInfo::location(QLibraryInfo::DataPath);
-        QString destDir = dataDir + "/zonebg";
-        QDir tmpDir(destDir);
-        if(!tmpDir.exists())
-        {
-            // try to install the default images for the current user and set the settigs value
-            settingsCache->copyPath(srcDir + "/zonebg", destDir);
-
-            settingsCache->setHandBgPath(destDir + "/fabric_green.png");
-            settingsCache->setStackBgPath(destDir + "/fabric_red.png");
-            settingsCache->setTableBgPath(destDir + "/fabric_blue.png");
-            settingsCache->setPlayerBgPath(destDir + "/fabric_gray.png");
-        }
-    }
 
     if(settingsCache->getSoundPath().isEmpty())
     {
@@ -196,7 +178,6 @@ int main(int argc, char *argv[])
             settingsCache->setSoundPath(destDir);
         }
     }
-#endif
 
     if (!settingsValid() || db->getLoadStatus() != Ok) {
         qDebug("main(): invalid settings or load status");
@@ -207,13 +188,14 @@ int main(int argc, char *argv[])
 
     if (settingsValid()) {
         qDebug("main(): starting main program");
+
         soundEngine = new SoundEngine;
         qDebug("main(): SoundEngine constructor finished");
 
         MainWindow ui;
         qDebug("main(): MainWindow constructor finished");
 
-        QIcon icon(":/resources/appicon.svg");
+        QIcon icon("theme:appicon.svg");
         ui.setWindowIcon(icon);
 
         ui.show();

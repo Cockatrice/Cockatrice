@@ -216,7 +216,7 @@ option(WITH_CLIENT "build cockatrice" ON)
 if(WITH_CLIENT)
     add_subdirectory(cockatrice)
     add_subdirectory(sounds)
-    add_subdirectory(zonebg)
+    add_subdirectory(themes)
     SET(CPACK_INSTALL_CMAKE_PROJECTS "cockatrice;cockatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
