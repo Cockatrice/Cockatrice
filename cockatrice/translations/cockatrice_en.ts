@@ -4337,17 +4337,22 @@ Please enter a name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1095"/>
+        <location filename="../src/tab_game.cpp" line="859"/>
+        <source>You are flooding the game. Please wait a couple of seconds.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="1106"/>
         <source>You have been kicked out of the game.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1189"/>
+        <location filename="../src/tab_game.cpp" line="1200"/>
         <source>Replay %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1191"/>
+        <location filename="../src/tab_game.cpp" line="1202"/>
         <source>Game %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
