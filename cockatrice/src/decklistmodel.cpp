@@ -72,13 +72,10 @@ int DeckListModel::rowCount(const QModelIndex &parent) const
 
 int DeckListModel::columnCount(const QModelIndex &/*parent*/) const
 {
-    /* Prices Disabled
     if (settingsCache->getPriceTagFeature())
         return 3;
     else
         return 2;
-    */
-    return 2;
 }
 
 QVariant DeckListModel::data(const QModelIndex &index, int role) const
