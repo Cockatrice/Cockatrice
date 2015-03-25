@@ -115,7 +115,7 @@ public:
     bool getZoneViewPileView() const { return zoneViewPileView; }
     bool getSoundEnabled() const { return soundEnabled; }
     QString getSoundPath() const { return soundPath; }
-    bool getPriceTagFeature() const { return priceTagFeature; }
+    bool getPriceTagFeature() const { return false; /* #859; priceTagFeature;*/ }
     int getPriceTagSource() const { return priceTagSource; }
     bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
     bool getIgnoreUnregisteredUserMessages() const { return ignoreUnregisteredUserMessages; }
