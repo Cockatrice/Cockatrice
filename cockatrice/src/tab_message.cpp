@@ -6,6 +6,10 @@
 #include "tab_message.h"
 #include "abstractclient.h"
 #include "chatview.h"
+#include "main.h"
+#include "settingscache.h"
+#include <QSystemTrayIcon>
+#include <QApplication>
 
 #include "pending_command.h"
 #include "pb/session_commands.pb.h"
@@ -107,7 +111,27 @@ void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
 {
     const UserLevelFlags userLevel(event.sender_name() == otherUserInfo->name() ? otherUserInfo->user_level() : ownUserInfo->user_level());
     chatView->appendMessage(QString::fromStdString(event.message()), QString::fromStdString(event.sender_name()), userLevel, true);
+    if (settingsCache->getShowMessagePopup() && shouldShowSystemPopup(event))
+        showSystemPopup(event);
+
     emit userEvent();
+}
+
+bool TabMessage::shouldShowSystemPopup(const Event_UserMessage &event) {
+    return (event.sender_name() == otherUserInfo->name() && 
+        tabSupervisor->currentIndex() != tabSupervisor->indexOf(this)) ||
+        QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0;
+}
+
+void TabMessage::showSystemPopup(const Event_UserMessage &event) {
+    disconnect(trayIcon, SIGNAL(messageClicked()), 0, 0);
+    trayIcon->showMessage(tr("Private message from ") + otherUserInfo->name().c_str(), event.message().c_str());
+    connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
+}
+
+void TabMessage::messageClicked() {
+    tabSupervisor->setCurrentIndex(tabSupervisor->indexOf(this));
+    QApplication::setActiveWindow(this);
 }
 
 void TabMessage::processUserLeft()

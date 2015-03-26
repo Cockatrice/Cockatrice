@@ -5,6 +5,7 @@
 #include <QDesktopServices>
 #include <QApplication>
 #include <QDebug>
+#include <QSystemTrayIcon>
 #include "chatview.h"
 #include "user_level.h"
 #include "user_context_menu.h"
@@ -223,6 +224,10 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                 cursor.insertText("@" + userName, mentionFormat);
                 message = message.mid(mention.size());
                 QApplication::alert(this);
+                if (shouldShowSystemPopup()) {
+                    QString ref = sender.left(sender.length() - 2);
+                    showSystemPopup(ref);
+                }
             } else {
                 int mentionEndIndex = message.indexOf(QRegExp("\\W"), 1);// from 1 as @ is non-char
                 if (mentionEndIndex == -1)
@@ -250,6 +255,22 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     if (atBottom)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }
+
+void ChatView::actMessageClicked() {
+    emit messageClickedSignal();
+}
+
+bool ChatView::shouldShowSystemPopup() {
+    return tabSupervisor->currentIndex() != tabSupervisor->indexOf(this) ||
+        QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0;
+}
+
+void ChatView::showSystemPopup(QString &sender) {
+    disconnect(trayIcon, SIGNAL(messageClicked()), 0, 0);
+    trayIcon->showMessage(sender + tr(" mentioned you."), tr("Click to view"));
+    connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(actMessageClicked()));
+}
+
 
 QColor ChatView::getCustomMentionColor() {
     QColor customColor;

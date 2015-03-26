@@ -21,6 +21,7 @@
 #define WINDOW_H
 
 #include <QMainWindow>
+#include <QSystemTrayIcon>
 #include "abstractclient.h"
 #include "pb/response.pb.h"
 
@@ -56,17 +57,27 @@ private slots:
     void actExit();
     
     void actAbout();
+
+    void iconActivated(QSystemTrayIcon::ActivationReason reason);
 private:
     static const QString appName;
     void setClientStatusTitle();
     void retranslateUi();
     void createActions();
     void createMenus();
+
+    void createTrayIcon();
+    void createTrayActions();
+
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *helpMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
         *aAbout;
     TabSupervisor *tabSupervisor;
+
+    QMenu *trayIconMenu;
+
+    QAction *closeAction;
 
     RemoteClient *client;
     QThread *clientThread;

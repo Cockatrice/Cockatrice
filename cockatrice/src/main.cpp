@@ -31,6 +31,7 @@
 #include <QDir>
 #include <QDesktopServices>
 #include <QDebug>
+#include <QSystemTrayIcon>
 
 #include "main.h"
 #include "window_main.h"
@@ -48,6 +49,8 @@ QTranslator *translator, *qtTranslator;
 SettingsCache *settingsCache;
 RNG_Abstract *rng;
 SoundEngine *soundEngine;
+QSystemTrayIcon *trayIcon;
+
 
 const QString translationPrefix = "cockatrice";
 #ifdef TRANSLATION_PATH

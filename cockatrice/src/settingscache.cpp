@@ -75,11 +75,23 @@ SettingsCache::SettingsCache()
     attemptAutoConnect = settings->value("server/auto_connect", 0).toBool();
 
     scaleCards = settings->value("cards/scaleCards", true).toBool();
+    showMessagePopups = settings->value("chat/showmessagepopups", true).toBool();
+    showMentionPopups = settings->value("chat/showmentionpopups", true).toBool();
 }
 
 void SettingsCache::setCardScaling(const int _scaleCards) {
     scaleCards = _scaleCards;
     settings->setValue("cards/scaleCards", scaleCards);
+}
+
+void SettingsCache::setShowMessagePopups(const int _showMessagePopups) {
+    showMessagePopups = _showMessagePopups;
+    settings->setValue("chat/showmessagepopups", showMessagePopups);
+}
+
+void SettingsCache::setShowMentionPopups(const int _showMentionPopus) {
+    showMentionPopups = _showMentionPopus;
+    settings->setValue("chat/showmentionpopups", showMentionPopups);
 }
 
 void SettingsCache::setLang(const QString &_lang)

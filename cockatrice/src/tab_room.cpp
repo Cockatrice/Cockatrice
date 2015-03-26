@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QToolButton>
 #include <QSplitter>
+#include <QApplication>
 #include "tab_supervisor.h"
 #include "tab_room.h"
 #include "tab_userlists.h"
@@ -42,6 +43,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
 
     chatView = new ChatView(tabSupervisor, 0, true);
+    connect(chatView, SIGNAL(messageClickedSignal()), this, SLOT(focusTab()));
     connect(chatView, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
     connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
@@ -123,6 +125,11 @@ void TabRoom::retranslateUi()
     aLeaveRoom->setText(tr("&Leave room"));
     aClearChat->setText(tr("&Clear chat"));
     aOpenChatSettings->setText(tr("Chat Settings..."));
+}
+
+void TabRoom::focusTab() {
+    QApplication::setActiveWindow(this);
+    tabSupervisor->setCurrentIndex(tabSupervisor->indexOf(this));
 }
 
 void TabRoom::closeRequest()
