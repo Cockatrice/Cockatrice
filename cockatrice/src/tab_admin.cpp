@@ -51,7 +51,7 @@ int ShutdownDialog::getMinutes() const
 }
 
 TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _fullAdmin, QWidget *parent)
-    : Tab(_tabSupervisor, parent), locked(true), client(_client), fullAdmin(_fullAdmin)
+    : Tab(_tabSupervisor, parent), locked(false), client(_client), fullAdmin(_fullAdmin)
 {
     updateServerMessageButton = new QPushButton;
     connect(updateServerMessageButton, SIGNAL(clicked()), this, SLOT(actUpdateServerMessage()));
@@ -65,12 +65,12 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
     
     adminGroupBox = new QGroupBox;
     adminGroupBox->setLayout(vbox);
-    adminGroupBox->setEnabled(false);
+    adminGroupBox->setEnabled(true);
     
     unlockButton = new QPushButton;
+    unlockButton->setEnabled(false);
     connect(unlockButton, SIGNAL(clicked()), this, SLOT(actUnlock()));
     lockButton = new QPushButton;
-    lockButton->setEnabled(false);
     connect(lockButton, SIGNAL(clicked()), this, SLOT(actLock()));
     
     QVBoxLayout *mainLayout = new QVBoxLayout;
