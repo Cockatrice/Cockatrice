@@ -268,6 +268,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
         default:
             QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)));
     }
+    actConnect();
 }
 
 void MainWindow::socketError(const QString &errorStr)
