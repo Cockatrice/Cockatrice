@@ -8,7 +8,7 @@
     <message>
         <source>The following sets has been found in the source file. Please mark the sets that will be imported.
 All core and expansion sets are selected by default.</source>
-        <translation>ソースファイルからこれらのカードセットが見つかりました。インポートするセットにチェックしてください。
+        <translation>ソースファイルから以下のカードセットが見つかりました。インポートするセットにチェックしてください。
  すべての基本セットと拡張セットはデフォルトで選択されています。</translation>
     </message>
     <message>
@@ -169,7 +169,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>The following sets has been imported. Press &quot;Save&quot; to save the imported cards to the Cockatrice database.</source>
-        <translation>これらのカードセットがインポートされます。”保存”をクリックするとインポートしたカードをCockatriceデータベースに保存します。</translation>
+        <translation>以下のカードセットがインポートされます。”保存”をクリックするとインポートしたカードをCockatriceデータベースに保存します。</translation>
     </message>
     <message>
         <source>Save to the default path (recommended)</source>

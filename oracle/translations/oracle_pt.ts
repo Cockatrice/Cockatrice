@@ -3,7 +3,7 @@
     <name>ChooseSetsPage</name>
     <message>
         <source>Sets selection</source>
-        <translation type="unfinished"/>
+        <translation>Seleção das edições</translation>
     </message>
     <message>
         <source>The following sets has been found in the source file. Please mark the sets that will be imported.
@@ -20,18 +20,18 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erro</translation>
     </message>
     <message>
         <source>Please mark at least one set.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor, marque pelo menos uma edição.</translation>
     </message>
 </context>
 <context>
     <name>IntroPage</name>
     <message>
         <source>Introduction</source>
-        <translation type="unfinished"/>
+        <translation>Introdução</translation>
     </message>
     <message>
         <source>English</source>
@@ -39,7 +39,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Language:</source>
-        <translation type="unfinished"/>
+        <translation>Língua:</translation>
     </message>
     <message>
         <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
@@ -50,7 +50,7 @@ All core and expansion sets are selected by default.</source>
     <name>LoadSetsPage</name>
     <message>
         <source>Source selection</source>
-        <translation type="unfinished"/>
+        <translation>Selecção da fonte</translation>
     </message>
     <message>
         <source>Please specify a source for the list of sets and cards. You can specify an url address that will be download or use an existing file from your computer.</source>
@@ -62,7 +62,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Local file:</source>
-        <translation type="unfinished"/>
+        <translation>Ficheiro local:</translation>
     </message>
     <message>
         <source>Restore default url</source>
@@ -70,11 +70,11 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Choose file...</source>
-        <translation type="unfinished"/>
+        <translation>Escolher ficheiro...</translation>
     </message>
     <message>
         <source>Load sets file</source>
-        <translation type="unfinished"/>
+        <translation>Carregar ficheiro das edições</translation>
     </message>
     <message>
         <source>Sets JSON file (*.json *.zip)</source>
@@ -86,23 +86,23 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erro</translation>
     </message>
     <message>
         <source>The provided url is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>O url providenciado não é válido.</translation>
     </message>
     <message>
         <source>Downloading (0MB)</source>
-        <translation type="unfinished"/>
+        <translation>A efectuar download (0MB)</translation>
     </message>
     <message>
         <source>Please choose a file.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor escolha um ficheiro.</translation>
     </message>
     <message>
         <source>Cannot open file &apos;%1&apos;.</source>
-        <translation type="unfinished"/>
+        <translation>Impossível abrir ficheiro &apos;%1&apos;.</translation>
     </message>
     <message>
         <source>Downloading (%1MB)</source>
@@ -110,7 +110,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Network error: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Erro da rede: %1.</translation>
     </message>
     <message>
         <source>Parsing file</source>
@@ -118,7 +118,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Failed to open Zip archive: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Abrir archivo zip falhou: %1.</translation>
     </message>
     <message>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
@@ -126,7 +126,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Zip extraction failed: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Extração do Zip falhada: %1.</translation>
     </message>
     <message>
         <source>Sorry, this version of Oracle does not support zipped files.</source>
@@ -152,18 +152,18 @@ All core and expansion sets are selected by default.</source>
     <name>OracleWizard</name>
     <message>
         <source>Oracle Importer</source>
-        <translation type="unfinished"/>
+        <translation>Importar Oracle</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"/>
+        <translation>Guardar</translation>
     </message>
 </context>
 <context>
     <name>SaveSetsPage</name>
     <message>
         <source>Sets imported</source>
-        <translation type="unfinished"/>
+        <translation>Edições importadas</translation>
     </message>
     <message>
         <source>The following sets has been imported. Press &quot;Save&quot; to save the imported cards to the Cockatrice database.</source>
@@ -175,7 +175,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erro</translation>
     </message>
     <message>
         <source>No set has been imported.</source>
@@ -187,7 +187,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>%1: %2 cards imported</source>
-        <translation type="unfinished"/>
+        <translation>%1. %2 cartas importadas</translation>
     </message>
     <message>
         <source>Save card database</source>
@@ -199,7 +199,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Success</source>
-        <translation type="unfinished"/>
+        <translation>Sucedido</translation>
     </message>
     <message>
         <source>The card database has been saved successfully to
@@ -235,15 +235,15 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Corrupted archive.</source>
-        <translation type="unfinished"/>
+        <translation>Archivo corrompido.</translation>
     </message>
     <message>
         <source>Wrong password.</source>
-        <translation type="unfinished"/>
+        <translation>Senha incorrecta.</translation>
     </message>
     <message>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation>Ainda não foi criado nenhum arquivo</translation>
     </message>
     <message>
         <source>File or directory does not exist.</source>
@@ -279,7 +279,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro desconhecido.</translation>
     </message>
 </context>
 <context>
@@ -322,7 +322,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro desconhecido.</translation>
     </message>
 </context>
 </TS>
