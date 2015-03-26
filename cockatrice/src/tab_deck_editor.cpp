@@ -173,19 +173,20 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     grid->addWidget(hashLabel1, 2, 0);
     grid->addWidget(hashLabel, 2, 1);
 
-    // Update price
+    /* Update price
     aUpdatePrices = new QAction(QString(), this);
     aUpdatePrices->setIcon(QIcon(":/resources/icon_update.png"));
     connect(aUpdatePrices, SIGNAL(triggered()), this, SLOT(actUpdatePrices()));
     if (!settingsCache->getPriceTagFeature())
         aUpdatePrices->setVisible(false);
     connect(settingsCache, SIGNAL(priceTagFeatureChanged(int)), this, SLOT(setPriceTagFeatureEnabled(int)));
+    */
 
     QToolBar *deckToolBar = new QToolBar;
     deckToolBar->setOrientation(Qt::Vertical);
     deckToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     deckToolBar->setIconSize(QSize(24, 24));
-    deckToolBar->addAction(aUpdatePrices);
+    //deckToolBar->addAction(aUpdatePrices);
     QHBoxLayout *deckToolbarLayout = new QHBoxLayout;
     deckToolbarLayout->addStretch();
     deckToolbarLayout->addWidget(deckToolBar);
@@ -299,8 +300,8 @@ void TabDeckEditor::retranslateUi()
     commentsLabel->setText(tr("&Comments:"));
     hashLabel1->setText(tr("Hash:"));
     
-    aUpdatePrices->setText(tr("&Update prices"));
-    aUpdatePrices->setShortcut(tr("Ctrl+U"));
+    //aUpdatePrices->setText(tr("&Update prices"));
+    //aUpdatePrices->setShortcut(tr("Ctrl+U"));
 
     aNewDeck->setText(tr("&New deck"));
     aLoadDeck->setText(tr("&Load deck..."));
@@ -669,10 +670,12 @@ void TabDeckEditor::actDecrement()
 
 void TabDeckEditor::setPriceTagFeatureEnabled(int enabled)
 {
-    aUpdatePrices->setVisible(enabled);
+    //aUpdatePrices->setVisible(enabled);
     deckModel->pricesUpdated();
 }
 
+
+/*
 void TabDeckEditor::actUpdatePrices()
 {
     aUpdatePrices->setDisabled(true);
@@ -689,12 +692,14 @@ void TabDeckEditor::actUpdatePrices()
     connect(up, SIGNAL(finishedUpdate()), this, SLOT(finishedUpdatingPrices()));
     up->updatePrices();
 }
+*/
+
 
 void TabDeckEditor::finishedUpdatingPrices()
 {
-    deckModel->pricesUpdated();
-    setModified(true);
-    aUpdatePrices->setDisabled(false);
+    //deckModel->pricesUpdated();
+    //setModified(true);
+    //aUpdatePrices->setDisabled(false);
 }
 
 void TabDeckEditor::setDeck(DeckLoader *_deck)
