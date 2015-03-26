@@ -4,6 +4,7 @@
 #include "carditem.h"
 #include "soundengine.h"
 #include "tab_supervisor.h"
+#include "settingscache.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/context_move_card.pb.h"
 #include "pb/context_mulligan.pb.h"
@@ -21,7 +22,7 @@ QString MessageLogWidget::sanitizeHtml(QString dirty) const
 
 QString MessageLogWidget::cardLink(const QString &cardName) const
 {
-    return QString("<a href=\"card://%1\">%2</a>").arg(cardName).arg(cardName);
+    return QString("<i><a href=\"card://%1\">%2</a></i>").arg(cardName).arg(cardName);
 }
 
 bool MessageLogWidget::isFemale(Player *player) const
@@ -37,9 +38,9 @@ bool MessageLogWidget::userIsFemale() const
 void MessageLogWidget::logGameJoined(int gameId)
 {
     if (userIsFemale())
-        appendHtmlServerMessage(tr("You have joined game #%1.", "female").arg(gameId));
+        appendHtmlServerMessage(tr("You have joined game #%1.", "female").arg("<font color=\"blue\">"+ QString::number(gameId) + "</font>"));
     else
-        appendHtmlServerMessage(tr("You have joined game #%1.", "male").arg(gameId));
+        appendHtmlServerMessage(tr("You have joined game #%1.", "male").arg("<font color=\"blue\">"+ QString::number(gameId) + "</font>"));
 }
 
 void MessageLogWidget::logReplayStarted(int gameId)
@@ -95,7 +96,7 @@ void MessageLogWidget::logDeckSelect(Player *player, QString deckHash, int sideb
     else
         appendHtmlServerMessage(tr("%1 has loaded a deck with %2 sideboard cards (%3).", gender).
                 arg(sanitizeHtml(player->getName())).
-                arg(sideboardSize).
+                arg("<font color=\"blue\">" + QString::number(sideboardSize) + "</font>").
                 arg(deckHash));
 }
 
@@ -183,9 +184,9 @@ void MessageLogWidget::logShuffle(Player *player, CardZone *zone)
 void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
 {
     if (isFemale(player))
-        appendHtmlServerMessage(tr("%1 rolls a %2 with a %3-sided die.", "female").arg(sanitizeHtml(player->getName())).arg(roll).arg(sides));
+        appendHtmlServerMessage(tr("%1 rolls a %2 with a %3-sided die.", "female").arg(sanitizeHtml(player->getName())).arg("<font color=\"blue\">" + QString::number(roll) + "</font>").arg("<font color=\"blue\">" + QString::number(sides) + "</font>"));
     else
-        appendHtmlServerMessage(tr("%1 rolls a %2 with a %3-sided die.", "male").arg(sanitizeHtml(player->getName())).arg(roll).arg(sides));
+        appendHtmlServerMessage(tr("%1 rolls a %2 with a %3-sided die.", "male").arg(sanitizeHtml(player->getName())).arg("<font color=\"blue\">" + QString::number(roll) + "</font>").arg("<font color=\"blue\">" + QString::number(sides) + "</font>"));
 }
 
 void MessageLogWidget::logDrawCards(Player *player, int number)
@@ -195,9 +196,9 @@ void MessageLogWidget::logDrawCards(Player *player, int number)
     else {
         soundEngine->draw();
         if (isFemale(player))
-            appendHtmlServerMessage(tr("%1 draws %n card(s).", "female", number).arg(sanitizeHtml(player->getName())));
+            appendHtmlServerMessage(tr("%1 draws %2 card(s).", "female").arg(sanitizeHtml(player->getName())).arg("<font color=\"blue\">" + QString::number(number) + "</font>"));
         else
-            appendHtmlServerMessage(tr("%1 draws %n card(s).", "male", number).arg(sanitizeHtml(player->getName())));
+            appendHtmlServerMessage(tr("%1 draws %2 card(s).", "male").arg(sanitizeHtml(player->getName())).arg("<font color=\"blue\">" + QString::number(number) + "</font>"));
     }
 }
 
@@ -290,7 +291,7 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
         cardStr = cardLink(cardName);
     
     if (ownerChange && (attributes.startZone->getPlayer() == attributes.player)) {
-        appendHtml(tr("%1 gives %2 control over %3.").arg(sanitizeHtml(attributes.player->getName())).arg(sanitizeHtml(attributes.targetZone->getPlayer()->getName())).arg(cardStr));
+        appendHtmlServerMessage(tr("%1 gives %2 control over %3.").arg(sanitizeHtml(attributes.player->getName())).arg(sanitizeHtml(attributes.targetZone->getPlayer()->getName())).arg(cardStr));
         return;
     }
     
@@ -545,14 +546,14 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
     int delta = abs(oldValue - value);
     if (value > oldValue) {
         if (isFemale(player))
-            finalStr = tr("%1 places %n %2 counter(s) on %3 (now %4).", "female", delta);
+            finalStr = tr("%1 places %2 %3 counter(s) on %4 (now %5).", "female");
         else
-            finalStr = tr("%1 places %n %2 counter(s) on %3 (now %4).", "male", delta);
+            finalStr = tr("%1 places %2 %3 counter(s) on %4 (now %5).", "male");
     } else {
         if (isFemale(player))
-            finalStr = tr("%1 removes %n %2 counter(s) from %3 (now %4).", "female", delta);
+            finalStr = tr("%1 removes %2 %3 counter(s) from %4 (now %5).", "female");
         else
-            finalStr = tr("%1 removes %n %2 counter(s) from %3 (now %4).", "male", delta);
+            finalStr = tr("%1 removes %2 %3 counter(s) from %4 (now %5).", "male");
     }
     
     switch (counterId) {
@@ -562,7 +563,7 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
         default: ;
     }
     
-    appendHtmlServerMessage(finalStr.arg(sanitizeHtml(player->getName())).arg(colorStr).arg(cardLink(cardName)).arg(value));
+    appendHtmlServerMessage(finalStr.arg(sanitizeHtml(player->getName())).arg("<font color=\"blue\">" + QString::number(delta) + "</font>").arg(colorStr).arg(cardLink(cardName)).arg(value));
 }
 
 void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
@@ -667,9 +668,9 @@ void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCar
          .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
     else
         appendHtmlServerMessage((isFemale(player)
-            ? tr("%1 is looking at the top %n card(s) %2.", "female", numberCards)
-            : tr("%1 is looking at the top %n card(s) %2.", "male", numberCards)
-        ).arg(sanitizeHtml(player->getName()))
+            ? tr("%1 is looking at the top %2 card(s) %3.", "female")
+            : tr("%1 is looking at the top %2 card(s) %3.", "male")
+        ).arg(sanitizeHtml(player->getName())).arg("<font color=\"blue\">" + QString::number(numberCards) + "</font>")
          .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone)));
 }
 
@@ -798,7 +799,8 @@ void MessageLogWidget::logSetActivePlayer(Player *player)
         str = tr("It is now %1's turn.", "female");
     else
         str = tr("It is now %1's turn.", "male");
-    appendHtml("<br><font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + str.arg(player->getName()) + "</b></font><br>");
+    QString fontColor = (player->getName().compare(QString(tabSupervisor->getUserInfo()->name().c_str())) == 0) ? "#" + settingsCache->getChatMentionColor(): "#0041FF";
+    appendHtml("<br><font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + str.arg("<font color=" + fontColor + ">" + player->getName() + "</font>") + "</b></font><br>");
 }
 
 void MessageLogWidget::logSetActivePhase(int phase)

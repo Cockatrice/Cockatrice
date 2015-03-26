@@ -89,6 +89,7 @@ void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
     anchorFormat.setForeground(Qt::blue);
     anchorFormat.setAnchor(true);
     anchorFormat.setAnchorHref("card://" + cardName);
+    anchorFormat.setFontItalic(true);
     
     cursor.setCharFormat(anchorFormat);
     cursor.insertText(cardName);
@@ -122,7 +123,9 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     
     if (showTimestamps && !sameSender) {
         QTextCharFormat timeFormat;
-        timeFormat.setForeground(Qt::black);
+        timeFormat.setForeground(QColor(SERVER_MESSAGE_COLOR));
+        if (sender.isEmpty())
+            timeFormat.setFontWeight(QFont::Bold);
         cursor.setCharFormat(timeFormat);
         cursor.insertText(QDateTime::currentDateTime().toString("[hh:mm:ss] "));
     }
@@ -153,8 +156,10 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
         cursor.insertText("    ");
     
     QTextCharFormat messageFormat;
-    if (sender.isEmpty())
+    if (sender.isEmpty()) {
         messageFormat.setForeground(Qt::darkGreen);
+        messageFormat.setFontWeight(QFont::Bold);
+    }
     cursor.setCharFormat(messageFormat);
     
     int from = 0, index = 0, bracket = 0, at = 0;
