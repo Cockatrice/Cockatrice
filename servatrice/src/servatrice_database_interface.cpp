@@ -35,7 +35,9 @@ void Servatrice_DatabaseInterface::initDatabase(const QSqlDatabase &_sqlDatabase
     }
 }
 
-void Servatrice_DatabaseInterface::initDatabase(const QString &type, const QString &hostName, const QString &databaseName, const QString &userName, const QString &password)
+bool Servatrice_DatabaseInterface::initDatabase(const QString &type, const QString &hostName,
+                                                const QString &databaseName, const QString &userName,
+                                                const QString &password)
 {
     sqlDatabase = QSqlDatabase::addDatabase(type, "main");
     sqlDatabase.setHostName(hostName);
@@ -43,7 +45,7 @@ void Servatrice_DatabaseInterface::initDatabase(const QString &type, const QStri
     sqlDatabase.setUserName(userName);
     sqlDatabase.setPassword(password);
     
-    openDatabase();
+    return openDatabase();
 }
 
 bool Servatrice_DatabaseInterface::openDatabase()

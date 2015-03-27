@@ -179,12 +179,17 @@ bool Servatrice::initServer()
     if (databaseType != DatabaseNone) {
         settingsCache->beginGroup("database");
         dbPrefix = settingsCache->value("prefix").toString();
-        servatriceDatabaseInterface->initDatabase("QMYSQL",
-                              settingsCache->value("hostname").toString(),
-                              settingsCache->value("database").toString(),
-                              settingsCache->value("user").toString(),
-                              settingsCache->value("password").toString());
+        bool dbOpened =
+            servatriceDatabaseInterface->initDatabase("QMYSQL",
+                 settingsCache->value("hostname").toString(),
+                 settingsCache->value("database").toString(),
+                 settingsCache->value("user").toString(),
+                 settingsCache->value("password").toString());
         settingsCache->endGroup();
+        if (!dbOpened) {
+            qDebug() << "Failed to open database";
+            return false;
+        }
 
         updateServerList();
 

@@ -33,7 +33,8 @@ public slots:
 public:
 	Servatrice_DatabaseInterface(int _instanceId, Servatrice *_server);
 	~Servatrice_DatabaseInterface();
-	void initDatabase(const QString &type, const QString &hostName, const QString &databaseName, const QString &userName, const QString &password);
+	bool initDatabase(const QString &type, const QString &hostName, const QString &databaseName,
+					  const QString &userName, const QString &password);
 	bool openDatabase();
 	bool checkSql();
 	QSqlQuery * prepareQuery(const QString &queryText);
