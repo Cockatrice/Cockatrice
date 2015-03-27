@@ -347,7 +347,7 @@ bool Servatrice::initServer()
 	if (gameServer->listen(QHostAddress::Any, gamePort))
 		qDebug() << "Server listening.";
 	else {
-		qDebug() << "gameServer->listen(): Error.";
+		qDebug() << "gameServer->listen(): Error:" << gameServer->errorString();
 		return false;
 	}
 	return true;
